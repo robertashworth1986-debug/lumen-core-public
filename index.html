@@ -69,3 +69,39 @@
 
 </body>
 </html>
+<script>
+async function loadData() {
+    try {
+        const res = await fetch('simulate.json');
+        const data = await res.json();
+
+        document.getElementById("stability").innerText = data.grid_stability + "%";
+        document.getElementById("latency").innerText = data.latency + "s";
+        document.getElementById("gain").innerText = "+" + data.optimization_gain + "%";
+
+    } catch (e) {
+        console.log("Data load failed", e);
+    }
+}
+
+loadData();
+</script>
+<div class="metric">Grid Stability Index: <b id="stability">--</b></div>
+<div class="metric">Drift Detection Latency: <b id="latency">--</b></div>
+<div class="metric">Optimization Gain: <b id="gain">--</b></div>
+
+<script>
+async function loadData() {
+    try {
+        const res = await fetch('simulate.json');
+        const data = await res.json();
+
+        document.getElementById("stability").innerText = data.grid_stability + "%";
+        document.getElementById("latency").innerText = data.latency + "s";
+        document.getElementById("gain").innerText = "+" + data.optimization_gain + "%";
+    } catch (e) {
+        console.log("Data load failed", e);
+    }
+}
+loadData();
+</script>
