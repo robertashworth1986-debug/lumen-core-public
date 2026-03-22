@@ -1,0 +1,4 @@
+=== LUMENCORE PROOF LEDGER ===
+Timestamp: 20260322T023758Z
+Founder: Robert Ashworth
+System: FlowForm / EtherFrame / LumenShell
