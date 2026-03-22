@@ -1,107 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>LumenCore™</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(circle at center, #0f172a, #020617);
-      color: white;
-      text-align: center;
-    }
-    .container {
-      padding: 80px 20px;
-    }
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 10px;
-    }
-    h2 {
-      font-weight: 300;
-      color: #38bdf8;
-    }
-    .card {
-      margin: 40px auto;
-      padding: 20px;
-      max-width: 600px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-    }
-    .btn {
-      margin-top: 20px;
-      display: inline-block;
-      padding: 12px 20px;
-      background: #38bdf8;
-      color: black;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LumenCore™</title>
+
+<style>
+body {
+    margin:0;
+    font-family:Arial;
+    background: radial-gradient(circle at center, #020617, #000);
+    color:white;
+    text-align:center;
+}
+
+h1 {
+    font-size:60px;
+    margin-top:40px;
+}
+
+.sub {
+    color:#38bdf8;
+    font-size:20px;
+    margin-bottom:30px;
+}
+
+.card {
+    background:rgba(255,255,255,0.05);
+    padding:25px;
+    margin:20px auto;
+    max-width:800px;
+    border-radius:15px;
+    box-shadow:0 0 25px rgba(56,189,248,0.2);
+}
+
+.metric {
+    font-size:22px;
+    margin:10px;
+}
+
+.btn {
+    background:#22d3ee;
+    padding:15px 30px;
+    border-radius:10px;
+    color:black;
+    font-weight:bold;
+    display:inline-block;
+    margin-top:20px;
+    text-decoration:none;
+}
+
+#pulse {
+    width:200px;
+    height:200px;
+    margin:40px auto;
+    border-radius:50%;
+    background:#22d3ee;
+    animation:pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform:scale(1); opacity:0.6; }
+    50% { transform:scale(1.2); opacity:0.2; }
+    100% { transform:scale(1); opacity:0.6; }
+}
+</style>
 </head>
+
 <body>
 
-<div class="container">
-  <h1>LumenCore™</h1>
-  <h2>Adaptive Intelligence for Infrastructure Optimization</h2>
+<h1>LumenCore™</h1>
+<div class="sub">Adaptive Intelligence for Infrastructure Optimization</div>
 
-  <div class="card">
-    <p>
-      LumenCore is a next-generation system designed to detect inefficiencies,
-      predict failure points, and optimize performance across energy, telecom,
-      and data infrastructure in real time.
-    </p>
-  </div>
+<div id="pulse"></div>
 
-  <div class="card">
-    <h3>Core Capabilities</h3>
-    <p>• Signal Analysis & Drift Detection</p>
-    <p>• AI-Driven Optimization Models</p>
-    <p>• Monte Carlo Flow Simulations</p>
-    <p>• Real-Time Infrastructure Intelligence</p>
-  </div>
-
-  <a class="btn" href="#">Request Access</a>
+<div class="card">
+<h2>Core Capabilities</h2>
+<p>Signal Analysis & Drift Detection</p>
+<p>AI Optimization Models</p>
+<p>Monte Carlo Flow Systems</p>
+<p>Real-Time Infrastructure Intelligence</p>
 </div>
+
+<div class="card">
+<h2>Live System Metrics</h2>
+<div class="metric">Grid Stability: <span id="s"></span></div>
+<div class="metric">Latency: <span id="l"></span></div>
+<div class="metric">Optimization Gain: <span id="g"></span></div>
+</div>
+
+<div class="card">
+<h2>System Status</h2>
+<p>Mode: ACTIVE</p>
+<p>Engine: LumenCore vNext</p>
+<p>Status: STABLE</p>
+</div>
+
+<a class="btn" href="#">Request Access</a>
+
+<script>
+function update() {
+    document.getElementById("s").innerText = (97 + Math.random()*3).toFixed(2) + "%";
+    document.getElementById("l").innerText = (0.3 + Math.random()*0.3).toFixed(3) + "s";
+    document.getElementById("g").innerText = "+" + (15 + Math.random()*10).toFixed(2) + "%";
+}
+setInterval(update, 1000);
+update();
+</script>
 
 </body>
 </html>
-<script>
-async function loadData() {
-    try {
-        const res = await fetch('simulate.json');
-        const data = await res.json();
-
-        document.getElementById("stability").innerText = data.grid_stability + "%";
-        document.getElementById("latency").innerText = data.latency + "s";
-        document.getElementById("gain").innerText = "+" + data.optimization_gain + "%";
-
-    } catch (e) {
-        console.log("Data load failed", e);
-    }
-}
-
-loadData();
-</script>
-<div class="metric">Grid Stability Index: <b id="stability">--</b></div>
-<div class="metric">Drift Detection Latency: <b id="latency">--</b></div>
-<div class="metric">Optimization Gain: <b id="gain">--</b></div>
-
-<script>
-async function loadData() {
-    try {
-        const res = await fetch('simulate.json');
-        const data = await res.json();
-
-        document.getElementById("stability").innerText = data.grid_stability + "%";
-        document.getElementById("latency").innerText = data.latency + "s";
-        document.getElementById("gain").innerText = "+" + data.optimization_gain + "%";
-    } catch (e) {
-        console.log("Data load failed", e);
-    }
-}
-loadData();
-</script>
