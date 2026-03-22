@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-03-22T19:17:54.1912510Z",
+  "summary": {
+    "run_id": "20260322T162207Z",
+    "generated_utc": "2026-03-22T16:43:30.2568071Z",
+    "coined_term": "Living Architecture™",
+    "total_files": 25914,
+    "total_bytes": 35714401476,
+    "total_gb": 33.2616,
+    "energy_like_files": 214,
+    "proof_like_files": 222,
+    "code_like_files": 22662,
+    "csv_files": 275,
+    "json_files": 64,
+    "pdf_files": 468,
+    "png_files": 472,
+    "zip_files": 121,
+    "py_files": 22440,
+    "duplicate_groups": 6141,
+    "unique_hashes": 9568,
+    "newest_file": "C:\\Users\\Novac\\iCloudDrive\\Copilot stuff\\Tha master beast pipeline_.txt",
+    "newest_modified_utc": "2026-03-22T16:20:06Z",
+    "largest_file": "C:\\Users\\Novac\\Desktop\\LumenCore_FreezeInventory\\inventory_20260212T193049Z\\evidence_bundle_20260212T193049Z.zip",
+    "largest_file_bytes": 6191696982
+  },
+  "chain": [
+    "LUMENCORE HYBRID CHAIN OF CUSTODY",
+    "RUN_ID: 20260322T162207Z",
+    "GENERATED_UTC: 2026-03-22T16:43:30.2806493Z",
+    "",
+    "c4c93c2231af0492b82082c292c5e7f1c2c3c5b1488d431e5cc8d62bf06068e4 | 187 | 2026-03-20T03:09:43.3924237Z | C:\\LumaTrader\\.venv\\Kraken api\\text.txt"
+  ],
+  "run": "RUN_20260322T162207Z"
+}
