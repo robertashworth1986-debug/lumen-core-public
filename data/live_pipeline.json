@@ -1,0 +1,25 @@
+{
+  "system_name": "LumenCore™",
+  "mode": "HYBRID_PROOF",
+  "generated_utc": "2026-03-22T16:44:02.1792440Z",
+  "coined_term": "Living Architecture™",
+  "headline_metrics": {
+    "total_files": 25914,
+    "energy_assets": 214,
+    "proof_assets": 222,
+    "code_assets": 22662,
+    "duplicate_groups": 6141,
+    "total_gb": 33.2616
+  },
+  "credibility": [
+    "SHA-256 chain-of-custody ledger generated",
+    "Local asset crawl completed",
+    "Energy-like data assets discovered",
+    "Proof-grade artifacts indexed"
+  ],
+  "next_outputs": [
+    "proof_brief.json",
+    "energy_signal_metrics.json",
+    "site_dashboard.json"
+  ]
+}
