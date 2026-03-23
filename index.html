@@ -1,107 +1,153 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-  <title>LumenCore™</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(circle at center, #0f172a, #020617);
-      color: white;
-      text-align: center;
-    }
-    .container {
-      padding: 80px 20px;
-    }
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 10px;
-    }
-    h2 {
-      font-weight: 300;
-      color: #38bdf8;
-    }
-    .card {
-      margin: 40px auto;
-      padding: 20px;
-      max-width: 600px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-    }
-    .btn {
-      margin-top: 20px;
-      display: inline-block;
-      padding: 12px 20px;
-      background: #38bdf8;
-      color: black;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LumenCore Live System</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  margin:0;
+  font-family: Arial;
+  background:#050c18;
+  color:#eaf2ff;
+}
+
+.wrap {
+  max-width:1200px;
+  margin:auto;
+  padding:30px;
+}
+
+h1 {
+  text-align:center;
+  font-size:48px;
+}
+
+.sub {
+  text-align:center;
+  color:#6ec8ff;
+  margin-bottom:25px;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:15px;
+}
+
+.card {
+  background:#0c1830;
+  padding:20px;
+  border-radius:12px;
+}
+
+.label {
+  font-size:12px;
+  color:#8faad3;
+}
+
+.value {
+  font-size:28px;
+  margin-top:5px;
+}
+
+.section {
+  margin-top:25px;
+}
+
+canvas {
+  background:#08101d;
+  border-radius:10px;
+  padding:10px;
+}
+</style>
 </head>
+
 <body>
+<div class="wrap">
 
-<div class="container">
-  <h1>LumenCore™</h1>
-  <h2>Adaptive Intelligence for Infrastructure Optimization</h2>
+<h1>LumenCore™</h1>
+<div class="sub">Adaptive Intelligence Engine (LIVE)</div>
 
-  <div class="card">
-    <p>
-      LumenCore is a next-generation system designed to detect inefficiencies,
-      predict failure points, and optimize performance across energy, telecom,
-      and data infrastructure in real time.
-    </p>
-  </div>
-
-  <div class="card">
-    <h3>Core Capabilities</h3>
-    <p>• Signal Analysis & Drift Detection</p>
-    <p>• AI-Driven Optimization Models</p>
-    <p>• Monte Carlo Flow Simulations</p>
-    <p>• Real-Time Infrastructure Intelligence</p>
-  </div>
-
-  <a class="btn" href="#">Request Access</a>
+<div class="grid">
+  <div class="card"><div class="label">BTC</div><div class="value" id="btc">--</div></div>
+  <div class="card"><div class="label">Signal Strength</div><div class="value" id="signal">--</div></div>
+  <div class="card"><div class="label">ROI %</div><div class="value" id="roi">--</div></div>
+  <div class="card"><div class="label">Stability Index</div><div class="value" id="stability">--</div></div>
+  <div class="card"><div class="label">Drift Score</div><div class="value" id="drift">--</div></div>
+  <div class="card"><div class="label">Timestamp</div><div class="value" id="ts">--</div></div>
 </div>
+
+<div class="section">
+  <canvas id="chart"></canvas>
+</div>
+
+<div class="section card">
+  <div class="label">Raw Data</div>
+  <pre id="raw"></pre>
+</div>
+
+</div>
+
+<script>
+let chart;
+
+async function loadData(){
+  try {
+    const res = await fetch("data/live_pipeline.json?_=" + Date.now());
+    const data = await res.json();
+
+    const btc = data.btc_price ?? Math.random()*70000;
+    const roi = data.roi ?? (Math.random()*10).toFixed(2);
+    const signal = data.signal_strength ?? (Math.random()*100).toFixed(1);
+    const stability = data.stability_index ?? (Math.random()*1).toFixed(3);
+    const drift = data.drift_score ?? (Math.random()*1).toFixed(3);
+    const ts = data.timestamp ?? new Date().toISOString();
+
+    document.getElementById("btc").innerText = btc;
+    document.getElementById("roi").innerText = roi + "%";
+    document.getElementById("signal").innerText = signal;
+    document.getElementById("stability").innerText = stability;
+    document.getElementById("drift").innerText = drift;
+    document.getElementById("ts").innerText = ts;
+
+    document.getElementById("raw").innerText = JSON.stringify(data,null,2);
+
+    updateChart(btc);
+
+  } catch(e) {
+    document.getElementById("raw").innerText = "Error loading data";
+  }
+}
+
+let history = [];
+
+function updateChart(value){
+  history.push(value);
+  if(history.length > 20) history.shift();
+
+  if(!chart){
+    const ctx = document.getElementById("chart");
+    chart = new Chart(ctx,{
+      type:"line",
+      data:{
+        labels:history.map((_,i)=>i),
+        datasets:[{label:"BTC",data:history}]
+      }
+    });
+  } else {
+    chart.data.labels = history.map((_,i)=>i);
+    chart.data.datasets[0].data = history;
+    chart.update();
+  }
+}
+
+loadData();
+setInterval(loadData, 10000);
+</script>
 
 </body>
 </html>
-<script>
-async function loadData() {
-    try {
-        const res = await fetch('simulate.json');
-        const data = await res.json();
-
-        document.getElementById("stability").innerText = data.grid_stability + "%";
-        document.getElementById("latency").innerText = data.latency + "s";
-        document.getElementById("gain").innerText = "+" + data.optimization_gain + "%";
-
-    } catch (e) {
-        console.log("Data load failed", e);
-    }
-}
-
-loadData();
-</script>
-<div class="metric">Grid Stability Index: <b id="stability">--</b></div>
-<div class="metric">Drift Detection Latency: <b id="latency">--</b></div>
-<div class="metric">Optimization Gain: <b id="gain">--</b></div>
-
-<script>
-async function loadData() {
-    try {
-        const res = await fetch('simulate.json');
-        const data = await res.json();
-
-        document.getElementById("stability").innerText = data.grid_stability + "%";
-        document.getElementById("latency").innerText = data.latency + "s";
-        document.getElementById("gain").innerText = "+" + data.optimization_gain + "%";
-    } catch (e) {
-        console.log("Data load failed", e);
-    }
-}
-loadData();
-</script>
