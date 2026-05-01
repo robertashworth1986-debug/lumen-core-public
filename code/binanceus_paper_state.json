@@ -1,0 +1,22 @@
+{
+  "triplet": true,
+  "positions": [],
+  "capital_tank": {
+    "sleeve_notional_usd": {
+      "breakout": 0.0,
+      "moonshot": 0.0,
+      "fallback": 0.0
+    },
+    "sleeve_cap_usd": {
+      "breakout": 45000,
+      "moonshot": 35000,
+      "fallback": 20000
+    }
+  },
+  "last_action": "INIT",
+  "cycle": 0,
+  "scan": {
+    "scanned": 0,
+    "scored": 0
+  }
+}

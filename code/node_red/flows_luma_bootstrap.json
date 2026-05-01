@@ -1,0 +1,179 @@
+[
+  {
+    "id": "b8f0f35f8de6409a",
+    "type": "tab",
+    "label": "LumaCore Immersive Bridge",
+    "disabled": false,
+    "info": "Polls Luma gateway snapshot and triggers guide brief requests."
+  },
+  {
+    "id": "2cdb3a72f2e188d1",
+    "type": "inject",
+    "z": "b8f0f35f8de6409a",
+    "name": "Poll snapshot every 3s",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "3",
+    "once": true,
+    "onceDelay": "0.2",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 190,
+    "y": 120,
+    "wires": [
+      [
+        "6d9d8faea2780f76"
+      ]
+    ]
+  },
+  {
+    "id": "6d9d8faea2780f76",
+    "type": "http request",
+    "z": "b8f0f35f8de6409a",
+    "name": "GET /api/snapshot",
+    "method": "GET",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://127.0.0.1:8787/api/snapshot",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [],
+    "x": 430,
+    "y": 120,
+    "wires": [
+      [
+        "9f14a5fd650d86ad",
+        "3cb223d7a676f0d7"
+      ]
+    ]
+  },
+  {
+    "id": "9f14a5fd650d86ad",
+    "type": "debug",
+    "z": "b8f0f35f8de6409a",
+    "name": "Snapshot debug",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "payload.paper.equity_text",
+    "statusType": "msg",
+    "x": 670,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "0d3f5cb3f86f11da",
+    "type": "inject",
+    "z": "b8f0f35f8de6409a",
+    "name": "Trigger Pitch Brief",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"prompt\":\"brief\",\"mode\":\"pitch\"}",
+    "payloadType": "json",
+    "x": 180,
+    "y": 220,
+    "wires": [
+      [
+        "86b7380c2bf92836"
+      ]
+    ]
+  },
+  {
+    "id": "86b7380c2bf92836",
+    "type": "http request",
+    "z": "b8f0f35f8de6409a",
+    "name": "POST /api/guide/respond",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://127.0.0.1:8787/api/guide/respond",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
+    "headers": [
+      {
+        "keyType": "other",
+        "keyValue": "Content-Type",
+        "valueType": "other",
+        "valueValue": "application/json"
+      }
+    ],
+    "x": 450,
+    "y": 220,
+    "wires": [
+      [
+        "f45aac2667eab650"
+      ]
+    ]
+  },
+  {
+    "id": "f45aac2667eab650",
+    "type": "debug",
+    "z": "b8f0f35f8de6409a",
+    "name": "Guide response",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload.response",
+    "targetType": "msg",
+    "x": 670,
+    "y": 220,
+    "wires": []
+  },
+  {
+    "id": "3cb223d7a676f0d7",
+    "type": "function",
+    "z": "b8f0f35f8de6409a",
+    "name": "Build immersive cue",
+    "func": "const p = msg.payload || {};\nmsg.payload = {\n  ts: p.generated_utc,\n  scene: 'core',\n  cue: 'pulse',\n  intensity: p.paper && p.paper.net_pnl < 0 ? 0.9 : 0.4,\n  lane: p.infra ? p.infra.top_lane : 'n/a'\n};\nreturn msg;",
+    "outputs": 1,
+    "timeout": "",
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 670,
+    "y": 170,
+    "wires": [
+      [
+        "2cb9b6fbb7c4f7cb"
+      ]
+    ]
+  },
+  {
+    "id": "2cb9b6fbb7c4f7cb",
+    "type": "debug",
+    "z": "b8f0f35f8de6409a",
+    "name": "Immersive cue output",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 910,
+    "y": 170,
+    "wires": []
+  }
+]

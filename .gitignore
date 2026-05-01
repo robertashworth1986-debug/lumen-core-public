@@ -1,0 +1,83 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+.venv/
+code/.venv/
+env*/
+venv*/
+*.egg-info/
+dist/
+build/
+
+# Secrets / keys
+*.env
+*.env.*
+luma_live_keys.env
+.env.live
+.env.sports
+*.key
+*.secret
+*_secret*
+*_key*
+
+# Large generated / data files
+*.csv
+*.jsonl
+*.zip
+*.tar.gz
+*.parquet
+
+# Generated dashboard HTML (auto-rebuilt by loop processes)
+dashboard/*.html
+
+# Execution runtime state (rebuilt every session)
+execution_events.jsonl
+execution_status.json
+execution_runtime.json
+execution_approval_queue.json
+infra_frozen_deltas.jsonl
+audit_chain.jsonl
+run/
+out/
+code/out/
+*.lock
+
+# Log files
+logs/
+*.log
+*.txt
+
+# VS Code
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+*.lnk
+
+# Images / screenshots
+*.PNG
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Cache / temp
+.cache/
+__MACOSX/
+
+# Old / duplicate stack copies
+INSTITAL_STACK_V2/
+INSTITUTIONAL_STACK/
+HYBRID_EVOLUTION_V2_20260324T015042Z/
+AUDIT_PACK/
+
+# Deploy stage staging folder
+.deploy_stage/
+
+# Data mirror
+data/

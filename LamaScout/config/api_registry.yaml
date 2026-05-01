@@ -1,0 +1,306 @@
+sources:
+  - name: youtube
+    display_name: YouTube
+    source_type: streaming_platform
+    active: true
+    auth:
+      api_key: "AIzaSyCd-ChmsbaNnREOwaX1nWOTajQFZd_-ysM"
+    endpoint: "https://www.googleapis.com/youtube/v3"
+    search_terms:
+      - new country singer 2026 official
+      - new hip hop artist 2026 official music video
+      - indie pop singer official 2026
+      - breakout r&b vocalist 2026
+      - new folk singer songwriter official
+      - independent artist debut single 2026
+      - new trap artist official video 2026
+      - alternative pop singer new single
+      - afrobeats emerging artist official 2026
+      - latin pop new artist official video 2026
+      - soul singer debut album 2026
+      - gospel singer new song 2026 official
+    notes: "Video and channel metrics for national artist discovery."
+
+  - name: spotify
+    display_name: Spotify
+    source_type: audio_platform
+    active: true
+    auth:
+      client_id: "2f7740e79932488fb70892f4897348fa"
+      client_secret: "78ec3f38de53418497c006c4af97882b"
+    endpoint: "https://api.spotify.com/v1"
+    search_terms:
+      - country singer
+      - hip hop rap independent
+      - indie pop acoustic
+      - r&b soul vocalist
+      - trap rap new
+      - folk singer songwriter
+      - alternative rock debut
+      - afrobeats independent
+      - latin pop independent
+      - gospel contemporary
+      - bedroom pop indie
+      - lo-fi singer songwriter
+    notes: "Monthly listener and release metrics for broad talent discovery."
+
+  - name: meta
+    display_name: Meta Graph (Instagram/Facebook)
+    source_type: social_platform
+    active: false
+    auth:
+      access_token: "YOUR_META_ACCESS_TOKEN"
+    endpoint: "https://graph.facebook.com"
+    search_terms:
+      - independent artist music
+      - new country singer
+      - rising hip hop artist
+      - indie pop musician
+      - unsigned r&b artist
+    notes: "Instagram/FB creator and business signal."
+
+  - name: google_trends
+    display_name: Google Trends
+    source_type: cultural_trend
+    active: true
+    auth: {}
+    endpoint: "https://trends.google.com/trends/api"
+    search_terms:
+      - Zach Bryan
+      - Ice Spice
+      - Gracie Abrams
+      - Noah Kahan
+      - Victoria Monet
+      - Sexyy Red
+      - Benson Boone
+      - Sabrina Carpenter
+      - Tyla
+      - Peso Pluma
+      - Jelly Roll
+      - Teddy Swims
+    notes: "Search interest and trend momentum — uses known breakout artists for calibration."
+
+  - name: musicbrainz
+    display_name: MusicBrainz
+    source_type: music_metadata
+    active: true
+    auth: {}
+    endpoint: "https://musicbrainz.org/ws/2/artist/"
+    search_terms:
+      - country singer United States
+      - hip hop artist United States
+      - indie pop artist
+      - r&b vocalist
+      - folk singer United States
+      - alternative rock
+      - trap rapper
+      - bedroom pop artist
+      - afrobeats United States
+      - latin pop United States
+    notes: "Open artist metadata from MusicBrainz, no API key required."
+
+  - name: wikipedia
+    display_name: Wikipedia
+    source_type: press_signal
+    active: true
+    auth: {}
+    endpoint: "https://en.wikipedia.org/w/api.php"
+    search_terms:
+      - emerging country music artist
+      - rising hip hop artist
+      - breakthrough indie artist
+      - new r&b singer
+      - independent music artist debut
+    notes: "Open Wikipedia search-based press and artist concept signal."
+
+  - name: twitter_x
+    display_name: X / Twitter
+    source_type: social_platform
+    active: false
+    auth:
+      bearer_token: "YOUR_TWITTER_BEARER_TOKEN"
+    endpoint: "https://api.twitter.com/2"
+    search_terms:
+      - independent music artist
+      - new single release
+      - unsigned artist debut
+    notes: "Buzz, mentions, and social signal."
+
+  - name: ticketmaster
+    display_name: Ticketmaster
+    source_type: venue_signal
+    active: false
+    auth:
+      api_key: "YOUR_TICKETMASTER_API_KEY"
+    endpoint: "https://app.ticketmaster.com/discovery/v2"
+    search_terms:
+      - emerging live show artist
+      - regional festival breakout
+      - headline support act
+    notes: "Live event and venue mention signal."
+
+  - name: news_api
+    display_name: NewsAPI
+    source_type: press_signal
+    active: false
+    auth:
+      api_key: "YOUR_NEWSAPI_KEY"
+    search_terms:
+      - emerging country artist
+      - rising hip hop artist
+      - breakthrough indie artist
+      - new r&b singer music
+      - independent artist record deal
+    endpoint: "https://newsapi.org/v2"
+    notes: "Media mention signal for national press coverage."
+
+  - name: spotify
+    display_name: Spotify
+    source_type: audio_platform
+    active: true
+    auth:
+      client_id: "2f7740e79932488fb70892f4897348fa"
+      client_secret: "78ec3f38de53418497c006c4af97882b"
+    endpoint: "https://api.spotify.com/v1"
+    search_terms:
+      - emerging country artist usa 2026
+      - rising hiphop artist
+      - breakthrough indie rock
+      - viral singer songwriter
+      - unsigned pop talent
+      - breakthrough edm producer
+      - rising local festival performer
+      - unsigned open mic act
+      - regional showcase artist
+      - breakout live circuit
+    notes: "Monthly listener and release metrics for broad talent discovery."
+
+  - name: meta
+    display_name: Meta Graph (Instagram/Facebook)
+    source_type: social_platform
+    active: false
+    auth:
+      access_token: "YOUR_META_ACCESS_TOKEN"
+    endpoint: "https://graph.facebook.com"
+    search_terms:
+      - emerging country artist usa 2026
+      - rising hiphop artist
+      - breakthrough indie rock
+      - viral singer songwriter
+      - unsigned pop talent
+      - breakthrough edm producer
+      - rising local festival performer
+      - unsigned open mic act
+      - regional showcase artist
+      - breakout live circuit
+    notes: "Instagram/FB creator and business signal."
+
+  - name: google_trends
+    display_name: Google Trends
+    source_type: cultural_trend
+    active: true
+    auth: {}
+    endpoint: "https://trends.google.com/trends/api"
+    search_terms:
+      - emerging country artist usa 2026
+      - rising hiphop artist
+      - breakthrough indie rock
+      - viral singer songwriter
+      - unsigned pop talent
+      - breakthrough edm producer
+      - rising local festival performer
+      - unsigned open mic act
+      - regional showcase artist
+      - breakout live circuit
+    notes: "Search interest and trend momentum from open Google Trends."
+
+  - name: musicbrainz
+    display_name: MusicBrainz
+    source_type: music_metadata
+    active: true
+    auth: {}
+    endpoint: "https://musicbrainz.org/ws/2/artist/"
+    search_terms:
+      - emerging country artist usa 2026
+      - rising hiphop artist
+      - breakthrough indie rock
+      - viral singer songwriter
+      - unsigned pop talent
+      - breakthrough edm producer
+      - rising local festival performer
+      - unsigned open mic act
+      - regional showcase artist
+      - breakout live circuit
+    notes: "Open artist metadata from MusicBrainz, no API key required."
+
+  - name: wikipedia
+    display_name: Wikipedia
+    source_type: press_signal
+    active: true
+    auth: {}
+    endpoint: "https://en.wikipedia.org/w/api.php"
+    search_terms:
+      - emerging country artist usa 2026
+      - rising hiphop artist
+      - breakthrough indie rock
+      - viral singer songwriter
+      - unsigned pop talent
+      - breakthrough edm producer
+      - rising local festival performer
+      - unsigned open mic act
+      - regional showcase artist
+      - breakout live circuit
+    notes: "Open Wikipedia search-based press and artist concept signal."
+
+  - name: twitter_x
+    display_name: X / Twitter
+    source_type: social_platform
+    active: false
+    auth:
+      bearer_token: "YOUR_TWITTER_BEARER_TOKEN"
+    endpoint: "https://api.twitter.com/2"
+    search_terms:
+      - emerging country artist usa 2026
+      - rising hiphop artist
+      - breakthrough indie rock
+      - viral singer songwriter
+      - unsigned pop talent
+      - breakthrough edm producer
+      - rising local festival performer
+      - unsigned open mic act
+      - regional showcase artist
+      - breakout live circuit
+    notes: "Buzz, mentions, and social signal."
+
+  - name: ticketmaster
+    display_name: Ticketmaster
+    source_type: venue_signal
+    active: false
+    auth:
+      api_key: "YOUR_TICKETMASTER_API_KEY"
+    endpoint: "https://app.ticketmaster.com/discovery/v2"
+    search_terms:
+      - emerging live show artist
+      - regional festival breakout
+      - headline support act
+    notes: "Live event and venue mention signal."
+
+  - name: news_api
+    display_name: NewsAPI
+    source_type: press_signal
+    active: false
+    auth:
+      api_key: "YOUR_NEWSAPI_KEY"
+    search_terms:
+      - emerging country artist usa 2026
+      - rising hiphop artist
+      - breakthrough indie rock
+      - viral singer songwriter
+      - unsigned pop talent
+      - breakthrough edm producer
+      - rising local festival performer
+      - unsigned open mic act
+      - regional showcase artist
+      - breakout live circuit
+    endpoint: "https://newsapi.org/v2"
+    notes: "Media mention signal for national press coverage."

@@ -1,0 +1,87 @@
+{
+  "organization": {
+    "legal_name": "LumenCore",
+    "uei": "SQY2XW71ZM51",
+    "ein": "39-3507463",
+    "sam_registered": true,
+    "entity_type": "for_profit_small_business",
+    "address": {
+      "street1": "",
+      "street2": "",
+      "city": "",
+      "state": "",
+      "zip": "",
+      "country": "US"
+    }
+  },
+  "contacts": {
+    "authorized_rep": {
+      "name": "Robert BabyRay Ashworth",
+      "title": "Founder and Authorized Representative",
+      "email": "robertashworth4444@gmail.com",
+      "phone": "615-438-2502"
+    },
+    "project_director": {
+      "name": "Robert BabyRay Ashworth",
+      "title": "Principal Investigator",
+      "email": "robertashworth4444@gmail.com",
+      "phone": "615-438-2502"
+    }
+  },
+  "qualification_profile": {
+    "eligibility_terms": [
+      "small business",
+      "for-profit",
+      "sbir",
+      "phase i"
+    ],
+    "keyword_targets": [
+      "grid resilience",
+      "infrastructure",
+      "predictive analytics",
+      "energy",
+      "outage prevention",
+      "critical infrastructure",
+      "digital twin"
+    ],
+    "exclude_terms": [
+      "nonprofit only",
+      "state government only",
+      "local government only",
+      "tribal only",
+      "individual applicants only"
+    ],
+    "agency_allowlist": [
+      "department of energy",
+      "energy",
+      "dod",
+      "darpa",
+      "nasa",
+      "eia"
+    ],
+    "min_award_usd": 150000,
+    "max_award_usd": 400000
+  },
+  "prefill_defaults": {
+    "project_title": "LumenCore: Predictive Grid Stability and Infrastructure Risk Intelligence",
+    "project_summary": "LumenCore delivers a predictive intelligence layer for energy and critical infrastructure operators. The platform ingests live telemetry, identifies pre-failure divergence patterns, and recommends actions before instability becomes downtime. In Phase I, we will validate early-warning accuracy, benchmark against incumbent monitoring workflows, and produce pilot-ready evidence for utility and federal infrastructure programs.",
+    "statement_of_need": "Grid and critical infrastructure operators still rely on reactive monitoring systems that detect incidents after conditions have already degraded. This response lag increases restoration costs, outage duration, and cascading failure risk. A practical pre-failure detection capability is needed to identify divergence signatures earlier, prioritize interventions by risk impact, and reduce both operational and public-service disruption.",
+    "expected_outcomes": [
+      "Demonstrate at least 20% earlier instability detection than baseline threshold-alert methods in simulation and replay scenarios.",
+      "Produce a validated risk-scoring model that prioritizes intervention candidates by expected outage impact reduction.",
+      "Deliver a pilot-ready implementation package including architecture, model cards, and operator playbooks for transition to Phase II deployment."
+    ],
+    "estimated_federal_funding_usd": 275000,
+    "estimated_non_federal_funding_usd": 50000,
+    "budget_narrative": {
+      "personnel": "Principal Investigator, ML engineer, and infrastructure analyst support model development, validation, and pilot package delivery.",
+      "equipment": "Cloud compute and secure data processing resources for simulation, training, and replay evaluation.",
+      "contractual": "Specialized advisory support for grid operations and compliance review.",
+      "other_direct_costs": "Data acquisition, software licenses, and reporting/tooling needed for reproducible benchmark evidence.",
+      "indirect_costs": "Allocated facilities, administration, and security/compliance overhead applied per approved accounting method.",
+      "cost_share": "Non-federal contribution covers supplemental engineering time and commercialization discovery activities."
+    },
+    "start_date": "2026-10-01",
+    "end_date": "2027-03-31"
+  }
+}

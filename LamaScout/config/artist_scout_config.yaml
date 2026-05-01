@@ -1,0 +1,101 @@
+lab_name: LumaScout
+version: 1
+
+target_audience: institutional
+champion_threshold: 70
+watch_threshold: 55
+monte_carlo_runs: 1000
+
+audit:
+  api_snapshot_dir: data/raw/api_snapshots
+  run_proof_file: artist_scout_run_proof.json
+  enable_live_proof: true
+
+weights:
+  follower_growth_30d: 0.12
+  engagement_rate: 0.12
+  engagement_velocity: 0.10
+  cross_platform_strength: 0.10
+  spotify_monthly_listeners_growth: 0.08
+  youtube_view_growth: 0.08
+  followers_total: 0.08
+  avg_views_total: 0.08
+  posting_consistency: 0.05
+  google_trends_growth: 0.04
+  genre_signal: 0.06
+  location_signal: 0.05
+  agt_cohort_signal: 0.04
+  age_cohort_signal: 0.05
+  press_signal: 0.02
+  venue_signal: 0.02
+
+penalties:
+  suspicious_engagement_penalty: -10
+  one_platform_only_penalty: -6
+  inactive_penalty: -8
+
+required_columns:
+  - artist_name
+  - platform
+  - genre
+  - city
+  - state
+  - country
+  - age_group
+  - agt_stage
+  - agt_age_group
+  - career_stage
+  - label_interest
+  - followers_current
+  - followers_30d_ago
+  - engagement_rate
+  - avg_views_current
+  - avg_views_30d_ago
+  - posts_30d
+  - monthly_listeners_current
+  - monthly_listeners_30d_ago
+  - google_trends_current
+  - google_trends_30d_ago
+  - press_mentions_30d
+  - venue_mentions_30d
+
+platforms_expected:
+  - instagram
+  - tiktok
+  - youtube
+  - spotify
+  - x
+  - facebook
+  - snapchat
+  - soundcloud
+  - apple_music
+  - news
+  - news_api
+  - ticketmaster
+
+breakout_score: 0.06
+hot_urgency: 0.04
+
+truth_engine:
+  monte_carlo_runs: 1000
+  evolutionary_generations: 40
+  evolutionary_population: 80
+  rolling_history_length: 20
+  enabled_strategies:
+    - hot_urgency
+    - breakout_forecast
+    - cross_platform_strength
+    - portfolio_diversity
+
+big_label_signals:
+  - major
+  - sony
+  - universal
+  - warner
+  - record label
+  - signed
+  - label interest
+
+breakout_threshold: 60
+unsigned_threshold: 50
+hot_radar_threshold: 50

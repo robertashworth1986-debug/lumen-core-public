@@ -1,0 +1,17 @@
+lumen-core.ai {
+    encode zstd gzip
+
+    @dashboard path / /dashboard* /opportunity* /execution*
+    handle @dashboard {
+        reverse_proxy 127.0.0.1:5016
+    }
+
+    @lamascout path /lamascout* /api* /health* /ui*
+    handle @lamascout {
+        reverse_proxy 127.0.0.1:8000
+    }
+
+    handle {
+        reverse_proxy 127.0.0.1:5016
+    }
+}

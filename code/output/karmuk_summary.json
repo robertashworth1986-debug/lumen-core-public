@@ -1,0 +1,82 @@
+{
+  "generated_utc": "2026-04-25T16:11:57.315635+00:00",
+  "case_count": 3,
+  "overall_karmuk": 5.3148,
+  "case_rankings": [
+    {
+      "case_id": "CASE-003",
+      "title": "South Loop Homicide",
+      "status": "Open",
+      "category": "Unsolved Homicide",
+      "evidence_count": 3,
+      "case_strength": 0.6562,
+      "karmuk_sum": 2.0339,
+      "burst_energy": 0.8147,
+      "constancy": 0.6029,
+      "median": 0.648262454434994,
+      "q75": 0.7456796143142712,
+      "q90": 0.8041299102418376,
+      "q99": 0.8392000877983773,
+      "max": 0.8430967741935483
+    },
+    {
+      "case_id": "CASE-001",
+      "title": "Westside Cold Case",
+      "status": "Open",
+      "category": "Unsolved Homicide",
+      "evidence_count": 3,
+      "case_strength": 0.6108,
+      "karmuk_sum": 2.1374,
+      "burst_energy": 0.9594,
+      "constancy": 0.5701,
+      "median": 0.756104834012813,
+      "q75": 0.8751012524684652,
+      "q90": 0.9464991035418564,
+      "q99": 0.9893378141858912,
+      "max": 0.9940976709241172
+    },
+    {
+      "case_id": "CASE-002",
+      "title": "North Bay Unknown",
+      "status": "Cold",
+      "category": "Missing Person",
+      "evidence_count": 2,
+      "case_strength": 0.5518,
+      "karmuk_sum": 1.1435,
+      "burst_energy": 0.663,
+      "constancy": 0.5166,
+      "median": 0.5717576194810398,
+      "q75": 0.6251576717980786,
+      "q90": 0.657197703188302,
+      "q99": 0.676421722022436,
+      "max": 0.6785577241151175
+    }
+  ],
+  "monte_carlo": {
+    "runs": 1200,
+    "best_value": 2.617,
+    "best_config": {
+      "run": 133,
+      "perturb": -0.1384,
+      "value": 2.617
+    },
+    "ensemble_mean": 2.5637,
+    "ensemble_std": 0.012
+  },
+  "rolling_karma": {
+    "history_length": 1,
+    "rolling_mean": 5.3148,
+    "rolling_std": 0.0,
+    "max_karmuk": 5.3148,
+    "min_karmuk": 5.3148
+  },
+  "karmuk_moments": {
+    "q50": 0.0,
+    "q75": 0.0,
+    "q90": 0.0,
+    "q99": 0.0
+  },
+  "karmuk_compound_1w": 7.4785,
+  "karmuk_compound_1m": 92.7401,
+  "notes": "XinFit karma engine: rolling karmuk sums, Monte Carlo burst search, harmonic evidence aggregation, and multi-fractile moments."
+}

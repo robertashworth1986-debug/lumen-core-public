@@ -1,0 +1,9 @@
+# LumaScout generated and runtime files
+out/
+reports/
+logs/
+data/normalized/
+.venv/
+__pycache__/
+*.pyc
+*.log

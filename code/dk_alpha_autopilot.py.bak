@@ -1,0 +1,844 @@
+from __future__ import annotations
+
+import argparse
+import csv
+import importlib
+import json
+import os
+import subprocess
+import sys
+import time
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+import requests
+
+ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+CODE_DIR = ROOT / "code"
+SPORTS_DIR = ROOT / "sports_data"
+OUT_DIR = ROOT / "out" / "sports_intelligence"
+ENV_FILE = CODE_DIR / "execution" / "config" / "luma_live_keys.env"
+API_BASE = "https://api.the-odds-api.com/v4"
+
+MARKET_PRIMARY = "h2h,spreads,totals"
+MARKET_FALLBACK = "h2h"
+
+ALPHA_BOARD_JSON = OUT_DIR / "_dk_alpha_board.json"
+ALPHA_BOARD_CSV = OUT_DIR / "_dk_alpha_board.csv"
+LONGSHOT_BOARD_JSON = OUT_DIR / "_dk_longshot_board.json"
+MARKET_CATALOG_JSON = OUT_DIR / "_dk_market_catalog.json"
+LOOP_STATE_JSON = OUT_DIR / "_dk_alpha_alert_state.json"
+ADVANCED_STACK_REPORT_JSON = OUT_DIR / "_dk_advanced_stack_report.json"
+
+RICH_VENV_PYTHON = ROOT / "code" / ".venv" / "Scripts" / "python.exe"
+REEXEC_FLAG_ENV = "DK_ALPHA_AUTOPILOT_REEXEC"
+
+
+@dataclass
+class Args:
+    regions: str
+    sports: str
+    min_edge: float
+    horizon_hours: float
+    bankroll: float
+    kelly_frac: float
+    max_bet: float
+    top_n: int
+    longshot_min_dk: float
+    longshot_min_edge: float
+    no_fetch: bool
+    no_flowform: bool
+    loop: bool
+    interval_sec: int
+    iterations: int
+    alert_min_edge: float
+
+
+def maybe_reexec_to_richer_env() -> None:
+    """If available, run this script under code/.venv where premium packages live."""
+    if os.getenv(REEXEC_FLAG_ENV) == "1":
+        return
+    if not RICH_VENV_PYTHON.exists():
+        return
+
+    current = Path(sys.executable).resolve()
+    target = RICH_VENV_PYTHON.resolve()
+    if current == target:
+        return
+
+    env = os.environ.copy()
+    env[REEXEC_FLAG_ENV] = "1"
+    cmd = [str(target), str(Path(__file__).resolve()), *sys.argv[1:]]
+    completed = subprocess.run(cmd, env=env, check=False)
+    raise SystemExit(completed.returncode)
+
+
+def detect_advanced_stack() -> dict[str, Any]:
+    checks = {
+        "numpy": "numpy",
+        "pandas": "pandas",
+        "sklearn": "scikit-learn",
+        "pypfopt": "PyPortfolioOpt",
+        "quantstats": "quantstats",
+        "lightgbm": "lightgbm",
+        "xgboost": "xgboost",
+        "shap": "shap",
+        "openai": "openai",
+        "fredapi": "fredapi",
+        "yfinance": "yfinance",
+        "alpaca": "alpaca-py",
+        "prometheus_fastapi_instrumentator": "prometheus-fastapi-instrumentator",
+        "zmq": "pyzmq",
+    }
+
+    modules: dict[str, dict[str, Any]] = {}
+    for module_name, package_name in checks.items():
+        try:
+            mod = importlib.import_module(module_name)
+            modules[module_name] = {
+                "installed": True,
+                "package": package_name,
+                "version": getattr(mod, "__version__", "unknown"),
+            }
+        except Exception as exc:
+            modules[module_name] = {
+                "installed": False,
+                "package": package_name,
+                "error": str(exc),
+            }
+
+    installed_count = sum(1 for m in modules.values() if m.get("installed"))
+    return {
+        "generated_utc": now_utc(),
+        "python_executable": str(Path(sys.executable).resolve()),
+        "installed_count": installed_count,
+        "total_checked": len(modules),
+        "modules": modules,
+    }
+
+
+def now_utc() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def load_env_file() -> None:
+    if not ENV_FILE.exists():
+        return
+    for line in ENV_FILE.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip()
+        if key and not os.getenv(key):
+            os.environ[key] = value
+
+
+def get_api_key() -> str:
+    for key_name in ("THEODDS_API_KEY", "ODDS_API_KEY", "SPORTS_ODDS_API_KEY"):
+        value = (os.getenv(key_name) or "").strip()
+        if value:
+            return value
+    return ""
+
+
+def http_get(url: str, params: dict[str, Any]) -> Any:
+    resp = requests.get(url, params=params, timeout=45)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def list_active_sports(api_key: str) -> list[str]:
+    payload = http_get(f"{API_BASE}/sports", {"apiKey": api_key})
+    out: list[str] = []
+    if isinstance(payload, list):
+        for item in payload:
+            if not isinstance(item, dict):
+                continue
+            key = str(item.get("key", "")).strip()
+            active = bool(item.get("active", False))
+            if key and active:
+                out.append(key)
+    return sorted(out)
+
+
+def fetch_sport_events(api_key: str, sport_key: str, regions: str, markets: str) -> list[dict[str, Any]]:
+    payload = http_get(
+        f"{API_BASE}/sports/{sport_key}/odds",
+        {
+            "apiKey": api_key,
+            "regions": regions,
+            "markets": markets,
+            "oddsFormat": "decimal",
+            "dateFormat": "iso",
+        },
+    )
+    if isinstance(payload, list):
+        return [x for x in payload if isinstance(x, dict)]
+    return []
+
+
+def write_json(path: Path, data: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+
+def no_vig_fair_nway(prices: list[float], idx: int) -> float:
+    implied = [1.0 / p for p in prices]
+    total = sum(implied)
+    return 1.0 / (implied[idx] / total)
+
+
+def to_american(decimal_odds: float) -> str:
+    if decimal_odds >= 2.0:
+        return f"+{int(round((decimal_odds - 1.0) * 100))}"
+    return f"-{int(round(100.0 / (decimal_odds - 1.0)))}"
+
+
+def kelly_fraction(dk_price: float, fair_price: float) -> float:
+    b = dk_price - 1.0
+    p = 1.0 / fair_price
+    q = 1.0 - p
+    if b <= 0:
+        return 0.0
+    f = ((b * p) - q) / b
+    return max(0.0, f)
+
+
+def fetch_universe(api_key: str, args: Args) -> dict[str, Any]:
+    SPORTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    if args.sports.strip().lower() == "all":
+        sports = list_active_sports(api_key)
+    else:
+        sports = [s.strip() for s in args.sports.split(",") if s.strip()]
+
+    manifest: dict[str, Any] = {
+        "generated_utc": now_utc(),
+        "regions": args.regions,
+        "sports_requested": len(sports),
+        "sports": {},
+    }
+
+    for sport_key in sports:
+        event_rows: list[dict[str, Any]] = []
+        used_markets = MARKET_PRIMARY
+        try:
+            event_rows = fetch_sport_events(api_key, sport_key, args.regions, MARKET_PRIMARY)
+        except requests.HTTPError:
+            try:
+                used_markets = MARKET_FALLBACK
+                event_rows = fetch_sport_events(api_key, sport_key, args.regions, MARKET_FALLBACK)
+            except Exception as exc:
+                manifest["sports"][sport_key] = {
+                    "ok": False,
+                    "events": 0,
+                    "markets_used": None,
+                    "error": str(exc),
+                }
+                continue
+        except Exception as exc:
+            manifest["sports"][sport_key] = {
+                "ok": False,
+                "events": 0,
+                "markets_used": None,
+                "error": str(exc),
+            }
+            continue
+
+        out_path = SPORTS_DIR / f"{sport_key}_allbooks_live_odds.json"
+        write_json(out_path, event_rows)
+        manifest["sports"][sport_key] = {
+            "ok": True,
+            "events": len(event_rows),
+            "markets_used": used_markets,
+            "path": str(out_path),
+        }
+
+    write_json(SPORTS_DIR / "allbooks_manifest.json", manifest)
+    return manifest
+
+
+def build_market_catalog() -> dict[str, Any]:
+    catalog: dict[str, Any] = {
+        "generated_utc": now_utc(),
+        "sports": {},
+        "global_markets": {},
+    }
+
+    for path in sorted(SPORTS_DIR.glob("*_allbooks_live_odds.json")):
+        sport_key = path.name.replace("_allbooks_live_odds.json", "")
+        per_market: dict[str, int] = {}
+        total_events = 0
+
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+
+        if not isinstance(data, list):
+            continue
+
+        for ev in data:
+            if not isinstance(ev, dict):
+                continue
+            total_events += 1
+            for bm in ev.get("bookmakers", []):
+                if not isinstance(bm, dict) or bm.get("key") != "draftkings":
+                    continue
+                for market in bm.get("markets", []):
+                    if not isinstance(market, dict):
+                        continue
+                    mk = str(market.get("key", "")).strip()
+                    if not mk:
+                        continue
+                    per_market[mk] = per_market.get(mk, 0) + 1
+                    catalog["global_markets"][mk] = catalog["global_markets"].get(mk, 0) + 1
+
+        catalog["sports"][sport_key] = {
+            "events": total_events,
+            "dk_markets": dict(sorted(per_market.items(), key=lambda kv: (-kv[1], kv[0]))),
+        }
+
+    catalog["global_markets"] = dict(
+        sorted(catalog["global_markets"].items(), key=lambda kv: (-kv[1], kv[0]))
+    )
+    write_json(MARKET_CATALOG_JSON, catalog)
+    return catalog
+
+
+def load_flowform_signals() -> list[dict[str, Any]]:
+    flow_path = OUT_DIR / "_flowform_ranked.json"
+    if not flow_path.exists():
+        return []
+    try:
+        payload = json.loads(flow_path.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+    signals = payload.get("signals", []) if isinstance(payload, dict) else []
+    if not isinstance(signals, list):
+        return []
+    return [s for s in signals if isinstance(s, dict)]
+
+
+def flowform_match(edge_row: dict[str, Any], flow_signals: list[dict[str, Any]]) -> dict[str, Any]:
+    sport_key = edge_row.get("sport_key", "")
+    home = edge_row.get("home_team", "")
+    away = edge_row.get("away_team", "")
+    market = edge_row.get("market", "")
+
+    matches: list[dict[str, Any]] = []
+    for sig in flow_signals:
+        if sig.get("sport_key") != sport_key:
+            continue
+        s_home = str(sig.get("home_team", ""))
+        s_away = str(sig.get("away_team", ""))
+        if s_home != home or s_away != away:
+            continue
+        s_market = str(sig.get("market", ""))
+        if market != s_market:
+            continue
+        matches.append(sig)
+
+    if not matches:
+        return {
+            "flowform_count": 0,
+            "flowform_best_score": 0.0,
+            "flowform_best_hhs": 0.0,
+            "flowform_signal_types": [],
+        }
+
+    best_score = max(float(m.get("score", 0.0) or 0.0) for m in matches)
+    best_hhs = max(float((m.get("flowform", {}) or {}).get("hybrid_harmonic_score", 0.0) or 0.0) for m in matches)
+    signal_types = sorted({str(m.get("signal_type", "")) for m in matches if m.get("signal_type")})
+
+    return {
+        "flowform_count": len(matches),
+        "flowform_best_score": round(best_score, 4),
+        "flowform_best_hhs": round(best_hhs, 4),
+        "flowform_signal_types": signal_types,
+    }
+
+
+def build_alpha_rows(args: Args) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    now = datetime.now(timezone.utc)
+    flow_signals = load_flowform_signals()
+
+    for path in sorted(SPORTS_DIR.glob("*_allbooks_live_odds.json")):
+        sport_key = path.name.replace("_allbooks_live_odds.json", "")
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+
+        if not isinstance(data, list):
+            continue
+
+        for ev in data:
+            if not isinstance(ev, dict):
+                continue
+
+            commence_time = str(ev.get("commence_time", ""))
+            if not commence_time:
+                continue
+
+            try:
+                start_dt = datetime.fromisoformat(commence_time.replace("Z", "+00:00"))
+            except Exception:
+                continue
+
+            hours_to_start = (start_dt - now).total_seconds() / 3600.0
+            if hours_to_start <= 0:
+                continue
+            if args.horizon_hours > 0 and hours_to_start > args.horizon_hours:
+                continue
+
+            home_team = str(ev.get("home_team", ""))
+            away_team = str(ev.get("away_team", ""))
+            game = f"{away_team} @ {home_team}".strip()
+
+            books: dict[str, dict[str, dict[str, float]]] = {}
+            for bm in ev.get("bookmakers", []):
+                if not isinstance(bm, dict):
+                    continue
+                bk = str(bm.get("key", ""))
+                if not bk:
+                    continue
+                books[bk] = {}
+                for market in bm.get("markets", []):
+                    if not isinstance(market, dict):
+                        continue
+                    mk = str(market.get("key", ""))
+                    if mk not in ("h2h", "spreads", "totals"):
+                        continue
+                    for outcome in market.get("outcomes", []):
+                        if not isinstance(outcome, dict):
+                            continue
+                        name = str(outcome.get("name", ""))
+                        price = outcome.get("price")
+                        point = outcome.get("point", "")
+                        if not name or not isinstance(price, (int, float)):
+                            continue
+                        group_key = f"{mk}::{point}"
+                        books[bk].setdefault(group_key, {})[name] = float(price)
+
+            dk = books.get("draftkings", {})
+            pin = books.get("pinnacle", {})
+            if not dk or not pin:
+                continue
+
+            for group_key, pin_map in pin.items():
+                if group_key not in dk:
+                    continue
+                dk_map = dk[group_key]
+                if len(pin_map) < 2:
+                    continue
+
+                names = list(pin_map.keys())
+                pin_prices = [pin_map[n] for n in names]
+                fair_prices = {
+                    n: no_vig_fair_nway(pin_prices, i) for i, n in enumerate(names)
+                }
+
+                market_key, point = group_key.split("::", 1)
+
+                for pick, dk_price in dk_map.items():
+                    fair_price = fair_prices.get(pick)
+                    if fair_price is None:
+                        continue
+
+                    edge_pct = (dk_price / fair_price - 1.0) * 100.0
+                    if edge_pct < args.min_edge:
+                        continue
+
+                    full_kelly = kelly_fraction(dk_price, fair_price)
+                    quarter_kelly = full_kelly * args.kelly_frac
+                    stake = min(args.max_bet, args.bankroll * quarter_kelly)
+
+                    row = {
+                        "sport_key": sport_key,
+                        "home_team": home_team,
+                        "away_team": away_team,
+                        "game": game,
+                        "market": market_key,
+                        "pick": pick,
+                        "point": point,
+                        "dk_price_decimal": round(dk_price, 4),
+                        "dk_price_american": to_american(dk_price),
+                        "fair_price_decimal": round(fair_price, 4),
+                        "edge_pct": round(edge_pct, 4),
+                        "hours_to_start": round(hours_to_start, 3),
+                        "commence_time": commence_time,
+                        "kelly_full_pct": round(full_kelly * 100.0, 4),
+                        "kelly_fraction_used": args.kelly_frac,
+                        "kelly_stake": round(stake, 2),
+                        "stake_cap": args.max_bet,
+                        "stake_return_if_win": round(stake * dk_price, 2),
+                        "stake_profit_if_win": round(stake * (dk_price - 1.0), 2),
+                    }
+
+                    row.update(flowform_match(row, flow_signals))
+                    row["alpha_score"] = round(
+                        row["edge_pct"] * 2.0
+                        + row["flowform_best_hhs"] * 0.25
+                        + row["flowform_count"] * 1.0,
+                        4,
+                    )
+
+                    row["alert_id"] = "|".join(
+                        [
+                            row["sport_key"],
+                            row["game"],
+                            row["market"],
+                            row["pick"],
+                            str(row["point"]),
+                            f"{row['dk_price_decimal']:.4f}",
+                        ]
+                    )
+                    rows.append(row)
+
+    rows.sort(key=lambda r: (r["alpha_score"], r["edge_pct"]), reverse=True)
+    return rows
+
+
+def _apply_advanced_scoring(rows: list[dict[str, Any]], args: Args, stack: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    features: dict[str, Any] = {
+        "pandas_scoring": False,
+        "sklearn_scaling": False,
+        "pypfopt_allocation": False,
+        "quantstats_snapshot": False,
+    }
+    if not rows:
+        return rows, features
+
+    modules = stack.get("modules", {})
+    has_numpy = bool(modules.get("numpy", {}).get("installed"))
+    has_pandas = bool(modules.get("pandas", {}).get("installed"))
+    has_sklearn = bool(modules.get("sklearn", {}).get("installed"))
+
+    if has_numpy and has_pandas:
+        try:
+            np = importlib.import_module("numpy")
+            pd = importlib.import_module("pandas")
+
+            df = pd.DataFrame(rows)
+            if not df.empty:
+                horizon = max(args.horizon_hours, 1.0)
+                df["time_weight"] = np.clip(1.0 - (df["hours_to_start"] / horizon), 0.0, 1.0)
+                features["pandas_scoring"] = True
+
+                if has_sklearn:
+                    try:
+                        RobustScaler = importlib.import_module("sklearn.preprocessing").RobustScaler
+                        scaler = RobustScaler()
+                        df["edge_scaled"] = scaler.fit_transform(df[["edge_pct"]]).ravel()
+                        features["sklearn_scaling"] = True
+                    except Exception:
+                        df["edge_scaled"] = 0.0
+                else:
+                    df["edge_scaled"] = 0.0
+
+                df["alpha_score"] = (
+                    df["alpha_score"]
+                    + (df["edge_scaled"] * 2.5)
+                    + (df["time_weight"] * 1.5)
+                ).round(4)
+
+                rows = df.sort_values(["alpha_score", "edge_pct"], ascending=False).to_dict("records")
+        except Exception:
+            pass
+
+    has_pypfopt = bool(modules.get("pypfopt", {}).get("installed"))
+    if has_pypfopt and rows:
+        try:
+            np = importlib.import_module("numpy")
+            EfficientFrontier = importlib.import_module("pypfopt.efficient_frontier").EfficientFrontier
+
+            candidates = [r for r in rows if r.get("edge_pct", 0.0) > 0.0]
+            n = min(20, len(candidates))
+            if n >= 2:
+                top = candidates[:n]
+                mu = np.array([float(r["edge_pct"]) / 100.0 for r in top], dtype=float)
+                var = []
+                for r in top:
+                    dk = float(r["dk_price_decimal"])
+                    fair = float(r["fair_price_decimal"])
+                    p = min(1.0, max(0.0, 1.0 / fair))
+                    payoff = dk - 1.0
+                    exp = p * payoff - (1.0 - p)
+                    v = p * (payoff - exp) ** 2 + (1.0 - p) * ((-1.0) - exp) ** 2
+                    var.append(max(v, 1e-6))
+                sigma = np.diag(np.array(var, dtype=float))
+
+                ef = EfficientFrontier(mu, sigma, weight_bounds=(0.0, 1.0))
+                ef.max_sharpe(risk_free_rate=0.0)
+                weights = ef.clean_weights()
+
+                weight_sum = sum(float(w) for w in weights.values())
+                if weight_sum > 0:
+                    for idx, row in enumerate(top):
+                        w = float(weights.get(idx, 0.0))
+                        stake = min(args.max_bet, args.bankroll * w)
+                        row["optimized_stake"] = round(stake, 2)
+                        row["optimized_weight"] = round(w, 6)
+                    features["pypfopt_allocation"] = True
+        except Exception:
+            pass
+
+    has_quantstats = bool(modules.get("quantstats", {}).get("installed"))
+    if has_quantstats and rows:
+        try:
+            pd = importlib.import_module("pandas")
+            qs = importlib.import_module("quantstats")
+            expected_returns = []
+            for r in rows:
+                dk = float(r["dk_price_decimal"])
+                fair = float(r["fair_price_decimal"])
+                p = min(1.0, max(0.0, 1.0 / fair))
+                expected_returns.append(p * (dk - 1.0) - (1.0 - p))
+            ret_series = pd.Series(expected_returns)
+            sharpe = qs.stats.sharpe(ret_series, rf=0.0)
+            sortino = qs.stats.sortino(ret_series, rf=0.0)
+            features["quantstats_snapshot"] = {
+                "expected_sharpe": None if sharpe is None else float(sharpe),
+                "expected_sortino": None if sortino is None else float(sortino),
+                "sample_size": int(len(ret_series)),
+            }
+        except Exception:
+            pass
+
+    return rows, features
+
+
+def write_csv(rows: list[dict[str, Any]], path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not rows:
+        path.write_text("", encoding="utf-8")
+        return
+
+    fieldnames = list(rows[0].keys())
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def run_flowform_layer() -> None:
+    cmd = [
+        str(Path(os.getenv("PYTHON_EXECUTABLE", "") or os.sys.executable)),
+        str(CODE_DIR / "sports_intelligence_layer.py"),
+    ]
+    subprocess.run(cmd, check=False)
+
+
+def load_previous_state() -> dict[str, Any]:
+    if not LOOP_STATE_JSON.exists():
+        return {"last_alert_ids": []}
+    try:
+        payload = json.loads(LOOP_STATE_JSON.read_text(encoding="utf-8"))
+    except Exception:
+        return {"last_alert_ids": []}
+    if not isinstance(payload, dict):
+        return {"last_alert_ids": []}
+    return payload
+
+
+def save_state(alert_ids: list[str]) -> None:
+    payload = {
+        "saved_utc": now_utc(),
+        "last_alert_ids": sorted(set(alert_ids)),
+    }
+    write_json(LOOP_STATE_JSON, payload)
+
+
+def print_top_rows(rows: list[dict[str, Any]], title: str, top_n: int) -> None:
+    print(f"\n{title}")
+    if not rows:
+        print("  (none)")
+        return
+
+    for idx, row in enumerate(rows[:top_n], start=1):
+        print(
+            f"  {idx:>2}. [{row['edge_pct']:>6.2f}%] [{row['alpha_score']:>7.2f}] "
+            f"{row['sport_key']} | {row['game']} | {row['market']} {row['pick']}"
+            f" {('('+str(row['point'])+')') if str(row['point']) else ''}"
+            f" | DK={row['dk_price_american']} ({row['dk_price_decimal']:.3f})"
+            f" | Kelly=${row['kelly_stake']:.2f} | T-{row['hours_to_start']:.2f}h"
+        )
+
+
+def run_once(args: Args, api_key: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    if not args.no_fetch:
+        manifest = fetch_universe(api_key, args)
+        ok_count = sum(1 for x in manifest["sports"].values() if isinstance(x, dict) and x.get("ok"))
+        print(f"Fetched sports: ok={ok_count}/{manifest['sports_requested']}")
+
+    if not args.no_flowform:
+        run_flowform_layer()
+
+    catalog = build_market_catalog()
+    print(f"DraftKings market catalog updated: global_markets={len(catalog['global_markets'])}")
+
+    stack = detect_advanced_stack()
+    rows = build_alpha_rows(args)
+    rows, advanced_features = _apply_advanced_scoring(rows, args, stack)
+
+    if rows:
+        for row in rows:
+            if "optimized_stake" not in row:
+                row["optimized_stake"] = row.get("kelly_stake", 0.0)
+                row["optimized_weight"] = None
+    longshots = [
+        r for r in rows
+        if r["dk_price_decimal"] >= args.longshot_min_dk and r["edge_pct"] >= args.longshot_min_edge
+    ]
+
+    payload = {
+        "generated_utc": now_utc(),
+        "regions": args.regions,
+        "min_edge": args.min_edge,
+        "horizon_hours": args.horizon_hours,
+        "bankroll": args.bankroll,
+        "kelly_fraction": args.kelly_frac,
+        "max_bet": args.max_bet,
+        "advanced_stack": {
+            "python_executable": stack.get("python_executable"),
+            "installed_count": stack.get("installed_count"),
+            "total_checked": stack.get("total_checked"),
+            "features_used": advanced_features,
+        },
+        "count": len(rows),
+        "rows": rows,
+    }
+    longshot_payload = {
+        "generated_utc": now_utc(),
+        "longshot_min_dk": args.longshot_min_dk,
+        "longshot_min_edge": args.longshot_min_edge,
+        "count": len(longshots),
+        "rows": longshots,
+    }
+
+    write_json(ALPHA_BOARD_JSON, payload)
+    write_json(LONGSHOT_BOARD_JSON, longshot_payload)
+    write_json(
+        ADVANCED_STACK_REPORT_JSON,
+        {
+            **stack,
+            "features_used": advanced_features,
+            "alpha_rows": len(rows),
+            "longshot_rows": len(longshots),
+        },
+    )
+    write_csv(rows, ALPHA_BOARD_CSV)
+
+    print(
+        "Advanced stack: "
+        f"{stack.get('installed_count', 0)}/{stack.get('total_checked', 0)} modules available "
+        f"| pandas={advanced_features.get('pandas_scoring')} "
+        f"| sklearn={advanced_features.get('sklearn_scaling')} "
+        f"| pypfopt={advanced_features.get('pypfopt_allocation')}"
+    )
+
+    print_top_rows(rows, "Top Alpha Board", args.top_n)
+    print_top_rows(longshots, "Potapova-Style Longshot Board", min(args.top_n, len(longshots) or args.top_n))
+
+    return rows, longshots
+
+
+def run_loop(args: Args, api_key: str) -> int:
+    iteration = 0
+    while True:
+        iteration += 1
+        print(f"\n=== Loop iteration {iteration} @ {now_utc()} ===")
+        rows, _ = run_once(args, api_key)
+
+        state = load_previous_state()
+        prev_ids = set(state.get("last_alert_ids", []))
+        current_ids = {
+            r["alert_id"]
+            for r in rows
+            if r["edge_pct"] >= args.alert_min_edge and r["hours_to_start"] > 0
+        }
+        new_ids = current_ids - prev_ids
+
+        if new_ids:
+            print(f"\nALERT: {len(new_ids)} new alpha opportunities (edge >= {args.alert_min_edge:.2f}%).")
+            new_rows = [r for r in rows if r["alert_id"] in new_ids]
+            print_top_rows(new_rows, "New Alpha Alerts", min(args.top_n, len(new_rows)))
+        else:
+            print("\nALERT: no new alpha opportunities above alert threshold.")
+
+        save_state(list(current_ids))
+
+        if args.iterations > 0 and iteration >= args.iterations:
+            print("Loop completed requested iterations.")
+            return 0
+
+        time.sleep(max(5, args.interval_sec))
+
+
+def parse_args() -> Args:
+    parser = argparse.ArgumentParser(description="DraftKings alpha autopilot: merge + loop + longshot hunter")
+    parser.add_argument("--regions", default="us,uk,eu")
+    parser.add_argument("--sports", default="all", help="Comma-separated sport keys or 'all'")
+    parser.add_argument("--min-edge", type=float, default=1.0)
+    parser.add_argument("--horizon-hours", type=float, default=72.0, help="Only include events starting within this many hours; 0 disables")
+    parser.add_argument("--bankroll", type=float, default=150.0)
+    parser.add_argument("--kelly-frac", type=float, default=0.25)
+    parser.add_argument("--max-bet", type=float, default=25.0)
+    parser.add_argument("--top-n", type=int, default=15)
+    parser.add_argument("--longshot-min-dk", type=float, default=4.0)
+    parser.add_argument("--longshot-min-edge", type=float, default=2.0)
+    parser.add_argument("--no-fetch", action="store_true")
+    parser.add_argument("--no-flowform", action="store_true")
+    parser.add_argument("--loop", action="store_true")
+    parser.add_argument("--interval-sec", type=int, default=300)
+    parser.add_argument("--iterations", type=int, default=0, help="0 means infinite loop")
+    parser.add_argument("--alert-min-edge", type=float, default=5.0)
+
+    ns = parser.parse_args()
+    return Args(
+        regions=ns.regions,
+        sports=ns.sports,
+        min_edge=ns.min_edge,
+        horizon_hours=ns.horizon_hours,
+        bankroll=ns.bankroll,
+        kelly_frac=ns.kelly_frac,
+        max_bet=ns.max_bet,
+        top_n=ns.top_n,
+        longshot_min_dk=ns.longshot_min_dk,
+        longshot_min_edge=ns.longshot_min_edge,
+        no_fetch=ns.no_fetch,
+        no_flowform=ns.no_flowform,
+        loop=ns.loop,
+        interval_sec=ns.interval_sec,
+        iterations=ns.iterations,
+        alert_min_edge=ns.alert_min_edge,
+    )
+
+
+def main() -> int:
+    maybe_reexec_to_richer_env()
+    load_env_file()
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    args = parse_args()
+    api_key = get_api_key()
+    if not api_key and not args.no_fetch:
+        print("ERROR: Missing odds API key (THEODDS_API_KEY / ODDS_API_KEY / SPORTS_ODDS_API_KEY).")
+        return 2
+
+    if args.loop:
+        return run_loop(args, api_key)
+
+    run_once(args, api_key)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

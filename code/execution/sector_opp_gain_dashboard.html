@@ -1,0 +1,519 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LumenCore ⚡ Live Opportunity Engine</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" crossorigin="anonymous" defer></script>
+<style>
+:root {
+  --bg0:#020b18;--bg1:#061322;--bg2:#0a1e35;
+  --glass:rgba(6,19,34,0.85);--border:rgba(34,211,238,.13);--border-bright:rgba(34,211,238,.45);
+  --cyan:#22d3ee;--cyan2:#06b6d4;--green:#22c55e;--green2:#16a34a;
+  --amber:#f59e0b;--red:#ef4444;--purple:#a78bfa;--pink:#f472b6;
+  --text:#e4eeff;--muted:#6b8ab0;
+  --glow-cyan:0 0 20px rgba(34,211,238,.35),0 0 60px rgba(34,211,238,.12);
+  --glow-green:0 0 20px rgba(34,197,94,.35),0 0 60px rgba(34,197,94,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow-x:hidden}
+body{background:var(--bg0);color:var(--text);font-family:Inter,'Segoe UI',system-ui,sans-serif;font-size:13px}
+#pc{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.5}
+body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,.07) 3px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:1}
+.pg{position:relative;z-index:2;max-width:1800px;margin:0 auto;padding:16px 20px 32px}
+.card{background:var(--glass);border:1px solid var(--border);border-radius:18px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.card.gc{border-color:var(--border-bright);box-shadow:var(--glow-cyan)}
+.ct{font-size:14px;font-weight:800;color:var(--cyan);display:flex;align-items:center;gap:7px;margin-bottom:14px}
+.hero{padding:20px 28px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(6,19,34,.97),rgba(2,11,24,.97));border:1px solid var(--border-bright);border-radius:22px;box-shadow:var(--glow-cyan),inset 0 1px 0 rgba(34,211,238,.08)}
+.hero h1{font-size:28px;font-weight:900;letter-spacing:-.5px;background:linear-gradient(90deg,var(--cyan) 0%,#38bdf8 50%,var(--purple) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero .sub{color:var(--muted);font-size:11px;margin-top:5px}
+.hero-r{display:flex;align-items:center;gap:20px}
+.spill{display:flex;align-items:center;gap:8px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:800;color:var(--green);animation:pf 3s ease-in-out infinite}
+@keyframes pf{0%,100%{opacity:1}50%{opacity:.7}}
+.dot{width:10px;height:10px;border-radius:50%;animation:dp 1.5s ease-in-out infinite}
+.dot.g{background:var(--green);box-shadow:0 0 8px var(--green)}
+.dot.a{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+@keyframes dp{0%,100%{transform:scale(1)}50%{transform:scale(1.45)}}
+.clk{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--cyan);letter-spacing:2px}
+.kr{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:14px}
+.kpi{padding:16px 18px;background:linear-gradient(160deg,rgba(10,30,53,.9),rgba(6,19,34,.9));border:1px solid var(--border);border-radius:16px;position:relative;overflow:hidden;transition:border-color .3s,box-shadow .3s}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.5}
+.kpi.g::before{background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.kpi.am::before{background:linear-gradient(90deg,transparent,var(--amber),transparent)}
+.kpi.pu::before{background:linear-gradient(90deg,transparent,var(--purple),transparent)}
+.kpi.re::before{background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.kl{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted)}
+.kv{font-size:26px;font-weight:900;color:var(--cyan);margin:6px 0 4px;font-variant-numeric:tabular-nums;transition:color .3s}
+.kpi.g .kv{color:var(--green)}.kpi.am .kv{color:var(--amber)}.kpi.pu .kv{color:var(--purple)}.kpi.re .kv{color:var(--red)}
+.ks{font-size:10px;color:var(--muted)}
+.cum-card{padding:18px;text-align:center;background:linear-gradient(135deg,rgba(6,19,34,.95),rgba(34,197,94,.06));border:1px solid rgba(34,197,94,.2);border-radius:18px;margin-top:14px}
+.cum-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px}
+.cum-val{font-size:50px;font-weight:900;color:var(--green);font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(34,197,94,.4),0 0 80px rgba(34,197,94,.15);letter-spacing:-1px}
+.cum-rt{font-size:12px;color:var(--muted);margin-top:6px}
+.cum-rt span{color:var(--cyan);font-weight:700}
+.bg{display:grid;grid-template-columns:1fr 400px;gap:14px;margin-top:14px}
+.cc{padding:18px 20px}
+#mc{width:100%;height:280px}
+.gr{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.gc2{padding:14px 16px;text-align:center}
+.glbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;color:var(--muted)}
+.gch{height:120px}
+.af{display:flex;flex-direction:column;gap:7px;max-height:270px;overflow-y:auto}
+.af::-webkit-scrollbar{width:4px}.af::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.ai{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;border-radius:10px;font-size:11px;animation:ain .4s ease-out}
+@keyframes ain{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
+.ai.HIGH{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25)}
+.ai.MEDIUM{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2)}
+.asev{font-weight:800;font-size:10px;padding:1px 6px;border-radius:4px;white-space:nowrap}
+.ai.HIGH .asev{background:rgba(239,68,68,.2);color:var(--red)}
+.ai.MEDIUM .asev{background:rgba(245,158,11,.15);color:var(--amber)}
+.amsg{color:var(--text);font-weight:500;line-height:1.4}
+.ats{color:var(--muted);font-size:9px;margin-top:2px}
+.sgc{padding:18px 20px;margin-top:14px}
+.sgh{display:grid;grid-template-columns:140px 110px 1fr 88px 76px 68px 68px;gap:8px;padding:0 4px 10px;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.srs{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.sr{display:grid;grid-template-columns:140px 110px 1fr 88px 76px 68px 68px;gap:8px;align-items:center;padding:7px 6px;border-radius:10px;border:1px solid transparent;transition:background .3s,border-color .3s}
+.sr:hover{background:rgba(34,211,238,.04);border-color:var(--border)}
+.sr.beat{background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.2);box-shadow:0 0 12px rgba(34,197,94,.08)}
+.sr.zs{animation:zsp .6s ease-out}
+@keyframes zsp{0%{background:rgba(245,158,11,.15)}100%{background:transparent}}
+.sn{font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp{font-weight:900;font-size:13px;font-variant-numeric:tabular-nums}
+.sw{position:relative;height:32px}
+.sw svg{width:100%;height:32px;overflow:visible}
+.sg{font-weight:800;font-size:12px;font-variant-numeric:tabular-nums;text-align:right}
+.sg.pos{color:var(--green)}.sg.neg{color:var(--red)}
+.mb{display:flex;align-items:center;justify-content:center;gap:3px;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px}
+.mb.up{background:rgba(34,197,94,.12);color:var(--green)}
+.mb.down{background:rgba(239,68,68,.1);color:var(--red)}
+.mb.flat{background:rgba(107,138,176,.1);color:var(--muted)}
+.lb{font-size:10px;font-weight:700;text-align:center;padding:2px 7px;border-radius:999px}
+.HIGH{background:rgba(34,197,94,.15);color:var(--green)}
+.MEDIUM{background:rgba(34,211,238,.1);color:var(--cyan)}
+.LOW{background:rgba(100,120,160,.1);color:var(--muted)}
+.rc{display:flex;flex-direction:column;gap:12px}
+.st{width:100%;border-collapse:collapse;font-size:11px}
+.st th{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:1px;padding:5px 6px;border-bottom:1px solid var(--border);text-align:left}
+.st td{padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.03)}
+.shg{color:var(--green);font-weight:800}.shw{color:var(--amber);font-weight:800}.shl{color:var(--muted)}
+.rst{font-size:9px;padding:1px 5px;border-radius:4px;background:rgba(167,139,250,.1);color:var(--purple)}
+#tc{position:fixed;top:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:9999;pointer-events:none}
+.toast{min-width:300px;max-width:380px;padding:12px 16px;border-radius:12px;font-size:12px;font-weight:600;backdrop-filter:blur(20px);animation:ti .35s cubic-bezier(.2,0,.2,1.4) forwards;pointer-events:all}
+@keyframes ti{from{opacity:0;transform:translateX(40px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
+.toast.HIGH{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#fca5a5}
+.toast.MEDIUM{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);color:#fde68a}
+.th{font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.tb{opacity:.85}
+.tw{margin-top:14px;overflow:hidden;white-space:nowrap;background:rgba(34,211,238,.03);border:1px solid var(--border);border-radius:10px;padding:7px 0}
+.ti{display:inline-block;animation:ts 40s linear infinite}
+@keyframes ts{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ti-i{display:inline-block;padding:0 36px;font-size:11px;color:var(--muted)}
+.ti-i .tn{color:var(--text);font-weight:700}.ti-i .tv{color:var(--cyan)}.ti-i .tg{color:var(--green);font-weight:700}.ti-i .tr{color:var(--red);font-weight:700}.ti-i .ts{color:rgba(34,211,238,.2);margin:0 6px}
+.br{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.proof-strip{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:11px 22px;margin-top:12px;background:linear-gradient(90deg,rgba(34,197,94,.06),rgba(34,211,238,.06),rgba(167,139,250,.06));border:1px solid rgba(34,197,94,.25);border-radius:14px;font-size:11px}
+.proof-strip .pb{display:flex;align-items:center;gap:7px;color:var(--text);font-weight:700;letter-spacing:.3px}.proof-strip .pb span{font-size:18px;font-weight:900;color:var(--green)}.proof-strip .pb small{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.proof-strip .ps{color:var(--muted);font-size:10px}
+.proof-strip .pv{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.exec-card{padding:18px 22px;margin-top:14px;background:linear-gradient(145deg,rgba(6,19,34,.97),rgba(34,197,94,.04));border:1px solid rgba(34,197,94,.22);border-radius:18px}
+.exec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.exec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.exec-bullet{padding:14px 16px;background:rgba(6,19,34,.8);border:1px solid var(--border);border-radius:12px;position:relative;overflow:hidden}
+.exec-bullet::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--accent-col,var(--cyan))}
+.exec-q{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px}
+.exec-a{font-size:13px;font-weight:700;color:var(--text);line-height:1.5}
+.exec-sig{font-size:10px;color:var(--muted);margin-top:6px}
+.src-panel{padding:18px 20px;margin-top:14px}
+#sbchart{width:100%;height:220px}
+.src-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.src-cell{padding:10px 14px;background:rgba(6,19,34,.7);border:1px solid var(--border);border-radius:10px;text-align:center}
+.src-cell .sc-n{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.src-cell .sc-v{font-size:20px;font-weight:900;font-variant-numeric:tabular-nums}
+.src-cell .sc-b{display:flex;gap:4px;justify-content:center;margin-top:4px;font-size:9px}
+.sc-oa{color:var(--cyan);font-weight:700}.sc-kb{color:var(--purple);font-weight:700}
+.bs{padding:14px 18px;border-radius:14px;background:rgba(6,19,34,.8);border:1px solid var(--border)}
+.roi-panel{padding:18px 20px;margin-top:14px}
+.roi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:12px}
+.roi-cell{padding:10px 14px;border-radius:10px;background:rgba(6,19,34,.8);border:1px solid var(--border);position:relative;overflow:hidden;transition:border-color .3s}
+.roi-cell:hover{border-color:var(--border-bright)}
+.roi-cell .rc-bar{position:absolute;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--green),var(--cyan));transition:width .8s cubic-bezier(.4,0,.2,1)}
+.roi-cell .rc-s{font-size:10px;color:var(--muted);text-overflow:ellipsis;overflow:hidden;white-space:nowrap;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.roi-cell .rc-v{font-weight:900;font-size:14px;color:var(--green);font-variant-numeric:tabular-nums}
+.algo-panel{padding:16px 18px;margin-top:12px;background:rgba(6,19,34,.72);border:1px solid var(--border);border-radius:14px}
+.algo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.algo-item{padding:10px 12px;background:rgba(10,30,53,.65);border:1px solid rgba(34,211,238,.12);border-radius:10px}
+.algo-name{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.algo-formula{font-size:12px;color:var(--text);font-family:Consolas,'Courier New',monospace;word-break:break-word}
+.readiness{padding:14px 16px;margin-top:12px;background:rgba(6,19,34,.82);border:1px solid rgba(34,211,238,.18);border-radius:14px}
+.readiness-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rd-cell{background:rgba(10,30,53,.62);border:1px solid rgba(34,211,238,.10);border-radius:10px;padding:10px 12px}
+.rd-l{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px}
+.rd-v{font-size:13px;font-weight:800;color:var(--text)}
+.bsl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.bsv{font-size:22px;font-weight:900;margin-top:4px;font-variant-numeric:tabular-nums}
+@media(max-width:1300px){.bg{grid-template-columns:1fr}.kr{grid-template-columns:repeat(3,1fr)}.br{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.kr{grid-template-columns:repeat(2,1fr)}.gr{grid-template-columns:1fr}.sgh,.sr{grid-template-columns:120px 90px 1fr 70px}.mb,.lb{display:none}}
+</style>
+</head>
+<body>
+<canvas id="pc"></canvas>
+<div id="tc"></div>
+<div class="pg">
+<div class="hero gc">
+  <div>
+    <h1>⚡ LumenCore — Live Opportunity Engine</h1>
+    <div class="sub">54 data sources · 20 sectors · SciPy rolling Sharpe · Champion flow baselines · Monte Carlo validated</div>
+  </div>
+  <div class="hero-r">
+    <div class="clk" id="clk">00:00:00</div>
+    <div class="spill"><div class="dot g" id="sdot"></div><span id="stxt">LIVE STREAMING</span></div>
+  </div>
+</div>
+
+<div class="kr">
+  <div class="kpi g"><div class="kl">Rolling $/sec</div><div class="kv" id="k0">—</div><div class="ks" id="k0s">All sectors</div></div>
+  <div class="kpi"><div class="kl">Rolling Hourly</div><div class="kv" id="k1">—</div><div class="ks">Full breadth</div></div>
+  <div class="kpi g"><div class="kl">Measured Hourly</div><div class="kv" id="k2">—</div><div class="ks">Live-probed</div></div>
+  <div class="kpi pu"><div class="kl">Breadth Cover</div><div class="kv" id="k3">—</div><div class="ks" id="k3s">sources</div></div>
+  <div class="kpi am"><div class="kl">SciPy Sharpe</div><div class="kv" id="k4">—</div><div class="ks">15-tick rolling</div></div>
+  <div class="kpi re" id="kac"><div class="kl">HIGH Alerts</div><div class="kv" id="k5">0</div><div class="ks">Sectors beating baseline</div></div>
+</div>
+
+<div class="cum-card">
+  <!-- PROOF STRIP -->
+  <div class="proof-strip" id="proofstrip">
+    <div class="pv">
+      <div class="pb"><span id="ps-src">54</span><small>total sources</small></div>
+      <div class="pb"><span id="ps-oa">37</span><small>open-access</small></div>
+      <div class="pb"><span id="ps-kb">17</span><small>key-backed</small></div>
+      <div class="pb"><span id="ps-sec">20</span><small>sectors</small></div>
+      <div class="pb"><span id="ps-mc">✓</span><small>Monte Carlo</small></div>
+      <div class="pb"><span id="ps-sh">✓</span><small>SciPy Sharpe</small></div>
+    </div>
+    <div class="ps">Last source proof: <strong id="ps-ts">—</strong></div>
+  </div>
+
+  <!-- EXECUTIVE BRIEF -->
+  <div class="exec-card card">
+    <div class="exec-header"><div class="ct">🎯 Executive Brief — Auto-Generated from Live Data</div><div style="font-size:10px;color:var(--muted)" id="eb-ts">Updated on tick</div></div>
+    <div class="exec-grid">
+      <div class="exec-bullet" style="--accent-col:var(--green)">
+        <div class="exec-q">What is the annual value?</div>
+        <div class="exec-a" id="eb0">Loading…</div>
+        <div class="exec-sig" id="eb0s"></div>
+      </div>
+      <div class="exec-bullet" style="--accent-col:var(--cyan)">
+        <div class="exec-q">Why trust the data?</div>
+        <div class="exec-a" id="eb1">Loading…</div>
+        <div class="exec-sig" id="eb1s"></div>
+      </div>
+      <div class="exec-bullet" style="--accent-col:var(--purple)">
+        <div class="exec-q">What is the edge?</div>
+        <div class="exec-a" id="eb2">Loading…</div>
+        <div class="exec-sig" id="eb2s"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOURCE ARCHITECTURE PANEL -->
+  <div class="card src-panel">
+    <div class="ct">🔬 Source Architecture — 54 Sources Across 20 Sectors</div>
+    <div id="sbchart"></div>
+    <div class="src-grid" id="src-topgrid"></div>
+  </div>
+
+  <!-- ANNUAL ROI PROJECTION PANEL -->
+  <div class="card roi-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+      <div class="ct">💰 Annual Value Projection — Per Sector</div>
+      <div style="font-size:10px;color:var(--muted)">Based on live rolling $/hr × annual multiplier</div>
+    </div>
+    <div class="roi-grid" id="roi-grid"><div style="color:var(--muted);font-size:11px;padding:12px">Loading…</div></div>
+  </div>
+
+  <div class="algo-panel">
+    <div class="ct">🧠 Strategy + Formula Deck</div>
+    <div class="algo-grid">
+      <div class="algo-item"><div class="algo-name">Champion Gain</div><div class="algo-formula">opp_gain_pct = ((live_sharpe / base_sharpe) - 1) * 100</div></div>
+      <div class="algo-item"><div class="algo-name">Rolling Sharpe</div><div class="algo-formula">mean(rets) / std(rets) * sqrt(N)</div></div>
+      <div class="algo-item"><div class="algo-name">Momentum Slope</div><div class="algo-formula">linregress(x, sparkline).slope / mean(sparkline)</div></div>
+      <div class="algo-item"><div class="algo-name">Anomaly Score</div><div class="algo-formula">z = (x - mean(window)) / std(window)</div></div>
+      <div class="algo-item"><div class="algo-name">Hybrid Crypto Regime</div><div class="algo-formula">hybrid = w * moon_score + (1-w) * fallback_score</div></div>
+      <div class="algo-item"><div class="algo-name">Breakout Harmonic</div><div class="algo-formula">near_high + accel + r2 + trade_density - chase_penalty</div></div>
+    </div>
+  </div>
+  <div class="readiness">
+    <div class="ct">🛰️ Live Readiness</div>
+    <div class="readiness-grid">
+      <div class="rd-cell"><div class="rd-l">Route</div><div class="rd-v" id="rd-route">—</div></div>
+      <div class="rd-cell"><div class="rd-l">Alpaca</div><div class="rd-v" id="rd-alpaca">—</div></div>
+      <div class="rd-cell"><div class="rd-l">Next Open</div><div class="rd-v" id="rd-open">—</div></div>
+      <div class="rd-cell"><div class="rd-l">Scan / Target</div><div class="rd-v" id="rd-scan">—</div></div>
+      <div class="rd-cell"><div class="rd-l">Profile</div><div class="rd-v" id="rd-profile">—</div></div>
+      <div class="rd-cell"><div class="rd-l">Entry Gate</div><div class="rd-v" id="rd-gate">—</div></div>
+      <div class="rd-cell"><div class="rd-l">Paper Loop</div><div class="rd-v" id="rd-ploop">—</div></div>
+      <div class="rd-cell"><div class="rd-l">Runtime Loop</div><div class="rd-v" id="rd-rloop">—</div></div>
+    </div>
+  </div>
+  <div class="cum-lbl">Session Cumulative Opportunity Gain</div>
+  <div class="cum-val" id="cumv">$0.00</div>
+  <div class="cum-rt">Compounding at <span id="cumr">—</span> · Live every 100ms</div>
+</div>
+
+<div class="bg">
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="card cc"><div class="ct">📈 Rolling Gain · Last 120 Ticks · Plotly Live</div><div id="mc"></div></div>
+    <div class="gr">
+      <div class="card gc2"><div class="glbl" id="g0l">—</div><div class="gch" id="g0"></div></div>
+      <div class="card gc2"><div class="glbl" id="g1l">—</div><div class="gch" id="g1"></div></div>
+      <div class="card gc2"><div class="glbl" id="g2l">—</div><div class="gch" id="g2"></div></div>
+    </div>
+  </div>
+  <div class="rc">
+    <div class="card" style="padding:16px 18px">
+      <div class="ct">🚨 Alert Feed <span id="acb" style="background:rgba(239,68,68,.15);color:var(--red);font-size:10px;padding:1px 8px;border-radius:999px;font-weight:800;margin-left:4px">0</span></div>
+      <div class="af" id="af"><div style="color:var(--muted);font-size:11px;padding:8px 0">Watching for threshold events…</div></div>
+    </div>
+    <div class="card" style="padding:16px 18px;flex:1">
+      <div class="ct">🏆 Champion Sharpe — Base vs Live vs SciPy</div>
+      <table class="st"><thead><tr><th>Sector</th><th>Base</th><th>Live</th><th>SciPy</th><th>Gain%</th></tr></thead>
+      <tbody id="stb"><tr><td colspan="5" style="color:var(--muted);text-align:center;padding:14px">Loading…</td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<div class="card sgc">
+  <div class="ct">⚡ Sector Intelligence Grid — Sparkline · Momentum · SciPy Z-score</div>
+  <div class="sgh"><div>Sector</div><div>$/sec</div><div>Sparkline 30pt</div><div style="text-align:right">vs Baseline</div><div style="text-align:center">Momentum</div><div style="text-align:center">Lane</div><div style="text-align:right">Z-score</div></div>
+  <div class="srs" id="srs"><div style="color:var(--muted);text-align:center;padding:20px">Connecting…</div></div>
+</div>
+
+<div class="tw"><div class="ti" id="tti"><span class="ti-i"><span class="tn">CONNECTING</span><span class="ts">·</span><span class="tv">—</span></span></div></div>
+
+<div class="br">
+  <div class="bs"><div class="bsl">Annual (Top Sector)</div><div class="bsv" id="b0" style="color:var(--green)">—</div></div>
+  <div class="bs"><div class="bsl">Measured Split</div><div class="bsv" id="b1" style="color:var(--cyan)">—</div></div>
+  <div class="bs"><div class="bsl">Paper Sharpe</div><div class="bsv" id="b2" style="color:var(--amber)">—</div></div>
+  <div class="bs"><div class="bsl">Active Sectors</div><div class="bsv" id="b3" style="color:var(--purple)">—</div></div>
+</div>
+</div>
+
+<script>
+// Particles
+(function(){
+  const c=document.getElementById('pc'),ctx=c.getContext('2d');
+  let W,H,ns=[];
+  const N=60,LD=165,SP=.3;
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}
+  function init(){ns=[];for(let i=0;i<N;i++)ns.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*SP,vy:(Math.random()-.5)*SP,r:Math.random()*1.5+.5})}
+  function draw(){ctx.clearRect(0,0,W,H);for(let i=0;i<ns.length;i++){for(let j=i+1;j<ns.length;j++){const dx=ns[i].x-ns[j].x,dy=ns[i].y-ns[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<LD){ctx.beginPath();ctx.strokeStyle=`rgba(34,211,238,${(1-d/LD)*.3})`;ctx.lineWidth=.6;ctx.moveTo(ns[i].x,ns[i].y);ctx.lineTo(ns[j].x,ns[j].y);ctx.stroke()}}}ns.forEach(n=>{ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);ctx.fillStyle='rgba(34,211,238,.65)';ctx.fill();n.x+=n.vx;n.y+=n.vy;if(n.x<0||n.x>W)n.vx*=-1;if(n.y<0||n.y>H)n.vy*=-1});requestAnimationFrame(draw)}
+  window.addEventListener('resize',()=>{resize();init()});resize();init();draw();
+})();
+
+// Palette
+const P=['#22d3ee','#22c55e','#a78bfa','#f59e0b','#f472b6','#38bdf8','#4ade80','#c084fc','#fbbf24','#fb7185','#67e8f9','#86efac','#d8b4fe','#fcd34d','#fda4af','#a5f3fc','#bbf7d0','#ede9fe','#fef3c7','#ffe4e6','#cffafe'];
+const pc=i=>P[i%P.length];
+
+// Helpers
+const fu=v=>v>=1e9?'$'+(v/1e9).toFixed(2)+'B':v>=1e6?'$'+(v/1e6).toFixed(2)+'M':v>=1e3?'$'+(v/1e3).toFixed(1)+'k':'$'+v.toFixed(2);
+const fp=v=>'$'+v.toFixed(4)+'/s';
+const fc=v=>(v>=0?'+':'')+v.toFixed(1)+'%';
+const pad=n=>String(n).padStart(2,'0');
+const ts=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())};
+setInterval(()=>document.getElementById('clk').textContent=ts(),1000);
+
+// Cumulative
+let cB=0,cS=Date.now(),cPS=0;
+// Source Breadth — fetch once
+let sbData=null;
+fetch('/api/source_breadth').then(r=>r.json()).then(d=>{
+  sbData=d;
+  document.getElementById('ps-src').textContent=d.combined||54;
+  document.getElementById('ps-oa').textContent=d.open_access||37;
+  document.getElementById('ps-kb').textContent=d.key_backed||17;
+  document.getElementById('ps-sec').textContent=d.sector_count||20;
+  if(d.generated_utc){
+    const dt=new Date(d.generated_utc);
+    document.getElementById('ps-ts').textContent=dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' '+dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})+' UTC';
+  }
+  buildSourceChart(d.sectors||[]);
+  buildSrcTopGrid(d.sectors||[]);
+}).catch(()=>{});
+
+function buildSourceChart(sectors){
+  if(!sectors.length)return;
+  const byCombo=sectors.slice().sort((a,b)=>b.combined_sources-a.combined_sources);
+  const names=byCombo.map(s=>s.sector.replace(/_/g,' '));
+  const oa=byCombo.map(s=>s.open_access_sources);
+  const kb=byCombo.map(s=>s.key_backed_sources);
+  const layout={paper_bgcolor:'transparent',plot_bgcolor:'transparent',barmode:'stack',margin:{t:5,b:90,l:10,r:10},font:{color:'#6b8ab0',size:10},xaxis:{tickfont:{size:9,color:'#6b8ab0'},tickangle:-40,gridcolor:'transparent'},yaxis:{gridcolor:'rgba(255,255,255,.04)',zeroline:false,title:{text:'sources',font:{size:10,color:'#6b8ab0'}}},legend:{font:{color:'#8aa0c0',size:10},bgcolor:'transparent',orientation:'h',y:1.05},hoverlabel:{bgcolor:'#061322',bordercolor:'#22d3ee',font:{color:'#e4eeff',size:11}}};
+  Plotly.newPlot('sbchart',[
+    {name:'Open-Access (no key)',x:names,y:oa,type:'bar',marker:{color:'rgba(34,211,238,.75)',line:{color:'rgba(34,211,238,.2)',width:1}},hovertemplate:'%{x}<br>Open-access: %{y}<extra></extra>'},
+    {name:'Key-Backed (API key)',x:names,y:kb,type:'bar',marker:{color:'rgba(167,139,250,.75)',line:{color:'rgba(167,139,250,.2)',width:1}},hovertemplate:'%{x}<br>Key-backed: %{y}<extra></extra>'}
+  ],layout,{displayModeBar:false,responsive:true});
+}
+
+function buildSrcTopGrid(sectors){
+  const top=sectors.slice().sort((a,b)=>b.combined_sources-a.combined_sources).slice(0,8);
+  document.getElementById('src-topgrid').innerHTML=top.map(s=>`<div class="src-cell"><div class="sc-n">${s.sector.replace(/_/g,' ')}</div><div class="sc-v" style="color:${s.combined_sources>=6?'var(--green)':s.combined_sources>=4?'var(--cyan)':'var(--muted)'}">${s.combined_sources}</div><div class="sc-b"><span class="sc-oa">${s.open_access_sources} open</span><span style="color:var(--border-bright)">·</span><span class="sc-kb">${s.key_backed_sources} key</span></div></div>`).join('');
+}
+
+function setReadiness(d){
+  if(!d)return;
+  const open = d.alpaca_market_open ? 'OPEN' : 'CLOSED';
+  const gate = d.entry_gate||{};
+  const nextOpen = d.alpaca_next_open_utc ? new Date(d.alpaca_next_open_utc).toLocaleString() : '—';
+  document.getElementById('rd-route').textContent = d.active_exchange_route||'—';
+  document.getElementById('rd-alpaca').textContent = open;
+  document.getElementById('rd-open').textContent = nextOpen;
+  document.getElementById('rd-scan').textContent = `${d.scan_count||0} / ${d.scan_target||0}`;
+  document.getElementById('rd-profile').textContent = d.profile||'—';
+  document.getElementById('rd-gate').textContent = `edge≥${(gate.min_edge||0).toFixed(2)} · vol≥$${Math.round(gate.min_quote_volume_usd||0)}`;
+  document.getElementById('rd-ploop').textContent = `${(d.paper_loop_seconds||0).toFixed(2)}s`;
+  document.getElementById('rd-rloop').textContent = `${(d.runtime_loop_seconds||0).toFixed(2)}s`;
+}
+
+function refreshReadiness(){
+  fetch('/api/live_readiness').then(r=>r.json()).then(setReadiness).catch(()=>{});
+}
+refreshReadiness();
+setInterval(refreshReadiness,5000);
+setInterval(()=>{
+  const v=cB+cPS*(Date.now()-cS)/1000;
+  document.getElementById('cumv').textContent='$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('cumr').textContent=fp(cPS);
+},100);
+
+// Plotly
+const PL={paper_bgcolor:'transparent',plot_bgcolor:'transparent',margin:{t:10,b:30,l:65,r:10},xaxis:{showgrid:false,zeroline:false,tickfont:{color:'#6b8ab0',size:10},color:'#6b8ab0'},yaxis:{gridcolor:'rgba(255,255,255,.04)',zeroline:false,tickfont:{color:'#6b8ab0',size:10},color:'#6b8ab0',tickprefix:'$',ticksuffix:'/s'},legend:{font:{color:'#6b8ab0',size:10},bgcolor:'transparent',orientation:'h',y:1.08},hovermode:'x unified',hoverlabel:{bgcolor:'#061322',bordercolor:'#22d3ee',font:{color:'#e4eeff',size:11}}};
+Plotly.newPlot('mc',[
+  {name:'Total $/sec',x:[],y:[],type:'scatter',mode:'lines',fill:'tozeroy',fillcolor:'rgba(34,211,238,.07)',line:{color:'#22d3ee',width:2}},
+  {name:'Measured $/sec',x:[],y:[],type:'scatter',mode:'lines',line:{color:'#22c55e',width:1.5,dash:'dot'}}
+],PL,{displayModeBar:false,responsive:true});
+
+function addPlot(t,a,b){Plotly.extendTraces('mc',{x:[[t],[t]],y:[[a],[b]]},[0,1],120)}
+
+// Gauges
+const GI=['g0','g1','g2'];let ginit=[false,false,false];
+function setGauge(i,sec,val,maxv,col){
+  const d=[{type:'indicator',mode:'gauge+number',value:val,number:{prefix:'$',suffix:'/s',font:{size:13,color:col},valueformat:'.4f'},gauge:{axis:{range:[0,maxv],tickcolor:'#6b8ab0',tickfont:{size:8,color:'#6b8ab0'}},bar:{color:col,thickness:.6},bgcolor:'rgba(255,255,255,.03)',bordercolor:'rgba(255,255,255,.06)',steps:[{range:[0,maxv*.5],color:'rgba(34,211,238,.04)'},{range:[maxv*.5,maxv*.8],color:'rgba(34,211,238,.08)'},{range:[maxv*.8,maxv],color:'rgba(34,197,94,.06)'}],threshold:{line:{color:col,width:2},thickness:.8,value:val}}}];
+  const l={paper_bgcolor:'transparent',plot_bgcolor:'transparent',margin:{t:0,b:0,l:20,r:20},font:{color:'#e4eeff'},height:120};
+  if(!ginit[i]){Plotly.newPlot(GI[i],d,l,{displayModeBar:false,responsive:true});ginit[i]=true}else{Plotly.react(GI[i],d,l)}
+  document.getElementById('g'+i+'l').textContent=sec.replace(/_/g,' ').toUpperCase();
+}
+
+// Sparkline SVG
+function spk(data,col){
+  if(!data||data.length<2)return'<svg></svg>';
+  const W=200,H=32,PAD=2,mn=Math.min(...data),mx=Math.max(...data),rng=mx-mn||1e-12;
+  const pts=data.map((v,i)=>[PAD+(i/(data.length-1))*(W-PAD*2),(H-PAD)-((v-mn)/rng)*(H-PAD*2)]);
+  const line='M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L');
+  const fill=line+`L${pts[pts.length-1][0].toFixed(1)},${H}L${pts[0][0].toFixed(1)},${H}Z`;
+  const gid='sg'+col.replace('#','').replace(/[^a-zA-Z0-9]/g,'');
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${col}" stop-opacity=".3"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><path d="${fill}" fill="url(#${gid})"/><path d="${line}" stroke="${col}" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+// Toasts
+const TC=document.getElementById('tc'),seen=new Set();
+function toast(a){
+  const k=a.sector+a.msg;if(seen.has(k))return;seen.add(k);setTimeout(()=>seen.delete(k),30000);
+  const el=document.createElement('div');el.className=`toast ${a.severity}`;
+  el.innerHTML=`<div class="th">${a.severity} · ${a.sector.replace(/_/g,' ').toUpperCase()}</div><div class="tb">${a.msg}</div>`;
+  TC.prepend(el);setTimeout(()=>{el.style.cssText='opacity:0;transform:translateX(40px);transition:all .4s';setTimeout(()=>el.remove(),400)},5000);
+}
+
+// Main tick processor
+function tick(d){
+    // Executive brief
+    const s=d.sectors||[];
+    if(s.length){
+      const totalAnnual=s.reduce((a,r)=>a+r.annual_usd,0);
+      const topSec=s[0];
+      const beatCount=s.filter(r=>r.live_sharpe>=r.base_sharpe).length;
+      const sharpe=d.system_rolling_sharpe>0?d.system_rolling_sharpe.toFixed(3):null;
+      const srcCount=(sbData&&sbData.combined)||54;
+      const oaCount=(sbData&&sbData.open_access)||37;
+      document.getElementById('eb0').textContent=`$${(totalAnnual/1e6).toFixed(1)}M projected annual value across ${s.length} sectors`;
+      document.getElementById('eb0s').textContent=`Top sector: ${topSec.sector.replace(/_/g,' ')} at $${(topSec.annual_usd/1e6).toFixed(2)}M/yr`;
+      document.getElementById('eb1').textContent=`${srcCount} independent sources · ${oaCount} require no API key · SciPy-validated Sharpe`;
+      document.getElementById('eb1s').textContent=`${beatCount}/${s.length} sectors beating Monte Carlo baseline now`;
+      document.getElementById('eb2').textContent=sharpe?`System rolling Sharpe ${sharpe} · ${beatCount} sectors above baseline · z-score monitored`:`${beatCount}/${s.length} sectors above champion baseline · momentum tracking live`;
+      document.getElementById('eb2s').textContent=`Champion baselines MC-tested · anomaly detection via scipy z-score`;
+      document.getElementById('eb-ts').textContent=new Date().toLocaleTimeString();
+    }
+    // ROI grid
+    if(s.length){
+      const maxAnn=s[0].annual_usd;
+      document.getElementById('roi-grid').innerHTML=s.map((r,i)=>{
+        const pct=Math.round((r.annual_usd/maxAnn)*100);
+        return `<div class="roi-cell"><div class="rc-bar" style="width:${pct}%"></div><div class="rc-s" title="${r.sector}">${r.sector.replace(/_/g,' ')}</div><div class="rc-v">${fu(r.annual_usd)}<span style="font-size:9px;color:var(--muted);font-weight:400">/yr</span></div></div>`;
+      }).join('');
+    }
+  const t=ts();
+  document.getElementById('k0').textContent=fp(d.total_per_sec_usd);
+  document.getElementById('k1').textContent=fu(d.total_hour_usd);
+  document.getElementById('k2').textContent=fu(d.measured_hour_usd);
+  document.getElementById('k3').textContent=d.breadth_pct.toFixed(0)+'%';
+  document.getElementById('k3s').textContent=`${d.measured_sources}/${d.total_sources} sources`;
+  document.getElementById('k4').textContent=d.system_rolling_sharpe>0?d.system_rolling_sharpe.toFixed(3):'—';
+  const ac=d.active_alerts||0;document.getElementById('k5').textContent=ac;
+  document.getElementById('kac').className='kpi '+(ac>0?'re':'');
+  if(cB===0&&d.cumulative_gain_usd>0){cB=d.cumulative_gain_usd;cS=Date.now()}
+  cPS=d.total_per_sec_usd;
+  addPlot(t,d.total_per_sec_usd,d.measured_hour_usd/3600);
+
+  if(!s.length)return;
+  s.slice(0,3).forEach((r,i)=>setGauge(i,r.sector,r.per_sec_usd,s[0].per_sec_usd*1.05,pc(i)));
+
+  // Alerts
+  const al=d.alerts||[];
+  document.getElementById('acb').textContent=al.length;
+  if(al.length)document.getElementById('af').innerHTML=al.slice(0,15).map(a=>`<div class="ai ${a.severity}"><span class="asev">${a.severity}</span><div><div class="amsg">${a.msg}</div><div class="ats">${a.ts?new Date(a.ts).toLocaleTimeString():''}</div></div></div>`).join('');
+  al.filter(a=>a.severity==='HIGH').forEach(toast);
+
+  // Sharpe table
+  document.getElementById('stb').innerHTML=s.slice(0,14).map((r,i)=>{
+    const cl=r.live_sharpe>=r.base_sharpe?'shg':r.live_sharpe>=r.base_sharpe*.8?'shw':'shl';
+    const rs=r.rolling_sharpe!=null?`<span class="rst">${r.rolling_sharpe.toFixed(2)}</span>`:'<span style="color:var(--muted);font-size:9px">—</span>';
+    return `<tr><td style="color:${pc(i)};font-weight:800">${r.sector.replace(/_/g,' ')}</td><td style="color:var(--muted)">${r.base_sharpe.toFixed(2)}</td><td class="${cl}">${r.live_sharpe.toFixed(2)}</td><td>${rs}</td><td class="${r.opp_gain_pct>=0?'shg':'shl'}" style="text-align:right">${fc(r.opp_gain_pct)}</td></tr>`;
+  }).join('');
+
+  // Sector grid
+  document.getElementById('srs').innerHTML=s.map((r,i)=>{
+    const cls=['sr',r.live_sharpe>=r.base_sharpe?'beat':'',Math.abs(r.zscore)>1.8?'zs':''].filter(Boolean).join(' ');
+    const ma=r.momentum==='up'?'▲':r.momentum==='down'?'▼':'▶';
+    const zc=Math.abs(r.zscore)>2?'var(--red)':Math.abs(r.zscore)>1.5?'var(--amber)':'var(--muted)';
+    return `<div class="${cls}"><div class="sn" style="color:${pc(i)}" title="${r.sector}">${r.sector.replace(/_/g,' ')}</div><div class="sp" style="color:${pc(i)}">${fp(r.per_sec_usd)}</div><div class="sw">${spk(r.sparkline,pc(i))}</div><div class="sg ${r.opp_gain_pct>=0?'pos':'neg'}">${fc(r.opp_gain_pct)}</div><div class="mb ${r.momentum}">${ma} ${r.momentum_pct>=0?'+':''}${r.momentum_pct.toFixed(2)}%</div><div class="lb ${r.confidence_lane}">${r.confidence_lane}</div><div style="text-align:right;font-size:11px;font-weight:700;color:${zc}">${r.zscore>=0?'+':''}${r.zscore.toFixed(2)}σ</div></div>`;
+  }).join('');
+
+  // Ticker
+  const ti=s.map(r=>`<span class="ti-i"><span class="tn">${r.sector.replace(/_/g,'·').toUpperCase()}</span><span class="ts">·</span><span class="tv">${fp(r.per_sec_usd)}</span><span class="ts">·</span><span class="${r.opp_gain_pct>=0?'tg':'tr'}">${fc(r.opp_gain_pct)}</span></span>`);
+  document.getElementById('tti').innerHTML=ti.join('')+ti.join('');
+
+  // Bottom
+  if(s[0])document.getElementById('b0').textContent=fu(s[0].annual_usd);
+  document.getElementById('b1').textContent=d.total_hour_usd>0?((d.measured_hour_usd/d.total_hour_usd)*100).toFixed(0)+'%':'—';
+  document.getElementById('b2').textContent=d.paper_sharpe>0?d.paper_sharpe.toFixed(3):'—';
+  document.getElementById('b3').textContent=s.length;
+}
+
+// WebSocket
+let ws,wst,alive=false;
+function conn(){
+  const proto=location.protocol==='https:'?'wss':'ws';
+  ws=new WebSocket(`${proto}://${location.host}/ws/ticks`);
+  ws.onopen=()=>{alive=true;document.getElementById('sdot').className='dot g';document.getElementById('stxt').textContent='LIVE STREAMING';setInterval(()=>{if(ws.readyState===1)ws.send('ping')},15000)};
+  ws.onmessage=e=>{try{tick(JSON.parse(e.data))}catch(err){console.warn(err)}};
+  ws.onclose=()=>{alive=false;document.getElementById('sdot').className='dot a';document.getElementById('stxt').textContent='RECONNECTING…';clearTimeout(wst);wst=setTimeout(conn,4000)};
+  ws.onerror=()=>ws.close();
+}
+let poll=false;
+setTimeout(()=>{if(!alive&&!poll){poll=true;setInterval(()=>fetch('/api/tick').then(r=>r.json()).then(tick).catch(()=>{}),3000)}},8000);
+conn();
+fetch('/api/history').then(r=>r.json()).then(d=>{
+  if(!d.history?.length)return;
+  d.history.forEach(h=>{const t=new Date(h.ts).toLocaleTimeString();Plotly.extendTraces('mc',{x:[[t],[t]],y:[[h.total_per_sec_usd],[h.measured_hour_usd/3600]]},[0,1],120)});
+  tick(d.history[d.history.length-1]);
+}).catch(()=>{});
+</script>
+</body>
+</html>
