@@ -121,6 +121,7 @@ class EvolutionarySignalGate:
         min_liquidity: float = 0.35,
         min_cross_confirm: float = 0.40,
         min_edge_bps: float = 5.0,
+        min_composite_score: float = 0.60,
         max_volatility_pct: float = 8.0,
         max_correlation: float = 0.8,
         max_sector_heat: float = 0.35,
@@ -155,6 +156,7 @@ class EvolutionarySignalGate:
             "monte_carlo": 0.45,
             "data_freshness": 0.70
         }
+        self.min_composite_score = float(min_composite_score)
         
         # Evolutionary adaptation
         self.adaptation_window = timedelta(days=adaptation_window_days)
@@ -307,7 +309,7 @@ class EvolutionarySignalGate:
         if x.sector_heat > thresholds["sector_heat"]:
             score -= 0.05
             reason_codes.append("sector_heat")
-        if x.signal_decay_score < thresholds["signal_decay"]:
+        if x.signal_decay_score > thresholds["signal_decay"]:
             score -= 0.05
             reason_codes.append("signal_decay")
         # --- Orderbook features ---
@@ -366,8 +368,28 @@ class EvolutionarySignalGate:
         # Apply regime adjustment to thresholds
         final_thresholds = {k: v * regime_multiplier for k, v in adapted_thresholds.items()}
         
-        # Calculate composite score
-        composite, confidence, factors = self._calculate_composite_score(x, final_thresholds)
+        # Calculate composite score.
+        # Backward-compatibility: older gate variants return (composite, reasons)
+        # while newer variants return (composite, confidence, factors).
+        composite_result = self._calculate_composite_score(x, final_thresholds)
+        if isinstance(composite_result, tuple):
+            if len(composite_result) >= 3:
+                composite, confidence, factors = composite_result[0], composite_result[1], composite_result[2]
+            elif len(composite_result) == 2:
+                composite, factors = composite_result
+                confidence = float(composite)
+            elif len(composite_result) == 1:
+                composite = composite_result[0]
+                confidence = float(composite)
+                factors = []
+            else:
+                composite = 0.0
+                confidence = 0.0
+                factors = []
+        else:
+            composite = float(composite_result)
+            confidence = float(composite)
+            factors = []
         
         # Check each factor against thresholds
         reasons = []
@@ -389,9 +411,13 @@ class EvolutionarySignalGate:
         for reason, failed in factor_checks.items():
             if failed:
                 reasons.append(reason)
+
+        for reason in (factors or []):
+            if reason not in reasons:
+                reasons.append(reason)
         
-        # Decision logic — lowered composite threshold from 0.65 to 0.60
-        armed = len(reasons) == 0 and composite >= 0.60
+        # Decision logic
+        armed = len(reasons) == 0 and composite >= float(self.min_composite_score)
         
         direction: Direction = "flat"
         urgency: Urgency = "passive"
