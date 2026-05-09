@@ -231,6 +231,7 @@ class KrakenClient:
         self._balance_rate_limit_fallback_sec = 180.0
         self._balance_cache_usd = 0.0
         self._balance_cache_utc = ""
+        self._balance_snapshot: dict[str, float] = {}
         self._asset_pairs_map: dict[str, dict[str, Any]] = {}
         self._asset_pairs_cache_utc = ""
         self._asset_pairs_cache_ttl_sec = 3600.0
@@ -303,6 +304,27 @@ class KrakenClient:
             return float(value)
         except Exception:
             return float(default)
+
+    @staticmethod
+    def _normalize_balance_asset(asset_code: str) -> str:
+        raw = str(asset_code or "").upper().strip()
+        if not raw:
+            return ""
+        token = raw.split(".", 1)[0].strip()
+        alias_map = {
+            "ZUSD": "USD",
+            "XXBT": "BTC",
+            "XBT": "BTC",
+            "XETH": "ETH",
+            "XDG": "DOGE",
+            "XXDG": "DOGE",
+            "XXRP": "XRP",
+            "XXLM": "XLM",
+        }
+        normalized = alias_map.get(token, token)
+        if normalized and normalized[0] in {"X", "Z"} and len(normalized) == 4 and normalized[1:].isalpha():
+            normalized = normalized[1:]
+        return normalized
 
     def _fetch_asset_pairs_map(self) -> dict[str, dict[str, Any]]:
         try:
@@ -384,6 +406,62 @@ class KrakenClient:
         except Exception:
             return float("inf")
 
+    def _fetch_balances(self) -> tuple[dict[str, float], str]:
+        try:
+            result = self._private("/0/private/Balance", {})
+            if "error" in result:
+                raw_error = result.get("error", "unknown")
+                if isinstance(raw_error, list):
+                    raw_error = ",".join(str(x) for x in raw_error)
+                return {}, f"kraken_balance_api_error:{raw_error}"
+            if not isinstance(result, dict):
+                return {}, "kraken_balance_api_error:malformed_payload"
+
+            balances: dict[str, float] = {}
+            for asset_code, amount in result.items():
+                qty = self._to_float(amount, 0.0)
+                if (not math.isfinite(qty)) or qty <= 0.0:
+                    continue
+                balances[str(asset_code).upper().strip()] = float(qty)
+
+            return balances, ""
+        except Exception as e:
+            return {}, f"balance_exception:{e}"
+
+    def get_account_balances(self, force_refresh: bool = False) -> dict[str, float]:
+        self.last_balance_error = ""
+        if not self.api_key or not self.api_secret:
+            self.last_balance_error = "missing_credentials"
+            return {}
+
+        cache_age_sec = self._cached_balance_age_sec()
+        if (not force_refresh) and self._balance_snapshot and cache_age_sec <= self._balance_cache_ttl_sec:
+            return dict(self._balance_snapshot)
+
+        balances, error_text = self._fetch_balances()
+        if balances:
+            zusd = float(balances.get("ZUSD", 0.0) or 0.0)
+            if zusd > 0.0:
+                self._save_balance_cache(zusd)
+            else:
+                self._balance_cache_utc = datetime.now(timezone.utc).isoformat()
+            self._balance_snapshot = dict(balances)
+            return dict(self._balance_snapshot)
+
+        self.last_balance_error = str(error_text or "kraken_balance_api_error:unknown")
+        rate_limited = "Rate limit" in self.last_balance_error
+        cache_age_sec = self._cached_balance_age_sec()
+
+        if rate_limited and self._balance_snapshot and cache_age_sec <= self._balance_rate_limit_fallback_sec:
+            self.last_balance_error += ";using_cached_balance_snapshot"
+            return dict(self._balance_snapshot)
+
+        if rate_limited and self._balance_cache_usd > 0.0 and cache_age_sec <= self._balance_rate_limit_fallback_sec:
+            self.last_balance_error += ";using_cached_usd_only"
+            return {"ZUSD": float(self._balance_cache_usd)}
+
+        return {}
+
     def _read_nonce_state(self) -> int:
         try:
             if KRAKEN_NONCE_STATE_FILE.exists():
@@ -445,46 +523,45 @@ class KrakenClient:
             return payload.get("result", {})
         return {"error": ["EAPI:Invalid nonce"]}
 
-    def get_account_balance(self) -> float:
-        self.last_balance_error = ""
-        if not self.api_key or not self.api_secret:
-            self.last_balance_error = "missing_credentials"
-            return 0.0
+    def get_account_balance(self, force_refresh: bool = False) -> float:
+        balances = self.get_account_balances(force_refresh=force_refresh)
+        if balances:
+            zusd = self._to_float(balances.get("ZUSD", 0.0), 0.0)
+            if zusd > 0.0:
+                return float(zusd)
 
         cache_age_sec = self._cached_balance_age_sec()
-        if self._balance_cache_usd > 0.0 and cache_age_sec <= self._balance_cache_ttl_sec:
+        if self._balance_cache_usd > 0.0 and cache_age_sec <= self._balance_rate_limit_fallback_sec:
+            if "using_cached_balance" not in self.last_balance_error:
+                suffix = ";" if self.last_balance_error else ""
+                self.last_balance_error = f"{self.last_balance_error}{suffix}using_cached_balance"
             return float(self._balance_cache_usd)
 
-        try:
-            result = self._private("/0/private/Balance", {})
-            if "error" in result:
-                raw_error = result.get("error", "unknown")
-                if isinstance(raw_error, list):
-                    raw_error = ",".join(str(x) for x in raw_error)
-                self.last_balance_error = f"kraken_balance_api_error:{raw_error}"
-                rate_limited = "Rate limit" in str(raw_error)
-                cache_age_sec = self._cached_balance_age_sec()
-                if rate_limited and self._balance_cache_usd > 0.0 and cache_age_sec <= self._balance_rate_limit_fallback_sec:
-                    self.last_balance_error += ";using_cached_balance"
-                    return float(self._balance_cache_usd)
-                return 0.0
-            zusd = float(result.get("ZUSD", 0.0))
-            if zusd <= 0.0:
-                self.last_balance_error = "zusd_zero_or_missing"
-                cache_age_sec = self._cached_balance_age_sec()
-                if self._balance_cache_usd > 0.0 and cache_age_sec <= self._balance_rate_limit_fallback_sec:
-                    self.last_balance_error += ";using_cached_balance"
-                    return float(self._balance_cache_usd)
-            else:
-                self._save_balance_cache(zusd)
-            return zusd
-        except Exception as e:
-            self.last_balance_error = f"balance_exception:{e}"
-            cache_age_sec = self._cached_balance_age_sec()
-            if self._balance_cache_usd > 0.0 and cache_age_sec <= self._balance_rate_limit_fallback_sec:
-                self.last_balance_error += ";using_cached_balance"
-                return float(self._balance_cache_usd)
+        if not self.last_balance_error:
+            self.last_balance_error = "zusd_zero_or_missing"
+        return 0.0
+
+    def get_asset_balance(self, symbol: str, force_refresh: bool = False) -> float:
+        target = str(symbol or "").upper().strip()
+        if not target:
             return 0.0
+
+        aliases = {target}
+        if target == "BTC":
+            aliases.add("XBT")
+        elif target == "XBT":
+            aliases.add("BTC")
+
+        balances = self.get_account_balances(force_refresh=force_refresh)
+        if not balances:
+            return 0.0
+
+        total = 0.0
+        for asset_code, qty in balances.items():
+            normalized = self._normalize_balance_asset(asset_code)
+            if normalized in aliases:
+                total += max(self._to_float(qty, 0.0), 0.0)
+        return float(max(total, 0.0))
 
     def send_order(self, pair: str, side: str, qty: float, price: float = None, order_type: str = "limit") -> dict:
         if not self.api_key or not self.api_secret:
@@ -555,8 +632,14 @@ class MultiExchangeRouter:
             return None
         return self.kraken.get_ticker(cfg["pair"])
 
-    def get_balance(self):
-        return self.kraken.get_account_balance()
+    def get_balance(self, force_refresh: bool = False):
+        return self.kraken.get_account_balance(force_refresh=force_refresh)
+
+    def get_asset_balance(self, symbol: str, force_refresh: bool = False):
+        return self.kraken.get_asset_balance(symbol, force_refresh=force_refresh)
+
+    def get_balance_snapshot(self, force_refresh: bool = False):
+        return self.kraken.get_account_balances(force_refresh=force_refresh)
 
     def place_order(self, symbol: str, side: str, qty: float, limit_price: float = None):
         cfg = self.get_symbol_config(symbol)
@@ -610,6 +693,8 @@ class RobustLiveExecutor:
         self.gate_override_enabled = False
         self.gate_override_min_confidence = 0.58
         self.gate_override_min_edge_bps = 7.5
+        self.spot_short_enabled = False
+        self.close_balance_buffer_fraction = 0.998
         self.gate_not_armed_streak = 0
         self.no_affordable_streak = 0
         self.no_affordable_recycle_enabled = True
@@ -720,6 +805,15 @@ class RobustLiveExecutor:
             ),
             0.0,
             200.0,
+        )
+        self.spot_short_enabled = bool(runtime.get("spot_short_enabled", self.spot_short_enabled))
+        self.close_balance_buffer_fraction = self._clamp(
+            self._to_float(
+                runtime.get("close_balance_buffer_fraction", self.close_balance_buffer_fraction),
+                self.close_balance_buffer_fraction,
+            ),
+            0.95,
+            1.0,
         )
         self.dynamic_reserve_enabled = bool(runtime.get("dynamic_reserve_enabled", self.dynamic_reserve_enabled))
         self.dynamic_reserve_max_balance_fraction = self._clamp(
@@ -1268,6 +1362,17 @@ class RobustLiveExecutor:
             return (entry - float(last)) / entry
         return (float(last) - entry) / entry
 
+    def _resolve_close_qty_for_spot(self, symbol: str, requested_qty: float, close_side: str) -> tuple[float, float, str]:
+        desired = max(float(requested_qty), 0.0)
+        if close_side != "sell":
+            return desired, desired, ""
+
+        available_qty = max(float(self.router.get_asset_balance(symbol, force_refresh=True) or 0.0), 0.0)
+        safe_available = max(available_qty * float(self.close_balance_buffer_fraction), 0.0)
+        close_qty = min(desired, safe_available)
+        balance_error = str(getattr(self.router.kraken, "last_balance_error", "") or "")
+        return float(close_qty), float(available_qty), balance_error
+
     def _no_affordable_recycle_cooldown_active(self, now: datetime) -> bool:
         if float(self.no_affordable_recycle_cooldown_sec) <= 0.0:
             return False
@@ -1353,18 +1458,69 @@ class RobustLiveExecutor:
 
         pos = best["position"]
         close_side = "sell" if str(pos.side).lower() == "long" else "buy"
-        close_qty = float(pos.qty)
+        requested_close_qty = float(pos.qty)
+        close_qty = float(requested_close_qty)
+        available_close_qty = float(requested_close_qty)
+        close_balance_error = ""
+
+        if close_side == "sell":
+            close_qty, available_close_qty, close_balance_error = self._resolve_close_qty_for_spot(
+                str(best["base_symbol"]),
+                requested_close_qty,
+                close_side,
+            )
+            if close_qty <= 0.0:
+                if available_close_qty <= 0.0 and not close_balance_error:
+                    # Reconcile stale in-memory position when exchange inventory is already flat.
+                    self.portfolio.close_position(str(pos.symbol), float(best["last"]), now.isoformat())
+                    self.audit_chain.append(
+                        "position_reconciled_no_inventory",
+                        {
+                            "symbol": str(best["base_symbol"]),
+                            "requested_qty": round(float(requested_close_qty), 10),
+                            "available_qty": 0.0,
+                            "reason": "no_exchange_inventory",
+                        },
+                    )
+                    result.update(
+                        {
+                            "executed": False,
+                            "reason": "position_reconciled_no_inventory",
+                            "symbol": str(best["base_symbol"]),
+                            "requested_qty": round(float(requested_close_qty), 10),
+                            "available_qty": 0.0,
+                        }
+                    )
+                    return result
+
+                result.update(
+                    {
+                        "reason": "no_available_balance_to_close",
+                        "symbol": str(best["base_symbol"]),
+                        "requested_qty": round(float(requested_close_qty), 10),
+                        "available_qty": round(float(available_close_qty), 10),
+                        "balance_error": close_balance_error,
+                    }
+                )
+                return result
+
         order_result = self.router.place_order(str(best["base_symbol"]), close_side, close_qty, None)
 
         if "error" in order_result:
             result["reason"] = "order_failed"
             result["symbol"] = str(best["base_symbol"])
             result["error"] = str(order_result.get("error"))
+            result["requested_qty"] = round(float(requested_close_qty), 10)
+            result["available_qty"] = round(float(available_close_qty), 10)
+            if close_balance_error:
+                result["balance_error"] = close_balance_error
             return result
 
         txid = order_result.get("txid", ["unknown"])
         txid = txid[0] if isinstance(txid, list) else str(txid)
 
+        if close_qty < requested_close_qty:
+            pos.qty = float(close_qty)
         self.portfolio.close_position(str(pos.symbol), float(best["last"]), now.isoformat())
         self.no_affordable_last_recycle_utc = now.isoformat()
         recycle_cfg = self.router.get_symbol_config(str(best["base_symbol"])) or {}
@@ -1450,7 +1606,68 @@ class RobustLiveExecutor:
                 continue
 
             close_side = "sell" if str(pos.side).lower() == "long" else "buy"
-            result = self.router.place_order(symbol, close_side, float(pos.qty), None)
+            requested_close_qty = float(pos.qty)
+            close_qty = float(requested_close_qty)
+            available_close_qty = float(requested_close_qty)
+            close_balance_error = ""
+
+            if close_side == "sell":
+                close_qty, available_close_qty, close_balance_error = self._resolve_close_qty_for_spot(
+                    symbol,
+                    requested_close_qty,
+                    close_side,
+                )
+                if close_qty <= 0.0:
+                    if available_close_qty <= 0.0 and not close_balance_error:
+                        # Inventory already flat on exchange; reconcile stale local OPEN position.
+                        self.portfolio.close_position(pos.symbol, float(last), now.isoformat())
+                        self.audit_chain.append(
+                            "position_reconciled_no_inventory",
+                            {
+                                "symbol": symbol,
+                                "requested_qty": round(float(requested_close_qty), 10),
+                                "available_qty": 0.0,
+                                "reason": "no_exchange_inventory",
+                            },
+                        )
+                        _write_live_heartbeat(
+                            {
+                                "status": "degraded",
+                                "reason": "position_reconciled_no_inventory",
+                                "symbol": symbol,
+                                "requested_qty": round(float(requested_close_qty), 10),
+                                "available_qty": 0.0,
+                            }
+                        )
+                        print("  reconciled stale position: no exchange inventory")
+                        return True
+
+                    _write_live_heartbeat(
+                        {
+                            "status": "blocked",
+                            "reason": "close_balance_unavailable",
+                            "symbol": symbol,
+                            "side": close_side,
+                            "requested_qty": float(requested_close_qty),
+                            "available_qty": float(available_close_qty),
+                            "balance_error": close_balance_error,
+                        }
+                    )
+                    continue
+
+            result = self.router.place_order(symbol, close_side, float(close_qty), None)
+            if "error" in result and close_side == "sell" and "Insufficient funds" in str(result.get("error")):
+                retry_qty, retry_available_qty, retry_balance_error = self._resolve_close_qty_for_spot(
+                    symbol,
+                    close_qty,
+                    close_side,
+                )
+                if retry_qty > 0.0 and retry_qty < close_qty:
+                    close_qty = float(retry_qty)
+                    available_close_qty = float(retry_available_qty)
+                    close_balance_error = str(retry_balance_error)
+                    result = self.router.place_order(symbol, close_side, float(close_qty), None)
+
             if "error" in result:
                 _write_live_heartbeat(
                     {
@@ -1458,7 +1675,10 @@ class RobustLiveExecutor:
                         "reason": "close_order_failed",
                         "symbol": symbol,
                         "side": close_side,
-                        "qty": float(pos.qty),
+                        "qty": float(close_qty),
+                        "requested_qty": float(requested_close_qty),
+                        "available_qty": float(available_close_qty),
+                        "balance_error": close_balance_error,
                         "error": str(result.get("error")),
                     }
                 )
@@ -1467,6 +1687,8 @@ class RobustLiveExecutor:
             txid = result.get("txid", ["unknown"])
             txid = txid[0] if isinstance(txid, list) else str(txid)
 
+            if close_qty < requested_close_qty:
+                pos.qty = float(close_qty)
             self.portfolio.close_position(pos.symbol, float(last), now.isoformat())
 
             self.trade_ledger.append(
@@ -1481,7 +1703,7 @@ class RobustLiveExecutor:
                     "execution_mode": "close_cycle",
                     "entry_price": round(float(pos.entry_price), 6),
                     "exit_price": round(float(last), 6),
-                    "qty": round(float(pos.qty), 10),
+                    "qty": round(float(close_qty), 10),
                     "pnl_pct": round(float(pnl_pct) * 100.0, 6),
                     "hold_sec": round(float(hold_sec), 3),
                 }
@@ -1492,7 +1714,7 @@ class RobustLiveExecutor:
                     "symbol": symbol,
                     "side": close_side,
                     "direction": str(pos.side),
-                    "qty": round(float(pos.qty), 10),
+                    "qty": round(float(close_qty), 10),
                     "txid": txid,
                     "pnl_pct": round(float(pnl_pct) * 100.0, 6),
                     "hold_sec": round(float(hold_sec), 3),
@@ -1505,6 +1727,7 @@ class RobustLiveExecutor:
                     "reason": "position_closed",
                     "symbol": symbol,
                     "side": close_side,
+                    "qty": round(float(close_qty), 10),
                     "txid": txid,
                     "pnl_pct": round(float(pnl_pct) * 100.0, 6),
                     "hold_sec": round(float(hold_sec), 3),
@@ -1646,6 +1869,21 @@ class RobustLiveExecutor:
             return
 
         if self._maybe_close_positions(symbol, float(last), now):
+            return
+
+        if decision_direction == "short" and (not self.spot_short_enabled):
+            live_usd = max(float(self.router.get_balance(force_refresh=True) or 0.0), 0.0)
+            _write_live_heartbeat(
+                {
+                    "status": "blocked",
+                    "reason": "short_disabled_spot",
+                    "symbol": symbol,
+                    "gate_direction": "short",
+                    "spot_short_enabled": bool(self.spot_short_enabled),
+                    "available_usd": round(float(live_usd), 6),
+                }
+            )
+            print("  blocked: spot short disabled")
             return
 
         portfolio_heat = self.portfolio.exposure() / max(self.portfolio.current_equity, 1)
@@ -1870,6 +2108,10 @@ class RobustLiveExecutor:
             err_text_l = err_text.lower()
             insufficient_funds = "Insufficient funds" in err_text
             volume_min_error = "volume minimum not met" in err_text_l
+            available_asset_qty = None
+
+            if insufficient_funds and side == "sell":
+                available_asset_qty = max(float(self.router.get_asset_balance(symbol, force_refresh=True) or 0.0), 0.0)
 
             if volume_min_error or insufficient_funds:
                 self.order_fail_streak += 1
@@ -1944,6 +2186,7 @@ class RobustLiveExecutor:
                     "symbol": symbol,
                     "side": side,
                     "error": str(result.get("error")),
+                    "available_asset_qty": round(float(available_asset_qty), 10) if available_asset_qty is not None else None,
                     "fail_streak": int(self.order_fail_streak),
                     "notional_throttle": round(float(self.notional_throttle), 6),
                     "buy_cooldown_until_utc": self.buy_cooldown_until_utc,
@@ -2129,7 +2372,7 @@ class RobustLiveExecutor:
                     self._to_float(self.runtime_cfg.get("max_notional_per_trade_usd", 0.0), 0.0),
                     0.0,
                 )
-                usd_balance_hint = max(float(self.router.get_balance() or 0.0), 0.0)
+                usd_balance_hint = max(float(self.router.get_balance(force_refresh=True) or 0.0), 0.0)
                 reserve_usd_hint = float(reserve_usd_configured)
                 if self.dynamic_reserve_enabled and usd_balance_hint > 0.0:
                     dynamic_cap = max(
