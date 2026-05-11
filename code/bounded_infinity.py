@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import statistics
+import inspect
 from datetime import datetime, timezone
 from typing import Any, Dict
 
@@ -108,7 +109,44 @@ class MetaEngine:
             engine = self.engines[name]
             if hasattr(engine, "run"):
                 try:
-                    results[name] = engine.run(data, weight=weight, context=context)
+                    run_fn = getattr(engine, "run")
+                    try:
+                        sig = inspect.signature(run_fn)
+                        params = list(sig.parameters.values())
+                        param_names = {p.name for p in params}
+                        has_var_positional = any(p.kind == inspect.Parameter.VAR_POSITIONAL for p in params)
+                        has_var_keyword = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params)
+
+                        args = []
+                        kwargs = {}
+
+                        if "data" in param_names:
+                            kwargs["data"] = data
+                        else:
+                            positional_params = [
+                                p
+                                for p in params
+                                if p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+                            ]
+                            if positional_params:
+                                first_name = positional_params[0].name
+                                if first_name not in {"weight", "context"}:
+                                    args.append(data)
+                            elif has_var_positional:
+                                args.append(data)
+
+                        if "weight" in param_names or has_var_keyword:
+                            kwargs["weight"] = weight
+                        if "context" in param_names or has_var_keyword:
+                            kwargs["context"] = context
+
+                        results[name] = run_fn(*args, **kwargs)
+                    except (TypeError, ValueError):
+                        # Fallback for dynamic/c-extension callables that do not expose a reliable signature.
+                        try:
+                            results[name] = run_fn(data, context=context)
+                        except TypeError:
+                            results[name] = run_fn(data)
                 except Exception as e:
                     results[name] = {"error": str(e), "weight": weight}
             else:

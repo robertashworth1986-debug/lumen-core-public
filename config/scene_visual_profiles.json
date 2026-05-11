@@ -1,0 +1,303 @@
+{
+  "schema": "luma_scene_visual_profile_v1",
+  "version": "2026-05-08",
+  "defaults": {
+    "render_pipeline": "urp",
+    "palette": "luma_core",
+    "postfx": {
+      "bloom": 0.44,
+      "vignette": 0.22,
+      "chromatic_aberration": 0.05,
+      "film_grain": 0.1
+    },
+    "camera": {
+      "shake": 0.08,
+      "orbit_speed": 0.34,
+      "fov_boost": 2.0
+    },
+    "particles": {
+      "density": 0.46,
+      "turbulence": 0.36,
+      "trail_length": 0.5
+    },
+    "audio": {
+      "layer": "ambient_core",
+      "ducking": 0.12
+    },
+    "haptics": {
+      "pulse": 0.15,
+      "duration_ms": 120
+    }
+  },
+  "cues": {
+    "success_pulse": {
+      "palette": "profit_green",
+      "bands": {
+        "low": {
+          "camera": {
+            "fov_boost": 2.1
+          },
+          "particles": {
+            "density": 0.45
+          }
+        },
+        "medium": {
+          "camera": {
+            "fov_boost": 3.2
+          },
+          "particles": {
+            "density": 0.58
+          }
+        },
+        "high": {
+          "camera": {
+            "fov_boost": 4.1
+          },
+          "particles": {
+            "density": 0.72
+          }
+        },
+        "extreme": {
+          "camera": {
+            "fov_boost": 5.2
+          },
+          "particles": {
+            "density": 0.84
+          }
+        }
+      }
+    },
+    "warning_pulse": {
+      "palette": "amber_warning",
+      "bands": {
+        "low": {
+          "camera": {
+            "shake": 0.12
+          },
+          "audio": {
+            "layer": "warning_soft"
+          }
+        },
+        "medium": {
+          "camera": {
+            "shake": 0.18
+          },
+          "audio": {
+            "layer": "warning_soft"
+          }
+        },
+        "high": {
+          "camera": {
+            "shake": 0.24
+          },
+          "audio": {
+            "layer": "warning_dense"
+          }
+        },
+        "extreme": {
+          "camera": {
+            "shake": 0.32
+          },
+          "audio": {
+            "layer": "warning_dense"
+          }
+        }
+      }
+    },
+    "critical_warning": {
+      "palette": "critical_red",
+      "bands": {
+        "low": {
+          "postfx": {
+            "vignette": 0.38
+          },
+          "haptics": {
+            "pulse": 0.35
+          }
+        },
+        "medium": {
+          "postfx": {
+            "vignette": 0.48
+          },
+          "haptics": {
+            "pulse": 0.52
+          }
+        },
+        "high": {
+          "postfx": {
+            "vignette": 0.6
+          },
+          "haptics": {
+            "pulse": 0.72
+          }
+        },
+        "extreme": {
+          "postfx": {
+            "vignette": 0.72
+          },
+          "haptics": {
+            "pulse": 0.9
+          }
+        }
+      }
+    },
+    "institutional_signal": {
+      "palette": "institutional_blue",
+      "bands": {
+        "low": {
+          "camera": {
+            "orbit_speed": 0.22
+          },
+          "audio": {
+            "layer": "institutional_soft"
+          }
+        },
+        "medium": {
+          "camera": {
+            "orbit_speed": 0.28
+          },
+          "audio": {
+            "layer": "institutional_drive"
+          }
+        },
+        "high": {
+          "camera": {
+            "orbit_speed": 0.34
+          },
+          "audio": {
+            "layer": "institutional_drive"
+          }
+        },
+        "extreme": {
+          "camera": {
+            "orbit_speed": 0.4
+          },
+          "audio": {
+            "layer": "institutional_drive"
+          }
+        }
+      }
+    },
+    "harmonic_peak": {
+      "palette": "harmonic_cyan",
+      "bands": {
+        "low": {
+          "particles": {
+            "trail_length": 0.72
+          }
+        },
+        "medium": {
+          "particles": {
+            "trail_length": 0.96
+          }
+        },
+        "high": {
+          "particles": {
+            "trail_length": 1.2
+          }
+        },
+        "extreme": {
+          "particles": {
+            "trail_length": 1.48
+          }
+        }
+      }
+    },
+    "service_degraded": {
+      "palette": "service_orange",
+      "bands": {
+        "low": {
+          "audio": {
+            "layer": "degraded_soft"
+          }
+        },
+        "medium": {
+          "audio": {
+            "layer": "degraded_soft"
+          },
+          "camera": {
+            "shake": 0.13
+          }
+        },
+        "high": {
+          "audio": {
+            "layer": "degraded_hard"
+          },
+          "camera": {
+            "shake": 0.22
+          }
+        },
+        "extreme": {
+          "audio": {
+            "layer": "degraded_hard"
+          },
+          "camera": {
+            "shake": 0.3
+          }
+        }
+      }
+    }
+  },
+  "scene_overrides": {
+    "harmonic": {
+      "default": {
+        "particles": {
+          "turbulence": 0.58
+        }
+      },
+      "bands": {
+        "high": {
+          "postfx": {
+            "bloom": 0.6
+          }
+        },
+        "extreme": {
+          "postfx": {
+            "bloom": 0.7
+          }
+        }
+      }
+    },
+    "alert": {
+      "default": {
+        "palette": "critical_red"
+      },
+      "bands": {
+        "high": {
+          "camera": {
+            "shake": 0.26
+          }
+        },
+        "extreme": {
+          "camera": {
+            "shake": 0.36
+          }
+        }
+      }
+    }
+  },
+  "hints": {
+    "cinematic": {
+      "postfx": {
+        "film_grain": 0.18
+      },
+      "camera": {
+        "fov_boost": 4.0
+      }
+    },
+    "investor": {
+      "camera": {
+        "orbit_speed": 0.24
+      },
+      "audio": {
+        "layer": "institutional_drive"
+      }
+    },
+    "sports": {
+      "palette": "sports_neon",
+      "particles": {
+        "turbulence": 0.66
+      }
+    }
+  }
+}

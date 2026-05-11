@@ -1,0 +1,18 @@
+{
+  "generated_utc": "2026-04-14T23:24:26.272213+00:00",
+  "enabled_sources": 0,
+  "registry_detected_sources": 0,
+  "sector_count": 0,
+  "estimated_hourly_preserved_value": 0,
+  "daily_translated_value": 0,
+  "weekly_translated_value": 0,
+  "monthly_translated_value": 0,
+  "yearly_translated_value": 0,
+  "top_current_optimization_lane": "n/a",
+  "top_current_lane_hour_value": 0.0,
+  "measured_source_rows": 0,
+  "sources_with_measured_rows": 0,
+  "sources_with_estimate_only": 0,
+  "sector_value_matrix": [],
+  "source_truth_rows": []
+}

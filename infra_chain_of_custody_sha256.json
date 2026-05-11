@@ -1,0 +1,29 @@
+{
+  "generated_utc": "2026-04-08T02:52:06.185277+00:00",
+  "files": [
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\infra_frozen_deltas.jsonl",
+      "sha256": "865c9522beb59334d97181e6e3fe513f3543606bc98147967d50f4b767c1ce1c"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\cross_sector_failure_predictions.jsonl",
+      "sha256": "1ce1c3c6fe6b781ac14c31808df7924c3c80d23e1e801f52e53c2f1e31fe13a4"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\infra_audit_ledger.jsonl",
+      "sha256": "b2aa55378ff6b5db4185da32be7fe31e21c9ddf693760018256054c8f57b8e76"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\cross_sector_optimization_report.json",
+      "sha256": "607f0c41707475e651bdde298e5a7c9d0ba07303cb2fbe06a48a6a8043fd9123"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\cross_sector_optimization_matrix.csv",
+      "sha256": "086dcc8c2bc8c5f93cf2d8e5dbb2c981f62158151994b6dee0f703f152afeb34"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\cross_sector_optimization_report.md",
+      "sha256": "66d640ccf2aa680b8c629bab3598a537855477dbeab00121d74f8c46da2894c2"
+    }
+  ]
+}

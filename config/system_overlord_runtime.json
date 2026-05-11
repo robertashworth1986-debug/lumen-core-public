@@ -1,0 +1,12 @@
+{
+  "selected_iso": "MISO",
+  "electricity_cost_per_kwh_usd": null,
+  "use_live_national_avg": true,
+  "site_kw_override": 0.0,
+  "notes": [
+    "use_live_national_avg=true fetches the EIA national average retail price (all sectors) live from the EIA API v2.",
+    "electricity_cost_per_kwh_usd is only used when use_live_national_avg=false; set to null to always prefer live data.",
+    "Set site_kw_override to a facility-specific kW load to compute exact one-place $/hour.",
+    "If site_kw_override is 0, the engine uses the latest live ISO demand from live_eia_<ISO>.csv."
+  ]
+}

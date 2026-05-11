@@ -1,0 +1,27 @@
+{
+  "api_timeout": 10,
+  "live_enabled": true,
+  "retry_attempts": 3,
+  "loop_seconds": 60,
+  "data_roots": [
+    "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data",
+    "C:\\LumaTrader\\data",
+    "C:\\Users\\Novac\\iCloudDrive\\Data sets"
+  ],
+  "dataset_catalog_csv": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\dataset_catalog_live.csv",
+  "dataset_scan_summary_csv": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\data_scan_summary_live.csv",
+  "data_ingest_proof_json": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\data_ingest_proof_live.json",
+  "source_truth_table_json": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\source_truth_table.json",
+  "live_source_registry_json": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\config\\live_source_registry.json",
+  "baseline_loss_rates": {
+    "power_grid": 125000.0,
+    "data_centers": 300000.0,
+    "telecom": 180000.0,
+    "labor_macro": 25000.0,
+    "weather_climate": 40000.0,
+    "water_hydrology": 35000.0,
+    "space_environment": 15000.0,
+    "economic_macro": 50000.0,
+    "market_execution": 10000.0
+  }
+}

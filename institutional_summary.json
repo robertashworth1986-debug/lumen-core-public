@@ -1,0 +1,16 @@
+{
+  "files_scanned": 5,
+  "total_candidates": 7056,
+  "top_file": "C:/LumaTrader/data\\fred_UNRATE.csv",
+  "top_flow": "mandelbrot",
+  "top_strategy": "macd_crossover",
+  "top_algo": "momentum_confirm",
+  "top_test_sharpe": 6.251156886724578,
+  "top_test_sortino": 6.3604988600114645,
+  "top_test_omega": 3.017830701150434,
+  "top_test_profit_factor": 3.017830701150434,
+  "top_test_win_rate": 0.425531914893617,
+  "top_test_calmar": 302.79223270230545,
+  "top_test_vs_baseline": 49.247401553317935,
+  "top_institutional_score": 835.6160694378011
+}

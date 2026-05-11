@@ -1,0 +1,129 @@
+{
+  "profile": "time_travel_burst_v1",
+  "enabled": true,
+  "burst": {
+    "window_sizes": [
+      6
+    ],
+    "stride": 1,
+    "max_windows": 20,
+    "lookback_trades": 400
+  },
+  "objective": {
+    "weight_growth": 0.45,
+    "weight_win_rate": 0.2,
+    "weight_sharpe": 0.2,
+    "weight_drawdown_penalty": 0.15
+  },
+  "constraints": {
+    "min_win_rate": 0.45,
+    "max_drawdown_pct": 16.0,
+    "min_sharpe": 0.1
+  },
+  "safety": {
+    "max_base_risk_fraction": 0.9,
+    "max_position_multiplier": 1.45,
+    "min_loop_seconds": 0.2,
+    "max_loop_seconds": 2.0,
+    "force_paper": true
+  },
+  "adaptive_mutation": {
+    "enabled": true,
+    "persist_policy_updates": true,
+    "mutation_history_file": "out/execution/time_travel_burst_history.json",
+    "score_improve_threshold": 0.25,
+    "win_rate_target": 0.6,
+    "drawdown_target_pct": 8.0,
+    "min_runs_before_mutation": 1,
+    "min_windows_for_expand": 2,
+    "max_consecutive_expand": 3,
+    "max_consecutive_contract": 2,
+    "cooldown_runs_after_expand": 1,
+    "cooldown_runs_after_contract": 1,
+    "window_size_bounds": [
+      6,
+      60
+    ],
+    "stride_bounds": [
+      1,
+      6
+    ],
+    "max_windows_bounds": [
+      20,
+      240
+    ],
+    "window_expand_step": 2,
+    "window_contract_step": 2,
+    "max_windows_expand_step": 10,
+    "max_windows_contract_step": 10,
+    "volatility_shock_brake": {
+      "enabled": true,
+      "recent_window": 16,
+      "baseline_window": 80,
+      "min_recent_window": 8,
+      "min_baseline_window": 24,
+      "std_ratio_trigger": 1.4,
+      "std_abs_trigger_pct": 0.08,
+      "mean_abs_trigger_pct": 0.05,
+      "cooldown_runs_after_shock": 2,
+      "autotune": {
+        "enabled": true,
+        "min_runs_between_tunes": 2,
+        "false_positive_streak_to_relax": 2,
+        "missed_shock_streak_to_tighten": 2,
+        "relax_ratio_step": 0.08,
+        "tighten_ratio_step": 0.06,
+        "relax_abs_step_pct": 0.015,
+        "tighten_abs_step_pct": 0.01,
+        "ratio_bounds": [
+          1.4,
+          4.0
+        ],
+        "abs_std_bounds": [
+          0.08,
+          0.8
+        ],
+        "abs_mean_bounds": [
+          0.05,
+          0.5
+        ]
+      }
+    },
+    "last_mode": "hold",
+    "last_reason": "cooldown",
+    "last_updated_utc": "2026-05-06T23:46:05.671604+00:00",
+    "mutation_state": {
+      "cooldown_remaining": 0,
+      "consecutive_expand": 0,
+      "consecutive_contract": 0,
+      "runs_seen": 810,
+      "total_mutations": 402,
+      "shock_false_positive_streak": 0,
+      "shock_missed_streak": 1,
+      "shock_last_tune_run": 809
+    },
+    "last_shock_brake": {
+      "triggered": false,
+      "reason": "none",
+      "std_ratio": 0.21537721,
+      "recent_std": 0.03133604
+    },
+    "last_shock_autotune": {
+      "enabled": true,
+      "feedback": "missed_shock",
+      "action": "hold",
+      "tuned": false,
+      "run_index": 810,
+      "thresholds": {
+        "std_ratio_trigger": 1.4,
+        "std_abs_trigger_pct": 0.08,
+        "mean_abs_trigger_pct": 0.05
+      }
+    }
+  },
+  "outputs": {
+    "report_file": "out/execution/time_travel_burst_report.json",
+    "patch_file": "config/runtime_time_travel_patch.json",
+    "audit_file": "out/execution/time_travel_burst_audit.json"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "generated_utc": "2026-04-05T22:51:39.482391+00:00",
+  "accounts_total": 2,
+  "accounts": [
+    {
+      "account_id": "ALPACA_PRIMARY",
+      "provider": "ALPACA",
+      "suffix": "PRIMARY",
+      "status": "ready",
+      "has_api_key": true,
+      "has_api_secret": true,
+      "api_key_masked": "PKYU***ICE7",
+      "api_secret_masked": "CvUa***7JAz"
+    },
+    {
+      "account_id": "KRAKEN_PRIMARY",
+      "provider": "KRAKEN",
+      "suffix": "PRIMARY",
+      "status": "ready",
+      "has_api_key": true,
+      "has_api_secret": true,
+      "api_key_masked": "Ob7g***Z/ME",
+      "api_secret_masked": "3HIN***gA=="
+    }
+  ],
+  "source_env": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\config\\luma_live_keys.env"
+}

@@ -1,0 +1,62 @@
+{
+  "generated_utc": "2026-04-08T02:52:06.180474+00:00",
+  "sims_run": 90,
+  "max_sims_budget": 120,
+  "recommended": {
+    "lumen_detection_efficiency": 0.95,
+    "mitigation_multiplier": 0.96,
+    "projected_failure_cost_usd": 12260096.4,
+    "avoided_cost_usd": 11181207.92,
+    "residual_cost_usd": 1078888.48,
+    "prevented_pct": 91.2,
+    "efficiency_score": 11127263.496
+  },
+  "top_5": [
+    {
+      "lumen_detection_efficiency": 0.95,
+      "mitigation_multiplier": 0.96,
+      "projected_failure_cost_usd": 12260096.4,
+      "avoided_cost_usd": 11181207.92,
+      "residual_cost_usd": 1078888.48,
+      "prevented_pct": 91.2,
+      "efficiency_score": 11127263.496
+    },
+    {
+      "lumen_detection_efficiency": 0.95,
+      "mitigation_multiplier": 0.92,
+      "projected_failure_cost_usd": 12260096.4,
+      "avoided_cost_usd": 10715324.25,
+      "residual_cost_usd": 1544772.15,
+      "prevented_pct": 87.4,
+      "efficiency_score": 10638085.6425
+    },
+    {
+      "lumen_detection_efficiency": 0.9,
+      "mitigation_multiplier": 0.96,
+      "projected_failure_cost_usd": 12260096.4,
+      "avoided_cost_usd": 10592723.29,
+      "residual_cost_usd": 1667373.11,
+      "prevented_pct": 86.4,
+      "efficiency_score": 10509354.6345
+    },
+    {
+      "lumen_detection_efficiency": 0.95,
+      "mitigation_multiplier": 0.88,
+      "projected_failure_cost_usd": 12260096.4,
+      "avoided_cost_usd": 10249440.59,
+      "residual_cost_usd": 2010655.81,
+      "prevented_pct": 83.6,
+      "efficiency_score": 10148907.7995
+    },
+    {
+      "lumen_detection_efficiency": 0.9,
+      "mitigation_multiplier": 0.92,
+      "projected_failure_cost_usd": 12260096.4,
+      "avoided_cost_usd": 10151359.82,
+      "residual_cost_usd": 2108736.58,
+      "prevented_pct": 82.8,
+      "efficiency_score": 10045922.991
+    }
+  ],
+  "auto_applied": false
+}

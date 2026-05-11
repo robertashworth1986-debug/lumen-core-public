@@ -14,6 +14,13 @@ HEALTH_FILE = OUT / "health_metrics.json"
 SNIPER_DECISION_FILE = OUT / "super_sniper_decision.json"
 GUARDRAILS_FILE = CONFIG / "lightning_guardrails.json"
 
+NOISE_DELTA_KEYS = {
+    "lightning_active",
+    "lightning_last_run_utc",
+    "lightning_constraint_count",
+    "lightning_live_guard_reasons",
+}
+
 
 def now_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -220,6 +227,7 @@ def run(dry_run: bool) -> int:
     constraints = detect_constraints(runtime, health, guardrails)
     patched = apply_upgrades(runtime, health, guardrails, dry_run=dry_run)
     delta = dict_delta(runtime, patched)
+    material_delta = {k: v for k, v in delta.items() if k not in NOISE_DELTA_KEYS}
 
     frozen = {
         "timestamp_utc": now_utc(),
@@ -228,6 +236,7 @@ def run(dry_run: bool) -> int:
         "constraints": constraints,
         "constraint_count": len(constraints),
         "delta_count": len(delta),
+        "material_delta_count": len(material_delta),
         "delta": delta,
         "mode_after": patched.get("mode"),
         "live_after": bool(patched.get("allow_live_orders", False)),
@@ -254,15 +263,18 @@ def run(dry_run: bool) -> int:
     }
     atomic_write_json(remediation_path, remediation, indent=2)
 
-    if not dry_run:
+    if not dry_run and material_delta:
         backup = RUNTIME_FILE.with_name(f"runtime_control.lightning_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
         atomic_write_json(backup, runtime, indent=2)
         atomic_write_json(RUNTIME_FILE, patched, indent=2)
+    elif not dry_run:
+        print("  [LIGHTNING] no material runtime change; skipped runtime write")
 
     print("[LIGHTNING] run complete")
     print(f"  dry_run: {dry_run}")
     print(f"  constraints: {len(constraints)}")
     print(f"  delta_count: {len(delta)}")
+    print(f"  material_delta_count: {len(material_delta)}")
     print(f"  mode_after: {patched.get('mode')} | live: {patched.get('allow_live_orders')}")
     print(f"  frozen_delta: {OUT / 'lightning_frozen_delta.json'}")
     print(f"  remediation: {remediation_path}")

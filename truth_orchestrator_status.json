@@ -1,0 +1,74 @@
+{
+  "generated_utc": "2026-04-06T12:26:13.450660+00:00",
+  "data_roots_present": [
+    "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data",
+    "C:\\LumaTrader\\data",
+    "C:\\Users\\Novac\\iCloudDrive\\Data sets"
+  ],
+  "files_scanned": 58,
+  "usable_files": 16,
+  "enabled_source_count": 0,
+  "registry_rows": 17,
+  "runtime_mode": "paper",
+  "execution_mode": "paper",
+  "script_results": [
+    {
+      "script": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\auto_data_ingest.py",
+      "ran": true,
+      "ok": false,
+      "returncode": 1,
+      "stdout_tail": "Scanning: C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export (1).csv\nScanning: C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export (2).csv\nScanning: C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export.csv\nScanning: C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Daily_U.S._nuclear_capacity_outage (1).csv\n",
+      "stderr_tail": "Traceback (most recent call last):\n  File \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\auto_data_ingest.py\", line 57, in <module>\n    print(f\"\\u274c Skipped (unreadable): {file}\")\n  File \"C:\\Program Files\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u274c' in position 0: character maps to <undefined>\n"
+    },
+    {
+      "script": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\full_beast_universe_runner.py",
+      "ran": true,
+      "ok": false,
+      "reason": "TimeoutExpired(['C:\\\\Program Files\\\\Python311\\\\python.exe', 'C:\\\\LumaTrader\\\\INSTITUTIONAL_STACK_V2\\\\code\\\\full_beast_universe_runner.py'], 300)"
+    },
+    {
+      "script": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\adaptive_engine.py",
+      "ran": true,
+      "ok": false,
+      "returncode": 1,
+      "stdout_tail": "",
+      "stderr_tail": "Traceback (most recent call last):\n  File \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\adaptive_engine.py\", line 8, in <module>\n    best = df.sort_values(\"test_sharpe\", ascending=False).iloc[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\Python311\\Lib\\site-packages\\pandas\\core\\frame.py\", line 8347, in sort_values\n    k = self._get_label_or_level_values(by[0], axis=axis)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Program Files\\Python311\\Lib\\site-packages\\pandas\\core\\generic.py\", line 1776, in _get_label_or_level_values\n    raise KeyError(key)\nKeyError: 'test_sharpe'\n"
+    },
+    {
+      "script": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\build_credibility_dashboard.py",
+      "ran": false,
+      "ok": false,
+      "reason": "missing"
+    },
+    {
+      "script": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\dashboard_unified_refresh.py",
+      "ran": true,
+      "ok": false,
+      "reason": "TimeoutExpired(['C:\\\\Program Files\\\\Python311\\\\python.exe', 'C:\\\\LumaTrader\\\\INSTITUTIONAL_STACK_V2\\\\code\\\\dashboard_unified_refresh.py'], 300)"
+    },
+    {
+      "script": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\alpaca_paper_loop_builder.py",
+      "ran": true,
+      "ok": false,
+      "returncode": 1,
+      "stdout_tail": "",
+      "stderr_tail": "Traceback (most recent call last):\n  File \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\alpaca_paper_loop_builder.py\", line 74, in <module>\n    state[\"trade_count\"] += 1\n    ~~~~~^^^^^^^^^^^^^^^\nKeyError: 'trade_count'\n"
+    },
+    {
+      "script": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\infra_live_loop_builder.py",
+      "ran": true,
+      "ok": false,
+      "returncode": 1,
+      "stdout_tail": "",
+      "stderr_tail": "Traceback (most recent call last):\n  File \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\infra_live_loop_builder.py\", line 240, in <module>\n    rows = source_rows()\n           ^^^^^^^^^^^^^\n  File \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\infra_live_loop_builder.py\", line 85, in source_rows\n    add(\"EIA\",          \"power_grid\",       True,  \"EIA_API_KEY\",           240, \"near-live energy/electric\",      \"power operations / grid\",                 3.10)\n  File \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\infra_live_loop_builder.py\", line 69, in add\n    baseline = cfg[\"baseline_loss_rates\"].get(sector, 10000.0)\n               ~~~^^^^^^^^^^^^^^^^^^^^^^^\nKeyError: 'baseline_loss_rates'\n"
+    },
+    {
+      "script": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\execution\\RUN_EXECUTION.ps1",
+      "ran": true,
+      "ok": false,
+      "returncode": 1,
+      "stdout_tail": "",
+      "stderr_tail": "  File \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\execution\\RUN_EXECUTION.ps1\", line 1\n    cd C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\execution\n       ^\nSyntaxError: invalid syntax\n"
+    }
+  ]
+}

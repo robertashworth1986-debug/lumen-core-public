@@ -1,0 +1,16 @@
+{
+  "mode": "live",
+  "allow_live_orders": true,
+  "kill_switch": false,
+  "symbol": "UNIVERSE",
+  "loop_seconds": 0.5,
+  "x1000_auto_enabled": true,
+  "x1000_interval_loops": 20,
+  "x1000_passes": 2,
+  "x1000_auto_apply": false,
+  "account_id": "KRAKEN_PRIMARY",
+  "account_provider": "KRAKEN",
+  "account_execution_mode": "crypto_exec",
+  "universe_executable_count": 10,
+  "universe_shadow_count": 10
+}

@@ -2,10 +2,42 @@ from pathlib import Path
 from datetime import datetime, timezone
 import json, math, statistics, time, os, traceback, sys, shutil, subprocess
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+def _pick_existing_path(candidates):
+    resolved = [Path(p).expanduser() for p in candidates if p]
+    for cand in resolved:
+        if cand.exists():
+            return cand
+    return resolved[0] if resolved else Path.cwd().resolve()
+
+
+def _resolve_stack_root() -> Path:
+    env_root = os.getenv("LUMA_STACK_ROOT")
+    return _pick_existing_path(
+        [
+            env_root,
+            Path(__file__).resolve().parent.parent,
+            Path.cwd().resolve(),
+            r"C:\LumaTrader\INSTITUTIONAL_STACK_V2",
+        ]
+    )
+
+
+def _resolve_dashboard_dir(stack_root: Path) -> Path:
+    env_dash = os.getenv("LUMA_DASHBOARD_DIR")
+    return _pick_existing_path(
+        [
+            env_dash,
+            stack_root.parent / "dashboard",
+            stack_root / "dashboard",
+            r"C:\LumaTrader\dashboard",
+        ]
+    )
+
+
+ROOT = _resolve_stack_root()
 CONF = ROOT / "config"
 OUT  = ROOT / "out"
-DASH = Path(r"C:\LumaTrader\dashboard")
+DASH = _resolve_dashboard_dir(ROOT)
 
 # Allow dashboard refresh to import engine/dashboard builders from the code folder
 sys.path.insert(0, str(ROOT / "code"))
@@ -67,6 +99,12 @@ LUMASCOUT_SUMMARY_EXPORT = ROOT / "out" / "lumascout" / "lumascout_summary.json"
 LUMASCOUT_DASH_PATH     = DASH / "lumascout_dashboard.html"
 LUMASCOUT_ROOT          = ROOT / "LamaScout"
 LUMASCOUT_OUT           = LUMASCOUT_ROOT / "out"
+
+PREMIUM_BUILDER_PATH = ROOT / "code" / "BUILD_ALL_PREMIUM_DASHBOARDS.py"
+ADV_VALIDATION_BUILDER_PATH = ROOT / "code" / "ADVANCED_FLEET_VALIDATION.py"
+MASTER_DASH_BUILDER_PATH = ROOT / "code" / "UNIFIED_MASTER_DASHBOARD_BUILDER.py"
+LANE_AUDIT_BUILDER_PATH = ROOT / "code" / "VERIFY_LANE_SEPARATION.py"
+CANONICAL_GOV_COLLECTOR_PATH = ROOT / "code" / "CANONICAL_GOV_DATA_COLLECTOR.py"
 
 DEFAULT_SECTOR_VALUES = {
     "energy": 3913.75,
@@ -514,6 +552,15 @@ def build_chain():
 
 
 def build_external_dashboards():
+    if not PREMIUM_BUILDER_PATH.exists():
+        lumascout = build_lumascout_dashboard(build_lumascout_metrics())
+        return {
+            "status": "skipped",
+            "reason": "premium_builder_missing",
+            "builder": str(PREMIUM_BUILDER_PATH),
+            "lumascout": lumascout,
+        }
+
     try:
         import BUILD_ALL_PREMIUM_DASHBOARDS as premium_dashboards
         premium_dashboards.main()
@@ -535,6 +582,13 @@ def build_external_dashboards():
 
 
 def build_advanced_validation_dashboard():
+    if not ADV_VALIDATION_BUILDER_PATH.exists():
+        return {
+            "status": "skipped",
+            "reason": "advanced_validation_builder_missing",
+            "builder": str(ADV_VALIDATION_BUILDER_PATH),
+        }
+
     try:
         import ADVANCED_FLEET_VALIDATION as adv
         return adv.main()
@@ -545,6 +599,13 @@ def build_advanced_validation_dashboard():
 
 
 def build_master_unified_dashboard():
+    if not MASTER_DASH_BUILDER_PATH.exists():
+        return {
+            "status": "skipped",
+            "reason": "master_dashboard_builder_missing",
+            "builder": str(MASTER_DASH_BUILDER_PATH),
+        }
+
     try:
         import UNIFIED_MASTER_DASHBOARD_BUILDER as master_builder
         master_builder.main()
@@ -595,6 +656,13 @@ def publish_master_dashboard_to_iis() -> dict:
 
 
 def build_lane_audit_dashboard():
+    if not LANE_AUDIT_BUILDER_PATH.exists():
+        return {
+            "status": "skipped",
+            "reason": "lane_audit_builder_missing",
+            "builder": str(LANE_AUDIT_BUILDER_PATH),
+        }
+
     try:
         import VERIFY_LANE_SEPARATION as lane
         lane.main()
@@ -609,10 +677,17 @@ def run_canonical_gov_collector_throttled():
     now = time.time()
     if now - GOV_COLLECTOR_CACHE["last_epoch"] < GOV_COLLECTOR_CACHE["min_interval_sec"]:
         return {"status": "skipped", "reason": "throttled"}
+
+    if not CANONICAL_GOV_COLLECTOR_PATH.exists():
+        return {
+            "status": "skipped",
+            "reason": "collector_missing",
+            "collector": str(CANONICAL_GOV_COLLECTOR_PATH),
+        }
+
     try:
-        collector_script = ROOT / "code" / "CANONICAL_GOV_DATA_COLLECTOR.py"
         completed = subprocess.run(
-            [sys.executable, str(collector_script)],
+            [sys.executable, str(CANONICAL_GOV_COLLECTOR_PATH)],
             capture_output=True,
             text=True,
             timeout=GOV_COLLECTOR_TIMEOUT_SEC,

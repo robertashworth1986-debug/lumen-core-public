@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-28T17:22:26.110889+00:00",
+  "mode": "shadow",
+  "best_pair": "XRP/USD",
+  "best_price": 1.35014,
+  "best_score": 1.653835,
+  "best_momentum": 0.067472,
+  "best_signal": 1,
+  "active_pair": null,
+  "position": 0,
+  "entry_price": 0.0,
+  "entry_size": 0.0,
+  "entry_score": 0.0,
+  "equity": 9980.59,
+  "realized_pnl": -19.41,
+  "trades": 126,
+  "wins": 5,
+  "losses": 121
+}

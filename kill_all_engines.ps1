@@ -1,12 +1,20 @@
-# PowerShell script to kill all Python and trading engine processes
-# Run this before launching all engines to ensure a clean start
+param(
+	[ValidateSet('dashboard', 'core', 'full')]
+	[string]$StackGroup = 'full',
 
-# Kill all python.exe processes (forcefully)
-Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+	[switch]$ForceAllPython
+)
 
-# Optionally, kill any lingering PowerShell or dashboard HTML processes (uncomment if needed)
-# Get-Process pwsh -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-# Get-Process "chrome" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-# Get-Process "msedge" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+$ErrorActionPreference = 'Stop'
 
-Write-Host "All Python and engine processes killed. Ready for clean launch."
+$manager = Join-Path $PSScriptRoot 'code\ops\MANAGE_LOCAL_STACK.ps1'
+if (-not (Test-Path $manager)) {
+	throw "Runtime manager not found at $manager"
+}
+
+& $manager -Action stop -StackGroup $StackGroup -Force
+
+if ($ForceAllPython) {
+	Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+	Write-Host '[EMERGENCY] Forced stop on all python.exe processes.'
+}

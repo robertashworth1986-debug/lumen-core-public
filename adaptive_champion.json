@@ -1,0 +1,7 @@
+{
+  "timestamp": 1776088674.1964362,
+  "flow": "gaussian",
+  "strategy": "keltner_squeeze",
+  "sharpe": 15.057985371675514,
+  "vs_baseline": -0.1166533304801353
+}

@@ -1,0 +1,72 @@
+{
+  "profile_name": "super_sniper_harmonic_hybrid",
+  "mode_intent": "aggressive",
+  "capital": {
+    "target_multiplier": 10.0,
+    "max_position_multiplier": 2.5,
+    "fallback_buying_power_floor_usd": 25.0,
+    "reserve_floor_usd": 1.0
+  },
+  "candidate_hunter": {
+    "enabled": true,
+    "lineage_lookback_trades": 200,
+    "min_lineage_trades": 5,
+    "min_lineage_win_rate": 0.55,
+    "min_lineage_avg_pnl_pct": 0.10,
+    "sharp_trigger": 2.0,
+    "min_candidate_score": 70.0,
+    "scan_limit": 48,
+    "burst_top_n": 10
+  },
+  "cadence": {
+    "loop_seconds": 0.35,
+    "symbol_skip_cooldown_sec": 12,
+    "ticker_fail_cooldown_sec": 3,
+    "min_order_cooldown_sec": 20
+  },
+  "pyramiding": {
+    "enabled": true,
+    "pyramid_reinvestment_multiplier": 3.25,
+    "profit_reinvestment_enabled": true,
+    "max_consecutive_order_failures": 6,
+    "order_failure_cooldown_sec": 15
+  },
+  "risk_overrides": {
+    "max_open_positions": 20,
+    "max_drawdown_pct": 8.0,
+    "max_daily_loss_usd": 40.0,
+    "max_portfolio_heat": 0.60,
+    "base_risk_fraction": 0.95,
+    "gate_override_enabled": true,
+    "gate_override_min_confidence": 0.58,
+    "gate_override_min_edge_bps": 7.5,
+    "aggressive_edge_threshold_bps": 7.5,
+    "force_entry_on_high_confidence": true,
+    "multi_exchange_fallback": true,
+    "parallel_order_attempts": 3,
+    "auto_convert_collateral": true,
+    "collateral_sell_fraction": 0.20,
+    "collateral_convert_cooldown_sec": 12,
+    "capital_aware_ranking_enabled": true,
+    "capital_aware_scan_size": 60,
+    "pounce_edge_bps_bonus": 5.0,
+    "leverage_multiplier": 1.0,
+    "futures_mode": false
+  },
+  "live_arming": {
+    "allow_live_switch": false,
+    "require_env_arm": true,
+    "env_var": "LUMENCORE_ARM_LIVE",
+    "env_value": "YES_I_ACCEPT_REAL_CAPITAL_RISK",
+    "require_manual_confirm_file": true,
+    "confirm_file": "config/live_arm.confirm",
+    "confirm_phrase": "ARM_LIVE_SUPER_SNIPER"
+  },
+  "audit": {
+    "delta_freeze_enabled": true,
+    "write_delta_patch": true,
+    "write_checksum": true,
+    "out_file": "out/execution/frozen_deltas_super_sniper.json",
+    "decision_file": "out/execution/super_sniper_decision.json"
+  }
+}

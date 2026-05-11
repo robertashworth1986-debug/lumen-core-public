@@ -1,0 +1,14 @@
+{
+  "base_risk_fraction": 0.7546,
+  "loop_seconds": 1.67,
+  "max_position_usd": 87.24,
+  "max_daily_loss_usd": 46.53,
+  "micro_fractal_growth_active": true,
+  "micro_fractal_growth_last_run_utc": "2026-05-06T23:46:05.659018+00:00",
+  "micro_fractal_growth_factor": 1.163208,
+  "micro_fractal_pass_improvement": 0.546709,
+  "micro_fractal_winner_pass": "pass2",
+  "micro_fractal_constraints": 3,
+  "mode": "paper",
+  "allow_live_orders": false
+}

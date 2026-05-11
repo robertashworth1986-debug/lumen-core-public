@@ -1,0 +1,69 @@
+# Caddyfile for lumen-core.ai
+# Auto-HTTPS via Let's Encrypt. Drop in /etc/caddy/Caddyfile.
+
+{
+    # Global options
+    email hello@lumen-core.ai
+}
+
+# === MAIN PUBLIC LANDING ===
+lumen-core.ai, www.lumen-core.ai {
+    root * /var/www/lumen-core
+    encode gzip zstd
+    file_server
+
+    @health path /health
+    respond @health "ok" 200
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "interest-cohort=()"
+        -Server
+    }
+
+    log {
+        output file /var/log/caddy/lumen-core.log {
+            roll_size 50mb
+            roll_keep 7
+        }
+    }
+}
+
+# === INVESTOR / APP DASHBOARD (Panel app on :5016) ===
+app.lumen-core.ai {
+    # Basic auth — change the hash below with: caddy hash-password
+    # Default credentials baked in: user=investor / pass=lumen2026
+    basicauth {
+        investor JDJhJDE0JG13RGFKNlNUZjFZbk1uM2Z6VC9PTk9Va3R3WTlvOFF0cXhpUTlTSFlsRy9yelV6Tll0VnNh
+    }
+
+    encode gzip zstd
+    reverse_proxy 127.0.0.1:5016 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Frame-Options "SAMEORIGIN"
+    }
+}
+
+# === RESEARCH / SCOUT (Panel app on :5017) ===
+research.lumen-core.ai {
+    basicauth {
+        investor JDJhJDE0JG13RGFKNlNUZjFZbk1uM2Z6VC9PTk9Va3R3WTlvOFF0cXhpUTlTSFlsRy9yelV6Tll0VnNh
+    }
+
+    encode gzip zstd
+    reverse_proxy 127.0.0.1:5017 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+}

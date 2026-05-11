@@ -1,0 +1,61 @@
+{
+  "generated_utc": "2026-04-04T03:21:54.199917+00:00",
+  "rows": [
+    {
+      "file": "C:\\LumaTrader\\data\\fred_DGS10.csv",
+      "sector": "rates",
+      "flow": "cumulative_flow",
+      "algo": "phase_coherence",
+      "strategy": "trend",
+      "metric_profile": "entropy_slayer",
+      "test_sharpe": 8.1833,
+      "vs_baseline": 250.0,
+      "test_max_dd": 0.0,
+      "institutional_score": 481.4044,
+      "rows": 16047,
+      "value_col": "value"
+    },
+    {
+      "file": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\MER_T09_04.csv",
+      "sector": "unknown",
+      "flow": "cumulative_flow",
+      "algo": "phase_coherence",
+      "strategy": "trend",
+      "metric_profile": "entropy_slayer",
+      "test_sharpe": 7.1491,
+      "vs_baseline": 112.08,
+      "test_max_dd": 0.8509,
+      "institutional_score": 427.8435,
+      "rows": 5704,
+      "value_col": "Value"
+    },
+    {
+      "file": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\kraken_live_5000.csv",
+      "sector": "volatility",
+      "flow": "threshold_clip",
+      "algo": "phase_coherence",
+      "strategy": "regime_switch",
+      "metric_profile": "entropy_slayer",
+      "test_sharpe": 5.082,
+      "vs_baseline": 12.42,
+      "test_max_dd": 2.918,
+      "institutional_score": 302.7426,
+      "rows": 721,
+      "value_col": "close"
+    },
+    {
+      "file": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Daily_U.S._nuclear_capacity_outage (1).csv",
+      "sector": "energy",
+      "flow": "threshold_clip",
+      "algo": "identity",
+      "strategy": "regime_switch",
+      "metric_profile": "stability_first",
+      "test_sharpe": 4.4135,
+      "vs_baseline": 5.38,
+      "test_max_dd": 3.5865,
+      "institutional_score": 262.2513,
+      "rows": 369,
+      "value_col": "Daily U.S. nuclear capacity outage"
+    }
+  ]
+}

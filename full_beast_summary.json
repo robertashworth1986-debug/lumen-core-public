@@ -1,0 +1,22 @@
+{
+  "files_scanned": 25,
+  "usable_files": 12,
+  "flowforms_count": 22,
+  "algos_count": 18,
+  "strategies_count": 19,
+  "metric_profiles_count": 6,
+  "expected_full_candidates": 541728,
+  "actual_candidates_scored": 541728,
+  "top_file": "C:\\LumaTrader\\data\\kraken_live.csv",
+  "top_flow": "cumulative_flow",
+  "top_algo": "phase_coherence",
+  "top_strategy": "trend",
+  "top_metric_profile": "entropy_slayer",
+  "top_test_sharpe": 11.049420788669929,
+  "top_test_vs_baseline": -3.8842811243031683,
+  "top_institutional_score": 1.4583021909448589e+224,
+  "leaderboard_csv": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\full_beast_leaderboard.csv",
+  "top10_csv": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\full_beast_top10.csv",
+  "registry_json": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\full_beast_registry.json",
+  "dataset_scan_csv": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\full_beast_dataset_scan.csv"
+}

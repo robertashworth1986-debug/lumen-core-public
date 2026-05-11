@@ -1,0 +1,16 @@
+{
+  "symbol": "XRP",
+  "pair": "XRPUSD",
+  "exchange": "kraken",
+  "selection_mode": "capital_aware",
+  "edge_multiplier": 1.4,
+  "institutional_score": 72.0,
+  "test_sharpe": 1.8,
+  "test_sortino": 2.1,
+  "flow": "harmonic",
+  "strategy": "momentum",
+  "algo": "adaptive",
+  "ranking_score": 0.87,
+  "selected_at": "2026-04-06T17:31:17.057363+00:00",
+  "note": "seeded_bootstrap_selection"
+}

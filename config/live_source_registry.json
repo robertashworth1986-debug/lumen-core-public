@@ -1,0 +1,215 @@
+{
+  "generated_utc": "2026-05-06T22:26:58.233515+00:00",
+  "paper_live_linked": true,
+  "rows": [
+    {
+      "source": "ALPACA",
+      "sector": "broker",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 5511,
+      "evidence_basis": "MEASURED_FILE_MATCH",
+      "dollar_basis": "MEASURED",
+      "last_probe_utc": "2026-05-06T22:26:55.607604+00:00",
+      "env": "ALPACA_API_KEY,ALPACA_API_SECRET",
+      "enabled": true
+    },
+    {
+      "source": "ALPHAVANTAGE",
+      "sector": "market_data",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 25101,
+      "evidence_basis": "MEASURED_FILE_MATCH",
+      "dollar_basis": "MEASURED",
+      "last_probe_utc": "2026-05-06T22:26:55.623775+00:00",
+      "env": "ALPHAVANTAGE_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "BEA",
+      "sector": "macro",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 555998,
+      "evidence_basis": "MEASURED_FILE_MATCH",
+      "dollar_basis": "MEASURED",
+      "last_probe_utc": "2026-05-06T22:26:57.200132+00:00",
+      "env": "BEA_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "BLS",
+      "sector": "labor",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 7557,
+      "evidence_basis": "MEASURED_FILE_MATCH",
+      "dollar_basis": "MEASURED",
+      "last_probe_utc": "2026-05-06T22:26:57.215647+00:00",
+      "env": "BLS_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "CENSUS",
+      "sector": "demographic",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 0,
+      "evidence_basis": "KEY_ONLY",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": "2026-05-06T22:26:57.225710+00:00",
+      "env": "CENSUS_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "EIA",
+      "sector": "energy",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 5862,
+      "evidence_basis": "MEASURED_FILE_MATCH",
+      "dollar_basis": "MEASURED",
+      "last_probe_utc": "2026-05-06T22:26:57.246694+00:00",
+      "env": "EIA_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "EPA_AQS",
+      "sector": "air_quality",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 0,
+      "evidence_basis": "KEY_ONLY",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": "2026-05-06T22:26:57.256875+00:00",
+      "env": "EPA_AQS_KEY,EPA_AQS_EMAIL",
+      "enabled": true
+    },
+    {
+      "source": "FINNHUB",
+      "sector": "market_data",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 38877,
+      "evidence_basis": "MEASURED_FILE_MATCH",
+      "dollar_basis": "MEASURED",
+      "last_probe_utc": "2026-05-06T22:26:57.293501+00:00",
+      "env": "FINNHUB_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "FRED",
+      "sector": "rates",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 57796,
+      "evidence_basis": "MEASURED_FILE_MATCH",
+      "dollar_basis": "MEASURED",
+      "last_probe_utc": "2026-05-06T22:26:57.339782+00:00",
+      "env": "FRED_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "KRAKEN",
+      "sector": "crypto_exec",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 8897,
+      "evidence_basis": "MEASURED_FILE_MATCH",
+      "dollar_basis": "MEASURED",
+      "last_probe_utc": "2026-05-06T22:26:57.355124+00:00",
+      "env": "KRAKEN_API_KEY,KRAKEN_API_SECRET",
+      "enabled": true
+    },
+    {
+      "source": "MASSIVE",
+      "sector": "market_data",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 80,
+      "evidence_basis": "MEASURED_FILE_MATCH",
+      "dollar_basis": "MEASURED",
+      "last_probe_utc": "2026-05-06T22:26:57.366391+00:00",
+      "env": "MASSIVE_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "NASA",
+      "sector": "space",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 0,
+      "evidence_basis": "KEY_ONLY",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": "2026-05-06T22:26:57.377857+00:00",
+      "env": "NASA_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "NOAA_NCEI",
+      "sector": "weather",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 0,
+      "evidence_basis": "KEY_ONLY",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": "2026-05-06T22:26:57.390703+00:00",
+      "env": "NOAA_API_TOKEN",
+      "enabled": true
+    },
+    {
+      "source": "NREL",
+      "sector": "energy_lab",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 771637,
+      "evidence_basis": "MEASURED_FILE_MATCH",
+      "dollar_basis": "MEASURED",
+      "last_probe_utc": "2026-05-06T22:26:58.173566+00:00",
+      "env": "NREL_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "SAM_GOV",
+      "sector": "federal_contracts",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 0,
+      "evidence_basis": "KEY_ONLY",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": "2026-05-11T05:30:00+00:00",
+      "env": "SAM_GOV_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "SBA_GOV",
+      "sector": "federal_small_business",
+      "status": "PUBLIC_OPEN_DATA",
+      "rows": 0,
+      "evidence_basis": "OPEN_DATA_PORTAL",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": "2026-05-11T05:45:00+00:00",
+      "env": "",
+      "enabled": true
+    },
+    {
+      "source": "TWELVE_DATA",
+      "sector": "market_data",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 4000,
+      "evidence_basis": "MEASURED_FILE_MATCH",
+      "dollar_basis": "MEASURED",
+      "last_probe_utc": "2026-05-06T22:26:58.185862+00:00",
+      "env": "TWELVE_DATA_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "USGS_WATER",
+      "sector": "water",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 0,
+      "evidence_basis": "KEY_ONLY",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": "2026-05-06T22:26:58.196892+00:00",
+      "env": "USGS_WATER_API_KEY",
+      "enabled": true
+    },
+    {
+      "source": "WEBHOOK",
+      "sector": "internal",
+      "status": "LIVE_KEY_PRESENT",
+      "rows": 5,
+      "evidence_basis": "MEASURED_FILE_MATCH",
+      "dollar_basis": "MEASURED",
+      "last_probe_utc": "2026-05-06T22:26:58.207157+00:00",
+      "env": "WEBHOOK_SHARED_SECRET",
+      "enabled": true
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "generated_utc": "2026-05-06T00:00:00Z",
+  "deployment_domain": "https://lumen-core.ai",
+  "canonical_dashboard_root": "INSTITUTIONAL_STACK_V2/dashboard",
+  "deploy_guards": [
+    "INSTITUTIONAL_STACK_V2/code/deploy/verify_dashboard_endpoints.sh",
+    "INSTITUTIONAL_STACK_V2/code/deploy/deploy_vps.sh"
+  ],
+  "runtime_endpoint_strategy": {
+    "default": "same-origin",
+    "localhost_fallback": "http://127.0.0.1:8787",
+    "manual_override_global": "window.LUMA_API_BASE"
+  },
+  "updated_files": [
+    "INSTITUTIONAL_STACK_V2/dashboard/investor_wallboard.html",
+    "INSTITUTIONAL_STACK_V2/dashboard/luma_experience.html",
+    "INSTITUTIONAL_STACK_V2/dashboard/signal_confidence_heatmap.html",
+    "INSTITUTIONAL_STACK_V2/dashboard/js/luma_design_system.js",
+    "INSTITUTIONAL_STACK_V2/dashboard/kraken_execution_dashboard.html",
+    "INSTITUTIONAL_STACK_V2/dashboard/lumencore_dashboard.html",
+    "INSTITUTIONAL_STACK_V2/dashboard/stage_wallboard.html",
+    "INSTITUTIONAL_STACK_V2/dashboard/nobel_tier_command_center.html",
+    "INSTITUTIONAL_STACK_V2/code/deploy/verify_dashboard_endpoints.sh",
+    "INSTITUTIONAL_STACK_V2/code/deploy/deploy_vps.sh"
+  ],
+  "notes": [
+    "Shared gateway resolution now supports domain deployment and optional global override.",
+    "Use same-origin routing on VPS so lumen-core.ai fronts the API and websocket paths.",
+    "deploy_vps.sh now defaults to lumen-core.ai and runs endpoint hygiene checks before publish."
+  ]
+}

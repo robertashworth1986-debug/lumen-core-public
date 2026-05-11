@@ -1,0 +1,150 @@
+{
+  "generated_utc": "2026-04-13T13:57:56.427526+00:00",
+  "readiness": "GREEN",
+  "enabled_registry_sources": 17,
+  "measured_sources": 9,
+  "adaptive_universe_count": 34,
+  "files_scanned": 115,
+  "usable_files": 115,
+  "flowforms_count": 22,
+  "algos_count": 18,
+  "strategies_count": 19,
+  "metric_profiles_count": 6,
+  "translated_yearly_value_total": 267036160800000.0,
+  "sector_rollup_truth": {
+    "broker": {
+      "live_sources": 1,
+      "rows": 0,
+      "hour": 10000.0,
+      "day": 240000.0,
+      "week": 1680000.0,
+      "month": 7200000.0,
+      "year": 87600000.0
+    },
+    "market_data": {
+      "live_sources": 4,
+      "rows": 90354,
+      "hour": 903550000.0,
+      "day": 21685200000.0,
+      "week": 151796400000.0,
+      "month": 650556000000.0,
+      "year": 7915098000000.0
+    },
+    "macro": {
+      "live_sources": 1,
+      "rows": 541763,
+      "hour": 27088150000.0,
+      "day": 650115600000.0,
+      "week": 4550809200000.0,
+      "month": 19503468000000.0,
+      "year": 237292194000000.0
+    },
+    "labor": {
+      "live_sources": 1,
+      "rows": 3773,
+      "hour": 94325000.0,
+      "day": 2263800000.0,
+      "week": 15846600000.0,
+      "month": 67914000000.0,
+      "year": 826287000000.0
+    },
+    "demographic": {
+      "live_sources": 1,
+      "rows": 0,
+      "hour": 50000.0,
+      "day": 1200000.0,
+      "week": 8400000.0,
+      "month": 36000000.0,
+      "year": 438000000.0
+    },
+    "energy": {
+      "live_sources": 1,
+      "rows": 3305,
+      "hour": 413125000.0,
+      "day": 9915000000.0,
+      "week": 69405000000.0,
+      "month": 297450000000.0,
+      "year": 3618975000000.0
+    },
+    "air_quality": {
+      "live_sources": 1,
+      "rows": 0,
+      "hour": 40000.0,
+      "day": 960000.0,
+      "week": 6720000.0,
+      "month": 28800000.0,
+      "year": 350400000.0
+    },
+    "rates": {
+      "live_sources": 1,
+      "rows": 37992,
+      "hour": 1899600000.0,
+      "day": 45590400000.0,
+      "week": 319132800000.0,
+      "month": 1367712000000.0,
+      "year": 16640496000000.0
+    },
+    "crypto_exec": {
+      "live_sources": 1,
+      "rows": 8176,
+      "hour": 81760000.0,
+      "day": 1962240000.0,
+      "week": 13735680000.0,
+      "month": 58867200000.0,
+      "year": 716217600000.0
+    },
+    "space": {
+      "live_sources": 1,
+      "rows": 0,
+      "hour": 15000.0,
+      "day": 360000.0,
+      "week": 2520000.0,
+      "month": 10800000.0,
+      "year": 131400000.0
+    },
+    "weather": {
+      "live_sources": 1,
+      "rows": 0,
+      "hour": 40000.0,
+      "day": 960000.0,
+      "week": 6720000.0,
+      "month": 28800000.0,
+      "year": 350400000.0
+    },
+    "energy_lab": {
+      "live_sources": 1,
+      "rows": 23,
+      "hour": 2875000.0,
+      "day": 69000000.0,
+      "week": 483000000.0,
+      "month": 2070000000.0,
+      "year": 25185000000.0
+    },
+    "water": {
+      "live_sources": 1,
+      "rows": 0,
+      "hour": 35000.0,
+      "day": 840000.0,
+      "week": 5880000.0,
+      "month": 25200000.0,
+      "year": 306600000.0
+    },
+    "internal": {
+      "live_sources": 1,
+      "rows": 0,
+      "hour": 5000.0,
+      "day": 120000.0,
+      "week": 840000.0,
+      "month": 3600000.0,
+      "year": 43800000.0
+    }
+  },
+  "next_truth_files": [
+    "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\config\\luma_live_keys.env",
+    "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\config\\live_sources.json",
+    "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\config\\live_source_registry.json",
+    "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\source_truth_table.json",
+    "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\adaptive_universe.json",
+    "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\engine_truth_audit.json"
+  ]
+}

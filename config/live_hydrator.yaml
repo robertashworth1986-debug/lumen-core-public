@@ -1,0 +1,5 @@
+poll_kraken_ohlc_interval: 60
+binanceus_kline_interval: 1h
+top_n: 200
+min_rows: 150
+cost_bps: 10

@@ -1,0 +1,35 @@
+{
+  "generated_utc": "2026-04-08T02:52:06.184514+00:00",
+  "event": "infra_cross_sector_sweep",
+  "program_alignment": [
+    "DARPA",
+    "DOE",
+    "DOD",
+    "NSF",
+    "NASA"
+  ],
+  "trusted_tier": "gov_audit_ready",
+  "sector_count": 3,
+  "projected_failure_cost_usd": 12260096.4,
+  "estimated_avoided_cost_usd": 11181207.92,
+  "estimated_residual_cost_usd": 1078888.48,
+  "prevented_pct": 91.2,
+  "optimization": {
+    "report_file": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\cross_sector_optimization_report.json",
+    "matrix_file": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\cross_sector_optimization_matrix.csv",
+    "markdown_file": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\cross_sector_optimization_report.md",
+    "recommended": {
+      "lumen_detection_efficiency": 0.95,
+      "mitigation_multiplier": 0.96,
+      "projected_failure_cost_usd": 12260096.4,
+      "avoided_cost_usd": 11181207.92,
+      "residual_cost_usd": 1078888.48,
+      "prevented_pct": 91.2,
+      "efficiency_score": 11127263.496
+    },
+    "sims_run": 90,
+    "auto_applied": false
+  },
+  "delta_file": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\infra_frozen_deltas.jsonl",
+  "prediction_file": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\cross_sector_failure_predictions.jsonl"
+}

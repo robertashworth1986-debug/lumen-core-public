@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LumaTrader™ — Live +EV Alpha Scanner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:    #060b12;
+    --bg2:   #0a121d;
+    --panel: rgba(12, 19, 29, 0.84);
+    --gold:  #dfbb6b;
+    --gold2: #f0d080;
+    --teal:  #56d7cb;
+    --teal2: #3fc4b8;
+    --ice:   #d8e6f7;
+    --ice2:  #a8c4e4;
+    --line:  rgba(126, 172, 214, 0.22);
+    --green: #4ade80;
+    --red:   #f87171;
+    --warn:  #fbbf24;
+    --orange:#fb923c;
+    --violet:#9e7bdc;
+    --rose:  #e07baa;
+    --row-hover: rgba(86,215,203,0.05);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ice);
+    font-family: 'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(1400px 800px at 12% -8%,  rgba(86,215,203,0.10), transparent 52%),
+      radial-gradient(1000px 600px at 92% 10%,  rgba(223,187,107,0.09), transparent 48%),
+      radial-gradient(600px  400px at 55% 95%,  rgba(158,123,220,0.08), transparent 46%),
+      linear-gradient(155deg, #060b12 0%, #0a121d 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #spiral-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.07;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .particle-field {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    border-radius: 50%;
+    background: var(--teal);
+    opacity: 0;
+    animation: particleDrift var(--dur, 12s) var(--delay, 0s) ease-in-out infinite;
+  }
+
+  @keyframes particleDrift {
+    0%   { opacity: 0;    transform: translate(0,0) scale(1); }
+    20%  { opacity: 0.45; }
+    80%  { opacity: 0.25; }
+    100% { opacity: 0;    transform: translate(var(--dx,30px), var(--dy,-80px)) scale(0.4); }
+  }
+  @keyframes pulseOrb   { 0%,100%{transform:scale(1);opacity:0.7} 50%{transform:scale(1.18);opacity:1} }
+  @keyframes fadeSlideUp{ from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes marqueeScroll{ 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  @keyframes edgePulse  { 0%,100%{opacity:1} 50%{opacity:0.55} }
+  @keyframes spin       { to{transform:rotate(360deg)} }
+  @keyframes shimmerBar {
+    0%  {background-position:-200px 0}
+    100%{background-position: 200px 0}
+  }
+
+  /* ── layout ── */
+  .page {
+    position: relative; z-index: 1;
+    max-width: 1380px; margin: 0 auto; padding: 0 28px 80px;
+  }
+
+  /* ── header ── */
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 28px 0 0; animation: fadeSlideUp 0.7s ease both;
+  }
+  .logo-group { display: flex; align-items: center; gap: 14px; }
+  .logo-mark  { position: relative; width: 48px; height: 48px; flex-shrink: 0; }
+  .logo-mark svg { width: 100%; height: 100%; }
+  .logo-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700; letter-spacing: 0.5px; color: var(--teal);
+  }
+  .logo-text span { color: var(--gold); }
+  .logo-meta {
+    font-size: 10px; color: var(--ice2); letter-spacing: 1px;
+    text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;
+  }
+  .header-right {
+    display: flex; align-items: center; gap: 18px;
+    font-size: 13px; color: var(--ice2);
+    font-family: 'IBM Plex Mono', monospace; flex-wrap: wrap;
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--teal);
+    display: inline-block; animation: pulseOrb 2s ease-in-out infinite; margin-right: 5px;
+  }
+  .clock-teal { color: var(--teal); }
+  #last-updated { font-size: 11px; color: var(--ice2); font-family: 'IBM Plex Mono', monospace; }
+  #stack-status { font-size: 11px; color: var(--ice2); font-family: 'IBM Plex Mono', monospace; opacity:0.8; }
+
+  /* ── hero ── */
+  .hero {
+    margin-top: 28px; padding: 30px 36px;
+    background: linear-gradient(120deg, rgba(86,215,203,0.14), rgba(223,187,107,0.10) 44%, rgba(10,18,29,0.88));
+    border: 1px solid rgba(86,215,203,0.28); border-radius: 20px;
+    position: relative; overflow: hidden; animation: fadeSlideUp 0.8s 0.1s ease both;
+  }
+  .hero::before {
+    content:''; position:absolute; right:-80px; top:-80px;
+    width:260px; height:260px; border-radius:50%;
+    background:radial-gradient(circle, rgba(86,215,203,0.22), transparent 65%);
+    animation: pulseOrb 6s ease-in-out infinite;
+  }
+  .hero-inner { position: relative; z-index: 1; }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(22px, 3vw, 34px); font-weight: 700;
+    line-height: 1.2; color: var(--teal); letter-spacing: 0.3px;
+  }
+  .hero h1 em { font-style: normal; color: var(--gold); }
+  .hero-sub { margin-top: 8px; font-size: 14px; color: var(--ice2); max-width: 700px; line-height: 1.6; }
+  .phi-badge {
+    display:inline-flex; align-items:center; gap:6px; margin-top:14px;
+    padding:5px 13px;
+    background:rgba(86,215,203,0.10); border:1px solid rgba(86,215,203,0.26);
+    border-radius:30px; font-family:'IBM Plex Mono',monospace;
+    font-size:11px; color:var(--teal); letter-spacing:0.4px;
+  }
+
+  /* ── summary tiles ── */
+  .summary-tiles {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+    gap: 12px; margin-top: 18px;
+  }
+  .tile {
+    background: rgba(6,11,18,0.6); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px; text-align: center;
+    transition: border-color 0.22s, box-shadow 0.22s;
+  }
+  .tile:hover { border-color: rgba(86,215,203,0.4); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  .tile .val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.4rem; font-weight: 600; margin-bottom: 4px; color: var(--ice);
+  }
+  .tile .lbl { font-size: 10px; color: var(--ice2); text-transform: uppercase; letter-spacing: 0.7px; margin-top: 2px; }
+  .tile.green  .val { color: var(--green); }
+  .tile.yellow .val { color: var(--warn); }
+  .tile.teal   .val { color: var(--teal); }
+
+  /* ── marquee ── */
+  .marquee-wrap { margin-top: 20px; overflow:hidden; padding:8px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .marquee-inner {
+    display:inline-flex; gap:48px; white-space:nowrap;
+    animation:marqueeScroll 38s linear infinite;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ice2); letter-spacing:0.3px;
+  }
+  .marquee-inner span { color: var(--teal); margin-right: 6px; }
+
+  /* ── config panel ── */
+  .config-panel {
+    margin-top: 28px; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 16px; padding: 18px 22px;
+    display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+    animation: fadeSlideUp 0.9s 0.25s ease both;
+  }
+  .config-group { display: flex; flex-direction: column; gap: 4px; }
+  .config-group label {
+    font-size: 10px; color: var(--ice2); text-transform: uppercase;
+    letter-spacing: 0.7px; font-family: 'IBM Plex Mono', monospace;
+  }
+  .config-group input[type=number] {
+    background: rgba(6,11,18,0.7); border: 1px solid var(--line); border-radius: 8px;
+    color: var(--gold); padding: 7px 12px; font-size: 15px; font-weight: 600;
+    font-family: 'IBM Plex Mono', monospace; width: 120px; outline: none;
+    transition: border-color 0.18s;
+  }
+  .config-group input[type=number]:focus { border-color: var(--teal); }
+  .config-divider { width: 1px; height: 38px; background: var(--line); }
+  .refresh-btn {
+    margin-left: auto; background: rgba(86,215,203,0.12); color: var(--teal);
+    border: 1px solid rgba(86,215,203,0.36); border-radius: 10px;
+    padding: 9px 20px; font-size: 13px; font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif; cursor: pointer;
+    display: flex; align-items: center; gap: 7px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .refresh-btn:hover { background: rgba(86,215,203,0.22); border-color: var(--teal); }
+  .refresh-btn svg { width: 15px; height: 15px; }
+  .refresh-btn.spinning svg { animation: spin 1s linear infinite; }
+
+  /* ── section label ── */
+  .section-label {
+    font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1.6px; color: var(--ice2);
+    margin: 38px 0 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content:''; flex:1; height:1px; background: var(--line); }
+
+  /* ── stake bar ── */
+  .stake-bar {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 22px; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    animation: fadeSlideUp 0.9s 0.3s ease both;
+  }
+  .stake-bar .title { font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; color:var(--gold); }
+  .stake-input-wrap { display:flex; align-items:center; gap:6px; }
+  .stake-input-wrap .dollar { color:var(--ice2); font-size:1.1rem; font-family:'IBM Plex Mono',monospace; }
+  .stake-bar input[type=number] {
+    background:rgba(6,11,18,0.7); border:1px solid var(--line); border-radius:8px;
+    color:var(--gold); padding:7px 12px; font-size:1.2rem; font-weight:600;
+    font-family:'IBM Plex Mono',monospace; width:120px; outline:none;
+    transition:border-color 0.18s;
+  }
+  .stake-bar input[type=number]:focus { border-color: var(--gold); }
+  .stake-hint { font-size:11px; color:var(--ice2); font-family:'IBM Plex Mono',monospace; }
+
+  /* ── picks table ── */
+  .table-wrap {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    overflow: hidden; margin-bottom: 24px; animation: fadeSlideUp 1s 0.35s ease both;
+  }
+  .table-header {
+    padding: 16px 22px; display:flex; align-items:center; justify-content:space-between;
+    border-bottom: 1px solid var(--line); background: rgba(6,11,18,0.5);
+  }
+  .table-header-title { font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; color:var(--teal); letter-spacing:0.4px; }
+  .table-header-sub   { font-size:11px; color:var(--ice2); font-family:'IBM Plex Mono',monospace; margin-top:2px; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: rgba(6,11,18,0.6); }
+  th {
+    padding: 10px 14px; text-align: left; font-size: 10px; color: var(--ice2); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--line);
+    white-space: nowrap; font-family: 'IBM Plex Mono', monospace;
+  }
+  td { padding: 12px 14px; border-bottom: 1px solid rgba(126,172,214,0.1); font-size: 13px; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(86,215,203,0.04); }
+
+  .badge {
+    display: inline-block; padding: 3px 9px; border-radius: 20px;
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.4px; font-family: 'IBM Plex Mono', monospace;
+  }
+  .badge-sport   { background:rgba(86,215,203,0.12);  color:var(--teal);  border:1px solid rgba(86,215,203,0.26); }
+  .badge-live    { background:rgba(248,113,113,0.14); color:#fca5a5; border:1px solid rgba(248,113,113,0.3); animation:edgePulse 1.5s infinite; }
+  .badge-tonight { background:rgba(251,191,36,0.12);  color:var(--warn);  border:1px solid rgba(251,191,36,0.28); }
+  .badge-upcoming{ background:rgba(74,222,128,0.10);  color:var(--green); border:1px solid rgba(74,222,128,0.22); }
+
+  .edge-bar-wrap { display:flex; align-items:center; gap:8px; min-width:110px; }
+  .edge-bar-bg   { flex:1; background:rgba(6,11,18,0.7); border-radius:4px; height:6px; overflow:hidden; max-width:80px; }
+  .edge-bar-fill { height:6px; border-radius:4px; }
+
+  .odds-decimal { font-size:11px; color:var(--ice2); font-family:'IBM Plex Mono',monospace; margin-top:1px; }
+  .kelly-val { color:var(--teal); font-weight:600; font-family:'IBM Plex Mono',monospace; }
+  .kelly-sub { font-size:11px; color:var(--ice2); margin-top:2px; font-family:'IBM Plex Mono',monospace; }
+  .return-val { font-weight:700; color:var(--green); font-family:'IBM Plex Mono',monospace; }
+  .profit-val { font-size:11px; margin-top:2px; font-family:'IBM Plex Mono',monospace; }
+  .no-picks { padding:48px; text-align:center; color:var(--ice2); font-family:'IBM Plex Mono',monospace; font-size:13px; }
+
+  /* ── log section ── */
+  .log-section {
+    background:var(--panel); border:1px solid var(--line); border-radius:18px;
+    overflow:hidden; margin-bottom:28px; animation:fadeSlideUp 1s 0.4s ease both;
+  }
+  .log-header {
+    padding:14px 22px; display:flex; justify-content:space-between; align-items:center;
+    border-bottom:1px solid var(--line); background:rgba(6,11,18,0.5);
+  }
+  .log-header-title { font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; color:var(--gold); }
+  .log-clear-btn {
+    background:rgba(248,113,113,0.12); color:#fca5a5; border:1px solid rgba(248,113,113,0.28);
+    border-radius:7px; padding:4px 12px; font-size:11px; cursor:pointer;
+    font-family:'IBM Plex Mono',monospace; transition:background 0.18s;
+  }
+  .log-clear-btn:hover { background:rgba(248,113,113,0.22); }
+  .log-table { width:100%; border-collapse:collapse; }
+  .log-table td, .log-table th { padding:10px 14px; border-bottom:1px solid rgba(126,172,214,0.1); font-size:12px; }
+  .log-table th { font-size:10px; color:var(--ice2); text-transform:uppercase; letter-spacing:0.7px; font-family:'IBM Plex Mono',monospace; background:rgba(6,11,18,0.6); }
+  .log-empty { padding:28px; text-align:center; color:var(--ice2); font-size:13px; font-family:'IBM Plex Mono',monospace; }
+  .log-result-win  { color:var(--green); font-weight:700; }
+  .log-result-loss { color:var(--red);   font-weight:700; }
+  .log-result-open { color:var(--ice2); }
+  .log-summary { padding:12px 22px; font-size:12px; color:var(--ice2); border-top:1px solid var(--line); font-family:'IBM Plex Mono',monospace; }
+
+  .result-btn {
+    background:none; border:1px solid var(--line); border-radius:5px;
+    color:var(--ice2); padding:3px 8px; cursor:pointer; font-size:10.5px; margin-right:3px;
+    font-family:'IBM Plex Mono',monospace; transition:border-color 0.18s;
+  }
+  .result-btn:hover { border-color:var(--teal); color:var(--teal); }
+  .result-btn.win  { border-color:var(--green); color:var(--green); }
+  .result-btn.loss { border-color:var(--red);   color:var(--red); }
+
+  /* ── footer ── */
+  footer {
+    margin-top:56px; padding:22px 0; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:10px; font-size:11px; color:var(--ice2);
+    font-family:'IBM Plex Mono',monospace; animation:fadeSlideUp 1s 0.5s ease both;
+  }
+
+  footer a.footer-link { color: var(--teal); text-decoration: none; }
+  footer a.footer-link:hover { color: var(--gold); }
+
+  /* ── gateway integration block ─────────────────────────────── */
+  .agw-wrap {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 32px 40px;
+  }
+  .agw-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #56d7cb;
+    margin-bottom: 14px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(126,172,214,0.18);
+  }
+  .agw-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .agw-card {
+    background: rgba(12,19,29,0.88);
+    border: 1px solid rgba(126,172,214,0.18);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .agw-card-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #dfbb6b;
+    margin-bottom: 4px;
+  }
+  .agw-card-sub {
+    font-size: 12px;
+    color: #a8c4e4;
+    margin-bottom: 12px;
+  }
+  .agw-stream {
+    font-size: 12px;
+  }
+  .agw-events {
+    margin-top: 10px;
+    font-size: 11px;
+    color: #a8c4e4;
+    max-height: 80px;
+    overflow: hidden;
+  }
+  .agw-node-line {
+    font-size: 13px;
+    color: #a8c4e4;
+  }
+  .agw-node-count {
+    color: #56d7cb;
+    font-weight: 700;
+  }
+  .agw-node-list {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #a8c4e4;
+  }
+  .agw-node-item { margin-bottom: 4px; }
+  .agw-explainer-panel { min-height: 80px; }
+
+  @media (max-width: 900px) {
+    .agw-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .page { padding: 0 14px 60px; }
+    table { font-size: 11px; }
+    td, th { padding: 8px 10px; }
+    .config-panel { gap: 12px; }
+    .summary-tiles { grid-template-columns: repeat(2,1fr); }
+  }
+</style>
+  <script src="dashboard/js/luma_design_system.js"></script>
+</head>
+<body>
+
+<!-- SVG spiral background -->
+<svg id="spiral-canvas" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#56d7cb" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#dfbb6b" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+  <g stroke="url(#sg1)" fill="none" stroke-width="1.2">
+    <path d="M 700 450 Q 700 162 988 162"/><path d="M 988 162 Q 1276 162 1276 450"/>
+    <path d="M 1276 450 Q 1276 738 988 738"/><path d="M 988 738 Q 700 738 700 450"/>
+    <path d="M 700 450 Q 700 272 878 272"/><path d="M 878 272 Q 1056 272 1056 450"/>
+    <path d="M 1056 450 Q 1056 628 878 628"/><path d="M 878 628 Q 700 628 700 450"/>
+    <circle cx="700" cy="450" r="178"  stroke-dasharray="4 8"  stroke-opacity="0.4"/>
+    <circle cx="700" cy="450" r="288"  stroke-dasharray="4 12" stroke-opacity="0.3"/>
+    <circle cx="700" cy="450" r="466"  stroke-dasharray="4 16" stroke-opacity="0.22"/>
+    <line x1="700" y1="272" x2="700" y2="628" stroke-dasharray="2 10" stroke-opacity="0.22"/>
+    <line x1="522" y1="450" x2="878" y2="450" stroke-dasharray="2 10" stroke-opacity="0.22"/>
+  </g>
+</svg>
+
+<div class="particle-field" id="particles"></div>
+
+<div class="page">
+  <header>
+    <div class="logo-group">
+      <div class="logo-mark">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="22" stroke="#56d7cb" stroke-width="1.5" stroke-dasharray="3 5" opacity="0.6"/>
+          <circle cx="24" cy="24" r="14" stroke="#dfbb6b" stroke-width="1.2" opacity="0.7"/>
+          <path d="M24 24 Q24 10 37 10 Q47 10 47 24" stroke="#56d7cb" stroke-width="1.8" fill="none"/>
+          <path d="M24 24 Q17 24 17 17 Q17 10 24 10" stroke="#dfbb6b" stroke-width="1.4" fill="none"/>
+          <circle cx="24" cy="24" r="2.5" fill="#56d7cb"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">Luma<span>Alpha</span></div>
+        <div class="logo-meta">Live +EV Sports Intelligence Scanner</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div id="last-updated">Loading…</div>
+      <div id="stack-status">Premium stack: checking…</div>
+      <span><span class="live-dot"></span>SCANNING</span>
+      <span id="clock" class="clock-teal">--:--:-- UTC</span>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <h1>Pinnacle No-Vig Sharp Lines.<br><em>DraftKings Edge Factory.</em></h1>
+      <p class="hero-sub">
+        Real-time expected-value scanning across 77 sports · N-way no-vig fair price modeling ·
+        Kelly criterion stake sizing · PyPortfolioOpt allocation · FlowForm α-score fusion
+      </p>
+      <div class="phi-badge">
+        φ = 1.6180339887 &nbsp;·&nbsp; Fibonacci-lattice scoring &nbsp;·&nbsp; FlowForm fusion &nbsp;·&nbsp; Premium Stack 14/14
+      </div>
+      <div class="summary-tiles" id="summary-tiles">
+        <div class="tile teal"><div class="val" id="tile-picks">—</div><div class="lbl">Live Picks</div></div>
+        <div class="tile green"><div class="val" id="tile-top-edge">—</div><div class="lbl">Top Edge %</div></div>
+        <div class="tile yellow"><div class="val" id="tile-kelly-total">—</div><div class="lbl">Kelly Total</div></div>
+        <div class="tile green"><div class="val" id="tile-opt-total">—</div><div class="lbl">Opt. Total</div></div>
+        <div class="tile"><div class="val" id="tile-next">—</div><div class="lbl">Next Event</div></div>
+        <div class="tile"><div class="val" id="tile-stack">—</div><div class="lbl">Modules</div></div>
+        <div class="tile"><div class="val" id="tile-pnl">—</div><div class="lbl">Logged P&amp;L</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee-wrap">
+    <div class="marquee-inner">
+      <span>ALPHA SCANNER</span> Boxing · MMA · NBA · MLB · NHL · Tennis · Soccer · UFL · live edge detection
+      &nbsp;&nbsp;&nbsp;
+      <span>SHARP LINES</span> Pinnacle no-vig N-way model · fair price calibration · all-books consensus
+      &nbsp;&nbsp;&nbsp;
+      <span>KELLY ENGINE</span> Fractional Kelly sizing · PyPortfolioOpt allocation · max-drawdown guard
+      &nbsp;&nbsp;&nbsp;
+      <span>FLOWFORM FUSION</span> φ-weighted signal scoring · engagement harmonic · breakout velocity index
+      &nbsp;&nbsp;&nbsp;
+      <span>ALPHA SCANNER</span> Boxing · MMA · NBA · MLB · NHL · Tennis · Soccer · UFL · live edge detection
+      &nbsp;&nbsp;&nbsp;
+      <span>SHARP LINES</span> Pinnacle no-vig N-way model · fair price calibration · all-books consensus
+      &nbsp;&nbsp;&nbsp;
+      <span>KELLY ENGINE</span> Fractional Kelly sizing · PyPortfolioOpt allocation · max-drawdown guard
+      &nbsp;&nbsp;&nbsp;
+      <span>FLOWFORM FUSION</span> φ-weighted signal scoring · engagement harmonic · breakout velocity index
+    </div>
+  </div>
+
+  <div class="config-panel">
+    <div class="config-group">
+      <label for="bankroll">Bankroll ($)</label>
+      <input type="number" id="bankroll" title="Bankroll" value="150" min="1" max="1000000" step="1">
+    </div>
+    <div class="config-divider"></div>
+    <div class="config-group">
+      <label for="kelly-frac">Kelly Fraction</label>
+      <input type="number" id="kelly-frac" title="Kelly Fraction" value="0.25" min="0.01" max="1" step="0.05">
+    </div>
+    <div class="config-divider"></div>
+    <div class="config-group">
+      <label for="max-bet">Max Bet ($)</label>
+      <input type="number" id="max-bet" title="Max Single Bet" value="25" min="1" max="10000" step="1">
+    </div>
+    <button class="refresh-btn" id="refresh-btn" onclick="refreshOdds()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M23 4v6h-6M1 20v-6h6"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+      </svg>
+      Refresh Odds
+    </button>
+  </div>
+
+  <div class="section-label">Live +EV Picks</div>
+
+  <div class="stake-bar">
+    <div class="title">⚡ Stake Calculator</div>
+    <div class="stake-input-wrap">
+      <span class="dollar">$</span>
+      <input type="number" id="custom-stake" value="10" min="0.01" step="0.01" placeholder="10">
+    </div>
+    <div class="stake-hint">← Enter any amount to instantly preview return &amp; profit for every pick</div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-header">
+      <div>
+        <div class="table-header-title">+EV Picks — Sorted by Edge %</div>
+        <div class="table-header-sub">Pinnacle no-vig · DraftKings pricing · FlowForm α-score fusion</div>
+      </div>
+    </div>
+    <div id="picks-container"><div class="no-picks">Loading picks…</div></div>
+  </div>
+
+  <div class="section-label">Bet Logger</div>
+
+  <div class="log-section">
+    <div class="log-header">
+      <div class="log-header-title">Investor Proof Trail — Logged Bets</div>
+      <button class="log-clear-btn" onclick="clearLog()">Clear Log</button>
+    </div>
+    <div id="log-container"><div class="log-empty">No bets logged yet · click "Log" on any pick above</div></div>
+    <div id="log-summary" class="log-summary"></div>
+  </div>
+</div>
+
+<footer>
+  <span>LumaTrader™ INSTITUTIONAL_STACK_V2 &nbsp;·&nbsp; Pinnacle No-Vig Model</span>
+  <span>For research &amp; evidence generation only &nbsp;·&nbsp; <a href="dashboard/index.html" class="footer-link">← Portal</a></span>
+</footer>
+
+<script>
+// ── State ────────────────────────────────────────────────────────────────────
+let picks = [];
+let betLog = JSON.parse(localStorage.getItem('lumatrader_bet_log') || '[]');
+let stackReport = null;
+
+// ── Clock ─────────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getUTCHours()).padStart(2,'0');
+  const m = String(now.getUTCMinutes()).padStart(2,'0');
+  const s = String(now.getUTCSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}:${s} UTC`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── Particles ─────────────────────────────────────────────────────────────────
+(function() {
+  const field = document.getElementById('particles');
+  for (let i = 0; i < 28; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left   = Math.random() * 100 + '%';
+    p.style.top    = (20 + Math.random() * 80) + '%';
+    p.style.setProperty('--dur',   (9 + Math.random() * 14) + 's');
+    p.style.setProperty('--delay', (Math.random() * 12) + 's');
+    p.style.setProperty('--dx',    (Math.random() * 60 - 30) + 'px');
+    p.style.setProperty('--dy',    -(40 + Math.random() * 80) + 'px');
+    if (Math.random() > 0.5) p.style.background = '#dfbb6b';
+    field.appendChild(p);
+  }
+})();
+
+// ── Utility ──────────────────────────────────────────────────────────────────
+function decimalToAmerican(d) {
+  if (d >= 2.0) return '+' + Math.round((d - 1) * 100);
+  return '-' + Math.round(100 / (d - 1));
+}
+
+function kellyStake(edge_pct, dk_price, bankroll, fracKelly, maxBet) {
+  const b = dk_price - 1;
+  const p = 1 / (dk_price / (1 + edge_pct / 100));  // implied fair prob
+  const q = 1 - p;
+  const f = (b * p - q) / b;
+  if (f <= 0) return 0;
+  const raw = bankroll * fracKelly * f;
+  return Math.min(maxBet, Math.max(0.01, raw));
+}
+
+function edgeColor(edge) {
+  if (edge >= 20) return '#f97316';
+  if (edge >= 5)  return '#22c55e';
+  if (edge >= 2)  return '#facc15';
+  return '#64748b';
+}
+
+function hoursLabel(h) {
+  if (h <= 0) return '<span class="badge badge-live">LIVE</span>';
+  if (h < 8)  return '<span class="badge badge-tonight">TONIGHT</span>';
+  const days = Math.floor(h / 24);
+  const hrs  = Math.round(h % 24);
+  if (days === 0) return `<span class="badge badge-upcoming">${hrs}h</span>`;
+  return `<span class="badge badge-upcoming">${days}d ${hrs}h</span>`;
+}
+
+function sportLabel(sport) {
+  const map = {
+    boxing_boxing: 'Boxing',
+    mma_mixed_martial_arts: 'MMA',
+    basketball_nba: 'NBA',
+    baseball_mlb: 'MLB',
+    icehockey_nhl: 'NHL',
+    americanfootball_ufl: 'UFL',
+    soccer_epl: 'EPL',
+    soccer_usa_mls: 'MLS',
+    tennis_atp_madrid_open: 'ATP Madrid',
+    tennis_wta_madrid_open: 'WTA Madrid',
+  };
+  return map[sport] || sport.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function fmt(n) { return n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+// ── Render picks table ───────────────────────────────────────────────────────
+function renderPicks() {
+  const customStake = parseFloat(document.getElementById('custom-stake').value) || 0;
+  const bankroll    = parseFloat(document.getElementById('bankroll').value)     || 150;
+  const fracKelly   = parseFloat(document.getElementById('kelly-frac').value)   || 0.25;
+  const maxBet      = parseFloat(document.getElementById('max-bet').value)      || 25;
+
+  if (!picks.length) {
+    document.getElementById('picks-container').innerHTML = '<div class="no-picks">No +EV picks found. Click Refresh Odds or re-run scan_props_ev.py</div>';
+    return;
+  }
+
+  // Tiles
+  const topEdge  = picks[0].edge_pct;
+  let kellyTotal = 0;
+  let optTotal = 0;
+  picks.forEach(p => {
+    const dkPrice = p.dk_price_decimal ?? p.dk_price;
+    kellyTotal += kellyStake(p.edge_pct, dkPrice, bankroll, fracKelly, maxBet);
+    optTotal += Number(p.optimized_stake ?? p.kelly_stake ?? 0);
+  });
+  const nextHours = Math.min(...picks.map(p => Math.max(0, p.hours_to_start)));
+  const days = Math.floor(nextHours / 24), hrs = Math.round(nextHours % 24);
+  document.getElementById('tile-picks').textContent   = picks.length;
+  document.getElementById('tile-top-edge').textContent= topEdge.toFixed(1) + '%';
+  document.getElementById('tile-kelly-total').textContent = '$' + fmt(kellyTotal);
+  document.getElementById('tile-opt-total').textContent = '$' + fmt(optTotal);
+  document.getElementById('tile-next').textContent    = nextHours <= 0 ? 'LIVE NOW' : (days > 0 ? `${days}d ${hrs}h` : `${hrs}h`);
+  if (stackReport && stackReport.total_checked) {
+    document.getElementById('tile-stack').textContent = `${stackReport.installed_count}/${stackReport.total_checked}`;
+  }
+
+  let html = `<table>
+    <thead><tr>
+      <th>#</th>
+      <th>Sport</th>
+      <th>Match</th>
+      <th>Pick</th>
+      <th>DK Odds</th>
+      <th>Edge %</th>
+      <th>Fair Price</th>
+      <th>Time</th>
+      <th>Kelly Stake</th>
+      <th>Opt. Stake</th>
+      <th>α Score</th>
+      <th>If $${customStake.toFixed(2)}</th>
+      <th>Log</th>
+    </tr></thead><tbody>`;
+
+  picks.forEach((p, i) => {
+    const dkPrice = p.dk_price_decimal ?? p.dk_price;
+    const fairPrice = p.fair_price_decimal ?? p.fair_price;
+    const ks   = kellyStake(p.edge_pct, dkPrice, bankroll, fracKelly, maxBet);
+    const optimizedStake = Number(p.optimized_stake ?? p.kelly_stake ?? ks);
+    const col  = edgeColor(p.edge_pct);
+    const barW = Math.min(100, p.edge_pct * 2).toFixed(0);
+    const customReturn = customStake * dkPrice;
+    const customProfit = customReturn - customStake;
+    const ksReturn = ks * dkPrice;
+    const optReturn = optimizedStake * dkPrice;
+
+    html += `<tr>
+      <td style="color:var(--ice2);font-size:11px;font-family:'IBM Plex Mono',monospace">${i+1}</td>
+      <td><span class="badge badge-sport">${sportLabel(p.sport)}</span></td>
+      <td style="max-width:190px;font-size:12px;color:var(--ice2)">${p.game}</td>
+      <td style="font-weight:600;color:var(--ice);font-family:'Space Grotesk',sans-serif">${p.pick}</td>
+      <td>
+        <span style="font-weight:700;color:var(--teal);font-family:'IBM Plex Mono',monospace">${decimalToAmerican(dkPrice)}</span>
+        <div class="odds-decimal">${dkPrice.toFixed(2)}x</div>
+      </td>
+      <td>
+        <div class="edge-bar-wrap">
+          <span style="font-weight:700;color:${col};min-width:46px;font-family:'IBM Plex Mono',monospace">${p.edge_pct.toFixed(1)}%</span>
+          <div class="edge-bar-bg"><div class="edge-bar-fill" style="width:${barW}%;background:${col}"></div></div>
+        </div>
+      </td>
+      <td style="color:var(--ice2);font-family:'IBM Plex Mono',monospace;font-size:12px">${fairPrice.toFixed(3)}</td>
+      <td>${hoursLabel(p.hours_to_start)}</td>
+      <td>
+        <span class="kelly-val">$${fmt(ks)}</span>
+        <div class="kelly-sub">→ $${fmt(ksReturn)}</div>
+      </td>
+      <td>
+        <span class="kelly-val">$${fmt(optimizedStake)}</span>
+        <div class="kelly-sub">→ $${fmt(optReturn)}</div>
+      </td>
+      <td style="font-weight:700;color:${edgeColor(p.alpha_score ?? p.edge_pct)};font-family:'IBM Plex Mono',monospace">${Number(p.alpha_score ?? 0).toFixed(2)}</td>
+      <td>
+        <div class="return-val">$${fmt(customReturn)}</div>
+        <div class="profit-val" style="color:${customProfit >= 0 ? 'var(--green)' : 'var(--red)'}">${customProfit >= 0 ? '+' : ''}$${fmt(customProfit)}</div>
+      </td>
+      <td>
+        <button class="result-btn" onclick="logBet(${i},${customStake})">Log</button>
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('picks-container').innerHTML = html;
+}
+
+// ── Bet Logger ───────────────────────────────────────────────────────────────
+function logBet(idx, stake) {
+  const p = picks[idx];
+  const ks = kellyStake(
+    p.edge_pct, p.dk_price,
+    parseFloat(document.getElementById('bankroll').value) || 150,
+    parseFloat(document.getElementById('kelly-frac').value) || 0.25,
+    parseFloat(document.getElementById('max-bet').value) || 25
+  );
+  const betStake = stake > 0 ? stake : ks;
+  const entry = {
+    id:           Date.now(),
+    timestamp:    new Date().toISOString(),
+    sport:        p.sport,
+    game:         p.game,
+    pick:         p.pick,
+    dk_price:     p.dk_price,
+    edge_pct:     p.edge_pct,
+    stake:        betStake,
+    potential_return: betStake * p.dk_price,
+    potential_profit: betStake * (p.dk_price - 1),
+    result:       'open',
+    pnl:          null,
+    commence_time: p.commence_time,
+  };
+  betLog.unshift(entry);
+  localStorage.setItem('lumatrader_bet_log', JSON.stringify(betLog));
+  renderLog();
+}
+
+function setResult(id, result) {
+  const entry = betLog.find(e => e.id === id);
+  if (!entry) return;
+  entry.result = result;
+  entry.pnl = result === 'win' ? entry.potential_profit : -entry.stake;
+  localStorage.setItem('lumatrader_bet_log', JSON.stringify(betLog));
+  renderLog();
+}
+
+function clearLog() {
+  if (!confirm('Clear all logged bets?')) return;
+  betLog = [];
+  localStorage.removeItem('lumatrader_bet_log');
+  renderLog();
+}
+
+function renderLog() {
+  if (!betLog.length) {
+    document.getElementById('log-container').innerHTML = '<div class="log-empty">No bets logged yet · click "Log" on any pick above</div>';
+    document.getElementById('log-summary').textContent = '';
+    document.getElementById('tile-pnl').textContent = '—';
+    return;
+  }
+
+  let html = `<table class="log-table">
+    <thead><tr>
+      <th>Time</th><th>Sport</th><th>Pick</th><th>DK</th><th>Edge</th><th>Stake</th><th>Potential Return</th><th>Result</th><th>P&amp;L</th>
+    </tr></thead><tbody>`;
+
+  betLog.forEach(e => {
+    const rClass = e.result === 'win' ? 'log-result-win' : e.result === 'loss' ? 'log-result-loss' : 'log-result-open';
+    const d = new Date(e.timestamp);
+    const ts = d.toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+    html += `<tr>
+      <td style="color:var(--ice2);font-size:11px;white-space:nowrap;font-family:'IBM Plex Mono',monospace">${ts}</td>
+      <td><span class="badge badge-sport">${sportLabel(e.sport)}</span></td>
+      <td style="font-weight:600;font-family:'Space Grotesk',sans-serif">${e.pick}<div style="font-size:11px;color:var(--ice2)">${e.game}</div></td>
+      <td style="font-family:'IBM Plex Mono',monospace">${decimalToAmerican(e.dk_price)}</td>
+      <td style="color:${edgeColor(e.edge_pct)};font-weight:700;font-family:'IBM Plex Mono',monospace">${e.edge_pct.toFixed(1)}%</td>
+      <td style="font-family:'IBM Plex Mono',monospace">$${fmt(e.stake)}</td>
+      <td style="font-family:'IBM Plex Mono',monospace">$${fmt(e.potential_return)}</td>
+      <td class="${rClass}">
+        ${e.result === 'open' ? `
+          <button class="result-btn win" onclick="setResult(${e.id},'win')">WIN</button>
+          <button class="result-btn loss" onclick="setResult(${e.id},'loss')">LOSS</button>
+        ` : e.result.toUpperCase()}
+      </td>
+      <td style="font-weight:700;color:${e.pnl === null ? 'var(--ice2)' : e.pnl >= 0 ? 'var(--green)' : 'var(--red)'};font-family:'IBM Plex Mono',monospace">
+        ${e.pnl === null ? '—' : (e.pnl >= 0 ? '+' : '') + '$' + fmt(e.pnl)}
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('log-container').innerHTML = html;
+
+  // Summary
+  const closed = betLog.filter(e => e.result !== 'open');
+  const totalPnl = closed.reduce((s, e) => s + (e.pnl || 0), 0);
+  const wins = closed.filter(e => e.result === 'win').length;
+  const totalStaked = closed.reduce((s, e) => s + e.stake, 0);
+  const roi = totalStaked > 0 ? (totalPnl / totalStaked * 100) : 0;
+  document.getElementById('log-summary').innerHTML = `
+    <b>${betLog.length}</b> bets logged &nbsp;|&nbsp;
+    <b>${closed.length}</b> settled &nbsp;|&nbsp;
+    ${wins}W / ${closed.length - wins}L &nbsp;|&nbsp;
+    Total staked: <b>$${fmt(totalStaked)}</b> &nbsp;|&nbsp;
+    P&amp;L: <b style="color:${totalPnl >= 0 ? 'var(--green)' : 'var(--red)'}">${totalPnl >= 0 ? '+' : ''}$${fmt(totalPnl)}</b> &nbsp;|&nbsp;
+    ROI: <b style="color:${roi >= 0 ? 'var(--green)' : 'var(--red)'}">${roi.toFixed(1)}%</b>
+  `;
+  document.getElementById('tile-pnl').textContent = (totalPnl >= 0 ? '+' : '') + '$' + fmt(totalPnl);
+  document.getElementById('tile-pnl').style.color = totalPnl >= 0 ? 'var(--green)' : 'var(--red)';
+}
+
+// ── Load picks from JSON ──────────────────────────────────────────────────────
+async function loadPicks() {
+  // Try to fetch the live JSON file
+  const paths = [
+    'out/sports_intelligence/_dk_alpha_board.json',
+    './out/sports_intelligence/_dk_alpha_board.json',
+    'sports_data/props_ev_results.json',
+    './sports_data/props_ev_results.json',
+  ];
+
+  for (const path of paths) {
+    try {
+      const res = await fetch(path + '?t=' + Date.now());
+      if (res.ok) {
+        const data = await res.json();
+        picks = (data.rows || []).filter(p => p.edge_pct > 0).map(p => ({
+          ...p,
+          sport: p.sport || p.sport_key,
+          dk_price: p.dk_price ?? p.dk_price_decimal,
+          fair_price: p.fair_price ?? p.fair_price_decimal,
+        }));
+        const gen = data.generated_utc ? new Date(data.generated_utc).toLocaleString() : 'unknown';
+        document.getElementById('last-updated').textContent = 'Odds updated: ' + gen;
+        renderPicks();
+        return;
+      }
+    } catch(e) { /* try next */ }
+  }
+
+  // Fallback: hardcoded from last scan
+  picks = [
+    { edge_pct:33.23, sport:'boxing_boxing', game:'Cobia Breedy @ Tsendbaatar Erdenbat', pick:'Cobia Breedy', dk_price:7.5, pin_price:5.37, fair_price:5.629, commence_time:'2026-05-02T01:15:00Z', hours_to_start:24.74 },
+    { edge_pct:3.57,  sport:'boxing_boxing', game:'Jin Sasaki @ Sora Tanaka',             pick:'Sora Tanaka',     dk_price:1.87, pin_price:1.74, fair_price:1.806, commence_time:'2026-05-02T07:00:00Z', hours_to_start:30.49 },
+    { edge_pct:3.39,  sport:'boxing_boxing', game:'David Benavidez @ Gilberto Ramirez',   pick:'David Benavidez', dk_price:1.26, pin_price:1.17, fair_price:1.219, commence_time:'2026-05-03T03:00:00Z', hours_to_start:50.49 },
+    { edge_pct:2.32,  sport:'mma_mixed_martial_arts', game:'Joaquin Buckley @ Sean Brady', pick:'Joaquin Buckley', dk_price:2.7, pin_price:2.54, fair_price:2.639, commence_time:'2026-05-10T03:15:00Z', hours_to_start:218.74 },
+    { edge_pct:2.18,  sport:'boxing_boxing', game:'Jose Tito Sanchez @ Jorge Chavez',     pick:'Jorge Chavez',    dk_price:1.87, pin_price:1.76, fair_price:1.83,  commence_time:'2026-05-03T00:00:00Z', hours_to_start:47.49 },
+    { edge_pct:2.05,  sport:'boxing_boxing', game:'Shogo Tanaka @ Kosuke Tomioka',        pick:'Shogo Tanaka',    dk_price:1.26, pin_price:1.19, fair_price:1.235, commence_time:'2026-05-02T07:00:00Z', hours_to_start:30.49 },
+    { edge_pct:1.04,  sport:'mma_mixed_martial_arts', game:'Ciryl Gane @ Alex Pereira',   pick:'Ciryl Gane',      dk_price:1.95, pin_price:1.86, fair_price:1.93,  commence_time:'2026-06-15T02:30:00Z', hours_to_start:1081.99 },
+  ];
+  document.getElementById('last-updated').textContent = 'Odds: cached Apr 30 (open dashboard via HTTP for live data)';
+  renderPicks();
+}
+
+async function refreshOdds() {
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  await loadPicks();
+  await loadStackReport();
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+}
+
+async function loadStackReport() {
+  const paths = [
+    'out/sports_intelligence/_dk_advanced_stack_report.json',
+    './out/sports_intelligence/_dk_advanced_stack_report.json',
+  ];
+  for (const path of paths) {
+    try {
+      const res = await fetch(path + '?t=' + Date.now());
+      if (res.ok) {
+        stackReport = await res.json();
+        const installed = Number(stackReport.installed_count || 0);
+        const total = Number(stackReport.total_checked || 0);
+        const py = (stackReport.python_executable || '').split('\\').slice(-3).join('\\');
+        document.getElementById('stack-status').textContent = `Premium stack: ${installed}/${total} active · ${py}`;
+        document.getElementById('tile-stack').textContent = `${installed}/${total}`;
+        return;
+      }
+    } catch (e) { /* try next */ }
+  }
+  document.getElementById('stack-status').textContent = 'Premium stack: report not found (run dk_alpha_autopilot.py)';
+}
+
+// ── Wire up live inputs ───────────────────────────────────────────────────────
+['custom-stake', 'bankroll', 'kelly-frac', 'max-bet'].forEach(id => {
+  document.getElementById(id).addEventListener('input', renderPicks);
+});
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+loadPicks();
+loadStackReport();
+renderLog();
+</script>
+
+  <!-- ── LumaTrader Gateway Intelligence Services ──────────────────────── -->
+  <div id="analytics-integrations" class="agw-wrap">
+    <div class="agw-title">
+      Gateway Intelligence Services
+    </div>
+
+    <div class="agw-grid">
+      <div class="agw-card">
+        <div class="agw-card-title">Node-RED Live Feed</div>
+        <div class="agw-card-sub">Real-time ingest bus &middot; ws://localhost:7700/ws</div>
+        <div id="nr-analytics" class="agw-stream"></div>
+        <div id="nr-analytics-events" class="agw-events">Waiting for events&hellip;</div>
+      </div>
+      <div class="agw-card">
+        <div class="agw-card-title">Unity Edge Intelligence</div>
+        <div class="agw-card-sub">XR harmonic node network &middot; live phi topology</div>
+        <div class="agw-node-line">Node Count: <span id="unityNodeCount" class="agw-node-count">--</span></div>
+        <div id="unity-analytics" class="agw-node-list">Awaiting Unity edge data...</div>
+      </div>
+      <div class="agw-card">
+        <div class="agw-card-title">Symbol Mesh</div>
+        <div class="agw-card-sub">1693-symbol watcher fleet &middot; real-spike detection &middot; 3s refresh</div>
+        <div class="agw-node-line">Watching: <span id="meshWatched" class="agw-node-count">--</span> &nbsp;|&nbsp; Live: <span id="meshWithData">--</span> &nbsp;|&nbsp; Status: <span id="meshStatus">--</span></div>
+        <div id="mesh-spike-feed" class="agw-node-list" style="min-height:80px">Waiting for spike data&hellip;</div>
+      </div>
+      <div class="agw-card">
+        <div class="agw-card-title">Spike Trade Engine</div>
+        <div class="agw-card-sub">Spike-driven auto-executor &middot; WS subscriber &middot; live PnL tracking</div>
+        <div class="agw-node-line">
+          Mode: <span id="spikeEngineMode" style="text-transform:uppercase">--</span>
+          &nbsp;|&nbsp; Status: <span id="spikeEngineStatus">--</span>
+          &nbsp;|&nbsp; Bankroll: $<span id="spikeEngineBankroll">--</span>
+        </div>
+        <div class="agw-node-line">
+          Open Pos: <span id="spikeEngineOpenPos" class="agw-node-count">--</span>
+          &nbsp;|&nbsp; Open PnL: $<span id="spikeEngineOpenPnl">--</span>
+          &nbsp;|&nbsp; Total Trades: <span id="spikeEngineTrades">--</span>
+          &nbsp;|&nbsp; Win Rate: <span id="spikeEngineWinRate">--</span>%
+        </div>
+        <div class="agw-node-line">
+          Realized PnL: $<span id="spikeEngineRealizedPnl">--</span>
+          &nbsp;|&nbsp; WS: <span id="spikeEngineWs">--</span>
+        </div>
+        <div class="agw-node-line" style="font-size:12px;font-family:monospace">
+          Regime: <span id="spikeEngineRegime" style="font-weight:bold">--</span>
+          &nbsp;|&nbsp; min_z=<span id="spikeEngineMinZ">--</span>
+          &nbsp;&nbsp;max_pos=<span id="spikeEngineMaxPos">--</span>
+          &nbsp;&nbsp;risk=<span id="spikeEngineRiskPct">--</span>%
+        </div>
+        <div id="spike-engine-feed" class="agw-node-list" style="min-height:80px">Waiting for spike engine data&hellip;</div>
+      </div>
+    </div>
+
+    <!-- V8 Coherence Monitor -->
+    <div class="agw-card" style="border-left:3px solid #a78bfa">
+      <div class="agw-card-title" style="color:#a78bfa">V8 Coherence Monitor</div>
+      <div class="agw-card-sub">Live Ω/C/S/E metrics &middot; P1&ndash;P8 perturbation detection &middot; 4s refresh</div>
+      <!-- Risk Regime Banner -->
+      <div id="v8-regime-banner" style="margin:6px 0;padding:6px 10px;border-radius:4px;background:#1e293b;display:flex;align-items:center;gap:12px">
+        <span style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em">Risk Regime</span>
+        <span id="v8RegimeName" style="font-weight:bold;font-size:14px;letter-spacing:.08em">--</span>
+        <span id="v8RegimeReason" style="font-size:11px;color:#64748b;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        <span id="v8RegimeAllow" style="font-size:11px"></span>
+      </div>
+      <div class="agw-node-line">
+        Grade: <span id="v8Grade" style="font-weight:bold">--</span>
+        &nbsp;|&nbsp; Scans: <span id="v8Scans">--</span>
+        &nbsp;|&nbsp; Status: <span id="v8Status">--</span>
+      </div>
+      <div class="agw-node-line" style="font-family:monospace;font-size:12px">
+        <span style="color:#a78bfa">Ω</span>=<span id="v8Omega">--</span>
+        &nbsp;&nbsp;<span style="color:#34d399">C</span>=<span id="v8C">--</span>
+        &nbsp;&nbsp;<span style="color:#60a5fa">S</span>=<span id="v8S">--</span>
+        &nbsp;&nbsp;<span style="color:#fbbf24">E</span>=<span id="v8E">--</span>
+        &nbsp;&nbsp;z&#818;=<span id="v8MeanZ">--</span>
+        &nbsp;&nbsp;lag=<span id="v8Lag">--</span>s
+      </div>
+      <div id="v8-perturbation-feed" class="agw-node-list" style="min-height:100px">Loading V8 coherence data&hellip;</div>
+    </div>
+
+    <!-- EchoLock™ Harmonic Resonance -->
+    <div class="agw-card" style="border-left:3px solid #a78bfa">
+      <div class="agw-card-title" style="color:#a78bfa">EchoLock™ Harmonic Resonance</div>
+      <div class="agw-card-sub">Phase-lock detection &middot; Confidence multiplier for Spike Engine &middot; 2s refresh</div>
+      <!-- Grade banner -->
+      <div id="echolock-banner" style="margin:6px 0;padding:8px 12px;border-radius:6px;background:#1e293b;display:flex;align-items:center;gap:16px">
+        <div style="text-align:center">
+          <div id="echolockGrade" style="font-size:20px;font-weight:bold;letter-spacing:.1em;color:#64748b">--</div>
+          <div style="font-size:10px;color:#475569;text-transform:uppercase">Grade</div>
+        </div>
+        <div style="text-align:center">
+          <div id="echolockScore" style="font-size:18px;font-weight:bold;color:#94a3b8">--</div>
+          <div style="font-size:10px;color:#475569;text-transform:uppercase">RS Score</div>
+        </div>
+        <div style="text-align:center">
+          <div id="echolockMult" style="font-size:20px;font-weight:bold;color:#34d399">&times;--</div>
+          <div style="font-size:10px;color:#475569;text-transform:uppercase">Conf. Mult</div>
+        </div>
+        <!-- Phase dial -->
+        <div style="flex:1;text-align:right">
+          <canvas id="echolockPhaseDial" width="60" height="60" title="φ phase angle"></canvas>
+          <div style="font-size:10px;color:#475569">φ = <span id="echolockPhi">--</span>°</div>
+        </div>
+      </div>
+      <div class="agw-node-line" style="font-size:12px;font-family:monospace">
+        Period: <span id="echolockPeriod">--</span>s
+        &nbsp;|&nbsp; CV: <span id="echolockCV">--</span>
+        &nbsp;|&nbsp; H-depth: <span id="echolockHDepth">--</span>
+        &nbsp;|&nbsp; Events: <span id="echolockEvents">--</span>
+        &nbsp;|&nbsp; Age: <span id="echolockAge">--</span>s
+      </div>
+      <div class="agw-node-line" style="font-size:11px;color:#64748b;font-family:monospace" id="echolockNote">--</div>
+    </div>
+
+    <div class="agw-card">
+      <div class="agw-card-title">Luma AI Explainer</div>
+      <div class="agw-card-sub">Ask about signals, edge, strategy, or request an investor pitch</div>
+      <div id="luma-explainer-panel" class="agw-explainer-panel"></div>
+    </div>
+
+    <div id="helmier-proof-panel"></div>
+  </div>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    if (!window.LumaDS) return;
+    LumaDS.mount({ intervalSec: 30, particleCount: 0 });
+    LumaDS.mountNodeRedStatus("nr-analytics");
+    LumaDS.mountExplainer("luma-explainer-panel", "analyst");
+    LumaDS.mountHelmier("helmier-proof-panel", { intervalSec: 45 });
+    function loadUnity() {
+      var unityPromise = LumaDS.gwUnityUnifiedEdge ? LumaDS.gwUnityUnifiedEdge() : LumaDS.gwUnityEdge();
+      Promise.all([unityPromise, LumaDS.gwTradingSummary ? LumaDS.gwTradingSummary() : Promise.resolve(null)]).then(function(result) {
+        var d = result[0];
+        var t = result[1];
+        if (!d) return;
+        LumaDS.setText("unityNodeCount", String(d.node_count || 0));
+        var top = document.getElementById("unity-analytics");
+        if (top) {
+          var lines = [];
+          if (t && t.execution) {
+            lines.push("<div class='agw-node-item'>Unified Trading -- bankroll: $" + Number(t.execution.current_bankroll || 0).toFixed(2) + " | open: " + Number(t.execution.open_positions || 0) + " | win: " + Number(t.execution.win_rate_pct || 0).toFixed(1) + "%</div>");
+          }
+          if (d.nodes && d.nodes.length) {
+            lines = lines.concat(d.nodes.slice(0, 3).map(function(n) {
+              return "<div class='agw-node-item'>" + n.asset + " -- edge: " + Number(n.edge_pct || 0).toFixed(1) + "% | score: " + Number(n.harmonic_score || 0).toFixed(2) + " | domain: " + (n.domain || "n/a") + "</div>";
+            }));
+          }
+          top.innerHTML = lines.join("") || "Awaiting unified edge data...";
+        }
+      });
+    }
+    loadUnity();
+    setInterval(loadUnity, 30000);
+
+    function loadMesh() {
+      fetch('http://127.0.0.1:8787/api/trading/symbol-mesh').then(function(r){return r.json();}).then(function(d){
+        var s = d.summary || {};
+        LumaDS.setText('meshWatched', String(s.total_watched || 0));
+        LumaDS.setText('meshWithData', String(s.symbols_with_data || 0));
+        var statusEl = document.getElementById('meshStatus');
+        if (statusEl) {
+          statusEl.textContent = d.status || '--';
+          statusEl.style.color = d.status === 'running' ? '#66f8d7' : '#f87171';
+        }
+        var feed = document.getElementById('mesh-spike-feed');
+        if (!feed) return;
+        var lines = [];
+        // Show real spikes first
+        var alerts = d.real_spike_alerts || [];
+        if (alerts.length) {
+          alerts.slice(0,5).forEach(function(sp){
+            lines.push("<div class='agw-node-item' style='color:#f97316'>&#9889; REAL SPIKE &mdash; " + sp.symbol + " " + (sp.spike_direction||'') + " z=" + Number(sp.spike_z_score||0).toFixed(2) + " score=" + Number(sp.spike_score||0).toFixed(3) + " @ $" + Number(sp.last_price||0).toFixed(5) + "</div>");
+          });
+        }
+        // Then top signals
+        var top = d.top_signals || [];
+        top.slice(0, 5).forEach(function(sig){
+          lines.push("<div class='agw-node-item'>" + sig.symbol + " &mdash; $" + Number(sig.last_price||0).toFixed(5) + " z=" + Number(sig.spike_z_score||0).toFixed(2) + " ticks=" + (sig.tick_count||0) + "</div>");
+        });
+        feed.innerHTML = lines.length ? lines.join('') : (d.status === 'running' ? 'Fleet live &mdash; no active spikes' : 'Fleet offline');
+      }).catch(function(){});
+    }
+    loadMesh();
+    setInterval(loadMesh, 3000);
+
+    function loadSpikeEngine() {
+      fetch('http://127.0.0.1:8787/api/trading/spike-engine').then(function(r){return r.json();}).then(function(d){
+        var statusEl = document.getElementById('spikeEngineStatus');
+        if (statusEl) {
+          statusEl.textContent = d.status || '--';
+          statusEl.style.color = d.status === 'running' ? '#66f8d7' : (d.status === 'stale' ? '#fbbf24' : '#f87171');
+        }
+        LumaDS.setText('spikeEngineMode', d.mode || '--');
+        LumaDS.setText('spikeEngineBankroll', Number(d.bankroll || 0).toFixed(2));
+        LumaDS.setText('spikeEngineOpenPos', String(d.open_positions || 0));
+        var openPnlEl = document.getElementById('spikeEngineOpenPnl');
+        if (openPnlEl) {
+          var openPnl = Number(d.open_pnl || 0);
+          openPnlEl.textContent = (openPnl >= 0 ? '+' : '') + openPnl.toFixed(4);
+          openPnlEl.style.color = openPnl >= 0 ? '#66f8d7' : '#f87171';
+        }
+        LumaDS.setText('spikeEngineTrades', String(d.total_trades || 0));
+        LumaDS.setText('spikeEngineWinRate', Number(d.win_rate_pct || 0).toFixed(1));
+        var rPnlEl = document.getElementById('spikeEngineRealizedPnl');
+        if (rPnlEl) {
+          var rPnl = Number(d.total_realized_pnl || 0);
+          rPnlEl.textContent = (rPnl >= 0 ? '+' : '') + rPnl.toFixed(4);
+          rPnlEl.style.color = rPnl >= 0 ? '#66f8d7' : '#f87171';
+        }
+        var wsEl = document.getElementById('spikeEngineWs');
+        if (wsEl) {
+          wsEl.textContent = d.ws_connected ? 'connected' : 'offline';
+          wsEl.style.color = d.ws_connected ? '#66f8d7' : '#f87171';
+        }
+        var feed = document.getElementById('spike-engine-feed');
+        if (!feed) return;
+        if (d.status === 'not_running') {
+          feed.innerHTML = "<div class='agw-node-item' style='color:#f87171'>Engine offline &mdash; " + (d.hint || 'start spike_trade_engine.py') + "</div>";
+          return;
+        }
+        var lines = [];
+        var positions = d.positions || [];
+        positions.forEach(function(p){
+          var pnlColor = (p.current_pnl || 0) >= 0 ? '#66f8d7' : '#f87171';
+          lines.push("<div class='agw-node-item'><span style='color:#fbbf24'>&#9632; OPEN</span> " + p.symbol + " " + (p.direction||'').toUpperCase() + " qty=" + Number(p.quantity||0).toFixed(4) + " @ $" + Number(p.entry_price||0).toFixed(5) + " | PnL: <span style='color:"+pnlColor+"'>$" + Number(p.current_pnl||0).toFixed(4) + "</span></div>");
+        });
+        var closed = d.recent_closed || [];
+        closed.slice(-3).reverse().forEach(function(p){
+          var win = (p.realized_pnl || 0) >= 0;
+          var emoji = win ? '&#9989;' : '&#10060;';
+          lines.push("<div class='agw-node-item'>" + emoji + " CLOSED " + p.symbol + " " + (p.exit_reason||'').toUpperCase() + " PnL: <span style='color:"+(win?'#66f8d7':'#f87171')+"'>$" + Number(p.realized_pnl||0).toFixed(4) + "</span></div>");
+        });
+        feed.innerHTML = lines.length ? lines.join('') : (d.status === 'running' ? 'Engine live &mdash; no positions yet' : 'Engine idle');
+      }).catch(function(){
+        var feed = document.getElementById('spike-engine-feed');
+        if (feed) feed.innerHTML = "<div class='agw-node-item' style='color:#f87171'>Gateway unreachable</div>";
+      });
+    }
+    loadSpikeEngine();
+    setInterval(loadSpikeEngine, 3000);
+
+    // ── V8 Coherence Monitor ───────────────────────────────────────────────
+    var V8_GRADE_COLORS = { PASS: '#34d399', WARN: '#fbbf24', FAIL: '#f87171' };
+    var V8_SEV_COLORS   = { none: '#6b7280', warn: '#fbbf24', fail: '#f87171' };
+
+    function loadV8Coherence() {
+      fetch('http://127.0.0.1:8787/api/system/fleet-coherence').then(function(r){return r.json();}).then(function(d){
+        var gradeEl = document.getElementById('v8Grade');
+        if (gradeEl) {
+          gradeEl.textContent = d.grade || '--';
+          gradeEl.style.color = V8_GRADE_COLORS[d.grade] || '#e2e8f0';
+        }
+        LumaDS.setText('v8Scans', String(d.scan_count || 0));
+        var statusEl = document.getElementById('v8Status');
+        if (statusEl) {
+          statusEl.textContent = d.status || '--';
+          statusEl.style.color = d.status === 'running' ? '#34d399' : '#f87171';
+        }
+
+        var m = d.metrics || {};
+        LumaDS.setText('v8Omega',  Number(m.omega  || 0).toFixed(4));
+        LumaDS.setText('v8C',      Number(m.C      || 0).toFixed(4));
+        LumaDS.setText('v8S',      Number(m.S      || 0).toFixed(4));
+        LumaDS.setText('v8E',      Number(m.E      || 0).toFixed(3));
+        LumaDS.setText('v8MeanZ',  Number(m.mean_z || 0).toFixed(3));
+        LumaDS.setText('v8Lag',    Number(m.freshness_sec || 0).toFixed(1));
+
+        var feed = document.getElementById('v8-perturbation-feed');
+        if (!feed) return;
+
+        if (d.status === 'not_running') {
+          feed.innerHTML = "<div class='agw-node-item' style='color:#f87171'>Monitor offline &mdash; " + (d.hint || '') + "</div>";
+          return;
+        }
+
+        var perturbations = d.perturbations || [];
+        var lines = perturbations.map(function(p) {
+          var col = V8_SEV_COLORS[p.severity] || '#6b7280';
+          var icon = p.detected ? (p.severity === 'fail' ? '&#10060;' : '&#9888;') : '&#9989;';
+          return "<div class='agw-node-item'>"
+            + "<span style='color:" + col + ";font-weight:bold'>" + icon + " " + p.class_id + "</span>"
+            + " <span style='color:#94a3b8'>" + p.name + "</span>"
+            + " &mdash; val=" + Number(p.value || 0).toFixed(4)
+            + " thr=" + Number(p.threshold || 0).toFixed(4)
+            + " <span style='color:" + col + "'>" + (p.severity === 'none' ? '' : p.severity.toUpperCase()) + "</span>"
+            + " <span style='color:#64748b;font-size:11px'>" + (p.note || '') + "</span>"
+            + "</div>";
+        });
+        feed.innerHTML = lines.length ? lines.join('') : 'Awaiting coherence data...';
+      }).catch(function() {
+        var feed = document.getElementById('v8-perturbation-feed');
+        if (feed) feed.innerHTML = "<div class='agw-node-item' style='color:#f87171'>Gateway unreachable</div>";
+      });
+    }
+    loadV8Coherence();
+    setInterval(loadV8Coherence, 4000);
+
+    // ── Risk Regime ────────────────────────────────────────────────────────
+    function loadRiskRegime() {
+      fetch('http://127.0.0.1:8787/api/system/risk-regime').then(function(r){return r.json();}).then(function(d){
+        var nameEl = document.getElementById('v8RegimeName');
+        if (nameEl) {
+          nameEl.textContent = d.regime || '--';
+          nameEl.style.color = d.color || '#94a3b8';
+        }
+        var reasonEl = document.getElementById('v8RegimeReason');
+        if (reasonEl) reasonEl.textContent = d.reason || '';
+        var allowEl = document.getElementById('v8RegimeAllow');
+        if (allowEl) {
+          var allow = d.allow_new !== false;
+          allowEl.textContent = allow ? '● NEW OK' : '⛔ HALTED';
+          allowEl.style.color = allow ? '#34d399' : '#f87171';
+        }
+        // Also push regime into Spike Engine card header
+        var spikeRegimeEl = document.getElementById('spikeEngineRegime');
+        if (spikeRegimeEl) {
+          spikeRegimeEl.textContent = d.regime || '--';
+          spikeRegimeEl.style.color = d.color || '#94a3b8';
+        }
+        var eff = d.effective || {};
+        var spikeMinZEl = document.getElementById('spikeEngineMinZ');
+        if (spikeMinZEl) spikeMinZEl.textContent = Number(eff.min_z || 0).toFixed(2);
+        var spikeMaxPosEl = document.getElementById('spikeEngineMaxPos');
+        if (spikeMaxPosEl) spikeMaxPosEl.textContent = String(eff.max_positions || '--');
+        var spikeRiskEl = document.getElementById('spikeEngineRiskPct');
+        if (spikeRiskEl) spikeRiskEl.textContent = Number(eff.risk_pct || 0).toFixed(2);
+      }).catch(function(){});
+    }
+    loadRiskRegime();
+    setInterval(loadRiskRegime, 4000);
+
+    // ── EchoLock Harmonic Resonance ────────────────────────────────────────
+    var ECHO_GRADE_COLORS = {
+      NOISE: '#64748b', WEAK: '#94a3b8', MODERATE: '#fbbf24',
+      STRONG: '#34d399', LOCK: '#a78bfa', STALE: '#475569'
+    };
+
+    function drawPhaseDial(canvasId, phiDeg) {
+      var c = document.getElementById(canvasId);
+      if (!c) return;
+      var ctx = c.getContext('2d');
+      var cx = 30, cy = 30, r = 24;
+      ctx.clearRect(0, 0, 60, 60);
+      // ring
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI);
+      ctx.strokeStyle = '#334155'; ctx.lineWidth = 3; ctx.stroke();
+      // tick marks
+      for (var i = 0; i < 8; i++) {
+        var a = (i / 8) * 2 * Math.PI - Math.PI/2;
+        ctx.beginPath();
+        ctx.moveTo(cx + (r-4)*Math.cos(a), cy + (r-4)*Math.sin(a));
+        ctx.lineTo(cx + r*Math.cos(a), cy + r*Math.sin(a));
+        ctx.strokeStyle = '#475569'; ctx.lineWidth = 1; ctx.stroke();
+      }
+      // needle
+      var phi = (phiDeg || 0) * Math.PI / 180 - Math.PI/2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + (r-4)*Math.cos(phi), cy + (r-4)*Math.sin(phi));
+      ctx.strokeStyle = '#a78bfa'; ctx.lineWidth = 2; ctx.stroke();
+      // dot
+      ctx.beginPath(); ctx.arc(cx, cy, 3, 0, 2*Math.PI);
+      ctx.fillStyle = '#a78bfa'; ctx.fill();
+    }
+
+    function loadEchoLock() {
+      fetch('http://127.0.0.1:8787/api/system/harmonic-resonance').then(function(r){return r.json();}).then(function(d){
+        if (d.status === 'not_available') return;
+        var grade = d.grade || 'NOISE';
+        var color = d.color || ECHO_GRADE_COLORS[grade] || '#64748b';
+        var el = function(id) { return document.getElementById(id); };
+        if (el('echolockGrade'))  { el('echolockGrade').textContent = grade; el('echolockGrade').style.color = color; }
+        if (el('echolockScore'))  el('echolockScore').textContent = Number(d.score || 0).toFixed(3);
+        if (el('echolockMult'))   { el('echolockMult').textContent = '×' + Number(d.confidence_mult || 1).toFixed(2); el('echolockMult').style.color = color; }
+        if (el('echolockPhi'))    el('echolockPhi').textContent = Number(d.phi_deg || 0).toFixed(0);
+        if (el('echolockPeriod')) el('echolockPeriod').textContent = Number(d.dominant_period_sec || 0).toFixed(1);
+        if (el('echolockCV'))     el('echolockCV').textContent = Number(d.cv || 1).toFixed(3);
+        if (el('echolockHDepth')) el('echolockHDepth').textContent = String(d.harmonic_depth || 0);
+        if (el('echolockEvents')) el('echolockEvents').textContent = String(d.event_window_size || 0);
+        if (el('echolockAge'))    el('echolockAge').textContent = Number(d.last_spike_age_sec || 0).toFixed(1);
+        if (el('echolockNote'))   el('echolockNote').textContent = d.note || '';
+        drawPhaseDial('echolockPhaseDial', d.phi_deg || 0);
+        // Update banner background glow on LOCK
+        var banner = document.getElementById('echolock-banner');
+        if (banner) {
+          banner.style.boxShadow = grade === 'LOCK' ? '0 0 12px ' + color + '66' :
+                                   grade === 'STRONG' ? '0 0 6px ' + color + '44' : 'none';
+        }
+      }).catch(function(){});
+    }
+    loadEchoLock();
+    setInterval(loadEchoLock, 2000);
+
+    LumaDS.gwOnWs(function(evt, data) {
+      if (evt !== "message") return;
+      // Spike alert push from gateway (fleet watcher)
+      if (data && data.type === 'spike_alert' && data.spikes && data.spikes.length) {
+        var feed = document.getElementById('mesh-spike-feed');
+        if (feed) {
+          var tag = "<div class='agw-node-item' style='color:#f97316;font-weight:bold'>&#128293; PUSH " + new Date().toLocaleTimeString() + " &mdash; ";
+          tag += data.spikes.map(function(sp){ return sp.symbol + ' ' + (sp.direction||'') + ' z=' + Number(sp.z_score||0).toFixed(2); }).join(', ');
+          tag += "</div>";
+          feed.innerHTML = tag + feed.innerHTML;
+        }
+      }
+      // Spike trade engine fill event
+      if (data && data.type === 'spike_trade' && data.event) {
+        var seFeed = document.getElementById('spike-engine-feed');
+        if (seFeed) {
+          var isOpen = data.event === 'SPIKE_POSITION_OPENED';
+          var color = isOpen ? '#fbbf24' : (data.realized_pnl >= 0 ? '#66f8d7' : '#f87171');
+          var icon = isOpen ? '&#9650;' : (data.realized_pnl >= 0 ? '&#9989;' : '&#10060;');
+          var tag2 = "<div class='agw-node-item' style='color:" + color + ";font-weight:bold'>" + icon + " WS " + new Date().toLocaleTimeString() + " " + data.event + " " + (data.symbol||'') + " " + (data.direction||'').toUpperCase() + (data.realized_pnl != null ? " PnL=$" + Number(data.realized_pnl).toFixed(4) : '') + "</div>";
+          seFeed.innerHTML = tag2 + seFeed.innerHTML;
+        }
+      }
+      var el = document.getElementById("nr-analytics-events");
+      if (el) el.innerHTML = new Date().toLocaleTimeString() + " >> " + JSON.stringify(data).slice(0, 60) + "<br/>" + el.innerHTML;
+    });
+  });
+  </script>
+
+</body>
+</html>

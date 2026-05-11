@@ -1,0 +1,17 @@
+{
+  "generated_utc": "2026-04-13T13:57:56.427526+00:00",
+  "engine_symbol": "UNIVERSE",
+  "paper_enabled": true,
+  "selection_source": "engine_logic",
+  "symbol_mode": "ADAPTIVE_UNIVERSE",
+  "enabled_registry_sources": 17,
+  "measured_sources": 9,
+  "adaptive_universe_count": 34,
+  "static_symbol_risk": false,
+  "audit_notes": [
+    "engine reads adaptive_universe.json",
+    "paper_trader_runtime.symbol_count=34",
+    "enabled_registry_sources=17",
+    "measured_sources=9"
+  ]
+}

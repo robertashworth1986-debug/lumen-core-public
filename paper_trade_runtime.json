@@ -1,0 +1,11 @@
+{
+  "generated_utc": "2026-04-14T22:52:43.4031296Z",
+  "loop_seconds": 5,
+  "paper_enabled": true,
+  "allow_live_orders": false,
+  "selection_source": "engine_logic",
+  "symbol_mode": "ADAPTIVE_UNIVERSE",
+  "runtime_symbol": "UNIVERSE",
+  "symbol_count": 34,
+  "ready": true
+}

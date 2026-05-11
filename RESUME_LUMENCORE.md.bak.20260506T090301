@@ -1,0 +1,75 @@
+# ROBERT BABYRAY ASHWORTH
+Senior Quant Systems Engineer | Trading Infrastructure Architect | Government and Institutional Technical Lead
+
+Location: United States (Relocation/Hybrid/Remote)  
+Email: robert@lumen-core.ai  
+Portfolio: lumen-core.ai | LumaTrader and LumenCore platform artifacts available on request
+
+## EXECUTIVE PROFILE
+Senior Python systems engineer with deep hands-on experience building and operating institutional-grade trading, optimization, and audit infrastructure across finance, energy, and cross-sector intelligence workflows. Founder-operator of the LumaTrader and LumenCore ecosystem, including autonomous execution stacks, runtime safety controls, high-integrity proof chains, and government-ready reporting artifacts.
+
+Combines quant engineering, reliability engineering, and mission-oriented system design to deliver resilient software for high-consequence environments. Experienced in translating complex technical systems into executive and public-sector narratives for federal review, investor diligence, and operations governance.
+
+## CORE COMPETENCIES
+- Mission-critical Python architecture for autonomous and semi-autonomous execution systems
+- Quantitative strategy lifecycle: signal generation, portfolio/risk controls, execution gating, attribution, and audit
+- Reliability controls: kill-switches, deadman timers, fallback routing, cooldowns, and constraint detection
+- Government-grade traceability: chain-of-custody artifacts, tamper-evident ledgers, reproducible evidence packs
+- Data engineering: multi-source ingestion, validation, quality gating, and live source health monitoring
+- API and integration engineering: FastAPI/uvicorn services, exchange integrations, Node-RED bridges, dashboard APIs
+- Operations and deployment: PowerShell automation, service supervision, singleton controls, runtime orchestration
+
+## TECHNOLOGY STACK
+- Languages: Python, PowerShell, SQL, JSON/JSONL
+- Platform and Services: FastAPI, uvicorn, asyncio, Docker-aware workflows, task orchestration scripts
+- Data and Quant: pandas, numpy, scipy, scikit-learn, lightgbm, xgboost, shap, quantstats, PyPortfolioOpt, optuna
+- Market and External Integrations: Alpaca APIs, Kraken APIs, yfinance, fredapi, government and macro data collectors
+- Observability and Reporting: Plotly, dashboard generation pipelines, provenance packs, structured runtime telemetry
+- Security and Control: role-aware runtime policies, approval queues, event lineage, locked execution modes
+
+## PROFESSIONAL EXPERIENCE
+### Founder and Principal Systems Engineer | LumaTrader / LumenCore Ecosystem
+2014 - Present
+- Architected and delivered a production-scale institutional stack (INSTITUTIONAL_STACK_V2) containing orchestration, execution, risk, monitoring, auditing, and reporting lanes.
+- Built and maintained multi-service runtime supervision for gateway, orchestrator, analytics, sector intelligence, truth fabric, and dashboard loops with health-state emission.
+- Engineered execution safety model spanning controller authorization, notional caps, open-position limits, kill-switch logic, deadman enforcement, and approval-queue guardrails.
+- Implemented tamper-evident evidence architecture with chained JSONL ledgers, reproducibility fingerprints, and chain-of-custody hashes for external audit and review workflows.
+- Designed and operated premium dashboard system with shared motif, explainer panel, Node-RED and Unity bridge surfaces, and live gateway-backed insights.
+- Delivered cross-sector intelligence and optimization components for finance, infrastructure, and public-interest use cases, including canonical data-collector hardening and provider hydration.
+- Established repeatable launch/recovery controls, singleton locking, and process de-duplication to stabilize long-running production loops and prevent artifact churn.
+- Produced investor and government-facing technical briefs, scorecards, and validation readouts linking runtime behavior to measurable system evidence.
+
+## SELECTED PLATFORM DELIVERABLES
+### Institutional Execution and Risk Fabric
+- Unified signal-to-order pipeline with explicit policy layers for liquidity checks, sizing constraints, risk kernels, and execution blocks.
+- Runtime-configurable control flags for live/paper mode, authorization gates, and defensive defaults.
+
+### Truth, Audit, and Compliance-Grade Evidence
+- Chain-linked audit events and reproducible evidence bundles for forensic review.
+- Sector-level attribution and infrastructure loss/risk ladders supporting executive and grant narratives.
+
+### AI and Explainability Enhancements
+- Integrated explainer service endpoints and strategy brief synthesis into live dashboard surfaces.
+- Added production-candidate quality filtering to improve signal fidelity and reduce noisy shortlist outputs.
+
+### Cross-Sector Data and Infrastructure Intelligence
+- Built data-ingest proofing and source health diagnostics across macro, market, and sector providers.
+- Hardened key hydration and provider alias mapping to increase resilience across varied deployment environments.
+
+## GOVERNMENT AND INSTITUTIONAL POSITIONING
+- Experience producing federal-style technical artifacts and operational evidence chains suitable for review by government, regulated, and institutional stakeholders.
+- Demonstrated capability to align engineering outputs with mission language: reliability, provenance, accountability, and operational continuity.
+- Comfortable operating as technical lead across architecture, implementation, incident response, and executive-level technical communication.
+
+## TARGET ROLES
+- Principal or Staff Quant Systems Engineer
+- Algorithmic Trading Infrastructure Engineer
+- Mission Systems Software Engineer (Government or Defense-Adjacent)
+- Senior Platform Engineer (Reliability, Control Planes, and Data Integrity)
+- Technical Program Lead for AI-Enabled Operational Systems
+
+## EDUCATION AND CREDENTIALS
+Detailed education, certifications, and clearance-eligibility details available for tailored submissions.
+
+## NOTE FOR RECRUITERS AND HIRING MANAGERS
+Portfolio artifacts include orchestrators, risk kernels, live dashboards, runtime supervision, evidence packs, and operational launch infrastructure. A role-specific version of this resume can be generated rapidly for public sector, financial infrastructure, or advanced R&D positions.

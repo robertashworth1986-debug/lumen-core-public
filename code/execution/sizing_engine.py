@@ -45,10 +45,12 @@ class SizingEngine:
     @staticmethod
     def _urgency_penalty(urgency: str) -> float:
         u = str(urgency or "normal").lower().strip()
+        if u == "ultra_aggressive":
+            return 1.16
         if u == "aggressive":
-            return 0.85
+            return 1.08
         if u == "passive":
-            return 1.05
+            return 0.92
         return 1.0
 
     @staticmethod

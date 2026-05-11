@@ -171,18 +171,34 @@ def verify_env_only() -> Dict[str, Any]:
 
 # Persistent, strictly increasing nonce logic
 NONCE_FILE = ROOT / "code" / "execution" / "config" / "kraken_nonce.txt"
+NONCE_RESOLUTION = os.getenv("KRAKEN_NONCE_RESOLUTION", "microseconds").strip().lower()
+
+
+def _nonce_now() -> int:
+    # Kraken accepts any increasing integer. Use microseconds by default
+    # to avoid collisions with parallel clients that use higher-resolution nonces.
+    if NONCE_RESOLUTION in {"ms", "millisecond", "milliseconds"}:
+        return int(time.time() * 1000)
+    return int(time.time_ns() // 1000)
+
+
+def _nonce_boost_units(boost_ms: int) -> int:
+    if NONCE_RESOLUTION in {"ms", "millisecond", "milliseconds"}:
+        return int(boost_ms)
+    return int(boost_ms * 1000)
 
 def _sanitize_last_nonce(last: int, now: int) -> int:
     if last < 0:
         return 0
-    # Allow future nonces up to a reasonable buffer so retry boosts are preserved.
-    if last > now * 10:
-        print(f"[KRAKEN] Resetting absurd nonce value {last} to current time {now}")
+    # Kraken nonce must fit signed 64-bit and be monotonically increasing.
+    # Do not clamp to wall-clock; other clients may use higher time resolutions.
+    if last > 9_223_372_036_854_775_807:
+        print(f"[KRAKEN] Resetting out-of-range nonce value {last} to current time {now}")
         return 0
     return last
 
-def _reset_nonce(boost_ms: int = 10000) -> str:
-    now = int(time.time() * 1000)
+def _reset_nonce(boost_ms: int = 10000, floor_nonce: int = 0) -> str:
+    now = _nonce_now()
     last = 0
     if NONCE_FILE.exists():
         try:
@@ -190,15 +206,19 @@ def _reset_nonce(boost_ms: int = 10000) -> str:
         except Exception:
             last = 0
     last = _sanitize_last_nonce(last, now)
-    candidate = max(now + boost_ms, last + 1, 1)
+    boost_units = _nonce_boost_units(boost_ms)
+    candidate = max(now + boost_units, last + 1, 1, int(floor_nonce))
     NONCE_FILE.parent.mkdir(parents=True, exist_ok=True)
     NONCE_FILE.write_text(str(candidate))
-    print(f"[KRAKEN] Nonce reset to {candidate} (boost {boost_ms}ms, last={last})")
+    print(
+        f"[KRAKEN] Nonce reset to {candidate} "
+        f"(boost {boost_ms}ms, resolution={NONCE_RESOLUTION}, floor={int(floor_nonce)}, last={last})"
+    )
     return str(candidate)
 
 def _nonce() -> str:
     NONCE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    now = int(time.time() * 1000)
+    now = _nonce_now()
     last = 0
     if NONCE_FILE.exists():
         try:
@@ -279,8 +299,11 @@ def _private_post(url_path: str, payload: Dict[str, Any], timeout: int = 20, ret
         if "EAPI:Invalid nonce" in msg and retry_attempt < 3:
             boosts = [10000, 60000, 3600000]
             boost_ms = boosts[retry_attempt] if retry_attempt < len(boosts) else boosts[-1]
+            # If another client writes much larger nonces for the same key,
+            # jump to nanosecond-scale floor after the first retry.
+            floor_nonce = int(time.time_ns()) if retry_attempt >= 1 else 0
             print(f"[KRAKEN] Invalid nonce detected, retrying request (attempt {retry_attempt + 1}) with boost {boost_ms}ms")
-            _reset_nonce(boost_ms=boost_ms)
+            _reset_nonce(boost_ms=boost_ms, floor_nonce=floor_nonce)
             time.sleep(0.25)
             return _private_post(url_path, payload, timeout=timeout, retry_attempt=retry_attempt + 1)
         if "EAPI:Invalid key" in msg:

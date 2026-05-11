@@ -41,7 +41,7 @@ MODULE_EXPORTS = {
     "modular_alpha_composer": ["AlphaComposer"],
     "modular_reporting_engine": ["ReportModule", "ReportingEngine", "json_report", "markdown_report"],
     "modular_monitoring_engine": ["MonitorModule", "MonitoringEngine", "drawdown_alert", "latency_monitor"],
-    "modular_compliance_engin                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       e": [
+    "modular_compliance_engine": [
         "ComplianceModule",
         "ComplianceEngine",
         "position_limit_check",

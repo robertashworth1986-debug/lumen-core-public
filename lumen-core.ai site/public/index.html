@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LUMENCORE • Runtime Status</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; font-family: Inter, Segoe UI, Arial, sans-serif; background: #0b1020; color: #e6ecff; }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 8px; font-size: 1.8rem; }
+    .muted { color: #a9b4d0; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-top: 16px; }
+    .card { background: #141b33; border: 1px solid #273157; border-radius: 12px; padding: 14px; }
+    .k { color: #8da3ff; font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; }
+    .v { font-size: 1.2rem; margin-top: 6px; font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #273157; font-size: .92rem; }
+    code { background: #1c2547; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>LUMENCORE Runtime Dashboard</h1>
+    <div class="muted" id="buildAt">Loading build metadata...</div>
+
+    <div class="grid" id="cards"></div>
+
+    <h2>Recent Trades</h2>
+    <table>
+      <thead><tr><th>Timestamp</th><th>Symbol</th><th>Side</th><th>Status</th><th>P&L</th></tr></thead>
+      <tbody id="trades"></tbody>
+    </table>
+
+    <h2>Recent Audit Events</h2>
+    <table>
+      <thead><tr><th>Time</th><th>Event</th><th>Symbol</th><th>Details</th></tr></thead>
+      <tbody id="audit"></tbody>
+    </table>
+  </div>
+
+  <script>
+    async function getJSON(path) {
+      const res = await fetch(path, { cache: 'no-store' });
+      if (!res.ok) throw new Error('Failed: ' + path);
+      return await res.json();
+    }
+
+    function card(k, v) {
+      return `<div class="card"><div class="k">${k}</div><div class="v">${v}</div></div>`;
+    }
+
+    (async () => {
+      try {
+        const [health, runtime, profile, portfolio, trades, audit, build] = await Promise.all([
+          getJSON('./data/health.json'),
+          getJSON('./data/runtime.json'),
+          getJSON('./data/profile.json'),
+          getJSON('./data/portfolio.json'),
+          getJSON('./data/trades_recent.json'),
+          getJSON('./data/audit_recent.json'),
+          getJSON('./data/build_info.json'),
+        ]);
+
+        document.getElementById('buildAt').innerHTML = `Generated: <code>${build.generated_utc}</code> • Source: <code>${build.stack_root}</code>`;
+
+        const cards = [];
+        cards.push(card('Runtime Mode', runtime.mode ?? 'unknown'));
+        cards.push(card('Live Orders', String(runtime.allow_live_orders)));
+        cards.push(card('Kill Switch', String(runtime.kill_switch)));
+        cards.push(card('Active Profile', profile.active_profile ?? 'unknown'));
+        cards.push(card('Current Equity', `$${(portfolio.current_equity ?? 0).toFixed(2)}`));
+        cards.push(card('Realized P&L', `$${(portfolio.realized_pnl_total ?? 0).toFixed(2)}`));
+        cards.push(card('Recent Trades', String((trades.items ?? []).length)));
+        cards.push(card('Recent Events', String((audit.items ?? []).length)));
+        document.getElementById('cards').innerHTML = cards.join('');
+
+        const tradeRows = (trades.items ?? []).slice(0, 20).map(t => {
+          return `<tr>
+            <td>${t.timestamp ?? '-'}</td>
+            <td>${t.symbol ?? '-'}</td>
+            <td>${t.side ?? '-'}</td>
+            <td>${t.status ?? '-'}</td>
+            <td>${(t.pnl ?? 0).toFixed ? t.pnl.toFixed(2) : (t.pnl ?? '-')}</td>
+          </tr>`;
+        }).join('');
+        document.getElementById('trades').innerHTML = tradeRows || '<tr><td colspan="5">No trades found.</td></tr>';
+
+        const auditRows = (audit.items ?? []).slice(0, 20).reverse().map(e => {
+          const payload = e.payload || {};
+          return `<tr>
+            <td>${e.event_time_utc ?? '-'}</td>
+            <td>${e.event_type ?? '-'}</td>
+            <td>${payload.symbol ?? '-'}</td>
+            <td>${JSON.stringify(payload).slice(0, 120)}</td>
+          </tr>`;
+        }).join('');
+        document.getElementById('audit').innerHTML = auditRows || '<tr><td colspan="4">No audit events found.</td></tr>';
+      } catch (err) {
+        document.body.insertAdjacentHTML('beforeend', `<pre style="color:#ff8a8a;padding:16px">${err}</pre>`);
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "equity": 13079.687033218037,
+  "position": 0,
+  "active_pair": null,
+  "entry_price": 2028.94,
+  "entry_time": "2026-03-28T13:44:36.844016+00:00",
+  "entry_size": 130.8,
+  "trades": 3,
+  "realized": 3079.687033218037,
+  "wins": 1,
+  "losses": 2,
+  "last_close": 0
+}

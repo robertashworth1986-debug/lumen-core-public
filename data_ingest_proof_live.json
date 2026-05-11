@@ -1,0 +1,188 @@
+{
+  "generated_utc": "2026-04-06T12:27:13.630036+00:00",
+  "roots_scanned": [
+    "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data",
+    "C:\\LumaTrader\\data",
+    "C:\\Users\\Novac\\iCloudDrive\\Data sets"
+  ],
+  "files_scanned": 58,
+  "usable_files": 16,
+  "top_clean_files": [
+    {
+      "file": "fred_DGS10.csv",
+      "source_path": "C:\\LumaTrader\\data\\fred_DGS10.csv",
+      "rows": 16047,
+      "cols": 2,
+      "value_col": "value",
+      "time_col": "date",
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 100.0
+    },
+    {
+      "file": "fred_DGS10.csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_DGS10.csv",
+      "rows": 16042,
+      "cols": 2,
+      "value_col": "value",
+      "time_col": "date",
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 100.0
+    },
+    {
+      "file": "fred_CPIAUCSL.csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_CPIAUCSL.csv",
+      "rows": 949,
+      "cols": 2,
+      "value_col": "value",
+      "time_col": "date",
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 100.0
+    },
+    {
+      "file": "fred_CPIAUCSL.csv",
+      "source_path": "C:\\LumaTrader\\data\\fred_CPIAUCSL.csv",
+      "rows": 949,
+      "cols": 2,
+      "value_col": "value",
+      "time_col": "date",
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 100.0
+    },
+    {
+      "file": "fred_UNRATE.csv",
+      "source_path": "C:\\LumaTrader\\data\\fred_UNRATE.csv",
+      "rows": 938,
+      "cols": 2,
+      "value_col": "value",
+      "time_col": "date",
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 100.0
+    },
+    {
+      "file": "fred_UNRATE.csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_UNRATE.csv",
+      "rows": 937,
+      "cols": 2,
+      "value_col": "value",
+      "time_col": "date",
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 100.0
+    },
+    {
+      "file": "kraken_live_5000.csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\kraken_live_5000.csv",
+      "rows": 721,
+      "cols": 8,
+      "value_col": "close",
+      "time_col": "time",
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 100.0
+    },
+    {
+      "file": "kraken_live_5000.csv",
+      "source_path": "C:\\LumaTrader\\data\\kraken_live_5000.csv",
+      "rows": 721,
+      "cols": 8,
+      "value_col": "close",
+      "time_col": "time",
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 100.0
+    },
+    {
+      "file": "MER_T09_04.csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\MER_T09_04.csv",
+      "rows": 5704,
+      "cols": 6,
+      "value_col": "Value",
+      "time_col": null,
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 90.0
+    },
+    {
+      "file": "MER_T09_04.csv",
+      "source_path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\MER_T09_04.csv",
+      "rows": 5704,
+      "cols": 6,
+      "value_col": "Value",
+      "time_col": null,
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 90.0
+    },
+    {
+      "file": "kraken_live.csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\kraken_live.csv",
+      "rows": 120,
+      "cols": 3,
+      "value_col": "close",
+      "time_col": "timestamp",
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 80.0
+    },
+    {
+      "file": "kraken_live.csv",
+      "source_path": "C:\\LumaTrader\\data\\kraken_live.csv",
+      "rows": 120,
+      "cols": 3,
+      "value_col": "close",
+      "time_col": "timestamp",
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 80.0
+    },
+    {
+      "file": "930-data-export (2).csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export (2).csv",
+      "rows": 193,
+      "cols": 6,
+      "value_col": "Demand Forecast (MWh)",
+      "time_col": null,
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 70.0
+    },
+    {
+      "file": "930-data-export (2).csv",
+      "source_path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\930-data-export (2).csv",
+      "rows": 193,
+      "cols": 6,
+      "value_col": "Demand Forecast (MWh)",
+      "time_col": null,
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 70.0
+    },
+    {
+      "file": "930-data-export (1).csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export (1).csv",
+      "rows": 67,
+      "cols": 6,
+      "value_col": "Selected Hour Demand (MWh)",
+      "time_col": null,
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 50.0
+    },
+    {
+      "file": "930-data-export (1).csv",
+      "source_path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\930-data-export (1).csv",
+      "rows": 67,
+      "cols": 6,
+      "value_col": "Selected Hour Demand (MWh)",
+      "time_col": null,
+      "status": "usable",
+      "reason": "ok",
+      "quality_score": 50.0
+    }
+  ]
+}

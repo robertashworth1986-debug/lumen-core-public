@@ -1,0 +1,55 @@
+{
+  "generated_utc": "2026-04-02T01:28:09.708318+00:00",
+  "registry_counts": {
+    "flowforms": 23,
+    "algos": 22,
+    "strategies": 22,
+    "metric_profiles": 18
+  },
+  "live_sources": {
+    "generated_utc": "2026-04-02T01:28:02.082003+00:00",
+    "sources": {
+      "eia": {
+        "enabled": true,
+        "api_key_present": true,
+        "rows_written": 240,
+        "files_written": [
+          "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\live_eia_CISO.csv",
+          "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\live_eia_ISNE.csv",
+          "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\live_eia_MISO.csv",
+          "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\live_eia_NYIS.csv",
+          "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\live_eia_PJM.csv"
+        ],
+        "error": ""
+      },
+      "twelve_data": {
+        "enabled": false,
+        "api_key_present": true,
+        "rows_written": 0,
+        "files_written": [],
+        "error": ""
+      },
+      "polygon": {
+        "enabled": false,
+        "api_key_present": true,
+        "rows_written": 0,
+        "files_written": [],
+        "error": ""
+      },
+      "finnhub": {
+        "enabled": false,
+        "api_key_present": false,
+        "rows_written": 0,
+        "files_written": [],
+        "error": ""
+      },
+      "alpaca": {
+        "enabled": false,
+        "api_key_present": false,
+        "rows_written": 0,
+        "files_written": [],
+        "error": ""
+      }
+    }
+  }
+}

@@ -81,3 +81,20 @@ AUDIT_PACK/
 
 # Data mirror
 data/
+
+# Dashboard build/runtime artifacts
+dashboard/node_modules/
+dashboard/archive/
+dashboard/evidence/runs/
+dashboard/proof_live*.json
+
+# High-churn runtime backup snapshots
+config/runtime_control.backup_*.json
+config/runtime_control.burst_backup_*.json
+config/runtime_control.*_backup_*.json
+config/runtime_control.fractal_backup_*.json
+config/runtime_control.lightning_backup_*.json
+config/runtime_control.__pre_drift_retest__.json
+
+# High-volume generated odds cache
+sports_data/

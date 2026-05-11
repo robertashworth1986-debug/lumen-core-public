@@ -1,0 +1,84 @@
+{
+  "profile": "lightning_hybrid_champion",
+  "version": "1.0.0",
+  "upgrades": {
+    "u01_volatility_circuit_breaker": {
+      "enabled": true,
+      "max_intraloop_volatility_pct": 4.0,
+      "action": "tighten_risk_and_slow_loop"
+    },
+    "u02_latency_drift_guard": {
+      "enabled": true,
+      "warn_p95_ms": 350,
+      "critical_p99_ms": 900,
+      "action": "degrade_to_paper_and_raise_cooldowns"
+    },
+    "u03_stability_guard": {
+      "enabled": true,
+      "max_error_rate_pct": 4.5,
+      "min_order_success_rate_pct": 88.0,
+      "action": "trip_kill_switch_soft"
+    },
+    "u04_sector_concentration_cap": {
+      "enabled": true,
+      "max_crypto_weight": 0.70,
+      "max_equity_weight": 0.70,
+      "action": "rebalance_candidate_weights"
+    },
+    "u05_slippage_guard": {
+      "enabled": true,
+      "max_estimated_slippage_bps": 30.0,
+      "action": "skip_symbol_and_tag_constraint"
+    },
+    "u06_data_freshness_guard": {
+      "enabled": true,
+      "max_health_staleness_sec": 90,
+      "action": "freeze_deltas_and_hold_fire"
+    },
+    "u07_capital_preservation_floor": {
+      "enabled": true,
+      "min_reserve_usd": 5.0,
+      "max_daily_loss_usd_floor": 25.0,
+      "action": "cap_position_size"
+    },
+    "u08_adaptive_cadence_controller": {
+      "enabled": true,
+      "fast_loop_seconds": 0.25,
+      "normal_loop_seconds": 0.50,
+      "slow_loop_seconds": 1.20,
+      "action": "dynamic_loop_throttle"
+    },
+    "u09_shadow_simulation_mode": {
+      "enabled": true,
+      "simulate_top_n": 5,
+      "action": "score_before_live"
+    },
+    "u10_auto_remediation_playbook": {
+      "enabled": true,
+      "write_remediation_file": true,
+      "out_file": "out/execution/lightning_remediation.json",
+      "action": "emit_when_why_where_fix"
+    }
+  },
+  "constraints_tagging": {
+    "enabled": true,
+    "tags": [
+      "latency_drift",
+      "stability",
+      "capital_floor",
+      "slippage_risk",
+      "data_stale",
+      "sector_concentration",
+      "volatility_spike"
+    ]
+  },
+  "live_arming": {
+    "allow_live_switch": false,
+    "require_env_arm": true,
+    "env_var": "LUMENCORE_ARM_LIGHTNING",
+    "env_value": "YES_ARM_LIGHTNING_LIVE",
+    "require_manual_confirm_file": true,
+    "confirm_file": "config/lightning_live_arm.confirm",
+    "confirm_phrase": "ARM_LIGHTNING_LIVE"
+  }
+}

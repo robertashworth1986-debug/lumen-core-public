@@ -1,0 +1,13 @@
+{
+  "equity": 9993.79,
+  "position": -1,
+  "entry_price": 213.34,
+  "entry_time": "2026-03-28T06:00:20.590259+00:00",
+  "entry_side": "SELL",
+  "entry_size_usd": 99.94,
+  "trades": 41,
+  "realized_pnl": -6.21,
+  "wins": 0,
+  "losses": 41,
+  "last_close_time": 1774677615.089577
+}

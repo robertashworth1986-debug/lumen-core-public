@@ -1,0 +1,259 @@
+{
+  "generated_utc": "2026-04-04T17:52:01.741648+00:00",
+  "summary": {
+    "readiness": "RED",
+    "enabled_registry_sources": 17,
+    "measured_sources": 10,
+    "adaptive_universe_count": 34,
+    "translated_yearly_value_total": 4697189350.8,
+    "translated_value_claim_type": "MODELED_ONLY_FROM_MEASURED_SOURCE_TRANSLATION",
+    "paper_trade_pnl_audit_status": "LEDGER_PRESENT_BUT_NO_REALIZED_PNL_YET",
+    "paper_trade_reported_pnl_usd": 0.0
+  },
+  "metric_derivation_warning": {
+    "test_sharpe": null,
+    "test_vs_baseline": null,
+    "test_cagr": null,
+    "test_max_dd": null,
+    "investor_score": null,
+    "credibility_flag": "MODEL_OR_BACKTEST_STATISTIC_UNTIL_REALIZED_PNL_AND_CLOSED_TRADES_EXIST",
+    "audit_comment": "These performance statistics may be mathematically valid for the tested return stream, but they are not equivalent to realized institutional live performance until closed-trade evidence exists."
+  },
+  "paper_trade_evidence": {
+    "paper_enabled": true,
+    "allow_live_orders": false,
+    "runtime_symbol": "UNKNOWN",
+    "selection_source": "UNKNOWN",
+    "symbol_mode": "UNKNOWN",
+    "symbol_count": 0,
+    "open_positions_count": 0,
+    "reported_pnl_usd": 0.0,
+    "pnl_audit_status": "LEDGER_PRESENT_BUT_NO_REALIZED_PNL_YET"
+  },
+  "sector_explainer": {
+    "broker": {
+      "status": "MEASURED",
+      "live_sources": 1.0,
+      "rows": 1.0,
+      "constraint_type": "execution / routing / order placement",
+      "money_drain_mode": "missed fills, bad routing, delay, idle capital",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 6931.47,
+        "day": 166355.28,
+        "week": 1164486.96,
+        "month": 4990658.4,
+        "year": 60719677.2
+      },
+      "audit_interpretation": "This sector is being measured by live probe-backed evidence. Returned rows=1. The translated yearly value shown is a modeled opportunity translation, not realized PnL or booked savings."
+    },
+    "market_data": {
+      "status": "MEASURED",
+      "live_sources": 4.0,
+      "rows": 1.0,
+      "constraint_type": "price discovery / event latency / symbol coverage",
+      "money_drain_mode": "bad entries, bad exits, stale market context",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 6931.47,
+        "day": 166355.28,
+        "week": 1164486.96,
+        "month": 4990658.4,
+        "year": 60719677.2
+      },
+      "audit_interpretation": "This sector is being measured by live probe-backed evidence. Returned rows=1. The translated yearly value shown is a modeled opportunity translation, not realized PnL or booked savings."
+    },
+    "rates": {
+      "status": "KEY_PRESENT_BUT_THIN_ROWS",
+      "live_sources": 1.0,
+      "rows": 0.0,
+      "constraint_type": "rates / macro liquidity drift",
+      "money_drain_mode": "bad macro positioning and wrong risk posture",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 0.0,
+        "day": 0.0,
+        "week": 0.0,
+        "month": 0.0,
+        "year": 0.0
+      },
+      "audit_interpretation": "This sector has keys or partial linkage but does not yet have enough measured evidence to make a strong institutional claim. Do not pitch this as realized performance."
+    },
+    "energy": {
+      "status": "KEY_PRESENT_BUT_THIN_ROWS",
+      "live_sources": 1.0,
+      "rows": 0.0,
+      "constraint_type": "energy throughput / outage / supply drift",
+      "money_drain_mode": "energy misread, outage blind spots, capacity drift",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 0.0,
+        "day": 0.0,
+        "week": 0.0,
+        "month": 0.0,
+        "year": 0.0
+      },
+      "audit_interpretation": "This sector has keys or partial linkage but does not yet have enough measured evidence to make a strong institutional claim. Do not pitch this as realized performance."
+    },
+    "labor": {
+      "status": "KEY_PRESENT_BUT_THIN_ROWS",
+      "live_sources": 1.0,
+      "rows": 0.0,
+      "constraint_type": "labor pressure / unemployment drift",
+      "money_drain_mode": "macro labor blind spots",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 0.0,
+        "day": 0.0,
+        "week": 0.0,
+        "month": 0.0,
+        "year": 0.0
+      },
+      "audit_interpretation": "This sector has keys or partial linkage but does not yet have enough measured evidence to make a strong institutional claim. Do not pitch this as realized performance."
+    },
+    "space": {
+      "status": "MEASURED",
+      "live_sources": 1.0,
+      "rows": 1.0,
+      "constraint_type": "space-weather / environmental externalities",
+      "money_drain_mode": "environmental blind spots affecting operations",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 10397.21,
+        "day": 249533.04,
+        "week": 1746731.28,
+        "month": 7485991.2,
+        "year": 91079559.6
+      },
+      "audit_interpretation": "This sector is being measured by live probe-backed evidence. Returned rows=1. The translated yearly value shown is a modeled opportunity translation, not realized PnL or booked savings."
+    },
+    "weather": {
+      "status": "MEASURED",
+      "live_sources": 1.0,
+      "rows": 5.0,
+      "constraint_type": "weather / climate disruption",
+      "money_drain_mode": "weather-driven loss, outage, scheduling drift",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 71670.38,
+        "day": 1720089.12,
+        "week": 12040623.84,
+        "month": 51602673.6,
+        "year": 627832528.8
+      },
+      "audit_interpretation": "This sector is being measured by live probe-backed evidence. Returned rows=5. The translated yearly value shown is a modeled opportunity translation, not realized PnL or booked savings."
+    },
+    "energy_lab": {
+      "status": "MEASURED",
+      "live_sources": 1.0,
+      "rows": 5.0,
+      "constraint_type": "renewables / grid / energy lab context",
+      "money_drain_mode": "energy planning blind spots",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 223969.93,
+        "day": 5375278.32,
+        "week": 37626948.24,
+        "month": 161258349.6,
+        "year": 1961976586.8
+      },
+      "audit_interpretation": "This sector is being measured by live probe-backed evidence. Returned rows=5. The translated yearly value shown is a modeled opportunity translation, not realized PnL or booked savings."
+    },
+    "water": {
+      "status": "MEASURED",
+      "live_sources": 1.0,
+      "rows": 1.0,
+      "constraint_type": "hydrology / water availability / flow disruption",
+      "money_drain_mode": "water-side operational blind spots",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 24260.15,
+        "day": 582243.6,
+        "week": 4075705.2,
+        "month": 17467308.0,
+        "year": 212518914.0
+      },
+      "audit_interpretation": "This sector is being measured by live probe-backed evidence. Returned rows=1. The translated yearly value shown is a modeled opportunity translation, not realized PnL or booked savings."
+    },
+    "demographic": {
+      "status": "MEASURED",
+      "live_sources": 1.0,
+      "rows": 1.0,
+      "constraint_type": "population / regional demand drift",
+      "money_drain_mode": "wrong location assumptions and demand misread",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 34657.36,
+        "day": 831776.64,
+        "week": 5822436.48,
+        "month": 24953299.2,
+        "year": 303598473.6
+      },
+      "audit_interpretation": "This sector is being measured by live probe-backed evidence. Returned rows=1. The translated yearly value shown is a modeled opportunity translation, not realized PnL or booked savings."
+    },
+    "macro": {
+      "status": "MEASURED",
+      "live_sources": 1.0,
+      "rows": 13.0,
+      "constraint_type": "GDP / income / macro growth drift",
+      "money_drain_mode": "macro misallocation",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 131952.87,
+        "day": 3166868.88,
+        "week": 22168082.16,
+        "month": 95006066.4,
+        "year": 1155907141.2
+      },
+      "audit_interpretation": "This sector is being measured by live probe-backed evidence. Returned rows=13. The translated yearly value shown is a modeled opportunity translation, not realized PnL or booked savings."
+    },
+    "air_quality": {
+      "status": "KEY_PRESENT_BUT_THIN_ROWS",
+      "live_sources": 1.0,
+      "rows": 0.0,
+      "constraint_type": "air quality / environmental stress",
+      "money_drain_mode": "air-quality-related operational degradation",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 0.0,
+        "day": 0.0,
+        "week": 0.0,
+        "month": 0.0,
+        "year": 0.0
+      },
+      "audit_interpretation": "This sector has keys or partial linkage but does not yet have enough measured evidence to make a strong institutional claim. Do not pitch this as realized performance."
+    },
+    "crypto_exec": {
+      "status": "MEASURED",
+      "live_sources": 1.0,
+      "rows": 8.0,
+      "constraint_type": "crypto execution / routing / balance proof",
+      "money_drain_mode": "missed fills, bad entries, idle capital, slippage",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 21972.25,
+        "day": 527334.0,
+        "week": 3691338.0,
+        "month": 15820020.0,
+        "year": 192476910.0
+      },
+      "audit_interpretation": "This sector is being measured by live probe-backed evidence. Returned rows=8. The translated yearly value shown is a modeled opportunity translation, not realized PnL or booked savings."
+    },
+    "internal": {
+      "status": "MEASURED",
+      "live_sources": 1.0,
+      "rows": 1.0,
+      "constraint_type": "signal/event ingress",
+      "money_drain_mode": "dropped internal triggers and missed event flow",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 3465.74,
+        "day": 83177.76,
+        "week": 582244.32,
+        "month": 2495332.8,
+        "year": 30359882.4
+      },
+      "audit_interpretation": "This sector is being measured by live probe-backed evidence. Returned rows=1. The translated yearly value shown is a modeled opportunity translation, not realized PnL or booked savings."
+    }
+  }
+}

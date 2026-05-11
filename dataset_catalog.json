@@ -1,0 +1,370 @@
+{
+  "generated_utc": "2026-04-04T03:21:54.195271+00:00",
+  "data_roots": [
+    "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data",
+    "C:\\LumaTrader\\data",
+    "C:\\Users\\Novac\\iCloudDrive\\Data sets"
+  ],
+  "files": [
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export (1).csv",
+      "name": "930-data-export (1).csv",
+      "stem": "930-data-export (1)",
+      "sector": "energy",
+      "rows": 67,
+      "value_col": "Region Code",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export (2).csv",
+      "name": "930-data-export (2).csv",
+      "stem": "930-data-export (2)",
+      "sector": "energy",
+      "rows": 193,
+      "value_col": "Region Code",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export.csv",
+      "name": "930-data-export.csv",
+      "stem": "930-data-export",
+      "sector": "energy",
+      "rows": 1,
+      "value_col": "Region Code",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Daily_U.S._nuclear_capacity_outage (1).csv",
+      "name": "Daily_U.S._nuclear_capacity_outage (1).csv",
+      "stem": "Daily_U.S._nuclear_capacity_outage (1)",
+      "sector": "energy",
+      "rows": 369,
+      "value_col": "Daily U.S. nuclear capacity outage",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Daily_U.S._nuclear_capacity_outage.csv",
+      "name": "Daily_U.S._nuclear_capacity_outage.csv",
+      "stem": "Daily_U.S._nuclear_capacity_outage",
+      "sector": "energy",
+      "rows": 369,
+      "value_col": "Daily U.S. nuclear capacity outage",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_CPIAUCSL.csv",
+      "name": "fred_CPIAUCSL.csv",
+      "stem": "fred_CPIAUCSL",
+      "sector": "rates",
+      "rows": 949,
+      "value_col": "value",
+      "first_ts": "1947-01-01 00:00:00+00:00",
+      "last_ts": "2026-02-01 00:00:00+00:00"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_DGS10.csv",
+      "name": "fred_DGS10.csv",
+      "stem": "fred_DGS10",
+      "sector": "rates",
+      "rows": 16042,
+      "value_col": "value",
+      "first_ts": "1962-01-02 00:00:00+00:00",
+      "last_ts": "2026-03-26 00:00:00+00:00"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_UNRATE.csv",
+      "name": "fred_UNRATE.csv",
+      "stem": "fred_UNRATE",
+      "sector": "rates",
+      "rows": 937,
+      "value_col": "value",
+      "first_ts": "1948-01-01 00:00:00+00:00",
+      "last_ts": "2026-02-01 00:00:00+00:00"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\kraken_live.csv",
+      "name": "kraken_live.csv",
+      "stem": "kraken_live",
+      "sector": "volatility",
+      "rows": 120,
+      "value_col": "close",
+      "first_ts": "2026-03-30 13:12:53.472409+00:00",
+      "last_ts": "2026-03-30 13:14:19.607728+00:00"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\kraken_live_5000.csv",
+      "name": "kraken_live_5000.csv",
+      "stem": "kraken_live_5000",
+      "sector": "volatility",
+      "rows": 721,
+      "value_col": "close",
+      "first_ts": "2026-03-30 03:32:00+00:00",
+      "last_ts": "2026-03-30 15:32:00+00:00"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\MER_T09_04.csv",
+      "name": "MER_T09_04.csv",
+      "stem": "MER_T09_04",
+      "sector": "unknown",
+      "rows": 5704,
+      "value_col": "Value",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Net_generation_for_all_sectors (1).csv",
+      "name": "Net_generation_for_all_sectors (1).csv",
+      "stem": "Net_generation_for_all_sectors (1)",
+      "sector": "energy",
+      "rows": 26,
+      "value_col": "Net generation for all sectors",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Net_generation_for_all_sectors.csv",
+      "name": "Net_generation_for_all_sectors.csv",
+      "stem": "Net_generation_for_all_sectors",
+      "sector": "energy",
+      "rows": 26,
+      "value_col": "Net generation for all sectors",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Net_generation_United_States_all_sectors_annual (1).csv",
+      "name": "Net_generation_United_States_all_sectors_annual (1).csv",
+      "stem": "Net_generation_United_States_all_sectors_annual (1)",
+      "sector": "energy",
+      "rows": 29,
+      "value_col": "Net generation United States all sectors annual",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Net_generation_United_States_all_sectors_annual.csv",
+      "name": "Net_generation_United_States_all_sectors_annual.csv",
+      "stem": "Net_generation_United_States_all_sectors_annual",
+      "sector": "energy",
+      "rows": 29,
+      "value_col": "Net generation United States all sectors annual",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Net_generation_United_States_all_sectors_monthly (1).csv",
+      "name": "Net_generation_United_States_all_sectors_monthly (1).csv",
+      "stem": "Net_generation_United_States_all_sectors_monthly (1)",
+      "sector": "energy",
+      "rows": 304,
+      "value_col": "Net generation United States all sectors monthly",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Net_generation_United_States_all_sectors_monthly.csv",
+      "name": "Net_generation_United_States_all_sectors_monthly.csv",
+      "stem": "Net_generation_United_States_all_sectors_monthly",
+      "sector": "energy",
+      "rows": 304,
+      "value_col": "Net generation United States all sectors monthly",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Nuclear_Plant_Outages_for_3_6_2026.csv",
+      "name": "Nuclear_Plant_Outages_for_3_6_2026.csv",
+      "stem": "Nuclear_Plant_Outages_for_3_6_2026",
+      "sector": "energy",
+      "rows": 59,
+      "value_col": "Nuclear Plant Outages for 3/6/2026",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\table1.csv",
+      "name": "table1.csv",
+      "stem": "table1",
+      "sector": "unknown",
+      "rows": 58,
+      "value_col": "STUB_1",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\table14.csv",
+      "name": "table14.csv",
+      "stem": "table14",
+      "sector": "unknown",
+      "rows": 74,
+      "value_col": "STUB_1",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\LumaTrader\\data\\fred_CPIAUCSL.csv",
+      "name": "fred_CPIAUCSL.csv",
+      "stem": "fred_CPIAUCSL",
+      "sector": "rates",
+      "rows": 949,
+      "value_col": "value",
+      "first_ts": "1947-01-01 00:00:00+00:00",
+      "last_ts": "2026-02-01 00:00:00+00:00"
+    },
+    {
+      "path": "C:\\LumaTrader\\data\\fred_DGS10.csv",
+      "name": "fred_DGS10.csv",
+      "stem": "fred_DGS10",
+      "sector": "rates",
+      "rows": 16047,
+      "value_col": "value",
+      "first_ts": "1962-01-02 00:00:00+00:00",
+      "last_ts": "2026-04-02 00:00:00+00:00"
+    },
+    {
+      "path": "C:\\LumaTrader\\data\\fred_UNRATE.csv",
+      "name": "fred_UNRATE.csv",
+      "stem": "fred_UNRATE",
+      "sector": "rates",
+      "rows": 938,
+      "value_col": "value",
+      "first_ts": "1948-01-01 00:00:00+00:00",
+      "last_ts": "2026-03-01 00:00:00+00:00"
+    },
+    {
+      "path": "C:\\LumaTrader\\data\\kraken_live.csv",
+      "name": "kraken_live.csv",
+      "stem": "kraken_live",
+      "sector": "volatility",
+      "rows": 120,
+      "value_col": "close",
+      "first_ts": "2026-03-30 13:12:53.472409+00:00",
+      "last_ts": "2026-03-30 13:14:19.607728+00:00"
+    },
+    {
+      "path": "C:\\LumaTrader\\data\\kraken_live_5000.csv",
+      "name": "kraken_live_5000.csv",
+      "stem": "kraken_live_5000",
+      "sector": "volatility",
+      "rows": 721,
+      "value_col": "close",
+      "first_ts": "2026-03-30 03:32:00+00:00",
+      "last_ts": "2026-03-30 15:32:00+00:00"
+    },
+    {
+      "path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\930-data-export (1).csv",
+      "name": "930-data-export (1).csv",
+      "stem": "930-data-export (1)",
+      "sector": "energy",
+      "rows": 67,
+      "value_col": "Region Code",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\930-data-export (2).csv",
+      "name": "930-data-export (2).csv",
+      "stem": "930-data-export (2)",
+      "sector": "energy",
+      "rows": 193,
+      "value_col": "Region Code",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\930-data-export.csv",
+      "name": "930-data-export.csv",
+      "stem": "930-data-export",
+      "sector": "energy",
+      "rows": 1,
+      "value_col": "Region Code",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\Daily_U.S._nuclear_capacity_outage (1).csv",
+      "name": "Daily_U.S._nuclear_capacity_outage (1).csv",
+      "stem": "Daily_U.S._nuclear_capacity_outage (1)",
+      "sector": "energy",
+      "rows": 369,
+      "value_col": "Daily U.S. nuclear capacity outage",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\Daily_U.S._nuclear_capacity_outage.csv",
+      "name": "Daily_U.S._nuclear_capacity_outage.csv",
+      "stem": "Daily_U.S._nuclear_capacity_outage",
+      "sector": "energy",
+      "rows": 369,
+      "value_col": "Daily U.S. nuclear capacity outage",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\MER_T09_04.csv",
+      "name": "MER_T09_04.csv",
+      "stem": "MER_T09_04",
+      "sector": "unknown",
+      "rows": 5704,
+      "value_col": "Value",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\Net_generation_for_all_sectors (1).csv",
+      "name": "Net_generation_for_all_sectors (1).csv",
+      "stem": "Net_generation_for_all_sectors (1)",
+      "sector": "energy",
+      "rows": 26,
+      "value_col": "Net generation for all sectors",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\Net_generation_United_States_all_sectors_annual (1).csv",
+      "name": "Net_generation_United_States_all_sectors_annual (1).csv",
+      "stem": "Net_generation_United_States_all_sectors_annual (1)",
+      "sector": "energy",
+      "rows": 29,
+      "value_col": "Net generation United States all sectors annual",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\Nuclear_Plant_Outages_for_3_6_2026.csv",
+      "name": "Nuclear_Plant_Outages_for_3_6_2026.csv",
+      "stem": "Nuclear_Plant_Outages_for_3_6_2026",
+      "sector": "energy",
+      "rows": 59,
+      "value_col": "Nuclear Plant Outages for 3/6/2026",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\table1.csv",
+      "name": "table1.csv",
+      "stem": "table1",
+      "sector": "unknown",
+      "rows": 58,
+      "value_col": "STUB_1",
+      "first_ts": "",
+      "last_ts": ""
+    },
+    {
+      "path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\table14.csv",
+      "name": "table14.csv",
+      "stem": "table14",
+      "sector": "unknown",
+      "rows": 74,
+      "value_col": "STUB_1",
+      "first_ts": "",
+      "last_ts": ""
+    }
+  ]
+}

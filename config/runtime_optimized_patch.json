@@ -1,0 +1,11 @@
+{
+  "base_risk_fraction": 0.6738,
+  "loop_seconds": 1.491,
+  "max_position_usd": 159.52,
+  "gate_override_min_confidence": 0.705,
+  "gate_override_min_edge_bps": 6.498,
+  "pyramid_reinvestment_multiplier": 2.078,
+  "optimizer_x1000_active": true,
+  "optimizer_x1000_last_run_utc": "2026-05-06T23:46:05.653890+00:00",
+  "optimizer_x1000_best_score": 3.1522
+}

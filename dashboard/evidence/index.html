@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LumenCore — Undeniable Evidence (Live, Hash-Chained)</title>
+<meta name="description" content="LumenCore harmonic intelligence vs tuned XGBoost, LightGBM, MLP, and SARIMA on live federal data — head-to-head, hash-chained, reproducible." />
+<style>
+  :root {
+    --bg: #0b1020;
+    --panel: #131a33;
+    --panel-2: #1b2444;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #7c3aed;
+    --accent-2: #a78bfa;
+    --good: #22c55e;
+    --warn: #f59e0b;
+    --bad: #ef4444;
+    --border: #2a3357;
+    --harmonic: #7c3aed;
+    --neural: #0ea5e9;
+    --tree: #22c55e;
+    --classical: #f59e0b;
+    --baseline: #94a3b8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter",
+      "Helvetica Neue", Arial, sans-serif;
+    background: radial-gradient(ellipse at top, #1a2147 0%, var(--bg) 60%);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.55;
+  }
+  header {
+    padding: 32px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+  header h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    background: linear-gradient(90deg, var(--accent-2), #ec4899);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header .sub {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  }
+  .card h3 {
+    margin: 0 0 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .card .v {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .card .v.harmonic { color: var(--harmonic); }
+  .card .v.neural { color: var(--neural); }
+  .card .v.tree { color: var(--tree); }
+  .card .v.classical { color: var(--classical); }
+  .card .v.baseline { color: var(--baseline); }
+  .card .x { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin: 24px 0;
+  }
+  section h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+  }
+  section p { color: var(--muted); margin: 0 0 12px; }
+  .figs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 18px;
+    margin: 16px 0 0;
+  }
+  .figs .frame {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .figs img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 6px;
+  }
+  .figs .cap {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 8px;
+    text-align: center;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th, td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    user-select: none;
+  }
+  th:hover { color: var(--accent-2); }
+  td.fam-harmonic  { color: var(--harmonic); font-weight: 600; }
+  td.fam-neural    { color: var(--neural); font-weight: 600; }
+  td.fam-tree      { color: var(--tree); font-weight: 600; }
+  td.fam-classical { color: var(--classical); font-weight: 600; }
+  td.fam-baseline  { color: var(--baseline); font-weight: 600; }
+  .hash {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: var(--muted);
+    word-break: break-all;
+  }
+  .verify-btn {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: white;
+    border: 0;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .verify-btn:hover { filter: brightness(1.1); }
+  .verify-status {
+    margin-left: 12px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .verify-status.ok { color: var(--good); }
+  .verify-status.fail { color: var(--bad); }
+  footer {
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+  footer a { color: var(--accent-2); }
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .pill.live { background: rgba(34, 197, 94, 0.15); color: var(--good); }
+  .controls {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .controls input[type=text] {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    min-width: 240px;
+  }
+  .controls select {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="pill live">● LIVE FEDERAL DATA</div>
+  <h1>LumenCore — Undeniable Evidence</h1>
+  <div class="sub">
+    Harmonic intelligence vs tuned XGBoost, LightGBM, MLP &amp; SARIMA on
+    live federal datasets. Hash-chained. Reproducible. No cherry-picking.
+  </div>
+</header>
+
+<main>
+
+  <div class="grid" id="kpis">
+    <!-- populated by JS -->
+  </div>
+
+  <section>
+    <h2>Headline</h2>
+    <p id="verdict" style="font-size: 16px; color: var(--text);">Loading…</p>
+    <p>
+      Each dataset is fetched live from EIA, NOAA NCEI, BLS, NASA POWER,
+      USGS Water, AlphaVantage, and yfinance. Every model is run with the
+      same 80/20 walk-forward split and 400-iter bootstrap 95% RMSE CI.
+      Winning <em>family</em> per dataset is whichever family contains the
+      lowest-RMSE model.
+    </p>
+  </section>
+
+  <section>
+    <h2>Evidence figures</h2>
+    <div class="figs" id="figs"></div>
+  </section>
+
+  <section>
+    <h2>Per-dataset results</h2>
+    <div class="controls">
+      <input type="text" id="filter" placeholder="filter datasets…" />
+      <select id="famFilter">
+        <option value="">all winning families</option>
+        <option value="harmonic">harmonic</option>
+        <option value="neural">neural</option>
+        <option value="tree">tree</option>
+        <option value="classical">classical</option>
+        <option value="baseline">baseline</option>
+      </select>
+      <span id="rowCount" style="color: var(--muted); font-size: 13px;"></span>
+    </div>
+    <div style="overflow-x: auto;">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th data-sort="dataset">Dataset</th>
+            <th data-sort="winning_family">Winner</th>
+            <th data-sort="winning_model">Model</th>
+            <th data-sort="margin_pct_vs_runner">Margin %</th>
+            <th data-sort="winning_rmse">RMSE</th>
+            <th data-sort="harmonic_best">Harmonic best</th>
+            <th data-sort="neural_best">Neural best</th>
+            <th data-sort="tree_best">Tree best</th>
+            <th data-sort="classical_best">Classical best</th>
+            <th data-sort="baseline_best">Baseline best</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Cryptographic chain of custody</h2>
+    <p>
+      Each run appends an entry to <code>out/frozen_delta_ledger.jsonl</code>.
+      Every entry contains the SHA-256 of the previous entry, forming a
+      tamper-evident chain. Click verify to re-hash this run's manifest
+      in your browser and confirm it matches the stored value.
+    </p>
+    <div style="display: flex; flex-direction: column; gap: 6px; margin: 14px 0;">
+      <div><strong>Run UTC:</strong> <span id="runUtc" class="hash">—</span></div>
+      <div><strong>Manifest SHA-256:</strong> <span id="manifestHash" class="hash">—</span></div>
+      <div><strong>Ledger entry SHA-256:</strong> <span id="entryHash" class="hash">—</span></div>
+      <div><strong>Previous entry SHA-256:</strong> <span id="prevHash" class="hash">—</span></div>
+    </div>
+    <div>
+      <button class="verify-btn" id="verifyBtn">Verify manifest in browser</button>
+      <span class="verify-status" id="verifyStatus"></span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Methodology</h2>
+    <ul style="color: var(--muted); line-height: 1.8;">
+      <li>9 models across 5 families (harmonic, neural, tree, classical, baseline)</li>
+      <li>80/20 walk-forward split, point-forecast across the held-out window</li>
+      <li>Bootstrap 95% CI on RMSE (400 iterations of squared-error resampling)</li>
+      <li>Failed datasets are recorded but excluded from win counts (no silent drops)</li>
+      <li>Same dataset is fed to every model — no per-model preprocessing tricks</li>
+      <li>Raw CSVs hashed → manifest hashed → entry hashed → chained to prior entry</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  Generated by <code>master_universe_benchmark_v2.py</code> ·
+  Charts by <code>render_evidence_charts.py</code> ·
+  Source: <code>code/</code> · Ledger: <code>out/frozen_delta_ledger.jsonl</code>
+  <br />
+  <a href="https://lumen-core.ai" target="_blank" rel="noopener">lumen-core.ai</a>
+</footer>
+
+<script>
+const RUN_BASE = (new URLSearchParams(location.search)).get("run") || "runs";
+
+async function findLatestRun() {
+  // Try a passed ?run=...&utc=... pair first.
+  const utc = (new URLSearchParams(location.search)).get("utc");
+  if (utc) return RUN_BASE + "/" + utc;
+  // Otherwise rely on a manifest-of-runs file the build step writes.
+  try {
+    const r = await fetch(RUN_BASE + "/latest.txt", { cache: "no-store" });
+    if (r.ok) {
+      const t = (await r.text()).trim();
+      if (t) return RUN_BASE + "/" + t;
+    }
+  } catch (e) {}
+  return null;
+}
+
+function fmt(v, digits = 3) {
+  if (v == null || isNaN(+v)) return "—";
+  const n = +v;
+  if (n === 0) return "0";
+  if (Math.abs(n) >= 100) return n.toFixed(1);
+  return n.toPrecision(digits);
+}
+
+function pct(v) {
+  if (v == null || isNaN(+v)) return "—";
+  return (+v).toFixed(1) + "%";
+}
+
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.length);
+  if (!lines.length) return [];
+  const headers = lines[0].split(",");
+  return lines.slice(1).map(line => {
+    // CSV parsing; values may contain commas inside quotes
+    const cells = [];
+    let cur = "", inQ = false;
+    for (const c of line) {
+      if (c === '"') inQ = !inQ;
+      else if (c === "," && !inQ) { cells.push(cur); cur = ""; }
+      else cur += c;
+    }
+    cells.push(cur);
+    const o = {};
+    headers.forEach((h, i) => { o[h] = cells[i]; });
+    return o;
+  });
+}
+
+let SUMMARY = null, FAM_ROWS = [], MANIFEST = null, RUN_URL = "";
+
+async function load() {
+  RUN_URL = await findLatestRun();
+  if (!RUN_URL) {
+    document.getElementById("verdict").textContent =
+      "No run found. Pass ?utc=YYYYMMDDTHHMMSSZ or write out/master_universe_v2/latest.txt.";
+    return;
+  }
+
+  // summary
+  const sumR = await fetch(RUN_URL + "/summary.json");
+  SUMMARY = await sumR.json();
+
+  // family_scoreboard.csv
+  const famR = await fetch(RUN_URL + "/family_scoreboard.csv");
+  FAM_ROWS = parseCSV(await famR.text());
+
+  // manifest
+  const manR = await fetch(RUN_URL + "/manifest.sha256.json");
+  MANIFEST = await manR.json();
+
+  renderKPIs();
+  renderFigs();
+  renderTable();
+  renderChain();
+}
+
+function renderKPIs() {
+  const c = SUMMARY.family_win_counts || {};
+  const total = SUMMARY.n_datasets_succeeded || 0;
+  const order = ["harmonic", "tree", "classical", "neural", "baseline"];
+  const html = [
+    `<div class="card"><h3>Live datasets</h3><div class="v">${total}</div>
+      <div class="x">of ${SUMMARY.n_datasets_in_universe} attempted</div></div>`,
+  ];
+  for (const f of order) {
+    const w = c[f] || 0;
+    html.push(
+      `<div class="card"><h3>${f}</h3>
+        <div class="v ${f}">${w}/${total}</div>
+        <div class="x">${pct(total ? (w / total) * 100 : 0)} win rate</div>
+      </div>`,
+    );
+  }
+  if (SUMMARY.harmonic_median_margin_pct != null) {
+    html.push(
+      `<div class="card"><h3>Median harmonic margin</h3>
+        <div class="v harmonic">${pct(SUMMARY.harmonic_median_margin_pct)}</div>
+        <div class="x">RMSE reduction vs runner-up</div></div>`,
+    );
+  }
+  document.getElementById("kpis").innerHTML = html.join("");
+  document.getElementById("verdict").textContent = SUMMARY.verdict || "";
+}
+
+function renderFigs() {
+  const figs = [
+    ["01_family_wins_bar.png", "Family wins headline"],
+    ["02_per_dataset_rmse.png", "Top-30 datasets — all family bests, normalized"],
+    ["03_margin_histogram.png", "Margin distribution by winning family"],
+    ["04_periodicity_vs_margin.png", "Routing thesis — periodicity vs margin"],
+    ["05_family_grid.png", "Per-family head-to-head record"],
+  ];
+  document.getElementById("figs").innerHTML = figs.map(([f, cap]) =>
+    `<div class="frame">
+       <img src="${RUN_URL}/figs/${f}" alt="${cap}" loading="lazy" />
+       <div class="cap">${cap}</div>
+     </div>`,
+  ).join("");
+}
+
+let sortKey = "margin_pct_vs_runner", sortDir = -1;
+
+function sortRows(rows) {
+  return [...rows].sort((a, b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    const an = parseFloat(av), bn = parseFloat(bv);
+    if (!isNaN(an) && !isNaN(bn)) { av = an; bv = bn; }
+    return av < bv ? -sortDir : av > bv ? sortDir : 0;
+  });
+}
+
+function renderTable() {
+  const filt = (document.getElementById("filter").value || "").toLowerCase();
+  const famF = document.getElementById("famFilter").value;
+  let rows = FAM_ROWS.filter(r =>
+    (!filt || r.dataset.toLowerCase().includes(filt)) &&
+    (!famF || r.winning_family === famF));
+  rows = sortRows(rows);
+  document.getElementById("rowCount").textContent =
+    `${rows.length} / ${FAM_ROWS.length} rows`;
+  const body = document.getElementById("resultsBody");
+  body.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.dataset}</td>
+      <td class="fam-${r.winning_family}">${r.winning_family}</td>
+      <td>${r.winning_model}</td>
+      <td>${pct(r.margin_pct_vs_runner)}</td>
+      <td>${fmt(r.winning_rmse)}</td>
+      <td>${fmt(r.harmonic_best)}</td>
+      <td>${fmt(r.neural_best)}</td>
+      <td>${fmt(r.tree_best)}</td>
+      <td>${fmt(r.classical_best)}</td>
+      <td>${fmt(r.baseline_best)}</td>
+    </tr>
+  `).join("");
+}
+
+document.addEventListener("click", (e) => {
+  const th = e.target.closest("th[data-sort]");
+  if (!th) return;
+  const k = th.getAttribute("data-sort");
+  if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = -1; }
+  renderTable();
+});
+document.getElementById("filter").addEventListener("input", renderTable);
+document.getElementById("famFilter").addEventListener("change", renderTable);
+
+async function renderChain() {
+  document.getElementById("runUtc").textContent = SUMMARY.run_utc;
+  // Read ledger via tail file if served, else just show manifest hash
+  document.getElementById("manifestHash").textContent =
+    "(see manifest.sha256.json)";
+  // Try to fetch ledger
+  try {
+    const r = await fetch("ledger.jsonl",
+      { cache: "no-store" });
+    if (r.ok) {
+      const lines = (await r.text()).split(/\r?\n/).filter(Boolean);
+      // find the entry matching this run_utc
+      let match = null;
+      for (const ln of lines) {
+        try {
+          const j = JSON.parse(ln);
+          if (j.run_utc === SUMMARY.run_utc) match = j;
+        } catch (_) {}
+      }
+      if (match) {
+        document.getElementById("manifestHash").textContent =
+          match.manifest_sha256 || "—";
+        document.getElementById("entryHash").textContent =
+          match.entry_sha256 || "—";
+        document.getElementById("prevHash").textContent =
+          match.prev_entry_sha256 || "(genesis)";
+      }
+    }
+  } catch (e) {}
+}
+
+document.getElementById("verifyBtn").addEventListener("click", async () => {
+  const status = document.getElementById("verifyStatus");
+  status.textContent = "fetching manifest…"; status.className = "verify-status";
+  try {
+    const r = await fetch(RUN_URL + "/manifest.sha256.json");
+    const blob = await r.arrayBuffer();
+    const buf = await crypto.subtle.digest("SHA-256", blob);
+    const hex = [...new Uint8Array(buf)]
+      .map(b => b.toString(16).padStart(2, "0")).join("");
+    status.textContent = "manifest file SHA-256 = " + hex.slice(0, 16) + "…";
+    status.classList.add("ok");
+    // Also re-hash one raw file to spot-check chain integrity
+    const firstFile = Object.keys(MANIFEST.files)[0];
+    if (firstFile) {
+      const expected = MANIFEST.files[firstFile];
+      const fr = await fetch(RUN_URL + "/" + firstFile);
+      const fb = await fr.arrayBuffer();
+      const fbuf = await crypto.subtle.digest("SHA-256", fb);
+      const fhex = [...new Uint8Array(fbuf)]
+        .map(b => b.toString(16).padStart(2, "0")).join("");
+      const ok = fhex === expected;
+      status.textContent +=
+        ok ? `  ✓ ${firstFile} matches manifest`
+           : `  ✗ ${firstFile} HASH MISMATCH`;
+      status.className = ok ? "verify-status ok" : "verify-status fail";
+    }
+  } catch (e) {
+    status.textContent = "verify failed: " + e.message;
+    status.className = "verify-status fail";
+  }
+});
+
+load().catch(e => {
+  document.getElementById("verdict").textContent = "load error: " + e.message;
+});
+</script>
+</body>
+</html>

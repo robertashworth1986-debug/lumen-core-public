@@ -17,6 +17,7 @@ SEED_VALIDATION = OUT / "seed_validation_readout.json"
 REGISTRY = CONF / "live_source_registry.json"
 OPPORTUNITY_BRIEF = EXEC / "institutional_opportunity_executive_brief.json"
 SOURCE_BREADTH = OUT / "approved_source_breadth_registry.json"
+EDGE_TRUTH = EXEC / "edge_truth_report.json"
 
 SCORECARD_JSON = EXEC / "institutional_metrics_scorecard.json"
 SCORECARD_MD = EXEC / "institutional_metrics_scorecard.md"
@@ -70,6 +71,7 @@ def build_scorecard() -> dict[str, Any]:
     registry = load_json(REGISTRY, {})
     opp = load_json(OPPORTUNITY_BRIEF, {})
     breadth = load_json(SOURCE_BREADTH, {})
+    edge = load_json(EDGE_TRUTH, {})
 
     account = daily.get("account", {}) if isinstance(daily, dict) else {}
     risk = daily.get("risk", {}) if isinstance(daily, dict) else {}
@@ -106,6 +108,8 @@ def build_scorecard() -> dict[str, Any]:
     open_access = as_int(breadth.get("open_access_approved_sources"), 0) if isinstance(breadth, dict) else 0
     combined_sources = as_int(breadth.get("combined_approved_sources"), key_backed + open_access) if isinstance(breadth, dict) else key_backed + open_access
     breadth_target = 60.0
+    edge_quality_score = as_float(edge.get("edge_quality_score"), 0.0) if isinstance(edge, dict) else 0.0
+    edge_verdict = str(edge.get("verdict", "UNKNOWN")).upper() if isinstance(edge, dict) else "UNKNOWN"
 
     score_components = {
         "coverage": min(100.0, (len(enabled_rows) / max(len(rows), 1)) * 100.0),
@@ -116,6 +120,7 @@ def build_scorecard() -> dict[str, Any]:
         "realized_roi": max(0.0, min(100.0, 50.0 + (realized_roi_pct * 2.0))),
         "win_rate": max(0.0, min(100.0, win_rate_pct)),
         "breadth": max(0.0, min(100.0, (combined_sources / breadth_target) * 100.0)),
+        "edge_truth": max(0.0, min(100.0, edge_quality_score)),
     }
     readiness_score = round(sum(score_components.values()) / len(score_components), 2)
 
@@ -127,6 +132,7 @@ def build_scorecard() -> dict[str, Any]:
         and max_drawdown_pct <= 25.0
         and realized_roi_pct > 0.0
         and win_rate_pct >= 45.0
+        and edge_verdict != "FAIL"
     ):
         readiness_tier = "GREEN"
     elif readiness_score >= 55.0 and measured_hour > 0.0 and (realized_roi_pct > -10.0):
@@ -143,6 +149,8 @@ def build_scorecard() -> dict[str, Any]:
         gaps.append("Walk-forward stability is weak; favor more robust champion blends.")
     if critical_alerts > 0:
         gaps.append("Critical lane alerts are active; stabilize measured feeds before investor broadcast.")
+    if edge_verdict == "FAIL":
+        gaps.append("Edge truth guard is FAIL; champion likely overfit or insufficiently robust versus baseline.")
 
     return {
         "generated_utc": now_utc(),
@@ -162,6 +170,8 @@ def build_scorecard() -> dict[str, Any]:
             "top_walkforward_sharpe_mean": walkforward_sharpe,
             "top_walkforward_stability": walkforward_stability,
             "top_institutional_score": institutional_score,
+            "edge_truth_score": edge_quality_score,
+            "edge_truth_verdict": edge_verdict,
             "champion_flow": str(best_lineage.get("flow", seed.get("champion", {}).get("flow", "unknown"))),
             "champion_strategy": str(best_lineage.get("strategy", seed.get("champion", {}).get("strategy", "unknown"))),
             "champion_algo": str(best_lineage.get("algo", seed.get("champion", {}).get("algo", "unknown"))),
@@ -192,6 +202,7 @@ def build_scorecard() -> dict[str, Any]:
             "source_registry": str(REGISTRY),
             "opportunity_brief": str(OPPORTUNITY_BRIEF),
             "approved_source_breadth": str(SOURCE_BREADTH),
+            "edge_truth_report": str(EDGE_TRUTH),
         },
     }
 
@@ -222,6 +233,8 @@ def render_markdown(scorecard: dict[str, Any]) -> str:
         f"- Walk-Forward Sharpe Mean: {as_float(r.get('top_walkforward_sharpe_mean')):.4f}",
         f"- Walk-Forward Stability: {as_float(r.get('top_walkforward_stability')):.4f}",
         f"- Top Institutional Score: {as_float(r.get('top_institutional_score')):.4f}",
+        f"- Edge Truth Score: {as_float(r.get('edge_truth_score')):.2f}",
+        f"- Edge Truth Verdict: {r.get('edge_truth_verdict', 'UNKNOWN')}",
         f"- Champion: {r.get('champion_flow', 'unknown')} / {r.get('champion_strategy', 'unknown')} / {r.get('champion_algo', 'unknown')}",
         "",
         "## Coverage KPIs",

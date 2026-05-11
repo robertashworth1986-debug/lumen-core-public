@@ -1,0 +1,13 @@
+{
+  "base_risk_fraction": 0.7535,
+  "loop_seconds": 1.493,
+  "max_position_usd": 126.5,
+  "time_travel_burst_active": true,
+  "time_travel_burst_last_run_utc": "2026-05-06T23:46:05.666440+00:00",
+  "time_travel_burst_best_score": 11.378746,
+  "time_travel_burst_best_win_rate": 0.333333,
+  "time_travel_burst_best_sharpe": 0.375918,
+  "time_travel_burst_best_drawdown": 0.141118,
+  "mode": "paper",
+  "allow_live_orders": false
+}

@@ -1,0 +1,34 @@
+{
+  "rendered_utc": "2026-03-27T03:40:55.488257+00:00",
+  "live_source": "C:\\LumaTrader\\dashboard\\level5_execution_dashboard.json",
+  "eia": {
+    "enabled": false,
+    "status": "missing EIA_API_KEY or EIA_SERIES_ID",
+    "series": "",
+    "value": null,
+    "unit": null,
+    "latency_ms": null,
+    "updated_utc": "2026-03-27T03:40:55.488271+00:00"
+  },
+  "alt": {
+    "name": "ALT_FEED",
+    "status": "not configured",
+    "value": null,
+    "latency_ms": null,
+    "updated_utc": "2026-03-27T03:40:55.488276+00:00"
+  },
+  "live_rows": [
+    {
+      "source_file": "C:\\LumaTrader\\output\\level4_live_allocation.csv",
+      "rows_loaded": 5,
+      "rows_scored": 5,
+      "active_rows": 5,
+      "gross_effective_weight": 0.904482381515736,
+      "top_pair": "HYPE/USD",
+      "top_strategy": "RAW_BTC",
+      "top_action": "SHORT",
+      "timestamp_utc": "2026-03-27T03:35:55.792499+00:00"
+    }
+  ],
+  "paper_pnl": {}
+}

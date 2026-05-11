@@ -1,0 +1,27 @@
+{
+  "profile": "institutional_multi_account_rollout",
+  "allow_live": true,
+  "require_env_arm": true,
+  "env_var": "LUMENCORE_ARM_MULTI_LIVE",
+  "env_value": "YES_ARM_MULTI_ACCOUNT_LIVE",
+  "require_confirm_file": true,
+  "confirm_file": "config/multi_live_arm.confirm",
+  "confirm_phrase": "ARM_MULTI_ACCOUNT_LIVE",
+  "max_accounts_to_activate": 50,
+  "default_mode": "live",
+  "default_loop_seconds": 0.5,
+  "x1000_auto_enabled": true,
+  "x1000_interval_loops": 20,
+  "x1000_passes": 2,
+  "x1000_auto_apply": false,
+  "providers": {
+    "KRAKEN": {
+      "supports_asset_classes": ["crypto"],
+      "execution_mode": "crypto_exec"
+    },
+    "ALPACA": {
+      "supports_asset_classes": ["equity"],
+      "execution_mode": "equity_exec"
+    }
+  }
+}

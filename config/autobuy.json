@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "max_open_target": 10,
+  "max_pending": 3,
+  "min_edge_score": 0.6,
+  "min_bucket_n": 8,
+  "min_win_rate_pct": 52,
+  "base_notional_usd": 10,
+  "edge_size_boost": true,
+  "max_notional_usd": 18,
+  "horizon_h": 24,
+  "loss_cooldown_hours": 2,
+  "controller": "Robert",
+  "scan_interval_s": 90
+}

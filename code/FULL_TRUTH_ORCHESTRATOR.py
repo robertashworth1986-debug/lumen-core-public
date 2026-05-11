@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import urllib.request
 import pandas as pd
 import numpy as np
+from runtime_live_lock import is_strict_live_locked, stamp_runtime_writer
 try:
     import yaml
 except ImportError:
@@ -376,11 +377,26 @@ def sync_live_sources(usable_files):
 
 def sync_runtime_files():
     rt = load_json(RUNTIME_CONTROL_PATH, {})
-    rt["mode"] = "paper"
-    rt["allow_live_orders"] = False
+
+    strict_live_locked = is_strict_live_locked(rt)
+
+    if strict_live_locked:
+        rt["mode"] = "live"
+        rt["allow_live_orders"] = True
+        rt["paper_enabled"] = False
+    else:
+        rt["mode"] = "paper"
+        rt["allow_live_orders"] = False
+
     rt["kill_switch"] = False
     rt["symbol"] = "UNIVERSE"
     rt["loop_seconds"] = 5
+    stamp_runtime_writer(
+        rt,
+        writer="code/FULL_TRUTH_ORCHESTRATOR.py",
+        strict_live_lock=strict_live_locked,
+        reason="full_truth_sync_runtime_files",
+    )
     save_json(RUNTIME_CONTROL_PATH, rt)
 
     paper = load_json(PAPER_RUNTIME_PATH, {})
@@ -403,20 +419,24 @@ def sync_runtime_files():
 
     ex_rt = load_json(EXECUTION_RUNTIME_JSON, {})
     ex_rt["timestamp"] = iso_now()
-    ex_rt["live_enabled"] = False
+    ex_rt["live_enabled"] = bool(strict_live_locked)
     ex_rt["kill_switch"] = False
-    ex_rt["runtime_mode"] = "paper"
+    ex_rt["runtime_mode"] = "live" if strict_live_locked else "paper"
     ex_rt["position"] = ex_rt.get("position", "flat")
     ex_rt["symbol"] = None
-    ex_rt["last_mode"] = "PAPER"
+    ex_rt["last_mode"] = "LIVE" if strict_live_locked else "PAPER"
     save_json(EXECUTION_RUNTIME_JSON, ex_rt)
 
     ex_status = load_json(EXECUTION_STATUS_JSON, {})
     ex_status["generated_utc"] = iso_now()
-    ex_status["execution_mode"] = "paper"
+    ex_status["execution_mode"] = "live" if strict_live_locked else "paper"
     ex_status["kill_switch"] = False
-    ex_status["live_arm"] = "OFF"
-    ex_status["note"] = "Paper + universe truth sync only. No live autonomous orders."
+    ex_status["live_arm"] = "ON" if strict_live_locked else "OFF"
+    ex_status["note"] = (
+        "Strict live profile lock detected; preserving live execution arming."
+        if strict_live_locked
+        else "Paper + universe truth sync only. No live autonomous orders."
+    )
     save_json(EXECUTION_STATUS_JSON, ex_status)
 
     if not APPROVAL_QUEUE_JSON.exists():
@@ -455,6 +475,7 @@ def find_script_candidates():
         "auto_data_ingest.py",
         "full_beast_universe_runner.py",
         "adaptive_engine.py",
+        "edge_truth_guard.py",
         "dashboard_unified_refresh.py",
         "alpaca_paper_loop_builder.py",
         "infra_live_loop_builder.py",
@@ -517,6 +538,11 @@ def cycle():
     for script in find_script_candidates():
         results.append(run_if_exists(script))
 
+    runtime_now = load_json(RUNTIME_CONTROL_PATH, {})
+    execution_now = load_json(EXECUTION_STATUS_JSON, {})
+    runtime_mode_now = str(runtime_now.get("mode", "paper") or "paper").strip().lower()
+    execution_mode_now = str(execution_now.get("execution_mode", runtime_mode_now) or runtime_mode_now).strip().lower()
+
     status = {
         "generated_utc": iso_now(),
         "data_roots_present": [str(r) for r in DATA_ROOTS if r.exists()],
@@ -524,8 +550,8 @@ def cycle():
         "usable_files": len(usable),
         "enabled_source_count": len([1 for _, v in live_sources.items() if isinstance(v, dict) and v.get("enabled")]),
         "registry_rows": len(registry.get("rows", [])),
-        "runtime_mode": "paper",
-        "execution_mode": "paper",
+        "runtime_mode": runtime_mode_now,
+        "execution_mode": execution_mode_now,
         "lumascout_active_sources": int(lumascout_export.get("active_sources", 0)),
         "lumascout_champions": int(lumascout_export.get("champions", 0)),
         "lumascout_watchlist": int(lumascout_export.get("watchlist", 0)),

@@ -49,6 +49,10 @@ def env_present(name):
 
 def sector_for(name, env_name=""):
     s = (str(name) + " " + str(env_name)).lower()
+    if any(x in s for x in ["sam.gov", "sam_gov", "federal contract", "contract opportunity"]):
+        return "federal_contracts"
+    if any(x in s for x in ["sba", "small business administration", "8(a)", "hubzone", "set-aside", "set aside"]):
+        return "federal_small_business"
     if any(x in s for x in ["implied", "iv", "volatility", "options"]):
         return "market_data"
     if any(x in s for x in ["polygon", "finnhub", "twelve", "alpaca", "equity", "stock", "market"]):
@@ -77,6 +81,8 @@ def sector_for(name, env_name=""):
 
 def default_est_hour(sector):
     table = {
+        "federal_contracts": 812.50,
+        "federal_small_business": 575.00,
         "energy": 3913.75,
         "market_data": 646.40,
         "crypto_exec": 959.50,
@@ -150,6 +156,7 @@ known = [
     ("BLS", "BLS_API_KEY", "labor"),
     ("CENSUS", "CENSUS_API_KEY", "demographic"),
     ("EPA_AQS_KEY", "EPA_AQS_KEY", "air_quality"),
+    ("SAM_GOV", "SAM_GOV_API_KEY", "federal_contracts"),
     ("IMPLIED", "IMPLIED_API_KEY", "market_data"),
     ("IMPLIED_VOL", "IMPLIED_VOL_API_KEY", "market_data"),
     ("TRADIER", "TRADIER_API_KEY", "market_data"),
@@ -184,6 +191,25 @@ if "IMPLIED" not in already and any(env_present(e) for e in option_capable_envs)
         "est_dollar_per_hour": float(default_est_hour("market_data")),
         "last_probe_utc": now_utc(),
         "env": backing,
+        "enabled": True
+    })
+
+# always-on public open-data lanes
+already = {str(x.get("source","")).upper() for x in rebuilt}
+open_data_known = [
+    ("SBA_GOV", "federal_small_business"),
+]
+for src, sector in open_data_known:
+    if src in already:
+        continue
+    rebuilt.append({
+        "source": src,
+        "sector": sector,
+        "status": "PUBLIC_OPEN_DATA",
+        "rows": 0,
+        "est_dollar_per_hour": float(default_est_hour(sector)),
+        "last_probe_utc": now_utc(),
+        "env": "",
         "enabled": True
     })
 

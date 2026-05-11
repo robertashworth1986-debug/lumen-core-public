@@ -1,0 +1,47 @@
+[
+  {
+    "item": "User onboarding flow",
+    "status": "incomplete",
+    "notes": "UI, registration, and account creation"
+  },
+  {
+    "item": "KYC/AML integration",
+    "status": "incomplete",
+    "notes": "ID verification, compliance checks"
+  },
+  {
+    "item": "Funding/deposit system",
+    "status": "incomplete",
+    "notes": "Bank, crypto, and fiat onramp"
+  },
+  {
+    "item": "Withdrawal/settlement system",
+    "status": "incomplete",
+    "notes": "User-initiated withdrawals, compliance review"
+  },
+  {
+    "item": "Live dashboard for users",
+    "status": "incomplete",
+    "notes": "Personalized analytics, notifications"
+  },
+  {
+    "item": "Notifications/alerts",
+    "status": "incomplete",
+    "notes": "Email, SMS, in-app"
+  },
+  {
+    "item": "Audit trail & reporting",
+    "status": "incomplete",
+    "notes": "Exportable logs, compliance evidence"
+  },
+  {
+    "item": "API key management UI",
+    "status": "complete",
+    "notes": "User and admin key management"
+  },
+  {
+    "item": "Legal/terms of service",
+    "status": "incomplete",
+    "notes": "User agreements, disclosures"
+  }
+]

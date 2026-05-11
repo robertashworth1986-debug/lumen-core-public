@@ -46,22 +46,44 @@ def main() -> int:
         print("[OK] Existing flow count already satisfies expected minimum; leaving flows unchanged.")
         return 0
 
+    import_ok = False
+
+    # Try modern v2 API first. It expects an object payload with a "flows" key.
+    v2_payload = flow_nodes
+    if isinstance(flow_nodes, list):
+        v2_payload = {"flows": flow_nodes}
+
     try:
         status, body = post_json(
             f"{args.base}/flows",
-            flow_nodes,
+            v2_payload,
             headers={"Node-RED-API-Version": "v2"},
         )
-        print(f"[INFO] POST /flows returned HTTP {status}")
+        print(f"[INFO] POST /flows (v2) returned HTTP {status}")
         if body.strip():
             print(f"[INFO] Response: {body[:240]}")
+        import_ok = True
     except urllib.error.HTTPError as ex:
         details = ex.read().decode("utf-8", errors="replace")
-        print(f"[ERROR] Flow import failed HTTP {ex.code}: {details[:240]}")
-        return 4
+        print(f"[WARN] v2 flow import failed HTTP {ex.code}: {details[:240]}")
     except Exception as ex:
-        print(f"[ERROR] Flow import failed: {ex}")
-        return 5
+        print(f"[WARN] v2 flow import failed: {ex}")
+
+    # Fallback for legacy flow endpoints that accept raw flow arrays.
+    if not import_ok:
+        try:
+            status, body = post_json(f"{args.base}/flows", flow_nodes)
+            print(f"[INFO] POST /flows (legacy) returned HTTP {status}")
+            if body.strip():
+                print(f"[INFO] Response: {body[:240]}")
+            import_ok = True
+        except urllib.error.HTTPError as ex:
+            details = ex.read().decode("utf-8", errors="replace")
+            print(f"[ERROR] Legacy flow import failed HTTP {ex.code}: {details[:240]}")
+            return 4
+        except Exception as ex:
+            print(f"[ERROR] Legacy flow import failed: {ex}")
+            return 5
 
     try:
         after = get_json(f"{args.base}/flows")

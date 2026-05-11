@@ -1,0 +1,21 @@
+{
+  "generated_utc": "2026-04-14T23:24:26.259555+00:00",
+  "live_now": true,
+  "state_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\paper_trade_state.json",
+  "ledger_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\paper_trade_ledger.jsonl",
+  "runtime_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\config\\paper_trader_runtime.json",
+  "starting_capital": 100000.0,
+  "current_equity": 100000.0,
+  "paper_profit": 0.0,
+  "wins": 0,
+  "losses": 0,
+  "trades": 0,
+  "win_rate_pct": 0.0,
+  "paper_sharpe": 0.0,
+  "paper_max_drawdown_pct": 0.0,
+  "last_symbol": "",
+  "last_side": "",
+  "ledger_rows_scanned": 1385,
+  "equity_curve_points": 2,
+  "value_basis": "MEASURED"
+}

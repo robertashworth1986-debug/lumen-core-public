@@ -1,0 +1,179 @@
+{
+  "generated_utc": "2026-04-12T17:43:22.325750+00:00",
+  "dashboard_status": "FAIL",
+  "paper_live": true,
+  "enabled_registry_sources": 17,
+  "sector_count": 14,
+  "sector_table": [
+    {
+      "sector": "energy",
+      "live_sources": 1,
+      "rows": 3305,
+      "hour": 3913.75,
+      "day": 93930.0,
+      "week": 657510.0,
+      "month": 2817900.0,
+      "year": 34284450.0,
+      "basis": "MEASURED"
+    },
+    {
+      "sector": "market_data",
+      "live_sources": 4,
+      "rows": 90355,
+      "hour": 2585.6,
+      "day": 62054.4,
+      "week": 434380.8,
+      "month": 1861632.0,
+      "year": 22649856.0,
+      "basis": "MEASURED"
+    },
+    {
+      "sector": "crypto_exec",
+      "live_sources": 1,
+      "rows": 9858,
+      "hour": 959.5,
+      "day": 23028.0,
+      "week": 161196.0,
+      "month": 690840.0,
+      "year": 8405220.0,
+      "basis": "MEASURED"
+    },
+    {
+      "sector": "rates",
+      "live_sources": 1,
+      "rows": 37992,
+      "hour": 934.25,
+      "day": 22422.0,
+      "week": 156954.0,
+      "month": 672660.0,
+      "year": 8184030.0,
+      "basis": "MEASURED"
+    },
+    {
+      "sector": "weather",
+      "live_sources": 1,
+      "rows": 1,
+      "hour": 888.8,
+      "day": 21331.2,
+      "week": 149318.4,
+      "month": 639936.0,
+      "year": 7785888.0,
+      "basis": "ESTIMATED"
+    },
+    {
+      "sector": "energy_lab",
+      "live_sources": 1,
+      "rows": 23,
+      "hour": 858.5,
+      "day": 20604.0,
+      "week": 144228.0,
+      "month": 618120.0,
+      "year": 7520460.0,
+      "basis": "MEASURED"
+    },
+    {
+      "sector": "broker",
+      "live_sources": 1,
+      "rows": 11084,
+      "hour": 707.0,
+      "day": 16968.0,
+      "week": 118776.0,
+      "month": 509040.0,
+      "year": 6193320.0,
+      "basis": "MEASURED"
+    },
+    {
+      "sector": "macro",
+      "live_sources": 1,
+      "rows": 541763,
+      "hour": 555.5,
+      "day": 13332.0,
+      "week": 93324.0,
+      "month": 399960.0,
+      "year": 4866180.0,
+      "basis": "MEASURED"
+    },
+    {
+      "sector": "water",
+      "live_sources": 1,
+      "rows": 1,
+      "hour": 505.0,
+      "day": 12120.0,
+      "week": 84840.0,
+      "month": 363600.0,
+      "year": 4423800.0,
+      "basis": "ESTIMATED"
+    },
+    {
+      "sector": "air_quality",
+      "live_sources": 1,
+      "rows": 1,
+      "hour": 424.2,
+      "day": 10180.8,
+      "week": 71265.6,
+      "month": 305424.0,
+      "year": 3715992.0,
+      "basis": "ESTIMATED"
+    },
+    {
+      "sector": "labor",
+      "live_sources": 1,
+      "rows": 3773,
+      "hour": 343.4,
+      "day": 8241.6,
+      "week": 57691.2,
+      "month": 247248.0,
+      "year": 3008184.0,
+      "basis": "MEASURED"
+    },
+    {
+      "sector": "space",
+      "live_sources": 1,
+      "rows": 1,
+      "hour": 303.0,
+      "day": 7272.0,
+      "week": 50904.0,
+      "month": 218160.0,
+      "year": 2654280.0,
+      "basis": "ESTIMATED"
+    },
+    {
+      "sector": "demographic",
+      "live_sources": 1,
+      "rows": 1,
+      "hour": 262.6,
+      "day": 6302.4,
+      "week": 44116.8,
+      "month": 189072.0,
+      "year": 2300376.0,
+      "basis": "ESTIMATED"
+    },
+    {
+      "sector": "internal",
+      "live_sources": 1,
+      "rows": 1,
+      "hour": 250.0,
+      "day": 6000.0,
+      "week": 42000.0,
+      "month": 180000.0,
+      "year": 2190000.0,
+      "basis": "ESTIMATED"
+    }
+  ],
+  "translated_year_value_total": 118182036.0,
+  "problems": [
+    "Execution live arm is on."
+  ],
+  "warnings": [
+    "execution mode is live",
+    "champion vs baseline is -3.88"
+  ],
+  "wins": [
+    "Runtime is in paper mode.",
+    "Paper trading is enabled.",
+    "Live orders remain disabled.",
+    "Credible leaderboard exists with at least 10 rows.",
+    "Empty report is clean.",
+    "Champion test Sharpe is positive (11.05)."
+  ]
+}

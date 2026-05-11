@@ -1,0 +1,54 @@
+{
+  "schema": "luma_scene_simulation_scenarios_v1",
+  "version": "2026-05-09-ops",
+  "scenarios": {
+    "institutional_open": {
+      "description": "Operator-tuned open sequence with slightly slower conviction cadence.",
+      "detail": {
+        "operator_profile": "institutional_desk_a"
+      }
+    },
+    "macro_news_whipsaw": {
+      "label": "Macro News Whipsaw",
+      "description": "Rapid volatility burst, containment, then directional recovery confirmation.",
+      "scene": "alert",
+      "hint": "cinematic",
+      "detail": {
+        "source": "scenario_macro_news_whipsaw",
+        "risk_mode": "headline_volatility"
+      },
+      "steps": [
+        {
+          "cue": "warning_pulse",
+          "intensity": 0.86,
+          "wait_ms": 120
+        },
+        {
+          "cue": "critical_warning",
+          "intensity": 0.97,
+          "wait_ms": 140
+        },
+        {
+          "scene": "core",
+          "cue": "service_degraded",
+          "intensity": 0.78,
+          "wait_ms": 170
+        },
+        {
+          "scene": "harmonic",
+          "cue": "institutional_signal",
+          "hint": "investor",
+          "intensity": 0.73,
+          "wait_ms": 200
+        },
+        {
+          "scene": "harmonic",
+          "cue": "success_pulse",
+          "hint": "investor",
+          "intensity": 0.84,
+          "wait_ms": 240
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "generated_utc": "2026-04-03T02:56:55.893402+00:00",
+  "mode": "paper",
+  "broker": "alpaca",
+  "execution_ready": true,
+  "kraken_ready": true,
+  "webhook_present": false
+}

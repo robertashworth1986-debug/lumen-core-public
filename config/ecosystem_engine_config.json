@@ -1,0 +1,149 @@
+{
+  "generated_by": "ecosystem_fabric_engine",
+  "profile": "government_grade_audit",
+  "crawl": {
+    "max_files_per_root": 25000,
+    "max_relevant_hits_per_root": 250,
+    "skip_dir_names": [
+      ".git",
+      ".hg",
+      ".svn",
+      "__pycache__",
+      "node_modules",
+      ".venv",
+      "venv",
+      "env",
+      "env311"
+    ],
+    "include_extensions": [
+      ".py",
+      ".ps1",
+      ".json",
+      ".jsonl",
+      ".md",
+      ".txt",
+      ".csv",
+      ".html",
+      ".pdf",
+      ".stl",
+      ".step",
+      ".obj",
+      ".glb",
+      ".blend",
+      ".dwg",
+      ".dxf"
+    ],
+    "relevance_keywords": [
+      "whitepaper",
+      "pilot",
+      "brief",
+      "grant",
+      "proposal",
+      "proof",
+      "audit",
+      "chain_of_custody",
+      "frozen_delta",
+      "delta",
+      "manifest",
+      "registry",
+      "dashboard",
+      "robot",
+      "lumenshell",
+      "motherboard",
+      "battery",
+      "honeycomb",
+      "magnetic",
+      "emp",
+      "nuclear",
+      "harmonic",
+      "identity",
+      "ar",
+      "vr",
+      "haptic",
+      "suit",
+      "sensor",
+      "protocol",
+      "unity",
+      "nodered",
+      "federal",
+      "darpa",
+      "doe",
+      "dod",
+      "nasa",
+      "nsf"
+    ]
+  },
+  "layer_registry": [
+    {
+      "name": "sports_signal_engine",
+      "entrypoint": "code/sports_odds_engine.py",
+      "runner": "code/RUN_SPORTS_ODDS_ENGINE.ps1",
+      "outputs": [
+        "out/sports_signals/_live_signals.json",
+        "out/sports_states/_sports_summary.json"
+      ]
+    },
+    {
+      "name": "sports_intelligence_layer",
+      "entrypoint": "code/sports_intelligence_layer.py",
+      "outputs": [
+        "out/sports_intelligence/_enriched_signals.json",
+        "out/sports_intelligence/_flowform_ranked.json"
+      ]
+    },
+    {
+      "name": "universal_harmonic_edge",
+      "entrypoint": "code/universal_harmonic_edge_core.py",
+      "outputs": [
+        "out/universal_edge/_cross_domain_ranked.json",
+        "out/universal_edge/_sports_ranked.json",
+        "out/universal_edge/_crypto_ranked.json",
+        "out/universal_edge/_infra_ranked.json"
+      ]
+    },
+    {
+      "name": "luma_gateway",
+      "entrypoint": "code/luma_experience_gateway.py",
+      "outputs": [
+        "C:/LumaTrader/dashboard/luma_experience.html"
+      ]
+    },
+    {
+      "name": "execution_orchestrator",
+      "entrypoint": "code/execution/execution_orchestrator.py",
+      "outputs": [
+        "out/execution/execution_audit_chain.jsonl"
+      ]
+    },
+    {
+      "name": "meta_orchestrator",
+      "entrypoint": "code/run_universal_meta_orchestrator.py",
+      "outputs": [
+        "execution_events.jsonl"
+      ]
+    },
+    {
+      "name": "alpaca_paper_orchestrator",
+      "entrypoint": "code/execution/alpaca_paper_orchestrator.py",
+      "runner": "code/RUN_ALPACA_PAPER_ORCHESTRATOR.ps1",
+      "outputs": [
+        "out/execution/alpaca_orchestrator_status.json",
+        "out/execution/alpaca_orchestrator_audit_chain.jsonl",
+        "out/execution/alpaca_symbol_ranked.json"
+      ]
+    }
+  ],
+  "sources": {
+    "registry_path": "config/live_source_registry.json",
+    "freshness_hours": 24
+  },
+  "audit": {
+    "chain_file": "out/ecosystem/ecosystem_audit_chain.jsonl",
+    "frozen_delta_file": "out/ecosystem/ecosystem_frozen_deltas.jsonl",
+    "snapshot_file": "out/ecosystem/ecosystem_master_snapshot.json",
+    "root_inventory_file": "out/ecosystem/ecosystem_root_inventory.json",
+    "relevant_inventory_file": "out/ecosystem/ecosystem_relevant_inventory.json",
+    "layer_status_file": "out/ecosystem/ecosystem_layer_status.json",
+    "source_health_file": "out/ecosystem/ecosystem_live_source_health.json"
+  }
+}

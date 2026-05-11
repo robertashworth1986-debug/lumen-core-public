@@ -1,0 +1,20 @@
+scan_roots:
+  - "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data"
+  - "C:\\Users\\Novac\\iCloudDrive\\Data sets"
+  - "C:\\Users\\Novac\\iCloudDrive\\what i built"
+allowed_exts:
+  - ".csv"
+  - ".xlsx"
+  - ".xls"
+  - ".json"
+  - ".txt"
+exclude_dir_names:
+  - ".venv"
+  - "__pycache__"
+  - "node_modules"
+  - ".git"
+  - "normalized_csv_lake"
+  - "gen4_output"
+  - "gen5_output"
+  - "gen6_output"
+  - "gen7_output"

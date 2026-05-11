@@ -1,4 +1,4 @@
-﻿"""
+"""
 DraftKings +EV Alpha Autopilot — Institutional Maximum Build
 ============================================================
 Active tiers (all lazy-imported from code/.venv):
@@ -691,27 +691,52 @@ def apply_ml_ensemble(
         X = _build_feature_matrix(rows, args.horizon_hours)
         y = _build_target(rows, args.horizon_hours)
 
+        use_gpu = str(os.getenv("LUMA_USE_GPU", "0")).strip().lower() in {"1", "true", "yes", "on"}
+
         # ── LightGBM ──────────────────────────────────────────────────────────
-        lgb_ds    = lgb.Dataset(X, label=y, feature_name=_FEATURE_NAMES, free_raw_data=False)
-        lgb_model = lgb.train(
-            {"objective": "regression", "metric": "rmse", "num_leaves": 15,
+        lgb_params = {"objective": "regression", "metric": "rmse", "num_leaves": 15,
              "max_depth": 4, "learning_rate": 0.08, "min_child_samples": 2,
-             "subsample": 0.8, "colsample_bytree": 0.8, "verbose": -1, "force_col_wise": True},
-            lgb_ds, num_boost_round=200, valid_sets=[lgb_ds],
-            callbacks=[lgb.early_stopping(20, verbose=False), lgb.log_evaluation(-1)],
-        )
+             "subsample": 0.8, "colsample_bytree": 0.8, "verbose": -1, "force_col_wise": True}
+        if use_gpu:
+            lgb_params["device"] = "gpu"
+        lgb_ds    = lgb.Dataset(X, label=y, feature_name=_FEATURE_NAMES, free_raw_data=False)
+        try:
+            lgb_model = lgb.train(
+                lgb_params,
+                lgb_ds, num_boost_round=200, valid_sets=[lgb_ds],
+                callbacks=[lgb.early_stopping(20, verbose=False), lgb.log_evaluation(-1)],
+            )
+        except Exception:
+            lgb_params.pop("device", None)
+            lgb_model = lgb.train(
+                lgb_params,
+                lgb_ds, num_boost_round=200, valid_sets=[lgb_ds],
+                callbacks=[lgb.early_stopping(20, verbose=False), lgb.log_evaluation(-1)],
+            )
         lgb_preds = lgb_model.predict(X)
         report["lgbm"] = True
 
         # ── XGBoost ───────────────────────────────────────────────────────────
-        xgb_dm    = xgb.DMatrix(X, label=y, feature_names=_FEATURE_NAMES)
-        xgb_model = xgb.train(
-            {"objective": "reg:squarederror", "eval_metric": "rmse", "max_depth": 4,
+        xgb_params = {"objective": "reg:squarederror", "eval_metric": "rmse", "max_depth": 4,
              "eta": 0.08, "subsample": 0.8, "colsample_bytree": 0.8,
-             "min_child_weight": 1, "verbosity": 0},
-            xgb_dm, num_boost_round=200,
-            evals=[(xgb_dm, "train")], verbose_eval=False, early_stopping_rounds=20,
-        )
+             "min_child_weight": 1, "verbosity": 0}
+        if use_gpu:
+            xgb_params.update({"tree_method": "hist", "device": "cuda"})
+        xgb_dm    = xgb.DMatrix(X, label=y, feature_names=_FEATURE_NAMES)
+        try:
+            xgb_model = xgb.train(
+                xgb_params,
+                xgb_dm, num_boost_round=200,
+                evals=[(xgb_dm, "train")], verbose_eval=False, early_stopping_rounds=20,
+            )
+        except Exception:
+            xgb_params.pop("device", None)
+            xgb_params.pop("tree_method", None)
+            xgb_model = xgb.train(
+                xgb_params,
+                xgb_dm, num_boost_round=200,
+                evals=[(xgb_dm, "train")], verbose_eval=False, early_stopping_rounds=20,
+            )
         xgb_preds = xgb_model.predict(xgb_dm)
         report["xgb"] = True
 

@@ -1,116 +1,201 @@
-import pandas as pd
-import numpy as np
-import plotly.graph_objs as go
-import plotly.io as pio
 import json
 from pathlib import Path
 
-def load_trade_log(path):
+import numpy as np
+import pandas as pd
+import plotly.graph_objs as go
+import plotly.io as pio
+
+
+STARTING_CAPITAL_USD = 100000.0
+
+
+def load_trade_log(path: str) -> pd.DataFrame:
     if not Path(path).exists():
         return pd.DataFrame()
-    with open(path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+    except Exception:
+        return pd.DataFrame()
+
+    if not isinstance(data, list):
+        return pd.DataFrame()
     return pd.DataFrame(data)
 
-def compute_metrics(df):
+
+def _select_closed(df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty:
+        return df
+    if "status" not in df.columns:
+        return df.copy()
+    return df[df["status"].astype(str).str.upper() == "CLOSED"].copy()
+
+
+def _numeric_series(df: pd.DataFrame, candidates: list[str]) -> pd.Series:
+    for col in candidates:
+        if col in df.columns:
+            values = pd.to_numeric(df[col], errors="coerce").dropna().reset_index(drop=True)
+            if not values.empty:
+                return values
+    return pd.Series(dtype=float)
+
+
+def _annualized_sharpe(returns: pd.Series, periods_per_year: int = 252) -> float:
+    returns = pd.to_numeric(returns, errors="coerce").replace([np.inf, -np.inf], np.nan).dropna()
+    if len(returns) < 2:
+        return 0.0
+    sigma = float(returns.std(ddof=1))
+    if not np.isfinite(sigma) or sigma <= 0:
+        return 0.0
+    mu = float(returns.mean())
+    return float((mu / sigma) * np.sqrt(periods_per_year))
+
+
+def _max_drawdown_pct(equity: pd.Series) -> float:
+    equity = pd.to_numeric(equity, errors="coerce").replace([np.inf, -np.inf], np.nan).dropna()
+    if equity.empty:
+        return 0.0
+    dd = (equity / equity.cummax()) - 1.0
+    return float(dd.min() * 100.0)
+
+
+def _build_equity_curve(df_closed: pd.DataFrame, pnl: pd.Series) -> pd.Series:
+    if "equity_usd" in df_closed.columns:
+        eq = pd.to_numeric(df_closed["equity_usd"], errors="coerce").dropna().reset_index(drop=True)
+        if not eq.empty:
+            return eq
+    return STARTING_CAPITAL_USD + pnl.cumsum()
+
+
+def compute_metrics(df: pd.DataFrame) -> dict:
     if df.empty:
         return {}
-    df_closed = df[df['status'].str.upper() == 'CLOSED']
-    pnl = df_closed['net_pnl'].astype(float)
-    returns = df_closed['net_pnl_pct'].astype(float) / 100.0
-    win_rate = (pnl > 0).mean() * 100
-    sharpe = (returns.mean() / returns.std()) * np.sqrt(252) if returns.std() > 0 else 0
-    drawdown = (df_closed['net_pnl'].cumsum().cummax() - df_closed['net_pnl'].cumsum()).max()
+
+    df_closed = _select_closed(df)
+    pnl = _numeric_series(df_closed, ["net_pnl", "pnl_usd", "realized_pnl_usd"])
+    if pnl.empty:
+        return {
+            "total_trades": float(len(df)),
+            "closed_trades": float(len(df_closed)),
+            "win_rate": 0.0,
+            "sharpe": 0.0,
+            "max_drawdown": 0.0,
+            "max_drawdown_pct": 0.0,
+            "total_pnl": 0.0,
+        }
+
+    returns = _numeric_series(df_closed, ["net_pnl_pct"]) / 100.0
+    if returns.empty:
+        equity_tmp = STARTING_CAPITAL_USD + pnl.cumsum()
+        returns = equity_tmp.pct_change().replace([np.inf, -np.inf], np.nan).dropna()
+
+    equity = _build_equity_curve(df_closed, pnl)
+    drawdown_usd = float((equity.cummax() - equity).max()) if not equity.empty else 0.0
+
     return {
-        'total_trades': len(df),
-        'closed_trades': len(df_closed),
-        'win_rate': win_rate,
-        'sharpe': sharpe,
-        'max_drawdown': drawdown,
-        'total_pnl': pnl.sum(),
+        "total_trades": float(len(df)),
+        "closed_trades": float(len(df_closed)),
+        "win_rate": float((pnl > 0).mean() * 100.0),
+        "sharpe": _annualized_sharpe(returns),
+        "max_drawdown": drawdown_usd,
+        "max_drawdown_pct": _max_drawdown_pct(equity),
+        "total_pnl": float(pnl.sum()),
     }
 
-def plot_equity_curve(df):
+
+def plot_equity_curve(df: pd.DataFrame) -> str | None:
     if df.empty:
         return None
-    df_closed = df[df['status'].str.upper() == 'CLOSED']
-    equity = df_closed['net_pnl'].cumsum()
+    df_closed = _select_closed(df)
+    pnl = _numeric_series(df_closed, ["net_pnl", "pnl_usd", "realized_pnl_usd"])
+    if pnl.empty:
+        return None
+
+    equity = _build_equity_curve(df_closed, pnl)
     fig = go.Figure()
-    # Use 'exit_time' if present, else fallback to 'timestamp'
-    x_col = 'exit_time' if 'exit_time' in df_closed.columns else 'timestamp'
-    fig.add_trace(go.Scatter(x=df_closed[x_col], y=equity, mode='lines', name='Equity Curve'))
-    fig.update_layout(title='Equity Curve', xaxis_title='Time', yaxis_title='Cumulative PnL (USD)', template='plotly_dark')
+    x_col = "exit_time" if "exit_time" in df_closed.columns else "timestamp"
+    x_vals = df_closed[x_col] if x_col in df_closed.columns else list(range(len(equity)))
+    fig.add_trace(go.Scatter(x=x_vals, y=equity, mode="lines", name="Equity Curve"))
+    fig.update_layout(title="Equity Curve", xaxis_title="Time", yaxis_title="Equity (USD)", template="plotly_dark")
     return pio.to_html(fig, full_html=False)
 
-def main():
-    trade_log_path = str(Path(__file__).parent.parent / 'out' / 'execution' / 'trade_log.json')
+
+def main() -> None:
+    trade_log_path = str(Path(__file__).parent.parent / "out" / "execution" / "trade_log.json")
     df = load_trade_log(trade_log_path)
     metrics = compute_metrics(df)
 
-    # Advanced analytics
     html_sections = []
     html_sections.append('<h1 style="text-align:center;">Institutional Trading Advanced Analytics Dashboard</h1>')
     html_sections.append('<h3>Key Metrics</h3><ul>')
-    for k, v in metrics.items():
-        html_sections.append(f'<li><b>{k.replace("_", " ").title()}:</b> {v:.4f}</li>')
+    for key, value in metrics.items():
+        html_sections.append(f'<li><b>{key.replace("_", " ").title()}:</b> {value:.4f}</li>')
     html_sections.append('</ul>')
 
-    # Equity curve
     equity_html = plot_equity_curve(df)
     if equity_html:
         html_sections.append('<h3>Equity Curve</h3>')
         html_sections.append(equity_html)
 
-    # Sector/asset breakdowns
-    if not df.empty and 'symbol' in df.columns:
-        sector_counts = df['symbol'].value_counts()
+    if not df.empty and "symbol" in df.columns:
+        sector_counts = df["symbol"].value_counts()
         sector_fig = go.Figure([go.Bar(x=sector_counts.index, y=sector_counts.values)])
-        sector_fig.update_layout(title='Trade Count by Asset/Sector', xaxis_title='Symbol', yaxis_title='Trades', template='plotly_dark')
+        sector_fig.update_layout(title="Trade Count by Asset/Sector", xaxis_title="Symbol", yaxis_title="Trades", template="plotly_dark")
         html_sections.append('<h3>Trade Count by Asset/Sector</h3>')
         html_sections.append(pio.to_html(sector_fig, full_html=False))
 
-    # PnL distribution
-    if not df.empty and 'net_pnl' in df.columns:
-        pnl_fig = go.Figure([go.Histogram(x=df['net_pnl'].astype(float), nbinsx=30)])
-        pnl_fig.update_layout(title='PnL Distribution', xaxis_title='Net PnL', yaxis_title='Frequency', template='plotly_dark')
-        html_sections.append('<h3>PnL Distribution</h3>')
-        html_sections.append(pio.to_html(pnl_fig, full_html=False))
+    if not df.empty:
+        df_closed = _select_closed(df)
+        pnl = _numeric_series(df_closed, ["net_pnl", "pnl_usd", "realized_pnl_usd"])
+        if not pnl.empty:
+            pnl_fig = go.Figure([go.Histogram(x=pnl, nbinsx=30)])
+            pnl_fig.update_layout(title="PnL Distribution", xaxis_title="Net PnL", yaxis_title="Frequency", template="plotly_dark")
+            html_sections.append('<h3>PnL Distribution</h3>')
+            html_sections.append(pio.to_html(pnl_fig, full_html=False))
 
-    # Trade duration histogram
-    if not df.empty and 'entry_time' in df.columns and 'exit_time' in df.columns:
+    if not df.empty and "entry_time" in df.columns and "exit_time" in df.columns:
         try:
-            entry = pd.to_datetime(df['entry_time'])
-            exit = pd.to_datetime(df['exit_time'])
-            duration = (exit - entry).dt.total_seconds() / 60
+            entry = pd.to_datetime(df["entry_time"])
+            exit_ = pd.to_datetime(df["exit_time"])
+            duration = (exit_ - entry).dt.total_seconds() / 60.0
             duration_fig = go.Figure([go.Histogram(x=duration, nbinsx=30)])
-            duration_fig.update_layout(title='Trade Duration (minutes)', xaxis_title='Duration (min)', yaxis_title='Frequency', template='plotly_dark')
+            duration_fig.update_layout(title="Trade Duration (minutes)", xaxis_title="Duration (min)", yaxis_title="Frequency", template="plotly_dark")
             html_sections.append('<h3>Trade Duration Distribution</h3>')
             html_sections.append(pio.to_html(duration_fig, full_html=False))
         except Exception:
             pass
 
-    # Regime/rotation detection (simple rolling Sharpe as proxy)
-    if not df.empty and 'net_pnl_pct' in df.columns and 'exit_time' in df.columns:
-        df_closed = df[df['status'].str.upper() == 'CLOSED'].copy()
-        df_closed['returns'] = df_closed['net_pnl_pct'].astype(float) / 100.0
-        df_closed['exit_time'] = pd.to_datetime(df_closed['exit_time'])
-        df_closed = df_closed.sort_values('exit_time')
-        df_closed['rolling_sharpe'] = df_closed['returns'].rolling(window=10, min_periods=3).mean() / (df_closed['returns'].rolling(window=10, min_periods=3).std() + 1e-9) * np.sqrt(252)
-        regime_fig = go.Figure([go.Scatter(x=df_closed['exit_time'], y=df_closed['rolling_sharpe'], mode='lines', name='Rolling Sharpe')])
-        regime_fig.update_layout(title='Rolling Sharpe Ratio (Regime Proxy)', xaxis_title='Time', yaxis_title='Sharpe', template='plotly_dark')
-        html_sections.append('<h3>Regime/Rotation Detection</h3>')
-        html_sections.append(pio.to_html(regime_fig, full_html=False))
+    if not df.empty and "exit_time" in df.columns:
+        df_closed = _select_closed(df).copy()
+        if not df_closed.empty:
+            returns = _numeric_series(df_closed, ["net_pnl_pct"]) / 100.0
+            if returns.empty:
+                pnl = _numeric_series(df_closed, ["net_pnl", "pnl_usd", "realized_pnl_usd"])
+                if not pnl.empty:
+                    equity = STARTING_CAPITAL_USD + pnl.cumsum()
+                    returns = equity.pct_change().replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
 
-    # Recent trades table (interactive)
+            if len(returns) >= 5:
+                df_closed = df_closed.tail(len(returns)).copy()
+                df_closed["returns"] = returns.values
+                df_closed["exit_time"] = pd.to_datetime(df_closed["exit_time"])
+                df_closed = df_closed.sort_values("exit_time")
+                roll_mean = df_closed["returns"].rolling(window=10, min_periods=5).mean()
+                roll_std = df_closed["returns"].rolling(window=10, min_periods=5).std(ddof=1)
+                rolling_sharpe = np.where(roll_std > 0, (roll_mean / roll_std) * np.sqrt(252), np.nan)
+                regime_fig = go.Figure([go.Scatter(x=df_closed["exit_time"], y=rolling_sharpe, mode="lines", name="Rolling Sharpe")])
+                regime_fig.update_layout(title="Rolling Sharpe Ratio (Regime Proxy)", xaxis_title="Time", yaxis_title="Sharpe", template="plotly_dark")
+                html_sections.append('<h3>Regime/Rotation Detection</h3>')
+                html_sections.append(pio.to_html(regime_fig, full_html=False))
+
     if not df.empty:
         html_sections.append('<h3>Recent Trades</h3>')
-        table_cols = ['symbol', 'side', 'entry_time', 'exit_time', 'net_pnl', 'net_pnl_pct', 'status']
-        table_cols = [c for c in table_cols if c in df.columns]
+        table_cols = ["symbol", "side", "entry_time", "exit_time", "net_pnl", "net_pnl_pct", "status"]
+        table_cols = [col for col in table_cols if col in df.columns]
         table_df = df[table_cols].tail(30).copy()
-        table_html = table_df.to_html(index=False, classes='table table-striped', border=0)
-        html_sections.append('<div style="overflow-x:auto;">' + table_html + '</div>')
+        html_sections.append('<div style="overflow-x:auto;">' + table_df.to_html(index=False, classes="table table-striped", border=0) + '</div>')
 
-    # Modern CSS for better visuals
     css = '''<style>
     body { background: #181818; color: #f0f0f0; font-family: 'Segoe UI', Arial, sans-serif; }
     h1, h2, h3 { color: #00bfff; }
@@ -120,12 +205,13 @@ def main():
     .table-striped tr:nth-child(even) { background: #232323; }
     </style>'''
 
-    output_path = Path(__file__).parent / 'dashboard_analytics.html'
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.write('<html><head><title>Advanced Trading Dashboard</title>' + css + '</head><body>')
+    output_path = Path(__file__).parent / "dashboard_analytics.html"
+    with open(output_path, "w", encoding="utf-8") as handle:
+        handle.write("<html><head><title>Advanced Trading Dashboard</title>" + css + "</head><body>")
         for section in html_sections:
-            f.write(section)
-        f.write('</body></html>')
+            handle.write(section)
+        handle.write("</body></html>")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

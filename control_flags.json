@@ -1,0 +1,20 @@
+{
+  "live_enabled": true,
+  "kill_switch": false,
+  "require_controller": true,
+  "allowed_controllers": [
+    "Robert",
+    "Joey",
+    "Nicole"
+  ],
+  "require_validate_pass": true,
+  "max_notional_per_trade_usd": 50.0,
+  "max_daily_loss_usd": 20.0,
+  "max_open_positions": 20,
+  "deadman_timeout_seconds": 30,
+  "default_pair": "XBTUSD",
+  "default_volume_base": 0.0004,
+  "default_order_type": "market",
+  "runtime_mode": "live",
+  "notes": "Set live_enabled=true and kill_switch=false only after smoke test and controller approval."
+}

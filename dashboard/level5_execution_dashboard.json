@@ -1,0 +1,11 @@
+{
+  "source_file": "C:\\LumaTrader\\output\\level4_live_allocation.csv",
+  "rows_loaded": 5,
+  "rows_scored": 5,
+  "active_rows": 5,
+  "gross_effective_weight": 0.904482381515736,
+  "top_pair": "HYPE/USD",
+  "top_strategy": "RAW_BTC",
+  "top_action": "SHORT",
+  "timestamp_utc": "2026-03-27T03:35:55.792499+00:00"
+}

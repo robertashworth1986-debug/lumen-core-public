@@ -4,6 +4,7 @@ import hashlib
 import json
 import math
 import os
+import sys
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,12 +20,23 @@ UNIVERSE_FILE = ROOT / "out" / "live_universe_catalog.csv"
 TRADE_LOG_FILE = OUT_DIR / "trade_log.json"
 HEALTH_FILE = OUT_DIR / "health_metrics.json"
 
+NOISE_DELTA_KEYS = {
+    "super_sniper_active",
+    "super_sniper_last_run_utc",
+    "super_sniper_sharp",
+    "super_sniper_guard_reasons",
+    "selected_symbol_hint",
+}
+
 # Canonical universe import
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 try:
-    from out.canonical_extended_universe import CANONICAL_UNIVERSE
-except ImportError:
-    # Fallback for direct script execution
     from canonical_extended_universe import CANONICAL_UNIVERSE
+except ImportError:
+    # Backward-compatible fallback for older packaging layouts.
+    from out.canonical_extended_universe import CANONICAL_UNIVERSE
 
 
 def now_utc() -> str:
@@ -227,15 +239,10 @@ def apply_super_sniper(
     hunter = sniper_cfg.get("candidate_hunter", {}) or {}
 
     current_bp = _safe_float(out.get("fallback_buying_power_usd"), 0.0)
-    target_mult = max(_safe_float(capital.get("target_multiplier"), 1.0), 1.0)
     floor = max(_safe_float(capital.get("fallback_buying_power_floor_usd"), 0.0), 0.0)
 
-    boosted_bp = max(current_bp * target_mult, floor)
-    out["fallback_buying_power_usd"] = round(boosted_bp, 2)
-
-    base_max_pos = _safe_float(out.get("max_position_usd"), 10.0)
-    pos_mult = max(_safe_float(capital.get("max_position_multiplier"), 1.0), 1.0)
-    out["max_position_usd"] = round(max(base_max_pos * pos_mult, 5.0), 2)
+    # Prevent compounding growth on repeated apply cycles.
+    out["fallback_buying_power_usd"] = round(max(current_bp, floor), 2)
     out["reserve_usd"] = round(max(_safe_float(capital.get("reserve_floor_usd"), 1.0), 0.0), 2)
 
     for k, v in cadence.items():
@@ -246,8 +253,10 @@ def apply_super_sniper(
     for k, v in risk.items():
         out[k] = v
 
+    # Keep runtime in universe mode so scanner is not locked to a tiny symbol set.
     if top_candidates:
-        out["symbol"] = top_candidates[0]["symbol"]
+        out["selected_symbol_hint"] = top_candidates[0]["symbol"]
+    out["symbol"] = "UNIVERSE"
 
     sharp_trigger = _safe_float(hunter.get("sharp_trigger"), 2.0)
     allow_live = False
@@ -329,6 +338,7 @@ def run(dry_run: bool) -> int:
     )
 
     delta = dict_delta(runtime_cfg, patched_cfg)
+    material_delta = {k: v for k, v in delta.items() if k not in NOISE_DELTA_KEYS}
 
     audit_cfg = sniper_cfg.get("audit", {}) or {}
     delta_file = ROOT / str(audit_cfg.get("out_file", "out/execution/frozen_deltas_super_sniper.json"))
@@ -349,6 +359,8 @@ def run(dry_run: bool) -> int:
         "live_after": bool(patched_cfg.get("allow_live_orders", False)),
         "delta_keys": sorted(list(delta.keys())),
         "delta_count": len(delta),
+        "material_delta_keys": sorted(list(material_delta.keys())),
+        "material_delta_count": len(material_delta),
     }
 
     checksum_block = {
@@ -367,10 +379,12 @@ def run(dry_run: bool) -> int:
     atomic_write_json(decision_file, decision, indent=2)
     atomic_write_json(delta_file, frozen_delta, indent=2)
 
-    if not dry_run:
+    if not dry_run and material_delta:
         backup = RUNTIME_FILE.with_name(f"runtime_control.backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
         atomic_write_json(backup, runtime_cfg, indent=2)
         atomic_write_json(RUNTIME_FILE, patched_cfg, indent=2)
+    elif not dry_run:
+        print("  [SUPER-SNIPER] no material runtime change; skipped runtime write")
 
     print("[SUPER-SNIPER] run complete")
     print(f"  dry_run: {dry_run}")
@@ -378,6 +392,7 @@ def run(dry_run: bool) -> int:
     print(f"  selected_symbol: {patched_cfg.get('symbol', 'UNIVERSE')}")
     print(f"  mode_after: {patched_cfg.get('mode')} | live: {patched_cfg.get('allow_live_orders')}")
     print(f"  delta_count: {len(delta)}")
+    print(f"  material_delta_count: {len(material_delta)}")
     print(f"  decision_file: {decision_file}")
     print(f"  frozen_delta_file: {delta_file}")
     return 0

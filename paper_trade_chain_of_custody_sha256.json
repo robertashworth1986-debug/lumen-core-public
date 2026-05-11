@@ -1,0 +1,25 @@
+{
+  "generated_utc": "2026-04-13T14:58:29.992597+00:00",
+  "files": [
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\paper_trade_ledger.jsonl",
+      "sha256": "cf6e1099e5970c8a486ee10ee1a7fb5466442c223af87622784954c8e1d8f80f"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\paper_trade_real_api_ledger.jsonl",
+      "sha256": "139e9d474db1867f113aa7b837349d9dbdcb10001a0cc108df5d48ea8fb718bf"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\paper_trade_state.json",
+      "sha256": "906a4faf0a29353bbb95f86ec3bc2d00b2ec0851db5e4dc228c04d335b926e0c"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\paper_trade_runtime.json",
+      "sha256": "650d834556f83c1febad8cc92ec8609af874fa5073fb70bb1a1edaa8bfa25ba6"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\investor_evidence_report.json",
+      "sha256": "a4fffa1ea05e8f9991405ea3bf62846abf0312cfb96bf3c79d367a795182d297"
+    }
+  ]
+}

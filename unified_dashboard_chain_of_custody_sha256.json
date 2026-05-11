@@ -1,0 +1,45 @@
+{
+  "generated_utc": "2026-04-14T23:24:26.278799+00:00",
+  "files": [
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\config\\live_source_registry.json",
+      "exists": true,
+      "sha256": "f8c68daf27d93dc2b97a3b5a5afc112e18bbe7b7e76a943e85fd4063e279b9da"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\config\\live_sources.json",
+      "exists": true,
+      "sha256": "e0fb2b39b03ac528c7ff38ad15dd87bfbf235408b4208b97c9f3d8849724ded9"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\config\\runtime_control.json",
+      "exists": true,
+      "sha256": "93fcb8e8219fc75d6d3196f4813b09cc24197c0d7ea51f673b0c23a5f86f3b93"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\rolling_performance.json",
+      "exists": true,
+      "sha256": "d140f3be821a363717b8a7c740930a61bfb13b355d7e198f6f9b149a759d6cf9"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\sector_value_matrix.json",
+      "exists": true,
+      "sha256": "0d40750cc3f041574dbddf79b1a14d2058604d660f9f09148844cc58bbdc00a7"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\source_truth_table.json",
+      "exists": true,
+      "sha256": "1ad7181f13f499d094ff463cd6fa64d5b110a2632de47fdbbad4efd1ba2bd4f5"
+    },
+    {
+      "path": "C:\\LumaTrader\\dashboard\\alpaca_paper_live_dashboard.html",
+      "exists": true,
+      "sha256": "d0e3d78c503bd8471e0ab726afe0df2a74a61fcd9ad5dbc11ecc0de117fcc316"
+    },
+    {
+      "path": "C:\\LumaTrader\\dashboard\\infra_institutional_live_dashboard.html",
+      "exists": true,
+      "sha256": "3a654d0b39cf263fe6bd536a95596c880e87c870336ec2012a958ab265a0c2ac"
+    }
+  ]
+}

@@ -48,9 +48,31 @@
       linear-gradient(155deg, #060b12 0%, #0a121d 100%);
   }
 
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0) 0px,
+        rgba(255,255,255,0) 2px,
+        rgba(86,215,203,0.02) 3px,
+        rgba(255,255,255,0) 6px
+      ),
+      linear-gradient(110deg, rgba(223,187,107,0.06) 0%, rgba(86,215,203,0.03) 45%, rgba(158,123,220,0.06) 100%);
+    mix-blend-mode: screen;
+    opacity: 0.55;
+  }
+
   #luma-spiral-canvas {
     position: fixed; inset: 0; width: 100%; height: 100%;
     opacity: 0.07; pointer-events: none; z-index: 0;
+  }
+
+  #luma-holo-wave-canvas {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    opacity: 0.16; pointer-events: none; z-index: 0;
+    mix-blend-mode: screen;
   }
 
   .luma-particles {
@@ -157,7 +179,18 @@
     background: var(--panel);
     border: 1px solid var(--line); border-radius: 16px; padding: 18px;
     backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     transition: border-color 0.25s, box-shadow 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .luma-card::before {
+    content: '';
+    position: absolute;
+    inset: auto -35% -70% -35%;
+    height: 76%;
+    background: radial-gradient(closest-side, rgba(86,215,203,0.15), transparent 76%);
+    pointer-events: none;
   }
   .luma-card:hover { border-color: rgba(86,215,203,0.3); animation: lumaGlow 2.5s ease-in-out infinite; }
   .luma-card.gold  { border-color: rgba(223,187,107,0.22); }
@@ -393,6 +426,54 @@
     window.addEventListener('resize', draw);
   }
 
+  function mountHoloWave() {
+    if (document.getElementById('luma-holo-wave-canvas')) { return; }
+    var canvas = document.createElement('canvas');
+    canvas.id = 'luma-holo-wave-canvas';
+    document.body.insertBefore(canvas, document.body.firstChild);
+    var ctx = canvas.getContext('2d');
+    var raf = null;
+
+    function drawFrame(ts) {
+      if (!ctx) { return; }
+      var w = canvas.width = window.innerWidth;
+      var h = canvas.height = window.innerHeight;
+      var t = (ts || 0) * 0.001;
+
+      ctx.clearRect(0, 0, w, h);
+
+      var grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0.0, 'rgba(86,215,203,0.16)');
+      grad.addColorStop(0.5, 'rgba(223,187,107,0.12)');
+      grad.addColorStop(1.0, 'rgba(158,123,220,0.15)');
+
+      for (var i = 0; i < 5; i++) {
+        var amp = (14 + i * 8);
+        var yBase = h * (0.22 + i * 0.14);
+        var speed = 0.45 + i * 0.12;
+        ctx.beginPath();
+        for (var x = 0; x <= w; x += 8) {
+          var y = yBase + Math.sin((x * 0.0065) + (t * speed)) * amp;
+          if (x === 0) { ctx.moveTo(x, y); }
+          else { ctx.lineTo(x, y); }
+        }
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.0 + (i * 0.18);
+        ctx.globalAlpha = 0.12 + i * 0.025;
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = 1;
+      raf = requestAnimationFrame(drawFrame);
+    }
+
+    raf = requestAnimationFrame(drawFrame);
+
+    window.addEventListener('beforeunload', function () {
+      if (raf) { cancelAnimationFrame(raf); }
+    });
+  }
+
   // ── Particle Field ────────────────────────────────────────────────────────
   function mountParticles(count) {
     count = count || 24;
@@ -418,7 +499,17 @@
   }
 
   // ── Gateway Bridge ────────────────────────────────────────────────────────
-  var GW = 'http://localhost:7700';
+  var GW = (function () {
+    var override = (window.LUMA_API_BASE || '').trim();
+    if (override) { return override.replace(/\/$/, ''); }
+    if (location.protocol === 'http:' || location.protocol === 'https:') {
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        return 'http://127.0.0.1:8787';
+      }
+      return location.origin || 'https://lumen-core.ai';
+    }
+    return 'http://127.0.0.1:8787';
+  })();
   var _ws = null;
   var _wsHandlers = [];
   var _wsConnected = false;
@@ -434,7 +525,8 @@
   function gwWsConnect() {
     if (_wsConnected) { return; }
     try {
-      _ws = new WebSocket('ws://localhost:7700/ws');
+      var wsBase = GW.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:');
+      _ws = new WebSocket(wsBase + '/ws/live');
       _ws.onopen  = function () { _wsConnected = true; _notifyWs('open', null); _setNrDot(true); };
       _ws.onmessage = function (e) {
         var d; try { d = JSON.parse(e.data); } catch (_) { d = e.data; }
@@ -468,10 +560,24 @@
 
   async function gwExplain(prompt, mode, targetEl) {
     if (targetEl) { targetEl.textContent = '⟳ Asking Luma…'; }
+    var trading = await gwTradingSummary();
+    var ctx = '';
+    if (trading && trading.execution) {
+      ctx = [
+        'Live unified trading context:',
+        'mode=' + (trading.mode || 'paper'),
+        'open_positions=' + (trading.execution.open_positions || 0),
+        'total_trades=' + (trading.execution.total_trades || 0),
+        'bankroll=' + (trading.execution.current_bankroll || 0),
+        'win_rate_pct=' + (trading.execution.win_rate_pct || 0),
+        'moonshots=' + ((trading.alpha && trading.alpha.moonshots) || 0)
+      ].join(' ');
+    }
+    var finalPrompt = (ctx ? (ctx + '\n\n') : '') + (prompt || 'Give a concise live systems summary.');
     var r = await fetch(GW + '/api/guide/respond', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: prompt, mode: mode || 'concierge' })
+      body: JSON.stringify({ prompt: finalPrompt, mode: mode || 'concierge' })
     });
     if (!r.ok) {
       if (targetEl) { targetEl.textContent = '⚠ Gateway offline'; }
@@ -483,6 +589,8 @@
   }
 
   async function gwUnityEdge() { return gwFetch('/api/unity/edge'); }
+  async function gwUnityUnifiedEdge() { return gwFetch('/api/unity/unified-edge'); }
+  async function gwTradingSummary() { return gwFetch('/api/trading/summary'); }
   async function gwSnapshot()  { return gwFetch('/api/snapshot'); }
 
   // ── Stat helpers ─────────────────────────────────────────────────────────
@@ -693,14 +801,20 @@
     var investor = data[5] || {};
     var eventsText = data[6] || '';
     var snap = data[7] || {};
+    var snapEdge = (snap && snap.edge) ? snap.edge : {};
+    var snapPackages = (snap && snap.packages) ? snap.packages : {};
+    var snapEvidence = (snap && snap.evidence) ? snap.evidence : {};
+    var snapEvidenceDerived = (snapEvidence && snapEvidence.derived) ? snapEvidence.derived : {};
 
     var sharpe = _firstNum(
+      _pickPath(snapEdge, ['top_test_sharpe']),
       _pickPath(cross, ['best_strategy_sharpe', 'top_sharpe', 'metrics.sharpe', 'optimization.best_sharpe']),
       _pickPath(investor, ['performance.sharpe', 'sharpe'])
     );
     if (sharpe === null) { sharpe = 4.2772; }
 
     var improvement = _firstNum(
+      _pickPath(snapEvidenceDerived, ['stacker_router_delta_pct']),
       _pickPath(cross, ['improvement_pct', 'optimization_improvement_pct', 'summary.improvement_pct']),
       _pickPath(investor, ['performance.improvement_pct'])
     );
@@ -714,7 +828,7 @@
 
     var txid = _lastTxidFromEventsText(eventsText) || _pickPath(investor, ['proof.last_txid', 'last_txid']) || 'awaiting';
 
-    var walkForward = _pickPath(seed, ['status', 'validation_status', 'summary.status']) || (_pickPath(seed, ['walk_forward_ok', 'passed']) ? 'PASS' : 'IN REVIEW');
+    var walkForward = _pickPath(snapEdge, ['verdict']) || _pickPath(seed, ['status', 'validation_status', 'summary.status']) || (_pickPath(seed, ['walk_forward_ok', 'passed']) ? 'PASS' : 'IN REVIEW');
 
     var hbUtc = _pickPath(hb, ['generated_utc', 'timestamp', 'heartbeat_utc']) || _pickPath(fed, ['generated_utc', 'timestamp']) || 'n/a';
     var chainCount = _firstNum(
@@ -725,13 +839,35 @@
     var reliability = 'heartbeat ' + String(hbUtc).slice(0, 19).replace('T', ' ');
     var chainMsg = chainCount !== null ? (String(chainCount) + ' hashes verified') : 'hash verification ready';
 
+    var evidenceRunUtc = _pickPath(snapEvidence, ['run_utc']);
+    if (evidenceRunUtc) {
+      reliability = 'evidence run ' + String(evidenceRunUtc) + ' | ' + reliability;
+    }
+
+    var evidenceWarnings = _pickPath(snapEvidence, ['warnings']);
+    if (Array.isArray(evidenceWarnings) && evidenceWarnings.length > 0) {
+      chainMsg = chainMsg + ' | ' + String(evidenceWarnings[0]);
+    }
+
+    var packageUsage = _firstNum(_pickPath(snapPackages, ['usage_pct']), null);
+    var routerWinRate = _firstNum(_pickPath(snapEvidenceDerived, ['router_win_rate_pct']), null);
+    var stackerWinRate = _firstNum(_pickPath(snapEvidenceDerived, ['stacker_router_win_rate_pct']), null);
+
+    var opportunity = packageUsage !== null ? (Number(packageUsage).toFixed(1) + '% pkg usage') : ('$' + Number(rollingHourly).toLocaleString() + '/hr');
+    if (routerWinRate !== null && stackerWinRate !== null) {
+      opportunity = 'router ' + Number(routerWinRate).toFixed(1) + '% | stacker ' + Number(stackerWinRate).toFixed(1) + '%';
+    }
+
+    var improvementNum = Number(improvement);
+    var improvementSign = improvementNum >= 0 ? '+' : '';
+
     return {
       txid: String(txid),
       sharpe: Number(sharpe).toFixed(3),
-      improvement: Number(improvement).toFixed(1) + '%',
+      improvement: improvementSign + improvementNum.toFixed(1) + '%',
       walkForward: String(walkForward),
       reliability: reliability,
-      opportunity: '$' + Number(rollingHourly).toLocaleString() + '/hr',
+      opportunity: opportunity,
       chain: chainMsg,
       closedTrades: (snap && snap.paper && snap.paper.closed_trades !== undefined) ? String(snap.paper.closed_trades) : 'n/a'
     };
@@ -781,6 +917,7 @@
     opts = opts || {};
     injectCSS();
     if (opts.spiral !== false)    { mountSpiral(); }
+    if (opts.holoWave !== false)  { mountHoloWave(); }
     if (opts.particles !== false) { mountParticles(opts.particleCount || 22); }
     if (opts.ws !== false)        { gwWsConnect(); }
     refreshAll();
@@ -791,6 +928,7 @@
     mount: mount,
     injectCSS: injectCSS,
     mountSpiral: mountSpiral,
+    mountHoloWave: mountHoloWave,
     mountParticles: mountParticles,
     mountExplainer: mountExplainer,
     mountHelmier: mountHelmier,
@@ -798,8 +936,10 @@
     gwWsConnect: gwWsConnect,
     gwOnWs: gwOnWs,
     gwSnapshot: gwSnapshot,
+    gwTradingSummary: gwTradingSummary,
     gwExplain: gwExplain,
     gwUnityEdge: gwUnityEdge,
+    gwUnityUnifiedEdge: gwUnityUnifiedEdge,
     gwNodeRedIngest: gwNodeRedIngest,
     refreshAll: refreshAll,
     refreshHelmier: refreshHelmier,

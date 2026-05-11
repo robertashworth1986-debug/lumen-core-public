@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
-from urllib import error, request
+from urllib import error, parse, request
 
 ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
 CODE_ROOT = ROOT / "code"
@@ -123,6 +123,18 @@ def _check_endpoints() -> List[Dict[str, Any]]:
     return rows
 
 
+def _endpoint_port(url: str) -> int:
+    try:
+        parsed = parse.urlparse(url)
+        if parsed.port:
+            return int(parsed.port)
+        if parsed.scheme.lower() == "https":
+            return 443
+        return 80
+    except Exception:
+        return -1
+
+
 def _heartbeat_status() -> Dict[str, Dict[str, Any]]:
     out: Dict[str, Dict[str, Any]] = {}
     now = datetime.now(timezone.utc)
@@ -173,15 +185,56 @@ def _orchestrator_drift_signals() -> Dict[str, Any]:
         return result
 
     text = ORCHESTRATOR.read_text(encoding="utf-8", errors="ignore")
-    result["top_level_print_count"] = text.count("print(")
-    result["sys_path_hack_count"] = text.count("sys.path.insert") + text.count("sys.path.append")
-    result["sleep_calls"] = text.count("time.sleep(")
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return result
+
+    def _call_is_print(node: ast.Call) -> bool:
+        return isinstance(node.func, ast.Name) and node.func.id == "print"
+
+    def _call_is_sys_path_hack(node: ast.Call) -> bool:
+        func = node.func
+        if not isinstance(func, ast.Attribute):
+            return False
+        if func.attr not in {"insert", "append"}:
+            return False
+        value = func.value
+        return (
+            isinstance(value, ast.Attribute)
+            and value.attr == "path"
+            and isinstance(value.value, ast.Name)
+            and value.value.id == "sys"
+        )
+
+    def _call_is_time_sleep(node: ast.Call) -> bool:
+        func = node.func
+        return (
+            isinstance(func, ast.Attribute)
+            and func.attr == "sleep"
+            and isinstance(func.value, ast.Name)
+            and func.value.id == "time"
+        )
+
+    for stmt in tree.body:
+        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        for node in ast.walk(stmt):
+            if not isinstance(node, ast.Call):
+                continue
+            if _call_is_print(node):
+                result["top_level_print_count"] += 1
+            if _call_is_sys_path_hack(node):
+                result["sys_path_hack_count"] += 1
+            if _call_is_time_sleep(node):
+                result["sleep_calls"] += 1
     return result
 
 
 def _build_findings(
     syntax_errors: List[Dict[str, Any]],
     endpoints: List[Dict[str, Any]],
+    ports: Dict[str, bool],
     heartbeats: Dict[str, Dict[str, Any]],
     runtime_cfg: Dict[str, Any],
     drift: Dict[str, Any],
@@ -201,6 +254,21 @@ def _build_findings(
 
     for ep in endpoints:
         if not ep.get("ok"):
+            ep_port = _endpoint_port(str(ep.get("url", "")))
+            port_up = ports.get(str(ep_port), False)
+            if not port_up:
+                findings.append(
+                    Finding(
+                        severity="medium",
+                        area="api",
+                        message=(
+                            f"Endpoint offline: local service on port {ep_port} is not listening "
+                            f"({ep['url']})"
+                        ),
+                        path=ep["url"],
+                    )
+                )
+                continue
             findings.append(
                 Finding(
                     severity="high",
@@ -219,15 +287,20 @@ def _build_findings(
         "live_engine_heartbeat",
         "investor_wallboard_heartbeat",
     ]
+    runtime_online = any(bool(v) for v in ports.values())
 
     for key in stale_critical:
         row = heartbeats.get(key, {})
         if not row.get("exists") or not row.get("fresh_120s"):
             findings.append(
                 Finding(
-                    severity="high",
+                    severity="high" if runtime_online else "medium",
                     area="heartbeat",
-                    message=f"Critical heartbeat stale/missing: {key}",
+                    message=(
+                        f"Critical heartbeat stale/missing: {key}"
+                        if runtime_online
+                        else f"Heartbeat stale while runtime appears offline: {key}"
+                    ),
                     path=row.get("path", ""),
                 )
             )
@@ -237,9 +310,13 @@ def _build_findings(
         if row.get("exists") and not row.get("fresh_600s"):
             findings.append(
                 Finding(
-                    severity="medium",
+                    severity="medium" if runtime_online else "low",
                     area="heartbeat",
-                    message=f"Secondary heartbeat stale: {key}",
+                    message=(
+                        f"Secondary heartbeat stale: {key}"
+                        if runtime_online
+                        else f"Heartbeat stale while runtime appears offline: {key}"
+                    ),
                     path=row.get("path", ""),
                 )
             )
@@ -257,7 +334,7 @@ def _build_findings(
                 )
             )
 
-    if drift.get("sys_path_hack_count", 0) > 0 or drift.get("sleep_calls", 0) > 0:
+    if drift.get("sleep_calls", 0) > 0:
         findings.append(
             Finding(
                 severity="medium",
@@ -266,6 +343,18 @@ def _build_findings(
                     "Orchestrator contains import-time side-effect signals "
                     f"(sys.path hacks={drift.get('sys_path_hack_count', 0)}, "
                     f"sleep calls={drift.get('sleep_calls', 0)})."
+                ),
+                path=str(ORCHESTRATOR),
+            )
+        )
+    elif drift.get("sys_path_hack_count", 0) > 0:
+        findings.append(
+            Finding(
+                severity="low",
+                area="drift",
+                message=(
+                    "Orchestrator mutates sys.path at import-time "
+                    f"(sys.path hacks={drift.get('sys_path_hack_count', 0)})."
                 ),
                 path=str(ORCHESTRATOR),
             )
@@ -338,12 +427,16 @@ def run_audit() -> Dict[str, Any]:
 
     syntax_errors = _scan_syntax([CODE_ROOT, LAMASCOUT_ROOT])
     endpoints = _check_endpoints()
+    ports = {
+        "7700": _check_port(7700),
+        "5016": _check_port(5016),
+    }
     heartbeats = _heartbeat_status()
     runtime_cfg = _load_runtime()
     module_triage = _module_triage()
     drift = _orchestrator_drift_signals()
 
-    findings = _build_findings(syntax_errors, endpoints, heartbeats, runtime_cfg, drift)
+    findings = _build_findings(syntax_errors, endpoints, ports, heartbeats, runtime_cfg, drift)
     findings_sorted = sorted(findings, key=lambda x: {"high": 0, "medium": 1, "low": 2}.get(x.severity, 9))
 
     report: Dict[str, Any] = {
@@ -355,10 +448,7 @@ def run_audit() -> Dict[str, Any]:
         },
         "syntax_errors": syntax_errors,
         "runtime": {
-            "ports": {
-                "7700": _check_port(7700),
-                "5016": _check_port(5016),
-            },
+            "ports": ports,
             "endpoints": endpoints,
             "heartbeats": heartbeats,
             "runtime_control": {

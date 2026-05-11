@@ -30,8 +30,13 @@ import pandas as pd
 import requests
 
 # Ensure local code paths are on sys.path before local imports
-sys.path.insert(0, r'C:\LumaTrader\INSTITUTIONAL_STACK_V2\code')
-sys.path.insert(0, r'C:\LumaTrader\INSTITUTIONAL_STACK_V2\code\execution')
+_BOOTSTRAP_PATHS = [
+    r'C:\LumaTrader\INSTITUTIONAL_STACK_V2\code',
+    r'C:\LumaTrader\INSTITUTIONAL_STACK_V2\code\execution',
+]
+for _bootstrap_path in _BOOTSTRAP_PATHS:
+    if _bootstrap_path not in sys.path:
+        sys.path[:0] = [_bootstrap_path]
 
 try:
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
@@ -46,6 +51,7 @@ from liquidity_guard import LiquidityGuard, LiquiditySnapshot
 from risk_kernel import RiskKernel, RiskState
 from rl_policy import RLPolicy
 from sector_rotation import SectorRotation
+from runtime_live_lock import runtime_writer_hint
 
 try:
     from execution.harmonic_signal_connector import HarmonicSignalConnector
@@ -83,12 +89,78 @@ X1000_CONTROL_PLANE_FILE = ROOT / 'code' / 'x1000_control_plane.py'
 LIVE_MARKET_STREAM_STATUS_FILE = OUT / 'live_market_stream_status.json'
 LIVE_RESELECTION_STATUS_FILE = OUT / 'live_reselection_status.json'
 LIVE_ENGINE_HEARTBEAT_FILE = OUT / 'live_engine_heartbeat.json'
+RUNTIME_DRIFT_ALERT_FILE = OUT / 'runtime_drift_alert.json'
+RUNTIME_DRIFT_OPERATOR_ALERT_FILE = OUT / 'runtime_drift_operator_alert.json'
 EXECUTION_LOCK_FILE = OUT / '.execution_lock'
+MAX_FALLBACK_BUYING_POWER_USD = 1_000_000_000.0
+
+KNOWN_RUNTIME_WRITER_PATHS = [
+    'code/FULL_TRUTH_ORCHESTRATOR.py',
+    'code/DISCOVER_AND_ROUTE_ALL_LIVE_KEYS.py',
+    'code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py',
+    'code/BUILD_ADAPTIVE_UNIVERSE_FROM_LIVE_KEYS.py',
+]
 
 # Rolling capital paths
 ROLLING_CAPITAL_BEST_MULTI_PATH = Path(r"C:/LumaTrader/rolling_capital/rolling_capital_best_multi.json")
 ROLLING_CAPITAL_HEATMAP_PATH = Path(r"C:/LumaTrader/rolling_capital/rolling_capital_heatmap.json")
 ROLLING_CAPITAL_BEST_PATH = Path(r"C:/LumaTrader/rolling_capital/rolling_capital_best.json")
+
+
+def get_rolling_capital_best_multi() -> tuple[Optional[str], Optional[str], Dict[str, Any]]:
+    if not ROLLING_CAPITAL_BEST_MULTI_PATH.exists():
+        return None, None, {}
+    try:
+        payload = json.loads(ROLLING_CAPITAL_BEST_MULTI_PATH.read_text(encoding='utf-8'))
+    except Exception:
+        return None, None, {}
+    if not isinstance(payload, dict):
+        return None, None, {}
+    symbol = payload.get('symbol')
+    family = payload.get('family')
+    metrics = payload.get('metrics')
+    return (
+        str(symbol).strip() if symbol else None,
+        str(family).strip() if family else None,
+        metrics if isinstance(metrics, dict) else {},
+    )
+
+
+def _normalize_best_multi_payload(value: Any) -> tuple[Optional[str], Optional[str], Dict[str, Any]]:
+    """Normalize legacy/new rolling-capital payload shapes into a stable 3-tuple."""
+    symbol: Optional[str] = None
+    family: Optional[str] = None
+    metrics: Dict[str, Any] = {}
+
+    if isinstance(value, dict):
+        symbol = value.get('symbol')
+        family = value.get('family')
+        raw_metrics = value.get('metrics')
+        if isinstance(raw_metrics, dict):
+            metrics = raw_metrics
+    elif isinstance(value, (tuple, list)):
+        if len(value) >= 1:
+            symbol = value[0]
+        if len(value) >= 2:
+            family = value[1]
+        if len(value) >= 3 and isinstance(value[2], dict):
+            metrics = value[2]
+
+    out_symbol = str(symbol).strip() if symbol else None
+    out_family = str(family).strip() if family else None
+    return out_symbol, out_family, metrics
+
+
+def get_rolling_capital_heatmap() -> List[Dict[str, Any]]:
+    if not ROLLING_CAPITAL_HEATMAP_PATH.exists():
+        return []
+    try:
+        payload = json.loads(ROLLING_CAPITAL_HEATMAP_PATH.read_text(encoding='utf-8'))
+    except Exception:
+        return []
+    if not isinstance(payload, list):
+        return []
+    return [row for row in payload if isinstance(row, dict)]
 
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -355,6 +427,114 @@ def _persist_live_engine_heartbeat(
     if extra:
         heartbeat['extra'] = dict(extra)
     _atomic_write_json(LIVE_ENGINE_HEARTBEAT_FILE, heartbeat, indent=2)
+
+
+def _persist_runtime_drift_alert(
+    loop_count: int,
+    runtime_cfg: Dict[str, Any],
+    changed_runtime: Dict[str, Any],
+    runtime_profile_sync_events_window: deque,
+    now_sync_ts: float,
+    runtime_writer_meta: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    window_seconds = float(runtime_cfg.get('runtime_drift_alert_window_sec', 900.0) or 900.0)
+    window_seconds = max(60.0, min(3600.0, window_seconds))
+    threshold = int(runtime_cfg.get('runtime_drift_alert_threshold', 6) or 6)
+    threshold = max(1, min(200, threshold))
+
+    writer_meta = dict(runtime_writer_meta or {})
+    likely_culprit_writer = str(
+        writer_meta.get('last_runtime_writer', runtime_cfg.get('_last_runtime_writer', '')) or ''
+    ).strip()
+    last_runtime_write_utc = str(
+        writer_meta.get('last_runtime_write_utc', runtime_cfg.get('_last_runtime_write_utc', '')) or ''
+    ).strip()
+    last_runtime_write_reason = str(
+        writer_meta.get('last_runtime_write_reason', runtime_cfg.get('_last_runtime_write_reason', '')) or ''
+    ).strip()
+    strict_live_locked_at_write = bool(
+        writer_meta.get('strict_live_locked_at_write', runtime_cfg.get('_strict_live_locked_at_write', False))
+    )
+
+    while runtime_profile_sync_events_window and (now_sync_ts - float(runtime_profile_sync_events_window[0])) > window_seconds:
+        runtime_profile_sync_events_window.popleft()
+
+    previous_total = 0
+    try:
+        if RUNTIME_DRIFT_ALERT_FILE.exists():
+            previous = json.loads(RUNTIME_DRIFT_ALERT_FILE.read_text(encoding='utf-8'))
+            if isinstance(previous, dict):
+                previous_total = int(previous.get('total_events', 0) or 0)
+    except Exception:
+        previous_total = 0
+
+    payload = {
+        'timestamp_utc': datetime.now(timezone.utc).isoformat(),
+        'loop': int(loop_count),
+        'window_seconds': float(window_seconds),
+        'window_events': int(len(runtime_profile_sync_events_window)),
+        'threshold': int(threshold),
+        'excessive': bool(len(runtime_profile_sync_events_window) >= threshold),
+        'total_events': int(previous_total + 1),
+        'runtime_mode': str(runtime_cfg.get('mode', 'paper')).lower(),
+        'live_orders_armed': bool(runtime_cfg.get('allow_live_orders', False)),
+        'paper_enabled': bool(runtime_cfg.get('paper_enabled', True)),
+        'changed_runtime': dict(changed_runtime or {}),
+        'likely_culprit_writer': likely_culprit_writer,
+        'last_runtime_write_utc': last_runtime_write_utc,
+        'last_runtime_write_reason': last_runtime_write_reason,
+        'strict_live_locked_at_write': strict_live_locked_at_write,
+        'culprit_candidates': list(KNOWN_RUNTIME_WRITER_PATHS),
+    }
+    _atomic_write_json(RUNTIME_DRIFT_ALERT_FILE, payload, indent=2)
+    return payload
+
+
+def _persist_runtime_drift_operator_alert(loop_count: int, drift_alert: Dict[str, Any]) -> Dict[str, Any]:
+    likely_culprit_writer = str(drift_alert.get('likely_culprit_writer', '') or '').strip()
+    if not likely_culprit_writer:
+        likely_culprit_writer = KNOWN_RUNTIME_WRITER_PATHS[0]
+
+    payload = {
+        'timestamp_utc': datetime.now(timezone.utc).isoformat(),
+        'loop': int(loop_count),
+        'severity': 'high',
+        'alert_type': 'runtime_live_profile_drift_excessive',
+        'window_events': int(drift_alert.get('window_events', 0) or 0),
+        'window_seconds': float(drift_alert.get('window_seconds', 0.0) or 0.0),
+        'threshold': int(drift_alert.get('threshold', 0) or 0),
+        'likely_culprit_writer': likely_culprit_writer,
+        'last_runtime_write_utc': str(drift_alert.get('last_runtime_write_utc', '') or ''),
+        'last_runtime_write_reason': str(drift_alert.get('last_runtime_write_reason', '') or ''),
+        'strict_live_locked_at_write': bool(drift_alert.get('strict_live_locked_at_write', False)),
+        'changed_runtime': dict(drift_alert.get('changed_runtime', {}) or {}),
+        'recommended_actions': [
+            'inspect likely_culprit_writer and disable paper-mode overrides',
+            'verify config/runtime_control.json remains {mode: live, allow_live_orders: true, paper_enabled: false}',
+            'check out/execution/execution_events.jsonl for runtime_live_profile_forced frequency',
+        ],
+    }
+
+    write_ok = False
+    try:
+        _atomic_write_json(RUNTIME_DRIFT_OPERATOR_ALERT_FILE, payload, indent=2)
+        write_ok = True
+    except Exception as exc:
+        payload['write_error'] = str(exc)[:180]
+
+    # Last-resort fallback so operator visibility never depends on one write path.
+    if not write_ok:
+        try:
+            RUNTIME_DRIFT_OPERATOR_ALERT_FILE.parent.mkdir(parents=True, exist_ok=True)
+            with open(RUNTIME_DRIFT_OPERATOR_ALERT_FILE, 'w', encoding='utf-8') as f:
+                json.dump(payload, f, indent=2)
+            write_ok = True
+        except Exception as exc:
+            payload['fallback_write_error'] = str(exc)[:180]
+
+    payload['file_exists'] = bool(RUNTIME_DRIFT_OPERATOR_ALERT_FILE.exists())
+    payload['write_ok'] = bool(write_ok)
+    return payload
 
 
 def _load_payout_intents() -> List[Dict[str, Any]]:
@@ -720,8 +900,9 @@ def _validate_runtime_cfg(raw_cfg: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     cfg['strict_live_only'] = _as_bool('strict_live_only', False)
     cfg['futures_mode'] = _as_bool('futures_mode', False)
     cfg['capital_aware_ranking_enabled'] = _as_bool('capital_aware_ranking_enabled', True)
-    cfg['x1000_auto_enabled'] = _as_bool('x1000_auto_enabled', True)
+    cfg['x1000_auto_enabled'] = _as_bool('x1000_auto_enabled', False)
     cfg['x1000_auto_apply'] = _as_bool('x1000_auto_apply', False)
+    cfg['force_live_mode'] = _as_bool('force_live_mode', False)
     cfg['shadow_intelligence_enabled'] = _as_bool('shadow_intelligence_enabled', True)
     cfg['shadow_river_enabled'] = _as_bool('shadow_river_enabled', True)
     cfg['shadow_arch_enabled'] = _as_bool('shadow_arch_enabled', True)
@@ -733,6 +914,7 @@ def _validate_runtime_cfg(raw_cfg: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     cfg['max_position_usd'] = _as_float('max_position_usd', 50.0, 0.1, 10_000_000.0)
     cfg['min_position_usd'] = _as_float('min_position_usd', 5.0, 0.01, 10_000_000.0)
     cfg['reserve_usd'] = _as_float('reserve_usd', 15.0, 0.0, 10_000_000.0)
+    cfg['fallback_buying_power_usd'] = _as_float('fallback_buying_power_usd', 0.0, 0.0, MAX_FALLBACK_BUYING_POWER_USD)
     cfg['base_risk_fraction'] = _as_float('base_risk_fraction', 0.20, 0.01, 1.0)
     cfg['leverage_multiplier'] = _as_float('leverage_multiplier', 1.0, 1.0, 5.0)
     cfg['micro_balance_threshold_usd'] = _as_float('micro_balance_threshold_usd', 25.0, 0.0, 10000.0)
@@ -915,6 +1097,38 @@ def _validate_runtime_cfg(raw_cfg: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     return cfg
 
 
+def _force_live_mode(raw_cfg: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """Optionally force live mode when explicitly armed by config.
+
+    By default this function preserves operator/runtime mode and only enforces
+    safety rails (kill switch disarms live orders).
+    """
+    cfg = dict(raw_cfg or {})
+    force_live = bool(cfg.get('force_live_mode', False))
+    kill_switch = bool(cfg.get('kill_switch', False))
+
+    if not force_live:
+        mode = str(cfg.get('mode', 'paper') or 'paper').strip().lower()
+        cfg['mode'] = mode if mode in ('paper', 'live') else 'paper'
+        if cfg['mode'] != 'live':
+            cfg['allow_live_orders'] = False
+            cfg['paper_enabled'] = bool(cfg.get('paper_enabled', True))
+        if kill_switch:
+            cfg['allow_live_orders'] = False
+        return cfg
+
+    cfg['mode'] = 'live'
+    cfg['paper_enabled'] = False
+
+    cfg['allow_live_orders'] = False if kill_switch else True
+
+    alpaca_mode = str(cfg.get('alpaca_authorized_mode', 'paper') or 'paper').strip().lower()
+    if alpaca_mode != 'live':
+        cfg['alpaca_live_trading_enabled'] = False
+
+    return cfg
+
+
 # Structured Event Logging System
 class StructuredEventLogger:
     """Emit structured JSON events for full operational visibility + audit trail."""
@@ -1077,22 +1291,19 @@ class ShadowIntelligence:
 
 
 api_keys = load_api_keys()
-import sys
-# Ensure the root directory is in sys.path for symbol_registry_auto import
-ROOT_PATH = r'C:\LumaTrader\INSTITUTIONAL_STACK_V2'
-if ROOT_PATH not in sys.path:
-    sys.path.insert(0, ROOT_PATH)
 try:
-    from symbol_registry_auto import SYMBOL_REGISTRY
-except ImportError:
-    # Fallback: try absolute path import
     import importlib.util
-    import os
-    registry_path = os.path.join(ROOT_PATH, 'symbol_registry_auto.py')
+
+    registry_path = ROOT / 'symbol_registry_auto.py'
     spec = importlib.util.spec_from_file_location('symbol_registry_auto', registry_path)
-    symbol_registry_auto = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(symbol_registry_auto)
-    SYMBOL_REGISTRY = symbol_registry_auto.SYMBOL_REGISTRY
+    if spec and spec.loader and registry_path.exists():
+        symbol_registry_auto = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(symbol_registry_auto)
+        SYMBOL_REGISTRY = getattr(symbol_registry_auto, 'SYMBOL_REGISTRY', {})
+    else:
+        SYMBOL_REGISTRY = {}
+except Exception:
+    SYMBOL_REGISTRY = {}
 class UniversalExchangeRouter:
     """Routes orders to correct exchange based on symbol"""
     ALPACA_SUPPORTED_SYMBOLS = {'BTC', 'ETH', 'SOL', 'XRP', 'DOGE'}
@@ -1890,10 +2101,6 @@ runtime_cfg = _validate_runtime_cfg(runtime_guard.load())
 runtime_cfg = _force_live_mode(runtime_cfg)
 print(f"[FORCE] Runtime Mode: {runtime_cfg['mode'].upper()}")
 print(f"[FORCE] Live Orders Armed: {runtime_cfg['allow_live_orders']}")
-
-runtime_cfg = _force_live_mode(runtime_cfg)
-print(f"[FORCE] Runtime Mode: {runtime_cfg['mode'].upper()}")
-print(f"[FORCE] Live Orders Armed: {runtime_cfg['allow_live_orders']}")
 print(f"[DEBUG-REGISTRY-ORCH] SYMBOL_REGISTRY count: {len(SYMBOL_REGISTRY)}")
 print(f"[DEBUG-REGISTRY-ORCH] SYMBOL_REGISTRY keys: {list(SYMBOL_REGISTRY.keys())[:50]} ... (truncated)")
 sys.stderr.flush()
@@ -1912,45 +2119,55 @@ sector_rotation = SectorRotation()
 
 # === AUTO-DETECT AND WIRE ALL ENGINES FOR META ENGINE ===
 import importlib
-import glob
 from bounded_infinity import MetaEngine
 
 def discover_engines():
-    engines = {}
-    # Always include core engines if present
-    try:
-        from signal_gate import EvolutionarySignalGate
-        engines['signal_gate'] = signal_gate
-    except Exception:
-        pass
-    try:
-        from portfolio_brain import PortfolioBrain
-        engines['portfolio_brain'] = portfolio
-    except Exception:
-        pass
-    try:
-        from liquidity_guard import LiquidityGuard
-        engines['liquidity_guard'] = liquidity_guard
-    except Exception:
-        pass
-    try:
-        from risk_kernel import RiskKernel
-        engines['risk_kernel'] = risk_kernel
-    except Exception:
-        pass
-    # Dynamically import any engine class in code/ ending with Engine
-    engine_files = glob.glob(str(ROOT / 'code' / '*engine.py'))
-    for ef in engine_files:
-        mod_name = Path(ef).stem
+    engines: Dict[str, Any] = {}
+
+    # Wire known in-memory engines only. Wildcard importing *engine.py modules is
+    # unsafe here because several files are script-style and execute side effects
+    # at import time (including process launches).
+    base_engines = {
+        'signal_gate': signal_gate,
+        'liquidity_guard': liquidity_guard,
+        'risk_kernel': risk_kernel,
+        'rl_policy': rl_policy,
+        'sector_rotation': sector_rotation,
+        'harmonic_connector': harmonic_connector,
+    }
+    for engine_name, engine_obj in base_engines.items():
+        if engine_obj is not None:
+            engines[engine_name] = engine_obj
+
+    # Optional dynamic imports are explicit-only and disabled by default.
+    if not bool(runtime_cfg.get('meta_engine_enable_dynamic_imports', False)):
+        return engines
+
+    dynamic_modules = runtime_cfg.get('meta_engine_modules', [])
+    if not isinstance(dynamic_modules, list):
+        return engines
+
+    for module_name_raw in dynamic_modules:
+        module_name = str(module_name_raw or '').strip()
+        if not module_name or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', module_name):
+            continue
         try:
-            mod = importlib.import_module(mod_name)
-            for attr in dir(mod):
-                if attr.lower().endswith('engine'):
-                    inst = getattr(mod, attr, None)
-                    if inst:
-                        engines[attr.lower()] = inst
+            mod = importlib.import_module(module_name)
         except Exception:
             continue
+        for attr in dir(mod):
+            if not attr.lower().endswith('engine'):
+                continue
+            candidate = getattr(mod, attr, None)
+            if candidate is None:
+                continue
+            if inspect.isclass(candidate):
+                try:
+                    candidate = candidate()
+                except Exception:
+                    continue
+            engines[f'{module_name}.{attr.lower()}'] = candidate
+
     return engines
 
 # Instantiate MetaEngine with all discovered engines
@@ -1966,7 +2183,7 @@ def cross_exchange_capital_rolling(router, runtime_cfg):
         }
         threshold = float(runtime_cfg.get('cross_exchange_roll_threshold_usd', 100.0))
         best_multi = get_rolling_capital_best_multi()
-        best_symbol, best_family, best_metrics = best_multi if best_multi else (None, None, {})
+        best_symbol, best_family, best_metrics = _normalize_best_multi_payload(best_multi)
         best_exchange = None
         if best_symbol:
             best_exchange = router.get_route_exchange(best_symbol)
@@ -2100,10 +2317,23 @@ def _resolve_starting_capital_usd(runtime_cfg: Dict, router: UniversalExchangeRo
     if usd_balance > 0:
         return usd_balance
 
-    fallback = float(runtime_cfg.get('fallback_buying_power_usd', 0.0) or 0.0)
+    fallback = _sanitize_fallback_buying_power_usd(runtime_cfg.get('fallback_buying_power_usd', 0.0))
     if fallback > 0:
         return fallback
     return 219.0
+
+
+def _sanitize_fallback_buying_power_usd(raw_value: Any) -> float:
+    """Normalize operator fallback buying power to a finite, bounded non-negative float."""
+    try:
+        value = float(raw_value)
+    except (TypeError, ValueError):
+        return 0.0
+    if not np.isfinite(value):
+        return 0.0
+    if value <= 0:
+        return 0.0
+    return min(value, MAX_FALLBACK_BUYING_POWER_USD)
 
 
 def _reconcile_exchange_state(router: UniversalExchangeRouter, trade_log_path: Path, runtime_cfg: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -2438,6 +2668,8 @@ def _run_x1000_control_plane(runtime_cfg: Dict[str, Any], loop_count: int) -> Di
 
 initial_capital_usd = _resolve_starting_capital_usd(runtime_cfg, router)
 portfolio = PortfolioBrain(initial_capital=initial_capital_usd)
+if hasattr(meta_engine, 'engines') and isinstance(meta_engine.engines, dict):
+    meta_engine.engines['portfolio_brain'] = portfolio
 
 print("✓ Signal Gate (Monte Carlo)")
 print("✓ Portfolio Brain (P&L Tracking)")
@@ -2896,13 +3128,17 @@ def get_next_symbol_decision(excluded_symbols: Optional[set] = None, max_attempt
         print("[PROFILE] Aggressive compounding mode ENABLED")
 
     # === DYNAMIC SYMBOL/PAIR SELECTION & ADAPTIVE SIZING ===
-    best_symbol, best_family, best_metrics = get_rolling_capital_best_multi()
+    best_symbol, best_family, best_metrics = _normalize_best_multi_payload(get_rolling_capital_best_multi())
     if best_symbol and best_family:
         print(f"[ORCH] Using rolling capital best: {best_symbol} {best_family} Sharpe: {best_metrics.get('sharpe', 0.0):.3f}")
+        best_direction = str(best_metrics.get('direction', 'long') or 'long').strip().lower()
+        if best_direction not in ('long', 'short'):
+            best_direction = 'long'
         # Build decision dict for orchestrator
         decision = {
             'symbol': best_symbol,
             'family': best_family,
+            'direction': best_direction,
             'confidence': float(best_metrics.get('win_rate', 0.0)),
             'edge_bps': float(best_metrics.get('sharpe', 0.0)) * 100,
             'regime': 'rolling_capital',
@@ -3253,6 +3489,9 @@ logging.basicConfig(
 )
 
 loop_count = 0
+last_live_profile_sync_log_ts = 0.0
+last_runtime_drift_alert_log_ts = 0.0
+runtime_profile_sync_events_window: deque = deque(maxlen=512)
 while True:
     try:
         loop_count += 1
@@ -3264,6 +3503,546 @@ while True:
         # You can pass live data/context as needed; here we pass portfolio and runtime_cfg
         meta_results = meta_engine.run(data=portfolio, context=runtime_cfg)
         print(f"[META ENGINE] Results: {meta_results}")
+
+        loaded_runtime_cfg = _validate_runtime_cfg(runtime_guard.load())
+        runtime_writer_meta = runtime_writer_hint(loaded_runtime_cfg)
+        runtime_cfg = _force_live_mode(loaded_runtime_cfg)
+
+        forced_runtime_updates = {
+            'mode': str(runtime_cfg.get('mode', 'live')).lower(),
+            'allow_live_orders': bool(runtime_cfg.get('allow_live_orders', True)),
+            'paper_enabled': bool(runtime_cfg.get('paper_enabled', False)),
+        }
+        if (
+            str(loaded_runtime_cfg.get('mode', 'paper')).lower() != 'live'
+            or bool(loaded_runtime_cfg.get('allow_live_orders', False)) != forced_runtime_updates['allow_live_orders']
+            or bool(loaded_runtime_cfg.get('paper_enabled', True)) != forced_runtime_updates['paper_enabled']
+        ):
+            changed_runtime = _persist_runtime_tuner_updates(forced_runtime_updates)
+            if changed_runtime:
+                now_sync_ts = time.time()
+                runtime_profile_sync_events_window.append(now_sync_ts)
+                if (now_sync_ts - last_live_profile_sync_log_ts) >= 30.0:
+                    print(f"  🔁 Runtime profile re-synced to LIVE: {changed_runtime}")
+                    last_live_profile_sync_log_ts = now_sync_ts
+                event_logger.emit(
+                    "runtime_live_profile_forced",
+                    loop_count,
+                    reason_code="runtime_profile_sync",
+                    context={
+                        "mode": changed_runtime.get('mode', forced_runtime_updates['mode']),
+                        "allow_live_orders": bool(changed_runtime.get('allow_live_orders', forced_runtime_updates['allow_live_orders'])),
+                        "paper_enabled": bool(changed_runtime.get('paper_enabled', forced_runtime_updates['paper_enabled'])),
+                    },
+                )
+                drift_alert = _persist_runtime_drift_alert(
+                    loop_count,
+                    runtime_cfg,
+                    changed_runtime,
+                    runtime_profile_sync_events_window,
+                    now_sync_ts,
+                    runtime_writer_meta=runtime_writer_meta,
+                )
+                if bool(drift_alert.get('excessive', False)):
+                    operator_alert = _persist_runtime_drift_operator_alert(loop_count, drift_alert)
+                    if (now_sync_ts - last_runtime_drift_alert_log_ts) >= 30.0:
+                        print(
+                            "  [WARN] Runtime drift rate elevated: "
+                            f"{int(drift_alert.get('window_events', 0))}/"
+                            f"{int(drift_alert.get('window_seconds', 0))}s"
+                        )
+                        last_runtime_drift_alert_log_ts = now_sync_ts
+                    event_logger.emit(
+                        "runtime_live_profile_drift_excessive",
+                        loop_count,
+                        reason_code="runtime_profile_drift_rate",
+                        context={
+                            "window_events": int(drift_alert.get('window_events', 0) or 0),
+                            "window_seconds": float(drift_alert.get('window_seconds', 0.0) or 0.0),
+                            "threshold": int(drift_alert.get('threshold', 0) or 0),
+                            "likely_culprit_writer": str(drift_alert.get('likely_culprit_writer', '') or ''),
+                            "operator_alert_file": str(RUNTIME_DRIFT_OPERATOR_ALERT_FILE),
+                            "operator_alert_severity": str(operator_alert.get('severity', 'high') or 'high'),
+                            "operator_alert_write_ok": bool(operator_alert.get('write_ok', False)),
+                            "operator_alert_file_exists": bool(operator_alert.get('file_exists', False)),
+                            "operator_alert_write_error": str(operator_alert.get('write_error', '') or ''),
+                            "operator_alert_fallback_write_error": str(operator_alert.get('fallback_write_error', '') or ''),
+                        },
+                    )
+
+        harmonic_connector.update_runtime_config(runtime_cfg)
+
+        strict_live_only = bool(runtime_cfg.get('strict_live_only', False))
+        live_profile_armed = (
+            str(runtime_cfg.get('mode', 'paper')).lower() == 'live'
+            and bool(runtime_cfg.get('allow_live_orders', False))
+            and not bool(runtime_cfg.get('paper_enabled', False))
+            and not bool(runtime_cfg.get('kill_switch', False))
+        )
+        if strict_live_only and (not live_profile_armed):
+            event_logger.emit(
+                "strict_live_profile_blocked",
+                loop_count,
+                reason_code="profile_not_live_armed",
+                context={
+                    "mode": str(runtime_cfg.get('mode', 'paper')),
+                    "allow_live_orders": bool(runtime_cfg.get('allow_live_orders', False)),
+                    "paper_enabled": bool(runtime_cfg.get('paper_enabled', True)),
+                    "kill_switch": bool(runtime_cfg.get('kill_switch', False)),
+                },
+            )
+            _persist_live_engine_heartbeat(
+                loop_count,
+                runtime_cfg,
+                portfolio,
+                active_profile,
+                status='blocked',
+                reason='strict_live_profile_not_armed',
+            )
+            print("  ⛔ Strict live-only profile not armed; blocking loop")
+            time.sleep(max(0.5, float(runtime_cfg.get('loop_seconds', 1) or 1)))
+            continue
+
+        if bool(runtime_cfg.get('x1000_auto_enabled', True)):
+            x1000_interval_loops = int(runtime_cfg.get('x1000_interval_loops', 60) or 60)
+            if (loop_count - last_x1000_trigger_loop) >= x1000_interval_loops:
+                x1000_result = _run_x1000_control_plane(runtime_cfg, loop_count)
+                last_x1000_trigger_loop = loop_count
+                status_txt = str(x1000_result.get('status', 'unknown'))
+                print(f"  ⚡ X1000 control-plane cycle @ loop {loop_count}: {status_txt}")
+                event_logger.emit(
+                    "x1000_cycle",
+                    loop_count,
+                    reason_code=status_txt,
+                    latency_ms=float(x1000_result.get('elapsed_ms', 0.0) or 0.0),
+                    context={
+                        "returncode": x1000_result.get('returncode'),
+                        "x1000_passes": int(runtime_cfg.get('x1000_passes', 2) or 2),
+                        "x1000_auto_apply": bool(runtime_cfg.get('x1000_auto_apply', False)),
+                        "stdout_tail": x1000_result.get('stdout_tail', ''),
+                        "stderr_tail": x1000_result.get('stderr_tail', ''),
+                    },
+                )
+                audit_chain.append(
+                    "x1000_cycle",
+                    {
+                        "loop": loop_count,
+                        "status": status_txt,
+                        "ok": bool(x1000_result.get('ok', False)),
+                        "returncode": x1000_result.get('returncode'),
+                        "elapsed_ms": float(x1000_result.get('elapsed_ms', 0.0) or 0.0),
+                        "reason": x1000_result.get('reason'),
+                    },
+                    timestamp.isoformat(),
+                )
+
+        rolling_sharpe = _rolling_sharpe_from_pnl_pct(list(rolling_pnl_pct))
+        fail_rate = _failure_rate(list(rolling_order_outcomes))
+        drawdown_pct = abs(float(portfolio.max_drawdown)) * 100.0
+
+        now_ts = time.time()
+        balances_for_profile = {}
+        if (now_ts - last_balance_fetch_ts) >= balance_poll_interval_sec:
+            polled = router.get_balance()
+            if polled:
+                last_balance_snapshot = polled
+                last_balance_fetch_ts = now_ts
+                balances_for_profile = polled
+            else:
+                balances_for_profile = last_balance_snapshot
+        else:
+            balances_for_profile = last_balance_snapshot
+        profile_balance = 0.0
+        for _k in ['ZUSD', 'USD', 'USDT', 'USDC']:
+            if _k in balances_for_profile:
+                try:
+                    profile_balance = float(balances_for_profile.get(_k, 0) or 0)
+                    if profile_balance > 0:
+                        break
+                except Exception:
+                    pass
+
+        candidate_profile = _select_adaptive_profile(
+            rolling_sharpe,
+            fail_rate,
+            drawdown_pct,
+            profile_balance,
+            float(runtime_cfg.get('micro_balance_threshold_usd', 25.0) or 25.0),
+        )
+        if candidate_profile != active_profile and (loop_count - last_profile_switch_loop) >= 8:
+            prev_profile = active_profile
+            active_profile = candidate_profile
+            last_profile_switch_loop = loop_count
+            print(
+                f"  🔁 Adaptive profile switch: {prev_profile.upper()} -> {active_profile.upper()} "
+                f"| Sharpe={rolling_sharpe:.2f} Fail={fail_rate:.2%} DD={drawdown_pct:.2f}%"
+            )
+            audit_chain.append(
+                "adaptive_profile_switch",
+                {
+                    "loop": loop_count,
+                    "from": prev_profile,
+                    "to": active_profile,
+                    "rolling_sharpe": float(rolling_sharpe),
+                    "failure_rate": float(fail_rate),
+                    "drawdown_pct": float(drawdown_pct),
+                },
+                timestamp.isoformat(),
+            )
+
+        runtime_cfg = _apply_profile(runtime_cfg, active_profile)
+        profile_locked_values = _load_runtime_profile_lock_overrides()
+        if profile_locked_values:
+            runtime_cfg.update(profile_locked_values)
+        runtime_cfg = _maybe_run_adaptive_selection_tuner(
+            runtime_cfg,
+            trade_log,
+            loop_count,
+            last_successful_order_ts,
+            event_logger,
+        )
+        _atomic_write_json(
+            ADAPTIVE_PROFILE_FILE,
+            {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "active_profile": active_profile,
+                "rolling_sharpe": float(rolling_sharpe),
+                "rolling_failure_rate": float(fail_rate),
+                "drawdown_pct": float(drawdown_pct),
+                "micro_balance_threshold_usd": float(runtime_cfg.get('micro_balance_threshold_usd', 25.0) or 25.0),
+                "sampled_trades": len(rolling_pnl_pct),
+                "sampled_orders": len(rolling_order_outcomes),
+                "profile_presets": PROFILE_PRESETS,
+            },
+            indent=2,
+        )
+
+        selection_usd_balance = profile_balance
+        selection_effective_usd_balance = selection_usd_balance
+        selection_futures_mode = bool(runtime_cfg.get('futures_mode', False)) and futures_leverage_supported
+        if selection_futures_mode:
+            tb = last_trade_balance_snapshot or {}
+            try:
+                selection_margin_free = float(tb.get('mf', 0) or 0)
+                if selection_margin_free > selection_effective_usd_balance:
+                    selection_effective_usd_balance = selection_margin_free
+            except Exception:
+                pass
+            manual_bp = _sanitize_fallback_buying_power_usd(runtime_cfg.get('fallback_buying_power_usd', 0.0))
+            if selection_effective_usd_balance <= 0 and manual_bp > 0:
+                selection_effective_usd_balance = manual_bp
+
+        _persist_live_engine_heartbeat(
+            loop_count,
+            runtime_cfg,
+            portfolio,
+            active_profile,
+            status='selecting',
+            reason='capital_aware_ranking',
+            usd_balance=selection_usd_balance,
+            extra={
+                'effective_usd_balance': float(selection_effective_usd_balance),
+                'capital_aware_rank_cache_sec': float(runtime_cfg.get('capital_aware_rank_cache_sec', 15.0) or 15.0),
+            },
+        )
+
+        # Get decision from engine
+        selection_result = _select_capital_aware_candidate(
+            runtime_cfg,
+            usd_balance=selection_usd_balance,
+            effective_usd_balance=selection_effective_usd_balance,
+            futures_mode=selection_futures_mode,
+        )
+        if isinstance(selection_result, tuple):
+            if len(selection_result) >= 3:
+                engine_decision, preloaded_ticker, selection_meta = selection_result[0], selection_result[1], selection_result[2]
+            elif len(selection_result) == 2:
+                engine_decision, preloaded_ticker = selection_result
+                selection_meta = {'selection_mode': 'legacy_two_tuple_coerced'}
+            elif len(selection_result) == 1:
+                engine_decision = selection_result[0]
+                preloaded_ticker = None
+                selection_meta = {'selection_mode': 'legacy_single_value_coerced'}
+            else:
+                engine_decision = None
+                preloaded_ticker = None
+                selection_meta = {'selection_mode': 'empty_selection_result'}
+        else:
+            engine_decision = selection_result
+            preloaded_ticker = None
+            selection_meta = {'selection_mode': 'non_tuple_selection_result'}
+        if not isinstance(selection_meta, dict):
+            selection_meta = {'selection_mode': 'selection_meta_coerced'}
+        live_market_stream_status = _load_live_market_stream_status()
+        live_market_stream_brief = _format_live_market_stream_brief(live_market_stream_status)
+        if engine_decision is None:
+            shadow_snapshot = {
+                'enabled': bool(runtime_cfg.get('shadow_intelligence_enabled', True)),
+                'reason': 'no_executable_candidate',
+                'selection_mode': str(selection_meta.get('selection_mode', 'capital_aware_wait')),
+                'best_symbol': str(selection_meta.get('best_symbol', '') or ''),
+                'best_affordability_ratio': float(selection_meta.get('best_affordability_ratio', 0.0) or 0.0),
+            }
+            event_logger.emit(
+                "shadow_intelligence",
+                loop_count,
+                symbol=str(selection_meta.get('best_symbol', '') or None),
+                reason_code="shadow_wait_state",
+                context={
+                    'shadow_reason': str(shadow_snapshot.get('reason', '')),
+                    'selection_mode': str(shadow_snapshot.get('selection_mode', '')),
+                    'best_affordability_ratio': float(shadow_snapshot.get('best_affordability_ratio', 0.0) or 0.0),
+                },
+            )
+            _persist_live_engine_heartbeat(
+                loop_count,
+                runtime_cfg,
+                portfolio,
+                active_profile,
+                status='waiting',
+                reason=str(selection_meta.get('selection_mode', 'capital_aware_wait')),
+                selection_meta=selection_meta,
+                extra={
+                    'best_symbol': str(selection_meta.get('best_symbol', '')),
+                    'best_affordability_ratio': float(selection_meta.get('best_affordability_ratio', 0.0) or 0.0),
+                    'shadow_intelligence': dict(shadow_snapshot),
+                },
+            )
+            print(
+                f"\n[{loop_count}] {timestamp.strftime('%H:%M:%S')} | No executable candidate "
+                f"| Selection: {selection_meta.get('selection_mode', 'capital_aware_wait')} "
+                f"| Best: {selection_meta.get('best_symbol', 'N/A')} "
+                f"({float(selection_meta.get('best_affordability_ratio', 0.0) or 0.0):.2f}x) "
+                f"| Stream: {live_market_stream_brief}"
+            )
+            _persist_operational_health(
+                event_logger,
+                portfolio,
+                loop_count,
+                rolling_pnl_pct,
+                rolling_order_outcomes,
+                runtime_cfg,
+                runway_start_ts,
+                realized_pnl_samples,
+                entry_timestamps,
+                shadow_snapshot,
+            )
+            time.sleep(0.25)
+            continue
+        symbol = engine_decision['symbol']
+        now_loop_ts = time.time()
+        if now_loop_ts < symbol_cooldown_until.get(symbol.upper(), 0.0):
+            remaining = symbol_cooldown_until[symbol.upper()] - now_loop_ts
+            _persist_live_engine_heartbeat(
+                loop_count,
+                runtime_cfg,
+                portfolio,
+                active_profile,
+                status='cooldown',
+                reason='symbol_cooldown_active',
+                symbol=symbol,
+                engine_decision=engine_decision,
+                selection_meta=selection_meta,
+                extra={'cooldown_remaining_sec': float(remaining)},
+            )
+            print(f"\n[{loop_count}] {timestamp.strftime('%H:%M:%S')} | Symbol: {symbol.upper()} | cooling down {remaining:.1f}s")
+            time.sleep(0.1)
+            continue
+        audit_chain.append(
+            "engine_decision",
+            {
+                "loop": loop_count,
+                "symbol": symbol,
+                "direction": engine_decision.get('direction'),
+                "confidence": float(engine_decision.get('confidence', 0.0) or 0.0),
+                "edge_bps": float(engine_decision.get('edge_bps', 0.0) or 0.0),
+                "regime": engine_decision.get('regime'),
+                "source": engine_decision.get('source', 'unknown'),
+                "market_data_mode": str(engine_decision.get('market_data_mode', 'unknown') or 'unknown'),
+                "live_market_stream_status": live_market_stream_status,
+                "selection_mode": selection_meta.get('selection_mode', 'legacy'),
+                "ranking_score": float(engine_decision.get('ranking_score', 0.0) or 0.0),
+                "affordability_ratio": float(engine_decision.get('affordability_ratio', 0.0) or 0.0)
+            },
+            timestamp.isoformat()
+        )
+
+        print(
+            f"\n[{loop_count}] {timestamp.strftime('%H:%M:%S')} | Symbol: {symbol.upper()} "
+            f"| Data: {str(engine_decision.get('market_data_mode', 'unknown') or 'unknown').upper()} "
+            f"| Stream: {live_market_stream_brief}"
+        )
+        _persist_live_engine_heartbeat(
+            loop_count,
+            runtime_cfg,
+            portfolio,
+            active_profile,
+            status='candidate_selected',
+            reason='engine_decision_ready',
+            symbol=symbol,
+            engine_decision=engine_decision,
+            selection_meta=selection_meta,
+        )
+
+        symbol_blacklist = {str(s).strip().upper() for s in list(runtime_cfg.get('symbol_blacklist', []) or [])}
+        hard_symbol_blacklist = {str(s).strip().upper() for s in list(runtime_cfg.get('hard_symbol_blacklist', []) or [])}
+        blocked_symbols = symbol_blacklist.union(hard_symbol_blacklist)
+        if symbol.upper() in blocked_symbols:
+            event_logger.emit(
+                "symbol_blacklisted_skip",
+                loop_count,
+                symbol=symbol,
+                reason_code="blacklisted_symbol",
+                context={
+                    "blocked_by": "hard_symbol_blacklist" if symbol.upper() in hard_symbol_blacklist else "symbol_blacklist",
+                },
+            )
+            print(
+                f"  ⛔ Blocked symbol policy skip: {symbol.upper()} "
+                f"({ 'hard' if symbol.upper() in hard_symbol_blacklist else 'runtime' } blacklist)"
+            )
+            symbol_cooldown_until[symbol.upper()] = time.time() + 60.0
+            time.sleep(0.1)
+            continue
+
+        if engine_decision.get('ranking_score') is not None:
+            print(
+                f"  Rank Score: {float(engine_decision.get('ranking_score', 0.0) or 0.0):.2f} "
+                f"| Affordability: {float(engine_decision.get('affordability_ratio', 0.0) or 0.0):.2f}x "
+                f"| Selection: {selection_meta.get('selection_mode', 'legacy')}"
+            )
+
+        # Get ticker
+        ticker_start = time.time()
+        ticker = preloaded_ticker or router.get_ticker(symbol)
+        ticker_latency_ms = (time.time() - ticker_start) * 1000.0
+
+        if not ticker:
+            _persist_live_engine_heartbeat(
+                loop_count,
+                runtime_cfg,
+                portfolio,
+                active_profile,
+                status='blocked',
+                reason='ticker_fetch_failed',
+                symbol=symbol,
+                engine_decision=engine_decision,
+                selection_meta=selection_meta,
+            )
+            print(f"  ⚠ Could not get ticker")
+            event_logger.emit("ticker_fetch_failed", loop_count, symbol=symbol,
+                            latency_ms=ticker_latency_ms, reason_code="api_error")
+            ticker_cd = float(runtime_cfg.get('ticker_fail_cooldown_sec', 5) or 5)
+            symbol_cooldown_until[symbol.upper()] = time.time() + ticker_cd
+            time.sleep(0.5)
+            continue
+
+        event_logger.emit("ticker_fetched", loop_count, symbol=symbol, latency_ms=ticker_latency_ms)
+
+        current_price = ticker['last']
+        bid = ticker['bid']
+        ask = ticker['ask']
+        pair = ticker['pair']
+
+        config = SYMBOL_REGISTRY[symbol.upper()]
+
+        print(f"  Price: ${current_price:.4f} | Bid: ${bid:.4f} | Ask: ${ask:.4f}")
+
+        # Get balance
+        now_ts = time.time()
+        if (now_ts - last_balance_fetch_ts) >= balance_poll_interval_sec:
+            polled = router.get_balance()
+            if polled:
+                last_balance_snapshot = polled
+                last_balance_fetch_ts = now_ts
+                balances = polled
+            else:
+                balances = last_balance_snapshot
+        else:
+            balances = last_balance_snapshot
+        usd_scan = _resolve_usd_buckets_from_balances(balances)
+        usd_balance = float(usd_scan.get('max_usd', 0.0) or 0.0)
+
+        core_snapshot = _build_core_crypto_balance_snapshot(router, balances)
+        live_balance_snapshot = {
+            'timestamp_utc': datetime.now(timezone.utc).isoformat(),
+            'loop': int(loop_count),
+            'usd_balance_max': float(usd_balance),
+            'usd_buckets': dict(usd_scan.get('usd_buckets', {}) or {}),
+            'core_crypto_est_usd': float(core_snapshot.get('core_crypto_est_usd', 0.0) or 0.0),
+            'portfolio_est_total_usd': float(usd_balance + float(core_snapshot.get('core_crypto_est_usd', 0.0) or 0.0)),
+            'core_assets': list(core_snapshot.get('core_assets', []) or []),
+            'unpriced_symbols': list(core_snapshot.get('unpriced_symbols', []) or []),
+            'raw_assets_positive_count': int(core_snapshot.get('raw_assets_positive_count', 0) or 0),
+        }
+        _atomic_write_json(LIVE_BALANCE_SNAPSHOT_FILE, live_balance_snapshot, indent=2)
+        if usd_balance > 0:
+            last_positive_usd_balance = usd_balance
+        elif last_positive_usd_balance > 0:
+            # Transient empty balance payloads are common; keep last seen positive value.
+            usd_balance = last_positive_usd_balance
+
+        futures_mode = bool(runtime_cfg.get('futures_mode', False)) and futures_leverage_supported
+        effective_usd_balance = usd_balance
+        account_equity_usd = 0.0
+        if futures_mode:
+            now_tb = time.time()
+            if (now_tb - last_trade_balance_fetch_ts) >= trade_balance_poll_interval_sec:
+                tb_polled = router.get_trade_balance('ZUSD')
+                if tb_polled:
+                    last_trade_balance_snapshot = tb_polled
+                    last_trade_balance_fetch_ts = now_tb
+
+            tb = last_trade_balance_snapshot or {}
+            try:
+                account_equity_usd = float(tb.get('eb', 0) or 0)
+                margin_free = float(tb.get('mf', 0) or 0)
+                if margin_free > effective_usd_balance:
+                    effective_usd_balance = margin_free
+            except Exception:
+                pass
+
+            # Emergency fallback: use operator-provided buying power when APIs are stale.
+            manual_bp = _sanitize_fallback_buying_power_usd(runtime_cfg.get('fallback_buying_power_usd', 0.0))
+            if effective_usd_balance <= 0 and manual_bp > 0:
+                effective_usd_balance = manual_bp
+
+        portfolio_value = usd_balance
+
+        print(f"  Free USD Cash: ${usd_balance:.2f}")
+        core_assets = list(core_snapshot.get('core_assets', []) or [])
+        core_summary = " | ".join(
+            [f"{str(a.get('symbol','?'))}:{float(a.get('qty',0.0) or 0.0):.6f}" for a in core_assets]
+        )
+        print(
+            f"  Core Crypto (BTC/ETH/SOL/ADA/XRP/DOGE) Est: "
+            f"${float(core_snapshot.get('core_crypto_est_usd', 0.0) or 0.0):.2f} "
+            f"| {core_summary}"
+        )
+        if core_snapshot.get('unpriced_symbols'):
+            print(f"  ⚠ Unpriced core symbols: {', '.join(core_snapshot.get('unpriced_symbols', []))}")
+        if account_equity_usd > 0:
+            print(f"  Account Equity (eb): ${account_equity_usd:.2f}")
+        if futures_mode and effective_usd_balance > usd_balance:
+            print(f"  Account Buying Power (mf): ${effective_usd_balance:.2f}")
+
+        # Auto-convert/sweep non-USD collateral to USD so capital recycles into the engine.
+        min_position_for_conversion = float(runtime_cfg.get('min_position_usd', 5.0) or 5.0)
+        convert_enabled = bool(runtime_cfg.get('auto_convert_collateral', True))
+        convert_fraction = float(runtime_cfg.get('collateral_sell_fraction', 0.20) or 0.20)
+        convert_cooldown = float(runtime_cfg.get('collateral_convert_cooldown_sec', 12.0) or 12.0)
+        proactive_sweep_enabled = bool(runtime_cfg.get('auto_sweep_to_usd_enabled', True))
+        sweep_full_balance = bool(runtime_cfg.get('auto_sweep_full_balance', True))
+        sweep_require_no_open_positions = bool(runtime_cfg.get('auto_sweep_require_no_open_positions', True))
+        sweep_min_notional_usd = float(runtime_cfg.get('auto_sweep_min_notional_usd', 2.0) or 2.0)
+        sweep_reserve_asset_qty = float(runtime_cfg.get('auto_sweep_reserve_asset_qty', 0.0) or 0.0)
+        sweep_max_assets_per_loop = int(runtime_cfg.get('auto_sweep_max_assets_per_loop', 2) or 2)
+
+        loop_open_positions = len(portfolio.get_open_positions())
+        cash_starved = usd_balance < min_position_for_conversion
+        no_open_position_gate = (not sweep_require_no_open_positions) or (loop_open_positions == 0)
+        cooldown_ready = (time.time() - last_collateral_convert_ts) >= convert_cooldown
+        should_attempt_conversion = convert_enabled and cooldown_ready and (cash_starved or (proactive_sweep_enabled and no_open_position_gate))
 
 
         if should_attempt_conversion:
@@ -3481,6 +4260,9 @@ while True:
         spread_bps = ((ask - bid) / max(current_price, 1e-9)) * 10000.0
         engine_conf = float(engine_decision.get('confidence', 0.0) or 0.0)
         engine_edge = float(engine_decision.get('edge_bps', 0.0) or 0.0)
+        engine_direction = str(engine_decision.get('direction', 'long') or 'long').strip().lower()
+        if engine_direction not in ('long', 'short'):
+            engine_direction = 'long'
         edge_norm = min(max(engine_edge / 25.0, 0.0), 1.0)
         alignment_score = min(max(0.35 + 0.55 * engine_conf + 0.10 * edge_norm, 0.0), 1.0)
         cross_confirm_score = min(max(0.30 + 0.50 * engine_conf + 0.20 * edge_norm, 0.0), 1.0)
@@ -3493,7 +4275,7 @@ while True:
             signal_decay_score=min(0.45, max(0.05, spread_bps / 100.0)),
             cross_confirm_score=cross_confirm_score,
             expected_edge_bps=engine_edge,
-            direction_hint=1.0 if engine_decision['direction'] == 'long' else 0.0,
+            direction_hint=1.0 if engine_direction == 'long' else 0.0,
             volatility_pct=max(0.05, min(abs((ask - bid) / max(current_price, 1e-9)) * 100.0, 8.0)),
             correlation_to_portfolio=min(portfolio.exposure() / max(portfolio.current_equity, 1.0), 1.0),
             market_regime="normal",
@@ -4720,7 +5502,27 @@ while True:
         shutdown_event.set()
         break
     except Exception as e:
-        event_logger.emit("execution_error", loop_count, reason_code=f"error_{type(e).__name__}", context={"error": str(e)[:200]})
+        tb_text = traceback.format_exc()
+        tb_tail = str(tb_text or '')[-2000:]
+        try:
+            logging.error(
+                "Exception in main loop (iteration %s): %s\n%s",
+                loop_count,
+                str(e),
+                tb_text,
+            )
+        except Exception:
+            pass
+        event_logger.emit(
+            "execution_error",
+            loop_count,
+            reason_code=f"error_{type(e).__name__}",
+            context={
+                "error": str(e)[:200],
+                "exception_type": type(e).__name__,
+                "traceback_tail": tb_tail,
+            },
+        )
         print(f"\n⚠ Error: {e}")
         time.sleep(0.5)
         if shutdown_event.is_set():

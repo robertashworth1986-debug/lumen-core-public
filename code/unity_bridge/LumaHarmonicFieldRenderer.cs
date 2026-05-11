@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 /// <summary>
 /// LumaHarmonicFieldRenderer
 /// ─────────────────────────
-/// Fetches /api/unity/edge from the Luma Experience Gateway and renders
+/// Fetches /api/unity/unified-edge from the Luma Experience Gateway and renders
 /// each harmonic signal as a glowing node in 3D space, arranged on a
 /// phi-resonant golden-ratio spiral.
 ///
@@ -27,6 +27,7 @@ public class LumaHarmonicFieldRenderer : MonoBehaviour {
 
     [Header("Gateway")]
     [SerializeField] private string baseUrl = "http://127.0.0.1:8787";
+    [SerializeField] private string edgePath = "/api/unity/unified-edge";
     [SerializeField] private float refreshSeconds = 3f;
 
     [Header("Field")]
@@ -39,6 +40,7 @@ public class LumaHarmonicFieldRenderer : MonoBehaviour {
     [SerializeField] private Color cryptoColor  = new Color(0.271f, 0.941f, 0.784f, 1f);
     [SerializeField] private Color sportsColor  = new Color(1.000f, 0.847f, 0.420f, 1f);
     [SerializeField] private Color infraColor   = new Color(0.655f, 0.545f, 0.980f, 1f);
+    [SerializeField] private Color tradingColor = new Color(0.976f, 0.494f, 0.682f, 1f);
     [SerializeField] private Color otherColor   = new Color(0.800f, 0.900f, 1.000f, 1f);
 
     // Golden angle in radians — Φ²
@@ -97,7 +99,7 @@ public class LumaHarmonicFieldRenderer : MonoBehaviour {
     }
 
     private IEnumerator FetchAndRender() {
-        var url = baseUrl.TrimEnd('/') + "/api/unity/edge";
+        var url = baseUrl.TrimEnd('/') + edgePath;
         using var req = UnityWebRequest.Get(url);
         yield return req.SendWebRequest();
 
@@ -230,6 +232,7 @@ public class LumaHarmonicFieldRenderer : MonoBehaviour {
             "crypto" => cryptoColor,
             "sports" => sportsColor,
             "infra"  => infraColor,
+            "trading" => tradingColor,
             _        => otherColor,
         };
     }

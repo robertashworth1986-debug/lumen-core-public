@@ -1,0 +1,47 @@
+{
+  "generated_utc": "2026-04-18T03:24:44.815394Z",
+  "case_count": 2,
+  "ranked_cases": [
+    {
+      "case_id": "CASE-001",
+      "title": "Westside Cold Case",
+      "status": "Open",
+      "category": "Unsolved Homicide",
+      "case_strength": 0.7238,
+      "credibility": 0.5909,
+      "stability": 0.6088,
+      "lead_quality": 0.8475,
+      "completeness": 0.6283,
+      "confidence": 0.722,
+      "freshness": 0.4762,
+      "evidence_count": 3,
+      "raw_components": [
+        "Forensic DNA",
+        "Witness Testimony",
+        "Digital Footprint"
+      ]
+    },
+    {
+      "case_id": "CASE-002",
+      "title": "North Bay Unknown",
+      "status": "Cold",
+      "category": "Missing Person",
+      "case_strength": 0.6936,
+      "credibility": 0.5475,
+      "stability": 0.569,
+      "lead_quality": 0.8338,
+      "completeness": 0.626,
+      "confidence": 0.6576,
+      "freshness": 0.4235,
+      "evidence_count": 2,
+      "raw_components": [
+        "Forensic Trace",
+        "Surveillance Video"
+      ]
+    }
+  ],
+  "categories": [
+    "Missing Person",
+    "Unsolved Homicide"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "filtered_sharpe": 1.7798436582593429,
+  "baseline_sharpe": 0.22604855189947454,
+  "filtered_max_dd": -0.03439276651520162,
+  "baseline_max_dd": -0.34423640438576764,
+  "filtered_return": 214.09031568520274,
+  "baseline_return": 1.5559900835674272,
+  "exposure": 0.05692442539929879
+}

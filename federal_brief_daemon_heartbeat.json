@@ -1,0 +1,9 @@
+{
+  "generated_utc": "2026-04-08T02:52:06.3102332Z",
+  "cycle": 81,
+  "ok": true,
+  "cross_exit": 0,
+  "brief_exit": 0,
+  "elapsed_sec": 0.214,
+  "run_ledger": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\federal_brief_run_ledger.jsonl"
+}

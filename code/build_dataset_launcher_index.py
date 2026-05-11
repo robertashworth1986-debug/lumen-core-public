@@ -114,7 +114,7 @@ manifest = {
 (OUT / "DATASET_LAUNCHER_MANIFEST.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
 ps_lines = []
-ps_lines.append('$datasets = Import-Csv "C:\LumaTrader\INSTITUTIONAL_STACK_V2\data\launcher_index\ENGINE_READY_DATASETS.csv"')
+ps_lines.append('$datasets = Import-Csv "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\launcher_index\\ENGINE_READY_DATASETS.csv"')
 ps_lines.append('$datasets | Select-Object -First 25 file_name, full_path, rows_est, time_col, value_col, sector_guess | Format-Table -AutoSize')
 (OUT / "SHOW_ENGINE_READY_DATASETS.ps1").write_text("\n".join(ps_lines), encoding="utf-8")
 

@@ -1,0 +1,43 @@
+{
+  "profile": "micro_fractal_growth_v1",
+  "enabled": true,
+  "micro_cells": {
+    "cell_count": 8,
+    "base_growth_step_pct": 1.8,
+    "max_growth_step_pct": 6.0,
+    "drawdown_brake_step_pct": 0.8
+  },
+  "fractal_ladders": {
+    "intraday": {
+      "target_multiplier": 1.12,
+      "risk_scalar": 1.05
+    },
+    "session": {
+      "target_multiplier": 1.35,
+      "risk_scalar": 1.15
+    },
+    "rolling": {
+      "target_multiplier": 1.80,
+      "risk_scalar": 1.25
+    }
+  },
+  "momentum": {
+    "improvement_floor": 0.05,
+    "boost_if_pass2_wins": true,
+    "boost_multiplier": 1.15,
+    "cooldown_if_stability_weak": true
+  },
+  "safety": {
+    "max_base_risk_fraction": 0.92,
+    "max_position_usd_multiplier": 1.60,
+    "min_loop_seconds": 0.20,
+    "max_loop_seconds": 2.50,
+    "max_daily_loss_usd_multiplier": 1.25,
+    "force_paper_on_high_constraints": true
+  },
+  "outputs": {
+    "report_file": "out/execution/micro_fractal_growth_report.json",
+    "patch_file": "config/runtime_fractal_patch.json",
+    "audit_file": "out/execution/micro_fractal_growth_audit.json"
+  }
+}

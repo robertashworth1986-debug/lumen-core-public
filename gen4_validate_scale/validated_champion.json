@@ -1,0 +1,10 @@
+{
+  "pair": "ZEC/USD",
+  "strategy": "trend",
+  "sharpe": 1.7818600527520756,
+  "max_dd": -0.2031302952562669,
+  "final": 1.9994631816549675,
+  "vs_buyhold": 1.1550519490584137,
+  "suspicious": false,
+  "validation_score": 21.033123503629003
+}

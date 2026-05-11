@@ -1,0 +1,35 @@
+{
+  "generated_utc": "2026-04-13T14:58:29.991602+00:00",
+  "source": "alpaca_paper_real_api",
+  "evidence_mode": "real_api",
+  "runtime_error": "",
+  "capital": {
+    "starting_capital_usd": 100000.0,
+    "latest_equity_usd": 100000.0,
+    "paper_profit_usd": 0.0,
+    "return_pct_total": 0.0
+  },
+  "fills": {
+    "count": 0,
+    "symbols": [],
+    "buy_count": 0,
+    "sell_count": 0
+  },
+  "equity_path": {
+    "snapshot_count": 1299,
+    "sampled_period_returns": 1298,
+    "win_periods": 0,
+    "loss_periods": 0,
+    "flat_periods": 1298,
+    "win_rate_pct": 0.0,
+    "sharpe_proxy": 0.0,
+    "annualized_sharpe_proxy": 0.0,
+    "max_drawdown_pct": 0.0,
+    "median_sample_interval_sec": null
+  },
+  "files": {
+    "real_ledger": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\paper_trade_real_api_ledger.jsonl",
+    "state": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\paper_trade_state.json",
+    "runtime": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\paper_trade_runtime.json"
+  }
+}

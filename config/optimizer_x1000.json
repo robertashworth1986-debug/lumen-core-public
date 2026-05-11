@@ -1,0 +1,36 @@
+{
+  "profile": "x1000_hybrid_optimizer",
+  "search": {
+    "iterations": 600,
+    "seed": 42,
+    "risk_fraction_bounds": [0.08, 0.95],
+    "loop_seconds_bounds": [0.2, 1.5],
+    "max_position_usd_multiplier_bounds": [0.6, 3.0],
+    "gate_confidence_bounds": [0.52, 0.80],
+    "gate_edge_bps_bounds": [6.0, 18.0],
+    "pyramid_multiplier_bounds": [1.2, 4.0]
+  },
+  "objective": {
+    "weight_growth": 0.50,
+    "weight_sharpe": 0.25,
+    "weight_stability": 0.15,
+    "weight_drawdown_penalty": 0.10
+  },
+  "constraints": {
+    "max_simulated_drawdown_pct": 18.0,
+    "min_simulated_win_rate": 0.45,
+    "min_simulated_sharpe": 0.25,
+    "max_error_rate_pct": 6.0
+  },
+  "outputs": {
+    "report_file": "out/execution/optimizer_x1000_report.json",
+    "patch_file": "config/runtime_optimized_patch.json",
+    "simulation_file": "out/execution/optimizer_x1000_simulation.json"
+  },
+  "apply": {
+    "allow_direct_runtime_patch": false,
+    "require_env_var": true,
+    "env_var": "LUMENCORE_ARM_OPTIMIZER_APPLY",
+    "env_value": "YES_APPLY_OPTIMIZER_PATCH"
+  }
+}

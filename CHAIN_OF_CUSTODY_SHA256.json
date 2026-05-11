@@ -1,0 +1,17 @@
+{
+  "generated_utc": "2026-04-03T02:56:55.894402+00:00",
+  "files": [
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\config\\live_source_registry.json",
+      "sha256": "027d132737a4c5b45829657b231e64796d59d445173101a855a99b19ec7338fd"
+    },
+    {
+      "path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\paper_execution_seed.json",
+      "sha256": "f897c9770dbe5bd5f813b142498e5ad62143217a456344c7a7d821e1420ab4ed"
+    },
+    {
+      "path": "C:\\LumaTrader\\dashboard\\live_source_registry.html",
+      "sha256": "03fd842e29d434501ede8cbfa551c453d5df2a5c8532c5e0a1dea1efb5341c70"
+    }
+  ]
+}

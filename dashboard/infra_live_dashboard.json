@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-05-06T21:57:32.104342+00:00",
+  "baseline": 0.0,
+  "drift": 0.7608,
+  "gain_percent": 13.97,
+  "loss_per_hour": 0.0,
+  "recovered_per_hour": 0.0,
+  "cumulative_value": 0.0,
+  "ticks": 0,
+  "source": "gateway_evidence_auto_repair",
+  "evidence_run_utc": "20260505T121657Z",
+  "repair_note": "Regenerated as valid JSON after binary/invalid dashboard artifact was detected."
+}

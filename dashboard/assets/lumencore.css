@@ -1,0 +1,293 @@
+/* =====================================================================
+   LumenCore Mission Control — shared cinematic theme
+   Used by: mission_control · grants · forecast · anomalies · explain · lab
+   ===================================================================== */
+:root {
+  --bg-0: #04060f;
+  --bg-1: #07091c;
+  --ink: #e6f0ff;
+  --ink-dim: #7d8bb5;
+  --neon-c: #22d3ee;
+  --neon-p: #a855f7;
+  --neon-g: #34d399;
+  --neon-a: #f59e0b;
+  --neon-r: #ef4444;
+  --glass: rgba(15, 23, 50, 0.45);
+  --glass-2: rgba(15, 23, 50, 0.65);
+  --border: rgba(124, 58, 237, 0.28);
+  --border-2: rgba(34, 211, 238, 0.38);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100%; }
+body {
+  background: var(--bg-0);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+}
+a { color: var(--neon-c); text-decoration: none; }
+
+/* ---------- WebGL canvas underlay ---------- */
+#bg-canvas {
+  position: fixed; inset: 0; z-index: 0;
+  background: radial-gradient(ellipse at 30% 20%, #1c1052 0%, var(--bg-0) 60%);
+}
+#grid-overlay {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.06) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+#scanlines {
+  position: fixed; inset: 0; z-index: 2; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg, transparent 0px, transparent 2px,
+    rgba(34, 211, 238, 0.018) 2px, rgba(34, 211, 238, 0.018) 4px);
+  animation: lc-scan 8s linear infinite;
+  opacity: 0.6;
+}
+@keyframes lc-scan { from { transform: translateY(0) } to { transform: translateY(8px) } }
+
+/* ---------- Layout ---------- */
+.lc-stage { position: relative; z-index: 10; padding: 24px 36px 80px; max-width: 1840px; margin: 0 auto; }
+
+.lc-topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  padding-bottom: 18px; border-bottom: 1px solid var(--border);
+  margin-bottom: 24px; flex-wrap: wrap;
+}
+.lc-brand { display: flex; align-items: center; gap: 14px; }
+.lc-brand .lc-logo {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--neon-c), var(--neon-p), var(--neon-g), var(--neon-c));
+  position: relative; animation: lc-spin 14s linear infinite;
+  box-shadow: 0 0 22px rgba(34, 211, 238, 0.4), 0 0 44px rgba(168, 85, 247, 0.22);
+  flex-shrink: 0;
+}
+.lc-brand .lc-logo::after {
+  content: ''; position: absolute; inset: 4px; border-radius: 50%; background: var(--bg-0);
+}
+.lc-brand .lc-logo::before {
+  content: ''; position: absolute; inset: 13px; border-radius: 50%;
+  background: radial-gradient(circle, var(--neon-c) 0%, transparent 70%);
+  z-index: 1; animation: lc-pulse 2.5s ease-in-out infinite;
+}
+@keyframes lc-spin { to { transform: rotate(360deg) } }
+@keyframes lc-pulse {
+  0%, 100% { opacity: 0.8; transform: scale(0.85) }
+  50% { opacity: 1; transform: scale(1) }
+}
+.lc-brand h1 {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 20px;
+  letter-spacing: 4px; line-height: 1;
+  background: linear-gradient(135deg, var(--neon-c), var(--neon-p));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.lc-brand .lc-sub {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  color: var(--ink-dim); letter-spacing: 3px; margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.lc-nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.lc-nav a {
+  padding: 7px 13px; border-radius: 6px;
+  color: var(--ink-dim); text-decoration: none;
+  font-family: 'Orbitron', sans-serif; font-size: 10px;
+  letter-spacing: 2px; font-weight: 700; text-transform: uppercase;
+  transition: all 0.2s; border: 1px solid transparent;
+}
+.lc-nav a:hover {
+  color: var(--neon-c); border-color: var(--border-2);
+  background: rgba(34, 211, 238, 0.06);
+}
+.lc-nav a.active {
+  color: var(--neon-c); border-color: var(--neon-c);
+  background: rgba(34, 211, 238, 0.08);
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.2);
+}
+
+.lc-clock {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--neon-c); display: flex; gap: 18px; align-items: center;
+}
+.lc-clock .lc-label { color: var(--ink-dim); font-size: 9px; letter-spacing: 2px; display: block; text-transform: uppercase; }
+.lc-clock .lc-val { font-size: 14px; font-weight: 700; color: var(--ink); }
+
+.lc-live {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 99px;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: var(--neon-g); font-size: 11px; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace; letter-spacing: 2px;
+}
+.lc-live::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--neon-g); box-shadow: 0 0 8px var(--neon-g);
+  animation: lc-blink 1.5s ease-in-out infinite;
+}
+@keyframes lc-blink { 50% { opacity: 0.3 } }
+
+/* ---------- Glass panel ---------- */
+.lc-panel {
+  position: relative;
+  background: var(--glass);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.lc-panel:hover { border-color: var(--border-2); }
+.lc-panel::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(135deg,
+    rgba(34, 211, 238, 0.06) 0%, transparent 40%,
+    transparent 60%, rgba(168, 85, 247, 0.05) 100%);
+}
+.lc-panel::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-c), transparent);
+  opacity: 0.6;
+}
+.lc-panel h2,
+.lc-panel h3 {
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 11px;
+  color: var(--ink-dim); letter-spacing: 3px; text-transform: uppercase;
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.lc-panel h2::before,
+.lc-panel h3::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--neon-c); box-shadow: 0 0 8px var(--neon-c);
+}
+
+/* ---------- Buttons ---------- */
+.lc-btn,
+button.lc-btn {
+  background: linear-gradient(135deg, var(--neon-c), var(--neon-p));
+  color: #04060f; border: 0;
+  border-radius: 6px; padding: 8px 16px; cursor: pointer;
+  font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  transition: all 0.2s;
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.3);
+  text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
+.lc-btn:hover { transform: translateY(-1px); box-shadow: 0 0 22px rgba(34, 211, 238, 0.55); }
+.lc-btn.secondary {
+  background: rgba(15, 23, 50, 0.65);
+  color: var(--ink); border: 1px solid var(--border-2);
+  box-shadow: none;
+}
+.lc-btn.secondary:hover { background: rgba(34, 211, 238, 0.08); border-color: var(--neon-c); }
+.lc-btn.success {
+  background: linear-gradient(135deg, var(--neon-g), var(--neon-c));
+  color: #04060f;
+}
+.lc-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ---------- Forms ---------- */
+input[type=text], input[type=number], input[type=search], select, textarea {
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 12px;
+  font: 13px 'JetBrains Mono', monospace;
+  outline: none;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--neon-c); box-shadow: 0 0 8px rgba(34, 211, 238, 0.2); }
+
+/* ---------- Tables ---------- */
+.lc-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.lc-table th {
+  text-align: left; padding: 8px 10px;
+  font-family: 'Orbitron', sans-serif; font-size: 10px;
+  color: var(--ink-dim); letter-spacing: 2px; text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+.lc-table td {
+  padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-family: 'JetBrains Mono', monospace;
+}
+.lc-table tr:hover { background: rgba(34, 211, 238, 0.04); }
+
+/* ---------- Pills ---------- */
+.lc-pill {
+  padding: 2px 9px; border-radius: 99px; font-size: 9px;
+  font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;
+  text-transform: uppercase; font-weight: 700;
+  display: inline-block;
+}
+.lc-pill.draft { background: rgba(125, 139, 181, 0.12); color: var(--ink-dim); border: 1px solid rgba(125, 139, 181, 0.3); }
+.lc-pill.approved { background: rgba(34, 211, 238, 0.12); color: var(--neon-c); border: 1px solid var(--neon-c); }
+.lc-pill.submitted { background: rgba(52, 211, 153, 0.12); color: var(--neon-g); border: 1px solid var(--neon-g); }
+.lc-pill.warn { background: rgba(245, 158, 11, 0.12); color: var(--neon-a); border: 1px solid var(--neon-a); }
+.lc-pill.alert { background: rgba(239, 68, 68, 0.12); color: var(--neon-r); border: 1px solid var(--neon-r); }
+
+/* ---------- Big number ---------- */
+.lc-bignum {
+  font-family: 'Orbitron', sans-serif; font-weight: 900;
+  font-size: 44px; line-height: 1;
+  background: linear-gradient(135deg, var(--neon-c) 0%, var(--neon-p) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; letter-spacing: -1px;
+  text-shadow: 0 0 40px rgba(34, 211, 238, 0.3);
+}
+.lc-bignum-label { font-size: 11px; color: var(--ink-dim); letter-spacing: 2px; text-transform: uppercase; margin-top: 6px; font-weight: 600; }
+
+/* ---------- Scrollbars ---------- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+::-webkit-scrollbar-thumb { background: linear-gradient(var(--neon-c), var(--neon-p)); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(var(--neon-p), var(--neon-c)); }
+
+/* ---------- Boot overlay ---------- */
+#lc-boot {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--bg-0);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.6s, visibility 0.6s;
+}
+#lc-boot.done { opacity: 0; visibility: hidden; pointer-events: none; }
+#lc-boot .ring {
+  width: 110px; height: 110px; border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--neon-c); border-right-color: var(--neon-p);
+  animation: lc-spin 1.2s linear infinite;
+  margin-bottom: 24px;
+  box-shadow: 0 0 40px rgba(34, 211, 238, 0.3);
+}
+#lc-boot .lc-boot-title {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 24px;
+  letter-spacing: 6px;
+  background: linear-gradient(135deg, var(--neon-c), var(--neon-p));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 14px;
+}
+#lc-boot .lc-boot-lines {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--neon-g); text-align: left; min-width: 360px;
+}
+#lc-boot .lc-boot-lines div { opacity: 0; animation: lc-line-in 0.4s forwards; }
+@keyframes lc-line-in { to { opacity: 1 } }
+
+/* ---------- Common helpers ---------- */
+.lc-mono { font-family: 'JetBrains Mono', monospace; }
+.lc-orb { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; text-transform: uppercase; }
+.lc-dim { color: var(--ink-dim); }
+.lc-c { color: var(--neon-c); }
+.lc-g { color: var(--neon-g); }
+.lc-p { color: var(--neon-p); }
+.lc-a { color: var(--neon-a); }
+.lc-r { color: var(--neon-r); }

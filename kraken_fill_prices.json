@@ -1,0 +1,50 @@
+{
+  "O2EDPW-OX3YN-ZICTPK": {
+    "price": 0.02321,
+    "vol_exec": 659.6306,
+    "cost": 15.31662,
+    "fee": 0.06127,
+    "status": "closed",
+    "resolved_utc": "2026-05-05T22:21:04.823222+00:00"
+  },
+  "O2OBNF-TO7DN-FDU2UI": {
+    "price": 0.01995,
+    "vol_exec": 774.7934,
+    "cost": 15.45713,
+    "fee": 0.06183,
+    "status": "closed",
+    "resolved_utc": "2026-05-05T22:21:04.823242+00:00"
+  },
+  "OYKUE7-O4P4R-MW5UBB": {
+    "price": 0.3725,
+    "vol_exec": 54.1419,
+    "cost": 20.17327,
+    "fee": 0.08069,
+    "status": "closed",
+    "resolved_utc": "2026-05-05T22:21:04.823246+00:00"
+  },
+  "OFQVHI-PUNXU-Z2AISP": {
+    "price": 0.00611,
+    "vol_exec": 2932.5513,
+    "cost": 17.92063,
+    "fee": 0.07168,
+    "status": "closed",
+    "resolved_utc": "2026-05-05T23:04:14.194239+00:00"
+  },
+  "OJNDU2-TFQFQ-YJQVGG": {
+    "price": 0.0599,
+    "vol_exec": 323.5199,
+    "cost": 19.38177,
+    "fee": 0.07753,
+    "status": "closed",
+    "resolved_utc": "2026-05-05T23:04:14.194255+00:00"
+  },
+  "ODDYIW-KEUEK-MTRTCM": {
+    "price": 0.05109,
+    "vol_exec": 370.7136,
+    "cost": 18.93976,
+    "fee": 0.07576,
+    "status": "closed",
+    "resolved_utc": "2026-05-05T23:04:14.194259+00:00"
+  }
+}

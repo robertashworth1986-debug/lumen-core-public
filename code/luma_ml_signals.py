@@ -20,6 +20,8 @@ import argparse
 import csv
 import io
 import json
+import os
+import subprocess
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -73,24 +75,54 @@ def build_feature_matrix(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, list
     return X, y, available
 
 
+def _gpu_requested() -> bool:
+    if str(os.getenv("LUMA_USE_GPU", "0")).strip().lower() not in {"1", "true", "yes", "on"}:
+        return False
+    try:
+        return subprocess.run(["nvidia-smi"], capture_output=True, text=True, timeout=3).returncode == 0
+    except Exception:
+        return False
+
+
 def train_ensemble(X: np.ndarray, y: np.ndarray) -> tuple[Any, Any]:
     """Train LightGBM + XGBoost on strategy features → institutional score."""
     import lightgbm as lgb
     import xgboost as xgb
 
-    lgb_model = lgb.LGBMRegressor(
-        n_estimators=200, learning_rate=0.05, max_depth=5,
-        num_leaves=31, subsample=0.8, colsample_bytree=0.8,
-        random_state=42, verbose=-1,
-    )
-    xgb_model = xgb.XGBRegressor(
-        n_estimators=200, learning_rate=0.05, max_depth=5,
-        subsample=0.8, colsample_bytree=0.8,
-        random_state=42, verbosity=0,
-    )
+    use_gpu = _gpu_requested()
 
-    lgb_model.fit(X, y)
-    xgb_model.fit(X, y)
+    lgb_kwargs = {
+        "n_estimators": 200, "learning_rate": 0.05, "max_depth": 5,
+        "num_leaves": 31, "subsample": 0.8, "colsample_bytree": 0.8,
+        "random_state": 42, "verbose": -1,
+    }
+    xgb_kwargs = {
+        "n_estimators": 200, "learning_rate": 0.05, "max_depth": 5,
+        "subsample": 0.8, "colsample_bytree": 0.8,
+        "random_state": 42, "verbosity": 0,
+    }
+    if use_gpu:
+        lgb_kwargs.update({"device": "gpu"})
+        xgb_kwargs.update({"tree_method": "hist", "device": "cuda"})
+
+    lgb_model = lgb.LGBMRegressor(**lgb_kwargs)
+    xgb_model = xgb.XGBRegressor(**xgb_kwargs)
+
+    try:
+        lgb_model.fit(X, y)
+    except Exception:
+        # Fallback to CPU if GPU training is unavailable at runtime
+        lgb_kwargs.pop("device", None)
+        lgb_model = lgb.LGBMRegressor(**lgb_kwargs)
+        lgb_model.fit(X, y)
+
+    try:
+        xgb_model.fit(X, y)
+    except Exception:
+        xgb_kwargs.pop("device", None)
+        xgb_kwargs.pop("tree_method", None)
+        xgb_model = xgb.XGBRegressor(**xgb_kwargs)
+        xgb_model.fit(X, y)
     return lgb_model, xgb_model
 
 

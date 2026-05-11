@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LumenCore — Institutional Quant Research, Built Solo</title>
+<meta name="description" content="Multi-asset walk-forward backtesting across 870+ instruments. Live exchange execution. Cryptographic audit trail. Built solo over 12+ months.">
+<meta property="og:title" content="LumenCore — Institutional Quant Research, Built Solo">
+<meta property="og:description" content="Walk-forward across 870+ instruments. Live TXIDs. Hash-chained evidence. Radical transparency.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lumen-core.ai">
+<style>
+  :root{
+    --bg:#06080d; --fg:#e7eef7; --mute:#8390a3; --line:#1c2535;
+    --acc:#5cf2c7; --acc2:#7ab7ff; --warn:#ffb86b; --bad:#ff7373;
+    --card:#0c111a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
+    font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(1200px 600px at 80% -200px, rgba(122,183,255,.08), transparent),
+      radial-gradient(900px 500px at -100px 600px, rgba(92,242,199,.06), transparent);
+  }
+  a{color:var(--acc2); text-decoration:none}
+  a:hover{color:var(--acc)}
+  .wrap{max-width:1080px;margin:0 auto;padding:36px 24px 80px}
+  header{display:flex;align-items:center;justify-content:space-between;padding:8px 0 36px;flex-wrap:wrap;gap:16px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.4px}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--acc);box-shadow:0 0 18px var(--acc)}
+  nav a{margin-left:24px;color:var(--mute);font-size:14px}
+  nav a:hover{color:var(--fg)}
+  .hero{padding:48px 0 30px;border-bottom:1px solid var(--line)}
+  .badge{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);
+    background:#0a0f17;padding:6px 12px;border-radius:999px;font-size:12.5px;color:var(--mute);
+    margin-bottom:20px}
+  .badge .pulse{width:7px;height:7px;border-radius:50%;background:var(--acc);
+    box-shadow:0 0 0 0 var(--acc); animation:pulse 2s infinite}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(92,242,199,.55)}
+    70%{box-shadow:0 0 0 10px rgba(92,242,199,0)}
+    100%{box-shadow:0 0 0 0 rgba(92,242,199,0)}
+  }
+  h1{font-size:clamp(32px,5vw,52px);line-height:1.05;margin:0 0 16px;letter-spacing:-.02em}
+  h1 em{font-style:normal;color:var(--acc)}
+  .lede{font-size:clamp(16px,1.7vw,19px);color:#cdd6e3;max-width:780px;margin:0 0 28px}
+  .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:10px;
+    border:1px solid var(--line);background:#0c111a;color:var(--fg);font-weight:600;font-size:14.5px;
+    transition:transform .08s ease, border-color .15s ease, background .15s ease}
+  .btn:hover{transform:translateY(-1px);border-color:#2a3a55}
+  .btn.primary{background:linear-gradient(180deg,#0e2a24,#08221c);border-color:#1c4a3d;color:var(--acc)}
+  .btn.primary:hover{border-color:var(--acc)}
+  .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:32px 0 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px}
+  .card h3{margin:0 0 4px;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute)}
+  .stat{font-size:30px;font-weight:700;color:var(--fg);margin-top:6px;letter-spacing:-.01em}
+  .stat .unit{font-size:14px;color:var(--mute);font-weight:500;margin-left:4px}
+  .sub{color:var(--mute);font-size:13px;margin-top:6px}
+  section{padding:64px 0;border-bottom:1px solid var(--line)}
+  section h2{font-size:28px;letter-spacing:-.01em;margin:0 0 6px}
+  section .kicker{color:var(--acc);font-size:12px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px}
+  section p.sec-lede{color:#cdd6e3;max-width:760px;margin:0 0 24px}
+  .pillars{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .pillar{padding:22px;border:1px solid var(--line);border-radius:14px;background:#080d15}
+  .pillar h4{margin:0 0 8px;font-size:16px;color:var(--acc2)}
+  .pillar p{margin:0;color:#aab5c5;font-size:14.5px}
+  .truth{background:linear-gradient(180deg,#08130f,#06090c);border:1px solid #1d3a30;border-radius:16px;padding:28px}
+  .truth h3{margin:0 0 6px;color:var(--acc)}
+  .truth p{margin:0;color:#bcd3c8}
+  .proof-table{width:100%;border-collapse:collapse;margin-top:6px;font-size:14.5px}
+  .proof-table th,.proof-table td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  .proof-table th{font-weight:600;color:var(--mute);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+  .proof-table tr:last-child td{border-bottom:none}
+  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap}
+  .pill.ok{background:rgba(92,242,199,.12);color:var(--acc);border:1px solid rgba(92,242,199,.3)}
+  .pill.work{background:rgba(255,184,107,.12);color:var(--warn);border:1px solid rgba(255,184,107,.3)}
+  .pill.in{background:rgba(122,183,255,.12);color:var(--acc2);border:1px solid rgba(122,183,255,.3)}
+  .contact{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .contact .card a{color:var(--acc2);font-weight:600}
+  footer{padding:36px 0 8px;color:var(--mute);font-size:13px;text-align:center}
+  footer .meta{margin-top:8px;font-size:12px;color:#5b6678}
+  code{background:#0a0f17;border:1px solid var(--line);padding:1px 6px;border-radius:5px;font-size:13px}
+  .tx{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:#a0c8ff;word-break:break-all}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand"><span class="dot"></span> LUMENCORE</div>
+    <nav>
+      <a href="#proof">Proof</a>
+      <a href="#what">What</a>
+      <a href="#stack">Stack</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero" style="border-top:none">
+    <div class="badge"><span class="pulse"></span> Live system &middot; Walk-forward in flight &middot; Radical transparency</div>
+    <h1>An institutional-grade quant research stack &mdash; <em>built solo</em>, audited in public.</h1>
+    <p class="lede">
+      LumenCore is a multi-asset research engine that runs walk-forward backtests across
+      <strong>870+ instruments</strong> in minutes, executes on real exchanges, and logs
+      every decision with cryptographic chain-of-custody. No fund. No paid signals. Just the
+      engine, the evidence, and the truth &mdash; including the losses.
+    </p>
+    <div class="ctas">
+      <a class="btn primary" href="#contact">Talk to the founder &rarr;</a>
+      <a class="btn" href="#proof">See the evidence</a>
+      <a class="btn" href="#stack">View the stack</a>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Universe under test</h3>
+        <div class="stat">870<span class="unit">instruments</span></div>
+        <div class="sub">Equities (Alpaca SIP) &middot; Crypto (Kraken + Alpaca)</div>
+      </div>
+      <div class="card">
+        <h3>Strategies &times; algos</h3>
+        <div class="stat">154<span class="unit">combos</span></div>
+        <div class="sub">22 strategy families &times; 7 post-processors</div>
+      </div>
+      <div class="card">
+        <h3>Walk-forward jobs</h3>
+        <div class="stat">132K<span class="unit">parallel</span></div>
+        <div class="sub">~5 minutes on 20 cores, cost-adjusted</div>
+      </div>
+      <div class="card">
+        <h3>Build duration</h3>
+        <div class="stat">12+<span class="unit">months solo</span></div>
+        <div class="sub">Single founder, full stack</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="what">
+    <div class="kicker">What it actually is</div>
+    <h2>A research platform &mdash; not a fund, not a signal service.</h2>
+    <p class="sec-lede">
+      LumenCore is the engine and the evidence trail. It validates strategies, logs every
+      decision with cryptographic hashing, and surfaces the truth &mdash; including when
+      strategies <em>fail</em> walk-forward. That radical transparency is the brand.
+    </p>
+    <div class="pillars">
+      <div class="pillar">
+        <h4>Multi-source data backbone</h4>
+        <p>Kraken USD universe (~650 pairs), Alpaca SIP equities (200 stocks &times; 2y hourly), Alpaca crypto (24 pairs). Production paid-tier feeds.</p>
+      </div>
+      <div class="pillar">
+        <h4>Walk-forward truth engine</h4>
+        <p>Rolling train/test windows, 25bps cost-adjusted, parallelized across all CPU cores. In-sample fits get exposed automatically &mdash; no cherry-picking.</p>
+      </div>
+      <div class="pillar">
+        <h4>Hash-chained audit ledger</h4>
+        <p>Every order, signal, and result hashed with SHA-256 and chained. Frozen-delta snapshots for institutional review.</p>
+      </div>
+      <div class="pillar">
+        <h4>Live execution proven</h4>
+        <p>Real Kraken transactions with verifiable TXIDs (see proof section below). This isn&rsquo;t a paper-trading screenshot factory.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="proof">
+    <div class="kicker">The evidence</div>
+    <h2>Verifiable. Auditable. Honest about what isn&rsquo;t.</h2>
+    <p class="sec-lede">
+      Below is exactly what exists today. No claims of awards, validations, or partnerships
+      that haven&rsquo;t been independently verified. As real milestones land, they&rsquo;re
+      added here with proof links &mdash; never before.
+    </p>
+
+    <table class="proof-table">
+      <thead><tr><th>Evidence</th><th>Source / detail</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Live exchange transactions</td>
+          <td class="tx">Kraken TXIDs: OQBCTI-5CTNN-2ICN2C, OH37RD-2OMMM-CJW4LS, OA4UX2-4XA2H-ZGFYOA</td>
+          <td><span class="pill ok">Live</span></td>
+        </tr>
+        <tr>
+          <td>Walk-forward backtest engine</td>
+          <td>132K parallel jobs &middot; 870 instruments &middot; reproducible from saved inputs</td>
+          <td><span class="pill ok">Operational</span></td>
+        </tr>
+        <tr>
+          <td>Hash-chained audit ledger</td>
+          <td>SHA-256 on every event &middot; <code>execution_events.jsonl</code> + frozen deltas</td>
+          <td><span class="pill ok">Continuous</span></td>
+        </tr>
+        <tr>
+          <td>Multi-source paid data feeds</td>
+          <td>Alpaca SIP &middot; Finnhub &middot; Alpha Vantage &middot; Twelve Data</td>
+          <td><span class="pill ok">Active</span></td>
+        </tr>
+        <tr>
+          <td>Production HTTPS deployment</td>
+          <td>Caddy + Let&rsquo;s Encrypt &middot; Oracle Cloud &middot; HTTP/2 + HTTP/3</td>
+          <td><span class="pill ok">Live (this site)</span></td>
+        </tr>
+        <tr>
+          <td>Universe-scale walk-forward run</td>
+          <td>Cross-asset survivorship-bias-free analysis</td>
+          <td><span class="pill in">In progress</span></td>
+        </tr>
+        <tr>
+          <td>Patent filing &middot; SAM.gov registration</td>
+          <td>In preparation &middot; details published once filing receipts received</td>
+          <td><span class="pill work">Pending verification</span></td>
+        </tr>
+        <tr>
+          <td>Federal grant submissions (SBIR/STTR)</td>
+          <td>Pursuing DOE / NSF / DoD opportunities</td>
+          <td><span class="pill work">Pursuing</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:28px" class="truth">
+      <h3>Radical-transparency policy</h3>
+      <p>
+        If a strategy fails walk-forward, that gets published too. The point of the platform
+        isn&rsquo;t to be right &mdash; it&rsquo;s to be <em>auditable</em>. The loudest red
+        flag in retail quant is a 100% win rate. We publish the red flags first.
+      </p>
+    </div>
+  </section>
+
+  <section id="stack">
+    <div class="kicker">Under the hood</div>
+    <h2>Production tooling, not notebooks.</h2>
+    <div class="pillars">
+      <div class="pillar">
+        <h4>Compute</h4>
+        <p>Python 3.14 &middot; ProcessPoolExecutor across 20 cores &middot; ThreadPoolExecutor for parallel HTTP &middot; pandas / numpy / scipy / scikit-learn / xgboost / optuna / SHAP installed and ready to wire.</p>
+      </div>
+      <div class="pillar">
+        <h4>Data</h4>
+        <p>Alpaca SIP equity feed (paid) &middot; Kraken full crypto universe &middot; Alpaca crypto v1beta3 &middot; Finnhub &middot; Alpha Vantage &middot; multi-source resilience.</p>
+      </div>
+      <div class="pillar">
+        <h4>Execution</h4>
+        <p>Kraken REST + WebSocket &middot; deadman switches &middot; auto-fire gating with manual approval queue &middot; rolling capital tracking &middot; real PnL ledger.</p>
+      </div>
+      <div class="pillar">
+        <h4>Infrastructure</h4>
+        <p>Oracle Cloud VPS &middot; Caddy 2.11 (auto-HTTPS) &middot; firewalld + iptables hardening &middot; daily-rotated logs &middot; Prometheus-ready metrics endpoints.</p>
+      </div>
+      <div class="pillar">
+        <h4>Evidence</h4>
+        <p>SHA-256 chain-of-custody on every event &middot; tamper-evident JSONL ledgers &middot; frozen-delta snapshot system &middot; reproducible from saved seeds.</p>
+      </div>
+      <div class="pillar">
+        <h4>Frontend</h4>
+        <p>Panel-based investor dashboards &middot; live KPI streaming &middot; Plotly visualizations &middot; gateway pattern for unified API surface.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" style="border-bottom:none">
+    <div class="kicker">Direct line</div>
+    <h2>Talk to the founder.</h2>
+    <p class="sec-lede">
+      Robert &ldquo;BabyRay&rdquo; Ashworth &mdash; principal engineer &amp; founder. Solo-built
+      across 12+ months. Replies same day for institutional inquiries, federal program officers,
+      and serious technical due diligence.
+    </p>
+    <div class="contact">
+      <div class="card">
+        <h3>Email</h3>
+        <div class="stat" style="font-size:18px"><a href="mailto:hello@lumen-core.ai">hello@lumen-core.ai</a></div>
+        <div class="sub">Partnerships, licensing, federal collaboration</div>
+      </div>
+      <div class="card">
+        <h3>Live system</h3>
+        <div class="stat" style="font-size:18px"><a href="https://app.lumen-core.ai">app.lumen-core.ai</a></div>
+        <div class="sub">Auth-gated live dashboard (creds on request)</div>
+      </div>
+      <div class="card">
+        <h3>Research console</h3>
+        <div class="stat" style="font-size:18px"><a href="https://research.lumen-core.ai">research.lumen-core.ai</a></div>
+        <div class="sub">Backtest results, walk-forward summaries</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>&copy; <span id="yr"></span> LumenCore &middot; LumaTrader&trade; &mdash; all rights reserved</div>
+    <div class="meta">
+      Hosted on Oracle Cloud &middot; HTTPS via Let&rsquo;s Encrypt &middot; <code>v1.1.0-truth</code>
+    </div>
+  </footer>
+</div>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

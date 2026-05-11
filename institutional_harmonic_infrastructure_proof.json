@@ -1,0 +1,42 @@
+{
+  "timestamp_utc": "2026-04-08T02:53:07.902206+00:00",
+  "artifacts": {
+    "kraken_source": {
+      "path": "C:\\LumaTrader\\data\\kraken_live_5000.csv",
+      "sha256": "43c4ec0e4b7a9f637d178f57dc8667cbb40132b637a1bc77d5d5cc2e87cf2799"
+    },
+    "fred_DGS10": {
+      "path": "C:\\LumaTrader\\data\\fred_DGS10.csv",
+      "sha256": "6547a7171f1a1d0b1c6163527e3602a52abe34966aa94fee23c723347cbe2618"
+    },
+    "fred_UNRATE": {
+      "path": "C:\\LumaTrader\\data\\fred_UNRATE.csv",
+      "sha256": "245e026f8c723da644b5d4425f7290f39ded79729b5c7e13f72acbc003197ec1"
+    },
+    "fred_CPIAUCSL": {
+      "path": "C:\\LumaTrader\\data\\fred_CPIAUCSL.csv",
+      "sha256": "3089c709086e3b464eb84be9960ba55e8fd57ea31c35fa381d09a3e393268aa4"
+    },
+    "eia_rto_daily": {
+      "error": "400 Client Error: Bad Request for url: https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=RZsPbQB0IBNSYPHOS1gJw5pdM07oZcBhr3Bvhb4j&frequency=daily&data%5B0%5D=value&facets%5Btype%5D%5B%5D=D&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=asc&length=5000"
+    }
+  },
+  "summary": {
+    "timestamp_utc": "2026-04-08T02:53:07.897208+00:00",
+    "rows": 1008,
+    "top_stack": "fred_CPIAUCSL",
+    "top_flow": "gaussian",
+    "top_strategy": "keltner_squeeze",
+    "top_test_sharpe": 14.57434027698863,
+    "top_test_vs_baseline": -0.1155991154589846,
+    "top_institutional_score": 304.77480287317906,
+    "errors": [
+      {
+        "stack": "eia_rto_daily",
+        "error": "400 Client Error: Bad Request for url: https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=RZsPbQB0IBNSYPHOS1gJw5pdM07oZcBhr3Bvhb4j&frequency=daily&data%5B0%5D=value&facets%5Btype%5D%5B%5D=D&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=asc&length=5000"
+      }
+    ]
+  },
+  "core_file": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\institutional_harmonic_core.py",
+  "suite_file": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\institutional_harmonic_suite.py"
+}

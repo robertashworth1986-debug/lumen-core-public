@@ -1,0 +1,89 @@
+{
+  "timestamp_utc": "2026-03-26T16:53:38.683119+00:00",
+  "source_file": "C:\\LumaTrader\\output\\level5_live_allocations.csv",
+  "starting_capital_usd": 200.0,
+  "rows_scanned": 5,
+  "approved_winners": 0,
+  "paper_trade_events_observed": 0,
+  "paper_ready_for_live": false,
+  "rules": {
+    "research_sharpe_min": 1.5,
+    "research_maxdd_floor": -0.25,
+    "research_final_min": 1.0,
+    "live_sharpe_min": 0.5,
+    "live_maxdd_floor": -0.12,
+    "min_trade_events_before_live": 30
+  },
+  "top_candidates": [
+    {
+      "pair": "PAXG/USD",
+      "strategy": "RAW_BTC_inverted",
+      "tf": 60,
+      "action": "LONG",
+      "paper_score": 2.131509,
+      "test_mc_sharpe": 6.006067,
+      "live_sharpe_now": -1.963438,
+      "test_max_dd": -0.144406,
+      "live_maxdd_now": -0.132273,
+      "norm_weight": 0.0,
+      "capital_usd": 0.0,
+      "approved": false
+    },
+    {
+      "pair": "XRP/EUR",
+      "strategy": "RAW_BTC_inverted",
+      "tf": 60,
+      "action": "SHORT",
+      "paper_score": 2.09187,
+      "test_mc_sharpe": 5.559642,
+      "live_sharpe_now": -1.431205,
+      "test_max_dd": -0.103648,
+      "live_maxdd_now": -0.21188,
+      "norm_weight": 0.0,
+      "capital_usd": 0.0,
+      "approved": false
+    },
+    {
+      "pair": "FET/USD",
+      "strategy": "harmonic_hybrid_inverted",
+      "tf": 60,
+      "action": "LONG",
+      "paper_score": 2.065822,
+      "test_mc_sharpe": 4.141587,
+      "live_sharpe_now": 0.231269,
+      "test_max_dd": -0.183385,
+      "live_maxdd_now": -0.07855,
+      "norm_weight": 0.0,
+      "capital_usd": 0.0,
+      "approved": false
+    },
+    {
+      "pair": "HYPE/USD",
+      "strategy": "RAW_BTC",
+      "tf": 60,
+      "action": "SHORT",
+      "paper_score": 1.975194,
+      "test_mc_sharpe": 5.700294,
+      "live_sharpe_now": -2.145084,
+      "test_max_dd": -0.159884,
+      "live_maxdd_now": -0.324557,
+      "norm_weight": 0.0,
+      "capital_usd": 0.0,
+      "approved": false
+    },
+    {
+      "pair": "XRP/USDT",
+      "strategy": "RAW_BTC_inverted",
+      "tf": 60,
+      "action": "SHORT",
+      "paper_score": 1.229966,
+      "test_mc_sharpe": 4.816902,
+      "live_sharpe_now": -2.933054,
+      "test_max_dd": -0.115212,
+      "live_maxdd_now": -0.239297,
+      "norm_weight": 0.0,
+      "capital_usd": 0.0,
+      "approved": false
+    }
+  ]
+}

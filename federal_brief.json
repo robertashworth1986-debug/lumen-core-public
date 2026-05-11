@@ -1,0 +1,87 @@
+{
+  "generated_utc": "2026-04-08T02:52:06.280722+00:00",
+  "mission": "cross_sector_failure_prevention_and_cost_avoidance",
+  "trust_tier": "gov_audit_ready",
+  "program_alignment": [
+    "DARPA",
+    "DOE",
+    "DOD",
+    "NSF",
+    "NASA"
+  ],
+  "portfolio": {
+    "sector_count": 3,
+    "prediction_count": 708,
+    "audit_event_count": 299
+  },
+  "financial_impact": {
+    "projected_failure_cost_usd": 12260096.4,
+    "estimated_avoided_cost_usd": 11181207.92,
+    "estimated_residual_cost_usd": 1078888.48,
+    "prevented_pct": 91.2
+  },
+  "top_risks": [
+    {
+      "sector": "financial_market_infra",
+      "stream": "FEDWIRE_OPS",
+      "constraint": "settlement_window_integrity",
+      "predicted_failure_utc": "2026-04-07T10:40:53.329549+00:00",
+      "projected_failure_cost_usd": 6200376.0,
+      "avoided_cost_usd": 3839272.82,
+      "confidence": 0.91
+    },
+    {
+      "sector": "financial_market_infra",
+      "stream": "FEDWIRE_OPS",
+      "constraint": "settlement_window_integrity",
+      "predicted_failure_utc": "2026-04-07T11:09:59.106678+00:00",
+      "projected_failure_cost_usd": 6200376.0,
+      "avoided_cost_usd": 5654742.91,
+      "confidence": 0.91
+    },
+    {
+      "sector": "financial_market_infra",
+      "stream": "FEDWIRE_OPS",
+      "constraint": "settlement_window_integrity",
+      "predicted_failure_utc": "2026-04-07T11:10:08.145147+00:00",
+      "projected_failure_cost_usd": 6200376.0,
+      "avoided_cost_usd": 5654742.91,
+      "confidence": 0.91
+    },
+    {
+      "sector": "financial_market_infra",
+      "stream": "FEDWIRE_OPS",
+      "constraint": "settlement_window_integrity",
+      "predicted_failure_utc": "2026-04-07T11:15:08.404353+00:00",
+      "projected_failure_cost_usd": 6200376.0,
+      "avoided_cost_usd": 5654742.91,
+      "confidence": 0.91
+    },
+    {
+      "sector": "financial_market_infra",
+      "stream": "FEDWIRE_OPS",
+      "constraint": "settlement_window_integrity",
+      "predicted_failure_utc": "2026-04-07T11:20:08.628792+00:00",
+      "projected_failure_cost_usd": 6200376.0,
+      "avoided_cost_usd": 5654742.91,
+      "confidence": 0.91
+    }
+  ],
+  "alpaca_evidence": {
+    "mode": "real_api",
+    "fills_count": 0,
+    "equity_usd": 100000.0,
+    "win_rate_pct": 0.0,
+    "sharpe_proxy": 0.0
+  },
+  "chain_of_custody": {
+    "hash_file_count": 6,
+    "chain_generated_utc": "2026-04-08T02:52:06.185277+00:00"
+  },
+  "files": {
+    "evidence": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\investor_and_grant_evidence.json",
+    "predictions": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\cross_sector_failure_predictions.jsonl",
+    "chain": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\infra_chain_of_custody_sha256.json",
+    "alpaca_evidence": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\investor_evidence_report.json"
+  }
+}

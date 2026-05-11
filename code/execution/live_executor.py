@@ -49,10 +49,17 @@ LIVE_AUDIT_CHAIN_FILE = OUT / "live_execution_audit_chain.jsonl"
 LIVE_HEARTBEAT_FILE = OUT / "live_executor_heartbeat.json"
 LIVE_HEARTBEAT_SCHEMA_VERSION = "1.0.0"
 LIVE_EXECUTOR_LOCK_FILE = OUT / "live_executor.lock"
+SYMBOL_FLIP_INTEL_FILE = OUT / "symbol_flip_intel_top5.json"
+COLLATERAL_CONVERT_LOG_FILE = OUT / "collateral_convert_log.jsonl"
 KRAKEN_NONCE_STATE_FILE = OUT / "kraken_nonce_state.json"
 KRAKEN_BALANCE_CACHE_FILE = OUT / "kraken_balance_cache.json"
 KRAKEN_ASSET_PAIRS_CACHE_FILE = OUT / "kraken_asset_pairs_cache.json"
 ROLLING_CAPITAL_BEST_MULTI_FILE = Path(r"C:/LumaTrader/rolling_capital/rolling_capital_best_multi.json")
+UNIVERSE_SYMBOL_FILE_CANDIDATES = (
+    ROOT / "out" / "adaptive_universe.json",
+    ROOT / "adaptive_universe.json",
+    OUT / "adaptive_universe.json",
+)
 
 OUT.mkdir(parents=True, exist_ok=True)
 DASH.mkdir(parents=True, exist_ok=True)
@@ -228,7 +235,7 @@ class KrakenClient:
         self.last_balance_error = ""
         self._last_nonce = int(time.time_ns())
         self._balance_cache_ttl_sec = 8.0
-        self._balance_rate_limit_fallback_sec = 180.0
+        self._balance_rate_limit_fallback_sec = 600.0
         self._balance_cache_usd = 0.0
         self._balance_cache_utc = ""
         self._balance_snapshot: dict[str, float] = {}
@@ -605,6 +612,48 @@ class KrakenClient:
 class MultiExchangeRouter:
     def __init__(self, api_keys: dict):
         self.kraken = KrakenClient(api_keys.get("KRAKEN_API_KEY", ""), api_keys.get("KRAKEN_API_SECRET", ""))
+        self._file_symbol_cache: list[str] = []
+        self._file_symbol_cache_utc = 0.0
+        self._file_symbol_cache_ttl_sec = 120.0
+
+    @staticmethod
+    def _normalize_symbol(raw: Any) -> str:
+        token = str(raw or "").upper().strip()
+        if not token:
+            return ""
+        if "/" in token:
+            token = token.split("/", 1)[0].strip()
+        token = token.replace("-", "").replace("_", "").strip()
+        if token.endswith("USDT") and len(token) > 4:
+            token = token[:-4]
+        elif token.endswith("USD") and len(token) > 3:
+            token = token[:-3]
+        return token.strip()
+
+    def _load_file_universe_symbols(self) -> list[str]:
+        now_ts = time.time()
+        if self._file_symbol_cache and (now_ts - self._file_symbol_cache_utc) <= self._file_symbol_cache_ttl_sec:
+            return list(self._file_symbol_cache)
+
+        discovered: set[str] = set()
+        for path in UNIVERSE_SYMBOL_FILE_CANDIDATES:
+            payload = load_json(path, {})
+            rows: list[Any] = []
+            if isinstance(payload, dict):
+                maybe_rows = payload.get("symbols", [])
+                if isinstance(maybe_rows, list):
+                    rows = maybe_rows
+            elif isinstance(payload, list):
+                rows = payload
+
+            for row in rows:
+                normalized = self._normalize_symbol(row)
+                if normalized:
+                    discovered.add(normalized)
+
+        self._file_symbol_cache = sorted(discovered)
+        self._file_symbol_cache_utc = now_ts
+        return list(self._file_symbol_cache)
 
     def get_symbol_config(self, symbol: str):
         key = str(symbol or "").upper().strip()
@@ -615,16 +664,32 @@ class MultiExchangeRouter:
             return cfg
         return self.kraken.resolve_symbol_config(key)
 
-    def get_candidate_symbols(self, max_symbols: int = 120) -> list[str]:
+    def get_candidate_symbols(self, max_symbols: int = 120, extra_symbols: Optional[list[str]] = None) -> list[str]:
         symbols = {str(k).upper() for k in SYMBOL_REGISTRY.keys()}
+        known = {str(k).upper() for k in SYMBOL_REGISTRY.keys()}
         dynamic_map = self.kraken.get_asset_pairs_map()
         if isinstance(dynamic_map, dict):
-            symbols.update(str(k).upper() for k in dynamic_map.keys())
-        if not symbols:
+            dynamic_keys = {str(k).upper() for k in dynamic_map.keys()}
+            symbols.update(dynamic_keys)
+            known.update(dynamic_keys)
+
+        symbols.update(self._load_file_universe_symbols())
+
+        for row in (extra_symbols or []):
+            normalized = self._normalize_symbol(row)
+            if normalized:
+                symbols.add(normalized)
+
+        tradable = sorted(s for s in symbols if s in known)
+        if not tradable and known:
+            tradable = sorted(known)
+        if not tradable:
             return []
-        rows = sorted(symbols)
+
         cap = max(int(max_symbols or 0), 1)
-        return rows[:cap]
+        if len(tradable) <= cap:
+            return tradable
+        return random.sample(tradable, cap)
 
     def get_ticker(self, symbol: str):
         cfg = self.get_symbol_config(symbol)
@@ -690,11 +755,32 @@ class RobustLiveExecutor:
         self.dynamic_reserve_floor_usd = 0.0
         self.low_balance_sample_trigger_usd = 12.0
         self.low_balance_sample_size = 24
+        self.low_balance_ticker_scan_cap = 120
         self.gate_override_enabled = False
         self.gate_override_min_confidence = 0.58
         self.gate_override_min_edge_bps = 7.5
         self.spot_short_enabled = False
         self.close_balance_buffer_fraction = 0.998
+        self.spot_inventory_entry_fraction = 0.35
+        self.max_symbol_allocation_pct = 0.52
+        self.auto_convert_collateral = True
+        self.collateral_sell_fraction = 0.20
+        self.collateral_convert_cooldown_sec = 12.0
+        self.min_collateral_convert_usd = 4.0
+        self.last_collateral_convert_utc = ""
+        self.stable_assets = {
+            "USDT",
+            "USDC",
+            "DAI",
+            "USDE",
+            "USD1",
+            "RLUSD",
+            "USAT",
+            "PYUSD",
+            "TUSD",
+            "FDUSD",
+            "USDS",
+        }
         self.gate_not_armed_streak = 0
         self.no_affordable_streak = 0
         self.no_affordable_recycle_enabled = True
@@ -726,6 +812,51 @@ class RobustLiveExecutor:
         self.universe_sample_size = 8
         self.universe_max_pick_spread_bps = 55.0
         self.last_symbol_selection_meta: dict[str, Any] = {}
+        self.allow_best_multi_preference = False
+        self.symbol_intel_enabled = True
+        self.symbol_intel_prefer_top_n = 5
+        self.symbol_intel_max_age_sec = 1200.0
+        self.symbol_intel_min_alpha_score = 1.5
+        self.allow_min_order_cap_breach = True
+        self.auto_convert_stable_for_quote = True
+        self.stable_convert_allowlist: set[str] = set()
+        self.stable_convert_denylist: set[str] = set()
+        self._symbol_intel_cache: dict[str, Any] = {}
+        self._symbol_intel_cache_utc = 0.0
+        self.same_symbol_reentry_cooldown_sec = 90.0
+        self.last_entry_symbol = ""
+        self.last_entry_time_utc = ""
+        self.deliberate_mode_enabled = True
+        self.global_entries_window_sec = 3600.0
+        self.global_entry_cooldown_sec = 75.0
+        self.max_entries_per_hour = 6
+        self.per_symbol_entry_cooldown_sec = 900.0
+        self.per_symbol_entries_window_sec = 3600.0
+        self.max_entries_per_symbol_window = 2
+        self.max_consecutive_same_symbol_entries = 2
+        self.same_symbol_streak_window_sec = 7200.0
+        self.entry_timestamps_utc: list[datetime] = []
+        self.symbol_entry_timestamps_utc: dict[str, list[datetime]] = {}
+        self.entry_symbol_history: list[tuple[datetime, str]] = []
+
+        self.profit_reinvestment_enabled = True
+        self.order_notional_pct = 0.24
+        self.max_deployable_capital_pct = 0.70
+        self.max_drawdown_pct_limit = 10.0
+        self.compounding_growth_sensitivity = 0.75
+        self.compounding_boost_ceiling = 1.80
+        self.compounding_min_notional_usd = 0.50
+        self.compounding_max_notional_usd = 25000.0
+
+        self.adaptive_gate_enabled = True
+        self.adaptive_gate_starvation_sec = 45.0
+        self.adaptive_gate_adjust_cooldown_sec = 20.0
+        self.adaptive_gate_relax_step_score = 0.01
+        self.adaptive_gate_relax_max_offset = 0.12
+        self.adaptive_gate_recover_step_score = 0.005
+        self.gate_relax_offset = 0.0
+        self.last_gate_adjust_utc = ""
+        self.configured_gate_min_composite_score = float(getattr(self.signal_gate, "min_composite_score", 0.60))
 
         self.pyramid_level = 1
         self.consecutive_losses = 0
@@ -761,6 +892,28 @@ class RobustLiveExecutor:
             return float(value)
         except Exception:
             return float(default)
+
+    @staticmethod
+    def _parse_runtime_symbol_set(raw: Any) -> set[str]:
+        rows: list[Any]
+        if isinstance(raw, str):
+            rows = [s.strip() for s in raw.split(",")]
+        elif isinstance(raw, (list, tuple, set)):
+            rows = list(raw)
+        else:
+            return set()
+
+        out: set[str] = set()
+        for row in rows:
+            token = str(row or "").upper().strip()
+            if not token:
+                continue
+            if "/" in token:
+                token = token.split("/", 1)[0].strip()
+            token = token.replace("-", "").replace("_", "").strip()
+            if token:
+                out.add(token)
+        return out
 
     def _effective_max_open_positions(self, raw_value: Any) -> int:
         try:
@@ -815,6 +968,56 @@ class RobustLiveExecutor:
             0.95,
             1.0,
         )
+        self.spot_inventory_entry_fraction = self._clamp(
+            self._to_float(
+                runtime.get("spot_inventory_entry_fraction", self.spot_inventory_entry_fraction),
+                self.spot_inventory_entry_fraction,
+            ),
+            0.05,
+            1.0,
+        )
+        self.max_symbol_allocation_pct = self._clamp(
+            self._to_float(
+                runtime.get("max_symbol_allocation_pct", self.max_symbol_allocation_pct),
+                self.max_symbol_allocation_pct,
+            ),
+            0.10,
+            0.95,
+        )
+        self.auto_convert_collateral = bool(runtime.get("auto_convert_collateral", self.auto_convert_collateral))
+        self.auto_convert_stable_for_quote = bool(
+            runtime.get("auto_convert_stable_for_quote", self.auto_convert_stable_for_quote)
+        )
+        self.stable_convert_allowlist = self._parse_runtime_symbol_set(
+            runtime.get("stable_convert_allowlist", [])
+        )
+        self.stable_convert_denylist = self._parse_runtime_symbol_set(
+            runtime.get("stable_convert_denylist", [])
+        )
+        self.collateral_sell_fraction = self._clamp(
+            self._to_float(
+                runtime.get("collateral_sell_fraction", self.collateral_sell_fraction),
+                self.collateral_sell_fraction,
+            ),
+            0.02,
+            0.95,
+        )
+        self.collateral_convert_cooldown_sec = self._clamp(
+            self._to_float(
+                runtime.get("collateral_convert_cooldown_sec", self.collateral_convert_cooldown_sec),
+                self.collateral_convert_cooldown_sec,
+            ),
+            0.0,
+            86400.0,
+        )
+        self.min_collateral_convert_usd = self._clamp(
+            self._to_float(
+                runtime.get("min_collateral_convert_usd", self.min_collateral_convert_usd),
+                self.min_collateral_convert_usd,
+            ),
+            0.5,
+            100000.0,
+        )
         self.dynamic_reserve_enabled = bool(runtime.get("dynamic_reserve_enabled", self.dynamic_reserve_enabled))
         self.dynamic_reserve_max_balance_fraction = self._clamp(
             self._to_float(
@@ -859,7 +1062,7 @@ class RobustLiveExecutor:
             86400.0,
         )
 
-        self.signal_gate.min_composite_score = self._clamp(
+        configured_gate_score = self._clamp(
             self._to_float(
                 runtime.get(
                     "gate_min_composite_score",
@@ -873,6 +1076,8 @@ class RobustLiveExecutor:
             0.35,
             0.95,
         )
+        self.configured_gate_min_composite_score = float(configured_gate_score)
+        self.signal_gate.min_composite_score = float(configured_gate_score)
         gate_thresholds = getattr(self.signal_gate, "base_thresholds", {})
         if isinstance(gate_thresholds, dict):
             gate_thresholds["alignment"] = self._clamp(
@@ -920,12 +1125,127 @@ class RobustLiveExecutor:
                 0.05,
                 1.0,
             )
+
+        self.adaptive_gate_enabled = bool(runtime.get("adaptive_entry_gate_enabled", self.adaptive_gate_enabled))
+        self.adaptive_gate_starvation_sec = self._clamp(
+            self._to_float(
+                runtime.get("adaptive_entry_gate_starvation_sec", self.adaptive_gate_starvation_sec),
+                self.adaptive_gate_starvation_sec,
+            ),
+            5.0,
+            3600.0,
+        )
+        self.adaptive_gate_adjust_cooldown_sec = self._clamp(
+            self._to_float(
+                runtime.get("adaptive_entry_gate_adjust_cooldown_sec", self.adaptive_gate_adjust_cooldown_sec),
+                self.adaptive_gate_adjust_cooldown_sec,
+            ),
+            1.0,
+            3600.0,
+        )
+
+        default_relax_score = max(
+            self._to_float(runtime.get("adaptive_entry_gate_relax_step_bps", 1.0), 1.0) / 100.0,
+            self.adaptive_gate_relax_step_score,
+        )
+        self.adaptive_gate_relax_step_score = self._clamp(
+            self._to_float(runtime.get("adaptive_entry_gate_relax_step_score", default_relax_score), default_relax_score),
+            0.001,
+            0.05,
+        )
+
+        default_recover_score = max(
+            self._to_float(runtime.get("adaptive_entry_gate_tighten_step_bps", 1.0), 1.0) / 200.0,
+            self.adaptive_gate_recover_step_score,
+        )
+        self.adaptive_gate_recover_step_score = self._clamp(
+            self._to_float(runtime.get("adaptive_entry_gate_recover_step_score", default_recover_score), default_recover_score),
+            0.001,
+            0.05,
+        )
+
+        self.adaptive_gate_relax_max_offset = self._clamp(
+            self._to_float(
+                runtime.get("adaptive_entry_gate_relax_max_offset", self.adaptive_gate_relax_max_offset),
+                self.adaptive_gate_relax_max_offset,
+            ),
+            0.01,
+            0.30,
+        )
+
+        if self.adaptive_gate_enabled and self.gate_relax_offset > 0.0:
+            self.gate_relax_offset = self._clamp(
+                self.gate_relax_offset,
+                0.0,
+                float(self.adaptive_gate_relax_max_offset),
+            )
+            self.signal_gate.min_composite_score = max(
+                float(self.configured_gate_min_composite_score) - float(self.gate_relax_offset),
+                0.35,
+            )
+        elif not self.adaptive_gate_enabled:
+            self.gate_relax_offset = 0.0
+
         configured_fallback = max(self._to_float(runtime.get("fallback_buying_power_usd", 0.0), 0.0), 0.0)
         if self.degraded_buying_power_usd <= 0.0:
             self.degraded_buying_power_usd = configured_fallback
         else:
             # Never expand above configured ceiling from adaptive value.
             self.degraded_buying_power_usd = min(self.degraded_buying_power_usd, max(configured_fallback, 0.0))
+
+        self.profit_reinvestment_enabled = bool(
+            runtime.get("profit_reinvestment_enabled", self.profit_reinvestment_enabled)
+        )
+        self.order_notional_pct = self._clamp(
+            self._to_float(runtime.get("order_notional_pct", self.order_notional_pct), self.order_notional_pct),
+            0.02,
+            0.95,
+        )
+        self.max_deployable_capital_pct = self._clamp(
+            self._to_float(
+                runtime.get("max_deployable_capital_pct", self.max_deployable_capital_pct),
+                self.max_deployable_capital_pct,
+            ),
+            0.05,
+            0.99,
+        )
+        self.max_drawdown_pct_limit = self._clamp(
+            self._to_float(runtime.get("max_drawdown_pct", self.max_drawdown_pct_limit), self.max_drawdown_pct_limit),
+            1.0,
+            95.0,
+        )
+        self.compounding_growth_sensitivity = self._clamp(
+            self._to_float(
+                runtime.get("compounding_growth_sensitivity", self.compounding_growth_sensitivity),
+                self.compounding_growth_sensitivity,
+            ),
+            0.0,
+            3.0,
+        )
+        self.compounding_boost_ceiling = self._clamp(
+            self._to_float(
+                runtime.get("pyramid_reinvestment_multiplier", self.compounding_boost_ceiling),
+                self.compounding_boost_ceiling,
+            ),
+            0.75,
+            3.0,
+        )
+        self.compounding_min_notional_usd = self._clamp(
+            self._to_float(
+                runtime.get("compounding_min_notional_usd", self.compounding_min_notional_usd),
+                self.compounding_min_notional_usd,
+            ),
+            0.0,
+            1000.0,
+        )
+        self.compounding_max_notional_usd = self._clamp(
+            self._to_float(
+                runtime.get("compounding_max_notional_usd", self.compounding_max_notional_usd),
+                self.compounding_max_notional_usd,
+            ),
+            1.0,
+            1_000_000.0,
+        )
 
         self.risk_kernel.max_daily_loss_usd = max(
             1.0,
@@ -939,6 +1259,32 @@ class RobustLiveExecutor:
             0.02,
             0.95,
         )
+
+        configured_risk_fraction = self._clamp(
+            self._to_float(runtime.get("base_risk_fraction", self.sizing_engine.max_risk_pct), self.sizing_engine.max_risk_pct),
+            0.0005,
+            0.03,
+        )
+        configured_risk_floor = self._clamp(
+            self._to_float(
+                runtime.get("max_risk_fraction_floor", self.sizing_engine.max_risk_pct_floor),
+                self.sizing_engine.max_risk_pct_floor,
+            ),
+            0.0001,
+            configured_risk_fraction,
+        )
+        configured_risk_ceiling = self._clamp(
+            self._to_float(
+                runtime.get("max_risk_fraction_ceiling", self.sizing_engine.max_risk_pct_ceiling),
+                self.sizing_engine.max_risk_pct_ceiling,
+            ),
+            configured_risk_fraction,
+            0.05,
+        )
+        self.sizing_engine.max_risk_pct = float(configured_risk_fraction)
+        self.sizing_engine.max_risk_pct_floor = float(configured_risk_floor)
+        self.sizing_engine.max_risk_pct_ceiling = float(configured_risk_ceiling)
+        self.sizing_engine.max_heat = float(self.risk_kernel.max_heat)
 
         self.failure_notional_decay = self._clamp(
             self._to_float(runtime.get("failure_notional_decay", self.failure_notional_decay), self.failure_notional_decay),
@@ -1049,7 +1395,7 @@ class RobustLiveExecutor:
             self._clamp(
                 self._to_float(runtime.get("universe_sample_size", self.universe_sample_size), self.universe_sample_size),
                 1.0,
-                64.0,
+                256.0,
             )
         )
         self.universe_max_pick_spread_bps = self._clamp(
@@ -1059,6 +1405,112 @@ class RobustLiveExecutor:
             ),
             5.0,
             250.0,
+        )
+        self.allow_best_multi_preference = bool(
+            runtime.get("allow_best_multi_preference", self.allow_best_multi_preference)
+        )
+        self.symbol_intel_enabled = bool(runtime.get("symbol_intel_enabled", self.symbol_intel_enabled))
+        self.symbol_intel_prefer_top_n = int(
+            self._clamp(
+                self._to_float(
+                    runtime.get("symbol_intel_prefer_top_n", self.symbol_intel_prefer_top_n),
+                    self.symbol_intel_prefer_top_n,
+                ),
+                1.0,
+                40.0,
+            )
+        )
+        self.symbol_intel_max_age_sec = self._clamp(
+            self._to_float(runtime.get("symbol_intel_max_age_sec", self.symbol_intel_max_age_sec), self.symbol_intel_max_age_sec),
+            30.0,
+            86400.0,
+        )
+        self.symbol_intel_min_alpha_score = self._clamp(
+            self._to_float(
+                runtime.get("symbol_intel_min_alpha_score", self.symbol_intel_min_alpha_score),
+                self.symbol_intel_min_alpha_score,
+            ),
+            0.0,
+            200.0,
+        )
+        self.allow_min_order_cap_breach = bool(
+            runtime.get("allow_min_order_cap_breach", self.allow_min_order_cap_breach)
+        )
+        self.same_symbol_reentry_cooldown_sec = self._clamp(
+            self._to_float(
+                runtime.get("same_symbol_reentry_cooldown_sec", self.same_symbol_reentry_cooldown_sec),
+                self.same_symbol_reentry_cooldown_sec,
+            ),
+            0.0,
+            3600.0,
+        )
+        self.deliberate_mode_enabled = bool(runtime.get("deliberate_mode_enabled", self.deliberate_mode_enabled))
+        self.global_entries_window_sec = self._clamp(
+            self._to_float(
+                runtime.get("global_entries_window_sec", self.global_entries_window_sec),
+                self.global_entries_window_sec,
+            ),
+            60.0,
+            86400.0,
+        )
+        self.global_entry_cooldown_sec = self._clamp(
+            self._to_float(
+                runtime.get("global_entry_cooldown_sec", self.global_entry_cooldown_sec),
+                self.global_entry_cooldown_sec,
+            ),
+            0.0,
+            3600.0,
+        )
+        self.max_entries_per_hour = int(
+            self._clamp(
+                self._to_float(runtime.get("max_entries_per_hour", self.max_entries_per_hour), self.max_entries_per_hour),
+                1.0,
+                240.0,
+            )
+        )
+        self.per_symbol_entry_cooldown_sec = self._clamp(
+            self._to_float(
+                runtime.get("per_symbol_entry_cooldown_sec", self.per_symbol_entry_cooldown_sec),
+                self.per_symbol_entry_cooldown_sec,
+            ),
+            0.0,
+            7200.0,
+        )
+        self.per_symbol_entries_window_sec = self._clamp(
+            self._to_float(
+                runtime.get("per_symbol_entries_window_sec", self.per_symbol_entries_window_sec),
+                self.per_symbol_entries_window_sec,
+            ),
+            60.0,
+            86400.0,
+        )
+        self.max_entries_per_symbol_window = int(
+            self._clamp(
+                self._to_float(
+                    runtime.get("max_entries_per_symbol_window", self.max_entries_per_symbol_window),
+                    self.max_entries_per_symbol_window,
+                ),
+                1.0,
+                50.0,
+            )
+        )
+        self.max_consecutive_same_symbol_entries = int(
+            self._clamp(
+                self._to_float(
+                    runtime.get("max_consecutive_same_symbol_entries", self.max_consecutive_same_symbol_entries),
+                    self.max_consecutive_same_symbol_entries,
+                ),
+                1.0,
+                20.0,
+            )
+        )
+        self.same_symbol_streak_window_sec = self._clamp(
+            self._to_float(
+                runtime.get("same_symbol_streak_window_sec", self.same_symbol_streak_window_sec),
+                self.same_symbol_streak_window_sec,
+            ),
+            60.0,
+            86400.0,
         )
         self.low_balance_sample_trigger_usd = self._clamp(
             self._to_float(
@@ -1073,6 +1525,16 @@ class RobustLiveExecutor:
                 self._to_float(runtime.get("low_balance_sample_size", self.low_balance_sample_size), self.low_balance_sample_size),
                 1.0,
                 200.0,
+            )
+        )
+        self.low_balance_ticker_scan_cap = int(
+            self._clamp(
+                self._to_float(
+                    runtime.get("low_balance_ticker_scan_cap", self.low_balance_ticker_scan_cap),
+                    self.low_balance_ticker_scan_cap,
+                ),
+                8.0,
+                400.0,
             )
         )
 
@@ -1090,6 +1552,164 @@ class RobustLiveExecutor:
         except Exception:
             return float("inf")
 
+    def _load_symbol_flip_intel_payload(self) -> dict[str, Any]:
+        now_ts = time.time()
+        if self._symbol_intel_cache and (now_ts - self._symbol_intel_cache_utc) <= 5.0:
+            return dict(self._symbol_intel_cache)
+
+        payload = load_json(SYMBOL_FLIP_INTEL_FILE, {})
+        if not isinstance(payload, dict):
+            payload = {}
+
+        self._symbol_intel_cache = dict(payload)
+        self._symbol_intel_cache_utc = now_ts
+        return dict(payload)
+
+    def _symbol_flip_intel_candidates(self) -> tuple[list[str], dict[str, Any]]:
+        meta: dict[str, Any] = {
+            "symbol_intel_enabled": bool(self.symbol_intel_enabled),
+            "symbol_intel_file_exists": bool(SYMBOL_FLIP_INTEL_FILE.exists()),
+            "symbol_intel_stale": False,
+            "symbol_intel_age_sec": None,
+            "symbol_intel_candidate_count": 0,
+            "symbol_intel_selected_count": 0,
+            "symbol_intel_executable_count": 0,
+            "symbol_intel_source": "none",
+        }
+
+        if not self.symbol_intel_enabled:
+            meta["symbol_intel_source"] = "disabled"
+            return [], meta
+
+        payload = self._load_symbol_flip_intel_payload()
+        if not payload:
+            meta["symbol_intel_source"] = "empty"
+            return [], meta
+
+        generated_utc = str(payload.get("generated_utc", "") or "")
+        age_sec = float("inf")
+        if generated_utc:
+            try:
+                generated_dt = self._parse_iso_utc(generated_utc)
+                age_sec = max((datetime.now(timezone.utc) - generated_dt).total_seconds(), 0.0)
+            except Exception:
+                age_sec = float("inf")
+
+        if math.isfinite(age_sec):
+            meta["symbol_intel_age_sec"] = round(float(age_sec), 3)
+
+        if math.isfinite(age_sec) and age_sec > float(self.symbol_intel_max_age_sec):
+            meta["symbol_intel_stale"] = True
+            meta["symbol_intel_source"] = "stale"
+            return [], meta
+
+        picks: list[str] = []
+
+        long_candidates = payload.get("long_candidates", []) if isinstance(payload, dict) else []
+        if isinstance(long_candidates, list):
+            ranked = sorted(
+                [row for row in long_candidates if isinstance(row, dict)],
+                key=lambda row: self._to_float(row.get("alpha_long_score", 0.0), 0.0),
+                reverse=True,
+            )
+            for row in ranked:
+                score = self._to_float(row.get("alpha_long_score", 0.0), 0.0)
+                if score < float(self.symbol_intel_min_alpha_score):
+                    continue
+                symbol = str(row.get("symbol", "") or "").upper().strip()
+                if symbol:
+                    picks.append(symbol)
+
+        focus_symbols = payload.get("focus_symbols", []) if isinstance(payload, dict) else []
+        if isinstance(focus_symbols, list):
+            for row in focus_symbols:
+                symbol = str(row or "").upper().strip()
+                if symbol:
+                    picks.append(symbol)
+
+        deduped = list(dict.fromkeys(picks))
+        limited = deduped[: max(int(self.symbol_intel_prefer_top_n), 1)]
+
+        meta["symbol_intel_candidate_count"] = int(len(deduped))
+        meta["symbol_intel_selected_count"] = int(len(limited))
+        meta["symbol_intel_executable_count"] = int(len(limited))
+        meta["symbol_intel_source"] = "symbol_flip_intel_top5"
+        return limited, meta
+
+    def _filter_symbols_by_executable_notional(
+        self,
+        symbols: list[str],
+        affordable_usd_hint: float,
+        max_notional_usd_cap: float,
+    ) -> tuple[list[str], dict[str, Any]]:
+        deduped = list(dict.fromkeys(str(s or "").upper().strip() for s in (symbols or []) if str(s or "").strip()))
+        meta: dict[str, Any] = {
+            "input_count": int(len(deduped)),
+            "evaluated_count": 0,
+            "executable_count": 0,
+            "rejected_missing_config": 0,
+            "rejected_unpriced": 0,
+            "rejected_affordable": 0,
+            "rejected_cap": 0,
+            "limits_applied": False,
+        }
+        if not deduped:
+            return [], meta
+
+        affordable_limit = max(self._to_float(affordable_usd_hint, 0.0), 0.0)
+        cap_limit = max(self._to_float(max_notional_usd_cap, 0.0), 0.0)
+
+        if affordable_limit <= 0.0 and cap_limit <= 0.0:
+            meta["executable_count"] = int(len(deduped))
+            return deduped, meta
+
+        meta["limits_applied"] = True
+        filtered: list[str] = []
+
+        for symbol in deduped:
+            cfg = self.router.get_symbol_config(symbol) or {}
+            static_min_order = self._to_float(cfg.get("min_order", 0.0), 0.0)
+            min_order_qty = self._effective_min_order(symbol, static_min_order)
+            if min_order_qty <= 0.0:
+                meta["rejected_missing_config"] = int(meta["rejected_missing_config"]) + 1
+                continue
+
+            ticker = self.router.get_ticker(symbol)
+            if not isinstance(ticker, dict):
+                meta["rejected_unpriced"] = int(meta["rejected_unpriced"]) + 1
+                continue
+            last_px = max(self._to_float(ticker.get("last", 0.0), 0.0), 0.0)
+            if last_px <= 0.0:
+                meta["rejected_unpriced"] = int(meta["rejected_unpriced"]) + 1
+                continue
+
+            meta["evaluated_count"] = int(meta["evaluated_count"]) + 1
+            min_notional = max(min_order_qty, 0.0) * float(last_px)
+
+            if cap_limit > 0.0 and min_notional > cap_limit:
+                meta["rejected_cap"] = int(meta["rejected_cap"]) + 1
+                continue
+            if affordable_limit > 0.0 and min_notional > affordable_limit:
+                meta["rejected_affordable"] = int(meta["rejected_affordable"]) + 1
+                continue
+
+            filtered.append(symbol)
+
+        meta["executable_count"] = int(len(filtered))
+        return filtered, meta
+
+    def _append_collateral_convert_log(self, now: datetime, context: str, payload: dict[str, Any]) -> None:
+        try:
+            row = {
+                "timestamp_utc": now.isoformat(),
+                "context": str(context or "unknown"),
+                "payload": payload if isinstance(payload, dict) else {"value": payload},
+            }
+            with open(COLLATERAL_CONVERT_LOG_FILE, "a", encoding="utf-8") as f:
+                f.write(json.dumps(row, ensure_ascii=True) + "\n")
+        except Exception:
+            pass
+
     def _select_symbol_from_universe(
         self,
         preferred: str,
@@ -1106,6 +1726,7 @@ class RobustLiveExecutor:
             "universe_candidate_count": len(unique),
             "universe_sample_size": 0,
             "universe_sample_escalated": False,
+            "universe_sample_strategy": "random",
             "universe_ticker_hits": 0,
             "universe_affordability_rejects": 0,
             "symbol_source": "none",
@@ -1126,14 +1747,33 @@ class RobustLiveExecutor:
             return picked, None, meta
 
         sample_size = min(max(int(self.universe_sample_size), 1), len(unique))
-        if (
-            affordable_usd_hint > 0.0
-            and affordable_usd_hint <= float(self.low_balance_sample_trigger_usd)
-            and len(unique) > sample_size
-        ):
+        low_balance_mode = bool(
+            affordable_usd_hint > 0.0 and affordable_usd_hint <= float(self.low_balance_sample_trigger_usd)
+        )
+        if low_balance_mode and len(unique) > sample_size:
             sample_size = min(max(sample_size, int(self.low_balance_sample_size)), len(unique))
             meta["universe_sample_escalated"] = True
-        sampled = random.sample(unique, sample_size) if len(unique) > sample_size else list(unique)
+
+        if low_balance_mode:
+            ranked = sorted(
+                unique,
+                key=lambda s: self._effective_min_order(
+                    s,
+                    self._to_float((self.router.get_symbol_config(s) or {}).get("min_order", 1e9), 1e9),
+                ),
+            )
+            ticker_scan_cap = min(max(int(self.low_balance_ticker_scan_cap), 1), len(ranked))
+            if affordable_usd_hint > 0.0 and affordable_usd_hint <= 2.0 and len(ranked) > ticker_scan_cap:
+                # Rank the full universe by minimum order, but cap ticker lookups to avoid scan stalls.
+                sample_size = max(sample_size, ticker_scan_cap)
+                meta["universe_sample_escalated"] = True
+                meta["universe_sample_strategy"] = "low_balance_ranked_scan"
+            sampled = ranked[: min(sample_size, ticker_scan_cap)]
+            if meta["universe_sample_strategy"] != "low_balance_ranked_scan":
+                meta["universe_sample_strategy"] = "low_balance_min_order"
+        else:
+            sampled = random.sample(unique, sample_size) if len(unique) > sample_size else list(unique)
+
         meta["universe_sample_size"] = len(sampled)
 
         best_symbol: Optional[str] = None
@@ -1156,7 +1796,10 @@ class RobustLiveExecutor:
                 continue
 
             cfg = self.router.get_symbol_config(symbol) or {}
-            min_order_qty = self._to_float(cfg.get("min_order", 0.0), 0.0)
+            min_order_qty = self._effective_min_order(
+                symbol,
+                self._to_float(cfg.get("min_order", 0.0), 0.0),
+            )
             last_px = self._to_float(ticker.get("last", 0.0), 0.0)
             min_order_notional = max(min_order_qty, 0.0) * max(last_px, 0.0)
 
@@ -1342,6 +1985,125 @@ class RobustLiveExecutor:
             self.recent_order_fail_utc.append(now)
         return self._failure_window_metrics(now)
 
+    def _adaptive_gate_adjust_cooldown_active(self, now: datetime) -> bool:
+        if float(self.adaptive_gate_adjust_cooldown_sec) <= 0.0:
+            return False
+        raw = str(self.last_gate_adjust_utc or "").strip()
+        if not raw:
+            return False
+        try:
+            last = self._parse_iso_utc(raw)
+        except Exception:
+            return False
+        return (now - last).total_seconds() < float(self.adaptive_gate_adjust_cooldown_sec)
+
+    def _maybe_relax_gate_threshold(self, now: datetime) -> bool:
+        if not self.adaptive_gate_enabled:
+            return False
+        if self._adaptive_gate_adjust_cooldown_active(now):
+            return False
+
+        starvation_sec = float(self.gate_not_armed_streak) * max(float(self.loop_seconds), 1.0)
+        if starvation_sec < float(self.adaptive_gate_starvation_sec):
+            return False
+
+        old_offset = float(self.gate_relax_offset)
+        new_offset = self._clamp(
+            old_offset + float(self.adaptive_gate_relax_step_score),
+            0.0,
+            float(self.adaptive_gate_relax_max_offset),
+        )
+        if new_offset <= old_offset:
+            return False
+
+        self.gate_relax_offset = float(new_offset)
+        self.last_gate_adjust_utc = now.isoformat()
+        self.signal_gate.min_composite_score = max(
+            float(self.configured_gate_min_composite_score) - float(self.gate_relax_offset),
+            0.35,
+        )
+        return True
+
+    def _recover_gate_threshold_after_fill(self, now: datetime) -> bool:
+        if not self.adaptive_gate_enabled:
+            return False
+        if float(self.gate_relax_offset) <= 0.0:
+            return False
+        if self._adaptive_gate_adjust_cooldown_active(now):
+            return False
+
+        old_offset = float(self.gate_relax_offset)
+        new_offset = max(old_offset - float(self.adaptive_gate_recover_step_score), 0.0)
+        if new_offset >= old_offset:
+            return False
+
+        self.gate_relax_offset = float(new_offset)
+        self.last_gate_adjust_utc = now.isoformat()
+        self.signal_gate.min_composite_score = max(
+            float(self.configured_gate_min_composite_score) - float(self.gate_relax_offset),
+            0.35,
+        )
+        return True
+
+    def _compute_compounding_notional_cap(
+        self,
+        available_usd: float,
+        gate_score: float,
+        drawdown_pct: float,
+        window_fail_rate: float,
+        static_cap_usd: float,
+    ) -> tuple[float, dict[str, Any]]:
+        bankroll = max(float(available_usd), 0.0)
+        deployable = max(bankroll * float(self.max_deployable_capital_pct), 0.0)
+        pct_target = max(deployable * float(self.order_notional_pct), 0.0)
+
+        static_cap = max(float(static_cap_usd), 0.0)
+        if static_cap > 0.0 and pct_target > 0.0:
+            base_cap = min(static_cap, pct_target)
+        elif static_cap > 0.0:
+            base_cap = static_cap
+        else:
+            base_cap = pct_target
+
+        dd_limit = max(float(self.max_drawdown_pct_limit) / 100.0, 0.01)
+        dd_ratio = self._clamp(float(drawdown_pct) / dd_limit, 0.0, 3.0)
+        drawdown_throttle = self._clamp(1.0 - (0.65 * dd_ratio), 0.20, 1.00)
+        fail_throttle = self._clamp(1.0 - (0.75 * float(window_fail_rate)), 0.30, 1.00)
+
+        initial_capital = max(float(getattr(self.portfolio, "initial_capital", 0.0) or 0.0), 1e-9)
+        growth_ratio = bankroll / initial_capital
+        growth_boost = 1.0 + max(growth_ratio - 1.0, 0.0) * float(self.compounding_growth_sensitivity)
+        quality_boost = self._clamp(0.85 + ((float(gate_score) - 0.50) * 0.90), 0.60, 1.25)
+
+        multiplier = 1.0
+        if self.profit_reinvestment_enabled:
+            multiplier = growth_boost * quality_boost * drawdown_throttle * fail_throttle
+            multiplier = self._clamp(multiplier, 0.25, float(self.compounding_boost_ceiling))
+
+        cap = max(base_cap * multiplier, 0.0)
+        if deployable > 0.0:
+            cap = min(cap, deployable)
+        if static_cap > 0.0:
+            cap = min(cap, static_cap)
+
+        cap = min(cap, float(self.compounding_max_notional_usd))
+        if cap > 0.0 and bankroll > 0.0:
+            min_floor = min(float(self.compounding_min_notional_usd), bankroll)
+            cap = max(cap, min_floor)
+
+        meta = {
+            "compounding_enabled": bool(self.profit_reinvestment_enabled),
+            "compounding_multiplier": round(float(multiplier), 6),
+            "compounding_base_cap_usd": round(float(base_cap), 6),
+            "compounding_notional_cap_usd": round(float(cap), 6),
+            "compounding_deployable_capital_usd": round(float(deployable), 6),
+            "compounding_bankroll_growth_ratio": round(float(growth_ratio), 6),
+            "compounding_drawdown_throttle": round(float(drawdown_throttle), 6),
+            "compounding_fail_throttle": round(float(fail_throttle), 6),
+            "compounding_quality_boost": round(float(quality_boost), 6),
+        }
+        return float(cap), meta
+
     def _effective_min_order(self, symbol: str, static_min_order: float) -> float:
         override = float(self.symbol_min_order_overrides.get(symbol.upper(), 0.0) or 0.0)
         return max(float(static_min_order), override)
@@ -1367,11 +2129,360 @@ class RobustLiveExecutor:
         if close_side != "sell":
             return desired, desired, ""
 
-        available_qty = max(float(self.router.get_asset_balance(symbol, force_refresh=True) or 0.0), 0.0)
+        available_qty = max(float(self.router.get_asset_balance(symbol, force_refresh=False) or 0.0), 0.0)
         safe_available = max(available_qty * float(self.close_balance_buffer_fraction), 0.0)
         close_qty = min(desired, safe_available)
         balance_error = str(getattr(self.router.kraken, "last_balance_error", "") or "")
         return float(close_qty), float(available_qty), balance_error
+
+    def _normalize_balance_symbol(self, asset_code: str) -> str:
+        normalizer = getattr(self.router.kraken, "_normalize_balance_asset", None)
+        if callable(normalizer):
+            try:
+                normalized = str(normalizer(asset_code) or "").upper().strip()
+                if normalized:
+                    return normalized
+            except Exception:
+                pass
+
+        raw = str(asset_code or "").upper().strip()
+        if not raw:
+            return ""
+        token = raw.split(".", 1)[0].strip()
+        fallback_alias = {
+            "ZUSD": "USD",
+            "XBT": "BTC",
+            "XXBT": "BTC",
+            "XETH": "ETH",
+            "XXRP": "XRP",
+            "XDG": "DOGE",
+            "XXDG": "DOGE",
+        }
+        return fallback_alias.get(token, token)
+
+    def _build_balance_valuation(self, force_refresh: bool = False) -> dict[str, Any]:
+        balances = self.router.get_balance_snapshot(force_refresh=force_refresh)
+        if not isinstance(balances, dict):
+            balances = {}
+
+        usd_cash = 0.0
+        stable_cash_usd = 0.0
+        holdings_value_usd = 0.0
+        unresolved_assets: list[str] = []
+        holdings: list[dict[str, Any]] = []
+        symbol_values_usd: dict[str, float] = {}
+
+        for asset_code, raw_qty in balances.items():
+            qty = max(self._to_float(raw_qty, 0.0), 0.0)
+            if qty <= 0.0:
+                continue
+
+            symbol = self._normalize_balance_symbol(asset_code)
+            if not symbol:
+                continue
+
+            if symbol == "USD":
+                usd_cash += float(qty)
+                continue
+
+            is_stable = symbol in self.stable_assets
+            last_px = 1.0 if is_stable else 0.0
+            if not is_stable:
+                ticker = self.router.get_ticker(symbol)
+                if isinstance(ticker, dict):
+                    last_px = max(self._to_float(ticker.get("last", 0.0), 0.0), 0.0)
+
+            value_usd = float(qty) * float(last_px)
+            if is_stable:
+                stable_cash_usd += float(value_usd)
+            else:
+                holdings_value_usd += float(value_usd)
+
+            symbol_values_usd[symbol] = float(symbol_values_usd.get(symbol, 0.0) + value_usd)
+            holdings.append(
+                {
+                    "asset_code": str(asset_code),
+                    "symbol": symbol,
+                    "qty": float(qty),
+                    "last": float(last_px),
+                    "value_usd": float(value_usd),
+                    "is_stable": bool(is_stable),
+                }
+            )
+
+            if (not is_stable) and value_usd <= 0.0:
+                unresolved_assets.append(symbol)
+
+        holdings.sort(key=lambda row: float(row.get("value_usd", 0.0) or 0.0), reverse=True)
+
+        cash_usd = float(max(usd_cash + stable_cash_usd, 0.0))
+        total_equity_usd = float(max(cash_usd + holdings_value_usd, cash_usd, 0.0))
+        largest_symbol = ""
+        largest_weight_pct = 0.0
+        if holdings and total_equity_usd > 0.0:
+            largest_symbol = str(holdings[0].get("symbol", "") or "")
+            largest_weight_pct = (float(holdings[0].get("value_usd", 0.0) or 0.0) / total_equity_usd) * 100.0
+
+        return {
+            "balances": balances,
+            "cash_usd": float(cash_usd),
+            "usd_cash_balance": float(max(usd_cash, 0.0)),
+            "stable_cash_equivalent_usd": float(max(stable_cash_usd, 0.0)),
+            "holdings_value_usd": float(max(holdings_value_usd, 0.0)),
+            "total_equity_usd": float(total_equity_usd),
+            "symbol_values_usd": symbol_values_usd,
+            "holdings": holdings,
+            "largest_symbol": largest_symbol,
+            "largest_weight_pct": float(max(largest_weight_pct, 0.0)),
+            "unresolved_assets": sorted(set(unresolved_assets)),
+        }
+
+    def _stable_asset_convertible(self, symbol: str) -> bool:
+        token = str(symbol or "").upper().strip()
+        if not token:
+            return False
+        if self.stable_convert_allowlist and token not in self.stable_convert_allowlist:
+            return False
+        if token in self.stable_convert_denylist:
+            return False
+        return True
+
+    def _collateral_convert_cooldown_active(self, now: datetime) -> bool:
+        if float(self.collateral_convert_cooldown_sec) <= 0.0:
+            return False
+        raw = str(self.last_collateral_convert_utc or "").strip()
+        if not raw:
+            return False
+        try:
+            last = self._parse_iso_utc(raw)
+        except Exception:
+            return False
+        return (now - last).total_seconds() < float(self.collateral_convert_cooldown_sec)
+
+    def _attempt_collateral_convert_for_liquidity(
+        self,
+        now: datetime,
+        reason: str,
+        required_usd: float = 0.0,
+        preferred_symbol: str = "",
+    ) -> dict[str, Any]:
+        result: dict[str, Any] = {
+            "attempted": True,
+            "executed": False,
+            "reason": "none",
+        }
+
+        def _finalize(payload: dict[str, Any]) -> dict[str, Any]:
+            self._append_collateral_convert_log(now, str(reason or "liquidity"), payload)
+            return payload
+
+        if not self.auto_convert_collateral:
+            result["reason"] = "disabled"
+            return _finalize(result)
+
+        if self._collateral_convert_cooldown_active(now):
+            result["reason"] = "cooldown_active"
+            result["cooldown_sec"] = round(float(self.collateral_convert_cooldown_sec), 3)
+            return _finalize(result)
+
+        valuation = self._build_balance_valuation(force_refresh=False)
+        quote_usd_balance = max(
+            self._to_float(
+                valuation.get("usd_cash_balance", valuation.get("cash_usd", 0.0)),
+                0.0,
+            ),
+            0.0,
+        )
+        required_usd_hint = max(self._to_float(required_usd, 0.0), 0.0)
+        allow_stable_conversion = bool(
+            self.auto_convert_stable_for_quote
+            and required_usd_hint > 0.0
+            and quote_usd_balance + 1e-9 < required_usd_hint
+        )
+        total_equity_usd = max(self._to_float(valuation.get("total_equity_usd", 0.0), 0.0), 0.0)
+        holdings = valuation.get("holdings", [])
+        if not isinstance(holdings, list) or not holdings:
+            result["reason"] = "no_holdings"
+            return _finalize(result)
+
+        preferred = str(preferred_symbol or "").upper().strip()
+        candidates: list[dict[str, Any]] = []
+        for row in holdings:
+            if not isinstance(row, dict):
+                continue
+            symbol = str(row.get("symbol", "") or "").upper().strip()
+            if not symbol or symbol == "USD":
+                continue
+            is_stable = bool(row.get("is_stable", False))
+            if is_stable:
+                if not allow_stable_conversion:
+                    continue
+                if not self._stable_asset_convertible(symbol):
+                    continue
+            qty = max(self._to_float(row.get("qty", 0.0), 0.0), 0.0)
+            last_px = max(self._to_float(row.get("last", 0.0), 0.0), 0.0)
+            value_usd = max(self._to_float(row.get("value_usd", 0.0), 0.0), 0.0)
+            if qty <= 0.0 or last_px <= 0.0 or value_usd < float(self.min_collateral_convert_usd):
+                continue
+
+            cfg = self.router.get_symbol_config(symbol) or {}
+            static_min_order = self._to_float(cfg.get("min_order", 0.0), 0.0)
+            min_order = self._effective_min_order(symbol, static_min_order)
+            if min_order <= 0.0:
+                continue
+            safe_available_qty = max(qty * float(self.close_balance_buffer_fraction), 0.0)
+            if safe_available_qty < min_order:
+                continue
+
+            weight_pct = ((value_usd / max(total_equity_usd, 1e-9)) * 100.0) if total_equity_usd > 0.0 else 0.0
+            overweight_bonus = max(weight_pct - (float(self.max_symbol_allocation_pct) * 100.0), 0.0)
+            score = value_usd + (overweight_bonus * value_usd * 0.02)
+            if is_stable and allow_stable_conversion:
+                score = score * 1.75
+            if preferred and symbol == preferred:
+                score *= 0.55
+
+            candidates.append(
+                {
+                    "symbol": symbol,
+                    "is_stable": bool(is_stable),
+                    "qty": float(qty),
+                    "last": float(last_px),
+                    "value_usd": float(value_usd),
+                    "weight_pct": float(weight_pct),
+                    "min_order": float(min_order),
+                    "safe_available_qty": float(safe_available_qty),
+                    "score": float(score),
+                }
+            )
+
+        if not candidates:
+            result["reason"] = "no_convertible_collateral"
+            return _finalize(result)
+
+        if allow_stable_conversion:
+            stable_candidates = [row for row in candidates if bool(row.get("is_stable", False))]
+            if stable_candidates:
+                candidates = stable_candidates
+
+        candidates.sort(key=lambda row: float(row.get("score", 0.0) or 0.0), reverse=True)
+        chosen = candidates[0]
+        symbol = str(chosen.get("symbol", "") or "").upper().strip()
+        last_px = max(self._to_float(chosen.get("last", 0.0), 0.0), 0.0)
+        min_order = max(self._to_float(chosen.get("min_order", 0.0), 0.0), 0.0)
+        safe_available_qty = max(self._to_float(chosen.get("safe_available_qty", 0.0), 0.0), 0.0)
+        if not symbol or last_px <= 0.0 or min_order <= 0.0 or safe_available_qty < min_order:
+            result["reason"] = "invalid_candidate"
+            return _finalize(result)
+
+        required_usd_effective = max(self._to_float(required_usd, 0.0), self.min_collateral_convert_usd)
+        qty_from_required = required_usd_effective / max(last_px, 1e-9)
+        qty_from_fraction = max(self._to_float(chosen.get("qty", 0.0), 0.0) * float(self.collateral_sell_fraction), 0.0)
+        qty = max(min_order, qty_from_required, qty_from_fraction)
+        qty = min(qty, safe_available_qty)
+        if qty < min_order:
+            result["reason"] = "qty_below_min_order"
+            result["symbol"] = symbol
+            result["qty"] = round(float(qty), 10)
+            result["min_order"] = round(float(min_order), 10)
+            return _finalize(result)
+
+        order_result = self.router.place_order(symbol, "sell", float(qty), None)
+        if "error" in order_result:
+            result["reason"] = "order_failed"
+            result["symbol"] = symbol
+            result["error"] = str(order_result.get("error"))
+            return _finalize(result)
+
+        txid = order_result.get("txid", ["unknown"])
+        txid = txid[0] if isinstance(txid, list) else str(txid)
+        cfg = self.router.get_symbol_config(symbol) or {}
+        pair = str(cfg.get("pair") or "")
+        size_usd = float(qty) * float(last_px)
+
+        self.trade_ledger.append(
+            {
+                "timestamp": now.isoformat(),
+                "txid": txid,
+                "symbol": symbol,
+                "pair": pair,
+                "direction": "flat",
+                "side": "sell",
+                "status": "COLLATERAL_CONVERT_SELL",
+                "execution_mode": "collateral_convert",
+                "entry_price": round(float(last_px), 6),
+                "qty": round(float(qty), 10),
+                "size_usd": round(float(size_usd), 6),
+                "convert_reason": str(reason or "liquidity"),
+            }
+        )
+        self.audit_chain.append(
+            "collateral_convert_sell",
+            {
+                "symbol": symbol,
+                "side": "sell",
+                "qty": round(float(qty), 10),
+                "size_usd": round(float(size_usd), 6),
+                "txid": txid,
+                "convert_reason": str(reason or "liquidity"),
+                "weight_pct": round(float(chosen.get("weight_pct", 0.0) or 0.0), 6),
+            },
+        )
+
+        self.last_collateral_convert_utc = now.isoformat()
+        result.update(
+            {
+                "executed": True,
+                "reason": "collateral_converted",
+                "symbol": symbol,
+                "is_stable": bool(chosen.get("is_stable", False)),
+                "txid": txid,
+                "side": "sell",
+                "qty": round(float(qty), 10),
+                "size_usd": round(float(size_usd), 6),
+                "weight_pct": round(float(chosen.get("weight_pct", 0.0) or 0.0), 6),
+                "required_usd": round(float(required_usd_effective), 6),
+                "quote_usd_before": round(float(quote_usd_balance), 6),
+            }
+        )
+        return _finalize(result)
+
+    def _reconcile_zero_inventory_positions(self, symbol: str, last: float, now: datetime) -> int:
+        available_qty = max(float(self.router.get_asset_balance(symbol, force_refresh=False) or 0.0), 0.0)
+        if available_qty > 0.0:
+            return 0
+
+        open_positions = self.portfolio.get_open_positions()
+        symbol_positions = [
+            p for p in open_positions
+            if str(p.symbol).upper().startswith(f"{symbol.upper()}/") and str(p.side).lower() == "long"
+        ]
+        if not symbol_positions:
+            return 0
+
+        reconciled = 0
+        for pos in symbol_positions:
+            self.portfolio.close_position(pos.symbol, float(last), now.isoformat())
+            reconciled += 1
+
+        self.audit_chain.append(
+            "positions_reconciled_zero_inventory",
+            {
+                "symbol": symbol,
+                "reconciled_count": int(reconciled),
+                "available_asset_qty": 0.0,
+            },
+        )
+        _write_live_heartbeat(
+            {
+                "status": "degraded",
+                "reason": "reconciled_zero_inventory_positions",
+                "symbol": symbol,
+                "reconciled_count": int(reconciled),
+                "available_asset_qty": 0.0,
+            }
+        )
+        return int(reconciled)
 
     def _no_affordable_recycle_cooldown_active(self, now: datetime) -> bool:
         if float(self.no_affordable_recycle_cooldown_sec) <= 0.0:
@@ -1835,6 +2946,7 @@ class RobustLiveExecutor:
 
         if not decision_armed:
             self.gate_not_armed_streak += 1
+            gate_relaxed = self._maybe_relax_gate_threshold(now)
             _write_live_heartbeat(
                 {
                     "status": "blocked",
@@ -1849,6 +2961,10 @@ class RobustLiveExecutor:
                     "gate_override_min_confidence": round(float(self.gate_override_min_confidence), 6),
                     "gate_override_min_edge_bps": round(float(self.gate_override_min_edge_bps), 6),
                     "gate_not_armed_streak": int(self.gate_not_armed_streak),
+                    "adaptive_gate_enabled": bool(self.adaptive_gate_enabled),
+                    "adaptive_gate_relaxed": bool(gate_relaxed),
+                    "adaptive_gate_relax_offset": round(float(self.gate_relax_offset), 6),
+                    "adaptive_gate_configured_min": round(float(self.configured_gate_min_composite_score), 6),
                 }
             )
             print("  blocked: gate not armed")
@@ -1868,11 +2984,15 @@ class RobustLiveExecutor:
             print("  blocked: spread too wide")
             return
 
+        reconciled_count = self._reconcile_zero_inventory_positions(symbol, float(last), now)
+        if reconciled_count > 0:
+            print(f"  reconciled stale positions: {reconciled_count}")
+
         if self._maybe_close_positions(symbol, float(last), now):
             return
 
         if decision_direction == "short" and (not self.spot_short_enabled):
-            live_usd = max(float(self.router.get_balance(force_refresh=True) or 0.0), 0.0)
+            live_usd = max(float(self.router.get_balance(force_refresh=False) or 0.0), 0.0)
             _write_live_heartbeat(
                 {
                     "status": "blocked",
@@ -1919,48 +3039,169 @@ class RobustLiveExecutor:
             print("  blocked: risk")
             return
 
-        usd_balance = float(self.router.get_balance() or 0.0)
+        balance_valuation = self._build_balance_valuation(force_refresh=False)
+        quote_usd_balance = max(
+            self._to_float(
+                balance_valuation.get("usd_cash_balance", balance_valuation.get("cash_usd", 0.0)),
+                0.0,
+            ),
+            0.0,
+        )
+        total_cash_usd = max(
+            self._to_float(balance_valuation.get("cash_usd", quote_usd_balance), quote_usd_balance),
+            quote_usd_balance,
+        )
+        stable_cash_equivalent_usd = max(
+            self._to_float(
+                balance_valuation.get("stable_cash_equivalent_usd", total_cash_usd - quote_usd_balance),
+                total_cash_usd - quote_usd_balance,
+            ),
+            0.0,
+        )
+        usd_balance = float(quote_usd_balance)
+        holdings_value_usd = max(self._to_float(balance_valuation.get("holdings_value_usd", 0.0), 0.0), 0.0)
+        portfolio_equity_usd = max(self._to_float(balance_valuation.get("total_equity_usd", usd_balance), usd_balance), usd_balance)
+        symbol_values_usd = balance_valuation.get("symbol_values_usd", {})
+        if not isinstance(symbol_values_usd, dict):
+            symbol_values_usd = {}
+        current_symbol_value_usd = max(
+            self._to_float(symbol_values_usd.get(str(symbol).upper(), 0.0), 0.0),
+            0.0,
+        )
+
+        balance_error = str(getattr(self.router.kraken, "last_balance_error", "") or "")
+        balance_cache_age_sec = float(getattr(self.router.kraken, "_cached_balance_age_sec", lambda: float("inf"))())
+        balance_confirmed_live = bool(quote_usd_balance > 0.0 and (not balance_error))
+        balance_source = "live_quote_usd" if balance_confirmed_live else "cached_or_unknown"
         balance_degraded_mode = False
-        if usd_balance <= 0:
-            fallback_equity = float(getattr(self.portfolio, "current_equity", 0.0) or 0.0)
-            has_credentials = bool(
-                getattr(self.router.kraken, "api_key", "")
-                and getattr(self.router.kraken, "api_secret", "")
-            )
-            balance_error = str(getattr(self.router.kraken, "last_balance_error", "") or "")
-            configured_fallback = self._to_float(self.runtime_cfg.get("fallback_buying_power_usd", 0.0), 0.0)
-            fallback_buying_power = max(min(self.degraded_buying_power_usd, configured_fallback), 0.0)
-
-            if has_credentials and "Rate limit" in balance_error and fallback_buying_power > 0.0:
-                usd_balance = max(min(fallback_buying_power, max(fallback_equity, 0.0)), 0.0)
-                if usd_balance > 0.0:
-                    balance_degraded_mode = True
-
-            if usd_balance <= 0.0:
-                _write_live_heartbeat(
-                    {
-                        "status": "blocked",
-                        "reason": "balance_unavailable",
-                        "symbol": symbol,
-                        "kraken_credentials_present": has_credentials,
-                        "balance_error": balance_error,
-                        "portfolio_equity_est_usd": round(fallback_equity, 6),
-                    }
-                )
-                print("  blocked: live balance unavailable")
-                return
-            _write_live_heartbeat(
-                {
-                    "status": "degraded",
-                    "reason": "balance_rate_limited_using_fallback_buying_power",
-                    "symbol": symbol,
-                    "balance_error": balance_error,
-                    "fallback_buying_power_usd": round(usd_balance, 6),
-                    "adaptive_buying_power_usd": round(self.degraded_buying_power_usd, 6),
-                }
-            )
 
         direction = decision_direction
+        side = "buy" if direction == "long" else "sell"
+        sell_available_qty = 0.0
+        sell_cap_qty = 0.0
+        sell_entry_target_qty = 0.0
+
+        if side == "sell":
+            sell_available_qty = max(float(self.router.get_asset_balance(symbol, force_refresh=False) or 0.0), 0.0)
+            sell_cap_qty = max(float(sell_available_qty) * float(self.close_balance_buffer_fraction), 0.0)
+            sell_entry_target_qty = max(float(sell_cap_qty) * float(self.spot_inventory_entry_fraction), 0.0)
+            if sell_cap_qty <= 0.0:
+                cfg_for_fallback = self.router.get_symbol_config(symbol) or {}
+                fallback_min_order = max(self._to_float(cfg_for_fallback.get("min_order", 0.0), 0.0), 0.0)
+                fallback_min_order_notional = fallback_min_order * float(last)
+                reserve_hint = max(self._to_float(self.runtime_cfg.get("reserve_usd", 0.0), 0.0), 0.0)
+                affordable_buy_usd = max(float(usd_balance) - reserve_hint, 0.0)
+
+                if fallback_min_order_notional > 0.0 and affordable_buy_usd >= fallback_min_order_notional:
+                    direction = "long"
+                    side = "buy"
+                    _write_live_heartbeat(
+                        {
+                            "status": "degraded",
+                            "reason": "short_without_inventory_forced_long",
+                            "symbol": symbol,
+                            "gate_direction": decision_direction,
+                            "available_asset_qty": 0.0,
+                            "affordable_buy_usd": round(float(affordable_buy_usd), 6),
+                            "min_order_notional": round(float(fallback_min_order_notional), 6),
+                        }
+                    )
+                else:
+                    _write_live_heartbeat(
+                        {
+                            "status": "blocked",
+                            "reason": "no_spot_inventory",
+                            "symbol": symbol,
+                            "gate_direction": direction,
+                            "side": side,
+                            "available_asset_qty": round(float(sell_available_qty), 10),
+                        }
+                    )
+                    print("  blocked: no spot inventory")
+                    return
+
+        reserve_usd_runtime = self._to_float(
+            self.runtime_cfg.get("reserve_usd", self.live_selection.get("reserve_usd", 0.0)),
+            0.0,
+        )
+        reserve_usd_effective_hint = self._to_float(pick_meta.get("reserve_usd_effective", reserve_usd_runtime), reserve_usd_runtime)
+        buy_affordable_usd = max(float(usd_balance) - max(float(reserve_usd_effective_hint), 0.0), 0.0)
+        allow_cached_balance_trading = bool(self.runtime_cfg.get("allow_cached_balance_trading", False))
+        cached_balance_trading_cap_usd = max(
+            self._to_float(self.runtime_cfg.get("cached_balance_trading_cap_usd", 0.0), 0.0),
+            0.0,
+        )
+        cached_balance_mode = False
+        if side == "buy" and (not balance_confirmed_live):
+            cached_balance_mode = bool(
+                allow_cached_balance_trading
+                and usd_balance > 0.0
+                and (
+                    "using_cached" in balance_error
+                    or "Rate limit" in balance_error
+                    or "EAPI:Rate limit exceeded" in balance_error
+                )
+            )
+            if cached_balance_mode:
+                if cached_balance_trading_cap_usd > 0.0:
+                    buy_affordable_usd = min(float(buy_affordable_usd), float(cached_balance_trading_cap_usd))
+                buy_affordable_usd = max(float(buy_affordable_usd), 0.0)
+                if buy_affordable_usd > 0.0:
+                    balance_degraded_mode = True
+
+        if side == "buy" and (((not balance_confirmed_live) and (not balance_degraded_mode)) or buy_affordable_usd <= 0.0):
+            cfg_for_convert = self.router.get_symbol_config(symbol) or {}
+            convert_min_order = max(self._to_float(cfg_for_convert.get("min_order", 0.0), 0.0), 0.0)
+            convert_required_usd = max(convert_min_order * float(last), self.min_collateral_convert_usd)
+            convert_result = self._attempt_collateral_convert_for_liquidity(
+                now,
+                reason="no_confirmed_funds",
+                required_usd=convert_required_usd,
+                preferred_symbol=str(symbol),
+            )
+
+            if bool(convert_result.get("executed", False)):
+                _write_live_heartbeat(
+                    {
+                        "status": "degraded",
+                        "reason": "collateral_convert_for_buy_liquidity",
+                        "symbol": symbol,
+                        "side": side,
+                        "available_usd": round(float(usd_balance), 6),
+                        "reserve_usd": round(float(reserve_usd_effective_hint), 6),
+                        "affordable_buy_usd": round(float(buy_affordable_usd), 6),
+                        "balance_error": balance_error,
+                        "balance_cache_age_sec": round(float(balance_cache_age_sec), 3) if math.isfinite(balance_cache_age_sec) else None,
+                        "balance_confirmed_live": bool(balance_confirmed_live),
+                        "balance_source": balance_source,
+                        "collateral_convert": convert_result,
+                    }
+                )
+                print("  degraded: collateral converted to restore buy liquidity")
+                return
+
+            _write_live_heartbeat(
+                {
+                    "status": "blocked",
+                    "reason": "no_confirmed_funds",
+                    "symbol": symbol,
+                    "side": side,
+                    "available_usd": round(float(usd_balance), 6),
+                    "reserve_usd": round(float(reserve_usd_effective_hint), 6),
+                    "affordable_buy_usd": round(float(buy_affordable_usd), 6),
+                    "balance_error": balance_error,
+                    "balance_cache_age_sec": round(float(balance_cache_age_sec), 3) if math.isfinite(balance_cache_age_sec) else None,
+                    "balance_confirmed_live": bool(balance_confirmed_live),
+                    "balance_source": balance_source,
+                    "allow_cached_balance_trading": bool(allow_cached_balance_trading),
+                    "cached_balance_trading_cap_usd": round(float(cached_balance_trading_cap_usd), 6),
+                    "cached_balance_mode": bool(cached_balance_mode),
+                    "collateral_convert": convert_result,
+                }
+            )
+            print("  blocked: no confirmed funds")
+            return
+
         window_attempts, window_failures, window_fail_rate, window_throttle = self._failure_window_metrics(now)
 
         if (
@@ -2004,28 +3245,142 @@ class RobustLiveExecutor:
             print("  blocked: buy cooldown active")
             return
 
+        if side == "buy" and self.deliberate_mode_enabled:
+            global_window_start = now - timedelta(seconds=float(self.global_entries_window_sec))
+            self.entry_timestamps_utc = [
+                ts
+                for ts in self.entry_timestamps_utc
+                if isinstance(ts, datetime) and ts >= global_window_start
+            ]
+            recent_entries = int(len(self.entry_timestamps_utc))
+            if recent_entries >= int(self.max_entries_per_hour):
+                _write_live_heartbeat(
+                    {
+                        "status": "blocked",
+                        "reason": "global_entry_rate_limit",
+                        "symbol": symbol,
+                        "entries_in_global_window": recent_entries,
+                        "global_entries_window_sec": round(float(self.global_entries_window_sec), 6),
+                        "max_entries_per_hour": int(self.max_entries_per_hour),
+                    }
+                )
+                print("  blocked: global entry rate limit")
+                return
+
+            if self.entry_timestamps_utc and self.global_entry_cooldown_sec > 0.0:
+                elapsed_global_sec = max((now - self.entry_timestamps_utc[-1]).total_seconds(), 0.0)
+                if elapsed_global_sec < float(self.global_entry_cooldown_sec):
+                    _write_live_heartbeat(
+                        {
+                            "status": "blocked",
+                            "reason": "global_entry_cooldown_active",
+                            "symbol": symbol,
+                            "elapsed_global_sec": round(float(elapsed_global_sec), 6),
+                            "global_entry_cooldown_sec": round(float(self.global_entry_cooldown_sec), 6),
+                        }
+                    )
+                    print("  blocked: global entry cooldown")
+                    return
+
+            symbol_key = str(symbol or "").upper().strip()
+            symbol_history = [
+                ts
+                for ts in self.symbol_entry_timestamps_utc.get(symbol_key, [])
+                if isinstance(ts, datetime)
+            ]
+            symbol_window_start = now - timedelta(seconds=float(self.per_symbol_entries_window_sec))
+            symbol_history = [ts for ts in symbol_history if ts >= symbol_window_start]
+            self.symbol_entry_timestamps_utc[symbol_key] = symbol_history
+
+            symbol_streak_window_start = now - timedelta(seconds=float(self.same_symbol_streak_window_sec))
+            self.entry_symbol_history = [
+                (ts, sym)
+                for ts, sym in self.entry_symbol_history
+                if isinstance(ts, datetime) and ts >= symbol_streak_window_start
+            ]
+
+            streak_count = 0
+            for ts, sym in reversed(self.entry_symbol_history):
+                if sym == symbol_key:
+                    streak_count += 1
+                    continue
+                break
+            if streak_count >= int(self.max_consecutive_same_symbol_entries):
+                _write_live_heartbeat(
+                    {
+                        "status": "blocked",
+                        "reason": "same_symbol_streak_limit",
+                        "symbol": symbol,
+                        "same_symbol_streak_count": int(streak_count),
+                        "max_consecutive_same_symbol_entries": int(self.max_consecutive_same_symbol_entries),
+                        "same_symbol_streak_window_sec": round(float(self.same_symbol_streak_window_sec), 6),
+                    }
+                )
+                print("  blocked: same symbol streak limit")
+                return
+
+            symbol_entries = int(len(symbol_history))
+            if symbol_entries >= int(self.max_entries_per_symbol_window):
+                _write_live_heartbeat(
+                    {
+                        "status": "blocked",
+                        "reason": "symbol_entry_window_limit",
+                        "symbol": symbol,
+                        "symbol_entries_window": symbol_entries,
+                        "max_entries_per_symbol_window": int(self.max_entries_per_symbol_window),
+                        "per_symbol_entries_window_sec": round(float(self.per_symbol_entries_window_sec), 6),
+                    }
+                )
+                print("  blocked: symbol entry window limit")
+                return
+
+            if symbol_history and self.per_symbol_entry_cooldown_sec > 0.0:
+                elapsed_symbol_sec = max((now - symbol_history[-1]).total_seconds(), 0.0)
+                if elapsed_symbol_sec < float(self.per_symbol_entry_cooldown_sec):
+                    _write_live_heartbeat(
+                        {
+                            "status": "blocked",
+                            "reason": "symbol_entry_cooldown_active",
+                            "symbol": symbol,
+                            "elapsed_symbol_sec": round(float(elapsed_symbol_sec), 6),
+                            "per_symbol_entry_cooldown_sec": round(float(self.per_symbol_entry_cooldown_sec), 6),
+                        }
+                    )
+                    print("  blocked: symbol entry cooldown")
+                    return
+
         stop_price = last * (0.98 if direction == "long" else 1.02)
         urgency = _resolve_urgency(float(gate_decision.composite_score), spread_bps, direction)
         fee_bps = float(self.live_selection.get("fee_bps", 10.0) or 10.0)
         slippage_bps = float(self.live_selection.get("slippage_bps", max(spread_bps * 0.6, 8.0)) or max(spread_bps * 0.6, 8.0))
         drawdown_pct = abs(float(getattr(self.portfolio, "max_drawdown", 0.0) or 0.0))
-        reserve_usd_runtime = self._to_float(
-            self.runtime_cfg.get("reserve_usd", self.live_selection.get("reserve_usd", 0.0)),
-            0.0,
-        )
         reserve_usd_effective = self._to_float(pick_meta.get("reserve_usd_effective", reserve_usd_runtime), reserve_usd_runtime)
         reserve_usd = min(max(reserve_usd_effective, 0.0), max(usd_balance, 0.0))
-        max_notional_usd = self._to_float(
+        sizing_equity_usd = float(usd_balance)
+        sizing_reserve_usd = float(reserve_usd)
+        if side == "sell":
+            sizing_equity_usd = max(float(usd_balance), float(sell_cap_qty) * float(last), 0.0)
+            sizing_reserve_usd = 0.0
+        max_notional_usd_config = self._to_float(
             self.runtime_cfg.get("max_notional_per_trade_usd", self.live_selection.get("max_notional_usd", 0.0)),
             0.0,
         )
+        compounding_available_usd = float(buy_affordable_usd) if side == "buy" else float(sizing_equity_usd)
+        compounding_cap_usd, compounding_meta = self._compute_compounding_notional_cap(
+            available_usd=compounding_available_usd,
+            gate_score=float(gate_decision.composite_score),
+            drawdown_pct=float(drawdown_pct),
+            window_fail_rate=float(window_fail_rate),
+            static_cap_usd=float(max_notional_usd_config),
+        )
+
         effective_notional_throttle = min(float(self.notional_throttle), float(window_throttle))
-        effective_max_notional_usd = max_notional_usd
-        if max_notional_usd > 0.0:
-            effective_max_notional_usd = max(0.5, max_notional_usd * max(float(effective_notional_throttle), 0.05))
+        effective_max_notional_usd = float(compounding_cap_usd)
+        if effective_max_notional_usd > 0.0:
+            effective_max_notional_usd = max(0.5, effective_max_notional_usd * max(float(effective_notional_throttle), 0.05))
         size_decision = self.sizing_engine.size(
             SizeInput(
-                equity_usd=usd_balance,
+                equity_usd=sizing_equity_usd,
                 entry_price=last,
                 stop_price=stop_price,
                 realized_vol=max(0.0001, gate_input.volatility_pct / 100.0),
@@ -2037,7 +3392,7 @@ class RobustLiveExecutor:
                 urgency=urgency,
                 dislocation_score=max(float(gate_decision.composite_score) - 0.40, 0.0),
                 drawdown_pct=drawdown_pct,
-                reserve_usd=reserve_usd,
+                reserve_usd=sizing_reserve_usd,
                 max_notional_usd=effective_max_notional_usd,
             )
         )
@@ -2049,9 +3404,26 @@ class RobustLiveExecutor:
             qty = qty * effective_notional_throttle
             notional_usd = qty * float(last)
             risk_usd = max(risk_usd * effective_notional_throttle, 0.0)
+
+        if side == "sell":
+            if qty <= 0.0:
+                qty = float(sell_entry_target_qty)
+            qty = min(max(float(qty), 0.0), float(sell_cap_qty))
+            notional_usd = float(qty) * float(last)
+            risk_usd = max(risk_usd, abs(float(last) - float(stop_price)) * float(qty))
+
         min_order_promoted = False
         if qty <= 0:
-            _write_live_heartbeat({"status": "blocked", "reason": "sizing_zero", "symbol": symbol, "urgency": urgency})
+            _write_live_heartbeat(
+                {
+                    "status": "blocked",
+                    "reason": "sizing_zero",
+                    "symbol": symbol,
+                    "side": side,
+                    "urgency": urgency,
+                    "available_asset_qty": round(float(sell_available_qty), 10) if side == "sell" else None,
+                }
+            )
             print("  blocked: sizing qty=0")
             return
 
@@ -2059,19 +3431,153 @@ class RobustLiveExecutor:
         min_order = self._effective_min_order(symbol, float(cfg["min_order"]))
         if qty < min_order:
             min_notional = min_order * float(last)
-            affordable = max(float(usd_balance) - reserve_usd, 0.0)
             cap_ok = (effective_max_notional_usd <= 0.0) or (min_notional <= effective_max_notional_usd)
-            if min_notional <= affordable and cap_ok:
-                qty = min_order
-                notional_usd = qty * float(last)
-                risk_usd = max(risk_usd, abs(float(last) - float(stop_price)) * qty)
-                min_order_promoted = True
+            if side == "buy":
+                affordable = max(float(usd_balance) - reserve_usd, 0.0)
+                cap_breach_applied = False
+                if (not cap_ok) and self.allow_min_order_cap_breach and min_notional <= affordable:
+                    cap_ok = True
+                    cap_breach_applied = True
+                if min_notional <= affordable and cap_ok:
+                    qty = min_order
+                    notional_usd = qty * float(last)
+                    risk_usd = max(risk_usd, abs(float(last) - float(stop_price)) * qty)
+                    min_order_promoted = True
+                    if cap_breach_applied:
+                        compounding_meta["min_order_cap_breach_applied"] = True
+                else:
+                    convert_result: Optional[dict[str, Any]] = None
+                    if min_notional > affordable:
+                        convert_result = self._attempt_collateral_convert_for_liquidity(
+                            now,
+                            reason="min_order_quote_shortfall",
+                            required_usd=float(min_notional),
+                            preferred_symbol=str(symbol),
+                        )
+                        if isinstance(convert_result, dict) and bool(convert_result.get("executed", False)):
+                            _write_live_heartbeat(
+                                {
+                                    "status": "degraded",
+                                    "reason": "collateral_convert_for_min_order",
+                                    "symbol": symbol,
+                                    "side": side,
+                                    "qty": round(float(qty), 10),
+                                    "min_order": round(float(min_order), 10),
+                                    "min_notional_usd": round(float(min_notional), 6),
+                                    "quote_usd_balance": round(float(quote_usd_balance), 6),
+                                    "stable_cash_equivalent_usd": round(float(stable_cash_equivalent_usd), 6),
+                                    "collateral_convert": convert_result,
+                                }
+                            )
+                            print("  degraded: collateral converted for min_order")
+                            return
+
+                    block_reason = "min_order_cap_conflict" if (min_notional <= affordable and (not cap_ok)) else "min_order_insufficient_quote"
+                    _write_live_heartbeat(
+                        {
+                            "status": "blocked",
+                            "reason": block_reason,
+                            "symbol": symbol,
+                            "side": side,
+                            "qty": round(float(qty), 10),
+                            "min_order": round(float(min_order), 10),
+                            "min_notional_usd": round(float(min_notional), 6),
+                            "quote_usd_balance": round(float(quote_usd_balance), 6),
+                            "total_cash_usd": round(float(total_cash_usd), 6),
+                            "stable_cash_equivalent_usd": round(float(stable_cash_equivalent_usd), 6),
+                            "affordable_buy_usd": round(float(affordable), 6),
+                            "effective_max_notional_usd": round(float(effective_max_notional_usd), 6),
+                            "allow_min_order_cap_breach": bool(self.allow_min_order_cap_breach),
+                            "collateral_convert": convert_result,
+                        }
+                    )
+                    print(f"  blocked: {block_reason}")
+                    return
             else:
-                _write_live_heartbeat({"status": "blocked", "reason": "min_order", "symbol": symbol, "qty": qty, "min_order": min_order})
-                print("  blocked: min_order")
+                if float(sell_cap_qty) < float(min_order) <= float(sell_available_qty):
+                    sell_cap_qty = float(sell_available_qty)
+                if float(sell_cap_qty) < float(min_order):
+                    _write_live_heartbeat(
+                        {
+                            "status": "blocked",
+                            "reason": "inventory_below_min_order",
+                            "symbol": symbol,
+                            "side": side,
+                            "available_asset_qty": round(float(sell_available_qty), 10),
+                            "sell_cap_qty": round(float(sell_cap_qty), 10),
+                            "min_order": round(float(min_order), 10),
+                        }
+                    )
+                    print("  blocked: inventory below min_order")
+                    return
+
+                promoted_qty = max(float(min_order), float(sell_entry_target_qty))
+                if effective_max_notional_usd > 0.0:
+                    promoted_qty = min(promoted_qty, float(effective_max_notional_usd) / max(float(last), 1e-9))
+                qty = min(promoted_qty, float(sell_cap_qty))
+                if qty < float(min_order):
+                    _write_live_heartbeat(
+                        {
+                            "status": "blocked",
+                            "reason": "min_order_after_caps",
+                            "symbol": symbol,
+                            "side": side,
+                            "qty": round(float(qty), 10),
+                            "min_order": round(float(min_order), 10),
+                            "max_notional_usd": round(float(effective_max_notional_usd), 6),
+                        }
+                    )
+                    print("  blocked: min_order after caps")
+                    return
+                notional_usd = float(qty) * float(last)
+                risk_usd = max(risk_usd, abs(float(last) - float(stop_price)) * float(qty))
+                min_order_promoted = True
+
+        if side == "buy":
+            projected_total_equity_usd = max(float(portfolio_equity_usd), float(usd_balance + holdings_value_usd), 1e-9)
+            max_symbol_value_usd = float(self.max_symbol_allocation_pct) * float(projected_total_equity_usd)
+            allowed_additional_usd = max(float(max_symbol_value_usd) - float(current_symbol_value_usd), 0.0)
+            current_weight_pct = (float(current_symbol_value_usd) / float(projected_total_equity_usd)) * 100.0
+
+            if allowed_additional_usd <= 0.0:
+                _write_live_heartbeat(
+                    {
+                        "status": "blocked",
+                        "reason": "symbol_concentration_limit",
+                        "symbol": symbol,
+                        "side": side,
+                        "current_symbol_value_usd": round(float(current_symbol_value_usd), 6),
+                        "portfolio_equity_usd": round(float(projected_total_equity_usd), 6),
+                        "current_symbol_weight_pct": round(float(current_weight_pct), 6),
+                        "max_symbol_allocation_pct": round(float(self.max_symbol_allocation_pct) * 100.0, 6),
+                    }
+                )
+                print("  blocked: symbol concentration cap")
                 return
 
-        side = "buy" if direction == "long" else "sell"
+            if float(notional_usd) > float(allowed_additional_usd):
+                adjusted_qty = float(allowed_additional_usd) / max(float(last), 1e-9)
+                if adjusted_qty >= float(min_order):
+                    qty = float(adjusted_qty)
+                    notional_usd = float(qty) * float(last)
+                    risk_usd = max(risk_usd, abs(float(last) - float(stop_price)) * float(qty))
+                else:
+                    _write_live_heartbeat(
+                        {
+                            "status": "blocked",
+                            "reason": "symbol_concentration_min_order_conflict",
+                            "symbol": symbol,
+                            "side": side,
+                            "current_symbol_value_usd": round(float(current_symbol_value_usd), 6),
+                            "portfolio_equity_usd": round(float(projected_total_equity_usd), 6),
+                            "allowed_additional_usd": round(float(allowed_additional_usd), 6),
+                            "max_symbol_allocation_pct": round(float(self.max_symbol_allocation_pct) * 100.0, 6),
+                            "min_order": round(float(min_order), 10),
+                        }
+                    )
+                    print("  blocked: concentration cap below min_order")
+                    return
+
         route_intent = RouteIntent(
             symbol=symbol,
             side=side,
@@ -2111,7 +3617,7 @@ class RobustLiveExecutor:
             available_asset_qty = None
 
             if insufficient_funds and side == "sell":
-                available_asset_qty = max(float(self.router.get_asset_balance(symbol, force_refresh=True) or 0.0), 0.0)
+                available_asset_qty = max(float(self.router.get_asset_balance(symbol, force_refresh=False) or 0.0), 0.0)
 
             if volume_min_error or insufficient_funds:
                 self.order_fail_streak += 1
@@ -2139,7 +3645,12 @@ class RobustLiveExecutor:
             # to recycle capital when spot inventory exists.
             if insufficient_funds and side == "buy":
                 unwind_qty = max(min_order, 0.0)
-                unwind = self.router.place_order(symbol, "sell", unwind_qty, None)
+                unwind_qty, unwind_available_qty, unwind_balance_error = self._resolve_close_qty_for_spot(
+                    symbol,
+                    unwind_qty,
+                    "sell",
+                )
+                unwind = self.router.place_order(symbol, "sell", unwind_qty, None) if unwind_qty > 0.0 else {"error": "unwind_no_inventory"}
                 if "error" not in unwind:
                     unwind_txid = unwind.get("txid", ["unknown"])
                     unwind_txid = unwind_txid[0] if isinstance(unwind_txid, list) else str(unwind_txid)
@@ -2165,6 +3676,8 @@ class RobustLiveExecutor:
                             "symbol": symbol,
                             "txid": unwind_txid,
                             "qty": round(float(unwind_qty), 10),
+                            "available_asset_qty": round(float(unwind_available_qty), 10),
+                            "balance_error": unwind_balance_error,
                             "fail_streak": int(self.order_fail_streak),
                             "notional_throttle": round(float(self.notional_throttle), 6),
                             "buy_cooldown_until_utc": self.buy_cooldown_until_utc,
@@ -2186,6 +3699,12 @@ class RobustLiveExecutor:
                     "symbol": symbol,
                     "side": side,
                     "error": str(result.get("error")),
+                    "balance_error": balance_error,
+                    "balance_cache_age_sec": round(float(balance_cache_age_sec), 3) if math.isfinite(balance_cache_age_sec) else None,
+                    "balance_confirmed_live": bool(balance_confirmed_live),
+                    "balance_source": balance_source,
+                    "available_usd": round(float(usd_balance), 6),
+                    "affordable_buy_usd": round(float(buy_affordable_usd), 6) if side == "buy" else None,
                     "available_asset_qty": round(float(available_asset_qty), 10) if available_asset_qty is not None else None,
                     "fail_streak": int(self.order_fail_streak),
                     "notional_throttle": round(float(self.notional_throttle), 6),
@@ -2215,6 +3734,20 @@ class RobustLiveExecutor:
 
         txid = result.get("txid", ["unknown"])
         txid = txid[0] if isinstance(txid, list) else str(txid)
+
+        if side == "buy":
+            self.last_entry_symbol = str(symbol or "").upper().strip()
+            self.last_entry_time_utc = now.isoformat()
+            self.entry_timestamps_utc.append(now)
+            symbol_key = str(symbol or "").upper().strip()
+            symbol_history = [
+                ts
+                for ts in self.symbol_entry_timestamps_utc.get(symbol_key, [])
+                if isinstance(ts, datetime)
+            ]
+            symbol_history.append(now)
+            self.symbol_entry_timestamps_utc[symbol_key] = symbol_history
+            self.entry_symbol_history.append((now, symbol_key))
 
         self.portfolio.add_position(
             Position(
@@ -2293,6 +3826,8 @@ class RobustLiveExecutor:
                 "recent_attempts": int(window_attempts),
                 "recent_failures": int(window_failures),
                 "recent_fail_rate_pct": round(float(window_fail_rate) * 100.0, 3),
+                "max_notional_per_trade_usd_config": round(float(max_notional_usd_config), 6),
+                "compounding_meta": dict(compounding_meta),
                 "effective_min_order": round(float(min_order), 10),
                 "spread_bps": round(spread_bps, 6),
                 "shadow_fill": {"est_fill": round(shadow_fill_px, 6), "slip_bps": round(shadow_slip_bps, 6)},
@@ -2329,6 +3864,8 @@ class RobustLiveExecutor:
                 "recent_attempts": int(window_attempts),
                 "recent_failures": int(window_failures),
                 "recent_fail_rate_pct": round(float(window_fail_rate) * 100.0, 3),
+                "max_notional_per_trade_usd_config": round(float(max_notional_usd_config), 6),
+                "compounding_meta": dict(compounding_meta),
                 "effective_min_order": round(float(min_order), 10),
                 "edge_score": round(float(gate_decision.composite_score), 6),
                 "portfolio_heat": round(portfolio_heat, 6),
@@ -2337,6 +3874,8 @@ class RobustLiveExecutor:
             }
         )
 
+        self._recover_gate_threshold_after_fill(now)
+
         print(f"  placed txid={txid}")
 
     def run_institutional_execution_loop(self):
@@ -2344,11 +3883,106 @@ class RobustLiveExecutor:
         while True:
             try:
                 self._refresh_runtime_config()
-                preferred = (_preferred_live_symbol() or "").upper().strip()
+                runtime_symbol_raw = str(self.runtime_cfg.get("symbol", "") or "").strip()
+                runtime_symbol_upper = runtime_symbol_raw.upper()
+                universe_mode = runtime_symbol_upper in {"", "UNIVERSE", "ADAPTIVE_UNIVERSE", "AUTO"}
+                preferred = ""
+                preferred_source = "none"
+                if not universe_mode:
+                    preferred = runtime_symbol_upper.split("/")[0].strip()
+                    preferred_source = "runtime_symbol"
+                elif self.allow_best_multi_preference:
+                    preferred = (_preferred_live_symbol() or "").upper().strip()
+                    if preferred:
+                        preferred_source = "best_multi"
 
-                scan_cap = int(self._to_float(self.runtime_cfg.get("scan_top_n", 500), 500.0))
-                scan_cap = max(scan_cap, 4)
-                candidates = self.router.get_candidate_symbols(max_symbols=scan_cap)
+                intel_symbols: list[str] = []
+                intel_meta: dict[str, Any] = {
+                    "symbol_intel_enabled": bool(self.symbol_intel_enabled),
+                    "symbol_intel_file_exists": bool(SYMBOL_FLIP_INTEL_FILE.exists()),
+                    "symbol_intel_stale": False,
+                    "symbol_intel_age_sec": None,
+                    "symbol_intel_candidate_count": 0,
+                    "symbol_intel_selected_count": 0,
+                    "symbol_intel_executable_count": 0,
+                    "symbol_intel_rejected_unpriced": 0,
+                    "symbol_intel_rejected_affordable": 0,
+                    "symbol_intel_rejected_cap": 0,
+                    "symbol_intel_source": "none",
+                }
+                if universe_mode:
+                    intel_symbols, intel_meta = self._symbol_flip_intel_candidates()
+                    if (not preferred) and intel_symbols:
+                        preferred = str(intel_symbols[0]).upper().strip()
+                        preferred_source = "symbol_flip_intel"
+
+                scan_cap = int(
+                    self._clamp(
+                        self._to_float(self.runtime_cfg.get("scan_top_n", 1200), 1200.0),
+                        4.0,
+                        5000.0,
+                    )
+                )
+                valuation_hint = self._build_balance_valuation(force_refresh=False)
+                quote_usd_hint = max(
+                    self._to_float(
+                        valuation_hint.get("usd_cash_balance", valuation_hint.get("cash_usd", 0.0)),
+                        0.0,
+                    ),
+                    0.0,
+                )
+                total_cash_usd_hint = max(
+                    self._to_float(valuation_hint.get("cash_usd", quote_usd_hint), quote_usd_hint),
+                    quote_usd_hint,
+                )
+                stable_cash_equivalent_hint = max(
+                    self._to_float(
+                        valuation_hint.get("stable_cash_equivalent_usd", total_cash_usd_hint - quote_usd_hint),
+                        total_cash_usd_hint - quote_usd_hint,
+                    ),
+                    0.0,
+                )
+                _write_live_heartbeat(
+                    {
+                        "status": "running",
+                        "reason": "scan_cycle_start",
+                        "universe_mode": bool(universe_mode),
+                        "preferred_symbol": preferred,
+                        "preferred_source": preferred_source,
+                        "universe_scan_cap": int(scan_cap),
+                        "gate_min_composite_score": round(float(getattr(self.signal_gate, "min_composite_score", 0.60)), 6),
+                        "adaptive_gate_enabled": bool(self.adaptive_gate_enabled),
+                        "adaptive_gate_relax_offset": round(float(self.gate_relax_offset), 6),
+                        "symbol_intel_enabled": bool(intel_meta.get("symbol_intel_enabled", False)),
+                        "symbol_intel_source": str(intel_meta.get("symbol_intel_source", "none") or "none"),
+                        "symbol_intel_stale": bool(intel_meta.get("symbol_intel_stale", False)),
+                        "symbol_intel_age_sec": intel_meta.get("symbol_intel_age_sec"),
+                        "symbol_intel_selected_count": int(self._to_float(intel_meta.get("symbol_intel_selected_count", 0), 0.0)),
+                        "quote_usd_hint": round(float(quote_usd_hint), 6),
+                        "total_cash_usd_hint": round(float(total_cash_usd_hint), 6),
+                        "stable_cash_equivalent_usd_hint": round(float(stable_cash_equivalent_hint), 6),
+                        "cash_usd_hint": round(float(self._to_float(valuation_hint.get("cash_usd", 0.0), 0.0)), 6),
+                        "holdings_value_usd_hint": round(float(self._to_float(valuation_hint.get("holdings_value_usd", 0.0), 0.0)), 6),
+                        "total_equity_usd_hint": round(float(self._to_float(valuation_hint.get("total_equity_usd", 0.0), 0.0)), 6),
+                        "largest_holding_symbol": str(valuation_hint.get("largest_symbol", "") or ""),
+                        "largest_holding_weight_pct": round(float(self._to_float(valuation_hint.get("largest_weight_pct", 0.0), 0.0)), 6),
+                    }
+                )
+
+                runtime_extra_symbols: list[str] = []
+                for field_name in ("symbol_universe_extra", "symbol_whitelist", "symbols"):
+                    raw_values = self.runtime_cfg.get(field_name, [])
+                    if isinstance(raw_values, str):
+                        raw_values = [s.strip() for s in raw_values.split(",") if str(s).strip()]
+                    if isinstance(raw_values, list):
+                        runtime_extra_symbols.extend(str(s) for s in raw_values if str(s).strip())
+                if intel_symbols:
+                    runtime_extra_symbols.extend(intel_symbols)
+
+                candidates = self.router.get_candidate_symbols(
+                    max_symbols=scan_cap,
+                    extra_symbols=runtime_extra_symbols,
+                )
 
                 # Respect runtime blacklists for live symbol selection.
                 blacklisted = {
@@ -2372,7 +4006,34 @@ class RobustLiveExecutor:
                     self._to_float(self.runtime_cfg.get("max_notional_per_trade_usd", 0.0), 0.0),
                     0.0,
                 )
-                usd_balance_hint = max(float(self.router.get_balance(force_refresh=True) or 0.0), 0.0)
+                allow_cached_balance_trading = bool(self.runtime_cfg.get("allow_cached_balance_trading", False))
+                cached_balance_trading_cap_usd = max(
+                    self._to_float(
+                        self.runtime_cfg.get(
+                            "cached_balance_trading_cap_usd",
+                            max_notional_usd_cap if max_notional_usd_cap > 0.0 else 0.0,
+                        ),
+                        max_notional_usd_cap if max_notional_usd_cap > 0.0 else 0.0,
+                    ),
+                    0.0,
+                )
+                usd_balance_hint = float(quote_usd_hint)
+                holdings_value_hint = max(self._to_float(valuation_hint.get("holdings_value_usd", 0.0), 0.0), 0.0)
+                total_equity_hint = max(
+                    self._to_float(valuation_hint.get("total_equity_usd", usd_balance_hint), usd_balance_hint),
+                    usd_balance_hint,
+                )
+                largest_holding_symbol_hint = str(valuation_hint.get("largest_symbol", "") or "")
+                largest_holding_weight_hint = max(self._to_float(valuation_hint.get("largest_weight_pct", 0.0), 0.0), 0.0)
+                balance_error_hint = str(getattr(self.router.kraken, "last_balance_error", "") or "")
+                balance_cache_age_sec = float(getattr(self.router.kraken, "_cached_balance_age_sec", lambda: float("inf"))())
+                using_cached_balance_hint = (
+                    "using_cached_balance" in balance_error_hint
+                    or "using_cached_usd_only" in balance_error_hint
+                    or "using_cached_balance_snapshot" in balance_error_hint
+                )
+                rate_limited_balance_hint = "Rate limit" in balance_error_hint or "EAPI:Rate limit exceeded" in balance_error_hint
+                balance_confirmed_live = usd_balance_hint > 0.0 and (not balance_error_hint)
                 reserve_usd_hint = float(reserve_usd_configured)
                 if self.dynamic_reserve_enabled and usd_balance_hint > 0.0:
                     dynamic_cap = max(
@@ -2381,6 +4042,44 @@ class RobustLiveExecutor:
                     )
                     reserve_usd_hint = min(float(reserve_usd_configured), float(dynamic_cap))
                 affordable_usd_hint = max(usd_balance_hint - reserve_usd_hint, 0.0)
+                cached_balance_stale = (
+                    (using_cached_balance_hint and balance_cache_age_sec > 120.0)
+                    or (rate_limited_balance_hint and (not balance_confirmed_live) and balance_cache_age_sec > 120.0)
+                )
+                if (not balance_confirmed_live) or cached_balance_stale:
+                    cached_fallback_allowed = (
+                        allow_cached_balance_trading
+                        and usd_balance_hint > 0.0
+                        and (using_cached_balance_hint or rate_limited_balance_hint)
+                    )
+                    if cached_fallback_allowed:
+                        affordable_usd_hint = max(usd_balance_hint - reserve_usd_hint, 0.0)
+                        if cached_balance_trading_cap_usd > 0.0:
+                            affordable_usd_hint = min(affordable_usd_hint, cached_balance_trading_cap_usd)
+                    else:
+                        affordable_usd_hint = 0.0
+
+                    if universe_mode and intel_symbols:
+                        intel_symbols, intel_exec_meta = self._filter_symbols_by_executable_notional(
+                            intel_symbols,
+                            affordable_usd_hint=float(affordable_usd_hint),
+                            max_notional_usd_cap=float(max_notional_usd_cap),
+                        )
+                        intel_meta["symbol_intel_executable_count"] = int(
+                            self._to_float(intel_exec_meta.get("executable_count", 0), 0.0)
+                        )
+                        intel_meta["symbol_intel_rejected_unpriced"] = int(
+                            self._to_float(intel_exec_meta.get("rejected_unpriced", 0), 0.0)
+                        )
+                        intel_meta["symbol_intel_rejected_affordable"] = int(
+                            self._to_float(intel_exec_meta.get("rejected_affordable", 0), 0.0)
+                        )
+                        intel_meta["symbol_intel_rejected_cap"] = int(
+                            self._to_float(intel_exec_meta.get("rejected_cap", 0), 0.0)
+                        )
+                        if preferred_source == "symbol_flip_intel":
+                            preferred = str(intel_symbols[0]).upper().strip() if intel_symbols else ""
+                            preferred_source = "symbol_flip_intel_executable" if preferred else "none"
 
                 symbol = preferred
                 preferred_cfg = self.router.get_symbol_config(symbol) if symbol else None
@@ -2388,21 +4087,41 @@ class RobustLiveExecutor:
                 preferred_min_order_notional = 0.0
                 preferred_affordable = True
                 if preferred_cfg and preferred_ticker:
-                    preferred_min_order_notional = max(
+                    preferred_min_order_qty = self._effective_min_order(
+                        symbol,
                         self._to_float(preferred_cfg.get("min_order", 0.0), 0.0),
+                    )
+                    preferred_min_order_notional = max(
+                        preferred_min_order_qty,
                         0.0,
                     ) * max(self._to_float(preferred_ticker.get("last", 0.0), 0.0), 0.0)
+                    if cached_balance_stale and not (allow_cached_balance_trading and affordable_usd_hint > 0.0):
+                        preferred_affordable = False
+                    if affordable_usd_hint <= 0.0:
+                        preferred_affordable = False
                     if max_notional_usd_cap > 0.0 and preferred_min_order_notional > max_notional_usd_cap:
                         preferred_affordable = False
-                    if affordable_usd_hint > 0.0 and preferred_min_order_notional > affordable_usd_hint:
+                    if preferred_min_order_notional > affordable_usd_hint:
                         preferred_affordable = False
 
                 preloaded_ticker: Optional[dict[str, Any]] = None
                 selection_meta: dict[str, Any] = {
                     "preferred_symbol": preferred,
+                    "preferred_source": preferred_source,
+                    "universe_mode": bool(universe_mode),
                     "preferred_min_order_notional": round(float(preferred_min_order_notional), 6),
                     "blocked_count": len(blocked),
                     "universe_scan_cap": int(scan_cap),
+                    "universe_extra_count": int(len(runtime_extra_symbols)),
+                    "symbol_intel_source": str(intel_meta.get("symbol_intel_source", "none") or "none"),
+                    "symbol_intel_stale": bool(intel_meta.get("symbol_intel_stale", False)),
+                    "symbol_intel_age_sec": intel_meta.get("symbol_intel_age_sec"),
+                    "symbol_intel_candidate_count": int(self._to_float(intel_meta.get("symbol_intel_candidate_count", 0), 0.0)),
+                    "symbol_intel_selected_count": int(self._to_float(intel_meta.get("symbol_intel_selected_count", 0), 0.0)),
+                    "symbol_intel_executable_count": int(self._to_float(intel_meta.get("symbol_intel_executable_count", 0), 0.0)),
+                    "symbol_intel_rejected_unpriced": int(self._to_float(intel_meta.get("symbol_intel_rejected_unpriced", 0), 0.0)),
+                    "symbol_intel_rejected_affordable": int(self._to_float(intel_meta.get("symbol_intel_rejected_affordable", 0), 0.0)),
+                    "symbol_intel_rejected_cap": int(self._to_float(intel_meta.get("symbol_intel_rejected_cap", 0), 0.0)),
                     "reserve_usd_configured": round(float(reserve_usd_configured), 6),
                     "reserve_usd_effective": round(float(reserve_usd_hint), 6),
                     "universe_candidate_count": int(len(candidates)),
@@ -2410,8 +4129,25 @@ class RobustLiveExecutor:
                     "universe_ticker_hits": 0,
                     "universe_affordability_rejects": 0,
                     "affordable_usd_hint": round(float(affordable_usd_hint), 6),
+                    "quote_usd_hint": round(float(quote_usd_hint), 6),
+                    "total_cash_usd_hint": round(float(total_cash_usd_hint), 6),
+                    "stable_cash_equivalent_usd_hint": round(float(stable_cash_equivalent_hint), 6),
+                    "cash_usd_hint": round(float(usd_balance_hint), 6),
+                    "holdings_value_usd_hint": round(float(holdings_value_hint), 6),
+                    "total_equity_usd_hint": round(float(total_equity_hint), 6),
+                    "largest_holding_symbol": largest_holding_symbol_hint,
+                    "largest_holding_weight_pct": round(float(largest_holding_weight_hint), 6),
+                    "max_symbol_allocation_pct": round(float(self.max_symbol_allocation_pct) * 100.0, 6),
+                    "balance_error_hint": balance_error_hint,
+                    "balance_cache_age_sec": round(float(balance_cache_age_sec), 3) if math.isfinite(balance_cache_age_sec) else None,
+                    "balance_confirmed_live": bool(balance_confirmed_live),
+                    "using_cached_balance_hint": bool(using_cached_balance_hint),
+                    "rate_limited_balance_hint": bool(rate_limited_balance_hint),
+                    "cached_balance_stale": bool(cached_balance_stale),
                     "max_notional_usd_cap": round(float(max_notional_usd_cap), 6),
-                    "symbol_source": "preferred",
+                    "allow_cached_balance_trading": bool(allow_cached_balance_trading),
+                    "cached_balance_trading_cap_usd": round(float(cached_balance_trading_cap_usd), 6),
+                    "symbol_source": "preferred" if preferred else "none",
                     "selected_spread_bps": None,
                     "selected_min_order_notional": round(float(preferred_min_order_notional), 6)
                     if preferred_min_order_notional > 0.0
@@ -2434,11 +4170,40 @@ class RobustLiveExecutor:
                     )
                     selection_meta["blocked_count"] = int(len(blocked))
                     selection_meta["universe_scan_cap"] = int(scan_cap)
+                    selection_meta["universe_extra_count"] = int(len(runtime_extra_symbols))
+                    selection_meta["symbol_intel_source"] = str(intel_meta.get("symbol_intel_source", "none") or "none")
+                    selection_meta["symbol_intel_stale"] = bool(intel_meta.get("symbol_intel_stale", False))
+                    selection_meta["symbol_intel_age_sec"] = intel_meta.get("symbol_intel_age_sec")
+                    selection_meta["symbol_intel_candidate_count"] = int(self._to_float(intel_meta.get("symbol_intel_candidate_count", 0), 0.0))
+                    selection_meta["symbol_intel_selected_count"] = int(self._to_float(intel_meta.get("symbol_intel_selected_count", 0), 0.0))
+                    selection_meta["symbol_intel_executable_count"] = int(self._to_float(intel_meta.get("symbol_intel_executable_count", 0), 0.0))
+                    selection_meta["symbol_intel_rejected_unpriced"] = int(self._to_float(intel_meta.get("symbol_intel_rejected_unpriced", 0), 0.0))
+                    selection_meta["symbol_intel_rejected_affordable"] = int(self._to_float(intel_meta.get("symbol_intel_rejected_affordable", 0), 0.0))
+                    selection_meta["symbol_intel_rejected_cap"] = int(self._to_float(intel_meta.get("symbol_intel_rejected_cap", 0), 0.0))
                     selection_meta["reserve_usd_configured"] = round(float(reserve_usd_configured), 6)
                     selection_meta["reserve_usd_effective"] = round(float(reserve_usd_hint), 6)
                     selection_meta["affordable_usd_hint"] = round(float(affordable_usd_hint), 6)
+                    selection_meta["quote_usd_hint"] = round(float(quote_usd_hint), 6)
+                    selection_meta["total_cash_usd_hint"] = round(float(total_cash_usd_hint), 6)
+                    selection_meta["stable_cash_equivalent_usd_hint"] = round(float(stable_cash_equivalent_hint), 6)
+                    selection_meta["cash_usd_hint"] = round(float(usd_balance_hint), 6)
+                    selection_meta["holdings_value_usd_hint"] = round(float(holdings_value_hint), 6)
+                    selection_meta["total_equity_usd_hint"] = round(float(total_equity_hint), 6)
+                    selection_meta["largest_holding_symbol"] = largest_holding_symbol_hint
+                    selection_meta["largest_holding_weight_pct"] = round(float(largest_holding_weight_hint), 6)
+                    selection_meta["max_symbol_allocation_pct"] = round(float(self.max_symbol_allocation_pct) * 100.0, 6)
+                    selection_meta["balance_error_hint"] = balance_error_hint
+                    selection_meta["balance_cache_age_sec"] = round(float(balance_cache_age_sec), 3) if math.isfinite(balance_cache_age_sec) else None
+                    selection_meta["balance_confirmed_live"] = bool(balance_confirmed_live)
+                    selection_meta["using_cached_balance_hint"] = bool(using_cached_balance_hint)
+                    selection_meta["rate_limited_balance_hint"] = bool(rate_limited_balance_hint)
+                    selection_meta["cached_balance_stale"] = bool(cached_balance_stale)
                     selection_meta["max_notional_usd_cap"] = round(float(max_notional_usd_cap), 6)
+                    selection_meta["allow_cached_balance_trading"] = bool(allow_cached_balance_trading)
+                    selection_meta["cached_balance_trading_cap_usd"] = round(float(cached_balance_trading_cap_usd), 6)
                     selection_meta["preferred_min_order_notional"] = round(float(preferred_min_order_notional), 6)
+                    selection_meta["preferred_source"] = preferred_source
+                    selection_meta["universe_mode"] = bool(universe_mode)
                     if not symbol:
                         blocked_payload = dict(selection_meta)
                         blocked_payload.update(
@@ -2453,20 +4218,100 @@ class RobustLiveExecutor:
                 else:
                     preloaded_ticker = preferred_ticker
 
+                selected_symbol = str(symbol).upper().strip()
+                if (
+                    universe_mode
+                    and self.same_symbol_reentry_cooldown_sec > 0.0
+                    and selected_symbol
+                    and selected_symbol == str(self.last_entry_symbol or "").upper().strip()
+                ):
+                    elapsed_sec = float("inf")
+                    last_entry_utc = str(self.last_entry_time_utc or "").strip()
+                    if last_entry_utc:
+                        try:
+                            last_entry_dt = datetime.fromisoformat(last_entry_utc.replace("Z", "+00:00"))
+                            if last_entry_dt.tzinfo is None:
+                                last_entry_dt = last_entry_dt.replace(tzinfo=timezone.utc)
+                            elapsed_sec = max((loop_now - last_entry_dt).total_seconds(), 0.0)
+                        except Exception:
+                            elapsed_sec = float("inf")
+
+                    if math.isfinite(elapsed_sec) and elapsed_sec < float(self.same_symbol_reentry_cooldown_sec):
+                        rotate_candidates = [
+                            s for s in candidates if str(s).upper().strip() != selected_symbol
+                        ]
+                        if rotate_candidates:
+                            rotated_symbol, rotated_ticker, rotated_meta = self._select_symbol_from_universe(
+                                "",
+                                rotate_candidates,
+                                affordable_usd_hint=affordable_usd_hint,
+                                max_notional_usd_cap=max_notional_usd_cap,
+                                allow_preferred_shortcut=False,
+                            )
+                            if rotated_symbol:
+                                symbol = rotated_symbol
+                                preloaded_ticker = rotated_ticker
+                                selection_meta["rotated_from_symbol"] = selected_symbol
+                                selection_meta["symbol_rotation_reason"] = "same_symbol_reentry_cooldown"
+                                selection_meta["same_symbol_elapsed_sec"] = round(float(elapsed_sec), 6)
+                                if isinstance(rotated_meta, dict):
+                                    for field in (
+                                        "symbol_source",
+                                        "selected_spread_bps",
+                                        "selected_min_order_notional",
+                                        "universe_sample_size",
+                                        "universe_sample_escalated",
+                                        "universe_ticker_hits",
+                                        "universe_affordability_rejects",
+                                    ):
+                                        if field in rotated_meta:
+                                            selection_meta[field] = rotated_meta[field]
+
                 selection_meta["selected_symbol"] = str(symbol).upper()
                 self.last_symbol_selection_meta = dict(selection_meta)
 
                 selected_min_notional = self._to_float(selection_meta.get("selected_min_order_notional", 0.0), 0.0)
+                selected_cfg = self.router.get_symbol_config(symbol) or {}
+                selected_min_qty_effective = self._effective_min_order(
+                    str(symbol or "").upper(),
+                    self._to_float(selected_cfg.get("min_order", 0.0), 0.0),
+                )
+                selected_last_px = 0.0
+                if isinstance(preloaded_ticker, dict):
+                    selected_last_px = self._to_float(preloaded_ticker.get("last", 0.0), 0.0)
+                if selected_last_px <= 0.0:
+                    selected_live_ticker = self.router.get_ticker(symbol)
+                    if isinstance(selected_live_ticker, dict):
+                        preloaded_ticker = selected_live_ticker
+                        selected_last_px = self._to_float(selected_live_ticker.get("last", 0.0), 0.0)
+                selected_min_notional_effective = max(selected_min_qty_effective, 0.0) * max(selected_last_px, 0.0)
+                if selected_min_notional_effective > 0.0:
+                    selected_min_notional = max(selected_min_notional, selected_min_notional_effective)
+                    selection_meta["selected_min_order_notional"] = round(float(selected_min_notional), 6)
+                    selection_meta["selected_min_order_notional_effective"] = round(
+                        float(selected_min_notional_effective),
+                        6,
+                    )
+
                 unaffordable_by_balance = affordable_usd_hint > 0.0 and selected_min_notional > affordable_usd_hint
                 unaffordable_by_cap = max_notional_usd_cap > 0.0 and selected_min_notional > max_notional_usd_cap
                 if selected_min_notional > 0.0 and (unaffordable_by_balance or unaffordable_by_cap):
                     self.no_affordable_streak += 1
                     recycle_result: Optional[dict[str, Any]] = None
+                    collateral_convert_result: Optional[dict[str, Any]] = None
                     if (
                         self.no_affordable_recycle_enabled
                         and self.no_affordable_streak >= int(self.no_affordable_recycle_streak_trigger)
                     ):
                         recycle_result = self._attempt_no_affordable_capital_recycle(loop_now)
+
+                    if not (isinstance(recycle_result, dict) and bool(recycle_result.get("executed", False))):
+                        collateral_convert_result = self._attempt_collateral_convert_for_liquidity(
+                            loop_now,
+                            reason="no_affordable_symbol",
+                            required_usd=float(selected_min_notional),
+                            preferred_symbol=str(symbol),
+                        )
 
                     blocked_payload = dict(selection_meta)
                     blocked_payload.update(
@@ -2482,8 +4327,13 @@ class RobustLiveExecutor:
                     )
                     if isinstance(recycle_result, dict):
                         blocked_payload["capital_recycle"] = recycle_result
+                    if isinstance(collateral_convert_result, dict):
+                        blocked_payload["collateral_convert"] = collateral_convert_result
                     _write_live_heartbeat(blocked_payload)
-                    if isinstance(recycle_result, dict) and bool(recycle_result.get("executed", False)):
+                    if (
+                        (isinstance(recycle_result, dict) and bool(recycle_result.get("executed", False)))
+                        or (isinstance(collateral_convert_result, dict) and bool(collateral_convert_result.get("executed", False)))
+                    ):
                         time.sleep(max(min(self.loop_seconds * 0.40, 2.0), 0.25))
                     else:
                         time.sleep(self.loop_seconds)

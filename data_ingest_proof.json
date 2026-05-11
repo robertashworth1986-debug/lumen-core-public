@@ -1,0 +1,167 @@
+{
+  "timestamp_utc": "2026-04-01T19:47:06.568492+00:00",
+  "roots_scanned": [
+    "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data",
+    "C:\\LumaTrader\\data",
+    "C:\\Users\\Novac\\iCloudDrive\\Data sets"
+  ],
+  "clean_dir": "C:\\LumaTrader\\clean_data",
+  "catalog_csv": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\dataset_catalog.csv",
+  "summary_csv": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\data_scan_summary.csv",
+  "files_seen": 39,
+  "files_cleaned": 18,
+  "files_skipped": 21,
+  "files_errored": 0,
+  "top_clean_files": [
+    {
+      "file": "table14.csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\table14.csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\table14_eee8109e30.csv",
+      "rows": 72,
+      "cols": 2,
+      "value_col": "feb",
+      "time_col": NaN,
+      "quality_score": 99.166667
+    },
+    {
+      "file": "table14.csv",
+      "source_path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\table14.csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\table14_2cc394b9ac.csv",
+      "rows": 72,
+      "cols": 2,
+      "value_col": "feb",
+      "time_col": NaN,
+      "quality_score": 99.166667
+    },
+    {
+      "file": "930-data-export (1).csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export (1).csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\930-data-export_1_9c8593a95c.csv",
+      "rows": 66,
+      "cols": 2,
+      "value_col": "prior_hour_demand_mwh",
+      "time_col": NaN,
+      "quality_score": 96.818182
+    },
+    {
+      "file": "930-data-export (1).csv",
+      "source_path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\930-data-export (1).csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\930-data-export_1_c62cce39c9.csv",
+      "rows": 66,
+      "cols": 2,
+      "value_col": "prior_hour_demand_mwh",
+      "time_col": NaN,
+      "quality_score": 96.818182
+    },
+    {
+      "file": "930-data-export (2).csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export (2).csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\930-data-export_2_71352ad98a.csv",
+      "rows": 193,
+      "cols": 2,
+      "value_col": "demand_forecast_mwh",
+      "time_col": NaN,
+      "quality_score": 90.037485
+    },
+    {
+      "file": "930-data-export (2).csv",
+      "source_path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\930-data-export (2).csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\930-data-export_2_995ba268e1.csv",
+      "rows": 193,
+      "cols": 2,
+      "value_col": "demand_forecast_mwh",
+      "time_col": NaN,
+      "quality_score": 90.037485
+    },
+    {
+      "file": "MER_T09_04.csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\MER_T09_04.csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\MER_T09_04_ae278e84d4.csv",
+      "rows": 3793,
+      "cols": 2,
+      "value_col": "value",
+      "time_col": NaN,
+      "quality_score": 81.007302
+    },
+    {
+      "file": "MER_T09_04.csv",
+      "source_path": "C:\\Users\\Novac\\iCloudDrive\\Data sets\\MER_T09_04.csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\MER_T09_04_641def4c59.csv",
+      "rows": 3793,
+      "cols": 2,
+      "value_col": "value",
+      "time_col": NaN,
+      "quality_score": 81.007302
+    },
+    {
+      "file": "kraken_live.csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\kraken_live.csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\kraken_live_ed7b0d22c1.csv",
+      "rows": 120,
+      "cols": 3,
+      "value_col": "close",
+      "time_col": "timestamp",
+      "quality_score": 74.25
+    },
+    {
+      "file": "kraken_live.csv",
+      "source_path": "C:\\LumaTrader\\data\\kraken_live.csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\kraken_live_2df27a2d23.csv",
+      "rows": 120,
+      "cols": 3,
+      "value_col": "close",
+      "time_col": "timestamp",
+      "quality_score": 74.25
+    },
+    {
+      "file": "fred_CPIAUCSL.csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_CPIAUCSL.csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\fred_CPIAUCSL_3958b7a751.csv",
+      "rows": 949,
+      "cols": 2,
+      "value_col": "value",
+      "time_col": "date",
+      "quality_score": 73.471787
+    },
+    {
+      "file": "fred_CPIAUCSL.csv",
+      "source_path": "C:\\LumaTrader\\data\\fred_CPIAUCSL.csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\fred_CPIAUCSL_b9b12fe229.csv",
+      "rows": 949,
+      "cols": 2,
+      "value_col": "value",
+      "time_col": "date",
+      "quality_score": 73.471787
+    },
+    {
+      "file": "kraken_live_5000.csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\kraken_live_5000.csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\kraken_live_5000_880d74790f.csv",
+      "rows": 721,
+      "cols": 9,
+      "value_col": "close",
+      "time_col": "time",
+      "quality_score": 65.700676
+    },
+    {
+      "file": "kraken_live_5000.csv",
+      "source_path": "C:\\LumaTrader\\data\\kraken_live_5000.csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\kraken_live_5000_341bc0cd97.csv",
+      "rows": 721,
+      "cols": 9,
+      "value_col": "close",
+      "time_col": "time",
+      "quality_score": 65.700676
+    },
+    {
+      "file": "fred_UNRATE.csv",
+      "source_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_UNRATE.csv",
+      "clean_path": "C:\\LumaTrader\\clean_data\\fred_UNRATE_3c5e7e2669.csv",
+      "rows": 937,
+      "cols": 2,
+      "value_col": "value",
+      "time_col": "date",
+      "quality_score": 64.956909
+    }
+  ]
+}
