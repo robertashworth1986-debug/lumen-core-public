@@ -6,7 +6,8 @@ Runs Monte Carlo simulations to generate updated Sharpe baselines.
 Computes opportunity gains vs. current deployment baseline.
 
 Execution: python MONTE_CARLO_REVALIDATION_ORCHESTRATOR.py --iterations 10000
-Output: out/monte_carlo_validation_20260425.json
+Output: out/monte_carlo_validation_<UTCSTAMP>.json
+    out/monte_carlo_validation_latest.json
         out/sector_sharpe_baselines_updated.json
         out/opportunity_gain_matrix_updated.json
 """
@@ -25,15 +26,34 @@ import numpy as np
 # ================================================================
 # CONFIG
 # ================================================================
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(os.getenv("LUMA_ROOT", str(Path(__file__).resolve().parents[1]))).resolve()
 CONF = ROOT / "config"
 OUT  = ROOT / "out"
+ASSUMPTIONS_PATH = CONF / "impact_model_assumptions.json"
+
+DEFAULT_IMPACT_ASSUMPTIONS = {
+    "historical_years": 20.0,
+    "default_savings_pct": 0.32,
+    "min_savings_pct": 0.05,
+    "max_savings_pct": 0.90,
+    "monte_carlo": {
+        "default_detection_rate": 0.32,
+        "sector_detection_rate_overrides": {},
+        "prevention_share_of_detected": 0.60,
+        "early_detection_share_of_detected": 0.40,
+        "early_detection_loss_reduction_pct": 0.50,
+    },
+}
 
 # ================================================================
 # UTILITIES
 # ================================================================
 def now_utc():
     return datetime.now(timezone.utc).isoformat()
+
+
+def utc_stamp() -> str:
+    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 def load_json(path: Path, default=None):
     try:
@@ -49,6 +69,97 @@ def save_json(path: Path, obj: Any) -> None:
     with open(path, "w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2)
     print(f"[OK] Saved: {path.name}")
+
+
+def _to_float(value: Any, default: float) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return float(default)
+
+
+def _clamp(value: float, minimum: float, maximum: float) -> float:
+    return max(minimum, min(maximum, value))
+
+
+def load_impact_assumptions() -> Dict[str, Any]:
+    raw = load_json(ASSUMPTIONS_PATH, {})
+    assumptions = dict(DEFAULT_IMPACT_ASSUMPTIONS)
+    assumptions["monte_carlo"] = dict(DEFAULT_IMPACT_ASSUMPTIONS["monte_carlo"])
+
+    if isinstance(raw, dict):
+        assumptions["historical_years"] = max(
+            1.0,
+            _to_float(raw.get("historical_years"), assumptions["historical_years"]),
+        )
+        assumptions["default_savings_pct"] = _to_float(
+            raw.get("default_savings_pct"), assumptions["default_savings_pct"]
+        )
+        assumptions["min_savings_pct"] = _to_float(
+            raw.get("min_savings_pct"), assumptions["min_savings_pct"]
+        )
+        assumptions["max_savings_pct"] = _to_float(
+            raw.get("max_savings_pct"), assumptions["max_savings_pct"]
+        )
+
+        raw_mc = raw.get("monte_carlo")
+        if isinstance(raw_mc, dict):
+            assumptions["monte_carlo"]["default_detection_rate"] = _to_float(
+                raw_mc.get(
+                    "default_detection_rate",
+                    assumptions["monte_carlo"]["default_detection_rate"],
+                ),
+                assumptions["monte_carlo"]["default_detection_rate"],
+            )
+            assumptions["monte_carlo"]["prevention_share_of_detected"] = _to_float(
+                raw_mc.get(
+                    "prevention_share_of_detected",
+                    assumptions["monte_carlo"]["prevention_share_of_detected"],
+                ),
+                assumptions["monte_carlo"]["prevention_share_of_detected"],
+            )
+            assumptions["monte_carlo"]["early_detection_share_of_detected"] = _to_float(
+                raw_mc.get(
+                    "early_detection_share_of_detected",
+                    assumptions["monte_carlo"]["early_detection_share_of_detected"],
+                ),
+                assumptions["monte_carlo"]["early_detection_share_of_detected"],
+            )
+            assumptions["monte_carlo"]["early_detection_loss_reduction_pct"] = _to_float(
+                raw_mc.get(
+                    "early_detection_loss_reduction_pct",
+                    assumptions["monte_carlo"]["early_detection_loss_reduction_pct"],
+                ),
+                assumptions["monte_carlo"]["early_detection_loss_reduction_pct"],
+            )
+
+            overrides: Dict[str, float] = {}
+            raw_overrides = raw_mc.get("sector_detection_rate_overrides")
+            if isinstance(raw_overrides, dict):
+                for key, value in raw_overrides.items():
+                    overrides[str(key)] = _to_float(
+                        value,
+                        assumptions["monte_carlo"]["default_detection_rate"],
+                    )
+            assumptions["monte_carlo"]["sector_detection_rate_overrides"] = overrides
+
+    lo = assumptions["min_savings_pct"]
+    hi = assumptions["max_savings_pct"]
+    if hi < lo:
+        lo, hi = hi, lo
+    assumptions["min_savings_pct"] = lo
+    assumptions["max_savings_pct"] = hi
+
+    mc = assumptions["monte_carlo"]
+    mc["default_detection_rate"] = _clamp(mc["default_detection_rate"], lo, hi)
+    mc["prevention_share_of_detected"] = _clamp(mc["prevention_share_of_detected"], 0.0, 1.0)
+    mc["early_detection_share_of_detected"] = _clamp(mc["early_detection_share_of_detected"], 0.0, 1.0)
+    mc["early_detection_loss_reduction_pct"] = _clamp(mc["early_detection_loss_reduction_pct"], 0.0, 1.0)
+    mc["sector_detection_rate_overrides"] = {
+        k: _clamp(v, lo, hi)
+        for k, v in mc.get("sector_detection_rate_overrides", {}).items()
+    }
+    return assumptions
 
 def compute_sharpe_ratio(returns: List[float], risk_free_rate: float = 0.00) -> float:
     """Compute Sharpe ratio from returns array"""
@@ -68,7 +179,12 @@ def compute_sortino_ratio(returns: List[float], target_return: float = 0.00) -> 
     downside_std = np.std(downside_returns) if len(downside_returns) > 0 else 0
     return np.mean(excess_returns) / downside_std if downside_std > 0 else np.mean(excess_returns)
 
-def monte_carlo_simulation(outages: List[Dict], sector: str, iterations: int = 1000) -> Dict[str, Any]:
+def monte_carlo_simulation(
+    outages: List[Dict],
+    sector: str,
+    assumptions: Dict[str, Any],
+    iterations: int = 1000,
+) -> Dict[str, Any]:
     """
     Run Monte Carlo simulation on outage data for a sector.
     Generates realistic scenarios by:
@@ -97,9 +213,31 @@ def monte_carlo_simulation(outages: List[Dict], sector: str, iterations: int = 1
         "simulation_runs": [],
     }
     
+    historical_years = assumptions["historical_years"]
+    mc_assumptions = assumptions["monte_carlo"]
+    detection_rate = mc_assumptions["sector_detection_rate_overrides"].get(
+        sector,
+        mc_assumptions["default_detection_rate"],
+    )
+    prevention_share = mc_assumptions["prevention_share_of_detected"]
+    early_detection_share = mc_assumptions["early_detection_share_of_detected"]
+    share_total = prevention_share + early_detection_share
+    if share_total > 1.0:
+        prevention_share /= share_total
+        early_detection_share /= share_total
+    early_detection_loss_reduction = mc_assumptions["early_detection_loss_reduction_pct"]
+
+    simulation_results["assumptions"] = {
+        "historical_years": historical_years,
+        "detection_rate": detection_rate,
+        "prevention_share_of_detected": prevention_share,
+        "early_detection_share_of_detected": early_detection_share,
+        "early_detection_loss_reduction_pct": early_detection_loss_reduction,
+    }
+
     # Calculate baseline loss
     baseline_losses = [o["estimated_loss_usd"] for o in sector_outages]
-    baseline_annual_loss = sum(baseline_losses) / (20 / 1)  # Normalize to annual over 20 years
+    baseline_annual_loss = sum(baseline_losses) / historical_years
     simulation_results["baseline_annual_loss"] = baseline_annual_loss
     
     # Run Monte Carlo iterations
@@ -111,18 +249,16 @@ def monte_carlo_simulation(outages: List[Dict], sector: str, iterations: int = 1
         # Baseline scenario: all losses realized
         baseline_loss_this_run = sum(o["estimated_loss_usd"] for o in sampled_outages)
         
-        # With LumenCore: assuming 32% detection/prevention on average
-        # (some detected early, some prevented, some still occur but reduced)
-        lumencore_detection_rate = 0.32  # From harmonic model validation
-        prevented_count = int(len(sampled_outages) * lumencore_detection_rate * 0.6)  # 60% of detected ones prevented
-        detected_early_count = int(len(sampled_outages) * lumencore_detection_rate * 0.4)  # 40% detected, loss reduced 50%
+        # With LumenCore: split detected events into prevented and early-detected reduced-loss events.
+        prevented_count = int(len(sampled_outages) * detection_rate * prevention_share)
+        detected_early_count = int(len(sampled_outages) * detection_rate * early_detection_share)
         
         loss_with_lumencore = baseline_loss_this_run
         for i in range(prevented_count):
             loss_with_lumencore -= sampled_outages[i]["estimated_loss_usd"]
         for i in range(prevented_count, prevented_count + detected_early_count):
             if i < len(sampled_outages):
-                loss_with_lumencore -= sampled_outages[i]["estimated_loss_usd"] * 0.5
+                loss_with_lumencore -= sampled_outages[i]["estimated_loss_usd"] * early_detection_loss_reduction
         
         # Calculate return (negative loss is positive return when added to baseline)
         baseline_return = 0  # Baseline is zero-return (loss state)
@@ -187,6 +323,7 @@ def main(iterations: int = 1000):
     print(f"Iterations per Sector: {iterations:,}")
     
     # Load ingested data
+    assumptions = load_impact_assumptions()
     ingestion_data = load_json(OUT / "master_data_ingestion_proof.json")
     outages_data = load_json(OUT / "historical_facility_outages_normalized.json")
     sector_impact_data = load_json(OUT / "sector_economic_impact_matrix.json")
@@ -201,6 +338,7 @@ def main(iterations: int = 1000):
             "version": "1.0",
             "iterations_per_sector": iterations,
             "total_sectors": len(SECTORS),
+            "assumptions_path": str(ASSUMPTIONS_PATH),
         },
         "validations": [],
         "summary": {},
@@ -213,7 +351,12 @@ def main(iterations: int = 1000):
         print(f"  [{idx+1}/{len(SECTORS)}] {sector:30} ", end="", flush=True)
         tick = time.time()
         
-        result = monte_carlo_simulation(all_outages, sector, iterations=iterations)
+        result = monte_carlo_simulation(
+            all_outages,
+            sector,
+            assumptions=assumptions,
+            iterations=iterations,
+        )
         all_results["validations"].append(result)
         
         elapsed = time.time() - tick
@@ -239,8 +382,10 @@ def main(iterations: int = 1000):
     }
     
     # Save results
-    validation_path = OUT / "monte_carlo_validation_20260425.json"
+    validation_path = OUT / f"monte_carlo_validation_{utc_stamp()}.json"
+    validation_latest_path = OUT / "monte_carlo_validation_latest.json"
     save_json(validation_path, all_results)
+    save_json(validation_latest_path, all_results)
     
     # Build updated Sharpe baselines
     sharpe_baselines = {
@@ -288,6 +433,7 @@ def main(iterations: int = 1000):
     print(f"Avg Savings Potential: {all_results['summary']['avg_savings_across_sectors']*100:.1f}%")
     print(f"\nOutput Files:")
     print(f"  - {validation_path.name}")
+    print(f"  - {validation_latest_path.name}")
     print(f"  - {baselines_path.name}")
     print(f"  - {gain_path.name}")
     print("=" * 80 + "\n")

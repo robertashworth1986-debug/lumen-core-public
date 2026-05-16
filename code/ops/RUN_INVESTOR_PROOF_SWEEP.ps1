@@ -1,5 +1,6 @@
 param(
     [switch]$PushNodeRed,
+    [switch]$RunSectorEnergyPipeline,
     [string]$NodeRedBase = "http://127.0.0.1:8787",
     [int]$MaxSeries = 0,
     [int]$MinRows = 252,
@@ -57,12 +58,27 @@ if ($PushNodeRed) {
 
 Write-Output "RUN_INVESTOR_PROOF_SWEEP python=$pythonCmd"
 Write-Output "RUN_INVESTOR_PROOF_SWEEP pushNodeRed=$PushNodeRed nodeRedBase=$NodeRedBase maxSeries=$MaxSeries"
+Write-Output "RUN_INVESTOR_PROOF_SWEEP runSectorEnergyPipeline=$RunSectorEnergyPipeline"
 
 & $pythonCmd @argsList
 $exitCode = $LASTEXITCODE
 
 if ($exitCode -ne 0) {
     throw "Investor proof sweep failed with exit code $exitCode"
+}
+
+if ($RunSectorEnergyPipeline) {
+    $sectorScript = Join-Path $root "INSTITUTIONAL_STACK_V2\code\ops\run_sector_energy_evidence_pipeline.py"
+    if (-not (Test-Path $sectorScript)) {
+        throw "Sector energy evidence pipeline script not found: $sectorScript"
+    }
+
+    Write-Output "RUN_INVESTOR_PROOF_SWEEP sectorEnergyPipeline=true"
+    & $pythonCmd $sectorScript
+    $sectorExitCode = $LASTEXITCODE
+    if ($sectorExitCode -ne 0) {
+        throw "Sector energy evidence pipeline failed with exit code $sectorExitCode"
+    }
 }
 
 Write-Output "RUN_INVESTOR_PROOF_SWEEP_COMPLETE"

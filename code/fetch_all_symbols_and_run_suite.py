@@ -3,6 +3,8 @@ import os, json, time, math
 from pathlib import Path
 from datetime import datetime, timezone
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 import numpy as np
 import pandas as pd
 import yaml
@@ -11,15 +13,46 @@ ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
 CFG = yaml.safe_load((ROOT / "config" / "live_hydrator.yaml").read_text(encoding="utf-8"))
 CORP = ROOT / "corpus_market"
 OUT  = ROOT / "out" / "execution"
+TRADER_LANE = "trader_alpha_execution"
+TRADER_OUT = OUT / "trader_alpha_lane"
 LOG  = ROOT / "logs"
-for p in [CORP, OUT, LOG]:
+for p in [CORP, OUT, TRADER_OUT, LOG]:
     p.mkdir(parents=True, exist_ok=True)
+
+PROTECTED_SECTOR_PROOF_PATHS = [
+    ROOT / "out" / "sector_value_matrix.json",
+    ROOT / "out" / "source_truth_table.json",
+    ROOT / "out" / "frozen_delta_ledger.jsonl",
+    ROOT / "out" / "infra_frozen_deltas.jsonl",
+]
 
 TOP_N = int(CFG.get("top_n", 200))
 MIN_ROWS = int(CFG.get("min_rows", 150))
 COST_BPS = float(CFG.get("cost_bps", 10))
 KRAKEN_OHLC_INTERVAL = int(CFG.get("poll_kraken_ohlc_interval", 60))
 BINANCEUS_KLINE_INTERVAL = str(CFG.get("binanceus_kline_interval", "1h"))
+REQUEST_TIMEOUT_SEC = float(CFG.get("request_timeout_sec", 30))
+HTTP_RETRY_TOTAL = int(CFG.get("http_retry_total", 4))
+HTTP_RETRY_BACKOFF_SEC = float(CFG.get("http_retry_backoff_sec", 0.5))
+PROGRESS_EVERY = int(CFG.get("progress_every", 100))
+
+MAX_KRAKEN_SYMBOLS = int(os.getenv("LUMA_MAX_KRAKEN_SYMBOLS", CFG.get("max_kraken_symbols", 0) or 0))
+MAX_BINANCEUS_SYMBOLS = int(os.getenv("LUMA_MAX_BINANCEUS_SYMBOLS", CFG.get("max_binanceus_symbols", 0) or 0))
+
+_retry = Retry(
+    total=HTTP_RETRY_TOTAL,
+    read=HTTP_RETRY_TOTAL,
+    connect=HTTP_RETRY_TOTAL,
+    backoff_factor=HTTP_RETRY_BACKOFF_SEC,
+    status_forcelist=[408, 429, 500, 502, 503, 504],
+    allowed_methods=["GET"],
+    respect_retry_after_header=True,
+    raise_on_status=False,
+)
+SESSION = requests.Session()
+_adapter = HTTPAdapter(max_retries=_retry, pool_connections=64, pool_maxsize=64)
+SESSION.mount("https://", _adapter)
+SESSION.mount("http://", _adapter)
 
 def utc_now():
     return datetime.now(timezone.utc).isoformat()
@@ -30,10 +63,20 @@ def log(msg: str):
     with open(LOG / "all_symbol_hydrator.log", "a", encoding="utf-8") as f:
         f.write(line + "\n")
 
-def get_json(url, params=None, headers=None, timeout=60):
-    r = requests.get(url, params=params, headers=headers, timeout=timeout)
+def get_json(url, params=None, headers=None, timeout=None):
+    timeout = REQUEST_TIMEOUT_SEC if timeout is None else timeout
+    r = SESSION.get(url, params=params, headers=headers, timeout=timeout)
     r.raise_for_status()
     return r.json()
+
+def _normalized(path: Path) -> str:
+    return str(path.resolve()).replace("\\", "/").lower()
+
+def assert_lane_boundary(write_paths: list[Path]):
+    protected = {_normalized(p) for p in PROTECTED_SECTOR_PROOF_PATHS}
+    for p in write_paths:
+        if _normalized(p) in protected:
+            raise RuntimeError(f"lane boundary violation: attempted write to protected sector/frozen proof path: {p}")
 
 # ------------------------
 # Symbol discovery
@@ -60,6 +103,9 @@ def fetch_kraken_pairs():
             "status": status
         })
     df = pd.DataFrame(rows).sort_values("symbol").reset_index(drop=True)
+    if MAX_KRAKEN_SYMBOLS > 0:
+        df = df.head(MAX_KRAKEN_SYMBOLS).reset_index(drop=True)
+    df.to_csv(TRADER_OUT / "kraken_pairs_registry.csv", index=False)
     df.to_csv(OUT / "kraken_pairs_registry.csv", index=False)
     return df
 
@@ -78,6 +124,9 @@ def fetch_binanceus_symbols():
             "status": rec.get("status")
         })
     df = pd.DataFrame(rows).sort_values("symbol").reset_index(drop=True)
+    if MAX_BINANCEUS_SYMBOLS > 0:
+        df = df.head(MAX_BINANCEUS_SYMBOLS).reset_index(drop=True)
+    df.to_csv(TRADER_OUT / "binanceus_symbols_registry.csv", index=False)
     df.to_csv(OUT / "binanceus_symbols_registry.csv", index=False)
     return df
 
@@ -193,6 +242,10 @@ def suspicious_flag(sharpe, max_dd, final, rows):
 # ------------------------
 def main():
     log("discovering symbols")
+    log(
+        f"http tuning timeout={REQUEST_TIMEOUT_SEC}s retries={HTTP_RETRY_TOTAL} backoff={HTTP_RETRY_BACKOFF_SEC}s "
+        f"cap_kraken={MAX_KRAKEN_SYMBOLS} cap_binanceus={MAX_BINANCEUS_SYMBOLS}"
+    )
     kraken_df = fetch_kraken_pairs()
     binance_df = fetch_binanceus_symbols()
 
@@ -201,7 +254,7 @@ def main():
 
     # Kraken
     log(f"kraken symbols: {len(kraken_df)}")
-    for _, r in kraken_df.iterrows():
+    for idx, r in kraken_df.iterrows():
         sym = str(r["symbol"])
         df = fetch_kraken_ohlc(sym)
         if df is None or len(df) < MIN_ROWS:
@@ -227,10 +280,12 @@ def main():
                 "validation_score": validation_score,
                 "rows": int(len(df))
             })
+        if PROGRESS_EVERY > 0 and (idx + 1) % PROGRESS_EVERY == 0:
+            log(f"kraken progress {idx + 1}/{len(kraken_df)} symbols")
 
     # Binance.US
     log(f"binanceus symbols: {len(binance_df)}")
-    for _, r in binance_df.iterrows():
+    for idx, r in binance_df.iterrows():
         sym = str(r["symbol"])
         df = fetch_binanceus_klines(sym)
         if df is None or len(df) < MIN_ROWS:
@@ -256,6 +311,8 @@ def main():
                 "validation_score": validation_score,
                 "rows": int(len(df))
             })
+        if PROGRESS_EVERY > 0 and (idx + 1) % PROGRESS_EVERY == 0:
+            log(f"binanceus progress {idx + 1}/{len(binance_df)} symbols")
 
     ranked = pd.DataFrame(all_ranked)
     if len(ranked) == 0:
@@ -264,47 +321,112 @@ def main():
 
     ranked["consistency_score"] = ranked["validation_score"] / (1 + ranked["suspicious"].astype(int))
     ranked["gen_all_score"] = ranked["consistency_score"]
+    ranked["data_domain"] = TRADER_LANE
     ranked = ranked.sort_values(["suspicious","validation_score","sharpe"], ascending=[True,False,False]).reset_index(drop=True)
 
-    ranked.to_csv(OUT / "gen_all_ranked.csv", index=False)
-    ranked.head(TOP_N).to_csv(OUT / "institutional_topn.csv", index=False)
+    lane_gen_all = TRADER_OUT / "gen_all_ranked_trader_alpha.csv"
+    lane_topn = TRADER_OUT / "institutional_topn_trader_alpha.csv"
+    lane_champion = TRADER_OUT / "gen_champion_trader_alpha.json"
+    lane_summary = TRADER_OUT / "live_key_routing_summary_trader_alpha.json"
+    lane_matrix = TRADER_OUT / "trader_exchange_strategy_matrix.csv"
+    lane_filtered = TRADER_OUT / "filtered_proof_trader_alpha.json"
+    lane_manifest = TRADER_OUT / "lane_boundary_manifest.json"
+
+    legacy_gen_all = OUT / "gen_all_ranked.csv"
+    legacy_topn = OUT / "institutional_topn.csv"
+    legacy_champion = OUT / "gen_champion.json"
+    legacy_summary = OUT / "live_key_routing_summary.json"
+    legacy_filtered = OUT / "filtered_proof.json"
+    legacy_trader_matrix = OUT / "trader_exchange_strategy_matrix.csv"
+
+    planned_writes = [
+        lane_gen_all,
+        lane_topn,
+        lane_champion,
+        lane_summary,
+        lane_matrix,
+        lane_filtered,
+        lane_manifest,
+        legacy_gen_all,
+        legacy_topn,
+        legacy_champion,
+        legacy_summary,
+        legacy_filtered,
+        legacy_trader_matrix,
+    ]
+    assert_lane_boundary(planned_writes)
+
+    ranked.to_csv(lane_gen_all, index=False)
+    ranked.to_csv(legacy_gen_all, index=False)
+    ranked.head(TOP_N).to_csv(lane_topn, index=False)
+    ranked.head(TOP_N).to_csv(legacy_topn, index=False)
 
     # best non-suspicious champion
     filt = ranked[ranked["suspicious"] == False].copy()
     if len(filt) == 0:
         filt = ranked.copy()
     champ = filt.iloc[0].to_dict()
-    (OUT / "gen_champion.json").write_text(json.dumps(champ, indent=2), encoding="utf-8")
+    champ["data_domain"] = TRADER_LANE
+    lane_champion.write_text(json.dumps(champ, indent=2), encoding="utf-8")
+    legacy_champion.write_text(json.dumps(champ, indent=2), encoding="utf-8")
 
     # summaries
     live_key_routing_summary = {
         "utc": utc_now(),
         "kraken_pairs_discovered": int(len(kraken_df)),
         "binanceus_symbols_discovered": int(len(binance_df)),
+        "request_timeout_sec": REQUEST_TIMEOUT_SEC,
+        "http_retry_total": HTTP_RETRY_TOTAL,
+        "http_retry_backoff_sec": HTTP_RETRY_BACKOFF_SEC,
+        "data_domain": TRADER_LANE,
+        "lane_output_root": str(TRADER_OUT),
         "market_files_written": int(len(list(CORP.glob("*.csv")))),
         "ranked_rows": int(len(ranked)),
         "top_pair": champ.get("pair"),
         "top_exchange": champ.get("exchange"),
         "top_strategy": champ.get("strategy")
     }
-    (OUT / "live_key_routing_summary.json").write_text(json.dumps(live_key_routing_summary, indent=2), encoding="utf-8")
+    lane_summary.write_text(json.dumps(live_key_routing_summary, indent=2), encoding="utf-8")
+    legacy_summary.write_text(json.dumps(live_key_routing_summary, indent=2), encoding="utf-8")
 
-    sector_value_matrix = ranked.groupby(["exchange","strategy"]).agg(
+    trader_exchange_strategy_matrix = ranked.groupby(["exchange","strategy"]).agg(
         mean_sharpe=("sharpe","mean"),
         mean_validation_score=("validation_score","mean"),
         count=("pair","count")
     ).reset_index()
-    sector_value_matrix.to_csv(OUT / "sector_value_matrix.csv", index=False)
+    trader_exchange_strategy_matrix.insert(0, "data_domain", TRADER_LANE)
+    trader_exchange_strategy_matrix.to_csv(lane_matrix, index=False)
+    trader_exchange_strategy_matrix.to_csv(legacy_trader_matrix, index=False)
 
     filtered_proof = ranked[(ranked["suspicious"] == False) & (ranked["rows"] >= MIN_ROWS)].head(50)
-    (OUT / "filtered_proof.json").write_text(filtered_proof.to_json(orient="records", indent=2), encoding="utf-8")
+    lane_filtered.write_text(filtered_proof.to_json(orient="records", indent=2), encoding="utf-8")
+    legacy_filtered.write_text(filtered_proof.to_json(orient="records", indent=2), encoding="utf-8")
+
+    legacy_collision = OUT / "sector_value_matrix.csv"
+    if legacy_collision.exists():
+        log(f"lane guard: legacy {legacy_collision.name} exists and is intentionally not updated by trader alpha run")
+
+    lane_manifest_payload = {
+        "generated_utc": utc_now(),
+        "lane": TRADER_LANE,
+        "lane_output_root": str(TRADER_OUT),
+        "protected_sector_proof_paths": [str(p) for p in PROTECTED_SECTOR_PROOF_PATHS],
+        "writes": [str(p) for p in planned_writes],
+        "notes": [
+            "Trader alpha run is isolated from frozen delta and sector-proof canonical paths.",
+            "Legacy trader compatibility outputs under out/execution remain enabled.",
+            "Deprecated ambiguous file name sector_value_matrix.csv is not updated by this script.",
+        ],
+    }
+    lane_manifest.write_text(json.dumps(lane_manifest_payload, indent=2), encoding="utf-8")
 
     log("done")
-    print(str(OUT / "gen_all_ranked.csv"))
-    print(str(OUT / "gen_champion.json"))
-    print(str(OUT / "live_key_routing_summary.json"))
-    print(str(OUT / "sector_value_matrix.csv"))
-    print(str(OUT / "filtered_proof.json"))
+    print(str(lane_gen_all))
+    print(str(lane_champion))
+    print(str(lane_summary))
+    print(str(lane_matrix))
+    print(str(lane_filtered))
+    print(str(lane_manifest))
 
 if __name__ == "__main__":
     main()

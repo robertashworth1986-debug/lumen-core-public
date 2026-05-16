@@ -9,7 +9,9 @@ Endpoints (all under /api/grants):
     GET  /api/grants/profile                company + PI profile
     GET  /api/grants/{grant_id}             latest draft package
     GET  /api/grants/{grant_id}/markdown    application.md as text
+    GET  /api/grants/{grant_id}/submission  latest submission packet + howto
     POST /api/grants/regenerate             re-run factory (all or one)
+    POST /api/grants/draft                  regenerate + prepare submission kit
     POST /api/grants/{grant_id}/approve     flip draft -> approved
     POST /api/grants/{grant_id}/submitted   record external submission
 
@@ -536,18 +538,31 @@ def _catalog_entry_for(grant_id: str) -> dict | None:
     return None
 
 
+def _load_submission_tooling():
+    sys.path.insert(0, str(ROOT / "code"))
+    try:
+        from grant_submission_kit import build_preflight, write_submission_kit  # type: ignore
+    except Exception as e:
+        raise HTTPException(status_code=500,
+                            detail=f"submission kit import failed: {e}")
+    return build_preflight, write_submission_kit
+
+
+def _prepare_submission_for_run(grant_id: str, run: Path, catalog_entry: dict | None) -> dict:
+    build_preflight, write_submission_kit = _load_submission_tooling()
+    pf = build_preflight(grant_id, run, catalog_entry)
+    files = write_submission_kit(grant_id, run, pf)
+    pf["written"] = {k: str(v) for k, v in files.items()}
+    return pf
+
+
 @router.get("/submission/dashboard")
 def submission_dashboard() -> JSONResponse:
     """One-shot preflight across every grant in the queue.
 
     Returns ready-to-submit count, total ceiling at risk, blockers histogram,
     and per-grant status. The dashboard surface for the cockpit."""
-    sys.path.insert(0, str(ROOT / "code"))
-    try:
-        from grant_submission_kit import build_preflight  # type: ignore
-    except Exception as e:
-        raise HTTPException(status_code=500,
-                            detail=f"submission kit import failed: {e}")
+    build_preflight, _ = _load_submission_tooling()
     if not QUEUE.exists():
         return JSONResponse({"items": [], "totals": {}})
     idx = _load(QUEUE)
@@ -597,25 +612,38 @@ def submission_dashboard() -> JSONResponse:
     return JSONResponse({"items": items, "totals": totals})
 
 
+@router.get("/{grant_id}/submission")
+def submission_status(grant_id: str) -> JSONResponse:
+    """Read the latest submission packet + howto for a grant if generated."""
+    run = _latest_run(GRANTS / grant_id)
+    if not run:
+        raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
+
+    packet_p = run / "submission_packet.json"
+    howto_p = run / "SUBMIT_HOWTO.md"
+    if not packet_p.exists():
+        raise HTTPException(status_code=404,
+                            detail="submission packet missing - run prepare_submission")
+
+    payload = {
+        "grant_id": grant_id,
+        "run_utc": run.name,
+        "submission_packet": _load(packet_p),
+        "has_howto": howto_p.exists(),
+        "howto_markdown": howto_p.read_text(encoding="utf-8") if howto_p.exists() else None,
+    }
+    return JSONResponse(payload)
+
+
 @router.post("/{grant_id}/prepare_submission")
 def prepare_submission(grant_id: str) -> JSONResponse:
     """Run preflight for one grant and write submission_packet.json + SUBMIT_HOWTO.md
     into the latest run directory. Returns the preflight dict."""
-    sys.path.insert(0, str(ROOT / "code"))
-    try:
-        from grant_submission_kit import (  # type: ignore
-            build_preflight, write_submission_kit,
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500,
-                            detail=f"submission kit import failed: {e}")
     run = _latest_run(GRANTS / grant_id)
     if not run:
         raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
     catalog_entry = _catalog_entry_for(grant_id)
-    pf = build_preflight(grant_id, run, catalog_entry)
-    files = write_submission_kit(grant_id, run, pf)
-    pf["written"] = {k: str(v) for k, v in files.items()}
+    pf = _prepare_submission_for_run(grant_id, run, catalog_entry)
     _emit("preflight", grant_id=grant_id,
           ready=pf.get("ready"),
           blockers=pf.get("blockers", []),
@@ -628,6 +656,90 @@ def prepare_submission(grant_id: str) -> JSONResponse:
 # ----------------------------------------------------------------------------
 class RegenerateRequest(BaseModel):
     grant_id: str | None = None
+
+
+class DraftRequest(BaseModel):
+    grant_id: str | None = None
+    force: bool = True
+    prepare_submission: bool = True
+
+
+@router.post("/draft")
+def draft(req: DraftRequest) -> JSONResponse:
+    """One-click drafting pipeline: regenerate + submission kit preflight.
+
+    This endpoint powers the portal's "Draft to submit-ready" action so
+    operators can refresh narrative artifacts and immediately see blockers
+    before manual AOR submission.
+    """
+    args: list[str] = []
+    if req.grant_id:
+        args.extend(["--grant", req.grant_id])
+    if req.force:
+        args.append("--force")
+
+    idx = _run_factory(args)
+    items = idx.get("items", []) if isinstance(idx, dict) else []
+    target_ids: list[str] = []
+    if req.grant_id:
+        target_ids = [req.grant_id]
+    else:
+        target_ids = [str(it.get("program_id")) for it in items if it.get("program_id")]
+
+    draft_items: list[dict] = []
+    if req.prepare_submission:
+        for grant_id in target_ids:
+            run = _latest_run(GRANTS / grant_id)
+            if not run:
+                draft_items.append({
+                    "grant_id": grant_id,
+                    "ready": False,
+                    "error": "no draft run found",
+                })
+                continue
+            try:
+                pf = _prepare_submission_for_run(grant_id, run, _catalog_entry_for(grant_id))
+                draft_items.append({
+                    "grant_id": grant_id,
+                    "run_utc": run.name,
+                    "ready": bool(pf.get("ready")),
+                    "package_complete": bool(pf.get("package_complete")),
+                    "approval_state": pf.get("approval_state"),
+                    "blockers": pf.get("blockers", []),
+                    "warnings": pf.get("warnings", []),
+                    "written": pf.get("written", {}),
+                    "portal_url": (pf.get("portal") or {}).get("portal_url"),
+                })
+            except HTTPException as e:
+                draft_items.append({
+                    "grant_id": grant_id,
+                    "ready": False,
+                    "error": str(e.detail),
+                })
+
+    n_ready = sum(1 for it in draft_items if it.get("ready") is True)
+    n_blocked = sum(1 for it in draft_items if it.get("ready") is False)
+    response = {
+        "ok": True,
+        "queue": idx,
+        "draft": {
+            "generated_utc": datetime.now(timezone.utc).isoformat(),
+            "n_total": len(draft_items),
+            "n_ready": n_ready,
+            "n_blocked": n_blocked,
+            "items": draft_items,
+        },
+    }
+
+    _emit(
+        "drafted",
+        grant_id=req.grant_id,
+        force=req.force,
+        prepare_submission=req.prepare_submission,
+        n_ready=n_ready,
+        n_blocked=n_blocked,
+    )
+    return JSONResponse(response)
 
 
 @router.post("/regenerate")

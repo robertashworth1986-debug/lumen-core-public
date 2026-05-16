@@ -25,10 +25,20 @@ from typing import Any, Dict, List, Optional, Tuple
 # ================================================================
 # CONFIG
 # ================================================================
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(os.getenv("LUMA_ROOT", str(Path(__file__).resolve().parents[1]))).resolve()
 CONF = ROOT / "config"
 OUT  = ROOT / "out"
 ENV_PATH = CONF / "luma_live_keys.env"
+ASSUMPTIONS_PATH = CONF / "impact_model_assumptions.json"
+
+DEFAULT_IMPACT_ASSUMPTIONS = {
+    "historical_years": 20.0,
+    "default_savings_pct": 0.32,
+    "min_savings_pct": 0.05,
+    "max_savings_pct": 0.90,
+    "scale_with_sector_multiplier": True,
+    "sector_savings_pct_overrides": {},
+}
 
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -52,6 +62,61 @@ def save_json(path: Path, obj: Any) -> None:
     with open(path, "w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2)
     print(f"[OK] Saved: {path}")
+
+
+def _to_float(value: Any, default: float) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return float(default)
+
+
+def _clamp(value: float, minimum: float, maximum: float) -> float:
+    return max(minimum, min(maximum, value))
+
+
+def load_impact_assumptions() -> Dict[str, Any]:
+    raw = load_json(ASSUMPTIONS_PATH, {})
+    assumptions = dict(DEFAULT_IMPACT_ASSUMPTIONS)
+
+    if isinstance(raw, dict):
+        assumptions["historical_years"] = max(
+            1.0,
+            _to_float(raw.get("historical_years"), assumptions["historical_years"]),
+        )
+        assumptions["default_savings_pct"] = _to_float(
+            raw.get("default_savings_pct"), assumptions["default_savings_pct"]
+        )
+        assumptions["min_savings_pct"] = _to_float(
+            raw.get("min_savings_pct"), assumptions["min_savings_pct"]
+        )
+        assumptions["max_savings_pct"] = _to_float(
+            raw.get("max_savings_pct"), assumptions["max_savings_pct"]
+        )
+        assumptions["scale_with_sector_multiplier"] = bool(
+            raw.get("scale_with_sector_multiplier", assumptions["scale_with_sector_multiplier"])
+        )
+
+        overrides: Dict[str, float] = {}
+        raw_overrides = raw.get("sector_savings_pct_overrides")
+        if isinstance(raw_overrides, dict):
+            for key, value in raw_overrides.items():
+                overrides[str(key)] = _to_float(value, assumptions["default_savings_pct"])
+        assumptions["sector_savings_pct_overrides"] = overrides
+
+    lo = assumptions["min_savings_pct"]
+    hi = assumptions["max_savings_pct"]
+    if hi < lo:
+        lo, hi = hi, lo
+    assumptions["min_savings_pct"] = lo
+    assumptions["max_savings_pct"] = hi
+    assumptions["default_savings_pct"] = _clamp(assumptions["default_savings_pct"], lo, hi)
+
+    assumptions["sector_savings_pct_overrides"] = {
+        k: _clamp(v, lo, hi)
+        for k, v in assumptions["sector_savings_pct_overrides"].items()
+    }
+    return assumptions
 
 def load_env_file(path: Path) -> Dict[str, str]:
     env = {}
@@ -562,25 +627,57 @@ def main():
     })
     
     # Build sector economic impact matrix
+    assumptions = load_impact_assumptions()
+    historical_years = assumptions["historical_years"]
+    default_savings_pct = assumptions["default_savings_pct"]
+    min_savings_pct = assumptions["min_savings_pct"]
+    max_savings_pct = assumptions["max_savings_pct"]
+    scale_with_multiplier = assumptions["scale_with_sector_multiplier"]
+    sector_overrides = assumptions["sector_savings_pct_overrides"]
+
     sector_matrix = {}
     for sector, definition in SECTOR_DEFINITIONS.items():
         sector_outages = [r for r in normalized_outages if r["sector"] == sector]
         total_loss = sum(r["estimated_loss_usd"] for r in sector_outages)
         avg_loss_per_event = total_loss / len(sector_outages) if sector_outages else 0
+
+        annual_recovery_potential = total_loss / historical_years
+        if sector in sector_overrides:
+            savings_pct = sector_overrides[sector]
+            savings_source = "sector_override"
+        else:
+            savings_pct = default_savings_pct
+            savings_source = "default"
+            if scale_with_multiplier:
+                savings_pct *= _to_float(definition.get("multiplier"), 1.0)
+                savings_source = "default_x_sector_multiplier"
+
+        savings_pct = _clamp(savings_pct, min_savings_pct, max_savings_pct)
+        recoverable_annual = annual_recovery_potential * savings_pct
         
         sector_matrix[sector] = {
             "definition": definition,
             "outage_count": len(sector_outages),
             "total_loss_usd": total_loss,
             "avg_loss_per_event_usd": avg_loss_per_event,
-            "annual_recovery_potential": total_loss / 20,  # 20-year average
-            "lumencore_savings_pct": 0.32,  # 32% from our harmonic models
-            "recoverable_annual_usd": (total_loss / 20) * 0.32,
+            "annual_recovery_potential": annual_recovery_potential,
+            "lumencore_savings_pct": savings_pct,
+            "lumencore_savings_source": savings_source,
+            "recoverable_annual_usd": recoverable_annual,
         }
     
     matrix_path = OUT / "sector_economic_impact_matrix.json"
     save_json(matrix_path, {
         "timestamp": now_utc(),
+        "assumptions": {
+            "source_path": str(ASSUMPTIONS_PATH),
+            "historical_years": historical_years,
+            "default_savings_pct": default_savings_pct,
+            "min_savings_pct": min_savings_pct,
+            "max_savings_pct": max_savings_pct,
+            "scale_with_sector_multiplier": scale_with_multiplier,
+            "sector_overrides_count": len(sector_overrides),
+        },
         "sectors": sector_matrix,
         "total_historical_loss_20yrs": sum(r["total_loss_usd"] for r in sector_matrix.values()),
         "total_recoverable_annual": sum(r["recoverable_annual_usd"] for r in sector_matrix.values()),

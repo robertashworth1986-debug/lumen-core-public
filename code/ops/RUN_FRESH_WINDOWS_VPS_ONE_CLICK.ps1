@@ -1,3 +1,4 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification='Function names in this script use singular nouns; suppress persistent stale diagnostic.')]
 param(
     [string]$Domain = "lumen-core.ai",
     [string]$RootPath = "C:\LumaTrader\INSTITUTIONAL_STACK_V2",
@@ -15,29 +16,6 @@ $ErrorActionPreference = "Stop"
 
 function Test-IsAdmin {
     return ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
-}
-
-function Convert-BoundParametersToArgs {
-    param([hashtable]$Bound)
-
-    $out = @()
-    foreach ($key in $Bound.Keys) {
-        if ($key -eq "NoElevation") {
-            continue
-        }
-
-        $value = $Bound[$key]
-        if ($value -is [switch]) {
-            if ($value.IsPresent) {
-                $out += "-$key"
-            }
-            continue
-        }
-
-        $out += "-$key"
-        $out += "$value"
-    }
-    return $out
 }
 
 function Invoke-PowerShellFile {
@@ -82,12 +60,29 @@ if (-not (Test-Path $BootstrapScript)) {
 $needsAdmin = (-not $SkipBootstrap) -and (-not $DryRun)
 if ($needsAdmin -and (-not $NoElevation) -and (-not (Test-IsAdmin))) {
     Write-Host "Relaunching as Administrator..." -ForegroundColor Yellow
-    $selfArgs = Convert-BoundParametersToArgs -Bound $PSBoundParameters
-    Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList @(
+    $selfArgs = @()
+    foreach ($key in $PSBoundParameters.Keys) {
+        if ($key -eq "NoElevation") {
+            continue
+        }
+
+        $value = $PSBoundParameters[$key]
+        if ($value -is [switch]) {
+            if ($value.IsPresent) {
+                $selfArgs += "-$key"
+            }
+            continue
+        }
+
+        $selfArgs += "-$key"
+        $selfArgs += "$value"
+    }
+    $elevatedArgs = @(
         "-NoProfile",
         "-ExecutionPolicy", "Bypass",
         "-File", $PSCommandPath
-    ) + $selfArgs | Out-Null
+    ) + $selfArgs
+    Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList $elevatedArgs | Out-Null
     return
 }
 

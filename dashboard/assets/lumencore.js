@@ -29,7 +29,7 @@
     return Array.from(new Set(values.filter(Boolean)));
   }
 
-  function resolveWsUrl(path = '/ws') {
+  function resolveWsUrl(path = '/ws/live') {
     if (USER_API_BASE) {
       const wsBase = USER_API_BASE
         .replace(/^https:\/\//i, 'wss://')
@@ -234,19 +234,41 @@
     });
   }
 
+  function loadThreeWithFallback(urls) {
+    const queue = Array.from(new Set(urls.filter(Boolean)));
+    const tryNext = () => {
+      if (!queue.length) {
+        console.warn('three.js failed to load from all sources; chrome will run without webgl field');
+        return;
+      }
+      const src = queue.shift();
+      const s = document.createElement('script');
+      s.src = src;
+      s.async = true;
+      s.onload = () => {
+        if (window.THREE) startWebGL();
+        else tryNext();
+      };
+      s.onerror = tryNext;
+      document.head.appendChild(s);
+    };
+    tryNext();
+  }
+
   if (window.THREE) {
     if (!IN_IFRAME) startWebGL();
   } else if (!IN_IFRAME && !IS_FILE_PROTOCOL) {
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js';
-    s.onload = startWebGL;
-    s.onerror = () => console.warn('three.js cdn failed; chrome will run without webgl field');
-    document.head.appendChild(s);
+    loadThreeWithFallback([
+      './assets/vendor/three.min.js',
+      '/assets/vendor/three.min.js',
+      'https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js',
+      'https://unpkg.com/three@0.162.0/build/three.min.js',
+    ]);
   }
 
   // 4. WebSocket bridge: surface grants events as a toast (Mission Control feel)
   try {
-    const wsUrl = resolveWsUrl('/ws');
+    const wsUrl = resolveWsUrl('/ws/live');
     if (wsUrl) {
       const ws = new WebSocket(wsUrl);
       ws.onmessage = (e) => {

@@ -327,20 +327,41 @@
 </footer>
 
 <script>
-const RUN_BASE = (new URLSearchParams(location.search)).get("run") || "runs";
+const IS_INST_DASHBOARD = /\/INSTITUTIONAL_STACK_V2\/dashboard\//i.test(String(location.pathname || '').replace(/\\/g, '/'));
+const DEFAULT_RUN_BASE = IS_INST_DASHBOARD ? "runs" : "../INSTITUTIONAL_STACK_V2/out/master_universe_v2";
+const ALT_RUN_BASE = IS_INST_DASHBOARD ? "../INSTITUTIONAL_STACK_V2/out/master_universe_v2" : "runs";
+const RUN_PARAM_BASE = (new URLSearchParams(location.search)).get("run");
+const RUN_BASES = RUN_PARAM_BASE ? [RUN_PARAM_BASE] : [DEFAULT_RUN_BASE, ALT_RUN_BASE];
+let ACTIVE_RUN_BASE = RUN_BASES[0];
 
 async function findLatestRun() {
   // Try a passed ?run=...&utc=... pair first.
   const utc = (new URLSearchParams(location.search)).get("utc");
-  if (utc) return RUN_BASE + "/" + utc;
-  // Otherwise rely on a manifest-of-runs file the build step writes.
-  try {
-    const r = await fetch(RUN_BASE + "/latest.txt", { cache: "no-store" });
-    if (r.ok) {
-      const t = (await r.text()).trim();
-      if (t) return RUN_BASE + "/" + t;
+  if (utc) {
+    for (const base of RUN_BASES) {
+      try {
+        const probe = await fetch(base + "/" + utc + "/summary.json", { cache: "no-store" });
+        if (probe.ok) {
+          ACTIVE_RUN_BASE = base;
+          return base + "/" + utc;
+        }
+      } catch (e) {}
     }
-  } catch (e) {}
+    return RUN_BASES[0] + "/" + utc;
+  }
+  // Otherwise rely on a manifest-of-runs file the build step writes.
+  for (const base of RUN_BASES) {
+    try {
+      const r = await fetch(base + "/latest.txt", { cache: "no-store" });
+      if (r.ok) {
+        const t = (await r.text()).trim();
+        if (t) {
+          ACTIVE_RUN_BASE = base;
+          return base + "/" + t;
+        }
+      }
+    } catch (e) {}
+  }
   return null;
 }
 
@@ -503,7 +524,7 @@ async function renderChain() {
     "(see manifest.sha256.json)";
   // Try to fetch ledger
   try {
-    const r = await fetch("ledger.jsonl",
+    const r = await fetch(ACTIVE_"ledger.jsonl",
       { cache: "no-store" });
     if (r.ok) {
       const lines = (await r.text()).split(/\r?\n/).filter(Boolean);
@@ -529,6 +550,11 @@ async function renderChain() {
 
 document.getElementById("verifyBtn").addEventListener("click", async () => {
   const status = document.getElementById("verifyStatus");
+  if (!RUN_URL || !MANIFEST) {
+    status.textContent = "no run loaded — pass ?utc=YYYYMMDDTHHMMSSZ or ensure /out/master_universe_v2/latest.txt is reachable";
+    status.className = "verify-status fail";
+    return;
+  }
   status.textContent = "fetching manifest…"; status.className = "verify-status";
   try {
     const r = await fetch(RUN_URL + "/manifest.sha256.json");
@@ -539,9 +565,10 @@ document.getElementById("verifyBtn").addEventListener("click", async () => {
     status.textContent = "manifest file SHA-256 = " + hex.slice(0, 16) + "…";
     status.classList.add("ok");
     // Also re-hash one raw file to spot-check chain integrity
-    const firstFile = Object.keys(MANIFEST.files)[0];
+    const files = MANIFEST && MANIFEST.files ? MANIFEST.files : null;
+    const firstFile = files ? Object.keys(files)[0] : null;
     if (firstFile) {
-      const expected = MANIFEST.files[firstFile];
+      const expected = files[firstFile];
       const fr = await fetch(RUN_URL + "/" + firstFile);
       const fb = await fr.arrayBuffer();
       const fbuf = await crypto.subtle.digest("SHA-256", fb);

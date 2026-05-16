@@ -1,0 +1,15 @@
+{
+  "historical_years": 20,
+  "default_savings_pct": 0.32,
+  "min_savings_pct": 0.05,
+  "max_savings_pct": 0.9,
+  "scale_with_sector_multiplier": true,
+  "sector_savings_pct_overrides": {},
+  "monte_carlo": {
+    "default_detection_rate": 0.32,
+    "sector_detection_rate_overrides": {},
+    "prevention_share_of_detected": 0.6,
+    "early_detection_share_of_detected": 0.4,
+    "early_detection_loss_reduction_pct": 0.5
+  }
+}

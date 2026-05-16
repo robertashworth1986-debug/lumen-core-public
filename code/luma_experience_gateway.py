@@ -2714,6 +2714,13 @@ def investor_brief() -> dict[str, Any]:
     snapshot_packages = snapshot_data.get("packages", {}) if isinstance(snapshot_data, dict) else {}
     snapshot_evidence = snapshot_data.get("evidence", {}) if isinstance(snapshot_data, dict) else {}
     evidence_derived = snapshot_evidence.get("derived", {}) if isinstance(snapshot_evidence, dict) else {}
+    try:
+        perf = api_perf_session()
+    except Exception:
+        perf = {}
+    perf_24h = perf.get("last_24h", {}) if isinstance(perf, dict) else {}
+    perf_24h_realized_net = float(perf_24h.get("realized_pnl_net_usd", 0.0) or 0.0)
+    perf_24h_sells = int(perf_24h.get("sells_count", 0) or 0)
 
     # Leaderboard top 10
     rows = _load_csv_rows(LEADERBOARD_CSV)
@@ -2757,6 +2764,8 @@ def investor_brief() -> dict[str, Any]:
             "equity_text":      fmt_usd(scorecard.get("current_equity_usd", 0.0)),
             "net_pnl_usd":      scorecard.get("net_pnl_usd", 0.0),
             "net_pnl_text":     fmt_usd(scorecard.get("net_pnl_usd", 0.0)),
+            "realized_24h_net_usd": perf_24h_realized_net,
+            "realized_24h_sells": perf_24h_sells,
             "closed_trades":    int(scorecard.get("closed_trades", 0) or 0),
             "win_rate_pct":     float(scorecard.get("win_rate_pct", 0.0) or 0.0),
             "profit_factor":    float(scorecard.get("profit_factor", 0.0) or 0.0),

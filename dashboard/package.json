@@ -11,8 +11,14 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@google/model-viewer": "^4.2.0",
+    "@tensorflow/tfjs": "^4.22.0",
+    "animejs": "^4.4.1",
+    "echarts": "^6.0.0",
+    "echarts-gl": "^2.0.9",
     "gsap": "^3.15.0",
     "postprocessing": "^6.39.1",
+    "stats.js": "^0.17.0",
     "three": "^0.184.0"
   }
 }

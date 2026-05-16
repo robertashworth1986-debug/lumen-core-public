@@ -396,7 +396,7 @@ Requires=luma-node-red.service luma-gateway.service
 [Service]
 Type=oneshot
 WorkingDirectory=$CODE_DIR
-ExecStartPre=/bin/sh -c 'for i in $(seq 1 30); do curl -fsS http://127.0.0.1:1880/ >/dev/null && exit 0; sleep 1; done; exit 1'
+ExecStartPre=/bin/sh -c 'for i in \$(seq 1 30); do curl -fsS http://127.0.0.1:1880/ >/dev/null && exit 0; sleep 1; done; exit 1'
 ExecStart=$PYTHON_BIN $NODE_RED_ENSURE_SCRIPT --base http://127.0.0.1:1880 --flow-file $NODE_RED_FLOW_FILE --min-nodes 11
 RemainAfterExit=yes
 

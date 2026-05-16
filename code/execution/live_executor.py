@@ -10,6 +10,7 @@ import hmac
 import hashlib
 import base64
 import requests
+from collections import deque
 
 from pathlib import Path
 from urllib.parse import urlencode
@@ -40,7 +41,7 @@ CONFIG = ROOT / "config"
 OUT = ROOT / "out" / "execution"
 DASH = ROOT / "dashboard"
 RUNTIME_CONTROL_FILE = CONFIG / "runtime_control.json"
-MIN_OPEN_POSITIONS_FLOOR = 10
+MIN_OPEN_POSITIONS_FLOOR = 1
 LIVE_TRADE_LOG_FILE = OUT / "live_trade_log.json"
 LIVE_SHADOW_LEDGER_FILE = OUT / "live_shadow_fills.csv"
 LIVE_TRADE_LEDGER_CSV_FILE = OUT / "live_trade_ledger.csv"
@@ -49,11 +50,16 @@ LIVE_AUDIT_CHAIN_FILE = OUT / "live_execution_audit_chain.jsonl"
 LIVE_HEARTBEAT_FILE = OUT / "live_executor_heartbeat.json"
 LIVE_HEARTBEAT_SCHEMA_VERSION = "1.0.0"
 LIVE_EXECUTOR_LOCK_FILE = OUT / "live_executor.lock"
+LIVE_PACING_STATE_FILE = OUT / "live_pacing_state.json"
 SYMBOL_FLIP_INTEL_FILE = OUT / "symbol_flip_intel_top5.json"
+SYMBOL_FLIP_LEARNING_FILE = OUT / "symbol_flip_learning_profile.json"
+LIVE_OPERATOR_APPROVAL_QUEUE_FILE = OUT / "live_operator_approval_queue.json"
 COLLATERAL_CONVERT_LOG_FILE = OUT / "collateral_convert_log.jsonl"
 KRAKEN_NONCE_STATE_FILE = OUT / "kraken_nonce_state.json"
 KRAKEN_BALANCE_CACHE_FILE = OUT / "kraken_balance_cache.json"
 KRAKEN_ASSET_PAIRS_CACHE_FILE = OUT / "kraken_asset_pairs_cache.json"
+CLEAN_OPS_ROSTER_LATEST_FILE = OUT / "clean_ops_roster_latest.json"
+DEFAULT_QUOTE_LANES = ("USD", "USDT", "EUR")
 ROLLING_CAPITAL_BEST_MULTI_FILE = Path(r"C:/LumaTrader/rolling_capital/rolling_capital_best_multi.json")
 UNIVERSE_SYMBOL_FILE_CANDIDATES = (
     ROOT / "out" / "adaptive_universe.json",
@@ -145,6 +151,27 @@ def _pid_running(pid: int) -> bool:
         return False
 
 
+def _process_commandline(pid: int) -> str:
+    if int(pid or 0) <= 0:
+        return ""
+    try:
+        probe = subprocess.run(
+            [
+                "powershell",
+                "-NoProfile",
+                "-Command",
+                f"$p=Get-CimInstance Win32_Process -Filter \"ProcessId={int(pid)}\" -ErrorAction SilentlyContinue; if($p){{$p.CommandLine}}",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=4,
+            check=False,
+        )
+        return str(probe.stdout or "").strip()
+    except Exception:
+        return ""
+
+
 def _acquire_executor_lock() -> bool:
     now_utc = datetime.now(timezone.utc).isoformat()
     pid = os.getpid()
@@ -218,6 +245,37 @@ def _release_executor_lock() -> None:
         pass
 
 
+def _is_duplicate_child_executor() -> tuple[bool, int]:
+    """Detect recursive child launches of this script from a parent live executor.
+
+    A healthy launch starts from shell/task runner and has no inherited root PID marker.
+    If a child process is spawned by the active executor, it inherits the marker and this
+    guard exits the child early to avoid lock/heartbeat races.
+    """
+
+    marker = str(os.environ.get("LUMA_LIVE_EXECUTOR_ROOT_PID", "") or "").strip()
+    parent_pid = os.getppid()
+    parent_cmd = _process_commandline(parent_pid).replace("\\", "/").lower()
+    if "code/execution/live_executor.py" in parent_cmd:
+        return True, int(parent_pid)
+
+    if not marker:
+        return False, 0
+
+    try:
+        root_pid = int(marker)
+    except Exception:
+        return False, 0
+
+    if root_pid <= 0:
+        return False, 0
+
+    pid = os.getpid()
+    if root_pid != pid and parent_pid == root_pid:
+        return True, int(root_pid)
+    return False, 0
+
+
 SYMBOL_REGISTRY = {
     "BTC": {"exchange": "kraken", "pair": "XBTUSD", "min_order": 0.0001},
     "ETH": {"exchange": "kraken", "pair": "ETHUSD", "min_order": 0.001},
@@ -242,6 +300,7 @@ class KrakenClient:
         self._asset_pairs_map: dict[str, dict[str, Any]] = {}
         self._asset_pairs_cache_utc = ""
         self._asset_pairs_cache_ttl_sec = 3600.0
+        self._default_quote_order = list(DEFAULT_QUOTE_LANES)
         self._load_balance_cache()
         self._load_asset_pairs_cache()
 
@@ -333,6 +392,60 @@ class KrakenClient:
             normalized = normalized[1:]
         return normalized
 
+    @staticmethod
+    def _normalize_quote_symbol(quote_code: str) -> str:
+        token = str(quote_code or "").upper().strip()
+        if not token:
+            return ""
+        alias_map = {
+            "ZUSD": "USD",
+            "ZEUR": "EUR",
+            "XUSDT": "USDT",
+            "ZUSDT": "USDT",
+        }
+        return alias_map.get(token, token)
+
+    @staticmethod
+    def _quote_rank(quote: str, quote_order: list[str]) -> int:
+        token = str(quote or "").upper().strip()
+        try:
+            return quote_order.index(token)
+        except ValueError:
+            return len(quote_order) + 1
+
+    def _select_config_by_quote(
+        self,
+        cfg: dict[str, Any],
+        quote_order: Optional[list[str]] = None,
+    ) -> dict[str, Any]:
+        selected = dict(cfg)
+        candidates = cfg.get("candidates")
+        if not isinstance(candidates, list) or not candidates:
+            return selected
+
+        order: list[str] = []
+        for row in (quote_order or self._default_quote_order):
+            token = self._normalize_quote_symbol(str(row))
+            if token and token not in order:
+                order.append(token)
+        if not order:
+            order = list(self._default_quote_order)
+
+        ranked = sorted(
+            [dict(c) for c in candidates if isinstance(c, dict)],
+            key=lambda c: (
+                self._quote_rank(str(c.get("quote", "USD")), order),
+                float(self._to_float(c.get("min_order", 1e-8), 1e-8)),
+                str(c.get("pair", "")),
+            ),
+        )
+        if not ranked:
+            return selected
+
+        selected = dict(ranked[0])
+        selected["candidates"] = ranked
+        return selected
+
     def _fetch_asset_pairs_map(self) -> dict[str, dict[str, Any]]:
         try:
             r = self.session.get(self.base_url + "/0/public/AssetPairs", timeout=12)
@@ -344,7 +457,9 @@ class KrakenClient:
             if not isinstance(result, dict):
                 return {}
 
-            out: dict[str, dict[str, Any]] = {}
+            allowed_quotes = {"USD", "USDT", "EUR"}
+            candidates_by_symbol: dict[str, dict[str, dict[str, Any]]] = {}
+
             for _, row in result.items():
                 if not isinstance(row, dict):
                     continue
@@ -354,8 +469,8 @@ class KrakenClient:
                     continue
                 base, quote = wsname.split("/", 1)
                 base = base.strip()
-                quote = quote.strip()
-                if quote != "USD":
+                quote = self._normalize_quote_symbol(quote.strip())
+                if quote not in allowed_quotes:
                     continue
 
                 min_order = self._to_float(row.get("ordermin", 0.0), 0.0)
@@ -367,10 +482,36 @@ class KrakenClient:
                     "exchange": "kraken",
                     "pair": altname,
                     "min_order": max(float(min_order), 1e-8),
+                    "base": base,
+                    "quote": quote,
+                    "pair_decimals": int(self._to_float(row.get("pair_decimals", 8), 8.0)),
                 }
-                out[base] = cfg
+
+                symbol_keys = {base}
                 if base == "XBT":
-                    out["BTC"] = cfg
+                    symbol_keys.add("BTC")
+                elif base == "BTC":
+                    symbol_keys.add("XBT")
+
+                for symbol_key in symbol_keys:
+                    per_symbol = candidates_by_symbol.setdefault(symbol_key, {})
+                    per_symbol[altname] = dict(cfg)
+
+            out: dict[str, dict[str, Any]] = {}
+            for symbol_key, by_pair in candidates_by_symbol.items():
+                rows = [dict(v) for v in by_pair.values() if isinstance(v, dict)]
+                if not rows:
+                    continue
+                rows.sort(
+                    key=lambda c: (
+                        self._quote_rank(str(c.get("quote", "USD")), self._default_quote_order),
+                        float(self._to_float(c.get("min_order", 1e-8), 1e-8)),
+                        str(c.get("pair", "")),
+                    )
+                )
+                chosen = dict(rows[0])
+                chosen["candidates"] = rows
+                out[symbol_key] = chosen
             return out
         except Exception:
             return {}
@@ -387,18 +528,22 @@ class KrakenClient:
 
         return self._asset_pairs_map
 
-    def resolve_symbol_config(self, symbol: str) -> Optional[dict[str, Any]]:
+    def resolve_symbol_config(
+        self,
+        symbol: str,
+        quote_order: Optional[list[str]] = None,
+    ) -> Optional[dict[str, Any]]:
         key = str(symbol or "").upper().strip()
         if not key:
             return None
         pairs_map = self.get_asset_pairs_map()
         cfg = pairs_map.get(key)
         if cfg:
-            return dict(cfg)
+            return self._select_config_by_quote(cfg, quote_order=quote_order)
         if key == "XBT" and "BTC" in pairs_map:
-            return dict(pairs_map["BTC"])
+            return self._select_config_by_quote(pairs_map["BTC"], quote_order=quote_order)
         if key == "BTC" and "XBT" in pairs_map:
-            return dict(pairs_map["XBT"])
+            return self._select_config_by_quote(pairs_map["XBT"], quote_order=quote_order)
         return None
 
     def _cached_balance_age_sec(self) -> float:
@@ -570,9 +715,101 @@ class KrakenClient:
                 total += max(self._to_float(qty, 0.0), 0.0)
         return float(max(total, 0.0))
 
-    def send_order(self, pair: str, side: str, qty: float, price: float = None, order_type: str = "limit") -> dict:
+    def get_open_orders(self, trades: bool = True) -> dict[str, Any]:
         if not self.api_key or not self.api_secret:
             return {"error": "missing kraken credentials"}
+
+        try:
+            payload = self._private("/0/private/OpenOrders", {"trades": bool(trades)})
+        except Exception as e:
+            return {"error": str(e)}
+
+        if "error" in payload:
+            return {"error": payload.get("error")}
+
+        open_map = payload.get("open", {}) if isinstance(payload, dict) else {}
+        if not isinstance(open_map, dict):
+            return {"orders": [], "count": 0}
+
+        orders: list[dict[str, Any]] = []
+        for txid, row in open_map.items():
+            if not isinstance(row, dict):
+                continue
+            descr = row.get("descr", {}) if isinstance(row.get("descr", {}), dict) else {}
+            orders.append(
+                {
+                    "txid": str(txid),
+                    "pair": str(descr.get("pair", "") or "").upper().strip(),
+                    "type": str(descr.get("type", "") or "").lower().strip(),
+                    "ordertype": str(descr.get("ordertype", "") or "").lower().strip(),
+                    "status": str(row.get("status", "") or "").lower().strip(),
+                    "vol": self._to_float(row.get("vol", 0.0), 0.0),
+                    "vol_exec": self._to_float(row.get("vol_exec", 0.0), 0.0),
+                    "opentm": self._to_float(row.get("opentm", 0.0), 0.0),
+                }
+            )
+
+        return {
+            "orders": orders,
+            "count": int(len(orders)),
+        }
+
+    def cancel_order(self, txid: str) -> dict[str, Any]:
+        token = str(txid or "").strip()
+        if not token:
+            return {"error": "missing_txid"}
+        if not self.api_key or not self.api_secret:
+            return {"error": "missing kraken credentials"}
+
+        try:
+            payload = self._private("/0/private/CancelOrder", {"txid": token})
+        except Exception as e:
+            return {"error": str(e)}
+
+        if "error" in payload:
+            return {"error": payload.get("error")}
+
+        out = dict(payload) if isinstance(payload, dict) else {"result": payload}
+        out["txid"] = token
+        return out
+
+    def cancel_all_orders(self) -> dict[str, Any]:
+        if not self.api_key or not self.api_secret:
+            return {"error": "missing kraken credentials"}
+
+        try:
+            payload = self._private("/0/private/CancelAll", {})
+        except Exception as e:
+            return {"error": str(e)}
+
+        if "error" in payload:
+            return {"error": payload.get("error")}
+
+        return dict(payload) if isinstance(payload, dict) else {"result": payload}
+
+    def send_order(
+        self,
+        pair: str,
+        side: str,
+        qty: float,
+        price: float = None,
+        order_type: str = "limit",
+        close_template: Optional[dict[str, Any]] = None,
+        pair_decimals: Optional[int] = None,
+    ) -> dict:
+        if not self.api_key or not self.api_secret:
+            return {"error": "missing kraken credentials"}
+
+        def _fmt_price(raw: float) -> str:
+            decimals = 8
+            if pair_decimals is not None:
+                try:
+                    decimals = int(pair_decimals)
+                except Exception:
+                    decimals = 8
+            decimals = max(min(decimals, 10), 0)
+            return f"{round(float(raw), decimals):.{decimals}f}"
+
         data = {
             "pair": pair,
             "type": side.lower(),
@@ -580,7 +817,26 @@ class KrakenClient:
             "volume": f"{qty:.8f}",
         }
         if order_type == "limit" and price is not None:
-            data["price"] = f"{price:.8f}"
+            data["price"] = _fmt_price(float(price))
+
+        if isinstance(close_template, dict):
+            # Prefer take-profit close for immediate peak-capture behavior,
+            # fallback to stop close when TP is unavailable.
+            tp_leg = close_template.get("take_profit")
+            stop_leg = close_template.get("stop")
+            selected_leg = tp_leg if isinstance(tp_leg, dict) else stop_leg if isinstance(stop_leg, dict) else None
+            if isinstance(selected_leg, dict):
+                close_ordertype = str(selected_leg.get("order_type", "")).strip().lower()
+                close_price = self._to_float(selected_leg.get("trigger_price", 0.0), 0.0)
+                if close_ordertype in {
+                    "stop-loss",
+                    "stop-loss-limit",
+                    "take-profit",
+                    "take-profit-limit",
+                } and close_price > 0.0:
+                    data["close[ordertype]"] = close_ordertype
+                    data["close[price]"] = _fmt_price(float(close_price))
+
         try:
             return self._private("/0/private/AddOrder", data)
         except Exception as e:
@@ -598,10 +854,26 @@ class KrakenClient:
                 return None
             key = next(iter(result.keys()))
             t = result[key]
+
+            def _series_value(field: str, idx: int = 1) -> float:
+                raw = t.get(field, [])
+                if isinstance(raw, (list, tuple)):
+                    if len(raw) > idx:
+                        return float(raw[idx] or 0.0)
+                    if raw:
+                        return float(raw[-1] or 0.0)
+                    return 0.0
+                return float(raw or 0.0)
+
             return {
                 "bid": float(t["b"][0]),
                 "ask": float(t["a"][0]),
                 "last": float(t["c"][0]),
+                "open": float(t.get("o", t["c"][0]) or 0.0),
+                "high_24h": _series_value("h", 1),
+                "low_24h": _series_value("l", 1),
+                "volume_24h": _series_value("v", 1),
+                "trade_count_24h": int(_series_value("t", 1)),
                 "pair": key,
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
@@ -655,14 +927,115 @@ class MultiExchangeRouter:
         self._file_symbol_cache_utc = now_ts
         return list(self._file_symbol_cache)
 
-    def get_symbol_config(self, symbol: str):
+    @staticmethod
+    def _runtime_quote_order() -> list[str]:
+        runtime = load_json(RUNTIME_CONTROL_FILE, {})
+        raw = runtime.get("clean_ops_quote_allow", list(DEFAULT_QUOTE_LANES)) if isinstance(runtime, dict) else list(DEFAULT_QUOTE_LANES)
+        rows: list[Any]
+        if isinstance(raw, str):
+            rows = [r.strip() for r in raw.split(",")]
+        elif isinstance(raw, (list, tuple, set)):
+            rows = list(raw)
+        else:
+            rows = list(DEFAULT_QUOTE_LANES)
+
+        out: list[str] = []
+        for row in rows:
+            token = KrakenClient._normalize_quote_symbol(str(row))
+            if token and token not in out:
+                out.append(token)
+        if not out:
+            out = list(DEFAULT_QUOTE_LANES)
+        return out
+
+    @staticmethod
+    def _quote_balance_from_snapshot(snapshot: dict[str, float], quote: str) -> float:
+        if not isinstance(snapshot, dict):
+            return 0.0
+        token = KrakenClient._normalize_quote_symbol(str(quote or ""))
+        key_map = {
+            "USD": ("ZUSD", "USD"),
+            "USDT": ("USDT", "XUSDT", "ZUSDT"),
+            "EUR": ("ZEUR", "EUR"),
+        }
+        keys = key_map.get(token, (token,))
+        total = 0.0
+        for key in keys:
+            try:
+                total += max(float(snapshot.get(key, 0.0) or 0.0), 0.0)
+            except Exception:
+                continue
+        return float(max(total, 0.0))
+
+    def _select_order_cfg_for_execution(self, symbol: str, side: str) -> Optional[dict[str, Any]]:
+        quote_order = self._runtime_quote_order()
+        cfg = self.get_symbol_config(symbol, quote_order=quote_order)
+        if not cfg:
+            return None
+
+        candidates = cfg.get("candidates")
+        if not isinstance(candidates, list) or not candidates:
+            return cfg
+
+        ranked = sorted(
+            [dict(c) for c in candidates if isinstance(c, dict)],
+            key=lambda c: (
+                KrakenClient._quote_rank(str(c.get("quote", "USD")), quote_order),
+                float(c.get("min_order", 1e-8) or 1e-8),
+                str(c.get("pair", "")),
+            ),
+        )
+        if not ranked:
+            return cfg
+
+        if str(side or "buy").lower() != "buy":
+            out = dict(ranked[0])
+            out["candidates"] = ranked
+            return out
+
+        balances = self.kraken.get_account_balances(force_refresh=False)
+        for cand in ranked:
+            quote = str(cand.get("quote", "USD") or "USD")
+            quote_balance = self._quote_balance_from_snapshot(balances, quote)
+            if quote_balance <= 0.0:
+                continue
+
+            ticker = self.kraken.get_ticker(str(cand.get("pair", "")))
+            last_px = 0.0
+            if isinstance(ticker, dict):
+                last_px = max(float(ticker.get("last", 0.0) or 0.0), 0.0)
+            min_notional_quote = max(float(cand.get("min_order", 0.0) or 0.0), 0.0) * max(last_px, 0.0)
+            if min_notional_quote <= 0.0 or quote_balance + 1e-9 >= min_notional_quote:
+                out = dict(cand)
+                out["candidates"] = ranked
+                out["quote_balance_hint"] = round(float(quote_balance), 8)
+                return out
+
+        out = dict(ranked[0])
+        out["candidates"] = ranked
+        return out
+
+    def get_symbol_config(self, symbol: str, quote_order: Optional[list[str]] = None):
         key = str(symbol or "").upper().strip()
         if not key:
             return None
-        cfg = SYMBOL_REGISTRY.get(key)
-        if cfg:
-            return cfg
-        return self.kraken.resolve_symbol_config(key)
+        static_cfg = SYMBOL_REGISTRY.get(key)
+        dynamic_cfg = self.kraken.resolve_symbol_config(key, quote_order=quote_order)
+
+        if static_cfg:
+            merged = dict(static_cfg)
+            if isinstance(dynamic_cfg, dict):
+                if "pair_decimals" in dynamic_cfg and "pair_decimals" not in merged:
+                    merged["pair_decimals"] = int(self.kraken._to_float(dynamic_cfg.get("pair_decimals", 8), 8.0))
+                if "base" in dynamic_cfg and "base" not in merged:
+                    merged["base"] = dynamic_cfg.get("base")
+                if "quote" in dynamic_cfg and "quote" not in merged:
+                    merged["quote"] = dynamic_cfg.get("quote")
+                if "candidates" in dynamic_cfg and "candidates" not in merged:
+                    merged["candidates"] = dynamic_cfg.get("candidates")
+            return merged
+
+        return dynamic_cfg
 
     def get_candidate_symbols(self, max_symbols: int = 120, extra_symbols: Optional[list[str]] = None) -> list[str]:
         symbols = {str(k).upper() for k in SYMBOL_REGISTRY.keys()}
@@ -686,13 +1059,18 @@ class MultiExchangeRouter:
         if not tradable:
             return []
 
-        cap = max(int(max_symbols or 0), 1)
-        if len(tradable) <= cap:
+        try:
+            cap = int(float(max_symbols))
+        except Exception:
+            cap = 0
+
+        # Explicit runtime convention: cap <= 0 means "scan all available symbols".
+        if cap <= 0 or len(tradable) <= cap:
             return tradable
         return random.sample(tradable, cap)
 
-    def get_ticker(self, symbol: str):
-        cfg = self.get_symbol_config(symbol)
+    def get_ticker(self, symbol: str, quote_order: Optional[list[str]] = None):
+        cfg = self.get_symbol_config(symbol, quote_order=quote_order)
         if not cfg:
             return None
         return self.kraken.get_ticker(cfg["pair"])
@@ -706,11 +1084,54 @@ class MultiExchangeRouter:
     def get_balance_snapshot(self, force_refresh: bool = False):
         return self.kraken.get_account_balances(force_refresh=force_refresh)
 
-    def place_order(self, symbol: str, side: str, qty: float, limit_price: float = None):
-        cfg = self.get_symbol_config(symbol)
+    def get_open_orders(self, trades: bool = True):
+        return self.kraken.get_open_orders(trades=trades)
+
+    def cancel_order(self, txid: str):
+        return self.kraken.cancel_order(txid)
+
+    def cancel_all_orders(self):
+        return self.kraken.cancel_all_orders()
+
+    def place_order(
+        self,
+        symbol: str,
+        side: str,
+        qty: float,
+        limit_price: float = None,
+        close_template: Optional[dict[str, Any]] = None,
+    ):
+        runtime = load_json(RUNTIME_CONTROL_FILE, {})
+        runtime_mode = str(runtime.get("mode", "paper") or "paper").strip().lower()
+        allow_live_orders = bool(runtime.get("allow_live_orders", False))
+        kill_switch = bool(runtime.get("kill_switch", False))
+
+        if runtime_mode != "live" or (not allow_live_orders) or kill_switch:
+            return {
+                "error": "live_orders_disabled",
+                "runtime_mode": runtime_mode,
+                "allow_live_orders": bool(allow_live_orders),
+                "kill_switch": bool(kill_switch),
+            }
+
+        cfg = self._select_order_cfg_for_execution(symbol, side)
         if not cfg:
             return {"error": f"unknown symbol {symbol}"}
-        return self.kraken.send_order(cfg["pair"], side, qty, limit_price, "limit" if limit_price else "market")
+
+        result = self.kraken.send_order(
+            cfg["pair"],
+            side,
+            qty,
+            limit_price,
+            "limit" if limit_price else "market",
+            close_template=close_template,
+            pair_decimals=cfg.get("pair_decimals"),
+        )
+        if isinstance(result, dict) and "error" not in result:
+            result["_router_pair"] = str(cfg.get("pair", ""))
+            result["_router_quote"] = str(cfg.get("quote", "USD") or "USD")
+            result["_router_min_order"] = float(cfg.get("min_order", 0.0) or 0.0)
+        return result
 
 
 class RobustLiveExecutor:
@@ -756,6 +1177,21 @@ class RobustLiveExecutor:
         self.low_balance_sample_trigger_usd = 12.0
         self.low_balance_sample_size = 24
         self.low_balance_ticker_scan_cap = 120
+        self.hybrid_swing_selector_enabled = True
+        self.hybrid_swing_min_range_pct = 0.25
+        self.hybrid_swing_min_momentum_pct = -0.75
+        self.hybrid_swing_spread_guard_bps = 85.0
+        self.hybrid_swing_range_weight = 1.25
+        self.hybrid_swing_momentum_weight = 1.0
+        self.hybrid_swing_position_weight = 0.75
+        self.hybrid_swing_activity_weight = 0.15
+        self.hybrid_swing_spread_penalty = 0.18
+        self.hybrid_swing_whitelist_relax_enabled = True
+        self.hybrid_swing_min_candidates = 64
+        self.hybrid_swing_relax_cap = 240
+        self.hybrid_swing_long_bias_enabled = True
+        self.hybrid_swing_long_bias_min_momentum_pct = 0.05
+        self.hybrid_swing_long_bias_penalty_per_pct = 18.0
         self.gate_override_enabled = False
         self.gate_override_min_confidence = 0.58
         self.gate_override_min_edge_bps = 7.5
@@ -767,6 +1203,8 @@ class RobustLiveExecutor:
         self.collateral_sell_fraction = 0.20
         self.collateral_convert_cooldown_sec = 12.0
         self.min_collateral_convert_usd = 4.0
+        self.collateral_convert_avoid_open_positions = True
+        self.collateral_convert_protect_open_positions_sec = 180.0
         self.last_collateral_convert_utc = ""
         self.stable_assets = {
             "USDT",
@@ -812,20 +1250,77 @@ class RobustLiveExecutor:
         self.universe_sample_size = 8
         self.universe_max_pick_spread_bps = 55.0
         self.last_symbol_selection_meta: dict[str, Any] = {}
+        self.live_operator_queue_enabled = True
+        self.live_operator_queue_max_candidates = 6
         self.allow_best_multi_preference = False
         self.symbol_intel_enabled = True
         self.symbol_intel_prefer_top_n = 5
         self.symbol_intel_max_age_sec = 1200.0
         self.symbol_intel_min_alpha_score = 1.5
+        self.symbol_intel_learning_enabled = True
+        self.symbol_intel_learning_weight = 0.30
+        self.symbol_intel_learning_max_bonus = 18.0
+        self.symbol_intel_learning_max_age_sec = 21600.0
+        self.edge_proof_enabled = True
+        self.edge_proof_recent_closed_trades = 6
+        self.edge_proof_min_win_rate_pct = 52.0
+        self.edge_proof_min_avg_pnl_pct = 0.05
+        self.edge_proof_max_last_close_age_min = 360.0
+        self.edge_proof_require_symbol_intel_fresh = True
+        self.edge_proof_hybrid_fallback_for_symbol_intel = True
+        self.edge_proof_bootstrap_enabled = True
+        self.edge_proof_bootstrap_max_entries_per_hour = 1
+        self.edge_proof_bootstrap_min_gate_score = 0.74
+        self.edge_proof_bootstrap_min_expected_edge_bps = 24.0
+        self.edge_proof_bootstrap_min_hybrid_score = 14.0
+        self.edge_proof_bootstrap_min_momentum_pct = 0.20
+        self.edge_proof_bootstrap_max_spread_bps = 14.0
+        self.edge_proof_bootstrap_hybrid_edge_scale = 0.35
+        self.edge_proof_bootstrap_require_hybrid_candidates = False
+        self.edge_proof_cost_floor_enabled = True
+        self.edge_proof_cost_floor_fee_roundtrip_bps = 52.0
+        self.edge_proof_cost_floor_spread_weight = 1.0
+        self.edge_proof_cost_floor_slippage_roundtrip_bps = 10.0
+        self.edge_proof_cost_floor_buffer_bps = 25.0
+        self.edge_proof_cost_floor_min_bps = 60.0
+        self.edge_proof_cost_floor_max_bps = 300.0
+        self.edge_proof_cost_floor_adaptive_enabled = True
+        self.edge_proof_cost_floor_adaptive_min_closed_trades = 6
+        self.edge_proof_cost_floor_adaptive_loss_threshold_bps = -8.0
+        self.edge_proof_cost_floor_adaptive_gain_threshold_bps = 18.0
+        self.edge_proof_cost_floor_adaptive_loss_adjust_bps = 20.0
+        self.edge_proof_cost_floor_adaptive_gain_adjust_bps = 10.0
+        self.edge_proof_cost_floor_adaptive_win_rate_floor_pct = 42.0
+        self.edge_proof_cost_floor_adaptive_win_rate_relax_pct = 62.0
+        self.edge_proof_cache_ttl_sec = 8.0
+        self._edge_proof_cache: dict[str, Any] = {}
+        self._edge_proof_cache_utc = 0.0
         self.allow_min_order_cap_breach = True
         self.auto_convert_stable_for_quote = True
         self.stable_convert_allowlist: set[str] = set()
         self.stable_convert_denylist: set[str] = set()
+        self.hard_safety_only_mode = False
+        self.max_trap_rate_pct = 48.0
+        self._trap_rate_cache: dict[str, float] = {}
+        self._trap_rate_cache_utc = 0.0
+        self._trap_rate_cache_ttl_sec = 300.0
         self._symbol_intel_cache: dict[str, Any] = {}
         self._symbol_intel_cache_utc = 0.0
+        self._symbol_learning_cache: dict[str, Any] = {}
+        self._symbol_learning_cache_utc = 0.0
         self.same_symbol_reentry_cooldown_sec = 90.0
         self.last_entry_symbol = ""
         self.last_entry_time_utc = ""
+        self.last_selected_symbol = ""
+        self.low_balance_rotation_cursor = 0
+        self.symbol_skip_cooldown_sec = 12.0
+        self.missing_ticker_skip_cooldown_sec = 120.0
+        self.spread_too_wide_skip_cooldown_sec = 90.0
+        self.universe_hard_reject_spread_bps = 120.0
+        self.preferred_symbol_max_spread_bps = 35.0
+        self._symbol_skip_until_utc: dict[str, datetime] = {}
+        self._symbol_skip_reasons: dict[str, str] = {}
+        self.edge_proof_bootstrap_entry_utc: list[datetime] = []
         self.deliberate_mode_enabled = True
         self.global_entries_window_sec = 3600.0
         self.global_entry_cooldown_sec = 75.0
@@ -838,6 +1333,10 @@ class RobustLiveExecutor:
         self.entry_timestamps_utc: list[datetime] = []
         self.symbol_entry_timestamps_utc: dict[str, list[datetime]] = {}
         self.entry_symbol_history: list[tuple[datetime, str]] = []
+        self.global_close_sweep_enabled = True
+        self.global_close_sweep_max_symbols = 12
+        self.global_close_sweep_interval_sec = 20.0
+        self.last_global_close_sweep_utc = ""
 
         self.profit_reinvestment_enabled = True
         self.order_notional_pct = 0.24
@@ -847,6 +1346,14 @@ class RobustLiveExecutor:
         self.compounding_boost_ceiling = 1.80
         self.compounding_min_notional_usd = 0.50
         self.compounding_max_notional_usd = 25000.0
+
+        self.capital_preservation_mode = True
+        self.capital_preservation_min_recent_closed = 4
+        self.capital_preservation_min_win_rate_pct = 42.0
+        self.capital_preservation_min_avg_pnl_pct = 0.0
+        self.capital_preservation_max_consecutive_losses = 3
+        self.capital_preservation_pause_sec = 900.0
+        self.capital_preservation_pause_until_utc = ""
 
         self.adaptive_gate_enabled = True
         self.adaptive_gate_starvation_sec = 45.0
@@ -862,6 +1369,137 @@ class RobustLiveExecutor:
         self.consecutive_losses = 0
         self.trade_log = []
         self._refresh_runtime_config()
+        self._load_pacing_state()
+
+    def _load_pacing_state(self) -> None:
+        payload = load_json(LIVE_PACING_STATE_FILE, {})
+        if not isinstance(payload, dict):
+            return
+
+        def _parse_dt(raw: Any) -> Optional[datetime]:
+            try:
+                return self._parse_iso_utc(str(raw))
+            except Exception:
+                return None
+
+        entry_rows = payload.get("entry_timestamps_utc", [])
+        loaded_entries: list[datetime] = []
+        if isinstance(entry_rows, list):
+            for raw in entry_rows:
+                parsed = _parse_dt(raw)
+                if isinstance(parsed, datetime):
+                    loaded_entries.append(parsed)
+        self.entry_timestamps_utc = loaded_entries[-4096:]
+
+        symbol_rows = payload.get("symbol_entry_timestamps_utc", {})
+        loaded_symbol_entries: dict[str, list[datetime]] = {}
+        if isinstance(symbol_rows, dict):
+            for key, values in symbol_rows.items():
+                symbol = str(key or "").upper().strip()
+                if not symbol or not isinstance(values, list):
+                    continue
+                parsed_rows: list[datetime] = []
+                for raw in values:
+                    parsed = _parse_dt(raw)
+                    if isinstance(parsed, datetime):
+                        parsed_rows.append(parsed)
+                if parsed_rows:
+                    loaded_symbol_entries[symbol] = parsed_rows[-1024:]
+        self.symbol_entry_timestamps_utc = loaded_symbol_entries
+
+        history_rows = payload.get("entry_symbol_history", [])
+        loaded_history: list[tuple[datetime, str]] = []
+        if isinstance(history_rows, list):
+            for row in history_rows:
+                if not isinstance(row, dict):
+                    continue
+                parsed = _parse_dt(row.get("ts"))
+                symbol = str(row.get("symbol", "") or "").upper().strip()
+                if isinstance(parsed, datetime) and symbol:
+                    loaded_history.append((parsed, symbol))
+        self.entry_symbol_history = loaded_history[-4096:]
+
+        skip_rows = payload.get("symbol_skip_until_utc", {})
+        loaded_skip: dict[str, datetime] = {}
+        if isinstance(skip_rows, dict):
+            for key, raw_until in skip_rows.items():
+                symbol = str(key or "").upper().strip()
+                parsed = _parse_dt(raw_until)
+                if symbol and isinstance(parsed, datetime):
+                    loaded_skip[symbol] = parsed
+        self._symbol_skip_until_utc = loaded_skip
+
+        skip_reason_rows = payload.get("symbol_skip_reasons", {})
+        loaded_skip_reasons: dict[str, str] = {}
+        if isinstance(skip_reason_rows, dict):
+            for key, reason in skip_reason_rows.items():
+                symbol = str(key or "").upper().strip()
+                if symbol:
+                    loaded_skip_reasons[symbol] = str(reason or "symbol_skip")
+        self._symbol_skip_reasons = loaded_skip_reasons
+
+        bootstrap_rows = payload.get("edge_proof_bootstrap_entry_utc", [])
+        loaded_bootstrap: list[datetime] = []
+        if isinstance(bootstrap_rows, list):
+            for raw in bootstrap_rows:
+                parsed = _parse_dt(raw)
+                if isinstance(parsed, datetime):
+                    loaded_bootstrap.append(parsed)
+        self.edge_proof_bootstrap_entry_utc = loaded_bootstrap[-1024:]
+
+        self.last_entry_symbol = str(payload.get("last_entry_symbol", self.last_entry_symbol) or "").upper().strip()
+        self.last_entry_time_utc = str(payload.get("last_entry_time_utc", self.last_entry_time_utc) or "").strip()
+        self.last_global_close_sweep_utc = str(
+            payload.get("last_global_close_sweep_utc", self.last_global_close_sweep_utc) or ""
+        ).strip()
+        pause_until = _parse_dt(payload.get("capital_preservation_pause_until_utc"))
+        if isinstance(pause_until, datetime):
+            self.capital_preservation_pause_until_utc = pause_until.isoformat()
+
+        try:
+            self._prune_symbol_skip_map(datetime.now(timezone.utc))
+        except Exception:
+            pass
+
+    def _save_pacing_state(self) -> None:
+        try:
+            symbol_entry_rows = {
+                str(symbol): [ts.isoformat() for ts in values[-1024:] if isinstance(ts, datetime)]
+                for symbol, values in self.symbol_entry_timestamps_utc.items()
+                if str(symbol).strip() and isinstance(values, list)
+            }
+            payload = {
+                "entry_timestamps_utc": [ts.isoformat() for ts in self.entry_timestamps_utc[-4096:] if isinstance(ts, datetime)],
+                "symbol_entry_timestamps_utc": symbol_entry_rows,
+                "entry_symbol_history": [
+                    {"ts": ts.isoformat(), "symbol": str(symbol)}
+                    for ts, symbol in self.entry_symbol_history[-4096:]
+                    if isinstance(ts, datetime) and str(symbol).strip()
+                ],
+                "symbol_skip_until_utc": {
+                    str(symbol): until.isoformat()
+                    for symbol, until in self._symbol_skip_until_utc.items()
+                    if str(symbol).strip() and isinstance(until, datetime)
+                },
+                "symbol_skip_reasons": {
+                    str(symbol): str(reason or "symbol_skip")
+                    for symbol, reason in self._symbol_skip_reasons.items()
+                    if str(symbol).strip()
+                },
+                "edge_proof_bootstrap_entry_utc": [
+                    ts.isoformat()
+                    for ts in self.edge_proof_bootstrap_entry_utc[-1024:]
+                    if isinstance(ts, datetime)
+                ],
+                "last_entry_symbol": str(self.last_entry_symbol or "").upper().strip(),
+                "last_entry_time_utc": str(self.last_entry_time_utc or "").strip(),
+                "last_global_close_sweep_utc": str(self.last_global_close_sweep_utc or "").strip(),
+                "capital_preservation_pause_until_utc": str(self.capital_preservation_pause_until_utc or "").strip(),
+                "updated_utc": datetime.now(timezone.utc).isoformat(),
+            }
+            LIVE_PACING_STATE_FILE.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        except Exception:
+            pass
 
     def _strategy_regime_conflict(self, strategy: str, regime_name: str) -> bool:
         # hard-block matrix
@@ -881,6 +1519,41 @@ class RobustLiveExecutor:
         except Exception:
             pass
         return 0.8
+
+    def _refresh_trap_rate_cache(self, force_refresh: bool = False) -> None:
+        now_ts = time.time()
+        if (
+            (not force_refresh)
+            and self._trap_rate_cache
+            and (now_ts - float(self._trap_rate_cache_utc)) <= float(self._trap_rate_cache_ttl_sec)
+        ):
+            return
+
+        payload = load_json(CLEAN_OPS_ROSTER_LATEST_FILE, {})
+        rows = payload.get("candidates", []) if isinstance(payload, dict) else []
+        trap_map: dict[str, float] = {}
+        if isinstance(rows, list):
+            for row in rows:
+                if not isinstance(row, dict):
+                    continue
+                symbol = str(row.get("symbol", "") or "").upper().strip()
+                trap_rate = self._to_float(row.get("trap_rate_pct", -1.0), -1.0)
+                if (not symbol) or trap_rate < 0.0:
+                    continue
+                prev = trap_map.get(symbol)
+                trap_map[symbol] = float(trap_rate) if prev is None else min(float(prev), float(trap_rate))
+
+        self._trap_rate_cache = trap_map
+        self._trap_rate_cache_utc = now_ts
+
+    def _symbol_trap_rate_pct(self, symbol: str) -> Optional[float]:
+        token = str(symbol or "").upper().strip()
+        if not token:
+            return None
+        self._refresh_trap_rate_cache(force_refresh=False)
+        if token not in self._trap_rate_cache:
+            return None
+        return float(self._trap_rate_cache.get(token, 0.0))
 
     @staticmethod
     def _clamp(value: float, low: float, high: float) -> float:
@@ -994,6 +1667,18 @@ class RobustLiveExecutor:
         self.stable_convert_denylist = self._parse_runtime_symbol_set(
             runtime.get("stable_convert_denylist", [])
         )
+        self.hard_safety_only_mode = bool(runtime.get("hard_safety_only_mode", self.hard_safety_only_mode))
+        self.max_trap_rate_pct = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "max_trap_rate_pct",
+                    runtime.get("approval_max_trap_rate_pct", self.max_trap_rate_pct),
+                ),
+                self.max_trap_rate_pct,
+            ),
+            0.0,
+            100.0,
+        )
         self.collateral_sell_fraction = self._clamp(
             self._to_float(
                 runtime.get("collateral_sell_fraction", self.collateral_sell_fraction),
@@ -1017,6 +1702,20 @@ class RobustLiveExecutor:
             ),
             0.5,
             100000.0,
+        )
+        self.collateral_convert_avoid_open_positions = bool(
+            runtime.get("collateral_convert_avoid_open_positions", self.collateral_convert_avoid_open_positions)
+        )
+        self.collateral_convert_protect_open_positions_sec = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "collateral_convert_protect_open_positions_sec",
+                    self.collateral_convert_protect_open_positions_sec,
+                ),
+                self.collateral_convert_protect_open_positions_sec,
+            ),
+            0.0,
+            86400.0,
         )
         self.dynamic_reserve_enabled = bool(runtime.get("dynamic_reserve_enabled", self.dynamic_reserve_enabled))
         self.dynamic_reserve_max_balance_fraction = self._clamp(
@@ -1126,6 +1825,17 @@ class RobustLiveExecutor:
                 1.0,
             )
 
+            if self.hard_safety_only_mode:
+                # In hard-safety mode, keep spread/liquidity/min-notional/trap gates authoritative
+                # and avoid over-blocking on softer regime/alignment features.
+                gate_thresholds["alignment"] = 0.05
+                gate_thresholds["regime_conf"] = 0.05
+                gate_thresholds["cross_confirm"] = 0.05
+                gate_thresholds["correlation"] = 1.0
+                gate_thresholds["sector_heat"] = 1.0
+                gate_thresholds["signal_decay"] = 1.0
+                self.signal_gate.min_composite_score = min(float(self.signal_gate.min_composite_score), 0.35)
+
         self.adaptive_gate_enabled = bool(runtime.get("adaptive_entry_gate_enabled", self.adaptive_gate_enabled))
         self.adaptive_gate_starvation_sec = self._clamp(
             self._to_float(
@@ -1214,6 +1924,65 @@ class RobustLiveExecutor:
             1.0,
             95.0,
         )
+        self.capital_preservation_mode = bool(
+            runtime.get("capital_preservation_mode", self.capital_preservation_mode)
+        )
+        self.capital_preservation_min_recent_closed = int(
+            self._clamp(
+                self._to_float(
+                    runtime.get(
+                        "capital_preservation_min_recent_closed",
+                        self.capital_preservation_min_recent_closed,
+                    ),
+                    self.capital_preservation_min_recent_closed,
+                ),
+                1.0,
+                200.0,
+            )
+        )
+        self.capital_preservation_min_win_rate_pct = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "capital_preservation_min_win_rate_pct",
+                    self.capital_preservation_min_win_rate_pct,
+                ),
+                self.capital_preservation_min_win_rate_pct,
+            ),
+            0.0,
+            100.0,
+        )
+        self.capital_preservation_min_avg_pnl_pct = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "capital_preservation_min_avg_pnl_pct",
+                    self.capital_preservation_min_avg_pnl_pct,
+                ),
+                self.capital_preservation_min_avg_pnl_pct,
+            ),
+            -100.0,
+            100.0,
+        )
+        self.capital_preservation_max_consecutive_losses = int(
+            self._clamp(
+                self._to_float(
+                    runtime.get(
+                        "capital_preservation_max_consecutive_losses",
+                        self.capital_preservation_max_consecutive_losses,
+                    ),
+                    self.capital_preservation_max_consecutive_losses,
+                ),
+                1.0,
+                25.0,
+            )
+        )
+        self.capital_preservation_pause_sec = self._clamp(
+            self._to_float(
+                runtime.get("capital_preservation_pause_sec", self.capital_preservation_pause_sec),
+                self.capital_preservation_pause_sec,
+            ),
+            30.0,
+            86400.0,
+        )
         self.compounding_growth_sensitivity = self._clamp(
             self._to_float(
                 runtime.get("compounding_growth_sensitivity", self.compounding_growth_sensitivity),
@@ -1245,6 +2014,27 @@ class RobustLiveExecutor:
             ),
             1.0,
             1_000_000.0,
+        )
+        self.global_close_sweep_enabled = bool(
+            runtime.get("global_close_sweep_enabled", self.global_close_sweep_enabled)
+        )
+        self.global_close_sweep_max_symbols = int(
+            self._clamp(
+                self._to_float(
+                    runtime.get("global_close_sweep_max_symbols", self.global_close_sweep_max_symbols),
+                    self.global_close_sweep_max_symbols,
+                ),
+                0.0,
+                5000.0,
+            )
+        )
+        self.global_close_sweep_interval_sec = self._clamp(
+            self._to_float(
+                runtime.get("global_close_sweep_interval_sec", self.global_close_sweep_interval_sec),
+                self.global_close_sweep_interval_sec,
+            ),
+            1.0,
+            3600.0,
         )
 
         self.risk_kernel.max_daily_loss_usd = max(
@@ -1394,8 +2184,8 @@ class RobustLiveExecutor:
         self.universe_sample_size = int(
             self._clamp(
                 self._to_float(runtime.get("universe_sample_size", self.universe_sample_size), self.universe_sample_size),
-                1.0,
-                256.0,
+                0.0,
+                5000.0,
             )
         )
         self.universe_max_pick_spread_bps = self._clamp(
@@ -1405,6 +2195,22 @@ class RobustLiveExecutor:
             ),
             5.0,
             250.0,
+        )
+        self.universe_hard_reject_spread_bps = self._clamp(
+            self._to_float(
+                runtime.get("universe_hard_reject_spread_bps", self.universe_hard_reject_spread_bps),
+                self.universe_hard_reject_spread_bps,
+            ),
+            0.0,
+            5000.0,
+        )
+        self.preferred_symbol_max_spread_bps = self._clamp(
+            self._to_float(
+                runtime.get("preferred_symbol_max_spread_bps", self.preferred_symbol_max_spread_bps),
+                self.preferred_symbol_max_spread_bps,
+            ),
+            1.0,
+            500.0,
         )
         self.allow_best_multi_preference = bool(
             runtime.get("allow_best_multi_preference", self.allow_best_multi_preference)
@@ -1416,8 +2222,8 @@ class RobustLiveExecutor:
                     runtime.get("symbol_intel_prefer_top_n", self.symbol_intel_prefer_top_n),
                     self.symbol_intel_prefer_top_n,
                 ),
-                1.0,
-                40.0,
+                0.0,
+                5000.0,
             )
         )
         self.symbol_intel_max_age_sec = self._clamp(
@@ -1432,6 +2238,317 @@ class RobustLiveExecutor:
             ),
             0.0,
             200.0,
+        )
+        self.symbol_intel_learning_enabled = bool(
+            runtime.get("symbol_intel_learning_enabled", self.symbol_intel_learning_enabled)
+        )
+        self.symbol_intel_learning_weight = self._clamp(
+            self._to_float(
+                runtime.get("symbol_intel_learning_weight", self.symbol_intel_learning_weight),
+                self.symbol_intel_learning_weight,
+            ),
+            0.0,
+            2.0,
+        )
+        self.symbol_intel_learning_max_bonus = self._clamp(
+            self._to_float(
+                runtime.get("symbol_intel_learning_max_bonus", self.symbol_intel_learning_max_bonus),
+                self.symbol_intel_learning_max_bonus,
+            ),
+            0.0,
+            60.0,
+        )
+        self.symbol_intel_learning_max_age_sec = self._clamp(
+            self._to_float(
+                runtime.get("symbol_intel_learning_max_age_sec", self.symbol_intel_learning_max_age_sec),
+                self.symbol_intel_learning_max_age_sec,
+            ),
+            30.0,
+            172800.0,
+        )
+        self.edge_proof_enabled = bool(runtime.get("edge_proof_enabled", self.edge_proof_enabled))
+        self.edge_proof_recent_closed_trades = int(
+            self._clamp(
+                self._to_float(
+                    runtime.get("edge_proof_recent_closed_trades", self.edge_proof_recent_closed_trades),
+                    self.edge_proof_recent_closed_trades,
+                ),
+                1.0,
+                200.0,
+            )
+        )
+        self.edge_proof_min_win_rate_pct = self._clamp(
+            self._to_float(
+                runtime.get("edge_proof_min_win_rate_pct", self.edge_proof_min_win_rate_pct),
+                self.edge_proof_min_win_rate_pct,
+            ),
+            0.0,
+            100.0,
+        )
+        self.edge_proof_min_avg_pnl_pct = self._clamp(
+            self._to_float(
+                runtime.get("edge_proof_min_avg_pnl_pct", self.edge_proof_min_avg_pnl_pct),
+                self.edge_proof_min_avg_pnl_pct,
+            ),
+            -100.0,
+            100.0,
+        )
+        self.edge_proof_max_last_close_age_min = self._clamp(
+            self._to_float(
+                runtime.get("edge_proof_max_last_close_age_min", self.edge_proof_max_last_close_age_min),
+                self.edge_proof_max_last_close_age_min,
+            ),
+            1.0,
+            1440.0,
+        )
+        self.edge_proof_require_symbol_intel_fresh = bool(
+            runtime.get("edge_proof_require_symbol_intel_fresh", self.edge_proof_require_symbol_intel_fresh)
+        )
+        self.edge_proof_hybrid_fallback_for_symbol_intel = bool(
+            runtime.get(
+                "edge_proof_hybrid_fallback_for_symbol_intel",
+                self.edge_proof_hybrid_fallback_for_symbol_intel,
+            )
+        )
+        self.edge_proof_bootstrap_enabled = bool(
+            runtime.get("edge_proof_bootstrap_enabled", self.edge_proof_bootstrap_enabled)
+        )
+        self.edge_proof_bootstrap_max_entries_per_hour = int(
+            self._clamp(
+                self._to_float(
+                    runtime.get(
+                        "edge_proof_bootstrap_max_entries_per_hour",
+                        self.edge_proof_bootstrap_max_entries_per_hour,
+                    ),
+                    self.edge_proof_bootstrap_max_entries_per_hour,
+                ),
+                0.0,
+                24.0,
+            )
+        )
+        self.edge_proof_bootstrap_min_gate_score = self._clamp(
+            self._to_float(
+                runtime.get("edge_proof_bootstrap_min_gate_score", self.edge_proof_bootstrap_min_gate_score),
+                self.edge_proof_bootstrap_min_gate_score,
+            ),
+            0.0,
+            0.99,
+        )
+        self.edge_proof_bootstrap_min_expected_edge_bps = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_bootstrap_min_expected_edge_bps",
+                    self.edge_proof_bootstrap_min_expected_edge_bps,
+                ),
+                self.edge_proof_bootstrap_min_expected_edge_bps,
+            ),
+            0.0,
+            500.0,
+        )
+        self.edge_proof_bootstrap_min_hybrid_score = self._clamp(
+            self._to_float(
+                runtime.get("edge_proof_bootstrap_min_hybrid_score", self.edge_proof_bootstrap_min_hybrid_score),
+                self.edge_proof_bootstrap_min_hybrid_score,
+            ),
+            -500.0,
+            500.0,
+        )
+        self.edge_proof_bootstrap_min_momentum_pct = self._clamp(
+            self._to_float(
+                runtime.get("edge_proof_bootstrap_min_momentum_pct", self.edge_proof_bootstrap_min_momentum_pct),
+                self.edge_proof_bootstrap_min_momentum_pct,
+            ),
+            -10.0,
+            10.0,
+        )
+        self.edge_proof_bootstrap_max_spread_bps = self._clamp(
+            self._to_float(
+                runtime.get("edge_proof_bootstrap_max_spread_bps", self.edge_proof_bootstrap_max_spread_bps),
+                self.edge_proof_bootstrap_max_spread_bps,
+            ),
+            0.0,
+            250.0,
+        )
+        self.edge_proof_bootstrap_hybrid_edge_scale = self._clamp(
+            self._to_float(
+                runtime.get("edge_proof_bootstrap_hybrid_edge_scale", self.edge_proof_bootstrap_hybrid_edge_scale),
+                self.edge_proof_bootstrap_hybrid_edge_scale,
+            ),
+            0.0,
+            10.0,
+        )
+        self.edge_proof_bootstrap_require_hybrid_candidates = bool(
+            runtime.get(
+                "edge_proof_bootstrap_require_hybrid_candidates",
+                self.edge_proof_bootstrap_require_hybrid_candidates,
+            )
+        )
+        self.edge_proof_cost_floor_enabled = bool(
+            runtime.get("edge_proof_cost_floor_enabled", self.edge_proof_cost_floor_enabled)
+        )
+        self.edge_proof_cost_floor_fee_roundtrip_bps = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_cost_floor_fee_roundtrip_bps",
+                    self.edge_proof_cost_floor_fee_roundtrip_bps,
+                ),
+                self.edge_proof_cost_floor_fee_roundtrip_bps,
+            ),
+            0.0,
+            500.0,
+        )
+        self.edge_proof_cost_floor_spread_weight = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_cost_floor_spread_weight",
+                    self.edge_proof_cost_floor_spread_weight,
+                ),
+                self.edge_proof_cost_floor_spread_weight,
+            ),
+            0.0,
+            3.0,
+        )
+        self.edge_proof_cost_floor_slippage_roundtrip_bps = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_cost_floor_slippage_roundtrip_bps",
+                    self.edge_proof_cost_floor_slippage_roundtrip_bps,
+                ),
+                self.edge_proof_cost_floor_slippage_roundtrip_bps,
+            ),
+            0.0,
+            250.0,
+        )
+        self.edge_proof_cost_floor_buffer_bps = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_cost_floor_buffer_bps",
+                    self.edge_proof_cost_floor_buffer_bps,
+                ),
+                self.edge_proof_cost_floor_buffer_bps,
+            ),
+            0.0,
+            250.0,
+        )
+        self.edge_proof_cost_floor_min_bps = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_cost_floor_min_bps",
+                    self.edge_proof_cost_floor_min_bps,
+                ),
+                self.edge_proof_cost_floor_min_bps,
+            ),
+            0.0,
+            500.0,
+        )
+        self.edge_proof_cost_floor_max_bps = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_cost_floor_max_bps",
+                    self.edge_proof_cost_floor_max_bps,
+                ),
+                self.edge_proof_cost_floor_max_bps,
+            ),
+            0.0,
+            1000.0,
+        )
+        self.edge_proof_cost_floor_adaptive_enabled = bool(
+            runtime.get("edge_proof_cost_floor_adaptive_enabled", self.edge_proof_cost_floor_adaptive_enabled)
+        )
+        self.edge_proof_cost_floor_adaptive_min_closed_trades = int(
+            self._clamp(
+                self._to_float(
+                    runtime.get(
+                        "edge_proof_cost_floor_adaptive_min_closed_trades",
+                        self.edge_proof_cost_floor_adaptive_min_closed_trades,
+                    ),
+                    self.edge_proof_cost_floor_adaptive_min_closed_trades,
+                ),
+                1.0,
+                200.0,
+            )
+        )
+        self.edge_proof_cost_floor_adaptive_loss_threshold_bps = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_cost_floor_adaptive_loss_threshold_bps",
+                    self.edge_proof_cost_floor_adaptive_loss_threshold_bps,
+                ),
+                self.edge_proof_cost_floor_adaptive_loss_threshold_bps,
+            ),
+            -500.0,
+            500.0,
+        )
+        self.edge_proof_cost_floor_adaptive_gain_threshold_bps = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_cost_floor_adaptive_gain_threshold_bps",
+                    self.edge_proof_cost_floor_adaptive_gain_threshold_bps,
+                ),
+                self.edge_proof_cost_floor_adaptive_gain_threshold_bps,
+            ),
+            -500.0,
+            500.0,
+        )
+        self.edge_proof_cost_floor_adaptive_loss_adjust_bps = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_cost_floor_adaptive_loss_adjust_bps",
+                    self.edge_proof_cost_floor_adaptive_loss_adjust_bps,
+                ),
+                self.edge_proof_cost_floor_adaptive_loss_adjust_bps,
+            ),
+            0.0,
+            500.0,
+        )
+        self.edge_proof_cost_floor_adaptive_gain_adjust_bps = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_cost_floor_adaptive_gain_adjust_bps",
+                    self.edge_proof_cost_floor_adaptive_gain_adjust_bps,
+                ),
+                self.edge_proof_cost_floor_adaptive_gain_adjust_bps,
+            ),
+            0.0,
+            500.0,
+        )
+        self.edge_proof_cost_floor_adaptive_win_rate_floor_pct = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_cost_floor_adaptive_win_rate_floor_pct",
+                    self.edge_proof_cost_floor_adaptive_win_rate_floor_pct,
+                ),
+                self.edge_proof_cost_floor_adaptive_win_rate_floor_pct,
+            ),
+            0.0,
+            100.0,
+        )
+        self.edge_proof_cost_floor_adaptive_win_rate_relax_pct = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "edge_proof_cost_floor_adaptive_win_rate_relax_pct",
+                    self.edge_proof_cost_floor_adaptive_win_rate_relax_pct,
+                ),
+                self.edge_proof_cost_floor_adaptive_win_rate_relax_pct,
+            ),
+            0.0,
+            100.0,
+        )
+        self.missing_ticker_skip_cooldown_sec = self._clamp(
+            self._to_float(
+                runtime.get("missing_ticker_skip_cooldown_sec", self.missing_ticker_skip_cooldown_sec),
+                self.missing_ticker_skip_cooldown_sec,
+            ),
+            1.0,
+            3600.0,
+        )
+        self.spread_too_wide_skip_cooldown_sec = self._clamp(
+            self._to_float(
+                runtime.get("spread_too_wide_skip_cooldown_sec", self.spread_too_wide_skip_cooldown_sec),
+                self.spread_too_wide_skip_cooldown_sec,
+            ),
+            1.0,
+            3600.0,
         )
         self.allow_min_order_cap_breach = bool(
             runtime.get("allow_min_order_cap_breach", self.allow_min_order_cap_breach)
@@ -1512,6 +2629,14 @@ class RobustLiveExecutor:
             60.0,
             86400.0,
         )
+        self.symbol_skip_cooldown_sec = self._clamp(
+            self._to_float(
+                runtime.get("symbol_skip_cooldown_sec", self.symbol_skip_cooldown_sec),
+                self.symbol_skip_cooldown_sec,
+            ),
+            0.0,
+            3600.0,
+        )
         self.low_balance_sample_trigger_usd = self._clamp(
             self._to_float(
                 runtime.get("low_balance_sample_trigger_usd", self.low_balance_sample_trigger_usd),
@@ -1533,8 +2658,127 @@ class RobustLiveExecutor:
                     runtime.get("low_balance_ticker_scan_cap", self.low_balance_ticker_scan_cap),
                     self.low_balance_ticker_scan_cap,
                 ),
+                0.0,
+                5000.0,
+            )
+        )
+        self.hybrid_swing_selector_enabled = bool(
+            runtime.get("hybrid_swing_selector_enabled", self.hybrid_swing_selector_enabled)
+        )
+        self.hybrid_swing_min_range_pct = self._clamp(
+            self._to_float(
+                runtime.get("hybrid_swing_min_range_pct", self.hybrid_swing_min_range_pct),
+                self.hybrid_swing_min_range_pct,
+            ),
+            0.0,
+            250.0,
+        )
+        self.hybrid_swing_min_momentum_pct = self._clamp(
+            self._to_float(
+                runtime.get("hybrid_swing_min_momentum_pct", self.hybrid_swing_min_momentum_pct),
+                self.hybrid_swing_min_momentum_pct,
+            ),
+            -100.0,
+            100.0,
+        )
+        self.hybrid_swing_spread_guard_bps = self._clamp(
+            self._to_float(
+                runtime.get("hybrid_swing_spread_guard_bps", self.hybrid_swing_spread_guard_bps),
+                self.hybrid_swing_spread_guard_bps,
+            ),
+            5.0,
+            500.0,
+        )
+        self.hybrid_swing_range_weight = self._clamp(
+            self._to_float(
+                runtime.get("hybrid_swing_range_weight", self.hybrid_swing_range_weight),
+                self.hybrid_swing_range_weight,
+            ),
+            0.0,
+            10.0,
+        )
+        self.hybrid_swing_momentum_weight = self._clamp(
+            self._to_float(
+                runtime.get("hybrid_swing_momentum_weight", self.hybrid_swing_momentum_weight),
+                self.hybrid_swing_momentum_weight,
+            ),
+            0.0,
+            10.0,
+        )
+        self.hybrid_swing_position_weight = self._clamp(
+            self._to_float(
+                runtime.get("hybrid_swing_position_weight", self.hybrid_swing_position_weight),
+                self.hybrid_swing_position_weight,
+            ),
+            0.0,
+            10.0,
+        )
+        self.hybrid_swing_activity_weight = self._clamp(
+            self._to_float(
+                runtime.get("hybrid_swing_activity_weight", self.hybrid_swing_activity_weight),
+                self.hybrid_swing_activity_weight,
+            ),
+            0.0,
+            10.0,
+        )
+        self.hybrid_swing_spread_penalty = self._clamp(
+            self._to_float(
+                runtime.get("hybrid_swing_spread_penalty", self.hybrid_swing_spread_penalty),
+                self.hybrid_swing_spread_penalty,
+            ),
+            0.0,
+            2.0,
+        )
+        self.hybrid_swing_whitelist_relax_enabled = bool(
+            runtime.get("hybrid_swing_whitelist_relax_enabled", self.hybrid_swing_whitelist_relax_enabled)
+        )
+        self.hybrid_swing_min_candidates = int(
+            self._clamp(
+                self._to_float(
+                    runtime.get("hybrid_swing_min_candidates", self.hybrid_swing_min_candidates),
+                    self.hybrid_swing_min_candidates,
+                ),
+                1.0,
+                1000.0,
+            )
+        )
+        self.hybrid_swing_relax_cap = int(
+            self._clamp(
+                self._to_float(runtime.get("hybrid_swing_relax_cap", self.hybrid_swing_relax_cap), self.hybrid_swing_relax_cap),
                 8.0,
-                400.0,
+                5000.0,
+            )
+        )
+        self.hybrid_swing_long_bias_enabled = bool(
+            runtime.get("hybrid_swing_long_bias_enabled", self.hybrid_swing_long_bias_enabled)
+        )
+        self.hybrid_swing_long_bias_min_momentum_pct = self._clamp(
+            self._to_float(
+                runtime.get("hybrid_swing_long_bias_min_momentum_pct", self.hybrid_swing_long_bias_min_momentum_pct),
+                self.hybrid_swing_long_bias_min_momentum_pct,
+            ),
+            -5.0,
+            5.0,
+        )
+        self.hybrid_swing_long_bias_penalty_per_pct = self._clamp(
+            self._to_float(
+                runtime.get("hybrid_swing_long_bias_penalty_per_pct", self.hybrid_swing_long_bias_penalty_per_pct),
+                self.hybrid_swing_long_bias_penalty_per_pct,
+            ),
+            0.0,
+            100.0,
+        )
+        self.live_operator_queue_enabled = bool(
+            runtime.get("live_operator_queue_enabled", self.live_operator_queue_enabled)
+        )
+        self.live_operator_queue_max_candidates = int(
+            self._clamp(
+                self._to_float(
+                    runtime.get("live_operator_queue_max_candidates", self.live_operator_queue_max_candidates),
+                    self.live_operator_queue_max_candidates,
+                ),
+                1.0,
+                20.0,
             )
         )
 
@@ -1552,6 +2796,82 @@ class RobustLiveExecutor:
         except Exception:
             return float("inf")
 
+    def _hybrid_swing_metrics_from_ticker(self, ticker: Optional[dict[str, Any]], spread_bps: float) -> dict[str, float | bool]:
+        if not isinstance(ticker, dict):
+            return {
+                "eligible": False,
+                "hybrid_score": -float("inf"),
+                "range_pct": 0.0,
+                "momentum_pct": 0.0,
+                "position_in_range": 0.0,
+                "activity_score": 0.0,
+                "trade_count_24h": 0.0,
+                "long_bias_pass": False,
+                "long_bias_penalty_bps": 0.0,
+            }
+
+        last_px = max(self._to_float(ticker.get("last", 0.0), 0.0), 0.0)
+        open_px = max(self._to_float(ticker.get("open", last_px), last_px), 0.0)
+        high_24h = max(self._to_float(ticker.get("high_24h", last_px), last_px), 0.0)
+        low_24h = max(self._to_float(ticker.get("low_24h", last_px), last_px), 0.0)
+        trade_count_24h = max(self._to_float(ticker.get("trade_count_24h", 0.0), 0.0), 0.0)
+
+        if last_px <= 0.0 or low_24h <= 0.0:
+            return {
+                "eligible": False,
+                "hybrid_score": -float("inf"),
+                "range_pct": 0.0,
+                "momentum_pct": 0.0,
+                "position_in_range": 0.0,
+                "activity_score": 0.0,
+                "trade_count_24h": trade_count_24h,
+                "long_bias_pass": False,
+                "long_bias_penalty_bps": 0.0,
+            }
+
+        high_24h = max(high_24h, low_24h)
+        range_span = max(high_24h - low_24h, 1e-9)
+        range_pct = ((high_24h - low_24h) / max(low_24h, 1e-9)) * 100.0
+        momentum_pct = ((last_px - open_px) / max(open_px, 1e-9)) * 100.0 if open_px > 0.0 else 0.0
+        position_in_range = max(min((last_px - low_24h) / range_span, 1.0), 0.0)
+        activity_score = max(min(math.log10(trade_count_24h + 1.0) / 4.5, 1.0), 0.0)
+
+        long_bias_enabled = bool(self.hybrid_swing_long_bias_enabled and (not self.spot_short_enabled))
+        momentum_deficit = (
+            max(float(self.hybrid_swing_long_bias_min_momentum_pct) - float(momentum_pct), 0.0)
+            if long_bias_enabled
+            else 0.0
+        )
+        long_bias_penalty_bps = momentum_deficit * float(self.hybrid_swing_long_bias_penalty_per_pct)
+        long_bias_pass = (not long_bias_enabled) or momentum_deficit <= 0.0
+
+        eligible = bool(
+            spread_bps <= float(self.hybrid_swing_spread_guard_bps)
+            and range_pct >= float(self.hybrid_swing_min_range_pct)
+            and momentum_pct >= float(self.hybrid_swing_min_momentum_pct)
+            and long_bias_pass
+        )
+        hybrid_score = (
+            (range_pct * float(self.hybrid_swing_range_weight))
+            + (momentum_pct * float(self.hybrid_swing_momentum_weight))
+            + ((position_in_range * 10.0) * float(self.hybrid_swing_position_weight))
+            + ((activity_score * 10.0) * float(self.hybrid_swing_activity_weight))
+            - (spread_bps * float(self.hybrid_swing_spread_penalty))
+            - float(long_bias_penalty_bps)
+        )
+
+        return {
+            "eligible": bool(eligible),
+            "hybrid_score": float(hybrid_score),
+            "range_pct": float(range_pct),
+            "momentum_pct": float(momentum_pct),
+            "position_in_range": float(position_in_range),
+            "activity_score": float(activity_score),
+            "trade_count_24h": float(trade_count_24h),
+            "long_bias_pass": bool(long_bias_pass),
+            "long_bias_penalty_bps": float(long_bias_penalty_bps),
+        }
+
     def _load_symbol_flip_intel_payload(self) -> dict[str, Any]:
         now_ts = time.time()
         if self._symbol_intel_cache and (now_ts - self._symbol_intel_cache_utc) <= 5.0:
@@ -1565,6 +2885,96 @@ class RobustLiveExecutor:
         self._symbol_intel_cache_utc = now_ts
         return dict(payload)
 
+    def _load_symbol_learning_payload(self) -> dict[str, Any]:
+        now_ts = time.time()
+        if self._symbol_learning_cache and (now_ts - self._symbol_learning_cache_utc) <= 10.0:
+            return dict(self._symbol_learning_cache)
+
+        payload = load_json(SYMBOL_FLIP_LEARNING_FILE, {})
+        if not isinstance(payload, dict):
+            payload = {}
+
+        self._symbol_learning_cache = dict(payload)
+        self._symbol_learning_cache_utc = now_ts
+        return dict(payload)
+
+    def _symbol_learning_bonus_map(self) -> tuple[dict[str, float], dict[str, Any]]:
+        meta: dict[str, Any] = {
+            "symbol_learning_enabled": bool(self.symbol_intel_learning_enabled),
+            "symbol_learning_file_exists": bool(SYMBOL_FLIP_LEARNING_FILE.exists()),
+            "symbol_learning_stale": False,
+            "symbol_learning_age_sec": None,
+            "symbol_learning_profile_count": 0,
+            "symbol_learning_bonus_count": 0,
+            "symbol_learning_source": "none",
+        }
+
+        if not self.symbol_intel_learning_enabled:
+            meta["symbol_learning_source"] = "disabled"
+            return {}, meta
+
+        payload = self._load_symbol_learning_payload()
+        if not payload:
+            meta["symbol_learning_source"] = "empty"
+            return {}, meta
+
+        generated_utc = str(payload.get("generated_utc", "") or "")
+        age_sec = float("inf")
+        if generated_utc:
+            try:
+                generated_dt = self._parse_iso_utc(generated_utc)
+                age_sec = max((datetime.now(timezone.utc) - generated_dt).total_seconds(), 0.0)
+            except Exception:
+                age_sec = float("inf")
+
+        if math.isfinite(age_sec):
+            meta["symbol_learning_age_sec"] = round(float(age_sec), 3)
+
+        if math.isfinite(age_sec) and age_sec > float(self.symbol_intel_learning_max_age_sec):
+            meta["symbol_learning_stale"] = True
+            meta["symbol_learning_source"] = "stale"
+            return {}, meta
+
+        rows = payload.get("symbol_profiles", []) if isinstance(payload, dict) else []
+        if not isinstance(rows, list):
+            rows = []
+
+        bonus_map: dict[str, float] = {}
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+
+            symbol = str(row.get("symbol", "") or "").upper().strip()
+            if not symbol:
+                continue
+
+            learned_long = self._to_float(row.get("learned_long_score", 0.0), 0.0)
+            learned_short = self._to_float(row.get("learned_short_score", 0.0), 0.0)
+            dominant_bias = str(row.get("dominant_bias", "long") or "long").strip().lower()
+            dominant_score = max(learned_long, learned_short)
+            if dominant_score <= 0.0:
+                continue
+
+            effective_score = float(dominant_score)
+            if dominant_bias == "short" and (not self.spot_short_enabled):
+                # Keep some signal value for volatility awareness but dampen short-only alpha on spot.
+                effective_score = max(float(learned_long), float(dominant_score) * 0.25)
+
+            bonus = min(
+                max(float(effective_score), 0.0) * float(self.symbol_intel_learning_weight),
+                float(self.symbol_intel_learning_max_bonus),
+            )
+            if bonus <= 0.0:
+                continue
+            existing = bonus_map.get(symbol, 0.0)
+            if bonus > existing:
+                bonus_map[symbol] = float(bonus)
+
+        meta["symbol_learning_profile_count"] = int(len(rows))
+        meta["symbol_learning_bonus_count"] = int(len(bonus_map))
+        meta["symbol_learning_source"] = "learning_profile"
+        return bonus_map, meta
+
     def _symbol_flip_intel_candidates(self) -> tuple[list[str], dict[str, Any]]:
         meta: dict[str, Any] = {
             "symbol_intel_enabled": bool(self.symbol_intel_enabled),
@@ -1574,6 +2984,7 @@ class RobustLiveExecutor:
             "symbol_intel_candidate_count": 0,
             "symbol_intel_selected_count": 0,
             "symbol_intel_executable_count": 0,
+            "symbol_intel_short_candidate_count": 0,
             "symbol_intel_source": "none",
         }
 
@@ -1620,6 +3031,24 @@ class RobustLiveExecutor:
                 if symbol:
                     picks.append(symbol)
 
+        short_candidates = payload.get("short_candidates", []) if isinstance(payload, dict) else []
+        if bool(self.spot_short_enabled) and isinstance(short_candidates, list):
+            ranked_short = sorted(
+                [row for row in short_candidates if isinstance(row, dict)],
+                key=lambda row: self._to_float(row.get("alpha_short_score", 0.0), 0.0),
+                reverse=True,
+            )
+            short_added = 0
+            for row in ranked_short:
+                score = self._to_float(row.get("alpha_short_score", 0.0), 0.0)
+                if score < float(self.symbol_intel_min_alpha_score):
+                    continue
+                symbol = str(row.get("symbol", "") or "").upper().strip()
+                if symbol:
+                    picks.append(symbol)
+                    short_added += 1
+            meta["symbol_intel_short_candidate_count"] = int(short_added)
+
         focus_symbols = payload.get("focus_symbols", []) if isinstance(payload, dict) else []
         if isinstance(focus_symbols, list):
             for row in focus_symbols:
@@ -1628,13 +3057,442 @@ class RobustLiveExecutor:
                     picks.append(symbol)
 
         deduped = list(dict.fromkeys(picks))
-        limited = deduped[: max(int(self.symbol_intel_prefer_top_n), 1)]
+        if int(self.symbol_intel_prefer_top_n) <= 0:
+            limited = list(deduped)
+        else:
+            limited = deduped[: int(self.symbol_intel_prefer_top_n)]
 
         meta["symbol_intel_candidate_count"] = int(len(deduped))
         meta["symbol_intel_selected_count"] = int(len(limited))
         meta["symbol_intel_executable_count"] = int(len(limited))
         meta["symbol_intel_source"] = "symbol_flip_intel_top5"
         return limited, meta
+
+    @staticmethod
+    def _read_jsonl_tail(path: Path, max_rows: int) -> list[dict[str, Any]]:
+        limit = max(int(max_rows), 1)
+        if not path.exists():
+            return []
+
+        lines: deque[str] = deque(maxlen=limit)
+        try:
+            with open(path, "r", encoding="utf-8", errors="ignore") as f:
+                for line in f:
+                    raw = line.strip()
+                    if raw:
+                        lines.append(raw)
+        except Exception:
+            return []
+
+        out: list[dict[str, Any]] = []
+        for raw in reversed(lines):
+            try:
+                payload = json.loads(raw)
+            except Exception:
+                continue
+            if isinstance(payload, dict):
+                out.append(payload)
+        return out
+
+    def _edge_proof_recent_quality(self, now: datetime) -> dict[str, Any]:
+        now_ts = time.time()
+        if self._edge_proof_cache and (now_ts - float(self._edge_proof_cache_utc)) <= float(self.edge_proof_cache_ttl_sec):
+            return dict(self._edge_proof_cache)
+
+        target = max(int(self.edge_proof_recent_closed_trades), 1)
+        scan_rows = int(self._clamp(float(target * 60), 120.0, 8000.0))
+        rows = self._read_jsonl_tail(LIVE_TRADE_LEDGER_JSONL_FILE, scan_rows)
+
+        close_statuses = {
+            "CLOSED",
+            "CAPITAL_RECYCLE_CLOSED",
+            "TP_FILLED",
+            "SL_FILLED",
+        }
+        closed_rows: list[dict[str, Any]] = []
+        for row in rows:
+            status = str(row.get("status", "") or "").upper().strip()
+            if status not in close_statuses:
+                continue
+            closed_rows.append(row)
+            if len(closed_rows) >= target:
+                break
+
+        pnl_values: list[float] = []
+        wins = 0
+        for row in closed_rows:
+            pnl_pct = self._to_float(row.get("pnl_pct", float("nan")), float("nan"))
+            if not math.isfinite(pnl_pct):
+                entry_px = self._to_float(row.get("entry_price", 0.0), 0.0)
+                exit_px = self._to_float(row.get("exit_price", 0.0), 0.0)
+                if entry_px > 0.0 and exit_px > 0.0:
+                    direction = str(row.get("direction", "long") or "long").strip().lower()
+                    if direction == "short":
+                        pnl_pct = ((entry_px - exit_px) / entry_px) * 100.0
+                    else:
+                        pnl_pct = ((exit_px - entry_px) / entry_px) * 100.0
+                else:
+                    pnl_pct = 0.0
+            pnl_values.append(float(pnl_pct))
+            if float(pnl_pct) > 0.0:
+                wins += 1
+
+        recent_closed_count = int(len(closed_rows))
+        win_rate_pct = (float(wins) / float(recent_closed_count) * 100.0) if recent_closed_count > 0 else 0.0
+        avg_pnl_pct = (sum(float(v) for v in pnl_values) / float(recent_closed_count)) if recent_closed_count > 0 else 0.0
+
+        last_close_age_min: Optional[float] = None
+        if closed_rows:
+            newest = closed_rows[0]
+            newest_ts = str(newest.get("timestamp") or newest.get("logged_utc") or "").strip()
+            if newest_ts:
+                try:
+                    ts = self._parse_iso_utc(newest_ts)
+                    last_close_age_min = max((now - ts).total_seconds() / 60.0, 0.0)
+                except Exception:
+                    last_close_age_min = None
+
+        pass_recent_closes = recent_closed_count >= target
+        pass_win_rate = float(win_rate_pct) >= float(self.edge_proof_min_win_rate_pct)
+        pass_avg_pnl = float(avg_pnl_pct) >= float(self.edge_proof_min_avg_pnl_pct)
+        pass_freshness = (
+            (last_close_age_min is not None)
+            and (float(last_close_age_min) <= float(self.edge_proof_max_last_close_age_min))
+        )
+
+        payload = {
+            "recent_closed_count": int(recent_closed_count),
+            "target_closed_count": int(target),
+            "win_rate_pct": round(float(win_rate_pct), 6),
+            "avg_pnl_pct": round(float(avg_pnl_pct), 6),
+            "last_close_age_min": round(float(last_close_age_min), 6) if last_close_age_min is not None else None,
+            "pass_recent_closes": bool(pass_recent_closes),
+            "pass_win_rate": bool(pass_win_rate),
+            "pass_avg_pnl": bool(pass_avg_pnl),
+            "pass_freshness": bool(pass_freshness),
+        }
+
+        self._edge_proof_cache = dict(payload)
+        self._edge_proof_cache_utc = now_ts
+        return payload
+
+    def _capital_preservation_snapshot(
+        self,
+        now: datetime,
+        quality: Optional[dict[str, Any]] = None,
+    ) -> dict[str, Any]:
+        payload_quality = quality if isinstance(quality, dict) else self._edge_proof_recent_quality(now)
+
+        required_recent_closed = max(int(self.capital_preservation_min_recent_closed), 1)
+        recent_closed_count = int(self._to_float(payload_quality.get("recent_closed_count", 0), 0.0))
+        win_rate_pct = self._to_float(payload_quality.get("win_rate_pct", 0.0), 0.0)
+        avg_pnl_pct = self._to_float(payload_quality.get("avg_pnl_pct", 0.0), 0.0)
+
+        scan_rows = int(self._clamp(float(required_recent_closed * 45), 120.0, 8000.0))
+        rows = self._read_jsonl_tail(LIVE_TRADE_LEDGER_JSONL_FILE, scan_rows)
+        close_statuses = {
+            "CLOSED",
+            "CAPITAL_RECYCLE_CLOSED",
+            "TP_FILLED",
+            "SL_FILLED",
+        }
+        consecutive_losses = 0
+        for row in rows:
+            status = str(row.get("status", "") or "").upper().strip()
+            if status not in close_statuses:
+                continue
+
+            pnl_pct = self._to_float(row.get("pnl_pct", float("nan")), float("nan"))
+            if not math.isfinite(pnl_pct):
+                entry_px = self._to_float(row.get("entry_price", 0.0), 0.0)
+                exit_px = self._to_float(row.get("exit_price", 0.0), 0.0)
+                if entry_px > 0.0 and exit_px > 0.0:
+                    direction = str(row.get("direction", "long") or "long").strip().lower()
+                    if direction == "short":
+                        pnl_pct = ((entry_px - exit_px) / entry_px) * 100.0
+                    else:
+                        pnl_pct = ((exit_px - entry_px) / entry_px) * 100.0
+                else:
+                    pnl_pct = 0.0
+
+            if float(pnl_pct) > 0.0:
+                break
+            consecutive_losses += 1
+            if consecutive_losses >= int(self.capital_preservation_max_consecutive_losses):
+                break
+
+        pause_until_dt: Optional[datetime] = None
+        pause_raw = str(self.capital_preservation_pause_until_utc or "").strip()
+        if pause_raw:
+            try:
+                pause_until_dt = self._parse_iso_utc(pause_raw)
+            except Exception:
+                pause_until_dt = None
+
+        if isinstance(pause_until_dt, datetime) and now >= pause_until_dt:
+            self.capital_preservation_pause_until_utc = ""
+            pause_until_dt = None
+
+        breach_codes: list[str] = []
+        if recent_closed_count >= required_recent_closed:
+            if float(win_rate_pct) < float(self.capital_preservation_min_win_rate_pct):
+                breach_codes.append("low_recent_win_rate")
+            if float(avg_pnl_pct) < float(self.capital_preservation_min_avg_pnl_pct):
+                breach_codes.append("low_recent_avg_pnl")
+        if consecutive_losses >= int(self.capital_preservation_max_consecutive_losses):
+            breach_codes.append("loss_streak")
+
+        if breach_codes and (pause_until_dt is None):
+            pause_until_dt = now + timedelta(seconds=float(self.capital_preservation_pause_sec))
+            self.capital_preservation_pause_until_utc = pause_until_dt.isoformat()
+
+        pause_active = isinstance(pause_until_dt, datetime)
+        allow_buy = (not pause_active) and (len(breach_codes) == 0)
+
+        return {
+            "enabled": bool(self.capital_preservation_mode),
+            "recent_closed_count": int(recent_closed_count),
+            "required_recent_closed": int(required_recent_closed),
+            "win_rate_pct": round(float(win_rate_pct), 6),
+            "avg_pnl_pct": round(float(avg_pnl_pct), 6),
+            "consecutive_losses": int(consecutive_losses),
+            "max_consecutive_losses": int(self.capital_preservation_max_consecutive_losses),
+            "min_win_rate_pct": round(float(self.capital_preservation_min_win_rate_pct), 6),
+            "min_avg_pnl_pct": round(float(self.capital_preservation_min_avg_pnl_pct), 6),
+            "pause_sec": round(float(self.capital_preservation_pause_sec), 6),
+            "pause_until_utc": pause_until_dt.isoformat() if isinstance(pause_until_dt, datetime) else None,
+            "pause_active": bool(pause_active),
+            "breach_codes": list(breach_codes),
+            "allow_buy": bool(allow_buy),
+        }
+
+    def _edge_proof_cost_floor_adaptive_adjustment(self, quality: dict[str, Any]) -> dict[str, Any]:
+        avg_pnl_pct = self._to_float(quality.get("avg_pnl_pct", 0.0), 0.0)
+        win_rate_pct = self._to_float(quality.get("win_rate_pct", 0.0), 0.0)
+        recent_closed_count = int(self._to_float(quality.get("recent_closed_count", 0), 0.0))
+        avg_net_pnl_bps = float(avg_pnl_pct) * 100.0
+
+        out: dict[str, Any] = {
+            "enabled": bool(self.edge_proof_cost_floor_adaptive_enabled),
+            "recent_closed_count": int(recent_closed_count),
+            "avg_net_pnl_bps": round(float(avg_net_pnl_bps), 6),
+            "win_rate_pct": round(float(win_rate_pct), 6),
+            "adjust_bps": 0.0,
+            "reason": "disabled",
+        }
+
+        if not bool(self.edge_proof_cost_floor_adaptive_enabled):
+            return out
+
+        min_closed = max(int(self.edge_proof_cost_floor_adaptive_min_closed_trades), 1)
+        if recent_closed_count < min_closed:
+            out["reason"] = "insufficient_samples"
+            return out
+
+        tighten = (
+            float(avg_net_pnl_bps) <= float(self.edge_proof_cost_floor_adaptive_loss_threshold_bps)
+            or float(win_rate_pct) < float(self.edge_proof_cost_floor_adaptive_win_rate_floor_pct)
+        )
+        relax = (
+            float(avg_net_pnl_bps) >= float(self.edge_proof_cost_floor_adaptive_gain_threshold_bps)
+            and float(win_rate_pct) >= float(self.edge_proof_cost_floor_adaptive_win_rate_relax_pct)
+        )
+
+        if tighten:
+            out["adjust_bps"] = round(float(self.edge_proof_cost_floor_adaptive_loss_adjust_bps), 6)
+            out["reason"] = "tighten"
+            return out
+        if relax:
+            out["adjust_bps"] = round(-abs(float(self.edge_proof_cost_floor_adaptive_gain_adjust_bps)), 6)
+            out["reason"] = "relax"
+            return out
+
+        out["reason"] = "hold"
+        return out
+
+    def _edge_proof_decision(self, now: datetime, selection_meta: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+        quality = self._edge_proof_recent_quality(now)
+        payload = dict(quality)
+        payload["enabled"] = bool(self.edge_proof_enabled)
+        adaptive_adjust_meta = self._edge_proof_cost_floor_adaptive_adjustment(quality)
+        adaptive_adjust_bps = self._to_float(adaptive_adjust_meta.get("adjust_bps", 0.0), 0.0)
+        payload["edge_proof_cost_floor_adaptive_enabled"] = bool(adaptive_adjust_meta.get("enabled", False))
+        payload["edge_proof_cost_floor_adaptive_reason"] = str(adaptive_adjust_meta.get("reason", "disabled") or "disabled")
+        payload["edge_proof_cost_floor_adaptive_adjust_bps"] = round(float(adaptive_adjust_bps), 6)
+        payload["edge_proof_cost_floor_adaptive_avg_net_pnl_bps"] = round(
+            float(self._to_float(adaptive_adjust_meta.get("avg_net_pnl_bps", 0.0), 0.0)),
+            6,
+        )
+        payload["edge_proof_cost_floor_adaptive_recent_closed_count"] = int(
+            self._to_float(adaptive_adjust_meta.get("recent_closed_count", 0), 0.0)
+        )
+        payload["edge_proof_cost_floor_adaptive_win_rate_pct"] = round(
+            float(self._to_float(adaptive_adjust_meta.get("win_rate_pct", 0.0), 0.0)),
+            6,
+        )
+
+        meta = selection_meta if isinstance(selection_meta, dict) else {}
+        intel_source = str(meta.get("symbol_intel_source", "none") or "none")
+        intel_stale = bool(meta.get("symbol_intel_stale", False))
+        intel_selected_count = int(self._to_float(meta.get("symbol_intel_selected_count", 0), 0.0))
+        symbol_source = str(meta.get("symbol_source", "none") or "none")
+        approval_candidate_count = int(self._to_float(meta.get("approval_candidate_count", 0), 0.0))
+        gate_score = self._to_float(meta.get("gate_composite_score", 0.0), 0.0)
+        gate_expected_edge_bps = self._to_float(meta.get("gate_expected_edge_bps", 0.0), 0.0)
+        selected_hybrid_score = self._to_float(meta.get("selected_hybrid_score", -float("inf")), -float("inf"))
+        selected_momentum_pct = self._to_float(meta.get("selected_momentum_pct", -999.0), -999.0)
+        selected_spread_bps = self._to_float(meta.get("selected_spread_bps", float("inf")), float("inf"))
+
+        self.edge_proof_bootstrap_entry_utc = [
+            ts
+            for ts in self.edge_proof_bootstrap_entry_utc
+            if isinstance(ts, datetime) and (now - ts).total_seconds() <= 3600.0
+        ]
+        bootstrap_recent_entries_1h = int(len(self.edge_proof_bootstrap_entry_utc))
+
+        pass_symbol_intel = True
+        if self.edge_proof_require_symbol_intel_fresh:
+            pass_symbol_intel = (
+                intel_source not in {"none", "disabled", "empty", "stale"}
+                and (not intel_stale)
+                and intel_selected_count > 0
+            )
+
+        intel_fallback_applied = False
+        if (
+            (not pass_symbol_intel)
+            and bool(self.edge_proof_hybrid_fallback_for_symbol_intel)
+            and symbol_source.startswith("hybrid_swing")
+            and approval_candidate_count > 0
+        ):
+            pass_symbol_intel = True
+            intel_fallback_applied = True
+
+        payload["pass_symbol_intel"] = bool(pass_symbol_intel)
+        payload["symbol_intel_source"] = intel_source
+        payload["symbol_intel_selected_count"] = int(intel_selected_count)
+        payload["symbol_intel_stale"] = bool(intel_stale)
+        payload["symbol_source"] = symbol_source
+        payload["approval_candidate_count"] = int(approval_candidate_count)
+        payload["edge_proof_hybrid_fallback_for_symbol_intel"] = bool(self.edge_proof_hybrid_fallback_for_symbol_intel)
+        payload["edge_proof_symbol_intel_fallback_applied"] = bool(intel_fallback_applied)
+        payload["edge_proof_bootstrap_enabled"] = bool(self.edge_proof_bootstrap_enabled)
+        payload["edge_proof_bootstrap_recent_entries_1h"] = int(bootstrap_recent_entries_1h)
+        payload["edge_proof_bootstrap_max_entries_per_hour"] = int(self.edge_proof_bootstrap_max_entries_per_hour)
+        payload["edge_proof_bootstrap_gate_score"] = round(float(gate_score), 6)
+        payload["edge_proof_bootstrap_expected_edge_bps"] = round(float(gate_expected_edge_bps), 6)
+        payload["edge_proof_bootstrap_selected_hybrid_score"] = (
+            round(float(selected_hybrid_score), 6) if math.isfinite(selected_hybrid_score) else None
+        )
+        payload["edge_proof_bootstrap_selected_momentum_pct"] = round(float(selected_momentum_pct), 6)
+        payload["edge_proof_bootstrap_selected_spread_bps"] = (
+            round(float(selected_spread_bps), 6) if math.isfinite(selected_spread_bps) else None
+        )
+        payload["edge_proof_bootstrap_hybrid_edge_scale"] = round(float(self.edge_proof_bootstrap_hybrid_edge_scale), 6)
+        payload["edge_proof_bootstrap_require_hybrid_candidates"] = bool(
+            self.edge_proof_bootstrap_require_hybrid_candidates
+        )
+
+        reason_codes: list[str] = []
+        if not bool(payload.get("pass_recent_closes", False)):
+            reason_codes.append("insufficient_recent_closes")
+        if not bool(payload.get("pass_win_rate", False)):
+            reason_codes.append("low_recent_win_rate")
+        if not bool(payload.get("pass_avg_pnl", False)):
+            reason_codes.append("low_recent_avg_pnl")
+        if not bool(payload.get("pass_freshness", False)):
+            reason_codes.append("stale_recent_closes")
+        if not bool(payload.get("pass_symbol_intel", True)):
+            reason_codes.append("symbol_intel_not_fresh")
+
+        if not self.edge_proof_enabled:
+            payload["armed"] = True
+            payload["reason"] = "edge_proof_disabled"
+            payload["reason_codes"] = []
+            payload["bootstrap_applied"] = False
+            payload["bootstrap_reason_codes"] = []
+            return payload
+
+        armed = len(reason_codes) == 0
+        bootstrap_applied = False
+        bootstrap_reason_codes: list[str] = []
+
+        if (not armed) and bool(self.edge_proof_bootstrap_enabled):
+            soft_reasons = {
+                "insufficient_recent_closes",
+                "low_recent_win_rate",
+                "low_recent_avg_pnl",
+                "stale_recent_closes",
+                "symbol_intel_not_fresh",
+            }
+            has_hybrid_context = symbol_source.startswith("hybrid_swing") and approval_candidate_count > 0
+            hybrid_edge_bps = 0.0
+            if math.isfinite(selected_hybrid_score):
+                hybrid_edge_bps = max(float(selected_hybrid_score), 0.0) * float(self.edge_proof_bootstrap_hybrid_edge_scale)
+            effective_edge_bps = max(float(gate_expected_edge_bps), float(hybrid_edge_bps))
+
+            spread_for_cost_bps = float(selected_spread_bps) if math.isfinite(selected_spread_bps) else float(
+                self.edge_proof_bootstrap_max_spread_bps
+            )
+            required_edge_bps = float(self.edge_proof_bootstrap_min_expected_edge_bps)
+            raw_cost_floor_bps = None
+            cost_floor_bps = None
+            if bool(self.edge_proof_cost_floor_enabled):
+                raw_cost_floor_bps = (
+                    float(self.edge_proof_cost_floor_fee_roundtrip_bps)
+                    + (float(self.edge_proof_cost_floor_spread_weight) * float(spread_for_cost_bps))
+                    + float(self.edge_proof_cost_floor_slippage_roundtrip_bps)
+                    + float(self.edge_proof_cost_floor_buffer_bps)
+                )
+                floor_low = min(float(self.edge_proof_cost_floor_min_bps), float(self.edge_proof_cost_floor_max_bps))
+                floor_high = max(float(self.edge_proof_cost_floor_min_bps), float(self.edge_proof_cost_floor_max_bps))
+                cost_floor_bps = self._clamp(raw_cost_floor_bps, floor_low, floor_high)
+                if adaptive_adjust_bps != 0.0:
+                    cost_floor_bps = self._clamp(float(cost_floor_bps) + float(adaptive_adjust_bps), floor_low, floor_high)
+                required_edge_bps = max(float(required_edge_bps), float(cost_floor_bps))
+            elif adaptive_adjust_bps != 0.0:
+                required_edge_bps = max(0.0, float(required_edge_bps) + float(adaptive_adjust_bps))
+
+            payload["edge_proof_bootstrap_hybrid_edge_bps"] = round(float(hybrid_edge_bps), 6)
+            payload["edge_proof_bootstrap_effective_edge_bps"] = round(float(effective_edge_bps), 6)
+            payload["edge_proof_bootstrap_required_edge_bps"] = round(float(required_edge_bps), 6)
+            payload["edge_proof_cost_floor_enabled"] = bool(self.edge_proof_cost_floor_enabled)
+            payload["edge_proof_bootstrap_cost_floor_raw_bps"] = (
+                round(float(raw_cost_floor_bps), 6) if raw_cost_floor_bps is not None else None
+            )
+            payload["edge_proof_bootstrap_cost_floor_bps"] = (
+                round(float(cost_floor_bps), 6) if cost_floor_bps is not None else None
+            )
+            if any(code not in soft_reasons for code in reason_codes):
+                bootstrap_reason_codes.append("bootstrap_non_soft_reason")
+            if bootstrap_recent_entries_1h >= int(self.edge_proof_bootstrap_max_entries_per_hour):
+                bootstrap_reason_codes.append("bootstrap_rate_limited")
+            if gate_score < float(self.edge_proof_bootstrap_min_gate_score):
+                bootstrap_reason_codes.append("bootstrap_gate_score_too_low")
+            if effective_edge_bps < float(required_edge_bps):
+                bootstrap_reason_codes.append("bootstrap_expected_edge_too_low")
+            if has_hybrid_context and selected_hybrid_score < float(self.edge_proof_bootstrap_min_hybrid_score):
+                bootstrap_reason_codes.append("bootstrap_hybrid_score_too_low")
+            if has_hybrid_context and selected_momentum_pct < float(self.edge_proof_bootstrap_min_momentum_pct):
+                bootstrap_reason_codes.append("bootstrap_momentum_too_low")
+            if has_hybrid_context and selected_spread_bps > float(self.edge_proof_bootstrap_max_spread_bps):
+                bootstrap_reason_codes.append("bootstrap_spread_too_wide")
+            if bool(self.edge_proof_bootstrap_require_hybrid_candidates) and (not has_hybrid_context):
+                bootstrap_reason_codes.append("bootstrap_missing_hybrid_candidates")
+
+            if len(bootstrap_reason_codes) == 0:
+                armed = True
+                bootstrap_applied = True
+
+        payload["armed"] = bool(armed)
+        if bootstrap_applied:
+            payload["reason"] = "edge_proof_bootstrap_override"
+        else:
+            payload["reason"] = "edge_proof_armed" if armed else "edge_proof_not_armed"
+        payload["reason_codes"] = reason_codes
+        payload["bootstrap_applied"] = bool(bootstrap_applied)
+        payload["bootstrap_reason_codes"] = list(bootstrap_reason_codes)
+        return payload
 
     def _filter_symbols_by_executable_notional(
         self,
@@ -1727,12 +3585,52 @@ class RobustLiveExecutor:
             "universe_sample_size": 0,
             "universe_sample_escalated": False,
             "universe_sample_strategy": "random",
+            "universe_rotation_cursor": None,
             "universe_ticker_hits": 0,
             "universe_affordability_rejects": 0,
+            "universe_hard_spread_rejects": 0,
+            "universe_hard_reject_spread_bps": round(float(self.universe_hard_reject_spread_bps), 6),
+            "universe_same_symbol_penalty_bps": 0.0,
+            "universe_same_symbol_penalty_hits": 0,
             "symbol_source": "none",
             "selected_spread_bps": None,
             "selected_min_order_notional": None,
+            "hybrid_swing_enabled": bool(self.hybrid_swing_selector_enabled),
+            "selected_hybrid_score": None,
+            "selected_momentum_pct": None,
+            "selected_range_pct": None,
+            "selected_position_in_range": None,
+            "selected_trade_count_24h": None,
+            "selected_long_bias_penalty_bps": None,
+            "hybrid_long_bias_enabled": bool(self.hybrid_swing_long_bias_enabled and (not self.spot_short_enabled)),
+            "hybrid_long_bias_min_momentum_pct": round(float(self.hybrid_swing_long_bias_min_momentum_pct), 6),
+            "bootstrap_candidate_count": 0,
+            "selected_bootstrap_ready": False,
+            "approval_candidate_count": 0,
+            "approval_candidates": [],
+            "symbol_learning_enabled": bool(self.symbol_intel_learning_enabled),
+            "symbol_learning_file_exists": bool(SYMBOL_FLIP_LEARNING_FILE.exists()),
+            "symbol_learning_source": "none",
+            "symbol_learning_stale": False,
+            "symbol_learning_age_sec": None,
+            "symbol_learning_profile_count": 0,
+            "symbol_learning_bonus_count": 0,
+            "symbol_learning_bonus_applied_count": 0,
+            "selected_learning_bonus": 0.0,
         }
+
+        learning_bonus_map, learning_meta = self._symbol_learning_bonus_map()
+        meta["symbol_learning_enabled"] = bool(learning_meta.get("symbol_learning_enabled", False))
+        meta["symbol_learning_file_exists"] = bool(learning_meta.get("symbol_learning_file_exists", False))
+        meta["symbol_learning_source"] = str(learning_meta.get("symbol_learning_source", "none") or "none")
+        meta["symbol_learning_stale"] = bool(learning_meta.get("symbol_learning_stale", False))
+        meta["symbol_learning_age_sec"] = learning_meta.get("symbol_learning_age_sec")
+        meta["symbol_learning_profile_count"] = int(
+            self._to_float(learning_meta.get("symbol_learning_profile_count", 0), 0.0)
+        )
+        meta["symbol_learning_bonus_count"] = int(
+            self._to_float(learning_meta.get("symbol_learning_bonus_count", 0), 0.0)
+        )
 
         if allow_preferred_shortcut and pref and self.router.get_symbol_config(pref):
             meta["symbol_source"] = "preferred"
@@ -1746,11 +3644,18 @@ class RobustLiveExecutor:
             meta["symbol_source"] = "random_scan_disabled"
             return picked, None, meta
 
-        sample_size = min(max(int(self.universe_sample_size), 1), len(unique))
+        configured_sample_size = int(self.universe_sample_size)
+        full_universe_scan = configured_sample_size <= 0
+        if full_universe_scan:
+            sample_size = len(unique)
+            meta["universe_sample_strategy"] = "full_universe"
+        else:
+            sample_size = min(max(configured_sample_size, 1), len(unique))
+
         low_balance_mode = bool(
             affordable_usd_hint > 0.0 and affordable_usd_hint <= float(self.low_balance_sample_trigger_usd)
         )
-        if low_balance_mode and len(unique) > sample_size:
+        if (not full_universe_scan) and low_balance_mode and len(unique) > sample_size:
             sample_size = min(max(sample_size, int(self.low_balance_sample_size)), len(unique))
             meta["universe_sample_escalated"] = True
 
@@ -1762,26 +3667,58 @@ class RobustLiveExecutor:
                     self._to_float((self.router.get_symbol_config(s) or {}).get("min_order", 1e9), 1e9),
                 ),
             )
-            ticker_scan_cap = min(max(int(self.low_balance_ticker_scan_cap), 1), len(ranked))
-            if affordable_usd_hint > 0.0 and affordable_usd_hint <= 2.0 and len(ranked) > ticker_scan_cap:
-                # Rank the full universe by minimum order, but cap ticker lookups to avoid scan stalls.
-                sample_size = max(sample_size, ticker_scan_cap)
-                meta["universe_sample_escalated"] = True
-                meta["universe_sample_strategy"] = "low_balance_ranked_scan"
+            if ranked:
+                cursor = int(self.low_balance_rotation_cursor % len(ranked))
+                if cursor > 0:
+                    ranked = ranked[cursor:] + ranked[:cursor]
+                self.low_balance_rotation_cursor = (cursor + 1) % len(ranked)
+                meta["universe_rotation_cursor"] = int(cursor)
+            configured_ticker_scan_cap = int(self.low_balance_ticker_scan_cap)
+            if configured_ticker_scan_cap <= 0:
+                ticker_scan_cap = len(ranked)
+                meta["universe_sample_strategy"] = "low_balance_full_scan"
+            else:
+                ticker_scan_cap = min(max(configured_ticker_scan_cap, 1), len(ranked))
+                if affordable_usd_hint > 0.0 and affordable_usd_hint <= 2.0 and len(ranked) > ticker_scan_cap:
+                    # Rank the full universe by minimum order, but cap ticker lookups to avoid scan stalls.
+                    sample_size = max(sample_size, ticker_scan_cap)
+                    meta["universe_sample_escalated"] = True
+                    meta["universe_sample_strategy"] = "low_balance_ranked_scan"
             sampled = ranked[: min(sample_size, ticker_scan_cap)]
-            if meta["universe_sample_strategy"] != "low_balance_ranked_scan":
+            if meta["universe_sample_strategy"] not in {"low_balance_ranked_scan", "low_balance_full_scan"}:
                 meta["universe_sample_strategy"] = "low_balance_min_order"
         else:
-            sampled = random.sample(unique, sample_size) if len(unique) > sample_size else list(unique)
+            if full_universe_scan:
+                sampled = list(unique)
+            else:
+                sampled = random.sample(unique, sample_size) if len(unique) > sample_size else list(unique)
+
+        hard_reject_spread_bps = max(self._to_float(self.universe_hard_reject_spread_bps, 0.0), 0.0)
 
         meta["universe_sample_size"] = len(sampled)
+        hybrid_enabled = bool(self.hybrid_swing_selector_enabled)
 
         best_symbol: Optional[str] = None
         best_ticker: Optional[dict[str, Any]] = None
+        best_score = float("inf")
         best_spread = float("inf")
         best_min_notional = float("inf")
+        best_hybrid_symbol: Optional[str] = None
+        best_hybrid_ticker: Optional[dict[str, Any]] = None
+        best_hybrid_score = -float("inf")
+        best_hybrid_spread = float("inf")
+        best_hybrid_notional = float("inf")
+        best_hybrid_meta: dict[str, Any] = {}
+        bootstrap_ready_rows: list[dict[str, Any]] = []
+        approval_rows: list[dict[str, Any]] = []
+        approval_by_symbol: dict[str, dict[str, Any]] = {}
         ticker_hits = 0
         affordability_rejects = 0
+        same_symbol_penalty_hits = 0
+        same_symbol_penalty_bps = 6.0 if low_balance_mode else 0.0
+        last_selected = str(self.last_selected_symbol or "").upper().strip()
+        learning_bonus_applied_count = 0
+        hard_spread_rejects = 0
         lowest_reject_symbol: Optional[str] = None
         lowest_reject_ticker: Optional[dict[str, Any]] = None
         lowest_reject_notional = float("inf")
@@ -1794,6 +3731,9 @@ class RobustLiveExecutor:
             spread_bps = self._spread_bps_from_ticker(ticker)
             if not math.isfinite(spread_bps):
                 continue
+            if hard_reject_spread_bps > 0.0 and spread_bps > hard_reject_spread_bps:
+                hard_spread_rejects += 1
+                continue
 
             cfg = self.router.get_symbol_config(symbol) or {}
             min_order_qty = self._effective_min_order(
@@ -1801,6 +3741,18 @@ class RobustLiveExecutor:
                 self._to_float(cfg.get("min_order", 0.0), 0.0),
             )
             last_px = self._to_float(ticker.get("last", 0.0), 0.0)
+            open_px = max(self._to_float(ticker.get("open", last_px), last_px), 0.0)
+            momentum_pct = ((last_px - open_px) / max(open_px, 1e-9)) * 100.0 if open_px > 0.0 else 0.0
+            long_bias_penalty_bps = 0.0
+            if self.hybrid_swing_long_bias_enabled and (not self.spot_short_enabled):
+                momentum_deficit = max(
+                    float(self.hybrid_swing_long_bias_min_momentum_pct) - float(momentum_pct),
+                    0.0,
+                )
+                long_bias_penalty_bps = momentum_deficit * float(self.hybrid_swing_long_bias_penalty_per_pct)
+            learning_bonus = float(self._to_float(learning_bonus_map.get(str(symbol).upper(), 0.0), 0.0))
+            if learning_bonus > 0.0:
+                learning_bonus_applied_count += 1
             min_order_notional = max(min_order_qty, 0.0) * max(last_px, 0.0)
 
             if max_notional_usd_cap > 0.0 and min_order_notional > float(max_notional_usd_cap):
@@ -1822,18 +3774,168 @@ class RobustLiveExecutor:
                 continue
 
             ticker_hits += 1
-            if spread_bps < best_spread:
+            score = float(spread_bps) + float(long_bias_penalty_bps) - float(learning_bonus)
+            if same_symbol_penalty_bps > 0.0 and last_selected and symbol == last_selected:
+                score += float(same_symbol_penalty_bps)
+                same_symbol_penalty_hits += 1
+
+            hybrid_metrics: Optional[dict[str, float | bool]] = None
+
+            if score < best_score:
+                best_score = score
                 best_spread = spread_bps
                 best_symbol = symbol
                 best_ticker = ticker
                 best_min_notional = min_order_notional
 
+            if hybrid_enabled:
+                hybrid_metrics = self._hybrid_swing_metrics_from_ticker(ticker, spread_bps)
+                if isinstance(hybrid_metrics, dict):
+                    hybrid_metrics["learning_bonus"] = float(learning_bonus)
+                if bool(hybrid_metrics.get("eligible", False)):
+                    hybrid_score = float(hybrid_metrics.get("hybrid_score", -float("inf")) or -float("inf"))
+                    hybrid_score += float(learning_bonus)
+                    momentum_pct_hybrid = float(self._to_float(hybrid_metrics.get("momentum_pct", 0.0), 0.0))
+                    if same_symbol_penalty_bps > 0.0 and last_selected and symbol == last_selected:
+                        hybrid_score -= float(same_symbol_penalty_bps)
+                    if hybrid_score > best_hybrid_score:
+                        best_hybrid_score = hybrid_score
+                        best_hybrid_symbol = symbol
+                        best_hybrid_ticker = ticker
+                        best_hybrid_spread = spread_bps
+                        best_hybrid_notional = min_order_notional
+                        best_hybrid_meta = dict(hybrid_metrics)
+
+                    if bool(self.edge_proof_bootstrap_enabled):
+                        bootstrap_ready = (
+                            hybrid_score >= float(self.edge_proof_bootstrap_min_hybrid_score)
+                            and momentum_pct_hybrid >= float(self.edge_proof_bootstrap_min_momentum_pct)
+                            and spread_bps <= float(self.edge_proof_bootstrap_max_spread_bps)
+                        )
+                        if bootstrap_ready:
+                            bootstrap_ready_rows.append(
+                                {
+                                    "symbol": symbol,
+                                    "ticker": ticker,
+                                    "hybrid_score": float(hybrid_score),
+                                    "spread_bps": float(spread_bps),
+                                    "min_order_notional": float(min_order_notional),
+                                    "hybrid_meta": dict(hybrid_metrics),
+                                }
+                            )
+
+            candidate_row: dict[str, Any] = {
+                "symbol": str(symbol),
+                "spread_bps": round(float(spread_bps), 6),
+                "selection_score_bps": round(float(score), 6),
+                "min_order_notional": round(float(min_order_notional), 6),
+                "momentum_pct": round(float(momentum_pct), 6),
+                "long_bias_penalty_bps": round(float(long_bias_penalty_bps), 6),
+                "learning_bonus": round(float(learning_bonus), 6),
+            }
+            if isinstance(hybrid_metrics, dict):
+                candidate_row["hybrid_eligible"] = bool(hybrid_metrics.get("eligible", False))
+                candidate_row["hybrid_score"] = round(
+                    float(self._to_float(hybrid_metrics.get("hybrid_score", -float("inf")), -float("inf"))),
+                    6,
+                )
+                candidate_row["range_pct"] = round(
+                    float(self._to_float(hybrid_metrics.get("range_pct", 0.0), 0.0)),
+                    6,
+                )
+                candidate_row["position_in_range"] = round(
+                    float(self._to_float(hybrid_metrics.get("position_in_range", 0.0), 0.0)),
+                    6,
+                )
+                candidate_row["trade_count_24h"] = int(
+                    self._to_float(hybrid_metrics.get("trade_count_24h", 0.0), 0.0)
+                )
+            approval_rows.append(candidate_row)
+            approval_by_symbol[str(symbol)] = candidate_row
+
         meta["universe_ticker_hits"] = ticker_hits
         meta["universe_affordability_rejects"] = affordability_rejects
+        meta["universe_hard_spread_rejects"] = int(hard_spread_rejects)
+        meta["universe_same_symbol_penalty_bps"] = round(float(same_symbol_penalty_bps), 6)
+        meta["universe_same_symbol_penalty_hits"] = int(same_symbol_penalty_hits)
+        meta["symbol_learning_bonus_applied_count"] = int(learning_bonus_applied_count)
+        meta["bootstrap_candidate_count"] = int(len(bootstrap_ready_rows))
+        if approval_rows:
+            if hybrid_enabled:
+                ranked_candidates = sorted(
+                    approval_rows,
+                    key=lambda row: (
+                        0 if bool(row.get("hybrid_eligible", False)) else 1,
+                        -float(self._to_float(row.get("hybrid_score", -float("inf")), -float("inf"))),
+                        float(self._to_float(row.get("selection_score_bps", row.get("spread_bps", 1e9)), 1e9)),
+                    ),
+                )
+            else:
+                ranked_candidates = sorted(
+                    approval_rows,
+                    key=lambda row: float(
+                        self._to_float(row.get("selection_score_bps", row.get("spread_bps", 1e9)), 1e9)
+                    ),
+                )
+            max_candidates = max(int(self.live_operator_queue_max_candidates), 1)
+            meta["approval_candidates"] = ranked_candidates[:max_candidates]
+            meta["approval_candidate_count"] = int(len(meta["approval_candidates"]))
+
+        if hybrid_enabled and bool(self.edge_proof_bootstrap_enabled) and bootstrap_ready_rows:
+            bootstrap_ready_rows.sort(
+                key=lambda row: (
+                    -float(self._to_float(row.get("hybrid_score", -float("inf")), -float("inf"))),
+                    float(self._to_float(row.get("spread_bps", float("inf")), float("inf"))),
+                )
+            )
+            top_bootstrap = bootstrap_ready_rows[0]
+            best_hybrid_symbol = str(top_bootstrap.get("symbol", "") or "").upper().strip()
+            best_hybrid_ticker = top_bootstrap.get("ticker") if isinstance(top_bootstrap.get("ticker"), dict) else None
+            best_hybrid_score = float(self._to_float(top_bootstrap.get("hybrid_score", -float("inf")), -float("inf")))
+            best_hybrid_spread = float(self._to_float(top_bootstrap.get("spread_bps", float("inf")), float("inf")))
+            best_hybrid_notional = float(self._to_float(top_bootstrap.get("min_order_notional", float("inf")), float("inf")))
+            best_hybrid_meta = dict(top_bootstrap.get("hybrid_meta") or {})
+            meta["selected_bootstrap_ready"] = True
+
+        if hybrid_enabled and best_hybrid_symbol is not None:
+            meta["selected_spread_bps"] = round(float(best_hybrid_spread), 6)
+            meta["selected_min_order_notional"] = round(float(best_hybrid_notional), 6)
+            meta["selected_hybrid_score"] = round(float(best_hybrid_score), 6)
+            meta["selected_momentum_pct"] = round(float(self._to_float(best_hybrid_meta.get("momentum_pct", 0.0), 0.0)), 6)
+            meta["selected_range_pct"] = round(float(self._to_float(best_hybrid_meta.get("range_pct", 0.0), 0.0)), 6)
+            meta["selected_position_in_range"] = round(
+                float(self._to_float(best_hybrid_meta.get("position_in_range", 0.0), 0.0)),
+                6,
+            )
+            meta["selected_trade_count_24h"] = int(self._to_float(best_hybrid_meta.get("trade_count_24h", 0.0), 0.0))
+            meta["selected_long_bias_penalty_bps"] = round(
+                float(self._to_float(best_hybrid_meta.get("long_bias_penalty_bps", 0.0), 0.0)),
+                6,
+            )
+            meta["selected_learning_bonus"] = round(
+                float(self._to_float(best_hybrid_meta.get("learning_bonus", 0.0), 0.0)),
+                6,
+            )
+            if best_hybrid_spread <= float(self.universe_max_pick_spread_bps):
+                if bool(meta.get("selected_bootstrap_ready", False)):
+                    meta["symbol_source"] = "hybrid_swing_bootstrap_ready"
+                else:
+                    meta["symbol_source"] = "hybrid_swing_spike_scan"
+                return best_hybrid_symbol, best_hybrid_ticker, meta
+            if bool(meta.get("selected_bootstrap_ready", False)):
+                meta["symbol_source"] = "hybrid_swing_bootstrap_ready_wide"
+            else:
+                meta["symbol_source"] = "hybrid_swing_spike_scan_wide"
+            return best_hybrid_symbol, best_hybrid_ticker, meta
 
         if best_symbol is not None:
             meta["selected_spread_bps"] = round(float(best_spread), 6)
             meta["selected_min_order_notional"] = round(float(best_min_notional), 6)
+            selected_row = approval_by_symbol.get(str(best_symbol), {})
+            if isinstance(selected_row, dict):
+                meta["selected_momentum_pct"] = selected_row.get("momentum_pct")
+                meta["selected_long_bias_penalty_bps"] = selected_row.get("long_bias_penalty_bps")
+                meta["selected_learning_bonus"] = selected_row.get("learning_bonus", 0.0)
             if best_spread <= float(self.universe_max_pick_spread_bps):
                 meta["symbol_source"] = "spread_scan"
                 return best_symbol, best_ticker, meta
@@ -1846,9 +3948,129 @@ class RobustLiveExecutor:
             meta["symbol_source"] = "affordability_floor_fallback"
             return lowest_reject_symbol, lowest_reject_ticker, meta
 
+        if hard_spread_rejects > 0:
+            meta["symbol_source"] = "hard_spread_reject_no_candidate"
+            return None, None, meta
+
         fallback = random.choice(unique)
         meta["symbol_source"] = "random_no_ticker"
         return fallback, None, meta
+
+    def _write_live_operator_approval_queue(
+        self,
+        now: datetime,
+        selected_symbol: str,
+        selection_meta: Optional[dict[str, Any]] = None,
+    ) -> None:
+        if not bool(self.live_operator_queue_enabled):
+            return
+
+        meta = dict(selection_meta or {})
+        rows = meta.get("approval_candidates", [])
+        if not isinstance(rows, list):
+            rows = []
+
+        selected = str(selected_symbol or "").upper().strip()
+        max_candidates = max(int(self.live_operator_queue_max_candidates), 1)
+        rows = rows[:max_candidates]
+
+        tickets: list[dict[str, Any]] = []
+        ts_compact = now.astimezone(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+        for idx, row in enumerate(rows, start=1):
+            if not isinstance(row, dict):
+                continue
+            symbol = str(row.get("symbol", "") or "").upper().strip()
+            if not symbol:
+                continue
+
+            cfg = self.router.get_symbol_config(symbol) or {}
+            pair = str(cfg.get("pair", "") or "").strip()
+            if not pair:
+                pair = f"{symbol}USD"
+
+            min_notional = max(self._to_float(row.get("min_order_notional", 0.0), 0.0), 0.0)
+            long_bias_penalty = max(self._to_float(row.get("long_bias_penalty_bps", 0.0), 0.0), 0.0)
+
+            tickets.append(
+                {
+                    "ticket_id": f"LIVE-OP-{ts_compact}-{symbol}-{idx:02d}",
+                    "timestamp_utc": now.isoformat(),
+                    "symbol": symbol,
+                    "pair": pair,
+                    "rank": int(idx),
+                    "decision_state": "PENDING_OPERATOR_REVIEW",
+                    "action_hint": "APPROVE_LONG_IF_CONFIRMED",
+                    "notional_hint_usd": round(float(min_notional), 6),
+                    "scanner_meta": {
+                        "spread_bps": row.get("spread_bps"),
+                        "selection_score_bps": row.get("selection_score_bps"),
+                        "hybrid_score": row.get("hybrid_score"),
+                        "hybrid_eligible": bool(row.get("hybrid_eligible", False)),
+                        "momentum_pct": row.get("momentum_pct"),
+                        "range_pct": row.get("range_pct"),
+                        "position_in_range": row.get("position_in_range"),
+                        "trade_count_24h": row.get("trade_count_24h"),
+                        "long_bias_penalty_bps": round(float(long_bias_penalty), 6),
+                        "selected_symbol": bool(symbol == selected),
+                    },
+                }
+            )
+
+        if (not tickets) and selected:
+            cfg = self.router.get_symbol_config(selected) or {}
+            pair = str(cfg.get("pair", "") or f"{selected}USD")
+            tickets.append(
+                {
+                    "ticket_id": f"LIVE-OP-{ts_compact}-{selected}-01",
+                    "timestamp_utc": now.isoformat(),
+                    "symbol": selected,
+                    "pair": pair,
+                    "rank": 1,
+                    "decision_state": "PENDING_OPERATOR_REVIEW",
+                    "action_hint": "APPROVE_LONG_IF_CONFIRMED",
+                    "notional_hint_usd": round(
+                        float(self._to_float(meta.get("selected_min_order_notional", 0.0), 0.0)),
+                        6,
+                    ),
+                    "scanner_meta": {
+                        "spread_bps": meta.get("selected_spread_bps"),
+                        "selection_score_bps": meta.get("selected_spread_bps"),
+                        "hybrid_score": meta.get("selected_hybrid_score"),
+                        "hybrid_eligible": bool(meta.get("selected_hybrid_score") is not None),
+                        "momentum_pct": meta.get("selected_momentum_pct"),
+                        "range_pct": meta.get("selected_range_pct"),
+                        "position_in_range": meta.get("selected_position_in_range"),
+                        "trade_count_24h": meta.get("selected_trade_count_24h"),
+                        "long_bias_penalty_bps": meta.get("selected_long_bias_penalty_bps"),
+                        "selected_symbol": True,
+                    },
+                }
+            )
+
+        payload = {
+            "generated_utc": now.isoformat(),
+            "schema": "luma_live_operator_queue_v1",
+            "source": "live_executor",
+            "scope": "execution_cycle",
+            "selected_symbol": selected,
+            "symbol_source": str(meta.get("symbol_source", "none") or "none"),
+            "queue_count": int(len(tickets)),
+            "evidence_paths": {
+                "runtime_control": str(RUNTIME_CONTROL_FILE),
+                "heartbeat": str(LIVE_HEARTBEAT_FILE),
+                "queue_file": str(LIVE_OPERATOR_APPROVAL_QUEUE_FILE),
+            },
+            "tickets": tickets,
+        }
+
+        try:
+            LIVE_OPERATOR_APPROVAL_QUEUE_FILE.write_text(
+                json.dumps(payload, indent=2),
+                encoding="utf-8",
+            )
+        except Exception:
+            pass
 
     def _build_realtime_features(self, symbol: str, ticker: dict[str, float]) -> dict[str, Any]:
         bid = float(ticker.get("bid", 0.0) or 0.0)
@@ -1943,6 +4165,50 @@ class RobustLiveExecutor:
         if dt.tzinfo is None:
             dt = dt.replace(tzinfo=timezone.utc)
         return dt.astimezone(timezone.utc)
+
+    def _prune_symbol_skip_map(self, now: datetime) -> None:
+        expired: list[str] = []
+        for symbol, until in self._symbol_skip_until_utc.items():
+            if not isinstance(until, datetime):
+                expired.append(symbol)
+                continue
+            if now >= until:
+                expired.append(symbol)
+
+        for symbol in expired:
+            self._symbol_skip_until_utc.pop(symbol, None)
+            self._symbol_skip_reasons.pop(symbol, None)
+
+        if expired:
+            self._save_pacing_state()
+
+    def _symbol_skip_active(self, symbol: str, now: datetime) -> bool:
+        key = str(symbol or "").upper().strip()
+        if not key:
+            return False
+        self._prune_symbol_skip_map(now)
+        until = self._symbol_skip_until_utc.get(key)
+        return isinstance(until, datetime) and now < until
+
+    def _mark_symbol_skip(
+        self,
+        symbol: str,
+        now: datetime,
+        reason: str,
+        cooldown_sec: float = 0.0,
+    ) -> None:
+        key = str(symbol or "").upper().strip()
+        if not key:
+            return
+
+        sec = max(self._to_float(cooldown_sec, 0.0), self._to_float(self.symbol_skip_cooldown_sec, 0.0))
+        if sec <= 0.0:
+            return
+
+        until = now + timedelta(seconds=float(sec))
+        self._symbol_skip_until_utc[key] = until
+        self._symbol_skip_reasons[key] = str(reason or "symbol_skip")
+        self._save_pacing_state()
 
     def _buy_cooldown_active(self, now: datetime) -> bool:
         raw = str(self.buy_cooldown_until_utc or "").strip()
@@ -2124,6 +4390,70 @@ class RobustLiveExecutor:
             return (entry - float(last)) / entry
         return (float(last) - entry) / entry
 
+    def _global_close_sweep_due(self, now: datetime) -> bool:
+        if not bool(self.global_close_sweep_enabled):
+            return False
+        if float(self.global_close_sweep_interval_sec) <= 0.0:
+            return True
+        last_raw = str(self.last_global_close_sweep_utc or "").strip()
+        if not last_raw:
+            return True
+        try:
+            last_dt = self._parse_iso_utc(last_raw)
+        except Exception:
+            return True
+        return (now - last_dt).total_seconds() >= float(self.global_close_sweep_interval_sec)
+
+    def _run_global_close_sweep(self, now: datetime, preferred_symbol: str = "") -> dict[str, Any]:
+        result = {
+            "executed": False,
+            "symbols_scanned": 0,
+            "symbols_with_ticker": 0,
+            "closed_count": 0,
+            "checked_symbols": [],
+        }
+        if not self._global_close_sweep_due(now):
+            return result
+
+        open_positions = self.portfolio.get_open_positions()
+        symbol_candidates: list[str] = []
+        for pos in open_positions:
+            raw = str(getattr(pos, "symbol", "") or "").upper().strip()
+            if not raw:
+                continue
+            base = raw.split("/", 1)[0].strip()
+            if base and base not in symbol_candidates:
+                symbol_candidates.append(base)
+
+        preferred = str(preferred_symbol or "").upper().strip()
+        if preferred and preferred in symbol_candidates:
+            symbol_candidates = [preferred] + [s for s in symbol_candidates if s != preferred]
+
+        max_symbols = int(self.global_close_sweep_max_symbols)
+        if max_symbols > 0:
+            symbol_candidates = symbol_candidates[:max_symbols]
+        result["executed"] = True
+        result["symbols_scanned"] = int(len(symbol_candidates))
+        result["checked_symbols"] = list(symbol_candidates)
+
+        closed_count = 0
+        symbols_with_ticker = 0
+        for sym in symbol_candidates:
+            ticker = self.router.get_ticker(sym)
+            if not isinstance(ticker, dict):
+                continue
+            last = self._to_float(ticker.get("last", 0.0), 0.0)
+            if last <= 0.0:
+                continue
+            symbols_with_ticker += 1
+            if self._maybe_close_positions(sym, float(last), now):
+                closed_count += 1
+
+        self.last_global_close_sweep_utc = now.isoformat()
+        result["symbols_with_ticker"] = int(symbols_with_ticker)
+        result["closed_count"] = int(closed_count)
+        return result
+
     def _resolve_close_qty_for_spot(self, symbol: str, requested_qty: float, close_side: str) -> tuple[float, float, str]:
         desired = max(float(requested_qty), 0.0)
         if close_side != "sell":
@@ -2237,6 +4567,59 @@ class RobustLiveExecutor:
             "unresolved_assets": sorted(set(unresolved_assets)),
         }
 
+    def _compute_live_risk_snapshot(self, balance_valuation: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+        valuation = (
+            balance_valuation
+            if isinstance(balance_valuation, dict)
+            else self._build_balance_valuation(force_refresh=False)
+        )
+
+        holdings = valuation.get("holdings", [])
+        if not isinstance(holdings, list):
+            holdings = []
+
+        live_open_positions = 0
+        for row in holdings:
+            if not isinstance(row, dict):
+                continue
+            symbol = str(row.get("symbol", "") or "").upper().strip()
+            if not symbol or symbol == "USD":
+                continue
+            is_stable = bool(row.get("is_stable", False)) or (symbol in self.stable_assets)
+            if is_stable:
+                continue
+            value_usd = max(self._to_float(row.get("value_usd", 0.0), 0.0), 0.0)
+            if value_usd >= max(float(self.min_collateral_convert_usd), 0.50):
+                live_open_positions += 1
+
+        local_open_positions = int(len(self.portfolio.get_open_positions()))
+        effective_open_positions = int(max(local_open_positions, live_open_positions))
+
+        local_exposure_usd = max(self._to_float(self.portfolio.exposure(), 0.0), 0.0)
+        live_exposure_usd = max(self._to_float(valuation.get("holdings_value_usd", 0.0), 0.0), 0.0)
+        effective_exposure_usd = max(local_exposure_usd, live_exposure_usd)
+
+        local_equity_usd = max(self._to_float(getattr(self.portfolio, "current_equity", 0.0), 0.0), 0.0)
+        live_equity_usd = max(self._to_float(valuation.get("total_equity_usd", 0.0), 0.0), 0.0)
+
+        local_heat = local_exposure_usd / max(local_equity_usd, 1.0)
+        live_heat = live_exposure_usd / max(live_equity_usd, 1.0)
+        effective_heat = max(local_heat, live_heat)
+
+        return {
+            "local_open_positions": int(local_open_positions),
+            "live_open_positions": int(live_open_positions),
+            "effective_open_positions": int(effective_open_positions),
+            "local_exposure_usd": float(local_exposure_usd),
+            "live_exposure_usd": float(live_exposure_usd),
+            "effective_exposure_usd": float(effective_exposure_usd),
+            "local_portfolio_heat": float(local_heat),
+            "live_portfolio_heat": float(live_heat),
+            "effective_portfolio_heat": float(effective_heat),
+            "local_equity_usd": float(local_equity_usd),
+            "live_equity_usd": float(live_equity_usd),
+        }
+
     def _stable_asset_convertible(self, symbol: str) -> bool:
         token = str(symbol or "").upper().strip()
         if not token:
@@ -2258,6 +4641,111 @@ class RobustLiveExecutor:
         except Exception:
             return False
         return (now - last).total_seconds() < float(self.collateral_convert_cooldown_sec)
+
+    def _open_long_hold_seconds_by_symbol(self, now: datetime) -> dict[str, float]:
+        holds: dict[str, float] = {}
+        open_positions = self.portfolio.get_open_positions()
+        for pos in open_positions:
+            if str(pos.side).lower() != "long":
+                continue
+            base_symbol = str(pos.symbol).split("/")[0].upper().strip()
+            if not base_symbol:
+                continue
+            try:
+                entry_dt = self._parse_iso_utc(pos.entry_time_utc)
+                hold_sec = max((now - entry_dt).total_seconds(), 0.0)
+            except Exception:
+                hold_sec = float("inf")
+            prev = holds.get(base_symbol)
+            holds[base_symbol] = float(hold_sec) if prev is None else min(float(prev), float(hold_sec))
+        return holds
+
+    def _release_reserved_inventory_for_symbol(
+        self,
+        symbol: str,
+        max_cancel_orders: int = 3,
+    ) -> dict[str, Any]:
+        symbol_key = str(symbol or "").upper().strip()
+        result: dict[str, Any] = {
+            "attempted": True,
+            "symbol": symbol_key,
+            "reason": "none",
+            "canceled": 0,
+            "failed": 0,
+            "txids": [],
+        }
+        if not symbol_key:
+            result["reason"] = "invalid_symbol"
+            return result
+
+        cfg = self.router.get_symbol_config(symbol_key) or {}
+        candidate_pairs: set[str] = set()
+        pair = str(cfg.get("pair", "") or "").upper().strip()
+        if pair:
+            candidate_pairs.add(pair)
+        candidates = cfg.get("candidates", []) if isinstance(cfg.get("candidates", []), list) else []
+        for row in candidates:
+            if not isinstance(row, dict):
+                continue
+            p = str(row.get("pair", "") or "").upper().strip()
+            if p:
+                candidate_pairs.add(p)
+
+        if not candidate_pairs:
+            result["reason"] = "no_symbol_pair"
+            return result
+
+        open_orders_payload = self.router.get_open_orders(trades=True)
+        if isinstance(open_orders_payload, dict) and "error" in open_orders_payload:
+            result["reason"] = "open_orders_error"
+            result["error"] = str(open_orders_payload.get("error"))
+            return result
+
+        orders = []
+        if isinstance(open_orders_payload, dict):
+            raw_orders = open_orders_payload.get("orders", [])
+            if isinstance(raw_orders, list):
+                orders = raw_orders
+
+        matches: list[dict[str, Any]] = []
+        for row in orders:
+            if not isinstance(row, dict):
+                continue
+            row_pair = str(row.get("pair", "") or "").upper().strip()
+            row_type = str(row.get("type", "") or "").lower().strip()
+            row_status = str(row.get("status", "") or "").lower().strip()
+            if row_pair not in candidate_pairs:
+                continue
+            if row_type != "sell" or row_status != "open":
+                continue
+            matches.append(row)
+
+        if not matches:
+            result["reason"] = "no_conflicting_open_sells"
+            return result
+
+        matches.sort(key=lambda row: self._to_float(row.get("opentm", 0.0), 0.0))
+        cancel_cap = max(int(max_cancel_orders or 0), 1)
+        for row in matches[:cancel_cap]:
+            txid = str(row.get("txid", "") or "").strip()
+            if not txid:
+                continue
+            cancel_result = self.router.cancel_order(txid)
+            if isinstance(cancel_result, dict) and "error" in cancel_result:
+                result["failed"] = int(result.get("failed", 0) or 0) + 1
+                continue
+            result["canceled"] = int(result.get("canceled", 0) or 0) + 1
+            result["txids"].append(txid)
+
+        canceled = int(result.get("canceled", 0) or 0)
+        failed = int(result.get("failed", 0) or 0)
+        if canceled > 0:
+            result["reason"] = "released"
+        elif failed > 0:
+            result["reason"] = "cancel_failed"
+        else:
+            result["reason"] = "cancel_not_attempted"
+        return result
 
     def _attempt_collateral_convert_for_liquidity(
         self,
@@ -2305,6 +4793,12 @@ class RobustLiveExecutor:
             result["reason"] = "no_holdings"
             return _finalize(result)
 
+        protect_window_sec = max(float(self.collateral_convert_protect_open_positions_sec), 0.0)
+        open_long_holds: dict[str, float] = {}
+        if bool(self.collateral_convert_avoid_open_positions) and protect_window_sec > 0.0:
+            open_long_holds = self._open_long_hold_seconds_by_symbol(now)
+        protected_open_position_skips: list[dict[str, Any]] = []
+
         preferred = str(preferred_symbol or "").upper().strip()
         candidates: list[dict[str, Any]] = []
         for row in holdings:
@@ -2313,6 +4807,17 @@ class RobustLiveExecutor:
             symbol = str(row.get("symbol", "") or "").upper().strip()
             if not symbol or symbol == "USD":
                 continue
+
+            hold_sec = open_long_holds.get(symbol)
+            if hold_sec is not None and hold_sec < protect_window_sec:
+                protected_open_position_skips.append(
+                    {
+                        "symbol": symbol,
+                        "hold_sec": round(float(hold_sec), 3),
+                    }
+                )
+                continue
+
             is_stable = bool(row.get("is_stable", False))
             if is_stable:
                 if not allow_stable_conversion:
@@ -2331,6 +4836,17 @@ class RobustLiveExecutor:
             if min_order <= 0.0:
                 continue
             safe_available_qty = max(qty * float(self.close_balance_buffer_fraction), 0.0)
+            live_available_qty = max(
+                self._to_float(self.router.get_asset_balance(symbol, force_refresh=True), 0.0),
+                0.0,
+            )
+            if live_available_qty > 0.0:
+                safe_available_qty = min(
+                    safe_available_qty,
+                    max(live_available_qty * float(self.close_balance_buffer_fraction), 0.0),
+                )
+            else:
+                safe_available_qty = 0.0
             if safe_available_qty < min_order:
                 continue
 
@@ -2352,12 +4868,19 @@ class RobustLiveExecutor:
                     "weight_pct": float(weight_pct),
                     "min_order": float(min_order),
                     "safe_available_qty": float(safe_available_qty),
+                    "live_available_qty": float(live_available_qty),
                     "score": float(score),
                 }
             )
 
+        if protected_open_position_skips:
+            result["protected_open_positions_skipped"] = int(len(protected_open_position_skips))
+            result["collateral_convert_protect_open_positions_sec"] = round(float(protect_window_sec), 3)
+
         if not candidates:
             result["reason"] = "no_convertible_collateral"
+            if protected_open_position_skips:
+                result["protected_open_positions"] = protected_open_position_skips[:8]
             return _finalize(result)
 
         if allow_stable_conversion:
@@ -2366,85 +4889,184 @@ class RobustLiveExecutor:
                 candidates = stable_candidates
 
         candidates.sort(key=lambda row: float(row.get("score", 0.0) or 0.0), reverse=True)
-        chosen = candidates[0]
-        symbol = str(chosen.get("symbol", "") or "").upper().strip()
-        last_px = max(self._to_float(chosen.get("last", 0.0), 0.0), 0.0)
-        min_order = max(self._to_float(chosen.get("min_order", 0.0), 0.0), 0.0)
-        safe_available_qty = max(self._to_float(chosen.get("safe_available_qty", 0.0), 0.0), 0.0)
-        if not symbol or last_px <= 0.0 or min_order <= 0.0 or safe_available_qty < min_order:
-            result["reason"] = "invalid_candidate"
-            return _finalize(result)
-
         required_usd_effective = max(self._to_float(required_usd, 0.0), self.min_collateral_convert_usd)
-        qty_from_required = required_usd_effective / max(last_px, 1e-9)
-        qty_from_fraction = max(self._to_float(chosen.get("qty", 0.0), 0.0) * float(self.collateral_sell_fraction), 0.0)
-        qty = max(min_order, qty_from_required, qty_from_fraction)
-        qty = min(qty, safe_available_qty)
-        if qty < min_order:
-            result["reason"] = "qty_below_min_order"
-            result["symbol"] = symbol
-            result["qty"] = round(float(qty), 10)
-            result["min_order"] = round(float(min_order), 10)
+        attempt_failures: list[dict[str, Any]] = []
+
+        for chosen in candidates:
+            symbol = str(chosen.get("symbol", "") or "").upper().strip()
+            last_px = max(self._to_float(chosen.get("last", 0.0), 0.0), 0.0)
+            min_order = max(self._to_float(chosen.get("min_order", 0.0), 0.0), 0.0)
+            safe_available_qty = max(self._to_float(chosen.get("safe_available_qty", 0.0), 0.0), 0.0)
+            if not symbol or last_px <= 0.0 or min_order <= 0.0 or safe_available_qty < min_order:
+                attempt_failures.append(
+                    {
+                        "symbol": symbol,
+                        "reason": "invalid_candidate",
+                    }
+                )
+                continue
+
+            qty_from_required = required_usd_effective / max(last_px, 1e-9)
+            qty_from_fraction = max(self._to_float(chosen.get("qty", 0.0), 0.0) * float(self.collateral_sell_fraction), 0.0)
+            qty = max(min_order, qty_from_required, qty_from_fraction)
+            qty = min(qty, safe_available_qty)
+            if qty < min_order:
+                attempt_failures.append(
+                    {
+                        "symbol": symbol,
+                        "reason": "qty_below_min_order",
+                        "qty": round(float(qty), 10),
+                        "min_order": round(float(min_order), 10),
+                    }
+                )
+                continue
+
+            qty_attempts: list[float] = []
+            for factor in (1.00, 0.85, 0.70, 0.55, 0.40):
+                candidate_qty = min(float(qty) * float(factor), float(safe_available_qty))
+                if candidate_qty + 1e-12 < float(min_order):
+                    continue
+                dedupe_key = round(float(candidate_qty), 10)
+                if any(abs(dedupe_key - existing) < 1e-10 for existing in qty_attempts):
+                    continue
+                qty_attempts.append(float(dedupe_key))
+
+            if not qty_attempts:
+                attempt_failures.append(
+                    {
+                        "symbol": symbol,
+                        "reason": "no_qty_attempts",
+                        "qty": round(float(qty), 10),
+                        "min_order": round(float(min_order), 10),
+                    }
+                )
+                continue
+
+            order_result: dict[str, Any] = {"error": "order_not_attempted"}
+            qty_error_trace: list[dict[str, Any]] = []
+            executed_qty = 0.0
+            reserve_release_result: Optional[dict[str, Any]] = None
+            reserve_release_attempted = False
+            for attempted_qty in qty_attempts:
+                order_result = self.router.place_order(symbol, "sell", float(attempted_qty), None)
+                if "error" not in order_result:
+                    executed_qty = float(attempted_qty)
+                    break
+
+                error_text = str(order_result.get("error"))
+                qty_error_trace.append(
+                    {
+                        "qty": round(float(attempted_qty), 10),
+                        "error": error_text,
+                    }
+                )
+
+                if ("Insufficient funds" in error_text) and (not reserve_release_attempted):
+                    reserve_release_attempted = True
+                    reserve_release_result = self._release_reserved_inventory_for_symbol(symbol, max_cancel_orders=3)
+                    if isinstance(reserve_release_result, dict):
+                        released_count = int(reserve_release_result.get("canceled", 0) or 0)
+                        if released_count > 0:
+                            retry_result = self.router.place_order(symbol, "sell", float(attempted_qty), None)
+                            if "error" not in retry_result:
+                                order_result = retry_result
+                                executed_qty = float(attempted_qty)
+                                break
+
+                            retry_error = str(retry_result.get("error"))
+                            qty_error_trace.append(
+                                {
+                                    "qty": round(float(attempted_qty), 10),
+                                    "error": retry_error,
+                                    "phase": "post_release_retry",
+                                }
+                            )
+                            order_result = retry_result
+                            if "Insufficient funds" not in retry_error:
+                                break
+
+                if "Insufficient funds" not in error_text:
+                    break
+
+            if "error" in order_result:
+                failure_payload: dict[str, Any] = {
+                    "symbol": symbol,
+                    "reason": "order_failed",
+                    "error": str(order_result.get("error")),
+                    "qty_attempts": qty_error_trace[:5],
+                }
+                if isinstance(reserve_release_result, dict):
+                    failure_payload["reserve_release"] = reserve_release_result
+                attempt_failures.append(failure_payload)
+                continue
+
+            qty = float(executed_qty)
+
+            txid = order_result.get("txid", ["unknown"])
+            txid = txid[0] if isinstance(txid, list) else str(txid)
+            cfg = self.router.get_symbol_config(symbol) or {}
+            pair = str(cfg.get("pair") or "")
+            size_usd = float(qty) * float(last_px)
+
+            self.trade_ledger.append(
+                {
+                    "timestamp": now.isoformat(),
+                    "txid": txid,
+                    "symbol": symbol,
+                    "pair": pair,
+                    "direction": "flat",
+                    "side": "sell",
+                    "status": "COLLATERAL_CONVERT_SELL",
+                    "execution_mode": "collateral_convert",
+                    "entry_price": round(float(last_px), 6),
+                    "qty": round(float(qty), 10),
+                    "size_usd": round(float(size_usd), 6),
+                    "convert_reason": str(reason or "liquidity"),
+                }
+            )
+            self.audit_chain.append(
+                "collateral_convert_sell",
+                {
+                    "symbol": symbol,
+                    "side": "sell",
+                    "qty": round(float(qty), 10),
+                    "size_usd": round(float(size_usd), 6),
+                    "txid": txid,
+                    "convert_reason": str(reason or "liquidity"),
+                    "weight_pct": round(float(chosen.get("weight_pct", 0.0) or 0.0), 6),
+                },
+            )
+
+            self.last_collateral_convert_utc = now.isoformat()
+            result.update(
+                {
+                    "executed": True,
+                    "reason": "collateral_converted",
+                    "symbol": symbol,
+                    "is_stable": bool(chosen.get("is_stable", False)),
+                    "txid": txid,
+                    "side": "sell",
+                    "qty": round(float(qty), 10),
+                    "size_usd": round(float(size_usd), 6),
+                    "weight_pct": round(float(chosen.get("weight_pct", 0.0) or 0.0), 6),
+                    "required_usd": round(float(required_usd_effective), 6),
+                    "quote_usd_before": round(float(quote_usd_balance), 6),
+                }
+            )
+            if isinstance(reserve_release_result, dict):
+                result["reserve_release"] = reserve_release_result
             return _finalize(result)
 
-        order_result = self.router.place_order(symbol, "sell", float(qty), None)
-        if "error" in order_result:
-            result["reason"] = "order_failed"
-            result["symbol"] = symbol
-            result["error"] = str(order_result.get("error"))
+        if attempt_failures:
+            result["reason"] = "order_failed_all_candidates"
+            result["attempt_failures"] = attempt_failures[:5]
+            first = attempt_failures[0]
+            result["symbol"] = str(first.get("symbol", ""))
+            if "error" in first:
+                result["error"] = str(first.get("error", ""))
             return _finalize(result)
 
-        txid = order_result.get("txid", ["unknown"])
-        txid = txid[0] if isinstance(txid, list) else str(txid)
-        cfg = self.router.get_symbol_config(symbol) or {}
-        pair = str(cfg.get("pair") or "")
-        size_usd = float(qty) * float(last_px)
-
-        self.trade_ledger.append(
-            {
-                "timestamp": now.isoformat(),
-                "txid": txid,
-                "symbol": symbol,
-                "pair": pair,
-                "direction": "flat",
-                "side": "sell",
-                "status": "COLLATERAL_CONVERT_SELL",
-                "execution_mode": "collateral_convert",
-                "entry_price": round(float(last_px), 6),
-                "qty": round(float(qty), 10),
-                "size_usd": round(float(size_usd), 6),
-                "convert_reason": str(reason or "liquidity"),
-            }
-        )
-        self.audit_chain.append(
-            "collateral_convert_sell",
-            {
-                "symbol": symbol,
-                "side": "sell",
-                "qty": round(float(qty), 10),
-                "size_usd": round(float(size_usd), 6),
-                "txid": txid,
-                "convert_reason": str(reason or "liquidity"),
-                "weight_pct": round(float(chosen.get("weight_pct", 0.0) or 0.0), 6),
-            },
-        )
-
-        self.last_collateral_convert_utc = now.isoformat()
-        result.update(
-            {
-                "executed": True,
-                "reason": "collateral_converted",
-                "symbol": symbol,
-                "is_stable": bool(chosen.get("is_stable", False)),
-                "txid": txid,
-                "side": "sell",
-                "qty": round(float(qty), 10),
-                "size_usd": round(float(size_usd), 6),
-                "weight_pct": round(float(chosen.get("weight_pct", 0.0) or 0.0), 6),
-                "required_usd": round(float(required_usd_effective), 6),
-                "quote_usd_before": round(float(quote_usd_balance), 6),
-            }
-        )
+        result["reason"] = "invalid_candidate"
         return _finalize(result)
 
     def _reconcile_zero_inventory_positions(self, symbol: str, last: float, now: datetime) -> int:
@@ -2797,6 +5419,9 @@ class RobustLiveExecutor:
 
             txid = result.get("txid", ["unknown"])
             txid = txid[0] if isinstance(txid, list) else str(txid)
+            close_cfg = self.router.get_symbol_config(symbol) or {}
+            close_pair = str(result.get("_router_pair") or close_cfg.get("pair") or "")
+            close_quote = str(result.get("_router_quote") or "").upper().strip()
 
             if close_qty < requested_close_qty:
                 pos.qty = float(close_qty)
@@ -2807,7 +5432,8 @@ class RobustLiveExecutor:
                     "timestamp": now.isoformat(),
                     "txid": txid,
                     "symbol": symbol,
-                    "pair": self.router.get_symbol_config(symbol)["pair"],
+                    "pair": close_pair,
+                    "quote_lane": close_quote,
                     "direction": str(pos.side),
                     "side": close_side,
                     "status": "CLOSED",
@@ -2862,7 +5488,7 @@ class RobustLiveExecutor:
                 pass
 
         strategy = self.live_selection.get("strategy", "harmonic_blend")
-        if self._strategy_regime_conflict(strategy, regime_name):
+        if (not self.hard_safety_only_mode) and self._strategy_regime_conflict(strategy, regime_name):
             return None  # hard block
 
         features = self._build_realtime_features(symbol, ticker)
@@ -2918,9 +5544,53 @@ class RobustLiveExecutor:
 
         _write_live_heartbeat = _emit_heartbeat
 
-        ticker = preloaded_ticker if isinstance(preloaded_ticker, dict) else self.router.get_ticker(symbol)
+        global_close_sweep = self._run_global_close_sweep(now, preferred_symbol=str(symbol))
+        pick_meta["global_close_sweep_executed"] = bool(global_close_sweep.get("executed", False))
+        pick_meta["global_close_sweep_symbols_scanned"] = int(
+            self._to_float(global_close_sweep.get("symbols_scanned", 0), 0.0)
+        )
+        pick_meta["global_close_sweep_symbols_with_ticker"] = int(
+            self._to_float(global_close_sweep.get("symbols_with_ticker", 0), 0.0)
+        )
+        pick_meta["global_close_sweep_closed_count"] = int(
+            self._to_float(global_close_sweep.get("closed_count", 0), 0.0)
+        )
+
+        runtime_quote_order_raw = self.runtime_cfg.get("clean_ops_quote_allow", list(DEFAULT_QUOTE_LANES))
+        if isinstance(runtime_quote_order_raw, str):
+            runtime_quote_order = [s.strip().upper() for s in runtime_quote_order_raw.split(",") if s.strip()]
+        elif isinstance(runtime_quote_order_raw, (list, tuple, set)):
+            runtime_quote_order = [str(s).upper().strip() for s in runtime_quote_order_raw if str(s).strip()]
+        else:
+            runtime_quote_order = list(DEFAULT_QUOTE_LANES)
+        if not runtime_quote_order:
+            runtime_quote_order = list(DEFAULT_QUOTE_LANES)
+
+        ticker = (
+            preloaded_ticker
+            if isinstance(preloaded_ticker, dict)
+            else self.router.get_ticker(symbol, quote_order=runtime_quote_order)
+        )
         if not ticker:
-            _write_live_heartbeat({"status": "blocked", "reason": "missing_ticker", "symbol": symbol})
+            missing_ticker_cooldown_sec = max(
+                float(self.missing_ticker_skip_cooldown_sec),
+                float(self.loop_seconds) * 2.0,
+            )
+            self._mark_symbol_skip(
+                str(symbol),
+                now,
+                "missing_ticker",
+                cooldown_sec=missing_ticker_cooldown_sec,
+            )
+            _write_live_heartbeat(
+                {
+                    "status": "blocked",
+                    "reason": "missing_ticker",
+                    "symbol": symbol,
+                    "symbol_skip_cooldown_sec": round(float(missing_ticker_cooldown_sec), 6),
+                    "symbol_skip_active_count": int(len(self._symbol_skip_until_utc)),
+                }
+            )
             print("  blocked: no ticker")
             return
 
@@ -2934,6 +5604,13 @@ class RobustLiveExecutor:
         gate_override_applied = False
         decision_armed = bool(gate_decision.armed)
         decision_direction = str(gate_decision.direction)
+        hard_safety_bypass_applied = False
+
+        if (not decision_armed) and self.hard_safety_only_mode:
+            hard_safety_bypass_applied = True
+            decision_armed = True
+            if decision_direction not in {"long", "short"}:
+                decision_direction = "long" if float(gate_input.direction_hint) >= 0.5 else "short"
 
         if (not decision_armed) and self.gate_override_enabled:
             override_conf_ok = float(gate_decision.composite_score) >= float(self.gate_override_min_confidence)
@@ -2965,6 +5642,7 @@ class RobustLiveExecutor:
                     "adaptive_gate_relaxed": bool(gate_relaxed),
                     "adaptive_gate_relax_offset": round(float(self.gate_relax_offset), 6),
                     "adaptive_gate_configured_min": round(float(self.configured_gate_min_composite_score), 6),
+                    "hard_safety_only_mode": bool(self.hard_safety_only_mode),
                 }
             )
             print("  blocked: gate not armed")
@@ -2975,13 +5653,39 @@ class RobustLiveExecutor:
         mid = max((bid + ask) / 2.0, 1e-9)
         spread_bps = abs((ask - bid) / mid) * 10000.0
         if spread_bps > 45.0:
+            spread_block_cooldown_sec = max(
+                float(self.spread_too_wide_skip_cooldown_sec),
+                float(self.loop_seconds) * 2.0,
+            )
+            self._mark_symbol_skip(
+                str(symbol),
+                now,
+                "spread_too_wide",
+                cooldown_sec=spread_block_cooldown_sec,
+            )
             _write_live_heartbeat({
                 "status": "blocked",
                 "reason": "spread_too_wide",
                 "symbol": symbol,
                 "spread_bps": round(spread_bps, 6),
+                "symbol_skip_cooldown_sec": round(float(spread_block_cooldown_sec), 6),
+                "symbol_skip_active_count": int(len(self._symbol_skip_until_utc)),
             })
             print("  blocked: spread too wide")
+            return
+
+        trap_rate_pct = self._symbol_trap_rate_pct(symbol)
+        if trap_rate_pct is not None and float(trap_rate_pct) > float(self.max_trap_rate_pct):
+            _write_live_heartbeat(
+                {
+                    "status": "blocked",
+                    "reason": "trap_rate",
+                    "symbol": symbol,
+                    "trap_rate_pct": round(float(trap_rate_pct), 6),
+                    "max_trap_rate_pct": round(float(self.max_trap_rate_pct), 6),
+                }
+            )
+            print("  blocked: trap rate")
             return
 
         reconciled_count = self._reconcile_zero_inventory_positions(symbol, float(last), now)
@@ -2992,22 +5696,64 @@ class RobustLiveExecutor:
             return
 
         if decision_direction == "short" and (not self.spot_short_enabled):
-            live_usd = max(float(self.router.get_balance(force_refresh=False) or 0.0), 0.0)
-            _write_live_heartbeat(
-                {
-                    "status": "blocked",
-                    "reason": "short_disabled_spot",
-                    "symbol": symbol,
-                    "gate_direction": "short",
-                    "spot_short_enabled": bool(self.spot_short_enabled),
-                    "available_usd": round(float(live_usd), 6),
-                }
-            )
-            print("  blocked: spot short disabled")
-            return
+            cfg_for_short_probe = self.router.get_symbol_config(symbol) or {}
+            probe_min_order = max(self._to_float(cfg_for_short_probe.get("min_order", 0.0), 0.0), 0.0)
+            probe_inventory_qty = max(float(self.router.get_asset_balance(symbol, force_refresh=False) or 0.0), 0.0)
+            probe_sell_cap_qty = max(probe_inventory_qty * float(self.close_balance_buffer_fraction), 0.0)
 
-        portfolio_heat = self.portfolio.exposure() / max(self.portfolio.current_equity, 1)
-        open_positions = len(self.portfolio.get_open_positions())
+            if probe_min_order > 0.0 and probe_sell_cap_qty + 1e-12 >= probe_min_order:
+                pick_meta["short_signal_inventory_sell_allowed"] = True
+            else:
+                live_usd = max(float(self.router.get_balance(force_refresh=False) or 0.0), 0.0)
+                reserve_hint = max(self._to_float(self.runtime_cfg.get("reserve_usd", 0.0), 0.0), 0.0)
+                affordable_buy_usd = max(float(live_usd) - reserve_hint, 0.0)
+                min_order_notional = probe_min_order * float(last)
+
+                if min_order_notional > 0.0 and affordable_buy_usd + 1e-9 >= min_order_notional:
+                    decision_direction = "long"
+                    pick_meta["short_signal_forced_long"] = True
+                    _write_live_heartbeat(
+                        {
+                            "status": "degraded",
+                            "reason": "short_signal_forced_long",
+                            "symbol": symbol,
+                            "gate_direction": "short",
+                            "spot_short_enabled": bool(self.spot_short_enabled),
+                            "available_usd": round(float(live_usd), 6),
+                            "affordable_buy_usd": round(float(affordable_buy_usd), 6),
+                            "min_order_notional": round(float(min_order_notional), 6),
+                        }
+                    )
+                else:
+                    short_block_cooldown_sec = max(float(self.symbol_skip_cooldown_sec), float(self.loop_seconds))
+                    self._mark_symbol_skip(
+                        str(symbol),
+                        now,
+                        "short_signal_spot_disabled",
+                        cooldown_sec=short_block_cooldown_sec,
+                    )
+                    _write_live_heartbeat(
+                        {
+                            "status": "blocked",
+                            "reason": "short_disabled_spot",
+                            "symbol": symbol,
+                            "gate_direction": "short",
+                            "spot_short_enabled": bool(self.spot_short_enabled),
+                            "available_usd": round(float(live_usd), 6),
+                            "affordable_buy_usd": round(float(affordable_buy_usd), 6),
+                            "min_order_notional": round(float(min_order_notional), 6),
+                            "symbol_skip_cooldown_sec": round(float(short_block_cooldown_sec), 6),
+                            "symbol_skip_active_count": int(len(self._symbol_skip_until_utc)),
+                        }
+                    )
+                    print("  blocked: spot short disabled (symbol skip armed)")
+                    return
+
+        balance_valuation = self._build_balance_valuation(force_refresh=False)
+        risk_snapshot = self._compute_live_risk_snapshot(balance_valuation)
+        portfolio_heat = float(risk_snapshot.get("effective_portfolio_heat", 0.0))
+        open_positions = int(risk_snapshot.get("effective_open_positions", 0))
+        open_risk_usd = float(risk_snapshot.get("effective_exposure_usd", 0.0))
         runtime_kill_switch = bool(self.runtime_cfg.get("kill_switch", False))
         runtime_live_mode = str(self.runtime_cfg.get("mode", "paper")).strip().lower() == "live"
 
@@ -3025,7 +5771,7 @@ class RobustLiveExecutor:
         risk_allowed, risk_reasons = self.risk_kernel.allow(
             RiskState(
                 day_pnl_usd=self.portfolio.realized_pnl_total,
-                open_risk_usd=self.portfolio.exposure(),
+                open_risk_usd=open_risk_usd,
                 portfolio_heat=portfolio_heat,
                 symbol_cooldown_active=False,
                 open_positions=open_positions,
@@ -3035,11 +5781,63 @@ class RobustLiveExecutor:
             )
         )
         if not risk_allowed:
-            _write_live_heartbeat({"status": "blocked", "reason": "risk", "symbol": symbol, "risk_reasons": list(risk_reasons or [])})
+            _write_live_heartbeat(
+                {
+                    "status": "blocked",
+                    "reason": "risk",
+                    "symbol": symbol,
+                    "risk_reasons": list(risk_reasons or []),
+                    "risk_portfolio_heat_local": round(float(risk_snapshot.get("local_portfolio_heat", 0.0)), 6),
+                    "risk_portfolio_heat_live": round(float(risk_snapshot.get("live_portfolio_heat", 0.0)), 6),
+                    "risk_portfolio_heat_effective": round(float(risk_snapshot.get("effective_portfolio_heat", 0.0)), 6),
+                    "risk_open_positions_local": int(self._to_float(risk_snapshot.get("local_open_positions", 0), 0.0)),
+                    "risk_open_positions_live": int(self._to_float(risk_snapshot.get("live_open_positions", 0), 0.0)),
+                    "risk_open_positions_effective": int(self._to_float(risk_snapshot.get("effective_open_positions", 0), 0.0)),
+                    "risk_exposure_local_usd": round(float(risk_snapshot.get("local_exposure_usd", 0.0)), 6),
+                    "risk_exposure_live_usd": round(float(risk_snapshot.get("live_exposure_usd", 0.0)), 6),
+                    "risk_exposure_effective_usd": round(float(risk_snapshot.get("effective_exposure_usd", 0.0)), 6),
+                    "risk_max_heat": round(float(self.risk_kernel.max_heat), 6),
+                    "risk_max_open_positions": int(self.max_open_positions),
+                }
+            )
             print("  blocked: risk")
             return
 
-        balance_valuation = self._build_balance_valuation(force_refresh=False)
+        pick_meta["gate_composite_score"] = round(float(gate_decision.composite_score), 6)
+        pick_meta["gate_confidence_level"] = round(float(gate_decision.confidence_level), 6)
+        pick_meta["gate_expected_edge_bps"] = round(float(gate_input.expected_edge_bps), 6)
+        pick_meta["gate_direction"] = str(decision_direction)
+
+        edge_proof = self._edge_proof_decision(now, pick_meta)
+        if bool(edge_proof.get("enabled", False)) and (not bool(edge_proof.get("armed", True))):
+            _write_live_heartbeat(
+                {
+                    "status": "blocked",
+                    "reason": "edge_proof_not_armed",
+                    "symbol": symbol,
+                    "edge_proof_reason_codes": list(edge_proof.get("reason_codes", [])),
+                    "edge_proof_recent_closed_count": int(self._to_float(edge_proof.get("recent_closed_count", 0), 0.0)),
+                    "edge_proof_target_closed_count": int(self._to_float(edge_proof.get("target_closed_count", 0), 0.0)),
+                    "edge_proof_win_rate_pct": round(self._to_float(edge_proof.get("win_rate_pct", 0.0), 0.0), 6),
+                    "edge_proof_avg_pnl_pct": round(self._to_float(edge_proof.get("avg_pnl_pct", 0.0), 0.0), 6),
+                    "edge_proof_last_close_age_min": edge_proof.get("last_close_age_min"),
+                    "edge_proof_pass_symbol_intel": bool(edge_proof.get("pass_symbol_intel", True)),
+                    "symbol_intel_source": str(edge_proof.get("symbol_intel_source", "none") or "none"),
+                    "edge_proof_bootstrap_enabled": bool(edge_proof.get("edge_proof_bootstrap_enabled", False)),
+                    "edge_proof_bootstrap_recent_entries_1h": int(self._to_float(edge_proof.get("edge_proof_bootstrap_recent_entries_1h", 0), 0.0)),
+                    "edge_proof_bootstrap_max_entries_per_hour": int(self._to_float(edge_proof.get("edge_proof_bootstrap_max_entries_per_hour", 0), 0.0)),
+                    "edge_proof_bootstrap_reason_codes": list(edge_proof.get("bootstrap_reason_codes", [])),
+                    "edge_proof_bootstrap_gate_score": round(self._to_float(edge_proof.get("edge_proof_bootstrap_gate_score", 0.0), 0.0), 6),
+                    "edge_proof_bootstrap_expected_edge_bps": round(self._to_float(edge_proof.get("edge_proof_bootstrap_expected_edge_bps", 0.0), 0.0), 6),
+                    "edge_proof_bootstrap_selected_hybrid_score": edge_proof.get("edge_proof_bootstrap_selected_hybrid_score"),
+                    "edge_proof_bootstrap_selected_momentum_pct": round(self._to_float(edge_proof.get("edge_proof_bootstrap_selected_momentum_pct", 0.0), 0.0), 6),
+                    "edge_proof_bootstrap_selected_spread_bps": edge_proof.get("edge_proof_bootstrap_selected_spread_bps"),
+                }
+            )
+            print("  blocked: edge proof not armed")
+            return
+
+        balance_valuation = balance_valuation if isinstance(balance_valuation, dict) else self._build_balance_valuation(force_refresh=False)
         quote_usd_balance = max(
             self._to_float(
                 balance_valuation.get("usd_cash_balance", balance_valuation.get("cash_usd", 0.0)),
@@ -3077,6 +5875,77 @@ class RobustLiveExecutor:
 
         direction = decision_direction
         side = "buy" if direction == "long" else "sell"
+
+        capital_preservation = self._capital_preservation_snapshot(now, quality=edge_proof)
+        if (
+            side == "buy"
+            and bool(capital_preservation.get("enabled", False))
+            and (not bool(capital_preservation.get("allow_buy", True)))
+        ):
+            _write_live_heartbeat(
+                {
+                    "status": "blocked",
+                    "reason": "capital_preservation_hold",
+                    "symbol": symbol,
+                    "side": side,
+                    "capital_preservation_enabled": bool(capital_preservation.get("enabled", False)),
+                    "capital_preservation_breach_codes": list(capital_preservation.get("breach_codes", [])),
+                    "capital_preservation_recent_closed_count": int(
+                        self._to_float(capital_preservation.get("recent_closed_count", 0), 0.0)
+                    ),
+                    "capital_preservation_required_recent_closed": int(
+                        self._to_float(capital_preservation.get("required_recent_closed", 0), 0.0)
+                    ),
+                    "capital_preservation_win_rate_pct": round(
+                        self._to_float(capital_preservation.get("win_rate_pct", 0.0), 0.0),
+                        6,
+                    ),
+                    "capital_preservation_avg_pnl_pct": round(
+                        self._to_float(capital_preservation.get("avg_pnl_pct", 0.0), 0.0),
+                        6,
+                    ),
+                    "capital_preservation_consecutive_losses": int(
+                        self._to_float(capital_preservation.get("consecutive_losses", 0), 0.0)
+                    ),
+                    "capital_preservation_pause_until_utc": capital_preservation.get("pause_until_utc"),
+                    "capital_preservation_pause_active": bool(capital_preservation.get("pause_active", False)),
+                }
+            )
+            self._save_pacing_state()
+            print("  blocked: capital preservation hold")
+            return
+        capital_reference_usd = max(
+            self._to_float(
+                self.runtime_cfg.get("initial_capital", getattr(self.portfolio, "initial_capital", 0.0)),
+                self._to_float(getattr(self.portfolio, "initial_capital", 0.0), 0.0),
+            ),
+            0.0,
+        )
+        live_drawdown_pct = 0.0
+        if capital_reference_usd > 0.0:
+            live_drawdown_pct = max(
+                ((float(capital_reference_usd) - float(portfolio_equity_usd)) / float(capital_reference_usd)) * 100.0,
+                0.0,
+            )
+
+        if side == "buy" and live_drawdown_pct >= float(self.max_drawdown_pct_limit):
+            _write_live_heartbeat(
+                {
+                    "status": "blocked",
+                    "reason": "live_drawdown_limit_hit",
+                    "symbol": symbol,
+                    "side": side,
+                    "live_drawdown_pct": round(float(live_drawdown_pct), 6),
+                    "max_drawdown_pct": round(float(self.max_drawdown_pct_limit), 6),
+                    "capital_reference_usd": round(float(capital_reference_usd), 6),
+                    "portfolio_equity_usd": round(float(portfolio_equity_usd), 6),
+                    "quote_usd_balance": round(float(quote_usd_balance), 6),
+                    "holdings_value_usd": round(float(holdings_value_usd), 6),
+                }
+            )
+            print("  blocked: live drawdown limit")
+            return
+
         sell_available_qty = 0.0
         sell_cap_qty = 0.0
         sell_entry_target_qty = 0.0
@@ -3199,6 +6068,7 @@ class RobustLiveExecutor:
                     "collateral_convert": convert_result,
                 }
             )
+            self._mark_symbol_skip(str(symbol), now, "no_confirmed_funds")
             print("  blocked: no confirmed funds")
             return
 
@@ -3427,7 +6297,7 @@ class RobustLiveExecutor:
             print("  blocked: sizing qty=0")
             return
 
-        cfg = self.router.get_symbol_config(symbol)
+        cfg = self.router.get_symbol_config(symbol, quote_order=runtime_quote_order)
         min_order = self._effective_min_order(symbol, float(cfg["min_order"]))
         if qty < min_order:
             min_notional = min_order * float(last)
@@ -3491,6 +6361,7 @@ class RobustLiveExecutor:
                             "collateral_convert": convert_result,
                         }
                     )
+                    self._mark_symbol_skip(str(symbol), now, str(block_reason))
                     print(f"  blocked: {block_reason}")
                     return
             else:
@@ -3540,6 +6411,7 @@ class RobustLiveExecutor:
             current_weight_pct = (float(current_symbol_value_usd) / float(projected_total_equity_usd)) * 100.0
 
             if allowed_additional_usd <= 0.0:
+                self._mark_symbol_skip(str(symbol), now, "symbol_concentration_limit")
                 _write_live_heartbeat(
                     {
                         "status": "blocked",
@@ -3575,6 +6447,7 @@ class RobustLiveExecutor:
                             "min_order": round(float(min_order), 10),
                         }
                     )
+                    self._mark_symbol_skip(str(symbol), now, "symbol_concentration_min_order_conflict")
                     print("  blocked: concentration cap below min_order")
                     return
 
@@ -3607,11 +6480,31 @@ class RobustLiveExecutor:
         limit_price = None
         if order_template.get("order_type") == "limit":
             limit_price = float(order_template.get("limit_price") or last)
-        result = self.router.place_order(symbol, side, qty, limit_price)
+        result = self.router.place_order(symbol, side, qty, limit_price, close_template=close_template)
         if "error" in result:
-            window_attempts, window_failures, window_fail_rate, window_throttle = self._record_order_attempt(now, success=False)
             err_text = str(result.get("error"))
             err_text_l = err_text.lower()
+            if "live_orders_disabled" in err_text_l:
+                _write_live_heartbeat(
+                    {
+                        "status": "dry_run",
+                        "reason": "live_orders_disabled",
+                        "symbol": symbol,
+                        "side": side,
+                        "urgency": urgency,
+                        "spread_bps": round(spread_bps, 6),
+                        "size_usd": round(notional_usd, 6),
+                        "risk_usd": round(risk_usd, 6),
+                        "gate_score": round(float(gate_decision.composite_score), 6),
+                        "order_template": order_template,
+                        "close_template": close_template,
+                        "close_template_armed": bool(close_template),
+                    }
+                )
+                print("  dry-run: live orders disabled")
+                return
+
+            window_attempts, window_failures, window_fail_rate, window_throttle = self._record_order_attempt(now, success=False)
             insufficient_funds = "Insufficient funds" in err_text
             volume_min_error = "volume minimum not met" in err_text_l
             available_asset_qty = None
@@ -3622,6 +6515,9 @@ class RobustLiveExecutor:
             if volume_min_error or insufficient_funds:
                 self.order_fail_streak += 1
                 self.notional_throttle = max(self.notional_throttle * self.failure_notional_decay, self.failure_notional_floor)
+                if side == "buy":
+                    skip_reason = "order_insufficient_funds" if insufficient_funds else "order_volume_minimum"
+                    self._mark_symbol_skip(str(symbol), now, skip_reason)
 
             raised_min_prev = None
             raised_min_new = None
@@ -3734,6 +6630,10 @@ class RobustLiveExecutor:
 
         txid = result.get("txid", ["unknown"])
         txid = txid[0] if isinstance(txid, list) else str(txid)
+        placed_pair = str(result.get("_router_pair") or cfg.get("pair") or "")
+        placed_quote = str(result.get("_router_quote") or cfg.get("quote") or "USD").upper().strip()
+        if not placed_quote:
+            placed_quote = "USD"
 
         if side == "buy":
             self.last_entry_symbol = str(symbol or "").upper().strip()
@@ -3748,10 +6648,11 @@ class RobustLiveExecutor:
             symbol_history.append(now)
             self.symbol_entry_timestamps_utc[symbol_key] = symbol_history
             self.entry_symbol_history.append((now, symbol_key))
+            self._save_pacing_state()
 
         self.portfolio.add_position(
             Position(
-                symbol=f"{symbol}/USD",
+                symbol=f"{symbol}/{placed_quote}",
                 side=direction,
                 entry_price=last,
                 current_price=last,
@@ -3770,7 +6671,8 @@ class RobustLiveExecutor:
                 "timestamp": now.isoformat(),
                 "txid": txid,
                 "symbol": symbol,
-                "pair": cfg["pair"],
+                "pair": placed_pair,
+                "quote_lane": placed_quote,
                 "direction": direction,
                 "side": side,
                 "status": "PLACED",
@@ -3789,7 +6691,7 @@ class RobustLiveExecutor:
             "live_order_placed",
             {
                 "symbol": symbol,
-                "pair": cfg["pair"],
+                "pair": placed_pair,
                 "side": side,
                 "direction": direction,
                 "urgency": urgency,
@@ -3804,7 +6706,8 @@ class RobustLiveExecutor:
                 "timestamp": now.isoformat(),
                 "txid": txid,
                 "symbol": symbol,
-                "pair": cfg["pair"],
+                "pair": placed_pair,
+                "quote_lane": placed_quote,
                 "direction": direction,
                 "side": side,
                 "entry_price": last,
@@ -3818,6 +6721,15 @@ class RobustLiveExecutor:
                 "min_order_promoted": bool(min_order_promoted),
                 "gate_override_applied": bool(gate_override_applied),
                 "gate_reason_codes": list(gate_decision.reason_codes or []),
+                "edge_proof": {
+                    "enabled": bool(edge_proof.get("enabled", False)),
+                    "armed": bool(edge_proof.get("armed", True)),
+                    "reason_codes": list(edge_proof.get("reason_codes", [])),
+                    "recent_closed_count": int(self._to_float(edge_proof.get("recent_closed_count", 0), 0.0)),
+                    "target_closed_count": int(self._to_float(edge_proof.get("target_closed_count", 0), 0.0)),
+                    "win_rate_pct": round(self._to_float(edge_proof.get("win_rate_pct", 0.0), 0.0), 6),
+                    "avg_pnl_pct": round(self._to_float(edge_proof.get("avg_pnl_pct", 0.0), 0.0), 6),
+                },
                 "balance_degraded_mode": bool(balance_degraded_mode),
                 "notional_throttle": round(float(self.notional_throttle), 6),
                 "fail_streak": int(self.order_fail_streak),
@@ -3833,6 +6745,8 @@ class RobustLiveExecutor:
                 "shadow_fill": {"est_fill": round(shadow_fill_px, 6), "slip_bps": round(shadow_slip_bps, 6)},
                 "order_template": order_template,
                 "close_template": close_template,
+                "close_template_armed": bool(close_template),
+                "hard_safety_bypass_applied": bool(hard_safety_bypass_applied),
                 "ledger_hash": ledger_hash,
                 "audit_hash": audit_row.get("event_hash"),
                 "status": "PLACED",
@@ -3846,7 +6760,8 @@ class RobustLiveExecutor:
             {
                 "status": "ok",
                 "symbol": symbol,
-                "pair": cfg["pair"],
+                "pair": placed_pair,
+                "quote_lane": placed_quote,
                 "side": side,
                 "txid": txid,
                 "urgency": urgency,
@@ -3856,6 +6771,16 @@ class RobustLiveExecutor:
                 "min_order_promoted": bool(min_order_promoted),
                 "gate_override_applied": bool(gate_override_applied),
                 "gate_reason_codes": list(gate_decision.reason_codes or []),
+                "edge_proof_enabled": bool(edge_proof.get("enabled", False)),
+                "edge_proof_armed": bool(edge_proof.get("armed", True)),
+                "edge_proof_reason_codes": list(edge_proof.get("reason_codes", [])),
+                "edge_proof_bootstrap_applied": bool(edge_proof.get("bootstrap_applied", False)),
+                "edge_proof_bootstrap_reason_codes": list(edge_proof.get("bootstrap_reason_codes", [])),
+                "edge_proof_bootstrap_applied": bool(edge_proof.get("bootstrap_applied", False)),
+                "edge_proof_bootstrap_reason_codes": list(edge_proof.get("bootstrap_reason_codes", [])),
+                "edge_proof_recent_closed_count": int(self._to_float(edge_proof.get("recent_closed_count", 0), 0.0)),
+                "edge_proof_win_rate_pct": round(self._to_float(edge_proof.get("win_rate_pct", 0.0), 0.0), 6),
+                "edge_proof_avg_pnl_pct": round(self._to_float(edge_proof.get("avg_pnl_pct", 0.0), 0.0), 6),
                 "balance_degraded_mode": bool(balance_degraded_mode),
                 "notional_throttle": round(float(self.notional_throttle), 6),
                 "fail_streak": int(self.order_fail_streak),
@@ -3871,8 +6796,24 @@ class RobustLiveExecutor:
                 "portfolio_heat": round(portfolio_heat, 6),
                 "open_positions": open_positions,
                 "max_open_positions": self.max_open_positions,
+                "risk_open_positions_local": int(self._to_float(risk_snapshot.get("local_open_positions", 0), 0.0)),
+                "risk_open_positions_live": int(self._to_float(risk_snapshot.get("live_open_positions", 0), 0.0)),
+                "risk_exposure_effective_usd": round(float(risk_snapshot.get("effective_exposure_usd", 0.0)), 6),
+                "live_drawdown_pct": round(float(live_drawdown_pct), 6),
+                "max_drawdown_pct": round(float(self.max_drawdown_pct_limit), 6),
+                "close_template_armed": bool(close_template),
+                "hard_safety_bypass_applied": bool(hard_safety_bypass_applied),
             }
         )
+
+        if bool(edge_proof.get("bootstrap_applied", False)):
+            self.edge_proof_bootstrap_entry_utc = [
+                ts
+                for ts in self.edge_proof_bootstrap_entry_utc
+                if isinstance(ts, datetime) and (now - ts).total_seconds() <= 3600.0
+            ]
+            self.edge_proof_bootstrap_entry_utc.append(now)
+            self._save_pacing_state()
 
         self._recover_gate_threshold_after_fill(now)
 
@@ -3885,6 +6826,13 @@ class RobustLiveExecutor:
                 self._refresh_runtime_config()
                 runtime_symbol_raw = str(self.runtime_cfg.get("symbol", "") or "").strip()
                 runtime_symbol_upper = runtime_symbol_raw.upper()
+                force_universe_mode = bool(self.runtime_cfg.get("force_universe_mode", False))
+                runtime_symbol_requested = runtime_symbol_upper
+                runtime_symbol_overridden = False
+                if force_universe_mode and runtime_symbol_upper not in {"", "UNIVERSE", "ADAPTIVE_UNIVERSE", "AUTO"}:
+                    runtime_symbol_upper = "UNIVERSE"
+                    runtime_symbol_overridden = True
+
                 universe_mode = runtime_symbol_upper in {"", "UNIVERSE", "ADAPTIVE_UNIVERSE", "AUTO"}
                 preferred = ""
                 preferred_source = "none"
@@ -3905,6 +6853,7 @@ class RobustLiveExecutor:
                     "symbol_intel_candidate_count": 0,
                     "symbol_intel_selected_count": 0,
                     "symbol_intel_executable_count": 0,
+                    "symbol_intel_short_candidate_count": 0,
                     "symbol_intel_rejected_unpriced": 0,
                     "symbol_intel_rejected_affordable": 0,
                     "symbol_intel_rejected_cap": 0,
@@ -3916,13 +6865,12 @@ class RobustLiveExecutor:
                         preferred = str(intel_symbols[0]).upper().strip()
                         preferred_source = "symbol_flip_intel"
 
-                scan_cap = int(
-                    self._clamp(
-                        self._to_float(self.runtime_cfg.get("scan_top_n", 1200), 1200.0),
-                        4.0,
-                        5000.0,
-                    )
-                )
+                scan_top_n_raw = self._to_float(self.runtime_cfg.get("scan_top_n", 1200), 1200.0)
+                if scan_top_n_raw <= 0.0:
+                    # Explicit runtime convention: scan_top_n <= 0 means "scan entire tradable universe".
+                    scan_cap = 0
+                else:
+                    scan_cap = int(self._clamp(scan_top_n_raw, 4.0, 50000.0))
                 valuation_hint = self._build_balance_valuation(force_refresh=False)
                 quote_usd_hint = max(
                     self._to_float(
@@ -3942,14 +6890,21 @@ class RobustLiveExecutor:
                     ),
                     0.0,
                 )
+                loop_now = datetime.now(timezone.utc)
+                self._prune_symbol_skip_map(loop_now)
+                symbol_skip_active_count = int(len(self._symbol_skip_until_utc))
                 _write_live_heartbeat(
                     {
                         "status": "running",
                         "reason": "scan_cycle_start",
                         "universe_mode": bool(universe_mode),
+                        "runtime_symbol_requested": runtime_symbol_requested,
+                        "runtime_symbol_overridden": bool(runtime_symbol_overridden),
+                        "force_universe_mode": bool(force_universe_mode),
                         "preferred_symbol": preferred,
                         "preferred_source": preferred_source,
                         "universe_scan_cap": int(scan_cap),
+                        "universe_scan_uncapped": bool(scan_cap <= 0),
                         "gate_min_composite_score": round(float(getattr(self.signal_gate, "min_composite_score", 0.60)), 6),
                         "adaptive_gate_enabled": bool(self.adaptive_gate_enabled),
                         "adaptive_gate_relax_offset": round(float(self.gate_relax_offset), 6),
@@ -3958,6 +6913,7 @@ class RobustLiveExecutor:
                         "symbol_intel_stale": bool(intel_meta.get("symbol_intel_stale", False)),
                         "symbol_intel_age_sec": intel_meta.get("symbol_intel_age_sec"),
                         "symbol_intel_selected_count": int(self._to_float(intel_meta.get("symbol_intel_selected_count", 0), 0.0)),
+                        "symbol_intel_short_candidate_count": int(self._to_float(intel_meta.get("symbol_intel_short_candidate_count", 0), 0.0)),
                         "quote_usd_hint": round(float(quote_usd_hint), 6),
                         "total_cash_usd_hint": round(float(total_cash_usd_hint), 6),
                         "stable_cash_equivalent_usd_hint": round(float(stable_cash_equivalent_hint), 6),
@@ -3966,11 +6922,22 @@ class RobustLiveExecutor:
                         "total_equity_usd_hint": round(float(self._to_float(valuation_hint.get("total_equity_usd", 0.0), 0.0)), 6),
                         "largest_holding_symbol": str(valuation_hint.get("largest_symbol", "") or ""),
                         "largest_holding_weight_pct": round(float(self._to_float(valuation_hint.get("largest_weight_pct", 0.0), 0.0)), 6),
+                        "symbol_skip_active_count": int(symbol_skip_active_count),
                     }
                 )
 
+                runtime_whitelist: set[str] = set()
+                for field_name in ("symbol_whitelist", "symbol_allowlist"):
+                    raw_values = self.runtime_cfg.get(field_name, [])
+                    if isinstance(raw_values, str):
+                        raw_values = [s.strip() for s in raw_values.split(",") if str(s).strip()]
+                    if isinstance(raw_values, list):
+                        runtime_whitelist.update(
+                            str(s).upper().strip() for s in raw_values if str(s).strip()
+                        )
+
                 runtime_extra_symbols: list[str] = []
-                for field_name in ("symbol_universe_extra", "symbol_whitelist", "symbols"):
+                for field_name in ("symbol_universe_extra", "symbols"):
                     raw_values = self.runtime_cfg.get(field_name, [])
                     if isinstance(raw_values, str):
                         raw_values = [s.strip() for s in raw_values.split(",") if str(s).strip()]
@@ -3983,6 +6950,10 @@ class RobustLiveExecutor:
                     max_symbols=scan_cap,
                     extra_symbols=runtime_extra_symbols,
                 )
+                runtime_whitelist_size = int(len(runtime_whitelist))
+                whitelist_enforced_count = int(len(candidates))
+                hybrid_whitelist_relaxed_added = 0
+                hybrid_whitelist_relax_target = 0
 
                 # Respect runtime blacklists for live symbol selection.
                 blacklisted = {
@@ -3997,10 +6968,55 @@ class RobustLiveExecutor:
                 }
                 blocked = blacklisted.union(hard_blacklisted)
                 candidates = [s for s in candidates if s not in blocked]
+                if preferred and str(preferred).upper().strip() in blocked:
+                    preferred = ""
+                    preferred_source = "runtime_blocked"
                 if not candidates:
                     candidates = [s for s in SYMBOL_REGISTRY.keys() if s.upper() not in blocked]
 
-                loop_now = datetime.now(timezone.utc)
+                # When an explicit runtime whitelist is provided, enforce it first.
+                if runtime_whitelist:
+                    all_candidates_pre_whitelist = list(candidates)
+                    candidates = [s for s in candidates if str(s).upper().strip() in runtime_whitelist]
+                    if not candidates:
+                        candidates = [
+                            s
+                            for s in sorted(runtime_whitelist)
+                            if s not in blocked and self.router.get_symbol_config(s) is not None
+                        ]
+                    whitelist_enforced_count = int(len(candidates))
+
+                    # Hybrid swing mode can widen beyond strict whitelist when breadth is too low.
+                    if universe_mode and self.hybrid_swing_whitelist_relax_enabled:
+                        hybrid_whitelist_relax_target = int(
+                            min(
+                                max(int(self.hybrid_swing_min_candidates), int(whitelist_enforced_count)),
+                                int(self.hybrid_swing_relax_cap),
+                            )
+                        )
+                        if len(candidates) < hybrid_whitelist_relax_target:
+                            expansion_pool = [
+                                s
+                                for s in all_candidates_pre_whitelist
+                                if str(s).upper().strip() not in runtime_whitelist
+                            ]
+                            if expansion_pool:
+                                random.shuffle(expansion_pool)
+                                needed = max(hybrid_whitelist_relax_target - len(candidates), 0)
+                                if needed > 0:
+                                    before_len = len(candidates)
+                                    candidates = list(dict.fromkeys(list(candidates) + expansion_pool[:needed]))
+                                    hybrid_whitelist_relaxed_added = max(len(candidates) - before_len, 0)
+
+                if candidates and symbol_skip_active_count > 0:
+                    non_skipped_candidates = [
+                        s for s in candidates if not self._symbol_skip_active(str(s), loop_now)
+                    ]
+                    if non_skipped_candidates:
+                        candidates = non_skipped_candidates
+
+                symbol_skip_active_count = int(len(self._symbol_skip_until_utc))
+
                 reserve_usd_configured = max(self._to_float(self.runtime_cfg.get("reserve_usd", 0.0), 0.0), 0.0)
                 max_notional_usd_cap = max(
                     self._to_float(self.runtime_cfg.get("max_notional_per_trade_usd", 0.0), 0.0),
@@ -4083,7 +7099,28 @@ class RobustLiveExecutor:
 
                 symbol = preferred
                 preferred_cfg = self.router.get_symbol_config(symbol) if symbol else None
-                preferred_ticker = self.router.get_ticker(symbol) if (symbol and preferred_cfg and symbol not in blocked) else None
+                preferred_skipped = bool(self._symbol_skip_active(symbol, loop_now)) if symbol else False
+                preferred_spread_bps = float("inf")
+                preferred_spread_limit_bps = float(self.preferred_symbol_max_spread_bps)
+                if float(self.universe_hard_reject_spread_bps) > 0.0:
+                    preferred_spread_limit_bps = min(
+                        float(preferred_spread_limit_bps),
+                        float(self.universe_hard_reject_spread_bps),
+                    )
+                preferred_rejected_reason = "preferred_symbol_skip_active" if preferred_skipped else ""
+                preferred_ticker = self.router.get_ticker(symbol) if (symbol and preferred_cfg and symbol not in blocked and (not preferred_skipped)) else None
+                if preferred_ticker:
+                    preferred_spread_bps = self._spread_bps_from_ticker(preferred_ticker)
+                    if (not math.isfinite(preferred_spread_bps)) or preferred_spread_bps > float(preferred_spread_limit_bps):
+                        preferred_rejected_reason = "preferred_spread_too_wide"
+                        self._mark_symbol_skip(
+                            symbol,
+                            loop_now,
+                            preferred_rejected_reason,
+                            cooldown_sec=max(float(self.spread_too_wide_skip_cooldown_sec), float(self.symbol_skip_cooldown_sec)),
+                        )
+                        preferred_skipped = True
+                        preferred_ticker = None
                 preferred_min_order_notional = 0.0
                 preferred_affordable = True
                 if preferred_cfg and preferred_ticker:
@@ -4108,23 +7145,35 @@ class RobustLiveExecutor:
                 selection_meta: dict[str, Any] = {
                     "preferred_symbol": preferred,
                     "preferred_source": preferred_source,
+                    "preferred_symbol_skipped": bool(preferred_skipped),
+                    "preferred_spread_bps": round(float(preferred_spread_bps), 6) if math.isfinite(preferred_spread_bps) else None,
+                    "preferred_spread_limit_bps": round(float(preferred_spread_limit_bps), 6),
+                    "preferred_rejected_reason": preferred_rejected_reason,
                     "universe_mode": bool(universe_mode),
                     "preferred_min_order_notional": round(float(preferred_min_order_notional), 6),
                     "blocked_count": len(blocked),
                     "universe_scan_cap": int(scan_cap),
                     "universe_extra_count": int(len(runtime_extra_symbols)),
+                    "symbol_skip_active_count": int(symbol_skip_active_count),
                     "symbol_intel_source": str(intel_meta.get("symbol_intel_source", "none") or "none"),
                     "symbol_intel_stale": bool(intel_meta.get("symbol_intel_stale", False)),
                     "symbol_intel_age_sec": intel_meta.get("symbol_intel_age_sec"),
                     "symbol_intel_candidate_count": int(self._to_float(intel_meta.get("symbol_intel_candidate_count", 0), 0.0)),
                     "symbol_intel_selected_count": int(self._to_float(intel_meta.get("symbol_intel_selected_count", 0), 0.0)),
                     "symbol_intel_executable_count": int(self._to_float(intel_meta.get("symbol_intel_executable_count", 0), 0.0)),
+                    "symbol_intel_short_candidate_count": int(self._to_float(intel_meta.get("symbol_intel_short_candidate_count", 0), 0.0)),
                     "symbol_intel_rejected_unpriced": int(self._to_float(intel_meta.get("symbol_intel_rejected_unpriced", 0), 0.0)),
                     "symbol_intel_rejected_affordable": int(self._to_float(intel_meta.get("symbol_intel_rejected_affordable", 0), 0.0)),
                     "symbol_intel_rejected_cap": int(self._to_float(intel_meta.get("symbol_intel_rejected_cap", 0), 0.0)),
                     "reserve_usd_configured": round(float(reserve_usd_configured), 6),
                     "reserve_usd_effective": round(float(reserve_usd_hint), 6),
                     "universe_candidate_count": int(len(candidates)),
+                    "runtime_whitelist_size": int(runtime_whitelist_size),
+                    "runtime_whitelist_enforced_count": int(whitelist_enforced_count),
+                    "hybrid_whitelist_relax_enabled": bool(self.hybrid_swing_whitelist_relax_enabled),
+                    "hybrid_whitelist_relax_target": int(hybrid_whitelist_relax_target),
+                    "hybrid_whitelist_relaxed_added": int(hybrid_whitelist_relaxed_added),
+                    "hybrid_swing_selector_enabled": bool(self.hybrid_swing_selector_enabled),
                     "universe_sample_size": 0,
                     "universe_ticker_hits": 0,
                     "universe_affordability_rejects": 0,
@@ -4171,12 +7220,14 @@ class RobustLiveExecutor:
                     selection_meta["blocked_count"] = int(len(blocked))
                     selection_meta["universe_scan_cap"] = int(scan_cap)
                     selection_meta["universe_extra_count"] = int(len(runtime_extra_symbols))
+                    selection_meta["symbol_skip_active_count"] = int(symbol_skip_active_count)
                     selection_meta["symbol_intel_source"] = str(intel_meta.get("symbol_intel_source", "none") or "none")
                     selection_meta["symbol_intel_stale"] = bool(intel_meta.get("symbol_intel_stale", False))
                     selection_meta["symbol_intel_age_sec"] = intel_meta.get("symbol_intel_age_sec")
                     selection_meta["symbol_intel_candidate_count"] = int(self._to_float(intel_meta.get("symbol_intel_candidate_count", 0), 0.0))
                     selection_meta["symbol_intel_selected_count"] = int(self._to_float(intel_meta.get("symbol_intel_selected_count", 0), 0.0))
                     selection_meta["symbol_intel_executable_count"] = int(self._to_float(intel_meta.get("symbol_intel_executable_count", 0), 0.0))
+                    selection_meta["symbol_intel_short_candidate_count"] = int(self._to_float(intel_meta.get("symbol_intel_short_candidate_count", 0), 0.0))
                     selection_meta["symbol_intel_rejected_unpriced"] = int(self._to_float(intel_meta.get("symbol_intel_rejected_unpriced", 0), 0.0))
                     selection_meta["symbol_intel_rejected_affordable"] = int(self._to_float(intel_meta.get("symbol_intel_rejected_affordable", 0), 0.0))
                     selection_meta["symbol_intel_rejected_cap"] = int(self._to_float(intel_meta.get("symbol_intel_rejected_cap", 0), 0.0))
@@ -4201,10 +7252,19 @@ class RobustLiveExecutor:
                     selection_meta["max_notional_usd_cap"] = round(float(max_notional_usd_cap), 6)
                     selection_meta["allow_cached_balance_trading"] = bool(allow_cached_balance_trading)
                     selection_meta["cached_balance_trading_cap_usd"] = round(float(cached_balance_trading_cap_usd), 6)
+                    selection_meta["runtime_whitelist_size"] = int(runtime_whitelist_size)
+                    selection_meta["runtime_whitelist_enforced_count"] = int(whitelist_enforced_count)
+                    selection_meta["hybrid_whitelist_relax_enabled"] = bool(self.hybrid_swing_whitelist_relax_enabled)
+                    selection_meta["hybrid_whitelist_relax_target"] = int(hybrid_whitelist_relax_target)
+                    selection_meta["hybrid_whitelist_relaxed_added"] = int(hybrid_whitelist_relaxed_added)
+                    selection_meta["hybrid_swing_selector_enabled"] = bool(self.hybrid_swing_selector_enabled)
+                    selection_meta["universe_scan_cap"] = int(scan_cap)
+                    selection_meta["universe_scan_uncapped"] = bool(scan_cap <= 0)
                     selection_meta["preferred_min_order_notional"] = round(float(preferred_min_order_notional), 6)
                     selection_meta["preferred_source"] = preferred_source
                     selection_meta["universe_mode"] = bool(universe_mode)
                     if not symbol:
+                        self._write_live_operator_approval_queue(loop_now, "", selection_meta)
                         blocked_payload = dict(selection_meta)
                         blocked_payload.update(
                             {
@@ -4217,6 +7277,9 @@ class RobustLiveExecutor:
                         continue
                 else:
                     preloaded_ticker = preferred_ticker
+
+                selection_meta["universe_scan_cap"] = int(scan_cap)
+                selection_meta["universe_scan_uncapped"] = bool(scan_cap <= 0)
 
                 selected_symbol = str(symbol).upper().strip()
                 if (
@@ -4268,7 +7331,9 @@ class RobustLiveExecutor:
                                             selection_meta[field] = rotated_meta[field]
 
                 selection_meta["selected_symbol"] = str(symbol).upper()
+                self.last_selected_symbol = str(symbol).upper().strip()
                 self.last_symbol_selection_meta = dict(selection_meta)
+                self._write_live_operator_approval_queue(loop_now, str(symbol), selection_meta)
 
                 selected_min_notional = self._to_float(selection_meta.get("selected_min_order_notional", 0.0), 0.0)
                 selected_cfg = self.router.get_symbol_config(symbol) or {}
@@ -4293,10 +7358,25 @@ class RobustLiveExecutor:
                         6,
                     )
 
-                unaffordable_by_balance = affordable_usd_hint > 0.0 and selected_min_notional > affordable_usd_hint
+                hard_zero_buying_power = (
+                    affordable_usd_hint <= 0.0
+                    and quote_usd_hint <= 0.0
+                    and total_cash_usd_hint <= 0.0
+                    and holdings_value_hint <= 0.0
+                )
+                unaffordable_by_balance = (
+                    (affordable_usd_hint > 0.0 and selected_min_notional > affordable_usd_hint)
+                    or (hard_zero_buying_power and selected_min_notional > 0.0)
+                )
                 unaffordable_by_cap = max_notional_usd_cap > 0.0 and selected_min_notional > max_notional_usd_cap
                 if selected_min_notional > 0.0 and (unaffordable_by_balance or unaffordable_by_cap):
                     self.no_affordable_streak += 1
+                    self._mark_symbol_skip(
+                        str(symbol),
+                        loop_now,
+                        "no_affordable_symbol",
+                        cooldown_sec=max(float(self.symbol_skip_cooldown_sec), float(self.loop_seconds)),
+                    )
                     recycle_result: Optional[dict[str, Any]] = None
                     collateral_convert_result: Optional[dict[str, Any]] = None
                     if (
@@ -4323,6 +7403,9 @@ class RobustLiveExecutor:
                             "affordable_usd_hint": round(float(affordable_usd_hint), 6),
                             "max_notional_usd_cap": round(float(max_notional_usd_cap), 6),
                             "no_affordable_streak": int(self.no_affordable_streak),
+                            "hard_zero_buying_power": bool(hard_zero_buying_power),
+                            "symbol_skip_cooldown_sec": round(float(self.symbol_skip_cooldown_sec), 6),
+                            "symbol_skip_active_count": int(len(self._symbol_skip_until_utc)),
                         }
                     )
                     if isinstance(recycle_result, dict):
@@ -4361,6 +7444,21 @@ class RobustLiveExecutor:
 
 
 if __name__ == "__main__":
+    duplicate_child, root_pid = _is_duplicate_child_executor()
+    if duplicate_child:
+        _write_live_heartbeat(
+            {
+                "status": "blocked",
+                "reason": "duplicate_child_executor",
+                "root_pid": int(root_pid),
+                "pid": int(os.getpid()),
+            }
+        )
+        print(f"duplicate child live_executor detected (root_pid={root_pid}, pid={os.getpid()})")
+        raise SystemExit(0)
+
+    os.environ["LUMA_LIVE_EXECUTOR_ROOT_PID"] = str(os.getpid())
+
     if not _acquire_executor_lock():
         raise SystemExit(0)
     atexit.register(_release_executor_lock)

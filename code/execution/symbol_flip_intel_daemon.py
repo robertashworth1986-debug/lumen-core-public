@@ -10,6 +10,7 @@ from typing import Any
 from analyze_symbol_flip_windows import (
     OUTPUT_INTEL_JSON,
     OUTPUT_JSON,
+    OUTPUT_LEARNING_JSON,
     OUTPUT_MD,
     _build_markdown,
     analyze,
@@ -34,6 +35,10 @@ def run_once(
     action_min_long_flip_pct: float,
     action_min_range_pct: float,
     action_top_n: int,
+    scan_all_usd_pairs: bool,
+    max_symbols: int,
+    state_move_threshold_pct: float,
+    assumed_entry_usd: float,
 ) -> dict[str, Any]:
     started_utc = now_utc()
     payload = analyze(
@@ -43,14 +48,20 @@ def run_once(
         action_min_long_flip_pct=max(float(action_min_long_flip_pct), 0.0),
         action_min_range_pct=max(float(action_min_range_pct), 0.0),
         action_top_n=max(int(action_top_n), 1),
+        scan_all_usd_pairs=bool(scan_all_usd_pairs),
+        max_symbols=int(max_symbols),
+        state_move_threshold_pct=max(float(state_move_threshold_pct), 0.0),
+        assumed_entry_usd=max(float(assumed_entry_usd), 0.0),
     )
 
     intel_payload = payload.get("intel", {}) if isinstance(payload.get("intel", {}), dict) else {}
+    learning_payload = payload.get("learning", {}) if isinstance(payload.get("learning", {}), dict) else {}
 
     OUTPUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_JSON.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     OUTPUT_MD.write_text(_build_markdown(payload), encoding="utf-8")
     OUTPUT_INTEL_JSON.write_text(json.dumps(intel_payload, indent=2), encoding="utf-8")
+    OUTPUT_LEARNING_JSON.write_text(json.dumps(learning_payload, indent=2), encoding="utf-8")
 
     focus_symbols = intel_payload.get("focus_symbols", []) if isinstance(intel_payload, dict) else []
     if not isinstance(focus_symbols, list):
@@ -65,6 +76,7 @@ def run_once(
         "output_json": str(OUTPUT_JSON.as_posix()),
         "output_markdown": str(OUTPUT_MD.as_posix()),
         "output_intel_json": str(OUTPUT_INTEL_JSON.as_posix()),
+        "output_learning_json": str(OUTPUT_LEARNING_JSON.as_posix()),
     }
     _write_status(status)
     return status
@@ -75,11 +87,15 @@ def main() -> None:
     parser.add_argument("--refresh-seconds", type=float, default=240.0, help="Seconds between refresh cycles.")
     parser.add_argument("--interval-minutes", type=int, default=5, help="Kraken OHLC interval minutes.")
     parser.add_argument("--ledger-tail", type=int, default=3000, help="Recent live ledger rows to inspect.")
+    parser.add_argument("--scan-all-usd-pairs", action="store_true", help="Include all Kraken USD pairs in the scan universe.")
+    parser.add_argument("--max-symbols", type=int, default=220, help="Maximum symbols to scan after universe assembly (0 = no cap).")
     parser.add_argument("--exclude-stablecoins", action="store_true", default=True, help="Exclude stable symbols from actionable ranks.")
     parser.add_argument("--include-stablecoins", action="store_true", help="Include stable symbols.")
     parser.add_argument("--action-min-long-flip-pct", type=float, default=2.2, help="Actionable long flip threshold.")
     parser.add_argument("--action-min-range-pct", type=float, default=3.2, help="Actionable 72h range threshold.")
     parser.add_argument("--action-top-n", type=int, default=5, help="Candidates per side to keep.")
+    parser.add_argument("--state-move-threshold-pct", type=float, default=0.12, help="Bar move threshold for state classification.")
+    parser.add_argument("--assumed-entry-usd", type=float, default=100.0, help="Assumed entry capital for peak-profit projection.")
     parser.add_argument("--run-once", action="store_true", help="Run one refresh cycle then exit.")
     args = parser.parse_args()
 
@@ -95,6 +111,10 @@ def main() -> None:
             action_min_long_flip_pct=args.action_min_long_flip_pct,
             action_min_range_pct=args.action_min_range_pct,
             action_top_n=args.action_top_n,
+            scan_all_usd_pairs=args.scan_all_usd_pairs,
+            max_symbols=args.max_symbols,
+            state_move_threshold_pct=args.state_move_threshold_pct,
+            assumed_entry_usd=args.assumed_entry_usd,
         )
         print(json.dumps(status, indent=2))
         return
@@ -108,6 +128,10 @@ def main() -> None:
                 action_min_long_flip_pct=args.action_min_long_flip_pct,
                 action_min_range_pct=args.action_min_range_pct,
                 action_top_n=args.action_top_n,
+                scan_all_usd_pairs=args.scan_all_usd_pairs,
+                max_symbols=args.max_symbols,
+                state_move_threshold_pct=args.state_move_threshold_pct,
+                assumed_entry_usd=args.assumed_entry_usd,
             )
             print(json.dumps(status, indent=2))
         except Exception as exc:

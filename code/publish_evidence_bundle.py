@@ -35,11 +35,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DASH = ROOT / "dashboard"
 EVID = DASH / "evidence"
+V2_RUNS = ROOT / "out" / "master_universe_v2"
 LEDGER = ROOT / "out" / "frozen_delta_ledger.jsonl"
 
 
 def latest_run() -> Path:
-    d = ROOT / "out" / "master_universe_v2"
+    d = V2_RUNS
     runs = sorted([p for p in d.iterdir() if p.is_dir()])
     if not runs:
         raise SystemExit("no runs found in out/master_universe_v2/")
@@ -48,6 +49,31 @@ def latest_run() -> Path:
         if (r / "summary.json").exists():
             return r
     return runs[-1]
+
+
+def _sync_root_dashboard_evidence(utc: str) -> None:
+    """Mirror the published evidence bundle to the workspace-root dashboard."""
+    mirror_evid = ROOT.parent / "dashboard" / "evidence"
+    if mirror_evid.resolve(strict=False) == EVID.resolve(strict=False):
+        return
+    if not mirror_evid.parent.exists():
+        print(f"[publish] root dashboard missing at {mirror_evid.parent} (skip mirror)")
+        return
+
+    src_run = EVID / "runs" / utc
+    dst_run = mirror_evid / "runs" / utc
+    dst_run.parent.mkdir(parents=True, exist_ok=True)
+    if dst_run.exists():
+        shutil.rmtree(dst_run)
+    shutil.copytree(src_run, dst_run)
+
+    mirror_evid.mkdir(parents=True, exist_ok=True)
+    for name in ["index.html", "latest.txt", "ledger.jsonl"]:
+        src = EVID / name
+        if src.exists():
+            shutil.copy2(src, mirror_evid / name)
+
+    print(f"[publish] mirrored bundle -> {mirror_evid}")
 
 
 def main() -> int:
@@ -120,8 +146,9 @@ def main() -> int:
                 shutil.copy2(sp, dst / fname)
         print(f"[publish] {label} pack copied -> {dst}")
 
-    # latest pointer
+    # latest pointers
     (EVID / "latest.txt").write_text(utc, encoding="ascii")
+    (V2_RUNS / "latest.txt").write_text(utc, encoding="ascii")
 
     # index.html = the master_evidence dashboard, but rewritten so it
     # looks up runs in ./runs/<utc>/ instead of ../out/master_universe_v2/.
@@ -137,6 +164,8 @@ def main() -> int:
     # ledger
     if LEDGER.exists():
         shutil.copy2(LEDGER, EVID / "ledger.jsonl")
+
+    _sync_root_dashboard_evidence(utc)
 
     print(f"[publish] wrote bundle to {EVID}")
     print(f"[publish] view locally:")

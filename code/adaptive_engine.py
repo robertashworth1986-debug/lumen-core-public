@@ -3,11 +3,13 @@ import json
 import time
 import os
 import sys
+from pathlib import Path
 
-INPUT_PATH = r"C:\LumaTrader\INSTITUTIONAL_STACK_V2\out\institutional_top10.csv"
-OUTPUT_PATH = r"C:\LumaTrader\INSTITUTIONAL_STACK_V2\out\adaptive_champion.json"
+ROOT = Path(os.getenv("LUMA_ROOT", str(Path(__file__).resolve().parents[1]))).resolve()
+INPUT_PATH = Path(os.getenv("LUMA_ADAPTIVE_INPUT", str(ROOT / "out" / "institutional_top10.csv"))).resolve()
+OUTPUT_PATH = Path(os.getenv("LUMA_ADAPTIVE_OUTPUT", str(ROOT / "out" / "adaptive_champion.json"))).resolve()
 
-if not os.path.exists(INPUT_PATH):
+if not INPUT_PATH.exists():
     print("Adaptive engine: input file missing, skipping update.")
     sys.exit(0)
 
@@ -32,10 +34,12 @@ deploy = {
     "flow": best.get("flow", "unknown"),
     "strategy": best.get("strategy", "unknown"),
     "sharpe": float(best["test_sharpe"]),
-    "vs_baseline": float(best.get("test_vs_baseline", 0.0))
+    "vs_baseline": float(best.get("test_vs_baseline", 0.0)),
+    "source_path": str(INPUT_PATH),
 }
 
+OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
     json.dump(deploy, f, indent=2)
 
-print("Updated Adaptive Champion")
+print(f"Updated Adaptive Champion -> {OUTPUT_PATH}")

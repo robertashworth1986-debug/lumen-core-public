@@ -1,4 +1,4 @@
-import os, json, time, math, base64, hashlib, hmac, urllib.request, urllib.parse, urllib.error
+import os, json, time, math, base64, hashlib, hmac, urllib.request, urllib.parse, urllib.error, re
 from datetime import datetime, timezone
 
 ROOT = r"C:\LumaTrader\INSTITUTIONAL_STACK_V2"
@@ -9,6 +9,7 @@ DASH = r"C:\LumaTrader\dashboard"
 ENV_PATH = os.path.join(CONF, "luma_live_keys.env")
 SEED_PATH = os.path.join(OUT, "seed_validation_readout.json")
 AUDIT_PACK_PATH = os.path.join(OUT, "AUDIT_GRADE_DERIVATION_PACK.json")
+KRAKEN_NONCE_STATE_PATH = os.path.join(OUT, "execution", "kraken_probe_nonce_state.json")
 
 def now_utc():
     return datetime.now(timezone.utc).isoformat()
@@ -39,6 +40,40 @@ def load_env_file(path):
         v = v.strip().strip('"').strip("'")
         env[k] = v
     return env
+
+def sanitize_probe_note(note, env_names=None):
+    text = str(note or "")
+    if not text:
+        return text
+    text = re.sub(
+        r"(?i)(key|api_key|token|secret|password|pwd|email)=([^&\s\"]+)",
+        r"\1=[REDACTED]",
+        text,
+    )
+    names = env_names or []
+    for env_name in names:
+        val = os.environ.get(env_name)
+        if val:
+            text = text.replace(str(val), "[REDACTED]")
+    return text
+
+def next_kraken_nonce(min_step=1_000_000):
+    state = load_json(KRAKEN_NONCE_STATE_PATH, {})
+    try:
+        last_nonce = int(state.get("last_nonce", 0) or 0)
+    except Exception:
+        last_nonce = 0
+    now_nonce = int(time.time_ns())
+    nonce_val = max(now_nonce, last_nonce + int(min_step))
+    try:
+        os.makedirs(os.path.dirname(KRAKEN_NONCE_STATE_PATH), exist_ok=True)
+        save_json(KRAKEN_NONCE_STATE_PATH, {
+            "last_nonce": nonce_val,
+            "updated_utc": now_utc(),
+        })
+    except Exception:
+        pass
+    return nonce_val
 
 def http_json(url, headers=None, timeout=20):
     req = urllib.request.Request(url, headers=headers or {})
@@ -249,11 +284,20 @@ def probe_alpha():
     key = os.environ.get("ALPHAVANTAGE_API_KEY")
     if not key:
         return {"probe_ok": False, "http_status": None, "rows": 0, "note": "missing env"}
+    # Intraday can rate-limit; fall back to Global Quote so key-backed lanes
+    # still measure when Alpha throttles high-frequency endpoints.
     u = f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&outputsize=compact&apikey={urllib.parse.quote(key)}"
     code, obj, txt = http_json(u)
     ts = obj.get("Time Series (5min)", {}) if isinstance(obj, dict) else {}
     rows = len(ts) if isinstance(ts, dict) else 0
-    return {"probe_ok": code == 200 and rows > 0, "http_status": code, "rows": rows, "note": "intraday_probe"}
+    if code == 200 and rows > 0:
+        return {"probe_ok": True, "http_status": code, "rows": rows, "note": "intraday_probe"}
+
+    u2 = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=IBM&apikey={urllib.parse.quote(key)}"
+    code2, obj2, txt2 = http_json(u2)
+    gq = obj2.get("Global Quote", {}) if isinstance(obj2, dict) else {}
+    rows2 = 1 if isinstance(gq, dict) and bool(gq.get("05. price") or gq.get("01. symbol")) else 0
+    return {"probe_ok": code2 == 200 and rows2 > 0, "http_status": code2, "rows": rows2, "note": "global_quote_probe"}
 
 def probe_twelve():
     key = os.environ.get("TWELVE_DATA_API_KEY")
@@ -269,8 +313,11 @@ def probe_massive():
     key = os.environ.get("MASSIVE_API_KEY")
     if not key:
         return {"probe_ok": False, "http_status": None, "rows": 0, "note": "missing env"}
-    # API surface may vary; keep honest and conservative
-    return {"probe_ok": False, "http_status": None, "rows": 0, "note": "key_present_but_no_generic_probe_configured"}
+    # Massive currently routes through Polygon-compatible API shape.
+    u = f"https://api.polygon.io/v2/aggs/ticker/SPY/prev?adjusted=true&apiKey={urllib.parse.quote(key)}"
+    code, obj, txt = http_json(u)
+    rows = len(obj.get("results", [])) if isinstance(obj, dict) else 0
+    return {"probe_ok": code == 200 and rows > 0, "http_status": code, "rows": rows, "note": "polygon_prev_probe"}
 
 def probe_fred():
     key = os.environ.get("FRED_API_KEY")
@@ -283,31 +330,51 @@ def probe_fred():
     return {"probe_ok": code == 200 and rows > 0, "http_status": code, "rows": rows, "note": "observations_probe"}
 
 def probe_eia():
-    key = os.environ.get("EIA_API_KEY")
+    key = os.environ.get("EIA_API_KEY_PREMIUM") or os.environ.get("EIA_API_KEY")
     if not key:
         return {"probe_ok": False, "http_status": None, "rows": 0, "note": "missing env"}
-    # minimal v2 probe
-    u = f"https://api.eia.gov/v2/electricity/rto/daily-region-data/data/?api_key={urllib.parse.quote(key)}&frequency=daily&data[0]=value&sort[0][column]=period&sort[0][direction]=desc&length=5"
-    code, obj, txt = http_json(u)
-    resp = obj.get("response", {}) if isinstance(obj, dict) else {}
-    data = resp.get("data", []) if isinstance(resp, dict) else []
-    rows = len(data) if isinstance(data, list) else 0
-    return {"probe_ok": code == 200 and rows > 0, "http_status": code, "rows": rows, "note": "eia_probe"}
+    urls = [
+        f"https://api.eia.gov/v2/electricity/rto/daily-region-data/data/?api_key={urllib.parse.quote(key)}&frequency=daily&data[0]=value&sort[0][column]=period&sort[0][direction]=desc&length=5",
+        f"https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key={urllib.parse.quote(key)}&frequency=hourly&data[0]=value&length=5",
+    ]
+    last_code = None
+    last_note = "eia_probe_no_rows"
+    for u in urls:
+        code, obj, txt = http_json(u)
+        last_code = code
+        resp = obj.get("response", {}) if isinstance(obj, dict) else {}
+        data = resp.get("data", []) if isinstance(resp, dict) else []
+        rows = len(data) if isinstance(data, list) else 0
+        if code == 200 and rows > 0:
+            return {"probe_ok": True, "http_status": code, "rows": rows, "note": "eia_probe"}
+        if isinstance(obj, dict) and isinstance(obj.get("error"), dict):
+            err = obj.get("error", {})
+            last_note = f"eia_error:{err.get('code','unknown')}"
+    return {"probe_ok": False, "http_status": last_code, "rows": 0, "note": last_note}
 
 def probe_bls():
     key = os.environ.get("BLS_API_KEY")
     if not key:
         return {"probe_ok": False, "http_status": None, "rows": 0, "note": "missing env"}
-    code, obj, txt = post_form(
+    # BLS is most reliable with JSON payload and explicit registration key.
+    payload = {
+        "seriesid": ["LNS14000000"],
+        "startyear": "2024",
+        "endyear": "2025",
+        "registrationkey": key,
+    }
+    req = urllib.request.Request(
         "https://api.bls.gov/publicAPI/v2/timeseries/data/",
-        {
-            "seriesid": json.dumps(["LNS14000000"]),
-            "startyear": "2024",
-            "endyear": "2025",
-            "registrationkey": key,
-        },
-        headers={"Content-Type": "application/x-www-form-urlencoded"}
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
     )
+    with urllib.request.urlopen(req, timeout=20) as r:
+        txt = r.read().decode("utf-8", errors="ignore")
+        try:
+            obj = json.loads(txt)
+        except Exception:
+            obj = {}
+        code = r.getcode()
     rows = 0
     if isinstance(obj, dict):
         results = obj.get("Results", {})
@@ -385,13 +452,21 @@ def probe_aqs():
     email = os.environ.get("EPA_AQS_EMAIL")
     if not (key and email):
         return {"probe_ok": False, "http_status": None, "rows": 0, "note": "missing env"}
-    u = f"https://aqs.epa.gov/data/api/annualData/byState?email={urllib.parse.quote(email)}&key={urllib.parse.quote(key)}&param=88101&bdate=20240101&edate=20241231&state=37"
+    # List endpoint is lower-friction and robust for credential validation.
+    u = f"https://aqs.epa.gov/data/api/list/states?email={urllib.parse.quote(email)}&key={urllib.parse.quote(key)}"
     code, obj, txt = http_json(u)
     rows = 0
     if isinstance(obj, dict):
         data = obj.get("Data", []) or obj.get("data", [])
-        rows = len(data) if isinstance(data, list) else 0
-    return {"probe_ok": code == 200 and rows > 0, "http_status": code, "rows": rows, "note": "aqs_probe"}
+        if isinstance(data, list) and data:
+            rows = len(data)
+        else:
+            header = obj.get("Header", [])
+            if isinstance(header, list) and header:
+                first = header[0] if isinstance(header[0], dict) else {}
+                if str(first.get("status", "")).lower() == "success":
+                    rows = 1
+    return {"probe_ok": code == 200 and rows > 0, "http_status": code, "rows": rows, "note": "aqs_list_probe"}
 
 def probe_kraken():
     key = os.environ.get("KRAKEN_API_KEY")
@@ -399,28 +474,37 @@ def probe_kraken():
     if not (key and sec):
         return {"probe_ok": False, "http_status": None, "rows": 0, "note": "missing env"}
     urlpath = "/0/private/Balance"
-    nonce = str(int(time.time() * 1000))
-    postdata = urllib.parse.urlencode({"nonce": nonce})
-    sha256 = hashlib.sha256((nonce + postdata).encode()).digest()
-    message = urlpath.encode() + sha256
-    signature = base64.b64encode(hmac.new(base64.b64decode(sec), message, hashlib.sha512).digest()).decode()
-    req = urllib.request.Request(
-        "https://api.kraken.com" + urlpath,
-        data=postdata.encode(),
-        headers={
-            "API-Key": key,
-            "API-Sign": signature,
-            "Content-Type": "application/x-www-form-urlencoded",
-        }
-    )
-    with urllib.request.urlopen(req, timeout=20) as r:
-        raw = r.read().decode("utf-8", errors="ignore")
-        obj = json.loads(raw)
-        err = obj.get("error", [])
-        result = obj.get("result", {})
-        rows = len(result) if isinstance(result, dict) else 0
-        ok = (not err) and rows > 0
-        return {"probe_ok": ok, "http_status": r.getcode(), "rows": rows, "note": "private_balance_probe"}
+    last_note = "private_balance_probe_failed"
+    for attempt in range(5):
+        nonce_val = next_kraken_nonce(min_step=1_000_000 + (attempt * 500_000))
+        nonce = str(nonce_val)
+        postdata = urllib.parse.urlencode({"nonce": nonce})
+        sha256 = hashlib.sha256((nonce + postdata).encode()).digest()
+        message = urlpath.encode() + sha256
+        signature = base64.b64encode(hmac.new(base64.b64decode(sec), message, hashlib.sha512).digest()).decode()
+        req = urllib.request.Request(
+            "https://api.kraken.com" + urlpath,
+            data=postdata.encode(),
+            headers={
+                "API-Key": key,
+                "API-Sign": signature,
+                "Content-Type": "application/x-www-form-urlencoded",
+            }
+        )
+        with urllib.request.urlopen(req, timeout=20) as r:
+            raw = r.read().decode("utf-8", errors="ignore")
+            obj = json.loads(raw)
+            err = obj.get("error", [])
+            result = obj.get("result", {})
+            rows = len(result) if isinstance(result, dict) else 0
+            if (not err) and rows > 0:
+                return {"probe_ok": True, "http_status": r.getcode(), "rows": rows, "note": "private_balance_probe"}
+            err_text = ";".join(str(e) for e in err) if isinstance(err, list) else str(err)
+            last_note = f"private_balance_probe:{err_text[:160]}" if err_text else "private_balance_probe_no_rows"
+        if "Invalid nonce" not in err_text:
+            break
+        time.sleep(0.05)
+    return {"probe_ok": False, "http_status": 200, "rows": 0, "note": last_note}
 
 def probe_webhook():
     sec = os.environ.get("WEBHOOK_SHARED_SECRET")
@@ -546,7 +630,7 @@ for p in PROVIDERS:
         "env_names": p["env_names"],
         "present_env_names": env_present,
         "last_probe_utc": now_utc(),
-        "probe_note": pr.get("note",""),
+        "probe_note": sanitize_probe_note(pr.get("note",""), p["env_names"]),
         "enabled": enabled,
         "measured": measured,
     }

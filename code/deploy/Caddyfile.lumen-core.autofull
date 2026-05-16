@@ -12,7 +12,7 @@ lumen-core.ai, www.lumen-core.ai {
 
     # Route API and websocket traffic to gateway.
     reverse_proxy /api/* 127.0.0.1:8787
-    reverse_proxy /ws/live 127.0.0.1:8787
+    reverse_proxy /ws* 127.0.0.1:8787
     reverse_proxy /health 127.0.0.1:8787
 
     @nginxHealth path /nginx-health

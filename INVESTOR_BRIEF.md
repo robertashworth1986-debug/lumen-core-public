@@ -1,9 +1,67 @@
-# LumaTrader Institutional Stack
+﻿# LumaTrader Institutional Stack
+
 ## Executive Investment Brief
 
-**Date:** April 24, 2026  
+**Date:** May 11, 2026  
 **Status:** Production-Ready  
 **System Mode:** Triplet Crypto Engine + AI Scout + Live Intel
+
+## MAY 2026 EVIDENCE ADDENDUM (EVENT-READY)
+
+This addendum updates the brief for live investor and partner conversations ahead of the May 21 event.
+
+### Live Site and Demo Links
+
+- Main dashboard: [mission_control](https://lumen-core.ai/mission_control.html)
+- Quant lab cockpit: [quant_lab](https://lumen-core.ai/quant_lab.html#overview)
+- Immersive experience: [luma_experience](https://lumen-core.ai/luma_experience.html)
+- Snapshot API: [api/snapshot](https://lumen-core.ai/api/snapshot)
+- Health endpoint: [health](https://lumen-core.ai/health)
+
+### Live Breadth (Current Evidence)
+
+- Enabled registry sources: 17
+- Measured sources: 9
+- Flowforms count: 22
+- Measured sector entries in audit derivation: 10
+- Total measured returned rows in audit derivation: 37 (max single sector row count: 13)
+
+### Live Performance and Allocation Snapshot
+
+- Allocation status: LIVE_ALLOCATION_READY
+- Average MC Sharpe (top 5): 5.2449
+- Best multi Sharpe snapshot: 6.7666
+- Current validated test win-rate ceiling in truth/dashboard artifacts: about 54.8% to 55%
+- Historical reference example includes a 92.0% win-rate value; treat this as historical/segment evidence unless reproduced in current production truth outputs
+
+### Federal and IP Readiness
+
+- SAM registration status: true
+- UEI/CAGE/EIN evidence present in dossier pack and audit materials
+- USPTO non-provisional reference: 19/281,546
+- Patent Center reference: 71551427
+- Chain-of-custody and hash-locked proof materials present in premium proof packet artifacts
+
+### Federal Codes and Patent Filing Snapshot
+
+- UEI: SQY2XW71ZM51
+- CAGE: 14TM8
+- EIN: 39-3507463
+- USPTO Application: 19/281,546
+- Filing confirmation number: 7076
+- Patent Center reference: 71551427
+- Filing receipt timestamp: 07/25/2025 11:06:37 PM ET
+
+### Valuation Positioning Bands (Pre-Money)
+
+- Conservative: $35M to $70M
+- Base case: $80M to $180M
+- Upside: $220M to $450M
+
+### Why This Supports Premium Positioning
+
+- This is a multi-product, multi-engine stack with live execution evidence, federal readiness anchors, and patent-linked chain-of-custody artifacts.
+- Valuation premium is driven by breadth and trust architecture, not a single model output.
 
 ---
 
@@ -22,17 +80,19 @@ All execution is **paper-traded on institutional accounts** (Alpaca, Binance US,
 ## THE TRIPLET ENGINE ARCHITECTURE
 
 ### Core Principle
+
 **Three coordinated bots, three independent capital pools, three profit targets — all running 24/7 without position conflicts.**
 
 ### Engine Configuration
 
 | Engine | Slots | Capital | Entry Targets | Profit Target | Use Case |
-|--------|-------|---------|---------------|---------------|----------|
+| ------ | ----- | ------- | ------------- | ------------- | -------- |
 | **Breakout** | 4 | 45% | High-velocity momentum | 1.4% per trade | Liquid, high-volume breakouts |
 | **Moonshot** | 4 | 35% | Sustained acceleration | 1.0% per trade | Mid-term acceleration plays |
 | **Fallback** | 4 | 20% | Rebound + stability | 0.6% per trade | Micro-compounding wins |
 
 ### Capital Sleeve Management
+
 - **Total Equity:** $100,000 (paper)
 - **Breakout Sleeve:** $45,000 (max 4 concurrent positions)
 - **Moonshot Sleeve:** $35,000 (max 4 concurrent positions)
@@ -41,7 +101,7 @@ All execution is **paper-traded on institutional accounts** (Alpaca, Binance US,
 
 ### Example Execution Flow
 
-```
+```text
 Market Snapshot (Cycle N):
   Scanned: 2,500 crypto pairs (BTC, ETH, alts, moonshots)
   Scored: 1,200 candidates (edge > 4%)
@@ -71,12 +131,14 @@ Result: +$142 realized PnL (+ open positions unrealized)
 
 ### Validation Filters
 
-**What Gets Accepted (Real Artists)**
+#### What Gets Accepted (Real Artists)
+
 - Single or multi-word artist names (Adele, SZA, Taylor Swift, Drake)
 - Proper capitalization and spacing
 - 2–50 characters, max 6 words
 
-**What Gets Rejected (Noise)**
+#### What Gets Rejected (Noise)
+
 - Channel names: "YouTube Music Topic", "Spotify Playlist", "official-channel-123"
 - Labels/aggregators: "RCA Records Label", "Media Group", "Vevo"
 - Generic queries: "Rising HipHop Artist", "Emerging Country Artist USA"
@@ -85,17 +147,20 @@ Result: +$142 realized PnL (+ open positions unrealized)
 ### Live Traction Scoring
 
 **Threshold for Institutional Interest:**
+
 - Followers ≥ 5,000 **OR**
 - Avg views ≥ 2,000 **OR**
 - Monthly listeners ≥ 5,000 **OR**
 - Video count ≥ 20 + avg views ≥ 500
 
 **Emerging Artist Range (Unsigned/Breakout):**
+
 - Min: 500 followers (above noise floor)
 - Max: 3M followers (before mega-celebrity tier)
 - Sweet spot: 1k–500k (institutional interest zone)
 
 ### Data Sources
+
 - **Spotify** (monthly listeners, engagement)
 - **YouTube** (video count, avg views)
 - **Instagram** (followers, posts/month)
@@ -108,19 +173,22 @@ Result: +$142 realized PnL (+ open positions unrealized)
 ## LIVE INTEL: MARKET REGIME DETECTION
 
 ### Real-Time Inputs
+
 - **BTC price history** (live from Binance US, updated every cycle)
 - **Realized volatility** (last 100 returns, GARCH estimation)
 - **Breadth signal** (% of top 100 candidates with pct24 > 0%)
 - **Heat multiplier** (volatility-adjusted risk appetite)
 
 ### Regime States
+
 | State | Trigger | Action |
-|-------|---------|--------|
+| ----- | ------- | ------ |
 | **Breakout** | High near-high density + momentum | Aggressive momentum entries |
 | **Moonshot** | Acceleration drift + strong breadth | Growth acceleration picks |
 | **Fallback** | Rebound + contraction | Mean-reversion/stabilization |
 
 ### Volatility Scaling
+
 - Realized vol < 1%: Full heat (max_gross_heat = 70%)
 - Realized vol 1–3%: Normal heat
 - Realized vol > 3%: Reduced heat (risk_aversion multiplier = 1.5x)
@@ -132,11 +200,13 @@ Result: +$142 realized PnL (+ open positions unrealized)
 ## EXECUTION PROOF & AUDITABILITY
 
 ### Real Orders (Not Simulation)
+
 - **Alpaca Paper Account:** Real v2/orders API, actual order IDs (UUID), live fill prices
 - **Binance US Paper:** Simulated fills against live order book snapshots
 - **Kraken Paper:** Simulated fills against live order book snapshots
 
 ### Ledger & Reporting
+
 - **JSONL appends:** Every BUY/SELL event tagged with:
   - `cycle`: Execution cycle number
   - `engine`: "breakout" | "moonshot" | "fallback"
@@ -154,6 +224,7 @@ Result: +$142 realized PnL (+ open positions unrealized)
   - Truth metadata ("real_alpaca_paper_fills" or "simulated")
 
 ### Investor-Grade Report
+
 File: `institutional_crypto_paper_report.json`
 
 ```json
@@ -229,6 +300,7 @@ File: `institutional_crypto_paper_report.json`
 ## TECHNICAL VALIDATION CHECKLIST
 
 ### Trader Engine
+
 - [x] Triplet profile configured with 4 slots per engine
 - [x] Capital sleeve caps enforced per engine
 - [x] Position tagging (engine field on every entry)
@@ -237,18 +309,21 @@ File: `institutional_crypto_paper_report.json`
 - [x] Alpaca real execution lane active
 
 ### Scout System
+
 - [x] Artist name filtering (reject channels, playlists, labels)
 - [x] Live traction detection (followers, listeners, views)
 - [x] Emerging artist classification (1k–3M range)
 - [x] Multi-source data aggregation (live, not cached)
 
 ### Intel Regime Controller
+
 - [x] Live BTC price inference (no cache)
 - [x] Volatility calculation (realized + GARCH)
 - [x] Regime state updates per cycle
 - [x] Heat multiplier adjustment for volatility
 
 ### Reporting
+
 - [x] Per-engine P&L tracking
 - [x] Institutional metadata (truth mode, real fills, order IDs)
 - [x] Auditable ledger (JSONL append-only)
@@ -259,17 +334,20 @@ File: `institutional_crypto_paper_report.json`
 ## NEXT STEPS: SHARK TANK PITCH ANGLES
 
 ### Angle 1: Algorithmic Alpha (Crypto)
-*"Three coordinated bots scanning 2,500 coins 24/7, capturing micro-compounding (0.6%), momentum (1.0%), and breakouts (1.4%) — simultaneously, without position collision."*
+
+"Three coordinated bots scanning 2,500 coins 24/7, capturing micro-compounding (0.6%), momentum (1.0%), and breakouts (1.4%) - simultaneously, without position collision."
 
 **Proof:** Real fills from Alpaca, per-engine ledger, live market regime adjustment.
 
 ### Angle 2: AI Intelligence Layer (Entertainment)
-*"Scout detects emerging artists at the inflection point (1k–500k followers) before venture/label do — using live multi-source traction scoring and fake-rejection filters."*
+
+"Scout detects emerging artists at the inflection point (1k-500k followers) before venture/label do - using live multi-source traction scoring and fake-rejection filters."
 
 **Proof:** Institutional-grade artist name validation, traction thresholds, sector alpha dashboard.
 
 ### Angle 3: Institutional-Grade Risk (All)
-*"Full capital sleeve isolation, per-strategy profit targets, market regime scaling, and auditable ledgers with real execution proof (order IDs, fills)."*
+
+"Full capital sleeve isolation, per-strategy profit targets, market regime scaling, and auditable ledgers with real execution proof (order IDs, fills)."
 
 **Proof:** Truth metadata, investor report, per-engine sleeves, ledger events.
 
@@ -278,12 +356,14 @@ File: `institutional_crypto_paper_report.json`
 ## DEPLOYMENT READINESS
 
 ### Current Environment
+
 - **Trader:** Python 3.14.4 venv, multi_exchange_paper_ticker.py running
 - **Scout:** LamaScout with api_clients, filtering active
 - **Intel:** crypto_regime_controller live inference active
 - **Report:** Automated institutional_crypto_paper_report generation
 
 ### To Go Live (Full Production)
+
 1. **Replace paper mode with live capital** (swap runtime_control.json flags)
 2. **Enable Alpaca live orders** (swap paper account keys for live account keys)
 3. **Add real-time webhook** (PnL notifications, emergency stops)
@@ -297,4 +377,3 @@ File: `institutional_crypto_paper_report.json`
 LumaTrader is a **production-ready triplet engine** for 24/7 crypto alpha generation, backed by **AI Scout** for trend discovery and **Live Intel** for market regime adaptation. All components are **audit-verified**, **institutionally-wired**, and **execution-proven** via real paper fills.
 
 Ready to scale from paper → live capital.
-

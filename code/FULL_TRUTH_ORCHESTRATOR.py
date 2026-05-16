@@ -1,4 +1,4 @@
-import os, json, csv, time, math, subprocess, traceback, re
+import os, sys, json, csv, time, math, subprocess, traceback, re
 from pathlib import Path
 from datetime import datetime, timezone
 import urllib.request
@@ -14,19 +14,23 @@ from external_data_sources import fetch_coingecko_market_data, fetch_binance_ohl
 from hybrid_harmonic_algorithms import ALGO_WRAPPERS
 from hybrid_harmonic_strategies import strat_harmonic_consensus
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(os.getenv("LUMA_ROOT", str(Path(__file__).resolve().parents[1]))).resolve()
+WORKSPACE_ROOT = ROOT.parent
 CODE = ROOT / "code"
 CONF = ROOT / "config"
 OUT  = ROOT / "out"
-DASH = Path(r"C:\LumaTrader\dashboard")
+DASH = WORKSPACE_ROOT / "dashboard"
 
 DATA_ROOTS = [
     ROOT / "data",
-    Path(r"C:\LumaTrader\data"),
+    WORKSPACE_ROOT / "data",
     Path.home() / "iCloudDrive" / "Data sets",
     Path.home() / "iCloudDrive" / "Data_sets",
     Path.home() / "iCloudDrive" / "Documents" / "Data sets",
 ]
+
+for _extra in [s.strip() for s in os.getenv("LUMA_EXTRA_DATA_ROOTS", "").split(";") if s.strip()]:
+    DATA_ROOTS.append(Path(_extra))
 
 LIVE_SOURCES_PATH          = CONF / "live_sources.json"
 LIVE_SOURCE_REGISTRY_PATH  = CONF / "live_source_registry.json"
@@ -51,6 +55,11 @@ PAPER_LEDGER_JSONL         = OUT / "paper_trade_ledger.jsonl"
 EXECUTION_RUNTIME_JSON     = OUT / "execution_runtime.json"
 EXECUTION_STATUS_JSON      = OUT / "execution_status.json"
 APPROVAL_QUEUE_JSON        = OUT / "execution_approval_queue.json"
+OPS_OUT_DIR                = OUT / "ops"
+
+SECTOR_PIPELINE_WRAPPER            = CODE / "ops" / "RUN_SECTOR_ENERGY_EVIDENCE_PIPELINE.ps1"
+SECTOR_PIPELINE_LATEST_JSON        = OPS_OUT_DIR / "sector_energy_evidence_pipeline_latest.json"
+SECTOR_PIPELINE_ORCH_STATUS_JSON   = OPS_OUT_DIR / "sector_energy_pipeline_orchestrator_status.json"
 
 REQUIRED_PAPER_SYMBOLS = [
     "SPY","QQQ","IWM","DIA",
@@ -179,6 +188,31 @@ def safe_int(x, default=0):
             return int(float(x))
         except Exception:
             return default
+
+
+def env_truthy(name, default=False):
+    raw = os.getenv(name)
+    if raw is None:
+        return bool(default)
+    txt = str(raw).strip().lower()
+    if not txt:
+        return bool(default)
+    return txt in {"1", "true", "yes", "on"}
+
+
+def parse_utc_maybe(value):
+    if not value:
+        return None
+    try:
+        txt = str(value).strip()
+        if txt.endswith("Z"):
+            txt = txt[:-1] + "+00:00"
+        dt = datetime.fromisoformat(txt)
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
+    except Exception:
+        return None
 
 def scan_csv_meta(path: Path):
     meta = {
@@ -442,25 +476,48 @@ def sync_runtime_files():
     if not APPROVAL_QUEUE_JSON.exists():
         save_json(APPROVAL_QUEUE_JSON, [])
 
-def run_if_exists(path: Path):
+def run_if_exists(path: Path, extra_args=None, timeout_sec=300):
     if not path.exists():
         return {"script": str(path), "ran": False, "ok": False, "reason": "missing"}
-    try:
-        cmd = [os.sys.executable, str(path)]
-        env = os.environ.copy()
+
+    suffix = path.suffix.lower()
+    env = os.environ.copy()
+    env["PYTHONIOENCODING"] = "utf-8"
+
+    if suffix == ".py":
+        cmd = [sys.executable, str(path)]
         if path.name == "run_universal_meta_orchestrator.py":
             cmd.append("--paper")
             env["PAPER_MODE"] = "true"
+    elif suffix == ".ps1":
+        cmd = ["pwsh", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(path)]
+    elif suffix in {".cmd", ".bat"}:
+        cmd = [str(path)]
+    else:
+        return {
+            "script": str(path),
+            "ran": False,
+            "ok": False,
+            "reason": f"unsupported_script_type:{suffix}",
+        }
+
+    if extra_args:
+        cmd.extend([str(a) for a in extra_args if str(a).strip()])
+
+    try:
         p = subprocess.run(
             cmd,
-            cwd=str(CODE),
+            cwd=str(path.parent),
             env=env,
             capture_output=True,
             text=True,
-            timeout=300
+            encoding="utf-8",
+            errors="replace",
+            timeout=max(30, int(timeout_sec))
         )
         return {
             "script": str(path),
+            "command": cmd,
             "ran": True,
             "ok": p.returncode == 0,
             "returncode": p.returncode,
@@ -468,7 +525,88 @@ def run_if_exists(path: Path):
             "stderr_tail": (p.stderr or "")[-1200:]
         }
     except Exception as e:
-        return {"script": str(path), "ran": True, "ok": False, "reason": repr(e)}
+        return {"script": str(path), "command": cmd, "ran": True, "ok": False, "reason": repr(e)}
+
+
+def maybe_run_sector_energy_pipeline():
+    interval_sec = max(300, safe_int(os.getenv("LUMA_SECTOR_PIPELINE_INTERVAL_SEC", "900"), 900))
+    step_timeout_sec = max(180, safe_int(os.getenv("LUMA_SECTOR_PIPELINE_STEP_TIMEOUT_SEC", "900"), 900))
+    run_investor_sweep = env_truthy("LUMA_SECTOR_PIPELINE_RUN_INVESTOR_SWEEP", False)
+
+    now = now_utc()
+    prior = load_json(SECTOR_PIPELINE_ORCH_STATUS_JSON, {})
+    prior_last_attempt = parse_utc_maybe(prior.get("last_attempt_utc"))
+    due_in_sec = 0
+    if prior_last_attempt is not None:
+        elapsed = (now - prior_last_attempt).total_seconds()
+        if elapsed < interval_sec:
+            due_in_sec = int(interval_sec - elapsed)
+
+    latest_payload = load_json(SECTOR_PIPELINE_LATEST_JSON, None)
+    latest_generated_utc = latest_payload.get("generated_utc") if isinstance(latest_payload, dict) else None
+    latest_status = latest_payload.get("status") if isinstance(latest_payload, dict) else None
+    latest_run_dir = latest_payload.get("run_dir") if isinstance(latest_payload, dict) else None
+
+    if due_in_sec > 0:
+        return {
+            "script": str(SECTOR_PIPELINE_WRAPPER),
+            "ran": False,
+            "ok": bool(prior.get("last_ok", True)),
+            "reason": "cadence_not_due",
+            "cadence_interval_sec": interval_sec,
+            "cadence_due_in_sec": due_in_sec,
+            "run_investor_sweep": run_investor_sweep,
+            "latest_pipeline_generated_utc": latest_generated_utc,
+            "latest_pipeline_status": latest_status,
+            "latest_pipeline_run_dir": latest_run_dir,
+            "last_success_utc": prior.get("last_success_utc"),
+        }
+
+    extra_args = ["-StepTimeoutSec", str(step_timeout_sec)]
+    if run_investor_sweep:
+        extra_args.append("-RunInvestorSweep")
+
+    result = run_if_exists(
+        SECTOR_PIPELINE_WRAPPER,
+        extra_args=extra_args,
+        timeout_sec=step_timeout_sec + 120,
+    )
+
+    latest_after = load_json(SECTOR_PIPELINE_LATEST_JSON, None)
+    latest_after_generated_utc = latest_after.get("generated_utc") if isinstance(latest_after, dict) else latest_generated_utc
+    latest_after_status = latest_after.get("status") if isinstance(latest_after, dict) else latest_status
+    latest_after_run_dir = latest_after.get("run_dir") if isinstance(latest_after, dict) else latest_run_dir
+
+    status_payload = {
+        "generated_utc": iso_now(),
+        "script": str(SECTOR_PIPELINE_WRAPPER),
+        "cadence_interval_sec": interval_sec,
+        "step_timeout_sec": step_timeout_sec,
+        "run_investor_sweep": run_investor_sweep,
+        "last_attempt_utc": iso_now(),
+        "last_ok": bool(result.get("ok")),
+        "last_returncode": result.get("returncode"),
+        "last_reason": result.get("reason"),
+        "latest_pipeline_generated_utc": latest_after_generated_utc,
+        "latest_pipeline_status": latest_after_status,
+        "latest_pipeline_run_dir": latest_after_run_dir,
+    }
+    if result.get("ok"):
+        status_payload["last_success_utc"] = iso_now()
+    else:
+        status_payload["last_success_utc"] = prior.get("last_success_utc")
+    save_json(SECTOR_PIPELINE_ORCH_STATUS_JSON, status_payload)
+
+    return {
+        **result,
+        "cadence_interval_sec": interval_sec,
+        "cadence_due_in_sec": 0,
+        "run_investor_sweep": run_investor_sweep,
+        "latest_pipeline_generated_utc": latest_after_generated_utc,
+        "latest_pipeline_status": latest_after_status,
+        "latest_pipeline_run_dir": latest_after_run_dir,
+        "last_success_utc": status_payload.get("last_success_utc"),
+    }
 
 def find_script_candidates():
     names = [
@@ -487,10 +625,10 @@ def find_script_candidates():
     exec_dir = CODE / "execution"
     if exec_dir.exists():
         extra = []
-        for p in exec_dir.glob("RUN_EXECUTION*"):
-            if p.suffix.lower() == ".py":
+        for p in sorted(exec_dir.glob("RUN_EXECUTION*"), key=lambda x: x.name.lower()):
+            if p.suffix.lower() in {".py", ".ps1", ".cmd", ".bat"}:
                 extra.append(p)
-        paths.extend(extra[:3])
+        paths.extend(extra[:5])
     return paths
 
 def open_dashboards():
@@ -533,6 +671,7 @@ def cycle():
     live_sources, registry = sync_live_sources(usable)
     sync_runtime_files()
     lumascout_export = export_lumascout_summary()
+    sector_pipeline = maybe_run_sector_energy_pipeline()
 
     results = []
     for script in find_script_candidates():
@@ -559,6 +698,7 @@ def cycle():
         "lumascout_delta_runs": int(lumascout_export.get("delta_runs", 0)),
         "lumascout_last_checksum": lumascout_export.get("last_checksum"),
         "lumascout_previous_checksum": lumascout_export.get("previous_checksum"),
+        "sector_energy_pipeline": sector_pipeline,
         "script_results": results
     }
     save_json(TRUTH_STATUS_JSON, status)
@@ -569,7 +709,14 @@ def main():
     while True:
         try:
             s = cycle()
-            print(f"[{iso_now()}] truth sync ok | files={s['files_scanned']} usable={s['usable_files']} enabled_sources={s['enabled_source_count']}")
+            sp = s.get("sector_energy_pipeline", {}) if isinstance(s, dict) else {}
+            if sp.get("ran"):
+                sp_state = "ok" if sp.get("ok") else "fail"
+            elif sp.get("reason") == "cadence_not_due":
+                sp_state = f"wait:{sp.get('cadence_due_in_sec', 0)}s"
+            else:
+                sp_state = "idle"
+            print(f"[{iso_now()}] truth sync ok | files={s['files_scanned']} usable={s['usable_files']} enabled_sources={s['enabled_source_count']} sector_pipeline={sp_state}")
         except Exception:
             err = {
                 "generated_utc": iso_now(),
