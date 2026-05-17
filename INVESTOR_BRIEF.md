@@ -1,10 +1,33 @@
-﻿# LumaTrader Institutional Stack
+# LumaTrader Institutional Stack
 
 ## Executive Investment Brief
 
 **Date:** May 11, 2026  
 **Status:** Production-Ready  
 **System Mode:** Triplet Crypto Engine + AI Scout + Live Intel
+
+## PRODUCTION TRUTH RULE (PUBLIC-FACING)
+
+For all investor, partner, and public-facing responses, this stack enforces the following hard rule:
+
+- Public answers must be sourced from current production artifacts only.
+- Backtest, historical, archive, paper, simulated, and dry-run paths are blocked from public payloads.
+- Every public snapshot must include hash-verified evidence and an append-only chain entry.
+- Historical research remains enabled internally for strategy and diagnostics, but it is never presented as live truth.
+
+### Truth Enforcement Artifacts
+
+- Policy file: `data/public_truth_policy.json`
+- Truth enforcer: `code/ops/ENFORCE_PRODUCTION_TRUTH_RULE.py`
+- Latest public truth snapshot: `out/ops/public_truth/public_truth_latest.json`
+- Chain ledger: `out/ip_layer/public_truth_chain_ledger.jsonl`
+
+### Continuous Opportunity and Response Flow
+
+- Full autonomy loop: `code/ops/RUN_OPPORTUNITY_AUTONOMY_LOOP.ps1`
+- Email opportunity watcher: `code/ops/RUN_EMAIL_OPPORTUNITY_WATCHER.ps1`
+- Email resume dispatcher: `code/ops/RUN_EMAIL_RESUME_DISPATCHER.ps1`
+- Email response watcher: `code/ops/RUN_EMAIL_RESPONSE_WATCHER.ps1`
 
 ## MAY 2026 EVIDENCE ADDENDUM (EVENT-READY)
 
@@ -377,3 +400,4 @@ File: `institutional_crypto_paper_report.json`
 LumaTrader is a **production-ready triplet engine** for 24/7 crypto alpha generation, backed by **AI Scout** for trend discovery and **Live Intel** for market regime adaptation. All components are **audit-verified**, **institutionally-wired**, and **execution-proven** via real paper fills.
 
 Ready to scale from paper → live capital.
+

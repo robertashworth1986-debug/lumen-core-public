@@ -129,13 +129,40 @@ def _days_to_deadline(deadline_str: str | None) -> dict[str, Any]:
     if "rolling" in s or "follow-on" in s or "post-phase" in s:
         return {"deadline": deadline_str, "days_remaining": None,
                 "rolling": True, "parseable": True}
-    # Try YYYY-MM-DD anywhere in the string
+    # Try common federal listing date formats anywhere in the string.
     import re as _re
-    m = _re.search(r"(20\d{2})-(\d{2})-(\d{2})", deadline_str)
-    if m:
+    # YYYY-MM-DD
+    m_iso = _re.search(r"(20\d{2})-(\d{2})-(\d{2})", deadline_str)
+    if m_iso:
         try:
-            d = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)),
-                         tzinfo=timezone.utc)
+            d = datetime(
+                int(m_iso.group(1)),
+                int(m_iso.group(2)),
+                int(m_iso.group(3)),
+                tzinfo=timezone.utc,
+            )
+            now = datetime.now(timezone.utc)
+            delta = (d - now).days
+            return {
+                "deadline": d.date().isoformat(),
+                "days_remaining": delta,
+                "rolling": False,
+                "parseable": True,
+                "risk": "expired" if delta < 0 else
+                        "critical" if delta < 14 else
+                        "soon" if delta < 45 else "ok",
+            }
+        except Exception:
+            pass
+
+    # MM/DD/YYYY and MM-DD-YYYY
+    m_us = _re.search(r"(\d{1,2})[/-](\d{1,2})[/-](20\d{2})", deadline_str)
+    if m_us:
+        try:
+            month = int(m_us.group(1))
+            day = int(m_us.group(2))
+            year = int(m_us.group(3))
+            d = datetime(year, month, day, tzinfo=timezone.utc)
             now = datetime.now(timezone.utc)
             delta = (d - now).days
             return {

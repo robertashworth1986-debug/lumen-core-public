@@ -63,6 +63,8 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+from application_context_resolver import load_application_profile
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 OUT = ROOT / "out"
@@ -1907,7 +1909,7 @@ def main(argv: list[str]) -> int:
         return 0
 
     catalog = _load_json(DATA / "grant_catalog.json")
-    profile = _load_json(DATA / "company_profile.json")
+    profile = load_application_profile()
     utc = _resolve_v2_utc()
     print(f"[factory] evidence run: {utc}")
     ev = build_evidence_summary(utc)

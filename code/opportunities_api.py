@@ -6,6 +6,20 @@ Core endpoints:
     POST /api/opportunities/harvest            -> trigger harvester
     POST /api/opportunities/fill               -> trigger filler bot
     POST /api/opportunities/autopilot          -> harvest + fill + funding + outreach
+    POST /api/opportunities/autopilot-v2       -> unified grants + linkedin + jobs autopilot
+    POST /api/opportunities/linkedin/optimize  -> build LumaLinkedIn assets + revised resume
+    GET  /api/opportunities/linkedin/latest    -> latest LinkedIn optimization payload
+    POST /api/opportunities/email/finder/run   -> run email opportunity finder cycle
+    GET  /api/opportunities/email/finder/latest-> latest email finder summary payload
+    GET  /api/opportunities/email/finder/queue -> queued email opportunities
+    POST /api/opportunities/email/dispatch/run -> send resume packages to scored opportunities
+    GET  /api/opportunities/email/dispatch/latest -> latest email dispatch summary payload
+    POST /api/opportunities/email/response/run -> run inbox reply watcher cycle
+    GET  /api/opportunities/email/response/latest -> latest reply watcher summary payload
+    POST /api/opportunities/context/refresh    -> rebuild unified application context
+    GET  /api/opportunities/context/latest     -> latest application context payload
+    POST /api/opportunities/jobs/factory       -> build resume-backed job packages
+    GET  /api/opportunities/jobs/queue         -> latest jobs queue index
     GET  /api/opportunities/tracker            -> cross-channel state rollup
     GET  /api/opportunities/awards             -> granted/awarded items
     GET  /api/opportunities/outreach/templates -> loaded outreach templates
@@ -32,14 +46,40 @@ from pydantic import BaseModel, Field
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "out" / "opportunities"
 OUTREACH_OUT = OUT / "outreach"
+LINKEDIN_OUT = OUT / "linkedin"
 OPS_OUT = ROOT / "out" / "ops"
 GRANTS_QUEUE = ROOT / "out" / "grants" / "_queue" / "index.json"
 FUNDING_QUEUE = ROOT / "out" / "funding" / "funding_approval_queue.json"
+JOBS_ROOT = ROOT / "out" / "jobs"
+JOBS_QUEUE = JOBS_ROOT / "_queue" / "index.json"
+EMAIL_OUT = OUT / "email"
+EMAIL_LATEST = EMAIL_OUT / "email_opportunities_latest.json"
+EMAIL_QUEUE = EMAIL_OUT / "email_opportunity_queue_latest.json"
+EMAIL_MANIFEST_LATEST = ROOT / "out" / "ops" / "email_opportunity_finder" / "email_opportunity_manifest_latest.json"
+EMAIL_DISPATCH_LATEST = EMAIL_OUT / "outbound_resume_dispatch_latest.json"
+EMAIL_DISPATCH_QUEUE = EMAIL_OUT / "outbound_resume_dispatch_queue_latest.json"
+EMAIL_DISPATCH_MANIFEST_LATEST = ROOT / "out" / "ops" / "email_resume_dispatcher" / "email_resume_dispatch_manifest_latest.json"
+EMAIL_RESPONSE_LATEST = EMAIL_OUT / "email_response_watcher_latest.json"
+EMAIL_RESPONSE_QUEUE = EMAIL_OUT / "email_response_queue_latest.json"
+EMAIL_RESPONSE_MANIFEST_LATEST = ROOT / "out" / "ops" / "email_response_watcher" / "email_response_manifest_latest.json"
+RESUME_LATEST = ROOT / "out" / "resume" / "resume_lumalinkedin_v1_latest.json"
+LINKEDIN_LATEST = LINKEDIN_OUT / "lumalinkedin_v1_latest.json"
+LINKEDIN_BUILD_LATEST = ROOT / "out" / "ops" / "lumalinkedin_v1_build_latest.json"
+MASTER_VAL_LATEST = ROOT / "out" / "ops" / "master_valuation" / "master_valuation_latest.json"
+IP_GRANT_WIN_MANIFEST_LATEST = ROOT / "out" / "ip_layer" / "autonomous_grant_win_manifest_latest.json"
+LUMA_EXPLAINER_QUANT_LATEST = ROOT / "out" / "ops" / "luma_explainer" / "luma_explainer_quantified_latest.json"
+BOOTH_DESIGN_MANIFEST_LATEST = ROOT / "out" / "ops" / "booth_design" / "booth_design_manifest_latest.json"
+PUBLIC_TRUTH_LATEST = ROOT / "out" / "ops" / "public_truth" / "public_truth_latest.json"
+PUBLIC_TRUTH_MANIFEST_LATEST = ROOT / "out" / "ops" / "public_truth" / "public_truth_manifest_latest.json"
+APP_CONTEXT_LATEST = ROOT / "out" / "ops" / "application_context" / "application_context_latest.json"
+APP_CONTEXT_MANIFEST_LATEST = ROOT / "out" / "ops" / "application_context" / "application_context_manifest_latest.json"
 WHITEHOLE_ROOT = Path(os.getenv("WHITEHOLE_ROOT", r"C:\WhiteHole"))
 
 PY = sys.executable
 OUT.mkdir(parents=True, exist_ok=True)
 OUTREACH_OUT.mkdir(parents=True, exist_ok=True)
+LINKEDIN_OUT.mkdir(parents=True, exist_ok=True)
+JOBS_ROOT.mkdir(parents=True, exist_ok=True)
 OPS_OUT.mkdir(parents=True, exist_ok=True)
 
 router = APIRouter(prefix="/api/opportunities", tags=["opportunities"])
@@ -101,6 +141,11 @@ def _latest_path(pattern: str) -> Path | None:
         return None
     items = sorted(WHITEHOLE_ROOT.glob(pattern), key=lambda x: x.stat().st_mtime)
     return items[-1] if items else None
+
+
+def _latest_linkedin_payload() -> dict[str, Any]:
+    payload = _read_json(LINKEDIN_LATEST)
+    return payload if isinstance(payload, dict) else {}
 
 
 def _load_outreach_templates() -> dict[str, Any]:
@@ -334,6 +379,26 @@ def _build_tracker() -> dict[str, Any]:
 
     grants_q = _read_json(GRANTS_QUEUE) or {}
     funding_q = _read_json(FUNDING_QUEUE) or []
+    jobs_q = _read_json(JOBS_QUEUE) or {}
+    email_latest = _read_json(EMAIL_LATEST) or {}
+    email_queue = _read_json(EMAIL_QUEUE) or []
+    email_manifest = _read_json(EMAIL_MANIFEST_LATEST) or {}
+    email_dispatch_latest = _read_json(EMAIL_DISPATCH_LATEST) or {}
+    email_dispatch_queue = _read_json(EMAIL_DISPATCH_QUEUE) or {}
+    email_dispatch_manifest = _read_json(EMAIL_DISPATCH_MANIFEST_LATEST) or {}
+    email_response_latest = _read_json(EMAIL_RESPONSE_LATEST) or {}
+    email_response_queue = _read_json(EMAIL_RESPONSE_QUEUE) or []
+    email_response_manifest = _read_json(EMAIL_RESPONSE_MANIFEST_LATEST) or {}
+    linkedin_latest = _latest_linkedin_payload()
+    linkedin_build_latest = _read_json(LINKEDIN_BUILD_LATEST) or {}
+    resume_latest = _read_json(RESUME_LATEST) or {}
+    valuation_latest = _read_json(MASTER_VAL_LATEST) or {}
+    ip_manifest_latest = _read_json(IP_GRANT_WIN_MANIFEST_LATEST) or {}
+    explainer_quant_latest = _read_json(LUMA_EXPLAINER_QUANT_LATEST) or {}
+    public_truth_latest = _read_json(PUBLIC_TRUTH_LATEST) or {}
+    public_truth_manifest = _read_json(PUBLIC_TRUTH_MANIFEST_LATEST) or {}
+    app_context_latest = _read_json(APP_CONTEXT_LATEST) or {}
+    app_context_manifest = _read_json(APP_CONTEXT_MANIFEST_LATEST) or {}
     funding_counts: dict[str, int] = {}
     if isinstance(funding_q, list):
         for item in funding_q:
@@ -360,6 +425,107 @@ def _build_tracker() -> dict[str, Any]:
         "funding_queue": {
             "n_total": len(funding_q) if isinstance(funding_q, list) else 0,
             "approval_state_counts": funding_counts,
+        },
+        "jobs_queue": {
+            "n_total": jobs_q.get("n_total", 0) if isinstance(jobs_q, dict) else 0,
+            "n_draft": jobs_q.get("n_draft", 0) if isinstance(jobs_q, dict) else 0,
+            "n_approved": jobs_q.get("n_approved", 0) if isinstance(jobs_q, dict) else 0,
+            "n_submitted": jobs_q.get("n_submitted", 0) if isinstance(jobs_q, dict) else 0,
+            "n_interview": jobs_q.get("n_interview", 0) if isinstance(jobs_q, dict) else 0,
+            "n_offer": jobs_q.get("n_offer", 0) if isinstance(jobs_q, dict) else 0,
+        },
+        "email_opportunities": {
+            "latest_generated_utc": email_latest.get("generated_utc") if isinstance(email_latest, dict) else None,
+            "sources_configured": email_latest.get("sources_configured") if isinstance(email_latest, dict) else 0,
+            "new_opportunities": email_latest.get("new_opportunities") if isinstance(email_latest, dict) else 0,
+            "queue_count": len(email_queue) if isinstance(email_queue, list) else 0,
+            "manifest_status": email_manifest.get("status") if isinstance(email_manifest, dict) else None,
+        },
+        "email_dispatch": {
+            "latest_generated_utc": email_dispatch_latest.get("generated_utc") if isinstance(email_dispatch_latest, dict) else None,
+            "status": email_dispatch_latest.get("status") if isinstance(email_dispatch_latest, dict) else None,
+            "dispatch_mode": email_dispatch_latest.get("dispatch_mode") if isinstance(email_dispatch_latest, dict) else None,
+            "sent_count": email_dispatch_latest.get("sent_count") if isinstance(email_dispatch_latest, dict) else 0,
+            "sent_total": email_dispatch_latest.get("sent_total") if isinstance(email_dispatch_latest, dict) else 0,
+            "queue_count": (
+                email_dispatch_queue.get("count")
+                if isinstance(email_dispatch_queue, dict)
+                else len(email_dispatch_queue)
+                if isinstance(email_dispatch_queue, list)
+                else 0
+            ),
+            "manifest_status": email_dispatch_manifest.get("status") if isinstance(email_dispatch_manifest, dict) else None,
+        },
+        "email_response_watcher": {
+            "latest_generated_utc": email_response_latest.get("generated_utc") if isinstance(email_response_latest, dict) else None,
+            "status": email_response_latest.get("status") if isinstance(email_response_latest, dict) else None,
+            "new_responses": email_response_latest.get("new_responses") if isinstance(email_response_latest, dict) else 0,
+            "matched_outbound_count": email_response_latest.get("matched_outbound_count") if isinstance(email_response_latest, dict) else 0,
+            "queue_count": len(email_response_queue) if isinstance(email_response_queue, list) else 0,
+            "manifest_status": email_response_manifest.get("status") if isinstance(email_response_manifest, dict) else None,
+        },
+        "linkedin": {
+            "connected_payload_present": bool(linkedin_latest),
+            "latest_generated_utc": linkedin_latest.get("generated_utc") if isinstance(linkedin_latest, dict) else None,
+            "headline_primary": (
+                linkedin_latest.get("headline_variants", [None])[0]
+                if isinstance(linkedin_latest, dict)
+                else None
+            ),
+            "resume_latest_generated_utc": resume_latest.get("generated_utc") if isinstance(resume_latest, dict) else None,
+            "build_latest_generated_utc": (
+                linkedin_build_latest.get("generated_utc")
+                if isinstance(linkedin_build_latest, dict)
+                else None
+            ),
+        },
+        "valuation": {
+            "latest_generated_utc": valuation_latest.get("generated_utc") if isinstance(valuation_latest, dict) else None,
+            "master_valuation_proxy_usd": (
+                (valuation_latest.get("valuation", {}) or {}).get("master_valuation_proxy_usd")
+                if isinstance(valuation_latest, dict)
+                else None
+            ),
+            "valuation_increment_usd": (
+                (valuation_latest.get("valuation", {}) or {}).get("valuation_increment_usd")
+                if isinstance(valuation_latest, dict)
+                else None
+            ),
+        },
+        "ip_grant_win": {
+            "manifest_present": bool(ip_manifest_latest),
+            "event_id": ip_manifest_latest.get("event_id") if isinstance(ip_manifest_latest, dict) else None,
+            "entry_sha256": ip_manifest_latest.get("entry_sha256") if isinstance(ip_manifest_latest, dict) else None,
+            "explainer_generated_utc": (
+                explainer_quant_latest.get("generated_utc")
+                if isinstance(explainer_quant_latest, dict)
+                else None
+            ),
+        },
+        "public_truth": {
+            "status": public_truth_latest.get("status") if isinstance(public_truth_latest, dict) else None,
+            "latest_generated_utc": public_truth_latest.get("generated_utc") if isinstance(public_truth_latest, dict) else None,
+            "chain_entry_sha256": (
+                (public_truth_latest.get("chain", {}) or {}).get("entry_sha256")
+                if isinstance(public_truth_latest, dict)
+                else None
+            ),
+            "manifest_generated_utc": public_truth_manifest.get("generated_utc") if isinstance(public_truth_manifest, dict) else None,
+        },
+        "application_context": {
+            "status": app_context_latest.get("status") if isinstance(app_context_latest, dict) else None,
+            "latest_generated_utc": app_context_latest.get("generated_utc") if isinstance(app_context_latest, dict) else None,
+            "completeness_score_pct": (
+                (app_context_latest.get("completeness", {}) or {}).get("score_pct")
+                if isinstance(app_context_latest, dict)
+                else None
+            ),
+            "missing_required_count": (
+                len((app_context_latest.get("completeness", {}) or {}).get("missing_required_fields") or [])
+                if isinstance(app_context_latest, dict)
+                else None
+            ),
+            "manifest_status": app_context_manifest.get("status") if isinstance(app_context_manifest, dict) else None,
         },
     }
     _write_json(OUT / "tracker.json", payload)
@@ -401,7 +567,9 @@ class AutopilotArgs(BaseModel):
     harvest_min_score: float = 0.30
     fill_min_score: float = 0.40
     fill_limit: int = 25
+    context_strict: bool = True
     build_funding_queue: bool = True
+    include_contract_loan_pack: bool = True
     funding_top: int = 12
     funding_channels: str = "grant,key-source,contract,loan"
     include_outreach: bool = True
@@ -411,6 +579,76 @@ class AutopilotArgs(BaseModel):
 
 class OutreachArgs(BaseModel):
     limit: int = 25
+
+
+class LinkedInOptimizeArgs(BaseModel):
+    build_pdf: bool = True
+    publish_summary_post: bool = False
+    dry_run_post: bool = True
+    max_packages: int = 28
+
+
+class JobsFactoryArgs(BaseModel):
+    min_score: float = 0.38
+    limit: int = 20
+    job: str = ""
+
+
+class EmailFinderArgs(BaseModel):
+    min_score: float = 0.90
+    max_per_cycle: int = 80
+    once: bool = True
+
+
+class EmailDispatchArgs(BaseModel):
+    min_fit_score: float = 0.42
+    limit: int = 20
+    once: bool = True
+    dry_run: bool = True
+
+
+class EmailResponseWatcherArgs(BaseModel):
+    max_per_cycle: int = 120
+    once: bool = True
+
+
+class AutopilotV2Args(BaseModel):
+    harvest_min_score: float = 0.30
+    fill_min_score: float = 0.40
+    fill_limit: int = 25
+    context_strict: bool = True
+    include_skip_pack: bool = True
+    include_grant_hunter: bool = True
+    grant_hunter_rows: int = 180
+    grant_hunter_top: int = 8
+    build_funding_queue: bool = True
+    include_contract_loan_pack: bool = True
+    funding_top: int = 12
+    funding_channels: str = "grant,key-source,contract,loan"
+    include_outreach: bool = True
+    outreach_limit: int = 25
+    include_linkedin: bool = True
+    linkedin_build_pdf: bool = True
+    linkedin_publish_summary_post: bool = False
+    linkedin_dry_run_post: bool = True
+    include_email_finder: bool = True
+    email_min_score: float = 0.90
+    email_max_per_cycle: int = 80
+    include_email_dispatch: bool = True
+    email_dispatch_min_fit_score: float = 0.42
+    email_dispatch_limit: int = 20
+    email_dispatch_dry_run: bool = True
+    include_email_response_watcher: bool = True
+    email_response_max_per_cycle: int = 120
+    include_jobs: bool = True
+    jobs_min_score: float = 0.38
+    jobs_limit: int = 20
+    include_ip_lock: bool = True
+    include_booth_design: bool = True
+    include_booth_explainer: bool = True
+    include_truth_snapshot: bool = True
+    truth_strict: bool = False
+    no_network: bool = False
 
 
 class ApprovalPatch(BaseModel):
@@ -437,6 +675,54 @@ def _run(script: str, args: list[str], timeout: int = 900) -> dict:
         return {"rc": -1, "error": "timeout"}
 
 
+def _run_linkedin_optimize(args: LinkedInOptimizeArgs) -> dict:
+    run_args = ["--max-packages", str(args.max_packages)]
+    if not args.build_pdf:
+        run_args.append("--no-pdf")
+    if args.publish_summary_post:
+        run_args.append("--publish-linkedin-summary")
+        if args.dry_run_post:
+            run_args.append("--dry-run-post")
+    return _run("lumalinkedin_resume_engine_v1.py", run_args, timeout=1200)
+
+
+def _run_jobs_factory(args: JobsFactoryArgs) -> dict:
+    run_args = ["--min-score", str(args.min_score), "--limit", str(args.limit)]
+    if args.job:
+        run_args.extend(["--job", args.job])
+    return _run("job_application_factory.py", run_args, timeout=1200)
+
+
+def _run_email_finder(args: EmailFinderArgs) -> dict:
+    run_args = ["--min-score", str(args.min_score), "--max-per-cycle", str(args.max_per_cycle)]
+    if args.once:
+        run_args.append("--once")
+    return _run("email_opportunity_finder.py", run_args, timeout=1200)
+
+
+def _run_email_dispatch(args: EmailDispatchArgs) -> dict:
+    run_args = ["--min-fit-score", str(args.min_fit_score), "--limit", str(args.limit)]
+    if args.once:
+        run_args.append("--once")
+    if args.dry_run:
+        run_args.append("--dry-run")
+    return _run("email_resume_dispatcher.py", run_args, timeout=1200)
+
+
+def _run_email_response_watcher(args: EmailResponseWatcherArgs) -> dict:
+    run_args = ["--max-per-cycle", str(args.max_per_cycle)]
+    if args.once:
+        run_args.append("--once")
+    return _run("email_response_watcher.py", run_args, timeout=1200)
+
+
+def _run_context_resolver(strict: bool = False) -> dict:
+    run_args: list[str] = []
+    if strict:
+        run_args.append("--strict")
+    return _run("application_context_resolver.py", run_args, timeout=900)
+
+
 @router.post("/harvest")
 def trigger_harvest(args: HarvestArgs) -> dict:
     return _run("opportunity_harvester.py", ["--min-score", str(args.min_score)])
@@ -450,6 +736,7 @@ def trigger_fill(args: FillArgs) -> dict:
 
 @router.post("/autopilot")
 def run_autopilot(args: AutopilotArgs) -> dict:
+    context_refresh = _run_context_resolver(strict=args.context_strict)
     harvest = _run("opportunity_harvester.py", ["--min-score", str(args.harvest_min_score)])
     fill = _run(
         "opportunity_filler.py",
@@ -469,6 +756,10 @@ def run_autopilot(args: AutopilotArgs) -> dict:
             funding_args.append("--no-network")
         funding = _run("funding_autopilot.py", funding_args)
 
+    contract_loan_pack = None
+    if args.include_contract_loan_pack:
+        contract_loan_pack = _run("ops/GENERATE_CONTRACT_LOAN_AND_INVESTOR_PACK.py", [])
+
     outreach = None
     if args.include_outreach:
         outreach = _generate_outreach_pack(limit=args.outreach_limit)
@@ -479,9 +770,11 @@ def run_autopilot(args: AutopilotArgs) -> dict:
 
     payload = {
         "generated_utc": _now_utc_iso(),
+        "application_context": context_refresh,
         "harvest": harvest,
         "fill": fill,
         "funding": funding,
+        "contract_loan_pack": contract_loan_pack,
         "outreach": outreach,
         "ranked_actionable": ranked_count,
         "tracker": tracker,
@@ -490,6 +783,384 @@ def run_autopilot(args: AutopilotArgs) -> dict:
     summary_path = OPS_OUT / f"opportunity_autopilot_{_utc_stamp()}.json"
     _write_json(summary_path, payload)
     payload["artifact"] = str(summary_path)
+    return payload
+
+
+@router.post("/autopilot-v2")
+def run_autopilot_v2(args: AutopilotV2Args) -> dict:
+    context_refresh = _run_context_resolver(strict=args.context_strict)
+    skip_pack = None
+    if args.include_skip_pack:
+        skip_pack = _run("ops/build_skips_grant_autofill_pack.py", [])
+
+    harvest = _run("opportunity_harvester.py", ["--min-score", str(args.harvest_min_score)])
+    fill = _run(
+        "opportunity_filler.py",
+        ["--min-score", str(args.fill_min_score), "--limit", str(args.fill_limit)],
+    )
+
+    grant_hunter = None
+    if args.include_grant_hunter:
+        grant_hunter = _run(
+            "grant_hunter_v2.py",
+            ["run-all", "--rows", str(args.grant_hunter_rows), "--top", str(args.grant_hunter_top)],
+            timeout=1800,
+        )
+
+    funding = None
+    if args.build_funding_queue:
+        funding_args = [
+            "build",
+            "--top",
+            str(args.funding_top),
+            "--channels",
+            args.funding_channels,
+        ]
+        if args.no_network:
+            funding_args.append("--no-network")
+        funding = _run("funding_autopilot.py", funding_args)
+
+    contract_loan_pack = None
+    if args.include_contract_loan_pack:
+        contract_loan_pack = _run("ops/GENERATE_CONTRACT_LOAN_AND_INVESTOR_PACK.py", [])
+
+    outreach = None
+    if args.include_outreach:
+        outreach = _generate_outreach_pack(limit=args.outreach_limit)
+
+    linkedin = None
+    if args.include_linkedin:
+        linkedin = _run_linkedin_optimize(
+            LinkedInOptimizeArgs(
+                build_pdf=args.linkedin_build_pdf,
+                publish_summary_post=args.linkedin_publish_summary_post,
+                dry_run_post=args.linkedin_dry_run_post,
+            )
+        )
+
+    email_finder = None
+    if args.include_email_finder:
+        email_finder = _run_email_finder(
+            EmailFinderArgs(
+                min_score=args.email_min_score,
+                max_per_cycle=args.email_max_per_cycle,
+                once=True,
+            )
+        )
+
+    email_dispatch = None
+    if args.include_email_dispatch:
+        email_dispatch = _run_email_dispatch(
+            EmailDispatchArgs(
+                min_fit_score=args.email_dispatch_min_fit_score,
+                limit=args.email_dispatch_limit,
+                once=True,
+                dry_run=args.email_dispatch_dry_run,
+            )
+        )
+
+    email_response_watcher = None
+    if args.include_email_response_watcher:
+        email_response_watcher = _run_email_response_watcher(
+            EmailResponseWatcherArgs(
+                max_per_cycle=args.email_response_max_per_cycle,
+                once=True,
+            )
+        )
+
+    jobs = None
+    if args.include_jobs:
+        jobs = _run_jobs_factory(
+            JobsFactoryArgs(
+                min_score=args.jobs_min_score,
+                limit=args.jobs_limit,
+            )
+        )
+
+    ip_lock = None
+    if args.include_ip_lock:
+        ip_lock = _run("ops/LOCK_AUTONOMOUS_GRANT_WIN.py", [])
+
+    booth_design = None
+    if args.include_booth_design:
+        booth_design = _run("ops/build_booth_design_pack.py", [])
+
+    booth_explainer = None
+    if args.include_booth_explainer:
+        booth_explainer = _run("build_booth_explainer_brief.py", [])
+
+    truth_snapshot = None
+    if args.include_truth_snapshot:
+        truth_args: list[str] = []
+        if args.truth_strict:
+            truth_args.append("--strict")
+        truth_snapshot = _run("ops/ENFORCE_PRODUCTION_TRUTH_RULE.py", truth_args)
+
+    tracker_payload = _build_tracker()
+    ranked = _read_json(OUT / "ranked.json") or {}
+    ranked_count = int(ranked.get("total_actionable", 0)) if isinstance(ranked, dict) else 0
+
+    payload = {
+        "generated_utc": _now_utc_iso(),
+        "application_context": context_refresh,
+        "skip_pack": skip_pack,
+        "harvest": harvest,
+        "fill": fill,
+        "grant_hunter": grant_hunter,
+        "funding": funding,
+        "contract_loan_pack": contract_loan_pack,
+        "outreach": outreach,
+        "linkedin": linkedin,
+        "email_finder": email_finder,
+        "email_dispatch": email_dispatch,
+        "email_response_watcher": email_response_watcher,
+        "jobs": jobs,
+        "ip_lock": ip_lock,
+        "booth_design": booth_design,
+        "booth_explainer": booth_explainer,
+        "truth_snapshot": truth_snapshot,
+        "ranked_actionable": ranked_count,
+        "tracker": tracker_payload,
+    }
+
+    summary_path = OPS_OUT / f"opportunity_autopilot_v2_{_utc_stamp()}.json"
+    _write_json(summary_path, payload)
+    payload["artifact"] = str(summary_path)
+    return payload
+
+
+@router.post("/linkedin/optimize")
+def optimize_linkedin(args: LinkedInOptimizeArgs) -> dict:
+    run = _run_linkedin_optimize(args)
+    latest = _latest_linkedin_payload()
+    resume = _read_json(RESUME_LATEST) or {}
+    return {
+        "generated_utc": _now_utc_iso(),
+        "run": run,
+        "linkedin_latest": latest,
+        "resume_latest": {
+            "generated_utc": resume.get("generated_utc") if isinstance(resume, dict) else None,
+            "artifacts": resume.get("artifacts") if isinstance(resume, dict) else None,
+        },
+    }
+
+
+@router.get("/linkedin/latest")
+def linkedin_latest() -> dict:
+    payload = _latest_linkedin_payload()
+    if not payload:
+        return {"error": "no linkedin optimization payload yet"}
+    return payload
+
+
+@router.post("/jobs/factory")
+def run_jobs_factory(args: JobsFactoryArgs) -> dict:
+    run = _run_jobs_factory(args)
+    queue = _read_json(JOBS_QUEUE) or {}
+    return {
+        "generated_utc": _now_utc_iso(),
+        "run": run,
+        "jobs_queue": queue,
+    }
+
+
+@router.get("/jobs/queue")
+def jobs_queue() -> dict:
+    payload = _read_json(JOBS_QUEUE)
+    if not payload:
+        return {"error": "no jobs queue yet -- POST /api/opportunities/jobs/factory"}
+    return payload
+
+
+@router.post("/email/finder/run")
+def run_email_finder(args: EmailFinderArgs) -> dict:
+    run = _run_email_finder(args)
+    latest = _read_json(EMAIL_LATEST) or {}
+    queue = _read_json(EMAIL_QUEUE) or []
+    return {
+        "generated_utc": _now_utc_iso(),
+        "run": run,
+        "email_latest": latest,
+        "email_queue_count": len(queue) if isinstance(queue, list) else 0,
+    }
+
+
+@router.get("/email/finder/latest")
+def email_finder_latest() -> dict:
+    payload = _read_json(EMAIL_LATEST)
+    if not payload:
+        return {"error": "no email opportunity payload yet -- POST /api/opportunities/email/finder/run"}
+    return payload
+
+
+@router.get("/email/finder/queue")
+def email_finder_queue(limit: int = 250) -> dict:
+    payload = _read_json(EMAIL_QUEUE)
+    if not payload:
+        return {"queue": [], "count": 0}
+    rows = payload if isinstance(payload, list) else []
+    return {"count": len(rows), "queue": rows[: max(1, limit)]}
+
+
+@router.get("/email/finder/manifest/latest")
+def email_finder_manifest_latest() -> dict:
+    payload = _read_json(EMAIL_MANIFEST_LATEST)
+    if not payload:
+        return {"error": "no email opportunity manifest yet"}
+    return payload
+
+
+@router.post("/email/dispatch/run")
+def run_email_dispatch(args: EmailDispatchArgs) -> dict:
+    run = _run_email_dispatch(args)
+    latest = _read_json(EMAIL_DISPATCH_LATEST) or {}
+    queue = _read_json(EMAIL_DISPATCH_QUEUE) or {}
+    return {
+        "generated_utc": _now_utc_iso(),
+        "run": run,
+        "dispatch_latest": latest,
+        "dispatch_queue_count": (
+            queue.get("count")
+            if isinstance(queue, dict)
+            else len(queue)
+            if isinstance(queue, list)
+            else 0
+        ),
+    }
+
+
+@router.get("/email/dispatch/latest")
+def email_dispatch_latest() -> dict:
+    payload = _read_json(EMAIL_DISPATCH_LATEST)
+    if not payload:
+        return {"error": "no email dispatch payload yet -- POST /api/opportunities/email/dispatch/run"}
+    return payload
+
+
+@router.get("/email/dispatch/queue")
+def email_dispatch_queue(limit: int = 250) -> dict:
+    payload = _read_json(EMAIL_DISPATCH_QUEUE)
+    if not payload:
+        return {"queue": [], "count": 0}
+    if isinstance(payload, dict):
+        rows = payload.get("items", []) if isinstance(payload.get("items"), list) else []
+        return {"count": len(rows), "queue": rows[: max(1, limit)]}
+    rows = payload if isinstance(payload, list) else []
+    return {"count": len(rows), "queue": rows[: max(1, limit)]}
+
+
+@router.get("/email/dispatch/manifest/latest")
+def email_dispatch_manifest_latest() -> dict:
+    payload = _read_json(EMAIL_DISPATCH_MANIFEST_LATEST)
+    if not payload:
+        return {"error": "no email dispatch manifest yet"}
+    return payload
+
+
+@router.post("/email/response/run")
+def run_email_response_watcher(args: EmailResponseWatcherArgs) -> dict:
+    run = _run_email_response_watcher(args)
+    latest = _read_json(EMAIL_RESPONSE_LATEST) or {}
+    queue = _read_json(EMAIL_RESPONSE_QUEUE) or []
+    return {
+        "generated_utc": _now_utc_iso(),
+        "run": run,
+        "response_latest": latest,
+        "response_queue_count": len(queue) if isinstance(queue, list) else 0,
+    }
+
+
+@router.get("/email/response/latest")
+def email_response_latest() -> dict:
+    payload = _read_json(EMAIL_RESPONSE_LATEST)
+    if not payload:
+        return {"error": "no response watcher payload yet -- POST /api/opportunities/email/response/run"}
+    return payload
+
+
+@router.get("/email/response/queue")
+def email_response_queue(limit: int = 250) -> dict:
+    payload = _read_json(EMAIL_RESPONSE_QUEUE)
+    if not payload:
+        return {"queue": [], "count": 0}
+    rows = payload if isinstance(payload, list) else []
+    return {"count": len(rows), "queue": rows[: max(1, limit)]}
+
+
+@router.get("/email/response/manifest/latest")
+def email_response_manifest_latest() -> dict:
+    payload = _read_json(EMAIL_RESPONSE_MANIFEST_LATEST)
+    if not payload:
+        return {"error": "no response watcher manifest yet"}
+    return payload
+
+
+@router.post("/context/refresh")
+def refresh_application_context(strict: bool = True) -> dict:
+    run = _run_context_resolver(strict=strict)
+    latest = _read_json(APP_CONTEXT_LATEST) or {}
+    manifest = _read_json(APP_CONTEXT_MANIFEST_LATEST) or {}
+    return {
+        "generated_utc": _now_utc_iso(),
+        "run": run,
+        "application_context_latest": latest,
+        "application_context_manifest": manifest,
+    }
+
+
+@router.get("/context/latest")
+def application_context_latest() -> dict:
+    payload = _read_json(APP_CONTEXT_LATEST)
+    if not payload:
+        return {"error": "no application context payload yet -- POST /api/opportunities/context/refresh"}
+    return payload
+
+
+@router.get("/valuation/latest")
+def valuation_latest() -> dict:
+    payload = _read_json(MASTER_VAL_LATEST)
+    if not payload:
+        return {"error": "no master valuation payload yet"}
+    return payload
+
+
+@router.get("/ip/grant-win/latest")
+def ip_grant_win_latest() -> dict:
+    payload = _read_json(IP_GRANT_WIN_MANIFEST_LATEST)
+    if not payload:
+        return {"error": "no autonomous grant win manifest yet"}
+    return payload
+
+
+@router.get("/explainer/quantified/latest")
+def explainer_quantified_latest() -> dict:
+    payload = _read_json(LUMA_EXPLAINER_QUANT_LATEST)
+    if not payload:
+        return {"error": "no quantified explainer payload yet"}
+    return payload
+
+
+@router.get("/booth/design/latest")
+def booth_design_latest() -> dict:
+    payload = _read_json(BOOTH_DESIGN_MANIFEST_LATEST)
+    if not payload:
+        return {"error": "no booth design manifest yet"}
+    return payload
+
+
+@router.get("/truth/latest")
+def truth_latest() -> dict:
+    payload = _read_json(PUBLIC_TRUTH_LATEST)
+    if not payload:
+        return {"error": "no public truth snapshot yet"}
+    return payload
+
+
+@router.get("/truth/manifest/latest")
+def truth_manifest_latest() -> dict:
+    payload = _read_json(PUBLIC_TRUTH_MANIFEST_LATEST)
+    if not payload:
+        return {"error": "no public truth manifest yet"}
     return payload
 
 

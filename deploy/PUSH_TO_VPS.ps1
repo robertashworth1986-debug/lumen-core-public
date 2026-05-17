@@ -1,12 +1,27 @@
 param(
     [string]$VpsIp = "157.151.148.234",
-    [string]$VpsUser = "ubuntu",
+    [string]$VpsUser = "opc",
     [string]$VpsRoot = "/opt/lumencore",
     [string]$Root = "C:\LumaTrader\INSTITUTIONAL_STACK_V2",
-    [string]$SshKeyPath = ""
+    [string]$SshKeyPath = "C:\Users\Novac\Downloads\ssh-key-2026-04-23.key"
 )
 
 $ErrorActionPreference = "Stop"
+
+if (-not $SshKeyPath -or -not (Test-Path $SshKeyPath)) {
+    $keyCandidates = @(
+        $env:LUMA_VPS_SSH_KEY,
+        "C:\Users\Novac\Downloads\ssh-key-2026-04-23.key",
+        (Join-Path $env:USERPROFILE ".ssh\id_ed25519"),
+        (Join-Path $env:USERPROFILE ".ssh\id_rsa")
+    )
+    foreach ($candidate in $keyCandidates) {
+        if ($candidate -and (Test-Path $candidate)) {
+            $SshKeyPath = (Resolve-Path $candidate).Path
+            break
+        }
+    }
+}
 
 # =============================================================================
 # LUMEN-CORE.AI — Push Stack to VPS
@@ -27,6 +42,7 @@ function Invoke-Scp {
     if ($SshKeyPath) {
         $scpArgs += @("-i", $SshKeyPath)
     }
+    $scpArgs += @("-o", "BatchMode=yes")
     $scpArgs += $Args
 
     & scp @scpArgs
@@ -47,6 +63,7 @@ function Invoke-Ssh {
     if ($SshKeyPath) {
         $sshArgs += @("-i", $SshKeyPath)
     }
+    $sshArgs += @("-o", "BatchMode=yes")
     $sshArgs += @("${VpsUser}@${VpsIp}", $RemoteCommand)
 
     & ssh @sshArgs
@@ -58,6 +75,9 @@ function Invoke-Ssh {
 $deployScript = Join-Path $Root "deploy\VPS_DEPLOY.sh"
 $codeDir = Join-Path $Root "code"
 $lamaScoutDir = Join-Path $Root "LamaScout"
+$stamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssZ")
+$codeArchive = Join-Path $env:TEMP "lumencore_code_$stamp.tgz"
+$lamaArchive = Join-Path $env:TEMP "lumencore_lamascout_$stamp.tgz"
 
 if (-not (Test-Path $deployScript)) {
     throw "Deploy script not found: $deployScript"
@@ -92,19 +112,31 @@ Invoke-Ssh -StepLabel "1/5 Run VPS deploy script" -RemoteCommand "chmod +x /tmp/
 
 # Step 2: Upload trading stack code
 Write-Host "[2/5] Uploading trading stack code..." -ForegroundColor Yellow
-Invoke-Scp -StepLabel "2/5 Upload code" -Args @(
-    "-r",
-    $codeDir,
-    "${VpsUser}@${VpsIp}:${VpsRoot}/"
+if (Test-Path $codeArchive) { Remove-Item $codeArchive -Force }
+tar -czf $codeArchive -C $Root --exclude='code/.venv' --exclude='code/**/__pycache__' --exclude='code/**/*.pyc' code
+if ($LASTEXITCODE -ne 0 -or -not (Test-Path $codeArchive)) {
+    throw "[2/5 Package code] tar archive build failed"
+}
+Invoke-Scp -StepLabel "2/5 Upload code archive" -Args @(
+    $codeArchive,
+    "${VpsUser}@${VpsIp}:/tmp/lumencore_code.tgz"
 )
+Invoke-Ssh -StepLabel "2/5 Extract code archive" -RemoteCommand "sudo rm -rf ${VpsRoot}/code && sudo mkdir -p ${VpsRoot} && sudo tar -xzf /tmp/lumencore_code.tgz -C ${VpsRoot} && rm -f /tmp/lumencore_code.tgz"
+Remove-Item $codeArchive -Force
 
 # Step 3: Upload LamaScout
 Write-Host "[3/5] Uploading LamaScout..." -ForegroundColor Yellow
-Invoke-Scp -StepLabel "3/5 Upload LamaScout" -Args @(
-    "-r",
-    $lamaScoutDir,
-    "${VpsUser}@${VpsIp}:${VpsRoot}/"
+if (Test-Path $lamaArchive) { Remove-Item $lamaArchive -Force }
+tar -czf $lamaArchive -C $Root LamaScout
+if ($LASTEXITCODE -ne 0 -or -not (Test-Path $lamaArchive)) {
+    throw "[3/5 Package LamaScout] tar archive build failed"
+}
+Invoke-Scp -StepLabel "3/5 Upload LamaScout archive" -Args @(
+    $lamaArchive,
+    "${VpsUser}@${VpsIp}:/tmp/lumencore_lamascout.tgz"
 )
+Invoke-Ssh -StepLabel "3/5 Extract LamaScout archive" -RemoteCommand "sudo rm -rf ${VpsRoot}/LamaScout && sudo mkdir -p ${VpsRoot} && sudo tar -xzf /tmp/lumencore_lamascout.tgz -C ${VpsRoot} && rm -f /tmp/lumencore_lamascout.tgz"
+Remove-Item $lamaArchive -Force
 
 # Step 4: Fix permissions and start services
 Write-Host "[4/5] Setting permissions and starting services..." -ForegroundColor Yellow

@@ -39,6 +39,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from application_context_resolver import load_application_profile
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 OUT = ROOT / "out" / "opportunities"
@@ -51,6 +53,7 @@ KNOWN_ENV_FILES = [
 
 PROFILE_PATH = DATA / "company_profile.json"
 CATALOG_PATH = DATA / "grant_catalog.json"
+SKIP_AUTOFILL_PATH = ROOT / "out" / "ops" / "skips_grant_autofill" / "skips_grant_autofill_latest.json"
 
 # Profile keyword pool (built once from profile + catalog) drives fit scoring.
 DEFAULT_KEYWORDS = [
@@ -73,6 +76,49 @@ PROFILE_NAICS = [
     "541715",  # R&D - Physical, Engineering, Life Sciences
     "518210",  # Data Processing, Hosting
 ]
+
+
+def _profile_keywords(profile: dict[str, Any]) -> list[str]:
+    company = profile.get("company", {}) if isinstance(profile, dict) else {}
+    capabilities = profile.get("company_capabilities", []) if isinstance(profile, dict) else []
+    identifiers = profile.get("identifiers", {}) if isinstance(profile, dict) else {}
+    federal = profile.get("federal_readiness", {}) if isinstance(profile, dict) else {}
+
+    seeds: list[str] = []
+    for value in [
+        company.get("legal_name"),
+        company.get("dba"),
+        company.get("website"),
+        company.get("sam_gov_status"),
+        federal.get("status"),
+        federal.get("runtime_mode"),
+    ]:
+        txt = str(value or "").strip()
+        if txt:
+            seeds.append(txt)
+
+    if isinstance(capabilities, list):
+        for row in capabilities:
+            txt = str(row or "").strip()
+            if txt:
+                seeds.append(txt)
+
+    patent_numbers = identifiers.get("patent_numbers") if isinstance(identifiers, dict) else []
+    if isinstance(patent_numbers, list):
+        for token in patent_numbers:
+            txt = str(token or "").strip()
+            if txt:
+                seeds.append(txt)
+
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for value in seeds:
+        key = _normalize(value)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        normalized.append(value)
+    return normalized
 
 
 # --------------------------- HTTP helpers --------------------------------- #
@@ -123,6 +169,101 @@ def _http_json(
     req = urllib.request.Request(url, data=body, headers=h, method=method)
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode("utf-8", errors="replace"))
+
+
+def _extract_deadline_note_date(note: str) -> str:
+    text = str(note or "")
+    m = re.search(r"([A-Za-z]+)\s+(\d{1,2}),\s*(20\d{2})", text)
+    if m:
+        month_name = _normalize(m.group(1))
+        month_map = {
+            "jan": 1,
+            "january": 1,
+            "feb": 2,
+            "february": 2,
+            "mar": 3,
+            "march": 3,
+            "apr": 4,
+            "april": 4,
+            "may": 5,
+            "jun": 6,
+            "june": 6,
+            "jul": 7,
+            "july": 7,
+            "aug": 8,
+            "august": 8,
+            "sep": 9,
+            "sept": 9,
+            "september": 9,
+            "oct": 10,
+            "october": 10,
+            "nov": 11,
+            "november": 11,
+            "dec": 12,
+            "december": 12,
+        }
+        month = month_map.get(month_name)
+        if month:
+            day = int(m.group(2))
+            year = int(m.group(3))
+            return f"{month:02d}/{day:02d}/{year:04d}"
+    return datetime.now(timezone.utc).strftime("%m/%d/%Y")
+
+
+def fetch_skip_grants() -> list[dict[str, Any]]:
+    if not SKIP_AUTOFILL_PATH.exists():
+        return []
+
+    try:
+        payload = json.loads(SKIP_AUTOFILL_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+    opportunities = payload.get("opportunity_variants", []) if isinstance(payload, dict) else []
+    use_of_funds = payload.get("use_of_funds_templates", {}) if isinstance(payload, dict) else {}
+    business_profile = payload.get("business_profile", {}) if isinstance(payload, dict) else {}
+    if not isinstance(opportunities, list):
+        return []
+
+    out: list[dict[str, Any]] = []
+    for item in opportunities:
+        if not isinstance(item, dict):
+            continue
+        oid = str(item.get("opportunity_id") or "skip-opportunity")
+        title = str(item.get("title") or oid)
+        fit = _normalize(item.get("fit"))
+        budget_key = str(item.get("recommended_budget_template") or "")
+        budget_map = use_of_funds.get(budget_key, {}) if isinstance(use_of_funds, dict) else {}
+        budget_total = 0.0
+        if isinstance(budget_map, dict):
+            for val in budget_map.values():
+                budget_total += float(val) if str(val).replace(".", "", 1).isdigit() else 0.0
+
+        out.append(
+            {
+                "source": "skip",
+                "id": f"SKIP-{_normalize(oid).replace(' ', '_')}",
+                "number": f"SKIP-{_normalize(oid).replace(' ', '_')}",
+                "title": title,
+                "agency": "Hello Skip Funding Network",
+                "status": "posted",
+                "open_date": datetime.now(timezone.utc).strftime("%m/%d/%Y"),
+                "close_date": _extract_deadline_note_date(str(item.get("deadline_note") or "")),
+                "doc_type": "SKIP Grant",
+                "url": str(business_profile.get("website") or "https://helloskip.com/"),
+                "topics": [
+                    str(item.get("autofill_angle") or ""),
+                    str(item.get("paste_ready_answer") or ""),
+                    "autonomous ai grant execution",
+                ],
+                "raw": {
+                    "awardCeiling": budget_total,
+                    "eligibility_required_tags": item.get("eligibility_required_tags", []),
+                    "fit": fit,
+                },
+            }
+        )
+    return out
 
 
 # --------------------------- Sources -------------------------------------- #
@@ -368,7 +509,10 @@ def is_actionable(rec: dict) -> bool:
 
 def harvest(min_score: float = 0.30, limit: int = 5000) -> dict:
     _hydrate_known_env_files()
+    profile = load_application_profile()
     keywords = list(DEFAULT_KEYWORDS)
+    keywords.extend(_profile_keywords(profile))
+    keywords = list(dict.fromkeys(k for k in keywords if str(k or "").strip()))
     sam_env_name, sam_key = _first_nonempty_env(
         "SAM_API_KEY",
         "SAM_GOV_API_KEY",
@@ -388,7 +532,11 @@ def harvest(min_score: float = 0.30, limit: int = 5000) -> dict:
     sm = fetch_sam_gov(sam_key, days=60, limit=200)
     print(f"  {len(sm)} records")
 
-    raw = (g + s + sm)[:limit]
+    print("[harvest] skip grants (local autofill feed) ...")
+    sk = fetch_skip_grants()
+    print(f"  {len(sk)} records")
+
+    raw = (g + s + sm + sk)[:limit]
     print(f"[harvest] total raw: {len(raw)}")
 
     # First-pass score on titles only, take top 150 for synopsis enrichment
@@ -424,7 +572,7 @@ def harvest(min_score: float = 0.30, limit: int = 5000) -> dict:
     raw_path = OUT / f"harvest_{stamp}.json"
     raw_path.write_text(json.dumps({
         "harvested_utc": now.isoformat(),
-        "totals": {"grants_gov": len(g), "sbir_gov": len(s), "sam_gov": len(sm)},
+        "totals": {"grants_gov": len(g), "sbir_gov": len(s), "sam_gov": len(sm), "skip": len(sk)},
         "records": raw,
     }, indent=2, default=str), encoding="utf-8")
 

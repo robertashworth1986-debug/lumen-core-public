@@ -16,6 +16,9 @@ NOBEL_CATALOG_FILE = OUT_DIR / "lumencore_nobel_engine_catalog.json"
 LIVE_HEARTBEAT_FILE = STACK_ROOT / "out" / "execution" / "live_executor_heartbeat.json"
 LIVE_TRADE_LEDGER_FILE = STACK_ROOT / "out" / "execution" / "live_trade_ledger.jsonl"
 PREMIUM_MIRROR_LATEST_FILE = STACK_ROOT.parent / "premium_packages_mirror" / "premium_package_mirror_latest.json"
+MASTER_VALUATION_FILE = STACK_ROOT / "out" / "ops" / "master_valuation" / "master_valuation_latest.json"
+LUMA_EXPLAINER_FILE = STACK_ROOT / "out" / "ops" / "luma_explainer" / "luma_explainer_quantified_latest.json"
+PUBLIC_TRUTH_FILE = STACK_ROOT / "out" / "ops" / "public_truth" / "public_truth_latest.json"
 
 OUTPUT_JSON = OUT_DIR / "booth_explainer_brief.json"
 OUTPUT_MD = OUT_DIR / "booth_explainer_brief.md"
@@ -104,6 +107,9 @@ def _build_payload(recent_trade_rows: int) -> dict[str, Any]:
     catalog = load_json(NOBEL_CATALOG_FILE, {})
     heartbeat = load_json(LIVE_HEARTBEAT_FILE, {})
     mirror = load_json(PREMIUM_MIRROR_LATEST_FILE, {})
+    master_valuation = load_json(MASTER_VALUATION_FILE, {})
+    luma_explainer = load_json(LUMA_EXPLAINER_FILE, {})
+    public_truth = load_json(PUBLIC_TRUTH_FILE, {})
     trade_rows = _tail_jsonl(LIVE_TRADE_LEDGER_FILE, max(1, recent_trade_rows))
 
     founder_profile = DEFAULT_FOUNDER_PROFILE
@@ -213,12 +219,33 @@ def _build_payload(recent_trade_rows: int) -> dict[str, Any]:
             "total_bytes_seen": _safe_int((mirror or {}).get("total_bytes_seen", 0), 0),
             "chain_of_custody_sha256": str((mirror or {}).get("chain_of_custody_sha256", "")),
         },
+        "autonomous_grant_win": {
+            "master_valuation_generated_utc": str((master_valuation or {}).get("generated_utc", "")),
+            "master_valuation_proxy_usd": _safe_float(
+                ((master_valuation or {}).get("valuation", {}) or {}).get("master_valuation_proxy_usd", 0.0),
+                0.0,
+            ),
+            "valuation_increment_usd": _safe_float(
+                ((master_valuation or {}).get("valuation", {}) or {}).get("valuation_increment_usd", 0.0),
+                0.0,
+            ),
+            "ip_entry_sha256": str((((master_valuation or {}).get("ip_lock", {}) or {}).get("entry_sha256", ""))),
+            "event_id": str((((master_valuation or {}).get("ip_lock", {}) or {}).get("event_id", ""))),
+            "explainer_generated_utc": str((luma_explainer or {}).get("generated_utc", "")),
+            "explainer_entry_sha256": str((luma_explainer or {}).get("entry_sha256", "")),
+            "public_truth_status": str((public_truth or {}).get("status", "")),
+            "public_truth_generated_utc": str((public_truth or {}).get("generated_utc", "")),
+            "public_truth_chain_entry_sha256": str((((public_truth or {}).get("chain", {}) or {}).get("entry_sha256", ""))),
+        },
         "artifacts": {
             "universe_map_json": str(UNIVERSE_MAP_FILE.as_posix()),
             "nobel_engine_catalog_json": str(NOBEL_CATALOG_FILE.as_posix()),
             "live_trade_ledger_jsonl": str(LIVE_TRADE_LEDGER_FILE.as_posix()),
             "live_executor_heartbeat_json": str(LIVE_HEARTBEAT_FILE.as_posix()),
             "premium_mirror_latest_json": str(PREMIUM_MIRROR_LATEST_FILE.as_posix()),
+            "master_valuation_latest_json": str(MASTER_VALUATION_FILE.as_posix()),
+            "luma_explainer_quantified_latest_json": str(LUMA_EXPLAINER_FILE.as_posix()),
+            "public_truth_latest_json": str(PUBLIC_TRUTH_FILE.as_posix()),
         },
     }
 
@@ -233,6 +260,7 @@ def _render_markdown(payload: dict[str, Any]) -> str:
     hb = live.get("heartbeat", {}) if isinstance(live, dict) else {}
     trade = live.get("latest_trade", {}) if isinstance(live, dict) else {}
     mirror = payload.get("premium_mirror", {}) if isinstance(payload, dict) else {}
+    grant_win = payload.get("autonomous_grant_win", {}) if isinstance(payload, dict) else {}
 
     lines: list[str] = []
     lines.append("# Luma Booth Explainer Brief")
@@ -277,6 +305,15 @@ def _render_markdown(payload: dict[str, Any]) -> str:
     lines.append(f"- total_sources: {mirror.get('total_sources', 0)}")
     lines.append(f"- total_files_seen: {mirror.get('total_files_seen', 0)}")
     lines.append(f"- total_files_copied: {mirror.get('total_files_copied', 0)}")
+    lines.append("")
+    lines.append("## Autonomous Grant Win Lock")
+    lines.append(f"- valuation_increment_usd: {grant_win.get('valuation_increment_usd', 0)}")
+    lines.append(f"- master_valuation_proxy_usd: {grant_win.get('master_valuation_proxy_usd', 0)}")
+    lines.append(f"- ip_entry_sha256: {grant_win.get('ip_entry_sha256', '')}")
+    lines.append(f"- event_id: {grant_win.get('event_id', '')}")
+    lines.append(f"- explainer_generated_utc: {grant_win.get('explainer_generated_utc', '')}")
+    lines.append(f"- public_truth_status: {grant_win.get('public_truth_status', '')}")
+    lines.append(f"- public_truth_chain_entry_sha256: {grant_win.get('public_truth_chain_entry_sha256', '')}")
 
     return "\n".join(lines).strip() + "\n"
 

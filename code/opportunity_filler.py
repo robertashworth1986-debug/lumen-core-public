@@ -25,6 +25,8 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
+from application_context_resolver import load_application_profile
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 OUT = ROOT / "out" / "opportunities"
@@ -78,6 +80,12 @@ def build_sf424(profile: dict, opp: dict) -> dict:
     pi = profile.get("pi", {}) or {}
     award = (opp.get("raw") or {}).get("awardCeiling")
     floor = (opp.get("raw") or {}).get("awardFloor")
+    patent_numbers = profile.get("patent_numbers") if isinstance(profile.get("patent_numbers"), list) else []
+    patent_line = (
+        f"USPTO patent references: {', '.join(str(x) for x in patent_numbers)}"
+        if patent_numbers
+        else "USPTO patent references (if applicable)"
+    )
     return {
         "_form": "SF-424 / Federal Assistance",
         "1_type_of_submission": "Application",
@@ -132,7 +140,7 @@ def build_sf424(profile: dict, opp: dict) -> dict:
             "Budget (build from program ceiling)",
             "Bio Sketch (PI)",
             "Letters of support (if requested)",
-            "USPTO patent reference 19/281,546",
+            patent_line,
         ],
     }
 
@@ -140,6 +148,8 @@ def build_sf424(profile: dict, opp: dict) -> dict:
 def cover_letter(profile: dict, opp: dict) -> str:
     today = datetime.now(timezone.utc).strftime("%B %d, %Y")
     pi = profile.get("pi", {}) or {}
+    patent_numbers = profile.get("patent_numbers") if isinstance(profile.get("patent_numbers"), list) else []
+    patent_text = ", ".join(str(x) for x in patent_numbers) if patent_numbers else "USPTO patent references available on request"
     return f"""# Cover Letter
 
 **Date:** {today}
@@ -158,7 +168,7 @@ LumenCore is a per-dataset adaptive forecasting engine with a frozen 673-dataset
 benchmark, empirically calibrated uncertainty bands (94.2% coverage at 80%
 target), live regime-shift detection (CUSUM + variance-ratio), and a SHA-256
 evidence chain. Live execution is verified on a public exchange. Patent
-USPTO 19/281,546 covers the harmonic phase-locked detection method.
+references: {patent_text}.
 
 This proposal directly addresses the opportunity's emphasis on the keyword
 matches detected by our automated fit-scoring: {", ".join(opp.get('_keyword_matches', []))}.
@@ -268,10 +278,22 @@ def fill_one(opp: dict, profile: dict, tech_master: str | None) -> Path:
 def _check_blockers(profile: dict, opp: dict) -> list[str]:
     blockers: list[str] = []
     must = ["legal_name", "duns_or_uei", "ein", "address_line1",
-            "city", "state", "zip"]
+            "city", "state", "zip", "phone", "email", "cage_code"]
     for f in must:
         if not profile.get(f):
             blockers.append(f"profile missing: {f}")
+    pi = profile.get("pi", {}) if isinstance(profile.get("pi"), dict) else {}
+    if not pi.get("name"):
+        blockers.append("profile missing: pi.name")
+    if not pi.get("phone"):
+        blockers.append("profile missing: pi.phone")
+    if not pi.get("email"):
+        blockers.append("profile missing: pi.email")
+    if not profile.get("patent_numbers"):
+        blockers.append("profile missing: patent_numbers")
+    federal_readiness = profile.get("federal_readiness") if isinstance(profile.get("federal_readiness"), dict) else {}
+    if not federal_readiness.get("status"):
+        blockers.append("profile missing: federal_readiness.status")
     if (profile.get("sam_gov_status") or "").lower() != "active":
         blockers.append("SAM.gov status not active")
     cd = opp.get("close_date") or ""
@@ -291,10 +313,18 @@ def main() -> int:
         print("[fill] no ranked.json -- run opportunity_harvester.py first")
         return 1
 
-    profile_full = json.loads(PROFILE.read_text(encoding="utf-8"))
+    profile_full = load_application_profile()
     # Profile schema nests fields under "company"; flatten for SF-424 mapping.
-    profile = dict(profile_full.get("company") or {})
-    profile["pi"] = profile_full.get("pi") or {}
+    profile = dict(profile_full.get("company") or {}) if isinstance(profile_full, dict) else {}
+    profile["pi"] = profile_full.get("pi") if isinstance(profile_full, dict) else {}
+    if not isinstance(profile.get("pi"), dict):
+        profile["pi"] = {}
+    identifiers = profile_full.get("identifiers") if isinstance(profile_full, dict) else {}
+    if isinstance(identifiers, dict):
+        profile["patent_numbers"] = identifiers.get("patent_numbers") or []
+    else:
+        profile["patent_numbers"] = []
+    profile["federal_readiness"] = profile_full.get("federal_readiness") if isinstance(profile_full, dict) else {}
     tech_master = TECH_VOLUME.read_text(encoding="utf-8") if TECH_VOLUME.exists() else None
     payload = json.loads(ranked_path.read_text(encoding="utf-8"))
     records = [r for r in payload.get("records", []) if r.get("_fit_score", 0) >= args.min_score]

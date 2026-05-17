@@ -1,0 +1,543 @@
+"""Email opportunity finder engine.
+
+Continuously polls configured IMAP inboxes, extracts opportunity signals from
+new messages, scores them, and writes deterministic artifacts for downstream
+approval and automation flows.
+
+Outputs:
+  out/opportunities/email/email_opportunities_latest.json
+  out/opportunities/email/email_opportunity_queue_latest.json
+  out/opportunities/email/email_opportunities_ledger.jsonl
+  out/ops/email_opportunity_finder/email_opportunity_manifest_latest.json
+
+Environment (primary source, no secrets committed):
+  LUMA_EMAIL_IMAP_HOST
+  LUMA_EMAIL_IMAP_PORT      (optional, default 993)
+  LUMA_EMAIL_IMAP_USER
+  LUMA_EMAIL_IMAP_PASSWORD
+  LUMA_EMAIL_IMAP_FOLDER    (optional, default INBOX)
+  LUMA_EMAIL_IMAP_SEARCH    (optional, default UNSEEN)
+
+Optional config file:
+  data/email_opportunity_sources.json
+"""
+
+from __future__ import annotations
+
+import argparse
+import email
+import email.policy
+import hashlib
+import imaplib
+import json
+import os
+import re
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DATA_DIR = ROOT / "data"
+OUT_EMAIL = ROOT / "out" / "opportunities" / "email"
+OUT_OPS = ROOT / "out" / "ops" / "email_opportunity_finder"
+
+STATE_PATH = OUT_EMAIL / "state.json"
+LATEST_PATH = OUT_EMAIL / "email_opportunities_latest.json"
+QUEUE_PATH = OUT_EMAIL / "email_opportunity_queue_latest.json"
+LEDGER_PATH = OUT_EMAIL / "email_opportunities_ledger.jsonl"
+LATEST_MD_PATH = OUT_EMAIL / "email_opportunities_latest.md"
+
+MANIFEST_LATEST = OUT_OPS / "email_opportunity_manifest_latest.json"
+CFG_PATH = DATA_DIR / "email_opportunity_sources.json"
+
+
+KEYWORD_WEIGHTS: dict[str, float] = {
+    "grant": 2.6,
+    "funding": 2.3,
+    "rfp": 2.2,
+    "proposal": 1.8,
+    "contract": 1.7,
+    "pilot": 1.6,
+    "award": 1.5,
+    "sbir": 2.6,
+    "sttr": 2.4,
+    "job": 1.8,
+    "hiring": 1.9,
+    "recruiter": 1.2,
+    "interview": 1.4,
+    "partner": 1.2,
+    "partnership": 1.5,
+    "procurement": 1.7,
+    "linkedin": 1.5,
+    "opportunity": 1.2,
+    "apply": 1.1,
+}
+
+DOMAIN_BOOSTS: dict[str, float] = {
+    "linkedin.com": 2.2,
+    "grants.gov": 2.5,
+    "sam.gov": 2.1,
+    "sbir.gov": 2.3,
+    "helloskip.com": 1.8,
+    "newtekone.com": 1.3,
+    "kiva.org": 1.1,
+}
+
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def now_tag() -> str:
+    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+
+def normalize(value: str) -> str:
+    return re.sub(r"\s+", " ", str(value or "").strip().lower())
+
+
+def safe_int(value: Any, default: int = 0) -> int:
+    try:
+        return int(float(value))
+    except Exception:
+        return default
+
+
+def safe_float(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except Exception:
+        return default
+
+
+def read_json(path: Path, default: Any) -> Any:
+    if not path.exists():
+        return default
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return default
+
+
+def write_json(path: Path, payload: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    tmp.replace(path)
+
+
+def write_text(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(content.rstrip("\r\n") + "\n", encoding="utf-8")
+    tmp.replace(path)
+
+
+def append_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
+    if not rows:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as fh:
+        for row in rows:
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def strip_html(html: str) -> str:
+    txt = re.sub(r"(?is)<(script|style).*?>.*?</\1>", " ", html)
+    txt = re.sub(r"(?s)<[^>]+>", " ", txt)
+    txt = re.sub(r"\s+", " ", txt)
+    return txt.strip()
+
+
+def extract_body_text(msg: email.message.Message) -> str:
+    chunks: list[str] = []
+    if msg.is_multipart():
+        for part in msg.walk():
+            ctype = str(part.get_content_type() or "").lower()
+            if ctype not in {"text/plain", "text/html"}:
+                continue
+            payload = part.get_payload(decode=True)
+            if payload is None:
+                continue
+            charset = part.get_content_charset() or "utf-8"
+            text = payload.decode(charset, errors="replace")
+            chunks.append(strip_html(text) if ctype == "text/html" else text)
+    else:
+        payload = msg.get_payload(decode=True)
+        if payload is not None:
+            charset = msg.get_content_charset() or "utf-8"
+            text = payload.decode(charset, errors="replace")
+            ctype = str(msg.get_content_type() or "").lower()
+            chunks.append(strip_html(text) if ctype == "text/html" else text)
+    body = "\n".join(chunks)
+    return re.sub(r"\s+", " ", body).strip()
+
+
+def extract_links(text: str) -> list[str]:
+    links = re.findall(r"https?://[^\s\]\[\)\(\"'<>{}]+", text or "")
+    seen: set[str] = set()
+    out: list[str] = []
+    for link in links:
+        if link in seen:
+            continue
+        seen.add(link)
+        out.append(link)
+    return out[:30]
+
+
+def detect_domains(from_addr: str, links: list[str]) -> list[str]:
+    domains: set[str] = set()
+    from_low = normalize(from_addr)
+    for key in DOMAIN_BOOSTS:
+        if key in from_low:
+            domains.add(key)
+    for link in links:
+        low = normalize(link)
+        for key in DOMAIN_BOOSTS:
+            if key in low:
+                domains.add(key)
+    return sorted(domains)
+
+
+def classify_type(text: str) -> str:
+    low = normalize(text)
+    if any(k in low for k in ("grant", "funding", "sbir", "rfp", "opportunity number")):
+        return "grant_or_funding"
+    if any(k in low for k in ("job", "hiring", "recruiter", "interview", "application")):
+        return "job"
+    if any(k in low for k in ("pilot", "partner", "partnership", "procurement", "contract")):
+        return "partnership_or_contract"
+    return "general_opportunity"
+
+
+def score_text(text: str, domains: list[str]) -> tuple[float, list[str]]:
+    low = normalize(text)
+    score = 0.0
+    hits: list[str] = []
+    for kw, weight in KEYWORD_WEIGHTS.items():
+        if kw in low:
+            score += weight
+            hits.append(kw)
+    for domain in domains:
+        score += DOMAIN_BOOSTS.get(domain, 0.0)
+    return score, hits
+
+
+def load_sources() -> list[dict[str, Any]]:
+    cfg = read_json(CFG_PATH, {})
+    sources = cfg.get("sources", []) if isinstance(cfg, dict) else []
+    out: list[dict[str, Any]] = []
+
+    if isinstance(sources, list):
+        for row in sources:
+            if not isinstance(row, dict):
+                continue
+            host = os.getenv(str(row.get("imap_host_env") or "").strip(), "").strip()
+            user = os.getenv(str(row.get("imap_user_env") or "").strip(), "").strip()
+            pwd = os.getenv(str(row.get("imap_password_env") or "").strip(), "").strip()
+            if not (host and user and pwd):
+                continue
+            out.append(
+                {
+                    "name": str(row.get("name") or "configured_inbox"),
+                    "host": host,
+                    "port": safe_int(row.get("imap_port", 993), 993),
+                    "user": user,
+                    "password": pwd,
+                    "folder": str(row.get("folder") or "INBOX"),
+                    "search": str(row.get("search") or "UNSEEN"),
+                }
+            )
+
+    env_host = (os.getenv("LUMA_EMAIL_IMAP_HOST") or os.getenv("EMAIL_IMAP_HOST") or "").strip()
+    env_user = (os.getenv("LUMA_EMAIL_IMAP_USER") or os.getenv("EMAIL_IMAP_USER") or "").strip()
+    env_pwd = (os.getenv("LUMA_EMAIL_IMAP_PASSWORD") or os.getenv("EMAIL_IMAP_PASSWORD") or "").strip()
+    if env_host and env_user and env_pwd:
+        out.append(
+            {
+                "name": "primary_inbox",
+                "host": env_host,
+                "port": safe_int(os.getenv("LUMA_EMAIL_IMAP_PORT", "993"), 993),
+                "user": env_user,
+                "password": env_pwd,
+                "folder": os.getenv("LUMA_EMAIL_IMAP_FOLDER", "INBOX"),
+                "search": os.getenv("LUMA_EMAIL_IMAP_SEARCH", "UNSEEN"),
+            }
+        )
+
+    dedup: dict[tuple[str, str], dict[str, Any]] = {}
+    for src in out:
+        dedup[(src["host"], src["user"])] = src
+    return list(dedup.values())
+
+
+def fetch_messages(source: dict[str, Any], max_per_cycle: int) -> list[email.message.Message]:
+    host = str(source.get("host") or "")
+    port = safe_int(source.get("port"), 993)
+    user = str(source.get("user") or "")
+    password = str(source.get("password") or "")
+    folder = str(source.get("folder") or "INBOX")
+    search = str(source.get("search") or "UNSEEN")
+
+    conn = imaplib.IMAP4_SSL(host, port)
+    try:
+        conn.login(user, password)
+        status, _ = conn.select(folder, readonly=True)
+        if status != "OK":
+            return []
+
+        status, data = conn.search(None, search)
+        if status != "OK":
+            status, data = conn.search(None, "ALL")
+            if status != "OK":
+                return []
+
+        ids = data[0].split() if data and data[0] else []
+        ids = ids[-max_per_cycle:]
+
+        out: list[email.message.Message] = []
+        parser = email.parser.BytesParser(policy=email.policy.default)
+        for msg_id in ids:
+            status, msg_data = conn.fetch(msg_id, "(RFC822)")
+            if status != "OK":
+                continue
+            raw_bytes = b""
+            for part in msg_data:
+                if isinstance(part, tuple) and len(part) >= 2 and isinstance(part[1], (bytes, bytearray)):
+                    raw_bytes += bytes(part[1])
+            if not raw_bytes:
+                continue
+            out.append(parser.parsebytes(raw_bytes))
+        return out
+    finally:
+        try:
+            conn.logout()
+        except Exception:
+            pass
+
+
+def fingerprint(msg: email.message.Message, mailbox_name: str) -> str:
+    key = "|".join(
+        [
+            mailbox_name,
+            str(msg.get("Message-ID") or ""),
+            str(msg.get("Date") or ""),
+            str(msg.get("From") or ""),
+            str(msg.get("Subject") or ""),
+        ]
+    )
+    return hashlib.sha256(key.encode("utf-8")).hexdigest()
+
+
+def render_markdown(summary: dict[str, Any], queue: list[dict[str, Any]]) -> str:
+    lines: list[str] = []
+    lines.append("# Email Opportunity Finder")
+    lines.append("")
+    lines.append(f"Generated UTC: {summary.get('generated_utc', '')}")
+    lines.append(f"Scope: {summary.get('scope', '')}")
+    lines.append(f"Sources configured: {summary.get('sources_configured', 0)}")
+    lines.append(f"New opportunities: {summary.get('new_opportunities', 0)}")
+    lines.append(f"Queue count: {len(queue)}")
+    lines.append("")
+    lines.append("## Top Queue")
+    lines.append("")
+    for row in queue[:25]:
+        lines.append(
+            f"- [{row.get('opportunity_type','general_opportunity')}] score={safe_float(row.get('raw_score')):.2f} "
+            f"from={row.get('from','')} subject={row.get('subject','')}"
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
+def run_cycle(*, min_score: float, max_per_cycle: int) -> dict[str, Any]:
+    OUT_EMAIL.mkdir(parents=True, exist_ok=True)
+    OUT_OPS.mkdir(parents=True, exist_ok=True)
+
+    state = read_json(STATE_PATH, {})
+    seen_ids = state.get("seen_ids", []) if isinstance(state, dict) else []
+    if not isinstance(seen_ids, list):
+        seen_ids = []
+    seen_set = set(str(x) for x in seen_ids)
+
+    prev_queue = read_json(QUEUE_PATH, [])
+    queue_rows: list[dict[str, Any]] = [r for r in prev_queue if isinstance(r, dict)] if isinstance(prev_queue, list) else []
+    queue_by_id = {str(r.get("id") or ""): r for r in queue_rows if str(r.get("id") or "")}
+
+    sources = load_sources()
+    fetched_total = 0
+    parsed_total = 0
+    new_rows: list[dict[str, Any]] = []
+    source_errors: list[dict[str, str]] = []
+
+    for source in sources:
+        name = str(source.get("name") or "inbox")
+        try:
+            messages = fetch_messages(source, max_per_cycle=max_per_cycle)
+        except Exception as exc:
+            source_errors.append({"source": name, "error": str(exc)[:500]})
+            continue
+
+        fetched_total += len(messages)
+        for msg in messages:
+            parsed_total += 1
+            msg_id = fingerprint(msg, name)
+            if msg_id in seen_set:
+                continue
+
+            subject = str(msg.get("Subject") or "")
+            from_addr = str(msg.get("From") or "")
+            body = extract_body_text(msg)
+            links = extract_links(body)
+            domains = detect_domains(from_addr, links)
+
+            text_blob = "\n".join([subject, from_addr, body])
+            raw_score, keyword_hits = score_text(text_blob, domains)
+            if raw_score < min_score:
+                seen_set.add(msg_id)
+                continue
+
+            row = {
+                "id": msg_id,
+                "generated_utc": now_iso(),
+                "mailbox": name,
+                "message_id": str(msg.get("Message-ID") or ""),
+                "date": str(msg.get("Date") or ""),
+                "from": from_addr,
+                "subject": subject,
+                "opportunity_type": classify_type(text_blob),
+                "raw_score": round(raw_score, 4),
+                "fit_score": round(min(1.0, raw_score / 15.0), 4),
+                "keyword_hits": keyword_hits,
+                "domains": domains,
+                "links": links,
+                "snippet": (body or "")[:700],
+                "state": "PENDING_REVIEW",
+            }
+            seen_set.add(msg_id)
+            new_rows.append(row)
+
+            existing = queue_by_id.get(msg_id)
+            if existing:
+                existing["last_seen_utc"] = row["generated_utc"]
+            else:
+                queue_by_id[msg_id] = row
+
+    queue_rows = sorted(
+        queue_by_id.values(),
+        key=lambda x: safe_float(x.get("raw_score"), 0.0),
+        reverse=True,
+    )[:2000]
+
+    state_out = {
+        "generated_utc": now_iso(),
+        "schema": "email_opportunity_state_v1",
+        "seen_ids": list(seen_set)[-50000:],
+        "seen_count": len(seen_set),
+        "queue_count": len(queue_rows),
+    }
+    write_json(STATE_PATH, state_out)
+
+    append_jsonl(LEDGER_PATH, new_rows)
+    write_json(QUEUE_PATH, queue_rows)
+
+    summary = {
+        "generated_utc": now_iso(),
+        "scope": "email_opportunity_finder_cycle",
+        "sources_configured": len(sources),
+        "fetched_messages": fetched_total,
+        "parsed_messages": parsed_total,
+        "new_opportunities": len(new_rows),
+        "queue_count": len(queue_rows),
+        "source_errors": source_errors,
+        "artifacts": {
+            "state": str(STATE_PATH),
+            "latest": str(LATEST_PATH),
+            "latest_markdown": str(LATEST_MD_PATH),
+            "queue": str(QUEUE_PATH),
+            "ledger": str(LEDGER_PATH),
+        },
+        "new_rows": new_rows[:250],
+    }
+    write_json(LATEST_PATH, summary)
+    write_text(LATEST_MD_PATH, render_markdown(summary, queue_rows))
+
+    tag = now_tag()
+    manifest = {
+        "generated_utc": now_iso(),
+        "schema": "email_opportunity_manifest_v1",
+        "status": "ok" if len(sources) > 0 else "no_sources_configured",
+        "summary": {
+            "new_opportunities": len(new_rows),
+            "queue_count": len(queue_rows),
+            "sources_configured": len(sources),
+        },
+        "paths": {
+            "latest": str(LATEST_PATH),
+            "latest_markdown": str(LATEST_MD_PATH),
+            "queue": str(QUEUE_PATH),
+            "ledger": str(LEDGER_PATH),
+            "state": str(STATE_PATH),
+        },
+        "sha256": {},
+    }
+    for p in [LATEST_PATH, LATEST_MD_PATH, QUEUE_PATH, LEDGER_PATH, STATE_PATH]:
+        if p.exists():
+            manifest["sha256"][str(p)] = sha256_file(p)
+
+    manifest_tag = OUT_OPS / f"email_opportunity_manifest_{tag}.json"
+    write_json(manifest_tag, manifest)
+    write_json(MANIFEST_LATEST, manifest)
+
+    return summary
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Continuously discover opportunities from inbox traffic.")
+    parser.add_argument("--once", action="store_true", help="Run a single poll cycle and exit.")
+    parser.add_argument("--interval-sec", type=int, default=180, help="Polling interval for continuous mode.")
+    parser.add_argument("--min-score", type=float, default=0.9, help="Minimum raw opportunity score.")
+    parser.add_argument("--max-per-cycle", type=int, default=80, help="Maximum messages fetched per source per cycle.")
+    args = parser.parse_args()
+
+    if args.once:
+        summary = run_cycle(min_score=args.min_score, max_per_cycle=args.max_per_cycle)
+        print(f"EMAIL_OPPORTUNITY_LATEST={LATEST_PATH}")
+        print(f"EMAIL_OPPORTUNITY_QUEUE={QUEUE_PATH}")
+        print(f"EMAIL_OPPORTUNITY_MANIFEST={MANIFEST_LATEST}")
+        print(f"EMAIL_OPPORTUNITY_NEW={summary.get('new_opportunities', 0)}")
+        return 0
+
+    while True:
+        try:
+            summary = run_cycle(min_score=args.min_score, max_per_cycle=args.max_per_cycle)
+            print(
+                json.dumps(
+                    {
+                        "generated_utc": summary.get("generated_utc"),
+                        "sources_configured": summary.get("sources_configured"),
+                        "new_opportunities": summary.get("new_opportunities"),
+                        "queue_count": summary.get("queue_count"),
+                    }
+                )
+            )
+        except KeyboardInterrupt:
+            break
+        except Exception as exc:
+            print(json.dumps({"generated_utc": now_iso(), "error": str(exc)[:500]}))
+        time.sleep(max(20, args.interval_sec))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

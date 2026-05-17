@@ -15,6 +15,77 @@ DASHBOARD_PORT=5016
 API_PORT=8000
 LAMASCOUT_API_PORT=8001
 
+PKG_MGR=""
+PY_BIN=""
+
+detect_pkg_manager() {
+    if command -v apt-get >/dev/null 2>&1; then
+        PKG_MGR="apt"
+    elif command -v dnf >/dev/null 2>&1; then
+        PKG_MGR="dnf"
+    elif command -v yum >/dev/null 2>&1; then
+        PKG_MGR="yum"
+    else
+        echo "ERROR: unsupported Linux distro (apt/dnf/yum not found)."
+        exit 1
+    fi
+}
+
+resolve_python_bin() {
+    if command -v "python${PY_VERSION}" >/dev/null 2>&1; then
+        PY_BIN="python${PY_VERSION}"
+    elif command -v python3 >/dev/null 2>&1; then
+        PY_BIN="python3"
+    else
+        echo "ERROR: python3 not found after package installation."
+        exit 1
+    fi
+}
+
+install_system_packages() {
+    case "${PKG_MGR}" in
+        apt)
+            apt-get update -y
+            apt-get install -y \
+                python${PY_VERSION} python${PY_VERSION}-venv python3-pip \
+                nginx certbot python3-certbot-nginx \
+                git curl wget unzip htop tmux screen \
+                build-essential libssl-dev libffi-dev \
+                postgresql-client \
+                supervisor \
+                ufw
+            ;;
+        dnf)
+            dnf -y install epel-release || true
+            dnf -y install \
+                python3 python3-pip python3-devel \
+                nginx \
+                git curl wget unzip tmux \
+                gcc gcc-c++ make openssl-devel libffi-devel \
+                postgresql \
+                firewalld
+
+            for pkg in python3-virtualenv certbot python3-certbot-nginx htop screen supervisor; do
+                dnf -y install "$pkg" || echo "      Optional package unavailable on this host: $pkg"
+            done
+            ;;
+        yum)
+            yum -y install epel-release || true
+            yum -y install \
+                python3 python3-pip python3-devel \
+                nginx \
+                git curl wget unzip tmux \
+                gcc gcc-c++ make openssl-devel libffi-devel \
+                postgresql \
+                firewalld
+
+            for pkg in python3-virtualenv certbot python3-certbot-nginx htop screen supervisor; do
+                yum -y install "$pkg" || echo "      Optional package unavailable on this host: $pkg"
+            done
+            ;;
+    esac
+}
+
 echo "======================================================"
 echo " LUMEN-CORE.AI VPS DEPLOYMENT — $(date -u)"
 echo "======================================================"
@@ -23,25 +94,31 @@ echo "======================================================"
 # 1. SYSTEM PACKAGES
 # ------------------------------------------------------------------------------
 echo "[1/9] Installing system packages..."
-apt-get update -y
-apt-get install -y \
-    python${PY_VERSION} python${PY_VERSION}-venv python3-pip \
-    nginx certbot python3-certbot-nginx \
-    git curl wget unzip htop tmux screen \
-    build-essential libssl-dev libffi-dev \
-    postgresql-client \
-    supervisor \
-    ufw
+detect_pkg_manager
+echo "      Package manager: ${PKG_MGR}"
+install_system_packages
+resolve_python_bin
+echo "      Python runtime: ${PY_BIN}"
 
 # ------------------------------------------------------------------------------
 # 2. FIREWALL
 # ------------------------------------------------------------------------------
 echo "[2/9] Configuring firewall..."
-ufw allow OpenSSH
-ufw allow 'Nginx Full'
-ufw allow 443/tcp
-ufw allow 80/tcp
-ufw --force enable
+if command -v ufw >/dev/null 2>&1; then
+    ufw allow OpenSSH || true
+    ufw allow 'Nginx Full' || true
+    ufw allow 443/tcp || true
+    ufw allow 80/tcp || true
+    ufw --force enable || true
+elif command -v firewall-cmd >/dev/null 2>&1; then
+    systemctl enable --now firewalld || true
+    firewall-cmd --permanent --add-service=ssh || true
+    firewall-cmd --permanent --add-service=http || true
+    firewall-cmd --permanent --add-service=https || true
+    firewall-cmd --reload || true
+else
+    echo "      Firewall tool not found; skipping automated firewall config."
+fi
 
 # ------------------------------------------------------------------------------
 # 3. CREATE STACK USER + DIRECTORIES
@@ -57,7 +134,10 @@ mkdir -p /var/log/lumencore
 # 4. PYTHON VENV + PACKAGES
 # ------------------------------------------------------------------------------
 echo "[4/9] Creating Python virtual environment..."
-python${PY_VERSION} -m venv ${STACK_ROOT}/.venv
+${PY_BIN} -m venv ${STACK_ROOT}/.venv || {
+    ${PY_BIN} -m pip install --user virtualenv
+    ${PY_BIN} -m virtualenv ${STACK_ROOT}/.venv
+}
 source ${STACK_ROOT}/.venv/bin/activate
 
 pip install --upgrade pip setuptools wheel
@@ -100,8 +180,8 @@ echo "[5/9] Code directory ready at ${STACK_ROOT}"
 echo "      --> rsync or scp your stack from your Windows machine:"
 echo ""
 echo "      # From Windows PowerShell (run once after this script finishes):"
-echo "      scp -r C:/LumaTrader/INSTITUTIONAL_STACK_V2/code/* ubuntu@157.151.148.234:${STACK_ROOT}/code/"
-echo "      scp -r C:/LumaTrader/INSTITUTIONAL_STACK_V2/LamaScout/* ubuntu@157.151.148.234:${STACK_ROOT}/LamaScout/"
+echo "      scp -r C:/LumaTrader/INSTITUTIONAL_STACK_V2/code/* <vps-user>@157.151.148.234:${STACK_ROOT}/code/"
+echo "      scp -r C:/LumaTrader/INSTITUTIONAL_STACK_V2/LamaScout/* <vps-user>@157.151.148.234:${STACK_ROOT}/LamaScout/"
 echo ""
 
 chown -R ${STACK_USER}:${STACK_USER} ${STACK_ROOT}
@@ -206,33 +286,22 @@ echo "[6/9] Services installed and enabled."
 # ------------------------------------------------------------------------------
 echo "[7/9] Configuring nginx for lumen-core.ai..."
 
-cat > /etc/nginx/sites-available/lumen-core.ai << 'EOF'
-# =============================================================================
-# lumen-core.ai — Nginx Reverse Proxy
-# =============================================================================
+mkdir -p /var/www/html
+systemctl enable --now nginx || true
 
-# Redirect HTTP -> HTTPS
+if [ -d /etc/nginx/sites-available ]; then
+    NGINX_CONF_PATH="/etc/nginx/sites-available/lumen-core.ai"
+else
+    NGINX_CONF_PATH="/etc/nginx/conf.d/lumen-core.ai.conf"
+fi
+
+cat > ${NGINX_CONF_PATH} << 'EOF'
+# =============================================================================
+# lumen-core.ai — Nginx Reverse Proxy (HTTP first; certbot will add TLS)
+# =============================================================================
 server {
     listen 80;
     server_name lumen-core.ai www.lumen-core.ai;
-    return 301 https://$host$request_uri;
-}
-
-server {
-    listen 443 ssl http2;
-    server_name lumen-core.ai www.lumen-core.ai;
-
-    # SSL — filled in by certbot
-    ssl_certificate     /etc/letsencrypt/live/lumen-core.ai/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/lumen-core.ai/privkey.pem;
-    include             /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
-
-    # Security headers
-    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
-    add_header X-Frame-Options SAMEORIGIN always;
-    add_header X-Content-Type-Options nosniff always;
-    add_header Referrer-Policy no-referrer-when-downgrade always;
 
     # --- Institutional Crypto Dashboard ---
     location /dashboard/ {
@@ -274,11 +343,21 @@ server {
         return 200 '{"status":"LUMEN-CORE ONLINE","domain":"lumen-core.ai","stack":"INSTITUTIONAL_STACK_V2"}';
         add_header Content-Type application/json;
     }
+
+    # --- ACME challenge path for certbot ---
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
 }
 EOF
 
-ln -sf /etc/nginx/sites-available/lumen-core.ai /etc/nginx/sites-enabled/lumen-core.ai
-rm -f /etc/nginx/sites-enabled/default
+if [ -d /etc/nginx/sites-enabled ] && [ -d /etc/nginx/sites-available ]; then
+    ln -sf /etc/nginx/sites-available/lumen-core.ai /etc/nginx/sites-enabled/lumen-core.ai
+    rm -f /etc/nginx/sites-enabled/default
+else
+    rm -f /etc/nginx/conf.d/default.conf || true
+fi
+
 nginx -t && systemctl reload nginx
 
 # ------------------------------------------------------------------------------

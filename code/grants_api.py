@@ -34,6 +34,8 @@ from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response
 from pydantic import BaseModel
 
+from application_context_resolver import load_application_profile, resolve_application_context
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 GRANTS = ROOT / "out" / "grants"
@@ -129,7 +131,7 @@ def catalog() -> JSONResponse:
 def profile() -> JSONResponse:
     if not PROFILE.exists():
         raise HTTPException(status_code=404, detail="profile missing")
-    return JSONResponse(_load(PROFILE))
+    return JSONResponse(load_application_profile())
 
 
 class ProfilePatch(BaseModel):
@@ -188,6 +190,7 @@ def patch_profile(patch: ProfilePatch) -> JSONResponse:
     tmp = PROFILE.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(prof, indent=2), encoding="utf-8")
     tmp.replace(PROFILE)
+    resolve_application_context(strict=False, write_outputs=True)
     _emit("profile_patched", patched_keys=[k for k in (
         "company", "pi", "uei", "ein", "sam_gov_status",
         "address_line1", "city", "state", "zip", "phone", "email")

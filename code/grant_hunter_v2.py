@@ -8,7 +8,8 @@ Fully automated end-to-end grant pipeline:
   3. WRITE  — generates a complete application packet per opportunity (narrative,
                budget, abstract, key personnel, expected outcomes)
   4. QUEUE  — drops approval tickets into the human gate; Robert hits Y/N
-  5. SUBMIT — on approval, auto-submits via Grants.gov workspace API
+    5. SUBMIT — after approval, submit externally in Grants.gov Workspace and
+                             record confirmation evidence
 
 SCORING FORMULA (higher = better):
   score = relevance_score
@@ -49,6 +50,7 @@ OUT_GRANTS = ROOT / "out" / "grants"
 OUT_PACKETS = OUT_GRANTS / "application_packets"
 OUT_QUEUE   = ROOT / "out" / "grant_approval_queue.json"
 PROFILE_PATH = CODE / "grants_profile_lumencore.json"
+SKIP_AUTOFILL_PATH = ROOT / "out" / "ops" / "skips_grant_autofill" / "skips_grant_autofill_latest.json"
 
 GRANTS_API   = "https://api.grants.gov/v1/api/search2"
 GRANTS_SYNC  = "https://api.grants.gov/v1/api/sync"   # detail endpoint
@@ -134,6 +136,69 @@ def _parse_date(s: str) -> Optional[datetime]:
             continue
     return None
 
+
+def _month_to_num(month_name: str) -> Optional[int]:
+    names = {
+        "jan": 1,
+        "january": 1,
+        "feb": 2,
+        "february": 2,
+        "mar": 3,
+        "march": 3,
+        "apr": 4,
+        "april": 4,
+        "may": 5,
+        "jun": 6,
+        "june": 6,
+        "jul": 7,
+        "july": 7,
+        "aug": 8,
+        "august": 8,
+        "sep": 9,
+        "sept": 9,
+        "september": 9,
+        "oct": 10,
+        "october": 10,
+        "nov": 11,
+        "november": 11,
+        "dec": 12,
+        "december": 12,
+    }
+    return names.get(_norm(month_name))
+
+
+def _extract_us_deadline(note: str) -> str:
+    txt = str(note or "")
+    m = re.search(r"([A-Za-z]+)\s+(\d{1,2}),\s*(20\d{2})", txt)
+    if m:
+        month = _month_to_num(m.group(1))
+        day = int(m.group(2))
+        year = int(m.group(3))
+        if month:
+            return f"{month:02d}/{day:02d}/{year:04d}"
+    return (datetime.now(timezone.utc) + timedelta(days=30)).strftime("%m/%d/%Y")
+
+
+def _slug(value: str) -> str:
+    return re.sub(r"[^A-Za-z0-9]+", "_", str(value or "")).strip("_").upper() or "SKIP"
+
+
+def _to_float(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except Exception:
+        return default
+
+
+def _template_budget_total(use_of_funds: Dict[str, Any], key: str) -> float:
+    row = use_of_funds.get(key, {}) if isinstance(use_of_funds, dict) else {}
+    if not isinstance(row, dict):
+        return 0.0
+    total = 0.0
+    for val in row.values():
+        total += _to_float(val, 0.0)
+    return total
+
 def _days_to_close(close_str: str) -> int:
     dt = _parse_date(close_str)
     if not dt:
@@ -203,6 +268,77 @@ def fetch_opportunities(keyword: str, rows: int = 250) -> List[Dict[str, Any]]:
             return hits
     return []
 
+
+def fetch_skip_opportunities(profile: Dict[str, Any]) -> List[Dict[str, Any]]:
+    payload = load_json(SKIP_AUTOFILL_PATH) if SKIP_AUTOFILL_PATH.exists() else {}
+    if not payload:
+        return []
+
+    opportunities = payload.get("opportunity_variants", [])
+    if not isinstance(opportunities, list):
+        return []
+
+    use_of_funds = payload.get("use_of_funds_templates", {}) if isinstance(payload, dict) else {}
+    evidence = payload.get("evidence_snapshot", {}) if isinstance(payload, dict) else {}
+
+    annual_value = _to_float(evidence.get("annual_value_signal_usd"), 0.0)
+    router_edge = _to_float(evidence.get("router_edge_pct"), 0.0)
+    harmonic = _to_float(evidence.get("harmonic_win_rate_pct"), 0.0)
+    website = str((payload.get("business_profile") or {}).get("website") or "https://helloskip.com/")
+
+    out: List[Dict[str, Any]] = []
+    open_date = datetime.now(timezone.utc).strftime("%m/%d/%Y")
+    fit_score_hint = {
+        "very_high": 26,
+        "high": 20,
+        "conditional": 12,
+    }
+
+    for row in opportunities:
+        if not isinstance(row, dict):
+            continue
+        oid = str(row.get("opportunity_id") or "skip_opportunity")
+        title = str(row.get("title") or oid)
+        fit = _norm(row.get("fit"))
+        budget_key = str(row.get("recommended_budget_template") or "")
+        budget_total = _template_budget_total(use_of_funds, budget_key)
+        close_date = _extract_us_deadline(str(row.get("deadline_note") or ""))
+        desc = " ".join(
+            [
+                str(row.get("autofill_angle") or ""),
+                str(row.get("paste_ready_answer") or ""),
+                "harmonic ai autonomous execution",
+                f"annual value signal {annual_value:,.2f}",
+                f"router edge {router_edge:.2f}%",
+                f"harmonic win rate {harmonic:.2f}%",
+                "small business AI grant application",
+            ]
+        ).strip()
+
+        out.append(
+            {
+                "oppNum": f"SKIP-{_slug(oid)}",
+                "title": title,
+                "agencyName": "Hello Skip Funding Network",
+                "oppStatus": "posted",
+                "openDate": open_date,
+                "closeDate": close_date,
+                "docType": "synopsis",
+                "description": desc,
+                "expectedNumberOfAwards": 1,
+                "estimatedTotalProgramFunding": budget_total,
+                "awardCeiling": budget_total,
+                "awardFloor": max(1000.0, budget_total * 0.3) if budget_total > 0 else 1000.0,
+                "eligibilities": "small business, us-based entrepreneur, ai builder",
+                "fundingCategories": "small_business|innovation|technology",
+                "opportunityUrl": website,
+                "source_tag": "skip",
+                "fit_score_hint": fit_score_hint.get(fit, 10),
+                "fit_label": fit,
+            }
+        )
+    return out
+
 # ─── Scoring ──────────────────────────────────────────────────────────────────
 
 def score_opportunity(hit: Dict[str, Any], profile: Dict[str, Any]) -> ScoredOpportunity:
@@ -218,6 +354,7 @@ def score_opportunity(hit: Dict[str, Any], profile: Dict[str, Any]) -> ScoredOpp
     agency = _norm(hit.get("agencyName", ""))
     status = _norm(hit.get("oppStatus", hit.get("status", "")))
     doc_type = _norm(hit.get("docType", ""))
+    is_skip = _norm(hit.get("source_tag", "")) == "skip"
     close_str = str(hit.get("closeDate", "") or "")
     open_str  = str(hit.get("openDate",  "") or "")
     days = _days_to_close(close_str)
@@ -244,12 +381,20 @@ def score_opportunity(hit: Dict[str, Any], profile: Dict[str, Any]) -> ScoredOpp
         if k in agency:
             tier = max(tier, v)
     if agency_allow:
-        if any(a in agency for a in agency_allow):
+        if is_skip:
+            relevance += 10
+            reasons.append("source_allowlist:skip")
+        elif any(a in agency for a in agency_allow):
             relevance += 10
             reasons.append("agency_allowlist_match")
         else:
             relevance -= 8
             reasons.append("agency_not_allowlisted")
+
+    if is_skip:
+        relevance += 12
+        reasons.append("source:skip_autonomous")
+        relevance += _to_float(hit.get("fit_score_hint"), 0.0)
 
     # Keywords
     for term in kw_targets:
@@ -568,7 +713,7 @@ def approve_ticket(ticket_id: str, notes: str = "") -> None:
         return
     save_queue(queue)
     print(f"✅ APPROVED: {ticket_id}")
-    print("   → Next step: run `grant_hunter_v2.py submit --ticket {ticket_id}` to submit to Grants.gov Workspace")
+    print("   → Next step: submit this packet in Grants.gov Workspace and record the returned tracking ID in your evidence artifacts.")
 
 # ─── CLI Commands ─────────────────────────────────────────────────────────────
 
@@ -590,6 +735,13 @@ def cmd_hunt(args: argparse.Namespace) -> int:
             print(f"   [{kw}] → {len(hits)} results (total unique: {len(all_hits)})")
         except Exception as e:
             print(f"   [WARN] {kw}: {e}")
+
+    skip_hits = fetch_skip_opportunities(profile)
+    for h in skip_hits:
+        key = str(h.get("oppNum") or uuid.uuid4().hex)
+        all_hits[key] = h
+    if skip_hits:
+        print(f"   [SKIP] injected {len(skip_hits)} opportunities from {SKIP_AUTOFILL_PATH}")
 
     print(f"\n📊 Scoring {len(all_hits)} unique opportunities...")
     scored = [score_opportunity(h, profile) for h in all_hits.values()]
