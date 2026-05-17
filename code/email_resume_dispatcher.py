@@ -58,6 +58,12 @@ LEDGER_PATH = OUT_EMAIL / "outbound_resume_dispatch_ledger.jsonl"
 LATEST_MD_PATH = OUT_EMAIL / "outbound_resume_dispatch_latest.md"
 
 MANIFEST_LATEST = OUT_OPS / "email_resume_dispatch_manifest_latest.json"
+KNOWN_ENV_FILES = [
+    ROOT / "config" / "luma_outreach_keys.env",
+    ROOT / "config" / "luma_live_keys.env",
+    ROOT / "code" / "execution" / "config" / "luma_live_keys.env",
+    ROOT / ".env",
+]
 
 EMAIL_RE = re.compile(r"^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$")
 
@@ -95,6 +101,34 @@ def read_json(path: Path, default: Any) -> Any:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return default
+
+
+def load_env_file(path: Path) -> list[str]:
+    loaded: list[str] = []
+    if not path.exists():
+        return loaded
+    for raw in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        env_key = key.strip()
+        env_val = value.strip().strip('"').strip("'")
+        if not env_key or not env_val:
+            continue
+        if env_key not in os.environ:
+            os.environ[env_key] = env_val
+            loaded.append(env_key)
+    return loaded
+
+
+def hydrate_known_env() -> dict[str, list[str]]:
+    detail: dict[str, list[str]] = {}
+    for path in KNOWN_ENV_FILES:
+        loaded = load_env_file(path)
+        if loaded:
+            detail[str(path)] = loaded
+    return detail
 
 
 def write_json(path: Path, payload: Any) -> None:
@@ -137,6 +171,8 @@ def parse_email(value: Any) -> str:
 
 
 def load_smtp_config() -> dict[str, Any]:
+    hydrate_known_env()
+
     host = (os.getenv("LUMA_SMTP_HOST") or os.getenv("EMAIL_SMTP_HOST") or "").strip()
     user = (os.getenv("LUMA_SMTP_USER") or os.getenv("EMAIL_SMTP_USER") or "").strip()
     password = (os.getenv("LUMA_SMTP_PASSWORD") or os.getenv("EMAIL_SMTP_PASSWORD") or "").strip()
@@ -145,8 +181,10 @@ def load_smtp_config() -> dict[str, Any]:
 
     starttls_raw = (os.getenv("LUMA_SMTP_STARTTLS") or "true").strip().lower()
     use_ssl_raw = (os.getenv("LUMA_SMTP_USE_SSL") or "false").strip().lower()
+    use_outlook_raw = (os.getenv("LUMA_USE_OUTLOOK_COM") or "true").strip().lower()
     starttls = starttls_raw in {"1", "true", "yes", "y"}
     use_ssl = use_ssl_raw in {"1", "true", "yes", "y"}
+    use_outlook = use_outlook_raw in {"1", "true", "yes", "y"}
 
     return {
         "host": host,
@@ -156,6 +194,7 @@ def load_smtp_config() -> dict[str, Any]:
         "from_addr": from_addr,
         "starttls": starttls,
         "use_ssl": use_ssl,
+        "use_outlook": use_outlook,
     }
 
 
@@ -182,6 +221,38 @@ def smtp_send(message: EmailMessage, smtp_cfg: dict[str, Any]) -> None:
         if user:
             server.login(user, password)
         server.send_message(message)
+
+
+def build_subject(row: dict[str, Any]) -> str:
+    source_subject = normalize_text(row.get("subject"))
+    if source_subject:
+        return f"Re: {source_subject} | Updated Luma Resume"
+    return "Luma Resume Package"
+
+
+def outlook_send(*, recipient: str, subject: str, body: str) -> dict[str, Any]:
+    try:
+        import win32com.client  # type: ignore
+    except Exception as exc:
+        raise RuntimeError(f"outlook_com_import_failed:{exc}")
+
+    try:
+        app = win32com.client.Dispatch("Outlook.Application")
+        mail = app.CreateItem(0)
+        mail.To = recipient
+        mail.Subject = subject
+        mail.Body = body
+
+        if RESUME_MD_PATH.exists():
+            mail.Attachments.Add(str(RESUME_MD_PATH))
+        if RESUME_PDF_PATH.exists():
+            mail.Attachments.Add(str(RESUME_PDF_PATH))
+
+        mail.Send()
+        synthetic_id = make_msgid(domain="outlook.local")
+        return {"ok": True, "message_id": synthetic_id}
+    except Exception as exc:
+        raise RuntimeError(f"outlook_com_send_failed:{exc}")
 
 
 def truth_snippet() -> dict[str, Any]:
@@ -257,11 +328,7 @@ def make_message(
     pi = profile.get("pi", {}) if isinstance(profile, dict) else {}
     sender_name = str(pi.get("name") or company.get("founder_pi") or "Luma Opportunity Engine")
 
-    source_subject = normalize_text(row.get("subject"))
-    if source_subject:
-        subject = f"Re: {source_subject} | Updated Luma Resume"
-    else:
-        subject = "Luma Resume Package"
+    subject = build_subject(row)
 
     message = EmailMessage()
     message["From"] = f"{sender_name} <{sender}>"
@@ -331,7 +398,15 @@ def run_cycle(*, min_fit_score: float, limit: int, dry_run: bool) -> dict[str, A
     smtp_cfg = load_smtp_config()
     sender = str(smtp_cfg.get("from_addr") or "").strip() or str((profile.get("company") or {}).get("email") or "").strip()
     smtp_ready = bool(str(smtp_cfg.get("host") or "").strip() and sender)
-    dispatch_mode = "dry_run" if dry_run else ("live" if smtp_ready else "disabled")
+    outlook_ready = bool(smtp_cfg.get("use_outlook", False))
+    if dry_run:
+        dispatch_mode = "dry_run"
+    elif smtp_ready:
+        dispatch_mode = "smtp_live"
+    elif outlook_ready:
+        dispatch_mode = "outlook_live"
+    else:
+        dispatch_mode = "disabled"
 
     rows_sorted = sorted(queue_rows, key=lambda r: safe_float(r.get("raw_score"), 0.0), reverse=True)
 
@@ -375,15 +450,25 @@ def run_cycle(*, min_fit_score: float, limit: int, dry_run: bool) -> dict[str, A
                 if dry_run:
                     outcome = "dry_run"
                     dry_run_count += 1
-                elif not smtp_ready:
-                    outcome = "skipped"
-                    note = "smtp_not_configured"
-                    skipped_count += 1
-                else:
+                elif smtp_ready:
                     smtp_send(msg, smtp_cfg)
                     outcome = "sent"
                     sent_count += 1
                     sent_set.add(opp_id)
+                else:
+                    if not outlook_ready:
+                        outcome = "skipped"
+                        note = "no_transport_configured"
+                        skipped_count += 1
+                    else:
+                        subject = build_subject(row)
+                        body = build_body(profile, truth, row)
+                        o = outlook_send(recipient=recipient, subject=subject, body=body)
+                        message_id = str(o.get("message_id") or message_id)
+                        outcome = "sent"
+                        note = "transport=outlook_com"
+                        sent_count += 1
+                        sent_set.add(opp_id)
             except Exception as exc:
                 outcome = "error"
                 note = str(exc)[:500]
@@ -435,8 +520,8 @@ def run_cycle(*, min_fit_score: float, limit: int, dry_run: bool) -> dict[str, A
     write_json(QUEUE_PATH, queue_payload)
 
     status = "ok"
-    if not dry_run and not smtp_ready:
-        status = "no_smtp_configured"
+    if not dry_run and not smtp_ready and not outlook_ready:
+        status = "no_transport_configured"
 
     summary = {
         "generated_utc": now_iso(),
@@ -444,6 +529,7 @@ def run_cycle(*, min_fit_score: float, limit: int, dry_run: bool) -> dict[str, A
         "status": status,
         "dispatch_mode": dispatch_mode,
         "smtp_configured": smtp_ready,
+        "outlook_com_enabled": outlook_ready,
         "sender": sender,
         "queue_loaded": len(queue_rows),
         "evaluated": evaluated,

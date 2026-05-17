@@ -37,7 +37,7 @@ Founder-operator of the LumaTrader and LumenCore platform ecosystem with end-to-
 
 ## TECHNOLOGY STACK AND PROVEN PACKAGES
 
-pandas, numpy, requests, scikit-learn, fastapi, joblib, matplotlib, ccxt, yfinance, orjson, symbol_registry_auto, pyyaml, polars, duckdb, fpdf, pydantic, lightgbm, scipy, reportlab, pypfopt
+pandas, numpy, requests, scikit-learn, fastapi, joblib, matplotlib, ccxt, yfinance, orjson, symbol_registry_auto, pyyaml, polars, duckdb, fpdf, win32com, pydantic, lightgbm, scipy, reportlab
 
 ## PROFESSIONAL EXPERIENCE
 

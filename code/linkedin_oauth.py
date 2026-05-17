@@ -3,7 +3,7 @@ linkedin_oauth.py
 =========================================================================
 Self-contained LinkedIn OAuth + Share helpers for LumenCore.
 
-Reads creds from config/luma_live_keys.env:
+Reads creds from config/luma_live_keys.env or config/luma_outreach_keys.env:
     LINKEDIN_CLIENT_ID
     LINKEDIN_CLIENT_SECRET
     LINKEDIN_REDIRECT_URI    (e.g. http://127.0.0.1:8787/auth/linkedin/callback)
@@ -39,9 +39,11 @@ import requests
 
 ROOT = Path(__file__).resolve().parent.parent
 ENV_FILES = [
+    ROOT / "config" / "luma_outreach_keys.env",
     ROOT / "config" / "luma_live_keys.env",
     ROOT / "code" / "execution" / "config" / "luma_live_keys.env",
     ROOT / ".deploy_stage" / "code" / "execution" / "config" / "luma_live_keys.env",
+    ROOT / ".env",
 ]
 TOKEN_PATH = ROOT / "config" / "linkedin_token.json"
 
@@ -74,7 +76,7 @@ def _required(keys: dict, name: str) -> str:
     v = keys.get(name)
     if not v:
         raise RuntimeError(
-            f"{name} not set. Add it to config/luma_live_keys.env "
+            f"{name} not set. Add it to config/luma_outreach_keys.env "
             f"(see https://www.linkedin.com/developers/apps Auth tab)."
         )
     return v

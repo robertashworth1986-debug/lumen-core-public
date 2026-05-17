@@ -51,6 +51,12 @@ LATEST_MD_PATH = OUT_EMAIL / "email_opportunities_latest.md"
 
 MANIFEST_LATEST = OUT_OPS / "email_opportunity_manifest_latest.json"
 CFG_PATH = DATA_DIR / "email_opportunity_sources.json"
+KNOWN_ENV_FILES = [
+    ROOT / "config" / "luma_outreach_keys.env",
+    ROOT / "config" / "luma_live_keys.env",
+    ROOT / "code" / "execution" / "config" / "luma_live_keys.env",
+    ROOT / ".env",
+]
 
 
 KEYWORD_WEIGHTS: dict[str, float] = {
@@ -119,6 +125,34 @@ def read_json(path: Path, default: Any) -> Any:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return default
+
+
+def load_env_file(path: Path) -> list[str]:
+    loaded: list[str] = []
+    if not path.exists():
+        return loaded
+    for raw in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        env_key = key.strip()
+        env_val = value.strip().strip('"').strip("'")
+        if not env_key or not env_val:
+            continue
+        if env_key not in os.environ:
+            os.environ[env_key] = env_val
+            loaded.append(env_key)
+    return loaded
+
+
+def hydrate_known_env() -> dict[str, list[str]]:
+    detail: dict[str, list[str]] = {}
+    for path in KNOWN_ENV_FILES:
+        loaded = load_env_file(path)
+        if loaded:
+            detail[str(path)] = loaded
+    return detail
 
 
 def write_json(path: Path, payload: Any) -> None:
@@ -233,7 +267,81 @@ def score_text(text: str, domains: list[str]) -> tuple[float, list[str]]:
     return score, hits
 
 
+def use_outlook_com() -> bool:
+    raw = (os.getenv("LUMA_USE_OUTLOOK_COM") or "true").strip().lower()
+    return raw in {"1", "true", "yes", "y"}
+
+
+def fingerprint_parts(mailbox_name: str, message_id: str, date_raw: str, from_addr: str, subject: str) -> str:
+    key = "|".join([mailbox_name, message_id, date_raw, from_addr, subject])
+    return hashlib.sha256(key.encode("utf-8")).hexdigest()
+
+
+def _extract_outlook_message_id(headers: str, fallback: str) -> str:
+    if headers:
+        match = re.search(r"(?im)^Message-ID:\s*(.+)$", headers)
+        if match:
+            return str(match.group(1) or "").strip()
+    return str(fallback or "").strip()
+
+
+def fetch_outlook_messages(*, max_per_cycle: int, unread_only: bool) -> list[dict[str, Any]]:
+    try:
+        import win32com.client  # type: ignore
+    except Exception:
+        return []
+
+    try:
+        app = win32com.client.Dispatch("Outlook.Application")
+        namespace = app.GetNamespace("MAPI")
+        inbox = namespace.GetDefaultFolder(6)
+        items = inbox.Items
+        items.Sort("[ReceivedTime]", True)
+        if unread_only:
+            items = items.Restrict("[Unread] = true")
+
+        out: list[dict[str, Any]] = []
+        for item in items:
+            if len(out) >= max_per_cycle:
+                break
+            try:
+                if int(getattr(item, "Class", 0)) != 43:
+                    continue
+
+                headers = ""
+                try:
+                    headers = str(item.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001E") or "")
+                except Exception:
+                    headers = ""
+
+                fallback_mid = ""
+                try:
+                    fallback_mid = str(item.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x1035001E") or "")
+                except Exception:
+                    fallback_mid = ""
+
+                received = getattr(item, "ReceivedTime", None)
+                date_raw = received.isoformat() if hasattr(received, "isoformat") else str(received or "")
+
+                out.append(
+                    {
+                        "message_id": _extract_outlook_message_id(headers, fallback_mid),
+                        "date": date_raw,
+                        "from": str(getattr(item, "SenderEmailAddress", "") or getattr(item, "SenderName", "") or ""),
+                        "subject": str(getattr(item, "Subject", "") or ""),
+                        "body": str(getattr(item, "Body", "") or ""),
+                    }
+                )
+            except Exception:
+                continue
+        return out
+    except Exception:
+        return []
+
+
 def load_sources() -> list[dict[str, Any]]:
+    hydrate_known_env()
+
     cfg = read_json(CFG_PATH, {})
     sources = cfg.get("sources", []) if isinstance(cfg, dict) else []
     out: list[dict[str, Any]] = []
@@ -278,7 +386,13 @@ def load_sources() -> list[dict[str, Any]]:
     dedup: dict[tuple[str, str], dict[str, Any]] = {}
     for src in out:
         dedup[(src["host"], src["user"])] = src
-    return list(dedup.values())
+    sources = list(dedup.values())
+    if sources:
+        return sources
+
+    if use_outlook_com():
+        return [{"name": "outlook_default_inbox", "outlook_com": True, "search": "UNSEEN"}]
+    return []
 
 
 def fetch_messages(source: dict[str, Any], max_per_cycle: int) -> list[email.message.Message]:
@@ -327,16 +441,13 @@ def fetch_messages(source: dict[str, Any], max_per_cycle: int) -> list[email.mes
 
 
 def fingerprint(msg: email.message.Message, mailbox_name: str) -> str:
-    key = "|".join(
-        [
-            mailbox_name,
-            str(msg.get("Message-ID") or ""),
-            str(msg.get("Date") or ""),
-            str(msg.get("From") or ""),
-            str(msg.get("Subject") or ""),
-        ]
+    return fingerprint_parts(
+        mailbox_name,
+        str(msg.get("Message-ID") or ""),
+        str(msg.get("Date") or ""),
+        str(msg.get("From") or ""),
+        str(msg.get("Subject") or ""),
     )
-    return hashlib.sha256(key.encode("utf-8")).hexdigest()
 
 
 def render_markdown(summary: dict[str, Any], queue: list[dict[str, Any]]) -> str:
@@ -382,6 +493,68 @@ def run_cycle(*, min_score: float, max_per_cycle: int) -> dict[str, Any]:
 
     for source in sources:
         name = str(source.get("name") or "inbox")
+        if bool(source.get("outlook_com")):
+            try:
+                messages_outlook = fetch_outlook_messages(
+                    max_per_cycle=max_per_cycle,
+                    unread_only=str(source.get("search") or "UNSEEN").strip().upper() == "UNSEEN",
+                )
+            except Exception as exc:
+                source_errors.append({"source": name, "error": str(exc)[:500]})
+                continue
+
+            fetched_total += len(messages_outlook)
+            for msg in messages_outlook:
+                parsed_total += 1
+                msg_id = fingerprint_parts(
+                    name,
+                    str(msg.get("message_id") or ""),
+                    str(msg.get("date") or ""),
+                    str(msg.get("from") or ""),
+                    str(msg.get("subject") or ""),
+                )
+                if msg_id in seen_set:
+                    continue
+
+                subject = str(msg.get("subject") or "")
+                from_addr = str(msg.get("from") or "")
+                body = str(msg.get("body") or "")
+                links = extract_links(body)
+                domains = detect_domains(from_addr, links)
+
+                text_blob = "\n".join([subject, from_addr, body])
+                raw_score, keyword_hits = score_text(text_blob, domains)
+                if raw_score < min_score:
+                    seen_set.add(msg_id)
+                    continue
+
+                row = {
+                    "id": msg_id,
+                    "generated_utc": now_iso(),
+                    "mailbox": name,
+                    "message_id": str(msg.get("message_id") or ""),
+                    "date": str(msg.get("date") or ""),
+                    "from": from_addr,
+                    "subject": subject,
+                    "opportunity_type": classify_type(text_blob),
+                    "raw_score": round(raw_score, 4),
+                    "fit_score": round(min(1.0, raw_score / 15.0), 4),
+                    "keyword_hits": keyword_hits,
+                    "domains": domains,
+                    "links": links,
+                    "snippet": (body or "")[:700],
+                    "state": "PENDING_REVIEW",
+                }
+                seen_set.add(msg_id)
+                new_rows.append(row)
+
+                existing = queue_by_id.get(msg_id)
+                if existing:
+                    existing["last_seen_utc"] = row["generated_utc"]
+                else:
+                    queue_by_id[msg_id] = row
+            continue
+
         try:
             messages = fetch_messages(source, max_per_cycle=max_per_cycle)
         except Exception as exc:
