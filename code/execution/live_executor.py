@@ -1292,6 +1292,14 @@ class RobustLiveExecutor:
         self.edge_proof_cost_floor_adaptive_gain_adjust_bps = 10.0
         self.edge_proof_cost_floor_adaptive_win_rate_floor_pct = 42.0
         self.edge_proof_cost_floor_adaptive_win_rate_relax_pct = 62.0
+        self.alpha_lock_enabled = True
+        self.alpha_lock_min_gate_score = 0.60
+        self.alpha_lock_min_expected_edge_bps = 20.0
+        self.alpha_lock_min_score = 4.5
+        self.alpha_lock_learning_bonus_weight = 0.35
+        self.alpha_lock_hybrid_score_weight = 1.0
+        self.alpha_lock_allow_hybrid_fallback = True
+        self.alpha_lock_allow_gate_only_fallback = False
         self.edge_proof_cache_ttl_sec = 8.0
         self._edge_proof_cache: dict[str, Any] = {}
         self._edge_proof_cache_utc = 0.0
@@ -2534,6 +2542,53 @@ class RobustLiveExecutor:
             0.0,
             100.0,
         )
+        self.alpha_lock_enabled = bool(runtime.get("alpha_lock_enabled", self.alpha_lock_enabled))
+        self.alpha_lock_min_gate_score = self._clamp(
+            self._to_float(
+                runtime.get("alpha_lock_min_gate_score", self.alpha_lock_min_gate_score),
+                self.alpha_lock_min_gate_score,
+            ),
+            0.0,
+            0.99,
+        )
+        self.alpha_lock_min_expected_edge_bps = self._clamp(
+            self._to_float(
+                runtime.get("alpha_lock_min_expected_edge_bps", self.alpha_lock_min_expected_edge_bps),
+                self.alpha_lock_min_expected_edge_bps,
+            ),
+            0.0,
+            500.0,
+        )
+        self.alpha_lock_min_score = self._clamp(
+            self._to_float(
+                runtime.get("alpha_lock_min_score", self.alpha_lock_min_score),
+                self.alpha_lock_min_score,
+            ),
+            -500.0,
+            1000.0,
+        )
+        self.alpha_lock_learning_bonus_weight = self._clamp(
+            self._to_float(
+                runtime.get("alpha_lock_learning_bonus_weight", self.alpha_lock_learning_bonus_weight),
+                self.alpha_lock_learning_bonus_weight,
+            ),
+            0.0,
+            5.0,
+        )
+        self.alpha_lock_hybrid_score_weight = self._clamp(
+            self._to_float(
+                runtime.get("alpha_lock_hybrid_score_weight", self.alpha_lock_hybrid_score_weight),
+                self.alpha_lock_hybrid_score_weight,
+            ),
+            0.0,
+            5.0,
+        )
+        self.alpha_lock_allow_hybrid_fallback = bool(
+            runtime.get("alpha_lock_allow_hybrid_fallback", self.alpha_lock_allow_hybrid_fallback)
+        )
+        self.alpha_lock_allow_gate_only_fallback = bool(
+            runtime.get("alpha_lock_allow_gate_only_fallback", self.alpha_lock_allow_gate_only_fallback)
+        )
         self.missing_ticker_skip_cooldown_sec = self._clamp(
             self._to_float(
                 runtime.get("missing_ticker_skip_cooldown_sec", self.missing_ticker_skip_cooldown_sec),
@@ -2884,6 +2939,52 @@ class RobustLiveExecutor:
         self._symbol_intel_cache = dict(payload)
         self._symbol_intel_cache_utc = now_ts
         return dict(payload)
+
+    def _symbol_alpha_score_for_symbol(self, symbol: str, direction: str = "long") -> tuple[Optional[float], str]:
+        symbol_key = str(symbol or "").upper().strip()
+        if not symbol_key:
+            return None, "missing_symbol"
+
+        payload = self._load_symbol_flip_intel_payload()
+        if not isinstance(payload, dict):
+            return None, "missing_payload"
+
+        direction_key = str(direction or "").strip().lower()
+        if direction_key == "short":
+            preferred_fields = ("alpha_short_score", "alpha_long_score")
+        else:
+            preferred_fields = ("alpha_long_score", "alpha_short_score")
+
+        best_score = -float("inf")
+        best_source = "not_found"
+        candidate_sets = (
+            ("long_candidates", payload.get("long_candidates", [])),
+            ("short_candidates", payload.get("short_candidates", [])),
+            ("focus_symbols", payload.get("focus_symbols", [])),
+        )
+        for source_name, rows in candidate_sets:
+            if not isinstance(rows, list):
+                continue
+            for row in rows:
+                if not isinstance(row, dict):
+                    continue
+                row_symbol = str(row.get("symbol", "") or "").upper().strip()
+                if row_symbol != symbol_key:
+                    continue
+
+                for field in preferred_fields:
+                    score = self._to_float(row.get(field, float("nan")), float("nan"))
+                    if math.isfinite(score):
+                        return float(score), f"{source_name}.{field}"
+
+                fallback = self._to_float(row.get("alpha_score", float("nan")), float("nan"))
+                if math.isfinite(fallback) and float(fallback) > float(best_score):
+                    best_score = float(fallback)
+                    best_source = f"{source_name}.alpha_score"
+
+        if math.isfinite(best_score):
+            return float(best_score), best_source
+        return None, "not_found"
 
     def _load_symbol_learning_payload(self) -> dict[str, Any]:
         now_ts = time.time()
@@ -3342,6 +3443,55 @@ class RobustLiveExecutor:
         selected_hybrid_score = self._to_float(meta.get("selected_hybrid_score", -float("inf")), -float("inf"))
         selected_momentum_pct = self._to_float(meta.get("selected_momentum_pct", -999.0), -999.0)
         selected_spread_bps = self._to_float(meta.get("selected_spread_bps", float("inf")), float("inf"))
+        selected_symbol = str(meta.get("selected_symbol", "") or "").upper().strip()
+        gate_direction = str(meta.get("gate_direction", "long") or "long").strip().lower()
+        selected_learning_bonus = max(self._to_float(meta.get("selected_learning_bonus", 0.0), 0.0), 0.0)
+
+        alpha_symbol_score, alpha_symbol_source = self._symbol_alpha_score_for_symbol(selected_symbol, gate_direction)
+        alpha_learning_component = float(selected_learning_bonus) * float(self.alpha_lock_learning_bonus_weight)
+        alpha_intel_score = None
+        if alpha_symbol_score is not None and math.isfinite(float(alpha_symbol_score)):
+            alpha_intel_score = max(float(alpha_symbol_score), 0.0) + float(alpha_learning_component)
+
+        alpha_hybrid_score = None
+        if bool(self.alpha_lock_allow_hybrid_fallback) and math.isfinite(selected_hybrid_score):
+            alpha_hybrid_score = max(float(selected_hybrid_score), 0.0) * float(self.alpha_lock_hybrid_score_weight)
+
+        alpha_candidates: list[float] = []
+        if alpha_intel_score is not None:
+            alpha_candidates.append(float(alpha_intel_score))
+        if alpha_hybrid_score is not None:
+            alpha_candidates.append(float(alpha_hybrid_score))
+
+        alpha_effective_score = max(alpha_candidates) if alpha_candidates else -float("inf")
+        alpha_hybrid_fallback_used = alpha_intel_score is None and alpha_hybrid_score is not None
+        pass_alpha_gate_score = float(gate_score) >= float(self.alpha_lock_min_gate_score)
+        pass_alpha_expected_edge = float(gate_expected_edge_bps) >= float(self.alpha_lock_min_expected_edge_bps)
+        pass_alpha_score = math.isfinite(alpha_effective_score) and float(alpha_effective_score) >= float(
+            self.alpha_lock_min_score
+        )
+
+        alpha_lock_reason_codes: list[str] = []
+        alpha_gate_only_fallback_applied = False
+        pass_alpha_lock = True
+        if bool(self.alpha_lock_enabled):
+            if not pass_alpha_gate_score:
+                alpha_lock_reason_codes.append("alpha_gate_score_too_low")
+            if not pass_alpha_expected_edge:
+                alpha_lock_reason_codes.append("alpha_expected_edge_too_low")
+            if not pass_alpha_score:
+                alpha_lock_reason_codes.append("alpha_score_too_low")
+
+            pass_alpha_lock = len(alpha_lock_reason_codes) == 0
+            if (
+                (not pass_alpha_lock)
+                and bool(self.alpha_lock_allow_gate_only_fallback)
+                and pass_alpha_gate_score
+                and pass_alpha_expected_edge
+            ):
+                pass_alpha_lock = True
+                alpha_gate_only_fallback_applied = True
+                alpha_lock_reason_codes = []
 
         self.edge_proof_bootstrap_entry_utc = [
             ts
@@ -3392,6 +3542,30 @@ class RobustLiveExecutor:
         payload["edge_proof_bootstrap_require_hybrid_candidates"] = bool(
             self.edge_proof_bootstrap_require_hybrid_candidates
         )
+        payload["alpha_lock_enabled"] = bool(self.alpha_lock_enabled)
+        payload["alpha_lock_selected_symbol"] = selected_symbol
+        payload["alpha_lock_direction"] = gate_direction
+        payload["alpha_lock_gate_score"] = round(float(gate_score), 6)
+        payload["alpha_lock_expected_edge_bps"] = round(float(gate_expected_edge_bps), 6)
+        payload["alpha_lock_symbol_alpha_source"] = str(alpha_symbol_source or "not_found")
+        payload["alpha_lock_symbol_alpha_score"] = (
+            round(float(alpha_symbol_score), 6) if alpha_symbol_score is not None else None
+        )
+        payload["alpha_lock_learning_bonus"] = round(float(selected_learning_bonus), 6)
+        payload["alpha_lock_learning_component"] = round(float(alpha_learning_component), 6)
+        payload["alpha_lock_hybrid_score"] = round(float(alpha_hybrid_score), 6) if alpha_hybrid_score is not None else None
+        payload["alpha_lock_effective_score"] = (
+            round(float(alpha_effective_score), 6) if math.isfinite(alpha_effective_score) else None
+        )
+        payload["alpha_lock_min_gate_score"] = round(float(self.alpha_lock_min_gate_score), 6)
+        payload["alpha_lock_min_expected_edge_bps"] = round(float(self.alpha_lock_min_expected_edge_bps), 6)
+        payload["alpha_lock_min_score"] = round(float(self.alpha_lock_min_score), 6)
+        payload["alpha_lock_allow_hybrid_fallback"] = bool(self.alpha_lock_allow_hybrid_fallback)
+        payload["alpha_lock_allow_gate_only_fallback"] = bool(self.alpha_lock_allow_gate_only_fallback)
+        payload["alpha_lock_hybrid_fallback_used"] = bool(alpha_hybrid_fallback_used)
+        payload["alpha_lock_gate_only_fallback_applied"] = bool(alpha_gate_only_fallback_applied)
+        payload["pass_alpha_lock"] = bool(pass_alpha_lock)
+        payload["alpha_lock_reason_codes"] = list(alpha_lock_reason_codes)
 
         reason_codes: list[str] = []
         if not bool(payload.get("pass_recent_closes", False)):
@@ -3404,6 +3578,8 @@ class RobustLiveExecutor:
             reason_codes.append("stale_recent_closes")
         if not bool(payload.get("pass_symbol_intel", True)):
             reason_codes.append("symbol_intel_not_fresh")
+        if not bool(payload.get("pass_alpha_lock", True)):
+            reason_codes.append("alpha_lock_not_armed")
 
         if not self.edge_proof_enabled:
             payload["armed"] = True
@@ -5832,6 +6008,16 @@ class RobustLiveExecutor:
                     "edge_proof_bootstrap_selected_hybrid_score": edge_proof.get("edge_proof_bootstrap_selected_hybrid_score"),
                     "edge_proof_bootstrap_selected_momentum_pct": round(self._to_float(edge_proof.get("edge_proof_bootstrap_selected_momentum_pct", 0.0), 0.0), 6),
                     "edge_proof_bootstrap_selected_spread_bps": edge_proof.get("edge_proof_bootstrap_selected_spread_bps"),
+                    "edge_proof_alpha_lock_enabled": bool(edge_proof.get("alpha_lock_enabled", False)),
+                    "edge_proof_alpha_lock_pass": bool(edge_proof.get("pass_alpha_lock", True)),
+                    "edge_proof_alpha_lock_reason_codes": list(edge_proof.get("alpha_lock_reason_codes", [])),
+                    "edge_proof_alpha_lock_selected_symbol": str(edge_proof.get("alpha_lock_selected_symbol", "") or ""),
+                    "edge_proof_alpha_lock_direction": str(edge_proof.get("alpha_lock_direction", "") or ""),
+                    "edge_proof_alpha_lock_effective_score": edge_proof.get("alpha_lock_effective_score"),
+                    "edge_proof_alpha_lock_symbol_alpha_score": edge_proof.get("alpha_lock_symbol_alpha_score"),
+                    "edge_proof_alpha_lock_symbol_alpha_source": str(edge_proof.get("alpha_lock_symbol_alpha_source", "not_found") or "not_found"),
+                    "edge_proof_alpha_lock_gate_score": round(self._to_float(edge_proof.get("alpha_lock_gate_score", 0.0), 0.0), 6),
+                    "edge_proof_alpha_lock_expected_edge_bps": round(self._to_float(edge_proof.get("alpha_lock_expected_edge_bps", 0.0), 0.0), 6),
                 }
             )
             print("  blocked: edge proof not armed")
@@ -6729,6 +6915,14 @@ class RobustLiveExecutor:
                     "target_closed_count": int(self._to_float(edge_proof.get("target_closed_count", 0), 0.0)),
                     "win_rate_pct": round(self._to_float(edge_proof.get("win_rate_pct", 0.0), 0.0), 6),
                     "avg_pnl_pct": round(self._to_float(edge_proof.get("avg_pnl_pct", 0.0), 0.0), 6),
+                    "alpha_lock_enabled": bool(edge_proof.get("alpha_lock_enabled", False)),
+                    "pass_alpha_lock": bool(edge_proof.get("pass_alpha_lock", True)),
+                    "alpha_lock_reason_codes": list(edge_proof.get("alpha_lock_reason_codes", [])),
+                    "alpha_lock_selected_symbol": str(edge_proof.get("alpha_lock_selected_symbol", "") or ""),
+                    "alpha_lock_direction": str(edge_proof.get("alpha_lock_direction", "") or ""),
+                    "alpha_lock_effective_score": edge_proof.get("alpha_lock_effective_score"),
+                    "alpha_lock_symbol_alpha_score": edge_proof.get("alpha_lock_symbol_alpha_score"),
+                    "alpha_lock_symbol_alpha_source": str(edge_proof.get("alpha_lock_symbol_alpha_source", "not_found") or "not_found"),
                 },
                 "balance_degraded_mode": bool(balance_degraded_mode),
                 "notional_throttle": round(float(self.notional_throttle), 6),
@@ -6781,6 +6975,12 @@ class RobustLiveExecutor:
                 "edge_proof_recent_closed_count": int(self._to_float(edge_proof.get("recent_closed_count", 0), 0.0)),
                 "edge_proof_win_rate_pct": round(self._to_float(edge_proof.get("win_rate_pct", 0.0), 0.0), 6),
                 "edge_proof_avg_pnl_pct": round(self._to_float(edge_proof.get("avg_pnl_pct", 0.0), 0.0), 6),
+                "edge_proof_alpha_lock_enabled": bool(edge_proof.get("alpha_lock_enabled", False)),
+                "edge_proof_alpha_lock_pass": bool(edge_proof.get("pass_alpha_lock", True)),
+                "edge_proof_alpha_lock_reason_codes": list(edge_proof.get("alpha_lock_reason_codes", [])),
+                "edge_proof_alpha_lock_effective_score": edge_proof.get("alpha_lock_effective_score"),
+                "edge_proof_alpha_lock_symbol_alpha_score": edge_proof.get("alpha_lock_symbol_alpha_score"),
+                "edge_proof_alpha_lock_symbol_alpha_source": str(edge_proof.get("alpha_lock_symbol_alpha_source", "not_found") or "not_found"),
                 "balance_degraded_mode": bool(balance_degraded_mode),
                 "notional_throttle": round(float(self.notional_throttle), 6),
                 "fail_streak": int(self.order_fail_streak),

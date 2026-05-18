@@ -5,11 +5,13 @@ import json
 import math
 import os
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+WORKSPACE_ROOT = ROOT.parent
 CODE = ROOT / "code"
 if str(CODE) not in sys.path:
     sys.path.insert(0, str(CODE))
@@ -24,12 +26,14 @@ from execution.alpaca_paper_executor import (
 CONFIG = ROOT / "config"
 OUT = ROOT / "out"
 EXEC_OUT = OUT / "execution"
+OPS_OUT = WORKSPACE_ROOT / "out" / "ops"
 PAPER_RUNTIME_FILE = CONFIG / "paper_trader_runtime.json"
 
 AGENTS_DIR = EXEC_OUT / "alpaca_symbol_agents"
 RANKED_FILE = EXEC_OUT / "alpaca_symbol_ranked.json"
 SUMMARY_FILE = EXEC_OUT / "alpaca_symbol_agents_summary.json"
 CURSOR_FILE = EXEC_OUT / "alpaca_symbol_agents_cursor.json"
+BREATH_METRICS_FILE = EXEC_OUT / "alpaca_breath_cycle_metrics.json"
 
 
 def now_utc() -> str:
@@ -63,6 +67,36 @@ def _looks_like_equity_symbol(symbol: str) -> bool:
     if len(s) > 8:
         return False
     return s.replace(".", "").replace("-", "").isalnum()
+
+
+def _load_latest_universe_index_summary() -> tuple[dict[str, Any], str]:
+    candidates: list[tuple[float, Path]] = []
+    if not OPS_OUT.exists():
+        return {}, ""
+
+    for entry in OPS_OUT.iterdir():
+        if not entry.is_dir() or not entry.name.startswith("universe_map_"):
+            continue
+        summary_path = entry / "universe_index_summary.json"
+        if not summary_path.exists():
+            continue
+        try:
+            candidates.append((summary_path.stat().st_mtime, summary_path))
+        except Exception:
+            continue
+
+    if not candidates:
+        return {}, ""
+
+    candidates.sort(key=lambda x: x[0], reverse=True)
+    latest = candidates[0][1]
+    try:
+        payload = json.loads(latest.read_text(encoding="utf-8"))
+        if isinstance(payload, dict):
+            return payload, str(latest)
+    except Exception:
+        pass
+    return {}, str(latest)
 
 
 def _compute_agent(snapshot: dict[str, Any], symbol: str) -> dict[str, Any]:
@@ -228,7 +262,8 @@ def _select_symbols_with_cursor(all_symbols: list[str], max_symbols: int) -> tup
     return selected, cursor, next_cursor
 
 
-def run_agents(max_symbols: int = 400) -> dict[str, Any]:
+def run_agents(max_symbols: int = 400, scan_mode: str = "windowed") -> dict[str, Any]:
+    started = time.perf_counter()
     keys = load_api_keys()
     client = AlpacaPaperClient(
         keys.get("ALPACA_API_KEY", ""),
@@ -254,7 +289,16 @@ def run_agents(max_symbols: int = 400) -> dict[str, Any]:
         symbols_source = "alpaca_tradable_assets"
         universe_total = len(symbols_all)
 
-    symbols, window_start, window_next = _select_symbols_with_cursor(symbols_all, max_symbols=max_symbols)
+    mode = str(scan_mode or "windowed").strip().lower()
+    if mode not in {"windowed", "full"}:
+        mode = "windowed"
+
+    if mode == "full":
+        symbols = list(symbols_all)
+        window_start = 0
+        window_next = 0
+    else:
+        symbols, window_start, window_next = _select_symbols_with_cursor(symbols_all, max_symbols=max_symbols)
 
     snapshots = _fetch_snapshots_batched(client, symbols, batch_size=250)
 
@@ -279,6 +323,7 @@ def run_agents(max_symbols: int = 400) -> dict[str, Any]:
 
     ranked_payload = {
         "generated_utc": now_utc(),
+        "scan_mode": mode,
         "source": symbols_source,
         "universe_total": int(universe_total),
         "scanned_symbols": len(symbols),
@@ -289,13 +334,48 @@ def run_agents(max_symbols: int = 400) -> dict[str, Any]:
     }
     write_json(RANKED_FILE, ranked_payload)
 
+    elapsed_sec = max(time.perf_counter() - started, 1e-9)
+    symbols_per_sec = float(len(symbols)) / elapsed_sec
+    scan_coverage_pct = (float(len(symbols)) / max(float(universe_total), 1.0)) * 100.0
+
+    universe_index_summary, universe_index_summary_path = _load_latest_universe_index_summary()
+    datasets_baseline = int(universe_index_summary.get("datasets_index", 0) or 0)
+    dynamic_symbol_baseline = max(int(universe_total), datasets_baseline)
+
+    breath_metrics = {
+        "generated_utc": now_utc(),
+        "engine": "alpaca_symbol_agents",
+        "scan_mode": mode,
+        "source": symbols_source,
+        "max_symbols_requested": int(max_symbols),
+        "universe_total": int(universe_total),
+        "scanned_symbols": int(len(symbols)),
+        "scan_coverage_pct": round(scan_coverage_pct, 4),
+        "symbols_per_sec": round(symbols_per_sec, 4),
+        "elapsed_sec": round(elapsed_sec, 4),
+        "execution_ready_count": int(sum(1 for a in agents if a.get("execution_ready"))),
+        "scan_window_start": int(window_start),
+        "scan_window_next": int(window_next),
+        "dynamic_symbol_baseline": int(dynamic_symbol_baseline),
+        "universe_index_summary_path": universe_index_summary_path,
+        "universe_index_summary": universe_index_summary,
+        "top_symbols": [str(a.get("symbol", "")) for a in agents[:12]],
+    }
+    write_json(BREATH_METRICS_FILE, breath_metrics)
+
     summary = {
         "generated_utc": now_utc(),
         "ranked_file": str(RANKED_FILE),
         "agents_dir": str(AGENTS_DIR),
+        "breath_metrics_file": str(BREATH_METRICS_FILE),
+        "scan_mode": mode,
         "source": symbols_source,
         "universe_total": int(universe_total),
         "scanned_symbols": len(symbols),
+        "scan_coverage_pct": round(scan_coverage_pct, 4),
+        "symbols_per_sec": round(symbols_per_sec, 4),
+        "dynamic_symbol_baseline": int(dynamic_symbol_baseline),
+        "universe_index_summary_path": universe_index_summary_path,
         "scan_window_start": int(window_start),
         "scan_window_next": int(window_next),
         "cursor_file": str(CURSOR_FILE),
@@ -330,9 +410,15 @@ def main() -> int:
     _acquire_singleton_lock()
     parser = argparse.ArgumentParser(description="Per-symbol anomaly/score agents for Alpaca paper flow")
     parser.add_argument("--max-symbols", type=int, default=400, help="Max symbols to evaluate per cycle")
+    parser.add_argument(
+        "--scan-mode",
+        choices=["windowed", "full"],
+        default="windowed",
+        help="windowed rotates through universe with cursor; full scans entire eligible universe",
+    )
     args = parser.parse_args()
 
-    summary = run_agents(max_symbols=args.max_symbols)
+    summary = run_agents(max_symbols=args.max_symbols, scan_mode=args.scan_mode)
     print(json.dumps(summary, indent=2))
     return 0
 
