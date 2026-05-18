@@ -96,15 +96,42 @@ padding:48px;max-width:640px;margin:0 auto}} a{{color:#7c3aed}} code{{background
 
 @router.get("/auth/linkedin/status")
 def linkedin_status() -> JSONResponse:
+    required = [
+        "LINKEDIN_CLIENT_ID",
+        "LINKEDIN_CLIENT_SECRET",
+        "LINKEDIN_REDIRECT_URI",
+    ]
     try:
         keys = li.load_keys()
-        configured = bool(keys.get("LINKEDIN_CLIENT_ID")
-                          and keys.get("LINKEDIN_CLIENT_SECRET")
-                          and keys.get("LINKEDIN_REDIRECT_URI"))
+        missing = [k for k in required if not keys.get(k)]
+        configured = not missing
     except Exception:
+        keys = {}
+        missing = required[:]
         configured = False
+
     tok = li.load_token()
-    out = {"configured": configured, "connected": bool(tok)}
+    out = {
+        "configured": configured,
+        "connected": bool(tok),
+        "missing": missing,
+        "key_file_candidates": [
+            "config/luma_outreach_keys.env",
+            "config/luma_live_keys.env",
+            "code/execution/config/luma_live_keys.env",
+        ],
+    }
+    if not configured:
+        out["next_actions"] = {
+            "create_app": "https://www.linkedin.com/developers/apps/new",
+            "set_keys_file": "config/luma_outreach_keys.env",
+            "expected_redirect": "http://127.0.0.1:8787/auth/linkedin/callback",
+        }
+    elif not tok:
+        out["next_actions"] = {
+            "connect_url": "http://127.0.0.1:8787/auth/linkedin/login",
+        }
+
     if tok:
         try:
             p = li.me()
