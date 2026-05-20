@@ -59,9 +59,11 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "out" / "opportunities"
 OUTREACH_OUT = OUT / "outreach"
 LINKEDIN_OUT = OUT / "linkedin"
+SOCIAL_OUT = OUT / "social"
 OPS_OUT = ROOT / "out" / "ops"
 GRANTS_QUEUE = ROOT / "out" / "grants" / "_queue" / "index.json"
 FUNDING_QUEUE = ROOT / "out" / "funding" / "funding_approval_queue.json"
+CROWDFUNDING_CAMPAIGN_QUEUE = ROOT / "out" / "crowdfunding_approval_queue.json"
 JOBS_ROOT = ROOT / "out" / "jobs"
 JOBS_QUEUE = JOBS_ROOT / "_queue" / "index.json"
 EMAIL_OUT = OUT / "email"
@@ -77,6 +79,8 @@ EMAIL_RESPONSE_MANIFEST_LATEST = ROOT / "out" / "ops" / "email_response_watcher"
 RESUME_LATEST = ROOT / "out" / "resume" / "resume_lumalinkedin_v1_latest.json"
 LINKEDIN_LATEST = LINKEDIN_OUT / "lumalinkedin_v1_latest.json"
 LINKEDIN_BUILD_LATEST = ROOT / "out" / "ops" / "lumalinkedin_v1_build_latest.json"
+SOCIAL_LATEST = SOCIAL_OUT / "social_platform_profile_latest.json"
+SOCIAL_BUILD_LATEST = ROOT / "out" / "ops" / "social_platform_profile_build_latest.json"
 MASTER_VAL_LATEST = ROOT / "out" / "ops" / "master_valuation" / "master_valuation_latest.json"
 IP_GRANT_WIN_MANIFEST_LATEST = ROOT / "out" / "ip_layer" / "autonomous_grant_win_manifest_latest.json"
 LUMA_EXPLAINER_QUANT_LATEST = ROOT / "out" / "ops" / "luma_explainer" / "luma_explainer_quantified_latest.json"
@@ -107,6 +111,7 @@ PY = sys.executable
 OUT.mkdir(parents=True, exist_ok=True)
 OUTREACH_OUT.mkdir(parents=True, exist_ok=True)
 LINKEDIN_OUT.mkdir(parents=True, exist_ok=True)
+SOCIAL_OUT.mkdir(parents=True, exist_ok=True)
 JOBS_ROOT.mkdir(parents=True, exist_ok=True)
 OPS_OUT.mkdir(parents=True, exist_ok=True)
 
@@ -306,6 +311,11 @@ def _latest_path(pattern: str) -> Path | None:
 
 def _latest_linkedin_payload() -> dict[str, Any]:
     payload = _read_json(LINKEDIN_LATEST)
+    return payload if isinstance(payload, dict) else {}
+
+
+def _latest_social_payload() -> dict[str, Any]:
+    payload = _read_json(SOCIAL_LATEST)
     return payload if isinstance(payload, dict) else {}
 
 
@@ -552,7 +562,10 @@ def _build_tracker() -> dict[str, Any]:
     email_response_manifest = _read_json(EMAIL_RESPONSE_MANIFEST_LATEST) or {}
     linkedin_latest = _latest_linkedin_payload()
     linkedin_build_latest = _read_json(LINKEDIN_BUILD_LATEST) or {}
+    social_latest = _latest_social_payload()
+    social_build_latest = _read_json(SOCIAL_BUILD_LATEST) or {}
     resume_latest = _read_json(RESUME_LATEST) or {}
+    crowdfunding_campaign_queue = _read_json(CROWDFUNDING_CAMPAIGN_QUEUE) or []
     valuation_latest = _read_json(MASTER_VAL_LATEST) or {}
     ip_manifest_latest = _read_json(IP_GRANT_WIN_MANIFEST_LATEST) or {}
     explainer_quant_latest = _read_json(LUMA_EXPLAINER_QUANT_LATEST) or {}
@@ -601,6 +614,21 @@ def _build_tracker() -> dict[str, Any]:
             funding_counts[key] = funding_counts.get(key, 0) + 1
             channel = str(item.get("channel") or "unknown").lower()
             funding_channel_counts[channel] = funding_channel_counts.get(channel, 0) + 1
+
+    crowdfunding_funding_rows = [
+        item
+        for item in (funding_q if isinstance(funding_q, list) else [])
+        if isinstance(item, dict) and str(item.get("channel") or "").lower() == "crowdfund"
+    ]
+    crowdfunding_funding_rows.sort(key=lambda row: float(row.get("priority_score") or 0.0), reverse=True)
+
+    crowdfunding_campaign_rows = [
+        row for row in (crowdfunding_campaign_queue if isinstance(crowdfunding_campaign_queue, list) else []) if isinstance(row, dict)
+    ]
+    crowdfunding_campaign_rows.sort(
+        key=lambda row: float(((row.get("platform") or {}).get("fit_score") or 0.0)),
+        reverse=True,
+    )
 
     sector_pipeline_latest = _read_json(SECTOR_EVIDENCE_PIPELINE_LATEST) or {}
     investor_proof_latest = _latest_investor_proof_summary() or {}
@@ -782,6 +810,12 @@ def _build_tracker() -> dict[str, Any]:
                 else 0
             ),
         },
+        "crowdfunding": {
+            "funding_queue_count": len(crowdfunding_funding_rows),
+            "campaign_queue_count": len(crowdfunding_campaign_rows),
+            "top_funding": crowdfunding_funding_rows[:5],
+            "top_campaigns": crowdfunding_campaign_rows[:5],
+        },
         "evidence_shipping": {
             "sector_pipeline_status": (
                 sector_pipeline_latest.get("status")
@@ -864,6 +898,25 @@ def _build_tracker() -> dict[str, Any]:
             "build_latest_generated_utc": (
                 linkedin_build_latest.get("generated_utc")
                 if isinstance(linkedin_build_latest, dict)
+                else None
+            ),
+        },
+        "social_media": {
+            "profile_payload_present": bool(social_latest),
+            "latest_generated_utc": social_latest.get("generated_utc") if isinstance(social_latest, dict) else None,
+            "platforms_scanned": (
+                ((social_latest.get("summary", {}) or {}).get("platforms_scanned"))
+                if isinstance(social_latest, dict)
+                else None
+            ),
+            "platforms_connected": (
+                ((social_latest.get("summary", {}) or {}).get("platforms_connected"))
+                if isinstance(social_latest, dict)
+                else None
+            ),
+            "build_latest_generated_utc": (
+                social_build_latest.get("generated_utc")
+                if isinstance(social_build_latest, dict)
                 else None
             ),
         },
@@ -1009,6 +1062,11 @@ class LinkedInOptimizeArgs(BaseModel):
     max_packages: int = 28
 
 
+class SocialOptimizeArgs(BaseModel):
+    max_platforms: int = 8
+    publish_mode: str = "dry_run"
+
+
 class JobsFactoryArgs(BaseModel):
     min_score: float = 0.38
     limit: int = 20
@@ -1068,6 +1126,9 @@ class AutopilotV2Args(BaseModel):
     linkedin_build_pdf: bool = True
     linkedin_publish_summary_post: bool = False
     linkedin_dry_run_post: bool = True
+    include_social_profiles: bool = True
+    social_max_platforms: int = 8
+    social_publish_mode: str = "dry_run"
     include_email_finder: bool = True
     email_min_score: float = 0.90
     email_max_per_cycle: int = 80
@@ -1121,6 +1182,15 @@ def _run_linkedin_optimize(args: LinkedInOptimizeArgs) -> dict:
         if args.dry_run_post:
             run_args.append("--dry-run-post")
     return _run("lumalinkedin_resume_engine_v1.py", run_args, timeout=1200)
+
+
+def _run_social_optimize(args: SocialOptimizeArgs) -> dict:
+    run_args = ["--max-platforms", str(max(1, int(args.max_platforms)))]
+    publish_mode = str(args.publish_mode or "dry_run").strip().lower()
+    if publish_mode not in {"none", "dry_run"}:
+        publish_mode = "dry_run"
+    run_args.extend(["--publish-mode", publish_mode])
+    return _run("social_platform_profile_engine_v1.py", run_args, timeout=1200)
 
 
 def _run_jobs_factory(args: JobsFactoryArgs) -> dict:
@@ -1368,6 +1438,15 @@ def run_autopilot_v2(args: AutopilotV2Args) -> dict:
             )
         )
 
+    social_profiles = None
+    if args.include_social_profiles:
+        social_profiles = _run_social_optimize(
+            SocialOptimizeArgs(
+                max_platforms=args.social_max_platforms,
+                publish_mode=args.social_publish_mode,
+            )
+        )
+
     email_finder = None
     if args.include_email_finder:
         email_finder = _run_email_finder(
@@ -1449,6 +1528,7 @@ def run_autopilot_v2(args: AutopilotV2Args) -> dict:
         "contract_loan_pack": contract_loan_pack,
         "outreach": outreach,
         "linkedin": linkedin,
+        "social_profiles": social_profiles,
         "email_finder": email_finder,
         "email_dispatch": email_dispatch,
         "email_response_watcher": email_response_watcher,
@@ -1491,6 +1571,31 @@ def linkedin_latest() -> dict:
             error="no linkedin optimization payload yet",
             hint="POST /api/opportunities/linkedin/optimize",
             code="linkedin_not_ready",
+        )
+    return payload
+
+
+@router.post("/social/optimize")
+def optimize_social(args: SocialOptimizeArgs) -> dict:
+    run = _run_social_optimize(args)
+    latest = _latest_social_payload()
+    build = _read_json(SOCIAL_BUILD_LATEST) or {}
+    return {
+        "generated_utc": _now_utc_iso(),
+        "run": run,
+        "social_latest": latest,
+        "build_latest": build,
+    }
+
+
+@router.get("/social/latest")
+def social_latest() -> dict:
+    payload = _latest_social_payload()
+    if not payload:
+        return _not_ready(
+            error="no social optimization payload yet",
+            hint="POST /api/opportunities/social/optimize",
+            code="social_not_ready",
         )
     return payload
 
@@ -1569,6 +1674,39 @@ def crowdfunding_queue(limit: int = 100) -> dict:
         "generated_utc": _now_utc_iso(),
         "count": len(rows),
         "queue": rows[:max_rows],
+    }
+
+
+@router.get("/crowdfunding/highlights")
+def crowdfunding_highlights(limit: int = 8) -> dict:
+    max_rows = _clamp_limit(limit, low=1, high=50)
+    funding_payload = _read_json(FUNDING_QUEUE)
+    campaign_payload = _read_json(CROWDFUNDING_CAMPAIGN_QUEUE)
+
+    funding_rows = [
+        row
+        for row in (funding_payload if isinstance(funding_payload, list) else [])
+        if isinstance(row, dict) and str(row.get("channel") or "").lower() == "crowdfund"
+    ]
+    funding_rows.sort(key=lambda row: float(row.get("priority_score") or 0.0), reverse=True)
+
+    campaign_rows = [row for row in (campaign_payload if isinstance(campaign_payload, list) else []) if isinstance(row, dict)]
+    campaign_rows.sort(
+        key=lambda row: float(((row.get("platform") or {}).get("fit_score") or 0.0)),
+        reverse=True,
+    )
+
+    return {
+        "generated_utc": _now_utc_iso(),
+        "funding_queue_count": len(funding_rows),
+        "campaign_queue_count": len(campaign_rows),
+        "pending_human_approval_count": sum(
+            1
+            for row in funding_rows
+            if str(row.get("approval_state") or "").upper() == "PENDING_HUMAN_APPROVAL"
+        ),
+        "top_funding_opportunities": funding_rows[:max_rows],
+        "top_campaign_blueprints": campaign_rows[:max_rows],
     }
 
 

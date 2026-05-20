@@ -119,6 +119,8 @@ try {
     }
     Add-Step -Name 'linkedin_resume_engine_v1' -Command $pythonExe -Arguments $linkedinArgs -WorkingDirectory $root
 
+    Add-Step -Name 'social_platform_profile_engine_v1' -Command $pythonExe -Arguments @('code/social_platform_profile_engine_v1.py', '--max-platforms', '8', '--publish-mode', 'dry_run') -WorkingDirectory $root
+
     Add-Step -Name 'alpaca_paper_status_no_orders' -Command $pythonExe -Arguments @('-m', 'execution.alpaca_paper_executor', '--status-only', '--no-orders') -WorkingDirectory (Join-Path $root 'code')
 
     if ($RunInvestorPacketRefresh) {

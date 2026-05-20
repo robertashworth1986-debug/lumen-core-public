@@ -20,6 +20,7 @@ param(
     [switch]$NoEmailResponseWatcher,
     [switch]$DispatchDryRun,
     [switch]$NoPdf,
+    [switch]$NoSocialProfiles,
     [switch]$PublishLinkedInSummary,
     [switch]$DryRunLinkedInPost,
     [switch]$TruthStrict,
@@ -141,6 +142,10 @@ try {
         }
     }
     Invoke-EngineStep -Name "LinkedIn + Resume V1" -Script "lumalinkedin_resume_engine_v1.py" -Args $linkedinArgs
+
+    if (-not $NoSocialProfiles) {
+        Invoke-EngineStep -Name "Social Platform Profiles V1" -Script "social_platform_profile_engine_v1.py" -Args @("--max-platforms", "8", "--publish-mode", "dry_run")
+    }
 
     Invoke-EngineStep -Name "Build SKIP Grant Autofill Pack" -Script "ops/build_skips_grant_autofill_pack.py"
 
