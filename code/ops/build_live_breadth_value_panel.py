@@ -191,9 +191,49 @@ def add_alias(source_lookup: dict[str, dict[str, Any]], key: str, row: dict[str,
 
 def build_registry_summary(path: Path) -> dict[str, Any]:
     registry = load_json(path)
-    rows = registry.get("rows", []) if isinstance(registry, dict) else []
-    if not isinstance(rows, list):
-        rows = []
+    rows: list[dict[str, Any]] = []
+    if isinstance(registry, dict):
+        candidate_rows = registry.get("rows", [])
+        if isinstance(candidate_rows, list) and candidate_rows:
+            rows = [r for r in candidate_rows if isinstance(r, dict)]
+        else:
+            # Compatibility path: some registries use `sources` entries with `status` + `env`.
+            candidate_sources = registry.get("sources", [])
+            if isinstance(candidate_sources, list):
+                normalized_rows: list[dict[str, Any]] = []
+                for raw in candidate_sources:
+                    if not isinstance(raw, dict):
+                        continue
+                    status = str(raw.get("status") or "").upper()
+                    env_name = str(raw.get("env") or "").strip()
+                    row_count = to_int(raw.get("rows"), 0)
+
+                    enabled = bool(raw.get("enabled", False))
+                    if not enabled:
+                        enabled = bool(env_name) or status in {
+                            "LIVE_KEY_PRESENT",
+                            "LIVE",
+                            "ENABLED",
+                            "OK",
+                            "HEALTHY",
+                        }
+
+                    measured = bool(raw.get("measured", False))
+                    if not measured:
+                        measured = row_count > 0 or status in {
+                            "LIVE_KEY_PRESENT",
+                            "MEASURED",
+                            "LIVE",
+                        }
+
+                    normalized = dict(raw)
+                    normalized["enabled"] = enabled
+                    normalized["measured"] = measured
+                    if not isinstance(normalized.get("translated_value"), dict):
+                        normalized["translated_value"] = {}
+                    normalized_rows.append(normalized)
+
+                rows = normalized_rows
 
     enabled_rows = [r for r in rows if isinstance(r, dict) and bool(r.get("enabled", False))]
     measured_rows = [r for r in enabled_rows if bool(r.get("measured", False))]
