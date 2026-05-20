@@ -65,6 +65,27 @@ def as_money(value: float) -> str:
     return f"${value:,.2f}"
 
 
+def resolve_logo_assets(stack_root: Path) -> dict[str, str]:
+    logo_dir = stack_root / "out" / "ops" / "linkedin_oauth_setup"
+    if not logo_dir.exists():
+        return {}
+
+    preferred = {
+        "logo_512": logo_dir / "luma_logo_fintech_cursive_512.png",
+        "logo_1024": logo_dir / "luma_logo_fintech_cursive_1024.png",
+        "logo_2048": logo_dir / "luma_logo_fintech_cursive_2048.png",
+        "logo_upload_ready_5mb": logo_dir / "luma_logo_fintech_cursive_5mb.png",
+        "logo_alias_512": logo_dir / "luma_linkedin_logo_512.png",
+        "logo_alias_5mb": logo_dir / "luma_linkedin_logo_5mb.png",
+    }
+
+    found: dict[str, str] = {}
+    for key, path in preferred.items():
+        if path.exists():
+            found[key] = str(path)
+    return found
+
+
 def build_payload(stack_root: Path) -> dict[str, Any]:
     investor_path = stack_root / "out" / "ops" / "investor_metric_readiness_latest.json"
     panel_path = stack_root / "out" / "ops" / "live_breadth_value_panel_latest.json"
@@ -79,6 +100,7 @@ def build_payload(stack_root: Path) -> dict[str, Any]:
     vps = load_json(vps_path)
     runtime = load_json(runtime_path)
     leader = first_leader_row(leaderboard_path)
+    logo_assets = resolve_logo_assets(stack_root)
 
     investor_summary = investor.get("summary", {}) if isinstance(investor, dict) else {}
     signal = investor_summary.get("signal_evidence", {}) if isinstance(investor_summary, dict) else {}
@@ -270,6 +292,7 @@ def build_payload(stack_root: Path) -> dict[str, Any]:
             "stage": "operational, grant-funded scale transition",
             "short_narrative": narrative_short,
             "long_narrative": narrative_long,
+            "logo_assets": logo_assets,
         },
         "evidence_snapshot": {
             "annual_value_signal_usd": annual_value,
@@ -337,6 +360,14 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.append(f"- Website: {profile.get('website', '')}")
     lines.append(f"- Stage: {profile.get('stage', '')}")
     lines.append("")
+
+    logo_assets = profile.get("logo_assets", {}) if isinstance(profile, dict) else {}
+    if isinstance(logo_assets, dict) and logo_assets:
+        lines.append("## Logo Assets")
+        lines.append("")
+        for key, value in logo_assets.items():
+            lines.append(f"- {key}: {value}")
+        lines.append("")
 
     lines.append("## Copy-Paste Short Pitch")
     lines.append("")

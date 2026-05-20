@@ -15,6 +15,14 @@ import numpy as np
 import pandas as pd
 
 try:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+except Exception:
+    plt = None
+
+try:
     import polars as pl
 except Exception:
     pl = None
@@ -945,6 +953,125 @@ def build_opportunity_table(results_df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def _short_series_label(value: str, max_len: int = 64) -> str:
+    text = str(value)
+    if len(text) <= max_len:
+        return text
+    keep = max(16, max_len - 3)
+    return text[:keep] + "..."
+
+
+def generate_winner_visuals(
+    results_df: pd.DataFrame,
+    opportunity_df: pd.DataFrame,
+    out_dir: Path,
+) -> dict[str, str]:
+    if plt is None:
+        return {}
+
+    visuals_dir = out_dir / "visuals"
+    visuals_dir.mkdir(parents=True, exist_ok=True)
+    artifacts: dict[str, str] = {}
+
+    top10_sharpe = results_df.head(10).copy()
+    if not top10_sharpe.empty:
+        top10_sharpe["label"] = top10_sharpe["series_name"].map(_short_series_label)
+        plot_df = top10_sharpe.iloc[::-1]
+
+        fig, ax = plt.subplots(figsize=(14, 8))
+        ax.barh(plot_df["label"], plot_df["sharpe_delta"], color="#0B7285")
+        ax.set_title("Champion FlowForms - Top 10 Sharpe Delta Winners")
+        ax.set_xlabel("Sharpe Delta")
+        ax.set_ylabel("Series")
+        ax.grid(alpha=0.25, axis="x")
+        fig.tight_layout()
+        sharpe_plot = visuals_dir / "winner_top10_sharpe_delta.png"
+        fig.savefig(sharpe_plot, dpi=180)
+        plt.close(fig)
+        artifacts["winner_top10_sharpe_delta_png"] = str(sharpe_plot)
+
+    top10_cagr = results_df.sort_values("cagr_delta", ascending=False).head(10).copy()
+    if not top10_cagr.empty:
+        top10_cagr["label"] = top10_cagr["series_name"].map(_short_series_label)
+        plot_df = top10_cagr.iloc[::-1]
+
+        fig, ax = plt.subplots(figsize=(14, 8))
+        ax.barh(plot_df["label"], plot_df["cagr_delta"], color="#2F9E44")
+        ax.set_title("Champion FlowForms - Top 10 CAGR Delta Winners")
+        ax.set_xlabel("CAGR Delta")
+        ax.set_ylabel("Series")
+        ax.grid(alpha=0.25, axis="x")
+        fig.tight_layout()
+        cagr_plot = visuals_dir / "winner_top10_cagr_delta.png"
+        fig.savefig(cagr_plot, dpi=180)
+        plt.close(fig)
+        artifacts["winner_top10_cagr_delta_png"] = str(cagr_plot)
+
+    if not results_df.empty:
+        scatter_df = results_df.copy()
+        scatter_df["drawdown_delta"] = scatter_df["drawdown_delta"].fillna(0.0)
+        scatter_df["edge_bps_per_bar"] = scatter_df["edge_bps_per_bar"].fillna(0.0)
+        scatter_df["point_size"] = (scatter_df["edge_bps_per_bar"].abs().clip(0, 500) / 5.0) + 12.0
+
+        fig, ax = plt.subplots(figsize=(12, 8))
+        sc = ax.scatter(
+            scatter_df["sharpe_delta"],
+            scatter_df["cagr_delta"],
+            c=scatter_df["drawdown_delta"],
+            s=scatter_df["point_size"],
+            alpha=0.68,
+            cmap="viridis",
+        )
+        ax.set_title("Champion FlowForms - Sharpe vs CAGR Delta Landscape")
+        ax.set_xlabel("Sharpe Delta")
+        ax.set_ylabel("CAGR Delta")
+        ax.grid(alpha=0.2)
+        cbar = fig.colorbar(sc, ax=ax)
+        cbar.set_label("Drawdown Delta")
+        fig.tight_layout()
+        scatter_plot = visuals_dir / "winner_scatter_sharpe_vs_cagr.png"
+        fig.savefig(scatter_plot, dpi=180)
+        plt.close(fig)
+        artifacts["winner_scatter_sharpe_vs_cagr_png"] = str(scatter_plot)
+
+    if not opportunity_df.empty:
+        opp = opportunity_df.sort_values("capital_usd").copy()
+        fig, ax = plt.subplots(figsize=(12, 7))
+        ax.plot(opp["capital_usd"], opp["gain_if_0p1pct_edge_usd"], marker="o", label="0.1% edge")
+        ax.plot(
+            opp["capital_usd"],
+            opp["gain_if_conservative_edge_usd"],
+            marker="o",
+            label="conservative edge",
+        )
+        ax.plot(opp["capital_usd"], opp["gain_if_median_cagr_delta_usd"], marker="o", label="median edge")
+        ax.plot(opp["capital_usd"], opp["gain_if_q75_cagr_delta_usd"], marker="o", label="q75 edge")
+        ax.set_xscale("log")
+        ax.set_title("Champion FlowForms - Opportunity Scale by Capital")
+        ax.set_xlabel("Capital (USD, log scale)")
+        ax.set_ylabel("Potential Gain (USD)")
+        ax.grid(alpha=0.25)
+        ax.legend()
+        fig.tight_layout()
+        opp_plot = visuals_dir / "winner_opportunity_scale.png"
+        fig.savefig(opp_plot, dpi=180)
+        plt.close(fig)
+        artifacts["winner_opportunity_scale_png"] = str(opp_plot)
+
+    if artifacts:
+        manifest_path = visuals_dir / "winner_visual_manifest.json"
+        manifest = {
+            "generated_utc": utc_now(),
+            "scope": "investor_proof_sweep_winner_visuals",
+            "visual_count": len(artifacts),
+            "visuals": artifacts,
+        }
+        manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+        artifacts["winner_visual_manifest_json"] = str(manifest_path)
+
+    return artifacts
+
+
 def post_json(url: str, payload: dict[str, Any]) -> tuple[bool, str]:
     body = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
@@ -1127,6 +1254,7 @@ def main() -> int:
     opportunity_df = build_opportunity_table(results_df)
     opportunity_csv = out_dir / "opportunity_scale_table.csv"
     opportunity_df.to_csv(opportunity_csv, index=False)
+    visual_artifacts = generate_winner_visuals(results_df, opportunity_df, out_dir)
 
     positive_ratio = float(positive_sharpe_count / max(1, len(results_df)))
     unity_payload = {
@@ -1240,6 +1368,7 @@ def main() -> int:
             "opportunity_scale_table_csv": str(opportunity_csv),
             "nodered_payload_json": str(nodered_payload_json),
             "unity_edge_payload_json": str(unity_payload_json),
+            **visual_artifacts,
         },
     }
 
@@ -1303,6 +1432,8 @@ def main() -> int:
         summary_json,
         summary_md,
     ]
+    for value in visual_artifacts.values():
+        artifact_files.append(Path(value))
     for path in artifact_files:
         hash_manifest_rows.append(
             {

@@ -9,17 +9,51 @@ ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
 OUT = ROOT / "out"
 DASH = ROOT / "dashboard"
 BUNDLE = OUT / "INSTITUTIONAL_REVIEW_BUNDLE"
+ROOT_PARENT = ROOT.parent
 
 FEDERAL_BRIEF = OUT / "federal_brief.json"
 OPT_REPORT = OUT / "cross_sector_optimization_report.json"
 GRANT_EVIDENCE = OUT / "investor_and_grant_evidence.json"
 CHAIN_FILE = OUT / "infra_chain_of_custody_sha256.json"
 ALPACA_EVIDENCE = OUT / "investor_evidence_report.json"
+INVESTOR_BRIEF = ROOT / "INVESTOR_BRIEF.md"
 
 NOBEL_DASHBOARD = DASH / "nobel_tier_command_center.html"
 SLIDES_JSON = BUNDLE / "nobel_tier_slides.json"
 SLIDES_MD = BUNDLE / "nobel_tier_powerpoint_slides.md"
 EXEC_SUMMARY_JSON = BUNDLE / "nobel_tier_executive_summary.json"
+
+
+def _latest_patent_tracker() -> Path | None:
+    ops_dir = ROOT_PARENT / "out" / "ops"
+    if not ops_dir.exists():
+        return None
+    candidates = sorted(ops_dir.glob("patent_filing_tracker_*.json"))
+    if not candidates:
+        return None
+    return candidates[-1]
+
+
+def extract_valuation_bands() -> list[str]:
+    if not INVESTOR_BRIEF.exists():
+        return []
+    try:
+        lines = INVESTOR_BRIEF.read_text(encoding="utf-8", errors="ignore").splitlines()
+    except Exception:
+        return []
+
+    in_section = False
+    out: list[str] = []
+    for line in lines:
+        text = line.strip()
+        if text.lower().startswith("### valuation positioning bands"):
+            in_section = True
+            continue
+        if in_section and text.startswith("### "):
+            break
+        if in_section and text.startswith("- "):
+            out.append(text[2:].strip())
+    return out[:8]
 
 
 def utc_iso() -> str:
@@ -49,11 +83,21 @@ def pct(value: Any) -> str:
         return "0.0000%"
 
 
-def build_dashboard_html(federal: Dict[str, Any], opt: Dict[str, Any], evidence: Dict[str, Any], chain: Dict[str, Any], alpaca: Dict[str, Any]) -> str:
+def build_dashboard_html(
+    federal: Dict[str, Any],
+    opt: Dict[str, Any],
+    evidence: Dict[str, Any],
+    chain: Dict[str, Any],
+    alpaca: Dict[str, Any],
+    patent: Dict[str, Any],
+    valuation_bands: List[str],
+) -> str:
     impact = federal.get("financial_impact", {}) if isinstance(federal, dict) else {}
     top_risks = federal.get("top_risks", []) if isinstance(federal, dict) else []
     recommended = opt.get("recommended", {}) if isinstance(opt, dict) else {}
     chain_files = chain.get("files", []) if isinstance(chain, dict) else []
+    app_anchor = patent.get("application_anchor", {}) if isinstance(patent, dict) else {}
+    patent_files = patent.get("evidence_files", []) if isinstance(patent, dict) else []
 
     rows = []
     for idx, risk in enumerate(top_risks[:8], start=1):
@@ -76,6 +120,16 @@ def build_dashboard_html(federal: Dict[str, Any], opt: Dict[str, Any], evidence:
         hash_rows.append(
             f"<tr><td>{path}</td><td class='mono'>{digest}</td></tr>"
         )
+
+    patent_rows = []
+    for item in patent_files[:8]:
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", ""))
+        digest = str(item.get("sha256", ""))
+        patent_rows.append(f"<tr><td>{path}</td><td class='mono'>{digest}</td></tr>")
+
+    valuation_html = "".join(f"<li>{v}</li>" for v in valuation_bands)
 
     return f"""<!doctype html>
 <html>
@@ -129,21 +183,56 @@ th {{ color:var(--muted); font-size:10px; text-transform:uppercase; letter-spaci
   </div>
 
   <div class='section'>
+        <h3>Patent Anchor and Valuation Positioning</h3>
+        <table class='table'>
+            <thead><tr><th>Field</th><th>Value</th></tr></thead>
+            <tbody>
+                <tr><td>USPTO Application</td><td>{app_anchor.get('uspto_application','')}</td></tr>
+                <tr><td>Patent Center Reference</td><td>{app_anchor.get('patent_center_reference','')}</td></tr>
+                <tr><td>Confirmation Number</td><td>{app_anchor.get('confirmation_number','')}</td></tr>
+                <tr><td>Receipt Timestamp</td><td>{app_anchor.get('receipt_timestamp_et','')}</td></tr>
+                <tr><td>Title</td><td>{app_anchor.get('title','')}</td></tr>
+            </tbody>
+        </table>
+        <div class='card' style='margin-top:12px;'>
+            <div class='k'>Valuation Positioning Bands</div>
+            <ul>{valuation_html}</ul>
+        </div>
+    </div>
+
+    <div class='section'>
     <h3>Chain of Custody (SHA-256)</h3>
     <table class='table'>
       <thead><tr><th>Artifact</th><th>SHA-256</th></tr></thead>
       <tbody>{''.join(hash_rows)}</tbody>
     </table>
   </div>
+
+    <div class='section'>
+        <h3>Patent Evidence File Hashes</h3>
+        <table class='table'>
+            <thead><tr><th>Artifact</th><th>SHA-256</th></tr></thead>
+            <tbody>{''.join(patent_rows)}</tbody>
+        </table>
+    </div>
 </div>
 </body>
 </html>"""
 
 
-def build_slide_pack(federal: Dict[str, Any], opt: Dict[str, Any], evidence: Dict[str, Any], chain: Dict[str, Any], alpaca: Dict[str, Any]) -> Dict[str, Any]:
+def build_slide_pack(
+    federal: Dict[str, Any],
+    opt: Dict[str, Any],
+    evidence: Dict[str, Any],
+    chain: Dict[str, Any],
+    alpaca: Dict[str, Any],
+    patent: Dict[str, Any],
+    valuation_bands: List[str],
+) -> Dict[str, Any]:
     impact = federal.get("financial_impact", {}) if isinstance(federal, dict) else {}
     recommended = opt.get("recommended", {}) if isinstance(opt, dict) else {}
     top_risks = federal.get("top_risks", []) if isinstance(federal, dict) else []
+    app_anchor = patent.get("application_anchor", {}) if isinstance(patent, dict) else {}
 
     slides = [
         {
@@ -176,6 +265,16 @@ def build_slide_pack(federal: Dict[str, Any], opt: Dict[str, Any], evidence: Dic
         },
         {
             "slide": 4,
+            "title": "Patent and Valuation Anchors",
+            "bullets": [
+                f"USPTO application: {app_anchor.get('uspto_application','')}",
+                f"Patent Center reference: {app_anchor.get('patent_center_reference','')}",
+                f"Confirmation number: {app_anchor.get('confirmation_number','')}",
+                f"Receipt timestamp: {app_anchor.get('receipt_timestamp_et','')}",
+            ] + valuation_bands[:4],
+        },
+        {
+            "slide": 5,
             "title": "Integrity and Chain of Custody",
             "bullets": [
                 f"SHA-256 hashed artifacts: {len((chain.get('files',[]) if isinstance(chain,dict) else []))}",
@@ -185,7 +284,7 @@ def build_slide_pack(federal: Dict[str, Any], opt: Dict[str, Any], evidence: Dic
             ],
         },
         {
-            "slide": 5,
+            "slide": 6,
             "title": "Deployment Track",
             "bullets": [
                 "24/7 federal brief daemon active with heartbeat and run ledger",
@@ -237,19 +336,33 @@ def run() -> Dict[str, Any]:
     evidence = load_json(GRANT_EVIDENCE, {})
     chain = load_json(CHAIN_FILE, {})
     alpaca = load_json(ALPACA_EVIDENCE, {})
+    patent_tracker_path = _latest_patent_tracker()
+    patent = load_json(patent_tracker_path, {}) if patent_tracker_path else {}
+    valuation_bands = extract_valuation_bands()
 
-    html = build_dashboard_html(federal, opt, evidence, chain, alpaca)
+    html = build_dashboard_html(federal, opt, evidence, chain, alpaca, patent, valuation_bands)
     NOBEL_DASHBOARD.write_text(html, encoding="utf-8")
 
-    slide_pack = build_slide_pack(federal, opt, evidence, chain, alpaca)
+    slide_pack = build_slide_pack(federal, opt, evidence, chain, alpaca, patent, valuation_bands)
     SLIDES_JSON.write_text(json.dumps(slide_pack, indent=2), encoding="utf-8")
     SLIDES_MD.write_text(render_slide_markdown(slide_pack), encoding="utf-8")
+
+    app_anchor = patent.get("application_anchor", {}) if isinstance(patent, dict) else {}
 
     executive = {
         "generated_utc": utc_iso(),
         "dashboard": str(NOBEL_DASHBOARD),
         "slides_json": str(SLIDES_JSON),
         "slides_markdown": str(SLIDES_MD),
+        "patent_tracker": str(patent_tracker_path) if patent_tracker_path else "",
+        "patent_anchor": {
+            "uspto_application": str(app_anchor.get("uspto_application") or ""),
+            "patent_center_reference": str(app_anchor.get("patent_center_reference") or ""),
+            "confirmation_number": str(app_anchor.get("confirmation_number") or ""),
+            "receipt_timestamp_et": str(app_anchor.get("receipt_timestamp_et") or ""),
+            "title": str(app_anchor.get("title") or ""),
+        },
+        "valuation_positioning_bands": valuation_bands,
         "headline": {
             "projected_failure_cost_usd": float((federal.get("financial_impact") or {}).get("projected_failure_cost_usd", 0.0) or 0.0),
             "estimated_avoided_cost_usd": float((federal.get("financial_impact") or {}).get("estimated_avoided_cost_usd", 0.0) or 0.0),

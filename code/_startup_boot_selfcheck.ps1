@@ -15,7 +15,15 @@ New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 $all = Get-CimInstance Win32_Process
 
 $dashboard = @($all | Where-Object {
-    $_.Name -like 'python*' -and $_.CommandLine -like '*dashboard_unified_refresh.py*'
+    (
+        $_.Name -like 'python*' -and (
+            $_.CommandLine -like '*dashboard_unified_refresh.py*' -or
+            $_.CommandLine -like '*build_institutional_crypto_paper_dashboard.py*'
+        )
+    ) -or (
+        ($_.Name -like 'powershell*' -or $_.Name -like 'pwsh*') -and
+        $_.CommandLine -like '*RUN_INSTITUTIONAL_CRYPTO_DASHBOARD.ps1*'
+    )
 }).Count
 
 $sector = @($all | Where-Object {
@@ -27,7 +35,15 @@ $infra = @($all | Where-Object {
 }).Count
 
 $paper = @($all | Where-Object {
-    ($_.Name -like 'powershell*' -or $_.Name -like 'pwsh*') -and $_.CommandLine -like '*RUN_ALPACA_PAPER_247.ps1*'
+    (
+        ($_.Name -like 'powershell*' -or $_.Name -like 'pwsh*') -and (
+            $_.CommandLine -like '*RUN_ALPACA_PAPER_247.ps1*' -or
+            $_.CommandLine -like '*RUN_MULTI_EXCHANGE_PAPER_TICKER.ps1*'
+        )
+    ) -or (
+        $_.Name -like 'python*' -and
+        $_.CommandLine -like '*multi_exchange_paper_ticker.py*'
+    )
 }).Count
 
 $services = @(

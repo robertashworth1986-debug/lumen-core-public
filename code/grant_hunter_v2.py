@@ -36,11 +36,13 @@ import os
 import re
 import sys
 import uuid
+import webbrowser
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.error import HTTPError, URLError
+from urllib.parse import quote_plus
 from urllib.request import Request, urlopen
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
@@ -49,8 +51,12 @@ CODE = ROOT / "code"
 OUT_GRANTS = ROOT / "out" / "grants"
 OUT_PACKETS = OUT_GRANTS / "application_packets"
 OUT_QUEUE   = ROOT / "out" / "grant_approval_queue.json"
+OUT_OPS = ROOT / "out" / "ops"
+OUT_SUBMIT_LANES = OUT_OPS / "grant_submit_lanes"
+OUT_SUBMIT_TICKET_SNAPSHOTS = OUT_SUBMIT_LANES / "tickets"
 PROFILE_PATH = CODE / "grants_profile_lumencore.json"
 SKIP_AUTOFILL_PATH = ROOT / "out" / "ops" / "skips_grant_autofill" / "skips_grant_autofill_latest.json"
+KEY_ENV_FILE = ROOT / "code" / "execution" / "config" / "luma_live_keys.env"
 
 GRANTS_API   = "https://api.grants.gov/v1/api/search2"
 GRANTS_SYNC  = "https://api.grants.gov/v1/api/sync"   # detail endpoint
@@ -190,6 +196,53 @@ def _to_float(value: Any, default: float = 0.0) -> float:
         return default
 
 
+def _pick_first(*values: Any) -> str:
+    for value in values:
+        if value is None:
+            continue
+        txt = str(value).strip()
+        if txt:
+            return txt
+    return ""
+
+
+def _load_key_map() -> Dict[str, str]:
+    file_keys: Dict[str, str] = {}
+    if KEY_ENV_FILE.exists():
+        try:
+            for raw in KEY_ENV_FILE.read_text(encoding="utf-8", errors="ignore").splitlines():
+                line = raw.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, value = line.split("=", 1)
+                file_keys[key.strip()] = value.strip()
+        except Exception:
+            pass
+
+    grants_key = _pick_first(
+        os.environ.get("GRANTS_GOV_API_KEY"),
+        os.environ.get("GRANTS_API_KEY"),
+        os.environ.get("GRANTS_GOV_KEY"),
+        file_keys.get("GRANTS_GOV_API_KEY"),
+        file_keys.get("GRANTS_API_KEY"),
+        file_keys.get("GRANTS_GOV_KEY"),
+    )
+
+    sam_key = _pick_first(
+        os.environ.get("SAM_GOV_API_KEY"),
+        os.environ.get("SAM_API_KEY"),
+        os.environ.get("SAM_KEY"),
+        file_keys.get("SAM_GOV_API_KEY"),
+        file_keys.get("SAM_API_KEY"),
+        file_keys.get("SAM_KEY"),
+    )
+
+    return {
+        "GRANTS_GOV_API_KEY": grants_key,
+        "SAM_GOV_API_KEY": sam_key,
+    }
+
+
 def _template_budget_total(use_of_funds: Dict[str, Any], key: str) -> float:
     row = use_of_funds.get(key, {}) if isinstance(use_of_funds, dict) else {}
     if not isinstance(row, dict):
@@ -232,12 +285,41 @@ def _blob(hit: Dict[str, Any]) -> str:
     ]
     return _norm(" ".join(str(v) for v in fields))
 
+
+def _hard_eligibility_mismatch_reason(blob: str, opp_num: str, title: str) -> str:
+    text = _norm(" ".join([blob or "", opp_num or "", title or ""]))
+
+    hard_patterns = [
+        "individual applicants only",
+        "applicants must be alumni",
+        "exchange program alumni",
+        "alumni engagement innovation fund",
+        "u.s. citizen alumni are not eligible",
+        "us citizen alumni are not eligible",
+        "not-for-profit, non-governmental organizations are not eligible",
+    ]
+    for pat in hard_patterns:
+        if pat in text:
+            return f"{pat.replace(' ', '_')}"
+
+    has_individuals = "individual" in text
+    has_smallbiz = ("small business" in text) or ("for-profit" in text) or ("for profit" in text)
+    if has_individuals and not has_smallbiz:
+        return "individual_only_without_small_business_eligibility"
+
+    return ""
+
 # ─── Grants.gov API ───────────────────────────────────────────────────────────
 
 def _api_post(url: str, payload: Dict[str, Any]) -> Dict[str, Any]:
     body = json.dumps(payload).encode("utf-8")
+    headers = {"Content-Type": "application/json", "Accept": "application/json"}
+    key_map = _load_key_map()
+    grants_key = str(key_map.get("GRANTS_GOV_API_KEY") or "").strip()
+    if grants_key:
+        headers["x-api-key"] = grants_key
     req = Request(url, data=body,
-                  headers={"Content-Type": "application/json", "Accept": "application/json"},
+                  headers=headers,
                   method="POST")
     try:
         with urlopen(req, timeout=30) as resp:
@@ -414,6 +496,27 @@ def score_opportunity(hit: Dict[str, Any], profile: Dict[str, Any]) -> ScoredOpp
         if term and term in blob:
             exclude_penalty += 25
             reasons.append(f"EXCLUDE:{term}")
+
+    hard_reason = ""
+    if not is_skip:
+        hard_reason = _hard_eligibility_mismatch_reason(
+            blob=blob,
+            opp_num=str(hit.get("oppNum") or hit.get("number") or ""),
+            title=str(hit.get("title") or hit.get("oppTitle") or ""),
+        )
+    if hard_reason:
+        exclude_penalty += 500.0
+        reasons.append(f"HARD_EXCLUDE:{hard_reason}")
+
+    # Must show at least one explicit profile relevance signal.
+    if not is_skip:
+        has_profile_match = any(
+            str(r).startswith("kw:") or str(r).startswith("elig:")
+            for r in reasons
+        )
+        if not has_profile_match:
+            exclude_penalty += 250.0
+            reasons.append("HARD_EXCLUDE:no_profile_keyword_or_eligibility_match")
 
     # Award size filter
     if min_usd > 0 and award_ceiling and award_ceiling < min_usd:
@@ -715,6 +818,235 @@ def approve_ticket(ticket_id: str, notes: str = "") -> None:
     print(f"✅ APPROVED: {ticket_id}")
     print("   → Next step: submit this packet in Grants.gov Workspace and record the returned tracking ID in your evidence artifacts.")
 
+
+def mark_ticket_submitted(
+    ticket_id: str,
+    tracking_id: str,
+    submitted_by: str,
+    notes: str = "",
+) -> bool:
+    queue = load_queue()
+    updated = False
+    for item in queue:
+        if item.get("ticket_id") != ticket_id:
+            continue
+        item["approval_state"] = "SUBMITTED_EXTERNALLY"
+        item["submitted_utc"] = now_utc()
+        item["external_tracking_id"] = tracking_id
+        item["submitted_by"] = submitted_by
+        if notes:
+            item["submission_notes"] = notes
+        updated = True
+        break
+
+    if not updated:
+        return False
+
+    save_queue(queue)
+    return True
+
+
+def _safe_float(val: Any) -> float:
+    try:
+        return float(val)
+    except Exception:
+        return 0.0
+
+
+def _deadline_risk(days_to_close: int) -> str:
+    if days_to_close == 9999:
+        return "unknown"
+    if days_to_close <= 0:
+        return "expired_or_today"
+    if days_to_close <= 3:
+        return "critical"
+    if days_to_close <= 7:
+        return "high"
+    if days_to_close <= 14:
+        return "medium"
+    return "normal"
+
+
+def _is_skip_item(item: Dict[str, Any]) -> bool:
+    opp = item.get("opportunity", {}) if isinstance(item, dict) else {}
+    opp_num = str(opp.get("opp_num") or "").upper()
+    title = _norm(opp.get("title") or "")
+    agency = _norm(opp.get("agency") or "")
+    return opp_num.startswith("SKIP-") or "hello skip" in agency or title.startswith("skip ")
+
+
+def _submit_url_for_item(item: Dict[str, Any]) -> Tuple[str, str]:
+    opp = item.get("opportunity", {}) if isinstance(item, dict) else {}
+    opp_num = str(opp.get("opp_num") or "").strip()
+    title = str(opp.get("title") or "").strip()
+
+    if _is_skip_item(item):
+        portal_url = "https://helloskip.com/"
+        return ("skip", portal_url)
+
+    query = opp_num or title or "federal grant"
+    portal_url = f"https://simpler.grants.gov/search?query={quote_plus(query)}"
+    return ("federal_grants_gov", portal_url)
+
+
+def _render_submit_lanes_markdown(payload: Dict[str, Any]) -> str:
+    lines: List[str] = []
+    totals = payload.get("totals", {}) if isinstance(payload, dict) else {}
+    lines.append("# Grant Submit Lanes")
+    lines.append("")
+    lines.append(f"Generated UTC: {payload.get('generated_utc', '')}")
+    lines.append(f"Scope: {payload.get('scope', '')}")
+    lines.append(f"Queue Source: {payload.get('source_queue_path', '')}")
+    lines.append("")
+    lines.append("## Totals")
+    lines.append("")
+    lines.append(f"- Matched tickets: {int(totals.get('matched_tickets', 0))}")
+    lines.append(f"- Skip tickets: {int(totals.get('skip_tickets', 0))}")
+    lines.append(f"- Federal tickets: {int(totals.get('federal_tickets', 0))}")
+    lines.append("")
+    lines.append("## One-Click Lanes")
+    lines.append("")
+
+    for lane in payload.get("lanes", []):
+        if not isinstance(lane, dict):
+            continue
+        lines.append(f"### {lane.get('ticket_id', '')} — {lane.get('title', '')}")
+        lines.append("")
+        lines.append(f"- State: {lane.get('approval_state', '')}")
+        lines.append(f"- Channel: {lane.get('channel', '')}")
+        lines.append(f"- Opportunity: {lane.get('opp_num', '')}")
+        lines.append(f"- Deadline: {lane.get('close_date', '')} ({lane.get('deadline_risk', '')})")
+        lines.append(f"- Submit URL: {lane.get('submit_url', '')}")
+        lines.append(f"- Launch command (PowerShell): `{lane.get('launch_command_windows', '')}`")
+        lines.append(f"- Ticket snapshot: {lane.get('ticket_snapshot_path', '')}")
+        lines.append(
+            "- Mark submitted command: "
+            f"`python code/grant_hunter_v2.py submitted --ticket {lane.get('ticket_id', '')} --tracking-id TRACKING_ID_HERE --by \"Robert Ashworth\"`"
+        )
+        lines.append("")
+
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def build_submit_lanes(
+    queue: List[Dict[str, Any]],
+    state_filters: List[str],
+    ticket_filters: List[str],
+    limit: int,
+) -> Dict[str, Any]:
+    wanted_states = {str(s or "").strip().upper() for s in state_filters if str(s or "").strip()}
+    wanted_tickets = {str(t or "").strip().upper() for t in ticket_filters if str(t or "").strip()}
+
+    matched: List[Dict[str, Any]] = []
+    for item in queue:
+        if not isinstance(item, dict):
+            continue
+        tid = str(item.get("ticket_id") or "").strip()
+        if not tid:
+            continue
+        state = str(item.get("approval_state") or "").strip().upper()
+        if wanted_states and state not in wanted_states:
+            continue
+        if wanted_tickets and tid.upper() not in wanted_tickets:
+            continue
+        matched.append(item)
+
+    matched.sort(
+        key=lambda item: (
+            _days_to_close(str((item.get("opportunity") or {}).get("close_date") or "")),
+            -_safe_float((item.get("opportunity") or {}).get("final_score")),
+        )
+    )
+
+    # Collapse duplicate tickets for the same opportunity so submit flow is one lane per opp.
+    deduped: List[Dict[str, Any]] = []
+    seen_opp_keys: set[str] = set()
+    duplicates_removed = 0
+    for item in matched:
+        opp = item.get("opportunity") if isinstance(item, dict) else {}
+        opp_num = str((opp or {}).get("opp_num") or "").strip().upper()
+        tid = str(item.get("ticket_id") or "").strip().upper()
+        key = opp_num or tid
+        if key in seen_opp_keys:
+            duplicates_removed += 1
+            continue
+        seen_opp_keys.add(key)
+        deduped.append(item)
+
+    matched = deduped
+
+    if limit > 0:
+        matched = matched[:limit]
+
+    OUT_SUBMIT_LANES.mkdir(parents=True, exist_ok=True)
+    OUT_SUBMIT_TICKET_SNAPSHOTS.mkdir(parents=True, exist_ok=True)
+
+    lanes: List[Dict[str, Any]] = []
+    for idx, item in enumerate(matched, start=1):
+        opp = item.get("opportunity", {}) if isinstance(item, dict) else {}
+        channel, submit_url = _submit_url_for_item(item)
+        ticket_id = str(item.get("ticket_id") or "")
+        close_date = str(opp.get("close_date") or "")
+        days_to_close = _days_to_close(close_date)
+        ticket_snapshot_path = OUT_SUBMIT_TICKET_SNAPSHOTS / f"{ticket_id}.json"
+        save_json(ticket_snapshot_path, item)
+        lanes.append(
+            {
+                "rank": idx,
+                "ticket_id": ticket_id,
+                "approval_state": str(item.get("approval_state") or ""),
+                "channel": channel,
+                "agency": str(opp.get("agency") or ""),
+                "title": str(opp.get("title") or ""),
+                "opp_num": str(opp.get("opp_num") or ""),
+                "close_date": close_date,
+                "days_to_close": days_to_close,
+                "deadline_risk": _deadline_risk(days_to_close),
+                "submit_url": submit_url,
+                "launch_command_windows": f'start "" "{submit_url}"',
+                "ticket_snapshot_path": str(ticket_snapshot_path),
+            }
+        )
+
+    tag = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    payload: Dict[str, Any] = {
+        "generated_utc": now_utc(),
+        "scope": "grant_submit_lanes",
+        "source_queue_path": str(OUT_QUEUE),
+        "filters": {
+            "states": sorted(wanted_states),
+            "ticket_ids": sorted(wanted_tickets),
+            "limit": limit,
+        },
+        "totals": {
+            "matched_tickets": len(lanes),
+            "unique_opportunities": len(lanes),
+            "duplicates_removed": duplicates_removed,
+            "skip_tickets": sum(1 for x in lanes if x.get("channel") == "skip"),
+            "federal_tickets": sum(1 for x in lanes if x.get("channel") == "federal_grants_gov"),
+        },
+        "lanes": lanes,
+    }
+
+    tagged_json = OUT_SUBMIT_LANES / f"grant_submit_lanes_{tag}.json"
+    latest_json = OUT_SUBMIT_LANES / "grant_submit_lanes_latest.json"
+    tagged_md = OUT_SUBMIT_LANES / f"grant_submit_lanes_{tag}.md"
+    latest_md = OUT_SUBMIT_LANES / "grant_submit_lanes_latest.md"
+
+    payload["artifacts"] = {
+        "tagged_json": str(tagged_json),
+        "latest_json": str(latest_json),
+        "tagged_md": str(tagged_md),
+        "latest_md": str(latest_md),
+    }
+
+    save_json(tagged_json, payload)
+    save_json(latest_json, payload)
+    markdown = _render_submit_lanes_markdown(payload)
+    tagged_md.write_text(markdown, encoding="utf-8")
+    latest_md.write_text(markdown, encoding="utf-8")
+    return payload
+
 # ─── CLI Commands ─────────────────────────────────────────────────────────────
 
 def cmd_hunt(args: argparse.Namespace) -> int:
@@ -747,10 +1079,17 @@ def cmd_hunt(args: argparse.Namespace) -> int:
     scored = [score_opportunity(h, profile) for h in all_hits.values()]
     scored.sort(key=lambda x: x.final_score, reverse=True)
 
+    def _is_hard_excluded(s: ScoredOpportunity) -> bool:
+        return any(str(r).startswith("HARD_EXCLUDE:") for r in s.reasons)
+
     # Filter: must be open, not expired
-    today_scored = [s for s in scored if 0 < s.days_to_close < 9999]
+    today_scored = [s for s in scored if 0 < s.days_to_close < 9999 and not _is_hard_excluded(s)]
     expired      = [s for s in scored if s.days_to_close == 0]
     no_date      = [s for s in scored if s.days_to_close == 9999]
+    disqualified = [s for s in scored if _is_hard_excluded(s)]
+
+    if disqualified:
+        print(f"\n🚫 Hard-excluded opportunities (eligibility mismatch): {len(disqualified)}")
 
     print(f"\n🏆 TOP {min(args.top, len(today_scored))} RANKED OPPORTUNITIES")
     print(f"{'RANK':<5} {'SCORE':<8} {'DAYS':<6} {'AWARDS':<8} {'OPP NUM':<20} TITLE")
@@ -767,8 +1106,10 @@ def cmd_hunt(args: argparse.Namespace) -> int:
         "total_open": len(today_scored),
         "total_expired": len(expired),
         "total_no_date": len(no_date),
+        "total_hard_excluded": len(disqualified),
         "ranked": [asdict(s) for s in today_scored],
         "expired": [asdict(s) for s in expired[:20]],
+        "hard_excluded": [asdict(s) for s in disqualified[:100]],
     })
     print(f"\n💾 Saved: {out_path}")
     return 0
@@ -842,6 +1183,68 @@ def cmd_approve(args: argparse.Namespace) -> int:
     approve_ticket(args.ticket, args.notes or "")
     return 0
 
+
+def cmd_submitted(args: argparse.Namespace) -> int:
+    ok = mark_ticket_submitted(
+        ticket_id=args.ticket,
+        tracking_id=args.tracking_id,
+        submitted_by=args.by,
+        notes=args.notes or "",
+    )
+    if not ok:
+        print(f"Ticket not found: {args.ticket}")
+        return 1
+
+    print(f"✅ SUBMITTED_EXTERNALLY: {args.ticket}")
+    print(f"   tracking_id={args.tracking_id}")
+    print(f"   submitted_by={args.by}")
+    print(f"   queue={OUT_QUEUE}")
+    return 0
+
+
+def cmd_submit_lanes(args: argparse.Namespace) -> int:
+    queue = load_queue()
+    if not queue:
+        print("Queue is empty. Run hunt/write/queue first.")
+        return 1
+
+    state_filters = [s.strip() for s in str(args.state or "").split(",") if s.strip()]
+    payload = build_submit_lanes(
+        queue=queue,
+        state_filters=state_filters,
+        ticket_filters=args.ticket or [],
+        limit=int(args.limit or 25),
+    )
+
+    lanes = payload.get("lanes", []) if isinstance(payload, dict) else []
+    if not lanes:
+        print("No matching tickets for submit-lanes filters.")
+        print(f"Artifacts: {payload.get('artifacts', {})}")
+        return 0
+
+    print("🚀 Grant submit lanes generated")
+    print(f"   matched={len(lanes)}  skip={payload.get('totals', {}).get('skip_tickets', 0)}  federal={payload.get('totals', {}).get('federal_tickets', 0)}")
+    for lane in lanes:
+        print(f"   - {lane.get('ticket_id')} | {lane.get('channel')} | {lane.get('submit_url')}")
+
+    if args.open:
+        opened = 0
+        for lane in lanes:
+            url = str(lane.get("submit_url") or "").strip()
+            if not url:
+                continue
+            try:
+                webbrowser.open(url, new=2)
+                opened += 1
+            except Exception:
+                continue
+        print(f"   opened_urls={opened}")
+
+    artifacts = payload.get("artifacts", {}) if isinstance(payload, dict) else {}
+    print(f"   json={artifacts.get('latest_json')}")
+    print(f"   md={artifacts.get('latest_md')}")
+    return 0
+
 def cmd_run_all(args: argparse.Namespace) -> int:
     print("=" * 80)
     print("  LUMENCORE GRANT HUNTER v2 — FULL PIPELINE")
@@ -886,6 +1289,20 @@ def build_parser() -> argparse.ArgumentParser:
     pa.add_argument("--ticket", required=True)
     pa.add_argument("--notes",  default="")
     pa.set_defaults(func=cmd_approve)
+
+    ps = sub.add_parser("submitted", help="Mark approved ticket as externally submitted")
+    ps.add_argument("--ticket", required=True)
+    ps.add_argument("--tracking-id", required=True)
+    ps.add_argument("--by", default="Robert Ashworth")
+    ps.add_argument("--notes", default="")
+    ps.set_defaults(func=cmd_submitted)
+
+    psl = sub.add_parser("submit-lanes", help="Build one-click submit lanes for approved tickets")
+    psl.add_argument("--state", default="APPROVED", help="Comma-separated queue states (default: APPROVED)")
+    psl.add_argument("--ticket", action="append", default=[], help="Specific ticket id (repeatable)")
+    psl.add_argument("--limit", type=int, default=25)
+    psl.add_argument("--open", action="store_true", help="Open each submit URL in browser")
+    psl.set_defaults(func=cmd_submit_lanes)
 
     pr = sub.add_parser("run-all", help="Full pipeline: hunt → write → queue")
     pr.add_argument("--rows", type=int, default=250)

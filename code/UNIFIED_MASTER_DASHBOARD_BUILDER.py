@@ -1234,20 +1234,60 @@ TEMPLATE = """<!DOCTYPE html>
       panel.setAttribute('aria-hidden', 'true');
     }
 
+    const PREMIUM_VOICE_STORAGE_KEY = 'luma.premiumVoiceName';
+
+    function voiceScore(voice) {
+      const name = String((voice && voice.name) || '').toLowerCase();
+      const lang = String((voice && voice.lang) || '').toLowerCase();
+      let score = 0;
+      if (lang.startsWith('en')) score += 20;
+      if (/neural|natural|enhanced|premium/.test(name)) score += 40;
+      if (/aria|jenny|zira|guy|davis|sara|samantha|alloy|nova/.test(name)) score += 25;
+      if (/microsoft|google|apple/.test(name)) score += 8;
+      if (/offline|embedded|compact/.test(name)) score -= 6;
+      return score;
+    }
+
     function populateVoices() {
       if (!('speechSynthesis' in window) || !voiceSelectEl) return;
-      availableVoices = window.speechSynthesis.getVoices();
+      availableVoices = window.speechSynthesis.getVoices().slice().sort((a, b) => {
+        const scoreDelta = voiceScore(b) - voiceScore(a);
+        if (scoreDelta !== 0) return scoreDelta;
+        return String(a.name || '').localeCompare(String(b.name || ''));
+      });
       const currentValue = voiceSelectEl.value;
+      const rememberedName = window.localStorage ? window.localStorage.getItem(PREMIUM_VOICE_STORAGE_KEY) : '';
       voiceSelectEl.innerHTML = '';
       availableVoices.forEach((voice, index) => {
         const option = document.createElement('option');
         option.value = String(index);
-        option.textContent = `${voice.name} (${voice.lang})`;
+        const premiumTag = voiceScore(voice) >= 55 ? ' [Premium]' : '';
+        option.textContent = `${voice.name} (${voice.lang})${premiumTag}`;
         voiceSelectEl.appendChild(option);
       });
-      const preferredIndex = availableVoices.findIndex((voice) => /en/i.test(voice.lang) && /female|zira|aria|samantha|jenny/i.test(voice.name));
-      const fallbackIndex = preferredIndex >= 0 ? preferredIndex : 0;
-      voiceSelectEl.value = currentValue || String(fallbackIndex);
+
+      let selectedIndex = 0;
+      if (rememberedName) {
+        const rememberedIdx = availableVoices.findIndex((voice) => String(voice.name || '') === rememberedName);
+        if (rememberedIdx >= 0) selectedIndex = rememberedIdx;
+      }
+      const parsedCurrent = Number(currentValue);
+      if (!Number.isNaN(parsedCurrent) && parsedCurrent >= 0 && parsedCurrent < availableVoices.length) {
+        selectedIndex = parsedCurrent;
+      }
+      voiceSelectEl.value = String(selectedIndex);
+
+      const selectedVoice = availableVoices[selectedIndex];
+      if (selectedVoice && window.localStorage) {
+        window.localStorage.setItem(PREMIUM_VOICE_STORAGE_KEY, String(selectedVoice.name || ''));
+      }
+
+      voiceSelectEl.onchange = () => {
+        const chosen = availableVoices[Number(voiceSelectEl.value)];
+        if (chosen && window.localStorage) {
+          window.localStorage.setItem(PREMIUM_VOICE_STORAGE_KEY, String(chosen.name || ''));
+        }
+      };
     }
 
     function speakText(text) {
@@ -1260,9 +1300,12 @@ TEMPLATE = """<!DOCTYPE html>
       utterance.rate = Number(rateRangeEl ? rateRangeEl.value : 0.98);
       utterance.pitch = Number(pitchRangeEl ? pitchRangeEl.value : 1.0);
       utterance.volume = 1.0;
-      const selectedVoice = availableVoices[Number(voiceSelectEl ? voiceSelectEl.value : 0)];
+      const selectedVoice = availableVoices[Number(voiceSelectEl ? voiceSelectEl.value : 0)] || availableVoices[0];
       if (selectedVoice) {
         utterance.voice = selectedVoice;
+        if (window.localStorage) {
+          window.localStorage.setItem(PREMIUM_VOICE_STORAGE_KEY, String(selectedVoice.name || ''));
+        }
       }
       window.speechSynthesis.speak(utterance);
     }

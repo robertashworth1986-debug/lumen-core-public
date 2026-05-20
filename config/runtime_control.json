@@ -171,7 +171,7 @@
   "capital_aware_rank_cache_sec": 15.0,
   "live_rest_ohlc_timeout_sec": 1.5,
   "capital_aware_selection_timeout_sec": 4.0,
-  "selection_min_edge": 1e-05,
+  "selection_min_edge": 0.00001,
   "signal_gate_min_score": 0.68,
   "expected_net_edge_min": 0.0,
   "max_deployable_capital_pct": 0.35,
