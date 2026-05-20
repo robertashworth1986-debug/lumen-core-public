@@ -12,7 +12,7 @@ param(
     [int]$ResponseMaxPerCycle = 120,
     [int]$GrantTop = 8,
     [int]$GrantRows = 180,
-    [switch]$NoContextStrict,
+    [switch]$NoContextRefreshStrict,
     [switch]$NoFunding,
     [switch]$NoContractLoanPack,
     [switch]$NoEmailFinder,
@@ -23,7 +23,12 @@ param(
     [switch]$PublishLinkedInSummary,
     [switch]$DryRunLinkedInPost,
     [switch]$TruthStrict,
-    [switch]$SkipGrantHunter
+    [switch]$SkipGrantHunter,
+    [string]$FundingChannels = "grant,key-source,contract,loan,crowdfund",
+    [switch]$NoHighPerformancePackagePass,
+    [switch]$NoSectorEvidencePush,
+    [switch]$NoNodeRedPush,
+    [string]$NodeRedBase = "http://127.0.0.1:8787"
 )
 
 Set-StrictMode -Version Latest
@@ -32,6 +37,7 @@ $ErrorActionPreference = "Stop"
 $stackRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $codeDir = Join-Path $stackRoot "code"
 $opsOut = Join-Path $stackRoot "out\ops"
+$syncPremiumScript = Join-Path $PSScriptRoot "SYNC_PREMIUM_PACKAGE_MIRROR.ps1"
 New-Item -ItemType Directory -Path $opsOut -Force | Out-Null
 
 $stamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssZ")
@@ -91,8 +97,37 @@ function Invoke-EngineStep {
 }
 
 try {
-    $contextArgs = @("--strict")
-    if ($NoContextStrict) { $contextArgs = @() }
+    if (-not $NoHighPerformancePackagePass) {
+        if (-not (Test-Path $syncPremiumScript)) {
+            throw "Missing script: $syncPremiumScript"
+        }
+
+        $syncStarted = Get-Date
+        Write-Output "[step] Sync Premium Performance Package Mirror"
+        & $syncPremiumScript -LatestZipCountFromProofs 8 -HashLimitMB 32
+        $syncRc = $LASTEXITCODE
+        if ($null -eq $syncRc) {
+            $syncRc = if ($?) { 0 } else { 1 }
+        }
+        $syncEnded = Get-Date
+        $steps += [ordered]@{
+            name = "Sync Premium Performance Package Mirror"
+            script = "ops/SYNC_PREMIUM_PACKAGE_MIRROR.ps1"
+            args = @("-LatestZipCountFromProofs", "8", "-HashLimitMB", "32")
+            rc = $syncRc
+            utc = $syncEnded.ToUniversalTime().ToString("o")
+            elapsed_sec = [Math]::Round(($syncEnded - $syncStarted).TotalSeconds, 3)
+        }
+        if ($syncRc -ne 0) {
+            throw "Step failed: Sync Premium Performance Package Mirror (rc=$syncRc)"
+        }
+    }
+
+    $useStrictContext = -not $NoContextRefreshStrict
+    $contextArgs = @()
+    if ($useStrictContext) {
+        $contextArgs = @("--strict")
+    }
     Invoke-EngineStep -Name "Resolve Application Context" -Script "application_context_resolver.py" -Args $contextArgs
 
     $linkedinArgs = @("--max-packages", "28")
@@ -117,7 +152,7 @@ try {
     }
 
     if (-not $NoFunding) {
-        Invoke-EngineStep -Name "Funding Queue Build" -Script "funding_autopilot.py" -Args @("build", "--top", "12", "--channels", "grant,key-source,contract,loan")
+        Invoke-EngineStep -Name "Funding Queue Build" -Script "funding_autopilot.py" -Args @("build", "--top", "12", "--channels", "$FundingChannels")
     }
 
     if (-not $NoContractLoanPack) {
@@ -144,6 +179,14 @@ try {
     Invoke-EngineStep -Name "Lock Autonomous Grant Win + Valuation" -Script "ops/LOCK_AUTONOMOUS_GRANT_WIN.py"
     Invoke-EngineStep -Name "Build Booth Design Pack" -Script "ops/build_booth_design_pack.py"
     Invoke-EngineStep -Name "Refresh Booth Explainer Brief" -Script "build_booth_explainer_brief.py"
+
+    if (-not $NoSectorEvidencePush) {
+        $sectorArgs = @("--run-investor-sweep")
+        if (-not $NoNodeRedPush) {
+            $sectorArgs += @("--push-nodered", "--nodered-base", "$NodeRedBase")
+        }
+        Invoke-EngineStep -Name "Sector + Investor Evidence Pipeline" -Script "ops/run_sector_energy_evidence_pipeline.py" -Args $sectorArgs
+    }
 
     $truthArgs = @()
     if ($TruthStrict) { $truthArgs += "--strict" }

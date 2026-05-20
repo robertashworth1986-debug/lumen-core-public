@@ -57,7 +57,7 @@ PROVIDERS = [
     {"source":"KRAKEN",       "sector":"crypto_exec",  "env":["KRAKEN_API_KEY","KRAKEN_API_SECRET"]},
     {"source":"MASSIVE",      "sector":"market_data",  "env":["MASSIVE_API_KEY"]},
     {"source":"NASA",         "sector":"space",        "env":["NASA_API_KEY"]},
-    {"source":"NOAA_NCEI",    "sector":"weather",      "env":["NOAA_API_TOKEN"]},
+    {"source":"NOAA_NCEI",    "sector":"weather",      "env":["NOAA_API_TOKEN","NOAA_NCEI_TOKEN","NCDC_NOAA_API_TOKEN"]},
     {"source":"NREL",         "sector":"energy_lab",   "env":["NREL_API_KEY"]},
     {"source":"TWELVE_DATA",  "sector":"market_data",  "env":["TWELVE_DATA_API_KEY"]},
     {"source":"USGS_WATER",   "sector":"water",        "env":["USGS_WATER_API_KEY"]},

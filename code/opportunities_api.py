@@ -7,6 +7,9 @@ Core endpoints:
     POST /api/opportunities/fill               -> trigger filler bot
     POST /api/opportunities/autopilot          -> harvest + fill + funding + outreach
     POST /api/opportunities/autopilot-v2       -> unified grants + linkedin + jobs autopilot
+    POST /api/opportunities/crowdfunding/call  -> run crowdfunding-specific funding call
+    GET  /api/opportunities/crowdfunding/queue -> latest crowdfunding queue slice
+    GET  /api/opportunities/evidence/shipping/latest -> latest Node-RED + Unity evidence shipping status
     POST /api/opportunities/linkedin/optimize  -> build LumaLinkedIn assets + revised resume
     GET  /api/opportunities/linkedin/latest    -> latest LinkedIn optimization payload
     POST /api/opportunities/email/finder/run   -> run email opportunity finder cycle
@@ -78,6 +81,9 @@ MASTER_VAL_LATEST = ROOT / "out" / "ops" / "master_valuation" / "master_valuatio
 IP_GRANT_WIN_MANIFEST_LATEST = ROOT / "out" / "ip_layer" / "autonomous_grant_win_manifest_latest.json"
 LUMA_EXPLAINER_QUANT_LATEST = ROOT / "out" / "ops" / "luma_explainer" / "luma_explainer_quantified_latest.json"
 BOOTH_DESIGN_MANIFEST_LATEST = ROOT / "out" / "ops" / "booth_design" / "booth_design_manifest_latest.json"
+BOOTH_PRINT_SPEC_LATEST = ROOT / "out" / "ops" / "booth_design" / "booth_print_spec.md"
+BOOTH_SETUP_CHECKLIST_LATEST = ROOT / "out" / "ops" / "booth_design" / "booth_setup_checklist.md"
+BOOTH_HOST_STYLE_GUIDE_LATEST = ROOT / "out" / "ops" / "booth_design" / "booth_host_style_guide.md"
 PUBLIC_TRUTH_LATEST = ROOT / "out" / "ops" / "public_truth" / "public_truth_latest.json"
 PUBLIC_TRUTH_MANIFEST_LATEST = ROOT / "out" / "ops" / "public_truth" / "public_truth_manifest_latest.json"
 APP_CONTEXT_LATEST = ROOT / "out" / "ops" / "application_context" / "application_context_latest.json"
@@ -94,6 +100,7 @@ GOV_BLUEPRINT_VAULT_LATEST = ROOT / "out" / "ops" / "gov_blueprint_vault" / "gov
 GOV_BLUEPRINT_VAULT_HEARTBEAT_LATEST = ROOT / "out" / "ops" / "gov_blueprint_vault" / "gov_blueprint_vault_heartbeat_latest.json"
 SITE_REACH_MISSION_LATEST = ROOT / "out" / "ops" / "site_reach_mission" / "site_reach_mission_latest.json"
 SITE_REACH_MISSION_HEARTBEAT_LATEST = ROOT / "out" / "ops" / "site_reach_mission" / "site_reach_mission_heartbeat_latest.json"
+SECTOR_EVIDENCE_PIPELINE_LATEST = ROOT / "out" / "ops" / "sector_energy_evidence_pipeline_latest.json"
 WHITEHOLE_ROOT = Path(os.getenv("WHITEHOLE_ROOT", r"C:\WhiteHole"))
 
 PY = sys.executable
@@ -255,6 +262,26 @@ def _heartbeat_snapshot(path: Path, stale_after_sec: float) -> dict[str, Any]:
         "is_fresh": is_fresh,
         "stale_after_sec": float(stale_after_sec),
     }
+
+
+def _latest_investor_proof_summary() -> dict[str, Any] | None:
+    roots = [
+        ROOT / "out" / "ops",
+        ROOT.parent / "out" / "ops",
+    ]
+    candidates: list[Path] = []
+    for base in roots:
+        if not base.exists():
+            continue
+        candidates.extend(base.glob("investor_proof_sweep_*/proof_summary.json"))
+    if not candidates:
+        return None
+    latest = max(candidates, key=lambda p: p.stat().st_mtime)
+    payload = _read_json(latest)
+    if not isinstance(payload, dict):
+        return None
+    payload["_path"] = str(latest)
+    return payload
 
 
 def _safe_slug(value: str) -> str:
@@ -567,10 +594,17 @@ def _build_tracker() -> dict[str, Any]:
         else {}
     )
     funding_counts: dict[str, int] = {}
+    funding_channel_counts: dict[str, int] = {}
     if isinstance(funding_q, list):
         for item in funding_q:
             key = str(item.get("approval_state") or "UNKNOWN").upper()
             funding_counts[key] = funding_counts.get(key, 0) + 1
+            channel = str(item.get("channel") or "unknown").lower()
+            funding_channel_counts[channel] = funding_channel_counts.get(channel, 0) + 1
+
+    sector_pipeline_latest = _read_json(SECTOR_EVIDENCE_PIPELINE_LATEST) or {}
+    investor_proof_latest = _latest_investor_proof_summary() or {}
+    node_red_unity = investor_proof_latest.get("node_red_unity") if isinstance(investor_proof_latest, dict) else {}
 
     payload = {
         "generated_utc": _now_utc_iso(),
@@ -735,6 +769,50 @@ def _build_tracker() -> dict[str, Any]:
         "funding_queue": {
             "n_total": len(funding_q) if isinstance(funding_q, list) else 0,
             "approval_state_counts": funding_counts,
+            "channel_counts": funding_channel_counts,
+            "crowdfunding_pending_human_approval": (
+                sum(
+                    1
+                    for item in funding_q
+                    if isinstance(item, dict)
+                    and str(item.get("channel") or "").lower() == "crowdfund"
+                    and str(item.get("approval_state") or "").upper() == "PENDING_HUMAN_APPROVAL"
+                )
+                if isinstance(funding_q, list)
+                else 0
+            ),
+        },
+        "evidence_shipping": {
+            "sector_pipeline_status": (
+                sector_pipeline_latest.get("status")
+                if isinstance(sector_pipeline_latest, dict)
+                else None
+            ),
+            "sector_pipeline_generated_utc": (
+                sector_pipeline_latest.get("generated_utc")
+                if isinstance(sector_pipeline_latest, dict)
+                else None
+            ),
+            "node_red_push_attempted": (
+                node_red_unity.get("attempted")
+                if isinstance(node_red_unity, dict)
+                else None
+            ),
+            "node_red_ingest_status": (
+                node_red_unity.get("ingest")
+                if isinstance(node_red_unity, dict)
+                else None
+            ),
+            "unity_scene_status": (
+                node_red_unity.get("scene")
+                if isinstance(node_red_unity, dict)
+                else None
+            ),
+            "investor_proof_summary_path": (
+                investor_proof_latest.get("_path")
+                if isinstance(investor_proof_latest, dict)
+                else None
+            ),
         },
         "jobs_queue": {
             "n_total": jobs_q.get("n_total", 0) if isinstance(jobs_q, dict) else 0,
@@ -896,6 +974,11 @@ class FillArgs(BaseModel):
     limit: int = 25
 
 
+class CrowdfundingCallArgs(BaseModel):
+    top: int = 8
+    no_network: bool = False
+
+
 class AutopilotArgs(BaseModel):
     harvest_min_score: float = 0.30
     fill_min_score: float = 0.40
@@ -904,7 +987,12 @@ class AutopilotArgs(BaseModel):
     build_funding_queue: bool = True
     include_contract_loan_pack: bool = True
     funding_top: int = 12
-    funding_channels: str = "grant,key-source,contract,loan"
+    funding_channels: str = "grant,key-source,contract,loan,crowdfund"
+    include_crowdfunding_call: bool = True
+    crowdfunding_top: int = 8
+    include_sector_evidence_push: bool = False
+    sector_push_nodered: bool = True
+    sector_nodered_base: str = "http://127.0.0.1:8787"
     include_outreach: bool = True
     outreach_limit: int = 25
     no_network: bool = False
@@ -968,7 +1056,12 @@ class AutopilotV2Args(BaseModel):
     build_funding_queue: bool = True
     include_contract_loan_pack: bool = True
     funding_top: int = 12
-    funding_channels: str = "grant,key-source,contract,loan"
+    funding_channels: str = "grant,key-source,contract,loan,crowdfund"
+    include_crowdfunding_call: bool = True
+    crowdfunding_top: int = 8
+    include_sector_evidence_push: bool = True
+    sector_push_nodered: bool = True
+    sector_nodered_base: str = "http://127.0.0.1:8787"
     include_outreach: bool = True
     outreach_limit: int = 25
     include_linkedin: bool = True
@@ -1100,6 +1193,26 @@ def run_autopilot(args: AutopilotArgs) -> dict:
             funding_args.append("--no-network")
         funding = _run("funding_autopilot.py", funding_args)
 
+    crowdfunding_call = None
+    if args.include_crowdfunding_call:
+        crowdfunding_args = [
+            "build",
+            "--top",
+            str(args.crowdfunding_top),
+            "--channels",
+            "crowdfund",
+        ]
+        if args.no_network:
+            crowdfunding_args.append("--no-network")
+        crowdfunding_call = _run("funding_autopilot.py", crowdfunding_args)
+
+    sector_evidence_push = None
+    if args.include_sector_evidence_push:
+        sector_args: list[str] = ["--run-investor-sweep"]
+        if args.sector_push_nodered:
+            sector_args.extend(["--push-nodered", "--nodered-base", args.sector_nodered_base])
+        sector_evidence_push = _run("ops/run_sector_energy_evidence_pipeline.py", sector_args, timeout=5400)
+
     contract_loan_pack = None
     if args.include_contract_loan_pack:
         contract_loan_pack = _run("ops/GENERATE_CONTRACT_LOAN_AND_INVESTOR_PACK.py", [])
@@ -1118,6 +1231,8 @@ def run_autopilot(args: AutopilotArgs) -> dict:
         "harvest": harvest,
         "fill": fill,
         "funding": funding,
+        "crowdfunding_call": crowdfunding_call,
+        "sector_evidence_push": sector_evidence_push,
         "contract_loan_pack": contract_loan_pack,
         "outreach": outreach,
         "ranked_actionable": ranked_count,
@@ -1215,6 +1330,26 @@ def run_autopilot_v2(args: AutopilotV2Args) -> dict:
             funding_args.append("--no-network")
         funding = _run("funding_autopilot.py", funding_args)
 
+    crowdfunding_call = None
+    if args.include_crowdfunding_call:
+        crowdfunding_args = [
+            "build",
+            "--top",
+            str(args.crowdfunding_top),
+            "--channels",
+            "crowdfund",
+        ]
+        if args.no_network:
+            crowdfunding_args.append("--no-network")
+        crowdfunding_call = _run("funding_autopilot.py", crowdfunding_args)
+
+    sector_evidence_push = None
+    if args.include_sector_evidence_push:
+        sector_args: list[str] = ["--run-investor-sweep"]
+        if args.sector_push_nodered:
+            sector_args.extend(["--push-nodered", "--nodered-base", args.sector_nodered_base])
+        sector_evidence_push = _run("ops/run_sector_energy_evidence_pipeline.py", sector_args, timeout=5400)
+
     contract_loan_pack = None
     if args.include_contract_loan_pack:
         contract_loan_pack = _run("ops/GENERATE_CONTRACT_LOAN_AND_INVESTOR_PACK.py", [])
@@ -1309,6 +1444,8 @@ def run_autopilot_v2(args: AutopilotV2Args) -> dict:
         "investor_mission_pack": investor_mission_pack,
         "site_reach_mission": site_reach_mission,
         "funding": funding,
+        "crowdfunding_call": crowdfunding_call,
+        "sector_evidence_push": sector_evidence_push,
         "contract_loan_pack": contract_loan_pack,
         "outreach": outreach,
         "linkedin": linkedin,
@@ -1391,6 +1528,47 @@ def run_email_finder(args: EmailFinderArgs) -> dict:
         "run": run,
         "email_latest": latest,
         "email_queue_count": len(queue) if isinstance(queue, list) else 0,
+    }
+
+
+@router.post("/crowdfunding/call")
+def crowdfunding_call(args: CrowdfundingCallArgs) -> dict:
+    run_args = ["build", "--top", str(args.top), "--channels", "crowdfund"]
+    if args.no_network:
+        run_args.append("--no-network")
+    run = _run("funding_autopilot.py", run_args, timeout=1800)
+    queue = _read_json(FUNDING_QUEUE)
+    rows = [
+        row
+        for row in (queue if isinstance(queue, list) else [])
+        if isinstance(row, dict) and str(row.get("channel") or "").lower() == "crowdfund"
+    ]
+    state_counts: dict[str, int] = {}
+    for row in rows:
+        state = str(row.get("approval_state") or "UNKNOWN").upper()
+        state_counts[state] = state_counts.get(state, 0) + 1
+    return {
+        "generated_utc": _now_utc_iso(),
+        "run": run,
+        "queue_count": len(rows),
+        "approval_state_counts": state_counts,
+        "queue": rows[:100],
+    }
+
+
+@router.get("/crowdfunding/queue")
+def crowdfunding_queue(limit: int = 100) -> dict:
+    payload = _read_json(FUNDING_QUEUE)
+    rows = [
+        row
+        for row in (payload if isinstance(payload, list) else [])
+        if isinstance(row, dict) and str(row.get("channel") or "").lower() == "crowdfund"
+    ]
+    max_rows = _clamp_limit(limit, low=1, high=500)
+    return {
+        "generated_utc": _now_utc_iso(),
+        "count": len(rows),
+        "queue": rows[:max_rows],
     }
 
 
@@ -1704,6 +1882,60 @@ def booth_design_latest() -> dict:
             code="booth_design_not_ready",
         )
     return payload
+
+
+@router.get("/booth/setup/latest")
+def booth_setup_latest() -> dict:
+    payload = _read_json(BOOTH_DESIGN_MANIFEST_LATEST)
+    if not payload:
+        return _not_ready(
+            error="no booth setup pack yet",
+            code="booth_setup_not_ready",
+        )
+    return {
+        "generated_utc": _now_utc_iso(),
+        "manifest": payload,
+        "print_spec_markdown": (
+            BOOTH_PRINT_SPEC_LATEST.read_text(encoding="utf-8", errors="ignore")
+            if BOOTH_PRINT_SPEC_LATEST.exists()
+            else None
+        ),
+        "setup_checklist_markdown": (
+            BOOTH_SETUP_CHECKLIST_LATEST.read_text(encoding="utf-8", errors="ignore")
+            if BOOTH_SETUP_CHECKLIST_LATEST.exists()
+            else None
+        ),
+        "host_style_guide_markdown": (
+            BOOTH_HOST_STYLE_GUIDE_LATEST.read_text(encoding="utf-8", errors="ignore")
+            if BOOTH_HOST_STYLE_GUIDE_LATEST.exists()
+            else None
+        ),
+    }
+
+
+@router.get("/evidence/shipping/latest")
+def evidence_shipping_latest() -> dict:
+    payload = _latest_investor_proof_summary()
+    if not payload:
+        return _not_ready(
+            error="no investor proof sweep summary found",
+            hint="Run RUN_INVESTOR_PROOF_SWEEP or RUN_SECTOR_ENERGY_EVIDENCE_PIPELINE with investor sweep",
+            code="evidence_shipping_not_ready",
+        )
+    node_red_unity = payload.get("node_red_unity") if isinstance(payload, dict) else {}
+    artifacts = payload.get("artifacts") if isinstance(payload, dict) else {}
+    return {
+        "generated_utc": _now_utc_iso(),
+        "summary_generated_utc": payload.get("generated_utc"),
+        "summary_path": payload.get("_path"),
+        "push_attempted": node_red_unity.get("attempted") if isinstance(node_red_unity, dict) else None,
+        "ingest_status": node_red_unity.get("ingest") if isinstance(node_red_unity, dict) else None,
+        "scene_status": node_red_unity.get("scene") if isinstance(node_red_unity, dict) else None,
+        "ingest_detail": node_red_unity.get("ingest_detail") if isinstance(node_red_unity, dict) else None,
+        "scene_detail": node_red_unity.get("scene_detail") if isinstance(node_red_unity, dict) else None,
+        "nodered_payload_json": artifacts.get("nodered_payload_json") if isinstance(artifacts, dict) else None,
+        "unity_edge_payload_json": artifacts.get("unity_edge_payload_json") if isinstance(artifacts, dict) else None,
+    }
 
 
 @router.get("/truth/latest")

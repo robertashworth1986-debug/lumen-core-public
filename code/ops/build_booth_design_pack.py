@@ -127,6 +127,56 @@ def print_spec_md() -> str:
 """
 
 
+def setup_checklist_md() -> str:
+  return """# Booth Setup Checklist
+
+## T-14 to T-7 Days
+
+1. Confirm booth dimensions, power drops, and ethernet policy with event operations.
+2. Submit print files to Office Depot and request proof before full run.
+3. Validate shipping destination, loading dock hours, and installation window.
+4. Confirm demo hardware list and backup cables/adapters.
+
+## T-2 Days
+
+1. Pack booth kit: banners, logo lockups, tape, zip ties, extension cords, gaffer tape.
+2. Stage demo loop assets: investor brief, explainer, mission telemetry, proof pack links.
+3. Verify QR codes route to live dashboard and grants/mission pages.
+
+## Day Of Setup
+
+1. Install center wall and side panel banners.
+2. Mount logo lockup on podium/front desk.
+3. Run display warmup and speaker check.
+4. Trigger one live scenario and one evidence refresh to verify runtime continuity.
+5. Capture setup photo + timestamp for chain-of-custody evidence.
+"""
+
+
+def host_style_guide_md() -> str:
+  return """# Booth Host Style Guide
+
+## Executive Look
+
+1. Suit: deep navy or charcoal, tailored fit, no loud patterns.
+2. Shirt: crisp white or light blue, structured collar.
+3. Tie: solid or subtle geometric in cyan/steel tones to match booth palette.
+4. Shoes: polished black or dark brown leather.
+
+## Stage Presence
+
+1. Open with one measurable proof line before visionary narrative.
+2. Keep posture upright, shoulders relaxed, and hands visible while speaking.
+3. Use the dashboard to show live evidence first, then projections.
+
+## Talk Track Discipline
+
+1. 20-second opener: what problem + what measurable outcome.
+2. 60-second proof: telemetry, investor pack, mission snapshots.
+3. 30-second close: next action and contact route.
+"""
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build Office Depot-ready booth banner/logo design pack.")
     parser.add_argument("--width-in", type=float, default=96.0)
@@ -158,6 +208,10 @@ def main() -> int:
 
     spec = OUT_DIR / "booth_print_spec.md"
     write_text(spec, print_spec_md())
+    checklist = OUT_DIR / "booth_setup_checklist.md"
+    write_text(checklist, setup_checklist_md())
+    style_guide = OUT_DIR / "booth_host_style_guide.md"
+    write_text(style_guide, host_style_guide_md())
 
     manifest = {
         "generated_utc": now_iso(),
@@ -165,7 +219,7 @@ def main() -> int:
         "dimensions_in": {"width": args.width_in, "height": args.height_in},
         "files": {},
     }
-    for path in sorted(OUT_DIR.glob("*.svg")) + [spec]:
+    for path in sorted(OUT_DIR.glob("*.svg")) + [spec, checklist, style_guide]:
         manifest["files"][str(path)] = {
             "sha256": sha256_file(path),
             "bytes": path.stat().st_size,

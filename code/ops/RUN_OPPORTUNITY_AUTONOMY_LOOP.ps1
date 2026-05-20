@@ -9,7 +9,18 @@ param(
     [double]$JobMinScore = 0.38,
     [int]$JobLimit = 20,
     [int]$ResponseMaxPerCycle = 120,
+    [int]$FundingTop = 12,
+    [string]$FundingChannels = "grant,key-source,contract,loan,crowdfund",
+    [int]$BoothRefreshEveryNCycles = 6,
+    [int]$SectorEvidenceEveryNCycles = 3,
+    [int]$HighPerformancePackagePassEveryNCycles = 12,
     [switch]$NoPdf,
+    [switch]$NoFunding,
+    [switch]$NoBoothDesign,
+    [switch]$NoHighPerformancePackagePass,
+    [switch]$NoSectorEvidencePush,
+    [switch]$NoNodeRedPush,
+    [string]$NodeRedBase = "http://127.0.0.1:8787",
     [switch]$PublishLinkedInSummary,
     [switch]$DryRunLinkedInPost,
     [switch]$DryRunEmailDispatch,
@@ -22,6 +33,7 @@ $ErrorActionPreference = "Stop"
 $stackRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $codeDir = Join-Path $stackRoot "code"
 $opsOut = Join-Path $stackRoot "out\ops\opportunity_autonomy_loop"
+$syncPremiumScript = Join-Path $PSScriptRoot "SYNC_PREMIUM_PACKAGE_MIRROR.ps1"
 New-Item -ItemType Directory -Path $opsOut -Force | Out-Null
 
 $pythonCandidates = @(
@@ -82,6 +94,43 @@ function Invoke-CycleStep {
     return $step
 }
 
+function Invoke-CyclePowerShellStep {
+    param(
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][string]$ScriptPath,
+        [Parameter(Mandatory = $false)][string[]]$Args = @()
+    )
+
+    if (-not (Test-Path $ScriptPath)) {
+        throw "Missing script: $ScriptPath"
+    }
+
+    $started = Get-Date
+    Write-Host "[cycle-step] $Name" -ForegroundColor Cyan
+    & $ScriptPath @Args
+    $rc = $LASTEXITCODE
+    if ($null -eq $rc) {
+        $rc = if ($?) { 0 } else { 1 }
+    }
+    $ended = Get-Date
+
+    $step = [ordered]@{
+        name = $Name
+        script = $ScriptPath
+        args = $Args
+        rc = $rc
+        started_utc = $started.ToUniversalTime().ToString("o")
+        ended_utc = $ended.ToUniversalTime().ToString("o")
+        elapsed_sec = [Math]::Round(($ended - $started).TotalSeconds, 3)
+    }
+
+    if ($rc -ne 0) {
+        throw "Step failed: $Name (rc=$rc)"
+    }
+
+    return $step
+}
+
 Write-Host "=====================================================" -ForegroundColor Green
 Write-Host " OPPORTUNITY AUTONOMY LOOP" -ForegroundColor Green
 Write-Host " Stack: $stackRoot" -ForegroundColor Green
@@ -101,6 +150,10 @@ while ($true) {
     $errorMessage = $null
 
     try {
+        if (-not $NoHighPerformancePackagePass -and ($cycle % [Math]::Max(1, $HighPerformancePackagePassEveryNCycles) -eq 0)) {
+            $steps += Invoke-CyclePowerShellStep -Name "Sync Premium Performance Package Mirror" -ScriptPath $syncPremiumScript -Args @("-LatestZipCountFromProofs", "8", "-HashLimitMB", "32")
+        }
+
         $steps += Invoke-CycleStep -Name "Resolve Application Context" -Script "application_context_resolver.py" -Args @("--strict")
 
         $linkedinArgs = @("--max-packages", "$MaxPackages")
@@ -115,6 +168,10 @@ while ($true) {
         }
         $steps += Invoke-CycleStep -Name "LinkedIn Resume Refresh" -Script "lumalinkedin_resume_engine_v1.py" -Args $linkedinArgs
 
+        if (-not $NoFunding) {
+            $steps += Invoke-CycleStep -Name "Funding Queue Build" -Script "funding_autopilot.py" -Args @("build", "--top", "$FundingTop", "--channels", "$FundingChannels")
+        }
+
         $steps += Invoke-CycleStep -Name "Email Opportunity Finder" -Script "email_opportunity_finder.py" -Args @("--once", "--min-score", "$EmailMinScore", "--max-per-cycle", "$EmailMaxPerCycle")
 
         $dispatchArgs = @("--once", "--min-fit-score", "$DispatchMinFitScore", "--limit", "$DispatchLimit")
@@ -126,6 +183,19 @@ while ($true) {
         $steps += Invoke-CycleStep -Name "Email Response Watcher" -Script "email_response_watcher.py" -Args @("--once", "--max-per-cycle", "$ResponseMaxPerCycle")
 
         $steps += Invoke-CycleStep -Name "Job Application Factory" -Script "job_application_factory.py" -Args @("--min-score", "$JobMinScore", "--limit", "$JobLimit")
+
+        if (-not $NoBoothDesign -and ($cycle % [Math]::Max(1, $BoothRefreshEveryNCycles) -eq 0)) {
+            $steps += Invoke-CycleStep -Name "Build Booth Design Pack" -Script "ops/build_booth_design_pack.py"
+            $steps += Invoke-CycleStep -Name "Refresh Booth Explainer Brief" -Script "build_booth_explainer_brief.py"
+        }
+
+        if (-not $NoSectorEvidencePush -and ($cycle % [Math]::Max(1, $SectorEvidenceEveryNCycles) -eq 0)) {
+            $sectorArgs = @("--run-investor-sweep")
+            if (-not $NoNodeRedPush) {
+                $sectorArgs += @("--push-nodered", "--nodered-base", "$NodeRedBase")
+            }
+            $steps += Invoke-CycleStep -Name "Sector + Investor Evidence Pipeline" -Script "ops/run_sector_energy_evidence_pipeline.py" -Args $sectorArgs
+        }
 
         $truthArgs = @()
         if (-not $NoTruthStrict) {

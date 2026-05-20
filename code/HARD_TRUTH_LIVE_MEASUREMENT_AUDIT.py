@@ -128,6 +128,13 @@ for k, v in envfile.items():
 def env_has(*names):
     return [n for n in names if os.environ.get(n)]
 
+def env_first(*names):
+    for name in names:
+        val = os.environ.get(name)
+        if isinstance(val, str) and val.strip():
+            return val.strip()
+    return ""
+
 PROVIDERS = [
     {
         "name": "ALPACA",
@@ -197,7 +204,7 @@ PROVIDERS = [
         "sector": "weather",
         "constraint_type": "weather / climate disruption",
         "money_drain_mode": "weather-driven loss, outage, scheduling drift",
-        "env_names": ["NOAA_API_TOKEN"],
+        "env_names": ["NOAA_API_TOKEN", "NOAA_NCEI_TOKEN", "NCDC_NOAA_API_TOKEN"],
     },
     {
         "name": "NREL",
@@ -393,7 +400,7 @@ def probe_nasa():
     return {"probe_ok": code == 200 and rows > 0, "http_status": code, "rows": rows, "note": "apod_probe"}
 
 def probe_noaa():
-    key = os.environ.get("NOAA_API_TOKEN")
+    key = env_first("NOAA_API_TOKEN", "NOAA_NCEI_TOKEN", "NCDC_NOAA_API_TOKEN")
     if not key:
         return {"probe_ok": False, "http_status": None, "rows": 0, "note": "missing env"}
     u = "https://www.ncei.noaa.gov/cdo-web/api/v2/datasets?limit=5"

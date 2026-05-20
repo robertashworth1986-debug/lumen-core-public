@@ -121,7 +121,8 @@ canonical = {
     },
     "NOAA_NCEI": {
         "sector": "weather",
-        "env_key": "NOAA_API_TOKEN"
+        "env_key": "NOAA_API_TOKEN",
+        "env_aliases": ["NOAA_NCEI_TOKEN", "NCDC_NOAA_API_TOKEN"]
     },
     "NREL": {
         "sector": "energy_lab",
@@ -156,10 +157,13 @@ measured_count = 0
 for source, meta in canonical.items():
     old = old_by_source.get(source, {})
     env_key = meta.get("env_key")
+    env_aliases = [str(x).strip() for x in (meta.get("env_aliases") or []) if str(x).strip()]
     env_secret = meta.get("env_secret")
     env_aux = meta.get("env_aux")
 
-    key_present = bool(found.get(env_key))
+    key_candidates = [env_key] + env_aliases
+    present_key_name = next((name for name in key_candidates if bool(found.get(name))), env_key)
+    key_present = any(bool(found.get(name)) for name in key_candidates)
     secret_present = bool(found.get(env_secret)) if env_secret else True
     aux_present = bool(found.get(env_aux)) if env_aux else True
 
@@ -195,7 +199,7 @@ for source, meta in canonical.items():
         "evidence_basis": evidence_basis,
         "dollar_basis": dollar_basis,
         "last_probe_utc": now_utc(),
-        "env": env_key,
+        "env": present_key_name,
         "enabled": enabled
     }
 
@@ -203,6 +207,8 @@ for source, meta in canonical.items():
         row["secret_env"] = env_secret
     if env_aux:
         row["aux_env"] = env_aux
+    if env_aliases:
+        row["env_aliases"] = env_aliases
     row["key_present"] = key_present
     if env_secret:
         row["secret_present"] = secret_present

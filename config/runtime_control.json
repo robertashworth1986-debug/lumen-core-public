@@ -1,7 +1,7 @@
 {
   "mode": "paper",
   "allow_live_orders": false,
-  "paper_enabled": false,
+  "paper_enabled": true,
   "futures_mode": false,
   "leverage_multiplier": 1.0,
   "kill_switch": false,

@@ -801,10 +801,21 @@ def execute_once(client: AlpacaPaperClient, runtime: dict, paper_runtime: dict, 
     risk_off_position_scale = float(paper_runtime.get("risk_off_position_scale", 0.60) or 0.60)
     risk_off_burst_entries = max(1, int(paper_runtime.get("risk_off_burst_entries", 1) or 1))
     risk_off_mode = drawdown_from_peak_pct <= risk_off_drawdown_pct
-    max_positions = int(paper_runtime.get("max_positions", 8) or 8)
+    max_positions = int(paper_runtime.get("max_positions", paper_runtime.get("max_position_count", 8)) or 8)
     position_size_pct = float(paper_runtime.get("position_size_pct", 0.35) or 0.35)
     min_entry_price = float(paper_runtime.get("min_entry_price", 3.0) or 3.0)
     off_hours_limit_buffer_pct = float(paper_runtime.get("off_hours_limit_buffer_pct", 0.005) or 0.0)
+    paper_runtime_enabled = bool(paper_runtime.get("enabled", True))
+    runtime_paper_enabled = bool(runtime.get("paper_enabled", True))
+    min_entry_capital_usd = float(paper_runtime.get("min_entry_capital_usd", 0.0) or 0.0)
+    capital_gate_pass = equity >= min_entry_capital_usd
+
+    if not paper_runtime_enabled:
+        note_parts.append("paper_runtime_disabled")
+    if not runtime_paper_enabled:
+        note_parts.append("runtime_control_paper_disabled")
+    if min_entry_capital_usd > 0 and not capital_gate_pass:
+        note_parts.append(f"min_entry_capital_block={round(min_entry_capital_usd, 2)}")
 
     if len(positions) > max_positions and not args.status_only and not args.no_orders:
         trim_count = len(positions) - max_positions
@@ -866,7 +877,14 @@ def execute_once(client: AlpacaPaperClient, runtime: dict, paper_runtime: dict, 
     effective_open_count = len(held_symbols | tracked_symbols | pending_order_symbols)
 
     order_results = []
-    can_submit_orders = (market_open or allow_off_hours_orders) and not weekend_closed and not entry_pause_active
+    can_submit_orders = (
+        (market_open or allow_off_hours_orders)
+        and not weekend_closed
+        and not entry_pause_active
+        and paper_runtime_enabled
+        and runtime_paper_enabled
+        and capital_gate_pass
+    )
 
     if candidate and effective_open_count < max_positions and can_submit_orders and not args.status_only and not args.no_orders:
         remaining_slots = max(1, max_positions - effective_open_count)
@@ -1039,6 +1057,10 @@ def execute_once(client: AlpacaPaperClient, runtime: dict, paper_runtime: dict, 
         "risk_off_mode": bool(risk_off_mode),
         "risk_off_drawdown_pct": risk_off_drawdown_pct,
         "risk_off_position_scale": risk_off_position_scale,
+        "paper_runtime_enabled": bool(paper_runtime_enabled),
+        "runtime_paper_enabled": bool(runtime_paper_enabled),
+        "min_entry_capital_usd": min_entry_capital_usd,
+        "capital_gate_pass": bool(capital_gate_pass),
         "entry_pause_active": bool(entry_pause_active),
         "reentry_cooldown_minutes": reentry_cooldown_minutes,
         "cooldown_symbols_count": len(cooldown_symbols),
@@ -1072,6 +1094,10 @@ def execute_once(client: AlpacaPaperClient, runtime: dict, paper_runtime: dict, 
             "drawdown_from_peak_pct": float(drawdown_from_peak_pct),
             "risk_off_mode": bool(risk_off_mode),
             "risk_off_drawdown_pct": float(risk_off_drawdown_pct),
+            "paper_runtime_enabled": bool(paper_runtime_enabled),
+            "runtime_paper_enabled": bool(runtime_paper_enabled),
+            "min_entry_capital_usd": float(min_entry_capital_usd),
+            "capital_gate_pass": bool(capital_gate_pass),
             "entry_pause_active": bool(entry_pause_active),
             "entry_pause_until_ts": float(entry_pause_until_ts),
             "min_entry_price": float(min_entry_price),

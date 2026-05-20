@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import os
 import re
 import shutil
 from datetime import datetime, timezone
@@ -74,12 +75,32 @@ def sha256_file(path: Path) -> str:
 
 
 def select_data_root() -> Path:
+    env_override = str(os.environ.get("LUMA_DATA_ROOT", "") or "").strip()
+    if env_override:
+        override_path = Path(env_override)
+        if override_path.exists() and override_path.is_dir():
+            return override_path
+
+    ranked: list[tuple[int, float, Path]] = []
+    dataset_names = list(DATASET_FILES.values())
+
     for candidate in DATA_ROOT_CANDIDATES:
-        if candidate.exists() and (candidate / DATASET_FILES["eia930_us48_hourly"]).exists():
-            return candidate
+        if not candidate.exists() or not candidate.is_dir():
+            continue
+
+        present_paths = [candidate / name for name in dataset_names if (candidate / name).exists()]
+        coverage_count = len(present_paths)
+        latest_mtime = max((p.stat().st_mtime for p in present_paths), default=0.0)
+        ranked.append((coverage_count, latest_mtime, candidate))
+
+    if ranked:
+        ranked.sort(key=lambda item: (item[0], item[1]), reverse=True)
+        return ranked[0][2]
+
     for candidate in DATA_ROOT_CANDIDATES:
-        if candidate.exists():
+        if candidate.exists() and candidate.is_dir():
             return candidate
+
     raise FileNotFoundError("No dataset root found. Checked C:/Data sets and stack data folders.")
 
 

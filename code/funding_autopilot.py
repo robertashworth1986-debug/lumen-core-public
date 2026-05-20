@@ -411,6 +411,37 @@ def _loan_items() -> list[dict[str, Any]]:
     return rows
 
 
+def _crowdfunding_items() -> list[dict[str, Any]]:
+    options = [
+        ("Reg CF Equity Raise", "Wefunder / Republic", 750_000.0, 21),
+        ("Kickstarter Hardware Launch", "Kickstarter", 250_000.0, 18),
+        ("Indiegogo Founders Campaign", "Indiegogo", 350_000.0, 20),
+    ]
+    rows = []
+    for title, agency, val, days in options:
+        rows.append(
+            {
+                "ticket_id": _ticket("FUND-CROWD"),
+                "channel": "crowdfund",
+                "title": title,
+                "agency": agency,
+                "opportunity_id": "crowdfunding_campaign",
+                "priority_score": round(82.0 + (30 - min(days, 30)) * 0.42, 2),
+                "days_to_deadline": days,
+                "deadline_utc": (datetime.now(timezone.utc) + timedelta(days=days)).isoformat(),
+                "approval_state": "PENDING_HUMAN_APPROVAL",
+                "status": "DRAFT_READY",
+                "created_utc": now_utc(),
+                "estimated_value_usd": val,
+                "reason": [
+                    "Community-backed capital lane with founder-credibility signaling",
+                    "Fits rapid pilot narrative and pre-order style validation",
+                ],
+            }
+        )
+    return rows
+
+
 def _write_draft(item: dict[str, Any], evidence: dict[str, Any]) -> dict[str, str]:
     DRAFTS.mkdir(parents=True, exist_ok=True)
     tid = item["ticket_id"]
@@ -452,7 +483,7 @@ def cmd_build(args: argparse.Namespace) -> int:
     evidence = _build_evidence_anchor()
     queue = load_queue()
 
-    channels = {c.strip().lower() for c in (args.channels or "grant,contract,loan").split(",") if c.strip()}
+    channels = {c.strip().lower() for c in (args.channels or "grant,key-source,contract,loan,crowdfund").split(",") if c.strip()}
     new_items: list[dict[str, Any]] = []
 
     if "grant" in channels:
@@ -463,6 +494,8 @@ def cmd_build(args: argparse.Namespace) -> int:
         new_items.extend(_contract_items())
     if "loan" in channels:
         new_items.extend(_loan_items())
+    if "crowdfund" in channels:
+        new_items.extend(_crowdfunding_items())
 
     # Dedupe by (channel,title)
     existing_keys = {(str(i.get("channel", "")).lower(), str(i.get("title", "")).strip().lower()) for i in queue}
@@ -561,12 +594,12 @@ def cmd_ship(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(description="Funding Autopilot: grants + contracts + loans")
+    p = argparse.ArgumentParser(description="Funding Autopilot: grants + contracts + loans + crowdfunding")
     sub = p.add_subparsers(dest="command", required=True)
 
     pb = sub.add_parser("build", help="Create new approval-ready funding drafts")
     pb.add_argument("--top", type=int, default=10)
-    pb.add_argument("--channels", default="grant,key-source,contract,loan")
+    pb.add_argument("--channels", default="grant,key-source,contract,loan,crowdfund")
     pb.add_argument("--no-network", action="store_true", help="Do not call Grants.gov hunt if ranked file is absent")
     pb.set_defaults(func=cmd_build)
 

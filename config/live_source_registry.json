@@ -1,261 +1,524 @@
 {
-  "generated_utc": "2026-05-17T12:42:06.285071+00:00",
-  "sources": [
-    {
-      "source": "BEA",
-      "sector": "macro",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "BEA_API_KEY"
-    },
-    {
-      "source": "CENSUS",
-      "sector": "demographic",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "CENSUS_API_KEY"
-    },
-    {
-      "source": "NOAA_NCEI",
-      "sector": "weather",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "NOAA_API_TOKEN"
-    },
-    {
-      "source": "NOAA_NCEI_ALT",
-      "sector": "weather",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "NCDC_NOAA_API_TOKEN"
-    },
-    {
-      "source": "NASA",
-      "sector": "space",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "NASA_API_KEY"
-    },
-    {
-      "source": "BLS",
-      "sector": "labor",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "BLS_API_KEY"
-    },
-    {
-      "source": "EIA",
-      "sector": "energy",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "EIA_API_KEY"
-    },
-    {
-      "source": "FRED",
-      "sector": "rates",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "FRED_API_KEY"
-    },
-    {
-      "source": "NREL",
-      "sector": "energy_lab",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "NREL_API_KEY"
-    },
-    {
-      "source": "USGS_WATER",
-      "sector": "water",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "USGS_WATER_API_KEY"
-    },
-    {
-      "source": "SAM_GOV",
-      "sector": "federal_contracts",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "SAM_GOV_API_KEY"
-    },
-    {
-      "source": "GRANTS_GOV",
-      "sector": "federal_grants",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "GRANTS_GOV_API_KEY"
-    },
-    {
-      "source": "DATA_GOV_PRIMARY",
-      "sector": "federal_data",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "DATA_GOV_API_KEY_PRIMARY"
-    },
-    {
-      "source": "DATA_GOV_SECONDARY",
-      "sector": "federal_data",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "DATA_GOV_API_KEY_SECONDARY"
-    },
-    {
-      "source": "DAP",
-      "sector": "federal_analytics",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "DAP_API_KEY"
-    },
+  "generated_utc": "2026-05-20T14:26:53.001843+00:00",
+  "paper_live_linked": true,
+  "rows": [
     {
       "source": "ALPACA",
       "sector": "broker",
-      "status": "LIVE_KEY_PRESENT",
+      "status": "MEASURED",
       "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "ALPACA_API_KEY"
-    },
-    {
-      "source": "ALPACA_SECRET",
-      "sector": "broker",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "ALPACA_API_SECRET"
-    },
-    {
-      "source": "ALPACA_LIVE",
-      "sector": "broker",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "ALPACA_LIVE_API_KEY"
-    },
-    {
-      "source": "ALPACA_LIVE_SECRET",
-      "sector": "broker",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "ALPACA_LIVE_API_SECRET"
-    },
-    {
-      "source": "TWELVE_DATA",
-      "sector": "market_data",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "TWELVE_DATA_API_KEY"
-    },
-    {
-      "source": "ALPHAVANTAGE",
-      "sector": "market_data",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "ALPHAVANTAGE_API_KEY"
-    },
-    {
-      "source": "POLYGON",
-      "sector": "market_data",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "POLYGON_API_KEY"
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "execution / routing / order placement",
+      "money_drain_mode": "missed fills, bad routing, delay, idle capital",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 6931.47,
+        "day": 166355.28,
+        "week": 1164486.96,
+        "month": 4990658.4,
+        "year": 60719677.2
+      },
+      "env_names": [
+        "ALPACA_API_KEY",
+        "ALPACA_API_SECRET"
+      ],
+      "present_env_names": [
+        "ALPACA_API_KEY",
+        "ALPACA_API_SECRET"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:43.184229+00:00",
+      "probe_note": "http_200_account",
+      "enabled": true,
+      "measured": true
     },
     {
       "source": "FINNHUB",
       "sector": "market_data",
-      "status": "LIVE_KEY_PRESENT",
+      "status": "MEASURED",
       "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "FINNHUB_API_KEY"
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "price discovery / event latency / symbol coverage",
+      "money_drain_mode": "bad entries, bad exits, stale market context",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 6931.47,
+        "day": 166355.28,
+        "week": 1164486.96,
+        "month": 4990658.4,
+        "year": 60719677.2
+      },
+      "env_names": [
+        "FINNHUB_API_KEY"
+      ],
+      "present_env_names": [
+        "FINNHUB_API_KEY"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:43.440158+00:00",
+      "probe_note": "quote_probe",
+      "enabled": true,
+      "measured": true
     },
     {
-      "source": "ODDS_API",
-      "sector": "sports_data",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "ODDS_API_KEY"
+      "source": "ALPHAVANTAGE",
+      "sector": "market_data",
+      "status": "PROBE_FAILED_OR_THIN",
+      "rows": 0,
+      "probe_ok": false,
+      "http_status": 200,
+      "evidence_basis": "KEY_PRESENT_BUT_NO_USABLE_ROWS",
+      "dollar_basis": "UNMEASURED",
+      "constraint_type": "market regime context / time series coverage",
+      "money_drain_mode": "weak ranking inputs, stale comparative context",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 0.0,
+        "day": 0.0,
+        "week": 0.0,
+        "month": 0.0,
+        "year": 0.0
+      },
+      "env_names": [
+        "ALPHAVANTAGE_API_KEY"
+      ],
+      "present_env_names": [
+        "ALPHAVANTAGE_API_KEY"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:43.998162+00:00",
+      "probe_note": "global_quote_probe",
+      "enabled": true,
+      "measured": false
     },
     {
-      "source": "KRAKEN_KEY",
-      "sector": "crypto_exec",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "KRAKEN_API_KEY"
-    },
-    {
-      "source": "KRAKEN_SECRET",
-      "sector": "crypto_exec",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "KRAKEN_API_SECRET"
-    },
-    {
-      "source": "EPA_AQS_KEY",
-      "sector": "air_quality",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "EPA_AQS_KEY"
-    },
-    {
-      "source": "EPA_AQS_ALT",
-      "sector": "air_quality",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "AQS_API_KEY"
-    },
-    {
-      "source": "EPA_AQS_TOKEN",
-      "sector": "air_quality",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "AQS_API_TOKEN"
-    },
-    {
-      "source": "EPA_AQS_EMAIL",
-      "sector": "air_quality",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "EPA_AQS_EMAIL"
-    },
-    {
-      "source": "WEBHOOK",
-      "sector": "internal",
-      "status": "LIVE_KEY_PRESENT",
-      "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "WEBHOOK_SHARED_SECRET"
+      "source": "TWELVE_DATA",
+      "sector": "market_data",
+      "status": "MEASURED",
+      "rows": 5,
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "cross-asset live price context",
+      "money_drain_mode": "low-quality selection and delayed reaction",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 17917.59,
+        "day": 430022.16,
+        "week": 3010155.12,
+        "month": 12900664.8,
+        "year": 156958088.4
+      },
+      "env_names": [
+        "TWELVE_DATA_API_KEY"
+      ],
+      "present_env_names": [
+        "TWELVE_DATA_API_KEY"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:44.240580+00:00",
+      "probe_note": "time_series_probe",
+      "enabled": true,
+      "measured": true
     },
     {
       "source": "MASSIVE",
       "sector": "market_data",
-      "status": "LIVE_KEY_PRESENT",
+      "status": "MEASURED",
       "rows": 1,
-      "last_probe_utc": "2026-05-17T12:42:06.285071+00:00",
-      "env": "MASSIVE_API_KEY"
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "broad market event and price context",
+      "money_drain_mode": "missed structure, stale inputs",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 6931.47,
+        "day": 166355.28,
+        "week": 1164486.96,
+        "month": 4990658.4,
+        "year": 60719677.2
+      },
+      "env_names": [
+        "MASSIVE_API_KEY"
+      ],
+      "present_env_names": [
+        "MASSIVE_API_KEY"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:44.499406+00:00",
+      "probe_note": "polygon_prev_probe",
+      "enabled": true,
+      "measured": true
+    },
+    {
+      "source": "FRED",
+      "sector": "rates",
+      "status": "MEASURED",
+      "rows": 10,
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "rates / macro liquidity drift",
+      "money_drain_mode": "bad macro positioning and wrong risk posture",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 119894.76,
+        "day": 2877474.24,
+        "week": 20142319.68,
+        "month": 86324227.2,
+        "year": 1050278097.6
+      },
+      "env_names": [
+        "FRED_API_KEY"
+      ],
+      "present_env_names": [
+        "FRED_API_KEY"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:45.091754+00:00",
+      "probe_note": "observations_probe",
+      "enabled": true,
+      "measured": true
+    },
+    {
+      "source": "EIA",
+      "sector": "energy",
+      "status": "PROBE_FAILED_OR_THIN",
+      "rows": 0,
+      "probe_ok": false,
+      "http_status": 403,
+      "evidence_basis": "KEY_PRESENT_BUT_NO_USABLE_ROWS",
+      "dollar_basis": "UNMEASURED",
+      "constraint_type": "energy throughput / outage / supply drift",
+      "money_drain_mode": "energy misread, outage blind spots, capacity drift",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 0.0,
+        "day": 0.0,
+        "week": 0.0,
+        "month": 0.0,
+        "year": 0.0
+      },
+      "env_names": [
+        "EIA_API_KEY"
+      ],
+      "present_env_names": [
+        "EIA_API_KEY"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:45.809030+00:00",
+      "probe_note": "http_error: {\n  \"error\": {\n    \"code\": \"API_KEY_INVALID\",\n    \"message\": \"An invalid api_key was supplied. Get one at https://api.eia.gov:443\"\n  }\n}",
+      "enabled": true,
+      "measured": false
+    },
+    {
+      "source": "BLS",
+      "sector": "labor",
+      "status": "MEASURED",
+      "rows": 24,
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "labor pressure / unemployment drift",
+      "money_drain_mode": "macro labor blind spots",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 80471.9,
+        "day": 1931325.6,
+        "week": 13519279.2,
+        "month": 57939768.0,
+        "year": 704933844.0
+      },
+      "env_names": [
+        "BLS_API_KEY"
+      ],
+      "present_env_names": [
+        "BLS_API_KEY"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:46.192188+00:00",
+      "probe_note": "bls_probe",
+      "enabled": true,
+      "measured": true
+    },
+    {
+      "source": "NASA",
+      "sector": "space",
+      "status": "MEASURED",
+      "rows": 1,
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "space-weather / environmental externalities",
+      "money_drain_mode": "environmental blind spots affecting operations",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 10397.21,
+        "day": 249533.04,
+        "week": 1746731.28,
+        "month": 7485991.2,
+        "year": 91079559.6
+      },
+      "env_names": [
+        "NASA_API_KEY"
+      ],
+      "present_env_names": [
+        "NASA_API_KEY"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:49.008952+00:00",
+      "probe_note": "apod_probe",
+      "enabled": true,
+      "measured": true
+    },
+    {
+      "source": "NOAA_NCEI",
+      "sector": "weather",
+      "status": "MEASURED",
+      "rows": 5,
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "weather / climate disruption",
+      "money_drain_mode": "weather-driven loss, outage, scheduling drift",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 71670.38,
+        "day": 1720089.12,
+        "week": 12040623.84,
+        "month": 51602673.6,
+        "year": 627832528.8
+      },
+      "env_names": [
+        "NOAA_API_TOKEN",
+        "NOAA_NCEI_TOKEN",
+        "NCDC_NOAA_API_TOKEN"
+      ],
+      "present_env_names": [
+        "NOAA_API_TOKEN"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:49.335075+00:00",
+      "probe_note": "datasets_probe",
+      "enabled": true,
+      "measured": true
+    },
+    {
+      "source": "NREL",
+      "sector": "energy_lab",
+      "status": "MEASURED",
+      "rows": 5,
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "renewables / grid / energy lab context",
+      "money_drain_mode": "energy planning blind spots",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 223969.93,
+        "day": 5375278.32,
+        "week": 37626948.24,
+        "month": 161258349.6,
+        "year": 1961976586.8
+      },
+      "env_names": [
+        "NREL_API_KEY"
+      ],
+      "present_env_names": [
+        "NREL_API_KEY"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:50.174018+00:00",
+      "probe_note": "stations_probe",
+      "enabled": true,
+      "measured": true
+    },
+    {
+      "source": "USGS_WATER",
+      "sector": "water",
+      "status": "MEASURED",
+      "rows": 1,
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "hydrology / water availability / flow disruption",
+      "money_drain_mode": "water-side operational blind spots",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 24260.15,
+        "day": 582243.6,
+        "week": 4075705.2,
+        "month": 17467308.0,
+        "year": 212518914.0
+      },
+      "env_names": [
+        "USGS_WATER_API_KEY"
+      ],
+      "present_env_names": [
+        "USGS_WATER_API_KEY"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:50.512440+00:00",
+      "probe_note": "iv_probe_public_with_key_present",
+      "enabled": true,
+      "measured": true
+    },
+    {
+      "source": "CENSUS",
+      "sector": "demographic",
+      "status": "MEASURED",
+      "rows": 1,
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "population / regional demand drift",
+      "money_drain_mode": "wrong location assumptions and demand misread",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 34657.36,
+        "day": 831776.64,
+        "week": 5822436.48,
+        "month": 24953299.2,
+        "year": 303598473.6
+      },
+      "env_names": [
+        "CENSUS_API_KEY"
+      ],
+      "present_env_names": [
+        "CENSUS_API_KEY"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:51.191391+00:00",
+      "probe_note": "acs_probe",
+      "enabled": true,
+      "measured": true
+    },
+    {
+      "source": "BEA",
+      "sector": "macro",
+      "status": "MEASURED",
+      "rows": 13,
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "GDP / income / macro growth drift",
+      "money_drain_mode": "macro misallocation",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 131952.87,
+        "day": 3166868.88,
+        "week": 22168082.16,
+        "month": 95006066.4,
+        "year": 1155907141.2
+      },
+      "env_names": [
+        "BEA_API_KEY"
+      ],
+      "present_env_names": [
+        "BEA_API_KEY"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:51.506534+00:00",
+      "probe_note": "dataset_list_probe",
+      "enabled": true,
+      "measured": true
+    },
+    {
+      "source": "EPA_AQS",
+      "sector": "air_quality",
+      "status": "PROBE_FAILED_OR_THIN",
+      "rows": 0,
+      "probe_ok": false,
+      "http_status": 400,
+      "evidence_basis": "KEY_PRESENT_BUT_NO_USABLE_ROWS",
+      "dollar_basis": "UNMEASURED",
+      "constraint_type": "air quality / environmental stress",
+      "money_drain_mode": "air-quality-related operational degradation",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 0.0,
+        "day": 0.0,
+        "week": 0.0,
+        "month": 0.0,
+        "year": 0.0
+      },
+      "env_names": [
+        "EPA_AQS_KEY",
+        "EPA_AQS_EMAIL"
+      ],
+      "present_env_names": [
+        "EPA_AQS_KEY",
+        "EPA_AQS_EMAIL"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:52.324175+00:00",
+      "probe_note": "http_error: {\n  \"Header\": [\n    {\n      \"status\": \"Failed\",\n      \"request_time\": \"2026-05-20T10:26:52.574-04:00\",\n      \"url\": \"https://aqs.epa.gov/data/api/list/states?email=[REDACTED]&key=[REDACTED]\",\n      \"error\": [\n        \"Email and/or key are invalid.\"\n      ]\n    }\n  ]\n}",
+      "enabled": true,
+      "measured": false
+    },
+    {
+      "source": "KRAKEN",
+      "sector": "crypto_exec",
+      "status": "MEASURED",
+      "rows": 42,
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "crypto execution / routing / balance proof",
+      "money_drain_mode": "missed fills, bad entries, idle capital, slippage",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 37612.0,
+        "day": 902688.0,
+        "week": 6318816.0,
+        "month": 27080640.0,
+        "year": 329481120.0
+      },
+      "env_names": [
+        "KRAKEN_API_KEY",
+        "KRAKEN_API_SECRET"
+      ],
+      "present_env_names": [
+        "KRAKEN_API_KEY",
+        "KRAKEN_API_SECRET"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:52.999847+00:00",
+      "probe_note": "private_balance_probe",
+      "enabled": true,
+      "measured": true
+    },
+    {
+      "source": "WEBHOOK",
+      "sector": "internal",
+      "status": "MEASURED",
+      "rows": 1,
+      "probe_ok": true,
+      "http_status": null,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
+      "constraint_type": "signal/event ingress",
+      "money_drain_mode": "dropped internal triggers and missed event flow",
+      "formula_basis": "bounded_log_translation_if_measured_else_zero",
+      "translated_value": {
+        "hour": 3465.74,
+        "day": 83177.76,
+        "week": 582244.32,
+        "month": 2495332.8,
+        "year": 30359882.4
+      },
+      "env_names": [
+        "WEBHOOK_SHARED_SECRET"
+      ],
+      "present_env_names": [
+        "WEBHOOK_SHARED_SECRET"
+      ],
+      "last_probe_utc": "2026-05-20T14:26:52.999847+00:00",
+      "probe_note": "shared_secret_present_internal",
+      "enabled": true,
+      "measured": true
     }
   ]
 }

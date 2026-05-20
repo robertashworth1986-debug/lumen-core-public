@@ -1,212 +1,302 @@
 {
-  "alpaca": {
-    "enabled": true,
-    "sector": "broker",
-    "kind": "broker",
-    "env_names": [
-      "ALPACA_API_KEY",
-      "ALPACA_API_SECRET"
-    ],
-    "present_env_names": [
-      "ALPACA_API_KEY",
-      "ALPACA_API_SECRET"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "alphavantage": {
-    "enabled": true,
-    "sector": "market_data",
-    "kind": "market_data",
-    "env_names": [
-      "ALPHAVANTAGE_API_KEY"
-    ],
-    "present_env_names": [
-      "ALPHAVANTAGE_API_KEY"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "bea": {
-    "enabled": true,
-    "sector": "macro",
-    "kind": "macro",
-    "env_names": [
-      "BEA_API_KEY"
-    ],
-    "present_env_names": [
-      "BEA_API_KEY"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "bls": {
-    "enabled": true,
-    "sector": "labor",
-    "kind": "labor",
-    "env_names": [
-      "BLS_API_KEY"
-    ],
-    "present_env_names": [
-      "BLS_API_KEY"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "census": {
-    "enabled": true,
-    "sector": "demographic",
-    "kind": "demographic",
-    "env_names": [
-      "CENSUS_API_KEY"
-    ],
-    "present_env_names": [
-      "CENSUS_API_KEY"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "eia": {
-    "enabled": true,
-    "sector": "energy",
-    "kind": "energy",
-    "env_names": [
-      "EIA_API_KEY"
-    ],
-    "present_env_names": [
-      "EIA_API_KEY"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "epa_aqs": {
-    "enabled": true,
-    "sector": "air_quality",
-    "kind": "air_quality",
-    "env_names": [
-      "EPA_AQS_KEY",
-      "EPA_AQS_EMAIL"
-    ],
-    "present_env_names": [
-      "EPA_AQS_KEY",
-      "EPA_AQS_EMAIL"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "finnhub": {
-    "enabled": true,
-    "sector": "market_data",
-    "kind": "market_data",
-    "env_names": [
-      "FINNHUB_API_KEY"
-    ],
-    "present_env_names": [
-      "FINNHUB_API_KEY"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "fred": {
-    "enabled": true,
-    "sector": "rates",
-    "kind": "rates",
-    "env_names": [
-      "FRED_API_KEY"
-    ],
-    "present_env_names": [
-      "FRED_API_KEY"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "kraken": {
-    "enabled": true,
-    "sector": "crypto_exec",
-    "kind": "crypto_exec",
-    "env_names": [
-      "KRAKEN_API_KEY",
-      "KRAKEN_API_SECRET"
-    ],
-    "present_env_names": [
-      "KRAKEN_API_KEY",
-      "KRAKEN_API_SECRET"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "massive": {
-    "enabled": true,
-    "sector": "market_data",
-    "kind": "market_data",
-    "env_names": [
-      "MASSIVE_API_KEY"
-    ],
-    "present_env_names": [
-      "MASSIVE_API_KEY"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "nasa": {
-    "enabled": true,
-    "sector": "space",
-    "kind": "space",
-    "env_names": [
-      "NASA_API_KEY"
-    ],
-    "present_env_names": [
-      "NASA_API_KEY"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "noaa_ncei": {
-    "enabled": true,
-    "sector": "weather",
-    "kind": "weather",
-    "env_names": [
-      "NOAA_API_TOKEN"
-    ],
-    "present_env_names": [
-      "NOAA_API_TOKEN"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "nrel": {
-    "enabled": true,
-    "sector": "energy_lab",
-    "kind": "energy_lab",
-    "env_names": [
-      "NREL_API_KEY"
-    ],
-    "present_env_names": [
-      "NREL_API_KEY"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "twelve_data": {
-    "enabled": true,
-    "sector": "market_data",
-    "kind": "market_data",
-    "env_names": [
-      "TWELVE_DATA_API_KEY"
-    ],
-    "present_env_names": [
-      "TWELVE_DATA_API_KEY"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "usgs_water": {
-    "enabled": true,
-    "sector": "water",
-    "kind": "water",
-    "env_names": [
-      "USGS_WATER_API_KEY"
-    ],
-    "present_env_names": [
-      "USGS_WATER_API_KEY"
-    ],
-    "measurement_mode": "local_dataset_match"
-  },
-  "webhook": {
-    "enabled": true,
-    "sector": "internal",
-    "kind": "internal",
-    "env_names": [
-      "WEBHOOK_SHARED_SECRET"
-    ],
-    "present_env_names": [
-      "WEBHOOK_SHARED_SECRET"
-    ],
-    "measurement_mode": "local_dataset_match"
+  "generated_utc": "2026-05-20T14:26:53.001843+00:00",
+  "providers": {
+    "ALPACA": {
+      "enabled": true,
+      "sector": "broker",
+      "env_names": [
+        "ALPACA_API_KEY",
+        "ALPACA_API_SECRET"
+      ],
+      "present_env_names": [
+        "ALPACA_API_KEY",
+        "ALPACA_API_SECRET"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "http_200_account",
+      "measured": true,
+      "rows": 1,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "FINNHUB": {
+      "enabled": true,
+      "sector": "market_data",
+      "env_names": [
+        "FINNHUB_API_KEY"
+      ],
+      "present_env_names": [
+        "FINNHUB_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "quote_probe",
+      "measured": true,
+      "rows": 1,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "ALPHAVANTAGE": {
+      "enabled": true,
+      "sector": "market_data",
+      "env_names": [
+        "ALPHAVANTAGE_API_KEY"
+      ],
+      "present_env_names": [
+        "ALPHAVANTAGE_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": false,
+      "probe_note": "global_quote_probe",
+      "measured": false,
+      "rows": 0,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "TWELVE_DATA": {
+      "enabled": true,
+      "sector": "market_data",
+      "env_names": [
+        "TWELVE_DATA_API_KEY"
+      ],
+      "present_env_names": [
+        "TWELVE_DATA_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "time_series_probe",
+      "measured": true,
+      "rows": 5,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "MASSIVE": {
+      "enabled": true,
+      "sector": "market_data",
+      "env_names": [
+        "MASSIVE_API_KEY"
+      ],
+      "present_env_names": [
+        "MASSIVE_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "polygon_prev_probe",
+      "measured": true,
+      "rows": 1,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "FRED": {
+      "enabled": true,
+      "sector": "rates",
+      "env_names": [
+        "FRED_API_KEY"
+      ],
+      "present_env_names": [
+        "FRED_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "observations_probe",
+      "measured": true,
+      "rows": 10,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "EIA": {
+      "enabled": true,
+      "sector": "energy",
+      "env_names": [
+        "EIA_API_KEY"
+      ],
+      "present_env_names": [
+        "EIA_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": false,
+      "probe_note": "http_error: {\n  \"error\": {\n    \"code\": \"API_KEY_INVALID\",\n    \"message\": \"An invalid api_key was supplied. Get one at https://api.eia.gov:443\"\n  }\n}",
+      "measured": false,
+      "rows": 0,
+      "http_status": 403,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "BLS": {
+      "enabled": true,
+      "sector": "labor",
+      "env_names": [
+        "BLS_API_KEY"
+      ],
+      "present_env_names": [
+        "BLS_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "bls_probe",
+      "measured": true,
+      "rows": 24,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "NASA": {
+      "enabled": true,
+      "sector": "space",
+      "env_names": [
+        "NASA_API_KEY"
+      ],
+      "present_env_names": [
+        "NASA_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "apod_probe",
+      "measured": true,
+      "rows": 1,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "NOAA_NCEI": {
+      "enabled": true,
+      "sector": "weather",
+      "env_names": [
+        "NOAA_API_TOKEN",
+        "NOAA_NCEI_TOKEN",
+        "NCDC_NOAA_API_TOKEN"
+      ],
+      "present_env_names": [
+        "NOAA_API_TOKEN"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "datasets_probe",
+      "measured": true,
+      "rows": 5,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "NREL": {
+      "enabled": true,
+      "sector": "energy_lab",
+      "env_names": [
+        "NREL_API_KEY"
+      ],
+      "present_env_names": [
+        "NREL_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "stations_probe",
+      "measured": true,
+      "rows": 5,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "USGS_WATER": {
+      "enabled": true,
+      "sector": "water",
+      "env_names": [
+        "USGS_WATER_API_KEY"
+      ],
+      "present_env_names": [
+        "USGS_WATER_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "iv_probe_public_with_key_present",
+      "measured": true,
+      "rows": 1,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "CENSUS": {
+      "enabled": true,
+      "sector": "demographic",
+      "env_names": [
+        "CENSUS_API_KEY"
+      ],
+      "present_env_names": [
+        "CENSUS_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "acs_probe",
+      "measured": true,
+      "rows": 1,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "BEA": {
+      "enabled": true,
+      "sector": "macro",
+      "env_names": [
+        "BEA_API_KEY"
+      ],
+      "present_env_names": [
+        "BEA_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "dataset_list_probe",
+      "measured": true,
+      "rows": 13,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "EPA_AQS": {
+      "enabled": true,
+      "sector": "air_quality",
+      "env_names": [
+        "EPA_AQS_KEY",
+        "EPA_AQS_EMAIL"
+      ],
+      "present_env_names": [
+        "EPA_AQS_KEY",
+        "EPA_AQS_EMAIL"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": false,
+      "probe_note": "http_error: {\n  \"Header\": [\n    {\n      \"status\": \"Failed\",\n      \"request_time\": \"2026-05-20T10:26:52.574-04:00\",\n      \"url\": \"https://aqs.epa.gov/data/api/list/states?email=[REDACTED]&key=[REDACTED]\",\n      \"error\": [\n        \"Email and/or key are invalid.\"\n      ]\n    }\n  ]\n}",
+      "measured": false,
+      "rows": 0,
+      "http_status": 400,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "KRAKEN": {
+      "enabled": true,
+      "sector": "crypto_exec",
+      "env_names": [
+        "KRAKEN_API_KEY",
+        "KRAKEN_API_SECRET"
+      ],
+      "present_env_names": [
+        "KRAKEN_API_KEY",
+        "KRAKEN_API_SECRET"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "private_balance_probe",
+      "measured": true,
+      "rows": 42,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    },
+    "WEBHOOK": {
+      "enabled": true,
+      "sector": "internal",
+      "env_names": [
+        "WEBHOOK_SHARED_SECRET"
+      ],
+      "present_env_names": [
+        "WEBHOOK_SHARED_SECRET"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "shared_secret_present_internal",
+      "measured": true,
+      "rows": 1,
+      "http_status": null,
+      "last_truth_sync_utc": "2026-05-20T14:26:53.001843+00:00"
+    }
   }
 }
