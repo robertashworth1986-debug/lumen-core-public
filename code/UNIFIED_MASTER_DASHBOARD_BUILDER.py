@@ -236,6 +236,10 @@ def collect_data() -> Dict[str, Any]:
     paper_mdd = safe_float(scorecard.get("max_drawdown_pct", 0.0))
     paper_cagr = safe_float(scorecard.get("cagr_pct", 0.0))
     paper_pf = safe_float(scorecard.get("profit_factor", 0.0))
+    paper_pnl_label = "Simulation Net PnL"
+    paper_pnl_sub = "Paper + walk-forward research rail (not live realized returns)"
+    paper_trades_label = "Simulation Trades / Hit Rate"
+    paper_trades_sub = "Paper/walk-forward sample (not live broker fills)"
     source_truth_rows = source_truth.get("rows", []) if isinstance(source_truth, dict) else []
     active_sources = [r for r in source_truth_rows if source_is_active(r)]
     active_sources.sort(key=annualized_source_value, reverse=True)
@@ -322,6 +326,7 @@ def collect_data() -> Dict[str, Any]:
       f"The paper proof rail is the strategy health signal. "
       f"Equity, net P and L, Sharpe, Sortino, drawdown, C A G R, profit factor, and chain-of-custody proof identifiers. "
       f"Every fill has a hash. Every score has a timestamp. "
+      f"This rail is simulation and walk-forward context unless live order mode is explicitly enabled. "
       f"This is what investor-safe proof looks like when you care what is true, what works, and what heals."
     )
 
@@ -366,6 +371,10 @@ def collect_data() -> Dict[str, Any]:
         "paper_profit": paper_profit,
         "paper_sharpe": paper_sharpe,
         "paper_trades": paper_trades,
+        "paper_pnl_label": paper_pnl_label,
+        "paper_pnl_sub": paper_pnl_sub,
+        "paper_trades_label": paper_trades_label,
+        "paper_trades_sub": paper_trades_sub,
         "paper_win_rate": paper_win_rate,
         "paper_sortino": paper_sortino,
         "paper_mdd": paper_mdd,
@@ -421,7 +430,7 @@ def collect_data() -> Dict[str, Any]:
             "text": paper_text,
             "chips": [
               f"Equity: {fmt_usd(paper_equity)}",
-              f"Net PnL: {fmt_usd(paper_profit)}",
+              f"{paper_pnl_label}: {fmt_usd(paper_profit)}",
               f"Proof IDs: {len(proof_ids)}",
             ],
           },
@@ -1081,13 +1090,13 @@ TEMPLATE = """<!DOCTYPE html>
       </div>
       <div class="grid">
         <div class="kpi"><div class="label">Paper Equity</div><div class="value" data-kpi-key="paper_equity">__PAPER_EQUITY__</div><div class="sub">Measured runtime state</div></div>
-        <div class="kpi"><div class="label">Net PnL</div><div class="value" data-kpi-key="paper_profit">__PAPER_PROFIT__</div><div class="sub">Current strategy P/L</div></div>
+        <div class="kpi"><div class="label">__PAPER_PNL_LABEL__</div><div class="value" data-kpi-key="paper_profit">__PAPER_PROFIT__</div><div class="sub">__PAPER_PNL_SUB__</div></div>
         <div class="kpi"><div class="label">Rolling Sharpe</div><div class="value" data-kpi-key="paper_sharpe">__PAPER_SHARPE__</div><div class="sub">Live score stream</div></div>
         <div class="kpi"><div class="label">Rolling Sortino</div><div class="value">__PAPER_SORTINO__</div><div class="sub">Downside-adjusted score</div></div>
         <div class="kpi"><div class="label">Max Drawdown</div><div class="value">__PAPER_MDD__</div><div class="sub">Peak-to-trough loss</div></div>
         <div class="kpi"><div class="label">CAGR</div><div class="value">__PAPER_CAGR__</div><div class="sub">Annualized growth proxy</div></div>
         <div class="kpi"><div class="label">Profit Factor</div><div class="value">__PAPER_PF__</div><div class="sub">Gross wins / gross losses</div></div>
-        <div class="kpi"><div class="label">Closed Trades / Win Rate</div><div class="value">__PAPER_TRADES__ / __PAPER_WR__</div><div class="sub">Walk-forward sample</div></div>
+        <div class="kpi"><div class="label">__PAPER_TRADES_LABEL__</div><div class="value">__PAPER_TRADES__ / __PAPER_WR__</div><div class="sub">__PAPER_TRADES_SUB__</div></div>
         <div class="kpi"><div class="label">Proof IDs (Tail)</div><div class="value">__PROOF_TXID_COUNT__</div><div class="sub">__PROOF_TXID_TAIL__</div></div>
       </div>
       <div class="foot" style="margin-top:12px;">
@@ -1659,14 +1668,18 @@ def render_html(data: Dict[str, Any]) -> str:
         "__ENABLED_SOURCES__": str(data["enabled_sources"]),
         "__RUNTIME__": f"{data['compute_minutes']:.2f}m",
         "__PAPER_EQUITY__": fmt_usd(data["paper_equity"]),
+        "__PAPER_PNL_LABEL__": html_escape(data["paper_pnl_label"]),
         "__PAPER_PROFIT__": fmt_usd(data["paper_profit"]),
+        "__PAPER_PNL_SUB__": html_escape(data["paper_pnl_sub"]),
         "__PAPER_SHARPE__": f"{data['paper_sharpe']:.2f}",
         "__PAPER_SORTINO__": f"{data['paper_sortino']:.2f}",
         "__PAPER_MDD__": f"{data['paper_mdd']:.2f}%",
         "__PAPER_CAGR__": f"{data['paper_cagr']:.2f}%",
         "__PAPER_PF__": f"{data['paper_pf']:.2f}",
+        "__PAPER_TRADES_LABEL__": html_escape(data["paper_trades_label"]),
         "__PAPER_TRADES__": str(data["paper_trades"]),
         "__PAPER_WR__": f"{data['paper_win_rate']:.1f}%",
+        "__PAPER_TRADES_SUB__": html_escape(data["paper_trades_sub"]),
         "__PROOF_TXID_COUNT__": str(data["proof_txid_count"]),
         "__PROOF_TXID_TAIL__": html_escape(data["proof_txid_tail"]),
         "__GENERATED__": now_utc(),

@@ -18,6 +18,13 @@ Core endpoints:
     GET  /api/opportunities/email/response/latest -> latest reply watcher summary payload
     POST /api/opportunities/context/refresh    -> rebuild unified application context
     GET  /api/opportunities/context/latest     -> latest application context payload
+    GET  /api/opportunities/investor/mission-pack/latest -> latest investor mission-control pack
+    GET  /api/opportunities/investor/heartbeat/latest -> latest mission/control/alpha refresh heartbeat statuses
+    GET  /api/opportunities/blueprints/latest  -> latest government-grade blueprint vault payload
+    GET  /api/opportunities/site-reach/latest  -> latest site reach and domain mission push payload
+    GET  /api/opportunities/grants/live-fill/latest -> latest autonomous grant live-fill payload
+    GET  /api/opportunities/alpha-edge/latest -> latest alpha/edge lock engine artifact
+    GET  /api/opportunities/investor/pitch/latest -> latest 3-minute Nobel-tier investor pitch
     POST /api/opportunities/jobs/factory       -> build resume-backed job packages
     GET  /api/opportunities/jobs/queue         -> latest jobs queue index
     GET  /api/opportunities/tracker            -> cross-channel state rollup
@@ -31,16 +38,18 @@ Core endpoints:
 from __future__ import annotations
 
 import csv
+import hmac
 import json
 import os
 import re
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel, Field
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -73,6 +82,18 @@ PUBLIC_TRUTH_LATEST = ROOT / "out" / "ops" / "public_truth" / "public_truth_late
 PUBLIC_TRUTH_MANIFEST_LATEST = ROOT / "out" / "ops" / "public_truth" / "public_truth_manifest_latest.json"
 APP_CONTEXT_LATEST = ROOT / "out" / "ops" / "application_context" / "application_context_latest.json"
 APP_CONTEXT_MANIFEST_LATEST = ROOT / "out" / "ops" / "application_context" / "application_context_manifest_latest.json"
+GRANT_SUBMIT_FIT_PACK_LATEST = ROOT / "out" / "ops" / "grant_submit_fit_pack" / "grant_submit_fit_pack_latest.json"
+INVESTOR_MISSION_CONTROL_PACK_LATEST = ROOT / "out" / "ops" / "investor_mission_control" / "investor_mission_control_pack_latest.json"
+INVESTOR_3MIN_PITCH_LATEST = ROOT / "out" / "ops" / "investor_mission_control" / "investor_3min_nobel_pitch_latest.md"
+ALPHA_EDGE_LOCK_ENGINE_LATEST = ROOT / "out" / "ops" / "alpha_edge_lock" / "alpha_edge_lock_engine_latest.json"
+ALPHA_EDGE_LOCK_ENGINE_HEARTBEAT_LATEST = ROOT / "out" / "ops" / "alpha_edge_lock" / "alpha_edge_lock_engine_heartbeat_latest.json"
+INVESTOR_MISSION_CONTROL_HEARTBEAT_LATEST = ROOT / "out" / "ops" / "investor_mission_control" / "investor_mission_control_pack_heartbeat_latest.json"
+INVESTOR_PACKET_REFRESH_LATEST = ROOT / "out" / "ops" / "investor_packet_refresh_latest.json"
+INVESTOR_PACKET_REFRESH_HEARTBEAT_LATEST = ROOT / "out" / "ops" / "investor_packet_refresh" / "investor_packet_refresh_heartbeat_latest.json"
+GOV_BLUEPRINT_VAULT_LATEST = ROOT / "out" / "ops" / "gov_blueprint_vault" / "gov_blueprint_vault_latest.json"
+GOV_BLUEPRINT_VAULT_HEARTBEAT_LATEST = ROOT / "out" / "ops" / "gov_blueprint_vault" / "gov_blueprint_vault_heartbeat_latest.json"
+SITE_REACH_MISSION_LATEST = ROOT / "out" / "ops" / "site_reach_mission" / "site_reach_mission_latest.json"
+SITE_REACH_MISSION_HEARTBEAT_LATEST = ROOT / "out" / "ops" / "site_reach_mission" / "site_reach_mission_heartbeat_latest.json"
 WHITEHOLE_ROOT = Path(os.getenv("WHITEHOLE_ROOT", r"C:\WhiteHole"))
 
 PY = sys.executable
@@ -82,13 +103,75 @@ LINKEDIN_OUT.mkdir(parents=True, exist_ok=True)
 JOBS_ROOT.mkdir(parents=True, exist_ok=True)
 OPS_OUT.mkdir(parents=True, exist_ok=True)
 
-router = APIRouter(prefix="/api/opportunities", tags=["opportunities"])
+def _split_tokens(raw: str | None) -> list[str]:
+    if not raw:
+        return []
+    return [token.strip() for token in raw.split(",") if token.strip()]
+
+
+def _expected_api_tokens() -> list[str]:
+    names = (
+        "LUMA_OPPORTUNITY_API_TOKEN",
+        "LUMA_OPP_API_TOKEN",
+        "LUMA_API_TOKEN",
+    )
+    values: list[str] = []
+    for name in names:
+        values.extend(_split_tokens(os.getenv(name)))
+    seen: set[str] = set()
+    deduped: list[str] = []
+    for value in values:
+        if value not in seen:
+            deduped.append(value)
+            seen.add(value)
+    return deduped
+
+
+def _extract_bearer(authorization: str | None) -> str:
+    raw = (authorization or "").strip()
+    if not raw:
+        return ""
+    parts = raw.split(" ", 1)
+    if len(parts) == 2 and parts[0].lower() == "bearer":
+        return parts[1].strip()
+    return ""
+
+
+def _require_api_token(
+    x_luma_token: str | None = Header(default=None, alias="X-Luma-Token"),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> None:
+    expected = _expected_api_tokens()
+    if not expected:
+        return
+
+    provided = (x_luma_token or "").strip() or _extract_bearer(authorization)
+    if not provided:
+        raise HTTPException(status_code=401, detail="missing api token")
+
+    if not any(hmac.compare_digest(provided, token) for token in expected):
+        raise HTTPException(status_code=403, detail="invalid api token")
+
+
+router = APIRouter(
+    prefix="/api/opportunities",
+    tags=["opportunities"],
+    dependencies=[Depends(_require_api_token)],
+)
 
 
 def _read_json(p: Path) -> Any:
     if not p.exists():
         return None
-    return json.loads(p.read_text(encoding="utf-8"))
+    for enc in ("utf-8", "utf-8-sig"):
+        try:
+            return json.loads(p.read_text(encoding=enc))
+        except Exception:
+            continue
+    try:
+        return json.loads(p.read_text(encoding="utf-8", errors="ignore"))
+    except Exception:
+        return None
 
 
 def _read_jsonl(p: Path) -> list[dict[str, Any]]:
@@ -121,6 +204,57 @@ def _now_utc_iso() -> str:
 
 def _utc_stamp() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+
+def _not_ready(
+    *,
+    error: str,
+    hint: str = "",
+    artifact: str | None = None,
+    code: str = "not_ready",
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "status": str(code),
+        "error": str(error),
+        "generated_utc": _now_utc_iso(),
+    }
+    if hint:
+        payload["hint"] = str(hint)
+    if artifact:
+        payload["artifact"] = str(artifact)
+    return payload
+
+
+def _clamp_limit(limit: int, low: int = 1, high: int = 1000) -> int:
+    try:
+        value = int(limit)
+    except Exception:
+        value = low
+    return max(low, min(high, value))
+
+
+def _file_age_sec(path: Path) -> float | None:
+    if not path.exists():
+        return None
+    return max(0.0, time.time() - path.stat().st_mtime)
+
+
+def _heartbeat_snapshot(path: Path, stale_after_sec: float) -> dict[str, Any]:
+    payload = _read_json(path)
+    if not isinstance(payload, dict):
+        payload = {}
+    age_sec = _file_age_sec(path)
+    is_fresh = bool(age_sec is not None and age_sec <= float(stale_after_sec))
+    return {
+        "path": str(path),
+        "exists": path.exists(),
+        "status": str(payload.get("status") or "unknown"),
+        "reason": str(payload.get("reason") or ""),
+        "generated_utc": payload.get("generated_utc") or payload.get("timestamp_utc"),
+        "age_sec": round(float(age_sec), 2) if age_sec is not None else None,
+        "is_fresh": is_fresh,
+        "stale_after_sec": float(stale_after_sec),
+    }
 
 
 def _safe_slug(value: str) -> str:
@@ -399,6 +533,39 @@ def _build_tracker() -> dict[str, Any]:
     public_truth_manifest = _read_json(PUBLIC_TRUTH_MANIFEST_LATEST) or {}
     app_context_latest = _read_json(APP_CONTEXT_LATEST) or {}
     app_context_manifest = _read_json(APP_CONTEXT_MANIFEST_LATEST) or {}
+    grant_submit_fit_latest = _read_json(GRANT_SUBMIT_FIT_PACK_LATEST) or {}
+    alpha_edge_lock_latest = _read_json(ALPHA_EDGE_LOCK_ENGINE_LATEST) or {}
+    investor_mission_pack_latest = _read_json(INVESTOR_MISSION_CONTROL_PACK_LATEST) or {}
+    investor_packet_refresh_latest = _read_json(INVESTOR_PACKET_REFRESH_LATEST) or {}
+    gov_blueprint_vault_latest = _read_json(GOV_BLUEPRINT_VAULT_LATEST) or {}
+    site_reach_mission_latest = _read_json(SITE_REACH_MISSION_LATEST) or {}
+
+    alpha_edge_hb = _heartbeat_snapshot(ALPHA_EDGE_LOCK_ENGINE_HEARTBEAT_LATEST, stale_after_sec=3600.0)
+    investor_mission_hb = _heartbeat_snapshot(INVESTOR_MISSION_CONTROL_HEARTBEAT_LATEST, stale_after_sec=3600.0)
+    investor_refresh_hb = _heartbeat_snapshot(INVESTOR_PACKET_REFRESH_HEARTBEAT_LATEST, stale_after_sec=3600.0)
+    blueprint_hb = _heartbeat_snapshot(GOV_BLUEPRINT_VAULT_HEARTBEAT_LATEST, stale_after_sec=7200.0)
+    site_reach_hb = _heartbeat_snapshot(SITE_REACH_MISSION_HEARTBEAT_LATEST, stale_after_sec=7200.0)
+
+    live_fill = (
+        investor_mission_pack_latest.get("autonomous_grant_live_fill", {})
+        if isinstance(investor_mission_pack_latest, dict)
+        else {}
+    )
+    selected_live_fill = (
+        live_fill.get("selected_opportunity", {})
+        if isinstance(live_fill, dict)
+        else {}
+    )
+    pitch_data = (
+        investor_mission_pack_latest.get("three_min_nobel_pitch", {})
+        if isinstance(investor_mission_pack_latest, dict)
+        else {}
+    )
+    parity_data = (
+        investor_mission_pack_latest.get("powerpoint_mirror_parity", {})
+        if isinstance(investor_mission_pack_latest, dict)
+        else {}
+    )
     funding_counts: dict[str, int] = {}
     if isinstance(funding_q, list):
         for item in funding_q:
@@ -421,6 +588,149 @@ def _build_tracker() -> dict[str, Any]:
             "n_draft": grants_q.get("n_draft", 0) if isinstance(grants_q, dict) else 0,
             "n_approved": grants_q.get("n_approved", 0) if isinstance(grants_q, dict) else 0,
             "n_submitted": grants_q.get("n_submitted", 0) if isinstance(grants_q, dict) else 0,
+        },
+        "grant_live_fill": {
+            "fit_pack_generated_utc": (
+                grant_submit_fit_latest.get("generated_utc")
+                if isinstance(grant_submit_fit_latest, dict)
+                else None
+            ),
+            "fit_likely": (
+                (grant_submit_fit_latest.get("summary", {}) or {}).get("fit_likely")
+                if isinstance(grant_submit_fit_latest, dict)
+                else None
+            ),
+            "status": live_fill.get("status") if isinstance(live_fill, dict) else None,
+            "selected_opp_num": (
+                selected_live_fill.get("opp_num")
+                if isinstance(selected_live_fill, dict)
+                else None
+            ),
+            "selected_submit_url": (
+                selected_live_fill.get("submit_url")
+                if isinstance(selected_live_fill, dict)
+                else None
+            ),
+            "autofill_packet_ready": (
+                live_fill.get("autofill_packet_ready")
+                if isinstance(live_fill, dict)
+                else None
+            ),
+        },
+        "investor_mission_pack": {
+            "latest_generated_utc": (
+                investor_mission_pack_latest.get("generated_utc")
+                if isinstance(investor_mission_pack_latest, dict)
+                else None
+            ),
+            "pitch_total_seconds": (
+                pitch_data.get("total_seconds")
+                if isinstance(pitch_data, dict)
+                else None
+            ),
+            "pitch_segments": (
+                len(pitch_data.get("segments") or [])
+                if isinstance(pitch_data, dict)
+                else 0
+            ),
+            "powerpoint_parity_ok": (
+                parity_data.get("parity_ok")
+                if isinstance(parity_data, dict)
+                else None
+            ),
+            "powerpoint_parity_drift_count": (
+                parity_data.get("drift_count")
+                if isinstance(parity_data, dict)
+                else None
+            ),
+            "heartbeat": investor_mission_hb,
+        },
+        "alpha_edge_lock_engine": {
+            "latest_generated_utc": (
+                alpha_edge_lock_latest.get("generated_utc")
+                if isinstance(alpha_edge_lock_latest, dict)
+                else None
+            ),
+            "problem_count": (
+                (alpha_edge_lock_latest.get("summary", {}) or {}).get("problem_count")
+                if isinstance(alpha_edge_lock_latest, dict)
+                else None
+            ),
+            "grade_a_locks": (
+                (alpha_edge_lock_latest.get("summary", {}) or {}).get("grade_a_locks")
+                if isinstance(alpha_edge_lock_latest, dict)
+                else None
+            ),
+            "top_problem": (
+                (alpha_edge_lock_latest.get("summary", {}) or {}).get("top_problem")
+                if isinstance(alpha_edge_lock_latest, dict)
+                else None
+            ),
+            "top_sector": (
+                (alpha_edge_lock_latest.get("summary", {}) or {}).get("top_sector")
+                if isinstance(alpha_edge_lock_latest, dict)
+                else None
+            ),
+            "heartbeat": alpha_edge_hb,
+        },
+        "investor_packet_refresh": {
+            "latest_generated_utc": (
+                investor_packet_refresh_latest.get("generated_utc")
+                if isinstance(investor_packet_refresh_latest, dict)
+                else None
+            ),
+            "latest_artifact": (
+                investor_packet_refresh_latest.get("latest_artifact")
+                if isinstance(investor_packet_refresh_latest, dict)
+                else None
+            ),
+            "heartbeat": investor_refresh_hb,
+        },
+        "gov_blueprints": {
+            "latest_generated_utc": (
+                gov_blueprint_vault_latest.get("generated_utc")
+                if isinstance(gov_blueprint_vault_latest, dict)
+                else None
+            ),
+            "asset_count": (
+                (gov_blueprint_vault_latest.get("summary", {}) or {}).get("asset_count")
+                if isinstance(gov_blueprint_vault_latest, dict)
+                else None
+            ),
+            "focus_term_count": (
+                (gov_blueprint_vault_latest.get("summary", {}) or {}).get("focus_term_count")
+                if isinstance(gov_blueprint_vault_latest, dict)
+                else None
+            ),
+            "highest_trl_target": (
+                (gov_blueprint_vault_latest.get("summary", {}) or {}).get("highest_trl_target")
+                if isinstance(gov_blueprint_vault_latest, dict)
+                else None
+            ),
+            "heartbeat": blueprint_hb,
+        },
+        "site_reach_mission": {
+            "latest_generated_utc": (
+                site_reach_mission_latest.get("generated_utc")
+                if isinstance(site_reach_mission_latest, dict)
+                else None
+            ),
+            "canonical_visitors_30d": (
+                (site_reach_mission_latest.get("summary", {}) or {}).get("canonical_visitors_30d")
+                if isinstance(site_reach_mission_latest, dict)
+                else None
+            ),
+            "canonical_visitors_source": (
+                (site_reach_mission_latest.get("summary", {}) or {}).get("canonical_visitors_source")
+                if isinstance(site_reach_mission_latest, dict)
+                else None
+            ),
+            "promotion_channels_ready": (
+                (site_reach_mission_latest.get("summary", {}) or {}).get("promotion_channels_ready")
+                if isinstance(site_reach_mission_latest, dict)
+                else None
+            ),
+            "heartbeat": site_reach_hb,
         },
         "funding_queue": {
             "n_total": len(funding_q) if isinstance(funding_q, list) else 0,
@@ -536,8 +846,13 @@ def _build_tracker() -> dict[str, Any]:
 def get_ranked(limit: int = 50) -> dict:
     payload = _read_json(OUT / "ranked.json")
     if not payload:
-        return {"error": "no harvest yet -- POST /api/opportunities/harvest"}
-    recs = payload.get("records", [])[:limit]
+        return _not_ready(
+            error="no harvest payload yet",
+            hint="POST /api/opportunities/harvest",
+            code="harvest_not_ready",
+        )
+    max_rows = _clamp_limit(limit, low=1, high=1000)
+    recs = payload.get("records", [])[:max_rows]
     return {
         "generated_utc": payload.get("generated_utc"),
         "total_actionable": payload.get("total_actionable"),
@@ -549,9 +864,27 @@ def get_ranked(limit: int = 50) -> dict:
 def get_queue() -> dict:
     p = OUT / "queue.jsonl"
     if not p.exists():
-        return {"queue": []}
-    items = [json.loads(line) for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
-    return {"count": len(items), "queue": items}
+        return {"count": 0, "queue": []}
+    items: list[dict[str, Any]] = []
+    malformed = 0
+    for line in p.read_text(encoding="utf-8", errors="ignore").splitlines():
+        raw = line.strip()
+        if not raw:
+            continue
+        try:
+            row = json.loads(raw)
+        except Exception:
+            malformed += 1
+            continue
+        if isinstance(row, dict):
+            items.append(row)
+        else:
+            malformed += 1
+
+    payload: dict[str, Any] = {"count": len(items), "queue": items}
+    if malformed:
+        payload["dropped_malformed_lines"] = malformed
+    return payload
 
 
 class HarvestArgs(BaseModel):
@@ -617,10 +950,21 @@ class AutopilotV2Args(BaseModel):
     fill_min_score: float = 0.40
     fill_limit: int = 25
     context_strict: bool = True
+    include_nobel_assets: bool = True
     include_skip_pack: bool = True
     include_grant_hunter: bool = True
     grant_hunter_rows: int = 180
     grant_hunter_top: int = 8
+    include_alpha_edge_lock_engine: bool = True
+    alpha_edge_sim_runs: int = 5000
+    include_blueprint_vault: bool = True
+    include_grant_submit_fit_pack: bool = True
+    grant_submit_fit_limit: int = 120
+    include_investor_mission_pack: bool = True
+    mission_pack_top_sectors: int = 10
+    include_site_reach_mission: bool = True
+    site_reach_days: int = 30
+    site_reach_allow_live_push: bool = False
     build_funding_queue: bool = True
     include_contract_loan_pack: bool = True
     funding_top: int = 12
@@ -789,6 +1133,11 @@ def run_autopilot(args: AutopilotArgs) -> dict:
 @router.post("/autopilot-v2")
 def run_autopilot_v2(args: AutopilotV2Args) -> dict:
     context_refresh = _run_context_resolver(strict=args.context_strict)
+
+    nobel_assets = None
+    if args.include_nobel_assets:
+        nobel_assets = _run("execution/build_nobel_tier_assets.py", [], timeout=1800)
+
     skip_pack = None
     if args.include_skip_pack:
         skip_pack = _run("ops/build_skips_grant_autofill_pack.py", [])
@@ -804,6 +1153,52 @@ def run_autopilot_v2(args: AutopilotV2Args) -> dict:
         grant_hunter = _run(
             "grant_hunter_v2.py",
             ["run-all", "--rows", str(args.grant_hunter_rows), "--top", str(args.grant_hunter_top)],
+            timeout=1800,
+        )
+
+    alpha_edge_lock_build = None
+    if args.include_alpha_edge_lock_engine:
+        alpha_edge_lock_build = _run(
+            "ops/BUILD_ALPHA_EDGE_LOCK_ENGINE.py",
+            ["--sim-runs", str(args.alpha_edge_sim_runs), "--top-n", "12"],
+            timeout=1800,
+        )
+
+    blueprint_vault = None
+    if args.include_blueprint_vault:
+        blueprint_vault = _run(
+            "ops/BUILD_GOV_BLUEPRINT_VAULT.py",
+            ["--exposure-level", "highest_level"],
+            timeout=1800,
+        )
+
+    grant_submit_fit_pack = None
+    if args.include_grant_submit_fit_pack:
+        grant_submit_fit_pack = _run(
+            "ops/BUILD_GRANT_SUBMIT_FIT_PACK.py",
+            ["--state", "APPROVED", "--limit", str(args.grant_submit_fit_limit)],
+            timeout=1800,
+        )
+
+    investor_mission_pack = None
+    if args.include_investor_mission_pack:
+        investor_mission_pack = _run(
+            "ops/BUILD_INVESTOR_MISSION_CONTROL_PACK.py",
+            ["--top-sectors", str(args.mission_pack_top_sectors)],
+            timeout=1800,
+        )
+
+    site_reach_mission = None
+    if args.include_site_reach_mission:
+        site_reach_args = [
+            "--days",
+            str(max(1, int(args.site_reach_days))),
+        ]
+        if args.site_reach_allow_live_push:
+            site_reach_args.append("--allow-live-push")
+        site_reach_mission = _run(
+            "ops/BUILD_SITE_REACH_AND_DOMAIN_MISSION_PUSH.py",
+            site_reach_args,
             timeout=1800,
         )
 
@@ -903,10 +1298,16 @@ def run_autopilot_v2(args: AutopilotV2Args) -> dict:
     payload = {
         "generated_utc": _now_utc_iso(),
         "application_context": context_refresh,
+        "nobel_assets": nobel_assets,
         "skip_pack": skip_pack,
         "harvest": harvest,
         "fill": fill,
         "grant_hunter": grant_hunter,
+        "alpha_edge_lock_build": alpha_edge_lock_build,
+        "blueprint_vault": blueprint_vault,
+        "grant_submit_fit_pack": grant_submit_fit_pack,
+        "investor_mission_pack": investor_mission_pack,
+        "site_reach_mission": site_reach_mission,
         "funding": funding,
         "contract_loan_pack": contract_loan_pack,
         "outreach": outreach,
@@ -949,7 +1350,11 @@ def optimize_linkedin(args: LinkedInOptimizeArgs) -> dict:
 def linkedin_latest() -> dict:
     payload = _latest_linkedin_payload()
     if not payload:
-        return {"error": "no linkedin optimization payload yet"}
+        return _not_ready(
+            error="no linkedin optimization payload yet",
+            hint="POST /api/opportunities/linkedin/optimize",
+            code="linkedin_not_ready",
+        )
     return payload
 
 
@@ -968,7 +1373,11 @@ def run_jobs_factory(args: JobsFactoryArgs) -> dict:
 def jobs_queue() -> dict:
     payload = _read_json(JOBS_QUEUE)
     if not payload:
-        return {"error": "no jobs queue yet -- POST /api/opportunities/jobs/factory"}
+        return _not_ready(
+            error="no jobs queue yet",
+            hint="POST /api/opportunities/jobs/factory",
+            code="jobs_not_ready",
+        )
     return payload
 
 
@@ -989,7 +1398,11 @@ def run_email_finder(args: EmailFinderArgs) -> dict:
 def email_finder_latest() -> dict:
     payload = _read_json(EMAIL_LATEST)
     if not payload:
-        return {"error": "no email opportunity payload yet -- POST /api/opportunities/email/finder/run"}
+        return _not_ready(
+            error="no email opportunity payload yet",
+            hint="POST /api/opportunities/email/finder/run",
+            code="email_finder_not_ready",
+        )
     return payload
 
 
@@ -998,15 +1411,20 @@ def email_finder_queue(limit: int = 250) -> dict:
     payload = _read_json(EMAIL_QUEUE)
     if not payload:
         return {"queue": [], "count": 0}
+    max_rows = _clamp_limit(limit, low=1, high=1000)
     rows = payload if isinstance(payload, list) else []
-    return {"count": len(rows), "queue": rows[: max(1, limit)]}
+    return {"count": len(rows), "queue": rows[:max_rows]}
 
 
 @router.get("/email/finder/manifest/latest")
 def email_finder_manifest_latest() -> dict:
     payload = _read_json(EMAIL_MANIFEST_LATEST)
     if not payload:
-        return {"error": "no email opportunity manifest yet"}
+        return _not_ready(
+            error="no email opportunity manifest yet",
+            hint="POST /api/opportunities/email/finder/run",
+            code="email_finder_manifest_not_ready",
+        )
     return payload
 
 
@@ -1033,7 +1451,11 @@ def run_email_dispatch(args: EmailDispatchArgs) -> dict:
 def email_dispatch_latest() -> dict:
     payload = _read_json(EMAIL_DISPATCH_LATEST)
     if not payload:
-        return {"error": "no email dispatch payload yet -- POST /api/opportunities/email/dispatch/run"}
+        return _not_ready(
+            error="no email dispatch payload yet",
+            hint="POST /api/opportunities/email/dispatch/run",
+            code="email_dispatch_not_ready",
+        )
     return payload
 
 
@@ -1042,18 +1464,23 @@ def email_dispatch_queue(limit: int = 250) -> dict:
     payload = _read_json(EMAIL_DISPATCH_QUEUE)
     if not payload:
         return {"queue": [], "count": 0}
+    max_rows = _clamp_limit(limit, low=1, high=1000)
     if isinstance(payload, dict):
         rows = payload.get("items", []) if isinstance(payload.get("items"), list) else []
-        return {"count": len(rows), "queue": rows[: max(1, limit)]}
+        return {"count": len(rows), "queue": rows[:max_rows]}
     rows = payload if isinstance(payload, list) else []
-    return {"count": len(rows), "queue": rows[: max(1, limit)]}
+    return {"count": len(rows), "queue": rows[:max_rows]}
 
 
 @router.get("/email/dispatch/manifest/latest")
 def email_dispatch_manifest_latest() -> dict:
     payload = _read_json(EMAIL_DISPATCH_MANIFEST_LATEST)
     if not payload:
-        return {"error": "no email dispatch manifest yet"}
+        return _not_ready(
+            error="no email dispatch manifest yet",
+            hint="POST /api/opportunities/email/dispatch/run",
+            code="email_dispatch_manifest_not_ready",
+        )
     return payload
 
 
@@ -1074,7 +1501,11 @@ def run_email_response_watcher(args: EmailResponseWatcherArgs) -> dict:
 def email_response_latest() -> dict:
     payload = _read_json(EMAIL_RESPONSE_LATEST)
     if not payload:
-        return {"error": "no response watcher payload yet -- POST /api/opportunities/email/response/run"}
+        return _not_ready(
+            error="no response watcher payload yet",
+            hint="POST /api/opportunities/email/response/run",
+            code="email_response_not_ready",
+        )
     return payload
 
 
@@ -1083,15 +1514,20 @@ def email_response_queue(limit: int = 250) -> dict:
     payload = _read_json(EMAIL_RESPONSE_QUEUE)
     if not payload:
         return {"queue": [], "count": 0}
+    max_rows = _clamp_limit(limit, low=1, high=1000)
     rows = payload if isinstance(payload, list) else []
-    return {"count": len(rows), "queue": rows[: max(1, limit)]}
+    return {"count": len(rows), "queue": rows[:max_rows]}
 
 
 @router.get("/email/response/manifest/latest")
 def email_response_manifest_latest() -> dict:
     payload = _read_json(EMAIL_RESPONSE_MANIFEST_LATEST)
     if not payload:
-        return {"error": "no response watcher manifest yet"}
+        return _not_ready(
+            error="no response watcher manifest yet",
+            hint="POST /api/opportunities/email/response/run",
+            code="email_response_manifest_not_ready",
+        )
     return payload
 
 
@@ -1112,15 +1548,128 @@ def refresh_application_context(strict: bool = True) -> dict:
 def application_context_latest() -> dict:
     payload = _read_json(APP_CONTEXT_LATEST)
     if not payload:
-        return {"error": "no application context payload yet -- POST /api/opportunities/context/refresh"}
+        return _not_ready(
+            error="no application context payload yet",
+            hint="POST /api/opportunities/context/refresh",
+            code="application_context_not_ready",
+        )
     return payload
+
+
+@router.get("/investor/mission-pack/latest")
+def investor_mission_pack_latest() -> dict:
+    payload = _read_json(INVESTOR_MISSION_CONTROL_PACK_LATEST)
+    if not payload:
+        return _not_ready(
+            error="no investor mission-control pack yet",
+            hint="Run RUN_INVESTOR_PACKET_REFRESH or POST /api/opportunities/autopilot-v2",
+            code="investor_mission_pack_not_ready",
+        )
+    return payload
+
+
+@router.get("/investor/heartbeat/latest")
+def investor_heartbeat_latest() -> dict:
+    return {
+        "generated_utc": _now_utc_iso(),
+        "mission_control_pack": _heartbeat_snapshot(INVESTOR_MISSION_CONTROL_HEARTBEAT_LATEST, stale_after_sec=3600.0),
+        "alpha_edge_lock": _heartbeat_snapshot(ALPHA_EDGE_LOCK_ENGINE_HEARTBEAT_LATEST, stale_after_sec=3600.0),
+        "investor_packet_refresh": _heartbeat_snapshot(INVESTOR_PACKET_REFRESH_HEARTBEAT_LATEST, stale_after_sec=3600.0),
+    }
+
+
+@router.get("/blueprints/latest")
+def blueprints_latest() -> dict:
+    payload = _read_json(GOV_BLUEPRINT_VAULT_LATEST)
+    if not payload:
+        return _not_ready(
+            error="no government blueprint vault payload yet",
+            hint="Run RUN_INVESTOR_PACKET_REFRESH or POST /api/opportunities/autopilot-v2",
+            code="blueprints_not_ready",
+        )
+    return payload
+
+
+@router.get("/site-reach/latest")
+def site_reach_latest() -> dict:
+    payload = _read_json(SITE_REACH_MISSION_LATEST)
+    if not payload:
+        return _not_ready(
+            error="no site reach payload yet",
+            hint="Run RUN_INVESTOR_PACKET_REFRESH or POST /api/opportunities/autopilot-v2",
+            code="site_reach_not_ready",
+        )
+    return payload
+
+
+@router.get("/grants/live-fill/latest")
+def grants_live_fill_latest() -> dict:
+    payload = _read_json(INVESTOR_MISSION_CONTROL_PACK_LATEST)
+    if not isinstance(payload, dict):
+        return _not_ready(
+            error="no investor mission-control pack yet",
+            hint="Run RUN_INVESTOR_PACKET_REFRESH or POST /api/opportunities/autopilot-v2",
+            code="investor_mission_pack_not_ready",
+        )
+    live_fill = payload.get("autonomous_grant_live_fill")
+    if not isinstance(live_fill, dict):
+        return _not_ready(
+            error="mission-control pack missing autonomous_grant_live_fill section",
+            hint="Rebuild with RUN_INVESTOR_PACKET_REFRESH",
+            code="grant_live_fill_missing",
+        )
+    return {
+        "generated_utc": payload.get("generated_utc"),
+        "live_fill": live_fill,
+    }
+
+
+@router.get("/alpha-edge/latest")
+def alpha_edge_latest() -> dict:
+    payload = _read_json(ALPHA_EDGE_LOCK_ENGINE_LATEST)
+    if not payload:
+        return _not_ready(
+            error="no alpha-edge lock engine artifact yet",
+            hint="Run RUN_INVESTOR_PACKET_REFRESH or POST /api/opportunities/autopilot-v2",
+            code="alpha_edge_not_ready",
+        )
+    return payload
+
+
+@router.get("/investor/pitch/latest")
+def investor_pitch_latest() -> dict:
+    payload = _read_json(INVESTOR_MISSION_CONTROL_PACK_LATEST)
+    if not isinstance(payload, dict):
+        return _not_ready(
+            error="no investor mission-control pack yet",
+            hint="Run RUN_INVESTOR_PACKET_REFRESH or POST /api/opportunities/autopilot-v2",
+            code="investor_mission_pack_not_ready",
+        )
+    pitch = payload.get("three_min_nobel_pitch")
+    if not isinstance(pitch, dict):
+        return _not_ready(
+            error="mission-control pack missing three_min_nobel_pitch section",
+            hint="Rebuild with RUN_INVESTOR_PACKET_REFRESH",
+            code="investor_pitch_missing",
+        )
+    markdown = None
+    if INVESTOR_3MIN_PITCH_LATEST.exists():
+        markdown = INVESTOR_3MIN_PITCH_LATEST.read_text(encoding="utf-8", errors="ignore")
+    return {
+        "generated_utc": payload.get("generated_utc"),
+        "pitch": pitch,
+        "pitch_markdown": markdown,
+    }
 
 
 @router.get("/valuation/latest")
 def valuation_latest() -> dict:
     payload = _read_json(MASTER_VAL_LATEST)
     if not payload:
-        return {"error": "no master valuation payload yet"}
+        return _not_ready(
+            error="no master valuation payload yet",
+            code="valuation_not_ready",
+        )
     return payload
 
 
@@ -1128,7 +1677,10 @@ def valuation_latest() -> dict:
 def ip_grant_win_latest() -> dict:
     payload = _read_json(IP_GRANT_WIN_MANIFEST_LATEST)
     if not payload:
-        return {"error": "no autonomous grant win manifest yet"}
+        return _not_ready(
+            error="no autonomous grant win manifest yet",
+            code="ip_grant_win_not_ready",
+        )
     return payload
 
 
@@ -1136,7 +1688,10 @@ def ip_grant_win_latest() -> dict:
 def explainer_quantified_latest() -> dict:
     payload = _read_json(LUMA_EXPLAINER_QUANT_LATEST)
     if not payload:
-        return {"error": "no quantified explainer payload yet"}
+        return _not_ready(
+            error="no quantified explainer payload yet",
+            code="explainer_not_ready",
+        )
     return payload
 
 
@@ -1144,7 +1699,10 @@ def explainer_quantified_latest() -> dict:
 def booth_design_latest() -> dict:
     payload = _read_json(BOOTH_DESIGN_MANIFEST_LATEST)
     if not payload:
-        return {"error": "no booth design manifest yet"}
+        return _not_ready(
+            error="no booth design manifest yet",
+            code="booth_design_not_ready",
+        )
     return payload
 
 
@@ -1152,7 +1710,10 @@ def booth_design_latest() -> dict:
 def truth_latest() -> dict:
     payload = _read_json(PUBLIC_TRUTH_LATEST)
     if not payload:
-        return {"error": "no public truth snapshot yet"}
+        return _not_ready(
+            error="no public truth snapshot yet",
+            code="truth_snapshot_not_ready",
+        )
     return payload
 
 
@@ -1160,7 +1721,10 @@ def truth_latest() -> dict:
 def truth_manifest_latest() -> dict:
     payload = _read_json(PUBLIC_TRUTH_MANIFEST_LATEST)
     if not payload:
-        return {"error": "no public truth manifest yet"}
+        return _not_ready(
+            error="no public truth manifest yet",
+            code="truth_manifest_not_ready",
+        )
     return payload
 
 
@@ -1173,10 +1737,11 @@ def tracker() -> dict:
 def awards(limit: int = 100) -> dict:
     payload = _build_tracker()
     rows = payload.get("awards", {}).get("items", [])
+    max_rows = _clamp_limit(limit, low=1, high=1000)
     return {
         "generated_utc": payload.get("generated_utc"),
         "count": payload.get("awards", {}).get("count", 0),
-        "items": rows[:limit],
+        "items": rows[:max_rows],
     }
 
 
@@ -1214,7 +1779,9 @@ def set_state(slug: str, patch: ApprovalPatch) -> dict:
     if not p.exists():
         raise HTTPException(404, f"package {slug} missing approval_state.json")
 
-    cur = json.loads(p.read_text(encoding="utf-8"))
+    cur = _read_json(p)
+    if not isinstance(cur, dict):
+        raise HTTPException(500, f"package {slug} has malformed approval_state.json")
     cur["state"] = state
     cur["notes"] = patch.notes or cur.get("notes", "")
     cur["updated_utc"] = _now_utc_iso()

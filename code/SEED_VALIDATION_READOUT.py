@@ -5,11 +5,15 @@ from datetime import datetime, timezone
 ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
 CONF = ROOT / "config"
 OUT = ROOT / "out"
-DASH = Path(r"C:\LumaTrader\dashboard")
+DASH_ROOT = Path(r"C:\LumaTrader\dashboard")
+DASH_STACK = ROOT / "dashboard"
 
 JSON_OUT = OUT / "seed_validation_readout.json"
 TXT_OUT  = OUT / "seed_validation_readout.txt"
-HTML_OUT = DASH / "seed_validation_readout.html"
+HTML_OUTS = [
+    DASH_ROOT / "seed_validation_readout.html",
+    DASH_STACK / "seed_validation_readout.html",
+]
 
 def now_utc():
     return datetime.now(timezone.utc).isoformat()
@@ -354,7 +358,8 @@ lines.append("")
 lines.append("FILE OUTPUTS")
 lines.append(str(JSON_OUT))
 lines.append(str(TXT_OUT))
-lines.append(str(HTML_OUT))
+for html_out in HTML_OUTS:
+    lines.append(str(html_out))
 
 TXT_OUT.write_text("\n".join(lines), encoding="utf-8")
 
@@ -500,12 +505,15 @@ ul {{ margin: 8px 0 0 18px; }}
 </html>
 """
 
-HTML_OUT.write_text(html_doc, encoding="utf-8")
+for html_out in HTML_OUTS:
+    html_out.parent.mkdir(parents=True, exist_ok=True)
+    html_out.write_text(html_doc, encoding="utf-8")
 
 print("WROTE:")
 print(JSON_OUT)
 print(TXT_OUT)
-print(HTML_OUT)
+for html_out in HTML_OUTS:
+    print(html_out)
 print("")
 print("READINESS:", readiness)
 print("SEED ASK:", money(investor_ask["seed_raise_usd_low"]), "to", money(investor_ask["seed_raise_usd_high"]))
@@ -513,4 +521,5 @@ print("GOV / PILOT ASK:", money(investor_ask["gov_pilot_usd_low"]), "to", money(
 print("")
 print("OPEN THESE:")
 print(TXT_OUT)
-print(HTML_OUT)
+for html_out in HTML_OUTS:
+    print(html_out)

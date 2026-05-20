@@ -624,6 +624,14 @@ def build_metric_readiness(
 
     metrics_stable_threshold = 200
     capital_mode = "micro_capitalized" if controller_portfolio_est > 0 and controller_portfolio_est < 1000 else "standard"
+    stability_progress_pct = 0.0
+    if metrics_stable_threshold > 0:
+        stability_progress_pct = min(100.0, (100.0 * float(closed_live_trades)) / float(metrics_stable_threshold))
+    provisional_label = (
+        "provisional_under_guardrails"
+        if closed_live_trades < metrics_stable_threshold
+        else "sample_stable_for_risk_metrics"
+    )
 
     status = "capital_and_risk_guarded"
     if runtime_allow_live and not runtime_kill_switch and controller_allow_live:
@@ -632,21 +640,30 @@ def build_metric_readiness(
         status = "limited_live_safety_mode"
 
     explanation = (
-        "Risk-adjusted performance metrics are currently constrained by deliberate capital and safety gates; "
-        "signal quality evidence is captured through breadth, routing edge, and cross-sector optimization proof."
+        "PnL and risk-adjusted metrics are intentionally flagged as provisional while capital and safety "
+        "guardrails constrain notional and live sample depth. Signal quality is validated through breadth "
+        "coverage, routing edge, and cross-sector preserved-value evidence."
     )
     if closed_live_trades < metrics_stable_threshold:
         explanation += (
-            " Closed-trade sample is below institutional stability threshold, so Sharpe/CAGR/Sortino should be treated as provisional."
+            f" Closed-trade sample depth is {round(stability_progress_pct, 2)}% of the institutional stability threshold "
+            "required before Sharpe/CAGR/Sortino are promoted from provisional to stable reporting."
         )
 
     return {
         "status": status,
+        "provisional_label": provisional_label,
         "explanation": explanation,
         "target_window": "thursday_readiness_window",
         "capital_mode": capital_mode,
         "closed_live_trades": closed_live_trades,
         "metrics_stable_threshold": metrics_stable_threshold,
+        "stability_progress_pct": round(stability_progress_pct, 2),
+        "provisional_due_to": [
+            "capital_and_notional_limits",
+            "risk_gates_active",
+            "sample_depth_below_institutional_threshold",
+        ],
         "provisional_metrics": {
             "win_rate_pct": win_rate_pct,
             "realized_net_usd": realized_net_usd,
@@ -722,9 +739,11 @@ def build_investor_metric_readiness_payload(
         },
         "summary": {
             "status": str(readiness.get("status") or "unknown"),
+            "provisional_label": str(readiness.get("provisional_label") or "unknown"),
             "investor_position": (
-                "Current PnL, Sharpe, CAGR, Sortino, and MDD are provisional because capital and risk gates "
-                "intentionally constrain live execution. This is a funding-readiness constraint, not a signal-discovery failure."
+                "Current PnL, Sharpe, CAGR, Sortino, and MDD remain provisional while intentional capital and risk "
+                "guardrails constrain live notional and sample depth. This reflects staged deployment discipline and "
+                "funding-readiness sequencing, not signal failure."
             ),
             "signal_evidence": {
                 "annual_value_usd": round(to_float(headline.get("total_estimated_annual_value_usd"), 0.0), 2),
@@ -752,6 +771,12 @@ def build_investor_metric_readiness_payload(
             "provisional_live_metrics": {
                 "closed_live_trades": to_int(readiness.get("closed_live_trades"), 0),
                 "metrics_stable_threshold": to_int(readiness.get("metrics_stable_threshold"), 0),
+                "stability_progress_pct": round(to_float(readiness.get("stability_progress_pct"), 0.0), 2),
+                "provisional_due_to": (
+                    readiness.get("provisional_due_to")
+                    if isinstance(readiness.get("provisional_due_to"), list)
+                    else []
+                ),
                 "win_rate_pct": round(to_float(provisional_metrics.get("win_rate_pct"), 0.0), 4),
                 "realized_net_usd": round(to_float(provisional_metrics.get("realized_net_usd"), 0.0), 4),
                 "max_drawdown_pct": round(to_float(provisional_metrics.get("max_drawdown_pct"), 0.0), 4),
@@ -824,6 +849,7 @@ def render_investor_metric_readiness_markdown(payload: dict[str, Any]) -> str:
     lines.append("## Why Risk-Adjusted Metrics Are Provisional")
     lines.append("")
     lines.append(f"Readiness status: {summary.get('status', 'unknown')}")
+    lines.append(f"Provisional label: {summary.get('provisional_label', 'unknown')}")
     lines.append("")
     lines.append("System gates currently enforce a constrained execution envelope:")
     lines.append("")
@@ -841,6 +867,7 @@ def render_investor_metric_readiness_markdown(payload: dict[str, Any]) -> str:
     lines.append("")
     lines.append(f"- closed live trades: {provisional.get('closed_live_trades', 0)}")
     lines.append(f"- institutional stability threshold: {provisional.get('metrics_stable_threshold', 0)}")
+    lines.append(f"- stability_progress_pct: {provisional.get('stability_progress_pct', 0)}")
     lines.append(f"- win_rate_pct: {provisional.get('win_rate_pct', 0)}")
     lines.append(f"- realized_net_usd: {provisional.get('realized_net_usd', 0)}")
     lines.append(f"- max_drawdown_pct: {provisional.get('max_drawdown_pct', 0)}")

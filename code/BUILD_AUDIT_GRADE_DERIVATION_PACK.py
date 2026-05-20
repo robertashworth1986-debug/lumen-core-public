@@ -3,7 +3,8 @@ import json, os, math, hashlib, datetime
 ROOT = r"C:\LumaTrader\INSTITUTIONAL_STACK_V2"
 CONF = os.path.join(ROOT, "config")
 OUT  = os.path.join(ROOT, "out")
-DASH = r"C:\LumaTrader\dashboard"
+DASH_ROOT = r"C:\LumaTrader\dashboard"
+DASH_STACK = os.path.join(ROOT, "dashboard")
 
 def now_utc():
     return datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
@@ -347,16 +348,21 @@ html += f"""
 
 <div class="card">
   <h2>Chain of custody file</h2>
-  <pre>{ledger_path}</pre>
+    <pre>out/CHAIN_OF_CUSTODY_256.txt</pre>
 </div>
 
 </body>
 </html>
 """
 
-html_path = os.path.join(DASH, "audit_derivation_pack.html")
-with open(html_path, "w", encoding="utf-8") as f:
-    f.write(html)
+html_paths = [
+        os.path.join(DASH_ROOT, "audit_derivation_pack.html"),
+        os.path.join(DASH_STACK, "audit_derivation_pack.html"),
+]
+for html_path in html_paths:
+        os.makedirs(os.path.dirname(html_path), exist_ok=True)
+        with open(html_path, "w", encoding="utf-8") as f:
+                f.write(html)
 
 txt_path = os.path.join(OUT, "audit_derivation_pack_readout.txt")
 with open(txt_path, "w", encoding="utf-8") as f:
@@ -373,6 +379,7 @@ with open(txt_path, "w", encoding="utf-8") as f:
 
 print("WROTE:", pack_path)
 print("WROTE:", ledger_path)
-print("WROTE:", html_path)
+for html_path in html_paths:
+    print("WROTE:", html_path)
 print("WROTE:", txt_path)
 print("DONE")

@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import hmac
 import math
 import os
 import pathlib
@@ -33,7 +34,7 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import orjson
 import uvicorn
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, Response
 from scipy import stats
 
@@ -53,6 +54,14 @@ ALPACA_STATUS_FILE       = EXEC / "alpaca_paper_status.json"
 MULTI_EX_STATUS_FILE     = EXEC / "multi_exchange_paper_ticker_status.json"
 RUNTIME_CONTROL_FILE     = ROOT / "config" / "runtime_control.json"
 PAPER_RUNTIME_FILE       = ROOT / "config" / "paper_trader_runtime.json"
+LANE_INTEGRITY_FILE      = EXEC / "lane_integrity_report.json"
+API_KEY_REGISTRY_FILE    = EXEC / "api_key_registry_report.json"
+OPP_CYCLE_LATEST_FILE    = OUT / "ops" / "opportunity_autonomy_loop" / "cycle_latest.json"
+LINKEDIN_BUILD_FILE      = OUT / "ops" / "lumalinkedin_v1_build_latest.json"
+EMAIL_FINDER_MANIFEST    = OUT / "ops" / "email_opportunity_finder" / "email_opportunity_manifest_latest.json"
+EMAIL_DISPATCH_MANIFEST  = OUT / "ops" / "email_resume_dispatcher" / "email_resume_dispatch_manifest_latest.json"
+EMAIL_RESPONSE_MANIFEST  = OUT / "ops" / "email_response_watcher" / "email_response_manifest_latest.json"
+GRANTS_QUEUE_FILE        = OUT / "grants" / "_queue" / "index.json"
 
 TICK_SECONDS   = 3       # How often to push a new tick to all clients
 HISTORY_POINTS = 120     # Rolling window of ticks to keep in memory
@@ -135,6 +144,68 @@ def _safe_json(path: pathlib.Path) -> Optional[Dict]:
         return orjson.loads(path.read_bytes())
     except Exception:
         return None
+
+
+def _split_tokens(raw: Optional[str]) -> List[str]:
+    if not raw:
+        return []
+    return [token.strip() for token in str(raw).split(",") if token.strip()]
+
+
+def _expected_api_tokens() -> List[str]:
+    names = ("LUMA_OPPORTUNITY_API_TOKEN", "LUMA_OPP_API_TOKEN", "LUMA_API_TOKEN")
+    values: List[str] = []
+    for name in names:
+        values.extend(_split_tokens(os.getenv(name)))
+    deduped: List[str] = []
+    seen: set[str] = set()
+    for value in values:
+        if value not in seen:
+            deduped.append(value)
+            seen.add(value)
+    return deduped
+
+
+def _extract_bearer(authorization: Optional[str]) -> str:
+    raw = (authorization or "").strip()
+    if not raw:
+        return ""
+    parts = raw.split(" ", 1)
+    if len(parts) == 2 and parts[0].lower() == "bearer":
+        return parts[1].strip()
+    return ""
+
+
+def _token_is_valid(candidate: str, expected: List[str]) -> bool:
+    return any(hmac.compare_digest(candidate, token) for token in expected)
+
+
+def _assert_http_token(request: Request) -> None:
+    expected = _expected_api_tokens()
+    if not expected:
+        return
+    provided = (
+        request.headers.get("x-luma-token", "").strip()
+        or _extract_bearer(request.headers.get("authorization"))
+    )
+    if not provided:
+        raise HTTPException(status_code=401, detail="missing api token")
+    if not _token_is_valid(provided, expected):
+        raise HTTPException(status_code=403, detail="invalid api token")
+
+
+def _assert_ws_token(ws: WebSocket) -> bool:
+    expected = _expected_api_tokens()
+    if not expected:
+        return True
+    provided = (
+        str(ws.query_params.get("token") or "").strip()
+        or ws.headers.get("x-luma-token", "").strip()
+        or _extract_bearer(ws.headers.get("authorization"))
+    )
+    if not provided:
+        return False
+    return _token_is_valid(provided, expected)
 
 
 def load_sector_rows() -> List[Dict[str, Any]]:
@@ -345,6 +416,9 @@ async def root():
 
 @app.websocket("/ws/ticks")
 async def websocket_endpoint(ws: WebSocket):
+    if not _assert_ws_token(ws):
+        await ws.close(code=1008)
+        return
     await ws.accept()
     connected_clients.append(ws)
     try:
@@ -400,32 +474,37 @@ async def startup_event():
 
 
 @app.get("/api/tick")
-async def api_tick():
+async def api_tick(request: Request):
+    _assert_http_token(request)
     data = orjson.dumps(_numpy_safe(compute_tick()))
     return Response(content=data, media_type="application/json")
 
 
 @app.get("/api/history")
-async def api_history():
+async def api_history(request: Request):
+    _assert_http_token(request)
     data = orjson.dumps({"history": tick_history[-HISTORY_POINTS:]})
     return Response(content=data, media_type="application/json")
 
 
 @app.get("/api/alerts")
-async def api_alerts():
+async def api_alerts(request: Request):
+    _assert_http_token(request)
     data = orjson.dumps({"alerts": alerts_buffer})
     return Response(content=data, media_type="application/json")
 
 
 @app.get("/api/sparklines")
-async def api_sparklines():
+async def api_sparklines(request: Request):
+    _assert_http_token(request)
     result = {sec: hist[-SPARKLINE_POINTS:] for sec, hist in per_sector_history.items()}
     data = orjson.dumps(result)
     return Response(content=data, media_type="application/json")
 
 
 @app.get("/api/source_breadth")
-async def api_source_breadth():
+async def api_source_breadth(request: Request):
+    _assert_http_token(request)
     sb = _safe_json(SOURCE_BREADTH_FILE) or {}
     data = orjson.dumps({
         "open_access": sb.get("open_access_approved_sources", 0),
@@ -439,7 +518,8 @@ async def api_source_breadth():
 
 
 @app.get("/api/live_readiness")
-async def api_live_readiness():
+async def api_live_readiness(request: Request):
+    _assert_http_token(request)
     alp = _safe_json(ALPACA_STATUS_FILE) or {}
     mex = _safe_json(MULTI_EX_STATUS_FILE) or {}
     rt = _safe_json(RUNTIME_CONTROL_FILE) or {}
@@ -471,6 +551,63 @@ async def api_live_readiness():
         },
         "paper_loop_seconds": float(pr.get("loop_seconds", 0.0) or 0.0),
         "runtime_loop_seconds": float(rt.get("loop_seconds", 0.0) or 0.0),
+    })
+    return Response(content=data, media_type="application/json")
+
+
+@app.get("/api/lane_health")
+async def api_lane_health(request: Request):
+    _assert_http_token(request)
+
+    lane_integrity = _safe_json(LANE_INTEGRITY_FILE) or {}
+    lane_summary = lane_integrity.get("summary", {}) if isinstance(lane_integrity, dict) else {}
+    key_registry = _safe_json(API_KEY_REGISTRY_FILE) or {}
+    opportunity_cycle = _safe_json(OPP_CYCLE_LATEST_FILE) or {}
+    linkedin_build = _safe_json(LINKEDIN_BUILD_FILE) or {}
+    email_finder_manifest = _safe_json(EMAIL_FINDER_MANIFEST) or {}
+    email_dispatch_manifest = _safe_json(EMAIL_DISPATCH_MANIFEST) or {}
+    email_response_manifest = _safe_json(EMAIL_RESPONSE_MANIFEST) or {}
+    grants_queue = _safe_json(GRANTS_QUEUE_FILE) or {}
+    runtime_control = _safe_json(RUNTIME_CONTROL_FILE) or {}
+
+    data = orjson.dumps({
+        "generated_utc": datetime.now(timezone.utc).isoformat(),
+        "lane_integrity": {
+            "status": lane_integrity.get("status", "not_ready") if isinstance(lane_integrity, dict) else "not_ready",
+            "cross_lane_key_count": int(lane_summary.get("cross_lane_key_count", 0) or 0),
+            "critical_missing_count": int(lane_summary.get("critical_missing_count", 0) or 0),
+            "coverage_pct": float(lane_summary.get("coverage_pct", 0.0) or 0.0),
+        },
+        "api_key_registry": {
+            "coverage_pct": float(key_registry.get("coverage_pct", 0.0) or 0.0) if isinstance(key_registry, dict) else 0.0,
+            "present_keys": int(key_registry.get("present_keys", 0) or 0) if isinstance(key_registry, dict) else 0,
+            "total_keys": int(key_registry.get("total_keys", 0) or 0) if isinstance(key_registry, dict) else 0,
+        },
+        "runtime_gate": {
+            "mode": runtime_control.get("mode", "unknown") if isinstance(runtime_control, dict) else "unknown",
+            "allow_live_orders": bool(runtime_control.get("allow_live_orders", False)) if isinstance(runtime_control, dict) else False,
+            "hard_safety_only_mode": bool(runtime_control.get("hard_safety_only_mode", False)) if isinstance(runtime_control, dict) else False,
+        },
+        "opportunity_lane": {
+            "status": opportunity_cycle.get("status", "not_ready") if isinstance(opportunity_cycle, dict) else "not_ready",
+            "generated_utc": opportunity_cycle.get("generated_utc") if isinstance(opportunity_cycle, dict) else None,
+            "cycle": int(opportunity_cycle.get("cycle", 0) or 0) if isinstance(opportunity_cycle, dict) else 0,
+        },
+        "linkedin_lane": {
+            "status": linkedin_build.get("status", "not_ready") if isinstance(linkedin_build, dict) else "not_ready",
+            "generated_utc": linkedin_build.get("generated_utc") if isinstance(linkedin_build, dict) else None,
+        },
+        "email_lane": {
+            "finder_status": email_finder_manifest.get("status", "not_ready") if isinstance(email_finder_manifest, dict) else "not_ready",
+            "dispatch_status": email_dispatch_manifest.get("status", "not_ready") if isinstance(email_dispatch_manifest, dict) else "not_ready",
+            "response_status": email_response_manifest.get("status", "not_ready") if isinstance(email_response_manifest, dict) else "not_ready",
+        },
+        "grants_lane": {
+            "queue_total": int(grants_queue.get("n_total", 0) or 0) if isinstance(grants_queue, dict) else 0,
+            "draft": int(grants_queue.get("n_draft", 0) or 0) if isinstance(grants_queue, dict) else 0,
+            "approved": int(grants_queue.get("n_approved", 0) or 0) if isinstance(grants_queue, dict) else 0,
+            "submitted": int(grants_queue.get("n_submitted", 0) or 0) if isinstance(grants_queue, dict) else 0,
+        },
     })
     return Response(content=data, media_type="application/json")
 

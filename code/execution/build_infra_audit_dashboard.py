@@ -25,11 +25,15 @@ from pathlib import Path
 ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
 OUT = ROOT / "out"
 EXEC_OUT = OUT / "execution"
-DASH = ROOT / "dashboard"
+DASH_STACK = ROOT / "dashboard"
+DASH_ROOT = ROOT.parent / "dashboard"
 
 CONSTRAINT_STATUS_FILE = EXEC_OUT / "infra_constraint_status.json"
 AUDIT_CHAIN_FILE = OUT / "audit_chain.jsonl"
-HTML_OUT = DASH / "infra_audit_dashboard.html"
+HTML_OUTS = [
+  DASH_STACK / "infra_audit_dashboard.html",
+  DASH_ROOT / "infra_audit_dashboard.html",
+]
 
 
 def load_json(path: Path, default):
@@ -974,8 +978,9 @@ def build_and_save() -> None:
     status = load_json(CONSTRAINT_STATUS_FILE, {})
     audit_events = load_jsonl_tail(AUDIT_CHAIN_FILE, 60)
     html = build_html(status, audit_events)
-    DASH.mkdir(parents=True, exist_ok=True)
-    HTML_OUT.write_text(html, encoding="utf-8")
+    for html_out in HTML_OUTS:
+        html_out.parent.mkdir(parents=True, exist_ok=True)
+        html_out.write_text(html, encoding="utf-8")
 
 
 def main() -> None:
@@ -989,7 +994,7 @@ def main() -> None:
                 os.kill(_pid, 0)
                 print(f"[singleton] build_infra_audit_dashboard already running as PID {_pid} — exiting.")
                 raise SystemExit(0)
-        except (ValueError, OSError):
+        except (ValueError, OSError, SystemError):
             pass
     _lock.write_text(str(os.getpid()))
     atexit.register(lambda: _lock.unlink(missing_ok=True))
@@ -1001,18 +1006,19 @@ def main() -> None:
 
     print("INFRA AUDIT DASHBOARD BUILDER")
     print(f"Input : {CONSTRAINT_STATUS_FILE}")
-    print(f"Output: {HTML_OUT}")
+    for html_out in HTML_OUTS:
+      print(f"Output: {html_out}")
     print(f"Loop  : {args.loop}  |  Interval: {args.interval}s")
 
     while True:
-        try:
-            build_and_save()
-            print(f"[{time.strftime('%H:%M:%S')}] Dashboard rebuilt → {HTML_OUT}")
-        except Exception as exc:
-            print(f"[ERROR] {exc}")
-        if not args.loop:
-            break
-        time.sleep(args.interval)
+      try:
+        build_and_save()
+        print(f"[{time.strftime('%H:%M:%S')}] Dashboard rebuilt -> {HTML_OUTS[0]} (+ root mirror)")
+      except Exception as exc:
+        print(f"[ERROR] {exc}")
+      if not args.loop:
+        break
+      time.sleep(args.interval)
 
 
 if __name__ == "__main__":

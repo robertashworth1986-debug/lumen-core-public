@@ -17,6 +17,7 @@ QUEUE_PATH = ROOT / "out" / "grant_approval_queue.json"
 PROFILE_PATH = ROOT / "code" / "grants_profile_lumencore.json"
 SKIP_PACK_PATH = ROOT / "out" / "ops" / "skips_grant_autofill" / "skips_grant_autofill_latest.json"
 RANKED_PATH = ROOT / "out" / "grants" / "grants_ranked_v2.json"
+BLUEPRINT_VAULT_PATH = ROOT / "out" / "ops" / "gov_blueprint_vault" / "gov_blueprint_vault_latest.json"
 KEY_ENV_FILE = ROOT / "code" / "execution" / "config" / "luma_live_keys.env"
 
 GRANTS_API = "https://api.grants.gov/v1/api/search2"
@@ -58,6 +59,62 @@ def _pick_first(*values: Any) -> str:
         if txt:
             return txt
     return ""
+
+
+def _extract_blueprint_terms(payload: dict[str, Any]) -> list[str]:
+    terms: list[str] = []
+    if not isinstance(payload, dict):
+        return terms
+
+    direct = payload.get("grant_focus_terms", [])
+    if isinstance(direct, list):
+        terms.extend(str(x) for x in direct if str(x).strip())
+
+    assets = payload.get("assets", [])
+    if isinstance(assets, list):
+        for row in assets:
+            if not isinstance(row, dict):
+                continue
+            tags = row.get("grant_tags", [])
+            if isinstance(tags, list):
+                terms.extend(str(x) for x in tags if str(x).strip())
+            domain = str(row.get("domain") or "").strip()
+            if domain:
+                terms.extend(token for token in domain.replace("_", " ").split(" ") if token)
+
+    out: list[str] = []
+    seen: set[str] = set()
+    for raw in terms:
+        token = _norm(str(raw).replace("_", " "))
+        if not token or token in seen:
+            continue
+        seen.add(token)
+        out.append(token)
+    return out
+
+
+def _blueprint_alignment(text_blob: str, terms: list[str], limit: int = 14) -> tuple[list[str], float]:
+    blob = _norm(text_blob)
+    if not blob or not terms:
+        return [], 0.0
+
+    matches: list[str] = []
+    for term in terms:
+        token = _norm(term)
+        if token and token in blob:
+            matches.append(token)
+
+    deduped: list[str] = []
+    seen: set[str] = set()
+    for token in matches:
+        if token in seen:
+            continue
+        seen.add(token)
+        deduped.append(token)
+
+    deduped = deduped[: max(1, int(limit))]
+    score = min(100.0, float(len(deduped)) * 6.0)
+    return deduped, round(score, 2)
 
 
 def _load_key_map() -> dict[str, str]:
@@ -345,6 +402,8 @@ def build_pack(state: str, limit: int) -> dict[str, Any]:
     queue_items = queue_raw if isinstance(queue_raw, list) else []
     profile = load_json(PROFILE_PATH)
     skip_payload = load_json(SKIP_PACK_PATH)
+    blueprint_payload = load_json(BLUEPRINT_VAULT_PATH)
+    blueprint_terms = _extract_blueprint_terms(blueprint_payload if isinstance(blueprint_payload, dict) else {})
     ranked_by_opp = _ranked_map()
     key_map = _load_key_map()
 
@@ -357,6 +416,7 @@ def build_pack(state: str, limit: int) -> dict[str, Any]:
 
     entries: list[dict[str, Any]] = []
     fit_counts = {"FIT_LIKELY": 0, "MANUAL_CHECK": 0, "HARD_EXCLUDE": 0}
+    blueprint_aligned_count = 0
 
     for row in selected:
         opp = _as_dict(row.get("opportunity"))
@@ -479,6 +539,26 @@ def build_pack(state: str, limit: int) -> dict[str, Any]:
                 ]
             )
 
+        alignment_blob = " ".join(
+            [
+                title,
+                agency,
+                eligibility_text,
+                description,
+                " ".join(applicant_types),
+                " ".join(funding_categories),
+                " ".join(wants),
+                " ".join(answer_focus),
+            ]
+        )
+        blueprint_matches, blueprint_alignment_score = _blueprint_alignment(alignment_blob, blueprint_terms)
+        if blueprint_matches:
+            blueprint_aligned_count += 1
+            wants.append(f"Blueprint alignment terms: {', '.join(blueprint_matches)}")
+            answer_focus.append(
+                "Bind narrative to Harmonic + Alpha Lock + Harmonic Edge Lock operating family with evidence-first validation milestones."
+            )
+
         fit_counts[fit_status] = fit_counts.get(fit_status, 0) + 1
 
         entries.append(
@@ -494,6 +574,8 @@ def build_pack(state: str, limit: int) -> dict[str, Any]:
                 "submit_url": _submit_url(opp_num, is_skip=is_skip),
                 "fit_status": fit_status,
                 "fit_reason": fit_reason,
+                "blueprint_alignment_score": blueprint_alignment_score,
+                "blueprint_term_matches": blueprint_matches,
                 "what_opportunity_wants": wants,
                 "answer_strategy": answer_focus,
                 "must_answer_fields": [
@@ -526,6 +608,17 @@ def build_pack(state: str, limit: int) -> dict[str, Any]:
             "fit_likely": fit_counts.get("FIT_LIKELY", 0),
             "manual_check": fit_counts.get("MANUAL_CHECK", 0),
             "hard_exclude": fit_counts.get("HARD_EXCLUDE", 0),
+            "blueprint_aligned": blueprint_aligned_count,
+        },
+        "blueprint_vault": {
+            "path": str(BLUEPRINT_VAULT_PATH),
+            "present": bool(isinstance(blueprint_payload, dict) and blueprint_payload),
+            "generated_utc": (
+                blueprint_payload.get("generated_utc")
+                if isinstance(blueprint_payload, dict)
+                else None
+            ),
+            "focus_term_count": len(blueprint_terms),
         },
         "key_status": {
             "grants_gov_api_key_present": bool(str(key_map.get("GRANTS_GOV_API_KEY") or "").strip()),
@@ -555,6 +648,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.append(f"- Fit likely: {summary.get('fit_likely', 0)}")
     lines.append(f"- Manual check: {summary.get('manual_check', 0)}")
     lines.append(f"- Hard exclude: {summary.get('hard_exclude', 0)}")
+    lines.append(f"- Blueprint aligned: {summary.get('blueprint_aligned', 0)}")
     lines.append("")
 
     for i, row in enumerate(items, start=1):
@@ -564,6 +658,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         lines.append(f"- Agency: {row.get('agency', '')}")
         lines.append(f"- Fit Status: {row.get('fit_status', '')}")
         lines.append(f"- Fit Reason: {row.get('fit_reason', '')}")
+        lines.append(f"- Blueprint Alignment Score: {row.get('blueprint_alignment_score', 0)}")
+        lines.append(f"- Blueprint Terms: {', '.join(str(x) for x in row.get('blueprint_term_matches', []))}")
         lines.append(f"- Close Date: {row.get('close_date', '')}")
         lines.append(f"- Days To Close: {row.get('days_to_close', '')}")
         lines.append(f"- Award Ceiling USD: {row.get('award_ceiling_usd', '')}")

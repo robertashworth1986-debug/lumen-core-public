@@ -22,7 +22,9 @@ Mount in luma_experience_gateway.py:
 from __future__ import annotations
 
 import io
+import hmac
 import json
+import os
 import re
 import subprocess
 import sys
@@ -30,7 +32,7 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response
 from pydantic import BaseModel
 
@@ -43,7 +45,57 @@ QUEUE = GRANTS / "_queue" / "index.json"
 CATALOG = DATA / "grant_catalog.json"
 PROFILE = DATA / "company_profile.json"
 
-router = APIRouter(prefix="/api/grants", tags=["grants"])
+def _split_tokens(raw: str | None) -> list[str]:
+    if not raw:
+        return []
+    return [token.strip() for token in raw.split(",") if token.strip()]
+
+
+def _expected_api_tokens() -> list[str]:
+    names = ("LUMA_GRANTS_API_TOKEN", "LUMA_API_TOKEN")
+    values: list[str] = []
+    for name in names:
+        values.extend(_split_tokens(os.getenv(name)))
+    seen: set[str] = set()
+    deduped: list[str] = []
+    for value in values:
+        if value not in seen:
+            deduped.append(value)
+            seen.add(value)
+    return deduped
+
+
+def _extract_bearer(authorization: str | None) -> str:
+    raw = (authorization or "").strip()
+    if not raw:
+        return ""
+    parts = raw.split(" ", 1)
+    if len(parts) == 2 and parts[0].lower() == "bearer":
+        return parts[1].strip()
+    return ""
+
+
+def _require_api_token(
+    x_luma_token: str | None = Header(default=None, alias="X-Luma-Token"),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> None:
+    expected = _expected_api_tokens()
+    if not expected:
+        return
+
+    provided = (x_luma_token or "").strip() or _extract_bearer(authorization)
+    if not provided:
+        raise HTTPException(status_code=401, detail="missing api token")
+
+    if not any(hmac.compare_digest(provided, token) for token in expected):
+        raise HTTPException(status_code=403, detail="invalid api token")
+
+
+router = APIRouter(
+    prefix="/api/grants",
+    tags=["grants"],
+    dependencies=[Depends(_require_api_token)],
+)
 
 # ----------------------------------------------------------------------------
 # Real-time event hook — gateway wires this to its WebSocket manager so
