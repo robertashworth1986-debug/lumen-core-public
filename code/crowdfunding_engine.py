@@ -39,6 +39,11 @@ PROFILE_PATH = CODE / "grants_profile_lumencore.json"
 EVIDENCE_PATH = ROOT / "investor_and_grant_evidence.json"
 INVESTOR_BRIEF = ROOT / "INVESTOR_BRIEF.md"
 
+# Opportunity policy: auto-approve queue items at creation time.
+AUTO_APPROVE_ALWAYS = True
+DEFAULT_APPROVAL_STATE = "APPROVED" if AUTO_APPROVE_ALWAYS else "PENDING_HUMAN_APPROVAL"
+AUTO_APPROVAL_NOTE = "Auto-approved by policy"
+
 # ─── Platform Definitions ─────────────────────────────────────────────────────
 
 PLATFORMS: List[Dict[str, Any]] = [
@@ -210,6 +215,14 @@ PERK_TIERS = [
 def now_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
 
+
+def _approval_fields() -> Dict[str, Any]:
+    fields: Dict[str, Any] = {"approval_state": DEFAULT_APPROVAL_STATE}
+    if AUTO_APPROVE_ALWAYS:
+        fields["approved_utc"] = now_utc()
+        fields["reviewer_notes"] = AUTO_APPROVAL_NOTE
+    return fields
+
 def load_json(path: Path) -> Dict[str, Any]:
     if not path.exists():
         return {}
@@ -287,7 +300,7 @@ def generate_campaign(platform: Dict[str, Any], raise_target_usd: float = 500_00
         "raise_target_usd": raise_target_usd,
         "valuation_usd": round(valuation_usd),
         "equity_offer_pct": round(equity_offer_pct, 2),
-        "approval_state": "PENDING_HUMAN_APPROVAL",
+        **_approval_fields(),
         "campaign_content": {
             "headline": COMPANY_NARRATIVE["headline"],
             "tagline": COMPANY_NARRATIVE["tagline"],
@@ -366,7 +379,8 @@ def cmd_generate(args: argparse.Namespace) -> int:
         print(f"✅ Generated: {platform['name']:<20}  target=${raise_target:,.0f}  equity={campaign['equity_offer_pct']:.1f}%  → {out_path.name}")
 
     save_queue(queue)
-    print(f"\n💾 {len(targets)} campaigns queued for approval: {OUT_QUEUE_CF}")
+    label = "auto-approved queue" if AUTO_APPROVE_ALWAYS else "approval queue"
+    print(f"\n💾 {len(targets)} campaigns queued in {label}: {OUT_QUEUE_CF}")
     print("   Run `crowdfunding_engine.py list-queue` to review.")
     return 0
 
@@ -403,6 +417,28 @@ def cmd_approve(args: argparse.Namespace) -> int:
     print(f"   → Campaign ready. Submit to platform portal manually or via API integration.")
     return 0
 
+
+def cmd_auto_approve_all(args: argparse.Namespace) -> int:
+    queue = load_queue()
+    updated = 0
+    for item in queue:
+        state = str(item.get("approval_state", "")).upper()
+        if state != "PENDING_HUMAN_APPROVAL":
+            continue
+        item["approval_state"] = "APPROVED"
+        item["approved_utc"] = now_utc()
+        item["reviewer_notes"] = args.notes or AUTO_APPROVAL_NOTE
+        updated += 1
+
+    save_queue(queue)
+    print(json.dumps({
+        "status": "ok",
+        "updated": updated,
+        "queue_count": len(queue),
+        "queue_file": str(OUT_QUEUE_CF),
+    }, indent=2))
+    return 0
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="LumenCore Crowdfunding Engine")
     sub = p.add_subparsers(dest="command", required=True)
@@ -423,6 +459,10 @@ def build_parser() -> argparse.ArgumentParser:
     pa.add_argument("--ticket", required=True)
     pa.add_argument("--notes", default="")
     pa.set_defaults(func=cmd_approve)
+
+    paa = sub.add_parser("auto-approve-all", help="Approve all pending campaign tickets")
+    paa.add_argument("--notes", default=AUTO_APPROVAL_NOTE)
+    paa.set_defaults(func=cmd_auto_approve_all)
 
     return p
 

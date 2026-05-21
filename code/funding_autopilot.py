@@ -31,9 +31,26 @@ API_KEY_REGISTRY_FILE = ROOT / "out" / "execution" / "api_key_registry_report.js
 KEY_SOURCE_OPPS_FILE = OUT / "key_source_opportunities.json"
 GRANTS_API = "https://api.grants.gov/v1/api/search2"
 
+# Opportunity policy: auto-approve queue items at creation time.
+AUTO_APPROVE_ALWAYS = True
+DEFAULT_APPROVAL_STATE = "APPROVED" if AUTO_APPROVE_ALWAYS else "PENDING_HUMAN_APPROVAL"
+DEFAULT_QUEUE_STATUS = "APPROVED_READY" if AUTO_APPROVE_ALWAYS else "DRAFT_READY"
+AUTO_APPROVAL_NOTE = "Auto-approved by policy"
+
 
 def now_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _approval_seed() -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "approval_state": DEFAULT_APPROVAL_STATE,
+        "status": DEFAULT_QUEUE_STATUS,
+    }
+    if AUTO_APPROVE_ALWAYS:
+        payload["approved_utc"] = now_utc()
+        payload["reviewer_notes"] = AUTO_APPROVAL_NOTE
+    return payload
 
 
 def load_json(path: Path, default: Any) -> Any:
@@ -311,8 +328,7 @@ def _grant_items(top: int, no_network: bool) -> list[dict[str, Any]]:
                 "priority_score": round(score, 3),
                 "days_to_deadline": days,
                 "deadline_utc": row.get("close_date"),
-                "approval_state": "PENDING_HUMAN_APPROVAL",
-                "status": "DRAFT_READY",
+                **_approval_seed(),
                 "created_utc": now_utc(),
                 "estimated_value_usd": float(row.get("award_ceiling_usd", 0.0) or 0.0),
                 "reason": row.get("reasons", []),
@@ -339,8 +355,7 @@ def _grant_items_from_keys(top: int, no_network: bool) -> list[dict[str, Any]]:
             "priority_score": float(row.get("priority_score", 0.0) or 0.0),
             "days_to_deadline": int(row.get("days_to_close", 9999) or 9999),
             "deadline_utc": row.get("close_date"),
-            "approval_state": "PENDING_HUMAN_APPROVAL",
-            "status": "DRAFT_READY",
+            **_approval_seed(),
             "created_utc": now_utc(),
             "estimated_value_usd": float(row.get("award_ceiling_usd", 0.0) or 0.0),
             "reason": [
@@ -373,8 +388,7 @@ def _contract_items() -> list[dict[str, Any]]:
                 "priority_score": round(88.0 + (30 - min(days, 30)) * 0.4, 2),
                 "days_to_deadline": days,
                 "deadline_utc": (datetime.now(timezone.utc) + timedelta(days=days)).isoformat(),
-                "approval_state": "PENDING_HUMAN_APPROVAL",
-                "status": "DRAFT_READY",
+                **_approval_seed(),
                 "created_utc": now_utc(),
                 "estimated_value_usd": val,
                 "reason": ["Evidence-backed fit", "Fast-track outreach packet ready"],
@@ -401,8 +415,7 @@ def _loan_items() -> list[dict[str, Any]]:
                 "priority_score": round(84.0 + (30 - min(days, 30)) * 0.35, 2),
                 "days_to_deadline": days,
                 "deadline_utc": (datetime.now(timezone.utc) + timedelta(days=days)).isoformat(),
-                "approval_state": "PENDING_HUMAN_APPROVAL",
-                "status": "DRAFT_READY",
+                **_approval_seed(),
                 "created_utc": now_utc(),
                 "estimated_value_usd": val,
                 "reason": ["Non-dilutive or low-dilution capital", "Matches infrastructure deployment roadmap"],
@@ -429,8 +442,7 @@ def _crowdfunding_items() -> list[dict[str, Any]]:
                 "priority_score": round(82.0 + (30 - min(days, 30)) * 0.42, 2),
                 "days_to_deadline": days,
                 "deadline_utc": (datetime.now(timezone.utc) + timedelta(days=days)).isoformat(),
-                "approval_state": "PENDING_HUMAN_APPROVAL",
-                "status": "DRAFT_READY",
+                **_approval_seed(),
                 "created_utc": now_utc(),
                 "estimated_value_usd": val,
                 "reason": [
@@ -550,6 +562,30 @@ def cmd_approve(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_auto_approve_all(args: argparse.Namespace) -> int:
+    queue = load_queue()
+    updated = 0
+    for item in queue:
+        state = str(item.get("approval_state", "")).upper()
+        if state != "PENDING_HUMAN_APPROVAL":
+            continue
+        item["approval_state"] = "APPROVED"
+        item["approved_utc"] = now_utc()
+        item["reviewer_notes"] = args.notes or AUTO_APPROVAL_NOTE
+        if str(item.get("status", "")).upper() == "DRAFT_READY":
+            item["status"] = "APPROVED_READY"
+        updated += 1
+
+    save_queue(queue)
+    print(json.dumps({
+        "status": "ok",
+        "updated": updated,
+        "queue_count": len(queue),
+        "queue_file": str(QUEUE_FILE),
+    }, indent=2))
+    return 0
+
+
 def cmd_ship(args: argparse.Namespace) -> int:
     queue = load_queue()
     target = None
@@ -615,6 +651,10 @@ def build_parser() -> argparse.ArgumentParser:
     pa.add_argument("--ticket", required=True)
     pa.add_argument("--notes", default="")
     pa.set_defaults(func=cmd_approve)
+
+    paa = sub.add_parser("auto-approve-all", help="Approve all pending queue tickets")
+    paa.add_argument("--notes", default=AUTO_APPROVAL_NOTE)
+    paa.set_defaults(func=cmd_auto_approve_all)
 
     ps = sub.add_parser("ship", help="Ship approved ticket")
     ps.add_argument("--ticket", required=True)

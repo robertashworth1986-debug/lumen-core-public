@@ -135,16 +135,18 @@ Invoke-Scp -StepLabel "3/5 Upload LamaScout archive" -Args @(
     $lamaArchive,
     "${VpsUser}@${VpsIp}:/tmp/lumencore_lamascout.tgz"
 )
-Invoke-Ssh -StepLabel "3/5 Extract LamaScout archive" -RemoteCommand "sudo rm -rf ${VpsRoot}/LamaScout && sudo mkdir -p ${VpsRoot} && sudo tar -xzf /tmp/lumencore_lamascout.tgz -C ${VpsRoot} && rm -f /tmp/lumencore_lamascout.tgz"
+Invoke-Ssh -StepLabel "3/5 Extract LamaScout archive" -RemoteCommand "sudo mkdir -p ${VpsRoot} && sudo tar -xzf /tmp/lumencore_lamascout.tgz --overwrite -C ${VpsRoot} && rm -f /tmp/lumencore_lamascout.tgz"
 Remove-Item $lamaArchive -Force
 
 # Step 4: Fix permissions and start services
 Write-Host "[4/5] Setting permissions and starting services..." -ForegroundColor Yellow
-Invoke-Ssh -StepLabel "4/5 Start services" -RemoteCommand "sudo chown -R lumencore:lumencore ${VpsRoot} && sudo systemctl start lamascout-api luma-dashboard lamascout-loop"
+$startServicesCmd = 'sudo chown -R lumencore:lumencore ' + $VpsRoot + '; sudo systemctl daemon-reload; for svc in lamascout-api luma-dashboard lamascout-loop luma-paper-ticker luma-intel-api; do if sudo systemctl list-unit-files --type=service | grep -q "^${svc}\.service"; then sudo systemctl enable --now "$svc"; fi; done'
+Invoke-Ssh -StepLabel "4/5 Start services" -RemoteCommand $startServicesCmd
 
 # Step 5: Status check
 Write-Host "[5/5] Service status..." -ForegroundColor Yellow
-Invoke-Ssh -StepLabel "5/5 Service status" -RemoteCommand "sudo systemctl status lamascout-api luma-dashboard --no-pager"
+$statusCmd = 'for svc in lamascout-api luma-dashboard lamascout-loop luma-paper-ticker luma-intel-api; do if sudo systemctl list-unit-files --type=service | grep -q "^${svc}\.service"; then echo "--- ${svc} ---"; sudo systemctl --no-pager --full status "$svc" | sed -n "1,12p"; fi; done'
+Invoke-Ssh -StepLabel "5/5 Service status" -RemoteCommand $statusCmd
 
 Write-Host ""
 Write-Host "=====================================================" -ForegroundColor Green
@@ -158,5 +160,6 @@ Write-Host ""
 Write-Host " Live endpoints (after SSL):"
 Write-Host "   https://lumen-core.ai/dashboard/  -> Institutional Crypto Dashboard"
 Write-Host "   https://lumen-core.ai/api/scout/  -> LamaScout API"
+Write-Host "   https://lumen-core.ai/intel/      -> Cross-sector opportunity API"
 Write-Host "   https://lumen-core.ai/proof/      -> Proof artifacts & reports"
 Write-Host "=====================================================" -ForegroundColor Green

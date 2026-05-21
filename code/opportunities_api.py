@@ -922,6 +922,7 @@ def _build_tracker() -> dict[str, Any]:
         },
         "valuation": {
             "latest_generated_utc": valuation_latest.get("generated_utc") if isinstance(valuation_latest, dict) else None,
+            "scope": valuation_latest.get("scope") if isinstance(valuation_latest, dict) else None,
             "master_valuation_proxy_usd": (
                 (valuation_latest.get("valuation", {}) or {}).get("master_valuation_proxy_usd")
                 if isinstance(valuation_latest, dict)
@@ -929,6 +930,31 @@ def _build_tracker() -> dict[str, Any]:
             ),
             "valuation_increment_usd": (
                 (valuation_latest.get("valuation", {}) or {}).get("valuation_increment_usd")
+                if isinstance(valuation_latest, dict)
+                else None
+            ),
+            "grant_and_opportunity_pipeline_value_usd": (
+                (valuation_latest.get("valuation", {}) or {}).get("grant_and_opportunity_pipeline_value_usd")
+                if isinstance(valuation_latest, dict)
+                else None
+            ),
+            "grant_finding_and_ranking_system_license_value_usd": (
+                (valuation_latest.get("valuation", {}) or {}).get("grant_finding_and_ranking_system_license_value_usd")
+                if isinstance(valuation_latest, dict)
+                else None
+            ),
+            "digital_scout_value_usd": (
+                (valuation_latest.get("valuation", {}) or {}).get("digital_scout_value_usd")
+                if isinstance(valuation_latest, dict)
+                else None
+            ),
+            "institutional_trading_system_value_usd": (
+                (valuation_latest.get("valuation", {}) or {}).get("institutional_trading_system_value_usd")
+                if isinstance(valuation_latest, dict)
+                else None
+            ),
+            "validated_engine_autonomy_value_usd": (
+                (valuation_latest.get("valuation", {}) or {}).get("validated_engine_autonomy_value_usd")
                 if isinstance(valuation_latest, dict)
                 else None
             ),

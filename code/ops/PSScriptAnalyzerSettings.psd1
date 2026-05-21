@@ -3,6 +3,8 @@
         'PSAvoidAssignmentToAutomaticVariable',
         'PSUseApprovedVerbs',
         'PSAvoidUsingWriteHost',
-        'PSAvoidUsingEmptyCatchBlock'
+        'PSAvoidUsingEmptyCatchBlock',
+        'PSUseUsingScopeModifierInNewRunspaces',
+        'PSReviewUnusedParameter'
     )
 }

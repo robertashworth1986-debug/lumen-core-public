@@ -135,6 +135,10 @@ $steps = New-Object 'System.Collections.Generic.List[object]'
 $panelScript = Join-Path $opsRoot 'RUN_LIVE_BREADTH_VALUE_PANEL.ps1'
 $parityScript = Join-Path $opsRoot 'AUDIT_DASHBOARD_MIRROR_PARITY.ps1'
 $proofSweepScript = Join-Path $opsRoot 'RUN_INVESTOR_PROOF_SWEEP.ps1'
+$valuationLockScript = Join-Path $opsRoot 'LOCK_AUTONOMOUS_GRANT_WIN.py'
+$valuationBriefScript = Join-Path $opsRoot 'BUILD_VALUATION_LICENSING_BRIEF.py'
+$premiumDeckScript = Join-Path $opsRoot 'BUILD_PREMIUM_3MIN_DROPMIC_DECK.py'
+$frozenDeltaChainScript = Join-Path $opsRoot 'BUILD_FROZEN_DELTA_TRUTH_CHAIN.py'
 $nobelAssetsScript = Join-Path $stackRoot 'code\execution\build_nobel_tier_assets.py'
 $alphaEdgeLockScript = Join-Path $opsRoot 'BUILD_ALPHA_EDGE_LOCK_ENGINE.py'
 $blueprintVaultScript = Join-Path $opsRoot 'BUILD_GOV_BLUEPRINT_VAULT.py'
@@ -169,6 +173,22 @@ if (-not (Test-Path -LiteralPath $grantFitScript)) {
 if (-not (Test-Path -LiteralPath $missionPackScript)) {
     Write-RefreshHeartbeat -Status 'error' -Reason 'missing_script' -ErrorMessage "Missing script: $missionPackScript"
     throw "Missing script: $missionPackScript"
+}
+if (-not (Test-Path -LiteralPath $valuationLockScript)) {
+    Write-RefreshHeartbeat -Status 'error' -Reason 'missing_script' -ErrorMessage "Missing script: $valuationLockScript"
+    throw "Missing script: $valuationLockScript"
+}
+if (-not (Test-Path -LiteralPath $valuationBriefScript)) {
+    Write-RefreshHeartbeat -Status 'error' -Reason 'missing_script' -ErrorMessage "Missing script: $valuationBriefScript"
+    throw "Missing script: $valuationBriefScript"
+}
+if (-not (Test-Path -LiteralPath $premiumDeckScript)) {
+    Write-RefreshHeartbeat -Status 'error' -Reason 'missing_script' -ErrorMessage "Missing script: $premiumDeckScript"
+    throw "Missing script: $premiumDeckScript"
+}
+if (-not (Test-Path -LiteralPath $frozenDeltaChainScript)) {
+    Write-RefreshHeartbeat -Status 'error' -Reason 'missing_script' -ErrorMessage "Missing script: $frozenDeltaChainScript"
+    throw "Missing script: $frozenDeltaChainScript"
 }
 if (-not (Test-Path -LiteralPath $siteReachMissionScript)) {
     Write-RefreshHeartbeat -Status 'error' -Reason 'missing_script' -ErrorMessage "Missing script: $siteReachMissionScript"
@@ -230,6 +250,28 @@ $steps.Add((Invoke-Step -Label 'build_site_reach_and_domain_mission_push' -Actio
     & $pythonExe $siteReachMissionScript --days 30 --allow-live-push
     if ($LASTEXITCODE -ne 0) {
         throw "BUILD_SITE_REACH_AND_DOMAIN_MISSION_PUSH failed with exit code $LASTEXITCODE"
+    }
+}))
+
+$steps.Add((Invoke-Step -Label 'refresh_master_valuation_licensing_dropmic_and_frozen_delta_truth_chain' -Action {
+    & $pythonExe $valuationLockScript
+    if ($LASTEXITCODE -ne 0) {
+        throw "LOCK_AUTONOMOUS_GRANT_WIN failed with exit code $LASTEXITCODE"
+    }
+
+    & $pythonExe $valuationBriefScript
+    if ($LASTEXITCODE -ne 0) {
+        throw "BUILD_VALUATION_LICENSING_BRIEF failed with exit code $LASTEXITCODE"
+    }
+
+    & $pythonExe $premiumDeckScript
+    if ($LASTEXITCODE -ne 0) {
+        throw "BUILD_PREMIUM_3MIN_DROPMIC_DECK failed with exit code $LASTEXITCODE"
+    }
+
+    & $pythonExe $frozenDeltaChainScript --strict
+    if ($LASTEXITCODE -ne 0) {
+        throw "BUILD_FROZEN_DELTA_TRUTH_CHAIN failed with exit code $LASTEXITCODE"
     }
 }))
 
@@ -295,6 +337,27 @@ $summary = [ordered]@{
         site_reach_mission_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/site_reach_mission/site_reach_mission_latest.json'
         site_reach_mission_latest_md = 'INSTITUTIONAL_STACK_V2/out/ops/site_reach_mission/site_reach_mission_latest.md'
         site_reach_mission_heartbeat_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/site_reach_mission/site_reach_mission_heartbeat_latest.json'
+        master_valuation_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/master_valuation/master_valuation_latest.json'
+        master_valuation_latest_md = 'INSTITUTIONAL_STACK_V2/out/ops/master_valuation/master_valuation_latest.md'
+        valuation_licensing_scenarios_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/master_valuation/valuation_licensing_scenarios_latest.json'
+        valuation_licensing_scenarios_latest_md = 'INSTITUTIONAL_STACK_V2/out/ops/master_valuation/valuation_licensing_scenarios_latest.md'
+        valuation_licensing_scenarios_latest_csv = 'INSTITUTIONAL_STACK_V2/out/ops/master_valuation/valuation_licensing_scenarios_latest.csv'
+        investor_valuation_brief_latest_md = 'INSTITUTIONAL_STACK_V2/out/ops/master_valuation/investor_valuation_brief_latest.md'
+        investor_valuation_brief_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/master_valuation/investor_valuation_brief_latest.json'
+        premium_dropmic_3min_latest_pptx = 'INSTITUTIONAL_STACK_V2/out/ops/investor_mission_control/premium_dropmic_3min_latest.pptx'
+        premium_dropmic_3min_script_latest_md = 'INSTITUTIONAL_STACK_V2/out/ops/investor_mission_control/premium_dropmic_3min_script_latest.md'
+        premium_dropmic_3min_pack_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/investor_mission_control/premium_dropmic_3min_pack_latest.json'
+        premium_dropmic_3min_visuals_latest_html = 'INSTITUTIONAL_STACK_V2/out/ops/investor_mission_control/premium_dropmic_3min_visuals_latest.html'
+        frozen_delta_live_surface_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/frozen_delta_truth_chain/deltas/frozen_delta_live_surface_latest.json'
+        frozen_delta_valuation_integrity_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/frozen_delta_truth_chain/deltas/frozen_delta_valuation_integrity_latest.json'
+        frozen_delta_operational_truth_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/frozen_delta_truth_chain/deltas/frozen_delta_operational_truth_latest.json'
+        frozen_delta_snapshot_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/frozen_delta_truth_chain/frozen_delta_snapshot_latest.json'
+        frozen_delta_truth_chain_ledger_jsonl = 'INSTITUTIONAL_STACK_V2/out/ops/frozen_delta_truth_chain/frozen_delta_truth_chain_ledger.jsonl'
+        frozen_delta_truth_chain_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/frozen_delta_truth_chain/frozen_delta_truth_chain_latest.json'
+        frozen_delta_truth_chain_verify_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/frozen_delta_truth_chain/frozen_delta_truth_chain_verify_latest.json'
+        frozen_delta_truth_chain_verify_latest_md = 'INSTITUTIONAL_STACK_V2/out/ops/frozen_delta_truth_chain/frozen_delta_truth_chain_verify_latest.md'
+        frozen_delta_chain_of_custody_latest_sha256_txt = 'INSTITUTIONAL_STACK_V2/out/ops/frozen_delta_truth_chain/frozen_delta_chain_of_custody_latest.sha256.txt'
+        frozen_delta_truth_chain_heartbeat_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/frozen_delta_truth_chain/frozen_delta_truth_chain_heartbeat_latest.json'
         investor_packet_refresh_heartbeat_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/investor_packet_refresh/investor_packet_refresh_heartbeat_latest.json'
         parity_markdown = 'INSTITUTIONAL_STACK_V2/out/ops/dashboard_mirror_parity_latest.md'
     }

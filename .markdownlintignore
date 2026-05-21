@@ -1,0 +1,8 @@
+# Markdownlint Ignore Patterns
+
+out/**
+**/out/**
+**/dashboard/archive/**
+**/dashboard/data/**
+**/tmp/**
+**/temp/**

@@ -1,4 +1,5 @@
 [CmdletBinding()]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Compatibility switches are retained for stable invocation contracts across ops flows.')]
 param(
     [double]$HarvestMinScore = 0.30,
     [double]$FillMinScore = 0.40,
@@ -10,6 +11,7 @@ param(
     [double]$DispatchMinFitScore = 0.42,
     [int]$DispatchLimit = 20,
     [int]$ResponseMaxPerCycle = 120,
+    [switch]$ContextStrict,
     [int]$GrantTop = 8,
     [int]$GrantRows = 180,
     [switch]$NoContextRefreshStrict,
@@ -34,6 +36,10 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+if ($ContextStrict) {
+    $NoContextRefreshStrict = $false
+}
 
 $stackRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $codeDir = Join-Path $stackRoot "code"

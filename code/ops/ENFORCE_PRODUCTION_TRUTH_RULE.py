@@ -314,6 +314,26 @@ def main() -> int:
             (master_val.get("valuation", {}) or {}).get("valuation_increment_usd"),
             0.0,
         ),
+        "grant_and_opportunity_pipeline_value_usd": safe_float(
+            (master_val.get("valuation", {}) or {}).get("grant_and_opportunity_pipeline_value_usd"),
+            0.0,
+        ),
+        "grant_finding_and_ranking_system_license_value_usd": safe_float(
+            (master_val.get("valuation", {}) or {}).get("grant_finding_and_ranking_system_license_value_usd"),
+            0.0,
+        ),
+        "digital_scout_value_usd": safe_float(
+            (master_val.get("valuation", {}) or {}).get("digital_scout_value_usd"),
+            0.0,
+        ),
+        "institutional_trading_system_value_usd": safe_float(
+            (master_val.get("valuation", {}) or {}).get("institutional_trading_system_value_usd"),
+            0.0,
+        ),
+        "validated_engine_autonomy_value_usd": safe_float(
+            (master_val.get("valuation", {}) or {}).get("validated_engine_autonomy_value_usd"),
+            0.0,
+        ),
         "autonomous_grant_event_id": str(grant_manifest.get("event_id") or ""),
         "autonomous_grant_entry_sha256": str(grant_manifest.get("entry_sha256") or ""),
         "grants_queue_total": (

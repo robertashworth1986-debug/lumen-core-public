@@ -14,6 +14,7 @@ PY_VERSION="3.11"
 DASHBOARD_PORT=5016
 API_PORT=8000
 LAMASCOUT_API_PORT=8001
+INTEL_API_PORT=7700
 
 PKG_MGR=""
 PY_BIN=""
@@ -255,6 +256,27 @@ StandardError=append:/var/log/lumencore/dashboard.log
 WantedBy=multi-user.target
 EOF
 
+# --- Cross-Sector Opportunity Intel API ---
+cat > /etc/systemd/system/luma-intel-api.service << EOF
+[Unit]
+Description=Luma Cross-Sector Opportunity Intel API
+After=network.target
+
+[Service]
+Type=simple
+User=lumencore
+WorkingDirectory=/opt/lumencore/code
+Environment="PATH=/opt/lumencore/.venv/bin"
+ExecStart=/opt/lumencore/.venv/bin/python -m uvicorn execution.sector_opp_gain_server:app --host 127.0.0.1 --port ${INTEL_API_PORT}
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/lumencore/sector-intel.log
+StandardError=append:/var/log/lumencore/sector-intel.log
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 # --- Paper Ticker Engine ---
 cat > /etc/systemd/system/luma-paper-ticker.service << 'EOF'
 [Unit]
@@ -277,7 +299,7 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable lamascout-api lamascout-loop luma-dashboard luma-paper-ticker
+systemctl enable lamascout-api lamascout-loop luma-dashboard luma-paper-ticker luma-intel-api
 
 echo "[6/9] Services installed and enabled."
 
@@ -328,6 +350,16 @@ server {
         proxy_http_version 1.1;
         proxy_set_header   Host $host;
         proxy_set_header   X-Real-IP $remote_addr;
+    }
+
+    # --- Cross-Sector Intel API ---
+    location /intel/ {
+        proxy_pass         http://127.0.0.1:7700/;
+        proxy_http_version 1.1;
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
     }
 
     # --- Static out/ directory (proof packs, reports) ---
@@ -382,6 +414,7 @@ echo ""
 echo " Services:"
 echo "   lamascout-api    → https://lumen-core.ai/api/scout/"
 echo "   dashboard        → https://lumen-core.ai/dashboard/"
+echo "   intel api        → https://lumen-core.ai/intel/"
 echo "   proof artifacts  → https://lumen-core.ai/proof/"
 echo ""
 echo " Next steps:"
@@ -389,5 +422,5 @@ echo "   1. Point DNS A record: lumen-core.ai → 157.151.148.234"
 echo "   2. SCP your code from Windows (commands shown in step 5 above)"
 echo "   3. Run certbot for SSL"
 echo "   4. systemctl start luma-paper-ticker lamascout-loop"
-echo "   5. systemctl start lamascout-api luma-dashboard"
+echo "   5. systemctl start lamascout-api luma-dashboard luma-intel-api"
 echo "======================================================"

@@ -1,4 +1,4 @@
-import os, re, csv, json, math, hashlib, statistics
+import os, re, csv, json, math, hashlib, statistics, io, zipfile
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -84,13 +84,28 @@ RUNTIME = read_json(CONF / "runtime_control.json", {})
 PAPER_RUNTIME = read_json(CONF / "paper_trader_runtime.json", {})
 INFRA_RUNTIME = read_json(CONF / "infra_live_runtime.json", {})
 
-DATA_ROOTS = INFRA_RUNTIME.get("data_roots") or [
+DEFAULT_DATA_ROOTS = [
+    r"C:\LumaTrader",
     r"C:\LumaTrader\INSTITUTIONAL_STACK_V2\data",
+    r"C:\LumaTrader\INSTITUTIONAL_STACK_V2\clean_data",
     r"C:\LumaTrader\data",
     str(Path.home() / "iCloudDrive" / "Data sets"),
 ]
 
-DATA_ROOTS = [Path(x) for x in DATA_ROOTS if str(x).strip()]
+configured_roots = INFRA_RUNTIME.get("data_roots") or []
+merged_roots = []
+seen = set()
+for root in list(configured_roots) + DEFAULT_DATA_ROOTS:
+    root_str = str(root or "").strip()
+    if not root_str:
+        continue
+    key = root_str.lower()
+    if key in seen:
+        continue
+    seen.add(key)
+    merged_roots.append(Path(root_str))
+
+DATA_ROOTS = merged_roots
 for p in DATA_ROOTS:
     try:
         p.mkdir(parents=True, exist_ok=True)
@@ -190,57 +205,348 @@ def infer_sector(text):
     if any(k in t for k in ["finnhub","alpha","massive","twelve","polygon","market","equity","stock"]): return "market_data"
     return "unknown"
 
-def scan_csv(path):
+def safe_int(value, default=0):
+    try:
+        return int(value)
+    except Exception:
+        return default
+
+SCAN_LIMIT = max(200, safe_int(INFRA_RUNTIME.get("dataset_scan_limit", os.getenv("LUMA_DATASET_SCAN_LIMIT", "2500")), 2500))
+ZIP_MEMBER_LIMIT = max(20, safe_int(INFRA_RUNTIME.get("zip_member_scan_limit", os.getenv("LUMA_ZIP_MEMBER_SCAN_LIMIT", "200")), 200))
+MAX_TEXT_BYTES = max(1024 * 64, safe_int(INFRA_RUNTIME.get("dataset_max_text_bytes", os.getenv("LUMA_DATASET_MAX_TEXT_BYTES", str(8 * 1024 * 1024))), 8 * 1024 * 1024))
+SKIP_PARTS = {".git", "__pycache__", "node_modules", ".venv", "venv", "venv3.11"}
+SUPPORTED_EXTS = {".csv", ".json", ".jsonl", ".ndjson", ".parquet", ".zip"}
+TS_KEYS = {"timestamp", "time", "date", "datetime", "period", "trading_day", "intervalending", "interval_start", "interval_end", "hourending"}
+VAL_KEYS = {"value", "close", "price", "settle", "demandforecastmwh", "demand", "load", "mw", "volume", "adjclose"}
+
+def pick_ts_col(headers):
+    for h in headers or []:
+        if slug(h) in TS_KEYS:
+            return h
+    return ""
+
+def pick_value_col(headers):
+    for h in headers or []:
+        if slug(h) in VAL_KEYS:
+            return h
+    if headers:
+        return headers[min(len(headers) - 1, 0)]
+    return ""
+
+def scan_csv_fileobj(fileobj):
     rows = 0
     headers = []
     first_ts = ""
     last_ts = ""
-    value_col = ""
+    try:
+        reader = csv.DictReader(fileobj)
+        headers = reader.fieldnames or []
+        ts_col = pick_ts_col(headers)
+        for row in reader:
+            rows += 1
+            if ts_col:
+                tv = str(row.get(ts_col, "")).strip()
+                if tv:
+                    if not first_ts:
+                        first_ts = tv
+                    last_ts = tv
+    except Exception:
+        return {"rows": 0, "headers": [], "first_ts": "", "last_ts": "", "value_col": "", "scan_note": "csv_parse_failed"}
+    return {
+        "rows": rows,
+        "headers": headers,
+        "first_ts": first_ts,
+        "last_ts": last_ts,
+        "value_col": pick_value_col(headers),
+        "scan_note": "ok",
+    }
+
+def scan_csv(path):
     try:
         with Path(path).open("r", encoding="utf-8-sig", errors="ignore", newline="") as f:
-            reader = csv.DictReader(f)
-            headers = reader.fieldnames or []
-            ts_candidates = [h for h in headers if slug(h) in {"timestamp","time","date","datetime","period","trading_day","intervalending","interval_start","interval_end","hourending"}]
-            val_candidates = [h for h in headers if slug(h) in {"value","close","price","settle","demandforecastmwh","demand","load","mw","volume","adjclose"}]
-            if val_candidates:
-                value_col = val_candidates[0]
-            elif headers:
-                value_col = headers[min(len(headers)-1, 0)]
-            ts_col = ts_candidates[0] if ts_candidates else ""
-            for row in reader:
-                rows += 1
-                if ts_col:
-                    tv = str(row.get(ts_col,"")).strip()
-                    if tv:
-                        if not first_ts:
-                            first_ts = tv
-                        last_ts = tv
+            return scan_csv_fileobj(f)
     except Exception:
-        return {"rows":0,"headers":[],"first_ts":"","last_ts":"","value_col":""}
-    return {"rows":rows,"headers":headers,"first_ts":first_ts,"last_ts":last_ts,"value_col":value_col}
+        return {"rows": 0, "headers": [], "first_ts": "", "last_ts": "", "value_col": "", "scan_note": "csv_open_failed"}
+
+def scan_json_text(text):
+    try:
+        payload = json.loads(text)
+    except Exception:
+        return {"rows": 0, "headers": [], "first_ts": "", "last_ts": "", "value_col": "", "scan_note": "json_parse_failed"}
+
+    rows = 0
+    headers = []
+    first_ts = ""
+    last_ts = ""
+
+    if isinstance(payload, list):
+        rows = len(payload)
+        first = payload[0] if payload else {}
+        last = payload[-1] if payload else {}
+        if isinstance(first, dict):
+            headers = list(first.keys())
+            ts_col = pick_ts_col(headers)
+            if ts_col:
+                first_ts = str(first.get(ts_col, "") or "")
+                last_ts = str(last.get(ts_col, "") or "") if isinstance(last, dict) else ""
+    elif isinstance(payload, dict):
+        if isinstance(payload.get("data"), list):
+            rows = len(payload.get("data") or [])
+            first = (payload.get("data") or [{}])[0] if rows else {}
+            last = (payload.get("data") or [{}])[-1] if rows else {}
+            if isinstance(first, dict):
+                headers = list(first.keys())
+                ts_col = pick_ts_col(headers)
+                if ts_col:
+                    first_ts = str(first.get(ts_col, "") or "")
+                    last_ts = str(last.get(ts_col, "") or "") if isinstance(last, dict) else ""
+        else:
+            rows = 1
+            headers = list(payload.keys())
+
+    return {
+        "rows": rows,
+        "headers": headers,
+        "first_ts": first_ts,
+        "last_ts": last_ts,
+        "value_col": pick_value_col(headers),
+        "scan_note": "ok",
+    }
+
+def scan_json(path):
+    p = Path(path)
+    try:
+        if p.stat().st_size > MAX_TEXT_BYTES:
+            return {"rows": 0, "headers": [], "first_ts": "", "last_ts": "", "value_col": "", "scan_note": "json_too_large"}
+        text = p.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return {"rows": 0, "headers": [], "first_ts": "", "last_ts": "", "value_col": "", "scan_note": "json_open_failed"}
+    return scan_json_text(text)
+
+def scan_jsonl(path):
+    rows = 0
+    first_obj = None
+    last_obj = None
+    try:
+        with Path(path).open("r", encoding="utf-8", errors="ignore") as f:
+            for raw in f:
+                line = raw.strip()
+                if not line:
+                    continue
+                try:
+                    obj = json.loads(line)
+                except Exception:
+                    continue
+                rows += 1
+                if first_obj is None:
+                    first_obj = obj
+                last_obj = obj
+                if rows >= 250000:
+                    break
+    except Exception:
+        return {"rows": 0, "headers": [], "first_ts": "", "last_ts": "", "value_col": "", "scan_note": "jsonl_open_failed"}
+
+    headers = list(first_obj.keys()) if isinstance(first_obj, dict) else []
+    ts_col = pick_ts_col(headers)
+    first_ts = str(first_obj.get(ts_col, "") or "") if ts_col and isinstance(first_obj, dict) else ""
+    last_ts = str(last_obj.get(ts_col, "") or "") if ts_col and isinstance(last_obj, dict) else ""
+    return {
+        "rows": rows,
+        "headers": headers,
+        "first_ts": first_ts,
+        "last_ts": last_ts,
+        "value_col": pick_value_col(headers),
+        "scan_note": "ok",
+    }
+
+def scan_parquet(path):
+    try:
+        import pyarrow.parquet as pq
+        pf = pq.ParquetFile(str(path))
+        rows = int(pf.metadata.num_rows) if pf.metadata else 0
+        headers = list(pf.schema.names) if pf.schema else []
+        return {
+            "rows": rows,
+            "headers": headers,
+            "first_ts": "",
+            "last_ts": "",
+            "value_col": pick_value_col(headers),
+            "scan_note": "ok",
+        }
+    except Exception:
+        return {"rows": 0, "headers": [], "first_ts": "", "last_ts": "", "value_col": "", "scan_note": "parquet_parse_failed"}
+
+def scan_by_suffix(path, suffix):
+    s = (suffix or "").lower()
+    if s == ".csv":
+        return scan_csv(path)
+    if s == ".json":
+        return scan_json(path)
+    if s in {".jsonl", ".ndjson"}:
+        return scan_jsonl(path)
+    if s == ".parquet":
+        return scan_parquet(path)
+    return {"rows": 0, "headers": [], "first_ts": "", "last_ts": "", "value_col": "", "scan_note": "unsupported"}
+
+def scan_zip(path):
+    rows = []
+    try:
+        with zipfile.ZipFile(path, "r") as zf:
+            scanned = 0
+            for member in zf.infolist():
+                if scanned >= ZIP_MEMBER_LIMIT:
+                    break
+                if member.is_dir():
+                    continue
+                member_path = Path(member.filename)
+                suffix = member_path.suffix.lower()
+                if suffix not in {".csv", ".json", ".jsonl", ".ndjson"}:
+                    continue
+
+                scanned += 1
+                info = {"rows": 0, "headers": [], "first_ts": "", "last_ts": "", "value_col": "", "scan_note": "zip_member_unparsed"}
+                try:
+                    with zf.open(member, "r") as f:
+                        if suffix == ".csv":
+                            text_stream = io.TextIOWrapper(f, encoding="utf-8-sig", errors="ignore", newline="")
+                            info = scan_csv_fileobj(text_stream)
+                        else:
+                            if member.file_size > MAX_TEXT_BYTES:
+                                info = {"rows": 0, "headers": [], "first_ts": "", "last_ts": "", "value_col": "", "scan_note": "zip_member_too_large"}
+                            else:
+                                text = f.read().decode("utf-8", errors="ignore")
+                                info = scan_json_text(text) if suffix == ".json" else scan_jsonl_text(text)
+                except Exception:
+                    info = {"rows": 0, "headers": [], "first_ts": "", "last_ts": "", "value_col": "", "scan_note": "zip_member_parse_failed"}
+
+                rows.append(
+                    {
+                        "path": f"{path}!{member.filename}",
+                        "archive_path": str(path),
+                        "name": member_path.name,
+                        "stem": member_path.stem,
+                        "sector": infer_sector(member.filename),
+                        "rows": int(info.get("rows", 0) or 0),
+                        "value_col": info.get("value_col", ""),
+                        "first_ts": info.get("first_ts", ""),
+                        "last_ts": info.get("last_ts", ""),
+                        "format": suffix.lstrip("."),
+                        "in_archive": True,
+                        "bytes": int(member.file_size or 0),
+                        "scan_note": info.get("scan_note", ""),
+                    }
+                )
+    except Exception:
+        pass
+    return rows
+
+def scan_jsonl_text(text):
+    rows = 0
+    first_obj = None
+    last_obj = None
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        try:
+            obj = json.loads(line)
+        except Exception:
+            continue
+        rows += 1
+        if first_obj is None:
+            first_obj = obj
+        last_obj = obj
+        if rows >= 250000:
+            break
+    headers = list(first_obj.keys()) if isinstance(first_obj, dict) else []
+    ts_col = pick_ts_col(headers)
+    first_ts = str(first_obj.get(ts_col, "") or "") if ts_col and isinstance(first_obj, dict) else ""
+    last_ts = str(last_obj.get(ts_col, "") or "") if ts_col and isinstance(last_obj, dict) else ""
+    return {
+        "rows": rows,
+        "headers": headers,
+        "first_ts": first_ts,
+        "last_ts": last_ts,
+        "value_col": pick_value_col(headers),
+        "scan_note": "ok",
+    }
 
 dataset_rows = []
+scan_stats = {
+    "scan_limit": SCAN_LIMIT,
+    "zip_member_limit": ZIP_MEMBER_LIMIT,
+    "max_text_bytes": MAX_TEXT_BYTES,
+    "roots_scanned": 0,
+    "files_considered": 0,
+    "files_measured": 0,
+    "zip_members_measured": 0,
+}
+
+measured_files = 0
 for root in DATA_ROOTS:
+    if measured_files >= SCAN_LIMIT:
+        break
     if not root.exists():
         continue
-    for p in root.rglob("*.csv"):
-        info = scan_csv(p)
-        dataset_rows.append({
-            "path": str(p),
-            "name": p.name,
-            "stem": p.stem,
-            "sector": infer_sector(p.name),
-            "rows": info["rows"],
-            "value_col": info["value_col"],
-            "first_ts": info["first_ts"],
-            "last_ts": info["last_ts"],
-        })
+    scan_stats["roots_scanned"] += 1
+    for p in root.rglob("*"):
+        if measured_files >= SCAN_LIMIT:
+            break
+        if not p.is_file():
+            continue
+        parts = {x.lower() for x in p.parts}
+        if any(skip in parts for skip in SKIP_PARTS):
+            continue
 
-write_json(OUT / "dataset_catalog.json", {
-    "generated_utc": now_utc(),
-    "data_roots": [str(x) for x in DATA_ROOTS],
-    "files": dataset_rows
-})
+        suffix = p.suffix.lower()
+        if suffix not in SUPPORTED_EXTS:
+            continue
+
+        scan_stats["files_considered"] += 1
+        if suffix == ".zip":
+            zip_rows = scan_zip(p)
+            dataset_rows.extend(zip_rows)
+            scan_stats["zip_members_measured"] += len(zip_rows)
+            measured_files += 1
+            scan_stats["files_measured"] += 1
+            continue
+
+        info = scan_by_suffix(p, suffix)
+        dataset_rows.append(
+            {
+                "path": str(p),
+                "archive_path": "",
+                "name": p.name,
+                "stem": p.stem,
+                "sector": infer_sector(p.name),
+                "rows": int(info.get("rows", 0) or 0),
+                "value_col": info.get("value_col", ""),
+                "first_ts": info.get("first_ts", ""),
+                "last_ts": info.get("last_ts", ""),
+                "format": suffix.lstrip("."),
+                "in_archive": False,
+                "bytes": int((p.stat().st_size if p.exists() else 0) or 0),
+                "scan_note": info.get("scan_note", ""),
+            }
+        )
+        measured_files += 1
+        scan_stats["files_measured"] += 1
+
+format_counts = {}
+for row in dataset_rows:
+    fmt = str(row.get("format", "unknown")).lower() or "unknown"
+    format_counts[fmt] = format_counts.get(fmt, 0) + 1
+
+write_json(
+    OUT / "dataset_catalog.json",
+    {
+        "generated_utc": now_utc(),
+        "data_roots": [str(x) for x in DATA_ROOTS],
+        "scan": scan_stats,
+        "formats": format_counts,
+        "files": dataset_rows,
+    },
+)
 
 SOURCE_MATCH_RULES = {
     "ALPACA":      ["alpaca","paper_trade","paper_execution","broker"],

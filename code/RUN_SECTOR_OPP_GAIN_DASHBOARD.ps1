@@ -4,6 +4,7 @@
 #  Opens : http://localhost:7700
 # ═══════════════════════════════════════════════════════════════════════════
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseUsingScopeModifierInNewRunspaces', '', Justification = 'Start-Job script block uses explicit $using: scope variables.')]
 param(
     [switch]$Detach,
     [int]$Port = 7700
@@ -66,14 +67,17 @@ if ($Detach) {
         exit 0
     }
 
-    # Launch server in background job so we can open the browser
+    # Launch server in a background process so we can open the browser
     Write-Host "  Starting server…" -ForegroundColor Yellow
 
-    $job = Start-Job -ScriptBlock {
-        param($py, $code, $port)
-        Set-Location $code
-        & $py -m uvicorn execution.sector_opp_gain_server:app --host 0.0.0.0 --port $port 2>&1
-    } -ArgumentList $VENV_PYTHON, $CODE, $Port
+    $startArgs = @{
+        FilePath = $VENV_PYTHON
+        ArgumentList = "-m uvicorn execution.sector_opp_gain_server:app --host 0.0.0.0 --port $Port"
+        WorkingDirectory = $CODE
+        WindowStyle = 'Minimized'
+        PassThru = $true
+    }
+    $serverProc = Start-Process @startArgs
 
     # Wait for server to become ready (up to 12s)
     $ready = $false
@@ -96,23 +100,7 @@ if ($Detach) {
     Start-Process "http://localhost:$Port"
     Write-Host "  Browser opened → http://localhost:$Port" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "  [Press Ctrl+C to stop]" -ForegroundColor Magenta
+    Write-Host "  Server running in background (PID: $($serverProc.Id))." -ForegroundColor Green
+    Write-Host "  Stop command: Stop-Process -Id $($serverProc.Id)" -ForegroundColor Magenta
     Write-Host ""
-
-    # Stream server output to console until stopped
-    try {
-        while ($true) {
-            $out = Receive-Job $job 2>&1
-            if ($out) { $out | ForEach-Object { Write-Host "  $_" } }
-
-            if ($job.State -eq 'Failed' -or $job.State -eq 'Stopped') {
-                Write-Host "  Server process ended (state: $($job.State))." -ForegroundColor Red
-                break
-            }
-            Start-Sleep -Milliseconds 800
-        }
-    } finally {
-        Remove-Job $job -Force -ErrorAction SilentlyContinue
-        Write-Host "  Dashboard stopped." -ForegroundColor Yellow
-    }
 }
