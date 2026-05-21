@@ -1,0 +1,27 @@
+{
+  "generated_utc": "2026-05-21T15:13:28.362971+00:00",
+  "scope": "staples_upgrade_repo_tracked",
+  "root": "INSTITUTIONAL_STACK_V2/staples_upgrade_2026-05-21",
+  "links": {
+    "investor": "https://lumen-core.ai/mission_control.html?lane=investor&src=staples2026_investor",
+    "partner": "https://lumen-core.ai/mission_control.html?lane=partner&src=staples2026_partner",
+    "customer": "https://lumen-core.ai/mission_control.html?lane=customer&src=staples2026_customer",
+    "health": "https://lumen-core.ai/health?src=staples2026_health",
+    "snapshot": "https://lumen-core.ai/api/snapshot?src=staples2026_snapshot"
+  },
+  "files": [
+    "INSTITUTIONAL_STACK_V2/staples_upgrade_2026-05-21/STAPLES_BANNER_8x3_HOLOGRAPHIC_2026-05-21.html",
+    "INSTITUTIONAL_STACK_V2/staples_upgrade_2026-05-21/STAPLES_BUSINESS_CARDS_ULTRA_2026-05-21.html",
+    "INSTITUTIONAL_STACK_V2/staples_upgrade_2026-05-21/STAPLES_FLYER_HOLOGRAPHIC_2026-05-21.html",
+    "INSTITUTIONAL_STACK_V2/staples_upgrade_2026-05-21/STAPLES_PITCH_DECK_ULTRA_2026-05-21.pptx",
+    "INSTITUTIONAL_STACK_V2/staples_upgrade_2026-05-21/STAPLES_PITCH_SCRIPT_ULTRA_2026-05-21.md",
+    "INSTITUTIONAL_STACK_V2/staples_upgrade_2026-05-21/STAPLES_POWERPOINT_STYLE_GUIDE_2026-05-21.md"
+  ],
+  "qr_files": [
+    "INSTITUTIONAL_STACK_V2/staples_upgrade_2026-05-21/qr/qr_customer.svg",
+    "INSTITUTIONAL_STACK_V2/staples_upgrade_2026-05-21/qr/qr_health.svg",
+    "INSTITUTIONAL_STACK_V2/staples_upgrade_2026-05-21/qr/qr_investor.svg",
+    "INSTITUTIONAL_STACK_V2/staples_upgrade_2026-05-21/qr/qr_partner.svg",
+    "INSTITUTIONAL_STACK_V2/staples_upgrade_2026-05-21/qr/qr_snapshot.svg"
+  ]
+}

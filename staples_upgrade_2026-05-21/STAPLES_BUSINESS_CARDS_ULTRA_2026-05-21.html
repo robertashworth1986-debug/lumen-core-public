@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>LumenCore Business Cards - Ultra Tech</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap');
+:root{--bg:#0B1117;--bg2:#101A24;--neon:#00E6C3;--electric:#32B8FF;--fire:#FF6A2A;--ink:#F3F8FF;}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 10% 10%,rgba(0,230,195,.16),transparent 34%),radial-gradient(circle at 88% 20%,rgba(50,184,255,.22),transparent 36%),linear-gradient(160deg,var(--bg),var(--bg2));font-family:'Space Grotesk',sans-serif;color:var(--ink);padding:18px}
+.sheet{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{aspect-ratio:3.5/2;border-radius:16px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.2);box-shadow:0 26px 60px rgba(0,0,0,.45);background:linear-gradient(135deg,rgba(15,27,37,.85),rgba(9,18,24,.95));}
+.card::before{content:'';position:absolute;inset:-20%;background:conic-gradient(from 190deg,transparent 0 40%,rgba(0,230,195,.24) 42% 48%,transparent 50% 80%,rgba(255,106,42,.22) 82% 88%,transparent 90%);filter:blur(2px);animation:spin 8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.inner{position:relative;z-index:2;padding:16px;height:100%;display:flex;flex-direction:column;justify-content:space-between}
+.brand{font-family:'Orbitron',sans-serif;font-size:1.1rem;letter-spacing:.08em;font-weight:800}
+.tag{font-size:.76rem;opacity:.92;max-width:55ch}
+.line{height:2px;width:100%;background:linear-gradient(90deg,var(--neon),var(--electric),var(--fire));opacity:.9;margin:10px 0}
+.name{font-weight:700;font-size:1rem} .role{font-size:.78rem;opacity:.92}
+.meta{font-size:.72rem;display:grid;gap:3px;opacity:.94}
+.qr{position:absolute;right:14px;bottom:14px;width:74px;height:74px;border-radius:10px;background:#fff;padding:5px;z-index:3;box-shadow:0 0 0 2px rgba(0,230,195,.36),0 12px 24px rgba(0,0,0,.45)}
+.back-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center;height:100%}
+.back h2{font-family:'Orbitron',sans-serif;margin:0;font-size:1rem;letter-spacing:.06em} .tiny{font-size:.68rem;opacity:.9;line-height:1.45}
+.scan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.scan{display:flex;gap:6px;align-items:center;background:rgba(255,255,255,.06);padding:6px;border-radius:8px}
+.scan img{width:34px;height:34px;background:#fff;border-radius:6px;padding:3px} .scan span{font-size:.66rem}
+@media print{body{padding:0;background:#fff} .sheet{max-width:none;gap:10px;padding:8px} .card{break-inside:avoid;box-shadow:none;border:1px solid #ccc}}
+</style></head><body>
+<div class="sheet">
+  <section class="card"><div class="inner"><div><div class="brand">LUMENCORE AI COMMAND</div><div class="tag">Government-grade multi-domain intelligence, execution control, and measurable trust surfaces.</div><div class="line"></div></div><div><div class="name">Robert Ashworth</div><div class="role">Founder | LumaTrader / LumenCore</div><div class="meta"><span>Live Demo: lumen-core.ai/mission_control.html</span><span>UEI SQY2XW71ZM51 | CAGE 14TM8 | USPTO 19/281,546</span><span>Book 20-min diligence via investor QR</span></div></div></div><img class="qr" src="qr/qr_investor.svg" alt="Investor QR"></section>
+  <section class="card back"><div class="inner"><div class="back-grid"><div><h2>SCAN LANES</h2><p class="tiny">Investor, partner, customer, health, and live snapshot all mapped to campaign tracking for same-day follow-up.</p><p class="tiny">Use this card for conference follow-through and fast qualification.</p></div><div class="scan-grid"><div class="scan"><img src="qr/qr_investor.svg"><span>Investor</span></div><div class="scan"><img src="qr/qr_partner.svg"><span>Partner</span></div><div class="scan"><img src="qr/qr_customer.svg"><span>Customer</span></div><div class="scan"><img src="qr/qr_health.svg"><span>Health</span></div></div></div></div></section>
+  <section class="card"><div class="inner"><div><div class="brand">LUMATRADER ALPHA ENGINE</div><div class="tag">Signal ranking, portfolio risk gates, and evidence-first operations in one execution stack.</div><div class="line"></div></div><div><div class="name">AI + Quant Mission Brief</div><div class="role">Institutional, Federal, Investor-ready</div><div class="meta"><span>Site: lumen-core.ai</span><span>Snapshot API + health live</span><span>Scan to run full diligence flow</span></div></div></div><img class="qr" src="qr/qr_snapshot.svg" alt="Snapshot QR"></section>
+  <section class="card back"><div class="inner"><div><h2 style="margin:0;font-family:Orbitron,sans-serif;letter-spacing:.06em">LIVE VALUE NARRATIVE</h2><p class="tiny">We convert fragmented data into operator action with controls, audits, and economic traceability. This is not a static dashboard product; it is a continuous decision infrastructure layer.</p><p class="tiny">Ask for the three-minute measured-value walkthrough.</p></div></div></section>
+</div>
+</body></html>

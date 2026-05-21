@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>LumenCore Holographic Flyer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Orbitron:wght@500;700&display=swap');
+:root{--base:#0B1117;--base2:#101A24;--c1:#00E6C3;--c2:#32B8FF;--c3:#FF6A2A;--ink:#F3F8FF;}
+*{box-sizing:border-box} html,body{margin:0} body{font-family:'Sora',sans-serif;background:linear-gradient(160deg,var(--base),var(--base2));color:var(--ink);}
+.page{width:8.5in;min-height:11in;margin:0 auto;padding:.42in;position:relative;overflow:hidden;background:radial-gradient(circle at 15% 8%,rgba(0,230,195,.22),transparent 38%),radial-gradient(circle at 85% 15%,rgba(50,184,255,.24),transparent 40%),linear-gradient(165deg,#0c141d,#0f1d2a 55%,#111926)}
+.gridline{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);background-size:34px 34px;mask:linear-gradient(180deg,rgba(0,0,0,.95),rgba(0,0,0,.2));pointer-events:none}
+.hero{position:relative;z-index:2;border:1px solid rgba(255,255,255,.25);border-radius:18px;padding:24px;background:linear-gradient(130deg,rgba(13,25,34,.84),rgba(11,18,24,.9));box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.badge{display:inline-block;padding:6px 12px;border-radius:999px;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;background:linear-gradient(90deg,var(--c1),var(--c2));color:#00161a;font-weight:800}
+h1{font-family:'Orbitron',sans-serif;font-size:34px;line-height:1.12;letter-spacing:.04em;margin:14px 0 12px}
+.sub{font-size:13.5px;line-height:1.55;max-width:72ch;color:#dbe8f5}
+.cols{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:16px}
+.panel{border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:14px;background:rgba(255,255,255,.04)}
+.panel h3{margin:0 0 8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#8ef2df}
+ul{margin:8px 0 0 18px;padding:0;line-height:1.52;font-size:12.5px}
+.qrwall{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.qrbox{background:#fff;border-radius:10px;padding:8px;text-align:center;color:#111}
+.qrbox img{width:100%;aspect-ratio:1/1}
+.qrbox div{font-size:10px;font-weight:700;margin-top:4px}
+.foot{display:flex;justify-content:space-between;gap:12px;margin-top:14px;font-size:10.8px;color:#bcd2e8}
+@media print{.page{margin:0;box-shadow:none}}
+</style></head><body><main class="page"><div class="gridline"></div>
+<section class="hero"><span class="badge">Live Intelligence Infrastructure</span><h1>LUMENCORE: GEOMETRIC + HOLOGRAPHIC COMMAND LAYER</h1>
+<p class="sub">A high-velocity decision and execution platform that transforms fragmented market and infrastructure data into measured action with operator controls, evidence chains, and valuation-aware intelligence surfaces.</p>
+<div class="cols"><article class="panel"><h3>Why It Wins</h3><ul><li>Real-time scoring across multiple data streams with visible decision logic.</li><li>Audit-safe proof outputs for investor, federal, and enterprise diligence.</li><li>Command dashboards + API delivery for operations, not slideware.</li><li>Live breadth, health, and valuation surfaces linked to measurable outputs.</li></ul><h3 style="margin-top:12px">Current Positioning</h3><ul><li>SaaS + licensing + mission control deployment model.</li><li>Institutional and government-ready narrative backed by proof artifacts.</li><li>Rapid pilot conversion path: 20-minute fit call to scoped implementation.</li></ul></article>
+<aside class="panel"><h3>Scan Live Lanes</h3><div class="qrwall"><div class="qrbox"><img src="qr/qr_investor.svg"><div>Investor</div></div><div class="qrbox"><img src="qr/qr_partner.svg"><div>Partner</div></div><div class="qrbox"><img src="qr/qr_customer.svg"><div>Customer</div></div><div class="qrbox"><img src="qr/qr_snapshot.svg"><div>Snapshot API</div></div></div></aside></div>
+<div class="foot"><span>UEI SQY2XW71ZM51 | CAGE 14TM8 | USPTO 19/281,546</span><span>lumen-core.ai</span></div>
+</section></main></body></html>

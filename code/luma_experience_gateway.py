@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import atexit
 import asyncio
 import copy
@@ -63,6 +64,14 @@ try:
     _PROMETHEUS_AVAILABLE = True
 except ImportError:
     _PROMETHEUS_AVAILABLE = False
+
+try:
+    import edge_tts
+
+    _EDGE_TTS_AVAILABLE = True
+except ImportError:
+    edge_tts = None
+    _EDGE_TTS_AVAILABLE = False
 
 try:
     from prometheus_client import CONTENT_TYPE_LATEST, REGISTRY, Counter, Gauge, generate_latest
@@ -970,6 +979,13 @@ class GuideRequest(BaseModel):
     mode: str = "concierge"
 
 
+class VoiceSynthesizeRequest(BaseModel):
+    text: str
+    profile: str = "luma_pitch"
+    rate: float = 1.0
+    pitch: float = 1.0
+
+
 class SessionEvent(BaseModel):
     event: str
     source: str = "web"
@@ -1001,6 +1017,72 @@ class CueScenarioRunRequest(BaseModel):
     repeat: int = 1
     hint: str = ""
     detail: dict[str, Any] = {}
+
+
+VOICE_PROFILE_PRESETS: dict[str, dict[str, str]] = {
+    "luma_pitch": {
+        "voice": "en-US-JennyNeural",
+        "description": "Warm premium pitch voice",
+    },
+    "luma_operator": {
+        "voice": "en-US-GuyNeural",
+        "description": "Crisp operator brief voice",
+    },
+    "luma_analyst": {
+        "voice": "en-US-AriaNeural",
+        "description": "Measured analyst voice",
+    },
+}
+
+
+def _clean_tts_text(raw: str) -> str:
+    text = " ".join(str(raw or "").strip().split())
+    max_chars_raw = os.getenv("LUMA_TTS_MAX_CHARS", "3200")
+    try:
+        max_chars = max(200, min(10000, int(max_chars_raw)))
+    except Exception:
+        max_chars = 3200
+    return text[:max_chars]
+
+
+def _edge_rate_from_multiplier(rate: float) -> str:
+    try:
+        mult = float(rate)
+    except Exception:
+        mult = 1.0
+    mult = max(0.5, min(1.8, mult))
+    pct = int(round((mult - 1.0) * 100.0))
+    return f"{pct:+d}%"
+
+
+def _edge_pitch_from_multiplier(pitch: float) -> str:
+    try:
+        mult = float(pitch)
+    except Exception:
+        mult = 1.0
+    mult = max(0.7, min(1.4, mult))
+    hz = int(round((mult - 1.0) * 24.0))
+    return f"{hz:+d}Hz"
+
+
+async def _synthesize_edge_tts_bytes(*, text: str, voice: str, rate: str, pitch: str) -> bytes:
+    if not _EDGE_TTS_AVAILABLE or edge_tts is None:
+        return b""
+    communicator = edge_tts.Communicate(
+        text=text,
+        voice=voice,
+        rate=rate,
+        volume="+0%",
+        pitch=pitch,
+    )
+    chunks: list[bytes] = []
+    async for chunk in communicator.stream():
+        if chunk.get("type") != "audio":
+            continue
+        data = chunk.get("data")
+        if isinstance(data, (bytes, bytearray)) and data:
+            chunks.append(bytes(data))
+    return b"".join(chunks)
 
 
 DEFAULT_SCENE_VISUAL_PROFILES: dict[str, Any] = {
@@ -2340,6 +2422,58 @@ def guide_respond(req: GuideRequest) -> dict[str, Any]:
     memory["guide_history"] = history
     save_session_memory(memory)
     return {"generated_utc": now_utc(), "mode": req.mode, "response": message, "history_size": len(history)}
+
+
+@app.post("/api/voice/synthesize")
+async def voice_synthesize(req: VoiceSynthesizeRequest) -> dict[str, Any]:
+    text = _clean_tts_text(req.text)
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+
+    profile_key = str(req.profile or "luma_pitch").strip().lower()
+    profile = VOICE_PROFILE_PRESETS.get(profile_key) or VOICE_PROFILE_PRESETS["luma_pitch"]
+
+    if not _EDGE_TTS_AVAILABLE:
+        return {
+            "status": "not_ready",
+            "provider": "edge-tts",
+            "error": "edge-tts package not installed",
+            "hint": "Install edge-tts in the active Python environment to enable neural narration.",
+            "generated_utc": now_utc(),
+        }
+
+    rate = _edge_rate_from_multiplier(req.rate)
+    pitch = _edge_pitch_from_multiplier(req.pitch)
+    voice_name = str(profile.get("voice") or "en-US-JennyNeural")
+
+    try:
+        audio_bytes = await _synthesize_edge_tts_bytes(
+            text=text,
+            voice=voice_name,
+            rate=rate,
+            pitch=pitch,
+        )
+        if not audio_bytes:
+            raise RuntimeError("empty audio output")
+    except Exception as exc:
+        return {
+            "status": "error",
+            "provider": "edge-tts",
+            "error": f"tts_synthesis_failed: {exc}",
+            "generated_utc": now_utc(),
+        }
+
+    return {
+        "status": "ok",
+        "provider": "edge-tts",
+        "profile": profile_key,
+        "voice": voice_name,
+        "description": profile.get("description", ""),
+        "mime_type": "audio/mpeg",
+        "audio_base64": base64.b64encode(audio_bytes).decode("ascii"),
+        "char_count": len(text),
+        "generated_utc": now_utc(),
+    }
 
 
 # ── Investor Command-Room endpoints ──────────────────────────────────────────
