@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Luma Healthcare Grants Widget Example</title>
+  <style>
+    :root {
+      --mw-blue: #48afe5;
+      --mw-blue-dark: #4f8bc9;
+      --mw-navy: #0d2a3d;
+      --mw-off-white: #f9fbf7;
+      --mw-light-gray: #f6f6f6;
+      --mw-light-blue-tint: #e2ebf2;
+      --mw-coral: #ff6c52;
+      --mw-coral-hover: #e85a42;
+      --mw-text: #0d2a3d;
+      --mw-text-light: #5a6d7a;
+
+      --mindwise-primary: var(--mw-navy);
+      --mindwise-secondary: var(--mw-blue-dark);
+      --mindwise-border: #d7e4ee;
+      --mindwise-link-bg: #eef6fb;
+      --mindwise-link-text: var(--mw-text);
+      --mindwise-link-border: var(--mw-blue);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Geist", "Geist Fallback", Arial, Helvetica, sans-serif;
+      color: var(--mw-text);
+      background:
+        radial-gradient(1100px 550px at 10% 0%, rgba(72, 175, 229, 0.24) 0%, rgba(72, 175, 229, 0) 62%),
+        radial-gradient(1000px 500px at 90% 100%, rgba(255, 108, 82, 0.16) 0%, rgba(255, 108, 82, 0) 58%),
+        var(--mw-off-white);
+      padding: 24px;
+    }
+
+    .demo-shell {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero {
+      border: 1px solid #dbe8f1;
+      border-radius: 18px;
+      padding: 20px 22px;
+      background: linear-gradient(136deg, #ffffff 0%, #f7fbfe 52%, #fef8f7 100%);
+      box-shadow: 0 14px 30px rgba(2, 6, 23, 0.06);
+    }
+
+    .hero .eyebrow {
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 11px;
+      color: var(--mw-blue);
+      font-weight: 800;
+    }
+
+    .hero h1 {
+      margin: 8px 0 6px 0;
+      font-size: clamp(22px, 4vw, 34px);
+      line-height: 1.1;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--mw-text-light);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 12px;
+      }
+
+      .hero {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="demo-shell">
+    <section class="hero">
+      <p class="eyebrow">MindWise Health</p>
+      <h1>Grant Growth Command</h1>
+      <p>
+        This is a native-style embed of Luma healthcare grant intelligence. It is designed to blend with host brand styles while preserving direct submit routing, AI-assisted draft flow, and full-console escalation.
+      </p>
+    </section>
+
+    <div
+      data-luma-healthcare-feed="../../out/ops/healthcare_grants_engine/healthcare_website_feed_latest.json"
+      data-luma-title="MindWise Healthcare Grant Radar"
+      data-luma-max="6"
+      data-luma-grants-console="../grants.html"
+      data-luma-theme="mindwise"
+      data-luma-density="cozy"
+      data-luma-new-tab="1"
+    ></div>
+  </main>
+
+  <script src="../js/luma_healthcare_grants_embed.js"></script>
+</body>
+</html>

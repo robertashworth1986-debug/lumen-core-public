@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
+from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 
@@ -326,10 +327,28 @@ def _fit_status(
     return "FIT_LIKELY", "passes_profile_gates"
 
 
-def _submit_url(opp_num: str, is_skip: bool) -> str:
+def _submit_url(opp_num: str, is_skip: bool, fallback_url: str = "") -> str:
     if is_skip:
         return "https://helloskip.com/"
-    return f"https://simpler.grants.gov/search?query={opp_num}"
+
+    source = str(fallback_url or "").strip()
+    source_norm = _norm(source)
+    if source and source.startswith("http"):
+        if (
+            "grants.gov/search-results-detail/" in source_norm
+            or "simpler.grants.gov/opportunity/" in source_norm
+            or "smartsimple" in source_norm
+        ):
+            return source
+
+    token = str(opp_num or "").strip()
+    if token:
+        return f"https://www.grants.gov/search-results-detail/{quote(token)}"
+
+    if source and source.startswith("http"):
+        return source
+
+    return "https://www.grants.gov/search-grants"
 
 
 def _find_skip_variant(skip_payload: dict[str, Any], opp_num: str, title: str) -> dict[str, Any]:
@@ -421,6 +440,7 @@ def build_pack(state: str, limit: int) -> dict[str, Any]:
     for row in selected:
         opp = _as_dict(row.get("opportunity"))
         opp_num = str(opp.get("opp_num") or "")
+        opp_url = str(opp.get("url") or "")
         title = str(opp.get("title") or "")
         agency = str(opp.get("agency") or "")
         close_date = str(opp.get("close_date") or "")
@@ -571,7 +591,7 @@ def build_pack(state: str, limit: int) -> dict[str, Any]:
                 "days_to_close": days_to_close,
                 "award_ceiling_usd": award_ceiling,
                 "source_channel": "skip" if is_skip else "grants_gov",
-                "submit_url": _submit_url(opp_num, is_skip=is_skip),
+                "submit_url": _submit_url(opp_num, is_skip=is_skip, fallback_url=opp_url),
                 "fit_status": fit_status,
                 "fit_reason": fit_reason,
                 "blueprint_alignment_score": blueprint_alignment_score,

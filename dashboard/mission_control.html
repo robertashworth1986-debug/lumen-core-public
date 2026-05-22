@@ -238,6 +238,41 @@
   .grants-list .row + .row { margin-top: 4px; }
   .grants-list .agency { font-weight: 600; }
   .grants-list .program { color: var(--ink-dim); font-size: 11px; }
+  .grants-list .route-hint {
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-dim);
+    opacity: 0.9;
+  }
+  .grant-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .grant-action-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    color: var(--neon-c);
+    text-decoration: none;
+    border: 1px solid rgba(34, 211, 238, 0.45);
+    border-radius: 6px;
+    padding: 4px 7px;
+    background: rgba(34, 211, 238, 0.06);
+  }
+  .grant-action-link.submit {
+    color: var(--neon-g);
+    border-color: rgba(52, 211, 153, 0.5);
+    background: rgba(52, 211, 153, 0.08);
+  }
+  .grant-action-link.ai {
+    color: var(--neon-a);
+    border-color: rgba(245, 158, 11, 0.45);
+    background: rgba(245, 158, 11, 0.08);
+  }
   .pill {
     padding: 2px 8px; border-radius: 99px; font-size: 9px;
     font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;
@@ -826,6 +861,7 @@
     .big-num { font-size: clamp(30px, 11vw, 42px); }
     .pipe-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .grants-list .row { grid-template-columns: 1fr; gap: 6px; }
+    .grant-actions { justify-content: flex-start; }
     .status-grid { grid-template-columns: 1fr; }
     .status-grid .v { text-align: left; }
     .layer-bar { flex-wrap: wrap; }
@@ -1339,11 +1375,13 @@ const LOCAL_OPPORTUNITIES = `${LOCAL_OUT}/opportunities`;
 const DEFAULT_RUN_UTC = '20260511T175644Z';
 const EXTERNAL_SUBMISSIONS_LEDGER_REL = 'ops/grants_live_submission_ledger_latest.json';
 const HEALTHCARE_POC_FORECAST_REL = 'ops/healthcare_grants_poc/healthcare_grants_poc_forecast_latest.json';
+const GRANT_SUBMIT_FIT_PACK_REL = 'ops/grant_submit_fit_pack/grant_submit_fit_pack_latest.json';
 
 let localQueueCache = null;
 let localEvidenceCache = null;
 let localEvidenceLatestRunCache = null;
 let externalGrantLedgerCache = undefined;
+const grantSubmitUrlByOpp = new Map();
 
 function resolveApi(path) {
   if (/^https?:\/\//i.test(path)) return path;
@@ -1399,6 +1437,38 @@ async function fetchFirstJson(paths) {
 
 function normalizeGrantSubmissionStatus(value) {
   return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
+}
+
+function normOpp(value) {
+  return String(value || '').trim().toUpperCase();
+}
+
+function isHttpUrl(value) {
+  return /^https?:\/\//i.test(String(value || ''));
+}
+
+function isUuid(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ''));
+}
+
+function grantSearchUrl(opp) {
+  const token = String(opp || '').trim();
+  if (!token) return 'https://www.grants.gov/search-grants';
+  if (/^SKIP-/i.test(token)) return 'https://helloskip.com/';
+  if (isUuid(token)) return `https://simpler.grants.gov/opportunity/${encodeURIComponent(token)}`;
+  return `https://www.grants.gov/search-results-detail/${encodeURIComponent(token)}`;
+}
+
+async function loadGrantSubmitFitPack() {
+  if (grantSubmitUrlByOpp.size > 0) return;
+  const pack = await fetchFirstJson(outCandidates(GRANT_SUBMIT_FIT_PACK_REL));
+  if (!pack || typeof pack !== 'object') return;
+  const opps = Array.isArray(pack.opportunities) ? pack.opportunities : [];
+  opps.forEach((op) => {
+    const key = normOpp(op?.opp_num);
+    const url = String(op?.submit_url || '').trim();
+    if (key && isHttpUrl(url)) grantSubmitUrlByOpp.set(key, url);
+  });
 }
 
 function externalGrantRecords(ledger) {
@@ -2287,6 +2357,8 @@ async function loadAll() {
     ...outCandidates(HEALTHCARE_POC_FORECAST_REL),
   ]) || {};
 
+  await loadGrantSubmitFitPack();
+
   const vpsCtrl = await fetchFirstJson([
     ...dashboardCandidates('data/vps_growth_controller_status.json'),
     ...outCandidates('execution/vps_growth_controller_status.json'),
@@ -2544,17 +2616,26 @@ async function loadAll() {
   $('grants-list').innerHTML = (g.items || []).map(it => {
     const stateClass = it.state || 'draft';
     const submitUrl = buildGrantSubmitUrl(it);
+    const consoleUrl = buildGrantConsoleUrl(it, false);
+    const aiFillUrl = buildGrantConsoleUrl(it, true);
+    const routeLabel = grantRouteLabel(submitUrl);
     return `
       <div class="row grant-row" style="cursor:pointer" data-submit-url="${escAttr(submitUrl)}">
         <div>
           <div class="agency">${escHTML(it.agency || it.program_id)}</div>
           <div class="program">${escHTML(it.program || '')}</div>
+          <div class="route-hint">${escHTML(routeLabel)}</div>
         </div>
         <div class="ceiling">$${(it.ceiling_usd || 0).toLocaleString()}</div>
         <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-dim)">
           fit ${((it.score || 0) * 100).toFixed(0)}%
         </div>
-        <span class="pill ${stateClass}">${stateClass}</span>
+        <div class="grant-actions">
+          <a class="grant-action-link submit" href="${escAttr(submitUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Submit ↗</a>
+          <a class="grant-action-link ai" href="${escAttr(aiFillUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">AI Fill</a>
+          <a class="grant-action-link" href="${escAttr(consoleUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Console</a>
+          <span class="pill ${stateClass}">${stateClass}</span>
+        </div>
       </div>`;
   }).join('') || '<div style="color:var(--ink-dim);padding:12px">No grants in pipeline.</div>';
 
@@ -2739,14 +2820,67 @@ function parseOppNumFromGrantUrl(url) {
 }
 
 function buildGrantSubmitUrl(item) {
-  const opp = String(item?.opp_num || parseOppNumFromGrantUrl(item?.url) || '').trim();
-  if (opp) {
-    if (/^SKIP-/i.test(opp)) return 'https://helloskip.com/';
-    return `https://simpler.grants.gov/search?query=${encodeURIComponent(opp)}`;
+  const sourceUrl = String(item?.url || '').trim();
+  const opp = normOpp(item?.opp_num || parseOppNumFromGrantUrl(sourceUrl) || '');
+
+  const explicit = String(item?.submit_url || item?.portal_url || item?.submission_url || '').trim();
+  if (isHttpUrl(explicit)) return explicit;
+
+  if (opp && grantSubmitUrlByOpp.has(opp)) {
+    return String(grantSubmitUrlByOpp.get(opp) || '');
   }
+
+  if (/grants\.gov\/search-results-detail\//i.test(sourceUrl)) {
+    return sourceUrl;
+  }
+
+  if (/simpler\.grants\.gov\/opportunity\//i.test(sourceUrl)) {
+    return sourceUrl;
+  }
+
+  if (/smartsimple/i.test(sourceUrl)) {
+    return sourceUrl;
+  }
+
+  if (opp) {
+    return grantSearchUrl(opp);
+  }
+
   const src = String(item?.url || '').trim();
   if (/^https?:\/\//i.test(src)) return src;
   return 'grants.html';
+}
+
+function grantRouteLabel(url) {
+  const target = String(url || '').trim();
+  if (!target) return 'route: none';
+  if (/grants\.gov\/search-results-detail\//i.test(target)) return 'route: grants.gov listing';
+  if (/simpler\.grants\.gov\/opportunity\//i.test(target)) return 'route: simpler listing';
+  if (/simpler\.grants\.gov\/search/i.test(target)) return 'route: simpler search';
+  if (/helloskip\.com/i.test(target)) return 'route: hello skip';
+  if (/smartsimple/i.test(target)) return 'route: SmartSimple';
+  if (/grants\.html/i.test(target)) return 'route: grant console';
+  try {
+    return `route: ${(new URL(target)).hostname}`;
+  } catch {
+    return 'route: external';
+  }
+}
+
+function buildGrantConsoleUrl(item, autoFill = false) {
+  const gid = String(item?.program_id || '').trim();
+  const opp = normOpp(item?.opp_num || parseOppNumFromGrantUrl(item?.url) || '');
+  const params = new URLSearchParams();
+  if (gid) {
+    params.set('grant_id', gid);
+  } else if (opp) {
+    params.set('opp', opp);
+  }
+  if (autoFill) {
+    params.set('auto_fill', '1');
+  }
+  const qs = params.toString();
+  return qs ? `grants.html?${qs}` : 'grants.html';
 }
 
 function openGrantSubmit(url) {
