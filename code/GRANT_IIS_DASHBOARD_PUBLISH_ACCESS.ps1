@@ -9,7 +9,7 @@ function Assert-Admin {
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = New-Object Security.Principal.WindowsPrincipal($identity)
     if (-not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
-        throw 'Run this script from an elevated PowerShell session.'
+     throw 'Run this script from an elevated PowerShell session.'
     }
 }
 

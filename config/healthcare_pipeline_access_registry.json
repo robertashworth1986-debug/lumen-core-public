@@ -1,0 +1,15 @@
+{
+  "schema": "healthcare_pipeline_access_v1",
+  "enabled": true,
+  "operators": [
+    {
+      "label": "friend_operator",
+      "key_id": "hpa_b7870fd667ff",
+      "key_sha256": "cd988248a20ac066e777e722054babf0770f471c14209f1f245a597bcfc130ca",
+      "role": "operator",
+      "created_utc": "2026-05-21T22:59:31.4756639Z",
+      "expires_utc": "2026-09-18T22:59:31.4756639Z",
+      "revoked": false
+    }
+  ]
+}

@@ -820,11 +820,10 @@ class KrakenClient:
             data["price"] = _fmt_price(float(price))
 
         if isinstance(close_template, dict):
-            # Prefer take-profit close for immediate peak-capture behavior,
-            # fallback to stop close when TP is unavailable.
+            # Prefer protective stop close first; fallback to take-profit when stop is unavailable.
             tp_leg = close_template.get("take_profit")
             stop_leg = close_template.get("stop")
-            selected_leg = tp_leg if isinstance(tp_leg, dict) else stop_leg if isinstance(stop_leg, dict) else None
+            selected_leg = stop_leg if isinstance(stop_leg, dict) else tp_leg if isinstance(tp_leg, dict) else None
             if isinstance(selected_leg, dict):
                 close_ordertype = str(selected_leg.get("order_type", "")).strip().lower()
                 close_price = self._to_float(selected_leg.get("trigger_price", 0.0), 0.0)
@@ -1345,6 +1344,9 @@ class RobustLiveExecutor:
         self.global_close_sweep_max_symbols = 12
         self.global_close_sweep_interval_sec = 20.0
         self.last_global_close_sweep_utc = ""
+        self.auto_trip_kill_switch_on_inventory_discrepancy = True
+        self.auto_kill_switch_trip_cooldown_sec = 300.0
+        self.auto_kill_switch_last_trip_utc = ""
 
         self.profit_reinvestment_enabled = True
         self.order_notional_pct = 0.24
@@ -2044,6 +2046,26 @@ class RobustLiveExecutor:
             1.0,
             3600.0,
         )
+        self.auto_trip_kill_switch_on_inventory_discrepancy = bool(
+            runtime.get(
+                "auto_trip_kill_switch_on_inventory_discrepancy",
+                self.auto_trip_kill_switch_on_inventory_discrepancy,
+            )
+        )
+        self.auto_kill_switch_trip_cooldown_sec = self._clamp(
+            self._to_float(
+                runtime.get(
+                    "auto_kill_switch_trip_cooldown_sec",
+                    self.auto_kill_switch_trip_cooldown_sec,
+                ),
+                self.auto_kill_switch_trip_cooldown_sec,
+            ),
+            0.0,
+            86400.0,
+        )
+        self.auto_kill_switch_last_trip_utc = str(
+            runtime.get("safety_auto_kill_trip_utc", self.auto_kill_switch_last_trip_utc) or ""
+        ).strip()
 
         self.risk_kernel.max_daily_loss_usd = max(
             1.0,
@@ -4403,6 +4425,83 @@ class RobustLiveExecutor:
             return
         self.buy_cooldown_until_utc = (now + timedelta(seconds=sec)).isoformat()
 
+    def _auto_kill_switch_cooldown_active(self, now: datetime) -> bool:
+        cooldown_sec = max(float(self.auto_kill_switch_trip_cooldown_sec), 0.0)
+        if cooldown_sec <= 0.0:
+            return False
+        raw = str(self.auto_kill_switch_last_trip_utc or "").strip()
+        if not raw:
+            return False
+        try:
+            last_trip = self._parse_iso_utc(raw)
+        except Exception:
+            return False
+        return (now - last_trip).total_seconds() < cooldown_sec
+
+    def _trip_runtime_kill_switch(
+        self,
+        now: datetime,
+        *,
+        reason: str,
+        symbol: str,
+        details: Optional[dict[str, Any]] = None,
+    ) -> dict[str, Any]:
+        result: dict[str, Any] = {
+            "attempted": bool(self.auto_trip_kill_switch_on_inventory_discrepancy),
+            "applied": False,
+            "already_on": False,
+            "cooldown_active": False,
+            "reason": str(reason or "inventory_discrepancy"),
+            "symbol": str(symbol or "").upper().strip(),
+            "runtime_control": str(RUNTIME_CONTROL_FILE),
+        }
+
+        if not self.auto_trip_kill_switch_on_inventory_discrepancy:
+            result["disabled"] = True
+            return result
+
+        runtime = load_json(RUNTIME_CONTROL_FILE, {})
+        if not isinstance(runtime, dict):
+            runtime = {}
+
+        runtime_kill_switch = bool(runtime.get("kill_switch", False))
+        result["already_on"] = runtime_kill_switch
+        if runtime_kill_switch:
+            self.auto_kill_switch_last_trip_utc = str(
+                runtime.get("safety_auto_kill_trip_utc", self.auto_kill_switch_last_trip_utc) or ""
+            ).strip()
+            return result
+
+        if self._auto_kill_switch_cooldown_active(now):
+            result["cooldown_active"] = True
+            return result
+
+        runtime["kill_switch"] = True
+        runtime["safety_auto_kill_source"] = "live_executor_inventory_discrepancy"
+        runtime["safety_auto_kill_reason"] = str(reason or "inventory_discrepancy")
+        runtime["safety_auto_kill_symbol"] = str(symbol or "").upper().strip()
+        runtime["safety_auto_kill_trip_utc"] = now.isoformat()
+
+        context: dict[str, Any] = {}
+        if isinstance(details, dict):
+            for key, value in details.items():
+                if isinstance(value, (str, int, float, bool)) or value is None:
+                    context[str(key)] = value
+        if context:
+            runtime["safety_auto_kill_context"] = context
+
+        try:
+            RUNTIME_CONTROL_FILE.write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            self.runtime_cfg = dict(runtime)
+            self.auto_kill_switch_last_trip_utc = str(runtime.get("safety_auto_kill_trip_utc", "") or "").strip()
+            result["applied"] = True
+            result["kill_switch"] = True
+            result["trip_utc"] = self.auto_kill_switch_last_trip_utc
+        except Exception as exc:
+            result["error"] = str(exc)
+
+        return result
+
     def _prune_recent_order_windows(self, now: datetime) -> None:
         cutoff = now - timedelta(seconds=max(float(self.failure_window_sec), 30.0))
         self.recent_order_attempt_utc = [ts for ts in self.recent_order_attempt_utc if ts >= cutoff]
@@ -4586,6 +4685,7 @@ class RobustLiveExecutor:
             "symbols_scanned": 0,
             "symbols_with_ticker": 0,
             "closed_count": 0,
+            "reconciled_count": 0,
             "checked_symbols": [],
         }
         if not self._global_close_sweep_due(now):
@@ -4613,6 +4713,7 @@ class RobustLiveExecutor:
         result["checked_symbols"] = list(symbol_candidates)
 
         closed_count = 0
+        reconciled_count = 0
         symbols_with_ticker = 0
         for sym in symbol_candidates:
             ticker = self.router.get_ticker(sym)
@@ -4622,12 +4723,14 @@ class RobustLiveExecutor:
             if last <= 0.0:
                 continue
             symbols_with_ticker += 1
+            reconciled_count += int(self._reconcile_zero_inventory_positions(sym, float(last), now))
             if self._maybe_close_positions(sym, float(last), now):
                 closed_count += 1
 
         self.last_global_close_sweep_utc = now.isoformat()
         result["symbols_with_ticker"] = int(symbols_with_ticker)
         result["closed_count"] = int(closed_count)
+        result["reconciled_count"] = int(reconciled_count)
         return result
 
     def _resolve_close_qty_for_spot(self, symbol: str, requested_qty: float, close_side: str) -> tuple[float, float, str]:
@@ -5271,13 +5374,34 @@ class RobustLiveExecutor:
                 "available_asset_qty": 0.0,
             },
         )
-        _write_live_heartbeat(
+
+        kill_trip = self._trip_runtime_kill_switch(
+            now,
+            reason="inventory_discrepancy_zero_exchange_inventory",
+            symbol=symbol,
+            details={
+                "reconciled_count": int(reconciled),
+                "available_asset_qty": 0.0,
+            },
+        )
+        self.audit_chain.append(
+            "inventory_discrepancy_detected",
             {
-                "status": "degraded",
-                "reason": "reconciled_zero_inventory_positions",
                 "symbol": symbol,
                 "reconciled_count": int(reconciled),
                 "available_asset_qty": 0.0,
+                "auto_kill_switch": dict(kill_trip),
+            },
+        )
+
+        _write_live_heartbeat(
+            {
+                "status": "critical",
+                "reason": "inventory_discrepancy_detected",
+                "symbol": symbol,
+                "reconciled_count": int(reconciled),
+                "available_asset_qty": 0.0,
+                "auto_kill_switch": dict(kill_trip),
             }
         )
         return int(reconciled)
@@ -5506,10 +5630,14 @@ class RobustLiveExecutor:
                 hold_sec = max_hold_sec + 1.0
 
             pnl_pct = self._position_pnl_pct(pos, float(last))
+            tp_hit = hold_sec >= min_hold_sec and pnl_pct >= tp_pct
+            # Protective stops should fire immediately; do not wait for min hold.
+            sl_hit = sl_pct > 0.0 and pnl_pct <= (-sl_pct)
+            timeout_hit = hold_sec >= max_hold_sec
             should_close = (
-                (hold_sec >= min_hold_sec and pnl_pct >= tp_pct)
-                or (hold_sec >= min_hold_sec and pnl_pct <= (-sl_pct))
-                or (hold_sec >= max_hold_sec)
+                tp_hit
+                or sl_hit
+                or timeout_hit
             )
             if not should_close:
                 continue
@@ -5546,6 +5674,35 @@ class RobustLiveExecutor:
                                 "symbol": symbol,
                                 "requested_qty": round(float(requested_close_qty), 10),
                                 "available_qty": 0.0,
+                            }
+                        )
+                        kill_trip = self._trip_runtime_kill_switch(
+                            now,
+                            reason="inventory_discrepancy_close_path_no_inventory",
+                            symbol=symbol,
+                            details={
+                                "requested_qty": round(float(requested_close_qty), 10),
+                                "available_qty": 0.0,
+                            },
+                        )
+                        self.audit_chain.append(
+                            "inventory_discrepancy_detected",
+                            {
+                                "symbol": symbol,
+                                "requested_qty": round(float(requested_close_qty), 10),
+                                "available_qty": 0.0,
+                                "path": "close_cycle",
+                                "auto_kill_switch": dict(kill_trip),
+                            },
+                        )
+                        _write_live_heartbeat(
+                            {
+                                "status": "critical",
+                                "reason": "inventory_discrepancy_detected",
+                                "symbol": symbol,
+                                "requested_qty": round(float(requested_close_qty), 10),
+                                "available_qty": 0.0,
+                                "auto_kill_switch": dict(kill_trip),
                             }
                         )
                         print("  reconciled stale position: no exchange inventory")
@@ -5730,6 +5887,9 @@ class RobustLiveExecutor:
         )
         pick_meta["global_close_sweep_closed_count"] = int(
             self._to_float(global_close_sweep.get("closed_count", 0), 0.0)
+        )
+        pick_meta["global_close_sweep_reconciled_count"] = int(
+            self._to_float(global_close_sweep.get("reconciled_count", 0), 0.0)
         )
 
         runtime_quote_order_raw = self.runtime_cfg.get("clean_ops_quote_allow", list(DEFAULT_QUOTE_LANES))

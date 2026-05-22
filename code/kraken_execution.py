@@ -447,14 +447,11 @@ def _count_open_positions() -> int:
     return int(state.get("open_position_count", 0) or 0)
 
 def enforce_risk(*, symbol: str, side: str, notional_usd: float) -> None:
+    _ = (symbol, side, notional_usd)
     flags = _ensure_flags()
 
     if bool(flags.get("kill_switch", True)):
         raise KrakenExecutionError("Kill switch is ON. Submission is blocked.")
-
-    # Risk block removed: allow any notional
-
-        return
 
     max_open_positions = int(flags.get("max_open_positions", 10))
     if _count_open_positions() >= max_open_positions:
@@ -693,8 +690,22 @@ def _count_open_positions() -> int:
     return int(state.get("open_position_count", 0) or 0)
 
 def enforce_risk(*, symbol: str, side: str, notional_usd: float) -> None:
-    # ALL RISK BLOCKS REMOVED -- FULLY UNRESTRICTED LIVE TRADING
-    return
+    _ = (symbol, side, notional_usd)
+    flags = _ensure_flags()
+
+    if bool(flags.get("kill_switch", True)):
+        raise KrakenExecutionError("Kill switch is ON. Submission is blocked.")
+
+    max_open_positions = int(flags.get("max_open_positions", 10))
+    if _count_open_positions() >= max_open_positions:
+        raise KrakenExecutionError("Risk block: max open positions reached")
+
+    max_daily_loss = float(flags.get("max_daily_loss_usd", 50.0))
+    daily_loss = _todays_live_loss_usd()
+    if daily_loss >= max_daily_loss:
+        raise KrakenExecutionError(
+            f"Risk block: daily loss cap reached ({daily_loss:.2f} >= {max_daily_loss:.2f})"
+        )
 
 def _public_ticker(pair: str) -> Dict[str, Any]:
     response = requests.get(
