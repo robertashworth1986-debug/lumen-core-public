@@ -5,6 +5,7 @@ param(
     [switch]$IncludeForecasted,
     [string]$ApiKey,
     [string]$AccessRegistryPath = "C:\LumaTrader\INSTITUTIONAL_STACK_V2\config\healthcare_pipeline_access_registry.json",
+    [string]$RequiredRolePattern = "^institutional(_|$)",
     [switch]$BypassApiKey
 )
 
@@ -116,9 +117,17 @@ if (-not $BypassApiKey) {
                 throw "ApiKey is not authorized for healthcare pipeline access."
             }
 
+            $role = [string]$operator.role
+            if ([string]::IsNullOrWhiteSpace($role)) {
+                throw "ApiKey record is missing role. Institutional role is required."
+            }
+            if ($RequiredRolePattern -and -not ($role -match $RequiredRolePattern)) {
+                throw "ApiKey role '$role' is not authorized. Required role pattern: $RequiredRolePattern"
+            }
+
             $label = [string]$operator.label
             $keyId = [string]$operator.key_id
-            Write-Output "RUN_HEALTHCARE_GRANTS_ENGINE_ACCESS operator=$label key_id=$keyId mode=registry"
+            Write-Output "RUN_HEALTHCARE_GRANTS_ENGINE_ACCESS operator=$label key_id=$keyId role=$role mode=registry"
         } else {
             Write-Output "RUN_HEALTHCARE_GRANTS_ENGINE_ACCESS mode=registry_disabled"
         }

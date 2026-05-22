@@ -6,7 +6,7 @@
       "label": "example_friend",
       "key_id": "hpa_example",
       "key_sha256": "replace_with_sha256_of_api_key",
-      "role": "operator",
+      "role": "institutional_operator",
       "created_utc": "2026-01-01T00:00:00Z",
       "expires_utc": "2026-12-31T23:59:59Z",
       "revoked": false

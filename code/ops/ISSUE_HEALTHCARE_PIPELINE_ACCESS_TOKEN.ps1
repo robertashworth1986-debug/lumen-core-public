@@ -1,5 +1,6 @@
 param(
     [string]$Label = "friend",
+    [string]$Role = "institutional_operator",
     [int]$DaysValid = 90,
     [string]$RegistryPath = "C:\LumaTrader\INSTITUTIONAL_STACK_V2\config\healthcare_pipeline_access_registry.json",
     [switch]$RevokeExistingForLabel
@@ -73,7 +74,7 @@ $newEntry = [ordered]@{
     label = $Label
     key_id = $keyId
     key_sha256 = $digest
-    role = "operator"
+    role = $Role
     created_utc = $nowUtc.ToString("o")
     expires_utc = $expiresUtc
     revoked = $false
@@ -104,6 +105,7 @@ $receipt | ConvertTo-Json -Depth 20 | Set-Content -Path $receiptPath -Encoding U
 Write-Output "ISSUE_HEALTHCARE_PIPELINE_ACCESS_TOKEN_OK"
 Write-Output "label=$Label"
 Write-Output "key_id=$keyId"
+Write-Output "role=$Role"
 Write-Output "expires_utc=$expiresUtc"
 Write-Output "registry_path=$RegistryPath"
 Write-Output "receipt_path=$receiptPath"

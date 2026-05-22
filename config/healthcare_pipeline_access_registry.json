@@ -9,6 +9,16 @@
       "role": "operator",
       "created_utc": "2026-05-21T22:59:31.4756639Z",
       "expires_utc": "2026-09-18T22:59:31.4756639Z",
+      "revoked": true,
+      "revoked_utc": "2026-05-22T10:46:52.2910405Z"
+    },
+    {
+      "label": "friend_operator",
+      "key_id": "hpa_e0f9f9fe80f3",
+      "key_sha256": "91f00bec737abf3d32eb885376ddf798a4d7ac4dbcd7977b859eb309d9c29ef9",
+      "role": "institutional_operator",
+      "created_utc": "2026-05-22T10:46:52.2910405Z",
+      "expires_utc": "2026-09-19T10:46:52.2910405Z",
       "revoked": false
     }
   ]

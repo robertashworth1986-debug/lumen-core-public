@@ -7,13 +7,14 @@ This pipeline supports API-key access control through a hashed registry file.
 Run:
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File code/ops/ISSUE_HEALTHCARE_PIPELINE_ACCESS_TOKEN.ps1 -Label friend_name -DaysValid 120 -RevokeExistingForLabel
+pwsh -NoProfile -ExecutionPolicy Bypass -File code/ops/ISSUE_HEALTHCARE_PIPELINE_ACCESS_TOKEN.ps1 -Label friend_name -Role institutional_operator -DaysValid 120 -RevokeExistingForLabel
 ```
 
 Output includes:
 
 - `api_key` (share with authorized operator only)
 - `key_id`
+- `role`
 - `expires_utc`
 - `registry_path`
 
@@ -39,4 +40,5 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File code/ops/RUN_HEALTHCARE_GRANTS_ENG
 
 - Registry file path: `config/healthcare_pipeline_access_registry.json`
 - If the file exists and `enabled=true`, `-ApiKey` is required.
+- The resolved API key role must match institutional policy (`^institutional(_|$)` by default).
 - Validation uses SHA-256 digests only; plain keys are not stored in the registry.
