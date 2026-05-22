@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MindWise x Luma Premium Flow Demo</title>
+  <style>
+    :root {
+      --mw-blue: #48afe5;
+      --mw-blue-dark: #4f8bc9;
+      --mw-navy: #0d2a3d;
+      --mw-off-white: #f9fbf7;
+      --mw-coral: #ff6c52;
+      --mw-coral-hover: #e85a42;
+      --mw-text: #0d2a3d;
+      --mw-text-light: #5a6d7a;
+      --surface: #ffffff;
+      --border: #d8e5ee;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Geist", "Geist Fallback", Arial, Helvetica, sans-serif;
+      color: var(--mw-text);
+      background:
+        radial-gradient(900px 460px at 5% -5%, rgba(72, 175, 229, 0.24) 0%, rgba(72, 175, 229, 0) 60%),
+        radial-gradient(900px 500px at 95% 105%, rgba(255, 108, 82, 0.18) 0%, rgba(255, 108, 82, 0) 60%),
+        var(--mw-off-white);
+    }
+
+    .shell {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      background: linear-gradient(140deg, var(--mw-navy) 0%, #174866 55%, var(--mw-blue-dark) 100%);
+      color: #ffffff;
+      position: relative;
+      padding: 26px;
+      box-shadow: 0 18px 42px rgba(2, 6, 23, 0.22);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -90px;
+      top: -80px;
+      width: 250px;
+      height: 250px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .eyebrow {
+      margin: 0;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-size: 11px;
+      opacity: 0.95;
+    }
+
+    h1 {
+      margin: 8px 0 10px 0;
+      line-height: 1.08;
+      font-size: clamp(26px, 4.8vw, 44px);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 880px;
+      line-height: 1.45;
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.94);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 14px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 10px 26px rgba(2, 6, 23, 0.08);
+    }
+
+    .panel h2 {
+      margin: 0 0 8px 0;
+      font-size: 19px;
+      line-height: 1.2;
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--mw-text-light);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .flow {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .step {
+      border: 1px solid #dbe7f0;
+      border-radius: 14px;
+      padding: 10px;
+      background: linear-gradient(130deg, #ffffff 0%, #f7fbfe 100%);
+    }
+
+    .step-id {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e9f4fc;
+      color: #145480;
+      border: 1px solid #b7daef;
+    }
+
+    .step h3 {
+      margin: 8px 0 6px 0;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .step p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.42;
+      color: var(--mw-text-light);
+    }
+
+    .backlog {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .lane {
+      border-radius: 12px;
+      border: 1px solid #dbe5ee;
+      padding: 10px;
+      background: #ffffff;
+    }
+
+    .lane h4 {
+      margin: 0 0 4px 0;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .lane ul {
+      margin: 0;
+      padding-left: 16px;
+      color: var(--mw-text-light);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .lane.p0 h4 {
+      color: #b42318;
+    }
+
+    .lane.p1 h4 {
+      color: #175cd3;
+    }
+
+    .lane.p2 h4 {
+      color: #087443;
+    }
+
+    .footer {
+      font-size: 12px;
+      color: var(--mw-text-light);
+      text-align: center;
+      padding: 2px 0 10px 0;
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">MindWise Health x Luma Premium</p>
+      <h1>End-to-End Grant Growth Experience Demo</h1>
+      <p>
+        This is a realistic preview of what Kishore and team would experience if we built their grant flow as a premium product: opportunity intelligence, AI-assisted drafting, blocker resolution, compliance evidence, and weekly executive reporting in one connected journey.
+      </p>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <h2>What Kishore Sees First</h2>
+        <p>
+          Native MindWise-styled grant radar with direct submit route, AI Fill handoff, and full Grant Console escalation.
+        </p>
+        <div
+          data-luma-healthcare-feed="../../out/ops/healthcare_grants_engine/healthcare_website_feed_latest.json"
+          data-luma-title="MindWise Healthcare Grant Radar"
+          data-luma-max="6"
+          data-luma-grants-console="../grants.html"
+          data-luma-theme="mindwise"
+          data-luma-density="cozy"
+          data-luma-new-tab="1"
+        ></div>
+      </article>
+
+      <article class="panel">
+        <h2>Premium Flow Design</h2>
+        <p>Production lane from discovery to audited submission package.</p>
+        <div class="flow">
+          <div class="step">
+            <span class="step-id">Step 01</span>
+            <h3>Rank + Prioritize</h3>
+            <p>Healthcare opportunities scored by urgency, healthcare fit, scientific relevance, and funding signals.</p>
+          </div>
+          <div class="step">
+            <span class="step-id">Step 02</span>
+            <h3>AI Draft Package</h3>
+            <p>One-click AI Fill opens grants console with target opportunity and prefilled narrative structure.</p>
+          </div>
+          <div class="step">
+            <span class="step-id">Step 03</span>
+            <h3>Blocker Resolution Loop</h3>
+            <p>Autodetect missing compliance elements, route to owner, and track closure inside one timeline.</p>
+          </div>
+          <div class="step">
+            <span class="step-id">Step 04</span>
+            <h3>Evidence + Integrity Pack</h3>
+            <p>Hash-sealed artifacts and replay-ready ledgers generated for audit, legal, and investor confidence.</p>
+          </div>
+          <div class="step">
+            <span class="step-id">Step 05</span>
+            <h3>Executive Command View</h3>
+            <p>Pipeline health, projected award value, time-to-submit, and risk posture summarized weekly.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>Optimization Backlog For MindWise</h2>
+      <p>P0/P1/P2 sequencing designed for immediate impact first, then compounding automation.</p>
+      <div class="backlog">
+        <div class="lane p0">
+          <h4>P0 - Immediate (0-2 weeks)</h4>
+          <ul>
+            <li>Site-native grant radar on /about and /demo routes with direct listing actions.</li>
+            <li>Auto-fill starter for Grants Console with opportunity context and AI draft mode.</li>
+            <li>Submission route confidence labels so users always know where final apply occurs.</li>
+          </ul>
+        </div>
+        <div class="lane p1">
+          <h4>P1 - Workflow Upgrade (2-6 weeks)</h4>
+          <ul>
+            <li>Cross-functional blocker board (clinical, finance, compliance, legal) with SLA tracking.</li>
+            <li>Provider-facing documentation snippets for faster attachment package prep.</li>
+            <li>Weekly digest email for leadership with opportunities won, at risk, and overdue.</li>
+          </ul>
+        </div>
+        <div class="lane p2">
+          <h4>P2 - Premium Automation (6-12 weeks)</h4>
+          <ul>
+            <li>Denial-risk predictor and eligibility automation hooks linked to grant narrative evidence.</li>
+            <li>Hash-verified proof packet export for board, partners, and federal diligence requests.</li>
+            <li>Multi-site rollout template for each MindWise specialty vertical.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer">MindWise Premium Demo - generated from active Luma healthcare pipeline artifacts</p>
+  </main>
+
+  <script src="../js/luma_healthcare_grants_embed.js"></script>
+</body>
+</html>
