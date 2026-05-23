@@ -5223,6 +5223,7 @@ def master_autofire_status() -> dict[str, Any]:
         "alpha_gate_max_spread_bps": cfg.get("alpha_gate_max_spread_bps"),
         "alpha_gate_min_turnover_usd": cfg.get("alpha_gate_min_turnover_usd"),
         "alpha_gate_allow_watch_strategy": cfg.get("alpha_gate_allow_watch_strategy"),
+        "alpha_gate_require_match_live": cfg.get("alpha_gate_require_match_live"),
         "strategy_mode": cfg.get("strategy_mode"),
         "max_notional_usd": cfg.get("max_notional_usd"),
         "moonshot_bankroll_frac": cfg.get("moonshot_bankroll_frac"),
@@ -5271,6 +5272,7 @@ def master_autofire_control(req: dict | None = None) -> dict[str, Any]:
                                 "alpha_gate_max_spread_bps": 35.0,
                                 "alpha_gate_min_turnover_usd": 250000.0,
                                                                 "alpha_gate_allow_watch_strategy": false,
+                                "alpha_gate_require_match_live": true,
                                                                 "strategy_mode": "hybrid",   # hybrid|moonshot|quickhit|swing
                                                                 "max_notional_usd": 20.0
       }
@@ -5290,6 +5292,7 @@ def master_autofire_control(req: dict | None = None) -> dict[str, Any]:
         "alpha_gate_max_spread_bps": 35.0,
         "alpha_gate_min_turnover_usd": 250000.0,
         "alpha_gate_allow_watch_strategy": False,
+        "alpha_gate_require_match_live": True,
         "strategy_mode": "hybrid",
         "max_notional_usd": 20.0,
         "moonshot_bankroll_frac": 0.18,
@@ -5376,6 +5379,8 @@ def master_autofire_control(req: dict | None = None) -> dict[str, Any]:
             return {"status": "error", "error": "alpha_gate_min_turnover_usd must be a non-negative number"}
     if "alpha_gate_allow_watch_strategy" in body:
         cur["alpha_gate_allow_watch_strategy"] = bool(body["alpha_gate_allow_watch_strategy"])
+    if "alpha_gate_require_match_live" in body:
+        cur["alpha_gate_require_match_live"] = bool(body["alpha_gate_require_match_live"])
     if "strategy_mode" in body:
         mode = str(body.get("strategy_mode") or "").strip().lower()
         if mode not in {"hybrid", "moonshot", "quickhit", "swing"}:

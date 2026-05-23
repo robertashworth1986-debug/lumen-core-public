@@ -73,6 +73,7 @@ def _read_runtime_config(default_threshold: float | None,
                 "alpha_gate_max_spread_bps": cfg.get("alpha_gate_max_spread_bps"),
                 "alpha_gate_min_turnover_usd": cfg.get("alpha_gate_min_turnover_usd"),
                 "alpha_gate_allow_watch_strategy": cfg.get("alpha_gate_allow_watch_strategy"),
+                "alpha_gate_require_match_live": cfg.get("alpha_gate_require_match_live"),
                 "strategy_mode": cfg.get("strategy_mode"),
                 "max_notional_usd": cfg.get("max_notional_usd"),
                 "moonshot_bankroll_frac": cfg.get("moonshot_bankroll_frac"),
@@ -114,6 +115,7 @@ def _read_runtime_config(default_threshold: float | None,
         "alpha_gate_max_spread_bps": None,
         "alpha_gate_min_turnover_usd": None,
         "alpha_gate_allow_watch_strategy": None,
+        "alpha_gate_require_match_live": None,
         "strategy_mode": None,
         "max_notional_usd": None,
         "moonshot_bankroll_frac": None,
@@ -300,22 +302,26 @@ def _load_alpha_map_context() -> dict:
     return context
 
 
-def _alpha_gate_required(validate: bool) -> bool:
-    return (not validate) and ALPHA_GATE_REQUIRE_MATCH_LIVE
+def _alpha_gate_required(validate: bool, gate_cfg: dict[str, object] | None = None) -> bool:
+    require_match_live = ALPHA_GATE_REQUIRE_MATCH_LIVE
+    if isinstance(gate_cfg, dict) and "require_match_live" in gate_cfg:
+        require_match_live = bool(gate_cfg.get("require_match_live"))
+    return (not validate) and bool(require_match_live)
 
 
-def _resolve_alpha_gate(runtime_cfg: dict | None) -> dict[str, float]:
+def _resolve_alpha_gate(runtime_cfg: dict | None) -> dict[str, object]:
     cfg = runtime_cfg or {}
     return {
         "min_edge": max(0.0, _safe_float(cfg.get("alpha_gate_min_edge"), ALPHA_GATE_MIN_EDGE)),
         "max_spread_bps": max(0.0, _safe_float(cfg.get("alpha_gate_max_spread_bps"), ALPHA_GATE_MAX_SPREAD_BPS)),
         "min_turnover_usd": max(0.0, _safe_float(cfg.get("alpha_gate_min_turnover_usd"), ALPHA_GATE_MIN_TURNOVER_USD)),
         "allow_watch_strategy": bool(cfg.get("alpha_gate_allow_watch_strategy", False)),
+        "require_match_live": bool(cfg.get("alpha_gate_require_match_live", ALPHA_GATE_REQUIRE_MATCH_LIVE)),
     }
 
 
-def _alpha_gate(row: dict, alpha_ctx: dict, validate: bool, gate_cfg: dict[str, float]) -> tuple[bool, str, dict | None]:
-    required = _alpha_gate_required(validate)
+def _alpha_gate(row: dict, alpha_ctx: dict, validate: bool, gate_cfg: dict[str, object]) -> tuple[bool, str, dict | None]:
+    required = _alpha_gate_required(validate, gate_cfg)
     lookup = alpha_ctx.get("lookup") if isinstance(alpha_ctx, dict) else {}
     if not isinstance(lookup, dict) or not lookup:
         if required:
@@ -466,24 +472,43 @@ def _classify_strategy_lane(row: dict, alpha_row: dict | None, strategy_cfg: dic
     alpha = alpha_row or {}
     strategy_mode = str(strategy_cfg.get("strategy_mode") or STRATEGY_MODE_HYBRID)
 
-    edge = _safe_float(alpha.get("alpha_edge_score"), 0.0)
-    spread = _safe_float(alpha.get("spread_bps"), 0.0)
-    turnover = _safe_float(alpha.get("turnover_24h_usd"), 0.0)
-    trend_score = _safe_float(alpha.get("trend_score"), 0.0)
-
-    r_1m = _safe_float(alpha.get("r_1m_pct"), 0.0)
-    r_5m = _safe_float(alpha.get("r_5m_pct"), 0.0)
-    r_30m = _safe_float(alpha.get("r_30m_pct"), 0.0)
-    r_1h = _safe_float(alpha.get("r_1h_pct"), 0.0)
-    r_15m = 0.65 * r_5m + 0.35 * r_30m
-    m4h = _safe_float(row.get("m4h"), r_1h * 4.0)
-
     dip_pct = _safe_float(row.get("dip_from_high_pct"), 0.0)
     rsi = _safe_float(row.get("rsi"), 50.0)
     vol_surge = _safe_float(row.get("vol_surge"), 0.0)
     score = _safe_float(row.get("score"), 0.0)
-    alpha_mode = str(alpha.get("strategy_mode") or "watch").strip().lower()
+    m4h = _safe_float(row.get("m4h"), 0.0)
+    fallback_r_1h = m4h / 4.0 if m4h else 0.0
+    fallback_r_5m = m4h / 48.0 if m4h else 0.0
+    fallback_r_30m = m4h / 8.0 if m4h else 0.0
+    fallback_r_1m = m4h / 240.0 if m4h else 0.0
+    fallback_r_15m = 0.65 * fallback_r_5m + 0.35 * fallback_r_30m
+    fallback_edge = max(0.0, score / 10.0)
+    fallback_turnover = _safe_float(row.get("vol_24h_usd"), 0.0)
+    fallback_spread = 18.0
     signals = {str(x).upper() for x in (row.get("signals") or [])}
+
+    if not alpha:
+        if "EXTREME_OVERSOLD" in signals or "DEEP_DIP" in signals:
+            alpha_mode = "mean_reversion_snapback"
+        elif fallback_r_1h > 0.0:
+            alpha_mode = "trend_follow_swing"
+        else:
+            alpha_mode = "momentum_snipe"
+    else:
+        alpha_mode = str(alpha.get("strategy_mode") or "watch").strip().lower()
+
+    edge = _safe_float(alpha.get("alpha_edge_score"), fallback_edge)
+    spread = _safe_float(alpha.get("spread_bps"), fallback_spread)
+    turnover = _safe_float(alpha.get("turnover_24h_usd"), fallback_turnover)
+    trend_score = _safe_float(alpha.get("trend_score"), 0.0)
+
+    r_1m = _safe_float(alpha.get("r_1m_pct"), fallback_r_1m)
+    r_5m = _safe_float(alpha.get("r_5m_pct"), fallback_r_5m)
+    r_30m = _safe_float(alpha.get("r_30m_pct"), fallback_r_30m)
+    r_1h = _safe_float(alpha.get("r_1h_pct"), fallback_r_1h)
+    r_15m = 0.65 * r_5m + 0.35 * r_30m
+    if not alpha:
+        r_15m = fallback_r_15m
 
     candidates: list[tuple[str, float, str]] = []
 
@@ -621,13 +646,15 @@ def _load_cached_scan_if_fresh(max_age_sec: float) -> dict | None:
     return _load_cached_scan()
 
 
-def _eligible(row: dict, alpha_ctx: dict, validate: bool, gate_cfg: dict[str, float]) -> tuple[bool, str, dict | None]:
+def _eligible(row: dict, alpha_ctx: dict, validate: bool, gate_cfg: dict[str, object]) -> tuple[bool, str, dict | None]:
     score = float(row.get("score", 0))
     signals = row.get("signals") or []
     vol_24h = float(row.get("vol_24h_usd", 0))
     price   = float(row.get("price", 0))
+    allow_watch = bool((gate_cfg or {}).get("allow_watch_strategy", False))
+    watch_only = len(signals) == 1 and str(signals[0]).upper() == "WATCH"
 
-    if signals == ["WATCH"]:
+    if watch_only and not allow_watch:
         return False, "watch_only", None
     if score < MIN_SCORE:
         return False, f"score<{MIN_SCORE}", None
@@ -648,7 +675,7 @@ def _compute_throughput_targets(
     alpha_ctx: dict,
     validate: bool,
     pending_count: int,
-    gate_cfg: dict[str, float],
+    gate_cfg: dict[str, object],
     runtime_cfg: dict | None,
 ) -> dict[str, int | bool]:
     cfg = runtime_cfg or {}
@@ -941,7 +968,7 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
         "alpha_map_available": bool(alpha_ctx.get("available")),
         "alpha_map_generated_utc": alpha_ctx.get("generated_utc"),
         "alpha_map_pairs_analyzed": alpha_ctx.get("pairs_analyzed"),
-        "alpha_gate_required": _alpha_gate_required(validate),
+        "alpha_gate_required": _alpha_gate_required(validate, gate_cfg),
         "alpha_gate_pass_count": alpha_gate_pass_count,
         "alpha_gate_fail_count": alpha_gate_fail_count,
         "alpha_gate_min_edge": float(gate_cfg.get("min_edge", ALPHA_GATE_MIN_EDGE)),
@@ -1024,6 +1051,7 @@ def main() -> int:
             "alpha_gate_max_spread_bps": ALPHA_GATE_MAX_SPREAD_BPS,
             "alpha_gate_min_turnover_usd": ALPHA_GATE_MIN_TURNOVER_USD,
             "alpha_gate_allow_watch_strategy": False,
+            "alpha_gate_require_match_live": True,
             "strategy_mode": STRATEGY_MODE_HYBRID,
             "max_notional_usd": MAX_NOTIONAL_USD,
             "moonshot_bankroll_frac": 0.18,
