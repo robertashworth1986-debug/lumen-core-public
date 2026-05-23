@@ -133,6 +133,7 @@
   // Underlay: WebGL canvas + grid + scanlines (prepend so they sit at z-index 0..2)
   const layers = document.createDocumentFragment();
   const canvas = document.createElement('canvas'); canvas.id = 'bg-canvas';
+  const ambient = document.createElement('div'); ambient.id = 'lc-ambient';
   const grid = document.createElement('div'); grid.id = 'grid-overlay';
   const scan = document.createElement('div'); scan.id = 'scanlines';
   // Inside an iframe we keep a transparent body so the parent's WebGL shows through
@@ -140,7 +141,7 @@
     document.documentElement.style.background = 'transparent';
     document.body.style.background = 'transparent';
   } else {
-    layers.append(canvas, grid, scan);
+    layers.append(canvas, ambient, grid, scan);
     document.body.prepend(layers);
   }
 
@@ -182,7 +183,7 @@
       (() => {
         const s = document.createElement('div'); s.className = 'lc-stage';
         // Move all body children into stage (except our injected layers/boot)
-        const skip = new Set([canvas, grid, scan, boot]);
+        const skip = new Set([canvas, ambient, grid, scan, boot]);
         Array.from(document.body.children).forEach(c => {
           if (!skip.has(c) && c !== s) s.appendChild(c);
         });
@@ -232,6 +233,91 @@
     if (e) e.textContent = new Date().toISOString().slice(11, 19);
   }
   setInterval(tick, 1000); tick();
+
+  function setupAmbientPointer() {
+    if (IN_IFRAME || !ambient) return;
+    const root = document.documentElement;
+    root.style.setProperty('--lc-ambient-x', '50%');
+    root.style.setProperty('--lc-ambient-y', '38%');
+    if (PERF.reducedMotion) return;
+
+    const onMove = (ev) => {
+      const w = Math.max(1, window.innerWidth);
+      const h = Math.max(1, window.innerHeight);
+      const xPct = ((ev.clientX / w) * 100).toFixed(2) + '%';
+      const yPct = ((ev.clientY / h) * 100).toFixed(2) + '%';
+      root.style.setProperty('--lc-ambient-x', xPct);
+      root.style.setProperty('--lc-ambient-y', yPct);
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+  }
+
+  function bindTilt(el) {
+    if (!el || PERF.reducedMotion || PERF.tier === 'lite' || el.dataset.lcTiltBound === '1') return;
+    el.dataset.lcTiltBound = '1';
+    el.addEventListener('pointermove', (ev) => {
+      const r = el.getBoundingClientRect();
+      const nx = ((ev.clientX - r.left) / Math.max(1, r.width)) - 0.5;
+      const ny = ((ev.clientY - r.top) / Math.max(1, r.height)) - 0.5;
+      const rotY = (nx * 3.2).toFixed(2);
+      const rotX = (-ny * 3.2).toFixed(2);
+      el.style.transform = `translate3d(0,-1px,0) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    }, { passive: true });
+    el.addEventListener('pointerleave', () => {
+      el.style.transform = 'translate3d(0,0,0)';
+    }, { passive: true });
+  }
+
+  function applyRevealChoreography() {
+    if (IN_IFRAME) return;
+    const selectors = [
+      '.lc-panel',
+      '.panel',
+      '.info-card',
+      '.metric-box',
+      '.proto-card',
+      '.chart-wrap',
+      '.kpi',
+      '.bridge-row',
+      '.svc-row',
+      '.ql-tab',
+      '.ql-pulse .kpi',
+      '.legend-item',
+    ];
+
+    const additions = [];
+    let idx = 0;
+    selectors.forEach((selector) => {
+      document.querySelectorAll(selector).forEach((el) => {
+        if (!el || el.closest('#lc-boot')) return;
+        if (el.dataset.lcReveal === '1') return;
+        el.dataset.lcReveal = '1';
+        el.style.setProperty('--lc-delay', `${Math.min(idx * 26, 560)}ms`);
+        el.setAttribute('data-lc-reveal', '1');
+        if (el.matches('.lc-panel, .panel, .info-card, .metric-box, .chart-wrap, .proto-card, .kpi')) {
+          el.setAttribute('data-lc-tilt', '1');
+          bindTilt(el);
+        }
+        additions.push(el);
+        idx += 1;
+      });
+    });
+
+    if (!additions.length) return;
+    if (PERF.reducedMotion) {
+      document.body.classList.add('lc-motion-reduce');
+      additions.forEach((el) => el.classList.add('in'));
+      return;
+    }
+
+    document.body.classList.add('lc-motion-ready');
+    requestAnimationFrame(() => additions.forEach((el) => el.classList.add('in')));
+  }
+
+  setupAmbientPointer();
+  applyRevealChoreography();
+  window.setTimeout(applyRevealChoreography, 700);
+  window.setTimeout(applyRevealChoreography, 1800);
 
   // 3. WebGL field — load Three.js once
   function startWebGL() {
