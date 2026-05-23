@@ -31,6 +31,10 @@ DEFAULT_POLICY: dict[str, Any] = {
     "buy_win_rate_floor_pct": 50.0,
     "buy_bucket_n_floor": 5,
     "buy_pair_cooldown_sec": 240.0,
+    "buy_min_execution_quality_score": 10.0,
+    "buy_min_liquidity_score": 8.0,
+    "buy_max_estimated_friction_bps": 45.0,
+    "buy_min_risk_adjusted_net_edge_pct": 0.25,
     "buy_max_notional_usd": 0.0,
     "min_free_usd_to_buy": 0.0,
     "require_edge_score": False,
@@ -77,6 +81,14 @@ def to_optional_float(value: Any) -> Optional[float]:
         return float(value)
     except Exception:
         return None
+
+
+def first_optional_float(*values: Any) -> Optional[float]:
+    for value in values:
+        parsed = to_optional_float(value)
+        if parsed is not None:
+            return parsed
+    return None
 
 
 def to_int(value: Any, default: int = 0) -> int:
@@ -401,10 +413,21 @@ def compute_sell_priority(ticket: dict[str, Any]) -> float:
 
 def compute_buy_priority(ticket: dict[str, Any], metrics: dict[str, Any]) -> float:
     edge = to_float(metrics.get("edge_score"), 0.0)
+    risk_adj_edge = to_float(metrics.get("risk_adjusted_net_edge_pct"), edge)
     wr = to_float(metrics.get("bucket_win_rate_pct"), 0.0)
     n = max(0, to_int(metrics.get("bucket_n"), 0))
+    exec_quality = to_float(metrics.get("execution_quality_score"), 0.0)
+    friction_bps = max(0.0, to_float(metrics.get("estimated_friction_bps"), 0.0))
     age_hours = max(0.0, to_float(ticket.get("age_hours"), 0.0))
-    return edge * 100.0 + wr + min(n, 100) * 0.10 + min(age_hours, 24.0) * 0.20
+    effective_edge = risk_adj_edge if risk_adj_edge > 0 else edge
+    return (
+        effective_edge * 100.0
+        + wr
+        + min(n, 100) * 0.10
+        + exec_quality * 0.75
+        - min(friction_bps, 120.0) * 0.20
+        + min(age_hours, 24.0) * 0.20
+    )
 
 
 def evaluate_buy_ticket(
@@ -424,8 +447,50 @@ def evaluate_buy_ticket(
     if not isinstance(scanner_meta, dict):
         scanner_meta = {}
 
-    edge_score = to_optional_float(scanner_meta.get("edge_score"))
+    alpha_gate = scanner_meta.get("alpha_gate")
+    if not isinstance(alpha_gate, dict):
+        alpha_gate = {}
+
+    strategy_meta = scanner_meta.get("strategy")
+    if not isinstance(strategy_meta, dict):
+        strategy_meta = {}
+
+    profitability_meta = strategy_meta.get("profitability")
+    if not isinstance(profitability_meta, dict):
+        profitability_meta = {}
+
+    edge_score = first_optional_float(
+        scanner_meta.get("edge_score"),
+        scanner_meta.get("alpha_edge_score"),
+        alpha_gate.get("risk_adjusted_net_edge_pct"),
+        alpha_gate.get("net_edge_pct"),
+        alpha_gate.get("alpha_edge_score"),
+        profitability_meta.get("risk_adjusted_net_edge_pct"),
+        profitability_meta.get("net_edge_pct"),
+        profitability_meta.get("raw_edge_pct"),
+    )
     win_rate_pct = to_optional_float(scanner_meta.get("bucket_win_rate_pct"))
+    execution_quality_score = first_optional_float(
+        scanner_meta.get("execution_quality_score"),
+        alpha_gate.get("execution_quality_score"),
+        profitability_meta.get("execution_quality_score"),
+    )
+    liquidity_score = first_optional_float(
+        scanner_meta.get("liquidity_score"),
+        alpha_gate.get("liquidity_score"),
+        profitability_meta.get("liquidity_score"),
+    )
+    estimated_friction_bps = first_optional_float(
+        alpha_gate.get("estimated_friction_bps"),
+        profitability_meta.get("estimated_friction_bps"),
+    )
+    risk_adjusted_net_edge_pct = first_optional_float(
+        alpha_gate.get("risk_adjusted_net_edge_pct"),
+        profitability_meta.get("risk_adjusted_net_edge_pct"),
+        alpha_gate.get("net_edge_pct"),
+        profitability_meta.get("net_edge_pct"),
+    )
+
     bucket_n = None
     if scanner_meta.get("bucket_n") not in (None, ""):
         try:
@@ -455,6 +520,34 @@ def evaluate_buy_ticket(
     if bucket_n is not None and bucket_n < n_floor:
         reasons.append(f"bucket_n {bucket_n} < floor {n_floor}")
 
+    min_exec_quality = max(0.0, to_float(policy.get("buy_min_execution_quality_score"), 0.0))
+    if execution_quality_score is not None and execution_quality_score < min_exec_quality:
+        reasons.append(
+            f"execution_quality {execution_quality_score:.2f} < floor {min_exec_quality:.2f}"
+        )
+
+    min_liquidity = max(0.0, to_float(policy.get("buy_min_liquidity_score"), 0.0))
+    if liquidity_score is not None and liquidity_score < min_liquidity:
+        reasons.append(
+            f"liquidity_score {liquidity_score:.2f} < floor {min_liquidity:.2f}"
+        )
+
+    max_friction_bps = max(0.0, to_float(policy.get("buy_max_estimated_friction_bps"), 0.0))
+    if (
+        max_friction_bps > 0
+        and estimated_friction_bps is not None
+        and estimated_friction_bps > max_friction_bps
+    ):
+        reasons.append(
+            f"estimated_friction_bps {estimated_friction_bps:.2f} > cap {max_friction_bps:.2f}"
+        )
+
+    risk_edge_floor = max(0.0, to_float(policy.get("buy_min_risk_adjusted_net_edge_pct"), 0.0))
+    if risk_adjusted_net_edge_pct is not None and risk_adjusted_net_edge_pct < risk_edge_floor:
+        reasons.append(
+            f"risk_adjusted_net_edge_pct {risk_adjusted_net_edge_pct:.3f} < floor {risk_edge_floor:.3f}"
+        )
+
     cooldown_sec = max(0.0, to_float(policy.get("buy_pair_cooldown_sec"), 0.0))
     if pair and cooldown_sec > 0:
         last_ts = pair_last_buy_approval_ts.get(pair, 0.0)
@@ -469,6 +562,10 @@ def evaluate_buy_ticket(
         "edge_score": edge_score,
         "bucket_win_rate_pct": win_rate_pct,
         "bucket_n": bucket_n,
+        "execution_quality_score": execution_quality_score,
+        "liquidity_score": liquidity_score,
+        "estimated_friction_bps": estimated_friction_bps,
+        "risk_adjusted_net_edge_pct": risk_adjusted_net_edge_pct,
     }
     return len(reasons) == 0, reasons, metrics
 
