@@ -105,7 +105,7 @@ if _GATEWAY_LOCK.exists():
             os.kill(_existing_pid, 0)  # raises OSError if the process is gone
             print(f"[singleton] luma_experience_gateway already running as PID {_existing_pid} — exiting.", flush=True)
             raise SystemExit(0)
-    except (ValueError, OSError):
+    except (ValueError, OSError, SystemError):
         pass  # stale lock
 _GATEWAY_LOCK.write_text(str(os.getpid()))
 atexit.register(lambda: _GATEWAY_LOCK.unlink(missing_ok=True))
@@ -225,6 +225,13 @@ def load_json(path: Path, default: Any) -> Any:
     except Exception:
         pass
     return default
+
+
+def to_float(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except Exception:
+        return float(default)
 
 
 def load_supervisor_health(default: Any) -> Any:

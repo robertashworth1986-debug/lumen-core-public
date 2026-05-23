@@ -68,6 +68,10 @@ def _read_runtime_config(default_threshold: float | None,
                 "adaptive_queue": cfg.get("adaptive_queue", True),
                 "scan_max_age_sec": cfg.get("scan_max_age_sec"),
                 "top_n": cfg.get("top_n"),
+                "pending_ticket_max_age_sec": cfg.get("pending_ticket_max_age_sec"),
+                "pending_profit_lock_max_age_sec": cfg.get("pending_profit_lock_max_age_sec"),
+                "pending_dedupe_by_pair_side": cfg.get("pending_dedupe_by_pair_side"),
+                "pending_keep_per_pair_side": cfg.get("pending_keep_per_pair_side"),
                 "max_auto_fires_per_cycle": cfg.get("max_auto_fires_per_cycle"),
                 "alpha_gate_min_edge": cfg.get("alpha_gate_min_edge"),
                 "alpha_gate_max_spread_bps": cfg.get("alpha_gate_max_spread_bps"),
@@ -75,7 +79,15 @@ def _read_runtime_config(default_threshold: float | None,
                 "alpha_gate_allow_watch_strategy": cfg.get("alpha_gate_allow_watch_strategy"),
                 "alpha_gate_require_match_live": cfg.get("alpha_gate_require_match_live"),
                 "strategy_mode": cfg.get("strategy_mode"),
+                "bankroll_usd": cfg.get("bankroll_usd"),
                 "max_notional_usd": cfg.get("max_notional_usd"),
+                "compounding_enabled": cfg.get("compounding_enabled"),
+                "compounding_reference_bankroll_usd": cfg.get("compounding_reference_bankroll_usd"),
+                "compounding_growth_sensitivity": cfg.get("compounding_growth_sensitivity"),
+                "compounding_min_bankroll_mult": cfg.get("compounding_min_bankroll_mult"),
+                "compounding_max_bankroll_mult": cfg.get("compounding_max_bankroll_mult"),
+                "compounding_equity_source_path": cfg.get("compounding_equity_source_path"),
+                "compounding_equity_max_age_sec": cfg.get("compounding_equity_max_age_sec"),
                 "moonshot_bankroll_frac": cfg.get("moonshot_bankroll_frac"),
                 "moonshot_max_per_cycle": cfg.get("moonshot_max_per_cycle"),
                 "moonshot_min_edge": cfg.get("moonshot_min_edge"),
@@ -99,6 +111,14 @@ def _read_runtime_config(default_threshold: float | None,
                 "swing_min_m4h_pct": cfg.get("swing_min_m4h_pct"),
                 "swing_max_spread_bps": cfg.get("swing_max_spread_bps"),
                 "swing_min_turnover_usd": cfg.get("swing_min_turnover_usd"),
+                "profitability_min_net_edge_pct": cfg.get("profitability_min_net_edge_pct"),
+                "profitability_fee_roundtrip_bps": cfg.get("profitability_fee_roundtrip_bps"),
+                "profitability_slippage_floor_bps": cfg.get("profitability_slippage_floor_bps"),
+                "profitability_spread_slippage_mult": cfg.get("profitability_spread_slippage_mult"),
+                "profitability_min_execution_quality_score": cfg.get("profitability_min_execution_quality_score"),
+                "profitability_notional_edge_scale_pct": cfg.get("profitability_notional_edge_scale_pct"),
+                "profitability_notional_floor_mult": cfg.get("profitability_notional_floor_mult"),
+                "profitability_notional_cap_mult": cfg.get("profitability_notional_cap_mult"),
             }
         except Exception:
             pass
@@ -110,6 +130,10 @@ def _read_runtime_config(default_threshold: float | None,
         "adaptive_queue": True,
         "scan_max_age_sec": None,
         "top_n": None,
+        "pending_ticket_max_age_sec": None,
+        "pending_profit_lock_max_age_sec": None,
+        "pending_dedupe_by_pair_side": None,
+        "pending_keep_per_pair_side": None,
         "max_auto_fires_per_cycle": None,
         "alpha_gate_min_edge": None,
         "alpha_gate_max_spread_bps": None,
@@ -117,7 +141,15 @@ def _read_runtime_config(default_threshold: float | None,
         "alpha_gate_allow_watch_strategy": None,
         "alpha_gate_require_match_live": None,
         "strategy_mode": None,
+        "bankroll_usd": None,
         "max_notional_usd": None,
+        "compounding_enabled": None,
+        "compounding_reference_bankroll_usd": None,
+        "compounding_growth_sensitivity": None,
+        "compounding_min_bankroll_mult": None,
+        "compounding_max_bankroll_mult": None,
+        "compounding_equity_source_path": None,
+        "compounding_equity_max_age_sec": None,
         "moonshot_bankroll_frac": None,
         "moonshot_max_per_cycle": None,
         "moonshot_min_edge": None,
@@ -141,6 +173,14 @@ def _read_runtime_config(default_threshold: float | None,
         "swing_min_m4h_pct": None,
         "swing_max_spread_bps": None,
         "swing_min_turnover_usd": None,
+        "profitability_min_net_edge_pct": None,
+        "profitability_fee_roundtrip_bps": None,
+        "profitability_slippage_floor_bps": None,
+        "profitability_spread_slippage_mult": None,
+        "profitability_min_execution_quality_score": None,
+        "profitability_notional_edge_scale_pct": None,
+        "profitability_notional_floor_mult": None,
+        "profitability_notional_cap_mult": None,
     }
 
 
@@ -183,12 +223,31 @@ ALPHA_GATE_ALLOWED_STRATEGIES = {
     "mean_reversion_snapback",
     "trend_follow_swing",
 }
+PROFITABILITY_MIN_NET_EDGE_PCT = 1.0
+PROFITABILITY_FEE_ROUNDTRIP_BPS = 40.0
+PROFITABILITY_SLIPPAGE_FLOOR_BPS = 8.0
+PROFITABILITY_SPREAD_SLIPPAGE_MULT = 1.25
+PROFITABILITY_MIN_EXECUTION_QUALITY_SCORE = 10.0
+PROFITABILITY_NOTIONAL_EDGE_SCALE_PCT = 8.0
+PROFITABILITY_NOTIONAL_FLOOR_MULT = 0.7
+PROFITABILITY_NOTIONAL_CAP_MULT = 1.4
 # Fail-closed only in LIVE mode. In DRY-RUN mode we keep discovery running.
 ALPHA_GATE_REQUIRE_MATCH_LIVE = True
 COOLDOWN_PAIRS_STATES = {"PENDING_HUMAN_APPROVAL", "EXECUTED_OPEN"}
 INTERVAL_MIN_DEFAULT = 15
 BANKROLL_DEFAULT     = 150.0
 TOP_N_DEFAULT        = 20
+PENDING_TICKET_MAX_AGE_SEC_DEFAULT = 1800.0
+PENDING_PROFIT_LOCK_MAX_AGE_SEC_DEFAULT = 180.0
+PENDING_DEDUPE_BY_PAIR_SIDE_DEFAULT = True
+PENDING_KEEP_PER_PAIR_SIDE_DEFAULT = 1
+COMPOUNDING_ENABLED_DEFAULT = True
+COMPOUNDING_REFERENCE_BANKROLL_USD = BANKROLL_DEFAULT
+COMPOUNDING_GROWTH_SENSITIVITY = 0.8
+COMPOUNDING_MIN_BANKROLL_MULT = 0.75
+COMPOUNDING_MAX_BANKROLL_MULT = 1.35
+COMPOUNDING_EQUITY_MAX_AGE_SEC = 10_800.0
+DEFAULT_COMPOUNDING_EQUITY_SOURCE = ROOT / "out" / "rolling_performance.json"
 
 STRATEGY_MODE_HYBRID = "hybrid"
 STRATEGY_MODE_MOONSHOT = "moonshot"
@@ -222,6 +281,110 @@ def _load_queue() -> list[dict]:
 
 def _save_queue(rows: list[dict]) -> None:
     QUEUE_FILE.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+
+
+def _parse_utc_ts(raw: object) -> datetime | None:
+    s = str(raw or "").strip()
+    if not s:
+        return None
+    try:
+        if s.endswith("Z"):
+            s = s[:-1] + "+00:00"
+        dt = datetime.fromisoformat(s)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
+    except Exception:
+        return None
+
+
+def _compact_pending_queue(rows: list[dict], runtime_cfg: dict | None) -> tuple[list[dict], dict]:
+    cfg = runtime_cfg or {}
+    ttl_pending_sec = max(
+        0.0,
+        _safe_float(cfg.get("pending_ticket_max_age_sec"), PENDING_TICKET_MAX_AGE_SEC_DEFAULT),
+    )
+    ttl_profit_lock_sec = max(
+        0.0,
+        _safe_float(
+            cfg.get("pending_profit_lock_max_age_sec"),
+            PENDING_PROFIT_LOCK_MAX_AGE_SEC_DEFAULT,
+        ),
+    )
+    dedupe_by_pair_side = bool(
+        cfg.get("pending_dedupe_by_pair_side", PENDING_DEDUPE_BY_PAIR_SIDE_DEFAULT)
+    )
+    keep_per_pair_side = max(
+        1,
+        _safe_int(cfg.get("pending_keep_per_pair_side"), PENDING_KEEP_PER_PAIR_SIDE_DEFAULT),
+    )
+
+    pending_before = sum(
+        1 for r in rows if str(r.get("approval_state") or "") == "PENDING_HUMAN_APPROVAL"
+    )
+    if not rows:
+        return rows, {
+            "changed": False,
+            "pending_before": 0,
+            "pending_after": 0,
+            "dropped_stale": 0,
+            "dropped_dedupe": 0,
+            "dedupe_enabled": dedupe_by_pair_side,
+        }
+
+    now_utc = datetime.now(timezone.utc)
+    keep_indices: set[int] = set()
+    pending_buckets: dict[str, list[tuple[float, int]]] = {}
+    dropped_stale = 0
+
+    for idx, row in enumerate(rows):
+        state = str(row.get("approval_state") or "")
+        if state != "PENDING_HUMAN_APPROVAL":
+            keep_indices.add(idx)
+            continue
+
+        ts = _parse_utc_ts(row.get("timestamp"))
+        age_sec = max(0.0, (now_utc - ts).total_seconds()) if ts else None
+        origin = str(row.get("origin") or "").strip().lower()
+        ttl = ttl_profit_lock_sec if origin == "profit_lock" else ttl_pending_sec
+        if ttl > 0 and age_sec is not None and age_sec > ttl:
+            dropped_stale += 1
+            continue
+
+        pair = str(row.get("pair") or "")
+        side = str(row.get("side") or "")
+        if not dedupe_by_pair_side:
+            keep_indices.add(idx)
+            continue
+
+        key = f"{pair}|{side}"
+        epoch = ts.timestamp() if ts else -1.0
+        pending_buckets.setdefault(key, []).append((epoch, idx))
+
+    dropped_dedupe = 0
+    if dedupe_by_pair_side:
+        selected_pending: set[int] = set()
+        for entries in pending_buckets.values():
+            entries.sort(key=lambda x: (x[0], x[1]), reverse=True)
+            for pos, (_, idx) in enumerate(entries):
+                if pos < keep_per_pair_side:
+                    selected_pending.add(idx)
+                else:
+                    dropped_dedupe += 1
+        keep_indices.update(selected_pending)
+
+    cleaned = [row for idx, row in enumerate(rows) if idx in keep_indices]
+    pending_after = sum(
+        1 for r in cleaned if str(r.get("approval_state") or "") == "PENDING_HUMAN_APPROVAL"
+    )
+    return cleaned, {
+        "changed": len(cleaned) != len(rows),
+        "pending_before": pending_before,
+        "pending_after": pending_after,
+        "dropped_stale": dropped_stale,
+        "dropped_dedupe": dropped_dedupe,
+        "dedupe_enabled": dedupe_by_pair_side,
+    }
 
 
 def _log_event(event: dict) -> None:
@@ -286,11 +449,23 @@ def _load_alpha_map_context() -> dict:
                     "wsname": wsname,
                     "strategy_mode": str(row.get("strategy_mode") or "watch").strip().lower(),
                     "alpha_edge_score": float(row.get("alpha_edge_score") or 0.0),
+                    "momentum_score": float(row.get("momentum_score") or 0.0),
+                    "trend_score": float(row.get("trend_score") or 0.0),
+                    "reversion_score": float(row.get("reversion_score") or 0.0),
+                    "liquidity_score": float(row.get("liquidity_score") or 0.0),
+                    "volatility_score": float(row.get("volatility_score") or 0.0),
+                    "execution_quality_score": float(row.get("execution_quality_score") or 0.0),
+                    "spread_penalty": float(row.get("spread_penalty") or 0.0),
                     "spread_bps": float(row.get("spread_bps") or 0.0),
                     "turnover_24h_usd": float(row.get("turnover_24h_usd") or 0.0),
+                    "r_1m_pct": float(row.get("r_1m_pct") or 0.0),
+                    "r_5m_pct": float(row.get("r_5m_pct") or 0.0),
+                    "r_30m_pct": float(row.get("r_30m_pct") or 0.0),
                     "r_1h_pct": float(row.get("r_1h_pct") or 0.0),
                     "r_24h_pct": float(row.get("r_24h_pct") or 0.0),
+                    "hv_24h_pct": float(row.get("hv_24h_pct") or 0.0),
                     "best_buy_hour_utc": int(float(row.get("best_buy_hour_utc") or -1)),
+                    "prefilter_score": float(row.get("prefilter_score") or 0.0),
                 }
     except Exception:
         return context
@@ -320,7 +495,91 @@ def _resolve_alpha_gate(runtime_cfg: dict | None) -> dict[str, object]:
     }
 
 
-def _alpha_gate(row: dict, alpha_ctx: dict, validate: bool, gate_cfg: dict[str, object]) -> tuple[bool, str, dict | None]:
+def _resolve_profitability_cfg(runtime_cfg: dict | None) -> dict[str, float]:
+    cfg = runtime_cfg or {}
+    return {
+        "min_net_edge_pct": max(
+            0.0,
+            _safe_float(cfg.get("profitability_min_net_edge_pct"), PROFITABILITY_MIN_NET_EDGE_PCT),
+        ),
+        "fee_roundtrip_bps": max(
+            0.0,
+            _safe_float(cfg.get("profitability_fee_roundtrip_bps"), PROFITABILITY_FEE_ROUNDTRIP_BPS),
+        ),
+        "slippage_floor_bps": max(
+            0.0,
+            _safe_float(cfg.get("profitability_slippage_floor_bps"), PROFITABILITY_SLIPPAGE_FLOOR_BPS),
+        ),
+        "spread_slippage_mult": max(
+            0.0,
+            _safe_float(cfg.get("profitability_spread_slippage_mult"), PROFITABILITY_SPREAD_SLIPPAGE_MULT),
+        ),
+        "min_execution_quality_score": max(
+            0.0,
+            _safe_float(
+                cfg.get("profitability_min_execution_quality_score"),
+                PROFITABILITY_MIN_EXECUTION_QUALITY_SCORE,
+            ),
+        ),
+        "notional_edge_scale_pct": max(
+            0.25,
+            _safe_float(
+                cfg.get("profitability_notional_edge_scale_pct"),
+                PROFITABILITY_NOTIONAL_EDGE_SCALE_PCT,
+            ),
+        ),
+        "notional_floor_mult": _clamp(
+            _safe_float(cfg.get("profitability_notional_floor_mult"), PROFITABILITY_NOTIONAL_FLOOR_MULT),
+            0.2,
+            1.0,
+        ),
+        "notional_cap_mult": max(
+            1.0,
+            _safe_float(cfg.get("profitability_notional_cap_mult"), PROFITABILITY_NOTIONAL_CAP_MULT),
+        ),
+    }
+
+
+def _annotate_profitability(alpha: dict, profit_cfg: dict[str, float]) -> dict:
+    enriched = dict(alpha or {})
+
+    gross_edge_pct = max(0.0, _safe_float(enriched.get("alpha_edge_score"), 0.0))
+    spread_bps = max(0.0, _safe_float(enriched.get("spread_bps"), 0.0))
+    execution_quality_score = max(0.0, _safe_float(enriched.get("execution_quality_score"), 0.0))
+    liquidity_score = max(0.0, _safe_float(enriched.get("liquidity_score"), 0.0))
+
+    quality_norm = _clamp((0.65 * execution_quality_score + 0.35 * liquidity_score) / 20.0, 0.0, 1.0)
+    slippage_bps = max(
+        profit_cfg["slippage_floor_bps"],
+        spread_bps * profit_cfg["spread_slippage_mult"],
+    )
+    friction_bps = profit_cfg["fee_roundtrip_bps"] + slippage_bps
+    net_edge_pct = gross_edge_pct - (friction_bps / 100.0)
+    risk_adjusted_net_edge_pct = net_edge_pct * (0.65 + 0.35 * quality_norm)
+
+    enriched.update(
+        {
+            "gross_edge_pct": round(gross_edge_pct, 6),
+            "estimated_fee_bps": round(float(profit_cfg["fee_roundtrip_bps"]), 6),
+            "estimated_slippage_bps": round(slippage_bps, 6),
+            "estimated_friction_bps": round(friction_bps, 6),
+            "net_edge_pct": round(net_edge_pct, 6),
+            "risk_adjusted_net_edge_pct": round(risk_adjusted_net_edge_pct, 6),
+            "quality_norm": round(quality_norm, 6),
+            "execution_quality_score": round(execution_quality_score, 6),
+            "liquidity_score": round(liquidity_score, 6),
+        }
+    )
+    return enriched
+
+
+def _alpha_gate(
+    row: dict,
+    alpha_ctx: dict,
+    validate: bool,
+    gate_cfg: dict[str, object],
+    profit_cfg: dict[str, float],
+) -> tuple[bool, str, dict | None]:
     required = _alpha_gate_required(validate, gate_cfg)
     lookup = alpha_ctx.get("lookup") if isinstance(alpha_ctx, dict) else {}
     if not isinstance(lookup, dict) or not lookup:
@@ -337,13 +596,21 @@ def _alpha_gate(row: dict, alpha_ctx: dict, validate: bool, gate_cfg: dict[str, 
             return False, "alpha_pair_not_mapped", None
         return True, "alpha_pair_not_mapped_validate_mode", None
 
+    alpha = _annotate_profitability(alpha=alpha, profit_cfg=profit_cfg)
+
     mode = str(alpha.get("strategy_mode") or "watch").strip().lower()
     edge = float(alpha.get("alpha_edge_score") or 0.0)
     spread = float(alpha.get("spread_bps") or 0.0)
     turnover = float(alpha.get("turnover_24h_usd") or 0.0)
+    execution_quality_score = float(alpha.get("execution_quality_score") or 0.0)
+    net_edge_pct = float(alpha.get("net_edge_pct") or 0.0)
     min_edge = float(gate_cfg.get("min_edge", ALPHA_GATE_MIN_EDGE))
     max_spread = float(gate_cfg.get("max_spread_bps", ALPHA_GATE_MAX_SPREAD_BPS))
     min_turnover = float(gate_cfg.get("min_turnover_usd", ALPHA_GATE_MIN_TURNOVER_USD))
+    min_execution_quality_score = float(
+        profit_cfg.get("min_execution_quality_score", PROFITABILITY_MIN_EXECUTION_QUALITY_SCORE)
+    )
+    min_net_edge_pct = float(profit_cfg.get("min_net_edge_pct", PROFITABILITY_MIN_NET_EDGE_PCT))
 
     if mode not in ALPHA_GATE_ALLOWED_STRATEGIES:
         if not (mode == "watch" and bool(gate_cfg.get("allow_watch_strategy", False))):
@@ -355,6 +622,10 @@ def _alpha_gate(row: dict, alpha_ctx: dict, validate: bool, gate_cfg: dict[str, 
         return False, f"alpha_spread>{max_spread}", alpha
     if turnover < min_turnover:
         return False, f"alpha_turnover<{min_turnover}", alpha
+    if execution_quality_score < min_execution_quality_score:
+        return False, f"alpha_exec_quality<{min_execution_quality_score}", alpha
+    if net_edge_pct < min_net_edge_pct:
+        return False, f"alpha_net_edge<{min_net_edge_pct}", alpha
 
     return True, "alpha_gate_ok", alpha
 
@@ -393,11 +664,112 @@ def _clamp(value: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, value))
 
 
+def _resolve_effective_bankroll(runtime_cfg: dict | None, fallback_bankroll: float) -> tuple[float, dict]:
+    cfg = runtime_cfg or {}
+    fallback = max(MIN_NOTIONAL_USD, _safe_float(fallback_bankroll, BANKROLL_DEFAULT))
+
+    bankroll_override = _safe_float(cfg.get("bankroll_usd"), 0.0)
+    if bankroll_override > 0:
+        return bankroll_override, {
+            "source": "runtime_cfg.bankroll_usd",
+            "source_path": None,
+            "source_age_sec": None,
+            "source_fresh": True,
+        }
+
+    source_path_raw = str(cfg.get("compounding_equity_source_path") or "").strip()
+    source_path = Path(source_path_raw) if source_path_raw else DEFAULT_COMPOUNDING_EQUITY_SOURCE
+    if not source_path.is_absolute():
+        source_path = ROOT / source_path
+    max_age_sec = max(
+        0.0,
+        _safe_float(cfg.get("compounding_equity_max_age_sec"), COMPOUNDING_EQUITY_MAX_AGE_SEC),
+    )
+    source_label = str(source_path)
+    try:
+        source_label = str(source_path.relative_to(ROOT))
+    except Exception:
+        pass
+
+    if source_path.exists():
+        try:
+            age_sec = max(0.0, time.time() - source_path.stat().st_mtime)
+            payload = json.loads(source_path.read_text(encoding="utf-8"))
+            equity = _safe_float(payload.get("current_equity"), 0.0)
+            if equity <= 0:
+                equity = _safe_float(payload.get("current_equity_usd"), 0.0)
+            if equity <= 0:
+                equity = _safe_float(payload.get("equity_usd"), 0.0)
+            source_fresh = (max_age_sec <= 0) or (age_sec <= max_age_sec)
+            if equity > 0 and source_fresh:
+                return max(MIN_NOTIONAL_USD, equity), {
+                    "source": "compounding_equity_source",
+                    "source_path": source_label,
+                    "source_age_sec": round(float(age_sec), 3),
+                    "source_fresh": True,
+                }
+            return fallback, {
+                "source": "compounding_equity_source_stale_or_invalid",
+                "source_path": source_label,
+                "source_age_sec": round(float(age_sec), 3),
+                "source_fresh": False,
+            }
+        except Exception:
+            pass
+
+    return fallback, {
+        "source": "cli_fallback",
+        "source_path": source_label,
+        "source_age_sec": None,
+        "source_fresh": False,
+    }
+
+
 def _resolve_strategy_runtime(runtime_cfg: dict | None, bankroll: float, validate: bool) -> dict:
     cfg = runtime_cfg or {}
     strategy_mode = str(cfg.get("strategy_mode") or STRATEGY_MODE_HYBRID).strip().lower()
     if strategy_mode not in STRATEGY_MODES:
         strategy_mode = STRATEGY_MODE_HYBRID
+
+    effective_bankroll = max(MIN_NOTIONAL_USD, _safe_float(bankroll, BANKROLL_DEFAULT))
+    compounding_enabled = bool(cfg.get("compounding_enabled", COMPOUNDING_ENABLED_DEFAULT))
+    reference_bankroll_usd = max(
+        MIN_NOTIONAL_USD,
+        _safe_float(
+            cfg.get("compounding_reference_bankroll_usd"),
+            COMPOUNDING_REFERENCE_BANKROLL_USD,
+        ),
+    )
+    compounding_growth_sensitivity = _clamp(
+        _safe_float(
+            cfg.get("compounding_growth_sensitivity"),
+            COMPOUNDING_GROWTH_SENSITIVITY,
+        ),
+        0.1,
+        2.5,
+    )
+    compounding_min_bankroll_mult = _clamp(
+        _safe_float(
+            cfg.get("compounding_min_bankroll_mult"),
+            COMPOUNDING_MIN_BANKROLL_MULT,
+        ),
+        0.25,
+        1.0,
+    )
+    compounding_max_bankroll_mult = max(
+        1.0,
+        _safe_float(
+            cfg.get("compounding_max_bankroll_mult"),
+            COMPOUNDING_MAX_BANKROLL_MULT,
+        ),
+    )
+    bankroll_ratio = effective_bankroll / max(reference_bankroll_usd, MIN_NOTIONAL_USD)
+    raw_bankroll_mult = bankroll_ratio ** compounding_growth_sensitivity if compounding_enabled else 1.0
+    compounding_bankroll_mult = (
+        _clamp(raw_bankroll_mult, compounding_min_bankroll_mult, compounding_max_bankroll_mult)
+        if compounding_enabled
+        else 1.0
+    )
 
     hard_max_notional = MAX_NOTIONAL_USD_VALIDATE_HARD if validate else MAX_NOTIONAL_USD_LIVE_HARD
     max_notional_usd = _clamp(
@@ -412,23 +784,41 @@ def _resolve_strategy_runtime(runtime_cfg: dict | None, bankroll: float, validat
         0.60,
     )
     moonshot_target_notional_usd = _clamp(
-        max(bankroll * moonshot_bankroll_frac, MIN_NOTIONAL_USD),
+        max(effective_bankroll * moonshot_bankroll_frac, MIN_NOTIONAL_USD),
         MIN_NOTIONAL_USD,
         max_notional_usd,
     )
-    quickhit_target_notional_usd = _clamp(
+    quickhit_base_target_notional_usd = _clamp(
         _safe_float(cfg.get("quickhit_target_notional_usd"), 12.0),
         MIN_NOTIONAL_USD,
         max_notional_usd,
     )
-    swing_target_notional_usd = _clamp(
+    quickhit_target_notional_usd = _clamp(
+        quickhit_base_target_notional_usd * compounding_bankroll_mult,
+        MIN_NOTIONAL_USD,
+        max_notional_usd,
+    )
+    swing_base_target_notional_usd = _clamp(
         _safe_float(cfg.get("swing_target_notional_usd"), 16.0),
+        MIN_NOTIONAL_USD,
+        max_notional_usd,
+    )
+    swing_target_notional_usd = _clamp(
+        swing_base_target_notional_usd * compounding_bankroll_mult,
         MIN_NOTIONAL_USD,
         max_notional_usd,
     )
 
     return {
         "strategy_mode": strategy_mode,
+        "effective_bankroll_usd": effective_bankroll,
+        "compounding_enabled": compounding_enabled,
+        "compounding_reference_bankroll_usd": reference_bankroll_usd,
+        "compounding_growth_sensitivity": compounding_growth_sensitivity,
+        "compounding_min_bankroll_mult": compounding_min_bankroll_mult,
+        "compounding_max_bankroll_mult": compounding_max_bankroll_mult,
+        "compounding_bankroll_ratio": bankroll_ratio,
+        "compounding_bankroll_mult": compounding_bankroll_mult,
         "max_notional_usd": max_notional_usd,
         "moonshot_target_notional_usd": moonshot_target_notional_usd,
         "moonshot_max_per_cycle": max(0, _safe_int(cfg.get("moonshot_max_per_cycle"), 1)),
@@ -446,6 +836,7 @@ def _resolve_strategy_runtime(runtime_cfg: dict | None, bankroll: float, validat
         "quickhit_min_m4h_pct": _safe_float(cfg.get("quickhit_min_m4h_pct"), -8.0),
         "quickhit_max_spread_bps": _safe_float(cfg.get("quickhit_max_spread_bps"), 24.0),
         "quickhit_min_turnover_usd": _safe_float(cfg.get("quickhit_min_turnover_usd"), 180000.0),
+        "quickhit_base_target_notional_usd": quickhit_base_target_notional_usd,
         "swing_target_notional_usd": swing_target_notional_usd,
         "swing_max_per_cycle": max(0, _safe_int(cfg.get("swing_max_per_cycle"), 2)),
         "swing_min_edge": _safe_float(cfg.get("swing_min_edge"), 4.5),
@@ -453,6 +844,7 @@ def _resolve_strategy_runtime(runtime_cfg: dict | None, bankroll: float, validat
         "swing_min_m4h_pct": _safe_float(cfg.get("swing_min_m4h_pct"), -3.0),
         "swing_max_spread_bps": _safe_float(cfg.get("swing_max_spread_bps"), 30.0),
         "swing_min_turnover_usd": _safe_float(cfg.get("swing_min_turnover_usd"), 150000.0),
+        "swing_base_target_notional_usd": swing_base_target_notional_usd,
     }
 
 
@@ -497,10 +889,16 @@ def _classify_strategy_lane(row: dict, alpha_row: dict | None, strategy_cfg: dic
     else:
         alpha_mode = str(alpha.get("strategy_mode") or "watch").strip().lower()
 
-    edge = _safe_float(alpha.get("alpha_edge_score"), fallback_edge)
+    raw_edge = _safe_float(alpha.get("alpha_edge_score"), fallback_edge)
+    net_edge = _safe_float(alpha.get("net_edge_pct"), raw_edge)
+    risk_adjusted_net_edge = _safe_float(alpha.get("risk_adjusted_net_edge_pct"), net_edge)
+    edge = risk_adjusted_net_edge
     spread = _safe_float(alpha.get("spread_bps"), fallback_spread)
     turnover = _safe_float(alpha.get("turnover_24h_usd"), fallback_turnover)
     trend_score = _safe_float(alpha.get("trend_score"), 0.0)
+    execution_quality_score = _safe_float(alpha.get("execution_quality_score"), 0.0)
+    liquidity_score = _safe_float(alpha.get("liquidity_score"), 0.0)
+    estimated_friction_bps = _safe_float(alpha.get("estimated_friction_bps"), spread)
 
     r_1m = _safe_float(alpha.get("r_1m_pct"), fallback_r_1m)
     r_5m = _safe_float(alpha.get("r_5m_pct"), fallback_r_5m)
@@ -584,6 +982,14 @@ def _classify_strategy_lane(row: dict, alpha_row: dict | None, strategy_cfg: dic
             "lane_reason": "no_strategy_lane_match",
             "lane_score": 0.0,
             "alpha_mode": alpha_mode,
+            "profitability": {
+                "raw_edge_pct": round(raw_edge, 6),
+                "net_edge_pct": round(net_edge, 6),
+                "risk_adjusted_net_edge_pct": round(risk_adjusted_net_edge, 6),
+                "estimated_friction_bps": round(estimated_friction_bps, 6),
+                "execution_quality_score": round(execution_quality_score, 6),
+                "liquidity_score": round(liquidity_score, 6),
+            },
             "tf": {
                 "r_1m_pct": round(r_1m, 6),
                 "r_15m_pct": round(r_15m, 6),
@@ -598,6 +1004,14 @@ def _classify_strategy_lane(row: dict, alpha_row: dict | None, strategy_cfg: dic
         "lane_reason": lane_reason,
         "lane_score": round(float(lane_score), 6),
         "alpha_mode": alpha_mode,
+        "profitability": {
+            "raw_edge_pct": round(raw_edge, 6),
+            "net_edge_pct": round(net_edge, 6),
+            "risk_adjusted_net_edge_pct": round(risk_adjusted_net_edge, 6),
+            "estimated_friction_bps": round(estimated_friction_bps, 6),
+            "execution_quality_score": round(execution_quality_score, 6),
+            "liquidity_score": round(liquidity_score, 6),
+        },
         "tf": {
             "r_1m_pct": round(r_1m, 6),
             "r_15m_pct": round(r_15m, 6),
@@ -617,7 +1031,12 @@ def _lane_cycle_cap(lane: str, strategy_cfg: dict) -> int:
     return 0
 
 
-def _resolve_lane_notional_usd(row: dict, lane: str, strategy_cfg: dict) -> float:
+def _resolve_lane_notional_usd(
+    row: dict,
+    lane: str,
+    strategy_cfg: dict,
+    strategy_meta: dict | None = None,
+) -> tuple[float, dict]:
     suggested_usd = float(row.get("size_usd", 0)) or float(row.get("size_pct", 0)) * BANKROLL_DEFAULT / 100
     if lane == LANE_MOONSHOT:
         target = max(suggested_usd, _safe_float(strategy_cfg.get("moonshot_target_notional_usd"), MAX_NOTIONAL_USD))
@@ -628,8 +1047,50 @@ def _resolve_lane_notional_usd(row: dict, lane: str, strategy_cfg: dict) -> floa
     else:
         target = suggested_usd or MAX_NOTIONAL_USD
 
+    sizing_meta = {
+        "base_target_usd": round(float(target), 6),
+        "conviction_mult": 1.0,
+        "edge_for_sizing_pct": 0.0,
+    }
+
+    profit_meta = (strategy_meta or {}).get("profitability") if isinstance(strategy_meta, dict) else None
+    edge_for_sizing = _safe_float(
+        (profit_meta or {}).get("risk_adjusted_net_edge_pct"),
+        _safe_float((profit_meta or {}).get("net_edge_pct"), 0.0),
+    )
+    if edge_for_sizing > 0:
+        edge_scale = max(
+            0.25,
+            _safe_float(
+                strategy_cfg.get("profitability_notional_edge_scale_pct"),
+                PROFITABILITY_NOTIONAL_EDGE_SCALE_PCT,
+            ),
+        )
+        floor_mult = _clamp(
+            _safe_float(
+                strategy_cfg.get("profitability_notional_floor_mult"),
+                PROFITABILITY_NOTIONAL_FLOOR_MULT,
+            ),
+            0.2,
+            1.0,
+        )
+        cap_mult = max(
+            1.0,
+            _safe_float(
+                strategy_cfg.get("profitability_notional_cap_mult"),
+                PROFITABILITY_NOTIONAL_CAP_MULT,
+            ),
+        )
+        conviction_mult = _clamp(floor_mult + (edge_for_sizing / edge_scale), floor_mult, cap_mult)
+        target *= conviction_mult
+        sizing_meta = {
+            "base_target_usd": sizing_meta["base_target_usd"],
+            "conviction_mult": round(float(conviction_mult), 6),
+            "edge_for_sizing_pct": round(float(edge_for_sizing), 6),
+        }
+
     max_notional = _safe_float(strategy_cfg.get("max_notional_usd"), MAX_NOTIONAL_USD)
-    return _clamp(target, MIN_NOTIONAL_USD, max_notional)
+    return _clamp(target, MIN_NOTIONAL_USD, max_notional), sizing_meta
 
 
 def _load_cached_scan_if_fresh(max_age_sec: float) -> dict | None:
@@ -646,7 +1107,13 @@ def _load_cached_scan_if_fresh(max_age_sec: float) -> dict | None:
     return _load_cached_scan()
 
 
-def _eligible(row: dict, alpha_ctx: dict, validate: bool, gate_cfg: dict[str, object]) -> tuple[bool, str, dict | None]:
+def _eligible(
+    row: dict,
+    alpha_ctx: dict,
+    validate: bool,
+    gate_cfg: dict[str, object],
+    profit_cfg: dict[str, float],
+) -> tuple[bool, str, dict | None]:
     score = float(row.get("score", 0))
     signals = row.get("signals") or []
     vol_24h = float(row.get("vol_24h_usd", 0))
@@ -663,7 +1130,7 @@ def _eligible(row: dict, alpha_ctx: dict, validate: bool, gate_cfg: dict[str, ob
     if price <= 0:
         return False, "zero_price", None
 
-    alpha_ok, alpha_reason, alpha_row = _alpha_gate(row, alpha_ctx, validate, gate_cfg)
+    alpha_ok, alpha_reason, alpha_row = _alpha_gate(row, alpha_ctx, validate, gate_cfg, profit_cfg)
     if not alpha_ok:
         return False, alpha_reason, alpha_row
 
@@ -676,6 +1143,7 @@ def _compute_throughput_targets(
     validate: bool,
     pending_count: int,
     gate_cfg: dict[str, object],
+    profit_cfg: dict[str, float],
     runtime_cfg: dict | None,
 ) -> dict[str, int | bool]:
     cfg = runtime_cfg or {}
@@ -692,7 +1160,13 @@ def _compute_throughput_targets(
     actionable = 0
     strong = 0
     for row in leaderboard:
-        ok, _why, alpha_row = _eligible(row, alpha_ctx=alpha_ctx, validate=validate, gate_cfg=gate_cfg)
+        ok, _why, alpha_row = _eligible(
+            row,
+            alpha_ctx=alpha_ctx,
+            validate=validate,
+            gate_cfg=gate_cfg,
+            profit_cfg=profit_cfg,
+        )
         if not ok:
             continue
         actionable += 1
@@ -733,13 +1207,30 @@ def _build_ticket(
         return None
     price = float(row["price"])
     strat_cfg = strategy_cfg if isinstance(strategy_cfg, dict) else {}
+    strategy_payload = dict(strategy_meta or {})
+    sizing_meta = {
+        "base_target_usd": 0.0,
+        "conviction_mult": 1.0,
+        "edge_for_sizing_pct": 0.0,
+    }
     if strategy_lane:
-        notional = _resolve_lane_notional_usd(row=row, lane=strategy_lane, strategy_cfg=strat_cfg)
+        notional, sizing_meta = _resolve_lane_notional_usd(
+            row=row,
+            lane=strategy_lane,
+            strategy_cfg=strat_cfg,
+            strategy_meta=strategy_payload,
+        )
     else:
         # Fallback for legacy callsites.
         suggested_usd = float(row.get("size_usd", 0)) or float(row.get("size_pct", 0)) * BANKROLL_DEFAULT / 100
         max_notional = _safe_float(strat_cfg.get("max_notional_usd"), MAX_NOTIONAL_USD)
         notional = max(MIN_NOTIONAL_USD, min(max_notional, suggested_usd or max_notional))
+        sizing_meta = {
+            "base_target_usd": round(float(suggested_usd or max_notional), 6),
+            "conviction_mult": 1.0,
+            "edge_for_sizing_pct": 0.0,
+        }
+    strategy_payload["sizing"] = sizing_meta
     volume_base = notional / price
     if volume_base <= 0:
         return None
@@ -776,13 +1267,19 @@ def _build_ticket(
             "wsname":     row.get("wsname"),
             "source":     "spike_hunter_v1",
             "strategy_lane": strategy_lane,
-            "strategy": strategy_meta or {},
+            "strategy": strategy_payload,
             "alpha_gate": {
                 "enabled": True,
                 "strategy_mode": (alpha_row or {}).get("strategy_mode"),
                 "alpha_edge_score": (alpha_row or {}).get("alpha_edge_score"),
                 "spread_bps": (alpha_row or {}).get("spread_bps"),
                 "turnover_24h_usd": (alpha_row or {}).get("turnover_24h_usd"),
+                "execution_quality_score": (alpha_row or {}).get("execution_quality_score"),
+                "liquidity_score": (alpha_row or {}).get("liquidity_score"),
+                "estimated_friction_bps": (alpha_row or {}).get("estimated_friction_bps"),
+                "gross_edge_pct": (alpha_row or {}).get("gross_edge_pct"),
+                "net_edge_pct": (alpha_row or {}).get("net_edge_pct"),
+                "risk_adjusted_net_edge_pct": (alpha_row or {}).get("risk_adjusted_net_edge_pct"),
                 "r_1h_pct": (alpha_row or {}).get("r_1h_pct"),
                 "r_24h_pct": (alpha_row or {}).get("r_24h_pct"),
                 "best_buy_hour_utc": (alpha_row or {}).get("best_buy_hour_utc"),
@@ -801,21 +1298,42 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
         default_threshold=auto_fire_score,
         default_enabled=True,
     )
+    effective_bankroll, bankroll_meta = _resolve_effective_bankroll(rt_cfg, bankroll)
 
     scan_source = "fresh_scan"
     scan = _load_cached_scan() if use_cached else _load_cached_scan_if_fresh(scan_max_age_sec)
     if scan is not None:
         scan_source = "cached_forced" if use_cached else "cached_fresh"
     if scan is None:
-        scan = _refresh_scan(bankroll=bankroll, top_n=top_n)
+        scan = _refresh_scan(bankroll=effective_bankroll, top_n=top_n)
         # Archive every fresh scan for later backtesting.
         _archive_scan(scan)
 
     leaderboard = scan.get("leaderboard") or []
     alpha_ctx = _load_alpha_map_context()
     gate_cfg = _resolve_alpha_gate(rt_cfg)
-    strategy_cfg = _resolve_strategy_runtime(runtime_cfg=rt_cfg, bankroll=bankroll, validate=validate)
+    profit_cfg = _resolve_profitability_cfg(rt_cfg)
+    strategy_cfg = _resolve_strategy_runtime(runtime_cfg=rt_cfg, bankroll=effective_bankroll, validate=validate)
+    strategy_cfg.update(
+        {
+            "profitability_notional_edge_scale_pct": profit_cfg.get(
+                "notional_edge_scale_pct",
+                PROFITABILITY_NOTIONAL_EDGE_SCALE_PCT,
+            ),
+            "profitability_notional_floor_mult": profit_cfg.get(
+                "notional_floor_mult",
+                PROFITABILITY_NOTIONAL_FLOOR_MULT,
+            ),
+            "profitability_notional_cap_mult": profit_cfg.get(
+                "notional_cap_mult",
+                PROFITABILITY_NOTIONAL_CAP_MULT,
+            ),
+        }
+    )
     rows = _load_queue()
+    rows, queue_cleanup = _compact_pending_queue(rows, rt_cfg)
+    if queue_cleanup.get("changed"):
+        _save_queue(rows)
 
     # Pairs already pending or in flight ─ skip duplicates
     blocked_pairs = {
@@ -832,6 +1350,7 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
         validate=validate,
         pending_count=pending_count,
         gate_cfg=gate_cfg,
+        profit_cfg=profit_cfg,
         runtime_cfg=rt_cfg,
     )
     slots = int(throughput["cycle_emit_budget"])
@@ -840,6 +1359,7 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
     skipped = []
     alpha_gate_pass_count = 0
     alpha_gate_fail_count = 0
+    profitability_gate_fail_count = 0
     lane_emitted_counts = {lane: 0 for lane in LANES}
     lane_skip_counts = {lane: 0 for lane in LANES}
 
@@ -850,11 +1370,19 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
         if pair in blocked_pairs:
             skipped.append({"pair": pair, "reason": "in_queue"})
             continue
-        ok, why, alpha_row = _eligible(row, alpha_ctx=alpha_ctx, validate=validate, gate_cfg=gate_cfg)
+        ok, why, alpha_row = _eligible(
+            row,
+            alpha_ctx=alpha_ctx,
+            validate=validate,
+            gate_cfg=gate_cfg,
+            profit_cfg=profit_cfg,
+        )
         if not ok:
             skipped.append({"pair": pair, "reason": why})
             if str(why).startswith("alpha_"):
                 alpha_gate_fail_count += 1
+            if str(why).startswith("alpha_net_edge") or str(why).startswith("alpha_exec_quality"):
+                profitability_gate_fail_count += 1
             continue
         if alpha_row:
             alpha_gate_pass_count += 1
@@ -880,6 +1408,8 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
                 f"signals={row.get('signals')} "
                 f"lane={lane} "
                 f"alpha_edge={(alpha_row or {}).get('alpha_edge_score', 'n/a')} "
+                f"net_edge={(strat.get('profitability') or {}).get('risk_adjusted_net_edge_pct', 'n/a')} "
+                f"friction_bps={(strat.get('profitability') or {}).get('estimated_friction_bps', 'n/a')} "
                 f"r1m={strat.get('tf', {}).get('r_1m_pct')} "
                 f"r15m={strat.get('tf', {}).get('r_15m_pct')} "
                 f"r1h={strat.get('tf', {}).get('r_1h_pct')} "
@@ -907,6 +1437,9 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
             "tf": strat.get("tf"),
             "alpha_edge_score": (alpha_row or {}).get("alpha_edge_score"),
             "alpha_strategy_mode": (alpha_row or {}).get("strategy_mode"),
+            "net_edge_pct": (strat.get("profitability") or {}).get("net_edge_pct"),
+            "risk_adjusted_net_edge_pct": (strat.get("profitability") or {}).get("risk_adjusted_net_edge_pct"),
+            "estimated_friction_bps": (strat.get("profitability") or {}).get("estimated_friction_bps"),
             "notional_usd": ticket["notional_usd"],
             "validate": ticket["payload"]["validate"],
         })
@@ -965,6 +1498,25 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
         "scan_max_age_sec": round(float(scan_max_age_sec), 3),
         "pairs_scanned": scan.get("pairs_scanned"),
         "leaderboard_size": len(leaderboard),
+        "bankroll_input_usd": float(bankroll),
+        "effective_bankroll_usd": float(strategy_cfg.get("effective_bankroll_usd", effective_bankroll)),
+        "bankroll_source": bankroll_meta.get("source"),
+        "bankroll_source_path": bankroll_meta.get("source_path"),
+        "bankroll_source_age_sec": bankroll_meta.get("source_age_sec"),
+        "bankroll_source_fresh": bankroll_meta.get("source_fresh"),
+        "compounding_enabled": bool(strategy_cfg.get("compounding_enabled", False)),
+        "compounding_bankroll_mult": float(strategy_cfg.get("compounding_bankroll_mult", 1.0)),
+        "compounding_reference_bankroll_usd": float(
+            strategy_cfg.get("compounding_reference_bankroll_usd", BANKROLL_DEFAULT)
+        ),
+        "quickhit_base_target_notional_usd": float(
+            strategy_cfg.get("quickhit_base_target_notional_usd", strategy_cfg.get("quickhit_target_notional_usd", 0.0))
+        ),
+        "quickhit_target_notional_usd": float(strategy_cfg.get("quickhit_target_notional_usd", 0.0)),
+        "swing_base_target_notional_usd": float(
+            strategy_cfg.get("swing_base_target_notional_usd", strategy_cfg.get("swing_target_notional_usd", 0.0))
+        ),
+        "swing_target_notional_usd": float(strategy_cfg.get("swing_target_notional_usd", 0.0)),
         "alpha_map_available": bool(alpha_ctx.get("available")),
         "alpha_map_generated_utc": alpha_ctx.get("generated_utc"),
         "alpha_map_pairs_analyzed": alpha_ctx.get("pairs_analyzed"),
@@ -974,6 +1526,34 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
         "alpha_gate_min_edge": float(gate_cfg.get("min_edge", ALPHA_GATE_MIN_EDGE)),
         "alpha_gate_max_spread_bps": float(gate_cfg.get("max_spread_bps", ALPHA_GATE_MAX_SPREAD_BPS)),
         "alpha_gate_min_turnover_usd": float(gate_cfg.get("min_turnover_usd", ALPHA_GATE_MIN_TURNOVER_USD)),
+        "profitability_min_net_edge_pct": float(
+            profit_cfg.get("min_net_edge_pct", PROFITABILITY_MIN_NET_EDGE_PCT)
+        ),
+        "profitability_fee_roundtrip_bps": float(
+            profit_cfg.get("fee_roundtrip_bps", PROFITABILITY_FEE_ROUNDTRIP_BPS)
+        ),
+        "profitability_slippage_floor_bps": float(
+            profit_cfg.get("slippage_floor_bps", PROFITABILITY_SLIPPAGE_FLOOR_BPS)
+        ),
+        "profitability_spread_slippage_mult": float(
+            profit_cfg.get("spread_slippage_mult", PROFITABILITY_SPREAD_SLIPPAGE_MULT)
+        ),
+        "profitability_min_execution_quality_score": float(
+            profit_cfg.get(
+                "min_execution_quality_score",
+                PROFITABILITY_MIN_EXECUTION_QUALITY_SCORE,
+            )
+        ),
+        "profitability_notional_edge_scale_pct": float(
+            profit_cfg.get("notional_edge_scale_pct", PROFITABILITY_NOTIONAL_EDGE_SCALE_PCT)
+        ),
+        "profitability_notional_floor_mult": float(
+            profit_cfg.get("notional_floor_mult", PROFITABILITY_NOTIONAL_FLOOR_MULT)
+        ),
+        "profitability_notional_cap_mult": float(
+            profit_cfg.get("notional_cap_mult", PROFITABILITY_NOTIONAL_CAP_MULT)
+        ),
+        "profitability_gate_fail_count": profitability_gate_fail_count,
         "strategy_mode": strategy_cfg.get("strategy_mode"),
         "max_notional_usd": strategy_cfg.get("max_notional_usd"),
         "strategy_lane_caps": {
@@ -983,6 +1563,12 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
         },
         "strategy_lane_emitted": lane_emitted_counts,
         "strategy_lane_skipped_budget": lane_skip_counts,
+        "pending_cleanup_changed": bool(queue_cleanup.get("changed")),
+        "pending_cleanup_before": int(queue_cleanup.get("pending_before", pending_count)),
+        "pending_cleanup_after": int(queue_cleanup.get("pending_after", pending_count)),
+        "pending_cleanup_dropped_stale": int(queue_cleanup.get("dropped_stale", 0)),
+        "pending_cleanup_dropped_dedupe": int(queue_cleanup.get("dropped_dedupe", 0)),
+        "pending_cleanup_dedupe_enabled": bool(queue_cleanup.get("dedupe_enabled", False)),
         "pending_before": pending_count,
         "adaptive_queue": bool(throughput["adaptive_queue"]),
         "target_pending_capacity": int(throughput["target_pending"]),
@@ -1046,6 +1632,10 @@ def main() -> int:
             "adaptive_queue": ADAPTIVE_QUEUE_DEFAULT,
             "scan_max_age_sec": args.scan_max_age_sec,
             "top_n": args.top_n,
+            "pending_ticket_max_age_sec": PENDING_TICKET_MAX_AGE_SEC_DEFAULT,
+            "pending_profit_lock_max_age_sec": PENDING_PROFIT_LOCK_MAX_AGE_SEC_DEFAULT,
+            "pending_dedupe_by_pair_side": PENDING_DEDUPE_BY_PAIR_SIDE_DEFAULT,
+            "pending_keep_per_pair_side": PENDING_KEEP_PER_PAIR_SIDE_DEFAULT,
             "max_auto_fires_per_cycle": MAX_AUTO_FIRES_PER_CYCLE,
             "alpha_gate_min_edge": ALPHA_GATE_MIN_EDGE,
             "alpha_gate_max_spread_bps": ALPHA_GATE_MAX_SPREAD_BPS,
@@ -1053,7 +1643,15 @@ def main() -> int:
             "alpha_gate_allow_watch_strategy": False,
             "alpha_gate_require_match_live": True,
             "strategy_mode": STRATEGY_MODE_HYBRID,
+            "bankroll_usd": args.bankroll,
             "max_notional_usd": MAX_NOTIONAL_USD,
+            "compounding_enabled": COMPOUNDING_ENABLED_DEFAULT,
+            "compounding_reference_bankroll_usd": COMPOUNDING_REFERENCE_BANKROLL_USD,
+            "compounding_growth_sensitivity": COMPOUNDING_GROWTH_SENSITIVITY,
+            "compounding_min_bankroll_mult": COMPOUNDING_MIN_BANKROLL_MULT,
+            "compounding_max_bankroll_mult": COMPOUNDING_MAX_BANKROLL_MULT,
+            "compounding_equity_source_path": "out/rolling_performance.json",
+            "compounding_equity_max_age_sec": COMPOUNDING_EQUITY_MAX_AGE_SEC,
             "moonshot_bankroll_frac": 0.18,
             "moonshot_max_per_cycle": 1,
             "moonshot_min_edge": 5.5,
@@ -1077,6 +1675,14 @@ def main() -> int:
             "swing_min_m4h_pct": -3.0,
             "swing_max_spread_bps": 30.0,
             "swing_min_turnover_usd": 150000.0,
+            "profitability_min_net_edge_pct": PROFITABILITY_MIN_NET_EDGE_PCT,
+            "profitability_fee_roundtrip_bps": PROFITABILITY_FEE_ROUNDTRIP_BPS,
+            "profitability_slippage_floor_bps": PROFITABILITY_SLIPPAGE_FLOOR_BPS,
+            "profitability_spread_slippage_mult": PROFITABILITY_SPREAD_SLIPPAGE_MULT,
+            "profitability_min_execution_quality_score": PROFITABILITY_MIN_EXECUTION_QUALITY_SCORE,
+            "profitability_notional_edge_scale_pct": PROFITABILITY_NOTIONAL_EDGE_SCALE_PCT,
+            "profitability_notional_floor_mult": PROFITABILITY_NOTIONAL_FLOOR_MULT,
+            "profitability_notional_cap_mult": PROFITABILITY_NOTIONAL_CAP_MULT,
         })
 
     # Write PID for dashboard control
