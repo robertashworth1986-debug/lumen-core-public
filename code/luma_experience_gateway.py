@@ -6531,10 +6531,10 @@ async def api_sells_lock_in(request: Request) -> dict[str, Any]:
     for t in queue:
         if str(t.get("side", "")).lower() != "sell":
             continue
-        # Don't count rejected/cancelled tickets toward the cooldown — those
-        # never went out the door and shouldn't block the next attempt.
+        # Count guard/human rejections toward cooldown to avoid rapid
+        # re-emission loops for lots that are not currently executable.
         state = str(t.get("approval_state") or "").upper()
-        if state in ("REJECTED_BY_GUARD", "REJECTED", "CANCELLED", "EXPIRED"):
+        if state in ("CANCELLED", "EXPIRED"):
             continue
         src = str(t.get("source_txid") or "")
         if not src:
@@ -6623,7 +6623,7 @@ async def _profit_lock_watcher() -> None:
                     if str(t.get("side", "")).lower() != "sell":
                         continue
                     state = str(t.get("approval_state") or "").upper()
-                    if state in ("REJECTED_BY_GUARD", "REJECTED", "CANCELLED", "EXPIRED"):
+                    if state in ("CANCELLED", "EXPIRED"):
                         continue
                     src = str(t.get("source_txid") or "")
                     if not src:
