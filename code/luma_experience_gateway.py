@@ -156,6 +156,8 @@ LIVE_TRUTH_FILE = OUT / "live_truth_fabric" / "live_truth_router.json"
 LIVE_TRUTH_MANIFEST_FILE = OUT / "live_truth_fabric" / "live_truth_manifest.json"
 LIVE_TRUTH_HEARTBEAT_FILE = EXEC_OUT / "live_truth_fabric_heartbeat.json"
 KRAKEN_POSITIVE_PROOF_FILE = EXEC_OUT / "kraken_positive_proof.json"
+KRAKEN_ALPHA_MAP_FILE = OUT / "ops" / "kraken_multi_tf_alpha_map_latest.json"
+KRAKEN_ALPHA_MAP_FILE_STACK_FALLBACK = ROOT / "INSTITUTIONAL_STACK_V2" / "out" / "ops" / "kraken_multi_tf_alpha_map_latest.json"
 PACKAGE_LEVERAGE_FILE = EXEC_OUT / "package_leverage_audit.json"
 FUNDING_QUEUE_FILE = OUT / "funding" / "funding_approval_queue.json"
 METRICS_SCORECARD_FILE = EXEC_OUT / "institutional_metrics_scorecard.json"
@@ -2848,6 +2850,36 @@ def investor_brief() -> dict[str, Any]:
     snapshot_packages = snapshot_data.get("packages", {}) if isinstance(snapshot_data, dict) else {}
     snapshot_evidence = snapshot_data.get("evidence", {}) if isinstance(snapshot_data, dict) else {}
     evidence_derived = snapshot_evidence.get("derived", {}) if isinstance(snapshot_evidence, dict) else {}
+    alpha_map_raw: dict[str, Any] = {}
+    alpha_map_source = ""
+    for cand in (KRAKEN_ALPHA_MAP_FILE, KRAKEN_ALPHA_MAP_FILE_STACK_FALLBACK):
+        payload = load_json(cand, None)
+        if isinstance(payload, dict) and payload:
+            alpha_map_raw = payload
+            alpha_map_source = str(cand)
+            break
+    alpha_leaderboard = alpha_map_raw.get("alpha_leaderboard") if isinstance(alpha_map_raw.get("alpha_leaderboard"), list) else []
+    alpha_top = alpha_leaderboard[0] if alpha_leaderboard else {}
+    if not isinstance(alpha_top, dict):
+        alpha_top = {}
+
+    try:
+        alpha_pairs_analyzed = int(float(alpha_map_raw.get("pairs_analyzed", 0) or 0))
+    except Exception:
+        alpha_pairs_analyzed = 0
+    try:
+        alpha_pair_errors = int(float(alpha_map_raw.get("pair_errors", 0) or 0))
+    except Exception:
+        alpha_pair_errors = 0
+
+    alpha_map_summary = {
+        "generated_utc": alpha_map_raw.get("generated_utc"),
+        "pairs_analyzed": alpha_pairs_analyzed,
+        "pair_errors": alpha_pair_errors,
+        "source_path": alpha_map_source,
+        "controls": alpha_map_raw.get("controls", {}),
+        "alpha_leaderboard": alpha_leaderboard[:20],
+    }
     try:
         perf = api_perf_session()
     except Exception:
@@ -2916,12 +2948,18 @@ def investor_brief() -> dict[str, Any]:
             "router_win_rate_pct": float(evidence_derived.get("router_win_rate_pct", 0.0) or 0.0),
             "stacker_router_win_rate_pct": float(evidence_derived.get("stacker_router_win_rate_pct", 0.0) or 0.0),
             "regime_break_rate_pct": float(evidence_derived.get("regime_break_rate_pct", 0.0) or 0.0),
+            "alpha_pairs_analyzed": alpha_pairs_analyzed,
+            "alpha_top_pair": str(alpha_top.get("pair", "") or ""),
+            "alpha_top_edge_score": float(alpha_top.get("alpha_edge_score", 0.0) or 0.0),
+            "alpha_top_strategy_mode": str(alpha_top.get("strategy_mode", "") or ""),
+            "alpha_generated_utc": alpha_map_summary.get("generated_utc"),
         },
         "strategy_leaderboard": top10,
         "execution_proof":      proof_events,
         "rolling_performance":  rolling,
         "harmonic":             harmonic,
         "evidence":             snapshot_evidence,
+        "alpha_map":            alpha_map_summary,
         "supervisor": {
             "pid":         supervisor.get("supervisor_pid"),
             "tick":        supervisor.get("tick"),
@@ -5089,7 +5127,9 @@ def master_scan_refill(req: dict | None = None) -> dict[str, Any]:
       {
         "use_cached": true,        # use spike_hunter_latest.json (default true, instant)
         "validate":   true,        # true=DRY-RUN, false=LIVE (default true)
-        "controller": "Robert"     # default Robert
+                "controller": "Robert",    # default Robert
+                "top_n": 160,               # optional override
+                "scan_max_age_sec": 60      # optional override
       }
     """
     body = req or {}
@@ -5106,12 +5146,25 @@ def master_scan_refill(req: dict | None = None) -> dict[str, Any]:
             atp = _imp_atp.reload(_sys_atp.modules["auto_ticket_producer"])
         else:
             atp = _imp_atp.import_module("auto_ticket_producer")
+
+        runtime_cfg = atp._read_runtime_config(default_threshold=None, default_enabled=True)
+        runtime_top_n = max(1, atp._safe_int(body.get("top_n"), atp._safe_int(runtime_cfg.get("top_n"), atp.TOP_N_DEFAULT)))
+        runtime_scan_max_age = max(
+            0.0,
+            atp._safe_float(
+                body.get("scan_max_age_sec"),
+                atp._safe_float(runtime_cfg.get("scan_max_age_sec"), atp.SCAN_MAX_AGE_SEC_DEFAULT),
+            ),
+        )
+
         summary = atp.emit_tickets(
             use_cached=use_cached,
             validate=validate,
             controller=controller,
             bankroll=atp.BANKROLL_DEFAULT,
-            top_n=atp.TOP_N_DEFAULT,
+            top_n=runtime_top_n,
+            scan_max_age_sec=runtime_scan_max_age,
+            runtime_cfg=runtime_cfg,
         )
         return {"status": "ok", **summary}
     except Exception as exc:  # noqa: BLE001
@@ -5160,6 +5213,41 @@ def master_autofire_status() -> dict[str, Any]:
         "status": "ok",
         "enabled": bool(cfg.get("enabled")),
         "auto_fire_score": cfg.get("auto_fire_score"),
+        "max_pending_tickets": cfg.get("max_pending_tickets"),
+        "max_cycle_emits": cfg.get("max_cycle_emits"),
+        "adaptive_queue": cfg.get("adaptive_queue", True),
+        "scan_max_age_sec": cfg.get("scan_max_age_sec"),
+        "top_n": cfg.get("top_n"),
+        "max_auto_fires_per_cycle": cfg.get("max_auto_fires_per_cycle"),
+        "alpha_gate_min_edge": cfg.get("alpha_gate_min_edge"),
+        "alpha_gate_max_spread_bps": cfg.get("alpha_gate_max_spread_bps"),
+        "alpha_gate_min_turnover_usd": cfg.get("alpha_gate_min_turnover_usd"),
+        "alpha_gate_allow_watch_strategy": cfg.get("alpha_gate_allow_watch_strategy"),
+        "strategy_mode": cfg.get("strategy_mode"),
+        "max_notional_usd": cfg.get("max_notional_usd"),
+        "moonshot_bankroll_frac": cfg.get("moonshot_bankroll_frac"),
+        "moonshot_max_per_cycle": cfg.get("moonshot_max_per_cycle"),
+        "moonshot_min_edge": cfg.get("moonshot_min_edge"),
+        "moonshot_min_dip_pct": cfg.get("moonshot_min_dip_pct"),
+        "moonshot_max_rsi": cfg.get("moonshot_max_rsi"),
+        "moonshot_min_rebound_15m_pct": cfg.get("moonshot_min_rebound_15m_pct"),
+        "moonshot_max_spread_bps": cfg.get("moonshot_max_spread_bps"),
+        "moonshot_min_turnover_usd": cfg.get("moonshot_min_turnover_usd"),
+        "quickhit_target_notional_usd": cfg.get("quickhit_target_notional_usd"),
+        "quickhit_max_per_cycle": cfg.get("quickhit_max_per_cycle"),
+        "quickhit_min_edge": cfg.get("quickhit_min_edge"),
+        "quickhit_min_r1m_pct": cfg.get("quickhit_min_r1m_pct"),
+        "quickhit_min_r15m_pct": cfg.get("quickhit_min_r15m_pct"),
+        "quickhit_min_m4h_pct": cfg.get("quickhit_min_m4h_pct"),
+        "quickhit_max_spread_bps": cfg.get("quickhit_max_spread_bps"),
+        "quickhit_min_turnover_usd": cfg.get("quickhit_min_turnover_usd"),
+        "swing_target_notional_usd": cfg.get("swing_target_notional_usd"),
+        "swing_max_per_cycle": cfg.get("swing_max_per_cycle"),
+        "swing_min_edge": cfg.get("swing_min_edge"),
+        "swing_min_r1h_pct": cfg.get("swing_min_r1h_pct"),
+        "swing_min_m4h_pct": cfg.get("swing_min_m4h_pct"),
+        "swing_max_spread_bps": cfg.get("swing_max_spread_bps"),
+        "swing_min_turnover_usd": cfg.get("swing_min_turnover_usd"),
         "daemon_pid": pid,
         "daemon_alive": alive,
     }
@@ -5172,12 +5260,62 @@ def master_autofire_control(req: dict | None = None) -> dict[str, Any]:
     Body (all optional):
       {
         "enabled":          true|false,   # pause/resume auto-fire
-        "auto_fire_score":  70.0          # null disables auto-fire
+                "auto_fire_score":  70.0,         # null disables auto-fire
+                "max_pending_tickets": 10,
+                "max_cycle_emits": 6,
+                "adaptive_queue": true,
+                "scan_max_age_sec": 120,
+                "top_n": 60,
+                                "max_auto_fires_per_cycle": 3,
+                                "alpha_gate_min_edge": 4.0,
+                                "alpha_gate_max_spread_bps": 35.0,
+                                "alpha_gate_min_turnover_usd": 250000.0,
+                                                                "alpha_gate_allow_watch_strategy": false,
+                                                                "strategy_mode": "hybrid",   # hybrid|moonshot|quickhit|swing
+                                                                "max_notional_usd": 20.0
       }
     """
     body = req or {}
     cfg_path = ROOT / "run" / "auto_fire_config.json"
-    cur = {"enabled": True, "auto_fire_score": None}
+    cur = {
+        "enabled": True,
+        "auto_fire_score": None,
+        "max_pending_tickets": 6,
+        "max_cycle_emits": 6,
+        "adaptive_queue": True,
+        "scan_max_age_sec": 120.0,
+        "top_n": 20,
+        "max_auto_fires_per_cycle": 3,
+        "alpha_gate_min_edge": 4.0,
+        "alpha_gate_max_spread_bps": 35.0,
+        "alpha_gate_min_turnover_usd": 250000.0,
+        "alpha_gate_allow_watch_strategy": False,
+        "strategy_mode": "hybrid",
+        "max_notional_usd": 20.0,
+        "moonshot_bankroll_frac": 0.18,
+        "moonshot_max_per_cycle": 1,
+        "moonshot_min_edge": 5.5,
+        "moonshot_min_dip_pct": 18.0,
+        "moonshot_max_rsi": 24.0,
+        "moonshot_min_rebound_15m_pct": 0.08,
+        "moonshot_max_spread_bps": 22.0,
+        "moonshot_min_turnover_usd": 200000.0,
+        "quickhit_target_notional_usd": 12.0,
+        "quickhit_max_per_cycle": 4,
+        "quickhit_min_edge": 4.0,
+        "quickhit_min_r1m_pct": 0.05,
+        "quickhit_min_r15m_pct": 0.15,
+        "quickhit_min_m4h_pct": -8.0,
+        "quickhit_max_spread_bps": 24.0,
+        "quickhit_min_turnover_usd": 180000.0,
+        "swing_target_notional_usd": 16.0,
+        "swing_max_per_cycle": 2,
+        "swing_min_edge": 4.5,
+        "swing_min_r1h_pct": 0.12,
+        "swing_min_m4h_pct": -3.0,
+        "swing_max_spread_bps": 30.0,
+        "swing_min_turnover_usd": 150000.0,
+    }
     if cfg_path.exists():
         try:
             cur = json.loads(cfg_path.read_text(encoding="utf-8"))
@@ -5194,6 +5332,179 @@ def master_autofire_control(req: dict | None = None) -> dict[str, Any]:
                 cur["auto_fire_score"] = float(v)
             except Exception:
                 return {"status": "error", "error": "auto_fire_score must be a number or null"}
+    if "max_pending_tickets" in body:
+        try:
+            cur["max_pending_tickets"] = max(1, int(float(body["max_pending_tickets"])))
+        except Exception:
+            return {"status": "error", "error": "max_pending_tickets must be a positive integer"}
+    if "max_cycle_emits" in body:
+        try:
+            cur["max_cycle_emits"] = max(1, int(float(body["max_cycle_emits"])))
+        except Exception:
+            return {"status": "error", "error": "max_cycle_emits must be a positive integer"}
+    if "adaptive_queue" in body:
+        cur["adaptive_queue"] = bool(body["adaptive_queue"])
+    if "scan_max_age_sec" in body:
+        try:
+            cur["scan_max_age_sec"] = max(0.0, float(body["scan_max_age_sec"]))
+        except Exception:
+            return {"status": "error", "error": "scan_max_age_sec must be a non-negative number"}
+    if "top_n" in body:
+        try:
+            cur["top_n"] = max(1, int(float(body["top_n"])))
+        except Exception:
+            return {"status": "error", "error": "top_n must be a positive integer"}
+    if "max_auto_fires_per_cycle" in body:
+        try:
+            cur["max_auto_fires_per_cycle"] = max(0, int(float(body["max_auto_fires_per_cycle"])))
+        except Exception:
+            return {"status": "error", "error": "max_auto_fires_per_cycle must be a non-negative integer"}
+    if "alpha_gate_min_edge" in body:
+        try:
+            cur["alpha_gate_min_edge"] = max(0.0, float(body["alpha_gate_min_edge"]))
+        except Exception:
+            return {"status": "error", "error": "alpha_gate_min_edge must be a non-negative number"}
+    if "alpha_gate_max_spread_bps" in body:
+        try:
+            cur["alpha_gate_max_spread_bps"] = max(0.0, float(body["alpha_gate_max_spread_bps"]))
+        except Exception:
+            return {"status": "error", "error": "alpha_gate_max_spread_bps must be a non-negative number"}
+    if "alpha_gate_min_turnover_usd" in body:
+        try:
+            cur["alpha_gate_min_turnover_usd"] = max(0.0, float(body["alpha_gate_min_turnover_usd"]))
+        except Exception:
+            return {"status": "error", "error": "alpha_gate_min_turnover_usd must be a non-negative number"}
+    if "alpha_gate_allow_watch_strategy" in body:
+        cur["alpha_gate_allow_watch_strategy"] = bool(body["alpha_gate_allow_watch_strategy"])
+    if "strategy_mode" in body:
+        mode = str(body.get("strategy_mode") or "").strip().lower()
+        if mode not in {"hybrid", "moonshot", "quickhit", "swing"}:
+            return {"status": "error", "error": "strategy_mode must be one of hybrid|moonshot|quickhit|swing"}
+        cur["strategy_mode"] = mode
+    if "max_notional_usd" in body:
+        try:
+            cur["max_notional_usd"] = max(5.0, float(body["max_notional_usd"]))
+        except Exception:
+            return {"status": "error", "error": "max_notional_usd must be a number >= 5"}
+
+    if "moonshot_bankroll_frac" in body:
+        try:
+            cur["moonshot_bankroll_frac"] = min(0.60, max(0.02, float(body["moonshot_bankroll_frac"])))
+        except Exception:
+            return {"status": "error", "error": "moonshot_bankroll_frac must be a number"}
+    if "moonshot_max_per_cycle" in body:
+        try:
+            cur["moonshot_max_per_cycle"] = max(0, int(float(body["moonshot_max_per_cycle"])))
+        except Exception:
+            return {"status": "error", "error": "moonshot_max_per_cycle must be a non-negative integer"}
+    if "moonshot_min_edge" in body:
+        try:
+            cur["moonshot_min_edge"] = max(0.0, float(body["moonshot_min_edge"]))
+        except Exception:
+            return {"status": "error", "error": "moonshot_min_edge must be a non-negative number"}
+    if "moonshot_min_dip_pct" in body:
+        try:
+            cur["moonshot_min_dip_pct"] = max(0.0, float(body["moonshot_min_dip_pct"]))
+        except Exception:
+            return {"status": "error", "error": "moonshot_min_dip_pct must be a non-negative number"}
+    if "moonshot_max_rsi" in body:
+        try:
+            cur["moonshot_max_rsi"] = min(100.0, max(0.0, float(body["moonshot_max_rsi"])))
+        except Exception:
+            return {"status": "error", "error": "moonshot_max_rsi must be a number between 0 and 100"}
+    if "moonshot_min_rebound_15m_pct" in body:
+        try:
+            cur["moonshot_min_rebound_15m_pct"] = float(body["moonshot_min_rebound_15m_pct"])
+        except Exception:
+            return {"status": "error", "error": "moonshot_min_rebound_15m_pct must be a number"}
+    if "moonshot_max_spread_bps" in body:
+        try:
+            cur["moonshot_max_spread_bps"] = max(0.0, float(body["moonshot_max_spread_bps"]))
+        except Exception:
+            return {"status": "error", "error": "moonshot_max_spread_bps must be a non-negative number"}
+    if "moonshot_min_turnover_usd" in body:
+        try:
+            cur["moonshot_min_turnover_usd"] = max(0.0, float(body["moonshot_min_turnover_usd"]))
+        except Exception:
+            return {"status": "error", "error": "moonshot_min_turnover_usd must be a non-negative number"}
+
+    if "quickhit_target_notional_usd" in body:
+        try:
+            cur["quickhit_target_notional_usd"] = max(5.0, float(body["quickhit_target_notional_usd"]))
+        except Exception:
+            return {"status": "error", "error": "quickhit_target_notional_usd must be a number >= 5"}
+    if "quickhit_max_per_cycle" in body:
+        try:
+            cur["quickhit_max_per_cycle"] = max(0, int(float(body["quickhit_max_per_cycle"])))
+        except Exception:
+            return {"status": "error", "error": "quickhit_max_per_cycle must be a non-negative integer"}
+    if "quickhit_min_edge" in body:
+        try:
+            cur["quickhit_min_edge"] = max(0.0, float(body["quickhit_min_edge"]))
+        except Exception:
+            return {"status": "error", "error": "quickhit_min_edge must be a non-negative number"}
+    if "quickhit_min_r1m_pct" in body:
+        try:
+            cur["quickhit_min_r1m_pct"] = float(body["quickhit_min_r1m_pct"])
+        except Exception:
+            return {"status": "error", "error": "quickhit_min_r1m_pct must be a number"}
+    if "quickhit_min_r15m_pct" in body:
+        try:
+            cur["quickhit_min_r15m_pct"] = float(body["quickhit_min_r15m_pct"])
+        except Exception:
+            return {"status": "error", "error": "quickhit_min_r15m_pct must be a number"}
+    if "quickhit_min_m4h_pct" in body:
+        try:
+            cur["quickhit_min_m4h_pct"] = float(body["quickhit_min_m4h_pct"])
+        except Exception:
+            return {"status": "error", "error": "quickhit_min_m4h_pct must be a number"}
+    if "quickhit_max_spread_bps" in body:
+        try:
+            cur["quickhit_max_spread_bps"] = max(0.0, float(body["quickhit_max_spread_bps"]))
+        except Exception:
+            return {"status": "error", "error": "quickhit_max_spread_bps must be a non-negative number"}
+    if "quickhit_min_turnover_usd" in body:
+        try:
+            cur["quickhit_min_turnover_usd"] = max(0.0, float(body["quickhit_min_turnover_usd"]))
+        except Exception:
+            return {"status": "error", "error": "quickhit_min_turnover_usd must be a non-negative number"}
+
+    if "swing_target_notional_usd" in body:
+        try:
+            cur["swing_target_notional_usd"] = max(5.0, float(body["swing_target_notional_usd"]))
+        except Exception:
+            return {"status": "error", "error": "swing_target_notional_usd must be a number >= 5"}
+    if "swing_max_per_cycle" in body:
+        try:
+            cur["swing_max_per_cycle"] = max(0, int(float(body["swing_max_per_cycle"])))
+        except Exception:
+            return {"status": "error", "error": "swing_max_per_cycle must be a non-negative integer"}
+    if "swing_min_edge" in body:
+        try:
+            cur["swing_min_edge"] = max(0.0, float(body["swing_min_edge"]))
+        except Exception:
+            return {"status": "error", "error": "swing_min_edge must be a non-negative number"}
+    if "swing_min_r1h_pct" in body:
+        try:
+            cur["swing_min_r1h_pct"] = float(body["swing_min_r1h_pct"])
+        except Exception:
+            return {"status": "error", "error": "swing_min_r1h_pct must be a number"}
+    if "swing_min_m4h_pct" in body:
+        try:
+            cur["swing_min_m4h_pct"] = float(body["swing_min_m4h_pct"])
+        except Exception:
+            return {"status": "error", "error": "swing_min_m4h_pct must be a number"}
+    if "swing_max_spread_bps" in body:
+        try:
+            cur["swing_max_spread_bps"] = max(0.0, float(body["swing_max_spread_bps"]))
+        except Exception:
+            return {"status": "error", "error": "swing_max_spread_bps must be a non-negative number"}
+    if "swing_min_turnover_usd" in body:
+        try:
+            cur["swing_min_turnover_usd"] = max(0.0, float(body["swing_min_turnover_usd"]))
+        except Exception:
+            return {"status": "error", "error": "swing_min_turnover_usd must be a non-negative number"}
+
     cfg_path.parent.mkdir(parents=True, exist_ok=True)
     cfg_path.write_text(json.dumps(cur, indent=2), encoding="utf-8")
     return {"status": "ok", **cur}

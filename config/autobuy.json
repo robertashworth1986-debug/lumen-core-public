@@ -1,15 +1,17 @@
 {
   "enabled": true,
-  "max_open_target": 10,
-  "max_pending": 3,
-  "min_edge_score": 0.6,
+  "max_open_target": 12,
+  "max_pending": 4,
+  "min_edge_score": 0.55,
   "min_bucket_n": 8,
-  "min_win_rate_pct": 52,
-  "base_notional_usd": 10,
+  "min_win_rate_pct": 50.0,
+  "base_notional_usd": 12.0,
   "edge_size_boost": true,
-  "max_notional_usd": 18,
+  "max_notional_usd": 20.0,
   "horizon_h": 24,
-  "loss_cooldown_hours": 2,
+  "loss_cooldown_hours": 2.5,
   "controller": "Robert",
-  "scan_interval_s": 90
+  "scan_interval_s": 60,
+  "daily_loss_floor_usd": -9.0,
+  "spike_max_age_minutes": 15
 }

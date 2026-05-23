@@ -46,5 +46,45 @@
     "fee": 0.07576,
     "status": "closed",
     "resolved_utc": "2026-05-05T23:04:14.194259+00:00"
+  },
+  "OYGEQC-GQ5CJ-P25KNN": {
+    "price": 0.03178,
+    "vol_exec": 476.493,
+    "cost": 15.14295,
+    "fee": 0.06057,
+    "status": "closed",
+    "resolved_utc": "2026-05-23T09:01:43.928059+00:00"
+  },
+  "ON22NB-DNAMX-W2SKN2": {
+    "price": 0.00828,
+    "vol_exec": 1822.6002,
+    "cost": 15.10858,
+    "fee": 0.06043,
+    "status": "closed",
+    "resolved_utc": "2026-05-23T09:14:33.615130+00:00"
+  },
+  "ONU7PJ-LDNB5-EMU6ZS": {
+    "price": 0.7264,
+    "vol_exec": 20.5903,
+    "cost": 14.956794,
+    "fee": 0.059828,
+    "status": "closed",
+    "resolved_utc": "2026-05-23T09:19:57.396727+00:00"
+  },
+  "OCL4LE-56OIH-7DDZNS": {
+    "price": 0.43,
+    "vol_exec": 37.296,
+    "cost": 16.03728,
+    "fee": 0.06414912,
+    "status": "closed",
+    "resolved_utc": "2026-05-23T15:43:40.465135+00:00"
+  },
+  "O2HJ67-BI373-UNH277": {
+    "price": 2.2354,
+    "vol_exec": 8.0935,
+    "cost": 18.09221,
+    "fee": 0.07237,
+    "status": "closed",
+    "resolved_utc": "2026-05-23T15:43:40.465135+00:00"
   }
 }
