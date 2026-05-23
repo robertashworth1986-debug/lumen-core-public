@@ -45,6 +45,10 @@ out/
 code/out/
 *.lock
 
+# High-churn runtime JSON cache/state
+kraken_fill_prices.json
+profit_lock_peaks.json
+
 # Log files
 logs/
 *.log
