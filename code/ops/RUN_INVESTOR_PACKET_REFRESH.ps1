@@ -144,6 +144,7 @@ $alphaEdgeLockScript = Join-Path $opsRoot 'BUILD_ALPHA_EDGE_LOCK_ENGINE.py'
 $blueprintVaultScript = Join-Path $opsRoot 'BUILD_GOV_BLUEPRINT_VAULT.py'
 $grantFitScript = Join-Path $opsRoot 'BUILD_GRANT_SUBMIT_FIT_PACK.py'
 $missionPackScript = Join-Path $opsRoot 'BUILD_INVESTOR_MISSION_CONTROL_PACK.py'
+$missionControlSupportScript = Join-Path $opsRoot 'BUILD_MISSION_CONTROL_SUPPORT_ARTIFACTS.py'
 $siteReachMissionScript = Join-Path $opsRoot 'BUILD_SITE_REACH_AND_DOMAIN_MISSION_PUSH.py'
 
 if (-not (Test-Path -LiteralPath $panelScript)) {
@@ -173,6 +174,10 @@ if (-not (Test-Path -LiteralPath $grantFitScript)) {
 if (-not (Test-Path -LiteralPath $missionPackScript)) {
     Write-RefreshHeartbeat -Status 'error' -Reason 'missing_script' -ErrorMessage "Missing script: $missionPackScript"
     throw "Missing script: $missionPackScript"
+}
+if (-not (Test-Path -LiteralPath $missionControlSupportScript)) {
+    Write-RefreshHeartbeat -Status 'error' -Reason 'missing_script' -ErrorMessage "Missing script: $missionControlSupportScript"
+    throw "Missing script: $missionControlSupportScript"
 }
 if (-not (Test-Path -LiteralPath $valuationLockScript)) {
     Write-RefreshHeartbeat -Status 'error' -Reason 'missing_script' -ErrorMessage "Missing script: $valuationLockScript"
@@ -243,6 +248,13 @@ $steps.Add((Invoke-Step -Label 'build_investor_mission_control_pack' -Action {
     & $pythonExe $missionPackScript --top-sectors $TopN
     if ($LASTEXITCODE -ne 0) {
         throw "BUILD_INVESTOR_MISSION_CONTROL_PACK failed with exit code $LASTEXITCODE"
+    }
+}))
+
+$steps.Add((Invoke-Step -Label 'build_mission_control_support_artifacts' -Action {
+    & $pythonExe $missionControlSupportScript
+    if ($LASTEXITCODE -ne 0) {
+        throw "BUILD_MISSION_CONTROL_SUPPORT_ARTIFACTS failed with exit code $LASTEXITCODE"
     }
 }))
 
@@ -334,6 +346,10 @@ $summary = [ordered]@{
         investor_mission_control_pack_latest_md = 'INSTITUTIONAL_STACK_V2/out/ops/investor_mission_control/investor_mission_control_pack_latest.md'
         investor_mission_control_pack_heartbeat_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/investor_mission_control/investor_mission_control_pack_heartbeat_latest.json'
         investor_3min_nobel_pitch_latest_md = 'INSTITUTIONAL_STACK_V2/out/ops/investor_mission_control/investor_3min_nobel_pitch_latest.md'
+        helmyer_qa_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/helmyer_qa_latest.json'
+        grants_live_submission_ledger_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/grants_live_submission_ledger_latest.json'
+        mission_control_support_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/mission_control_support/mission_control_support_latest.json'
+        mission_control_support_heartbeat_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/mission_control_support/mission_control_support_heartbeat_latest.json'
         site_reach_mission_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/site_reach_mission/site_reach_mission_latest.json'
         site_reach_mission_latest_md = 'INSTITUTIONAL_STACK_V2/out/ops/site_reach_mission/site_reach_mission_latest.md'
         site_reach_mission_heartbeat_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/site_reach_mission/site_reach_mission_heartbeat_latest.json'

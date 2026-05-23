@@ -110,10 +110,26 @@ Invoke-Scp -StepLabel "1/5 Upload deploy script" -Args @(
 Write-Host "[1/5] Running deploy script on VPS (installs all system deps + Python venv)..." -ForegroundColor Yellow
 Invoke-Ssh -StepLabel "1/5 Run VPS deploy script" -RemoteCommand "chmod +x /tmp/VPS_DEPLOY.sh && sudo bash /tmp/VPS_DEPLOY.sh"
 
-# Step 2: Upload trading stack code
-Write-Host "[2/5] Uploading trading stack code..." -ForegroundColor Yellow
+# Step 2: Upload trading stack code + dashboard + core ops artifacts
+Write-Host "[2/5] Uploading trading stack + dashboard + ops artifacts..." -ForegroundColor Yellow
 if (Test-Path $codeArchive) { Remove-Item $codeArchive -Force }
-tar -czf $codeArchive -C $Root --exclude='code/.venv' --exclude='code/**/__pycache__' --exclude='code/**/*.pyc' code
+$bundleTargets = @("code", "dashboard")
+if (Test-Path (Join-Path $Root "out\ops")) {
+    $bundleTargets += "out/ops"
+}
+if (Test-Path (Join-Path $Root "out\grant_approval_queue.json")) {
+    $bundleTargets += "out/grant_approval_queue.json"
+}
+
+$tarArgs = @(
+    "-czf", $codeArchive,
+    "-C", $Root,
+    "--exclude=code/.venv",
+    "--exclude=code/**/__pycache__",
+    "--exclude=code/**/*.pyc"
+) + $bundleTargets
+
+& tar @tarArgs
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path $codeArchive)) {
     throw "[2/5 Package code] tar archive build failed"
 }
@@ -121,7 +137,7 @@ Invoke-Scp -StepLabel "2/5 Upload code archive" -Args @(
     $codeArchive,
     "${VpsUser}@${VpsIp}:/tmp/lumencore_code.tgz"
 )
-Invoke-Ssh -StepLabel "2/5 Extract code archive" -RemoteCommand "sudo rm -rf ${VpsRoot}/code && sudo mkdir -p ${VpsRoot} && sudo tar -xzf /tmp/lumencore_code.tgz -C ${VpsRoot} && rm -f /tmp/lumencore_code.tgz"
+Invoke-Ssh -StepLabel "2/5 Extract code archive" -RemoteCommand "sudo rm -rf ${VpsRoot}/code ${VpsRoot}/dashboard && sudo mkdir -p ${VpsRoot} && sudo tar -xzf /tmp/lumencore_code.tgz -C ${VpsRoot} && rm -f /tmp/lumencore_code.tgz"
 Remove-Item $codeArchive -Force
 
 # Step 3: Upload LamaScout
@@ -155,11 +171,13 @@ Write-Host ""
 Write-Host " DNS: Point lumen-core.ai A record -> 157.151.148.234" -ForegroundColor Cyan
 Write-Host " Then run SSL cert:"
 Write-Host "   ssh ${VpsUser}@${VpsIp}"
-Write-Host "   sudo certbot --nginx -d lumen-core.ai -d www.lumen-core.ai --non-interactive --agree-tos -m admin@lumen-core.ai"
+Write-Host "   sudo certbot --nginx -d lumen-core.ai -d www.lumen-core.ai -d app.lumen-core.ai -d research.lumen-core.ai --non-interactive --agree-tos -m admin@lumen-core.ai"
 Write-Host ""
 Write-Host " Live endpoints (after SSL):"
 Write-Host "   https://lumen-core.ai/dashboard/  -> Institutional Crypto Dashboard"
 Write-Host "   https://lumen-core.ai/api/scout/  -> LamaScout API"
 Write-Host "   https://lumen-core.ai/intel/      -> Cross-sector opportunity API"
 Write-Host "   https://lumen-core.ai/proof/      -> Proof artifacts & reports"
+Write-Host "   https://app.lumen-core.ai/        -> Investor app dashboard"
+Write-Host "   https://research.lumen-core.ai/   -> Research/scout dashboard"
 Write-Host "=====================================================" -ForegroundColor Green

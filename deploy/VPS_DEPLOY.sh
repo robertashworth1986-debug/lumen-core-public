@@ -8,6 +8,8 @@
 set -e
 
 DOMAIN="lumen-core.ai"
+APP_DOMAIN="app.${DOMAIN}"
+RESEARCH_DOMAIN="research.${DOMAIN}"
 STACK_ROOT="/opt/lumencore"
 STACK_USER="lumencore"
 PY_VERSION="3.11"
@@ -309,60 +311,110 @@ echo "[6/9] Services installed and enabled."
 echo "[7/9] Configuring nginx for lumen-core.ai..."
 
 mkdir -p /var/www/html
+mkdir -p /var/www/lumatrader
 systemctl enable --now nginx || true
 
-if [ -d /etc/nginx/sites-available ]; then
-    NGINX_CONF_PATH="/etc/nginx/sites-available/lumen-core.ai"
-else
-    NGINX_CONF_PATH="/etc/nginx/conf.d/lumen-core.ai.conf"
-fi
+cat > /etc/nginx/conf.d/lumatrader.conf << 'EOF'
+upstream trading_dashboard { server 127.0.0.1:5016; keepalive 32; }
+upstream intel_api { server 127.0.0.1:7700; keepalive 32; }
+upstream scout_dashboard { server 127.0.0.1:5017; keepalive 32; }
+upstream lamascout_api { server 127.0.0.1:8001; keepalive 32; }
+upstream luma_gateway { server 127.0.0.1:8787; keepalive 64; }
 
-cat > ${NGINX_CONF_PATH} << 'EOF'
-# =============================================================================
-# lumen-core.ai — Nginx Reverse Proxy (HTTP first; certbot will add TLS)
-# =============================================================================
 server {
     listen 80;
-    server_name lumen-core.ai www.lumen-core.ai;
+    server_name yourdomain.com www.yourdomain.com app.yourdomain.com research.yourdomain.com;
+    return 301 https://$host$request_uri;
+}
 
-    # --- Institutional Crypto Dashboard ---
-    location /dashboard/ {
-        proxy_pass         http://127.0.0.1:5016/;
-        proxy_http_version 1.1;
-        proxy_set_header   Upgrade $http_upgrade;
-        proxy_set_header   Connection "upgrade";
-        proxy_set_header   Host $host;
-        proxy_set_header   X-Real-IP $remote_addr;
-        proxy_read_timeout 86400;
-    }
+server {
+    listen 443 ssl;
+    server_name yourdomain.com www.yourdomain.com;
 
-    # --- LamaScout Artist Intelligence API ---
+    ssl_certificate     /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
     location /api/scout/ {
-        proxy_pass         http://127.0.0.1:8001/;
+        proxy_pass         http://lamascout_api/;
         proxy_http_version 1.1;
-        proxy_set_header   Host $host;
-        proxy_set_header   X-Real-IP $remote_addr;
-    }
-
-    # --- Trading Stack API (if enabled) ---
-    location /api/trading/ {
-        proxy_pass         http://127.0.0.1:8000/;
-        proxy_http_version 1.1;
-        proxy_set_header   Host $host;
-        proxy_set_header   X-Real-IP $remote_addr;
-    }
-
-    # --- Cross-Sector Intel API ---
-    location /intel/ {
-        proxy_pass         http://127.0.0.1:7700/;
-        proxy_http_version 1.1;
-        proxy_set_header   Host $host;
-        proxy_set_header   X-Real-IP $remote_addr;
-        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
         proxy_set_header   X-Forwarded-Proto $scheme;
     }
 
-    # --- Static out/ directory (proof packs, reports) ---
+    location /api/ {
+        proxy_pass         http://luma_gateway;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+
+    location /auth/ {
+        proxy_pass         http://luma_gateway;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+
+    location /ws/live {
+        proxy_pass         http://luma_gateway;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade           $http_upgrade;
+        proxy_set_header   Connection        "upgrade";
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400s;
+    }
+
+    location = /dashboard {
+        return 302 /quant_lab.html;
+    }
+
+    location = /dashboard/ {
+        return 302 /quant_lab.html;
+    }
+
+    location /trading {
+        rewrite ^/trading(/.*)$ $1 break;
+        proxy_pass         http://trading_dashboard;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400s;
+    }
+
+    location /scout {
+        rewrite ^/scout(/.*)$ $1 break;
+        proxy_pass         http://scout_dashboard;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400s;
+    }
+
+    location /intel {
+        rewrite ^/intel(/.*)$ $1 break;
+        proxy_pass         http://intel_api;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+
     location /proof/ {
         alias /opt/lumencore/out/;
         autoindex on;
@@ -370,25 +422,92 @@ server {
         autoindex_localtime on;
     }
 
-    # --- Root serves a status page ---
-    location / {
-        return 200 '{"status":"LUMEN-CORE ONLINE","domain":"lumen-core.ai","stack":"INSTITUTIONAL_STACK_V2"}';
-        add_header Content-Type application/json;
+    location /evidence/ {
+        proxy_pass         http://luma_gateway;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
     }
 
-    # --- ACME challenge path for certbot ---
-    location /.well-known/acme-challenge/ {
-        root /var/www/html;
+    location /out/ {
+        proxy_pass         http://luma_gateway;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+
+    location ~ ^/INSTITUTIONAL_STACK_V2/out/(.*)$ {
+        return 302 /out/$1;
+    }
+
+    location = /data/sector_energy_evidence_pipeline_latest.json {
+        return 302 /out/ops/sector_energy_evidence_pipeline_latest.json;
+    }
+
+    location = /data/sector_energy_investor_bridge_latest.json {
+        return 302 /out/sector_energy/sector_energy_investor_bridge_latest.json;
+    }
+
+    location = /INSTITUTIONAL_STACK_V2/dashboard/data/sector_energy_evidence_pipeline_latest.json {
+        return 302 /out/ops/sector_energy_evidence_pipeline_latest.json;
+    }
+
+    location = /INSTITUTIONAL_STACK_V2/dashboard/data/sector_energy_investor_bridge_latest.json {
+        return 302 /out/sector_energy/sector_energy_investor_bridge_latest.json;
+    }
+
+    location / {
+        root /opt/lumencore/dashboard;
+        try_files $uri $uri/ @gateway_fallback;
+    }
+
+    location @gateway_fallback {
+        proxy_pass         http://luma_gateway;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name app.yourdomain.com;
+    ssl_certificate     /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    location / {
+        return 302 https://yourdomain.com/investor_command_room.html;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name research.yourdomain.com;
+    ssl_certificate     /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    location / {
+        return 302 https://yourdomain.com/quant_lab.html;
     }
 }
 EOF
 
-if [ -d /etc/nginx/sites-enabled ] && [ -d /etc/nginx/sites-available ]; then
-    ln -sf /etc/nginx/sites-available/lumen-core.ai /etc/nginx/sites-enabled/lumen-core.ai
-    rm -f /etc/nginx/sites-enabled/default
-else
-    rm -f /etc/nginx/conf.d/default.conf || true
+sed -i "s/yourdomain.com/${DOMAIN}/g" /etc/nginx/conf.d/lumatrader.conf
+
+if [ -d /etc/nginx/sites-enabled ]; then
+    rm -f /etc/nginx/sites-enabled/lumen-core.ai || true
+    rm -f /etc/nginx/sites-enabled/default || true
 fi
+rm -f /etc/nginx/conf.d/default.conf || true
+rm -f /etc/nginx/conf.d/lumen-core.ai.conf || true
 
 nginx -t && systemctl reload nginx
 
@@ -399,7 +518,7 @@ echo "[8/9] Obtaining SSL certificate for lumen-core.ai..."
 echo "      NOTE: DNS must be pointed to 157.151.148.234 BEFORE this runs."
 echo ""
 echo "      Run this command after DNS propagates:"
-echo "      certbot --nginx -d lumen-core.ai -d www.lumen-core.ai --non-interactive --agree-tos -m admin@lumen-core.ai"
+echo "      certbot --nginx -d lumen-core.ai -d www.lumen-core.ai -d app.lumen-core.ai -d research.lumen-core.ai --non-interactive --agree-tos -m admin@lumen-core.ai"
 echo ""
 echo "      Auto-renewal is already configured by certbot's systemd timer."
 
@@ -416,6 +535,8 @@ echo "   lamascout-api    → https://lumen-core.ai/api/scout/"
 echo "   dashboard        → https://lumen-core.ai/dashboard/"
 echo "   intel api        → https://lumen-core.ai/intel/"
 echo "   proof artifacts  → https://lumen-core.ai/proof/"
+echo "   investor app     → https://${APP_DOMAIN}/"
+echo "   research app     → https://${RESEARCH_DOMAIN}/"
 echo ""
 echo " Next steps:"
 echo "   1. Point DNS A record: lumen-core.ai → 157.151.148.234"

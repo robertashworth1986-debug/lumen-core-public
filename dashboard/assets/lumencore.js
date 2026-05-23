@@ -29,6 +29,17 @@
     return Array.from(new Set(values.filter(Boolean)));
   }
 
+  function normalizeLegacyPath(path) {
+    const raw = String(path || '');
+    if (raw.startsWith('/INSTITUTIONAL_STACK_V2/out/')) {
+      return '/out/' + raw.slice('/INSTITUTIONAL_STACK_V2/out/'.length);
+    }
+    if (raw.startsWith('/INSTITUTIONAL_STACK_V2/dashboard/')) {
+      return '/' + raw.slice('/INSTITUTIONAL_STACK_V2/dashboard/'.length);
+    }
+    return raw;
+  }
+
   function resolveWsUrl(path = '/ws/live') {
     if (USER_API_BASE) {
       const wsBase = USER_API_BASE
@@ -159,6 +170,15 @@
   function startWebGL() {
     const THREE = window.THREE;
     if (!THREE || !canvas) return;
+    const pointer = { x: 0, y: 0 };
+    const onPointerMove = (ev) => {
+      const w = Math.max(1, window.innerWidth);
+      const h = Math.max(1, window.innerHeight);
+      pointer.x = (ev.clientX / w) * 2 - 1;
+      pointer.y = (ev.clientY / h) * 2 - 1;
+    };
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -219,8 +239,11 @@
       r1.rotation.x = t * 0.18;  r1.rotation.y = t * 0.10;
       r2.rotation.x = -t * 0.15 + Math.PI / 3; r2.rotation.z = t * 0.12;
       r3.rotation.y = t * 0.08 + Math.PI / 4;  r3.rotation.z = -t * 0.06;
-      camera.position.x = Math.sin(t * 0.1) * 0.6;
-      camera.position.y = Math.cos(t * 0.08) * 0.4;
+      r1.material.opacity = 0.33 + Math.sin(t * 0.9) * 0.12;
+      r2.material.opacity = 0.26 + Math.cos(t * 0.7) * 0.10;
+      r3.material.opacity = 0.24 + Math.sin(t * 0.5 + 0.7) * 0.08;
+      camera.position.x = Math.sin(t * 0.1) * 0.6 + pointer.x * 0.7;
+      camera.position.y = Math.cos(t * 0.08) * 0.4 - pointer.y * 0.45;
       camera.lookAt(0, 0, 0);
       renderer.render(scene, camera);
       requestAnimationFrame(loop);
@@ -234,11 +257,91 @@
     });
   }
 
+  let fallbackRunning = false;
+  function startCanvasFallback() {
+    if (!canvas || fallbackRunning) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    fallbackRunning = true;
+
+    const pointer = { x: 0, y: 0 };
+    const onPointerMove = (ev) => {
+      const w = Math.max(1, window.innerWidth);
+      const h = Math.max(1, window.innerHeight);
+      pointer.x = (ev.clientX / w) * 2 - 1;
+      pointer.y = (ev.clientY / h) * 2 - 1;
+    };
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+
+    const particles = Array.from({ length: 180 }, () => ({
+      x: Math.random(),
+      y: Math.random(),
+      z: Math.random(),
+      vx: (Math.random() - 0.5) * 0.00035,
+      vy: (Math.random() - 0.5) * 0.00035,
+      r: 0.4 + Math.random() * 2.1,
+      hue: 170 + Math.random() * 120,
+      alpha: 0.12 + Math.random() * 0.35,
+    }));
+
+    const resize = () => {
+      const w = Math.max(1, window.innerWidth);
+      const h = Math.max(1, window.innerHeight);
+      canvas.width = Math.floor(w * Math.min(window.devicePixelRatio || 1, 2));
+      canvas.height = Math.floor(h * Math.min(window.devicePixelRatio || 1, 2));
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(canvas.width / w, canvas.height / h);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    let t0 = performance.now();
+    const render = (now) => {
+      const dt = Math.min(32, now - t0);
+      t0 = now;
+      const w = Math.max(1, window.innerWidth);
+      const h = Math.max(1, window.innerHeight);
+
+      ctx.clearRect(0, 0, w, h);
+      const glowX = w * (0.5 + pointer.x * 0.08);
+      const glowY = h * (0.45 - pointer.y * 0.08);
+      const grad = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, Math.max(w, h) * 0.66);
+      grad.addColorStop(0, 'rgba(34,211,238,0.10)');
+      grad.addColorStop(0.5, 'rgba(168,85,247,0.08)');
+      grad.addColorStop(1, 'rgba(4,6,15,0.0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      for (const p of particles) {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        if (p.x < -0.05) p.x = 1.05;
+        if (p.x > 1.05) p.x = -0.05;
+        if (p.y < -0.05) p.y = 1.05;
+        if (p.y > 1.05) p.y = -0.05;
+
+        const px = p.x * w + pointer.x * (8 + p.z * 24);
+        const py = p.y * h - pointer.y * (8 + p.z * 24);
+        const radius = p.r * (0.65 + p.z * 0.9);
+        ctx.beginPath();
+        ctx.arc(px, py, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${Math.round(p.hue)}, 92%, 68%, ${p.alpha})`;
+        ctx.fill();
+      }
+
+      requestAnimationFrame(render);
+    };
+    requestAnimationFrame(render);
+  }
+
   function loadThreeWithFallback(urls) {
     const queue = Array.from(new Set(urls.filter(Boolean)));
     const tryNext = () => {
       if (!queue.length) {
         console.warn('three.js failed to load from all sources; chrome will run without webgl field');
+        startCanvasFallback();
         return;
       }
       const src = queue.shift();
@@ -257,13 +360,17 @@
 
   if (window.THREE) {
     if (!IN_IFRAME) startWebGL();
-  } else if (!IN_IFRAME && !IS_FILE_PROTOCOL) {
-    loadThreeWithFallback([
-      './assets/vendor/three.min.js',
-      '/assets/vendor/three.min.js',
-      'https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js',
-      'https://unpkg.com/three@0.162.0/build/three.min.js',
-    ]);
+  } else if (!IN_IFRAME) {
+    if (!IS_FILE_PROTOCOL) {
+      loadThreeWithFallback([
+        './assets/vendor/three.min.js',
+        '/assets/vendor/three.min.js',
+        'https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js',
+        'https://unpkg.com/three@0.162.0/build/three.min.js',
+      ]);
+    } else {
+      startCanvasFallback();
+    }
   }
 
   // 4. WebSocket bridge: surface grants events as a toast (Mission Control feel)
@@ -316,7 +423,7 @@
   // 5. Helpers exposed for pages
   window.LC = {
     api: async (path, opts = {}) => {
-      const pathStr = String(path || '');
+      const pathStr = normalizeLegacyPath(path);
       const directHttp = /^https?:\/\//i.test(pathStr);
       const candidates = [];
 

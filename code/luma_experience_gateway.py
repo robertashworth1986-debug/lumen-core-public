@@ -7180,7 +7180,10 @@ def api_perf_history(days: int = 14) -> dict[str, Any]:
 if DASH.exists():
     # Expose the workspace `out/` tree read-only so master_evidence.html
     # can resolve `../out/master_universe_v2/...` relative paths.
-    _OUT_DIR = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2\out")
+    _OUT_DIR = OUT
+    _out_env = (os.getenv("LUMA_OUT_DIR") or "").strip()
+    if _out_env:
+        _OUT_DIR = Path(_out_env).expanduser().resolve()
     if _OUT_DIR.exists():
         app.mount("/out", StaticFiles(directory=str(_OUT_DIR)), name="out_tree")
     app.mount("/", StaticFiles(directory=str(DASH), html=True), name="dashboard")
