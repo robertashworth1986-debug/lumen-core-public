@@ -18,6 +18,73 @@
     ? window.LUMA_API_BASE.trim().replace(/\/$/, '')
     : '';
 
+  function prefersReducedMotion() {
+    try {
+      return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function resolveVisualProfile() {
+    const mem = Number(navigator.deviceMemory || 0);
+    const cores = Number(navigator.hardwareConcurrency || 0);
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const saveData = Boolean(conn && conn.saveData);
+    const reducedMotion = prefersReducedMotion();
+    const compactViewport = Math.min(window.innerWidth || 0, window.innerHeight || 0) < 760;
+
+    let tier = 'ultra';
+    if (saveData || reducedMotion || compactViewport || (mem && mem <= 4) || (cores && cores <= 4)) {
+      tier = 'balanced';
+    }
+    if (saveData || reducedMotion || (mem && mem <= 2) || (cores && cores <= 2)) {
+      tier = 'lite';
+    }
+
+    const profile = {
+      ultra: {
+        maxPixelRatio: 2,
+        webglParticles: 1200,
+        ringSegments: 320,
+        fallbackParticles: 220,
+        pointerScale: 1,
+        motionScale: 1,
+        ringPulse: true,
+        frameStride: 1,
+      },
+      balanced: {
+        maxPixelRatio: 1.7,
+        webglParticles: 760,
+        ringSegments: 224,
+        fallbackParticles: 140,
+        pointerScale: 0.72,
+        motionScale: 0.82,
+        ringPulse: true,
+        frameStride: 1,
+      },
+      lite: {
+        maxPixelRatio: 1.3,
+        webglParticles: 420,
+        ringSegments: 128,
+        fallbackParticles: 80,
+        pointerScale: 0.42,
+        motionScale: 0.55,
+        ringPulse: false,
+        frameStride: 2,
+      },
+    };
+
+    return {
+      tier,
+      saveData,
+      reducedMotion,
+      ...profile[tier],
+    };
+  }
+
+  const PERF = resolveVisualProfile();
+
   function normalizeDashboardHref(href) {
     if (!href) return href;
     if (/^(https?:|mailto:|#|javascript:)/i.test(href)) return href;
@@ -171,16 +238,18 @@
     const THREE = window.THREE;
     if (!THREE || !canvas) return;
     const pointer = { x: 0, y: 0 };
-    const onPointerMove = (ev) => {
-      const w = Math.max(1, window.innerWidth);
-      const h = Math.max(1, window.innerHeight);
-      pointer.x = (ev.clientX / w) * 2 - 1;
-      pointer.y = (ev.clientY / h) * 2 - 1;
-    };
-    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    if (!PERF.reducedMotion) {
+      const onPointerMove = (ev) => {
+        const w = Math.max(1, window.innerWidth);
+        const h = Math.max(1, window.innerHeight);
+        pointer.x = (ev.clientX / w) * 2 - 1;
+        pointer.y = (ev.clientY / h) * 2 - 1;
+      };
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+    }
 
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, PERF.maxPixelRatio));
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     const scene = new THREE.Scene();
@@ -189,7 +258,7 @@
       window.innerWidth / window.innerHeight, 0.1, 200);
     camera.position.set(0, 0, 18);
 
-    const N = 900;
+    const N = PERF.webglParticles;
     const positions = new Float32Array(N * 3);
     const colors = new Float32Array(N * 3);
     const speeds = new Float32Array(N);
@@ -201,7 +270,7 @@
       colors[i*3]   = 0.13 + t * 0.5;
       colors[i*3+1] = 0.83 - t * 0.5;
       colors[i*3+2] = 0.94;
-      speeds[i] = 0.005 + Math.random() * 0.02;
+      speeds[i] = (0.005 + Math.random() * 0.02) * PERF.motionScale;
     }
     const geom = new THREE.BufferGeometry();
     geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -212,7 +281,7 @@
     }));
     scene.add(points);
 
-    const ringGeom = new THREE.TorusGeometry(7, 0.04, 32, 256);
+    const ringGeom = new THREE.TorusGeometry(7, 0.04, 24, PERF.ringSegments);
     const r1 = new THREE.Mesh(ringGeom, new THREE.MeshBasicMaterial({
       color: 0x22d3ee, transparent: true, opacity: 0.45,
       blending: THREE.AdditiveBlending }));
@@ -227,8 +296,13 @@
     scene.add(r1, r2, r3);
 
     const clock = new THREE.Clock();
+    let frame = 0;
     function loop() {
-      const t = clock.getElapsedTime();
+      requestAnimationFrame(loop);
+      frame += 1;
+      if (PERF.frameStride > 1 && (frame % PERF.frameStride) !== 0) return;
+
+      const t = clock.getElapsedTime() * PERF.motionScale;
       const pos = points.geometry.attributes.position.array;
       for (let i = 0; i < N; i++) {
         pos[i*3+2] += speeds[i];
@@ -239,14 +313,21 @@
       r1.rotation.x = t * 0.18;  r1.rotation.y = t * 0.10;
       r2.rotation.x = -t * 0.15 + Math.PI / 3; r2.rotation.z = t * 0.12;
       r3.rotation.y = t * 0.08 + Math.PI / 4;  r3.rotation.z = -t * 0.06;
-      r1.material.opacity = 0.33 + Math.sin(t * 0.9) * 0.12;
-      r2.material.opacity = 0.26 + Math.cos(t * 0.7) * 0.10;
-      r3.material.opacity = 0.24 + Math.sin(t * 0.5 + 0.7) * 0.08;
-      camera.position.x = Math.sin(t * 0.1) * 0.6 + pointer.x * 0.7;
-      camera.position.y = Math.cos(t * 0.08) * 0.4 - pointer.y * 0.45;
+      if (PERF.ringPulse) {
+        r1.material.opacity = 0.33 + Math.sin(t * 0.9) * 0.12;
+        r2.material.opacity = 0.26 + Math.cos(t * 0.7) * 0.10;
+        r3.material.opacity = 0.24 + Math.sin(t * 0.5 + 0.7) * 0.08;
+      } else {
+        r1.material.opacity = 0.28;
+        r2.material.opacity = 0.24;
+        r3.material.opacity = 0.2;
+      }
+      const pointerX = PERF.reducedMotion ? 0 : pointer.x * PERF.pointerScale;
+      const pointerY = PERF.reducedMotion ? 0 : pointer.y * PERF.pointerScale;
+      camera.position.x = Math.sin(t * 0.1) * 0.6 + pointerX * 0.7;
+      camera.position.y = Math.cos(t * 0.08) * 0.4 - pointerY * 0.45;
       camera.lookAt(0, 0, 0);
       renderer.render(scene, camera);
-      requestAnimationFrame(loop);
     }
     loop();
 
@@ -265,20 +346,22 @@
     fallbackRunning = true;
 
     const pointer = { x: 0, y: 0 };
-    const onPointerMove = (ev) => {
-      const w = Math.max(1, window.innerWidth);
-      const h = Math.max(1, window.innerHeight);
-      pointer.x = (ev.clientX / w) * 2 - 1;
-      pointer.y = (ev.clientY / h) * 2 - 1;
-    };
-    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    if (!PERF.reducedMotion) {
+      const onPointerMove = (ev) => {
+        const w = Math.max(1, window.innerWidth);
+        const h = Math.max(1, window.innerHeight);
+        pointer.x = (ev.clientX / w) * 2 - 1;
+        pointer.y = (ev.clientY / h) * 2 - 1;
+      };
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+    }
 
-    const particles = Array.from({ length: 180 }, () => ({
+    const particles = Array.from({ length: PERF.fallbackParticles }, () => ({
       x: Math.random(),
       y: Math.random(),
       z: Math.random(),
-      vx: (Math.random() - 0.5) * 0.00035,
-      vy: (Math.random() - 0.5) * 0.00035,
+      vx: (Math.random() - 0.5) * 0.00035 * PERF.motionScale,
+      vy: (Math.random() - 0.5) * 0.00035 * PERF.motionScale,
       r: 0.4 + Math.random() * 2.1,
       hue: 170 + Math.random() * 120,
       alpha: 0.12 + Math.random() * 0.35,
@@ -298,15 +381,24 @@
     window.addEventListener('resize', resize);
 
     let t0 = performance.now();
+    let frame = 0;
     const render = (now) => {
-      const dt = Math.min(32, now - t0);
+      requestAnimationFrame(render);
+      frame += 1;
+
+      const dtRaw = Math.min(48, now - t0);
       t0 = now;
+      if (PERF.frameStride > 1 && (frame % PERF.frameStride) !== 0) return;
+
+      const dt = dtRaw * PERF.motionScale;
       const w = Math.max(1, window.innerWidth);
       const h = Math.max(1, window.innerHeight);
 
       ctx.clearRect(0, 0, w, h);
-      const glowX = w * (0.5 + pointer.x * 0.08);
-      const glowY = h * (0.45 - pointer.y * 0.08);
+      const pointerX = PERF.reducedMotion ? 0 : pointer.x;
+      const pointerY = PERF.reducedMotion ? 0 : pointer.y;
+      const glowX = w * (0.5 + pointerX * 0.08);
+      const glowY = h * (0.45 - pointerY * 0.08);
       const grad = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, Math.max(w, h) * 0.66);
       grad.addColorStop(0, 'rgba(34,211,238,0.10)');
       grad.addColorStop(0.5, 'rgba(168,85,247,0.08)');
@@ -322,16 +414,14 @@
         if (p.y < -0.05) p.y = 1.05;
         if (p.y > 1.05) p.y = -0.05;
 
-        const px = p.x * w + pointer.x * (8 + p.z * 24);
-        const py = p.y * h - pointer.y * (8 + p.z * 24);
+        const px = p.x * w + pointerX * PERF.pointerScale * (8 + p.z * 24);
+        const py = p.y * h - pointerY * PERF.pointerScale * (8 + p.z * 24);
         const radius = p.r * (0.65 + p.z * 0.9);
         ctx.beginPath();
         ctx.arc(px, py, radius, 0, Math.PI * 2);
         ctx.fillStyle = `hsla(${Math.round(p.hue)}, 92%, 68%, ${p.alpha})`;
         ctx.fill();
       }
-
-      requestAnimationFrame(render);
     };
     requestAnimationFrame(render);
   }
@@ -460,6 +550,12 @@
     },
     href: normalizeDashboardHref,
     toast: lcToast,
+    performance: {
+      tier: PERF.tier,
+      saveData: PERF.saveData,
+      reducedMotion: PERF.reducedMotion,
+      frameStride: PERF.frameStride,
+    },
     fmt: {
       num: (n, d = 0) => (n === null || n === undefined || isNaN(n)) ? '—'
         : Number(n).toLocaleString(undefined, { maximumFractionDigits: d }),
