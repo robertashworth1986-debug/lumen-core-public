@@ -35,6 +35,8 @@ DEFAULT_POLICY: dict[str, Any] = {
     "buy_min_liquidity_score": 8.0,
     "buy_max_estimated_friction_bps": 45.0,
     "buy_min_risk_adjusted_net_edge_pct": 0.25,
+    "buy_pending_ttl_hours": 6.0,
+    "buy_pair_overrides": {},
     "buy_max_notional_usd": 0.0,
     "min_free_usd_to_buy": 0.0,
     "require_edge_score": False,
@@ -49,6 +51,19 @@ DEFAULT_POLICY: dict[str, Any] = {
     "skip_scan_refill_when_buy_paused": True,
     "force_zero_buy_budget_when_paused": True,
 }
+
+BUY_POLICY_OVERRIDE_KEYS = (
+    "require_edge_score",
+    "buy_edge_floor",
+    "buy_win_rate_floor_pct",
+    "buy_bucket_n_floor",
+    "buy_pair_cooldown_sec",
+    "buy_min_execution_quality_score",
+    "buy_min_liquidity_score",
+    "buy_max_estimated_friction_bps",
+    "buy_min_risk_adjusted_net_edge_pct",
+    "buy_max_notional_usd",
+)
 
 
 def now_utc() -> str:
@@ -154,6 +169,64 @@ def load_policy(path: Path) -> dict[str, Any]:
     except Exception:
         pass
     return policy
+
+
+def ticket_age_hours(ticket: dict[str, Any], now_ts: Optional[float] = None) -> float:
+    dt = parse_utc(ticket.get("timestamp"))
+    if dt is None:
+        return float("inf")
+    ref_ts = now_ts if now_ts is not None else time.time()
+    return max(0.0, ref_ts - dt.timestamp()) / 3600.0
+
+
+def resolve_pair_buy_policy(policy: dict[str, Any], pair: str) -> dict[str, Any]:
+    effective = {key: policy.get(key) for key in BUY_POLICY_OVERRIDE_KEYS}
+    pair_clean = str(pair or "").strip().upper()
+    if not pair_clean:
+        return effective
+
+    overrides = policy.get("buy_pair_overrides")
+    if not isinstance(overrides, dict):
+        return effective
+
+    pair_override: Optional[dict[str, Any]] = None
+    for raw_pair, cfg in overrides.items():
+        if not isinstance(cfg, dict):
+            continue
+        if str(raw_pair or "").strip().upper() == pair_clean:
+            pair_override = cfg
+            break
+
+    if pair_override is None:
+        return effective
+
+    for key in BUY_POLICY_OVERRIDE_KEYS:
+        if key in pair_override:
+            effective[key] = pair_override[key]
+    return effective
+
+
+def reason_histogram(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    counts: dict[str, int] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        side = str(row.get("side") or "unknown").strip().lower() or "unknown"
+        raw_reasons = row.get("reasons")
+        if isinstance(raw_reasons, list):
+            reasons = [str(x or "unspecified").strip() or "unspecified" for x in raw_reasons]
+        else:
+            reason = str(row.get("reason") or "unspecified").strip() or "unspecified"
+            reasons = [reason]
+
+        for reason in reasons:
+            key = f"{side}:{reason}"
+            counts[key] = counts.get(key, 0) + 1
+
+    return [
+        {"reason": reason, "count": count}
+        for reason, count in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+    ]
 
 
 def load_state(path: Path) -> tuple[set[str], dict[str, float]]:
@@ -333,6 +406,108 @@ def build_decide_payload(ticket_id: str, controller: str, reason: str) -> dict[s
     }
 
 
+def build_reject_payload(ticket_id: str, controller: str, reason: str) -> dict[str, Any]:
+    return {
+        "ticket_id": ticket_id,
+        "decision": "reject",
+        "controller": controller,
+        "reason": reason,
+        "confirm_phrase": "",
+    }
+
+
+def expire_stale_pending_buys(
+    tickets: list[dict[str, Any]],
+    gateway_url: str,
+    controller: str,
+    max_pending_buy_age_hours: float,
+    log_file: Path,
+) -> dict[str, Any]:
+    now_ts = time.time()
+    attempted = 0
+    expired = 0
+    failed = 0
+    details: list[dict[str, Any]] = []
+
+    ttl_hours = max(0.0, float(max_pending_buy_age_hours))
+    if ttl_hours <= 0:
+        return {
+            "enabled": False,
+            "attempted": 0,
+            "expired_count": 0,
+            "failed_count": 0,
+            "max_pending_buy_age_hours": ttl_hours,
+            "details": [],
+        }
+
+    for ticket in tickets:
+        if not isinstance(ticket, dict):
+            continue
+        if str(ticket.get("approval_state") or "").upper() != "PENDING_HUMAN_APPROVAL":
+            continue
+        if str(ticket.get("side") or "").strip().lower() != "buy":
+            continue
+
+        age_hours = ticket_age_hours(ticket, now_ts=now_ts)
+        if age_hours < ttl_hours:
+            continue
+
+        ticket_id = str(ticket.get("ticket_id") or "").strip()
+        if not ticket_id:
+            continue
+
+        attempted += 1
+        reason = (
+            "approval_autofire_stale_buy_expiry "
+            f"age_hours={age_hours:.2f} ttl_hours={ttl_hours:.2f}"
+        )
+        payload = build_reject_payload(ticket_id=ticket_id, controller=controller, reason=reason)
+        result = request_json(
+            f"{gateway_url}/api/master/approval/decide",
+            method="POST",
+            payload=payload,
+        )
+        status = str(result.get("status") if isinstance(result, dict) else "unknown")
+        ok = status == "rejected"
+        if ok:
+            expired += 1
+        else:
+            failed += 1
+
+        row = {
+            "ticket_id": ticket_id,
+            "pair": str(ticket.get("pair") or "").strip().upper(),
+            "status": status,
+            "age_hours": round(age_hours, 4),
+        }
+        if not ok:
+            row["result"] = result
+        details.append(row)
+
+        append_jsonl(
+            log_file,
+            {
+                "ts": now_utc(),
+                "event": "stale_buy_auto_expire_attempt",
+                "ticket_id": ticket_id,
+                "pair": row["pair"],
+                "age_hours": row["age_hours"],
+                "ttl_hours": round(ttl_hours, 4),
+                "status": status,
+                "result": result,
+            },
+        )
+
+    return {
+        "enabled": True,
+        "attempted": attempted,
+        "expired_count": expired,
+        "failed_count": failed,
+        "max_pending_buy_age_hours": ttl_hours,
+        "details": details[:25],
+    }
+
+
 def extract_perf_net(perf_payload: dict[str, Any]) -> tuple[Optional[float], Optional[str]]:
     session = perf_payload.get("session") if isinstance(perf_payload, dict) else {}
     if not isinstance(session, dict):
@@ -442,6 +617,7 @@ def evaluate_buy_ticket(
     reasons: list[str] = []
 
     pair = str(ticket.get("pair") or "").strip().upper()
+    pair_policy = resolve_pair_buy_policy(policy=policy, pair=pair)
     notional_usd = to_float(ticket.get("notional_usd"), 0.0)
     scanner_meta = ticket.get("scanner_meta")
     if not isinstance(scanner_meta, dict):
@@ -501,38 +677,46 @@ def evaluate_buy_ticket(
     if buy_paused:
         reasons.append(buy_pause_reason)
 
-    if buy_notional_cap > 0 and notional_usd > buy_notional_cap:
-        reasons.append(f"notional ${notional_usd:.2f} exceeds cap ${buy_notional_cap:.2f}")
+    pair_notional_cap = max(0.0, to_float(pair_policy.get("buy_max_notional_usd"), 0.0))
+    effective_notional_cap = buy_notional_cap
+    if pair_notional_cap > 0:
+        effective_notional_cap = (
+            min(effective_notional_cap, pair_notional_cap)
+            if effective_notional_cap > 0
+            else pair_notional_cap
+        )
+    if effective_notional_cap > 0 and notional_usd > effective_notional_cap:
+        reasons.append(f"notional ${notional_usd:.2f} exceeds cap ${effective_notional_cap:.2f}")
 
-    require_edge = bool(policy.get("require_edge_score", False))
-    edge_floor = to_float(policy.get("buy_edge_floor"), 0.0)
+    require_edge = bool(pair_policy.get("require_edge_score", False))
+    edge_floor = to_float(pair_policy.get("buy_edge_floor"), 0.0)
     if edge_score is None:
         if require_edge:
             reasons.append("missing edge_score")
     elif edge_score < edge_floor:
         reasons.append(f"edge {edge_score:.3f} < floor {edge_floor:.3f}")
 
-    win_floor = to_float(policy.get("buy_win_rate_floor_pct"), 0.0)
+    win_floor = to_float(pair_policy.get("buy_win_rate_floor_pct"), 0.0)
     if win_rate_pct is not None and win_rate_pct < win_floor:
         reasons.append(f"win_rate {win_rate_pct:.1f}% < floor {win_floor:.1f}%")
 
-    n_floor = max(0, to_int(policy.get("buy_bucket_n_floor"), 0))
+    n_floor = max(0, to_int(pair_policy.get("buy_bucket_n_floor"), 0))
     if bucket_n is not None and bucket_n < n_floor:
         reasons.append(f"bucket_n {bucket_n} < floor {n_floor}")
 
-    min_exec_quality = max(0.0, to_float(policy.get("buy_min_execution_quality_score"), 0.0))
+    min_exec_quality = max(0.0, to_float(pair_policy.get("buy_min_execution_quality_score"), 0.0))
     if execution_quality_score is not None and execution_quality_score < min_exec_quality:
         reasons.append(
             f"execution_quality {execution_quality_score:.2f} < floor {min_exec_quality:.2f}"
         )
 
-    min_liquidity = max(0.0, to_float(policy.get("buy_min_liquidity_score"), 0.0))
+    min_liquidity = max(0.0, to_float(pair_policy.get("buy_min_liquidity_score"), 0.0))
     if liquidity_score is not None and liquidity_score < min_liquidity:
         reasons.append(
             f"liquidity_score {liquidity_score:.2f} < floor {min_liquidity:.2f}"
         )
 
-    max_friction_bps = max(0.0, to_float(policy.get("buy_max_estimated_friction_bps"), 0.0))
+    max_friction_bps = max(0.0, to_float(pair_policy.get("buy_max_estimated_friction_bps"), 0.0))
     if (
         max_friction_bps > 0
         and estimated_friction_bps is not None
@@ -542,13 +726,13 @@ def evaluate_buy_ticket(
             f"estimated_friction_bps {estimated_friction_bps:.2f} > cap {max_friction_bps:.2f}"
         )
 
-    risk_edge_floor = max(0.0, to_float(policy.get("buy_min_risk_adjusted_net_edge_pct"), 0.0))
+    risk_edge_floor = max(0.0, to_float(pair_policy.get("buy_min_risk_adjusted_net_edge_pct"), 0.0))
     if risk_adjusted_net_edge_pct is not None and risk_adjusted_net_edge_pct < risk_edge_floor:
         reasons.append(
             f"risk_adjusted_net_edge_pct {risk_adjusted_net_edge_pct:.3f} < floor {risk_edge_floor:.3f}"
         )
 
-    cooldown_sec = max(0.0, to_float(policy.get("buy_pair_cooldown_sec"), 0.0))
+    cooldown_sec = max(0.0, to_float(pair_policy.get("buy_pair_cooldown_sec"), 0.0))
     if pair and cooldown_sec > 0:
         last_ts = pair_last_buy_approval_ts.get(pair, 0.0)
         if last_ts > 0 and (now_ts - last_ts) < cooldown_sec:
@@ -566,6 +750,19 @@ def evaluate_buy_ticket(
         "liquidity_score": liquidity_score,
         "estimated_friction_bps": estimated_friction_bps,
         "risk_adjusted_net_edge_pct": risk_adjusted_net_edge_pct,
+        "effective_notional_cap": effective_notional_cap,
+        "pair_policy": {
+            "require_edge_score": bool(pair_policy.get("require_edge_score", False)),
+            "buy_edge_floor": edge_floor,
+            "buy_win_rate_floor_pct": win_floor,
+            "buy_bucket_n_floor": n_floor,
+            "buy_pair_cooldown_sec": cooldown_sec,
+            "buy_min_execution_quality_score": min_exec_quality,
+            "buy_min_liquidity_score": min_liquidity,
+            "buy_max_estimated_friction_bps": max_friction_bps,
+            "buy_min_risk_adjusted_net_edge_pct": risk_edge_floor,
+            "buy_max_notional_usd": pair_notional_cap,
+        },
     }
     return len(reasons) == 0, reasons, metrics
 
@@ -860,6 +1057,19 @@ def main() -> int:
             if isinstance(refreshed_tickets, list):
                 tickets = refreshed_tickets
 
+        stale_buy_expiry = expire_stale_pending_buys(
+            tickets=tickets,
+            gateway_url=gateway_url,
+            controller=controller,
+            max_pending_buy_age_hours=max(0.0, to_float(policy.get("buy_pending_ttl_hours"), 0.0)),
+            log_file=log_file,
+        )
+        if to_int(stale_buy_expiry.get("attempted"), 0) > 0:
+            queue_payload = request_json(f"{gateway_url}/api/master/approval-queue")
+            refreshed_tickets = queue_payload.get("tickets") if isinstance(queue_payload, dict) else None
+            if isinstance(refreshed_tickets, list):
+                tickets = refreshed_tickets
+
         buy_notional_cap = resolve_buy_notional_cap(policy=policy, queue_payload=queue_payload)
         if usd_equity is not None:
             available_cap = max(0.0, usd_equity * 0.90)
@@ -977,6 +1187,8 @@ def main() -> int:
             and str(t.get("approval_state") or "").upper() == "PENDING_HUMAN_APPROVAL"
         )
         cycle_duration_sec = max(0.0, time.time() - cycle_start)
+        skipped_reason_hist = reason_histogram(skipped_by_policy)
+        rate_limited_reason_hist = reason_histogram(rate_limited)
 
         heartbeat = {
             "generated_utc": now_utc(),
@@ -1004,7 +1216,11 @@ def main() -> int:
             "buy_notional_cap_usd": buy_notional_cap,
             "usd_equity": usd_equity,
             "min_free_usd_to_buy": min_free_usd_to_buy,
+            "buy_pending_ttl_hours": max(0.0, to_float(policy.get("buy_pending_ttl_hours"), 0.0)),
+            "stale_buy_expiry": stale_buy_expiry,
             "seed_actions": seed_actions,
+            "skipped_reason_histogram": skipped_reason_hist[:40],
+            "rate_limited_reason_histogram": rate_limited_reason_hist[:20],
             "cycle_duration_sec": round(cycle_duration_sec, 4),
             "seen_count": len(seen),
             "policy": policy,
