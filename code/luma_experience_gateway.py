@@ -4816,10 +4816,12 @@ def _evaluate_guards(
     except Exception:
         raw_max_open = 0
     max_open = 0 if raw_max_open <= 0 else max(raw_max_open, APPROVAL_MIN_OPEN_POSITIONS_FLOOR)
+    ticket_side = str(ticket.get("side", "")).strip().lower()
+    max_open_ok = (max_open <= 0 or open_positions < max_open) if ticket_side == "buy" else True
     add(
         "open_positions_under_max",
-        max_open <= 0 or open_positions < max_open,
-        f"open={open_positions} max={max_open}",
+        max_open_ok,
+        f"open={open_positions} max={max_open} side={ticket_side or 'unknown'}",
     )
 
     age_h = _ticket_age_hours(ticket)
@@ -4847,6 +4849,107 @@ def _evaluate_guards(
     )
 
     return {"guards": guards, "pass_all": all(g["pass"] for g in guards)}
+
+
+def _norm_symbol(raw: Any) -> str:
+    s = str(raw or "").strip().upper().replace("/", "").replace("-", "")
+    if s.endswith(".HOLD"):
+        s = s[:-5]
+    return s
+
+
+def _pair_base_candidates(pair: str) -> set[str]:
+    p = _norm_symbol(pair)
+    if not p:
+        return set()
+    out: set[str] = {p}
+    for quote in ("ZUSD", "USD"):
+        if p.endswith(quote) and len(p) > len(quote):
+            base = p[: -len(quote)]
+            out.add(base)
+            if len(base) > 3 and base[0] in ("X", "Z"):
+                out.add(base[1:])
+    return {x for x in out if x}
+
+
+def _sell_balance_precheck(pair: str, volume: Any) -> dict[str, Any]:
+    pair_clean = str(pair or "").strip().upper()
+    try:
+        required = abs(float(volume))
+    except Exception:
+        return {
+            "ok": False,
+            "enforced": True,
+            "reason": "invalid_volume",
+            "pair": pair_clean,
+            "required": 0.0,
+            "available": 0.0,
+            "matched_assets": [],
+        }
+
+    if required <= 0:
+        return {
+            "ok": False,
+            "enforced": True,
+            "reason": "non_positive_volume",
+            "pair": pair_clean,
+            "required": required,
+            "available": 0.0,
+            "matched_assets": [],
+        }
+
+    snap = api_kraken_balance(force=0)
+    if not isinstance(snap, dict) or not bool(snap.get("ok")):
+        # Fail open if balance endpoint is unavailable.
+        return {
+            "ok": True,
+            "enforced": False,
+            "reason": "balance_unavailable",
+            "pair": pair_clean,
+            "required": required,
+            "available": None,
+            "matched_assets": [],
+        }
+
+    pair_norm = _norm_symbol(pair_clean)
+    base_candidates = _pair_base_candidates(pair_clean)
+    matched_assets: list[str] = []
+    available = 0.0
+
+    for row in (snap.get("breakdown") or []):
+        if not isinstance(row, dict):
+            continue
+        asset = str(row.get("asset") or "").strip().upper()
+        if not asset:
+            continue
+        qty = to_float(row.get("qty"), 0.0)
+        if qty <= 0:
+            continue
+
+        asset_norm = _norm_symbol(asset)
+        asset_base = asset_norm[1:] if len(asset_norm) > 3 and asset_norm[0] in ("X", "Z") else asset_norm
+        guessed_pair_norm = _norm_symbol(_asset_to_usd_pair(asset) or "")
+
+        match = False
+        if guessed_pair_norm and guessed_pair_norm == pair_norm:
+            match = True
+        if not match and (asset_norm in base_candidates or asset_base in base_candidates):
+            match = True
+
+        if match:
+            available += qty
+            matched_assets.append(asset)
+
+    epsilon = max(1e-8, required * 0.0005)
+    return {
+        "ok": (available + epsilon) >= required,
+        "enforced": True,
+        "reason": "ok" if (available + epsilon) >= required else "insufficient_base_balance",
+        "pair": pair_clean,
+        "required": required,
+        "available": available,
+        "matched_assets": sorted(set(matched_assets)),
+    }
 
 
 def _auto_stale_queue(queue: list[dict[str, Any]]) -> int:
@@ -5050,15 +5153,54 @@ def master_approval_decide(req: ApprovalDecideRequest) -> dict[str, Any]:
     payload = dict(ticket.get("payload") or {})
     is_validate = str(payload.get("validate", "true")).lower() in ("true", "1", "yes")
 
+    payload_pair = str(payload.get("pair") or "").strip().upper()
+    payload_side = str(payload.get("type") or "").strip().lower()
+    payload_volume = payload.get("volume")
+
+    if payload_side == "sell" and not is_validate:
+        sell_check = _sell_balance_precheck(payload_pair, payload_volume)
+        if not bool(sell_check.get("ok", True)):
+            failure = {
+                "name": "sell_volume_available",
+                "pass": False,
+                "detail": (
+                    f"pair='{payload_pair}' required={to_float(sell_check.get('required'), 0.0):.8f} "
+                    f"available={to_float(sell_check.get('available'), 0.0):.8f} "
+                    f"assets={sell_check.get('matched_assets') or []}"
+                ),
+            }
+            ticket["approval_state"] = "REJECTED_BY_GUARD"
+            ticket["decided_at_utc"] = now_utc()
+            ticket["decided_by"] = req.controller
+            ticket["decision_reason"] = "guard rail failure"
+            ticket["guard_failures"] = [failure]
+            _save_approval_queue(queue)
+            _append_jsonl(
+                APPROVAL_AUDIT_FILE,
+                {
+                    "ts": now_utc(),
+                    "event": "approve_blocked_sell_balance_precheck",
+                    "ticket_id": req.ticket_id,
+                    "controller": req.controller,
+                    "balance_check": sell_check,
+                    "failed_guards": [failure],
+                },
+            )
+            return {
+                "status": "blocked",
+                "reason": "guard_failure",
+                "failed_guards": [failure],
+            }
+
     _append_jsonl(APPROVAL_AUDIT_FILE, {
         "ts": now_utc(),
         "event": "approve_submitting_to_kraken",
         "ticket_id": req.ticket_id,
         "controller": req.controller,
         "validate": is_validate,
-        "pair": payload.get("pair"),
-        "side": payload.get("type"),
-        "volume": payload.get("volume"),
+        "pair": payload_pair,
+        "side": payload_side,
+        "volume": payload_volume,
     })
 
     result = _kraken_add_order(payload)

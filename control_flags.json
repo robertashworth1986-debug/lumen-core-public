@@ -10,7 +10,7 @@
   "require_validate_pass": true,
   "max_notional_per_trade_usd": 50.0,
   "max_daily_loss_usd": 20.0,
-  "max_open_positions": 20,
+  "max_open_positions": 30,
   "deadman_timeout_seconds": 30,
   "default_pair": "XBTUSD",
   "default_volume_base": 0.0004,
