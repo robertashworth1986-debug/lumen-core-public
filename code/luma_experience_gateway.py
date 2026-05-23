@@ -4879,7 +4879,11 @@ def _pair_base_candidates(pair: str) -> set[str]:
     return {x for x in out if x}
 
 
-def _sell_balance_precheck(pair: str, volume: Any) -> dict[str, Any]:
+def _sell_balance_precheck(
+    pair: str,
+    volume: Any,
+    balance_snapshot: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
     pair_clean = str(pair or "").strip().upper()
     try:
         required = abs(float(volume))
@@ -4905,7 +4909,7 @@ def _sell_balance_precheck(pair: str, volume: Any) -> dict[str, Any]:
             "matched_assets": [],
         }
 
-    snap = api_kraken_balance(force=0)
+    snap = balance_snapshot if isinstance(balance_snapshot, dict) else api_kraken_balance(force=0)
     if not isinstance(snap, dict) or not bool(snap.get("ok")):
         # Fail open if balance endpoint is unavailable.
         return {
@@ -6548,6 +6552,8 @@ async def api_sells_lock_in(request: Request) -> dict[str, Any]:
             age_s = 1e9
         recent_by_src[src] = min(recent_by_src.get(src, 1e9), age_s)
 
+    balance_snap = api_kraken_balance(force=0)
+
     created: list[dict[str, Any]] = []
     skipped: list[dict[str, Any]] = []
     for lot in upnl.get("lots") or []:
@@ -6562,6 +6568,27 @@ async def api_sells_lock_in(request: Request) -> dict[str, Any]:
         if not force and recent_by_src.get(tx, 1e9) < cooldown:
             skipped.append({"txid": tx, "reason": f"cooldown ({recent_by_src[tx]:.0f}s < {cooldown}s)"})
             continue
+
+        # Skip creating SELL tickets that cannot pass live balance precheck.
+        if not force:
+            sell_check = _sell_balance_precheck(
+                str(lot.get("pair") or ""),
+                lot.get("qty"),
+                balance_snapshot=balance_snap,
+            )
+            if not bool(sell_check.get("ok", True)):
+                skipped.append(
+                    {
+                        "txid": tx,
+                        "reason": (
+                            f"insufficient_base_balance "
+                            f"(required={to_float(sell_check.get('required'), 0.0):.8f} "
+                            f"available={to_float(sell_check.get('available'), 0.0):.8f})"
+                        ),
+                    }
+                )
+                continue
+
         ticket = _build_sell_ticket(lot, decision, note_prefix="profit_lock_manual" if force else "profit_lock")
         queue.append(ticket)
         created.append(ticket)
@@ -6617,6 +6644,7 @@ async def _profit_lock_watcher() -> None:
                 upnl = api_kraken_unrealized()
                 peaks = _load_peaks()
                 queue = _load_approval_queue()
+                balance_snap = api_kraken_balance(force=0)
                 cooldown = int(cfg.get("ticket_cooldown_s") or 600)
                 recent_by_src: dict[str, float] = {}
                 for t in queue:
@@ -6644,6 +6672,15 @@ async def _profit_lock_watcher() -> None:
                         continue
                     if recent_by_src.get(tx, 1e9) < cooldown:
                         continue
+
+                    sell_check = _sell_balance_precheck(
+                        str(lot.get("pair") or ""),
+                        lot.get("qty"),
+                        balance_snapshot=balance_snap,
+                    )
+                    if not bool(sell_check.get("ok", True)):
+                        continue
+
                     queue.append(_build_sell_ticket(lot, decision, note_prefix="profit_lock_auto"))
                     created += 1
                     _PROFIT_LOCK_STATE["last_decision"] = {
