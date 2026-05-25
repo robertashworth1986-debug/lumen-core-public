@@ -55,6 +55,7 @@ PAPER_STATE_CANDIDATES = [
     OUT / "paper_state.json",
 ]
 PAPER_LEDGER_CANDIDATES = [
+    OUT / "paper_trade_real_api_ledger.jsonl",
     OUT / "paper_trade_ledger.jsonl",
     OUT / "paper_ledger.jsonl",
     OUT / "trade_ledger.jsonl",
@@ -133,6 +134,24 @@ def safe_float(x, default=0.0):
         return float(x)
     except Exception:
         return default
+
+
+def first_present(mapping, keys, default=None):
+    if not isinstance(mapping, dict):
+        return default
+    for key in keys:
+        value = mapping.get(key)
+        if value is not None and value != "":
+            return value
+    return default
+
+
+def first_present_multi(mappings, keys, default=None):
+    for mapping in mappings:
+        value = first_present(mapping, keys, None)
+        if value is not None:
+            return value
+    return default
 
 def read_json(path, default):
     try:
@@ -264,25 +283,65 @@ def build_paper_metrics():
     runtime = read_json(runtime_path, {})
     ledger = read_jsonl(ledger_path)
 
-    starting = safe_float(state.get("starting_capital", state.get("starting_equity", 100000.0)), 100000.0)
-    equity = safe_float(state.get("current_equity", state.get("equity", starting)), starting)
-    pnl = round(equity - starting, 2)
+    sources = [state, runtime]
 
-    wins = int(safe_float(state.get("wins", 0), 0))
-    losses = int(safe_float(state.get("losses", 0), 0))
-    trades = int(safe_float(state.get("trades", wins + losses), wins + losses))
-    last_symbol = str(state.get("last_symbol", runtime.get("last_symbol", "")))
-    last_side = str(state.get("last_side", runtime.get("last_side", "")))
+    starting = safe_float(
+        first_present_multi(
+            sources,
+            [
+                "starting_capital",
+                "starting_equity",
+                "starting_capital_usd",
+                "starting_equity_usd",
+            ],
+            100000.0,
+        ),
+        100000.0,
+    )
+    equity = safe_float(
+        first_present_multi(
+            sources,
+            [
+                "current_equity",
+                "equity",
+                "equity_usd",
+                "current_equity_usd",
+            ],
+            starting,
+        ),
+        starting,
+    )
+    explicit_pnl = first_present_multi(
+        sources,
+        ["paper_profit", "paper_profit_usd", "pnl_usd", "pnl"],
+        None,
+    )
+    pnl = round(safe_float(explicit_pnl, equity - starting), 2) if explicit_pnl is not None else round(equity - starting, 2)
+
+    wins = int(safe_float(first_present_multi(sources, ["wins", "win_count"], 0), 0))
+    losses = int(safe_float(first_present_multi(sources, ["losses", "loss_count"], 0), 0))
+    trades = int(
+        safe_float(
+            first_present_multi(sources, ["trades", "trade_count", "total_trades"], wins + losses),
+            wins + losses,
+        )
+    )
+    last_symbol = str(first_present_multi(sources, ["last_symbol"], ""))
+    last_side = str(first_present_multi(sources, ["last_side"], ""))
 
     eq_curve = []
     pnl_values = []
     closed_trade_pnls = []
 
     for row in ledger[-1000:]:
-        eq = row.get("equity_after")
+        eq = first_present(
+            row,
+            ["equity_after", "equity", "equity_usd", "account_equity", "current_equity"],
+            None,
+        )
         if eq is not None:
             eq_curve.append(safe_float(eq))
-        row_pnl = row.get("pnl")
+        row_pnl = first_present(row, ["pnl", "pnl_usd", "realized_pnl", "net_pnl"], None)
         if row_pnl is not None:
             pnl_values.append(safe_float(row_pnl))
             closed_trade_pnls.append(safe_float(row_pnl))

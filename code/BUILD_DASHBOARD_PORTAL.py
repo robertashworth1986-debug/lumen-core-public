@@ -50,6 +50,22 @@ def main() -> None:
     twin_seed = load_json(TWIN_SEED_PATH, {})
     now = datetime.now(timezone.utc).isoformat()
 
+    critical_links = [
+      ("Mission Control", "mission_control.html"),
+      ("Quant Lab", "quant_lab.html"),
+      ("Investor Room", "investor_command_room.html"),
+      ("Investor Wallboard", "investor_wallboard.html"),
+      ("Grants", "grants.html"),
+      ("Kraken Execution", "kraken_execution_dashboard.html"),
+      ("Scenario Mission", "scenario_mission.html"),
+      ("Staleness Command", "staleness_command_center.html"),
+      ("Harmonic Proofpack", "harmonic_proofpack_mission.html"),
+      ("Live Source Registry", "live_source_registry.html"),
+    ]
+    critical_links_html = "".join(
+      f'<a class="btn ghost" href="{href}">{label}</a>' for label, href in critical_links
+    )
+
     payload = {
         "generated_utc": now,
         "paper_equity": fmt_usd(scorecard.get("current_equity_usd", 0.0)),
@@ -67,7 +83,7 @@ def main() -> None:
         "sections": {
             "overview": {
                 "title": "Portal Overview",
-                "text": "This portal is the command surface for all three public boards: institutional infrastructure, paper execution, and LamaScout artist intelligence.",
+              "text": "This portal is the command surface for all three public boards plus a curated live operations set. Legacy pages are archived under dashboard/archive to reduce surface noise.",
             },
             "unified": {
                 "title": "Unified Board",
@@ -177,6 +193,7 @@ def main() -> None:
       <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Paper Board</div><h2 style=\"margin-top:12px;\">Execution Proof Rail</h2><p style=\"margin-top:10px;\">Dedicated paper compounding board with proof IDs, equity curve, positions, and narrated execution state.</p><div class=\"metric\"><div class=\"label\">Closed Trades</div><div class=\"value\">{payload['paper_trades']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"{ALPACA_FILE.name}\">Launch</a></div></div>
       <div class=\"card portal-card reveal\"><div class=\"eyebrow\">LamaScout</div><h2 style=\"margin-top:12px;\">Artist Intelligence</h2><p style=\"margin-top:10px;\">Unsigned discovery, candidate ranking, signal charts, alert rail, and narrated proof of scout output.</p><div class=\"metric\"><div class=\"label\">Production Candidates</div><div class=\"value\">{payload['production_candidates']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"{SCOUT_FILE.name}\">Launch</a></div></div>
     </section>
+    <section class="card reveal" style="margin-top:20px;"><div class="eyebrow">Critical Live Boards</div><h2 style="margin-top:12px;">Operations + Investor Quick Launch</h2><p style="margin-top:10px;">Only the live, go-forward boards are listed here. Older dashboard generations have been archived out of the top-level surface.</p><div class="actions" style="margin-top:14px;">{critical_links_html}</div></section>
     <section class=\"card reveal\" style=\"margin-top:20px;\"><div class=\"eyebrow\">Immersive</div><h2 style=\"margin-top:12px;\">LumaCore XR Entry</h2><p style=\"margin-top:10px;\">Launch the real-time immersive bridge with cinematic visuals, live websocket data, and voice-guided walkthrough mode for demos.</p><div class=\"actions\" style=\"margin-top:14px;\"><a class=\"btn primary\" href=\"luma_experience.html\">Launch Immersive Experience</a></div></section>
     <section class=\"card reveal\" style=\"margin-top:20px;\"><div class=\"eyebrow\">Notes</div><ul><li>Generated UTC: {now}</li><li>Unified board remains the most complete investor surface.</li><li>Paper board now has its own premium runtime shell and voice explainer.</li><li>LamaScout now has a premium static board in the same dashboard folder.</li><li>Immersive mode is now wired through the live gateway endpoint.</li></ul></section>
   </div>
