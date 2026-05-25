@@ -46,7 +46,7 @@ class OrderRouter:
             "validate": validate_only
         }
 
-    def build_close_template(self, x: RouteIntent) -> dict | None:
+    def build_close_template(self, x: RouteIntent) -> Optional[dict]:
         if x.stop_price is None and x.take_profit is None:
             return None
         out = {}

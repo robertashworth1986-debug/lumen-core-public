@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -80,6 +81,14 @@ def write_json(path: Path, data: Any) -> None:
     path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
+def sanitize_error_message(message: str, api_key: str) -> str:
+    text = str(message or "")
+    if api_key:
+        text = text.replace(api_key, "***")
+    text = re.sub(r"([?&]apiKey=)[^&\s]+", r"\1***", text, flags=re.IGNORECASE)
+    return text
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Pull live DraftKings odds via The Odds API")
     parser.add_argument("--sport", default="basketball_nba", help="Sport key (e.g. basketball_nba) or 'all'")
@@ -109,7 +118,11 @@ def main() -> int:
         try:
             events = fetch_sport(api_key, sport_key, args.regions, args.markets)
         except Exception as exc:
-            manifest["sports"][sport_key] = {"ok": False, "error": str(exc), "events": 0}
+            manifest["sports"][sport_key] = {
+                "ok": False,
+                "error": sanitize_error_message(str(exc), api_key),
+                "events": 0,
+            }
             continue
 
         out_path = SPORTS_DIR / f"{sport_key}_draftkings_live_odds.json"

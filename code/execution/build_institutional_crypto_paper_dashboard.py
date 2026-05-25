@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import threading
 import time
 from datetime import datetime, timezone
@@ -13,7 +14,8 @@ import panel as pn
 import plotly.graph_objects as go
 
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+_DEFAULT_ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get("LUMA_STACK_ROOT", str(_DEFAULT_ROOT))).expanduser()
 EXEC_OUT = ROOT / "out" / "execution"
 DASH = ROOT / "dashboard"
 

@@ -1,7 +1,13 @@
 param(
     [string]$RootPath = 'C:\LumaTrader\INSTITUTIONAL_STACK_V2',
     [int]$PremiumStaleHours = 24,
-    [switch]$InstallRecommendedPackages
+    [switch]$InstallRecommendedPackages,
+    [switch]$SkipPremiumSync,
+    [switch]$SkipInvestorProofSweep,
+    [int]$PremiumSyncTimeoutSec = 300,
+    [int]$StepTimeoutSec = 900,
+    [int]$InvestorProofTimeoutSec = 1800,
+    [int]$HeartbeatSec = 20
 )
 
 $ErrorActionPreference = 'Stop'
@@ -41,6 +47,25 @@ function Tail-Log {
     return Get-Content -Path $Path -Tail $Lines -Encoding UTF8
 }
 
+function Resolve-CommandPath {
+    param([string]$Command)
+
+    if ([string]::IsNullOrWhiteSpace($Command)) {
+        return $null
+    }
+
+    if (Test-Path $Command) {
+        return (Resolve-Path $Command).Path
+    }
+
+    $cmd = Get-Command $Command -ErrorAction SilentlyContinue
+    if ($cmd) {
+        return $cmd.Source
+    }
+
+    return $null
+}
+
 $ResolvedRoot = (Resolve-Path $RootPath).Path
 $WorkspaceRoot = Split-Path -Parent $ResolvedRoot
 $OpsPath = Join-Path $ResolvedRoot 'code\ops'
@@ -59,18 +84,18 @@ function Invoke-Step {
     param(
         [string]$Name,
         [string]$Command,
-        [string[]]$Args,
-        [string]$WorkingDirectory
+        [string[]]$StepArgs,
+        [string]$WorkingDirectory,
+        [int]$TimeoutSec = 900,
+        [int]$HeartbeatSeconds = 20
     )
 
     $safeName = ($Name -replace '[^A-Za-z0-9_-]', '_')
     $stdoutPath = Join-Path $RunDir ("{0}.stdout.log" -f $safeName)
     $stderrPath = Join-Path $RunDir ("{0}.stderr.log" -f $safeName)
 
-    $exists = $true
-    if ($Command -like '*.ps1' -and -not (Test-Path $Command)) {
-        $exists = $false
-    }
+    $resolvedCommand = Resolve-CommandPath -Command $Command
+    $exists = ($null -ne $resolvedCommand)
 
     if (-not $exists) {
         $row = [PSCustomObject]@{
@@ -78,6 +103,7 @@ function Invoke-Step {
             ok = $false
             return_code = -404
             duration_sec = 0
+            timed_out = $false
             stdout_log = $stdoutPath
             stderr_log = $stderrPath
             stdout_tail = @()
@@ -87,19 +113,44 @@ function Invoke-Step {
         return $row
     }
 
+    Write-Output ("[STACK_SWEEP][START] step={0} timeout_sec={1}" -f $Name, $TimeoutSec)
+
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
-    Push-Location $WorkingDirectory
+    $rc = 1
+    $timedOut = $false
+    $heartbeatWindow = [Math]::Max(5, $HeartbeatSeconds)
     try {
-        & $Command @Args 1> $stdoutPath 2> $stderrPath
-        $rc = $LASTEXITCODE
-        if ($null -eq $rc) {
-            $rc = 0
+        $proc = Start-Process -FilePath $resolvedCommand -ArgumentList $StepArgs -WorkingDirectory $WorkingDirectory -NoNewWindow -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
+        $nextHeartbeat = (Get-Date).AddSeconds($heartbeatWindow)
+
+        while (-not $proc.HasExited) {
+            Start-Sleep -Milliseconds 500
+            $proc.Refresh()
+
+            if ((Get-Date) -ge $nextHeartbeat) {
+                Write-Output ("[STACK_SWEEP][RUNNING] step={0} elapsed_sec={1}" -f $Name, [Math]::Round($sw.Elapsed.TotalSeconds, 1))
+                $nextHeartbeat = (Get-Date).AddSeconds($heartbeatWindow)
+            }
+
+            if ($sw.Elapsed.TotalSeconds -ge $TimeoutSec) {
+                $timedOut = $true
+                Write-Output ("[STACK_SWEEP][TIMEOUT] step={0} elapsed_sec={1}" -f $Name, [Math]::Round($sw.Elapsed.TotalSeconds, 1))
+                Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+                break
+            }
+        }
+
+        if (-not $timedOut) {
+            $proc.WaitForExit()
+            $rc = [int]$proc.ExitCode
+        } else {
+            $rc = 124
+            Add-Content -Path $stderrPath -Value ("Timed out after {0} seconds" -f $TimeoutSec) -Encoding UTF8
         }
     } catch {
         $_ | Out-File -FilePath $stderrPath -Append -Encoding UTF8
         $rc = 1
     } finally {
-        Pop-Location
         $sw.Stop()
     }
 
@@ -108,12 +159,14 @@ function Invoke-Step {
         ok = ($rc -eq 0)
         return_code = [int]$rc
         duration_sec = [Math]::Round($sw.Elapsed.TotalSeconds, 2)
+        timed_out = $timedOut
         stdout_log = $stdoutPath
         stderr_log = $stderrPath
         stdout_tail = Tail-Log -Path $stdoutPath -Lines 40
         stderr_tail = Tail-Log -Path $stderrPath -Lines 40
     }
     $steps.Add($row)
+    Write-Output ("[STACK_SWEEP][END] step={0} ok={1} rc={2} duration_sec={3}" -f $Name, $row.ok, $row.return_code, $row.duration_sec)
     return $row
 }
 
@@ -134,10 +187,10 @@ if ($premiumLatest -and $premiumLatest.generated_utc) {
     }
 }
 
-$syncPremium = (-not $premiumFresh)
+$syncPremium = ((-not $premiumFresh) -and (-not $SkipPremiumSync))
 if ($syncPremium) {
     $syncScript = Join-Path $OpsPath 'SYNC_PREMIUM_PACKAGE_MIRROR.ps1'
-    Invoke-Step -Name 'sync_premium_package_mirror' -Command 'pwsh' -Args @(
+    Invoke-Step -Name 'sync_premium_package_mirror' -Command 'pwsh' -StepArgs @(
         '-NoProfile',
         '-ExecutionPolicy',
         'Bypass',
@@ -145,33 +198,63 @@ if ($syncPremium) {
         $syncScript,
         '-HashLimitMB',
         '64'
-    ) -WorkingDirectory $WorkspaceRoot | Out-Null
+    ) -WorkingDirectory $WorkspaceRoot -TimeoutSec $PremiumSyncTimeoutSec -HeartbeatSeconds $HeartbeatSec | Out-Null
     $premiumLatest = Read-JsonFile -Path $premiumLatestPath
+} elseif ($SkipPremiumSync) {
+    $skipPremiumRow = [PSCustomObject]@{
+        name = 'sync_premium_package_mirror'
+        ok = $true
+        return_code = 0
+        duration_sec = 0
+        timed_out = $false
+        skipped = $true
+        stdout_log = ''
+        stderr_log = ''
+        stdout_tail = @('Skipped by -SkipPremiumSync')
+        stderr_tail = @()
+    }
+    $steps.Add($skipPremiumRow)
 }
 
-Invoke-Step -Name 'dashboard_mirror_parity_audit' -Command 'pwsh' -Args @(
+Invoke-Step -Name 'dashboard_mirror_parity_audit' -Command 'pwsh' -StepArgs @(
     '-NoProfile',
     '-ExecutionPolicy',
     'Bypass',
     '-File',
     (Join-Path $OpsPath 'AUDIT_DASHBOARD_MIRROR_PARITY.ps1')
-) -WorkingDirectory $WorkspaceRoot | Out-Null
+) -WorkingDirectory $WorkspaceRoot -TimeoutSec $StepTimeoutSec -HeartbeatSeconds $HeartbeatSec | Out-Null
 
-Invoke-Step -Name 'live_key_measurement_audit' -Command 'pwsh' -Args @(
+Invoke-Step -Name 'live_key_measurement_audit' -Command 'pwsh' -StepArgs @(
     '-NoProfile',
     '-ExecutionPolicy',
     'Bypass',
     '-File',
     (Join-Path $OpsPath 'RUN_LIVE_KEY_MEASUREMENT_AUDIT.ps1')
-) -WorkingDirectory $WorkspaceRoot | Out-Null
+) -WorkingDirectory $WorkspaceRoot -TimeoutSec $StepTimeoutSec -HeartbeatSeconds $HeartbeatSec | Out-Null
 
-Invoke-Step -Name 'investor_proof_sweep' -Command 'pwsh' -Args @(
-    '-NoProfile',
-    '-ExecutionPolicy',
-    'Bypass',
-    '-File',
-    (Join-Path $OpsPath 'RUN_INVESTOR_PROOF_SWEEP.ps1')
-) -WorkingDirectory $WorkspaceRoot | Out-Null
+if (-not $SkipInvestorProofSweep) {
+    Invoke-Step -Name 'investor_proof_sweep' -Command 'pwsh' -StepArgs @(
+        '-NoProfile',
+        '-ExecutionPolicy',
+        'Bypass',
+        '-File',
+        (Join-Path $OpsPath 'RUN_INVESTOR_PROOF_SWEEP.ps1')
+    ) -WorkingDirectory $WorkspaceRoot -TimeoutSec $InvestorProofTimeoutSec -HeartbeatSeconds $HeartbeatSec | Out-Null
+} else {
+    $skipRow = [PSCustomObject]@{
+        name = 'investor_proof_sweep'
+        ok = $true
+        return_code = 0
+        duration_sec = 0
+        timed_out = $false
+        skipped = $true
+        stdout_log = ''
+        stderr_log = ''
+        stdout_tail = @('Skipped by -SkipInvestorProofSweep')
+        stderr_tail = @()
+    }
+    $steps.Add($skipRow)
+}
 
 $dashboardPackagePath = Join-Path $ResolvedRoot 'dashboard\package.json'
 $dashboardPackage = Read-JsonFile -Path $dashboardPackagePath
@@ -219,7 +302,7 @@ if ($InstallRecommendedPackages -and $missing.Count -gt 0) {
 
     if ($npmCmd) {
         $installArgs = @('install') + @($missing | ForEach-Object { $_.name })
-        $installResult = Invoke-Step -Name 'install_cutting_edge_dashboard_packages' -Command $npmCmd.Source -Args $installArgs -WorkingDirectory (Join-Path $ResolvedRoot 'dashboard')
+        $installResult = Invoke-Step -Name 'install_cutting_edge_dashboard_packages' -Command $npmCmd.Source -StepArgs $installArgs -WorkingDirectory (Join-Path $ResolvedRoot 'dashboard') -TimeoutSec $StepTimeoutSec -HeartbeatSeconds $HeartbeatSec
     } else {
         $installResult = [PSCustomObject]@{
             name = 'install_cutting_edge_dashboard_packages'
@@ -255,6 +338,8 @@ $summary = [ordered]@{
         latest_path = $premiumLatestPath
         age_hours = $premiumAgeHours
         stale_threshold_hours = $PremiumStaleHours
+        sync_timeout_sec = $PremiumSyncTimeoutSec
+        skip_premium_sync_requested = [bool]$SkipPremiumSync
         was_fresh_before_run = $premiumFresh
         sync_executed = $syncPremium
         latest_after_run = $premiumLatest

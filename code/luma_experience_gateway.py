@@ -3891,6 +3891,7 @@ async def start_broadcaster() -> None:
     asyncio.create_task(_kraken_equity_sampler())
     asyncio.create_task(_profit_lock_watcher())
     asyncio.create_task(_autobuy_watcher())
+    asyncio.create_task(_smart_scanner_watcher())
 
 
 async def _kraken_equity_sampler() -> None:
@@ -7020,6 +7021,368 @@ def _maybe_refresh_spike_cache(max_age_minutes: float) -> dict[str, Any]:
     except Exception as exc:
         info["error"] = str(exc)[:200]
     return info
+
+
+# =============================================================================
+# SMART SCANNER SERVICE — dedicated background scanner that continuously
+# refreshes scan intelligence while execution workers are running.
+# =============================================================================
+
+SMART_SCANNER_FILE = ROOT / "config" / "smart_scanner.json"
+SMART_SCANNER_ALPHA_LOG = ROOT / "run" / "smart_scanner_alpha.log"
+
+SMART_SCANNER_DEFAULT = {
+    "enabled": True,
+    "scan_interval_s": 30,
+    "spike_enabled": True,
+    "spike_max_age_minutes": 8.0,
+    "alpha_enabled": True,
+    "alpha_max_age_minutes": 30.0,
+    "alpha_quotes": "ZUSD,USDT",
+    "alpha_top_liquid": 711,
+    "alpha_limit": 711,
+    "alpha_min_turnover_usd": 0.0,
+    "alpha_max_spread_bps": 10000.0,
+    "alpha_spike_threshold_pct": 3.0,
+}
+
+_SMART_SCANNER_STATE: dict[str, Any] = {
+    "started_utc": None,
+    "last_tick_utc": None,
+    "last_error": None,
+    "last_spike_scan_utc": None,
+    "last_spike_status": None,
+    "last_alpha_scan_utc": None,
+    "last_alpha_status": None,
+    "last_alpha_completed_utc": None,
+    "last_alpha_success_utc": None,
+    "last_alpha_exit_code": None,
+    "spike_refresh_count": 0,
+    "alpha_refresh_count": 0,
+    "alpha_running": False,
+}
+
+_SMART_SCANNER_ALPHA_PROC: Any = None
+_SMART_SCANNER_ALPHA_LOG_FH: Any = None
+
+
+def _load_smart_scanner_cfg() -> dict[str, Any]:
+    cfg = dict(SMART_SCANNER_DEFAULT)
+    try:
+        if SMART_SCANNER_FILE.exists():
+            user = json.loads(SMART_SCANNER_FILE.read_text(encoding="utf-8"))
+            if isinstance(user, dict):
+                cfg.update(user)
+    except Exception:
+        pass
+    return cfg
+
+
+def _save_smart_scanner_cfg(cfg: dict[str, Any]) -> None:
+    SMART_SCANNER_FILE.parent.mkdir(parents=True, exist_ok=True)
+    SMART_SCANNER_FILE.write_text(json.dumps(cfg, indent=2), encoding="utf-8")
+
+
+def _latest_alpha_map_path() -> Path | None:
+    candidates = [
+        KRAKEN_ALPHA_MAP_FILE,
+        KRAKEN_ALPHA_MAP_FILE_STACK_FALLBACK,
+    ]
+    existing: list[Path] = []
+    for cand in candidates:
+        try:
+            if cand.exists():
+                existing.append(cand)
+        except Exception:
+            continue
+    if not existing:
+        return None
+    try:
+        return max(existing, key=lambda p: p.stat().st_mtime)
+    except Exception:
+        return existing[0]
+
+
+def _latest_alpha_map_age_minutes() -> float | None:
+    path = _latest_alpha_map_path()
+    if path is None:
+        return None
+    try:
+        age_s = max(0.0, time.time() - path.stat().st_mtime)
+        return round(age_s / 60.0, 3)
+    except Exception:
+        return None
+
+
+def _read_latest_alpha_map_summary() -> dict[str, Any]:
+    path = _latest_alpha_map_path()
+    if path is None:
+        return {"available": False}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        return {
+            "available": True,
+            "path": str(path),
+            "generated_utc": payload.get("generated_utc"),
+            "pairs_discovered": payload.get("pairs_discovered"),
+            "pairs_after_liquidity_filter": payload.get("pairs_after_liquidity_filter"),
+            "pairs_analyzed": payload.get("pairs_analyzed"),
+            "pair_errors": payload.get("pair_errors"),
+            "age_minutes": _latest_alpha_map_age_minutes(),
+        }
+    except Exception as exc:
+        return {
+            "available": False,
+            "path": str(path),
+            "error": str(exc)[:200],
+            "age_minutes": _latest_alpha_map_age_minutes(),
+        }
+
+
+def _poll_alpha_scan_process() -> None:
+    global _SMART_SCANNER_ALPHA_PROC
+    global _SMART_SCANNER_ALPHA_LOG_FH
+    proc = _SMART_SCANNER_ALPHA_PROC
+    if proc is None:
+        _SMART_SCANNER_STATE["alpha_running"] = False
+        return
+
+    try:
+        rc = proc.poll()
+    except Exception as exc:
+        _SMART_SCANNER_STATE["alpha_running"] = False
+        _SMART_SCANNER_STATE["last_error"] = f"alpha_poll_error: {str(exc)[:200]}"
+        _SMART_SCANNER_ALPHA_PROC = None
+        return
+
+    if rc is None:
+        _SMART_SCANNER_STATE["alpha_running"] = True
+        return
+
+    _SMART_SCANNER_STATE["alpha_running"] = False
+    _SMART_SCANNER_STATE["last_alpha_completed_utc"] = now_utc()
+    _SMART_SCANNER_STATE["last_alpha_exit_code"] = int(rc)
+    if int(rc) == 0:
+        _SMART_SCANNER_STATE["last_alpha_success_utc"] = now_utc()
+        _SMART_SCANNER_STATE["last_alpha_status"] = {
+            "state": "completed",
+            "exit_code": int(rc),
+            "summary": _read_latest_alpha_map_summary(),
+        }
+    else:
+        _SMART_SCANNER_STATE["last_error"] = f"alpha_scan_exit_code={int(rc)}"
+        _SMART_SCANNER_STATE["last_alpha_status"] = {
+            "state": "failed",
+            "exit_code": int(rc),
+        }
+    _SMART_SCANNER_ALPHA_PROC = None
+    try:
+        if _SMART_SCANNER_ALPHA_LOG_FH is not None:
+            _SMART_SCANNER_ALPHA_LOG_FH.close()
+    except Exception:
+        pass
+    _SMART_SCANNER_ALPHA_LOG_FH = None
+
+
+def _start_alpha_scan(cfg: dict[str, Any], reason: str) -> dict[str, Any]:
+    global _SMART_SCANNER_ALPHA_PROC
+    global _SMART_SCANNER_ALPHA_LOG_FH
+    _poll_alpha_scan_process()
+    if _SMART_SCANNER_ALPHA_PROC is not None:
+        return {"started": False, "running": True, "reason": "already_running"}
+
+    script = CODE / "ops" / "build_kraken_multi_tf_alpha_map.py"
+    if not script.exists():
+        return {"started": False, "running": False, "reason": "script_missing", "path": str(script)}
+
+    top_liquid = max(1, int(to_float(cfg.get("alpha_top_liquid"), 711)))
+    limit = max(1, int(to_float(cfg.get("alpha_limit"), 711)))
+    min_turnover = float(to_float(cfg.get("alpha_min_turnover_usd"), 0.0))
+    max_spread = float(to_float(cfg.get("alpha_max_spread_bps"), 10000.0))
+    spike_threshold = float(to_float(cfg.get("alpha_spike_threshold_pct"), 3.0))
+    quotes = str(cfg.get("alpha_quotes") or "ZUSD,USDT").strip() or "ZUSD,USDT"
+
+    SMART_SCANNER_ALPHA_LOG.parent.mkdir(parents=True, exist_ok=True)
+    cmd = [
+        sys.executable,
+        str(script),
+        "--stack-root",
+        str(ROOT),
+        "--quotes",
+        quotes,
+        "--top-liquid",
+        str(top_liquid),
+        "--limit",
+        str(limit),
+        "--min-turnover-usd",
+        str(min_turnover),
+        "--max-spread-bps",
+        str(max_spread),
+        "--spike-threshold-pct",
+        str(spike_threshold),
+    ]
+
+    try:
+        try:
+            if _SMART_SCANNER_ALPHA_LOG_FH is not None:
+                _SMART_SCANNER_ALPHA_LOG_FH.close()
+        except Exception:
+            pass
+        _SMART_SCANNER_ALPHA_LOG_FH = open(str(SMART_SCANNER_ALPHA_LOG), "a", encoding="utf-8")
+        _SMART_SCANNER_ALPHA_PROC = subprocess.Popen(
+            cmd,
+            cwd=str(ROOT),
+            stdout=_SMART_SCANNER_ALPHA_LOG_FH,
+            stderr=_SMART_SCANNER_ALPHA_LOG_FH,
+        )
+        _SMART_SCANNER_STATE["alpha_running"] = True
+        _SMART_SCANNER_STATE["last_alpha_scan_utc"] = now_utc()
+        _SMART_SCANNER_STATE["alpha_refresh_count"] = int(_SMART_SCANNER_STATE.get("alpha_refresh_count") or 0) + 1
+        _SMART_SCANNER_STATE["last_alpha_status"] = {
+            "state": "started",
+            "reason": reason,
+            "cmd": cmd,
+        }
+        return {
+            "started": True,
+            "running": True,
+            "reason": reason,
+            "cmd": cmd,
+        }
+    except Exception as exc:
+        _SMART_SCANNER_STATE["alpha_running"] = False
+        _SMART_SCANNER_STATE["last_error"] = f"alpha_start_error: {str(exc)[:200]}"
+        return {
+            "started": False,
+            "running": False,
+            "reason": "start_failed",
+            "error": str(exc)[:200],
+        }
+
+
+def _smart_scanner_tick(force: bool = False, run_spike: bool = True, run_alpha: bool = True) -> dict[str, Any]:
+    cfg = _load_smart_scanner_cfg()
+    _poll_alpha_scan_process()
+    interval = max(10, int(to_float(cfg.get("scan_interval_s"), 30)))
+    _SMART_SCANNER_STATE["last_tick_utc"] = now_utc()
+
+    if not bool(cfg.get("enabled", True)) and not force:
+        return {
+            "ok": True,
+            "enabled": False,
+            "effective_interval_s": interval,
+            "spike": {"skipped": "disabled"},
+            "alpha": {"skipped": "disabled"},
+        }
+
+    spike_status: dict[str, Any] = {"skipped": "not_requested"}
+    alpha_status: dict[str, Any] = {"skipped": "not_requested"}
+
+    if run_spike and bool(cfg.get("spike_enabled", True)):
+        spike_status = _maybe_refresh_spike_cache(float(to_float(cfg.get("spike_max_age_minutes"), 8.0)))
+        if bool(spike_status.get("refreshed")):
+            _SMART_SCANNER_STATE["spike_refresh_count"] = int(_SMART_SCANNER_STATE.get("spike_refresh_count") or 0) + 1
+            _SMART_SCANNER_STATE["last_spike_scan_utc"] = now_utc()
+        _SMART_SCANNER_STATE["last_spike_status"] = spike_status
+
+    if run_alpha and bool(cfg.get("alpha_enabled", True)):
+        alpha_age_minutes = _latest_alpha_map_age_minutes()
+        max_age_minutes = float(to_float(cfg.get("alpha_max_age_minutes"), 30.0))
+        due = force or (alpha_age_minutes is None) or (alpha_age_minutes >= max_age_minutes)
+        if due:
+            alpha_status = _start_alpha_scan(cfg, reason="force" if force else "stale_or_missing")
+        else:
+            alpha_status = {
+                "started": False,
+                "running": bool(_SMART_SCANNER_STATE.get("alpha_running")),
+                "reason": "fresh_cache",
+                "age_minutes": alpha_age_minutes,
+                "max_age_minutes": max_age_minutes,
+            }
+        _SMART_SCANNER_STATE["last_alpha_status"] = alpha_status
+
+    return {
+        "ok": True,
+        "enabled": bool(cfg.get("enabled", True)),
+        "effective_interval_s": interval,
+        "spike": spike_status,
+        "alpha": alpha_status,
+    }
+
+
+@app.get("/api/scanner/smart/config")
+def api_smart_scanner_get_config() -> dict[str, Any]:
+    return {
+        "ok": True,
+        "config": _load_smart_scanner_cfg(),
+        "path": str(SMART_SCANNER_FILE),
+    }
+
+
+@app.post("/api/scanner/smart/config")
+async def api_smart_scanner_set_config(req: Request) -> dict[str, Any]:
+    body = await req.json()
+    if not isinstance(body, dict):
+        return {"ok": False, "error": "expected JSON object"}
+    cfg = _load_smart_scanner_cfg()
+    for key in SMART_SCANNER_DEFAULT.keys():
+        if key in body:
+            cfg[key] = body[key]
+    _save_smart_scanner_cfg(cfg)
+    return {"ok": True, "config": cfg}
+
+
+@app.post("/api/scanner/smart/run")
+async def api_smart_scanner_run(req: Request) -> dict[str, Any]:
+    body: dict[str, Any] = {}
+    try:
+        body = await req.json()
+    except Exception:
+        body = {}
+    force = bool(body.get("force", True))
+    run_spike = bool(body.get("run_spike", True))
+    run_alpha = bool(body.get("run_alpha", True))
+    return {
+        "ok": True,
+        "ts": now_utc(),
+        "result": _smart_scanner_tick(force=force, run_spike=run_spike, run_alpha=run_alpha),
+    }
+
+
+@app.get("/api/scanner/smart/status")
+def api_smart_scanner_status() -> dict[str, Any]:
+    _poll_alpha_scan_process()
+    cfg = _load_smart_scanner_cfg()
+    alpha_summary = _read_latest_alpha_map_summary()
+    return {
+        "ok": True,
+        "ts": now_utc(),
+        "config": cfg,
+        "state": dict(_SMART_SCANNER_STATE),
+        "alpha_latest": alpha_summary,
+        "spike_latest": {
+            "path": str(SPIKE_HUNTER_LATEST),
+            "exists": bool(SPIKE_HUNTER_LATEST.exists()),
+            "age_minutes": (
+                round((time.time() - SPIKE_HUNTER_LATEST.stat().st_mtime) / 60.0, 3)
+                if SPIKE_HUNTER_LATEST.exists()
+                else None
+            ),
+        },
+    }
+
+
+async def _smart_scanner_watcher() -> None:
+    _SMART_SCANNER_STATE["started_utc"] = now_utc()
+    await asyncio.sleep(6.0)
+    while True:
+        sleep_s = 30
+        try:
+            tick = _smart_scanner_tick(force=False, run_spike=True, run_alpha=True)
+            sleep_s = max(10, int(tick.get("effective_interval_s") or 30))
+        except Exception as exc:
+            _SMART_SCANNER_STATE["last_error"] = f"watcher_error: {str(exc)[:200]}"
+        await asyncio.sleep(sleep_s)
 
 
 def _check_circuit_breaker(cfg: dict[str, Any]) -> dict[str, Any]:

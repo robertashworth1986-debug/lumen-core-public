@@ -60,6 +60,10 @@ OPS_OUT_DIR                = OUT / "ops"
 SECTOR_PIPELINE_WRAPPER            = CODE / "ops" / "RUN_SECTOR_ENERGY_EVIDENCE_PIPELINE.ps1"
 SECTOR_PIPELINE_LATEST_JSON        = OPS_OUT_DIR / "sector_energy_evidence_pipeline_latest.json"
 SECTOR_PIPELINE_ORCH_STATUS_JSON   = OPS_OUT_DIR / "sector_energy_pipeline_orchestrator_status.json"
+UNIVERSAL_ORCH_SCRIPT_NAME         = "run_universal_meta_orchestrator.py"
+UNIVERSAL_ORCH_CADENCE_STATE_JSON  = OUT / "execution" / "universal_orch_cadence_state.json"
+
+_SCRIPT_LAST_RUN_TS: dict[str, float] = {}
 
 REQUIRED_PAPER_SYMBOLS = [
     "SPY","QQQ","IWM","DIA",
@@ -213,6 +217,39 @@ def parse_utc_maybe(value):
         return dt.astimezone(timezone.utc)
     except Exception:
         return None
+
+
+def _load_script_cadence_state() -> dict[str, float]:
+    payload = load_json(UNIVERSAL_ORCH_CADENCE_STATE_JSON, {})
+    raw = payload.get("script_last_run_ts") if isinstance(payload, dict) else {}
+    if not isinstance(raw, dict):
+        return {}
+
+    out: dict[str, float] = {}
+    for key, value in raw.items():
+        try:
+            out[str(key)] = float(value)
+        except Exception:
+            continue
+    return out
+
+
+def _persist_script_last_run_ts(script_name: str, ts_value: float) -> None:
+    _SCRIPT_LAST_RUN_TS[str(script_name)] = float(ts_value)
+    payload = {
+        "generated_utc": iso_now(),
+        "script_last_run_ts": {
+            str(k): float(v)
+            for k, v in _SCRIPT_LAST_RUN_TS.items()
+        },
+    }
+    try:
+        save_json(UNIVERSAL_ORCH_CADENCE_STATE_JSON, payload)
+    except Exception:
+        pass
+
+
+_SCRIPT_LAST_RUN_TS.update(_load_script_cadence_state())
 
 def scan_csv_meta(path: Path):
     meta = {
@@ -480,6 +517,24 @@ def run_if_exists(path: Path, extra_args=None, timeout_sec=300):
     if not path.exists():
         return {"script": str(path), "ran": False, "ok": False, "reason": "missing"}
 
+    script_name = path.name
+    cadence_sec = 0
+    if script_name == UNIVERSAL_ORCH_SCRIPT_NAME:
+        cadence_sec = max(60, safe_int(os.getenv("LUMA_UNIVERSAL_ORCH_INTERVAL_SEC", "900"), 900))
+    if cadence_sec > 0:
+        last_ts = _SCRIPT_LAST_RUN_TS.get(script_name)
+        if last_ts is not None:
+            elapsed = max(0.0, time.time() - float(last_ts))
+            if elapsed < cadence_sec:
+                return {
+                    "script": str(path),
+                    "ran": False,
+                    "ok": True,
+                    "reason": "cadence_not_due",
+                    "cadence_interval_sec": cadence_sec,
+                    "cadence_due_in_sec": int(cadence_sec - elapsed),
+                }
+
     suffix = path.suffix.lower()
     env = os.environ.copy()
     env["PYTHONIOENCODING"] = "utf-8"
@@ -504,6 +559,13 @@ def run_if_exists(path: Path, extra_args=None, timeout_sec=300):
     if extra_args:
         cmd.extend([str(a) for a in extra_args if str(a).strip()])
 
+    effective_timeout = max(30, int(timeout_sec))
+    if script_name == UNIVERSAL_ORCH_SCRIPT_NAME:
+        effective_timeout = max(
+            60,
+            safe_int(os.getenv("LUMA_UNIVERSAL_ORCH_TIMEOUT_SEC", str(effective_timeout)), effective_timeout),
+        )
+
     try:
         p = subprocess.run(
             cmd,
@@ -513,19 +575,29 @@ def run_if_exists(path: Path, extra_args=None, timeout_sec=300):
             text=True,
             encoding="utf-8",
             errors="replace",
-            timeout=max(30, int(timeout_sec))
+            timeout=effective_timeout
         )
+        _persist_script_last_run_ts(script_name, time.time())
         return {
             "script": str(path),
             "command": cmd,
             "ran": True,
             "ok": p.returncode == 0,
             "returncode": p.returncode,
+            "timeout_sec": effective_timeout,
             "stdout_tail": (p.stdout or "")[-1200:],
             "stderr_tail": (p.stderr or "")[-1200:]
         }
     except Exception as e:
-        return {"script": str(path), "command": cmd, "ran": True, "ok": False, "reason": repr(e)}
+        _persist_script_last_run_ts(script_name, time.time())
+        return {
+            "script": str(path),
+            "command": cmd,
+            "ran": True,
+            "ok": False,
+            "timeout_sec": effective_timeout,
+            "reason": repr(e),
+        }
 
 
 def maybe_run_sector_energy_pipeline():

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
+import html
 import json
 import re
 import subprocess
@@ -26,6 +28,8 @@ INVESTOR_READINESS_PATH = ROOT / "out" / "ops" / "investor_metric_readiness_late
 VALUE_PANEL_PATH = ROOT / "out" / "ops" / "live_breadth_value_panel_latest.json"
 VPS_GROWTH_PATH = ROOT / "out" / "execution" / "vps_growth_proof.json"
 LEADERBOARD_PATH = ROOT / "out" / "execution" / "institutional_leaderboard.csv"
+RUNTIME_CONTROL_PATH = ROOT / "config" / "runtime_control.json"
+EXECUTION_STATUS_PATH = ROOT / "out" / "execution_status.json"
 
 RESUME_MD_PATH = ROOT / "RESUME_LUMENCORE.md"
 
@@ -109,6 +113,53 @@ def _fmt_pct(value: float) -> str:
     return f"{value:.2f}%"
 
 
+def _fmt_money_compact(value: float) -> str:
+    abs_value = abs(value)
+    if abs_value >= 1_000_000_000:
+        return f"${value / 1_000_000_000:,.2f}B"
+    if abs_value >= 1_000_000:
+        return f"${value / 1_000_000:,.2f}M"
+    if abs_value >= 1_000:
+        return f"${value / 1_000:,.2f}K"
+    return _fmt_money(value)
+
+
+def _dedupe_keep_order(values: list[str], case_insensitive: bool = True) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for raw in values:
+        value = str(raw or "").strip()
+        if not value:
+            continue
+        key = value.casefold() if case_insensitive else value
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(value)
+    return out
+
+
+def _humanize_sector_name(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return "Financial Market Infra"
+    text = text.replace("_", " ").replace("-", " ")
+    return " ".join(part.capitalize() for part in text.split())
+
+
+def _display_package_name(name: str) -> str:
+    package = str(name or "").strip()
+    if not package:
+        return ""
+    mapping = {
+        "fastapi": "FastAPI",
+        "scikit-learn": "scikit-learn",
+        "pyyaml": "PyYAML",
+        "opencv-python": "OpenCV",
+    }
+    return mapping.get(package.casefold(), package)
+
+
 def _benchmark_dataset_count() -> int:
     latest_path = ROOT / "out" / "master_universe_v2" / "latest.txt"
     if not latest_path.exists():
@@ -178,6 +229,42 @@ def _collect_external_packages(max_packages: int) -> list[dict[str, Any]]:
     return rows
 
 
+def _resolve_runtime_posture(gates: dict[str, Any]) -> dict[str, Any]:
+    posture = {
+        "runtime_mode": str(gates.get("runtime_mode") or "paper").strip().lower() or "paper",
+        "allow_live_orders": bool(gates.get("allow_live_orders", False)),
+        "paper_enabled": bool(gates.get("paper_enabled", True)),
+        "runtime_mode_source": "investor_metric_readiness",
+    }
+
+    runtime_cfg = _read_json(RUNTIME_CONTROL_PATH)
+    if isinstance(runtime_cfg, dict) and runtime_cfg:
+        cfg_mode = str(runtime_cfg.get("mode") or "").strip().lower()
+        if cfg_mode in {"live", "paper"}:
+            posture["runtime_mode"] = cfg_mode
+            posture["runtime_mode_source"] = "runtime_control"
+        if "allow_live_orders" in runtime_cfg:
+            posture["allow_live_orders"] = bool(runtime_cfg.get("allow_live_orders"))
+        if "paper_enabled" in runtime_cfg:
+            posture["paper_enabled"] = bool(runtime_cfg.get("paper_enabled"))
+
+    execution_status = _read_json(EXECUTION_STATUS_PATH)
+    if isinstance(execution_status, dict) and execution_status:
+        status_mode = str(execution_status.get("execution_mode") or "").strip().lower()
+        if posture["runtime_mode_source"] != "runtime_control" and status_mode in {"live", "paper"}:
+            posture["runtime_mode"] = status_mode
+            posture["runtime_mode_source"] = "execution_status"
+        if "allow_live_orders" not in runtime_cfg and "live_arm" in execution_status:
+            posture["allow_live_orders"] = str(execution_status.get("live_arm") or "").strip().upper() == "ON"
+
+    if posture["runtime_mode"] == "live" and posture["allow_live_orders"]:
+        posture["paper_enabled"] = False
+    elif posture["runtime_mode"] == "paper" and "paper_enabled" not in gates and "paper_enabled" not in runtime_cfg:
+        posture["paper_enabled"] = True
+
+    return posture
+
+
 def _build_metrics() -> dict[str, Any]:
     investor = _read_json(INVESTOR_READINESS_PATH)
     panel = _read_json(VALUE_PANEL_PATH)
@@ -214,6 +301,7 @@ def _build_metrics() -> dict[str, Any]:
     closed_trades = _safe_int(provisional.get("closed_live_trades"), _safe_int(vps_live.get("closed_live_count"), 0))
     win_rate = _safe_float(provisional.get("win_rate_pct"), _safe_float(vps_live.get("win_rate_pct"), 0.0))
     realized_net = _safe_float(provisional.get("realized_net_usd"), _safe_float(vps_live.get("realized_net_usd"), 0.0))
+    posture = _resolve_runtime_posture(gates)
 
     return {
         "dataset_count": dataset_count,
@@ -224,8 +312,10 @@ def _build_metrics() -> dict[str, Any]:
         "harmonic_win_rate_pct": harmonic_win_rate,
         "kalisha_prediction_score": kalisha_score,
         "cross_sector_avoided_cost_usd": avoided_cost,
-        "runtime_mode": str(gates.get("runtime_mode") or "paper"),
-        "allow_live_orders": bool(gates.get("allow_live_orders", False)),
+        "runtime_mode": str(posture.get("runtime_mode") or "paper"),
+        "runtime_mode_source": str(posture.get("runtime_mode_source") or "unknown"),
+        "allow_live_orders": bool(posture.get("allow_live_orders", False)),
+        "paper_enabled": bool(posture.get("paper_enabled", True)),
         "max_notional_per_trade_usd": _safe_float(gates.get("max_notional_per_trade_usd"), 0.0),
         "closed_live_trades": closed_trades,
         "win_rate_pct": win_rate,
@@ -248,9 +338,32 @@ def _build_resume_markdown(profile: dict[str, Any], metrics: dict[str, Any], pac
     website = str(company.get("website") or "https://lumen-core.ai")
     location = f"{company.get('city', 'Nashville')}, {company.get('state', 'TN')}"
     dataset_count = metrics.get("dataset_count") or 673
-    package_names = [row.get("package", "") for row in packages if row.get("package")]
+    package_names = _dedupe_keep_order([str(row.get("package", "")) for row in packages if row.get("package")])
 
-    tech_line = ", ".join(package_names[:20]) if package_names else "fastapi, pandas, numpy, scipy, scikit-learn, requests"
+    tech_display = [_display_package_name(pkg) for pkg in package_names[:20] if _display_package_name(pkg)]
+    tech_line = ", ".join(tech_display) if tech_display else "FastAPI, pandas, numpy, scipy, scikit-learn, requests"
+
+    annual_value_num = _safe_float(metrics.get("annual_value_usd"))
+    annual_value_full = _fmt_money(annual_value_num)
+    annual_value_compact = _fmt_money_compact(annual_value_num)
+    annual_value_line = annual_value_full if annual_value_full == annual_value_compact else f"{annual_value_full} ({annual_value_compact})"
+
+    top_sector = _humanize_sector_name(metrics.get("top_sector"))
+    closed_trades = _safe_int(metrics.get("closed_live_trades"), 0)
+    win_rate = _safe_float(metrics.get("win_rate_pct"), 0.0)
+    realized_net = _safe_float(metrics.get("realized_net_usd"), 0.0)
+    if closed_trades > 0 and win_rate > 0.0:
+        live_telemetry_line = (
+            f"Live execution telemetry: {closed_trades} closed trades, {_fmt_pct(win_rate)} win rate, "
+            f"realized net {_fmt_money(realized_net)}."
+        )
+    elif closed_trades > 0:
+        live_telemetry_line = (
+            f"Live execution telemetry: {closed_trades} closed trades with auditable reason-code and PnL artifacts "
+            "in the evidence lane."
+        )
+    else:
+        live_telemetry_line = "Live execution telemetry: runtime controls and proof capture active."
 
     return f"""# {name.upper()}
 
@@ -268,10 +381,10 @@ Founder-operator of the LumaTrader and LumenCore platform ecosystem with end-to-
 ## INSTITUTIONAL IMPACT SNAPSHOT
 
 - Dataset benchmark breadth: {dataset_count} datasets with reproducible artifacts and hash-linked evidence.
-- Annual modeled value signal: {_fmt_money(_safe_float(metrics.get('annual_value_usd')))}.
-- Top sector and hourly signal: {metrics.get('top_sector')} at {_fmt_money(_safe_float(metrics.get('top_sector_hourly_value_usd')))} per hour.
+- Annual modeled value signal: {annual_value_line}.
+- Top sector and hourly signal: {top_sector} at {_fmt_money(_safe_float(metrics.get('top_sector_hourly_value_usd')))} per hour.
 - Router edge and harmonic consistency: {_fmt_pct(_safe_float(metrics.get('router_edge_pct')))} edge, {_fmt_pct(_safe_float(metrics.get('harmonic_win_rate_pct')))} harmonic win rate.
-- Live execution telemetry: {int(_safe_float(metrics.get('closed_live_trades')))} closed trades, {_fmt_pct(_safe_float(metrics.get('win_rate_pct')))} win rate, realized net {_fmt_money(_safe_float(metrics.get('realized_net_usd')))}.
+- {live_telemetry_line}
 
 ## CORE COMPETENCIES
 
@@ -325,7 +438,7 @@ def _build_linkedin_payload(profile: dict[str, Any], metrics: dict[str, Any], pa
     name = str(pi.get("name") or company.get("founder_pi") or "Robert BabyRay Ashworth")
     dataset_count = metrics.get("dataset_count") or 673
 
-    package_names = [row.get("package", "") for row in packages if row.get("package")]
+    package_names = _dedupe_keep_order([str(row.get("package", "")) for row in packages if row.get("package")])
     skill_seed = [
         "Python",
         "FastAPI",
@@ -337,10 +450,17 @@ def _build_linkedin_payload(profile: dict[str, Any], metrics: dict[str, Any], pa
         "PowerShell",
     ]
     for pkg in package_names[:12]:
-        if pkg and pkg not in skill_seed:
-            skill_seed.append(pkg)
+        label = _display_package_name(pkg)
+        if label:
+            skill_seed.append(label)
 
-    annual_value = _fmt_money(_safe_float(metrics.get("annual_value_usd")))
+    skills = _dedupe_keep_order(skill_seed)
+
+    annual_value_num = _safe_float(metrics.get("annual_value_usd"))
+    annual_value = _fmt_money(annual_value_num)
+    annual_value_compact = _fmt_money_compact(annual_value_num)
+    top_sector = _humanize_sector_name(metrics.get("top_sector"))
+    router_edge = _fmt_pct(_safe_float(metrics.get("router_edge_pct")))
     headline_variants = [
         "Principal Quant Systems Engineer | Institutional Automation | Government-Grade Evidence",
         "Founder, LumaTrader/LumenCore | Quant Infrastructure | Risk-Gated Execution",
@@ -349,10 +469,14 @@ def _build_linkedin_payload(profile: dict[str, Any], metrics: dict[str, Any], pa
         "Institutional and Federal-Ready Technical Lead | Forecasting | Control Planes",
     ]
 
-    about = (
+    about_short = (
+        f"I build institutional-grade quant and operations systems that move from signal to action with explicit risk controls and auditable evidence. "
+        f"Current benchmark breadth: {dataset_count} datasets with reproducible outputs across LumaTrader and LumenCore."
+    )
+    about_long = (
         f"I build institutional-grade quant and operational intelligence systems that move from signal to action with explicit risk controls and verifiable evidence. "
         f"My platform work spans LumaTrader and LumenCore, where I operate a {dataset_count}-dataset benchmark and produce reproducible artifacts for investors and federal-style reviews. "
-        f"Current modeled annual value signal: {annual_value}. Top impact lane: {metrics.get('top_sector')} with hourly signal value of "
+        f"Current modeled annual value signal: {annual_value_compact}. Top impact lane: {top_sector} with hourly signal value of "
         f"{_fmt_money(_safe_float(metrics.get('top_sector_hourly_value_usd')))}. "
         f"I specialize in Python control planes, FastAPI services, runtime guardrails, and proof-grade reporting that keeps technical claims auditable."
     )
@@ -363,6 +487,15 @@ def _build_linkedin_payload(profile: dict[str, Any], metrics: dict[str, Any], pa
         "Implemented approval queues, kill-switch semantics, and pacing guardrails to enforce safe runtime posture.",
         "Automated grant and opportunity workflows with prefilled artifacts, submission checklists, and queue tracking.",
         "Maintained lane-boundary governance across trading, sector, and sports intelligence pipelines.",
+    ]
+    experience_roles = [
+        {
+            "title": "Founder and Principal Systems Engineer",
+            "company": "LumaTrader / LumenCore",
+            "dates": "2014 - Present",
+            "location": "Nashville, TN",
+            "bullets": experience,
+        }
     ]
 
     featured_links = [
@@ -376,8 +509,8 @@ def _build_linkedin_payload(profile: dict[str, Any], metrics: dict[str, Any], pa
             "title": "LumaLinkedIn Edition V1 launch",
             "text": (
                 f"LumaLinkedIn Edition V1 is live. I just refreshed my production resume and opportunity stack using evidence-first automation: "
-                f"{dataset_count} benchmark datasets, {_fmt_pct(_safe_float(metrics.get('router_edge_pct')))} router edge, "
-                f"and a modeled annual value signal of {annual_value}. Building systems where every claim maps to artifacts."
+                f"{dataset_count} benchmark datasets, {router_edge} router edge, "
+                f"and a modeled annual value signal of {annual_value_compact}. Building systems where every claim maps to artifacts."
             ),
         },
         {
@@ -389,33 +522,371 @@ def _build_linkedin_payload(profile: dict[str, Any], metrics: dict[str, Any], pa
         },
     ]
 
+    runtime_mode = str(metrics.get("runtime_mode") or "paper").upper()
+    live_order_mode = "ON" if bool(metrics.get("allow_live_orders")) else "OFF"
+    impact_snapshot = [
+        {
+            "label": "Dataset Breadth",
+            "value": f"{_safe_int(dataset_count):,}",
+            "hint": "Reproducible benchmark scope",
+        },
+        {
+            "label": "Annual Signal",
+            "value": annual_value_compact,
+            "hint": "Modeled value lane",
+        },
+        {
+            "label": "Router Edge",
+            "value": router_edge,
+            "hint": "Decision uplift signal",
+        },
+        {
+            "label": "Runtime Mode",
+            "value": runtime_mode,
+            "hint": f"Live orders: {live_order_mode}",
+        },
+    ]
+    quick_apply_steps = [
+        "Paste Recommended Headline into LinkedIn Headline.",
+        "Use About (Short) for mobile summary and About (Full) for the main profile section.",
+        "Create Experience entry from Experience Pack bullets.",
+        "Add Featured Links and top skills for profile credibility.",
+        "Use Post Templates to publish launch and operating updates.",
+    ]
+
     return {
         "generated_utc": _now_iso(),
         "version": "lumalinkedin_v1",
+        "audience_id": "master",
+        "audience_label": "Master Profile",
         "name": name,
+        "headline_recommended": headline_variants[0],
         "headline_variants": headline_variants,
-        "about": about,
+        "about": about_long,
+        "about_short": about_short,
+        "about_full": about_long,
         "experience_bullets": experience,
+        "experience_roles": experience_roles,
         "featured_links": featured_links,
-        "skills": skill_seed[:30],
+        "skills": skills[:30],
         "post_templates": post_templates,
+        "impact_snapshot": impact_snapshot,
+        "quick_apply_steps": quick_apply_steps,
+        "profile_fill_pack": {
+            "headline": headline_variants[0],
+            "about_short": about_short,
+            "about_full": about_long,
+            "experience": experience_roles,
+            "skills": skills[:30],
+            "featured_links": featured_links,
+            "impact_snapshot": impact_snapshot,
+            "quick_apply_steps": quick_apply_steps,
+        },
+    }
+
+
+def _build_linkedin_audience_variants(
+    master_payload: dict[str, Any],
+    metrics: dict[str, Any],
+    company: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
+    dataset_count = _safe_int(metrics.get("dataset_count"), 0)
+    annual_signal = _fmt_money_compact(_safe_float(metrics.get("annual_value_usd")))
+    avoided_cost = _fmt_money_compact(_safe_float(metrics.get("cross_sector_avoided_cost_usd")))
+    router_edge = _fmt_pct(_safe_float(metrics.get("router_edge_pct")))
+    top_sector = _humanize_sector_name(metrics.get("top_sector"))
+    runtime_mode = str(metrics.get("runtime_mode") or "paper").upper()
+    live_orders = "ON" if bool(metrics.get("allow_live_orders")) else "OFF"
+
+    uei = str(company.get("duns_or_uei") or "SQY2XW71ZM51")
+    cage = str(company.get("cage_code") or "14TM8")
+    sam = str(company.get("sam_gov_status") or "active").upper()
+
+    def _mk_variant(
+        audience_id: str,
+        audience_label: str,
+        headline: str,
+        about_short: str,
+        about_full: str,
+        role_title: str,
+        experience: list[str],
+        quick_apply_steps: list[str],
+        post_templates: list[dict[str, str]],
+        impact_snapshot: list[dict[str, str]],
+    ) -> dict[str, Any]:
+        payload = copy.deepcopy(master_payload)
+        payload["audience_id"] = audience_id
+        payload["audience_label"] = audience_label
+        payload["headline_recommended"] = headline
+        payload["headline_variants"] = _dedupe_keep_order(
+            [headline] + [str(x) for x in payload.get("headline_variants", []) if str(x).strip()]
+        )[:6]
+        payload["about"] = about_full
+        payload["about_short"] = about_short
+        payload["about_full"] = about_full
+        payload["experience_bullets"] = experience
+        payload["experience_roles"] = [
+            {
+                "title": role_title,
+                "company": "LumaTrader / LumenCore",
+                "dates": "2014 - Present",
+                "location": "Nashville, TN",
+                "bullets": experience,
+            }
+        ]
+        payload["post_templates"] = post_templates
+        payload["impact_snapshot"] = impact_snapshot
+        payload["quick_apply_steps"] = quick_apply_steps
+        payload["profile_fill_pack"] = {
+            "headline": headline,
+            "about_short": about_short,
+            "about_full": about_full,
+            "experience": payload["experience_roles"],
+            "skills": payload.get("skills", []),
+            "featured_links": payload.get("featured_links", []),
+            "impact_snapshot": impact_snapshot,
+            "quick_apply_steps": quick_apply_steps,
+        }
+        return payload
+
+    investor = _mk_variant(
+        audience_id="investor",
+        audience_label="Investor Positioning",
+        headline="Founder | Institutional Quant Infrastructure | Evidence-Backed Growth Systems",
+        about_short=(
+            f"I build monetizable quant and AI infrastructure with deterministic controls and investor-grade proof artifacts. "
+            f"Current platform benchmark: {dataset_count:,} datasets with reproducible evidence."
+        ),
+        about_full=(
+            f"I architect and operate LumaTrader and LumenCore as an evidence-first infrastructure platform designed for institutional and strategic growth partners. "
+            f"Current modeled annual signal is {annual_signal}, with router edge at {router_edge} and top value lane in {top_sector}. "
+            f"Cross-sector recommended avoided cost currently tracks at {avoided_cost}. "
+            "Every material claim maps to machine-readable artifacts, enabling diligence-ready investor review."
+        ),
+        role_title="Founder and Principal Quant Infrastructure Engineer",
+        experience=[
+            "Scaled an institutional quant stack from research to production with auditable execution and evidence packaging.",
+            "Built investor-facing mission-control surfaces that expose signal, control posture, and outcome telemetry.",
+            "Designed repeatable valuation and readiness pipelines for funding and strategic-partner diligence.",
+            "Integrated risk-gated runtime controls to protect capital pathways while preserving deployment speed.",
+            "Established artifact-first reporting discipline so each milestone is traceable and reviewable.",
+        ],
+        quick_apply_steps=[
+            "Use investor headline for profile identity.",
+            "Use investor about copy with annual signal + avoided cost metrics.",
+            "Pin evidence and mission links in featured section.",
+            "Use investor post templates for launch and update cadence.",
+        ],
+        post_templates=[
+            {
+                "title": "Investor brief: infrastructure signal",
+                "text": (
+                    f"LumaTrader/LumenCore now tracks {dataset_count:,} reproducible datasets with {router_edge} router edge and {annual_signal} modeled annual signal. "
+                    "Built for diligence-ready, evidence-backed institutional scaling."
+                ),
+            },
+            {
+                "title": "Evidence-first growth update",
+                "text": (
+                    f"Cross-sector avoided cost now sits at {avoided_cost} with fully auditable runtime and reporting artifacts. "
+                    "Scaling with discipline: performance, controls, and proof in one operating surface."
+                ),
+            },
+        ],
+        impact_snapshot=[
+            {"label": "Annual Signal", "value": annual_signal, "hint": "Modeled value lane"},
+            {"label": "Avoided Cost", "value": avoided_cost, "hint": "Cross-sector optimization"},
+            {"label": "Router Edge", "value": router_edge, "hint": "Decision uplift"},
+            {"label": "Evidence", "value": "HASH-CHAINED", "hint": "Diligence-ready artifacts"},
+        ],
+    )
+
+    government = _mk_variant(
+        audience_id="government",
+        audience_label="Government Positioning",
+        headline="Mission Systems Architect | Government-Grade Evidence | Risk-Controlled AI Ops",
+        about_short=(
+            f"I deliver mission-oriented software and quant infrastructure with deterministic controls, auditable chains, and federal-ready evidence packaging. "
+            f"UEI {uei} | CAGE {cage} | SAM {sam}."
+        ),
+        about_full=(
+            "I design mission systems that prioritize reliability, traceability, and defensible operations. "
+            f"Across LumaTrader and LumenCore, the platform currently operates across {dataset_count:,} benchmark datasets with reproducible outputs and risk-gated execution. "
+            f"Government identifiers: UEI {uei}, CAGE {cage}, SAM {sam}. "
+            "The operating model emphasizes deterministic pipelines, reason-code telemetry, and machine-readable artifacts suitable for technical and programmatic review."
+        ),
+        role_title="Founder and Mission Systems Software Architect",
+        experience=[
+            "Built deterministic, replayable pipelines that preserve chain-of-custody and evidence integrity.",
+            "Implemented runtime guardrails, kill-switch semantics, and explicit reason-code telemetry for safe operations.",
+            "Produced machine-readable proof bundles for technical validation and oversight workflows.",
+            "Maintained API and dashboard surfaces that provide transparent operational state and fallback continuity.",
+            "Aligned engineering decisions to mission reliability, control assurance, and audit readiness.",
+        ],
+        quick_apply_steps=[
+            "Set government headline and short about with UEI/CAGE/SAM identifiers.",
+            "Use full about to emphasize deterministic controls and evidence posture.",
+            "Highlight mission links and evidence runs in featured section.",
+            "Use government post templates for capability updates.",
+        ],
+        post_templates=[
+            {
+                "title": "Mission systems readiness update",
+                "text": (
+                    f"Mission-oriented platform update: {dataset_count:,} benchmark datasets under deterministic control lanes, runtime mode {runtime_mode}, live-order posture {live_orders}. "
+                    "All key claims mapped to machine-readable evidence artifacts."
+                ),
+            },
+            {
+                "title": "Evidence and control assurance",
+                "text": (
+                    f"Operating with government-grade traceability: UEI {uei}, CAGE {cage}, SAM {sam}. "
+                    "Focus remains on reliability, control integrity, and auditable execution pathways."
+                ),
+            },
+        ],
+        impact_snapshot=[
+            {"label": "UEI", "value": uei, "hint": "Entity identifier"},
+            {"label": "CAGE", "value": cage, "hint": "Government contract code"},
+            {"label": "SAM", "value": sam, "hint": "Registration posture"},
+            {"label": "Runtime", "value": runtime_mode, "hint": f"Live orders: {live_orders}"},
+        ],
+    )
+
+    recruiting = _mk_variant(
+        audience_id="recruiting",
+        audience_label="Recruiting Positioning",
+        headline="Staff/Principal Python Platform Engineer | AI + Quant Infrastructure | Production Reliability",
+        about_short=(
+            f"I build and operate production Python platforms that combine AI, quant workflows, and reliability engineering. "
+            f"Current operating scope: {dataset_count:,} datasets with end-to-end evidence automation."
+        ),
+        about_full=(
+            "I am a hands-on builder who ships across architecture, backend systems, automation, and operator-facing dashboards. "
+            f"In the current platform, I own signal pipelines, control planes, and reporting surfaces supporting {dataset_count:,} benchmark datasets with {router_edge} router edge. "
+            "I focus on clear interfaces, deterministic behavior, and high-leverage execution so teams can move quickly without sacrificing production quality."
+        ),
+        role_title="Founder and Staff-Level Platform Engineer",
+        experience=[
+            "Architected and shipped Python/FastAPI services for high-churn quant and operations workloads.",
+            "Built end-to-end automation lanes spanning data ingestion, decisioning, and evidence/reporting outputs.",
+            "Integrated risk controls, fallback logic, and instrumentation to keep runtime behavior explainable.",
+            "Developed dashboard and API surfaces that allow stakeholders to act on live technical context.",
+            "Maintained delivery speed while preserving reproducibility, testability, and operational integrity.",
+        ],
+        quick_apply_steps=[
+            "Use recruiting headline to signal role level and platform depth.",
+            "Use short about for recruiter scan and full about for hiring-manager depth.",
+            "Paste experience bullets into one role entry and add featured links.",
+            "Use recruiting post templates when sharing build or hiring updates.",
+        ],
+        post_templates=[
+            {
+                "title": "Platform engineering snapshot",
+                "text": (
+                    f"Staff-level platform engineering update: {dataset_count:,} datasets, {router_edge} router edge, and full-stack evidence automation from runtime to reporting. "
+                    "Building systems that are fast, auditable, and production-ready."
+                ),
+            },
+            {
+                "title": "Builder mindset",
+                "text": (
+                    "I like solving hard reliability and architecture problems end-to-end: control planes, APIs, dashboards, and proof artifacts. "
+                    "Shipping practical systems with measurable outcomes."
+                ),
+            },
+        ],
+        impact_snapshot=[
+            {"label": "Dataset Breadth", "value": f"{dataset_count:,}", "hint": "Production benchmark scope"},
+            {"label": "Stack Depth", "value": f"{len(master_payload.get('skills', []))}", "hint": "Core skills captured"},
+            {"label": "Router Edge", "value": router_edge, "hint": "System decision quality"},
+            {"label": "Runtime", "value": runtime_mode, "hint": f"Live orders: {live_orders}"},
+        ],
+    )
+
+    return {
+        "investor": investor,
+        "government": government,
+        "recruiting": recruiting,
     }
 
 
 def _render_linkedin_markdown(payload: dict[str, Any]) -> str:
     lines: list[str] = []
-    lines.append("# LumaLinkedIn Edition V1")
+    audience_label = str(payload.get("audience_label") or "Master Profile").strip()
+    lines.append(f"# LumaLinkedIn Edition V1 - {audience_label}")
     lines.append("")
     lines.append(f"Generated UTC: {payload.get('generated_utc', '')}")
+    audience_id = str(payload.get("audience_id") or "master").strip()
+    lines.append(f"Audience: {audience_id}")
+    lines.append("")
+    lines.append("## Quick Apply Steps")
+    lines.append("")
+    steps = payload.get("quick_apply_steps", []) if isinstance(payload.get("quick_apply_steps"), list) else []
+    if steps:
+        for idx, step in enumerate(steps, start=1):
+            lines.append(f"{idx}. {step}")
+    else:
+        lines.append("1. Apply recommended headline, about, experience, links, and skills in order.")
+    lines.append("")
+    recommended = str(payload.get("headline_recommended") or "").strip()
+    if recommended:
+        lines.append("## Recommended Headline")
+        lines.append("")
+        lines.append(recommended)
+        lines.append("")
+    lines.append("## Executive Impact Snapshot")
+    lines.append("")
+    impact = payload.get("impact_snapshot", []) if isinstance(payload.get("impact_snapshot"), list) else []
+    if impact:
+        for item in impact:
+            if not isinstance(item, dict):
+                continue
+            lines.append(
+                f"- {item.get('label', 'Metric')}: {item.get('value', '')}"
+                + (f" ({item.get('hint', '')})" if item.get("hint") else "")
+            )
+    else:
+        lines.append("- No impact snapshot available.")
     lines.append("")
     lines.append("## Headline Variants")
     lines.append("")
     for idx, item in enumerate(payload.get("headline_variants", []), start=1):
         lines.append(f"{idx}. {item}")
     lines.append("")
-    lines.append("## About")
+    about_short = str(payload.get("about_short") or "").strip()
+    if about_short:
+        lines.append("## About (Short)")
+        lines.append("")
+        lines.append(about_short)
+        lines.append("")
+    lines.append("## About (Full)")
     lines.append("")
-    lines.append(str(payload.get("about", "")))
+    lines.append(str(payload.get("about_full") or payload.get("about", "")))
+    lines.append("")
+    lines.append("## Experience (Profile Entry)")
+    lines.append("")
+    roles = payload.get("experience_roles", []) if isinstance(payload.get("experience_roles"), list) else []
+    if roles:
+        for role in roles:
+            if not isinstance(role, dict):
+                continue
+            role_title = str(role.get("title") or "Role")
+            role_company = str(role.get("company") or "Company")
+            role_dates = str(role.get("dates") or "")
+            role_location = str(role.get("location") or "")
+            lines.append(f"### {role_title} | {role_company}")
+            lines.append("")
+            if role_dates or role_location:
+                parts = [part for part in [role_dates, role_location] if part]
+                lines.append(" | ".join(parts))
+                lines.append("")
+            for bullet in role.get("bullets", []):
+                lines.append(f"- {bullet}")
+            lines.append("")
+    else:
+        for item in payload.get("experience_bullets", []):
+            lines.append(f"- {item}")
     lines.append("")
     lines.append("## Experience Bullets")
     lines.append("")
@@ -443,6 +914,477 @@ def _render_linkedin_markdown(payload: dict[str, Any]) -> str:
         lines.append(str(item.get("text", "")))
         lines.append("")
     return "\n".join(lines)
+
+
+def _render_linkedin_html(payload: dict[str, Any]) -> str:
+    def _esc_text(value: Any) -> str:
+        return html.escape(str(value or ""), quote=True)
+
+    def _esc_url(value: Any) -> str:
+        raw = str(value or "").strip()
+        if raw.startswith(("http://", "https://")):
+            return html.escape(raw, quote=True)
+        return "#"
+
+    name = _esc_text(payload.get("name") or "Robert BabyRay Ashworth")
+    headline_recommended = str(payload.get("headline_recommended") or "").strip()
+    if not headline_recommended:
+        variants = payload.get("headline_variants", []) if isinstance(payload.get("headline_variants"), list) else []
+        headline_recommended = str(variants[0] if variants else "Principal Quant Systems Engineer")
+    headline_recommended = _esc_text(headline_recommended)
+
+    about_short = _esc_text(payload.get("about_short") or "")
+    about_full = _esc_text(payload.get("about_full") or payload.get("about") or "")
+
+    headline_items = [str(v).strip() for v in payload.get("headline_variants", []) if str(v).strip()]
+    impact_snapshot = payload.get("impact_snapshot", []) if isinstance(payload.get("impact_snapshot"), list) else []
+
+    roles = payload.get("experience_roles", []) if isinstance(payload.get("experience_roles"), list) else []
+    if not roles:
+        bullets = payload.get("experience_bullets", []) if isinstance(payload.get("experience_bullets"), list) else []
+        roles = [
+            {
+                "title": "Founder and Principal Systems Engineer",
+                "company": "LumaTrader / LumenCore",
+                "dates": "2014 - Present",
+                "location": "Nashville, TN",
+                "bullets": bullets,
+            }
+        ]
+
+    featured_links = payload.get("featured_links", []) if isinstance(payload.get("featured_links"), list) else []
+    skills = payload.get("skills", []) if isinstance(payload.get("skills"), list) else []
+    post_templates = payload.get("post_templates", []) if isinstance(payload.get("post_templates"), list) else []
+
+    headline_list_html = "\n".join(f"<li>{_esc_text(item)}</li>" for item in headline_items)
+
+    impact_html = "\n".join(
+        "\n".join(
+            [
+                "<article class='stat-card'>",
+                f"  <p class='stat-label'>{_esc_text(item.get('label') or 'Metric')}</p>",
+                f"  <p class='stat-value'>{_esc_text(item.get('value') or '')}</p>",
+                f"  <p class='stat-hint'>{_esc_text(item.get('hint') or '')}</p>",
+                "</article>",
+            ]
+        )
+        for item in impact_snapshot
+        if isinstance(item, dict)
+    )
+
+    role_cards_html: list[str] = []
+    for role in roles:
+        if not isinstance(role, dict):
+            continue
+        title = _esc_text(role.get("title") or "Role")
+        company = _esc_text(role.get("company") or "Company")
+        dates = _esc_text(role.get("dates") or "")
+        location = _esc_text(role.get("location") or "")
+        subtitle = " | ".join(part for part in [dates, location] if part)
+        bullets_html = "\n".join(f"<li>{_esc_text(b)}</li>" for b in role.get("bullets", []) if str(b).strip())
+        role_cards_html.append(
+            "\n".join(
+                [
+                    "<article class='role-card'>",
+                    f"  <h4>{title} <span>@ {company}</span></h4>",
+                    f"  <p class='role-sub'>{subtitle}</p>" if subtitle else "",
+                    "  <ul class='role-bullets'>",
+                    bullets_html,
+                    "  </ul>",
+                    "</article>",
+                ]
+            )
+        )
+
+    links_html = "\n".join(
+        f"<a class='link-chip' href='{_esc_url(item.get('url'))}' target='_blank' rel='noopener noreferrer'>{_esc_text(item.get('label') or 'Link')}</a>"
+        for item in featured_links
+        if isinstance(item, dict)
+    )
+
+    skills_html = "\n".join(
+        f"<span class='skill-chip'>{_esc_text(skill)}</span>" for skill in skills if str(skill).strip()
+    )
+
+    posts_html = "\n".join(
+        "\n".join(
+            [
+                "<article class='post-card'>",
+                f"  <h4>{_esc_text(item.get('title') or 'Post')}</h4>",
+                f"  <p>{_esc_text(item.get('text') or '')}</p>",
+                "</article>",
+            ]
+        )
+        for item in post_templates
+        if isinstance(item, dict)
+    )
+
+    generated = _esc_text(payload.get("generated_utc") or "")
+    audience_label = _esc_text(payload.get("audience_label") or "Master Profile")
+    quick_steps = payload.get("quick_apply_steps", []) if isinstance(payload.get("quick_apply_steps"), list) else []
+    quick_steps_html = "\n".join(
+        f"<li>{_esc_text(step)}</li>" for step in quick_steps if str(step).strip()
+    )
+    if not quick_steps_html:
+        quick_steps_html = "<li>Apply headline, about, experience, links, and skills in sequence.</li>"
+
+    return f"""<!doctype html>
+<html lang=\"en\">
+<head>
+    <meta charset=\"utf-8\" />
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+    <title>LumaLinkedIn Edition V1 - {audience_label}</title>
+    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">
+    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>
+    <link href=\"https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap\" rel=\"stylesheet\">
+    <style>
+        :root {{
+            --bg-0: #04060f;
+            --bg-1: #07091c;
+            --ink: #e6f0ff;
+            --ink-dim: #7d8bb5;
+            --neon-c: #22d3ee;
+            --neon-p: #a855f7;
+            --neon-g: #34d399;
+            --neon-a: #f59e0b;
+            --glass: rgba(15, 23, 50, 0.45);
+            --border: rgba(124, 58, 237, 0.28);
+            --border-2: rgba(34, 211, 238, 0.38);
+        }}
+        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+        html, body {{ min-height: 100%; }}
+        body {{
+            background: radial-gradient(ellipse at 30% 20%, #1c1052 0%, var(--bg-0) 60%);
+            color: var(--ink);
+            font-family: 'Inter', -apple-system, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }}
+        body::before {{
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(34, 211, 238, 0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 211, 238, 0.045) 1px, transparent 1px);
+            background-size: 44px 44px;
+            mask-image: radial-gradient(ellipse at center, black 35%, transparent 80%);
+            opacity: 0.85;
+        }}
+        body::after {{
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(34, 211, 238, 0.015) 3px, rgba(34, 211, 238, 0.015) 4px);
+            opacity: 0.5;
+        }}
+        .stage {{
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 30px 22px 60px;
+            position: relative;
+            z-index: 2;
+        }}
+        .top-bar {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }}
+        .brand h1 {{
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(20px, 2.8vw, 30px);
+            letter-spacing: 3px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-c), var(--neon-p));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }}
+        .brand .sub {{
+            margin-top: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--ink-dim);
+            letter-spacing: 1px;
+            font-size: 11px;
+            text-transform: uppercase;
+        }}
+        .pill {{
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(52, 211, 153, 0.42);
+            background: rgba(52, 211, 153, 0.12);
+            border-radius: 999px;
+            padding: 6px 12px;
+            color: var(--neon-g);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }}
+        .pill::before {{
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--neon-g);
+            box-shadow: 0 0 10px var(--neon-g);
+            animation: pulse 1.6s ease-in-out infinite;
+        }}
+        .grid {{
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 14px;
+        }}
+        .card {{
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            backdrop-filter: blur(12px) saturate(150%);
+            -webkit-backdrop-filter: blur(12px) saturate(150%);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+            animation: reveal 0.5s ease both;
+        }}
+        .card:nth-child(2) {{ animation-delay: 0.04s; }}
+        .card:nth-child(3) {{ animation-delay: 0.08s; }}
+        .card:nth-child(4) {{ animation-delay: 0.12s; }}
+        .card:nth-child(5) {{ animation-delay: 0.16s; }}
+        .card:nth-child(6) {{ animation-delay: 0.2s; }}
+        .card::before {{
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(34,211,238,0.07), transparent 45%, rgba(168,85,247,0.06));
+            pointer-events: none;
+        }}
+        .card::after {{
+            content: '';
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            top: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(34,211,238,0.8), transparent);
+            opacity: 0.7;
+        }}
+        .card:hover {{
+            transform: translateY(-2px);
+            border-color: var(--border-2);
+        }}
+        .span-12 {{ grid-column: span 12; }}
+        .span-8 {{ grid-column: span 8; }}
+        .span-6 {{ grid-column: span 6; }}
+        .span-4 {{ grid-column: span 4; }}
+        h2 {{
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            color: var(--ink-dim);
+            text-transform: uppercase;
+            font-size: 11px;
+            margin-bottom: 10px;
+        }}
+        .hero-shell {{
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            border-radius: 12px;
+            padding: 14px;
+            background: linear-gradient(130deg, rgba(34,211,238,0.08), rgba(168,85,247,0.06));
+        }}
+        .hero-title {{
+            font-size: clamp(22px, 3.8vw, 36px);
+            line-height: 1.15;
+            font-weight: 800;
+            text-wrap: balance;
+            margin-bottom: 10px;
+        }}
+        .hero-sub {{
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--neon-c);
+            font-size: 12px;
+            letter-spacing: 0.8px;
+        }}
+        .workflow-list {{
+            padding-left: 18px;
+            display: grid;
+            gap: 8px;
+            line-height: 1.45;
+            font-size: 13px;
+        }}
+        .workflow-list li::marker {{ color: var(--neon-a); }}
+        .stats-grid {{
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }}
+        .stat-card {{
+            border: 1px solid rgba(125, 139, 181, 0.34);
+            border-radius: 10px;
+            padding: 12px;
+            background: rgba(7, 9, 28, 0.5);
+        }}
+        .stat-label {{
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--ink-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-size: 10px;
+        }}
+        .stat-value {{
+            margin-top: 5px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--ink);
+        }}
+        .stat-hint {{
+            margin-top: 3px;
+            color: var(--ink-dim);
+            font-size: 11px;
+        }}
+        .body-copy {{ line-height: 1.65; color: var(--ink); font-size: 15px; }}
+        .headline-list {{ list-style: none; display: grid; gap: 8px; }}
+        .headline-list li {{
+            border: 1px solid rgba(125, 139, 181, 0.35);
+            border-radius: 10px;
+            padding: 10px;
+            background: rgba(7, 9, 28, 0.46);
+            line-height: 1.45;
+        }}
+        .role-card + .role-card {{ margin-top: 12px; }}
+        .role-card h4 {{ font-size: 16px; margin-bottom: 6px; color: var(--ink); }}
+        .role-card h4 span {{ color: var(--neon-c); font-weight: 600; }}
+        .role-sub {{ color: var(--ink-dim); font-size: 12px; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }}
+        .role-bullets {{ padding-left: 18px; display: grid; gap: 6px; line-height: 1.55; }}
+        .chips {{ display: flex; flex-wrap: wrap; gap: 8px; }}
+        .link-chip {{
+            text-decoration: none;
+            color: var(--ink);
+            border: 1px solid rgba(34, 211, 238, 0.44);
+            background: rgba(34, 211, 238, 0.11);
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }}
+        .link-chip:hover {{ border-color: var(--neon-g); color: var(--neon-g); }}
+        .skill-chip {{
+            border: 1px solid rgba(168, 85, 247, 0.44);
+            background: rgba(168, 85, 247, 0.16);
+            border-radius: 999px;
+            padding: 7px 11px;
+            font-size: 12px;
+            color: var(--ink);
+        }}
+        .post-card + .post-card {{ margin-top: 10px; }}
+        .post-card h4 {{ color: var(--neon-c); margin-bottom: 6px; font-size: 14px; }}
+        .post-card p {{ line-height: 1.55; color: var(--ink); }}
+        footer {{
+            margin-top: 16px;
+            font-size: 11px;
+            color: var(--ink-dim);
+            font-family: 'JetBrains Mono', monospace;
+            text-align: right;
+        }}
+        @keyframes pulse {{ 50% {{ opacity: 0.35; }} }}
+        @keyframes reveal {{ from {{ opacity: 0; transform: translateY(7px); }} to {{ opacity: 1; transform: translateY(0); }} }}
+        @media (max-width: 980px) {{
+            .span-8, .span-6, .span-4 {{ grid-column: span 12; }}
+            .stats-grid {{ grid-template-columns: 1fr 1fr; }}
+            .top-bar {{ flex-direction: column; align-items: flex-start; }}
+        }}
+        @media (max-width: 620px) {{
+            .stats-grid {{ grid-template-columns: 1fr; }}
+        }}
+    </style>
+</head>
+<body>
+    <main class=\"stage\">
+        <header class=\"top-bar\">
+            <div class=\"brand\">
+                <h1>LUMALINKEDIN EDITION V1</h1>
+                <p class=\"sub\">Domain-parity premium profile pack | {audience_label}</p>
+            </div>
+            <div class=\"pill\">VISUAL PARITY: PREMIUM</div>
+        </header>
+
+        <section class=\"grid\">
+            <article class=\"card span-8\">
+                <h2>Recommended Headline</h2>
+                <div class=\"hero-shell\">
+                    <p class=\"hero-title\">{headline_recommended}</p>
+                    <p class=\"hero-sub\">{name}</p>
+                </div>
+            </article>
+
+            <article class=\"card span-4\">
+                <h2>Quick Apply Order</h2>
+                <ol class=\"workflow-list\">
+                    {quick_steps_html}
+                </ol>
+            </article>
+
+            <article class=\"card span-12\">
+                <h2>Executive Impact Snapshot</h2>
+                <div class=\"stats-grid\">
+                    {impact_html}
+                </div>
+            </article>
+
+            <article class=\"card span-6\">
+                <h2>Headline Variants</h2>
+                <ul class=\"headline-list\">
+                    {headline_list_html}
+                </ul>
+            </article>
+
+            <article class=\"card span-6\">
+                <h2>About (Short)</h2>
+                <p class=\"body-copy\">{about_short}</p>
+            </article>
+
+            <article class=\"card span-12\">
+                <h2>About (Full)</h2>
+                <p class=\"body-copy\">{about_full}</p>
+            </article>
+
+            <article class=\"card span-8\">
+                <h2>Experience Pack</h2>
+                {''.join(role_cards_html)}
+            </article>
+
+            <article class=\"card span-4\">
+                <h2>Featured Links</h2>
+                <div class=\"chips\">
+                    {links_html}
+                </div>
+            </article>
+
+            <article class=\"card span-12\">
+                <h2>Skills</h2>
+                <div class=\"chips\">
+                    {skills_html}
+                </div>
+            </article>
+
+            <article class=\"card span-12\">
+                <h2>Post Templates</h2>
+                {posts_html}
+            </article>
+        </section>
+
+        <footer>Generated UTC: {generated}</footer>
+    </main>
+</body>
+</html>
+"""
 
 
 def _publish_linkedin_summary(payload: dict[str, Any], dry_run: bool) -> dict[str, Any]:
@@ -536,17 +1478,64 @@ def main() -> int:
     _write_json(latest_resume_json, resume_payload)
 
     linkedin_payload = _build_linkedin_payload(profile, metrics, packages)
+    company = profile.get("company", {}) if isinstance(profile, dict) else {}
+    audience_variants = _build_linkedin_audience_variants(linkedin_payload, metrics, company)
+    linkedin_payload["available_audiences"] = sorted(audience_variants.keys())
+    linkedin_payload["audience_variants"] = audience_variants
     linkedin_md = _render_linkedin_markdown(linkedin_payload)
+    linkedin_html = _render_linkedin_html(linkedin_payload)
 
     tagged_linkedin_json = LINKEDIN_OUT / f"lumalinkedin_v1_{stamp}.json"
     tagged_linkedin_md = LINKEDIN_OUT / f"lumalinkedin_v1_{stamp}.md"
+    tagged_linkedin_html = LINKEDIN_OUT / f"lumalinkedin_v1_{stamp}.html"
     latest_linkedin_json = LINKEDIN_OUT / "lumalinkedin_v1_latest.json"
     latest_linkedin_md = LINKEDIN_OUT / "lumalinkedin_v1_latest.md"
+    latest_linkedin_html = LINKEDIN_OUT / "lumalinkedin_v1_latest.html"
 
     _write_json(tagged_linkedin_json, linkedin_payload)
     _write_json(latest_linkedin_json, linkedin_payload)
     _write_text(tagged_linkedin_md, linkedin_md)
     _write_text(latest_linkedin_md, linkedin_md)
+    _write_text(tagged_linkedin_html, linkedin_html)
+    _write_text(latest_linkedin_html, linkedin_html)
+
+    variant_artifacts: dict[str, dict[str, str]] = {}
+    for audience_id, audience_payload in audience_variants.items():
+        audience_md = _render_linkedin_markdown(audience_payload)
+        audience_html = _render_linkedin_html(audience_payload)
+
+        tagged_variant_json = LINKEDIN_OUT / f"lumalinkedin_v1_{audience_id}_{stamp}.json"
+        tagged_variant_md = LINKEDIN_OUT / f"lumalinkedin_v1_{audience_id}_{stamp}.md"
+        tagged_variant_html = LINKEDIN_OUT / f"lumalinkedin_v1_{audience_id}_{stamp}.html"
+        latest_variant_json = LINKEDIN_OUT / f"lumalinkedin_v1_{audience_id}_latest.json"
+        latest_variant_md = LINKEDIN_OUT / f"lumalinkedin_v1_{audience_id}_latest.md"
+        latest_variant_html = LINKEDIN_OUT / f"lumalinkedin_v1_{audience_id}_latest.html"
+
+        _write_json(tagged_variant_json, audience_payload)
+        _write_json(latest_variant_json, audience_payload)
+        _write_text(tagged_variant_md, audience_md)
+        _write_text(latest_variant_md, audience_md)
+        _write_text(tagged_variant_html, audience_html)
+        _write_text(latest_variant_html, audience_html)
+
+        variant_artifacts[audience_id] = {
+            "latest_json": str(latest_variant_json),
+            "latest_md": str(latest_variant_md),
+            "latest_html": str(latest_variant_html),
+            "tagged_json": str(tagged_variant_json),
+            "tagged_md": str(tagged_variant_md),
+            "tagged_html": str(tagged_variant_html),
+        }
+
+    variant_manifest = {
+        "generated_utc": _now_iso(),
+        "scope": "lumalinkedin_v1_audience_variants",
+        "audiences": variant_artifacts,
+    }
+    tagged_variant_manifest = LINKEDIN_OUT / f"lumalinkedin_v1_audience_variants_{stamp}.json"
+    latest_variant_manifest = LINKEDIN_OUT / "lumalinkedin_v1_audience_variants_latest.json"
+    _write_json(tagged_variant_manifest, variant_manifest)
+    _write_json(latest_variant_manifest, variant_manifest)
 
     pdf_result: dict[str, Any] | None = None
     if not args.no_pdf:
@@ -568,6 +1557,9 @@ def main() -> int:
         "linkedin_artifacts": {
             "latest_linkedin_md": str(latest_linkedin_md),
             "latest_linkedin_json": str(latest_linkedin_json),
+            "latest_linkedin_html": str(latest_linkedin_html),
+            "audience_variants_latest_manifest": str(latest_variant_manifest),
+            "audience_variants": variant_artifacts,
         },
         "pdf_result": pdf_result,
         "publish_result": publish_result,
@@ -580,6 +1572,8 @@ def main() -> int:
     print(f"RESUME_MD={RESUME_MD_PATH}")
     print(f"RESUME_JSON={latest_resume_json}")
     print(f"LINKEDIN_JSON={latest_linkedin_json}")
+    print(f"LINKEDIN_HTML={latest_linkedin_html}")
+    print(f"LINKEDIN_AUDIENCE_VARIANTS={latest_variant_manifest}")
     print(f"SUMMARY={summary_path}")
     return 0
 

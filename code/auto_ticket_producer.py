@@ -45,6 +45,7 @@ QUEUE_FILE = ROOT / "execution_approval_queue.json"
 SPIKE_LATEST = ROOT / "out" / "spike_hunter" / "spike_hunter_latest.json"
 ALPHA_MAP_LATEST_JSON = ROOT / "out" / "ops" / "kraken_multi_tf_alpha_map_latest.json"
 ALPHA_MAP_LATEST_CSV = ROOT / "out" / "ops" / "kraken_multi_tf_alpha_map_latest.csv"
+CLUSTER_LATEST_JSON = ROOT / "out" / "ops" / "kraken_6m_move_clusters_latest.json"
 SPIKE_HISTORY_DIR = ROOT / "out" / "spike_hunter" / "history"
 SPIKE_HISTORY_DIR.mkdir(parents=True, exist_ok=True)
 PRODUCER_LOG = ROOT / "out" / "execution" / "auto_ticket_producer.jsonl"
@@ -73,11 +74,23 @@ def _read_runtime_config(default_threshold: float | None,
                 "pending_dedupe_by_pair_side": cfg.get("pending_dedupe_by_pair_side"),
                 "pending_keep_per_pair_side": cfg.get("pending_keep_per_pair_side"),
                 "max_auto_fires_per_cycle": cfg.get("max_auto_fires_per_cycle"),
+                "auto_fire_score_moonshot": cfg.get("auto_fire_score_moonshot"),
+                "auto_fire_score_quickhit": cfg.get("auto_fire_score_quickhit"),
+                "auto_fire_score_swing": cfg.get("auto_fire_score_swing"),
+                "max_auto_fires_per_cycle_moonshot": cfg.get("max_auto_fires_per_cycle_moonshot"),
+                "max_auto_fires_per_cycle_quickhit": cfg.get("max_auto_fires_per_cycle_quickhit"),
+                "max_auto_fires_per_cycle_swing": cfg.get("max_auto_fires_per_cycle_swing"),
                 "alpha_gate_min_edge": cfg.get("alpha_gate_min_edge"),
                 "alpha_gate_max_spread_bps": cfg.get("alpha_gate_max_spread_bps"),
                 "alpha_gate_min_turnover_usd": cfg.get("alpha_gate_min_turnover_usd"),
                 "alpha_gate_allow_watch_strategy": cfg.get("alpha_gate_allow_watch_strategy"),
                 "alpha_gate_require_match_live": cfg.get("alpha_gate_require_match_live"),
+                "cluster_gate_enabled": cfg.get("cluster_gate_enabled"),
+                "cluster_enforce_time_alignment": cfg.get("cluster_enforce_time_alignment"),
+                "cluster_min_pair_score": cfg.get("cluster_min_pair_score"),
+                "cluster_hour_tolerance": cfg.get("cluster_hour_tolerance"),
+                "cluster_weekday_tolerance": cfg.get("cluster_weekday_tolerance"),
+                "cluster_require_alignment_live": cfg.get("cluster_require_alignment_live"),
                 "strategy_mode": cfg.get("strategy_mode"),
                 "bankroll_usd": cfg.get("bankroll_usd"),
                 "max_notional_usd": cfg.get("max_notional_usd"),
@@ -135,11 +148,23 @@ def _read_runtime_config(default_threshold: float | None,
         "pending_dedupe_by_pair_side": None,
         "pending_keep_per_pair_side": None,
         "max_auto_fires_per_cycle": None,
+        "auto_fire_score_moonshot": None,
+        "auto_fire_score_quickhit": None,
+        "auto_fire_score_swing": None,
+        "max_auto_fires_per_cycle_moonshot": None,
+        "max_auto_fires_per_cycle_quickhit": None,
+        "max_auto_fires_per_cycle_swing": None,
         "alpha_gate_min_edge": None,
         "alpha_gate_max_spread_bps": None,
         "alpha_gate_min_turnover_usd": None,
         "alpha_gate_allow_watch_strategy": None,
         "alpha_gate_require_match_live": None,
+        "cluster_gate_enabled": None,
+        "cluster_enforce_time_alignment": None,
+        "cluster_min_pair_score": None,
+        "cluster_hour_tolerance": None,
+        "cluster_weekday_tolerance": None,
+        "cluster_require_alignment_live": None,
         "strategy_mode": None,
         "bankroll_usd": None,
         "max_notional_usd": None,
@@ -231,6 +256,12 @@ PROFITABILITY_MIN_EXECUTION_QUALITY_SCORE = 10.0
 PROFITABILITY_NOTIONAL_EDGE_SCALE_PCT = 8.0
 PROFITABILITY_NOTIONAL_FLOOR_MULT = 0.7
 PROFITABILITY_NOTIONAL_CAP_MULT = 1.4
+CLUSTER_GATE_ENABLED_DEFAULT = True
+CLUSTER_GATE_ENFORCE_TIME_ALIGNMENT_DEFAULT = True
+CLUSTER_GATE_MIN_PAIR_SCORE = 8.0
+CLUSTER_GATE_HOUR_TOLERANCE = 1
+CLUSTER_GATE_WEEKDAY_TOLERANCE = 0
+CLUSTER_GATE_REQUIRE_ALIGNMENT_LIVE = True
 # Fail-closed only in LIVE mode. In DRY-RUN mode we keep discovery running.
 ALPHA_GATE_REQUIRE_MATCH_LIVE = True
 COOLDOWN_PAIRS_STATES = {"PENDING_HUMAN_APPROVAL", "EXECUTED_OPEN"}
@@ -477,6 +508,57 @@ def _load_alpha_map_context() -> dict:
     return context
 
 
+def _load_cluster_context() -> dict:
+    context = {
+        "available": False,
+        "generated_utc": "",
+        "pairs_analyzed": 0,
+        "lookup": {},
+    }
+    if not CLUSTER_LATEST_JSON.exists():
+        return context
+
+    try:
+        payload = json.loads(CLUSTER_LATEST_JSON.read_text(encoding="utf-8"))
+    except Exception:
+        return context
+
+    rows = payload.get("pair_clusters") or []
+    if not isinstance(rows, list):
+        return context
+
+    lookup = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        pair = str(row.get("pair") or "")
+        wsname = str(row.get("wsname") or "")
+        key = _pair_token(pair or wsname)
+        if not key:
+            continue
+        lookup[key] = {
+            "pair": pair,
+            "wsname": wsname,
+            "cluster_score": float(row.get("cluster_score") or 0.0),
+            "best_hour_utc": int(float(row.get("best_hour_utc") or -1)),
+            "best_weekday_utc": int(float(row.get("best_weekday_utc") or -1)),
+            "best_weekday_name": str(row.get("best_weekday_name") or ""),
+            "best_hour_score": float(row.get("best_hour_score") or 0.0),
+            "best_weekday_score": float(row.get("best_weekday_score") or 0.0),
+            "mean_abs_move_pct": float(row.get("mean_abs_move_pct") or 0.0),
+            "burst_rate_pct": float(row.get("burst_rate_pct") or 0.0),
+            "win_rate_pct": float(row.get("win_rate_pct") or 0.0),
+            "turnover_24h_usd": float(row.get("turnover_24h_usd") or 0.0),
+            "samples": int(float(row.get("samples") or 0)),
+        }
+
+    context["generated_utc"] = str(payload.get("generated_utc") or "")
+    context["pairs_analyzed"] = int(payload.get("pairs_analyzed") or len(lookup) or 0)
+    context["available"] = bool(lookup)
+    context["lookup"] = lookup
+    return context
+
+
 def _alpha_gate_required(validate: bool, gate_cfg: dict[str, object] | None = None) -> bool:
     require_match_live = ALPHA_GATE_REQUIRE_MATCH_LIVE
     if isinstance(gate_cfg, dict) and "require_match_live" in gate_cfg:
@@ -493,6 +575,95 @@ def _resolve_alpha_gate(runtime_cfg: dict | None) -> dict[str, object]:
         "allow_watch_strategy": bool(cfg.get("alpha_gate_allow_watch_strategy", False)),
         "require_match_live": bool(cfg.get("alpha_gate_require_match_live", ALPHA_GATE_REQUIRE_MATCH_LIVE)),
     }
+
+
+def _cluster_gate_required(validate: bool, cluster_cfg: dict[str, object] | None = None) -> bool:
+    require_alignment_live = CLUSTER_GATE_REQUIRE_ALIGNMENT_LIVE
+    if isinstance(cluster_cfg, dict) and "require_alignment_live" in cluster_cfg:
+        require_alignment_live = bool(cluster_cfg.get("require_alignment_live"))
+    return (not validate) and bool(require_alignment_live)
+
+
+def _resolve_cluster_gate(runtime_cfg: dict | None) -> dict[str, object]:
+    cfg = runtime_cfg or {}
+    return {
+        "enabled": bool(cfg.get("cluster_gate_enabled", CLUSTER_GATE_ENABLED_DEFAULT)),
+        "enforce_time_alignment": bool(
+            cfg.get("cluster_enforce_time_alignment", CLUSTER_GATE_ENFORCE_TIME_ALIGNMENT_DEFAULT)
+        ),
+        "min_pair_score": max(
+            0.0,
+            _safe_float(cfg.get("cluster_min_pair_score"), CLUSTER_GATE_MIN_PAIR_SCORE),
+        ),
+        "hour_tolerance": max(
+            0,
+            _safe_int(cfg.get("cluster_hour_tolerance"), CLUSTER_GATE_HOUR_TOLERANCE),
+        ),
+        "weekday_tolerance": max(
+            0,
+            _safe_int(cfg.get("cluster_weekday_tolerance"), CLUSTER_GATE_WEEKDAY_TOLERANCE),
+        ),
+        "require_alignment_live": bool(
+            cfg.get("cluster_require_alignment_live", CLUSTER_GATE_REQUIRE_ALIGNMENT_LIVE)
+        ),
+    }
+
+
+def _cyclic_distance(value: int, target: int, modulo: int) -> int:
+    if modulo <= 0:
+        return abs(value - target)
+    raw = abs(value - target) % modulo
+    return min(raw, modulo - raw)
+
+
+def _cluster_gate(
+    row: dict,
+    cluster_ctx: dict,
+    validate: bool,
+    cluster_cfg: dict[str, object],
+) -> tuple[bool, str, dict | None]:
+    if not bool(cluster_cfg.get("enabled", CLUSTER_GATE_ENABLED_DEFAULT)):
+        return True, "cluster_gate_disabled", None
+
+    required = _cluster_gate_required(validate, cluster_cfg)
+    lookup = cluster_ctx.get("lookup") if isinstance(cluster_ctx, dict) else {}
+    if not isinstance(lookup, dict) or not lookup:
+        if required:
+            return False, "cluster_map_unavailable", None
+        return True, "cluster_map_unavailable_validate_mode", None
+
+    pair = _normalize_pair_for_kraken(row.get("pair", ""), row.get("wsname", ""))
+    key = _pair_token(pair)
+    cluster = lookup.get(key)
+
+    if cluster is None:
+        if required:
+            return False, "cluster_pair_not_mapped", None
+        return True, "cluster_pair_not_mapped_validate_mode", None
+
+    score = float(cluster.get("cluster_score") or 0.0)
+    min_pair_score = float(cluster_cfg.get("min_pair_score", CLUSTER_GATE_MIN_PAIR_SCORE))
+    if score < min_pair_score:
+        return False, f"cluster_score<{min_pair_score}", cluster
+
+    if bool(cluster_cfg.get("enforce_time_alignment", CLUSTER_GATE_ENFORCE_TIME_ALIGNMENT_DEFAULT)):
+        best_hour = int(cluster.get("best_hour_utc") or -1)
+        best_weekday = int(cluster.get("best_weekday_utc") or -1)
+        now_dt = datetime.now(timezone.utc)
+        hour_tol = int(cluster_cfg.get("hour_tolerance", CLUSTER_GATE_HOUR_TOLERANCE))
+        weekday_tol = int(cluster_cfg.get("weekday_tolerance", CLUSTER_GATE_WEEKDAY_TOLERANCE))
+
+        if best_hour >= 0:
+            hour_dist = _cyclic_distance(now_dt.hour, best_hour, 24)
+            if hour_dist > hour_tol:
+                return False, "cluster_hour_window_miss", cluster
+
+        if best_weekday >= 0:
+            weekday_dist = _cyclic_distance(now_dt.weekday(), best_weekday, 7)
+            if weekday_dist > weekday_tol:
+                return False, "cluster_weekday_window_miss", cluster
+
+    return True, "cluster_gate_ok", cluster
 
 
 def _resolve_profitability_cfg(runtime_cfg: dict | None) -> dict[str, float]:
@@ -1110,10 +1281,12 @@ def _load_cached_scan_if_fresh(max_age_sec: float) -> dict | None:
 def _eligible(
     row: dict,
     alpha_ctx: dict,
+    cluster_ctx: dict,
     validate: bool,
     gate_cfg: dict[str, object],
     profit_cfg: dict[str, float],
-) -> tuple[bool, str, dict | None]:
+    cluster_cfg: dict[str, object],
+) -> tuple[bool, str, dict | None, dict | None]:
     score = float(row.get("score", 0))
     signals = row.get("signals") or []
     vol_24h = float(row.get("vol_24h_usd", 0))
@@ -1122,28 +1295,39 @@ def _eligible(
     watch_only = len(signals) == 1 and str(signals[0]).upper() == "WATCH"
 
     if watch_only and not allow_watch:
-        return False, "watch_only", None
+        return False, "watch_only", None, None
     if score < MIN_SCORE:
-        return False, f"score<{MIN_SCORE}", None
+        return False, f"score<{MIN_SCORE}", None, None
     if vol_24h < MIN_24H_VOL_USD:
-        return False, f"vol_24h<{MIN_24H_VOL_USD}", None
+        return False, f"vol_24h<{MIN_24H_VOL_USD}", None, None
     if price <= 0:
-        return False, "zero_price", None
+        return False, "zero_price", None, None
 
     alpha_ok, alpha_reason, alpha_row = _alpha_gate(row, alpha_ctx, validate, gate_cfg, profit_cfg)
     if not alpha_ok:
-        return False, alpha_reason, alpha_row
+        return False, alpha_reason, alpha_row, None
 
-    return True, "ok", alpha_row
+    cluster_ok, cluster_reason, cluster_row = _cluster_gate(
+        row=row,
+        cluster_ctx=cluster_ctx,
+        validate=validate,
+        cluster_cfg=cluster_cfg,
+    )
+    if not cluster_ok:
+        return False, cluster_reason, alpha_row, cluster_row
+
+    return True, "ok", alpha_row, cluster_row
 
 
 def _compute_throughput_targets(
     leaderboard: list[dict],
     alpha_ctx: dict,
+    cluster_ctx: dict,
     validate: bool,
     pending_count: int,
     gate_cfg: dict[str, object],
     profit_cfg: dict[str, float],
+    cluster_cfg: dict[str, object],
     runtime_cfg: dict | None,
 ) -> dict[str, int | bool]:
     cfg = runtime_cfg or {}
@@ -1160,12 +1344,14 @@ def _compute_throughput_targets(
     actionable = 0
     strong = 0
     for row in leaderboard:
-        ok, _why, alpha_row = _eligible(
+        ok, _why, alpha_row, _cluster_row = _eligible(
             row,
             alpha_ctx=alpha_ctx,
+            cluster_ctx=cluster_ctx,
             validate=validate,
             gate_cfg=gate_cfg,
             profit_cfg=profit_cfg,
+            cluster_cfg=cluster_cfg,
         )
         if not ok:
             continue
@@ -1198,6 +1384,7 @@ def _build_ticket(
     validate: bool,
     note: str,
     alpha_row: dict | None = None,
+    cluster_row: dict | None = None,
     strategy_lane: str | None = None,
     strategy_meta: dict | None = None,
     strategy_cfg: dict | None = None,
@@ -1284,6 +1471,19 @@ def _build_ticket(
                 "r_24h_pct": (alpha_row or {}).get("r_24h_pct"),
                 "best_buy_hour_utc": (alpha_row or {}).get("best_buy_hour_utc"),
             },
+            "cluster_target": {
+                "enabled": cluster_row is not None,
+                "cluster_score": (cluster_row or {}).get("cluster_score"),
+                "best_hour_utc": (cluster_row or {}).get("best_hour_utc"),
+                "best_weekday_utc": (cluster_row or {}).get("best_weekday_utc"),
+                "best_weekday_name": (cluster_row or {}).get("best_weekday_name"),
+                "best_hour_score": (cluster_row or {}).get("best_hour_score"),
+                "best_weekday_score": (cluster_row or {}).get("best_weekday_score"),
+                "mean_abs_move_pct": (cluster_row or {}).get("mean_abs_move_pct"),
+                "burst_rate_pct": (cluster_row or {}).get("burst_rate_pct"),
+                "win_rate_pct": (cluster_row or {}).get("win_rate_pct"),
+                "samples": (cluster_row or {}).get("samples"),
+            },
         },
     }
 
@@ -1311,7 +1511,9 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
 
     leaderboard = scan.get("leaderboard") or []
     alpha_ctx = _load_alpha_map_context()
+    cluster_ctx = _load_cluster_context()
     gate_cfg = _resolve_alpha_gate(rt_cfg)
+    cluster_cfg = _resolve_cluster_gate(rt_cfg)
     profit_cfg = _resolve_profitability_cfg(rt_cfg)
     strategy_cfg = _resolve_strategy_runtime(runtime_cfg=rt_cfg, bankroll=effective_bankroll, validate=validate)
     strategy_cfg.update(
@@ -1347,10 +1549,12 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
     throughput = _compute_throughput_targets(
         leaderboard=leaderboard,
         alpha_ctx=alpha_ctx,
+        cluster_ctx=cluster_ctx,
         validate=validate,
         pending_count=pending_count,
         gate_cfg=gate_cfg,
         profit_cfg=profit_cfg,
+        cluster_cfg=cluster_cfg,
         runtime_cfg=rt_cfg,
     )
     slots = int(throughput["cycle_emit_budget"])
@@ -1359,6 +1563,8 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
     skipped = []
     alpha_gate_pass_count = 0
     alpha_gate_fail_count = 0
+    cluster_gate_pass_count = 0
+    cluster_gate_fail_count = 0
     profitability_gate_fail_count = 0
     lane_emitted_counts = {lane: 0 for lane in LANES}
     lane_skip_counts = {lane: 0 for lane in LANES}
@@ -1370,22 +1576,28 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
         if pair in blocked_pairs:
             skipped.append({"pair": pair, "reason": "in_queue"})
             continue
-        ok, why, alpha_row = _eligible(
+        ok, why, alpha_row, cluster_row = _eligible(
             row,
             alpha_ctx=alpha_ctx,
+            cluster_ctx=cluster_ctx,
             validate=validate,
             gate_cfg=gate_cfg,
             profit_cfg=profit_cfg,
+            cluster_cfg=cluster_cfg,
         )
         if not ok:
             skipped.append({"pair": pair, "reason": why})
             if str(why).startswith("alpha_"):
                 alpha_gate_fail_count += 1
+            if str(why).startswith("cluster_"):
+                cluster_gate_fail_count += 1
             if str(why).startswith("alpha_net_edge") or str(why).startswith("alpha_exec_quality"):
                 profitability_gate_fail_count += 1
             continue
         if alpha_row:
             alpha_gate_pass_count += 1
+        if cluster_row:
+            cluster_gate_pass_count += 1
 
         strat = _classify_strategy_lane(row=row, alpha_row=alpha_row, strategy_cfg=strategy_cfg)
         lane = str(strat.get("lane") or "")
@@ -1416,6 +1628,7 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
                 f"r4h={strat.get('tf', {}).get('r_4h_pct')}"
             ),
             alpha_row=alpha_row,
+            cluster_row=cluster_row,
             strategy_lane=lane,
             strategy_meta=strat,
             strategy_cfg=strategy_cfg,
@@ -1437,6 +1650,10 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
             "tf": strat.get("tf"),
             "alpha_edge_score": (alpha_row or {}).get("alpha_edge_score"),
             "alpha_strategy_mode": (alpha_row or {}).get("strategy_mode"),
+            "cluster_score": (cluster_row or {}).get("cluster_score"),
+            "cluster_best_hour_utc": (cluster_row or {}).get("best_hour_utc"),
+            "cluster_best_weekday_utc": (cluster_row or {}).get("best_weekday_utc"),
+            "cluster_best_weekday_name": (cluster_row or {}).get("best_weekday_name"),
             "net_edge_pct": (strat.get("profitability") or {}).get("net_edge_pct"),
             "risk_adjusted_net_edge_pct": (strat.get("profitability") or {}).get("risk_adjusted_net_edge_pct"),
             "estimated_friction_bps": (strat.get("profitability") or {}).get("estimated_friction_bps"),
@@ -1451,12 +1668,57 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
     # ── Optional auto-fire ─────────────────────────────────────────────
     auto_fired = []
     max_auto_fires_per_cycle = max(0, _safe_int((rt_cfg or {}).get("max_auto_fires_per_cycle"), MAX_AUTO_FIRES_PER_CYCLE))
-    if auto_fire_score is not None and emitted:
+    lane_threshold_keys = {
+        LANE_MOONSHOT: "auto_fire_score_moonshot",
+        LANE_QUICKHIT: "auto_fire_score_quickhit",
+        LANE_SWING: "auto_fire_score_swing",
+    }
+    lane_cap_keys = {
+        LANE_MOONSHOT: "max_auto_fires_per_cycle_moonshot",
+        LANE_QUICKHIT: "max_auto_fires_per_cycle_quickhit",
+        LANE_SWING: "max_auto_fires_per_cycle_swing",
+    }
+    default_auto_fire_threshold = (
+        _safe_float(auto_fire_score, 0.0) if auto_fire_score is not None else None
+    )
+    lane_auto_fired_counts = {lane: 0 for lane in LANES}
+    auto_fire_lane_thresholds = {}
+    auto_fire_lane_caps = {}
+
+    for lane in LANES:
+        raw_threshold = (rt_cfg or {}).get(lane_threshold_keys.get(lane, ""))
+        if raw_threshold is None:
+            lane_threshold = default_auto_fire_threshold
+        else:
+            lane_threshold = _safe_float(
+                raw_threshold,
+                default_auto_fire_threshold if default_auto_fire_threshold is not None else 0.0,
+            )
+        auto_fire_lane_thresholds[lane] = lane_threshold
+        auto_fire_lane_caps[lane] = max(
+            0,
+            _safe_int(
+                (rt_cfg or {}).get(lane_cap_keys.get(lane, "")),
+                max_auto_fires_per_cycle,
+            ),
+        )
+
+    if default_auto_fire_threshold is not None and emitted:
         for e in emitted:
             if max_auto_fires_per_cycle and len(auto_fired) >= max_auto_fires_per_cycle:
                 break
+
+            lane = str(e.get("strategy_lane") or "")
+            lane_cap = int(auto_fire_lane_caps.get(lane, max_auto_fires_per_cycle))
+            if lane_cap and lane_auto_fired_counts.get(lane, 0) >= lane_cap:
+                continue
+
+            lane_threshold = auto_fire_lane_thresholds.get(lane, default_auto_fire_threshold)
+            if lane_threshold is None:
+                continue
+
             score = e.get("score") or 0.0
-            if score < auto_fire_score:
+            if score < lane_threshold:
                 continue
             if e.get("validate"):
                 # never auto-fire DRY-RUN; pointless
@@ -1466,7 +1728,7 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
                 "ticket_id": tid,
                 "decision": "approve",
                 "controller": controller,
-                "reason": f"auto-fire: score {score} >= {auto_fire_score}",
+                "reason": f"auto-fire[{lane}]: score {score} >= {lane_threshold}",
                 "confirm_phrase": f"FIRE {tid}",
             }).encode("utf-8")
             req = urllib.request.Request(
@@ -1481,16 +1743,35 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
                 auto_fired.append({
                     "ticket_id": tid,
                     "pair": e["pair"],
+                    "strategy_lane": lane,
+                    "score_threshold": lane_threshold,
                     "score": score,
                     "status": res.get("status"),
                     "txid": res.get("txid"),
                     "reason": res.get("reason"),
                 })
+                lane_auto_fired_counts[lane] = lane_auto_fired_counts.get(lane, 0) + 1
             except urllib.error.HTTPError as he:
-                auto_fired.append({"ticket_id": tid, "pair": e["pair"], "status": "http_error",
-                                   "code": he.code, "body": he.read().decode("utf-8", "ignore")[:200]})
+                auto_fired.append({
+                    "ticket_id": tid,
+                    "pair": e["pair"],
+                    "strategy_lane": lane,
+                    "score_threshold": lane_threshold,
+                    "status": "http_error",
+                    "code": he.code,
+                    "body": he.read().decode("utf-8", "ignore")[:200],
+                })
+                lane_auto_fired_counts[lane] = lane_auto_fired_counts.get(lane, 0) + 1
             except Exception as exc:  # noqa: BLE001
-                auto_fired.append({"ticket_id": tid, "pair": e["pair"], "status": "error", "error": str(exc)})
+                auto_fired.append({
+                    "ticket_id": tid,
+                    "pair": e["pair"],
+                    "strategy_lane": lane,
+                    "score_threshold": lane_threshold,
+                    "status": "error",
+                    "error": str(exc),
+                })
+                lane_auto_fired_counts[lane] = lane_auto_fired_counts.get(lane, 0) + 1
 
     summary = {
         "scan_generated_utc": scan.get("generated_utc"),
@@ -1520,12 +1801,31 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
         "alpha_map_available": bool(alpha_ctx.get("available")),
         "alpha_map_generated_utc": alpha_ctx.get("generated_utc"),
         "alpha_map_pairs_analyzed": alpha_ctx.get("pairs_analyzed"),
+        "cluster_map_available": bool(cluster_ctx.get("available")),
+        "cluster_map_generated_utc": cluster_ctx.get("generated_utc"),
+        "cluster_map_pairs_analyzed": cluster_ctx.get("pairs_analyzed"),
         "alpha_gate_required": _alpha_gate_required(validate, gate_cfg),
         "alpha_gate_pass_count": alpha_gate_pass_count,
         "alpha_gate_fail_count": alpha_gate_fail_count,
         "alpha_gate_min_edge": float(gate_cfg.get("min_edge", ALPHA_GATE_MIN_EDGE)),
         "alpha_gate_max_spread_bps": float(gate_cfg.get("max_spread_bps", ALPHA_GATE_MAX_SPREAD_BPS)),
         "alpha_gate_min_turnover_usd": float(gate_cfg.get("min_turnover_usd", ALPHA_GATE_MIN_TURNOVER_USD)),
+        "cluster_gate_enabled": bool(cluster_cfg.get("enabled", CLUSTER_GATE_ENABLED_DEFAULT)),
+        "cluster_gate_required": _cluster_gate_required(validate, cluster_cfg),
+        "cluster_gate_enforce_time_alignment": bool(
+            cluster_cfg.get("enforce_time_alignment", CLUSTER_GATE_ENFORCE_TIME_ALIGNMENT_DEFAULT)
+        ),
+        "cluster_gate_min_pair_score": float(
+            cluster_cfg.get("min_pair_score", CLUSTER_GATE_MIN_PAIR_SCORE)
+        ),
+        "cluster_gate_hour_tolerance": int(
+            cluster_cfg.get("hour_tolerance", CLUSTER_GATE_HOUR_TOLERANCE)
+        ),
+        "cluster_gate_weekday_tolerance": int(
+            cluster_cfg.get("weekday_tolerance", CLUSTER_GATE_WEEKDAY_TOLERANCE)
+        ),
+        "cluster_gate_pass_count": cluster_gate_pass_count,
+        "cluster_gate_fail_count": cluster_gate_fail_count,
         "profitability_min_net_edge_pct": float(
             profit_cfg.get("min_net_edge_pct", PROFITABILITY_MIN_NET_EDGE_PCT)
         ),
@@ -1583,6 +1883,9 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
         "validate_mode": validate,
         "controller": controller,
         "auto_fire_score": auto_fire_score,
+        "auto_fire_lane_thresholds": auto_fire_lane_thresholds,
+        "auto_fire_lane_caps": auto_fire_lane_caps,
+        "auto_fire_lane_counts": lane_auto_fired_counts,
         "auto_fired": auto_fired,
         "auto_fired_count": len(auto_fired),
     }
@@ -1637,11 +1940,23 @@ def main() -> int:
             "pending_dedupe_by_pair_side": PENDING_DEDUPE_BY_PAIR_SIDE_DEFAULT,
             "pending_keep_per_pair_side": PENDING_KEEP_PER_PAIR_SIDE_DEFAULT,
             "max_auto_fires_per_cycle": MAX_AUTO_FIRES_PER_CYCLE,
+            "auto_fire_score_moonshot": 68.0,
+            "auto_fire_score_quickhit": 72.0,
+            "auto_fire_score_swing": 66.0,
+            "max_auto_fires_per_cycle_moonshot": 1,
+            "max_auto_fires_per_cycle_quickhit": 2,
+            "max_auto_fires_per_cycle_swing": 1,
             "alpha_gate_min_edge": ALPHA_GATE_MIN_EDGE,
             "alpha_gate_max_spread_bps": ALPHA_GATE_MAX_SPREAD_BPS,
             "alpha_gate_min_turnover_usd": ALPHA_GATE_MIN_TURNOVER_USD,
             "alpha_gate_allow_watch_strategy": False,
             "alpha_gate_require_match_live": True,
+            "cluster_gate_enabled": CLUSTER_GATE_ENABLED_DEFAULT,
+            "cluster_enforce_time_alignment": CLUSTER_GATE_ENFORCE_TIME_ALIGNMENT_DEFAULT,
+            "cluster_min_pair_score": CLUSTER_GATE_MIN_PAIR_SCORE,
+            "cluster_hour_tolerance": CLUSTER_GATE_HOUR_TOLERANCE,
+            "cluster_weekday_tolerance": CLUSTER_GATE_WEEKDAY_TOLERANCE,
+            "cluster_require_alignment_live": CLUSTER_GATE_REQUIRE_ALIGNMENT_LIVE,
             "strategy_mode": STRATEGY_MODE_HYBRID,
             "bankroll_usd": args.bankroll,
             "max_notional_usd": MAX_NOTIONAL_USD,

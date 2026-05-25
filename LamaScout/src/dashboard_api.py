@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 import json
 import pandas as pd
+from typing import Optional
 from .settings import OUT, REP
 from .filters import apply_filters
 
@@ -31,7 +32,7 @@ def sort_by_available_columns(df: pd.DataFrame, columns, ascending=True):
 
 @app.get("/", response_class=RedirectResponse)
 def root():
-    return RedirectResponse(url="/ui")
+    return RedirectResponse(url="ui")
 
 
 @app.get("/ui", response_class=HTMLResponse)
@@ -391,18 +392,18 @@ def audit():
 
 @app.get("/search")
 def search(
-    genre: str | None = None,
-    city: str | None = None,
-    state: str | None = None,
-    country: str | None = None,
-    age_group: str | None = None,
-    agt_stage: str | None = None,
-    tier: str | None = None,
-    label_interest: str | None = None,
-    not_signed: bool | None = Query(None, description="Return only unsigned prospects when true"),
-    today: str | None = None,
-    tomorrow: str | None = None,
-    scope: str | None = None,
+  genre: Optional[str] = None,
+  city: Optional[str] = None,
+  state: Optional[str] = None,
+  country: Optional[str] = None,
+  age_group: Optional[str] = None,
+  agt_stage: Optional[str] = None,
+  tier: Optional[str] = None,
+  label_interest: Optional[str] = None,
+  not_signed: Optional[bool] = Query(None, description="Return only unsigned prospects when true"),
+  today: Optional[str] = None,
+  tomorrow: Optional[str] = None,
+  scope: Optional[str] = None,
     top_n: int = Query(20, ge=1, le=200),
 ):
     path = OUT / "artist_champion_rankings.csv"
@@ -430,13 +431,13 @@ def search(
 
 @app.get("/prospects")
 def prospects(
-    genre: str | None = None,
-    city: str | None = None,
-    state: str | None = None,
-    country: str | None = None,
-    age_group: str | None = None,
-    agt_stage: str | None = None,
-    not_signed: bool | None = Query(True, description="Only unsigned prospects when true"),
+  genre: Optional[str] = None,
+  city: Optional[str] = None,
+  state: Optional[str] = None,
+  country: Optional[str] = None,
+  age_group: Optional[str] = None,
+  agt_stage: Optional[str] = None,
+  not_signed: Optional[bool] = Query(True, description="Only unsigned prospects when true"),
     top_n: int = Query(20, ge=1, le=50),
 ):
     path = OUT / "artist_champion_rankings.csv"
@@ -462,9 +463,9 @@ def prospects(
 
 @app.get("/radar")
 def radar(
-    genre: str | None = None,
-    state: str | None = None,
-    country: str | None = None,
+  genre: Optional[str] = None,
+  state: Optional[str] = None,
+  country: Optional[str] = None,
     top_n: int = Query(20, ge=1, le=50),
 ):
     path = OUT / "artist_champion_rankings.csv"
