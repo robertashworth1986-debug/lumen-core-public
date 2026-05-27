@@ -590,6 +590,8 @@ def build_extra_datasets(
     include_eia930: bool = True,
     include_openaq: bool = True,
     include_coingecko: bool = True,
+    av_symbols: list[str] | None = None,
+    yf_symbols: list[str] | None = None,
 ) -> Dict[str, Callable]:
     """Build the extra-fetcher dict for v2."""
     state_fuels = state_fuels or ["ALL", "NG", "SUN", "WND", "COW", "NUC"]
@@ -642,17 +644,23 @@ def build_extra_datasets(
 
     # AlphaVantage equities (premium key — assume paid tier; if rate-limited
     # the fetcher raises and we soft-fail per dataset)
+    av_symbols = av_symbols or [
+        "SPY", "QQQ", "DIA", "IWM", "XLE", "XLF", "XLK", "XLV", "XLI",
+        "XLP", "XLU", "XLY", "XLB", "XLRE", "GLD", "SLV", "USO", "UNG",
+        "TLT", "HYG", "EEM", "EFA", "VNQ", "VXX", "BTC-USD",
+    ]
     if include_alphavantage:
-        for sym in ["SPY","QQQ","DIA","IWM","XLE","XLF","XLK","XLV","XLI",
-                    "XLP","XLU","XLY","XLB","XLRE","GLD","SLV","USO","UNG",
-                    "TLT","HYG","EEM","EFA","VNQ","VXX","BTC-USD"]:
+        for sym in av_symbols:
             out[f"AV_{sym.replace('-','_')}"] = (lambda s=sym: alphavantage_monthly(s))
 
     # yfinance ETFs and indices (no key)
+    yf_symbols = yf_symbols or [
+        "^GSPC", "^DJI", "^IXIC", "^RUT", "^VIX", "^TNX",
+        "AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "TSLA", "META", "BRK-B",
+        "JPM", "V", "WMT", "JNJ", "XOM", "CVX", "BTC-USD", "ETH-USD",
+    ]
     if include_yfinance:
-        for sym in ["^GSPC","^DJI","^IXIC","^RUT","^VIX","^TNX",
-                    "AAPL","MSFT","GOOGL","AMZN","NVDA","TSLA","META","BRK-B",
-                    "JPM","V","WMT","JNJ","XOM","CVX","BTC-USD","ETH-USD"]:
+        for sym in yf_symbols:
             safe = sym.replace("^","IDX_").replace("-","_")
             out[f"YF_{safe}"] = (lambda s=sym: yfinance_monthly(s))
 

@@ -16,6 +16,7 @@ LINKEDIN_BUILD_PATH = OPS_ROOT / "lumalinkedin_v1_build_latest.json"
 MISSION_PACK_PATH = OPS_ROOT / "investor_mission_control" / "investor_mission_control_pack_latest.json"
 GRANT_FIT_PATH = OPS_ROOT / "grant_submit_fit_pack" / "grant_submit_fit_pack_latest.json"
 GRANT_QUEUE_PATH = ROOT / "out" / "grant_approval_queue.json"
+GRANT_EMAIL_RECEIPTS_PATH = OPS_ROOT / "grants_email_receipts_latest.json"
 
 
 def now_iso() -> str:
@@ -225,9 +226,12 @@ def _norm_status(value: Any) -> str:
 def build_grants_live_submission_ledger(
     grant_queue: dict[str, Any],
     grant_fit: dict[str, Any],
+    email_receipts: dict[str, Any],
 ) -> dict[str, Any]:
     records: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()
+    queue_records_added = 0
+    email_records_added = 0
 
     queue_items: list[Any] = []
     if isinstance(grant_queue, dict):
@@ -264,12 +268,72 @@ def build_grants_live_submission_ledger(
                 "source": "grant_approval_queue",
             }
         )
+        queue_records_added += 1
+
+    receipt_rows = email_receipts.get("records") if isinstance(email_receipts, dict) else []
+    if isinstance(receipt_rows, list):
+        for row in receipt_rows:
+            if not isinstance(row, dict):
+                continue
+            opp_num = first_nonempty(row.get("opp_num"), row.get("opportunity_number"), row.get("opportunity_id"))
+            grants_tracking_number = first_nonempty(
+                row.get("grants_tracking_number"),
+                row.get("tracking_number"),
+                row.get("tracking_id"),
+            )
+            workspace_id = first_nonempty(row.get("workspace_id"), row.get("workspace"))
+            if not (opp_num or grants_tracking_number or workspace_id):
+                continue
+            key = (opp_num, grants_tracking_number, workspace_id)
+            if key in seen:
+                continue
+            seen.add(key)
+
+            status = _norm_status(first_nonempty(row.get("status"), "submitted_email_receipt"))
+            if not status:
+                status = "submitted_email_receipt"
+            source = first_nonempty(row.get("source"), "gmail_manual_receipt")
+
+            merged = {
+                "opp_num": opp_num,
+                "status": status,
+                "grants_tracking_number": grants_tracking_number,
+                "workspace_id": workspace_id,
+                "source": source,
+            }
+
+            for field in (
+                "grant_id",
+                "agency_tracking_number",
+                "application_name",
+                "aor_name",
+                "uei",
+                "event_utc",
+                "email_subject",
+                "email_received_local",
+                "email_link",
+                "opportunity_name",
+                "notes",
+            ):
+                value = row.get(field)
+                if value not in (None, ""):
+                    merged[field] = value
+
+            records.append(merged)
+            email_records_added += 1
 
     fit_summary = grant_fit.get("summary") if isinstance(grant_fit, dict) else {}
     selected = to_int(fit_summary.get("selected_opportunities") if isinstance(fit_summary, dict) else 0, 0)
     fit_likely = to_int(fit_summary.get("fit_likely") if isinstance(fit_summary, dict) else 0, 0)
 
-    if records:
+    if records and queue_records_added and email_records_added:
+        notes = (
+            "Derived from submitted records found in grant approval queue artifacts and "
+            "manual external email receipt ingestion."
+        )
+    elif records and email_records_added:
+        notes = "Derived from manual external email receipt ingestion."
+    elif records:
         notes = "Derived from submitted records found in grant approval queue artifacts."
     else:
         notes = (
@@ -285,11 +349,14 @@ def build_grants_live_submission_ledger(
             "record_count": len(records),
             "fit_selected_opportunities": selected,
             "fit_likely_count": fit_likely,
+            "queue_records_added": queue_records_added,
+            "email_records_added": email_records_added,
         },
         "notes": notes,
         "source_artifacts": {
             "grant_approval_queue": str(GRANT_QUEUE_PATH),
             "grant_submit_fit_pack_latest": str(GRANT_FIT_PATH),
+            "grants_email_receipts_latest": str(GRANT_EMAIL_RECEIPTS_PATH),
         },
     }
 
@@ -301,6 +368,7 @@ def main() -> int:
     mission_pack = load_json(MISSION_PACK_PATH, {})
     grant_fit = load_json(GRANT_FIT_PATH, {})
     grant_queue = load_json(GRANT_QUEUE_PATH, {})
+    email_receipts = load_json(GRANT_EMAIL_RECEIPTS_PATH, {})
 
     helmyer_payload = build_helmyer_payload(
         live_breadth=live_breadth,
@@ -312,6 +380,7 @@ def main() -> int:
     grant_ledger_payload = build_grants_live_submission_ledger(
         grant_queue=grant_queue,
         grant_fit=grant_fit,
+        email_receipts=email_receipts,
     )
 
     stamp = now_tag()

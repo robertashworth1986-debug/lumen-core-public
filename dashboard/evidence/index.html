@@ -233,6 +233,63 @@
   </div>
 
   <section>
+    <h2>What the numbers mean</h2>
+    <p id="meaningSummary">
+      Latest run <code id="meaningRunUtc">—</code> currently reports
+      <strong id="meaningSucceeded">—</strong> succeeded datasets out of
+      <strong id="meaningUniverse">—</strong> in-universe candidates.
+      Warning and alert counts below are run-scoped values when available.
+    </p>
+    <div class="grid" style="margin-top: 16px;">
+      <div class="card">
+        <h3>Universe</h3>
+        <div class="v" id="meaningUniverseCard">—</div>
+        <div class="x">datasets in the benchmark universe for the cited run</div>
+      </div>
+      <div class="card">
+        <h3>Succeeded</h3>
+        <div class="v" id="meaningSucceededCard">—</div>
+        <div class="x">datasets that completed end-to-end and produced a score</div>
+      </div>
+      <div class="card">
+        <h3>Warnings</h3>
+        <div class="v" id="meaningWarningsCard">—</div>
+        <div class="x">datasets with at least one point outside the 95% band</div>
+      </div>
+      <div class="card">
+        <h3>Alerts</h3>
+        <div class="v" id="meaningAlertsCard">—</div>
+        <div class="x">datasets with at least one point outside the 3-σ band</div>
+      </div>
+    </div>
+    <p>
+      “Frozen deltas” means a run was hashed, written to a ledger, and locked as evidence.
+      Hashing proves the artifact did not change after generation; the ledger proves which run produced it.
+      A frozen delta is proof of process, not proof of agency approval.
+    </p>
+  </section>
+
+  <section>
+    <h2>Ship quality gate</h2>
+    <p>
+      Every published run now includes a dataset polish audit. The publish step can block shipping if any shipped dataset is below polished tier.
+      This keeps the evidence surface aligned with reviewer expectations instead of trusting manual checks.
+    </p>
+    <div class="grid" id="polishCards">
+      <div class="card">
+        <h3>Polish status</h3>
+        <div class="v" id="polishStatus">Loading…</div>
+        <div class="x" id="polishMeta">Waiting for dataset_polish_audit.json</div>
+      </div>
+      <div class="card">
+        <h3>Audit artifact</h3>
+        <div class="v" style="font-size: 18px;"><a id="polishLink" href="#" style="color: var(--accent-2);">Open dataset polish audit</a></div>
+        <div class="x">Run-level proof that shipped datasets meet polish criteria.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
     <h2>Headline</h2>
     <p id="verdict" style="font-size: 16px; color: var(--text);">Loading…</p>
     <p>
@@ -314,6 +371,17 @@
       <li>Same dataset is fed to every model — no per-model preprocessing tricks</li>
       <li>Raw CSVs hashed → manifest hashed → entry hashed → chained to prior entry</li>
     </ul>
+  </section>
+
+  <section>
+    <h2>Budget intuition</h2>
+    <p>
+      If you are asking what a package like this is “worth,” the answer depends on whether you mean delivery effort or funding leverage.
+      As a rough working model: $1,000 covers a narrow proof pack, $2,000 covers a cleaner reviewer pack, $5,000 covers a strong institutional packet, and $10,000 is where you can start expecting a polished, multi-artifact grant-ready evidence system.
+    </p>
+    <p>
+      That is not a market price for the datasets themselves. The real value comes from whether the pack answers reviewer questions faster, reduces ambiguity, and makes the claim reproducible.
+    </p>
   </section>
 
 </main>
@@ -399,6 +467,7 @@ function parseCSV(text) {
 }
 
 let SUMMARY = null, FAM_ROWS = [], MANIFEST = null, RUN_URL = "";
+let POLISH_AUDIT = null;
 
 async function load() {
   RUN_URL = await findLatestRun();
@@ -421,9 +490,11 @@ async function load() {
   MANIFEST = await manR.json();
 
   renderKPIs();
+  renderMeaning();
   renderFigs();
   renderTable();
-  renderChain();
+  await renderChain();
+  await renderPolish();
 }
 
 function renderKPIs() {
@@ -452,6 +523,40 @@ function renderKPIs() {
   }
   document.getElementById("kpis").innerHTML = html.join("");
   document.getElementById("verdict").textContent = SUMMARY.verdict || "";
+}
+
+function firstPresentNumber(source, keys) {
+  for (const key of keys) {
+    const val = source?.[key];
+    if (val != null && val !== "" && !Number.isNaN(Number(val))) {
+      return Number(val);
+    }
+  }
+  return null;
+}
+
+function renderMeaning() {
+  const runUtc = SUMMARY?.run_utc || "—";
+  const universe = firstPresentNumber(SUMMARY, ["n_datasets_in_universe", "datasets_in_universe", "universe_count"]);
+  const succeeded = firstPresentNumber(SUMMARY, ["n_datasets_succeeded", "datasets_succeeded", "succeeded_count"]);
+  const warnings = firstPresentNumber(SUMMARY, ["n_warning_datasets", "warning_datasets", "warnings", "warn_count"]);
+  const alerts = firstPresentNumber(SUMMARY, ["n_alert_datasets", "alert_datasets", "alerts", "alert_count"]);
+
+  const f = (n) => (n == null ? "—" : String(Math.round(n)));
+  const runEl = document.getElementById("meaningRunUtc");
+  const sEl = document.getElementById("meaningSucceeded");
+  const uEl = document.getElementById("meaningUniverse");
+  const sCardEl = document.getElementById("meaningSucceededCard");
+  const uCardEl = document.getElementById("meaningUniverseCard");
+  const wCardEl = document.getElementById("meaningWarningsCard");
+  const aCardEl = document.getElementById("meaningAlertsCard");
+  if (runEl) runEl.textContent = runUtc;
+  if (sEl) sEl.textContent = f(succeeded);
+  if (uEl) uEl.textContent = f(universe);
+  if (sCardEl) sCardEl.textContent = f(succeeded);
+  if (uCardEl) uCardEl.textContent = f(universe);
+  if (wCardEl) wCardEl.textContent = f(warnings);
+  if (aCardEl) aCardEl.textContent = f(alerts);
 }
 
 function renderFigs() {
@@ -524,7 +629,7 @@ async function renderChain() {
     "(see manifest.sha256.json)";
   // Try to fetch ledger
   try {
-    const r = await fetch(ACTIVE_"ledger.jsonl",
+    const r = await fetch("ledger.jsonl",
       { cache: "no-store" });
     if (r.ok) {
       const lines = (await r.text()).split(/\r?\n/).filter(Boolean);
@@ -546,6 +651,38 @@ async function renderChain() {
       }
     }
   } catch (e) {}
+}
+
+async function renderPolish() {
+  const statusEl = document.getElementById("polishStatus");
+  const metaEl = document.getElementById("polishMeta");
+  const linkEl = document.getElementById("polishLink");
+  if (!RUN_URL) {
+    statusEl.textContent = "No run";
+    metaEl.textContent = "Run URL not resolved";
+    return;
+  }
+  try {
+    const r = await fetch(RUN_URL + "/dataset_polish_audit.json", { cache: "no-store" });
+    if (!r.ok) {
+      statusEl.textContent = "Unavailable";
+      metaEl.textContent = "dataset_polish_audit.json not found for this run";
+      linkEl.removeAttribute("href");
+      return;
+    }
+    POLISH_AUDIT = await r.json();
+    const polished = Number(POLISH_AUDIT.polished_count || 0);
+    const total = Number(POLISH_AUDIT.datasets_shipped || 0);
+    const review = Number(POLISH_AUDIT.review_count || 0);
+    const incomplete = Number(POLISH_AUDIT.incomplete_count || 0);
+    statusEl.textContent = `${polished}/${total}`;
+    metaEl.textContent = `review: ${review} | incomplete: ${incomplete} | strict gate: ${POLISH_AUDIT.strict_polished_gate ? "on" : "off"}`;
+    linkEl.href = RUN_URL + "/dataset_polish_audit.md";
+  } catch (e) {
+    statusEl.textContent = "Error";
+    metaEl.textContent = "Failed to load polish audit: " + e.message;
+    linkEl.removeAttribute("href");
+  }
 }
 
 document.getElementById("verifyBtn").addEventListener("click", async () => {

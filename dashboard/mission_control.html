@@ -2819,12 +2819,44 @@ function parseOppNumFromGrantUrl(url) {
   }
 }
 
+function isInformationalGrantLanding(url) {
+  const target = String(url || '').trim();
+  if (!isHttpUrl(target)) return false;
+  let parsed;
+  try {
+    parsed = new URL(target);
+  } catch {
+    return false;
+  }
+  const host = parsed.hostname.toLowerCase();
+  const path = parsed.pathname.toLowerCase();
+
+  if (host.includes('grants.gov') || host.includes('simpler.grants.gov')) return false;
+  if (host.includes('helloskip.com') || host.includes('smartsimple')) return false;
+
+  if (host.includes('science.osti.gov') && /^\/sbir\/?$/.test(path)) return true;
+  if (host.includes('nist.gov') && /\/sbir\/?$/.test(path)) return true;
+  if (host.includes('seedfund.nsf.gov')) return true;
+  if (host.includes('sbir.nasa.gov')) return true;
+  if (host.includes('afwerx.com')) return true;
+  if (host.includes('arpa-e.energy.gov')) return true;
+  if (host.includes('techpartnerships.noaa.gov')) return true;
+
+  if ((path === '/' || path === '') && /(sbir|sttr|grant|funding|opportun)/i.test(target)) return true;
+  return false;
+}
+
 function buildGrantSubmitUrl(item) {
   const sourceUrl = String(item?.url || '').trim();
   const opp = normOpp(item?.opp_num || parseOppNumFromGrantUrl(sourceUrl) || '');
 
   const explicit = String(item?.submit_url || item?.portal_url || item?.submission_url || '').trim();
-  if (isHttpUrl(explicit)) return explicit;
+  if (isHttpUrl(explicit)) {
+    if (!isInformationalGrantLanding(explicit)) {
+      return explicit;
+    }
+    return buildGrantConsoleUrl(item, true);
+  }
 
   if (opp && grantSubmitUrlByOpp.has(opp)) {
     return String(grantSubmitUrlByOpp.get(opp) || '');
@@ -2847,7 +2879,12 @@ function buildGrantSubmitUrl(item) {
   }
 
   const src = String(item?.url || '').trim();
-  if (/^https?:\/\//i.test(src)) return src;
+  if (/^https?:\/\//i.test(src)) {
+    if (isInformationalGrantLanding(src)) {
+      return buildGrantConsoleUrl(item, true);
+    }
+    return src;
+  }
   return 'grants.html';
 }
 

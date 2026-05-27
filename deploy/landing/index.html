@@ -83,6 +83,13 @@
   footer .meta{margin-top:8px;font-size:12px;color:#5b6678}
   code{background:#0a0f17;border:1px solid var(--line);padding:1px 6px;border-radius:5px;font-size:13px}
   .tx{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:#a0c8ff;word-break:break-all}
+  .review-rail{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:20px}
+  .review-box{background:linear-gradient(180deg,#0a1119,#080d15);border:1px solid #20314a;border-radius:14px;padding:18px}
+  .review-box h4{margin:0 0 8px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc)}
+  .review-box p{margin:0;color:#b8c4d6;font-size:14px}
+  .review-box ul{margin:12px 0 0;padding-left:18px;color:#cdd6e3;font-size:14px}
+  .review-box li{margin:6px 0}
+  .review-box .mini{margin-top:12px;color:var(--mute);font-size:12px}
 </style>
 </head>
 <body>
@@ -111,6 +118,8 @@
       <a class="btn primary" href="#contact">Talk to the founder &rarr;</a>
       <a class="btn" href="#proof">See the evidence</a>
       <a class="btn" href="#stack">View the stack</a>
+      <a class="btn" href="/dashboard/evidence/index.html">Open evidence hub</a>
+      <a class="btn" href="/dashboard/mission_control.html">Open mission control</a>
     </div>
 
     <div class="grid">
@@ -133,6 +142,48 @@
         <h3>Build duration</h3>
         <div class="stat">12+<span class="unit">months solo</span></div>
         <div class="sub">Single founder, full stack</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reviewer-pack">
+    <div class="kicker">Institutional reviewer pack</div>
+    <h2>What a high-ranking reviewer expects, surfaced up front.</h2>
+    <p class="sec-lede">
+      This rail is designed to answer the first institutional questions without forcing a reviewer to hunt through folders, PDFs, or dashboards. It points straight at the evidence hub, the live submission ledger, and the operational control surface.
+    </p>
+    <div class="review-rail">
+      <div class="review-box">
+        <h4>Evidence chain</h4>
+        <p>Every major run should land in the evidence hub with a timestamped run directory, manifest, and summary.</p>
+        <ul>
+          <li><a href="/dashboard/evidence/index.html">Reviewer-friendly evidence hub</a></li>
+          <li><a href="/out/ops/grants_live_submission_ledger_latest.json">Live grants submission ledger</a></li>
+          <li><a href="/out/ops/grant_factory_reviewer_brief_latest.md">Reviewer brief</a></li>
+          <li><a href="/dashboard/mission_control.html">Mission control operations view</a></li>
+        </ul>
+        <div class="mini">Goal: one click from claim to proof.</div>
+      </div>
+      <div class="review-box">
+        <h4>Grant factory</h4>
+        <p>Keep submissions, receipts, and PDFs synchronized so no application exists only in someone’s memory.</p>
+        <ul>
+          <li>Grant receipts ingested from email into the ledger</li>
+          <li>Tracking IDs, agency numbers, and workspace IDs preserved</li>
+          <li>Submission packets preserved as review artifacts</li>
+        </ul>
+        <div class="mini">Goal: every submission can be reconstructed end to end.</div>
+      </div>
+      <div class="review-box">
+        <h4>Reviewer objections</h4>
+        <p>Pre-answer the things reviewers usually challenge: reproducibility, funding logic, evidence integrity, and operational readiness.</p>
+        <ul>
+          <li>What was measured?</li>
+          <li>How was it verified?</li>
+          <li>Where is the chain of custody?</li>
+          <li>Can the result be reproduced?</li>
+        </ul>
+        <div class="mini">Goal: remove ambiguity before the first read.</div>
       </div>
     </div>
   </section>
