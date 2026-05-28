@@ -1033,6 +1033,17 @@
       <div class="lbv-note" id="lbv-note">Loading cross-sector live breadth value chain...</div>
     </div>
 
+    <div class="panel col-12">
+      <h3>Live Rolling Opportunity and Stability</h3>
+      <div class="coh-grid">
+        <div class="coh-tile"><div class="k">Rolling Opportunity</div><div id="roll-opp-hourly" class="v">—</div></div>
+        <div class="coh-tile"><div class="k">Annualized Opportunity</div><div id="roll-opp-annual" class="v">—</div></div>
+        <div class="coh-tile"><div class="k">Stability Index</div><div id="roll-stability" class="v">—</div></div>
+        <div class="coh-tile"><div class="k">Runtime Truth</div><div id="roll-runtime" class="v">—</div></div>
+      </div>
+      <div class="vps-proof-note" id="roll-note">Loading rolling opportunity and stability metrics from live artifact chain...</div>
+    </div>
+
     <!-- Row 2: Evidence layers + Pipeline -->
     <div class="panel col-7">
       <h3>Evidence Layers · 7 Independent Proofs</h3>
@@ -1051,6 +1062,20 @@
         <span style="color: var(--neon-c)">$</span><span id="pipe-tap" style="color: var(--ink); font-weight: 700">—</span>
         <span> total addressable across federal programs</span>
       </div>
+    </div>
+
+    <div class="panel col-12">
+      <h3>Sports Alpha Elite Pane</h3>
+      <div class="coh-grid">
+        <div class="coh-tile"><div class="k">Candidates</div><div id="sports-candidate-count" class="v">—</div></div>
+        <div class="coh-tile"><div class="k">Elite Singles</div><div id="sports-elite-count" class="v">—</div></div>
+        <div class="coh-tile"><div class="k">Pick-6 Combos</div><div id="sports-pick6-count" class="v">—</div></div>
+        <div class="coh-tile"><div class="k">Bankroll Model</div><div id="sports-bankroll" class="v">—</div></div>
+      </div>
+      <div class="coh-toplist" id="sports-master"></div>
+      <div class="coh-toplist" id="sports-teaser" style="margin-top:8px"></div>
+      <div class="coh-toplist" id="sports-pick6" style="margin-top:8px"></div>
+      <div class="vps-proof-note" id="sports-note">Loading institutional sports Monte Carlo edge artifact...</div>
     </div>
 
     <div class="panel col-12">
@@ -1376,6 +1401,7 @@ const DEFAULT_RUN_UTC = '20260511T175644Z';
 const EXTERNAL_SUBMISSIONS_LEDGER_REL = 'ops/grants_live_submission_ledger_latest.json';
 const HEALTHCARE_POC_FORECAST_REL = 'ops/healthcare_grants_poc/healthcare_grants_poc_forecast_latest.json';
 const GRANT_SUBMIT_FIT_PACK_REL = 'ops/grant_submit_fit_pack/grant_submit_fit_pack_latest.json';
+const SPORTS_MONTE_CARLO_EDGE_REL = 'ops/sports_monte_carlo_edge/sports_monte_carlo_edge_latest.json';
 
 let localQueueCache = null;
 let localEvidenceCache = null;
@@ -2034,6 +2060,49 @@ function renderLiveBreadthPanel(panel, readinessPayload) {
   }
 }
 
+function renderRollingTruthStrip(panel, readinessPayload, summaryPayload, queuePayload) {
+  const headline = (panel && typeof panel === 'object' && panel.headline && typeof panel.headline === 'object')
+    ? panel.headline
+    : {};
+  const readinessPanel = (panel && typeof panel === 'object' && panel.metric_readiness && typeof panel.metric_readiness === 'object')
+    ? panel.metric_readiness
+    : {};
+  const readinessSummary = (readinessPayload && typeof readinessPayload === 'object' && readinessPayload.summary && typeof readinessPayload.summary === 'object')
+    ? readinessPayload.summary
+    : {};
+  const liveMetrics = (readinessSummary.provisional_live_metrics && typeof readinessSummary.provisional_live_metrics === 'object')
+    ? readinessSummary.provisional_live_metrics
+    : {};
+  const status = String(readinessSummary.status || readinessPanel.status || headline.performance_metrics_status || 'unknown');
+
+  const hourly = toFinite(headline.total_estimated_hourly_value_usd, 0);
+  const annual = toFinite(headline.total_estimated_annual_value_usd, 0);
+
+  const stabilityFromSummary = toFinite(liveMetrics.stability_progress_pct, NaN);
+  const stabilityFromPanel = toFinite(readinessPanel.stability_progress_pct, NaN);
+  const stabilityPct = Number.isFinite(stabilityFromSummary)
+    ? stabilityFromSummary
+    : (Number.isFinite(stabilityFromPanel) ? stabilityFromPanel : 0);
+
+  const mode = String((summaryPayload && summaryPayload.mode) || (readinessSummary.capital_and_risk_gate_evidence || {}).runtime_mode || 'unknown').toUpperCase();
+  const runState = String((summaryPayload && summaryPayload.status) || '').toLowerCase();
+  const running = runState === 'running';
+  const flags = (queuePayload && queuePayload.control_flags && typeof queuePayload.control_flags === 'object')
+    ? queuePayload.control_flags
+    : {};
+  const liveArm = !!flags.live_enabled;
+  const kill = !!flags.kill_switch;
+
+  $('roll-opp-hourly').textContent = fmtUsdCompact(hourly) + '/h';
+  $('roll-opp-annual').textContent = fmtUsdCompact(annual) + '/yr';
+  $('roll-stability').textContent = stabilityPct.toFixed(1) + '%';
+  $('roll-runtime').textContent = `${mode} · ${running ? 'RUNNING' : 'IDLE'} · ARM ${liveArm ? 'ON' : 'OFF'} · KILL ${kill ? 'ON' : 'OFF'}`;
+
+  const explain = String(readinessSummary.explanation || readinessPanel.explanation || '').trim();
+  $('roll-note').textContent =
+    `status ${status} | coverage ${toFinite(headline.measured_coverage_pct, 0).toFixed(2)}% (${Math.round(toFinite(headline.measured_sources, 0))}/${Math.round(toFinite(headline.enabled_sources, 0))}) | router ${toFinite(headline.router_edge_pct, 0).toFixed(2)}% | ${explain || 'live stability tracks institutional threshold progress from frozen delta evidence chain.'}`;
+}
+
 function toHref(path) {
   const raw = String(path || '').trim();
   if (!raw) return '';
@@ -2288,6 +2357,72 @@ function renderHealthcarePocDial(payload) {
   }
 }
 
+function renderSportsElitePanel(payload) {
+  const p = (payload && typeof payload === 'object') ? payload : {};
+  const master = (p.master_bet && typeof p.master_bet === 'object') ? p.master_bet : {};
+  const teaser = Array.isArray(p.public_teaser) ? p.public_teaser : [];
+  const pick6 = Array.isArray(p.pick6_elite) ? p.pick6_elite : [];
+
+  const eliteCount = Number.isFinite(Number(p.elite_count)) ? Number(p.elite_count) : 0;
+  const candidateCount = Number.isFinite(Number(p.candidate_count)) ? Number(p.candidate_count) : 0;
+  const pick6Count = Number.isFinite(Number(p.pick6_count)) ? Number(p.pick6_count) : 0;
+  const bankroll = Number.isFinite(Number(p.bankroll_usd)) ? Number(p.bankroll_usd) : 0;
+
+  const masterOdds = Number.isFinite(Number(master.odds_decimal)) ? Number(master.odds_decimal).toFixed(2) : '—';
+  const masterP = Number.isFinite(Number(master.p_est)) ? (Number(master.p_est) * 100).toFixed(1) + '%' : '—';
+  const masterEv = Number.isFinite(Number(master.ev_pct)) ? Number(master.ev_pct).toFixed(2) + '%' : '—';
+
+  $('sports-elite-count').textContent = String(eliteCount);
+  $('sports-candidate-count').textContent = String(candidateCount);
+  $('sports-pick6-count').textContent = String(pick6Count);
+  $('sports-bankroll').textContent = '$' + bankroll.toFixed(2);
+
+  $('sports-master').innerHTML = master && Object.keys(master).length
+    ? `
+      <div class="row">
+        <span class="domain">${escHTML(String(master.sport || 'SPORT'))}</span>
+        <span class="label">${escHTML(String(master.game || ''))}</span>
+        <span class="impact">odds ${escHTML(masterOdds)} · p ${escHTML(masterP)} · EV ${escHTML(masterEv)}</span>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <span class="domain">MASTER BET</span>
+        <span class="label">${escHTML(String(master.pick || ''))} · ${escHTML(String(master.market || ''))}</span>
+        <span class="impact">utility ${Number.isFinite(Number(master.single_utility)) ? Number(master.single_utility).toFixed(5) : '—'}</span>
+      </div>
+    `
+    : '<div class="empty">No master bet available yet.</div>';
+
+  $('sports-teaser').innerHTML = teaser.length
+    ? teaser.map((row, idx) => `
+      <div class="row">
+        <span class="domain">public #${idx + 3}</span>
+        <span class="label">${escHTML(String(row.pick || ''))} · ${escHTML(String(row.game || ''))}</span>
+        <span class="impact">odds ${Number.isFinite(Number(row.odds_decimal)) ? Number(row.odds_decimal).toFixed(2) : '—'}</span>
+      </div>
+    `).join('')
+    : '<div class="empty">Public teaser picks pending.</div>';
+
+  const topPick6 = pick6[0] || null;
+  $('sports-pick6').innerHTML = topPick6
+    ? `
+      <div class="row">
+        <span class="domain">hit probability</span>
+        <span class="label">${(Number(topPick6.p_hit || 0) * 100).toFixed(4)}%</span>
+        <span class="impact">x${Number(topPick6.payout_multiple || 0).toFixed(2)} payout</span>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <span class="domain">expected P/L</span>
+        <span class="label">$${Number(topPick6.expected_profit_usd || 0).toFixed(4)} @ $${Number(topPick6.stake_usd || 1).toFixed(2)}</span>
+        <span class="impact">score ${Number(topPick6.risk_adjusted_score || 0).toFixed(6)}</span>
+      </div>
+    `
+    : '<div class="empty">Pick-6 Monte Carlo combos not available.</div>';
+
+  const stamp = String(p.generated_utc || 'n/a');
+  $('sports-note').textContent =
+    'sports MC edge artifact · ' + stamp + ' · conservative shrink + risk-adjusted pick-6 ranking';
+}
+
 async function loadAll() {
   const [snap, summary, queue] = await Promise.all([
     api('/api/snapshot'),
@@ -2355,6 +2490,10 @@ async function loadAll() {
 
   const healthcarePocLatest = await fetchFirstJson([
     ...outCandidates(HEALTHCARE_POC_FORECAST_REL),
+  ]) || {};
+
+  const sportsMonteCarloEdge = await fetchFirstJson([
+    ...outCandidates(SPORTS_MONTE_CARLO_EDGE_REL),
   ]) || {};
 
   await loadGrantSubmitFitPack();
@@ -2715,6 +2854,7 @@ async function loadAll() {
   );
 
   renderHealthcarePocDial(healthcarePocLatest || {});
+  renderSportsElitePanel(sportsMonteCarloEdge || {});
 
   const cohScore = coh.coherence_score || {};
   const cohTrading = coh.trading_stack || {};
@@ -2753,6 +2893,7 @@ async function loadAll() {
   $('coh-note').textContent = cohBits.join(' | ');
 
   renderLiveBreadthPanel(liveBreadth, investorReadiness);
+  renderRollingTruthStrip(liveBreadth, investorReadiness, summary || {}, queue || {});
 
   const exec = (snap && typeof snap.execution === 'object') ? snap.execution : {};
   const guard = (exec.guardrails && typeof exec.guardrails === 'object') ? exec.guardrails : {};
