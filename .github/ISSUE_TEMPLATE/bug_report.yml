@@ -1,0 +1,68 @@
+name: Bug Report
+description: Something in the live system isn't behaving as expected
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a report. LumenCore is a live production system — the more specific you are, the faster it gets fixed.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area
+      description: Which part of the system is misbehaving?
+      options:
+        - lumen-core.ai portal / UI
+        - Kraken Execution Dashboard
+        - Evidence Ledger (hash chain)
+        - Mission Control Dashboard
+        - Agent Approval Hub
+        - API endpoint
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug. Include URLs, screenshots, or JSON responses where possible.
+      placeholder: "The evidence ledger showed a broken hash chain link on..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      placeholder: "I expected the hash chain to validate and the TXID to be green..."
+
+  - type: input
+    id: url
+    attributes:
+      label: URL (if applicable)
+      placeholder: "https://lumen-core.ai/evidence/"
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Low (cosmetic / minor)
+        - Medium (functional issue, workaround exists)
+        - High (core feature broken)
+        - Critical (live trading or evidence chain impacted)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I checked that the site is online at [lumen-core.ai](https://lumen-core.ai) before filing
+          required: true
+        - label: I refreshed the page (no-cache) before filing
+          required: true

@@ -1,0 +1,83 @@
+name: 🔄 Live Metrics Sync
+
+on:
+  schedule:
+    # Every 30 minutes — keep the repo reflecting a live, breathing system
+    - cron: '*/30 * * * *'
+  workflow_dispatch:   # allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  sync-metrics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch live metrics from lumen-core.ai
+        id: fetch
+        run: |
+          echo "Pulling live metrics from production endpoints..."
+
+          # Fetch the live status JSON from the VPS
+          LIVE_STATUS=$(curl -sf --max-time 10 https://lumen-core.ai/api/live_status.json 2>/dev/null || echo "null")
+          FEDERAL_BRIEF=$(curl -sf --max-time 10 https://lumen-core.ai/api/federal_brief.json 2>/dev/null || echo "null")
+          EVIDENCE_SUMMARY=$(curl -sf --max-time 10 https://lumen-core.ai/api/evidence_summary.json 2>/dev/null || echo "null")
+          EXECUTOR_HB=$(curl -sf --max-time 10 https://lumen-core.ai/api/executor_heartbeat.json 2>/dev/null || echo "null")
+
+          # Build the snapshot
+          SNAPSHOT_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          SITE_UP=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" https://lumen-core.ai/ || echo "000")
+
+          cat > data/live_snapshot.json << EOF
+          {
+            "snapshot_utc": "${SNAPSHOT_TS}",
+            "site_status": "${SITE_UP}",
+            "live_status": ${LIVE_STATUS},
+            "federal_brief": ${FEDERAL_BRIEF},
+            "evidence_summary": ${EVIDENCE_SUMMARY},
+            "executor_heartbeat": ${EXECUTOR_HB}
+          }
+          EOF
+
+          echo "site_status=${SITE_UP}" >> $GITHUB_OUTPUT
+          echo "snapshot_ts=${SNAPSHOT_TS}" >> $GITHUB_OUTPUT
+
+      - name: Write site health badge data
+        run: |
+          SITE_UP="${{ steps.fetch.outputs.site_status }}"
+          if [ "$SITE_UP" = "200" ]; then
+            STATUS_COLOR="brightgreen"
+            STATUS_MSG="online"
+          else
+            STATUS_COLOR="red"
+            STATUS_MSG="unreachable"
+          fi
+          cat > data/site_health_badge.json << EOF
+          {
+            "schemaVersion": 1,
+            "label": "lumen-core.ai",
+            "message": "${STATUS_MSG}",
+            "color": "${STATUS_COLOR}",
+            "cacheSeconds": 300
+          }
+          EOF
+
+      - name: Commit metrics snapshot
+        run: |
+          git config user.name  "lumencore-bot"
+          git config user.email "bot@lumen-core.ai"
+          git add data/live_snapshot.json data/site_health_badge.json
+          # Only commit if there are actual changes
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(metrics): live snapshot ${{ steps.fetch.outputs.snapshot_ts }}"
+            git push
+          else
+            echo "No changes — metrics unchanged since last run."
+          fi

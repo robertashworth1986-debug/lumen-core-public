@@ -83,8 +83,9 @@ AUDIT_PACK/
 # Deploy stage staging folder
 .deploy_stage/
 
-# Data mirror
+# Data mirror (exclude bulk data, but track live badge JSON for GitHub Actions)
 data/
+!data/*.json
 
 # Dashboard build/runtime artifacts
 dashboard/node_modules/

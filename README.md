@@ -1,14 +1,23 @@
+![LumenCore Banner](https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,50:00ffe7,100:7928ca&height=220&section=header&text=LumenCore%E2%84%A2&fontSize=72&fontColor=ffffff&fontAlignY=38&desc=Institutional%20AI%20%C2%B7%20Live%20Trading%20%C2%B7%20Patent%20Pending%20%C2%B7%20Built%20Solo%20from%20a%20Van&descSize=18&descAlignY=62&animation=fadeIn)
+
 # LumenCore™ — Built by One Person. For Three Kids.
 ### Robert Ashworth | Solo Engineer | No Funding | No Team | Just Drive
 
 > *"I live in my van. I code every waking hour. My kids are everything.  
 > One day they'll see what Dad was actually building out here."*
 
+<!-- LIVE SYSTEM STATUS — badges pull real-time data from the production VPS -->
+[![Site Status](https://img.shields.io/endpoint?url=https://lumen-core.ai/data/uptime_badge.json&cacheSeconds=60&style=for-the-badge)](https://lumen-core.ai)
+[![Live Metrics](https://img.shields.io/endpoint?url=https://lumen-core.ai/data/site_health_badge.json&cacheSeconds=60&style=flat-square)](https://lumen-core.ai)
 [![⭐ Star This Repo](https://img.shields.io/badge/%E2%AD%90-Star%20This%20Repo-gold?style=for-the-badge)](https://github.com/robertashworth1986-debug/lumen-core-public)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-lumen--core.ai-00ffe7?style=for-the-badge)](https://lumen-core.ai)
 [![Evidence](https://img.shields.io/badge/Hash--Chained%20Evidence-Live-brightgreen?style=for-the-badge)](https://lumen-core.ai/evidence/)
 [![Patent](https://img.shields.io/badge/Patent-Pending-orange?style=for-the-badge)](#intellectual-property)
 [![Sponsor](https://img.shields.io/badge/💛-Sponsor%20This%20Work-ff69b4?style=for-the-badge)](https://github.com/sponsors/robertashworth1986-debug)
+[![Health Probe](https://github.com/robertashworth1986-debug/lumen-core-public/actions/workflows/health-probe.yml/badge.svg)](https://github.com/robertashworth1986-debug/lumen-core-public/actions/workflows/health-probe.yml)
+[![Live Metrics Sync](https://github.com/robertashworth1986-debug/lumen-core-public/actions/workflows/live-metrics-sync.yml/badge.svg)](https://github.com/robertashworth1986-debug/lumen-core-public/actions/workflows/live-metrics-sync.yml)
+[![Last Commit](https://img.shields.io/github/last-commit/robertashworth1986-debug/lumen-core-public?style=flat-square&color=00ffe7&label=last%20update)](https://github.com/robertashworth1986-debug/lumen-core-public/commits/main)
+[![CHANGELOG](https://img.shields.io/badge/Changelog-View-blueviolet?style=flat-square)](CHANGELOG.md)
 
 ---
 
@@ -101,6 +110,9 @@ Fair. So here's what you can verify *right now*, without trusting anything I say
 | Government-level documentation | Federal brief, audit-ready proof packs, DOE SBIR alignment |
 | Patent filings | Non-provisional, attorney-reviewed IP across trading + hardware |
 | Scale of the codebase | 22,000+ Python files, 150+ build artifacts, 12+ months of commits |
+
+<!-- Live equity card — auto-regenerated every 20 minutes by GitHub Actions -->
+[![Live Equity Card](assets/equity_card.svg)](https://lumen-core.ai/kraken_execution_dashboard.html)
 
 I'm not asking you to take my word for it. I'm asking you to look.
 
@@ -201,6 +213,56 @@ Coined term: **Living Architecture™** — self-stabilizing harmonic intelligen
 
 ---
 
+## System Architecture
+
+```mermaid
+graph TB
+    subgraph INTEL ["🧠 LumenCore™ Intelligence Layer"]
+        direction LR
+        HB["Harmonic Backprop\nPhase-Lock AI\n(Patent Pending)"]
+        ALPHA["Multi-TF Alpha Map\n711 Pairs · 4 Timeframes\n1h / 4h / 1d / 1w"]
+        SECTOR["Cross-Sector Engine\nEnergy · Finance\nDefense · Healthcare"]
+        HB --> ALPHA --> SECTOR
+    end
+
+    subgraph EXEC ["⚡ LumaTrader™ Execution Layer"]
+        direction LR
+        SCAN["Symbol Scanner\n711+ Kraken Pairs"]
+        GATE["7-Layer Signal Gate\nEdge · Risk · Heat\nApproval · Cooldown"]
+        APPR["Agent Approval Hub\nHuman-in-Loop\nAuto-fire Daemon"]
+        ORDER["Kraken Exchange\nREST + WebSocket\nReal TXIDs"]
+        SCAN --> GATE --> APPR --> ORDER
+    end
+
+    subgraph PROOF ["🔐 Evidence & Ops Layer"]
+        direction LR
+        CHAIN["SHA-256 Hash Chain\nTamper-Evident\nExecution Ledger"]
+        DASH["Mission Control\nlumen-core.ai\nLive Dashboards"]
+        VPS["Oracle Cloud VPS\nnginx · systemd\nHTTPS"]
+        CHAIN --> DASH --> VPS
+    end
+
+    subgraph RISK ["🛡️ Risk Management"]
+        direction TB
+        HB2["Portfolio Heat Gate\nmax 35% exposure"]
+        DM["Deadman Switch\nAuto-halt on breach"]
+        WF["Walk-Forward\nValidator"]
+        HB2 --- DM --- WF
+    end
+
+    SECTOR -->|alpha signals| SCAN
+    ORDER -->|execution proof| CHAIN
+    GATE <-->|heat / exposure| RISK
+    DASH -.->|live data feed| PROOF
+
+    style INTEL fill:#0d1117,color:#00ffe7,stroke:#00ffe7
+    style EXEC fill:#0d1117,color:#7ee787,stroke:#7ee787
+    style PROOF fill:#0d1117,color:#f78166,stroke:#f78166
+    style RISK fill:#0d1117,color:#ffa657,stroke:#ffa657
+```
+
+---
+
 ## Technology Stack
 
 ```
@@ -295,3 +357,5 @@ Robert Ashworth · LumenCore · LumaTrader · algorithmic trading · quantitativ
 ---
 
 *Built: 2025–2026 | Status: LIVE | Team: 1 | Funding: $0 | Motivation: Everything*
+
+![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:7928ca,100:00ffe7&height=120&section=footer&text=lumen-core.ai%20%C2%B7%20Built%20for%20three%20kids&fontSize=16&fontColor=ffffff&fontAlignY=65)

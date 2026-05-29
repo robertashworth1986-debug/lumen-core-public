@@ -1,0 +1,11 @@
+{
+  "note": "This directory is auto-populated by GitHub Actions (health-probe.yml and live-metrics-sync.yml). Live data from lumen-core.ai is committed here every 15-30 minutes.",
+  "files": {
+    "site_health.json": "Endpoint health status for all lumen-core.ai routes",
+    "site_health_badge.json": "Shields.io endpoint badge data for site health",
+    "uptime_badge.json": "Shields.io endpoint badge — overall uptime summary",
+    "live_snapshot.json": "Live metrics snapshot pulled from production API",
+    "site_health_badge.json": "Badge data for the health probe workflow"
+  },
+  "last_action_run": "pending first workflow run"
+}

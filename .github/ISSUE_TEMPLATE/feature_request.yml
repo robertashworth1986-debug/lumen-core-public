@@ -1,0 +1,56 @@
+name: Feature Request / Collaboration Idea
+description: Suggest something for the platform, or propose a collaboration
+title: "[IDEA] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Got an idea? Whether it's a dashboard feature, a new sector for the intelligence engine, or a collaboration proposal — I want to hear it.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - New dashboard feature
+        - New sector / domain (energy, defense, healthcare, etc.)
+        - Algorithm / strategy improvement
+        - Evidence / proof chain enhancement
+        - Infrastructure / ops improvement
+        - Hardware R&D idea
+        - Collaboration / partnership proposal
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What's the idea?
+      description: Describe the feature or collaboration in as much detail as you'd like.
+      placeholder: "It would be powerful if the alpha globe could show sector-level heat overlays..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: value
+    attributes:
+      label: What value does it add?
+      description: Who benefits? What problem does it solve?
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Any thoughts on implementation?
+      description: Optional — but if you have a technical suggestion, include it here.
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: How important is this to you?
+      options:
+        - Nice to have
+        - Would actively use this
+        - This is critical for my use case
+        - I'm willing to help build it

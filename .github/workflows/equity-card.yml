@@ -1,0 +1,140 @@
+name: 📊 Generate Live Equity Card
+
+on:
+  schedule:
+    # Every 20 minutes — keep the equity card fresh
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-card:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch live executor data
+        id: data
+        run: |
+          # Try live heartbeat from VPS
+          HB=$(curl -sf --max-time 10 https://lumen-core.ai/api/executor_heartbeat.json 2>/dev/null || echo "{}")
+          BRIEF=$(curl -sf --max-time 10 https://lumen-core.ai/api/federal_brief.json 2>/dev/null || echo "{}")
+
+          # Parse fields with jq, fall back gracefully
+          EQUITY=$(echo "$HB"   | jq -r '.total_equity_usd_hint // "—"')
+          STATUS=$(echo "$HB"   | jq -r '.status // "unknown"')
+          REASON=$(echo "$HB"   | jq -r '.reason // ""')
+          POSITIONS=$(echo "$HB" | jq -r '.risk_open_positions_live // "—"')
+          HEAT=$(echo "$HB"     | jq -r 'if .risk_portfolio_heat_live then (.risk_portfolio_heat_live * 100 | floor | tostring) + "%" else "—" end')
+          HB_TS=$(echo "$HB"    | jq -r '.timestamp_utc // "—"')
+          EXEC_COUNT=$(echo "$BRIEF" | jq -r '.total_executions // "—"')
+
+          # Format equity as $X.XX
+          if [ "$EQUITY" != "—" ]; then
+            EQUITY=$(printf "$%.2f" "$EQUITY")
+          fi
+
+          echo "equity=${EQUITY}" >> $GITHUB_OUTPUT
+          echo "status=${STATUS}" >> $GITHUB_OUTPUT
+          echo "reason=${REASON}" >> $GITHUB_OUTPUT
+          echo "positions=${POSITIONS}" >> $GITHUB_OUTPUT
+          echo "heat=${HEAT}" >> $GITHUB_OUTPUT
+          echo "hb_ts=${HB_TS}" >> $GITHUB_OUTPUT
+          echo "exec_count=${EXEC_COUNT}" >> $GITHUB_OUTPUT
+          echo "gen_ts=$(date -u +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_OUTPUT
+
+      - name: Render equity SVG card
+        run: |
+          EQUITY="${{ steps.data.outputs.equity }}"
+          STATUS="${{ steps.data.outputs.status }}"
+          REASON="${{ steps.data.outputs.reason }}"
+          POSITIONS="${{ steps.data.outputs.positions }}"
+          HEAT="${{ steps.data.outputs.heat }}"
+          HB_TS="${{ steps.data.outputs.hb_ts }}"
+          EXEC_COUNT="${{ steps.data.outputs.exec_count }}"
+          GEN_TS="${{ steps.data.outputs.gen_ts }}"
+
+          # Status color
+          if [ "$STATUS" = "running" ]; then STATUS_COLOR="#00ffe7"; STATUS_DOT="#00ffe7"
+          elif [ "$STATUS" = "blocked" ]; then STATUS_COLOR="#ffa657"; STATUS_DOT="#ffa657"
+          else STATUS_COLOR="#8b949e"; STATUS_DOT="#8b949e"; fi
+
+          mkdir -p assets
+
+          cat > assets/equity_card.svg << SVGEOF
+          <svg width="600" height="200" viewBox="0 0 600 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#0d1117;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#161b22;stop-opacity:1" />
+              </linearGradient>
+              <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#00ffe7;stop-opacity:0.8" />
+                <stop offset="100%" style="stop-color:#7928ca;stop-opacity:0.8" />
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            <!-- Background -->
+            <rect width="600" height="200" rx="12" fill="url(#bg)" />
+            <rect width="600" height="3" rx="1.5" fill="url(#accent)" />
+
+            <!-- Status dot (animated) -->
+            <circle cx="28" cy="32" r="6" fill="${STATUS_DOT}" filter="url(#glow)">
+              <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+            </circle>
+
+            <!-- Title -->
+            <text x="46" y="37" font-family="'Segoe UI', system-ui, sans-serif" font-size="15" font-weight="700" fill="#ffffff">LumaTrader™ — Live Execution</text>
+            <text x="46" y="55" font-family="'Segoe UI', system-ui, sans-serif" font-size="11" fill="${STATUS_COLOR}">${STATUS}${REASON:+ · $REASON}</text>
+
+            <!-- Divider -->
+            <line x1="20" y1="70" x2="580" y2="70" stroke="#21262d" stroke-width="1"/>
+
+            <!-- Equity (main metric) -->
+            <text x="30" y="110" font-family="'Segoe UI', system-ui, sans-serif" font-size="11" fill="#8b949e">LIVE EQUITY</text>
+            <text x="30" y="142" font-family="'Segoe UI', system-ui, sans-serif" font-size="36" font-weight="800" fill="#00ffe7" filter="url(#glow)">${EQUITY}</text>
+
+            <!-- Stats grid -->
+            <text x="300" y="95" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#8b949e">OPEN POSITIONS</text>
+            <text x="300" y="115" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#ffffff">${POSITIONS}</text>
+
+            <text x="420" y="95" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#8b949e">PORTFOLIO HEAT</text>
+            <text x="420" y="115" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="${STATUS_COLOR}">${HEAT}</text>
+
+            <text x="300" y="148" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#8b949e">TOTAL EXECUTIONS</text>
+            <text x="300" y="168" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#7ee787">${EXEC_COUNT}</text>
+
+            <text x="420" y="148" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#8b949e">EXCHANGE</text>
+            <text x="420" y="168" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#ffffff">Kraken</text>
+
+            <!-- Footer -->
+            <line x1="20" y1="178" x2="580" y2="178" stroke="#21262d" stroke-width="1"/>
+            <text x="30" y="193" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#484f58">Updated: ${GEN_TS} · lumen-core.ai · Hash-chained proof at /evidence/</text>
+          </svg>
+          SVGEOF
+
+          echo "SVG card generated successfully."
+          head -5 assets/equity_card.svg
+
+      - name: Commit equity card
+        run: |
+          git config user.name  "lumencore-bot"
+          git config user.email "bot@lumen-core.ai"
+          git add assets/equity_card.svg
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(card): equity ${{ steps.data.outputs.equity }} · ${{ steps.data.outputs.positions }} positions · ${{ steps.data.outputs.gen_ts }}"
+            git push
+          else
+            echo "Card unchanged — no commit needed."
+          fi

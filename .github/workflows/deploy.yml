@@ -1,0 +1,62 @@
+name: 🚀 Deploy Dashboard to VPS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dashboard/**/*.html'
+      - 'assets/**'
+      - 'data/*.json'
+      - '*.html'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+
+      - name: Sync dashboard assets to VPS
+        run: |
+          # Sync HTML dashboards + data JSON to VPS web roots
+          rsync -avz --delete \
+            --exclude='*.py' \
+            --exclude='*.ps1' \
+            --exclude='.git/' \
+            --exclude='node_modules/' \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            dashboard/ \
+            opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/
+
+          # Sync data snapshots
+          rsync -avz \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            data/ \
+            opc@${{ secrets.VPS_HOST }}:/opt/lumencore/data/
+
+          echo "Dashboard deploy complete."
+
+      - name: Smoke test production endpoints
+        run: |
+          sleep 5  # let nginx settle
+          PORTAL=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" https://lumen-core.ai/ || echo "000")
+          DASH=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" https://lumen-core.ai/kraken_execution_dashboard.html || echo "000")
+          echo "Portal: $PORTAL | Kraken Dashboard: $DASH"
+          if [ "$PORTAL" != "200" ] || [ "$DASH" != "200" ]; then
+            echo "::error::Post-deploy smoke test failed — check VPS nginx"
+            exit 1
+          fi
+          echo "✅ All production endpoints responding after deploy."
