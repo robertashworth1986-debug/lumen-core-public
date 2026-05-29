@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  width:1280px;height:640px;overflow:hidden;
+  background:#030c18;
+  font-family:'Segoe UI',system-ui,sans-serif;
+  color:#fff;
+  display:flex;align-items:stretch;
+}
+
+/* left panel */
+.left{
+  flex:1;padding:56px 60px;display:flex;flex-direction:column;justify-content:space-between;
+  border-right:1px solid #0a2540;
+}
+.brand{
+  display:flex;flex-direction:column;gap:12px;
+}
+.logo-line{
+  display:flex;align-items:center;gap:14px;
+}
+.glyph{
+  width:48px;height:48px;border-radius:10px;
+  background:linear-gradient(135deg,#00ffe7,#0066ff);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:900;color:#000;
+}
+.logo-text{font-size:2rem;font-weight:900;letter-spacing:-.5px}
+.logo-text .tm{font-size:.9rem;vertical-align:super;color:#00ffe7}
+.tagline{font-size:1.05rem;color:#4a8ab0;line-height:1.4;max-width:480px}
+.tagline strong{color:#00ffe7}
+
+.story{
+  background:#050f20;border:1px solid #0a2540;border-radius:12px;padding:24px 28px;
+}
+.story p{
+  font-size:1.0rem;line-height:1.65;color:#c0d0e0;
+  font-style:italic;
+}
+.story .author{
+  margin-top:14px;font-size:.82rem;color:#4a8ab0;font-style:normal;font-weight:600;
+}
+
+.badges{display:flex;gap:10px;flex-wrap:wrap}
+.badge{
+  padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;
+  letter-spacing:.04em;
+}
+.b-live{background:#0a2d1a;color:#00ff88;border:1px solid #1a5a2a}
+.b-patent{background:#2d1a00;color:#ffd700;border:1px solid #5a3a00}
+.b-doe{background:#0a1a2d;color:#00aaff;border:1px solid #1a3a5a}
+.b-solo{background:#1a0a2d;color:#b066ff;border:1px solid #3a1a5a}
+
+/* right panel */
+.right{
+  width:400px;padding:40px 44px;display:flex;flex-direction:column;gap:18px;
+  background:#040e1c;
+}
+.right-title{
+  font-size:.72rem;color:#2a5070;text-transform:uppercase;letter-spacing:.1em;font-weight:700;
+  padding-bottom:10px;border-bottom:1px solid #0a2540;
+}
+.stat{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid #060f1e}
+.stat-label{font-size:.78rem;color:#4a7090}
+.stat-val{font-size:.88rem;font-weight:700;color:#00ffe7;text-align:right;max-width:200px}
+
+.url{
+  margin-top:auto;padding-top:20px;border-top:1px solid #0a2540;
+  font-size:.95rem;font-weight:700;color:#00ffe7;letter-spacing:-.02em;
+}
+.url .sub{font-size:.72rem;color:#2a5070;font-weight:400;display:block;margin-top:4px}
+
+/* decorative grid */
+.grid-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background-image:
+    linear-gradient(rgba(0,255,231,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,255,231,.03) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;
+}
+/* glow */
+.glow{
+  position:fixed;top:-200px;right:100px;width:500px;height:500px;
+  background:radial-gradient(circle,rgba(0,100,255,.12),transparent 70%);
+  pointer-events:none;
+}
+</style>
+</head>
+<body>
+<div class="grid-overlay"></div>
+<div class="glow"></div>
+
+<div class="left">
+  <div class="brand">
+    <div class="logo-line">
+      <div class="glyph">L</div>
+      <div class="logo-text">LumenCore<span class="tm">™</span></div>
+    </div>
+    <p class="tagline">
+      <strong>Institutional-grade quant AI, cross-sector intelligence,</strong> and autonomous trading — 
+      built by one person, with zero funding, living in a van.
+    </p>
+  </div>
+
+  <div class="story">
+    <p>"I live in my van. I code every waking hour. My kids are everything.<br>
+    One day they'll see what Dad was actually building out here."</p>
+    <div class="author">— Robert Ashworth, Founder &amp; Solo Engineer</div>
+  </div>
+
+  <div class="badges">
+    <span class="badge b-live">🟢 LIVE PRODUCTION</span>
+    <span class="badge b-patent">⚡ PATENT PENDING</span>
+    <span class="badge b-doe">🏛 DOE SBIR CANDIDATE</span>
+    <span class="badge b-solo">👤 SOLO BUILD</span>
+  </div>
+</div>
+
+<div class="right">
+  <div class="right-title">What Was Built ($0 Funding)</div>
+  <div class="stat">
+    <span class="stat-label">Platform</span>
+    <span class="stat-val">Institutional Algorithmic Trading System</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Exchange</span>
+    <span class="stat-val">Kraken — Real TXIDs, Verified</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Pairs Scanned</span>
+    <span class="stat-val">711+ (Multi-Timeframe)</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">AI Architecture</span>
+    <span class="stat-val">Harmonic Backpropagation (Patent Pending)</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Sectors</span>
+    <span class="stat-val">Finance · Energy · Defense · Healthcare</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Hardware IP</span>
+    <span class="stat-val">Curved PCBs · Honeycomb EV · Robot Design</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Codebase</span>
+    <span class="stat-val">22,000+ Python files · 12+ months</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Team Size</span>
+    <span class="stat-val" style="color:#ff9944">1</span>
+  </div>
+
+  <div class="url">
+    lumen-core.ai
+    <span class="sub">Live system · Hash-chained proof · Open source showcase</span>
+  </div>
+</div>
+
+</body>
+</html>
