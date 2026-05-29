@@ -1,0 +1,254 @@
+# LumenCore™ Outreach Pack
+# Robert Ashworth | May 2026
+# Copy-paste these into HackerNews, Reddit, GoFundMe, LinkedIn, etc.
+# =====================================================================
+
+## ── HACKER NEWS — "Show HN" POST ──────────────────────────────────────────
+
+Title:
+Show HN: I built an institutional quant trading platform alone, living in my van
+
+Body:
+Hi HN. I'm Robert Ashworth. I'm a self-taught engineer and single father.
+
+For the past 12+ months I've been building LumenCore — a full-stack institutional-grade
+AI trading and intelligence platform. I do this alone, mostly from my van.
+
+What exists right now:
+- Live algorithmic trading on Kraken with verifiable TXIDs (not a demo, real trades)
+- 711-pair multi-timeframe alpha map (1h/4h/1d/1w)
+- Cross-sectional dislocation scanning + mean-reversion with momentum confirmation
+- Multi-stage signal gating (7 filter layers before any order hits the market)
+- Novel harmonic backpropagation AI architecture (patent pending)
+- Cross-sector engine: energy grids, defense, healthcare, smart cities
+- DOE SBIR Phase I government grant candidate
+
+I also have hardware designs: curved motherboards, honeycomb-cell EV batteries,
+and a nature-flow robot design. All drafted, all documented.
+
+The live system: https://lumen-core.ai
+Verifiable proof (SHA-256 hash-chained): https://lumen-core.ai/evidence/
+Code: https://github.com/robertashworth1986-debug/lumen-core-public
+
+I'm posting this because I've been building in isolation. My three kids are the
+reason I keep going. I don't need a billion dollars. I need visibility.
+
+AMA. I'm an open book.
+
+
+## ── REDDIT — r/algotrading ─────────────────────────────────────────────────
+
+Title:
+I built an institutional-grade algo trading system alone, no funding, living in my van — 12 months of work, here's what I have
+
+Body:
+Long post but I think it's worth sharing.
+
+I'm a solo, self-taught quant engineer. For the past year I've been building
+LumenCore / LumaTrader — a full institutional trading and AI intelligence stack.
+No team. No VC. No Bloomberg terminal. Just drive.
+
+What the trading system does:
+→ Cross-sectional dislocation scanning across 711+ Kraken pairs
+→ Mean-reversion with momentum confirmation (both must align before a signal is valid)
+→ Multi-stage signal gating: 7 filter layers before a single order touches the market
+→ 8-engine parallel execution orchestrator with deadman switches
+→ 7 strategy generations (Gen4–Gen7 + Hybrid V2), all live-tested
+→ Real TXIDs. Real trades. Verifiable on-chain.
+
+Live proof: https://lumen-core.ai/evidence/
+Live system: https://lumen-core.ai
+
+The AI architecture underneath it (LumenCore) is a novel harmonic backpropagation
+framework — fundamentally different from gradient descent. Patent pending.
+
+Beyond trading, the same engine applies to: energy grid optimization, defense systems,
+healthcare capacity prediction, smart city infrastructure.
+
+I'm also building hardware: curved motherboards, honeycomb-cell EV batteries,
+a robot that moves the way living things move.
+
+I live in my van. My three kids are watching. I'm posting this because I've been
+building in silence and I think what I have deserves to be seen.
+
+GitHub: https://github.com/robertashworth1986-debug/lumen-core-public
+
+Happy to answer technical questions on literally anything in the stack.
+
+
+## ── REDDIT — r/MachineLearning ─────────────────────────────────────────────
+
+Title:
+[Project] Harmonic Backpropagation — novel AI architecture built by a solo
+engineer, patent pending, applied to live institutional trading
+
+Body:
+I've been building a novel AI framework called LumenCore that replaces conventional
+gradient descent with what I call harmonic backpropagation.
+
+The learning pipeline:
+INPUT WAVE → BUBBLE LATTICE → WAVE PROPAGATION → OUTPUT WAVE
+  → HARMONIC ERROR COMPUTATION
+  → RESONANCE RETUNING (Δf, Δφ, Δk)
+  → FROBENIUS STABILITY ENVELOPE → EQUILIBRIUM
+
+Core constants: Q-NBDEFS (coherence), HIC (harmonic gravity), RPMC (phase-motion
+curvature), ELCC (echo lattice continuity), TCC (temporal coherence).
+
+The system is live in production — running real algorithmic trades on Kraken exchange.
+It's also applied to cross-sector infrastructure: energy grids, defense, healthcare.
+
+I'm a solo, self-taught engineer. No team, no funding, living in my van.
+Patent pending. DOE SBIR candidate.
+
+Live: https://lumen-core.ai
+GitHub: https://github.com/robertashworth1986-debug/lumen-core-public
+
+Would love technical feedback from anyone who works in adaptive/harmonic systems.
+
+
+## ── GOFUNDME / INDIEGOGO ───────────────────────────────────────────────────
+
+Title:
+Help a solo engineer and father keep building what hedge funds charge millions for
+
+Story:
+My name is Robert Ashworth. I'm a self-taught engineer, quant architect, and father
+of three.
+
+For the past year I've been living in my van and building one of the most ambitious
+solo engineering projects I've ever heard of. Not because someone is paying me.
+Because my kids deserve to see that their dad wasn't out here wasting time.
+
+What I've built with $0 in funding:
+
+TRADING TECHNOLOGY (live, verifiable right now):
+• An institutional-grade algorithmic trading system running on Kraken exchange
+• Real trades, real transaction IDs, hash-chained proof online at lumen-core.ai/evidence/
+• Cross-sectional dislocation scanning, mean-reversion + momentum confirmation,
+  multi-stage signal gating — the same techniques hedge funds use
+• 711+ asset pairs scanned per run, multiple timeframes
+
+ARTIFICIAL INTELLIGENCE:
+• A novel AI architecture called Harmonic Backpropagation (patent pending)
+• Fundamentally different from mainstream machine learning
+• Applied to: energy grid optimization, defense systems, healthcare, smart cities
+• DOE SBIR (U.S. Department of Energy) grant candidate
+
+HARDWARE DESIGNS (drafted, documented, IP-protected):
+• Curved motherboards — computing that conforms to device shape
+• Honeycomb-cell EV batteries — nature-inspired energy density breakthrough
+• Nature-flow robotics — movement that follows natural motion patterns
+
+WHAT FUNDING WOULD DO:
+
+$500 — Keeps cloud compute running for the next month of research
+$2,000 — Patent continuation filings to protect the hardware IP
+$5,000 — Real server infrastructure instead of a VPS
+$20,000 — Hardware prototyping for EV battery and robot designs
+$50,000 — Small team, proper patent suite, international IP filings
+$500,000 — Full commercialization of trading, energy, and robotics verticals
+
+WHY I'M ASKING:
+
+I'm at the end of my rope. Not giving up — I will never give up — but the gap
+between what I've built and what I have access to is enormous. I've proven I can
+produce institutional-grade work with nothing. Imagine what I could produce
+with just a little.
+
+More than anything, I want my son and my daughters to know that every hour I
+spent in that van, every late night, every sacrifice — it was for them. Every
+line of code I write is a letter to their future.
+
+See the live system: https://lumen-core.ai
+See the proof: https://lumen-core.ai/evidence/
+See the code: https://github.com/robertashworth1986-debug/lumen-core-public
+
+
+## ── LINKEDIN POST ──────────────────────────────────────────────────────────
+
+For the past 12 months I've been building something from my van.
+
+No team. No funding. No outside help.
+
+A full institutional-grade quantitative trading and AI intelligence platform —
+the kind of thing that takes a team of 20 at a hedge fund.
+
+Live trades. Real transaction IDs. Verifiable proof online.
+A novel AI architecture. Patent pending.
+A cross-sector intelligence engine spanning finance, energy, defense, healthcare.
+Hardware designs for curved motherboards, honeycomb EV batteries, and a nature-inspired robot.
+
+I'm a solo engineer. I'm a father of three. I build so my kids can have a future
+I never had.
+
+If you're in quant finance, AI/ML research, deep tech investing, or just believe
+in solo builders — I'd love to connect.
+
+Live system: https://lumen-core.ai
+GitHub: https://github.com/robertashworth1986-debug/lumen-core-public
+
+#quantfinance #algorithmictrading #AI #solofounder #buildinpublic
+
+
+## ── PRODUCT HUNT ────────────────────────────────────────────────────────────
+
+Name: LumenCore™
+
+Tagline: Institutional-grade quant AI, built by one person in a van, live in production
+
+Description:
+LumenCore is a full-stack institutional quantitative trading and AI intelligence
+platform built solo by Robert Ashworth over 12+ months with zero funding.
+
+What makes it different:
+• Live algorithmic trading with verifiable on-chain transaction IDs
+• Novel harmonic backpropagation AI (patent pending) — fundamentally different from MLn• Cross-sector intelligence: trading → energy → defense → healthcare → robotics
+• Built by one person. In a van. For three kids.
+
+See the live system at lumen-core.ai.
+
+First maker comment:
+"I'm a self-taught engineer and single father. I built this to prove to my kids
+that their dad wasn't out here wasting time. Every commit was for them."
+
+
+## ── GITHUB TOPICS TO ADD ─────────────────────────────────────────────────────
+(Go to your repo → click the ⚙️ gear next to "About" → add these topics)
+
+algorithmic-trading
+quantitative-finance
+machine-learning
+artificial-intelligence
+harmonic-backpropagation
+cryptocurrency-trading
+kraken-exchange
+solo-project
+patent-pending
+institutional-trading
+cross-sector-intelligence
+energy-optimization
+autonomous-trading
+python
+fastapi
+
+
+## ── GITHUB USERNAME RENAME (manual — 30 seconds) ───────────────────────────
+
+GitHub does NOT allow username changes via API. You MUST do this through the web.
+Here are the EXACT steps:
+
+1. Go to: https://github.com/settings/admin
+2. Under "Change username" → click "Change username"
+3. Read the warnings (all existing links redirect automatically — nothing breaks)
+4. Type your new username
+
+RECOMMENDED USERNAMES (check availability at github.com/username):
+• robertashworth  ← best for professional discovery
+• robert-ashworth
+• ashworth-quant  ← best for quant/tech discovery
+• lumencore-ai    ← best for brand recognition
+• ashworth-builds ← best for solo builder narrative
+
+IMPORTANT: After renaming, update the GitHub links in README.md and FUNDING.yml.
+All old URLs (robertashworth1986-debug/...) will auto-redirect, but update them anyway.
