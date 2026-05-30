@@ -98,6 +98,9 @@ function Ensure-LiveExecutor {
         return
     }
 
+    # Clear stale duplicate-child marker so PID recycling can't false-block the executor.
+    $env:LUMA_LIVE_EXECUTOR_ROOT_PID = ""
+
     Push-Location $execDir
     try {
         Start-Process -FilePath $runtimePy -ArgumentList $executorArgs -WindowStyle Hidden | Out-Null

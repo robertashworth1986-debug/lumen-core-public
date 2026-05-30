@@ -10,10 +10,12 @@ from pathlib import Path
 
 import requests
 
-from execution.adaptive_regime_router import route_equity_signal
-
-
 ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+CODE = ROOT / "code"
+if str(CODE) not in sys.path:
+    sys.path.insert(0, str(CODE))
+
+from execution.adaptive_regime_router import route_equity_signal
 CONFIG = ROOT / "config"
 OUT = ROOT / "out"
 EXEC_OUT = OUT / "execution"

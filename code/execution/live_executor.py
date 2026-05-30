@@ -253,11 +253,9 @@ def _is_duplicate_child_executor() -> tuple[bool, int]:
     guard exits the child early to avoid lock/heartbeat races.
     """
 
+    # Only block when: env marker is set AND the marked PID is our parent AND that parent
+    # is actually still running live_executor.py (guards against PID recycling / stale markers).
     marker = str(os.environ.get("LUMA_LIVE_EXECUTOR_ROOT_PID", "") or "").strip()
-    parent_pid = os.getppid()
-    parent_cmd = _process_commandline(parent_pid).replace("\\", "/").lower()
-    if "code/execution/live_executor.py" in parent_cmd:
-        return True, int(parent_pid)
 
     if not marker:
         return False, 0
@@ -271,8 +269,15 @@ def _is_duplicate_child_executor() -> tuple[bool, int]:
         return False, 0
 
     pid = os.getpid()
-    if root_pid != pid and parent_pid == root_pid:
-        return True, int(root_pid)
+    if root_pid == pid:
+        return False, 0  # We are the root executor
+
+    parent_pid = os.getppid()
+    if parent_pid == root_pid:
+        # Verify the parent is actually live_executor.py and not a recycled PID.
+        root_cmd = _process_commandline(root_pid).replace("\\", "/").lower()
+        if "code/execution/live_executor.py" in root_cmd:
+            return True, int(root_pid)
     return False, 0
 
 
@@ -703,6 +708,12 @@ class KrakenClient:
             aliases.add("XBT")
         elif target == "XBT":
             aliases.add("BTC")
+        # Also include the canonical normalized form so that Kraken internal codes
+        # (e.g. XXDG for XDG/DOGE) resolve correctly when the target is the
+        # exchange-facing ticker rather than the canonical name.
+        target_canonical = self._normalize_balance_asset(target)
+        if target_canonical and target_canonical != target:
+            aliases.add(target_canonical)
 
         balances = self.get_account_balances(force_refresh=force_refresh)
         if not balances:
@@ -867,11 +878,15 @@ class KrakenClient:
             return {
                 "bid": float(t["b"][0]),
                 "ask": float(t["a"][0]),
+                "bid_qty": float(t["b"][1]) if len(t.get("b", [])) > 1 else 0.0,
+                "ask_qty": float(t["a"][1]) if len(t.get("a", [])) > 1 else 0.0,
                 "last": float(t["c"][0]),
+                "last_trade_qty": float(t["c"][1]) if len(t.get("c", [])) > 1 else 0.0,
                 "open": float(t.get("o", t["c"][0]) or 0.0),
                 "high_24h": _series_value("h", 1),
                 "low_24h": _series_value("l", 1),
                 "volume_24h": _series_value("v", 1),
+                "vwap_24h": _series_value("p", 1),
                 "trade_count_24h": int(_series_value("t", 1)),
                 "pair": key,
                 "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -1185,12 +1200,128 @@ class RobustLiveExecutor:
         self.hybrid_swing_position_weight = 0.75
         self.hybrid_swing_activity_weight = 0.15
         self.hybrid_swing_spread_penalty = 0.18
+        self.hybrid_swing_max_entry_range_position = 0.65  # hard cap: don't buy in top 35% of 24h range
         self.hybrid_swing_whitelist_relax_enabled = True
         self.hybrid_swing_min_candidates = 64
         self.hybrid_swing_relax_cap = 240
         self.hybrid_swing_long_bias_enabled = True
         self.hybrid_swing_long_bias_min_momentum_pct = 0.05
         self.hybrid_swing_long_bias_penalty_per_pct = 18.0
+        # ── INSTITUTIONAL SWING HUNTER / TRAILING STOP ENGINE ────────────────
+        self.trailing_stop_enabled = True
+        self.trailing_stop_activation_bps = 80.0    # arm trail once peak gain >= this (bps)
+        self.trailing_stop_trail_bps = 40.0         # trail this many bps below peak (locks in profit)
+        self.trailing_stop_dynamic_scaling = True   # widen activation on high-amplitude assets
+        self.trailing_stop_dynamic_multiplier = 0.08  # activation_bps += amplitude_pct * mult * 100
+        self._position_peaks: dict[str, float] = {}   # pos_key -> best price seen while position open
+        # ─────────────────────────────────────────────────────────────────────
+        # ── Velocity Reversal Exit ────────────────────────────────────────────
+        self._position_prev_price: dict[str, float] = {}  # pos_key -> price at start of last cycle
+        self.trailing_stop_vel_exit_enabled = True         # fast exit when momentum reverses sharply
+        self.trailing_stop_vel_exit_threshold_pct = 0.30  # single-cycle drop >= this triggers exit
+        # ── VWAP Entry Filter ─────────────────────────────────────────────────
+        self.hybrid_swing_vwap_filter_enabled = True
+        self.hybrid_swing_vwap_max_deviation_pct = 2.0    # only enter within 2% above VWAP
+        # ── Quarter-Kelly Position Sizing ─────────────────────────────────────
+        self.kelly_sizing_enabled = True
+        self.kelly_fraction = 0.25                        # 25% Kelly (quarter-Kelly)
+        self.kelly_min_sample_trades = 6                  # min confirmed trades before sizing boost
+        # ── Order Book Imbalance (OBI) Entry Filter ────────────────────────────
+        self.hybrid_swing_obi_filter_enabled = True       # require net buy pressure to enter
+        self.hybrid_swing_min_obi = 0.0                   # minimum OBI score (0 = any net bid pressure)
+        self.hybrid_swing_obi_weight = 1.0                # OBI contribution multiplier in hybrid score
+        # ── Volume Conviction Score ────────────────────────────────────────────
+        self.hybrid_swing_conviction_weight = 1.0         # conviction score multiplier in hybrid score
+        # ── Break-Even Ratchet ─────────────────────────────────────────────────
+        self.trailing_stop_breakeven_enabled = True        # floor trailing stop to entry once ratchet fires
+        self.trailing_stop_breakeven_ratchet_mult = 1.5   # peak gain must be >= activation × mult to ratchet
+        # ── Market Regime Filter ───────────────────────────────────────────────
+        self.hybrid_swing_regime_filter_enabled = True       # block entries in confirmed bear regime
+        self.hybrid_swing_regime_bear_momentum_pct = -1.0    # 24h momentum below this = bear regime
+        self.hybrid_swing_regime_bull_bonus = 5.0            # extra hybrid_score pts in confirmed bull regime
+        # ── Adaptive Post-Loss Cooldown ────────────────────────────────────────
+        self.adaptive_loss_cooldown_enabled = True          # scale up reentry cooldown on loss
+        self.adaptive_loss_cooldown_scale = 10.0            # loss_pct (decimal) * scale added to base multiplier
+        self.adaptive_loss_cooldown_cap_sec = 1800.0        # max cooldown cap (30 min)
+        # ─────────────────────────────────────────────────────────────────────
+
+        # ══════════════════════════════════════════════════════════════════════
+        # SELL LOGIC INNOVATIONS  (10-feature suite)
+        # ══════════════════════════════════════════════════════════════════════
+
+        # Innovation 1: Profit Lock ────────────────────────────────────────────
+        # Immediately close the position the instant PnL hits a hard profit target.
+        # Overrides trailing-stop logic so gains are guaranteed.
+        self.profit_lock_enabled = True
+        self.profit_lock_pct = 0.08            # close instantly at +8% PnL
+
+        # Innovation 2: Dead-Weight Purge ─────────────────────────────────────
+        # Positions that have been open too long without meaningful price movement
+        # are tying up heat uselessly.  Exit them to free capital.
+        self.dead_weight_purge_enabled = True
+        self.dead_weight_max_age_sec = 1800.0  # 30 min stale hold triggers purge
+        self.dead_weight_max_drift_pct = 0.005 # must have moved < 0.5% (either way)
+
+        # Innovation 3: Age-Tightened Trailing Stop ───────────────────────────
+        # The longer we hold, the tighter the trail becomes.  Prevents giving back
+        # hard-earned gains on slow, aging positions.
+        self.age_trail_tighten_enabled = True
+        self.age_trail_tighten_start_sec = 120.0  # begin tightening after 2 min
+        self.age_trail_tighten_rate = 0.005        # subtract 0.5% from trail per extra 60 sec of hold
+
+        # Innovation 4: Cascade Loss Guard ────────────────────────────────────
+        # When multiple positions are simultaneously underwater, exit the worst one
+        # before losses compound portfolio-wide.
+        self.cascade_guard_enabled = True
+        self.cascade_guard_min_positions = 3   # need >= 3 positions simultaneously underwater
+        self.cascade_guard_threshold_pct = 0.02  # positions must be down >= 2%
+
+        # Innovation 5: Short-Signal Force Exit Timer ─────────────────────────
+        # If the executor has been holding a bearish-flagged position (short_signal_forced_long)
+        # for > N seconds, force close the largest such position regardless of PnL.
+        self.short_signal_force_exit_enabled = True
+        self.short_signal_force_exit_sec = 600.0  # 10 min of bearish pressure = forced exit
+        self._short_signal_flagged_since_utc: dict[str, str] = {}  # pos_key -> first_flagged_utc
+
+        # Innovation 6: Velocity Reversal on Small Loss ───────────────────────
+        # Extend velocity-reversal exits to positions that are at a small loss AND
+        # price is dropping sharply — don't wait for stop-loss; cut early.
+        self.vel_exit_on_loss_enabled = True
+        self.vel_exit_on_loss_max_pnl_pct = -0.005   # fires when PnL <= -0.5%
+        self.vel_exit_on_loss_vel_threshold_pct = 0.50  # price must drop >= 0.5% in one cycle
+
+        # Innovation 7: Conviction-Tiered Take-Profit ─────────────────────────
+        # Positions entered with a lower gate score exit sooner (tighter TP).
+        # High-conviction positions (strong gate score) are allowed to run further.
+        self.conviction_tiered_tp_enabled = True
+        self.conviction_tiered_tp_low_score = 0.65     # gate scores below this get tighter TP
+        self.conviction_tiered_tp_low_tp_pct = 0.004   # low-conviction TP: +0.4%
+
+        # Innovation 8: Moonshot Slot Reserve ────────────────────────────────
+        # When a preferred symbol is queued and has been blocked by heat for
+        # >= N seconds, lower the exit threshold for the LOWEST-alpha current position
+        # so it exits faster and frees the slot.
+        self.moonshot_slot_reserve_enabled = True
+        self.moonshot_slot_reserve_blocked_sec = 120.0   # position has been heat-blocked for 2+ min
+        self.moonshot_slot_reserve_tp_override_pct = 0.002  # exit lowest-alpha at +0.2% to free slot
+        self._heat_blocked_since_utc: str = ""  # tracks when heat-block started
+
+        # Innovation 9: PnL Drawdown Accelerator ─────────────────────────────
+        # When position PnL drops from its intra-position peak by more than X%,
+        # close immediately even if trailing stop hasn't fired yet.
+        self.pnl_drawdown_accel_enabled = True
+        self.pnl_drawdown_accel_peak_drop_pct = 0.035   # exit if PnL drops 3.5% from its peak
+
+        # Innovation 10: Heat-Triggered Capital Recycle ───────────────────────
+        # THE KEY INNOVATION: when the buy is blocked by heat AND a preferred symbol
+        # is queued, score all open positions and exit the weakest one to free heat.
+        # Runs directly in the main cycle when risk check fails with heat reason.
+        self.heat_recycle_enabled = True
+        self.heat_recycle_min_hold_sec = 60.0     # don't recycle a position we just entered (1 min min)
+        self.heat_recycle_cooldown_sec = 45.0      # wait 45s between heat-recycle sells
+        self._heat_recycle_last_utc: str = ""      # last time heat-recycle fired
+        self._phantom_skip_symbols: dict = {}      # symbol → UTC when phantom-flagged (skip re-inject for 300s)
+        # ══════════════════════════════════════════════════════════════════════
         self.gate_override_enabled = False
         self.gate_override_min_confidence = 0.58
         self.gate_override_min_edge_bps = 7.5
@@ -2806,6 +2937,14 @@ class RobustLiveExecutor:
             0.0,
             2.0,
         )
+        self.hybrid_swing_max_entry_range_position = self._clamp(
+            self._to_float(
+                runtime.get("hybrid_swing_max_entry_range_position", self.hybrid_swing_max_entry_range_position),
+                self.hybrid_swing_max_entry_range_position,
+            ),
+            0.1,
+            1.0,
+        )
         self.hybrid_swing_whitelist_relax_enabled = bool(
             runtime.get("hybrid_swing_whitelist_relax_enabled", self.hybrid_swing_whitelist_relax_enabled)
         )
@@ -2845,6 +2984,180 @@ class RobustLiveExecutor:
             0.0,
             100.0,
         )
+        # ── Institutional Swing Hunter / Trailing Stop Engine ─────────────────
+        self.trailing_stop_enabled = bool(
+            runtime.get("trailing_stop_enabled", self.trailing_stop_enabled)
+        )
+        self.trailing_stop_activation_bps = self._clamp(
+            self._to_float(
+                runtime.get("trailing_stop_activation_bps", self.trailing_stop_activation_bps),
+                self.trailing_stop_activation_bps,
+            ),
+            10.0,
+            5000.0,
+        )
+        self.trailing_stop_trail_bps = self._clamp(
+            self._to_float(
+                runtime.get("trailing_stop_trail_bps", self.trailing_stop_trail_bps),
+                self.trailing_stop_trail_bps,
+            ),
+            5.0,
+            2000.0,
+        )
+        self.trailing_stop_dynamic_scaling = bool(
+            runtime.get("trailing_stop_dynamic_scaling", self.trailing_stop_dynamic_scaling)
+        )
+        self.trailing_stop_dynamic_multiplier = self._clamp(
+            self._to_float(
+                runtime.get("trailing_stop_dynamic_multiplier", self.trailing_stop_dynamic_multiplier),
+                self.trailing_stop_dynamic_multiplier,
+            ),
+            0.0,
+            2.0,
+        )
+        self.trailing_stop_vel_exit_enabled = bool(
+            runtime.get("trailing_stop_vel_exit_enabled", self.trailing_stop_vel_exit_enabled)
+        )
+        self.trailing_stop_vel_exit_threshold_pct = self._clamp(
+            self._to_float(
+                runtime.get("trailing_stop_vel_exit_threshold_pct", self.trailing_stop_vel_exit_threshold_pct),
+                self.trailing_stop_vel_exit_threshold_pct,
+            ),
+            0.05,
+            5.0,
+        )
+        self.hybrid_swing_vwap_filter_enabled = bool(
+            runtime.get("hybrid_swing_vwap_filter_enabled", self.hybrid_swing_vwap_filter_enabled)
+        )
+        self.hybrid_swing_vwap_max_deviation_pct = self._clamp(
+            self._to_float(
+                runtime.get("hybrid_swing_vwap_max_deviation_pct", self.hybrid_swing_vwap_max_deviation_pct),
+                self.hybrid_swing_vwap_max_deviation_pct,
+            ),
+            0.0,
+            20.0,
+        )
+        self.kelly_sizing_enabled = bool(
+            runtime.get("kelly_sizing_enabled", self.kelly_sizing_enabled)
+        )
+        self.kelly_fraction = self._clamp(
+            self._to_float(
+                runtime.get("kelly_fraction", self.kelly_fraction),
+                self.kelly_fraction,
+            ),
+            0.05,
+            1.0,
+        )
+        self.kelly_min_sample_trades = max(1, int(
+            self._to_float(
+                runtime.get("kelly_min_sample_trades", self.kelly_min_sample_trades),
+                self.kelly_min_sample_trades,
+            )
+        ))
+        # ── OBI + Conviction + Break-Even Ratchet hot-reload ──────────────────
+        self.hybrid_swing_obi_filter_enabled = bool(
+            runtime.get("hybrid_swing_obi_filter_enabled", self.hybrid_swing_obi_filter_enabled)
+        )
+        self.hybrid_swing_min_obi = self._clamp(
+            self._to_float(runtime.get("hybrid_swing_min_obi", self.hybrid_swing_min_obi), self.hybrid_swing_min_obi),
+            -1.0, 1.0,
+        )
+        self.hybrid_swing_obi_weight = self._clamp(
+            self._to_float(runtime.get("hybrid_swing_obi_weight", self.hybrid_swing_obi_weight), self.hybrid_swing_obi_weight),
+            0.0, 20.0,
+        )
+        self.hybrid_swing_conviction_weight = self._clamp(
+            self._to_float(runtime.get("hybrid_swing_conviction_weight", self.hybrid_swing_conviction_weight), self.hybrid_swing_conviction_weight),
+            0.0, 10.0,
+        )
+        self.trailing_stop_breakeven_enabled = bool(
+            runtime.get("trailing_stop_breakeven_enabled", self.trailing_stop_breakeven_enabled)
+        )
+        self.trailing_stop_breakeven_ratchet_mult = self._clamp(
+            self._to_float(runtime.get("trailing_stop_breakeven_ratchet_mult", self.trailing_stop_breakeven_ratchet_mult), self.trailing_stop_breakeven_ratchet_mult),
+            1.0, 5.0,
+        )
+        # ── Market Regime Filter hot-reload ───────────────────────────────────
+        self.hybrid_swing_regime_filter_enabled = bool(
+            runtime.get("hybrid_swing_regime_filter_enabled", self.hybrid_swing_regime_filter_enabled)
+        )
+        self.hybrid_swing_regime_bear_momentum_pct = self._clamp(
+            self._to_float(runtime.get("hybrid_swing_regime_bear_momentum_pct", self.hybrid_swing_regime_bear_momentum_pct), self.hybrid_swing_regime_bear_momentum_pct),
+            -20.0, 0.0,
+        )
+        self.hybrid_swing_regime_bull_bonus = self._clamp(
+            self._to_float(runtime.get("hybrid_swing_regime_bull_bonus", self.hybrid_swing_regime_bull_bonus), self.hybrid_swing_regime_bull_bonus),
+            0.0, 30.0,
+        )
+        # ── Adaptive Post-Loss Cooldown hot-reload ─────────────────────────────
+        self.adaptive_loss_cooldown_enabled = bool(
+            runtime.get("adaptive_loss_cooldown_enabled", self.adaptive_loss_cooldown_enabled)
+        )
+        self.adaptive_loss_cooldown_scale = self._clamp(
+            self._to_float(runtime.get("adaptive_loss_cooldown_scale", self.adaptive_loss_cooldown_scale), self.adaptive_loss_cooldown_scale),
+            0.0, 100.0,
+        )
+        self.adaptive_loss_cooldown_cap_sec = self._clamp(
+            self._to_float(runtime.get("adaptive_loss_cooldown_cap_sec", self.adaptive_loss_cooldown_cap_sec), self.adaptive_loss_cooldown_cap_sec),
+            0.0, 86400.0,
+        )
+        # ─────────────────────────────────────────────────────────────────────
+
+        # ══ Sell Logic Innovations hot-reload ═════════════════════════════════
+        # Innovation 1: Profit Lock
+        self.profit_lock_enabled = bool(runtime.get("profit_lock_enabled", self.profit_lock_enabled))
+        self.profit_lock_pct = self._clamp(
+            self._to_float(runtime.get("profit_lock_pct", self.profit_lock_pct), self.profit_lock_pct), 0.001, 2.0)
+        # Innovation 2: Dead-Weight Purge
+        self.dead_weight_purge_enabled = bool(runtime.get("dead_weight_purge_enabled", self.dead_weight_purge_enabled))
+        self.dead_weight_max_age_sec = self._clamp(
+            self._to_float(runtime.get("dead_weight_max_age_sec", self.dead_weight_max_age_sec), self.dead_weight_max_age_sec), 60.0, 86400.0)
+        self.dead_weight_max_drift_pct = self._clamp(
+            self._to_float(runtime.get("dead_weight_max_drift_pct", self.dead_weight_max_drift_pct), self.dead_weight_max_drift_pct), 0.0, 0.20)
+        # Innovation 3: Age-Tightened Trailing Stop
+        self.age_trail_tighten_enabled = bool(runtime.get("age_trail_tighten_enabled", self.age_trail_tighten_enabled))
+        self.age_trail_tighten_start_sec = self._clamp(
+            self._to_float(runtime.get("age_trail_tighten_start_sec", self.age_trail_tighten_start_sec), self.age_trail_tighten_start_sec), 30.0, 3600.0)
+        self.age_trail_tighten_rate = self._clamp(
+            self._to_float(runtime.get("age_trail_tighten_rate", self.age_trail_tighten_rate), self.age_trail_tighten_rate), 0.0, 0.05)
+        # Innovation 4: Cascade Loss Guard
+        self.cascade_guard_enabled = bool(runtime.get("cascade_guard_enabled", self.cascade_guard_enabled))
+        self.cascade_guard_min_positions = max(2, int(self._to_float(runtime.get("cascade_guard_min_positions", self.cascade_guard_min_positions), self.cascade_guard_min_positions)))
+        self.cascade_guard_threshold_pct = self._clamp(
+            self._to_float(runtime.get("cascade_guard_threshold_pct", self.cascade_guard_threshold_pct), self.cascade_guard_threshold_pct), 0.001, 0.50)
+        # Innovation 5: Short-Signal Force Exit Timer
+        self.short_signal_force_exit_enabled = bool(runtime.get("short_signal_force_exit_enabled", self.short_signal_force_exit_enabled))
+        self.short_signal_force_exit_sec = self._clamp(
+            self._to_float(runtime.get("short_signal_force_exit_sec", self.short_signal_force_exit_sec), self.short_signal_force_exit_sec), 30.0, 86400.0)
+        # Innovation 6: Velocity Reversal on Small Loss
+        self.vel_exit_on_loss_enabled = bool(runtime.get("vel_exit_on_loss_enabled", self.vel_exit_on_loss_enabled))
+        self.vel_exit_on_loss_max_pnl_pct = self._clamp(
+            self._to_float(runtime.get("vel_exit_on_loss_max_pnl_pct", self.vel_exit_on_loss_max_pnl_pct), self.vel_exit_on_loss_max_pnl_pct), -0.20, 0.0)
+        self.vel_exit_on_loss_vel_threshold_pct = self._clamp(
+            self._to_float(runtime.get("vel_exit_on_loss_vel_threshold_pct", self.vel_exit_on_loss_vel_threshold_pct), self.vel_exit_on_loss_vel_threshold_pct), 0.05, 10.0)
+        # Innovation 7: Conviction-Tiered Take-Profit
+        self.conviction_tiered_tp_enabled = bool(runtime.get("conviction_tiered_tp_enabled", self.conviction_tiered_tp_enabled))
+        self.conviction_tiered_tp_low_score = self._clamp(
+            self._to_float(runtime.get("conviction_tiered_tp_low_score", self.conviction_tiered_tp_low_score), self.conviction_tiered_tp_low_score), 0.0, 1.0)
+        self.conviction_tiered_tp_low_tp_pct = self._clamp(
+            self._to_float(runtime.get("conviction_tiered_tp_low_tp_pct", self.conviction_tiered_tp_low_tp_pct), self.conviction_tiered_tp_low_tp_pct), 0.0001, 0.20)
+        # Innovation 8: Moonshot Slot Reserve
+        self.moonshot_slot_reserve_enabled = bool(runtime.get("moonshot_slot_reserve_enabled", self.moonshot_slot_reserve_enabled))
+        self.moonshot_slot_reserve_blocked_sec = self._clamp(
+            self._to_float(runtime.get("moonshot_slot_reserve_blocked_sec", self.moonshot_slot_reserve_blocked_sec), self.moonshot_slot_reserve_blocked_sec), 10.0, 3600.0)
+        self.moonshot_slot_reserve_tp_override_pct = self._clamp(
+            self._to_float(runtime.get("moonshot_slot_reserve_tp_override_pct", self.moonshot_slot_reserve_tp_override_pct), self.moonshot_slot_reserve_tp_override_pct), 0.0, 0.10)
+        # Innovation 9: PnL Drawdown Accelerator
+        self.pnl_drawdown_accel_enabled = bool(runtime.get("pnl_drawdown_accel_enabled", self.pnl_drawdown_accel_enabled))
+        self.pnl_drawdown_accel_peak_drop_pct = self._clamp(
+            self._to_float(runtime.get("pnl_drawdown_accel_peak_drop_pct", self.pnl_drawdown_accel_peak_drop_pct), self.pnl_drawdown_accel_peak_drop_pct), 0.001, 0.50)
+        # Innovation 10: Heat-Triggered Capital Recycle
+        self.heat_recycle_enabled = bool(runtime.get("heat_recycle_enabled", self.heat_recycle_enabled))
+        self.heat_recycle_min_hold_sec = self._clamp(
+            self._to_float(runtime.get("heat_recycle_min_hold_sec", self.heat_recycle_min_hold_sec), self.heat_recycle_min_hold_sec), 0.0, 3600.0)
+        self.heat_recycle_cooldown_sec = self._clamp(
+            self._to_float(runtime.get("heat_recycle_cooldown_sec", self.heat_recycle_cooldown_sec), self.heat_recycle_cooldown_sec), 5.0, 3600.0)
+        # ══════════════════════════════════════════════════════════════════════
         self.live_operator_queue_enabled = bool(
             runtime.get("live_operator_queue_enabled", self.live_operator_queue_enabled)
         )
@@ -2885,6 +3198,11 @@ class RobustLiveExecutor:
                 "trade_count_24h": 0.0,
                 "long_bias_pass": False,
                 "long_bias_penalty_bps": 0.0,
+                "vwap_deviation_pct": 0.0,
+                "obi": 0.0,
+                "conviction_score": 0.0,
+                "regime_bull": False,
+                "regime_bear": False,
             }
 
         last_px = max(self._to_float(ticker.get("last", 0.0), 0.0), 0.0)
@@ -2892,6 +3210,10 @@ class RobustLiveExecutor:
         high_24h = max(self._to_float(ticker.get("high_24h", last_px), last_px), 0.0)
         low_24h = max(self._to_float(ticker.get("low_24h", last_px), last_px), 0.0)
         trade_count_24h = max(self._to_float(ticker.get("trade_count_24h", 0.0), 0.0), 0.0)
+        vwap_24h = max(self._to_float(ticker.get("vwap_24h", 0.0), 0.0), 0.0)
+        bid_qty = max(self._to_float(ticker.get("bid_qty", 0.0), 0.0), 0.0)
+        ask_qty = max(self._to_float(ticker.get("ask_qty", 0.0), 0.0), 0.0)
+        volume_24h = max(self._to_float(ticker.get("volume_24h", 0.0), 0.0), 0.0)
 
         if last_px <= 0.0 or low_24h <= 0.0:
             return {
@@ -2904,6 +3226,11 @@ class RobustLiveExecutor:
                 "trade_count_24h": trade_count_24h,
                 "long_bias_pass": False,
                 "long_bias_penalty_bps": 0.0,
+                "vwap_deviation_pct": 0.0,
+                "obi": 0.0,
+                "conviction_score": 0.0,
+                "regime_bull": False,
+                "regime_bear": False,
             }
 
         high_24h = max(high_24h, low_24h)
@@ -2912,6 +3239,34 @@ class RobustLiveExecutor:
         momentum_pct = ((last_px - open_px) / max(open_px, 1e-9)) * 100.0 if open_px > 0.0 else 0.0
         position_in_range = max(min((last_px - low_24h) / range_span, 1.0), 0.0)
         activity_score = max(min(math.log10(trade_count_24h + 1.0) / 4.5, 1.0), 0.0)
+
+        # ── Order Book Imbalance (OBI) — microstructure buy/sell pressure ─────
+        # OBI ∈ [-1, +1]: +1 = pure bid pressure, -1 = pure ask pressure
+        _obi_total = bid_qty + ask_qty
+        obi = (bid_qty - ask_qty) / max(_obi_total, 1e-9) if _obi_total > 0.0 else 0.0
+        obi_filter_pass = (
+            not self.hybrid_swing_obi_filter_enabled
+            or _obi_total <= 0.0   # skip filter if qty data unavailable
+            or obi >= float(self.hybrid_swing_min_obi)
+        )
+        # ── Volume Conviction Score — per-trade institutional size proxy ───────
+        # avg_trade_size_usd: larger = more institutional activity per trade
+        # Log-normalize: [10 USD .. 10M USD] → [0.0 .. 1.0]
+        avg_trade_usd = (volume_24h * last_px) / max(trade_count_24h, 1.0)
+        conviction_score = max(min((math.log10(max(avg_trade_usd, 1.0)) - 1.0) / 6.0, 1.0), 0.0)
+
+        # ── Market Regime Filter ──────────────────────────────────────────────
+        # Uses 24h price structure (no external data needed)
+        # Bull: price above 24h midpoint AND positive session momentum
+        # Bear: price below 24h midpoint AND momentum below bear threshold
+        _mid_24h = (high_24h + low_24h) / 2.0
+        _regime_bull = bool(last_px >= _mid_24h and momentum_pct >= 0.0)
+        _regime_bear = bool(last_px < _mid_24h and momentum_pct < float(self.hybrid_swing_regime_bear_momentum_pct))
+        regime_filter_pass = (
+            not self.hybrid_swing_regime_filter_enabled
+            or not _regime_bear
+        )
+        _regime_bull_bonus = float(self.hybrid_swing_regime_bull_bonus) if _regime_bull else 0.0
 
         long_bias_enabled = bool(self.hybrid_swing_long_bias_enabled and (not self.spot_short_enabled))
         momentum_deficit = (
@@ -2922,19 +3277,36 @@ class RobustLiveExecutor:
         long_bias_penalty_bps = momentum_deficit * float(self.hybrid_swing_long_bias_penalty_per_pct)
         long_bias_pass = (not long_bias_enabled) or momentum_deficit <= 0.0
 
+        # ── VWAP institutional entry filter ────────────────────────────────────
+        vwap_deviation_pct = 0.0
+        vwap_filter_pass = True
+        if vwap_24h > 0.0 and self.hybrid_swing_vwap_filter_enabled:
+            vwap_deviation_pct = ((last_px - vwap_24h) / vwap_24h) * 100.0
+            vwap_filter_pass = vwap_deviation_pct <= float(self.hybrid_swing_vwap_max_deviation_pct)
+
         eligible = bool(
             spread_bps <= float(self.hybrid_swing_spread_guard_bps)
             and range_pct >= float(self.hybrid_swing_min_range_pct)
             and momentum_pct >= float(self.hybrid_swing_min_momentum_pct)
+            and position_in_range <= float(self.hybrid_swing_max_entry_range_position)  # don't buy in top of range
             and long_bias_pass
+            and vwap_filter_pass   # institutional: only enter near/below VWAP
+            and obi_filter_pass    # microstructure: only enter when bid pressure >= ask pressure
+            and regime_filter_pass # macro: block entries in confirmed bear regime
         )
+        # VWAP score penalty: decays the more price overshoots VWAP above tolerance
+        vwap_score_adj = -max(vwap_deviation_pct, 0.0) * 2.0 if vwap_24h > 0.0 else 0.0
         hybrid_score = (
             (range_pct * float(self.hybrid_swing_range_weight))
             + (momentum_pct * float(self.hybrid_swing_momentum_weight))
-            + ((position_in_range * 10.0) * float(self.hybrid_swing_position_weight))
+            + (((1.0 - position_in_range) * 10.0) * float(self.hybrid_swing_position_weight))  # inverted: reward buying near LOW of range
             + ((activity_score * 10.0) * float(self.hybrid_swing_activity_weight))
             - (spread_bps * float(self.hybrid_swing_spread_penalty))
             - float(long_bias_penalty_bps)
+            + vwap_score_adj
+            + (obi * 3.0 * float(self.hybrid_swing_obi_weight))          # +3 pts at max bid pressure
+            + (conviction_score * 5.0 * float(self.hybrid_swing_conviction_weight))  # +5 pts at max institutional conviction
+            + _regime_bull_bonus               # +bull_bonus pts in confirmed bull regime
         )
 
         return {
@@ -2947,6 +3319,11 @@ class RobustLiveExecutor:
             "trade_count_24h": float(trade_count_24h),
             "long_bias_pass": bool(long_bias_pass),
             "long_bias_penalty_bps": float(long_bias_penalty_bps),
+            "vwap_deviation_pct": float(vwap_deviation_pct),
+            "obi": float(obi),
+            "conviction_score": float(conviction_score),
+            "regime_bull": _regime_bull,
+            "regime_bear": _regime_bear,
         }
 
     def _load_symbol_flip_intel_payload(self) -> dict[str, Any]:
@@ -4632,6 +5009,25 @@ class RobustLiveExecutor:
             min_floor = min(float(self.compounding_min_notional_usd), bankroll)
             cap = max(cap, min_floor)
 
+        # ── Quarter-Kelly adaptive sizing ──────────────────────────────────────
+        # Boosts position cap when recent win rate confirms strong edge.
+        # Floor at 1.0× ensures this never shrinks cap (drawdown_throttle + fail_throttle cover downside).
+        _kelly_cap_mult = 1.0
+        try:
+            _eq = dict(self._edge_proof_cache or {})
+            _n_trades = int(_eq.get("recent_closed_count", 0) or 0)
+            if _n_trades >= int(self.kelly_min_sample_trades) and bool(self.kelly_sizing_enabled):
+                _wr = self._clamp(self._to_float(_eq.get("win_rate_pct", 50.0), 50.0) / 100.0, 0.0, 1.0)
+                _f_star = max(2.0 * _wr - 1.0, 0.0)  # simplified Kelly for binary outcomes
+                _kelly_cap_mult = self._clamp(
+                    1.0 + _f_star * float(self.kelly_fraction),
+                    1.0,   # never shrinks cap — drawdown_throttle / fail_throttle handle downside
+                    1.40,  # max 40% size boost on confirmed high win-rate edge
+                )
+        except Exception:
+            pass
+        cap = max(cap * _kelly_cap_mult, 0.0)
+
         meta = {
             "compounding_enabled": bool(self.profit_reinvestment_enabled),
             "compounding_multiplier": round(float(multiplier), 6),
@@ -4642,6 +5038,7 @@ class RobustLiveExecutor:
             "compounding_drawdown_throttle": round(float(drawdown_throttle), 6),
             "compounding_fail_throttle": round(float(fail_throttle), 6),
             "compounding_quality_boost": round(float(quality_boost), 6),
+            "kelly_fraction_multiplier": round(float(_kelly_cap_mult), 6),
         }
         return float(cap), meta
 
@@ -4665,6 +5062,262 @@ class RobustLiveExecutor:
             return (entry - float(last)) / entry
         return (float(last) - entry) / entry
 
+    # ── Innovation 4: Cascade Loss Guard ──────────────────────────────────────
+    def _cascade_guard_check(self, now: datetime) -> bool:
+        """
+        When >= cascade_guard_min_positions are simultaneously underwater by >= threshold,
+        exit the worst-performing one immediately to prevent correlated portfolio bleed.
+        Returns True if a position was closed.
+        """
+        if not self.cascade_guard_enabled:
+            return False
+        try:
+            open_positions = self.portfolio.get_open_positions()
+            threshold = float(self.cascade_guard_threshold_pct)
+            underwater: list[tuple[float, Any, str, float]] = []  # (pnl_pct, pos, base, last)
+            for pos in open_positions:
+                base = str(getattr(pos, "symbol", "") or "").split("/")[0].upper().strip()
+                if not base:
+                    continue
+                ticker = self.router.get_ticker(base)
+                if not isinstance(ticker, dict):
+                    continue
+                last = self._to_float(ticker.get("last", 0.0), 0.0)
+                if last <= 0.0:
+                    continue
+                pnl = self._position_pnl_pct(pos, last)
+                if pnl <= -threshold:
+                    underwater.append((pnl, pos, base, last))
+            if len(underwater) < int(self.cascade_guard_min_positions):
+                return False
+            # Sort: worst PnL first
+            underwater.sort(key=lambda x: x[0])
+            worst_pnl, worst_pos, worst_base, worst_last = underwater[0]
+            close_qty, _, _ = self._resolve_close_qty_for_spot(worst_base, float(worst_pos.qty), "sell")
+            if close_qty <= 0.0:
+                return False
+            if float(close_qty) * float(worst_last) < 9.5:  # below Kraken minimum notional
+                return False
+            order = self.router.place_order(worst_base, "sell", close_qty)
+            if not isinstance(order, dict) or not order.get("txid"):
+                return False
+            txid = str(order.get("txid", ""))
+            self.portfolio.close_position(str(worst_pos.symbol), worst_last, now.isoformat())
+            _pos_key = str(worst_pos.order_id) if str(worst_pos.order_id) else f"{worst_pos.symbol}|{worst_pos.entry_time_utc}"
+            self._position_peaks.pop(_pos_key, None)
+            self._position_prev_price.pop(_pos_key, None)
+            self.audit_chain.append("cascade_guard_exit", {
+                "symbol": worst_base, "txid": txid,
+                "pnl_pct": round(worst_pnl * 100.0, 4),
+                "underwater_count": len(underwater),
+            })
+            return True
+        except Exception as exc:
+            self.audit_chain.append("cascade_guard_error", {"error": str(exc)})
+            return False
+
+    # ── Innovation 5: Short-Signal Force Exit Timer ────────────────────────────
+    def _short_signal_force_exit_check(self, now: datetime) -> bool:
+        """
+        If the executor has been flagged short_signal_forced_long for longer than
+        short_signal_force_exit_sec, find the largest-valued position that is
+        currently bearish (based on 24h momentum) and force-close it.
+        Returns True if a position was closed.
+        """
+        if not self.short_signal_force_exit_enabled:
+            return False
+        try:
+            open_positions = self.portfolio.get_open_positions()
+            if not open_positions:
+                return False
+            threshold_sec = float(self.short_signal_force_exit_sec)
+            best_candidate = None
+            best_value = 0.0
+            for pos in open_positions:
+                base = str(getattr(pos, "symbol", "") or "").split("/")[0].upper().strip()
+                if not base:
+                    continue
+                ticker = self.router.get_ticker(base)
+                if not isinstance(ticker, dict):
+                    continue
+                last = self._to_float(ticker.get("last", 0.0), 0.0)
+                if last <= 0.0:
+                    continue
+                # Check for bearish signal via negative 24h momentum
+                r24 = self._to_float(ticker.get("change_pct_24h", ticker.get("vwap", 0.0)), 0.0)
+                # Use absolute value of qty for value calc; only consider negative momentum
+                value_usd = abs(float(pos.qty)) * last
+                _pos_key = str(pos.order_id) if str(pos.order_id) else f"{pos.symbol}|{pos.entry_time_utc}"
+                # Track when bearish signal was first detected
+                if r24 < 0.0:
+                    if _pos_key not in self._short_signal_flagged_since_utc:
+                        self._short_signal_flagged_since_utc[_pos_key] = now.isoformat()
+                    try:
+                        flagged_dt = self._parse_iso_utc(self._short_signal_flagged_since_utc[_pos_key])
+                        flagged_dur = (now - flagged_dt).total_seconds()
+                    except Exception:
+                        flagged_dur = 0.0
+                    if flagged_dur >= threshold_sec and value_usd > best_value:
+                        best_value = value_usd
+                        best_candidate = (pos, base, last)
+                else:
+                    # Signal cleared — reset timer
+                    self._short_signal_flagged_since_utc.pop(_pos_key, None)
+            if best_candidate is None:
+                return False
+            worst_pos, worst_base, worst_last = best_candidate
+            close_qty, _, _ = self._resolve_close_qty_for_spot(worst_base, float(worst_pos.qty), "sell")
+            if close_qty <= 0.0:
+                return False
+            if float(close_qty) * float(worst_last) < 9.5:  # below Kraken minimum notional
+                return False
+            order = self.router.place_order(worst_base, "sell", close_qty)
+            if not isinstance(order, dict) or not order.get("txid"):
+                return False
+            txid = str(order.get("txid", ""))
+            pnl = self._position_pnl_pct(worst_pos, worst_last)
+            self.portfolio.close_position(str(worst_pos.symbol), worst_last, now.isoformat())
+            _pos_key2 = str(worst_pos.order_id) if str(worst_pos.order_id) else f"{worst_pos.symbol}|{worst_pos.entry_time_utc}"
+            self._position_peaks.pop(_pos_key2, None)
+            self._position_prev_price.pop(_pos_key2, None)
+            self._short_signal_flagged_since_utc.pop(_pos_key2, None)
+            self.audit_chain.append("short_signal_force_exit", {
+                "symbol": worst_base, "txid": txid,
+                "pnl_pct": round(pnl * 100.0, 4),
+                "forced_hold_sec": round(float(self.short_signal_force_exit_sec), 1),
+            })
+            return True
+        except Exception as exc:
+            self.audit_chain.append("short_signal_force_exit_error", {"error": str(exc)})
+            return False
+
+    # ── Innovation 10: Heat-Triggered Capital Recycle ──────────────────────────
+    def _heat_recycle_attempt(self, now: datetime, preferred_symbol: str = "") -> bool:
+        """
+        When a buy is blocked purely by heat AND a preferred symbol is queued,
+        score all open positions and sell the weakest one to reduce heat.
+        Scores by: PnL% contribution + hold time bonus — lowest score exits first.
+        Respects a minimum hold time and cooldown to prevent thrashing.
+        Returns True if a position was closed.
+        """
+        if not self.heat_recycle_enabled:
+            return False
+        # Cooldown guard
+        if self._heat_recycle_last_utc:
+            try:
+                _last_dt = self._parse_iso_utc(self._heat_recycle_last_utc)
+                if (now - _last_dt).total_seconds() < float(self.heat_recycle_cooldown_sec):
+                    return False
+            except Exception:
+                pass
+        try:
+            open_positions = self.portfolio.get_open_positions()
+            if not open_positions:
+                return False
+            min_hold = float(self.heat_recycle_min_hold_sec)
+            worst: Optional[dict] = None
+            for pos in open_positions:
+                base = str(getattr(pos, "symbol", "") or "").split("/")[0].upper().strip()
+                if not base:
+                    continue
+                # Don't recycle the preferred symbol itself
+                if base == str(preferred_symbol or "").upper().strip():
+                    continue
+                ticker = self.router.get_ticker(base)
+                if not isinstance(ticker, dict):
+                    continue
+                last = self._to_float(ticker.get("last", 0.0), 0.0)
+                if last <= 0.0:
+                    continue
+                try:
+                    entry_dt = self._parse_iso_utc(pos.entry_time_utc)
+                    hold_sec = max((now - entry_dt).total_seconds(), 0.0)
+                except Exception:
+                    hold_sec = min_hold + 1.0
+                if hold_sec < min_hold:
+                    continue
+                pnl_pct = self._position_pnl_pct(pos, last)
+                notional_usd = abs(float(pos.qty)) * last
+                # Score: high PnL + long hold = KEEP.  Low PnL + big notional = RECYCLE.
+                # Lowest score = first to recycle.
+                score = (pnl_pct * 200.0) + (hold_sec / 300.0) - (notional_usd / 50.0)
+                if worst is None or score < float(worst["score"]):
+                    worst = {
+                        "pos": pos, "base": base, "last": last,
+                        "hold_sec": hold_sec, "pnl_pct": pnl_pct,
+                        "notional_usd": notional_usd, "score": score,
+                    }
+            if worst is None:
+                self.audit_chain.append("heat_recycle_no_candidate", {"min_hold_sec": float(self.heat_recycle_min_hold_sec), "positions_checked": len(open_positions)})
+                return False
+            pos = worst["pos"]
+            base = worst["base"]
+            last_px = worst["last"]
+            close_qty, avail_qty, bal_err = self._resolve_close_qty_for_spot(base, float(pos.qty), "sell")
+            if close_qty <= 0.0:
+                # Balance not available — try raw qty from position record directly
+                raw_qty = float(pos.qty)
+                if raw_qty * float(last_px) >= 9.5:
+                    close_qty = raw_qty
+                else:
+                    self.audit_chain.append("heat_recycle_skip_qty", {"symbol": base, "avail_qty": float(avail_qty), "raw_qty": raw_qty, "bal_err": str(bal_err)})
+                    return False
+            if float(close_qty) * float(last_px) < 9.5:  # below Kraken minimum notional
+                self.audit_chain.append("heat_recycle_skip_notional", {"symbol": base, "notional_usd": round(float(close_qty) * float(last_px), 4)})
+                return False
+            order = self.router.place_order(base, "sell", float(close_qty))
+            if not isinstance(order, dict) or not order.get("txid"):
+                resp_str = str(order)[:300]
+                is_insufficient = "insufficient funds" in resp_str.lower() or "EOrder:Insufficient" in resp_str
+                # If Insufficient Funds, try cancelling stale open sell orders for this symbol
+                # (leftover stop-loss orders from previous sessions lock the balance)
+                _release_result: Optional[dict] = None
+                if is_insufficient:
+                    try:
+                        _release_result = self._release_reserved_inventory_for_symbol(base, max_cancel_orders=5)
+                        _released = int(_release_result.get("canceled", 0) if isinstance(_release_result, dict) else 0)
+                        if _released > 0:
+                            # Retry the sell now that stale orders are cancelled
+                            order = self.router.place_order(base, "sell", float(close_qty))
+                            resp_str = str(order)[:300]
+                            is_insufficient = "insufficient funds" in resp_str.lower() or "EOrder:Insufficient" in resp_str
+                    except Exception:
+                        pass
+                if isinstance(order, dict) and order.get("txid"):
+                    # Retry succeeded — fall through to the success path below
+                    pass
+                else:
+                    is_phantom = is_insufficient
+                    self.audit_chain.append("heat_recycle_order_failed", {"symbol": base, "qty": float(close_qty), "response": resp_str, "phantom_reconciled": is_phantom, "release_result": _release_result})
+                    if is_phantom:
+                        # Position doesn't exist on exchange — reconcile it out so heat corrects
+                        self.portfolio.close_position(str(pos.symbol), float(last_px), now.isoformat())
+                        _pos_key_pr = str(pos.order_id) if str(pos.order_id) else f"{pos.symbol}|{pos.entry_time_utc}"
+                        self._position_peaks.pop(_pos_key_pr, None)
+                        self._position_prev_price.pop(_pos_key_pr, None)
+                        self._phantom_skip_symbols[base] = now.isoformat()  # Suppress re-injection for 5 min
+                        self.audit_chain.append("phantom_position_reconciled", {"symbol": base, "qty": float(close_qty), "notional_usd": round(float(close_qty) * float(last_px), 4)})
+                    return False
+            txid = str(order.get("txid", ""))
+            pnl = worst["pnl_pct"]
+            self.portfolio.close_position(str(pos.symbol), last_px, now.isoformat())
+            _pos_key3 = str(pos.order_id) if str(pos.order_id) else f"{pos.symbol}|{pos.entry_time_utc}"
+            self._position_peaks.pop(_pos_key3, None)
+            self._position_prev_price.pop(_pos_key3, None)
+            self._heat_recycle_last_utc = now.isoformat()
+            self.audit_chain.append("heat_recycle_exit", {
+                "symbol": base, "txid": txid,
+                "pnl_pct": round(pnl * 100.0, 4),
+                "notional_usd": round(float(worst["notional_usd"]), 4),
+                "hold_sec": round(float(worst["hold_sec"]), 1),
+                "preferred_queued": str(preferred_symbol or ""),
+                "recycle_score": round(float(worst["score"]), 4),
+            })
+            return True
+        except Exception as exc:
+            self.audit_chain.append("heat_recycle_error", {"error": str(exc)})
+            return False
+
     def _global_close_sweep_due(self, now: datetime) -> bool:
         if not bool(self.global_close_sweep_enabled):
             return False
@@ -4679,6 +5332,130 @@ class RobustLiveExecutor:
             return True
         return (now - last_dt).total_seconds() >= float(self.global_close_sweep_interval_sec)
 
+    _STABLECOIN_SKIP = frozenset({
+        "USD", "USDT", "USDC", "RLUSD", "DAI", "BUSD", "USDP", "TUSD", "FRAX",
+        "EUR", "GBP", "CHF", "ZUSD", "ZEUR", "ZGBP",
+    })
+
+    def _inject_orphaned_balance_positions(self, now: datetime) -> int:
+        """
+        When the bot restarts, the in-memory portfolio is empty but Kraken may still hold
+        crypto bought in prior sessions.  This method reads the live balance, finds non-USD /
+        non-stablecoin holdings worth more than $1 USD, and injects synthetic 'timed-out'
+        OPEN positions into the portfolio so the global close sweep can close them normally.
+
+        Safe-guards:
+        - Per-symbol duplicate check prevents double-inject for any symbol already in portfolio.
+        - Sets entry_time_utc two hours in the past so timeout close fires immediately.
+        - Entry price is set to current ticker price (bot closes at ~breakeven on the recorded side).
+        - Skips anything below the $1 minimum value threshold.
+        """
+        injected = 0
+        try:
+            balances = self.router.get_balance_snapshot(force_refresh=True)
+            if not isinstance(balances, dict):
+                return 0
+
+            two_hours_ago = (now - timedelta(hours=2)).isoformat()
+
+            for asset_code, raw_qty in balances.items():
+                qty = max(self._to_float(raw_qty, 0.0), 0.0)
+                if qty <= 0.0:
+                    continue
+
+                base = self._normalize_balance_symbol(str(asset_code))
+                if not base or base in self._STABLECOIN_SKIP:
+                    continue
+
+                # Skip symbols recently phantom-flagged (sell failed with Insufficient Funds)
+                _phantom_ts = self._phantom_skip_symbols.get(base)
+                if _phantom_ts:
+                    try:
+                        _phantom_age = (now - self._parse_iso_utc(str(_phantom_ts))).total_seconds()
+                        if _phantom_age < 300.0:
+                            continue  # Still within 5-min cooldown — don't re-inject
+                        else:
+                            del self._phantom_skip_symbols[base]  # Expired — allow retry
+                    except Exception:
+                        pass
+
+                ticker = self.router.get_ticker(base)
+                if not isinstance(ticker, dict):
+                    ticker = {}
+                last = self._to_float(ticker.get("last", 0.0), 0.0)
+                if last <= 0.0:
+                    # Fallback: scan trade ledger for the last known fill price for this asset.
+                    try:
+                        ledger_rows = self._read_jsonl_tail(LIVE_TRADE_LEDGER_JSONL_FILE, 200)
+                        for _row in reversed(ledger_rows):
+                            _sym = str(_row.get("symbol", "")).upper().strip()
+                            _side = str(_row.get("side", "")).lower()
+                            _ep = self._to_float(_row.get("entry_price", 0.0), 0.0)
+                            if _sym == base and _side == "buy" and _ep > 0.0:
+                                last = _ep
+                                break
+                    except Exception:
+                        pass
+                if last <= 0.0:
+                    continue
+
+                value_usd = qty * last
+                if value_usd < 1.0:
+                    continue
+
+                # Determine the quote currency this asset was most likely traded against.
+                sym_cfg = self.router.get_symbol_config(base) or {}
+                quote = str(sym_cfg.get("quote", "USD")).upper().strip() or "USD"
+                full_symbol = f"{base}/{quote}"
+
+                # Check we haven't already injected this symbol.
+                already_there = any(
+                    str(getattr(p, "symbol", "")).upper().startswith(f"{base}/")
+                    for p in self.portfolio.get_open_positions()
+                )
+                if already_there:
+                    continue
+
+                self.portfolio.add_position(
+                    Position(
+                        symbol=full_symbol,
+                        side="long",
+                        entry_price=float(last),
+                        current_price=float(last),
+                        qty=float(qty),
+                        entry_time_utc=two_hours_ago,
+                        flowform="recovery",
+                        algo="balance_recovery",
+                        strategy="orphan_drain",
+                        order_id="RECOVERY",
+                        status="OPEN",
+                    )
+                )
+                injected += 1
+
+                self.audit_chain.append(
+                    "orphaned_position_injected",
+                    {
+                        "symbol": full_symbol,
+                        "qty": round(float(qty), 10),
+                        "last_price": round(float(last), 6),
+                        "value_usd": round(float(value_usd), 4),
+                        "entry_time_utc": two_hours_ago,
+                    },
+                )
+        except Exception as exc:
+            self.audit_chain.append("orphaned_position_inject_error", {"error": str(exc)})
+
+        if injected > 0:
+            _write_live_heartbeat(
+                {
+                    "status": "recovering",
+                    "reason": "orphaned_balance_positions_injected",
+                    "injected_count": int(injected),
+                }
+            )
+        return int(injected)
+
     def _run_global_close_sweep(self, now: datetime, preferred_symbol: str = "") -> dict[str, Any]:
         result = {
             "executed": False,
@@ -4692,6 +5469,14 @@ class RobustLiveExecutor:
             return result
 
         open_positions = self.portfolio.get_open_positions()
+
+        # --- Orphaned position recovery ---
+        # After a bot restart the in-memory portfolio may be partially populated from the ledger
+        # (e.g. old XMR lots) while Kraken still holds other tokens bought in prior cycles.
+        # Run the injector unconditionally — per-symbol duplicate checks prevent double-inject.
+        self._inject_orphaned_balance_positions(now)
+        open_positions = self.portfolio.get_open_positions()
+
         symbol_candidates: list[str] = []
         for pos in open_positions:
             raw = str(getattr(pos, "symbol", "") or "").upper().strip()
@@ -4718,8 +5503,18 @@ class RobustLiveExecutor:
         for sym in symbol_candidates:
             ticker = self.router.get_ticker(sym)
             if not isinstance(ticker, dict):
-                continue
+                ticker = {}
             last = self._to_float(ticker.get("last", 0.0), 0.0)
+            if last <= 0.0:
+                # Fallback: use entry price for timed-out positions so the close sweep
+                # can still close positions whose ticker price is unavailable.
+                for _fp in self.portfolio.get_open_positions():
+                    _base = str(getattr(_fp, "symbol", "") or "").split("/")[0].upper()
+                    if _base == sym:
+                        _ep = self._to_float(getattr(_fp, "entry_price", 0.0), 0.0)
+                        if _ep > 0.0:
+                            last = _ep
+                        break
             if last <= 0.0:
                 continue
             symbols_with_ticker += 1
@@ -4731,6 +5526,17 @@ class RobustLiveExecutor:
         result["symbols_with_ticker"] = int(symbols_with_ticker)
         result["closed_count"] = int(closed_count)
         result["reconciled_count"] = int(reconciled_count)
+
+        # Innovation 4: Cascade Loss Guard — run after per-symbol sweep
+        if not closed_count:
+            if self._cascade_guard_check(now):
+                result["closed_count"] = closed_count + 1
+
+        # Innovation 5: Short-Signal Force Exit Timer — run after close sweep
+        if not closed_count:
+            if self._short_signal_force_exit_check(now):
+                result["closed_count"] = closed_count + 1
+
         return result
 
     def _resolve_close_qty_for_spot(self, symbol: str, requested_qty: float, close_side: str) -> tuple[float, float, str]:
@@ -5361,6 +6167,32 @@ class RobustLiveExecutor:
         if not symbol_positions:
             return 0
 
+        # Grace period: skip reconciliation for positions opened within the last 90 seconds.
+        # This prevents a race condition where a freshly placed order hasn't settled on the
+        # exchange yet (or the balance cache hasn't refreshed) and the zero-inventory check
+        # would incorrectly close/auto-kill a perfectly valid new position.
+        grace_sec = 90.0
+        fresh_positions = []
+        for p in symbol_positions:
+            entry_raw = str(getattr(p, "entry_time_utc", "") or getattr(p, "entry_time", "") or "").strip()
+            if entry_raw:
+                try:
+                    from datetime import timezone as _tz
+                    entry_dt = datetime.fromisoformat(entry_raw)
+                    if entry_dt.tzinfo is None:
+                        entry_dt = entry_dt.replace(tzinfo=_tz.utc)
+                    now_aware = now if now.tzinfo is not None else now.replace(tzinfo=_tz.utc)
+                    age_sec = (now_aware - entry_dt).total_seconds()
+                    if age_sec < grace_sec:
+                        continue  # too new — skip this position in the reconcile pass
+                except Exception:
+                    pass
+            fresh_positions.append(p)
+
+        symbol_positions = fresh_positions
+        if not symbol_positions:
+            return 0
+
         reconciled = 0
         for pos in symbol_positions:
             self.portfolio.close_position(pos.symbol, float(last), now.isoformat())
@@ -5630,15 +6462,205 @@ class RobustLiveExecutor:
                 hold_sec = max_hold_sec + 1.0
 
             pnl_pct = self._position_pnl_pct(pos, float(last))
-            tp_hit = hold_sec >= min_hold_sec and pnl_pct >= tp_pct
+
+            # ── INSTITUTIONAL SWING HUNTER / TRAILING STOP ENGINE ────────────
+            trail_hit = False
+            _vel_exit_hit = False  # velocity reversal sub-flag for granular close reason
+            _uses_trail = self.trailing_stop_enabled and str(pos.side).strip().lower() == "long"
+            if _uses_trail:
+                _activation_bps = float(self.trailing_stop_activation_bps)
+                _trail_bps = float(self.trailing_stop_trail_bps)
+                # Dynamic amplitude scaling: high-vol assets earn a wider activation buffer
+                if self.trailing_stop_dynamic_scaling:
+                    try:
+                        _tk = self.router.get_ticker(symbol) or {}
+                        _h24 = self._to_float(_tk.get("high_24h", 0.0), 0.0)
+                        _l24 = self._to_float(_tk.get("low_24h", 0.0), 0.0)
+                        if _l24 > 0.0 and _h24 > _l24:
+                            _amp_pct = (_h24 - _l24) / _l24 * 100.0
+                            _atr_mult = float(self.trailing_stop_dynamic_multiplier)
+                            # Activation: widen for high-vol assets
+                            _activation_bps = max(
+                                _activation_bps,
+                                _amp_pct * _atr_mult * 100.0,
+                            )
+                            # Trail: also scale by ATR proxy (half mult) — prevents noise stop-outs
+                            _trail_bps = max(
+                                _trail_bps,
+                                _amp_pct * (_atr_mult * 0.5) * 100.0,
+                            )
+                    except Exception:
+                        pass
+                _activation_pct = _activation_bps / 10000.0
+                _trail_pct = _trail_bps / 10000.0
+                # Per-position peak price tracked in executor dict (no dataclass change needed)
+                _pos_key = str(pos.order_id) if str(pos.order_id) else f"{pos.symbol}|{pos.entry_time_utc}"
+                _cur_peak = self._position_peaks.get(_pos_key, float(pos.entry_price))
+                if float(last) > _cur_peak:
+                    _cur_peak = float(last)
+                    self._position_peaks[_pos_key] = _cur_peak
+                # Arm once cumulative peak gain >= activation threshold; trail bps below peak
+                _entry_px = max(float(pos.entry_price), 1e-9)
+                _peak_gain_pct = (_cur_peak - _entry_px) / _entry_px
+                if _peak_gain_pct >= _activation_pct and _cur_peak > 0.0:
+                    _trail_price = _cur_peak * (1.0 - _trail_pct)
+                    # ── Innovation 7: Break-Even Ratchet ───────────────────────────
+                    # Once peak gain >= activation × ratchet_mult, floor stop to entry.
+                    # Guarantees we NEVER exit at a loss once sufficiently in profit.
+                    if self.trailing_stop_breakeven_enabled:
+                        _be_threshold = _activation_pct * float(self.trailing_stop_breakeven_ratchet_mult)
+                        if _peak_gain_pct >= _be_threshold:
+                            _trail_price = max(_trail_price, _entry_px)  # floor: stop can never be below entry
+                    trail_hit = float(last) <= _trail_price
+                # ── Velocity Reversal Exit ──────────────────────────────────────
+                # Inter-cycle price velocity: detects sharp momentum flip before trailing stop fires
+                _prev_px = self._position_prev_price.get(_pos_key, float(last))
+                _vel_pct = (float(last) - _prev_px) / max(_prev_px, 1e-9) * 100.0
+                self._position_prev_price[_pos_key] = float(last)
+                if (
+                    self.trailing_stop_vel_exit_enabled
+                    and pnl_pct > 0.0
+                    and _peak_gain_pct >= _activation_pct
+                    and _vel_pct <= -float(self.trailing_stop_vel_exit_threshold_pct)
+                ):
+                    trail_hit = True
+                    _vel_exit_hit = True
+            # ─────────────────────────────────────────────────────────────────
+
+            # For long positions with trailing stop active: suppress flat TP so momentum rides
+            tp_hit = (not _uses_trail) and hold_sec >= min_hold_sec and pnl_pct >= tp_pct
             # Protective stops should fire immediately; do not wait for min hold.
             sl_hit = sl_pct > 0.0 and pnl_pct <= (-sl_pct)
             timeout_hit = hold_sec >= max_hold_sec
+
+            # ══ Sell Innovations 1–9 (evaluated per-position in close sweep) ═══
+
+            # Innovation 1: Profit Lock ─ hard ceiling; guarantee the gain
+            profit_lock_hit = (
+                self.profit_lock_enabled
+                and pnl_pct >= float(self.profit_lock_pct)
+            )
+
+            # Innovation 2: Dead-Weight Purge ─ exit positions wasting heat
+            dead_weight_hit = (
+                self.dead_weight_purge_enabled
+                and hold_sec >= float(self.dead_weight_max_age_sec)
+                and abs(pnl_pct) < float(self.dead_weight_max_drift_pct)
+            )
+
+            # Innovation 3: Age-Tightened Trailing Stop ─ trail tightens as position ages
+            # Modifies trail_bps used above; applied here as a post-pass tighter re-check
+            age_trail_hit = False
+            if (
+                self.age_trail_tighten_enabled
+                and _uses_trail
+                and hold_sec > float(self.age_trail_tighten_start_sec)
+                and not trail_hit
+            ):
+                _extra_hold = hold_sec - float(self.age_trail_tighten_start_sec)
+                _tighten_factor = float(self.age_trail_tighten_rate) * (_extra_hold / 60.0)
+                _tighter_trail_pct = max(float(self.trailing_stop_trail_bps) / 10000.0 - _tighten_factor, 0.0005)
+                _pos_key_local = str(pos.order_id) if str(pos.order_id) else f"{pos.symbol}|{pos.entry_time_utc}"
+                _cur_peak_local = self._position_peaks.get(_pos_key_local, float(pos.entry_price))
+                _activation_pct_local = float(self.trailing_stop_activation_bps) / 10000.0
+                _peak_gain_local = (_cur_peak_local - max(float(pos.entry_price), 1e-9)) / max(float(pos.entry_price), 1e-9)
+                if _peak_gain_local >= _activation_pct_local and _cur_peak_local > 0.0:
+                    _tight_trail_price = _cur_peak_local * (1.0 - _tighter_trail_pct)
+                    age_trail_hit = float(last) <= _tight_trail_price
+
+            # Innovation 6: Velocity Reversal on Small Loss ─ cut quickly on downside momentum
+            vel_loss_hit = False
+            if self.vel_exit_on_loss_enabled and not _uses_trail:
+                _pos_key_vl = str(pos.order_id) if str(pos.order_id) else f"{pos.symbol}|{pos.entry_time_utc}"
+                _prev_px_vl = self._position_prev_price.get(_pos_key_vl, float(last))
+                _vel_vl = (float(last) - _prev_px_vl) / max(_prev_px_vl, 1e-9) * 100.0
+                self._position_prev_price[_pos_key_vl] = float(last)
+                vel_loss_hit = (
+                    hold_sec >= min_hold_sec
+                    and pnl_pct <= float(self.vel_exit_on_loss_max_pnl_pct)
+                    and _vel_vl <= -float(self.vel_exit_on_loss_vel_threshold_pct)
+                )
+
+            # Innovation 7: Conviction-Tiered TP ─ low-confidence positions exit sooner
+            conviction_tp_hit = False
+            if self.conviction_tiered_tp_enabled and (not _uses_trail):
+                _gate_score = self._to_float(getattr(pos, "gate_score", 1.0), 1.0)
+                if _gate_score < float(self.conviction_tiered_tp_low_score):
+                    conviction_tp_hit = (
+                        hold_sec >= min_hold_sec
+                        and pnl_pct >= float(self.conviction_tiered_tp_low_tp_pct)
+                    )
+
+            # Innovation 8: Moonshot Slot Reserve ─ loosen exit if heat-blocked for too long
+            moonshot_tp_hit = False
+            if self.moonshot_slot_reserve_enabled and self._heat_blocked_since_utc:
+                try:
+                    _blocked_dt = self._parse_iso_utc(self._heat_blocked_since_utc)
+                    _blocked_dur = (now - _blocked_dt).total_seconds()
+                except Exception:
+                    _blocked_dur = 0.0
+                if _blocked_dur >= float(self.moonshot_slot_reserve_blocked_sec) and (not _uses_trail):
+                    moonshot_tp_hit = (
+                        hold_sec >= min_hold_sec
+                        and pnl_pct >= float(self.moonshot_slot_reserve_tp_override_pct)
+                    )
+
+            # Innovation 9: PnL Drawdown Accelerator ─ exit when PnL falls hard from its peak
+            pnl_drawdown_hit = False
+            if self.pnl_drawdown_accel_enabled and pnl_pct > 0.0:
+                _pos_key_pd = str(pos.order_id) if str(pos.order_id) else f"{pos.symbol}|{pos.entry_time_utc}"
+                _intra_peak_pnl = self._position_peaks.get(f"pnl_peak_{_pos_key_pd}", pnl_pct)
+                if pnl_pct > _intra_peak_pnl:
+                    _intra_peak_pnl = pnl_pct
+                    self._position_peaks[f"pnl_peak_{_pos_key_pd}"] = _intra_peak_pnl
+                _pnl_drop = _intra_peak_pnl - pnl_pct
+                pnl_drawdown_hit = (
+                    hold_sec >= min_hold_sec
+                    and _intra_peak_pnl >= float(self.trailing_stop_activation_bps) / 10000.0
+                    and _pnl_drop >= float(self.pnl_drawdown_accel_peak_drop_pct)
+                )
+
+            # ══════════════════════════════════════════════════════════════════
+
             should_close = (
                 tp_hit
                 or sl_hit
                 or timeout_hit
+                or trail_hit
+                or profit_lock_hit
+                or dead_weight_hit
+                or age_trail_hit
+                or vel_loss_hit
+                or conviction_tp_hit
+                or moonshot_tp_hit
+                or pnl_drawdown_hit
             )
+            if _vel_exit_hit:
+                _close_reason = "velocity_reversal"
+            elif profit_lock_hit:
+                _close_reason = "profit_lock"
+            elif pnl_drawdown_hit:
+                _close_reason = "pnl_drawdown_accel"
+            elif age_trail_hit:
+                _close_reason = "age_trail_tighten"
+            elif trail_hit:
+                _close_reason = "trailing_stop"
+            elif tp_hit:
+                _close_reason = "take_profit"
+            elif conviction_tp_hit:
+                _close_reason = "conviction_tiered_tp"
+            elif moonshot_tp_hit:
+                _close_reason = "moonshot_slot_reserve"
+            elif vel_loss_hit:
+                _close_reason = "vel_exit_loss"
+            elif dead_weight_hit:
+                _close_reason = "dead_weight_purge"
+            elif sl_hit:
+                _close_reason = "stop_loss"
+            elif timeout_hit:
+                _close_reason = "timeout"
+            else:
+                _close_reason = "unknown"
             if not should_close:
                 continue
 
@@ -5657,6 +6679,9 @@ class RobustLiveExecutor:
                 if close_qty <= 0.0:
                     if available_close_qty <= 0.0 and not close_balance_error:
                         # Inventory already flat on exchange; reconcile stale local OPEN position.
+                        _recon_pos_key = str(pos.order_id) if str(pos.order_id) else f"{pos.symbol}|{pos.entry_time_utc}"
+                        self._position_peaks.pop(_recon_pos_key, None)
+                        self._position_prev_price.pop(_recon_pos_key, None)
                         self.portfolio.close_position(pos.symbol, float(last), now.isoformat())
                         self.audit_chain.append(
                             "position_reconciled_no_inventory",
@@ -5721,6 +6746,11 @@ class RobustLiveExecutor:
                     )
                     continue
 
+            # Pre-flight: skip positions too small to meet Kraken's minimum notional (~$10)
+            _close_notional_usd = float(close_qty) * float(last)
+            if _close_notional_usd < 9.5:
+                continue
+
             result = self.router.place_order(symbol, close_side, float(close_qty), None)
             if "error" in result and close_side == "sell" and "Insufficient funds" in str(result.get("error")):
                 retry_qty, retry_available_qty, retry_balance_error = self._resolve_close_qty_for_spot(
@@ -5735,6 +6765,8 @@ class RobustLiveExecutor:
                     result = self.router.place_order(symbol, close_side, float(close_qty), None)
 
             if "error" in result:
+                _err_str = str(result.get("error"))
+                _is_phantom = "insufficient funds" in _err_str.lower()
                 _write_live_heartbeat(
                     {
                         "status": "error",
@@ -5745,9 +6777,18 @@ class RobustLiveExecutor:
                         "requested_qty": float(requested_close_qty),
                         "available_qty": float(available_close_qty),
                         "balance_error": close_balance_error,
-                        "error": str(result.get("error")),
+                        "error": _err_str,
+                        "phantom_reconciled": _is_phantom,
                     }
                 )
+                if _is_phantom:
+                    # Position not on exchange — reconcile it out so heat resets correctly
+                    _pos_key_ph = str(pos.order_id) if str(pos.order_id) else f"{pos.symbol}|{pos.entry_time_utc}"
+                    self._position_peaks.pop(_pos_key_ph, None)
+                    self._position_prev_price.pop(_pos_key_ph, None)
+                    self.portfolio.close_position(pos.symbol, float(last), now.isoformat())
+                    self._phantom_skip_symbols[symbol] = now.isoformat()  # Suppress re-injection for 5 min
+                    self.audit_chain.append("phantom_position_reconciled", {"symbol": symbol, "qty": float(close_qty), "notional_usd": round(float(close_qty) * float(last), 4)})
                 continue
 
             txid = result.get("txid", ["unknown"])
@@ -5758,6 +6799,10 @@ class RobustLiveExecutor:
 
             if close_qty < requested_close_qty:
                 pos.qty = float(close_qty)
+            # ── Trailing stop / velocity tracker cleanup ──────────────────────
+            _close_pos_key = str(pos.order_id) if str(pos.order_id) else f"{pos.symbol}|{pos.entry_time_utc}"
+            self._position_peaks.pop(_close_pos_key, None)
+            self._position_prev_price.pop(_close_pos_key, None)
             self.portfolio.close_position(pos.symbol, float(last), now.isoformat())
 
             self.trade_ledger.append(
@@ -5771,6 +6816,7 @@ class RobustLiveExecutor:
                     "side": close_side,
                     "status": "CLOSED",
                     "execution_mode": "close_cycle",
+                    "close_reason": _close_reason,
                     "entry_price": round(float(pos.entry_price), 6),
                     "exit_price": round(float(last), 6),
                     "qty": round(float(close_qty), 10),
@@ -5786,6 +6832,7 @@ class RobustLiveExecutor:
                     "direction": str(pos.side),
                     "qty": round(float(close_qty), 10),
                     "txid": txid,
+                    "close_reason": _close_reason,
                     "pnl_pct": round(float(pnl_pct) * 100.0, 6),
                     "hold_sec": round(float(hold_sec), 3),
                 },
@@ -5804,6 +6851,17 @@ class RobustLiveExecutor:
                 }
             )
             print(f"  closed txid={txid} side={close_side} pnl_pct={pnl_pct*100.0:.3f}%")
+            # ── Adaptive Post-Loss Cooldown ───────────────────────────────────
+            # Scale symbol re-entry cooldown proportionally to loss magnitude
+            if self.adaptive_loss_cooldown_enabled and float(pnl_pct) < 0.0:
+                _loss_frac = abs(float(pnl_pct))  # decimal form, e.g. 0.02 for 2% loss
+                _base_cd = max(float(self.same_symbol_reentry_cooldown_sec), 0.0)
+                _adaptive_cd = min(
+                    _base_cd * (1.0 + _loss_frac * float(self.adaptive_loss_cooldown_scale)),
+                    float(self.adaptive_loss_cooldown_cap_sec),
+                )
+                if _adaptive_cd > _base_cd:
+                    self._mark_symbol_skip(str(symbol), now, f"adaptive_loss_cooldown_{_close_reason}", _adaptive_cd)
             return True
 
         return False
@@ -6117,6 +7175,17 @@ class RobustLiveExecutor:
             )
         )
         if not risk_allowed:
+            # Track how long we've been heat-blocked (feeds Innovation 8: Moonshot Slot Reserve)
+            _heat_blocked = any("heat" in str(r).lower() for r in (risk_reasons or []))
+            if _heat_blocked:
+                if not self._heat_blocked_since_utc:
+                    self._heat_blocked_since_utc = now.isoformat()
+                # Innovation 10: Heat-Triggered Capital Recycle
+                # If heat is the ONLY blocker and we have a preferred symbol queued,
+                # sell the weakest position right now so next cycle the buy fires.
+                self._heat_recycle_attempt(now, preferred_symbol=str(symbol or ""))
+            else:
+                self._heat_blocked_since_utc = ""
             _write_live_heartbeat(
                 {
                     "status": "blocked",
@@ -6809,6 +7878,11 @@ class RobustLiveExecutor:
         )
         order_template = self.order_router.build_primary(route_intent, validate_only=False)
         close_template = self.order_router.build_close_template(route_intent)
+        # Disable Kraken close_template (conditional stop-loss on buy orders).
+        # The executor manages all exits via heat-recycle, close-sweep, and timeout.
+        # Kraken stop-loss orders created by close_template lock up the full asset
+        # balance, causing every subsequent sell attempt to fail with EOrder:Insufficient funds.
+        close_template = None
         shadow_fill_px, shadow_slip_bps = self.shadow_runner.simulate_fill(bid, ask, side, urgency)
         self.shadow_runner.append_ledger(
             str(LIVE_SHADOW_LEDGER_FILE),
@@ -7110,6 +8184,9 @@ class RobustLiveExecutor:
         with open(LIVE_TRADE_LOG_FILE, "w", encoding="utf-8") as f:
             json.dump(self.trade_log, f, indent=2)
 
+        # Clear heat-block timer on successful order — the slot is now filled
+        self._heat_blocked_since_utc = ""
+
         _write_live_heartbeat(
             {
                 "status": "ok",
@@ -7181,6 +8258,16 @@ class RobustLiveExecutor:
 
     def run_institutional_execution_loop(self):
         print(f"starting live loop (interval={self.loop_seconds:.2f}s, max_open={self.max_open_positions})")
+        # Startup: cancel any stale open orders from previous sessions that may be
+        # locking reserved crypto balances and blocking new sell orders.
+        try:
+            _startup_cancel = self.router.cancel_all_orders()
+            _cancelled_count = int(_startup_cancel.get("count", 0) if isinstance(_startup_cancel, dict) else 0)
+            if _cancelled_count > 0:
+                self.audit_chain.append("startup_stale_orders_cancelled", {"count": _cancelled_count})
+                print(f"startup: cancelled {_cancelled_count} stale open order(s) to release reserved balance")
+        except Exception as _startup_cancel_err:
+            print(f"startup: cancel_all_orders error (non-fatal): {_startup_cancel_err}")
         while True:
             try:
                 self._refresh_runtime_config()

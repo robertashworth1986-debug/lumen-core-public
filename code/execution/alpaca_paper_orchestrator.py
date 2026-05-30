@@ -348,8 +348,23 @@ def _acquire_singleton_lock() -> None:
     atexit.register(lambda: _LOCK_FILE.unlink(missing_ok=True))
 
 
+RUNTIME_CONTROL_FILE = CONFIG / "runtime_control.json"
+
+
 def main() -> int:
     _acquire_singleton_lock()
+
+    # Respect paper_enabled flag — if False in runtime_control, exit cleanly.
+    # The supervisor will back off and stop restarting when paper trading is disabled.
+    try:
+        rc_cfg = json.loads(RUNTIME_CONTROL_FILE.read_text(encoding="utf-8")) if RUNTIME_CONTROL_FILE.exists() else {}
+        if rc_cfg.get("paper_enabled") is False:
+            print("[orchestrator] paper_enabled=False in runtime_control — exiting.", flush=True)
+            write_json(ORCH_STATUS_FILE, {"generated_utc": now_utc(), "status": "disabled", "reason": "paper_enabled=False"})
+            return 0
+    except Exception:
+        pass
+
     parser = argparse.ArgumentParser(description="Dedicated Alpaca paper orchestrator + symbol agents + executor handoff")
     parser.add_argument("--loop", action="store_true", help="Run continuously")
     parser.add_argument("--interval-sec", type=int, default=60, help="Loop interval")

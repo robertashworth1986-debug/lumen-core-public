@@ -1675,6 +1675,13 @@ try:
 except Exception as _op_err:  # pragma: no cover
     log.warning("opportunities_api not mounted: %s", _op_err)
 
+# Autonomous Agent Manifest — unified human-in-the-loop approval queue
+try:
+    from autonomous_agent_manifest import router as _agents_router  # type: ignore
+    app.include_router(_agents_router)
+except Exception as _ag_err:  # pragma: no cover
+    log.warning("autonomous_agent_manifest not mounted: %s", _ag_err)
+
 manager = ConnectionManager()
 
 

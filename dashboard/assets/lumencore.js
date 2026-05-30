@@ -195,6 +195,8 @@
       ['/mission_control.html', 'Mission'],
       ['/grants.html', 'Grants'],
       ['/forecast.html', 'Forecast'],
+      ['/agent_approval_hub.html', 'Agents ⚡'],
+      ['/draftkings_parlay_lab.html', 'Parlay Lab 🎯'],
       ['/anomalies.html', 'Anomalies'],
       ['/explain.html', 'Explain'],
       ['/lab.html', 'Lab'],
