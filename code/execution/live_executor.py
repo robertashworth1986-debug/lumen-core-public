@@ -1252,6 +1252,16 @@ class RobustLiveExecutor:
         self.adaptive_loss_cooldown_enabled = True          # scale up reentry cooldown on loss
         self.adaptive_loss_cooldown_scale = 10.0            # loss_pct (decimal) * scale added to base multiplier
         self.adaptive_loss_cooldown_cap_sec = 1800.0        # max cooldown cap (30 min)
+        # ── Innovation 12: Session-Level Symbol Win-Rate Filter ────────────────
+        # Track consecutive wins/losses per symbol in this session.
+        # Consistent losers get escalating cooldown; hot streaks get priority.
+        self.session_loss_streak_threshold = 3       # losses in a row → extended cooldown
+        self.session_loss_streak_cooldown_sec = 900.0  # 15 min extended cooldown per streak hit
+        self.session_loss_hard_block_threshold = 5   # 5 consecutive losses → session block
+        self.session_win_streak_threshold = 3        # wins in a row → symbol flagged as hot
+        self._session_symbol_consecutive_wins: dict[str, int] = {}   # symbol → consecutive win count
+        self._session_symbol_consecutive_losses: dict[str, int] = {} # symbol → consecutive loss count
+        self._session_hot_symbols: set = set()       # symbols on win streak this session
         # ─────────────────────────────────────────────────────────────────────
 
         # ══════════════════════════════════════════════════════════════════════
@@ -7060,6 +7070,31 @@ class RobustLiveExecutor:
                 )
                 if _adaptive_cd > _base_cd:
                     self._mark_symbol_skip(str(symbol), now, f"adaptive_loss_cooldown_{_close_reason}", _adaptive_cd)
+            # ── Innovation 12: Session Symbol Win-Rate Filter ─────────────────
+            # Track consecutive W/L streaks per symbol.  Consistent losers get
+            # escalating cooldowns; hot win streaks are flagged for preference.
+            _sym_key = str(symbol).upper().strip()
+            if float(pnl_pct) > 0.0:
+                _wins = self._session_symbol_consecutive_wins.get(_sym_key, 0) + 1
+                self._session_symbol_consecutive_wins[_sym_key] = _wins
+                self._session_symbol_consecutive_losses[_sym_key] = 0
+                if _wins >= int(self.session_win_streak_threshold):
+                    self._session_hot_symbols.add(_sym_key)
+            else:
+                _losses = self._session_symbol_consecutive_losses.get(_sym_key, 0) + 1
+                self._session_symbol_consecutive_losses[_sym_key] = _losses
+                self._session_symbol_consecutive_wins[_sym_key] = 0
+                self._session_hot_symbols.discard(_sym_key)
+                if _losses >= int(self.session_loss_hard_block_threshold):
+                    # 5+ consecutive losses: session-block for the rest of the hour
+                    _hard_cd = 3600.0
+                    self._mark_symbol_skip(_sym_key, now, "session_loss_hard_block", _hard_cd)
+                    print(f"  [inn12] session hard-block {_sym_key}: {_losses} consecutive losses")
+                elif _losses >= int(self.session_loss_streak_threshold):
+                    # 3+ losses: extended cooldown, stacks per extra loss
+                    _streak_cd = float(self.session_loss_streak_cooldown_sec) * (_losses - int(self.session_loss_streak_threshold) + 1)
+                    self._mark_symbol_skip(_sym_key, now, "session_loss_streak", _streak_cd)
+                    print(f"  [inn12] loss streak cooldown {_sym_key}: {_losses} losses → {_streak_cd:.0f}s skip")
             return True
 
         return False

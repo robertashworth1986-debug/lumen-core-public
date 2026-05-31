@@ -26,8 +26,9 @@ HB_OUT       = os.path.join(STACK_ROOT, "out", "execution", "intel_refresh_daemo
 SCANNER_PY   = os.path.join(STACK_ROOT, "code", "ops", "build_kraken_multi_tf_alpha_map.py")
 
 # ── Config (tunable at runtime via env vars) ────────────────────────────────────
-DERIVE_INTERVAL_SEC = int(os.environ.get("INTEL_DERIVE_INTERVAL", "300"))   # 5 min
-SCAN_INTERVAL_SEC   = int(os.environ.get("INTEL_SCAN_INTERVAL",   "1800"))  # 30 min
+DERIVE_INTERVAL_SEC     = int(os.environ.get("INTEL_DERIVE_INTERVAL", "300"))   # 5 min
+SCAN_INTERVAL_SEC       = int(os.environ.get("INTEL_SCAN_INTERVAL",   "900"))   # 15 min (was 30)
+EMERGENCY_STALE_SEC     = int(os.environ.get("INTEL_EMERGENCY_STALE", "2700")) # force rescan if > 45 min stale
 TOP_N               = int(os.environ.get("INTEL_TOP_N",           "12"))
 MAX_SPREAD_BPS      = float(os.environ.get("INTEL_MAX_SPREAD_BPS", "80"))   # filter wide-spread pairs
 SCAN_TOP_LIQUID     = int(os.environ.get("INTEL_SCAN_TOP_LIQUID", "100"))   # quick scan
@@ -196,12 +197,14 @@ def main():
 
         # ── Decide whether to scan ──────────────────────────────────────────
         do_scan = False
-        if (now - last_scan_utc) >= SCAN_INTERVAL_SEC:
-            # Also check: is existing alpha map too stale?
-            alpha_check = load_json(ALPHA_LATEST)
-            age = alpha_age_sec(alpha_check)
-            if age > SCAN_INTERVAL_SEC:
-                do_scan = True
+        alpha_check = load_json(ALPHA_LATEST)
+        _cur_age = alpha_age_sec(alpha_check)
+        if (now - last_scan_utc) >= SCAN_INTERVAL_SEC and _cur_age > SCAN_INTERVAL_SEC:
+            do_scan = True
+        elif _cur_age > EMERGENCY_STALE_SEC:
+            # Emergency re-scan: alpha map is dangerously stale regardless of interval
+            print(f"[{ts}] #{cycle:04d}  ⚠ EMERGENCY RESCAN — alpha_age={_cur_age/60:.1f} min > {EMERGENCY_STALE_SEC//60} min threshold", flush=True)
+            do_scan = True
 
         if do_scan:
             scan_ok = trigger_scan(python_exe)
@@ -233,14 +236,17 @@ def main():
                 status = "empty_leaderboard"
 
         # ── Heartbeat ───────────────────────────────────────────────────────
+        _hb_alpha = load_json(ALPHA_LATEST)
         write_atomic(HB_OUT, {
             "generated_utc":       utcnow_iso(),
             "cycle":               cycle,
             "status":              status,
             "last_derive_utc":     datetime.fromtimestamp(last_derive_utc, tz=timezone.utc).isoformat() if last_derive_utc else None,
             "last_scan_utc":       datetime.fromtimestamp(last_scan_utc,   tz=timezone.utc).isoformat() if last_scan_utc   else None,
+            "alpha_map_age_sec":   round(alpha_age_sec(_hb_alpha), 1),
             "derive_interval_sec": DERIVE_INTERVAL_SEC,
             "scan_interval_sec":   SCAN_INTERVAL_SEC,
+            "emergency_stale_sec": EMERGENCY_STALE_SEC,
             "top_n":               TOP_N,
         })
 
