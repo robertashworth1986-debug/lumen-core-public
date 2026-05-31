@@ -347,5 +347,6 @@
   "capital_preservation_max_consecutive_losses": 5,
   "capital_preservation_pause_sec": 300.0,
   "capital_preservation_min_win_rate_pct": 20.0,
-  "capital_preservation_min_recent_closed": 6
+  "capital_preservation_min_recent_closed": 6,
+  "capital_preservation_mode": false
 }

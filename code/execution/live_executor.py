@@ -7621,7 +7621,7 @@ class RobustLiveExecutor:
         bid, ask, last = ticker["bid"], ticker["ask"], ticker["last"]
         mid = max((bid + ask) / 2.0, 1e-9)
         spread_bps = abs((ask - bid) / mid) * 10000.0
-        if spread_bps > 45.0:
+        if spread_bps > float(self.hybrid_swing_spread_guard_bps):
             spread_block_cooldown_sec = max(
                 float(self.spread_too_wide_skip_cooldown_sec),
                 float(self.loop_seconds) * 2.0,
