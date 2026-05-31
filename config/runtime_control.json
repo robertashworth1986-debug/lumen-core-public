@@ -100,6 +100,8 @@
   "position_timeout_exit_enabled": true,
   "dead_weight_max_age_sec": 300,
   "dead_weight_max_drift_pct": 0.0015,
+  "heat_recycle_min_hold_sec": 180,
+  "heat_recycle_cooldown_sec": 90,
   "min_expected_net_edge_bps": 20.0,
   "edge_fee_coverage_multiplier": 1.03,
   "adaptive_entry_gate_enabled": true,
@@ -161,7 +163,13 @@
     "NIGHT",
     "H",
     "USELESS",
-    "ASSET"
+    "ASSET",
+    "USD1",
+    "AUSD",
+    "USDC",
+    "USDT",
+    "EURC",
+    "PYUSD"
   ],
   "symbol_whitelist": [],
   "maker_first_enabled": true,
