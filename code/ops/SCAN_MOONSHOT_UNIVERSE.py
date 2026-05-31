@@ -266,7 +266,7 @@ def run_scan():
               f"{c['range_position']*100:>5.0f}% ${c['volume_usd_24h']:>10,.0f} "
               f"{c['momentum_pct']:>+7.2f}% {c['moonshot_score']:>6.2f}")
 
-    print(f"\n[scan] watchlist written → {WATCHLIST_FILE}")
+    print(f"\n[scan] watchlist written -> {WATCHLIST_FILE}")
     print(f"[scan] full report → {REPORT_FILE}")
     return candidates
 
