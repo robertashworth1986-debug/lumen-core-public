@@ -7024,12 +7024,14 @@ class RobustLiveExecutor:
 
             # Innovation 3: Age-Tightened Trailing Stop ─ trail tightens as position ages
             # Modifies trail_bps used above; applied here as a post-pass tighter re-check
+            # Moonshot positions are exempt: they have their own 250bps activation + 60bps trail
             age_trail_hit = False
             if (
                 self.age_trail_tighten_enabled
                 and _uses_trail
                 and hold_sec > float(self.age_trail_tighten_start_sec)
                 and not trail_hit
+                and not _inn22_is_moonshot
             ):
                 _extra_hold = hold_sec - float(self.age_trail_tighten_start_sec)
                 _tighten_factor = float(self.age_trail_tighten_rate) * (_extra_hold / 60.0)
