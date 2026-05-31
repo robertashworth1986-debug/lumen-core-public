@@ -267,7 +267,7 @@ def run_scan():
               f"{c['momentum_pct']:>+7.2f}% {c['moonshot_score']:>6.2f}")
 
     print(f"\n[scan] watchlist written -> {WATCHLIST_FILE}")
-    print(f"[scan] full report → {REPORT_FILE}")
+    print(f"[scan] full report -> {REPORT_FILE}")
     return candidates
 
 
