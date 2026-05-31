@@ -104,7 +104,7 @@
   "heat_recycle_cooldown_sec": 90,
   "min_expected_net_edge_bps": 20.0,
   "edge_fee_coverage_multiplier": 1.03,
-  "adaptive_entry_gate_enabled": true,
+  "adaptive_entry_gate_enabled": false,
   "adaptive_entry_gate_min_bps": 1.0,
   "adaptive_entry_gate_max_bps": 1.0,
   "adaptive_entry_gate_relax_step_bps": 2.0,
