@@ -309,13 +309,18 @@
   "universe_scan_cap": 2000,
   "max_spread_bps": 35.0,
   "safety_auto_kill_source": "live_executor_inventory_discrepancy",
-  "safety_auto_kill_reason": "inventory_discrepancy_close_path_no_inventory",
-  "safety_auto_kill_symbol": "MEZO",
-  "safety_auto_kill_trip_utc": "2026-05-31T05:14:24.839185+00:00",
+  "safety_auto_kill_reason": "inventory_discrepancy_zero_exchange_inventory",
+  "safety_auto_kill_symbol": "NEO",
+  "safety_auto_kill_trip_utc": "2026-05-31T06:13:52.564649+00:00",
   "safety_auto_kill_context": {
-    "requested_qty": 669.4752102297,
-    "available_qty": 0.0
+    "reconciled_count": 1,
+    "available_asset_qty": 0.0
   },
   "success_notional_recovery_step": 0.6,
-  "failure_notional_floor": 0.45
+  "failure_notional_floor": 0.45,
+  "moonshot_amplifier_enabled": true,
+  "moonshot_amplifier_min_gate_score": 0.85,
+  "moonshot_amplifier_multiplier": 1.6,
+  "moonshot_amplifier_max_cap_pct": 0.42,
+  "moonshot_watchlist_path": "out/ops/moonshot_watchlist.json"
 }

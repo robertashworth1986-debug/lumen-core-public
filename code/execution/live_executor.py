@@ -1319,6 +1319,21 @@ class RobustLiveExecutor:
         self._dw_strike_count: dict[str, int] = {}   # symbol → cumulative dead_weight count
         # ─────────────────────────────────────────────────────────────────────
 
+        # ── Innovation 19: Moonshot Size Amplifier ────────────────────────────
+        # When a symbol is on the live moonshot watchlist AND the gate score is
+        # strong, boost the effective notional cap so we ride BADGER/PORTAL-class
+        # pumps with more firepower.  Watchlist is refreshed every 5 minutes from
+        # out/ops/moonshot_watchlist.json (written by SCAN_MOONSHOT_UNIVERSE.py).
+        self.moonshot_amplifier_enabled = True
+        self.moonshot_amplifier_min_gate_score = 0.85   # only boost high-conviction entries
+        self.moonshot_amplifier_multiplier = 1.60        # 60% more size on watchlist symbols
+        self.moonshot_amplifier_max_cap_pct = 0.42       # hard cap: never >42% of available cash
+        self.moonshot_watchlist_path = "out/ops/moonshot_watchlist.json"
+        self._moonshot_watchlist_cache: list = []
+        self._moonshot_watchlist_cache_ts: float = 0.0
+        self._moonshot_watchlist_cache_ttl: float = 300.0  # refresh every 5 minutes
+        # ─────────────────────────────────────────────────────────────────────
+
         # ══════════════════════════════════════════════════════════════════════
         # SELL LOGIC INNOVATIONS  (10-feature suite)
         # ══════════════════════════════════════════════════════════════════════
@@ -3300,6 +3315,15 @@ class RobustLiveExecutor:
             self._to_float(runtime.get("dw_strike_escalator_multiplier", self.dw_strike_escalator_multiplier), self.dw_strike_escalator_multiplier), 1.0, 8.0)
         self.dw_strike_escalator_max_sec = self._clamp(
             self._to_float(runtime.get("dw_strike_escalator_max_sec", self.dw_strike_escalator_max_sec), self.dw_strike_escalator_max_sec), 600.0, 86400.0)
+        # Innovation 19: Moonshot Size Amplifier
+        self.moonshot_amplifier_enabled = bool(runtime.get("moonshot_amplifier_enabled", self.moonshot_amplifier_enabled))
+        self.moonshot_amplifier_min_gate_score = self._clamp(
+            self._to_float(runtime.get("moonshot_amplifier_min_gate_score", self.moonshot_amplifier_min_gate_score), self.moonshot_amplifier_min_gate_score), 0.60, 1.00)
+        self.moonshot_amplifier_multiplier = self._clamp(
+            self._to_float(runtime.get("moonshot_amplifier_multiplier", self.moonshot_amplifier_multiplier), self.moonshot_amplifier_multiplier), 1.10, 3.00)
+        self.moonshot_amplifier_max_cap_pct = self._clamp(
+            self._to_float(runtime.get("moonshot_amplifier_max_cap_pct", self.moonshot_amplifier_max_cap_pct), self.moonshot_amplifier_max_cap_pct), 0.25, 0.60)
+        self.moonshot_watchlist_path = str(runtime.get("moonshot_watchlist_path", self.moonshot_watchlist_path))
         # ══════════════════════════════════════════════════════════════════════
         self.live_operator_queue_enabled = bool(
             runtime.get("live_operator_queue_enabled", self.live_operator_queue_enabled)
@@ -5105,6 +5129,30 @@ class RobustLiveExecutor:
             0.35,
         )
         return True
+
+    def _moonshot_size_boost(self, symbol: str, gate_score: float) -> float:
+        """Innovation 19: Return size multiplier when symbol is on the moonshot watchlist."""
+        if not self.moonshot_amplifier_enabled:
+            return 1.0
+        if gate_score < float(self.moonshot_amplifier_min_gate_score):
+            return 1.0
+        import time as _time
+        _now_m = _time.monotonic()
+        if _now_m - self._moonshot_watchlist_cache_ts > float(self._moonshot_watchlist_cache_ttl):
+            try:
+                import pathlib as _pathlib, json as _json
+                _wl_path = _pathlib.Path(self.moonshot_watchlist_path)
+                if not _wl_path.is_absolute():
+                    _wl_path = _pathlib.Path(__file__).resolve().parent.parent.parent / _wl_path
+                _wl_data = _json.loads(_wl_path.read_text())
+                self._moonshot_watchlist_cache = [str(s).upper() for s in _wl_data.get("watchlist", [])]
+                self._moonshot_watchlist_cache_ts = _now_m
+            except Exception:
+                return 1.0
+        _sym_clean = str(symbol).upper().split("/")[0]
+        if _sym_clean in self._moonshot_watchlist_cache:
+            return float(self.moonshot_amplifier_multiplier)
+        return 1.0
 
     def _compute_compounding_notional_cap(
         self,
@@ -8079,6 +8127,15 @@ class RobustLiveExecutor:
         effective_max_notional_usd = float(compounding_cap_usd)
         if effective_max_notional_usd > 0.0:
             effective_max_notional_usd = max(0.5, effective_max_notional_usd * max(float(effective_notional_throttle), 0.05))
+        # ── Innovation 19: Moonshot Size Amplifier ────────────────────────────
+        if self.moonshot_amplifier_enabled and side == "buy" and effective_max_notional_usd > 0.0:
+            _ms_mult = self._moonshot_size_boost(symbol, float(gate_decision.composite_score))
+            if _ms_mult > 1.0:
+                _ms_raw = effective_max_notional_usd
+                _ms_hard_cap = float(compounding_available_usd) * float(self.moonshot_amplifier_max_cap_pct)
+                effective_max_notional_usd = min(effective_max_notional_usd * _ms_mult, _ms_hard_cap)
+                print(f"  [inn19] moonshot-amplifier: {symbol} notional {_ms_raw:.2f}→{effective_max_notional_usd:.2f} ({_ms_mult:.2f}x cap={_ms_hard_cap:.2f})")
+        # ─────────────────────────────────────────────────────────────────────
         size_decision = self.sizing_engine.size(
             SizeInput(
                 equity_usd=sizing_equity_usd,
