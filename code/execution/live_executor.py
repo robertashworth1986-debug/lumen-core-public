@@ -1221,6 +1221,8 @@ class RobustLiveExecutor:
         self.trailing_stop_dynamic_scaling = True   # widen activation on high-amplitude assets
         self.trailing_stop_dynamic_multiplier = 0.08  # activation_bps += amplitude_pct * mult * 100
         self._position_peaks: dict[str, float] = {}   # pos_key -> best price seen while position open
+        self._alpha_score_cache: dict[str, float] = {}  # symbol -> alpha_long_score from intel file
+        self._alpha_score_cache_mtime: float = 0.0      # file mtime when cache was last loaded
         # ─────────────────────────────────────────────────────────────────────
         # ── Velocity Reversal Exit ────────────────────────────────────────────
         self._position_prev_price: dict[str, float] = {}  # pos_key -> price at start of last cycle
@@ -6592,6 +6594,28 @@ class RobustLiveExecutor:
         )
         return result
 
+    def _get_symbol_alpha_score(self, symbol: str) -> Optional[float]:
+        """Return the alpha_long_score for *symbol* from the symbol-flip intel file.
+        Refreshes the in-memory cache whenever the file changes on disk.
+        Returns None when the file is absent or the symbol is not in the intel."""
+        try:
+            p = SYMBOL_FLIP_INTEL_FILE
+            if not p.exists():
+                return None
+            mtime = p.stat().st_mtime
+            if mtime != self._alpha_score_cache_mtime:
+                data = json.loads(p.read_text(encoding="utf-8"))
+                candidates = data.get("long_candidates") or []
+                self._alpha_score_cache = {
+                    str(c.get("symbol", "")).upper(): self._to_float(c.get("alpha_long_score", 0.0), 0.0)
+                    for c in candidates
+                    if c.get("symbol")
+                }
+                self._alpha_score_cache_mtime = mtime
+            return self._alpha_score_cache.get(str(symbol or "").upper())
+        except Exception:
+            return None
+
     def _maybe_close_positions(self, symbol: str, last: float, now: datetime) -> bool:
         open_positions = self.portfolio.get_open_positions()
         symbol_positions = [
@@ -6605,6 +6629,25 @@ class RobustLiveExecutor:
         sl_bps = self._to_float(self.runtime_cfg.get("position_sl_net_bps", 40.0), 40.0)
         min_hold_sec = self._to_float(self.runtime_cfg.get("position_min_hold_seconds", 15.0), 15.0)
         max_hold_sec = self._to_float(self.runtime_cfg.get("position_max_hold_seconds", 240.0), 240.0)
+
+        # ── Alpha-Adaptive Exit Scaling (Innovation 11) ──────────────────────
+        # High alpha_long_score signals get a wider TP and longer max-hold to let
+        # momentum winners run.  Low-score signals get tighter TP/SL to exit
+        # quickly and preserve capital.  Can be disabled via runtime_control.json.
+        if self.runtime_cfg.get("alpha_adaptive_exit_enabled", True):
+            _alpha = self._get_symbol_alpha_score(symbol)
+            if _alpha is not None:
+                if _alpha >= 20.0:              # momentum_snipe tier — let it run
+                    tp_bps = max(tp_bps, 100.0)
+                    max_hold_sec = min(max_hold_sec * 2.0, 480.0)
+                elif _alpha >= 12.0:            # trend_follow_swing — moderate extension
+                    tp_bps = max(tp_bps, 80.0)
+                    max_hold_sec = min(max_hold_sec * 1.5, 360.0)
+                elif _alpha < 8.0:              # low conviction — tighten and exit fast
+                    tp_bps = min(tp_bps, 45.0)
+                    sl_bps = min(sl_bps, 28.0)
+                    max_hold_sec = min(max_hold_sec, 150.0)
+        # ─────────────────────────────────────────────────────────────────────
 
         tp_pct = max(tp_bps / 10000.0, 0.0)
         sl_pct = max(sl_bps / 10000.0, 0.0)
