@@ -1263,6 +1263,16 @@ class RobustLiveExecutor:
         self._session_symbol_consecutive_losses: dict[str, int] = {} # symbol → consecutive loss count
         self._session_hot_symbols: set = set()       # symbols on win streak this session
         # ─────────────────────────────────────────────────────────────────────
+        # ── Innovation 14: Age-Pressure TP Ladder ─────────────────────────────
+        # Converts flat-timeout trades into micro-wins by lowering the TP bar as
+        # hold time approaches max_hold_sec.  At 70% hold: exit if PnL >= 5 bps.
+        # At 85% hold: exit with any positive PnL.  Reclaims capital faster than
+        # waiting for a full timeout at near-zero.
+        self.age_pressure_tp_enabled = True
+        self.age_pressure_tp_early_pct = 0.70    # 70% of max_hold → early gate activates
+        self.age_pressure_tp_early_min_bps = 5.0 # early gate: exit if PnL >= this (bps)
+        self.age_pressure_tp_late_pct  = 0.85    # 85% of max_hold → late gate: any gain exits
+        # ─────────────────────────────────────────────────────────────────────
 
         # ══════════════════════════════════════════════════════════════════════
         # SELL LOGIC INNOVATIONS  (10-feature suite)
@@ -3200,6 +3210,14 @@ class RobustLiveExecutor:
             self._to_float(runtime.get("heat_recycle_min_hold_sec", self.heat_recycle_min_hold_sec), self.heat_recycle_min_hold_sec), 0.0, 3600.0)
         self.heat_recycle_cooldown_sec = self._clamp(
             self._to_float(runtime.get("heat_recycle_cooldown_sec", self.heat_recycle_cooldown_sec), self.heat_recycle_cooldown_sec), 5.0, 3600.0)
+        # Innovation 14: Age-Pressure TP Ladder
+        self.age_pressure_tp_enabled = bool(runtime.get("age_pressure_tp_enabled", self.age_pressure_tp_enabled))
+        self.age_pressure_tp_early_pct = self._clamp(
+            self._to_float(runtime.get("age_pressure_tp_early_pct", self.age_pressure_tp_early_pct), self.age_pressure_tp_early_pct), 0.50, 0.95)
+        self.age_pressure_tp_early_min_bps = self._clamp(
+            self._to_float(runtime.get("age_pressure_tp_early_min_bps", self.age_pressure_tp_early_min_bps), self.age_pressure_tp_early_min_bps), 0.0, 200.0)
+        self.age_pressure_tp_late_pct = self._clamp(
+            self._to_float(runtime.get("age_pressure_tp_late_pct", self.age_pressure_tp_late_pct), self.age_pressure_tp_late_pct), 0.51, 0.99)
         # ══════════════════════════════════════════════════════════════════════
         self.live_operator_queue_enabled = bool(
             runtime.get("live_operator_queue_enabled", self.live_operator_queue_enabled)
@@ -6828,6 +6846,21 @@ class RobustLiveExecutor:
                     and _pnl_drop >= float(self.pnl_drawdown_accel_peak_drop_pct)
                 )
 
+            # ── Innovation 14: Age-Pressure TP Ladder ─────────────────────────
+            # As position ages toward max_hold_sec, progressively lower the TP bar.
+            # At 70% hold: exit if PnL >= age_pressure_tp_early_min_bps.
+            # At 85% hold: exit with any positive PnL — micro-win vs timeout @ zero.
+            age_pressure_tp_hit = False
+            if self.age_pressure_tp_enabled and not _uses_trail and hold_sec >= min_hold_sec and pnl_pct > 0.0:
+                _hold_util = hold_sec / max(max_hold_sec, 1.0)
+                _early_min_pct = float(self.age_pressure_tp_early_min_bps) / 10000.0
+                if _hold_util >= float(self.age_pressure_tp_late_pct):
+                    age_pressure_tp_hit = True   # late gate: any positive PnL is enough
+                elif _hold_util >= float(self.age_pressure_tp_early_pct):
+                    age_pressure_tp_hit = pnl_pct >= _early_min_pct
+                if age_pressure_tp_hit:
+                    print(f"  [inn14] age-pressure TP {symbol}  hold={hold_sec:.0f}s/{max_hold_sec:.0f}s  pnl={pnl_pct*100:.3f}%")
+
             # ══════════════════════════════════════════════════════════════════
 
             should_close = (
@@ -6842,6 +6875,7 @@ class RobustLiveExecutor:
                 or conviction_tp_hit
                 or moonshot_tp_hit
                 or pnl_drawdown_hit
+                or age_pressure_tp_hit
             )
             if _vel_exit_hit:
                 _close_reason = "velocity_reversal"
@@ -6857,6 +6891,8 @@ class RobustLiveExecutor:
                 _close_reason = "take_profit"
             elif conviction_tp_hit:
                 _close_reason = "conviction_tiered_tp"
+            elif age_pressure_tp_hit:
+                _close_reason = "age_pressure_tp"
             elif moonshot_tp_hit:
                 _close_reason = "moonshot_slot_reserve"
             elif vel_loss_hit:
