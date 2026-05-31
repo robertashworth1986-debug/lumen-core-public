@@ -195,7 +195,14 @@
     "LUSD",
     "CUSDT",
     "USDA",
-    "USDP"
+    "USDP",
+    "TGBP",
+    "TCAD",
+    "TAUD",
+    "TEUR",
+    "EURT",
+    "XCHF",
+    "XSGD"
   ],
   "symbol_whitelist": [],
   "maker_first_enabled": true,
