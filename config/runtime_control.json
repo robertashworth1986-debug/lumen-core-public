@@ -6,7 +6,7 @@
   "leverage_multiplier": 1.0,
   "kill_switch": true,
   "max_daily_loss_usd": 8.0,
-  "max_open_positions": 10,
+  "max_open_positions": 20,
   "max_portfolio_heat": 0.72,
   "loop_seconds": 5,
   "max_position_usd": 126.5,
@@ -310,8 +310,8 @@
   "max_spread_bps": 130.0,
   "safety_auto_kill_source": "live_executor_inventory_discrepancy",
   "safety_auto_kill_reason": "inventory_discrepancy_zero_exchange_inventory",
-  "safety_auto_kill_symbol": "MEZO",
-  "safety_auto_kill_trip_utc": "2026-05-31T06:31:07.090126+00:00",
+  "safety_auto_kill_symbol": "TX",
+  "safety_auto_kill_trip_utc": "2026-05-31T06:44:02.277487+00:00",
   "safety_auto_kill_context": {
     "reconciled_count": 1,
     "available_asset_qty": 0.0
