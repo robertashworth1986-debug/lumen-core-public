@@ -104,7 +104,8 @@ def load_institutional_live_selection() -> dict:
 
 def _resolve_urgency(edge_score: float, spread_bps: float, direction: str) -> str:
     del direction
-    if edge_score >= 0.82 and spread_bps <= 10.0:
+    # High conviction → always market regardless of spread (avoid IOC limit failures)
+    if edge_score >= 0.82:
         return "aggressive"
     if edge_score >= 0.50 and spread_bps <= 25.0:
         return "normal"
@@ -1470,7 +1471,7 @@ class RobustLiveExecutor:
         self.success_notional_recovery_step = 0.03
         self.insufficient_funds_cooldown_step_sec = 20.0
         self.insufficient_funds_cooldown_max_sec = 300.0
-        self.stale_buy_order_ttl_sec = 480.0           # cancel limit buys unfilled after 8 min
+        self.stale_buy_order_ttl_sec = 60.0            # cancel limit buys unfilled after 60s (IOC should cancel immediately)
         self._last_stale_order_cleanup_utc: Optional[str] = None  # ISO str of last sweep
         self.stale_order_cleanup_interval_sec = 300.0  # periodic sweep every 5 min
         self.recent_order_attempt_utc: list[datetime] = []
@@ -6909,6 +6910,12 @@ class RobustLiveExecutor:
                     print(f"  [inn22] moonshot-tp: {_sym22} tp {tp_bps:.0f}→{_inn22_tp:.0f}bps hold {max_hold_sec:.0f}→{_inn22_hold:.0f}s")
                     tp_bps = _inn22_tp
                     max_hold_sec = max(max_hold_sec, _inn22_hold)
+                # Inn22: Widen SL for moonshot positions so volatile 5%+ runners
+                # aren't stopped out on normal dips before reaching the moonshot TP.
+                _inn22_sl_override = self._to_float(self.runtime_cfg.get("inn22_moonshot_sl_bps", 0.0), 0.0)
+                if _inn22_sl_override > 0.0 and sl_bps < _inn22_sl_override:
+                    print(f"  [inn22] moonshot-sl: {_sym22} sl {sl_bps:.0f}→{_inn22_sl_override:.0f}bps")
+                    sl_bps = _inn22_sl_override
         # ─────────────────────────────────────────────────────────────────────
 
         tp_pct = max(tp_bps / 10000.0, 0.0)
