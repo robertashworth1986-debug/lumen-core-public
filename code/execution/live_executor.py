@@ -1286,6 +1286,15 @@ class RobustLiveExecutor:
         self.age_pressure_sl_late_fraction = 0.35 # late-gate: SL = 35% of original (~19 bps)
         # ─────────────────────────────────────────────────────────────────────
 
+        # ── Innovation 16: Flat-Exit Reentry Dampener ─────────────────────────
+        # After a dead_weight_purge OR any exit where |pnl| < flat_exit_dampener_min_bps,
+        # apply an extended symbol skip to prevent repeatedly entering frozen symbols.
+        # A "flat exit" means zero alpha was generated — the symbol should rest longer.
+        self.flat_exit_dampener_enabled = True
+        self.flat_exit_dampener_min_bps = 5.0        # |pnl| below this → counted as flat
+        self.flat_exit_dampener_cooldown_sec = 900.0  # 15-min skip after flat close
+        # ─────────────────────────────────────────────────────────────────────
+
         # ══════════════════════════════════════════════════════════════════════
         # SELL LOGIC INNOVATIONS  (10-feature suite)
         # ══════════════════════════════════════════════════════════════════════
@@ -3240,6 +3249,12 @@ class RobustLiveExecutor:
             self._to_float(runtime.get("age_pressure_sl_late_pct", self.age_pressure_sl_late_pct), self.age_pressure_sl_late_pct), 0.50, 0.95)
         self.age_pressure_sl_late_fraction = self._clamp(
             self._to_float(runtime.get("age_pressure_sl_late_fraction", self.age_pressure_sl_late_fraction), self.age_pressure_sl_late_fraction), 0.05, 0.95)
+        # Innovation 16: Flat-Exit Reentry Dampener
+        self.flat_exit_dampener_enabled = bool(runtime.get("flat_exit_dampener_enabled", self.flat_exit_dampener_enabled))
+        self.flat_exit_dampener_min_bps = self._clamp(
+            self._to_float(runtime.get("flat_exit_dampener_min_bps", self.flat_exit_dampener_min_bps), self.flat_exit_dampener_min_bps), 0.0, 50.0)
+        self.flat_exit_dampener_cooldown_sec = self._clamp(
+            self._to_float(runtime.get("flat_exit_dampener_cooldown_sec", self.flat_exit_dampener_cooldown_sec), self.flat_exit_dampener_cooldown_sec), 60.0, 7200.0)
         # ══════════════════════════════════════════════════════════════════════
         self.live_operator_queue_enabled = bool(
             runtime.get("live_operator_queue_enabled", self.live_operator_queue_enabled)
@@ -7174,6 +7189,20 @@ class RobustLiveExecutor:
                     _streak_cd = float(self.session_loss_streak_cooldown_sec) * (_losses - int(self.session_loss_streak_threshold) + 1)
                     self._mark_symbol_skip(_sym_key, now, "session_loss_streak", _streak_cd)
                     print(f"  [inn12] loss streak cooldown {_sym_key}: {_losses} losses → {_streak_cd:.0f}s skip")
+            # ── Innovation 16: Flat-Exit Reentry Dampener ─────────────────────
+            # dead_weight_purge or any exit with |pnl| < flat_exit_dampener_min_bps
+            # means zero alpha — extend the symbol skip to 15 min to let it rest.
+            if self.flat_exit_dampener_enabled:
+                _flat_min_pct = float(self.flat_exit_dampener_min_bps) / 10000.0
+                _is_flat_close = (
+                    _close_reason == "dead_weight_purge"
+                    or abs(float(pnl_pct)) < _flat_min_pct
+                )
+                if _is_flat_close:
+                    _damp_cd = float(self.flat_exit_dampener_cooldown_sec)
+                    self._mark_symbol_skip(_sym_key, now, "flat_exit_dampener", _damp_cd)
+                    print(f"  [inn16] flat-exit dampener {_sym_key}  |pnl|={abs(float(pnl_pct))*10000:.1f}bps  skip={_damp_cd:.0f}s  reason={_close_reason}")
+            # ─────────────────────────────────────────────────────────────────
             return True
 
         return False
