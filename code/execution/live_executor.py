@@ -5487,6 +5487,9 @@ class RobustLiveExecutor:
                 # Don't recycle the preferred symbol itself
                 if base == str(preferred_symbol or "").upper().strip():
                     continue
+                # Inn22: never recycle a moonshot position — let it hold to 500bps TP
+                if self.inn22_moonshot_tp_enabled and base in self._moonshot_watchlist_cache:
+                    continue
                 ticker = self.router.get_ticker(base)
                 if not isinstance(ticker, dict):
                     continue
