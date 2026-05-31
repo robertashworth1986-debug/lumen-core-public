@@ -1343,6 +1343,12 @@ class RobustLiveExecutor:
         self.inn21_equity_scale_pct: float = 0.085         # position = 8.5% of equity
         self.inn21_equity_scale_min_cap: float = 12.0      # floor cap (USD)
         self.inn21_equity_scale_hard_max: float = 5000.0   # ceiling cap (USD)
+        # Innovation 22: Moonshot Long-Hold TP Amplifier
+        self.inn22_moonshot_tp_enabled: bool = True         # widen TP/hold for watchlist symbols
+        self.inn22_moonshot_tp_bps: float = 500.0           # 5% TP for moonshot symbols
+        self.inn22_moonshot_max_hold_sec: float = 14400.0   # 4-hour max hold for moonshots
+        self.inn22_moonshot_trail_activation_bps: float = 250.0  # 2.5% before trail arms
+        self.inn22_moonshot_trail_bps: float = 60.0         # 0.6% trail for moonshots
         # ─────────────────────────────────────────────────────────────────────
 
         # ══════════════════════════════════════════════════════════════════════
@@ -3354,6 +3360,16 @@ class RobustLiveExecutor:
             self._to_float(runtime.get("inn21_equity_scale_min_cap", self.inn21_equity_scale_min_cap), self.inn21_equity_scale_min_cap), 1.0, 500.0)
         self.inn21_equity_scale_hard_max = self._clamp(
             self._to_float(runtime.get("inn21_equity_scale_hard_max", self.inn21_equity_scale_hard_max), self.inn21_equity_scale_hard_max), 10.0, 50000.0)
+        # Innovation 22: Moonshot Long-Hold TP Amplifier
+        self.inn22_moonshot_tp_enabled = bool(runtime.get("inn22_moonshot_tp_enabled", self.inn22_moonshot_tp_enabled))
+        self.inn22_moonshot_tp_bps = self._clamp(
+            self._to_float(runtime.get("inn22_moonshot_tp_bps", self.inn22_moonshot_tp_bps), self.inn22_moonshot_tp_bps), 50.0, 50000.0)
+        self.inn22_moonshot_max_hold_sec = self._clamp(
+            self._to_float(runtime.get("inn22_moonshot_max_hold_sec", self.inn22_moonshot_max_hold_sec), self.inn22_moonshot_max_hold_sec), 60.0, 86400.0)
+        self.inn22_moonshot_trail_activation_bps = self._clamp(
+            self._to_float(runtime.get("inn22_moonshot_trail_activation_bps", self.inn22_moonshot_trail_activation_bps), self.inn22_moonshot_trail_activation_bps), 10.0, 5000.0)
+        self.inn22_moonshot_trail_bps = self._clamp(
+            self._to_float(runtime.get("inn22_moonshot_trail_bps", self.inn22_moonshot_trail_bps), self.inn22_moonshot_trail_bps), 5.0, 2000.0)
         # ══════════════════════════════════════════════════════════════════════
         self.live_operator_queue_enabled = bool(
             runtime.get("live_operator_queue_enabled", self.live_operator_queue_enabled)
@@ -6863,6 +6879,38 @@ class RobustLiveExecutor:
                     max_hold_sec = min(max_hold_sec, 150.0)
         # ─────────────────────────────────────────────────────────────────────
 
+        # ── Innovation 22: Moonshot Long-Hold TP Amplifier ───────────────────
+        # Symbols on the moonshot watchlist get a dramatically wider TP target
+        # and a 4-hour max hold, letting genuine rocket-movers capture 5-50%
+        # moves instead of being force-closed at the base 0.8% scalp target.
+        # Trailing stop activation is also widened to 2.5% so the stop doesn't
+        # prematurely fire at 0.45% peak on a symbol targeting +5%.
+        _inn22_is_moonshot = False
+        if self.inn22_moonshot_tp_enabled:
+            import time as _t22
+            _now22 = _t22.monotonic()
+            if _now22 - self._moonshot_watchlist_cache_ts > float(self._moonshot_watchlist_cache_ttl):
+                try:
+                    import pathlib as _p22, json as _j22
+                    _wl22 = _p22.Path(self.moonshot_watchlist_path)
+                    if not _wl22.is_absolute():
+                        _wl22 = _p22.Path(__file__).resolve().parent.parent.parent / _wl22
+                    _wd22 = _j22.loads(_wl22.read_text())
+                    self._moonshot_watchlist_cache = [str(s).upper() for s in _wd22.get("watchlist", [])]
+                    self._moonshot_watchlist_cache_ts = _now22
+                except Exception:
+                    pass
+            _sym22 = str(symbol).upper().split("/")[0]
+            if _sym22 in self._moonshot_watchlist_cache:
+                _inn22_is_moonshot = True
+                _inn22_tp = float(self.inn22_moonshot_tp_bps)
+                _inn22_hold = float(self.inn22_moonshot_max_hold_sec)
+                if tp_bps < _inn22_tp:
+                    print(f"  [inn22] moonshot-tp: {_sym22} tp {tp_bps:.0f}→{_inn22_tp:.0f}bps hold {max_hold_sec:.0f}→{_inn22_hold:.0f}s")
+                    tp_bps = _inn22_tp
+                    max_hold_sec = max(max_hold_sec, _inn22_hold)
+        # ─────────────────────────────────────────────────────────────────────
+
         tp_pct = max(tp_bps / 10000.0, 0.0)
         sl_pct = max(sl_bps / 10000.0, 0.0)
 
@@ -6882,6 +6930,11 @@ class RobustLiveExecutor:
             if _uses_trail:
                 _activation_bps = float(self.trailing_stop_activation_bps)
                 _trail_bps = float(self.trailing_stop_trail_bps)
+                # Inn22: Widen trailing stop thresholds for moonshot positions so the
+                # stop doesn't arm at +0.45% and cut a 5% moonshot run short.
+                if _inn22_is_moonshot:
+                    _activation_bps = max(_activation_bps, float(self.inn22_moonshot_trail_activation_bps))
+                    _trail_bps = max(_trail_bps, float(self.inn22_moonshot_trail_bps))
                 # Dynamic amplitude scaling: high-vol assets earn a wider activation buffer
                 if self.trailing_stop_dynamic_scaling:
                     try:
