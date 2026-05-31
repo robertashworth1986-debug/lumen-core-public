@@ -1273,6 +1273,18 @@ class RobustLiveExecutor:
         self.age_pressure_tp_early_min_bps = 5.0 # early gate: exit if PnL >= this (bps)
         self.age_pressure_tp_late_pct  = 0.85    # 85% of max_hold → late gate: any gain exits
         # ─────────────────────────────────────────────────────────────────────
+        # ── Innovation 15: Age-Pressure SL Tightener ────────────────────────
+        # Mirror of Inn14: as a losing position ages, dynamically tighten the SL
+        # so it exits before timeout eats the full loss.
+        # At 50% of max_hold: SL narrows to sl_mid_fraction × sl_bps.
+        # At 75% of max_hold: SL narrows to sl_late_fraction × sl_bps.
+        # Example at sl=55bps: 50%→33bps gate, 75%→19bps gate.
+        self.age_pressure_sl_enabled = True
+        self.age_pressure_sl_mid_pct = 0.50       # 50% of max_hold → mid-gate activates
+        self.age_pressure_sl_mid_fraction = 0.60  # mid-gate: SL = 60% of original (~33 bps)
+        self.age_pressure_sl_late_pct = 0.75      # 75% of max_hold → late-gate activates
+        self.age_pressure_sl_late_fraction = 0.35 # late-gate: SL = 35% of original (~19 bps)
+        # ─────────────────────────────────────────────────────────────────────
 
         # ══════════════════════════════════════════════════════════════════════
         # SELL LOGIC INNOVATIONS  (10-feature suite)
@@ -3218,6 +3230,16 @@ class RobustLiveExecutor:
             self._to_float(runtime.get("age_pressure_tp_early_min_bps", self.age_pressure_tp_early_min_bps), self.age_pressure_tp_early_min_bps), 0.0, 200.0)
         self.age_pressure_tp_late_pct = self._clamp(
             self._to_float(runtime.get("age_pressure_tp_late_pct", self.age_pressure_tp_late_pct), self.age_pressure_tp_late_pct), 0.51, 0.99)
+        # Innovation 15: Age-Pressure SL Tightener
+        self.age_pressure_sl_enabled = bool(runtime.get("age_pressure_sl_enabled", self.age_pressure_sl_enabled))
+        self.age_pressure_sl_mid_pct = self._clamp(
+            self._to_float(runtime.get("age_pressure_sl_mid_pct", self.age_pressure_sl_mid_pct), self.age_pressure_sl_mid_pct), 0.30, 0.80)
+        self.age_pressure_sl_mid_fraction = self._clamp(
+            self._to_float(runtime.get("age_pressure_sl_mid_fraction", self.age_pressure_sl_mid_fraction), self.age_pressure_sl_mid_fraction), 0.10, 1.00)
+        self.age_pressure_sl_late_pct = self._clamp(
+            self._to_float(runtime.get("age_pressure_sl_late_pct", self.age_pressure_sl_late_pct), self.age_pressure_sl_late_pct), 0.50, 0.95)
+        self.age_pressure_sl_late_fraction = self._clamp(
+            self._to_float(runtime.get("age_pressure_sl_late_fraction", self.age_pressure_sl_late_fraction), self.age_pressure_sl_late_fraction), 0.05, 0.95)
         # ══════════════════════════════════════════════════════════════════════
         self.live_operator_queue_enabled = bool(
             runtime.get("live_operator_queue_enabled", self.live_operator_queue_enabled)
@@ -6861,6 +6883,24 @@ class RobustLiveExecutor:
                 if age_pressure_tp_hit:
                     print(f"  [inn14] age-pressure TP {symbol}  hold={hold_sec:.0f}s/{max_hold_sec:.0f}s  pnl={pnl_pct*100:.3f}%")
 
+            # ── Innovation 15: Age-Pressure SL Tightener ─────────────────────────
+            # As a losing position ages, tighten the effective SL threshold to
+            # cut the loss before timeout.  Fractions of base sl_pct are applied:
+            # At 50% hold: exit if |loss| >= sl_mid_fraction × sl_pct
+            # At 75% hold: exit if |loss| >= sl_late_fraction × sl_pct
+            age_pressure_sl_hit = False
+            if self.age_pressure_sl_enabled and hold_sec >= min_hold_sec and pnl_pct < 0.0 and sl_pct > 0.0:
+                _hold_util_sl = hold_sec / max(max_hold_sec, 1.0)
+                if _hold_util_sl >= float(self.age_pressure_sl_late_pct):
+                    _late_sl = sl_pct * float(self.age_pressure_sl_late_fraction)
+                    age_pressure_sl_hit = pnl_pct <= -_late_sl
+                elif _hold_util_sl >= float(self.age_pressure_sl_mid_pct):
+                    _mid_sl = sl_pct * float(self.age_pressure_sl_mid_fraction)
+                    age_pressure_sl_hit = pnl_pct <= -_mid_sl
+                if age_pressure_sl_hit:
+                    _gate_lbl = 'late' if _hold_util_sl >= float(self.age_pressure_sl_late_pct) else 'mid'
+                    print(f"  [inn15] age-pressure SL {symbol}  {_gate_lbl}  hold={hold_sec:.0f}s/{max_hold_sec:.0f}s  pnl={pnl_pct*100:.3f}%")
+
             # ══════════════════════════════════════════════════════════════════
 
             should_close = (
@@ -6876,6 +6916,7 @@ class RobustLiveExecutor:
                 or moonshot_tp_hit
                 or pnl_drawdown_hit
                 or age_pressure_tp_hit
+                or age_pressure_sl_hit
             )
             if _vel_exit_hit:
                 _close_reason = "velocity_reversal"
@@ -6893,6 +6934,8 @@ class RobustLiveExecutor:
                 _close_reason = "conviction_tiered_tp"
             elif age_pressure_tp_hit:
                 _close_reason = "age_pressure_tp"
+            elif age_pressure_sl_hit:
+                _close_reason = "age_pressure_sl"
             elif moonshot_tp_hit:
                 _close_reason = "moonshot_slot_reserve"
             elif vel_loss_hit:
