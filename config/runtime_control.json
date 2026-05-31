@@ -106,6 +106,7 @@
   "edge_fee_coverage_multiplier": 1.03,
   "adaptive_entry_gate_enabled": false,
   "age_trail_tighten_start_sec": 600,
+  "age_pressure_tp_early_min_bps": 20,
   "adaptive_entry_gate_min_bps": 1.0,
   "adaptive_entry_gate_max_bps": 1.0,
   "adaptive_entry_gate_relax_step_bps": 2.0,

@@ -7105,7 +7105,7 @@ class RobustLiveExecutor:
             # At 70% hold: exit if PnL >= age_pressure_tp_early_min_bps.
             # At 85% hold: exit with any positive PnL — micro-win vs timeout @ zero.
             age_pressure_tp_hit = False
-            if self.age_pressure_tp_enabled and not _uses_trail and not _inn22_is_moonshot and hold_sec >= min_hold_sec and pnl_pct > 0.0:
+            if self.age_pressure_tp_enabled and not _inn22_is_moonshot and hold_sec >= min_hold_sec and pnl_pct > 0.0:
                 _hold_util = hold_sec / max(max_hold_sec, 1.0)
                 _early_min_pct = float(self.age_pressure_tp_early_min_bps) / 10000.0
                 if _hold_util >= float(self.age_pressure_tp_late_pct):
