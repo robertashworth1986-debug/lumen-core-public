@@ -1308,6 +1308,17 @@ class RobustLiveExecutor:
         self._recent_close_pnl_abs_bps: deque = deque(maxlen=6)  # rolling |pnl| in bps
         # ─────────────────────────────────────────────────────────────────────
 
+        # ── Innovation 18: Dead-Weight Strike Escalator ───────────────────────
+        # Each time the SAME symbol is dead_weight_purged again, escalate the
+        # re-entry cooldown exponentially: 2nd purge = 30 min, 3rd = 1 hour,
+        # 4th+ = capped at 4 hours.  Strike 1 is already handled by Inn16 (900s).
+        self.dw_strike_escalator_enabled = True
+        self.dw_strike_escalator_base_sec = 900.0    # base (Inn16 level; escalation starts at 2x)
+        self.dw_strike_escalator_multiplier = 2.0    # doubles each additional strike
+        self.dw_strike_escalator_max_sec = 14400.0   # cap at 4 hours
+        self._dw_strike_count: dict[str, int] = {}   # symbol → cumulative dead_weight count
+        # ─────────────────────────────────────────────────────────────────────
+
         # ══════════════════════════════════════════════════════════════════════
         # SELL LOGIC INNOVATIONS  (10-feature suite)
         # ══════════════════════════════════════════════════════════════════════
@@ -3281,6 +3292,14 @@ class RobustLiveExecutor:
             self._to_float(runtime.get("cluster_flat_max_bps", self.cluster_flat_max_bps), self.cluster_flat_max_bps), 0.0, 100.0)
         self.cluster_flat_pause_sec = self._clamp(
             self._to_float(runtime.get("cluster_flat_pause_sec", self.cluster_flat_pause_sec), self.cluster_flat_pause_sec), 30.0, 3600.0)
+        # Innovation 18: Dead-Weight Strike Escalator
+        self.dw_strike_escalator_enabled = bool(runtime.get("dw_strike_escalator_enabled", self.dw_strike_escalator_enabled))
+        self.dw_strike_escalator_base_sec = self._clamp(
+            self._to_float(runtime.get("dw_strike_escalator_base_sec", self.dw_strike_escalator_base_sec), self.dw_strike_escalator_base_sec), 60.0, 7200.0)
+        self.dw_strike_escalator_multiplier = self._clamp(
+            self._to_float(runtime.get("dw_strike_escalator_multiplier", self.dw_strike_escalator_multiplier), self.dw_strike_escalator_multiplier), 1.0, 8.0)
+        self.dw_strike_escalator_max_sec = self._clamp(
+            self._to_float(runtime.get("dw_strike_escalator_max_sec", self.dw_strike_escalator_max_sec), self.dw_strike_escalator_max_sec), 600.0, 86400.0)
         # ══════════════════════════════════════════════════════════════════════
         self.live_operator_queue_enabled = bool(
             runtime.get("live_operator_queue_enabled", self.live_operator_queue_enabled)
@@ -7243,6 +7262,21 @@ class RobustLiveExecutor:
                         _pause = float(self.cluster_flat_pause_sec)
                         self._set_buy_cooldown(now, _pause)
                         print(f"  [inn17] flat-cluster pause: {_flat_count}/{_n} closes flat (<{_flat_max}bps)  pause={_pause:.0f}s")
+            # ─────────────────────────────────────────────────────────────────
+            # ── Innovation 18: Dead-Weight Strike Escalator ───────────────────
+            # Track how many times this symbol has been dead_weight_purged.
+            # From 2nd purge onwards, escalate the skip duration exponentially.
+            # Strike 1 = 900s (handled by Inn16).  Strike 2 = 1800s.  3 = 3600s. etc.
+            if self.dw_strike_escalator_enabled and _close_reason == "dead_weight_purge":
+                _dw_strike = self._dw_strike_count.get(_sym_key, 0) + 1
+                self._dw_strike_count[_sym_key] = _dw_strike
+                if _dw_strike >= 2:
+                    _esc_cd = min(
+                        float(self.dw_strike_escalator_base_sec) * (float(self.dw_strike_escalator_multiplier) ** (_dw_strike - 1)),
+                        float(self.dw_strike_escalator_max_sec),
+                    )
+                    self._mark_symbol_skip(_sym_key, now, f"dw_strike_{_dw_strike}", _esc_cd)
+                    print(f"  [inn18] dw-strike-escalator {_sym_key}  strike={_dw_strike}  skip={_esc_cd:.0f}s")
             # ─────────────────────────────────────────────────────────────────
             return True
 
