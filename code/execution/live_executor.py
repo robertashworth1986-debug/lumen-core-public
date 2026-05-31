@@ -2096,6 +2096,11 @@ class RobustLiveExecutor:
                 0.05,
                 1.0,
             )
+            gate_thresholds["win_rate"] = self._clamp(
+                self._to_float(runtime.get("gate_min_win_rate", gate_thresholds.get("win_rate", 0.35)), gate_thresholds.get("win_rate", 0.35)),
+                0.0,
+                0.99,
+            )
 
             if self.hard_safety_only_mode:
                 # In hard-safety mode, keep spread/liquidity/min-notional/trap gates authoritative
@@ -7471,7 +7476,7 @@ class RobustLiveExecutor:
             return None  # hard block
 
         features = self._build_realtime_features(symbol, ticker)
-        hist_wr = self.portfolio.win_rate() / 100 if getattr(self.portfolio, "total_trades", 0) > 0 else 0.52
+        hist_wr = self.portfolio.win_rate() / 100 if getattr(self.portfolio, "total_trades", 0) >= 20 else 0.52
         open_positions = len(self.portfolio.get_open_positions())
         sector_heat = min(open_positions / max(float(self.max_open_positions), 1.0), 0.99)
 
