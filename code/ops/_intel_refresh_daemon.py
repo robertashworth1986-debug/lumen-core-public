@@ -227,11 +227,11 @@ def main():
                     f"{c['symbol']}({c['alpha_long_score']:.1f})"
                     for c in intel["long_candidates"][:3]
                 )
-                print(f"[{ts}] #{cycle:04d}  ✓ intel refreshed  "
+                print(f"[{ts}] #{cycle:04d}  OK intel refreshed  "
                       f"alpha_age={age_sec/60:.1f}min  top3=[{top3}]", flush=True)
                 status = "ok"
             else:
-                print(f"[{ts}] #{cycle:04d}  ⚠ alpha leaderboard empty "
+                print(f"[{ts}] #{cycle:04d}  WARN alpha leaderboard empty "
                       f"(alpha_age={age_sec/60:.1f}min)", flush=True)
                 status = "empty_leaderboard"
 
