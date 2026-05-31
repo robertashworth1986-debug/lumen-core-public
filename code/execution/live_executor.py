@@ -302,6 +302,7 @@ class KrakenClient:
         self._balance_cache_usd = 0.0
         self._balance_cache_utc = ""
         self._balance_snapshot: dict[str, float] = {}
+        self._open_order_locked_usd: float = 0.0   # USD locked in open limit buy orders
         self._asset_pairs_map: dict[str, dict[str, Any]] = {}
         self._asset_pairs_cache_utc = ""
         self._asset_pairs_cache_ttl_sec = 3600.0
@@ -598,6 +599,11 @@ class KrakenClient:
         balances, error_text = self._fetch_balances()
         if balances:
             zusd = float(balances.get("ZUSD", 0.0) or 0.0)
+            # Subtract capital locked in open limit buy orders so sizing reflects
+            # truly available balance (not total including locked-but-unfilled orders).
+            locked = max(float(self._open_order_locked_usd or 0.0), 0.0)
+            if locked > 0.0 and zusd > 0.0:
+                balances["ZUSD"] = max(zusd - locked, 0.0)
             if zusd > 0.0:
                 self._save_balance_cache(zusd)
             else:
@@ -756,6 +762,7 @@ class KrakenClient:
                     "status": str(row.get("status", "") or "").lower().strip(),
                     "vol": self._to_float(row.get("vol", 0.0), 0.0),
                     "vol_exec": self._to_float(row.get("vol_exec", 0.0), 0.0),
+                    "price": self._to_float(descr.get("price", 0.0), 0.0),
                     "opentm": self._to_float(row.get("opentm", 0.0), 0.0),
                 }
             )
@@ -1364,6 +1371,9 @@ class RobustLiveExecutor:
         self.success_notional_recovery_step = 0.03
         self.insufficient_funds_cooldown_step_sec = 20.0
         self.insufficient_funds_cooldown_max_sec = 300.0
+        self.stale_buy_order_ttl_sec = 480.0           # cancel limit buys unfilled after 8 min
+        self._last_stale_order_cleanup_utc: Optional[str] = None  # ISO str of last sweep
+        self.stale_order_cleanup_interval_sec = 300.0  # periodic sweep every 5 min
         self.recent_order_attempt_utc: list[datetime] = []
         self.recent_order_fail_utc: list[datetime] = []
         self.failure_window_sec = 300.0
@@ -5339,6 +5349,127 @@ class RobustLiveExecutor:
             self.audit_chain.append("heat_recycle_error", {"error": str(exc)})
             return False
 
+    def _cancel_stale_buy_orders(self, now: datetime, force: bool = False) -> dict[str, Any]:
+        """Cancel unfilled limit BUY orders older than stale_buy_order_ttl_sec.
+
+        Called periodically and on every EOrder:Insufficient funds hit to free
+        locked capital before the executor gives up and throttles notional size.
+        """
+        result: dict[str, Any] = {"checked": 0, "cancelled": 0, "freed_usd": 0.0, "errors": 0}
+        try:
+            # Rate-limit: only run once per stale_order_cleanup_interval_sec unless forced
+            if not force and self._last_stale_order_cleanup_utc:
+                try:
+                    last_dt = self._parse_iso_utc(self._last_stale_order_cleanup_utc)
+                    if (now - last_dt).total_seconds() < float(self.stale_order_cleanup_interval_sec):
+                        result["skipped"] = "cooldown"
+                        return result
+                except Exception:
+                    pass
+
+            self._last_stale_order_cleanup_utc = now.isoformat()
+            open_payload = self.router.get_open_orders(trades=True)
+            if isinstance(open_payload, dict) and "error" in open_payload:
+                result["errors"] += 1
+                return result
+
+            orders = open_payload.get("orders", []) if isinstance(open_payload, dict) else []
+            ttl = float(self.stale_buy_order_ttl_sec)
+            now_ts = now.timestamp()
+
+            # Update open-order locked USD on the Kraken client so balance reflects reality
+            total_locked = 0.0
+            stale: list[dict[str, Any]] = []
+            for row in orders:
+                if not isinstance(row, dict):
+                    continue
+                if str(row.get("type", "")).lower() != "buy":
+                    continue
+                opentm = self._to_float(row.get("opentm", 0.0), 0.0)
+                vol_rem = max(self._to_float(row.get("vol"), 0.0) - self._to_float(row.get("vol_exec"), 0.0), 0.0)
+                price = self._to_float(row.get("price", 0.0), 0.0)
+                total_locked += vol_rem * price
+                if opentm <= 0.0:
+                    continue
+                age_sec = now_ts - opentm
+                if age_sec >= ttl:
+                    stale.append(row)
+
+            # Inform the Kraken client about currently locked capital
+            try:
+                self.router.kraken._open_order_locked_usd = float(total_locked)
+            except Exception:
+                pass
+
+            result["checked"] = len(orders)
+            if not stale:
+                return result
+
+            # Cancel stale buy orders one by one (preserve good orders)
+            for row in stale:
+                txid = str(row.get("txid", "") or "").strip()
+                if not txid:
+                    continue
+                try:
+                    cancel_resp = self.router.cancel_order(txid)
+                    if isinstance(cancel_resp, dict) and "error" not in cancel_resp:
+                        vol_remaining = max(
+                            self._to_float(row.get("vol"), 0.0) - self._to_float(row.get("vol_exec"), 0.0), 0.0
+                        )
+                        price = self._to_float(row.get("price", 0.0), 0.0)
+                        freed = vol_remaining * price
+                        result["cancelled"] += 1
+                        result["freed_usd"] += freed
+                        self.audit_chain.append(
+                            "stale_buy_order_cancelled",
+                            {
+                                "txid": txid,
+                                "pair": str(row.get("pair", "")),
+                                "age_sec": round(now_ts - self._to_float(row.get("opentm"), 0.0), 1),
+                                "freed_usd": round(freed, 4),
+                            },
+                        )
+                    else:
+                        result["errors"] += 1
+                except Exception:
+                    result["errors"] += 1
+
+            # If we freed capital, force-refresh the balance cache
+            if result["cancelled"] > 0:
+                try:
+                    # Clear locked amount proportionally
+                    freed = float(result["freed_usd"])
+                    prev_locked = max(float(self.router.kraken._open_order_locked_usd), 0.0)
+                    self.router.kraken._open_order_locked_usd = max(prev_locked - freed, 0.0)
+                    self.router.get_balance_snapshot(force_refresh=True)
+                    # Reset fail streak — capital is now available again
+                    self.order_fail_streak = max(self.order_fail_streak - result["cancelled"] * 3, 0)
+                    self.notional_throttle = min(
+                        self.notional_throttle * (1.0 + self.success_notional_recovery_step * result["cancelled"]),
+                        1.0,
+                    )
+                    print(
+                        f"  stale_buy_cancel: freed ${result['freed_usd']:.2f} from "
+                        f"{result['cancelled']} order(s), fail_streak → {self.order_fail_streak}, "
+                        f"throttle → {self.notional_throttle:.3f}"
+                    )
+                except Exception:
+                    pass
+        except Exception as exc:
+            self.audit_chain.append("stale_buy_cancel_error", {"error": str(exc)})
+            result["errors"] += 1
+        return result
+
+    def _stale_order_cleanup_due(self, now: datetime) -> bool:
+        """True if the periodic stale-order cleanup sweep should run this loop."""
+        if not self._last_stale_order_cleanup_utc:
+            return True
+        try:
+            last_dt = self._parse_iso_utc(self._last_stale_order_cleanup_utc)
+            return (now - last_dt).total_seconds() >= float(self.stale_order_cleanup_interval_sec)
+        except Exception:
+            return True
+
     def _global_close_sweep_due(self, now: datetime) -> bool:
         if not bool(self.global_close_sweep_enabled):
             return False
@@ -7956,6 +8087,18 @@ class RobustLiveExecutor:
             if insufficient_funds and side == "sell":
                 available_asset_qty = max(float(self.router.get_asset_balance(symbol, force_refresh=False) or 0.0), 0.0)
 
+            # On EOrder:Insufficient funds for a BUY, attempt to free capital by
+            # cancelling any stale unfilled limit buy orders before escalating throttle.
+            if insufficient_funds and side == "buy":
+                try:
+                    _stale_result = self._cancel_stale_buy_orders(now, force=True)
+                    if _stale_result.get("cancelled", 0) > 0:
+                        # Capital freed — do NOT escalate fail_streak or throttle
+                        self.audit_chain.append("insufficient_funds_stale_release", _stale_result)
+                        return
+                except Exception:
+                    pass
+
             if volume_min_error or insufficient_funds:
                 self.order_fail_streak += 1
                 self.notional_throttle = max(self.notional_throttle * self.failure_notional_decay, self.failure_notional_floor)
@@ -8363,6 +8506,12 @@ class RobustLiveExecutor:
                 )
                 loop_now = datetime.now(timezone.utc)
                 self._prune_symbol_skip_map(loop_now)
+                # Periodic stale buy-order sweep — frees locked capital every 5 min
+                if self._stale_order_cleanup_due(loop_now):
+                    try:
+                        self._cancel_stale_buy_orders(loop_now, force=False)
+                    except Exception:
+                        pass
                 symbol_skip_active_count = int(len(self._symbol_skip_until_utc))
                 _write_live_heartbeat(
                     {
