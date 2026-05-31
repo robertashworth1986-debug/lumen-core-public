@@ -1333,6 +1333,17 @@ class RobustLiveExecutor:
         self._moonshot_watchlist_cache_ts: float = 0.0
         self._moonshot_watchlist_cache_ttl: float = 300.0  # refresh every 5 minutes
         # ─────────────────────────────────────────────────────────────────────
+        # Innovation 20: Throttle Reset Command + Preferred Symbol Fast Lane
+        self.fail_streak_reset_nonce: int = 0             # bump in config to reset throttle
+        self._last_fail_streak_reset_nonce: int = 0       # tracks last applied nonce
+        self.preferred_symbol_fast_lane_enabled: bool = True  # force preferred into candidates
+        self.preferred_symbol_fast_lane_min_alpha: float = 0.0  # min alpha score to force (0=always)
+        # Innovation 21: Equity-Scaled Compounding Cap
+        self.inn21_equity_scale_enabled: bool = True       # auto-scale position cap with equity
+        self.inn21_equity_scale_pct: float = 0.085         # position = 8.5% of equity
+        self.inn21_equity_scale_min_cap: float = 12.0      # floor cap (USD)
+        self.inn21_equity_scale_hard_max: float = 5000.0   # ceiling cap (USD)
+        # ─────────────────────────────────────────────────────────────────────
 
         # ══════════════════════════════════════════════════════════════════════
         # SELL LOGIC INNOVATIONS  (10-feature suite)
@@ -3324,6 +3335,25 @@ class RobustLiveExecutor:
         self.moonshot_amplifier_max_cap_pct = self._clamp(
             self._to_float(runtime.get("moonshot_amplifier_max_cap_pct", self.moonshot_amplifier_max_cap_pct), self.moonshot_amplifier_max_cap_pct), 0.25, 0.60)
         self.moonshot_watchlist_path = str(runtime.get("moonshot_watchlist_path", self.moonshot_watchlist_path))
+        # Innovation 20: Throttle Reset Command + Preferred Symbol Fast Lane
+        new_nonce = int(self._to_float(runtime.get("fail_streak_reset_nonce", 0), 0))
+        if new_nonce != self._last_fail_streak_reset_nonce and new_nonce > 0:
+            self._last_fail_streak_reset_nonce = new_nonce
+            self.order_fail_streak = 0
+            self.notional_throttle = 1.0
+            self._set_buy_cooldown(datetime.now(timezone.utc), 0.0)
+            print(f"[Inn20] throttle reset via nonce={new_nonce}: fail_streak=0, throttle=1.0")
+        self.preferred_symbol_fast_lane_enabled = bool(runtime.get("preferred_symbol_fast_lane_enabled", self.preferred_symbol_fast_lane_enabled))
+        self.preferred_symbol_fast_lane_min_alpha = self._clamp(
+            self._to_float(runtime.get("preferred_symbol_fast_lane_min_alpha", self.preferred_symbol_fast_lane_min_alpha), self.preferred_symbol_fast_lane_min_alpha), 0.0, 50.0)
+        # Innovation 21: Equity-Scaled Compounding Cap
+        self.inn21_equity_scale_enabled = bool(runtime.get("inn21_equity_scale_enabled", self.inn21_equity_scale_enabled))
+        self.inn21_equity_scale_pct = self._clamp(
+            self._to_float(runtime.get("inn21_equity_scale_pct", self.inn21_equity_scale_pct), self.inn21_equity_scale_pct), 0.02, 0.50)
+        self.inn21_equity_scale_min_cap = self._clamp(
+            self._to_float(runtime.get("inn21_equity_scale_min_cap", self.inn21_equity_scale_min_cap), self.inn21_equity_scale_min_cap), 1.0, 500.0)
+        self.inn21_equity_scale_hard_max = self._clamp(
+            self._to_float(runtime.get("inn21_equity_scale_hard_max", self.inn21_equity_scale_hard_max), self.inn21_equity_scale_hard_max), 10.0, 50000.0)
         # ══════════════════════════════════════════════════════════════════════
         self.live_operator_queue_enabled = bool(
             runtime.get("live_operator_queue_enabled", self.live_operator_queue_enabled)
@@ -4434,6 +4464,32 @@ class RobustLiveExecutor:
                 sampled = list(unique)
             else:
                 sampled = random.sample(unique, sample_size) if len(unique) > sample_size else list(unique)
+
+        # Inn20: Preferred Symbol Fast Lane — guarantee pref is always in the sampled pool
+        # when fast lane is enabled AND it qualifies by alpha score.  This prevents the
+        # random sample from accidentally excluding the top intel candidate every cycle.
+        if (
+            pref
+            and pref in unique
+            and pref not in sampled
+            and bool(self.preferred_symbol_fast_lane_enabled)
+        ):
+            _fast_lane_ok = False
+            try:
+                _intel = self._load_symbol_flip_intel_payload()
+                if isinstance(_intel, dict):
+                    _longs = _intel.get("long_candidates", []) or []
+                    if isinstance(_longs, list) and _longs:
+                        _top = _longs[0] if isinstance(_longs[0], dict) else {}
+                        if str(_top.get("symbol", "")).upper().strip() == pref:
+                            _alpha = self._to_float(_top.get("alpha_long_score", 0.0), 0.0)
+                            if _alpha >= float(self.preferred_symbol_fast_lane_min_alpha):
+                                _fast_lane_ok = True
+            except Exception:
+                pass
+            if _fast_lane_ok:
+                sampled.insert(0, pref)
+                meta["universe_sample_strategy"] = meta.get("universe_sample_strategy", "random") + "+fast_lane"
 
         hard_reject_spread_bps = max(self._to_float(self.universe_hard_reject_spread_bps, 0.0), 0.0)
 
@@ -8135,6 +8191,22 @@ class RobustLiveExecutor:
                 _ms_hard_cap = float(compounding_available_usd) * float(self.moonshot_amplifier_max_cap_pct)
                 effective_max_notional_usd = min(effective_max_notional_usd * _ms_mult, _ms_hard_cap)
                 print(f"  [inn19] moonshot-amplifier: {symbol} notional {_ms_raw:.2f}→{effective_max_notional_usd:.2f} ({_ms_mult:.2f}x cap={_ms_hard_cap:.2f})")
+        # ── Innovation 21: Equity-Scaled Compounding Cap ──────────────────────
+        # Automatically scales the per-trade notional cap as equity grows so
+        # position sizes compound upward (8.5% of equity by default).
+        # This drives the $274 → $10,000 compounding trajectory.
+        if self.inn21_equity_scale_enabled and side == "buy":
+            _inn21_equity = max(float(portfolio_equity_usd), float(usd_balance), 0.0)
+            if _inn21_equity > 0.0:
+                _inn21_cap = self._clamp(
+                    _inn21_equity * self.inn21_equity_scale_pct,
+                    self.inn21_equity_scale_min_cap,
+                    self.inn21_equity_scale_hard_max,
+                )
+                _inn21_affordable_cap = min(_inn21_cap, float(compounding_available_usd) * 0.80)
+                if _inn21_affordable_cap > effective_max_notional_usd:
+                    print(f"  [inn21] equity-scale: {effective_max_notional_usd:.2f}→{_inn21_affordable_cap:.2f} ({self.inn21_equity_scale_pct*100:.1f}% of ${_inn21_equity:.0f})")
+                effective_max_notional_usd = max(effective_max_notional_usd, _inn21_affordable_cap)
         # ─────────────────────────────────────────────────────────────────────
         size_decision = self.sizing_engine.size(
             SizeInput(
