@@ -7007,10 +7007,12 @@ class RobustLiveExecutor:
             )
 
             # Innovation 2: Dead-Weight Purge ─ exit positions wasting heat
+            # Inn22 moonshot positions are exempt: they need up to 4 hours to develop.
             dead_weight_hit = (
                 self.dead_weight_purge_enabled
                 and hold_sec >= float(self.dead_weight_max_age_sec)
                 and abs(pnl_pct) < float(self.dead_weight_max_drift_pct)
+                and not _inn22_is_moonshot
             )
 
             # Innovation 3: Age-Tightened Trailing Stop ─ trail tightens as position ages
