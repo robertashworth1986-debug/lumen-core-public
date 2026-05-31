@@ -7097,6 +7097,7 @@ class RobustLiveExecutor:
                     hold_sec >= min_hold_sec
                     and _intra_peak_pnl >= float(self.trailing_stop_activation_bps) / 10000.0
                     and _pnl_drop >= float(self.pnl_drawdown_accel_peak_drop_pct)
+                    and not _inn22_is_moonshot  # moonshots use 250bps trail activation
                 )
 
             # ── Innovation 14: Age-Pressure TP Ladder ─────────────────────────
@@ -7104,7 +7105,7 @@ class RobustLiveExecutor:
             # At 70% hold: exit if PnL >= age_pressure_tp_early_min_bps.
             # At 85% hold: exit with any positive PnL — micro-win vs timeout @ zero.
             age_pressure_tp_hit = False
-            if self.age_pressure_tp_enabled and not _uses_trail and hold_sec >= min_hold_sec and pnl_pct > 0.0:
+            if self.age_pressure_tp_enabled and not _uses_trail and not _inn22_is_moonshot and hold_sec >= min_hold_sec and pnl_pct > 0.0:
                 _hold_util = hold_sec / max(max_hold_sec, 1.0)
                 _early_min_pct = float(self.age_pressure_tp_early_min_bps) / 10000.0
                 if _hold_util >= float(self.age_pressure_tp_late_pct):
@@ -7120,7 +7121,7 @@ class RobustLiveExecutor:
             # At 50% hold: exit if |loss| >= sl_mid_fraction × sl_pct
             # At 75% hold: exit if |loss| >= sl_late_fraction × sl_pct
             age_pressure_sl_hit = False
-            if self.age_pressure_sl_enabled and hold_sec >= min_hold_sec and pnl_pct < 0.0 and sl_pct > 0.0:
+            if self.age_pressure_sl_enabled and not _inn22_is_moonshot and hold_sec >= min_hold_sec and pnl_pct < 0.0 and sl_pct > 0.0:
                 _hold_util_sl = hold_sec / max(max_hold_sec, 1.0)
                 if _hold_util_sl >= float(self.age_pressure_sl_late_pct):
                     _late_sl = sl_pct * float(self.age_pressure_sl_late_fraction)
