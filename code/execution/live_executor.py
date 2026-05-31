@@ -1295,6 +1295,19 @@ class RobustLiveExecutor:
         self.flat_exit_dampener_cooldown_sec = 900.0  # 15-min skip after flat close
         # ─────────────────────────────────────────────────────────────────────
 
+        # ── Innovation 17: Flat-Cluster Regime Pause ──────────────────────────
+        # When the recent N closes are dominated by flat/zero-alpha exits,
+        # the market is in a low-alpha regime.  Pause ALL new entries for
+        # cluster_flat_pause_sec seconds to avoid burning more capital.
+        # "Flat close" = |pnl_pct| < cluster_flat_max_bps.
+        self.cluster_flat_pause_enabled = True
+        self.cluster_flat_recent_n = 6          # sliding window of last N closes
+        self.cluster_flat_threshold_frac = 0.67 # 4/6 flat → regime pause
+        self.cluster_flat_max_bps = 10.0        # flat = |pnl| < 10 bps
+        self.cluster_flat_pause_sec = 240.0     # 4-min global entry pause
+        self._recent_close_pnl_abs_bps: deque = deque(maxlen=6)  # rolling |pnl| in bps
+        # ─────────────────────────────────────────────────────────────────────
+
         # ══════════════════════════════════════════════════════════════════════
         # SELL LOGIC INNOVATIONS  (10-feature suite)
         # ══════════════════════════════════════════════════════════════════════
@@ -3255,6 +3268,19 @@ class RobustLiveExecutor:
             self._to_float(runtime.get("flat_exit_dampener_min_bps", self.flat_exit_dampener_min_bps), self.flat_exit_dampener_min_bps), 0.0, 50.0)
         self.flat_exit_dampener_cooldown_sec = self._clamp(
             self._to_float(runtime.get("flat_exit_dampener_cooldown_sec", self.flat_exit_dampener_cooldown_sec), self.flat_exit_dampener_cooldown_sec), 60.0, 7200.0)
+        # Innovation 17: Flat-Cluster Regime Pause
+        self.cluster_flat_pause_enabled = bool(runtime.get("cluster_flat_pause_enabled", self.cluster_flat_pause_enabled))
+        _new_n = int(self._clamp(
+            self._to_float(runtime.get("cluster_flat_recent_n", self.cluster_flat_recent_n), self.cluster_flat_recent_n), 3.0, 20.0))
+        if _new_n != self._recent_close_pnl_abs_bps.maxlen:
+            self._recent_close_pnl_abs_bps = deque(list(self._recent_close_pnl_abs_bps)[-_new_n:], maxlen=_new_n)
+        self.cluster_flat_recent_n = _new_n
+        self.cluster_flat_threshold_frac = self._clamp(
+            self._to_float(runtime.get("cluster_flat_threshold_frac", self.cluster_flat_threshold_frac), self.cluster_flat_threshold_frac), 0.50, 1.00)
+        self.cluster_flat_max_bps = self._clamp(
+            self._to_float(runtime.get("cluster_flat_max_bps", self.cluster_flat_max_bps), self.cluster_flat_max_bps), 0.0, 100.0)
+        self.cluster_flat_pause_sec = self._clamp(
+            self._to_float(runtime.get("cluster_flat_pause_sec", self.cluster_flat_pause_sec), self.cluster_flat_pause_sec), 30.0, 3600.0)
         # ══════════════════════════════════════════════════════════════════════
         self.live_operator_queue_enabled = bool(
             runtime.get("live_operator_queue_enabled", self.live_operator_queue_enabled)
@@ -7202,6 +7228,21 @@ class RobustLiveExecutor:
                     _damp_cd = float(self.flat_exit_dampener_cooldown_sec)
                     self._mark_symbol_skip(_sym_key, now, "flat_exit_dampener", _damp_cd)
                     print(f"  [inn16] flat-exit dampener {_sym_key}  |pnl|={abs(float(pnl_pct))*10000:.1f}bps  skip={_damp_cd:.0f}s  reason={_close_reason}")
+            # ─────────────────────────────────────────────────────────────────
+            # ── Innovation 17: Flat-Cluster Regime Pause ──────────────────────
+            # Push this close's |pnl| into the rolling window.  If enough
+            # recent closes are flat (zero-alpha), trigger a global buy pause.
+            if self.cluster_flat_pause_enabled:
+                self._recent_close_pnl_abs_bps.append(abs(float(pnl_pct)) * 10000.0)
+                _n = len(self._recent_close_pnl_abs_bps)
+                if _n >= int(self.cluster_flat_recent_n):
+                    _flat_max = float(self.cluster_flat_max_bps)
+                    _flat_count = sum(1 for v in self._recent_close_pnl_abs_bps if v < _flat_max)
+                    _flat_frac = _flat_count / max(_n, 1)
+                    if _flat_frac >= float(self.cluster_flat_threshold_frac):
+                        _pause = float(self.cluster_flat_pause_sec)
+                        self._set_buy_cooldown(now, _pause)
+                        print(f"  [inn17] flat-cluster pause: {_flat_count}/{_n} closes flat (<{_flat_max}bps)  pause={_pause:.0f}s")
             # ─────────────────────────────────────────────────────────────────
             return True
 
