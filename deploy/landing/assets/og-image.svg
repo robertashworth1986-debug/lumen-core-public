@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="rg1" cx="80%" cy="-30%" r="70%">
+      <stop offset="0%" stop-color="#7ab7ff" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#06080d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="rg2" cx="-5%" cy="95%" r="60%">
+      <stop offset="0%" stop-color="#5cf2c7" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#06080d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#06080d"/>
+  <rect width="1200" height="630" fill="url(#rg1)"/>
+  <rect width="1200" height="630" fill="url(#rg2)"/>
+
+  <!-- Top border accent -->
+  <rect x="0" y="0" width="1200" height="2" fill="#5cf2c7" opacity="0.6"/>
+
+  <!-- Brand mark -->
+  <circle cx="72" cy="72" r="8" fill="#5cf2c7" opacity="0.9"/>
+  <text x="92" y="80" font-family="ui-sans-serif,system-ui,-apple-system,sans-serif" font-size="22" font-weight="700" fill="#e7eef7" letter-spacing="1">LUMENCORE</text>
+
+  <!-- Live badge -->
+  <rect x="72" y="108" width="140" height="28" rx="14" fill="#0a0f17" stroke="#1c2535" stroke-width="1"/>
+  <circle cx="92" cy="122" r="5" fill="#5cf2c7"/>
+  <text x="104" y="127" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#8390a3">Live System</text>
+
+  <!-- Main headline -->
+  <text x="72" y="230" font-family="ui-sans-serif,system-ui,-apple-system,sans-serif" font-size="58" font-weight="700" fill="#e7eef7" letter-spacing="-1.5">Institutional quant research,</text>
+  <text x="72" y="302" font-family="ui-sans-serif,system-ui,-apple-system,sans-serif" font-size="58" font-weight="700" fill="#5cf2c7" letter-spacing="-1.5">built solo.</text>
+
+  <!-- Subtext -->
+  <text x="72" y="360" font-family="ui-sans-serif,system-ui,sans-serif" font-size="22" fill="#8390a3">870+ instruments · Live Kraken TXIDs · SHA-256 audit chain · Radical transparency</text>
+
+  <!-- Stats row -->
+  <!-- Stat 1 -->
+  <rect x="72" y="420" width="220" height="100" rx="12" fill="#0c111a" stroke="#1c2535" stroke-width="1"/>
+  <text x="92" y="452" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11" fill="#8390a3" letter-spacing="1" text-transform="uppercase">INSTRUMENTS</text>
+  <text x="92" y="498" font-family="ui-sans-serif,system-ui,sans-serif" font-size="40" font-weight="700" fill="#e7eef7">870+</text>
+
+  <!-- Stat 2 -->
+  <rect x="312" y="420" width="220" height="100" rx="12" fill="#0c111a" stroke="#1c2535" stroke-width="1"/>
+  <text x="332" y="452" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11" fill="#8390a3" letter-spacing="1">PARALLEL JOBS</text>
+  <text x="332" y="498" font-family="ui-sans-serif,system-ui,sans-serif" font-size="40" font-weight="700" fill="#e7eef7">132K</text>
+
+  <!-- Stat 3 -->
+  <rect x="552" y="420" width="220" height="100" rx="12" fill="#0c111a" stroke="#1c2535" stroke-width="1"/>
+  <text x="572" y="452" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11" fill="#8390a3" letter-spacing="1">BUILD DURATION</text>
+  <text x="572" y="498" font-family="ui-sans-serif,system-ui,sans-serif" font-size="40" font-weight="700" fill="#e7eef7">12mo</text>
+
+  <!-- Stat 4 -->
+  <rect x="792" y="420" width="220" height="100" rx="12" fill="#0c111a" stroke="#1c2535" stroke-width="1"/>
+  <text x="812" y="452" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11" fill="#8390a3" letter-spacing="1">AUDIT TRAIL</text>
+  <text x="812" y="498" font-family="ui-sans-serif,system-ui,sans-serif" font-size="40" font-weight="700" fill="#5cf2c7">SHA-256</text>
+
+  <!-- Domain -->
+  <text x="1128" y="600" font-family="ui-monospace,Menlo,monospace" font-size="14" fill="#5b6678" text-anchor="end">lumen-core.ai</text>
+</svg>

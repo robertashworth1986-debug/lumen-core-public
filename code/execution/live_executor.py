@@ -1744,6 +1744,27 @@ class RobustLiveExecutor:
             runtime = {}
         self.runtime_cfg = runtime
 
+        # Merge symbol_skip_until_utc from runtime_control.json into the
+        # in-memory skip map so hot-reload of runtime_control takes effect
+        # without a restart.  Only *extend* existing entries; never shorten a
+        # skip that was dynamically added by the executor's own logic.
+        _rc_skip_rows = runtime.get("symbol_skip_until_utc", {})
+        if isinstance(_rc_skip_rows, dict):
+            _now_utc = datetime.now(timezone.utc)
+            for _rc_key, _rc_raw in _rc_skip_rows.items():
+                _rc_sym = str(_rc_key or "").upper().strip()
+                if not _rc_sym:
+                    continue
+                try:
+                    _rc_until = self._parse_iso_utc(str(_rc_raw))
+                except Exception:
+                    continue
+                if _rc_until <= _now_utc:
+                    continue  # already expired — don't inject
+                _existing = self._symbol_skip_until_utc.get(_rc_sym)
+                if not isinstance(_existing, datetime) or _rc_until > _existing:
+                    self._symbol_skip_until_utc[_rc_sym] = _rc_until
+
         self.live_selection = load_institutional_live_selection()
         self.edge_multiplier = max(self._to_float(self.live_selection.get("edge_multiplier", 1.0), 1.0), 0.5)
         self.max_open_positions = self._effective_max_open_positions(runtime.get("max_open_positions", MIN_OPEN_POSITIONS_FLOOR))
@@ -5400,7 +5421,10 @@ class RobustLiveExecutor:
                     continue
 
                 value_usd = qty * last
-                if value_usd < 1.0:
+                # Skip balances below $15 — Kraken minimum sell notional is ~$10,
+                # injecting sub-$15 dust creates phantom positions that can never be
+                # closed, consuming heat and blocking real entries indefinitely.
+                if value_usd < 15.0:
                     continue
 
                 # Determine the quote currency this asset was most likely traded against.

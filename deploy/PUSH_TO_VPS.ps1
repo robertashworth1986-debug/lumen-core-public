@@ -154,6 +154,26 @@ Invoke-Scp -StepLabel "3/5 Upload LamaScout archive" -Args @(
 Invoke-Ssh -StepLabel "3/5 Extract LamaScout archive" -RemoteCommand "sudo mkdir -p ${VpsRoot} && sudo tar -xzf /tmp/lumencore_lamascout.tgz --overwrite -C ${VpsRoot} && rm -f /tmp/lumencore_lamascout.tgz"
 Remove-Item $lamaArchive -Force
 
+# Step 3b: Upload public landing page (index.html, robots.txt, sitemap.xml, assets/)
+$landingDir = Join-Path $Root "deploy\landing"
+if (Test-Path $landingDir) {
+    Write-Host "[3b] Uploading public landing page (SEO assets)..." -ForegroundColor Yellow
+    $landingArchive = Join-Path $env:TEMP "lumencore_landing_$stamp.tgz"
+    if (Test-Path $landingArchive) { Remove-Item $landingArchive -Force }
+    tar -czf $landingArchive -C $landingDir .
+    if ($LASTEXITCODE -eq 0 -and (Test-Path $landingArchive)) {
+        Invoke-Scp -StepLabel "3b Upload landing archive" -Args @(
+            $landingArchive,
+            "${VpsUser}@${VpsIp}:/tmp/lumencore_landing.tgz"
+        )
+        Invoke-Ssh -StepLabel "3b Extract landing to web root" -RemoteCommand "sudo mkdir -p /var/www/lumen-core/assets && sudo tar -xzf /tmp/lumencore_landing.tgz --overwrite -C /var/www/lumen-core/ && rm -f /tmp/lumencore_landing.tgz && sudo chown -R caddy:caddy /var/www/lumen-core/ 2>/dev/null || true"
+        Remove-Item $landingArchive -Force
+        Write-Host "[3b] Landing page pushed OK" -ForegroundColor Green
+    } else {
+        Write-Warning "[3b] Landing tar failed — skipping landing upload"
+    }
+}
+
 # Step 4: Fix permissions and start services
 Write-Host "[4/5] Setting permissions and starting services..." -ForegroundColor Yellow
 $startServicesCmd = 'sudo chown -R lumencore:lumencore ' + $VpsRoot + '; sudo systemctl daemon-reload; for svc in lamascout-api luma-dashboard lamascout-loop luma-paper-ticker luma-intel-api; do if sudo systemctl list-unit-files --type=service | grep -q "^${svc}\.service"; then sudo systemctl enable --now "$svc"; fi; done'
