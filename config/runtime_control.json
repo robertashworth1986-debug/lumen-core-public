@@ -343,5 +343,9 @@
   "inn22_moonshot_tp_bps": 500.0,
   "inn22_moonshot_max_hold_sec": 14400.0,
   "inn22_moonshot_trail_activation_bps": 250.0,
-  "inn22_moonshot_trail_bps": 60.0
+  "inn22_moonshot_trail_bps": 60.0,
+  "capital_preservation_max_consecutive_losses": 5,
+  "capital_preservation_pause_sec": 300.0,
+  "capital_preservation_min_win_rate_pct": 20.0,
+  "capital_preservation_min_recent_closed": 6
 }
