@@ -2101,6 +2101,11 @@ class RobustLiveExecutor:
                 0.0,
                 0.99,
             )
+            gate_thresholds["orderbook_spread_bps"] = self._clamp(
+                self._to_float(runtime.get("gate_max_orderbook_spread_bps", gate_thresholds.get("orderbook_spread_bps", 18.0)), gate_thresholds.get("orderbook_spread_bps", 18.0)),
+                5.0,
+                500.0,
+            )
 
             if self.hard_safety_only_mode:
                 # In hard-safety mode, keep spread/liquidity/min-notional/trap gates authoritative

@@ -20,6 +20,7 @@
   "gate_min_composite_score": 0.82,
   "gate_min_win_rate": 0.15,
   "gate_min_alignment": 0.4,
+  "gate_max_orderbook_spread_bps": 80.0,
   "gate_override_enabled": false,
   "gate_override_min_confidence": 0.82,
   "gate_override_min_edge_bps": 15.0,
