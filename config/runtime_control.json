@@ -388,5 +388,18 @@
   "capital_preservation_pause_sec": 300.0,
   "capital_preservation_min_win_rate_pct": 20.0,
   "capital_preservation_min_recent_closed": 6,
-  "capital_preservation_mode": false
+  "capital_preservation_mode": false,
+  "inn23_queue_prune_enabled": true,
+  "inn23_queue_entry_ttl_sec": 300.0,
+  "inn23_queue_prune_interval_sec": 60.0,
+  "inn24_confirmation_enabled": true,
+  "inn24_confirmation_scans": 2,
+  "inn24_confirmation_window_sec": 180.0,
+  "inn25_volume_surge_enabled": true,
+  "inn25_volume_surge_ratio": 1.8,
+  "inn25_volume_surge_bonus": 0.04,
+  "inn25_volume_baseline_scans": 12,
+  "inn26_equity_recovery_enabled": true,
+  "inn26_equity_recovery_threshold_usd": 60.0,
+  "inn26_equity_recovery_resume_usd": 100.0
 }

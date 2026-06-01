@@ -1352,6 +1352,49 @@ class RobustLiveExecutor:
         self.inn22_moonshot_trail_bps: float = 60.0         # 0.6% trail for moonshots
         # ─────────────────────────────────────────────────────────────────────
 
+        # ── Innovation 23: Approval Queue Auto-Expiry ─────────────────────────
+        # Every N seconds, prune stale entries from execution_approval_queue.json.
+        # Market orders older than inn23_queue_entry_ttl_sec are worthless price
+        # snapshots — purge them so the queue never exceeds ~50 live items.
+        self.inn23_queue_prune_enabled: bool = True
+        self.inn23_queue_entry_ttl_sec: float = 300.0       # 5 min TTL for queued tickets
+        self.inn23_queue_prune_interval_sec: float = 60.0   # prune check every 60s
+        self._last_queue_prune_utc: Optional[str] = None
+        # ─────────────────────────────────────────────────────────────────────
+
+        # ── Innovation 24: Alpha Confirmation Window ──────────────────────────
+        # Before entering, require a symbol to appear as a top candidate in N
+        # consecutive scans within a rolling window.  Eliminates noise spikes that
+        # appear once and vanish; strong setups persist across scans.
+        self.inn24_confirmation_enabled: bool = True
+        self.inn24_confirmation_scans: int = 2              # need 2 consecutive appearances
+        self.inn24_confirmation_window_sec: float = 180.0   # appearances must be within 3 min
+        self._inn24_candidate_hits: dict[str, list[float]] = {}  # symbol -> [hit_epoch, ...]
+        # ─────────────────────────────────────────────────────────────────────
+
+        # ── Innovation 25: Volume Surge Entry Amplifier ───────────────────────
+        # When a symbol's 24-h traded volume is surging (current > baseline * ratio),
+        # apply a composite-score bonus so high-momentum breakouts score higher
+        # and beat out quieter candidates.  Baseline is the rolling 12-scan median.
+        self.inn25_volume_surge_enabled: bool = True
+        self.inn25_volume_surge_ratio: float = 1.8          # volume must be 1.8x baseline
+        self.inn25_volume_surge_bonus: float = 0.04         # add 0.04 to composite score
+        self.inn25_volume_baseline_scans: int = 12          # scans to build median baseline
+        self._inn25_volume_history: dict[str, list[float]] = {}  # symbol -> [24h_vol, ...]
+        # ─────────────────────────────────────────────────────────────────────
+
+        # ── Innovation 26: Equity Recovery Sell-Drain Mode ───────────────────
+        # When total portfolio equity drops below a configured floor, block ALL new
+        # buy entries.  Only sell-side activity runs until equity recovers to the
+        # resume threshold.  Protects minimum capital by clearing stale positions
+        # rather than adding more risk when the account is in distress.
+        self.inn26_equity_recovery_enabled: bool = True
+        self.inn26_equity_recovery_threshold_usd: float = 60.0   # activate below $60
+        self.inn26_equity_recovery_resume_usd: float = 100.0     # resume buys above $100
+        self._inn26_recovery_mode_active: bool = False
+        self._inn26_recovery_activated_utc: Optional[str] = None
+        # ─────────────────────────────────────────────────────────────────────
+
         # ══════════════════════════════════════════════════════════════════════
         # SELL LOGIC INNOVATIONS  (10-feature suite)
         # ══════════════════════════════════════════════════════════════════════
@@ -3381,6 +3424,32 @@ class RobustLiveExecutor:
             self._to_float(runtime.get("inn22_moonshot_trail_activation_bps", self.inn22_moonshot_trail_activation_bps), self.inn22_moonshot_trail_activation_bps), 10.0, 5000.0)
         self.inn22_moonshot_trail_bps = self._clamp(
             self._to_float(runtime.get("inn22_moonshot_trail_bps", self.inn22_moonshot_trail_bps), self.inn22_moonshot_trail_bps), 5.0, 2000.0)
+        # Inn23: Approval Queue Auto-Expiry
+        self.inn23_queue_prune_enabled = bool(runtime.get("inn23_queue_prune_enabled", self.inn23_queue_prune_enabled))
+        self.inn23_queue_entry_ttl_sec = self._clamp(
+            self._to_float(runtime.get("inn23_queue_entry_ttl_sec", self.inn23_queue_entry_ttl_sec), self.inn23_queue_entry_ttl_sec), 30.0, 3600.0)
+        self.inn23_queue_prune_interval_sec = self._clamp(
+            self._to_float(runtime.get("inn23_queue_prune_interval_sec", self.inn23_queue_prune_interval_sec), self.inn23_queue_prune_interval_sec), 10.0, 600.0)
+        # Inn24: Alpha Confirmation Window
+        self.inn24_confirmation_enabled = bool(runtime.get("inn24_confirmation_enabled", self.inn24_confirmation_enabled))
+        self.inn24_confirmation_scans = int(self._clamp(
+            self._to_float(runtime.get("inn24_confirmation_scans", self.inn24_confirmation_scans), float(self.inn24_confirmation_scans)), 1.0, 10.0))
+        self.inn24_confirmation_window_sec = self._clamp(
+            self._to_float(runtime.get("inn24_confirmation_window_sec", self.inn24_confirmation_window_sec), self.inn24_confirmation_window_sec), 10.0, 1800.0)
+        # Inn25: Volume Surge Entry Amplifier
+        self.inn25_volume_surge_enabled = bool(runtime.get("inn25_volume_surge_enabled", self.inn25_volume_surge_enabled))
+        self.inn25_volume_surge_ratio = self._clamp(
+            self._to_float(runtime.get("inn25_volume_surge_ratio", self.inn25_volume_surge_ratio), self.inn25_volume_surge_ratio), 1.0, 10.0)
+        self.inn25_volume_surge_bonus = self._clamp(
+            self._to_float(runtime.get("inn25_volume_surge_bonus", self.inn25_volume_surge_bonus), self.inn25_volume_surge_bonus), 0.0, 0.20)
+        self.inn25_volume_baseline_scans = int(self._clamp(
+            self._to_float(runtime.get("inn25_volume_baseline_scans", self.inn25_volume_baseline_scans), float(self.inn25_volume_baseline_scans)), 3.0, 60.0))
+        # Inn26: Equity Recovery Sell-Drain Mode
+        self.inn26_equity_recovery_enabled = bool(runtime.get("inn26_equity_recovery_enabled", self.inn26_equity_recovery_enabled))
+        self.inn26_equity_recovery_threshold_usd = self._clamp(
+            self._to_float(runtime.get("inn26_equity_recovery_threshold_usd", self.inn26_equity_recovery_threshold_usd), self.inn26_equity_recovery_threshold_usd), 1.0, 50000.0)
+        self.inn26_equity_recovery_resume_usd = self._clamp(
+            self._to_float(runtime.get("inn26_equity_recovery_resume_usd", self.inn26_equity_recovery_resume_usd), self.inn26_equity_recovery_resume_usd), 1.0, 100000.0)
         # ══════════════════════════════════════════════════════════════════════
         self.live_operator_queue_enabled = bool(
             runtime.get("live_operator_queue_enabled", self.live_operator_queue_enabled)
@@ -5716,6 +5785,58 @@ class RobustLiveExecutor:
         except Exception:
             return True
 
+    # ── Innovation 23: Approval Queue Auto-Expiry ────────────────────────────
+    def _inn23_queue_prune_due(self, now: datetime) -> bool:
+        """True if it is time to run the approval queue TTL sweep."""
+        if not bool(self.inn23_queue_prune_enabled):
+            return False
+        if not self._last_queue_prune_utc:
+            return True
+        try:
+            last_dt = self._parse_iso_utc(self._last_queue_prune_utc)
+            return (now - last_dt).total_seconds() >= float(self.inn23_queue_prune_interval_sec)
+        except Exception:
+            return True
+
+    def _inn23_prune_approval_queue(self, now: datetime) -> int:
+        """Remove entries older than inn23_queue_entry_ttl_sec from execution_approval_queue.json.
+        Returns count of entries pruned.
+        """
+        queue_file = ROOT / "execution_approval_queue.json"
+        pruned = 0
+        try:
+            if not queue_file.exists():
+                return 0
+            raw = queue_file.read_text(encoding="utf-8").strip()
+            if not raw:
+                return 0
+            entries = json.loads(raw)
+            if not isinstance(entries, list):
+                return 0
+            cutoff_epoch = now.timestamp() - float(self.inn23_queue_entry_ttl_sec)
+            fresh: list = []
+            for item in entries:
+                ts_str = str(item.get("timestamp", "") or "").strip()
+                keep = True
+                if ts_str:
+                    try:
+                        ts_dt = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                        if ts_dt.timestamp() < cutoff_epoch:
+                            keep = False
+                            pruned += 1
+                    except Exception:
+                        pass  # malformed timestamp: keep as safe fallback
+                if keep:
+                    fresh.append(item)
+            if pruned > 0:
+                queue_file.write_text(json.dumps(fresh, ensure_ascii=False), encoding="utf-8")
+                print(f"  [inn23] queue_prune: removed {pruned} stale tickets, {len(fresh)} remaining")
+        except Exception as exc:
+            print(f"  [inn23] queue_prune error: {exc}")
+        self._last_queue_prune_utc = now.isoformat()
+        return pruned
+    # ─────────────────────────────────────────────────────────────────────────
+
     def _global_close_sweep_due(self, now: datetime) -> bool:
         if not bool(self.global_close_sweep_enabled):
             return False
@@ -7592,6 +7713,17 @@ class RobustLiveExecutor:
             print("  blocked: regime/selection conflict or no data")
             return
 
+        # Inn25: Apply volume surge bonus to expected_edge_bps before gate evaluation
+        if bool(self.inn25_volume_surge_enabled):
+            _inn25_bonus = float(self._to_float(pick_meta.get("inn25_volume_surge_bonus", 0.0), 0.0))
+            if _inn25_bonus > 0.0:
+                import dataclasses as _dc
+                gate_input = _dc.replace(
+                    gate_input,
+                    expected_edge_bps=gate_input.expected_edge_bps + _inn25_bonus * 100.0
+                )
+                pick_meta["inn25_edge_bps_boosted"] = round(gate_input.expected_edge_bps, 2)
+
         gate_decision = self.signal_gate.decide(gate_input)
         gate_override_applied = False
         decision_armed = bool(gate_decision.armed)
@@ -7926,6 +8058,22 @@ class RobustLiveExecutor:
             )
             self._save_pacing_state()
             print("  blocked: capital preservation hold")
+            return
+
+        # Inn26: Equity Recovery Sell-Drain Mode — block new buys when equity is distressed
+        if side == "buy" and bool(self.inn26_equity_recovery_enabled) and bool(self._inn26_recovery_mode_active):
+            _write_live_heartbeat(
+                {
+                    "status": "blocked",
+                    "reason": "inn26_equity_recovery_mode",
+                    "symbol": symbol,
+                    "side": side,
+                    "inn26_recovery_threshold_usd": round(float(self.inn26_equity_recovery_threshold_usd), 2),
+                    "inn26_recovery_resume_usd": round(float(self.inn26_equity_recovery_resume_usd), 2),
+                    "inn26_activated_utc": str(self._inn26_recovery_activated_utc or ""),
+                }
+            )
+            print(f"  blocked: inn26 equity_recovery_mode — no new buys until equity >= ${self.inn26_equity_recovery_resume_usd:.0f}")
             return
         capital_reference_usd = max(
             self._to_float(
@@ -8980,6 +9128,26 @@ class RobustLiveExecutor:
                         self._cancel_stale_buy_orders(loop_now, force=False)
                     except Exception:
                         pass
+                # Inn23: Auto-expire stale approval queue entries
+                if self._inn23_queue_prune_due(loop_now):
+                    try:
+                        self._inn23_prune_approval_queue(loop_now)
+                    except Exception:
+                        pass
+                # Inn26: Update equity recovery mode flag
+                if bool(self.inn26_equity_recovery_enabled):
+                    _equity_hint = float(self._to_float(valuation_hint.get("total_equity_usd", 0.0), 0.0))
+                    if _equity_hint <= 0.0:
+                        _equity_hint = float(total_cash_usd_hint)
+                    if not self._inn26_recovery_mode_active:
+                        if _equity_hint > 0.0 and _equity_hint < float(self.inn26_equity_recovery_threshold_usd):
+                            self._inn26_recovery_mode_active = True
+                            self._inn26_recovery_activated_utc = loop_now.isoformat()
+                            print(f"  [inn26] equity_recovery_mode ACTIVATED — equity=${_equity_hint:.2f} < threshold=${self.inn26_equity_recovery_threshold_usd:.2f}")
+                    else:
+                        if _equity_hint >= float(self.inn26_equity_recovery_resume_usd):
+                            self._inn26_recovery_mode_active = False
+                            print(f"  [inn26] equity_recovery_mode DEACTIVATED — equity=${_equity_hint:.2f} >= resume=${self.inn26_equity_recovery_resume_usd:.2f}")
                 symbol_skip_active_count = int(len(self._symbol_skip_until_utc))
                 _write_live_heartbeat(
                     {
@@ -9511,6 +9679,58 @@ class RobustLiveExecutor:
                     continue
 
                 self.no_affordable_streak = 0
+
+                # Inn24: Alpha Confirmation Window — require N consecutive scans before entry
+                if bool(self.inn24_confirmation_enabled) and int(self.inn24_confirmation_scans) >= 2:
+                    _sym24 = str(symbol).upper().strip()
+                    _now_epoch = loop_now.timestamp()
+                    _window = float(self.inn24_confirmation_window_sec)
+                    hits = self._inn24_candidate_hits.get(_sym24, [])
+                    # Prune hits outside the window
+                    hits = [t for t in hits if _now_epoch - t <= _window]
+                    hits.append(_now_epoch)
+                    self._inn24_candidate_hits[_sym24] = hits
+                    _required = int(self.inn24_confirmation_scans)
+                    if len(hits) < _required:
+                        selection_meta["inn24_confirmation_hits"] = len(hits)
+                        selection_meta["inn24_confirmation_required"] = _required
+                        _write_live_heartbeat(
+                            {
+                                "status": "pending",
+                                "reason": "inn24_confirmation_pending",
+                                "symbol": _sym24,
+                                "inn24_hits": len(hits),
+                                "inn24_required": _required,
+                                "inn24_window_sec": _window,
+                            }
+                        )
+                        print(f"  [inn24] {_sym24} confirmation {len(hits)}/{_required} — holding for next scan")
+                        time.sleep(self.loop_seconds)
+                        continue
+                    selection_meta["inn24_confirmed"] = True
+                    selection_meta["inn24_hits"] = len(hits)
+
+                # Inn25: Volume Surge Entry Amplifier — boost edge on breakout volume
+                if bool(self.inn25_volume_surge_enabled) and isinstance(preloaded_ticker, dict):
+                    _sym25 = str(symbol).upper().strip()
+                    _vol25 = self._to_float(preloaded_ticker.get("volume", 0.0), 0.0)
+                    if _vol25 > 0.0:
+                        _hist25 = self._inn25_volume_history.get(_sym25, [])
+                        _hist25.append(_vol25)
+                        _max_scans = max(int(self.inn25_volume_baseline_scans), 3)
+                        if len(_hist25) > _max_scans:
+                            _hist25 = _hist25[-_max_scans:]
+                        self._inn25_volume_history[_sym25] = _hist25
+                        if len(_hist25) >= 3:
+                            _baseline = sorted(_hist25)[len(_hist25) // 2]  # median
+                            if _baseline > 0.0 and _vol25 >= _baseline * float(self.inn25_volume_surge_ratio):
+                                _bonus = float(self.inn25_volume_surge_bonus)
+                                selection_meta["inn25_volume_surge"] = True
+                                selection_meta["inn25_volume_surge_bonus"] = _bonus
+                                selection_meta["inn25_volume_current"] = round(_vol25, 2)
+                                selection_meta["inn25_volume_baseline"] = round(_baseline, 2)
+                                print(f"  [inn25] {_sym25} volume surge x{_vol25/_baseline:.1f} — edge +{_bonus:.3f}")
+
                 self.execute_trade_cycle(symbol, preloaded_ticker=preloaded_ticker, selection_meta=selection_meta)
                 time.sleep(self.loop_seconds)
             except KeyboardInterrupt:
