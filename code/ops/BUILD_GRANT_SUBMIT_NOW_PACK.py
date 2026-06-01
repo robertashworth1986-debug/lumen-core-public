@@ -168,14 +168,47 @@ def main(argv: list[str]) -> int:
     pack_dir.mkdir(parents=True, exist_ok=True)
     PACK_ROOT.mkdir(parents=True, exist_ok=True)
 
-    # Per-ticket briefs
+    # Per-ticket briefs + auto-attached fresh multi-asset frozen-delta evidence pack
     brief_files = []
+    evidence_results: list[dict] = []
+    try:
+        # Local import to keep this module standalone-runnable
+        from BUILD_GRANT_EVIDENCE_DELTA_PACK import (  # type: ignore
+            parse_agency_memo, load_ticket_snapshot as _evp_load_snap,
+            build_pack as _evp_build, MEMO_PATH as _EVP_MEMO,
+            INFRA_DELTAS as _EVP_DELTAS, PACK_ROOT as _EVP_PACK_ROOT,
+            FRESHNESS_HOURS_DEFAULT as _EVP_FRESH_DEF,
+        )
+        _evp_sections = parse_agency_memo(_EVP_MEMO)
+        _evp_available = _EVP_DELTAS.exists()
+    except Exception as exc:
+        print(f"WARN: evidence-pack module unavailable: {exc}")
+        _evp_sections = {}
+        _evp_available = False
+
     for rec in actionable:
         snap = _load_ticket_snapshot(rec["ticket_id"])
         md = _render_ticket_md(rec, snap)
         f = pack_dir / f"{rec['ticket_id']}.md"
         f.write_text(md, encoding="utf-8")
         brief_files.append(str(f))
+        if _evp_available:
+            ticket_for_evp = {
+                "ticket_id": rec["ticket_id"],
+                "title": rec.get("title", ""),
+                "channel": rec.get("channel", ""),
+                "opp_num": rec.get("opp_num", ""),
+                "agency": (snap.get("opportunity", {}) or {}).get("agency", "") if isinstance(snap, dict) else "",
+                "submit_url": rec.get("submit_url", ""),
+                "close_date": rec.get("close_date", ""),
+                "score": rec.get("score"),
+            }
+            try:
+                res = _evp_build(ticket_for_evp, snap, _evp_sections, _EVP_FRESH_DEF)
+                evidence_results.append(res)
+            except Exception as exc:
+                print(f"WARN: evidence pack failed for {rec['ticket_id']}: {exc}")
+                evidence_results.append({"ticket_id": rec["ticket_id"], "error": str(exc)})
 
     # Top index markdown
     lines = [
@@ -206,6 +239,27 @@ def main(argv: list[str]) -> int:
         rel = (pack_dir / f"{r['ticket_id']}.md").relative_to(PACK_ROOT)
         lines.append(f"- [{r['ticket_id']} — {r['title'][:60]}]({rel.as_posix()})")
     lines.append("")
+    if evidence_results:
+        lines.append("## Fresh Multi-Asset Frozen-Delta Evidence Packs")
+        lines.append("")
+        lines.append("| Ticket | Freshness | Agency Match | Bundle SHA | Latest Evidence |")
+        lines.append("| --- | --- | --- | --- | --- |")
+        for r in evidence_results:
+            tid = r.get("ticket_id", "")
+            if "error" in r:
+                lines.append(f"| `{tid}` | ERROR | — | — | {r.get('error','')} |")
+                continue
+            fresh = (r.get("freshness") or {}).get("state", "?")
+            label = r.get("memo_label") or "—"
+            sha = (r.get("bundle_sha256") or "")[:16]
+            latest = Path(r.get("latest_md") or "")
+            try:
+                latest_rel = latest.relative_to(ROOT).as_posix() if latest.exists() else ""
+            except Exception:
+                latest_rel = str(latest)
+            link = f"[{latest_rel}](../../../{latest_rel})" if latest_rel else "—"
+            lines.append(f"| `{tid}` | {fresh} | {label} | `{sha}` | {link} |")
+        lines.append("")
     if expired:
         lines.append("## Expired Tickets (no longer actionable)")
         for r in expired:
@@ -222,9 +276,11 @@ def main(argv: list[str]) -> int:
         "totals": {
             "actionable": len(actionable),
             "expired": len(expired),
+            "evidence_packs": len(evidence_results),
         },
         "actionable": actionable,
         "expired": expired,
+        "evidence_packs": evidence_results,
         "pack_dir": str(pack_dir),
     }
     (pack_dir / "SUBMIT_NOW.json").write_text(
