@@ -91,7 +91,7 @@
   "binanceus_private_poll_seconds": 3.0,
   "position_min_hold_seconds": 20.0,
   "position_stop_loss_min_hold_seconds": 15.0,
-  "position_tp_net_bps": 110.0,
+  "position_tp_net_bps": 80.0,
   "position_sl_net_bps": 28.0,
   "trailing_stop_activation_bps": 70.0,
   "trailing_stop_trail_bps": 22.0,
@@ -171,7 +171,8 @@
     "CAMP",
     "DEGEN",
     "VVV",
-    "PAXG"
+    "PAXG",
+    "STG"
   ],
   "hard_symbol_blacklist": [
     "SIDEKICK",
