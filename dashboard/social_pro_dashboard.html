@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luma Social Pro Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #eaf5ff;
+      --muted: #9bb0c2;
+      --line: #294056;
+      --good: #22d38d;
+      --warn: #ffc64a;
+      --bad: #ff6e6e;
+      --bg0: #071017;
+      --bg1: #0d1f2d;
+      --bg2: #1a1a23;
+      --panel: rgba(7, 20, 32, 0.78);
+      --accentA: #0ad9b8;
+      --accentB: #ffb86c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Manrope", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(1000px 620px at -10% -20%, rgba(255, 184, 108, 0.24), transparent 62%),
+        radial-gradient(980px 680px at 110% -24%, rgba(10, 217, 184, 0.26), transparent 65%),
+        linear-gradient(145deg, var(--bg0) 0%, var(--bg1) 45%, var(--bg2) 100%);
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 26px 20px 60px;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .eyebrow {
+      font-family: "Barlow Condensed", sans-serif;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      color: var(--warn);
+      font-size: 0.88rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.7rem, 4vw, 2.7rem);
+      line-height: 1.02;
+      letter-spacing: -0.015em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 0.82rem;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .nav a:hover {
+      border-color: var(--accentA);
+      transform: translateY(-1px);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.28);
+    }
+
+    .span-12 { grid-column: span 12; }
+    .span-8 { grid-column: span 8; }
+    .span-6 { grid-column: span 6; }
+    .span-4 { grid-column: span 4; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 12px;
+    }
+
+    .k {
+      color: var(--muted);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+
+    .v {
+      font-size: 1.32rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .v.good { color: var(--good); }
+    .v.warn { color: var(--warn); }
+    .v.bad { color: var(--bad); }
+
+    .platform-name {
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 0.76rem;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .pill.good { color: var(--good); border-color: rgba(34, 211, 141, 0.4); }
+    .pill.bad { color: var(--bad); border-color: rgba(255, 110, 110, 0.35); }
+
+    .meta {
+      margin-top: 10px;
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .about {
+      margin-top: 12px;
+      color: #d3e4f2;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      padding: 10px 8px;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.74rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .status-pass { color: var(--good); font-weight: 700; }
+    .status-missing { color: var(--bad); font-weight: 700; }
+
+    .cmd-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .cmd {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.23);
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.82rem;
+      word-break: break-all;
+    }
+
+    .template {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .template h4 {
+      margin: 0 0 6px;
+      font-size: 0.96rem;
+    }
+
+    .template p {
+      margin: 0;
+      color: #d8e7f3;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    .copy-btn {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--ink);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      border-color: var(--accentA);
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .error {
+      border: 1px solid rgba(255, 110, 110, 0.35);
+      background: rgba(255, 110, 110, 0.08);
+      color: #ffd6d6;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 0.86rem;
+    }
+
+    @media (max-width: 1024px) {
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .span-8, .span-6, .span-4 { grid-column: span 12; }
+    }
+
+    @media (max-width: 640px) {
+      .stats { grid-template-columns: 1fr; }
+      th:nth-child(4), td:nth-child(4) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="title">
+        <div class="eyebrow">Trust + Promotion Surface</div>
+        <h1>Facebook + LinkedIn Pro Dashboard</h1>
+        <p class="subtitle" id="generated">Loading latest social proof feed...</p>
+      </div>
+      <div class="nav">
+        <a href="mission_control.html">Mission Control</a>
+        <a href="http://127.0.0.1:8787/auth/linkedin/login" target="_blank" rel="noopener">Connect LinkedIn</a>
+        <a href="evidence/index.html" target="_blank" rel="noopener">Proof Bundle</a>
+        <a href="investor_command_room.html">Investor Room</a>
+      </div>
+    </div>
+
+    <div class="grid">
+      <section class="card span-12">
+        <div class="stats" id="summary-stats"></div>
+      </section>
+
+      <section class="card span-6">
+        <div class="platform-name">LinkedIn</div>
+        <div id="linkedin-card"></div>
+      </section>
+
+      <section class="card span-6">
+        <div class="platform-name">Facebook</div>
+        <div id="facebook-card"></div>
+      </section>
+
+      <section class="card span-8">
+        <div class="eyebrow">Verifiable Artifact Ledger</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Artifact</th>
+              <th>SHA256</th>
+              <th>Bytes</th>
+            </tr>
+          </thead>
+          <tbody id="verification-rows"></tbody>
+        </table>
+      </section>
+
+      <section class="card span-4">
+        <div class="eyebrow">Reproducibility Commands</div>
+        <div class="cmd-list" id="repro-cmds"></div>
+        <div class="small" style="margin-top:10px;" id="repro-notes"></div>
+      </section>
+
+      <section class="card span-6">
+        <div class="eyebrow">LinkedIn Promotion Templates</div>
+        <div id="linkedin-templates"></div>
+      </section>
+
+      <section class="card span-6">
+        <div class="eyebrow">Facebook Promotion Templates</div>
+        <div id="facebook-templates"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const DATA_CANDIDATES = [
+      "data/social_pro_dashboard_latest.json",
+      "../out/ops/social_pro_dashboard/social_pro_dashboard_feed_latest.json"
+    ];
+
+    const esc = (value) => String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+
+    const money = (value) => {
+      const num = Number(value || 0);
+      if (!Number.isFinite(num)) return "$0";
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(num);
+    };
+
+    async function fetchJson(path) {
+      const res = await fetch(path, { cache: "no-store" });
+      if (!res.ok) throw new Error(`${path} :: HTTP ${res.status}`);
+      return await res.json();
+    }
+
+    async function fetchFirst(candidates) {
+      const errors = [];
+      for (const path of candidates) {
+        try {
+          const payload = await fetchJson(path);
+          return { payload, path };
+        } catch (err) {
+          errors.push(String(err));
+        }
+      }
+      throw new Error(errors.join(" | "));
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        navigator.clipboard.writeText(text).catch(() => {});
+      }
+    }
+
+    function statusPill(connected) {
+      return connected
+        ? '<span class="pill good">Connected</span>'
+        : '<span class="pill bad">Not Connected</span>';
+    }
+
+    function renderPlatformCard(containerId, card) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      const keys = Array.isArray(card.present_keys) ? card.present_keys : [];
+      const keyPreview = keys.length ? keys.slice(0, 4).map((k) => esc(k)).join(", ") : "none detected";
+      el.innerHTML = `
+        ${statusPill(Boolean(card.connected))}
+        <div class="meta">
+          <div><strong>Present key count:</strong> ${Number(card.present_key_count || 0)}</div>
+          <div><strong>Cadence:</strong> ${esc(card.cadence || "")}</div>
+          <div><strong>Tone:</strong> ${esc(card.tone || "")}</div>
+          <div><strong>Detected keys:</strong> ${keyPreview}</div>
+        </div>
+        <div class="about">${esc(card.about || "")}</div>
+      `;
+    }
+
+    function renderTemplates(containerId, templates) {
+      const host = document.getElementById(containerId);
+      if (!host) return;
+      const rows = Array.isArray(templates) ? templates : [];
+      if (!rows.length) {
+        host.innerHTML = '<div class="small" style="margin-top:10px;">No templates available yet. Run the social refresh pipeline first.</div>';
+        return;
+      }
+      host.innerHTML = rows.map((row, idx) => {
+        const title = esc(row.title || `Template ${idx + 1}`);
+        const text = esc(row.text || "");
+        return `
+          <article class="template">
+            <h4>${title}</h4>
+            <p>${text}</p>
+            <button class="copy-btn" data-copy="${text}">Copy Template</button>
+          </article>
+        `;
+      }).join("");
+
+      host.querySelectorAll(".copy-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          copyText(btn.getAttribute("data-copy") || "");
+          btn.textContent = "Copied";
+          setTimeout(() => { btn.textContent = "Copy Template"; }, 900);
+        });
+      });
+    }
+
+    function renderVerification(rows) {
+      const body = document.getElementById("verification-rows");
+      if (!body) return;
+      const items = Array.isArray(rows) ? rows : [];
+      body.innerHTML = items.map((row) => {
+        const ok = Boolean(row.exists);
+        const statusClass = ok ? "status-pass" : "status-missing";
+        const statusText = ok ? "PASS" : "MISSING";
+        return `
+          <tr>
+            <td class="${statusClass}">${statusText}</td>
+            <td>${esc(row.path || "")}</td>
+            <td title="${esc(row.sha256 || "")}">${esc(row.sha256_short || "")}</td>
+            <td>${Number(row.size_bytes || 0).toLocaleString("en-US")}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderSummary(summary) {
+      const host = document.getElementById("summary-stats");
+      if (!host) return;
+      const connected = Number(summary.platform_connected_count || 0);
+      const targets = Number(summary.platform_target_count || 0);
+      const verified = Number(summary.verification_target_present_count || 0);
+      const checks = Number(summary.verification_target_count || 0);
+      const measuredShare = Number(summary.measured_share_pct || 0);
+      host.innerHTML = `
+        <div class="stat"><div class="k">Platforms Connected</div><div class="v ${connected >= targets && targets > 0 ? "good" : "warn"}">${connected}/${targets}</div></div>
+        <div class="stat"><div class="k">Verification Targets</div><div class="v ${verified === checks && checks > 0 ? "good" : "warn"}">${verified}/${checks}</div></div>
+        <div class="stat"><div class="k">Measured Coverage</div><div class="v">${measuredShare.toFixed(2)}%</div></div>
+        <div class="stat"><div class="k">Modeled Annual Value</div><div class="v">${money(summary.annual_value_usd)}</div></div>
+      `;
+    }
+
+    function renderRepro(feed) {
+      const cmds = ((feed.reproducibility || {}).commands || []);
+      const notes = ((feed.reproducibility || {}).notes || []);
+      const cmdHost = document.getElementById("repro-cmds");
+      const noteHost = document.getElementById("repro-notes");
+      if (cmdHost) {
+        cmdHost.innerHTML = cmds.map((cmd) => `<div class="cmd">${esc(cmd)}</div>`).join("");
+      }
+      if (noteHost) {
+        noteHost.innerHTML = notes.map((n) => `- ${esc(n)}`).join("<br>");
+      }
+    }
+
+    function renderGenerated(feed, sourcePath) {
+      const el = document.getElementById("generated");
+      if (!el) return;
+      const generated = esc(feed.generated_utc || "");
+      const lane = esc((feed.summary || {}).top_sector || "unknown");
+      el.textContent = `Generated UTC: ${generated} | Top lane: ${lane} | Source: ${sourcePath}`;
+    }
+
+    function render(feed, sourcePath) {
+      const platforms = Array.isArray(feed.platforms) ? feed.platforms : [];
+      const byId = Object.fromEntries(platforms.map((p) => [String(p.platform_id || "").toLowerCase(), p]));
+      const linkedin = byId.linkedin || {};
+      const facebook = byId.facebook || {};
+
+      renderGenerated(feed, sourcePath);
+      renderSummary(feed.summary || {});
+      renderPlatformCard("linkedin-card", linkedin);
+      renderPlatformCard("facebook-card", facebook);
+      renderVerification(feed.verification_targets || []);
+      renderRepro(feed);
+      renderTemplates("linkedin-templates", (feed.promotion || {}).linkedin_templates || linkedin.post_templates || []);
+      renderTemplates("facebook-templates", (feed.promotion || {}).facebook_templates || facebook.post_templates || []);
+    }
+
+    (async () => {
+      try {
+        const { payload, path } = await fetchFirst(DATA_CANDIDATES);
+        render(payload || {}, path);
+      } catch (err) {
+        const shell = document.querySelector(".shell");
+        if (shell) {
+          const block = document.createElement("div");
+          block.className = "error";
+          block.textContent = `Failed to load social pro feed. Run BUILD_SOCIAL_PRO_DASHBOARD_FEED.py. Details: ${String(err)}`;
+          shell.appendChild(block);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

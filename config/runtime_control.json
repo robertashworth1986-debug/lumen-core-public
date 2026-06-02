@@ -162,6 +162,11 @@
   "x1000_interval_loops": 60,
   "x1000_passes": 2,
   "x1000_timeout_sec": 120,
+  "learned_runtime_overrides_enabled": true,
+  "learned_blacklist_apply_enabled": true,
+  "learned_blocked_hours_apply_enabled": true,
+  "learned_recommended_max_open_apply_enabled": true,
+  "learned_min_hold_apply_enabled": true,
   "symbol_blacklist": [
     "ALLO",
     "MANTRA",

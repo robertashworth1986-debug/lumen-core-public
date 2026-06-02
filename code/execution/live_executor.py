@@ -41,6 +41,7 @@ CONFIG = ROOT / "config"
 OUT = ROOT / "out" / "execution"
 DASH = ROOT / "dashboard"
 RUNTIME_CONTROL_FILE = CONFIG / "runtime_control.json"
+LEARNED_RUNTIME_OVERRIDES_FILE = ROOT / "out" / "ops" / "trader_learnings" / "learned_runtime_overrides.json"
 MIN_OPEN_POSITIONS_FLOOR = 1
 LIVE_TRADE_LOG_FILE = OUT / "live_trade_log.json"
 LIVE_SHADOW_LEDGER_FILE = OUT / "live_shadow_fills.csv"
@@ -1882,6 +1883,26 @@ class RobustLiveExecutor:
                 out.add(token)
         return out
 
+    @staticmethod
+    def _parse_utc_hours(raw: Any) -> set[int]:
+        rows: list[Any]
+        if isinstance(raw, str):
+            rows = [s.strip() for s in raw.split(",") if str(s).strip()]
+        elif isinstance(raw, (list, tuple, set)):
+            rows = list(raw)
+        else:
+            return set()
+
+        out: set[int] = set()
+        for row in rows:
+            try:
+                hour = int(float(row))
+            except Exception:
+                continue
+            if 0 <= hour <= 23:
+                out.add(hour)
+        return out
+
     def _effective_max_open_positions(self, raw_value: Any) -> int:
         try:
             parsed = int(float(raw_value))
@@ -1891,10 +1912,58 @@ class RobustLiveExecutor:
             return MIN_OPEN_POSITIONS_FLOOR
         return max(MIN_OPEN_POSITIONS_FLOOR, parsed)
 
+    def _apply_learned_runtime_overrides(self, runtime: dict[str, Any]) -> dict[str, Any]:
+        merged = dict(runtime or {})
+        if not bool(merged.get("learned_runtime_overrides_enabled", True)):
+            return merged
+
+        path_raw = str(merged.get("learned_runtime_overrides_path", "") or "").strip()
+        learned_path = Path(path_raw).expanduser() if path_raw else LEARNED_RUNTIME_OVERRIDES_FILE
+        learned = load_json(learned_path, {})
+        if not isinstance(learned, dict) or not learned:
+            return merged
+
+        if bool(merged.get("learned_blacklist_apply_enabled", True)):
+            learned_blacklist = self._parse_runtime_symbol_set(learned.get("blacklist_pairs", []))
+            if learned_blacklist:
+                runtime_blacklist = self._parse_runtime_symbol_set(merged.get("symbol_blacklist", []))
+                runtime_blacklist.update(learned_blacklist)
+                merged["symbol_blacklist"] = sorted(runtime_blacklist)
+
+        if bool(merged.get("learned_blocked_hours_apply_enabled", True)):
+            learned_hours = self._parse_utc_hours(learned.get("blocked_hours_utc", []))
+            if learned_hours:
+                configured_hours = self._parse_utc_hours(merged.get("blocked_hours_utc", []))
+                configured_hours.update(learned_hours)
+                merged["blocked_hours_utc"] = sorted(configured_hours)
+
+        if bool(merged.get("learned_recommended_max_open_apply_enabled", True)):
+            learned_max_open = int(self._to_float(learned.get("recommended_max_open_positions", 0), 0.0))
+            if learned_max_open > 0:
+                configured_max_open = self._effective_max_open_positions(
+                    merged.get("max_open_positions", MIN_OPEN_POSITIONS_FLOOR)
+                )
+                merged["max_open_positions"] = max(
+                    MIN_OPEN_POSITIONS_FLOOR,
+                    min(configured_max_open, learned_max_open),
+                )
+
+        if bool(merged.get("learned_min_hold_apply_enabled", True)):
+            learned_min_hold_sec = self._to_float(learned.get("min_hold_seconds", 0.0), 0.0)
+            if learned_min_hold_sec > 0:
+                current_reentry = self._to_float(
+                    merged.get("same_symbol_reentry_cooldown_sec", 0.0),
+                    0.0,
+                )
+                merged["same_symbol_reentry_cooldown_sec"] = max(current_reentry, learned_min_hold_sec)
+
+        return merged
+
     def _refresh_runtime_config(self) -> None:
         runtime = load_json(RUNTIME_CONTROL_FILE, {})
         if not isinstance(runtime, dict):
             runtime = {}
+        runtime = self._apply_learned_runtime_overrides(runtime)
         self.runtime_cfg = runtime
 
         # Merge symbol_skip_until_utc from runtime_control.json into the
@@ -7668,6 +7737,52 @@ class RobustLiveExecutor:
         pick_meta["global_close_sweep_reconciled_count"] = int(
             self._to_float(global_close_sweep.get("reconciled_count", 0), 0.0)
         )
+
+        blocked_symbols = self._parse_runtime_symbol_set(self.runtime_cfg.get("symbol_blacklist", []))
+        blocked_symbols.update(self._parse_runtime_symbol_set(self.runtime_cfg.get("hard_symbol_blacklist", [])))
+        symbol_token = str(symbol or "").upper().strip().replace("-", "").replace("_", "")
+        if "/" in symbol_token:
+            symbol_token = symbol_token.split("/", 1)[0].strip()
+        if symbol_token and symbol_token in blocked_symbols:
+            self._mark_symbol_skip(
+                str(symbol),
+                now,
+                "runtime_symbol_blacklist",
+                cooldown_sec=max(float(self.symbol_skip_cooldown_sec), float(self.loop_seconds)),
+            )
+            _write_live_heartbeat(
+                {
+                    "status": "blocked",
+                    "reason": "runtime_symbol_blacklist",
+                    "symbol": symbol,
+                    "symbol_skip_active_count": int(len(self._symbol_skip_until_utc)),
+                }
+            )
+            print("  blocked: runtime symbol blacklist")
+            return
+
+        blocked_hours_utc = self._parse_utc_hours(self.runtime_cfg.get("blocked_hours_utc", []))
+        if blocked_hours_utc and now.hour in blocked_hours_utc:
+            blocked_hour_cooldown_sec = max(float(self.symbol_skip_cooldown_sec), float(self.loop_seconds))
+            self._mark_symbol_skip(
+                str(symbol),
+                now,
+                "blocked_hour_utc",
+                cooldown_sec=blocked_hour_cooldown_sec,
+            )
+            _write_live_heartbeat(
+                {
+                    "status": "blocked",
+                    "reason": "blocked_hour_utc",
+                    "symbol": symbol,
+                    "blocked_hours_utc": sorted(blocked_hours_utc),
+                    "utc_hour": int(now.hour),
+                    "symbol_skip_cooldown_sec": round(float(blocked_hour_cooldown_sec), 6),
+                    "symbol_skip_active_count": int(len(self._symbol_skip_until_utc)),
+                }
+            )
+            print("  blocked: utc hour window")
+            return
 
         runtime_quote_order_raw = self.runtime_cfg.get("clean_ops_quote_allow", list(DEFAULT_QUOTE_LANES))
         if isinstance(runtime_quote_order_raw, str):

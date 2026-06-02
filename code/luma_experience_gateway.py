@@ -4724,6 +4724,7 @@ APPROVAL_QUEUE_FILE = ROOT / "execution_approval_queue.json"
 APPROVAL_QUEUE_FILE_OUT = OUT / "execution_approval_queue.json"
 APPROVAL_AUDIT_FILE = EXEC_OUT / "approval_decisions.jsonl"
 LIVE_KEYS_FILE = ROOT / "config" / "luma_live_keys.env"
+TRADER_LEARNINGS_OVERRIDES_FILE = OUT / "ops" / "trader_learnings" / "learned_runtime_overrides.json"
 APPROVAL_TICKET_TTL_HOURS = 24.0
 APPROVAL_MIN_OPEN_POSITIONS_FLOOR = 10
 
@@ -4886,6 +4887,102 @@ def _bleed_protect_check(ticket: dict[str, Any], flags: dict[str, Any]) -> tuple
     )
 
 
+def _load_trader_learnings_overrides() -> dict[str, Any]:
+    payload = load_json(TRADER_LEARNINGS_OVERRIDES_FILE, {})
+    return payload if isinstance(payload, dict) else {}
+
+
+def _parse_utc_hours(raw: Any) -> set[int]:
+    rows: list[Any]
+    if isinstance(raw, str):
+        rows = [s.strip() for s in raw.split(",") if str(s).strip()]
+    elif isinstance(raw, (list, tuple, set)):
+        rows = list(raw)
+    else:
+        return set()
+
+    out: set[int] = set()
+    for row in rows:
+        try:
+            hour = int(float(row))
+        except Exception:
+            continue
+        if 0 <= hour <= 23:
+            out.add(hour)
+    return out
+
+
+def _learned_runtime_guard_check(
+    ticket: dict[str, Any],
+    flags: dict[str, Any],
+    open_positions: int,
+) -> tuple[bool, str]:
+    if not bool(flags.get("learnings_apply_enabled", True)):
+        return True, "learnings=disabled"
+
+    payload = ticket.get("payload") or {}
+    side = str(payload.get("type", "")).strip().lower()
+    if side != "buy":
+        return True, "sell_or_unknown_side_pass"
+
+    pair = str(payload.get("pair", "")).upper().strip()
+    learned = _load_trader_learnings_overrides()
+    if not learned:
+        return True, "learnings=missing_or_empty"
+
+    if bool(flags.get("learnings_blacklist_block_enabled", True)):
+        learned_blacklist = {
+            str(s).upper().strip()
+            for s in (learned.get("blacklist_pairs", []) or [])
+            if str(s).strip()
+        }
+        learned_blacklist.update(
+            str(s).upper().strip()
+            for s in (flags.get("learnings_blacklist_pairs", []) or [])
+            if str(s).strip()
+        )
+        if pair and pair in learned_blacklist:
+            return False, f"pair {pair} blocked by learned blacklist"
+
+    if bool(flags.get("learnings_blocked_hours_enabled", True)):
+        blocked_hours = _parse_utc_hours(learned.get("blocked_hours_utc", []))
+        if blocked_hours:
+            now_hour = datetime.now(timezone.utc).hour
+            if now_hour in blocked_hours:
+                return False, (
+                    f"utc_hour={now_hour} blocked by learned hours "
+                    f"{sorted(blocked_hours)}"
+                )
+
+    if bool(flags.get("learnings_recommended_max_open_enabled", True)):
+        try:
+            learned_max_open = int(float(learned.get("recommended_max_open_positions", 0) or 0))
+        except Exception:
+            learned_max_open = 0
+        if learned_max_open > 0 and open_positions >= learned_max_open:
+            return False, f"open={open_positions} >= learned_max_open={learned_max_open}"
+
+    if bool(flags.get("learnings_min_hold_enabled", True)):
+        min_hold_sec = to_float(learned.get("min_hold_seconds", 0.0), 0.0)
+        if min_hold_sec > 0 and pair:
+            snap = _bleed_protect_recent_trades()
+            last_buy = str((snap.get("last_buy_ts_by_pair") or {}).get(pair) or "").strip()
+            if last_buy:
+                try:
+                    dt = datetime.fromisoformat(last_buy.replace("Z", "+00:00"))
+                    if dt.tzinfo is None:
+                        dt = dt.replace(tzinfo=timezone.utc)
+                    elapsed = (datetime.now(timezone.utc) - dt).total_seconds()
+                    if elapsed < min_hold_sec:
+                        return False, (
+                            f"pair {pair} last buy {elapsed:.0f}s ago < learned_min_hold={min_hold_sec:.0f}s"
+                        )
+                except Exception:
+                    pass
+
+    return True, "learned_overrides_pass"
+
+
 def _evaluate_guards(
     ticket: dict[str, Any],
     flags: dict[str, Any],
@@ -4960,6 +5057,11 @@ def _evaluate_guards(
     # and re-entry cooldown after a sell. SELLs always pass (flatten lane).
     bp_ok, bp_detail = _bleed_protect_check(ticket, flags)
     add("bleed_protect", bp_ok, bp_detail)
+
+    # Learned runtime guard: enforces daily-learned blacklist/time windows and
+    # optional tighter open-position cap and min-hold re-entry control.
+    lr_ok, lr_detail = _learned_runtime_guard_check(ticket, flags, open_positions)
+    add("learned_runtime", lr_ok, lr_detail)
 
     return {"guards": guards, "pass_all": all(g["pass"] for g in guards)}
 
