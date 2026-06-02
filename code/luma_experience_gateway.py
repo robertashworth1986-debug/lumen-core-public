@@ -4793,6 +4793,99 @@ def _count_open_positions(queue: list[dict[str, Any]]) -> int:
     return sum(1 for t in queue if str(t.get("approval_state", "")).upper() == "EXECUTED_OPEN")
 
 
+# ── Bleed-Protection Guard ───────────────────────────────────────────────────
+# Reads recent live submit_order events from execution_events.jsonl and blocks
+# new BUY tickets when the trader shows distress patterns (chop, over-trading,
+# rapid same-pair re-entries). Configured via control_flags.json:
+#   bleed_protect_enabled: bool (default true)
+#   bleed_protect_max_live_trades_per_day: int (default 24)
+#   bleed_protect_max_same_pair_per_day: int (default 2)
+#   bleed_protect_min_seconds_since_last_sell_same_pair: float (default 1800)
+# Sells are NEVER blocked by this guard (so user can always flatten).
+def _bleed_protect_recent_trades() -> dict[str, Any]:
+    """Scan execution_events.jsonl from UTC midnight forward and tally live
+    (validate=false) submit_order events by pair/side."""
+    out = {"total": 0, "by_pair": {}, "last_sell_ts_by_pair": {}, "last_buy_ts_by_pair": {}}
+    if not EXECUTION_EVENTS_FILE.exists():
+        return out
+    today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    try:
+        with EXECUTION_EVENTS_FILE.open("r", encoding="utf-8", errors="ignore") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    e = json.loads(line)
+                except Exception:
+                    continue
+                if e.get("event") != "submit_order":
+                    continue
+                if e.get("validate"):
+                    continue
+                ts = str(e.get("ts") or "")
+                if not ts.startswith(today_utc):
+                    continue
+                pair = str(e.get("pair") or "").upper()
+                side = str(e.get("side") or "").lower()
+                if not pair or side not in ("buy", "sell"):
+                    continue
+                out["total"] += 1
+                row = out["by_pair"].setdefault(pair, {"buy": 0, "sell": 0})
+                row[side] += 1
+                if side == "sell":
+                    out["last_sell_ts_by_pair"][pair] = ts
+                else:
+                    out["last_buy_ts_by_pair"][pair] = ts
+    except Exception:
+        return out
+    return out
+
+
+def _bleed_protect_check(ticket: dict[str, Any], flags: dict[str, Any]) -> tuple[bool, str]:
+    """Return (ok, detail). Only constrains BUY tickets; SELL always passes."""
+    if not bool(flags.get("bleed_protect_enabled", True)):
+        return True, "bleed_protect=disabled"
+    payload = ticket.get("payload") or {}
+    side = str(payload.get("type", "")).lower()
+    if side != "buy":
+        return True, "sell_or_unknown_side_pass"
+    pair = str(payload.get("pair", "")).upper()
+    snap = _bleed_protect_recent_trades()
+    max_total = int(float(flags.get("bleed_protect_max_live_trades_per_day", 24) or 24))
+    if snap["total"] >= max_total:
+        return False, (
+            f"daily_trade_count={snap['total']} >= max={max_total} "
+            "(over-trading circuit breaker; flatten or wait for UTC reset)"
+        )
+    pair_row = snap["by_pair"].get(pair, {"buy": 0, "sell": 0})
+    max_same = int(float(flags.get("bleed_protect_max_same_pair_per_day", 2) or 2))
+    if (pair_row.get("buy", 0) + pair_row.get("sell", 0)) >= max_same:
+        return False, (
+            f"pair {pair} traded {pair_row.get('buy',0)+pair_row.get('sell',0)}x today "
+            f">= max={max_same} (revenge-trade block)"
+        )
+    cooldown = float(flags.get("bleed_protect_min_seconds_since_last_sell_same_pair", 1800.0) or 0.0)
+    last_sell = snap["last_sell_ts_by_pair"].get(pair)
+    if cooldown > 0 and last_sell:
+        try:
+            dt = datetime.fromisoformat(str(last_sell).replace("Z", "+00:00"))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            elapsed = (datetime.now(timezone.utc) - dt).total_seconds()
+            if elapsed < cooldown:
+                return False, (
+                    f"pair {pair} sold {elapsed:.0f}s ago; cooldown={cooldown:.0f}s "
+                    "(re-entry chop guard)"
+                )
+        except Exception:
+            pass
+    return True, (
+        f"trades_today={snap['total']}/{max_total} "
+        f"pair_today={pair_row.get('buy',0)+pair_row.get('sell',0)}/{max_same}"
+    )
+
+
 def _evaluate_guards(
     ticket: dict[str, Any],
     flags: dict[str, Any],
@@ -4862,6 +4955,11 @@ def _evaluate_guards(
         state == "PENDING_HUMAN_APPROVAL",
         f"approval_state={state}",
     )
+
+    # Bleed-protection: rate-limit live BUYs by daily count, per-pair count,
+    # and re-entry cooldown after a sell. SELLs always pass (flatten lane).
+    bp_ok, bp_detail = _bleed_protect_check(ticket, flags)
+    add("bleed_protect", bp_ok, bp_detail)
 
     return {"guards": guards, "pass_all": all(g["pass"] for g in guards)}
 
