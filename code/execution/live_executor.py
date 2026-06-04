@@ -7063,6 +7063,16 @@ class RobustLiveExecutor:
         sl_bps = self._to_float(self.runtime_cfg.get("position_sl_net_bps", 40.0), 40.0)
         min_hold_sec = self._to_float(self.runtime_cfg.get("position_min_hold_seconds", 15.0), 15.0)
         max_hold_sec = self._to_float(self.runtime_cfg.get("position_max_hold_seconds", 240.0), 240.0)
+        sl_min_hold_sec = self._to_float(
+            self.runtime_cfg.get("position_stop_loss_min_hold_seconds", min_hold_sec),
+            min_hold_sec,
+        )
+        sl_emergency_mult = self._to_float(
+            self.runtime_cfg.get("position_stop_loss_emergency_multiplier", 2.0),
+            2.0,
+        )
+        sl_min_hold_sec = max(0.0, min(max_hold_sec, sl_min_hold_sec))
+        sl_emergency_mult = max(1.0, min(5.0, sl_emergency_mult))
 
         # ── Alpha-Adaptive Exit Scaling (Innovation 11) ──────────────────────
         # High alpha_long_score signals get a wider TP and longer max-hold to let
@@ -7204,8 +7214,13 @@ class RobustLiveExecutor:
 
             # For long positions with trailing stop active: suppress flat TP so momentum rides
             tp_hit = (not _uses_trail) and hold_sec >= min_hold_sec and pnl_pct >= tp_pct
-            # Protective stops should fire immediately; do not wait for min hold.
-            sl_hit = sl_pct > 0.0 and pnl_pct <= (-sl_pct)
+            # Stop-loss exits require a configurable minimum hold unless loss breaches
+            # an emergency multiplier threshold.
+            sl_emergency_hit = False
+            sl_hit = False
+            if sl_pct > 0.0 and pnl_pct <= (-sl_pct):
+                sl_emergency_hit = pnl_pct <= (-sl_pct * sl_emergency_mult)
+                sl_hit = hold_sec >= sl_min_hold_sec or sl_emergency_hit
             timeout_hit = hold_sec >= max_hold_sec
 
             # ══ Sell Innovations 1–9 (evaluated per-position in close sweep) ═══
@@ -7374,6 +7389,8 @@ class RobustLiveExecutor:
                 _close_reason = "vel_exit_loss"
             elif dead_weight_hit:
                 _close_reason = "dead_weight_purge"
+            elif sl_emergency_hit:
+                _close_reason = "stop_loss_emergency"
             elif sl_hit:
                 _close_reason = "stop_loss"
             elif timeout_hit:
@@ -7541,6 +7558,9 @@ class RobustLiveExecutor:
                     "qty": round(float(close_qty), 10),
                     "pnl_pct": round(float(pnl_pct) * 100.0, 6),
                     "hold_sec": round(float(hold_sec), 3),
+                    "stop_loss_min_hold_sec": round(float(sl_min_hold_sec), 3),
+                    "stop_loss_emergency_hit": bool(sl_emergency_hit),
+                    "stop_loss_emergency_mult": round(float(sl_emergency_mult), 3),
                 }
             )
             self.audit_chain.append(
@@ -7554,6 +7574,9 @@ class RobustLiveExecutor:
                     "close_reason": _close_reason,
                     "pnl_pct": round(float(pnl_pct) * 100.0, 6),
                     "hold_sec": round(float(hold_sec), 3),
+                    "stop_loss_min_hold_sec": round(float(sl_min_hold_sec), 3),
+                    "stop_loss_emergency_hit": bool(sl_emergency_hit),
+                    "stop_loss_emergency_mult": round(float(sl_emergency_mult), 3),
                 },
             )
 
