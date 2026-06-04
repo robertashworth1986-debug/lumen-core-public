@@ -351,6 +351,66 @@ def _submit_url(opp_num: str, is_skip: bool, fallback_url: str = "") -> str:
     return "https://www.grants.gov/search-grants"
 
 
+def _parse_close_date(value: str) -> datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+
+    norm = _norm(text)
+    if "rolling" in norm or "tbd" in norm or "to be announced" in norm:
+        return None
+
+    candidates = [text]
+    match = re.search(r"\d{1,4}[/-]\d{1,2}[/-]\d{1,4}", text)
+    if match:
+        candidates.insert(0, match.group(0))
+
+    formats = (
+        "%m/%d/%Y",
+        "%m/%d/%y",
+        "%Y-%m-%d",
+        "%Y/%m/%d",
+        "%m-%d-%Y",
+        "%m-%d-%y",
+    )
+    for candidate in candidates:
+        token = str(candidate or "").strip()
+        if not token:
+            continue
+        for fmt in formats:
+            try:
+                parsed = datetime.strptime(token, fmt)
+                if parsed.year < 100:
+                    parsed = parsed.replace(year=2000 + parsed.year)
+                return parsed.replace(tzinfo=timezone.utc)
+            except Exception:
+                continue
+    return None
+
+
+def _deadline_status_from_days(days: int) -> str:
+    if days < 0:
+        return "OVERDUE"
+    if days == 0:
+        return "DUE_TODAY"
+    if days <= 7:
+        return "DUE_SOON"
+    return "OPEN"
+
+
+def _resolve_deadline_fields(close_date: str, fallback_days: int | None) -> tuple[int | None, str, str]:
+    parsed = _parse_close_date(close_date)
+    if parsed is not None:
+        days = int((parsed.date() - datetime.now(timezone.utc).date()).days)
+        return days, _deadline_status_from_days(days), parsed.date().isoformat()
+
+    if fallback_days is None or int(fallback_days) >= 9999:
+        return None, "ROLLING_OR_UNKNOWN", ""
+
+    days = int(fallback_days)
+    return days, _deadline_status_from_days(days), ""
+
+
 def _find_skip_variant(skip_payload: dict[str, Any], opp_num: str, title: str) -> dict[str, Any]:
     variants = skip_payload.get("opportunity_variants", []) if isinstance(skip_payload, dict) else []
     if not isinstance(variants, list):
@@ -436,6 +496,8 @@ def build_pack(state: str, limit: int) -> dict[str, Any]:
     entries: list[dict[str, Any]] = []
     fit_counts = {"FIT_LIKELY": 0, "MANUAL_CHECK": 0, "HARD_EXCLUDE": 0}
     blueprint_aligned_count = 0
+    deadline_overdue_count = 0
+    deadline_due_within_7d_count = 0
 
     for row in selected:
         opp = _as_dict(row.get("opportunity"))
@@ -444,7 +506,7 @@ def build_pack(state: str, limit: int) -> dict[str, Any]:
         title = str(opp.get("title") or "")
         agency = str(opp.get("agency") or "")
         close_date = str(opp.get("close_date") or "")
-        days_to_close = int(_safe_float(opp.get("days_to_close"), 9999.0))
+        days_to_close_raw = int(_safe_float(opp.get("days_to_close"), 9999.0))
         award_ceiling = _safe_float(opp.get("award_ceiling_usd"), 0.0)
         is_skip = _norm(opp_num).startswith("skip-")
 
@@ -579,6 +641,12 @@ def build_pack(state: str, limit: int) -> dict[str, Any]:
                 "Bind narrative to Harmonic + Alpha Lock + Harmonic Edge Lock operating family with evidence-first validation milestones."
             )
 
+        days_to_close, deadline_status, close_date_iso = _resolve_deadline_fields(close_date, days_to_close_raw)
+        if deadline_status == "OVERDUE":
+            deadline_overdue_count += 1
+        if deadline_status in {"OVERDUE", "DUE_TODAY", "DUE_SOON"}:
+            deadline_due_within_7d_count += 1
+
         fit_counts[fit_status] = fit_counts.get(fit_status, 0) + 1
 
         entries.append(
@@ -589,6 +657,9 @@ def build_pack(state: str, limit: int) -> dict[str, Any]:
                 "agency": agency,
                 "close_date": close_date,
                 "days_to_close": days_to_close,
+                "days_to_close_raw_queue": days_to_close_raw,
+                "deadline_status": deadline_status,
+                "close_date_iso": close_date_iso or None,
                 "award_ceiling_usd": award_ceiling,
                 "source_channel": "skip" if is_skip else "grants_gov",
                 "submit_url": _submit_url(opp_num, is_skip=is_skip, fallback_url=opp_url),
@@ -629,6 +700,8 @@ def build_pack(state: str, limit: int) -> dict[str, Any]:
             "manual_check": fit_counts.get("MANUAL_CHECK", 0),
             "hard_exclude": fit_counts.get("HARD_EXCLUDE", 0),
             "blueprint_aligned": blueprint_aligned_count,
+            "deadline_overdue": deadline_overdue_count,
+            "deadline_due_within_7d": deadline_due_within_7d_count,
         },
         "blueprint_vault": {
             "path": str(BLUEPRINT_VAULT_PATH),
@@ -669,6 +742,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.append(f"- Manual check: {summary.get('manual_check', 0)}")
     lines.append(f"- Hard exclude: {summary.get('hard_exclude', 0)}")
     lines.append(f"- Blueprint aligned: {summary.get('blueprint_aligned', 0)}")
+    lines.append(f"- Deadline overdue: {summary.get('deadline_overdue', 0)}")
+    lines.append(f"- Deadline due within 7d (incl overdue): {summary.get('deadline_due_within_7d', 0)}")
     lines.append("")
 
     for i, row in enumerate(items, start=1):
@@ -682,6 +757,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         lines.append(f"- Blueprint Terms: {', '.join(str(x) for x in row.get('blueprint_term_matches', []))}")
         lines.append(f"- Close Date: {row.get('close_date', '')}")
         lines.append(f"- Days To Close: {row.get('days_to_close', '')}")
+        lines.append(f"- Deadline Status: {row.get('deadline_status', '')}")
         lines.append(f"- Award Ceiling USD: {row.get('award_ceiling_usd', '')}")
         lines.append(f"- Submit URL: {row.get('submit_url', '')}")
         lines.append("- What This Opportunity Wants:")

@@ -1398,7 +1398,7 @@ const LOCAL_GRANTS = (pathResolver && pathResolver.grantsBase) ? pathResolver.gr
 const LOCAL_EVIDENCE = (pathResolver && pathResolver.evidenceBase) ? pathResolver.evidenceBase : './evidence';
 const LOCAL_EVIDENCE_RUNS = (pathResolver && pathResolver.evidenceRunsBase) ? pathResolver.evidenceRunsBase : `${LOCAL_EVIDENCE}/runs`;
 const LOCAL_OPPORTUNITIES = `${LOCAL_OUT}/opportunities`;
-const DEFAULT_RUN_UTC = '20260511T175644Z';
+const DEFAULT_RUN_UTC = '20260526T050639Z';
 const EXTERNAL_SUBMISSIONS_LEDGER_REL = 'ops/grants_live_submission_ledger_latest.json';
 const HEALTHCARE_POC_FORECAST_REL = 'ops/healthcare_grants_poc/healthcare_grants_poc_forecast_latest.json';
 const GRANT_SUBMIT_FIT_PACK_REL = 'ops/grant_submit_fit_pack/grant_submit_fit_pack_latest.json';
@@ -1407,6 +1407,7 @@ const SPORTS_MONTE_CARLO_EDGE_REL = 'ops/sports_monte_carlo_edge/sports_monte_ca
 let localQueueCache = null;
 let localEvidenceCache = null;
 let localEvidenceLatestRunCache = null;
+let localBenchmarkLatestRunCache = null;
 let externalGrantLedgerCache = undefined;
 const grantSubmitUrlByOpp = new Map();
 
@@ -1444,14 +1445,45 @@ async function fetchFirstText(paths) {
   return null;
 }
 
+function parseRunTag(value) {
+  const text = String(value || '').trim();
+  if (!text) return '';
+  const match = text.match(/\b\d{8}T\d{6}Z\b/);
+  return match ? match[0] : '';
+}
+
 async function getEvidenceLatestRun() {
   if (localEvidenceLatestRunCache) return localEvidenceLatestRunCache;
-  const txt = await fetchFirstText(evidenceCandidates('latest.txt'));
+  const txt = await fetchFirstText([
+    ...evidenceCandidates('latest.txt'),
+    ...outCandidates('master_universe_v2/latest.txt'),
+  ]);
   if (!txt) return null;
-  const run = (txt || '').trim();
+  const run = parseRunTag(txt);
   if (!run) return null;
   localEvidenceLatestRunCache = run;
   return run;
+}
+
+async function getBenchmarkLatestRun() {
+  if (localBenchmarkLatestRunCache) return localBenchmarkLatestRunCache;
+
+  const probes = [
+    ...outCandidates('master_universe_v2/latest.txt'),
+    ...evidenceCandidates('latest.txt'),
+  ];
+
+  const runs = [];
+  for (const probe of probes) {
+    const txt = await fetchText(probe);
+    const run = parseRunTag(txt);
+    if (run) runs.push(run);
+  }
+
+  if (!runs.length) return null;
+  runs.sort();
+  localBenchmarkLatestRunCache = runs[runs.length - 1];
+  return localBenchmarkLatestRunCache;
 }
 
 async function fetchFirstJson(paths) {
@@ -1776,24 +1808,13 @@ async function getLocalEvidence() {
 
   const q = await getLocalQueue();
   const item = q?.items?.[0] || null;
+  const benchmarkLatestRun = await getBenchmarkLatestRun();
   const latestEvidenceRun = await getEvidenceLatestRun();
   const runCandidates = [];
-  if (item?.latest_utc) runCandidates.push(item.latest_utc);
+  if (benchmarkLatestRun) runCandidates.push(benchmarkLatestRun);
   if (latestEvidenceRun) runCandidates.push(latestEvidenceRun);
+  if (item?.latest_utc) runCandidates.push(item.latest_utc);
   runCandidates.push(DEFAULT_RUN_UTC);
-
-  if (item) {
-    const appRunUtc = item.latest_utc || latestEvidenceRun || DEFAULT_RUN_UTC;
-    const app = await fetchJson(`${LOCAL_GRANTS}/${item.program_id}/${appRunUtc}/application.json`);
-    if (app?.evidence_summary) {
-      localEvidenceCache = {
-        run_utc: app.evidence_run_utc || appRunUtc,
-        source: 'local-artifacts',
-        layers: app.evidence_summary,
-      };
-      return localEvidenceCache;
-    }
-  }
 
   const uniqCandidates = [...new Set(runCandidates.filter(Boolean))];
   for (const candidate of uniqCandidates) {
@@ -1801,6 +1822,28 @@ async function getLocalEvidence() {
     if (ev) {
       localEvidenceCache = ev;
       return localEvidenceCache;
+    }
+  }
+
+  // Keep app-level evidence as a fallback only when benchmark artifacts are unavailable.
+  if (item) {
+    const appRunCandidates = [
+      item.latest_utc,
+      latestEvidenceRun,
+      benchmarkLatestRun,
+      DEFAULT_RUN_UTC,
+    ];
+    const uniqAppCandidates = [...new Set(appRunCandidates.filter(Boolean))];
+    for (const appRunUtc of uniqAppCandidates) {
+      const app = await fetchJson(`${LOCAL_GRANTS}/${item.program_id}/${appRunUtc}/application.json`);
+      if (app?.evidence_summary) {
+        localEvidenceCache = {
+          run_utc: app.evidence_run_utc || appRunUtc,
+          source: 'local-artifacts',
+          layers: app.evidence_summary,
+        };
+        return localEvidenceCache;
+      }
     }
   }
 

@@ -423,12 +423,8 @@ server {
     }
 
     location /evidence/ {
-        proxy_pass         http://luma_gateway;
-        proxy_http_version 1.1;
-        proxy_set_header   Host              $host;
-        proxy_set_header   X-Real-IP         $remote_addr;
-        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto $scheme;
+        alias /opt/lumencore/dashboard/evidence/;
+        try_files $uri $uri/ =404;
     }
 
     location /out/ {
@@ -462,6 +458,7 @@ server {
 
     location / {
         root /opt/lumencore/dashboard;
+        index mission_control.html index.html;
         try_files $uri $uri/ @gateway_fallback;
     }
 

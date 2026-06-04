@@ -48,6 +48,10 @@ def norm_status(value: Any) -> str:
     return "_".join(part for part in text.split() if part)
 
 
+def norm_opp(value: Any) -> str:
+    return str(value or "").strip().upper()
+
+
 def classify_status(status: str) -> str:
     if any(token in status for token in ("rejected", "error", "invalid", "denied")):
         return "blocked"
@@ -76,6 +80,17 @@ def build_payload(ledger: dict[str, Any]) -> dict[str, Any]:
     rows = ledger.get("records") if isinstance(ledger, dict) else []
     records = rows if isinstance(rows, list) else []
 
+    waiting_opp_keys: set[str] = set()
+    for row in records:
+        if not isinstance(row, dict):
+            continue
+        opp_key = norm_opp(row.get("opp_num"))
+        if not opp_key:
+            continue
+        status = norm_status(row.get("status"))
+        if classify_status(status) == "waiting":
+            waiting_opp_keys.add(opp_key)
+
     newly_submitted: list[dict[str, Any]] = []
     waiting_followups: list[dict[str, Any]] = []
     blocked_fix_now: list[dict[str, Any]] = []
@@ -92,6 +107,7 @@ def build_payload(ledger: dict[str, Any]) -> dict[str, Any]:
         source = str(row.get("source") or "").strip()
         tracking = str(row.get("grants_tracking_number") or "").strip()
         opp_num = str(row.get("opp_num") or "").strip()
+        opp_key = norm_opp(opp_num)
 
         base = {
             "opp_num": opp_num,
@@ -105,6 +121,16 @@ def build_payload(ledger: dict[str, Any]) -> dict[str, Any]:
             newly_submitted.append(dict(base))
 
         if category == "blocked":
+            if opp_key in waiting_opp_keys:
+                enriched = dict(base)
+                enriched["priority"] = "P2"
+                enriched["next_actions"] = [
+                    "Superseded by a newer tracking lane on this same opportunity that is already in waiting/agency-review state.",
+                    "Preserve for audit history only; do not treat as active blocker unless the waiting lane regresses.",
+                ]
+                enriched["superseded_by_waiting_lane"] = True
+                info_rows.append(enriched)
+                continue
             enriched = dict(base)
             enriched["priority"] = "P0"
             enriched["next_actions"] = blocked_actions()

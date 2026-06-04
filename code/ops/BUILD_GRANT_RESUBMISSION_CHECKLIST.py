@@ -54,6 +54,14 @@ def norm_status(value: Any) -> str:
     return "_".join(part for part in txt.split() if part)
 
 
+def is_blocked_status(status: str) -> bool:
+    return any(token in status for token in ("rejected", "error", "invalid", "denied"))
+
+
+def is_waiting_status(status: str) -> bool:
+    return any(token in status for token in ("received_by_agency", "agency_tracking", "submitted", "validated"))
+
+
 def pick_target(waiting_payload: dict[str, Any], ledger_payload: dict[str, Any], tracking: str, opp_num: str) -> dict[str, Any] | None:
     blocked = waiting_payload.get("blocked_or_fix_now") if isinstance(waiting_payload, dict) else []
     waiting = waiting_payload.get("waiting_followups") if isinstance(waiting_payload, dict) else []
@@ -81,14 +89,87 @@ def pick_target(waiting_payload: dict[str, Any], ledger_payload: dict[str, Any],
         if isinstance(row, dict):
             return row
 
+    waiting_opp_keys: set[str] = set()
     for row in records:
         if not isinstance(row, dict):
             continue
         status = norm_status(row.get("status"))
-        if any(token in status for token in ("rejected", "error", "invalid", "denied")):
+        if is_waiting_status(status):
+            opp_key = norm(row.get("opp_num"))
+            if opp_key:
+                waiting_opp_keys.add(opp_key)
+
+    for row in records:
+        if not isinstance(row, dict):
+            continue
+        status = norm_status(row.get("status"))
+        if is_blocked_status(status):
+            opp_key = norm(row.get("opp_num"))
+            if opp_key and opp_key in waiting_opp_keys:
+                continue
             return row
 
-    return records[0] if records and isinstance(records[0], dict) else None
+    return None
+
+
+def build_noop_payload(owner: str, waiting_payload: dict[str, Any]) -> dict[str, Any]:
+    headline = waiting_payload.get("headline", {}) if isinstance(waiting_payload, dict) else {}
+    waiting_count = int(headline.get("waiting_followup_count", 0)) if isinstance(headline, dict) else 0
+    blocked_count = int(headline.get("blocked_count", 0)) if isinstance(headline, dict) else 0
+
+    return {
+        "generated_utc": now_iso(),
+        "scope": "grant_resubmission_checklist",
+        "target": {
+            "opp_num": "",
+            "grants_tracking_number": "",
+            "status": "no_resubmission_required",
+            "source": "automation",
+            "status_local_time": "",
+            "agency_tracking_number": "",
+            "application_name": "",
+        },
+        "fit_context": {
+            "title": "",
+            "agency": "",
+            "fit_status": "",
+            "blueprint_alignment_score": None,
+            "days_to_close": None,
+        },
+        "execution": {
+            "owner": owner,
+            "priority": "P2",
+            "due_utc": (now_utc() + timedelta(hours=24)).isoformat(),
+            "checklist": [
+                {
+                    "step": "No active resubmission target detected; keep monitoring waiting lanes and refresh daily",
+                    "owner": owner,
+                    "priority": "P2",
+                    "status": "pending",
+                    "evidence_required": "grant_waiting_actions_latest.json refreshed with blocked_count remaining zero",
+                }
+            ],
+            "commands": [
+                "python code/ops/BUILD_GRANT_WAITING_ACTIONS.py",
+                "python code/ops/BUILD_GRANT_FOLLOWUP_TRACKER.py",
+            ],
+        },
+        "go_no_go_gate": {
+            "go_if": [
+                f"waiting_followup_count remains manageable ({waiting_count})",
+                f"blocked_count remains zero ({blocked_count})",
+            ],
+            "hold_if": [
+                "Any new rejected/error status appears in grants_live_submission_ledger_latest.json",
+            ],
+        },
+        "evidence_paths": {
+            "ledger_latest_json": str(LEDGER_LATEST),
+            "waiting_actions_latest_json": str(WAITING_ACTIONS_LATEST),
+            "fit_pack_latest_json": str(FIT_PACK_LATEST),
+            "grants_console": "INSTITUTIONAL_STACK_V2/dashboard/grants.html",
+        },
+    }
 
 
 def find_fit_entry(fit_payload: dict[str, Any], opp_num: str) -> dict[str, Any]:
@@ -251,11 +332,11 @@ def main() -> int:
     fit_payload = load_json(FIT_PACK_LATEST, {})
 
     target = pick_target(waiting_payload, ledger_payload, args.tracking_number, args.opp_num)
-    if not isinstance(target, dict):
-        raise SystemExit("No grant target found for resubmission checklist")
-
-    fit_entry = find_fit_entry(fit_payload, str(target.get("opp_num") or ""))
-    payload = build_payload(target, fit_entry, owner=str(args.owner), due_hours=max(1, int(args.due_hours)))
+    if isinstance(target, dict):
+        fit_entry = find_fit_entry(fit_payload, str(target.get("opp_num") or ""))
+        payload = build_payload(target, fit_entry, owner=str(args.owner), due_hours=max(1, int(args.due_hours)))
+    else:
+        payload = build_noop_payload(owner=str(args.owner), waiting_payload=waiting_payload)
 
     stamp = now_tag()
     json_tagged = OPS_ROOT / f"grant_resubmission_checklist_{stamp}.json"
@@ -271,9 +352,9 @@ def main() -> int:
     write_text(md_latest, md_text)
 
     print("BUILD_GRANT_RESUBMISSION_CHECKLIST")
-    print(f"target_tracking={payload['target']['grants_tracking_number']}")
-    print(f"target_status={payload['target']['status']}")
-    print(f"due_utc={payload['execution']['due_utc']}")
+    print(f"target_tracking={payload.get('target', {}).get('grants_tracking_number', '')}")
+    print(f"target_status={payload.get('target', {}).get('status', '')}")
+    print(f"due_utc={payload.get('execution', {}).get('due_utc', '')}")
     print(f"latest_json={json_latest}")
     print(f"latest_md={md_latest}")
     return 0
