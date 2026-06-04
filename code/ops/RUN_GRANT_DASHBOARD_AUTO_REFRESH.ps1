@@ -3,7 +3,8 @@ param(
     [string]$Owner = 'Robert Ashworth',
     [string]$TargetTrackingNumber = '',
     [string]$TargetOppNum = '',
-    [switch]$RunParityAudit
+    [switch]$RunParityAudit,
+    [switch]$IncludeKrakenChecks
 )
 
 Set-StrictMode -Version Latest
@@ -12,6 +13,11 @@ $ErrorActionPreference = 'Stop'
 $runParityAudit = $RunParityAudit.IsPresent
 if (-not $PSBoundParameters.ContainsKey('RunParityAudit')) {
     $runParityAudit = $true
+}
+
+$includeKrakenChecks = $IncludeKrakenChecks.IsPresent
+if (-not $PSBoundParameters.ContainsKey('IncludeKrakenChecks')) {
+    $includeKrakenChecks = $true
 }
 
 $root = 'C:\LumaTrader'
@@ -31,7 +37,15 @@ $buildMissionSupport = Join-Path $opsRoot 'BUILD_MISSION_CONTROL_SUPPORT_ARTIFAC
 $buildWaitingActions = Join-Path $opsRoot 'BUILD_GRANT_WAITING_ACTIONS.py'
 $buildResubChecklist = Join-Path $opsRoot 'BUILD_GRANT_RESUBMISSION_CHECKLIST.py'
 $buildFollowupTracker = Join-Path $opsRoot 'BUILD_GRANT_FOLLOWUP_TRACKER.py'
+$analyzeTraderBleed = Join-Path $opsRoot 'ANALYZE_TRADER_BLEED.py'
+$buildGrantKrakenBrief = Join-Path $opsRoot 'BUILD_GRANT_KRAKEN_ACTION_BRIEF.py'
 $parityScript = Join-Path $opsRoot 'AUDIT_DASHBOARD_MIRROR_PARITY.ps1'
+$growthController = Join-Path $stackRoot 'code\execution\kraken_live_growth_controller.py'
+
+$controllerName = 'Robert'
+if (-not [string]::IsNullOrWhiteSpace($Owner)) {
+    $controllerName = ($Owner -split '\s+')[0]
+}
 
 $pythonCandidates = @(
     (Join-Path $stackRoot 'code\.venv\Scripts\python.exe'),
@@ -123,6 +137,30 @@ try {
         }
     }))
 
+    if ($includeKrakenChecks) {
+        $steps.Add((Invoke-Step -Label 'analyze_trader_bleed' -Action {
+            & $pythonExe $analyzeTraderBleed
+            if ($LASTEXITCODE -ne 0) {
+                throw "ANALYZE_TRADER_BLEED failed with exit code $LASTEXITCODE"
+            }
+        }))
+
+        $steps.Add((Invoke-Step -Label 'refresh_kraken_growth_controller_status' -Action {
+            $args = @($growthController, '--cached', '--controller', $controllerName)
+            & $pythonExe @args
+            if ($LASTEXITCODE -ne 0) {
+                throw "kraken_live_growth_controller failed with exit code $LASTEXITCODE"
+            }
+        }))
+
+        $steps.Add((Invoke-Step -Label 'build_grant_kraken_action_brief' -Action {
+            & $pythonExe $buildGrantKrakenBrief
+            if ($LASTEXITCODE -ne 0) {
+                throw "BUILD_GRANT_KRAKEN_ACTION_BRIEF failed with exit code $LASTEXITCODE"
+            }
+        }))
+    }
+
     if ($runParityAudit) {
         $steps.Add((Invoke-Step -Label 'audit_dashboard_mirror_parity' -Action {
             & pwsh -NoProfile -ExecutionPolicy Bypass -File $parityScript
@@ -153,6 +191,7 @@ $payload = [ordered]@{
         target_tracking_number = $TargetTrackingNumber
         target_opp_num = $TargetOppNum
         run_parity_audit = [bool]$runParityAudit
+        include_kraken_checks = [bool]$includeKrakenChecks
     }
     elapsed_sec = [math]::Round(((Get-Date) - $pipelineStart).TotalSeconds, 2)
     python_exe = $pythonExe
@@ -163,6 +202,9 @@ $payload = [ordered]@{
         grant_resubmission_checklist_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/grant_resubmission_checklist_latest.json'
         grant_followup_tracker_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/grant_followup_tracker_latest.json'
         grant_followup_tracker_latest_csv = 'INSTITUTIONAL_STACK_V2/out/ops/grant_followup_tracker_latest.csv'
+        trader_bleed_snapshot_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/trader_bleed_snapshot/trader_bleed_snapshot_latest.json'
+        vps_growth_controller_status_json = 'INSTITUTIONAL_STACK_V2/out/execution/vps_growth_controller_status.json'
+        grant_kraken_action_brief_latest_json = 'INSTITUTIONAL_STACK_V2/out/ops/grant_kraken_action_brief/grant_kraken_action_brief_latest.json'
     }
 }
 
