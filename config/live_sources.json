@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-05-26T14:53:43.589050+00:00",
+  "generated_utc": "2026-06-02T15:55:02.109554+00:00",
   "providers": {
     "ALPACA": {
       "enabled": true,
@@ -18,7 +18,7 @@
       "measured": true,
       "rows": 1,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "FINNHUB": {
       "enabled": true,
@@ -35,7 +35,7 @@
       "measured": true,
       "rows": 1,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "ALPHAVANTAGE": {
       "enabled": true,
@@ -52,7 +52,7 @@
       "measured": false,
       "rows": 0,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "TWELVE_DATA": {
       "enabled": true,
@@ -69,7 +69,7 @@
       "measured": true,
       "rows": 5,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "MASSIVE": {
       "enabled": true,
@@ -86,7 +86,7 @@
       "measured": true,
       "rows": 1,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "FRED": {
       "enabled": true,
@@ -103,7 +103,7 @@
       "measured": true,
       "rows": 10,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "EIA": {
       "enabled": true,
@@ -120,7 +120,7 @@
       "measured": false,
       "rows": 0,
       "http_status": 403,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "BLS": {
       "enabled": true,
@@ -137,7 +137,7 @@
       "measured": true,
       "rows": 24,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "NASA": {
       "enabled": true,
@@ -154,7 +154,7 @@
       "measured": true,
       "rows": 1,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "NOAA_NCEI": {
       "enabled": true,
@@ -173,7 +173,7 @@
       "measured": true,
       "rows": 5,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "NREL": {
       "enabled": true,
@@ -186,11 +186,11 @@
       ],
       "status": "LIVE_KEY_PRESENT",
       "probe_ok": false,
-      "probe_note": "http_error: {\n  \"error\": {\n    \"code\": \"SCHEDULED_BROWNOUT\",\n    \"message\": \"The `developer.nrel.gov` domain will be shut down on May 29, 2026. API users must update any `developer.nrel.gov` references in code to `developer.nlr.gov` for continued service. This outage is part of previously announced periodic bro",
+      "probe_note": "exception: URLError: <urlopen error [Errno 11001] getaddrinfo failed>",
       "measured": false,
       "rows": 0,
-      "http_status": 410,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "http_status": null,
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "USGS_WATER": {
       "enabled": true,
@@ -207,7 +207,7 @@
       "measured": true,
       "rows": 1,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "CENSUS": {
       "enabled": true,
@@ -219,12 +219,12 @@
         "CENSUS_API_KEY"
       ],
       "status": "LIVE_KEY_PRESENT",
-      "probe_ok": false,
-      "probe_note": "exception: TimeoutError: The read operation timed out",
-      "measured": false,
-      "rows": 0,
-      "http_status": null,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "probe_ok": true,
+      "probe_note": "acs_probe",
+      "measured": true,
+      "rows": 1,
+      "http_status": 200,
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "BEA": {
       "enabled": true,
@@ -241,7 +241,7 @@
       "measured": true,
       "rows": 13,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "EPA_AQS": {
       "enabled": true,
@@ -256,11 +256,11 @@
       ],
       "status": "LIVE_KEY_PRESENT",
       "probe_ok": false,
-      "probe_note": "http_error: {\n  \"Header\": [\n    {\n      \"status\": \"Failed\",\n      \"request_time\": \"2026-05-26T10:53:44.816-04:00\",\n      \"url\": \"https://aqs.epa.gov/data/api/list/states?email=[REDACTED]&key=[REDACTED]\",\n      \"error\": [\n        \"Email and/or key are invalid.\"\n      ]\n    }\n  ]\n}",
+      "probe_note": "http_error: {\n  \"Header\": [\n    {\n      \"status\": \"Failed\",\n      \"request_time\": \"2026-06-02T11:55:01.881-04:00\",\n      \"url\": \"https://aqs.epa.gov/data/api/list/states?email=[REDACTED]&key=[REDACTED]\",\n      \"error\": [\n        \"Email and/or key are invalid.\"\n      ]\n    }\n  ]\n}",
       "measured": false,
       "rows": 0,
       "http_status": 400,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "KRAKEN": {
       "enabled": true,
@@ -277,9 +277,9 @@
       "probe_ok": true,
       "probe_note": "private_balance_probe",
       "measured": true,
-      "rows": 57,
+      "rows": 198,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     },
     "WEBHOOK": {
       "enabled": true,
@@ -296,7 +296,7 @@
       "measured": true,
       "rows": 1,
       "http_status": null,
-      "last_truth_sync_utc": "2026-05-26T14:53:43.589050+00:00"
+      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
     }
   }
 }

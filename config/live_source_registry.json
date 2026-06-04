@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-05-26T14:53:43.589050+00:00",
+  "generated_utc": "2026-06-02T15:55:02.109554+00:00",
   "paper_live_linked": true,
   "rows": [
     {
@@ -29,7 +29,7 @@
         "ALPACA_API_KEY",
         "ALPACA_API_SECRET"
       ],
-      "last_probe_utc": "2026-05-26T14:53:18.856291+00:00",
+      "last_probe_utc": "2026-06-02T15:54:53.709159+00:00",
       "probe_note": "http_200_account",
       "enabled": true,
       "measured": true
@@ -59,7 +59,7 @@
       "present_env_names": [
         "FINNHUB_API_KEY"
       ],
-      "last_probe_utc": "2026-05-26T14:53:19.106248+00:00",
+      "last_probe_utc": "2026-06-02T15:54:54.015968+00:00",
       "probe_note": "quote_probe",
       "enabled": true,
       "measured": true
@@ -89,7 +89,7 @@
       "present_env_names": [
         "ALPHAVANTAGE_API_KEY"
       ],
-      "last_probe_utc": "2026-05-26T14:53:19.281130+00:00",
+      "last_probe_utc": "2026-06-02T15:54:54.446762+00:00",
       "probe_note": "global_quote_probe",
       "enabled": true,
       "measured": false
@@ -119,7 +119,7 @@
       "present_env_names": [
         "TWELVE_DATA_API_KEY"
       ],
-      "last_probe_utc": "2026-05-26T14:53:19.389839+00:00",
+      "last_probe_utc": "2026-06-02T15:54:54.701253+00:00",
       "probe_note": "time_series_probe",
       "enabled": true,
       "measured": true
@@ -149,7 +149,7 @@
       "present_env_names": [
         "MASSIVE_API_KEY"
       ],
-      "last_probe_utc": "2026-05-26T14:53:19.522790+00:00",
+      "last_probe_utc": "2026-06-02T15:54:54.951087+00:00",
       "probe_note": "polygon_prev_probe",
       "enabled": true,
       "measured": true
@@ -179,7 +179,7 @@
       "present_env_names": [
         "FRED_API_KEY"
       ],
-      "last_probe_utc": "2026-05-26T14:53:19.888942+00:00",
+      "last_probe_utc": "2026-06-02T15:54:55.650858+00:00",
       "probe_note": "observations_probe",
       "enabled": true,
       "measured": true
@@ -209,7 +209,7 @@
       "present_env_names": [
         "EIA_API_KEY"
       ],
-      "last_probe_utc": "2026-05-26T14:53:20.247906+00:00",
+      "last_probe_utc": "2026-06-02T15:54:56.134214+00:00",
       "probe_note": "http_error: {\n  \"error\": {\n    \"code\": \"API_KEY_INVALID\",\n    \"message\": \"An invalid api_key was supplied. Get one at https://api.eia.gov:443\"\n  }\n}",
       "enabled": true,
       "measured": false
@@ -239,7 +239,7 @@
       "present_env_names": [
         "BLS_API_KEY"
       ],
-      "last_probe_utc": "2026-05-26T14:53:20.479110+00:00",
+      "last_probe_utc": "2026-06-02T15:54:56.624950+00:00",
       "probe_note": "bls_probe",
       "enabled": true,
       "measured": true
@@ -269,7 +269,7 @@
       "present_env_names": [
         "NASA_API_KEY"
       ],
-      "last_probe_utc": "2026-05-26T14:53:20.928563+00:00",
+      "last_probe_utc": "2026-06-02T15:54:59.175895+00:00",
       "probe_note": "apod_probe",
       "enabled": true,
       "measured": true
@@ -301,7 +301,7 @@
       "present_env_names": [
         "NOAA_API_TOKEN"
       ],
-      "last_probe_utc": "2026-05-26T14:53:21.081168+00:00",
+      "last_probe_utc": "2026-06-02T15:54:59.480232+00:00",
       "probe_note": "datasets_probe",
       "enabled": true,
       "measured": true
@@ -312,7 +312,7 @@
       "status": "PROBE_FAILED_OR_THIN",
       "rows": 0,
       "probe_ok": false,
-      "http_status": 410,
+      "http_status": null,
       "evidence_basis": "KEY_PRESENT_BUT_NO_USABLE_ROWS",
       "dollar_basis": "UNMEASURED",
       "constraint_type": "renewables / grid / energy lab context",
@@ -331,8 +331,8 @@
       "present_env_names": [
         "NREL_API_KEY"
       ],
-      "last_probe_utc": "2026-05-26T14:53:21.443407+00:00",
-      "probe_note": "http_error: {\n  \"error\": {\n    \"code\": \"SCHEDULED_BROWNOUT\",\n    \"message\": \"The `developer.nrel.gov` domain will be shut down on May 29, 2026. API users must update any `developer.nrel.gov` references in code to `developer.nlr.gov` for continued service. This outage is part of previously announced periodic bro",
+      "last_probe_utc": "2026-06-02T15:54:59.550722+00:00",
+      "probe_note": "exception: URLError: <urlopen error [Errno 11001] getaddrinfo failed>",
       "enabled": true,
       "measured": false
     },
@@ -361,7 +361,7 @@
       "present_env_names": [
         "USGS_WATER_API_KEY"
       ],
-      "last_probe_utc": "2026-05-26T14:53:21.689542+00:00",
+      "last_probe_utc": "2026-06-02T15:55:00.284188+00:00",
       "probe_note": "iv_probe_public_with_key_present",
       "enabled": true,
       "measured": true
@@ -369,21 +369,21 @@
     {
       "source": "CENSUS",
       "sector": "demographic",
-      "status": "PROBE_FAILED_OR_THIN",
-      "rows": 0,
-      "probe_ok": false,
-      "http_status": null,
-      "evidence_basis": "KEY_PRESENT_BUT_NO_USABLE_ROWS",
-      "dollar_basis": "UNMEASURED",
+      "status": "MEASURED",
+      "rows": 1,
+      "probe_ok": true,
+      "http_status": 200,
+      "evidence_basis": "LIVE_HTTP_PROBE",
+      "dollar_basis": "MEASURED",
       "constraint_type": "population / regional demand drift",
       "money_drain_mode": "wrong location assumptions and demand misread",
       "formula_basis": "bounded_log_translation_if_measured_else_zero",
       "translated_value": {
-        "hour": 0.0,
-        "day": 0.0,
-        "week": 0.0,
-        "month": 0.0,
-        "year": 0.0
+        "hour": 34657.36,
+        "day": 831776.64,
+        "week": 5822436.48,
+        "month": 24953299.2,
+        "year": 303598473.6
       },
       "env_names": [
         "CENSUS_API_KEY"
@@ -391,10 +391,10 @@
       "present_env_names": [
         "CENSUS_API_KEY"
       ],
-      "last_probe_utc": "2026-05-26T14:53:41.847932+00:00",
-      "probe_note": "exception: TimeoutError: The read operation timed out",
+      "last_probe_utc": "2026-06-02T15:55:00.987686+00:00",
+      "probe_note": "acs_probe",
       "enabled": true,
-      "measured": false
+      "measured": true
     },
     {
       "source": "BEA",
@@ -421,7 +421,7 @@
       "present_env_names": [
         "BEA_API_KEY"
       ],
-      "last_probe_utc": "2026-05-26T14:53:42.089565+00:00",
+      "last_probe_utc": "2026-06-02T15:55:01.392695+00:00",
       "probe_note": "dataset_list_probe",
       "enabled": true,
       "measured": true
@@ -453,8 +453,8 @@
         "EPA_AQS_KEY",
         "EPA_AQS_EMAIL"
       ],
-      "last_probe_utc": "2026-05-26T14:53:43.381185+00:00",
-      "probe_note": "http_error: {\n  \"Header\": [\n    {\n      \"status\": \"Failed\",\n      \"request_time\": \"2026-05-26T10:53:44.816-04:00\",\n      \"url\": \"https://aqs.epa.gov/data/api/list/states?email=[REDACTED]&key=[REDACTED]\",\n      \"error\": [\n        \"Email and/or key are invalid.\"\n      ]\n    }\n  ]\n}",
+      "last_probe_utc": "2026-06-02T15:55:01.793089+00:00",
+      "probe_note": "http_error: {\n  \"Header\": [\n    {\n      \"status\": \"Failed\",\n      \"request_time\": \"2026-06-02T11:55:01.881-04:00\",\n      \"url\": \"https://aqs.epa.gov/data/api/list/states?email=[REDACTED]&key=[REDACTED]\",\n      \"error\": [\n        \"Email and/or key are invalid.\"\n      ]\n    }\n  ]\n}",
       "enabled": true,
       "measured": false
     },
@@ -462,7 +462,7 @@
       "source": "KRAKEN",
       "sector": "crypto_exec",
       "status": "MEASURED",
-      "rows": 57,
+      "rows": 198,
       "probe_ok": true,
       "http_status": 200,
       "evidence_basis": "LIVE_HTTP_PROBE",
@@ -471,11 +471,11 @@
       "money_drain_mode": "missed fills, bad entries, idle capital, slippage",
       "formula_basis": "bounded_log_translation_if_measured_else_zero",
       "translated_value": {
-        "hour": 40604.43,
-        "day": 974506.32,
-        "week": 6821544.24,
-        "month": 29235189.6,
-        "year": 355694806.8
+        "hour": 52933.05,
+        "day": 1270393.2,
+        "week": 8892752.4,
+        "month": 38111796.0,
+        "year": 463693518.0
       },
       "env_names": [
         "KRAKEN_API_KEY",
@@ -485,7 +485,7 @@
         "KRAKEN_API_KEY",
         "KRAKEN_API_SECRET"
       ],
-      "last_probe_utc": "2026-05-26T14:53:43.589050+00:00",
+      "last_probe_utc": "2026-06-02T15:55:02.109554+00:00",
       "probe_note": "private_balance_probe",
       "enabled": true,
       "measured": true
@@ -515,7 +515,7 @@
       "present_env_names": [
         "WEBHOOK_SHARED_SECRET"
       ],
-      "last_probe_utc": "2026-05-26T14:53:43.589050+00:00",
+      "last_probe_utc": "2026-06-02T15:55:02.109554+00:00",
       "probe_note": "shared_secret_present_internal",
       "enabled": true,
       "measured": true
