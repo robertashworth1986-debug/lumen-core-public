@@ -82,9 +82,13 @@ class Paths:
     pilots: Path
     key_audit: Path
     vps_controller: Path
+    vps_health_audit: Path
     live_executor_hb: Path
     approval_hb: Path
     execution_status: Path
+    staleness_report: Path
+    investor_proof_scorecard: Path
+    metrics_scorecard: Path
     investor_packet_latest: Path
 
 
@@ -97,9 +101,13 @@ def locate_paths() -> Paths:
         pilots=ROOT / "out" / "ops" / "pilot_site_opportunity_pack_latest.json",
         key_audit=ROOT / "out" / "ops" / "live_key_measurement_audit_latest.json",
         vps_controller=ROOT / "out" / "execution" / "vps_growth_controller_status.json",
+        vps_health_audit=ROOT / "out" / "ops" / "vps_health_hardening_audit_latest.json",
         live_executor_hb=ROOT / "out" / "execution" / "live_executor_heartbeat.json",
         approval_hb=ROOT / "out" / "execution" / "approval_autofire_heartbeat.json",
         execution_status=ROOT / "out" / "execution_status.json",
+        staleness_report=ROOT / "out" / "ops" / "staleness_report.json",
+        investor_proof_scorecard=ROOT / "out" / "execution" / "investor_proof_scorecard.json",
+        metrics_scorecard=ROOT / "out" / "execution" / "institutional_metrics_scorecard.json",
         investor_packet_latest=ROOT / "out" / "ops" / "investor_packet_refresh_latest.json",
     )
 
@@ -192,6 +200,14 @@ def build_backlog(
     readiness_payload: dict[str, Any],
     key_audit_payload: dict[str, Any],
     controller_payload: dict[str, Any],
+    live_executor_hb_payload: dict[str, Any],
+    staleness_payload: dict[str, Any],
+    vps_health_payload: dict[str, Any],
+    investor_proof_payload: dict[str, Any],
+    metrics_scorecard_payload: dict[str, Any],
+    investor_proof_age_sec: float | None,
+    metrics_scorecard_age_sec: float | None,
+    staleness_report_age_sec: float | None,
     execution_status_age_sec: float | None,
 ) -> list[dict[str, Any]]:
     backlog: list[dict[str, Any]] = []
@@ -256,11 +272,98 @@ def build_backlog(
             }
         )
 
+    if bool(live_executor_hb_payload.get("symbol_intel_stale", False)):
+        backlog.append(
+            {
+                "priority": "P1",
+                "title": "Refresh stale symbol-intel cache before next live cycle",
+                "impact": "Reduces stale ranking bias and improves candidate quality for entries and exits.",
+                "owner_lane": "execution_quant",
+                "evidence": f"symbol_intel_age_sec={round(to_float(live_executor_hb_payload.get('symbol_intel_age_sec', 0.0), 0.0), 1)}",
+            }
+        )
+
+    staleness_status = str(staleness_payload.get("overall_status", "")).lower()
+    if staleness_status in {"critical", "stale"}:
+        backlog.append(
+            {
+                "priority": "P0",
+                "title": "Recover stale execution and proof chains",
+                "impact": "Restores investor-grade freshness for execution, proof, and dashboard telemetry.",
+                "owner_lane": "platform_reliability",
+                "evidence": f"staleness_overall_status={staleness_status} score={to_int(staleness_payload.get('score_0_100', 0))}",
+            }
+        )
+    elif staleness_report_age_sec is not None and staleness_report_age_sec > 86400.0:
+        backlog.append(
+            {
+                "priority": "P1",
+                "title": "Regenerate staleness report on daily cadence",
+                "impact": "Keeps operational freshness alerts current and actionable.",
+                "owner_lane": "platform_reliability",
+                "evidence": f"staleness_report_age_sec={round(staleness_report_age_sec, 1)}",
+            }
+        )
+
+    investor_closed = to_int(investor_proof_payload.get("closed_trades", 0))
+    investor_wr = to_float(investor_proof_payload.get("win_rate_pct", 0.0))
+    investor_mdd = to_float(investor_proof_payload.get("max_drawdown_pct", 0.0))
+    if investor_closed >= 100 and (investor_wr < 20.0 or investor_mdd >= 50.0):
+        backlog.append(
+            {
+                "priority": "P0",
+                "title": "Quarantine failing proof profile and rotate strategy baseline",
+                "impact": "Prevents degraded profile metrics from contaminating investor confidence and runtime tuning.",
+                "owner_lane": "trading_ops",
+                "evidence": f"profile={investor_proof_payload.get('profile','')} win_rate_pct={investor_wr:.2f} max_drawdown_pct={investor_mdd:.2f}",
+            }
+        )
+
+    if investor_proof_age_sec is not None and investor_proof_age_sec > 86400.0:
+        backlog.append(
+            {
+                "priority": "P1",
+                "title": "Refresh investor proof scorecard from latest ledger",
+                "impact": "Keeps narrative metrics synchronized with current strategy and execution profile.",
+                "owner_lane": "investor_reporting",
+                "evidence": f"investor_proof_scorecard_age_sec={round(investor_proof_age_sec, 1)}",
+            }
+        )
+
+    if metrics_scorecard_age_sec is not None and metrics_scorecard_age_sec > 604800.0:
+        backlog.append(
+            {
+                "priority": "P1",
+                "title": "Rebuild institutional metrics scorecard weekly",
+                "impact": "Aligns readiness tiers with latest execution and source evidence.",
+                "owner_lane": "investor_reporting",
+                "evidence": f"institutional_metrics_scorecard_age_sec={round(metrics_scorecard_age_sec, 1)}",
+            }
+        )
+
+    vps_findings = vps_health_payload.get("findings", []) if isinstance(vps_health_payload, dict) else []
+    if isinstance(vps_findings, list):
+        for finding in vps_findings:
+            if not isinstance(finding, dict):
+                continue
+            title = str(finding.get("title", "")).strip()
+            severity = str(finding.get("severity", "P2")).upper()
+            if title in {"System updates pending on VPS", "Certbot package not installed"}:
+                backlog.append(
+                    {
+                        "priority": "P1" if severity == "P1" else "P2",
+                        "title": title,
+                        "impact": "Strengthens external uptime, patch posture, and public endpoint trust.",
+                        "owner_lane": "vps_ops",
+                        "evidence": str(finding.get("detail", ""))[:220],
+                    }
+                )
+
     mode = str(controller_payload.get("mode", ""))
     if mode == "SAFE_DRY_RUN":
         backlog.append(
             {
-                "priority": "P2",
+                "priority": "P1",
                 "title": "Define SAFE_DRY_RUN to guarded-live promotion gate",
                 "impact": "Creates explicit commercialization milestone from proof mode to production buyer mode.",
                 "owner_lane": "trading_ops",
@@ -284,6 +387,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.append(f"- Runtime readiness: {snapshot.get('runtime_readiness_status', '')}")
     lines.append(f"- Live executor heartbeat fresh: {snapshot.get('live_executor_heartbeat_fresh', False)}")
     lines.append(f"- Approval heartbeat fresh: {snapshot.get('approval_heartbeat_fresh', False)}")
+    lines.append(f"- Symbol intel stale: {snapshot.get('symbol_intel_stale', False)}")
+    lines.append(f"- Staleness status: {snapshot.get('staleness_overall_status', '')}")
+    lines.append(f"- Investor proof win_rate_pct: {to_float(snapshot.get('investor_proof_win_rate_pct', 0.0)):.2f}")
+    lines.append(f"- Investor proof max_drawdown_pct: {to_float(snapshot.get('investor_proof_max_drawdown_pct', 0.0)):.2f}")
+    lines.append(f"- VPS P1 findings: {to_int(snapshot.get('vps_p1_findings', 0))}")
     lines.append("")
 
     lines.append("## Commercial Sector Priorities")
@@ -342,9 +450,13 @@ def main() -> int:
     pilots = load_json(paths.pilots, {})
     key_audit = load_json(paths.key_audit, {})
     controller = load_json(paths.vps_controller, {})
+    vps_health = load_json(paths.vps_health_audit, {})
     live_hb = load_json(paths.live_executor_hb, {})
     approval_hb = load_json(paths.approval_hb, {})
     execution_status = load_json(paths.execution_status, {})
+    staleness_report = load_json(paths.staleness_report, {})
+    investor_proof_scorecard = load_json(paths.investor_proof_scorecard, {})
+    metrics_scorecard = load_json(paths.metrics_scorecard, {})
     packet_latest = load_json(paths.investor_packet_latest, {})
 
     proof_summary_path = locate_latest_proof_summary()
@@ -353,6 +465,14 @@ def main() -> int:
     live_hb_age = age_seconds_from_iso(live_hb.get("timestamp_utc"))
     approval_hb_age = age_seconds_from_iso(approval_hb.get("generated_utc"))
     execution_status_age = age_seconds_from_iso(execution_status.get("generated_utc"))
+    staleness_report_age = age_seconds_from_iso(staleness_report.get("generated_utc"))
+    investor_proof_age = age_seconds_from_iso(investor_proof_scorecard.get("generated_utc"))
+    metrics_scorecard_age = age_seconds_from_iso(metrics_scorecard.get("generated_utc"))
+
+    vps_findings = vps_health.get("findings", []) if isinstance(vps_health, dict) else []
+    if not isinstance(vps_findings, list):
+        vps_findings = []
+    vps_p1_findings = sum(1 for row in vps_findings if isinstance(row, dict) and str(row.get("severity", "")).upper() == "P1")
 
     grant_rows = grants.get("opportunities", []) if isinstance(grants, dict) else []
     if not isinstance(grant_rows, list):
@@ -384,10 +504,22 @@ def main() -> int:
             "live_executor_heartbeat_status": str(live_hb.get("status", "")),
             "live_executor_heartbeat_age_sec": live_hb_age,
             "live_executor_heartbeat_fresh": (live_hb_age is not None and live_hb_age <= 180.0),
+            "symbol_intel_stale": bool(live_hb.get("symbol_intel_stale", False)),
+            "symbol_intel_age_sec": to_float(live_hb.get("symbol_intel_age_sec", 0.0)),
             "approval_heartbeat_status": str(approval_hb.get("status", "")),
             "approval_heartbeat_age_sec": approval_hb_age,
             "approval_heartbeat_fresh": (approval_hb_age is not None and approval_hb_age <= 180.0),
             "execution_status_age_sec": execution_status_age,
+            "staleness_overall_status": str(staleness_report.get("overall_status", "")),
+            "staleness_report_age_sec": staleness_report_age,
+            "investor_proof_profile": str(investor_proof_scorecard.get("profile", "")),
+            "investor_proof_win_rate_pct": to_float(investor_proof_scorecard.get("win_rate_pct", 0.0)),
+            "investor_proof_net_pnl_pct": to_float(investor_proof_scorecard.get("net_pnl_pct", 0.0)),
+            "investor_proof_max_drawdown_pct": to_float(investor_proof_scorecard.get("max_drawdown_pct", 0.0)),
+            "investor_proof_age_sec": investor_proof_age,
+            "institutional_metrics_readiness_tier": str(metrics_scorecard.get("readiness_tier", "")),
+            "institutional_metrics_scorecard_age_sec": metrics_scorecard_age,
+            "vps_p1_findings": vps_p1_findings,
             "key_measured_coverage_pct": to_float((key_audit.get("summary", {}) if isinstance(key_audit, dict) else {}).get("measured_coverage_pct", 0.0)),
             "packet_refresh_generated_utc": packet_latest.get("generated_utc", "") if isinstance(packet_latest, dict) else "",
         },
@@ -401,6 +533,14 @@ def main() -> int:
             readiness_payload=readiness,
             key_audit_payload=key_audit,
             controller_payload=controller,
+            live_executor_hb_payload=live_hb,
+            staleness_payload=staleness_report,
+            vps_health_payload=vps_health,
+            investor_proof_payload=investor_proof_scorecard,
+            metrics_scorecard_payload=metrics_scorecard,
+            investor_proof_age_sec=investor_proof_age,
+            metrics_scorecard_age_sec=metrics_scorecard_age,
+            staleness_report_age_sec=staleness_report_age,
             execution_status_age_sec=execution_status_age,
         ),
         "evidence_paths": {
@@ -411,9 +551,13 @@ def main() -> int:
             "pilots": str(paths.pilots),
             "key_audit": str(paths.key_audit),
             "vps_controller": str(paths.vps_controller),
+            "vps_health_audit": str(paths.vps_health_audit),
             "live_executor_heartbeat": str(paths.live_executor_hb),
             "approval_heartbeat": str(paths.approval_hb),
             "execution_status": str(paths.execution_status),
+            "staleness_report": str(paths.staleness_report),
+            "investor_proof_scorecard": str(paths.investor_proof_scorecard),
+            "institutional_metrics_scorecard": str(paths.metrics_scorecard),
             "proof_summary": str(proof_summary_path) if proof_summary_path else "",
         },
     }
