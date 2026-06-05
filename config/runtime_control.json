@@ -233,7 +233,7 @@
   "expected_net_edge_min": 0.0,
   "max_deployable_capital_pct": 0.72,
   "order_notional_pct": 0.35,
-  "max_drawdown_pct": 10.0,
+  "max_drawdown_pct": 25.0,
   "profit_reinvestment_enabled": true,
   "aggressive_edge_threshold_bps": 7.5,
   "force_entry_on_high_confidence": true,
