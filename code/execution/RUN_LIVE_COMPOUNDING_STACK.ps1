@@ -31,7 +31,8 @@ $daemonArgs = @(
     $daemonScript,
     "--gateway-url", "http://$GatewayHost`:$GatewayPort",
     "--controller", $Controller,
-    "--interval-sec", "5"
+    "--interval-sec", "5",
+    "--include-existing"
 )
 
 $executorScript = Join-Path $execDir "live_executor.py"

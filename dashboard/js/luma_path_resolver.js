@@ -49,6 +49,27 @@
       ]);
     }
 
+    function grantsCandidates(rel) {
+      var roots = unique([
+        join(outBase, 'grants'),
+        join(mirrorOutBase, 'grants'),
+        inInstitutionalDashboard ? '/INSTITUTIONAL_STACK_V2/out/grants' : '/out/grants',
+        inInstitutionalDashboard ? '/out/grants' : '/INSTITUTIONAL_STACK_V2/out/grants',
+      ]);
+      var tail = cleanRel(rel);
+      if (!tail) {
+        return roots;
+      }
+      return unique(roots.map(function (root) {
+        return join(root, tail);
+      }));
+    }
+
+    function opsCandidates(rel) {
+      var tail = cleanRel(rel);
+      return outCandidates(tail ? ('ops/' + tail) : 'ops');
+    }
+
     function evidenceCandidates(rel) {
       return unique([
         join(evidenceBase, rel),
@@ -101,6 +122,8 @@
       evidenceBase: evidenceBase,
       evidenceRunsBase: evidenceBase + '/runs',
       outCandidates: outCandidates,
+      grantsCandidates: grantsCandidates,
+      opsCandidates: opsCandidates,
       evidenceCandidates: evidenceCandidates,
       dashboardCandidates: dashboardCandidates,
       resolvePaneSrc: resolvePaneSrc,

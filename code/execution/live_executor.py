@@ -9818,8 +9818,22 @@ class RobustLiveExecutor:
 
                 self.no_affordable_streak = 0
 
-                # Inn24: Alpha Confirmation Window — require N consecutive scans before entry
-                if bool(self.inn24_confirmation_enabled) and int(self.inn24_confirmation_scans) >= 2:
+                # Inn24: Alpha Confirmation Window — require N consecutive scans before entry.
+                # Read from hot-reloaded runtime_cfg at decision time to avoid stale in-memory defaults.
+                _inn24_enabled_now = bool(
+                    self.runtime_cfg.get("inn24_confirmation_enabled", self.inn24_confirmation_enabled)
+                )
+                _inn24_required_now = int(
+                    self._clamp(
+                        self._to_float(
+                            self.runtime_cfg.get("inn24_confirmation_scans", self.inn24_confirmation_scans),
+                            float(self.inn24_confirmation_scans),
+                        ),
+                        1.0,
+                        10.0,
+                    )
+                )
+                if _inn24_enabled_now and _inn24_required_now >= 2:
                     _sym24 = str(symbol).upper().strip()
                     _now_epoch = loop_now.timestamp()
                     _window = float(self.inn24_confirmation_window_sec)
@@ -9828,7 +9842,7 @@ class RobustLiveExecutor:
                     hits = [t for t in hits if _now_epoch - t <= _window]
                     hits.append(_now_epoch)
                     self._inn24_candidate_hits[_sym24] = hits
-                    _required = int(self.inn24_confirmation_scans)
+                    _required = int(_inn24_required_now)
                     if len(hits) < _required:
                         selection_meta["inn24_confirmation_hits"] = len(hits)
                         selection_meta["inn24_confirmation_required"] = _required
