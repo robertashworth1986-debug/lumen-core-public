@@ -24,6 +24,7 @@ import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 from application_context_resolver import load_application_profile
 
@@ -32,6 +33,7 @@ DATA = ROOT / "data"
 OUT = ROOT / "out" / "opportunities"
 PROFILE = DATA / "company_profile.json"
 TECH_VOLUME = ROOT / "out" / "grants" / "nsf_sbir_phase_i" / "20260505T121657Z" / "technical_volume.md"
+V2_RUNS = ROOT / "out" / "master_universe_v2"
 
 PORTAL_HINTS = {
     "grants.gov": {
@@ -74,6 +76,31 @@ PORTAL_HINTS = {
 def safe_slug(s: str) -> str:
     s = re.sub(r"[^A-Za-z0-9]+", "_", str(s or "")).strip("_")
     return s[:60] or "unknown"
+
+
+def latest_benchmark_snapshot() -> dict[str, Any]:
+    latest = V2_RUNS / "latest.txt"
+    if not latest.exists():
+        return {}
+
+    run_utc = latest.read_text(encoding="utf-8").strip()
+    if not run_utc:
+        return {}
+
+    summary_path = V2_RUNS / run_utc / "summary.json"
+    if not summary_path.exists():
+        return {"run_utc": run_utc}
+
+    try:
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    except Exception:
+        return {"run_utc": run_utc}
+
+    return {
+        "run_utc": run_utc,
+        "n_datasets_in_universe": summary.get("n_datasets_in_universe"),
+        "n_datasets_succeeded": summary.get("n_datasets_succeeded"),
+    }
 
 
 def build_sf424(profile: dict, opp: dict) -> dict:
@@ -150,6 +177,18 @@ def cover_letter(profile: dict, opp: dict) -> str:
     pi = profile.get("pi", {}) or {}
     patent_numbers = profile.get("patent_numbers") if isinstance(profile.get("patent_numbers"), list) else []
     patent_text = ", ".join(str(x) for x in patent_numbers) if patent_numbers else "USPTO patent references available on request"
+    bench = latest_benchmark_snapshot()
+    n_universe = bench.get("n_datasets_in_universe")
+    n_scored = bench.get("n_datasets_succeeded")
+    if isinstance(n_universe, int) and isinstance(n_scored, int):
+        benchmark_line = (
+            f"a frozen benchmark of {n_universe:,} datasets "
+            f"({n_scored:,} successfully scored in the latest full run)"
+        )
+    elif isinstance(n_universe, int):
+        benchmark_line = f"a frozen benchmark of {n_universe:,} datasets"
+    else:
+        benchmark_line = "a frozen benchmark"
     return f"""# Cover Letter
 
 **Date:** {today}
@@ -164,9 +203,9 @@ I am submitting an application from **{profile.get('legal_name')}**
 (DBA {profile.get('dba')}, UEI {profile.get('duns_or_uei')}, CAGE
 {profile.get('cage_code')}) in response to the above opportunity.
 
-LumenCore is a per-dataset adaptive forecasting engine with a frozen 673-dataset
-benchmark, empirically calibrated uncertainty bands (94.2% coverage at 80%
-target), live regime-shift detection (CUSUM + variance-ratio), and a SHA-256
+LumenCore is a per-dataset adaptive forecasting engine with {benchmark_line},
+empirically calibrated uncertainty bands, live regime-shift detection
+(CUSUM + variance-ratio), and a SHA-256
 evidence chain. Live execution is verified on a public exchange. Patent
 references: {patent_text}.
 

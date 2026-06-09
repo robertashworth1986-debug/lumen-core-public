@@ -1484,6 +1484,7 @@ class RobustLiveExecutor:
         self.collateral_sell_fraction = 0.20
         self.collateral_convert_cooldown_sec = 12.0
         self.min_collateral_convert_usd = 4.0
+        self.orphan_recovery_min_value_usd = 15.0
         self.collateral_convert_avoid_open_positions = True
         self.collateral_convert_protect_open_positions_sec = 180.0
         self.last_collateral_convert_utc = ""
@@ -2083,6 +2084,14 @@ class RobustLiveExecutor:
             self._to_float(
                 runtime.get("min_collateral_convert_usd", self.min_collateral_convert_usd),
                 self.min_collateral_convert_usd,
+            ),
+            0.5,
+            100000.0,
+        )
+        self.orphan_recovery_min_value_usd = self._clamp(
+            self._to_float(
+                runtime.get("orphan_recovery_min_value_usd", self.orphan_recovery_min_value_usd),
+                self.orphan_recovery_min_value_usd,
             ),
             0.5,
             100000.0,
@@ -3837,6 +3846,45 @@ class RobustLiveExecutor:
         meta["symbol_learning_source"] = "learning_profile"
         return bonus_map, meta
 
+    def _moonshot_watchlist_symbols(self, require_fresh: bool = True) -> tuple[list[str], bool]:
+        """Return moonshot watchlist symbols and stale flag.
+
+        When require_fresh is True, stale watchlists are ignored.
+        """
+        if not (bool(self.moonshot_amplifier_enabled) or bool(self.inn22_moonshot_tp_enabled)):
+            return [], False
+
+        symbols: list[str] = []
+        stale = False
+        try:
+            _wl_path = Path(self.moonshot_watchlist_path)
+            if not _wl_path.is_absolute():
+                _wl_path = Path(__file__).resolve().parent.parent.parent / _wl_path
+            _wl_payload = load_json(_wl_path, {})
+            if isinstance(_wl_payload, dict):
+                _wl_generated = str(_wl_payload.get("generated_utc", "") or "")
+                _wl_fresh = True
+                if _wl_generated:
+                    try:
+                        _wl_dt = self._parse_iso_utc(_wl_generated)
+                        _wl_age = max((datetime.now(timezone.utc) - _wl_dt).total_seconds(), 0.0)
+                        _wl_fresh = _wl_age <= max(float(self.symbol_intel_max_age_sec), 900.0)
+                    except Exception:
+                        _wl_fresh = False
+                if require_fresh and (not _wl_fresh):
+                    stale = True
+                else:
+                    _wl_rows = _wl_payload.get("watchlist", [])
+                    if isinstance(_wl_rows, list):
+                        for _sym in _wl_rows:
+                            _clean = str(_sym or "").upper().strip()
+                            if _clean:
+                                symbols.append(_clean)
+        except Exception:
+            return [], False
+
+        return list(dict.fromkeys(symbols)), bool(stale)
+
     def _symbol_flip_intel_candidates(self) -> tuple[list[str], dict[str, Any]]:
         meta: dict[str, Any] = {
             "symbol_intel_enabled": bool(self.symbol_intel_enabled),
@@ -3847,15 +3895,37 @@ class RobustLiveExecutor:
             "symbol_intel_selected_count": 0,
             "symbol_intel_executable_count": 0,
             "symbol_intel_short_candidate_count": 0,
+            "moonshot_watchlist_count": 0,
+            "moonshot_watchlist_stale": False,
             "symbol_intel_source": "none",
         }
 
         if not self.symbol_intel_enabled:
+            moonshot_symbols, moonshot_stale = self._moonshot_watchlist_symbols(require_fresh=True)
+            meta["moonshot_watchlist_stale"] = bool(moonshot_stale)
+            if moonshot_symbols:
+                limited = moonshot_symbols[: int(self.symbol_intel_prefer_top_n)] if int(self.symbol_intel_prefer_top_n) > 0 else list(moonshot_symbols)
+                meta["symbol_intel_candidate_count"] = int(len(moonshot_symbols))
+                meta["symbol_intel_selected_count"] = int(len(limited))
+                meta["symbol_intel_executable_count"] = int(len(limited))
+                meta["moonshot_watchlist_count"] = int(len(moonshot_symbols))
+                meta["symbol_intel_source"] = "moonshot_watchlist_fallback_disabled"
+                return limited, meta
             meta["symbol_intel_source"] = "disabled"
             return [], meta
 
         payload = self._load_symbol_flip_intel_payload()
         if not payload:
+            moonshot_symbols, moonshot_stale = self._moonshot_watchlist_symbols(require_fresh=True)
+            meta["moonshot_watchlist_stale"] = bool(moonshot_stale)
+            if moonshot_symbols:
+                limited = moonshot_symbols[: int(self.symbol_intel_prefer_top_n)] if int(self.symbol_intel_prefer_top_n) > 0 else list(moonshot_symbols)
+                meta["symbol_intel_candidate_count"] = int(len(moonshot_symbols))
+                meta["symbol_intel_selected_count"] = int(len(limited))
+                meta["symbol_intel_executable_count"] = int(len(limited))
+                meta["moonshot_watchlist_count"] = int(len(moonshot_symbols))
+                meta["symbol_intel_source"] = "moonshot_watchlist_fallback_empty"
+                return limited, meta
             meta["symbol_intel_source"] = "empty"
             return [], meta
 
@@ -3873,6 +3943,16 @@ class RobustLiveExecutor:
 
         if math.isfinite(age_sec) and age_sec > float(self.symbol_intel_max_age_sec):
             meta["symbol_intel_stale"] = True
+            moonshot_symbols, moonshot_stale = self._moonshot_watchlist_symbols(require_fresh=True)
+            meta["moonshot_watchlist_stale"] = bool(moonshot_stale)
+            if moonshot_symbols:
+                limited = moonshot_symbols[: int(self.symbol_intel_prefer_top_n)] if int(self.symbol_intel_prefer_top_n) > 0 else list(moonshot_symbols)
+                meta["symbol_intel_candidate_count"] = int(len(moonshot_symbols))
+                meta["symbol_intel_selected_count"] = int(len(limited))
+                meta["symbol_intel_executable_count"] = int(len(limited))
+                meta["moonshot_watchlist_count"] = int(len(moonshot_symbols))
+                meta["symbol_intel_source"] = "moonshot_watchlist_fallback_stale"
+                return limited, meta
             meta["symbol_intel_source"] = "stale"
             return [], meta
 
@@ -3918,7 +3998,10 @@ class RobustLiveExecutor:
                 if symbol:
                     picks.append(symbol)
 
-        deduped = list(dict.fromkeys(picks))
+        moonshot_symbols, moonshot_stale = self._moonshot_watchlist_symbols(require_fresh=True)
+        meta["moonshot_watchlist_stale"] = bool(moonshot_stale)
+
+        deduped = list(dict.fromkeys(moonshot_symbols + picks))
         if int(self.symbol_intel_prefer_top_n) <= 0:
             limited = list(deduped)
         else:
@@ -3927,7 +4010,8 @@ class RobustLiveExecutor:
         meta["symbol_intel_candidate_count"] = int(len(deduped))
         meta["symbol_intel_selected_count"] = int(len(limited))
         meta["symbol_intel_executable_count"] = int(len(limited))
-        meta["symbol_intel_source"] = "symbol_flip_intel_top5"
+        meta["moonshot_watchlist_count"] = int(len(moonshot_symbols))
+        meta["symbol_intel_source"] = "moonshot_watchlist+symbol_flip_intel_top5" if moonshot_symbols else "symbol_flip_intel_top5"
         return limited, meta
 
     @staticmethod
@@ -5988,10 +6072,9 @@ class RobustLiveExecutor:
                     continue
 
                 value_usd = qty * last
-                # Skip balances below $15 — Kraken minimum sell notional is ~$10,
-                # injecting sub-$15 dust creates phantom positions that can never be
-                # closed, consuming heat and blocking real entries indefinitely.
-                if value_usd < 15.0:
+                # Skip balances below configured recovery floor. Injecting tiny
+                # dust can create phantom positions too small to close reliably.
+                if value_usd < float(self.orphan_recovery_min_value_usd):
                     continue
 
                 # Determine the quote currency this asset was most likely traded against.
@@ -6254,6 +6337,14 @@ class RobustLiveExecutor:
         if not isinstance(holdings, list):
             holdings = []
 
+        # Align risk position counting with orphan-recovery injection threshold.
+        # Prevents max_positions deadlock when mid-size balances are counted as
+        # live positions but are too small to inject/close from portfolio state.
+        live_position_count_min_usd = max(
+            float(self.min_collateral_convert_usd),
+            float(self.orphan_recovery_min_value_usd),
+        )
+
         live_open_positions = 0
         for row in holdings:
             if not isinstance(row, dict):
@@ -6265,7 +6356,7 @@ class RobustLiveExecutor:
             if is_stable:
                 continue
             value_usd = max(self._to_float(row.get("value_usd", 0.0), 0.0), 0.0)
-            if value_usd >= max(float(self.min_collateral_convert_usd), 0.50):
+            if value_usd >= max(float(live_position_count_min_usd), 0.50):
                 live_open_positions += 1
 
         local_open_positions = int(len(self.portfolio.get_open_positions()))
@@ -8071,6 +8162,8 @@ class RobustLiveExecutor:
                     "risk_exposure_effective_usd": round(float(risk_snapshot.get("effective_exposure_usd", 0.0)), 6),
                     "risk_max_heat": round(float(self.risk_kernel.max_heat), 6),
                     "risk_max_open_positions": int(self.max_open_positions),
+                    "risk_min_collateral_convert_usd": round(float(self.min_collateral_convert_usd), 6),
+                    "risk_orphan_recovery_min_value_usd": round(float(self.orphan_recovery_min_value_usd), 6),
                 }
             )
             print("  blocked: risk")

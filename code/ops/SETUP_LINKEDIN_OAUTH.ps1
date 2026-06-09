@@ -3,6 +3,9 @@ param(
     [string]$ClientId = "",
     [string]$ClientSecret = "",
     [string]$RedirectUri = "http://127.0.0.1:8787/auth/linkedin/callback",
+    [string]$ProfileUrl = "",
+    [string]$CompanyPageUrl = "",
+    [string]$GoogleDriveAssetUrl = "",
     [switch]$OpenBrowser,
     [switch]$NoPrompt
 )
@@ -18,7 +21,11 @@ $outDir = Join-Path $stackRoot "out\ops\linkedin_oauth_setup"
 New-Item -ItemType Directory -Path $configDir -Force | Out-Null
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 
-$appCreateUrl = "https://www.linkedin.com/developers/apps/new"
+$developerPortalUrl = "https://developer.linkedin.com/"
+$developerLoginUrl = "https://www.linkedin.com/developers/login"
+$appListUrl = "https://www.linkedin.com/developers/apps?appStatus=active"
+$appCreateUrl = "https://www.linkedin.com/developers/apps/new?src=direct%2Fnone&veh=direct%2Fnone"
+$companyPageCreateUrl = "https://www.linkedin.com/company/setup/new/"
 $gatewayStatusUrl = "http://127.0.0.1:8787/auth/linkedin/status"
 $gatewayLoginUrl = "http://127.0.0.1:8787/auth/linkedin/login"
 
@@ -31,6 +38,9 @@ function Get-DefaultTemplateBlock {
         "LINKEDIN_CLIENT_ID=",
         "LINKEDIN_CLIENT_SECRET=",
         "LINKEDIN_REDIRECT_URI=http://127.0.0.1:8787/auth/linkedin/callback",
+        "LINKEDIN_PROFILE_URL=",
+        "LINKEDIN_COMPANY_PAGE_URL=",
+        "LINKEDIN_BRAND_ASSET_URL=",
         "",
         "# SMTP outbound (resume dispatch)",
         "LUMA_SMTP_HOST=",
@@ -76,6 +86,7 @@ function Write-EnvKeyValue {
         [object]$EnvLineBlock,
         [Parameter(Mandatory = $true)]
         [string]$Key,
+        [AllowEmptyString()]
         [Parameter(Mandatory = $true)]
         [string]$Value
     )
@@ -139,6 +150,24 @@ if (-not $NoPrompt) {
             $RedirectUri = $inRedirect.Trim()
         }
     }
+    if (-not $ProfileUrl -and [string]::IsNullOrWhiteSpace(($current["LINKEDIN_PROFILE_URL"]))) {
+        $inProfileUrl = Read-Host "Enter LINKEDIN_PROFILE_URL (optional, blank to skip)"
+        if (-not [string]::IsNullOrWhiteSpace($inProfileUrl)) {
+            $ProfileUrl = $inProfileUrl.Trim()
+        }
+    }
+    if (-not $CompanyPageUrl -and [string]::IsNullOrWhiteSpace(($current["LINKEDIN_COMPANY_PAGE_URL"]))) {
+        $inCompanyPageUrl = Read-Host "Enter LINKEDIN_COMPANY_PAGE_URL (optional, blank to skip)"
+        if (-not [string]::IsNullOrWhiteSpace($inCompanyPageUrl)) {
+            $CompanyPageUrl = $inCompanyPageUrl.Trim()
+        }
+    }
+    if (-not $GoogleDriveAssetUrl -and [string]::IsNullOrWhiteSpace(($current["LINKEDIN_BRAND_ASSET_URL"]))) {
+        $inGoogleAssetUrl = Read-Host "Enter LINKEDIN_BRAND_ASSET_URL (optional, Google Drive/file link)"
+        if (-not [string]::IsNullOrWhiteSpace($inGoogleAssetUrl)) {
+            $GoogleDriveAssetUrl = $inGoogleAssetUrl.Trim()
+        }
+    }
 }
 
 if (-not $RedirectUri) {
@@ -152,6 +181,15 @@ if ($ClientSecret) {
     Write-EnvKeyValue -EnvLineBlock $envLines -Key "LINKEDIN_CLIENT_SECRET" -Value $ClientSecret
 }
 Write-EnvKeyValue -EnvLineBlock $envLines -Key "LINKEDIN_REDIRECT_URI" -Value $RedirectUri
+if ($ProfileUrl) {
+    Write-EnvKeyValue -EnvLineBlock $envLines -Key "LINKEDIN_PROFILE_URL" -Value $ProfileUrl
+}
+if ($CompanyPageUrl) {
+    Write-EnvKeyValue -EnvLineBlock $envLines -Key "LINKEDIN_COMPANY_PAGE_URL" -Value $CompanyPageUrl
+}
+if ($GoogleDriveAssetUrl) {
+    Write-EnvKeyValue -EnvLineBlock $envLines -Key "LINKEDIN_BRAND_ASSET_URL" -Value $GoogleDriveAssetUrl
+}
 
 $afterWriteProbe = Get-EnvMapFromBlock -EnvLineBlock $envLines
 if (-not $afterWriteProbe.ContainsKey("LINKEDIN_CLIENT_ID")) {
@@ -162,6 +200,15 @@ if (-not $afterWriteProbe.ContainsKey("LINKEDIN_CLIENT_SECRET")) {
 }
 if (-not $afterWriteProbe.ContainsKey("LINKEDIN_REDIRECT_URI")) {
     Write-EnvKeyValue -EnvLineBlock $envLines -Key "LINKEDIN_REDIRECT_URI" -Value "http://127.0.0.1:8787/auth/linkedin/callback"
+}
+if (-not $afterWriteProbe.ContainsKey("LINKEDIN_PROFILE_URL")) {
+    Write-EnvKeyValue -EnvLineBlock $envLines -Key "LINKEDIN_PROFILE_URL" -Value ""
+}
+if (-not $afterWriteProbe.ContainsKey("LINKEDIN_COMPANY_PAGE_URL")) {
+    Write-EnvKeyValue -EnvLineBlock $envLines -Key "LINKEDIN_COMPANY_PAGE_URL" -Value ""
+}
+if (-not $afterWriteProbe.ContainsKey("LINKEDIN_BRAND_ASSET_URL")) {
+    Write-EnvKeyValue -EnvLineBlock $envLines -Key "LINKEDIN_BRAND_ASSET_URL" -Value ""
 }
 
 Set-Content -Path $keyPath -Value ($envLines -join "`r`n") -Encoding UTF8
@@ -177,6 +224,9 @@ foreach ($k in $required) {
 $configured = ($missing.Count -eq 0)
 
 if ($OpenBrowser) {
+    Start-Process $developerPortalUrl
+    Start-Process $developerLoginUrl
+    Start-Process $appListUrl
     Start-Process $appCreateUrl
     Start-Process $gatewayStatusUrl
     if ($configured) {
@@ -188,18 +238,42 @@ $stamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssZ")
 $summaryPath = Join-Path $outDir "linkedin_oauth_setup_$stamp.json"
 $latestPath = Join-Path $outDir "linkedin_oauth_setup_latest.json"
 
+$metadataMissing = @()
+if ([string]::IsNullOrWhiteSpace(($final["LINKEDIN_PROFILE_URL"]))) {
+    $metadataMissing += "LINKEDIN_PROFILE_URL"
+}
+if ([string]::IsNullOrWhiteSpace(($final["LINKEDIN_COMPANY_PAGE_URL"]))) {
+    $metadataMissing += "LINKEDIN_COMPANY_PAGE_URL"
+}
+
+$status = "keys_pending"
+if ($configured) {
+    $status = "ready_for_consent"
+    if ($metadataMissing.Count -gt 0) {
+        $status = "ready_for_consent_metadata_pending"
+    }
+}
+
 $summary = [ordered]@{
     generated_utc = (Get-Date).ToUniversalTime().ToString("o")
     scope = "linkedin_oauth_setup"
     key_file = $keyPath
     configured = $configured
     missing = $missing
+    metadata_missing = $metadataMissing
     redirect_uri = $final["LINKEDIN_REDIRECT_URI"]
+    profile_url = $final["LINKEDIN_PROFILE_URL"]
+    company_page_url = $final["LINKEDIN_COMPANY_PAGE_URL"]
+    brand_asset_url = $final["LINKEDIN_BRAND_ASSET_URL"]
+    developer_portal_url = $developerPortalUrl
+    developer_login_url = $developerLoginUrl
+    app_list_url = $appListUrl
     app_create_url = $appCreateUrl
+    company_page_create_url = $companyPageCreateUrl
     gateway_status_url = $gatewayStatusUrl
     gateway_login_url = $gatewayLoginUrl
     open_browser = [bool]$OpenBrowser
-    status = if ($configured) { "ready_for_consent" } else { "keys_pending" }
+    status = $status
 }
 
 $summary | ConvertTo-Json -Depth 6 | Set-Content -Path $summaryPath -Encoding UTF8
@@ -208,5 +282,10 @@ Copy-Item -Path $summaryPath -Destination $latestPath -Force
 Write-Output "LINKEDIN_SETUP_STATUS=$($summary.status)"
 Write-Output "LINKEDIN_SETUP_CONFIGURED=$configured"
 Write-Output "LINKEDIN_SETUP_MISSING=$($missing -join ',')"
+Write-Output "LINKEDIN_SETUP_METADATA_MISSING=$($metadataMissing -join ',')"
+Write-Output "LINKEDIN_SETUP_BRAND_ASSET_URL=$($summary.brand_asset_url)"
+Write-Output "LINKEDIN_SETUP_DEVELOPER_PORTAL=$developerPortalUrl"
+Write-Output "LINKEDIN_SETUP_DEVELOPER_LOGIN=$developerLoginUrl"
+Write-Output "LINKEDIN_SETUP_COMPANY_PAGE_CREATE=$companyPageCreateUrl"
 Write-Output "LINKEDIN_SETUP_SUMMARY=$summaryPath"
 Write-Output "LINKEDIN_SETUP_LATEST=$latestPath"

@@ -16,7 +16,7 @@ Founder-operator of the LumaTrader and LumenCore platform ecosystem with end-to-
 - Dataset benchmark breadth: 1212 datasets with reproducible artifacts and hash-linked evidence.
 - Annual modeled value signal: $52,331,333,340.00 ($52.33B).
 - Top sector and hourly signal: Financial Market Infra at $3,647,280.00 per hour.
-- Router edge and harmonic consistency: 49.48% edge, 18.99% harmonic win rate.
+- Router edge and harmonic consistency: 49.48% edge, 24.51% harmonic win rate.
 - Live execution telemetry: 37 closed trades with auditable reason-code and PnL artifacts in the evidence lane.
 
 ## CORE COMPETENCIES
@@ -37,7 +37,7 @@ Founder-operator of the LumaTrader and LumenCore platform ecosystem with end-to-
 
 ## TECHNOLOGY STACK AND PROVEN PACKAGES
 
-pandas, numpy, requests, scikit-learn, FastAPI, matplotlib, joblib, ccxt, pptx, yfinance, orjson, symbol_registry_auto, PyYAML, pillow, polars, duckdb, fpdf, win32com, pydantic, lightgbm
+pandas, numpy, requests, scikit-learn, FastAPI, matplotlib, joblib, ccxt, pptx, yfinance, orjson, pydantic, symbol_registry_auto, PyYAML, pillow, polars, duckdb, fpdf, win32com, lightgbm
 
 ## PROFESSIONAL EXPERIENCE
 

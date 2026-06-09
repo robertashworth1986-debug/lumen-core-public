@@ -2,7 +2,7 @@
 regime_shift_scanner.py
 ==========================
 Innovation #14 — detects sudden mean/variance regime breaks in every series of
-the frozen 673-dataset universe.
+the latest frozen benchmark universe.
 
 Method (per dataset y):
     1. Standardize: y' = (y - rolling_mean(60)) / rolling_std(60)
@@ -27,7 +27,7 @@ Output:
         regime_summary.md
         manifest.sha256.json
 
-Joblib parallel; ~30s on 673 datasets.
+Joblib parallel; runtime scales with current benchmark breadth.
 """
 from __future__ import annotations
 

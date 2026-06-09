@@ -203,9 +203,10 @@ def _fmt_post(utc: str, summary: dict, base_url: str,
         ov = calib["overall"]
         c80 = ov.get("mean_cov80")
         c95 = ov.get("mean_cov95")
+        calib_n = ov.get("n_datasets") or n_total
         if c80 is not None and c95 is not None:
             calib_block = (
-                f"\n📐 Confidence-band calibration (across all 673 datasets):\n"
+                f"\n📐 Confidence-band calibration (across {calib_n} datasets):\n"
                 f"   80% bands actually cover {c80*100:.1f}% (target 80) — conservative.\n"
                 f"   95% bands actually cover {c95*100:.1f}% (target 95) — honest.\n"
             )

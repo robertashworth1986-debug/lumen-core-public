@@ -28,6 +28,7 @@ import urllib.error
 REPO_ROOT   = pathlib.Path(__file__).resolve().parent.parent.parent
 OUT_DIR     = REPO_ROOT / "out" / "ops"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
+RUNTIME_CONTROL_FILE = REPO_ROOT / "config" / "runtime_control.json"
 
 CANDIDATES_FILE  = OUT_DIR / "moonshot_candidates.json"
 WATCHLIST_FILE   = OUT_DIR / "moonshot_watchlist.json"
@@ -39,7 +40,7 @@ PRICE_MAX        = 5.00       # ceiling — want small tokens with room to 10x+
 VOLUME_MIN_USD   = 25_000     # 24h volume floor — need liquidity to fill
 SPREAD_MAX_BPS   = 60         # max bid-ask spread allowed
 RANGE_MIN_PCT    = 8.0        # min 24h high/low range %  (volatile = opportunity)
-MOMENTUM_MIN     = -99.0      # 24h price change — allow negatives for reversal plays
+MOMENTUM_MIN     = 0.0        # prefer symbols with positive 24h momentum
 TOP_N_WATCH      = 20         # watchlist size
 
 # BADGER reference profile (the known moonshot template)
@@ -55,6 +56,91 @@ def _get(url: str, timeout: int = 8):
     req = urllib.request.Request(url, headers={"User-Agent": "LumaTrader/1.0"})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode())
+
+
+def _to_float(value, default: float) -> float:
+    try:
+        return float(value)
+    except Exception:
+        return float(default)
+
+
+def _load_runtime_filters() -> dict:
+    """Load runtime-aware filters so watchlist output is immediately executable."""
+    now_utc = datetime.datetime.now(datetime.timezone.utc)
+    blocked_symbols: set[str] = set()
+    skip_symbols: set[str] = set()
+    spread_cap_candidates = [float(SPREAD_MAX_BPS)]
+    momentum_floor = float(MOMENTUM_MIN)
+    gate_floor = 0.85
+
+    if RUNTIME_CONTROL_FILE.exists():
+        try:
+            runtime = json.loads(RUNTIME_CONTROL_FILE.read_text(encoding="utf-8"))
+
+            # Use execution-critical spread gates for tradability. Do NOT include
+            # preferred_symbol_max_spread_bps here because that can be tighter than
+            # general entry gates and collapse moonshot discovery to zero symbols.
+            for key in (
+                "universe_hard_reject_spread_bps",
+                "universe_max_pick_spread_bps",
+                "gate_max_orderbook_spread_bps",
+            ):
+                val = _to_float(runtime.get(key, 0.0), 0.0)
+                if val > 0.0:
+                    spread_cap_candidates.append(val)
+
+            # Optional explicit scanner override in runtime.
+            scanner_spread_override = _to_float(runtime.get("moonshot_scanner_max_spread_bps", 0.0), 0.0)
+
+            momentum_floor = max(
+                float(MOMENTUM_MIN),
+                _to_float(runtime.get("hybrid_swing_min_momentum_pct", MOMENTUM_MIN), MOMENTUM_MIN),
+                _to_float(runtime.get("hybrid_long_bias_min_momentum_pct", MOMENTUM_MIN), MOMENTUM_MIN),
+            )
+
+            gate_floor = max(
+                _to_float(runtime.get("gate_min_composite_score", 0.85), 0.85),
+                _to_float(runtime.get("min_gate_score_for_entry", 0.85), 0.85),
+                _to_float(runtime.get("signal_gate_min_score", 0.85), 0.85),
+            )
+
+            for sym in runtime.get("symbol_blacklist", []) or []:
+                s = str(sym).upper().strip()
+                if s:
+                    blocked_symbols.add(s)
+            for sym in runtime.get("hard_symbol_blacklist", []) or []:
+                s = str(sym).upper().strip()
+                if s:
+                    blocked_symbols.add(s)
+
+            for sym, until_raw in (runtime.get("symbol_skip_until_utc", {}) or {}).items():
+                s = str(sym).upper().strip()
+                if not s:
+                    continue
+                try:
+                    until_dt = datetime.datetime.fromisoformat(str(until_raw).replace("Z", "+00:00"))
+                    if until_dt.tzinfo is None:
+                        until_dt = until_dt.replace(tzinfo=datetime.timezone.utc)
+                    if until_dt > now_utc:
+                        skip_symbols.add(s)
+                except Exception:
+                    continue
+        except Exception as exc:
+            print(f"[scan] runtime filter load warning: {exc}")
+
+    spread_max_bps = min(spread_cap_candidates)
+    if 'scanner_spread_override' in locals() and scanner_spread_override > 0.0:
+        spread_max_bps = scanner_spread_override
+    spread_max_bps = max(12.0, min(spread_max_bps, 60.0))
+
+    return {
+        "spread_max_bps": spread_max_bps,
+        "momentum_min_pct": momentum_floor,
+        "blocked_symbols": blocked_symbols,
+        "skip_symbols": skip_symbols,
+        "instruction_gate_score": gate_floor,
+    }
 
 
 def fetch_kraken_tickers():
@@ -92,7 +178,7 @@ def fetch_tickers_bulk(pairs: list[str]) -> dict:
     return results
 
 
-def score_candidate(pair_name: str, tk: dict, pair_meta: dict) -> dict | None:
+def score_candidate(pair_name: str, tk: dict, pair_meta: dict, runtime_filters: dict) -> dict | None:
     """Score a single ticker. Returns None if it doesn't pass filters."""
     try:
         ask   = float(tk["a"][0])
@@ -104,6 +190,14 @@ def score_candidate(pair_name: str, tk: dict, pair_meta: dict) -> dict | None:
         open_ = float(tk["o"])      # 24h open
         vwap  = float(tk["p"][1])   # 24h VWAP
     except (KeyError, IndexError, ValueError):
+        return None
+
+    meta = pair_meta.get(pair_name, {})
+    base = str(meta.get("base", pair_name.replace("USD", "").replace("ZUSD", ""))).upper().strip()
+
+    if base in runtime_filters["blocked_symbols"]:
+        return None
+    if base in runtime_filters["skip_symbols"]:
         return None
 
     if last <= 0 or bid <= 0:
@@ -120,7 +214,7 @@ def score_candidate(pair_name: str, tk: dict, pair_meta: dict) -> dict | None:
 
     # Spread
     spread_bps = (ask - bid) / max(bid, 1e-12) * 10000
-    if spread_bps > SPREAD_MAX_BPS:
+    if spread_bps > float(runtime_filters["spread_max_bps"]):
         return None
 
     # 24h range
@@ -132,7 +226,7 @@ def score_candidate(pair_name: str, tk: dict, pair_meta: dict) -> dict | None:
 
     # 24h momentum (last vs open)
     momentum_pct = (last - open_) / max(open_, 1e-12) * 100.0
-    if momentum_pct < MOMENTUM_MIN:
+    if momentum_pct < float(runtime_filters["momentum_min_pct"]):
         return None
 
     # Position within 24h range (0=at low, 1=at high)
@@ -153,10 +247,6 @@ def score_candidate(pair_name: str, tk: dict, pair_meta: dict) -> dict | None:
         volume_score     * 1.0 +
         momentum_score   * 2.5
     )
-
-    # Extract base symbol
-    meta = pair_meta.get(pair_name, {})
-    base = meta.get("base", pair_name.replace("USD", "").replace("ZUSD", ""))
 
     return {
         "pair":           pair_name,
@@ -181,6 +271,14 @@ def score_candidate(pair_name: str, tk: dict, pair_meta: dict) -> dict | None:
 def run_scan():
     ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     print(f"[scan] moonshot universe scan — {ts}")
+    runtime_filters = _load_runtime_filters()
+    print(
+        "[scan] runtime filters: "
+        f"spread<= {runtime_filters['spread_max_bps']:.2f} bps, "
+        f"momentum>= {runtime_filters['momentum_min_pct']:.2f}%, "
+        f"blocked={len(runtime_filters['blocked_symbols'])}, "
+        f"skip_active={len(runtime_filters['skip_symbols'])}"
+    )
 
     # Fetch pairs
     pairs, pair_meta = fetch_kraken_tickers()
@@ -193,7 +291,7 @@ def run_scan():
     # Score all
     candidates = []
     for pair_name, tk in raw_tickers.items():
-        result = score_candidate(pair_name, tk, pair_meta)
+        result = score_candidate(pair_name, tk, pair_meta, runtime_filters)
         if result:
             candidates.append(result)
 
@@ -208,8 +306,11 @@ def run_scan():
             "price_min": PRICE_MIN,
             "price_max": PRICE_MAX,
             "volume_min_usd": VOLUME_MIN_USD,
-            "spread_max_bps": SPREAD_MAX_BPS,
+            "spread_max_bps": runtime_filters["spread_max_bps"],
             "range_min_pct": RANGE_MIN_PCT,
+            "momentum_min_pct": runtime_filters["momentum_min_pct"],
+            "blocked_symbols_count": len(runtime_filters["blocked_symbols"]),
+            "skip_symbols_count": len(runtime_filters["skip_symbols"]),
         },
         "candidates": candidates,
     }
@@ -221,7 +322,16 @@ def run_scan():
         "generated_utc": ts,
         "watchlist": watchlist_symbols,
         "top_candidates": candidates[:TOP_N_WATCH],
-        "instruction": "Executor should prioritize entries on these symbols when gate_score >= 0.7",
+        "instruction": (
+            "Executor should prioritize entries on these symbols when "
+            f"gate_score >= {runtime_filters['instruction_gate_score']:.2f}"
+        ),
+        "policy": {
+            "spread_max_bps": runtime_filters["spread_max_bps"],
+            "momentum_min_pct": runtime_filters["momentum_min_pct"],
+            "excluded_blocked_symbols_count": len(runtime_filters["blocked_symbols"]),
+            "excluded_skip_symbols_count": len(runtime_filters["skip_symbols"]),
+        },
     }
     WATCHLIST_FILE.write_text(json.dumps(watchlist, indent=2))
 
