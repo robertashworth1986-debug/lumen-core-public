@@ -11,7 +11,9 @@ from pathlib import Path
 from typing import Any
 from urllib import error, request
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parents[2]))
+).expanduser().resolve()
 CODE = ROOT / "code"
 if str(CODE) not in sys.path:
     sys.path.insert(0, str(CODE))

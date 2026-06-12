@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-02T15:55:02.109554+00:00",
+  "generated_utc": "2026-06-10T18:02:12.116325+00:00",
   "providers": {
     "ALPACA": {
       "enabled": true,
@@ -14,28 +14,23 @@
       ],
       "status": "LIVE_KEY_PRESENT",
       "probe_ok": true,
-      "probe_note": "http_200_account",
+      "probe_note": "hydrated_shell_present",
       "measured": true,
-      "rows": 1,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
-    },
-    "FINNHUB": {
-      "enabled": true,
-      "sector": "market_data",
-      "env_names": [
-        "FINNHUB_API_KEY"
+      "rows": 5511,
+      "matched_files": [
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\alpaca_aapl.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\alpaca_amzn.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\alpaca_googl.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\alpaca_jpm.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\alpaca_meta.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\alpaca_msft.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\alpaca_nvda.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\alpaca_qqq.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\alpaca_spy.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\alpaca_tsla.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\alpaca_xom.csv"
       ],
-      "present_env_names": [
-        "FINNHUB_API_KEY"
-      ],
-      "status": "LIVE_KEY_PRESENT",
-      "probe_ok": true,
-      "probe_note": "quote_probe",
-      "measured": true,
-      "rows": 1,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
+      "last_truth_sync_utc": "2026-06-10T18:02:12.193949+00:00"
     },
     "ALPHAVANTAGE": {
       "enabled": true,
@@ -47,184 +42,31 @@
         "ALPHAVANTAGE_API_KEY"
       ],
       "status": "LIVE_KEY_PRESENT",
-      "probe_ok": false,
-      "probe_note": "global_quote_probe",
-      "measured": false,
-      "rows": 0,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
-    },
-    "TWELVE_DATA": {
-      "enabled": true,
-      "sector": "market_data",
-      "env_names": [
-        "TWELVE_DATA_API_KEY"
-      ],
-      "present_env_names": [
-        "TWELVE_DATA_API_KEY"
-      ],
-      "status": "LIVE_KEY_PRESENT",
       "probe_ok": true,
-      "probe_note": "time_series_probe",
+      "probe_note": "hydrated_shell_present",
       "measured": true,
-      "rows": 5,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
-    },
-    "MASSIVE": {
-      "enabled": true,
-      "sector": "market_data",
-      "env_names": [
-        "MASSIVE_API_KEY"
+      "rows": 25101,
+      "matched_files": [
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\EVIDENCE\\V9_MONEY_SAVED_TABLE_20260118T185107Z.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\av_fx_audusd.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\av_fx_chfusd.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\av_fx_eurusd.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\av_fx_gbpusd.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\av_fx_jpyusd.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_PUBLIC_SOURCES_OUT_PUBLIC_AVOIDED_LOSS_15_mins_20260104T190821Z.csv__assumed_minutes_saved.csv__f1380019c0.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_PUBLIC_SOURCES_OUT_PUBLIC_AVOIDED_LOSS_15_mins_20260104T190821Z.csv__avoided_loss_usd.csv__852455e72b.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_PUBLIC_SOURCES_OUT_PUBLIC_AVOIDED_LOSS_15_mins_20260104T190821Z.csv__cost_per_minute_usd.csv__bdb2d08fc5.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_PUBLIC_SOURCES_OUT_PUBLIC_AVOIDED_LOSS_15_mins_20260104T190821Z.csv__delta_minutes.csv__012154302d.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_PUBLIC_SOURCES_OUT_PUBLIC_AVOIDED_LOSS_15_mins_20260104T192008Z.csv__assumed_minutes_saved.csv__b6ce2c5672.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_PUBLIC_SOURCES_OUT_PUBLIC_AVOIDED_LOSS_15_mins_20260104T192008Z.csv__avoided_loss_usd.csv__08b8c15577.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_PUBLIC_SOURCES_OUT_PUBLIC_AVOIDED_LOSS_15_mins_20260104T192008Z.csv__cost_per_minute_usd.csv__00848b7653.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_PUBLIC_SOURCES_OUT_PUBLIC_AVOIDED_LOSS_15_mins_20260104T192008Z.csv__delta_minutes.csv__ebc8a9f3f8.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_PUBLIC_SOURCES_OUT_PUBLIC_DELTAS_20260104T190738Z.csv__avoided_loss_usd.csv__5f542920d8.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_082348Z_99_RAW_ORIGINALS_iCloud_Downloads_REVIEWER_PACK_20260118T193654Z_05_V9_MoneySaved.csv__value.csv__80b5a5b198.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_085312Z_99_RAW_ORIGINALS_iCloud_Downloads_REVIEWER_PACK_20260118T193654Z_05_V9_MoneySaved.csv__value.csv__df13400140.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_091728Z_99_RAW_ORIGINALS_iCloud_Downloads_REVIEWER_PACK_20260118T193654Z_05_V9_MoneySaved.csv__value.csv__92c6fbea5b.csv"
       ],
-      "present_env_names": [
-        "MASSIVE_API_KEY"
-      ],
-      "status": "LIVE_KEY_PRESENT",
-      "probe_ok": true,
-      "probe_note": "polygon_prev_probe",
-      "measured": true,
-      "rows": 1,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
-    },
-    "FRED": {
-      "enabled": true,
-      "sector": "rates",
-      "env_names": [
-        "FRED_API_KEY"
-      ],
-      "present_env_names": [
-        "FRED_API_KEY"
-      ],
-      "status": "LIVE_KEY_PRESENT",
-      "probe_ok": true,
-      "probe_note": "observations_probe",
-      "measured": true,
-      "rows": 10,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
-    },
-    "EIA": {
-      "enabled": true,
-      "sector": "energy",
-      "env_names": [
-        "EIA_API_KEY"
-      ],
-      "present_env_names": [
-        "EIA_API_KEY"
-      ],
-      "status": "LIVE_KEY_PRESENT",
-      "probe_ok": false,
-      "probe_note": "http_error: {\n  \"error\": {\n    \"code\": \"API_KEY_INVALID\",\n    \"message\": \"An invalid api_key was supplied. Get one at https://api.eia.gov:443\"\n  }\n}",
-      "measured": false,
-      "rows": 0,
-      "http_status": 403,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
-    },
-    "BLS": {
-      "enabled": true,
-      "sector": "labor",
-      "env_names": [
-        "BLS_API_KEY"
-      ],
-      "present_env_names": [
-        "BLS_API_KEY"
-      ],
-      "status": "LIVE_KEY_PRESENT",
-      "probe_ok": true,
-      "probe_note": "bls_probe",
-      "measured": true,
-      "rows": 24,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
-    },
-    "NASA": {
-      "enabled": true,
-      "sector": "space",
-      "env_names": [
-        "NASA_API_KEY"
-      ],
-      "present_env_names": [
-        "NASA_API_KEY"
-      ],
-      "status": "LIVE_KEY_PRESENT",
-      "probe_ok": true,
-      "probe_note": "apod_probe",
-      "measured": true,
-      "rows": 1,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
-    },
-    "NOAA_NCEI": {
-      "enabled": true,
-      "sector": "weather",
-      "env_names": [
-        "NOAA_API_TOKEN",
-        "NOAA_NCEI_TOKEN",
-        "NCDC_NOAA_API_TOKEN"
-      ],
-      "present_env_names": [
-        "NOAA_API_TOKEN"
-      ],
-      "status": "LIVE_KEY_PRESENT",
-      "probe_ok": true,
-      "probe_note": "datasets_probe",
-      "measured": true,
-      "rows": 5,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
-    },
-    "NREL": {
-      "enabled": true,
-      "sector": "energy_lab",
-      "env_names": [
-        "NREL_API_KEY"
-      ],
-      "present_env_names": [
-        "NREL_API_KEY"
-      ],
-      "status": "LIVE_KEY_PRESENT",
-      "probe_ok": false,
-      "probe_note": "exception: URLError: <urlopen error [Errno 11001] getaddrinfo failed>",
-      "measured": false,
-      "rows": 0,
-      "http_status": null,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
-    },
-    "USGS_WATER": {
-      "enabled": true,
-      "sector": "water",
-      "env_names": [
-        "USGS_WATER_API_KEY"
-      ],
-      "present_env_names": [
-        "USGS_WATER_API_KEY"
-      ],
-      "status": "LIVE_KEY_PRESENT",
-      "probe_ok": true,
-      "probe_note": "iv_probe_public_with_key_present",
-      "measured": true,
-      "rows": 1,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
-    },
-    "CENSUS": {
-      "enabled": true,
-      "sector": "demographic",
-      "env_names": [
-        "CENSUS_API_KEY"
-      ],
-      "present_env_names": [
-        "CENSUS_API_KEY"
-      ],
-      "status": "LIVE_KEY_PRESENT",
-      "probe_ok": true,
-      "probe_note": "acs_probe",
-      "measured": true,
-      "rows": 1,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
+      "last_truth_sync_utc": "2026-06-10T18:02:12.252015+00:00"
     },
     "BEA": {
       "enabled": true,
@@ -237,11 +79,102 @@
       ],
       "status": "LIVE_KEY_PRESENT",
       "probe_ok": true,
-      "probe_note": "dataset_list_probe",
+      "probe_note": "hydrated_shell_present",
       "measured": true,
-      "rows": 13,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
+      "rows": 555998,
+      "matched_files": [
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\full_beast_dataset_scan.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\full_beast_leaderboard.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\full_beast_top10.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore__data_us_gdp.csv__3479a5940d.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore__Sectors_macro_us_gdp.csv__29166b568c.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_O.000_runs_coarse_grid.csv__gain_c.csv__39f63bea15.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_082348Z_99_RAW_ORIGINALS_iCloud_O.000_runs_best_timeseries.csv__error.csv__beab377ba6.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_091728Z_99_RAW_ORIGINALS_iCloud_Downloads_REVIEWER_PACK_20260118T193654Z_05_V9_MoneySaved.csv__value.csv__92c6fbea5b.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\normalized_csv_lake\\per_series\\notional_usd__b7dd4f1b7bea.csv"
+      ],
+      "last_truth_sync_utc": "2026-06-10T18:02:17.880577+00:00"
+    },
+    "BLS": {
+      "enabled": true,
+      "sector": "labor",
+      "env_names": [
+        "BLS_API_KEY"
+      ],
+      "present_env_names": [
+        "BLS_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "hydrated_shell_present",
+      "measured": true,
+      "rows": 7557,
+      "matched_files": [
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_CPIAUCSL.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_UNRATE.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore__data_inflation_cpi.csv__3c1b49eeaa.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore__Sectors_misc_inflation_cpi.csv__d9bc1b9d4e.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\normalized_csv_lake\\per_series\\fred_CPIAUCSL__4f5177bca2c9.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\normalized_csv_lake\\per_series\\fred_UNRATE__d79283c45463.csv",
+        "C:\\LumaTrader\\data\\fred_CPIAUCSL.csv",
+        "C:\\LumaTrader\\data\\fred_UNRATE.csv"
+      ],
+      "last_truth_sync_utc": "2026-06-10T18:02:17.942837+00:00"
+    },
+    "CENSUS": {
+      "enabled": true,
+      "sector": "demographic",
+      "env_names": [
+        "CENSUS_API_KEY"
+      ],
+      "present_env_names": [
+        "CENSUS_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "hydrated_shell_present",
+      "measured": false,
+      "rows": 0,
+      "matched_files": [],
+      "last_truth_sync_utc": "2026-06-10T18:02:17.971023+00:00"
+    },
+    "EIA": {
+      "enabled": true,
+      "sector": "energy",
+      "env_names": [
+        "EIA_API_KEY"
+      ],
+      "present_env_names": [
+        "EIA_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "hydrated_shell_present",
+      "measured": true,
+      "rows": 5862,
+      "matched_files": [
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Daily_U.S._nuclear_capacity_outage (1).csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Daily_U.S._nuclear_capacity_outage.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\EDGE_POWER_RESULTS.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Nuclear_Plant_Outages_for_3_6_2026.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Data sets\\Daily_U.S._nuclear_capacity_outage (1).csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Data sets\\Daily_U.S._nuclear_capacity_outage.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Data sets\\Nuclear_Plant_Outages_for_3_6_2026.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\EIA reports_\\Net_generation_for_all_sectors.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\EIA reports_\\Net_generation_United_States_all_sectors_annual.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\EIA reports_\\Net_generation_United_States_all_sectors_monthly (1).csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\EIA reports_\\Net_generation_United_States_all_sectors_monthly.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\live_eia_CISO.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\live_eia_ISNE.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\live_eia_MISO.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\live_eia_NYIS.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\live_eia_PJM.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\Data_sets__Daily_U.S._nuclear_capacity_outage.csv__bd6ac5306d.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\Data_sets__Daily_U.S._nuclear_capacity_outage_1_.csv__daaf627277.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\Data_sets__Nuclear_Plant_Outages_for_3_6_2026.csv__dd8ebcb767.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore__data_Data_sets_Daily_U.S._nuclear_capacity_outage.csv__ebffaef64f.csv"
+      ],
+      "last_truth_sync_utc": "2026-06-10T18:02:18.076868+00:00"
     },
     "EPA_AQS": {
       "enabled": true,
@@ -255,12 +188,81 @@
         "EPA_AQS_EMAIL"
       ],
       "status": "LIVE_KEY_PRESENT",
-      "probe_ok": false,
-      "probe_note": "http_error: {\n  \"Header\": [\n    {\n      \"status\": \"Failed\",\n      \"request_time\": \"2026-06-02T11:55:01.881-04:00\",\n      \"url\": \"https://aqs.epa.gov/data/api/list/states?email=[REDACTED]&key=[REDACTED]\",\n      \"error\": [\n        \"Email and/or key are invalid.\"\n      ]\n    }\n  ]\n}",
+      "probe_ok": true,
+      "probe_note": "hydrated_shell_present",
       "measured": false,
       "rows": 0,
-      "http_status": 400,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
+      "matched_files": [],
+      "last_truth_sync_utc": "2026-06-10T18:02:18.110716+00:00"
+    },
+    "FINNHUB": {
+      "enabled": true,
+      "sector": "market_data",
+      "env_names": [
+        "FINNHUB_API_KEY"
+      ],
+      "present_env_names": [
+        "FINNHUB_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "hydrated_shell_present",
+      "measured": true,
+      "rows": 38877,
+      "matched_files": [
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export (1).csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export (2).csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\930-data-export.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Daily_U.S._nuclear_capacity_outage (1).csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Daily_U.S._nuclear_capacity_outage.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\data_scan_summary.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\EDGE_POWER_RESULTS.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_CPIAUCSL.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_DGS10.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_UNRATE.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\gen3_full_results.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\kraken_live.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\kraken_live_5000.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\MER_T09_04.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Net_generation_for_all_sectors (1).csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Net_generation_for_all_sectors.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Net_generation_United_States_all_sectors_annual (1).csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Net_generation_United_States_all_sectors_annual.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Net_generation_United_States_all_sectors_monthly (1).csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\Net_generation_United_States_all_sectors_monthly.csv"
+      ],
+      "last_truth_sync_utc": "2026-06-10T18:02:18.284170+00:00"
+    },
+    "FRED": {
+      "enabled": true,
+      "sector": "rates",
+      "env_names": [
+        "FRED_API_KEY"
+      ],
+      "present_env_names": [
+        "FRED_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "hydrated_shell_present",
+      "measured": true,
+      "rows": 57796,
+      "matched_files": [
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_CPIAUCSL.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_DGS10.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\fred_UNRATE.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\institutional_flow_strategy_champions.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore__data_unemployment_rate.csv__9fadba9813.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore__Sectors_misc_unemployment_rate.csv__a22e32426d.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\execution\\institutional_flow_strategy_champions.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\normalized_csv_lake\\per_series\\fred_CPIAUCSL__4f5177bca2c9.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\normalized_csv_lake\\per_series\\fred_DGS10__b8a076e6967c.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\normalized_csv_lake\\per_series\\fred_UNRATE__d79283c45463.csv",
+        "C:\\LumaTrader\\data\\fred_CPIAUCSL.csv",
+        "C:\\LumaTrader\\data\\fred_DGS10.csv",
+        "C:\\LumaTrader\\data\\fred_UNRATE.csv"
+      ],
+      "last_truth_sync_utc": "2026-06-10T18:02:18.418707+00:00"
     },
     "KRAKEN": {
       "enabled": true,
@@ -275,11 +277,170 @@
       ],
       "status": "LIVE_KEY_PRESENT",
       "probe_ok": true,
-      "probe_note": "private_balance_probe",
+      "probe_note": "hydrated_shell_present",
       "measured": true,
-      "rows": 198,
-      "http_status": 200,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
+      "rows": 8897,
+      "matched_files": [
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\kraken_live.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\kraken_live_5000.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\kraken_ada_daily.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\kraken_aud_daily.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\kraken_btc_daily.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\kraken_doge_daily.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\kraken_eth_daily.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\kraken_eur_daily.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\kraken_gbp_daily.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\kraken_sol_daily.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\kraken_xrp_daily.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\kraken_execution_tickets.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\kraken_order_intents.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\normalized_csv_lake\\per_series\\kraken_live_5000__b3c50440d914.csv",
+        "C:\\LumaTrader\\data\\kraken_live.csv",
+        "C:\\LumaTrader\\data\\kraken_live_5000.csv"
+      ],
+      "last_truth_sync_utc": "2026-06-10T18:02:18.485728+00:00"
+    },
+    "MASSIVE": {
+      "enabled": true,
+      "sector": "market_data",
+      "env_names": [
+        "MASSIVE_API_KEY"
+      ],
+      "present_env_names": [
+        "MASSIVE_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "hydrated_shell_present",
+      "measured": true,
+      "rows": 80,
+      "matched_files": [
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\out\\kraken_execution_tickets.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_Powerball___WHEEL-BALANCE_set__10_structural_tickets_.csv__Pick.csv__b2155fa039.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_Powerball___WHEEL-BALANCE_set__10_structural_tickets_.csv__Powerball.csv__b8e047bcee.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_082348Z_99_RAW_ORIGINALS_iCloud_Powerball___WHEEL-BALANCE_set__10_structural_tickets_.csv__Pick.csv__b21aa4a8c3.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_082348Z_99_RAW_ORIGINALS_iCloud_Powerball___WHEEL-BALANCE_set__10_structural_tickets_.csv__Powerball.csv__609455a958.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_085312Z_99_RAW_ORIGINALS_iCloud_Powerball___WHEEL-BALANCE_set__10_structural_tickets_.csv__Pick.csv__b52c6f74da.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_085312Z_99_RAW_ORIGINALS_iCloud_Powerball___WHEEL-BALANCE_set__10_structural_tickets_.csv__Powerball.csv__7cb85032f4.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_091728Z_99_RAW_ORIGINALS_iCloud_Powerball___WHEEL-BALANCE_set__10_structural_tickets_.csv__Pick.csv__3972f8df46.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_091728Z_99_RAW_ORIGINALS_iCloud_Powerball___WHEEL-BALANCE_set__10_structural_tickets_.csv__Powerball.csv__14353de1df.csv"
+      ],
+      "last_truth_sync_utc": "2026-06-10T18:02:18.518100+00:00"
+    },
+    "NASA": {
+      "enabled": true,
+      "sector": "space",
+      "env_names": [
+        "NASA_API_KEY"
+      ],
+      "present_env_names": [
+        "NASA_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "hydrated_shell_present",
+      "measured": false,
+      "rows": 0,
+      "matched_files": [],
+      "last_truth_sync_utc": "2026-06-10T18:02:18.545699+00:00"
+    },
+    "NOAA_NCEI": {
+      "enabled": true,
+      "sector": "weather",
+      "env_names": [
+        "NOAA_API_TOKEN"
+      ],
+      "present_env_names": [
+        "NOAA_API_TOKEN"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "hydrated_shell_present",
+      "measured": false,
+      "rows": 0,
+      "matched_files": [],
+      "last_truth_sync_utc": "2026-06-10T18:02:18.569039+00:00"
+    },
+    "NREL": {
+      "enabled": true,
+      "sector": "energy_lab",
+      "env_names": [
+        "NREL_API_KEY"
+      ],
+      "present_env_names": [
+        "NREL_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "hydrated_shell_present",
+      "measured": true,
+      "rows": 771637,
+      "matched_files": [
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\EVIDENCE\\V9_MONEY_SAVED_TABLE_20260118T185107Z.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_0.csv__b93aadf108.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_10000.csv__8ab3f53199.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_100000.csv__e5d3569d5f.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_105000.csv__f6fb0ea086.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_110000.csv__ff1a7509dd.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_115000.csv__975d9572ad.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_120000.csv__1da2187e39.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_125000.csv__15f6e09079.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_130000.csv__6bc04960a0.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_135000.csv__277f3e31b5.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_140000.csv__289ffe092a.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_145000.csv__bc5d0eacd9.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_15000.csv__828bf87e2e.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_150000.csv__bada0a6bc8.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_155000.csv__00ff74ced9.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_160000.csv__2b0e350ce6.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_20000.csv__7aaadaf25d.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_25000.csv__b1bac8576f.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenCore_Energy_Lab__csv_total-energy_total-energy_30000.csv__a6be9dc9de.csv"
+      ],
+      "last_truth_sync_utc": "2026-06-10T18:02:20.708933+00:00"
+    },
+    "TWELVE_DATA": {
+      "enabled": true,
+      "sector": "market_data",
+      "env_names": [
+        "TWELVE_DATA_API_KEY"
+      ],
+      "present_env_names": [
+        "TWELVE_DATA_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "hydrated_shell_present",
+      "measured": true,
+      "rows": 4000,
+      "matched_files": [
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\twelvedata_aapl.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\twelvedata_amzn.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\twelvedata_googl.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\twelvedata_meta.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\twelvedata_msft.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\twelvedata_nvda.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\twelvedata_spy.csv",
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_fetched\\twelvedata_tsla.csv"
+      ],
+      "last_truth_sync_utc": "2026-06-10T18:02:20.746056+00:00"
+    },
+    "USGS_WATER": {
+      "enabled": true,
+      "sector": "water",
+      "env_names": [
+        "USGS_WATER_API_KEY"
+      ],
+      "present_env_names": [
+        "USGS_WATER_API_KEY"
+      ],
+      "status": "LIVE_KEY_PRESENT",
+      "probe_ok": true,
+      "probe_note": "hydrated_shell_present",
+      "measured": false,
+      "rows": 0,
+      "matched_files": [],
+      "last_truth_sync_utc": "2026-06-10T18:02:20.771756+00:00"
     },
     "WEBHOOK": {
       "enabled": true,
@@ -292,11 +453,13 @@
       ],
       "status": "LIVE_KEY_PRESENT",
       "probe_ok": true,
-      "probe_note": "shared_secret_present_internal",
+      "probe_note": "hydrated_shell_present",
       "measured": true,
-      "rows": 1,
-      "http_status": null,
-      "last_truth_sync_utc": "2026-06-02T15:55:02.109554+00:00"
+      "rows": 5,
+      "matched_files": [
+        "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\promoted_raw\\LumenLab__crawler_out_timeseries_C_LumenCore_output_champions.csv__signal_strength.csv__6a3f6b29f9.csv"
+      ],
+      "last_truth_sync_utc": "2026-06-10T18:02:20.795189+00:00"
     }
   }
 }

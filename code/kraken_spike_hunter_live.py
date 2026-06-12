@@ -6,13 +6,13 @@ scores every pair for momentum, dip-from-high, volume surge, and RSI.
 Returns a ranked leaderboard of highest-conviction trade setups.
 """
 
-import json, time, sys, math
+import json, time, sys, math, os
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Optional
 import requests
 
-ROOT    = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT    = Path(os.environ.get("LUMA_ROOT") or Path(__file__).resolve().parents[1]).resolve()
 OUT_DIR = ROOT / "out" / "spike_hunter"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 

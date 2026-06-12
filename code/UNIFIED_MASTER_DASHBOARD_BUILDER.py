@@ -7,23 +7,33 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
+).expanduser().resolve()
 OUT = ROOT / "out"
 EXEC_OUT = OUT / "execution"
-DASH = ROOT / "dashboard"
+DASH = Path(
+    os.environ.get("LUMA_DASHBOARD_DIR", str(ROOT / "dashboard"))
+).expanduser().resolve()
 INVESTOR_SCORECARD = EXEC_OUT / "investor_proof_scorecard.json"
 BINANCEUS_PAPER_LEDGER = EXEC_OUT / "binanceus_paper_ledger.jsonl"
 SECTOR_MATRIX_PATH = OUT / "sector_value_matrix.json"
 SOURCE_TRUTH_PATH = OUT / "source_truth_table.json"
 TALK_TRACK_PATH = EXEC_OUT / "investor_talk_track.md"
 STRATEGIC_SUMMARY_PATH = ROOT / "code" / "📈 Strategic Summary & Next Steps.txt"
-TWIN_SEED_PATH = Path(r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json")
+TWIN_SEED_PATH = Path(
+    os.environ.get(
+        "LUMA_TWIN_SEED_PATH",
+        r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json",
+    )
+)
 
 
 def now_utc() -> str:

@@ -74,6 +74,8 @@ REQUIRED_FIELDS = [
     "company.duns_or_uei",
     "company.ein",
     "company.sam_gov_status",
+    "company.sam_gov_verified_utc",
+    "company.sam_gov_expiration_date",
     "company.address_line1",
     "company.city",
     "company.state",
@@ -364,6 +366,7 @@ def resolve_application_context(*, strict: bool = False, write_outputs: bool = T
         "differentiators": profile_payload.get("differentiators", []),
         "ip_status": profile_payload.get("ip_status"),
         "team_letters_of_support": profile_payload.get("team_letters_of_support", []),
+        "submission_readiness": profile_payload.get("submission_readiness", {}),
         "federal_readiness": federal_readiness,
         "identifiers": identifiers,
     }
@@ -433,11 +436,26 @@ def resolve_application_context(*, strict: bool = False, write_outputs: bool = T
 
 
 def load_application_profile() -> dict[str, Any]:
-    latest = _load_json(CTX_LATEST, {})
-    if isinstance(latest, dict):
-        profile = latest.get("application_profile")
-        if isinstance(profile, dict) and profile.get("company") and profile.get("pi"):
-            return profile
+    source_paths = [
+        PROFILE_PATH,
+        INVESTOR_READINESS_PATH,
+        SKIP_AUTOFILL_PATH,
+        Path(__file__).resolve(),
+    ]
+    source_mtime = max(
+        (path.stat().st_mtime for path in source_paths if path.exists()),
+        default=0.0,
+    )
+    cache_fresh = (
+        CTX_LATEST.exists()
+        and CTX_LATEST.stat().st_mtime >= source_mtime
+    )
+    if cache_fresh:
+        latest = _load_json(CTX_LATEST, {})
+        if isinstance(latest, dict):
+            profile = latest.get("application_profile")
+            if isinstance(profile, dict) and profile.get("company") and profile.get("pi"):
+                return profile
     payload = resolve_application_context(strict=False, write_outputs=True)
     profile = payload.get("application_profile")
     return profile if isinstance(profile, dict) else {"company": {}, "pi": {}}

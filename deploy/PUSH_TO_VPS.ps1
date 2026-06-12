@@ -1,9 +1,9 @@
 param(
-    [string]$VpsIp = "157.151.148.234",
+    [string]$VpsIp = $(if ($env:LUMA_VPS_HOST) { $env:LUMA_VPS_HOST } else { "157.151.148.234" }),
     [string]$VpsUser = "opc",
     [string]$VpsRoot = "/opt/lumencore",
     [string]$Root = "C:\LumaTrader\INSTITUTIONAL_STACK_V2",
-    [string]$SshKeyPath = "C:\Users\Novac\Downloads\ssh-key-2026-04-23.key"
+    [string]$SshKeyPath = $env:LUMA_VPS_SSH_KEY
 )
 
 $ErrorActionPreference = "Stop"
@@ -72,7 +72,7 @@ function Invoke-Ssh {
     }
 }
 
-$deployScript = Join-Path $Root "deploy\VPS_DEPLOY.sh"
+$deployScript = Join-Path $Root "code\deploy\deploy_vps.sh"
 $codeDir = Join-Path $Root "code"
 $lamaScoutDir = Join-Path $Root "LamaScout"
 $stamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssZ")
@@ -100,20 +100,28 @@ if ($SshKeyPath) {
 }
 Write-Host "=====================================================" -ForegroundColor Cyan
 
-# Step 1: Upload the deploy script and run it
-Write-Host "[1/5] Uploading deploy script..." -ForegroundColor Yellow
-Invoke-Scp -StepLabel "1/5 Upload deploy script" -Args @(
-    $deployScript,
-    "${VpsUser}@${VpsIp}:/tmp/VPS_DEPLOY.sh"
-)
-
-Write-Host "[1/5] Running deploy script on VPS (installs all system deps + Python venv)..." -ForegroundColor Yellow
-Invoke-Ssh -StepLabel "1/5 Run VPS deploy script" -RemoteCommand "chmod +x /tmp/VPS_DEPLOY.sh && sudo bash /tmp/VPS_DEPLOY.sh"
+# Step 1: Verify the target before packaging or changing services.
+Write-Host "[1/5] Checking VPS connectivity and capacity..." -ForegroundColor Yellow
+Invoke-Ssh -StepLabel "1/5 VPS preflight" -RemoteCommand "set -e; test -d ${VpsRoot}; df -Pk ${VpsRoot}; test `$(df -Pk ${VpsRoot} | awk 'NR==2 {print `$4}') -gt 2097152"
 
 # Step 2: Upload trading stack code + dashboard + core ops artifacts
 Write-Host "[2/5] Uploading trading stack + dashboard + ops artifacts..." -ForegroundColor Yellow
 if (Test-Path $codeArchive) { Remove-Item $codeArchive -Force }
-$bundleTargets = @("code", "dashboard")
+$bundleTargets = @(
+    "code",
+    "dashboard",
+    "config/runtime_control.json",
+    "config/paper_trader_runtime.json",
+    "config/autobuy.json",
+    "config/accounts/ALPACA_PRIMARY/runtime_control.json",
+    "config/accounts/KRAKEN_PRIMARY/runtime_control.json",
+    "symbol_registry_auto.py"
+)
+foreach ($dataFile in @("data/grant_catalog.json", "data/company_profile.json")) {
+    if (Test-Path (Join-Path $Root $dataFile)) {
+        $bundleTargets += $dataFile
+    }
+}
 if (Test-Path (Join-Path $Root "out\ops")) {
     $bundleTargets += "out/ops"
 }
@@ -126,7 +134,11 @@ $tarArgs = @(
     "-C", $Root,
     "--exclude=code/.venv",
     "--exclude=code/**/__pycache__",
-    "--exclude=code/**/*.pyc"
+    "--exclude=code/**/*.pyc",
+    "--exclude=code/**/*.tgz",
+    "--exclude=code/**/*.tar.gz",
+    "--exclude=dashboard/node_modules",
+    "--exclude=code/archive"
 ) + $bundleTargets
 
 & tar @tarArgs
@@ -137,7 +149,7 @@ Invoke-Scp -StepLabel "2/5 Upload code archive" -Args @(
     $codeArchive,
     "${VpsUser}@${VpsIp}:/tmp/lumencore_code.tgz"
 )
-Invoke-Ssh -StepLabel "2/5 Extract code archive" -RemoteCommand "sudo rm -rf ${VpsRoot}/code ${VpsRoot}/dashboard && sudo mkdir -p ${VpsRoot} && sudo tar -xzf /tmp/lumencore_code.tgz -C ${VpsRoot} && rm -f /tmp/lumencore_code.tgz"
+Invoke-Ssh -StepLabel "2/5 Extract code archive" -RemoteCommand "set -e; sudo mkdir -p ${VpsRoot}; sudo tar -xzf /tmp/lumencore_code.tgz --no-same-owner -C ${VpsRoot}; rm -f /tmp/lumencore_code.tgz"
 Remove-Item $codeArchive -Force
 
 # Step 3: Upload LamaScout
@@ -174,21 +186,21 @@ if (Test-Path $landingDir) {
     }
 }
 
-# Step 4: Fix permissions and start services
-Write-Host "[4/5] Setting permissions and starting services..." -ForegroundColor Yellow
-$startServicesCmd = 'sudo chown -R lumencore:lumencore ' + $VpsRoot + '; sudo systemctl daemon-reload; for svc in lamascout-api luma-dashboard lamascout-loop luma-paper-ticker luma-intel-api; do if sudo systemctl list-unit-files --type=service | grep -q "^${svc}\.service"; then sudo systemctl enable --now "$svc"; fi; done'
-Invoke-Ssh -StepLabel "4/5 Start services" -RemoteCommand $startServicesCmd
+# Step 4: Install current units after current source is in place.
+Write-Host "[4/5] Installing and restarting canonical production services..." -ForegroundColor Yellow
+$installServicesCmd = 'set -e; sudo chown -R lumencore:lumencore ' + $VpsRoot + '; sudo env LUMA_SERVICE_USER=lumencore LUMA_DOMAIN=lumen-core.ai bash ' + $VpsRoot + '/code/deploy/deploy_vps.sh lumen-core.ai; sudo systemctl restart luma-gateway luma-dashboard-refresh luma-paper-ticker luma-symbol-awareness luma-kraken-history'
+Invoke-Ssh -StepLabel "4/5 Install services" -RemoteCommand $installServicesCmd
 
 # Step 5: Status check
 Write-Host "[5/5] Service status..." -ForegroundColor Yellow
-$statusCmd = 'for svc in lamascout-api luma-dashboard lamascout-loop luma-paper-ticker luma-intel-api; do if sudo systemctl list-unit-files --type=service | grep -q "^${svc}\.service"; then echo "--- ${svc} ---"; sudo systemctl --no-pager --full status "$svc" | sed -n "1,12p"; fi; done'
+$statusCmd = 'for svc in luma-gateway luma-dashboard-refresh luma-paper-ticker luma-symbol-awareness luma-kraken-history lamascout-api luma-dashboard luma-intel-api; do if sudo systemctl list-unit-files --type=service | grep -q "^${svc}\.service"; then echo "--- ${svc} ---"; sudo systemctl --no-pager --full status "$svc" | sed -n "1,12p"; fi; done; curl -fsS http://127.0.0.1:8787/health >/dev/null; curl -fsS http://127.0.0.1:8787/api/snapshot >/dev/null'
 Invoke-Ssh -StepLabel "5/5 Service status" -RemoteCommand $statusCmd
 
 Write-Host ""
 Write-Host "=====================================================" -ForegroundColor Green
 Write-Host " UPLOAD COMPLETE" -ForegroundColor Green
 Write-Host ""
-Write-Host " DNS: Point lumen-core.ai A record -> 157.151.148.234" -ForegroundColor Cyan
+Write-Host " DNS: Point lumen-core.ai A record -> $VpsIp" -ForegroundColor Cyan
 Write-Host " Then run SSL cert:"
 Write-Host "   ssh ${VpsUser}@${VpsIp}"
 Write-Host "   sudo certbot --nginx -d lumen-core.ai -d www.lumen-core.ai -d app.lumen-core.ai -d research.lumen-core.ai --non-interactive --agree-tos -m admin@lumen-core.ai"

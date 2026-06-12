@@ -121,6 +121,156 @@ def _scan_to_be_filled(obj: Any, path: str = "") -> list[str]:
     return missing
 
 
+def _scan_package_placeholders(run_dir: Path, filenames: list[str]) -> list[str]:
+    missing: list[str] = []
+    for filename in filenames:
+        path = run_dir / filename
+        if not path.exists():
+            continue
+        if path.suffix.lower() == ".json":
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            missing.extend(
+                f"{filename}:{field}"
+                for field in _scan_to_be_filled(payload)
+            )
+            continue
+        if path.suffix.lower() in {".md", ".txt"}:
+            for line_no, line in enumerate(
+                path.read_text(encoding="utf-8", errors="replace").splitlines(),
+                start=1,
+            ):
+                if "TO_BE_FILLED" in line.upper():
+                    missing.append(f"{filename}:line:{line_no}")
+    return sorted(set(missing))
+
+
+def _parse_date(value: Any) -> datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    for fmt in ("%Y-%m-%d", "%m/%d/%Y", "%m-%d-%Y"):
+        try:
+            return datetime.strptime(text, fmt).replace(tzinfo=timezone.utc)
+        except ValueError:
+            continue
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
+    except Exception:
+        return None
+
+
+def _is_nsf_sbir(grant_id: str, app: dict[str, Any]) -> bool:
+    source_meta = app.get("source_metadata")
+    if not isinstance(source_meta, dict):
+        source_meta = {}
+    blob = " ".join(
+        [
+            grant_id,
+            str(app.get("agency") or ""),
+            str(app.get("program") or ""),
+            str(source_meta.get("synopsis_excerpt") or ""),
+            str((source_meta.get("agency_contact") or {}).get("name") or ""),
+        ]
+    ).lower()
+    return "nsf" in blob and (
+        "sbir" in blob or "small business innovation research" in blob
+    )
+
+
+def _opportunity_window(
+    app: dict[str, Any],
+    catalog_entry: dict[str, Any] | None,
+    deadline: dict[str, Any],
+) -> dict[str, Any]:
+    for candidate in (
+        (catalog_entry or {}).get("opportunity_window"),
+        app.get("opportunity_window"),
+    ):
+        if isinstance(candidate, dict) and candidate.get("status"):
+            return candidate
+
+    current_state = str(
+        (catalog_entry or {}).get("current_state")
+        or app.get("current_state")
+        or ""
+    ).strip()
+    state = current_state.lower().replace("-", " ")
+    source_meta = app.get("source_metadata")
+    if not isinstance(source_meta, dict):
+        source_meta = {}
+    source_name = str(source_meta.get("source") or "catalog").strip().lower()
+    verified_at = _parse_date(
+        source_meta.get("discovered_utc")
+        or (catalog_entry or {}).get("source_verified_utc")
+        or app.get("source_verified_utc")
+    )
+    if any(
+        marker in state
+        for marker in (
+            "closed",
+            "cancelled",
+            "canceled",
+            "archived",
+            "between cycle",
+            "between_cycles",
+            "not yet released",
+            "future",
+            "tba",
+        )
+    ):
+        return {
+            "status": "unavailable",
+            "actionable": False,
+            "reason": f"current_state={current_state or 'unknown'}",
+        }
+    if deadline.get("risk") == "expired":
+        return {
+            "status": "expired",
+            "actionable": False,
+            "reason": "deadline_passed",
+        }
+    if "open" not in state and "posted" not in state:
+        max_age_days = 7.0 if source_name == "grants_gov_live_scan" else 30.0
+        age_days = (
+            (datetime.now(timezone.utc) - verified_at).total_seconds() / 86400.0
+            if verified_at is not None
+            else None
+        )
+        if age_days is None or age_days > max_age_days:
+            return {
+                "status": "verification_required",
+                "actionable": False,
+                "reason": (
+                    "source_never_verified"
+                    if age_days is None
+                    else f"source_verification_stale_{age_days:.1f}_days"
+                ),
+            }
+    if deadline.get("parseable") and not deadline.get("rolling"):
+        return {
+            "status": "open",
+            "actionable": True,
+            "reason": "dated_window_open",
+        }
+    if "open" in state or "posted" in state:
+        return {
+            "status": "open",
+            "actionable": True,
+            "reason": f"current_state={current_state}",
+        }
+    return {
+        "status": "verification_required",
+        "actionable": False,
+        "reason": "no_verified_open_window",
+    }
+
+
 def _days_to_deadline(deadline_str: str | None) -> dict[str, Any]:
     """Best-effort parse of catalog deadline_typical."""
     if not deadline_str:
@@ -141,8 +291,7 @@ def _days_to_deadline(deadline_str: str | None) -> dict[str, Any]:
                 int(m_iso.group(3)),
                 tzinfo=timezone.utc,
             )
-            now = datetime.now(timezone.utc)
-            delta = (d - now).days
+            delta = (d.date() - datetime.now(timezone.utc).date()).days
             return {
                 "deadline": d.date().isoformat(),
                 "days_remaining": delta,
@@ -163,8 +312,7 @@ def _days_to_deadline(deadline_str: str | None) -> dict[str, Any]:
             day = int(m_us.group(2))
             year = int(m_us.group(3))
             d = datetime(year, month, day, tzinfo=timezone.utc)
-            now = datetime.now(timezone.utc)
-            delta = (d - now).days
+            delta = (d.date() - datetime.now(timezone.utc).date()).days
             return {
                 "deadline": d.date().isoformat(),
                 "days_remaining": delta,
@@ -257,23 +405,49 @@ def build_preflight(grant_id: str, run_dir: Path,
     state = (json.loads(state_p.read_text(encoding="utf-8"))
              if state_p.exists() else {})
 
-    # Required artifacts in a complete package
-    required_files = [
-        "application.json", "application.md",
-        "technical_volume.md", "commercialization_plan.md",
-        "cover_letter.md", "budget.json",
-        "eligibility_report.json", "evidence_manifest.json",
-        "manifest.sha256.json", "approval_state.json",
-    ]
+    readiness = app.get("submission_readiness")
+    if not isinstance(readiness, dict):
+        readiness = {}
+    nsf_sbir = _is_nsf_sbir(grant_id, app)
+    nsf_invitation_id = str(
+        readiness.get("nsf_project_pitch_invitation_id") or ""
+    ).strip()
+    target_stage = (
+        "project_pitch"
+        if nsf_sbir and not nsf_invitation_id
+        else "full_proposal"
+    )
+
+    if target_stage == "project_pitch":
+        required_files = [
+            "application.json",
+            "PROJECT_PITCH.md",
+            "eligibility_report.json",
+            "evidence_manifest.json",
+            "approval_state.json",
+        ]
+    else:
+        required_files = [
+            "application.json", "application.md",
+            "technical_volume.md", "commercialization_plan.md",
+            "cover_letter.md", "budget.json",
+            "eligibility_report.json", "evidence_manifest.json",
+            "manifest.sha256.json", "approval_state.json",
+        ]
     present_files = {p.name for p in run_dir.iterdir() if p.is_file()}
     missing_files = [f for f in required_files if f not in present_files]
     package_complete = len(missing_files) == 0
 
-    missing_fields = _scan_to_be_filled(app)
-    portal = _portal_for(grant_id)
+    missing_fields = _scan_package_placeholders(run_dir, required_files)
+    portal = (
+        PORTAL_REGISTRY["nsf_sbir"]
+        if nsf_sbir
+        else _portal_for(grant_id)
+    )
     deadline = _days_to_deadline(
         (catalog_entry or {}).get("deadline_typical")
         or app.get("deadline_typical"))
+    opportunity_window = _opportunity_window(app, catalog_entry, deadline)
 
     blockers: list[str] = []
     warnings: list[str] = []
@@ -283,14 +457,13 @@ def build_preflight(grant_id: str, run_dir: Path,
     if missing_files:
         blockers.append(f"package missing required files: {missing_files}")
     if missing_fields:
-        # SAM.gov UEI is the universal hard blocker
-        crit = [f for f in missing_fields if any(
-            k in f.lower() for k in ("uei", "duns", "ein", "sam_gov"))]
-        if crit:
-            blockers.append(f"SAM.gov / UEI / EIN required before submission: {crit}")
-        other = [f for f in missing_fields if f not in crit]
-        if other:
-            warnings.append(f"non-critical TO_BE_FILLED fields: {other}")
+        blockers.append(f"package contains unresolved TO_BE_FILLED fields: {missing_fields}")
+    if not opportunity_window.get("actionable"):
+        blockers.append(
+            "opportunity window is not verified open: "
+            f"{opportunity_window.get('status')} "
+            f"({opportunity_window.get('reason')})"
+        )
     if deadline.get("risk") == "expired":
         blockers.append(f"deadline expired ({deadline.get('deadline')})")
     elif deadline.get("risk") == "critical":
@@ -300,6 +473,63 @@ def build_preflight(grant_id: str, run_dir: Path,
     elig = (app.get("eligibility") or {})
     if not elig.get("eligible", False):
         blockers.append(f"eligibility check failed: {elig.get('reasons', [])}")
+
+    budget = app.get("budget")
+    if not isinstance(budget, dict):
+        blockers.append("budget is missing from application.json")
+    else:
+        ceiling = budget.get("ceiling_usd")
+        total = budget.get("total")
+        try:
+            if int(total) != int(ceiling):
+                blockers.append(
+                    f"budget total ({total}) does not equal award ceiling ({ceiling})"
+                )
+        except Exception:
+            blockers.append("budget total/ceiling is not numeric")
+
+    applicant = app.get("applicant")
+    if not isinstance(applicant, dict):
+        applicant = {}
+    sam_status = str(applicant.get("sam_gov_status") or "").strip().lower()
+    sam_expiration = _parse_date(applicant.get("sam_gov_expiration_date"))
+    sam_verified_utc = _parse_date(applicant.get("sam_gov_verified_utc"))
+
+    if target_stage == "project_pitch":
+        if sam_status != "active" or sam_expiration is None or sam_verified_utc is None:
+            warnings.append(
+                "SAM.gov status/expiration is not currently verified; this does not "
+                "block the Project Pitch, but it will block an invited full proposal"
+            )
+    else:
+        if sam_status != "active":
+            blockers.append("SAM.gov registration is not marked active")
+        if sam_expiration is None:
+            blockers.append("SAM.gov expiration date has not been verified")
+        elif sam_expiration.date() < datetime.now(timezone.utc).date():
+            blockers.append(
+                f"SAM.gov registration expired ({sam_expiration.date().isoformat()})"
+            )
+        elif (sam_expiration.date() - datetime.now(timezone.utc).date()).days <= 30:
+            warnings.append(
+                "SAM.gov registration expires within 30 days "
+                f"({sam_expiration.date().isoformat()})"
+            )
+        if sam_verified_utc is None:
+            blockers.append("SAM.gov status has no verification timestamp")
+
+        if nsf_sbir:
+            if not nsf_invitation_id:
+                blockers.append("NSF Project Pitch invitation/case identifier is missing")
+            if not readiness.get("research_gov_account_verified"):
+                blockers.append("Research.gov account is not verified")
+            if not str(readiness.get("nsf_sbc_registration_id") or "").strip():
+                blockers.append("NSF small-business registration ID is missing")
+        else:
+            if not readiness.get("grants_gov_account_verified"):
+                blockers.append("Grants.gov account linkage is not verified")
+            if not readiness.get("aor_authority_verified"):
+                blockers.append("AOR submission authority is not verified")
 
     sf424 = _sf424_field_map(app)
 
@@ -312,7 +542,9 @@ def build_preflight(grant_id: str, run_dir: Path,
         "package_complete": package_complete,
         "missing_files": missing_files,
         "missing_fields": missing_fields,
+        "target_stage": target_stage,
         "deadline": deadline,
+        "opportunity_window": opportunity_window,
         "portal": portal,
         "sf424_map": sf424,
         "blockers": blockers,
@@ -338,12 +570,14 @@ def write_submission_kit(grant_id: str, run_dir: Path,
     blockers = p.get("blockers", [])
     warnings = p.get("warnings", [])
     sf424 = p.get("sf424_map", {})
+    target_stage = p.get("target_stage", "full_proposal")
 
     md: list[str] = []
     md.append(f"# Submission Kit — {p.get('grant_id')}")
     md.append("")
     md.append(f"**Agency:** {p.get('agency')}  ")
     md.append(f"**Program:** {p.get('program')}  ")
+    md.append(f"**Target stage:** `{target_stage}`  ")
     md.append(f"**Ceiling:** ${p.get('ceiling_usd'):,}  " if p.get('ceiling_usd') else "")
     md.append(f"**Approval state:** `{p.get('approval_state')}`  ")
     if deadline.get("rolling"):
@@ -376,43 +610,50 @@ def write_submission_kit(grant_id: str, run_dir: Path,
         md.append(f"- **Note:** {portal.get('note')}")
     md.append("")
     md.append("### Required to submit")
-    for r in portal.get("requires", []):
-        md.append(f"- [ ] {r}")
+    if target_stage == "project_pitch":
+        md.append("- [ ] NSF Project Pitch content reviewed")
+        md.append("- [ ] NSF Seed Fund portal account accessible")
+        md.append("- [ ] Founder/PI performs final review and portal submission")
+    else:
+        for r in portal.get("requires", []):
+            md.append(f"- [ ] {r}")
     md.append("")
 
     md.append("## 📋 Step-by-step")
-    md.append("1. **Verify SAM.gov registration** is active (UEI, EIN, banking, NAICS).")
-    md.append("   - If not yet registered: https://sam.gov/content/entity-registration")
-    md.append("   - Allow ~10 business days for first-time registration.")
-    md.append("2. **Confirm Grants.gov account** is linked to the UEI and you are designated AOR.")
-    md.append("   - https://www.grants.gov/applicants/registration")
-    md.append(f"3. **Open the opportunity** in the portal: {portal.get('portal_url')}")
-    md.append("4. **Click 'Apply'** → creates a Workspace package.")
-    md.append("5. **Upload the attachments** from this run directory:")
-    md.append("   - `application.md` (or rendered PDF) → Project Narrative")
-    md.append("   - `technical_volume.md` → Technical Volume")
-    md.append("   - `commercialization_plan.md` → Commercialization Plan")
-    md.append("   - `budget.json` → fill SF-424A budget form (use values below)")
-    md.append("   - `cover_letter.md` → Cover Letter")
-    md.append("   - `evidence_manifest.json` + `manifest.sha256.json` → Supplementary")
-    md.append("6. **Fill SF-424 cover form** using the field map below (copy-paste).")
-    md.append("7. **AOR signs and submits** in Workspace.")
-    md.append("8. **Record the Grants.gov Tracking Number** returned (format: GRANT##########).")
-    md.append("9. Mark submitted in Luma:")
-    md.append(f"   ```")
-    md.append(f"   POST /api/grants/{p.get('grant_id')}/submitted")
-    md.append(f"   {{\"submitted_by\":\"<AOR name>\",\"external_tracking_id\":\"GRANT##########\"}}")
-    md.append("   ```")
+    if target_stage == "project_pitch":
+        md.append("1. Sign in to the NSF Seed Fund Project Pitch portal.")
+        md.append("2. Review `PROJECT_PITCH.md` against the current portal character limits.")
+        md.append("3. Enter the four pitch sections and verify every factual claim.")
+        md.append("4. Founder/PI performs the final review and submits in the portal.")
+        md.append("5. Record the NSF case number and response when received.")
+        md.append("6. Do not start a full Research.gov proposal until NSF issues an invitation.")
+    else:
+        md.append("1. **Verify SAM.gov registration** is active (UEI, EIN, banking, NAICS).")
+        md.append("   - If not yet registered: https://sam.gov/content/entity-registration")
+        md.append("   - Allow up to 10 business days for activation.")
+        md.append("2. **Confirm the submission account** is linked to the UEI and AOR authority is active.")
+        md.append(f"3. **Open the opportunity** in the portal: {portal.get('portal_url')}")
+        md.append("4. **Create the portal application package.**")
+        md.append("5. **Upload the required attachments** from this run directory.")
+        md.append("6. **Fill the federal cover form** using the field map below.")
+        md.append("7. **AOR signs and submits** in the designated portal.")
+        md.append("8. **Record the external tracking number** returned.")
+        md.append("9. Mark submitted in Luma:")
+        md.append("   ```")
+        md.append(f"   POST /api/grants/{p.get('grant_id')}/submitted")
+        md.append("   {\"submitted_by\":\"<AOR name>\",\"external_tracking_id\":\"GRANT##########\"}")
+        md.append("   ```")
     md.append("")
 
-    md.append("## 📑 SF-424 Field Map (copy-paste ready)")
-    md.append("")
-    md.append("| Form Field | Value |")
-    md.append("|---|---|")
-    for k, v in sf424.items():
-        vv = "" if v is None else str(v).replace("|", "\\|")
-        md.append(f"| {k} | {vv} |")
-    md.append("")
+    if target_stage != "project_pitch":
+        md.append("## 📑 SF-424 Field Map (copy-paste ready)")
+        md.append("")
+        md.append("| Form Field | Value |")
+        md.append("|---|---|")
+        for k, v in sf424.items():
+            vv = "" if v is None else str(v).replace("|", "\\|")
+            md.append(f"| {k} | {vv} |")
+        md.append("")
 
     if p.get("missing_fields"):
         md.append("## ✏️ Fields needing your input (from `data/company_profile.json`)")

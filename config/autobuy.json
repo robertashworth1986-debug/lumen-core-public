@@ -1,5 +1,5 @@
 {
-  "enabled": true,
+  "enabled": false,
   "max_open_target": 12,
   "max_pending": 4,
   "min_edge_score": 0.55,

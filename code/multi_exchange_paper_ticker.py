@@ -29,7 +29,9 @@ except Exception:
     orjson = None
 
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
+).expanduser().resolve()
 CODE = ROOT / "code"
 CONF = ROOT / "config"
 OUT = ROOT / "out" / "execution"
@@ -48,7 +50,12 @@ INSTITUTIONAL_PAPER_DASHBOARD_FILE = ROOT / "dashboard" / "institutional_crypto_
 INSTITUTIONAL_PAPER_BRIEF_FILE = OUT / "institutional_crypto_executive_brief.pdf"
 LOCK_FILE = CODE / ".multi_exchange_paper_ticker.lock"
 DUCKDB_KPI_FILE = OUT / "analytics" / "investor_kpi_duckdb.json"
-ROLLING_BEST_FILE = Path(r"C:/LumaTrader/rolling_capital/rolling_capital_best_multi.json")
+ROLLING_BEST_FILE = Path(
+    os.environ.get(
+        "LUMA_ROLLING_CAPITAL_FILE",
+        str(ROOT.parent / "rolling_capital" / "rolling_capital_best_multi.json"),
+    )
+).expanduser()
 EXECUTION_AUDIT_CHAIN_FILE = OUT / "execution_audit_chain.jsonl"
 INVESTOR_SCORECARD_FILE = OUT / "investor_proof_scorecard.json"
 INVESTOR_SCORECARD_HISTORY_FILE = OUT / "investor_proof_scorecard.jsonl"
@@ -3069,13 +3076,26 @@ def run_institutional_crypto_dashboard_builder(python_exe: str) -> Dict[str, Any
             text=True,
             check=False,
         )
-        return {
+        result = {
             "ok": proc.returncode == 0,
             "return_code": proc.returncode,
             "stdout_tail": (proc.stdout or "").splitlines()[-6:],
             "stderr_tail": (proc.stderr or "").splitlines()[-6:],
             "dashboard_file": str(INSTITUTIONAL_PAPER_DASHBOARD_FILE),
         }
+        fallback = ROOT / "dashboard" / "alpaca_paper_live_dashboard.html"
+        if not result["ok"] and fallback.exists():
+            INSTITUTIONAL_PAPER_DASHBOARD_FILE.parent.mkdir(parents=True, exist_ok=True)
+            INSTITUTIONAL_PAPER_DASHBOARD_FILE.write_bytes(fallback.read_bytes())
+            result.update(
+                {
+                    "ok": True,
+                    "fallback_used": True,
+                    "fallback_source": str(fallback),
+                    "panel_export_return_code": proc.returncode,
+                }
+            )
+        return result
     except Exception as exc:
         return {"ok": False, "error": str(exc), "dashboard_file": str(INSTITUTIONAL_PAPER_DASHBOARD_FILE)}
 

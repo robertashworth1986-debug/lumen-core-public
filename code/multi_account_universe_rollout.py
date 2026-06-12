@@ -15,6 +15,7 @@ OUT = ROOT / "out" / "execution"
 ENV_FILE = CONFIG / "luma_live_keys.env"
 UNIVERSE_FILE = ROOT / "out" / "live_universe_catalog.csv"
 POLICY_FILE = CONFIG / "multi_account_policy.json"
+GLOBAL_RUNTIME_FILE = CONFIG / "runtime_control.json"
 
 REGISTRY_FILE = CONFIG / "live_account_registry.json"
 ROLLOUT_FILE = OUT / "multi_account_rollout_plan.json"
@@ -155,6 +156,16 @@ def discover_accounts(env: Dict[str, str]) -> List[Dict[str, Any]]:
 def build_account_plan(accounts: List[Dict[str, Any]], universe: List[Dict[str, str]], policy: Dict[str, Any], apply_live: bool) -> Dict[str, Any]:
     providers_cfg = policy.get("providers", {}) or {}
     allow_live, live_reasons = _live_guard(policy)
+    global_runtime = read_json(GLOBAL_RUNTIME_FILE, {})
+    global_live_armed = (
+        str(global_runtime.get("mode", "paper")).strip().lower() == "live"
+        and bool(global_runtime.get("allow_live_orders", False))
+        and not bool(global_runtime.get("paper_enabled", True))
+        and not bool(global_runtime.get("kill_switch", False))
+    )
+    if apply_live and not global_live_armed:
+        live_reasons.append("global_runtime_not_live_armed")
+        allow_live = False
 
     plan_accounts: List[Dict[str, Any]] = []
     constraints: List[Dict[str, Any]] = []
@@ -211,7 +222,9 @@ def build_account_plan(accounts: List[Dict[str, Any]], universe: List[Dict[str, 
         runtime_patch = {
             "mode": mode,
             "allow_live_orders": bool(safe_live),
-            "kill_switch": False,
+            "paper_enabled": not bool(safe_live),
+            "kill_switch": bool(global_runtime.get("kill_switch", False)),
+            "inherits_global_live_gate": True,
             "symbol": "UNIVERSE",
             "loop_seconds": float(policy.get("default_loop_seconds", 0.5)),
             "x1000_auto_enabled": bool(policy.get("x1000_auto_enabled", True)),
@@ -241,7 +254,8 @@ def build_account_plan(accounts: List[Dict[str, Any]], universe: List[Dict[str, 
     return {
         "generated_utc": now_utc(),
         "allow_live_requested": apply_live,
-        "allow_live_effective": allow_live and apply_live,
+        "allow_live_effective": allow_live and apply_live and global_live_armed,
+        "global_live_armed": global_live_armed,
         "live_guard_reasons": live_reasons,
         "accounts_total": len(accounts),
         "accounts_ready": sum(1 for a in accounts if a.get("status") == "ready"),

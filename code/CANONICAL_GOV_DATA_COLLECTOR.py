@@ -8,7 +8,9 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
+).expanduser().resolve()
 OUT = ROOT / "out"
 CONF = ROOT / "config"
 SNAP_DIR = OUT / "gov_live_snapshots"

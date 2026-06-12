@@ -12,6 +12,7 @@ import os
 import random
 import subprocess
 import sys
+import threading
 import time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -186,6 +187,11 @@ RUNTIME_DRIFT_OPERATOR_ALERT_FILE = EXEC_OUT / "runtime_drift_operator_alert.jso
 SCENE_VISUAL_PROFILE_FILE = ROOT / "config" / "scene_visual_profiles.json"
 SCENE_SIMULATION_SCENARIO_FILE = ROOT / "config" / "scene_simulation_scenarios.json"
 SCENE_SIMULATION_RUNS_FILE = EXEC_OUT / "scene_simulation_runs.jsonl"
+SCENE_SIMULATION_RUNS_MAX_BYTES = max(
+    1_048_576,
+    int(os.getenv("LUMA_SCENE_RUNS_MAX_BYTES", str(64 * 1024 * 1024))),
+)
+_JSONL_WRITE_LOCK = threading.Lock()
 STALENESS_REPORT_FILE = OUT / "ops" / "staleness_report.json"
 LUMAQ_BRAIN_REPORT_FILE = OUT / "ops" / "lumaq_brain_report.json"
 LUMAQ_TOP10_REGISTRY_FILE = OUT / "ops" / "lumaq_top10_alpha_registry.json"
@@ -235,11 +241,32 @@ def to_float(value: Any, default: float = 0.0) -> float:
 
 
 def load_supervisor_health(default: Any) -> Any:
+    candidates: list[tuple[float, dict[str, Any]]] = []
     for cand in SUPERVISOR_HEALTH_FILES:
         data = load_json(cand, None)
-        if data is not None:
-            return data
-    return default
+        if not isinstance(data, dict):
+            continue
+        try:
+            freshness_key = float(cand.stat().st_mtime)
+        except Exception:
+            freshness_key = 0.0
+        candidates.append((freshness_key, data))
+    if not candidates:
+        return default
+    return max(candidates, key=lambda item: item[0])[1]
+
+
+def _iso_age_seconds(value: Any) -> float | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return max(0.0, (datetime.now(timezone.utc) - parsed.astimezone(timezone.utc)).total_seconds())
+    except Exception:
+        return None
 
 
 def _scan_latest_runtime_drift_excessive_event() -> dict[str, Any]:
@@ -958,6 +985,7 @@ def build_snapshot() -> dict[str, Any]:
             "top_entry": (awareness.get("summary", {}) or {}).get("top_entry"),
             "top_exit": (awareness.get("summary", {}) or {}).get("top_exit"),
             "top_eval": (awareness.get("summary", {}) or {}).get("top_eval"),
+            "timing_edge_context": awareness.get("timing_edge_context", {}),
         },
         "runtime": {
             "drift_operator_alert": runtime_drift,
@@ -1718,20 +1746,67 @@ def root() -> RedirectResponse:
 @app.get("/health")
 def health() -> dict[str, Any]:
     supervisor = load_supervisor_health(None)
+    artifact_paths = {
+        "symbol_awareness": (AWARENESS_FILE, 30.0),
+        "paper_ticker": (EXEC_OUT / "multi_exchange_paper_ticker_status.json", 120.0),
+        "timing_edge": (OUT / "ops" / "symbol_timing_edge_latest.json", 8 * 3600.0),
+    }
+    artifact_health: dict[str, Any] = {}
+    for name, (path, stale_after_sec) in artifact_paths.items():
+        try:
+            age_sec = max(0.0, time.time() - path.stat().st_mtime)
+            fresh = age_sec <= stale_after_sec
+        except OSError:
+            age_sec = None
+            fresh = False
+        artifact_health[name] = {
+            "fresh": fresh,
+            "age_sec": round(age_sec, 3) if age_sec is not None else None,
+            "stale_after_sec": stale_after_sec,
+        }
+    artifacts_healthy = all(row["fresh"] for row in artifact_health.values())
+
     if supervisor is None:
-        svc_status = {"supervisor": "not_running"}
-    else:
         svc_status = {
+            "status": "ok" if artifacts_healthy else "degraded",
+            "all_healthy": artifacts_healthy,
+            "health_source": "artifact_heartbeats",
+            "supervisor": "not_running",
+            "reasons": [] if artifacts_healthy else ["supervisor_health_missing"],
+            "artifacts": artifact_health,
+        }
+    else:
+        supervisor_updated_utc = supervisor.get("timestamp_utc")
+        supervisor_age_sec = _iso_age_seconds(supervisor_updated_utc)
+        supervisor_fresh = supervisor_age_sec is not None and supervisor_age_sec <= 30.0
+        process_healthy = bool(supervisor.get("all_healthy", False))
+        supervisor_authoritative = process_healthy and supervisor_fresh
+        overall_healthy = supervisor_authoritative or artifacts_healthy
+        reasons: list[str] = []
+        if not process_healthy and not artifacts_healthy:
+            reasons.append("one_or_more_services_not_running")
+        if not supervisor_fresh and not artifacts_healthy:
+            reasons.append("supervisor_heartbeat_stale")
+        svc_status = {
+            "status": "ok" if overall_healthy else "degraded",
+            "health_source": (
+                "supervisor" if supervisor_authoritative else "artifact_heartbeats"
+            ),
             "supervisor_pid": supervisor.get("supervisor_pid"),
-            "all_healthy": supervisor.get("all_healthy"),
+            "all_healthy": overall_healthy,
+            "processes_running": process_healthy,
             "supervisor_tick": supervisor.get("tick"),
-            "supervisor_updated_utc": supervisor.get("timestamp_utc"),
+            "supervisor_updated_utc": supervisor_updated_utc,
+            "supervisor_age_sec": round(supervisor_age_sec, 3) if supervisor_age_sec is not None else None,
+            "supervisor_fresh": supervisor_fresh,
+            "reasons": reasons,
+            "artifacts": artifact_health,
             "services": {
                 s["name"]: {"running": s["running"], "pid": s["pid"], "restarts": s["restart_count"]}
                 for s in supervisor.get("services", [])
             },
         }
-    return {"status": "ok", "generated_utc": now_utc(), **svc_status}
+    return {"generated_utc": now_utc(), **svc_status}
 
 
 @app.get("/api/snapshot")
@@ -2678,11 +2753,26 @@ def _build_booth_explainer_brief_payload() -> dict[str, Any]:
     }
 
 
-def _append_jsonl(path: Path, row: dict[str, Any]) -> None:
+def _append_jsonl(
+    path: Path,
+    row: dict[str, Any],
+    *,
+    max_bytes: int | None = None,
+) -> None:
     try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("a", encoding="utf-8") as fh:
-            fh.write(json.dumps(row, ensure_ascii=True) + "\n")
+        with _JSONL_WRITE_LOCK:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if (
+                max_bytes is not None
+                and max_bytes > 0
+                and path.exists()
+                and path.stat().st_size >= max_bytes
+            ):
+                rotated = path.with_name(f"{path.name}.1")
+                rotated.unlink(missing_ok=True)
+                os.replace(path, rotated)
+            with path.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps(row, ensure_ascii=True) + "\n")
     except Exception:
         pass
 
@@ -2751,7 +2841,11 @@ def _record_scene_simulation_run(
         "config_version": str(config_version or "unknown"),
         "detail": _safe_dict(detail),
     }
-    _append_jsonl(SCENE_SIMULATION_RUNS_FILE, row)
+    _append_jsonl(
+        SCENE_SIMULATION_RUNS_FILE,
+        row,
+        max_bytes=SCENE_SIMULATION_RUNS_MAX_BYTES,
+    )
 
     try:
         memory = load_session_memory()
@@ -7042,6 +7136,32 @@ AUTOBUY_DEFAULT = {
 }
 
 
+def _autobuy_runtime_gate() -> dict[str, Any]:
+    runtime = load_json(RUNTIME_CONTROL_FILE, {})
+    mode = str(runtime.get("mode", "paper")).strip().lower()
+    allow_live_orders = bool(runtime.get("allow_live_orders", False))
+    paper_enabled = bool(runtime.get("paper_enabled", True))
+    kill_switch = bool(runtime.get("kill_switch", False))
+    armed = mode == "live" and allow_live_orders and not paper_enabled and not kill_switch
+    reasons: list[str] = []
+    if mode != "live":
+        reasons.append(f"mode={mode}")
+    if not allow_live_orders:
+        reasons.append("allow_live_orders=false")
+    if paper_enabled:
+        reasons.append("paper_enabled=true")
+    if kill_switch:
+        reasons.append("kill_switch=true")
+    return {
+        "armed": armed,
+        "mode": mode,
+        "allow_live_orders": allow_live_orders,
+        "paper_enabled": paper_enabled,
+        "kill_switch": kill_switch,
+        "reasons": reasons,
+    }
+
+
 def _load_autobuy_cfg() -> dict[str, Any]:
     cfg = dict(AUTOBUY_DEFAULT)
     try:
@@ -7639,6 +7759,16 @@ def _autobuy_scan_once(force: bool = False) -> dict[str, Any]:
     Now also: (1) refreshes spike cache if stale, (2) checks the equity-floor
     circuit breaker BEFORE creating any tickets."""
     cfg = _load_autobuy_cfg()
+    runtime_gate = _autobuy_runtime_gate()
+    if not runtime_gate["armed"]:
+        return {
+            "ok": True,
+            "ts": now_utc(),
+            "skipped_all": "runtime_not_live_armed",
+            "runtime_gate": runtime_gate,
+            "created": [],
+            "skipped": [],
+        }
     if not force and not bool(cfg.get("enabled", False)):
         return {"ok": True, "skipped_all": "disabled", "created": [], "skipped": []}
 
@@ -7824,6 +7954,7 @@ def api_autobuy_status() -> dict[str, Any]:
         "ok": True,
         "ts": now_utc(),
         "config": cfg,
+        "runtime_gate": _autobuy_runtime_gate(),
         "started_utc": _AUTOBUY_STATE.get("started_utc"),
         "last_scan_utc": _AUTOBUY_STATE.get("last_scan_utc"),
         "last_scan_eligible": _AUTOBUY_STATE.get("last_scan_eligible"),

@@ -262,9 +262,8 @@ def score_candidate(pair_name: str, tk: dict, pair_meta: dict, runtime_filters: 
         "volume_usd_24h": round(vol_usd, 0),
         "momentum_pct":   round(momentum_pct, 4),
         "moonshot_score": round(moonshot_score, 4),
-        "potential_5x":   round(last * 5, 8),
-        "potential_10x":  round(last * 10, 8),
-        "potential_100x": round(last * 100, 8),
+        "evidence_status": "heuristic_unvalidated",
+        "execution_authorized": False,
     }
 
 
@@ -301,6 +300,12 @@ def run_scan():
     # Save full list
     payload = {
         "generated_utc": ts,
+        "evidence_status": "heuristic_unvalidated",
+        "execution_authorized": False,
+        "warning": (
+            "Live ticker heuristics are discovery evidence only. Historical event-rate "
+            "and walk-forward gates are required before execution use."
+        ),
         "total_candidates": len(candidates),
         "filters": {
             "price_min": PRICE_MIN,
@@ -320,11 +325,13 @@ def run_scan():
     watchlist_symbols = [c["symbol"] for c in candidates[:TOP_N_WATCH]]
     watchlist = {
         "generated_utc": ts,
+        "evidence_status": "heuristic_unvalidated",
+        "execution_authorized": False,
         "watchlist": watchlist_symbols,
         "top_candidates": candidates[:TOP_N_WATCH],
         "instruction": (
-            "Executor should prioritize entries on these symbols when "
-            f"gate_score >= {runtime_filters['instruction_gate_score']:.2f}"
+            "Research watchlist only. Executor must ignore this artifact until "
+            "execution_authorized=true is produced by a validated historical event study."
         ),
         "policy": {
             "spread_max_bps": runtime_filters["spread_max_bps"],
@@ -344,14 +351,14 @@ def run_scan():
         "",
         "## Top 20 Moonshot Candidates",
         "",
-        "| # | Symbol | Price | Range24h% | Position | Vol24h(USD) | Momentum% | Score | 10x Target |",
-        "|---|--------|-------|-----------|----------|-------------|-----------|-------|------------|",
+        "| # | Symbol | Price | Range24h% | Position | Vol24h(USD) | Momentum% | Score |",
+        "|---|--------|-------|-----------|----------|-------------|-----------|-------|",
     ]
     for i, c in enumerate(candidates[:20], 1):
         lines.append(
             f"| {i} | **{c['symbol']}** | ${c['price_usd']} | {c['range_24h_pct']}% | "
             f"{c['range_position']*100:.0f}% | ${c['volume_usd_24h']:,.0f} | "
-            f"{c['momentum_pct']:+.2f}% | {c['moonshot_score']:.2f} | ${c['potential_10x']} |"
+            f"{c['momentum_pct']:+.2f}% | {c['moonshot_score']:.2f} |"
         )
 
     lines += [
@@ -362,6 +369,8 @@ def run_scan():
         "## Scanner Logic",
         "- `moonshot_score = range*3 + position*2 + cheap_price*1.5 + volume*1 + momentum*2.5`",
         "- High score = big 24h range, near 24h high, cheap price, strong positive momentum",
+        "- This score is not a probability of 5x, 10x, or 100x performance.",
+        "- Execution authorization: false.",
         "",
         f"*Generated: {ts}*",
     ]

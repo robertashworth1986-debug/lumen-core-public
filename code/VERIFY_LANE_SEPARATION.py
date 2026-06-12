@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
+).expanduser().resolve()
 CODE = ROOT / "code"
 OUT = ROOT / "out"
-DASH = Path(r"C:\LumaTrader\dashboard")
+DASH = Path(
+    os.environ.get("LUMA_DASHBOARD_DIR", str(ROOT / "dashboard"))
+).expanduser().resolve()
 LAMASCOUT = ROOT / "LamaScout"
 CONF = ROOT / "config"
 

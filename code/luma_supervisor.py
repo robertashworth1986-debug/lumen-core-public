@@ -12,10 +12,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
+).resolve()
 CODE = ROOT / "code"
 RUN_DIR = ROOT / "run"
-OUT_DIR = CODE / "out" / "execution"
+OUT_DIR = ROOT / "out" / "execution"
 
 RUN_DIR.mkdir(parents=True, exist_ok=True)
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -281,6 +283,34 @@ def build_services(include_icloud: bool = False, no_orders: bool = False) -> lis
         Service("live-truth-fabric",
             [py, str(CODE / "live_truth_fabric_daemon.py"), "--loop", "--interval", "30"],
             detect="live_truth_fabric_daemon.py"),
+        Service(
+            "kraken-history",
+            [
+                py,
+                str(CODE / "ops" / "collect_kraken_hourly_history.py"),
+                "--daemon",
+                "--cycle-sec",
+                "21600",
+                "--pair-limit",
+                "80",
+                "--rebuild-timing",
+            ],
+            detect="collect_kraken_hourly_history.py",
+            base_delay=30.0,
+            max_delay=900.0,
+        ),
+        Service(
+            "symbol-awareness",
+            [
+                py,
+                str(CODE / "execution" / "luma_symbol_awareness_daemon.py"),
+                "--loop-seconds",
+                "1.0",
+            ],
+            detect="luma_symbol_awareness_daemon.py",
+            base_delay=10.0,
+            max_delay=300.0,
+        ),
     ]
 
 

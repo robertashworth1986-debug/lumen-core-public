@@ -3,22 +3,32 @@ from __future__ import annotations
 import csv
 import html
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
+).expanduser().resolve()
 SCOUT = ROOT / "LamaScout"
 REPORTS = SCOUT / "reports"
-DASH = Path(r"C:\LumaTrader\dashboard")
+DASH = Path(
+    os.environ.get("LUMA_DASHBOARD_DIR", str(ROOT / "dashboard"))
+).expanduser().resolve()
 HTML_OUT = DASH / "lumascout_dashboard.html"
 SUMMARY_FILE = REPORTS / "artist_scout_summary.json"
 TOP10_FILE = REPORTS / "top10_unsigned_production.csv"
 DELTA_FILE = REPORTS / "delta_history.json"
 ALERTS_FILE = REPORTS / "artist_ping_alerts.txt"
 PROOF_FILE = REPORTS / "artist_scout_run_proof.json"
-TWIN_SEED_PATH = Path(r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json")
+TWIN_SEED_PATH = Path(
+    os.environ.get(
+        "LUMA_TWIN_SEED_PATH",
+        r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json",
+    )
+)
 
 
 def load_json(path: Path, default: Any) -> Any:

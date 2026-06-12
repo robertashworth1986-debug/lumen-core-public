@@ -192,9 +192,12 @@ class ProfilePatch(BaseModel):
     phone, email) or nested dicts (company={...}, pi={...})."""
     company: dict | None = None
     pi: dict | None = None
+    submission_readiness: dict | None = None
     uei: str | None = None
     ein: str | None = None
     sam_gov_status: str | None = None
+    sam_gov_verified_utc: str | None = None
+    sam_gov_expiration_date: str | None = None
     address_line1: str | None = None
     city: str | None = None
     state: str | None = None
@@ -225,6 +228,14 @@ def patch_profile(patch: ProfilePatch) -> JSONResponse:
         company.update({k: v for k, v in patch.company.items() if v is not None})
     if patch.pi:
         pi.update({k: v for k, v in patch.pi.items() if v is not None})
+    if patch.submission_readiness:
+        prof.setdefault("submission_readiness", {}).update(
+            {
+                k: v
+                for k, v in patch.submission_readiness.items()
+                if v is not None
+            }
+        )
 
     # Convenience flat-key shortcuts (overwrite company-level fields)
     if patch.uei is not None:
@@ -233,6 +244,10 @@ def patch_profile(patch: ProfilePatch) -> JSONResponse:
         company["ein"] = patch.ein
     if patch.sam_gov_status is not None:
         company["sam_gov_status"] = patch.sam_gov_status
+    if patch.sam_gov_verified_utc is not None:
+        company["sam_gov_verified_utc"] = patch.sam_gov_verified_utc
+    if patch.sam_gov_expiration_date is not None:
+        company["sam_gov_expiration_date"] = patch.sam_gov_expiration_date
     for k in ("address_line1", "city", "state", "zip", "phone", "email"):
         v = getattr(patch, k, None)
         if v is not None:
@@ -244,7 +259,8 @@ def patch_profile(patch: ProfilePatch) -> JSONResponse:
     tmp.replace(PROFILE)
     resolve_application_context(strict=False, write_outputs=True)
     _emit("profile_patched", patched_keys=[k for k in (
-        "company", "pi", "uei", "ein", "sam_gov_status",
+        "company", "pi", "submission_readiness", "uei", "ein", "sam_gov_status",
+        "sam_gov_verified_utc", "sam_gov_expiration_date",
         "address_line1", "city", "state", "zip", "phone", "email")
         if getattr(patch, k, None) is not None])
 
@@ -820,7 +836,10 @@ def approve(grant_id: str) -> JSONResponse:
     except Exception as e:
         raise HTTPException(status_code=500,
                             detail=f"factory import failed: {e}")
-    state = _approve(grant_id)
+    try:
+        state = _approve(grant_id)
+    except SystemExit as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
     queue = update_queue()
     _emit("approved", grant_id=grant_id, state=state, queue_summary={
         "n_total": queue.get("n_total"),
@@ -844,6 +863,32 @@ def mark_submitted(grant_id: str, req: SubmittedRequest) -> JSONResponse:
         raise HTTPException(
             status_code=400,
             detail=f"grant must be approved before marking submitted (state={state.get('state')})")
+    preflight = _prepare_submission_for_run(
+        grant_id,
+        run,
+        _catalog_entry_for(grant_id),
+    )
+    if preflight.get("target_stage") == "project_pitch":
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "This package is at the NSF Project Pitch stage, not full-proposal "
+                "submission. Record the pitch case/invitation in submission_readiness first."
+            ),
+        )
+    if not preflight.get("ready"):
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "message": "submission preflight failed",
+                "blockers": preflight.get("blockers", []),
+            },
+        )
+    if not str(req.external_tracking_id or "").strip():
+        raise HTTPException(
+            status_code=400,
+            detail="external_tracking_id is required to mark a grant submitted",
+        )
     state["state"] = "submitted"
     state["submitted_utc"] = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     state["submitted_by"] = req.submitted_by

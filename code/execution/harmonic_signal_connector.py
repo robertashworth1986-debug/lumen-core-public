@@ -1,5 +1,3 @@
-
-print("[UNIQUE-DEBUG-LOAD] harmonic_signal_connector.py loaded from code/execution at ", __file__)
 """
 HarmonicSignalConnector  (v2 — upgraded)
 -----------------------------------------
@@ -26,6 +24,7 @@ Key fixes vs v1:
 import sys
 import asyncio
 import json
+import os
 import threading
 import time
 import numpy as np
@@ -39,10 +38,23 @@ try:
 except Exception:
     websockets = None
 
-ROOT           = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parents[2]))
+).expanduser().resolve()
 SELECTION_FILE = ROOT / "out" / "execution" / "institutional_live_selection.json"
 RESELECTION_STATUS_FILE = ROOT / "out" / "execution" / "live_reselection_status.json"
 MARKET_STREAM_STATUS_FILE = ROOT / "out" / "execution" / "live_market_stream_status.json"
+_DEBUG = os.environ.get("LUMA_HARMONIC_DEBUG", "").strip().lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
+
+
+def _debug(message: str) -> None:
+    if _DEBUG:
+        print(message, flush=True)
 
 _OHLC_INTERVAL_FAST = 1   # 1-minute for momentum
 _OHLC_INTERVAL_SLOW = 5   # 5-minute for trend
@@ -483,26 +495,26 @@ class HarmonicSignalConnector:
         key = (str(pair), int(interval))
         now = time.time()
 
-        print(f"[DEBUG-TRACE] _get_cached_ohlc_closes: pair={pair}, interval={interval}")
+        _debug(f"[DEBUG-TRACE] _get_cached_ohlc_closes: pair={pair}, interval={interval}")
 
         # 1. Try websocket (live data)
-        print(f"[DEBUG-TRACE] Checking websocket for pair={pair}, interval={interval}, market_stream={self._market_stream is not None}")
+        _debug(f"[DEBUG-TRACE] Checking websocket for pair={pair}, interval={interval}, market_stream={self._market_stream is not None}")
         if self._market_stream is not None:
             ws_series = self._market_stream.get_closes(pair, interval, _OHLC_MIN_CANDLES)
-            print(f"[DEBUG-TRACE] Websocket get_closes returned: {type(ws_series)}, len={len(ws_series) if ws_series is not None else 'None'}")
+            _debug(f"[DEBUG-TRACE] Websocket get_closes returned: {type(ws_series)}, len={len(ws_series) if ws_series is not None else 'None'}")
             if ws_series is not None and len(ws_series) >= _OHLC_MIN_CANDLES:
                 ws_series = ws_series.tail(cache_max_points).reset_index(drop=True)
                 self._last_data_sources[key] = "websocket"
                 if cache_enabled:
                     with self._cache_lock:
                         self._ohlc_cache[key] = {"ts": now, "closes": ws_series.copy(), "source": "websocket"}
-                print(f"[DEBUG-TRACE] Returning websocket (LIVE) data for {pair}, {len(ws_series)} points")
+                _debug(f"[DEBUG-TRACE] Returning websocket (LIVE) data for {pair}, {len(ws_series)} points")
                 return ws_series
             else:
-                print(f"[DEBUG-TRACE] Websocket (LIVE) did not return enough candles for {pair} (needed {_OHLC_MIN_CANDLES})")
+                _debug(f"[DEBUG-TRACE] Websocket (LIVE) did not return enough candles for {pair} (needed {_OHLC_MIN_CANDLES})")
 
         # 2. Try cache
-        print(f"[DEBUG-TRACE] Checking cache for pair={pair}, interval={interval}, cache_enabled={cache_enabled}")
+        _debug(f"[DEBUG-TRACE] Checking cache for pair={pair}, interval={interval}, cache_enabled={cache_enabled}")
         if cache_enabled:
             with self._cache_lock:
                 entry = self._ohlc_cache.get(key)
@@ -510,16 +522,16 @@ class HarmonicSignalConnector:
                     cached = entry.get("closes")
                     if isinstance(cached, pd.Series) and len(cached) >= _OHLC_MIN_CANDLES:
                         self._last_data_sources[key] = str(entry.get("source", "rest") or "rest")
-                        print(f"[DEBUG-TRACE] Returning cached data for {pair}, {len(cached)} points")
+                        _debug(f"[DEBUG-TRACE] Returning cached data for {pair}, {len(cached)} points")
                         return cached.copy()
-        print(f"[DEBUG-TRACE] Cache miss or not enough candles for {pair}")
+        _debug(f"[DEBUG-TRACE] Cache miss or not enough candles for {pair}")
 
         # 3. Try REST (Kraken public API)
-        print(f"[DEBUG-TRACE] Checking REST for pair={pair}, interval={interval}")
+        _debug(f"[DEBUG-TRACE] Checking REST for pair={pair}, interval={interval}")
         allow_rest_seed = bool(self._runtime_cfg.get("live_websocket_seed_rest", True)) or self._market_stream is None
         if allow_rest_seed:
             closes = _fetch_ohlc_closes(pair, interval=interval, timeout_sec=rest_timeout_sec)
-            print(f"[DEBUG-TRACE] REST get_closes returned: {type(closes)}, len={len(closes) if closes is not None else 'None'}")
+            _debug(f"[DEBUG-TRACE] REST get_closes returned: {type(closes)}, len={len(closes) if closes is not None else 'None'}")
             if closes is not None:
                 closes = closes.tail(cache_max_points).reset_index(drop=True)
                 if self._market_stream is not None:
@@ -528,23 +540,22 @@ class HarmonicSignalConnector:
                     with self._cache_lock:
                         self._ohlc_cache[key] = {"ts": now, "closes": closes.copy(), "source": "rest"}
                 self._last_data_sources[key] = "rest"
-                print(f"[DEBUG-TRACE] Returning REST (Kraken API) data for {pair}, {len(closes)} points")
+                _debug(f"[DEBUG-TRACE] Returning REST (Kraken API) data for {pair}, {len(closes)} points")
                 return closes
             else:
-                print(f"[DEBUG-TRACE] REST (Kraken API) did not return enough candles for {pair} (needed {_OHLC_MIN_CANDLES})")
+                _debug(f"[DEBUG-TRACE] REST (Kraken API) did not return enough candles for {pair} (needed {_OHLC_MIN_CANDLES})")
 
         # 4. Fallback: Try local CSV data (robust, with logging)
-        print(f"[DEBUG-TRACE] Entering CSV fallback for pair={pair}, interval={interval} (LIVE and REST failed)")
+        _debug(f"[DEBUG-TRACE] Entering CSV fallback for pair={pair}, interval={interval} (LIVE and REST failed)")
         try:
             import pandas as pd
             from pathlib import Path
             import os
-            ROOT = Path(r"C:/LumaTrader/INSTITUTIONAL_STACK_V2")
             clean_data = ROOT / "clean_data"
-            print(f"[DEBUG-TRACE] clean_data path: {clean_data}")
-            print(f"[CSV-FALLBACK] Working directory: {os.getcwd()}")
-            print(f"[CSV-FALLBACK] clean_data/ files: {list(clean_data.glob('*.csv'))}")
-            print(f"[CSV-FALLBACK] Attempting fallback for pair: {pair}")
+            _debug(f"[DEBUG-TRACE] clean_data path: {clean_data}")
+            _debug(f"[CSV-FALLBACK] Working directory: {os.getcwd()}")
+            _debug(f"[CSV-FALLBACK] clean_data/ files: {list(clean_data.glob('*.csv'))}")
+            _debug(f"[CSV-FALLBACK] Attempting fallback for pair: {pair}")
             base = pair.lower().replace("usd", "")
             candidates = [
                 clean_data / f"kraken_{base}_daily.csv",
@@ -552,40 +563,40 @@ class HarmonicSignalConnector:
                 clean_data / f"kraken_{pair.lower()}.csv",
                 clean_data / f"kraken_{pair.lower()}_daily.csv",
             ]
-            print(f"[DEBUG-TRACE] CSV candidate files: {candidates}")
+            _debug(f"[DEBUG-TRACE] CSV candidate files: {candidates}")
             found = False
             for file in candidates:
-                print(f"[DEBUG-TRACE] Checking CSV file: {file}")
+                _debug(f"[DEBUG-TRACE] Checking CSV file: {file}")
                 if file.exists():
                     try:
                         df = pd.read_csv(file)
-                        print(f"[DEBUG-TRACE] Loaded CSV {file}, columns: {df.columns.tolist()}, rows: {len(df)}")
+                        _debug(f"[DEBUG-TRACE] Loaded CSV {file}, columns: {df.columns.tolist()}, rows: {len(df)}")
                         candidate_cols = ["close", "clo", "price", "last", "c"]
                         found_col = False
                         for col in candidate_cols:
                             if col in df.columns:
                                 s = pd.to_numeric(df[col], errors="coerce").dropna()
-                                print(f"[DEBUG-TRACE] Found column {col} in {file}, {len(s)} points")
+                                _debug(f"[DEBUG-TRACE] Found column {col} in {file}, {len(s)} points")
                                 if len(s) >= _OHLC_MIN_CANDLES:
                                     s = s.tail(cache_max_points).reset_index(drop=True)
                                     self._last_data_sources[key] = f"csv:{file.name}"
-                                    print(f"[DEBUG-TRACE] Returning CSV data for {pair}, {len(s)} points")
+                                    _debug(f"[DEBUG-TRACE] Returning CSV data for {pair}, {len(s)} points")
                                     return s
                                 else:
-                                    print(f"[DEBUG-TRACE] Not enough data in {file} for {pair}: {len(s)} points, need {_OHLC_MIN_CANDLES}")
+                                    _debug(f"[DEBUG-TRACE] Not enough data in {file} for {pair}: {len(s)} points, need {_OHLC_MIN_CANDLES}")
                                 found_col = True
                         if not found_col:
-                            print(f"[DEBUG-TRACE] No valid close/price columns in {file}")
+                            _debug(f"[DEBUG-TRACE] No valid close/price columns in {file}")
                     except Exception as e:
-                        print(f"[DEBUG-TRACE] Error reading CSV {file}: {e}")
+                        _debug(f"[DEBUG-TRACE] Error reading CSV {file}: {e}")
                     found = True
             if not found:
-                print(f"[DEBUG-TRACE] No CSV found for {pair}")
-            print(f"[DEBUG-TRACE] CSV fallback failed for {pair} (no valid data found)")
+                _debug(f"[DEBUG-TRACE] No CSV found for {pair}")
+            _debug(f"[DEBUG-TRACE] CSV fallback failed for {pair} (no valid data found)")
         except Exception as e:
-            print(f"[DEBUG-TRACE] Exception in CSV fallback for {pair}: {e}")
+            _debug(f"[DEBUG-TRACE] Exception in CSV fallback for {pair}: {e}")
 
-        print(f"[DEBUG-TRACE] All data sources failed for {pair}, returning None")
+        _debug(f"[DEBUG-TRACE] All data sources failed for {pair}, returning None")
         return None
 
     def _write_reselection_status(self, payload: Dict[str, Any]) -> None:
@@ -754,13 +765,9 @@ class HarmonicSignalConnector:
 
 
     def get_ranked_decisions(self, scan_size: int = 6) -> List[Dict]:
-        from pathlib import Path
-        debug_file = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2\orchestrator_ranked_debug.txt")
-        with debug_file.open("a", encoding="utf-8") as f:
-            f.write(f"[ENTERED get_ranked_decisions] scan_size={scan_size} symbols={self._symbols}\n")
-        print(f"[DEBUG-REGISTRY] [CODE/EXECUTION VERSION ACTIVE] self._symbols: {self._symbols}")
-        print(f"[DEBUG-REGISTRY] [CODE/EXECUTION VERSION ACTIVE] self._pairs: {self._pairs}")
-        print(f"[DEBUG-REGISTRY] [CODE/EXECUTION VERSION ACTIVE] scan_size: {scan_size}")
+        _debug(f"[DEBUG-REGISTRY] symbols={self._symbols}")
+        _debug(f"[DEBUG-REGISTRY] pairs={self._pairs}")
+        _debug(f"[DEBUG-REGISTRY] scan_size={scan_size}")
         # FORCE: Always scan ALL symbols, ignore scan_size
         self._maybe_run_live_reselection()
 
@@ -772,50 +779,18 @@ class HarmonicSignalConnector:
             self._refresh_counter = 0
 
         ranked: List[Dict] = []
-        debug_rows = []
-        print(f"[DEBUG-FORCE] get_ranked_decisions: Forcing scan of ALL symbols (total: {len(self._symbols)})")
+        _debug(f"[DEBUG-FORCE] scanning all symbols (total: {len(self._symbols)})")
         for idx, symbol in enumerate(self._symbols):
             try:
                 decision = self._build_decision_for_symbol(symbol)
                 if decision.get("source", "").startswith("HARMONIC_NO_DATA"):
-                    print(f"[CSV-FALLBACK] {symbol}: NO DATA, fallback triggered, decision={decision}")
+                    _debug(f"[CSV-FALLBACK] {symbol}: no data, decision={decision}")
                 else:
-                    print(f"[DEBUG-FORCE] {symbol}: edge_bps={decision.get('edge_bps', 0.0):.2f}, confidence={decision.get('confidence', 0.0):.2f}, data_mode={decision.get('market_data_mode','none')}, signal={decision.get('signal', 0.0):.3f}")
+                    _debug(f"[DEBUG-FORCE] {symbol}: edge_bps={decision.get('edge_bps', 0.0):.2f}, confidence={decision.get('confidence', 0.0):.2f}, data_mode={decision.get('market_data_mode','none')}, signal={decision.get('signal', 0.0):.3f}")
                 ranked.append(decision)
             except Exception as e:
-                print(f"[DEBUG-FORCE] Exception for {symbol}: {e}")
-        print(f"[DEBUG-FORCE] Ranked {len(ranked)} symbols. Returning all.")
-
-        # Sort by composite: edge_bps × confidence (higher = better opportunity)
-        ranked.sort(
-            key=lambda item: float(item.get("edge_bps", 0.0)) * float(item.get("confidence", 0.0)),
-            reverse=True,
-        )
-        return ranked
-        # FORCE: Always scan ALL symbols, ignore scan_size
-        self._maybe_run_live_reselection()
-
-        # Periodically reload best combo from disk
-        self._refresh_counter += 1
-        refresh_every = max(1, int(self._runtime_cfg.get("live_selection_refresh_every", _SELECTION_REFRESH_EVERY) or _SELECTION_REFRESH_EVERY))
-        if self._refresh_counter >= refresh_every:
-            self.refresh_selection()
-            self._refresh_counter = 0
-
-        ranked: List[Dict] = []
-        debug_rows = []
-        print(f"[DEBUG-FORCE] get_ranked_decisions: Forcing scan of ALL symbols (total: {len(self._symbols)})")
-        for idx, symbol in enumerate(self._symbols):
-            try:
-                decision = self._build_decision_for_symbol(symbol)
-                if decision.get("source", "").startswith("HARMONIC_NO_DATA"):
-                    print(f"[DEBUG-FORCE] {symbol}: NO DATA, fallback triggered, decision={decision}")
-                else:
-                    print(f"[DEBUG-FORCE] {symbol}: edge_bps={decision.get('edge_bps', 0.0):.2f}, confidence={decision.get('confidence', 0.0):.2f}, data_mode={decision.get('market_data_mode','none')}, signal={decision.get('signal', 0.0):.3f}")
-                ranked.append(decision)
-            except Exception as e:
-                print(f"[DEBUG-FORCE] Exception for {symbol}: {e}")
-        print(f"[DEBUG-FORCE] Ranked {len(ranked)} symbols. Returning all.")
+                _debug(f"[DEBUG-FORCE] Exception for {symbol}: {e}")
+        _debug(f"[DEBUG-FORCE] ranked {len(ranked)} symbols")
 
         # Sort by composite: edge_bps × confidence (higher = better opportunity)
         ranked.sort(

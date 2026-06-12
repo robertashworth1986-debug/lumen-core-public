@@ -2,19 +2,29 @@ from __future__ import annotations
 
 import html
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
+).expanduser().resolve()
 EXEC_OUT = ROOT / "out" / "execution"
-DASH = Path(r"C:\LumaTrader\dashboard")
+DASH = Path(
+    os.environ.get("LUMA_DASHBOARD_DIR", str(ROOT / "dashboard"))
+).expanduser().resolve()
 HTML_OUT = DASH / "alpaca_paper_live_dashboard.html"
 STATE_FILE = EXEC_OUT / "binanceus_paper_state.json"
 SCORECARD_FILE = EXEC_OUT / "investor_proof_scorecard.json"
 LEDGER_FILE = EXEC_OUT / "binanceus_paper_ledger.jsonl"
-TWIN_SEED_PATH = Path(r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json")
+TWIN_SEED_PATH = Path(
+    os.environ.get(
+        "LUMA_TWIN_SEED_PATH",
+        r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json",
+    )
+)
 
 
 def load_json(path: Path, default: Any) -> Any:

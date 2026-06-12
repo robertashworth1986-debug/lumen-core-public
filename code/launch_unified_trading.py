@@ -2,7 +2,7 @@
 """
 Unified Trading System Launcher
 ================================
-Starts the complete alpha discovery + execution pipeline:
+Legacy simulation launcher. It does not provide a production live path:
   1. unified_alpha_engine.py — finds alpha signals (arbitrage, momentum, value)
   2. unified_trade_executor.py — executes trades on those signals (paper or live)
   3. Wires both into luma_experience_gateway for real-time dashboard visibility
@@ -11,8 +11,7 @@ Usage:
   # Paper trading (simulated, safe)
   python launch_unified_trading.py --mode paper --daemon
   
-  # Live trading (real execution, requires approval)
-  python launch_unified_trading.py --mode live --daemon
+  # Live mode is rejected. Use execution/live_executor.py after readiness gates.
   
   # Single cycle test
   python launch_unified_trading.py --mode paper
@@ -195,6 +194,17 @@ Examples:
     )
     
     args = parser.parse_args()
+
+    if args.mode == "live":
+        parser.error(
+            "live mode is disabled: unified_alpha_engine uses stub market data "
+            "and unified_trade_executor simulates fills."
+        )
+    if os.environ.get("LUMA_ENABLE_LEGACY_SIMULATION") != "1":
+        parser.error(
+            "legacy unified simulation is retired from production. Set "
+            "LUMA_ENABLE_LEGACY_SIMULATION=1 only for isolated development."
+        )
     
     logger.info(f"Unified Trading System Launcher v1.0")
     logger.info(f"Mode: {args.mode.upper()}")

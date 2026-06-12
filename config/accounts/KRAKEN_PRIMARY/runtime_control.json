@@ -1,6 +1,7 @@
 {
-  "mode": "live",
-  "allow_live_orders": true,
+  "mode": "paper",
+  "allow_live_orders": false,
+  "paper_enabled": true,
   "kill_switch": false,
   "symbol": "UNIVERSE",
   "loop_seconds": 1.0,
@@ -11,6 +12,7 @@
   "account_id": "KRAKEN_PRIMARY",
   "account_provider": "KRAKEN",
   "account_execution_mode": "crypto_exec",
+  "inherits_global_live_gate": true,
   "universe_executable_count": 10,
   "universe_shadow_count": 10
 }

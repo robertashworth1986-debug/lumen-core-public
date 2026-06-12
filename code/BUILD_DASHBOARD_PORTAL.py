@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
-DASH = Path(r"C:\LumaTrader\dashboard")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
+).expanduser().resolve()
+DASH = Path(
+    os.environ.get("LUMA_DASHBOARD_DIR", str(ROOT / "dashboard"))
+).expanduser().resolve()
 HTML_OUT = DASH / "dashboard_portal.html"
 INDEX_OUT = DASH / "index.html"
 UNIFIED_FILE = DASH / "LUMENCORE_MASTER_DASHBOARD_UNIFIED_20260425.html"
@@ -16,7 +21,12 @@ SCOUT_FILE = DASH / "lumascout_dashboard.html"
 SCORECARD = ROOT / "out" / "execution" / "investor_proof_scorecard.json"
 SCOUT_SUMMARY = ROOT / "LamaScout" / "reports" / "artist_scout_summary.json"
 SECTOR_MATRIX = ROOT / "out" / "sector_value_matrix.json"
-TWIN_SEED_PATH = Path(r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json")
+TWIN_SEED_PATH = Path(
+    os.environ.get(
+        "LUMA_TWIN_SEED_PATH",
+        r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json",
+    )
+)
 
 
 def load_json(path: Path, default: Any) -> Any:

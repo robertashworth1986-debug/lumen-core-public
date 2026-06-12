@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -18,9 +19,13 @@ except Exception:
     duckdb = None
 
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
+).expanduser().resolve()
 OUT = ROOT / "out"
-DASH = Path(r"C:\LumaTrader\dashboard")
+DASH = Path(
+    os.environ.get("LUMA_DASHBOARD_DIR", str(ROOT / "dashboard"))
+).expanduser().resolve()
 
 SECTOR_MATRIX = OUT / "sector_economic_impact_matrix.json"
 OPP_GAIN = OUT / "opportunity_gain_matrix_updated.json"

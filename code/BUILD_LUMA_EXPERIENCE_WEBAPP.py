@@ -1,10 +1,18 @@
 from __future__ import annotations
 
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
 
 STAMP_RE = re.compile(r"(Generated UTC:\s*)([^<]+)")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
+).expanduser().resolve()
+DASH = Path(
+    os.environ.get("LUMA_DASHBOARD_DIR", str(ROOT / "dashboard"))
+).expanduser().resolve()
+OUT = DASH / "luma_experience.html"
 
 
 def _score_source(text: str) -> tuple[int, int]:
@@ -49,20 +57,12 @@ def _load_best_source(candidates: list[Path]) -> tuple[Path, str]:
 
 
 def main() -> None:
-    stack_root = Path(__file__).resolve().parent.parent
-    workspace_root = stack_root.parent
-
-    top_dash = workspace_root / "dashboard" / "luma_experience.html"
-    stack_dash = stack_root / "dashboard" / "luma_experience.html"
-
-    source, html = _load_best_source([top_dash, stack_dash])
+    source, html = _load_best_source([OUT])
     html = _update_generated_stamp(html)
 
-    targets = [top_dash, stack_dash]
-    for target in targets:
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(html, encoding="utf-8")
-        print(str(target))
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text(html, encoding="utf-8")
+    print(str(OUT))
 
     print(f"[sync] source={source}")
 

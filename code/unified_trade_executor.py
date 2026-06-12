@@ -4,7 +4,7 @@ Unified Trade Executor — Paper & Live Trading on Thousands of Symbols
 =======================================================================
 Takes alpha signals from unified_alpha_engine.py and executes:
   • Paper trading (simulated, tracks all metrics for validation)
-  • Live trading (real execution on Kraken/Alpaca/etc when approved)
+  • Paper simulation only. Live mode is intentionally blocked.
   • Position sizing using Kelly criterion
   • Risk management (stops, take-profits, max drawdown)
   • Real-time P&L tracking (replaces stale -37% metric)
@@ -24,8 +24,7 @@ Core features:
      Records all decisions to audit trail (CLV equivalent)
   
   4. LIVE EXECUTION
-     Same logic as paper, but submits real orders
-     Requires user approval (via API gate or dashboard)
+     Not implemented. Use execution/live_executor.py for real orders.
   
   5. REAL P&L TRACKING
      Daily P&L calculation
@@ -46,7 +45,7 @@ Outputs:
 Usage:
   python unified_trade_executor.py                    # single loop
   python unified_trade_executor.py --daemon           # continuous
-  python unified_trade_executor.py --mode live        # real execution
+  python unified_trade_executor.py --mode live        # rejected: simulation is not live-safe
 """
 
 import argparse
@@ -574,6 +573,13 @@ def main():
     
     global MODE
     MODE = args.mode
+
+    if MODE == "live":
+        parser.error(
+            "live mode is disabled: this legacy executor only simulates price "
+            "movement and never submits exchange orders. Use "
+            "code/execution/live_executor.py after production readiness gates pass."
+        )
     
     if args.daemon:
         asyncio.run(daemon_loop())

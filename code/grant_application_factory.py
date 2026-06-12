@@ -72,6 +72,8 @@ GRANTS = OUT / "grants"
 QUEUE_DIR = GRANTS / "_queue"
 APPROVED_DIR = GRANTS / "_approved"
 LIVE_SOURCE_REGISTRY = ROOT / "config" / "live_source_registry.json"
+DATASET_CATALOG_PATH = OUT / "dataset_catalog.json"
+DATA_BREADTH_PROBE_PATH = OUT / "ops" / "data_breadth_runtime_probe_latest.json"
 HUNTER_PROFILE_PATH = ROOT / "code" / "grants_profile_lumencore.json"
 OPPORTUNITY_SCAN_PATH = QUEUE_DIR / "opportunity_scan.json"
 
@@ -296,7 +298,106 @@ def _days_to_close(close_date: str) -> int:
     dt = _parse_date(close_date)
     if not dt:
         return 9999
-    return max(0, (dt - datetime.now(timezone.utc)).days)
+    return (dt.date() - datetime.now(timezone.utc).date()).days
+
+
+def _program_window_assessment(program: dict[str, Any]) -> dict[str, Any]:
+    deadline_raw = str(program.get("deadline_typical") or "").strip()
+    state_raw = str(program.get("current_state") or "").strip()
+    state = _norm_text(state_raw)
+    deadline = _parse_date(deadline_raw)
+    source_meta = program.get("source_metadata")
+    if not isinstance(source_meta, dict):
+        source_meta = {}
+    source_name = str(source_meta.get("source") or "catalog").strip().lower()
+    verified_at = _parse_date(
+        source_meta.get("discovered_utc")
+        or program.get("source_verified_utc")
+    )
+    verification_age_days = (
+        (datetime.now(timezone.utc) - verified_at).total_seconds() / 86400.0
+        if verified_at is not None
+        else None
+    )
+    days_remaining = (
+        (deadline.date() - datetime.now(timezone.utc).date()).days
+        if deadline is not None
+        else None
+    )
+
+    closed_markers = (
+        "closed",
+        "cancelled",
+        "canceled",
+        "archived",
+        "between cycle",
+        "between_cycles",
+        "not yet released",
+        "future",
+        "tba",
+    )
+    if any(marker in state for marker in closed_markers):
+        return {
+            "status": "unavailable",
+            "actionable": False,
+            "reason": f"current_state={state_raw or 'unknown'}",
+            "deadline": deadline.date().isoformat() if deadline else deadline_raw or None,
+            "days_remaining": days_remaining,
+        }
+    if deadline is not None and days_remaining is not None and days_remaining < 0:
+        return {
+            "status": "expired",
+            "actionable": False,
+            "reason": "deadline_passed",
+            "deadline": deadline.date().isoformat(),
+            "days_remaining": days_remaining,
+        }
+    max_source_age_days = 7.0 if source_name == "grants_gov_live_scan" else 30.0
+    if verification_age_days is None or verification_age_days > max_source_age_days:
+        return {
+            "status": "verification_required",
+            "actionable": False,
+            "reason": (
+                "source_never_verified"
+                if verification_age_days is None
+                else f"source_verification_stale_{verification_age_days:.1f}_days"
+            ),
+            "deadline": deadline.date().isoformat() if deadline else deadline_raw or None,
+            "days_remaining": days_remaining,
+            "source": source_name,
+            "source_verified_utc": verified_at.isoformat() if verified_at else None,
+        }
+    if deadline is not None:
+        return {
+            "status": "open",
+            "actionable": True,
+            "reason": "dated_window_open",
+            "deadline": deadline.date().isoformat(),
+            "days_remaining": days_remaining,
+        }
+    if "open" in state or "posted" in state:
+        return {
+            "status": "open",
+            "actionable": True,
+            "reason": f"current_state={state_raw}",
+            "deadline": deadline_raw or None,
+            "days_remaining": None,
+        }
+    if "rolling" in _norm_text(deadline_raw):
+        return {
+            "status": "verification_required",
+            "actionable": False,
+            "reason": "rolling_window_requires_current_source_verification",
+            "deadline": deadline_raw,
+            "days_remaining": None,
+        }
+    return {
+        "status": "verification_required",
+        "actionable": False,
+        "reason": "no_verified_open_window",
+        "deadline": deadline_raw or None,
+        "days_remaining": None,
+    }
 
 
 def _read_live_source_registry() -> dict[str, Any]:
@@ -331,6 +432,16 @@ def _read_live_source_registry() -> dict[str, Any]:
         "active_sectors": sorted(set(active_sectors)),
         "active_source_count": len(set(active_sources)),
         "active_sector_count": len(set(active_sectors)),
+        "measured_source_count": len({
+            str(row.get("source") or "").strip().upper()
+            for row in active_rows
+            if str(row.get("evidence_basis") or "").upper() == "MEASURED_FILE_MATCH"
+        }),
+        "credential_only_source_count": len({
+            str(row.get("source") or "").strip().upper()
+            for row in active_rows
+            if str(row.get("evidence_basis") or "").upper() == "KEY_ONLY"
+        }),
         "active_rows": active_rows,
     }
 
@@ -342,8 +453,54 @@ def _registry_layer_summary() -> dict[str, Any]:
         "paper_live_linked": reg.get("paper_live_linked"),
         "active_source_count": reg.get("active_source_count"),
         "active_sector_count": reg.get("active_sector_count"),
+        "measured_source_count": reg.get("measured_source_count"),
+        "credential_only_source_count": reg.get("credential_only_source_count"),
         "active_sources": reg.get("active_sources", []),
         "active_sectors": reg.get("active_sectors", []),
+    }
+
+
+def _file_provenance(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {"path": str(path), "exists": False}
+    h = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1 << 20), b""):
+            h.update(chunk)
+    return {
+        "path": str(path.resolve()),
+        "exists": True,
+        "size_bytes": path.stat().st_size,
+        "modified_utc": datetime.fromtimestamp(
+            path.stat().st_mtime, tz=timezone.utc
+        ).isoformat(),
+        "sha256": h.hexdigest(),
+    }
+
+
+def _measured_breadth_summary() -> dict[str, Any]:
+    probe = _read_or_none(DATA_BREADTH_PROBE_PATH) or {}
+    catalog = _read_or_none(DATASET_CATALOG_PATH) or {}
+    ds = probe.get("dataset_summary") if isinstance(probe.get("dataset_summary"), dict) else {}
+    scan = catalog.get("scan") if isinstance(catalog.get("scan"), dict) else {}
+    scan_limit = _safe_int(scan.get("scan_limit"), 0) or 0
+    files_considered = _safe_int(scan.get("files_considered"), 0) or 0
+    return {
+        "scope": "measured_artifact_catalog_not_live_series_count",
+        "generated_utc": probe.get("generated_utc") or catalog.get("generated_utc"),
+        "artifacts_measured": _safe_int(ds.get("datasets_measured"), 0) or 0,
+        "parse_ok_count": _safe_int(ds.get("parse_ok_count"), 0) or 0,
+        "parse_ok_pct": _safe_float(ds.get("parse_ok_pct"), 0.0) or 0.0,
+        "rows_total": _safe_int(ds.get("rows_total"), 0) or 0,
+        "bytes_total": _safe_int(ds.get("bytes_total"), 0) or 0,
+        "zip_members_measured": _safe_int(ds.get("zipped_member_count"), 0) or 0,
+        "scan_limit": scan_limit,
+        "files_considered": files_considered,
+        "catalog_capped": bool(scan_limit and files_considered >= scan_limit),
+        "provenance": {
+            "runtime_probe": _file_provenance(DATA_BREADTH_PROBE_PATH),
+            "dataset_catalog": _file_provenance(DATASET_CATALOG_PATH),
+        },
     }
 
 
@@ -647,7 +804,7 @@ def _score_live_hit(hit: dict[str, Any], hunter_profile: dict) -> dict[str, Any]
 
     if 0 < days <= 7:
         score += 20.0
-    elif days <= 30:
+    elif 0 < days <= 30:
         score += 10.0
     elif days == 9999:
         score -= 3.0
@@ -881,7 +1038,7 @@ def discover_live_programs(
             continue
         days = int(scored.get("days_to_close") or 9999)
         score = float(scored.get("score") or 0.0)
-        if days == 0:
+        if days <= 0:
             continue
         if days == 9999 and score < 26:
             continue
@@ -997,6 +1154,7 @@ def build_evidence_summary(utc: str) -> dict:
     layers = {
         "benchmark": {
             "n_datasets": n_total,
+            "claim_scope": "frozen_benchmark_evaluated_series",
             "n_models": 9,
             "n_families": 5,
             "family_win_counts": fwc,
@@ -1043,6 +1201,7 @@ def build_evidence_summary(utc: str) -> dict:
             "n_variance_break": regime.get("n_with_variance_regime_break"),
             "params": regime.get("params"),
         },
+        "measured_breadth": _measured_breadth_summary(),
         "active_registry": _registry_layer_summary(),
     }
     return {"run_utc": utc, "layers": layers}
@@ -1309,6 +1468,24 @@ def score_eligibility(program: dict, profile: dict, evidence: dict) -> dict:
             reasons.append(f"PI employed {pct}% ✓")
     if e.get("phase_i_completed_required"):
         gaps.append("Phase I completion needed (status: TO_BE_FILLED)")
+        eligible = False
+
+    window = _program_window_assessment(program)
+    if not window.get("actionable"):
+        eligible = False
+        gaps.append(
+            "Opportunity is not currently actionable: "
+            f"{window.get('status')} ({window.get('reason')})"
+        )
+    else:
+        reasons.append(
+            "Opportunity window verified open"
+            + (
+                f" ({window.get('days_remaining')} days remaining)"
+                if window.get("days_remaining") is not None
+                else ""
+            )
+        )
 
     # Topical fit — fraction of fit_keywords mentioned in capabilities
     caps_text = " ".join(profile.get("company_capabilities", []) +
@@ -1354,6 +1531,7 @@ def score_eligibility(program: dict, profile: dict, evidence: dict) -> dict:
         "topical_fit": round(fit, 3),
         "evidence_bonus": round(ev_score, 3),
         "opportunity_bonus": round(opp_bonus, 3),
+        "opportunity_window": window,
         "reasons": reasons,
         "gaps": gaps,
     }
@@ -1372,6 +1550,7 @@ def render_project_summary(
     ben = L["benchmark"]
     rt = L["meta_router"]
     cal = L["ci_calibration"]
+    breadth = L.get("measured_breadth", {})
     n = ben.get("n_datasets") or "—"
     rt_rate = rt.get("win_rate")
     rt_pct = f"{rt_rate*100:.1f}%" if isinstance(rt_rate, (int, float)) else "—"
@@ -1405,7 +1584,10 @@ def render_project_summary(
     active_sources = registry.get("active_sources") if isinstance(registry.get("active_sources"), list) else []
     if active_sectors or active_sources:
         sector_line = (
-            f"- **Active registry scope:** {len(active_sectors)} sectors / {len(active_sources)} sources live; "
+            f"- **Enabled source registry:** {len(active_sectors)} sectors / {len(active_sources)} "
+            f"credentialed or public-data sources; "
+            f"{registry.get('measured_source_count', 0)} have measured local artifacts and "
+            f"{registry.get('credential_only_source_count', 0)} are credential-only. "
             f"sector list = {', '.join(map(str, active_sectors[:8]))}.\n"
         )
 
@@ -1437,10 +1619,14 @@ def render_project_summary(
         f"series, plus six independent evidence layers — all SHA-256 verifiable, "
         f"all reproducible from one frozen benchmark.\n\n"
         f"## Headline results (frozen run `{ev['run_utc']}`)\n"
-        f"- **{n} live federal/market datasets** evaluated head-to-head across 9 "
+        f"- **{n} frozen benchmark series** evaluated head-to-head across 9 "
         f"models in 5 families.\n"
-        f"- **Meta-router** beats every fixed family: {rt.get('wins')}/{rt.get('n')} "
-        f"wins ({rt_pct}); median rel-RMSE vs oracle = "
+        f"- **Measured data breadth:** {breadth.get('artifacts_measured', 0):,} physical/archive "
+        f"artifacts measured, {breadth.get('parse_ok_count', 0):,} parsed successfully, "
+        f"covering {breadth.get('rows_total', 0):,} rows. This catalog is broader than, "
+        f"and is not represented as identical to, the frozen benchmark or live feeds.\n"
+        f"- **Meta-router evaluation:** {rt.get('wins')}/{rt.get('n')} "
+        f"series-level wins ({rt_pct}); median rel-RMSE vs oracle = "
         f"{rt.get('median_rel_rmse_vs_oracle')}.\n"
         f"- **Calibrated uncertainty:** 80% bands cover {c80s} empirically; 95% "
         f"bands cover {c95s} (target 80% / 95%).\n"
@@ -1500,7 +1686,7 @@ def render_technical_volume(
         f"models keep predicting yesterday's world.\n\n"
         f"## 2. Approach (seven verifiable layers)\n\n"
         f"**Layer 1 — Master benchmark.** {L['benchmark'].get('n_datasets')} "
-        f"live datasets × 9 models × 5 families: baseline, harmonic, neural, "
+        f"frozen benchmark series × 9 models × 5 families: baseline, harmonic, neural, "
         f"tree, classical. Walk-forward 80/20 split per dataset. RMSE per "
         f"(dataset, model). Frozen output: SHA-256 chain in "
         f"`out/master_universe_v2/<UTC>/manifest.sha256.json`.\n\n"
@@ -1537,7 +1723,8 @@ def render_technical_volume(
         f"## 3. Why this is novel\n"
         + "\n".join(f"- {d}" for d in profile.get("differentiators", [])) + "\n\n"
         f"## 4. Phase {('II' if 'phase_ii' in program['id'] else 'I')} milestones\n"
-        f"- M1 (month 1): Expand benchmark universe to 1,500 datasets.\n"
+        f"- M1 (month 1): Deduplicate the measured artifact catalog and promote "
+        f"at least 1,500 distinct, quality-controlled series into the benchmark.\n"
         f"- M2 (month 2): Retrain router on expanded universe; target "
         f"≥55% per-dataset wins.\n"
         f"- M3 (month 3): Ship live REST + WebSocket API for forecast "
@@ -1558,6 +1745,17 @@ def render_technical_volume(
 
 
 def render_commercialization(program: dict, profile: dict, ev: dict) -> str:
+    verified_letters = [
+        str(letter).strip()
+        for letter in profile.get("team_letters_of_support", [])
+        if str(letter).strip()
+        and not str(letter).strip().upper().startswith("TO_BE_FILLED")
+    ]
+    letters_text = (
+        "\n".join(f"- {letter}" for letter in verified_letters)
+        if verified_letters
+        else "- No third-party letter is claimed in this draft; add only executed letters permitted by the solicitation."
+    )
     return (
         f"# Commercialization Plan\n\n"
         f"## Market\n"
@@ -1583,7 +1781,7 @@ def render_commercialization(program: dict, profile: dict, ev: dict) -> str:
         f"## Competitive positioning\n"
         + "\n".join(f"- {d}" for d in profile.get("differentiators", [])) + "\n\n"
         f"## Letters of support (commitments)\n"
-        + "\n".join(f"- {l}" for l in profile.get("team_letters_of_support", [])) + "\n\n"
+        + letters_text + "\n\n"
         f"## Path to follow-on funding\n"
         f"Phase I → Phase II ({program.get('ceiling_usd')}) → enterprise pilots "
         f"→ Series Seed (LumenCore as standalone product company). "
@@ -1595,34 +1793,41 @@ def render_budget(program: dict, profile: dict) -> dict:
     """Generate a default budget that fits the program ceiling."""
     ceiling = int(program.get("ceiling_usd") or 200_000)
     months = int(program.get("duration_months") or 6)
-    pi_loaded_rate_per_month = 18_500  # blended
-    pi_total = pi_loaded_rate_per_month * months
-    if pi_total > ceiling * 0.55:
-        pi_total = int(ceiling * 0.55)
+    pi_loaded_rate_per_month = 18_500
+    pi_total = min(
+        pi_loaded_rate_per_month * months,
+        int(ceiling * 0.42),
+    )
     fringe = int(pi_total * 0.27)
-    indirect = int((pi_total + fringe) * 0.45)
-    travel = min(7_500, int(ceiling * 0.04))
+    travel = min(7_500, int(ceiling * 0.03))
     cloud = min(15_000, int(ceiling * 0.08))
-    materials = min(5_000, int(ceiling * 0.025))
-    consultants = max(0, ceiling - (pi_total + fringe + indirect + travel + cloud + materials))
+    materials = min(5_000, int(ceiling * 0.02))
+    consultants = int(ceiling * 0.12)
+    committed = pi_total + fringe + travel + cloud + materials + consultants
+    indirect = max(0, ceiling - committed)
+    total = committed + indirect
+    if total != ceiling:
+        raise RuntimeError(
+            f"budget allocator invariant failed: total={total} ceiling={ceiling}"
+        )
     return {
         "ceiling_usd": ceiling,
         "duration_months": months,
         "categories": {
             "pi_salary": pi_total,
             "fringe_benefits_27pct": fringe,
-            "indirect_costs_45pct": indirect,
+            "indirect_costs_provisional": indirect,
             "travel_conferences": travel,
             "cloud_compute": cloud,
             "materials_supplies": materials,
             "consultants_subawards": consultants,
         },
-        "total": pi_total + fringe + indirect + travel + cloud + materials + consultants,
+        "total": total,
         "notes": [
-            "PI rate is blended W-2 equivalent; final invoicing per fully-loaded actuals.",
+            "PI rate is a planning assumption; final salary and effort must match payroll and solicitation rules.",
             "Cloud compute covers GPU training + on-demand FastAPI hosting.",
-            "Consultants line reserved for energy-domain SME advisor for "
-            "regulatory / pilot integration.",
+            "Indirect costs are a balancing planning reserve, not a claimed negotiated rate; validate the allowed base and rate before submission.",
+            "Consultants/subawards require quotes, scopes, and solicitation-specific allowability review.",
         ],
     }
 
@@ -1638,7 +1843,7 @@ def render_cover_letter(program: dict, profile: dict, ev: dict) -> str:
         f"under {program['program']}. Our LumenCore™ stack is a production, "
         f"evidence-chained forecasting platform with seven independent, "
         f"SHA-256-verifiable measurement layers — built on "
-        f"{ev['layers']['benchmark'].get('n_datasets')} live datasets and "
+        f"{ev['layers']['benchmark'].get('n_datasets')} frozen benchmark series and "
         f"validated end-to-end before this submission was assembled.\n\n"
         f"Every quantitative claim in the attached package resolves to a "
         f"public manifest entry at https://lumen-core.ai/evidence/runs/"
@@ -1699,6 +1904,68 @@ def render_application_md(program: dict, profile: dict, ev: dict, budget: dict) 
     return "\n".join(parts) + "\n"
 
 
+def _is_nsf_sbir(program: dict[str, Any]) -> bool:
+    source_meta = program.get("source_metadata")
+    if not isinstance(source_meta, dict):
+        source_meta = {}
+    blob = _norm_text(
+        " ".join(
+            [
+                str(program.get("id") or ""),
+                str(program.get("agency") or ""),
+                str(program.get("program") or ""),
+                str(source_meta.get("synopsis_excerpt") or ""),
+                str((source_meta.get("agency_contact") or {}).get("name") or ""),
+            ]
+        )
+    )
+    return "nsf" in blob and (
+        "sbir" in blob or "small business innovation research" in blob
+    )
+
+
+def render_nsf_project_pitch(program: dict, profile: dict, ev: dict) -> str:
+    benchmark = ev["layers"]["benchmark"]
+    breadth = ev["layers"].get("measured_breadth", {})
+    return (
+        f"# NSF Project Pitch - {profile['company']['dba']}\n\n"
+        f"## 1. Technology innovation\n"
+        f"LumenCore is an evidence-chained forecasting and decision platform that "
+        f"tests multiple model families per time series, routes each series to the "
+        f"best-performing family, calibrates uncertainty empirically, and detects "
+        f"anomalies and regime changes. The technical risk is whether model-family "
+        f"selection and uncertainty calibration can remain reliable across sectors "
+        f"without hiding weak cases behind a single aggregate score.\n\n"
+        f"## 2. Technical objectives and challenges\n"
+        f"Phase I will: (1) deduplicate and quality-rank the measured data catalog; "
+        f"(2) expand the current frozen benchmark of "
+        f"{benchmark.get('n_datasets')} evaluated series; (3) run leakage-resistant "
+        f"walk-forward validation and calibration; (4) quantify failure modes by "
+        f"sector and regime; and (5) expose signed evidence artifacts through a "
+        f"reviewable API. The local catalog currently measures "
+        f"{breadth.get('artifacts_measured', 0):,} artifacts and "
+        f"{breadth.get('rows_total', 0):,} rows, but those counts are not claimed "
+        f"as distinct live feeds or benchmarked series.\n\n"
+        f"## 3. Market opportunity\n"
+        f"Initial customers are operators that need auditable forecasts rather than "
+        f"opaque point predictions: energy and infrastructure teams, regulated data "
+        f"operations, and enterprise risk groups. The commercialization test is a "
+        f"paid pilot in which LumenCore is measured against the customer's incumbent "
+        f"forecast and alert workflow on accuracy, calibration, latency, and operator "
+        f"time saved.\n\n"
+        f"## 4. Company and team\n"
+        f"{profile['company']['legal_name']} is a U.S.-owned small business led by "
+        f"{profile['pi']['name']}, {profile['pi']['title']}. The current system includes "
+        f"data ingestion, multi-family forecasting, uncertainty calibration, anomaly "
+        f"detection, signed evidence manifests, and deployed API surfaces. Phase I "
+        f"funding would convert the research stack into a repeatable, independently "
+        f"validated product with documented security and deployment controls.\n\n"
+        f"## Submission status\n"
+        f"This file is a draft for the NSF Project Pitch gate. It does not claim an "
+        f"NSF invitation or authorization to submit a full proposal.\n"
+    )
+
+
 # ----------------------------------------------------------------------------
 # Bundle writer
 # ----------------------------------------------------------------------------
@@ -1721,11 +1988,18 @@ def write_bundle(program: dict, profile: dict, ev: dict,
     tech_md = render_technical_volume(program, profile, ev, spotlights=spotlights)
     comm_md = render_commercialization(program, profile, ev)
     cover = render_cover_letter(program, profile, ev)
+    project_pitch = (
+        render_nsf_project_pitch(program, profile, ev)
+        if _is_nsf_sbir(program)
+        else None
+    )
 
     (out_dir / "application.md").write_text(app_md, encoding="utf-8")
     (out_dir / "technical_volume.md").write_text(tech_md, encoding="utf-8")
     (out_dir / "commercialization_plan.md").write_text(comm_md, encoding="utf-8")
     (out_dir / "cover_letter.md").write_text(cover, encoding="utf-8")
+    if project_pitch is not None:
+        (out_dir / "PROJECT_PITCH.md").write_text(project_pitch, encoding="utf-8")
     (out_dir / "budget.json").write_text(
         json.dumps(budget, indent=2), encoding="utf-8")
 
@@ -1749,6 +2023,11 @@ def write_bundle(program: dict, profile: dict, ev: dict,
         "page_limits": program.get("page_limits"),
         "source_metadata": program.get("source_metadata", {}),
         "evidence_spotlights": spotlights,
+        "current_state": program.get("current_state"),
+        "source_verified_utc": program.get("source_verified_utc"),
+        "source_verification_url": program.get("source_verification_url"),
+        "opportunity_window": _program_window_assessment(program),
+        "submission_readiness": profile.get("submission_readiness", {}),
     }
     (out_dir / "application.json").write_text(
         json.dumps(application_json, indent=2), encoding="utf-8")
@@ -1776,6 +2055,11 @@ def write_bundle(program: dict, profile: dict, ev: dict,
             "local_path": str((ROOT / "dashboard" / "evidence" / "runs" /
                                ev["run_utc"]).resolve()),
             "layers": list(ev["layers"].keys()),
+            "artifact_provenance": {
+                "data_breadth_runtime_probe": _file_provenance(DATA_BREADTH_PROBE_PATH),
+                "dataset_catalog": _file_provenance(DATASET_CATALOG_PATH),
+                "live_source_registry": _file_provenance(LIVE_SOURCE_REGISTRY),
+            },
         }, indent=2), encoding="utf-8")
 
     # SHA-256 manifest of this bundle
@@ -1799,6 +2083,12 @@ def write_bundle(program: dict, profile: dict, ev: dict,
 def update_queue() -> dict:
     QUEUE_DIR.mkdir(parents=True, exist_ok=True)
     items: list[dict] = []
+    catalog_payload = _read_or_none(DATA / "grant_catalog.json") or {}
+    catalog_by_id = {
+        str(row.get("id")): row
+        for row in catalog_payload.get("programs", [])
+        if isinstance(row, dict) and row.get("id")
+    }
     if GRANTS.exists():
         for prog_dir in sorted(GRANTS.iterdir()):
             if not prog_dir.is_dir() or prog_dir.name.startswith("_"):
@@ -1811,18 +2101,36 @@ def update_queue() -> dict:
             state = _read_or_none(latest / "approval_state.json") or {}
             app = _read_or_none(latest / "application.json") or {}
             source_meta = app.get("source_metadata") if isinstance(app.get("source_metadata"), dict) else {}
+            catalog_program = catalog_by_id.get(prog_dir.name, {})
+            window_input = dict(app)
+            for key in (
+                "deadline_typical",
+                "current_state",
+                "url",
+                "source_verified_utc",
+                "source_verification_url",
+            ):
+                if catalog_program.get(key) is not None:
+                    window_input[key] = catalog_program.get(key)
+            window = _program_window_assessment(window_input)
+            effective_state = state.get("state", "draft")
+            if effective_state == "approved" and not window.get("actionable"):
+                effective_state = "stale_approved"
             items.append({
                 "program_id": prog_dir.name,
                 "latest_utc": latest.name,
                 "state": state.get("state", "draft"),
+                "effective_state": effective_state,
                 "approved_utc": state.get("approved_utc"),
                 "score": elig.get("score"),
                 "eligible": elig.get("eligible"),
                 "agency": app.get("agency"),
                 "program": app.get("program"),
                 "ceiling_usd": app.get("ceiling_usd"),
-                "deadline_typical": app.get("deadline_typical"),
-                "url": app.get("url"),
+                "deadline_typical": window_input.get("deadline_typical"),
+                "url": window_input.get("url"),
+                "opportunity_window": window,
+                "actionable": bool(window.get("actionable")) and bool(elig.get("eligible")),
                 "source": source_meta.get("source", "catalog"),
                 "opportunity_id": source_meta.get("opportunity_id"),
                 "opp_num": source_meta.get("opp_num"),
@@ -1847,6 +2155,10 @@ def update_queue() -> dict:
         "n_draft": sum(1 for i in items if i["state"] == "draft"),
         "n_approved": sum(1 for i in items if i["state"] == "approved"),
         "n_submitted": sum(1 for i in items if i["state"] == "submitted"),
+        "n_actionable": sum(1 for i in items if i.get("actionable")),
+        "n_stale_approved": sum(
+            1 for i in items if i.get("effective_state") == "stale_approved"
+        ),
         "opportunity_scan": scan_summary,
         "items": items,
     }
@@ -1863,6 +2175,32 @@ def approve(program_id: str) -> dict:
     if not runs:
         raise SystemExit(f"no runs in {prog_dir}")
     latest = runs[-1]
+    app = _read_or_none(latest / "application.json") or {}
+    catalog_payload = _read_or_none(DATA / "grant_catalog.json") or {}
+    catalog_program = next(
+        (
+            row
+            for row in catalog_payload.get("programs", [])
+            if isinstance(row, dict) and row.get("id") == program_id
+        ),
+        {},
+    )
+    window_input = dict(app)
+    for key in (
+        "deadline_typical",
+        "current_state",
+        "url",
+        "source_verified_utc",
+        "source_verification_url",
+    ):
+        if catalog_program.get(key) is not None:
+            window_input[key] = catalog_program.get(key)
+    window = _program_window_assessment(window_input)
+    if not window.get("actionable"):
+        raise SystemExit(
+            f"refusing approval for non-actionable opportunity {program_id}: "
+            f"{window.get('status')} ({window.get('reason')})"
+        )
     state_p = latest / "approval_state.json"
     state = json.loads(state_p.read_text(encoding="utf-8"))
     state["state"] = "approved"

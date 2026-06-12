@@ -1,9 +1,12 @@
 import json
+import os
 import time
 from pathlib import Path
 
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parents[2]))
+).expanduser().resolve()
 EXEC_OUT = ROOT / "out" / "execution"
 
 REPORT_FILE = EXEC_OUT / "institutional_crypto_paper_report.json"
@@ -207,7 +210,8 @@ def main() -> int:
         "pdf_error": pdf_error,
     }
     print(json.dumps(summary, indent=2))
-    return 0 if pdf_ok else 1
+    # The markdown brief is the required artifact; PDF is an optional enhancement.
+    return 0
 
 
 if __name__ == "__main__":

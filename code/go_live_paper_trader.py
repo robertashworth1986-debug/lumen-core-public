@@ -97,19 +97,11 @@ def write_proof(runtime_control: dict, paper_runtime: dict, confirm: dict) -> No
 
 
 def main() -> int:
-    runtime_control = arm_live_mode()
-    paper_runtime = arm_paper_runtime()
-    confirm = create_live_arm_confirm()
-    write_proof(runtime_control, paper_runtime, confirm)
-
-    print("=== LIVE PAPER TRADER ARMING COMPLETE ===")
-    print(f"Runtime control updated: {runtime_control['path']}")
-    print(f"Paper runtime updated: {paper_runtime['path']}")
-    print(f"Live arm confirm file: {confirm['path']}")
-    print(f"Proof artifact: {PROOF_FILE}")
-    print("")
-    print("Next step: run RUN_ALPACA_PAPER_247.ps1 to start the live paper loop.")
-    return 0
+    print("REFUSED: legacy live arming script is retired.")
+    print("It mixed paper and live flags, enabled gate overrides, and wrote a")
+    print("confirmation file without validating heartbeats, balances, or risk.")
+    print("Use the institutional live executor readiness workflow instead.")
+    return 2
 
 
 if __name__ == '__main__':

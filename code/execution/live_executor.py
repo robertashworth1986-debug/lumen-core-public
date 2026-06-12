@@ -3862,6 +3862,13 @@ class RobustLiveExecutor:
                 _wl_path = Path(__file__).resolve().parent.parent.parent / _wl_path
             _wl_payload = load_json(_wl_path, {})
             if isinstance(_wl_payload, dict):
+                _authorized = (
+                    bool(_wl_payload.get("execution_authorized", False))
+                    and str(_wl_payload.get("evidence_status") or "").lower()
+                    in {"walk_forward_validated", "production_validated"}
+                )
+                if not _authorized:
+                    return [], False
                 _wl_generated = str(_wl_payload.get("generated_utc", "") or "")
                 _wl_fresh = True
                 if _wl_generated:
@@ -5450,7 +5457,16 @@ class RobustLiveExecutor:
                 if not _wl_path.is_absolute():
                     _wl_path = _pathlib.Path(__file__).resolve().parent.parent.parent / _wl_path
                 _wl_data = _json.loads(_wl_path.read_text())
-                self._moonshot_watchlist_cache = [str(s).upper() for s in _wl_data.get("watchlist", [])]
+                _authorized = (
+                    bool(_wl_data.get("execution_authorized", False))
+                    and str(_wl_data.get("evidence_status") or "").lower()
+                    in {"walk_forward_validated", "production_validated"}
+                )
+                self._moonshot_watchlist_cache = (
+                    [str(s).upper() for s in _wl_data.get("watchlist", [])]
+                    if _authorized
+                    else []
+                )
                 self._moonshot_watchlist_cache_ts = _now_m
             except Exception:
                 return 1.0
@@ -7201,7 +7217,16 @@ class RobustLiveExecutor:
                     if not _wl22.is_absolute():
                         _wl22 = _p22.Path(__file__).resolve().parent.parent.parent / _wl22
                     _wd22 = _j22.loads(_wl22.read_text())
-                    self._moonshot_watchlist_cache = [str(s).upper() for s in _wd22.get("watchlist", [])]
+                    _authorized22 = (
+                        bool(_wd22.get("execution_authorized", False))
+                        and str(_wd22.get("evidence_status") or "").lower()
+                        in {"walk_forward_validated", "production_validated"}
+                    )
+                    self._moonshot_watchlist_cache = (
+                        [str(s).upper() for s in _wd22.get("watchlist", [])]
+                        if _authorized22
+                        else []
+                    )
                     self._moonshot_watchlist_cache_ts = _now22
                 except Exception:
                     pass

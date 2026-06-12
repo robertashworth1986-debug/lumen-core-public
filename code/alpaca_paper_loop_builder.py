@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 import os
 import json
@@ -8,12 +10,16 @@ from datetime import datetime, timezone
 
 import requests
 
-ROOT  = Path(r"C:\LumaTrader")
-STACK = ROOT / "INSTITUTIONAL_STACK_V2"
+STACK = Path(
+    os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
+).expanduser().resolve()
+ROOT = STACK.parent
 CODE  = STACK / "code"
 CFG   = STACK / "config"
 OUT   = STACK / "out"
-DASH  = ROOT / "dashboard"
+DASH = Path(
+    os.environ.get("LUMA_DASHBOARD_DIR", str(STACK / "dashboard"))
+).expanduser().resolve()
 
 for p in [CODE, CFG, OUT, DASH]:
     p.mkdir(parents=True, exist_ok=True)

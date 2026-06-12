@@ -10,7 +10,13 @@
 set -euo pipefail
 
 DOMAIN="${LUMA_DOMAIN:-${1:-lumen-core.ai}}"
-SERVICE_USER="${LUMA_SERVICE_USER:-${SUDO_USER:-opc}}"
+if [[ -n "${LUMA_SERVICE_USER:-}" ]]; then
+   SERVICE_USER="$LUMA_SERVICE_USER"
+elif id -u lumencore >/dev/null 2>&1; then
+   SERVICE_USER="lumencore"
+else
+   SERVICE_USER="${SUDO_USER:-opc}"
+fi
 if ! id -u "$SERVICE_USER" >/dev/null 2>&1; then
    SERVICE_USER="root"
 fi
@@ -198,6 +204,7 @@ PREMIUM_PACKAGES=(
    alpaca-py
    pyzmq
    colorama
+   reportlab
 )
 if "$PYTHON_BIN" -m pip install "${PREMIUM_PACKAGES[@]}" >/tmp/luma_premium_deps.log 2>&1; then
    echo "  PASS premium stack dependencies refreshed"
@@ -212,7 +219,7 @@ else
 fi
 
 if "$PYTHON_BIN" - <<'PY' >/tmp/luma_premium_probe.log 2>&1
-import importlib
+import importlib.util
 modules = [
     "sklearn",
     "scipy",
@@ -287,6 +294,7 @@ rsync -av --delete \
    --exclude '*.ps1' \
    --exclude '__pycache__/' \
    --exclude '.venv/' \
+   --exclude 'node_modules/' \
    "$DASHBOARD_SRC/" "$WWW_ROOT/"
 
 # Compatibility aliases expected by some entrypoints.
@@ -318,6 +326,7 @@ EOF
 echo "==> Starting gateway service..."
 systemctl daemon-reload
 systemctl enable --now luma-gateway
+systemctl restart luma-gateway
 
 echo "==> Checking gateway health..."
 if ! curl -fsS "http://127.0.0.1:8787/health" >/tmp/luma_gateway_health.json; then
@@ -351,9 +360,122 @@ WantedBy=multi-user.target
 EOF
    systemctl daemon-reload
    systemctl enable --now luma-dashboard-refresh
+   systemctl restart luma-dashboard-refresh
 else
    echo "==> WARNING: dashboard refresh script not found at $REFRESH_SCRIPT; skipping auto-refresh service."
 fi
+
+mkdir -p "$STACK_ROOT/data/kraken_hourly_history" "$STACK_ROOT/out/ops" "$STACK_ROOT/out/execution"
+chown -R "$SERVICE_USER:$SERVICE_GROUP" \
+   "$STACK_ROOT/data/kraken_hourly_history" \
+   "$STACK_ROOT/out/ops" \
+   "$STACK_ROOT/out/execution" || true
+
+RUNTIME_PREFLIGHT="$CODE_DIR/ops/assert_runtime_safety.py"
+PAPER_TICKER="$CODE_DIR/multi_exchange_paper_ticker.py"
+if [[ -f "$RUNTIME_PREFLIGHT" && -f "$PAPER_TICKER" ]]; then
+   echo "==> Installing paper-only ticker service..."
+   cat > /etc/systemd/system/luma-paper-ticker.service <<EOF
+[Unit]
+Description=Luma Multi-Exchange Paper Ticker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=$SERVICE_USER
+Group=$SERVICE_GROUP
+WorkingDirectory=$CODE_DIR
+Environment=PYTHONUNBUFFERED=1
+Environment=LUMA_STACK_ROOT=$STACK_ROOT
+ExecStartPre=$PYTHON_BIN $RUNTIME_PREFLIGHT
+ExecStart=$PYTHON_BIN $PAPER_TICKER --profile apex --seed-capital 250000
+Restart=on-failure
+RestartSec=20
+
+[Install]
+WantedBy=multi-user.target
+EOF
+   systemctl daemon-reload
+   systemctl enable --now luma-paper-ticker
+   systemctl restart luma-paper-ticker
+else
+   echo "==> WARNING: paper ticker or runtime preflight missing; ticker service not installed."
+fi
+
+AWARENESS_SCRIPT="$CODE_DIR/execution/luma_symbol_awareness_daemon.py"
+if [[ -f "$AWARENESS_SCRIPT" && -f "$STACK_ROOT/symbol_registry_auto.py" ]]; then
+   echo "==> Installing symbol awareness service..."
+   cat > /etc/systemd/system/luma-symbol-awareness.service <<EOF
+[Unit]
+Description=Luma Full-Universe Symbol Awareness (Shadow Only)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=$SERVICE_USER
+Group=$SERVICE_GROUP
+WorkingDirectory=$CODE_DIR
+Environment=PYTHONUNBUFFERED=1
+Environment=LUMA_STACK_ROOT=$STACK_ROOT
+Environment=LUMA_HARMONIC_DEBUG=0
+ExecStart=$PYTHON_BIN $AWARENESS_SCRIPT --loop-seconds 1.0 --batch-size 120
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+   systemctl daemon-reload
+   systemctl enable --now luma-symbol-awareness
+   systemctl restart luma-symbol-awareness
+else
+   echo "==> WARNING: awareness script or symbol registry missing; awareness service not installed."
+fi
+
+HISTORY_SCRIPT="$CODE_DIR/ops/collect_kraken_hourly_history.py"
+if [[ -f "$HISTORY_SCRIPT" ]]; then
+   echo "==> Installing Kraken history service..."
+   cat > /etc/systemd/system/luma-kraken-history.service <<EOF
+[Unit]
+Description=Luma Kraken Hourly History Collector and Timing Rebuild
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=$SERVICE_USER
+Group=$SERVICE_GROUP
+WorkingDirectory=$CODE_DIR
+Environment=PYTHONUNBUFFERED=1
+Environment=LUMA_STACK_ROOT=$STACK_ROOT
+ExecStart=$PYTHON_BIN $HISTORY_SCRIPT --daemon --cycle-sec 21600 --pair-limit 80 --rebuild-timing
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
+EOF
+   systemctl daemon-reload
+   systemctl enable --now luma-kraken-history
+   systemctl restart luma-kraken-history
+else
+   echo "==> WARNING: Kraken history collector missing; history service not installed."
+fi
+
+cat > /etc/logrotate.d/lumencore <<'EOF'
+/var/log/lumencore/*.log {
+    daily
+    rotate 7
+    size 50M
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+}
+EOF
 
 if [[ -n "$NODE_RED_BIN" ]]; then
    NODE_RED_USERDIR="/var/lib/luma-node-red"
@@ -441,6 +563,15 @@ else
 fi
 
 echo "==> Running post-deploy smoke checks..."
+for p in "/api/snapshot" "/api/unity/unified-edge" "/health"; do
+   code="$(curl -sS -o /dev/null -w "%{http_code}" "http://127.0.0.1:8787$p")"
+   if [[ "$code" != "200" ]]; then
+      echo "ERROR: direct gateway smoke check failed for $p (HTTP $code)" >&2
+      exit 4
+   fi
+   echo "  PASS gateway $p (HTTP $code)"
+done
+
 if [[ "$EDGE_USING_CADDY" == "1" ]]; then
    SMOKE_BASE="http://127.0.0.1:8787"
    SMOKE_PATHS=(
@@ -466,7 +597,7 @@ fi
 
 for p in "${SMOKE_PATHS[@]}"; do
    code="$(curl -sS -o /dev/null -w "%{http_code}" "$SMOKE_BASE$p")"
-   if [[ "$code" != "200" ]]; then
+   if [[ "$code" != "200" && "$code" != "301" && "$code" != "302" && "$code" != "307" && "$code" != "308" ]]; then
       echo "ERROR: smoke check failed for $p (HTTP $code)" >&2
       exit 4
    fi
