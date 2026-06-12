@@ -340,9 +340,18 @@ systemctl enable --now luma-gateway
 systemctl restart luma-gateway
 
 echo "==> Checking gateway health..."
-if ! curl -fsS "http://127.0.0.1:8787/health" >/tmp/luma_gateway_health.json; then
+gateway_ready=0
+for attempt in $(seq 1 30); do
+   if curl -fsS "http://127.0.0.1:8787/health" >/tmp/luma_gateway_health.json; then
+      gateway_ready=1
+      break
+   fi
+   sleep 1
+done
+if [[ "$gateway_ready" != "1" ]]; then
    echo "ERROR: gateway health check failed on 127.0.0.1:8787" >&2
    systemctl --no-pager --full status luma-gateway || true
+   journalctl -u luma-gateway -n 80 --no-pager || true
    exit 5
 fi
 echo "  PASS gateway health"
