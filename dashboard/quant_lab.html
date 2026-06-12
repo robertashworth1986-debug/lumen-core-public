@@ -711,7 +711,7 @@
       '> luma qhi face agent materializing …',
       '> handshake: meta-router · stacker · blender …',
       '> calibration · anomaly · regime channels online',
-      '> kraken execution layer armed',
+      '> kraken paper/shadow execution gate verified',
       '> grants pipeline ready · 8 programs · $3.53M',
       '> alpha scanner · Kalisha scoring · explainer linked',
       '> entering quant lab',
@@ -732,7 +732,7 @@
       </div>
     </div>
     <div class="ql-status">
-      <span><span class="dot"></span>LIVE</span>
+      <span><span class="dot"></span><b data-runtime-mode>CHECKING</b></span>
       <span>UTC · <b id="ql-clock">—</b></span>
       <span>FROZEN · <b id="ql-frozen-run">—</b></span>
       <span>HASH · <b id="ql-hash">c070ad1a…</b></span>
@@ -774,7 +774,7 @@
       <span class="ico"></span>Core Mission <span class="meta new">new</span>
     </div>
     <div class="ql-tab" data-src="/investor_command_room.html" data-title="Investor Command Room">
-      <span class="ico"></span>Investor Room <span class="meta live">live</span>
+      <span class="ico"></span>Investor Room <span class="meta live">app</span>
     </div>
     <div class="ql-tab" data-src="/lumaq_brain_command_center.html" data-title="Luma Agent QHI · Pitch · Valuation · Mayor Handoff">
       <span class="ico"></span>Luma Agent <span class="meta new">face</span>
@@ -788,16 +788,16 @@
 
     <h3>Trading</h3>
     <div class="ql-tab" data-src="/kraken_execution_dashboard.html" data-title="Kraken Execution · click-Approve">
-      <span class="ico"></span>Kraken Execution <span class="meta live">live</span>
+      <span class="ico"></span>Kraken Execution <span class="meta live">paper</span>
     </div>
     <div class="ql-tab" data-src="/live_positions.html" data-title="Live Positions · Real Kraken TXIDs (truth)">
       <span class="ico"></span>Live Positions <span class="meta new">truth</span>
     </div>
     <div class="ql-tab" data-src="/alpaca_paper_live_dashboard.html" data-title="Alpaca Paper · live TXIDs">
-      <span class="ico"></span>Alpaca Paper <span class="meta live">live</span>
+      <span class="ico"></span>Alpaca Paper <span class="meta live">paper</span>
     </div>
     <div class="ql-tab" data-src="/dashboard_analytics.html" data-title="Sports +EV · LumaAlpha">
-      <span class="ico"></span>Sports +EV <span class="meta live">live</span>
+      <span class="ico"></span>Sports +EV <span class="meta live">edge</span>
     </div>
     <div class="ql-tab" data-src="/dashboard_analytics.html#paper_derby_lane" data-title="Kentucky Derby Paper Picks · edge-ranked paper lane">
       <span class="ico"></span>Derby Paper <span class="meta new">lane</span>
@@ -825,7 +825,7 @@
       <span class="ico"></span>Grants <span class="meta new">v3</span>
     </div>
     <div class="ql-tab" data-src="/investor_wallboard.html" data-title="Investor Wallboard">
-      <span class="ico"></span>Wallboard <span class="meta live">live</span>
+      <span class="ico"></span>Wallboard <span class="meta live">board</span>
     </div>
 
     <h3>Proof &amp; Ops</h3>
@@ -833,7 +833,7 @@
       <span class="ico"></span>Walk-Forward <span class="meta new">proof</span>
     </div>
     <div class="ql-tab" data-src="/infra_audit_dashboard.html" data-title="Infrastructure Audit">
-      <span class="ico"></span>Infrastructure <span class="meta live">live</span>
+      <span class="ico"></span>Infrastructure <span class="meta live">audit</span>
     </div>
     <div class="ql-tab" data-src="/seed_validation_readout.html" data-title="Seed Validation">
       <span class="ico"></span>Seed Validation <span class="meta new">proof</span>
@@ -1469,7 +1469,7 @@ function renderOverview() {
     ${card('Master Intelligence · Package Leverage', '/lumencore_master_v2.html',
       'Full package-leverage pane: active vs installed packages, top active stack, and sector data-engine utilization.', ['new','live'])}
     ${card('Kraken Execution · click-Approve', '/kraken_execution_dashboard.html',
-      'One-click approval queue for live trades. Shadow intents → human-gate → submit. THE master execution console.', ['live','critical'])}
+      'Paper/shadow intent review with a fail-closed human gate. Live submission remains disabled until explicit production authorization.', ['live','critical'])}
     ${card('Grants Console', '/grants.html',
       '8 federal programs, 3 approved, $3.53M addressable. Click-Approve drafts, print/PDF, ZIP bundle, run-over-run diff.', ['new','live'])}
     ${card('Sports +EV · LumaAlpha', '/dashboard_analytics.html',
@@ -1493,17 +1493,17 @@ function renderOverview() {
     ${card('Investor Command Room', '/investor_command_room.html',
       'KPI grid, leaderboard, sector heat, harmonic right-rail. Investor-facing, printable.', ['live'])}
     ${card('Investor Wallboard', '/investor_wallboard.html',
-      'Golden-spiral hero, gigantic KPIs, live badge. Deploy this on a TV in the boardroom.', ['live'])}
+      'Golden-spiral hero and boardroom-scale KPIs with evidence freshness and runtime truth.', ['live'])}
     ${card('Chain of Custody', '/audit_derivation_pack.html',
       'SHA-256 hash chain, audit ledger, frozen deltas — for legal, compliance, federal submission.', ['new'])}
     ${card('Alpaca Paper · Live TXIDs', '/alpaca_paper_live_dashboard.html',
-      'Live Alpaca paper trading: TXIDs, equity curve, top candidates, runtime status.', ['live'])}
+      'Alpaca paper-trading telemetry: TXIDs, equity curve, top candidates, and runtime status.', ['live'])}
     ${card('Public Evidence Bundle', '/evidence/',
       'The LinkedIn-shareable evidence pack — meta-router benchmark + grants summary + chain of custody.', ['new'])}
   `;
 }
 function card(title, src, desc, badges) {
-  const b = badges.map(x => `<span class="badge ${x}">${x}</span>`).join('');
+  const b = badges.map(x => `<span class="badge ${x}">${x === 'live' ? 'active' : x}</span>`).join('');
   return `<div class="ql-card" data-go="${src}">
     <h4>${title}</h4><p>${desc}</p><div class="badges">${b}</div>
   </div>`;
