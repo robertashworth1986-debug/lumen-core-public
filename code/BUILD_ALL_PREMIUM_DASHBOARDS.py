@@ -13,15 +13,22 @@ def main() -> None:
     unified.main()
     alpaca.main()
     scout.main()
-    immersive.main()
+    immersive_status = "ok"
+    try:
+        immersive.main()
+    except SystemExit as exc:
+        # Immersive mode is an optional presentation surface. A missing source
+        # page must not terminate the production dashboard refresh loop.
+        immersive_status = f"skipped: {exc}"
     portal.main()
     print(json.dumps({
         "status": "ok",
+        "immersive_status": immersive_status,
         "artifacts": [
             str(unified.DASH / "LUMENCORE_MASTER_DASHBOARD_UNIFIED_20260425.html"),
             str(alpaca.HTML_OUT),
             str(scout.HTML_OUT),
-            str(immersive.OUT),
+            str(immersive.OUT) if immersive.OUT.exists() else None,
             str(portal.HTML_OUT),
             str(portal.INDEX_OUT),
         ],

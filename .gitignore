@@ -39,6 +39,10 @@ dashboard/*.html
 !dashboard/grants.html
 !dashboard/forecast.html
 !dashboard/explain.html
+!dashboard/operator_home.html
+!dashboard/anomalies.html
+!dashboard/lab.html
+!dashboard/lumascout.html
 
 # Execution runtime state (rebuilt every session)
 execution_events.jsonl

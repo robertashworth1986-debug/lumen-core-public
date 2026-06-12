@@ -2126,7 +2126,7 @@ def update_queue() -> dict:
                 "eligible": elig.get("eligible"),
                 "agency": app.get("agency"),
                 "program": app.get("program"),
-                "ceiling_usd": app.get("ceiling_usd"),
+                "ceiling_usd": catalog_program.get("ceiling_usd", app.get("ceiling_usd")),
                 "deadline_typical": window_input.get("deadline_typical"),
                 "url": window_input.get("url"),
                 "opportunity_window": window,

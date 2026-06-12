@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 CANONICAL_PAGES = (
+    "operator_home.html",
     "mission_control.html",
     "quant_lab.html",
     "kraken_execution_dashboard.html",

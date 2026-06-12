@@ -478,12 +478,19 @@ def build_preflight(grant_id: str, run_dir: Path,
     if not isinstance(budget, dict):
         blockers.append("budget is missing from application.json")
     else:
-        ceiling = budget.get("ceiling_usd")
+        ceiling = (
+            (catalog_entry or {}).get("ceiling_usd")
+            or budget.get("ceiling_usd")
+        )
         total = budget.get("total")
         try:
-            if int(total) != int(ceiling):
+            if int(total) > int(ceiling):
                 blockers.append(
-                    f"budget total ({total}) does not equal award ceiling ({ceiling})"
+                    f"budget total ({total}) exceeds award ceiling ({ceiling})"
+                )
+            elif int(total) < int(ceiling):
+                warnings.append(
+                    f"budget requests {total} of the {ceiling} maximum; confirm the requested amount is intentional"
                 )
         except Exception:
             blockers.append("budget total/ceiling is not numeric")
@@ -550,7 +557,10 @@ def build_preflight(grant_id: str, run_dir: Path,
         "blockers": blockers,
         "warnings": warnings,
         "ready": len(blockers) == 0,
-        "ceiling_usd": (app.get("budget") or {}).get("ceiling_usd"),
+        "ceiling_usd": (
+            (catalog_entry or {}).get("ceiling_usd")
+            or (app.get("budget") or {}).get("ceiling_usd")
+        ),
         "submitted_utc": state.get("submitted_utc"),
         "external_tracking_id": state.get("external_tracking_id"),
         "preflight_utc": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"),

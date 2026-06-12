@@ -114,12 +114,16 @@ STRICT_PREMIUM_STACK="${LUMA_STRICT_PREMIUM_STACK:-0}"
 
 REQUIRED_PAGES=(
    "index.html"
+   "operator_home.html"
    "mission_control.html"
    "grants.html"
    "quant_lab.html"
    "kraken_execution_dashboard.html"
    "forecast.html"
    "explain.html"
+   "anomalies.html"
+   "lab.html"
+   "lumascout.html"
 )
 
 if [[ -f "$COMMAND_FABRIC_ENSURE" ]]; then

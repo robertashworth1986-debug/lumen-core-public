@@ -290,6 +290,9 @@ def grant_detail(grant_id: str) -> JSONResponse:
         p = run / f
         if p.exists():
             out[f.replace(".json", "")] = json.loads(p.read_text(encoding="utf-8"))
+    current_program = _catalog_entry_for(grant_id)
+    if current_program:
+        out["current_program"] = current_program
     return JSONResponse(out)
 
 

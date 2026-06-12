@@ -1076,6 +1076,12 @@ async function loadQueue() {
     renderQueue();
     renderMissionPulse();
     await applyUrlBootstrap();
+    if (!activeId) {
+      const preferred = (queue?.items || []).find((it) => it?.opportunity_window?.actionable === true)
+        || (queue?.items || []).find((it) => String(it?.effective_state || it?.state || '') === 'approved')
+        || (queue?.items || [])[0];
+      if (preferred?.program_id) await loadDetail(preferred.program_id);
+    }
   } catch (e) {
     $('grant-list').innerHTML =
       `<li class="err">Failed: ${e.message}</li>`;
@@ -1146,6 +1152,7 @@ function renderQueue() {
   const items = queue.items || [];
   $('grant-list').innerHTML = items.map(it => {
     const rawSubmitUrl = grantSubmitUrl(it, null, null);
+    const actionable = it?.opportunity_window?.actionable === true;
     const submitHref = isInformationalGrantLanding(rawSubmitUrl)
       ? grantConsoleBootstrapUrl(it)
       : rawSubmitUrl;
@@ -1163,8 +1170,8 @@ function renderQueue() {
              target="_blank"
              rel="noopener"
              onclick="event.stopPropagation()"
-             style="padding:6px 10px;font-size:10px;letter-spacing:1px;border-color:var(--neon-g);color:var(--neon-g)">Submit ↗</a>
-          <span class="pill ${it.state}">${it.state}</span>
+             style="padding:6px 10px;font-size:10px;letter-spacing:1px;border-color:${actionable ? 'var(--neon-g)' : 'var(--border)'};color:${actionable ? 'var(--neon-g)' : 'var(--ink-dim)'}">${actionable ? 'Submit' : 'Review'} ↗</a>
+          <span class="pill ${it.state}">${escHTML(it.effective_state || it.state)}</span>
         </div>
       </div>
       <div class="meta">
@@ -1198,6 +1205,34 @@ function grantActionRowsForOpp(oppNum) {
     return (priorityRank[pa] ?? 9) - (priorityRank[pb] ?? 9);
   });
   return rows;
+}
+
+function classifySubmissionBlocker(text) {
+  const value = String(text || '');
+  if (/SAM\.gov|Grants\.gov|AOR|signature|portal|registration/i.test(value)) {
+    return { lane: 'operator', action: 'Verify this in the official account or submission portal, then record the verification date in the company profile.' };
+  }
+  if (/opportunity window|source_never_verified|not verified open|deadline/i.test(value)) {
+    return { lane: 'source', action: 'Open the official opportunity notice. Do not submit until the open window and exact solicitation are confirmed.' };
+  }
+  if (/TO_BE_FILLED|budget total|package|missing file/i.test(value)) {
+    return { lane: 'system', action: 'Update the missing company/project facts, then use Regenerate and Prepare submission draft.' };
+  }
+  if (/approval_state|approved/i.test(value)) {
+    return { lane: 'review', action: 'Review the regenerated package and approve it only after every factual and legal field is correct.' };
+  }
+  return { lane: 'review', action: 'Review and resolve this item before approval.' };
+}
+
+function blockerActionPanel(blockers) {
+  const rows = (blockers || []).map((blocker) => {
+    const item = classifySubmissionBlocker(blocker);
+    return `<tr><td>${escHTML(item.lane.toUpperCase())}</td><td>${escHTML(String(blocker))}</td><td>${escHTML(item.action)}</td></tr>`;
+  }).join('');
+  if (!rows) return '';
+  return `<h3>How to unblock this package</h3>
+    <table class="sf-table"><thead><tr><th>Owner</th><th>Blocker</th><th>Next action</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="gaps"><b>Safety rule:</b> the factory may draft and validate files, but it must not invent registration status, authorization, signatures, or an open solicitation window.</div>`;
 }
 
 function parseBootstrapFlag(value) {
@@ -1330,6 +1365,7 @@ function renderDetail(d) {
   const state = d.approval_state || {};
   const submission = submissionByGrant.get(d.grant_id)?.submission_packet || null;
   const queueItem = (queue?.items || []).find(x => x.program_id === d.grant_id) || {};
+  const currentProgram = (d.current_program && typeof d.current_program === 'object') ? d.current_program : queueItem;
   const submitUrl = grantSubmitUrl(queueItem, d, submission);
   const submitSystem = String(submission?.portal?.submission_system || '').trim();
   const oppForActions = queueItem?.opp_num || app?.source_metadata?.opp_num || app?.opp_num || parseOppFromGrantUrl(app?.url);
@@ -1387,9 +1423,9 @@ function renderDetail(d) {
     </h2>
     <p style="color: var(--ink-dim); margin: 0 0 16px">
       ${escHTML(app.topic_area || '')} · ceiling
-      <b>$${(app.ceiling_usd || 0).toLocaleString()}</b> ·
+      <b>$${Number(currentProgram.ceiling_usd || app.ceiling_usd || 0).toLocaleString()}</b> ·
       duration <b>${app.duration_months || '—'} mo</b> ·
-      deadline <b>${escHTML(app.deadline_typical || '—')}</b>
+      deadline <b>${escHTML(currentProgram.deadline_typical || app.deadline_typical || '—')}</b>
     </p>
 
     <div class="toolbar">
@@ -1529,6 +1565,7 @@ async function loadMarkdown(tab) {
         <p><b>Approval state:</b> ${escHTML(String(p.approval_state || 'draft'))}</p>
         <p><b>Package complete:</b> ${p.package_complete ? 'yes' : 'no'}</p>
         ${blockers ? `<div class="gaps"><b>Blockers</b><ul>${blockers}</ul></div>` : '<div class="reasons"><b>No blockers detected</b></div>'}
+        ${blockerActionPanel(p.blockers || [])}
         ${warnings ? `<div class="gaps"><b>Warnings</b><ul>${warnings}</ul></div>` : ''}
         ${reqs ? `<h3>Portal required checklist</h3><ul>${reqs}</ul>` : ''}
         <h3>SF-424 Copy/Paste Map</h3>

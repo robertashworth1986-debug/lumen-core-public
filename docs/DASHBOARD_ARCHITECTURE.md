@@ -4,10 +4,11 @@ Updated: June 12, 2026
 
 ## Canonical Surfaces
 
-The public product has six primary operator surfaces:
+The public product has a plain-English home plus six primary operator surfaces:
 
 | Surface | Route | Responsibility |
 | --- | --- | --- |
+| Operator Home | `/` or `/operator_home.html` | Product map, proof boundaries, commercialization, and live readiness |
 | Mission Control | `/mission_control.html` | System health, evidence, approvals, and operating posture |
 | Quant Lab | `/quant_lab.html` | Unified research cockpit and navigation host |
 | Kraken Execution | `/kraken_execution_dashboard.html` | Paper execution, order evidence, positions, and market awareness |

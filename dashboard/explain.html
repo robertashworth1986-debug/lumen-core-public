@@ -93,7 +93,8 @@
   <div class="lc-panel">
     <h2>Inspect a router pick</h2>
     <div class="controls">
-      <input id="ds" type="text" placeholder="dataset_id (e.g. fred_DGS10) — type then press Enter" value="fred_DGS10"/>
+      <input id="ds" type="text" list="dataset-options" placeholder="Choose a measured dataset, then press Enter"/>
+      <datalist id="dataset-options"></datalist>
       <button class="lc-btn" id="go">Explain</button>
     </div>
     <div id="error" class="err" style="display:none"></div>
@@ -699,7 +700,22 @@ function render(d, runtime) {
 $('go').addEventListener('click', () => explain($('ds').value.trim()));
 $('ds').addEventListener('keydown', e => { if (e.key === 'Enter') explain($('ds').value.trim()); });
 renderPrototypeGallery();
-explain($('ds').value.trim());
+async function initializeDatasetPicker() {
+  try {
+    const payload = await LC.api('/api/forecast/datasets?limit=200');
+    const datasets = (payload.datasets || []).map(row => String(row.dataset || '')).filter(Boolean);
+    $('dataset-options').innerHTML = datasets.map(id => `<option value="${id}"></option>`).join('');
+    const requested = new URLSearchParams(location.search).get('dataset');
+    const selected = requested && datasets.includes(requested) ? requested : datasets[0];
+    if (!selected) throw new Error('No measured datasets are available.');
+    $('ds').value = selected;
+    await explain(selected);
+  } catch (e) {
+    $('error').style.display = 'block';
+    $('error').textContent = `Dataset catalog failed: ${e.message}`;
+  }
+}
+initializeDatasetPicker();
 </script>
 <script src="./assets/luma_command_fabric.js"></script>
 </body>

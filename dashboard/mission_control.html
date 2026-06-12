@@ -991,7 +991,7 @@
       <div class="vps-proof-grid">
         <div class="vps-proof-tile"><div class="k">Proof Score</div><div id="vps-score" class="v">—</div></div>
         <div class="vps-proof-tile"><div class="k">TXIDs</div><div id="vps-txids" class="v green">—</div></div>
-        <div class="vps-proof-tile"><div class="k">Live Submits 7D</div><div id="vps-submit7d" class="v amber">—</div></div>
+        <div class="vps-proof-tile"><div class="k">Historical Submits 7D</div><div id="vps-submit7d" class="v amber">—</div></div>
         <div class="vps-proof-tile"><div class="k">Exchange Closed</div><div id="vps-closed" class="v green">—</div></div>
         <div class="vps-proof-tile"><div class="k">Fill Sync</div><div id="vps-fill-sync" class="v cyan">—</div></div>
         <div class="vps-proof-tile"><div class="k">Realized Net</div><div id="vps-net" class="v">—</div></div>
@@ -2246,7 +2246,7 @@ function renderLinkedInRail(buildPayload, linkedinPayload, resumePayload, authSt
   }
 }
 
-function renderHelmyerPane(helmyerPayload, providerPackPayload, readinessPayload, grantPayload, vpsPayload, linkedinBuildPayload) {
+function renderHelmyerPane(helmyerPayload, providerPackPayload, readinessPayload, grantPayload, vpsPayload, linkedinBuildPayload, runtimeSnapshot, evidenceOverview) {
   const helmyer = (helmyerPayload && typeof helmyerPayload === 'object') ? helmyerPayload : {};
   const providerPack = (providerPackPayload && typeof providerPackPayload === 'object') ? providerPackPayload : {};
   const readiness = (readinessPayload && typeof readinessPayload === 'object') ? readinessPayload : {};
@@ -2296,6 +2296,40 @@ function renderHelmyerPane(helmyerPayload, providerPackPayload, readinessPayload
       },
     ];
   }
+
+  const gate = (runtimeSnapshot?.runtime?.execution_gate && typeof runtimeSnapshot.runtime.execution_gate === 'object')
+    ? runtimeSnapshot.runtime.execution_gate
+    : {};
+  const gateMode = firstNonEmpty(gate.display_mode, gate.mode, 'unknown');
+  const gateLive = gate.execution_authorized === true;
+  qaItems = qaItems.filter((item) => {
+    const q = String(item.q || '').toLowerCase();
+    return !q.includes('live execution currently enabled')
+      && !q.includes('current annualized value surface')
+      && !q.includes('routing and harmonic signal quality')
+      && !q.includes('grant submission readiness posture');
+  });
+  qaItems.unshift({
+    q: 'Is live execution currently enabled?',
+    a: `No. Authoritative runtime gate: ${gateMode}; execution_authorized=${gateLive}; allow_live_orders=${gate.allow_live_orders === true}.`,
+  });
+  qaItems.push({
+    q: 'Are the displayed value estimates realized savings or revenue?',
+    a: 'No. They are modeled opportunity hypotheses until a customer baseline, attributable measured improvement, and acceptance record exist.',
+  });
+  const evidenceV2 = (evidenceOverview?.v2 && typeof evidenceOverview.v2 === 'object') ? evidenceOverview.v2 : {};
+  const evidenceRouter = (evidenceOverview?.router && typeof evidenceOverview.router === 'object') ? evidenceOverview.router : {};
+  const evidenceN = Math.round(toFinite(evidenceV2.n_datasets_succeeded, evidenceRouter.n_datasets));
+  const harmonicShare = toFinite(evidenceV2.harmonic_win_rate, 0) * 100;
+  const routerShare = toFinite(evidenceRouter.win_rates?.router, 0) * 100;
+  qaItems.push({
+    q: 'What does the measured forecast benchmark support?',
+    a: `Across ${evidenceN} datasets, router win share is ${routerShare.toFixed(2)}% and harmonic family win share is ${harmonicShare.toFixed(2)}%. This supports adaptive selection, not universal harmonic superiority.`,
+  });
+  qaItems.push({
+    q: 'What grant action is actually available now?',
+    a: `${Math.round(toFinite(grants.n_actionable, 0))} verified actionable opportunity; ${Math.round(toFinite(grants.n_submitted, 0))} submissions recorded by the dashboard evidence ledger. Open Grants for the NSF Project Pitch and blocker ownership.`,
+  });
 
   const host = $('helmyer-list');
   if (host) {
@@ -2799,6 +2833,7 @@ async function loadAll() {
 
   $('grants-list').innerHTML = (g.items || []).map(it => {
     const stateClass = it.state || 'draft';
+    const actionable = it?.opportunity_window?.actionable === true;
     const submitUrl = buildGrantSubmitUrl(it);
     const consoleUrl = buildGrantConsoleUrl(it, false);
     const aiFillUrl = buildGrantConsoleUrl(it, true);
@@ -2815,10 +2850,10 @@ async function loadAll() {
           fit ${((it.score || 0) * 100).toFixed(0)}%
         </div>
         <div class="grant-actions">
-          <a class="grant-action-link submit" href="${escAttr(submitUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Submit ↗</a>
+          <a class="grant-action-link submit" href="${escAttr(submitUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${actionable ? 'Submit' : 'Review'} ↗</a>
           <a class="grant-action-link ai" href="${escAttr(aiFillUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">AI Fill</a>
           <a class="grant-action-link" href="${escAttr(consoleUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Console</a>
-          <span class="pill ${stateClass}">${stateClass}</span>
+          <span class="pill ${stateClass}">${escHTML(it.effective_state || stateClass)}</span>
         </div>
       </div>`;
   }).join('') || '<div style="color:var(--ink-dim);padding:12px">No grants in pipeline.</div>';
@@ -2876,7 +2911,7 @@ async function loadAll() {
   const noteBits = [
     'source runs: ' + String(vpsEv.event_source_count || 0),
     'ledger txids: ' + String((vps.live_ledger_evidence || {}).txid_count || 0),
-    'closed live trades: ' + String(vpsPerf.closed_live_count || 0),
+    'historical closed live trades: ' + String(vpsPerf.closed_live_count || 0),
     'exchange closed: ' + (reconEnabled ? (String(reconClosed) + '/' + String(reconQueried)) : 'disabled'),
     'fill sync: ' + (reconEnabled ? ((Number.isFinite(reconSync) ? reconSync.toFixed(1) : '0.0') + '%') : 'disabled'),
     'win rate: ' + Number(vpsPerf.win_rate_pct || 0).toFixed(2) + '%',
@@ -2895,7 +2930,9 @@ async function loadAll() {
     investorReadiness || {},
     grantPayload || {},
     vps || {},
-    linkedinBuildLatest || {}
+    linkedinBuildLatest || {},
+    snap || {},
+    evRaw || {}
   );
 
   renderHealthcarePocDial(healthcarePocLatest || {});

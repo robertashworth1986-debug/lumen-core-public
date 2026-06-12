@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LumenCore Operator Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/lumencore.css">
+<link rel="stylesheet" href="./assets/luma_command_fabric.css">
+<style>
+  .home { max-width: 1480px; margin: 0 auto; padding: 34px 28px 130px; }
+  .hero { display:grid; grid-template-columns:1.3fr .7fr; gap:16px; margin-bottom:16px; }
+  .panel { border:1px solid var(--border); border-radius:16px; padding:22px; background:rgba(7,13,31,.82); box-shadow:0 24px 70px rgba(0,0,0,.28); }
+  .eyebrow,.label { font:700 10px 'Orbitron',sans-serif; letter-spacing:2px; text-transform:uppercase; color:var(--neon-c); }
+  h1 { margin:12px 0 10px; font:900 clamp(2rem,5vw,4.4rem)/1.02 'Orbitron',sans-serif; }
+  h2 { margin:0 0 12px; font:700 14px 'Orbitron',sans-serif; letter-spacing:1.4px; text-transform:uppercase; }
+  p { color:var(--ink-dim); line-height:1.65; }
+  .truth { color:var(--ink); font-size:1.05rem; max-width:900px; }
+  .mode { margin-top:16px; display:inline-flex; gap:8px; align-items:center; border:1px solid var(--neon-a); border-radius:999px; padding:8px 12px; color:var(--neon-a); font:700 11px 'JetBrains Mono',monospace; }
+  .grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin-bottom:16px; }
+  .product { display:flex; flex-direction:column; min-height:310px; }
+  .product .state { margin:8px 0 12px; font:700 12px 'JetBrains Mono',monospace; }
+  .good { color:var(--neon-g); } .warn { color:var(--neon-a); } .bad { color:var(--neon-r); }
+  .metric { font:900 29px 'Orbitron',sans-serif; color:var(--neon-c); margin:5px 0; }
+  .actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:auto; padding-top:16px; }
+  .btn { display:inline-block; padding:9px 12px; border-radius:8px; border:1px solid var(--border); color:var(--ink); text-decoration:none; font:700 11px 'Orbitron',sans-serif; letter-spacing:.7px; }
+  .btn.primary { border-color:var(--neon-c); color:var(--neon-c); }
+  .three { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+  ul { color:var(--ink-dim); line-height:1.65; padding-left:19px; }
+  code { color:var(--neon-c); }
+  .stamp { margin-top:12px; color:var(--ink-dim); font:400 10px 'JetBrains Mono',monospace; }
+  @media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}.hero,.three{grid-template-columns:1fr}}
+  @media(max-width:700px){.grid{grid-template-columns:1fr}.home{padding:20px 14px 120px}}
+</style>
+</head>
+<body>
+<main class="home">
+  <section class="hero">
+    <div class="panel">
+      <div class="eyebrow">LumenCore Operator Home</div>
+      <h1>One platform. Four products. One truth layer.</h1>
+      <p class="truth">LumenCore is an evidence and decision platform: it compares forecasting methods, ranks market and opportunity signals, creates auditable grant packages, and preserves reproducible proof artifacts. It is not currently authorized for live trading and it has not yet proved universal harmonic superiority or guaranteed economic savings.</p>
+      <div class="mode" id="mode">CHECKING AUTHORITATIVE EXECUTION GATE</div>
+    </div>
+    <div class="panel">
+      <div class="label">What to do today</div>
+      <ol style="color:var(--ink);line-height:1.75">
+        <li>Finish and submit the current NSF Project Pitch.</li>
+        <li>Renew and verify SAM.gov registration data.</li>
+        <li>Keep trading in paper/shadow until forward results are positive after costs.</li>
+        <li>Run leakage-free V7 harmonic validation before making patent or performance claims.</li>
+      </ol>
+      <div class="stamp" id="stamp">loading live status...</div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <article class="panel product">
+      <div class="label">Market Intelligence + Trader</div>
+      <div class="metric" id="paper-pnl">—</div>
+      <div class="state warn" id="trade-state">LOADING</div>
+      <p>Ranks symbols and timing windows, then records paper execution evidence. The large live executor and orchestrator are research/production candidates; the deployed loop is the guarded paper ticker.</p>
+      <div class="actions"><a class="btn primary" href="/kraken_execution_dashboard.html">Open Trader</a><a class="btn" href="/mission_control.html">Readiness</a></div>
+    </article>
+    <article class="panel product">
+      <div class="label">Forecast + Evidence Lab</div>
+      <div class="metric" id="datasets">—</div>
+      <div class="state good" id="forecast-state">LOADING</div>
+      <p>Benchmarks model families across a broad dataset universe. Current evidence supports adaptive routing on the measured benchmark, not a claim that harmonic models always win.</p>
+      <div class="actions"><a class="btn primary" href="/quant_lab.html">Open Quant Lab</a><a class="btn" href="/lab.html">Scoreboard</a><a class="btn" href="/anomalies.html">Anomalies</a></div>
+    </article>
+    <article class="panel product">
+      <div class="label">Grant Factory</div>
+      <div class="metric" id="grant-actionable">—</div>
+      <div class="state warn" id="grant-state">LOADING</div>
+      <p>Qualifies opportunities, builds application packages, checks budgets and placeholders, and preserves submission evidence. Human identity, registration, approval, signature, and portal submission remain operator actions.</p>
+      <div class="actions"><a class="btn primary" href="/grants.html">Open Grants</a></div>
+    </article>
+    <article class="panel product">
+      <div class="label">LumaScout</div>
+      <div class="metric" id="scout-count">—</div>
+      <div class="state warn" id="scout-state">LOADING</div>
+      <p>Ranks artist discovery signals and produces an auditable shortlist. It is a scouting intelligence prototype, not a label deal, investment recommendation, or verified revenue stream.</p>
+      <div class="actions"><a class="btn primary" href="/lumascout.html">Open LumaScout</a></div>
+    </article>
+  </section>
+
+  <section class="three">
+    <article class="panel">
+      <h2>Proven Today</h2>
+      <ul>
+        <li>673-dataset benchmark artifacts and model-family scoreboards.</li>
+        <li>Immutable run manifests, hashes, ledgers, and frozen evidence snapshots.</li>
+        <li>Working public APIs, dashboards, paper execution, and grant package generation.</li>
+      </ul>
+    </article>
+    <article class="panel">
+      <h2>Not Proven Yet</h2>
+      <ul>
+        <li>Profitable live trading or institutional return performance.</li>
+        <li>Universal harmonic, phase-locking, or geometric-flow superiority.</li>
+        <li>Realized multibillion-dollar savings or a fixed dollar value per frozen delta.</li>
+      </ul>
+    </article>
+    <article class="panel">
+      <h2>How This Makes Money</h2>
+      <ul>
+        <li>Grant-funded R&amp;D tied to a narrow, measurable technical claim.</li>
+        <li>Paid pilots that price a baseline, measured improvement, and acceptance test.</li>
+        <li>Evidence-platform licensing after repeatable customer outcomes exist.</li>
+      </ul>
+    </article>
+  </section>
+</main>
+<script src="./assets/luma_command_fabric.js"></script>
+<script>
+const money = (v) => '$' + Number(v || 0).toLocaleString(undefined,{maximumFractionDigits:0});
+async function json(path){const r=await fetch(path,{cache:'no-store'});if(!r.ok)throw new Error(String(r.status));return r.json();}
+Promise.allSettled([
+  json('/api/snapshot'),
+  json('/api/forecast/evidence-overview'),
+  json('/api/grants'),
+  json('/api/scout/summary')
+]).then(([snapR,forecastR,grantsR,scoutR])=>{
+  const snap=snapR.value||{}, gate=snap.runtime?.execution_gate||{}, paper=snap.paper||{};
+  const snapshotAvailable=snapR.status==='fulfilled';
+  const live=gate.execution_authorized===true;
+  document.getElementById('mode').textContent=snapshotAvailable?(live?'LIVE EXECUTION AUTHORIZED':'PAPER / SHADOW ONLY · LIVE ORDERS NOT AUTHORIZED'):'RUNTIME API UNAVAILABLE';
+  document.getElementById('mode').className='mode '+(snapshotAvailable&&live?'good':'warn');
+  document.getElementById('paper-pnl').textContent=snapshotAvailable?money(paper.net_pnl):'UNAVAILABLE';
+  document.getElementById('trade-state').textContent=!snapshotAvailable?'CHECK PUBLIC RUNTIME API':(paper.net_pnl>0?'FORWARD VALIDATION STILL REQUIRED':'NOT LIVE-READY · PAPER PNL NEGATIVE');
+  document.getElementById('trade-state').className='state '+(!snapshotAvailable?'warn':(paper.net_pnl>0?'warn':'bad'));
+  const f=forecastR.value||{}, n=f.v2?.n_datasets_succeeded||0, route=f.router?.win_rates?.router||0;
+  document.getElementById('datasets').textContent=forecastR.status==='fulfilled'?n+' DATASETS':'UNAVAILABLE';
+  document.getElementById('forecast-state').textContent=forecastR.status==='fulfilled'?'ROUTER WIN SHARE '+(route*100).toFixed(1)+'%':'CHECK FORECAST API';
+  const g=grantsR.value||{};
+  document.getElementById('grant-actionable').textContent=grantsR.status==='fulfilled'?Number(g.n_actionable||0)+' ACTIONABLE':'UNAVAILABLE';
+  document.getElementById('grant-state').textContent=grantsR.status!=='fulfilled'?'CHECK GRANTS API':(Number(g.n_actionable||0)>0?'NEXT: NSF PROJECT PITCH':'NO VERIFIED OPEN SUBMISSION');
+  const s=scoutR.value||{};
+  document.getElementById('scout-count').textContent=scoutR.status==='fulfilled'?Number(s.production_candidate_count||0)+' CANDIDATES':'UNAVAILABLE';
+  document.getElementById('scout-state').textContent=scoutR.status==='fulfilled'?'LAST DATA '+String(s.generated_utc||'UNKNOWN').slice(0,10):'CHECK SCOUT API';
+  document.getElementById('stamp').textContent='live snapshot '+String(snap.generated_utc||'unavailable');
+});
+</script>
+</body>
+</html>

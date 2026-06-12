@@ -182,7 +182,7 @@ def build_helmyer_payload(
         },
         {
             "question": "What is the current annualized value surface?",
-            "answer": f"Modeled annual preserved-value signal is ${annual_value:,.2f}.",
+            "answer": f"Unverified modeled opportunity estimate is ${annual_value:,.2f}; it is not booked revenue or realized savings.",
         },
         {
             "question": "Which sector is carrying top mission impact?",
@@ -194,7 +194,7 @@ def build_helmyer_payload(
         },
         {
             "question": "Is live execution currently enabled?",
-            "answer": f"Runtime mode is {runtime_mode}; allow_live_orders is {'ON' if allow_live else 'OFF'} with posture {readiness_status}.",
+            "answer": f"Artifact posture is {runtime_mode}; live orders are {'ON' if allow_live else 'OFF'}. The public runtime execution gate remains authoritative.",
         },
         {
             "question": "What is the grant submission readiness posture?",

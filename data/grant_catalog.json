@@ -1,0 +1,309 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-05-05T00:00:00Z",
+  "note": "Curated grant catalog. Deadlines and ceilings are typical-cycle values; verify against the program announcement before submission.",
+  "programs": [
+    {
+      "id": "doe_sbir_phase_i_25_2",
+      "agency": "U.S. Department of Energy",
+      "program": "SBIR/STTR Phase I",
+      "topic_area": "Advanced Computing & Data Analytics for Energy Systems",
+      "ceiling_usd": 200000,
+      "duration_months": 6,
+      "deadline_typical": "FY26 NOFO not yet released — watch via doe_fy26_watcher.py",
+      "current_state": "between_cycles_fy25_closed_fy26_future",
+      "url": "https://science.osti.gov/sbir",
+      "eligibility": {
+        "small_business": true,
+        "us_owned_majority": true,
+        "employees_lt": 500,
+        "pi_employed_min_pct": 51,
+        "us_research_only": true
+      },
+      "fit_keywords": [
+        "energy", "grid", "infrastructure", "forecasting", "anomaly detection",
+        "time series", "ml", "ai", "harmonic", "optimization"
+      ],
+      "required_sections": [
+        "Project Summary", "Project Description", "Innovation",
+        "Technical Approach", "Anticipated Results",
+        "Commercialization Plan", "Key Personnel", "Facilities", "Budget"
+      ],
+      "page_limits": {"project_description_pages": 15}
+    },
+    {
+      "id": "nsf_sbir_phase_i",
+      "agency": "National Science Foundation",
+      "program": "America's Seed Fund (SBIR Phase I)",
+      "topic_area": "AI & Advanced Computing",
+      "ceiling_usd": 305000,
+      "duration_months": 12,
+      "deadline_typical": "rolling: project pitch first, then full proposal",
+      "current_state": "open_project_pitch",
+      "source_verified_utc": "2026-06-11T00:00:00Z",
+      "source_verification_url": "https://seedfund.nsf.gov/apply/project-pitch/",
+      "full_proposal_deadlines": [
+        "2026-07-27",
+        "2026-11-04",
+        "2027-03-04"
+      ],
+      "url": "https://seedfund.nsf.gov",
+      "eligibility": {
+        "small_business": true,
+        "us_owned_majority": true,
+        "employees_lt": 500,
+        "pi_employed_min_pct": 51,
+        "deep_tech_focus": true
+      },
+      "fit_keywords": [
+        "ai", "ml", "forecasting", "infrastructure", "deep tech",
+        "novel algorithm", "explainable", "calibration"
+      ],
+      "required_sections": [
+        "Project Pitch", "Technical Innovation", "Customer & Market",
+        "Team", "Risks", "Broader Impact"
+      ],
+      "page_limits": {"project_pitch_pages": 3, "full_proposal_pages": 15}
+    },
+    {
+      "id": "arpa_e_seedling",
+      "agency": "ARPA-E",
+      "program": "OPEN / Seedling",
+      "topic_area": "Transformational Energy Tech",
+      "ceiling_usd": 500000,
+      "duration_months": 12,
+      "deadline_typical": "2026-09-15",
+      "url": "https://arpa-e.energy.gov/funding-opportunities",
+      "eligibility": {
+        "small_business": true,
+        "us_research_only": true,
+        "transformational_required": true
+      },
+      "fit_keywords": [
+        "transformational", "energy", "grid", "harmonic", "regime detection",
+        "infrastructure resilience", "novel"
+      ],
+      "required_sections": [
+        "Concept Paper", "Technical Innovation",
+        "Performance Targets", "Team Capabilities", "Budget"
+      ],
+      "page_limits": {"concept_paper_pages": 12}
+    },
+    {
+      "id": "nist_sbir_25",
+      "agency": "NIST",
+      "program": "SBIR Phase I",
+      "topic_area": "Measurement Science / Data Analytics",
+      "ceiling_usd": 100000,
+      "duration_months": 6,
+      "deadline_typical": "FY25 Phase II NOFO closed; FY26 NOFO TBA — subscribe at nist.gov/tpo/sbir",
+      "current_state": "between_cycles",
+      "url": "https://www.nist.gov/sbir",
+      "eligibility": {
+        "small_business": true,
+        "us_owned_majority": true,
+        "employees_lt": 500
+      },
+      "fit_keywords": [
+        "measurement", "calibration", "uncertainty", "benchmarking",
+        "evidence", "reproducibility"
+      ],
+      "required_sections": [
+        "Technical Volume", "Cost Volume", "Commercialization", "Bio Sketches"
+      ],
+      "page_limits": {"technical_volume_pages": 25}
+    },
+    {
+      "id": "afwerx_sbir_open_topic",
+      "agency": "U.S. Air Force / AFWERX",
+      "program": "SBIR Phase I — Open Topic",
+      "topic_area": "Dual-Use Innovation",
+      "ceiling_usd": 75000,
+      "duration_months": 3,
+      "deadline_typical": "rolling open topics",
+      "url": "https://afwerx.com",
+      "eligibility": {
+        "small_business": true,
+        "us_owned_majority": true,
+        "employees_lt": 500,
+        "dual_use_required": true
+      },
+      "fit_keywords": [
+        "dual-use", "forecasting", "infrastructure", "decision support",
+        "real-time", "anomaly", "early warning"
+      ],
+      "required_sections": [
+        "Volume 2 Technical", "Volume 3 Cost", "Volume 5 Commercialization"
+      ],
+      "page_limits": {"technical_volume_pages": 20}
+    },
+    {
+      "id": "darpa_disruptioneer",
+      "agency": "DARPA",
+      "program": "Disruption Opportunity (DO)",
+      "topic_area": "AI Exploration",
+      "ceiling_usd": 1000000,
+      "duration_months": 18,
+      "deadline_typical": "rolling against active DO solicitations",
+      "url": "https://www.darpa.mil/work-with-us/opportunities",
+      "eligibility": {
+        "us_research_only": true,
+        "novel_algorithm_required": true
+      },
+      "fit_keywords": [
+        "novel ai", "explainable", "uncertainty", "regime", "resilience",
+        "phase-locked", "harmonic"
+      ],
+      "required_sections": [
+        "Volume 1 Technical", "Volume 2 Cost", "Statement of Work"
+      ],
+      "page_limits": {"volume_1_pages": 25}
+    },
+    {
+      "id": "nsf_pfi_tt",
+      "agency": "NSF",
+      "program": "Partnerships for Innovation — Technology Translation",
+      "topic_area": "Lab-to-Market",
+      "ceiling_usd": 250000,
+      "duration_months": 18,
+      "deadline_typical": "2026-09-23",
+      "url": "https://new.nsf.gov/funding/opportunities/partnerships-innovation-pfi",
+      "eligibility": {
+        "us_research_only": true,
+        "prior_nsf_funded": false,
+        "technology_translation_focus": true
+      },
+      "fit_keywords": [
+        "translation", "commercialization", "evidence", "validation",
+        "deployable", "infrastructure"
+      ],
+      "required_sections": [
+        "Project Description", "Commercialization Plan", "References"
+      ],
+      "page_limits": {"project_description_pages": 15}
+    },
+    {
+      "id": "doe_phase_ii_pathway",
+      "agency": "U.S. Department of Energy",
+      "program": "SBIR Phase II (post-Phase-I)",
+      "topic_area": "Advanced Computing & Data Analytics",
+      "ceiling_usd": 1100000,
+      "duration_months": 24,
+      "deadline_typical": "follow-on after Phase I award",
+      "url": "https://science.osti.gov/sbir",
+      "eligibility": {
+        "small_business": true,
+        "phase_i_completed_required": true
+      },
+      "fit_keywords": [
+        "energy", "grid", "phase ii", "scale", "deployment", "pilot"
+      ],
+      "required_sections": [
+        "Project Description", "Phase I Results", "Phase II Plan",
+        "Commercialization Plan", "Budget"
+      ],
+      "page_limits": {"project_description_pages": 25}
+    },
+    {
+      "id": "nasa_sbir_phase_i",
+      "agency": "NASA",
+      "program": "SBIR Phase I",
+      "topic_area": "Earth Science / Data Analytics / Autonomous Systems",
+      "ceiling_usd": 225000,
+      "duration_months": 6,
+      "deadline_typical": "2026-05-21",
+      "current_state": "closed_2026_phase_i_may_21",
+      "source_verified_utc": "2026-06-12T00:00:00Z",
+      "source_verification_url": "https://www.nasa.gov/sbir_sttr/phase-i/",
+      "url": "https://www.nasa.gov/sbir_sttr/phase-i/",
+      "eligibility": {
+        "small_business": true,
+        "us_owned_majority": true,
+        "employees_lt": 500,
+        "pi_employed_min_pct": 51,
+        "us_research_only": true
+      },
+      "fit_keywords": [
+        "earth observation", "anomaly detection", "time series", "ml",
+        "ai", "autonomous", "decision support", "data analytics",
+        "infrastructure", "forecasting", "calibration"
+      ],
+      "narrative_hook": "Leverages NASA Earth-data APIs (already integrated) for harmonic anomaly detection over satellite + ground sensor fusion.",
+      "required_sections": [
+        "Technical Proposal", "Cost Proposal", "Briefing Chart",
+        "Tech Innovation", "Commercialization"
+      ],
+      "page_limits": {"technical_proposal_pages": 19}
+    },
+    {
+      "id": "nasa_sbir_phase_ii",
+      "agency": "NASA",
+      "program": "SBIR Phase II (post-Phase-I)",
+      "topic_area": "Earth Science / Data Analytics",
+      "ceiling_usd": 850000,
+      "duration_months": 24,
+      "deadline_typical": "follow-on after NASA Phase I",
+      "url": "https://sbir.nasa.gov/solicitations",
+      "eligibility": {
+        "small_business": true,
+        "phase_i_completed_required": true
+      },
+      "fit_keywords": [
+        "scale", "deployment", "pilot", "earth science",
+        "operational", "data product"
+      ],
+      "required_sections": [
+        "Technical Proposal", "Phase I Results", "Commercialization", "Cost"
+      ],
+      "page_limits": {"technical_proposal_pages": 50}
+    },
+    {
+      "id": "noaa_sbir_25",
+      "agency": "NOAA",
+      "program": "SBIR Phase I",
+      "topic_area": "Climate / Energy / Ocean Data Analytics",
+      "ceiling_usd": 175000,
+      "duration_months": 6,
+      "deadline_typical": "2026-12-15",
+      "url": "https://techpartnerships.noaa.gov/sbir/",
+      "eligibility": {
+        "small_business": true,
+        "us_owned_majority": true,
+        "employees_lt": 500
+      },
+      "fit_keywords": [
+        "climate", "energy", "weather", "anomaly", "forecasting",
+        "data analytics", "ml", "infrastructure resilience"
+      ],
+      "narrative_hook": "Couples EIA energy demand APIs with NOAA climate APIs for grid-stress harmonic forecasting.",
+      "required_sections": [
+        "Technical Proposal", "Cost Proposal", "Commercialization"
+      ],
+      "page_limits": {"technical_proposal_pages": 25}
+    },
+    {
+      "id": "doe_eere_data_utilization",
+      "agency": "U.S. Department of Energy (EERE)",
+      "program": "Energy Data Innovation / Buildings & Grid Analytics",
+      "topic_area": "EIA / Grid Data Utilization",
+      "ceiling_usd": 500000,
+      "duration_months": 18,
+      "deadline_typical": "2026-10-30",
+      "url": "https://www.energy.gov/eere/funding/eere-funding-opportunities",
+      "eligibility": {
+        "small_business": true,
+        "us_research_only": true,
+        "energy_data_utilization": true
+      },
+      "fit_keywords": [
+        "eia", "energy data", "grid analytics", "demand forecasting",
+        "buildings", "anomaly detection", "operational"
+      ],
+      "narrative_hook": "Direct EIA API integration for state-level demand anomaly forecasting with harmonic phase-locked detection.",
+      "required_sections": [
+        "Concept Paper", "Technical Volume", "Budget", "Team", "Commercialization"
+      ],
+      "page_limits": {"concept_paper_pages": 8, "technical_volume_pages": 20}
+    }
+  ]
+}

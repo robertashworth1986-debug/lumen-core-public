@@ -11,6 +11,7 @@
   }
 
   var ROUTES = [
+    { label: "Home", href: "/operator_home.html", hint: "Plain-English platform, proof, and readiness map" },
     { label: "Mission", href: "/mission_control.html", hint: "System health and evidence control" },
     { label: "Quant", href: "/quant_lab.html", hint: "Unified research and operator cockpit" },
     { label: "Trade", href: "/kraken_execution_dashboard.html", hint: "Kraken paper and execution evidence" },

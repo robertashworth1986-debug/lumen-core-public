@@ -62,6 +62,47 @@ class ProductionRepairTests(unittest.TestCase):
                 any("TO_BE_FILLED" in blocker for blocker in preflight["blockers"])
             )
 
+    def test_submission_preflight_allows_request_below_maximum_ceiling(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            required = {
+                "application.json": (
+                    '{"agency":"Test","program":"Test","deadline_typical":"2099-01-01",'
+                    '"current_state":"open","applicant":{"sam_gov_status":"active",'
+                    '"sam_gov_verified_utc":"2098-01-01","sam_gov_expiration_date":"2099-12-31"},'
+                    '"submission_readiness":{"grants_gov_account_verified":true,'
+                    '"aor_authority_verified":true},"eligibility":{"eligible":true},'
+                    '"budget":{"ceiling_usd":150000,"total":125000}}'
+                ),
+                "application.md": "complete\n",
+                "technical_volume.md": "complete\n",
+                "commercialization_plan.md": "complete\n",
+                "cover_letter.md": "complete\n",
+                "budget.json": "{}",
+                "eligibility_report.json": "{}",
+                "evidence_manifest.json": "{}",
+                "manifest.sha256.json": "{}",
+                "approval_state.json": '{"state":"approved"}',
+            }
+            for name, content in required.items():
+                (run_dir / name).write_text(content, encoding="utf-8")
+            preflight = build_preflight(
+                "test_grant",
+                run_dir,
+                {
+                    "deadline_typical": "2099-01-01",
+                    "current_state": "open",
+                    "source_verified_utc": "2098-01-01",
+                    "ceiling_usd": 150000,
+                },
+            )
+            self.assertFalse(
+                any("budget total" in blocker for blocker in preflight["blockers"])
+            )
+            self.assertTrue(
+                any("maximum" in warning for warning in preflight["warnings"])
+            )
+
     def test_known_low_hour_is_selected_in_training(self) -> None:
         candles: list[Candle] = []
         start = datetime(2025, 1, 1, tzinfo=timezone.utc)

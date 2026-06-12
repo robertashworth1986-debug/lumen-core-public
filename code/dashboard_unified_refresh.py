@@ -629,7 +629,7 @@ def build_external_dashboards():
             "paper": str(PAPER_DASH_PATH),
             "lumascout": str(LUMASCOUT_DASH_PATH),
         }
-    except Exception as e:
+    except (Exception, SystemExit) as e:
         print(f"[PREMIUM] Failed to build premium dashboards: {e}")
         traceback.print_exc()
         lumascout = build_lumascout_dashboard(build_lumascout_metrics())
