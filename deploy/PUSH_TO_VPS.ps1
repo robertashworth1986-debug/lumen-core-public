@@ -188,7 +188,7 @@ if (Test-Path $landingDir) {
 
 # Step 4: Install current units after current source is in place.
 Write-Host "[4/5] Installing and restarting canonical production services..." -ForegroundColor Yellow
-$installServicesCmd = 'set -e; sudo chown -R lumencore:lumencore ' + $VpsRoot + '; sudo env LUMA_SERVICE_USER=lumencore LUMA_DOMAIN=lumen-core.ai bash ' + $VpsRoot + '/code/deploy/deploy_vps.sh lumen-core.ai; sudo systemctl restart luma-gateway luma-dashboard-refresh luma-paper-ticker luma-symbol-awareness luma-kraken-history'
+$installServicesCmd = 'set -e; sudo find ' + $VpsRoot + '/code/deploy -type f -name "*.sh" -exec sed -i "s/\r$//" {} +; sudo bash -n ' + $VpsRoot + '/code/deploy/deploy_vps.sh; sudo chown -R lumencore:lumencore ' + $VpsRoot + '; sudo env LUMA_SERVICE_USER=lumencore LUMA_DOMAIN=lumen-core.ai bash ' + $VpsRoot + '/code/deploy/deploy_vps.sh lumen-core.ai; sudo systemctl restart luma-gateway luma-dashboard-refresh luma-paper-ticker luma-symbol-awareness luma-kraken-history'
 Invoke-Ssh -StepLabel "4/5 Install services" -RemoteCommand $installServicesCmd
 
 # Step 5: Status check
