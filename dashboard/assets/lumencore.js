@@ -1,7 +1,7 @@
 // =====================================================================
 // LumenCore Mission Control — shared cinematic chrome
 // Loads on every reskinned page; injects:
-//   - WebGL particle field + harmonic rings (Three.js via CDN)
+//   - WebGL particle field + harmonic rings (vendored Three.js with CDN fallback)
 //   - boot sequence overlay
 //   - top bar (logo, title, nav, clock, LIVE pill)
 //   - holographic grid + scanlines
@@ -543,8 +543,8 @@
       loadThreeWithFallback([
         './assets/vendor/three.min.js',
         '/assets/vendor/three.min.js',
-        'https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js',
-        'https://unpkg.com/three@0.162.0/build/three.min.js',
+        'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.min.js',
+        'https://unpkg.com/three@0.160.1/build/three.min.js',
       ]);
     } else {
       startCanvasFallback();
