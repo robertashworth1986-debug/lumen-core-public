@@ -1,0 +1,2005 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LumenCore - Kraken Execution Mission Control</title>
+<script src="js/luma_design_system.js"></script>
+<script src="js/luma_path_resolver.js"></script>
+<script src="js/cinematic_telemetry_layer.js"></script>
+<link rel="stylesheet" href="./assets/luma_command_fabric.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: #eaf3ff;
+  background:
+    radial-gradient(1200px 700px at 8% -8%, rgba(34, 211, 238, 0.22), transparent 60%),
+    radial-gradient(900px 600px at 92% -12%, rgba(168, 85, 247, 0.22), transparent 60%),
+    radial-gradient(1300px 800px at 50% 120%, rgba(59, 130, 246, 0.18), transparent 62%),
+    linear-gradient(145deg, #040712 0%, #070b18 50%, #05070f 100%);
+  overflow-x: hidden;
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::before {
+  background-image:
+    linear-gradient(rgba(86, 215, 203, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(86, 215, 203, 0.05) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: radial-gradient(circle at 50% 30%, black 28%, transparent 82%);
+  opacity: 0.8;
+}
+
+body::after {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 2px,
+    rgba(34, 211, 238, 0.03) 2px,
+    rgba(34, 211, 238, 0.03) 4px
+  );
+  animation: scan-shift 10s linear infinite;
+}
+
+.luma-page {
+  position: relative;
+  z-index: 1;
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 20px 22px 44px;
+  backdrop-filter: blur(1px);
+}
+
+.luma-header {
+  border: 1px solid rgba(86, 215, 203, 0.22);
+  background: linear-gradient(135deg, rgba(11, 18, 34, 0.76), rgba(8, 13, 24, 0.64));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 20px 50px rgba(5, 8, 20, 0.65),
+    0 0 36px rgba(86, 215, 203, 0.16);
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+
+.luma-logo-text {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1.1px;
+  text-shadow: 0 0 20px rgba(86, 215, 203, 0.4);
+}
+
+.luma-logo-sub {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1.1px;
+}
+
+.luma-statusbar {
+  margin-top: 12px;
+  border: 1px solid rgba(86, 215, 203, 0.24);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(9, 15, 28, 0.9), rgba(7, 11, 21, 0.76));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 30px rgba(1, 6, 16, 0.5);
+}
+
+.luma-section-title {
+  margin-top: 18px;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #dff8ff;
+  text-shadow: 0 0 16px rgba(86, 215, 203, 0.34);
+}
+
+.luma-card {
+  position: relative;
+  border-radius: 14px;
+  border: 1px solid rgba(86, 215, 203, 0.22);
+  background: linear-gradient(165deg, rgba(10, 17, 34, 0.82), rgba(8, 12, 24, 0.66));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 18px 42px rgba(3, 8, 18, 0.58),
+    0 0 34px rgba(86, 215, 203, 0.1);
+  transform-style: preserve-3d;
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  overflow: hidden;
+}
+
+.luma-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -125%;
+  width: 62%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0),
+    rgba(186, 252, 255, 0.12),
+    rgba(255, 255, 255, 0)
+  );
+  transform: skewX(-16deg);
+  animation: holo-sweep 9.5s ease-in-out infinite;
+}
+
+.luma-card:hover {
+  transform: translateY(-3px) rotateX(1.2deg) rotateY(-0.8deg);
+  border-color: rgba(86, 215, 203, 0.46);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 24px 58px rgba(3, 8, 18, 0.72),
+    0 0 44px rgba(86, 215, 203, 0.24);
+}
+
+.luma-card.gold {
+  border-color: rgba(251, 191, 36, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 18px 42px rgba(3, 8, 18, 0.58),
+    0 0 36px rgba(251, 191, 36, 0.12);
+}
+
+.luma-card-title,
+.proof-row .k,
+.growth-tile .k {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.7px;
+}
+
+.luma-stat-value,
+.growth-tile .v {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.4px;
+  text-shadow: 0 0 18px rgba(86, 215, 203, 0.26);
+}
+
+.luma-table-wrap {
+  border: 1px solid rgba(86, 215, 203, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.luma-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  background: rgba(10, 18, 34, 0.9);
+}
+
+.luma-table tbody tr {
+  background: rgba(7, 12, 24, 0.62);
+}
+
+.luma-table tbody tr:nth-child(even) {
+  background: rgba(9, 15, 29, 0.78);
+}
+
+.luma-table tbody tr:hover {
+  background: rgba(24, 45, 78, 0.65);
+}
+
+.proof-chip,
+.growth-link,
+.state-pill {
+  backdrop-filter: blur(6px);
+}
+
+.luma-footer {
+  margin-top: 18px;
+  border-top: 1px solid rgba(86, 215, 203, 0.22);
+  color: rgba(223, 248, 255, 0.86);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.4px;
+}
+
+#kraken-cinematic-host {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.telemetry-rail {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(86, 215, 203, 0.2);
+  border-radius: 10px;
+  padding: 7px 10px;
+  background: linear-gradient(180deg, rgba(8, 13, 24, 0.82), rgba(7, 11, 20, 0.66));
+}
+
+.telemetry-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(86, 215, 203, 0.18);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  color: rgba(223, 248, 255, 0.88);
+}
+
+.telemetry-chip.ok {
+  border-color: rgba(74, 222, 128, 0.35);
+  color: rgba(134, 239, 172, 0.94);
+}
+
+.telemetry-chip.warn {
+  border-color: rgba(251, 191, 36, 0.38);
+  color: rgba(253, 224, 71, 0.94);
+}
+
+.telemetry-chip.crit {
+  border-color: rgba(248, 113, 113, 0.42);
+  color: rgba(254, 202, 202, 0.95);
+}
+
+.telemetry-meter {
+  margin-left: auto;
+  min-width: 180px;
+  flex: 1;
+  max-width: 260px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(2, 6, 16, 0.76);
+  border: 1px solid rgba(86, 215, 203, 0.15);
+  overflow: hidden;
+}
+
+.telemetry-meter > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  transition: width 260ms ease;
+  background: linear-gradient(90deg, rgba(34, 211, 238, 0.85), rgba(168, 85, 247, 0.82));
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.34);
+}
+
+.telemetry-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--ice2);
+}
+
+@keyframes holo-sweep {
+  0%, 70%, 100% { left: -130%; opacity: 0; }
+  18% { opacity: 1; }
+  44% { left: 150%; opacity: 0.75; }
+}
+
+@keyframes scan-shift {
+  from { transform: translateY(0); }
+  to { transform: translateY(8px); }
+}
+
+@media (max-width: 1080px) {
+  .luma-page {
+    padding: 14px 12px 28px;
+  }
+  .luma-header {
+    border-radius: 12px;
+  }
+  .luma-card {
+    border-radius: 12px;
+  }
+  .telemetry-meter {
+    min-width: 120px;
+    max-width: none;
+  }
+}
+
+.proof-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.proof-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(86, 215, 203, 0.08);
+  color: var(--ice2);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.6px;
+}
+.proof-chip b {
+  color: var(--teal);
+}
+.txid-cell {
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--gold);
+  font-size: 11px;
+}
+.state-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--line);
+}
+.state-pending {
+  color: var(--warn);
+  border-color: rgba(251, 191, 36, 0.32);
+  background: rgba(251, 191, 36, 0.12);
+}
+.state-executed {
+  color: var(--green);
+  border-color: rgba(74, 222, 128, 0.32);
+  background: rgba(74, 222, 128, 0.12);
+}
+.state-rejected {
+  color: var(--red);
+  border-color: rgba(248, 113, 113, 0.32);
+  background: rgba(248, 113, 113, 0.12);
+}
+.state-other {
+  color: var(--ice2);
+}
+.proof-notes {
+  display: grid;
+  gap: 8px;
+}
+.proof-row {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(6, 11, 18, 0.45);
+}
+.proof-row .k {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--ice2);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.proof-row .v {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--ice);
+}
+.ws-banner {
+  margin-left: auto;
+}
+.growth-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+.growth-tile {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(6, 11, 18, 0.45);
+}
+.growth-tile .k {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--ice2);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+.growth-tile .v {
+  margin-top: 3px;
+  color: var(--teal);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+}
+.growth-link {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(86, 215, 203, 0.1);
+  color: var(--teal);
+  text-decoration: none;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 6px 10px;
+}
+@media (max-width: 980px) {
+  .growth-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+</style>
+</head>
+<body>
+<div id="kraken-cinematic-host" aria-hidden="true"></div>
+<div class="luma-page">
+
+  <div class="luma-header">
+    <div class="luma-logo">
+      <div class="luma-logo-mark"></div>
+      <div>
+        <div class="luma-logo-text">Luma<span>Core</span></div>
+        <div class="luma-logo-sub">Kraken Execution Mission Control</div>
+      </div>
+    </div>
+    <div class="luma-header-right">
+      <span id="nr-hdr" class="luma-badge gold">WS CONNECTING</span>
+      <span id="execModeBadge" class="luma-badge warn">BOOTSTRAP</span>
+      <span id="liveRegistryStamp" style="color:var(--ice2)">refresh -</span>
+    </div>
+  </div>
+
+  <div class="luma-statusbar" id="execStatusBar">
+    <div class="luma-status-dot warn" id="statusDot"></div>
+    <span>Mode: <strong id="sbMode">-</strong></span>
+    <span class="luma-sep">|</span>
+    <span>Live Arm: <strong id="sbLiveArm">-</strong></span>
+    <span class="luma-sep">|</span>
+    <span>Kill Switch: <strong id="sbKill">-</strong></span>
+    <span class="luma-sep">|</span>
+    <span>Pending: <strong id="sbPending">-</strong></span>
+    <span class="luma-sep">|</span>
+    <span>Open Lots: <strong id="sbOpen">-</strong></span>
+    <span class="luma-sep">|</span>
+    <span>TXIDs: <strong id="sbTxid">-</strong></span>
+    <span class="luma-sep">|</span>
+    <span>Premium Usage: <strong id="sbPkg">-</strong></span>
+    <span class="luma-sep">|</span>
+    <span>Kraken Equity: <strong id="sbEquity">-</strong></span>
+  </div>
+
+  <div class="telemetry-rail" id="telemetryRail">
+    <span class="telemetry-chip warn">feed booting</span>
+    <span class="telemetry-meta" id="telemetryMeta">waiting for first telemetry sweep...</span>
+    <span class="telemetry-meter"><span id="telemetryPulseBar"></span></span>
+  </div>
+
+  <!-- ============================================================
+       Alpha Globe Intelligence Panel (AlphaGlobe3D)
+       ============================================================ -->
+  <div style="margin-top:14px;display:flex;gap:14px;align-items:stretch;flex-wrap:wrap">
+
+    <!-- Globe canvas -->
+    <div style="background:rgba(4,7,18,0.72);border:1px solid rgba(34,211,238,0.2);border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;min-width:280px;backdrop-filter:blur(12px);flex:0 0 280px">
+      <div style="font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:rgba(34,211,238,0.6);margin-bottom:8px">3D ALPHA GLOBE</div>
+      <canvas id="kraken-globe-canvas" style="width:220px;height:220px;border-radius:50%;cursor:grab;display:block;filter:drop-shadow(0 0 24px rgba(34,211,238,0.3))"></canvas>
+      <div style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(107,122,170,0.8);text-align:center">DRAG · SCROLL ZOOM · CLICK PAIR</div>
+      <div style="margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(34,211,238,0.7)" id="globe-pair-count">Loading pairs…</div>
+    </div>
+
+    <!-- Globe stats + agent hub link -->
+    <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:10px;justify-content:space-between">
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:rgba(34,211,238,0.6);margin-bottom:2px">ALPHA INTEL SNAPSHOT</div>
+        <div id="globe-top-pair" style="background:rgba(7,11,28,0.7);border:1px solid rgba(34,211,238,0.18);border-radius:10px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8f1ff">Hover globe to inspect pair…</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <div style="flex:1;min-width:90px;background:rgba(7,11,28,0.7);border:1px solid rgba(52,211,153,0.2);border-radius:10px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:10px">
+            <div style="color:rgba(107,122,170,0.8);font-size:9px;margin-bottom:2px">STRONG</div>
+            <div style="color:#34d399;font-size:14px;font-weight:700" id="globe-count-strong">—</div>
+          </div>
+          <div style="flex:1;min-width:90px;background:rgba(7,11,28,0.7);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:10px">
+            <div style="color:rgba(107,122,170,0.8);font-size:9px;margin-bottom:2px">MODERATE</div>
+            <div style="color:#f59e0b;font-size:14px;font-weight:700" id="globe-count-mod">—</div>
+          </div>
+          <div style="flex:1;min-width:90px;background:rgba(7,11,28,0.7);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:10px">
+            <div style="color:rgba(107,122,170,0.8);font-size:9px;margin-bottom:2px">AVOID</div>
+            <div style="color:#f87171;font-size:14px;font-weight:700" id="globe-count-avoid">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Approval Hub shortcut -->
+      <a href="agent_approval_hub.html" style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.35);border-radius:10px;padding:12px 16px;text-decoration:none;color:#34d399;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.2px;transition:background .15s" onmouseover="this.style.background='rgba(52,211,153,0.18)'" onmouseout="this.style.background='rgba(52,211,153,0.08)'">
+        <span>🚀 AGENT APPROVAL HUB</span>
+        <span style="background:rgba(52,211,153,0.2);border-radius:20px;padding:2px 10px;font-family:'JetBrains Mono',monospace;font-size:9px" id="globe-pending-count">…</span>
+      </a>
+
+    </div>
+  </div>
+
+  <div class="luma-card gold" style="margin-top:14px">
+    <div class="luma-card-title">Execution Authenticity Guard</div>
+    <div class="luma-stat-value sm" id="truthVal">VERIFYING</div>
+    <div class="luma-stat-sub" id="truthSub">Cross-checking mode, executor heartbeat, and TXID-backed fills...</div>
+  </div>
+
+  <div class="luma-section-title">Runtime Execution Control Plane</div>
+  <div class="luma-grid luma-grid-4">
+    <div class="luma-card">
+      <div class="luma-card-title">Execution Mode</div>
+      <div class="luma-stat-value sm" id="modeVal">-</div>
+      <div class="luma-stat-sub" id="modeSub">Awaiting gateway data</div>
+    </div>
+    <div class="luma-card">
+      <div class="luma-card-title">Live Arm State</div>
+      <div class="luma-stat-value sm" id="armVal">-</div>
+      <div class="luma-stat-sub" id="armSub">Runtime control flags</div>
+    </div>
+    <div class="luma-card">
+      <div class="luma-card-title">Kill Switch</div>
+      <div class="luma-stat-value sm" id="killVal">-</div>
+      <div class="luma-stat-sub" id="killSub">Deadman safety rail</div>
+    </div>
+    <div class="luma-card">
+      <div class="luma-card-title">Approval Backlog</div>
+      <div class="luma-stat-value sm" id="pendingVal">-</div>
+      <div class="luma-stat-sub" id="pendingSub">Tickets requiring operator decision</div>
+    </div>
+  </div>
+
+  <div class="luma-grid luma-grid-4">
+    <div class="luma-card">
+      <div class="luma-card-title">Kraken USD Equity</div>
+      <div class="luma-stat-value sm gold" id="eqVal">-</div>
+      <div class="luma-stat-sub" id="eqSub">Real balance feed</div>
+    </div>
+    <div class="luma-card">
+      <div class="luma-card-title">Unrealized PnL</div>
+      <div class="luma-stat-value sm" id="upnlVal">-</div>
+      <div class="luma-stat-sub" id="upnlSub">Live mark-to-market</div>
+    </div>
+    <div class="luma-card">
+      <div class="luma-card-title">Realized Net Today</div>
+      <div class="luma-stat-value sm" id="realizedVal">-</div>
+      <div class="luma-stat-sub" id="realizedSub">Matched round-trips after fees</div>
+    </div>
+    <div class="luma-card">
+      <div class="luma-card-title">Premium Package Usage</div>
+      <div class="luma-stat-value sm" id="pkgVal">-</div>
+      <div class="luma-stat-sub" id="pkgSub">Active package leverage</div>
+    </div>
+  </div>
+
+  <div class="luma-section-title">Real TXID Proof Rail</div>
+  <div class="luma-card gold">
+    <div class="proof-strip">
+      <span class="proof-chip">Last refresh: <b id="proofStamp">-</b></span>
+      <span class="proof-chip">Ledger source: <b id="proofSource">-</b></span>
+      <span class="proof-chip">Latest TXID: <b id="proofLastTxid">-</b></span>
+    </div>
+    <div class="luma-table-wrap">
+      <table class="luma-table">
+        <thead>
+          <tr><th>UTC</th><th>Event</th><th>Pair</th><th>Side</th><th>Volume</th><th>TXID</th><th>Controller</th></tr>
+        </thead>
+        <tbody id="txidRows">
+          <tr><td colspan="7" style="text-align:center;color:var(--ice2);padding:24px">Waiting for execution feed...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="luma-section-title">Execution Approval Queue</div>
+  <div class="luma-card">
+    <div class="luma-table-wrap">
+      <table class="luma-table">
+        <thead>
+          <tr><th>Ticket</th><th>UTC</th><th>Pair</th><th>Side</th><th>Notional</th><th>Guards</th><th>State</th><th>Note</th></tr>
+        </thead>
+        <tbody id="approvalRows">
+          <tr><td colspan="8" style="text-align:center;color:var(--ice2);padding:24px">Queue loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="luma-section-title">Open Lots - Ledger Truth</div>
+  <div class="luma-card">
+    <div class="luma-table-wrap">
+      <table class="luma-table">
+        <thead>
+          <tr><th>Opened</th><th>Pair</th><th>Side</th><th>Volume</th><th>Remaining</th><th>Entry Price</th><th>TXID</th></tr>
+        </thead>
+        <tbody id="lotRows">
+          <tr><td colspan="7" style="text-align:center;color:var(--ice2);padding:24px">Open-lot ledger loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="luma-grid luma-grid-2" style="margin-top:24px">
+    <div class="luma-card">
+      <div class="luma-card-title">Node-RED Pipeline + Unity Feed</div>
+      <div id="nr-main" style="margin:10px 0"></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ice2)">/ws/live + /api/unity/edge</div>
+      <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ice2)">
+        Unity nodes: <strong id="unityNodeCount" style="color:var(--teal)">-</strong>
+      </div>
+      <div id="nr-events" style="margin-top:8px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--teal);max-height:80px;overflow-y:auto">No events yet...</div>
+    </div>
+
+    <div class="luma-card gold">
+      <div class="luma-card-title">Mission-Control Proof Statement</div>
+      <div id="proofStatement" class="proof-notes">
+        <div class="proof-row"><div class="k">Runtime rail</div><div class="v">Waiting for live telemetry...</div></div>
+      </div>
+      <div id="luma-explainer-panel" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <div class="luma-section-title">VPS Growth Evidence</div>
+  <div class="luma-card gold">
+    <div class="growth-grid">
+      <div class="growth-tile"><div class="k">Proof Score</div><div class="v" id="vpsScoreVal">-</div></div>
+      <div class="growth-tile"><div class="k">TXIDs</div><div class="v" id="vpsTxidVal">-</div></div>
+      <div class="growth-tile"><div class="k">Live Submits 7d</div><div class="v" id="vpsSubmitVal">-</div></div>
+      <div class="growth-tile"><div class="k">Realized Net</div><div class="v" id="vpsNetVal">-</div></div>
+    </div>
+    <div class="growth-grid" style="margin-top:8px">
+      <div class="growth-tile"><div class="k">Exchange Closed</div><div class="v" id="vpsClosedVal">-</div></div>
+      <div class="growth-tile"><div class="k">Fill Sync</div><div class="v" id="vpsFillSyncVal">-</div></div>
+      <div class="growth-tile"><div class="k">Controller Mode</div><div class="v" id="vpsCtrlModeVal">-</div></div>
+      <div class="growth-tile"><div class="k">Allow Live</div><div class="v" id="vpsCtrlLiveVal">-</div></div>
+      <div class="growth-tile"><div class="k">Heartbeat</div><div class="v" id="vpsCtrlHeartbeatVal">-</div></div>
+      <div class="growth-tile"><div class="k">Guard Reasons</div><div class="v" id="vpsCtrlReasonsVal">-</div></div>
+    </div>
+    <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ice2)">
+      source refresh <strong id="vpsRefreshUtc" style="color:var(--teal)">-</strong>
+      <span style="margin-left:8px">controller <strong id="vpsCtrlMeta" style="color:var(--teal)">-</strong></span>
+    </div>
+    <a class="growth-link" href="vps_growth_proof_3d.html">Open 3D VPS Growth Proof Room</a>
+  </div>
+
+  <div class="luma-footer">
+    <span>LumaTrader - Kraken Execution Layer v3</span>
+    <span>Robert BabyRay Ashworth</span>
+    <span>Gateway: <strong id="gatewayLabel">lumen-core.ai</strong></span>
+    <span>Telemetry: <strong id="telemetrySourceLabel">BOOT</strong></span>
+  </div>
+</div>
+
+<script>
+const REFRESH_MS = 8000;
+const LOCAL_BUNDLE_TTL_MS = 15000;
+const API_BASE = (() => {
+  const override = (window.LUMA_API_BASE || '').trim();
+  if (override) {
+    return override.replace(/\/$/, '');
+  }
+  if (location.protocol === 'http:' || location.protocol === 'https:') {
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      return 'http://127.0.0.1:8787';
+    }
+    return location.origin;
+  }
+  return '';
+})();
+const pathResolver = (window.LumaPathResolver && typeof window.LumaPathResolver.build === 'function')
+  ? window.LumaPathResolver.build({
+      locationPath: location.pathname,
+      protocol: location.protocol,
+    })
+  : null;
+
+const sourceState = Object.create(null);
+const localBundleCache = { ts: 0, bundle: null, promise: null };
+let cinematicLayer = null;
+let lastRefreshUtc = null;
+let refreshFailureCount = 0;
+
+const $ = (id) => document.getElementById(id);
+
+function esc(v) {
+  return String(v == null ? '' : v)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function setText(id, value) {
+  const el = $(id);
+  if (el) {
+    el.textContent = value;
+  }
+}
+
+function setStat(id, value, tone) {
+  const el = $(id);
+  if (!el) {
+    return;
+  }
+  el.textContent = value;
+  el.className = 'luma-stat-value sm';
+  if (tone) {
+    el.classList.add(tone);
+  }
+}
+
+function setBadge(id, label, tone) {
+  const el = $(id);
+  if (!el) {
+    return;
+  }
+  el.className = 'luma-badge';
+  if (tone) {
+    el.classList.add(tone);
+  }
+  el.textContent = label;
+}
+
+function fmtUsd(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) {
+    return 'n/a';
+  }
+  return '$' + n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+}
+
+function fmtSignedUsd(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) {
+    return 'n/a';
+  }
+  const prefix = n >= 0 ? '+' : '-';
+  return prefix + '$' + Math.abs(n).toLocaleString(undefined, { maximumFractionDigits: 2 });
+}
+
+function fmtPct(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) {
+    return 'n/a';
+  }
+  return n.toFixed(1) + '%';
+}
+
+function fmtTs(v) {
+  if (!v) {
+    return 'n/a';
+  }
+  try {
+    return new Date(v).toISOString().replace('T', ' ').slice(0, 19) + 'Z';
+  } catch (_) {
+    return String(v);
+  }
+}
+
+function compactTxid(v) {
+  const s = String(v || '');
+  if (s.length <= 16) {
+    return s || 'n/a';
+  }
+  return s.slice(0, 7) + '...' + s.slice(-7);
+}
+
+function basename(path) {
+  const s = String(path || '');
+  if (!s) {
+    return 'n/a';
+  }
+  const idx = Math.max(s.lastIndexOf('/'), s.lastIndexOf('\\'));
+  return idx >= 0 ? s.slice(idx + 1) : s;
+}
+
+function stateClass(state) {
+  const s = String(state || '').toUpperCase();
+  if (s === 'PENDING_HUMAN_APPROVAL') {
+    return 'state-pending';
+  }
+  if (s === 'EXECUTED_OPEN') {
+    return 'state-executed';
+  }
+  if (s.includes('REJECT')) {
+    return 'state-rejected';
+  }
+  return 'state-other';
+}
+
+function countRecentTx(events, minutes) {
+  const cutoff = Date.now() - minutes * 60000;
+  return events.filter((ev) => {
+    const ts = Date.parse(ev.ts || '');
+    return Number.isFinite(ts) && ts >= cutoff;
+  }).length;
+}
+
+function isLikelyTxid(value) {
+  const v = String(value || '').trim();
+  if (!v) {
+    return false;
+  }
+  return /^[A-Za-z0-9\-]{8,}$/.test(v);
+}
+
+function isVerifiedExecutionEvent(ev) {
+  if (!ev || !isLikelyTxid(ev.txid)) {
+    return false;
+  }
+  const side = String(ev.side || '').toLowerCase();
+  if (side !== 'buy' && side !== 'sell') {
+    return false;
+  }
+  const ts = Date.parse(String(ev.ts || ''));
+  if (!Number.isFinite(ts)) {
+    return false;
+  }
+  const eventName = String(ev.event || '').toLowerCase();
+  return /(submit|fill|execut|order|close|open)/.test(eventName);
+}
+
+function uniquePaths(values) {
+  const seen = new Set();
+  const out = [];
+  (values || []).forEach((value) => {
+    const key = String(value || '').trim();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    out.push(key);
+  });
+  return out;
+}
+
+function outCandidates(rel) {
+  const clean = String(rel || '').replace(/^\/+/, '');
+  const candidates = (pathResolver && typeof pathResolver.outCandidates === 'function')
+    ? pathResolver.outCandidates(clean)
+    : uniquePaths([
+        '../out/' + clean,
+        '../INSTITUTIONAL_STACK_V2/out/' + clean,
+        '/out/' + clean,
+        '/INSTITUTIONAL_STACK_V2/out/' + clean,
+      ]);
+  const fileMode = location.protocol !== 'http:' && location.protocol !== 'https:';
+  if (!fileMode) {
+    return candidates;
+  }
+  const relOnly = candidates.filter((p) => !/^(\/|[A-Za-z]:[\\/])/.test(String(p || '').trim()));
+  const ordered = relOnly.length ? relOnly : candidates;
+  return uniquePaths(
+    ordered
+      .filter((p) => p.includes('INSTITUTIONAL_STACK_V2/out/'))
+      .concat(ordered.filter((p) => !p.includes('INSTITUTIONAL_STACK_V2/out/')))
+  );
+}
+
+function setSource(path, source) {
+  const key = String(path || '');
+  const base = key.split('?')[0];
+  sourceState[key] = source;
+  sourceState[base] = source;
+}
+
+function getSource(path) {
+  const key = String(path || '');
+  const base = key.split('?')[0];
+  return sourceState[key] || sourceState[base] || 'missing';
+}
+
+function parseJsonlText(text, maxRows = 360) {
+  const src = String(text || '').trim();
+  if (!src) return [];
+  const lines = src.split(/\r?\n/);
+  const start = Math.max(0, lines.length - maxRows);
+  const rows = [];
+  for (let i = start; i < lines.length; i += 1) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    try {
+      rows.push(JSON.parse(line));
+    } catch (_) {
+      // skip malformed row
+    }
+  }
+  return rows;
+}
+
+function toIsoLike(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const ts = Date.parse(raw);
+  if (Number.isFinite(ts)) {
+    return new Date(ts).toISOString();
+  }
+  return raw;
+}
+
+function normalizeAuditEvent(row) {
+  const payload = row && typeof row === 'object' && row.payload && typeof row.payload === 'object'
+    ? row.payload
+    : row;
+  const eventName = String(row?.event_type || row?.event || payload?.event_type || payload?.event || '').trim();
+  const sideRaw = String(payload?.side || row?.side || '').toLowerCase();
+  const side = sideRaw || (/closed|sell/.test(eventName.toLowerCase()) ? 'sell' : (/placed|buy/.test(eventName.toLowerCase()) ? 'buy' : ''));
+  const symbol = String(payload?.symbol || row?.symbol || '').trim();
+  const pair = String(payload?.pair || row?.pair || (symbol ? `${symbol}USD` : '')).trim();
+  return {
+    ts: toIsoLike(row?.event_time_utc || row?.timestamp_utc || row?.timestamp || payload?.timestamp || payload?.ts),
+    event: eventName || 'event',
+    pair,
+    side,
+    volume: payload?.qty ?? payload?.volume ?? payload?.notional_usd ?? row?.qty ?? null,
+    txid: payload?.txid || row?.txid || '',
+    controller: 'artifact_chain',
+  };
+}
+
+async function fetchJsonFromCandidates(candidates) {
+  const paths = uniquePaths(candidates);
+  for (const path of paths) {
+    try {
+      const r = await fetch(path, { cache: 'no-store' });
+      if (!r.ok) continue;
+      return await r.json();
+    } catch (_) {
+      // try next
+    }
+  }
+  return null;
+}
+
+async function fetchJsonlFromCandidates(candidates, maxRows = 360) {
+  const paths = uniquePaths(candidates);
+  for (const path of paths) {
+    try {
+      const r = await fetch(path, { cache: 'no-store' });
+      if (!r.ok) continue;
+      const text = await r.text();
+      const rows = parseJsonlText(text, maxRows);
+      if (rows.length) return rows;
+    } catch (_) {
+      // try next
+    }
+  }
+  return [];
+}
+
+function ledgerSellPnlUsd(row) {
+  const qty = Number(row?.qty);
+  const entry = Number(row?.entry_price);
+  const exit = Number(row?.exit_price);
+  const direction = String(row?.direction || 'long').toLowerCase();
+  if (Number.isFinite(qty) && Number.isFinite(entry) && Number.isFinite(exit)) {
+    const gross = (exit - entry) * qty;
+    return direction === 'short' ? -gross : gross;
+  }
+  const sizeUsd = Number(row?.size_usd);
+  const pnlPct = Number(row?.pnl_pct);
+  if (Number.isFinite(sizeUsd) && Number.isFinite(pnlPct)) {
+    return sizeUsd * (pnlPct / 100);
+  }
+  return 0;
+}
+
+function computeOpenLots(ledgerRows) {
+  const lotsByPair = new Map();
+  const rows = (ledgerRows || []).slice().sort((a, b) => String(a?.timestamp || a?.logged_utc || '').localeCompare(String(b?.timestamp || b?.logged_utc || '')));
+
+  rows.forEach((row) => {
+    const side = String(row?.side || '').toLowerCase();
+    const pair = String(row?.pair || (row?.symbol ? `${row.symbol}USD` : '')).trim();
+    const qty = Number(row?.qty);
+    if (!pair || !Number.isFinite(qty) || qty <= 0) return;
+
+    if (!lotsByPair.has(pair)) {
+      lotsByPair.set(pair, []);
+    }
+    const lots = lotsByPair.get(pair);
+
+    if (side === 'buy') {
+      lots.push({
+        ts: toIsoLike(row?.timestamp || row?.logged_utc),
+        pair,
+        side: 'buy',
+        volume: qty,
+        remaining: qty,
+        price: Number(row?.entry_price),
+        txid: String(row?.txid || ''),
+      });
+      return;
+    }
+
+    if (side === 'sell') {
+      let remaining = qty;
+      for (let i = 0; i < lots.length && remaining > 0; i += 1) {
+        const lot = lots[i];
+        if (!lot || !Number.isFinite(lot.remaining) || lot.remaining <= 0) continue;
+        const dec = Math.min(lot.remaining, remaining);
+        lot.remaining -= dec;
+        remaining -= dec;
+      }
+    }
+  });
+
+  const openLots = [];
+  lotsByPair.forEach((lots) => {
+    lots.forEach((lot) => {
+      if (Number.isFinite(lot.remaining) && lot.remaining > 1e-8) {
+        openLots.push(lot);
+      }
+    });
+  });
+  return openLots;
+}
+
+async function loadLocalExecutionBundle() {
+  const now = Date.now();
+  if (localBundleCache.bundle && (now - localBundleCache.ts) < LOCAL_BUNDLE_TTL_MS) {
+    return localBundleCache.bundle;
+  }
+  if (localBundleCache.promise) {
+    return localBundleCache.promise;
+  }
+
+  localBundleCache.promise = (async () => {
+    const [heartbeat, queueRaw, balanceRaw, packageAudit, portfolioSummary, ledgerRows, auditRows] = await Promise.all([
+      fetchJsonFromCandidates(outCandidates('execution/live_engine_heartbeat.json').concat(outCandidates('execution/live_executor_heartbeat.json'))),
+      fetchJsonFromCandidates(outCandidates('execution/live_operator_approval_queue.json')),
+      fetchJsonFromCandidates(outCandidates('execution/kraken_balance_cache.json').concat(outCandidates('execution/live_balance_snapshot.json'))),
+      fetchJsonFromCandidates(outCandidates('execution/package_leverage_audit.json').concat(outCandidates('execution/premium_stack_runtime.json'))),
+      fetchJsonFromCandidates(outCandidates('execution/portfolio_summary.json')),
+      fetchJsonlFromCandidates(outCandidates('execution/live_trade_ledger.jsonl'), 520),
+      fetchJsonlFromCandidates(outCandidates('execution/live_execution_audit_chain.jsonl').concat(outCandidates('execution/execution_events.jsonl')), 420),
+    ]);
+
+    const tickets = Array.isArray(queueRaw?.tickets)
+      ? queueRaw.tickets.map((ticket) => {
+          const state = String(ticket?.approval_state || ticket?.decision_state || 'PENDING_HUMAN_APPROVAL').toUpperCase();
+          const normalizedState = state === 'PENDING_OPERATOR_REVIEW' ? 'PENDING_HUMAN_APPROVAL' : state;
+          const hint = String(ticket?.action_hint || '').toUpperCase();
+          const inferredSide = hint.includes('SHORT') || hint.includes('SELL') ? 'sell' : 'buy';
+          return {
+            ticket_id: ticket?.ticket_id || 'ticket',
+            timestamp: ticket?.timestamp || ticket?.timestamp_utc || queueRaw?.generated_utc || heartbeat?.timestamp_utc,
+            pair: ticket?.pair || (ticket?.symbol ? `${ticket.symbol}USD` : ''),
+            side: ticket?.side || inferredSide,
+            notional_usd: Number(ticket?.notional_usd ?? ticket?.notional_hint_usd ?? 0),
+            guards_pass_all: normalizedState !== 'PENDING_HUMAN_APPROVAL',
+            approval_state: normalizedState,
+            note: ticket?.note || ticket?.action_hint || '',
+          };
+        })
+      : [];
+
+    const openLots = computeOpenLots(ledgerRows);
+    const buyRows = (ledgerRows || []).filter((row) => String(row?.side || '').toLowerCase() === 'buy');
+    const sellRows = (ledgerRows || []).filter((row) => String(row?.side || '').toLowerCase() === 'sell');
+    const nowMs = Date.now();
+    const sellRows24 = sellRows.filter((row) => {
+      const ts = Date.parse(row?.timestamp || row?.logged_utc || '');
+      return Number.isFinite(ts) && ts >= (nowMs - 24 * 3600 * 1000);
+    });
+
+    const realizedNet = sellRows.reduce((acc, row) => acc + ledgerSellPnlUsd(row), 0);
+    const wins24 = sellRows24.filter((row) => {
+      const pct = Number(row?.pnl_pct);
+      if (Number.isFinite(pct)) return pct > 0;
+      return ledgerSellPnlUsd(row) > 0;
+    }).length;
+
+    const equityFromBalance = Number(balanceRaw?.zusd ?? balanceRaw?.portfolio_est_total_usd ?? balanceRaw?.usd_balance_max);
+    const equityFromPortfolio = Number(portfolioSummary?.current_equity);
+    const equityFromHeartbeat = Number(heartbeat?.portfolio_equity_usd || heartbeat?.total_equity_usd_hint);
+    const usdEquity = Number.isFinite(equityFromBalance)
+      ? equityFromBalance
+      : (Number.isFinite(equityFromPortfolio) ? equityFromPortfolio : equityFromHeartbeat);
+
+    const normalizedEvents = (auditRows || [])
+      .map(normalizeAuditEvent)
+      .filter((row) => row && row.ts)
+      .sort((a, b) => String(b.ts || '').localeCompare(String(a.ts || '')));
+
+    const bundle = {
+      snapshot: packageAudit
+        ? {
+            packages: {
+              usage_pct: Number(packageAudit?.active_utilization_pct ?? packageAudit?.import_ok_pct ?? 0),
+              installed_count: Number(packageAudit?.installed_package_count || 0),
+              active_count: Number(packageAudit?.active_package_count ?? packageAudit?.import_ok_count ?? 0),
+            },
+          }
+        : null,
+      summary: {
+        mode: String(heartbeat?.runtime_mode || 'LIVE').toUpperCase(),
+        status: String(heartbeat?.status || 'running').toLowerCase(),
+      },
+      queue: {
+        tickets,
+        control_flags: {
+          live_enabled: Boolean(heartbeat?.live_orders_armed ?? true),
+          kill_switch: Boolean(String(heartbeat?.reason || '').toLowerCase().includes('kill')),
+          max_notional_per_trade_usd: Number(heartbeat?.quote_usd_hint || 0),
+          deadman_timeout_seconds: Number(heartbeat?.deadman_timeout_seconds || 0),
+        },
+        generated_utc: queueRaw?.generated_utc || queueRaw?.timestamp_utc || heartbeat?.timestamp_utc || null,
+      },
+      eventsPayload: {
+        events: normalizedEvents,
+        source: 'artifact_chain',
+      },
+      positions: {
+        lots_open: openLots,
+        totals: {
+          open_lot_count: openLots.length,
+          real_buys: buyRows.length,
+          real_sells: sellRows.length,
+          closed_round_trips: Math.min(buyRows.length, sellRows.length),
+        },
+      },
+      balance: {
+        ok: Number.isFinite(usdEquity),
+        usd_equity: usdEquity,
+        asset_count: Number(balanceRaw?.raw_assets_positive_count || 0),
+        cached: true,
+      },
+      unrealized: {
+        totals: {
+          upnl_usd: 0,
+          upnl_pct: 0,
+        },
+      },
+      perf: {
+        session: {
+          realized_pnl_net_usd: realizedNet,
+          sells_count: sellRows.length,
+        },
+        last_24h: {
+          win_rate_pct: sellRows24.length ? (wins24 / sellRows24.length) * 100 : 0,
+        },
+      },
+      vpsProof: await fetchJsonFromCandidates(outCandidates('execution/vps_growth_proof.json')),
+      vpsController: await fetchJsonFromCandidates(outCandidates('execution/vps_growth_controller_status.json')),
+    };
+
+    localBundleCache.ts = Date.now();
+    localBundleCache.bundle = bundle;
+    return bundle;
+  })();
+
+  try {
+    return await localBundleCache.promise;
+  } finally {
+    localBundleCache.promise = null;
+  }
+}
+
+async function loadLocalFallbackForPath(path) {
+  const basePath = String(path || '').split('?')[0];
+  const bundle = await loadLocalExecutionBundle();
+  switch (basePath) {
+    case '/api/snapshot': return bundle.snapshot;
+    case '/api/trading/summary': return bundle.summary;
+    case '/api/master/approval-queue': return bundle.queue;
+    case '/api/events/recent': return bundle.eventsPayload;
+    case '/api/positions/live': return bundle.positions;
+    case '/api/kraken/balance': return bundle.balance;
+    case '/api/kraken/unrealized': return bundle.unrealized;
+    case '/api/perf/session': return bundle.perf;
+    case '/data/vps_growth_proof.json':
+    case '/out/execution/vps_growth_proof.json':
+      return bundle.vpsProof;
+    case '/data/vps_growth_controller_status.json':
+    case '/out/execution/vps_growth_controller_status.json':
+      return bundle.vpsController;
+    default:
+      return null;
+  }
+}
+
+async function apiGet(path) {
+  const key = String(path || '');
+  const basePath = key.split('?')[0];
+  const apiLikePath = /^\/(api|data)\//i.test(basePath);
+
+  if (!API_BASE && apiLikePath) {
+    const fallbackOnly = await loadLocalFallbackForPath(basePath);
+    if (fallbackOnly != null) {
+      setSource(key, 'artifact');
+      setSource(basePath, 'artifact');
+      return fallbackOnly;
+    }
+    setSource(key, 'missing');
+    setSource(basePath, 'missing');
+    return null;
+  }
+
+  const urls = [];
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    urls.push(path);
+  } else {
+    if (!apiLikePath || API_BASE) {
+      urls.push(path);
+    }
+    if (API_BASE) {
+      urls.push(API_BASE + path);
+    }
+  }
+
+  const seen = new Set();
+  for (const url of urls) {
+    if (seen.has(url)) {
+      continue;
+    }
+    seen.add(url);
+    try {
+      const r = await fetch(url, { cache: 'no-store' });
+      if (!r.ok) {
+        continue;
+      }
+      const payload = await r.json();
+      setSource(key, 'api');
+      setSource(basePath, 'api');
+      return payload;
+    } catch (_) {
+      // try next source
+    }
+  }
+
+  const fallback = await loadLocalFallbackForPath(path);
+  if (fallback != null) {
+    setSource(key, 'artifact');
+    setSource(basePath, 'artifact');
+    return fallback;
+  }
+
+  setSource(key, 'missing');
+  setSource(basePath, 'missing');
+  return null;
+}
+
+function renderTxidRows(events) {
+  const body = $('txidRows');
+  if (!body) {
+    return;
+  }
+  if (!events.length) {
+    body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--ice2);padding:24px">No verified TXIDs yet.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = events.slice(0, 20).map((ev) => {
+    const side = String(ev.side || '').toLowerCase();
+    const sideClass = side === 'buy' ? 'green' : (side === 'sell' ? 'red' : 'warn');
+    return '<tr>' +
+      '<td>' + esc(fmtTs(ev.ts)) + '</td>' +
+      '<td>' + esc(ev.event || 'event') + '</td>' +
+      '<td class="teal">' + esc(ev.pair || '-') + '</td>' +
+      '<td class="' + sideClass + '">' + esc(side ? side.toUpperCase() : '-') + '</td>' +
+      '<td>' + esc(ev.volume == null ? '-' : ev.volume) + '</td>' +
+      '<td class="txid-cell" title="' + esc(ev.txid || '') + '">' + esc(compactTxid(ev.txid)) + '</td>' +
+      '<td>' + esc(ev.controller || '-') + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function renderApprovalRows(tickets) {
+  const body = $('approvalRows');
+  if (!body) {
+    return;
+  }
+  if (!tickets.length) {
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--ice2);padding:24px">No tickets in queue.</td></tr>';
+    return;
+  }
+
+  const sorted = tickets.slice().sort((a, b) => {
+    const ap = String(a.approval_state || '').toUpperCase() === 'PENDING_HUMAN_APPROVAL' ? 0 : 1;
+    const bp = String(b.approval_state || '').toUpperCase() === 'PENDING_HUMAN_APPROVAL' ? 0 : 1;
+    if (ap !== bp) {
+      return ap - bp;
+    }
+    return String(b.timestamp || '').localeCompare(String(a.timestamp || ''));
+  });
+
+  body.innerHTML = sorted.slice(0, 24).map((t) => {
+    const side = String(t.side || '').toLowerCase();
+    const sideClass = side === 'buy' ? 'green' : (side === 'sell' ? 'red' : 'warn');
+    const state = String(t.approval_state || 'UNKNOWN').toUpperCase();
+    const guards = t.guards_pass_all ? 'PASS' : 'BLOCK';
+    const note = String(t.note || '').slice(0, 80);
+    return '<tr>' +
+      '<td class="txid-cell">' + esc(t.ticket_id || '-') + '</td>' +
+      '<td>' + esc(fmtTs(t.timestamp)) + '</td>' +
+      '<td class="teal">' + esc(t.pair || '-') + '</td>' +
+      '<td class="' + sideClass + '">' + esc(side ? side.toUpperCase() : '-') + '</td>' +
+      '<td>' + esc(fmtUsd(t.notional_usd)) + '</td>' +
+      '<td><span class="state-pill ' + (t.guards_pass_all ? 'state-executed' : 'state-rejected') + '">' + esc(guards) + '</span></td>' +
+      '<td><span class="state-pill ' + stateClass(state) + '">' + esc(state) + '</span></td>' +
+      '<td>' + esc(note || '-') + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function renderLotRows(lots) {
+  const body = $('lotRows');
+  if (!body) {
+    return;
+  }
+  if (!lots.length) {
+    body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--ice2);padding:24px">No open lots in ledger.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = lots.slice(0, 24).map((lot) => {
+    const side = String(lot.side || '').toLowerCase();
+    const sideClass = side === 'buy' ? 'green' : (side === 'sell' ? 'red' : 'warn');
+    return '<tr>' +
+      '<td>' + esc(fmtTs(lot.ts)) + '</td>' +
+      '<td class="teal">' + esc(lot.pair || '-') + '</td>' +
+      '<td class="' + sideClass + '">' + esc(side ? side.toUpperCase() : '-') + '</td>' +
+      '<td>' + esc(lot.volume == null ? '-' : lot.volume) + '</td>' +
+      '<td>' + esc(lot.remaining == null ? '-' : lot.remaining) + '</td>' +
+      '<td>' + esc(Number.isFinite(Number(lot.price)) ? Number(lot.price).toFixed(6) : '-') + '</td>' +
+      '<td class="txid-cell" title="' + esc(lot.txid || '') + '">' + esc(compactTxid(lot.txid)) + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function renderProofNotes(ctx) {
+  const wrap = $('proofStatement');
+  if (!wrap) {
+    return;
+  }
+
+  const lines = [
+    {
+      k: 'Runtime rail',
+      v: ctx.mode + ' | live arm ' + (ctx.liveArm ? 'ON' : 'OFF') + ' | kill switch ' + (ctx.killSwitch ? 'ON' : 'OFF') + ' | status ' + (ctx.running ? 'running' : 'not_running')
+    },
+    {
+      k: 'Ledger truth',
+      v: 'real buys ' + ctx.realBuys + ' | real sells ' + ctx.realSells + ' | open lots ' + ctx.openLots + ' | closed round-trips ' + ctx.closedTrips
+    },
+    {
+      k: 'Performance proof',
+      v: 'realized net today ' + ctx.realizedText + ' | 24h win rate ' + ctx.winRateText + ' | matched sells ' + ctx.sellsCount
+    },
+    {
+      k: 'Premium package rail',
+      v: ctx.pkgLine
+    },
+    {
+      k: 'TXID cadence',
+      v: ctx.txCadence + ' | latest ' + (ctx.latestTx || 'awaiting first TXID')
+    },
+    {
+      k: 'VPS growth proof',
+      v: ctx.vpsLine
+    }
+  ];
+
+  wrap.innerHTML = lines.map((row) => {
+    return '<div class="proof-row"><div class="k">' + esc(row.k) + '</div><div class="v">' + esc(row.v) + '</div></div>';
+  }).join('');
+}
+
+function setWsBanner(state) {
+  const el = $('nr-hdr');
+  if (!el) {
+    return;
+  }
+  if (state === 'connected') {
+    el.className = 'luma-badge green';
+    el.textContent = 'WS CONNECTED';
+  } else if (state === 'message') {
+    el.className = 'luma-badge';
+    el.textContent = 'WS LIVE';
+  } else {
+    el.className = 'luma-badge warn';
+    el.textContent = 'WS RECONNECTING';
+  }
+}
+
+function sourceClass(source) {
+  if (source === 'api') return 'ok';
+  if (source === 'artifact') return 'warn';
+  return 'crit';
+}
+
+function renderTelemetryRail(runtime) {
+  const rail = $('telemetryRail');
+  if (!rail) return;
+  const chips = [
+    { label: 'Snapshot', key: '/api/snapshot' },
+    { label: 'Queue', key: '/api/master/approval-queue' },
+    { label: 'Events', key: '/api/events/recent' },
+    { label: 'Balance', key: '/api/kraken/balance' },
+  ];
+
+  const chipHtml = chips.map((chip) => {
+    const src = getSource(chip.key);
+    const tag = src === 'api' ? 'API' : (src === 'artifact' ? 'FILE' : 'MISS');
+    return `<span class="telemetry-chip ${sourceClass(src)}">${chip.label} ${tag}</span>`;
+  }).join('');
+
+  const ageText = runtime?.ageSec != null ? `${runtime.ageSec.toFixed(0)}s` : 'n/a';
+  const failText = refreshFailureCount > 0 ? ` · degraded x${refreshFailureCount}` : '';
+  const metaText = `${runtime?.mode || 'UNKNOWN'} · ${runtime?.state || 'idle'} · tx10m ${runtime?.tx10m || 0} · age ${ageText}${failText}`;
+  const width = Math.max(0, Math.min(100, Number(runtime?.pulse || 0)));
+
+  rail.innerHTML = `${chipHtml}
+    <span class="telemetry-meta" id="telemetryMeta">${esc(metaText)}</span>
+    <span class="telemetry-meter"><span id="telemetryPulseBar" style="width:${width}%"></span></span>`;
+
+  const srcLabel = $('telemetrySourceLabel');
+  if (srcLabel) {
+    const values = chips.map((chip) => getSource(chip.key));
+    if (values.every((v) => v === 'api')) srcLabel.textContent = 'LIVE API';
+    else if (values.some((v) => v === 'artifact')) srcLabel.textContent = 'MIXED FILE';
+    else srcLabel.textContent = 'DEGRADED';
+  }
+}
+
+function ensureCinematicLayer() {
+  if (cinematicLayer || !window.LumaCinematic) {
+    return;
+  }
+  const host = $('kraken-cinematic-host');
+  if (!host) {
+    return;
+  }
+  cinematicLayer = window.LumaCinematic.mount({
+    host,
+    mode: 'EXEC',
+    source: 'API',
+  });
+}
+
+function updateCinematicTelemetry(runtime) {
+  ensureCinematicLayer();
+  if (!cinematicLayer || !runtime) {
+    return;
+  }
+  const missing = ['/api/snapshot', '/api/master/approval-queue', '/api/events/recent', '/api/kraken/balance']
+    .map((key) => getSource(key))
+    .filter((src) => src === 'missing').length;
+  const artifact = ['/api/snapshot', '/api/master/approval-queue', '/api/events/recent', '/api/kraken/balance']
+    .map((key) => getSource(key))
+    .filter((src) => src === 'artifact').length;
+
+  const anomaly = Math.max(runtime.anomaly, missing * 26 + refreshFailureCount * 8);
+  const confidencePenalty = artifact * 9 + missing * 14;
+
+  cinematicLayer.setMetrics({
+    pulse: runtime.pulse,
+    integrity: Math.max(8, runtime.integrity - missing * 12),
+    throughput: runtime.throughput,
+    anomaly,
+    confidence: Math.max(5, runtime.confidence - confidencePenalty),
+  });
+
+  const source = missing > 0 ? 'DEGRADED' : (artifact > 0 ? 'ARTIFACT' : 'API');
+  cinematicLayer.setMeta('mode', runtime.mode || 'EXEC');
+  cinematicLayer.setMeta('source', source);
+  const cue = runtime.killSwitch
+    ? 'KILL'
+    : (runtime.running ? (missing > 0 ? 'RECOVER' : 'ALIVE') : 'IDLE');
+  cinematicLayer.setMeta('cue', cue);
+}
+
+async function refreshDashboard() {
+  try {
+    const [snapshot, summary, queue, eventsPayload, positions, balance, unrealized, perf, vpsProofPrimary, vpsCtrlPrimary] = await Promise.all([
+    apiGet('/api/snapshot'),
+    apiGet('/api/trading/summary'),
+    apiGet('/api/master/approval-queue'),
+    apiGet('/api/events/recent?limit=80'),
+    apiGet('/api/positions/live'),
+    apiGet('/api/kraken/balance'),
+    apiGet('/api/kraken/unrealized'),
+    apiGet('/api/perf/session'),
+    apiGet('/data/vps_growth_proof.json'),
+    apiGet('/data/vps_growth_controller_status.json')
+  ]);
+
+    const vpsProof = vpsProofPrimary || await apiGet('/out/execution/vps_growth_proof.json');
+    const vpsCtrl = vpsCtrlPrimary || await apiGet('/out/execution/vps_growth_controller_status.json');
+
+    const events = Array.isArray(eventsPayload && eventsPayload.events) ? eventsPayload.events : [];
+    const txEvents = events.filter(isVerifiedExecutionEvent).sort((a, b) => String(b.ts || '').localeCompare(String(a.ts || '')));
+    const weakTxEvents = events.filter((ev) => ev && ev.txid && !isVerifiedExecutionEvent(ev));
+    const tickets = Array.isArray(queue && queue.tickets) ? queue.tickets : [];
+    const pending = tickets.filter((t) => String(t.approval_state || '').toUpperCase() === 'PENDING_HUMAN_APPROVAL').length;
+    const flags = (queue && queue.control_flags) || {};
+    const liveArm = Boolean(flags.live_enabled);
+    const killSwitch = Boolean(flags.kill_switch);
+    const mode = String((summary && summary.mode) || 'paper').toUpperCase();
+    const running = String((summary && summary.status) || '').toLowerCase() === 'running';
+
+    const totals = (positions && positions.totals) || {};
+    const openLots = Number(totals.open_lot_count || 0);
+    const realBuys = Number(totals.real_buys || 0);
+    const realSells = Number(totals.real_sells || 0);
+    const closedTrips = Number(totals.closed_round_trips || 0);
+
+    const pkg = (snapshot && snapshot.packages) || {};
+    const pkgUsage = Number(pkg.usage_pct);
+    const pkgInstalled = Number(pkg.installed_count || 0);
+    const pkgActive = Number(pkg.active_count || 0);
+
+    const equity = balance && balance.ok ? Number(balance.usd_equity) : NaN;
+    const upnl = unrealized && unrealized.totals ? Number(unrealized.totals.upnl_usd) : NaN;
+    const upnlPct = unrealized && unrealized.totals ? Number(unrealized.totals.upnl_pct) : NaN;
+
+    const session = (perf && perf.session) || {};
+    const last24 = (perf && perf.last_24h) || {};
+    const realized = Number(session.realized_pnl_net_usd);
+    const winRate = Number(last24.win_rate_pct);
+    const sellsCount = Number(session.sells_count || 0);
+
+    const tx10m = countRecentTx(txEvents, 10);
+    const latestTx = txEvents.length ? compactTxid(txEvents[0].txid) : null;
+
+    const vpsEv = (vpsProof && vpsProof.kraken_execution_evidence) || {};
+    const vpsRecon = (vpsProof && vpsProof.kraken_fill_reconciliation) || {};
+    const vpsPerf = (vpsProof && vpsProof.live_trade_performance) || {};
+    const vpsScore = (vpsProof && vpsProof.integrity_score) || {};
+    const vpsGuard = (vpsCtrl && vpsCtrl.guard) || {};
+    const vpsScoreVal = Number(vpsScore.score_0_100 || 0);
+    const vpsNet = Number(vpsPerf.realized_net_usd);
+    const vpsClosed = Number(vpsRecon.closed_count || 0);
+    const vpsQueried = Number(vpsRecon.txids_queried || 0);
+    const vpsSync = Number(vpsRecon.fill_sync_pct || 0);
+    const vpsReconEnabled = Boolean(vpsRecon.query_enabled);
+    const vpsReconErrors = Array.isArray(vpsRecon.query_errors) ? vpsRecon.query_errors : [];
+    const ctrlMode = String((vpsCtrl && vpsCtrl.mode) || 'UNKNOWN').toUpperCase();
+    const ctrlAllowLive = Boolean(vpsGuard.allow_live);
+    const ctrlReasons = Array.isArray(vpsGuard.reasons) ? vpsGuard.reasons : [];
+    const ctrlReasonsText = ctrlReasons.length ? ctrlReasons.slice(0, 3).join(', ') : 'none';
+    const ctrlHeartbeatStatus = String(vpsGuard.heartbeat_status || 'unknown');
+    const ctrlHeartbeatSource = String(vpsGuard.heartbeat_source || 'n/a');
+    const ctrlHeartbeatAge = Number(vpsGuard.heartbeat_age_minutes);
+    const ctrlHeartbeatText =
+    (vpsGuard.heartbeat_ok ? 'OK ' : 'BLOCKED ')
+    + ctrlHeartbeatSource
+    + (Number.isFinite(ctrlHeartbeatAge) ? (' ' + ctrlHeartbeatAge.toFixed(1) + 'm') : '');
+    const vpsLine =
+    'score ' + vpsScoreVal.toFixed(2) +
+    ' | txids ' + String(vpsEv.txid_count || 0) +
+    ' | submits7d ' + String(vpsEv.recent_7d_live_submit || 0) +
+    ' | exchange closed ' + (vpsReconEnabled ? (String(vpsClosed) + '/' + String(vpsQueried)) : 'disabled') +
+    ' | fill sync ' + (vpsReconEnabled ? ((Number.isFinite(vpsSync) ? vpsSync.toFixed(1) : '0.0') + '%') : 'disabled') +
+    ' | realized ' + (Number.isFinite(vpsNet) ? fmtSignedUsd(vpsNet) : 'n/a') +
+    ' | ctrl ' + ctrlMode +
+    ' | live ' + (ctrlAllowLive ? 'ON' : 'OFF') +
+    ' | reasons ' + ctrlReasonsText +
+    (vpsReconErrors.length ? ' | recon err ' + vpsReconErrors.slice(0, 1).join(',') : '');
+
+    const verifiedLive = mode === 'LIVE' && running && realBuys > 0 && realSells > 0 && txEvents.length > 0;
+    const badgeTone = killSwitch ? 'red' : (verifiedLive ? 'green' : (liveArm ? 'warn' : 'warn'));
+    const badgeLabel = verifiedLive
+    ? 'LIVE VERIFIED'
+    : (mode + (killSwitch ? ' KILL-SWITCH' : (liveArm ? ' ARMED / NOT VERIFIED' : ' SAFE')));
+    setBadge('execModeBadge', badgeLabel, badgeTone);
+
+    const dot = $('statusDot');
+    if (dot) {
+      dot.className = 'luma-status-dot';
+      if (killSwitch) {
+        dot.classList.add('crit');
+      } else if (!liveArm) {
+        dot.classList.add('warn');
+      }
+    }
+
+    setText('liveRegistryStamp', 'refresh ' + fmtTs((queue && queue.generated_utc) || (snapshot && snapshot.generated_utc) || new Date().toISOString()));
+
+    setText('sbMode', mode + (running ? ' RUN' : ' IDLE'));
+    setText('sbLiveArm', liveArm ? 'ON' : 'OFF');
+    setText('sbKill', killSwitch ? 'ON' : 'OFF');
+    setText('sbPending', String(pending));
+    setText('sbOpen', String(openLots));
+    setText('sbTxid', tx10m + '/10m verified');
+    setText('sbPkg', Number.isFinite(pkgUsage) ? pkgUsage.toFixed(1) + '%' : 'n/a');
+    setText('sbEquity', Number.isFinite(equity) ? fmtUsd(equity) : 'offline');
+
+    setStat('modeVal', mode, killSwitch ? 'red' : (liveArm ? 'green' : 'gold'));
+    setText('modeSub', running ? 'executor heartbeat active' : 'executor not running');
+
+    setStat('armVal', liveArm ? 'ON' : 'OFF', liveArm ? 'green' : 'red');
+    setText('armSub', 'max notional ' + fmtUsd(flags.max_notional_per_trade_usd));
+
+    setStat('killVal', killSwitch ? 'ON' : 'OFF', killSwitch ? 'red' : 'green');
+    setText('killSub', 'deadman ' + String(flags.deadman_timeout_seconds || 0) + 's');
+
+    setStat('pendingVal', String(pending), pending > 0 ? 'warn' : 'green');
+    setText('pendingSub', String(tickets.length) + ' total ticket(s) tracked');
+
+    if (Number.isFinite(equity)) {
+      setStat('eqVal', fmtUsd(equity), 'gold');
+      setText('eqSub', String(balance.asset_count || 0) + ' assets' + (balance.cached ? ' | cached' : ' | fresh'));
+    } else {
+      setStat('eqVal', 'offline', 'warn');
+      setText('eqSub', 'Check Kraken credentials and gateway');
+    }
+
+    if (Number.isFinite(upnl)) {
+      setStat('upnlVal', fmtSignedUsd(upnl), upnl >= 0 ? 'green' : 'red');
+      setText('upnlSub', 'open lots ' + String(openLots) + ' | ' + (Number.isFinite(upnlPct) ? (upnlPct.toFixed(2) + '%') : 'n/a'));
+    } else {
+      setStat('upnlVal', 'n/a', 'warn');
+      setText('upnlSub', 'No open lots or unrealized feed unavailable');
+    }
+
+    if (Number.isFinite(realized)) {
+      setStat('realizedVal', fmtSignedUsd(realized), realized >= 0 ? 'green' : 'red');
+      setText('realizedSub', String(sellsCount) + ' sells today | 24h WR ' + fmtPct(winRate));
+    } else {
+      setStat('realizedVal', 'n/a', 'warn');
+      setText('realizedSub', 'No matched round-trips recorded yet');
+    }
+
+    if (Number.isFinite(pkgUsage)) {
+      const tone = pkgUsage >= 75 ? 'green' : (pkgUsage >= 45 ? 'warn' : 'red');
+      setStat('pkgVal', pkgUsage.toFixed(1) + '%', tone);
+      setText('pkgSub', String(pkgActive) + '/' + String(pkgInstalled) + ' active premium adapters');
+    } else {
+      setStat('pkgVal', 'n/a', 'warn');
+      setText('pkgSub', 'Package leverage audit missing');
+    }
+
+    setText('proofStamp', fmtTs(new Date().toISOString()));
+    setText('proofSource', basename(eventsPayload && eventsPayload.source));
+    setText('proofLastTxid', latestTx || 'awaiting first TXID');
+
+    if (verifiedLive) {
+      setStat('truthVal', 'REAL EXECUTION VERIFIED', 'green');
+      setText('truthSub', 'TXID-backed buy/sell execution detected with live mode + running executor heartbeat.');
+    } else {
+      const weakCount = weakTxEvents.length;
+      const reasonBits = [];
+      if (mode !== 'LIVE') reasonBits.push('mode=' + mode);
+      if (!running) reasonBits.push('executor=idle');
+      if (realBuys + realSells === 0) reasonBits.push('real_fills=0');
+      if (txEvents.length === 0) reasonBits.push('verified_txid=0');
+      if (weakCount > 0) reasonBits.push('weak_txid=' + weakCount);
+      setStat('truthVal', 'PAPER / NOT VERIFIED', 'warn');
+      setText('truthSub', 'No confirmed live execution evidence. ' + reasonBits.join(' | '));
+    }
+
+    setText('vpsScoreVal', vpsScoreVal.toFixed(2));
+    setText('vpsTxidVal', String(vpsEv.txid_count || 0));
+    setText('vpsSubmitVal', String(vpsEv.recent_7d_live_submit || 0));
+    setText('vpsClosedVal', vpsReconEnabled ? (String(vpsClosed) + '/' + String(vpsQueried)) : 'DISABLED');
+    setText('vpsFillSyncVal', vpsReconEnabled ? ((Number.isFinite(vpsSync) ? vpsSync.toFixed(1) : '0.0') + '%') : 'DISABLED');
+    setText('vpsNetVal', Number.isFinite(vpsNet) ? fmtSignedUsd(vpsNet) : 'n/a');
+    setText('vpsCtrlModeVal', ctrlMode);
+    setText('vpsCtrlLiveVal', ctrlAllowLive ? 'READY' : 'SAFE');
+    setText('vpsCtrlHeartbeatVal', ctrlHeartbeatText);
+    setText('vpsCtrlReasonsVal', ctrlReasonsText);
+    setText('vpsRefreshUtc', fmtTs((vpsProof && vpsProof.generated_utc) || (vpsCtrl && vpsCtrl.generated_utc)));
+    setText('vpsCtrlMeta', ctrlHeartbeatStatus);
+
+    renderTxidRows(txEvents);
+    renderApprovalRows(tickets);
+    renderLotRows(Array.isArray(positions && positions.lots_open) ? positions.lots_open : []);
+
+    const pkgLine = Number.isFinite(pkgUsage)
+    ? (pkgActive + '/' + pkgInstalled + ' active (' + pkgUsage.toFixed(1) + '% usage)')
+    : 'package leverage unavailable';
+
+    renderProofNotes({
+      mode,
+      liveArm,
+      killSwitch,
+      running,
+      realBuys,
+      realSells,
+      openLots,
+      closedTrips,
+      realizedText: Number.isFinite(realized) ? fmtSignedUsd(realized) : 'n/a',
+      winRateText: fmtPct(winRate),
+      sellsCount,
+      pkgLine,
+      txCadence: tx10m + ' TXIDs in last 10m',
+      latestTx,
+      vpsLine
+    });
+
+    const sourceValues = [
+      getSource('/api/snapshot'),
+      getSource('/api/master/approval-queue'),
+      getSource('/api/events/recent'),
+      getSource('/api/kraken/balance'),
+    ];
+    const missingCount = sourceValues.filter((src) => src === 'missing').length;
+    const artifactCount = sourceValues.filter((src) => src === 'artifact').length;
+    const pulse = Math.max(5, Math.min(100, 34 + tx10m * 9 + (running ? 16 : 0) - missingCount * 8));
+    const integrity = Math.max(6, Math.min(100, 82 - missingCount * 18 - (killSwitch ? 24 : 0) - (pending > 0 ? 8 : 0)));
+    const throughput = Math.max(4, Math.min(100, 20 + Math.min(50, (realSells + realBuys) * 2.2) + (running ? 12 : 0)));
+    const confidence = Math.max(5, Math.min(100, 44 + (verifiedLive ? 32 : 0) - artifactCount * 8 - missingCount * 12));
+    const anomaly = Math.max(0, Math.min(100, (killSwitch ? 65 : 12) + pending * 4 + missingCount * 16));
+
+    const nowIso = new Date().toISOString();
+    if (!lastRefreshUtc) {
+      lastRefreshUtc = nowIso;
+    }
+    const ageMs = lastRefreshUtc ? (Date.now() - Date.parse(lastRefreshUtc)) : 0;
+    const runtimeRail = {
+      mode,
+      state: running ? 'running' : 'idle',
+      tx10m,
+      ageSec: Math.max(0, ageMs / 1000),
+      pulse,
+      integrity,
+      throughput,
+      confidence,
+      anomaly,
+      running,
+      killSwitch,
+    };
+
+    renderTelemetryRail(runtimeRail);
+    updateCinematicTelemetry(runtimeRail);
+
+    const gatewayLabel = $('gatewayLabel');
+    if (gatewayLabel) {
+      gatewayLabel.textContent = API_BASE || 'file-artifact-mode';
+    }
+
+    refreshFailureCount = 0;
+    lastRefreshUtc = nowIso;
+  } catch (err) {
+    refreshFailureCount += 1;
+    const mode = 'DEGRADED';
+    const ageMs = lastRefreshUtc ? (Date.now() - Date.parse(lastRefreshUtc)) : 0;
+    const runtimeRail = {
+      mode,
+      state: 'retry',
+      tx10m: 0,
+      ageSec: Math.max(0, ageMs / 1000),
+      pulse: 14,
+      integrity: 26,
+      throughput: 8,
+      confidence: 18,
+      anomaly: 78,
+      running: false,
+      killSwitch: false,
+    };
+    renderTelemetryRail(runtimeRail);
+    updateCinematicTelemetry(runtimeRail);
+    setBadge('execModeBadge', 'TELEMETRY DEGRADED', 'warn');
+    setText('liveRegistryStamp', 'refresh degraded: ' + (err && err.message ? err.message : 'unknown error'));
+  }
+}
+
+async function loadUnityNodeCount() {
+  if (!window.LumaDS || !LumaDS.gwUnityEdge) {
+    return;
+  }
+  try {
+    const d = await LumaDS.gwUnityEdge();
+    setText('unityNodeCount', String((d && d.node_count) || 0));
+  } catch (_) {
+    setText('unityNodeCount', 'n/a');
+  }
+}
+
+function mountDesignSystemHooks() {
+  if (!window.LumaDS) {
+    setWsBanner('reconnect');
+    return;
+  }
+
+  try {
+    LumaDS.injectCSS();
+    LumaDS.mountSpiral();
+    LumaDS.mountParticles(16);
+  } catch (_) {
+    // no-op
+  }
+
+  try {
+    LumaDS.mountNodeRedStatus('nr-main');
+    LumaDS.mountExplainer('luma-explainer-panel', 'analyst');
+    LumaDS.gwWsConnect();
+
+    setWsBanner('reconnect');
+    LumaDS.gwOnWs((evt, data) => {
+      if (evt === 'open') {
+        setWsBanner('connected');
+      } else if (evt === 'message') {
+        setWsBanner('message');
+        const el = $('nr-events');
+        if (el) {
+          const msg = new Date().toLocaleTimeString() + ' -> ' + JSON.stringify(data).slice(0, 90);
+          el.innerHTML = esc(msg) + '<br/>' + el.innerHTML;
+        }
+      } else {
+        setWsBanner('reconnect');
+      }
+    });
+  } catch (_) {
+    setWsBanner('reconnect');
+  }
+
+  loadUnityNodeCount();
+  setInterval(loadUnityNodeCount, 30000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  mountDesignSystemHooks();
+  refreshDashboard();
+  setInterval(refreshDashboard, REFRESH_MS);
+});
+</script>
+
+<!-- Alpha Globe 3D -->
+<script src="js/alpha_globe_3d.js"></script>
+<script>
+(function () {
+  var API_BASE = (typeof window.LUMA_API_BASE === 'string' && window.LUMA_API_BASE)
+    ? window.LUMA_API_BASE.replace(/\/$/, '') : '';
+  var resolver = (window.LumaPathResolver && typeof window.LumaPathResolver.build === 'function')
+    ? window.LumaPathResolver.build({ locationPath: location.pathname, protocol: location.protocol })
+    : null;
+
+  function unique(values) {
+    var seen = {};
+    var out = [];
+    (values || []).forEach(function (value) {
+      var key = String(value || '').trim();
+      if (!key || seen[key]) return;
+      seen[key] = true;
+      out.push(key);
+    });
+    return out;
+  }
+
+  function outCandidates(rel) {
+    var clean = String(rel || '').replace(/^\/+/, '');
+    var candidates = (resolver && typeof resolver.outCandidates === 'function')
+      ? resolver.outCandidates(clean)
+      : unique([
+          '../out/' + clean,
+          '../INSTITUTIONAL_STACK_V2/out/' + clean,
+          '/out/' + clean,
+          '/INSTITUTIONAL_STACK_V2/out/' + clean,
+        ]);
+    var fileMode = location.protocol !== 'http:' && location.protocol !== 'https:';
+    if (!fileMode) {
+      return candidates;
+    }
+    var relOnly = candidates.filter(function (p) {
+      return !/^(\/|[A-Za-z]:[\\/])/.test(String(p || '').trim());
+    });
+    var ordered = relOnly.length ? relOnly : candidates;
+    return unique(
+      ordered
+        .filter(function (p) { return p.indexOf('INSTITUTIONAL_STACK_V2/out/') >= 0; })
+        .concat(ordered.filter(function (p) { return p.indexOf('INSTITUTIONAL_STACK_V2/out/') < 0; }))
+    );
+  }
+
+  function loadAlphaMap(globe) {
+    var candidates = unique(outCandidates('ops/kraken_multi_tf_alpha_map_latest.json').concat([
+      API_BASE ? (API_BASE + '/out/ops/kraken_multi_tf_alpha_map_latest.json') : '',
+    ]));
+
+    function tryNext(idx) {
+      if (idx >= candidates.length) {
+        globe.loadData([]);
+        return;
+      }
+      fetch(candidates[idx], { cache: 'no-store' })
+        .then(function (r) {
+          if (!r.ok) throw new Error(String(r.status || 'fetch'));
+          return r.json();
+        })
+        .then(function (json) {
+          globe.loadData(json);
+        })
+        .catch(function () {
+          tryNext(idx + 1);
+        });
+    }
+
+    tryNext(0);
+  }
+
+  function loadPendingCount() {
+    var el = document.getElementById('globe-pending-count');
+    if (!el) return;
+
+    function setCount(value, source) {
+      el.textContent = String(value || 0) + ' pending';
+      el.title = source || '';
+    }
+
+    var queueApi = API_BASE
+      ? fetch(API_BASE + '/api/agents/queue', { cache: 'no-cache' })
+      : Promise.reject(new Error('api-disabled-in-file-mode'));
+
+    queueApi
+      .then(function (r) {
+        if (!r.ok) throw new Error(String(r.status || 'fetch'));
+        return r.json();
+      })
+      .then(function (data) {
+        setCount(data.total_pending || 0, 'api');
+      })
+      .catch(function () {
+        var queueCandidates = outCandidates('execution/live_operator_approval_queue.json');
+        (function tryQueue(idx) {
+          if (idx >= queueCandidates.length) {
+            setCount(0, 'fallback-missing');
+            return;
+          }
+          fetch(queueCandidates[idx], { cache: 'no-store' })
+            .then(function (r) {
+              if (!r.ok) throw new Error(String(r.status || 'fetch'));
+              return r.json();
+            })
+            .then(function (payload) {
+              var tickets = Array.isArray(payload && payload.tickets) ? payload.tickets : [];
+              var pending = tickets.filter(function (row) {
+                var state = String(row && (row.approval_state || row.decision_state) || '').toUpperCase();
+                return state === 'PENDING_HUMAN_APPROVAL' || state === 'PENDING_OPERATOR_REVIEW';
+              }).length;
+              setCount(pending, 'artifact');
+            })
+            .catch(function () {
+              tryQueue(idx + 1);
+            });
+        })(0);
+      });
+  }
+
+  function initKrakenGlobe() {
+    var canvas = document.getElementById('kraken-globe-canvas');
+    if (!canvas || !window.AlphaGlobe3D) { setTimeout(initKrakenGlobe, 500); return; }
+
+    var globe = new AlphaGlobe3D(canvas, { radius: 3.8, rotateSpeed: 0.0024, fov: 56 });
+    loadAlphaMap(globe);
+
+    globe.on('ready', function (info) {
+      var el = document.getElementById('globe-pair-count');
+      if (el) el.textContent = info.count + ' pairs loaded';
+      // Count tiers from the internal data
+      var strong = 0, mod = 0, avoid = 0;
+      (globe._data || []).forEach(function (d) {
+        var t = d.alpha_tier || '';
+        if (t === 'strong') strong++;
+        else if (t === 'moderate') mod++;
+        else if (t === 'avoid') avoid++;
+      });
+      var s = document.getElementById('globe-count-strong');
+      var m = document.getElementById('globe-count-mod');
+      var a = document.getElementById('globe-count-avoid');
+      if (s) s.textContent = strong;
+      if (m) m.textContent = mod;
+      if (a) a.textContent = avoid;
+    });
+
+    globe.on('hover', function (d) {
+      var el = document.getElementById('globe-top-pair');
+      if (!el) return;
+      var conf = ((d.alpha_score || 0) * 100).toFixed(1);
+      var ret24 = d.return_24h !== undefined ? ((d.return_24h * 100).toFixed(2) + '%') : '—';
+      var tierColors = { strong:'#34d399', moderate:'#f59e0b', neutral:'#7dd3fc', weak:'#fb923c', avoid:'#f87171' };
+      var col = tierColors[d.alpha_tier || 'neutral'] || '#e8f1ff';
+      el.innerHTML = '<b style="color:' + col + '">' + (d.pair || '') + '</b>'
+        + ' &nbsp;·&nbsp; Alpha: <b>' + conf + '%</b>'
+        + ' &nbsp;·&nbsp; 24h: <b>' + ret24 + '</b>'
+        + '<br/><span style="color:rgba(107,122,170,0.8);font-size:9px">' + (d.alpha_tier || '').toUpperCase() + ' TIER</span>';
+    });
+
+    loadPendingCount();
+  }
+
+  // Wait for THREE to be ready (loaded by luma_design_system.js or CDN)
+  setTimeout(initKrakenGlobe, 1200);
+})();
+</script>
+<script src="./assets/luma_command_fabric.js"></script>
+</body>
+</html>

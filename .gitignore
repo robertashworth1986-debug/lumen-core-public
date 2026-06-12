@@ -33,6 +33,12 @@ luma_live_keys.env
 # Generated dashboard HTML (auto-rebuilt by loop processes)
 dashboard/*.html
 !dashboard/social_pro_dashboard.html
+!dashboard/mission_control.html
+!dashboard/quant_lab.html
+!dashboard/kraken_execution_dashboard.html
+!dashboard/grants.html
+!dashboard/forecast.html
+!dashboard/explain.html
 
 # Execution runtime state (rebuilt every session)
 execution_events.jsonl

@@ -108,6 +108,7 @@ REFRESH_SCRIPT="$CODE_DIR/dashboard_unified_refresh.py"
 NODE_RED_FLOW_FILE="$CODE_DIR/node_red/flows_luma_bidirectional.json"
 NODE_RED_ENSURE_SCRIPT="$CODE_DIR/ENSURE_NODERED_LUMA_FLOWS.py"
 COHERENCE_BUILDER="$STACK_ROOT/code/build_gov_grade_coherence_report.py"
+COMMAND_FABRIC_ENSURE="$CODE_DIR/ops/ensure_dashboard_command_fabric.py"
 STRICT_COHERENCE_BUILD="${LUMA_STRICT_COHERENCE_BUILD:-0}"
 STRICT_PREMIUM_STACK="${LUMA_STRICT_PREMIUM_STACK:-0}"
 
@@ -116,7 +117,17 @@ REQUIRED_PAGES=(
    "mission_control.html"
    "grants.html"
    "quant_lab.html"
+   "kraken_execution_dashboard.html"
+   "forecast.html"
+   "explain.html"
 )
+
+if [[ -f "$COMMAND_FABRIC_ENSURE" ]]; then
+   echo "==> Ensuring canonical dashboard command fabric..."
+   "$PYTHON_BIN" "$COMMAND_FABRIC_ENSURE" \
+      --dashboard-root "$DASHBOARD_SRC" \
+      --strict
+fi
 
 for page in "${REQUIRED_PAGES[@]}"; do
    if [[ ! -f "$DASHBOARD_SRC/$page" ]]; then

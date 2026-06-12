@@ -910,6 +910,47 @@ def _build_execution_snapshot() -> dict[str, Any]:
     }
 
 
+def _build_runtime_gate_snapshot() -> dict[str, Any]:
+    runtime = load_json(RUNTIME_CONTROL_FILE, {})
+    if not isinstance(runtime, dict):
+        runtime = {}
+    mode = str(runtime.get("mode", "paper") or "paper").strip().lower()
+    allow_live_orders = bool(runtime.get("allow_live_orders", False))
+    paper_enabled = bool(runtime.get("paper_enabled", True))
+    kill_switch = bool(runtime.get("kill_switch", False))
+    execution_authorized = (
+        mode == "live"
+        and allow_live_orders
+        and not paper_enabled
+        and not kill_switch
+    )
+    reasons: list[str] = []
+    if mode != "live":
+        reasons.append(f"mode={mode}")
+    if not allow_live_orders:
+        reasons.append("allow_live_orders=false")
+    if paper_enabled:
+        reasons.append("paper_enabled=true")
+    if kill_switch:
+        reasons.append("kill_switch=true")
+    return {
+        "mode": mode,
+        "display_mode": (
+            "live"
+            if execution_authorized
+            else "paper"
+            if paper_enabled or mode == "paper"
+            else "shadow"
+        ),
+        "execution_authorized": execution_authorized,
+        "armed": execution_authorized,
+        "allow_live_orders": allow_live_orders,
+        "paper_enabled": paper_enabled,
+        "kill_switch": kill_switch,
+        "reasons": reasons,
+    }
+
+
 def build_snapshot() -> dict[str, Any]:
     scorecard = load_json(SCORECARD_FILE, {})
     metrics = load_json(METRICS_SCORECARD_FILE, {})
@@ -989,6 +1030,7 @@ def build_snapshot() -> dict[str, Any]:
         },
         "runtime": {
             "drift_operator_alert": runtime_drift,
+            "execution_gate": _build_runtime_gate_snapshot(),
         },
         "edge": {
             "verdict": edge_verdict,
@@ -7137,29 +7179,7 @@ AUTOBUY_DEFAULT = {
 
 
 def _autobuy_runtime_gate() -> dict[str, Any]:
-    runtime = load_json(RUNTIME_CONTROL_FILE, {})
-    mode = str(runtime.get("mode", "paper")).strip().lower()
-    allow_live_orders = bool(runtime.get("allow_live_orders", False))
-    paper_enabled = bool(runtime.get("paper_enabled", True))
-    kill_switch = bool(runtime.get("kill_switch", False))
-    armed = mode == "live" and allow_live_orders and not paper_enabled and not kill_switch
-    reasons: list[str] = []
-    if mode != "live":
-        reasons.append(f"mode={mode}")
-    if not allow_live_orders:
-        reasons.append("allow_live_orders=false")
-    if paper_enabled:
-        reasons.append("paper_enabled=true")
-    if kill_switch:
-        reasons.append("kill_switch=true")
-    return {
-        "armed": armed,
-        "mode": mode,
-        "allow_live_orders": allow_live_orders,
-        "paper_enabled": paper_enabled,
-        "kill_switch": kill_switch,
-        "reasons": reasons,
-    }
+    return _build_runtime_gate_snapshot()
 
 
 def _load_autobuy_cfg() -> dict[str, Any]:

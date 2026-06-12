@@ -16,6 +16,7 @@ import grant_application_factory as grant_factory
 from grant_submission_kit import build_preflight
 from build_symbol_timing_edge_model import Candle, analyze_symbol
 from collect_kraken_hourly_history import merge_rows
+from ensure_dashboard_command_fabric import ensure_fabric
 from assert_runtime_safety import assert_paper_mode
 
 
@@ -156,6 +157,20 @@ class ProductionRepairTests(unittest.TestCase):
             'Path(r"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2")',
             source,
         )
+
+    def test_dashboard_command_fabric_injection_is_idempotent(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            page = Path(tmp) / "mission_control.html"
+            page.write_text(
+                "<html><head></head><body><main>test</main></body></html>",
+                encoding="utf-8",
+            )
+            self.assertTrue(ensure_fabric(page))
+            first = page.read_text(encoding="utf-8")
+            self.assertIn("luma_command_fabric.css", first)
+            self.assertIn("luma_command_fabric.js", first)
+            self.assertFalse(ensure_fabric(page))
+            self.assertEqual(first, page.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

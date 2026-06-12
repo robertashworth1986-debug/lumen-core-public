@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/luma_command_fabric.css">
 <style>
   :root {
     --bg-0: #04060f;
@@ -953,7 +954,7 @@
     <div class="clock">
       <div><span class="label">UTC Now</span><span class="val" id="clock-utc">—</span></div>
       <div><span class="label">Frozen Run</span><span class="val" id="frozen-run">—</span></div>
-      <div><span class="live-pill">LIVE</span></div>
+      <div><span class="live-pill" data-runtime-mode>CHECKING</span></div>
     </div>
   </div>
 
@@ -3128,5 +3129,6 @@ setInterval(tickClock, 1000); tickClock();
 loadAll();
 setInterval(loadAll, 8000);
 </script>
+<script src="./assets/luma_command_fabric.js"></script>
 </body>
 </html>

@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>LumenCore — Grants Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/lumencore.css">
+<link rel="stylesheet" href="./assets/luma_command_fabric.css">
+<style>
+  .grants-grid { display: grid; grid-template-columns: 480px 1fr; gap: 18px; }
+  @media (max-width: 1100px) { .grants-grid { grid-template-columns: 1fr } }
+  .summary { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .grant-list { list-style: none; margin: 0; padding: 0; max-height: 75vh; overflow-y: auto; }
+  .grant-item { padding: 12px; margin-bottom: 8px; border: 1px solid var(--border);
+                border-radius: 8px; background: rgba(15,23,50,0.55); cursor: pointer;
+                transition: all 0.18s; backdrop-filter: blur(6px); }
+  .grant-item:hover { border-color: var(--neon-p); transform: translateX(2px);
+                       box-shadow: 0 0 14px rgba(168,85,247,0.18); }
+  .grant-item.active { border-color: var(--neon-c); background: rgba(34,211,238,0.08);
+                        box-shadow: 0 0 16px rgba(34,211,238,0.25); }
+  .grant-item .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .grant-item .agency { font-weight: 700; font-family: 'Orbitron', sans-serif;
+                         letter-spacing: 1px; font-size: 13px; }
+  .grant-item .program { color: var(--ink-dim); font-size: 12px; margin-top: 2px; }
+  .grant-item .meta { font-size: 11px; color: var(--ink-dim); margin-top: 8px;
+                       display: flex; gap: 12px; flex-wrap: wrap; font-family: 'JetBrains Mono', monospace; }
+  .grant-item .score-bar { display: inline-block; width: 60px; height: 6px;
+                            background: rgba(0,0,0,0.4); border-radius: 3px;
+                            position: relative; vertical-align: middle; overflow: hidden; }
+  .grant-item .score-bar > div { position: absolute; left: 0; top: 0; bottom: 0;
+                                  background: linear-gradient(90deg, var(--neon-c), var(--neon-p));
+                                  border-radius: 3px; box-shadow: 0 0 6px var(--neon-c); }
+  .toolbar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .btn-link { background: rgba(15,23,50,0.6); border: 1px solid var(--border); color: var(--ink);
+              border-radius: 6px; padding: 9px 14px; font-size: 11px; font-weight: 700;
+              text-decoration: none; font-family: 'Orbitron', sans-serif; letter-spacing: 1.5px;
+              text-transform: uppercase; transition: all 0.18s; }
+  .btn-link:hover { border-color: var(--neon-c); color: var(--neon-c);
+                     box-shadow: 0 0 10px rgba(34,211,238,0.3); }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border);
+          margin-bottom: 14px; flex-wrap: wrap; }
+  .tab { padding: 8px 14px; cursor: pointer; color: var(--ink-dim); font-size: 11px;
+         border-bottom: 2px solid transparent; font-family: 'Orbitron', sans-serif;
+         letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700;
+         transition: all 0.18s; }
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--neon-c); border-bottom-color: var(--neon-c);
+                 text-shadow: 0 0 8px rgba(34,211,238,0.5); }
+  .markdown { background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+              border-radius: 8px; padding: 18px; max-height: 70vh; overflow-y: auto;
+              font-size: 13px; line-height: 1.7; }
+  .markdown h1 { font-family: 'Orbitron', sans-serif; font-size: 18px; margin: 0 0 12px;
+                  background: linear-gradient(135deg, var(--neon-c), var(--neon-p));
+                  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .markdown h2 { font-family: 'Orbitron', sans-serif; font-size: 14px; margin: 18px 0 8px;
+                  border-left: 3px solid var(--neon-p); padding-left: 10px;
+                  letter-spacing: 1px; text-transform: uppercase; }
+  .markdown h3 { font-size: 12px; color: var(--neon-c); margin: 14px 0 6px;
+                  font-family: 'Orbitron', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; }
+  .markdown table { border-collapse: collapse; margin: 8px 0; width: 100%; }
+  .markdown th, .markdown td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .markdown th { font-family: 'Orbitron', sans-serif; font-size: 10px;
+                  color: var(--ink-dim); text-transform: uppercase; letter-spacing: 1.5px; }
+  .markdown code { background: rgba(168,85,247,0.18); padding: 1px 6px; border-radius: 3px;
+                    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--neon-c); }
+  .markdown li { margin: 4px 0; }
+  .empty { color: var(--ink-dim); padding: 32px; text-align: center;
+            font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .err { color: var(--neon-r); padding: 12px; background: rgba(239,68,68,0.08);
+         border: 1px solid rgba(239,68,68,0.4); border-radius: 8px;
+         font-family: 'JetBrains Mono', monospace; }
+  .gaps { margin: 10px 0; padding: 10px; background: rgba(245,158,11,0.08);
+          border-left: 3px solid var(--neon-a); border-radius: 4px;
+          font-size: 12px; color: var(--neon-a); }
+  .gaps li { color: var(--neon-a); }
+  .reasons { margin: 10px 0; padding: 10px; background: rgba(52,211,153,0.06);
+             border-left: 3px solid var(--neon-g); border-radius: 4px;
+             font-size: 12px; color: var(--neon-g); }
+  .submission-card { margin: 10px 0; padding: 12px; border-radius: 8px;
+                     border: 1px solid var(--border); background: rgba(15,23,50,0.35); }
+  .submission-card.ready { border-color: var(--neon-g); box-shadow: 0 0 10px rgba(52,211,153,0.18); }
+  .submission-card.blocked { border-color: var(--neon-a); box-shadow: 0 0 10px rgba(245,158,11,0.18); }
+  .submission-title { font-family: 'Orbitron', sans-serif; font-size: 12px; letter-spacing: 1.2px;
+                      text-transform: uppercase; margin-bottom: 6px; }
+  .submission-meta { color: var(--ink-dim); font-size: 11px; font-family: 'JetBrains Mono', monospace; }
+  .submission-badges { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .submission-badge { font-size: 10px; border: 1px solid var(--border); border-radius: 999px;
+                      padding: 3px 8px; color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; }
+  .submission-badge.ok { border-color: var(--neon-g); color: var(--neon-g); }
+  .submission-badge.warn { border-color: var(--neon-a); color: var(--neon-a); }
+  .quick-lane { margin: 10px 0 14px; padding: 12px; border-radius: 10px;
+                border: 1px solid rgba(34, 211, 238, 0.35);
+                background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(168, 85, 247, 0.08));
+                box-shadow: 0 0 18px rgba(34, 211, 238, 0.12); }
+  .mission-pulse-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+  .mission-card { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+                  background: linear-gradient(150deg, rgba(8, 18, 36, 0.75), rgba(12, 22, 44, 0.45));
+                  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 0 14px rgba(34, 211, 238, 0.08); }
+  .mission-k { font-family: 'Orbitron', sans-serif; letter-spacing: 1.2px; text-transform: uppercase;
+               font-size: 10px; color: var(--ink-dim); }
+  .mission-v { margin-top: 4px; font-family: 'Orbitron', sans-serif; font-size: 15px;
+               color: var(--ink); text-shadow: 0 0 10px rgba(34, 211, 238, 0.22); }
+  .mission-sub { margin-top: 2px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-dim); }
+  .mission-v.good { color: var(--neon-g); }
+  .mission-v.warn { color: var(--neon-a); }
+  .mission-v.alert { color: var(--neon-r); }
+  .mission-meter { margin-top: 7px; height: 5px; border-radius: 999px; background: rgba(15,23,50,0.65); overflow: hidden; }
+  .mission-meter > span { display: block; height: 100%; border-radius: 999px;
+                          background: linear-gradient(90deg, var(--neon-c), var(--neon-p));
+                          box-shadow: 0 0 12px rgba(34, 211, 238, 0.28); transition: width 260ms ease; }
+  .mission-drapers { margin-bottom: 12px; border: 1px solid rgba(251, 191, 36, 0.35); border-radius: 10px;
+                     padding: 10px 12px; background: linear-gradient(150deg, rgba(36, 24, 8, 0.54), rgba(21, 18, 9, 0.35));
+                     box-shadow: 0 0 16px rgba(251, 191, 36, 0.12); }
+  .mission-drapers .topline { font-family: 'Orbitron', sans-serif; font-size: 11px; letter-spacing: 1.4px;
+                              text-transform: uppercase; color: var(--neon-a); }
+  .mission-drapers .headline { margin-top: 5px; font-family: 'Orbitron', sans-serif; font-size: 16px; color: #fde68a; }
+  .mission-drapers .detail { margin-top: 3px; font-size: 11px; color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; }
+  #grants-cinematic-host { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .lc-stage { position: relative; z-index: 2; }
+  @media (max-width: 1080px) { .mission-pulse-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .quick-steps { margin: 8px 0 12px; padding-left: 18px; font-size: 12px; color: var(--ink); }
+  .quick-steps li { margin: 4px 0; }
+  .sf-table td:last-child { width: 86px; text-align: right; }
+  .sf-copy-btn { padding: 5px 8px; font-size: 10px; border-radius: 5px; }
+  input[type=text] { width: 100%; }
+  /* legacy class shims for inline JS */
+  .pill { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 11px;
+          border: 1px solid var(--border); background: rgba(15,23,50,0.55);
+          font-family: 'Orbitron', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .pill.draft { color: var(--ink-dim); }
+  .pill.approved { color: var(--neon-c); border-color: var(--neon-c); box-shadow: 0 0 8px rgba(34,211,238,0.3); }
+  .pill.submitted { color: var(--neon-g); border-color: var(--neon-g); box-shadow: 0 0 8px rgba(52,211,153,0.3); }
+  button { background: linear-gradient(135deg, var(--neon-c), var(--neon-p));
+           color: #04060f; border: 0; border-radius: 6px; padding: 9px 14px; cursor: pointer;
+           font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800;
+           letter-spacing: 1.5px; text-transform: uppercase; transition: all 0.18s; }
+  button:hover { box-shadow: 0 0 18px rgba(34,211,238,0.5); transform: translateY(-1px); }
+  button.secondary { background: rgba(15,23,50,0.6); border: 1px solid var(--border); color: var(--ink); }
+  button.secondary:hover { border-color: var(--neon-p); color: var(--neon-p); box-shadow: 0 0 14px rgba(168,85,247,0.3); }
+  button.success { background: linear-gradient(135deg, var(--neon-g), #10b981); color: #04060f; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+  table { width: 100%; border-collapse: collapse; }
+  table th, table td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  table th { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--ink-dim);
+              text-transform: uppercase; letter-spacing: 1.5px; text-align: left; }
+</style>
+</head>
+<body>
+<script>window.LC_CONFIG = { title: 'GRANTS', subtitle: 'Submission console · draft to submit-ready · $3.53M addressable',
+  bootLines: ['> handshake: grants api','> drafting submit-ready packages',
+              '> scanning contracts + loans + sbir + pilot ops','> preflight blockers + SF-424 map','> ready'] };</script>
+
+<div id="grants-cinematic-host" aria-hidden="true"></div>
+
+<div class="lc-stage">
+  <div class="lc-panel" style="margin-bottom:14px">
+    <h2>Mission Pulse</h2>
+    <div id="mission-drapers" class="mission-drapers"></div>
+    <div id="mission-pulse" class="mission-pulse-grid"></div>
+  </div>
+  <div class="grants-grid">
+    <div class="lc-panel">
+      <h2>Pipeline</h2>
+      <div class="summary" id="summary"></div>
+      <div class="toolbar">
+        <button class="lc-btn" id="draft-all">Draft to submit-ready</button>
+        <button class="lc-btn secondary" id="opps-autopilot">Scan all opportunities</button>
+        <button class="lc-btn secondary" id="regenerate">Regenerate all drafts</button>
+      </div>
+      <ul class="grant-list" id="grant-list"></ul>
+    </div>
+    <div class="lc-panel">
+      <div id="detail" class="empty">Select a grant on the left.</div>
+    </div>
+  </div>
+</div>
+
+<script src="./assets/lumencore.js"></script>
+<script src="./js/luma_path_resolver.js"></script>
+<script src="./js/cinematic_telemetry_layer.js"></script>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const pathResolver = (window.LumaPathResolver && typeof window.LumaPathResolver.build === 'function')
+  ? window.LumaPathResolver.build({
+      locationPath: location.pathname,
+      protocol: location.protocol,
+    })
+  : null;
+
+function normalizeApiBase(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  if (!/^https?:\/\//i.test(raw)) return '';
+  return raw.replace(/\/$/, '');
+}
+
+function resolveApiBase() {
+  const fromWindow = normalizeApiBase(window.LUMA_API_BASE);
+  if (fromWindow) return fromWindow;
+
+  const params = new URLSearchParams(window.location.search || '');
+  const fromQuery = normalizeApiBase(params.get('api_base') || params.get('api'));
+  if (fromQuery) {
+    try { localStorage.setItem('LUMA_API_BASE', fromQuery); } catch {}
+    return fromQuery;
+  }
+
+  try {
+    const fromStorage = normalizeApiBase(localStorage.getItem('LUMA_API_BASE'));
+    if (fromStorage) return fromStorage;
+  } catch {}
+
+  if (location.protocol === 'file:') {
+    return 'https://lumen-core.ai';
+  }
+
+  return normalizeApiBase(location.origin);
+}
+
+const API_BASE = resolveApiBase();
+const CAN_TRY_LIVE_API = !(location.protocol === 'file:' && !API_BASE);
+const FILE_MODE = location.protocol === 'file:';
+
+function prioritizeFileCandidates(values, mirrorNeedle) {
+  const src = Array.isArray(values) ? values : [];
+  const deduped = [];
+  const seen = new Set();
+  src.forEach((value) => {
+    const key = String(value || '').trim();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    deduped.push(key);
+  });
+  if (!FILE_MODE) return deduped;
+  const relOnly = deduped.filter((path) => !/^(\/|[A-Za-z]:[\\/])/.test(path));
+  const ordered = relOnly.length ? relOnly : deduped;
+  const mirror = ordered.filter((path) => path.includes(mirrorNeedle));
+  const other = ordered.filter((path) => !path.includes(mirrorNeedle));
+  return mirror.concat(other);
+}
+
+const LOCAL_GRANTS_ROOT_CANDIDATES = (() => {
+  if (pathResolver && typeof pathResolver.grantsCandidates === 'function') {
+    return prioritizeFileCandidates(pathResolver.grantsCandidates(''), 'INSTITUTIONAL_STACK_V2/out/grants');
+  }
+  if (pathResolver && typeof pathResolver.outCandidates === 'function') {
+    return prioritizeFileCandidates(pathResolver.outCandidates('grants'), 'INSTITUTIONAL_STACK_V2/out/grants');
+  }
+  return prioritizeFileCandidates(['../out/grants', '../INSTITUTIONAL_STACK_V2/out/grants'], 'INSTITUTIONAL_STACK_V2/out/grants');
+})();
+const LOCAL_OPS_ROOT_CANDIDATES = (() => {
+  if (pathResolver && typeof pathResolver.opsCandidates === 'function') {
+    return prioritizeFileCandidates(pathResolver.opsCandidates(''), 'INSTITUTIONAL_STACK_V2/out/ops');
+  }
+  if (pathResolver && typeof pathResolver.outCandidates === 'function') {
+    return prioritizeFileCandidates(pathResolver.outCandidates('ops'), 'INSTITUTIONAL_STACK_V2/out/ops');
+  }
+  return prioritizeFileCandidates(['../out/ops', '../INSTITUTIONAL_STACK_V2/out/ops'], 'INSTITUTIONAL_STACK_V2/out/ops');
+})();
+const LOCAL_GRANTS_ROOT = LOCAL_GRANTS_ROOT_CANDIDATES[0] || '../out/grants';
+const LOCAL_OPS_ROOT = LOCAL_OPS_ROOT_CANDIDATES[0] || '../out/ops';
+const EXTERNAL_SUBMISSIONS_LEDGER_REL = 'ops/grants_live_submission_ledger_latest.json';
+const WAITING_ACTIONS_REL = 'ops/grant_waiting_actions_latest.json';
+const MEET_DRAPERS_REL = 'ops/meet_drapers_capital_projection/meet_drapers_capital_projection_latest.json';
+
+let queue = null;
+let activeId = null;
+let activeTab = 'submission';
+let runtimeMode = 'api';
+let activeDetail = null;
+let submissionDashboard = null;
+let opportunityTracker = null;
+let externalSubmissionLedger = null;
+let waitingActions = null;
+let meetDrapersProjection = null;
+let meetDrapersSourcePath = null;
+let cinematicLayer = null;
+let urlBootstrapApplied = false;
+
+const submissionByGrant = new Map();
+const submitUrlByOpp = new Map();
+
+const localCache = {
+  queue: null,
+  queueRoot: null,
+  details: new Map(),
+  externalSubmissionLedger: undefined,
+  waitingActions: undefined,
+  meetDrapersProjection: undefined,
+};
+
+function uniquePaths(values) {
+  const seen = new Set();
+  const out = [];
+  (values || []).forEach((value) => {
+    const key = String(value || '').trim();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    out.push(key);
+  });
+  return out;
+}
+
+function joinPath(base, rel) {
+  const cleanBase = String(base || '').replace(/\/+$/, '');
+  const cleanRel = String(rel || '').replace(/^\/+/, '');
+  return cleanRel ? `${cleanBase}/${cleanRel}` : cleanBase;
+}
+
+function joinAllPaths(roots, rel) {
+  return uniquePaths((roots || []).map((root) => joinPath(root, rel)));
+}
+
+function queueItemRoot(item) {
+  return String(item?._local_root || localCache.queueRoot || LOCAL_GRANTS_ROOT);
+}
+
+function clampPct(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(100, n));
+}
+
+function resolveApiPath(path) {
+  if (/^https?:\/\//i.test(path)) return path;
+  if (API_BASE && path.startsWith('/')) return API_BASE + path;
+  return path;
+}
+
+function safeSeg(v) {
+  return String(v || '').replace(/[^A-Za-z0-9._-]/g, '');
+}
+
+function escAttr(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;');
+}
+
+function normOpp(v) {
+  return String(v || '').trim().toUpperCase();
+}
+
+function isUuid(v) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v || ''));
+}
+
+function isHttpUrl(v) {
+  return /^https?:\/\//i.test(String(v || ''));
+}
+
+function parseOppFromGrantUrl(url) {
+  const txt = String(url || '').trim();
+  if (!txt) return '';
+  const m = txt.match(/search-results-detail\/([^/?#]+)/i);
+  if (!m || !m[1]) return '';
+  try {
+    return decodeURIComponent(m[1]);
+  } catch {
+    return m[1];
+  }
+}
+
+function grantSearchUrl(opp) {
+  const token = String(opp || '').trim();
+  if (!token) return 'https://www.grants.gov/search-grants';
+  if (/^SKIP-/i.test(token)) return 'https://helloskip.com/';
+  if (isUuid(token)) return `https://simpler.grants.gov/opportunity/${encodeURIComponent(token)}`;
+  return `https://www.grants.gov/search-results-detail/${encodeURIComponent(token)}`;
+}
+
+function isInformationalGrantLanding(url) {
+  const target = String(url || '').trim();
+  if (!isHttpUrl(target)) return false;
+  let parsed;
+  try {
+    parsed = new URL(target);
+  } catch {
+    return false;
+  }
+  const host = parsed.hostname.toLowerCase();
+  const path = parsed.pathname.toLowerCase();
+
+  if (host.includes('grants.gov') || host.includes('simpler.grants.gov')) return false;
+  if (host.includes('helloskip.com') || host.includes('smartsimple')) return false;
+
+  if (host.includes('science.osti.gov') && /^\/sbir\/?$/.test(path)) return true;
+  if (host.includes('nist.gov') && /\/sbir\/?$/.test(path)) return true;
+  if (host.includes('seedfund.nsf.gov')) return true;
+  if (host.includes('sbir.nasa.gov')) return true;
+  if (host.includes('afwerx.com')) return true;
+  if (host.includes('arpa-e.energy.gov')) return true;
+  if (host.includes('techpartnerships.noaa.gov')) return true;
+
+  if ((path === '/' || path === '') && /(sbir|sttr|grant|funding|opportun)/i.test(target)) return true;
+  return false;
+}
+
+function grantConsoleBootstrapUrl(item) {
+  const params = new URLSearchParams();
+  const grantId = String(item?.program_id || '').trim();
+  const opp = normOpp(item?.opp_num || parseOppFromGrantUrl(item?.url));
+  if (grantId) {
+    params.set('grant_id', grantId);
+  } else if (opp) {
+    params.set('opp', opp);
+  }
+  params.set('auto_fill', '1');
+  const qs = params.toString();
+  return qs ? `grants.html?${qs}` : 'grants.html';
+}
+
+async function loadGrantSubmitFitPack() {
+  submitUrlByOpp.clear();
+  const candidates = joinAllPaths(
+    LOCAL_OPS_ROOT_CANDIDATES,
+    'grant_submit_fit_pack/grant_submit_fit_pack_latest.json'
+  );
+  for (const candidate of candidates) {
+    const pack = await fetchJsonLoose(candidate);
+    if (!pack || typeof pack !== 'object') continue;
+    (pack.opportunities || []).forEach((op) => {
+      const key = normOpp(op.opp_num);
+      const url = String(op.submit_url || '').trim();
+      if (key && isHttpUrl(url)) submitUrlByOpp.set(key, url);
+    });
+    if (submitUrlByOpp.size) {
+      return;
+    }
+  }
+}
+
+function grantSubmitUrl(item, detail, submissionPacket) {
+  const portalUrl = submissionPacket?.portal?.portal_url;
+  if (isHttpUrl(portalUrl)) return portalUrl;
+
+  const appUrl = detail?.application?.url;
+  const itemUrl = item?.url;
+  const oppFromFields = [
+    item?.opp_num,
+    detail?.application?.source_metadata?.opp_num,
+    parseOppFromGrantUrl(appUrl),
+    parseOppFromGrantUrl(itemUrl),
+  ].map(normOpp).find(Boolean);
+
+  if (oppFromFields && submitUrlByOpp.has(oppFromFields)) {
+    return submitUrlByOpp.get(oppFromFields);
+  }
+  if (oppFromFields) {
+    return grantSearchUrl(oppFromFields);
+  }
+  if (isHttpUrl(appUrl)) return appUrl;
+  if (isHttpUrl(itemUrl)) return itemUrl;
+  return 'https://www.grants.gov/';
+}
+
+async function copyTextValue(text) {
+  if (!navigator.clipboard) return false;
+  try {
+    await navigator.clipboard.writeText(String(text || ''));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function localArtifactHref(grantId, runUtc, fileName, approved = false, grantRoot = null) {
+  const id = safeSeg(grantId);
+  const run = safeSeg(runUtc);
+  const rootBase = String(grantRoot || localCache.queueRoot || LOCAL_GRANTS_ROOT).replace(/\/+$/, '');
+  const root = approved
+    ? `${rootBase}/_approved/${id}/${run}`
+    : `${rootBase}/${id}/${run}`;
+  return encodeURI(`${root}/${fileName}`);
+}
+
+async function fetchJsonStrict(path, opts = {}) {
+  const r = await fetch(resolveApiPath(path), { cache: 'no-store', ...opts });
+  if (!r.ok) {
+    const e = await r.text();
+    const body = String(e || '').trim();
+    if (/gateway time-?out|\b504\b/i.test(body)) {
+      throw new Error(`${r.status} Gateway Timeout`);
+    }
+    const plain = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const snippet = plain ? (plain.length > 220 ? `${plain.slice(0, 217)}...` : plain) : 'HTTP error';
+    throw new Error(`${r.status} ${snippet}`);
+  }
+  const ct = r.headers.get('content-type') || '';
+  return ct.includes('json') ? r.json() : r.text();
+}
+
+async function fetchJsonLoose(path) {
+  try {
+    const r = await fetch(encodeURI(path), { cache: 'no-store' });
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
+}
+
+async function fetchTextLoose(path) {
+  try {
+    const r = await fetch(encodeURI(path), { cache: 'no-store' });
+    if (!r.ok) return null;
+    return await r.text();
+  } catch {
+    return null;
+  }
+}
+
+function normalizeSubmissionStatus(value) {
+  return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
+}
+
+function externalSubmissionSummary(ledger) {
+  const records = Array.isArray(ledger?.records) ? ledger.records.filter(Boolean) : [];
+  const validated = records.filter((row) => normalizeSubmissionStatus(row?.status).includes('validated')).length;
+  const rejected = records.filter((row) => normalizeSubmissionStatus(row?.status).includes('rejected')).length;
+  const submitted = records.length;
+  return { records, submitted, validated, rejected };
+}
+
+function waitingActionSummary(payload) {
+  const waiting = Array.isArray(payload?.waiting_followups)
+    ? payload.waiting_followups.filter(Boolean)
+    : [];
+  const blocked = Array.isArray(payload?.blocked_or_fix_now)
+    ? payload.blocked_or_fix_now.filter(Boolean)
+    : [];
+  return {
+    waiting,
+    blocked,
+    waitingCount: waiting.length,
+    blockedCount: blocked.length,
+  };
+}
+
+async function loadExternalSubmissionLedger() {
+  if (localCache.externalSubmissionLedger !== undefined) {
+    return localCache.externalSubmissionLedger;
+  }
+  const candidates = joinAllPaths(
+    LOCAL_OPS_ROOT_CANDIDATES,
+    'grants_live_submission_ledger_latest.json'
+  );
+
+  for (const candidate of candidates) {
+    const payload = await fetchJsonLoose(candidate);
+    if (payload && typeof payload === 'object') {
+      localCache.externalSubmissionLedger = payload;
+      return payload;
+    }
+  }
+
+  localCache.externalSubmissionLedger = null;
+  return null;
+}
+
+async function loadWaitingActions() {
+  if (localCache.waitingActions !== undefined) {
+    return localCache.waitingActions;
+  }
+  const candidates = joinAllPaths(
+    LOCAL_OPS_ROOT_CANDIDATES,
+    'grant_waiting_actions_latest.json'
+  );
+
+  for (const candidate of candidates) {
+    const payload = await fetchJsonLoose(candidate);
+    if (payload && typeof payload === 'object') {
+      localCache.waitingActions = payload;
+      return payload;
+    }
+  }
+
+  localCache.waitingActions = null;
+  return null;
+}
+
+async function loadMeetDrapersProjection() {
+  if (localCache.meetDrapersProjection !== undefined) {
+    return localCache.meetDrapersProjection;
+  }
+  const candidates = joinAllPaths(
+    LOCAL_OPS_ROOT_CANDIDATES,
+    'meet_drapers_capital_projection/meet_drapers_capital_projection_latest.json'
+  );
+
+  for (const candidate of candidates) {
+    const payload = await fetchJsonLoose(candidate);
+    if (payload && typeof payload === 'object') {
+      localCache.meetDrapersProjection = payload;
+      meetDrapersSourcePath = candidate;
+      return payload;
+    }
+  }
+
+  localCache.meetDrapersProjection = null;
+  return null;
+}
+
+function drapersFrame(payload) {
+  const rows = Array.isArray(payload?.scenario_projection)
+    ? payload.scenario_projection
+    : [];
+  const byStart = (usd) => rows.filter((row) => Number(row?.start_usd) === usd && Number.isFinite(Number(row?.months_to_target)));
+  const rows50 = byStart(50000).sort((a, b) => Number(a.months_to_target) - Number(b.months_to_target));
+  const rows10 = byStart(10000).sort((a, b) => Number(a.months_to_target) - Number(b.months_to_target));
+  const at10Pct = rows50.find((row) => Math.abs(Number(row?.monthly_return) - 0.10) < 1e-6) || null;
+  return {
+    fastest50: rows50[0] || null,
+    fastest10: rows10[0] || null,
+    at10Pct: at10Pct,
+  };
+}
+
+function toneClass(value, warnAt = 62, alertAt = 40) {
+  const v = Number(value);
+  if (!Number.isFinite(v)) return 'warn';
+  if (v <= alertAt) return 'alert';
+  if (v <= warnAt) return 'warn';
+  return 'good';
+}
+
+function missionSnapshot() {
+  const total = Number(queue?.n_total || submissionDashboard?.totals?.n_total || 0);
+  const ready = Number(submissionDashboard?.totals?.n_ready_to_submit || 0);
+  const approved = Number(queue?.n_approved || submissionDashboard?.totals?.n_approved || 0);
+  const submitted = Math.max(
+    Number(queue?.n_submitted || 0),
+    Number(submissionDashboard?.totals?.n_submitted || 0),
+    Number(externalSubmissionSummary(externalSubmissionLedger).submitted || 0)
+  );
+  const waiting = waitingActionSummary(waitingActions);
+  const tracked = Number(opportunityTracker?.opportunities?.n_total || 0);
+  const awarded = Number(opportunityTracker?.awards?.count || 0);
+
+  const safeTotal = Math.max(total, 1);
+  const readyRatio = ready / safeTotal;
+  const submittedRatio = submitted / safeTotal;
+  const blockedRatio = waiting.blockedCount / safeTotal;
+  const validated = Number(externalSubmissionSummary(externalSubmissionLedger).validated || 0);
+  const validatedRatio = submitted > 0 ? validated / submitted : 0;
+
+  const pulse = clampPct(36 + readyRatio * 40 + submittedRatio * 24 + awarded * 2);
+  const integrity = clampPct(84 - blockedRatio * 56 + validatedRatio * 18);
+  const throughput = clampPct(18 + submittedRatio * 58 + (approved / safeTotal) * 24);
+  const anomaly = clampPct(8 + blockedRatio * 70 + Math.min(waiting.waitingCount * 4, 24));
+  const confidence = clampPct(42 + readyRatio * 26 + validatedRatio * 24 - blockedRatio * 24 + (runtimeMode === 'artifact' ? -8 : 8));
+
+  return {
+    total,
+    ready,
+    approved,
+    submitted,
+    tracked,
+    awarded,
+    waitingCount: waiting.waitingCount,
+    blockedCount: waiting.blockedCount,
+    pulse,
+    integrity,
+    throughput,
+    anomaly,
+    confidence,
+  };
+}
+
+function ensureCinematicLayer() {
+  if (cinematicLayer || !window.LumaCinematic) return;
+  const host = $('grants-cinematic-host');
+  if (!host) return;
+  cinematicLayer = window.LumaCinematic.mount({
+    host,
+    mode: 'GRANTS',
+    source: runtimeMode === 'artifact' ? 'ARTIFACT' : 'LIVE',
+  });
+}
+
+function updateCinematicLayer(snapshot) {
+  ensureCinematicLayer();
+  if (!cinematicLayer || !snapshot) return;
+  cinematicLayer.setMetrics({
+    pulse: snapshot.pulse,
+    integrity: snapshot.integrity,
+    throughput: snapshot.throughput,
+    anomaly: snapshot.anomaly,
+    confidence: snapshot.confidence,
+  });
+  cinematicLayer.setMeta('mode', runtimeMode === 'artifact' ? 'ARTIFACT' : 'LIVE');
+  cinematicLayer.setMeta('source', runtimeMode === 'artifact' ? 'FILE' : 'API');
+  const cue = snapshot.blockedCount > 0
+    ? 'BLOCKERS'
+    : (snapshot.submitted > 0 ? 'SUBMIT' : 'BUILD');
+  cinematicLayer.setMeta('cue', cue);
+}
+
+function renderMissionPulse() {
+  const pulseRoot = $('mission-pulse');
+  const drapersRoot = $('mission-drapers');
+  if (!pulseRoot || !drapersRoot) return;
+
+  const snap = missionSnapshot();
+  const cards = [
+    {
+      key: 'Pipeline Pulse',
+      value: `${snap.pulse.toFixed(0)}%`,
+      sub: `${snap.total} tracked · ${snap.ready} ready`,
+      meter: snap.pulse,
+      cls: toneClass(snap.pulse),
+    },
+    {
+      key: 'Integrity Rail',
+      value: `${snap.integrity.toFixed(0)}%`,
+      sub: `${snap.blockedCount} fix-now · ${snap.waitingCount} waiting`,
+      meter: snap.integrity,
+      cls: toneClass(snap.integrity),
+    },
+    {
+      key: 'Submission Velocity',
+      value: `${snap.throughput.toFixed(0)}%`,
+      sub: `${snap.submitted} submitted · ${snap.approved} approved`,
+      meter: snap.throughput,
+      cls: toneClass(snap.throughput),
+    },
+    {
+      key: 'Confidence',
+      value: `${snap.confidence.toFixed(0)}%`,
+      sub: `${snap.tracked} opps · ${snap.awarded} awards`,
+      meter: snap.confidence,
+      cls: toneClass(snap.confidence),
+    },
+  ];
+
+  pulseRoot.innerHTML = cards.map((card) => `
+    <div class="mission-card">
+      <div class="mission-k">${card.key}</div>
+      <div class="mission-v ${card.cls}">${card.value}</div>
+      <div class="mission-sub">${escHTML(card.sub)}</div>
+      <div class="mission-meter"><span style="width:${clampPct(card.meter)}%"></span></div>
+    </div>
+  `).join('');
+
+  const drapers = drapersFrame(meetDrapersProjection || {});
+  const drapersHref = meetDrapersSourcePath
+    ? meetDrapersSourcePath.replace(/\.json$/i, '.html')
+    : '';
+  if (drapers.fastest50 || drapers.at10Pct) {
+    const fastest = drapers.fastest50;
+    const at10 = drapers.at10Pct;
+    drapersRoot.innerHTML = `
+      <div class="topline">Meet Drapers Projection Lane</div>
+      <div class="headline">$50K → $1M in ${Number((at10 || fastest)?.months_to_target || 0).toFixed(1)} months (modeled)</div>
+      <div class="detail">10% monthly scenario ${at10 ? `${(Number(at10.annualized_return || 0) * 100).toFixed(2)}% annualized` : 'n/a'}</div>
+      <div class="detail">Fastest modeled: ${(Number(fastest?.monthly_return || 0) * 100).toFixed(0)}% monthly in ${Number(fastest?.months_to_target || 0).toFixed(1)} months</div>
+      ${drapersHref ? `<div style="margin-top:6px"><a class="btn-link" href="${escAttr(drapersHref)}" target="_blank" rel="noopener" style="padding:6px 10px;font-size:10px;border-color:var(--neon-a);color:var(--neon-a)">Open projection deck ↗</a></div>` : ''}
+    `;
+  } else {
+    drapersRoot.innerHTML = `
+      <div class="topline">Meet Drapers Projection Lane</div>
+      <div class="headline">Projection pack offline</div>
+      <div class="detail">Generate out/ops/meet_drapers_capital_projection to hydrate this panel.</div>
+    `;
+  }
+
+  updateCinematicLayer(snap);
+}
+
+async function localQueue() {
+  if (localCache.queue) return localCache.queue;
+  const candidates = joinAllPaths(LOCAL_GRANTS_ROOT_CANDIDATES, '_queue/index.json');
+  for (const candidate of candidates) {
+    const q = await fetchJsonLoose(candidate);
+    if (!q || typeof q !== 'object') continue;
+    const root = candidate.replace(/\/_queue\/index\.json$/i, '');
+    const taggedItems = Array.isArray(q.items)
+      ? q.items.map((item) => ({ ...item, _local_root: root }))
+      : [];
+    localCache.queueRoot = root || LOCAL_GRANTS_ROOT;
+    localCache.queue = {
+      ...q,
+      items: taggedItems,
+      run_utc: q.run_utc || q.generated_utc || null,
+      source: 'local-artifacts',
+      source_root: localCache.queueRoot,
+    };
+    return localCache.queue;
+  }
+  return null;
+}
+
+async function localQueueItem(programId) {
+  const q = await localQueue();
+  return (q?.items || []).find(it => it.program_id === programId) || null;
+}
+
+async function localGrantDetail(programId) {
+  if (localCache.details.has(programId)) return localCache.details.get(programId);
+  const item = await localQueueItem(programId);
+  if (!item) throw new Error(`Unknown grant id: ${programId}`);
+
+  const runUtc = item.latest_utc;
+  const base = `${queueItemRoot(item)}/${safeSeg(programId)}/${safeSeg(runUtc)}`;
+  const [application, eligibility_report, approval_state, budget] = await Promise.all([
+    fetchJsonLoose(`${base}/application.json`),
+    fetchJsonLoose(`${base}/eligibility_report.json`),
+    fetchJsonLoose(`${base}/approval_state.json`),
+    fetchJsonLoose(`${base}/budget.json`),
+  ]);
+
+  if (!application) {
+    throw new Error(`Missing local artifact: ${base}/application.json`);
+  }
+
+  const detail = {
+    grant_id: programId,
+    run_utc: runUtc,
+    source: 'local-artifacts',
+    application: application || {},
+    eligibility_report: eligibility_report || {},
+    approval_state: approval_state || {},
+    budget: budget || {},
+  };
+  localCache.details.set(programId, detail);
+  return detail;
+}
+
+async function localGrantMarkdown(programId, section) {
+  const item = await localQueueItem(programId);
+  if (!item) throw new Error(`Unknown grant id: ${programId}`);
+  const runUtc = item.latest_utc;
+  const base = `${queueItemRoot(item)}/${safeSeg(programId)}/${safeSeg(runUtc)}`;
+  const map = {
+    application: 'application.md',
+    technical: 'technical_volume.md',
+    commercialization: 'commercialization_plan.md',
+    cover: 'cover_letter.md',
+  };
+  const fileName = map[section] || map.application;
+  const content = await fetchTextLoose(`${base}/${fileName}`);
+  if (content == null) throw new Error(`Missing local artifact: ${base}/${fileName}`);
+  return content;
+}
+
+function valueDiff(current, approved) {
+  return {
+    current: current == null ? null : current,
+    approved: approved == null ? null : approved,
+    changed: JSON.stringify(current ?? null) !== JSON.stringify(approved ?? null),
+  };
+}
+
+async function localGrantDiff(programId) {
+  const item = await localQueueItem(programId);
+  if (!item) throw new Error(`Unknown grant id: ${programId}`);
+  const runUtc = item.latest_utc;
+  const grantRoot = queueItemRoot(item);
+  const currentBase = `${grantRoot}/${safeSeg(programId)}/${safeSeg(runUtc)}`;
+  const approvedBase = `${grantRoot}/_approved/${safeSeg(programId)}/${safeSeg(runUtc)}`;
+
+  const [currentApp, approvedApp, currentBudget, approvedBudget] = await Promise.all([
+    fetchJsonLoose(`${currentBase}/application.json`),
+    fetchJsonLoose(`${approvedBase}/application.json`),
+    fetchJsonLoose(`${currentBase}/budget.json`),
+    fetchJsonLoose(`${approvedBase}/budget.json`),
+  ]);
+
+  if (!approvedApp) {
+    return {
+      has_approved: false,
+      current_run_utc: runUtc,
+      approved_run_utc: null,
+      headline: {},
+      layers: {},
+      files: [],
+    };
+  }
+
+  const layersCurrent = currentApp?.evidence_summary || {};
+  const layersApproved = approvedApp?.evidence_summary || {};
+  const layerKeys = Array.from(new Set([...Object.keys(layersCurrent), ...Object.keys(layersApproved)]));
+  const layers = {};
+  layerKeys.forEach(k => {
+    layers[k] = {
+      current: layersCurrent[k] ?? null,
+      approved: layersApproved[k] ?? null,
+      changed: JSON.stringify(layersCurrent[k] ?? null) !== JSON.stringify(layersApproved[k] ?? null),
+    };
+  });
+
+  const fileNames = [
+    'application.json',
+    'eligibility_report.json',
+    'approval_state.json',
+    'budget.json',
+    'application.md',
+    'technical_volume.md',
+    'commercialization_plan.md',
+    'cover_letter.md',
+    'submission_packet.json',
+  ];
+
+  const files = await Promise.all(fileNames.map(async (name) => {
+    const [curTxt, appTxt] = await Promise.all([
+      fetchTextLoose(`${currentBase}/${name}`),
+      fetchTextLoose(`${approvedBase}/${name}`),
+    ]);
+    const currentBytes = curTxt == null ? null : curTxt.length;
+    const approvedBytes = appTxt == null ? null : appTxt.length;
+
+    let status = 'unchanged';
+    if (curTxt == null && appTxt != null) status = 'removed';
+    else if (curTxt != null && appTxt == null) status = 'added';
+    else if (curTxt !== appTxt) status = 'modified';
+
+    return {
+      name,
+      status,
+      current_bytes: currentBytes,
+      approved_bytes: approvedBytes,
+    };
+  }));
+
+  return {
+    has_approved: true,
+    current_run_utc: runUtc,
+    approved_run_utc: runUtc,
+    headline: {
+      evidence_run_utc: valueDiff(currentApp?.evidence_run_utc, approvedApp?.evidence_run_utc),
+      eligibility_score: valueDiff(currentApp?.eligibility?.score, approvedApp?.eligibility?.score),
+      budget_total: valueDiff(currentBudget?.total ?? currentApp?.budget?.total, approvedBudget?.total ?? approvedApp?.budget?.total),
+      layers,
+    },
+    files,
+  };
+}
+
+async function localGrantSubmission(programId) {
+  const item = await localQueueItem(programId);
+  if (!item) throw new Error(`Unknown grant id: ${programId}`);
+  const runUtc = item.latest_utc;
+  const base = `${queueItemRoot(item)}/${safeSeg(programId)}/${safeSeg(runUtc)}`;
+  const [packet, howto] = await Promise.all([
+    fetchJsonLoose(`${base}/submission_packet.json`),
+    fetchTextLoose(`${base}/SUBMIT_HOWTO.md`),
+  ]);
+  if (!packet) {
+    throw new Error(`Submission packet not found for ${programId}. Click \"Prepare submission draft\" first.`);
+  }
+  return {
+    grant_id: programId,
+    run_utc: runUtc,
+    submission_packet: packet,
+    has_howto: howto != null,
+    howto_markdown: howto,
+  };
+}
+
+async function localSubmissionDashboard() {
+  const q = await localQueue();
+  if (!q) return { items: [], totals: {} };
+  const rows = Array.isArray(q.items) ? q.items : [];
+  const items = [];
+  let nReady = 0;
+  let nApproved = 0;
+  let nSubmitted = 0;
+  let ceilingTotal = 0;
+  let ceilingReady = 0;
+
+  rows.forEach((row) => {
+    const state = String(row?.state || '').toLowerCase();
+    const ceiling = Number(row?.ceiling_usd || 0);
+    ceilingTotal += Number.isFinite(ceiling) ? ceiling : 0;
+    if (state === 'approved') nApproved += 1;
+    if (state === 'submitted') nSubmitted += 1;
+    if (state === 'approved' || state === 'submitted') {
+      nReady += 1;
+      ceilingReady += Number.isFinite(ceiling) ? ceiling : 0;
+    }
+  });
+
+  const extSummary = externalSubmissionSummary(await loadExternalSubmissionLedger());
+  nSubmitted = Math.max(nSubmitted, extSummary.submitted);
+  return {
+    items,
+    totals: {
+      n_total: items.length,
+      n_approved: nApproved,
+      n_submitted: nSubmitted,
+      n_ready_to_submit: nReady,
+      ceiling_total_usd: Math.round(ceilingTotal * 100) / 100,
+      ceiling_ready_to_submit_usd: Math.round(ceilingReady * 100) / 100,
+      preflight_utc: q.generated_utc || null,
+    },
+  };
+}
+
+async function localApi(path) {
+  const u = new URL(path, location.href);
+  const parts = u.pathname.split('/').filter(Boolean);
+  if (parts[0] && parts[0].includes(':')) parts.shift();
+  if (parts[0] !== 'api' || parts[1] !== 'grants') return null;
+
+  if (parts.length === 4 && parts[2] === 'submission' && parts[3] === 'dashboard') {
+    return localSubmissionDashboard();
+  }
+
+  if (parts.length === 2) return localQueue();
+  const id = decodeURIComponent(parts[2] || '');
+  if (!id) return null;
+
+  if (parts.length === 3) return localGrantDetail(id);
+  if (parts.length === 4 && parts[3] === 'markdown') {
+    const section = u.searchParams.get('section') || 'application';
+    return localGrantMarkdown(id, section);
+  }
+  if (parts.length === 4 && parts[3] === 'submission') return localGrantSubmission(id);
+  if (parts.length === 4 && parts[3] === 'diff') return localGrantDiff(id);
+
+  return null;
+}
+
+async function api(path, opts = {}) {
+  const method = String(opts.method || 'GET').toUpperCase();
+  const allowFallback = method === 'GET';
+
+  if (!CAN_TRY_LIVE_API && allowFallback) {
+    runtimeMode = 'artifact';
+  }
+
+  if ((runtimeMode !== 'artifact' || !allowFallback) && CAN_TRY_LIVE_API) {
+    try {
+      const data = await fetchJsonStrict(path, opts);
+      runtimeMode = 'api';
+      return data;
+    } catch (err) {
+      if (!allowFallback) throw err;
+      runtimeMode = 'artifact';
+    }
+  }
+
+  if (!allowFallback) {
+    throw new Error('Live grants API unavailable in this mode.');
+  }
+
+  const fallback = await localApi(path);
+  if (fallback != null) return fallback;
+
+  throw new Error('Read-only artifact mode: endpoint unavailable.');
+}
+
+async function loadQueue() {
+  try {
+    await loadGrantSubmitFitPack();
+    externalSubmissionLedger = await loadExternalSubmissionLedger();
+    waitingActions = await loadWaitingActions();
+    meetDrapersProjection = await loadMeetDrapersProjection();
+    queue = await api('/api/grants');
+    try {
+      submissionDashboard = await api('/api/grants/submission/dashboard');
+    } catch {
+      submissionDashboard = null;
+    }
+    try {
+      opportunityTracker = await api('/api/opportunities/tracker');
+    } catch {
+      opportunityTracker = null;
+    }
+    renderQueue();
+    renderMissionPulse();
+    await applyUrlBootstrap();
+  } catch (e) {
+    $('grant-list').innerHTML =
+      `<li class="err">Failed: ${e.message}</li>`;
+    renderMissionPulse();
+  }
+}
+
+function renderQueue() {
+  if (!queue) return;
+  const readOnly = runtimeMode === 'artifact';
+  const readyCount = Number(submissionDashboard?.totals?.n_ready_to_submit || 0);
+  const submittedFromPackets = Number(submissionDashboard?.totals?.n_submitted || 0);
+  const externalSummary = externalSubmissionSummary(externalSubmissionLedger);
+  const waitingSummary = waitingActionSummary(waitingActions);
+  const submittedCount = Math.max(
+    Number(queue.n_submitted || 0),
+    submittedFromPackets,
+    externalSummary.submitted,
+  );
+  const liveTracking = externalSummary.records
+    .map((row) => String(row?.grants_tracking_number || row?.workspace_id || '').trim())
+    .filter(Boolean)
+    .slice(0, 2)
+    .join(' · ');
+  const oppAwards = Number(opportunityTracker?.awards?.count || 0);
+  const oppTracked = Number(opportunityTracker?.opportunities?.n_total || 0);
+  $('summary').innerHTML = [
+    `<span class="pill"><b>${queue.n_total ?? 0}</b> total</span>`,
+    `<span class="pill draft"><b>${queue.n_draft ?? 0}</b> draft</span>`,
+    `<span class="pill approved"><b>${queue.n_approved ?? 0}</b> approved</span>`,
+    `<span class="pill submitted"><b>${submittedCount}</b> submitted</span>`,
+    externalSummary.submitted > 0
+      ? `<span class="pill approved"><b>${externalSummary.validated}</b> validated</span>`
+      : '',
+    externalSummary.submitted > 0
+      ? `<span class="pill" style="color:var(--neon-a);border-color:var(--neon-a)"><b>${externalSummary.rejected}</b> rejected</span>`
+      : '',
+    waitingSummary.waitingCount > 0
+      ? `<span class="pill"><b>${waitingSummary.waitingCount}</b> waiting follow-ups</span>`
+      : '',
+    waitingSummary.blockedCount > 0
+      ? `<span class="pill" style="color:var(--neon-a);border-color:var(--neon-a)"><b>${waitingSummary.blockedCount}</b> fix-now</span>`
+      : '',
+    liveTracking
+      ? `<span class="pill">live tracking: ${escHTML(liveTracking)}</span>`
+      : '',
+    `<span class="pill approved"><b>${readyCount}</b> ready-to-submit</span>`,
+    `<span class="pill"><b>${oppTracked}</b> opps tracked</span>`,
+    `<span class="pill submitted"><b>${oppAwards}</b> awarded</span>`,
+    readOnly
+      ? `<span class="pill" style="color:var(--neon-a); border-color:var(--neon-a)">read-only artifact mode</span>`
+      : `<span class="pill approved">live api mode</span>`,
+  ].join('');
+
+  $('draft-all').disabled = readOnly;
+  $('draft-all').title = readOnly
+    ? 'Unavailable while API is offline; showing local artifact files.'
+    : 'Regenerate and prepare submission packets for all grants.';
+  $('opps-autopilot').disabled = readOnly;
+  $('opps-autopilot').title = readOnly
+    ? 'Unavailable while API is offline; showing local artifact files.'
+    : 'Scan all opportunities (grants/contracts/loans/pilot ops) and generate outreach pack.';
+  $('regenerate').disabled = readOnly;
+  $('regenerate').title = readOnly
+    ? 'Unavailable while API is offline; showing local artifact files.'
+    : 'Regenerate all grant drafts only.';
+
+  const items = queue.items || [];
+  $('grant-list').innerHTML = items.map(it => {
+    const rawSubmitUrl = grantSubmitUrl(it, null, null);
+    const submitHref = isInformationalGrantLanding(rawSubmitUrl)
+      ? grantConsoleBootstrapUrl(it)
+      : rawSubmitUrl;
+    return `
+    <li class="grant-item ${it.program_id === activeId ? 'active' : ''}"
+        data-id="${it.program_id}">
+      <div class="row">
+        <div>
+          <div class="agency">${escHTML(it.agency || it.program_id)}</div>
+          <div class="program">${escHTML(it.program || '')}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <a class="btn-link"
+             href="${escAttr(submitHref)}"
+             target="_blank"
+             rel="noopener"
+             onclick="event.stopPropagation()"
+             style="padding:6px 10px;font-size:10px;letter-spacing:1px;border-color:var(--neon-g);color:var(--neon-g)">Submit ↗</a>
+          <span class="pill ${it.state}">${it.state}</span>
+        </div>
+      </div>
+      <div class="meta">
+        <span>$${(it.ceiling_usd || 0).toLocaleString()}</span>
+        <span>fit: ${((it.score || 0) * 100).toFixed(0)}%
+          <span class="score-bar"><div style="width:${(it.score || 0) * 100}%"></div></span>
+        </span>
+        <span>deadline: ${escHTML(it.deadline_typical || '—')}</span>
+      </div>
+    </li>
+  `;
+  }).join('') || '<li class="empty">No grants yet.</li>';
+  document.querySelectorAll('.grant-item').forEach(el => {
+    el.addEventListener('click', () => loadDetail(el.dataset.id));
+  });
+
+  renderMissionPulse();
+}
+
+function grantActionRowsForOpp(oppNum) {
+  const key = normOpp(oppNum);
+  if (!key) return [];
+  const summary = waitingActionSummary(waitingActions);
+  const rows = [...summary.blocked, ...summary.waiting]
+    .filter((row) => normOpp(row?.opp_num) === key);
+
+  const priorityRank = { P0: 0, P1: 1, P2: 2 };
+  rows.sort((a, b) => {
+    const pa = String(a?.priority || 'P2').toUpperCase();
+    const pb = String(b?.priority || 'P2').toUpperCase();
+    return (priorityRank[pa] ?? 9) - (priorityRank[pb] ?? 9);
+  });
+  return rows;
+}
+
+function parseBootstrapFlag(value) {
+  const token = String(value || '').trim().toLowerCase();
+  return token === '1' || token === 'true' || token === 'yes' || token === 'y' || token === 'on';
+}
+
+function isTimeoutLikeError(err) {
+  const msg = String(err?.message || err || '');
+  return /\b504\b|gateway time-?out|timed? out|timeout/i.test(msg);
+}
+
+function compactErrorMessage(err, fallback = 'Request failed') {
+  const raw = String(err?.message || err || '').trim();
+  if (!raw) return fallback;
+  if (isTimeoutLikeError(raw)) return '504 Gateway Timeout';
+  const firstLine = raw.split(/\r?\n/).map(s => s.trim()).find(Boolean) || raw;
+  const plain = firstLine.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!plain) return fallback;
+  return plain.length > 220 ? `${plain.slice(0, 217)}...` : plain;
+}
+
+function showBootstrapNotice(message) {
+  const slot = $('detail');
+  if (!slot) return;
+  const id = 'bootstrap-notice';
+  const existing = document.getElementById(id);
+  if (existing) existing.remove();
+  const note = document.createElement('div');
+  note.id = id;
+  note.className = 'gaps';
+  note.innerHTML = `<b>Auto-fill notice:</b> ${escHTML(message)}`;
+  slot.prepend(note);
+}
+
+function resolveBootstrapGrantId() {
+  const params = new URLSearchParams(window.location.search || '');
+  const direct = String(params.get('grant_id') || params.get('grant') || '').trim();
+  if (direct) return direct;
+
+  const opp = normOpp(params.get('opp') || params.get('opp_num'));
+  if (!opp) return '';
+
+  const items = Array.isArray(queue?.items) ? queue.items : [];
+  const found = items.find((it) => {
+    const itemOpp = normOpp(it?.opp_num || parseOppFromGrantUrl(it?.url));
+    return itemOpp && itemOpp === opp;
+  });
+  return found ? String(found.program_id || '').trim() : '';
+}
+
+async function applyUrlBootstrap() {
+  if (urlBootstrapApplied) return;
+  urlBootstrapApplied = true;
+
+  const params = new URLSearchParams(window.location.search || '');
+  const grantId = resolveBootstrapGrantId();
+  if (!grantId) return;
+
+  const exists = Array.isArray(queue?.items)
+    ? queue.items.some((it) => String(it?.program_id || '').trim() === grantId)
+    : false;
+  if (!exists) return;
+
+  activeTab = 'submission';
+  await loadDetail(grantId);
+
+  if (!parseBootstrapFlag(params.get('auto_fill'))) {
+    return;
+  }
+
+  if (runtimeMode === 'artifact') {
+    showBootstrapNotice('Auto-fill requested, but console is in read-only artifact mode. You can still use Open submit site and Copy SF-424.');
+    return;
+  }
+
+  const existingSubmission = submissionByGrant.get(grantId)?.submission_packet || null;
+  if (existingSubmission?.ready) {
+    return;
+  }
+
+  try {
+    await prepareSubmission(grantId, { quiet: true });
+    return;
+  } catch {}
+
+  try {
+    await draft(grantId, { quiet: true, skipSuccessAlert: true });
+  } catch (err) {
+    const msg = isTimeoutLikeError(err)
+      ? 'Auto-fill timed out (504). Continue with Open submit site and Copy SF-424 now, then retry AI autofill in ~30 seconds.'
+      : `Auto-fill unavailable: ${compactErrorMessage(err, 'request failed')}`;
+    showBootstrapNotice(msg);
+  }
+}
+
+function escHTML(s) {
+  return String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+}
+
+async function loadDetail(id) {
+  activeId = id;
+  try {
+    const next = new URLSearchParams(window.location.search || '');
+    next.set('grant_id', String(id || ''));
+    history.replaceState(null, '', `${window.location.pathname}?${next.toString()}`);
+  } catch {}
+  document.querySelectorAll('.grant-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.id === id);
+  });
+  try {
+    const d = await api(`/api/grants/${encodeURIComponent(id)}`);
+    activeDetail = d;
+    try {
+      const sub = await api(`/api/grants/${encodeURIComponent(id)}/submission`);
+      submissionByGrant.set(id, sub);
+    } catch {
+      submissionByGrant.delete(id);
+    }
+    renderDetail(d);
+    loadMarkdown(activeTab);
+  } catch (e) {
+    $('detail').innerHTML = `<div class="err">${e.message}</div>`;
+  }
+}
+
+function renderDetail(d) {
+  const elig = d.eligibility_report || {};
+  const app = d.application || {};
+  const state = d.approval_state || {};
+  const submission = submissionByGrant.get(d.grant_id)?.submission_packet || null;
+  const queueItem = (queue?.items || []).find(x => x.program_id === d.grant_id) || {};
+  const submitUrl = grantSubmitUrl(queueItem, d, submission);
+  const submitSystem = String(submission?.portal?.submission_system || '').trim();
+  const oppForActions = queueItem?.opp_num || app?.source_metadata?.opp_num || app?.opp_num || parseOppFromGrantUrl(app?.url);
+  const actionRows = grantActionRowsForOpp(oppForActions);
+  const primaryAction = actionRows[0] || null;
+  const followupCard = primaryAction
+    ? `<div class="${String(primaryAction.priority || '').toUpperCase() === 'P0' ? 'gaps' : 'reasons'}">
+         <b>Follow-up Actions (${escHTML(String(primaryAction.priority || 'P1'))})</b>
+         <div style="margin-top:4px; font-family:'JetBrains Mono', monospace; font-size:11px">
+           tracking ${escHTML(String(primaryAction.grants_tracking_number || 'n/a'))} · status ${escHTML(String(primaryAction.status || 'n/a'))}
+           ${primaryAction.due_utc ? ` · due ${escHTML(String(primaryAction.due_utc))}` : ''}
+         </div>
+         <ul>${(Array.isArray(primaryAction.next_actions) ? primaryAction.next_actions : [])
+           .map((item) => `<li>${escHTML(String(item || ''))}</li>`)
+           .join('')}</ul>
+       </div>`
+    : '';
+
+  const reasons = (elig.reasons || []).map(r => `<li>${escHTML(r)}</li>`).join('');
+  const gaps = (elig.gaps || []).map(g => `<li>${escHTML(g)}</li>`).join('');
+
+  const isApproved = state.state === 'approved' || state.state === 'submitted';
+  const isSubmitted = state.state === 'submitted';
+  const readOnly = runtimeMode === 'artifact';
+
+  const runUtc = d.run_utc || (queue?.items || []).find(x => x.program_id === d.grant_id)?.latest_utc;
+  const grantRoot = queueItemRoot(queueItem);
+  const printHref = readOnly
+    ? localArtifactHref(d.grant_id, runUtc, 'application.md', false, grantRoot)
+    : `/api/grants/${encodeURIComponent(d.grant_id)}/print`;
+  const bundleHref = readOnly
+    ? localArtifactHref(d.grant_id, runUtc, 'submission_packet.json', false, grantRoot)
+    : `/api/grants/${encodeURIComponent(d.grant_id)}/bundle.zip`;
+  const printLabel = readOnly ? 'Open application.md' : 'Print / PDF';
+  const bundleLabel = readOnly ? 'Open submission packet' : 'Download .zip';
+
+  const submissionCard = submission
+    ? `<div class="submission-card ${submission.ready ? 'ready' : 'blocked'}">
+         <div class="submission-title">Submission Draft ${submission.ready ? 'Ready' : 'Needs Input'}</div>
+         <div class="submission-meta">Portal: ${escHTML((submission.portal || {}).portal_url || app.url || 'n/a')} · preflight ${escHTML(submission.preflight_utc || 'n/a')}</div>
+         <div class="submission-badges">
+           <span class="submission-badge ${submission.ready ? 'ok' : 'warn'}">${submission.ready ? 'READY TO SUBMIT' : `${(submission.blockers || []).length} blockers`}</span>
+           <span class="submission-badge">state: ${escHTML(String(submission.approval_state || 'draft'))}</span>
+           <span class="submission-badge">package: ${submission.package_complete ? 'complete' : 'missing files'}</span>
+         </div>
+       </div>`
+    : `<div class="submission-card blocked">
+         <div class="submission-title">Submission Draft Not Prepared</div>
+         <div class="submission-meta">Click <b>Prepare submission draft</b> or <b>Draft to submit-ready</b> to build the final packet and blocker report.</div>
+       </div>`;
+
+  $('detail').innerHTML = `
+    <h2 style="margin: 0 0 4px; font-size: 18px; border: 0; padding: 0">
+      ${escHTML(app.agency || '')} — ${escHTML(app.program || '')}
+    </h2>
+    <p style="color: var(--ink-dim); margin: 0 0 16px">
+      ${escHTML(app.topic_area || '')} · ceiling
+      <b>$${(app.ceiling_usd || 0).toLocaleString()}</b> ·
+      duration <b>${app.duration_months || '—'} mo</b> ·
+      deadline <b>${escHTML(app.deadline_typical || '—')}</b>
+    </p>
+
+    <div class="toolbar">
+      <button class="success" id="approve-btn" ${(readOnly || isApproved) ? 'disabled' : ''}>
+        ${isApproved ? '✓ Approved' : 'Approve draft'}
+      </button>
+      <button class="secondary" id="regen-btn" ${readOnly ? 'disabled' : ''}>Regenerate</button>
+      <button class="secondary" id="prepare-btn" ${readOnly ? 'disabled' : ''}>Prepare submission draft</button>
+      <button class="secondary" id="autofill-btn" ${readOnly ? 'disabled' : ''}>AI autofill + blockers</button>
+      <button class="secondary" id="submitted-btn" ${(readOnly || !isApproved || isSubmitted) ? 'disabled' : ''}>
+        ${isSubmitted ? '✓ Submitted' : 'Mark as submitted'}
+      </button>
+      <a class="btn-link" href="${escAttr(submitUrl)}"
+         target="_blank" rel="noopener"
+         style="background:var(--panel-2);border:1px solid var(--neon-g);color:var(--neon-g);
+                border-radius:6px;padding:8px 14px;font-size:12px;font-weight:600;
+                text-decoration:none">Open submit site ↗</a>
+      <a class="btn-link" href="${printHref}"
+         target="_blank" rel="noopener"
+         style="background:var(--panel-2);border:1px solid var(--border);color:var(--ink);
+                border-radius:6px;padding:8px 14px;font-size:12px;font-weight:600;
+                text-decoration:none">${printLabel}</a>
+      <a class="btn-link" href="${bundleHref}"
+         target="_blank" rel="noopener"
+         style="background:var(--panel-2);border:1px solid var(--border);color:var(--ink);
+                border-radius:6px;padding:8px 14px;font-size:12px;font-weight:600;
+                text-decoration:none">${bundleLabel}</a>
+      ${(app.url && app.url !== submitUrl) ? `<a href="${escHTML(app.url)}" target="_blank" rel="noopener"
+                     style="margin-left: auto; color: var(--accent-2);
+                            text-decoration: none; align-self: center; font-size: 12px">
+                     program page ↗</a>` : ''}
+    </div>
+
+    <p style="margin:2px 0 12px;color:var(--ink-dim);font-size:11px;font-family:'JetBrains Mono',monospace">
+      submit route: <a href="${escAttr(submitUrl)}" target="_blank" rel="noopener" style="color:var(--neon-g)">${escHTML(submitUrl)}</a>
+      ${submitSystem ? ` · system ${escHTML(submitSystem)}` : ''}
+    </p>
+
+    ${readOnly ? `<div class="gaps"><b>Read-only mode:</b> Live grants API is offline. Viewing real artifacts from out/grants; approve/regenerate/submit actions are disabled.</div>` : ''}
+
+    ${submissionCard}
+  ${followupCard}
+    ${reasons ? `<div class="reasons"><b>Eligibility ✓</b><ul>${reasons}</ul></div>` : ''}
+    ${gaps ? `<div class="gaps"><b>Open items</b><ul>${gaps}</ul></div>` : ''}
+
+    <div class="tabs">
+      <div class="tab ${activeTab === 'application' ? 'active' : ''}" data-tab="application">Application</div>
+      <div class="tab ${activeTab === 'technical' ? 'active' : ''}" data-tab="technical">Technical Volume</div>
+      <div class="tab ${activeTab === 'commercialization' ? 'active' : ''}" data-tab="commercialization">Commercialization</div>
+      <div class="tab ${activeTab === 'cover' ? 'active' : ''}" data-tab="cover">Cover Letter</div>
+      <div class="tab ${activeTab === 'budget' ? 'active' : ''}" data-tab="budget">Budget</div>
+      <div class="tab ${activeTab === 'submission' ? 'active' : ''}" data-tab="submission">Submission Kit</div>
+      <div class="tab ${activeTab === 'diff' ? 'active' : ''}" data-tab="diff">Diff vs approved</div>
+    </div>
+    <div id="md" class="markdown">loading…</div>
+  `;
+
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      activeTab = t.dataset.tab;
+      document.querySelectorAll('.tab').forEach(x =>
+        x.classList.toggle('active', x.dataset.tab === activeTab));
+      loadMarkdown(activeTab);
+    });
+  });
+
+  $('approve-btn').addEventListener('click', () => approve(d.grant_id));
+  $('regen-btn').addEventListener('click', () => regenerate(d.grant_id));
+  $('prepare-btn').addEventListener('click', () => prepareSubmission(d.grant_id));
+  $('autofill-btn').addEventListener('click', () => draft(d.grant_id));
+  $('submitted-btn').addEventListener('click', () => markSubmitted(d.grant_id));
+}
+
+async function loadMarkdown(tab) {
+  if (!activeId) return;
+  const slot = $('md');
+  if (!slot) return;
+
+  if (tab === 'budget') {
+    try {
+      const d = await api(`/api/grants/${encodeURIComponent(activeId)}`);
+      const b = d.budget || {};
+      const rows = Object.entries(b.categories || {}).map(([k, v]) =>
+        `<tr><td>${k.replace(/_/g, ' ')}</td><td style="text-align:right">$${Number(v || 0).toLocaleString()}</td></tr>`).join('');
+      slot.innerHTML = `
+        <h3>Budget — $${Number(b.total || 0).toLocaleString()} / ${b.duration_months || '—'}mo</h3>
+        <table>${rows}</table>
+        <ul>${(b.notes || []).map(n => `<li>${escHTML(n)}</li>`).join('')}</ul>
+      `;
+    } catch (e) {
+      slot.innerHTML = `<div class="err">${e.message}</div>`;
+    }
+    return;
+  }
+
+  if (tab === 'submission') {
+    try {
+      const payload = await api(`/api/grants/${encodeURIComponent(activeId)}/submission`);
+      submissionByGrant.set(activeId, payload);
+      const p = payload.submission_packet || {};
+      const rowItem = (queue?.items || []).find(x => x.program_id === activeId) || {};
+      const submitLaneUrl = grantSubmitUrl(rowItem, activeDetail, p);
+      const portal = p.portal || {};
+      const blockers = (p.blockers || []).map(x => `<li>${escHTML(String(x))}</li>`).join('');
+      const warnings = (p.warnings || []).map(x => `<li>${escHTML(String(x))}</li>`).join('');
+      const reqs = (portal.requires || []).map(x => `<li>${escHTML(String(x))}</li>`).join('');
+      const sfPairs = Object.entries(p.sf424_map || {});
+      const sfRows = sfPairs.map(([k, v]) => {
+        const val = String(v ?? '');
+        return `<tr>
+          <td>${escHTML(String(k))}</td>
+          <td>${escHTML(val)}</td>
+          <td><button class="secondary sf-copy-btn" data-copy="${escAttr(val)}">Copy</button></td>
+        </tr>`;
+      }).join('');
+      const sfTsv = sfPairs.map(([k, v]) => `${k}\t${String(v ?? '')}`).join('\n');
+      const canMarkSubmittedFast = runtimeMode !== 'artifact' && p.approval_state === 'approved';
+
+      slot.innerHTML = `
+        <div class="quick-lane">
+          <div class="submission-title">3-Minute Fast Submit Lane</div>
+          <ol class="quick-steps">
+            <li>Open the live submit route for this grant.</li>
+            <li>Copy the SF-424 field map in one click (or field-by-field).</li>
+            <li>Finalize uploads/signature, then mark submitted with tracking ID.</li>
+          </ol>
+          <div class="toolbar" style="margin-bottom:0">
+            <a class="btn-link" href="${escAttr(submitLaneUrl)}" target="_blank" rel="noopener"
+               style="border-color:var(--neon-g);color:var(--neon-g)">1) Open submit site ↗</a>
+            <button class="secondary" id="copy-sf424-all">2) Copy SF-424 TSV</button>
+            <button class="success" id="mark-submitted-fast" ${canMarkSubmittedFast ? '' : 'disabled'}>3) Mark submitted</button>
+          </div>
+        </div>
+        <h3>Submission Readiness: ${p.ready ? '<span style="color:var(--neon-g)">READY</span>' : '<span style="color:var(--neon-a)">BLOCKED</span>'}</h3>
+        <p><b>Portal:</b> <a href="${escHTML(portal.portal_url || '#')}" target="_blank" rel="noopener" style="color:var(--accent-2)">${escHTML(portal.portal_url || 'n/a')}</a></p>
+        <p><b>System:</b> ${escHTML(portal.submission_system || 'n/a')}</p>
+        <p><b>Approval state:</b> ${escHTML(String(p.approval_state || 'draft'))}</p>
+        <p><b>Package complete:</b> ${p.package_complete ? 'yes' : 'no'}</p>
+        ${blockers ? `<div class="gaps"><b>Blockers</b><ul>${blockers}</ul></div>` : '<div class="reasons"><b>No blockers detected</b></div>'}
+        ${warnings ? `<div class="gaps"><b>Warnings</b><ul>${warnings}</ul></div>` : ''}
+        ${reqs ? `<h3>Portal required checklist</h3><ul>${reqs}</ul>` : ''}
+        <h3>SF-424 Copy/Paste Map</h3>
+        <table class="sf-table"><thead><tr><th>Field</th><th>Value</th><th>Copy</th></tr></thead><tbody>${sfRows}</tbody></table>
+      `;
+
+      const copyAllBtn = slot.querySelector('#copy-sf424-all');
+      if (copyAllBtn) {
+        copyAllBtn.addEventListener('click', async () => {
+          const ok = await copyTextValue(sfTsv);
+          const prev = copyAllBtn.textContent;
+          copyAllBtn.textContent = ok ? 'Copied TSV' : 'Clipboard blocked';
+          setTimeout(() => { copyAllBtn.textContent = prev; }, 1500);
+        });
+      }
+
+      slot.querySelectorAll('.sf-copy-btn').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const val = btn.getAttribute('data-copy') || '';
+          const ok = await copyTextValue(val);
+          const prev = btn.textContent;
+          btn.textContent = ok ? 'Copied' : 'No clipboard';
+          setTimeout(() => { btn.textContent = prev; }, 1200);
+        });
+      });
+
+      const markSubmittedFastBtn = slot.querySelector('#mark-submitted-fast');
+      if (markSubmittedFastBtn) {
+        markSubmittedFastBtn.addEventListener('click', () => markSubmitted(activeId));
+      }
+    } catch (e) {
+      slot.innerHTML = `<div class="empty">No submission packet yet. Click "Prepare submission draft" to build it.</div>`;
+    }
+    return;
+  }
+
+  if (tab === 'diff') {
+    try {
+      const d = await api(`/api/grants/${encodeURIComponent(activeId)}/diff`);
+      if (!d.has_approved) {
+        slot.innerHTML = `<div class="empty">No approved snapshot yet — approve this draft to start tracking diffs.</div>`;
+        return;
+      }
+      const h = d.headline || {};
+      const fileRows = (d.files || []).map(f => {
+        const color = f.status === 'unchanged' ? 'var(--ink-dim)' :
+                      f.status === 'modified' ? 'var(--warn)' :
+                      f.status === 'added' ? 'var(--ok)' : 'var(--alert)';
+        return `<tr><td>${escHTML(f.name)}</td>
+                    <td style="color:${color}">${f.status}</td>
+                    <td style="text-align:right">${f.current_bytes || '—'}</td>
+                    <td style="text-align:right; color:var(--ink-dim)">${f.approved_bytes || '—'}</td></tr>`;
+      }).join('');
+      const numRow = (label, val) => {
+        if (!val) return '';
+        const c = val.changed ? 'var(--warn)' : 'var(--ok)';
+        return `<tr><td>${label}</td>
+                    <td style="color:${c}">${escHTML(String(val.current))}</td>
+                    <td style="color:var(--ink-dim)">${escHTML(String(val.approved))}</td>
+                    <td>${val.changed ? 'changed' : 'unchanged'}</td></tr>`;
+      };
+      const layers = h.layers || {};
+      const layerRows = Object.entries(layers).map(([k, v]) => {
+        const cur = JSON.stringify(v.current);
+        const prev = JSON.stringify(v.approved);
+        const c = v.changed ? 'var(--warn)' : 'var(--ok)';
+        return `<tr><td>${k}</td>
+                    <td style="color:${c}; font-family:monospace; font-size:11px">${escHTML(cur).slice(0, 80)}</td>
+                    <td style="color:var(--ink-dim); font-family:monospace; font-size:11px">${escHTML(prev).slice(0, 80)}</td>
+                    <td>${v.changed ? 'changed' : 'same'}</td></tr>`;
+      }).join('');
+      slot.innerHTML = `
+        <h3>Diff: current draft (${escHTML(d.current_run_utc)}) vs approved (${escHTML(d.approved_run_utc)})</h3>
+        <h3>Headline numbers</h3>
+        <table><thead><tr><th>field</th><th>current</th><th>approved</th><th></th></tr></thead><tbody>
+          ${numRow('Evidence run UTC', h.evidence_run_utc)}
+          ${numRow('Eligibility score', h.eligibility_score)}
+          ${numRow('Budget total', h.budget_total)}
+        </tbody></table>
+        <h3>Evidence layers</h3>
+        <table><thead><tr><th>layer</th><th>current</th><th>approved</th><th></th></tr></thead><tbody>
+          ${layerRows}
+        </tbody></table>
+        <h3>File-level deltas (SHA-256)</h3>
+        <table><thead><tr><th>file</th><th>status</th><th>cur bytes</th><th>app bytes</th></tr></thead><tbody>
+          ${fileRows}
+        </tbody></table>`;
+    } catch (e) {
+      slot.innerHTML = `<div class="err">${e.message}</div>`;
+    }
+    return;
+  }
+
+  try {
+    const md = await api(`/api/grants/${encodeURIComponent(activeId)}/markdown?section=${tab}`);
+    slot.innerHTML = renderMarkdown(md);
+  } catch (e) {
+    slot.innerHTML = `<div class="err">${e.message}</div>`;
+  }
+}
+
+function renderMarkdown(md) {
+  // Minimal markdown -> HTML (headings, lists, tables, code, bold, italics, links).
+  const lines = md.split(/\r?\n/);
+  let html = '';
+  let inList = false, inTable = false;
+  const flush = () => {
+    if (inList) { html += '</ul>'; inList = false; }
+    if (inTable) { html += '</tbody></table>'; inTable = false; }
+  };
+  const inline = s => s
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+    .replace(/\*([^*]+)\*/g, '<i>$1</i>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g,
+             '<a href="$2" target="_blank" style="color:var(--accent-2)">$1</a>');
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    if (/^### /.test(l)) { flush(); html += `<h3>${inline(l.slice(4))}</h3>`; continue; }
+    if (/^## /.test(l)) { flush(); html += `<h2>${inline(l.slice(3))}</h2>`; continue; }
+    if (/^# /.test(l)) { flush(); html += `<h1>${inline(l.slice(2))}</h1>`; continue; }
+    if (/^---/.test(l)) { flush(); html += '<hr style="border-color:var(--border)"/>'; continue; }
+    if (/^\| /.test(l)) {
+      const cells = l.split('|').slice(1, -1).map(c => c.trim());
+      if (lines[i+1] && /^\|[-:\s|]+\|$/.test(lines[i+1])) {
+        flush();
+        html += '<table><thead><tr>' +
+          cells.map(c => `<th>${inline(c)}</th>`).join('') +
+          '</tr></thead><tbody>';
+        inTable = true;
+        i++; continue;
+      }
+      if (inTable) {
+        html += '<tr>' + cells.map(c => `<td>${inline(c)}</td>`).join('') + '</tr>';
+        continue;
+      }
+    }
+    if (/^- /.test(l)) {
+      if (!inList) { flush(); html += '<ul>'; inList = true; }
+      html += `<li>${inline(l.slice(2))}</li>`;
+      continue;
+    }
+    flush();
+    if (l.trim()) html += `<p>${inline(l)}</p>`;
+  }
+  flush();
+  return html;
+}
+
+async function approve(id) {
+  if (runtimeMode === 'artifact') {
+    alert('Read-only artifact mode: approve requires the live grants API.');
+    return;
+  }
+  if (!confirm(`Approve "${id}"? This locks the draft and copies it to /out/grants/_approved/.`)) return;
+  try {
+    const r = await api(`/api/grants/${encodeURIComponent(id)}/approve`, {method: 'POST'});
+    queue = r.queue;
+    renderQueue();
+    loadDetail(id);
+  } catch (e) {
+    alert(`Approve failed: ${e.message}`);
+  }
+}
+
+async function regenerate(id) {
+  if (runtimeMode === 'artifact') {
+    alert('Read-only artifact mode: regenerate requires the live grants API.');
+    return;
+  }
+  try {
+    const r = await api('/api/grants/regenerate', {
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({grant_id: id || null}),
+    });
+    queue = r.queue;
+    renderQueue();
+    if (activeId) loadDetail(activeId);
+  } catch (e) {
+    alert(`Regenerate failed: ${e.message}`);
+  }
+}
+
+async function draft(grantId, options = {}) {
+  const quiet = !!options.quiet;
+  const skipSuccessAlert = !!options.skipSuccessAlert;
+  if (runtimeMode === 'artifact') {
+    const msg = 'Read-only artifact mode: drafting requires the live grants API.';
+    if (quiet) throw new Error(msg);
+    alert(msg);
+    return;
+  }
+  try {
+    const r = await api('/api/grants/draft', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ grant_id: grantId || null, force: true, prepare_submission: true }),
+    });
+    queue = r.queue;
+    try {
+      submissionDashboard = await api('/api/grants/submission/dashboard');
+    } catch {
+      submissionDashboard = null;
+    }
+    const draftMeta = r.draft || {};
+    const targets = draftMeta.items || [];
+    targets.forEach(it => {
+      if (!it.grant_id) return;
+      submissionByGrant.delete(it.grant_id);
+    });
+    renderQueue();
+    if (activeId) {
+      activeTab = 'submission';
+      await loadDetail(activeId);
+    }
+    if (!quiet && !skipSuccessAlert) {
+      alert(`Draft complete: ${draftMeta.n_ready || 0} ready, ${draftMeta.n_blocked || 0} blocked. Open Submission Kit tab for blockers.`);
+    }
+  } catch (e) {
+    if (quiet) throw e;
+    const msg = isTimeoutLikeError(e)
+      ? 'Draft failed: 504 Gateway Timeout. The server took too long; retry in a moment.'
+      : `Draft failed: ${compactErrorMessage(e, 'request failed')}`;
+    alert(msg);
+  }
+}
+
+async function draftAll() {
+  await draft(null);
+}
+
+async function runOpportunityAutopilot() {
+  if (runtimeMode === 'artifact') {
+    alert('Read-only artifact mode: opportunity autopilot requires the live API.');
+    return;
+  }
+  try {
+    const r = await fetchJsonStrict('/api/opportunities/autopilot', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        harvest_min_score: 0.3,
+        fill_min_score: 0.4,
+        fill_limit: 30,
+        build_funding_queue: true,
+        funding_top: 20,
+        funding_channels: 'grant,key-source,contract,loan',
+        include_outreach: true,
+        outreach_limit: 30,
+        no_network: false,
+      }),
+    });
+
+    try {
+      opportunityTracker = await api('/api/opportunities/tracker');
+    } catch {
+      opportunityTracker = null;
+    }
+    try {
+      queue = await api('/api/grants');
+      submissionDashboard = await api('/api/grants/submission/dashboard');
+    } catch {
+      // keep current queue view if grants API temporarily unavailable
+    }
+    renderQueue();
+    if (activeId) {
+      activeTab = 'submission';
+      await loadDetail(activeId);
+    }
+
+    const ranked = Number(r?.ranked_actionable || 0);
+    const tracked = Number(r?.tracker?.opportunities?.n_total || 0);
+    const awarded = Number(r?.tracker?.awards?.count || 0);
+    alert(`Opportunity autopilot complete. Actionable found: ${ranked}. Tracked: ${tracked}. Awarded: ${awarded}. Outreach pack generated.`);
+  } catch (e) {
+    alert(`Opportunity autopilot failed: ${e.message}`);
+  }
+}
+
+async function prepareSubmission(id, options = {}) {
+  const quiet = !!options.quiet;
+  if (runtimeMode === 'artifact') {
+    const msg = 'Read-only artifact mode: prepare requires the live grants API.';
+    if (quiet) throw new Error(msg);
+    alert(msg);
+    return;
+  }
+  try {
+    await api(`/api/grants/${encodeURIComponent(id)}/prepare_submission`, {
+      method: 'POST',
+    });
+    try {
+      const payload = await api(`/api/grants/${encodeURIComponent(id)}/submission`);
+      submissionByGrant.set(id, payload);
+    } catch {
+      submissionByGrant.delete(id);
+    }
+    try {
+      submissionDashboard = await api('/api/grants/submission/dashboard');
+    } catch {
+      submissionDashboard = null;
+    }
+    activeTab = 'submission';
+    await loadDetail(id);
+  } catch (e) {
+    if (quiet) throw e;
+    const msg = isTimeoutLikeError(e)
+      ? 'Prepare submission failed: 504 Gateway Timeout. The server took too long; retry in a moment.'
+      : `Prepare submission failed: ${compactErrorMessage(e, 'request failed')}`;
+    alert(msg);
+  }
+}
+
+async function markSubmitted(id) {
+  if (runtimeMode === 'artifact') {
+    alert('Read-only artifact mode: mark-submitted requires the live grants API.');
+    return;
+  }
+  const tracking = prompt(`External tracking ID for "${id}" (e.g. grants.gov reference):`);
+  if (tracking === null) return;
+  const by = prompt('Submitted by (your name)?', 'Robert Ashworth');
+  if (by === null) return;
+  try {
+    const r = await api(`/api/grants/${encodeURIComponent(id)}/submitted`, {
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({submitted_by: by, external_tracking_id: tracking}),
+    });
+    queue = r.queue;
+    try {
+      submissionDashboard = await api('/api/grants/submission/dashboard');
+    } catch {
+      submissionDashboard = null;
+    }
+    renderQueue();
+    loadDetail(id);
+  } catch (e) {
+    alert(`Mark-submitted failed: ${e.message}`);
+  }
+}
+
+$('draft-all').addEventListener('click', () => draftAll());
+$('opps-autopilot').addEventListener('click', () => runOpportunityAutopilot());
+$('regenerate').addEventListener('click', () => regenerate(null));
+ensureCinematicLayer();
+renderMissionPulse();
+loadQueue();
+</script>
+<script src="./assets/luma_command_fabric.js"></script>
+</body>
+</html>

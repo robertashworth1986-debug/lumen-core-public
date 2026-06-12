@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LumenCore — Forecast Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/lumencore.css">
+<link rel="stylesheet" href="./assets/luma_command_fabric.css">
+<style>
+  .split-shell {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: minmax(330px, 1.05fr) minmax(440px, 1.65fr);
+    align-items: start;
+  }
+  @media (max-width: 1180px) {
+    .split-shell { grid-template-columns: 1fr; }
+  }
+  .pane { display: flex; flex-direction: column; gap: 14px; }
+  .card { border-radius: 12px; }
+  .input-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr 116px;
+    align-items: end;
+  }
+  .input-grid .full { grid-column: 1 / -1; }
+  @media (max-width: 640px) {
+    .input-grid { grid-template-columns: 1fr; }
+  }
+  label { display: block; color: var(--ink-dim); font-family: 'Orbitron', sans-serif;
+          font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+          margin-bottom: 6px; font-weight: 700; }
+  .metric-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .metric {
+    border: 1px solid var(--border);
+    background: linear-gradient(165deg, rgba(11,16,27,0.84), rgba(15,20,34,0.75));
+    border-radius: 10px;
+    padding: 10px;
+  }
+  .metric .v { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 700;
+                       background: linear-gradient(135deg, var(--neon-c), var(--neon-p));
+                       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .metric .k { font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 2px;
+                       color: var(--ink-dim); text-transform: uppercase; font-weight: 700; }
+  .split-kpi {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .split-kpi .v { color: var(--neon-c); font-weight: 700; }
+  .chart-card { position: relative; overflow: hidden; }
+  .chart-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .chart-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag {
+    border: 1px solid var(--border);
+    background: rgba(21, 30, 52, 0.6);
+    color: var(--ink-dim);
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 4px 9px;
+  }
+  .tag strong { color: var(--ink); font-weight: 700; }
+  #chart { width: 100%; height: 390px; display: block; border-radius: 10px;
+           background: rgba(0,0,0,0.25); border: 1px solid var(--border); }
+  .lower-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.1fr);
+  }
+  @media (max-width: 980px) {
+    .lower-grid { grid-template-columns: 1fr; }
+  }
+  .conf-bars { display: flex; flex-direction: column; gap: 6px; }
+  .conf-bar { display: flex; align-items: center; gap: 10px; font-size: 12px;
+              font-family: 'JetBrains Mono', monospace; }
+  .conf-bar .lbl { width: 88px; color: var(--ink-dim); text-transform: uppercase; font-size: 10px; letter-spacing: 1px; }
+  .conf-bar .bar { flex: 1; height: 6px; background: rgba(34,211,238,0.08);
+                   border-radius: 3px; overflow: hidden; }
+  .conf-bar .bar > div { height: 100%; background: linear-gradient(90deg, var(--neon-c), var(--neon-p));
+                          box-shadow: 0 0 6px var(--neon-c); border-radius: 3px;
+                          transition: width 0.7s cubic-bezier(.2,.8,.2,1); }
+  .conf-bar .pct { width: 56px; text-align: right; color: var(--neon-c); font-weight: 700; }
+  .telemetry {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 196px;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(0,0,0,0.2);
+  }
+  .telemetry li {
+    border-bottom: 1px solid rgba(125, 139, 181, 0.16);
+    padding: 8px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink);
+  }
+  .telemetry li:last-child { border-bottom: 0; }
+  .telemetry .t { color: var(--ink-dim); margin-right: 8px; }
+  .vol-readout {
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink-dim);
+    font-size: 11px;
+  }
+  .forecast-table-wrap {
+    max-height: 236px;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  #tbl { margin-top: 0; }
+  .err { color: var(--neon-r); font-family: 'JetBrains Mono', monospace; font-size: 12px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<script>window.LC_CONFIG = { title: 'FORECAST', subtitle: 'Split-pane command deck · meta-router cockpit',
+  bootLines: ['> handshake: forecast api','> loading dataset catalog …','> meta-router weights cached',
+              '> calibration bands armed','> split-pane armed · ready'] };</script>
+
+<div class="lc-stage">
+  <div class="split-shell">
+    <section class="pane">
+      <div class="lc-panel card">
+        <h2>Forecast Launcher</h2>
+        <div class="input-grid">
+          <div>
+            <label for="ds">Dataset</label>
+            <select id="ds" style="width:100%"><option>loading…</option></select>
+          </div>
+          <div>
+            <label for="h">Horizon</label>
+            <input id="h" type="number" min="1" max="120" value="12" style="width:100%">
+          </div>
+          <button class="lc-btn full" id="go" disabled>Run forecast</button>
+        </div>
+        <div id="err" class="err"></div>
+      </div>
+
+      <div class="lc-panel card">
+        <h2>Scenario Lab</h2>
+        <div class="input-grid">
+          <div>
+            <label for="scenario">Projection mode</label>
+            <select id="scenario" style="width:100%">
+              <option value="base" selected>Base line</option>
+              <option value="bull">Bull drift</option>
+              <option value="bear">Bear pressure</option>
+              <option value="shock">Shock stress</option>
+            </select>
+          </div>
+          <div>
+            <label for="vol">Band scaler</label>
+            <input id="vol" type="range" min="70" max="190" value="100" step="5" style="width:100%">
+            <div class="vol-readout" id="volText">100% dispersion</div>
+          </div>
+        </div>
+        <div class="split-kpi">
+          <span>Scenario effect</span>
+          <span class="v" id="scenarioEffect">Neutral</span>
+        </div>
+      </div>
+
+      <div class="lc-panel card">
+        <h2>Signal Stack</h2>
+        <div class="metric-grid">
+          <div class="metric"><div class="k">Family chosen</div><div class="v" id="fam">—</div></div>
+          <div class="metric"><div class="k">History obs</div><div class="v" id="nh">—</div></div>
+          <div class="metric"><div class="k">Horizon</div><div class="v" id="hh">—</div></div>
+          <div class="metric"><div class="k">Terminal drift</div><div class="v" id="drift">—</div></div>
+        </div>
+        <div class="split-kpi">
+          <span>Dominant confidence</span>
+          <span class="v" id="confTop">—</span>
+        </div>
+      </div>
+
+      <div class="lc-panel card">
+        <h2>Telemetry Rail</h2>
+        <ul class="telemetry" id="telemetry"></ul>
+      </div>
+    </section>
+
+    <section class="pane">
+      <div class="lc-panel card chart-card" id="result">
+        <div class="chart-head">
+          <h2 style="margin:0">Projection Canvas</h2>
+          <div class="chart-tags">
+            <span class="tag">run <strong id="run">—</strong></span>
+            <span class="tag">mode <strong id="modeTag">base</strong></span>
+            <span class="tag">scaler <strong id="volTag">1.00x</strong></span>
+          </div>
+        </div>
+        <canvas id="chart" width="1200" height="390"></canvas>
+      </div>
+
+      <div class="lower-grid" id="details">
+        <div class="lc-panel card">
+          <h2>Family Confidence</h2>
+          <div id="conf" class="conf-bars"></div>
+        </div>
+        <div class="lc-panel card">
+          <h2>Forecast Tape</h2>
+          <div class="forecast-table-wrap">
+            <table class="lc-table" id="tbl"><thead><tr>
+              <th>t</th><th>date</th><th>point</th><th>80% lo</th><th>80% hi</th><th>95% lo</th><th>95% hi</th>
+            </tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="./assets/lumencore.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const ds = $("#ds"), btn = $("#go"), err = $("#err");
+const telemetry = $("#telemetry");
+const scenario = $("#scenario");
+const vol = $("#vol");
+const volText = $("#volText");
+
+let latestRun = null;
+
+function log(line) {
+  const li = document.createElement("li");
+  const stamp = new Date().toISOString().slice(11, 19);
+  li.innerHTML = `<span class="t">${stamp}</span>${line}`;
+  telemetry.prepend(li);
+  while (telemetry.children.length > 14) telemetry.lastChild.remove();
+}
+
+function fmt(v, digits = 3) {
+  return Number.isFinite(v) ? v.toFixed(digits) : "—";
+}
+
+function modeProfile() {
+  const mode = scenario.value;
+  if (mode === "bull") return { mode, label: "Bull drift", drift: 0.09, band: 0.92, effect: "+trend" };
+  if (mode === "bear") return { mode, label: "Bear pressure", drift: -0.09, band: 1.12, effect: "-trend" };
+  if (mode === "shock") return { mode, label: "Shock stress", drift: -0.18, band: 1.35, effect: "tail widen" };
+  return { mode: "base", label: "Base line", drift: 0, band: 1, effect: "neutral" };
+}
+
+function applyMode(baseForecast) {
+  const profile = modeProfile();
+  const scaler = Number(vol.value || 100) / 100;
+  const n = Math.max(1, baseForecast.length);
+  return baseForecast.map((f, i) => {
+    const trend = n === 1 ? 0 : i / (n - 1);
+    const anchor = Math.max(Math.abs(f.value || 0), 1);
+    const drift = profile.drift * trend * anchor;
+    const mid = (f.value || 0) + drift;
+
+    const half80 = Math.max(1e-9, ((f.hi80 || 0) - (f.lo80 || 0)) / 2);
+    const half95 = Math.max(1e-9, ((f.hi95 || 0) - (f.lo95 || 0)) / 2);
+    const spreadMul = scaler * profile.band * (1 + (trend * 0.18));
+
+    return {
+      ...f,
+      value: mid,
+      lo80: mid - half80 * spreadMul,
+      hi80: mid + half80 * spreadMul,
+      lo95: mid - half95 * spreadMul,
+      hi95: mid + half95 * spreadMul
+    };
+  });
+}
+
+function updateModeLabels() {
+  const profile = modeProfile();
+  const scaler = Number(vol.value || 100) / 100;
+  volText.textContent = `${Math.round(scaler * 100)}% dispersion`;
+  $("#modeTag").textContent = profile.mode;
+  $("#volTag").textContent = `${scaler.toFixed(2)}x`;
+  $("#scenarioEffect").textContent = `${profile.label} · ${profile.effect}`;
+}
+
+async function loadList() {
+  try {
+    const j = await LC.api("/api/forecast/datasets?limit=2000");
+    ds.innerHTML = "";
+    (j.datasets || []).forEach(d => {
+      const o = document.createElement("option");
+      o.value = d.dataset; o.textContent = `${d.dataset}  (${d.n_obs})`;
+      ds.appendChild(o);
+    });
+    btn.disabled = false;
+    log(`dataset catalog loaded · ${ds.options.length} symbols`);
+    log("split-pane forecast deck online");
+  } catch (e) { err.textContent = "failed to load datasets: " + e.message; }
+}
+
+function drawChart(forecast) {
+  const c = $("#chart"), ctx = c.getContext("2d");
+  const W = c.width, H = c.height, pad = 36;
+  ctx.clearRect(0, 0, W, H);
+  if (!forecast.length) {
+    ctx.fillStyle = "rgba(125, 139, 181, 0.7)";
+    ctx.font = "13px 'JetBrains Mono', monospace";
+    ctx.fillText("Run a dataset to project the next horizon.", pad, H / 2);
+    return;
+  }
+  const lo95 = forecast.map(f => f.lo95), hi95 = forecast.map(f => f.hi95);
+  const lo80 = forecast.map(f => f.lo80), hi80 = forecast.map(f => f.hi80);
+  const pt = forecast.map(f => f.value);
+  const all = [...lo95, ...hi95, ...pt];
+  const ymin = Math.min(...all), ymax = Math.max(...all);
+  const yspan = (ymax - ymin) || 1, n = forecast.length;
+  const x = i => pad + (i / Math.max(1, n - 1)) * (W - 2 * pad);
+  const y = v => H - pad - ((v - ymin) / yspan) * (H - 2 * pad);
+
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, "rgba(34, 211, 238, 0.06)");
+  grad.addColorStop(1, "rgba(168, 85, 247, 0.03)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.strokeStyle = "rgba(125, 139, 181, 0.3)";
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad, pad); ctx.lineTo(pad, H - pad); ctx.lineTo(W - pad, H - pad); ctx.stroke();
+
+  ctx.strokeStyle = "rgba(125, 139, 181, 0.18)";
+  for (let i = 1; i <= 4; i++) {
+    const yy = pad + (i / 5) * (H - 2 * pad);
+    ctx.beginPath();
+    ctx.moveTo(pad, yy);
+    ctx.lineTo(W - pad, yy);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = "rgba(168, 85, 247, 0.14)";
+  ctx.beginPath();
+  ctx.moveTo(x(0), y(hi95[0]));
+  for (let i = 1; i < n; i++) ctx.lineTo(x(i), y(hi95[i]));
+  for (let i = n - 1; i >= 0; i--) ctx.lineTo(x(i), y(lo95[i]));
+  ctx.closePath(); ctx.fill();
+
+  ctx.fillStyle = "rgba(34, 211, 238, 0.22)";
+  ctx.beginPath();
+  ctx.moveTo(x(0), y(hi80[0]));
+  for (let i = 1; i < n; i++) ctx.lineTo(x(i), y(hi80[i]));
+  for (let i = n - 1; i >= 0; i--) ctx.lineTo(x(i), y(lo80[i]));
+  ctx.closePath(); ctx.fill();
+
+  ctx.shadowColor = "rgba(34, 211, 238, 0.6)"; ctx.shadowBlur = 8;
+  ctx.strokeStyle = "#22d3ee"; ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  for (let i = 0; i < n; i++) { const px = x(i), py = y(pt[i]); if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+  ctx.stroke(); ctx.shadowBlur = 0;
+
+  ctx.fillStyle = "#7d8bb5"; ctx.font = "10px 'JetBrains Mono', monospace";
+  ctx.fillText(ymax.toExponential(2), 4, pad + 8);
+  ctx.fillText(ymin.toExponential(2), 4, H - pad);
+  ctx.fillText("t=1", pad, H - 8);
+  ctx.fillText("t=" + n, W - pad - 30, H - 8);
+}
+
+function renderConf(p) {
+  const el = $("#conf"); el.innerHTML = "";
+  if (!p) {
+    $("#confTop").textContent = "—";
+    el.innerHTML = '<span class="lc-dim lc-mono" style="font-size:11px">router does not expose probabilities</span>';
+    return;
+  }
+  const entries = Object.entries(p).sort((a, b) => b[1] - a[1]);
+  if (entries.length) {
+    $("#confTop").textContent = `${entries[0][0]} ${(entries[0][1] * 100).toFixed(1)}%`;
+  }
+  for (const [fam, prob] of entries) {
+    const row = document.createElement("div");
+    row.className = "conf-bar";
+    row.innerHTML = `<div class="lbl">${fam}</div>
+      <div class="bar"><div style="width:${(prob*100).toFixed(1)}%"></div></div>
+      <div class="pct">${(prob*100).toFixed(1)}%</div>`;
+    el.appendChild(row);
+  }
+}
+
+function renderTable(fc) {
+  const tb = $("#tbl tbody");
+  tb.innerHTML = "";
+  fc.forEach(f => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${f.t}</td><td>${f.forecast_date || "—"}</td>
+      <td>${fmt(f.value)}</td><td>${fmt(f.lo80)}</td>
+      <td>${fmt(f.hi80)}</td><td>${fmt(f.lo95)}</td>
+      <td>${fmt(f.hi95)}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function renderFromState() {
+  if (!latestRun || !latestRun.forecast) return;
+  const adjusted = applyMode(latestRun.forecast);
+  const first = adjusted[0]?.value ?? null;
+  const last = adjusted[adjusted.length - 1]?.value ?? null;
+  const drift = (Number.isFinite(first) && Number.isFinite(last)) ? ((last - first) / Math.max(Math.abs(first), 1)) * 100 : null;
+
+  $("#fam").textContent = latestRun.chosen_family || "—";
+  $("#nh").textContent = latestRun.n_history ?? "—";
+  $("#hh").textContent = latestRun.horizon ?? "—";
+  $("#run").textContent = latestRun.evidence_run || "—";
+  $("#drift").textContent = Number.isFinite(drift) ? `${drift.toFixed(1)}%` : "—";
+
+  renderConf(latestRun.family_confidences);
+  drawChart(adjusted);
+  renderTable(adjusted);
+}
+
+btn.addEventListener("click", async () => {
+  err.textContent = ""; btn.disabled = true; btn.textContent = "running…";
+  try {
+    const id = ds.value, h = $("#h").value;
+    const j = await LC.api(`/api/forecast/series/${encodeURIComponent(id)}?h=${h}`);
+    latestRun = j;
+    renderFromState();
+    log(`forecast complete · ${id} h=${j.horizon} family=${j.chosen_family}`);
+  } catch (e) {
+    err.textContent = e.message || String(e);
+    log(`forecast failed · ${(e && e.message) ? e.message : e}`);
+  }
+  finally { btn.disabled = false; btn.textContent = "Run forecast"; }
+});
+
+scenario.addEventListener("change", () => {
+  updateModeLabels();
+  renderFromState();
+  log(`scenario switched · ${modeProfile().label}`);
+});
+
+vol.addEventListener("input", () => {
+  updateModeLabels();
+  renderFromState();
+});
+
+updateModeLabels();
+drawChart([]);
+log("booting forecast deck");
+loadList();
+</script>
+<script src="./assets/luma_command_fabric.js"></script>
+</body>
+</html>

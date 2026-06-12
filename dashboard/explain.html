@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LumenCore — Router Explainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/lumencore.css">
+<link rel="stylesheet" href="./assets/luma_command_fabric.css">
+<style>
+  .controls { display: flex; gap: 12px; align-items: center; padding: 14px;
+              background: rgba(15,23,50,0.35); border: 1px solid var(--border);
+              border-radius: 10px; margin-bottom: 16px; }
+  .controls input { flex: 1; }
+  .grid-3 { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 18px; }
+  .info-card { background: rgba(15,23,50,0.45); border: 1px solid var(--border);
+               border-radius: 10px; padding: 14px 16px; backdrop-filter: blur(10px);
+               position: relative; overflow: hidden; }
+  .info-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+                       background: linear-gradient(90deg, transparent, var(--neon-p), transparent); }
+  .info-card h3 { margin: 0 0 8px; font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 2px;
+                  color: var(--ink-dim); text-transform: uppercase; font-weight: 700; }
+  .info-card .v { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 700;
+                  background: linear-gradient(135deg, var(--neon-c), var(--neon-p));
+                  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .pill-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill-row .pill { padding: 4px 12px; border-radius: 99px; font-size: 11px; font-family: 'Orbitron', sans-serif;
+                    letter-spacing: 1px; text-transform: uppercase; border: 1px solid var(--border); color: var(--ink-dim); }
+  .pill-row .pill.lead { background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(168,85,247,0.2));
+                          border-color: var(--neon-c); color: var(--ink);
+                          box-shadow: 0 0 14px rgba(34,211,238,0.3); }
+  .err { color: var(--neon-r); padding: 12px; background: rgba(239,68,68,0.08);
+         border: 1px solid rgba(239,68,68,0.4); border-radius: 8px; font-family: 'JetBrains Mono', monospace; }
+  .bar { display: inline-block; height: 8px; background: linear-gradient(90deg, var(--neon-c), var(--neon-p));
+         border-radius: 4px; vertical-align: middle; margin-left: 6px; box-shadow: 0 0 6px var(--neon-c); }
+    .metric-strip { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin: 12px 0 18px; }
+    .metric-box { border: 1px solid var(--border); border-radius: 10px; background: rgba(15,23,50,0.35); padding: 12px 14px; }
+    .metric-box .k { font-size: 9px; color: var(--ink-dim); letter-spacing: 2px; text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
+    .metric-box .v { margin-top: 6px; font-size: 22px; font-weight: 800; font-family: 'Orbitron', sans-serif; color: var(--neon-c); }
+    .metric-box .sub { margin-top: 4px; font-size: 11px; color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; }
+    .prob-grid { display: grid; gap: 8px; margin-top: 8px; }
+    .prob-row { display: grid; grid-template-columns: 120px 1fr 62px; align-items: center; gap: 10px; }
+    .prob-row .name { font-size: 11px; color: var(--ink); font-family: 'JetBrains Mono', monospace; }
+    .prob-track { height: 8px; border-radius: 99px; background: rgba(6,11,18,0.6); overflow: hidden; border: 1px solid rgba(86,215,203,0.2); }
+    .prob-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--neon-c), var(--neon-p)); }
+    .prob-row .pct { text-align: right; font-size: 11px; color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; }
+    .insight-card { margin-top: 18px; border: 1px solid var(--border); border-radius: 10px; background: rgba(6,11,18,0.45); padding: 12px 14px; }
+    .insight-card h3 { margin: 0 0 8px; font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: 2px; color: var(--neon-c); text-transform: uppercase; }
+    .insight-card ul { margin: 0; padding-left: 18px; color: var(--ink); font-size: 12px; line-height: 1.6; }
+    .prototype-wrap { margin-top: 22px; border: 1px solid var(--border); border-radius: 12px;
+              background: rgba(6,11,18,0.45); padding: 14px; }
+    .prototype-wrap h2 { margin: 0 0 8px; }
+    .proto-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .proto-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+            background: rgba(15,23,50,0.35); }
+    .proto-thumb { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+             background: rgba(2,6,23,0.85); }
+    .proto-meta { padding: 10px 12px; }
+    .proto-title { margin: 0; font-size: 12px; font-weight: 700; color: var(--ink); }
+    .proto-lane { margin-top: 4px; font-size: 10px; color: var(--ink-dim); letter-spacing: 1px;
+            text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+    .proto-note { margin-top: 6px; font-size: 11px; color: var(--ink-dim); }
+        .proto-actions { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .proto-link { font-size: 10px; border: 1px solid var(--border); border-radius: 6px;
+          padding: 4px 8px; color: var(--neon-c); text-decoration: none; font-family: 'JetBrains Mono', monospace; }
+        .legend-grid { margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+        .legend-item { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+          background: rgba(15,23,50,0.25); font-size: 11px; color: var(--ink-dim); line-height: 1.45; }
+        .legend-item b { color: var(--ink); }
+        .warn-note { margin-top: 8px; font-size: 11px; color: var(--neon-a); font-family: 'JetBrains Mono', monospace; }
+        .viz-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 14px 0 18px; }
+        .viz-card { border: 1px solid var(--border); border-radius: 10px; background: rgba(6,11,18,0.45); padding: 10px; }
+        .viz-title { margin: 0 0 8px; font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ink-dim); font-family: 'Orbitron', sans-serif; }
+        .viz-canvas { width: 100%; height: 130px; border-radius: 8px; border: 1px solid rgba(34,211,238,0.22);
+          background: radial-gradient(circle at 50% 16%, rgba(34,211,238,0.16), rgba(10,16,34,0.56) 58%, rgba(4,6,15,0.78)); }
+        .viz-foot { margin-top: 8px; font-size: 10px; color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; }
+        @media (max-width: 760px) {
+          .proto-thumb { object-fit: contain; aspect-ratio: 4 / 3; }
+          .prob-row { grid-template-columns: 96px 1fr 54px; gap: 8px; }
+          .prob-row .name { font-size: 10px; }
+          .viz-canvas { height: 116px; }
+        }
+</style>
+</head>
+<body>
+<script>window.LC_CONFIG = { title: 'EXPLAIN', subtitle: 'Per-series router + institutional evidence rationale',
+  bootLines: ['> handshake: explainer api','> loading classifier feature_importances_',
+              '> z-score vs population computed','> ready'] };</script>
+
+<div class="lc-stage">
+  <div class="lc-panel">
+    <h2>Inspect a router pick</h2>
+    <div class="controls">
+      <input id="ds" type="text" placeholder="dataset_id (e.g. fred_DGS10) — type then press Enter" value="fred_DGS10"/>
+      <button class="lc-btn" id="go">Explain</button>
+    </div>
+    <div id="error" class="err" style="display:none"></div>
+    <div id="content"></div>
+    <div class="prototype-wrap">
+      <h2>Evidence Visuals</h2>
+      <div class="lc-dim" style="font-size:12px; margin-bottom:10px">
+        Curated from exported evidence runs and proof artifacts.
+        Visuals are treated as support material; decision authority remains with audited metrics and execution logs.
+        <a href="./alpha_burst_lab_holo_3d.html" style="margin-left:8px">Open Holographic Command Room</a>
+        <a href="./scenario_mission.html" style="margin-left:8px">Open Cinematic Cue Mission</a>
+      </div>
+      <div id="prototype-grid" class="proto-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script src="./assets/lumencore.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const fmt = (v, d=4) => v == null ? '—' : Number(v).toFixed(d);
+const pct = (v) => Number(v || 0) * 100;
+
+const DEFAULT_EVIDENCE_UTC = '20260505T121657Z';
+const VISUAL_RUN_FALLBACKS = ['20260511T175644Z', '20260505T121657Z', '20260505T104706Z', '20260505T082948Z'];
+
+function toAssetPath(path) {
+  if (location.protocol === 'file:' && String(path || '').startsWith('/')) {
+    return '.' + path;
+  }
+  return path;
+}
+
+async function canLoadAsset(path) {
+  const url = toAssetPath(path);
+  try {
+    const head = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+    if (head.ok) return true;
+  } catch (_) {}
+  try {
+    const get = await fetch(url, { cache: 'no-store' });
+    return get.ok;
+  } catch (_) {
+    return false;
+  }
+}
+
+function buildPrototypeVisuals(visualRunUtc) {
+  const utc = (visualRunUtc || DEFAULT_EVIDENCE_UTC).trim();
+  const evidenceBase = `/evidence/runs/${utc}/figs`;
+  const premiumBase = '/out/execution/harmonic_backprop_proofpack/20260509T102800Z_premium_flow';
+  return [
+    {
+      title: 'Family Wins Distribution',
+      lane: 'router selection evidence',
+      note: `Observed win share across candidate model families from run ${utc}.`,
+      src: `${evidenceBase}/01_family_wins_bar.png`,
+      href: `${evidenceBase}/01_family_wins_bar.png`
+    },
+    {
+      title: 'Per-Dataset RMSE',
+      lane: 'error surface',
+      note: `Dataset-level prediction error profile from run ${utc}.`,
+      src: `${evidenceBase}/02_per_dataset_rmse.png`,
+      href: `${evidenceBase}/02_per_dataset_rmse.png`
+    },
+    {
+      title: 'Margin Distribution',
+      lane: 'confidence spread',
+      note: `Distribution of family margin confidence from run ${utc}.`,
+      src: `${evidenceBase}/03_margin_histogram.png`,
+      href: `${evidenceBase}/03_margin_histogram.png`
+    },
+    {
+      title: 'Periodicity vs Margin',
+      lane: 'harmonic diagnostics',
+      note: `Periodicity and margin coupling from run ${utc}.`,
+      src: `${evidenceBase}/04_periodicity_vs_margin.png`,
+      href: `${evidenceBase}/04_periodicity_vs_margin.png`
+    },
+    {
+      title: 'Family Grid',
+      lane: 'model topology',
+      note: `Family topology spread visual from run ${utc}.`,
+      src: `${evidenceBase}/05_family_grid.png`,
+      href: `${evidenceBase}/05_family_grid.png`
+    },
+    {
+      title: 'Backprop RMSE Rank',
+      lane: 'premium flow validation',
+      note: 'Ranked RMSE panel from harmonic backprop proofpack.',
+      src: `${premiumBase}/rmse_rank.png`,
+      href: `${premiumBase}/rmse_rank.png`
+    },
+    {
+      title: 'Backprop Holdout Predictions',
+      lane: 'premium flow validation',
+      note: 'Holdout predictions panel from harmonic backprop proofpack.',
+      src: `${premiumBase}/holdout_predictions.png`,
+      href: `${premiumBase}/holdout_predictions.png`
+    },
+    {
+      title: 'Holographic Command Room',
+      lane: 'immersive control surface',
+      note: 'Interactive 3D mission room for live executive walkthroughs.',
+      src: `${evidenceBase}/05_family_grid.png`,
+      href: './alpha_burst_lab_holo_3d.html'
+    },
+    {
+      title: 'Cinematic Cue Mission',
+      lane: 'narrative timeline',
+      note: 'Narrative walkthrough layer synchronized to the mission context.',
+      src: `${evidenceBase}/04_periodicity_vs_margin.png`,
+      href: './scenario_mission.html'
+    }
+  ];
+}
+
+async function resolveEvidenceVisualRunUtc() {
+  const candidates = [];
+  try {
+    const resp = await fetch(toAssetPath('/evidence/latest.txt'), { cache: 'no-store' });
+    if (resp.ok) {
+      const utc = (await resp.text()).trim();
+      if (/^\d{8}T\d{6}Z$/.test(utc)) candidates.push(utc);
+    }
+  } catch (_) {}
+  VISUAL_RUN_FALLBACKS.forEach((utc) => candidates.push(utc));
+
+  for (const utc of Array.from(new Set(candidates))) {
+    const probe = `/evidence/runs/${utc}/figs/05_family_grid.png`;
+    if (await canLoadAsset(probe)) return utc;
+  }
+  return DEFAULT_EVIDENCE_UTC;
+}
+
+async function renderPrototypeGallery() {
+  const host = $('prototype-grid');
+  if (!host) return;
+  const visualRunUtc = await resolveEvidenceVisualRunUtc();
+  const prototypeVisuals = buildPrototypeVisuals(visualRunUtc);
+
+  host.innerHTML = prototypeVisuals.map((item, idx) => `
+    <article class="proto-card" data-card="${idx}">
+      <img class="proto-thumb" alt="${item.title}" loading="lazy" data-src="${item.src}">
+      <div class="proto-meta">
+        <p class="proto-title">${item.title}</p>
+        <div class="proto-lane">${item.lane}</div>
+        <div class="proto-note">${item.note}</div>
+        <div class="proto-actions">
+          <a class="proto-link" href="${item.href || item.src}" target="_blank" rel="noopener noreferrer">Open full view</a>
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  const ensureNotEmpty = () => {
+    if (host.querySelector('.proto-card')) return;
+    host.innerHTML = '<div class="lc-dim" style="padding:14px;border:1px dashed var(--border);border-radius:10px">No visual artifacts were reachable from this environment. Confirm /evidence and /out routes are live.</div>';
+  };
+
+  host.querySelectorAll('img[data-src]').forEach((img) => {
+    const raw = img.getAttribute('data-src') || '';
+    img.src = encodeURI(toAssetPath(raw));
+    img.addEventListener('error', () => {
+      const card = img.closest('.proto-card');
+      if (card) card.remove();
+      ensureNotEmpty();
+    }, { once: true });
+  });
+
+  ensureNotEmpty();
+}
+
+function kalishaBand(score) {
+  if (score >= 80) return 'A+ lock';
+  if (score >= 68) return 'A strong';
+  if (score >= 52) return 'B active';
+  if (score >= 38) return 'C watch';
+  return 'D weak';
+}
+
+function computeKalisha(d) {
+  const probs = (d.family_probabilities || []).map(p => Number(p.prob || 0)).filter(Number.isFinite).sort((a, b) => b - a);
+  const lead = probs[0] || 0;
+  const second = probs[1] || 0;
+  const spread = Math.max(0, lead - second);
+
+  const contrib = (d.feature_contributions || []).slice(0, 12);
+  const avgAbsZ = contrib.length
+    ? contrib.reduce((s, c) => s + Math.abs(Number(c.z_vs_pop || 0)), 0) / contrib.length
+    : 0;
+  const avgContribution = contrib.length
+    ? contrib.reduce((s, c) => s + Number(c.score || 0), 0) / contrib.length
+    : 0;
+
+  const score = Math.max(0, Math.min(100,
+    (lead * 62) +
+    (spread * 26) +
+    Math.min(12, avgAbsZ * 3.2) +
+    Math.min(8, avgContribution * 180)
+  ));
+
+  return {
+    score,
+    band: kalishaBand(score),
+    leadProb: lead,
+    spread,
+    avgAbsZ,
+  };
+}
+
+function buildInsights(d, k) {
+  const lines = [];
+  lines.push(`Kalisha score ${k.score.toFixed(1)} (${k.band}) with lead-family confidence ${(k.leadProb * 100).toFixed(1)}%.`);
+  lines.push(`Family separation is ${(k.spread * 100).toFixed(1)}%; larger spread means lower route ambiguity.`);
+  if (k.leadProb >= 0.98) lines.push('Lead family confidence is very high; verify sample size and regime stability before treating this as durable behavior.');
+  if (k.avgAbsZ >= 2) lines.push(`Feature profile is strongly out-of-distribution (avg |z| ${k.avgAbsZ.toFixed(2)}), favor active risk controls.`);
+  else lines.push(`Feature profile is close to population baseline (avg |z| ${k.avgAbsZ.toFixed(2)}), favor steady sizing.`);
+  lines.push('Family probability reflects model-selection confidence, not guaranteed trade win-rate or realized PnL.');
+  lines.push(`Chosen family is ${d.chosen_family || 'unknown'} with router run ${d.router_run || 'n/a'} over ${d.n_history || 0} history rows.`);
+  return lines;
+}
+
+function freshnessLabel(utc) {
+  const ts = Date.parse(utc || '');
+  if (!Number.isFinite(ts)) return 'freshness unknown';
+  const ageMin = Math.max(0, (Date.now() - ts) / 60000);
+  if (ageMin <= 30) return 'fresh <=30m';
+  if (ageMin <= 240) return `fresh ${Math.round(ageMin)}m`;
+  if (ageMin <= 1440) return `aging ${Math.round(ageMin / 60)}h`;
+  return `stale ${Math.round(ageMin / 1440)}d`;
+}
+
+async function loadRuntimeContext() {
+  const [snap, trading] = await Promise.all([
+    LC.api('/api/snapshot').catch(() => null),
+    LC.api('/api/trading/summary').catch(() => null),
+  ]);
+  return { snap, trading };
+}
+
+function getExplainerVisualProfile() {
+  const perf = (window.LC && window.LC.performance) ? window.LC.performance : {};
+  const tier = perf.tier || 'balanced';
+  const reducedMotion = Boolean(perf.reducedMotion);
+  const profiles = {
+    ultra: { pixelCap: 2, lineWidth: 2.2 },
+    balanced: { pixelCap: 1.7, lineWidth: 1.9 },
+    lite: { pixelCap: 1.3, lineWidth: 1.5 },
+  };
+  return { tier, reducedMotion, ...(profiles[tier] || profiles.balanced) };
+}
+
+function setupVizCanvas(canvas, profile) {
+  if (!canvas) return null;
+  const rect = canvas.getBoundingClientRect();
+  if (!rect.width || !rect.height) return null;
+  const ratio = Math.min(window.devicePixelRatio || 1, profile.pixelCap || 2);
+  canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+  canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  return { ctx, w: rect.width, h: rect.height };
+}
+
+function drawConfidenceArc(canvas, kalisha, profile) {
+  const env = setupVizCanvas(canvas, profile);
+  if (!env) return;
+  const { ctx, w, h } = env;
+  ctx.clearRect(0, 0, w, h);
+
+  const cx = w / 2;
+  const cy = h * 0.62;
+  const radius = Math.min(w, h) * 0.34;
+  const start = Math.PI * 0.75;
+  const end = Math.PI * 2.25;
+  const progress = Math.max(0, Math.min(1, (kalisha.score / 100) * 0.7 + kalisha.leadProb * 0.3));
+
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = 'rgba(125,139,181,0.28)';
+  ctx.lineWidth = profile.lineWidth;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, start, end);
+  ctx.stroke();
+
+  const sweep = start + (end - start) * progress;
+  const grad = ctx.createLinearGradient(cx - radius, cy, cx + radius, cy);
+  grad.addColorStop(0, 'rgba(34,211,238,0.95)');
+  grad.addColorStop(1, 'rgba(168,85,247,0.95)');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = profile.lineWidth + 1.3;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, start, sweep);
+  ctx.stroke();
+
+  ctx.fillStyle = '#e6f0ff';
+  ctx.font = "700 24px 'Orbitron', sans-serif";
+  ctx.textAlign = 'center';
+  ctx.fillText(kalisha.score.toFixed(1), cx, cy - 2);
+  ctx.fillStyle = '#7d8bb5';
+  ctx.font = "11px 'JetBrains Mono', monospace";
+  ctx.fillText(kalisha.band.toUpperCase(), cx, cy + 16);
+}
+
+function drawProbabilitySurface(canvas, probs, profile) {
+  const env = setupVizCanvas(canvas, profile);
+  if (!env) return;
+  const { ctx, w, h } = env;
+  ctx.clearRect(0, 0, w, h);
+
+  if (!probs.length) {
+    ctx.fillStyle = '#7d8bb5';
+    ctx.font = "11px 'JetBrains Mono', monospace";
+    ctx.fillText('no probability data', 12, h / 2);
+    return;
+  }
+
+  const sorted = [...probs].sort((a, b) => (b.prob || 0) - (a.prob || 0)).slice(0, 6);
+  const maxP = Math.max(...sorted.map((p) => Number(p.prob || 0)), 0.001);
+  const left = 14;
+  const right = w - 14;
+  const top = 14;
+  const bottom = h - 20;
+  const span = Math.max(1, sorted.length - 1);
+
+  ctx.strokeStyle = 'rgba(125,139,181,0.22)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 3; i++) {
+    const y = top + ((bottom - top) / 2) * i;
+    ctx.beginPath();
+    ctx.moveTo(left, y);
+    ctx.lineTo(right, y);
+    ctx.stroke();
+  }
+
+  const pts = sorted.map((p, i) => {
+    const x = left + ((right - left) / span) * i;
+    const norm = Number(p.prob || 0) / maxP;
+    const y = bottom - norm * (bottom - top);
+    return { x, y, p };
+  });
+
+  const fill = ctx.createLinearGradient(0, top, 0, bottom);
+  fill.addColorStop(0, 'rgba(34,211,238,0.28)');
+  fill.addColorStop(1, 'rgba(168,85,247,0.04)');
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, bottom);
+  for (const pt of pts) ctx.lineTo(pt.x, pt.y);
+  ctx.lineTo(pts[pts.length - 1].x, bottom);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+
+  ctx.strokeStyle = 'rgba(34,211,238,0.95)';
+  ctx.lineWidth = profile.lineWidth;
+  ctx.beginPath();
+  for (let i = 0; i < pts.length; i++) {
+    const pt = pts[i];
+    if (i === 0) ctx.moveTo(pt.x, pt.y);
+    else ctx.lineTo(pt.x, pt.y);
+  }
+  ctx.stroke();
+
+  ctx.font = "10px 'JetBrains Mono', monospace";
+  ctx.textAlign = 'center';
+  for (const pt of pts) {
+    ctx.beginPath();
+    ctx.fillStyle = '#a855f7';
+    ctx.arc(pt.x, pt.y, 2.6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#7d8bb5';
+    ctx.fillText(String(pt.p.family || '').slice(0, 9), pt.x, bottom + 12);
+  }
+}
+
+function drawContributionPulse(canvas, contributions, profile) {
+  const env = setupVizCanvas(canvas, profile);
+  if (!env) return;
+  const { ctx, w, h } = env;
+  ctx.clearRect(0, 0, w, h);
+
+  const rows = (contributions || []).slice(0, 8);
+  if (!rows.length) {
+    ctx.fillStyle = '#7d8bb5';
+    ctx.font = "11px 'JetBrains Mono', monospace";
+    ctx.fillText('no contribution data', 12, h / 2);
+    return;
+  }
+
+  const left = 12;
+  const right = w - 14;
+  const top = 12;
+  const rowH = (h - top - 10) / rows.length;
+  const maxScore = Math.max(...rows.map((r) => Number(r.score || 0)), 0.001);
+
+  ctx.font = "10px 'JetBrains Mono', monospace";
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const y = top + i * rowH;
+    const width = ((right - left) * Number(row.score || 0)) / maxScore;
+
+    ctx.fillStyle = 'rgba(125,139,181,0.14)';
+    ctx.fillRect(left, y + 4, right - left, Math.max(5, rowH - 8));
+
+    const grad = ctx.createLinearGradient(left, y, left + width, y);
+    grad.addColorStop(0, 'rgba(34,211,238,0.9)');
+    grad.addColorStop(1, 'rgba(168,85,247,0.78)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(left, y + 4, Math.max(1, width), Math.max(5, rowH - 8));
+
+    ctx.fillStyle = '#e6f0ff';
+    ctx.fillText(String(row.feature || '').slice(0, 13), left + 3, y + rowH - 4);
+  }
+}
+
+function renderExplainerVisuals(d, kalisha) {
+  const profile = getExplainerVisualProfile();
+  drawConfidenceArc($('viz-confidence'), kalisha, profile);
+  drawProbabilitySurface($('viz-prob-surface'), d.family_probabilities || [], profile);
+  drawContributionPulse($('viz-contrib-pulse'), d.feature_contributions || [], profile);
+  const quality = $('viz-quality');
+  if (quality) {
+    quality.textContent = `render ${profile.tier.toUpperCase()}${profile.reducedMotion ? ' · reduced-motion' : ''}`;
+  }
+}
+
+async function explain(ds) {
+  $('error').style.display = 'none';
+  $('content').innerHTML = '<p class="lc-dim lc-mono" style="padding:24px; text-align:center">loading…</p>';
+  try {
+    const [d, runtime] = await Promise.all([
+      LC.api(`/api/forecast/explain/${encodeURIComponent(ds)}`),
+      loadRuntimeContext(),
+    ]);
+    render(d, runtime);
+  } catch (e) {
+    $('content').innerHTML = '';
+    $('error').style.display = 'block';
+    $('error').textContent = `Explain failed: ${e.message}`;
+  }
+}
+
+function render(d, runtime) {
+  const probs = d.family_probabilities || [];
+  const kalisha = computeKalisha(d);
+  const insights = buildInsights(d, kalisha);
+  const snap = runtime && runtime.snap ? runtime.snap : {};
+  const trading = runtime && runtime.trading ? runtime.trading : {};
+  const runtimeUtc = String(snap.generated_utc || trading.generated_utc || d.router_run || 'n/a');
+  const runtimeFresh = freshnessLabel(runtimeUtc);
+  const exec = trading.execution || {};
+  const lane = String(snap.top_sector || trading.top_domain || d.chosen_family || 'unknown').toUpperCase();
+  const probsHtml = probs.map((p, i) =>
+    `<span class="pill ${i === 0 ? 'lead' : ''}" title="${fmt(p.prob, 4)}">${p.family} · ${(p.prob*100).toFixed(1)}%</span>`
+  ).join('');
+
+  const probsBarHtml = probs.map(p => {
+    const v = Math.max(0, Math.min(100, pct(p.prob)));
+    return `<div class="prob-row">
+      <div class="name">${p.family}</div>
+      <div class="prob-track"><div class="prob-fill" style="width:${v.toFixed(1)}%"></div></div>
+      <div class="pct">${v.toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+
+  const top = (d.feature_contributions || []).slice(0, 12);
+  const topHtml = top.map(c => {
+    const w = Math.min(100, c.score * 1000);
+    return `<tr>
+      <td><span class="lc-mono">${c.feature}</span></td>
+      <td>${fmt(c.value, 4)}</td>
+      <td>${fmt(c.z_vs_pop, 2)}</td>
+      <td>${fmt(c.importance, 3)}</td>
+      <td>${fmt(c.score, 4)}<span class="bar" style="width:${w}px"></span></td>
+    </tr>`;
+  }).join('');
+
+  const imp = d.feature_importances || [];
+  const impHtml = imp.map(f =>
+    `<tr><td><span class="lc-mono">${f.feature}</span></td><td>${fmt(f.importance, 3)}</td><td>${fmt(f.value, 4)}</td></tr>`
+  ).join('');
+
+  $('content').innerHTML = `
+    <div class="grid-3" style="margin-bottom:14px">
+      <div class="info-card">
+        <h3>Runtime Context</h3>
+        <div class="lc-mono" style="font-size:13px;color:var(--ink)">${runtimeUtc}</div>
+        <div class="lc-dim" style="margin-top:6px;font-size:11px">${runtimeFresh} · lane ${lane}</div>
+      </div>
+      <div class="info-card">
+        <h3>Execution Posture</h3>
+        <div class="lc-mono" style="font-size:13px;color:var(--ink)">${String(exec.status || trading.mode || 'unknown').toUpperCase()}</div>
+        <div class="lc-dim" style="margin-top:6px;font-size:11px">live ${Boolean(snap.live_now) ? 'on' : 'off'} · kill ${Boolean(exec.kill_switch) ? 'on' : 'off'}</div>
+      </div>
+      <div class="info-card">
+        <h3>Portfolio Estimate</h3>
+        <div class="v">${Number.isFinite(Number(trading.portfolio_est_usd)) ? ('$' + Number(trading.portfolio_est_usd).toLocaleString()) : '—'}</div>
+        <div class="lc-dim" style="margin-top:6px;font-size:11px">source: /api/trading/summary</div>
+      </div>
+    </div>
+
+    <div class="metric-strip">
+      <div class="metric-box">
+        <div class="k">Kalisha Score</div>
+        <div class="v">${kalisha.score.toFixed(1)}</div>
+        <div class="sub">${kalisha.band}</div>
+      </div>
+      <div class="metric-box">
+        <div class="k">Lead Probability</div>
+        <div class="v">${(kalisha.leadProb * 100).toFixed(1)}%</div>
+        <div class="sub">top family confidence</div>
+      </div>
+      <div class="metric-box">
+        <div class="k">Route Separation</div>
+        <div class="v">${(kalisha.spread * 100).toFixed(1)}%</div>
+        <div class="sub">winner vs runner-up</div>
+      </div>
+      <div class="metric-box">
+        <div class="k">Signal Intensity</div>
+        <div class="v">${kalisha.avgAbsZ.toFixed(2)}</div>
+        <div class="sub">avg |z| of top contributors</div>
+      </div>
+    </div>
+
+    <div class="viz-grid">
+      <div class="viz-card">
+        <h3 class="viz-title">Confidence Arc</h3>
+        <canvas id="viz-confidence" class="viz-canvas"></canvas>
+        <div class="viz-foot">Blend of kalisha score and lead-family certainty.</div>
+      </div>
+      <div class="viz-card">
+        <h3 class="viz-title">Probability Surface</h3>
+        <canvas id="viz-prob-surface" class="viz-canvas"></canvas>
+        <div class="viz-foot">Top family probabilities mapped as a weighted signal curve.</div>
+      </div>
+      <div class="viz-card">
+        <h3 class="viz-title">Contribution Pulse</h3>
+        <canvas id="viz-contrib-pulse" class="viz-canvas"></canvas>
+        <div class="viz-foot" id="viz-quality">render profile loading…</div>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <h3>Investor Translation Layer</h3>
+      <div class="legend-grid">
+        <div class="legend-item"><b>Global feature importance</b>: Long-run model weight from training; higher means the feature usually matters more.</div>
+        <div class="legend-item"><b>This series</b>: Current observed value for the selected dataset/series.</div>
+        <div class="legend-item"><b>z vs pop</b>: Distance from normal baseline in standard deviations; bigger absolute values mean less typical behavior.</div>
+        <div class="legend-item"><b>Contribution</b>: Decision impact score for this case, computed as importance x abs(z-score).</div>
+      </div>
+      <div class="warn-note">Interpretation guardrail: high confidence or high win share is a model-selection signal, not a promise of realized return.</div>
+    </div>
+
+    <div class="grid-3">
+      <div class="info-card">
+        <h3>Dataset</h3>
+        <div class="lc-mono" style="font-size:16px; color:var(--ink); font-weight:600">${d.dataset}</div>
+        <div class="lc-dim" style="font-size:11px; margin-top:4px; font-family:'JetBrains Mono',monospace">
+          n_history: ${d.n_history} · router run ${d.router_run}
+        </div>
+      </div>
+      <div class="info-card">
+        <h3>Chosen family</h3>
+        <div class="v">${d.chosen_family}</div>
+      </div>
+      <div class="info-card" style="grid-column: 1 / -1">
+        <h3>Family probabilities</h3>
+        <div class="pill-row">${probsHtml || '<em class="lc-dim">not available</em>'}</div>
+        <div class="prob-grid">${probsBarHtml || ''}</div>
+      </div>
+    </div>
+
+    <h2>Top feature contributions
+      <span class="lc-dim" style="font-size:11px; font-family:'JetBrains Mono',monospace">
+        (decision impact = importance x abs(z vs population))
+      </span></h2>
+    <table class="lc-table">
+      <thead><tr>
+        <th>Feature</th><th>Current value</th><th>Distance from baseline (z)</th>
+        <th>Importance</th><th>Decision impact</th>
+      </tr></thead>
+      <tbody>${topHtml || '<tr><td colspan="5" class="lc-dim">no contribution data — population features.csv missing</td></tr>'}</tbody>
+    </table>
+
+    <h2 style="margin-top:24px">Global feature importance
+      <span class="lc-dim" style="font-size:11px; font-family:'JetBrains Mono',monospace">(stable model weight, not guaranteed PnL)</span>
+    </h2>
+    <table class="lc-table">
+      <thead><tr><th>Feature</th><th>Importance</th><th>This series</th></tr></thead>
+      <tbody>${impHtml || '<tr><td colspan="3" class="lc-dim">classifier exposes no feature_importances_</td></tr>'}</tbody>
+    </table>
+
+    <div class="insight-card">
+      <h3>Luma Tactical Readout</h3>
+      <ul>${insights.map(line => `<li>${line}</li>`).join('')}</ul>
+    </div>`;
+
+  requestAnimationFrame(() => renderExplainerVisuals(d, kalisha));
+}
+
+$('go').addEventListener('click', () => explain($('ds').value.trim()));
+$('ds').addEventListener('keydown', e => { if (e.key === 'Enter') explain($('ds').value.trim()); });
+renderPrototypeGallery();
+explain($('ds').value.trim());
+</script>
+<script src="./assets/luma_command_fabric.js"></script>
+</body>
+</html>
