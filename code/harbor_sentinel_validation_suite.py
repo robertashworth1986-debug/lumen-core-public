@@ -1,0 +1,413 @@
+"""Development/validation and stress suite for HarborSentinel.
+
+The suite selects one threshold on development-only synthetic scenarios, then
+freezes that threshold for disjoint validation and stress conditions. It is a
+software feasibility benchmark, not operational or field evidence.
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import hashlib
+import json
+import platform
+import time
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import pandas as pd
+
+from harbor_sentinel_benchmark import (
+    ANOMALY_TYPES,
+    evaluate_alerts,
+    fit_profiles,
+    score_stream,
+    select_threshold,
+    simulate_scenario,
+)
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_OUT = ROOT / "out" / "harbor_sentinel_validation"
+EVIDENCE_BOUNDARY = (
+    "Synthetic software benchmark only. Inputs are generated AIS/ADS-B and "
+    "radar-like observations, not operational sensor data. Results do not "
+    "establish harbor, SSDS, adversarial, classified-environment, or field "
+    "performance. Runtime measurements are machine-specific observations."
+)
+
+
+@dataclass(frozen=True)
+class Condition:
+    name: str
+    tracks: int
+    test_noise_multiplier: float
+    benign_beacon_dropout_probability: float
+    benign_beacon_dropout_burst_fraction: float
+
+
+CONDITIONS = (
+    Condition("nominal_24_tracks", 24, 1.0, 0.0, 0.0),
+    Condition("congested_96_tracks", 96, 1.0, 0.0, 0.0),
+    Condition("sensor_shift_1_5x", 24, 1.5, 0.0, 0.0),
+    Condition("benign_point_dropout_2pct", 24, 1.0, 0.02, 0.0),
+    Condition("benign_burst_dropout_20pct", 24, 1.0, 0.0, 0.20),
+    Condition("combined_stress", 96, 1.5, 0.02, 0.20),
+    Condition("severe_combined_stress", 192, 2.5, 0.05, 0.35),
+)
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _aggregate_condition(
+    condition: Condition,
+    *,
+    scenarios: int,
+    base_seed: int,
+    threshold: float,
+    warmup_steps: int,
+    test_steps: int,
+    anomaly_fraction: float,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    alerts_by_scenario: list[pd.DataFrame] = []
+    scenario_rows: list[dict[str, Any]] = []
+    started = time.perf_counter()
+    for scenario in range(scenarios):
+        seed = base_seed + scenario * 10_007
+        frame = simulate_scenario(
+            seed=seed,
+            tracks=condition.tracks,
+            warmup_steps=warmup_steps,
+            test_steps=test_steps,
+            anomaly_fraction=anomaly_fraction,
+            test_noise_multiplier=condition.test_noise_multiplier,
+            benign_beacon_dropout_probability=(
+                condition.benign_beacon_dropout_probability
+            ),
+            benign_beacon_dropout_burst_fraction=(
+                condition.benign_beacon_dropout_burst_fraction
+            ),
+        )
+        alerts = score_stream(
+            frame,
+            fit_profiles(frame),
+            threshold=threshold,
+        )
+        alerts.insert(0, "scenario", scenario)
+        metrics = evaluate_alerts(alerts)
+        alerts_by_scenario.append(alerts)
+        scenario_rows.append(
+            {
+                "condition": condition.name,
+                "scenario": scenario,
+                "seed": seed,
+                "tracks": condition.tracks,
+                "precision": metrics["detector"]["precision"],
+                "recall": metrics["detector"]["recall"],
+                "f1": metrics["detector"]["f1"],
+                "baseline_f1": metrics["baseline"]["f1"],
+                "false_alerts_per_10000": metrics["detector"][
+                    "false_alerts_per_10000_normal_points"
+                ],
+                "event_recall": metrics["event_recall"],
+                "median_detection_delay_steps": metrics[
+                    "median_detection_delay_steps"
+                ],
+            }
+        )
+    elapsed = time.perf_counter() - started
+    all_alerts = pd.concat(alerts_by_scenario, ignore_index=True)
+    aggregate = evaluate_alerts(all_alerts)
+    processed_points = int(len(all_alerts))
+    class_detection = {}
+    for anomaly_type, metrics in aggregate["class_metrics"].items():
+        class_detection[anomaly_type] = {
+            "point_recall": metrics["recall"],
+            "event_count": metrics["event_count"],
+            "event_recall": metrics["event_recall"],
+            "median_detection_delay_steps": metrics[
+                "median_detection_delay_steps"
+            ],
+            "threat_candidate_point_recall": metrics[
+                "threat_candidate_point_recall"
+            ],
+        }
+    result = {
+        "configuration": {
+            "tracks": condition.tracks,
+            "test_noise_multiplier": condition.test_noise_multiplier,
+            "benign_beacon_dropout_probability": (
+                condition.benign_beacon_dropout_probability
+            ),
+            "benign_beacon_dropout_burst_fraction": (
+                condition.benign_beacon_dropout_burst_fraction
+            ),
+            "scenarios": scenarios,
+        },
+        "detector": aggregate["detector"],
+        "threat_candidate": aggregate["threat_candidate"],
+        "fixed_kinematic_comparator": aggregate["baseline"],
+        "event_recall": aggregate["event_recall"],
+        "median_detection_delay_steps": aggregate[
+            "median_detection_delay_steps"
+        ],
+        "explanation_coverage": aggregate["explanation_coverage"],
+        "maximum_algorithmic_state_bytes_per_track": aggregate[
+            "maximum_algorithmic_state_bytes_per_track"
+        ],
+        "class_detection": class_detection,
+        "alert_category_counts": aggregate["alert_category_counts"],
+        "runtime_observation": {
+            "elapsed_seconds": elapsed,
+            "processed_test_points": processed_points,
+            "test_points_per_second": (
+                processed_points / elapsed if elapsed else None
+            ),
+            "note": "Machine-specific Python prototype timing; not a latency SLA.",
+        },
+    }
+    return result, scenario_rows
+
+
+def run_suite(
+    *,
+    out_dir: Path,
+    development_scenarios: int = 20,
+    validation_scenarios: int = 30,
+    warmup_steps: int = 120,
+    test_steps: int = 180,
+    anomaly_fraction: float = 0.75,
+    development_seed_base: int = 1_600_000,
+    validation_seed_base: int = 1_900_000,
+) -> dict[str, Any]:
+    out_dir.mkdir(parents=True, exist_ok=False)
+
+    development_frames = [
+        simulate_scenario(
+            seed=development_seed_base + scenario * 10_007,
+            tracks=24,
+            warmup_steps=warmup_steps,
+            test_steps=test_steps,
+            anomaly_fraction=anomaly_fraction,
+        )
+        for scenario in range(development_scenarios)
+    ]
+    threshold_selection = select_threshold(
+        development_frames,
+        [5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0],
+        false_alert_cap_per_10000=100.0,
+    )
+    threshold = float(threshold_selection["selected_threshold"])
+
+    conditions: dict[str, Any] = {}
+    scenario_rows: list[dict[str, Any]] = []
+    for index, condition in enumerate(CONDITIONS):
+        condition_result, rows = _aggregate_condition(
+            condition,
+            scenarios=validation_scenarios,
+            base_seed=validation_seed_base + index * 1_000_000,
+            threshold=threshold,
+            warmup_steps=warmup_steps,
+            test_steps=test_steps,
+            anomaly_fraction=anomaly_fraction,
+        )
+        conditions[condition.name] = condition_result
+        scenario_rows.extend(rows)
+
+    summary = {
+        "schema": "harbor_sentinel_validation_suite_v1",
+        "generated_utc": datetime.now(timezone.utc).isoformat(),
+        "evidence_boundary": EVIDENCE_BOUNDARY,
+        "development": {
+            "scenarios": development_scenarios,
+            "seed_base": development_seed_base,
+            "threshold_selection": threshold_selection,
+        },
+        "validation": {
+            "scenarios_per_condition": validation_scenarios,
+            "seed_base": validation_seed_base,
+            "threshold_frozen_from_development": threshold,
+            "warmup_steps": warmup_steps,
+            "test_steps": test_steps,
+            "anomaly_fraction": anomaly_fraction,
+            "conditions": conditions,
+        },
+        "platform": platform.platform(),
+        "python": platform.python_version(),
+        "limitations": [
+            "No operational or government-furnished sensor data.",
+            "No SSDS integration or operator-in-the-loop evaluation.",
+            "No real adversary, electronic warfare, or cybersecurity validation.",
+            "The comparator is a fixed kinematic rule, not a claimed state-of-the-art system.",
+            "The compact-state count excludes Python runtime and integration overhead.",
+        ],
+    }
+
+    summary_path = out_dir / "summary.json"
+    summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+
+    scenario_path = out_dir / "scenario_summary.csv"
+    with scenario_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(scenario_rows[0]))
+        writer.writeheader()
+        writer.writerows(scenario_rows)
+
+    nominal = conditions["nominal_24_tracks"]
+    combined = conditions["combined_stress"]
+    severe = conditions["severe_combined_stress"]
+    class_lines = [
+        (
+            f"- {name}: event recall "
+            f"{nominal['class_detection'][name]['event_recall']:.3f}; "
+            f"median delay "
+            f"{nominal['class_detection'][name]['median_detection_delay_steps']}"
+        )
+        for name in ANOMALY_TYPES
+    ]
+    scorecard_path = out_dir / "SCORECARD.md"
+    scorecard_path.write_text(
+        "\n".join(
+            [
+                "# HarborSentinel Validation and Stress Scorecard",
+                "",
+                f"Evidence boundary: {EVIDENCE_BOUNDARY}",
+                "",
+                "## Development Gate",
+                "",
+                f"- Development scenarios: {development_scenarios}",
+                f"- Frozen threshold: {threshold:.1f}",
+                "- Selection rule: maximize development F1 subject to no more "
+                "than 100 false alerts per 10,000 normal points.",
+                "",
+                "## Disjoint Nominal Validation",
+                "",
+                f"- Precision: {nominal['detector']['precision']:.3f}",
+                f"- Recall: {nominal['detector']['recall']:.3f}",
+                f"- F1: {nominal['detector']['f1']:.3f}",
+                "- Fixed kinematic comparator F1: "
+                f"{nominal['fixed_kinematic_comparator']['f1']:.3f}",
+                "- False alerts per 10,000 normal points: "
+                f"{nominal['detector']['false_alerts_per_10000_normal_points']:.1f}",
+                "- Behavior-based threat-candidate false alerts per 10,000 "
+                "normal points: "
+                f"{nominal['threat_candidate']['false_alerts_per_10000_normal_points']:.1f}",
+                f"- Event recall: {nominal['event_recall']:.3f}",
+                "- Median detection delay: "
+                f"{nominal['median_detection_delay_steps']} steps",
+                "",
+                "## Nominal Class Detection",
+                "",
+                *class_lines,
+                "",
+                "## Combined Congestion/Noise/Dropout Stress",
+                "",
+                f"- Tracks per scenario: {combined['configuration']['tracks']}",
+                f"- Precision: {combined['detector']['precision']:.3f}",
+                f"- Recall: {combined['detector']['recall']:.3f}",
+                f"- F1: {combined['detector']['f1']:.3f}",
+                "- False alerts per 10,000 normal points: "
+                f"{combined['detector']['false_alerts_per_10000_normal_points']:.1f}",
+                "- Behavior-based threat-candidate false alerts per 10,000 "
+                "normal points: "
+                f"{combined['threat_candidate']['false_alerts_per_10000_normal_points']:.1f}",
+                f"- Event recall: {combined['event_recall']:.3f}",
+                "",
+                "## Severe Breakdown Test",
+                "",
+                f"- Tracks per scenario: {severe['configuration']['tracks']}",
+                f"- Review-alert precision: {severe['detector']['precision']:.3f}",
+                f"- Review-alert F1: {severe['detector']['f1']:.3f}",
+                "- Review false alerts per 10,000 normal points: "
+                f"{severe['detector']['false_alerts_per_10000_normal_points']:.1f}",
+                "- Behavior-based threat-candidate false alerts per 10,000 "
+                "normal points: "
+                f"{severe['threat_candidate']['false_alerts_per_10000_normal_points']:.1f}",
+                "",
+                "## Interpretation",
+                "",
+                "These results test threshold separation and software behavior "
+                "under generated congestion, noise, and benign transmitter "
+                "dropout. Source-integrity alerts are separated from "
+                "behavior-based threat candidates because transmitter loss or "
+                "sensor disagreement alone does not identify hostile intent. "
+                "The severe condition is a measured failure region, not a "
+                "validated operating envelope.",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    files = {}
+    for path in (summary_path, scenario_path, scorecard_path):
+        files[path.name] = {
+            "bytes": path.stat().st_size,
+            "sha256": _sha256(path),
+        }
+    (out_dir / "manifest.sha256.json").write_text(
+        json.dumps(
+            {
+                "schema": "harbor_sentinel_validation_manifest_v1",
+                "generated_utc": summary["generated_utc"],
+                "files": files,
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    return summary
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--development-scenarios", type=int, default=20)
+    parser.add_argument("--validation-scenarios", type=int, default=30)
+    parser.add_argument("--development-seed-base", type=int, default=1_600_000)
+    parser.add_argument("--validation-seed-base", type=int, default=1_900_000)
+    args = parser.parse_args()
+    summary = run_suite(
+        out_dir=args.out,
+        development_scenarios=max(3, args.development_scenarios),
+        validation_scenarios=max(3, args.validation_scenarios),
+        development_seed_base=args.development_seed_base,
+        validation_seed_base=args.validation_seed_base,
+    )
+    nominal = summary["validation"]["conditions"]["nominal_24_tracks"]
+    combined = summary["validation"]["conditions"]["combined_stress"]
+    print(
+        json.dumps(
+            {
+                "threshold": summary["validation"][
+                    "threshold_frozen_from_development"
+                ],
+                "nominal_f1": nominal["detector"]["f1"],
+                "nominal_false_alerts_per_10000": nominal["detector"][
+                    "false_alerts_per_10000_normal_points"
+                ],
+                "combined_stress_f1": combined["detector"]["f1"],
+                "combined_stress_false_alerts_per_10000": combined[
+                    "detector"
+                ]["false_alerts_per_10000_normal_points"],
+                "severe_stress_f1": summary["validation"]["conditions"][
+                    "severe_combined_stress"
+                ]["detector"]["f1"],
+            },
+            indent=2,
+        )
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
