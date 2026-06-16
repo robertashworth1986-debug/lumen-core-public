@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "live_trading_allowed": false,
+  "secret_values_allowed_in_reports": false,
+  "benchmark_lanes": [
+    {
+      "lane": "DARPA_DICE",
+      "candidate_scripts": [
+        "code/dice_preliminary_benchmark.py",
+        "tests/test_dice_preliminary_benchmark.py"
+      ],
+      "claim_type": "bounded preliminary decision intelligence benchmark"
+    },
+    {
+      "lane": "Navy_HarborSentinel",
+      "candidate_scripts": [
+        "code/harbor_sentinel_benchmark.py",
+        "code/harbor_sentinel_validation_suite.py",
+        "tests/test_harbor_sentinel_benchmark.py",
+        "tests/test_harbor_sentinel_validation_suite.py"
+      ],
+      "claim_type": "synthetic validation and anomaly monitoring"
+    },
+    {
+      "lane": "DLA_MissionWeave",
+      "candidate_scripts": [
+        "code/missionweave_benchmark.py",
+        "tests/test_missionweave_benchmark.py"
+      ],
+      "claim_type": "workflow orchestration and mission support automation"
+    },
+    {
+      "lane": "NSF_Project_Pitch",
+      "candidate_scripts": [
+        "code/real_data_fair_benchmark.py",
+        "code/validation_proof_pack.py",
+        "code/build_gov_grade_coherence_report.py"
+      ],
+      "claim_type": "research novelty, reproducibility, and evaluation protocol"
+    },
+    {
+      "lane": "Navy_TrackCast",
+      "candidate_scripts": [
+        "code/regime_shift_scanner.py",
+        "code/anomaly_scanner.py",
+        "code/forecast_api.py"
+      ],
+      "claim_type": "signal tracking, forecasting, and early warning"
+    },
+    {
+      "lane": "Safety_Runtime_Truth",
+      "candidate_scripts": [
+        "code/execution/live_data_no_orders_gate.py",
+        "code/execution/order_safety_gate.py",
+        "code/execution/safe_live_executor.py",
+        "code/execution/tiny_live_manual_arm_readiness.py"
+      ],
+      "claim_type": "safe autonomy and runtime governance"
+    }
+  ],
+  "known_not_blocking": [
+    "UEI exists according to operator",
+    "CAGE exists according to operator",
+    "SAM.gov registration exists according to operator",
+    "SAM.gov API key exists in local registry according to operator",
+    "Grants.gov API key exists in local registry according to operator"
+  ],
+  "likely_remaining_blockers": [
+    "agency-specific one-page technical abstract",
+    "reviewer-safe benchmark table",
+    "budget justification mapped to milestones",
+    "commercialization or transition pathway",
+    "letters of support or pilot validation",
+    "final portal field mapping"
+  ]
+}

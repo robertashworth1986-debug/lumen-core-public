@@ -1,0 +1,955 @@
+{
+  "detected_blockers": [
+    "Navy_TrackCast: scripts exist but no passing benchmark yet"
+  ],
+  "env_audit_no_values": {
+    "environment_variables_present_no_values": {
+      "CAGE": false,
+      "CAGE_CODE": false,
+      "EIA_API_KEY": true,
+      "FRED_API_KEY": true,
+      "GRANTS_API_KEY": false,
+      "GRANTS_GOV_API_KEY": false,
+      "KRAKEN_API_KEY": true,
+      "KRAKEN_API_SECRET": true,
+      "OPENAI_API_KEY": true,
+      "SAM_API_KEY": false,
+      "SAM_GOV_API_KEY": false,
+      "UEI": false
+    },
+    "local_env_files_found_no_values": [
+      "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\config\\luma_live_keys.env",
+      "C:\\LumenCore\\ai_workflow_bridge\\.env"
+    ],
+    "variable_names_seen_in_local_env_files_no_values": [
+      "ALLOW_FILE_WRITES",
+      "ALPACA_API_KEY",
+      "ALPACA_API_SECRET",
+      "ALPHAVANTAGE_API_KEY",
+      "BEA_API_KEY",
+      "BLS_API_KEY",
+      "CENSUS_API_KEY",
+      "EIA_API_KEY",
+      "EPA_AQS_EMAIL",
+      "EPA_AQS_KEY",
+      "FINNHUB_API_KEY",
+      "FRED_API_KEY",
+      "KRAKEN_API_KEY",
+      "KRAKEN_API_SECRET",
+      "LIVE_EXECUTION",
+      "MASSIVE_API_KEY",
+      "MAX_FILES_TO_SCAN",
+      "NASA_API_KEY",
+      "NOAA_API_TOKEN",
+      "NREL_API_KEY",
+      "OPENAI_API_KEY",
+      "OPENAI_MODEL",
+      "REGISTRY_ROOT",
+      "TWELVE_DATA_API_KEY",
+      "USGS_WATER_API_KEY",
+      "WEBHOOK_SHARED_SECRET"
+    ]
+  },
+  "generated_utc": "2026-06-16T01:41:25.554155+00:00",
+  "lanes": [
+    {
+      "candidate_count": 2,
+      "claim_type": "bounded preliminary decision intelligence benchmark",
+      "existing_count": 2,
+      "failed_count": 0,
+      "lane": "DARPA_DICE",
+      "passed_count": 2,
+      "ran_count": 2,
+      "results": [
+        {
+          "elapsed_seconds": 0.576,
+          "exists": true,
+          "path": "code/dice_preliminary_benchmark.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "b9f54993b1a5483e38d28ed003bf47ec28f2778e03322434868c1e4333a8c2bf",
+          "stderr_tail": "",
+          "stdout_tail": "{\n  \"mission_success_rate_points\": 0.008333333333343518,\n  \"message_reduction_pct\": 31.48226977800137,\n  \"recovery_message_reduction_pct\": 40.98837209302325,\n  \"role_coherence_rate_points\": 6.534143924048541\n}\n",
+          "timeout": false
+        },
+        {
+          "elapsed_seconds": 0.252,
+          "exists": true,
+          "path": "tests/test_dice_preliminary_benchmark.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "2b387e642d5ec4cd18b4b621c10c05cf20ccc30da64d651a9e8e6618d0401f2b",
+          "stderr_tail": ".\n----------------------------------------------------------------------\nRan 1 test in 0.151s\n\nOK\n",
+          "stdout_tail": "",
+          "timeout": false
+        }
+      ],
+      "timeout_count": 0
+    },
+    {
+      "candidate_count": 4,
+      "claim_type": "synthetic validation and anomaly monitoring",
+      "existing_count": 4,
+      "failed_count": 0,
+      "lane": "Navy_HarborSentinel",
+      "passed_count": 3,
+      "ran_count": 4,
+      "results": [
+        {
+          "elapsed_seconds": 12.063,
+          "exists": true,
+          "path": "code/harbor_sentinel_benchmark.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "8ec80504efd01d6be6a31f8b50c3d4757fabd233ed7a37640adc698d1b470c3d",
+          "stderr_tail": "",
+          "stdout_tail": "{\n  \"run_dir\": \"C:\\\\LumenCore_GitHub\\\\lumen-core-public\\\\out\\\\harbor_sentinel\\\\20260616T013840Z\",\n  \"precision_mean\": 0.9399105316753726,\n  \"precision_min\": 0.926829268292683,\n  \"recall_mean\": 0.9176639421099668,\n  \"recall_min\": 0.9131313131313131,\n  \"f1_mean\": 0.9286436503916782,\n  \"f1_min\": 0.9220138203356368,\n  \"baseline_f1_mean\": 0.5974858007537273,\n  \"f1_lift_over_baseline_pct\": 55.425225038016954,\n  \"event_recall_mean\": 1.0,\n  \"median_detection_delay_steps\": 1.0,\n  \"false_alerts_per_10000_mean\": 78.8718394889132,\n  \"explanation_coverage_mean\": 1.0,\n  \"maximum_algorithmic_state_bytes_per_track\": 139\n}\n",
+          "timeout": false
+        },
+        {
+          "elapsed_seconds": 120,
+          "exists": true,
+          "path": "code/harbor_sentinel_validation_suite.py",
+          "ran": true,
+          "returncode": null,
+          "sha256": "dc9c2586efa5659b8934f02fec37e6afea4afac3780fdff6c566743b10ee14ac",
+          "stderr_tail": "",
+          "stdout_tail": "",
+          "timeout": true
+        },
+        {
+          "elapsed_seconds": 2.773,
+          "exists": true,
+          "path": "tests/test_harbor_sentinel_benchmark.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "b50141710b3a36bc780f297395a710c15791464615eb6a4900a2f934102080fe",
+          "stderr_tail": ".........\n----------------------------------------------------------------------\nRan 9 tests in 2.234s\n\nOK\n",
+          "stdout_tail": "",
+          "timeout": false
+        },
+        {
+          "elapsed_seconds": 15.835,
+          "exists": true,
+          "path": "tests/test_harbor_sentinel_validation_suite.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "5ba5ef9420d9ab603eb529c885a4c86f53c52bc1b19109c8eced2eab6c26dd24",
+          "stderr_tail": ".\n----------------------------------------------------------------------\nRan 1 test in 15.283s\n\nOK\n",
+          "stdout_tail": "",
+          "timeout": false
+        }
+      ],
+      "timeout_count": 1
+    },
+    {
+      "candidate_count": 2,
+      "claim_type": "workflow orchestration and mission support automation",
+      "existing_count": 2,
+      "failed_count": 0,
+      "lane": "DLA_MissionWeave",
+      "passed_count": 2,
+      "ran_count": 2,
+      "results": [
+        {
+          "elapsed_seconds": 7.615,
+          "exists": true,
+          "path": "code/missionweave_benchmark.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "ecff9ead66347b48aff093ffd7affe8958f355bf93273be8820dc5326331e39d",
+          "stderr_tail": "",
+          "stdout_tail": "{\n  \"selected_weights\": \"critical\",\n  \"conditions\": {\n    \"nominal\": {\n      \"mean_delta\": 0.057771679432762096,\n      \"bootstrap_95pct_interval\": [\n        0.03777214601520276,\n        0.0806324318037359\n      ],\n      \"favorable_scenario_fraction\": 0.8333333333333334,\n      \"zero_delta_scenario_fraction\": 0.13333333333333333,\n      \"scenario_count\": 30\n    },\n    \"surge\": {\n      \"mean_delta\": 0.1155766853539992,\n      \"bootstrap_95pct_interval\": [\n        0.07408176607555333,\n        0.16113158148214404\n      ],\n      \"favorable_scenario_fraction\": 0.8,\n      \"zero_delta_scenario_fraction\": 0.03333333333333333,\n      \"scenario_count\": 30\n    },\n    \"targeted_absence\": {\n      \"mean_delta\": 0.11751993789161899,\n      \"bootstrap_95pct_interval\": [\n        0.0733448224001888,\n        0.16384198104453804\n      ],\n      \"favorable_scenario_fraction\": 0.8333333333333334,\n      \"zero_delta_scenario_fraction\": 0.1,\n      \"scenario_count\": 30\n    },\n    \"system_outage\": {\n      \"mean_delta\": 0.12659297855361853,\n      \"bootstrap_95pct_interval\": [\n        0.08517337633262627,\n        0.17614313325317768\n      ],\n      \"favorable_scenario_fraction\": 0.9333333333333333,\n      \"zero_delta_scenario_fraction\": 0.0,\n      \"scenario_count\": 30\n    },\n    \"combined_stress\": {\n      \"mean_delta\": 0.030165132726542716,\n      \"bootstrap_95pct_interval\": [\n        0.01677235021739905,\n        0.04350157097340508\n      ],\n      \"favorable_scenario_fraction\": 0.7666666666666667,\n      \"zero_delta_scenario_fraction\": 0.0,\n      \"scenario_count\": 30\n    }\n  }\n}\n",
+          "timeout": false
+        },
+        {
+          "elapsed_seconds": 0.497,
+          "exists": true,
+          "path": "tests/test_missionweave_benchmark.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "c5e1ed552e100db9e13690b3c7ac561a59a89031208aea4ea0583836313ad178",
+          "stderr_tail": "....\n----------------------------------------------------------------------\nRan 4 tests in 0.339s\n\nOK\n",
+          "stdout_tail": "",
+          "timeout": false
+        }
+      ],
+      "timeout_count": 0
+    },
+    {
+      "candidate_count": 3,
+      "claim_type": "research novelty, reproducibility, and evaluation protocol",
+      "existing_count": 3,
+      "failed_count": 1,
+      "lane": "NSF_Project_Pitch",
+      "passed_count": 2,
+      "ran_count": 3,
+      "results": [
+        {
+          "elapsed_seconds": 1.25,
+          "exists": true,
+          "path": "code/real_data_fair_benchmark.py",
+          "ran": true,
+          "returncode": 1,
+          "sha256": "bc6476ca23fd1dcc0170adb2130e47abf037ac8b43afe6958728363f94739613",
+          "stderr_tail": "",
+          "stdout_tail": "=== real_data_fair_benchmark @ 20260616T014119Z ===\noutput dir: C:\\LumenCore_GitHub\\lumen-core-public\\out\\real_data_fair_benchmark\\20260616T014119Z\n\n[fetch] EIA_GEN_ALL_FUELS ...\n  ! fetch failed: EIA_API_KEY missing\n[fetch] EIA_GEN_SOLAR ...\n  ! fetch failed: EIA_API_KEY missing\n[fetch] EIA_GEN_WIND ...\n  ! fetch failed: EIA_API_KEY missing\n[fetch] EIA_GEN_NATGAS ...\n  ! fetch failed: EIA_API_KEY missing\nFATAL: no datasets succeeded\n",
+          "timeout": false
+        },
+        {
+          "elapsed_seconds": 0.468,
+          "exists": true,
+          "path": "code/validation_proof_pack.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "0617aa791c3ec7051214dd5b687255a2f9b842cb2f004f812d05cb2f14ae8dbf",
+          "stderr_tail": "",
+          "stdout_tail": "",
+          "timeout": false
+        },
+        {
+          "elapsed_seconds": 0.059,
+          "exists": true,
+          "path": "code/build_gov_grade_coherence_report.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "9ba1927e86ee518873f2e3297bc5c8e61d303e4794b2d8b446a8568aafd06ea6",
+          "stderr_tail": "",
+          "stdout_tail": "C:\\LumenCore_GitHub\\lumen-core-public\\out\\execution\\gov_grade_coherence_report.json\nC:\\LumenCore_GitHub\\lumen-core-public\\out\\execution\\gov_grade_coherence_report.md\nC:\\LumenCore_GitHub\\lumen-core-public\\out\\execution\\gov_grade_coherence_report_sha256.json\nC:\\LumenCore_GitHub\\lumen-core-public\\out\\execution\\gov_grade_coherence_report_history.jsonl\nC:\\LumenCore_GitHub\\lumen-core-public\\dashboard\\data\\gov_grade_coherence_report.json\n",
+          "timeout": false
+        }
+      ],
+      "timeout_count": 0
+    },
+    {
+      "candidate_count": 3,
+      "claim_type": "signal tracking, forecasting, and early warning",
+      "existing_count": 3,
+      "failed_count": 3,
+      "lane": "Navy_TrackCast",
+      "passed_count": 0,
+      "ran_count": 3,
+      "results": [
+        {
+          "elapsed_seconds": 0.502,
+          "exists": true,
+          "path": "code/regime_shift_scanner.py",
+          "ran": true,
+          "returncode": 1,
+          "sha256": "68b751fe566970b44877fc3aa450460295320af32d3c1cff2762bed08899dc8f",
+          "stderr_tail": "Traceback (most recent call last):\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\regime_shift_scanner.py\", line 259, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\regime_shift_scanner.py\", line 157, in main\n    utc = _resolve_run_utc()\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\regime_shift_scanner.py\", line 65, in _resolve_run_utc\n    runs = sorted([p.name for p in V2_RUNS.iterdir() if p.is_dir()])\n                                   ~~~~~~~~~~~~~~~^^\n  File \"C:\\Python314\\Lib\\pathlib\\__init__.py\", line 836, in iterdir\n    with os.scandir(root_dir) as scandir_it:\n         ~~~~~~~~~~^^^^^^^^^^\nFileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\\\LumenCore_GitHub\\\\lumen-core-public\\\\out\\\\master_universe_v2'\n",
+          "stdout_tail": "",
+          "timeout": false
+        },
+        {
+          "elapsed_seconds": 1.289,
+          "exists": true,
+          "path": "code/anomaly_scanner.py",
+          "ran": true,
+          "returncode": 1,
+          "sha256": "f8133229a107190aec1cd12158b0f3a07bea8e402b567246a88d80d193ba698d",
+          "stderr_tail": "",
+          "stdout_tail": "FATAL: no ANOM_UTC and no latest.txt\n",
+          "timeout": false
+        },
+        {
+          "elapsed_seconds": 0.47,
+          "exists": true,
+          "path": "code/forecast_api.py",
+          "ran": true,
+          "returncode": 1,
+          "sha256": "1ca15b15a651bb42782b065743cac105472c044a048d4e633f0d6b36239a786e",
+          "stderr_tail": "Traceback (most recent call last):\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\forecast_api.py\", line 39, in <module>\n    from fastapi import APIRouter, HTTPException, Query\nModuleNotFoundError: No module named 'fastapi'\n",
+          "stdout_tail": "",
+          "timeout": false
+        }
+      ],
+      "timeout_count": 0
+    },
+    {
+      "candidate_count": 4,
+      "claim_type": "safe autonomy and runtime governance",
+      "existing_count": 4,
+      "failed_count": 0,
+      "lane": "Safety_Runtime_Truth",
+      "passed_count": 4,
+      "ran_count": 4,
+      "results": [
+        {
+          "elapsed_seconds": 0.076,
+          "exists": true,
+          "path": "code/execution/live_data_no_orders_gate.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "8e2f4f67e3c3656e550754dc8f1786d9fe3c5b5169d1a3e53958dba4fa9e4a5f",
+          "stderr_tail": "",
+          "stdout_tail": "LIVE_DATA_NO_ORDERS_GATE=PASS_READ_ONLY\nORDER_PERMISSION=False\nREASON=blocked_by_live_data_no_orders_stage\nREPORT=C:\\LumenCore_GitHub\\lumen-core-public\\out\\safety_reports\\LATEST_live_data_no_orders_gate.md\n",
+          "timeout": false
+        },
+        {
+          "elapsed_seconds": 1.206,
+          "exists": true,
+          "path": "code/execution/order_safety_gate.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "2c9bf922087fb002d3ef72c2b71351a1ae5e7eda4fcd7fcad89057d01ada5eaa",
+          "stderr_tail": "",
+          "stdout_tail": "{\n  \"approved\": false,\n  \"blockers\": [],\n  \"generated_utc\": \"2026-06-16T01:41:24.044895+00:00\",\n  \"intent\": {\n    \"notional_usd\": 1.0,\n    \"order_type\": \"market\",\n    \"quantity\": null,\n    \"side\": \"buy\",\n    \"source\": \"order_safety_gate_smoke\",\n    \"symbol\": \"TEST/USD\"\n  },\n  \"reason\": \"blocked_by_live_data_no_orders_stage\",\n  \"stage\": \"live-data-no-orders\",\n  \"warnings\": [\n    \"kill_switch_clear_by_file_check\",\n    \"live_order_config_detected_but_stage_blocks_orders\",\n    \"risk_local_basic_pass\",\n    \"signal_local_no_known_gate\"\n  ]\n}\n",
+          "timeout": false
+        },
+        {
+          "elapsed_seconds": 1.271,
+          "exists": true,
+          "path": "code/execution/safe_live_executor.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "4c59e1dca7fb9676c25e7e50bd53aa5382a94a7945d5af461f0541f23f5e23e5",
+          "stderr_tail": "",
+          "stdout_tail": "{\n  \"approved\": false,\n  \"blocked\": true,\n  \"decision\": {\n    \"approved\": false,\n    \"blockers\": [],\n    \"generated_utc\": \"2026-06-16T01:41:25.267558+00:00\",\n    \"intent\": {\n      \"notional_usd\": 1.0,\n      \"order_type\": \"market\",\n      \"quantity\": null,\n      \"side\": \"buy\",\n      \"source\": \"safe_live_executor_smoke\",\n      \"symbol\": \"TEST/USD\"\n    },\n    \"reason\": \"blocked_by_live_data_no_orders_stage\",\n    \"stage\": \"live-data-no-orders\",\n    \"warnings\": [\n      \"kill_switch_clear_by_file_check\",\n      \"live_order_config_detected_but_stage_blocks_orders\",\n      \"risk_local_basic_pass\",\n      \"signal_local_no_known_gate\"\n    ]\n  },\n  \"executor_called\": false,\n  \"executor_result\": null,\n  \"generated_utc\": \"2026-06-16T01:41:25.268075+00:00\",\n  \"intent\": {\n    \"notional_usd\": 1.0,\n    \"order_type\": \"market\",\n    \"quantity\": null,\n    \"side\": \"buy\",\n    \"source\": \"safe_live_executor_smoke\",\n    \"symbol\": \"TEST/USD\"\n  },\n  \"live_executor_surface\": {\n    \"candidate_functions_found\": [],\n    \"import_ok\": true,\n    \"order_related_callables\": [\n      \"MultiExchangeRouter\",\n      \"OrderRouter\",\n      \"RouteIntent\"\n    ]\n  },\n  \"reason\": \"blocked_by_live_data_no_orders_stage\",\n  \"stage\": \"live-data-no-orders\"\n}\nREPORT=C:\\LumenCore_GitHub\\lumen-core-public\\out\\safety_reports\\LATEST_safe_live_executor_smoke.md\n",
+          "timeout": false
+        },
+        {
+          "elapsed_seconds": 0.045,
+          "exists": true,
+          "path": "code/execution/tiny_live_manual_arm_readiness.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "cde841a9654fec163e70847adfb02d3d53c2a48a6aba32c8bec12d97bd7c52d3",
+          "stderr_tail": "",
+          "stdout_tail": "{\n  \"audit_counts\": {\n    \"files_with_raw_live_references\": 33,\n    \"files_with_safe_references\": 18\n  },\n  \"blockers\": [],\n  \"live_trading_active\": false,\n  \"mode\": \"design_only\",\n  \"reason\": \"manual_arm_not_enabled_design_only\",\n  \"tiny_live_ready\": false\n}\nJSON_REPORT=C:\\LumenCore_GitHub\\lumen-core-public\\out\\safety_reports\\LATEST_tiny_live_manual_arm_readiness.json\nMD_REPORT=C:\\LumenCore_GitHub\\lumen-core-public\\out\\safety_reports\\LATEST_tiny_live_manual_arm_readiness.md\n",
+          "timeout": false
+        }
+      ],
+      "timeout_count": 0
+    }
+  ],
+  "likely_remaining_blockers": [
+    "agency-specific one-page technical abstract",
+    "reviewer-safe benchmark table",
+    "budget justification mapped to milestones",
+    "commercialization or transition pathway",
+    "letters of support or pilot validation",
+    "final portal field mapping"
+  ],
+  "live_trading_allowed": false,
+  "plan_sha256": "e2304382d6642d285ead5054b1b6c8359594a4156f6c9d719a097980c998ea4c",
+  "premium_catalog": {
+    "count": 134,
+    "top_artifacts": [
+      {
+        "path": "out/harbor_sentinel/20260616T013840Z/alerts.csv",
+        "sha256": "1869b2382b63110f07799fe6fc333266bb72c8edd7d289f9e812c8d569347a9f",
+        "size_bytes": 15330803
+      },
+      {
+        "path": "dashboard/mission_control.html",
+        "sha256": "602a0a7c38110395284fedba247a5065a050477864888c112611129dc68f6703",
+        "size_bytes": 134140
+      },
+      {
+        "path": "code/grant_application_factory.py",
+        "sha256": "db149bdde033985e770fdbcac4def66845afc8c4bda26833b59ba423bc3e2a66",
+        "size_bytes": 100139
+      },
+      {
+        "path": "dashboard/grants.html",
+        "sha256": "f1fd6cf4faf1381c4d402cdc33d9475ef722c4b89c9d584ead350b4c73029905",
+        "size_bytes": 81992
+      },
+      {
+        "path": "out/missionweave_validation/scenario_summary.csv",
+        "sha256": "ee3e66425bcbede263bf8325fa92da047b4d91157ab093ed35840641a90edfe4",
+        "size_bytes": 62304
+      },
+      {
+        "path": "code/grant_hunter_v2.py",
+        "sha256": "e8418fdd98d0a96e78af85cbacbf503b497c9e05ed532cb1f082aa6f869d0c3a",
+        "size_bytes": 53925
+      },
+      {
+        "path": "code/ops/investor_proof_sweep.py",
+        "sha256": "73eac2118fd94a9a71d8120629385f19cfc79dbe9e9de025e9281e5b7920eacd",
+        "size_bytes": 53357
+      },
+      {
+        "path": "code/ops/LOCK_AUTONOMOUS_GRANT_WIN.py",
+        "sha256": "031923ca4398c22f3b61c9dfed9ba0837ad134c96ce865f9b2bd4a581dcf5e06",
+        "size_bytes": 39392
+      },
+      {
+        "path": "code/build_vps_growth_proof.py",
+        "sha256": "51387ea52d356a170ca2dd44ac8929d3663db63207e182be4ad4be29be8a3291",
+        "size_bytes": 35851
+      },
+      {
+        "path": "code/ops/BUILD_INVESTOR_MISSION_CONTROL_PACK.py",
+        "sha256": "ae1ba52fd9121f8bd11f45d76bd1df9f6a874a7b0bcfc0617bcd008499523f53",
+        "size_bytes": 35790
+      },
+      {
+        "path": "code/grants_api.py",
+        "sha256": "c8c84cb5fecb09d624296a4d79987e9c1163363000a6bf85fd2b374d748aa078",
+        "size_bytes": 35340
+      },
+      {
+        "path": "code/harbor_sentinel_benchmark.py",
+        "sha256": "8ec80504efd01d6be6a31f8b50c3d4757fabd233ed7a37640adc698d1b470c3d",
+        "size_bytes": 33742
+      },
+      {
+        "path": "code/master_universe_benchmark_v2.py",
+        "sha256": "dea30096181f9af975a68337daa9c927dbeb32bbf5d20c75e528c46f8465587e",
+        "size_bytes": 33443
+      },
+      {
+        "path": "code/build_gov_grade_coherence_report.py",
+        "sha256": "9ba1927e86ee518873f2e3297bc5c8e61d303e4794b2d8b446a8568aafd06ea6",
+        "size_bytes": 32219
+      },
+      {
+        "path": "code/ops/BUILD_GRANT_SUBMIT_FIT_PACK.py",
+        "sha256": "a9cd574095001a19d397b881bc7c35db92fd3206ad19c2f17e6a76ea47577655",
+        "size_bytes": 32029
+      },
+      {
+        "path": "code/ops/run_healthcare_grants_engine.py",
+        "sha256": "7524b51f280a175e99d52a0f211e78bf06e2329f4c4861a07e9a76539bac48c4",
+        "size_bytes": 29754
+      },
+      {
+        "path": "code/ops/BUILD_GRANT_EVIDENCE_DELTA_PACK.py",
+        "sha256": "b66e3ba0d6707f55c60c2a0f550327e6b2b53ccb1ab9f29514c1d7222181631d",
+        "size_bytes": 29007
+      },
+      {
+        "path": "code/grant_submission_kit.py",
+        "sha256": "547554f9d26415cb5df492cb9a751e85ba4384e0b559702607d45eb14f85a543",
+        "size_bytes": 28768
+      },
+      {
+        "path": "code/master_universe_benchmark.py",
+        "sha256": "f4755f4fbcd43f534851e5e5fda502195eb3b09086fdf1e83215f2b59b3f1b56",
+        "size_bytes": 28026
+      },
+      {
+        "path": "code/ops/BUILD_SITE_REACH_AND_DOMAIN_MISSION_PUSH.py",
+        "sha256": "289336b20ed73d0d5f7f9839c32bdc2dee5559d0ac8dbb0a4503cebb77c2ae09",
+        "size_bytes": 27806
+      },
+      {
+        "path": "code/missionweave_benchmark.py",
+        "sha256": "ecff9ead66347b48aff093ffd7affe8958f355bf93273be8820dc5326331e39d",
+        "size_bytes": 27799
+      },
+      {
+        "path": "code/ops/BUILD_PREMIUM_3MIN_DROPMIC_DECK.py",
+        "sha256": "50b60b08b145f57bfe6b3107f57efb6dada70786647fae379d309c184d61bc12",
+        "size_bytes": 27243
+      },
+      {
+        "path": "code/BUILD_ALPACA_PREMIUM_DASHBOARD.py",
+        "sha256": "1caf521e3777ff9a439dea261533eb3d97323566c0ede5df1b108eea1b96f35b",
+        "size_bytes": 26421
+      },
+      {
+        "path": "dashboard/evidence/index.html",
+        "sha256": "699de4ef2eed56f4417c8e7a058dd67aea065afb7cf995ecb3ce8c20552567ba",
+        "size_bytes": 25917
+      },
+      {
+        "path": "code/BUILD_LAMASCOUT_PREMIUM_DASHBOARD.py",
+        "sha256": "b1bd30f7c17742a0b67f865285c4dcfc0f76f40cbecf336c2690575abe02af8a",
+        "size_bytes": 23193
+      },
+      {
+        "path": "code/execution/fleet_coherence_monitor.py",
+        "sha256": "bb99320fedcc3ff10436e2d13bc1afe65b5a787319fe56928e8cab25270c3d7c",
+        "size_bytes": 22851
+      },
+      {
+        "path": "code/PATCH_SEED_VALIDATION_READER_FIX2.py",
+        "sha256": "dc2d6af18f29fbfc90204f659db65f4cdc58c52cc09ec648f7f9dda3523252fd",
+        "size_bytes": 22404
+      },
+      {
+        "path": "code/execution/seed_validation_reader.py",
+        "sha256": "dc2d6af18f29fbfc90204f659db65f4cdc58c52cc09ec648f7f9dda3523252fd",
+        "size_bytes": 22404
+      },
+      {
+        "path": "code/FORCE_REBUILD_SEED_VALIDATION.py",
+        "sha256": "49081000d64c12700eeabca5ff528833789a671826fbeb9862a76f83dcc247cc",
+        "size_bytes": 22105
+      },
+      {
+        "path": "code/execution/harmonic_backprop_proofpack.py",
+        "sha256": "c7bbf6c63b3c9e0d7e144432dac2a2b5413b8d7dc9a7b015759c2d6d52ed2679",
+        "size_bytes": 21909
+      },
+      {
+        "path": "code/ops/build_skips_grant_autofill_pack.py",
+        "sha256": "e1dc5e4584460a4c3a94f19246fd9afd3b94f96e1149ab3fe1eb5f969f6b8ad0",
+        "size_bytes": 21827
+      },
+      {
+        "path": "code/dice_preliminary_benchmark.py",
+        "sha256": "b9f54993b1a5483e38d28ed003bf47ec28f2778e03322434868c1e4333a8c2bf",
+        "size_bytes": 21430
+      },
+      {
+        "path": "code/ops/BUILD_GOV_BLUEPRINT_VAULT.py",
+        "sha256": "495914d22d2a63b80ba854608a8b4d285df75833763c094d81455f7a88447f40",
+        "size_bytes": 21063
+      },
+      {
+        "path": "code/PATCH_SEED_VALIDATION_READER.py",
+        "sha256": "13810d980420e61c5b95d4e4850e039b2f5b320b02ba4923331d510d61107eb2",
+        "size_bytes": 21047
+      },
+      {
+        "path": "out/missionweave_validation/summary.json",
+        "sha256": "a8d75fe3480733c29cdbd73cf5e39e8a25b84f8d38cf33f84dc7c2e54bc55c27",
+        "size_bytes": 20809
+      },
+      {
+        "path": "code/SEED_VALIDATION_READOUT.py",
+        "sha256": "fc6edfad219f279ed16f53af4488d5cf730c7014c8ae2906511b907cb8b17e0a",
+        "size_bytes": 20539
+      },
+      {
+        "path": "code/ops/run_healthcare_grants_poc_forecast.py",
+        "sha256": "6e7c5b43851604815a9a81061fd7a3328eab51a8db407749eac04a5f0918451b",
+        "size_bytes": 19951
+      },
+      {
+        "path": "code/ops/RUN_INVESTOR_PACKET_REFRESH.ps1",
+        "sha256": "00a0a811b0b181c65cd56a4f3311d2147795e1d667cb0a1f1f08919a83a8b868",
+        "size_bytes": 19748
+      },
+      {
+        "path": "code/MONTE_CARLO_REVALIDATION_ORCHESTRATOR.py",
+        "sha256": "bd0a57fa997524bf0ded2cf34f6c7b7125871f2d173c2c0916951d9a54bb1ea1",
+        "size_bytes": 18963
+      },
+      {
+        "path": "code/ops/GENERATE_CONTRACT_LOAN_AND_INVESTOR_PACK.py",
+        "sha256": "674bfe65690f34b5348466b7213edc527d851ab7c90e0abd74840b35cb641f36",
+        "size_bytes": 18464
+      },
+      {
+        "path": "code/CANONICAL_GOV_DATA_COLLECTOR.py",
+        "sha256": "63bdce71f4b91ffcab1f301a0dba11a901e24c711e0b3a424c01712dc186b885",
+        "size_bytes": 17106
+      },
+      {
+        "path": "code/ops/BUILD_MISSION_CONTROL_SUPPORT_ARTIFACTS.py",
+        "sha256": "7463390c954f897e806c11b7da1a8c732016218a57b3142415941f74e0e88606",
+        "size_bytes": 16984
+      },
+      {
+        "path": "code/real_data_fair_benchmark.py",
+        "sha256": "bc6476ca23fd1dcc0170adb2130e47abf037ac8b43afe6958728363f94739613",
+        "size_bytes": 16839
+      },
+      {
+        "path": "code/ops/run_sector_energy_evidence_pipeline.py",
+        "sha256": "71f599e8251fb1cb4a9672558f4c8443436afcb6bac296ad4292d14916f63014",
+        "size_bytes": 16774
+      },
+      {
+        "path": "code/harbor_sentinel_validation_suite.py",
+        "sha256": "dc9c2586efa5659b8934f02fec37e6afea4afac3780fdff6c566743b10ee14ac",
+        "size_bytes": 16432
+      },
+      {
+        "path": "code/build_kraken_positive_proof.py",
+        "sha256": "b81b0ceb1b7bd246199c09779d1008e343408568bccd1534a0c2d89bfdb9397e",
+        "size_bytes": 16067
+      },
+      {
+        "path": "code/ops/RUN_GRANT_FINAL_GATE.py",
+        "sha256": "6e3e197382ced8dd73c84b98e1d2d42969aec9f6158b8c0ae1fc613376992abf",
+        "size_bytes": 15085
+      },
+      {
+        "path": "code/execution/benchmark_beater.py",
+        "sha256": "fc36e7c2eba24462c02058d4e6c09edccea28cfe0e3fcea4186f3c3c0d00ec35",
+        "size_bytes": 15033
+      },
+      {
+        "path": "code/ops/GENERATE_PREMIUM_LUMA_LOGO.py",
+        "sha256": "184b0aca883f2338b8645faf4a5041c6a493f3f21a1c0515c622ac8b08227f51",
+        "size_bytes": 14678
+      },
+      {
+        "path": "code/ops/BUILD_GRANT_KRAKEN_ACTION_BRIEF.py",
+        "sha256": "3af56a0c5ecc5822e4ebc9935d1743d668be50470eec0e53a8a7a398e039a95f",
+        "size_bytes": 14508
+      },
+      {
+        "path": "INVESTOR_BRIEF.md",
+        "sha256": "43d7ca6bf128d8856b822a1fe0f3cf848b3f4130676bf56371fa96000a537fb4",
+        "size_bytes": 14165
+      },
+      {
+        "path": "code/ops/BUILD_GRANT_RESUBMISSION_CHECKLIST.py",
+        "sha256": "86e918910e2c7bd18fa72e9433955a9e2864a4f7352db9c369a7a6f59a9133a5",
+        "size_bytes": 14145
+      },
+      {
+        "path": "code/ops/BUILD_INVESTOR_ONE_PAGER.py",
+        "sha256": "089840bb83f858503ca88f64407fdb2f6678684fbae0218f53bfb079c9ea1bcc",
+        "size_bytes": 13961
+      },
+      {
+        "path": "code/ops/grant_evidence_benchmark_lab.py",
+        "sha256": "2c6605a71eb548fb4e71d4fe571f1ad6455af59202fbb0988508e3ed3b85e3b9",
+        "size_bytes": 12945
+      },
+      {
+        "path": "code/publish_evidence_bundle.py",
+        "sha256": "9233725e2c317839b2e57d057349d9a15bce9923eed99bb662e6cace892e2762",
+        "size_bytes": 12714
+      },
+      {
+        "path": "code/linkedin_publish_evidence.py",
+        "sha256": "d7677e928b64d3f76bc45fd918ce9eac0ba11609e104e833a0b5630113111e99",
+        "size_bytes": 12593
+      },
+      {
+        "path": "code/grants_autofill.py",
+        "sha256": "a537fae8a8437f0356914e836c415c7732cebcedd7fd4e722fab64e590348e54",
+        "size_bytes": 12569
+      },
+      {
+        "path": "code/ops/BUILD_GRANT_SUBMIT_NOW_PACK.py",
+        "sha256": "804ade6d6bd916bd01a66bc6541869f3e23db69d478f59a21a08f19dbdfa1b8e",
+        "size_bytes": 12207
+      },
+      {
+        "path": "code/ops/RUN_GRANT_FACTORY_FASTLANE.ps1",
+        "sha256": "91727bd6a10544ef5005c48b2c7c3326e797f91111fab9b692bbb4516ebe7cf2",
+        "size_bytes": 12082
+      },
+      {
+        "path": "data/grant_catalog.json",
+        "sha256": "b5208ba125fc7cd01571966b301c406ca3046cdb559ac89864cc50c015b5a498",
+        "size_bytes": 11649
+      },
+      {
+        "path": "code/execution/build_investor_wallboard.py",
+        "sha256": "785e294cd2aa98f23b9e6422c0a7721bce2665e436a790d35b956b5649b7ca1c",
+        "size_bytes": 11512
+      },
+      {
+        "path": "code/ops/RUN_BATCH_GRANT_SUBMISSION_READY.py",
+        "sha256": "9b53315ba313b30186955a9df592370f970aa699b98fe221e6e0d8b47c232ed5",
+        "size_bytes": 10088
+      },
+      {
+        "path": "code/render_evidence_charts.py",
+        "sha256": "99dabcb482df26310a590d5dcacf17f6920cc1ef52fb373a4459f269976172ee",
+        "size_bytes": 9707
+      },
+      {
+        "path": "code/ops/BUILD_GRANT_WAITING_ACTIONS.py",
+        "sha256": "45ad8bf3d782321a8a6d42a79b785d0ad5e91c509c8036aab7e3964f5c127cf6",
+        "size_bytes": 9196
+      },
+      {
+        "path": "build_validation_frontend.py",
+        "sha256": "4e2e62f34faf2164a7418a76bdd17a1e951a67a75d5ff66af2f18a7e187f5a84",
+        "size_bytes": 9074
+      },
+      {
+        "path": "dashboard/embed/mindwise_premium_flow_demo.html",
+        "sha256": "f0caa430956601a01c38ea84faf42591e1663aaa07129685aab97d5eac25f7d1",
+        "size_bytes": 8804
+      },
+      {
+        "path": "code/ops/RUN_GRANT_DASHBOARD_AUTO_REFRESH.ps1",
+        "sha256": "d3dd97fd42822018df06ea7dd2595995671bdc9690c8574704a000d52d324420",
+        "size_bytes": 8428
+      },
+      {
+        "path": "code/ADVANCED_FLEET_VALIDATION.py",
+        "sha256": "88834d79ae6844d6fa2eec4d20b5f3fb6578527e241345de8e5de0da3d5fc5fc",
+        "size_bytes": 8240
+      },
+      {
+        "path": "code/ops/SYNC_PREMIUM_PACKAGE_MIRROR.ps1",
+        "sha256": "6b0aa1b2503589bb46cba72c43e567925a5989e89e48bf9ba445c38f25829533",
+        "size_bytes": 8142
+      },
+      {
+        "path": "code/execution/investor_performance_report.py",
+        "sha256": "d12af1dbd02c3e537790d41bdee065616851b7f64379d8037ae9d3d42954853e",
+        "size_bytes": 7659
+      },
+      {
+        "path": "code/execution/federal_brief_builder.py",
+        "sha256": "3a9d37848e31ef62c4ff1b2dbfa9becc48a56125b5420c46481013e885e090ba",
+        "size_bytes": 7503
+      },
+      {
+        "path": "code/BUILD_INVESTOR_BREADTH_PAGE.py",
+        "sha256": "db41cc8bf24386ea5f026eb21bde054673ac45164d29acc9d6a1f2937342b95a",
+        "size_bytes": 7098
+      },
+      {
+        "path": "code/ops/BUILD_GRANT_FOLLOWUP_TRACKER.py",
+        "sha256": "41d8061ad596cf8ca613a94349443baa13b70a9cdd3637e531905fcaa809afc4",
+        "size_bytes": 6928
+      },
+      {
+        "path": "code/ops/UPSERT_GRANTS_EMAIL_RECEIPT.py",
+        "sha256": "fec3906384ebaee9cd88571bfab8dc623773182794cc8f1daede2234318076ba",
+        "size_bytes": 6339
+      },
+      {
+        "path": "code/ops/MARK_GRANT_SUBMITTED.py",
+        "sha256": "ab52b8dd9664a7a9360f411f412ecded7e484bfc3d3c2005ec627987bd9758cc",
+        "size_bytes": 6204
+      },
+      {
+        "path": "out/dice_preliminary/trials.csv",
+        "sha256": "b4d701f2c8c0db86fe29eedcb14efc0ae8c6db663963d9e3835b281adb9ac715",
+        "size_bytes": 6060
+      },
+      {
+        "path": "code/execution/premium_package_mesh.py",
+        "sha256": "a7e50f9f8fccf0b599d704306944edb06908264d4ce89254eb60ab9f5600e857",
+        "size_bytes": 5789
+      },
+      {
+        "path": "data_ingest_proof.json",
+        "sha256": "331bb08d82c33f4ec2318c0684dd856b0a2d51c71e29c7b096c76ecb8e2f7b46",
+        "size_bytes": 5747
+      },
+      {
+        "path": "tests/test_harbor_sentinel_benchmark.py",
+        "sha256": "b50141710b3a36bc780f297395a710c15791464615eb6a4900a2f934102080fe",
+        "size_bytes": 5626
+      },
+      {
+        "path": "code/ops/RUN_HEALTHCARE_GRANTS_ENGINE.ps1",
+        "sha256": "990afac2a76dd51b80ec67c5833a51fe86a4923ee47392cc2d622bf4319e6d7d",
+        "size_bytes": 5374
+      },
+      {
+        "path": "data_ingest_proof_live.json",
+        "sha256": "eb2178303b9a6d410277e3850ac89b5e0b8dfe30ff37af35151660b71891806f",
+        "size_bytes": 5273
+      },
+      {
+        "path": "evidence/agency_alignment_memo.md",
+        "sha256": "a63a89060ba0b3dbd1a8ce2465387a462ea592e2e2d9410af360b6896aec3213",
+        "size_bytes": 4612
+      },
+      {
+        "path": "code/grants_profile_lumencore.json",
+        "sha256": "6d9431557dd9c3ad331feb641c0e0898484b822170c2034bcaf260cefbf86261",
+        "size_bytes": 4575
+      },
+      {
+        "path": "code/build_investor_evidence_pack.py",
+        "sha256": "9342dd0b5c46ad7bb72d8092a52d3c8c886f4def01ae2f45a4dd851072ffa831",
+        "size_bytes": 4513
+      },
+      {
+        "path": "docs/HARMONIC_VALIDATION_PROTOCOL.md",
+        "sha256": "0be76764a1ffaa321399ea4df54c4d0f3edcaaeb32442b746c6cdaeb61ae215d",
+        "size_bytes": 4337
+      },
+      {
+        "path": "out/execution/gov_grade_coherence_report.json",
+        "sha256": "366747087ffc20b6f7a84ab2144d3cc6f41aaf6b1b18a8826b8ddea013fafa72",
+        "size_bytes": 4288
+      },
+      {
+        "path": "dashboard/data/gov_grade_coherence_report.json",
+        "sha256": "366747087ffc20b6f7a84ab2144d3cc6f41aaf6b1b18a8826b8ddea013fafa72",
+        "size_bytes": 4288
+      },
+      {
+        "path": "code/ops/RUN_INVESTOR_PROOF_SWEEP.ps1",
+        "sha256": "73ef253bae37518c2b32f3918febf55d427df6563da5efa2ba90ff95e439fba9",
+        "size_bytes": 4176
+      },
+      {
+        "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+        "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957",
+        "size_bytes": 4065
+      },
+      {
+        "path": "docs/MISSIONWEAVE_GENERATED_WORKFLOW_VALIDATION_2026-06-13.md",
+        "sha256": "cf916c086ced63d89fc981272142b1fd14ff53c0e0b73842159915161e114294",
+        "size_bytes": 4049
+      },
+      {
+        "path": "docs/HARBOR_SENTINEL_VALIDATION_2026-06-13.md",
+        "sha256": "718d20bb85bd163b6670440cf61d7c989b47abc5fabe93dff08c2c39d3b18b51",
+        "size_bytes": 3978
+      },
+      {
+        "path": "seed_validation_readout.json",
+        "sha256": "02d48c25345d04983ea5298eae36c4080b662422d6f53f33892708aec966cefe",
+        "size_bytes": 3866
+      },
+      {
+        "path": "out/harbor_sentinel/20260616T013840Z/scenario_summary.csv",
+        "sha256": "0c1bc22fc9062aa0c447378af34d1c60ef3c08d402ca7cb22c037c517ff40b64",
+        "size_bytes": 3780
+      },
+      {
+        "path": "code/RUN_FEDERAL_BRIEF_247.ps1",
+        "sha256": "802248afe9569b1f3ec29ea182f698ce455417debadec95d1d010e03fa6c4ed1",
+        "size_bytes": 3355
+      },
+      {
+        "path": "dashboard/embed/healthcare_grants_widget_example.html",
+        "sha256": "d35f9f52c38e832c44b7be20c05f0b23b5ae66abe13f96738f195f9828276714",
+        "size_bytes": 3158
+      },
+      {
+        "path": "runtime_env_hydration_proof.json",
+        "sha256": "dd11711403dd2ffd3d45e62f83ea6c92c95e857940f9bf6eabf17aec31908430",
+        "size_bytes": 3136
+      },
+      {
+        "path": "tests/test_missionweave_benchmark.py",
+        "sha256": "c5e1ed552e100db9e13690b3c7ac561a59a89031208aea4ea0583836313ad178",
+        "size_bytes": 3105
+      },
+      {
+        "path": "docs/DICE_PRELIMINARY_BENCHMARK_2026-06-13.md",
+        "sha256": "ec08e4727ec1cb723d211638240362c9eff60b83997a7267096c8ee70acbfa01",
+        "size_bytes": 3032
+      },
+      {
+        "path": "federal_brief.json",
+        "sha256": "4b02dd6a197a67ad61141b39b2a6034c842650b9a9ab69b7c00a8daa9197d691",
+        "size_bytes": 2906
+      },
+      {
+        "path": "out/dice_preliminary/summary.json",
+        "sha256": "c43441551a53457896dc4f5259b55737241088ae8d1c2eadcc85cb631a317b93",
+        "size_bytes": 2650
+      },
+      {
+        "path": "config/grant_evidence_benchmark_plan.json",
+        "sha256": "e2304382d6642d285ead5054b1b6c8359594a4156f6c9d719a097980c998ea4c",
+        "size_bytes": 2527
+      },
+      {
+        "path": "investor_txids/trade_log.json",
+        "sha256": "8b5b8eec7b61dcd995f306250c24338bc7b47fb5994703636091f9db68ea63b1",
+        "size_bytes": 2466
+      },
+      {
+        "path": "code/execution/premium_mesh_supervisor.py",
+        "sha256": "d240b0de3b8e2264a836dd7bac3b37787b7489431579ed821e98827d7b18dbe8",
+        "size_bytes": 2391
+      },
+      {
+        "path": "code/ops/RUN_SECTOR_ENERGY_EVIDENCE_PIPELINE.ps1",
+        "sha256": "a06db3bcc34bcb20b3000a587fa6965834d2ca44357d93b9041c0e781b9f3286",
+        "size_bytes": 2102
+      },
+      {
+        "path": "institutional_harmonic_infrastructure_proof.json",
+        "sha256": "72b009f39ec58c032966d71fcfeadb0974b03b7c9b84a097d7b88888df4bf589",
+        "size_bytes": 2016
+      },
+      {
+        "path": "out/missionweave_validation/SCORECARD.md",
+        "sha256": "b6242bd300beb7bc08a8e2e35307dd607dbcbc46fb3bf47f0c87e2bbb8ac423d",
+        "size_bytes": 1838
+      },
+      {
+        "path": "code/RUN_INVESTOR_WALLBOARD.ps1",
+        "sha256": "d930b76fb6eb96571dcf7b7f16ca017744b8f4853e0409baace92687bfaee908",
+        "size_bytes": 1732
+      },
+      {
+        "path": "tests/test_dice_preliminary_benchmark.py",
+        "sha256": "2b387e642d5ec4cd18b4b621c10c05cf20ccc30da64d651a9e8e6618d0401f2b",
+        "size_bytes": 1633
+      },
+      {
+        "path": "tests/test_harbor_sentinel_validation_suite.py",
+        "sha256": "5ba5ef9420d9ab603eb529c885a4c86f53c52bc1b19109c8eced2eab6c26dd24",
+        "size_bytes": 1603
+      },
+      {
+        "path": "out/harbor_sentinel/20260616T013840Z/summary.json",
+        "sha256": "1a731082c562db3f65f3ceb6e67302c40d4ae36026bd852ebc0e964177c48a46",
+        "size_bytes": 1461
+      },
+      {
+        "path": "dashboard/generate_validation_proof.py",
+        "sha256": "a7ee7a31c8c620a7506c93d8dbb812acf922ad0b989c29e546a9fd190b4d8fb2",
+        "size_bytes": 1427
+      },
+      {
+        "path": "federal_brief.md",
+        "sha256": "defc7af6479f28f97a8bf8b86f617af35cb41f27f06256ca4bbbdc51c48f1d7d",
+        "size_bytes": 1425
+      },
+      {
+        "path": "investor_and_grant_evidence.json",
+        "sha256": "b58350cfbc6e0a209b09cec2a7beebaaad4e12388a6544f9e56e9ef31b10bcee",
+        "size_bytes": 1318
+      },
+      {
+        "path": "code/validation_proof_pack.py",
+        "sha256": "0617aa791c3ec7051214dd5b687255a2f9b842cb2f004f812d05cb2f14ae8dbf",
+        "size_bytes": 1306
+      },
+      {
+        "path": "code/ops/REGISTER_GRANT_DASHBOARD_REFRESH_TASK.ps1",
+        "sha256": "d60b5eac40729826a938f8c005c09fe5da93ad8f36638f550aad8c6653f6d2cf",
+        "size_bytes": 1259
+      },
+      {
+        "path": "code/BUILD_ALL_PREMIUM_DASHBOARDS.py",
+        "sha256": "91e23ed159b2b74a052e657a8b846e62df25dd4c2fbc9a9887b1de6d20a35754",
+        "size_bytes": 1182
+      },
+      {
+        "path": "PERSISTED_RUNTIME_LOCK_PROOF.json",
+        "sha256": "263c47d2cc6b4893597ffb85d17d1ba543dd65a4c2289275383887d4ff9c5499",
+        "size_bytes": 1161
+      },
+      {
+        "path": "out/dice_preliminary/SCORECARD.md",
+        "sha256": "88944478d922a203cd6902035559472fdb390af22a2754ee7338af1f1a7175cd",
+        "size_bytes": 1118
+      },
+      {
+        "path": "code/GRANT_IIS_DASHBOARD_PUBLISH_ACCESS.ps1",
+        "sha256": "3f134d3a209ee2c5ad0d234fe7a68f7edf5c1d9e67fba9b5d56129470238dd67",
+        "size_bytes": 1114
+      },
+      {
+        "path": "investor_evidence_report.json",
+        "sha256": "a4fffa1ea05e8f9991405ea3bf62846abf0312cfb96bf3c79d367a795182d297",
+        "size_bytes": 1028
+      }
+    ]
+  },
+  "repo_root": "C:\\LumenCore_GitHub\\lumen-core-public",
+  "secret_values_in_report": false,
+  "wins_not_blocking": [
+    "UEI exists according to operator",
+    "CAGE exists according to operator",
+    "SAM.gov registration exists according to operator",
+    "SAM.gov API key exists in local registry according to operator",
+    "Grants.gov API key exists in local registry according to operator",
+    "DARPA_DICE: 2 command(s) passed",
+    "Navy_HarborSentinel: 3 command(s) passed",
+    "DLA_MissionWeave: 2 command(s) passed",
+    "NSF_Project_Pitch: 2 command(s) passed",
+    "Safety_Runtime_Truth: 4 command(s) passed"
+  ]
+}
