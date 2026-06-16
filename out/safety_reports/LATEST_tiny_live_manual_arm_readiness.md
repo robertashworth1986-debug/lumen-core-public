@@ -1,6 +1,6 @@
 # Tiny-Live Manual Arm Readiness
 
-- Generated UTC: `2026-06-16T01:25:01.970830+00:00`
+- Generated UTC: `2026-06-16T01:26:29.839391+00:00`
 - Mode: `design_only`
 - Live trading active: `False`
 - Tiny-live ready: `False`
@@ -8,8 +8,8 @@
 
 ## Audit Counts
 
-- `files_with_raw_live_references`: `32`
-- `files_with_safe_references`: `14`
+- `files_with_raw_live_references`: `33`
+- `files_with_safe_references`: `18`
 
 ## Checks
 

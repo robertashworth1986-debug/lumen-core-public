@@ -1,7 +1,7 @@
 {
   "audit_counts": {
-    "files_with_raw_live_references": 32,
-    "files_with_safe_references": 14
+    "files_with_raw_live_references": 33,
+    "files_with_safe_references": 18
   },
   "blockers": [],
   "checks": {
@@ -26,7 +26,7 @@
     "safe_reference_count_known": true
   },
   "confirmation_file": "C:\\LumenCore_GitHub\\lumen-core-public\\LIVE_TINY_MANUAL_ARM.confirm",
-  "generated_utc": "2026-06-16T01:25:01.970830+00:00",
+  "generated_utc": "2026-06-16T01:26:29.839391+00:00",
   "live_trading_active": false,
   "meaning": [
     "This patch prepares the future tiny-live path but does not activate it.",

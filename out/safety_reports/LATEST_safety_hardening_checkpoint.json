@@ -1,0 +1,44 @@
+{
+  "generated": "2026-06-15T20:26:29.8886348-05:00",
+  "branch": "codex/live-data-no-orders-gate",
+  "head": "95e4600",
+  "stage": "live-data-no-orders",
+  "order_permission": false,
+  "live_trading_active": false,
+  "tiny_live_active": false,
+  "latest_commits": [
+    "95e4600 safety: add tiny-live manual arm readiness design",
+    "eae1004 safety: redirect legacy live launchers to no-orders path",
+    "8fabd3d safety: add safe no-orders live launcher and entrypoint audit",
+    "ae8b633 safety: add guarded live executor facade",
+    "01afa08 safety: route orders through central safety gate",
+    "dafba98 safety: add central order safety gate",
+    "3e70ffb safety: add live-data no-orders gate",
+    "7353521 chore(card): equity ΓÇö ┬╖ ΓÇö positions ┬╖ 2026-06-15 23:21 UTC"
+  ],
+  "reports": [
+    "out/safety_reports/LATEST_live_data_no_orders_gate.md",
+    "out/safety_reports/LATEST_safe_live_executor_smoke.md",
+    "out/safety_reports/LATEST_live_entrypoint_audit.md",
+    "out/safety_reports/LATEST_legacy_launcher_redirects.md",
+    "out/safety_reports/LATEST_tiny_live_manual_arm_readiness.md"
+  ],
+  "audit_counts": {
+    "files_with_raw_live_references": 33,
+    "files_with_safe_references": 18
+  },
+  "gate": {
+    "order_permission": false,
+    "reason": "blocked_by_live_data_no_orders_stage"
+  },
+  "safe_executor": {
+    "blocked": true,
+    "executor_called": false,
+    "reason": "blocked_by_live_data_no_orders_stage"
+  },
+  "tiny_live": {
+    "live_trading_active": false,
+    "tiny_live_ready": false,
+    "reason": "manual_arm_not_enabled_design_only"
+  }
+}

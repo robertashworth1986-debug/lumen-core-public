@@ -1,13 +1,13 @@
 # LumenCore Raw Live Entrypoint Audit
 
-- Generated UTC: `2026-06-16T01:22:53.847137+00:00`
+- Generated UTC: `2026-06-16T01:26:29.527556+00:00`
 - Repo root: `C:\LumenCore_GitHub\lumen-core-public`
 
 ## Summary
 
-- `files_with_raw_live_references`: `32`
-- `files_with_safe_references`: `14`
-- `total_files_with_hits`: `38`
+- `files_with_raw_live_references`: `33`
+- `files_with_safe_references`: `18`
+- `total_files_with_hits`: `42`
 
 ## Meaning
 
@@ -108,6 +108,16 @@
 | 27 | YES | NO | `     Not implemented. Use execution/live_executor.py for real orders.` |
 | 581 | YES | NO | `            "code/execution/live_executor.py after production readiness gates pass."` |
 
+### `config/tiny_live_manual_arm_policy.json`
+
+- Raw live references: `0`
+- Safe references: `2`
+
+| Line | Raw | Safe | Text |
+|---:|---|---|---|
+| 14 | NO | YES | `  "require_order_safety_gate": true,` |
+| 15 | NO | YES | `  "require_safe_live_executor": true,` |
+
 ### `docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md`
 
 - Raw live references: `1`
@@ -132,8 +142,8 @@
 
 ### `out/safety_reports/LATEST_live_entrypoint_audit.json`
 
-- Raw live references: `245`
-- Safe references: `126`
+- Raw live references: `271`
+- Safe references: `97`
 
 | Line | Raw | Safe | Text |
 |---:|---|---|---|
@@ -204,6 +214,30 @@
 | Line | Raw | Safe | Text |
 |---:|---|---|---|
 | 36 | NO | YES | `    "source": "safe_live_executor_smoke",` |
+
+### `out/safety_reports/LATEST_tiny_live_manual_arm_readiness.json`
+
+- Raw live references: `0`
+- Safe references: `4`
+
+| Line | Raw | Safe | Text |
+|---:|---|---|---|
+| 11 | NO | YES | `    "live_data_no_orders_gate_exists": true,` |
+| 14 | NO | YES | `    "order_safety_gate_exists": true,` |
+| 25 | NO | YES | `    "safe_live_executor_exists": true,` |
+| 43 | NO | YES | `    "Confirm safe_live_executor blocks orders before executor call.",` |
+
+### `out/safety_reports/LATEST_tiny_live_manual_arm_readiness.md`
+
+- Raw live references: `0`
+- Safe references: `4`
+
+| Line | Raw | Safe | Text |
+|---:|---|---|---|
+| 23 | NO | YES | `\| `order_safety_gate_exists` \| `True` \|` |
+| 24 | NO | YES | `\| `safe_live_executor_exists` \| `True` \|` |
+| 25 | NO | YES | `\| `live_data_no_orders_gate_exists` \| `True` \|` |
+| 46 | NO | YES | `- Confirm safe_live_executor blocks orders before executor call.` |
 
 ### `code/execution/approval_autofire_daemon.py`
 
@@ -391,6 +425,22 @@
 | 5 | YES | NO | `# Backup file: code\execution\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect` |
 | 18 | YES | NO | `=== SUPERVISE_LIVE_COMPOUNDING_STACK.ps1 redirected to safe no-orders launcher ===" -ForegroundColor Cyan` |
 | 20 | YES | NO | `Write-Host "Original backup: code\execution\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect" -ForegroundColor Yellow` |
+
+### `code/execution/tiny_live_manual_arm_readiness.py`
+
+- Raw live references: `2`
+- Safe references: `7`
+
+| Line | Raw | Safe | Text |
+|---:|---|---|---|
+| 37 | NO | YES | `    live_gate_report = root / "out" / "safety_reports" / "LATEST_live_data_no_orders_gate.json"` |
+| 38 | NO | YES | `    safe_executor_report = root / "out" / "safety_reports" / "LATEST_safe_live_executor_smoke.json"` |
+| 41 | NO | YES | `    ledger = root / "out" / "safety_reports" / "order_safety_gate_ledger.jsonl"` |
+| 56 | NO | YES | `        "order_safety_gate_exists": exists(root, "code/execution/order_safety_gate.py"),` |
+| 57 | YES | YES | `        "safe_live_executor_exists": exists(root, "code/execution/safe_live_executor.py"),` |
+| 58 | NO | YES | `        "live_data_no_orders_gate_exists": exists(root, "code/execution/live_data_no_orders_gate.py"),` |
+| 59 | YES | NO | `        "router_uses_safety_gate_exists": exists(root, "code/execution/order_router.py"),` |
+| 95 | NO | YES | `            "Confirm safe_live_executor blocks orders before executor call.",` |
 
 ### `code/execution/universe_audit_runner.py`
 

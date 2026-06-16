@@ -237,6 +237,31 @@
     {
       "hits": [
         {
+          "line": 14,
+          "patterns": [
+            "order_safety_gate"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "  \"require_order_safety_gate\": true,"
+        },
+        {
+          "line": 15,
+          "patterns": [
+            "safe_live_executor"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "  \"require_safe_live_executor\": true,"
+        }
+      ],
+      "path": "config/tiny_live_manual_arm_policy.json",
+      "raw_count": 0,
+      "safe_count": 2
+    },
+    {
+      "hits": [
+        {
           "line": 25,
           "patterns": [
             "live_executor\\.py"
@@ -666,8 +691,8 @@
         }
       ],
       "path": "out/safety_reports/LATEST_live_entrypoint_audit.json",
-      "raw_count": 245,
-      "safe_count": 126
+      "raw_count": 271,
+      "safe_count": 97
     },
     {
       "hits": [
@@ -1077,6 +1102,92 @@
       "path": "out/safety_reports/LATEST_safe_live_executor_smoke.md",
       "raw_count": 0,
       "safe_count": 1
+    },
+    {
+      "hits": [
+        {
+          "line": 11,
+          "patterns": [
+            "live_data_no_orders_gate"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "    \"live_data_no_orders_gate_exists\": true,"
+        },
+        {
+          "line": 14,
+          "patterns": [
+            "order_safety_gate"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "    \"order_safety_gate_exists\": true,"
+        },
+        {
+          "line": 25,
+          "patterns": [
+            "safe_live_executor"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "    \"safe_live_executor_exists\": true,"
+        },
+        {
+          "line": 43,
+          "patterns": [
+            "safe_live_executor"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "    \"Confirm safe_live_executor blocks orders before executor call.\","
+        }
+      ],
+      "path": "out/safety_reports/LATEST_tiny_live_manual_arm_readiness.json",
+      "raw_count": 0,
+      "safe_count": 4
+    },
+    {
+      "hits": [
+        {
+          "line": 23,
+          "patterns": [
+            "order_safety_gate"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "| `order_safety_gate_exists` | `True` |"
+        },
+        {
+          "line": 24,
+          "patterns": [
+            "safe_live_executor"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "| `safe_live_executor_exists` | `True` |"
+        },
+        {
+          "line": 25,
+          "patterns": [
+            "live_data_no_orders_gate"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "| `live_data_no_orders_gate_exists` | `True` |"
+        },
+        {
+          "line": 46,
+          "patterns": [
+            "safe_live_executor"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "- Confirm safe_live_executor blocks orders before executor call."
+        }
+      ],
+      "path": "out/safety_reports/LATEST_tiny_live_manual_arm_readiness.md",
+      "raw_count": 0,
+      "safe_count": 4
     },
     {
       "hits": [
@@ -1798,6 +1909,86 @@
     {
       "hits": [
         {
+          "line": 37,
+          "patterns": [
+            "live_data_no_orders_gate"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "    live_gate_report = root / \"out\" / \"safety_reports\" / \"LATEST_live_data_no_orders_gate.json\""
+        },
+        {
+          "line": 38,
+          "patterns": [
+            "safe_live_executor"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "    safe_executor_report = root / \"out\" / \"safety_reports\" / \"LATEST_safe_live_executor_smoke.json\""
+        },
+        {
+          "line": 41,
+          "patterns": [
+            "order_safety_gate"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "    ledger = root / \"out\" / \"safety_reports\" / \"order_safety_gate_ledger.jsonl\""
+        },
+        {
+          "line": 56,
+          "patterns": [
+            "order_safety_gate"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "        \"order_safety_gate_exists\": exists(root, \"code/execution/order_safety_gate.py\"),"
+        },
+        {
+          "line": 57,
+          "patterns": [
+            "live_executor\\.py",
+            "safe_live_executor"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": true,
+          "text": "        \"safe_live_executor_exists\": exists(root, \"code/execution/safe_live_executor.py\"),"
+        },
+        {
+          "line": 58,
+          "patterns": [
+            "live_data_no_orders_gate"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "        \"live_data_no_orders_gate_exists\": exists(root, \"code/execution/live_data_no_orders_gate.py\"),"
+        },
+        {
+          "line": 59,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "        \"router_uses_safety_gate_exists\": exists(root, \"code/execution/order_router.py\"),"
+        },
+        {
+          "line": 95,
+          "patterns": [
+            "safe_live_executor"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "            \"Confirm safe_live_executor blocks orders before executor call.\","
+        }
+      ],
+      "path": "code/execution/tiny_live_manual_arm_readiness.py",
+      "raw_count": 2,
+      "safe_count": 7
+    },
+    {
+      "hits": [
+        {
           "line": 41,
           "patterns": [
             "order_router"
@@ -1951,7 +2142,7 @@
       "safe_count": 0
     }
   ],
-  "generated_utc": "2026-06-16T01:22:53.847137+00:00",
+  "generated_utc": "2026-06-16T01:26:29.527556+00:00",
   "meaning": [
     "Raw live references are not automatically unsafe, but they must route through safe_live_executor/order_safety_gate before any live order path is trusted.",
     "Patch 5 only audits and creates a safe launcher; it does not rewrite every legacy script yet.",
@@ -1959,8 +2150,8 @@
   ],
   "repo_root": "C:\\LumenCore_GitHub\\lumen-core-public",
   "summary": {
-    "files_with_raw_live_references": 32,
-    "files_with_safe_references": 14,
-    "total_files_with_hits": 38
+    "files_with_raw_live_references": 33,
+    "files_with_safe_references": 18,
+    "total_files_with_hits": 42
   }
 }
