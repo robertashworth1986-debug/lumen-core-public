@@ -1,6 +1,6 @@
 # LumenCore Grant Evidence Benchmark Lab
 
-Generated UTC: 2026-06-16T01:41:25.554155+00:00
+Generated UTC: 2026-06-16T02:01:04.571932+00:00
 
 Live trading allowed: false
 Secret values in report: false
@@ -14,10 +14,10 @@ This report builds a reproducible grant evidence package with benchmark lanes, S
 | Lane | Existing | Ran | Passed | Failed | Timed Out | Claim Type |
 |---|---:|---:|---:|---:|---:|---|
 | DARPA_DICE | 2 | 2 | 2 | 0 | 0 | bounded preliminary decision intelligence benchmark |
-| Navy_HarborSentinel | 4 | 4 | 3 | 0 | 1 | synthetic validation and anomaly monitoring |
-| DLA_MissionWeave | 2 | 2 | 2 | 0 | 0 | workflow orchestration and mission support automation |
+| Navy_HarborSentinel | 4 | 4 | 3 | 1 | 0 | synthetic validation and anomaly monitoring |
+| DLA_MissionWeave | 2 | 2 | 1 | 1 | 0 | workflow orchestration and mission support automation |
 | NSF_Project_Pitch | 3 | 3 | 2 | 1 | 0 | research novelty, reproducibility, and evaluation protocol |
-| Navy_TrackCast | 3 | 3 | 0 | 3 | 0 | signal tracking, forecasting, and early warning |
+| Navy_TrackCast | 4 | 4 | 2 | 2 | 0 | signal tracking, forecasting, and early warning |
 | Safety_Runtime_Truth | 4 | 4 | 4 | 0 | 0 | safe autonomy and runtime governance |
 
 ## Wins / Not Blocking
@@ -29,13 +29,14 @@ This report builds a reproducible grant evidence package with benchmark lanes, S
 - Grants.gov API key exists in local registry according to operator
 - DARPA_DICE: 2 command(s) passed
 - Navy_HarborSentinel: 3 command(s) passed
-- DLA_MissionWeave: 2 command(s) passed
+- DLA_MissionWeave: 1 command(s) passed
 - NSF_Project_Pitch: 2 command(s) passed
+- Navy_TrackCast: 2 command(s) passed
 - Safety_Runtime_Truth: 4 command(s) passed
 
 ## Detected Blockers
 
-- Navy_TrackCast: scripts exist but no passing benchmark yet
+- None detected in expected lanes.
 
 ## Likely Remaining Grant Blockers
 
@@ -101,15 +102,18 @@ This report builds a reproducible grant evidence package with benchmark lanes, S
 
 ## Premium / Grant Artifact Catalog
 
-Artifacts found: 134
+Artifacts found: 161
 
 - out/harbor_sentinel/20260616T013840Z/alerts.csv | size 15330803 | sha256 1869b2382b63110f07799fe6fc333266bb72c8edd7d289f9e812c8d569347a9f
+- out/harbor_sentinel/20260616T015808Z/alerts.csv | size 15330803 | sha256 1869b2382b63110f07799fe6fc333266bb72c8edd7d289f9e812c8d569347a9f
+- out/harbor_sentinel/20260616T020023Z/alerts.csv | size 15330803 | sha256 1869b2382b63110f07799fe6fc333266bb72c8edd7d289f9e812c8d569347a9f
 - dashboard/mission_control.html | size 134140 | sha256 602a0a7c38110395284fedba247a5065a050477864888c112611129dc68f6703
 - code/grant_application_factory.py | size 100139 | sha256 db149bdde033985e770fdbcac4def66845afc8c4bda26833b59ba423bc3e2a66
 - dashboard/grants.html | size 81992 | sha256 f1fd6cf4faf1381c4d402cdc33d9475ef722c4b89c9d584ead350b4c73029905
 - out/missionweave_validation/scenario_summary.csv | size 62304 | sha256 ee3e66425bcbede263bf8325fa92da047b4d91157ab093ed35840641a90edfe4
 - code/grant_hunter_v2.py | size 53925 | sha256 e8418fdd98d0a96e78af85cbacbf503b497c9e05ed532cb1f082aa6f869d0c3a
 - code/ops/investor_proof_sweep.py | size 53357 | sha256 73eac2118fd94a9a71d8120629385f19cfc79dbe9e9de025e9281e5b7920eacd
+- out/grant_evidence/LATEST_grant_evidence_benchmark_lab.json | size 43248 | sha256 34f36a8f2a2b3a536c19d373dee1669f5e9897698e0f9219985916aab6e0e4bd
 - code/ops/LOCK_AUTONOMOUS_GRANT_WIN.py | size 39392 | sha256 031923ca4398c22f3b61c9dfed9ba0837ad134c96ce865f9b2bd4a581dcf5e06
 - code/build_vps_growth_proof.py | size 35851 | sha256 51387ea52d356a170ca2dd44ac8929d3663db63207e182be4ad4be29be8a3291
 - code/ops/BUILD_INVESTOR_MISSION_CONTROL_PACK.py | size 35790 | sha256 ae1ba52fd9121f8bd11f45d76bd1df9f6a874a7b0bcfc0617bcd008499523f53
@@ -127,8 +131,10 @@ Artifacts found: 134
 - code/ops/BUILD_PREMIUM_3MIN_DROPMIC_DECK.py | size 27243 | sha256 50b60b08b145f57bfe6b3107f57efb6dada70786647fae379d309c184d61bc12
 - code/BUILD_ALPACA_PREMIUM_DASHBOARD.py | size 26421 | sha256 1caf521e3777ff9a439dea261533eb3d97323566c0ede5df1b108eea1b96f35b
 - dashboard/evidence/index.html | size 25917 | sha256 699de4ef2eed56f4417c8e7a058dd67aea065afb7cf995ecb3ce8c20552567ba
+- out/grant_evidence/LATEST_trackcast_existing_stack_benchmark.json | size 25590 | sha256 e1ff5e7da360f4d5d52f0576d7e387f23a0cef374799abfce218fd842b597d01
 - code/BUILD_LAMASCOUT_PREMIUM_DASHBOARD.py | size 23193 | sha256 b1bd30f7c17742a0b67f865285c4dcfc0f76f40cbecf336c2690575abe02af8a
 - code/execution/fleet_coherence_monitor.py | size 22851 | sha256 bb99320fedcc3ff10436e2d13bc1afe65b5a787319fe56928e8cab25270c3d7c
+- out/grant_evidence/LATEST_grant_evidence_benchmark_lab.md | size 22452 | sha256 cb39849fd4c35ecd0aa0a0a498382b0944567ca3282936f2acce5a8754b7c110
 - code/PATCH_SEED_VALIDATION_READER_FIX2.py | size 22404 | sha256 dc2d6af18f29fbfc90204f659db65f4cdc58c52cc09ec648f7f9dda3523252fd
 - code/execution/seed_validation_reader.py | size 22404 | sha256 dc2d6af18f29fbfc90204f659db65f4cdc58c52cc09ec648f7f9dda3523252fd
 - code/FORCE_REBUILD_SEED_VALIDATION.py | size 22105 | sha256 49081000d64c12700eeabca5ff528833789a671826fbeb9862a76f83dcc247cc
@@ -148,11 +154,6 @@ Artifacts found: 134
 - code/real_data_fair_benchmark.py | size 16839 | sha256 bc6476ca23fd1dcc0170adb2130e47abf037ac8b43afe6958728363f94739613
 - code/ops/run_sector_energy_evidence_pipeline.py | size 16774 | sha256 71f599e8251fb1cb4a9672558f4c8443436afcb6bac296ad4292d14916f63014
 - code/harbor_sentinel_validation_suite.py | size 16432 | sha256 dc9c2586efa5659b8934f02fec37e6afea4afac3780fdff6c566743b10ee14ac
-- code/build_kraken_positive_proof.py | size 16067 | sha256 b81b0ceb1b7bd246199c09779d1008e343408568bccd1534a0c2d89bfdb9397e
-- code/ops/RUN_GRANT_FINAL_GATE.py | size 15085 | sha256 6e3e197382ced8dd73c84b98e1d2d42969aec9f6158b8c0ae1fc613376992abf
-- code/execution/benchmark_beater.py | size 15033 | sha256 fc36e7c2eba24462c02058d4e6c09edccea28cfe0e3fcea4186f3c3c0d00ec35
-- code/ops/GENERATE_PREMIUM_LUMA_LOGO.py | size 14678 | sha256 184b0aca883f2338b8645faf4a5041c6a493f3f21a1c0515c622ac8b08227f51
-- code/ops/BUILD_GRANT_KRAKEN_ACTION_BRIEF.py | size 14508 | sha256 3af56a0c5ecc5822e4ebc9935d1743d668be50470eec0e53a8a7a398e039a95f
 
 ## Detailed Benchmark Results
 
@@ -187,7 +188,7 @@ Error tail:
 ```text
 .
 ----------------------------------------------------------------------
-Ran 1 test in 0.151s
+Ran 1 test in 0.154s
 
 OK
 
@@ -205,7 +206,7 @@ OK
 Output tail:
 ```text
 {
-  "run_dir": "C:\\LumenCore_GitHub\\lumen-core-public\\out\\harbor_sentinel\\20260616T013840Z",
+  "run_dir": "C:\\LumenCore_GitHub\\lumen-core-public\\out\\harbor_sentinel\\20260616T020023Z",
   "precision_mean": 0.9399105316753726,
   "precision_min": 0.926829268292683,
   "recall_mean": 0.9176639421099668,
@@ -227,8 +228,30 @@ Output tail:
 - Exists: True
 - SHA-256: dc9c2586efa5659b8934f02fec37e6afea4afac3780fdff6c566743b10ee14ac
 - Ran: True
-- Return code: None
-- Timeout: True
+- Return code: 1
+- Timeout: False
+
+Error tail:
+```text
+Traceback (most recent call last):
+  File "C:\LumenCore_GitHub\lumen-core-public\code\harbor_sentinel_validation_suite.py", line 413, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "C:\LumenCore_GitHub\lumen-core-public\code\harbor_sentinel_validation_suite.py", line 379, in main
+    summary = run_suite(
+        out_dir=args.out,
+    ...<3 lines>...
+        validation_seed_base=args.validation_seed_base,
+    )
+  File "C:\LumenCore_GitHub\lumen-core-public\code\harbor_sentinel_validation_suite.py", line 193, in run_suite
+    out_dir.mkdir(parents=True, exist_ok=False)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileExistsError: [WinError 183] Cannot create a file when that file already exists: 'C:\\LumenCore_GitHub\\lumen-core-public\\out\\harbor_sentinel_validation'
+
+```
 
 #### tests/test_harbor_sentinel_benchmark.py
 - Exists: True
@@ -241,7 +264,7 @@ Error tail:
 ```text
 .........
 ----------------------------------------------------------------------
-Ran 9 tests in 2.234s
+Ran 9 tests in 2.429s
 
 OK
 
@@ -258,7 +281,7 @@ Error tail:
 ```text
 .
 ----------------------------------------------------------------------
-Ran 1 test in 15.283s
+Ran 1 test in 16.926s
 
 OK
 
@@ -270,66 +293,28 @@ OK
 - Exists: True
 - SHA-256: ecff9ead66347b48aff093ffd7affe8958f355bf93273be8820dc5326331e39d
 - Ran: True
-- Return code: 0
+- Return code: 1
 - Timeout: False
 
-Output tail:
+Error tail:
 ```text
-{
-  "selected_weights": "critical",
-  "conditions": {
-    "nominal": {
-      "mean_delta": 0.057771679432762096,
-      "bootstrap_95pct_interval": [
-        0.03777214601520276,
-        0.0806324318037359
-      ],
-      "favorable_scenario_fraction": 0.8333333333333334,
-      "zero_delta_scenario_fraction": 0.13333333333333333,
-      "scenario_count": 30
-    },
-    "surge": {
-      "mean_delta": 0.1155766853539992,
-      "bootstrap_95pct_interval": [
-        0.07408176607555333,
-        0.16113158148214404
-      ],
-      "favorable_scenario_fraction": 0.8,
-      "zero_delta_scenario_fraction": 0.03333333333333333,
-      "scenario_count": 30
-    },
-    "targeted_absence": {
-      "mean_delta": 0.11751993789161899,
-      "bootstrap_95pct_interval": [
-        0.0733448224001888,
-        0.16384198104453804
-      ],
-      "favorable_scenario_fraction": 0.8333333333333334,
-      "zero_delta_scenario_fraction": 0.1,
-      "scenario_count": 30
-    },
-    "system_outage": {
-      "mean_delta": 0.12659297855361853,
-      "bootstrap_95pct_interval": [
-        0.08517337633262627,
-        0.17614313325317768
-      ],
-      "favorable_scenario_fraction": 0.9333333333333333,
-      "zero_delta_scenario_fraction": 0.0,
-      "scenario_count": 30
-    },
-    "combined_stress": {
-      "mean_delta": 0.030165132726542716,
-      "bootstrap_95pct_interval": [
-        0.01677235021739905,
-        0.04350157097340508
-      ],
-      "favorable_scenario_fraction": 0.7666666666666667,
-      "zero_delta_scenario_fraction": 0.0,
-      "scenario_count": 30
-    }
-  }
-}
+Traceback (most recent call last):
+  File "C:\LumenCore_GitHub\lumen-core-public\code\missionweave_benchmark.py", line 842, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "C:\LumenCore_GitHub\lumen-core-public\code\missionweave_benchmark.py", line 812, in main
+    summary = run_suite(
+        out_dir=args.out,
+    ...<4 lines>...
+        horizon=max(80, args.horizon),
+    )
+  File "C:\LumenCore_GitHub\lumen-core-public\code\missionweave_benchmark.py", line 642, in run_suite
+    out_dir.mkdir(parents=True, exist_ok=False)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileExistsError: [WinError 183] Cannot create a file when that file already exists: 'C:\\LumenCore_GitHub\\lumen-core-public\\out\\missionweave_validation'
 
 ```
 
@@ -344,7 +329,7 @@ Error tail:
 ```text
 ....
 ----------------------------------------------------------------------
-Ran 4 tests in 0.339s
+Ran 4 tests in 0.403s
 
 OK
 
@@ -361,8 +346,8 @@ OK
 
 Output tail:
 ```text
-=== real_data_fair_benchmark @ 20260616T014119Z ===
-output dir: C:\LumenCore_GitHub\lumen-core-public\out\real_data_fair_benchmark\20260616T014119Z
+=== real_data_fair_benchmark @ 20260616T020057Z ===
+output dir: C:\LumenCore_GitHub\lumen-core-public\out\real_data_fair_benchmark\20260616T020057Z
 
 [fetch] EIA_GEN_ALL_FUELS ...
   ! fetch failed: EIA_API_KEY missing
@@ -402,28 +387,47 @@ C:\LumenCore_GitHub\lumen-core-public\dashboard\data\gov_grade_coherence_report.
 
 ### Navy_TrackCast
 
+#### code/trackcast/trackcast_existing_stack_benchmark.py
+- Exists: True
+- SHA-256: 3a092e0bec0872a2bb5d34b83961b4e552f5151a476479cfa78a0993d7169f1b
+- Ran: True
+- Return code: 0
+- Timeout: False
+
+Output tail:
+```text
+{
+  "pass": true,
+  "score": 12,
+  "reasons": [
+    "master_universe directory discovered",
+    "latest data file discovered",
+    "anomaly data/source discovered",
+    "TrackCast data artifact discovered",
+    "regime shift script discovered",
+    "anomaly script discovered",
+    "forecast script discovered"
+  ],
+  "json_report": "C:\\LumenCore_GitHub\\lumen-core-public\\out\\grant_evidence\\LATEST_trackcast_existing_stack_benchmark.json",
+  "md_report": "C:\\LumenCore_GitHub\\lumen-core-public\\out\\grant_evidence\\LATEST_trackcast_existing_stack_benchmark.md"
+}
+
+```
+
 #### code/regime_shift_scanner.py
 - Exists: True
 - SHA-256: 68b751fe566970b44877fc3aa450460295320af32d3c1cff2762bed08899dc8f
 - Ran: True
-- Return code: 1
+- Return code: 0
 - Timeout: False
 
-Error tail:
+Output tail:
 ```text
-Traceback (most recent call last):
-  File "C:\LumenCore_GitHub\lumen-core-public\code\regime_shift_scanner.py", line 259, in <module>
-    raise SystemExit(main())
-                     ~~~~^^
-  File "C:\LumenCore_GitHub\lumen-core-public\code\regime_shift_scanner.py", line 157, in main
-    utc = _resolve_run_utc()
-  File "C:\LumenCore_GitHub\lumen-core-public\code\regime_shift_scanner.py", line 65, in _resolve_run_utc
-    runs = sorted([p.name for p in V2_RUNS.iterdir() if p.is_dir()])
-                                   ~~~~~~~~~~~~~~~^^
-  File "C:\Python314\Lib\pathlib\__init__.py", line 836, in iterdir
-    with os.scandir(root_dir) as scandir_it:
-         ~~~~~~~~~~^^^^^^^^^^
-FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\LumenCore_GitHub\\lumen-core-public\\out\\master_universe_v2'
+[regime] run=20260616T015847Z
+[regime] 0 datasets
+[regime] scanned 0 datasets in 0.0s
+[regime] wrote C:\LumenCore_GitHub\lumen-core-public\out\regime_shift_scanner\20260616T015847Z
+[regime] 0/0 datasets have mean-shift breaks; 0 recent; 0 variance regime
 
 ```
 
@@ -436,7 +440,7 @@ FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\
 
 Output tail:
 ```text
-FATAL: no ANOM_UTC and no latest.txt
+FATAL: C:\LumenCore_GitHub\lumen-core-public\out\master_universe_v2\2026-06-15T20:09:00Z\raw does not exist
 
 ```
 
@@ -486,7 +490,7 @@ Output tail:
 {
   "approved": false,
   "blockers": [],
-  "generated_utc": "2026-06-16T01:41:24.044895+00:00",
+  "generated_utc": "2026-06-16T02:01:02.979293+00:00",
   "intent": {
     "notional_usd": 1.0,
     "order_type": "market",
@@ -522,7 +526,7 @@ Output tail:
   "decision": {
     "approved": false,
     "blockers": [],
-    "generated_utc": "2026-06-16T01:41:25.267558+00:00",
+    "generated_utc": "2026-06-16T02:01:04.277064+00:00",
     "intent": {
       "notional_usd": 1.0,
       "order_type": "market",
@@ -542,7 +546,7 @@ Output tail:
   },
   "executor_called": false,
   "executor_result": null,
-  "generated_utc": "2026-06-16T01:41:25.268075+00:00",
+  "generated_utc": "2026-06-16T02:01:04.277604+00:00",
   "intent": {
     "notional_usd": 1.0,
     "order_type": "market",

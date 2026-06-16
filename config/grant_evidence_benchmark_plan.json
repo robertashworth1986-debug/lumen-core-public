@@ -41,6 +41,7 @@
     {
       "lane": "Navy_TrackCast",
       "candidate_scripts": [
+        "code/trackcast/trackcast_existing_stack_benchmark.py",
         "code/regime_shift_scanner.py",
         "code/anomaly_scanner.py",
         "code/forecast_api.py"

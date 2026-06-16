@@ -1,6 +1,6 @@
 # Grant Submission Blocker Map
 
-Generated UTC: 2026-06-16T01:52:27.073130+00:00
+Generated UTC: 2026-06-16T02:01:05.054134+00:00
 
 ## Not Blocking
 
@@ -11,13 +11,14 @@ Generated UTC: 2026-06-16T01:52:27.073130+00:00
 - Grants.gov API key exists in local registry according to operator
 - DARPA_DICE: 2 command(s) passed
 - Navy_HarborSentinel: 3 command(s) passed
-- DLA_MissionWeave: 2 command(s) passed
+- DLA_MissionWeave: 1 command(s) passed
 - NSF_Project_Pitch: 2 command(s) passed
+- Navy_TrackCast: 2 command(s) passed
 - Safety_Runtime_Truth: 4 command(s) passed
 
 ## Detected Benchmark Blockers
 
-- Navy_TrackCast: scripts exist but no passing benchmark yet
+- None detected.
 
 ## Package Blockers To Close
 

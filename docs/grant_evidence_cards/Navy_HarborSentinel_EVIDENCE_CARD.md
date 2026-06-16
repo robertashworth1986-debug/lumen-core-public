@@ -1,6 +1,6 @@
 # Grant Evidence Card — Navy_HarborSentinel
 
-Generated UTC: 2026-06-16T01:52:27.070737+00:00
+Generated UTC: 2026-06-16T02:01:05.052254+00:00
 
 ## Status
 
@@ -8,8 +8,8 @@ Generated UTC: 2026-06-16T01:52:27.070737+00:00
 - Existing scripts: 4
 - Scripts ran: 4
 - Passed: 3
-- Failed: 0
-- Timed out: 1
+- Failed: 1
+- Timed out: 0
 
 ## Claim Type
 
@@ -24,7 +24,7 @@ Reviewer-safe claim: this lane has partial passing preliminary benchmark evidenc
 | Script | Exists | Ran | Return Code | Timeout | SHA-256 |
 |---|---:|---:|---:|---:|---|
 | code/harbor_sentinel_benchmark.py | True | True | 0 | False | 8ec80504efd01d6be6a31f8b50c3d4757fabd233ed7a37640adc698d1b470c3d |
-| code/harbor_sentinel_validation_suite.py | True | True | None | True | dc9c2586efa5659b8934f02fec37e6afea4afac3780fdff6c566743b10ee14ac |
+| code/harbor_sentinel_validation_suite.py | True | True | 1 | False | dc9c2586efa5659b8934f02fec37e6afea4afac3780fdff6c566743b10ee14ac |
 | tests/test_harbor_sentinel_benchmark.py | True | True | 0 | False | b50141710b3a36bc780f297395a710c15791464615eb6a4900a2f934102080fe |
 | tests/test_harbor_sentinel_validation_suite.py | True | True | 0 | False | 5ba5ef9420d9ab603eb529c885a4c86f53c52bc1b19109c8eced2eab6c26dd24 |
 

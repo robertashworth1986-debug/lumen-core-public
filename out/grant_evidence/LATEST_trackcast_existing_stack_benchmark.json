@@ -1,0 +1,641 @@
+{
+  "discovery": {
+    "anom_files": [
+      {
+        "line_count_if_text": 551,
+        "name": "anomalies.csv",
+        "relative_path": "dashboard/evidence/runs/20260505T121657Z/anomalies/anomalies.csv",
+        "root_label": "C_LumaTrader",
+        "sha256": "2a37af85db7cb59b5f886210f6d51308cd0ff02601de2458aeeb173ecb1642b8",
+        "size_bytes": 58011,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 43,
+        "name": "anomaly_summary.md",
+        "relative_path": "dashboard/evidence/runs/20260505T121657Z/anomalies/anomaly_summary.md",
+        "root_label": "C_LumaTrader",
+        "sha256": "7617d91e33452cd769c7030366f61ba2671e0523031b585548a02f5b47dd3877",
+        "size_bytes": 2034,
+        "suffix": ".md"
+      },
+      {
+        "line_count_if_text": 9,
+        "name": "manifest.sha256.json",
+        "relative_path": "dashboard/evidence/runs/20260505T121657Z/anomalies/manifest.sha256.json",
+        "root_label": "C_LumaTrader",
+        "sha256": "4ac63a36be4cbd9fbeaad2f2cdf21443fe726de0f21fdb94e202d9402667bce9",
+        "size_bytes": 417,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 674,
+        "name": "ranked.csv",
+        "relative_path": "dashboard/evidence/runs/20260505T121657Z/anomalies/ranked.csv",
+        "root_label": "C_LumaTrader",
+        "sha256": "e06977dea41ba969ebc167a552949b7ff2e3e6b588d28057ae67191fbf0856ba",
+        "size_bytes": 48178,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 13,
+        "name": "summary.json",
+        "relative_path": "dashboard/evidence/runs/20260505T121657Z/anomalies/summary.json",
+        "root_label": "C_LumaTrader",
+        "sha256": "cb64887018d41c92971a0a90ba4e6a996d6c17f5e92aadc4e91deb5679fdfc64",
+        "size_bytes": 352,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 551,
+        "name": "anomalies.csv",
+        "relative_path": "dashboard/evidence/runs/20260511T175644Z/anomalies/anomalies.csv",
+        "root_label": "C_LumaTrader",
+        "sha256": "2a37af85db7cb59b5f886210f6d51308cd0ff02601de2458aeeb173ecb1642b8",
+        "size_bytes": 58011,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 43,
+        "name": "anomaly_summary.md",
+        "relative_path": "dashboard/evidence/runs/20260511T175644Z/anomalies/anomaly_summary.md",
+        "root_label": "C_LumaTrader",
+        "sha256": "7617d91e33452cd769c7030366f61ba2671e0523031b585548a02f5b47dd3877",
+        "size_bytes": 2034,
+        "suffix": ".md"
+      },
+      {
+        "line_count_if_text": 9,
+        "name": "manifest.sha256.json",
+        "relative_path": "dashboard/evidence/runs/20260511T175644Z/anomalies/manifest.sha256.json",
+        "root_label": "C_LumaTrader",
+        "sha256": "4ac63a36be4cbd9fbeaad2f2cdf21443fe726de0f21fdb94e202d9402667bce9",
+        "size_bytes": 417,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 674,
+        "name": "ranked.csv",
+        "relative_path": "dashboard/evidence/runs/20260511T175644Z/anomalies/ranked.csv",
+        "root_label": "C_LumaTrader",
+        "sha256": "e06977dea41ba969ebc167a552949b7ff2e3e6b588d28057ae67191fbf0856ba",
+        "size_bytes": 48178,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 13,
+        "name": "summary.json",
+        "relative_path": "dashboard/evidence/runs/20260511T175644Z/anomalies/summary.json",
+        "root_label": "C_LumaTrader",
+        "sha256": "cb64887018d41c92971a0a90ba4e6a996d6c17f5e92aadc4e91deb5679fdfc64",
+        "size_bytes": 352,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 551,
+        "name": "anomalies.csv",
+        "relative_path": "dashboard/evidence/runs/20260526T050639Z/anomalies/anomalies.csv",
+        "root_label": "C_LumaTrader",
+        "sha256": "2a37af85db7cb59b5f886210f6d51308cd0ff02601de2458aeeb173ecb1642b8",
+        "size_bytes": 58011,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 43,
+        "name": "anomaly_summary.md",
+        "relative_path": "dashboard/evidence/runs/20260526T050639Z/anomalies/anomaly_summary.md",
+        "root_label": "C_LumaTrader",
+        "sha256": "7617d91e33452cd769c7030366f61ba2671e0523031b585548a02f5b47dd3877",
+        "size_bytes": 2034,
+        "suffix": ".md"
+      },
+      {
+        "line_count_if_text": 9,
+        "name": "manifest.sha256.json",
+        "relative_path": "dashboard/evidence/runs/20260526T050639Z/anomalies/manifest.sha256.json",
+        "root_label": "C_LumaTrader",
+        "sha256": "4ac63a36be4cbd9fbeaad2f2cdf21443fe726de0f21fdb94e202d9402667bce9",
+        "size_bytes": 417,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 674,
+        "name": "ranked.csv",
+        "relative_path": "dashboard/evidence/runs/20260526T050639Z/anomalies/ranked.csv",
+        "root_label": "C_LumaTrader",
+        "sha256": "e06977dea41ba969ebc167a552949b7ff2e3e6b588d28057ae67191fbf0856ba",
+        "size_bytes": 48178,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 13,
+        "name": "summary.json",
+        "relative_path": "dashboard/evidence/runs/20260526T050639Z/anomalies/summary.json",
+        "root_label": "C_LumaTrader",
+        "sha256": "cb64887018d41c92971a0a90ba4e6a996d6c17f5e92aadc4e91deb5679fdfc64",
+        "size_bytes": 352,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 551,
+        "name": "anomalies.csv",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260505T121657Z/anomalies/anomalies.csv",
+        "root_label": "C_LumaTrader",
+        "sha256": "2a37af85db7cb59b5f886210f6d51308cd0ff02601de2458aeeb173ecb1642b8",
+        "size_bytes": 58011,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 43,
+        "name": "anomaly_summary.md",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260505T121657Z/anomalies/anomaly_summary.md",
+        "root_label": "C_LumaTrader",
+        "sha256": "7617d91e33452cd769c7030366f61ba2671e0523031b585548a02f5b47dd3877",
+        "size_bytes": 2034,
+        "suffix": ".md"
+      },
+      {
+        "line_count_if_text": 9,
+        "name": "manifest.sha256.json",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260505T121657Z/anomalies/manifest.sha256.json",
+        "root_label": "C_LumaTrader",
+        "sha256": "4ac63a36be4cbd9fbeaad2f2cdf21443fe726de0f21fdb94e202d9402667bce9",
+        "size_bytes": 417,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 674,
+        "name": "ranked.csv",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260505T121657Z/anomalies/ranked.csv",
+        "root_label": "C_LumaTrader",
+        "sha256": "e06977dea41ba969ebc167a552949b7ff2e3e6b588d28057ae67191fbf0856ba",
+        "size_bytes": 48178,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 13,
+        "name": "summary.json",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260505T121657Z/anomalies/summary.json",
+        "root_label": "C_LumaTrader",
+        "sha256": "cb64887018d41c92971a0a90ba4e6a996d6c17f5e92aadc4e91deb5679fdfc64",
+        "size_bytes": 352,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 551,
+        "name": "anomalies.csv",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260511T175644Z/anomalies/anomalies.csv",
+        "root_label": "C_LumaTrader",
+        "sha256": "2a37af85db7cb59b5f886210f6d51308cd0ff02601de2458aeeb173ecb1642b8",
+        "size_bytes": 58011,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 43,
+        "name": "anomaly_summary.md",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260511T175644Z/anomalies/anomaly_summary.md",
+        "root_label": "C_LumaTrader",
+        "sha256": "7617d91e33452cd769c7030366f61ba2671e0523031b585548a02f5b47dd3877",
+        "size_bytes": 2034,
+        "suffix": ".md"
+      },
+      {
+        "line_count_if_text": 9,
+        "name": "manifest.sha256.json",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260511T175644Z/anomalies/manifest.sha256.json",
+        "root_label": "C_LumaTrader",
+        "sha256": "4ac63a36be4cbd9fbeaad2f2cdf21443fe726de0f21fdb94e202d9402667bce9",
+        "size_bytes": 417,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 674,
+        "name": "ranked.csv",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260511T175644Z/anomalies/ranked.csv",
+        "root_label": "C_LumaTrader",
+        "sha256": "e06977dea41ba969ebc167a552949b7ff2e3e6b588d28057ae67191fbf0856ba",
+        "size_bytes": 48178,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 13,
+        "name": "summary.json",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260511T175644Z/anomalies/summary.json",
+        "root_label": "C_LumaTrader",
+        "sha256": "cb64887018d41c92971a0a90ba4e6a996d6c17f5e92aadc4e91deb5679fdfc64",
+        "size_bytes": 352,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 551,
+        "name": "anomalies.csv",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260526T050639Z/anomalies/anomalies.csv",
+        "root_label": "C_LumaTrader",
+        "sha256": "2a37af85db7cb59b5f886210f6d51308cd0ff02601de2458aeeb173ecb1642b8",
+        "size_bytes": 58011,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 43,
+        "name": "anomaly_summary.md",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260526T050639Z/anomalies/anomaly_summary.md",
+        "root_label": "C_LumaTrader",
+        "sha256": "7617d91e33452cd769c7030366f61ba2671e0523031b585548a02f5b47dd3877",
+        "size_bytes": 2034,
+        "suffix": ".md"
+      },
+      {
+        "line_count_if_text": 9,
+        "name": "manifest.sha256.json",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260526T050639Z/anomalies/manifest.sha256.json",
+        "root_label": "C_LumaTrader",
+        "sha256": "4ac63a36be4cbd9fbeaad2f2cdf21443fe726de0f21fdb94e202d9402667bce9",
+        "size_bytes": 417,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 674,
+        "name": "ranked.csv",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260526T050639Z/anomalies/ranked.csv",
+        "root_label": "C_LumaTrader",
+        "sha256": "e06977dea41ba969ebc167a552949b7ff2e3e6b588d28057ae67191fbf0856ba",
+        "size_bytes": 48178,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 13,
+        "name": "summary.json",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/runs/20260526T050639Z/anomalies/summary.json",
+        "root_label": "C_LumaTrader",
+        "sha256": "cb64887018d41c92971a0a90ba4e6a996d6c17f5e92aadc4e91deb5679fdfc64",
+        "size_bytes": 352,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 551,
+        "name": "anomalies.csv",
+        "relative_path": "dashboard/evidence/runs/20260505T121657Z/anomalies/anomalies.csv",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "2a37af85db7cb59b5f886210f6d51308cd0ff02601de2458aeeb173ecb1642b8",
+        "size_bytes": 58011,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 43,
+        "name": "anomaly_summary.md",
+        "relative_path": "dashboard/evidence/runs/20260505T121657Z/anomalies/anomaly_summary.md",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "7617d91e33452cd769c7030366f61ba2671e0523031b585548a02f5b47dd3877",
+        "size_bytes": 2034,
+        "suffix": ".md"
+      },
+      {
+        "line_count_if_text": 9,
+        "name": "manifest.sha256.json",
+        "relative_path": "dashboard/evidence/runs/20260505T121657Z/anomalies/manifest.sha256.json",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "4ac63a36be4cbd9fbeaad2f2cdf21443fe726de0f21fdb94e202d9402667bce9",
+        "size_bytes": 417,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 674,
+        "name": "ranked.csv",
+        "relative_path": "dashboard/evidence/runs/20260505T121657Z/anomalies/ranked.csv",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "e06977dea41ba969ebc167a552949b7ff2e3e6b588d28057ae67191fbf0856ba",
+        "size_bytes": 48178,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 13,
+        "name": "summary.json",
+        "relative_path": "dashboard/evidence/runs/20260505T121657Z/anomalies/summary.json",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "cb64887018d41c92971a0a90ba4e6a996d6c17f5e92aadc4e91deb5679fdfc64",
+        "size_bytes": 352,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 551,
+        "name": "anomalies.csv",
+        "relative_path": "dashboard/evidence/runs/20260511T175644Z/anomalies/anomalies.csv",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "2a37af85db7cb59b5f886210f6d51308cd0ff02601de2458aeeb173ecb1642b8",
+        "size_bytes": 58011,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 43,
+        "name": "anomaly_summary.md",
+        "relative_path": "dashboard/evidence/runs/20260511T175644Z/anomalies/anomaly_summary.md",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "7617d91e33452cd769c7030366f61ba2671e0523031b585548a02f5b47dd3877",
+        "size_bytes": 2034,
+        "suffix": ".md"
+      },
+      {
+        "line_count_if_text": 9,
+        "name": "manifest.sha256.json",
+        "relative_path": "dashboard/evidence/runs/20260511T175644Z/anomalies/manifest.sha256.json",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "4ac63a36be4cbd9fbeaad2f2cdf21443fe726de0f21fdb94e202d9402667bce9",
+        "size_bytes": 417,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 674,
+        "name": "ranked.csv",
+        "relative_path": "dashboard/evidence/runs/20260511T175644Z/anomalies/ranked.csv",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "e06977dea41ba969ebc167a552949b7ff2e3e6b588d28057ae67191fbf0856ba",
+        "size_bytes": 48178,
+        "suffix": ".csv"
+      },
+      {
+        "line_count_if_text": 13,
+        "name": "summary.json",
+        "relative_path": "dashboard/evidence/runs/20260511T175644Z/anomalies/summary.json",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "cb64887018d41c92971a0a90ba4e6a996d6c17f5e92aadc4e91deb5679fdfc64",
+        "size_bytes": 352,
+        "suffix": ".json"
+      }
+    ],
+    "anomaly_scripts": [
+      {
+        "line_count_if_text": null,
+        "name": "anomaly_scanner.py",
+        "relative_path": "code/anomaly_scanner.py",
+        "root_label": "repo",
+        "sha256": "f8133229a107190aec1cd12158b0f3a07bea8e402b567246a88d80d193ba698d",
+        "size_bytes": 10181,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "anomaly_scanner.py",
+        "relative_path": "INSTITUTIONAL_STACK_V2/code/anomaly_scanner.py",
+        "root_label": "C_LumaTrader",
+        "sha256": "f8133229a107190aec1cd12158b0f3a07bea8e402b567246a88d80d193ba698d",
+        "size_bytes": 10181,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "anomaly_mode.py",
+        "relative_path": "INSTITUTIONAL_STACK_V2/env311/Lib/site-packages/torch/autograd/anomaly_mode.py",
+        "root_label": "C_LumaTrader",
+        "sha256": "168c1fd281017b0e237aca182356e068a5ec27cfaefaaa14fbd4deb9c18cb090",
+        "size_bytes": 5072,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "anomaly_scanner.py",
+        "relative_path": "code/anomaly_scanner.py",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "f8133229a107190aec1cd12158b0f3a07bea8e402b567246a88d80d193ba698d",
+        "size_bytes": 10181,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "anomaly_mode.py",
+        "relative_path": "env311/Lib/site-packages/torch/autograd/anomaly_mode.py",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "168c1fd281017b0e237aca182356e068a5ec27cfaefaaa14fbd4deb9c18cb090",
+        "size_bytes": 5072,
+        "suffix": ".py"
+      }
+    ],
+    "forecast_scripts": [
+      {
+        "line_count_if_text": null,
+        "name": "forecast_api.py",
+        "relative_path": "code/forecast_api.py",
+        "root_label": "repo",
+        "sha256": "1ca15b15a651bb42782b065743cac105472c044a048d4e633f0d6b36239a786e",
+        "size_bytes": 20326,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "run_healthcare_grants_poc_forecast.py",
+        "relative_path": "code/ops/run_healthcare_grants_poc_forecast.py",
+        "root_label": "repo",
+        "sha256": "6e7c5b43851604815a9a81061fd7a3328eab51a8db407749eac04a5f0918451b",
+        "size_bytes": 19951,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "forecast_api.py",
+        "relative_path": "INSTITUTIONAL_STACK_V2/code/forecast_api.py",
+        "root_label": "C_LumaTrader",
+        "sha256": "1ca15b15a651bb42782b065743cac105472c044a048d4e633f0d6b36239a786e",
+        "size_bytes": 20326,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "run_healthcare_grants_poc_forecast.py",
+        "relative_path": "INSTITUTIONAL_STACK_V2/code/ops/run_healthcare_grants_poc_forecast.py",
+        "root_label": "C_LumaTrader",
+        "sha256": "6e7c5b43851604815a9a81061fd7a3328eab51a8db407749eac04a5f0918451b",
+        "size_bytes": 19951,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "test_forecasting.py",
+        "relative_path": "INSTITUTIONAL_STACK_V2/env311/Lib/site-packages/statsmodels/tsa/statespace/tests/test_forecasting.py",
+        "root_label": "C_LumaTrader",
+        "sha256": "305d82bf48e53123484c62856efa95d8d05890f4b804d1c924b1c3ec4371028a",
+        "size_bytes": 1626,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "forecast_api.py",
+        "relative_path": "code/forecast_api.py",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "1ca15b15a651bb42782b065743cac105472c044a048d4e633f0d6b36239a786e",
+        "size_bytes": 20326,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "run_healthcare_grants_poc_forecast.py",
+        "relative_path": "code/ops/run_healthcare_grants_poc_forecast.py",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "6e7c5b43851604815a9a81061fd7a3328eab51a8db407749eac04a5f0918451b",
+        "size_bytes": 19951,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "test_forecasting.py",
+        "relative_path": "env311/Lib/site-packages/statsmodels/tsa/statespace/tests/test_forecasting.py",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "305d82bf48e53123484c62856efa95d8d05890f4b804d1c924b1c3ec4371028a",
+        "size_bytes": 1626,
+        "suffix": ".py"
+      }
+    ],
+    "latest_files": [
+      {
+        "line_count_if_text": 1,
+        "name": "latest.txt",
+        "relative_path": "out/harbor_sentinel/latest.txt",
+        "root_label": "repo",
+        "sha256": "aa1b41a8d69a870f724724978fa443078a79758828d1f9de5687d968037308ff",
+        "size_bytes": 18,
+        "suffix": ".txt"
+      },
+      {
+        "line_count_if_text": 1,
+        "name": "latest.txt",
+        "relative_path": "dashboard/evidence/latest.txt",
+        "root_label": "C_LumaTrader",
+        "sha256": "a01c72c51846f127f71c7c7966d7adaa1075214e432b4e228f7fa4954058ca76",
+        "size_bytes": 16,
+        "suffix": ".txt"
+      },
+      {
+        "line_count_if_text": 1,
+        "name": "latest.txt",
+        "relative_path": "INSTITUTIONAL_STACK_V2/dashboard/evidence/latest.txt",
+        "root_label": "C_LumaTrader",
+        "sha256": "a01c72c51846f127f71c7c7966d7adaa1075214e432b4e228f7fa4954058ca76",
+        "size_bytes": 16,
+        "suffix": ".txt"
+      },
+      {
+        "line_count_if_text": 1,
+        "name": "latest.txt",
+        "relative_path": "dashboard/evidence/latest.txt",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "a01c72c51846f127f71c7c7966d7adaa1075214e432b4e228f7fa4954058ca76",
+        "size_bytes": 16,
+        "suffix": ".txt"
+      }
+    ],
+    "master_universe_dirs": [
+      {
+        "child_count": 2,
+        "relative_path": "out/master_universe",
+        "root_label": "repo"
+      },
+      {
+        "child_count": 2,
+        "relative_path": "out/master_universe_v2",
+        "root_label": "repo"
+      }
+    ],
+    "regime_shift_scripts": [
+      {
+        "line_count_if_text": null,
+        "name": "regime_shift_scanner.py",
+        "relative_path": "code/regime_shift_scanner.py",
+        "root_label": "repo",
+        "sha256": "68b751fe566970b44877fc3aa450460295320af32d3c1cff2762bed08899dc8f",
+        "size_bytes": 9203,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "regime_shift_scanner.py",
+        "relative_path": "INSTITUTIONAL_STACK_V2/code/regime_shift_scanner.py",
+        "root_label": "C_LumaTrader",
+        "sha256": "68b751fe566970b44877fc3aa450460295320af32d3c1cff2762bed08899dc8f",
+        "size_bytes": 9203,
+        "suffix": ".py"
+      },
+      {
+        "line_count_if_text": null,
+        "name": "regime_shift_scanner.py",
+        "relative_path": "code/regime_shift_scanner.py",
+        "root_label": "C_LumaTrader_Institutional",
+        "sha256": "68b751fe566970b44877fc3aa450460295320af32d3c1cff2762bed08899dc8f",
+        "size_bytes": 9203,
+        "suffix": ".py"
+      }
+    ],
+    "trackcast_data_files": [
+      {
+        "line_count_if_text": 39,
+        "name": "Navy_TrackCast_EVIDENCE_CARD.md",
+        "relative_path": "docs/grant_evidence_cards/Navy_TrackCast_EVIDENCE_CARD.md",
+        "root_label": "repo",
+        "sha256": "5f8e97da53db063f1a045bf2dd2e28d3eef686a9c4b3c28c5f286544f69fb69a",
+        "size_bytes": 1427,
+        "suffix": ".md"
+      },
+      {
+        "line_count_if_text": 641,
+        "name": "LATEST_trackcast_existing_stack_benchmark.json",
+        "relative_path": "out/grant_evidence/LATEST_trackcast_existing_stack_benchmark.json",
+        "root_label": "repo",
+        "sha256": "fc5f10ac4a762fe9c4c91e02d7d492a634034f842a73c9069f98c09be3d5751f",
+        "size_bytes": 25591,
+        "suffix": ".json"
+      },
+      {
+        "line_count_if_text": 113,
+        "name": "LATEST_trackcast_existing_stack_benchmark.md",
+        "relative_path": "out/grant_evidence/LATEST_trackcast_existing_stack_benchmark.md",
+        "root_label": "repo",
+        "sha256": "f719a80aad79d29b4afc37eeff58ff6fa6919db573336b0129ed24a4e5348aed",
+        "size_bytes": 9269,
+        "suffix": ".md"
+      },
+      {
+        "line_count_if_text": 35,
+        "name": "TRACKCAST_EXISTING_STACK_REPAIR.md",
+        "relative_path": "out/grant_evidence/TRACKCAST_EXISTING_STACK_REPAIR.md",
+        "root_label": "repo",
+        "sha256": "950c41257e169b105b3503a2b5e44be59a549f1dd4b9feee960109346af63eb0",
+        "size_bytes": 995,
+        "suffix": ".md"
+      },
+      {
+        "line_count_if_text": 47,
+        "name": "TRACKCAST_FAILURE_TRIAGE.md",
+        "relative_path": "out/grant_evidence/TRACKCAST_FAILURE_TRIAGE.md",
+        "root_label": "repo",
+        "sha256": "3077b73008c19890eba0b017f2d58616ee5faea60cf70a31f98024f432b2c6df",
+        "size_bytes": 1233,
+        "suffix": ".md"
+      }
+    ],
+    "trackcast_scripts": [
+      {
+        "line_count_if_text": null,
+        "name": "trackcast_existing_stack_benchmark.py",
+        "relative_path": "code/trackcast/trackcast_existing_stack_benchmark.py",
+        "root_label": "repo",
+        "sha256": "3a092e0bec0872a2bb5d34b83961b4e552f5151a476479cfa78a0993d7169f1b",
+        "size_bytes": 9797,
+        "suffix": ".py"
+      }
+    ]
+  },
+  "generated_utc": "2026-06-16T02:00:59.295044+00:00",
+  "repo_root_label": "repo",
+  "score": {
+    "meaning": "Existing TrackCast stack is discoverable and benchmark-ready at the structural level.",
+    "pass": true,
+    "reasons": [
+      "master_universe directory discovered",
+      "latest data file discovered",
+      "anomaly data/source discovered",
+      "TrackCast data artifact discovered",
+      "regime shift script discovered",
+      "anomaly script discovered",
+      "forecast script discovered"
+    ],
+    "score": 12
+  },
+  "secret_values_in_report": false
+}

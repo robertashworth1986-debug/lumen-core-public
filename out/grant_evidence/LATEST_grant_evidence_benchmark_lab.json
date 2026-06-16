@@ -1,7 +1,5 @@
 {
-  "detected_blockers": [
-    "Navy_TrackCast: scripts exist but no passing benchmark yet"
-  ],
+  "detected_blockers": [],
   "env_audit_no_values": {
     "environment_variables_present_no_values": {
       "CAGE": false,
@@ -50,7 +48,7 @@
       "WEBHOOK_SHARED_SECRET"
     ]
   },
-  "generated_utc": "2026-06-16T01:41:25.554155+00:00",
+  "generated_utc": "2026-06-16T02:01:04.571932+00:00",
   "lanes": [
     {
       "candidate_count": 2,
@@ -62,7 +60,7 @@
       "ran_count": 2,
       "results": [
         {
-          "elapsed_seconds": 0.576,
+          "elapsed_seconds": 0.622,
           "exists": true,
           "path": "code/dice_preliminary_benchmark.py",
           "ran": true,
@@ -73,13 +71,13 @@
           "timeout": false
         },
         {
-          "elapsed_seconds": 0.252,
+          "elapsed_seconds": 0.245,
           "exists": true,
           "path": "tests/test_dice_preliminary_benchmark.py",
           "ran": true,
           "returncode": 0,
           "sha256": "2b387e642d5ec4cd18b4b621c10c05cf20ccc30da64d651a9e8e6618d0401f2b",
-          "stderr_tail": ".\n----------------------------------------------------------------------\nRan 1 test in 0.151s\n\nOK\n",
+          "stderr_tail": ".\n----------------------------------------------------------------------\nRan 1 test in 0.154s\n\nOK\n",
           "stdout_tail": "",
           "timeout": false
         }
@@ -90,86 +88,86 @@
       "candidate_count": 4,
       "claim_type": "synthetic validation and anomaly monitoring",
       "existing_count": 4,
-      "failed_count": 0,
+      "failed_count": 1,
       "lane": "Navy_HarborSentinel",
       "passed_count": 3,
       "ran_count": 4,
       "results": [
         {
-          "elapsed_seconds": 12.063,
+          "elapsed_seconds": 12.504,
           "exists": true,
           "path": "code/harbor_sentinel_benchmark.py",
           "ran": true,
           "returncode": 0,
           "sha256": "8ec80504efd01d6be6a31f8b50c3d4757fabd233ed7a37640adc698d1b470c3d",
           "stderr_tail": "",
-          "stdout_tail": "{\n  \"run_dir\": \"C:\\\\LumenCore_GitHub\\\\lumen-core-public\\\\out\\\\harbor_sentinel\\\\20260616T013840Z\",\n  \"precision_mean\": 0.9399105316753726,\n  \"precision_min\": 0.926829268292683,\n  \"recall_mean\": 0.9176639421099668,\n  \"recall_min\": 0.9131313131313131,\n  \"f1_mean\": 0.9286436503916782,\n  \"f1_min\": 0.9220138203356368,\n  \"baseline_f1_mean\": 0.5974858007537273,\n  \"f1_lift_over_baseline_pct\": 55.425225038016954,\n  \"event_recall_mean\": 1.0,\n  \"median_detection_delay_steps\": 1.0,\n  \"false_alerts_per_10000_mean\": 78.8718394889132,\n  \"explanation_coverage_mean\": 1.0,\n  \"maximum_algorithmic_state_bytes_per_track\": 139\n}\n",
+          "stdout_tail": "{\n  \"run_dir\": \"C:\\\\LumenCore_GitHub\\\\lumen-core-public\\\\out\\\\harbor_sentinel\\\\20260616T020023Z\",\n  \"precision_mean\": 0.9399105316753726,\n  \"precision_min\": 0.926829268292683,\n  \"recall_mean\": 0.9176639421099668,\n  \"recall_min\": 0.9131313131313131,\n  \"f1_mean\": 0.9286436503916782,\n  \"f1_min\": 0.9220138203356368,\n  \"baseline_f1_mean\": 0.5974858007537273,\n  \"f1_lift_over_baseline_pct\": 55.425225038016954,\n  \"event_recall_mean\": 1.0,\n  \"median_detection_delay_steps\": 1.0,\n  \"false_alerts_per_10000_mean\": 78.8718394889132,\n  \"explanation_coverage_mean\": 1.0,\n  \"maximum_algorithmic_state_bytes_per_track\": 139\n}\n",
           "timeout": false
         },
         {
-          "elapsed_seconds": 120,
+          "elapsed_seconds": 0.468,
           "exists": true,
           "path": "code/harbor_sentinel_validation_suite.py",
           "ran": true,
-          "returncode": null,
+          "returncode": 1,
           "sha256": "dc9c2586efa5659b8934f02fec37e6afea4afac3780fdff6c566743b10ee14ac",
-          "stderr_tail": "",
+          "stderr_tail": "Traceback (most recent call last):\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\harbor_sentinel_validation_suite.py\", line 413, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\harbor_sentinel_validation_suite.py\", line 379, in main\n    summary = run_suite(\n        out_dir=args.out,\n    ...<3 lines>...\n        validation_seed_base=args.validation_seed_base,\n    )\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\harbor_sentinel_validation_suite.py\", line 193, in run_suite\n    out_dir.mkdir(parents=True, exist_ok=False)\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Python314\\Lib\\pathlib\\__init__.py\", line 1011, in mkdir\n    os.mkdir(self, mode)\n    ~~~~~~~~^^^^^^^^^^^^\nFileExistsError: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\LumenCore_GitHub\\\\lumen-core-public\\\\out\\\\harbor_sentinel_validation'\n",
           "stdout_tail": "",
-          "timeout": true
+          "timeout": false
         },
         {
-          "elapsed_seconds": 2.773,
+          "elapsed_seconds": 2.904,
           "exists": true,
           "path": "tests/test_harbor_sentinel_benchmark.py",
           "ran": true,
           "returncode": 0,
           "sha256": "b50141710b3a36bc780f297395a710c15791464615eb6a4900a2f934102080fe",
-          "stderr_tail": ".........\n----------------------------------------------------------------------\nRan 9 tests in 2.234s\n\nOK\n",
+          "stderr_tail": ".........\n----------------------------------------------------------------------\nRan 9 tests in 2.429s\n\nOK\n",
           "stdout_tail": "",
           "timeout": false
         },
         {
-          "elapsed_seconds": 15.835,
+          "elapsed_seconds": 17.436,
           "exists": true,
           "path": "tests/test_harbor_sentinel_validation_suite.py",
           "ran": true,
           "returncode": 0,
           "sha256": "5ba5ef9420d9ab603eb529c885a4c86f53c52bc1b19109c8eced2eab6c26dd24",
-          "stderr_tail": ".\n----------------------------------------------------------------------\nRan 1 test in 15.283s\n\nOK\n",
+          "stderr_tail": ".\n----------------------------------------------------------------------\nRan 1 test in 16.926s\n\nOK\n",
           "stdout_tail": "",
           "timeout": false
         }
       ],
-      "timeout_count": 1
+      "timeout_count": 0
     },
     {
       "candidate_count": 2,
       "claim_type": "workflow orchestration and mission support automation",
       "existing_count": 2,
-      "failed_count": 0,
+      "failed_count": 1,
       "lane": "DLA_MissionWeave",
-      "passed_count": 2,
+      "passed_count": 1,
       "ran_count": 2,
       "results": [
         {
-          "elapsed_seconds": 7.615,
+          "elapsed_seconds": 0.153,
           "exists": true,
           "path": "code/missionweave_benchmark.py",
           "ran": true,
-          "returncode": 0,
+          "returncode": 1,
           "sha256": "ecff9ead66347b48aff093ffd7affe8958f355bf93273be8820dc5326331e39d",
-          "stderr_tail": "",
-          "stdout_tail": "{\n  \"selected_weights\": \"critical\",\n  \"conditions\": {\n    \"nominal\": {\n      \"mean_delta\": 0.057771679432762096,\n      \"bootstrap_95pct_interval\": [\n        0.03777214601520276,\n        0.0806324318037359\n      ],\n      \"favorable_scenario_fraction\": 0.8333333333333334,\n      \"zero_delta_scenario_fraction\": 0.13333333333333333,\n      \"scenario_count\": 30\n    },\n    \"surge\": {\n      \"mean_delta\": 0.1155766853539992,\n      \"bootstrap_95pct_interval\": [\n        0.07408176607555333,\n        0.16113158148214404\n      ],\n      \"favorable_scenario_fraction\": 0.8,\n      \"zero_delta_scenario_fraction\": 0.03333333333333333,\n      \"scenario_count\": 30\n    },\n    \"targeted_absence\": {\n      \"mean_delta\": 0.11751993789161899,\n      \"bootstrap_95pct_interval\": [\n        0.0733448224001888,\n        0.16384198104453804\n      ],\n      \"favorable_scenario_fraction\": 0.8333333333333334,\n      \"zero_delta_scenario_fraction\": 0.1,\n      \"scenario_count\": 30\n    },\n    \"system_outage\": {\n      \"mean_delta\": 0.12659297855361853,\n      \"bootstrap_95pct_interval\": [\n        0.08517337633262627,\n        0.17614313325317768\n      ],\n      \"favorable_scenario_fraction\": 0.9333333333333333,\n      \"zero_delta_scenario_fraction\": 0.0,\n      \"scenario_count\": 30\n    },\n    \"combined_stress\": {\n      \"mean_delta\": 0.030165132726542716,\n      \"bootstrap_95pct_interval\": [\n        0.01677235021739905,\n        0.04350157097340508\n      ],\n      \"favorable_scenario_fraction\": 0.7666666666666667,\n      \"zero_delta_scenario_fraction\": 0.0,\n      \"scenario_count\": 30\n    }\n  }\n}\n",
+          "stderr_tail": "Traceback (most recent call last):\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\missionweave_benchmark.py\", line 842, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\missionweave_benchmark.py\", line 812, in main\n    summary = run_suite(\n        out_dir=args.out,\n    ...<4 lines>...\n        horizon=max(80, args.horizon),\n    )\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\missionweave_benchmark.py\", line 642, in run_suite\n    out_dir.mkdir(parents=True, exist_ok=False)\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Python314\\Lib\\pathlib\\__init__.py\", line 1011, in mkdir\n    os.mkdir(self, mode)\n    ~~~~~~~~^^^^^^^^^^^^\nFileExistsError: [WinError 183] Cannot create a file when that file already exists: 'C:\\\\LumenCore_GitHub\\\\lumen-core-public\\\\out\\\\missionweave_validation'\n",
+          "stdout_tail": "",
           "timeout": false
         },
         {
-          "elapsed_seconds": 0.497,
+          "elapsed_seconds": 0.56,
           "exists": true,
           "path": "tests/test_missionweave_benchmark.py",
           "ran": true,
           "returncode": 0,
           "sha256": "c5e1ed552e100db9e13690b3c7ac561a59a89031208aea4ea0583836313ad178",
-          "stderr_tail": "....\n----------------------------------------------------------------------\nRan 4 tests in 0.339s\n\nOK\n",
+          "stderr_tail": "....\n----------------------------------------------------------------------\nRan 4 tests in 0.403s\n\nOK\n",
           "stdout_tail": "",
           "timeout": false
         }
@@ -186,18 +184,18 @@
       "ran_count": 3,
       "results": [
         {
-          "elapsed_seconds": 1.25,
+          "elapsed_seconds": 1.283,
           "exists": true,
           "path": "code/real_data_fair_benchmark.py",
           "ran": true,
           "returncode": 1,
           "sha256": "bc6476ca23fd1dcc0170adb2130e47abf037ac8b43afe6958728363f94739613",
           "stderr_tail": "",
-          "stdout_tail": "=== real_data_fair_benchmark @ 20260616T014119Z ===\noutput dir: C:\\LumenCore_GitHub\\lumen-core-public\\out\\real_data_fair_benchmark\\20260616T014119Z\n\n[fetch] EIA_GEN_ALL_FUELS ...\n  ! fetch failed: EIA_API_KEY missing\n[fetch] EIA_GEN_SOLAR ...\n  ! fetch failed: EIA_API_KEY missing\n[fetch] EIA_GEN_WIND ...\n  ! fetch failed: EIA_API_KEY missing\n[fetch] EIA_GEN_NATGAS ...\n  ! fetch failed: EIA_API_KEY missing\nFATAL: no datasets succeeded\n",
+          "stdout_tail": "=== real_data_fair_benchmark @ 20260616T020057Z ===\noutput dir: C:\\LumenCore_GitHub\\lumen-core-public\\out\\real_data_fair_benchmark\\20260616T020057Z\n\n[fetch] EIA_GEN_ALL_FUELS ...\n  ! fetch failed: EIA_API_KEY missing\n[fetch] EIA_GEN_SOLAR ...\n  ! fetch failed: EIA_API_KEY missing\n[fetch] EIA_GEN_WIND ...\n  ! fetch failed: EIA_API_KEY missing\n[fetch] EIA_GEN_NATGAS ...\n  ! fetch failed: EIA_API_KEY missing\nFATAL: no datasets succeeded\n",
           "timeout": false
         },
         {
-          "elapsed_seconds": 0.468,
+          "elapsed_seconds": 0.497,
           "exists": true,
           "path": "code/validation_proof_pack.py",
           "ran": true,
@@ -208,7 +206,7 @@
           "timeout": false
         },
         {
-          "elapsed_seconds": 0.059,
+          "elapsed_seconds": 0.057,
           "exists": true,
           "path": "code/build_gov_grade_coherence_report.py",
           "ran": true,
@@ -222,38 +220,49 @@
       "timeout_count": 0
     },
     {
-      "candidate_count": 3,
+      "candidate_count": 4,
       "claim_type": "signal tracking, forecasting, and early warning",
-      "existing_count": 3,
-      "failed_count": 3,
+      "existing_count": 4,
+      "failed_count": 2,
       "lane": "Navy_TrackCast",
-      "passed_count": 0,
-      "ran_count": 3,
+      "passed_count": 2,
+      "ran_count": 4,
       "results": [
         {
-          "elapsed_seconds": 0.502,
+          "elapsed_seconds": 0.673,
           "exists": true,
-          "path": "code/regime_shift_scanner.py",
+          "path": "code/trackcast/trackcast_existing_stack_benchmark.py",
           "ran": true,
-          "returncode": 1,
-          "sha256": "68b751fe566970b44877fc3aa450460295320af32d3c1cff2762bed08899dc8f",
-          "stderr_tail": "Traceback (most recent call last):\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\regime_shift_scanner.py\", line 259, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\regime_shift_scanner.py\", line 157, in main\n    utc = _resolve_run_utc()\n  File \"C:\\LumenCore_GitHub\\lumen-core-public\\code\\regime_shift_scanner.py\", line 65, in _resolve_run_utc\n    runs = sorted([p.name for p in V2_RUNS.iterdir() if p.is_dir()])\n                                   ~~~~~~~~~~~~~~~^^\n  File \"C:\\Python314\\Lib\\pathlib\\__init__.py\", line 836, in iterdir\n    with os.scandir(root_dir) as scandir_it:\n         ~~~~~~~~~~^^^^^^^^^^\nFileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\\\LumenCore_GitHub\\\\lumen-core-public\\\\out\\\\master_universe_v2'\n",
-          "stdout_tail": "",
+          "returncode": 0,
+          "sha256": "3a092e0bec0872a2bb5d34b83961b4e552f5151a476479cfa78a0993d7169f1b",
+          "stderr_tail": "",
+          "stdout_tail": "{\n  \"pass\": true,\n  \"score\": 12,\n  \"reasons\": [\n    \"master_universe directory discovered\",\n    \"latest data file discovered\",\n    \"anomaly data/source discovered\",\n    \"TrackCast data artifact discovered\",\n    \"regime shift script discovered\",\n    \"anomaly script discovered\",\n    \"forecast script discovered\"\n  ],\n  \"json_report\": \"C:\\\\LumenCore_GitHub\\\\lumen-core-public\\\\out\\\\grant_evidence\\\\LATEST_trackcast_existing_stack_benchmark.json\",\n  \"md_report\": \"C:\\\\LumenCore_GitHub\\\\lumen-core-public\\\\out\\\\grant_evidence\\\\LATEST_trackcast_existing_stack_benchmark.md\"\n}\n",
           "timeout": false
         },
         {
-          "elapsed_seconds": 1.289,
+          "elapsed_seconds": 0.663,
+          "exists": true,
+          "path": "code/regime_shift_scanner.py",
+          "ran": true,
+          "returncode": 0,
+          "sha256": "68b751fe566970b44877fc3aa450460295320af32d3c1cff2762bed08899dc8f",
+          "stderr_tail": "",
+          "stdout_tail": "[regime] run=20260616T015847Z\n[regime] 0 datasets\n[regime] scanned 0 datasets in 0.0s\n[regime] wrote C:\\LumenCore_GitHub\\lumen-core-public\\out\\regime_shift_scanner\\20260616T015847Z\n[regime] 0/0 datasets have mean-shift breaks; 0 recent; 0 variance regime\n",
+          "timeout": false
+        },
+        {
+          "elapsed_seconds": 1.345,
           "exists": true,
           "path": "code/anomaly_scanner.py",
           "ran": true,
           "returncode": 1,
           "sha256": "f8133229a107190aec1cd12158b0f3a07bea8e402b567246a88d80d193ba698d",
           "stderr_tail": "",
-          "stdout_tail": "FATAL: no ANOM_UTC and no latest.txt\n",
+          "stdout_tail": "FATAL: C:\\LumenCore_GitHub\\lumen-core-public\\out\\master_universe_v2\\2026-06-15T20:09:00Z\\raw does not exist\n",
           "timeout": false
         },
         {
-          "elapsed_seconds": 0.47,
+          "elapsed_seconds": 0.485,
           "exists": true,
           "path": "code/forecast_api.py",
           "ran": true,
@@ -276,7 +285,7 @@
       "ran_count": 4,
       "results": [
         {
-          "elapsed_seconds": 0.076,
+          "elapsed_seconds": 0.079,
           "exists": true,
           "path": "code/execution/live_data_no_orders_gate.py",
           "ran": true,
@@ -287,29 +296,29 @@
           "timeout": false
         },
         {
-          "elapsed_seconds": 1.206,
+          "elapsed_seconds": 1.29,
           "exists": true,
           "path": "code/execution/order_safety_gate.py",
           "ran": true,
           "returncode": 0,
           "sha256": "2c9bf922087fb002d3ef72c2b71351a1ae5e7eda4fcd7fcad89057d01ada5eaa",
           "stderr_tail": "",
-          "stdout_tail": "{\n  \"approved\": false,\n  \"blockers\": [],\n  \"generated_utc\": \"2026-06-16T01:41:24.044895+00:00\",\n  \"intent\": {\n    \"notional_usd\": 1.0,\n    \"order_type\": \"market\",\n    \"quantity\": null,\n    \"side\": \"buy\",\n    \"source\": \"order_safety_gate_smoke\",\n    \"symbol\": \"TEST/USD\"\n  },\n  \"reason\": \"blocked_by_live_data_no_orders_stage\",\n  \"stage\": \"live-data-no-orders\",\n  \"warnings\": [\n    \"kill_switch_clear_by_file_check\",\n    \"live_order_config_detected_but_stage_blocks_orders\",\n    \"risk_local_basic_pass\",\n    \"signal_local_no_known_gate\"\n  ]\n}\n",
+          "stdout_tail": "{\n  \"approved\": false,\n  \"blockers\": [],\n  \"generated_utc\": \"2026-06-16T02:01:02.979293+00:00\",\n  \"intent\": {\n    \"notional_usd\": 1.0,\n    \"order_type\": \"market\",\n    \"quantity\": null,\n    \"side\": \"buy\",\n    \"source\": \"order_safety_gate_smoke\",\n    \"symbol\": \"TEST/USD\"\n  },\n  \"reason\": \"blocked_by_live_data_no_orders_stage\",\n  \"stage\": \"live-data-no-orders\",\n  \"warnings\": [\n    \"kill_switch_clear_by_file_check\",\n    \"live_order_config_detected_but_stage_blocks_orders\",\n    \"risk_local_basic_pass\",\n    \"signal_local_no_known_gate\"\n  ]\n}\n",
           "timeout": false
         },
         {
-          "elapsed_seconds": 1.271,
+          "elapsed_seconds": 1.349,
           "exists": true,
           "path": "code/execution/safe_live_executor.py",
           "ran": true,
           "returncode": 0,
           "sha256": "4c59e1dca7fb9676c25e7e50bd53aa5382a94a7945d5af461f0541f23f5e23e5",
           "stderr_tail": "",
-          "stdout_tail": "{\n  \"approved\": false,\n  \"blocked\": true,\n  \"decision\": {\n    \"approved\": false,\n    \"blockers\": [],\n    \"generated_utc\": \"2026-06-16T01:41:25.267558+00:00\",\n    \"intent\": {\n      \"notional_usd\": 1.0,\n      \"order_type\": \"market\",\n      \"quantity\": null,\n      \"side\": \"buy\",\n      \"source\": \"safe_live_executor_smoke\",\n      \"symbol\": \"TEST/USD\"\n    },\n    \"reason\": \"blocked_by_live_data_no_orders_stage\",\n    \"stage\": \"live-data-no-orders\",\n    \"warnings\": [\n      \"kill_switch_clear_by_file_check\",\n      \"live_order_config_detected_but_stage_blocks_orders\",\n      \"risk_local_basic_pass\",\n      \"signal_local_no_known_gate\"\n    ]\n  },\n  \"executor_called\": false,\n  \"executor_result\": null,\n  \"generated_utc\": \"2026-06-16T01:41:25.268075+00:00\",\n  \"intent\": {\n    \"notional_usd\": 1.0,\n    \"order_type\": \"market\",\n    \"quantity\": null,\n    \"side\": \"buy\",\n    \"source\": \"safe_live_executor_smoke\",\n    \"symbol\": \"TEST/USD\"\n  },\n  \"live_executor_surface\": {\n    \"candidate_functions_found\": [],\n    \"import_ok\": true,\n    \"order_related_callables\": [\n      \"MultiExchangeRouter\",\n      \"OrderRouter\",\n      \"RouteIntent\"\n    ]\n  },\n  \"reason\": \"blocked_by_live_data_no_orders_stage\",\n  \"stage\": \"live-data-no-orders\"\n}\nREPORT=C:\\LumenCore_GitHub\\lumen-core-public\\out\\safety_reports\\LATEST_safe_live_executor_smoke.md\n",
+          "stdout_tail": "{\n  \"approved\": false,\n  \"blocked\": true,\n  \"decision\": {\n    \"approved\": false,\n    \"blockers\": [],\n    \"generated_utc\": \"2026-06-16T02:01:04.277064+00:00\",\n    \"intent\": {\n      \"notional_usd\": 1.0,\n      \"order_type\": \"market\",\n      \"quantity\": null,\n      \"side\": \"buy\",\n      \"source\": \"safe_live_executor_smoke\",\n      \"symbol\": \"TEST/USD\"\n    },\n    \"reason\": \"blocked_by_live_data_no_orders_stage\",\n    \"stage\": \"live-data-no-orders\",\n    \"warnings\": [\n      \"kill_switch_clear_by_file_check\",\n      \"live_order_config_detected_but_stage_blocks_orders\",\n      \"risk_local_basic_pass\",\n      \"signal_local_no_known_gate\"\n    ]\n  },\n  \"executor_called\": false,\n  \"executor_result\": null,\n  \"generated_utc\": \"2026-06-16T02:01:04.277604+00:00\",\n  \"intent\": {\n    \"notional_usd\": 1.0,\n    \"order_type\": \"market\",\n    \"quantity\": null,\n    \"side\": \"buy\",\n    \"source\": \"safe_live_executor_smoke\",\n    \"symbol\": \"TEST/USD\"\n  },\n  \"live_executor_surface\": {\n    \"candidate_functions_found\": [],\n    \"import_ok\": true,\n    \"order_related_callables\": [\n      \"MultiExchangeRouter\",\n      \"OrderRouter\",\n      \"RouteIntent\"\n    ]\n  },\n  \"reason\": \"blocked_by_live_data_no_orders_stage\",\n  \"stage\": \"live-data-no-orders\"\n}\nREPORT=C:\\LumenCore_GitHub\\lumen-core-public\\out\\safety_reports\\LATEST_safe_live_executor_smoke.md\n",
           "timeout": false
         },
         {
-          "elapsed_seconds": 0.045,
+          "elapsed_seconds": 0.049,
           "exists": true,
           "path": "code/execution/tiny_live_manual_arm_readiness.py",
           "ran": true,
@@ -332,12 +341,22 @@
     "final portal field mapping"
   ],
   "live_trading_allowed": false,
-  "plan_sha256": "e2304382d6642d285ead5054b1b6c8359594a4156f6c9d719a097980c998ea4c",
+  "plan_sha256": "5a4a2f3e1f41830a66e92135b4b9b91e9c91703030e1f712bbec297ce2906b16",
   "premium_catalog": {
-    "count": 134,
+    "count": 161,
     "top_artifacts": [
       {
         "path": "out/harbor_sentinel/20260616T013840Z/alerts.csv",
+        "sha256": "1869b2382b63110f07799fe6fc333266bb72c8edd7d289f9e812c8d569347a9f",
+        "size_bytes": 15330803
+      },
+      {
+        "path": "out/harbor_sentinel/20260616T015808Z/alerts.csv",
+        "sha256": "1869b2382b63110f07799fe6fc333266bb72c8edd7d289f9e812c8d569347a9f",
+        "size_bytes": 15330803
+      },
+      {
+        "path": "out/harbor_sentinel/20260616T020023Z/alerts.csv",
         "sha256": "1869b2382b63110f07799fe6fc333266bb72c8edd7d289f9e812c8d569347a9f",
         "size_bytes": 15330803
       },
@@ -370,6 +389,11 @@
         "path": "code/ops/investor_proof_sweep.py",
         "sha256": "73eac2118fd94a9a71d8120629385f19cfc79dbe9e9de025e9281e5b7920eacd",
         "size_bytes": 53357
+      },
+      {
+        "path": "out/grant_evidence/LATEST_grant_evidence_benchmark_lab.json",
+        "sha256": "34f36a8f2a2b3a536c19d373dee1669f5e9897698e0f9219985916aab6e0e4bd",
+        "size_bytes": 43248
       },
       {
         "path": "code/ops/LOCK_AUTONOMOUS_GRANT_WIN.py",
@@ -457,6 +481,11 @@
         "size_bytes": 25917
       },
       {
+        "path": "out/grant_evidence/LATEST_trackcast_existing_stack_benchmark.json",
+        "sha256": "e1ff5e7da360f4d5d52f0576d7e387f23a0cef374799abfce218fd842b597d01",
+        "size_bytes": 25590
+      },
+      {
         "path": "code/BUILD_LAMASCOUT_PREMIUM_DASHBOARD.py",
         "sha256": "b1bd30f7c17742a0b67f865285c4dcfc0f76f40cbecf336c2690575abe02af8a",
         "size_bytes": 23193
@@ -465,6 +494,11 @@
         "path": "code/execution/fleet_coherence_monitor.py",
         "sha256": "bb99320fedcc3ff10436e2d13bc1afe65b5a787319fe56928e8cab25270c3d7c",
         "size_bytes": 22851
+      },
+      {
+        "path": "out/grant_evidence/LATEST_grant_evidence_benchmark_lab.md",
+        "sha256": "cb39849fd4c35ecd0aa0a0a498382b0944567ca3282936f2acce5a8754b7c110",
+        "size_bytes": 22452
       },
       {
         "path": "code/PATCH_SEED_VALIDATION_READER_FIX2.py",
@@ -647,9 +681,24 @@
         "size_bytes": 10088
       },
       {
+        "path": "code/ops/build_grant_evidence_cards.py",
+        "sha256": "6b7d92ea8a4f799677a6944671a87895a749f20af78a87f9931ae95b7f880015",
+        "size_bytes": 9862
+      },
+      {
+        "path": "code/trackcast/trackcast_existing_stack_benchmark.py",
+        "sha256": "3a092e0bec0872a2bb5d34b83961b4e552f5151a476479cfa78a0993d7169f1b",
+        "size_bytes": 9797
+      },
+      {
         "path": "code/render_evidence_charts.py",
         "sha256": "99dabcb482df26310a590d5dcacf17f6920cc1ef52fb373a4459f269976172ee",
         "size_bytes": 9707
+      },
+      {
+        "path": "out/grant_evidence/LATEST_trackcast_existing_stack_benchmark.md",
+        "sha256": "2d474eeb8c59a7e3d7b569da2a63dcb354f234b2eb2adfec952c74b296d9ce0c",
+        "size_bytes": 9268
       },
       {
         "path": "code/ops/BUILD_GRANT_WAITING_ACTIONS.py",
@@ -763,12 +812,12 @@
       },
       {
         "path": "out/execution/gov_grade_coherence_report.json",
-        "sha256": "366747087ffc20b6f7a84ab2144d3cc6f41aaf6b1b18a8826b8ddea013fafa72",
+        "sha256": "6d9aba49abdba021f528ecbdf7b900207f140f207e4b838e7ec84339132558d2",
         "size_bytes": 4288
       },
       {
         "path": "dashboard/data/gov_grade_coherence_report.json",
-        "sha256": "366747087ffc20b6f7a84ab2144d3cc6f41aaf6b1b18a8826b8ddea013fafa72",
+        "sha256": "6d9aba49abdba021f528ecbdf7b900207f140f207e4b838e7ec84339132558d2",
         "size_bytes": 4288
       },
       {
@@ -798,6 +847,16 @@
       },
       {
         "path": "out/harbor_sentinel/20260616T013840Z/scenario_summary.csv",
+        "sha256": "0c1bc22fc9062aa0c447378af34d1c60ef3c08d402ca7cb22c037c517ff40b64",
+        "size_bytes": 3780
+      },
+      {
+        "path": "out/harbor_sentinel/20260616T015808Z/scenario_summary.csv",
+        "sha256": "0c1bc22fc9062aa0c447378af34d1c60ef3c08d402ca7cb22c037c517ff40b64",
+        "size_bytes": 3780
+      },
+      {
+        "path": "out/harbor_sentinel/20260616T020023Z/scenario_summary.csv",
         "sha256": "0c1bc22fc9062aa0c447378af34d1c60ef3c08d402ca7cb22c037c517ff40b64",
         "size_bytes": 3780
       },
@@ -832,14 +891,14 @@
         "size_bytes": 2906
       },
       {
-        "path": "out/dice_preliminary/summary.json",
-        "sha256": "c43441551a53457896dc4f5259b55737241088ae8d1c2eadcc85cb631a317b93",
-        "size_bytes": 2650
+        "path": "config/grant_evidence_benchmark_plan.json",
+        "sha256": "5a4a2f3e1f41830a66e92135b4b9b91e9c91703030e1f712bbec297ce2906b16",
+        "size_bytes": 2667
       },
       {
-        "path": "config/grant_evidence_benchmark_plan.json",
-        "sha256": "e2304382d6642d285ead5054b1b6c8359594a4156f6c9d719a097980c998ea4c",
-        "size_bytes": 2527
+        "path": "out/dice_preliminary/summary.json",
+        "sha256": "75401748da2e1bd2cf696f986dfd363714acc00d6de9da6410a1f6640142fd64",
+        "size_bytes": 2650
       },
       {
         "path": "investor_txids/trade_log.json",
@@ -885,56 +944,6 @@
         "path": "out/harbor_sentinel/20260616T013840Z/summary.json",
         "sha256": "1a731082c562db3f65f3ceb6e67302c40d4ae36026bd852ebc0e964177c48a46",
         "size_bytes": 1461
-      },
-      {
-        "path": "dashboard/generate_validation_proof.py",
-        "sha256": "a7ee7a31c8c620a7506c93d8dbb812acf922ad0b989c29e546a9fd190b4d8fb2",
-        "size_bytes": 1427
-      },
-      {
-        "path": "federal_brief.md",
-        "sha256": "defc7af6479f28f97a8bf8b86f617af35cb41f27f06256ca4bbbdc51c48f1d7d",
-        "size_bytes": 1425
-      },
-      {
-        "path": "investor_and_grant_evidence.json",
-        "sha256": "b58350cfbc6e0a209b09cec2a7beebaaad4e12388a6544f9e56e9ef31b10bcee",
-        "size_bytes": 1318
-      },
-      {
-        "path": "code/validation_proof_pack.py",
-        "sha256": "0617aa791c3ec7051214dd5b687255a2f9b842cb2f004f812d05cb2f14ae8dbf",
-        "size_bytes": 1306
-      },
-      {
-        "path": "code/ops/REGISTER_GRANT_DASHBOARD_REFRESH_TASK.ps1",
-        "sha256": "d60b5eac40729826a938f8c005c09fe5da93ad8f36638f550aad8c6653f6d2cf",
-        "size_bytes": 1259
-      },
-      {
-        "path": "code/BUILD_ALL_PREMIUM_DASHBOARDS.py",
-        "sha256": "91e23ed159b2b74a052e657a8b846e62df25dd4c2fbc9a9887b1de6d20a35754",
-        "size_bytes": 1182
-      },
-      {
-        "path": "PERSISTED_RUNTIME_LOCK_PROOF.json",
-        "sha256": "263c47d2cc6b4893597ffb85d17d1ba543dd65a4c2289275383887d4ff9c5499",
-        "size_bytes": 1161
-      },
-      {
-        "path": "out/dice_preliminary/SCORECARD.md",
-        "sha256": "88944478d922a203cd6902035559472fdb390af22a2754ee7338af1f1a7175cd",
-        "size_bytes": 1118
-      },
-      {
-        "path": "code/GRANT_IIS_DASHBOARD_PUBLISH_ACCESS.ps1",
-        "sha256": "3f134d3a209ee2c5ad0d234fe7a68f7edf5c1d9e67fba9b5d56129470238dd67",
-        "size_bytes": 1114
-      },
-      {
-        "path": "investor_evidence_report.json",
-        "sha256": "a4fffa1ea05e8f9991405ea3bf62846abf0312cfb96bf3c79d367a795182d297",
-        "size_bytes": 1028
       }
     ]
   },
@@ -948,8 +957,9 @@
     "Grants.gov API key exists in local registry according to operator",
     "DARPA_DICE: 2 command(s) passed",
     "Navy_HarborSentinel: 3 command(s) passed",
-    "DLA_MissionWeave: 2 command(s) passed",
+    "DLA_MissionWeave: 1 command(s) passed",
     "NSF_Project_Pitch: 2 command(s) passed",
+    "Navy_TrackCast: 2 command(s) passed",
     "Safety_Runtime_Truth: 4 command(s) passed"
   ]
 }

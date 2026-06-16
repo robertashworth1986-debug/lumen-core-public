@@ -1,40 +1,16 @@
 # Navy TrackCast Failure Triage
 
-Generated UTC: 2026-06-16T01:52:27.072651+00:00
+Generated UTC: 2026-06-16T02:01:05.053812+00:00
 
 ## Summary
 
-- Existing scripts: 3
-- Ran: 3
-- Passed: 0
-- Failed: 3
+- Existing scripts: 4
+- Ran: 4
+- Passed: 2
+- Failed: 2
 - Timed out: 0
 
 ## Failed Scripts
-
-### code/regime_shift_scanner.py
-
-- Return code: 1
-- Timeout: False
-- SHA-256: 68b751fe566970b44877fc3aa450460295320af32d3c1cff2762bed08899dc8f
-
-Error tail:
-```text
-Traceback (most recent call last):
-  File "C:\LumenCore_GitHub\lumen-core-public\code\regime_shift_scanner.py", line 259, in <module>
-    raise SystemExit(main())
-                     ~~~~^^
-  File "C:\LumenCore_GitHub\lumen-core-public\code\regime_shift_scanner.py", line 157, in main
-    utc = _resolve_run_utc()
-  File "C:\LumenCore_GitHub\lumen-core-public\code\regime_shift_scanner.py", line 65, in _resolve_run_utc
-    runs = sorted([p.name for p in V2_RUNS.iterdir() if p.is_dir()])
-                                   ~~~~~~~~~~~~~~~^^
-  File "C:\Python314\Lib\pathlib\__init__.py", line 836, in iterdir
-    with os.scandir(root_dir) as scandir_it:
-         ~~~~~~~~~~^^^^^^^^^^
-FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\LumenCore_GitHub\\lumen-core-public\\out\\master_universe_v2'
-
-```
 
 ### code/anomaly_scanner.py
 
@@ -44,7 +20,7 @@ FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\
 
 Output tail:
 ```text
-FATAL: no ANOM_UTC and no latest.txt
+FATAL: C:\LumenCore_GitHub\lumen-core-public\out\master_universe_v2\2026-06-15T20:09:00Z\raw does not exist
 
 ```
 

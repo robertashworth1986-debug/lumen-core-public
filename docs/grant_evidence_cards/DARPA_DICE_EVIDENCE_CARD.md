@@ -1,6 +1,6 @@
 # Grant Evidence Card — DARPA_DICE
 
-Generated UTC: 2026-06-16T01:52:27.069890+00:00
+Generated UTC: 2026-06-16T02:01:05.051832+00:00
 
 ## Status
 
