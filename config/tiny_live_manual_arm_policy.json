@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "design_only",
+  "enabled": false,
+  "stage_name": "tiny-live-manual-arm",
+  "confirmation_file": "LIVE_TINY_MANUAL_ARM.confirm",
+  "max_order_usd": 5,
+  "max_daily_loss_usd": 10,
+  "max_open_positions": 1,
+  "max_orders_per_hour": 3,
+  "min_seconds_between_orders": 300,
+  "require_human_confirmation": true,
+  "require_safe_launcher": true,
+  "require_order_safety_gate": true,
+  "require_safe_live_executor": true,
+  "require_chain_of_custody": true,
+  "require_live_data_no_orders_pass": true,
+  "require_raw_entrypoint_audit": true,
+  "require_no_secret_printing": true,
+  "activation_status": "NOT_ACTIVE",
+  "notes": [
+    "This policy is a design artifact only.",
+    "Live trading must remain blocked until a separate deliberate manual-arm patch.",
+    "Tiny-live is limited to very small notional test orders only after safety gates pass.",
+    "This file alone must never enable live trading."
+  ]
+}
