@@ -1,6 +1,6 @@
 # Safe Live Executor Smoke
 
-- Generated UTC: `2026-06-16T01:18:59.790174+00:00`
+- Generated UTC: `2026-06-16T01:20:28.174333+00:00`
 - Stage: `live-data-no-orders`
 - Approved: `False`
 - Blocked: `True`
@@ -27,7 +27,7 @@
 {
   "approved": false,
   "blockers": [],
-  "generated_utc": "2026-06-16T01:18:59.789677+00:00",
+  "generated_utc": "2026-06-16T01:20:28.173821+00:00",
   "intent": {
     "notional_usd": 1.0,
     "order_type": "market",
