@@ -34,6 +34,7 @@ Founder-operator of the LumaTrader and LumenCore platform ecosystem with end-to-
 - LinkedIn evidence publishing lane and profile optimization automation.
 - Sports and market intelligence fusion lanes with explicit lane-boundary controls.
 - End-to-end evidence packaging pipelines for investor and federal reviews.
+- Reviewer-first proof navigation that maps public claims to dashboards, ledgers, manifests, and runtime controls.
 
 ## TECHNOLOGY STACK AND PROVEN PACKAGES
 
@@ -55,6 +56,7 @@ pandas, numpy, requests, scikit-learn, FastAPI, matplotlib, joblib, ccxt, pptx, 
 - UEI: SQY2XW71ZM51 | CAGE: 14TM8 | SAM status: active.
 - Track record generating federal-style submissions and preflight-ready package artifacts.
 - Operates with evidence-first discipline: every major claim maps to machine-readable outputs.
+- Maintains reusable positioning collateral for investor outreach, grant narratives, LinkedIn, and technical hiring conversations.
 
 ## TARGET ROLES
 

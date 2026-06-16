@@ -108,6 +108,8 @@ Fair. So here's what you can verify *right now*, without trusting anything I say
 | Live trading system | [lumen-core.ai/kraken_execution_dashboard.html](https://lumen-core.ai/kraken_execution_dashboard.html) — real trades, live data |
 | Real executed trades | [lumen-core.ai/evidence/](https://lumen-core.ai/evidence/) — SHA-256 hash-chained TXID ledger |
 | Government-level documentation | Federal brief, audit-ready proof packs, DOE SBIR alignment |
+| Reviewer proof index | [`docs/INVESTOR_PROOF_INDEX.md`](docs/INVESTOR_PROOF_INDEX.md) — one-page diligence map from claim to artifact |
+| External positioning | [`docs/POSITIONING_PLAYBOOK.md`](docs/POSITIONING_PLAYBOOK.md) — investor, grant, hiring, and LinkedIn language |
 | Patent filings | Non-provisional, attorney-reviewed IP across trading + hardware |
 | Scale of the codebase | 22,000+ Python files, 150+ build artifacts, 12+ months of commits |
 
@@ -143,6 +145,17 @@ I'm not asking you to take my word for it. I'm asking you to look.
 - **[Evidence Ledger](https://lumen-core.ai/evidence/)** — Hash-chained live proof (SHA-256 verified)
 - **[Forecast](https://lumen-core.ai/forecast.html)** — Predictive alpha forecasting
 - **[Anomalies](https://lumen-core.ai/anomalies.html)** — Cross-sector anomaly detection
+
+### Reviewer Trust Surfaces
+
+| Surface | Repo artifact | Reviewer value |
+|---------|---------------|----------------|
+| Investor proof index | [`docs/INVESTOR_PROOF_INDEX.md`](docs/INVESTOR_PROOF_INDEX.md) | Converts claims into a one-page diligence path. |
+| Positioning playbook | [`docs/POSITIONING_PLAYBOOK.md`](docs/POSITIONING_PLAYBOOK.md) | Keeps investor, grant, hiring, and LinkedIn language consistent. |
+| Grant submission control room | [`docs/GRANT_SUBMISSION_CONTROL_ROOM.md`](docs/GRANT_SUBMISSION_CONTROL_ROOM.md) | Gives the authenticated operator a final submit sequence, portal routes, and receipt evidence checklist. |
+| Session package bridge | [`docs/SESSION_PACKAGE_BRIDGE.md`](docs/SESSION_PACKAGE_BRIDGE.md) | Indexes repo-local premium packages, tools, dashboards, bridges, and evidence lanes for the current session. |
+| Local Codex plugin session packet | [`code/ops/IMPORT_CODEX_PLUGIN_SESSION_PACKET.ps1`](code/ops/IMPORT_CODEX_PLUGIN_SESSION_PACKET.ps1) | Builds a non-secret manifest of local Codex plugins/MCP/browser-control candidates so compatible future sessions can rehydrate the right tool stack. |
+| Trust snapshot | [`dashboard/investor_trust_snapshot.html`](dashboard/investor_trust_snapshot.html) | Static dashboard card for reviewers who need the proof map before deep technical review. |
 
 ---
 

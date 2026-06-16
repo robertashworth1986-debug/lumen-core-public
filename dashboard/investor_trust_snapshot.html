@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LumenCore Investor Trust Snapshot</title>
+  <style>
+    :root { color-scheme: dark; --bg:#070b12; --panel:#101827; --line:#243044; --text:#e7f3ff; --muted:#9fb0c8; --cyan:#00ffe7; --violet:#9b5cff; --green:#42f59b; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif; background: radial-gradient(circle at top left, rgba(0,255,231,.18), transparent 34%), radial-gradient(circle at bottom right, rgba(155,92,255,.15), transparent 34%), var(--bg); color:var(--text); }
+    main { width:min(1120px, calc(100% - 32px)); margin:0 auto; padding:56px 0; }
+    .hero { border:1px solid var(--line); background:rgba(16,24,39,.82); border-radius:28px; padding:34px; box-shadow:0 24px 80px rgba(0,0,0,.35); }
+    .eyebrow { color:var(--cyan); letter-spacing:.16em; text-transform:uppercase; font-weight:800; font-size:12px; }
+    h1 { font-size:clamp(36px, 6vw, 72px); line-height:.95; margin:14px 0; }
+    p { color:var(--muted); font-size:18px; line-height:1.6; max-width:850px; }
+    .grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:24px; }
+    .card { border:1px solid var(--line); background:rgba(7,11,18,.7); border-radius:22px; padding:22px; min-height:190px; }
+    .card h2 { margin:0 0 8px; font-size:20px; }
+    .badge { display:inline-flex; border:1px solid rgba(0,255,231,.35); color:var(--green); border-radius:999px; padding:6px 10px; font-size:12px; font-weight:800; margin-bottom:14px; }
+    a { color:var(--cyan); text-decoration:none; font-weight:800; }
+    a:hover { text-decoration:underline; }
+    .footer { margin-top:22px; color:var(--muted); font-size:14px; }
+    @media (max-width: 850px) { .grid { grid-template-columns:1fr; } .hero { padding:24px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="eyebrow">Reviewer-first proof map</div>
+      <h1>LumenCore Investor Trust Snapshot</h1>
+      <p>This static dashboard card gives skeptical reviewers a fast path from public claims to proof surfaces: live dashboards, hash-linked evidence, machine-readable artifacts, runtime controls, and external positioning collateral.</p>
+      <div class="grid" aria-label="Trust surfaces">
+        <article class="card">
+          <span class="badge">1 · Proof Index</span>
+          <h2>Claim → Artifact Map</h2>
+          <p>Use the investor proof index to trace claims into dashboards, ledgers, JSON artifacts, and runtime guardrail documents.</p>
+          <a href="../docs/INVESTOR_PROOF_INDEX.md">Open proof index</a>
+        </article>
+        <article class="card">
+          <span class="badge">3 · Dashboard</span>
+          <h2>Live Review Surfaces</h2>
+          <p>Mission Control, Kraken execution, evidence ledger, forecasts, and anomaly dashboards anchor the public credibility layer.</p>
+          <a href="mission_control.html">Open mission control</a>
+        </article>
+        <article class="card">
+          <span class="badge">5 · Positioning</span>
+          <h2>External Narrative</h2>
+          <p>The positioning playbook keeps investor, grant, hiring, and LinkedIn language consistent with the available proof artifacts.</p>
+          <a href="../docs/POSITIONING_PLAYBOOK.md">Open playbook</a>
+        </article>
+      </div>
+      <div class="footer">Built for diligence speed: truth before polish, machine-readable where possible, no historical ledger rewrites.</div>
+    </section>
+  </main>
+</body>
+</html>
