@@ -1,13 +1,13 @@
 # LumenCore Raw Live Entrypoint Audit
 
-- Generated UTC: `2026-06-16T01:20:31.207426+00:00`
+- Generated UTC: `2026-06-16T01:22:53.847137+00:00`
 - Repo root: `C:\LumenCore_GitHub\lumen-core-public`
 
 ## Summary
 
-- `files_with_raw_live_references`: `29`
-- `files_with_safe_references`: `11`
-- `total_files_with_hits`: `35`
+- `files_with_raw_live_references`: `32`
+- `files_with_safe_references`: `14`
+- `total_files_with_hits`: `38`
 
 ## Meaning
 
@@ -116,6 +116,75 @@
 | Line | Raw | Safe | Text |
 |---:|---|---|---|
 | 25 | YES | NO | `ticker, and symbol-awareness services. The large `live_executor.py` and` |
+
+### `out/safety_reports/LATEST_legacy_launcher_redirects.md`
+
+- Raw live references: `4`
+- Safe references: `1`
+
+| Line | Raw | Safe | Text |
+|---:|---|---|---|
+| 9 | YES | NO | `- code\execution\RUN_LIVE_COMPOUNDING_STACK.ps1` |
+| 10 | YES | NO | `  Backup: code\execution\RUN_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect` |
+| 11 | YES | NO | `- code\execution\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1` |
+| 12 | YES | NO | `  Backup: code\execution\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect` |
+| 18 | NO | YES | `- Old launchers cannot bypass order_safety_gate.py through these entrypoints.` |
+
+### `out/safety_reports/LATEST_live_entrypoint_audit.json`
+
+- Raw live references: `245`
+- Safe references: `126`
+
+| Line | Raw | Safe | Text |
+|---:|---|---|---|
+| 12 | YES | NO | `          "text": "- **Live executor duplicate-child false positive** \u2014 Rewrote `_is_duplicate_child_executor()` in `live_executor.py`. Old PID-recycling edge case caused executor to self-block on launch. New logic uses env-marker + parent-PID + commandline triple-check."` |
+| 17 | YES | NO | `            "RUN_LIVE_COMPOUNDING_STACK"` |
+| 21 | YES | NO | `          "text": "- **Stale env var on executor relaunch** \u2014 `RUN_LIVE_COMPOUNDING_STACK.ps1` now clears `LUMA_LIVE_EXECUTOR_ROOT_PID` before each executor spawn."` |
+| 33 | YES | NO | `            "approval_autofire_daemon"` |
+| 37 | YES | NO | `          "text": "    \"decision_reason\": \"approval_autofire_daemon\","` |
+| 53 | YES | NO | `          "text": "    'code/execution/live_executor.py',"` |
+| 58 | YES | NO | `            "order_router"` |
+| 62 | YES | NO | `          "text": "    'code/execution/order_router.py',"` |
+| 74 | YES | NO | `            "RUN_EXECUTION"` |
+| 78 | YES | NO | `          "text": "      \"script\": \"C:\\\\LumaTrader\\\\INSTITUTIONAL_STACK_V2\\\\code\\\\execution\\\\RUN_EXECUTION.ps1\","` |
+| 83 | YES | NO | `            "RUN_EXECUTION"` |
+| 87 | YES | NO | `          "text": "      \"stderr_tail\": \"  File \\\"C:\\\\LumaTrader\\\\INSTITUTIONAL_STACK_V2\\\\code\\\\execution\\\\RUN_EXECUTION.ps1\\\", line 1\\n    cd C:\\\\LumaTrader\\\\INSTITUTIONAL_STACK_V2\\\\code\\\\execution\\n       ^\\nSyntaxError: invalid syntax\\n\""` |
+| 99 | YES | NO | `            "RUN_EXECUTION"` |
+| 103 | YES | NO | `          "text": "        for p in sorted(exec_dir.glob(\"RUN_EXECUTION*\"), key=lambda x: x.name.lower()):"` |
+| 119 | YES | NO | `          "text": "  # Live mode is rejected. Use execution/live_executor.py after readiness gates."` |
+| 131 | YES | NO | `            "order_router"` |
+| 135 | YES | NO | `          "text": "from execution.order_router import OrderRouter, RouteIntent"` |
+| 140 | YES | NO | `            "order_router"` |
+| 144 | YES | NO | `          "text": "    order_router = OrderRouter()"` |
+| 149 | YES | NO | `            "order_router"` |
+
+### `out/safety_reports/LATEST_live_entrypoint_audit.md`
+
+- Raw live references: `116`
+- Safe references: `51`
+
+| Line | Raw | Safe | Text |
+|---:|---|---|---|
+| 14 | NO | YES | `- Raw live references are not automatically unsafe, but they must route through safe_live_executor/order_safety_gate before any live order path is trusted.` |
+| 27 | YES | NO | `\| 20 \| YES \| NO \| `- **Live executor duplicate-child false positive** — Rewrote `_is_duplicate_child_executor()` in `live_executor.py`. Old PID-recycling edge case caused executor to self-block on launch. New logic uses env-marker + parent-PID + commandline triple-check.` \|` |
+| 28 | YES | NO | `\| 22 \| YES \| NO \| `- **Stale env var on executor relaunch** — `RUN_LIVE_COMPOUNDING_STACK.ps1` now clears `LUMA_LIVE_EXECUTOR_ROOT_PID` before each executor spawn.` \|` |
+| 37 | YES | NO | `\| 95130 \| YES \| NO \| `    "decision_reason": "approval_autofire_daemon",` \|` |
+| 46 | YES | NO | `\| 20 \| YES \| NO \| `    'code/execution/live_executor.py',` \|` |
+| 47 | YES | NO | `\| 23 \| YES \| NO \| `    'code/execution/order_router.py',` \|` |
+| 56 | YES | NO | `\| 66 \| YES \| NO \| `      "script": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\execution\\RUN_EXECUTION.ps1",` \|` |
+| 57 | YES | NO | `\| 71 \| YES \| NO \| `      "stderr_tail": "  File \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\execution\\RUN_EXECUTION.ps1\", line 1\n    cd C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\execution\n       ^\nSyntaxError: invalid syntax\n"` \|` |
+| 66 | YES | NO | `\| 700 \| YES \| NO \| `        for p in sorted(exec_dir.glob("RUN_EXECUTION*"), key=lambda x: x.name.lower()):` \|` |
+| 75 | YES | NO | `\| 14 \| YES \| NO \| `  # Live mode is rejected. Use execution/live_executor.py after readiness gates.` \|` |
+| 84 | YES | NO | `\| 20 \| YES \| NO \| `from execution.order_router import OrderRouter, RouteIntent` \|` |
+| 85 | YES | NO | `\| 1747 \| YES \| NO \| `    order_router = OrderRouter()` \|` |
+| 86 | YES | NO | `\| 2018 \| YES \| NO \| `        order_template = order_router.build_primary(route_intent, validate_only=True)` \|` |
+| 87 | YES | NO | `\| 2019 \| YES \| NO \| `        close_template = order_router.build_close_template(route_intent)` \|` |
+| 88 | YES | NO | `\| 2472 \| YES \| NO \| `        order_template = order_router.build_primary(route_intent, validate_only=True)` \|` |
+| 89 | YES | NO | `\| 2473 \| YES \| NO \| `        close_template = order_router.build_close_template(route_intent)` \|` |
+| 98 | YES | NO | `\| 14 \| YES \| NO \| `CONTROLLER_SCRIPT = EXEC / "kraken_live_growth_controller.py"` \|` |
+| 99 | YES | NO | `\| 87 \| YES \| NO \| `    run_step(build_controller_cmd(args), "kraken_live_growth_controller")` \|` |
+| 108 | YES | NO | `\| 27 \| YES \| NO \| `     Not implemented. Use execution/live_executor.py for real orders.` \|` |
+| 109 | YES | NO | `\| 581 \| YES \| NO \| `            "code/execution/live_executor.py after production readiness gates pass."` \|` |
 
 ### `out/safety_reports/LATEST_safe_live_executor_smoke.json`
 
@@ -228,17 +297,15 @@
 
 ### `code/execution/RUN_LIVE_COMPOUNDING_STACK.ps1`
 
-- Raw live references: `6`
+- Raw live references: `4`
 - Safe references: `0`
 
 | Line | Raw | Safe | Text |
 |---:|---|---|---|
-| 29 | YES | NO | `$daemonScript = Join-Path $execDir "approval_autofire_daemon.py"` |
-| 38 | YES | NO | `$executorScript = Join-Path $execDir "live_executor.py"` |
-| 74 | YES | NO | `    $running = Get-ProcsByPattern "*approval_autofire_daemon.py*" \| Select-Object -First 1` |
-| 85 | YES | NO | `        $running = Get-ProcsByPattern "*approval_autofire_daemon.py*" \| Select-Object -First 1` |
-| 96 | YES | NO | `    $running = Get-ProcsByPattern "*live_executor.py*" \| Select-Object -First 1` |
-| 115 | YES | NO | `        $running = Get-ProcsByPattern "*live_executor.py*" \| Select-Object -First 1` |
+| 4 | YES | NO | `# Legacy launcher: code\execution\RUN_LIVE_COMPOUNDING_STACK.ps1` |
+| 5 | YES | NO | `# Backup file: code\execution\RUN_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect` |
+| 18 | YES | NO | `=== RUN_LIVE_COMPOUNDING_STACK.ps1 redirected to safe no-orders launcher ===" -ForegroundColor Cyan` |
+| 20 | YES | NO | `Write-Host "Original backup: code\execution\RUN_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect" -ForegroundColor Yellow` |
 
 ### `code/execution/RUN_LIVE_DATA_NO_ORDERS_GATE.ps1`
 
@@ -315,14 +382,15 @@
 
 ### `code/execution/SUPERVISE_LIVE_COMPOUNDING_STACK.ps1`
 
-- Raw live references: `3`
+- Raw live references: `4`
 - Safe references: `0`
 
 | Line | Raw | Safe | Text |
 |---:|---|---|---|
-| 13 | YES | NO | `$launcher = Join-Path $execDir "RUN_LIVE_COMPOUNDING_STACK.ps1"` |
-| 128 | YES | NO | `        $daemonCount = Get-ProcessCount "*approval_autofire_daemon.py*"` |
-| 129 | YES | NO | `        $executorCount = Get-ProcessCount "*live_executor.py*"` |
+| 4 | YES | NO | `# Legacy launcher: code\execution\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1` |
+| 5 | YES | NO | `# Backup file: code\execution\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect` |
+| 18 | YES | NO | `=== SUPERVISE_LIVE_COMPOUNDING_STACK.ps1 redirected to safe no-orders launcher ===" -ForegroundColor Cyan` |
+| 20 | YES | NO | `Write-Host "Original backup: code\execution\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect" -ForegroundColor Yellow` |
 
 ### `code/execution/universe_audit_runner.py`
 

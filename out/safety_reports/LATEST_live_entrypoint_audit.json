@@ -253,6 +253,793 @@
     {
       "hits": [
         {
+          "line": 9,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "- code\\execution\\RUN_LIVE_COMPOUNDING_STACK.ps1"
+        },
+        {
+          "line": 10,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "  Backup: code\\execution\\RUN_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect"
+        },
+        {
+          "line": 11,
+          "patterns": [
+            "SUPERVISE_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "- code\\execution\\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1"
+        },
+        {
+          "line": 12,
+          "patterns": [
+            "SUPERVISE_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "  Backup: code\\execution\\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect"
+        },
+        {
+          "line": 18,
+          "patterns": [
+            "order_safety_gate"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "- Old launchers cannot bypass order_safety_gate.py through these entrypoints."
+        }
+      ],
+      "path": "out/safety_reports/LATEST_legacy_launcher_redirects.md",
+      "raw_count": 4,
+      "safe_count": 1
+    },
+    {
+      "hits": [
+        {
+          "line": 12,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"- **Live executor duplicate-child false positive** \\u2014 Rewrote `_is_duplicate_child_executor()` in `live_executor.py`. Old PID-recycling edge case caused executor to self-block on launch. New logic uses env-marker + parent-PID + commandline triple-check.\""
+        },
+        {
+          "line": 17,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"RUN_LIVE_COMPOUNDING_STACK\""
+        },
+        {
+          "line": 21,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"- **Stale env var on executor relaunch** \\u2014 `RUN_LIVE_COMPOUNDING_STACK.ps1` now clears `LUMA_LIVE_EXECUTOR_ROOT_PID` before each executor spawn.\""
+        },
+        {
+          "line": 33,
+          "patterns": [
+            "approval_autofire_daemon"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"approval_autofire_daemon\""
+        },
+        {
+          "line": 37,
+          "patterns": [
+            "approval_autofire_daemon"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"    \\\"decision_reason\\\": \\\"approval_autofire_daemon\\\",\""
+        },
+        {
+          "line": 53,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"    'code/execution/live_executor.py',\""
+        },
+        {
+          "line": 58,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"order_router\""
+        },
+        {
+          "line": 62,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"    'code/execution/order_router.py',\""
+        },
+        {
+          "line": 74,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"RUN_EXECUTION\""
+        },
+        {
+          "line": 78,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"      \\\"script\\\": \\\"C:\\\\\\\\LumaTrader\\\\\\\\INSTITUTIONAL_STACK_V2\\\\\\\\code\\\\\\\\execution\\\\\\\\RUN_EXECUTION.ps1\\\",\""
+        },
+        {
+          "line": 83,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"RUN_EXECUTION\""
+        },
+        {
+          "line": 87,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"      \\\"stderr_tail\\\": \\\"  File \\\\\\\"C:\\\\\\\\LumaTrader\\\\\\\\INSTITUTIONAL_STACK_V2\\\\\\\\code\\\\\\\\execution\\\\\\\\RUN_EXECUTION.ps1\\\\\\\", line 1\\\\n    cd C:\\\\\\\\LumaTrader\\\\\\\\INSTITUTIONAL_STACK_V2\\\\\\\\code\\\\\\\\execution\\\\n       ^\\\\nSyntaxError: invalid syntax\\\\n\\\"\""
+        },
+        {
+          "line": 99,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"RUN_EXECUTION\""
+        },
+        {
+          "line": 103,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"        for p in sorted(exec_dir.glob(\\\"RUN_EXECUTION*\\\"), key=lambda x: x.name.lower()):\""
+        },
+        {
+          "line": 119,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"  # Live mode is rejected. Use execution/live_executor.py after readiness gates.\""
+        },
+        {
+          "line": 131,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"order_router\""
+        },
+        {
+          "line": 135,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"from execution.order_router import OrderRouter, RouteIntent\""
+        },
+        {
+          "line": 140,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"order_router\""
+        },
+        {
+          "line": 144,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"    order_router = OrderRouter()\""
+        },
+        {
+          "line": 149,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"order_router\""
+        },
+        {
+          "line": 153,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"        order_template = order_router.build_primary(route_intent, validate_only=True)\""
+        },
+        {
+          "line": 158,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"order_router\""
+        },
+        {
+          "line": 162,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"        close_template = order_router.build_close_template(route_intent)\""
+        },
+        {
+          "line": 167,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"order_router\""
+        },
+        {
+          "line": 171,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"        order_template = order_router.build_primary(route_intent, validate_only=True)\""
+        },
+        {
+          "line": 176,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"order_router\""
+        },
+        {
+          "line": 180,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"        close_template = order_router.build_close_template(route_intent)\""
+        },
+        {
+          "line": 192,
+          "patterns": [
+            "kraken_live_growth_controller"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"kraken_live_growth_controller\""
+        },
+        {
+          "line": 196,
+          "patterns": [
+            "kraken_live_growth_controller"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"CONTROLLER_SCRIPT = EXEC / \\\"kraken_live_growth_controller.py\\\"\""
+        },
+        {
+          "line": 201,
+          "patterns": [
+            "kraken_live_growth_controller"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"kraken_live_growth_controller\""
+        },
+        {
+          "line": 205,
+          "patterns": [
+            "kraken_live_growth_controller"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"    run_step(build_controller_cmd(args), \\\"kraken_live_growth_controller\\\")\""
+        },
+        {
+          "line": 221,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"     Not implemented. Use execution/live_executor.py for real orders.\""
+        },
+        {
+          "line": 230,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"            \\\"code/execution/live_executor.py after production readiness gates pass.\\\"\""
+        },
+        {
+          "line": 246,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"ticker, and symbol-awareness services. The large `live_executor.py` and\""
+        },
+        {
+          "line": 258,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"RUN_LIVE_COMPOUNDING_STACK\""
+        },
+        {
+          "line": 262,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"- code\\\\execution\\\\RUN_LIVE_COMPOUNDING_STACK.ps1\""
+        },
+        {
+          "line": 267,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"RUN_LIVE_COMPOUNDING_STACK\""
+        },
+        {
+          "line": 271,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"  Backup: code\\\\execution\\\\RUN_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect\""
+        },
+        {
+          "line": 276,
+          "patterns": [
+            "SUPERVISE_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "            \"SUPERVISE_LIVE_COMPOUNDING_STACK\""
+        },
+        {
+          "line": 280,
+          "patterns": [
+            "SUPERVISE_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "          \"text\": \"- code\\\\execution\\\\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1\""
+        }
+      ],
+      "path": "out/safety_reports/LATEST_live_entrypoint_audit.json",
+      "raw_count": 245,
+      "safe_count": 126
+    },
+    {
+      "hits": [
+        {
+          "line": 14,
+          "patterns": [
+            "safe_live_executor",
+            "order_safety_gate"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "- Raw live references are not automatically unsafe, but they must route through safe_live_executor/order_safety_gate before any live order path is trusted."
+        },
+        {
+          "line": 27,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 20 | YES | NO | `- **Live executor duplicate-child false positive** \u2014 Rewrote `_is_duplicate_child_executor()` in `live_executor.py`. Old PID-recycling edge case caused executor to self-block on launch. New logic uses env-marker + parent-PID + commandline triple-check.` |"
+        },
+        {
+          "line": 28,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 22 | YES | NO | `- **Stale env var on executor relaunch** \u2014 `RUN_LIVE_COMPOUNDING_STACK.ps1` now clears `LUMA_LIVE_EXECUTOR_ROOT_PID` before each executor spawn.` |"
+        },
+        {
+          "line": 37,
+          "patterns": [
+            "approval_autofire_daemon"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 95130 | YES | NO | `    \"decision_reason\": \"approval_autofire_daemon\",` |"
+        },
+        {
+          "line": 46,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 20 | YES | NO | `    'code/execution/live_executor.py',` |"
+        },
+        {
+          "line": 47,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 23 | YES | NO | `    'code/execution/order_router.py',` |"
+        },
+        {
+          "line": 56,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 66 | YES | NO | `      \"script\": \"C:\\\\LumaTrader\\\\INSTITUTIONAL_STACK_V2\\\\code\\\\execution\\\\RUN_EXECUTION.ps1\",` |"
+        },
+        {
+          "line": 57,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 71 | YES | NO | `      \"stderr_tail\": \"  File \\\"C:\\\\LumaTrader\\\\INSTITUTIONAL_STACK_V2\\\\code\\\\execution\\\\RUN_EXECUTION.ps1\\\", line 1\\n    cd C:\\\\LumaTrader\\\\INSTITUTIONAL_STACK_V2\\\\code\\\\execution\\n       ^\\nSyntaxError: invalid syntax\\n\"` |"
+        },
+        {
+          "line": 66,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 700 | YES | NO | `        for p in sorted(exec_dir.glob(\"RUN_EXECUTION*\"), key=lambda x: x.name.lower()):` |"
+        },
+        {
+          "line": 75,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 14 | YES | NO | `  # Live mode is rejected. Use execution/live_executor.py after readiness gates.` |"
+        },
+        {
+          "line": 84,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 20 | YES | NO | `from execution.order_router import OrderRouter, RouteIntent` |"
+        },
+        {
+          "line": 85,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 1747 | YES | NO | `    order_router = OrderRouter()` |"
+        },
+        {
+          "line": 86,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 2018 | YES | NO | `        order_template = order_router.build_primary(route_intent, validate_only=True)` |"
+        },
+        {
+          "line": 87,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 2019 | YES | NO | `        close_template = order_router.build_close_template(route_intent)` |"
+        },
+        {
+          "line": 88,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 2472 | YES | NO | `        order_template = order_router.build_primary(route_intent, validate_only=True)` |"
+        },
+        {
+          "line": 89,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 2473 | YES | NO | `        close_template = order_router.build_close_template(route_intent)` |"
+        },
+        {
+          "line": 98,
+          "patterns": [
+            "kraken_live_growth_controller"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 14 | YES | NO | `CONTROLLER_SCRIPT = EXEC / \"kraken_live_growth_controller.py\"` |"
+        },
+        {
+          "line": 99,
+          "patterns": [
+            "kraken_live_growth_controller"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 87 | YES | NO | `    run_step(build_controller_cmd(args), \"kraken_live_growth_controller\")` |"
+        },
+        {
+          "line": 108,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 27 | YES | NO | `     Not implemented. Use execution/live_executor.py for real orders.` |"
+        },
+        {
+          "line": 109,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 581 | YES | NO | `            \"code/execution/live_executor.py after production readiness gates pass.\"` |"
+        },
+        {
+          "line": 118,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 25 | YES | NO | `ticker, and symbol-awareness services. The large `live_executor.py` and` |"
+        },
+        {
+          "line": 127,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 9 | YES | NO | `- code\\execution\\RUN_LIVE_COMPOUNDING_STACK.ps1` |"
+        },
+        {
+          "line": 128,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 10 | YES | NO | `  Backup: code\\execution\\RUN_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect` |"
+        },
+        {
+          "line": 129,
+          "patterns": [
+            "SUPERVISE_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 11 | YES | NO | `- code\\execution\\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1` |"
+        },
+        {
+          "line": 130,
+          "patterns": [
+            "SUPERVISE_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 12 | YES | NO | `  Backup: code\\execution\\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect` |"
+        },
+        {
+          "line": 131,
+          "patterns": [
+            "order_safety_gate"
+          ],
+          "raw_live_reference": false,
+          "safe_reference": true,
+          "text": "| 18 | NO | YES | `- Old launchers cannot bypass order_safety_gate.py through these entrypoints.` |"
+        },
+        {
+          "line": 140,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 12 | YES | NO | `          \"text\": \"- **Live executor duplicate-child false positive** \\u2014 Rewrote `_is_duplicate_child_executor()` in `live_executor.py`. Old PID-recycling edge case caused executor to self-block on launch. New logic uses env-marker + parent-PID + commandline triple-check.\"` |"
+        },
+        {
+          "line": 141,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 17 | YES | NO | `            \"RUN_LIVE_COMPOUNDING_STACK\"` |"
+        },
+        {
+          "line": 142,
+          "patterns": [
+            "RUN_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 21 | YES | NO | `          \"text\": \"- **Stale env var on executor relaunch** \\u2014 `RUN_LIVE_COMPOUNDING_STACK.ps1` now clears `LUMA_LIVE_EXECUTOR_ROOT_PID` before each executor spawn.\"` |"
+        },
+        {
+          "line": 143,
+          "patterns": [
+            "approval_autofire_daemon"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 33 | YES | NO | `            \"approval_autofire_daemon\"` |"
+        },
+        {
+          "line": 144,
+          "patterns": [
+            "approval_autofire_daemon"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 37 | YES | NO | `          \"text\": \"    \\\"decision_reason\\\": \\\"approval_autofire_daemon\\\",\"` |"
+        },
+        {
+          "line": 145,
+          "patterns": [
+            "live_executor\\.py"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 53 | YES | NO | `          \"text\": \"    'code/execution/live_executor.py',\"` |"
+        },
+        {
+          "line": 146,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 58 | YES | NO | `            \"order_router\"` |"
+        },
+        {
+          "line": 147,
+          "patterns": [
+            "order_router"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 62 | YES | NO | `          \"text\": \"    'code/execution/order_router.py',\"` |"
+        },
+        {
+          "line": 148,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 74 | YES | NO | `            \"RUN_EXECUTION\"` |"
+        },
+        {
+          "line": 149,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 78 | YES | NO | `          \"text\": \"      \\\"script\\\": \\\"C:\\\\\\\\LumaTrader\\\\\\\\INSTITUTIONAL_STACK_V2\\\\\\\\code\\\\\\\\execution\\\\\\\\RUN_EXECUTION.ps1\\\",\"` |"
+        },
+        {
+          "line": 150,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 83 | YES | NO | `            \"RUN_EXECUTION\"` |"
+        },
+        {
+          "line": 151,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 87 | YES | NO | `          \"text\": \"      \\\"stderr_tail\\\": \\\"  File \\\\\\\"C:\\\\\\\\LumaTrader\\\\\\\\INSTITUTIONAL_STACK_V2\\\\\\\\code\\\\\\\\execution\\\\\\\\RUN_EXECUTION.ps1\\\\\\\", line 1\\\\n    cd C:\\\\\\\\LumaTrader\\\\\\\\INSTITUTIONAL_STACK_V2\\\\\\\\code\\\\\\\\execution\\\\n       ^\\\\nSyntaxError: invalid syntax\\\\n\\\"\"` |"
+        },
+        {
+          "line": 152,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 99 | YES | NO | `            \"RUN_EXECUTION\"` |"
+        },
+        {
+          "line": 153,
+          "patterns": [
+            "RUN_EXECUTION"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "| 103 | YES | NO | `          \"text\": \"        for p in sorted(exec_dir.glob(\\\"RUN_EXECUTION*\\\"), key=lambda x: x.name.lower()):\"` |"
+        }
+      ],
+      "path": "out/safety_reports/LATEST_live_entrypoint_audit.md",
+      "raw_count": 116,
+      "safe_count": 51
+    },
+    {
+      "hits": [
+        {
           "line": 13,
           "patterns": [
             "safe_live_executor"
@@ -650,62 +1437,44 @@
     {
       "hits": [
         {
-          "line": 29,
+          "line": 4,
           "patterns": [
-            "approval_autofire_daemon"
+            "RUN_LIVE_COMPOUNDING_STACK"
           ],
           "raw_live_reference": true,
           "safe_reference": false,
-          "text": "$daemonScript = Join-Path $execDir \"approval_autofire_daemon.py\""
+          "text": "# Legacy launcher: code\\execution\\RUN_LIVE_COMPOUNDING_STACK.ps1"
         },
         {
-          "line": 38,
+          "line": 5,
           "patterns": [
-            "live_executor\\.py"
+            "RUN_LIVE_COMPOUNDING_STACK"
           ],
           "raw_live_reference": true,
           "safe_reference": false,
-          "text": "$executorScript = Join-Path $execDir \"live_executor.py\""
+          "text": "# Backup file: code\\execution\\RUN_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect"
         },
         {
-          "line": 74,
+          "line": 18,
           "patterns": [
-            "approval_autofire_daemon"
+            "RUN_LIVE_COMPOUNDING_STACK"
           ],
           "raw_live_reference": true,
           "safe_reference": false,
-          "text": "    $running = Get-ProcsByPattern \"*approval_autofire_daemon.py*\" | Select-Object -First 1"
+          "text": "=== RUN_LIVE_COMPOUNDING_STACK.ps1 redirected to safe no-orders launcher ===\" -ForegroundColor Cyan"
         },
         {
-          "line": 85,
+          "line": 20,
           "patterns": [
-            "approval_autofire_daemon"
+            "RUN_LIVE_COMPOUNDING_STACK"
           ],
           "raw_live_reference": true,
           "safe_reference": false,
-          "text": "        $running = Get-ProcsByPattern \"*approval_autofire_daemon.py*\" | Select-Object -First 1"
-        },
-        {
-          "line": 96,
-          "patterns": [
-            "live_executor\\.py"
-          ],
-          "raw_live_reference": true,
-          "safe_reference": false,
-          "text": "    $running = Get-ProcsByPattern \"*live_executor.py*\" | Select-Object -First 1"
-        },
-        {
-          "line": 115,
-          "patterns": [
-            "live_executor\\.py"
-          ],
-          "raw_live_reference": true,
-          "safe_reference": false,
-          "text": "        $running = Get-ProcsByPattern \"*live_executor.py*\" | Select-Object -First 1"
+          "text": "Write-Host \"Original backup: code\\execution\\RUN_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect\" -ForegroundColor Yellow"
         }
       ],
       "path": "code/execution/RUN_LIVE_COMPOUNDING_STACK.ps1",
-      "raw_count": 6,
+      "raw_count": 4,
       "safe_count": 0
     },
     {
@@ -986,35 +1755,44 @@
     {
       "hits": [
         {
-          "line": 13,
+          "line": 4,
           "patterns": [
-            "RUN_LIVE_COMPOUNDING_STACK"
+            "SUPERVISE_LIVE_COMPOUNDING_STACK"
           ],
           "raw_live_reference": true,
           "safe_reference": false,
-          "text": "$launcher = Join-Path $execDir \"RUN_LIVE_COMPOUNDING_STACK.ps1\""
+          "text": "# Legacy launcher: code\\execution\\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1"
         },
         {
-          "line": 128,
+          "line": 5,
           "patterns": [
-            "approval_autofire_daemon"
+            "SUPERVISE_LIVE_COMPOUNDING_STACK"
           ],
           "raw_live_reference": true,
           "safe_reference": false,
-          "text": "        $daemonCount = Get-ProcessCount \"*approval_autofire_daemon.py*\""
+          "text": "# Backup file: code\\execution\\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect"
         },
         {
-          "line": 129,
+          "line": 18,
           "patterns": [
-            "live_executor\\.py"
+            "SUPERVISE_LIVE_COMPOUNDING_STACK"
           ],
           "raw_live_reference": true,
           "safe_reference": false,
-          "text": "        $executorCount = Get-ProcessCount \"*live_executor.py*\""
+          "text": "=== SUPERVISE_LIVE_COMPOUNDING_STACK.ps1 redirected to safe no-orders launcher ===\" -ForegroundColor Cyan"
+        },
+        {
+          "line": 20,
+          "patterns": [
+            "SUPERVISE_LIVE_COMPOUNDING_STACK"
+          ],
+          "raw_live_reference": true,
+          "safe_reference": false,
+          "text": "Write-Host \"Original backup: code\\execution\\SUPERVISE_LIVE_COMPOUNDING_STACK.ps1.bak_pre_safe_redirect\" -ForegroundColor Yellow"
         }
       ],
       "path": "code/execution/SUPERVISE_LIVE_COMPOUNDING_STACK.ps1",
-      "raw_count": 3,
+      "raw_count": 4,
       "safe_count": 0
     },
     {
@@ -1173,7 +1951,7 @@
       "safe_count": 0
     }
   ],
-  "generated_utc": "2026-06-16T01:20:31.207426+00:00",
+  "generated_utc": "2026-06-16T01:22:53.847137+00:00",
   "meaning": [
     "Raw live references are not automatically unsafe, but they must route through safe_live_executor/order_safety_gate before any live order path is trusted.",
     "Patch 5 only audits and creates a safe launcher; it does not rewrite every legacy script yet.",
@@ -1181,8 +1959,8 @@
   ],
   "repo_root": "C:\\LumenCore_GitHub\\lumen-core-public",
   "summary": {
-    "files_with_raw_live_references": 29,
-    "files_with_safe_references": 11,
-    "total_files_with_hits": 35
+    "files_with_raw_live_references": 32,
+    "files_with_safe_references": 14,
+    "total_files_with_hits": 38
   }
 }

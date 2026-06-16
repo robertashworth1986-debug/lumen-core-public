@@ -4,7 +4,7 @@
   "decision": {
     "approved": false,
     "blockers": [],
-    "generated_utc": "2026-06-16T01:20:28.173821+00:00",
+    "generated_utc": "2026-06-16T01:22:50.853511+00:00",
     "intent": {
       "notional_usd": 1.0,
       "order_type": "market",
@@ -24,7 +24,7 @@
   },
   "executor_called": false,
   "executor_result": null,
-  "generated_utc": "2026-06-16T01:20:28.174333+00:00",
+  "generated_utc": "2026-06-16T01:22:50.854048+00:00",
   "intent": {
     "notional_usd": 1.0,
     "order_type": "market",
