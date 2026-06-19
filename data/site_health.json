@@ -1,0 +1,14 @@
+{
+  "checked_utc": "2026-06-19T20:57:26Z",
+  "overall": "degraded",
+  "healthy_count": 5,
+  "total_count": 6,
+  "endpoints": {
+  "portal": { "url": "https://lumen-core.ai/", "status": 200, "ok": true },
+  "evidence": { "url": "https://lumen-core.ai/evidence/", "status": 200, "ok": true },
+  "kraken_dashboard": { "url": "https://lumen-core.ai/kraken_execution_dashboard.html", "status": 200, "ok": true },
+  "mission_control": { "url": "https://lumen-core.ai/mission_control.html", "status": 200, "ok": true },
+  "approval_hub": { "url": "https://lumen-core.ai/agent_approval_hub.html", "status": 404000, "ok": false },
+  "forecast": { "url": "https://lumen-core.ai/forecast.html", "status": 200, "ok": true }
+  }
+}
