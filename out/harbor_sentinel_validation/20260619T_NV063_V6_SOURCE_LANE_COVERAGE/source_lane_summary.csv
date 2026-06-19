@@ -1,0 +1,631 @@
+condition,scenario,seed,source_lane,source_family,observations,available_observations,availability_rate,unique_tracks,synthetic_only,authorized_operational_data,note
+nominal_24_tracks,0,1900000,generated_ais_like_surface,AIS-like cooperative beacon,2160,2087,0.9662037037037037,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,0,1900000,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,0,1900000,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,1,1910007,generated_ais_like_surface,AIS-like cooperative beacon,2160,2075,0.9606481481481481,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,1,1910007,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,1,1910007,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,2,1920014,generated_ais_like_surface,AIS-like cooperative beacon,2160,2068,0.9574074074074074,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,2,1920014,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,2,1920014,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,3,1930021,generated_ais_like_surface,AIS-like cooperative beacon,2160,2077,0.961574074074074,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,3,1930021,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,3,1930021,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,4,1940028,generated_ais_like_surface,AIS-like cooperative beacon,2160,2064,0.9555555555555556,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,4,1940028,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,4,1940028,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,5,1950035,generated_ais_like_surface,AIS-like cooperative beacon,2160,2069,0.9578703703703704,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,5,1950035,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,5,1950035,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,6,1960042,generated_ais_like_surface,AIS-like cooperative beacon,2160,2071,0.9587962962962963,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,6,1960042,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,6,1960042,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,7,1970049,generated_ais_like_surface,AIS-like cooperative beacon,2160,2073,0.9597222222222223,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,7,1970049,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,7,1970049,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,8,1980056,generated_ais_like_surface,AIS-like cooperative beacon,2160,2078,0.962037037037037,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,8,1980056,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,8,1980056,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,9,1990063,generated_ais_like_surface,AIS-like cooperative beacon,2160,2077,0.961574074074074,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,9,1990063,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,9,1990063,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,10,2000070,generated_ais_like_surface,AIS-like cooperative beacon,2160,2073,0.9597222222222223,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,10,2000070,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,10,2000070,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,11,2010077,generated_ais_like_surface,AIS-like cooperative beacon,2160,2076,0.9611111111111111,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,11,2010077,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,11,2010077,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,12,2020084,generated_ais_like_surface,AIS-like cooperative beacon,2160,2072,0.9592592592592593,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,12,2020084,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,12,2020084,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,13,2030091,generated_ais_like_surface,AIS-like cooperative beacon,2160,2070,0.9583333333333334,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,13,2030091,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,13,2030091,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,14,2040098,generated_ais_like_surface,AIS-like cooperative beacon,2160,2086,0.9657407407407408,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,14,2040098,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,14,2040098,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,15,2050105,generated_ais_like_surface,AIS-like cooperative beacon,2160,2081,0.9634259259259259,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,15,2050105,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,15,2050105,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,16,2060112,generated_ais_like_surface,AIS-like cooperative beacon,2160,2071,0.9587962962962963,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,16,2060112,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,16,2060112,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,17,2070119,generated_ais_like_surface,AIS-like cooperative beacon,2160,2063,0.9550925925925926,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,17,2070119,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,17,2070119,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,18,2080126,generated_ais_like_surface,AIS-like cooperative beacon,2160,2073,0.9597222222222223,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,18,2080126,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,18,2080126,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,19,2090133,generated_ais_like_surface,AIS-like cooperative beacon,2160,2081,0.9634259259259259,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,19,2090133,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,19,2090133,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,20,2100140,generated_ais_like_surface,AIS-like cooperative beacon,2160,2076,0.9611111111111111,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,20,2100140,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,20,2100140,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,21,2110147,generated_ais_like_surface,AIS-like cooperative beacon,2160,2073,0.9597222222222223,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,21,2110147,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,21,2110147,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,22,2120154,generated_ais_like_surface,AIS-like cooperative beacon,2160,2077,0.961574074074074,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,22,2120154,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,22,2120154,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,23,2130161,generated_ais_like_surface,AIS-like cooperative beacon,2160,2081,0.9634259259259259,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,23,2130161,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,23,2130161,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,24,2140168,generated_ais_like_surface,AIS-like cooperative beacon,2160,2064,0.9555555555555556,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,24,2140168,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,24,2140168,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,25,2150175,generated_ais_like_surface,AIS-like cooperative beacon,2160,2065,0.9560185185185185,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,25,2150175,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,25,2150175,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,26,2160182,generated_ais_like_surface,AIS-like cooperative beacon,2160,2076,0.9611111111111111,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,26,2160182,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,26,2160182,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,27,2170189,generated_ais_like_surface,AIS-like cooperative beacon,2160,2082,0.9638888888888889,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,27,2170189,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,27,2170189,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,28,2180196,generated_ais_like_surface,AIS-like cooperative beacon,2160,2072,0.9592592592592593,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,28,2180196,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,28,2180196,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+nominal_24_tracks,29,2190203,generated_ais_like_surface,AIS-like cooperative beacon,2160,2070,0.9583333333333334,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+nominal_24_tracks,29,2190203,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+nominal_24_tracks,29,2190203,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,0,2900000,generated_ais_like_surface,AIS-like cooperative beacon,8640,8286,0.9590277777777778,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,0,2900000,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,0,2900000,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,1,2910007,generated_ais_like_surface,AIS-like cooperative beacon,8640,8310,0.9618055555555556,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,1,2910007,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,1,2910007,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,2,2920014,generated_ais_like_surface,AIS-like cooperative beacon,8640,8310,0.9618055555555556,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,2,2920014,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,2,2920014,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,3,2930021,generated_ais_like_surface,AIS-like cooperative beacon,8640,8266,0.9567129629629629,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,3,2930021,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,3,2930021,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,4,2940028,generated_ais_like_surface,AIS-like cooperative beacon,8640,8306,0.9613425925925926,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,4,2940028,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,4,2940028,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,5,2950035,generated_ais_like_surface,AIS-like cooperative beacon,8640,8295,0.9600694444444444,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,5,2950035,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,5,2950035,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,6,2960042,generated_ais_like_surface,AIS-like cooperative beacon,8640,8331,0.9642361111111111,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,6,2960042,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,6,2960042,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,7,2970049,generated_ais_like_surface,AIS-like cooperative beacon,8640,8321,0.9630787037037037,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,7,2970049,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,7,2970049,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,8,2980056,generated_ais_like_surface,AIS-like cooperative beacon,8640,8312,0.962037037037037,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,8,2980056,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,8,2980056,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,9,2990063,generated_ais_like_surface,AIS-like cooperative beacon,8640,8289,0.959375,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,9,2990063,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,9,2990063,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,10,3000070,generated_ais_like_surface,AIS-like cooperative beacon,8640,8267,0.9568287037037037,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,10,3000070,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,10,3000070,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,11,3010077,generated_ais_like_surface,AIS-like cooperative beacon,8640,8310,0.9618055555555556,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,11,3010077,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,11,3010077,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,12,3020084,generated_ais_like_surface,AIS-like cooperative beacon,8640,8299,0.9605324074074074,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,12,3020084,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,12,3020084,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,13,3030091,generated_ais_like_surface,AIS-like cooperative beacon,8640,8305,0.9612268518518519,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,13,3030091,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,13,3030091,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,14,3040098,generated_ais_like_surface,AIS-like cooperative beacon,8640,8314,0.9622685185185185,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,14,3040098,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,14,3040098,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,15,3050105,generated_ais_like_surface,AIS-like cooperative beacon,8640,8341,0.9653935185185185,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,15,3050105,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,15,3050105,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,16,3060112,generated_ais_like_surface,AIS-like cooperative beacon,8640,8286,0.9590277777777778,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,16,3060112,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,16,3060112,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,17,3070119,generated_ais_like_surface,AIS-like cooperative beacon,8640,8306,0.9613425925925926,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,17,3070119,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,17,3070119,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,18,3080126,generated_ais_like_surface,AIS-like cooperative beacon,8640,8292,0.9597222222222223,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,18,3080126,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,18,3080126,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,19,3090133,generated_ais_like_surface,AIS-like cooperative beacon,8640,8318,0.9627314814814815,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,19,3090133,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,19,3090133,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,20,3100140,generated_ais_like_surface,AIS-like cooperative beacon,8640,8301,0.9607638888888889,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,20,3100140,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,20,3100140,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,21,3110147,generated_ais_like_surface,AIS-like cooperative beacon,8640,8285,0.9589120370370371,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,21,3110147,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,21,3110147,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,22,3120154,generated_ais_like_surface,AIS-like cooperative beacon,8640,8278,0.9581018518518518,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,22,3120154,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,22,3120154,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,23,3130161,generated_ais_like_surface,AIS-like cooperative beacon,8640,8315,0.9623842592592593,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,23,3130161,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,23,3130161,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,24,3140168,generated_ais_like_surface,AIS-like cooperative beacon,8640,8299,0.9605324074074074,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,24,3140168,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,24,3140168,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,25,3150175,generated_ais_like_surface,AIS-like cooperative beacon,8640,8306,0.9613425925925926,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,25,3150175,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,25,3150175,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,26,3160182,generated_ais_like_surface,AIS-like cooperative beacon,8640,8309,0.9616898148148149,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,26,3160182,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,26,3160182,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,27,3170189,generated_ais_like_surface,AIS-like cooperative beacon,8640,8289,0.959375,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,27,3170189,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,27,3170189,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,28,3180196,generated_ais_like_surface,AIS-like cooperative beacon,8640,8278,0.9581018518518518,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,28,3180196,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,28,3180196,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+congested_96_tracks,29,3190203,generated_ais_like_surface,AIS-like cooperative beacon,8640,8289,0.959375,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+congested_96_tracks,29,3190203,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8640,1.0,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+congested_96_tracks,29,3190203,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,0,3900000,generated_ais_like_surface,AIS-like cooperative beacon,2160,2081,0.9634259259259259,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,0,3900000,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,0,3900000,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,1,3910007,generated_ais_like_surface,AIS-like cooperative beacon,2160,2082,0.9638888888888889,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,1,3910007,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,1,3910007,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,2,3920014,generated_ais_like_surface,AIS-like cooperative beacon,2160,2078,0.962037037037037,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,2,3920014,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,2,3920014,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,3,3930021,generated_ais_like_surface,AIS-like cooperative beacon,2160,2076,0.9611111111111111,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,3,3930021,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,3,3930021,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,4,3940028,generated_ais_like_surface,AIS-like cooperative beacon,2160,2080,0.9629629629629629,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,4,3940028,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,4,3940028,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,5,3950035,generated_ais_like_surface,AIS-like cooperative beacon,2160,2071,0.9587962962962963,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,5,3950035,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,5,3950035,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,6,3960042,generated_ais_like_surface,AIS-like cooperative beacon,2160,2079,0.9625,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,6,3960042,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,6,3960042,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,7,3970049,generated_ais_like_surface,AIS-like cooperative beacon,2160,2075,0.9606481481481481,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,7,3970049,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,7,3970049,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,8,3980056,generated_ais_like_surface,AIS-like cooperative beacon,2160,2066,0.9564814814814815,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,8,3980056,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,8,3980056,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,9,3990063,generated_ais_like_surface,AIS-like cooperative beacon,2160,2072,0.9592592592592593,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,9,3990063,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,9,3990063,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,10,4000070,generated_ais_like_surface,AIS-like cooperative beacon,2160,2066,0.9564814814814815,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,10,4000070,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,10,4000070,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,11,4010077,generated_ais_like_surface,AIS-like cooperative beacon,2160,2063,0.9550925925925926,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,11,4010077,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,11,4010077,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,12,4020084,generated_ais_like_surface,AIS-like cooperative beacon,2160,2081,0.9634259259259259,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,12,4020084,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,12,4020084,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,13,4030091,generated_ais_like_surface,AIS-like cooperative beacon,2160,2074,0.9601851851851851,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,13,4030091,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,13,4030091,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,14,4040098,generated_ais_like_surface,AIS-like cooperative beacon,2160,2076,0.9611111111111111,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,14,4040098,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,14,4040098,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,15,4050105,generated_ais_like_surface,AIS-like cooperative beacon,2160,2079,0.9625,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,15,4050105,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,15,4050105,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,16,4060112,generated_ais_like_surface,AIS-like cooperative beacon,2160,2083,0.9643518518518519,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,16,4060112,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,16,4060112,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,17,4070119,generated_ais_like_surface,AIS-like cooperative beacon,2160,2076,0.9611111111111111,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,17,4070119,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,17,4070119,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,18,4080126,generated_ais_like_surface,AIS-like cooperative beacon,2160,2069,0.9578703703703704,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,18,4080126,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,18,4080126,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,19,4090133,generated_ais_like_surface,AIS-like cooperative beacon,2160,2072,0.9592592592592593,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,19,4090133,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,19,4090133,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,20,4100140,generated_ais_like_surface,AIS-like cooperative beacon,2160,2057,0.9523148148148148,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,20,4100140,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,20,4100140,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,21,4110147,generated_ais_like_surface,AIS-like cooperative beacon,2160,2063,0.9550925925925926,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,21,4110147,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,21,4110147,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,22,4120154,generated_ais_like_surface,AIS-like cooperative beacon,2160,2065,0.9560185185185185,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,22,4120154,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,22,4120154,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,23,4130161,generated_ais_like_surface,AIS-like cooperative beacon,2160,2086,0.9657407407407408,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,23,4130161,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,23,4130161,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,24,4140168,generated_ais_like_surface,AIS-like cooperative beacon,2160,2065,0.9560185185185185,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,24,4140168,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,24,4140168,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,25,4150175,generated_ais_like_surface,AIS-like cooperative beacon,2160,2086,0.9657407407407408,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,25,4150175,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,25,4150175,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,26,4160182,generated_ais_like_surface,AIS-like cooperative beacon,2160,2087,0.9662037037037037,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,26,4160182,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,26,4160182,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,27,4170189,generated_ais_like_surface,AIS-like cooperative beacon,2160,2068,0.9574074074074074,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,27,4170189,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,27,4170189,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,28,4180196,generated_ais_like_surface,AIS-like cooperative beacon,2160,2078,0.962037037037037,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,28,4180196,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,28,4180196,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+sensor_shift_1_5x,29,4190203,generated_ais_like_surface,AIS-like cooperative beacon,2160,2068,0.9574074074074074,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+sensor_shift_1_5x,29,4190203,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+sensor_shift_1_5x,29,4190203,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,0,4900000,generated_ais_like_surface,AIS-like cooperative beacon,2160,2040,0.9444444444444444,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,0,4900000,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2122,0.9824074074074074,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,0,4900000,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,1,4910007,generated_ais_like_surface,AIS-like cooperative beacon,2160,2022,0.9361111111111111,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,1,4910007,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2126,0.9842592592592593,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,1,4910007,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,2,4920014,generated_ais_like_surface,AIS-like cooperative beacon,2160,2030,0.9398148148148148,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,2,4920014,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2116,0.9796296296296296,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,2,4920014,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,3,4930021,generated_ais_like_surface,AIS-like cooperative beacon,2160,2035,0.9421296296296297,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,3,4930021,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2115,0.9791666666666666,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,3,4930021,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,4,4940028,generated_ais_like_surface,AIS-like cooperative beacon,2160,2042,0.9453703703703704,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,4,4940028,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2109,0.9763888888888889,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,4,4940028,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,5,4950035,generated_ais_like_surface,AIS-like cooperative beacon,2160,2037,0.9430555555555555,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,5,4950035,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2126,0.9842592592592593,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,5,4950035,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,6,4960042,generated_ais_like_surface,AIS-like cooperative beacon,2160,2011,0.9310185185185185,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,6,4960042,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2111,0.9773148148148149,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,6,4960042,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,7,4970049,generated_ais_like_surface,AIS-like cooperative beacon,2160,2031,0.9402777777777778,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,7,4970049,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2120,0.9814814814814815,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,7,4970049,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,8,4980056,generated_ais_like_surface,AIS-like cooperative beacon,2160,2041,0.9449074074074074,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,8,4980056,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2120,0.9814814814814815,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,8,4980056,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,9,4990063,generated_ais_like_surface,AIS-like cooperative beacon,2160,2027,0.9384259259259259,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,9,4990063,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2113,0.9782407407407407,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,9,4990063,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,10,5000070,generated_ais_like_surface,AIS-like cooperative beacon,2160,2035,0.9421296296296297,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,10,5000070,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2124,0.9833333333333333,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,10,5000070,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,11,5010077,generated_ais_like_surface,AIS-like cooperative beacon,2160,2051,0.9495370370370371,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,11,5010077,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2112,0.9777777777777777,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,11,5010077,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,12,5020084,generated_ais_like_surface,AIS-like cooperative beacon,2160,2054,0.950925925925926,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,12,5020084,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2130,0.9861111111111112,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,12,5020084,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,13,5030091,generated_ais_like_surface,AIS-like cooperative beacon,2160,2030,0.9398148148148148,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,13,5030091,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2126,0.9842592592592593,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,13,5030091,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,14,5040098,generated_ais_like_surface,AIS-like cooperative beacon,2160,2045,0.9467592592592593,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,14,5040098,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2120,0.9814814814814815,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,14,5040098,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,15,5050105,generated_ais_like_surface,AIS-like cooperative beacon,2160,2035,0.9421296296296297,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,15,5050105,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2117,0.9800925925925926,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,15,5050105,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,16,5060112,generated_ais_like_surface,AIS-like cooperative beacon,2160,2034,0.9416666666666667,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,16,5060112,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2123,0.9828703703703704,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,16,5060112,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,17,5070119,generated_ais_like_surface,AIS-like cooperative beacon,2160,2026,0.937962962962963,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,17,5070119,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2120,0.9814814814814815,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,17,5070119,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,18,5080126,generated_ais_like_surface,AIS-like cooperative beacon,2160,2026,0.937962962962963,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,18,5080126,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2119,0.9810185185185185,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,18,5080126,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,19,5090133,generated_ais_like_surface,AIS-like cooperative beacon,2160,2026,0.937962962962963,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,19,5090133,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2120,0.9814814814814815,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,19,5090133,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,20,5100140,generated_ais_like_surface,AIS-like cooperative beacon,2160,2031,0.9402777777777778,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,20,5100140,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2118,0.9805555555555555,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,20,5100140,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,21,5110147,generated_ais_like_surface,AIS-like cooperative beacon,2160,2064,0.9555555555555556,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,21,5110147,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2110,0.9768518518518519,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,21,5110147,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,22,5120154,generated_ais_like_surface,AIS-like cooperative beacon,2160,2043,0.9458333333333333,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,22,5120154,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2122,0.9824074074074074,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,22,5120154,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,23,5130161,generated_ais_like_surface,AIS-like cooperative beacon,2160,2018,0.9342592592592592,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,23,5130161,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2135,0.9884259259259259,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,23,5130161,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,24,5140168,generated_ais_like_surface,AIS-like cooperative beacon,2160,2023,0.9365740740740741,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,24,5140168,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2122,0.9824074074074074,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,24,5140168,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,25,5150175,generated_ais_like_surface,AIS-like cooperative beacon,2160,2039,0.9439814814814815,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,25,5150175,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2122,0.9824074074074074,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,25,5150175,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,26,5160182,generated_ais_like_surface,AIS-like cooperative beacon,2160,2047,0.9476851851851852,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,26,5160182,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2119,0.9810185185185185,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,26,5160182,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,27,5170189,generated_ais_like_surface,AIS-like cooperative beacon,2160,2027,0.9384259259259259,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,27,5170189,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2128,0.9851851851851852,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,27,5170189,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,28,5180196,generated_ais_like_surface,AIS-like cooperative beacon,2160,2030,0.9398148148148148,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,28,5180196,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2126,0.9842592592592593,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,28,5180196,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_point_dropout_2pct,29,5190203,generated_ais_like_surface,AIS-like cooperative beacon,2160,2039,0.9439814814814815,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_point_dropout_2pct,29,5190203,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2136,0.9888888888888889,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_point_dropout_2pct,29,5190203,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,0,5900000,generated_ais_like_surface,AIS-like cooperative beacon,2160,2088,0.9666666666666667,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,0,5900000,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2140,0.9907407407407407,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,0,5900000,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,1,5910007,generated_ais_like_surface,AIS-like cooperative beacon,2160,2075,0.9606481481481481,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,1,5910007,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,1,5910007,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,2,5920014,generated_ais_like_surface,AIS-like cooperative beacon,2160,2076,0.9611111111111111,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,2,5920014,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,2,5920014,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,3,5930021,generated_ais_like_surface,AIS-like cooperative beacon,2160,2054,0.950925925925926,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,3,5930021,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2130,0.9861111111111112,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,3,5930021,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,4,5940028,generated_ais_like_surface,AIS-like cooperative beacon,2160,2077,0.961574074074074,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,4,5940028,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2133,0.9875,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,4,5940028,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,5,5950035,generated_ais_like_surface,AIS-like cooperative beacon,2160,2054,0.950925925925926,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,5,5950035,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2133,0.9875,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,5,5950035,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,6,5960042,generated_ais_like_surface,AIS-like cooperative beacon,2160,2045,0.9467592592592593,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,6,5960042,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,6,5960042,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,7,5970049,generated_ais_like_surface,AIS-like cooperative beacon,2160,2061,0.9541666666666667,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,7,5970049,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2140,0.9907407407407407,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,7,5970049,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,8,5980056,generated_ais_like_surface,AIS-like cooperative beacon,2160,2046,0.9472222222222222,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,8,5980056,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2115,0.9791666666666666,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,8,5980056,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,9,5990063,generated_ais_like_surface,AIS-like cooperative beacon,2160,2045,0.9467592592592593,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,9,5990063,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,9,5990063,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,10,6000070,generated_ais_like_surface,AIS-like cooperative beacon,2160,2038,0.9435185185185185,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,10,6000070,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2133,0.9875,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,10,6000070,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,11,6010077,generated_ais_like_surface,AIS-like cooperative beacon,2160,2077,0.961574074074074,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,11,6010077,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,11,6010077,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,12,6020084,generated_ais_like_surface,AIS-like cooperative beacon,2160,2073,0.9597222222222223,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,12,6020084,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2142,0.9916666666666667,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,12,6020084,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,13,6030091,generated_ais_like_surface,AIS-like cooperative beacon,2160,2056,0.9518518518518518,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,13,6030091,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,13,6030091,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,14,6040098,generated_ais_like_surface,AIS-like cooperative beacon,2160,2053,0.950462962962963,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,14,6040098,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,14,6040098,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,15,6050105,generated_ais_like_surface,AIS-like cooperative beacon,2160,2075,0.9606481481481481,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,15,6050105,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,15,6050105,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,16,6060112,generated_ais_like_surface,AIS-like cooperative beacon,2160,2065,0.9560185185185185,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,16,6060112,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2131,0.986574074074074,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,16,6060112,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,17,6070119,generated_ais_like_surface,AIS-like cooperative beacon,2160,2043,0.9458333333333333,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,17,6070119,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,17,6070119,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,18,6080126,generated_ais_like_surface,AIS-like cooperative beacon,2160,2077,0.961574074074074,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,18,6080126,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2112,0.9777777777777777,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,18,6080126,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,19,6090133,generated_ais_like_surface,AIS-like cooperative beacon,2160,2065,0.9560185185185185,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,19,6090133,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2130,0.9861111111111112,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,19,6090133,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,20,6100140,generated_ais_like_surface,AIS-like cooperative beacon,2160,2080,0.9629629629629629,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,20,6100140,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2130,0.9861111111111112,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,20,6100140,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,21,6110147,generated_ais_like_surface,AIS-like cooperative beacon,2160,2058,0.9527777777777777,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,21,6110147,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,21,6110147,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,22,6120154,generated_ais_like_surface,AIS-like cooperative beacon,2160,2038,0.9435185185185185,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,22,6120154,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,22,6120154,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,23,6130161,generated_ais_like_surface,AIS-like cooperative beacon,2160,2045,0.9467592592592593,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,23,6130161,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2131,0.986574074074074,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,23,6130161,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,24,6140168,generated_ais_like_surface,AIS-like cooperative beacon,2160,2070,0.9583333333333334,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,24,6140168,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,24,6140168,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,25,6150175,generated_ais_like_surface,AIS-like cooperative beacon,2160,2079,0.9625,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,25,6150175,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2135,0.9884259259259259,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,25,6150175,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,26,6160182,generated_ais_like_surface,AIS-like cooperative beacon,2160,2076,0.9611111111111111,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,26,6160182,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,26,6160182,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,27,6170189,generated_ais_like_surface,AIS-like cooperative beacon,2160,2070,0.9583333333333334,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,27,6170189,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,27,6170189,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,28,6180196,generated_ais_like_surface,AIS-like cooperative beacon,2160,2050,0.9490740740740741,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,28,6180196,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2160,1.0,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,28,6180196,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+benign_burst_dropout_20pct,29,6190203,generated_ais_like_surface,AIS-like cooperative beacon,2160,2066,0.9564814814814815,12,True,False,Generated surface cooperative-source observations; not public AIS files.
+benign_burst_dropout_20pct,29,6190203,generated_adsb_like_air,ADS-B-like cooperative beacon,2160,2130,0.9861111111111112,12,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+benign_burst_dropout_20pct,29,6190203,generated_notional_radar_like_contact,Notional radar-like observation,4320,4320,1.0,24,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,0,6900000,generated_ais_like_surface,AIS-like cooperative beacon,8640,8094,0.9368055555555556,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,0,6900000,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8418,0.9743055555555555,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,0,6900000,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,1,6910007,generated_ais_like_surface,AIS-like cooperative beacon,8640,8108,0.9384259259259259,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,1,6910007,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8425,0.9751157407407407,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,1,6910007,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,2,6920014,generated_ais_like_surface,AIS-like cooperative beacon,8640,8116,0.9393518518518519,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,2,6920014,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8427,0.9753472222222223,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,2,6920014,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,3,6930021,generated_ais_like_surface,AIS-like cooperative beacon,8640,8091,0.9364583333333333,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,3,6930021,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8413,0.9737268518518518,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,3,6930021,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,4,6940028,generated_ais_like_surface,AIS-like cooperative beacon,8640,8106,0.9381944444444444,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,4,6940028,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8411,0.9734953703703704,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,4,6940028,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,5,6950035,generated_ais_like_surface,AIS-like cooperative beacon,8640,8165,0.9450231481481481,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,5,6950035,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8446,0.9775462962962963,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,5,6950035,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,6,6960042,generated_ais_like_surface,AIS-like cooperative beacon,8640,8085,0.9357638888888888,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,6,6960042,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8445,0.9774305555555556,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,6,6960042,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,7,6970049,generated_ais_like_surface,AIS-like cooperative beacon,8640,8090,0.9363425925925926,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,7,6970049,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8488,0.9824074074074074,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,7,6970049,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,8,6980056,generated_ais_like_surface,AIS-like cooperative beacon,8640,8018,0.9280092592592593,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,8,6980056,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8387,0.9707175925925926,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,8,6980056,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,9,6990063,generated_ais_like_surface,AIS-like cooperative beacon,8640,8138,0.9418981481481481,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,9,6990063,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8445,0.9774305555555556,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,9,6990063,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,10,7000070,generated_ais_like_surface,AIS-like cooperative beacon,8640,8135,0.9415509259259259,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,10,7000070,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8488,0.9824074074074074,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,10,7000070,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,11,7010077,generated_ais_like_surface,AIS-like cooperative beacon,8640,8068,0.9337962962962963,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,11,7010077,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8355,0.9670138888888888,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,11,7010077,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,12,7020084,generated_ais_like_surface,AIS-like cooperative beacon,8640,8025,0.9288194444444444,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,12,7020084,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8417,0.9741898148148148,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,12,7020084,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,13,7030091,generated_ais_like_surface,AIS-like cooperative beacon,8640,8078,0.9349537037037037,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,13,7030091,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8419,0.9744212962962963,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,13,7030091,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,14,7040098,generated_ais_like_surface,AIS-like cooperative beacon,8640,8057,0.9325231481481482,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,14,7040098,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8423,0.9748842592592593,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,14,7040098,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,15,7050105,generated_ais_like_surface,AIS-like cooperative beacon,8640,8045,0.9311342592592593,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,15,7050105,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8435,0.9762731481481481,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,15,7050105,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,16,7060112,generated_ais_like_surface,AIS-like cooperative beacon,8640,8101,0.9376157407407407,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,16,7060112,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8427,0.9753472222222223,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,16,7060112,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,17,7070119,generated_ais_like_surface,AIS-like cooperative beacon,8640,8030,0.9293981481481481,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,17,7070119,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8491,0.9827546296296297,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,17,7070119,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,18,7080126,generated_ais_like_surface,AIS-like cooperative beacon,8640,8162,0.944675925925926,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,18,7080126,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8426,0.9752314814814815,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,18,7080126,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,19,7090133,generated_ais_like_surface,AIS-like cooperative beacon,8640,8089,0.9362268518518518,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,19,7090133,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8377,0.9695601851851852,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,19,7090133,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,20,7100140,generated_ais_like_surface,AIS-like cooperative beacon,8640,8124,0.9402777777777778,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,20,7100140,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8456,0.9787037037037037,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,20,7100140,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,21,7110147,generated_ais_like_surface,AIS-like cooperative beacon,8640,8160,0.9444444444444444,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,21,7110147,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8408,0.9731481481481481,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,21,7110147,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,22,7120154,generated_ais_like_surface,AIS-like cooperative beacon,8640,8035,0.9299768518518519,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,22,7120154,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8478,0.98125,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,22,7120154,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,23,7130161,generated_ais_like_surface,AIS-like cooperative beacon,8640,8091,0.9364583333333333,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,23,7130161,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8456,0.9787037037037037,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,23,7130161,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,24,7140168,generated_ais_like_surface,AIS-like cooperative beacon,8640,8080,0.9351851851851852,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,24,7140168,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8424,0.975,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,24,7140168,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,25,7150175,generated_ais_like_surface,AIS-like cooperative beacon,8640,8044,0.9310185185185185,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,25,7150175,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8469,0.9802083333333333,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,25,7150175,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,26,7160182,generated_ais_like_surface,AIS-like cooperative beacon,8640,8100,0.9375,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,26,7160182,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8376,0.9694444444444444,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,26,7160182,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,27,7170189,generated_ais_like_surface,AIS-like cooperative beacon,8640,8035,0.9299768518518519,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,27,7170189,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8396,0.9717592592592592,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,27,7170189,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,28,7180196,generated_ais_like_surface,AIS-like cooperative beacon,8640,8092,0.9365740740740741,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,28,7180196,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8403,0.9725694444444445,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,28,7180196,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+combined_stress,29,7190203,generated_ais_like_surface,AIS-like cooperative beacon,8640,8028,0.9291666666666667,48,True,False,Generated surface cooperative-source observations; not public AIS files.
+combined_stress,29,7190203,generated_adsb_like_air,ADS-B-like cooperative beacon,8640,8372,0.9689814814814814,48,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+combined_stress,29,7190203,generated_notional_radar_like_contact,Notional radar-like observation,17280,17280,1.0,96,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,0,7900000,generated_ais_like_surface,AIS-like cooperative beacon,17280,15661,0.9063078703703704,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,0,7900000,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16314,0.9440972222222223,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,0,7900000,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,1,7910007,generated_ais_like_surface,AIS-like cooperative beacon,17280,15608,0.9032407407407408,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,1,7910007,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16348,0.9460648148148149,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,1,7910007,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,2,7920014,generated_ais_like_surface,AIS-like cooperative beacon,17280,15615,0.9036458333333334,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,2,7920014,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16371,0.9473958333333333,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,2,7920014,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,3,7930021,generated_ais_like_surface,AIS-like cooperative beacon,17280,15618,0.9038194444444444,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,3,7930021,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16274,0.9417824074074074,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,3,7930021,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,4,7940028,generated_ais_like_surface,AIS-like cooperative beacon,17280,15564,0.9006944444444445,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,4,7940028,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16436,0.9511574074074074,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,4,7940028,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,5,7950035,generated_ais_like_surface,AIS-like cooperative beacon,17280,15481,0.8958912037037037,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,5,7950035,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16297,0.943113425925926,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,5,7950035,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,6,7960042,generated_ais_like_surface,AIS-like cooperative beacon,17280,15613,0.9035300925925925,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,6,7960042,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16358,0.9466435185185185,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,6,7960042,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,7,7970049,generated_ais_like_surface,AIS-like cooperative beacon,17280,15611,0.9034143518518518,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,7,7970049,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16443,0.9515625,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,7,7970049,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,8,7980056,generated_ais_like_surface,AIS-like cooperative beacon,17280,15589,0.9021412037037037,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,8,7980056,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16361,0.9468171296296296,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,8,7980056,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,9,7990063,generated_ais_like_surface,AIS-like cooperative beacon,17280,15688,0.9078703703703703,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,9,7990063,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16310,0.9438657407407407,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,9,7990063,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,10,8000070,generated_ais_like_surface,AIS-like cooperative beacon,17280,15655,0.9059606481481481,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,10,8000070,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16385,0.9482060185185185,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,10,8000070,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,11,8010077,generated_ais_like_surface,AIS-like cooperative beacon,17280,15531,0.8987847222222223,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,11,8010077,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16347,0.9460069444444444,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,11,8010077,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,12,8020084,generated_ais_like_surface,AIS-like cooperative beacon,17280,15668,0.906712962962963,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,12,8020084,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16309,0.9438078703703704,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,12,8020084,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,13,8030091,generated_ais_like_surface,AIS-like cooperative beacon,17280,15645,0.9053819444444444,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,13,8030091,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16291,0.9427662037037037,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,13,8030091,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,14,8040098,generated_ais_like_surface,AIS-like cooperative beacon,17280,15557,0.9002893518518519,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,14,8040098,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16340,0.9456018518518519,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,14,8040098,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,15,8050105,generated_ais_like_surface,AIS-like cooperative beacon,17280,15676,0.9071759259259259,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,15,8050105,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16395,0.9487847222222222,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,15,8050105,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,16,8060112,generated_ais_like_surface,AIS-like cooperative beacon,17280,15576,0.9013888888888889,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,16,8060112,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16273,0.9417245370370371,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,16,8060112,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,17,8070119,generated_ais_like_surface,AIS-like cooperative beacon,17280,15715,0.9094328703703703,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,17,8070119,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16365,0.9470486111111112,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,17,8070119,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,18,8080126,generated_ais_like_surface,AIS-like cooperative beacon,17280,15575,0.9013310185185185,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,18,8080126,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16431,0.9508680555555555,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,18,8080126,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,19,8090133,generated_ais_like_surface,AIS-like cooperative beacon,17280,15563,0.900636574074074,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,19,8090133,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16313,0.9440393518518518,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,19,8090133,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,20,8100140,generated_ais_like_surface,AIS-like cooperative beacon,17280,15610,0.9033564814814815,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,20,8100140,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16374,0.9475694444444445,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,20,8100140,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,21,8110147,generated_ais_like_surface,AIS-like cooperative beacon,17280,15587,0.9020254629629629,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,21,8110147,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16310,0.9438657407407407,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,21,8110147,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,22,8120154,generated_ais_like_surface,AIS-like cooperative beacon,17280,15551,0.8999421296296296,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,22,8120154,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16225,0.9389467592592593,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,22,8120154,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,23,8130161,generated_ais_like_surface,AIS-like cooperative beacon,17280,15670,0.9068287037037037,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,23,8130161,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16288,0.9425925925925925,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,23,8130161,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,24,8140168,generated_ais_like_surface,AIS-like cooperative beacon,17280,15677,0.9072337962962963,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,24,8140168,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16394,0.9487268518518519,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,24,8140168,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,25,8150175,generated_ais_like_surface,AIS-like cooperative beacon,17280,15700,0.9085648148148148,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,25,8150175,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16375,0.9476273148148148,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,25,8150175,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,26,8160182,generated_ais_like_surface,AIS-like cooperative beacon,17280,15578,0.9015046296296296,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,26,8160182,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16204,0.9377314814814814,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,26,8160182,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,27,8170189,generated_ais_like_surface,AIS-like cooperative beacon,17280,15709,0.9090856481481482,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,27,8170189,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16367,0.9471643518518519,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,27,8170189,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,28,8180196,generated_ais_like_surface,AIS-like cooperative beacon,17280,15616,0.9037037037037037,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,28,8180196,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16315,0.9441550925925926,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,28,8180196,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.
+severe_combined_stress,29,8190203,generated_ais_like_surface,AIS-like cooperative beacon,17280,15633,0.9046875,96,True,False,Generated surface cooperative-source observations; not public AIS files.
+severe_combined_stress,29,8190203,generated_adsb_like_air,ADS-B-like cooperative beacon,17280,16096,0.9314814814814815,96,True,False,Generated air cooperative-source observations; not licensed ADS-B files.
+severe_combined_stress,29,8190203,generated_notional_radar_like_contact,Notional radar-like observation,34560,34560,1.0,192,True,False,Generated radar-like observations paired with every test track point.

@@ -95,9 +95,10 @@ def _aggregate_condition(
     warmup_steps: int,
     test_steps: int,
     anomaly_fraction: float,
-) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
     alerts_by_scenario: list[pd.DataFrame] = []
     scenario_rows: list[dict[str, Any]] = []
+    source_lane_rows: list[dict[str, Any]] = []
     started = time.perf_counter()
     for scenario in range(scenarios):
         seed = base_seed + scenario * 10_007
@@ -114,6 +115,9 @@ def _aggregate_condition(
             benign_beacon_dropout_burst_fraction=(
                 condition.benign_beacon_dropout_burst_fraction
             ),
+        )
+        source_lane_rows.extend(
+            _source_lane_rows(condition.name, scenario, seed, frame)
         )
         alerts = score_stream(
             frame,
@@ -207,6 +211,7 @@ def _aggregate_condition(
         "class_detection": class_detection,
         "alert_category_counts": aggregate["alert_category_counts"],
         "source_degradation": degradation,
+        "source_lane_coverage": _aggregate_source_lane_rows(source_lane_rows),
         "runtime_observation": {
             "elapsed_seconds": elapsed,
             "processed_test_points": processed_points,
@@ -216,7 +221,86 @@ def _aggregate_condition(
             "note": "Machine-specific Python prototype timing; not a latency SLA.",
         },
     }
-    return result, scenario_rows
+    return result, scenario_rows, source_lane_rows
+
+
+def _source_lane_rows(
+    condition: str,
+    scenario: int,
+    seed: int,
+    frame: pd.DataFrame,
+) -> list[dict[str, Any]]:
+    test = frame[~frame["warmup"]].copy()
+    rows: list[dict[str, Any]] = []
+    lane_specs = (
+        (
+            "generated_ais_like_surface",
+            "AIS-like cooperative beacon",
+            test["domain"].eq("maritime"),
+            "Generated surface cooperative-source observations; not public AIS files.",
+        ),
+        (
+            "generated_adsb_like_air",
+            "ADS-B-like cooperative beacon",
+            test["domain"].eq("air"),
+            "Generated air cooperative-source observations; not licensed ADS-B files.",
+        ),
+        (
+            "generated_notional_radar_like_contact",
+            "Notional radar-like observation",
+            pd.Series(True, index=test.index),
+            "Generated radar-like observations paired with every test track point.",
+        ),
+    )
+    for lane, source_family, mask, note in lane_specs:
+        lane_frame = test[mask]
+        if lane == "generated_notional_radar_like_contact":
+            available = int(len(lane_frame))
+        else:
+            available = int(lane_frame["beacon_available"].sum())
+        observations = int(len(lane_frame))
+        rows.append(
+            {
+                "condition": condition,
+                "scenario": scenario,
+                "seed": seed,
+                "source_lane": lane,
+                "source_family": source_family,
+                "observations": observations,
+                "available_observations": available,
+                "availability_rate": (
+                    available / observations if observations else 0.0
+                ),
+                "unique_tracks": int(lane_frame["track_id"].nunique()),
+                "synthetic_only": True,
+                "authorized_operational_data": False,
+                "note": note,
+            }
+        )
+    return rows
+
+
+def _aggregate_source_lane_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    coverage: dict[str, Any] = {}
+    if not rows:
+        return coverage
+    frame = pd.DataFrame(rows)
+    for lane, group in frame.groupby("source_lane", sort=True):
+        observations = int(group["observations"].sum())
+        available = int(group["available_observations"].sum())
+        coverage[lane] = {
+            "source_family": str(group["source_family"].iloc[0]),
+            "observations": observations,
+            "available_observations": available,
+            "availability_rate": (
+                available / observations if observations else 0.0
+            ),
+            "max_unique_tracks_per_scenario": int(group["unique_tracks"].max()),
+            "synthetic_only": True,
+            "authorized_operational_data": False,
+            "note": str(group["note"].iloc[0]),
+        }
+    return coverage
 
 
 def run_suite(
@@ -252,8 +336,9 @@ def run_suite(
 
     conditions: dict[str, Any] = {}
     scenario_rows: list[dict[str, Any]] = []
+    source_lane_rows: list[dict[str, Any]] = []
     for index, condition in enumerate(CONDITIONS):
-        condition_result, rows = _aggregate_condition(
+        condition_result, rows, lane_rows = _aggregate_condition(
             condition,
             scenarios=validation_scenarios,
             base_seed=validation_seed_base + index * 1_000_000,
@@ -265,11 +350,24 @@ def run_suite(
         )
         conditions[condition.name] = condition_result
         scenario_rows.extend(rows)
+        source_lane_rows.extend(lane_rows)
 
     summary = {
         "schema": "harbor_sentinel_validation_suite_v2",
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "evidence_boundary": EVIDENCE_BOUNDARY,
+        "representative_source_lanes": {
+            "mode": "generated feasibility inputs only",
+            "minimum_topic_source_set_modeled": [
+                "AIS-like cooperative surface beacon",
+                "ADS-B-like cooperative air beacon",
+                "notional radar-like contacts",
+            ],
+            "boundary": (
+                "This run does not acquire NOAA AIS, OpenSky ADS-B, Navy "
+                "radar, SSDS, or government-furnished operational data."
+            ),
+        },
         "score_configuration": {
             **SCORE_CONFIG,
             "note": SCORE_CONFIG_NOTE,
@@ -308,6 +406,12 @@ def run_suite(
         writer.writeheader()
         writer.writerows(scenario_rows)
 
+    source_lane_path = out_dir / "source_lane_summary.csv"
+    with source_lane_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(source_lane_rows[0]))
+        writer.writeheader()
+        writer.writerows(source_lane_rows)
+
     nominal = conditions["nominal_24_tracks"]
     combined = conditions["combined_stress"]
     severe = conditions["severe_combined_stress"]
@@ -340,6 +444,9 @@ def run_suite(
                 "- Beacon-loss review gate: five consecutive missing "
                 "cooperative observations generate source-integrity review "
                 "without automatically creating a threat candidate.",
+                "- Source lanes represented in this generated run: AIS-like "
+                "surface cooperative beacon, ADS-B-like air cooperative "
+                "beacon, and notional radar-like contacts.",
                 "",
                 "## Disjoint Nominal Validation",
                 "",
@@ -389,6 +496,22 @@ def run_suite(
                 "- Median source-degradation factor: "
                 f"{severe['source_degradation']['median_source_degradation_factor']:.2f}",
                 "",
+                "## Generated Source-Lane Coverage",
+                "",
+                "- Boundary: generated feasibility inputs only; no NOAA AIS, "
+                "OpenSky ADS-B, Navy radar, SSDS, or government-furnished "
+                "operational data are included.",
+                "- Nominal AIS-like availability: "
+                f"{nominal['source_lane_coverage']['generated_ais_like_surface']['availability_rate']:.3f}",
+                "- Nominal ADS-B-like availability: "
+                f"{nominal['source_lane_coverage']['generated_adsb_like_air']['availability_rate']:.3f}",
+                "- Nominal radar-like contact availability: "
+                f"{nominal['source_lane_coverage']['generated_notional_radar_like_contact']['availability_rate']:.3f}",
+                "- Severe-stress AIS-like availability: "
+                f"{severe['source_lane_coverage']['generated_ais_like_surface']['availability_rate']:.3f}",
+                "- Severe-stress ADS-B-like availability: "
+                f"{severe['source_lane_coverage']['generated_adsb_like_air']['availability_rate']:.3f}",
+                "",
                 "## Interpretation",
                 "",
                 "These results test threshold separation and software behavior "
@@ -406,7 +529,7 @@ def run_suite(
     )
 
     files = {}
-    for path in (summary_path, scenario_path, scorecard_path):
+    for path in (summary_path, scenario_path, source_lane_path, scorecard_path):
         files[path.name] = {
             "bytes": path.stat().st_size,
             "sha256": _sha256(path),

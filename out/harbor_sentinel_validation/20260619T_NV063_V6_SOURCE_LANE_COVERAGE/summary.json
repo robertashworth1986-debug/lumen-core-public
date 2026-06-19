@@ -1,0 +1,1053 @@
+{
+  "schema": "harbor_sentinel_validation_suite_v2",
+  "generated_utc": "2026-06-19T20:35:34.418887+00:00",
+  "evidence_boundary": "Synthetic software benchmark only. Inputs are generated AIS/ADS-B and radar-like observations, not operational sensor data. Results do not establish harbor, SSDS, adversarial, classified-environment, or field performance. Runtime measurements are machine-specific observations.",
+  "representative_source_lanes": {
+    "mode": "generated feasibility inputs only",
+    "minimum_topic_source_set_modeled": [
+      "AIS-like cooperative surface beacon",
+      "ADS-B-like cooperative air beacon",
+      "notional radar-like contacts"
+    ],
+    "boundary": "This run does not acquire NOAA AIS, OpenSky ADS-B, Navy radar, SSDS, or government-furnished operational data."
+  },
+  "score_configuration": {
+    "source_loss_threshold": 5.0,
+    "enable_scene_degradation_gate": true,
+    "degradation_onset": 2.25,
+    "degradation_slope": 0.55,
+    "degradation_cap": 2.25,
+    "note": "The v2 score stream estimates scene-wide source degradation from the median normalized radar/beacon disagreement at each timestamp, without using ground-truth labels. Behavioral scores and sensor-disagreement scores are down-weighted when the whole scene indicates a sensor-noise shift. Beacon loss uses a separate source-integrity review gate and does not by itself become a behavior-based threat candidate."
+  },
+  "development": {
+    "scenarios": 20,
+    "seed_base": 1600000,
+    "threshold_selection": {
+      "selected_threshold": 10.0,
+      "false_alert_cap_per_10000": 100.0,
+      "candidate_results": [
+        {
+          "threshold": 5.0,
+          "f1_mean": 0.8384885019068895,
+          "false_alerts_per_10000_mean": 456.993034381983
+        },
+        {
+          "threshold": 6.0,
+          "f1_mean": 0.912256778470848,
+          "false_alerts_per_10000_mean": 199.93928765952936
+        },
+        {
+          "threshold": 7.0,
+          "f1_mean": 0.9403301182671292,
+          "false_alerts_per_10000_mean": 110.80668457872598
+        },
+        {
+          "threshold": 8.0,
+          "f1_mean": 0.9496296933451168,
+          "false_alerts_per_10000_mean": 81.89577798663686
+        },
+        {
+          "threshold": 9.0,
+          "f1_mean": 0.9522923781514129,
+          "false_alerts_per_10000_mean": 73.74511815237778
+        },
+        {
+          "threshold": 10.0,
+          "f1_mean": 0.9527528131788762,
+          "false_alerts_per_10000_mean": 71.11863296108933
+        },
+        {
+          "threshold": 12.0,
+          "f1_mean": 0.9520523825603113,
+          "false_alerts_per_10000_mean": 70.98667202152744
+        }
+      ],
+      "selection_rule": "maximize mean development F1 subject to the false-alert cap; if no threshold satisfies the cap, maximize F1 and then minimize false alerts"
+    }
+  },
+  "validation": {
+    "scenarios_per_condition": 30,
+    "seed_base": 1900000,
+    "threshold_frozen_from_development": 10.0,
+    "warmup_steps": 120,
+    "test_steps": 180,
+    "anomaly_fraction": 0.75,
+    "conditions": {
+      "nominal_24_tracks": {
+        "configuration": {
+          "tracks": 24,
+          "test_noise_multiplier": 1.0,
+          "benign_beacon_dropout_probability": 0.0,
+          "benign_beacon_dropout_burst_fraction": 0.0,
+          "scenarios": 30
+        },
+        "detector": {
+          "true_positives": 14799,
+          "false_positives": 816,
+          "false_negatives": 662,
+          "true_negatives": 113323,
+          "precision": 0.9477425552353507,
+          "recall": 0.9571825884483539,
+          "f1": 0.9524391813618227,
+          "false_alerts_per_10000_normal_points": 71.4917775694548
+        },
+        "threat_candidate": {
+          "true_positives": 12584,
+          "false_positives": 816,
+          "false_negatives": 2877,
+          "true_negatives": 113323,
+          "precision": 0.9391044776119403,
+          "recall": 0.8139188926977556,
+          "f1": 0.8720418557915526,
+          "false_alerts_per_10000_normal_points": 71.4917775694548
+        },
+        "fixed_kinematic_comparator": {
+          "true_positives": 6281,
+          "false_positives": 452,
+          "false_negatives": 9180,
+          "true_negatives": 113687,
+          "precision": 0.9328679637605822,
+          "recall": 0.4062479787853308,
+          "f1": 0.5660088312156438,
+          "false_alerts_per_10000_normal_points": 39.600837575237215
+        },
+        "event_recall": 1.0,
+        "median_detection_delay_steps": 1.0,
+        "explanation_coverage": 1.0,
+        "maximum_algorithmic_state_bytes_per_track": 139,
+        "class_detection": {
+          "route_deviation": {
+            "point_recall": 1.0,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 1.0
+          },
+          "loiter": {
+            "point_recall": 0.9652777777777778,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9652777777777778
+          },
+          "speed_burst": {
+            "point_recall": 0.9528957528957529,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9528957528957529
+          },
+          "sharp_turn": {
+            "point_recall": 0.96484375,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.96484375
+          },
+          "beacon_silence": {
+            "point_recall": 0.8604110120201629,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 4.0,
+            "threat_candidate_point_recall": 0.0015509887553315238
+          },
+          "beacon_spoof": {
+            "point_recall": 1.0,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 1.0
+          }
+        },
+        "alert_category_counts": {
+          "source_integrity": 2215,
+          "behavioral": 10792,
+          "combined": 2608
+        },
+        "source_degradation": {
+          "median_source_degradation_index": 1.8113800723704347,
+          "p95_source_degradation_index": 2.292394460812887,
+          "median_source_degradation_factor": 1.0,
+          "p95_source_degradation_factor": 1.0233169534470876,
+          "max_source_degradation_factor": 1.3697971128714608,
+          "note": "Scene-level source-quality diagnostic computed from observations only; no ground-truth anomaly labels are used."
+        },
+        "source_lane_coverage": {
+          "generated_adsb_like_air": {
+            "source_family": "ADS-B-like cooperative beacon",
+            "observations": 64800,
+            "available_observations": 64800,
+            "availability_rate": 1.0,
+            "max_unique_tracks_per_scenario": 12,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated air cooperative-source observations; not licensed ADS-B files."
+          },
+          "generated_ais_like_surface": {
+            "source_family": "AIS-like cooperative beacon",
+            "observations": 64800,
+            "available_observations": 62221,
+            "availability_rate": 0.9602006172839506,
+            "max_unique_tracks_per_scenario": 12,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated surface cooperative-source observations; not public AIS files."
+          },
+          "generated_notional_radar_like_contact": {
+            "source_family": "Notional radar-like observation",
+            "observations": 129600,
+            "available_observations": 129600,
+            "availability_rate": 1.0,
+            "max_unique_tracks_per_scenario": 24,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated radar-like observations paired with every test track point."
+          }
+        },
+        "runtime_observation": {
+          "elapsed_seconds": 22.04380890005268,
+          "processed_test_points": 129600,
+          "test_points_per_second": 5879.201756266825,
+          "note": "Machine-specific Python prototype timing; not a latency SLA."
+        }
+      },
+      "congested_96_tracks": {
+        "configuration": {
+          "tracks": 96,
+          "test_noise_multiplier": 1.0,
+          "benign_beacon_dropout_probability": 0.0,
+          "benign_beacon_dropout_burst_fraction": 0.0,
+          "scenarios": 30
+        },
+        "detector": {
+          "true_positives": 58882,
+          "false_positives": 3262,
+          "false_negatives": 2649,
+          "true_negatives": 453607,
+          "precision": 0.9475090113285273,
+          "recall": 0.9569485300092636,
+          "f1": 0.9522053769961593,
+          "false_alerts_per_10000_normal_points": 71.39902247690257
+        },
+        "threat_candidate": {
+          "true_positives": 50152,
+          "false_positives": 3262,
+          "false_negatives": 11379,
+          "true_negatives": 453607,
+          "precision": 0.9389298685737821,
+          "recall": 0.8150688270952853,
+          "f1": 0.8726260385401714,
+          "false_alerts_per_10000_normal_points": 71.39902247690257
+        },
+        "fixed_kinematic_comparator": {
+          "true_positives": 24954,
+          "false_positives": 1808,
+          "false_negatives": 36577,
+          "true_negatives": 455061,
+          "precision": 0.9324415215604215,
+          "recall": 0.4055516731403683,
+          "f1": 0.5652543236723183,
+          "false_alerts_per_10000_normal_points": 39.573707123923924
+        },
+        "event_recall": 1.0,
+        "median_detection_delay_steps": 1.0,
+        "explanation_coverage": 1.0,
+        "maximum_algorithmic_state_bytes_per_track": 139,
+        "class_detection": {
+          "route_deviation": {
+            "point_recall": 1.0,
+            "event_count": 360,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 1.0
+          },
+          "loiter": {
+            "point_recall": 0.9649669131957961,
+            "event_count": 360,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9649669131957961
+          },
+          "speed_burst": {
+            "point_recall": 0.9522094607747713,
+            "event_count": 360,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9522094607747713
+          },
+          "sharp_turn": {
+            "point_recall": 0.9650892164468581,
+            "event_count": 360,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9650892164468581
+          },
+          "beacon_silence": {
+            "point_recall": 0.8588396976538726,
+            "event_count": 360,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 4.0,
+            "threat_candidate_point_recall": 0.002061450868754295
+          },
+          "beacon_spoof": {
+            "point_recall": 1.0,
+            "event_count": 360,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 0.9998058629392351
+          }
+        },
+        "alert_category_counts": {
+          "source_integrity": 8730,
+          "behavioral": 43095,
+          "combined": 10319
+        },
+        "source_degradation": {
+          "median_source_degradation_index": 1.8189110601832874,
+          "p95_source_degradation_index": 2.0470204275200055,
+          "median_source_degradation_factor": 1.0,
+          "p95_source_degradation_factor": 1.0,
+          "max_source_degradation_factor": 1.0632487868512557,
+          "note": "Scene-level source-quality diagnostic computed from observations only; no ground-truth anomaly labels are used."
+        },
+        "source_lane_coverage": {
+          "generated_adsb_like_air": {
+            "source_family": "ADS-B-like cooperative beacon",
+            "observations": 259200,
+            "available_observations": 259200,
+            "availability_rate": 1.0,
+            "max_unique_tracks_per_scenario": 48,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated air cooperative-source observations; not licensed ADS-B files."
+          },
+          "generated_ais_like_surface": {
+            "source_family": "AIS-like cooperative beacon",
+            "observations": 259200,
+            "available_observations": 249013,
+            "availability_rate": 0.9606983024691358,
+            "max_unique_tracks_per_scenario": 48,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated surface cooperative-source observations; not public AIS files."
+          },
+          "generated_notional_radar_like_contact": {
+            "source_family": "Notional radar-like observation",
+            "observations": 518400,
+            "available_observations": 518400,
+            "availability_rate": 1.0,
+            "max_unique_tracks_per_scenario": 96,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated radar-like observations paired with every test track point."
+          }
+        },
+        "runtime_observation": {
+          "elapsed_seconds": 75.52304689999437,
+          "processed_test_points": 518400,
+          "test_points_per_second": 6864.12984219839,
+          "note": "Machine-specific Python prototype timing; not a latency SLA."
+        }
+      },
+      "sensor_shift_1_5x": {
+        "configuration": {
+          "tracks": 24,
+          "test_noise_multiplier": 1.5,
+          "benign_beacon_dropout_probability": 0.0,
+          "benign_beacon_dropout_burst_fraction": 0.0,
+          "scenarios": 30
+        },
+        "detector": {
+          "true_positives": 14685,
+          "false_positives": 880,
+          "false_negatives": 688,
+          "true_negatives": 113347,
+          "precision": 0.9434628975265018,
+          "recall": 0.9552462108892213,
+          "f1": 0.9493179908203503,
+          "false_alerts_per_10000_normal_points": 77.03957908375428
+        },
+        "threat_candidate": {
+          "true_positives": 12276,
+          "false_positives": 879,
+          "false_negatives": 3097,
+          "true_negatives": 113348,
+          "precision": 0.9331812998859749,
+          "recall": 0.7985428998894165,
+          "f1": 0.8606281547952888,
+          "false_alerts_per_10000_normal_points": 76.95203410752273
+        },
+        "fixed_kinematic_comparator": {
+          "true_positives": 6300,
+          "false_positives": 598,
+          "false_negatives": 9073,
+          "true_negatives": 113629,
+          "precision": 0.9133082052768918,
+          "recall": 0.4098094061016067,
+          "f1": 0.5657581608369628,
+          "false_alerts_per_10000_normal_points": 52.35189578646029
+        },
+        "event_recall": 1.0,
+        "median_detection_delay_steps": 1.0,
+        "explanation_coverage": 1.0,
+        "maximum_algorithmic_state_bytes_per_track": 139,
+        "class_detection": {
+          "route_deviation": {
+            "point_recall": 0.9984484096198604,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 0.9984484096198604
+          },
+          "loiter": {
+            "point_recall": 0.9645472061657033,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9645472061657033
+          },
+          "speed_burst": {
+            "point_recall": 0.9424265842349304,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 2.0,
+            "threat_candidate_point_recall": 0.9424265842349304
+          },
+          "sharp_turn": {
+            "point_recall": 0.964,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.964
+          },
+          "beacon_silence": {
+            "point_recall": 0.8630721489526765,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 4.0,
+            "threat_candidate_point_recall": 0.014352211016291699
+          },
+          "beacon_spoof": {
+            "point_recall": 1.0,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 0.9127861089187056
+          }
+        },
+        "alert_category_counts": {
+          "source_integrity": 2410,
+          "behavioral": 10812,
+          "combined": 2343
+        },
+        "source_degradation": {
+          "median_source_degradation_index": 2.742205563838934,
+          "p95_source_degradation_index": 3.41788852392674,
+          "median_source_degradation_factor": 1.2707130601114138,
+          "p95_source_degradation_factor": 1.6423386881597068,
+          "max_source_degradation_factor": 2.1451164497371584,
+          "note": "Scene-level source-quality diagnostic computed from observations only; no ground-truth anomaly labels are used."
+        },
+        "source_lane_coverage": {
+          "generated_adsb_like_air": {
+            "source_family": "ADS-B-like cooperative beacon",
+            "observations": 64800,
+            "available_observations": 64800,
+            "availability_rate": 1.0,
+            "max_unique_tracks_per_scenario": 12,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated air cooperative-source observations; not licensed ADS-B files."
+          },
+          "generated_ais_like_surface": {
+            "source_family": "AIS-like cooperative beacon",
+            "observations": 64800,
+            "available_observations": 62222,
+            "availability_rate": 0.9602160493827161,
+            "max_unique_tracks_per_scenario": 12,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated surface cooperative-source observations; not public AIS files."
+          },
+          "generated_notional_radar_like_contact": {
+            "source_family": "Notional radar-like observation",
+            "observations": 129600,
+            "available_observations": 129600,
+            "availability_rate": 1.0,
+            "max_unique_tracks_per_scenario": 24,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated radar-like observations paired with every test track point."
+          }
+        },
+        "runtime_observation": {
+          "elapsed_seconds": 21.78018629999133,
+          "processed_test_points": 129600,
+          "test_points_per_second": 5950.362325415536,
+          "note": "Machine-specific Python prototype timing; not a latency SLA."
+        }
+      },
+      "benign_point_dropout_2pct": {
+        "configuration": {
+          "tracks": 24,
+          "test_noise_multiplier": 1.0,
+          "benign_beacon_dropout_probability": 0.02,
+          "benign_beacon_dropout_burst_fraction": 0.0,
+          "scenarios": 30
+        },
+        "detector": {
+          "true_positives": 14655,
+          "false_positives": 813,
+          "false_negatives": 651,
+          "true_negatives": 113481,
+          "precision": 0.9474398758727696,
+          "recall": 0.9574676597412779,
+          "f1": 0.9524273737570677,
+          "false_alerts_per_10000_normal_points": 71.13234290513938
+        },
+        "threat_candidate": {
+          "true_positives": 12426,
+          "false_positives": 813,
+          "false_negatives": 2880,
+          "true_negatives": 113481,
+          "precision": 0.9385905279854974,
+          "recall": 0.8118384947079577,
+          "f1": 0.8706253284287966,
+          "false_alerts_per_10000_normal_points": 71.13234290513938
+        },
+        "fixed_kinematic_comparator": {
+          "true_positives": 6486,
+          "false_positives": 451,
+          "false_negatives": 8820,
+          "true_negatives": 113843,
+          "precision": 0.9349863053193023,
+          "recall": 0.42375539004312035,
+          "f1": 0.583194712943398,
+          "false_alerts_per_10000_normal_points": 39.45963917615973
+        },
+        "event_recall": 1.0,
+        "median_detection_delay_steps": 1.0,
+        "explanation_coverage": 1.0,
+        "maximum_algorithmic_state_bytes_per_track": 139,
+        "class_detection": {
+          "route_deviation": {
+            "point_recall": 1.0,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 1.0
+          },
+          "loiter": {
+            "point_recall": 0.9639603960396039,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9639603960396039
+          },
+          "speed_burst": {
+            "point_recall": 0.9550473186119873,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9550473186119873
+          },
+          "sharp_turn": {
+            "point_recall": 0.9651972157772621,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9651972157772621
+          },
+          "beacon_silence": {
+            "point_recall": 0.8624951718810352,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 4.0,
+            "threat_candidate_point_recall": 0.0019312475859405175
+          },
+          "beacon_spoof": {
+            "point_recall": 1.0,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 0.999605367008682
+          }
+        },
+        "alert_category_counts": {
+          "source_integrity": 2229,
+          "behavioral": 10701,
+          "combined": 2538
+        },
+        "source_degradation": {
+          "median_source_degradation_index": 1.8254604496238076,
+          "p95_source_degradation_index": 2.3045207112607953,
+          "median_source_degradation_factor": 1.0,
+          "p95_source_degradation_factor": 1.0299863911934373,
+          "max_source_degradation_factor": 1.4943580110867436,
+          "note": "Scene-level source-quality diagnostic computed from observations only; no ground-truth anomaly labels are used."
+        },
+        "source_lane_coverage": {
+          "generated_adsb_like_air": {
+            "source_family": "ADS-B-like cooperative beacon",
+            "observations": 64800,
+            "available_observations": 63627,
+            "availability_rate": 0.9818981481481481,
+            "max_unique_tracks_per_scenario": 12,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated air cooperative-source observations; not licensed ADS-B files."
+          },
+          "generated_ais_like_surface": {
+            "source_family": "AIS-like cooperative beacon",
+            "observations": 64800,
+            "available_observations": 61039,
+            "availability_rate": 0.9419598765432099,
+            "max_unique_tracks_per_scenario": 12,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated surface cooperative-source observations; not public AIS files."
+          },
+          "generated_notional_radar_like_contact": {
+            "source_family": "Notional radar-like observation",
+            "observations": 129600,
+            "available_observations": 129600,
+            "availability_rate": 1.0,
+            "max_unique_tracks_per_scenario": 24,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated radar-like observations paired with every test track point."
+          }
+        },
+        "runtime_observation": {
+          "elapsed_seconds": 23.20852740004193,
+          "processed_test_points": 129600,
+          "test_points_per_second": 5584.154382831108,
+          "note": "Machine-specific Python prototype timing; not a latency SLA."
+        }
+      },
+      "benign_burst_dropout_20pct": {
+        "configuration": {
+          "tracks": 24,
+          "test_noise_multiplier": 1.0,
+          "benign_beacon_dropout_probability": 0.0,
+          "benign_beacon_dropout_burst_fraction": 0.2,
+          "scenarios": 30
+        },
+        "detector": {
+          "true_positives": 14578,
+          "false_positives": 1472,
+          "false_negatives": 662,
+          "true_negatives": 112888,
+          "precision": 0.9082866043613708,
+          "recall": 0.9565616797900263,
+          "f1": 0.9317992968999681,
+          "false_alerts_per_10000_normal_points": 128.71633438265127
+        },
+        "threat_candidate": {
+          "true_positives": 12364,
+          "false_positives": 814,
+          "false_negatives": 2876,
+          "true_negatives": 113546,
+          "precision": 0.9382303839732888,
+          "recall": 0.8112860892388452,
+          "f1": 0.8701527201069744,
+          "false_alerts_per_10000_normal_points": 71.17873382301504
+        },
+        "fixed_kinematic_comparator": {
+          "true_positives": 6177,
+          "false_positives": 452,
+          "false_negatives": 9063,
+          "true_negatives": 113908,
+          "precision": 0.931814753356464,
+          "recall": 0.4053149606299213,
+          "f1": 0.5649092322465591,
+          "false_alerts_per_10000_normal_points": 39.52430919902064
+        },
+        "event_recall": 1.0,
+        "median_detection_delay_steps": 1.0,
+        "explanation_coverage": 1.0,
+        "maximum_algorithmic_state_bytes_per_track": 139,
+        "class_detection": {
+          "route_deviation": {
+            "point_recall": 1.0,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 1.0
+          },
+          "loiter": {
+            "point_recall": 0.9645808736717828,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9645808736717828
+          },
+          "speed_burst": {
+            "point_recall": 0.9511022044088177,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9511022044088177
+          },
+          "sharp_turn": {
+            "point_recall": 0.964243146603099,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.964243146603099
+          },
+          "beacon_silence": {
+            "point_recall": 0.860302677532014,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 4.0,
+            "threat_candidate_point_recall": 0.0011641443538998836
+          },
+          "beacon_spoof": {
+            "point_recall": 1.0,
+            "event_count": 90,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 1.0
+          }
+        },
+        "alert_category_counts": {
+          "source_integrity": 2872,
+          "behavioral": 10637,
+          "combined": 2541
+        },
+        "source_degradation": {
+          "median_source_degradation_index": 1.8255009645474123,
+          "p95_source_degradation_index": 2.307860081824652,
+          "median_source_degradation_factor": 1.0,
+          "p95_source_degradation_factor": 1.0318230450035586,
+          "max_source_degradation_factor": 1.4003922160947335,
+          "note": "Scene-level source-quality diagnostic computed from observations only; no ground-truth anomaly labels are used."
+        },
+        "source_lane_coverage": {
+          "generated_adsb_like_air": {
+            "source_family": "ADS-B-like cooperative beacon",
+            "observations": 64800,
+            "available_observations": 64365,
+            "availability_rate": 0.993287037037037,
+            "max_unique_tracks_per_scenario": 12,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated air cooperative-source observations; not licensed ADS-B files."
+          },
+          "generated_ais_like_surface": {
+            "source_family": "AIS-like cooperative beacon",
+            "observations": 64800,
+            "available_observations": 61875,
+            "availability_rate": 0.9548611111111112,
+            "max_unique_tracks_per_scenario": 12,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated surface cooperative-source observations; not public AIS files."
+          },
+          "generated_notional_radar_like_contact": {
+            "source_family": "Notional radar-like observation",
+            "observations": 129600,
+            "available_observations": 129600,
+            "availability_rate": 1.0,
+            "max_unique_tracks_per_scenario": 24,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated radar-like observations paired with every test track point."
+          }
+        },
+        "runtime_observation": {
+          "elapsed_seconds": 24.81264140002895,
+          "processed_test_points": 129600,
+          "test_points_per_second": 5223.144038177604,
+          "note": "Machine-specific Python prototype timing; not a latency SLA."
+        }
+      },
+      "combined_stress": {
+        "configuration": {
+          "tracks": 96,
+          "test_noise_multiplier": 1.5,
+          "benign_beacon_dropout_probability": 0.02,
+          "benign_beacon_dropout_burst_fraction": 0.2,
+          "scenarios": 30
+        },
+        "detector": {
+          "true_positives": 58913,
+          "false_positives": 6618,
+          "false_negatives": 2720,
+          "true_negatives": 450149,
+          "precision": 0.8990096290305352,
+          "recall": 0.9558677980951763,
+          "f1": 0.926567267465635,
+          "false_alerts_per_10000_normal_points": 144.88787499972634
+        },
+        "threat_candidate": {
+          "true_positives": 49952,
+          "false_positives": 3492,
+          "false_negatives": 11681,
+          "true_negatives": 453275,
+          "precision": 0.9346605792979568,
+          "recall": 0.8104749079227037,
+          "f1": 0.8681491523067163,
+          "false_alerts_per_10000_normal_points": 76.45035652750747
+        },
+        "fixed_kinematic_comparator": {
+          "true_positives": 25640,
+          "false_positives": 2583,
+          "false_negatives": 35993,
+          "true_negatives": 454184,
+          "precision": 0.9084789001877901,
+          "recall": 0.4160109032498824,
+          "f1": 0.5706908831908832,
+          "false_alerts_per_10000_normal_points": 56.549619390192376
+        },
+        "event_recall": 1.0,
+        "median_detection_delay_steps": 1.0,
+        "explanation_coverage": 1.0,
+        "maximum_algorithmic_state_bytes_per_track": 139,
+        "class_detection": {
+          "route_deviation": {
+            "point_recall": 0.999510906778832,
+            "event_count": 360,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 0.999510906778832
+          },
+          "loiter": {
+            "point_recall": 0.964362012041173,
+            "event_count": 360,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.964362012041173
+          },
+          "speed_burst": {
+            "point_recall": 0.9439361495036013,
+            "event_count": 360,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 2.0,
+            "threat_candidate_point_recall": 0.9439361495036013
+          },
+          "sharp_turn": {
+            "point_recall": 0.9651904853993425,
+            "event_count": 360,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9651904853993425
+          },
+          "beacon_silence": {
+            "point_recall": 0.8614191775444107,
+            "event_count": 360,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 4.0,
+            "threat_candidate_point_recall": 0.01158111689076455
+          },
+          "beacon_spoof": {
+            "point_recall": 1.0,
+            "event_count": 360,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 0.9706995245949355
+          }
+        },
+        "alert_category_counts": {
+          "source_integrity": 12087,
+          "behavioral": 43315,
+          "combined": 10129
+        },
+        "source_degradation": {
+          "median_source_degradation_index": 2.732235118029677,
+          "p95_source_degradation_index": 3.0978767917375976,
+          "median_source_degradation_factor": 1.265229314916322,
+          "p95_source_degradation_factor": 1.4663322354556787,
+          "max_source_degradation_factor": 1.703721816328028,
+          "note": "Scene-level source-quality diagnostic computed from observations only; no ground-truth anomaly labels are used."
+        },
+        "source_lane_coverage": {
+          "generated_adsb_like_air": {
+            "source_family": "ADS-B-like cooperative beacon",
+            "observations": 259200,
+            "available_observations": 252801,
+            "availability_rate": 0.9753125,
+            "max_unique_tracks_per_scenario": 48,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated air cooperative-source observations; not licensed ADS-B files."
+          },
+          "generated_ais_like_surface": {
+            "source_family": "AIS-like cooperative beacon",
+            "observations": 259200,
+            "available_observations": 242590,
+            "availability_rate": 0.9359182098765432,
+            "max_unique_tracks_per_scenario": 48,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated surface cooperative-source observations; not public AIS files."
+          },
+          "generated_notional_radar_like_contact": {
+            "source_family": "Notional radar-like observation",
+            "observations": 518400,
+            "available_observations": 518400,
+            "availability_rate": 1.0,
+            "max_unique_tracks_per_scenario": 96,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated radar-like observations paired with every test track point."
+          }
+        },
+        "runtime_observation": {
+          "elapsed_seconds": 85.20109459996456,
+          "processed_test_points": 518400,
+          "test_points_per_second": 6084.428873055999,
+          "note": "Machine-specific Python prototype timing; not a latency SLA."
+        }
+      },
+      "severe_combined_stress": {
+        "configuration": {
+          "tracks": 192,
+          "test_noise_multiplier": 2.5,
+          "benign_beacon_dropout_probability": 0.05,
+          "benign_beacon_dropout_burst_fraction": 0.35,
+          "scenarios": 30
+        },
+        "detector": {
+          "true_positives": 112503,
+          "false_positives": 17528,
+          "false_negatives": 10742,
+          "true_negatives": 896027,
+          "precision": 0.8652013750567172,
+          "recall": 0.9128402774960445,
+          "f1": 0.8883826339645289,
+          "false_alerts_per_10000_normal_points": 191.86584277903356
+        },
+        "threat_candidate": {
+          "true_positives": 80435,
+          "false_positives": 7030,
+          "false_negatives": 42810,
+          "true_negatives": 906525,
+          "precision": 0.9196249928542846,
+          "recall": 0.6526431092539251,
+          "f1": 0.7634663755873001,
+          "false_alerts_per_10000_normal_points": 76.95212658241704
+        },
+        "fixed_kinematic_comparator": {
+          "true_positives": 53870,
+          "false_positives": 39064,
+          "false_negatives": 69375,
+          "true_negatives": 874491,
+          "precision": 0.5796586825058644,
+          "recall": 0.43709683962838247,
+          "f1": 0.4983832842227968,
+          "false_alerts_per_10000_normal_points": 427.6042493336471
+        },
+        "event_recall": 1.0,
+        "median_detection_delay_steps": 2.0,
+        "explanation_coverage": 1.0,
+        "maximum_algorithmic_state_bytes_per_track": 139,
+        "class_detection": {
+          "route_deviation": {
+            "point_recall": 0.7917765406778006,
+            "event_count": 720,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 4.0,
+            "threat_candidate_point_recall": 0.7917765406778006
+          },
+          "loiter": {
+            "point_recall": 0.9558665756363991,
+            "event_count": 720,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9558665756363991
+          },
+          "speed_burst": {
+            "point_recall": 0.9052056398497341,
+            "event_count": 720,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 3.0,
+            "threat_candidate_point_recall": 0.9052056398497341
+          },
+          "sharp_turn": {
+            "point_recall": 0.9591387325666748,
+            "event_count": 720,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 1.0,
+            "threat_candidate_point_recall": 0.9591387325666748
+          },
+          "beacon_silence": {
+            "point_recall": 0.8652492527239417,
+            "event_count": 720,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 4.0,
+            "threat_candidate_point_recall": 0.01205283964902131
+          },
+          "beacon_spoof": {
+            "point_recall": 1.0,
+            "event_count": 720,
+            "event_recall": 1.0,
+            "median_detection_delay_steps": 0.0,
+            "threat_candidate_point_recall": 0.3019381162869772
+          }
+        },
+        "alert_category_counts": {
+          "source_integrity": 42566,
+          "behavioral": 80961,
+          "combined": 6504
+        },
+        "source_degradation": {
+          "median_source_degradation_index": 4.542960465070127,
+          "p95_source_degradation_index": 4.98227439524048,
+          "median_source_degradation_factor": 2.25,
+          "p95_source_degradation_factor": 2.25,
+          "max_source_degradation_factor": 2.25,
+          "note": "Scene-level source-quality diagnostic computed from observations only; no ground-truth anomaly labels are used."
+        },
+        "source_lane_coverage": {
+          "generated_adsb_like_air": {
+            "source_family": "ADS-B-like cooperative beacon",
+            "observations": 518400,
+            "available_observations": 489909,
+            "availability_rate": 0.9450405092592593,
+            "max_unique_tracks_per_scenario": 96,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated air cooperative-source observations; not licensed ADS-B files."
+          },
+          "generated_ais_like_surface": {
+            "source_family": "AIS-like cooperative beacon",
+            "observations": 518400,
+            "available_observations": 468540,
+            "availability_rate": 0.9038194444444444,
+            "max_unique_tracks_per_scenario": 96,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated surface cooperative-source observations; not public AIS files."
+          },
+          "generated_notional_radar_like_contact": {
+            "source_family": "Notional radar-like observation",
+            "observations": 1036800,
+            "available_observations": 1036800,
+            "availability_rate": 1.0,
+            "max_unique_tracks_per_scenario": 192,
+            "synthetic_only": true,
+            "authorized_operational_data": false,
+            "note": "Generated radar-like observations paired with every test track point."
+          }
+        },
+        "runtime_observation": {
+          "elapsed_seconds": 147.8431063000462,
+          "processed_test_points": 1036800,
+          "test_points_per_second": 7012.8396646092115,
+          "note": "Machine-specific Python prototype timing; not a latency SLA."
+        }
+      }
+    }
+  },
+  "platform": "Windows-10-10.0.26200-SP0",
+  "python": "3.11.9",
+  "limitations": [
+    "No operational or government-furnished sensor data.",
+    "No SSDS integration or operator-in-the-loop evaluation.",
+    "No real adversary, electronic warfare, or cybersecurity validation.",
+    "The comparator is a fixed kinematic rule, not a claimed state-of-the-art system.",
+    "The compact-state count excludes Python runtime and integration overhead."
+  ]
+}

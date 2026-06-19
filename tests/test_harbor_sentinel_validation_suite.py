@@ -40,6 +40,24 @@ class HarborSentinelValidationSuiteTests(unittest.TestCase):
             self.assertIn("combined_stress", summary["validation"]["conditions"])
             combined = summary["validation"]["conditions"]["combined_stress"]
             self.assertIn("source_degradation", combined)
+            self.assertIn("source_lane_coverage", combined)
+            self.assertIn(
+                "generated_ais_like_surface",
+                combined["source_lane_coverage"],
+            )
+            self.assertIn(
+                "generated_adsb_like_air",
+                combined["source_lane_coverage"],
+            )
+            self.assertIn(
+                "generated_notional_radar_like_contact",
+                combined["source_lane_coverage"],
+            )
+            self.assertTrue(
+                combined["source_lane_coverage"][
+                    "generated_notional_radar_like_contact"
+                ]["synthetic_only"]
+            )
             self.assertGreaterEqual(
                 combined["source_degradation"][
                     "median_source_degradation_factor"
@@ -52,7 +70,12 @@ class HarborSentinelValidationSuiteTests(unittest.TestCase):
             )
             self.assertEqual(
                 set(manifest["files"]),
-                {"summary.json", "scenario_summary.csv", "SCORECARD.md"},
+                {
+                    "summary.json",
+                    "scenario_summary.csv",
+                    "source_lane_summary.csv",
+                    "SCORECARD.md",
+                },
             )
             for metadata in manifest["files"].values():
                 self.assertEqual(len(metadata["sha256"]), 64)

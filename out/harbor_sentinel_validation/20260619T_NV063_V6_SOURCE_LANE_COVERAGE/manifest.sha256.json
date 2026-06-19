@@ -1,0 +1,22 @@
+{
+  "schema": "harbor_sentinel_validation_manifest_v1",
+  "generated_utc": "2026-06-19T20:35:34.418887+00:00",
+  "files": {
+    "summary.json": {
+      "bytes": 43137,
+      "sha256": "9663a21edb4fe6ebd1c2580987b37efeea913e92c59f8c63677adb12a560ed52"
+    },
+    "scenario_summary.csv": {
+      "bytes": 28863,
+      "sha256": "bea637761b71f8a655c0635d2b2367147714b42cdf98c0089e6d13ff87b54805"
+    },
+    "source_lane_summary.csv": {
+      "bytes": 126303,
+      "sha256": "b7e2009ed3bf04789618898d8d1a87caa52e5e8d24052d31290e06b96559a5ef"
+    },
+    "SCORECARD.md": {
+      "bytes": 3183,
+      "sha256": "f4f852c67404f1fe778d52094a0171a66afde4505b7980b459140d6b7d6c0675"
+    }
+  }
+}
