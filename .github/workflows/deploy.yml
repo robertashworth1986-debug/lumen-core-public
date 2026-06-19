@@ -31,6 +31,9 @@ jobs:
 
       - name: Sync dashboard assets to VPS
         run: |
+          ssh -o StrictHostKeyChecking=no opc@${{ secrets.VPS_HOST }} \
+            "mkdir -p /opt/lumencore/dashboard /opt/lumencore/data && df -h /opt/lumencore"
+
           # Sync HTML dashboards + data JSON to VPS web roots
           # The VPS has limited free space, so avoid temp-copy rewrites of large
           # preseeded vendor bundles while still shipping dashboard changes.
