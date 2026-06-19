@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LumenCore Agent Approval Hub</title>
+<script>window.LUMA_PAGE_ID = 'agent_approval_hub';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/lumencore.css">
+<link rel="stylesheet" href="./assets/luma_command_fabric.css">
+<script src="./assets/lumencore.js"></script>
+<style>
+  :root {
+    --panel: rgba(7,13,31,.84);
+    --line: rgba(34,211,238,.24);
+    --line-hot: rgba(168,85,247,.42);
+    --cyan: #22d3ee;
+    --violet: #a855f7;
+    --green: #34d399;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --ink: #e8f1ff;
+    --dim: #8aa0ca;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    font-family: Inter, system-ui, sans-serif;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(34,211,238,.20), transparent 28%),
+      radial-gradient(circle at 84% 0%, rgba(168,85,247,.18), transparent 32%),
+      linear-gradient(135deg, #03060e 0%, #071126 50%, #050714 100%);
+  }
+  body:before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(34,211,238,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34,211,238,.045) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.75), transparent 85%);
+  }
+  main { position: relative; max-width: 1440px; margin: 0 auto; padding: 34px 24px 120px; }
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0,1.15fr) minmax(320px,.85fr);
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  .panel {
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: var(--panel);
+    box-shadow: 0 28px 90px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.04);
+    padding: 24px;
+    backdrop-filter: blur(14px);
+  }
+  .eyebrow, .label {
+    font: 800 10px Orbitron, sans-serif;
+    letter-spacing: 2.2px;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  h1 {
+    margin: 12px 0;
+    max-width: 960px;
+    font: 900 clamp(2.2rem, 6vw, 5.2rem)/.96 Orbitron, sans-serif;
+    letter-spacing: -2px;
+  }
+  h2 { margin: 0 0 12px; font: 800 14px Orbitron, sans-serif; letter-spacing: 1.2px; text-transform: uppercase; }
+  p { color: var(--dim); line-height: 1.65; }
+  .truth { max-width: 920px; color: #c9d7f2; font-size: 1.04rem; }
+  .status-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .chip {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 9px 12px;
+    font: 800 11px "JetBrains Mono", monospace;
+    color: var(--dim);
+    background: rgba(0,0,0,.18);
+  }
+  .chip.good { color: var(--green); border-color: rgba(52,211,153,.42); }
+  .chip.warn { color: var(--amber); border-color: rgba(245,158,11,.42); }
+  .chip.bad { color: var(--red); border-color: rgba(239,68,68,.42); }
+  .orbit {
+    min-height: 340px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .core {
+    position: relative;
+    width: min(78vw, 360px);
+    aspect-ratio: 1;
+    border: 1px solid rgba(34,211,238,.36);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(circle, rgba(34,211,238,.25), transparent 32%),
+      radial-gradient(circle, rgba(168,85,247,.15), transparent 62%);
+    box-shadow: 0 0 55px rgba(34,211,238,.18);
+  }
+  .core:before, .core:after {
+    content: "";
+    position: absolute;
+    inset: 30px;
+    border: 1px dashed rgba(168,85,247,.46);
+    border-radius: 50%;
+    animation: spin 22s linear infinite;
+  }
+  .core:after {
+    inset: 66px;
+    border-color: rgba(52,211,153,.42);
+    animation-duration: 15s;
+    animation-direction: reverse;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .core strong {
+    position: relative;
+    z-index: 2;
+    width: 170px;
+    text-align: center;
+    font: 900 18px Orbitron, sans-serif;
+    letter-spacing: 1.6px;
+    color: white;
+  }
+  .grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; margin-bottom: 18px; }
+  .card { min-height: 260px; display: flex; flex-direction: column; }
+  .metric { margin: 12px 0 4px; font: 900 34px Orbitron, sans-serif; color: var(--cyan); }
+  .sub { min-height: 22px; color: var(--dim); font: 700 11px "JetBrains Mono", monospace; }
+  .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: auto; padding-top: 18px; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    padding: 9px 12px;
+    color: var(--ink);
+    text-decoration: none;
+    font: 800 11px Orbitron, sans-serif;
+    letter-spacing: .7px;
+    background: rgba(255,255,255,.03);
+  }
+  .btn.primary { color: var(--cyan); border-color: rgba(34,211,238,.58); box-shadow: 0 0 28px rgba(34,211,238,.10); }
+  .btn.hot { color: #d8b4fe; border-color: var(--line-hot); }
+  .queue { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 14px; }
+  th, td { padding: 11px 10px; border-bottom: 1px solid rgba(255,255,255,.08); text-align: left; }
+  th { color: var(--cyan); font: 800 10px Orbitron, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  td { color: #cfe0ff; font: 600 12px "JetBrains Mono", monospace; }
+  .notice { color: var(--amber); border-color: rgba(245,158,11,.38); }
+  @media(max-width: 1120px) { .hero, .queue { grid-template-columns: 1fr; } .grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+  @media(max-width: 700px) { main { padding: 22px 14px 110px; } .grid { grid-template-columns: 1fr; } h1 { letter-spacing: -1px; } }
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div class="panel">
+      <div class="eyebrow">LumenCore Human Gate</div>
+      <h1>Agent Approval Hub</h1>
+      <p class="truth">This page is the public-safe command surface for actions that require a human decision before money, submission, outreach, or deployment moves. It links the trading queue, grant factory, mission control, and quant lab without claiming autonomous profit or agency approval.</p>
+      <div class="status-row">
+        <span class="chip warn" id="mode-chip">operator gate active</span>
+        <span class="chip" id="queue-chip">queue: checking</span>
+        <span class="chip" id="health-chip">health: checking</span>
+        <span class="chip">live execution requires explicit approval</span>
+      </div>
+    </div>
+    <div class="panel orbit" aria-label="approval control orbit">
+      <div class="core"><strong>HUMAN<br>IN THE<br>LOOP</strong></div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <article class="panel card">
+      <div class="label">Trade Approval</div>
+      <div class="metric" id="trade-pending">--</div>
+      <div class="sub" id="trade-sub">pending human review</div>
+      <p>Review staged execution tickets, guard checks, stale ticket status, and portfolio heat before any live action.</p>
+      <div class="actions">
+        <a class="btn primary" href="/kraken_execution_dashboard.html#approvalRows">Open Trade Queue</a>
+        <a class="btn" href="/kraken_execution_dashboard.html">Kraken Dashboard</a>
+      </div>
+    </article>
+    <article class="panel card">
+      <div class="label">Grant Approval</div>
+      <div class="metric" id="grant-ready">--</div>
+      <div class="sub" id="grant-sub">submission packages</div>
+      <p>Move only validated packages into portal work. Identity, signature, certifications, and final submission stay human-controlled.</p>
+      <div class="actions">
+        <a class="btn primary" href="/grants.html">Open Grant Factory</a>
+        <a class="btn" href="/mission_control.html">Submission Readiness</a>
+      </div>
+    </article>
+    <article class="panel card">
+      <div class="label">Evidence Gate</div>
+      <div class="metric" id="evidence-count">--</div>
+      <div class="sub" id="evidence-sub">frozen proof artifacts</div>
+      <p>Evidence supports bounded claims only. A frozen delta proves process and reproducibility, not commercial value by itself.</p>
+      <div class="actions">
+        <a class="btn primary" href="/evidence/">Open Evidence</a>
+        <a class="btn" href="/quant_lab.html#family-bench">Benchmarks</a>
+      </div>
+    </article>
+    <article class="panel card">
+      <div class="label">System Control</div>
+      <div class="metric" id="system-health">--</div>
+      <div class="sub" id="system-sub">dashboard endpoint health</div>
+      <p>Use this as the launch point for recovery, monitoring, and proof hygiene when the platform reports drift.</p>
+      <div class="actions">
+        <a class="btn primary" href="/mission_control.html">Mission Control</a>
+        <a class="btn" href="/operator_home.html">Operator Home</a>
+      </div>
+    </article>
+  </section>
+
+  <section class="queue">
+    <article class="panel">
+      <h2>Decision Lanes</h2>
+      <table>
+        <thead><tr><th>Lane</th><th>Required Before Action</th><th>Destination</th></tr></thead>
+        <tbody>
+          <tr><td>Trading</td><td>Guard pass, heat cap, ticket freshness, operator decision</td><td><a class="btn" href="/kraken_execution_dashboard.html#approvalRows">Review</a></td></tr>
+          <tr><td>Grants</td><td>Eligibility, budget, attachments, certifications, portal login</td><td><a class="btn" href="/grants.html">Review</a></td></tr>
+          <tr><td>Outreach</td><td>Claim boundary, contact fit, no spam automation</td><td><a class="btn" href="/mission_control.html">Review</a></td></tr>
+          <tr><td>Deployment</td><td>Health check, rollback path, no secrets in public repo</td><td><a class="btn" href="/mission_control.html">Review</a></td></tr>
+        </tbody>
+      </table>
+    </article>
+    <article class="panel notice">
+      <h2>Operating Boundary</h2>
+      <p>This hub is deliberately conservative. It is built to increase decision quality, auditability, and reviewer trust. It does not represent that the trader is institution-ready, profitable, or safe for unmanaged live execution. Those claims require forward-tested, cost-adjusted, leakage-free evidence.</p>
+      <div class="actions">
+        <a class="btn hot" href="/quant_lab.html">Validate Edge</a>
+        <a class="btn hot" href="/forecast.html">Forecast Lab</a>
+        <a class="btn hot" href="/explain.html">Explainability</a>
+      </div>
+    </article>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+async function fetchJson(path) {
+  try {
+    const res = await fetch(path, { cache: 'no-store' });
+    if (!res.ok) throw new Error(String(res.status));
+    return await res.json();
+  } catch (_) {
+    return null;
+  }
+}
+function setText(id, value) {
+  const el = $(id);
+  if (el) el.textContent = value;
+}
+function countPending(queue) {
+  const tickets = Array.isArray(queue?.tickets) ? queue.tickets : Array.isArray(queue) ? queue : [];
+  return tickets.filter((t) => String(t?.approval_state || t?.decision_state || '').toUpperCase().includes('PENDING')).length;
+}
+async function boot() {
+  const [queue, health, brief, evidence] = await Promise.all([
+    fetchJson('/api/master/approval-queue'),
+    fetchJson('/data/site_health.json'),
+    fetchJson('/api/federal_brief.json'),
+    fetchJson('/api/evidence_summary.json')
+  ]);
+
+  const pending = countPending(queue);
+  setText('trade-pending', queue ? String(pending) : 'offline');
+  setText('trade-sub', queue ? 'pending human review' : 'live API unavailable; open Kraken dashboard');
+  setText('queue-chip', queue ? `queue: ${pending} pending` : 'queue: offline');
+
+  const ready = Number(brief?.submission_ready_count ?? brief?.ready_count ?? brief?.total_executions ?? 0);
+  setText('grant-ready', Number.isFinite(ready) && ready > 0 ? String(ready) : '--');
+  setText('grant-sub', brief ? 'live federal brief loaded' : 'open Grant Factory for local package state');
+
+  const frozen = Number(evidence?.frozen_delta_count ?? evidence?.total_frozen_deltas ?? evidence?.total_artifacts ?? 0);
+  setText('evidence-count', Number.isFinite(frozen) && frozen > 0 ? String(frozen) : '--');
+  setText('evidence-sub', evidence ? 'evidence API loaded' : 'static evidence index available');
+
+  const overall = health?.overall || 'checking';
+  const healthy = health ? `${health.healthy_count}/${health.total_count}` : '--';
+  setText('system-health', health ? healthy : '--');
+  setText('system-sub', `status: ${overall}`);
+  setText('health-chip', health ? `health: ${overall} ${healthy}` : 'health: unknown');
+  $('health-chip')?.classList.add(overall === 'operational' ? 'good' : overall === 'outage' ? 'bad' : 'warn');
+}
+boot();
+</script>
+</body>
+</html>

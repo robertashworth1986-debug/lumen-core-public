@@ -40,6 +40,7 @@ dashboard/*.html
 !dashboard/forecast.html
 !dashboard/explain.html
 !dashboard/operator_home.html
+!dashboard/agent_approval_hub.html
 !dashboard/anomalies.html
 !dashboard/lab.html
 !dashboard/lumascout.html
