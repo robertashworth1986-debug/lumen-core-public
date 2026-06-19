@@ -32,7 +32,16 @@ jobs:
       - name: Sync dashboard assets to VPS
         run: |
           ssh -o StrictHostKeyChecking=no opc@${{ secrets.VPS_HOST }} \
-            "mkdir -p /opt/lumencore/dashboard /opt/lumencore/data && df -h /opt/lumencore"
+            "if [ -d /opt/lumencore/dashboard ]; then \
+               rm -rf /opt/lumencore/dashboard/node_modules \
+                      /opt/lumencore/dashboard/.git \
+                      /opt/lumencore/dashboard/.pytest_cache \
+                      /opt/lumencore/dashboard/.mypy_cache \
+                      /opt/lumencore/dashboard/.ruff_cache; \
+               find /opt/lumencore/dashboard -type d -name '__pycache__' -prune -exec rm -rf {} +; \
+               find /opt/lumencore/dashboard -type f \( -name '*.pyc' -o -name '*.tmp' -o -name '*.bak' -o -name '*.log' \) -delete; \
+             fi; \
+             mkdir -p /opt/lumencore/dashboard /opt/lumencore/data && df -h /opt/lumencore"
 
           # Sync HTML dashboards + data JSON to VPS web roots
           # The VPS has limited free space, so avoid temp-copy rewrites of large
