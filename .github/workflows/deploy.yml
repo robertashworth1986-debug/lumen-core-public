@@ -32,19 +32,20 @@ jobs:
       - name: Sync dashboard assets to VPS
         run: |
           ssh -o StrictHostKeyChecking=no opc@${{ secrets.VPS_HOST }} \
-            "if [ -d /opt/lumencore/dashboard ]; then \
-               rm -rf /opt/lumencore/dashboard/node_modules \
+            "if command -v sudo >/dev/null 2>&1; then SUDO=sudo; else SUDO=; fi; \
+             if [ -d /opt/lumencore/dashboard ]; then \
+               \$SUDO rm -rf /opt/lumencore/dashboard/node_modules \
                       /opt/lumencore/dashboard/.git \
                       /opt/lumencore/dashboard/.pytest_cache \
                       /opt/lumencore/dashboard/.mypy_cache \
                       /opt/lumencore/dashboard/.ruff_cache; \
-               find /opt/lumencore/dashboard -type d -name '__pycache__' -prune -exec rm -rf {} +; \
-               find /opt/lumencore/dashboard -type f \( -name '*.pyc' -o -name '*.tmp' -o -name '*.bak' -o -name '*.log' \) -delete; \
+               \$SUDO find /opt/lumencore/dashboard -type d -name '__pycache__' -prune -exec rm -rf {} +; \
+               \$SUDO find /opt/lumencore/dashboard -type f \( -name '*.pyc' -o -name '*.tmp' -o -name '*.bak' -o -name '*.log' \) -delete; \
              fi; \
-             mkdir -p /opt/lumencore/dashboard /opt/lumencore/data; \
+             \$SUDO install -d -o opc -g opc -m 755 /opt/lumencore/dashboard /opt/lumencore/data; \
              df -h /opt/lumencore; \
              echo 'Largest remote directories:'; \
-             du -xhd1 /opt /var /home /tmp 2>/dev/null | sort -h | tail -40; \
+             du -xhd1 /opt/lumencore /opt /var /home /tmp 2>/dev/null | sort -h | tail -50; \
              touch /opt/lumencore/data/.deploy_write_test && rm -f /opt/lumencore/data/.deploy_write_test"
 
           # Sync HTML dashboards + data JSON to VPS web roots
