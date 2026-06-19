@@ -46,7 +46,7 @@ jobs:
                \$SUDO find /opt/lumencore/dashboard -type d -name '__pycache__' -prune -exec rm -rf {} +; \
                \$SUDO find /opt/lumencore/dashboard -type f \( -name '*.pyc' -o -name '*.tmp' -o -name '*.bak' -o -name '*.log' \) -delete; \
              fi; \
-             \$SUDO install -d -o opc -g opc -m 755 /opt/lumencore/dashboard /opt/lumencore/data; \
+             \$SUDO install -d -o opc -g opc -m 755 /opt/lumencore/dashboard /opt/lumencore/dashboard/data /opt/lumencore/data; \
              df -h /opt/lumencore; \
              echo 'Largest remote directories:'; \
              du -xhd1 /opt/lumencore /opt /var /home /tmp 2>/dev/null | sort -h | tail -50; \
@@ -60,6 +60,7 @@ jobs:
             --exclude='*.ps1' \
             --exclude='.git/' \
             --exclude='node_modules/' \
+            --exclude='data/' \
             --exclude='assets/vendor/three.min.js' \
             -e "ssh -o StrictHostKeyChecking=no" \
             dashboard/ \
@@ -71,6 +72,12 @@ jobs:
             data/ \
             opc@${{ secrets.VPS_HOST }}:/opt/lumencore/data/
 
+          # Sync browser-visible data snapshots for dashboards that fetch /data/*.json
+          rsync -rlvz --delete --inplace --size-only --no-perms --omit-dir-times \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            data/ \
+            opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/data/
+
           echo "Dashboard deploy complete."
 
       - name: Smoke test production endpoints
@@ -78,8 +85,9 @@ jobs:
           sleep 5  # let nginx settle
           PORTAL=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" https://lumen-core.ai/ || echo "000")
           DASH=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" https://lumen-core.ai/kraken_execution_dashboard.html || echo "000")
-          echo "Portal: $PORTAL | Kraken Dashboard: $DASH"
-          if [ "$PORTAL" != "200" ] || [ "$DASH" != "200" ]; then
+          DATA=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" https://lumen-core.ai/data/site_health.json || echo "000")
+          echo "Portal: $PORTAL | Kraken Dashboard: $DASH | Site Health Data: $DATA"
+          if [ "$PORTAL" != "200" ] || [ "$DASH" != "200" ] || [ "$DATA" != "200" ]; then
             echo "::error::Post-deploy smoke test failed — check VPS nginx"
             exit 1
           fi
