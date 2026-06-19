@@ -95,7 +95,8 @@ AUDIT_PACK/
 .deploy_stage/
 
 # Data mirror (exclude bulk data, but track live badge JSON for GitHub Actions)
-data/
+data/*
+!data/
 !data/*.json
 
 # Dashboard build/runtime artifacts

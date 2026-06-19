@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: scheduled-repository-writer
+  cancel-in-progress: false
+
 jobs:
   sync-metrics:
     runs-on: ubuntu-latest
@@ -23,6 +27,7 @@ jobs:
       - name: Fetch live metrics from lumen-core.ai
         id: fetch
         run: |
+          mkdir -p data
           echo "Pulling live metrics from production endpoints..."
 
           # Fetch the live status JSON from the VPS
@@ -77,7 +82,8 @@ jobs:
           # Only commit if there are actual changes
           if ! git diff --cached --quiet; then
             git commit -m "chore(metrics): live snapshot ${{ steps.fetch.outputs.snapshot_ts }}"
-            git push
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
           else
             echo "No changes — metrics unchanged since last run."
           fi

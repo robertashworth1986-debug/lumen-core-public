@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: scheduled-repository-writer
+  cancel-in-progress: false
+
 jobs:
   health-probe:
     runs-on: ubuntu-latest
@@ -23,6 +27,7 @@ jobs:
       - name: Probe all production endpoints
         id: probe
         run: |
+          mkdir -p data
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           check_endpoint() {
             local name=$1
@@ -93,7 +98,8 @@ jobs:
           git add data/site_health.json data/uptime_badge.json
           if ! git diff --cached --quiet; then
             git commit -m "chore(health): ${{ steps.probe.outputs.overall }} — ${{ steps.probe.outputs.healthy }}/6 endpoints up @ ${{ steps.probe.outputs.timestamp }}"
-            git push
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
 
       - name: Fail job on outage (optional alerting hook)

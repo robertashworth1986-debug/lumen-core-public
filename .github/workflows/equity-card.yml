@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: scheduled-repository-writer
+  cancel-in-progress: false
+
 jobs:
   generate-card:
     runs-on: ubuntu-latest
@@ -134,7 +138,8 @@ jobs:
           git add assets/equity_card.svg
           if ! git diff --cached --quiet; then
             git commit -m "chore(card): equity ${{ steps.data.outputs.equity }} · ${{ steps.data.outputs.positions }} positions · ${{ steps.data.outputs.gen_ts }}"
-            git push
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
           else
             echo "Card unchanged — no commit needed."
           fi
