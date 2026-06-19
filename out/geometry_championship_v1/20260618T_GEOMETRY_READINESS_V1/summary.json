@@ -1,0 +1,49 @@
+{
+  "evidence_boundary": "Research registry only. A family is not a finding until its lane-specific promotion gate passes on frozen validation scenarios.",
+  "generated_utc": "2026-06-19T03:32:56.235931+00:00",
+  "readiness": {
+    "championship_ready": false,
+    "claim_gate_passed": false,
+    "family_count": 14,
+    "lane_count": 7,
+    "lane_family_counts": {
+      "branching_transport": 3,
+      "field_guided_control": 3,
+      "mission_network_routing": 4,
+      "multi_agent_coordination": 1,
+      "packing_topology": 1,
+      "stability_diagnostic": 1,
+      "thermal_ventilation": 1
+    },
+    "legacy_only_families": [
+      "mycelium_network",
+      "toroidal_fields"
+    ],
+    "pending_families": [
+      "slime_mold_routing",
+      "magnetic_field_geometry",
+      "halbach_arrays",
+      "flower_of_life_hexagonal_packing",
+      "non_euclidean_geodesics",
+      "frobenius_stability",
+      "bird_v_formation_flocking",
+      "ant_trails",
+      "river_deltas",
+      "leaf_veins",
+      "vascular_lung_branching",
+      "termite_mound_ventilation"
+    ],
+    "performance_ready_families": [],
+    "performance_results_generated": false,
+    "verdict": "not_ready_no_performance_implementations"
+  },
+  "registry_source": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2.worktrees\\geometry-dice-evidence\\config\\geometry_championship_v1_registry.json",
+  "schema": "geometry_championship_v1_readiness",
+  "source_commit": "f462ad53c127d3d1ae327edd01a88e36aea5c9be",
+  "validation": {
+    "cross_lane_ranking_disabled": true,
+    "performance_benchmark_run": false,
+    "registry_valid": true,
+    "required_family_ids_present": true
+  }
+}

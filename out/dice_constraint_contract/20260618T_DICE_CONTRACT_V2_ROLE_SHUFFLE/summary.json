@@ -1,0 +1,470 @@
+{
+  "schema": "dice_constraint_contract_generated_benchmark_v1",
+  "generated_utc": "2026-06-19T03:33:22.382678+00:00",
+  "evidence_boundary": "Generated discrete-event software benchmark only. Agents are stochastic executors, not language models. Contract fields and attacks are modeled assumptions. Results do not establish DICE metric attainment, semantic correctness, operational defense performance, or adversarial security.",
+  "development": {
+    "scenarios_per_condition": 12,
+    "seed_base": 3100000,
+    "conditions": [
+      "benign",
+      "independent_compromise_10pct"
+    ],
+    "selected_margin": 0,
+    "candidate_results": [
+      {
+        "margin": 0,
+        "mean_objective": 0.9555216814155526,
+        "minimum_objective": 0.9243261269876311
+      },
+      {
+        "margin": 1,
+        "mean_objective": 0.9080547014811724,
+        "minimum_objective": 0.8754926280194621
+      },
+      {
+        "margin": 2,
+        "mean_objective": 0.8385105664054562,
+        "minimum_objective": 0.8017976114648634
+      }
+    ],
+    "selection_rule": "maximize mean development objective across benign and independent 10% compromise; objective rewards safe completion and strategy entropy while penalizing violations, false rejection, and messages"
+  },
+  "validation": {
+    "scenarios_per_condition": 30,
+    "seed_base": 3900000,
+    "agents": 500,
+    "tasks": 1200,
+    "roles": 12,
+    "conditions": {
+      "benign": {
+        "configuration": {
+          "name": "benign",
+          "failed_fraction": 0.05,
+          "compromised_fraction": 0.0,
+          "collusive_fraction": 0.0,
+          "monitor_noise": 0.02,
+          "stale_evidence_fraction": 0.02
+        },
+        "metrics": {
+          "peer_reputation": {
+            "safe_completion_rate": 0.9076944444444445,
+            "raw_completion_rate": 0.9993333333333333,
+            "constraint_violation_rate": 0.0916983804077693,
+            "compromised_assignment_rate": 0.0,
+            "messages_per_safe_completion": 16.421800205018826,
+            "false_rejection_rate": 0.0,
+            "strategy_entropy": 0.9912804130686328,
+            "unavailable_task_rate": 0.0
+          },
+          "constraint_contract": {
+            "safe_completion_rate": 0.94925,
+            "raw_completion_rate": 0.974,
+            "constraint_violation_rate": 0.025410032611804242,
+            "compromised_assignment_rate": 0.0,
+            "messages_per_safe_completion": 14.671702720004856,
+            "false_rejection_rate": 0.023621462499600412,
+            "strategy_entropy": 0.9913730294446526,
+            "unavailable_task_rate": 0.011722222222222222
+          },
+          "paired": {
+            "safe_completion_rate": {
+              "mean_delta": 0.04155555555555555,
+              "bootstrap_95pct_interval": [
+                0.03841666666666668,
+                0.044583333333333315
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "constraint_violation_rate": {
+              "mean_delta": -0.06628834779596507,
+              "bootstrap_95pct_interval": [
+                -0.07000839817579887,
+                -0.062301928252815456
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "compromised_assignment_rate": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "favorable_scenario_fraction": 0.0,
+              "zero_delta_scenario_fraction": 1.0,
+              "scenario_count": 30
+            },
+            "messages_per_safe_completion": {
+              "mean_delta": -1.7500974850139688,
+              "bootstrap_95pct_interval": [
+                -1.8396368366455815,
+                -1.6560492825965814
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "strategy_entropy": {
+              "mean_delta": 9.261637601973108e-05,
+              "bootstrap_95pct_interval": [
+                -0.0018188748637818462,
+                0.0020429455722084737
+              ],
+              "favorable_scenario_fraction": 0.5666666666666667,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            }
+          }
+        }
+      },
+      "independent_compromise_10pct": {
+        "configuration": {
+          "name": "independent_compromise_10pct",
+          "failed_fraction": 0.05,
+          "compromised_fraction": 0.1,
+          "collusive_fraction": 0.0,
+          "monitor_noise": 0.04,
+          "stale_evidence_fraction": 0.05
+        },
+        "metrics": {
+          "peer_reputation": {
+            "safe_completion_rate": 0.9003888888888889,
+            "raw_completion_rate": 0.9986111111111111,
+            "constraint_violation_rate": 0.09835896709733848,
+            "compromised_assignment_rate": 0.0064249735954755955,
+            "messages_per_safe_completion": 16.70893206831553,
+            "false_rejection_rate": 0.0,
+            "strategy_entropy": 0.9913478635221532,
+            "unavailable_task_rate": 0.0
+          },
+          "constraint_contract": {
+            "safe_completion_rate": 0.9355833333333333,
+            "raw_completion_rate": 0.9605277777777778,
+            "constraint_violation_rate": 0.025960445618505558,
+            "compromised_assignment_rate": 0.0,
+            "messages_per_safe_completion": 14.896217248196903,
+            "false_rejection_rate": 0.05763361519783905,
+            "strategy_entropy": 0.9929415796925374,
+            "unavailable_task_rate": 0.02047222222222222
+          },
+          "paired": {
+            "safe_completion_rate": {
+              "mean_delta": 0.03519444444444445,
+              "bootstrap_95pct_interval": [
+                0.030444444444444458,
+                0.039833333333333346
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "constraint_violation_rate": {
+              "mean_delta": -0.07239852147883291,
+              "bootstrap_95pct_interval": [
+                -0.0765708080957222,
+                -0.0683637752634841
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "compromised_assignment_rate": {
+              "mean_delta": -0.0064249735954755955,
+              "bootstrap_95pct_interval": [
+                -0.00747959974719602,
+                -0.005451187305572841
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "messages_per_safe_completion": {
+              "mean_delta": -1.8127148201186272,
+              "bootstrap_95pct_interval": [
+                -1.9225332890674882,
+                -1.7049762979232974
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "strategy_entropy": {
+              "mean_delta": 0.0015937161703841593,
+              "bootstrap_95pct_interval": [
+                0.00010120653222000721,
+                0.003179792136459803
+              ],
+              "favorable_scenario_fraction": 0.6333333333333333,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            }
+          }
+        }
+      },
+      "collusion_10pct": {
+        "configuration": {
+          "name": "collusion_10pct",
+          "failed_fraction": 0.05,
+          "compromised_fraction": 0.1,
+          "collusive_fraction": 0.75,
+          "monitor_noise": 0.04,
+          "stale_evidence_fraction": 0.05
+        },
+        "metrics": {
+          "peer_reputation": {
+            "safe_completion_rate": 0.9015,
+            "raw_completion_rate": 0.9984722222222222,
+            "constraint_violation_rate": 0.0971184297336159,
+            "compromised_assignment_rate": 0.00620363002210995,
+            "messages_per_safe_completion": 16.693474248557028,
+            "false_rejection_rate": 0.0,
+            "strategy_entropy": 0.9919089428239001,
+            "unavailable_task_rate": 0.0
+          },
+          "constraint_contract": {
+            "safe_completion_rate": 0.9365,
+            "raw_completion_rate": 0.9671388888888889,
+            "constraint_violation_rate": 0.03168709002183108,
+            "compromised_assignment_rate": 0.006499406149344227,
+            "messages_per_safe_completion": 15.07849019072418,
+            "false_rejection_rate": 0.05664842004467701,
+            "strategy_entropy": 0.9934277797722736,
+            "unavailable_task_rate": 0.006555555555555556
+          },
+          "paired": {
+            "safe_completion_rate": {
+              "mean_delta": 0.035,
+              "bootstrap_95pct_interval": [
+                0.03047222222222224,
+                0.03961111111111112
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "constraint_violation_rate": {
+              "mean_delta": -0.06543133971178482,
+              "bootstrap_95pct_interval": [
+                -0.06991634444934385,
+                -0.06117202743728798
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "compromised_assignment_rate": {
+              "mean_delta": 0.0002957761272342767,
+              "bootstrap_95pct_interval": [
+                -0.000966244318166091,
+                0.001537994767881069
+              ],
+              "favorable_scenario_fraction": 0.4,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "messages_per_safe_completion": {
+              "mean_delta": -1.614984057832848,
+              "bootstrap_95pct_interval": [
+                -1.7314332365178253,
+                -1.5077598417949791
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "strategy_entropy": {
+              "mean_delta": 0.001518836948373518,
+              "bootstrap_95pct_interval": [
+                0.0005183284471464724,
+                0.002550856089214758
+              ],
+              "favorable_scenario_fraction": 0.7,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            }
+          }
+        }
+      },
+      "monitor_shift": {
+        "configuration": {
+          "name": "monitor_shift",
+          "failed_fraction": 0.05,
+          "compromised_fraction": 0.1,
+          "collusive_fraction": 0.35,
+          "monitor_noise": 0.22,
+          "stale_evidence_fraction": 0.08
+        },
+        "metrics": {
+          "peer_reputation": {
+            "safe_completion_rate": 0.9021111111111111,
+            "raw_completion_rate": 0.9983611111111111,
+            "constraint_violation_rate": 0.09640507128167806,
+            "compromised_assignment_rate": 0.006537593219685217,
+            "messages_per_safe_completion": 16.776578898679983,
+            "false_rejection_rate": 0.0,
+            "strategy_entropy": 0.9932056776091672,
+            "unavailable_task_rate": 0.0
+          },
+          "constraint_contract": {
+            "safe_completion_rate": 0.9230833333333334,
+            "raw_completion_rate": 0.9589166666666666,
+            "constraint_violation_rate": 0.03737984903757705,
+            "compromised_assignment_rate": 0.0035681034856438376,
+            "messages_per_safe_completion": 15.345358921747774,
+            "false_rejection_rate": 0.1137598059363497,
+            "strategy_entropy": 0.993124241684262,
+            "unavailable_task_rate": 0.0125
+          },
+          "paired": {
+            "safe_completion_rate": {
+              "mean_delta": 0.020972222222222232,
+              "bootstrap_95pct_interval": [
+                0.016916666666666677,
+                0.024944444444444446
+              ],
+              "favorable_scenario_fraction": 0.9666666666666667,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "constraint_violation_rate": {
+              "mean_delta": -0.05902522224410102,
+              "bootstrap_95pct_interval": [
+                -0.06243103616569974,
+                -0.05577585142015552
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "compromised_assignment_rate": {
+              "mean_delta": -0.002969489734041379,
+              "bootstrap_95pct_interval": [
+                -0.004323951183998304,
+                -0.0016278507943228515
+              ],
+              "favorable_scenario_fraction": 0.7666666666666667,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "messages_per_safe_completion": {
+              "mean_delta": -1.4312199769322103,
+              "bootstrap_95pct_interval": [
+                -1.518629361089492,
+                -1.3409205088878746
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "strategy_entropy": {
+              "mean_delta": -8.143592490524505e-05,
+              "bootstrap_95pct_interval": [
+                -0.0015633407250014294,
+                0.0013436926555625169
+              ],
+              "favorable_scenario_fraction": 0.4666666666666667,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            }
+          }
+        }
+      },
+      "high_collusion_25pct": {
+        "configuration": {
+          "name": "high_collusion_25pct",
+          "failed_fraction": 0.05,
+          "compromised_fraction": 0.25,
+          "collusive_fraction": 0.9,
+          "monitor_noise": 0.06,
+          "stale_evidence_fraction": 0.1
+        },
+        "metrics": {
+          "peer_reputation": {
+            "safe_completion_rate": 0.8899722222222223,
+            "raw_completion_rate": 0.9961111111111112,
+            "constraint_violation_rate": 0.10656466423363989,
+            "compromised_assignment_rate": 0.019687356232423195,
+            "messages_per_safe_completion": 17.45386161732168,
+            "false_rejection_rate": 0.0,
+            "strategy_entropy": 0.9911261359513748,
+            "unavailable_task_rate": 0.0
+          },
+          "constraint_contract": {
+            "safe_completion_rate": 0.9034722222222222,
+            "raw_completion_rate": 0.951,
+            "constraint_violation_rate": 0.04999040996565103,
+            "compromised_assignment_rate": 0.029254461284529035,
+            "messages_per_safe_completion": 16.3811944087092,
+            "false_rejection_rate": 0.10868242988836109,
+            "strategy_entropy": 0.9931853751450794,
+            "unavailable_task_rate": 0.0011111111111111111
+          },
+          "paired": {
+            "safe_completion_rate": {
+              "mean_delta": 0.013499999999999993,
+              "bootstrap_95pct_interval": [
+                0.009527777777777776,
+                0.017527777777777774
+              ],
+              "favorable_scenario_fraction": 0.8666666666666667,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "constraint_violation_rate": {
+              "mean_delta": -0.056574254267988865,
+              "bootstrap_95pct_interval": [
+                -0.06053344676421891,
+                -0.05274425824488955
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "compromised_assignment_rate": {
+              "mean_delta": 0.009567105052105838,
+              "bootstrap_95pct_interval": [
+                0.007310244171369477,
+                0.011840633324755956
+              ],
+              "favorable_scenario_fraction": 0.06666666666666667,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "messages_per_safe_completion": {
+              "mean_delta": -1.0726672086124827,
+              "bootstrap_95pct_interval": [
+                -1.1867889377266638,
+                -0.9590523316364881
+              ],
+              "favorable_scenario_fraction": 1.0,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            },
+            "strategy_entropy": {
+              "mean_delta": 0.00205923919370465,
+              "bootstrap_95pct_interval": [
+                0.000798444030918602,
+                0.0034446276316357763
+              ],
+              "favorable_scenario_fraction": 0.6666666666666666,
+              "zero_delta_scenario_fraction": 0.0,
+              "scenario_count": 30
+            }
+          }
+        }
+      }
+    }
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.6",
+  "limitations": [
+    "No language-model inference, tools, memory systems, or TA3 adaptor.",
+    "Role, horizon, evidence, attack, and monitor behavior are generated assumptions.",
+    "A locally consistent forged contract can pass deterministic field checks.",
+    "Message sizes and cryptographic computation costs are not measured.",
+    "Strategy entropy is a generated proxy, not cognitive-agility evidence."
+  ]
+}

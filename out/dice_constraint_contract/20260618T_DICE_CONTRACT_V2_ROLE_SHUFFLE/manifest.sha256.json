@@ -1,0 +1,18 @@
+{
+  "schema": "dice_constraint_contract_manifest_v1",
+  "generated_utc": "2026-06-19T03:33:22.382678+00:00",
+  "files": {
+    "trials.csv": {
+      "bytes": 57266,
+      "sha256": "56214575ae3c4ac090e3300fb32a9dd945150546ce2833c0837b9484040dc380"
+    },
+    "summary.json": {
+      "bytes": 18575,
+      "sha256": "6dbbde77870983231809d7621208b3f34cdc47170353ebc1094baf48489c46e3"
+    },
+    "SCORECARD.md": {
+      "bytes": 1783,
+      "sha256": "cc914699b029c643616afeb37f79ca51b0620fc9254779a13472f42cc6bab08a"
+    }
+  }
+}
