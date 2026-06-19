@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -32,17 +32,20 @@ jobs:
       - name: Sync dashboard assets to VPS
         run: |
           # Sync HTML dashboards + data JSON to VPS web roots
-          rsync -avz --delete \
+          # The VPS has limited free space, so avoid temp-copy rewrites of large
+          # preseeded vendor bundles while still shipping dashboard changes.
+          rsync -rlvz --delete --inplace --size-only --no-perms --omit-dir-times \
             --exclude='*.py' \
             --exclude='*.ps1' \
             --exclude='.git/' \
             --exclude='node_modules/' \
+            --exclude='assets/vendor/three.min.js' \
             -e "ssh -o StrictHostKeyChecking=no" \
             dashboard/ \
             opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/
 
           # Sync data snapshots
-          rsync -avz \
+          rsync -rlvz --inplace --size-only --no-perms --omit-dir-times \
             -e "ssh -o StrictHostKeyChecking=no" \
             data/ \
             opc@${{ secrets.VPS_HOST }}:/opt/lumencore/data/
