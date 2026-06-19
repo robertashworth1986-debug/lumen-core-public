@@ -39,6 +39,13 @@ OUT = ROOT / "out" / "execution"
 RUNTIME_FILE = CONF / "runtime_control.json"
 STATUS_FILE = OUT / "multi_exchange_paper_ticker_status.json"
 LEDGER_FILE = OUT / "multi_exchange_paper_ticker_ledger.jsonl"
+LEDGER_ROTATION_STATUS_FILE = OUT / "multi_exchange_paper_ticker_ledger_rotation.json"
+PAPER_TICKER_LEDGER_MAX_BYTES = int(
+    os.getenv("LUMA_PAPER_TICKER_LEDGER_MAX_BYTES", str(64 * 1024 * 1024))
+)
+PAPER_TICKER_LEDGER_TAIL_BYTES = int(
+    os.getenv("LUMA_PAPER_TICKER_LEDGER_TAIL_BYTES", str(8 * 1024 * 1024))
+)
 BINANCEUS_PAPER_STATE_FILE = OUT / "binanceus_paper_state.json"
 BINANCEUS_PAPER_LEDGER_FILE = OUT / "binanceus_paper_ledger.jsonl"
 BINANCEUS_PAPER_SCOREBOARD_FILE = OUT / "binanceus_paper_scoreboard.json"
@@ -782,6 +789,111 @@ def append_jsonl(path: Path, payload: Any) -> None:
             f.write(orjson.dumps(payload).decode("utf-8") + "\n")
         else:
             f.write(json.dumps(payload, ensure_ascii=False) + "\n")
+
+
+def _write_rotation_status(status_path: Path, payload: Dict[str, Any]) -> None:
+    try:
+        status_path.parent.mkdir(parents=True, exist_ok=True)
+        status_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _tail_bytes_preserving_jsonl_lines(path: Path, tail_bytes: int) -> bytes:
+    size = path.stat().st_size
+    keep = max(1024, min(int(tail_bytes), size))
+    with path.open("rb") as handle:
+        if keep < size:
+            handle.seek(-keep, os.SEEK_END)
+            data = handle.read()
+            _, _, data = data.partition(b"\n")
+        else:
+            data = handle.read()
+    if data and not data.endswith(b"\n"):
+        data += b"\n"
+    return data
+
+
+def rotate_jsonl_if_needed(
+    path: Path,
+    *,
+    max_bytes: int,
+    tail_bytes: int,
+    status_path: Path,
+) -> Dict[str, Any]:
+    """Bound noisy JSONL status ledgers so a VPS cannot fill its root disk."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        current_size = path.stat().st_size
+    except OSError:
+        return {"rotated": False, "reason": "missing"}
+
+    if current_size <= max_bytes:
+        return {"rotated": False, "bytes_before": current_size}
+
+    status: Dict[str, Any] = {
+        "rotated": True,
+        "generated_utc": now_utc(),
+        "path": str(path),
+        "bytes_before": current_size,
+        "max_bytes": int(max_bytes),
+        "tail_bytes_requested": int(tail_bytes),
+    }
+    tmp = path.with_suffix(path.suffix + ".tail.tmp")
+    try:
+        tail = _tail_bytes_preserving_jsonl_lines(path, tail_bytes)
+        tmp.write_bytes(tail)
+        os.replace(tmp, path)
+        status.update(
+            {
+                "mode": "tail_preserved",
+                "bytes_after": path.stat().st_size,
+                "tail_preserved": True,
+            }
+        )
+    except OSError as exc:
+        try:
+            if tmp.exists():
+                tmp.unlink()
+        except OSError:
+            pass
+        # If the disk is already full, preserving a tail may be impossible.
+        # Truncation is the fail-closed choice: lose cycle snapshots, keep services alive.
+        path.write_text("", encoding="utf-8")
+        status.update(
+            {
+                "mode": "emergency_truncate",
+                "bytes_after": 0,
+                "tail_preserved": False,
+                "error": str(exc),
+            }
+        )
+    _write_rotation_status(status_path, status)
+    return status
+
+
+def append_bounded_jsonl(
+    path: Path,
+    payload: Any,
+    *,
+    max_bytes: int,
+    tail_bytes: int,
+    status_path: Path,
+) -> Dict[str, Any]:
+    rotation = rotate_jsonl_if_needed(
+        path,
+        max_bytes=max_bytes,
+        tail_bytes=tail_bytes,
+        status_path=status_path,
+    )
+    append_jsonl(path, payload)
+    if rotation.get("rotated"):
+        try:
+            rotation["bytes_after_append"] = path.stat().st_size
+            _write_rotation_status(status_path, rotation)
+        except OSError:
+            pass
+    return rotation
 
 
 def sha256_file(path: Path) -> str:
@@ -3159,7 +3271,14 @@ def tick(python_exe: str, cycle: int, profile: str, seed_capital: float, reset_s
         "alpaca_builder": builder,
     }
     save_json(STATUS_FILE, payload)
-    append_jsonl(LEDGER_FILE, payload)
+    ledger_rotation = append_bounded_jsonl(
+        LEDGER_FILE,
+        payload,
+        max_bytes=PAPER_TICKER_LEDGER_MAX_BYTES,
+        tail_bytes=PAPER_TICKER_LEDGER_TAIL_BYTES,
+        status_path=LEDGER_ROTATION_STATUS_FILE,
+    )
+    payload["ledger_rotation"] = ledger_rotation
     payload["institutional_crypto_paper_report"] = build_institutional_crypto_paper_report(payload, seed_capital, reset_state)
     payload["institutional_crypto_dashboard"] = run_institutional_crypto_dashboard_builder(python_exe)
     payload["institutional_crypto_brief"] = run_institutional_crypto_brief_builder(python_exe)

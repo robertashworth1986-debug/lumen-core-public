@@ -1,6 +1,6 @@
 # Dashboard Architecture
 
-Updated: June 12, 2026
+Updated: June 19, 2026
 
 ## Canonical Surfaces
 
@@ -15,6 +15,7 @@ The public product has a plain-English home plus six primary operator surfaces:
 | Grants | `/grants.html` | Opportunity qualification, application readiness, and submission workflow |
 | Forecast | `/forecast.html` | Forecast scenarios and model comparison |
 | Explainer | `/explain.html` | Per-series router rationale and evidence interpretation |
+| Agent Approval Hub | `/agent_approval_hub.html` | Human approval queue for agent actions and audit log review |
 
 These surfaces share `assets/luma_command_fabric.css` and
 `assets/luma_command_fabric.js`. The command fabric provides canonical
@@ -43,7 +44,9 @@ pages cannot silently lose the shared layer.
 Investor rooms, evidence packs, staleness tools, scenario views, source
 registries, and generated premium boards remain useful supporting surfaces.
 They should be linked from a canonical surface rather than promoted as another
-top-level product.
+top-level product. The approval hub is an exception because it is an operating
+safety surface: it must stay reachable whenever autonomous or semi-autonomous
+agent queues are enabled.
 
 ## Generated Pages
 

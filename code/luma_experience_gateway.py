@@ -161,6 +161,7 @@ KRAKEN_ALPHA_MAP_FILE = OUT / "ops" / "kraken_multi_tf_alpha_map_latest.json"
 KRAKEN_ALPHA_MAP_FILE_STACK_FALLBACK = ROOT / "INSTITUTIONAL_STACK_V2" / "out" / "ops" / "kraken_multi_tf_alpha_map_latest.json"
 PACKAGE_LEVERAGE_FILE = EXEC_OUT / "package_leverage_audit.json"
 FUNDING_QUEUE_FILE = OUT / "funding" / "funding_approval_queue.json"
+FEDERAL_BRIEF_FILE = OUT / "federal_brief.json"
 METRICS_SCORECARD_FILE = EXEC_OUT / "institutional_metrics_scorecard.json"
 EDGE_TRUTH_FILE = EXEC_OUT / "edge_truth_report.json"
 CONTROL_FLAGS_FILE = ROOT / "control_flags.json"
@@ -1854,6 +1855,139 @@ def health() -> dict[str, Any]:
 @app.get("/api/snapshot")
 def snapshot() -> dict[str, Any]:
     return build_snapshot()
+
+
+def _public_file_meta(path: Path) -> dict[str, Any]:
+    try:
+        stat = path.stat()
+    except OSError:
+        return {
+            "path": str(path),
+            "exists": False,
+            "age_sec": None,
+            "size_bytes": 0,
+        }
+    return {
+        "path": str(path),
+        "exists": True,
+        "age_sec": round(max(0.0, time.time() - stat.st_mtime), 3),
+        "size_bytes": int(stat.st_size),
+    }
+
+
+@app.get("/api/live_status.json")
+def live_status_json() -> dict[str, Any]:
+    """Compatibility feed for GitHub cards and older dashboard clients."""
+    health_payload = health()
+    snapshot_payload = build_snapshot()
+    execution_gate = (
+        snapshot_payload.get("runtime", {}).get("execution_gate", {})
+        if isinstance(snapshot_payload.get("runtime"), dict)
+        else {}
+    )
+    return {
+        "schema": "lumencore_live_status_compat_v1",
+        "generated_utc": now_utc(),
+        "status": health_payload.get("status", "unknown"),
+        "all_healthy": bool(health_payload.get("all_healthy", False)),
+        "health_source": health_payload.get("health_source"),
+        "reasons": health_payload.get("reasons", []),
+        "domain": "lumen-core.ai",
+        "execution_gate": execution_gate,
+        "paper": snapshot_payload.get("paper", {}),
+        "artifacts": health_payload.get("artifacts", {}),
+        "services": health_payload.get("services", {}),
+        "compatibility_note": (
+            "Derived from /health and /api/snapshot; stale artifacts remain "
+            "reported as degraded."
+        ),
+    }
+
+
+@app.get("/api/federal_brief.json")
+def federal_brief_json() -> dict[str, Any]:
+    """Compatibility feed for grant/federal status cards."""
+    existing = load_json(FEDERAL_BRIEF_FILE, None)
+    if isinstance(existing, dict) and existing:
+        return {
+            "schema": "lumencore_federal_brief_compat_v1",
+            "generated_utc": now_utc(),
+            "source": str(FEDERAL_BRIEF_FILE),
+            "source_meta": _public_file_meta(FEDERAL_BRIEF_FILE),
+            **existing,
+        }
+
+    funding = funding_approval_queue()
+    grant_queue = load_json(OUT / "grant_approval_queue.json", [])
+    if not isinstance(grant_queue, list):
+        grant_queue = []
+    return {
+        "schema": "lumencore_federal_brief_compat_v1",
+        "generated_utc": now_utc(),
+        "status": "degraded",
+        "source": "derived_from_gateway_queues",
+        "message": (
+            "out/federal_brief.json was not found; this compatibility feed "
+            "summarizes available funding and grant queues without claiming "
+            "submission readiness."
+        ),
+        "funding_queue": {
+            "queue_count": funding.get("queue_count", 0),
+            "pending_count": funding.get("pending_count", 0),
+            "approved_count": funding.get("approved_count", 0),
+            "shipped_count": funding.get("shipped_count", 0),
+        },
+        "grant_queue_count": len(grant_queue),
+        "claim_boundary": (
+            "Queue presence is not portal submission, SAM verification, or "
+            "agency eligibility approval."
+        ),
+    }
+
+
+@app.get("/api/evidence_summary.json")
+def evidence_summary_json() -> dict[str, Any]:
+    """Compatibility evidence summary for static cards and health probes."""
+    evidence = load_latest_dashboard_evidence()
+    return {
+        "schema": "lumencore_evidence_summary_compat_v1",
+        "generated_utc": now_utc(),
+        "available": bool(evidence.get("available", False)),
+        "status": evidence.get("status", "unknown"),
+        "run_utc": evidence.get("run_utc"),
+        "source_dir": evidence.get("source_dir"),
+        "warnings": evidence.get("warnings", []),
+        "derived": evidence.get("derived", {}),
+        "integrity": evidence.get("integrity", {}),
+        "claim_boundary": (
+            "This feed reports dashboard evidence artifacts only; it is not "
+            "a field-performance or grant-award claim."
+        ),
+    }
+
+
+@app.get("/api/executor_heartbeat.json")
+def executor_heartbeat_json() -> dict[str, Any]:
+    """Compatibility heartbeat feed for execution cards."""
+    heartbeat = load_json(LIVE_EXECUTOR_HEARTBEAT_FILE, None)
+    if isinstance(heartbeat, dict) and heartbeat:
+        return {
+            "schema": "lumencore_executor_heartbeat_compat_v1",
+            "generated_utc": now_utc(),
+            "source": str(LIVE_EXECUTOR_HEARTBEAT_FILE),
+            "source_meta": _public_file_meta(LIVE_EXECUTOR_HEARTBEAT_FILE),
+            **heartbeat,
+        }
+    return {
+        "schema": "lumencore_executor_heartbeat_compat_v1",
+        "generated_utc": now_utc(),
+        "status": "not_found",
+        "source": str(LIVE_EXECUTOR_HEARTBEAT_FILE),
+        "source_meta": _public_file_meta(LIVE_EXECUTOR_HEARTBEAT_FILE),
+        "execution": _build_execution_snapshot(),
+        "runtime_gate": _build_runtime_gate_snapshot(),
+        "claim_boundary": "No live execution authorization is implied.",
+    }
 
 
 @app.get("/api/evidence/latest")
