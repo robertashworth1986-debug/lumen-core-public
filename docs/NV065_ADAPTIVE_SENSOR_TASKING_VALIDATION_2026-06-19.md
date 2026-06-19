@@ -12,7 +12,7 @@ field readiness.
 
 ## Design
 
-Frozen run `20260619T_NV065_SENSOR_TASKING_V1` used 12 development scenarios
+Frozen run `20260619T_NV065_SENSOR_TASKING_V2_SENSOR_PROFILE` used 12 development scenarios
 across nominal, dense-raid, and hostility-shift conditions to select one
 adaptive sensor-management policy from four candidates. The selected
 `critical_release` policy was then held fixed for 24 disjoint validation
@@ -31,6 +31,11 @@ Each paired seed used identical generated tracks for:
 - adaptive sensor management using marginal contribution, source quality,
   recent confirmation, and generated fire-control-quality need.
 
+The v2 packet also emits `sensor_resource_profile.json`, which documents the
+generated SPS-48, SPQ-9B, MK-9, and SPY-6(V)3 archetypes used in the
+experiment. These are topic-aligned unclassified assumptions only, not
+Navy-approved radar physics, SSDS interface data, or fire-control evidence.
+
 ## Results
 
 | Condition | Greedy critical FCQ | Adaptive critical FCQ | Mean delta | Paired 95% bootstrap interval | Sensor-task delta | Low-value fraction delta |
@@ -46,6 +51,19 @@ The low-value fraction was mixed and worsened under generated sensor
 degradation and hostility shift because the adaptive policy used fewer total
 updates while concentrating more of the remaining updates on already-controlled
 critical tracks. This is a diagnostic tradeoff, not a hidden success.
+
+## Generated Sensor-Resource Profile
+
+| Sensor archetype | Generated capacity/step | Generated precision | Generated scan cost | Strongest generated suitability |
+|---|---:|---:|---:|---|
+| SPS-48 | 8 | 0.16 | 1.00 | air |
+| SPQ-9B | 7 | 0.18 | 1.00 | surface |
+| MK-9 | 3 | 0.36 | 1.80 | missile |
+| SPY-6(V)3 | 9 | 0.24 | 1.40 | air |
+
+Not modeled: radar waveforms, electromagnetic propagation, track association
+with real sensors, classified sensor performance, SSDS message implementation,
+operator workload study, cybersecurity, or adversarial effects.
 
 ## Interpretation
 
@@ -72,5 +90,5 @@ operator-review concept without claiming integration.
   --horizon 150
 ```
 
-The suite writes `summary.json`, `scenario_summary.csv`, `SCORECARD.md`, and a
-SHA-256 manifest.
+The suite writes `summary.json`, `sensor_resource_profile.json`,
+`scenario_summary.csv`, `SCORECARD.md`, and a SHA-256 manifest.

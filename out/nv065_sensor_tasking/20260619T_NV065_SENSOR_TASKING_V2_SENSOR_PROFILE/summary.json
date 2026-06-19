@@ -1,0 +1,974 @@
+{
+  "schema": "nv065_adaptive_sensor_tasking_benchmark_v1",
+  "generated_utc": "2026-06-19T20:49:04.682229+00:00",
+  "evidence_boundary": "Generated software benchmark only. Tracks, sensors, covariance, hostility changes, sensor feedback, and tasking costs are synthetic. Results do not establish SSDS integration, fire-control performance, sensor physics, classified-environment performance, cybersecurity, adversarial robustness, or field readiness.",
+  "sensor_assumption_boundary": "Topic-aligned unclassified archetypes only. Parameters are generated software assumptions for task-allocation experiments, not radar physics, Navy-approved values, SSDS interface data, or fire-control evidence.",
+  "sensor_resource_profile": {
+    "schema": "nv065_sensor_resource_profile_v1",
+    "boundary": "Topic-aligned unclassified archetypes only. Parameters are generated software assumptions for task-allocation experiments, not radar physics, Navy-approved values, SSDS interface data, or fire-control evidence.",
+    "fcq_threshold": 1.0,
+    "sensor_archetypes": [
+      {
+        "name": "SPS-48",
+        "topic_role": "air-search radar archetype",
+        "generated_capacity_per_step": 8,
+        "generated_precision": 0.16,
+        "generated_scan_cost": 1.0,
+        "target_type_suitability": {
+          "air": 1.0,
+          "missile": 0.72,
+          "surface": 0.34
+        }
+      },
+      {
+        "name": "SPQ-9B",
+        "topic_role": "surface/low-altitude tracking radar archetype",
+        "generated_capacity_per_step": 7,
+        "generated_precision": 0.18,
+        "generated_scan_cost": 1.0,
+        "target_type_suitability": {
+          "surface": 1.0,
+          "missile": 0.7,
+          "air": 0.56
+        }
+      },
+      {
+        "name": "MK-9",
+        "topic_role": "tracker/illuminator archetype",
+        "generated_capacity_per_step": 3,
+        "generated_precision": 0.36,
+        "generated_scan_cost": 1.8,
+        "target_type_suitability": {
+          "missile": 1.0,
+          "air": 0.7,
+          "surface": 0.45
+        }
+      },
+      {
+        "name": "SPY-6(V)3",
+        "topic_role": "multi-function radar archetype",
+        "generated_capacity_per_step": 9,
+        "generated_precision": 0.24,
+        "generated_scan_cost": 1.4,
+        "target_type_suitability": {
+          "air": 1.0,
+          "missile": 0.95,
+          "surface": 0.72
+        }
+      }
+    ],
+    "condition_adjustments": [
+      {
+        "condition": "nominal",
+        "capacity_factor": 1.0,
+        "clutter_multiplier": 1.0,
+        "maneuver_multiplier": 1.0,
+        "sensor_quality": {}
+      },
+      {
+        "condition": "dense_raid",
+        "capacity_factor": 0.82,
+        "clutter_multiplier": 1.22,
+        "maneuver_multiplier": 1.0,
+        "sensor_quality": {}
+      },
+      {
+        "condition": "sensor_degradation",
+        "capacity_factor": 1.0,
+        "clutter_multiplier": 1.0,
+        "maneuver_multiplier": 1.0,
+        "sensor_quality": {
+          "SPY-6(V)3": 0.56,
+          "SPQ-9B": 0.78
+        }
+      },
+      {
+        "condition": "hostility_shift",
+        "capacity_factor": 1.0,
+        "clutter_multiplier": 1.0,
+        "maneuver_multiplier": 1.25,
+        "sensor_quality": {}
+      },
+      {
+        "condition": "combined_stress",
+        "capacity_factor": 0.74,
+        "clutter_multiplier": 1.35,
+        "maneuver_multiplier": 1.32,
+        "sensor_quality": {
+          "SPY-6(V)3": 0.62,
+          "SPQ-9B": 0.74,
+          "SPS-48": 0.82
+        }
+      }
+    ],
+    "not_modeled": [
+      "radar waveforms",
+      "electromagnetic propagation",
+      "track association with real sensors",
+      "classified sensor performance",
+      "SSDS message implementation",
+      "operator workload study",
+      "cybersecurity or adversarial effects"
+    ]
+  },
+  "development": {
+    "scenario_count": 12,
+    "seed_base": 3100000,
+    "conditions": [
+      "nominal",
+      "dense_raid",
+      "hostility_shift"
+    ],
+    "selected_policy": {
+      "name": "critical_release",
+      "release_threshold": 0.04,
+      "critical_boost": 1.7,
+      "stale_boost": 0.35,
+      "release_penalty": 0.8,
+      "degradation_weight": 1.0
+    },
+    "candidate_results": [
+      {
+        "name": "balanced_release",
+        "critical_fcq_delta_vs_greedy": 0.0462587036893893,
+        "low_value_task_fraction_delta_vs_greedy": 0.18792702816489898,
+        "median_shift_response_delay_delta_vs_greedy": 0.0,
+        "selection_score": -0.019515756168325342
+      },
+      {
+        "name": "critical_release",
+        "critical_fcq_delta_vs_greedy": 0.061280161378996306,
+        "low_value_task_fraction_delta_vs_greedy": 0.008478409930110302,
+        "median_shift_response_delay_delta_vs_greedy": 0.0,
+        "selection_score": 0.0583127179034577
+      },
+      {
+        "name": "fast_shift_release",
+        "critical_fcq_delta_vs_greedy": 0.03874122235091334,
+        "low_value_task_fraction_delta_vs_greedy": 0.28026057566154455,
+        "median_shift_response_delay_delta_vs_greedy": 0.0,
+        "selection_score": -0.05934997913062725
+      },
+      {
+        "name": "conservative_release",
+        "critical_fcq_delta_vs_greedy": 0.05859225409912394,
+        "low_value_task_fraction_delta_vs_greedy": 0.0012461778254731308,
+        "median_shift_response_delay_delta_vs_greedy": 0.0,
+        "selection_score": 0.05815609186020835
+      }
+    ],
+    "selection_rule": "maximize development critical-FCQ delta versus greedy uncertainty, penalizing low-value tasking and hostility-shift response delay"
+  },
+  "validation": {
+    "scenarios_per_condition": 24,
+    "seed_base": 3900000,
+    "horizon": 150,
+    "fcq_threshold": 1.0,
+    "conditions": {
+      "nominal": {
+        "configuration": {
+          "initial_tracks": 24,
+          "arrival_rate": 0.14,
+          "shift_probability": 0.01,
+          "clutter_multiplier": 1.0,
+          "maneuver_multiplier": 1.0,
+          "capacity_factor": 1.0,
+          "sensor_quality": {}
+        },
+        "metrics": {
+          "fixed_priority": {
+            "critical_fcq_rate": 0.8800263077324827,
+            "high_hostility_fcq_rate": 0.9494393261025357,
+            "mean_critical_covariance": 0.6017860970804337,
+            "low_value_task_fraction": 0.36975308641975313,
+            "assignments_per_step": 27.0,
+            "median_shift_response_delay": 2.75,
+            "missed_shift_count": 1.9583333333333333,
+            "critical_track_count": 38.5,
+            "track_count": 44.875
+          },
+          "greedy_uncertainty": {
+            "critical_fcq_rate": 0.993144866713194,
+            "high_hostility_fcq_rate": 1.0,
+            "mean_critical_covariance": 0.26831925620356706,
+            "low_value_task_fraction": 0.06810699588477366,
+            "assignments_per_step": 27.0,
+            "median_shift_response_delay": 0.0,
+            "missed_shift_count": 0.0,
+            "critical_track_count": 38.5,
+            "track_count": 44.875
+          },
+          "adaptive_sensor_manager": {
+            "critical_fcq_rate": 0.9984512085373264,
+            "high_hostility_fcq_rate": 1.0,
+            "mean_critical_covariance": 0.5452229207645435,
+            "low_value_task_fraction": 0.07596191800562345,
+            "assignments_per_step": 14.71861111111111,
+            "median_shift_response_delay": 0.0,
+            "missed_shift_count": 0.0,
+            "critical_track_count": 38.5,
+            "track_count": 44.875
+          },
+          "adaptive_vs_fixed_priority": {
+            "critical_fcq_rate": {
+              "mean_delta": 0.1184249008048438,
+              "bootstrap_95pct_interval": [
+                0.10632222072924721,
+                0.1320252530215079
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "high_hostility_fcq_rate": {
+              "mean_delta": 0.050560673897464235,
+              "bootstrap_95pct_interval": [
+                0.047431952090939825,
+                0.05421890234617688
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "mean_critical_covariance": {
+              "mean_delta": -0.05656317631589037,
+              "bootstrap_95pct_interval": [
+                -0.11584823326923,
+                -0.005142876685872088
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 0.5416666666666666
+            },
+            "low_value_task_fraction": {
+              "mean_delta": -0.2937911684141296,
+              "bootstrap_95pct_interval": [
+                -0.31231964063600076,
+                -0.27362632133066894
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "assignments_per_step": {
+              "mean_delta": -12.28138888888889,
+              "bootstrap_95pct_interval": [
+                -12.667145833333334,
+                -11.828604166666667
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "median_shift_response_delay": {
+              "mean_delta": -2.75,
+              "bootstrap_95pct_interval": [
+                -2.9583333333333335,
+                -2.5208333333333335
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            }
+          },
+          "adaptive_vs_greedy_uncertainty": {
+            "critical_fcq_rate": {
+              "mean_delta": 0.005306341824132389,
+              "bootstrap_95pct_interval": [
+                0.004553490896134971,
+                0.006069796314820901
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "high_hostility_fcq_rate": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "mean_critical_covariance": {
+              "mean_delta": 0.2769036645609763,
+              "bootstrap_95pct_interval": [
+                0.2693195955916995,
+                0.2841984915273557
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 0.0
+            },
+            "low_value_task_fraction": {
+              "mean_delta": 0.00785492212084978,
+              "bootstrap_95pct_interval": [
+                -0.0005040606803285948,
+                0.015244406761112437
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 0.4166666666666667
+            },
+            "assignments_per_step": {
+              "mean_delta": -12.28138888888889,
+              "bootstrap_95pct_interval": [
+                -12.667145833333334,
+                -11.828604166666667
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "median_shift_response_delay": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            }
+          }
+        }
+      },
+      "dense_raid": {
+        "configuration": {
+          "initial_tracks": 58,
+          "arrival_rate": 0.42,
+          "shift_probability": 0.02,
+          "clutter_multiplier": 1.22,
+          "maneuver_multiplier": 1.0,
+          "capacity_factor": 0.82,
+          "sensor_quality": {}
+        },
+        "metrics": {
+          "fixed_priority": {
+            "critical_fcq_rate": 0.5150831410948606,
+            "high_hostility_fcq_rate": 0.5627791823052747,
+            "mean_critical_covariance": 1.3562655623939708,
+            "low_value_task_fraction": 0.08623737373737374,
+            "assignments_per_step": 22.0,
+            "median_shift_response_delay": 4.604166666666667,
+            "missed_shift_count": 32.916666666666664,
+            "critical_track_count": 113.5,
+            "track_count": 122.625
+          },
+          "greedy_uncertainty": {
+            "critical_fcq_rate": 0.4907198637783646,
+            "high_hostility_fcq_rate": 0.48725484369846367,
+            "mean_critical_covariance": 1.0306417796532157,
+            "low_value_task_fraction": 0.0,
+            "assignments_per_step": 22.0,
+            "median_shift_response_delay": 0.020833333333333332,
+            "missed_shift_count": 23.75,
+            "critical_track_count": 113.5,
+            "track_count": 122.625
+          },
+          "adaptive_sensor_manager": {
+            "critical_fcq_rate": 0.6549711277688129,
+            "high_hostility_fcq_rate": 0.6547258104705752,
+            "mean_critical_covariance": 0.9212004141295052,
+            "low_value_task_fraction": 0.0,
+            "assignments_per_step": 22.0,
+            "median_shift_response_delay": 0.0,
+            "missed_shift_count": 3.125,
+            "critical_track_count": 113.5,
+            "track_count": 122.625
+          },
+          "adaptive_vs_fixed_priority": {
+            "critical_fcq_rate": {
+              "mean_delta": 0.13988798667395236,
+              "bootstrap_95pct_interval": [
+                0.12244178182463923,
+                0.1559715027566349
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "high_hostility_fcq_rate": {
+              "mean_delta": 0.09194662816530047,
+              "bootstrap_95pct_interval": [
+                0.07321478575808815,
+                0.10879966518957346
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 0.9583333333333334
+            },
+            "mean_critical_covariance": {
+              "mean_delta": -0.4350651482644656,
+              "bootstrap_95pct_interval": [
+                -0.4757575172783658,
+                -0.3922698063188733
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "low_value_task_fraction": {
+              "mean_delta": -0.08623737373737374,
+              "bootstrap_95pct_interval": [
+                -0.09582260101010101,
+                -0.0767522095959596
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "assignments_per_step": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "median_shift_response_delay": {
+              "mean_delta": -4.604166666666667,
+              "bootstrap_95pct_interval": [
+                -4.833333333333333,
+                -4.354166666666667
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            }
+          },
+          "adaptive_vs_greedy_uncertainty": {
+            "critical_fcq_rate": {
+              "mean_delta": 0.16425126399044834,
+              "bootstrap_95pct_interval": [
+                0.15096153909923749,
+                0.1772401452654886
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "high_hostility_fcq_rate": {
+              "mean_delta": 0.16747096677211157,
+              "bootstrap_95pct_interval": [
+                0.15312237443166554,
+                0.18132567385828346
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "mean_critical_covariance": {
+              "mean_delta": -0.10944136552371063,
+              "bootstrap_95pct_interval": [
+                -0.11403307606078436,
+                -0.10478689508674117
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "low_value_task_fraction": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "assignments_per_step": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "median_shift_response_delay": {
+              "mean_delta": -0.020833333333333332,
+              "bootstrap_95pct_interval": [
+                -0.0625,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            }
+          }
+        }
+      },
+      "sensor_degradation": {
+        "configuration": {
+          "initial_tracks": 32,
+          "arrival_rate": 0.2,
+          "shift_probability": 0.016,
+          "clutter_multiplier": 1.0,
+          "maneuver_multiplier": 1.0,
+          "capacity_factor": 1.0,
+          "sensor_quality": {
+            "SPY-6(V)3": 0.56,
+            "SPQ-9B": 0.78
+          }
+        },
+        "metrics": {
+          "fixed_priority": {
+            "critical_fcq_rate": 0.8265526142621843,
+            "high_hostility_fcq_rate": 0.9078349407333152,
+            "mean_critical_covariance": 0.8261437605649545,
+            "low_value_task_fraction": 0.2684259259259259,
+            "assignments_per_step": 27.0,
+            "median_shift_response_delay": 4.5,
+            "missed_shift_count": 5.125,
+            "critical_track_count": 56.75,
+            "track_count": 61.625
+          },
+          "greedy_uncertainty": {
+            "critical_fcq_rate": 0.9863023814567119,
+            "high_hostility_fcq_rate": 1.0,
+            "mean_critical_covariance": 0.4658417056198793,
+            "low_value_task_fraction": 0.0010390946502057614,
+            "assignments_per_step": 27.0,
+            "median_shift_response_delay": 0.0,
+            "missed_shift_count": 0.0,
+            "critical_track_count": 56.75,
+            "track_count": 61.625
+          },
+          "adaptive_sensor_manager": {
+            "critical_fcq_rate": 0.9953267465541012,
+            "high_hostility_fcq_rate": 1.0,
+            "mean_critical_covariance": 0.6577554822876132,
+            "low_value_task_fraction": 0.13285990073208423,
+            "assignments_per_step": 19.75611111111111,
+            "median_shift_response_delay": 0.0,
+            "missed_shift_count": 0.0,
+            "critical_track_count": 56.75,
+            "track_count": 61.625
+          },
+          "adaptive_vs_fixed_priority": {
+            "critical_fcq_rate": {
+              "mean_delta": 0.16877413229191687,
+              "bootstrap_95pct_interval": [
+                0.15377356355961413,
+                0.18429149081856466
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "high_hostility_fcq_rate": {
+              "mean_delta": 0.09216505926668489,
+              "bootstrap_95pct_interval": [
+                0.084550399105238,
+                0.10119197216093656
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "mean_critical_covariance": {
+              "mean_delta": -0.16838827827734126,
+              "bootstrap_95pct_interval": [
+                -0.2362847411855541,
+                -0.11409545130835876
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 0.875
+            },
+            "low_value_task_fraction": {
+              "mean_delta": -0.13556602519384167,
+              "bootstrap_95pct_interval": [
+                -0.16222365311155065,
+                -0.1103880102328512
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "assignments_per_step": {
+              "mean_delta": -7.24388888888889,
+              "bootstrap_95pct_interval": [
+                -7.845409722222222,
+                -6.662097222222223
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "median_shift_response_delay": {
+              "mean_delta": -4.5,
+              "bootstrap_95pct_interval": [
+                -4.708333333333333,
+                -4.291666666666667
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            }
+          },
+          "adaptive_vs_greedy_uncertainty": {
+            "critical_fcq_rate": {
+              "mean_delta": 0.009024365097389325,
+              "bootstrap_95pct_interval": [
+                0.008088516648720862,
+                0.009943935801332487
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "high_hostility_fcq_rate": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "mean_critical_covariance": {
+              "mean_delta": 0.19191377666773388,
+              "bootstrap_95pct_interval": [
+                0.17686027536630625,
+                0.20689781242485866
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 0.0
+            },
+            "low_value_task_fraction": {
+              "mean_delta": 0.1318208060818785,
+              "bootstrap_95pct_interval": [
+                0.11990821764994061,
+                0.14343246999729833
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 0.0
+            },
+            "assignments_per_step": {
+              "mean_delta": -7.24388888888889,
+              "bootstrap_95pct_interval": [
+                -7.845409722222222,
+                -6.662097222222223
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "median_shift_response_delay": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            }
+          }
+        }
+      },
+      "hostility_shift": {
+        "configuration": {
+          "initial_tracks": 34,
+          "arrival_rate": 0.22,
+          "shift_probability": 0.045,
+          "clutter_multiplier": 1.0,
+          "maneuver_multiplier": 1.25,
+          "capacity_factor": 1.0,
+          "sensor_quality": {}
+        },
+        "metrics": {
+          "fixed_priority": {
+            "critical_fcq_rate": 0.8361203756396719,
+            "high_hostility_fcq_rate": 0.9150351023717235,
+            "mean_critical_covariance": 0.8337001106522299,
+            "low_value_task_fraction": 0.20219135802469138,
+            "assignments_per_step": 27.0,
+            "median_shift_response_delay": 3.8125,
+            "missed_shift_count": 6.375,
+            "critical_track_count": 64.79166666666667,
+            "track_count": 66.95833333333333
+          },
+          "greedy_uncertainty": {
+            "critical_fcq_rate": 0.9897617663695994,
+            "high_hostility_fcq_rate": 1.0,
+            "mean_critical_covariance": 0.4707243089215312,
+            "low_value_task_fraction": 0.0019032921810699592,
+            "assignments_per_step": 27.0,
+            "median_shift_response_delay": 0.0,
+            "missed_shift_count": 0.0,
+            "critical_track_count": 64.79166666666667,
+            "track_count": 66.95833333333333
+          },
+          "adaptive_sensor_manager": {
+            "critical_fcq_rate": 0.996622435802299,
+            "high_hostility_fcq_rate": 1.0,
+            "mean_critical_covariance": 0.5944774301377405,
+            "low_value_task_fraction": 0.04110187692011407,
+            "assignments_per_step": 22.743333333333336,
+            "median_shift_response_delay": 0.0,
+            "missed_shift_count": 0.0,
+            "critical_track_count": 64.79166666666667,
+            "track_count": 66.95833333333333
+          },
+          "adaptive_vs_fixed_priority": {
+            "critical_fcq_rate": {
+              "mean_delta": 0.16050206016262722,
+              "bootstrap_95pct_interval": [
+                0.14582106973630826,
+                0.17727316393725345
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "high_hostility_fcq_rate": {
+              "mean_delta": 0.0849648976282767,
+              "bootstrap_95pct_interval": [
+                0.07563642934640527,
+                0.09775435087657008
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "mean_critical_covariance": {
+              "mean_delta": -0.23922268051448958,
+              "bootstrap_95pct_interval": [
+                -0.2965757993172481,
+                -0.19096694596041172
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "low_value_task_fraction": {
+              "mean_delta": -0.1610894811045773,
+              "bootstrap_95pct_interval": [
+                -0.174080542506539,
+                -0.14826490884886243
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "assignments_per_step": {
+              "mean_delta": -4.256666666666667,
+              "bootstrap_95pct_interval": [
+                -4.763,
+                -3.816881944444444
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "median_shift_response_delay": {
+              "mean_delta": -3.8125,
+              "bootstrap_95pct_interval": [
+                -3.9375,
+                -3.6666666666666665
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            }
+          },
+          "adaptive_vs_greedy_uncertainty": {
+            "critical_fcq_rate": {
+              "mean_delta": 0.006860669432699658,
+              "bootstrap_95pct_interval": [
+                0.006043452169217822,
+                0.007687185406778602
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "high_hostility_fcq_rate": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "mean_critical_covariance": {
+              "mean_delta": 0.12375312121620917,
+              "bootstrap_95pct_interval": [
+                0.11142995564360994,
+                0.13741533639953388
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 0.0
+            },
+            "low_value_task_fraction": {
+              "mean_delta": 0.039198584739044105,
+              "bootstrap_95pct_interval": [
+                0.03475113065809611,
+                0.043926236444557065
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 0.0
+            },
+            "assignments_per_step": {
+              "mean_delta": -4.256666666666667,
+              "bootstrap_95pct_interval": [
+                -4.763,
+                -3.816881944444444
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "median_shift_response_delay": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            }
+          }
+        }
+      },
+      "combined_stress": {
+        "configuration": {
+          "initial_tracks": 64,
+          "arrival_rate": 0.48,
+          "shift_probability": 0.042,
+          "clutter_multiplier": 1.35,
+          "maneuver_multiplier": 1.32,
+          "capacity_factor": 0.74,
+          "sensor_quality": {
+            "SPY-6(V)3": 0.62,
+            "SPQ-9B": 0.74,
+            "SPS-48": 0.82
+          }
+        },
+        "metrics": {
+          "fixed_priority": {
+            "critical_fcq_rate": 0.14799690405074148,
+            "high_hostility_fcq_rate": 0.15052488478406348,
+            "mean_critical_covariance": 2.4296573983848146,
+            "low_value_task_fraction": 0.02363888888888889,
+            "assignments_per_step": 20.0,
+            "median_shift_response_delay": 17.416666666666668,
+            "missed_shift_count": 93.95833333333333,
+            "critical_track_count": 129.58333333333334,
+            "track_count": 135.08333333333334
+          },
+          "greedy_uncertainty": {
+            "critical_fcq_rate": 0.003091974049248663,
+            "high_hostility_fcq_rate": 0.0035737266825439074,
+            "mean_critical_covariance": 2.190957499178037,
+            "low_value_task_fraction": 0.0,
+            "assignments_per_step": 20.0,
+            "median_shift_response_delay": 42.145833333333336,
+            "missed_shift_count": 123.91666666666667,
+            "critical_track_count": 129.58333333333334,
+            "track_count": 135.08333333333334
+          },
+          "adaptive_sensor_manager": {
+            "critical_fcq_rate": 0.10441180323489396,
+            "high_hostility_fcq_rate": 0.11225383806945126,
+            "mean_critical_covariance": 2.091199426746128,
+            "low_value_task_fraction": 0.0,
+            "assignments_per_step": 20.0,
+            "median_shift_response_delay": 9.083333333333334,
+            "missed_shift_count": 80.79166666666667,
+            "critical_track_count": 129.58333333333334,
+            "track_count": 135.08333333333334
+          },
+          "adaptive_vs_fixed_priority": {
+            "critical_fcq_rate": {
+              "mean_delta": -0.04358510081584751,
+              "bootstrap_95pct_interval": [
+                -0.05204805793428458,
+                -0.03438184849870457
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 0.041666666666666664
+            },
+            "high_hostility_fcq_rate": {
+              "mean_delta": -0.038271046714612234,
+              "bootstrap_95pct_interval": [
+                -0.04813784447877984,
+                -0.027808512162805554
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 0.041666666666666664
+            },
+            "mean_critical_covariance": {
+              "mean_delta": -0.3384579716386867,
+              "bootstrap_95pct_interval": [
+                -0.3853426294082581,
+                -0.29574072776305627
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "low_value_task_fraction": {
+              "mean_delta": -0.02363888888888889,
+              "bootstrap_95pct_interval": [
+                -0.029015277777777782,
+                -0.01883333333333333
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "assignments_per_step": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "median_shift_response_delay": {
+              "mean_delta": -8.333333333333334,
+              "bootstrap_95pct_interval": [
+                -9.6875,
+                -7.248958333333334
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            }
+          },
+          "adaptive_vs_greedy_uncertainty": {
+            "critical_fcq_rate": {
+              "mean_delta": 0.10131982918564529,
+              "bootstrap_95pct_interval": [
+                0.09224839212288183,
+                0.11206672363021818
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "high_hostility_fcq_rate": {
+              "mean_delta": 0.10868011138690736,
+              "bootstrap_95pct_interval": [
+                0.09869015080505099,
+                0.12000552093828262
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "mean_critical_covariance": {
+              "mean_delta": -0.0997580724319096,
+              "bootstrap_95pct_interval": [
+                -0.11756594185689424,
+                -0.08353413658003774
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "low_value_task_fraction": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "assignments_per_step": {
+              "mean_delta": 0.0,
+              "bootstrap_95pct_interval": [
+                0.0,
+                0.0
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            },
+            "median_shift_response_delay": {
+              "mean_delta": -33.0625,
+              "bootstrap_95pct_interval": [
+                -35.834895833333334,
+                -30.41510416666667
+              ],
+              "scenario_count": 24,
+              "favorable_scenario_fraction": 1.0
+            }
+          }
+        }
+      }
+    }
+  },
+  "limitations": [
+    "No SSDS, Aegis, Navy sensor, fire-control, or operational data.",
+    "No electromagnetic propagation, radar waveform, covariance filter, or classified model.",
+    "No real-time implementation, cybersecurity assessment, or integration test.",
+    "Sensor names are topic-aligned archetypes; parameters are generated assumptions.",
+    "The benchmark tests tasking allocation behavior, not fire-control readiness."
+  ]
+}

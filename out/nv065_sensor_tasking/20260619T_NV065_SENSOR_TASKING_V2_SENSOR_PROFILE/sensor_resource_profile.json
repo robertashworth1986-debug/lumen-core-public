@@ -1,0 +1,108 @@
+{
+  "schema": "nv065_sensor_resource_profile_v1",
+  "boundary": "Topic-aligned unclassified archetypes only. Parameters are generated software assumptions for task-allocation experiments, not radar physics, Navy-approved values, SSDS interface data, or fire-control evidence.",
+  "fcq_threshold": 1.0,
+  "sensor_archetypes": [
+    {
+      "name": "SPS-48",
+      "topic_role": "air-search radar archetype",
+      "generated_capacity_per_step": 8,
+      "generated_precision": 0.16,
+      "generated_scan_cost": 1.0,
+      "target_type_suitability": {
+        "air": 1.0,
+        "missile": 0.72,
+        "surface": 0.34
+      }
+    },
+    {
+      "name": "SPQ-9B",
+      "topic_role": "surface/low-altitude tracking radar archetype",
+      "generated_capacity_per_step": 7,
+      "generated_precision": 0.18,
+      "generated_scan_cost": 1.0,
+      "target_type_suitability": {
+        "surface": 1.0,
+        "missile": 0.7,
+        "air": 0.56
+      }
+    },
+    {
+      "name": "MK-9",
+      "topic_role": "tracker/illuminator archetype",
+      "generated_capacity_per_step": 3,
+      "generated_precision": 0.36,
+      "generated_scan_cost": 1.8,
+      "target_type_suitability": {
+        "missile": 1.0,
+        "air": 0.7,
+        "surface": 0.45
+      }
+    },
+    {
+      "name": "SPY-6(V)3",
+      "topic_role": "multi-function radar archetype",
+      "generated_capacity_per_step": 9,
+      "generated_precision": 0.24,
+      "generated_scan_cost": 1.4,
+      "target_type_suitability": {
+        "air": 1.0,
+        "missile": 0.95,
+        "surface": 0.72
+      }
+    }
+  ],
+  "condition_adjustments": [
+    {
+      "condition": "nominal",
+      "capacity_factor": 1.0,
+      "clutter_multiplier": 1.0,
+      "maneuver_multiplier": 1.0,
+      "sensor_quality": {}
+    },
+    {
+      "condition": "dense_raid",
+      "capacity_factor": 0.82,
+      "clutter_multiplier": 1.22,
+      "maneuver_multiplier": 1.0,
+      "sensor_quality": {}
+    },
+    {
+      "condition": "sensor_degradation",
+      "capacity_factor": 1.0,
+      "clutter_multiplier": 1.0,
+      "maneuver_multiplier": 1.0,
+      "sensor_quality": {
+        "SPY-6(V)3": 0.56,
+        "SPQ-9B": 0.78
+      }
+    },
+    {
+      "condition": "hostility_shift",
+      "capacity_factor": 1.0,
+      "clutter_multiplier": 1.0,
+      "maneuver_multiplier": 1.25,
+      "sensor_quality": {}
+    },
+    {
+      "condition": "combined_stress",
+      "capacity_factor": 0.74,
+      "clutter_multiplier": 1.35,
+      "maneuver_multiplier": 1.32,
+      "sensor_quality": {
+        "SPY-6(V)3": 0.62,
+        "SPQ-9B": 0.74,
+        "SPS-48": 0.82
+      }
+    }
+  ],
+  "not_modeled": [
+    "radar waveforms",
+    "electromagnetic propagation",
+    "track association with real sensors",
+    "classified sensor performance",
+    "SSDS message implementation",
+    "operator workload study",
+    "cybersecurity or adversarial effects"
+  ]
+}

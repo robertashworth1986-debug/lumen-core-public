@@ -1,0 +1,22 @@
+{
+  "schema": "nv065_sensor_tasking_manifest_v1",
+  "generated_utc": "2026-06-19T20:49:04.682229+00:00",
+  "files": {
+    "summary.json": {
+      "bytes": 35889,
+      "sha256": "acb7dd7ad29a452adbf152f7579cb7648b99fa758a5c27821531af6094a11880"
+    },
+    "sensor_resource_profile.json": {
+      "bytes": 3008,
+      "sha256": "769c8d87809bc56278d8b6bbeb37d510ecf09e68fdd8d2ab9a2fb096393818b4"
+    },
+    "scenario_summary.csv": {
+      "bytes": 34865,
+      "sha256": "30af4716b3d53ea7bcf09cb30923406bff43495a00925589c3763cd015771b10"
+    },
+    "SCORECARD.md": {
+      "bytes": 2668,
+      "sha256": "8f2b130f635b31ac1aa75c052261fcc243028b50dacdb46df4c5796648493b80"
+    }
+  }
+}

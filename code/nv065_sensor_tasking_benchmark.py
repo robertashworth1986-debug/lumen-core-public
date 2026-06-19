@@ -120,6 +120,12 @@ SENSORS = (
     ),
 )
 
+SENSOR_ASSUMPTION_BOUNDARY = (
+    "Topic-aligned unclassified archetypes only. Parameters are generated "
+    "software assumptions for task-allocation experiments, not radar physics, "
+    "Navy-approved values, SSDS interface data, or fire-control evidence."
+)
+
 CONDITIONS = (
     Condition("nominal", initial_tracks=24, arrival_rate=0.14, shift_probability=0.010),
     Condition(
@@ -168,6 +174,49 @@ def sensor_quality(condition: Condition, sensor: Sensor) -> float:
     if not condition.sensor_quality:
         return 1.0
     return float(condition.sensor_quality.get(sensor.name, 1.0))
+
+
+def sensor_resource_profile() -> dict[str, Any]:
+    return {
+        "schema": "nv065_sensor_resource_profile_v1",
+        "boundary": SENSOR_ASSUMPTION_BOUNDARY,
+        "fcq_threshold": FCQ_THRESHOLD,
+        "sensor_archetypes": [
+            {
+                "name": sensor.name,
+                "topic_role": {
+                    "SPS-48": "air-search radar archetype",
+                    "SPQ-9B": "surface/low-altitude tracking radar archetype",
+                    "MK-9": "tracker/illuminator archetype",
+                    "SPY-6(V)3": "multi-function radar archetype",
+                }[sensor.name],
+                "generated_capacity_per_step": sensor.capacity,
+                "generated_precision": sensor.precision,
+                "generated_scan_cost": sensor.scan_cost,
+                "target_type_suitability": sensor.suitability,
+            }
+            for sensor in SENSORS
+        ],
+        "condition_adjustments": [
+            {
+                "condition": condition.name,
+                "capacity_factor": condition.capacity_factor,
+                "clutter_multiplier": condition.clutter_multiplier,
+                "maneuver_multiplier": condition.maneuver_multiplier,
+                "sensor_quality": condition.sensor_quality or {},
+            }
+            for condition in CONDITIONS
+        ],
+        "not_modeled": [
+            "radar waveforms",
+            "electromagnetic propagation",
+            "track association with real sensors",
+            "classified sensor performance",
+            "SSDS message implementation",
+            "operator workload study",
+            "cybersecurity or adversarial effects",
+        ],
+    }
 
 
 def generate_tracks(
@@ -735,6 +784,8 @@ def run_suite(
         "schema": "nv065_adaptive_sensor_tasking_benchmark_v1",
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "evidence_boundary": EVIDENCE_BOUNDARY,
+        "sensor_assumption_boundary": SENSOR_ASSUMPTION_BOUNDARY,
+        "sensor_resource_profile": sensor_resource_profile(),
         "development": {
             "scenario_count": development_scenarios,
             "seed_base": development_seed_base,
@@ -761,6 +812,11 @@ def run_suite(
 
     summary_path = out_dir / "summary.json"
     summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    sensor_profile_path = out_dir / "sensor_resource_profile.json"
+    sensor_profile_path.write_text(
+        json.dumps(sensor_resource_profile(), indent=2),
+        encoding="utf-8",
+    )
     csv_path = out_dir / "scenario_summary.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(scenario_rows[0]))
@@ -778,6 +834,8 @@ def run_suite(
         f"- Selected policy: {selected.name}",
         "- Development conditions: nominal, dense raid, hostility shift.",
         "- Baselines: fixed priority and greedy uncertainty tasking.",
+        "- Sensor-resource profile: generated SPS-48, SPQ-9B, MK-9, and "
+        "SPY-6(V)3 archetypes; not Navy-approved radar physics or SSDS data.",
         "",
         "## Frozen Validation",
         "",
@@ -813,6 +871,22 @@ def run_suite(
             "critical tracks. All comparisons use identical generated tracks "
             "per paired seed.",
             "",
+            "## Generated Sensor-Resource Profile",
+            "",
+            f"Boundary: {SENSOR_ASSUMPTION_BOUNDARY}",
+            "",
+            "| Sensor archetype | Generated capacity/step | Generated precision | Generated scan cost | Strongest generated suitability |",
+            "|---|---:|---:|---:|---|",
+            *[
+                "| "
+                f"{sensor.name} | "
+                f"{sensor.capacity} | "
+                f"{sensor.precision:.2f} | "
+                f"{sensor.scan_cost:.2f} | "
+                f"{max(sensor.suitability.items(), key=lambda item: item[1])[0]} |"
+                for sensor in SENSORS
+            ],
+            "",
             "## Interpretation",
             "",
             "The benchmark tests a narrow allocation hypothesis: marginal "
@@ -829,7 +903,7 @@ def run_suite(
     scorecard_path.write_text("\n".join(lines), encoding="utf-8")
 
     files = {}
-    for path in (summary_path, csv_path, scorecard_path):
+    for path in (summary_path, sensor_profile_path, csv_path, scorecard_path):
         files[path.name] = {
             "bytes": path.stat().st_size,
             "sha256": _sha256(path),

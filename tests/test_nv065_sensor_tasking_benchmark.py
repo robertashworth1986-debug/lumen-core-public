@@ -15,8 +15,10 @@ from nv065_sensor_tasking_benchmark import (  # noqa: E402
     CONDITIONS,
     POLICY_CANDIDATES,
     EVIDENCE_BOUNDARY,
+    SENSORS,
     generate_tracks,
     run_suite,
+    sensor_resource_profile,
     simulate_policy,
 )
 
@@ -79,6 +81,11 @@ class NV065SensorTaskingBenchmarkTests(unittest.TestCase):
                 horizon=90,
             )
             self.assertEqual(summary["evidence_boundary"], EVIDENCE_BOUNDARY)
+            self.assertIn("sensor_resource_profile", summary)
+            self.assertEqual(
+                {item["name"] for item in summary["sensor_resource_profile"]["sensor_archetypes"]},
+                {sensor.name for sensor in SENSORS},
+            )
             self.assertNotEqual(
                 summary["development"]["seed_base"],
                 summary["validation"]["seed_base"],
@@ -100,9 +107,29 @@ class NV065SensorTaskingBenchmarkTests(unittest.TestCase):
             manifest = json.loads(
                 (out / "manifest.sha256.json").read_text(encoding="utf-8")
             )
+            self.assertEqual(
+                set(manifest["files"]),
+                {
+                    "summary.json",
+                    "sensor_resource_profile.json",
+                    "scenario_summary.csv",
+                    "SCORECARD.md",
+                },
+            )
             for name, metadata in manifest["files"].items():
                 actual = hashlib.sha256((out / name).read_bytes()).hexdigest()
                 self.assertEqual(actual, metadata["sha256"])
+
+    def test_sensor_resource_profile_is_bounded_to_generated_assumptions(self) -> None:
+        profile = sensor_resource_profile()
+        self.assertEqual(profile["schema"], "nv065_sensor_resource_profile_v1")
+        self.assertTrue(profile["boundary"].startswith("Topic-aligned unclassified"))
+        self.assertEqual(
+            {item["name"] for item in profile["sensor_archetypes"]},
+            {"SPS-48", "SPQ-9B", "MK-9", "SPY-6(V)3"},
+        )
+        self.assertIn("radar waveforms", profile["not_modeled"])
+        self.assertIn("SSDS message implementation", profile["not_modeled"])
 
 
 if __name__ == "__main__":
