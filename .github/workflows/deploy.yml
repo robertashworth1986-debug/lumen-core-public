@@ -33,6 +33,10 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no opc@${{ secrets.VPS_HOST }} \
             "if command -v sudo >/dev/null 2>&1; then SUDO=sudo; else SUDO=; fi; \
+             \$SUDO journalctl --vacuum-size=100M >/dev/null 2>&1 || true; \
+             \$SUDO dnf clean all >/dev/null 2>&1 || true; \
+             \$SUDO yum clean all >/dev/null 2>&1 || true; \
+             \$SUDO find /var/log -type f \( -name '*.gz' -o -name '*.old' -o -name '*.1' -o -name '*.log.*' \) -delete 2>/dev/null || true; \
              if [ -d /opt/lumencore/dashboard ]; then \
                \$SUDO rm -rf /opt/lumencore/dashboard/node_modules \
                       /opt/lumencore/dashboard/.git \
