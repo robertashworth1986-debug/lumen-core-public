@@ -2,6 +2,9 @@
 
 Updated: June 13, 2026
 
+Follow-up evidence: the constraint-carrying commitment ablation is documented
+in `docs/DICE_CONSTRAINT_CONTRACT_BENCHMARK_2026-06-18.md`.
+
 ## Evidence Boundary
 
 This is a synthetic discrete-event software benchmark. Agents are stochastic

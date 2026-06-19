@@ -1,0 +1,210 @@
+{
+  "schema": "geometry_championship_v1_registry",
+  "version": 1,
+  "evidence_boundary": "Research registry only. A family is not a finding until its lane-specific promotion gate passes on frozen validation scenarios.",
+  "core_rule": "No geometry is sacred until it wins. Every pattern must compete. Every champion must be frozen. Every claim must be measurable.",
+  "cross_lane_ranking_allowed": false,
+  "lanes": {
+    "mission_network_routing": {
+      "baselines": [
+        "dijkstra",
+        "a_star",
+        "min_cost_flow",
+        "k_shortest_redundancy"
+      ],
+      "metrics": [
+        "delivery_rate",
+        "path_cost_per_delivery",
+        "recovery_steps",
+        "maximum_edge_load",
+        "messages",
+        "runtime_ms"
+      ]
+    },
+    "field_guided_control": {
+      "baselines": [
+        "euclidean_potential_field",
+        "model_predictive_control"
+      ],
+      "metrics": [
+        "goal_completion_rate",
+        "path_cost",
+        "collision_rate",
+        "control_effort",
+        "runtime_ms"
+      ]
+    },
+    "packing_topology": {
+      "baselines": [
+        "square_lattice",
+        "triangular_lattice",
+        "random_packing",
+        "optimized_packing"
+      ],
+      "metrics": [
+        "packing_density",
+        "connectivity",
+        "failure_tolerance",
+        "material_proxy",
+        "runtime_ms"
+      ]
+    },
+    "multi_agent_coordination": {
+      "baselines": [
+        "independent_shortest_path",
+        "consensus_control",
+        "model_predictive_control"
+      ],
+      "metrics": [
+        "mission_completion_rate",
+        "collision_rate",
+        "formation_error",
+        "messages",
+        "runtime_ms"
+      ]
+    },
+    "branching_transport": {
+      "baselines": [
+        "minimum_spanning_tree",
+        "steiner_approximation",
+        "min_cost_flow"
+      ],
+      "metrics": [
+        "delivered_flow",
+        "energy_proxy",
+        "material_proxy",
+        "failure_tolerance",
+        "runtime_ms"
+      ]
+    },
+    "thermal_ventilation": {
+      "baselines": [
+        "straight_duct",
+        "conventional_hvac_network",
+        "cfd_reference"
+      ],
+      "metrics": [
+        "temperature_uniformity",
+        "pressure_drop",
+        "energy_proxy",
+        "recovery_time",
+        "runtime_ms"
+      ]
+    },
+    "stability_diagnostic": {
+      "baselines": [
+        "spectral_norm",
+        "condition_number",
+        "perturbation_response"
+      ],
+      "metrics": [
+        "frobenius_delta",
+        "spectral_delta",
+        "condition_delta",
+        "output_sensitivity"
+      ]
+    }
+  },
+  "families": [
+    {
+      "id": "mycelium_network",
+      "label": "Mycelium or fungus network",
+      "lane": "mission_network_routing",
+      "status": "legacy_analogue_only",
+      "located_source": "C:/LumaQuantLab/CANONICAL_RESEARCH_STACK_20260324T043204Z/current/scripts/luma_v2_pipeline.py",
+      "located_result": "Negative portfolio result; ranked last in V2, V3, and V4. No routing implementation."
+    },
+    {
+      "id": "slime_mold_routing",
+      "label": "Slime mold routing",
+      "lane": "mission_network_routing",
+      "status": "specification_only"
+    },
+    {
+      "id": "magnetic_field_geometry",
+      "label": "Magnetic field geometry",
+      "lane": "field_guided_control",
+      "status": "specification_only"
+    },
+    {
+      "id": "toroidal_fields",
+      "label": "Toroidal fields",
+      "lane": "field_guided_control",
+      "status": "legacy_transform_only"
+    },
+    {
+      "id": "halbach_arrays",
+      "label": "Halbach arrays",
+      "lane": "field_guided_control",
+      "status": "specification_only"
+    },
+    {
+      "id": "flower_of_life_hexagonal_packing",
+      "label": "Flower of Life or hexagonal packing",
+      "lane": "packing_topology",
+      "status": "concept_only"
+    },
+    {
+      "id": "non_euclidean_geodesics",
+      "label": "Non-Euclidean geodesics",
+      "lane": "mission_network_routing",
+      "status": "specification_only"
+    },
+    {
+      "id": "frobenius_stability",
+      "label": "Frobenius stability tests",
+      "lane": "stability_diagnostic",
+      "status": "diagnostic_specification",
+      "competitor": false
+    },
+    {
+      "id": "bird_v_formation_flocking",
+      "label": "Bird V-formation or flocking",
+      "lane": "multi_agent_coordination",
+      "status": "specification_only"
+    },
+    {
+      "id": "ant_trails",
+      "label": "Ant trails",
+      "lane": "mission_network_routing",
+      "status": "specification_only"
+    },
+    {
+      "id": "river_deltas",
+      "label": "River deltas",
+      "lane": "branching_transport",
+      "status": "specification_only"
+    },
+    {
+      "id": "leaf_veins",
+      "label": "Leaf veins",
+      "lane": "branching_transport",
+      "status": "specification_only"
+    },
+    {
+      "id": "vascular_lung_branching",
+      "label": "Vascular or lung branching",
+      "lane": "branching_transport",
+      "status": "specification_only"
+    },
+    {
+      "id": "termite_mound_ventilation",
+      "label": "Termite mound ventilation",
+      "lane": "thermal_ventilation",
+      "status": "specification_only"
+    }
+  ],
+  "promotion_gate": {
+    "versioned_definition": true,
+    "preregistered_task_and_failure_criterion": true,
+    "budget_matched_baselines": true,
+    "frozen_development_and_validation_scenarios": true,
+    "minimum_validation_folds": 5,
+    "paired_uncertainty_interval": true,
+    "multiple_comparison_control": true,
+    "runtime_and_resource_measurement": true,
+    "sha256_manifest": true,
+    "negative_results_retained": true,
+    "independent_or_representative_validation_required_for_operational_claim": true
+  }
+}
