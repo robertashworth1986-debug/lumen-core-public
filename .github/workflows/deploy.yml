@@ -41,7 +41,11 @@ jobs:
                find /opt/lumencore/dashboard -type d -name '__pycache__' -prune -exec rm -rf {} +; \
                find /opt/lumencore/dashboard -type f \( -name '*.pyc' -o -name '*.tmp' -o -name '*.bak' -o -name '*.log' \) -delete; \
              fi; \
-             mkdir -p /opt/lumencore/dashboard /opt/lumencore/data && df -h /opt/lumencore"
+             mkdir -p /opt/lumencore/dashboard /opt/lumencore/data; \
+             df -h /opt/lumencore; \
+             echo 'Largest remote directories:'; \
+             du -xhd1 /opt /var /home /tmp 2>/dev/null | sort -h | tail -40; \
+             touch /opt/lumencore/data/.deploy_write_test && rm -f /opt/lumencore/data/.deploy_write_test"
 
           # Sync HTML dashboards + data JSON to VPS web roots
           # The VPS has limited free space, so avoid temp-copy rewrites of large
