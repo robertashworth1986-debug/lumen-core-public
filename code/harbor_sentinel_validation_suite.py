@@ -60,6 +60,22 @@ CONDITIONS = (
     Condition("severe_combined_stress", 192, 2.5, 0.05, 0.35),
 )
 
+SCORE_CONFIG = {
+    "source_loss_threshold": 5.0,
+    "enable_scene_degradation_gate": True,
+    "degradation_onset": 2.25,
+    "degradation_slope": 0.55,
+    "degradation_cap": 2.25,
+}
+SCORE_CONFIG_NOTE = (
+    "The v2 score stream estimates scene-wide source degradation from the "
+    "median normalized radar/beacon disagreement at each timestamp, without "
+    "using ground-truth labels. Behavioral scores and sensor-disagreement "
+    "scores are down-weighted when the whole scene indicates a sensor-noise "
+    "shift. Beacon loss uses a separate source-integrity review gate and does "
+    "not by itself become a behavior-based threat candidate."
+)
+
 
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
@@ -75,6 +91,7 @@ def _aggregate_condition(
     scenarios: int,
     base_seed: int,
     threshold: float,
+    score_config: dict[str, Any],
     warmup_steps: int,
     test_steps: int,
     anomaly_fraction: float,
@@ -102,6 +119,7 @@ def _aggregate_condition(
             frame,
             fit_profiles(frame),
             threshold=threshold,
+            **score_config,
         )
         alerts.insert(0, "scenario", scenario)
         metrics = evaluate_alerts(alerts)
@@ -129,6 +147,27 @@ def _aggregate_condition(
     all_alerts = pd.concat(alerts_by_scenario, ignore_index=True)
     aggregate = evaluate_alerts(all_alerts)
     processed_points = int(len(all_alerts))
+    degradation = {
+        "median_source_degradation_index": float(
+            all_alerts["source_degradation_index"].median()
+        ),
+        "p95_source_degradation_index": float(
+            all_alerts["source_degradation_index"].quantile(0.95)
+        ),
+        "median_source_degradation_factor": float(
+            all_alerts["source_degradation_factor"].median()
+        ),
+        "p95_source_degradation_factor": float(
+            all_alerts["source_degradation_factor"].quantile(0.95)
+        ),
+        "max_source_degradation_factor": float(
+            all_alerts["source_degradation_factor"].max()
+        ),
+        "note": (
+            "Scene-level source-quality diagnostic computed from observations "
+            "only; no ground-truth anomaly labels are used."
+        ),
+    }
     class_detection = {}
     for anomaly_type, metrics in aggregate["class_metrics"].items():
         class_detection[anomaly_type] = {
@@ -167,6 +206,7 @@ def _aggregate_condition(
         ],
         "class_detection": class_detection,
         "alert_category_counts": aggregate["alert_category_counts"],
+        "source_degradation": degradation,
         "runtime_observation": {
             "elapsed_seconds": elapsed,
             "processed_test_points": processed_points,
@@ -206,6 +246,7 @@ def run_suite(
         development_frames,
         [5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0],
         false_alert_cap_per_10000=100.0,
+        **SCORE_CONFIG,
     )
     threshold = float(threshold_selection["selected_threshold"])
 
@@ -217,6 +258,7 @@ def run_suite(
             scenarios=validation_scenarios,
             base_seed=validation_seed_base + index * 1_000_000,
             threshold=threshold,
+            score_config=SCORE_CONFIG,
             warmup_steps=warmup_steps,
             test_steps=test_steps,
             anomaly_fraction=anomaly_fraction,
@@ -225,9 +267,13 @@ def run_suite(
         scenario_rows.extend(rows)
 
     summary = {
-        "schema": "harbor_sentinel_validation_suite_v1",
+        "schema": "harbor_sentinel_validation_suite_v2",
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "evidence_boundary": EVIDENCE_BOUNDARY,
+        "score_configuration": {
+            **SCORE_CONFIG,
+            "note": SCORE_CONFIG_NOTE,
+        },
         "development": {
             "scenarios": development_scenarios,
             "seed_base": development_seed_base,
@@ -288,6 +334,12 @@ def run_suite(
                 f"- Frozen threshold: {threshold:.1f}",
                 "- Selection rule: maximize development F1 subject to no more "
                 "than 100 false alerts per 10,000 normal points.",
+                "- Source-quality calibration: scene-wide median "
+                "radar/beacon disagreement gates behavior confidence under "
+                "detected sensor-noise shift.",
+                "- Beacon-loss review gate: five consecutive missing "
+                "cooperative observations generate source-integrity review "
+                "without automatically creating a threat candidate.",
                 "",
                 "## Disjoint Nominal Validation",
                 "",
@@ -321,6 +373,8 @@ def run_suite(
                 "normal points: "
                 f"{combined['threat_candidate']['false_alerts_per_10000_normal_points']:.1f}",
                 f"- Event recall: {combined['event_recall']:.3f}",
+                "- Median source-degradation factor: "
+                f"{combined['source_degradation']['median_source_degradation_factor']:.2f}",
                 "",
                 "## Severe Breakdown Test",
                 "",
@@ -332,6 +386,8 @@ def run_suite(
                 "- Behavior-based threat-candidate false alerts per 10,000 "
                 "normal points: "
                 f"{severe['threat_candidate']['false_alerts_per_10000_normal_points']:.1f}",
+                "- Median source-degradation factor: "
+                f"{severe['source_degradation']['median_source_degradation_factor']:.2f}",
                 "",
                 "## Interpretation",
                 "",
@@ -340,8 +396,9 @@ def run_suite(
                 "dropout. Source-integrity alerts are separated from "
                 "behavior-based threat candidates because transmitter loss or "
                 "sensor disagreement alone does not identify hostile intent. "
-                "The severe condition is a measured failure region, not a "
-                "validated operating envelope.",
+                "The v2 source-quality gate is a synthetic feasibility result, "
+                "not an operational degraded-sensor claim, and must be repeated "
+                "on representative public and authorized government data.",
                 "",
             ]
         ),

@@ -103,6 +103,34 @@ def _fused_position(row: pd.Series) -> tuple[float, float]:
     return float(row["radar_x"]), float(row["radar_y"])
 
 
+def _scene_source_degradation(
+    group: pd.DataFrame,
+    profiles: dict[str, TrackProfile],
+    *,
+    onset: float,
+    slope: float,
+    cap: float,
+) -> tuple[float, float]:
+    """Estimate scene-wide sensor-noise shift without using labels."""
+    normalized_disagreements: list[float] = []
+    for _, row in group.iterrows():
+        if not bool(row["beacon_available"]):
+            continue
+        profile = profiles[str(row["track_id"])]
+        disagreement = math.hypot(
+            float(row["radar_x"]) - float(row["beacon_x"]),
+            float(row["radar_y"]) - float(row["beacon_y"]),
+        )
+        normalized_disagreements.append(
+            disagreement / profile.disagreement_scale
+        )
+    if not normalized_disagreements:
+        return 1.0, 0.0
+    index = float(np.median(normalized_disagreements))
+    factor = min(cap, 1.0 + max(0.0, index - onset) * slope)
+    return factor, index
+
+
 def simulate_scenario(
     *,
     seed: int,
@@ -347,120 +375,177 @@ def score_stream(
     profiles: dict[str, TrackProfile],
     *,
     threshold: float = 4.0,
+    source_loss_threshold: float | None = None,
+    enable_scene_degradation_gate: bool = False,
+    degradation_onset: float = 2.25,
+    degradation_slope: float = 0.55,
+    degradation_cap: float = 2.25,
 ) -> pd.DataFrame:
     alerts: list[dict[str, Any]] = []
     test = frame[~frame["warmup"]].sort_values(["timestamp", "track_id"])
-    for _, row in test.iterrows():
-        profile = profiles[str(row["track_id"])]
-        x, y = _fused_position(row)
-        timestamp = int(row["timestamp"])
-        delta_x = x - profile.last_x
-        delta_y = y - profile.last_y
-        speed = math.hypot(delta_x, delta_y)
-        heading = math.atan2(delta_y, delta_x)
-        expected_heading = math.atan2(
-            profile.velocity_y,
-            profile.velocity_x,
-        )
-        expected_x = profile.intercept_x + profile.velocity_x * timestamp
-        expected_y = profile.intercept_y + profile.velocity_y * timestamp
-        route_score = (
-            math.hypot(x - expected_x, y - expected_y)
-            / profile.position_scale
-        )
-        speed_score = (
-            abs(speed - profile.expected_speed) / profile.speed_scale
-        )
-        heading_score = (
-            _angle_difference(heading, expected_heading)
-            / profile.heading_scale
-        )
-        acceleration_score = (
-            abs(speed - profile.last_speed) / profile.acceleration_scale
-        )
-        if bool(row["beacon_available"]):
-            profile.missing_streak = 0
-            disagreement_score = (
-                math.hypot(
-                    float(row["radar_x"]) - float(row["beacon_x"]),
-                    float(row["radar_y"]) - float(row["beacon_y"]),
-                )
-                / profile.disagreement_scale
+    loss_threshold = (
+        threshold if source_loss_threshold is None else source_loss_threshold
+    )
+    for timestamp, group in test.groupby("timestamp", sort=True):
+        if enable_scene_degradation_gate:
+            degradation_factor, degradation_index = _scene_source_degradation(
+                group,
+                profiles,
+                onset=degradation_onset,
+                slope=degradation_slope,
+                cap=degradation_cap,
             )
         else:
-            profile.missing_streak += 1
-            disagreement_score = 0.0
-        missing_score = profile.missing_streak / 1.5
-        components = {
-            "route_deviation": route_score,
-            "speed_anomaly": speed_score,
-            "heading_change": heading_score,
-            "acceleration": acceleration_score,
-            "sensor_disagreement": disagreement_score,
-            "beacon_loss": missing_score,
-        }
-        reason, score = max(components.items(), key=lambda item: item[1])
-        alert = score >= threshold
-        exceeded = {
-            name for name, value in components.items() if value >= threshold
-        }
-        behavioral_reasons = {
-            "route_deviation",
-            "speed_anomaly",
-            "heading_change",
-            "acceleration",
-        }
-        source_reasons = {"sensor_disagreement", "beacon_loss"}
-        has_behavioral = bool(exceeded & behavioral_reasons)
-        has_source = bool(exceeded & source_reasons)
-        if alert and has_behavioral and has_source:
-            alert_category = "combined"
-        elif alert and has_behavioral:
-            alert_category = "behavioral"
-        elif alert and has_source:
-            alert_category = "source_integrity"
-        else:
-            alert_category = ""
-        threat_candidate = bool(
-            alert and alert_category in {"behavioral", "combined"}
-        )
-        if not alert:
-            review_priority = ""
-        elif alert_category == "combined" or score >= threshold * 1.5:
-            review_priority = "high"
-        elif alert_category == "behavioral":
-            review_priority = "medium"
-        else:
-            review_priority = "low"
-        confidence = (
-            float(1.0 - math.exp(-(score - threshold + 1.0) / 2.5))
-            if alert
-            else float(max(0.0, score / threshold) * 0.49)
-        )
-        baseline_score = max(speed_score, heading_score)
-        alerts.append(
-            {
-                "timestamp": timestamp,
-                "track_id": profile.track_id,
-                "domain": profile.domain,
-                "true_anomaly": bool(row["true_anomaly"]),
-                "anomaly_type": str(row["anomaly_type"]),
-                "event_start": int(row["event_start"]),
-                "alert": alert,
-                "alert_category": alert_category,
-                "review_priority": review_priority,
-                "threat_candidate": threat_candidate,
-                "confidence": min(0.999, confidence),
-                "reason": reason if alert else "",
-                "score": score,
-                "baseline_alert": baseline_score >= threshold,
-                "baseline_score": baseline_score,
-                "state_bytes": profile.algorithmic_state_bytes,
+            degradation_factor = 1.0
+            degradation_index = 0.0
+        for _, row in group.sort_values("track_id").iterrows():
+            profile = profiles[str(row["track_id"])]
+            x, y = _fused_position(row)
+            timestamp = int(row["timestamp"])
+            delta_x = x - profile.last_x
+            delta_y = y - profile.last_y
+            speed = math.hypot(delta_x, delta_y)
+            heading = math.atan2(delta_y, delta_x)
+            expected_heading = math.atan2(
+                profile.velocity_y,
+                profile.velocity_x,
+            )
+            expected_x = profile.intercept_x + profile.velocity_x * timestamp
+            expected_y = profile.intercept_y + profile.velocity_y * timestamp
+            raw_route_score = (
+                math.hypot(x - expected_x, y - expected_y)
+                / profile.position_scale
+            )
+            raw_speed_score = (
+                abs(speed - profile.expected_speed) / profile.speed_scale
+            )
+            raw_heading_score = (
+                _angle_difference(heading, expected_heading)
+                / profile.heading_scale
+            )
+            raw_acceleration_score = (
+                abs(speed - profile.last_speed) / profile.acceleration_scale
+            )
+            route_score = raw_route_score / degradation_factor
+            speed_score = raw_speed_score / degradation_factor
+            heading_score = raw_heading_score / degradation_factor
+            acceleration_score = raw_acceleration_score / degradation_factor
+            if bool(row["beacon_available"]):
+                profile.missing_streak = 0
+                raw_disagreement_score = (
+                    math.hypot(
+                        float(row["radar_x"]) - float(row["beacon_x"]),
+                        float(row["radar_y"]) - float(row["beacon_y"]),
+                    )
+                    / profile.disagreement_scale
+                )
+                disagreement_score = raw_disagreement_score / (
+                    degradation_factor * 1.15
+                )
+            else:
+                profile.missing_streak += 1
+                disagreement_score = 0.0
+            missing_score = (
+                float(profile.missing_streak)
+                if source_loss_threshold is not None
+                else profile.missing_streak / 1.5
+            )
+            components = {
+                "route_deviation": route_score,
+                "speed_anomaly": speed_score,
+                "heading_change": heading_score,
+                "acceleration": acceleration_score,
+                "sensor_disagreement": disagreement_score,
+                "beacon_loss": missing_score,
             }
-        )
-        profile.last_x = x
-        profile.last_y = y
-        profile.last_speed = speed
+            component_thresholds = {
+                "route_deviation": threshold,
+                "speed_anomaly": threshold,
+                "heading_change": threshold,
+                "acceleration": threshold,
+                "sensor_disagreement": threshold,
+                "beacon_loss": loss_threshold,
+            }
+            reason, score = max(
+                components.items(),
+                key=lambda item: item[1] / component_thresholds[item[0]],
+            )
+            alert = any(
+                value >= component_thresholds[name]
+                for name, value in components.items()
+            )
+            exceeded = {
+                name
+                for name, value in components.items()
+                if value >= component_thresholds[name]
+            }
+            behavioral_reasons = {
+                "route_deviation",
+                "speed_anomaly",
+                "heading_change",
+                "acceleration",
+            }
+            source_reasons = {"sensor_disagreement", "beacon_loss"}
+            has_behavioral = bool(exceeded & behavioral_reasons)
+            has_source = bool(exceeded & source_reasons)
+            if alert and has_behavioral and has_source:
+                alert_category = "combined"
+            elif alert and has_behavioral:
+                alert_category = "behavioral"
+            elif alert and has_source:
+                alert_category = "source_integrity"
+            else:
+                alert_category = ""
+            threat_candidate = bool(
+                alert and alert_category in {"behavioral", "combined"}
+            )
+            reason_threshold = component_thresholds[reason]
+            reason_ratio = score / reason_threshold
+            if not alert:
+                review_priority = ""
+            elif alert_category == "combined" or reason_ratio >= 1.5:
+                review_priority = "high"
+            elif alert_category == "behavioral":
+                review_priority = "medium"
+            else:
+                review_priority = "low"
+            confidence = (
+                float(
+                    1.0
+                    - math.exp(
+                        -(score - reason_threshold + 1.0) / 2.5
+                    )
+                )
+                if alert
+                else float(max(0.0, reason_ratio) * 0.49)
+            )
+            baseline_score = max(raw_speed_score, raw_heading_score)
+            alerts.append(
+                {
+                    "timestamp": timestamp,
+                    "track_id": profile.track_id,
+                    "domain": profile.domain,
+                    "true_anomaly": bool(row["true_anomaly"]),
+                    "anomaly_type": str(row["anomaly_type"]),
+                    "event_start": int(row["event_start"]),
+                    "alert": alert,
+                    "alert_category": alert_category,
+                    "review_priority": review_priority,
+                    "threat_candidate": threat_candidate,
+                    "confidence": min(0.999, confidence),
+                    "reason": reason if alert else "",
+                    "score": score,
+                    "reason_threshold": reason_threshold,
+                    "source_degradation_index": degradation_index,
+                    "source_degradation_factor": degradation_factor,
+                    "baseline_alert": baseline_score >= threshold,
+                    "baseline_score": baseline_score,
+                    "state_bytes": profile.algorithmic_state_bytes,
+                }
+            )
+            profile.last_x = x
+            profile.last_y = y
+            profile.last_speed = speed
     return pd.DataFrame(alerts)
 
 
@@ -592,6 +677,11 @@ def select_threshold(
     candidates: list[float],
     *,
     false_alert_cap_per_10000: float,
+    source_loss_threshold: float | None = None,
+    enable_scene_degradation_gate: bool = False,
+    degradation_onset: float = 2.25,
+    degradation_slope: float = 0.55,
+    degradation_cap: float = 2.25,
 ) -> dict[str, Any]:
     rows: list[dict[str, float]] = []
     for threshold in candidates:
@@ -601,6 +691,11 @@ def select_threshold(
                 frame,
                 copy.deepcopy(fit_profiles(frame)),
                 threshold=threshold,
+                source_loss_threshold=source_loss_threshold,
+                enable_scene_degradation_gate=enable_scene_degradation_gate,
+                degradation_onset=degradation_onset,
+                degradation_slope=degradation_slope,
+                degradation_cap=degradation_cap,
             )
             scenario_metrics.append(evaluate_alerts(alerts)["detector"])
         f1_mean = float(np.mean([row["f1"] for row in scenario_metrics]))

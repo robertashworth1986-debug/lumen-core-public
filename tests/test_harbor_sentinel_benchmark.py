@@ -174,6 +174,60 @@ class HarborSentinelBenchmarkTests(unittest.TestCase):
         )
         self.assertTrue((missing_by_track >= 18).all())
 
+    def test_scene_degradation_gate_reduces_sensor_shift_false_alerts(self) -> None:
+        frame = simulate_scenario(
+            seed=131,
+            tracks=24,
+            warmup_steps=80,
+            test_steps=100,
+            test_noise_multiplier=1.5,
+        )
+        baseline = evaluate_alerts(
+            score_stream(frame, fit_profiles(frame), threshold=8.0)
+        )
+        gated = evaluate_alerts(
+            score_stream(
+                frame,
+                fit_profiles(frame),
+                threshold=8.0,
+                source_loss_threshold=5.0,
+                enable_scene_degradation_gate=True,
+            )
+        )
+        self.assertLess(
+            gated["detector"]["false_alerts_per_10000_normal_points"],
+            baseline["detector"]["false_alerts_per_10000_normal_points"],
+        )
+
+    def test_source_loss_gate_speeds_beacon_silence_review(self) -> None:
+        frame = simulate_scenario(
+            seed=141,
+            tracks=12,
+            warmup_steps=80,
+            test_steps=100,
+            anomaly_fraction=1.0,
+        )
+        baseline = evaluate_alerts(
+            score_stream(frame, fit_profiles(frame), threshold=8.0)
+        )
+        faster = evaluate_alerts(
+            score_stream(
+                frame,
+                fit_profiles(frame),
+                threshold=8.0,
+                source_loss_threshold=5.0,
+                enable_scene_degradation_gate=True,
+            )
+        )
+        self.assertLess(
+            faster["class_metrics"]["beacon_silence"][
+                "median_detection_delay_steps"
+            ],
+            baseline["class_metrics"]["beacon_silence"][
+                "median_detection_delay_steps"
+            ],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

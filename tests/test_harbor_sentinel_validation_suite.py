@@ -26,8 +26,26 @@ class HarborSentinelValidationSuiteTests(unittest.TestCase):
             )
             self.assertEqual(summary["development"]["seed_base"], 1_600_000)
             self.assertEqual(summary["validation"]["seed_base"], 1_900_000)
+            self.assertEqual(summary["schema"], "harbor_sentinel_validation_suite_v2")
+            self.assertTrue(
+                summary["score_configuration"][
+                    "enable_scene_degradation_gate"
+                ]
+            )
+            self.assertEqual(
+                summary["score_configuration"]["source_loss_threshold"],
+                5.0,
+            )
             self.assertIn("nominal_24_tracks", summary["validation"]["conditions"])
             self.assertIn("combined_stress", summary["validation"]["conditions"])
+            combined = summary["validation"]["conditions"]["combined_stress"]
+            self.assertIn("source_degradation", combined)
+            self.assertGreaterEqual(
+                combined["source_degradation"][
+                    "median_source_degradation_factor"
+                ],
+                1.0,
+            )
             self.assertTrue((out / "manifest.sha256.json").exists())
             manifest = json.loads(
                 (out / "manifest.sha256.json").read_text(encoding="utf-8")

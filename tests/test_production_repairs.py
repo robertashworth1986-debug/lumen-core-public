@@ -13,6 +13,8 @@ sys.path.insert(0, str(ROOT / "code"))
 sys.path.insert(0, str(ROOT / "code" / "ops"))
 
 import grant_application_factory as grant_factory
+import luma_experience_gateway as gateway
+import multi_exchange_paper_ticker as paper_ticker
 from grant_submission_kit import build_preflight
 from build_symbol_timing_edge_model import Candle, analyze_symbol
 from collect_kraken_hourly_history import merge_rows
@@ -21,6 +23,69 @@ from assert_runtime_safety import assert_paper_mode
 
 
 class ProductionRepairTests(unittest.TestCase):
+    def test_gateway_exposes_legacy_dashboard_compatibility_feeds(self) -> None:
+        live_status = gateway.live_status_json()
+        federal_brief = gateway.federal_brief_json()
+        evidence_summary = gateway.evidence_summary_json()
+        executor_heartbeat = gateway.executor_heartbeat_json()
+
+        self.assertEqual(
+            live_status["schema"],
+            "lumencore_live_status_compat_v1",
+        )
+        self.assertIn("execution_gate", live_status)
+        self.assertEqual(
+            federal_brief["schema"],
+            "lumencore_federal_brief_compat_v1",
+        )
+        self.assertIn("claim_boundary", federal_brief)
+        self.assertEqual(
+            evidence_summary["schema"],
+            "lumencore_evidence_summary_compat_v1",
+        )
+        self.assertIn("claim_boundary", evidence_summary)
+        self.assertEqual(
+            executor_heartbeat["schema"],
+            "lumencore_executor_heartbeat_compat_v1",
+        )
+        self.assertIn("source_meta", executor_heartbeat)
+
+    def test_agent_approval_hub_is_restored_to_public_dashboard_surface(self) -> None:
+        hub = ROOT / "dashboard" / "agent_approval_hub.html"
+        self.assertTrue(hub.exists())
+        text = hub.read_text(encoding="utf-8")
+        self.assertIn("LumenCore — Agent Approval Hub", text)
+        self.assertIn("/api/agents/queue", text)
+
+    def test_paper_ticker_cycle_ledger_is_bounded(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger = Path(tmp) / "paper_ticker.jsonl"
+            status = Path(tmp) / "paper_ticker_rotation.json"
+            ledger.write_text(
+                "".join(
+                    f'{{"row": {idx}, "payload": "{("x" * 30)}"}}\n'
+                    for idx in range(40)
+                ),
+                encoding="utf-8",
+            )
+            before = ledger.stat().st_size
+            rotation = paper_ticker.append_bounded_jsonl(
+                ledger,
+                {"row": "new", "payload": "latest"},
+                max_bytes=500,
+                tail_bytes=180,
+                status_path=status,
+            )
+            after = ledger.stat().st_size
+            text = ledger.read_text(encoding="utf-8")
+
+            self.assertGreater(before, 500)
+            self.assertTrue(rotation["rotated"])
+            self.assertLess(after, before)
+            self.assertIn('"row"', text)
+            self.assertIn('"new"', text)
+            self.assertTrue(status.exists())
+
     def test_budget_never_exceeds_ceiling(self) -> None:
         for ceiling in (75_000, 100_000, 200_000, 305_000, 1_100_000):
             budget = grant_factory.render_budget(
@@ -78,6 +143,8 @@ class ProductionRepairTests(unittest.TestCase):
                 "technical_volume.md": "complete\n",
                 "commercialization_plan.md": "complete\n",
                 "cover_letter.md": "complete\n",
+                "HEILMEIER_CATECHISM.md": "complete\n",
+                "BENCHMARK_BREADTH_ADDENDUM.md": "complete\n",
                 "budget.json": "{}",
                 "eligibility_report.json": "{}",
                 "evidence_manifest.json": "{}",

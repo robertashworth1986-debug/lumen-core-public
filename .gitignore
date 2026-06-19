@@ -36,6 +36,7 @@ dashboard/*.html
 !dashboard/mission_control.html
 !dashboard/quant_lab.html
 !dashboard/kraken_execution_dashboard.html
+!dashboard/agent_approval_hub.html
 !dashboard/grants.html
 !dashboard/forecast.html
 !dashboard/explain.html
