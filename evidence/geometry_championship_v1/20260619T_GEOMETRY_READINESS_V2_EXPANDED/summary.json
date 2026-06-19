@@ -1,0 +1,55 @@
+{
+  "evidence_boundary": "Research registry only. A family is not a finding until its lane-specific promotion gate passes on frozen validation scenarios.",
+  "generated_utc": "2026-06-19T21:41:20.865899+00:00",
+  "readiness": {
+    "championship_ready": false,
+    "claim_gate_passed": false,
+    "family_count": 18,
+    "lane_count": 9,
+    "lane_family_counts": {
+      "branching_transport": 3,
+      "field_guided_control": 3,
+      "mission_network_routing": 5,
+      "multi_agent_coordination": 2,
+      "packing_topology": 1,
+      "resource_aware_scheduling": 1,
+      "stability_diagnostic": 1,
+      "thermal_ventilation": 1,
+      "time_series_model_routing": 1
+    },
+    "legacy_only_families": [
+      "mycelium_network",
+      "toroidal_fields",
+      "hybrid_flowforms"
+    ],
+    "pending_families": [
+      "slime_mold_routing",
+      "magnetic_field_geometry",
+      "halbach_arrays",
+      "flower_of_life_hexagonal_packing",
+      "non_euclidean_geodesics",
+      "frobenius_stability",
+      "bee_foraging_paths",
+      "bird_v_formation_flocking",
+      "wolf_pack_pursuit_paths",
+      "ant_trails",
+      "river_deltas",
+      "leaf_veins",
+      "vascular_lung_branching",
+      "termite_mound_ventilation",
+      "hibernation_bounded_wake_logic"
+    ],
+    "performance_ready_families": [],
+    "performance_results_generated": false,
+    "verdict": "not_ready_no_performance_implementations"
+  },
+  "registry_source": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2.worktrees\\fix-health-metrics-actions-current\\config\\geometry_championship_v1_registry.json",
+  "schema": "geometry_championship_v1_readiness",
+  "source_commit": "91e35fcf4fe6119a90fd8c6e66eb96b74a940ac3",
+  "validation": {
+    "cross_lane_ranking_disabled": true,
+    "performance_benchmark_run": false,
+    "registry_valid": true,
+    "required_family_ids_present": true
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "files": {
+    "SCORECARD.md": {
+      "bytes": 2270,
+      "sha256": "d174f5af31e90b509231a024addd1d690d5d26253b83ffa39d3b74f771d5fb15"
+    },
+    "registry.snapshot.json": {
+      "bytes": 7555,
+      "sha256": "b01d3b14c614849e7ce6e2432fc99a393f440b52c96f210efd572da9ec629ff6"
+    },
+    "summary.json": {
+      "bytes": 1923,
+      "sha256": "7bd04984a654a9e5a0813a8cdea31ce71ebc24c1e9a202515433485fe6485545"
+    }
+  },
+  "generated_utc": "2026-06-19T21:41:20.865899+00:00",
+  "schema": "geometry_championship_v1_manifest"
+}
