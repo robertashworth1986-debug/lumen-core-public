@@ -17,6 +17,7 @@ HARBOR_DATA_JSON = OUT_OPS / "harbor_data_source_readiness_audit_latest.json"
 HARBOR_AIS_ACQUISITION_JSON = OUT_OPS / "harbor_ais_pilot_acquisition_latest.json"
 HARBOR_AIS_SPLITS_JSON = OUT_OPS / "harbor_ais_heldout_splits_latest.json"
 HARBOR_PUBLIC_AIS_GATE_JSON = OUT_OPS / "harbor_public_ais_gate_latest.json"
+HARBOR_AIS_IO_PREFLIGHT_JSON = OUT_OPS / "harbor_ais_io_preflight_latest.json"
 
 OPS_FEED_JSON = OUT_OPS / "grant_dashboard_status_feed_latest.json"
 DASHBOARD_FEED_JSON = DASHBOARD_DATA / "grant_readiness_status.json"
@@ -27,6 +28,7 @@ BOUNDARIES = [
     "Portal authority, certifications, and action-time submit approval remain user gates.",
     "Synthetic benchmarks support bounded software feasibility only, not field validation.",
     "HarborSentinel public AIS has raw acquisition, held-out splits, and a single-lane readiness gate; this is data-readiness evidence, not detection-performance or field validation.",
+    "HarborSentinel controlled-injection benchmarking must wait until frozen AIS split I/O is responsive.",
     "Trading, Kraken, live-breadth, or frozen-delta artifacts must not be cited as profit proof.",
 ]
 
@@ -111,6 +113,53 @@ def source_probe_summary(harbor_ais: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def io_preflight_summary(preflight: dict[str, Any]) -> dict[str, Any]:
+    if not preflight:
+        return {
+            "posture": "NOT_RUN",
+            "required_ok": 0,
+            "required_files": 0,
+            "any_timeout": False,
+            "probes": [],
+            "claim_boundary": (
+                "No AIS split I/O preflight artifact is available in this feed. "
+                "Do not run or cite controlled-injection results until the frozen split is readable."
+            ),
+        }
+    probes = []
+    for row in preflight.get("probes", []) or []:
+        if not isinstance(row, dict):
+            continue
+        probes.append(
+            {
+                "label": str(row.get("label", "")),
+                "status": str(row.get("status", "")),
+                "ok": bool(row.get("ok", False)),
+                "expected_bytes": row.get("expected_bytes"),
+                "actual_bytes": row.get("actual_bytes"),
+                "size_matches": row.get("size_matches"),
+                "sample_bytes_read": row.get("sample_bytes_read"),
+                "timeout_seconds": row.get("timeout_seconds"),
+                "elapsed_seconds": row.get("elapsed_seconds"),
+                "full_hash_requested": bool(row.get("full_hash_requested", False)),
+            }
+        )
+    summary = preflight.get("summary", {}) if isinstance(preflight.get("summary"), dict) else {}
+    return {
+        "posture": str(preflight.get("posture", "UNKNOWN")),
+        "required_ok": int(summary.get("required_ok", 0) or 0),
+        "required_files": int(summary.get("required_files", 0) or 0),
+        "all_required_ok": bool(summary.get("all_required_ok", False)),
+        "any_timeout": bool(summary.get("any_timeout", False)),
+        "timeout_seconds": preflight.get("timeout_seconds"),
+        "sample_bytes": preflight.get("sample_bytes"),
+        "full_hash": bool(preflight.get("full_hash", False)),
+        "probes": probes,
+        "next_gate": str(preflight.get("next_gate", "")),
+        "claim_boundary": str(preflight.get("claim_boundary", "")),
+    }
+
+
 def artifact_velocity(generated: list[tuple[str, datetime]]) -> dict[str, Any]:
     unique = []
     seen = set()
@@ -157,12 +206,27 @@ def build_feed() -> dict[str, Any]:
     harbor_acquisition = read_json(HARBOR_AIS_ACQUISITION_JSON)
     harbor_splits = read_json(HARBOR_AIS_SPLITS_JSON)
     harbor_gate = read_json(HARBOR_PUBLIC_AIS_GATE_JSON)
+    harbor_io_preflight = read_json(HARBOR_AIS_IO_PREFLIGHT_JSON)
 
-    if not any([readiness, dice, harbor_ais, harbor_data, harbor_acquisition, harbor_splits, harbor_gate]):
+    if not any(
+        [
+            readiness,
+            dice,
+            harbor_ais,
+            harbor_data,
+            harbor_acquisition,
+            harbor_splits,
+            harbor_gate,
+            harbor_io_preflight,
+        ]
+    ):
         public_snapshot = read_json(DASHBOARD_FEED_JSON)
         if public_snapshot.get("schema") == "grant_dashboard_status_feed_v1":
             public_snapshot["generated_utc"] = now_utc()
             public_snapshot["scope"] = "dashboard_safe_grant_readiness_public_snapshot"
+            harbor = public_snapshot.get("harbor")
+            if isinstance(harbor, dict) and "ais_io_preflight" not in harbor:
+                harbor["ais_io_preflight"] = io_preflight_summary({})
             return public_snapshot
 
     packages = [
@@ -179,6 +243,7 @@ def build_feed() -> dict[str, Any]:
         ("harbor_ais_pilot_acquisition", harbor_acquisition),
         ("harbor_ais_heldout_splits", harbor_splits),
         ("harbor_public_ais_gate", harbor_gate),
+        ("harbor_ais_io_preflight", harbor_io_preflight),
     ]:
         ts = parse_dt(payload.get("generated_utc"))
         if ts is not None:
@@ -190,6 +255,7 @@ def build_feed() -> dict[str, Any]:
     posture = str(readiness.get("posture", "UNKNOWN"))
     dice_local_blockers = len(dice.get("local_blockers", []) or [])
     dice_portal_blockers = len(dice.get("portal_user_blockers", []) or [])
+    harbor_io = io_preflight_summary(harbor_io_preflight)
 
     return {
         "generated_utc": now_utc(),
@@ -219,8 +285,12 @@ def build_feed() -> dict[str, Any]:
             },
             {
                 "key": "Harbor AIS",
-                "value": str(harbor_gate.get("posture") or harbor_acquisition.get("posture") or harbor_ais.get("posture", "SOURCE_PROBED")),
-                "sub": "Public AIS splits/gate ready; still not multi-source or field validation.",
+                "value": str(harbor_io.get("posture") or harbor_gate.get("posture") or harbor_acquisition.get("posture") or harbor_ais.get("posture", "SOURCE_PROBED")),
+                "sub": (
+                    "Frozen AIS split I/O must be ready before controlled-injection benchmarking."
+                    if harbor_io.get("posture") == "PUBLIC_AIS_SPLIT_IO_BLOCKED"
+                    else "Public AIS splits/gate ready; still not multi-source or field validation."
+                ),
                 "tone": "warn",
             },
             {
@@ -270,6 +340,7 @@ def build_feed() -> dict[str, Any]:
                 "gate_checks": harbor_gate.get("gate_checks", {}),
                 "claim_boundary": str(harbor_gate.get("claim_boundary", "")),
             },
+            "ais_io_preflight": harbor_io,
             "external_raw_data_rule": (
                 "Stage large NOAA/MarineCadastre/public AIS files on an external raw-data volume "
                 "via LUMA_HARBOR_DATA_ROOT; commit only hashes, manifests, schema profiles, and bounded summaries."
@@ -285,6 +356,7 @@ def build_feed() -> dict[str, Any]:
             "harbor_ais_acquisition": "out/ops/harbor_ais_pilot_acquisition_latest.json",
             "harbor_ais_splits": "out/ops/harbor_ais_heldout_splits_latest.json",
             "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json",
+            "harbor_ais_io_preflight": "out/ops/harbor_ais_io_preflight_latest.json",
         },
     }
 

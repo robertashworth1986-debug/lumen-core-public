@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -39,6 +40,7 @@ def test_dashboard_feed_exposes_acquisition_without_overclaiming():
     assert harbor["public_ais_gate"]["posture"] == "PUBLIC_AIS_SINGLE_LANE_GATE_READY"
     assert harbor["public_ais_gate"]["overlap_mmsi"] >= 100
     assert "does not establish HarborSentinel detection performance" in harbor["public_ais_gate"]["claim_boundary"]
+    assert "path" not in json.dumps(harbor["ais_io_preflight"]).lower()
     assert any("No grant is marked submitted" in item for item in feed["claim_boundaries"])
 
 
@@ -51,3 +53,45 @@ def test_builder_velocity_is_bounded_artifact_metric():
     assert velocity["per_hour"] >= 0
     assert "not a model benchmark" in velocity["measurement_boundary"]
     assert "revenue claim" in feed["priority_cards"][3]["sub"]
+
+
+def test_io_preflight_summary_does_not_publish_private_paths(tmp_path):
+    module = load_module()
+    preflight = {
+        "schema": "harbor_ais_io_preflight_v1",
+        "posture": "PUBLIC_AIS_SPLIT_IO_BLOCKED",
+        "timeout_seconds": 3,
+        "sample_bytes": 4096,
+        "full_hash": False,
+        "summary": {
+            "required_files": 2,
+            "required_ok": 0,
+            "all_required_ok": False,
+            "any_timeout": True,
+        },
+        "probes": [
+            {
+                "label": "development",
+                "path": "G:/Private/HarborSentinel/development.csv",
+                "expected_bytes": 123,
+                "status": "timeout",
+                "ok": False,
+                "timeout_seconds": 3,
+            }
+        ],
+        "next_gate": "Run the benchmark only after split I/O is ready.",
+        "claim_boundary": "This preflight does not establish HarborSentinel detection performance.",
+    }
+    path = tmp_path / "preflight.json"
+    path.write_text(json.dumps(preflight), encoding="utf-8")
+    module.HARBOR_AIS_IO_PREFLIGHT_JSON = path
+
+    feed = module.build_feed()
+    safe = feed["harbor"]["ais_io_preflight"]
+    serialized = json.dumps(safe)
+
+    assert safe["posture"] == "PUBLIC_AIS_SPLIT_IO_BLOCKED"
+    assert safe["required_ok"] == 0
+    assert safe["any_timeout"] is True
+    assert "G:/Private" not in serialized
+    assert '"path"' not in serialized
