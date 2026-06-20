@@ -1,0 +1,154 @@
+{
+  "boundary": "This is a public coordination packet for reviewers and support organizations. It does not prove portal authority, certify eligibility or CMMC/SPRS status, approve costs, create legal representation, submit an application, or make trading or investment claims.",
+  "do_not_claim": [
+    "submitted, awarded, accepted, CMMC Level 2 certified, agency endorsed, partner committed, field validated, profit proven, institutional-grade, guaranteed funding, or guaranteed revenue"
+  ],
+  "do_not_share": [
+    "passwords, MFA codes, API keys, tokens, tax IDs, banking data, or private portal screenshots",
+    "UEI, CAGE/NCAGE, non-public SAM screenshots, or private registry dumps",
+    "unsupported claims of CMMC level, SPRS score, clearances, facilities, partners, customers, revenue, or field validation",
+    "private grant upload files unless a safe channel and reviewer role are established"
+  ],
+  "generated_utc": "2026-06-20T23:35:32.314039+00:00",
+  "official_support_lanes": [
+    {
+      "helps_with": [
+        "DICE",
+        "HarborSentinel",
+        "MissionWeave",
+        "NV065"
+      ],
+      "id": "apex_federal_contracting",
+      "name": "SBA federal contracting assistance / APEX Accelerator path",
+      "public_ask": "Review federal portal readiness, submitter authority, registrations, and representation boundaries.",
+      "url": "https://www.sba.gov/local-assistance/federal-contracting-assistance"
+    },
+    {
+      "helps_with": [
+        "HarborSentinel",
+        "MissionWeave",
+        "NV065"
+      ],
+      "id": "dod_osbp_cyber_resources",
+      "name": "DoD OSBP cybersecurity resources / Project Spectrum path",
+      "public_ask": "Clarify CMMC/SPRS/PIEE facts and the evidence needed before any cybersecurity representation.",
+      "url": "https://business.defense.gov/Programs/Cyber-Security-Resources/"
+    },
+    {
+      "helps_with": [
+        "Patent/legal rescue"
+      ],
+      "id": "uspto_patent_pro_bono",
+      "name": "USPTO Patent Pro Bono Program",
+      "public_ask": "Route urgent patent-deadline questions to a qualified patent attorney or agent.",
+      "url": "https://www.uspto.gov/patents/basics/using-legal-services/pro-bono/patent-pro-bono-program"
+    },
+    {
+      "helps_with": [
+        "DICE",
+        "HarborSentinel",
+        "NSF Project Pitch"
+      ],
+      "id": "sbir_fast",
+      "name": "SBIR.gov FAST support",
+      "public_ask": "Find regional SBIR/STTR proposal coaching and agency-fit support.",
+      "url": "https://www.sbir.gov/community/fast"
+    },
+    {
+      "helps_with": [
+        "DICE",
+        "HarborSentinel",
+        "NSF Project Pitch"
+      ],
+      "id": "sbir_program_context",
+      "name": "SBIR.gov program context",
+      "public_ask": "Ground public proposal language in SBIR/STTR purpose without implying awards or revenue.",
+      "url": "https://www.sbir.gov/about"
+    }
+  ],
+  "package_snapshot": [
+    {
+      "local_blockers": 0,
+      "manifest_expected": 6,
+      "manifest_matched": 6,
+      "name": "DICE",
+      "portal": "DARPA BAAT",
+      "portal_user_blockers": 6,
+      "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
+      "required_artifacts_present": 9,
+      "required_artifacts_total": 9
+    },
+    {
+      "local_blockers": 0,
+      "manifest_expected": 4,
+      "manifest_matched": 4,
+      "name": "HarborSentinel",
+      "portal": "DSIP",
+      "portal_user_blockers": 5,
+      "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
+      "required_artifacts_present": 14,
+      "required_artifacts_total": 14
+    },
+    {
+      "local_blockers": 0,
+      "manifest_expected": 0,
+      "manifest_matched": 0,
+      "name": "NSF Project Pitch",
+      "portal": "NSF Seed Fund Project Pitch portal",
+      "portal_user_blockers": 4,
+      "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
+      "required_artifacts_present": 3,
+      "required_artifacts_total": 3
+    },
+    {
+      "local_blockers": 0,
+      "manifest_expected": 3,
+      "manifest_matched": 3,
+      "name": "MissionWeave",
+      "portal": "DSIP",
+      "portal_user_blockers": 4,
+      "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
+      "required_artifacts_present": 4,
+      "required_artifacts_total": 4
+    },
+    {
+      "local_blockers": 0,
+      "manifest_expected": 4,
+      "manifest_matched": 4,
+      "name": "NV065",
+      "portal": "DSIP",
+      "portal_user_blockers": 4,
+      "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
+      "required_artifacts_present": 3,
+      "required_artifacts_total": 3
+    }
+  ],
+  "public_posture": {
+    "dashboard_signal": "LOCAL_READY_PORTAL_BLOCKED",
+    "local_blockers": 0,
+    "packages": 5,
+    "portal_user_blockers": 23,
+    "submitted_by_feed": 0
+  },
+  "reviewer_requests": [
+    "Challenge reproducibility and claim boundaries before proposal language is strengthened.",
+    "Help convert portal and compliance unknowns into written factual confirmations.",
+    "Review DICE and HarborSentinel agency fit without implying endorsement.",
+    "Identify labeled or adjudicated validation sources that can improve HarborSentinel beyond controlled injections.",
+    "Review cost assumptions only as planning estimates until a proper budget reviewer is involved."
+  ],
+  "schema": "public_support_readiness_packet_v1",
+  "source_artifacts": {
+    "grant_dashboard_feed": "dashboard/data/grant_readiness_status.json",
+    "harbor_public_ais_packet": "docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md",
+    "public_submission_gate_map": "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md",
+    "public_visibility_packet": "docs/PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md"
+  },
+  "strong_public_evidence": [
+    "DICE local package hygiene is tracked, but BAAT and final approval remain outside the public repo.",
+    "HarborSentinel public AIS acquisition, held-out splits, and full-hash split preflight are tracked.",
+    "HarborSentinel controlled-injection benchmark is available as bounded detector-vs-baseline evidence with posture PUBLIC_AIS_INJECTION_BENCHMARK_READY.",
+    "The public submission gate map separates proof from portal, compliance, cost, team, and submit gates."
+  ],
+  "visibility_goal_prompt": "Operate as LumenCore's proof-and-traction engine. Every cycle must convert ambition into a verifiable artifact: source, hash, benchmark, split, dashboard feed, grant packet, outreach asset, or blocker board. Maximize respected visibility by publishing only defensible claims, preserving private submission materials, and making the evidence so clean that serious reviewers can audit it without a sales pitch. Do not chase fame directly; build the proof surface that makes attention rational."
+}

@@ -1,6 +1,6 @@
 # Public Visibility and Source Authority Packet
 
-Generated UTC: 2026-06-20T22:56:29.305331+00:00
+Generated UTC: 2026-06-20T23:35:32.253569+00:00
 
 ## Identity
 
@@ -66,7 +66,20 @@ Boundary: The gate map is a public coordination artifact. It does not certify el
 4. Inspect the Harbor AIS gate for public-data readiness, split hashes, and validation boundaries.
 5. Inspect the Harbor controlled-injection benchmark only as bounded public AIS detector-vs-baseline evidence.
 6. Inspect the public submission gate map to see what still requires human, legal/compliance, portal, or cost authority.
-7. Only then map the evidence into DICE/Harbor proposal language.
+7. Inspect the public support readiness packet to route help through official support lanes without sharing private portal data.
+8. Only then map the evidence into DICE/Harbor proposal language.
+
+## Source Artifacts
+
+- grant_readiness_feed: `out/ops/grant_dashboard_status_feed_latest.json`
+- high_impact_goal: `out/ops/lumencore_high_impact_goal_latest.json`
+- dice_lock_packet: `out/ops/dice_submission_lock_packet_latest.json`
+- harbor_public_ais_gate: `out/ops/harbor_public_ais_gate_latest.json`
+- harbor_ais_injection_benchmark: `out/ops/harbor_ais_injection_benchmark_latest.json`
+- harbor_heldout_splits: `out/ops/harbor_ais_heldout_splits_latest.json`
+- harbor_ais_acquisition: `out/ops/harbor_ais_pilot_acquisition_latest.json`
+- public_submission_gate_map: `docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md`
+- public_support_readiness: `docs/PUBLIC_SUPPORT_AND_REVIEWER_READINESS_2026-06-20.md`
 
 ## Outreach Copy
 

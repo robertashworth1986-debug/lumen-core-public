@@ -36,6 +36,10 @@ def test_visibility_packet_is_public_safe_and_source_backed():
     assert any("controlled-injection" in item for item in payload["do_not_claim"])
     assert any("Guaranteed awards" in item for item in payload["do_not_claim"])
     assert "not equity" in payload["lumenstock_boundary"]
+    assert payload["source_backed_artifacts"]["public_support_readiness"].endswith(
+        "PUBLIC_SUPPORT_AND_REVIEWER_READINESS_2026-06-20.md"
+    )
+    assert any("support readiness packet" in step for step in payload["reviewer_path"])
 
 
 def test_goal_prompt_prioritizes_proof_over_hype():

@@ -200,6 +200,7 @@ def build_payload() -> dict[str, Any]:
             "harbor_heldout_splits": "out/ops/harbor_ais_heldout_splits_latest.json",
             "harbor_ais_acquisition": "out/ops/harbor_ais_pilot_acquisition_latest.json",
             "public_submission_gate_map": "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md",
+            "public_support_readiness": "docs/PUBLIC_SUPPORT_AND_REVIEWER_READINESS_2026-06-20.md",
         },
         "reviewer_path": [
             "Open the public-safe LumenCore repository/site first for reproducibility posture.",
@@ -208,6 +209,7 @@ def build_payload() -> dict[str, Any]:
             "Inspect the Harbor AIS gate for public-data readiness, split hashes, and validation boundaries.",
             "Inspect the Harbor controlled-injection benchmark only as bounded public AIS detector-vs-baseline evidence.",
             "Inspect the public submission gate map to see what still requires human, legal/compliance, portal, or cost authority.",
+            "Inspect the public support readiness packet to route help through official support lanes without sharing private portal data.",
             "Only then map the evidence into DICE/Harbor proposal language.",
         ],
         "outreach_copy": {
@@ -283,6 +285,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         )
     lines.extend(["## Reviewer Path", ""])
     lines.extend(f"{idx}. {step}" for idx, step in enumerate(payload["reviewer_path"], start=1))
+    lines.extend(["", "## Source Artifacts", ""])
+    for name, path in payload["source_backed_artifacts"].items():
+        lines.append(f"- {name}: `{path}`")
     lines.extend(["", "## Outreach Copy", "", "### LinkedIn Short", "", payload["outreach_copy"]["linkedin_short"], ""])
     lines.extend(
         [
