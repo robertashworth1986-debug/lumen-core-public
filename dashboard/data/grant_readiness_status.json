@@ -307,7 +307,7 @@
     "Portal authority, certifications, and action-time submit approval remain user gates.",
     "Synthetic benchmarks support bounded software feasibility only, not field validation.",
     "HarborSentinel public AIS has raw acquisition, held-out splits, and a single-lane readiness gate; this is data-readiness evidence, not detection-performance or field validation.",
-    "HarborSentinel controlled-injection benchmarking must wait until frozen AIS split I/O is responsive.",
+    "HarborSentinel controlled-injection benchmarking is detector-vs-baseline evidence on public AIS perturbations, not real adversary detection, multi-source fusion, or field validation.",
     "Trading, Kraken, live-breadth, or frozen-delta artifacts must not be cited as profit proof."
   ],
   "source_files": {
