@@ -267,6 +267,7 @@ const LOCAL_OPS_ROOT = LOCAL_OPS_ROOT_CANDIDATES[0] || '../out/ops';
 const EXTERNAL_SUBMISSIONS_LEDGER_REL = 'ops/grants_live_submission_ledger_latest.json';
 const WAITING_ACTIONS_REL = 'ops/grant_waiting_actions_latest.json';
 const MEET_DRAPERS_REL = 'ops/meet_drapers_capital_projection/meet_drapers_capital_projection_latest.json';
+const GRANT_READINESS_STATUS_REL = 'grant_dashboard_status_feed_latest.json';
 
 let queue = null;
 let activeId = null;
@@ -278,6 +279,7 @@ let opportunityTracker = null;
 let externalSubmissionLedger = null;
 let waitingActions = null;
 let meetDrapersProjection = null;
+let grantReadinessStatus = null;
 let meetDrapersSourcePath = null;
 let cinematicLayer = null;
 let urlBootstrapApplied = false;
@@ -292,6 +294,7 @@ const localCache = {
   externalSubmissionLedger: undefined,
   waitingActions: undefined,
   meetDrapersProjection: undefined,
+  grantReadinessStatus: undefined,
 };
 
 function uniquePaths(values) {
@@ -607,6 +610,28 @@ async function loadMeetDrapersProjection() {
   return null;
 }
 
+async function loadGrantReadinessStatus() {
+  if (localCache.grantReadinessStatus !== undefined) {
+    return localCache.grantReadinessStatus;
+  }
+  const candidates = uniquePaths([
+    './data/grant_readiness_status.json',
+    'data/grant_readiness_status.json',
+    ...joinAllPaths(LOCAL_OPS_ROOT_CANDIDATES, GRANT_READINESS_STATUS_REL),
+  ]);
+
+  for (const candidate of candidates) {
+    const payload = await fetchJsonLoose(candidate);
+    if (payload && typeof payload === 'object') {
+      localCache.grantReadinessStatus = payload;
+      return payload;
+    }
+  }
+
+  localCache.grantReadinessStatus = null;
+  return null;
+}
+
 function drapersFrame(payload) {
   const rows = Array.isArray(payload?.scenario_projection)
     ? payload.scenario_projection
@@ -628,6 +653,16 @@ function toneClass(value, warnAt = 62, alertAt = 40) {
   if (v <= alertAt) return 'alert';
   if (v <= warnAt) return 'warn';
   return 'good';
+}
+
+function shortPosture(value, fallback = 'OFFLINE') {
+  const raw = String(value || fallback).trim();
+  if (!raw) return fallback;
+  if (raw === 'PUBLIC_AIS_RAW_ACQUIRED_HASHED_PROFILED') return 'AIS ACQUIRED';
+  if (raw === 'PUBLIC_AIS_SINGLE_LANE_GATE_READY') return 'AIS GATE READY';
+  if (raw === 'LOCAL_LOCKED_PORTAL_BLOCKED') return 'LOCKED / GATED';
+  if (raw === 'LOCAL_READY_PORTAL_BLOCKED') return 'READY / GATED';
+  return raw.replace(/_/g, ' ').slice(0, 28);
 }
 
 function missionSnapshot() {
@@ -708,7 +743,48 @@ function renderMissionPulse() {
   if (!pulseRoot || !drapersRoot) return;
 
   const snap = missionSnapshot();
-  const cards = [
+  const feed = grantReadinessStatus && typeof grantReadinessStatus === 'object'
+    ? grantReadinessStatus
+    : null;
+  const feedSummary = feed?.summary || {};
+  const diceLock = feed?.dice_lock || {};
+  const harborAcq = feed?.harbor?.ais_acquisition || {};
+  const harborGate = feed?.harbor?.public_ais_gate || {};
+  const velocity = feed?.builder_velocity || {};
+  const portalBlockers = Number(feedSummary.portal_user_blockers || 0);
+  const localBlockers = Number(feedSummary.local_blockers || 0);
+  const artifactCount = Number(velocity.artifact_count || 0);
+  const artifactPerHour = Number(velocity.per_hour || 0);
+  const cards = feed ? [
+    {
+      key: 'Grant Readiness',
+      value: shortPosture(feedSummary.dashboard_signal || feed.posture, 'READY / GATED'),
+      sub: `${localBlockers} local · ${portalBlockers} portal/user gates`,
+      meter: localBlockers === 0 ? 84 : 36,
+      cls: localBlockers === 0 ? 'warn' : 'alert',
+    },
+    {
+      key: 'DICE Lock',
+      value: shortPosture(diceLock.posture, 'LOCKED / GATED'),
+      sub: `${Number(diceLock.render_page_png_count || 0)} pages · ${Number(diceLock.visible_url_count || 0)} URLs`,
+      meter: Number(diceLock.local_blockers || 0) === 0 ? 90 : 35,
+      cls: Number(diceLock.local_blockers || 0) === 0 ? 'warn' : 'alert',
+    },
+    {
+      key: 'Harbor AIS',
+      value: shortPosture(harborGate.posture || harborAcq.posture || feed?.harbor?.ais_pilot?.posture, 'PROBED'),
+      sub: `${Number(harborGate.validation_rows || harborAcq.sample_rows || 0).toLocaleString()} validation rows · ${Number(harborGate.overlap_mmsi || 0).toLocaleString()} MMSI overlap`,
+      meter: harborGate.posture ? 82 : (harborAcq.raw_file_sha256 ? 76 : 48),
+      cls: harborGate.posture ? 'warn' : (harborAcq.raw_file_sha256 ? 'warn' : 'alert'),
+    },
+    {
+      key: 'Builder Velocity',
+      value: artifactCount ? `${artifactPerHour.toFixed(1)} art/hr` : 'MEASURED',
+      sub: `${artifactCount} timestamped artifacts · no revenue claim`,
+      meter: artifactCount ? 72 : 42,
+      cls: artifactCount ? 'good' : 'warn',
+    },
+  ] : [
     {
       key: 'Pipeline Pulse',
       value: `${snap.pulse.toFixed(0)}%`,
@@ -1062,6 +1138,7 @@ async function loadQueue() {
     externalSubmissionLedger = await loadExternalSubmissionLedger();
     waitingActions = await loadWaitingActions();
     meetDrapersProjection = await loadMeetDrapersProjection();
+    grantReadinessStatus = await loadGrantReadinessStatus();
     queue = await api('/api/grants');
     try {
       submissionDashboard = await api('/api/grants/submission/dashboard');
@@ -1096,6 +1173,7 @@ function renderQueue() {
   const submittedFromPackets = Number(submissionDashboard?.totals?.n_submitted || 0);
   const externalSummary = externalSubmissionSummary(externalSubmissionLedger);
   const waitingSummary = waitingActionSummary(waitingActions);
+  const readinessSummary = grantReadinessStatus?.summary || {};
   const submittedCount = Math.max(
     Number(queue.n_submitted || 0),
     submittedFromPackets,
@@ -1124,6 +1202,12 @@ function renderQueue() {
       : '',
     waitingSummary.blockedCount > 0
       ? `<span class="pill" style="color:var(--neon-a);border-color:var(--neon-a)"><b>${waitingSummary.blockedCount}</b> fix-now</span>`
+      : '',
+    grantReadinessStatus
+      ? `<span class="pill" style="color:var(--neon-a);border-color:var(--neon-a)"><b>${Number(readinessSummary.portal_user_blockers || 0)}</b> portal/user gates</span>`
+      : '',
+    grantReadinessStatus
+      ? `<span class="pill approved"><b>${Number(readinessSummary.local_blockers || 0)}</b> local blockers</span>`
       : '',
     liveTracking
       ? `<span class="pill">live tracking: ${escHTML(liveTracking)}</span>`
