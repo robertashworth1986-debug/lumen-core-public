@@ -44,12 +44,12 @@ APPROVAL_QUEUE_FILE = OUT_DIR / "execution_approval_queue.json"
 LAST_RESULT_FILE = OUT_DIR / "last_execution_result.json"
 
 DEFAULT_FLAGS = {
-    "live_enabled": True,
-    "kill_switch": False,
+    "live_enabled": False,
+    "kill_switch": True,
     "require_controller": True,
     "allowed_controllers": ["Robert", "Joey", "Nicole"],
     "require_validate_pass": True,
-    "max_notional_per_trade_usd": 1000000.0,
+    "max_notional_per_trade_usd": 25.0,
     "max_daily_loss_usd": 20.0,
     "max_open_positions": 10,
     "deadman_timeout_seconds": 30,
@@ -57,7 +57,7 @@ DEFAULT_FLAGS = {
     "default_volume_base": 0.0004,
     "default_order_type": "market",
     "runtime_mode": "shadow",
-    "notes": "Set live_enabled=true and kill_switch=false only after smoke test and controller approval."
+    "notes": "Safe default: shadow mode with kill switch on. Turn live on only after smoke test, controller approval, and explicit human action."
 }
 
 class KrakenExecutionError(Exception):
@@ -278,21 +278,11 @@ def _private_post(url_path: str, payload: Dict[str, Any], timeout: int = 20, ret
     except requests.RequestException as exc:
         error_text = str(exc)
         if api_url == "https://api.sandbox.kraken.com" and "Failed to resolve 'api.sandbox.kraken.com'" in error_text:
-            fallback_url = KRAKEN_API_URL
-            print(f"[KRAKEN] Sandbox DNS failed; retrying live endpoint {fallback_url}", file=sys.stderr, flush=True)
-            try:
-                response = requests.post(
-                    fallback_url + url_path,
-                    headers=headers,
-                    data=body,
-                    timeout=timeout,
-                )
-                response.raise_for_status()
-                data = response.json()
-            except requests.RequestException as exc2:
-                raise KrakenExecutionError(f"Kraken network error: {exc2}") from exc2
-        else:
-            raise KrakenExecutionError(f"Kraken network error: {exc}") from exc
+            raise KrakenExecutionError(
+                "Kraken sandbox endpoint could not be resolved; refusing to fall back to the live endpoint. "
+                "Clear KRAKEN_API_TESTNET/KRAKEN_API_URL or fix DNS intentionally before retrying."
+            ) from exc
+        raise KrakenExecutionError(f"Kraken network error: {exc}") from exc
 
     if data.get("error"):
         msg = "; ".join(map(str, data["error"]))
@@ -400,8 +390,8 @@ def _runtime_snapshot(**extra: Any) -> Dict[str, Any]:
     state = load_state()
     runtime = {
         "timestamp": _now_iso(),
-        "live_enabled": bool(flags.get("live_enabled", True)),
-        "kill_switch": bool(flags.get("kill_switch", False)),
+        "live_enabled": bool(flags.get("live_enabled", False)),
+        "kill_switch": bool(flags.get("kill_switch", True)),
         "runtime_mode": str(flags.get("runtime_mode", "live")),
         "allowed_controllers": list(flags.get("allowed_controllers", [])),
         "position": state.get("position", "flat"),
@@ -447,11 +437,28 @@ def _count_open_positions() -> int:
     return int(state.get("open_position_count", 0) or 0)
 
 def enforce_risk(*, symbol: str, side: str, notional_usd: float) -> None:
-    _ = (symbol, side, notional_usd)
     flags = _ensure_flags()
+    pair = str(symbol or "").strip().upper()
+    order_side = str(side or "").strip().lower()
+    notional = float(notional_usd or 0.0)
+
+    if not pair:
+        raise KrakenExecutionError("Risk block: missing Kraken pair")
+    if order_side not in {"buy", "sell"}:
+        raise KrakenExecutionError(f"Risk block: invalid side {side!r}")
+    if notional <= 0.0:
+        raise KrakenExecutionError("Risk block: notional must be positive")
 
     if bool(flags.get("kill_switch", True)):
         raise KrakenExecutionError("Kill switch is ON. Submission is blocked.")
+
+    max_notional = float(flags.get("max_notional_per_trade_usd", 0.0) or 0.0)
+    if max_notional <= 0.0:
+        raise KrakenExecutionError("Risk block: max notional cap is not configured")
+    if notional > max_notional:
+        raise KrakenExecutionError(
+            f"Risk block: notional exceeds per-trade cap ({notional:.2f} > {max_notional:.2f})"
+        )
 
     max_open_positions = int(flags.get("max_open_positions", 10))
     if _count_open_positions() >= max_open_positions:
@@ -463,7 +470,6 @@ def enforce_risk(*, symbol: str, side: str, notional_usd: float) -> None:
         raise KrakenExecutionError(
             f"Risk block: daily loss cap reached ({daily_loss:.2f} >= {max_daily_loss:.2f})"
         )
-
 def _public_ticker(pair: str) -> Dict[str, Any]:
     response = requests.get(
         KRAKEN_API_URL + "/0/public/Ticker",
@@ -551,7 +557,7 @@ def queue_approval_ticket(
         "notional_usd": float(notional_usd),
         "volume_base": float(volume_base),
         "payload": payload,
-        "approval_state": "APROVED",
+        "approval_state": "PENDING_HUMAN_APPROVAL",
         "note": note
     }
     queue.append(ticket)
@@ -690,11 +696,28 @@ def _count_open_positions() -> int:
     return int(state.get("open_position_count", 0) or 0)
 
 def enforce_risk(*, symbol: str, side: str, notional_usd: float) -> None:
-    _ = (symbol, side, notional_usd)
     flags = _ensure_flags()
+    pair = str(symbol or "").strip().upper()
+    order_side = str(side or "").strip().lower()
+    notional = float(notional_usd or 0.0)
+
+    if not pair:
+        raise KrakenExecutionError("Risk block: missing Kraken pair")
+    if order_side not in {"buy", "sell"}:
+        raise KrakenExecutionError(f"Risk block: invalid side {side!r}")
+    if notional <= 0.0:
+        raise KrakenExecutionError("Risk block: notional must be positive")
 
     if bool(flags.get("kill_switch", True)):
         raise KrakenExecutionError("Kill switch is ON. Submission is blocked.")
+
+    max_notional = float(flags.get("max_notional_per_trade_usd", 0.0) or 0.0)
+    if max_notional <= 0.0:
+        raise KrakenExecutionError("Risk block: max notional cap is not configured")
+    if notional > max_notional:
+        raise KrakenExecutionError(
+            f"Risk block: notional exceeds per-trade cap ({notional:.2f} > {max_notional:.2f})"
+        )
 
     max_open_positions = int(flags.get("max_open_positions", 10))
     if _count_open_positions() >= max_open_positions:
@@ -706,7 +729,6 @@ def enforce_risk(*, symbol: str, side: str, notional_usd: float) -> None:
         raise KrakenExecutionError(
             f"Risk block: daily loss cap reached ({daily_loss:.2f} >= {max_daily_loss:.2f})"
         )
-
 def _public_ticker(pair: str) -> Dict[str, Any]:
     response = requests.get(
         KRAKEN_API_URL + "/0/public/Ticker",
@@ -838,7 +860,7 @@ def submit_order_validate_only(
         side=side,
         volume_base=float(volume_base),
         ordertype=ordertype,
-        validate=False,
+        validate=True,
         userref=userref
     )
 
