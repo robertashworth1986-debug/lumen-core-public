@@ -22,7 +22,7 @@ Make LumenCore the trusted proof-driven adaptive orchestration stack for complex
 - Local blockers: 0
 - Portal/user blockers: 21
 - Harbor AIS posture: `PUBLIC_AIS_SINGLE_LANE_GATE_READY`
-- Harbor AIS I/O preflight: `PUBLIC_AIS_SPLIT_IO_READY` (2/2 required files OK)
+- Harbor AIS I/O preflight: `PUBLIC_AIS_SPLIT_IO_READY` (2/2 required files OK; 2/2 full-file SHA-256 matches)
 - Harbor AIS injection benchmark: `PUBLIC_AIS_INJECTION_BENCHMARK_READY`, motion recall 1.0, speed-only baseline 0.25835, lift 0.7416499999999999
 - Harbor public AIS region: New Orleans / Mississippi River Delta
 - Harbor public AIS validation rows: 50000

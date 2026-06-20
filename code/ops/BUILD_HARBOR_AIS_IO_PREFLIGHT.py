@@ -212,6 +212,32 @@ def build_preflight(
     all_required_ok = bool(required) and all(bool(row.get("ok")) for row in required)
     any_timeout = any(row.get("status") == "timeout" for row in probes)
     posture = "PUBLIC_AIS_SPLIT_IO_READY" if all_required_ok else "PUBLIC_AIS_SPLIT_IO_BLOCKED"
+    if full_hash:
+        next_gate = (
+            "Add stronger baselines and labeled or adjudicated validation before claiming "
+            "precision, false-positive rate, multi-source fusion, ADS-B/radar validation, "
+            "or field performance."
+        )
+        claim_boundary = (
+            "This preflight proves that the required frozen public AIS split files are reachable, "
+            "sample-readable within the configured timeout, and full-file SHA-256 matched against "
+            "the frozen split manifest. It does not establish HarborSentinel detection performance, "
+            "multi-source fusion, ADS-B or radar validation, Navy/SSDS integration, field performance, "
+            "or operational suitability."
+        )
+    else:
+        next_gate = (
+            "Use full-hash recheck, stronger baselines, and labeled or adjudicated validation "
+            "before claiming precision, false-positive rate, multi-source fusion, ADS-B/radar "
+            "validation, or field performance."
+        )
+        claim_boundary = (
+            "This preflight only proves that the frozen public AIS split files are reachable and "
+            "sample-readable within the configured timeout. Unless full_hash is true, it does not "
+            "rehash the complete files. It does not establish HarborSentinel detection performance, "
+            "multi-source fusion, ADS-B or radar validation, Navy/SSDS integration, field performance, "
+            "or operational suitability."
+        )
     payload = {
         "generated_utc": now_utc(),
         "schema": "harbor_ais_io_preflight_v1",
@@ -228,19 +254,14 @@ def build_preflight(
             "required_ok": sum(1 for row in required if row.get("ok")),
             "all_required_ok": all_required_ok,
             "any_timeout": any_timeout,
+            "full_hash_match_count": (
+                sum(1 for row in required if row.get("sha256_matches") is True)
+                if full_hash
+                else None
+            ),
         },
-        "next_gate": (
-            "Use full-hash recheck, stronger baselines, and labeled or adjudicated validation "
-            "before claiming precision, false-positive rate, multi-source fusion, ADS-B/radar "
-            "validation, or field performance."
-        ),
-        "claim_boundary": (
-            "This preflight only proves that the frozen public AIS split files are reachable and "
-            "sample-readable within the configured timeout. Unless full_hash is true, it does not "
-            "rehash the complete files. It does not establish HarborSentinel detection performance, "
-            "multi-source fusion, ADS-B or radar validation, Navy/SSDS integration, field performance, "
-            "or operational suitability."
-        ),
+        "next_gate": next_gate,
+        "claim_boundary": claim_boundary,
     }
     if write_outputs:
         write_json(OUT_JSON, payload)
@@ -278,6 +299,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- expected bytes: {row.get('expected_bytes')}",
                 f"- actual bytes: {row.get('actual_bytes', 'n/a')}",
                 f"- size matches: {row.get('size_matches', 'n/a')}",
+                f"- SHA-256 matches manifest: {row.get('sha256_matches', 'n/a')}",
+                f"- actual SHA-256: `{row.get('actual_sha256', 'n/a')}`",
                 f"- sample bytes read: {row.get('sample_bytes_read', 'n/a')}",
                 f"- elapsed seconds: {row.get('elapsed_seconds', 'n/a')}",
                 "",

@@ -143,6 +143,7 @@ def io_preflight_summary(preflight: dict[str, Any]) -> dict[str, Any]:
                 "timeout_seconds": row.get("timeout_seconds"),
                 "elapsed_seconds": row.get("elapsed_seconds"),
                 "full_hash_requested": bool(row.get("full_hash_requested", False)),
+                "sha256_matches": row.get("sha256_matches"),
             }
         )
     summary = preflight.get("summary", {}) if isinstance(preflight.get("summary"), dict) else {}
@@ -152,6 +153,7 @@ def io_preflight_summary(preflight: dict[str, Any]) -> dict[str, Any]:
         "required_files": int(summary.get("required_files", 0) or 0),
         "all_required_ok": bool(summary.get("all_required_ok", False)),
         "any_timeout": bool(summary.get("any_timeout", False)),
+        "full_hash_match_count": summary.get("full_hash_match_count"),
         "timeout_seconds": preflight.get("timeout_seconds"),
         "sample_bytes": preflight.get("sample_bytes"),
         "full_hash": bool(preflight.get("full_hash", False)),

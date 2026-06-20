@@ -14,7 +14,7 @@ The current proof chain is:
 2. raw file acquired, hashed, and schema-profiled;
 3. New Orleans / Mississippi River Delta development and validation splits
    frozen;
-4. split I/O preflight passed;
+4. split I/O preflight passed with full-file SHA-256 verification;
 5. a bounded controlled-injection detector-vs-baseline benchmark ran on the
    validation split.
 
@@ -74,13 +74,16 @@ Navy/SSDS integration, field performance, or operational suitability.
 | Required files OK | 2/2 |
 | Timeout | 5.0 seconds |
 | Sample bytes per file | 4096 |
-| Full hash requested | false |
+| Full hash requested | true |
+| Full-hash matches | 2/2 required split files |
 | Development file bytes | 5598389 |
 | Validation file bytes | 5595298 |
 
-Boundary: the preflight proves the frozen split files are reachable and
-sample-readable within the configured timeout. Because full hash was false, this
-preflight did not rehash the complete files.
+Boundary: the preflight proves the frozen split files are reachable,
+sample-readable within the configured timeout, and full-file SHA-256 matched
+against the frozen split manifest. It does not establish HarborSentinel
+detection performance, multi-source fusion, ADS-B/radar validation,
+Navy/SSDS integration, field performance, or operational suitability.
 
 ## Controlled-Injection Benchmark
 
@@ -150,4 +153,3 @@ Do not use this packet to claim:
    smoothness, heading-rate, and track-context models.
 5. Report precision, review-queue burden, and false-positive estimates only
    after labels or an analyst adjudication protocol exists.
-

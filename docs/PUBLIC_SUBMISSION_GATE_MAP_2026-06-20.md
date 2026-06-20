@@ -14,7 +14,7 @@ The goal is not to imply that any grant has been submitted or approved. The goal
 - The public dashboard reports zero local package blockers.
 - The public dashboard reports twenty-one portal/user gates.
 - DICE is locally locked for package hygiene, but BAAT/upload authority and final human review remain outside the public evidence trail.
-- HarborSentinel has public NOAA AIS acquisition, hashes, held-out splits, split I/O preflight, and a bounded controlled-injection benchmark.
+- HarborSentinel has public NOAA AIS acquisition, hashes, held-out splits, full-hash split I/O preflight, and a bounded controlled-injection benchmark.
 
 ## Universal No-Click Rule
 
@@ -58,13 +58,14 @@ Evidence that is strong now:
 
 - Public NOAA AIS raw file was acquired and hashed.
 - Development and validation splits were frozen from public AIS data.
-- Split I/O preflight confirms the public split files are reachable and sample-readable.
+- Split I/O preflight confirms the public split files are reachable,
+  sample-readable, and full-file SHA-256 matched against the frozen split
+  manifest.
 - Controlled-injection benchmark reports 20,000 injected validation segments.
 - Motion-consistency detector recall is reported against a speed-only baseline with explicit non-claim boundaries.
 
 Gates still required:
 
-- Run full-hash recheck when the reviewer packet needs complete local file-integrity proof.
 - Add stronger baselines and labeled or adjudicated validation before precision, false-positive-rate, or field-performance claims.
 - Confirm DSIP/Navy portal authority and final submission path.
 - Confirm data-rights, export-control, CMMC/SPRS, and facility/team statements before submission.
