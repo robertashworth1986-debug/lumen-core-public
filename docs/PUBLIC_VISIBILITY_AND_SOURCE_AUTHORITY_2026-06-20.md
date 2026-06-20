@@ -52,6 +52,12 @@ Evidence: Readiness audit reports 0 local blockers and 21 portal/user gates acro
 
 Boundary: Portal authority, compliance representations, cost review, teaming, and submit/certification actions remain unresolved.
 
+### Public submission gates are explicitly mapped.
+
+Evidence: `docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md` separates reproducible evidence from portal authority, eligibility, compliance, cost, team, claim, and final submit gates.
+
+Boundary: The gate map is a public coordination artifact. It does not certify eligibility, approve a budget, prove compliance status, or submit any application.
+
 ## Reviewer Path
 
 1. Open the public-safe LumenCore repository/site first for reproducibility posture.
@@ -59,7 +65,8 @@ Boundary: Portal authority, compliance representations, cost review, teaming, an
 3. Inspect the DICE lock packet for local package hygiene and remaining BAAT/SAM/human gates.
 4. Inspect the Harbor AIS gate for public-data readiness, split hashes, and validation boundaries.
 5. Inspect the Harbor controlled-injection benchmark only as bounded public AIS detector-vs-baseline evidence.
-6. Only then map the evidence into DICE/Harbor proposal language.
+6. Inspect the public submission gate map to see what still requires human, legal/compliance, portal, or cost authority.
+7. Only then map the evidence into DICE/Harbor proposal language.
 
 ## Outreach Copy
 

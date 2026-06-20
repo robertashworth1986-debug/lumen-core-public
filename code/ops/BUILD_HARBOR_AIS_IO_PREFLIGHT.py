@@ -230,8 +230,9 @@ def build_preflight(
             "any_timeout": any_timeout,
         },
         "next_gate": (
-            "Run the HarborSentinel controlled-injection benchmark only after development and "
-            "validation split I/O preflight is ready."
+            "Use full-hash recheck, stronger baselines, and labeled or adjudicated validation "
+            "before claiming precision, false-positive rate, multi-source fusion, ADS-B/radar "
+            "validation, or field performance."
         ),
         "claim_boundary": (
             "This preflight only proves that the frozen public AIS split files are reachable and "
