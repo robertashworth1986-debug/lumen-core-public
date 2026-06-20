@@ -14,6 +14,7 @@ DOCS = ROOT / "docs"
 
 JSON_OUT = OUT / "grant_submission_readiness_audit_latest.json"
 MD_OUT = GRANTS / "TOP5_SUBMISSION_READINESS_AUDIT_2026-06-19.md"
+SAM_CAPTURE_JSON = OUT / "sam_gov_entity_status_capture_latest.json"
 
 TOP5 = {
     "DICE": {
@@ -173,6 +174,27 @@ def load_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def read_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        payload = load_json(path)
+    except Exception:
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def sam_capture() -> dict[str, Any]:
+    payload = read_json(SAM_CAPTURE_JSON)
+    if payload.get("schema") != "sam_gov_entity_status_capture_v1":
+        return {}
+    return payload
+
+
+def sam_is_active(payload: dict[str, Any]) -> bool:
+    return str(payload.get("registration_status", "")).strip().lower() == "active registration"
+
+
 def verify_manifest(run_dir: Path) -> dict[str, Any]:
     manifest = run_dir / "manifest.sha256.json"
     result: dict[str, Any] = {
@@ -321,6 +343,20 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
     local_blockers.extend(nsf_blockers)
 
     portal_blockers = list(cfg.get("portal_blockers", []))
+    verified_portal_facts: list[str] = []
+    sam = sam_capture()
+    if sam_is_active(sam):
+        verified_portal_facts.append(
+            "SAM.gov active registration verified from signed-in workspace: "
+            f"UEI {sam.get('uei', 'recorded')}, CAGE/NCAGE {sam.get('cage_ncage', 'recorded')}, "
+            f"purpose {sam.get('purpose_of_registration', 'recorded')}, "
+            f"expiration {sam.get('expiration_date', 'recorded')}."
+        )
+        portal_blockers = [
+            item
+            for item in portal_blockers
+            if item != "SAM.gov entity status/linkage must be verified."
+        ]
     readiness = "LOCAL_READY_PORTAL_BLOCKED" if not local_blockers else "LOCAL_BLOCKED"
     if portal_blockers:
         readiness = readiness + "_USER_GATES"
@@ -335,12 +371,14 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
         "nsf_fields": nsf_fields,
         "local_blockers": local_blockers,
         "portal_user_blockers": portal_blockers,
+        "verified_portal_facts": verified_portal_facts,
     }
 
 
 def build_audit() -> dict[str, Any]:
     packages = [package_audit(name, cfg) for name, cfg in TOP5.items()]
     geometry = verify_manifest(GEOMETRY_REGISTRY)
+    sam = sam_capture()
     local_blocker_count = sum(len(pkg["local_blockers"]) for pkg in packages)
     portal_blocker_count = sum(len(pkg["portal_user_blockers"]) for pkg in packages)
     posture = "LOCAL_READY_PORTAL_BLOCKED" if local_blocker_count == 0 else "LOCAL_BLOCKED"
@@ -357,6 +395,18 @@ def build_audit() -> dict[str, Any]:
         },
         "packages": packages,
         "geometry_registry": geometry,
+        "sam_gov": {
+            "verified": sam_is_active(sam),
+            "status": sam.get("registration_status", "unverified"),
+            "expiration_date": sam.get("expiration_date", ""),
+            "purpose_of_registration": sam.get("purpose_of_registration", ""),
+            "capture": rel(SAM_CAPTURE_JSON) if sam else "",
+            "boundary": (
+                "SAM active registration reduces entity-status uncertainty. It does not verify BAAT, "
+                "DSIP, Grants.gov, Research.gov, CMMC/SPRS, Affirming Official authority, cost validity, "
+                "or final submit authority."
+            ),
+        },
         "claim_boundary": (
             "Synthetic benchmarks support bounded software feasibility only. "
             "Portal authority, certifications, partners, cost validity, field validation, "
@@ -379,6 +429,14 @@ def render_markdown(audit: dict[str, Any]) -> str:
         f"- Local blockers: {audit['summary']['local_blockers']}",
         f"- Portal/user blockers: {audit['summary']['portal_user_blockers']}",
         f"- Geometry registry manifest: {audit['summary']['geometry_registry_matched']}/{audit['summary']['geometry_registry_expected']} matched",
+        "",
+        "## Verified Portal Facts",
+        "",
+        f"- SAM.gov verified: {audit.get('sam_gov', {}).get('verified')}",
+        f"- SAM.gov status: {audit.get('sam_gov', {}).get('status')}",
+        f"- SAM.gov expiration: {audit.get('sam_gov', {}).get('expiration_date') or 'n/a'}",
+        f"- SAM.gov purpose: {audit.get('sam_gov', {}).get('purpose_of_registration') or 'n/a'}",
+        f"- Boundary: {audit.get('sam_gov', {}).get('boundary')}",
         "",
         "## Claim Boundary",
         "",
@@ -405,13 +463,19 @@ def render_markdown(audit: dict[str, Any]) -> str:
             lines.append("- NSF field counts:")
             for field, row in pkg["nsf_fields"].items():
                 lines.append(f"  - {field}: {row['characters']}/{row['limit']} ({row['remaining']} remaining)")
+        if pkg.get("verified_portal_facts"):
+            lines.append("- verified portal facts:")
+            lines.extend(f"  - {item}" for item in pkg["verified_portal_facts"])
         lines.append("- local blockers:")
         if pkg["local_blockers"]:
             lines.extend(f"  - {item}" for item in pkg["local_blockers"])
         else:
             lines.append("  - none")
         lines.append("- portal/user blockers:")
-        lines.extend(f"  - {item}" for item in pkg["portal_user_blockers"])
+        if pkg["portal_user_blockers"]:
+            lines.extend(f"  - {item}" for item in pkg["portal_user_blockers"])
+        else:
+            lines.append("  - none")
         lines.append("")
     return "\n".join(lines)
 
