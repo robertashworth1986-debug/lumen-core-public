@@ -114,7 +114,7 @@ def build_payload() -> dict[str, Any]:
     gate_checks = gate.get("gate_checks", {}) if isinstance(gate.get("gate_checks"), dict) else {}
     injection_ready = harbor_injection.get("posture") == "PUBLIC_AIS_INJECTION_BENCHMARK_READY"
     injection_result = harbor_injection.get("controlled_injection_benchmark", {})
-    if not isinstance(injection_result, dict):
+    if not isinstance(injection_result, dict) or not injection_result:
         injection_result = harbor_injection
 
     proof_claims = [
@@ -135,6 +135,17 @@ def build_payload() -> dict[str, Any]:
             "claim": "Top-five grant packets are locally ready but not submitted.",
             "evidence": f"Readiness audit reports {summary.get('local_blockers', 0)} local blockers and {summary.get('portal_user_blockers', 0)} portal/user gates across {summary.get('packages', 0)} packages.",
             "boundary": "Portal authority, compliance representations, cost review, teaming, and submit/certification actions remain unresolved.",
+        },
+        {
+            "claim": "Public submission gates are explicitly mapped.",
+            "evidence": (
+                "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md separates reproducible evidence from portal authority, "
+                "eligibility, compliance, cost, team, claim, and final submit gates."
+            ),
+            "boundary": (
+                "The gate map is a public coordination artifact. It does not certify eligibility, approve a budget, "
+                "prove compliance status, or submit any application."
+            ),
         },
     ]
     if injection_ready:
@@ -180,6 +191,7 @@ def build_payload() -> dict[str, Any]:
             "harbor_ais_injection_benchmark": "out/ops/harbor_ais_injection_benchmark_latest.json",
             "harbor_heldout_splits": "out/ops/harbor_ais_heldout_splits_latest.json",
             "harbor_ais_acquisition": "out/ops/harbor_ais_pilot_acquisition_latest.json",
+            "public_submission_gate_map": "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md",
         },
         "reviewer_path": [
             "Open the public-safe LumenCore repository/site first for reproducibility posture.",
@@ -187,6 +199,7 @@ def build_payload() -> dict[str, Any]:
             "Inspect the DICE lock packet for local package hygiene and remaining BAAT/SAM/human gates.",
             "Inspect the Harbor AIS gate for public-data readiness, split hashes, and validation boundaries.",
             "Inspect the Harbor controlled-injection benchmark only as bounded public AIS detector-vs-baseline evidence.",
+            "Inspect the public submission gate map to see what still requires human, legal/compliance, portal, or cost authority.",
             "Only then map the evidence into DICE/Harbor proposal language.",
         ],
         "outreach_copy": {

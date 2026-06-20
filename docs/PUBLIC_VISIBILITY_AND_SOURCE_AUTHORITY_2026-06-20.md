@@ -1,6 +1,6 @@
 # Public Visibility and Source Authority Packet
 
-Generated UTC: 2026-06-20T21:42:43.294935+00:00
+Generated UTC: 2026-06-20T22:23:49.064615+00:00
 
 ## Identity
 
@@ -54,7 +54,7 @@ Boundary: Portal authority, compliance representations, cost review, teaming, an
 
 ### Public submission gates are explicitly mapped.
 
-Evidence: `docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md` separates reproducible evidence from portal authority, eligibility, compliance, cost, team, claim, and final submit gates.
+Evidence: docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md separates reproducible evidence from portal authority, eligibility, compliance, cost, team, claim, and final submit gates.
 
 Boundary: The gate map is a public coordination artifact. It does not certify eligibility, approve a budget, prove compliance status, or submit any application.
 
