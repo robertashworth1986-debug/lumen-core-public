@@ -41,6 +41,12 @@ def test_dashboard_feed_exposes_acquisition_without_overclaiming():
     assert harbor["public_ais_gate"]["overlap_mmsi"] >= 100
     assert "does not establish HarborSentinel detection performance" in harbor["public_ais_gate"]["claim_boundary"]
     assert "path" not in json.dumps(harbor["ais_io_preflight"]).lower()
+    injection = harbor["ais_injection_benchmark"]
+    assert injection["posture"] == "PUBLIC_AIS_INJECTION_BENCHMARK_READY"
+    assert injection["total_injected_segments"] > 0
+    assert injection["motion_consistency_recall"] >= injection["speed_only_baseline_recall"]
+    assert "operational detection performance" in injection["claim_boundary"]
+    assert "path" not in json.dumps(injection).lower()
     assert any("No grant is marked submitted" in item for item in feed["claim_boundaries"])
 
 

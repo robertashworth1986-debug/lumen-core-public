@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-20T07:54:09.576313+00:00",
+  "generated_utc": "2026-06-20T21:42:43.252574+00:00",
   "schema": "lumencore_high_impact_goal_v1",
   "north_star_goal": "Make LumenCore the trusted proof-driven adaptive orchestration stack for complex systems: every claim is backed by reproducible data, every dashboard separates evidence from ambition, and every grant, contract, customer, or investor conversation can audit the work without needing a pitch.",
   "operating_doctrine": [
@@ -14,26 +14,33 @@
     "grant_posture": "LOCAL_READY_PORTAL_BLOCKED",
     "packages_checked": 5,
     "local_blockers": 0,
-    "portal_user_blockers": 23,
+    "portal_user_blockers": 21,
     "harbor_ais_posture": "PUBLIC_AIS_SINGLE_LANE_GATE_READY",
+    "harbor_ais_io_preflight_posture": "PUBLIC_AIS_SPLIT_IO_READY",
+    "harbor_ais_io_preflight_required_ok": 2,
+    "harbor_ais_io_preflight_required_files": 2,
+    "harbor_ais_injection_benchmark_posture": "PUBLIC_AIS_INJECTION_BENCHMARK_READY",
+    "harbor_ais_injection_motion_recall": 1.0,
+    "harbor_ais_injection_baseline_recall": 0.25835,
+    "harbor_ais_injection_recall_lift": 0.7416499999999999,
     "harbor_public_ais_region": "New Orleans / Mississippi River Delta",
     "harbor_public_ais_validation_rows": 50000,
     "builder_velocity": {
-      "artifact_count": 7,
+      "artifact_count": 9,
       "window_start_utc": "2026-06-20T01:53:36.675109+00:00",
-      "window_end_utc": "2026-06-20T07:53:43.701511+00:00",
-      "window_seconds": 21607.026,
-      "per_second": 0.000324,
-      "per_minute": 0.019,
-      "per_hour": 1.166,
+      "window_end_utc": "2026-06-20T21:38:24.957712+00:00",
+      "window_seconds": 71088.283,
+      "per_second": 0.000127,
+      "per_minute": 0.008,
+      "per_hour": 0.456,
       "measurement_boundary": "Rate is computed only from timestamped local artifacts in this feed. It is not a model benchmark, labor-cost estimate, revenue claim, or funding probability."
     }
   },
   "highest_leverage_milestones": [
     {
       "lane": "HarborSentinel representative data",
-      "target": "Use the frozen NOAA AIS New Orleans / Mississippi River Delta dev/validation split and single-lane gate as the public representative-data bridge, then run the next HarborSentinel detector experiment without tuning on validation.",
-      "traction_reason": "This moves HarborSentinel beyond synthetic-only source readiness while still preserving the boundary that AIS single-lane diagnostics are not Navy field validation."
+      "target": "Use the frozen NOAA AIS New Orleans / Mississippi River Delta dev/validation split, single-lane gate, and current controlled-injection benchmark as the public representative-data bridge while preserving the boundary that controlled injections are not field validation.",
+      "traction_reason": "This moves HarborSentinel beyond synthetic-only source readiness and gives reviewers a reproducible detector-vs-baseline result without claiming Navy operational performance."
     },
     {
       "lane": "DICE submission quality",
@@ -59,12 +66,13 @@
   "lumenstock": {
     "name": "LumenStock Proof-Weighted Opportunity Index",
     "ticker_style_symbol": "LUMEN-PWI",
-    "composite": 60.57,
+    "composite": 66.62,
     "components": {
       "proof_integrity": 100,
       "data_representativeness": 95,
-      "benchmark_governance": 80,
-      "compliance_readiness": 34,
+      "data_operability": 90,
+      "benchmark_governance": 95,
+      "compliance_readiness": 38,
       "grant_factory_maturity": 85,
       "market_traction": 20,
       "revenue_evidence": 10
@@ -72,8 +80,8 @@
     "interpretation": "Internal proof/value readiness index. It is not equity, not a token, not a securities offering, not investment advice, and not a valuation."
   },
   "next_72_hours": [
-    "Package the NOAA AIS held-out split and public AIS gate into the HarborSentinel reviewer proof packet.",
-    "Run the next HarborSentinel detector experiment against the frozen public AIS split without threshold tuning on validation.",
+    "Package the NOAA AIS held-out split, public AIS gate, local split-cache recovery, and controlled-injection benchmark into the HarborSentinel reviewer proof packet.",
+    "Update HarborSentinel proposal language to cite the controlled-injection result only as a bounded public AIS benchmark, not as real-world threat, multi-source fusion, or field validation.",
     "Hydrate grants dashboard with readiness, DICE lock, Harbor AIS, and builder velocity feeds.",
     "Prepare public-safe proof cards for DICE/Harbor without private proposal text.",
     "Use the LumenStock Proof-Weighted Opportunity Index as an internal prioritization meter only."
@@ -81,6 +89,7 @@
   "hard_boundaries": [
     "Do not represent LumenStock as stock, equity, a token, a public offering, or an investment product.",
     "Do not claim guaranteed funding, guaranteed profit, field validation, CMMC certification, or institutional trading readiness.",
+    "Do not describe HarborSentinel controlled-injection detector evidence as real adversary detection, multi-source fusion, Navy/SSDS integration, or field validation.",
     "Do not submit, certify, consent, upload, or move money without fresh action-time approval.",
     "Do not commit raw AIS bulk data, secrets, credentials, private portal screenshots, or private application packets to public repos."
   ]

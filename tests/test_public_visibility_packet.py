@@ -27,6 +27,8 @@ def test_visibility_packet_is_public_safe_and_source_backed():
     assert any("NOAA" in source["name"] for source in payload["primary_sources"])
     assert any("DARPA DICE" in source["name"] for source in payload["primary_sources"])
     assert any("HarborSentinel now has public AIS" in item["claim"] for item in payload["proof_claims"])
+    assert any("controlled-injection benchmark" in item["claim"] for item in payload["proof_claims"])
+    assert any("controlled-injection" in item for item in payload["do_not_claim"])
     assert any("Guaranteed awards" in item for item in payload["do_not_claim"])
     assert "not equity" in payload["lumenstock_boundary"]
 

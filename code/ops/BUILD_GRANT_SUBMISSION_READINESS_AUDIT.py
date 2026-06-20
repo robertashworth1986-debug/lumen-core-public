@@ -15,6 +15,7 @@ DOCS = ROOT / "docs"
 JSON_OUT = OUT / "grant_submission_readiness_audit_latest.json"
 MD_OUT = GRANTS / "TOP5_SUBMISSION_READINESS_AUDIT_2026-06-19.md"
 SAM_CAPTURE_JSON = OUT / "sam_gov_entity_status_capture_latest.json"
+HARBOR_AIS_INJECTION_JSON = OUT / "harbor_ais_injection_benchmark_latest.json"
 
 TOP5 = {
     "DICE": {
@@ -58,6 +59,7 @@ TOP5 = {
             GRANTS / "NV063_HarborSentinel" / "NV063_AIS_PILOT_ACQUISITION_2026-06-20.md",
             GRANTS / "NV063_HarborSentinel" / "NV063_AIS_HELDOUT_SPLIT_MANIFEST_2026-06-20.md",
             GRANTS / "NV063_HarborSentinel" / "NV063_PUBLIC_AIS_GATE_2026-06-20.md",
+            GRANTS / "NV063_HarborSentinel" / "NV063_AIS_INJECTION_BENCHMARK_2026-06-20.md",
             GRANTS / "NV063_HarborSentinel" / "NV063_VOLUME2_SOURCE_QA_2026-06-19.md",
             GRANTS / "NV063_HarborSentinel" / "NV063_COST_BASIS_WORKING.md",
             GRANTS / "NV063_HarborSentinel" / "render_qa_20260619_volume2_v2" / "NV063_VOLUME2_TECHNICAL_DRAFT_2026-06-19.pdf",
@@ -193,6 +195,17 @@ def sam_capture() -> dict[str, Any]:
 
 def sam_is_active(payload: dict[str, Any]) -> bool:
     return str(payload.get("registration_status", "")).strip().lower() == "active registration"
+
+
+def harbor_injection_benchmark() -> dict[str, Any]:
+    payload = read_json(HARBOR_AIS_INJECTION_JSON)
+    if payload.get("schema") != "harbor_ais_injection_benchmark_v1":
+        return {}
+    return payload
+
+
+def harbor_injection_ready(payload: dict[str, Any]) -> bool:
+    return str(payload.get("posture", "")).strip() == "PUBLIC_AIS_INJECTION_BENCHMARK_READY"
 
 
 def verify_manifest(run_dir: Path) -> dict[str, Any]:
@@ -357,6 +370,23 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
             for item in portal_blockers
             if item != "SAM.gov entity status/linkage must be verified."
         ]
+    if name == "HarborSentinel":
+        injection = harbor_injection_benchmark()
+        if harbor_injection_ready(injection):
+            result = injection.get("controlled_injection_benchmark", {})
+            verified_portal_facts.append(
+                "HarborSentinel public AIS controlled-injection benchmark ready: "
+                f"{result.get('total_injected_segments', 'n/a')} injected validation segments, "
+                f"motion-consistency recall {result.get('motion_consistency_recall', 'n/a')}, "
+                f"speed-only baseline recall {result.get('speed_only_baseline_recall', 'n/a')}; "
+                "boundary: controlled kinematic injections are not real threat labels, multi-source fusion, or field validation."
+            )
+            portal_blockers = [
+                item
+                for item in portal_blockers
+                if item
+                != "Public NOAA AIS raw data, held-out splits, and single-lane AIS readiness gate exist, but this is still public AIS data-readiness evidence rather than HarborSentinel detection-performance, multi-source fusion, ADS-B, radar, Navy/SSDS, or field validation."
+            ]
     readiness = "LOCAL_READY_PORTAL_BLOCKED" if not local_blockers else "LOCAL_BLOCKED"
     if portal_blockers:
         readiness = readiness + "_USER_GATES"

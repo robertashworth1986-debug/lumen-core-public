@@ -17,6 +17,7 @@ PUBLIC_DASHBOARD_FEED_JSON = DASHBOARD_DATA / "grant_readiness_status.json"
 HIGH_IMPACT_JSON = OUT_OPS / "lumencore_high_impact_goal_latest.json"
 PUBLIC_HIGH_IMPACT_JSON = DASHBOARD_DATA / "lumencore_high_impact_goal.json"
 HARBOR_GATE_JSON = OUT_OPS / "harbor_public_ais_gate_latest.json"
+HARBOR_INJECTION_JSON = OUT_OPS / "harbor_ais_injection_benchmark_latest.json"
 
 OUT_JSON = OUT_OPS / "public_visibility_packet_latest.json"
 OUT_MD = DOCS / "PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md"
@@ -98,10 +99,23 @@ def build_payload() -> dict[str, Any]:
     if not high_impact:
         high_impact = read_json(PUBLIC_HIGH_IMPACT_JSON)
     harbor_gate = read_json(HARBOR_GATE_JSON)
+    harbor_injection = read_json(HARBOR_INJECTION_JSON)
     summary = readiness.get("summary", {}) if isinstance(readiness.get("summary"), dict) else {}
     harbor = dashboard.get("harbor", {}) if isinstance(dashboard.get("harbor"), dict) else {}
     gate = harbor.get("public_ais_gate", {}) if isinstance(harbor.get("public_ais_gate"), dict) else {}
+    if not harbor_gate and gate:
+        harbor_gate = {"posture": gate.get("posture", "UNKNOWN")}
+    if not harbor_injection:
+        harbor_injection = (
+            harbor.get("ais_injection_benchmark", {})
+            if isinstance(harbor.get("ais_injection_benchmark"), dict)
+            else {}
+        )
     gate_checks = gate.get("gate_checks", {}) if isinstance(gate.get("gate_checks"), dict) else {}
+    injection_ready = harbor_injection.get("posture") == "PUBLIC_AIS_INJECTION_BENCHMARK_READY"
+    injection_result = harbor_injection.get("controlled_injection_benchmark", {})
+    if not isinstance(injection_result, dict):
+        injection_result = harbor_injection
 
     proof_claims = [
         {
@@ -123,6 +137,23 @@ def build_payload() -> dict[str, Any]:
             "boundary": "Portal authority, compliance representations, cost review, teaming, and submit/certification actions remain unresolved.",
         },
     ]
+    if injection_ready:
+        proof_claims.insert(
+            2,
+            {
+                "claim": "HarborSentinel has a bounded public AIS controlled-injection benchmark.",
+                "evidence": (
+                    f"{injection_result.get('total_injected_segments', 0)} injected validation segments; "
+                    f"motion-consistency recall {injection_result.get('motion_consistency_recall', 0)} versus "
+                    f"speed-only baseline recall {injection_result.get('speed_only_baseline_recall', 0)} "
+                    f"(lift {injection_result.get('recall_lift_vs_speed_only', 0)})."
+                ),
+                "boundary": (
+                    "Controlled kinematic injections on public AIS validation data are not real adversary labels, "
+                    "multi-source fusion, ADS-B/radar validation, Navy/SSDS integration, field performance, or operational suitability."
+                ),
+            },
+        )
 
     return {
         "generated_utc": now_utc(),
@@ -146,6 +177,7 @@ def build_payload() -> dict[str, Any]:
             "high_impact_goal": "out/ops/lumencore_high_impact_goal_latest.json",
             "dice_lock_packet": "out/ops/dice_submission_lock_packet_latest.json",
             "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json",
+            "harbor_ais_injection_benchmark": "out/ops/harbor_ais_injection_benchmark_latest.json",
             "harbor_heldout_splits": "out/ops/harbor_ais_heldout_splits_latest.json",
             "harbor_ais_acquisition": "out/ops/harbor_ais_pilot_acquisition_latest.json",
         },
@@ -154,19 +186,20 @@ def build_payload() -> dict[str, Any]:
             "Read the source authority packet and claim boundaries before any performance claim.",
             "Inspect the DICE lock packet for local package hygiene and remaining BAAT/SAM/human gates.",
             "Inspect the Harbor AIS gate for public-data readiness, split hashes, and validation boundaries.",
+            "Inspect the Harbor controlled-injection benchmark only as bounded public AIS detector-vs-baseline evidence.",
             "Only then map the evidence into DICE/Harbor proposal language.",
         ],
         "outreach_copy": {
             "linkedin_short": (
                 "I am building LumenCore as a proof-driven orchestration stack for complex systems. "
                 "The latest milestone: public NOAA AIS data is now acquired, hashed, split into held-out development/validation sets, "
-                "and gated with explicit non-claim boundaries. I am looking for serious reviewers, agency-aligned collaborators, "
+                "gated, and tested with a bounded controlled-injection benchmark against a speed-only baseline. I am looking for serious reviewers, agency-aligned collaborators, "
                 "and teams that care about evidence before claims."
             ),
             "reviewer_email_subject": "LumenCore proof packet: DICE local lock + public AIS HarborSentinel gate",
             "reviewer_email_body": (
                 "I am sharing a public-safe proof packet for LumenCore. It includes a locally locked DARPA DICE abstract package, "
-                "a HarborSentinel public AIS data-readiness gate built from NOAA AIS, and explicit boundaries on what the evidence does "
+                "a HarborSentinel public AIS data-readiness gate built from NOAA AIS, a bounded controlled-injection benchmark, and explicit boundaries on what the evidence does "
                 "and does not prove. I would value technical review focused on reproducibility, claim discipline, and agency fit."
             ),
             "goal_prompt": (
@@ -179,7 +212,7 @@ def build_payload() -> dict[str, Any]:
         "do_not_claim": [
             "Guaranteed awards, funding, wealth, or fame.",
             "CMMC Level 2 certification, clearance, export determination, or portal authority without current proof.",
-            "Harbor/Navy/SSDS/field performance from public AIS single-lane data-readiness.",
+            "Harbor/Navy/SSDS/field performance from public AIS single-lane data-readiness or controlled-injection results.",
             "Trading profitability or institutional-grade execution from governance audits.",
             "Partner, customer, investor, or agency endorsement without written confirmation.",
         ],

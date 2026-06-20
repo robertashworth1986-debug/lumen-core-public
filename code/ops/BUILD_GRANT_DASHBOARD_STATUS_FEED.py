@@ -18,6 +18,7 @@ HARBOR_AIS_ACQUISITION_JSON = OUT_OPS / "harbor_ais_pilot_acquisition_latest.jso
 HARBOR_AIS_SPLITS_JSON = OUT_OPS / "harbor_ais_heldout_splits_latest.json"
 HARBOR_PUBLIC_AIS_GATE_JSON = OUT_OPS / "harbor_public_ais_gate_latest.json"
 HARBOR_AIS_IO_PREFLIGHT_JSON = OUT_OPS / "harbor_ais_io_preflight_latest.json"
+HARBOR_AIS_INJECTION_JSON = OUT_OPS / "harbor_ais_injection_benchmark_latest.json"
 
 OPS_FEED_JSON = OUT_OPS / "grant_dashboard_status_feed_latest.json"
 DASHBOARD_FEED_JSON = DASHBOARD_DATA / "grant_readiness_status.json"
@@ -160,6 +161,46 @@ def io_preflight_summary(preflight: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def injection_benchmark_summary(benchmark: dict[str, Any]) -> dict[str, Any]:
+    if not benchmark:
+        return {
+            "posture": "NOT_RUN",
+            "total_injected_segments": 0,
+            "motion_consistency_recall": 0.0,
+            "speed_only_baseline_recall": 0.0,
+            "recall_lift_vs_speed_only": 0.0,
+            "families": {},
+            "claim_boundary": (
+                "No controlled-injection benchmark artifact is available in this feed. "
+                "Do not cite HarborSentinel detector performance from this lane."
+            ),
+        }
+    result = benchmark.get("controlled_injection_benchmark", {})
+    families = result.get("families", {}) if isinstance(result.get("families"), dict) else {}
+    safe_families: dict[str, Any] = {}
+    for name, row in families.items():
+        if not isinstance(row, dict):
+            continue
+        safe_families[str(name)] = {
+            "injected_segments": row.get("injected_segments"),
+            "motion_consistency_recall": row.get("motion_consistency_recall"),
+            "speed_only_baseline_recall": row.get("speed_only_baseline_recall"),
+            "boundary": row.get("boundary", ""),
+        }
+    return {
+        "posture": str(benchmark.get("posture", "UNKNOWN")),
+        "development_segments": benchmark.get("development", {}).get("segments"),
+        "validation_segments": benchmark.get("validation", {}).get("segments"),
+        "total_injected_segments": result.get("total_injected_segments", 0),
+        "motion_consistency_recall": result.get("motion_consistency_recall", 0.0),
+        "speed_only_baseline_recall": result.get("speed_only_baseline_recall", 0.0),
+        "recall_lift_vs_speed_only": result.get("recall_lift_vs_speed_only", 0.0),
+        "families": safe_families,
+        "natural_candidate_rates": benchmark.get("natural_candidate_rates", {}),
+        "claim_boundary": str(benchmark.get("claim_boundary", "")),
+    }
+
+
 def artifact_velocity(generated: list[tuple[str, datetime]]) -> dict[str, Any]:
     unique = []
     seen = set()
@@ -207,6 +248,7 @@ def build_feed() -> dict[str, Any]:
     harbor_splits = read_json(HARBOR_AIS_SPLITS_JSON)
     harbor_gate = read_json(HARBOR_PUBLIC_AIS_GATE_JSON)
     harbor_io_preflight = read_json(HARBOR_AIS_IO_PREFLIGHT_JSON)
+    harbor_injection_benchmark = read_json(HARBOR_AIS_INJECTION_JSON)
 
     if not any(
         [
@@ -218,6 +260,7 @@ def build_feed() -> dict[str, Any]:
             harbor_splits,
             harbor_gate,
             harbor_io_preflight,
+            harbor_injection_benchmark,
         ]
     ):
         public_snapshot = read_json(DASHBOARD_FEED_JSON)
@@ -227,6 +270,8 @@ def build_feed() -> dict[str, Any]:
             harbor = public_snapshot.get("harbor")
             if isinstance(harbor, dict) and "ais_io_preflight" not in harbor:
                 harbor["ais_io_preflight"] = io_preflight_summary({})
+            if isinstance(harbor, dict) and "ais_injection_benchmark" not in harbor:
+                harbor["ais_injection_benchmark"] = injection_benchmark_summary({})
             return public_snapshot
 
     packages = [
@@ -244,6 +289,7 @@ def build_feed() -> dict[str, Any]:
         ("harbor_ais_heldout_splits", harbor_splits),
         ("harbor_public_ais_gate", harbor_gate),
         ("harbor_ais_io_preflight", harbor_io_preflight),
+        ("harbor_ais_injection_benchmark", harbor_injection_benchmark),
     ]:
         ts = parse_dt(payload.get("generated_utc"))
         if ts is not None:
@@ -256,6 +302,7 @@ def build_feed() -> dict[str, Any]:
     dice_local_blockers = len(dice.get("local_blockers", []) or [])
     dice_portal_blockers = len(dice.get("portal_user_blockers", []) or [])
     harbor_io = io_preflight_summary(harbor_io_preflight)
+    harbor_injection = injection_benchmark_summary(harbor_injection_benchmark)
 
     return {
         "generated_utc": now_utc(),
@@ -285,8 +332,11 @@ def build_feed() -> dict[str, Any]:
             },
             {
                 "key": "Harbor AIS",
-                "value": str(harbor_io.get("posture") or harbor_gate.get("posture") or harbor_acquisition.get("posture") or harbor_ais.get("posture", "SOURCE_PROBED")),
+                "value": str(harbor_injection.get("posture") or harbor_io.get("posture") or harbor_gate.get("posture") or harbor_acquisition.get("posture") or harbor_ais.get("posture", "SOURCE_PROBED")),
                 "sub": (
+                    "Controlled public AIS injection benchmark ready; not real-world or field validation."
+                    if harbor_injection.get("posture") == "PUBLIC_AIS_INJECTION_BENCHMARK_READY"
+                    else
                     "Frozen AIS split I/O must be ready before controlled-injection benchmarking."
                     if harbor_io.get("posture") == "PUBLIC_AIS_SPLIT_IO_BLOCKED"
                     else "Public AIS splits/gate ready; still not multi-source or field validation."
@@ -341,6 +391,7 @@ def build_feed() -> dict[str, Any]:
                 "claim_boundary": str(harbor_gate.get("claim_boundary", "")),
             },
             "ais_io_preflight": harbor_io,
+            "ais_injection_benchmark": harbor_injection,
             "external_raw_data_rule": (
                 "Stage large NOAA/MarineCadastre/public AIS files on an external raw-data volume "
                 "via LUMA_HARBOR_DATA_ROOT; commit only hashes, manifests, schema profiles, and bounded summaries."
@@ -357,6 +408,7 @@ def build_feed() -> dict[str, Any]:
             "harbor_ais_splits": "out/ops/harbor_ais_heldout_splits_latest.json",
             "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json",
             "harbor_ais_io_preflight": "out/ops/harbor_ais_io_preflight_latest.json",
+            "harbor_ais_injection_benchmark": "out/ops/harbor_ais_injection_benchmark_latest.json",
         },
     }
 

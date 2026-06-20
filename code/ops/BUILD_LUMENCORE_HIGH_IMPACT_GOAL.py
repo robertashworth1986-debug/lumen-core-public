@@ -18,6 +18,7 @@ HARBOR_AIS_ACQUISITION_JSON = OUT_OPS / "harbor_ais_pilot_acquisition_latest.jso
 HARBOR_AIS_SPLITS_JSON = OUT_OPS / "harbor_ais_heldout_splits_latest.json"
 HARBOR_PUBLIC_AIS_GATE_JSON = OUT_OPS / "harbor_public_ais_gate_latest.json"
 HARBOR_AIS_IO_PREFLIGHT_JSON = OUT_OPS / "harbor_ais_io_preflight_latest.json"
+HARBOR_AIS_INJECTION_JSON = OUT_OPS / "harbor_ais_injection_benchmark_latest.json"
 
 OUT_JSON = OUT_OPS / "lumencore_high_impact_goal_latest.json"
 OUT_MD = DOCS / "LUMENCORE_HIGH_IMPACT_GOAL_2026-06-20.md"
@@ -55,6 +56,7 @@ def score_lumenstock(
     splits: dict[str, Any],
     public_gate: dict[str, Any],
     io_preflight: dict[str, Any],
+    injection_benchmark: dict[str, Any],
 ) -> dict[str, Any]:
     summary = readiness.get("summary", {}) if isinstance(readiness.get("summary"), dict) else {}
     local_blockers = int(summary.get("local_blockers", 0) or 0)
@@ -68,13 +70,19 @@ def score_lumenstock(
     io_posture = str(io_preflight.get("posture", "NOT_RUN"))
     io_ready = io_posture == "PUBLIC_AIS_SPLIT_IO_READY"
     io_blocked = io_posture == "PUBLIC_AIS_SPLIT_IO_BLOCKED"
+    injection_ready = str(injection_benchmark.get("posture", "")) == "PUBLIC_AIS_INJECTION_BENCHMARK_READY"
     artifact_count = int(dashboard.get("builder_velocity", {}).get("artifact_count", 0) or 0)
 
     components = {
         "proof_integrity": 100 if local_blockers == 0 else 45,
         "data_representativeness": min(95, 55 + (15 if acquisition_ready else 0) + (10 if splits_ready else 0) + (15 if gate_ready else 0)),
         "data_operability": 90 if io_ready else (45 if io_blocked else 60),
-        "benchmark_governance": 70 + (10 if geometry_expected and geometry_matched == geometry_expected else 0),
+        "benchmark_governance": min(
+            95,
+            70
+            + (10 if geometry_expected and geometry_matched == geometry_expected else 0)
+            + (15 if injection_ready else 0),
+        ),
         "compliance_readiness": max(20, 80 - portal_blockers * 2),
         "grant_factory_maturity": min(85, 35 + packages * 8 + artifact_count * 4),
         "market_traction": 20,
@@ -107,6 +115,7 @@ def build_payload() -> dict[str, Any]:
     splits = read_json(HARBOR_AIS_SPLITS_JSON)
     public_gate = read_json(HARBOR_PUBLIC_AIS_GATE_JSON)
     io_preflight = read_json(HARBOR_AIS_IO_PREFLIGHT_JSON)
+    injection_benchmark = read_json(HARBOR_AIS_INJECTION_JSON)
     harbor = dashboard.get("harbor", {}) if isinstance(dashboard.get("harbor"), dict) else {}
     if not acquisition:
         acquisition = harbor.get("ais_acquisition", {}) if isinstance(harbor.get("ais_acquisition"), dict) else {}
@@ -122,9 +131,18 @@ def build_payload() -> dict[str, Any]:
             }
     if not io_preflight:
         io_preflight = harbor.get("ais_io_preflight", {}) if isinstance(harbor.get("ais_io_preflight"), dict) else {}
-    lumenstock = score_lumenstock(readiness, dashboard, acquisition, splits, public_gate, io_preflight)
+    if not injection_benchmark:
+        injection_benchmark = (
+            harbor.get("ais_injection_benchmark", {})
+            if isinstance(harbor.get("ais_injection_benchmark"), dict)
+            else {}
+        )
+    lumenstock = score_lumenstock(readiness, dashboard, acquisition, splits, public_gate, io_preflight, injection_benchmark)
     summary = readiness.get("summary", {}) if isinstance(readiness.get("summary"), dict) else {}
     io_posture = str(io_preflight.get("posture", "NOT_RUN"))
+    injection_result = injection_benchmark.get("controlled_injection_benchmark", {})
+    if not isinstance(injection_result, dict):
+        injection_result = injection_benchmark
 
     return {
         "generated_utc": now_utc(),
@@ -151,6 +169,10 @@ def build_payload() -> dict[str, Any]:
             "harbor_ais_io_preflight_posture": io_posture,
             "harbor_ais_io_preflight_required_ok": io_preflight.get("summary", {}).get("required_ok") if isinstance(io_preflight.get("summary"), dict) else io_preflight.get("required_ok"),
             "harbor_ais_io_preflight_required_files": io_preflight.get("summary", {}).get("required_files") if isinstance(io_preflight.get("summary"), dict) else io_preflight.get("required_files"),
+            "harbor_ais_injection_benchmark_posture": injection_benchmark.get("posture", "NOT_RUN"),
+            "harbor_ais_injection_motion_recall": injection_result.get("motion_consistency_recall", 0.0),
+            "harbor_ais_injection_baseline_recall": injection_result.get("speed_only_baseline_recall", 0.0),
+            "harbor_ais_injection_recall_lift": injection_result.get("recall_lift_vs_speed_only", 0.0),
             "harbor_public_ais_region": public_gate.get("selected_region", {}).get("label", ""),
             "harbor_public_ais_validation_rows": public_gate.get("validation", {}).get("row_metrics", {}).get("rows", 0),
             "builder_velocity": dashboard.get("builder_velocity", {}),
@@ -158,8 +180,8 @@ def build_payload() -> dict[str, Any]:
         "highest_leverage_milestones": [
             {
                 "lane": "HarborSentinel representative data",
-                "target": "Use the frozen NOAA AIS New Orleans / Mississippi River Delta dev/validation split and single-lane gate as the public representative-data bridge; first restore responsive split I/O, then run the next HarborSentinel detector experiment without tuning on validation.",
-                "traction_reason": "This moves HarborSentinel beyond synthetic-only source readiness while still preserving the boundary that AIS single-lane diagnostics are not Navy field validation.",
+                "target": "Use the frozen NOAA AIS New Orleans / Mississippi River Delta dev/validation split, single-lane gate, and current controlled-injection benchmark as the public representative-data bridge while preserving the boundary that controlled injections are not field validation.",
+                "traction_reason": "This moves HarborSentinel beyond synthetic-only source readiness and gives reviewers a reproducible detector-vs-baseline result without claiming Navy operational performance.",
             },
             {
                 "lane": "DICE submission quality",
@@ -184,8 +206,8 @@ def build_payload() -> dict[str, Any]:
         ],
         "lumenstock": lumenstock,
         "next_72_hours": [
-            "Package the NOAA AIS held-out split and public AIS gate into the HarborSentinel reviewer proof packet.",
-            "Fix the frozen AIS split I/O timeout, rerun the I/O preflight until development and validation are readable, then run the controlled-injection detector benchmark without threshold tuning on validation.",
+            "Package the NOAA AIS held-out split, public AIS gate, local split-cache recovery, and controlled-injection benchmark into the HarborSentinel reviewer proof packet.",
+            "Update HarborSentinel proposal language to cite the controlled-injection result only as a bounded public AIS benchmark, not as real-world threat, multi-source fusion, or field validation.",
             "Hydrate grants dashboard with readiness, DICE lock, Harbor AIS, and builder velocity feeds.",
             "Prepare public-safe proof cards for DICE/Harbor without private proposal text.",
             "Use the LumenStock Proof-Weighted Opportunity Index as an internal prioritization meter only.",
@@ -193,7 +215,7 @@ def build_payload() -> dict[str, Any]:
         "hard_boundaries": [
             "Do not represent LumenStock as stock, equity, a token, a public offering, or an investment product.",
             "Do not claim guaranteed funding, guaranteed profit, field validation, CMMC certification, or institutional trading readiness.",
-            "Do not cite HarborSentinel controlled-injection detector performance until split I/O preflight is ready and the benchmark produces a current reproducible result.",
+            "Do not describe HarborSentinel controlled-injection detector evidence as real adversary detection, multi-source fusion, Navy/SSDS integration, or field validation.",
             "Do not submit, certify, consent, upload, or move money without fresh action-time approval.",
             "Do not commit raw AIS bulk data, secrets, credentials, private portal screenshots, or private application packets to public repos.",
         ],
@@ -225,6 +247,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Harbor AIS posture: `{truth['harbor_ais_posture']}`",
             f"- Harbor AIS I/O preflight: `{truth.get('harbor_ais_io_preflight_posture', 'NOT_RUN')}` "
             f"({truth.get('harbor_ais_io_preflight_required_ok', 0)}/{truth.get('harbor_ais_io_preflight_required_files', 0)} required files OK)",
+            f"- Harbor AIS injection benchmark: `{truth.get('harbor_ais_injection_benchmark_posture', 'NOT_RUN')}`, "
+            f"motion recall {truth.get('harbor_ais_injection_motion_recall', 0)}, "
+            f"speed-only baseline {truth.get('harbor_ais_injection_baseline_recall', 0)}, "
+            f"lift {truth.get('harbor_ais_injection_recall_lift', 0)}",
             f"- Harbor public AIS region: {truth.get('harbor_public_ais_region') or 'n/a'}",
             f"- Harbor public AIS validation rows: {truth.get('harbor_public_ais_validation_rows') or 0}",
         ]

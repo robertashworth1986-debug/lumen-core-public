@@ -1,12 +1,12 @@
 {
-  "generated_utc": "2026-06-20T07:56:39.338681+00:00",
+  "generated_utc": "2026-06-20T21:42:43.184366+00:00",
   "schema": "grant_dashboard_status_feed_v1",
   "scope": "dashboard_safe_grant_readiness",
   "posture": "LOCAL_READY_PORTAL_BLOCKED",
   "summary": {
     "packages": 5,
     "local_blockers": 0,
-    "portal_user_blockers": 23,
+    "portal_user_blockers": 21,
     "submitted_by_feed": 0,
     "ready_local_not_portal": true,
     "dashboard_signal": "LOCAL_READY_PORTAL_BLOCKED"
@@ -20,14 +20,14 @@
     },
     {
       "key": "Top-Five Grants",
-      "value": "0 local / 23 portal",
+      "value": "0 local / 21 portal",
       "sub": "Local packages are file-ready; submissions remain portal/user gated.",
       "tone": "warn"
     },
     {
       "key": "Harbor AIS",
-      "value": "PUBLIC_AIS_SINGLE_LANE_GATE_READY",
-      "sub": "Public AIS splits/gate ready; still not multi-source or field validation.",
+      "value": "PUBLIC_AIS_INJECTION_BENCHMARK_READY",
+      "sub": "Controlled public AIS injection benchmark ready; not real-world or field validation.",
       "tone": "warn"
     },
     {
@@ -48,19 +48,19 @@
       "manifest_expected": 6,
       "render_ok": true,
       "local_blockers": 0,
-      "portal_user_blockers": 6
+      "portal_user_blockers": 5
     },
     {
       "name": "HarborSentinel",
       "portal": "DSIP",
       "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
-      "required_artifacts_present": 12,
-      "required_artifacts_total": 12,
+      "required_artifacts_present": 13,
+      "required_artifacts_total": 13,
       "manifest_matched": 4,
       "manifest_expected": 4,
       "render_ok": true,
       "local_blockers": 0,
-      "portal_user_blockers": 5
+      "portal_user_blockers": 4
     },
     {
       "name": "NSF Project Pitch",
@@ -209,16 +209,97 @@
       },
       "claim_boundary": "This gate establishes public AIS single-lane data readiness, schema coverage, track overlap, and frozen development-to-validation diagnostics. It does not establish HarborSentinel detection performance, multi-source fusion performance, ADS-B licensing, radar validation, Navy/SSDS integration, field performance, or operational suitability."
     },
+    "ais_io_preflight": {
+      "posture": "PUBLIC_AIS_SPLIT_IO_READY",
+      "required_ok": 2,
+      "required_files": 2,
+      "all_required_ok": true,
+      "any_timeout": false,
+      "timeout_seconds": 5.0,
+      "sample_bytes": 4096,
+      "full_hash": false,
+      "probes": [
+        {
+          "label": "development",
+          "status": "ok",
+          "ok": true,
+          "expected_bytes": 5598389,
+          "actual_bytes": 5598389,
+          "size_matches": true,
+          "sample_bytes_read": 4096,
+          "timeout_seconds": null,
+          "elapsed_seconds": 0.0,
+          "full_hash_requested": false
+        },
+        {
+          "label": "validation",
+          "status": "ok",
+          "ok": true,
+          "expected_bytes": 5595298,
+          "actual_bytes": 5595298,
+          "size_matches": true,
+          "sample_bytes_read": 4096,
+          "timeout_seconds": null,
+          "elapsed_seconds": 0.0,
+          "full_hash_requested": false
+        }
+      ],
+      "next_gate": "Run the HarborSentinel controlled-injection benchmark only after development and validation split I/O preflight is ready.",
+      "claim_boundary": "This preflight only proves that the frozen public AIS split files are reachable and sample-readable within the configured timeout. Unless full_hash is true, it does not rehash the complete files. It does not establish HarborSentinel detection performance, multi-source fusion, ADS-B or radar validation, Navy/SSDS integration, field performance, or operational suitability."
+    },
+    "ais_injection_benchmark": {
+      "posture": "PUBLIC_AIS_INJECTION_BENCHMARK_READY",
+      "development_segments": 48624,
+      "validation_segments": 48616,
+      "total_injected_segments": 20000,
+      "motion_consistency_recall": 1.0,
+      "speed_only_baseline_recall": 0.25835,
+      "recall_lift_vs_speed_only": 0.7416499999999999,
+      "families": {
+        "speed_burst": {
+          "injected_segments": 5000,
+          "motion_consistency_recall": 1.0,
+          "speed_only_baseline_recall": 1.0,
+          "boundary": "Controlled kinematic injection on public AIS validation segments; not a real threat label."
+        },
+        "position_jump": {
+          "injected_segments": 5000,
+          "motion_consistency_recall": 1.0,
+          "speed_only_baseline_recall": 0.0116,
+          "boundary": "Controlled kinematic injection on public AIS validation segments; not a real threat label."
+        },
+        "heading_snap": {
+          "injected_segments": 5000,
+          "motion_consistency_recall": 1.0,
+          "speed_only_baseline_recall": 0.009,
+          "boundary": "Controlled kinematic injection on public AIS validation segments; not a real threat label."
+        },
+        "consistency_gap": {
+          "injected_segments": 5000,
+          "motion_consistency_recall": 1.0,
+          "speed_only_baseline_recall": 0.0128,
+          "boundary": "Controlled kinematic injection on public AIS validation segments; not a real threat label."
+        }
+      },
+      "natural_candidate_rates": {
+        "development_motion_candidate_rate": 0.029059723593287266,
+        "validation_motion_candidate_rate": 0.03583182491360869,
+        "development_speed_only_candidate_rate": 0.009912800263244488,
+        "validation_speed_only_candidate_rate": 0.0109428994569689,
+        "boundary": "Natural candidate rates are unlabeled review queues, not false-positive rates."
+      },
+      "claim_boundary": "This is a held-out public AIS controlled-injection benchmark. It demonstrates that a frozen development-threshold motion-consistency detector catches injected kinematic perturbations on validation AIS segments better than a speed-only baseline. It does not establish HarborSentinel operational detection performance, real adversary detection, multi-source fusion, ADS-B/radar validation, Navy/SSDS integration, field performance, or operational suitability."
+    },
     "external_raw_data_rule": "Stage large NOAA/MarineCadastre/public AIS files on an external raw-data volume via LUMA_HARBOR_DATA_ROOT; commit only hashes, manifests, schema profiles, and bounded summaries."
   },
   "builder_velocity": {
-    "artifact_count": 7,
+    "artifact_count": 9,
     "window_start_utc": "2026-06-20T01:53:36.675109+00:00",
-    "window_end_utc": "2026-06-20T07:54:09.658797+00:00",
-    "window_seconds": 21632.984,
-    "per_second": 0.000324,
-    "per_minute": 0.019,
-    "per_hour": 1.165,
+    "window_end_utc": "2026-06-20T21:38:24.957712+00:00",
+    "window_seconds": 71088.283,
+    "per_second": 0.000127,
+    "per_minute": 0.008,
+    "per_hour": 0.456,
     "measurement_boundary": "Rate is computed only from timestamped local artifacts in this feed. It is not a model benchmark, labor-cost estimate, revenue claim, or funding probability."
   },
   "claim_boundaries": [
@@ -226,6 +307,7 @@
     "Portal authority, certifications, and action-time submit approval remain user gates.",
     "Synthetic benchmarks support bounded software feasibility only, not field validation.",
     "HarborSentinel public AIS has raw acquisition, held-out splits, and a single-lane readiness gate; this is data-readiness evidence, not detection-performance or field validation.",
+    "HarborSentinel controlled-injection benchmarking must wait until frozen AIS split I/O is responsive.",
     "Trading, Kraken, live-breadth, or frozen-delta artifacts must not be cited as profit proof."
   ],
   "source_files": {
@@ -235,6 +317,8 @@
     "harbor_data": "out/ops/harbor_data_source_readiness_audit_latest.json",
     "harbor_ais_acquisition": "out/ops/harbor_ais_pilot_acquisition_latest.json",
     "harbor_ais_splits": "out/ops/harbor_ais_heldout_splits_latest.json",
-    "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json"
+    "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json",
+    "harbor_ais_io_preflight": "out/ops/harbor_ais_io_preflight_latest.json",
+    "harbor_ais_injection_benchmark": "out/ops/harbor_ais_injection_benchmark_latest.json"
   }
 }

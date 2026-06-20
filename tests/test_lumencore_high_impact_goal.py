@@ -41,7 +41,12 @@ def test_lumenstock_score_uses_current_truth_without_guarantees():
         "PUBLIC_AIS_SPLIT_IO_BLOCKED",
         "NOT_RUN",
     }
+    assert payload["current_truth"]["harbor_ais_injection_benchmark_posture"] in {
+        "PUBLIC_AIS_INJECTION_BENCHMARK_READY",
+        "PUBLIC_AIS_INJECTION_BENCHMARK_REVIEW",
+        "NOT_RUN",
+    }
     assert payload["current_truth"]["harbor_public_ais_validation_rows"] == 50000
-    assert any("split I/O preflight" in item for item in payload["hard_boundaries"])
-    assert any("Fix the frozen AIS split I/O timeout" in item for item in payload["next_72_hours"])
+    assert any("controlled-injection detector evidence" in item for item in payload["hard_boundaries"])
+    assert any("controlled-injection result" in item for item in payload["next_72_hours"])
     assert "guaranteed funding" in " ".join(payload["hard_boundaries"]).lower()
