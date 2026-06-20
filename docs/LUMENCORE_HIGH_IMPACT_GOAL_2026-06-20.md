@@ -1,6 +1,6 @@
 # LumenCore High-Impact Goal
 
-Generated UTC: 2026-06-20T07:54:09.576313+00:00
+Generated UTC: 2026-06-20T21:42:43.245225+00:00
 
 ## North Star
 
@@ -20,19 +20,21 @@ Make LumenCore the trusted proof-driven adaptive orchestration stack for complex
 - Grant posture: `LOCAL_READY_PORTAL_BLOCKED`
 - Packages checked: 5
 - Local blockers: 0
-- Portal/user blockers: 23
+- Portal/user blockers: 21
 - Harbor AIS posture: `PUBLIC_AIS_SINGLE_LANE_GATE_READY`
+- Harbor AIS I/O preflight: `PUBLIC_AIS_SPLIT_IO_READY` (2/2 required files OK)
+- Harbor AIS injection benchmark: `PUBLIC_AIS_INJECTION_BENCHMARK_READY`, motion recall 1.0, speed-only baseline 0.25835, lift 0.7416499999999999
 - Harbor public AIS region: New Orleans / Mississippi River Delta
 - Harbor public AIS validation rows: 50000
-- Builder artifact velocity: 7 timestamped artifacts, 1.166 artifacts/hour over the measured artifact window
+- Builder artifact velocity: 9 timestamped artifacts, 0.456 artifacts/hour over the measured artifact window
 
 ## Highest-Leverage Milestones
 
 ### HarborSentinel representative data
 
-Target: Use the frozen NOAA AIS New Orleans / Mississippi River Delta dev/validation split and single-lane gate as the public representative-data bridge, then run the next HarborSentinel detector experiment without tuning on validation.
+Target: Use the frozen NOAA AIS New Orleans / Mississippi River Delta dev/validation split, single-lane gate, and current controlled-injection benchmark as the public representative-data bridge while preserving the boundary that controlled injections are not field validation.
 
-Why it matters: This moves HarborSentinel beyond synthetic-only source readiness while still preserving the boundary that AIS single-lane diagnostics are not Navy field validation.
+Why it matters: This moves HarborSentinel beyond synthetic-only source readiness and gives reviewers a reproducible detector-vs-baseline result without claiming Navy operational performance.
 
 ### DICE submission quality
 
@@ -62,7 +64,7 @@ Why it matters: Traction comes from buyers and agencies trusting the evidence ch
 
 Working name: LumenStock Proof-Weighted Opportunity Index (`LUMEN-PWI`)
 
-Composite readiness score: 60.57/100
+Composite readiness score: 66.62/100
 
 Internal proof/value readiness index. It is not equity, not a token, not a securities offering, not investment advice, and not a valuation.
 
@@ -70,16 +72,17 @@ Components:
 
 - proof_integrity: 100/100
 - data_representativeness: 95/100
-- benchmark_governance: 80/100
-- compliance_readiness: 34/100
+- data_operability: 90/100
+- benchmark_governance: 95/100
+- compliance_readiness: 38/100
 - grant_factory_maturity: 85/100
 - market_traction: 20/100
 - revenue_evidence: 10/100
 
 ## Next 72 Hours
 
-- Package the NOAA AIS held-out split and public AIS gate into the HarborSentinel reviewer proof packet.
-- Run the next HarborSentinel detector experiment against the frozen public AIS split without threshold tuning on validation.
+- Package the NOAA AIS held-out split, public AIS gate, local split-cache recovery, and controlled-injection benchmark into the HarborSentinel reviewer proof packet.
+- Update HarborSentinel proposal language to cite the controlled-injection result only as a bounded public AIS benchmark, not as real-world threat, multi-source fusion, or field validation.
 - Hydrate grants dashboard with readiness, DICE lock, Harbor AIS, and builder velocity feeds.
 - Prepare public-safe proof cards for DICE/Harbor without private proposal text.
 - Use the LumenStock Proof-Weighted Opportunity Index as an internal prioritization meter only.
@@ -88,5 +91,6 @@ Components:
 
 - Do not represent LumenStock as stock, equity, a token, a public offering, or an investment product.
 - Do not claim guaranteed funding, guaranteed profit, field validation, CMMC certification, or institutional trading readiness.
+- Do not describe HarborSentinel controlled-injection detector evidence as real adversary detection, multi-source fusion, Navy/SSDS integration, or field validation.
 - Do not submit, certify, consent, upload, or move money without fresh action-time approval.
 - Do not commit raw AIS bulk data, secrets, credentials, private portal screenshots, or private application packets to public repos.

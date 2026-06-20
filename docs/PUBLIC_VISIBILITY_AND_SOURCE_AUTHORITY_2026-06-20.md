@@ -1,6 +1,6 @@
 # Public Visibility and Source Authority Packet
 
-Generated UTC: 2026-06-20T07:54:09.623895+00:00
+Generated UTC: 2026-06-20T21:42:43.294935+00:00
 
 ## Identity
 
@@ -40,9 +40,15 @@ Evidence: NOAA AIS raw ZIP acquired and hashed; 50,000-row development and 50,00
 
 Boundary: Does not establish HarborSentinel detection performance, ADS-B rights, radar validation, Navy/SSDS integration, or field validation.
 
+### HarborSentinel has a bounded public AIS controlled-injection benchmark.
+
+Evidence: 20000 injected validation segments; motion-consistency recall 1.0 versus speed-only baseline recall 0.25835 (lift 0.7416499999999999).
+
+Boundary: Controlled kinematic injections on public AIS validation data are not real adversary labels, multi-source fusion, ADS-B/radar validation, Navy/SSDS integration, field performance, or operational suitability.
+
 ### Top-five grant packets are locally ready but not submitted.
 
-Evidence: Readiness audit reports 0 local blockers and 23 portal/user gates across 5 packages.
+Evidence: Readiness audit reports 0 local blockers and 21 portal/user gates across 5 packages.
 
 Boundary: Portal authority, compliance representations, cost review, teaming, and submit/certification actions remain unresolved.
 
@@ -52,19 +58,20 @@ Boundary: Portal authority, compliance representations, cost review, teaming, an
 2. Read the source authority packet and claim boundaries before any performance claim.
 3. Inspect the DICE lock packet for local package hygiene and remaining BAAT/SAM/human gates.
 4. Inspect the Harbor AIS gate for public-data readiness, split hashes, and validation boundaries.
-5. Only then map the evidence into DICE/Harbor proposal language.
+5. Inspect the Harbor controlled-injection benchmark only as bounded public AIS detector-vs-baseline evidence.
+6. Only then map the evidence into DICE/Harbor proposal language.
 
 ## Outreach Copy
 
 ### LinkedIn Short
 
-I am building LumenCore as a proof-driven orchestration stack for complex systems. The latest milestone: public NOAA AIS data is now acquired, hashed, split into held-out development/validation sets, and gated with explicit non-claim boundaries. I am looking for serious reviewers, agency-aligned collaborators, and teams that care about evidence before claims.
+I am building LumenCore as a proof-driven orchestration stack for complex systems. The latest milestone: public NOAA AIS data is now acquired, hashed, split into held-out development/validation sets, gated, and tested with a bounded controlled-injection benchmark against a speed-only baseline. I am looking for serious reviewers, agency-aligned collaborators, and teams that care about evidence before claims.
 
 ### Reviewer Email
 
 Subject: LumenCore proof packet: DICE local lock + public AIS HarborSentinel gate
 
-I am sharing a public-safe proof packet for LumenCore. It includes a locally locked DARPA DICE abstract package, a HarborSentinel public AIS data-readiness gate built from NOAA AIS, and explicit boundaries on what the evidence does and does not prove. I would value technical review focused on reproducibility, claim discipline, and agency fit.
+I am sharing a public-safe proof packet for LumenCore. It includes a locally locked DARPA DICE abstract package, a HarborSentinel public AIS data-readiness gate built from NOAA AIS, a bounded controlled-injection benchmark, and explicit boundaries on what the evidence does and does not prove. I would value technical review focused on reproducibility, claim discipline, and agency fit.
 
 ### Goal Prompt
 
@@ -74,7 +81,7 @@ Operate as LumenCore's proof-and-traction engine. Every cycle must convert ambit
 
 - Guaranteed awards, funding, wealth, or fame.
 - CMMC Level 2 certification, clearance, export determination, or portal authority without current proof.
-- Harbor/Navy/SSDS/field performance from public AIS single-lane data-readiness.
+- Harbor/Navy/SSDS/field performance from public AIS single-lane data-readiness or controlled-injection results.
 - Trading profitability or institutional-grade execution from governance audits.
 - Partner, customer, investor, or agency endorsement without written confirmation.
 
