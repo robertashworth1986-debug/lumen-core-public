@@ -17,6 +17,7 @@ PUBLIC_DASHBOARD_FEED_JSON = DASHBOARD_DATA / "grant_readiness_status.json"
 HARBOR_AIS_ACQUISITION_JSON = OUT_OPS / "harbor_ais_pilot_acquisition_latest.json"
 HARBOR_AIS_SPLITS_JSON = OUT_OPS / "harbor_ais_heldout_splits_latest.json"
 HARBOR_PUBLIC_AIS_GATE_JSON = OUT_OPS / "harbor_public_ais_gate_latest.json"
+HARBOR_AIS_IO_PREFLIGHT_JSON = OUT_OPS / "harbor_ais_io_preflight_latest.json"
 
 OUT_JSON = OUT_OPS / "lumencore_high_impact_goal_latest.json"
 OUT_MD = DOCS / "LUMENCORE_HIGH_IMPACT_GOAL_2026-06-20.md"
@@ -53,6 +54,7 @@ def score_lumenstock(
     acquisition: dict[str, Any],
     splits: dict[str, Any],
     public_gate: dict[str, Any],
+    io_preflight: dict[str, Any],
 ) -> dict[str, Any]:
     summary = readiness.get("summary", {}) if isinstance(readiness.get("summary"), dict) else {}
     local_blockers = int(summary.get("local_blockers", 0) or 0)
@@ -63,11 +65,15 @@ def score_lumenstock(
     acquisition_ready = acquisition.get("posture") == "PUBLIC_AIS_RAW_ACQUIRED_HASHED_PROFILED"
     splits_ready = splits.get("posture") == "PUBLIC_AIS_HELDOUT_SPLITS_FROZEN"
     gate_ready = public_gate.get("posture") == "PUBLIC_AIS_SINGLE_LANE_GATE_READY"
+    io_posture = str(io_preflight.get("posture", "NOT_RUN"))
+    io_ready = io_posture == "PUBLIC_AIS_SPLIT_IO_READY"
+    io_blocked = io_posture == "PUBLIC_AIS_SPLIT_IO_BLOCKED"
     artifact_count = int(dashboard.get("builder_velocity", {}).get("artifact_count", 0) or 0)
 
     components = {
         "proof_integrity": 100 if local_blockers == 0 else 45,
         "data_representativeness": min(95, 55 + (15 if acquisition_ready else 0) + (10 if splits_ready else 0) + (15 if gate_ready else 0)),
+        "data_operability": 90 if io_ready else (45 if io_blocked else 60),
         "benchmark_governance": 70 + (10 if geometry_expected and geometry_matched == geometry_expected else 0),
         "compliance_readiness": max(20, 80 - portal_blockers * 2),
         "grant_factory_maturity": min(85, 35 + packages * 8 + artifact_count * 4),
@@ -100,6 +106,7 @@ def build_payload() -> dict[str, Any]:
     acquisition = read_json(HARBOR_AIS_ACQUISITION_JSON)
     splits = read_json(HARBOR_AIS_SPLITS_JSON)
     public_gate = read_json(HARBOR_PUBLIC_AIS_GATE_JSON)
+    io_preflight = read_json(HARBOR_AIS_IO_PREFLIGHT_JSON)
     harbor = dashboard.get("harbor", {}) if isinstance(dashboard.get("harbor"), dict) else {}
     if not acquisition:
         acquisition = harbor.get("ais_acquisition", {}) if isinstance(harbor.get("ais_acquisition"), dict) else {}
@@ -113,8 +120,11 @@ def build_payload() -> dict[str, Any]:
                 "selected_region": gate.get("region", {}),
                 "validation": {"row_metrics": {"rows": gate.get("validation_rows", 0)}},
             }
-    lumenstock = score_lumenstock(readiness, dashboard, acquisition, splits, public_gate)
+    if not io_preflight:
+        io_preflight = harbor.get("ais_io_preflight", {}) if isinstance(harbor.get("ais_io_preflight"), dict) else {}
+    lumenstock = score_lumenstock(readiness, dashboard, acquisition, splits, public_gate, io_preflight)
     summary = readiness.get("summary", {}) if isinstance(readiness.get("summary"), dict) else {}
+    io_posture = str(io_preflight.get("posture", "NOT_RUN"))
 
     return {
         "generated_utc": now_utc(),
@@ -138,6 +148,9 @@ def build_payload() -> dict[str, Any]:
             "local_blockers": summary.get("local_blockers", 0),
             "portal_user_blockers": summary.get("portal_user_blockers", 0),
             "harbor_ais_posture": public_gate.get("posture") or splits.get("posture") or acquisition.get("posture", "NOT_ACQUIRED"),
+            "harbor_ais_io_preflight_posture": io_posture,
+            "harbor_ais_io_preflight_required_ok": io_preflight.get("summary", {}).get("required_ok") if isinstance(io_preflight.get("summary"), dict) else io_preflight.get("required_ok"),
+            "harbor_ais_io_preflight_required_files": io_preflight.get("summary", {}).get("required_files") if isinstance(io_preflight.get("summary"), dict) else io_preflight.get("required_files"),
             "harbor_public_ais_region": public_gate.get("selected_region", {}).get("label", ""),
             "harbor_public_ais_validation_rows": public_gate.get("validation", {}).get("row_metrics", {}).get("rows", 0),
             "builder_velocity": dashboard.get("builder_velocity", {}),
@@ -145,7 +158,7 @@ def build_payload() -> dict[str, Any]:
         "highest_leverage_milestones": [
             {
                 "lane": "HarborSentinel representative data",
-                "target": "Use the frozen NOAA AIS New Orleans / Mississippi River Delta dev/validation split and single-lane gate as the public representative-data bridge, then run the next HarborSentinel detector experiment without tuning on validation.",
+                "target": "Use the frozen NOAA AIS New Orleans / Mississippi River Delta dev/validation split and single-lane gate as the public representative-data bridge; first restore responsive split I/O, then run the next HarborSentinel detector experiment without tuning on validation.",
                 "traction_reason": "This moves HarborSentinel beyond synthetic-only source readiness while still preserving the boundary that AIS single-lane diagnostics are not Navy field validation.",
             },
             {
@@ -172,7 +185,7 @@ def build_payload() -> dict[str, Any]:
         "lumenstock": lumenstock,
         "next_72_hours": [
             "Package the NOAA AIS held-out split and public AIS gate into the HarborSentinel reviewer proof packet.",
-            "Run the next HarborSentinel detector experiment against the frozen public AIS split without threshold tuning on validation.",
+            "Fix the frozen AIS split I/O timeout, rerun the I/O preflight until development and validation are readable, then run the controlled-injection detector benchmark without threshold tuning on validation.",
             "Hydrate grants dashboard with readiness, DICE lock, Harbor AIS, and builder velocity feeds.",
             "Prepare public-safe proof cards for DICE/Harbor without private proposal text.",
             "Use the LumenStock Proof-Weighted Opportunity Index as an internal prioritization meter only.",
@@ -180,6 +193,7 @@ def build_payload() -> dict[str, Any]:
         "hard_boundaries": [
             "Do not represent LumenStock as stock, equity, a token, a public offering, or an investment product.",
             "Do not claim guaranteed funding, guaranteed profit, field validation, CMMC certification, or institutional trading readiness.",
+            "Do not cite HarborSentinel controlled-injection detector performance until split I/O preflight is ready and the benchmark produces a current reproducible result.",
             "Do not submit, certify, consent, upload, or move money without fresh action-time approval.",
             "Do not commit raw AIS bulk data, secrets, credentials, private portal screenshots, or private application packets to public repos.",
         ],
@@ -209,6 +223,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Local blockers: {truth['local_blockers']}",
             f"- Portal/user blockers: {truth['portal_user_blockers']}",
             f"- Harbor AIS posture: `{truth['harbor_ais_posture']}`",
+            f"- Harbor AIS I/O preflight: `{truth.get('harbor_ais_io_preflight_posture', 'NOT_RUN')}` "
+            f"({truth.get('harbor_ais_io_preflight_required_ok', 0)}/{truth.get('harbor_ais_io_preflight_required_files', 0)} required files OK)",
             f"- Harbor public AIS region: {truth.get('harbor_public_ais_region') or 'n/a'}",
             f"- Harbor public AIS validation rows: {truth.get('harbor_public_ais_validation_rows') or 0}",
         ]
