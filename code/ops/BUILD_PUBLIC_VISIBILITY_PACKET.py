@@ -116,6 +116,12 @@ def build_payload() -> dict[str, Any]:
     injection_result = harbor_injection.get("controlled_injection_benchmark", {})
     if not isinstance(injection_result, dict) or not injection_result:
         injection_result = harbor_injection
+    best_baseline = (
+        injection_result.get("baseline_suite", {})
+        .get("best_single_axis_baseline", {})
+        if isinstance(injection_result.get("baseline_suite", {}), dict)
+        else {}
+    )
 
     proof_claims = [
         {
@@ -157,7 +163,9 @@ def build_payload() -> dict[str, Any]:
                     f"{injection_result.get('total_injected_segments', 0)} injected validation segments; "
                     f"motion-consistency recall {injection_result.get('motion_consistency_recall', 0)} versus "
                     f"speed-only baseline recall {injection_result.get('speed_only_baseline_recall', 0)} "
-                    f"(lift {injection_result.get('recall_lift_vs_speed_only', 0)})."
+                    f"(lift {injection_result.get('recall_lift_vs_speed_only', 0)}); "
+                    f"best single-axis baseline {best_baseline.get('name', 'n/a')} recall "
+                    f"{best_baseline.get('recall', 'n/a')}."
                 ),
                 "boundary": (
                     "Controlled kinematic injections on public AIS validation data are not real adversary labels, "

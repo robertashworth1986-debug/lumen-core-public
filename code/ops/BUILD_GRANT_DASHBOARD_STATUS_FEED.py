@@ -171,6 +171,7 @@ def injection_benchmark_summary(benchmark: dict[str, Any]) -> dict[str, Any]:
             "motion_consistency_recall": 0.0,
             "speed_only_baseline_recall": 0.0,
             "recall_lift_vs_speed_only": 0.0,
+            "baseline_suite": {},
             "families": {},
             "claim_boundary": (
                 "No controlled-injection benchmark artifact is available in this feed. "
@@ -197,6 +198,7 @@ def injection_benchmark_summary(benchmark: dict[str, Any]) -> dict[str, Any]:
         "motion_consistency_recall": result.get("motion_consistency_recall", 0.0),
         "speed_only_baseline_recall": result.get("speed_only_baseline_recall", 0.0),
         "recall_lift_vs_speed_only": result.get("recall_lift_vs_speed_only", 0.0),
+        "baseline_suite": result.get("baseline_suite", {}),
         "families": safe_families,
         "natural_candidate_rates": benchmark.get("natural_candidate_rates", {}),
         "claim_boundary": str(benchmark.get("claim_boundary", "")),

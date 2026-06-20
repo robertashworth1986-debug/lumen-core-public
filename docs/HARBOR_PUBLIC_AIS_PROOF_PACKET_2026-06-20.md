@@ -96,6 +96,19 @@ Navy/SSDS integration, field performance, or operational suitability.
 | Motion-consistency recall | 1.0 |
 | Speed-only baseline recall | 0.25835 |
 | Recall lift vs speed-only | 0.7416499999999999 |
+| Best single-axis baseline | speed_gap_consistency_p99 (recall 0.5068) |
+
+### Stronger Single-Axis Baselines
+
+| Baseline | Recall | Gap vs motion consistency |
+|---|---:|---:|
+| reported_speed_sog_p99 | 0.2584 | 0.7416 |
+| derived_trajectory_speed_p99 | 0.5053 | 0.4947 |
+| speed_gap_consistency_p99 | 0.5068 | 0.4932 |
+| heading_rate_p99 | 0.2575 | 0.7425 |
+
+Boundary: these single-axis baseline recalls are controlled-injection checks,
+not precision, false-positive, or field-performance estimates.
 
 ### Family Results
 
@@ -122,7 +135,8 @@ rates.
 
 This packet supports the claim that a frozen development-threshold
 motion-consistency detector catches controlled kinematic perturbations on
-held-out public AIS validation segments better than a speed-only baseline.
+held-out public AIS validation segments better than a speed-only baseline and
+the strongest current single-axis p99 baseline in this public AIS lane.
 
 This is useful because it moves HarborSentinel from synthetic-only framing into
 public-source representative-data evidence with hashes, splits, and a bounded
@@ -143,13 +157,14 @@ Do not use this packet to claim:
 
 ## Next Validation Gates
 
-1. Rehash full development and validation split files during a longer
-   reproducibility run.
+1. Repeat full-file SHA-256 preflight during any fresh reviewer reproduction
+   run.
 2. Add labeled or analyst-reviewed anomaly cases if a public or partner-safe
    source becomes available.
 3. Add ADS-B and radar only after rights, source quality, and validation
    boundaries are explicit.
-4. Compare against stronger baselines beyond speed-only, including trajectory
-   smoothness, heading-rate, and track-context models.
+4. Extend beyond current single-axis baselines into trajectory smoothness,
+   route-distance, track-context, density-aware, and analyst-review-burden
+   models.
 5. Report precision, review-queue burden, and false-positive estimates only
    after labels or an analyst adjudication protocol exists.

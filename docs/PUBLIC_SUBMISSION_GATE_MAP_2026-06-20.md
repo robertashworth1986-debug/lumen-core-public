@@ -12,7 +12,7 @@ The goal is not to imply that any grant has been submitted or approved. The goal
 
 - Five federal-style packages are tracked in the readiness system.
 - The public dashboard reports zero local package blockers.
-- The public dashboard reports twenty-one portal/user gates.
+- The public dashboard reports twenty-three portal/user gates.
 - DICE is locally locked for package hygiene, but BAAT/upload authority and final human review remain outside the public evidence trail.
 - HarborSentinel has public NOAA AIS acquisition, hashes, held-out splits, full-hash split I/O preflight, and a bounded controlled-injection benchmark.
 
@@ -62,11 +62,16 @@ Evidence that is strong now:
   sample-readable, and full-file SHA-256 matched against the frozen split
   manifest.
 - Controlled-injection benchmark reports 20,000 injected validation segments.
-- Motion-consistency detector recall is reported against a speed-only baseline with explicit non-claim boundaries.
+- Motion-consistency detector recall is reported against a speed-only baseline
+  and the strongest current single-axis p99 baseline
+  (`speed_gap_consistency_p99`, recall 0.5068) with explicit non-claim
+  boundaries.
 
 Gates still required:
 
-- Add stronger baselines and labeled or adjudicated validation before precision, false-positive-rate, or field-performance claims.
+- Extend beyond current single-axis baselines and add labeled or adjudicated
+  validation before precision, false-positive-rate, or field-performance
+  claims.
 - Confirm DSIP/Navy portal authority and final submission path.
 - Confirm data-rights, export-control, CMMC/SPRS, and facility/team statements before submission.
 - Review cost and technical assumptions with a qualified human before certification.

@@ -1,12 +1,12 @@
 {
-  "generated_utc": "2026-06-20T21:42:43.184366+00:00",
+  "generated_utc": "2026-06-20T22:56:29.168045+00:00",
   "schema": "grant_dashboard_status_feed_v1",
   "scope": "dashboard_safe_grant_readiness",
   "posture": "LOCAL_READY_PORTAL_BLOCKED",
   "summary": {
     "packages": 5,
     "local_blockers": 0,
-    "portal_user_blockers": 21,
+    "portal_user_blockers": 23,
     "submitted_by_feed": 0,
     "ready_local_not_portal": true,
     "dashboard_signal": "LOCAL_READY_PORTAL_BLOCKED"
@@ -20,7 +20,7 @@
     },
     {
       "key": "Top-Five Grants",
-      "value": "0 local / 21 portal",
+      "value": "0 local / 23 portal",
       "sub": "Local packages are file-ready; submissions remain portal/user gated.",
       "tone": "warn"
     },
@@ -42,25 +42,25 @@
       "name": "DICE",
       "portal": "DARPA BAAT",
       "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
-      "required_artifacts_present": 8,
-      "required_artifacts_total": 8,
+      "required_artifacts_present": 9,
+      "required_artifacts_total": 9,
       "manifest_matched": 6,
       "manifest_expected": 6,
       "render_ok": true,
       "local_blockers": 0,
-      "portal_user_blockers": 5
+      "portal_user_blockers": 6
     },
     {
       "name": "HarborSentinel",
       "portal": "DSIP",
       "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
-      "required_artifacts_present": 13,
-      "required_artifacts_total": 13,
+      "required_artifacts_present": 14,
+      "required_artifacts_total": 14,
       "manifest_matched": 4,
       "manifest_expected": 4,
       "render_ok": true,
       "local_blockers": 0,
-      "portal_user_blockers": 4
+      "portal_user_blockers": 5
     },
     {
       "name": "NSF Project Pitch",
@@ -216,7 +216,7 @@
       "all_required_ok": true,
       "any_timeout": false,
       "full_hash_match_count": 2,
-      "timeout_seconds": 5.0,
+      "timeout_seconds": 10.0,
       "sample_bytes": 4096,
       "full_hash": true,
       "probes": [
@@ -258,6 +258,60 @@
       "motion_consistency_recall": 1.0,
       "speed_only_baseline_recall": 0.25835,
       "recall_lift_vs_speed_only": 0.7416499999999999,
+      "baseline_suite": {
+        "baselines": {
+          "reported_speed_sog_p99": {
+            "description": "Flags only segments whose AIS reported SOG exceeds the development p99 SOG threshold.",
+            "recall": 0.25835,
+            "recall_gap_vs_motion_consistency": 0.7416499999999999,
+            "family_recalls": {
+              "speed_burst": 1.0,
+              "position_jump": 0.0116,
+              "heading_snap": 0.009,
+              "consistency_gap": 0.0128
+            }
+          },
+          "derived_trajectory_speed_p99": {
+            "description": "Flags only segments whose point-to-point derived trajectory speed exceeds the development p99 derived-speed threshold.",
+            "recall": 0.5053,
+            "recall_gap_vs_motion_consistency": 0.49470000000000003,
+            "family_recalls": {
+              "speed_burst": 1.0,
+              "position_jump": 1.0,
+              "heading_snap": 0.0104,
+              "consistency_gap": 0.0108
+            }
+          },
+          "speed_gap_consistency_p99": {
+            "description": "Flags only segments whose AIS SOG versus derived-speed gap exceeds the development p99 consistency-gap threshold.",
+            "recall": 0.5068,
+            "recall_gap_vs_motion_consistency": 0.49319999999999997,
+            "family_recalls": {
+              "speed_burst": 0.0156,
+              "position_jump": 1.0,
+              "heading_snap": 0.0116,
+              "consistency_gap": 1.0
+            }
+          },
+          "heading_rate_p99": {
+            "description": "Flags only segments whose heading-change rate exceeds the development p99 turn-rate threshold.",
+            "recall": 0.2575,
+            "recall_gap_vs_motion_consistency": 0.7424999999999999,
+            "family_recalls": {
+              "speed_burst": 0.0104,
+              "position_jump": 0.0096,
+              "heading_snap": 1.0,
+              "consistency_gap": 0.01
+            }
+          }
+        },
+        "best_single_axis_baseline": {
+          "name": "speed_gap_consistency_p99",
+          "recall": 0.5068,
+          "recall_gap_vs_motion_consistency": 0.49319999999999997
+        },
+        "boundary": "Baseline suite compares single-axis frozen p99 detectors on controlled injections. It is not a labeled false-positive or operational-performance comparison."
+      },
       "families": {
         "speed_burst": {
           "injected_segments": 5000,
@@ -289,20 +343,38 @@
         "validation_motion_candidate_rate": 0.03583182491360869,
         "development_speed_only_candidate_rate": 0.009912800263244488,
         "validation_speed_only_candidate_rate": 0.0109428994569689,
+        "baseline_candidate_rates": {
+          "reported_speed_sog_p99": {
+            "development": 0.009912800263244488,
+            "validation": 0.0109428994569689
+          },
+          "derived_trajectory_speed_p99": {
+            "development": 0.010015630141493913,
+            "validation": 0.011045746256376502
+          },
+          "speed_gap_consistency_p99": {
+            "development": 0.010015630141493913,
+            "validation": 0.015550436070429488
+          },
+          "heading_rate_p99": {
+            "development": 0.010015630141493913,
+            "validation": 0.01051094289945697
+          }
+        },
         "boundary": "Natural candidate rates are unlabeled review queues, not false-positive rates."
       },
-      "claim_boundary": "This is a held-out public AIS controlled-injection benchmark. It demonstrates that a frozen development-threshold motion-consistency detector catches injected kinematic perturbations on validation AIS segments better than a speed-only baseline. It does not establish HarborSentinel operational detection performance, real adversary detection, multi-source fusion, ADS-B/radar validation, Navy/SSDS integration, field performance, or operational suitability."
+      "claim_boundary": "This is a held-out public AIS controlled-injection benchmark. It demonstrates that a frozen development-threshold motion-consistency detector catches injected kinematic perturbations on validation AIS segments better than multiple single-axis frozen p99 baselines. It does not establish HarborSentinel operational detection performance, real adversary detection, multi-source fusion, ADS-B/radar validation, Navy/SSDS integration, field performance, or operational suitability."
     },
     "external_raw_data_rule": "Stage large NOAA/MarineCadastre/public AIS files on an external raw-data volume via LUMA_HARBOR_DATA_ROOT; commit only hashes, manifests, schema profiles, and bounded summaries."
   },
   "builder_velocity": {
     "artifact_count": 9,
     "window_start_utc": "2026-06-20T01:53:36.675109+00:00",
-    "window_end_utc": "2026-06-20T21:38:24.957712+00:00",
-    "window_seconds": 71088.283,
-    "per_second": 0.000127,
-    "per_minute": 0.008,
-    "per_hour": 0.456,
+    "window_end_utc": "2026-06-20T22:56:29.066860+00:00",
+    "window_seconds": 75772.392,
+    "per_second": 0.000119,
+    "per_minute": 0.007,
+    "per_hour": 0.428,
     "measurement_boundary": "Rate is computed only from timestamped local artifacts in this feed. It is not a model benchmark, labor-cost estimate, revenue claim, or funding probability."
   },
   "claim_boundaries": [

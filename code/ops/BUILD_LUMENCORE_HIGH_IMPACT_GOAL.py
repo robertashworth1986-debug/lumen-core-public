@@ -49,6 +49,17 @@ def write_text(path: Path, text: str) -> None:
     path.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
 
 
+def has_best_single_axis_baseline(payload: dict[str, Any]) -> bool:
+    result = payload.get("controlled_injection_benchmark", {})
+    if not isinstance(result, dict) or not result:
+        result = payload
+    suite = result.get("baseline_suite", {})
+    if not isinstance(suite, dict):
+        return False
+    best = suite.get("best_single_axis_baseline", {})
+    return isinstance(best, dict) and bool(best.get("name"))
+
+
 def score_lumenstock(
     readiness: dict[str, Any],
     dashboard: dict[str, Any],
@@ -137,12 +148,20 @@ def build_payload() -> dict[str, Any]:
             if isinstance(harbor.get("ais_injection_benchmark"), dict)
             else {}
         )
+    elif isinstance(harbor.get("ais_injection_benchmark"), dict) and not has_best_single_axis_baseline(injection_benchmark):
+        injection_benchmark = harbor["ais_injection_benchmark"]
     lumenstock = score_lumenstock(readiness, dashboard, acquisition, splits, public_gate, io_preflight, injection_benchmark)
     summary = readiness.get("summary", {}) if isinstance(readiness.get("summary"), dict) else {}
     io_posture = str(io_preflight.get("posture", "NOT_RUN"))
     injection_result = injection_benchmark.get("controlled_injection_benchmark", {})
-    if not isinstance(injection_result, dict):
+    if not isinstance(injection_result, dict) or not injection_result:
         injection_result = injection_benchmark
+    best_baseline = (
+        injection_result.get("baseline_suite", {})
+        .get("best_single_axis_baseline", {})
+        if isinstance(injection_result.get("baseline_suite", {}), dict)
+        else {}
+    )
 
     return {
         "generated_utc": now_utc(),
@@ -169,10 +188,13 @@ def build_payload() -> dict[str, Any]:
             "harbor_ais_io_preflight_posture": io_posture,
             "harbor_ais_io_preflight_required_ok": io_preflight.get("summary", {}).get("required_ok") if isinstance(io_preflight.get("summary"), dict) else io_preflight.get("required_ok"),
             "harbor_ais_io_preflight_required_files": io_preflight.get("summary", {}).get("required_files") if isinstance(io_preflight.get("summary"), dict) else io_preflight.get("required_files"),
+            "harbor_ais_io_preflight_full_hash_match_count": io_preflight.get("summary", {}).get("full_hash_match_count") if isinstance(io_preflight.get("summary"), dict) else io_preflight.get("full_hash_match_count"),
             "harbor_ais_injection_benchmark_posture": injection_benchmark.get("posture", "NOT_RUN"),
             "harbor_ais_injection_motion_recall": injection_result.get("motion_consistency_recall", 0.0),
             "harbor_ais_injection_baseline_recall": injection_result.get("speed_only_baseline_recall", 0.0),
             "harbor_ais_injection_recall_lift": injection_result.get("recall_lift_vs_speed_only", 0.0),
+            "harbor_ais_injection_best_single_axis_baseline": best_baseline.get("name", ""),
+            "harbor_ais_injection_best_single_axis_recall": best_baseline.get("recall", 0.0),
             "harbor_public_ais_region": public_gate.get("selected_region", {}).get("label", ""),
             "harbor_public_ais_validation_rows": public_gate.get("validation", {}).get("row_metrics", {}).get("rows", 0),
             "builder_velocity": dashboard.get("builder_velocity", {}),
@@ -246,10 +268,13 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Portal/user blockers: {truth['portal_user_blockers']}",
             f"- Harbor AIS posture: `{truth['harbor_ais_posture']}`",
             f"- Harbor AIS I/O preflight: `{truth.get('harbor_ais_io_preflight_posture', 'NOT_RUN')}` "
-            f"({truth.get('harbor_ais_io_preflight_required_ok', 0)}/{truth.get('harbor_ais_io_preflight_required_files', 0)} required files OK)",
+            f"({truth.get('harbor_ais_io_preflight_required_ok', 0)}/{truth.get('harbor_ais_io_preflight_required_files', 0)} required files OK; "
+            f"{truth.get('harbor_ais_io_preflight_full_hash_match_count', 0)}/{truth.get('harbor_ais_io_preflight_required_files', 0)} full-file SHA-256 matches)",
             f"- Harbor AIS injection benchmark: `{truth.get('harbor_ais_injection_benchmark_posture', 'NOT_RUN')}`, "
             f"motion recall {truth.get('harbor_ais_injection_motion_recall', 0)}, "
             f"speed-only baseline {truth.get('harbor_ais_injection_baseline_recall', 0)}, "
+            f"best single-axis baseline `{truth.get('harbor_ais_injection_best_single_axis_baseline') or 'n/a'}` "
+            f"recall {truth.get('harbor_ais_injection_best_single_axis_recall', 0)}, "
             f"lift {truth.get('harbor_ais_injection_recall_lift', 0)}",
             f"- Harbor public AIS region: {truth.get('harbor_public_ais_region') or 'n/a'}",
             f"- Harbor public AIS validation rows: {truth.get('harbor_public_ais_validation_rows') or 0}",

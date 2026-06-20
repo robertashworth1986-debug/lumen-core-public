@@ -15,8 +15,8 @@ portal, cost, compliance, and trading claims bounded.
 |---|---|---|
 | DICE | Local lock posture reports 0 local blockers, 7-page render packet, 12 visible URLs, and ROM cost boundary. | Not submitted; does not prove BAAT authority, eligibility, cost validity, or award likelihood. |
 | HarborSentinel public AIS | NOAA AIS raw file was acquired, hashed, profiled, and split into 50,000-row development and 50,000-row validation sets for New Orleans / Mississippi River Delta. | Public AIS readiness is not Navy/SSDS integration, ADS-B/radar validation, field performance, or operational suitability. |
-| HarborSentinel controlled injection | 20000 injected validation segments; motion-consistency recall 1.0 versus speed-only baseline recall 0.25835. | Controlled kinematic injections are not real adversary labels and do not establish real-world threat detection. |
-| Top-five grant factory | Dashboard feed reports 5 packages, 0 local blockers, and 21 portal/user gates. | Packages are not marked submitted; portal authority, compliance, teaming, cost review, and submit approval remain user gates. |
+| HarborSentinel controlled injection | 20000 injected validation segments; motion-consistency recall 1.0 versus speed-only baseline recall 0.25835 and best single-axis baseline `speed_gap_consistency_p99` recall 0.5068. | Controlled kinematic injections are not real adversary labels and do not establish real-world threat detection. |
+| Top-five grant factory | Dashboard feed reports 5 packages, 0 local blockers, and 23 portal/user gates. | Packages are not marked submitted; portal authority, compliance, teaming, cost review, and submit approval remain user gates. |
 
 ## Why A Serious Reviewer Should Care
 
@@ -50,6 +50,6 @@ portal, cost, compliance, and trading claims bounded.
 
 ## Next Best Public Artifact
 
-Publish a reviewer-readable HarborSentinel proof packet that links the source,
-hash, split, I/O preflight, controlled-injection benchmark, baselines, and
-claim boundaries without including raw AIS bulk data or private proposal text.
+Keep the reviewer-readable HarborSentinel proof packet current as the benchmark
+adds stronger baselines, labels, adjudication, or external validation, without
+including raw AIS bulk data or private proposal text.

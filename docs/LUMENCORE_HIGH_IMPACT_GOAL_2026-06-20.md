@@ -1,6 +1,6 @@
 # LumenCore High-Impact Goal
 
-Generated UTC: 2026-06-20T21:42:43.245225+00:00
+Generated UTC: 2026-06-20T23:01:42.922230+00:00
 
 ## North Star
 
@@ -20,13 +20,13 @@ Make LumenCore the trusted proof-driven adaptive orchestration stack for complex
 - Grant posture: `LOCAL_READY_PORTAL_BLOCKED`
 - Packages checked: 5
 - Local blockers: 0
-- Portal/user blockers: 21
+- Portal/user blockers: 23
 - Harbor AIS posture: `PUBLIC_AIS_SINGLE_LANE_GATE_READY`
 - Harbor AIS I/O preflight: `PUBLIC_AIS_SPLIT_IO_READY` (2/2 required files OK; 2/2 full-file SHA-256 matches)
-- Harbor AIS injection benchmark: `PUBLIC_AIS_INJECTION_BENCHMARK_READY`, motion recall 1.0, speed-only baseline 0.25835, lift 0.7416499999999999
+- Harbor AIS injection benchmark: `PUBLIC_AIS_INJECTION_BENCHMARK_READY`, motion recall 1.0, speed-only baseline 0.25835, best single-axis baseline `speed_gap_consistency_p99` recall 0.5068, lift 0.7416499999999999
 - Harbor public AIS region: New Orleans / Mississippi River Delta
 - Harbor public AIS validation rows: 50000
-- Builder artifact velocity: 9 timestamped artifacts, 0.456 artifacts/hour over the measured artifact window
+- Builder artifact velocity: 9 timestamped artifacts, 0.428 artifacts/hour over the measured artifact window
 
 ## Highest-Leverage Milestones
 
@@ -64,7 +64,7 @@ Why it matters: Traction comes from buyers and agencies trusting the evidence ch
 
 Working name: LumenStock Proof-Weighted Opportunity Index (`LUMEN-PWI`)
 
-Composite readiness score: 66.62/100
+Composite readiness score: 64.88/100
 
 Internal proof/value readiness index. It is not equity, not a token, not a securities offering, not investment advice, and not a valuation.
 
@@ -73,8 +73,8 @@ Components:
 - proof_integrity: 100/100
 - data_representativeness: 95/100
 - data_operability: 90/100
-- benchmark_governance: 95/100
-- compliance_readiness: 38/100
+- benchmark_governance: 85/100
+- compliance_readiness: 34/100
 - grant_factory_maturity: 85/100
 - market_traction: 20/100
 - revenue_evidence: 10/100

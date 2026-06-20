@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-20T21:42:43.252574+00:00",
+  "generated_utc": "2026-06-20T23:01:42.922230+00:00",
   "schema": "lumencore_high_impact_goal_v1",
   "north_star_goal": "Make LumenCore the trusted proof-driven adaptive orchestration stack for complex systems: every claim is backed by reproducible data, every dashboard separates evidence from ambition, and every grant, contract, customer, or investor conversation can audit the work without needing a pitch.",
   "operating_doctrine": [
@@ -14,25 +14,28 @@
     "grant_posture": "LOCAL_READY_PORTAL_BLOCKED",
     "packages_checked": 5,
     "local_blockers": 0,
-    "portal_user_blockers": 21,
+    "portal_user_blockers": 23,
     "harbor_ais_posture": "PUBLIC_AIS_SINGLE_LANE_GATE_READY",
     "harbor_ais_io_preflight_posture": "PUBLIC_AIS_SPLIT_IO_READY",
     "harbor_ais_io_preflight_required_ok": 2,
     "harbor_ais_io_preflight_required_files": 2,
+    "harbor_ais_io_preflight_full_hash_match_count": 2,
     "harbor_ais_injection_benchmark_posture": "PUBLIC_AIS_INJECTION_BENCHMARK_READY",
     "harbor_ais_injection_motion_recall": 1.0,
     "harbor_ais_injection_baseline_recall": 0.25835,
     "harbor_ais_injection_recall_lift": 0.7416499999999999,
+    "harbor_ais_injection_best_single_axis_baseline": "speed_gap_consistency_p99",
+    "harbor_ais_injection_best_single_axis_recall": 0.5068,
     "harbor_public_ais_region": "New Orleans / Mississippi River Delta",
     "harbor_public_ais_validation_rows": 50000,
     "builder_velocity": {
       "artifact_count": 9,
       "window_start_utc": "2026-06-20T01:53:36.675109+00:00",
-      "window_end_utc": "2026-06-20T21:38:24.957712+00:00",
-      "window_seconds": 71088.283,
-      "per_second": 0.000127,
-      "per_minute": 0.008,
-      "per_hour": 0.456,
+      "window_end_utc": "2026-06-20T22:56:29.066860+00:00",
+      "window_seconds": 75772.392,
+      "per_second": 0.000119,
+      "per_minute": 0.007,
+      "per_hour": 0.428,
       "measurement_boundary": "Rate is computed only from timestamped local artifacts in this feed. It is not a model benchmark, labor-cost estimate, revenue claim, or funding probability."
     }
   },
@@ -66,13 +69,13 @@
   "lumenstock": {
     "name": "LumenStock Proof-Weighted Opportunity Index",
     "ticker_style_symbol": "LUMEN-PWI",
-    "composite": 66.62,
+    "composite": 64.88,
     "components": {
       "proof_integrity": 100,
       "data_representativeness": 95,
       "data_operability": 90,
-      "benchmark_governance": 95,
-      "compliance_readiness": 38,
+      "benchmark_governance": 85,
+      "compliance_readiness": 34,
       "grant_factory_maturity": 85,
       "market_traction": 20,
       "revenue_evidence": 10

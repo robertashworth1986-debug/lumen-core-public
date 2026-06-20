@@ -1,6 +1,6 @@
 # Public Visibility and Source Authority Packet
 
-Generated UTC: 2026-06-20T22:23:49.064615+00:00
+Generated UTC: 2026-06-20T22:56:29.305331+00:00
 
 ## Identity
 
@@ -42,13 +42,13 @@ Boundary: Does not establish HarborSentinel detection performance, ADS-B rights,
 
 ### HarborSentinel has a bounded public AIS controlled-injection benchmark.
 
-Evidence: 20000 injected validation segments; motion-consistency recall 1.0 versus speed-only baseline recall 0.25835 (lift 0.7416499999999999).
+Evidence: 20000 injected validation segments; motion-consistency recall 1.0 versus speed-only baseline recall 0.25835 (lift 0.7416499999999999); best single-axis baseline speed_gap_consistency_p99 recall 0.5068.
 
 Boundary: Controlled kinematic injections on public AIS validation data are not real adversary labels, multi-source fusion, ADS-B/radar validation, Navy/SSDS integration, field performance, or operational suitability.
 
 ### Top-five grant packets are locally ready but not submitted.
 
-Evidence: Readiness audit reports 0 local blockers and 21 portal/user gates across 5 packages.
+Evidence: Readiness audit reports 0 local blockers and 23 portal/user gates across 5 packages.
 
 Boundary: Portal authority, compliance representations, cost review, teaming, and submit/certification actions remain unresolved.
 

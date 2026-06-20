@@ -41,11 +41,16 @@ def test_lumenstock_score_uses_current_truth_without_guarantees():
         "PUBLIC_AIS_SPLIT_IO_BLOCKED",
         "NOT_RUN",
     }
+    assert "harbor_ais_io_preflight_full_hash_match_count" in payload["current_truth"]
     assert payload["current_truth"]["harbor_ais_injection_benchmark_posture"] in {
         "PUBLIC_AIS_INJECTION_BENCHMARK_READY",
         "PUBLIC_AIS_INJECTION_BENCHMARK_REVIEW",
         "NOT_RUN",
     }
+    assert "harbor_ais_injection_best_single_axis_recall" in payload["current_truth"]
+    rendered = module.render_markdown(payload)
+    assert "full-file SHA-256 matches" in rendered
+    assert "`speed_gap_consistency_p99`" in rendered
     assert payload["current_truth"]["harbor_public_ais_validation_rows"] == 50000
     assert any("controlled-injection detector evidence" in item for item in payload["hard_boundaries"])
     assert any("controlled-injection result" in item for item in payload["next_72_hours"])
