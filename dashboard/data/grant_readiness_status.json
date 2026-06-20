@@ -1,0 +1,240 @@
+{
+  "generated_utc": "2026-06-20T07:56:39.338681+00:00",
+  "schema": "grant_dashboard_status_feed_v1",
+  "scope": "dashboard_safe_grant_readiness",
+  "posture": "LOCAL_READY_PORTAL_BLOCKED",
+  "summary": {
+    "packages": 5,
+    "local_blockers": 0,
+    "portal_user_blockers": 23,
+    "submitted_by_feed": 0,
+    "ready_local_not_portal": true,
+    "dashboard_signal": "LOCAL_READY_PORTAL_BLOCKED"
+  },
+  "priority_cards": [
+    {
+      "key": "DICE Lock",
+      "value": "LOCAL_LOCKED_PORTAL_BLOCKED",
+      "sub": "0 local blockers \u00b7 6 portal/user gates",
+      "tone": "warn"
+    },
+    {
+      "key": "Top-Five Grants",
+      "value": "0 local / 23 portal",
+      "sub": "Local packages are file-ready; submissions remain portal/user gated.",
+      "tone": "warn"
+    },
+    {
+      "key": "Harbor AIS",
+      "value": "PUBLIC_AIS_SINGLE_LANE_GATE_READY",
+      "sub": "Public AIS splits/gate ready; still not multi-source or field validation.",
+      "tone": "warn"
+    },
+    {
+      "key": "Builder Velocity",
+      "value": "measured",
+      "sub": "Artifact throughput only; no revenue claim or award-probability claim.",
+      "tone": "good"
+    }
+  ],
+  "packages": [
+    {
+      "name": "DICE",
+      "portal": "DARPA BAAT",
+      "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
+      "required_artifacts_present": 8,
+      "required_artifacts_total": 8,
+      "manifest_matched": 6,
+      "manifest_expected": 6,
+      "render_ok": true,
+      "local_blockers": 0,
+      "portal_user_blockers": 6
+    },
+    {
+      "name": "HarborSentinel",
+      "portal": "DSIP",
+      "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
+      "required_artifacts_present": 12,
+      "required_artifacts_total": 12,
+      "manifest_matched": 4,
+      "manifest_expected": 4,
+      "render_ok": true,
+      "local_blockers": 0,
+      "portal_user_blockers": 5
+    },
+    {
+      "name": "NSF Project Pitch",
+      "portal": "NSF Seed Fund Project Pitch portal",
+      "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
+      "required_artifacts_present": 3,
+      "required_artifacts_total": 3,
+      "manifest_matched": 0,
+      "manifest_expected": 0,
+      "render_ok": null,
+      "local_blockers": 0,
+      "portal_user_blockers": 4
+    },
+    {
+      "name": "MissionWeave",
+      "portal": "DSIP",
+      "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
+      "required_artifacts_present": 4,
+      "required_artifacts_total": 4,
+      "manifest_matched": 3,
+      "manifest_expected": 3,
+      "render_ok": null,
+      "local_blockers": 0,
+      "portal_user_blockers": 4
+    },
+    {
+      "name": "NV065",
+      "portal": "DSIP",
+      "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
+      "required_artifacts_present": 3,
+      "required_artifacts_total": 3,
+      "manifest_matched": 4,
+      "manifest_expected": 4,
+      "render_ok": null,
+      "local_blockers": 0,
+      "portal_user_blockers": 4
+    }
+  ],
+  "dice_lock": {
+    "posture": "LOCAL_LOCKED_PORTAL_BLOCKED",
+    "local_blockers": 0,
+    "portal_user_blockers": 6,
+    "visible_url_count": 12,
+    "placeholder_hits": [],
+    "render_page_png_count": 7,
+    "rom_cost_boundary_present": true
+  },
+  "harbor": {
+    "data_source_posture": "SOURCE_LANES_IDENTIFIED_REPRESENTATIVE_DATA_NOT_EXECUTED",
+    "ais_pilot": {
+      "posture": "PUBLIC_AIS_SOURCES_PROBED_DOWNLOAD_NOT_EXECUTED",
+      "candidate_count": 2,
+      "candidates": [
+        {
+          "label": "noaa_2024_daily_csv_zip_2024_01_01",
+          "url": "https://coast.noaa.gov/htdata/CMSP/AISDataHandler/2024/AIS_2024_01_01.zip",
+          "status_code": 200,
+          "content_length_bytes": 290340871,
+          "download_allowed": false
+        },
+        {
+          "label": "noaa_ais_track_geoparquet_2025_02",
+          "url": "https://ocmgeodatastor1.blob.core.windows.net/marinecadastre/aistrack/ais-track-2025-02.parquet",
+          "status_code": 200,
+          "content_length_bytes": 1081091902,
+          "download_allowed": false
+        }
+      ]
+    },
+    "ais_acquisition": {
+      "posture": "PUBLIC_AIS_RAW_ACQUIRED_HASHED_PROFILED",
+      "source_url": "https://coast.noaa.gov/htdata/CMSP/AISDataHandler/2024/AIS_2024_01_01.zip",
+      "raw_file_bytes": 290340871,
+      "raw_file_sha256": "03ed1e16f4445361d3d7cd6e0f0b4175dce4e63b0c5c8c99252728c64de9253c",
+      "sample_rows": 10000,
+      "columns": [
+        "MMSI",
+        "BaseDateTime",
+        "LAT",
+        "LON",
+        "SOG",
+        "COG",
+        "Heading",
+        "VesselName",
+        "IMO",
+        "CallSign",
+        "VesselType",
+        "Status",
+        "Length",
+        "Width",
+        "Draft",
+        "Cargo",
+        "TransceiverClass"
+      ],
+      "claim_boundary": "This acquisition proves that a public AIS raw file was staged on the external data drive, hashed, and schema-profiled. It does not prove HarborSentinel performance, Navy/SSDS integration, field validation, ADS-B rights, radar performance, or operational suitability."
+    },
+    "ais_heldout_splits": {
+      "posture": "PUBLIC_AIS_HELDOUT_SPLITS_FROZEN",
+      "region": {
+        "region_id": "new_orleans_delta",
+        "label": "New Orleans / Mississippi River Delta",
+        "bounds": {
+          "lat_min": 28.6,
+          "lat_max": 30.35,
+          "lon_min": -90.95,
+          "lon_max": -88.65
+        },
+        "total_region_rows": 878938,
+        "split_counts_before_cap": {
+          "development": 438050,
+          "validation": 440888
+        }
+      },
+      "development_rows": 50000,
+      "validation_rows": 50000,
+      "development_sha256": "128c42e103e722f8343af85e18c7b392953d2e48f46261705cf3e6f509149a46",
+      "validation_sha256": "050f062ce913bc98b63573ba649c6022061e44dd9773dce48f520dd9006849e6",
+      "claim_boundary": "This artifact freezes public AIS held-out development and validation splits. It does not establish HarborSentinel detection performance, Navy sensor validation, SSDS integration, ADS-B rights, radar performance, or operational suitability."
+    },
+    "public_ais_gate": {
+      "posture": "PUBLIC_AIS_SINGLE_LANE_GATE_READY",
+      "region": {
+        "region_id": "new_orleans_delta",
+        "label": "New Orleans / Mississippi River Delta",
+        "bounds": {
+          "lat_min": 28.6,
+          "lat_max": 30.35,
+          "lon_min": -90.95,
+          "lon_max": -88.65
+        },
+        "total_region_rows": 878938,
+        "split_counts_before_cap": {
+          "development": 438050,
+          "validation": 440888
+        }
+      },
+      "development_rows": 50000,
+      "validation_rows": 50000,
+      "overlap_mmsi": 1046,
+      "gate_checks": {
+        "development_rows_at_least_10000": true,
+        "validation_rows_at_least_10000": true,
+        "core_completeness_at_least_99pct": true,
+        "overlap_mmsi_at_least_100": true,
+        "validation_eligible_tracks_at_least_50": true
+      },
+      "claim_boundary": "This gate establishes public AIS single-lane data readiness, schema coverage, track overlap, and frozen development-to-validation diagnostics. It does not establish HarborSentinel detection performance, multi-source fusion performance, ADS-B licensing, radar validation, Navy/SSDS integration, field performance, or operational suitability."
+    },
+    "external_raw_data_rule": "Stage large NOAA/MarineCadastre/public AIS files on an external raw-data volume via LUMA_HARBOR_DATA_ROOT; commit only hashes, manifests, schema profiles, and bounded summaries."
+  },
+  "builder_velocity": {
+    "artifact_count": 7,
+    "window_start_utc": "2026-06-20T01:53:36.675109+00:00",
+    "window_end_utc": "2026-06-20T07:54:09.658797+00:00",
+    "window_seconds": 21632.984,
+    "per_second": 0.000324,
+    "per_minute": 0.019,
+    "per_hour": 1.165,
+    "measurement_boundary": "Rate is computed only from timestamped local artifacts in this feed. It is not a model benchmark, labor-cost estimate, revenue claim, or funding probability."
+  },
+  "claim_boundaries": [
+    "No grant is marked submitted by this feed.",
+    "Portal authority, certifications, and action-time submit approval remain user gates.",
+    "Synthetic benchmarks support bounded software feasibility only, not field validation.",
+    "HarborSentinel public AIS has raw acquisition, held-out splits, and a single-lane readiness gate; this is data-readiness evidence, not detection-performance or field validation.",
+    "Trading, Kraken, live-breadth, or frozen-delta artifacts must not be cited as profit proof."
+  ],
+  "source_files": {
+    "readiness_audit": "out/ops/grant_submission_readiness_audit_latest.json",
+    "dice_lock": "out/ops/dice_submission_lock_packet_latest.json",
+    "harbor_ais": "out/ops/harbor_ais_pilot_registry_latest.json",
+    "harbor_data": "out/ops/harbor_data_source_readiness_audit_latest.json",
+    "harbor_ais_acquisition": "out/ops/harbor_ais_pilot_acquisition_latest.json",
+    "harbor_ais_splits": "out/ops/harbor_ais_heldout_splits_latest.json",
+    "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json"
+  }
+}
