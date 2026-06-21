@@ -1,6 +1,6 @@
 # Public Support And Reviewer Readiness
 
-Generated UTC: 2026-06-20T23:35:32.314039+00:00
+Generated UTC: 2026-06-21T00:15:00+00:00
 
 ## Boundary
 
@@ -18,7 +18,7 @@ This is a public coordination packet for reviewers and support organizations. It
 
 | Package | Portal | Readiness | Local blockers | Portal/user blockers | Artifacts | Manifest matches |
 |---|---|---|---:|---:|---:|---:|
-| DICE | DARPA BAAT | `LOCAL_READY_PORTAL_BLOCKED_USER_GATES` | 0 | 6 | 9/9 | 6/6 |
+| DICE | DARPA BAAT | `LOCAL_READY_PORTAL_BLOCKED_USER_GATES` | 0 | 6 | 11/11 | 11/11 |
 | HarborSentinel | DSIP | `LOCAL_READY_PORTAL_BLOCKED_USER_GATES` | 0 | 5 | 14/14 | 4/4 |
 | NSF Project Pitch | NSF Seed Fund Project Pitch portal | `LOCAL_READY_PORTAL_BLOCKED_USER_GATES` | 0 | 4 | 3/3 | 0/0 |
 | MissionWeave | DSIP | `LOCAL_READY_PORTAL_BLOCKED_USER_GATES` | 0 | 4 | 4/4 | 3/3 |
@@ -26,7 +26,7 @@ This is a public coordination packet for reviewers and support organizations. It
 
 ## Strong Public Evidence
 
-- DICE local package hygiene is tracked, but BAAT and final approval remain outside the public repo.
+- DICE local package hygiene is tracked, and a public-safe live-breadth replay capsule summarizes 6 live-source files and 14 deterministic replay windows without publishing private portal materials.
 - HarborSentinel public AIS acquisition, held-out splits, and full-hash split preflight are tracked.
 - HarborSentinel controlled-injection benchmark is available as bounded detector-vs-baseline evidence with posture PUBLIC_AIS_INJECTION_BENCHMARK_READY.
 - The public submission gate map separates proof from portal, compliance, cost, team, and submit gates.
@@ -85,6 +85,7 @@ This is a public coordination packet for reviewers and support organizations. It
 ## Source Artifacts
 
 - public_visibility_packet: `docs/PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md`
+- dice_public_live_breadth_replay: `docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md`
 - public_submission_gate_map: `docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md`
 - harbor_public_ais_packet: `docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md`
 - grant_dashboard_feed: `dashboard/data/grant_readiness_status.json`

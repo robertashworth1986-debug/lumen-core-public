@@ -1,6 +1,6 @@
 # Public Visibility and Source Authority Packet
 
-Generated UTC: 2026-06-20T23:35:32.253569+00:00
+Generated UTC: 2026-06-21T00:15:00+00:00
 
 ## Identity
 
@@ -34,6 +34,12 @@ Evidence: DICE submission lock packet reports 0 local blockers, 7-page render pa
 
 Boundary: Does not approve BAAT upload, certify eligibility, validate cost, or replace human action-time approval.
 
+### DICE now has a public-safe live-breadth replay evidence capsule.
+
+Evidence: Frozen live-breadth replay uses 6 Kraken/EIA source files and 14 deterministic replay windows: safe-completion delta +0.0437, constraint-violation delta -0.1216, messages-per-safe-completion delta -2.8157, with false-rejection cost +0.0514.
+
+Boundary: Live rows are stress signals with deterministic derived labels. This does not prove DICE metric attainment, field validation, operational DoD performance, trading profit, award likelihood, or portal readiness.
+
 ### HarborSentinel now has public AIS data-readiness evidence.
 
 Evidence: NOAA AIS raw ZIP acquired and hashed; 50,000-row development and 50,000-row validation splits frozen; single-lane public AIS gate posture PUBLIC_AIS_SINGLE_LANE_GATE_READY.
@@ -63,17 +69,19 @@ Boundary: The gate map is a public coordination artifact. It does not certify el
 1. Open the public-safe LumenCore repository/site first for reproducibility posture.
 2. Read the source authority packet and claim boundaries before any performance claim.
 3. Inspect the DICE lock packet for local package hygiene and remaining BAAT/SAM/human gates.
-4. Inspect the Harbor AIS gate for public-data readiness, split hashes, and validation boundaries.
-5. Inspect the Harbor controlled-injection benchmark only as bounded public AIS detector-vs-baseline evidence.
-6. Inspect the public submission gate map to see what still requires human, legal/compliance, portal, or cost authority.
-7. Inspect the public support readiness packet to route help through official support lanes without sharing private portal data.
-8. Only then map the evidence into DICE/Harbor proposal language.
+4. Inspect the DICE public live-breadth replay capsule as stress-replay evidence, not field validation.
+5. Inspect the Harbor AIS gate for public-data readiness, split hashes, and validation boundaries.
+6. Inspect the Harbor controlled-injection benchmark only as bounded public AIS detector-vs-baseline evidence.
+7. Inspect the public submission gate map to see what still requires human, legal/compliance, portal, or cost authority.
+8. Inspect the public support readiness packet to route help through official support lanes without sharing private portal data.
+9. Only then map the evidence into DICE/Harbor proposal language.
 
 ## Source Artifacts
 
 - grant_readiness_feed: `out/ops/grant_dashboard_status_feed_latest.json`
 - high_impact_goal: `out/ops/lumencore_high_impact_goal_latest.json`
 - dice_lock_packet: `out/ops/dice_submission_lock_packet_latest.json`
+- dice_public_live_breadth_replay: `docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md`
 - harbor_public_ais_gate: `out/ops/harbor_public_ais_gate_latest.json`
 - harbor_ais_injection_benchmark: `out/ops/harbor_ais_injection_benchmark_latest.json`
 - harbor_heldout_splits: `out/ops/harbor_ais_heldout_splits_latest.json`
@@ -85,13 +93,13 @@ Boundary: The gate map is a public coordination artifact. It does not certify el
 
 ### LinkedIn Short
 
-I am building LumenCore as a proof-driven orchestration stack for complex systems. The latest milestone: public NOAA AIS data is now acquired, hashed, split into held-out development/validation sets, gated, and tested with a bounded controlled-injection benchmark against a speed-only baseline. I am looking for serious reviewers, agency-aligned collaborators, and teams that care about evidence before claims.
+I am building LumenCore as a proof-driven orchestration stack for complex systems. The latest public-safe milestones: DICE now has a frozen live-breadth replay capsule, and HarborSentinel has public NOAA AIS held-out splits plus a bounded controlled-injection benchmark. I am looking for serious reviewers, agency-aligned collaborators, and teams that care about evidence before claims.
 
 ### Reviewer Email
 
 Subject: LumenCore proof packet: DICE local lock + public AIS HarborSentinel gate
 
-I am sharing a public-safe proof packet for LumenCore. It includes a locally locked DARPA DICE abstract package, a HarborSentinel public AIS data-readiness gate built from NOAA AIS, a bounded controlled-injection benchmark, and explicit boundaries on what the evidence does and does not prove. I would value technical review focused on reproducibility, claim discipline, and agency fit.
+I am sharing a public-safe proof packet for LumenCore. It includes a locally locked DARPA DICE abstract package, a public-safe DICE live-breadth replay capsule, a HarborSentinel public AIS data-readiness gate built from NOAA AIS, a bounded controlled-injection benchmark, and explicit boundaries on what the evidence does and does not prove. I would value technical review focused on reproducibility, claim discipline, and agency fit.
 
 ### Goal Prompt
 

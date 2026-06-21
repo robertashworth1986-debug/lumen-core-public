@@ -9,7 +9,7 @@
     "unsupported claims of CMMC level, SPRS score, clearances, facilities, partners, customers, revenue, or field validation",
     "private grant upload files unless a safe channel and reviewer role are established"
   ],
-  "generated_utc": "2026-06-20T23:35:32.314039+00:00",
+  "generated_utc": "2026-06-21T00:15:00+00:00",
   "official_support_lanes": [
     {
       "helps_with": [
@@ -69,14 +69,14 @@
   "package_snapshot": [
     {
       "local_blockers": 0,
-      "manifest_expected": 6,
-      "manifest_matched": 6,
+      "manifest_expected": 11,
+      "manifest_matched": 11,
       "name": "DICE",
       "portal": "DARPA BAAT",
       "portal_user_blockers": 6,
       "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
-      "required_artifacts_present": 9,
-      "required_artifacts_total": 9
+      "required_artifacts_present": 11,
+      "required_artifacts_total": 11
     },
     {
       "local_blockers": 0,
@@ -139,13 +139,14 @@
   ],
   "schema": "public_support_readiness_packet_v1",
   "source_artifacts": {
+    "dice_public_live_breadth_replay": "docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md",
     "grant_dashboard_feed": "dashboard/data/grant_readiness_status.json",
     "harbor_public_ais_packet": "docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md",
     "public_submission_gate_map": "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md",
     "public_visibility_packet": "docs/PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md"
   },
   "strong_public_evidence": [
-    "DICE local package hygiene is tracked, but BAAT and final approval remain outside the public repo.",
+    "DICE local package hygiene is tracked, and a public-safe live-breadth replay capsule summarizes 6 live-source files and 14 deterministic replay windows without publishing private portal materials.",
     "HarborSentinel public AIS acquisition, held-out splits, and full-hash split preflight are tracked.",
     "HarborSentinel controlled-injection benchmark is available as bounded detector-vs-baseline evidence with posture PUBLIC_AIS_INJECTION_BENCHMARK_READY.",
     "The public submission gate map separates proof from portal, compliance, cost, team, and submit gates."
