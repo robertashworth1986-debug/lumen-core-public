@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-21T06:05:00+00:00",
+  "generated_utc": "2026-06-21T06:21:26.003569+00:00",
   "schema": "public_visibility_packet_v1",
   "author": {
     "name": "Robert Ashworth",
@@ -52,14 +52,19 @@
       "boundary": "Live rows are stress signals with deterministic derived labels. This does not prove DICE metric attainment, field validation, operational DoD performance, trading profit, award likelihood, or portal readiness."
     },
     {
-      "claim": "HarborSentinel now has public AIS data-readiness evidence.",
-      "evidence": "NOAA AIS raw ZIP acquired and hashed; 50,000-row development and 50,000-row validation splits frozen; single-lane public AIS gate posture PUBLIC_AIS_SINGLE_LANE_GATE_READY.",
-      "boundary": "Does not establish HarborSentinel detection performance, ADS-B rights, radar validation, Navy/SSDS integration, or field validation."
-    },
-    {
       "claim": "HarborSentinel has a bounded public AIS controlled-injection benchmark.",
       "evidence": "20000 injected validation segments; motion-consistency recall 1.0 versus speed-only baseline recall 0.25835 (lift 0.7416499999999999); best single-axis baseline speed_gap_consistency_p99 recall 0.5068.",
       "boundary": "Controlled kinematic injections on public AIS validation data are not real adversary labels, multi-source fusion, ADS-B/radar validation, Navy/SSDS integration, field performance, or operational suitability."
+    },
+    {
+      "claim": "Live-breadth frozen-delta evidence is now provenance-gated.",
+      "evidence": "Public-safe local gate reports 17 enabled live sources, 12 measured sources, 70.59% measured coverage, 11 promoted live-measured source rows, and 8 context-only rows. The promoted live-measured value signal is $8,435/hour ($73,890,600/year); the much larger unmeasured/context surface is explicitly not promoted.",
+      "boundary": "This is a provenance and claim-discipline gate. It does not prove actual customer savings, revenue, trading profit, grant merit, valuation, or field performance."
+    },
+    {
+      "claim": "HarborSentinel now has public AIS data-readiness evidence.",
+      "evidence": "NOAA AIS raw ZIP acquired and hashed; 50,000-row development and 50,000-row validation splits frozen; single-lane public AIS gate posture PUBLIC_AIS_SINGLE_LANE_GATE_READY.",
+      "boundary": "Does not establish HarborSentinel detection performance, ADS-B rights, radar validation, Navy/SSDS integration, or field validation."
     },
     {
       "claim": "HarborSentinel now has a public AIS review-burden profile.",
@@ -82,6 +87,7 @@
     "high_impact_goal": "out/ops/lumencore_high_impact_goal_latest.json",
     "dice_lock_packet": "out/ops/dice_submission_lock_packet_latest.json",
     "dice_public_live_breadth_replay": "docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md",
+    "live_breadth_provenance_gate": "docs/LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md",
     "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json",
     "harbor_ais_injection_benchmark": "out/ops/harbor_ais_injection_benchmark_latest.json",
     "harbor_public_ais_review_burden": "docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md",
@@ -95,6 +101,7 @@
     "Read the source authority packet and claim boundaries before any performance claim.",
     "Inspect the DICE lock packet for local package hygiene and remaining BAAT/SAM/human gates.",
     "Inspect the DICE public live-breadth replay capsule as stress-replay evidence, not field validation.",
+    "Inspect the live-breadth provenance gate to separate promoted live-measured rows from context-only rows.",
     "Inspect the Harbor AIS gate for public-data readiness, split hashes, and validation boundaries.",
     "Inspect the Harbor controlled-injection benchmark only as bounded public AIS detector-vs-baseline evidence.",
     "Inspect the Harbor public AIS review-burden capsule only as an unlabeled queue/workload estimate.",
@@ -103,9 +110,9 @@
     "Only then map the evidence into DICE/Harbor proposal language."
   ],
   "outreach_copy": {
-    "linkedin_short": "I am building LumenCore as a proof-driven orchestration stack for complex systems. The latest public-safe milestones: DICE now has a frozen live-breadth replay capsule, and HarborSentinel has public NOAA AIS held-out splits, a bounded controlled-injection benchmark, and an unlabeled review-burden profile. I am looking for serious reviewers, agency-aligned collaborators, and teams that care about evidence before claims.",
+    "linkedin_short": "I am building LumenCore as a proof-driven orchestration stack for complex systems. The latest public-safe milestones: DICE now has a frozen live-breadth replay capsule; live-breadth frozen deltas are provenance-gated; and HarborSentinel has public NOAA AIS held-out splits, a bounded controlled-injection benchmark, and an unlabeled review-burden profile. I am looking for serious reviewers, agency-aligned collaborators, and teams that care about evidence before claims.",
     "reviewer_email_subject": "LumenCore proof packet: DICE local lock + public AIS HarborSentinel gate",
-    "reviewer_email_body": "I am sharing a public-safe proof packet for LumenCore. It includes a locally locked DARPA DICE abstract package, a public-safe DICE live-breadth replay capsule, a HarborSentinel public AIS data-readiness gate built from NOAA AIS, a bounded controlled-injection benchmark, an unlabeled review-burden profile, and explicit boundaries on what the evidence does and does not prove. I would value technical review focused on reproducibility, claim discipline, and agency fit.",
+    "reviewer_email_body": "I am sharing a public-safe proof packet for LumenCore. It includes a locally locked DARPA DICE abstract package, a public-safe DICE live-breadth replay capsule, a live-breadth provenance gate, a HarborSentinel public AIS data-readiness gate built from NOAA AIS, a bounded controlled-injection benchmark, an unlabeled review-burden profile, and explicit boundaries on what the evidence does and does not prove. I would value technical review focused on reproducibility, claim discipline, and agency fit.",
     "goal_prompt": "Operate as LumenCore's proof-and-traction engine. Every cycle must convert ambition into a verifiable artifact: source, hash, benchmark, split, dashboard feed, grant packet, outreach asset, or blocker board. Maximize respected visibility by publishing only defensible claims, preserving private submission materials, and making the evidence so clean that serious reviewers can audit it without a sales pitch. Do not chase fame directly; build the proof surface that makes attention rational."
   },
   "do_not_claim": [

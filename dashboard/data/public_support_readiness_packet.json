@@ -9,7 +9,7 @@
     "unsupported claims of CMMC level, SPRS score, clearances, facilities, partners, customers, revenue, or field validation",
     "private grant upload files unless a safe channel and reviewer role are established"
   ],
-  "generated_utc": "2026-06-21T06:05:00+00:00",
+  "generated_utc": "2026-06-21T06:21:26.169504+00:00",
   "official_support_lanes": [
     {
       "helps_with": [
@@ -69,25 +69,25 @@
   "package_snapshot": [
     {
       "local_blockers": 0,
-      "manifest_expected": 11,
-      "manifest_matched": 11,
+      "manifest_expected": 6,
+      "manifest_matched": 6,
       "name": "DICE",
       "portal": "DARPA BAAT",
       "portal_user_blockers": 6,
       "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
-      "required_artifacts_present": 11,
-      "required_artifacts_total": 11
+      "required_artifacts_present": 9,
+      "required_artifacts_total": 9
     },
     {
       "local_blockers": 0,
-      "manifest_expected": 8,
-      "manifest_matched": 8,
+      "manifest_expected": 4,
+      "manifest_matched": 4,
       "name": "HarborSentinel",
       "portal": "DSIP",
       "portal_user_blockers": 5,
       "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
-      "required_artifacts_present": 15,
-      "required_artifacts_total": 15
+      "required_artifacts_present": 14,
+      "required_artifacts_total": 14
     },
     {
       "local_blockers": 0,
@@ -143,11 +143,13 @@
     "grant_dashboard_feed": "dashboard/data/grant_readiness_status.json",
     "harbor_public_ais_packet": "docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md",
     "harbor_public_ais_review_burden": "docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md",
+    "live_breadth_provenance_gate": "docs/LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md",
     "public_submission_gate_map": "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md",
     "public_visibility_packet": "docs/PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md"
   },
   "strong_public_evidence": [
     "DICE local package hygiene is tracked, and a public-safe live-breadth replay capsule summarizes 6 live-source files and 14 deterministic replay windows without publishing private portal materials.",
+    "Live-breadth frozen-delta evidence is provenance-gated: only live-measured rows are promoted, while unmeasured or reference rows remain context-only.",
     "HarborSentinel public AIS acquisition, held-out splits, and full-hash split preflight are tracked.",
     "HarborSentinel controlled-injection benchmark is available as bounded detector-vs-baseline evidence with posture PUBLIC_AIS_INJECTION_BENCHMARK_READY.",
     "HarborSentinel public AIS review-burden profile estimates natural validation queue load without claiming precision or false-positive rates.",

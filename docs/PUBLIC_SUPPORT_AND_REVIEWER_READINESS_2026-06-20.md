@@ -1,6 +1,6 @@
 # Public Support And Reviewer Readiness
 
-Generated UTC: 2026-06-21T06:05:00+00:00
+Generated UTC: 2026-06-21T06:21:26.169504+00:00
 
 ## Boundary
 
@@ -18,8 +18,8 @@ This is a public coordination packet for reviewers and support organizations. It
 
 | Package | Portal | Readiness | Local blockers | Portal/user blockers | Artifacts | Manifest matches |
 |---|---|---|---:|---:|---:|---:|
-| DICE | DARPA BAAT | `LOCAL_READY_PORTAL_BLOCKED_USER_GATES` | 0 | 6 | 11/11 | 11/11 |
-| HarborSentinel | DSIP | `LOCAL_READY_PORTAL_BLOCKED_USER_GATES` | 0 | 5 | 15/15 | 8/8 |
+| DICE | DARPA BAAT | `LOCAL_READY_PORTAL_BLOCKED_USER_GATES` | 0 | 6 | 9/9 | 6/6 |
+| HarborSentinel | DSIP | `LOCAL_READY_PORTAL_BLOCKED_USER_GATES` | 0 | 5 | 14/14 | 4/4 |
 | NSF Project Pitch | NSF Seed Fund Project Pitch portal | `LOCAL_READY_PORTAL_BLOCKED_USER_GATES` | 0 | 4 | 3/3 | 0/0 |
 | MissionWeave | DSIP | `LOCAL_READY_PORTAL_BLOCKED_USER_GATES` | 0 | 4 | 4/4 | 3/3 |
 | NV065 | DSIP | `LOCAL_READY_PORTAL_BLOCKED_USER_GATES` | 0 | 4 | 3/3 | 4/4 |
@@ -27,6 +27,7 @@ This is a public coordination packet for reviewers and support organizations. It
 ## Strong Public Evidence
 
 - DICE local package hygiene is tracked, and a public-safe live-breadth replay capsule summarizes 6 live-source files and 14 deterministic replay windows without publishing private portal materials.
+- Live-breadth frozen-delta evidence is provenance-gated: only live-measured rows are promoted, while unmeasured or reference rows remain context-only.
 - HarborSentinel public AIS acquisition, held-out splits, and full-hash split preflight are tracked.
 - HarborSentinel controlled-injection benchmark is available as bounded detector-vs-baseline evidence with posture PUBLIC_AIS_INJECTION_BENCHMARK_READY.
 - HarborSentinel public AIS review-burden profile estimates natural validation queue load without claiming precision or false-positive rates.
@@ -87,9 +88,10 @@ This is a public coordination packet for reviewers and support organizations. It
 
 - public_visibility_packet: `docs/PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md`
 - dice_public_live_breadth_replay: `docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md`
-- harbor_public_ais_review_burden: `docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md`
+- live_breadth_provenance_gate: `docs/LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md`
 - public_submission_gate_map: `docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md`
 - harbor_public_ais_packet: `docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md`
+- harbor_public_ais_review_burden: `docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md`
 - grant_dashboard_feed: `dashboard/data/grant_readiness_status.json`
 
 ## Visibility Rule

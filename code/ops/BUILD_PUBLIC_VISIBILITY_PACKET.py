@@ -18,6 +18,7 @@ HIGH_IMPACT_JSON = OUT_OPS / "lumencore_high_impact_goal_latest.json"
 PUBLIC_HIGH_IMPACT_JSON = DASHBOARD_DATA / "lumencore_high_impact_goal.json"
 HARBOR_GATE_JSON = OUT_OPS / "harbor_public_ais_gate_latest.json"
 HARBOR_INJECTION_JSON = OUT_OPS / "harbor_ais_injection_benchmark_latest.json"
+PROVENANCE_GATE_DOC = DOCS / "LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md"
 
 OUT_JSON = OUT_OPS / "public_visibility_packet_latest.json"
 OUT_MD = DOCS / "PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md"
@@ -130,6 +131,30 @@ def build_payload() -> dict[str, Any]:
             "boundary": "Does not approve BAAT upload, certify eligibility, validate cost, or replace human action-time approval.",
         },
         {
+            "claim": "DICE now has a public-safe live-breadth replay evidence capsule.",
+            "evidence": (
+                "Frozen live-breadth replay uses 6 Kraken/EIA source files and 14 deterministic replay windows: "
+                "safe-completion delta +0.0437, constraint-violation delta -0.1216, "
+                "messages-per-safe-completion delta -2.8157, with false-rejection cost +0.0514."
+            ),
+            "boundary": (
+                "Live rows are stress signals with deterministic derived labels. This does not prove DICE metric "
+                "attainment, field validation, operational DoD performance, trading profit, award likelihood, or portal readiness."
+            ),
+        },
+        {
+            "claim": "Live-breadth frozen-delta evidence is now provenance-gated.",
+            "evidence": (
+                "Public-safe local gate reports 17 enabled live sources, 12 measured sources, 70.59% measured coverage, "
+                "11 promoted live-measured source rows, and 8 context-only rows. The promoted live-measured value signal is "
+                "$8,435/hour ($73,890,600/year); the much larger unmeasured/context surface is explicitly not promoted."
+            ),
+            "boundary": (
+                "This is a provenance and claim-discipline gate. It does not prove actual customer savings, revenue, "
+                "trading profit, grant merit, valuation, or field performance."
+            ),
+        },
+        {
             "claim": "HarborSentinel now has public AIS data-readiness evidence.",
             "evidence": (
                 "NOAA AIS raw ZIP acquired and hashed; 50,000-row development and 50,000-row validation splits frozen; "
@@ -173,6 +198,20 @@ def build_payload() -> dict[str, Any]:
                 ),
             },
         )
+    proof_claims.insert(
+        5 if injection_ready else 4,
+        {
+            "claim": "HarborSentinel now has a public AIS review-burden profile.",
+            "evidence": (
+                "Held-out validation queue: 48616 validation segments, 1742 natural candidates, candidate rate 0.0358, "
+                "mean 145.167 candidates/hour, p95 158.7 candidates/hour, sparse-tier candidate rate 0.1191."
+            ),
+            "boundary": (
+                "Natural candidate rates are unlabeled review queues, not precision, false-positive rates, real threat "
+                "detection, field validation, operational suitability, award likelihood, or portal readiness."
+            ),
+        },
+    )
 
     return {
         "generated_utc": now_utc(),
@@ -195,8 +234,11 @@ def build_payload() -> dict[str, Any]:
             "grant_readiness_feed": "out/ops/grant_dashboard_status_feed_latest.json",
             "high_impact_goal": "out/ops/lumencore_high_impact_goal_latest.json",
             "dice_lock_packet": "out/ops/dice_submission_lock_packet_latest.json",
+            "dice_public_live_breadth_replay": "docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md",
+            "live_breadth_provenance_gate": str(PROVENANCE_GATE_DOC.relative_to(ROOT)).replace("\\", "/"),
             "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json",
             "harbor_ais_injection_benchmark": "out/ops/harbor_ais_injection_benchmark_latest.json",
+            "harbor_public_ais_review_burden": "docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md",
             "harbor_heldout_splits": "out/ops/harbor_ais_heldout_splits_latest.json",
             "harbor_ais_acquisition": "out/ops/harbor_ais_pilot_acquisition_latest.json",
             "public_submission_gate_map": "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md",
@@ -206,8 +248,11 @@ def build_payload() -> dict[str, Any]:
             "Open the public-safe LumenCore repository/site first for reproducibility posture.",
             "Read the source authority packet and claim boundaries before any performance claim.",
             "Inspect the DICE lock packet for local package hygiene and remaining BAAT/SAM/human gates.",
+            "Inspect the DICE public live-breadth replay capsule as stress-replay evidence, not field validation.",
+            "Inspect the live-breadth provenance gate to separate promoted live-measured rows from context-only rows.",
             "Inspect the Harbor AIS gate for public-data readiness, split hashes, and validation boundaries.",
             "Inspect the Harbor controlled-injection benchmark only as bounded public AIS detector-vs-baseline evidence.",
+            "Inspect the Harbor public AIS review-burden capsule only as an unlabeled queue/workload estimate.",
             "Inspect the public submission gate map to see what still requires human, legal/compliance, portal, or cost authority.",
             "Inspect the public support readiness packet to route help through official support lanes without sharing private portal data.",
             "Only then map the evidence into DICE/Harbor proposal language.",
@@ -215,14 +260,17 @@ def build_payload() -> dict[str, Any]:
         "outreach_copy": {
             "linkedin_short": (
                 "I am building LumenCore as a proof-driven orchestration stack for complex systems. "
-                "The latest milestone: public NOAA AIS data is now acquired, hashed, split into held-out development/validation sets, "
-                "gated, and tested with a bounded controlled-injection benchmark against a speed-only baseline. I am looking for serious reviewers, agency-aligned collaborators, "
+                "The latest public-safe milestones: DICE now has a frozen live-breadth replay capsule; live-breadth frozen deltas are provenance-gated; "
+                "and HarborSentinel has public NOAA AIS held-out splits, a bounded controlled-injection benchmark, and an unlabeled review-burden profile. "
+                "I am looking for serious reviewers, agency-aligned collaborators, "
                 "and teams that care about evidence before claims."
             ),
             "reviewer_email_subject": "LumenCore proof packet: DICE local lock + public AIS HarborSentinel gate",
             "reviewer_email_body": (
                 "I am sharing a public-safe proof packet for LumenCore. It includes a locally locked DARPA DICE abstract package, "
-                "a HarborSentinel public AIS data-readiness gate built from NOAA AIS, a bounded controlled-injection benchmark, and explicit boundaries on what the evidence does "
+                "a public-safe DICE live-breadth replay capsule, a live-breadth provenance gate, "
+                "a HarborSentinel public AIS data-readiness gate built from NOAA AIS, a bounded controlled-injection benchmark, "
+                "an unlabeled review-burden profile, and explicit boundaries on what the evidence does "
                 "and does not prove. I would value technical review focused on reproducibility, claim discipline, and agency fit."
             ),
             "goal_prompt": (

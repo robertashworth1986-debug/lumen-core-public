@@ -28,6 +28,14 @@ def test_visibility_packet_is_public_safe_and_source_backed():
     assert any("DARPA DICE" in source["name"] for source in payload["primary_sources"])
     assert any("HarborSentinel now has public AIS" in item["claim"] for item in payload["proof_claims"])
     assert any("controlled-injection benchmark" in item["claim"] for item in payload["proof_claims"])
+    assert any("provenance-gated" in item["claim"] for item in payload["proof_claims"])
+    provenance_claims = [
+        item for item in payload["proof_claims"] if "provenance-gated" in item["claim"]
+    ]
+    assert provenance_claims
+    assert "12 measured sources" in provenance_claims[0]["evidence"]
+    assert "context-only" in provenance_claims[0]["evidence"]
+    assert "does not prove actual customer savings" in provenance_claims[0]["boundary"]
     injection_claims = [
         item for item in payload["proof_claims"] if "controlled-injection benchmark" in item["claim"]
     ]
@@ -39,7 +47,11 @@ def test_visibility_packet_is_public_safe_and_source_backed():
     assert payload["source_backed_artifacts"]["public_support_readiness"].endswith(
         "PUBLIC_SUPPORT_AND_REVIEWER_READINESS_2026-06-20.md"
     )
+    assert payload["source_backed_artifacts"]["live_breadth_provenance_gate"].endswith(
+        "LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md"
+    )
     assert any("support readiness packet" in step for step in payload["reviewer_path"])
+    assert any("provenance gate" in step for step in payload["reviewer_path"])
 
 
 def test_goal_prompt_prioritizes_proof_over_hype():

@@ -34,6 +34,10 @@ def test_public_support_packet_is_bounded_and_source_backed():
     assert "https://www.sbir.gov/community/fast" in urls
     assert "does not prove portal authority" in payload["boundary"]
     assert any("HarborSentinel" in item for item in payload["strong_public_evidence"])
+    assert any("provenance-gated" in item for item in payload["strong_public_evidence"])
+    assert payload["source_artifacts"]["live_breadth_provenance_gate"].endswith(
+        "LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md"
+    )
 
 
 def test_public_support_markdown_and_snapshot_avoid_private_claims():
@@ -45,6 +49,8 @@ def test_public_support_markdown_and_snapshot_avoid_private_claims():
     assert "PUBLIC_SUPPORT_AND_REVIEWER_READINESS_2026-06-20.md".lower() not in serialized
     assert "guaranteed funding" in serialized
     assert "do not claim" in markdown.lower()
+    assert "provenance-gated" in serialized
+    assert "context-only" in serialized
     assert "submitted by public feed: 0" in markdown.lower()
     assert "uei" in serialized
     assert "cage" in serialized

@@ -146,12 +146,14 @@ def build_payload(
         },
         "package_snapshot": build_package_snapshot(grant_feed),
         "strong_public_evidence": [
-            "DICE local package hygiene is tracked, but BAAT and final approval remain outside the public repo.",
+            "DICE local package hygiene is tracked, and a public-safe live-breadth replay capsule summarizes 6 live-source files and 14 deterministic replay windows without publishing private portal materials.",
+            "Live-breadth frozen-delta evidence is provenance-gated: only live-measured rows are promoted, while unmeasured or reference rows remain context-only.",
             "HarborSentinel public AIS acquisition, held-out splits, and full-hash split preflight are tracked.",
             (
                 "HarborSentinel controlled-injection benchmark is available as bounded detector-vs-baseline evidence "
                 f"with posture {injection.get('posture', 'UNKNOWN')}."
             ),
+            "HarborSentinel public AIS review-burden profile estimates natural validation queue load without claiming precision or false-positive rates.",
             "The public submission gate map separates proof from portal, compliance, cost, team, and submit gates.",
         ],
         "official_support_lanes": OFFICIAL_SUPPORT_LANES,
@@ -168,8 +170,11 @@ def build_payload(
         ],
         "source_artifacts": {
             "public_visibility_packet": "docs/PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md",
+            "dice_public_live_breadth_replay": "docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md",
+            "live_breadth_provenance_gate": "docs/LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md",
             "public_submission_gate_map": "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md",
             "harbor_public_ais_packet": "docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md",
+            "harbor_public_ais_review_burden": "docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md",
             "grant_dashboard_feed": "dashboard/data/grant_readiness_status.json",
         },
         "visibility_goal_prompt": (
