@@ -18,6 +18,7 @@ HIGH_IMPACT_JSON = OUT_OPS / "lumencore_high_impact_goal_latest.json"
 PUBLIC_HIGH_IMPACT_JSON = DASHBOARD_DATA / "lumencore_high_impact_goal.json"
 HARBOR_GATE_JSON = OUT_OPS / "harbor_public_ais_gate_latest.json"
 HARBOR_INJECTION_JSON = OUT_OPS / "harbor_ais_injection_benchmark_latest.json"
+PROVENANCE_GATE_JSON = DASHBOARD_DATA / "live_breadth_provenance_gate.json"
 PROVENANCE_GATE_DOC = DOCS / "LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md"
 
 OUT_JSON = OUT_OPS / "public_visibility_packet_latest.json"
@@ -101,6 +102,17 @@ def build_payload() -> dict[str, Any]:
         high_impact = read_json(PUBLIC_HIGH_IMPACT_JSON)
     harbor_gate = read_json(HARBOR_GATE_JSON)
     harbor_injection = read_json(HARBOR_INJECTION_JSON)
+    provenance_gate = read_json(PROVENANCE_GATE_JSON)
+    provenance_metrics = (
+        provenance_gate.get("public_safe_metrics", {})
+        if isinstance(provenance_gate.get("public_safe_metrics"), dict)
+        else {}
+    )
+    truth_chain_interpretation = (
+        provenance_gate.get("truth_chain_interpretation", {})
+        if isinstance(provenance_gate.get("truth_chain_interpretation"), dict)
+        else {}
+    )
     summary = readiness.get("summary", {}) if isinstance(readiness.get("summary"), dict) else {}
     harbor = dashboard.get("harbor", {}) if isinstance(dashboard.get("harbor"), dict) else {}
     gate = harbor.get("public_ais_gate", {}) if isinstance(harbor.get("public_ais_gate"), dict) else {}
@@ -145,9 +157,17 @@ def build_payload() -> dict[str, Any]:
         {
             "claim": "Live-breadth frozen-delta evidence is now provenance-gated.",
             "evidence": (
-                "Public-safe local gate reports 17 enabled live sources, 12 measured sources, 70.59% measured coverage, "
-                "11 promoted live-measured source rows, and 8 context-only rows. The promoted live-measured value signal is "
-                "$8,435/hour ($73,890,600/year); the much larger unmeasured/context surface is explicitly not promoted."
+                f"Public-safe local gate reports {provenance_metrics.get('enabled_live_sources', 17)} enabled live sources, "
+                f"{provenance_metrics.get('measured_live_sources', 12)} measured sources, "
+                f"{float(provenance_metrics.get('measured_coverage_pct', 70.59)):.2f}% measured coverage, "
+                f"{provenance_metrics.get('promoted_live_measured_source_rows', 11)} promoted live-measured source rows, "
+                f"and {provenance_metrics.get('context_only_source_rows', 8)} context-only rows. "
+                "The promoted live-measured value signal is "
+                f"${float(provenance_metrics.get('promoted_live_measured_hourly_value_signal_usd', 8435.0)):,.0f}/hour "
+                f"(${float(provenance_metrics.get('promoted_live_measured_annual_value_signal_usd', 73890600.0)):,.0f}/year); "
+                f"the larger ${float(provenance_metrics.get('context_only_annual_surface_usd', 52257442740.0)):,.0f}/year "
+                "context-only surface is explicitly not promoted. "
+                f"Truth-chain interpretation: {truth_chain_interpretation.get('interpretation', 'promoted annual value is live-measured only.')}"
             ),
             "boundary": (
                 "This is a provenance and claim-discipline gate. It does not prove actual customer savings, revenue, "
@@ -236,6 +256,7 @@ def build_payload() -> dict[str, Any]:
             "dice_lock_packet": "out/ops/dice_submission_lock_packet_latest.json",
             "dice_public_live_breadth_replay": "docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md",
             "live_breadth_provenance_gate": str(PROVENANCE_GATE_DOC.relative_to(ROOT)).replace("\\", "/"),
+            "live_breadth_provenance_gate_json": str(PROVENANCE_GATE_JSON.relative_to(ROOT)).replace("\\", "/"),
             "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json",
             "harbor_ais_injection_benchmark": "out/ops/harbor_ais_injection_benchmark_latest.json",
             "harbor_public_ais_review_burden": "docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md",

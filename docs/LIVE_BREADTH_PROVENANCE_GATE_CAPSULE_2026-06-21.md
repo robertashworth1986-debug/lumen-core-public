@@ -1,16 +1,12 @@
 # Live-Breadth Provenance Gate Capsule
 
-Generated UTC: 2026-06-21T06:20:00Z
+Generated UTC: 2026-06-21T07:50:23.657357+00:00
 
 ## Purpose
 
-This capsule documents a public-safe evidence-boundary upgrade for LumenCore's
-live-breadth and frozen-delta reporting.
+Document the public-safe evidence-boundary upgrade for LumenCore live-breadth and frozen-delta reporting.
 
-The useful change is simple: only rows tied to measured live sources are
-promoted as live-breadth evidence. Unmeasured frozen deltas, reference fallback
-rows, synthetic controls, and exploratory context stay visible, but they are no
-longer allowed to inflate the headline evidence layer.
+The useful change is simple: only rows tied to measured live sources are promoted as live-breadth evidence. Unmeasured frozen deltas, reference fallback rows, synthetic controls, and exploratory context stay visible, but they are not allowed to inflate the headline evidence layer.
 
 ## Public-Safe Snapshot
 
@@ -24,44 +20,51 @@ longer allowed to inflate the headline evidence layer.
 | Reference fallback used | false |
 | Promoted live-measured hourly value signal | $8,435 |
 | Promoted live-measured annual value signal | $73,890,600 |
+| Context-only annual surface | $52,257,442,740 |
+| Top live-measured sector | power_grid |
+| Top live-measured sector hourly value signal | $5,562 |
 
-## What Changed
+## Evidence Buckets
 
-The local evidence router now separates three buckets:
+### `live_measured_delta_rows`
 
-1. `live_measured_delta_rows`: promoted live-breadth evidence.
-2. `unmeasured_frozen_delta_rows`: context-only until source measurement is proven.
-3. `reference_fallback_only`: calibration/context only.
+- Public use: Promoted live-breadth evidence.
+- Boundary: Still not proof of customer savings, grant merit, field performance, or trading profit.
 
-This means a large unmeasured or reference-derived value surface can remain in
-the research file, but it is not treated as primary public evidence.
+### `unmeasured_frozen_delta_rows`
 
-## Why It Matters
+- Public use: Context-only until source measurement is proven.
+- Boundary: May remain visible for research prioritization but cannot inflate headline evidence.
 
-Reviewers can now distinguish:
+### `reference_fallback_only`
 
-- what was actually measured through live-source registry evidence;
-- what was frozen and hashable but not yet source-measured;
-- what remains synthetic, reference, or exploratory context.
+- Public use: Calibration/context only.
+- Boundary: Not live evidence and not a substitute for measured source rows.
 
-That makes the grant posture stronger because the claim surface is smaller,
-cleaner, and harder to overstate.
+## Truth-Chain Interpretation
+
+- Promoted annual value signal: $73,890,600
+- Context-only annual surface retained as context: $52,257,442,740
+- Interpretation: The public annual value signal should be read as the promoted live-measured measurement surface only. The larger context-only surface is retained for research prioritization and must not be described as live proof.
+
+## Grant Packet Use
+
+- DICE: Useful as proof of measurement discipline and replay realism after synthetic controls; not native DICE ground truth or DICE metric attainment.
+- HarborSentinel: Useful as cross-stack provenance discipline; HarborSentinel merit still rests on bounded public AIS evidence, controlled injections, review-burden profile, and future authorized lanes.
 
 ## Boundary
 
-This capsule does not prove actual customer savings, revenue, trading profit,
-grant merit, agency acceptance, valuation, field performance, or operational
-deployment readiness.
-
-The dollar figures above are value-signal estimates from the provenance-gated
-live-breadth evidence layer. They are not revenue, not realized savings, not an
-investment claim, and not a guarantee.
+This public-safe capsule does not prove actual customer savings, revenue, trading profit, grant merit, agency acceptance, valuation, field performance, operational deployment readiness, or portal readiness. Dollar figures are value-signal estimates from a provenance-gated measurement layer, not realized savings, not revenue, not an investment claim, and not a guarantee.
 
 ## Reviewer Use
 
-Use this capsule as a public evidence-quality control. It supports the statement
-that LumenCore separates live-measured evidence from context-only evidence before
-using frozen deltas in public or grant-facing materials.
+Use this capsule as public evidence-quality control showing that LumenCore separates live-measured evidence from context-only evidence before using frozen deltas in public or grant-facing materials.
 
-Do not use it as a substitute for portal authority, compliance review, customer
-baseline acceptance, field validation, or final human submission approval.
+## Claim Gate
+
+- ready_for_portal_upload: `false`
+- ready_for_submit: `false`
+- grant_merit_proven: `false`
+- field_performance_proven: `false`
+- trading_profit_proven: `false`
+- context_only_promoted_as_live_proof: `false`

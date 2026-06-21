@@ -35,6 +35,7 @@ def test_visibility_packet_is_public_safe_and_source_backed():
     assert provenance_claims
     assert "12 measured sources" in provenance_claims[0]["evidence"]
     assert "context-only" in provenance_claims[0]["evidence"]
+    assert "Truth-chain interpretation" in provenance_claims[0]["evidence"]
     assert "does not prove actual customer savings" in provenance_claims[0]["boundary"]
     injection_claims = [
         item for item in payload["proof_claims"] if "controlled-injection benchmark" in item["claim"]
@@ -49,6 +50,9 @@ def test_visibility_packet_is_public_safe_and_source_backed():
     )
     assert payload["source_backed_artifacts"]["live_breadth_provenance_gate"].endswith(
         "LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md"
+    )
+    assert payload["source_backed_artifacts"]["live_breadth_provenance_gate_json"].endswith(
+        "live_breadth_provenance_gate.json"
     )
     assert any("support readiness packet" in step for step in payload["reviewer_path"])
     assert any("provenance gate" in step for step in payload["reviewer_path"])

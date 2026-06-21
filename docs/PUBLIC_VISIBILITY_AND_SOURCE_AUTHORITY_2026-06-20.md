@@ -1,6 +1,6 @@
 # Public Visibility and Source Authority Packet
 
-Generated UTC: 2026-06-21T06:21:26.003569+00:00
+Generated UTC: 2026-06-21T07:50:23.848638+00:00
 
 ## Identity
 
@@ -48,7 +48,7 @@ Boundary: Controlled kinematic injections on public AIS validation data are not 
 
 ### Live-breadth frozen-delta evidence is now provenance-gated.
 
-Evidence: Public-safe local gate reports 17 enabled live sources, 12 measured sources, 70.59% measured coverage, 11 promoted live-measured source rows, and 8 context-only rows. The promoted live-measured value signal is $8,435/hour ($73,890,600/year); the much larger unmeasured/context surface is explicitly not promoted.
+Evidence: Public-safe local gate reports 17 enabled live sources, 12 measured sources, 70.59% measured coverage, 11 promoted live-measured source rows, and 8 context-only rows. The promoted live-measured value signal is $8,435/hour ($73,890,600/year); the larger $52,257,442,740/year context-only surface is explicitly not promoted. Truth-chain interpretation: The public annual value signal should be read as the promoted live-measured measurement surface only. The larger context-only surface is retained for research prioritization and must not be described as live proof.
 
 Boundary: This is a provenance and claim-discipline gate. It does not prove actual customer savings, revenue, trading profit, grant merit, valuation, or field performance.
 
@@ -97,6 +97,7 @@ Boundary: The gate map is a public coordination artifact. It does not certify el
 - dice_lock_packet: `out/ops/dice_submission_lock_packet_latest.json`
 - dice_public_live_breadth_replay: `docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md`
 - live_breadth_provenance_gate: `docs/LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md`
+- live_breadth_provenance_gate_json: `dashboard/data/live_breadth_provenance_gate.json`
 - harbor_public_ais_gate: `out/ops/harbor_public_ais_gate_latest.json`
 - harbor_ais_injection_benchmark: `out/ops/harbor_ais_injection_benchmark_latest.json`
 - harbor_public_ais_review_burden: `docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md`

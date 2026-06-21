@@ -15,6 +15,7 @@ GRANT_FEED_JSON = OUT_OPS / "grant_dashboard_status_feed_latest.json"
 PUBLIC_GRANT_FEED_JSON = DASHBOARD_DATA / "grant_readiness_status.json"
 PUBLIC_VISIBILITY_JSON = OUT_OPS / "public_visibility_packet_latest.json"
 PUBLIC_VISIBILITY_DASHBOARD_JSON = DASHBOARD_DATA / "public_visibility_packet.json"
+PROVENANCE_GATE_JSON = DASHBOARD_DATA / "live_breadth_provenance_gate.json"
 
 OUT_JSON = OUT_OPS / "public_support_readiness_packet_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "public_support_readiness_packet.json"
@@ -129,6 +130,17 @@ def build_payload(
         or read_json(PUBLIC_VISIBILITY_JSON)
         or read_json(PUBLIC_VISIBILITY_DASHBOARD_JSON)
     )
+    provenance_gate = read_json(PROVENANCE_GATE_JSON)
+    provenance_metrics = (
+        provenance_gate.get("public_safe_metrics", {})
+        if isinstance(provenance_gate.get("public_safe_metrics"), dict)
+        else {}
+    )
+    truth_chain = (
+        provenance_gate.get("truth_chain_interpretation", {})
+        if isinstance(provenance_gate.get("truth_chain_interpretation"), dict)
+        else {}
+    )
     summary = grant_feed.get("summary", {}) if isinstance(grant_feed.get("summary"), dict) else {}
     harbor = grant_feed.get("harbor", {}) if isinstance(grant_feed.get("harbor"), dict) else {}
     injection = harbor.get("ais_injection_benchmark", {}) if isinstance(harbor.get("ais_injection_benchmark"), dict) else {}
@@ -147,7 +159,15 @@ def build_payload(
         "package_snapshot": build_package_snapshot(grant_feed),
         "strong_public_evidence": [
             "DICE local package hygiene is tracked, and a public-safe live-breadth replay capsule summarizes 6 live-source files and 14 deterministic replay windows without publishing private portal materials.",
-            "Live-breadth frozen-delta evidence is provenance-gated: only live-measured rows are promoted, while unmeasured or reference rows remain context-only.",
+            (
+                "Live-breadth frozen-delta evidence is provenance-gated: "
+                f"{provenance_metrics.get('measured_live_sources', 12)}/"
+                f"{provenance_metrics.get('enabled_live_sources', 17)} live sources are measured, "
+                f"{provenance_metrics.get('promoted_live_measured_source_rows', 11)} rows are promoted, "
+                f"{provenance_metrics.get('context_only_source_rows', 8)} rows remain context-only, and "
+                f"the truth-chain promoted annual value signal is "
+                f"${float(truth_chain.get('promoted_annual_value_signal_usd', 73890600.0)):,.0f}."
+            ),
             "HarborSentinel public AIS acquisition, held-out splits, and full-hash split preflight are tracked.",
             (
                 "HarborSentinel controlled-injection benchmark is available as bounded detector-vs-baseline evidence "
@@ -172,6 +192,7 @@ def build_payload(
             "public_visibility_packet": "docs/PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md",
             "dice_public_live_breadth_replay": "docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md",
             "live_breadth_provenance_gate": "docs/LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md",
+            "live_breadth_provenance_gate_json": "dashboard/data/live_breadth_provenance_gate.json",
             "public_submission_gate_map": "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md",
             "harbor_public_ais_packet": "docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md",
             "harbor_public_ais_review_burden": "docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md",

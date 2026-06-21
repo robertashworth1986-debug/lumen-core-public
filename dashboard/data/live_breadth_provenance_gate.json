@@ -1,0 +1,55 @@
+{
+  "boundary": "This public-safe capsule does not prove actual customer savings, revenue, trading profit, grant merit, agency acceptance, valuation, field performance, operational deployment readiness, or portal readiness. Dollar figures are value-signal estimates from a provenance-gated measurement layer, not realized savings, not revenue, not an investment claim, and not a guarantee.",
+  "claim_gate": {
+    "context_only_promoted_as_live_proof": false,
+    "field_performance_proven": false,
+    "grant_merit_proven": false,
+    "ready_for_portal_upload": false,
+    "ready_for_submit": false,
+    "trading_profit_proven": false
+  },
+  "evidence_buckets": [
+    {
+      "boundary": "Still not proof of customer savings, grant merit, field performance, or trading profit.",
+      "bucket": "live_measured_delta_rows",
+      "public_use": "Promoted live-breadth evidence."
+    },
+    {
+      "boundary": "May remain visible for research prioritization but cannot inflate headline evidence.",
+      "bucket": "unmeasured_frozen_delta_rows",
+      "public_use": "Context-only until source measurement is proven."
+    },
+    {
+      "boundary": "Not live evidence and not a substitute for measured source rows.",
+      "bucket": "reference_fallback_only",
+      "public_use": "Calibration/context only."
+    }
+  ],
+  "generated_utc": "2026-06-21T07:50:23.657357+00:00",
+  "grant_packet_use": {
+    "dice": "Useful as proof of measurement discipline and replay realism after synthetic controls; not native DICE ground truth or DICE metric attainment.",
+    "harbor_sentinel": "Useful as cross-stack provenance discipline; HarborSentinel merit still rests on bounded public AIS evidence, controlled injections, review-burden profile, and future authorized lanes."
+  },
+  "public_safe_metrics": {
+    "context_only_annual_surface_usd": 52257442740.0,
+    "context_only_source_rows": 8,
+    "enabled_live_sources": 17,
+    "measured_coverage_pct": 70.59,
+    "measured_live_sources": 12,
+    "promoted_live_measured_annual_value_signal_usd": 73890600.0,
+    "promoted_live_measured_hourly_value_signal_usd": 8435.0,
+    "promoted_live_measured_source_rows": 11,
+    "reference_fallback_used": false,
+    "top_live_measured_sector": "power_grid",
+    "top_live_measured_sector_hourly_value_usd": 5562.5,
+    "truth_chain_promoted_annual_value_signal_usd": 73890600.0
+  },
+  "purpose": "Document the public-safe evidence-boundary upgrade for LumenCore live-breadth and frozen-delta reporting.",
+  "reviewer_use": "Use this capsule as public evidence-quality control showing that LumenCore separates live-measured evidence from context-only evidence before using frozen deltas in public or grant-facing materials.",
+  "schema": "public_live_breadth_provenance_gate_v1",
+  "truth_chain_interpretation": {
+    "context_only_annual_surface_usd": 52257442740.0,
+    "interpretation": "The public annual value signal should be read as the promoted live-measured measurement surface only. The larger context-only surface is retained for research prioritization and must not be described as live proof.",
+    "promoted_annual_value_signal_usd": 73890600.0
+  }
+}
