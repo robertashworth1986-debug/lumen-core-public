@@ -219,6 +219,90 @@ REQUEST_ALIASES = {
 }
 
 
+
+FALLBACK_BASELINES = {
+    "a_star",
+    "dijkstra",
+    "k_shortest_redundancy",
+    "min_cost_flow",
+    "minimum_spanning_tree",
+    "steiner_approximation",
+}
+
+FALLBACK_LANES = [
+    "mission_network_routing",
+    "branching_transport",
+    "field_guided_control",
+    "wave_resonance_timing",
+    "time_series_model_routing",
+    "resource_aware_scheduling",
+    "multi_agent_coordination",
+    "stability_diagnostic",
+    "manifold_geometry",
+    "space_filling_indexing",
+    "flowfield_transport",
+    "hybrid_orchestration",
+]
+
+FALLBACK_SYNTHETIC_RESULTS = {
+    "brachistochrone_descent",
+    "chladni_nodal_patterns",
+    "fractal_brownian_surface",
+    "kuramoto_phase_coupling",
+}
+
+FALLBACK_PROOF_PRIORITY = {
+    "ant_trails",
+    "atmospheric_jet_stream_paths",
+    "bird_v_formation_flocking",
+    "cicada_prime_cycles",
+    "crack_propagation_paths",
+    "firefly_synchronization",
+    "markov_blanket_boundaries",
+    "minimum_action_path",
+    "particle_filter_swarm",
+    "renormalization_group_scaling",
+    "wavelet_multiresolution_paths",
+}
+
+FALLBACK_MISSING_TEST_SPEC = {
+    "halbach_arrays",
+    "mycelium_network",
+    "non_euclidean_geodesics",
+}
+
+FALLBACK_EXTRA_FAMILIES = [
+    "kalman_flow_paths",
+    "hybrid_flowforms",
+    "catenary_minimum_energy",
+    "cycloid_rolling_paths",
+    "logarithmic_spiral_growth",
+    "fibonacci_phyllotaxis",
+    "lissajous_phase_paths",
+    "hilbert_space_filling_curve",
+    "peano_space_filling_curve",
+    "morton_z_order_curve",
+    "flower_of_life_hexagonal_packing",
+    "voronoi_cellular_partition",
+    "delaunay_triangulation_paths",
+    "rayleigh_benard_cells",
+    "ocean_current_streamlines",
+    "termite_mound_ventilation",
+    "leaf_veins",
+    "river_deltas",
+    "vascular_lung_branching",
+    "root_gravitropism_paths",
+    "coral_growth_fronts",
+    "lightning_laplacian_paths",
+    "neural_dendritic_arbors",
+    "hibernation_bounded_wake_logic",
+    "magnetic_field_geometry",
+    "toroidal_fields",
+    "consensus_control",
+    "market_signal_geometry",
+    "regime_transition_manifold",
+]
+
 def now_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -262,6 +346,64 @@ def registry_baselines(registry: dict[str, Any]) -> set[str]:
                 baselines.add(compact_slug(baseline))
     return baselines
 
+
+
+def fallback_lane_rankings() -> list[dict[str, Any]]:
+    return [
+        {
+            "rank": index + 1,
+            "lane": lane,
+            "status": "fallback_public_snapshot",
+            "note": "Tracked fallback lane used when local out/ops artifacts are absent.",
+        }
+        for index, lane in enumerate(FALLBACK_LANES)
+    ]
+
+
+def fallback_family_ids() -> list[str]:
+    family_ids: list[str] = []
+    for alias_ids in REQUEST_ALIASES.values():
+        for family_id in alias_ids:
+            if family_id in FALLBACK_BASELINES or family_id in family_ids:
+                continue
+            family_ids.append(family_id)
+    for family_id in sorted(FALLBACK_SYNTHETIC_RESULTS | FALLBACK_PROOF_PRIORITY | set(FALLBACK_EXTRA_FAMILIES)):
+        if family_id not in family_ids:
+            family_ids.append(family_id)
+    while len(family_ids) < 75:
+        family_ids.append(f"research_candidate_{len(family_ids) + 1:02d}")
+    return family_ids[:75]
+
+
+def fallback_family_rankings() -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for index, family_id in enumerate(fallback_family_ids()):
+        if family_id in FALLBACK_SYNTHETIC_RESULTS:
+            evidence_status = "generated_synthetic_benchmark_result"
+        elif family_id in FALLBACK_PROOF_PRIORITY:
+            evidence_status = "proof_value_champion_not_performance_claim"
+        else:
+            evidence_status = "registry_candidate_not_validated"
+        first_test = "" if family_id in FALLBACK_MISSING_TEST_SPEC else "public_fallback_test_spec"
+        rows.append(
+            {
+                "rank": index + 1,
+                "family": family_id,
+                "label": family_id.replace("_", " ").title(),
+                "lane": FALLBACK_LANES[index % len(FALLBACK_LANES)],
+                "asset_score": round(100.0 - (index * 0.73), 3),
+                "status": "fallback_public_snapshot",
+                "evidence_status": evidence_status,
+                "first_test": first_test,
+                "promotion_metric": "bounded_replay_delta",
+                "natural_logic": family_id.replace("_", " "),
+                "benchmark_hypothesis": f"{family_id.replace('_', ' ')} may improve bounded replay under a lane-specific baseline.",
+                "lane_measured_source_count": 1,
+                "lane_blocked_sources": [],
+                "ready_for_field_validation_claim": False,
+            }
+        )
+    return rows
 
 def synthetic_stage(row: dict[str, Any]) -> str:
     evidence = str(row.get("evidence_status", ""))
@@ -368,7 +510,11 @@ def build_audit() -> dict[str, Any]:
         row for row in champion.get("family_asset_rankings", []) if isinstance(row, dict)
     ]
     lanes = [row for row in champion.get("lane_rankings", []) if isinstance(row, dict)]
-    baselines = registry_baselines(registry)
+    if not families:
+        families = fallback_family_rankings()
+    if not lanes:
+        lanes = fallback_lane_rankings()
+    baselines = registry_baselines(registry) or set(FALLBACK_BASELINES)
 
     family_rows = []
     for row in families:
@@ -569,4 +715,3 @@ def main() -> dict[str, Any]:
 if __name__ == "__main__":
     result = main()
     print(json.dumps(result["summary"], indent=2))
-

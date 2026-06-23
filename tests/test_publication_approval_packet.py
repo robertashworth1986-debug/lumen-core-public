@@ -23,8 +23,8 @@ def test_packet_requires_approval_before_public_actions():
     assert payload["schema"] == "publication_approval_packet_v1"
     assert payload["publication_policy"]["approval_required_before_live_profile_or_social_changes"] is True
     assert payload["publication_policy"]["no_auto_posting"] is True
-    assert payload["github"]["branch"] == "geometry-coverage-audit-20260623"
-    assert "pull/new/geometry-coverage-audit-20260623" in payload["github"]["pr_url"]
+    assert payload["github"]["branch"] == "geometry-public-packet-20260623"
+    assert "pull/new/geometry-public-packet-20260623" in payload["github"]["pr_url"]
 
 
 def test_linkedin_copy_uses_bounded_evidence_numbers():

@@ -1,11 +1,11 @@
 # Publication Approval Packet
 
-Generated UTC: `2026-06-23T20:47:38.931952+00:00`
+Generated UTC: `2026-06-23T22:05:05.680771+00:00`
 
 ## Status
 
-- Public branch: `geometry-coverage-audit-20260623`
-- PR URL: https://github.com/robertashworth1986-debug/lumen-core-public/pull/new/geometry-coverage-audit-20260623
+- Public branch: `geometry-public-packet-20260623`
+- PR URL: https://github.com/robertashworth1986-debug/lumen-core-public/pull/new/geometry-public-packet-20260623
 - Approval required before LinkedIn/site/email changes: `True`
 
 ## Evidence Summary
@@ -18,7 +18,7 @@ Generated UTC: `2026-06-23T20:47:38.931952+00:00`
 
 ## Channel Plan
 
-- P1 GitHub: Open pull request for the public-safe audit branch. (https://github.com/robertashworth1986-debug/lumen-core-public/pull/new/geometry-coverage-audit-20260623) Approval required: `False`
+- P1 GitHub: Open pull request for the public-safe audit branch. (https://github.com/robertashworth1986-debug/lumen-core-public/pull/new/geometry-public-packet-20260623) Approval required: `False`
 - P2 lumen-core.ai: Add a public proof note linking to the geometry coverage audit and PR. (https://lumen-core.ai) Approval required: `True`
 - P3 LinkedIn: Publish one bounded proof post and update Featured link after user approval. (https://www.linkedin.com/) Approval required: `True`
 - P4 Reviewer email/DM: Send short reviewer note to selected technical reviewers or program-aligned contacts. Approval required: `True`
@@ -72,8 +72,8 @@ I am sharing a public-safe LumenCore proof artifact for technical review. The ne
 
 The purpose is not to claim final performance. The purpose is to make the evidence boundary auditable: what has been ranked, what has synthetic benchmark evidence, what is queued for live replay, and what still requires independent/field validation.
 
-Public branch: geometry-coverage-audit-20260623
-Pull request draft URL: https://github.com/robertashworth1986-debug/lumen-core-public/pull/new/geometry-coverage-audit-20260623
+Public branch: geometry-public-packet-20260623
+Pull request draft URL: https://github.com/robertashworth1986-debug/lumen-core-public/pull/new/geometry-public-packet-20260623
 Public repo: https://github.com/robertashworth1986-debug/lumen-core-public
 
 I would value review focused on reproducibility, baseline fairness, claim discipline, and which lane should be prioritized for live replay or pilot validation.

@@ -19,10 +19,10 @@ OUT_JSON = OUT_OPS / "publication_approval_packet_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "publication_approval_packet.json"
 OUT_MD = DOCS / "PUBLICATION_APPROVAL_PACKET_2026-06-23.md"
 
-GITHUB_BRANCH = "geometry-coverage-audit-20260623"
+GITHUB_BRANCH = "geometry-public-packet-20260623"
 GITHUB_PR_URL = (
     "https://github.com/robertashworth1986-debug/"
-    "lumen-core-public/pull/new/geometry-coverage-audit-20260623"
+    "lumen-core-public/pull/new/geometry-public-packet-20260623"
 )
 PUBLIC_REPO_URL = "https://github.com/robertashworth1986-debug/lumen-core-public"
 PUBLIC_SITE_URL = "https://lumen-core.ai"
@@ -333,4 +333,3 @@ def main() -> dict[str, Any]:
 if __name__ == "__main__":
     result = main()
     print(json.dumps({"schema": result["schema"], "github": result["github"]}, indent=2))
-

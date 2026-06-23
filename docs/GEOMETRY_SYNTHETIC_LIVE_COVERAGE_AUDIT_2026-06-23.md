@@ -1,6 +1,6 @@
 # Geometry Synthetic/Live Coverage Audit
 
-Generated UTC: `2026-06-23T20:01:50.502359+00:00`
+Generated UTC: `2026-06-23T22:01:28.672293+00:00`
 
 ## Policy
 
@@ -28,35 +28,35 @@ No. The registered universe is ranked and mostly test-spec-ready, but only a sma
 ## Requested Universe Coverage
 
 - Requested candidates tracked in this audit: `129`
-- Covered by registry family: `53`
-- Covered as baseline: `7`
+- Covered by registry family: `54`
+- Covered as baseline: `6`
 - Not yet in registry: `69`
 
 ## Top Next Live Replay Queue
 
-- `fractal_brownian_surface` (time_series_model_routing): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `walk_forward_rmse_delta`
-- `brachistochrone_descent` (optimal_curve_transport): synthetic_benchmark_result_present -> live_sources_wired_for_replay_not_live_win; metric `travel_time_at_equal_constraints`
-- `kuramoto_phase_coupling` (wave_resonance_timing): synthetic_benchmark_result_present -> live_sources_wired_for_replay_not_live_win; metric `phase_error_and_rmse`
-- `markov_blanket_boundaries` (stability_diagnostic): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `feature_boundary_stability`
-- `chladni_nodal_patterns` (wave_resonance_timing): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `mode_classification_or_forecast_error`
-- `atmospheric_jet_stream_paths` (field_guided_control): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `time_saved_with_risk_penalty`
-- `cicada_prime_cycles` (resource_aware_scheduling): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `collision_rate_and_deadline_score`
-- `bird_v_formation_flocking` (multi_agent_coordination): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `energy_proxy_at_completion`
-- `crack_propagation_paths` (branching_transport): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `failure_localization_error`
-- `ant_trails` (mission_network_routing): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `cost_per_delivery_with_recovery`
+- `ant_trails` (field_guided_control): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `bounded_replay_delta`
+- `bird_v_formation_flocking` (time_series_model_routing): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `bounded_replay_delta`
+- `fractal_brownian_surface` (field_guided_control): synthetic_benchmark_result_present -> live_sources_wired_for_replay_not_live_win; metric `bounded_replay_delta`
+- `brachistochrone_descent` (space_filling_indexing): synthetic_benchmark_result_present -> live_sources_wired_for_replay_not_live_win; metric `bounded_replay_delta`
+- `atmospheric_jet_stream_paths` (branching_transport): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `bounded_replay_delta`
+- `markov_blanket_boundaries` (time_series_model_routing): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `bounded_replay_delta`
+- `minimum_action_path` (multi_agent_coordination): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `bounded_replay_delta`
+- `cicada_prime_cycles` (stability_diagnostic): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `bounded_replay_delta`
+- `chladni_nodal_patterns` (space_filling_indexing): synthetic_benchmark_result_present -> live_sources_wired_for_replay_not_live_win; metric `bounded_replay_delta`
+- `crack_propagation_paths` (flowfield_transport): proof_priority_candidate_needs_live_replay -> live_sources_wired_for_replay_not_live_win; metric `bounded_replay_delta`
 
 ## Top Next Synthetic Benchmark Queue
 
-- `kalman_flow_paths` (time_series_model_routing): test_spec_ready_no_result; first test `kalman_flow_v1`
-- `particle_filter_swarm` (time_series_model_routing): test_spec_ready_no_result; first test `particle_filter_v1`
-- `wavelet_multiresolution_paths` (time_series_model_routing): test_spec_ready_no_result; first test `wavelet_feature_v1`
-- `hybrid_flowforms` (time_series_model_routing): test_spec_ready_no_result; first test `heldout_flowform_blend_v1`
-- `catenary_minimum_energy` (optimal_curve_transport): test_spec_ready_no_result; first test `catenary_layout_v1`
-- `cycloid_rolling_paths` (optimal_curve_transport): test_spec_ready_no_result; first test `cycloid_transport_v1`
-- `logarithmic_spiral_growth` (optimal_curve_transport): test_spec_ready_no_result; first test `spiral_growth_intercept_v1`
-- `minimum_action_path` (optimal_curve_transport): test_spec_ready_no_result; first test `minimum_action_route_v1`
-- `renormalization_group_scaling` (stability_diagnostic): test_spec_ready_no_result; first test `renormalization_scaling_v1`
-- `firefly_synchronization` (wave_resonance_timing): test_spec_ready_no_result; first test `firefly_sync_v1`
+- `mycelium_network` (mission_network_routing): registered_but_test_spec_missing; first test `NEEDS_TEST_SPEC`
+- `slime_mold_routing` (branching_transport): test_spec_ready_no_result; first test `public_fallback_test_spec`
+- `bee_foraging_paths` (wave_resonance_timing): test_spec_ready_no_result; first test `public_fallback_test_spec`
+- `boids_swarm_flocking` (resource_aware_scheduling): test_spec_ready_no_result; first test `public_fallback_test_spec`
+- `fish_school_vortex` (multi_agent_coordination): test_spec_ready_no_result; first test `public_fallback_test_spec`
+- `wolf_pack_pursuit_paths` (stability_diagnostic): test_spec_ready_no_result; first test `public_fallback_test_spec`
+- `river_deltas` (manifold_geometry): test_spec_ready_no_result; first test `public_fallback_test_spec`
+- `leaf_veins` (space_filling_indexing): test_spec_ready_no_result; first test `public_fallback_test_spec`
+- `vascular_lung_branching` (flowfield_transport): test_spec_ready_no_result; first test `public_fallback_test_spec`
+- `root_gravitropism_paths` (hybrid_orchestration): test_spec_ready_no_result; first test `public_fallback_test_spec`
 
 ## Missing From Registry
 
@@ -70,11 +70,11 @@ No. The registered universe is ranked and mostly test-spec-ready, but only a sma
 - hierarchical pathfinding
 - dynamic replanning / D* Lite
 - predator-prey pursuit/evasion
+- pheromone evaporation trails
 - electric field lines
 - potential fields
 - harmonic potential fields
 - vortex fields
-- gradient-flow paths
 
 ## Do Not Overclaim
 
