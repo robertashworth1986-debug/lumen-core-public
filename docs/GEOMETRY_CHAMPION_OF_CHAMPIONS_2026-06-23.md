@@ -1,6 +1,7 @@
 # Geometry Champion Of Champions
 
-Generated UTC: `2026-06-25T11:21:01.597938+00:00`
+Generated UTC: `2026-06-25T22:45:47.078569+00:00`
+Board SHA-256: `4f99a8d6317b3e345d6548b739709961a920859c682be2e8f95a864768dd6c1e`
 
 ## Boundary
 
@@ -10,24 +11,60 @@ This board ranks what to validate next. It does not establish field validation, 
 
 - Families ranked: 140 / 140
 - Lanes ranked: 12 / 12
-- Live measured sources: 17
-- Live measured rows: 417
+- Live measured sources: 18
+- Live measured rows: 418
+- Live adapter replays: 4
+- Candidate beats named baseline count: 4
 - Reviewer packet ready: `true`
 - Ready for field-validation claim: `false`
 - Ready for real-dollar claim: `false`
 - Kraken live execution allowed: `false`
-- Strict rolling champions: `0`
-- Triple-source candidates: `3`
-- Single-run candidates: `1`
+- Bounded estimated value claim allowed: `true`
+- Paid pilot scoping allowed: `true`
+- Safe estimated value signal: `$4,520/hour`, `$39,595,200/year` under assumptions
+- Blocked context-only value surface: `$52,288,496,940/year`
+- Vault packet ready: `true`
+- Vault hashes verified: `true`
+- Strict rolling champions: `4`
+- Robust repeat candidates: `1`
+- Triple-source candidates: `1`
+- Single-run candidates: `0`
+
+## Current Truth Gates
+
+- live_data_available_for_benchmarking: `true`
+- rolling_champion_present: `true`
+- bounded_estimated_value_claim_allowed: `true`
+- paid_pilot_scoping_allowed: `true`
+- field_validation_claim_allowed: `false`
+- real_dollar_savings_claim_allowed: `false`
+- fixed_dollar_delta_sale_claim_allowed: `false`
+- live_trading_or_autonomous_execution_allowed: `false`
+- vps_domain_live_dashboard_routed: `false`
+- all_registered_families_live_benchmarked: `false`
+- all_families_have_benchmark_specs: `false`
+- glyph_or_external_vault_routed: `true`
+- triple_dataset_frozen_assets_present: `true`
+
+## Strongest Current Read
+
+- Strongest current candidate: `brachistochrone_descent` (optimal_curve_transport)
+- Evidence status: `rolling_champion_repeat_live_context_not_field_validated`
+- Claim stage: `rolling_champion_not_field_validated`
+- Robust repeat gate: `true`
+- Paid pilot ready: `true`
+- Strongest money proxy: `phase_locked_residual_corrector` (energy_price_pressure_proxy) delta `36.387422`
 
 ## Category Champions
 
 - operational_proof_priority: `time_series_model_routing` (time_series_model_routing) score `228.72`
-- top_family_asset: `Crack propagation paths` (branching_transport) score `100.0`
-- proof_value_champion: `Crack propagation paths` (branching_transport) score `100.0`
-- strict_triple_source_candidate: `Brachistochrone fastest-descent curve` (optimal_curve_transport) score `100.0`
-- strict_single_run_candidate: `Thermal plume convection` (thermal_ventilation) score `100.0`
-- harmonic_phase_lock_candidate: `wave_resonance_timing` (wave_resonance_timing) score `132.532`
+- top_family_asset: `Brachistochrone fastest-descent curve` (optimal_curve_transport) score `273.826`
+- proof_value_champion: `Beast Algo: Echo Stack` (time_series_model_routing) score `115.0`
+- strict_rolling_champion: `Brachistochrone fastest-descent curve` (optimal_curve_transport) score `273.826`
+- robust_repeat_candidate: `Brachistochrone fastest-descent curve` (optimal_curve_transport) score `273.826`
+- paid_pilot_scoping_candidate: `Brachistochrone fastest-descent curve` (optimal_curve_transport) score `273.826`
+- strict_triple_source_candidate: `Leaf veins` (branching_transport) score `151.3`
+- harmonic_phase_lock_candidate: `wave_resonance_timing` (wave_resonance_timing) score `161.032`
 - market_lane_status: `market_signal_geometry` (market_signal_geometry) score `77.64`
 
 ## Lane Proof Priority
@@ -67,16 +104,27 @@ This board ranks what to validate next. It does not establish field validation, 
 
 ### 4. wave_resonance_timing
 
-- Operational proof score: 132.532
+- Operational proof score: 161.032
 - Claim stage: `live_replay_ready_not_field_validated`
-- Measured sources: 4
-- Measured rows: 85
-- Blocked sources: NASA
+- Measured sources: 5
+- Measured rows: 86
+- Blocked sources: none
 - Generated champion: `kuramoto_phase_coupling`
 - Proof champion: `beast_algo_cross_asset_resonance`
 - First replay: oscillatory-window replay comparing Kuramoto, PLL, Kalman, FFT, and ARIMA under identical frozen windows
 
-### 5. resource_aware_scheduling
+### 5. field_guided_control
+
+- Operational proof score: 123.7
+- Claim stage: `live_replay_ready_not_field_validated`
+- Measured sources: 4
+- Measured rows: 38
+- Blocked sources: none
+- Generated champion: `none`
+- Proof champion: `atmospheric_jet_stream_paths`
+- First replay: field drift and corridor-control replay using weather, hydrology, and public time-series stress controls
+
+### 6. resource_aware_scheduling
 
 - Operational proof score: 120.42
 - Claim stage: `live_replay_ready_not_field_validated`
@@ -87,7 +135,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Proof champion: `cicada_prime_cycles`
 - First replay: bounded wake/scheduling replay using macro pressure and internal event cadence
 
-### 6. multi_agent_coordination
+### 7. multi_agent_coordination
 
 - Operational proof score: 117.74
 - Claim stage: `live_replay_ready_not_field_validated`
@@ -98,7 +146,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Proof champion: `bird_v_formation_flocking`
 - First replay: multi-agent coordination replay under weather/event disruption and public time-series stress
 
-### 7. branching_transport
+### 8. branching_transport
 
 - Operational proof score: 113.224
 - Claim stage: `live_replay_ready_not_field_validated`
@@ -109,7 +157,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Proof champion: `crack_propagation_paths`
 - First replay: critical-flow and failure-propagation replay using EIA load, weather, hydrology, and event signals
 
-### 8. mission_network_routing
+### 9. mission_network_routing
 
 - Operational proof score: 111.04
 - Claim stage: `live_replay_ready_not_field_validated`
@@ -120,7 +168,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Proof champion: `ant_trails`
 - First replay: degraded-network routing windows from grant/opportunity, weather, water, and event-ingress signals
 
-### 9. thermal_ventilation
+### 10. thermal_ventilation
 
 - Operational proof score: 96.648
 - Claim stage: `live_replay_ready_not_field_validated`
@@ -130,17 +178,6 @@ This board ranks what to validate next. It does not establish field validation, 
 - Generated champion: `thermal_plume_convection`
 - Proof champion: `rayleigh_benard_cells`
 - First replay: load-plus-ambient thermal replay comparing plume/cellular ventilation against straight-duct baselines
-
-### 10. field_guided_control
-
-- Operational proof score: 95.2
-- Claim stage: `live_replay_ready_not_field_validated`
-- Measured sources: 3
-- Measured rows: 37
-- Blocked sources: NASA
-- Generated champion: `none`
-- Proof champion: `atmospheric_jet_stream_paths`
-- First replay: field drift and corridor-control replay using weather, hydrology, and public time-series stress controls
 
 ### 11. packing_topology
 
@@ -166,26 +203,26 @@ This board ranks what to validate next. It does not establish field validation, 
 
 ## Top Family Assets
 
-- 1. `crack_propagation_paths` (branching_transport): 100.0 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
-- 2. `leaf_veins` (branching_transport): 100.0 - generated_software_benchmark_only_needs_live_replay - rolling `not_promoted`
-- 3. `beast_algo_curvature_pressure` (optimal_curve_transport): 100.0 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
-- 4. `brachistochrone_descent` (optimal_curve_transport): 100.0 - triple_source_live_candidate_needs_repeat_run - rolling `triple_source_candidate`
-- 5. `rayleigh_benard_cells` (thermal_ventilation): 100.0 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
-- 6. `thermal_plume_convection` (thermal_ventilation): 100.0 - single_run_candidate_needs_more_sources_or_repeat - rolling `single_run_candidate`
-- 7. `beast_algo_echo_stack` (time_series_model_routing): 100.0 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
-- 8. `beast_algo_cross_asset_resonance` (wave_resonance_timing): 100.0 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
-- 9. `kuramoto_phase_coupling` (wave_resonance_timing): 100.0 - triple_source_live_candidate_needs_repeat_run - rolling `triple_source_candidate`
-- 10. `ant_trails` (mission_network_routing): 99.305 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
-- 11. `atmospheric_jet_stream_paths` (field_guided_control): 97.568 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
-- 12. `markov_blanket_boundaries` (stability_diagnostic): 97.15 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
-- 13. `cicada_prime_cycles` (resource_aware_scheduling): 94.714 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
-- 14. `bird_v_formation_flocking` (multi_agent_coordination): 91.751 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
-- 15. `kidney_nephron_filtration` (branching_transport): 91.356 - live_breadth_source_available_needs_lane_replay - rolling `not_in_rolling_gate`
-- 16. `lightning_laplacian_paths` (branching_transport): 91.356 - live_breadth_source_available_needs_lane_replay - rolling `not_in_rolling_gate`
-- 17. `murray_law_branching` (branching_transport): 91.356 - live_breadth_source_available_needs_lane_replay - rolling `not_in_rolling_gate`
-- 18. `neural_dendritic_arbors` (branching_transport): 91.356 - live_breadth_source_available_needs_lane_replay - rolling `not_in_rolling_gate`
-- 19. `river_deltas` (branching_transport): 91.356 - live_breadth_source_available_needs_lane_replay - rolling `not_in_rolling_gate`
-- 20. `root_gravitropism_paths` (branching_transport): 91.356 - live_breadth_source_available_needs_lane_replay - rolling `not_in_rolling_gate`
+- 1. `brachistochrone_descent` (optimal_curve_transport): 273.826 - rolling_champion_repeat_live_context_not_field_validated - rolling `rolling_champion`
+- 2. `kuramoto_phase_coupling` (wave_resonance_timing): 247.069 - rolling_champion_repeat_live_context_not_field_validated - rolling `rolling_champion`
+- 3. `thermal_plume_convection` (thermal_ventilation): 188.846 - rolling_champion_repeat_live_context_not_field_validated - rolling `rolling_champion`
+- 4. `leaf_veins` (branching_transport): 151.3 - triple_source_live_candidate_needs_repeat_run - rolling `triple_source_candidate`
+- 5. `beast_algo_echo_stack` (time_series_model_routing): 115.0 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
+- 6. `fractal_brownian_surface` (time_series_model_routing): 112.177 - live_breadth_source_available_needs_lane_replay - rolling `not_promoted`
+- 7. `markov_blanket_boundaries` (stability_diagnostic): 109.15 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
+- 8. `beast_algo_cross_asset_resonance` (wave_resonance_timing): 109.0 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
+- 9. `ant_trails` (mission_network_routing): 108.305 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
+- 10. `crack_propagation_paths` (branching_transport): 106.0 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
+- 11. `beast_algo_curvature_pressure` (optimal_curve_transport): 106.0 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
+- 12. `cicada_prime_cycles` (resource_aware_scheduling): 103.714 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
+- 13. `atmospheric_jet_stream_paths` (field_guided_control): 103.568 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
+- 14. `rayleigh_benard_cells` (thermal_ventilation): 103.0 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
+- 15. `beast_algo_multi_timeframe_stack` (time_series_model_routing): 99.177 - live_breadth_source_available_needs_lane_replay - rolling `not_in_rolling_gate`
+- 16. `beast_algo_multi_timescale_interference` (time_series_model_routing): 99.177 - live_breadth_source_available_needs_lane_replay - rolling `not_in_rolling_gate`
+- 17. `beast_algo_resonant_pressure` (time_series_model_routing): 99.177 - live_breadth_source_available_needs_lane_replay - rolling `not_in_rolling_gate`
+- 18. `kalman_flow_paths` (time_series_model_routing): 99.177 - live_breadth_source_available_needs_lane_replay - rolling `not_in_rolling_gate`
+- 19. `particle_filter_swarm` (time_series_model_routing): 99.177 - live_breadth_source_available_needs_lane_replay - rolling `not_in_rolling_gate`
+- 20. `wavelet_multiresolution_paths` (time_series_model_routing): 99.177 - live_breadth_source_available_needs_lane_replay - rolling `not_in_rolling_gate`
 
 ## Field Validation Requirements
 
@@ -194,6 +231,14 @@ This board ranks what to validate next. It does not establish field validation, 
 - Run identical inputs through baseline and candidate with hashes, failures, and runtime recorded.
 - Report uncertainty intervals and multiple-comparison controls across tested families.
 - Obtain a partner, agency, or independent reviewer confirmation before calling it field validation.
+
+## Required Next Wiring
+
+- Route dashboard/data/geometry_champion_of_champions.json and field_money_truth_sweep.json to the live VPS/domain and verify hosted hashes.
+- Convert brachistochrone_descent and kuramoto_phase_coupling proof cards into grant appendices with the same claim gates.
+- Add benchmark specs for the remaining registered families until all_families_have_benchmark_specs is true.
+- Build adapters for high-value unbenchmarked families before claiming broad family coverage.
+- Acquire buyer or agency authorized field data before any field-validation or real-dollar savings claim.
 
 ## Blocked Or Thin Sources
 

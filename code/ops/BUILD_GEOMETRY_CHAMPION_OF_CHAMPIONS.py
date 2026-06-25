@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -17,6 +18,11 @@ MATRIX_JSON = OUT_OPS / "geometry_live_wiring_matrix_latest.json"
 FRONTIER_JSON = OUT_OPS / "geometry_proof_frontier_board_latest.json"
 REVIEWER_GATE_JSON = OUT_OPS / "reviewer_evidence_gate_latest.json"
 QUEUE_JSON = OUT_OPS / "geometry_live_breadth_proof_queue_latest.json"
+ROLLING_GATE_JSON = OUT_OPS / "rolling_champion_gate_latest.json"
+UNCERTAINTY_JSON = OUT_OPS / "geometry_repeat_uncertainty_report_latest.json"
+PROOF_TO_PILOT_JSON = OUT_OPS / "proof_to_pilot_control_room_latest.json"
+TRUTH_SWEEP_JSON = OUT_OPS / "field_money_truth_sweep_latest.json"
+CLAIM_MAP_JSON = OUT_OPS / "claim_strength_value_unlock_map_latest.json"
 
 OUT_JSON = OUT_OPS / "geometry_champion_of_champions_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "geometry_champion_of_champions.json"
@@ -53,6 +59,47 @@ def norm_id(value: Any) -> str:
 
 def norm_source(value: Any) -> str:
     return str(value or "").strip().upper()
+
+
+def safe_float(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def safe_int(value: Any, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def rows_from(payload: dict[str, Any], key: str) -> list[dict[str, Any]]:
+    rows = payload.get(key, [])
+    return [row for row in rows if isinstance(row, dict)] if isinstance(rows, list) else []
+
+
+def rolling_by_family(rolling: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {norm_id(row.get("family_id")): row for row in rows_from(rolling, "promotion_board") if row.get("family_id")}
+
+
+def uncertainty_by_family(uncertainty: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {norm_id(row.get("family_id")): row for row in rows_from(uncertainty, "analyses") if row.get("family_id")}
+
+
+def proof_cards_by_family(proof_to_pilot: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {norm_id(row.get("family_id")): row for row in rows_from(proof_to_pilot, "top_cards") if row.get("family_id")}
+
+
+def summary_dict(payload: dict[str, Any]) -> dict[str, Any]:
+    summary = payload.get("summary", {})
+    return summary if isinstance(summary, dict) else {}
+
+
+def gates_dict(payload: dict[str, Any]) -> dict[str, Any]:
+    gates = payload.get("gates", {})
+    return gates if isinstance(gates, dict) else {}
 
 
 def registry_families(registry: dict[str, Any]) -> list[dict[str, Any]]:
@@ -255,41 +302,133 @@ def family_rankings(registry: dict[str, Any], matrix: dict[str, Any]) -> list[di
     return ranked
 
 
-def family_rankings_from_queue(queue: dict[str, Any]) -> list[dict[str, Any]]:
+def overlay_claim_stage(rolling_status: str, uncertainty: dict[str, Any], live_sources: list[Any]) -> str:
+    if rolling_status == "rolling_champion":
+        return "rolling_champion_not_field_validated"
+    if bool(uncertainty.get("robust_repeat_uncertainty_gate_passed")):
+        return "robust_repeat_window_candidate_not_field_validated"
+    if bool(uncertainty.get("repeat_candidate_gate_passed")):
+        return "repeat_window_candidate_not_field_validated"
+    if rolling_status in {"triple_source_candidate", "single_run_candidate"}:
+        return "live_replay_candidate_needs_repeat"
+    if live_sources:
+        return "live_replay_ready_not_field_validated"
+    return "registry_design_only"
+
+
+def overlay_evidence_status(rolling_status: str, uncertainty: dict[str, Any], fallback: str) -> str:
+    if rolling_status == "rolling_champion":
+        return "rolling_champion_repeat_live_context_not_field_validated"
+    if bool(uncertainty.get("robust_repeat_uncertainty_gate_passed")):
+        return "robust_repeat_window_candidate_not_field_validated"
+    if rolling_status == "triple_source_candidate":
+        return "triple_source_live_candidate_needs_repeat_run"
+    if rolling_status == "single_run_candidate":
+        return "single_run_candidate_needs_more_sources_or_repeat"
+    if bool(uncertainty.get("repeat_candidate_gate_passed")):
+        return "repeat_window_candidate_not_field_validated"
+    return fallback or "registry_candidate_not_validated"
+
+
+def overlay_asset_score(row: dict[str, Any], rolling: dict[str, Any], uncertainty: dict[str, Any], proof_card: dict[str, Any]) -> float:
+    score = safe_float(row.get("priority_score"))
+    rolling_status = norm_id(rolling.get("status") or row.get("rolling_gate_status"))
+    source_count = safe_int(rolling.get("source_count"), len(row.get("live_measured_sources", []) or []))
+    delta = safe_float(rolling.get("latest_score_delta_vs_named_baseline"))
+    if rolling_status == "rolling_champion":
+        score += 70.0
+    elif rolling_status == "triple_source_candidate":
+        score += 35.0
+    elif rolling_status == "single_run_candidate":
+        score += 12.0
+    if bool(uncertainty.get("robust_repeat_uncertainty_gate_passed")):
+        score += 60.0
+    elif bool(uncertainty.get("repeat_candidate_gate_passed")):
+        score += 25.0
+    if proof_card:
+        score += 20.0
+    score += min(source_count * 3.0, 30.0)
+    if delta > 0:
+        score += min(delta * 100.0, 25.0)
+    if row.get("lane") == "market_signal_geometry":
+        score -= 20.0
+    return round(score, 3)
+
+
+def family_rankings_from_queue(
+    queue: dict[str, Any],
+    rolling: dict[str, Any] | None = None,
+    uncertainty: dict[str, Any] | None = None,
+    proof_to_pilot: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
     queue_rows = queue.get("family_queue", [])
     if not isinstance(queue_rows, list) or not queue_rows:
         return []
+    rolling_map = rolling_by_family(rolling or {})
+    uncertainty_map = uncertainty_by_family(uncertainty or {})
+    proof_map = proof_cards_by_family(proof_to_pilot or {})
     rows = []
     for row in queue_rows:
         if not isinstance(row, dict):
             continue
         family_id = norm_id(row.get("family_id"))
+        rolling_row = rolling_map.get(family_id, {})
+        uncertainty_row = uncertainty_map.get(family_id, {})
+        proof_card = proof_map.get(family_id, {})
+        rolling_status = norm_id(rolling_row.get("status") or row.get("rolling_gate_status") or "not_in_rolling_gate")
+        live_sources = row.get("live_measured_sources", []) or []
         rows.append(
             {
                 "family": family_id,
                 "label": row.get("label", family_id),
                 "lane": row.get("lane", ""),
                 "status": row.get("status", ""),
-                "asset_score": float(row.get("priority_score", 0.0) or 0.0),
-                "evidence_status": row.get("evidence_status", "registry_candidate_not_validated"),
-                "rolling_gate_status": row.get("rolling_gate_status", "not_in_rolling_gate"),
-                "rolling_gate_repeat_live_win_count": int(row.get("rolling_gate_repeat_live_win_count", 0) or 0),
-                "rolling_gate_distinct_run_hash_count": int(row.get("rolling_gate_distinct_run_hash_count", 0) or 0),
-                "claim_stage": (
-                    "live_replay_candidate_needs_repeat"
-                    if row.get("rolling_gate_status") in {"triple_source_candidate", "single_run_candidate"}
-                    else "live_replay_ready_not_field_validated"
-                    if row.get("live_measured_sources")
-                    else "registry_design_only"
+                "asset_score": overlay_asset_score(row, rolling_row, uncertainty_row, proof_card),
+                "evidence_status": overlay_evidence_status(
+                    rolling_status,
+                    uncertainty_row,
+                    row.get("evidence_status", "registry_candidate_not_validated"),
                 ),
+                "rolling_gate_status": rolling_status,
+                "rolling_gate_repeat_live_win_count": safe_int(
+                    rolling_row.get("repeat_live_win_count"),
+                    safe_int(row.get("rolling_gate_repeat_live_win_count")),
+                ),
+                "rolling_gate_distinct_run_hash_count": safe_int(
+                    rolling_row.get("distinct_run_hash_count"),
+                    safe_int(row.get("rolling_gate_distinct_run_hash_count")),
+                ),
+                "rolling_latest_score_delta_vs_named_baseline": rolling_row.get("latest_score_delta_vs_named_baseline"),
+                "rolling_source_count": safe_int(rolling_row.get("source_count"), len(live_sources)),
+                "rolling_sources": rolling_row.get("sources", []),
+                "claim_stage": overlay_claim_stage(rolling_status, uncertainty_row, live_sources),
                 "natural_logic": row.get("natural_logic", ""),
                 "benchmark_hypothesis": row.get("benchmark_hypothesis", ""),
                 "first_test": row.get("first_test", ""),
                 "promotion_metric": row.get("promotion_metric", ""),
                 "failure_mode": row.get("failure_mode", ""),
-                "lane_operational_proof_score": float(row.get("priority_score", 0.0) or 0.0),
-                "lane_measured_source_count": len(row.get("live_measured_sources", []) or []),
+                "lane_operational_proof_score": safe_float(row.get("priority_score")),
+                "lane_measured_source_count": len(live_sources),
                 "lane_blocked_sources": row.get("context_only_sources", []),
+                "uncertainty_stage": uncertainty_row.get("evidence_stage", ""),
+                "robust_repeat_uncertainty_gate_passed": bool(
+                    uncertainty_row.get("robust_repeat_uncertainty_gate_passed")
+                ),
+                "repeat_candidate_gate_passed": bool(uncertainty_row.get("repeat_candidate_gate_passed")),
+                "uncertainty_lower_95_delta": (
+                    uncertainty_row.get("delta_stats", {}).get("normal_t_lower_95_delta")
+                    if isinstance(uncertainty_row.get("delta_stats"), dict)
+                    else None
+                ),
+                "uncertainty_sign_test_p": uncertainty_row.get("one_sided_sign_test_p_value"),
+                "uncertainty_windows": uncertainty_row.get("window_count"),
+                "uncertainty_wins": uncertainty_row.get("win_count"),
+                "paid_pilot_ready": bool(proof_card),
+                "pilot_name": proof_card.get("pilot_name", ""),
+                "manual_outreach_allowed": bool(proof_card.get("claim_gate", {}).get("manual_outreach_allowed"))
+                if isinstance(proof_card.get("claim_gate"), dict)
+                else False,
+                "unlock_conditions": proof_card.get("unlock_conditions", []),
                 "ready_for_field_validation_claim": False,
                 "ready_for_real_dollar_claim": False,
                 "kraken_live_execution_allowed": False,
@@ -314,6 +453,8 @@ def category_champions(lanes: list[dict[str, Any]], families: list[dict[str, Any
     triple_source = [row for row in families if row.get("rolling_gate_status") == "triple_source_candidate"]
     single_run = [row for row in families if row.get("rolling_gate_status") == "single_run_candidate"]
     rolling = [row for row in families if row.get("rolling_gate_status") == "rolling_champion"]
+    robust = [row for row in families if row.get("robust_repeat_uncertainty_gate_passed")]
+    paid_pilot = [row for row in families if row.get("paid_pilot_ready")]
     harmonic = [row for row in lanes if row["lane"] == "wave_resonance_timing"]
     market = [row for row in lanes if row["lane"] == "market_signal_geometry"]
     return {
@@ -322,10 +463,66 @@ def category_champions(lanes: list[dict[str, Any]], families: list[dict[str, Any
         "generated_benchmark_delta_champion": generated[0] if generated else {},
         "proof_value_champion": proof[0] if proof else by_family_status.get("proof_value_champion_not_performance_claim", {}),
         "strict_rolling_champion": rolling[0] if rolling else {},
+        "robust_repeat_candidate": robust[0] if robust else {},
+        "paid_pilot_scoping_candidate": paid_pilot[0] if paid_pilot else {},
         "strict_triple_source_candidate": triple_source[0] if triple_source else {},
         "strict_single_run_candidate": single_run[0] if single_run else {},
         "harmonic_phase_lock_candidate": harmonic[0] if harmonic else {},
         "market_lane_status": market[0] if market else {},
+    }
+
+
+def strongest_rolling_proxy(rolling: dict[str, Any], family_id: str) -> dict[str, Any]:
+    for row in rows_from(rolling, "promotion_board"):
+        if norm_id(row.get("family_id")) == family_id:
+            return row
+    return {}
+
+
+def champion_of_champions_section(
+    families: list[dict[str, Any]],
+    rolling: dict[str, Any],
+    truth: dict[str, Any],
+) -> dict[str, Any]:
+    by_family = {row["family"]: row for row in families}
+    rolling_rows = [row for row in families if row.get("rolling_gate_status") == "rolling_champion"]
+    robust_rows = [row for row in rolling_rows if row.get("robust_repeat_uncertainty_gate_passed")]
+    strongest_current = robust_rows[0] if robust_rows else (rolling_rows[0] if rolling_rows else (families[0] if families else {}))
+    return {
+        "strongest_current": strongest_current,
+        "best_buyer_pilot_card": by_family.get("brachistochrone_descent", {}),
+        "best_harmonic_candidate": by_family.get("kuramoto_phase_coupling", {}),
+        "best_thermal_candidate": by_family.get("thermal_plume_convection", {}),
+        "best_branching_next_candidate": by_family.get("leaf_veins", by_family.get("crack_propagation_paths", {})),
+        "strongest_money_proxy": strongest_rolling_proxy(rolling, "phase_locked_residual_corrector"),
+        "safe_estimated_value_signal": {
+            "hourly_usd": summary_dict(truth).get("safe_estimated_hourly_value_usd", 0),
+            "annual_usd": summary_dict(truth).get("safe_estimated_annual_value_usd", 0),
+            "language": "Estimated under assumptions only; not field validation, revenue, ROI, or realized savings.",
+        },
+        "blocked_context_value_surface": {
+            "annual_usd": summary_dict(truth).get("blocked_context_annual_value_usd", 0),
+            "language": "Context-only opportunity surface; blocked from dollar claims until field validation and accepted economics exist.",
+        },
+    }
+
+
+def current_truth_gates(truth: dict[str, Any]) -> dict[str, Any]:
+    gates = gates_dict(truth)
+    return {
+        "live_data_available_for_benchmarking": bool(gates.get("live_data_available_for_benchmarking")),
+        "rolling_champion_present": bool(gates.get("rolling_champion_present")),
+        "bounded_estimated_value_claim_allowed": bool(gates.get("bounded_estimated_value_claim_allowed")),
+        "paid_pilot_scoping_allowed": bool(gates.get("paid_pilot_scoping_allowed")),
+        "field_validation_claim_allowed": False,
+        "real_dollar_savings_claim_allowed": False,
+        "fixed_dollar_delta_sale_claim_allowed": False,
+        "live_trading_or_autonomous_execution_allowed": False,
+        "vps_domain_live_dashboard_routed": bool(gates.get("vps_domain_live_dashboard_routed")),
+        "all_registered_families_live_benchmarked": bool(gates.get("all_registered_families_live_benchmarked")),
+        "all_families_have_benchmark_specs": bool(gates.get("all_families_have_benchmark_specs")),
+        "glyph_or_external_vault_routed": bool(gates.get("glyph_or_external_vault_routed")),
+        "triple_dataset_frozen_assets_present": bool(gates.get("triple_dataset_frozen_assets_present")),
     }
 
 
@@ -335,78 +532,104 @@ def build_board() -> dict[str, Any]:
     frontier = read_json(FRONTIER_JSON)
     gate = read_json(REVIEWER_GATE_JSON)
     queue = read_json(QUEUE_JSON)
+    rolling = read_json(ROLLING_GATE_JSON)
+    uncertainty = read_json(UNCERTAINTY_JSON)
+    proof_to_pilot = read_json(PROOF_TO_PILOT_JSON)
+    truth = read_json(TRUTH_SWEEP_JSON)
+    claim_map = read_json(CLAIM_MAP_JSON)
 
     lane_rows = lane_rankings(matrix)
-    family_rows = family_rankings_from_queue(queue) or family_rankings(registry, matrix)
+    family_rows = family_rankings_from_queue(queue, rolling, uncertainty, proof_to_pilot) or family_rankings(registry, matrix)
     blocked = reviewer_blocked_sources(gate)
     summary_matrix = matrix.get("summary", {}) if isinstance(matrix.get("summary"), dict) else {}
+    truth_summary = summary_dict(truth)
+    rolling_summary = summary_dict(rolling)
+    truth_gates = current_truth_gates(truth)
     registry_cross_lane = bool(registry.get("cross_lane_ranking_allowed"))
 
-    return {
+    payload = {
         "generated_utc": now_utc(),
         "schema": "geometry_champion_of_champions_v1",
-        "purpose": "Rank geometry lanes and families for the next proof-building sprint without treating cross-lane rankings as field validation.",
+        "purpose": "Rank geometry lanes and families for the next proof-building sprint using the latest live truth gates without treating cross-lane rankings as field validation.",
         "global_performance_champion_allowed": False,
         "cross_lane_ranking_policy": "Cross-lane ranking is allowed only as an operational proof-build priority, not as a scientific global winner claim.",
         "registry_cross_lane_ranking_allowed": registry_cross_lane,
         "summary": {
-            "lane_count": len(registry_lanes(registry)),
-            "family_count": len(registry_families(registry)),
+            "lane_count": truth_summary.get("registered_lane_count", len(registry_lanes(registry))),
+            "family_count": truth_summary.get("registered_family_count", len(registry_families(registry))),
             "ranked_lane_count": len(lane_rows),
             "ranked_family_count": len(family_rows),
-            "live_measured_sources": summary_matrix.get("live_source_measured_count", 0),
-            "live_total_measured_rows": summary_matrix.get("total_measured_rows", 0),
+            "live_measured_sources": truth_summary.get("measured_sources", summary_matrix.get("live_source_measured_count", 0)),
+            "live_total_measured_rows": truth_summary.get("total_measured_rows", summary_matrix.get("total_measured_rows", 0)),
+            "adapter_replay_count": truth_summary.get("adapter_replay_count", 0),
+            "candidate_beats_named_baseline_count": truth_summary.get("candidate_beats_named_baseline_count", 0),
             "reviewer_packet_ready": bool(gate.get("ready_for_reviewer_packet")),
             "ready_for_field_validation_claim": False,
             "ready_for_real_dollar_claim": False,
             "kraken_live_execution_allowed": False,
+            "bounded_estimated_value_claim_allowed": truth_gates["bounded_estimated_value_claim_allowed"],
+            "paid_pilot_scoping_allowed": truth_gates["paid_pilot_scoping_allowed"],
+            "safe_estimated_hourly_value_usd": truth_summary.get("safe_estimated_hourly_value_usd", 0),
+            "safe_estimated_annual_value_usd": truth_summary.get("safe_estimated_annual_value_usd", 0),
+            "blocked_context_annual_value_usd": truth_summary.get("blocked_context_annual_value_usd", 0),
+            "vault_packet_ready": bool(truth_summary.get("vault_packet_ready")),
+            "vault_packet_dir": truth_summary.get("vault_packet_dir", ""),
+            "vault_hashes_verified": bool(truth_summary.get("vault_hashes_verified")),
+            "benchmark_specified_family_count": truth_summary.get("benchmark_specified_family_count", 0),
             "blocked_or_thin_sources": blocked,
-            "strict_rolling_champion_count": int(queue.get("promotion_gate", {}).get("strict_rolling_champion_count", 0) or 0)
-            if isinstance(queue.get("promotion_gate"), dict)
-            else 0,
-            "triple_source_candidate_count": int(queue.get("promotion_gate", {}).get("triple_source_candidate_count", 0) or 0)
-            if isinstance(queue.get("promotion_gate"), dict)
-            else 0,
-            "single_run_candidate_count": int(queue.get("promotion_gate", {}).get("single_run_candidate_count", 0) or 0)
-            if isinstance(queue.get("promotion_gate"), dict)
-            else 0,
+            "strict_rolling_champion_count": rolling_summary.get(
+                "rolling_champion_count",
+                truth_summary.get("rolling_champion_count", 0),
+            ),
+            "robust_repeat_candidate_count": truth_summary.get("robust_repeat_candidate_count", 0),
+            "triple_source_candidate_count": rolling_summary.get(
+                "triple_source_candidate_count",
+                truth_summary.get("triple_source_candidate_count", 0),
+            ),
+            "single_run_candidate_count": rolling_summary.get(
+                "single_run_candidate_count",
+                truth_summary.get("single_run_candidate_count", 0),
+            ),
             "claim_boundary": (
                 "This board ranks what to validate next. It does not establish field validation, "
                 "real-dollar savings, trading profit, universal superiority, or award certainty."
             ),
         },
+        "current_truth_gates": truth_gates,
+        "champion_of_champions": champion_of_champions_section(family_rows, rolling, truth),
         "category_champions": category_champions(lane_rows, family_rows),
         "lane_rankings": lane_rows,
         "family_asset_rankings": family_rows,
+        "external_rolling_candidates": rows_from(rolling, "promotion_board"),
         "top_assets_to_build_now": [
             {
-                "asset": "Live multi-source regime replay",
-                "lane": "time_series_model_routing",
-                "why": "It has the strongest fresh live-source wiring and the cleanest proof-chain leverage.",
-                "claim_limit": "Replay priority, not field validation.",
+                "asset": "Brachistochrone constrained-routing proof card",
+                "lane": "optimal_curve_transport",
+                "why": "It is the only current robust repeat-window candidate and the strongest buyer-authorized pilot target.",
+                "claim_limit": "Repeat live-context candidate; not field validation or realized savings.",
             },
             {
                 "asset": "Harmonic phase-lock proof card",
                 "lane": "wave_resonance_timing",
-                "why": "Kuramoto/PLL/Kalman comparisons are the clearest way to test the harmonic thesis on oscillatory systems.",
-                "claim_limit": "Generated champion plus live wiring; needs frozen live replay and uncertainty intervals.",
+                "why": "Kuramoto/PLL/Kalman comparisons are the clearest way to test the harmonic thesis on oscillatory systems, and the family is now a repeat live-context rolling champion.",
+                "claim_limit": "Needs more holdout windows and a stronger uncertainty gate before field validation language.",
             },
             {
-                "asset": "Brachistochrone optimal-curve proof card",
-                "lane": "optimal_curve_transport",
-                "why": "It has the largest generated benchmark delta and a clean visual/math explanation.",
-                "claim_limit": "Software benchmark only until tested on fresh frozen path windows.",
+                "asset": "Energy price pressure money-proxy replay",
+                "lane": "energy_price_pressure_proxy",
+                "why": "It has the largest current named-baseline delta, but it is still a proxy and needs buyer or agency economics before money claims.",
+                "claim_limit": "Bounded estimated value only; not realized savings.",
             },
             {
                 "asset": "Critical-infrastructure branching transport proof card",
                 "lane": "branching_transport",
-                "why": "Crack/branching logic maps directly to resilience, outage localization, flow, and avoided-loss language.",
-                "claim_limit": "Proof-value champion, not performance winner; NREL remains blocked.",
+                "why": "Leaf-vein and crack/branching logic maps directly to resilience, outage localization, flow, and avoided-loss language.",
+                "claim_limit": "Candidate only until repeat windows and uncertainty pass.",
             },
             {
                 "asset": "Thermal ventilation and datacenter cooling proof card",
                 "lane": "thermal_ventilation",
-                "why": "EIA plus NOAA makes this the clearest hardware-energy wedge once live replay is run.",
+                "why": "It is a rolling champion but has too few source types for robust promotion; it is the clearest hardware-energy wedge once source depth improves.",
                 "claim_limit": "Needs real or partner thermal baselines before dollar claims.",
             },
         ],
@@ -417,13 +640,26 @@ def build_board() -> dict[str, Any]:
             "Report uncertainty intervals and multiple-comparison controls across tested families.",
             "Obtain a partner, agency, or independent reviewer confirmation before calling it field validation.",
         ],
+        "required_next_wiring": [
+            "Route dashboard/data/geometry_champion_of_champions.json and field_money_truth_sweep.json to the live VPS/domain and verify hosted hashes.",
+            "Convert brachistochrone_descent and kuramoto_phase_coupling proof cards into grant appendices with the same claim gates.",
+            "Add benchmark specs for the remaining registered families until all_families_have_benchmark_specs is true.",
+            "Build adapters for high-value unbenchmarked families before claiming broad family coverage.",
+            "Acquire buyer or agency authorized field data before any field-validation or real-dollar savings claim.",
+        ],
         "inputs": {
             "registry": str(REGISTRY_JSON.relative_to(ROOT)).replace("\\", "/"),
             "geometry_live_wiring_matrix": str(MATRIX_JSON.relative_to(ROOT)).replace("\\", "/"),
             "geometry_proof_frontier_board": str(FRONTIER_JSON.relative_to(ROOT)).replace("\\", "/"),
             "reviewer_evidence_gate": str(REVIEWER_GATE_JSON.relative_to(ROOT)).replace("\\", "/"),
             "geometry_live_breadth_proof_queue": str(QUEUE_JSON.relative_to(ROOT)).replace("\\", "/"),
+            "rolling_champion_gate": str(ROLLING_GATE_JSON.relative_to(ROOT)).replace("\\", "/"),
+            "geometry_repeat_uncertainty_report": str(UNCERTAINTY_JSON.relative_to(ROOT)).replace("\\", "/"),
+            "proof_to_pilot_control_room": str(PROOF_TO_PILOT_JSON.relative_to(ROOT)).replace("\\", "/"),
+            "field_money_truth_sweep": str(TRUTH_SWEEP_JSON.relative_to(ROOT)).replace("\\", "/"),
+            "claim_strength_value_unlock_map": str(CLAIM_MAP_JSON.relative_to(ROOT)).replace("\\", "/"),
             "frontier_schema": frontier.get("schema", ""),
+            "claim_map_schema": claim_map.get("schema", ""),
         },
         "outputs": {
             "json": str(OUT_JSON.relative_to(ROOT)).replace("\\", "/"),
@@ -431,15 +667,24 @@ def build_board() -> dict[str, Any]:
             "markdown": str(OUT_MD.relative_to(ROOT)).replace("\\", "/"),
         },
     }
+    payload["board_sha256"] = hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return payload
 
 
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     champions = payload["category_champions"]
+    truth_gates = payload.get("current_truth_gates", {})
+    coc = payload.get("champion_of_champions", {})
+    strongest = coc.get("strongest_current", {}) if isinstance(coc, dict) else {}
+    money_proxy = coc.get("strongest_money_proxy", {}) if isinstance(coc, dict) else {}
     lines = [
         "# Geometry Champion Of Champions",
         "",
         f"Generated UTC: `{payload['generated_utc']}`",
+        f"Board SHA-256: `{payload.get('board_sha256', '')}`",
         "",
         "## Boundary",
         "",
@@ -451,17 +696,48 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Lanes ranked: {summary['ranked_lane_count']} / {summary['lane_count']}",
         f"- Live measured sources: {summary['live_measured_sources']}",
         f"- Live measured rows: {summary['live_total_measured_rows']}",
+        f"- Live adapter replays: {summary['adapter_replay_count']}",
+        f"- Candidate beats named baseline count: {summary['candidate_beats_named_baseline_count']}",
         f"- Reviewer packet ready: `{str(summary['reviewer_packet_ready']).lower()}`",
         f"- Ready for field-validation claim: `{str(summary['ready_for_field_validation_claim']).lower()}`",
         f"- Ready for real-dollar claim: `{str(summary['ready_for_real_dollar_claim']).lower()}`",
         f"- Kraken live execution allowed: `{str(summary['kraken_live_execution_allowed']).lower()}`",
+        f"- Bounded estimated value claim allowed: `{str(summary['bounded_estimated_value_claim_allowed']).lower()}`",
+        f"- Paid pilot scoping allowed: `{str(summary['paid_pilot_scoping_allowed']).lower()}`",
+        f"- Safe estimated value signal: `${summary['safe_estimated_hourly_value_usd']:,.0f}/hour`, `${summary['safe_estimated_annual_value_usd']:,.0f}/year` under assumptions",
+        f"- Blocked context-only value surface: `${summary['blocked_context_annual_value_usd']:,.0f}/year`",
+        f"- Vault packet ready: `{str(summary['vault_packet_ready']).lower()}`",
+        f"- Vault hashes verified: `{str(summary['vault_hashes_verified']).lower()}`",
         f"- Strict rolling champions: `{summary['strict_rolling_champion_count']}`",
+        f"- Robust repeat candidates: `{summary['robust_repeat_candidate_count']}`",
         f"- Triple-source candidates: `{summary['triple_source_candidate_count']}`",
         f"- Single-run candidates: `{summary['single_run_candidate_count']}`",
         "",
-        "## Category Champions",
+        "## Current Truth Gates",
         "",
     ]
+    for key, value in truth_gates.items():
+        lines.append(f"- {key}: `{str(value).lower()}`")
+    lines.extend(
+        [
+            "",
+            "## Strongest Current Read",
+            "",
+            f"- Strongest current candidate: `{strongest.get('family', '')}` ({strongest.get('lane', '')})",
+            f"- Evidence status: `{strongest.get('evidence_status', '')}`",
+            f"- Claim stage: `{strongest.get('claim_stage', '')}`",
+            f"- Robust repeat gate: `{str(strongest.get('robust_repeat_uncertainty_gate_passed', False)).lower()}`",
+            f"- Paid pilot ready: `{str(strongest.get('paid_pilot_ready', False)).lower()}`",
+            f"- Strongest money proxy: `{money_proxy.get('family_id', '')}` ({money_proxy.get('lane', '')}) delta `{money_proxy.get('latest_score_delta_vs_named_baseline', '')}`",
+            "",
+        ]
+    )
+    lines.extend(
+        [
+        "## Category Champions",
+        "",
+        ]
+    )
     for name, row in champions.items():
         if not isinstance(row, dict) or not row:
             continue
@@ -494,6 +770,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         )
     lines.extend(["", "## Field Validation Requirements", ""])
     lines.extend(f"- {item}" for item in payload["field_validation_requirements"])
+    lines.extend(["", "## Required Next Wiring", ""])
+    lines.extend(f"- {item}" for item in payload["required_next_wiring"])
     lines.extend(["", "## Blocked Or Thin Sources", ""])
     for source in summary["blocked_or_thin_sources"]:
         lines.append(f"- `{source}`")
