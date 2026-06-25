@@ -250,6 +250,15 @@
     <section id="cards" class="cards" aria-label="Top proof cards"></section>
 
     <section class="panel wide" style="margin-top: 14px;">
+      <h2>Paid Pilot Outreach Queue</h2>
+      <p style="margin-top: 8px;">
+        Ranked manual outreach targets generated from the current proof cards.
+        This queue is for reviewed-contact selection only; it is not a send engine.
+      </p>
+      <ul id="outreachQueue" class="artifact-list"></ul>
+    </section>
+
+    <section class="panel wide" style="margin-top: 14px;">
       <h2>Artifact Health</h2>
       <ul id="artifacts" class="artifact-list"></ul>
     </section>
@@ -257,6 +266,7 @@
 
   <script>
     const FEED_PATH = "data/proof_to_pilot_control_room.json";
+    const OUTREACH_QUEUE_PATH = "data/paid_pilot_outreach_queue.json";
 
     const metricDefs = [
       ["family_count", "Geometry Families"],
@@ -373,7 +383,51 @@
       }).join("");
     }
 
-    function render(payload) {
+    function renderOutreachQueue(payload) {
+      const queue = (payload.queue || []).slice(0, 8);
+      const summary = payload.summary || {};
+      const gate = payload.send_gate || {};
+      const gateSummary = `
+        <li class="gate">
+          <span>Queue rows / top target</span>
+          <strong class="ok">${asText(summary.queue_count)} / ${asText(summary.top_ranked_target)}</strong>
+        </li>
+        <li class="gate">
+          <span>Bulk email allowed</span>
+          <strong class="${gate.bulk_email_allowed ? "ok" : "blocked"}">${asText(gate.bulk_email_allowed)}</strong>
+        </li>
+        <li class="gate">
+          <span>Contact scraping allowed</span>
+          <strong class="${gate.contact_scraping_allowed ? "ok" : "blocked"}">${asText(gate.contact_scraping_allowed)}</strong>
+        </li>
+        <li class="gate">
+          <span>Send without user review allowed</span>
+          <strong class="${gate.send_without_user_review_allowed ? "ok" : "blocked"}">${asText(gate.send_without_user_review_allowed)}</strong>
+        </li>
+      `;
+      const rows = queue.map((row) => `
+        <li class="artifact">
+          <span>
+            <strong>${row.rank}. ${row.target_segment}</strong><br />
+            <span class="hash">${row.family_id} / ${row.lane}</span><br />
+            ${row.buyer_role} - ${row.measured_outcome}
+          </span>
+          <strong class="${row.send_now_allowed ? "ok" : "blocked"}">send ${asText(row.send_now_allowed)}</strong>
+        </li>
+      `).join("");
+      byId("outreachQueue").innerHTML = gateSummary + rows;
+    }
+
+    function renderOutreachQueueError(error) {
+      byId("outreachQueue").innerHTML = `
+        <li class="artifact error">
+          <span>Could not load <span class="hash">${OUTREACH_QUEUE_PATH}</span></span>
+          <strong>${error.message}</strong>
+        </li>
+      `;
+    }
+
+    function render(payload, outreachPayload) {
       const summary = payload.summary || {};
       byId("status").innerHTML = `
         <strong class="ok">Feed loaded.</strong>
@@ -384,6 +438,7 @@
       renderGates(summary);
       renderClaimControls(payload);
       renderCards(payload.top_cards);
+      if (outreachPayload) renderOutreachQueue(outreachPayload);
       renderArtifacts(payload.artifact_health);
     }
 
@@ -391,7 +446,16 @@
       try {
         const response = await fetch(FEED_PATH, { cache: "no-store" });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        render(await response.json());
+        const payload = await response.json();
+        let outreachPayload = null;
+        try {
+          const outreachResponse = await fetch(OUTREACH_QUEUE_PATH, { cache: "no-store" });
+          if (!outreachResponse.ok) throw new Error(`HTTP ${outreachResponse.status}`);
+          outreachPayload = await outreachResponse.json();
+        } catch (outreachError) {
+          renderOutreachQueueError(outreachError);
+        }
+        render(payload, outreachPayload);
       } catch (error) {
         byId("status").classList.add("error");
         byId("status").textContent = `Could not load ${FEED_PATH}: ${error.message}`;

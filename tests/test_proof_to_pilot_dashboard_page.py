@@ -12,10 +12,12 @@ def test_proof_to_pilot_dashboard_references_control_room_feed():
 
     assert "Proof To Pilot Control Room" in html
     assert "data/proof_to_pilot_control_room.json" in html
+    assert "data/paid_pilot_outreach_queue.json" in html
     assert "renderSummary" in html
     assert "renderGates" in html
     assert "renderCards" in html
     assert "renderArtifacts" in html
+    assert "renderOutreachQueue" in html
 
 
 def test_proof_to_pilot_dashboard_keeps_claim_gates_visible():
@@ -30,6 +32,8 @@ def test_proof_to_pilot_dashboard_keeps_claim_gates_visible():
         "Fixed-dollar delta claim allowed",
         "Bulk email allowed",
         "Live trading/autonomous execution allowed",
+        "Contact scraping allowed",
+        "Send without user review allowed",
     ]
 
     for gate in required_gates:
@@ -44,6 +48,7 @@ def test_proof_to_pilot_dashboard_is_buyer_safe_not_bulk_send_surface():
     assert "does not authorize bulk email" in html
     assert "fixed-dollar frozen-delta claims" in html
     assert "field-validation claims" in html
+    assert "it is not a send engine" in html
 
     forbidden = [
         "live_order_placement",
