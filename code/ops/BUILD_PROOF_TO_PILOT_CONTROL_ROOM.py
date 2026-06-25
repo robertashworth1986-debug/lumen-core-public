@@ -39,6 +39,15 @@ BOUNDARY = (
     "award certainty, bulk email permission, live trading, or autonomous operational execution."
 )
 
+DEFAULT_UNLOCK_CONDITIONS = [
+    "buyer-authorized field data",
+    "pre-registered holdout windows",
+    "buyer-approved economic conversion factors",
+    "baseline and candidate replay under identical constraints",
+    "adverse-outcome and operator-burden guardrails",
+    "signed or otherwise traceable pilot result artifact",
+]
+
 
 def now_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -140,7 +149,7 @@ def build_top_card(
             "pre-register at least 20 holdout windows before replay",
             "run incumbent baselines and candidate under identical constraints",
         ],
-        "unlock_conditions": protocol.get("commercial_claim_unlock_requires", []),
+        "unlock_conditions": protocol.get("commercial_claim_unlock_requires") or DEFAULT_UNLOCK_CONDITIONS,
         "claim_gate": {
             "manual_outreach_allowed": True,
             "paid_evaluation_offer_allowed": True,

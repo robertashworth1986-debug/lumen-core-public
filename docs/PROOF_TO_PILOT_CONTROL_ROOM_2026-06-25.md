@@ -1,6 +1,6 @@
 # Proof To Pilot Control Room
 
-Generated UTC: `2026-06-25T15:01:14.879195+00:00`
+Generated UTC: `2026-06-25T17:18:11.565540+00:00`
 
 This control room aggregates proof-to-pilot readiness. It can support manual reviewed outreach and paid evaluation scoping. It does not prove field validation, realized savings, fixed-dollar frozen-delta value, award certainty, bulk email permission, live trading, or autonomous operational execution.
 
@@ -9,12 +9,12 @@ This control room aggregates proof-to-pilot readiness. It can support manual rev
 - Geometry families ranked: `140`
 - Natural-path families: `137`
 - Natural-path target met: `true`
-- Robust repeat-window candidates: `2`
+- Robust repeat-window candidates: `1`
 - Buyer pilot packets: `2`
 - Manual outreach ready: `2`
 - Commercial stage: `paid_evaluation_scoping_ready_not_field_validated`
 - All chain docs present: `true`
-- Control-room chain SHA-256: `cd61438678aa51b271be9723e0d93bf57ea6a6405155271dcae653f6bd9b8cba`
+- Control-room chain SHA-256: `6d6e8528ad6741e1b3a6b1e75b8eb401fcc24433413df48ed74bbb9cb9f44397`
 
 ## Gates
 
@@ -33,7 +33,7 @@ This control room aggregates proof-to-pilot readiness. It can support manual rev
 - Lane: `optimal_curve_transport`
 - Pilot: Constrained Transport / Routing Replay Pilot
 - Commercial stage: `manual_paid_pilot_outreach_ready`
-- Evidence: 6/6 positive windows, min delta `0.067174`, lower 95 delta `0.070176`, minimum sources `5`.
+- Evidence: 7/7 positive windows, min delta `0.067174`, lower 95 delta `0.072454`, minimum sources `5`.
 - Email subject: `Paid pilot scoping: Constrained Transport / Routing Replay Pilot`
 - Next actions:
   - manually select 5 to 10 reviewed buyer or agency technical contacts
@@ -46,7 +46,7 @@ This control room aggregates proof-to-pilot readiness. It can support manual rev
 - Lane: `wave_resonance_timing`
 - Pilot: Wave / Resonance Timing Forecast Pilot
 - Commercial stage: `manual_paid_pilot_outreach_ready`
-- Evidence: 6/6 positive windows, min delta `0.140311`, lower 95 delta `0.155168`, minimum sources `4`.
+- Evidence: 3/3 positive windows, min delta `0.166195`, lower 95 delta `0.16276`, minimum sources `None`.
 - Email subject: `Paid pilot scoping: Wave / Resonance Timing Forecast Pilot`
 - Next actions:
   - manually select 5 to 10 reviewed buyer or agency technical contacts
@@ -59,10 +59,10 @@ This control room aggregates proof-to-pilot readiness. It can support manual rev
 
 | Artifact | Present | SHA-256 |
 | --- | --- | --- |
-| `docs/GEOMETRY_CHAMPION_ASSET_MAP_2026-06-25.md` | `true` | `b477ed99c28c5f68` |
-| `docs/GEOMETRY_REPEAT_PROOF_VALIDATION_2026-06-25.md` | `true` | `f969678b735721ed` |
-| `docs/GEOMETRY_REPEAT_UNCERTAINTY_REPORT_2026-06-25.md` | `true` | `f2054049037f212b` |
-| `docs/GEOMETRY_FIELD_VALIDATION_PROTOCOL_2026-06-25.md` | `true` | `d991c1c6f285b24a` |
+| `docs/GEOMETRY_CHAMPION_ASSET_MAP_2026-06-25.md` | `true` | `88b8978d0ad4255e` |
+| `docs/GEOMETRY_REPEAT_PROOF_VALIDATION_2026-06-25.md` | `true` | `b50bd11d52903f17` |
+| `docs/GEOMETRY_REPEAT_UNCERTAINTY_REPORT_2026-06-25.md` | `true` | `7aef72261a7d22f8` |
+| `docs/GEOMETRY_FIELD_VALIDATION_PROTOCOL_2026-06-25.md` | `true` | `ecb0c7342c94d30f` |
 | `docs/FIELD_VALIDATION_BUYER_PILOT_PACKET_2026-06-25.md` | `true` | `caf348eadd90ae5f` |
 | `docs/FROZEN_DELTA_BUYER_OUTREACH_PACKET_2026-06-25.md` | `true` | `ca15f394fc41829b` |
 
