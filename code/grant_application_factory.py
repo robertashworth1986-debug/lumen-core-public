@@ -302,9 +302,15 @@ def _days_to_close(close_date: str) -> int:
 
 
 def _program_window_assessment(program: dict[str, Any]) -> dict[str, Any]:
-    deadline_raw = str(program.get("deadline_typical") or "").strip()
+    open_date_raw = str(program.get("open_date") or "").strip()
+    deadline_raw = str(
+        program.get("close_date")
+        or program.get("deadline_typical")
+        or ""
+    ).strip()
     state_raw = str(program.get("current_state") or "").strip()
     state = _norm_text(state_raw)
+    open_date = _parse_date(open_date_raw)
     deadline = _parse_date(deadline_raw)
     source_meta = program.get("source_metadata")
     if not isinstance(source_meta, dict):
@@ -324,6 +330,11 @@ def _program_window_assessment(program: dict[str, Any]) -> dict[str, Any]:
         if deadline is not None
         else None
     )
+    days_until_open = (
+        (open_date.date() - datetime.now(timezone.utc).date()).days
+        if open_date is not None
+        else None
+    )
 
     closed_markers = (
         "closed",
@@ -340,7 +351,9 @@ def _program_window_assessment(program: dict[str, Any]) -> dict[str, Any]:
         return {
             "status": "unavailable",
             "actionable": False,
+            "draftable": False,
             "reason": f"current_state={state_raw or 'unknown'}",
+            "open_date": open_date.date().isoformat() if open_date else None,
             "deadline": deadline.date().isoformat() if deadline else deadline_raw or None,
             "days_remaining": days_remaining,
         }
@@ -348,7 +361,9 @@ def _program_window_assessment(program: dict[str, Any]) -> dict[str, Any]:
         return {
             "status": "expired",
             "actionable": False,
+            "draftable": False,
             "reason": "deadline_passed",
+            "open_date": open_date.date().isoformat() if open_date else None,
             "deadline": deadline.date().isoformat(),
             "days_remaining": days_remaining,
         }
@@ -357,21 +372,36 @@ def _program_window_assessment(program: dict[str, Any]) -> dict[str, Any]:
         return {
             "status": "verification_required",
             "actionable": False,
+            "draftable": False,
             "reason": (
                 "source_never_verified"
                 if verification_age_days is None
                 else f"source_verification_stale_{verification_age_days:.1f}_days"
             ),
+            "open_date": open_date.date().isoformat() if open_date else None,
             "deadline": deadline.date().isoformat() if deadline else deadline_raw or None,
             "days_remaining": days_remaining,
             "source": source_name,
             "source_verified_utc": verified_at.isoformat() if verified_at else None,
         }
+    if days_until_open is not None and days_until_open > 0:
+        return {
+            "status": "upcoming",
+            "actionable": False,
+            "draftable": True,
+            "reason": f"released_for_drafting_opens_{open_date.date().isoformat()}",
+            "open_date": open_date.date().isoformat(),
+            "days_until_open": days_until_open,
+            "deadline": deadline.date().isoformat() if deadline else deadline_raw or None,
+            "days_remaining": days_remaining,
+        }
     if deadline is not None:
         return {
             "status": "open",
             "actionable": True,
+            "draftable": True,
             "reason": "dated_window_open",
+            "open_date": open_date.date().isoformat() if open_date else None,
             "deadline": deadline.date().isoformat(),
             "days_remaining": days_remaining,
         }
@@ -379,7 +409,9 @@ def _program_window_assessment(program: dict[str, Any]) -> dict[str, Any]:
         return {
             "status": "open",
             "actionable": True,
+            "draftable": True,
             "reason": f"current_state={state_raw}",
+            "open_date": open_date.date().isoformat() if open_date else None,
             "deadline": deadline_raw or None,
             "days_remaining": None,
         }
@@ -387,14 +419,18 @@ def _program_window_assessment(program: dict[str, Any]) -> dict[str, Any]:
         return {
             "status": "verification_required",
             "actionable": False,
+            "draftable": False,
             "reason": "rolling_window_requires_current_source_verification",
+            "open_date": open_date.date().isoformat() if open_date else None,
             "deadline": deadline_raw,
             "days_remaining": None,
         }
     return {
         "status": "verification_required",
         "actionable": False,
+        "draftable": False,
         "reason": "no_verified_open_window",
+        "open_date": open_date.date().isoformat() if open_date else None,
         "deadline": deadline_raw or None,
         "days_remaining": None,
     }
@@ -500,6 +536,77 @@ def _measured_breadth_summary() -> dict[str, Any]:
         "provenance": {
             "runtime_probe": _file_provenance(DATA_BREADTH_PROBE_PATH),
             "dataset_catalog": _file_provenance(DATASET_CATALOG_PATH),
+        },
+    }
+
+
+def _latest_breadth_benchmark_summary() -> dict[str, Any]:
+    root = OUT / "master_universe_v2"
+    latest_path = root / "latest.txt"
+    if not latest_path.exists():
+        return {"available": False}
+    run_utc = latest_path.read_text(encoding="utf-8").strip()
+    summary_path = root / run_utc / "summary.json"
+    summary = _read_or_none(summary_path) or {}
+    datasets = summary.get("datasets") if isinstance(summary.get("datasets"), dict) else {}
+    hashes = [
+        str(meta.get("raw_sha256"))
+        for meta in datasets.values()
+        if isinstance(meta, dict) and meta.get("raw_sha256")
+    ]
+    distinct_hashes = len(set(hashes))
+    dependencies = (
+        summary.get("model_dependencies")
+        if isinstance(summary.get("model_dependencies"), dict)
+        else {}
+    )
+    return {
+        "available": bool(summary),
+        "run_utc": run_utc,
+        "claim_scope": "dependency_verified_single_holdout_breadth_benchmark",
+        "attempted_series": _safe_int(summary.get("n_datasets_in_universe"), 0) or 0,
+        "successful_series": _safe_int(summary.get("n_datasets_succeeded"), 0) or 0,
+        "distinct_raw_sha256": distinct_hashes,
+        "duplicate_entries": max(0, len(hashes) - distinct_hashes),
+        "n_models": len(summary.get("models") or []),
+        "n_families": len(summary.get("families") or {}),
+        "model_dependencies": dependencies,
+        "all_dependencies_available": bool(dependencies) and all(
+            bool(status.get("available"))
+            for status in dependencies.values()
+            if isinstance(status, dict)
+        ),
+        "family_win_counts": summary.get("family_win_counts", {}),
+        "harmonic_win_rate": summary.get("harmonic_win_rate"),
+        "harmonic_median_margin_pct": summary.get("harmonic_median_margin_pct"),
+        "validation_design": summary.get("validation_design", {}),
+        "submission_grade_v7": bool(
+            (summary.get("validation_design") or {}).get("submission_grade_v7")
+        ),
+        "provenance": {
+            "summary": _file_provenance(summary_path),
+            "manifest": _file_provenance(root / run_utc / "manifest.sha256.json"),
+        },
+    }
+
+
+def _latest_research_artifact_summary(
+    artifact_name: str,
+) -> dict[str, Any]:
+    root = OUT / artifact_name
+    latest_path = root / "latest.txt"
+    if not latest_path.exists():
+        return {"available": False}
+    run_utc = latest_path.read_text(encoding="utf-8").strip()
+    summary_path = root / run_utc / "summary.json"
+    summary = _read_or_none(summary_path) or {}
+    return {
+        "available": bool(summary),
+        "run_utc": run_utc,
+        "summary": summary,
+        "provenance": {
+            "summary": _file_provenance(summary_path),
+            "manifest": _file_provenance(root / run_utc / "manifest.sha256.json"),
         },
     }
 
@@ -1155,8 +1262,8 @@ def build_evidence_summary(utc: str) -> dict:
         "benchmark": {
             "n_datasets": n_total,
             "claim_scope": "frozen_benchmark_evaluated_series",
-            "n_models": 9,
-            "n_families": 5,
+            "n_models": len(v2.get("models") or []),
+            "n_families": len(v2.get("families") or {}),
             "family_win_counts": fwc,
             "harmonic_win_rate": v2.get("harmonic_win_rate"),
             "harmonic_median_margin_pct": v2.get("harmonic_median_margin_pct"),
@@ -1168,6 +1275,8 @@ def build_evidence_summary(utc: str) -> dict:
             "win_rate": rs.get("win_rates", {}).get("router"),
             "median_rel_rmse_vs_oracle":
                 rs.get("median_rel_rmse_vs_oracle", {}).get("router"),
+            "evidence_status": "legacy_exploratory_temporal_leakage_detected",
+            "submission_claim_allowed": False,
         },
         "hybrid_stacker": {
             "router_wins": ss.get("win_counts", {}).get("router"),
@@ -1176,6 +1285,8 @@ def build_evidence_summary(utc: str) -> dict:
                 ss.get("beats_v2_oracle", {}).get("j_sarima_plus_harmonic"),
             "k_beats_v2_oracle":
                 ss.get("beats_v2_oracle", {}).get("k_linear_plus_harmonic"),
+            "evidence_status": "legacy_exploratory_target_leakage_detected",
+            "submission_claim_allowed": False,
         },
         "ci_calibration": {
             "mean_cov80": cov.get("mean_cov80"),
@@ -1201,6 +1312,9 @@ def build_evidence_summary(utc: str) -> dict:
             "n_variance_break": regime.get("n_with_variance_regime_break"),
             "params": regime.get("params"),
         },
+        "latest_breadth_benchmark": _latest_breadth_benchmark_summary(),
+        "hybrid_edge_v7": _latest_research_artifact_summary("hybrid_edge_v7"),
+        "harbor_sentinel": _latest_research_artifact_summary("harbor_sentinel"),
         "measured_breadth": _measured_breadth_summary(),
         "active_registry": _registry_layer_summary(),
     }
@@ -1255,6 +1369,10 @@ def _dataset_artifact_maps(utc: str) -> dict[str, Any]:
 
 
 def build_program_spotlights(program: dict, utc: str, max_items: int = 6) -> list[dict[str, Any]]:
+    if str(program.get("topic_number") or "").startswith("NV"):
+        # The current frozen universe has no representative maritime or defense
+        # track data. Generic energy/market spotlights would weaken topic fit.
+        return []
     maps = _dataset_artifact_maps(utc)
     dataset_meta = maps["dataset_meta"]
     anomaly_map = maps["anomaly_map"]
@@ -1471,11 +1589,16 @@ def score_eligibility(program: dict, profile: dict, evidence: dict) -> dict:
         eligible = False
 
     window = _program_window_assessment(program)
-    if not window.get("actionable"):
+    if not window.get("actionable") and not window.get("draftable"):
         eligible = False
         gaps.append(
             "Opportunity is not currently actionable: "
             f"{window.get('status')} ({window.get('reason')})"
+        )
+    elif window.get("status") == "upcoming":
+        reasons.append(
+            "Opportunity is released for drafting and opens "
+            f"{window.get('open_date')} ({window.get('days_until_open')} days)"
         )
     else:
         reasons.append(
@@ -1551,6 +1674,24 @@ def render_project_summary(
     rt = L["meta_router"]
     cal = L["ci_calibration"]
     breadth = L.get("measured_breadth", {})
+    latest_breadth = L.get("latest_breadth_benchmark", {})
+    hybrid_v7 = L.get("hybrid_edge_v7", {})
+    hybrid_summary = hybrid_v7.get("summary", {})
+    harbor = L.get("harbor_sentinel", {})
+    harbor_summary = harbor.get("summary", {})
+    harbor_aggregate = harbor_summary.get("aggregate", {})
+    harbor_headline = ""
+    if program.get("topic_number") == "NV063" and harbor.get("available"):
+        harbor_headline = (
+            f"- **HarborSentinel synthetic validation:** run "
+            f"`{harbor.get('run_utc')}` achieved mean F1 "
+            f"{harbor_aggregate.get('f1_mean', 0):.3f}, mean precision "
+            f"{harbor_aggregate.get('precision_mean', 0):.3f}, and mean recall "
+            f"{harbor_aggregate.get('recall_mean', 0):.3f} using at most "
+            f"{harbor_aggregate.get('maximum_algorithmic_state_bytes_per_track')} "
+            f"bytes of algorithmic state per track. This is synthetic software "
+            f"evidence, not field performance.\n"
+        )
     n = ben.get("n_datasets") or "—"
     rt_rate = rt.get("win_rate")
     rt_pct = f"{rt_rate*100:.1f}%" if isinstance(rt_rate, (int, float)) else "—"
@@ -1612,27 +1753,45 @@ def render_project_summary(
         f"(d/b/a {profile['company']['dba']})  \n"
         f"**PI:** {profile['pi']['name']}, {profile['pi']['title']}\n\n"
         f"## Innovation\n"
-        f"LumenCore™ ships a production, evidence-chained time-series forecasting "
-        f"stack that solves the hardest problem in operational forecasting: "
+        f"LumenCore™ is an evidence-chained time-series forecasting research and "
+        f"prototype stack that addresses a central problem in operational "
+        f"forecasting: "
         f"**no single model family wins everywhere**. We fix this with a "
-        f"per-dataset family meta-router that selects the right model for each "
-        f"series, plus six independent evidence layers — all SHA-256 verifiable, "
-        f"all reproducible from one frozen benchmark.\n\n"
+        f"past-only evidence gate that activates bounded model corrections only "
+        f"when recent validation supports them, plus independently hashed "
+        f"benchmark and prototype artifacts.\n\n"
         f"## Headline results (frozen run `{ev['run_utc']}`)\n"
         f"- **{n} frozen benchmark series** evaluated head-to-head across 9 "
         f"models in 5 families.\n"
+        f"- **Scale extension:** dependency-verified run "
+        f"`{latest_breadth.get('run_utc')}` evaluated "
+        f"{latest_breadth.get('successful_series')} series with "
+        f"{latest_breadth.get('distinct_raw_sha256')} distinct raw hashes. "
+        f"This is single-holdout breadth evidence, not V7 walk-forward proof.\n"
         f"- **Measured data breadth:** {breadth.get('artifacts_measured', 0):,} physical/archive "
         f"artifacts measured, {breadth.get('parse_ok_count', 0):,} parsed successfully, "
         f"covering {breadth.get('rows_total', 0):,} rows. This catalog is broader than, "
         f"and is not represented as identical to, the frozen benchmark or live feeds.\n"
-        f"- **Meta-router evaluation:** {rt.get('wins')}/{rt.get('n')} "
-        f"series-level wins ({rt_pct}); median rel-RMSE vs oracle = "
-        f"{rt.get('median_rel_rmse_vs_oracle')}.\n"
-        f"- **Calibrated uncertainty:** 80% bands cover {c80s} empirically; 95% "
+        f"- **Legacy router audit:** the historical {rt.get('wins')}/"
+        f"{rt.get('n')} result is retained for traceability but excluded from "
+        f"submission performance claims because the audit found temporal "
+        f"feature leakage.\n"
+        f"- **Leakage-resistant V7 validation:** run "
+        f"`{hybrid_v7.get('run_utc')}` evaluated "
+        f"{hybrid_summary.get('datasets_evaluated')} untouched validation "
+        f"series; median MAE improvement was "
+        f"{hybrid_summary.get('median_mae_improvement_pct')}% and "
+        f"{hybrid_summary.get('robust_datasets')} datasets passed the full "
+        f"robustness gate. Negative results are preserved rather than promoted "
+        f"into a universal forecasting claim.\n"
+        + harbor_headline
+        + f"- **Calibrated uncertainty:** 80% bands cover {c80s} empirically; 95% "
         f"bands cover {c95s} (target 80% / 95%).\n"
-        f"- **Anomaly scanner:** {L['anomaly_scanner'].get('n_with_2sigma')}/"
-        f"{L['anomaly_scanner'].get('n_datasets')} datasets flagged ≥2σ in the "
-        f"holdout window — early-warning candidates.\n"
+        f"- **Legacy anomaly inventory:** "
+        f"{L['anomaly_scanner'].get('n_with_2sigma')}/"
+        f"{L['anomaly_scanner'].get('n_datasets')} datasets were flagged ≥2σ "
+        f"in the historical holdout scan. Because that scan used the legacy "
+        f"router, it is exploratory rather than submission performance proof.\n"
         f"- **Regime-shift detector:** {L['regime_shift'].get('n_with_break')}/"
         f"{L['regime_shift'].get('n_datasets')} datasets carry mean-shift breaks "
         f"(CUSUM δ=0.5, h=5); {L['regime_shift'].get('n_recent')} broke in the "
@@ -1658,6 +1817,12 @@ def render_technical_volume(
     L = ev["layers"]
     rg = L["regime_shift"]
     bl = L["stacking_blender"]
+    breadth_benchmark = L.get("latest_breadth_benchmark", {})
+    hybrid_v7 = L.get("hybrid_edge_v7", {})
+    hybrid_summary = hybrid_v7.get("summary", {})
+    harbor = L.get("harbor_sentinel", {})
+    harbor_summary = harbor.get("summary", {})
+    harbor_aggregate = harbor_summary.get("aggregate", {})
     weights = bl.get("avg_blend_weights") or {}
     weights_lines = "\n".join(
         f"  - {k}: avg weight {v:.3f}" for k, v in
@@ -1667,40 +1832,134 @@ def render_technical_volume(
     spotlight_section = ""
     if spotlight_lines:
         spotlight_section = (
-            "## 2B. Program-targeted dataset findings\n"
+            "## Program-targeted dataset findings\n"
             "These dataset-level findings were selected to align with the current opportunity's sector and agency framing:\n"
             + "\n".join(spotlight_lines)
             + "\n\n"
         )
+    strategy = (
+        program.get("proposal_strategy")
+        if isinstance(program.get("proposal_strategy"), dict)
+        else {}
+    )
+    phase_i_plan = strategy.get("phase_i_plan") or []
+    metrics = strategy.get("metrics") or []
+    risks = strategy.get("risks") or []
+    topic_section = ""
+    milestones_section = (
+        "- M1 (month 1): Freeze the current 1,500+ distinct-series benchmark and "
+        "publish its provenance, deduplication, missingness, and failure audit.\n"
+        "- M2 (month 2): Upgrade the breadth run to at least five untouched "
+        "walk-forward folds with nested model selection and corrected comparisons.\n"
+        "- M3 (month 3): Ship live REST + WebSocket API for forecast "
+        "streaming; SLA <200ms p95 cold latency.\n"
+        "- M4 (month 4): Run a representative-domain pilot with pre-registered "
+        "baselines and acceptance metrics.\n"
+        "- M5 (month 5): Reproducibility audit by an independent reviewer "
+        "using only the SHA-256 evidence chain.\n"
+        "- M6 (month 6): Phase I final report + Phase II proposal package.\n"
+    )
+    anticipated_section = (
+        "- Preserve and quality-audit the current 1,500+ distinct-series breadth benchmark.\n"
+        "- Empirical 80% / 95% band coverage within +/-2 percentage points of nominal.\n"
+        "- All deliverables packaged with SHA-256 manifests and a documented failure register.\n"
+    )
+    problem_statement = (
+        "Operational forecasting in critical infrastructure suffers model "
+        "brittleness, miscalibrated uncertainty, and silent regime shifts. "
+        "A credible system must expose these failures and abstain when its "
+        "evidence is weak."
+    )
+    novelty_lines = profile.get("differentiators", [])
+    preliminary_evidence_section = ""
+    if program.get("topic_number") == "NV063" and harbor.get("available"):
+        problem_statement = (
+            "Navy watch teams must identify meaningful deviations across "
+            "congested AIS, ADS-B, and radar-like tracks without retaining a "
+            "massive historical database or flooding operators with opaque "
+            "alerts. The Phase I question is whether compact streaming "
+            "pattern-of-life state and cross-sensor consistency tests can "
+            "deliver timely, explainable alerts under route, kinematic, "
+            "dropout, spoofing-like, and concept-drift conditions."
+        )
+        novelty_lines = [
+            "Compact per-track pattern-of-life state rather than a retained massive historical database",
+            "Cross-sensor AIS/ADS-B and radar-like consistency checks with explicit reason codes",
+            "Confidence-scored alerts with bounded memory and operator-visible evidence",
+            "Frozen scenario seeds, failure cases, and SHA-256 manifests for independent reproduction",
+        ]
+        preliminary_evidence_section = (
+            "## 2B. Preliminary synthetic software evidence\n"
+            f"Frozen run `{harbor.get('run_utc')}` evaluated "
+            f"{harbor_summary.get('configuration', {}).get('scenarios')} "
+            "deterministic scenarios with fused AIS/ADS-B and radar-like "
+            "observations, including route deviation, loitering, speed burst, "
+            "sharp turn, beacon silence, and beacon spoof events. Mean "
+            f"precision was {harbor_aggregate.get('precision_mean', 0):.3f}, "
+            f"mean recall was {harbor_aggregate.get('recall_mean', 0):.3f}, "
+            f"mean F1 was {harbor_aggregate.get('f1_mean', 0):.3f}, and the "
+            "fixed-rule baseline mean F1 was "
+            f"{harbor_aggregate.get('baseline_f1_mean', 0):.3f}. Event recall "
+            f"was {harbor_aggregate.get('event_recall_mean', 0):.3f} with a "
+            "median detection delay of "
+            f"{harbor_aggregate.get('median_detection_delay_steps')} step. "
+            "Every alert included a reason and confidence, and compact state "
+            "was bounded at "
+            f"{harbor_aggregate.get('maximum_algorithmic_state_bytes_per_track')} "
+            "bytes per track.\n\n"
+            "**Evidence boundary.** This is a synthetic software benchmark. It "
+            "does not establish operational harbor, sensor, SSDS, adversarial, "
+            "or field performance. Phase I must repeat the study on "
+            "representative public and government-furnished data with frozen "
+            "acceptance thresholds and independent review.\n\n"
+        )
+    if strategy:
+        topic_section = (
+            "## 2A. Topic-specific concept\n"
+            f"**Problem.** {strategy.get('problem', program.get('topic_area'))}\n\n"
+            f"**Innovation.** {strategy.get('innovation', 'A scoped, testable Phase I prototype.')}\n\n"
+            "**Phase I plan.**\n"
+            + "\n".join(f"- {item}" for item in phase_i_plan)
+            + "\n\n**Risks and mitigations.**\n"
+            + "\n".join(f"- {item}" for item in risks)
+            + "\n\n"
+        )
+        milestones_section = "\n".join(
+            f"- M{index + 1}: {item}" for index, item in enumerate(phase_i_plan)
+        ) + "\n"
+        anticipated_section = "\n".join(f"- {item}" for item in metrics) + "\n"
 
     return (
         f"# Technical Volume\n\n"
         f"## 1. Problem statement\n"
-        f"Operational forecasting in critical infrastructure (electricity, "
-        f"financial, supply chain) suffers three coupled failures:\n"
-        f"1. **Model brittleness** — every estimator has datasets where it loses "
-        f"badly; users pick one and live with the worst case.\n"
-        f"2. **Uncertainty theatre** — point forecasts ship with bands that are "
-        f"either wildly miscalibrated or never reported at all.\n"
-        f"3. **Silent regime shifts** — when the data-generating process changes, "
-        f"models keep predicting yesterday's world.\n\n"
-        f"## 2. Approach (seven verifiable layers)\n\n"
+        + problem_statement
+        + "\n\n"
+        f"## 2. Approach and verifiable evidence\n\n"
+        f"**Breadth benchmark.** The latest dependency-verified breadth run "
+        f"`{breadth_benchmark.get('run_utc')}` contains "
+        f"{breadth_benchmark.get('successful_series')} successful series and "
+        f"{breadth_benchmark.get('distinct_raw_sha256')} distinct raw SHA-256 "
+        f"hashes across {breadth_benchmark.get('n_models')} models and "
+        f"{breadth_benchmark.get('n_families')} families. It uses a single "
+        f"chronological holdout and is scale evidence, not V7 multi-fold "
+        f"walk-forward proof.\n\n"
         f"**Layer 1 — Master benchmark.** {L['benchmark'].get('n_datasets')} "
-        f"frozen benchmark series × 9 models × 5 families: baseline, harmonic, neural, "
-        f"tree, classical. Walk-forward 80/20 split per dataset. RMSE per "
+        f"frozen benchmark series × {L['benchmark'].get('n_models')} models × "
+        f"{L['benchmark'].get('n_families')} families: baseline, harmonic, neural, "
+        f"tree, classical. Chronological 80/20 holdout per dataset. RMSE per "
         f"(dataset, model). Frozen output: SHA-256 chain in "
         f"`out/master_universe_v2/<UTC>/manifest.sha256.json`.\n\n"
-        f"**Layer 2 — Meta-router.** A 16-feature random-forest classifier "
-        f"learns which family wins on each series. Features include trend "
-        f"slope, harmonic-12 strength, seasonality FFT energy, autocorr at "
-        f"k=1..12, hurst exponent, std-of-diffs. Result: "
-        f"{L['meta_router'].get('wins')}/{L['meta_router'].get('n')} wins, "
-        f"median rel-RMSE vs oracle = {L['meta_router'].get('median_rel_rmse_vs_oracle')}.\n\n"
-        f"**Layer 3 — Hybrid stacker.** Eight strategies head-to-head, "
-        f"including two novel hybrids: SARIMA + harmonic-residual ("
-        f"beats v2-oracle on {L['hybrid_stacker'].get('j_beats_v2_oracle')} "
-        f"datasets) and Linear+harmonic-residual (beats on "
-        f"{L['hybrid_stacker'].get('k_beats_v2_oracle')}).\n\n"
+        f"**Layer 2 — Legacy router audit.** The historical random-forest "
+        f"router and its {L['meta_router'].get('wins')}/"
+        f"{L['meta_router'].get('n')} headline are retained only as exploratory "
+        f"history. The current audit found that full-series features included "
+        f"the outer holdout period, so this number is not used as submission "
+        f"performance evidence.\n\n"
+        f"**Layer 3 — Legacy hybrid audit.** Historical hybrid-oracle counts "
+        f"are also excluded from claims because the downstream router was fit "
+        f"using target-dataset outcome labels. The architectures remain Phase I "
+        f"candidates, but they must earn their place under nested past-only "
+        f"selection.\n\n"
         f"**Layer 4 — CI calibration.** σ·√h residual-bootstrap bands. "
         f"Empirical coverage: 80% target → "
         f"{L['ci_calibration'].get('mean_cov80')*100:.1f}% actual; "
@@ -1708,40 +1967,165 @@ def render_technical_volume(
         f"**Layer 5 — NNLS stacking blender.** Convex non-negative least-squares "
         f"weights over five family champions, fit on a holdout slice of training. "
         f"Average blend weights:\n{weights_lines}\n\n"
-        f"**Layer 6 — Anomaly scanner.** Router-picked champion forecasts every "
-        f"series; |z| against σ·√h bands flags points >2σ as anomalies. "
+        f"**Layer 6 — Legacy anomaly inventory.** The historical router-picked "
+        f"champion forecast every series and |z| against σ·√h bands flagged "
+        f"points >2σ. "
         f"{L['anomaly_scanner'].get('n_with_2sigma')}/"
-        f"{L['anomaly_scanner'].get('n_datasets')} datasets flagged.\n\n"
+        f"{L['anomaly_scanner'].get('n_datasets')} datasets flagged. Because "
+        f"the scan depends on the audited legacy router, these counts are "
+        f"retained as exploratory anomaly candidates only.\n\n"
         f"**Layer 7 — Regime-shift detector.** Two-sided CUSUM "
         f"(δ={(rg.get('params') or {}).get('cusum_delta')}, "
         f"h={(rg.get('params') or {}).get('cusum_h')}) on rolling-standardized "
         f"series, plus variance-ratio test. Found "
         f"{rg.get('n_with_break')}/{rg.get('n_datasets')} datasets with "
         f"mean-shift breaks; {rg.get('n_recent')} in the last 12 steps.\n\n"
+        f"**Layer 8 — Leakage-resistant hybrid V7.** Frozen validation run "
+        f"`{hybrid_v7.get('run_utc')}` used expanding outer walk-forward folds, "
+        f"nested past-only selection, a recent-fold confirmation gate, bounded "
+        f"corrections, paired block bootstrap, and immutable manifests across "
+        f"{hybrid_summary.get('datasets_evaluated')} untouched series. Median "
+        f"MAE improvement was "
+        f"{hybrid_summary.get('median_mae_improvement_pct')}%; "
+        f"{hybrid_summary.get('robust_datasets')} datasets passed all robustness "
+        f"gates. This negative result rejects a universal edge claim and "
+        f"supports abstention as a first-class system behavior.\n\n"
+        + topic_section
+        + preliminary_evidence_section
         + spotlight_section
         +
         f"## 3. Why this is novel\n"
-        + "\n".join(f"- {d}" for d in profile.get("differentiators", [])) + "\n\n"
-        f"## 4. Phase {('II' if 'phase_ii' in program['id'] else 'I')} milestones\n"
-        f"- M1 (month 1): Deduplicate the measured artifact catalog and promote "
-        f"at least 1,500 distinct, quality-controlled series into the benchmark.\n"
-        f"- M2 (month 2): Retrain router on expanded universe; target "
-        f"≥55% per-dataset wins.\n"
-        f"- M3 (month 3): Ship live REST + WebSocket API for forecast "
-        f"streaming; SLA <200ms p95 cold latency.\n"
-        f"- M4 (month 4): Pilot integration with one DOE partner laboratory "
-        f"and one private-sector pilot (energy or critical-infrastructure SCADA).\n"
-        f"- M5 (month 5): Reproducibility audit by an independent reviewer "
-        f"using only the SHA-256 evidence chain.\n"
-        f"- M6 (month 6): Phase I final report + Phase II proposal package.\n\n"
-        f"## 5. Anticipated results\n"
-        f"- ≥55% per-dataset family-selection wins on a 1,500-set universe.\n"
-        f"- Empirical 80% / 95% band coverage within ±2pp of nominal.\n"
-        f"- ≥30% reduction in surprise-event misses (anomaly + regime breaks "
-        f"detected before manual operator detection in pilot SCADA logs).\n"
-        f"- All deliverables published with SHA-256 manifests at "
+        + "\n".join(f"- {d}" for d in novelty_lines) + "\n\n"
+        + f"## 4. Phase {('II' if 'phase_ii' in program['id'] else 'I')} milestones\n"
+        + milestones_section
+        + "\n"
+        + f"## 5. Anticipated results\n"
+        + anticipated_section
+        + f"- All deliverables published with SHA-256 manifests at "
         f"https://lumen-core.ai/evidence/.\n"
     )
+
+
+def render_heilmeier_catechism(
+    program: dict[str, Any],
+    profile: dict[str, Any],
+    ev: dict[str, Any],
+) -> str:
+    strategy = (
+        program.get("proposal_strategy")
+        if isinstance(program.get("proposal_strategy"), dict)
+        else {}
+    )
+    risks = strategy.get("risks") or [
+        "Representative data may not capture operational edge cases.",
+        "Latency or scale may reduce quality under mission load.",
+        "Narrow validation could create false confidence.",
+    ]
+    metrics = strategy.get("metrics") or [
+        "Task-specific quality against pre-registered baselines.",
+        "Latency, scalability, calibration, and false-alert controls.",
+        "Reproducibility and operator interpretability.",
+    ]
+    title = strategy.get("title") or (
+        f"{profile['company']['dba']} - {program.get('topic_area')}"
+    )
+    duration = int(program.get("duration_months") or 6)
+    cost_schedule = strategy.get(
+        "cost_schedule",
+        f"A {duration}-month Phase I effort within the solicitation ceiling. "
+        "The final budget will be locked only after the official instructions "
+        "and indirect-rate assumptions are verified.",
+    )
+    risks_text = "\n".join(f"- {item}" for item in risks)
+    metrics_text = "\n".join(f"- {item}" for item in metrics)
+    return f"""# Heilmeier Catechism
+
+## What are you trying to do?
+{strategy.get("today", strategy.get("problem", "Build a scoped Phase I prototype that converts heterogeneous time-series data into reproducible, uncertainty-aware decisions."))}
+
+## How is it done today, and what are the limits?
+{strategy.get("current_practice", "Current workflows are fragmented, manually tuned, difficult to audit, and commonly evaluated on narrow datasets without strong controls for leakage, uncertainty, or operational failure.")}
+
+## What is new in your approach, and why will it succeed?
+{strategy.get("approach", strategy.get("innovation", "The approach combines modular data adapters, regime-aware modeling, constrained optimization, and immutable evidence artifacts so every recommendation can be reproduced and challenged."))}
+
+## Who cares?
+{strategy.get("who_cares", "Government operators and commercial teams that need timely, explainable decisions from noisy multi-source data while preserving human authority and auditability.")}
+
+## If successful, what difference will it make?
+{strategy.get("impact", "Phase I will establish whether the concept improves decision quality, response time, and evidence traceability enough to justify a Phase II operational prototype.")}
+
+## What are the risks and payoffs?
+**Risks**
+{risks_text}
+
+**Payoff**
+{strategy.get("payoff", "A reusable decision-support capability that reduces manual analysis burden and makes model recommendations transparent, testable, and transferable.")}
+
+## How much will it cost, and how long will it take?
+{cost_schedule}
+
+## What are the midterm and final exams?
+**Midterm:** {strategy.get("midterm", "Freeze requirements, baselines, datasets, and the evaluation protocol; demonstrate an end-to-end prototype on representative simulated or public data.")}
+
+**Final:** {strategy.get("final", "Deliver the prototype, controlled benchmark results, uncertainty analysis, failure register, reproducibility package, and Phase II transition plan.")}
+
+**Primary measures**
+{metrics_text}
+
+## Working Title
+{title}
+
+## Evidence Boundary
+The current evidence run `{ev["run_utc"]}` supports software capability, reproducible benchmarking, orchestration, and audit artifacts. It does not establish profitable live trading, completed government deployment, or guaranteed mission impact.
+"""
+
+
+def render_benchmark_breadth_addendum(ev: dict[str, Any]) -> str:
+    breadth = ev["layers"].get("latest_breadth_benchmark", {})
+    wins = breadth.get("family_win_counts") or {}
+    dependencies = breadth.get("model_dependencies") or {}
+    dependency_lines = "\n".join(
+        f"- {model}: {status.get('package')} {status.get('version')} "
+        f"(available={status.get('available')})"
+        for model, status in dependencies.items()
+        if isinstance(status, dict)
+    )
+    win_lines = "\n".join(
+        f"- {family}: {count} series"
+        for family, count in wins.items()
+    )
+    harmonic_rate = breadth.get("harmonic_win_rate")
+    harmonic_pct = (
+        f"{float(harmonic_rate) * 100:.1f}%"
+        if isinstance(harmonic_rate, (int, float))
+        else "not available"
+    )
+    return f"""# Benchmark Breadth Addendum
+
+## Dependency-Verified Scale Result
+- Run: `{breadth.get("run_utc")}`
+- Attempted series: {breadth.get("attempted_series")}
+- Successful series: {breadth.get("successful_series")}
+- Distinct raw SHA-256 hashes: {breadth.get("distinct_raw_sha256")}
+- Duplicate entries excluded from the distinct count: {breadth.get("duplicate_entries")}
+- Models: {breadth.get("n_models")}
+- Families: {breadth.get("n_families")}
+- Required premium dependencies available: {breadth.get("all_dependencies_available")}
+
+## Dependency Record
+{dependency_lines}
+
+## Family Winners
+{win_lines}
+
+The harmonic family won {harmonic_pct} of successful series. This result is reported without a superiority claim because no model family won everywhere.
+
+## Validation Boundary
+This run uses a single chronological 80/20 holdout per series. It demonstrates acquisition scale, dependency integrity, frozen inputs, and broad family comparison. It is not the V7 multi-fold walk-forward, surrogate-test, and multiple-comparison-controlled proof required for a submission-grade universal performance claim.
+
+The coherent seven-layer evidence run remains `{ev["run_utc"]}`. The breadth run supplements that evidence; it does not replace or silently merge with it.
+"""
 
 
 def render_commercialization(program: dict, profile: dict, ev: dict) -> str:
@@ -1794,18 +2178,64 @@ def render_budget(program: dict, profile: dict) -> dict:
     ceiling = int(program.get("ceiling_usd") or 200_000)
     months = int(program.get("duration_months") or 6)
     pi_loaded_rate_per_month = 18_500
-    pi_total = min(
-        pi_loaded_rate_per_month * months,
-        int(ceiling * 0.42),
+
+    def allocate_period(amount: int, period_months: int) -> dict[str, int]:
+        pi_total = min(
+            pi_loaded_rate_per_month * period_months,
+            int(amount * 0.42),
+        )
+        fringe = int(pi_total * 0.27)
+        travel = min(7_500, int(amount * 0.03))
+        cloud = min(15_000, int(amount * 0.08))
+        materials = min(5_000, int(amount * 0.02))
+        consultants = int(amount * 0.12)
+        committed = (
+            pi_total + fringe + travel + cloud + materials + consultants
+        )
+        return {
+            "pi_salary": pi_total,
+            "fringe_benefits_27pct": fringe,
+            "indirect_costs_provisional": max(0, amount - committed),
+            "travel_conferences": travel,
+            "cloud_compute": cloud,
+            "materials_supplies": materials,
+            "consultants_subawards": consultants,
+        }
+
+    structure = (
+        program.get("budget_structure")
+        if isinstance(program.get("budget_structure"), dict)
+        else {}
     )
-    fringe = int(pi_total * 0.27)
-    travel = min(7_500, int(ceiling * 0.03))
-    cloud = min(15_000, int(ceiling * 0.08))
-    materials = min(5_000, int(ceiling * 0.02))
-    consultants = int(ceiling * 0.12)
-    committed = pi_total + fringe + travel + cloud + materials + consultants
-    indirect = max(0, ceiling - committed)
-    total = committed + indirect
+    periods: dict[str, Any] = {}
+    if structure:
+        base_amount = int(structure.get("base_max_usd") or 0)
+        option_amount = int(structure.get("option_max_usd") or 0)
+        base_months = int(structure.get("base_months") or 0)
+        option_months = int(structure.get("option_months") or 0)
+        periods = {
+            "phase_i_base": {
+                "months": base_months,
+                "ceiling_usd": base_amount,
+                "categories": allocate_period(base_amount, base_months),
+            },
+            "phase_i_option": {
+                "months": option_months,
+                "ceiling_usd": option_amount,
+                "categories": allocate_period(option_amount, option_months),
+            },
+        }
+        categories = {
+            name: sum(
+                int(period["categories"].get(name, 0))
+                for period in periods.values()
+            )
+            for name in periods["phase_i_base"]["categories"]
+        }
+        total = base_amount + option_amount
+    else:
+        categories = allocate_period(ceiling, months)
+        total = sum(categories.values())
     if total != ceiling:
         raise RuntimeError(
             f"budget allocator invariant failed: total={total} ceiling={ceiling}"
@@ -1813,21 +2243,21 @@ def render_budget(program: dict, profile: dict) -> dict:
     return {
         "ceiling_usd": ceiling,
         "duration_months": months,
-        "categories": {
-            "pi_salary": pi_total,
-            "fringe_benefits_27pct": fringe,
-            "indirect_costs_provisional": indirect,
-            "travel_conferences": travel,
-            "cloud_compute": cloud,
-            "materials_supplies": materials,
-            "consultants_subawards": consultants,
-        },
+        "categories": categories,
+        "periods": periods,
         "total": total,
         "notes": [
             "PI rate is a planning assumption; final salary and effort must match payroll and solicitation rules.",
             "Cloud compute covers GPU training + on-demand FastAPI hosting.",
             "Indirect costs are a balancing planning reserve, not a claimed negotiated rate; validate the allowed base and rate before submission.",
             "Consultants/subawards require quotes, scopes, and solicitation-specific allowability review.",
+            (
+                "Navy Phase I Base and Option costs are separated in the "
+                "periods object; the Base and Option each cover exactly six "
+                "months."
+                if periods
+                else "No separate Base/Option structure is configured."
+            ),
         ],
     }
 
@@ -1840,11 +2270,12 @@ def render_cover_letter(program: dict, profile: dict, ev: dict) -> str:
         f"Re: SBIR / Topic — {program.get('topic_area')}\n\n"
         f"Dear Selection Committee,\n\n"
         f"{profile['company']['legal_name']} respectfully submits this proposal "
-        f"under {program['program']}. Our LumenCore™ stack is a production, "
-        f"evidence-chained forecasting platform with seven independent, "
-        f"SHA-256-verifiable measurement layers — built on "
+        f"under {program['program']}. Our LumenCore™ stack is an "
+        f"evidence-chained research and prototype platform with independently "
+        f"SHA-256-verifiable measurement layers, built on "
         f"{ev['layers']['benchmark'].get('n_datasets')} frozen benchmark series and "
-        f"validated end-to-end before this submission was assembled.\n\n"
+        f"the topic-specific validation boundaries stated in the technical "
+        f"volume.\n\n"
         f"Every quantitative claim in the attached package resolves to a "
         f"public manifest entry at https://lumen-core.ai/evidence/runs/"
         f"{ev['run_utc']}/. Reviewers can independently rebuild any number, "
@@ -1880,6 +2311,14 @@ def render_application_md(program: dict, profile: dict, ev: dict, budget: dict) 
     ]
     for cat, amt in budget["categories"].items():
         parts.append(f"| {cat.replace('_', ' ').title()} | ${amt:,} |")
+    if budget.get("periods"):
+        parts.append("\n## Base and Option separation\n")
+        for period_name, period in budget["periods"].items():
+            label = period_name.replace("_", " ").title()
+            parts.append(
+                f"- **{label}:** ${period['ceiling_usd']:,} over "
+                f"{period['months']} months"
+            )
     parts.append("\n## Budget notes\n" + "\n".join(f"- {n}" for n in budget["notes"]))
     parts.append("\n---\n")
     parts.append("# Key Personnel\n")
@@ -1927,43 +2366,74 @@ def _is_nsf_sbir(program: dict[str, Any]) -> bool:
 def render_nsf_project_pitch(program: dict, profile: dict, ev: dict) -> str:
     benchmark = ev["layers"]["benchmark"]
     breadth = ev["layers"].get("measured_breadth", {})
-    return (
-        f"# NSF Project Pitch - {profile['company']['dba']}\n\n"
-        f"## 1. Technology innovation\n"
-        f"LumenCore is an evidence-chained forecasting and decision platform that "
-        f"tests multiple model families per time series, routes each series to the "
-        f"best-performing family, calibrates uncertainty empirically, and detects "
-        f"anomalies and regime changes. The technical risk is whether model-family "
-        f"selection and uncertainty calibration can remain reliable across sectors "
-        f"without hiding weak cases behind a single aggregate score.\n\n"
-        f"## 2. Technical objectives and challenges\n"
-        f"Phase I will: (1) deduplicate and quality-rank the measured data catalog; "
-        f"(2) expand the current frozen benchmark of "
-        f"{benchmark.get('n_datasets')} evaluated series; (3) run leakage-resistant "
-        f"walk-forward validation and calibration; (4) quantify failure modes by "
-        f"sector and regime; and (5) expose signed evidence artifacts through a "
-        f"reviewable API. The local catalog currently measures "
-        f"{breadth.get('artifacts_measured', 0):,} artifacts and "
-        f"{breadth.get('rows_total', 0):,} rows, but those counts are not claimed "
-        f"as distinct live feeds or benchmarked series.\n\n"
-        f"## 3. Market opportunity\n"
-        f"Initial customers are operators that need auditable forecasts rather than "
-        f"opaque point predictions: energy and infrastructure teams, regulated data "
-        f"operations, and enterprise risk groups. The commercialization test is a "
-        f"paid pilot in which LumenCore is measured against the customer's incumbent "
-        f"forecast and alert workflow on accuracy, calibration, latency, and operator "
-        f"time saved.\n\n"
-        f"## 4. Company and team\n"
-        f"{profile['company']['legal_name']} is a U.S.-owned small business led by "
-        f"{profile['pi']['name']}, {profile['pi']['title']}. The current system includes "
-        f"data ingestion, multi-family forecasting, uncertainty calibration, anomaly "
-        f"detection, signed evidence manifests, and deployed API surfaces. Phase I "
-        f"funding would convert the research stack into a repeatable, independently "
-        f"validated product with documented security and deployment controls.\n\n"
-        f"## Submission status\n"
-        f"This file is a draft for the NSF Project Pitch gate. It does not claim an "
-        f"NSF invitation or authorization to submit a full proposal.\n"
+    latest_breadth = ev["layers"].get("latest_breadth_benchmark", {})
+    return f"""# NSF Project Pitch - {profile['company']['dba']}
+
+## 1. Technology innovation
+Most forecasting products select one model class, optimize a single average error score, and attach confidence bands that are not tested when the data-generating process changes. That design can look strong in aggregate while failing badly on the exact series or regime an operator cares about.
+
+LumenCore's proposed innovation is an evidence-chained, per-series decision architecture that treats model selection, uncertainty calibration, and regime change as one research problem. Multiple model families compete on chronological evidence; a meta-learner estimates which family is appropriate for a new series; conformal/residual methods calibrate uncertainty by horizon and regime; and a change detector can abstain or re-route when the operating distribution shifts. Every recommendation is linked to frozen inputs, code/configuration identifiers, metrics, and a SHA-256 manifest so weak cases remain visible.
+
+The unproven, high-impact question is whether this architecture can generalize across sectors without leakage or overconfidence. Success would replace opaque "best model" claims with a system that can state which method it selected, why, how uncertain it is, when its assumptions stopped holding, and what evidence supports the decision. The coherent seven-layer run establishes feasibility on {benchmark.get('n_datasets')} frozen evaluated series. A separate dependency-verified breadth run evaluates {latest_breadth.get('successful_series')} series with {latest_breadth.get('distinct_raw_sha256')} distinct raw hashes, but it uses one chronological holdout. Phase I is needed to establish rigorous multi-fold generalization, calibration under shift, and product-level reliability.
+
+## 2. Technical objectives and challenges
+Objective 1 is to convert the current 1,500+ distinct-series breadth benchmark into a quality-controlled V7 research asset. Each series will receive provenance, deduplication, minimum-history, missingness, frequency, and leakage checks. The broader local catalog measures {breadth.get('artifacts_measured', 0):,} artifacts and {breadth.get('rows_total', 0):,} rows, but artifacts will not be counted as benchmark series unless they pass those controls.
+
+Objective 2 is leakage-resistant validation. We will use rolling-origin folds, frozen baselines, nested selection for routing and hyperparameters, bootstrap confidence intervals, and multiple-comparison controls. Results will be reported by sector, horizon, regime, and failure class rather than only as an aggregate win rate.
+
+Objective 3 is uncertainty that remains useful during change. We will compare residual bootstrap and conformal variants, measure empirical coverage and interval width by horizon, and add an abstention policy when calibration or data quality falls outside pre-registered bounds.
+
+Objective 4 is a reproducible API prototype. Each response will include the selected family, forecast distribution, anomaly/regime indicators, confidence and abstention state, data freshness, and evidence identifiers. Acceptance tests will cover deterministic replay, schema/version compatibility, latency, and failure recovery.
+
+The central risks are distribution shift, meta-router overfitting, duplicated or low-quality series, and apparently strong averages hiding sector failures. These are the research targets, not assumptions: Phase I will pre-register baselines and thresholds, preserve negative results, and deliver a failure register alongside the prototype.
+
+## 3. Market opportunity
+The initial customer is an energy, infrastructure, or regulated-data operator that already produces forecasts but cannot easily audit model selection, uncertainty, or behavior after a regime change. Their pain is not the absence of another point forecast; it is the operational cost of manually reconciling models, investigating false alerts, and defending decisions made from weak or poorly calibrated evidence.
+
+LumenCore will enter through paid evaluation pilots. On the customer's historical data, the product will run beside the incumbent workflow and be judged on forecast error, interval coverage, alert precision/recall, abstention quality, latency, reproducibility, and analyst time. The near-term product is an API and deployable service; longer-term markets include energy operations, environmental and public-data forecasting, supply-chain risk, and financial risk analytics.
+
+Competition includes single-family forecasting APIs, AutoML systems, and internal notebooks. LumenCore is differentiated by per-series family routing, shift-aware calibration and abstention, explicit failure reporting, and evidence manifests designed for regulated or high-consequence review.
+
+## 4. Company and team
+{profile['company']['legal_name']} is a U.S.-owned small business led by {profile['pi']['name']}, {profile['pi']['title']}. The founder built the current ingestion, multi-family forecasting, routing, calibration, anomaly/regime detection, execution, API, and evidence-manifest systems and will serve as PI at {profile['pi'].get('employed_pct')}% employment.
+
+The existing stack is a research prototype, not a claim of completed institutional deployment or profitable live performance. Phase I will convert it into a rigorously validated product with frozen evaluation protocols, security documentation, deterministic packaging, customer-facing APIs, and independent reproducibility review.
+
+The principal team gaps are domain-specific pilot access, external statistical review, cybersecurity/compliance review, and product integration support. The Phase I plan reserves scoped consultant/subaward capacity for these functions; named personnel and commitments will be finalized before any full proposal budget or support claim is submitted.
+
+## Submission status
+This is a draft for the NSF Project Pitch gate. It does not claim an NSF invitation or authorization to submit a full proposal.
+"""
+
+
+def nsf_project_pitch_character_counts(project_pitch: str) -> dict[str, Any]:
+    headings = [
+        ("technology_innovation", "## 1. Technology innovation", 3500),
+        ("technical_objectives_and_challenges", "## 2. Technical objectives and challenges", 3500),
+        ("market_opportunity", "## 3. Market opportunity", 1750),
+        ("company_and_team", "## 4. Company and team", 1750),
+    ]
+    counts: dict[str, Any] = {}
+    for index, (key, heading, limit) in enumerate(headings):
+        start = project_pitch.index(heading) + len(heading)
+        end = (
+            project_pitch.index(headings[index + 1][1])
+            if index + 1 < len(headings)
+            else project_pitch.index("## Submission status")
+        )
+        body = project_pitch[start:end].strip()
+        counts[key] = {
+            "characters": len(body),
+            "limit": limit,
+            "within_limit": len(body) <= limit,
+            "remaining": limit - len(body),
+        }
+    counts["all_within_limits"] = all(
+        item["within_limit"]
+        for item in counts.values()
+        if isinstance(item, dict)
     )
+    return counts
 
 
 # ----------------------------------------------------------------------------
@@ -1988,6 +2458,8 @@ def write_bundle(program: dict, profile: dict, ev: dict,
     tech_md = render_technical_volume(program, profile, ev, spotlights=spotlights)
     comm_md = render_commercialization(program, profile, ev)
     cover = render_cover_letter(program, profile, ev)
+    heilmeier = render_heilmeier_catechism(program, profile, ev)
+    breadth_addendum = render_benchmark_breadth_addendum(ev)
     project_pitch = (
         render_nsf_project_pitch(program, profile, ev)
         if _is_nsf_sbir(program)
@@ -1998,8 +2470,21 @@ def write_bundle(program: dict, profile: dict, ev: dict,
     (out_dir / "technical_volume.md").write_text(tech_md, encoding="utf-8")
     (out_dir / "commercialization_plan.md").write_text(comm_md, encoding="utf-8")
     (out_dir / "cover_letter.md").write_text(cover, encoding="utf-8")
+    (out_dir / "HEILMEIER_CATECHISM.md").write_text(
+        heilmeier, encoding="utf-8"
+    )
+    (out_dir / "BENCHMARK_BREADTH_ADDENDUM.md").write_text(
+        breadth_addendum, encoding="utf-8"
+    )
     if project_pitch is not None:
         (out_dir / "PROJECT_PITCH.md").write_text(project_pitch, encoding="utf-8")
+        (out_dir / "PROJECT_PITCH_LIMITS.json").write_text(
+            json.dumps(
+                nsf_project_pitch_character_counts(project_pitch),
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
     (out_dir / "budget.json").write_text(
         json.dumps(budget, indent=2), encoding="utf-8")
 
@@ -2016,9 +2501,15 @@ def write_bundle(program: dict, profile: dict, ev: dict,
         "budget": budget,
         "evidence_summary": ev["layers"],
         "deadline_typical": program.get("deadline_typical"),
+        "open_date": program.get("open_date"),
+        "close_date": program.get("close_date"),
         "ceiling_usd": program.get("ceiling_usd"),
+        "funding_cap_verified": bool(program.get("funding_cap_verified", True)),
         "duration_months": program.get("duration_months"),
         "url": program.get("url"),
+        "topic_number": program.get("topic_number"),
+        "solicitation_number": program.get("solicitation_number"),
+        "compliance": program.get("compliance", []),
         "required_sections_provided": program.get("required_sections", []),
         "page_limits": program.get("page_limits"),
         "source_metadata": program.get("source_metadata", {}),
@@ -2230,6 +2721,11 @@ def main(argv: list[str]) -> int:
                     help="rebuild bundles even if state==approved (preserves "
                          "the approved state and approved_utc; refuses to "
                          "touch already-submitted grants)")
+    ap.add_argument(
+        "--offline",
+        action="store_true",
+        help="use the verified local catalog without a live opportunity scan",
+    )
     args = ap.parse_args(argv)
 
     if args.approve:
@@ -2253,7 +2749,24 @@ def main(argv: list[str]) -> int:
     ev = build_evidence_summary(utc)
 
     catalog_programs = list(catalog["programs"])
-    live_programs, scan_summary = discover_live_programs(profile, catalog_programs)
+    named_catalog_grant = bool(
+        args.grant
+        and any(program.get("id") == args.grant for program in catalog_programs)
+    )
+    if args.offline or named_catalog_grant:
+        live_programs = []
+        scan_summary = {
+            "status": "local_catalog_only",
+            "query_count": 0,
+            "hits_total_unique": 0,
+            "qualified_count": 0,
+            "selected_count": 0,
+        }
+    else:
+        live_programs, scan_summary = discover_live_programs(
+            profile,
+            catalog_programs,
+        )
     print(
         "[factory] opportunity scan: "
         f"queries={scan_summary.get('query_count', 0)} "

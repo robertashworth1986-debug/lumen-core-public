@@ -19,16 +19,20 @@ What this does every 60 seconds:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import os
+import statistics
 import sys
 import time
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_ROOT", str(Path(__file__).resolve().parents[2]))
+).expanduser().resolve()
 CODE = ROOT / "code"
 OUT_FILE = ROOT / "out" / "execution" / "benchmark_beater.json"
 
@@ -96,7 +100,7 @@ def _fib_prox(prices: List[float], lb: int = 55) -> float:
     if rng == 0:
         return 0.0
     p = prices[-1]
-    return min(abs(p - lo + r * rng - p) for r in FIB_RATIOS) / rng  # type: ignore[return-value]
+    return min(abs(p - (lo + r * rng)) for r in FIB_RATIOS) / rng
 
 
 def _bubble_z(prices: List[float], w: int = 50) -> float:
@@ -182,41 +186,68 @@ def fblh_alpha(prices: List[float]) -> Dict[str, float]:
 
 # ─── Strategy simulation ──────────────────────────────────────────────────────
 
-def simulate_vs_benchmark(prices: List[float], lookback_days: int) -> Dict[str, Any]:
+def simulate_vs_benchmark(
+    prices: List[float],
+    lookback_days: int,
+    *,
+    roundtrip_cost_bps: float = 10.0,
+    slippage_bps: float = 2.0,
+    annualization: int = 252,
+) -> Dict[str, Any]:
     """
     Given a price series (daily closes), simulate:
     - Benchmark: buy-and-hold from lookback_days ago to now
     - FBLH strategy: signal-driven long/flat/short
     Returns performance metrics and % edge.
     """
-    n = min(lookback_days + 1, len(prices))
-    window = prices[-n:]
-    if len(window) < 5:
+    if len(prices) < 95:
         return {"ok": False, "reason": "insufficient_data"}
+    start_index = max(90, len(prices) - lookback_days)
+    if len(prices) - start_index < 2:
+        return {"ok": False, "reason": "insufficient_test_bars"}
 
     # --- Benchmark (buy and hold) ---
-    bh_return = (window[-1] - window[0]) / (window[0] + 1e-8)
+    one_side_cost = (roundtrip_cost_bps / 2.0 + slippage_bps) / 10_000.0
+    benchmark_entry = prices[start_index - 1]
+    benchmark_equity = (
+        (1.0 - one_side_cost)
+        * (prices[-1] / (benchmark_entry + 1e-8))
+        * (1.0 - one_side_cost)
+    )
+    bh_return = benchmark_equity - 1.0
 
     # --- FBLH strategy simulation ---
-    strat_returns = []
+    strat_returns: List[float] = []
     position = 0.0  # +1 long, -1 short, 0 flat
     trade_count = 0
-    wins = 0
+    active_bars = 0
+    positive_active_bars = 0
+    total_turnover = 0.0
 
-    for i in range(90, len(window)):
-        sig = fblh_alpha(window[:i])
+    for i in range(start_index, len(prices)):
+        # Signal sees only data through i-1; position changes after bar i closes.
+        sig = fblh_alpha(prices[:i])
         new_pos = {"LONG": 1.0, "SHORT": -1.0, "WATCH": 0.5, "FLAT": 0.0}.get(sig["entry"], 0.0)
-        bar_ret = (window[i] - window[i - 1]) / (window[i - 1] + 1e-8)
-        pnl = position * bar_ret
+        bar_ret = (prices[i] - prices[i - 1]) / (prices[i - 1] + 1e-8)
+        turnover = abs(new_pos - position)
+        execution_cost = turnover * one_side_cost
+        pnl = position * bar_ret - execution_cost
         strat_returns.append(pnl)
-        if new_pos != position and position != 0.0:
-            trade_count += 1
+        if position != 0.0:
+            active_bars += 1
             if pnl > 0:
-                wins += 1
+                positive_active_bars += 1
+        if turnover > 0:
+            trade_count += 1
+            total_turnover += turnover
         position = new_pos
 
     if not strat_returns:
         return {"ok": False, "reason": "no_bars_simulated"}
+    if position != 0.0:
+        strat_returns[-1] -= abs(position) * one_side_cost
+        trade_count += 1
+        total_turnover += abs(position)
 
     # Compound strategy return
     strat_equity = 1.0
@@ -226,7 +257,11 @@ def simulate_vs_benchmark(prices: List[float], lookback_days: int) -> Dict[str, 
 
     alpha_edge = strat_return - bh_return
     beat_pct = alpha_edge * 100.0
-    sharpe = (_mean(strat_returns) / _std(strat_returns) * math.sqrt(252)) if _std(strat_returns) > 0 else 0.0
+    sharpe = (
+        _mean(strat_returns) / _std(strat_returns) * math.sqrt(annualization)
+        if _std(strat_returns) > 0
+        else 0.0
+    )
 
     peak = 1.0
     max_dd = 0.0
@@ -237,7 +272,9 @@ def simulate_vs_benchmark(prices: List[float], lookback_days: int) -> Dict[str, 
         dd = (peak - eq) / peak
         max_dd = max(max_dd, dd)
 
-    win_rate = wins / trade_count if trade_count > 0 else 0.0
+    positive_bar_rate = (
+        positive_active_bars / active_bars if active_bars > 0 else 0.0
+    )
 
     return {
         "ok": True,
@@ -249,7 +286,11 @@ def simulate_vs_benchmark(prices: List[float], lookback_days: int) -> Dict[str, 
         "sharpe_ratio": round(sharpe, 3),
         "max_drawdown_pct": round(max_dd * 100, 3),
         "trade_count": int(trade_count),
-        "win_rate_pct": round(win_rate * 100, 1),
+        "total_turnover": round(total_turnover, 3),
+        "win_rate_pct": round(positive_bar_rate * 100, 1),
+        "win_rate_definition": "positive_net_active_bar_rate",
+        "roundtrip_cost_bps": round(roundtrip_cost_bps, 3),
+        "slippage_bps_per_side": round(slippage_bps, 3),
         "bars_simulated": len(strat_returns),
     }
 
@@ -315,19 +356,42 @@ def fallback_synthetic_prices(symbol: str, days: int = 400) -> List[float]:
 
 # ─── Main snapshot builder ─────────────────────────────────────────────────────
 
-def build_snapshot() -> Dict[str, Any]:
+def build_snapshot(
+    *,
+    allow_synthetic: bool = False,
+    roundtrip_cost_bps: float = 10.0,
+    slippage_bps: float = 2.0,
+) -> Dict[str, Any]:
     generated = datetime.now(timezone.utc)
     results = []
     summary_beats = 0
     summary_total = 0
+    all_live_beats = 0
+    all_live_total = 0
+    core_alpha_edges: List[float] = []
+    core_sharpes: List[float] = []
 
     for bench in BENCHMARKS:
         symbol = bench["symbol"]
         prices = fetch_prices(symbol, days=400)
         source = "yfinance_live"
         if len(prices) < 100:
-            prices = fallback_synthetic_prices(symbol, days=400)
-            source = "synthetic_fallback"
+            if allow_synthetic:
+                prices = fallback_synthetic_prices(symbol, days=400)
+                source = "synthetic_research_only"
+            else:
+                results.append({
+                    "symbol": symbol,
+                    "name": bench["name"],
+                    "asset_class": bench["class"],
+                    "data_source": "unavailable",
+                    "latest_price": None,
+                    "bars_available": len(prices),
+                    "current_signal": None,
+                    "performance_vs_benchmark": {},
+                    "error": "live_data_unavailable_synthetic_disabled",
+                })
+                continue
 
         # Current FBLH signal on full series
         current_sig = fblh_alpha(prices)
@@ -335,12 +399,25 @@ def build_snapshot() -> Dict[str, Any]:
 
         windows_out = {}
         for w in WINDOWS:
-            perf = simulate_vs_benchmark(prices, lookback_days=w)
+            perf = simulate_vs_benchmark(
+                prices,
+                lookback_days=w,
+                roundtrip_cost_bps=roundtrip_cost_bps,
+                slippage_bps=slippage_bps,
+                annualization=365 if bench["class"] == "crypto" else 252,
+            )
             windows_out[f"{w}d"] = perf
-            if perf.get("ok") and perf.get("beating_benchmark"):
-                summary_beats += 1
-            if perf.get("ok"):
-                summary_total += 1
+            eligible_for_headline = source == "yfinance_live"
+            if eligible_for_headline and perf.get("ok"):
+                all_live_total += 1
+                if perf.get("beating_benchmark"):
+                    all_live_beats += 1
+                if w >= 90:
+                    summary_total += 1
+                    core_alpha_edges.append(float(perf.get("alpha_edge_pct", 0.0)))
+                    core_sharpes.append(float(perf.get("sharpe_ratio", 0.0)))
+                    if perf.get("beating_benchmark"):
+                        summary_beats += 1
 
         results.append({
             "symbol": symbol,
@@ -354,11 +431,38 @@ def build_snapshot() -> Dict[str, Any]:
         })
 
     beat_rate_pct = round(summary_beats / summary_total * 100, 1) if summary_total > 0 else 0.0
-    overall_verdict = "BEATING" if beat_rate_pct >= 50 else "TRAILING"
+    all_window_beat_rate_pct = (
+        round(all_live_beats / all_live_total * 100, 1)
+        if all_live_total > 0
+        else 0.0
+    )
+    median_alpha_edge_pct = (
+        round(statistics.median(core_alpha_edges), 3)
+        if core_alpha_edges
+        else 0.0
+    )
+    positive_sharpe_rate_pct = (
+        round(
+            sum(1 for value in core_sharpes if value > 0) / len(core_sharpes) * 100,
+            1,
+        )
+        if core_sharpes
+        else 0.0
+    )
+    if summary_total == 0:
+        overall_verdict = "INSUFFICIENT_LIVE_DATA"
+    elif (
+        beat_rate_pct >= 60.0
+        and median_alpha_edge_pct > 0.0
+        and positive_sharpe_rate_pct >= 60.0
+    ):
+        overall_verdict = "PRELIMINARY_EDGE"
+    else:
+        overall_verdict = "NO_ROBUST_EDGE"
 
     return {
         "generated_utc": generated.isoformat(),
-        "schema": "benchmark_beater_v1",
+        "schema": "benchmark_beater_v2",
         "clock": {
             "unix_ts": int(generated.timestamp()),
             "human": generated.strftime("%Y-%m-%d %H:%M:%S UTC"),
@@ -369,7 +473,26 @@ def build_snapshot() -> Dict[str, Any]:
             "beat_rate_pct": beat_rate_pct,
             "windows_beating": int(summary_beats),
             "windows_total": int(summary_total),
+            "headline_window_policy": "90d_and_365d_only",
+            "all_window_beat_rate_pct": all_window_beat_rate_pct,
+            "all_live_windows_total": all_live_total,
+            "median_alpha_edge_pct": median_alpha_edge_pct,
+            "positive_sharpe_rate_pct": positive_sharpe_rate_pct,
             "yfinance_available": HAS_YF,
+            "synthetic_allowed": allow_synthetic,
+            "headline_uses_live_data_only": True,
+        },
+        "validation": {
+            "chronological_no_lookahead": True,
+            "roundtrip_cost_bps": roundtrip_cost_bps,
+            "slippage_bps_per_side": slippage_bps,
+            "synthetic_results_excluded_from_headline": True,
+            "preliminary_edge_gate": {
+                "core_beat_rate_min_pct": 60.0,
+                "median_alpha_edge_must_be_positive": True,
+                "positive_sharpe_rate_min_pct": 60.0,
+            },
+            "promotion_status": "exploratory_not_live_authorization",
         },
         "benchmarks": results,
     }
@@ -382,9 +505,29 @@ def atomic_write(path: Path, data: Dict[str, Any]) -> None:
     tmp.replace(path)
 
 
-def run_once() -> Dict[str, Any]:
-    snap = build_snapshot()
+def run_once(
+    *,
+    allow_synthetic: bool = False,
+    roundtrip_cost_bps: float = 10.0,
+    slippage_bps: float = 2.0,
+) -> Dict[str, Any]:
+    snap = build_snapshot(
+        allow_synthetic=allow_synthetic,
+        roundtrip_cost_bps=roundtrip_cost_bps,
+        slippage_bps=slippage_bps,
+    )
     atomic_write(OUT_FILE, snap)
+    payload = OUT_FILE.read_bytes()
+    atomic_write(
+        OUT_FILE.with_name("benchmark_beater.manifest.json"),
+        {
+            "generated_utc": snap["generated_utc"],
+            "artifact": OUT_FILE.name,
+            "sha256": hashlib.sha256(payload).hexdigest(),
+            "bytes": len(payload),
+            "validation": snap["validation"],
+        },
+    )
     return snap
 
 
@@ -393,10 +536,21 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--loop", action="store_true", help="Run continuously")
     p.add_argument("--interval", type=int, default=60, help="Refresh interval seconds")
     p.add_argument("--quiet", action="store_true", help="Suppress verbose output")
+    p.add_argument(
+        "--allow-synthetic",
+        action="store_true",
+        help="Research-only fallback; synthetic results never affect the headline",
+    )
+    p.add_argument("--roundtrip-cost-bps", type=float, default=10.0)
+    p.add_argument("--slippage-bps", type=float, default=2.0)
     args = p.parse_args(argv)
 
     def _run():
-        snap = run_once()
+        snap = run_once(
+            allow_synthetic=args.allow_synthetic,
+            roundtrip_cost_bps=args.roundtrip_cost_bps,
+            slippage_bps=args.slippage_bps,
+        )
         h = snap["headline"]
         if not args.quiet:
             verdict = h["overall_verdict"]

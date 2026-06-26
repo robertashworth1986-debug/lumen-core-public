@@ -22,6 +22,7 @@ Usage from grants_api.py:
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -63,6 +64,19 @@ PORTAL_REGISTRY: dict[str, dict[str, Any]] = {
         "submission_system": "DSIP (Defense SBIR/STTR Innovation Portal)",
         "dsip_url": "https://www.dodsbirsttr.mil/submissions/",
         "requires": ["UEI", "SAM.gov active", "DSIP account", "AOR signature"],
+    },
+    "dod_sbir": {
+        "agency": "U.S. Department of Defense",
+        "portal_url": "https://www.dodsbirsttr.mil/submissions/",
+        "topics_url": "https://www.dodsbirsttr.mil/topics-app/",
+        "submission_system": "DSIP (Defense SBIR/STTR Innovation Portal)",
+        "requires": [
+            "UEI",
+            "SAM.gov active",
+            "DSIP account and submitter permissions",
+            "Topic-specific forms and volumes",
+            "DoD security/export-control representations",
+        ],
     },
     "arpa_e": {
         "agency": "ARPA-E",
@@ -200,6 +214,10 @@ def _opportunity_window(
         or app.get("current_state")
         or ""
     ).strip()
+    open_date = _parse_date(
+        (catalog_entry or {}).get("open_date")
+        or app.get("open_date")
+    )
     state = current_state.lower().replace("-", " ")
     source_meta = app.get("source_metadata")
     if not isinstance(source_meta, dict):
@@ -252,6 +270,14 @@ def _opportunity_window(
                     else f"source_verification_stale_{age_days:.1f}_days"
                 ),
             }
+    if open_date is not None and open_date.date() > datetime.now(timezone.utc).date():
+        return {
+            "status": "upcoming",
+            "actionable": False,
+            "draftable": True,
+            "reason": f"released_for_drafting_opens_{open_date.date().isoformat()}",
+            "open_date": open_date.date().isoformat(),
+        }
     if deadline.get("parseable") and not deadline.get("rolling"):
         return {
             "status": "open",
@@ -409,6 +435,7 @@ def build_preflight(grant_id: str, run_dir: Path,
     if not isinstance(readiness, dict):
         readiness = {}
     nsf_sbir = _is_nsf_sbir(grant_id, app)
+    dod_sbir = grant_id.startswith("dod_sbir")
     nsf_invitation_id = str(
         readiness.get("nsf_project_pitch_invitation_id") or ""
     ).strip()
@@ -422,6 +449,7 @@ def build_preflight(grant_id: str, run_dir: Path,
         required_files = [
             "application.json",
             "PROJECT_PITCH.md",
+            "PROJECT_PITCH_LIMITS.json",
             "eligibility_report.json",
             "evidence_manifest.json",
             "approval_state.json",
@@ -430,7 +458,8 @@ def build_preflight(grant_id: str, run_dir: Path,
         required_files = [
             "application.json", "application.md",
             "technical_volume.md", "commercialization_plan.md",
-            "cover_letter.md", "budget.json",
+            "cover_letter.md", "HEILMEIER_CATECHISM.md",
+            "BENCHMARK_BREADTH_ADDENDUM.md", "budget.json",
             "eligibility_report.json", "evidence_manifest.json",
             "manifest.sha256.json", "approval_state.json",
         ]
@@ -494,6 +523,53 @@ def build_preflight(grant_id: str, run_dir: Path,
                 )
         except Exception:
             blockers.append("budget total/ceiling is not numeric")
+        structure = (
+            (catalog_entry or {}).get("budget_structure")
+            if isinstance((catalog_entry or {}).get("budget_structure"), dict)
+            else {}
+        )
+        if structure:
+            periods = (
+                budget.get("periods")
+                if isinstance(budget.get("periods"), dict)
+                else {}
+            )
+            for period_name, amount_key, months_key in (
+                ("phase_i_base", "base_max_usd", "base_months"),
+                ("phase_i_option", "option_max_usd", "option_months"),
+            ):
+                period = (
+                    periods.get(period_name)
+                    if isinstance(periods.get(period_name), dict)
+                    else {}
+                )
+                if not period:
+                    blockers.append(
+                        f"budget is missing required {period_name} separation"
+                    )
+                    continue
+                try:
+                    if int(period.get("ceiling_usd")) > int(
+                        structure.get(amount_key)
+                    ):
+                        blockers.append(
+                            f"{period_name} exceeds its official ceiling"
+                        )
+                    if int(period.get("months")) != int(
+                        structure.get(months_key)
+                    ):
+                        blockers.append(
+                            f"{period_name} must be exactly "
+                            f"{structure.get(months_key)} months"
+                        )
+                except Exception:
+                    blockers.append(
+                        f"{period_name} amount/months are not numeric"
+                    )
+    if not bool(app.get("funding_cap_verified", True)):
+        blockers.append(
+            "official solicitation funding ceiling has not been verified"
+        )
 
     applicant = app.get("applicant")
     if not isinstance(applicant, dict):
@@ -532,13 +608,24 @@ def build_preflight(grant_id: str, run_dir: Path,
                 blockers.append("Research.gov account is not verified")
             if not str(readiness.get("nsf_sbc_registration_id") or "").strip():
                 blockers.append("NSF small-business registration ID is missing")
+        elif dod_sbir:
+            if not readiness.get("dsip_account_verified"):
+                blockers.append(
+                    "DSIP account and submitter permissions are not verified"
+                )
+            if not readiness.get("dod_compliance_verified"):
+                blockers.append(
+                    "DoD compliance review is incomplete (CMMC Level 2 "
+                    "self-assessment, ITAR/EAR, foreign ownership/foreign "
+                    "nationals, and topic security requirements)"
+                )
         else:
             if not readiness.get("grants_gov_account_verified"):
                 blockers.append("Grants.gov account linkage is not verified")
             if not readiness.get("aor_authority_verified"):
                 blockers.append("AOR submission authority is not verified")
 
-    sf424 = _sf424_field_map(app)
+    sf424 = {} if dod_sbir else _sf424_field_map(app)
 
     return {
         "grant_id": grant_id,
@@ -645,7 +732,10 @@ def write_submission_kit(grant_id: str, run_dir: Path,
         md.append(f"3. **Open the opportunity** in the portal: {portal.get('portal_url')}")
         md.append("4. **Create the portal application package.**")
         md.append("5. **Upload the required attachments** from this run directory.")
-        md.append("6. **Fill the federal cover form** using the field map below.")
+        if sf424:
+            md.append("6. **Fill the federal cover form** using the field map below.")
+        else:
+            md.append("6. **Complete the DSIP topic forms** using the current official instructions.")
         md.append("7. **AOR signs and submits** in the designated portal.")
         md.append("8. **Record the external tracking number** returned.")
         md.append("9. Mark submitted in Luma:")
@@ -655,7 +745,7 @@ def write_submission_kit(grant_id: str, run_dir: Path,
         md.append("   ```")
     md.append("")
 
-    if target_stage != "project_pitch":
+    if target_stage != "project_pitch" and sf424:
         md.append("## 📑 SF-424 Field Map (copy-paste ready)")
         md.append("")
         md.append("| Form Field | Value |")
@@ -663,6 +753,14 @@ def write_submission_kit(grant_id: str, run_dir: Path,
         for k, v in sf424.items():
             vv = "" if v is None else str(v).replace("|", "\\|")
             md.append(f"| {k} | {vv} |")
+        md.append("")
+    elif target_stage != "project_pitch":
+        md.append("## DSIP Forms")
+        md.append("")
+        md.append(
+            "Use the official DSIP solicitation instructions and topic forms. "
+            "Do not upload an SF-424 unless the solicitation explicitly requests it."
+        )
         md.append("")
 
     if p.get("missing_fields"):
@@ -677,4 +775,29 @@ def write_submission_kit(grant_id: str, run_dir: Path,
     md.append("---")
     md.append(f"_Generated {p.get('preflight_utc')} by `grant_submission_kit.py`._")
     howto_p.write_text("\n".join(md), encoding="utf-8")
+    _refresh_manifest(run_dir)
     return {"packet": packet_p, "howto": howto_p}
+
+
+def _refresh_manifest(run_dir: Path) -> None:
+    manifest_path = run_dir / "manifest.sha256.json"
+    if manifest_path.exists():
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except Exception:
+            manifest = {}
+    else:
+        manifest = {}
+    files: dict[str, dict[str, Any]] = {}
+    for path in sorted(run_dir.iterdir()):
+        if not path.is_file() or path.name == manifest_path.name:
+            continue
+        files[path.name] = {
+            "size_bytes": path.stat().st_size,
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        }
+    manifest["generated_utc"] = datetime.now(timezone.utc).strftime(
+        "%Y%m%dT%H%M%SZ"
+    )
+    manifest["files"] = files
+    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")

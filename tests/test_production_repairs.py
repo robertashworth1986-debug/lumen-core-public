@@ -11,6 +11,7 @@ from types import SimpleNamespace
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "code"))
 sys.path.insert(0, str(ROOT / "code" / "ops"))
+sys.path.insert(0, str(ROOT / "code" / "execution"))
 
 import grant_application_factory as grant_factory
 from grant_submission_kit import build_preflight
@@ -18,6 +19,7 @@ from build_symbol_timing_edge_model import Candle, analyze_symbol
 from collect_kraken_hourly_history import merge_rows
 from ensure_dashboard_command_fabric import ensure_fabric
 from assert_runtime_safety import assert_paper_mode
+from benchmark_beater import _fib_prox, simulate_vs_benchmark
 
 
 class ProductionRepairTests(unittest.TestCase):
@@ -48,6 +50,8 @@ class ProductionRepairTests(unittest.TestCase):
                 "technical_volume.md": "ok\n",
                 "commercialization_plan.md": "ok\n",
                 "cover_letter.md": "ok\n",
+                "HEILMEIER_CATECHISM.md": "ok\n",
+                "BENCHMARK_BREADTH_ADDENDUM.md": "ok\n",
                 "budget.json": "{}",
                 "eligibility_report.json": "{}",
                 "evidence_manifest.json": "{}",
@@ -78,6 +82,8 @@ class ProductionRepairTests(unittest.TestCase):
                 "technical_volume.md": "complete\n",
                 "commercialization_plan.md": "complete\n",
                 "cover_letter.md": "complete\n",
+                "HEILMEIER_CATECHISM.md": "complete\n",
+                "BENCHMARK_BREADTH_ADDENDUM.md": "complete\n",
                 "budget.json": "{}",
                 "eligibility_report.json": "{}",
                 "evidence_manifest.json": "{}",
@@ -102,6 +108,97 @@ class ProductionRepairTests(unittest.TestCase):
             self.assertTrue(
                 any("maximum" in warning for warning in preflight["warnings"])
             )
+
+    def test_released_future_opportunity_is_draftable_not_actionable(self) -> None:
+        verified = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        window = grant_factory._program_window_assessment(
+            {
+                "current_state": "pre_release_released",
+                "source_verified_utc": verified,
+                "open_date": "2099-06-24",
+                "close_date": "2099-07-22",
+            }
+        )
+        self.assertEqual(window["status"], "upcoming")
+        self.assertTrue(window["draftable"])
+        self.assertFalse(window["actionable"])
+
+    def test_heilmeier_renderer_uses_topic_specific_strategy(self) -> None:
+        rendered = grant_factory.render_heilmeier_catechism(
+            {
+                "topic_area": "Adaptive Sensor Management",
+                "duration_months": 6,
+                "proposal_strategy": {
+                    "title": "SenseDirector",
+                    "today": "Allocate four radars under hard constraints.",
+                    "metrics": ["Mission-weighted information gain."],
+                    "risks": ["Simulation-to-hardware transfer."],
+                },
+            },
+            {"company": {"dba": "Luma"}},
+            {"run_utc": "20260613T000000Z"},
+        )
+        self.assertIn("SenseDirector", rendered)
+        self.assertIn("Allocate four radars", rendered)
+        self.assertIn("Mission-weighted information gain", rendered)
+
+    def test_dod_preflight_blocks_upcoming_unverified_package(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            verified = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            app = {
+                "agency": "U.S. Navy / NAVSEA",
+                "program": "DoD SBIR Phase I",
+                "deadline_typical": "2099-07-22",
+                "open_date": "2099-06-24",
+                "close_date": "2099-07-22",
+                "current_state": "pre_release_released",
+                "source_verified_utc": verified,
+                "funding_cap_verified": False,
+                "applicant": {
+                    "sam_gov_status": "active",
+                    "sam_gov_verified_utc": verified,
+                    "sam_gov_expiration_date": "2099-12-31",
+                },
+                "submission_readiness": {
+                    "dsip_account_verified": False,
+                    "dod_compliance_verified": False,
+                },
+                "eligibility": {"eligible": True},
+                "budget": {"ceiling_usd": 250000, "total": 250000},
+            }
+            files = {
+                "application.json": __import__("json").dumps(app),
+                "application.md": "complete\n",
+                "technical_volume.md": "complete\n",
+                "commercialization_plan.md": "complete\n",
+                "cover_letter.md": "complete\n",
+                "HEILMEIER_CATECHISM.md": "complete\n",
+                "BENCHMARK_BREADTH_ADDENDUM.md": "complete\n",
+                "budget.json": "{}",
+                "eligibility_report.json": "{}",
+                "evidence_manifest.json": "{}",
+                "manifest.sha256.json": "{}",
+                "approval_state.json": '{"state":"approved"}',
+            }
+            for name, content in files.items():
+                (run_dir / name).write_text(content, encoding="utf-8")
+            preflight = build_preflight(
+                "dod_sbir_test",
+                run_dir,
+                {
+                    "deadline_typical": "2099-07-22",
+                    "open_date": "2099-06-24",
+                    "current_state": "pre_release_released",
+                    "source_verified_utc": verified,
+                    "ceiling_usd": 250000,
+                },
+            )
+            blockers = "\n".join(preflight["blockers"])
+            self.assertIn("not verified open", blockers)
+            self.assertIn("funding ceiling", blockers)
+            self.assertIn("DSIP account", blockers)
+            self.assertIn("DoD compliance review", blockers)
 
     def test_known_low_hour_is_selected_in_training(self) -> None:
         candles: list[Candle] = []
@@ -149,6 +246,53 @@ class ProductionRepairTests(unittest.TestCase):
         ]
         self.assertIn(3, selected)
         self.assertFalse(result["execution_authorized"])
+
+    def test_benchmark_beater_preserves_warmup_for_short_windows(self) -> None:
+        prices = [
+            100.0 + index * 0.1 + 3.0 * __import__("math").sin(index / 7.0)
+            for index in range(180)
+        ]
+        result = simulate_vs_benchmark(
+            prices,
+            lookback_days=7,
+            roundtrip_cost_bps=10.0,
+            slippage_bps=2.0,
+        )
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["bars_simulated"], 7)
+        self.assertEqual(
+            result["win_rate_definition"],
+            "positive_net_active_bar_rate",
+        )
+
+    def test_benchmark_beater_fibonacci_proximity_uses_current_price(self) -> None:
+        prices = [100.0, 200.0] + [150.0] * 52 + [161.8]
+        self.assertAlmostEqual(_fib_prox(prices, 55), 0.0, places=6)
+
+    def test_benchmark_beater_costs_reduce_strategy_return(self) -> None:
+        math = __import__("math")
+        prices = [
+            100.0 + index * 0.03 + 8.0 * math.sin(index / 4.0)
+            for index in range(220)
+        ]
+        frictionless = simulate_vs_benchmark(
+            prices,
+            lookback_days=90,
+            roundtrip_cost_bps=0.0,
+            slippage_bps=0.0,
+        )
+        costed = simulate_vs_benchmark(
+            prices,
+            lookback_days=90,
+            roundtrip_cost_bps=40.0,
+            slippage_bps=10.0,
+        )
+        self.assertTrue(frictionless["ok"])
+        self.assertTrue(costed["ok"])
+        self.assertLessEqual(
+            costed["strategy_return_pct"],
+            frictionless["strategy_return_pct"],
+        )
 
     def test_history_merge_is_deduplicated_and_drops_open_candle(self) -> None:
         now_ts = int(datetime.now(timezone.utc).timestamp())

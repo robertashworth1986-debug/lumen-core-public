@@ -156,7 +156,7 @@ def build_payload(stack_root: Path) -> dict[str, Any]:
     autofill_fields = {
         "business_name": "LumaTrader / LumenCore",
         "founder_name": "Robert Ashworth",
-        "business_stage": "operational and revenue-readiness",
+        "business_stage": "prototype validation and grant-readiness",
         "business_location": "United States",
         "industry": "AI + quant infrastructure + operational intelligence",
         "website": "https://lumen-core.ai",
@@ -170,13 +170,19 @@ def build_payload(stack_root: Path) -> dict[str, Any]:
             "Our harmonic flowform engine converts live signals into ranked actions with proof-grade evidence, making funding and operations decisions faster and safer."
         ),
         "traction_metrics": {
-            "annual_value_signal_usd": annual_value,
-            "top_sector": top_sector,
-            "top_sector_hourly_value_usd": top_sector_hour,
-            "cross_sector_avoided_cost_usd": avoided_cost,
-            "router_edge_pct": router_edge,
-            "harmonic_win_rate_pct": harmonic_win,
-            "kalisha_prediction_score": kalisha,
+            "evidence_status": "prototype_benchmarks_only",
+            "claim_boundary": (
+                "No robust trading edge, realized sector savings, customer revenue, or "
+                "independently validated economic value is claimed."
+            ),
+            "closed_live_trades": to_float(
+                provisional.get("closed_live_trades"),
+                to_float(vps_perf.get("closed_live_count")),
+            ),
+            "realized_net_usd": to_float(
+                provisional.get("realized_net_usd"),
+                to_float(vps_perf.get("realized_net_usd")),
+            ),
             "top_model": {
                 "flow": leader_flow,
                 "strategy": leader_strategy,
@@ -185,11 +191,26 @@ def build_payload(stack_root: Path) -> dict[str, Any]:
                 "institutional_score": leader_score,
             },
         },
+        "modeled_research_signals_not_traction": {
+            "annual_value_signal_usd": annual_value,
+            "top_sector": top_sector,
+            "top_sector_hourly_value_usd": top_sector_hour,
+            "cross_sector_avoided_cost_usd": avoided_cost,
+            "router_edge_pct": router_edge,
+            "harmonic_win_rate_pct": harmonic_win,
+            "kalisha_prediction_score": kalisha,
+            "use_restriction": (
+                "Internal hypothesis and prioritization fields only. Do not present as "
+                "realized value, valuation, customer traction, or guaranteed performance."
+            ),
+        },
         "why_now": (
-            "We have validated signal-value capture, but risk-adjusted financial metrics are still intentionally constrained by micro-capital safety gates."
+            "We have reproducible prototype benchmarks and evidence automation, while "
+            "customer-domain validation and repeatable economic impact remain to be established."
         ),
         "funding_need": (
-            "Grant capital is used to move from constrained proof mode into funded scaling mode, increasing execution depth and publishing stable risk-adjusted performance metrics."
+            "Grant capital will fund representative-data validation, stronger baselines, "
+            "security and compliance work, and customer-facing pilots with preregistered metrics."
         ),
         "use_of_funds_short": (
             "Data/compute expansion, execution guardrail hardening, evidence-pack automation, and customer-validation pilots."
@@ -203,15 +224,15 @@ def build_payload(stack_root: Path) -> dict[str, Any]:
 
     narrative_short = (
         "LumaTrader is an AI-powered execution and operations platform that converts live signals into auditable actions. "
-        f"Current modeled annual value signal is {as_money(annual_value)} with top impact in {top_sector}. "
-        "Grant funding lets us scale from guarded micro-cap proof mode into measurable growth mode."
+        "The current evidence supports a prototype and reproducible research workflow, not a claim of robust trading edge or realized sector savings. "
+        "Grant funding will support representative-data validation, compliance, and measurable customer pilots."
     )
 
     narrative_long = (
         "We built LumaTrader/LumenCore to reduce avoidable operational and execution loss using real-time signal fusion, "
-        "strict risk controls, and proof-grade reporting. The system currently indicates large preserved-value potential while "
-        "remaining in deliberate safety mode with constrained capital. This is exactly where grant capital creates leverage: "
-        "it unlocks deeper run-time coverage, stronger market validation, and statistically stable performance reporting. "
+        "strict risk controls, and proof-grade reporting. Current results are prototype benchmarks and modeled hypotheses, "
+        "not realized customer value or a guaranteed financial return. Grant capital creates leverage by funding "
+        "representative-data evaluation, stronger market validation, and statistically stable performance reporting. "
         "We will use funding to harden execution infrastructure, expand measured evidence lanes, and accelerate customer-facing outcomes."
     )
 
@@ -289,19 +310,17 @@ def build_payload(stack_root: Path) -> dict[str, Any]:
             "founder": "Robert Ashworth",
             "website": "https://lumen-core.ai",
             "location": "United States",
-            "stage": "operational, grant-funded scale transition",
+            "stage": "prototype validation and grant-readiness",
             "short_narrative": narrative_short,
             "long_narrative": narrative_long,
             "logo_assets": logo_assets,
         },
         "evidence_snapshot": {
-            "annual_value_signal_usd": annual_value,
-            "top_sector": top_sector,
-            "top_sector_hourly_value_usd": top_sector_hour,
-            "router_edge_pct": router_edge,
-            "harmonic_win_rate_pct": harmonic_win,
-            "kalisha_prediction_score": kalisha,
-            "cross_sector_avoided_cost_usd": avoided_cost,
+            "claim_classification": "prototype_benchmarks_only",
+            "claim_boundary": (
+                "No robust trading edge, realized sector savings, customer revenue, or "
+                "independently validated economic value is claimed."
+            ),
             "runtime_mode": str(gates.get("runtime_mode") or runtime.get("mode") or "paper"),
             "allow_live_orders": bool(gates.get("allow_live_orders", runtime.get("allow_live_orders", False))),
             "hard_safety_only_mode": bool(gates.get("hard_safety_only_mode", runtime.get("hard_safety_only_mode", False))),
@@ -311,6 +330,19 @@ def build_payload(stack_root: Path) -> dict[str, Any]:
             "win_rate_pct": to_float(provisional.get("win_rate_pct"), to_float(vps_perf.get("win_rate_pct"))),
             "realized_net_usd": to_float(provisional.get("realized_net_usd"), to_float(vps_perf.get("realized_net_usd"))),
             "sector_energy_pipeline_status": str(sector.get("status") or "unknown"),
+        },
+        "internal_modeled_research_signals": {
+            "annual_value_signal_usd": annual_value,
+            "top_sector": top_sector,
+            "top_sector_hourly_value_usd": top_sector_hour,
+            "router_edge_pct": router_edge,
+            "harmonic_win_rate_pct": harmonic_win,
+            "kalisha_prediction_score": kalisha,
+            "cross_sector_avoided_cost_usd": avoided_cost,
+            "use_restriction": (
+                "Internal hypothesis and prioritization fields only. Do not copy into "
+                "traction, valuation, savings, or performance claims."
+            ),
         },
         "autofill_fields": autofill_fields,
         "use_of_funds_templates": use_of_funds,
@@ -384,15 +416,14 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.append(str(autofill.get("solution_statement", "")))
     lines.append("")
 
-    lines.append("## Evidence Highlights")
+    lines.append("## Reviewer-Safe Evidence Highlights")
     lines.append("")
-    lines.append(f"- Annual value signal: {as_money(to_float(evidence.get('annual_value_signal_usd')))}")
-    lines.append(f"- Top sector: {evidence.get('top_sector', '')}")
-    lines.append(f"- Top sector hourly value: {as_money(to_float(evidence.get('top_sector_hourly_value_usd')))}")
-    lines.append(f"- Router edge: {to_float(evidence.get('router_edge_pct')):.2f}%")
-    lines.append(f"- Harmonic win rate: {to_float(evidence.get('harmonic_win_rate_pct')):.2f}%")
-    lines.append(f"- Kalisha score: {to_float(evidence.get('kalisha_prediction_score')):.2f}")
-    lines.append(f"- Avoided cost estimate: {as_money(to_float(evidence.get('cross_sector_avoided_cost_usd')))}")
+    lines.append(f"- Evidence status: {evidence.get('claim_classification', '')}")
+    lines.append(f"- Claim boundary: {evidence.get('claim_boundary', '')}")
+    lines.append(f"- Runtime mode: {evidence.get('runtime_mode', '')}")
+    lines.append(f"- Live orders allowed: {bool(evidence.get('allow_live_orders', False))}")
+    lines.append(f"- Closed live trades: {to_float(evidence.get('closed_live_trades')):.0f}")
+    lines.append(f"- Realized net: {as_money(to_float(evidence.get('realized_net_usd')))}")
     lines.append("")
 
     lines.append("## Opportunity Variants")

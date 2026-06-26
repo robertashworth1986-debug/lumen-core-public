@@ -415,6 +415,12 @@ def render_evidence_md(
     # 3. Truth-chain anchor
     lines.append("## 3. Frozen Delta Truth-Chain Anchor")
     lines.append("")
+    lines.append(
+        "**Claim boundary:** A valid hash chain proves artifact integrity and chronology. "
+        "It does not independently validate economic value, customer savings, model accuracy, "
+        "or causal attribution. Valuation and annual-value proxy fields are excluded below."
+    )
+    lines.append("")
     if truth_chain:
         lines.append(f"- Run tag: `{truth_chain.get('run_tag','')}`")
         lines.append(f"- Generated UTC: {truth_chain.get('generated_utc','')}")
@@ -424,12 +430,9 @@ def render_evidence_md(
         metrics = truth_chain.get("metrics") or {}
         if metrics:
             lines.append("")
-            lines.append("**Anchored metrics:**")
+            lines.append("**Reviewer-safe anchored metrics:**")
             for key in (
-                "annual_value_signal_usd", "router_edge_pct", "harmonic_win_rate_pct",
-                "top_sector", "top_sector_hourly_value_usd",
                 "measured_sources", "enabled_sources", "measured_coverage_pct",
-                "benchmark_prevented_pct", "valuation_proxy_usd",
                 "grants_queue_total", "public_truth_status",
             ):
                 if key in metrics:

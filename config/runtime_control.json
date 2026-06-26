@@ -7,7 +7,7 @@
   "kill_switch": false,
   "auto_trip_kill_switch_on_inventory_discrepancy": false,
   "max_daily_loss_usd": 65.0,
-  "max_open_positions": 2,
+  "max_open_positions": 5,
   "max_portfolio_heat": 0.45,
   "loop_seconds": 2,
   "max_position_usd": 850.0,

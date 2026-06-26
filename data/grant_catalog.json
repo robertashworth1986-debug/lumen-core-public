@@ -304,6 +304,319 @@
         "Concept Paper", "Technical Volume", "Budget", "Team", "Commercialization"
       ],
       "page_limits": {"concept_paper_pages": 8, "technical_volume_pages": 20}
+    },
+    {
+      "id": "dod_sbir_26bz_nv056",
+      "agency": "U.S. Navy / NAVSEA",
+      "program": "DoD SBIR 2026 Release 3 Phase I",
+      "solicitation_number": "DON26BZ03",
+      "topic_number": "NV056",
+      "topic_area": "Optimizing Satellite Imagery across Commercial Vendors",
+      "ceiling_usd": 315000,
+      "funding_cap_verified": true,
+      "funding_cap_note": "Verified against NAVY_26BZ Phase I Release 3 instructions dated 2026-06-03: Base <= $200,000; Option <= $115,000; total <= $315,000.",
+      "duration_months": 12,
+      "budget_structure": {
+        "base_max_usd": 200000,
+        "base_months": 6,
+        "option_max_usd": 115000,
+        "option_months": 6
+      },
+      "open_date": "2026-06-24",
+      "close_date": "2026-07-22",
+      "deadline_typical": "2026-07-22 12:00 ET",
+      "current_state": "pre_release_released",
+      "source_verified_utc": "2026-06-13T00:00:00Z",
+      "source_verification_url": "https://www.navysbir.com/n26_3/DON26BZ03-NV056.htm",
+      "url": "https://www.navysbir.com/n26_3/DON26BZ03-NV056.htm",
+      "eligibility": {
+        "small_business": true,
+        "us_owned_majority": true,
+        "employees_lt": 500,
+        "pi_employed_min_pct": 51,
+        "us_research_only": true
+      },
+      "fit_keywords": [
+        "optimization", "forecasting", "infrastructure", "evidence",
+        "time series", "ai", "ml", "decision support"
+      ],
+      "compliance": [
+        "CMMC Level 2 self-assessment",
+        "ITAR/EAR and foreign-national review",
+        "Topic-specific security and data-integrity controls",
+        "Phase II facility/personnel clearance planning if required"
+      ],
+      "proposal_strategy": {
+        "title": "OrbitBroker: Explainable Multi-Vendor Satellite Collection Optimization",
+        "problem": "Mission planners must coordinate heterogeneous commercial imagery vendors with different APIs, revisit rates, resolution, weather constraints, costs, and security boundaries while avoiding redundant collection.",
+        "innovation": "A vendor-neutral hub-and-spoke optimizer that converts mission intent into constrained collection plans, simulates vendor endpoints, ranks alternatives under uncertainty, and emits an auditable explanation for every tasking decision.",
+        "today": "Build and validate a software prototype that schedules imagery requests across simulated commercial-vendor APIs while optimizing mission priority, timeliness, resolution, weather risk, cost, and redundancy.",
+        "current_practice": "Current planning is vendor-specific and labor intensive. Operators reconcile incompatible interfaces and incomplete forecasts manually, making tradeoffs difficult to reproduce and increasing redundant or late collections.",
+        "approach": "Luma will combine adapter-based vendor normalization, weather and availability forecasting, constrained multi-objective optimization, uncertainty-aware re-planning, and SHA-256 evidence records. Phase I uses simulated endpoints and notional vendor data, which the topic expressly permits.",
+        "who_cares": "NAVSEA and joint mission planners who need faster, lower-friction access to commercial imagery, plus commercial fleet, insurance, disaster-response, and infrastructure-monitoring customers.",
+        "impact": "A successful Phase I would show that one explainable planner can reduce redundant tasking and planning latency while preserving mission priorities and security boundaries across multiple vendors.",
+        "payoff": "A transition-ready orchestration layer that lets the government change or add imagery vendors without rebuilding the planning workflow.",
+        "phase_i_plan": [
+          "Month 1: freeze mission scenarios, vendor schemas, baseline heuristics, constraints, and acceptance metrics.",
+          "Month 2: implement simulated vendor APIs and a normalized tasking/telemetry model.",
+          "Months 3-4: implement multi-objective scheduling, weather-risk forecasting, deconfliction, and explainable re-planning.",
+          "Month 5: run scenario sweeps against first-come, cheapest-vendor, and priority-only baselines.",
+          "Month 6: deliver the prototype, reproducibility package, cybersecurity plan, and Phase II integration roadmap."
+        ],
+        "metrics": [
+          "Mission-priority-weighted collection utility versus three fixed scheduling baselines.",
+          "Redundant collection rate, missed-window rate, cost per satisfied request, and plan-generation latency.",
+          "Recovery quality after vendor, weather, or communications disruptions.",
+          "One hundred percent traceability from input constraints to the selected plan and explanation."
+        ],
+        "risks": [
+          "Vendor APIs and policies may differ from simulations; mitigate with versioned adapters and contract tests.",
+          "Conflicting objectives may produce unstable plans; mitigate with explicit constraints, sensitivity analysis, and operator-adjustable weights.",
+          "Security restrictions may limit data exchange; mitigate with metadata minimization and deployment-boundary controls."
+        ],
+        "midterm": "Demonstrate normalized simulated endpoints and an end-to-end plan for at least three vendor profiles with frozen baselines.",
+        "final": "Demonstrate disruption-aware optimization across representative mission scenarios and deliver measured results, failure cases, source code, interfaces, and a Phase II transition plan."
+      },
+      "required_sections": [
+        "Cover Sheet", "Technical Volume", "Cost Volume",
+        "Company Commercialization Report", "Supporting Documents"
+      ],
+      "page_limits": {"technical_volume_pages": 10}
+    },
+    {
+      "id": "dod_sbir_26bz_nv061",
+      "agency": "U.S. Navy / NAVSEA",
+      "program": "DoD SBIR 2026 Release 3 Phase I",
+      "solicitation_number": "DON26BZ03",
+      "topic_number": "NV061",
+      "topic_area": "Predictive Movement for Object Oriented Tracking",
+      "ceiling_usd": 315000,
+      "funding_cap_verified": true,
+      "funding_cap_note": "Verified against NAVY_26BZ Phase I Release 3 instructions dated 2026-06-03: Base <= $200,000; Option <= $115,000; total <= $315,000.",
+      "duration_months": 12,
+      "budget_structure": {
+        "base_max_usd": 200000,
+        "base_months": 6,
+        "option_max_usd": 115000,
+        "option_months": 6
+      },
+      "open_date": "2026-06-24",
+      "close_date": "2026-07-22",
+      "deadline_typical": "2026-07-22 12:00 ET",
+      "current_state": "pre_release_released",
+      "source_verified_utc": "2026-06-13T00:00:00Z",
+      "source_verification_url": "https://www.navysbir.com/n26_3/DON26BZ03-NV061.htm",
+      "url": "https://www.navysbir.com/n26_3/DON26BZ03-NV061.htm",
+      "eligibility": {
+        "small_business": true,
+        "us_owned_majority": true,
+        "employees_lt": 500,
+        "pi_employed_min_pct": 51,
+        "us_research_only": true
+      },
+      "fit_keywords": [
+        "forecasting", "anomaly detection", "time series", "ai", "ml",
+        "calibration", "decision support", "evidence"
+      ],
+      "compliance": [
+        "CMMC Level 2 self-assessment",
+        "ITAR/EAR and foreign-national review",
+        "Topic-specific security requirements",
+        "Phase II facility/personnel clearance planning if required"
+      ],
+      "proposal_strategy": {
+        "title": "TrackCast: Uncertainty-Calibrated Predictive Movement for Object Tracking",
+        "problem": "Operators need to forecast object movement, identify patterns of life and change, prioritize tracks, and scale to congested sensor environments without flooding users with low-value predictions.",
+        "innovation": "A hierarchy-aware trajectory forecaster that routes tracks by motion regime, produces calibrated future-position envelopes, detects pattern-of-life deviations, and explains the observations driving each priority score.",
+        "today": "Build a predictive movement prototype that forecasts future object state, detects pattern-of-life changes, prioritizes tracks, and reports calibrated uncertainty at operational latency.",
+        "current_practice": "Many trackers extrapolate with one motion model or use opaque learned predictors. They degrade under maneuvers, sparse observations, and distribution shift, and their confidence estimates are difficult for operators to trust.",
+        "approach": "Luma will benchmark fixed kinematic, tree, neural, and harmonic/regime-aware predictors under walk-forward evaluation, then route each track to an appropriate family and calibrate prediction envelopes using held-out residuals.",
+        "who_cares": "NAVSEA operators managing dense object tracks, as well as commercial maritime awareness, aviation, logistics, and autonomous-system teams.",
+        "impact": "A successful result would improve useful look-ahead while reducing false alerts and giving operators an evidence-backed reason to trust or reject each forecast.",
+        "payoff": "A modular forecasting service that can attach to existing track managers and improve as mission-specific data become available.",
+        "phase_i_plan": [
+          "Month 1: define representative motion regimes, public/simulated sensor data, baselines, horizons, and acceptance metrics.",
+          "Month 2: implement track cleaning, feature extraction, hierarchy, and pattern-of-life baselines.",
+          "Months 3-4: implement routed multi-family trajectory prediction, calibrated envelopes, change detection, and priority scoring.",
+          "Month 5: stress test maneuver, missing-data, clutter, and scale scenarios with bootstrap uncertainty.",
+          "Month 6: deliver prototype APIs, benchmark report, failure register, and Phase II sensor-integration plan."
+        ],
+        "metrics": [
+          "Position and velocity error by forecast horizon and motion regime.",
+          "Precision, recall, F1, false-positive rate, and false-negative rate for change detection.",
+          "Prediction-interval coverage and calibration error.",
+          "Per-track latency, throughput, and degradation under missing or delayed observations."
+        ],
+        "risks": [
+          "Simulated motion may not match fleet data; mitigate with domain randomization and explicit transfer tests.",
+          "Routing can overfit regime labels; mitigate with nested walk-forward evaluation and simple baselines.",
+          "Priority scores may be misinterpreted; mitigate with factor-level explanations and operator thresholds."
+        ],
+        "midterm": "Freeze data, baselines, and metrics and demonstrate calibrated forecasts on at least three distinct movement regimes.",
+        "final": "Demonstrate horizon-specific forecasting, pattern-of-life change detection, prioritization, and scale tests with reproducible evidence and documented failure cases."
+      },
+      "required_sections": [
+        "Cover Sheet", "Technical Volume", "Cost Volume",
+        "Company Commercialization Report", "Supporting Documents"
+      ],
+      "page_limits": {"technical_volume_pages": 10}
+    },
+    {
+      "id": "dod_sbir_26bz_nv063",
+      "agency": "U.S. Navy / NAVSEA",
+      "program": "DoD SBIR 2026 Release 3 Phase I",
+      "solicitation_number": "DON26BZ03",
+      "topic_number": "NV063",
+      "topic_area": "Anomalous Behavior Detection and Alerting for Congested Maritime Environments",
+      "ceiling_usd": 315000,
+      "funding_cap_verified": true,
+      "funding_cap_note": "Verified against NAVY_26BZ Phase I Release 3 instructions dated 2026-06-03: Base <= $200,000; Option <= $115,000; total <= $315,000.",
+      "duration_months": 12,
+      "budget_structure": {
+        "base_max_usd": 200000,
+        "base_months": 6,
+        "option_max_usd": 115000,
+        "option_months": 6
+      },
+      "open_date": "2026-06-24",
+      "close_date": "2026-07-22",
+      "deadline_typical": "2026-07-22 12:00 ET",
+      "current_state": "pre_release_released",
+      "source_verified_utc": "2026-06-13T00:00:00Z",
+      "source_verification_url": "https://www.navysbir.com/n26_3/DON26BZ03-NV063.htm",
+      "url": "https://www.navysbir.com/n26_3/DON26BZ03-NV063.htm",
+      "eligibility": {
+        "small_business": true,
+        "us_owned_majority": true,
+        "employees_lt": 500,
+        "pi_employed_min_pct": 51,
+        "us_research_only": true
+      },
+      "fit_keywords": [
+        "anomaly detection", "regime detection", "time series", "ai", "ml",
+        "explainable", "calibration", "evidence"
+      ],
+      "compliance": [
+        "CMMC Level 2 self-assessment",
+        "ITAR/EAR and foreign-national review",
+        "Topic-specific security requirements",
+        "Phase II facility/personnel clearance planning if required"
+      ],
+      "proposal_strategy": {
+        "title": "HarborSentinel: Explainable Maritime Anomaly Detection without Massive Historical Databases",
+        "problem": "Congested maritime environments require continuous anomaly detection across AIS, ADS-B, radar, and other tracks, but operators cannot absorb brittle black-box alerts or systems that require enormous historical databases.",
+        "innovation": "A streaming, explainable pattern-of-life engine that learns compact local baselines, detects behavioral and regime changes, fuses heterogeneous track evidence, and emits alerts with reason codes, confidence, and the observations that triggered them.",
+        "today": "Build a real-time prototype that detects and explains anomalous behavior in congested maritime tracks using compact adaptive baselines rather than a massive historical database.",
+        "current_practice": "Rule systems are transparent but brittle; large learned models can be data hungry and opaque. Both can produce excessive false alarms when traffic density, geography, or operating conditions change.",
+        "approach": "Luma will combine streaming pattern-of-life features, robust change detection, multi-source consistency checks, calibrated anomaly scores, and human-readable reason codes. The design retains only the statistics and evidence needed for the alert decision.",
+        "who_cares": "Navy watch teams and port-security operators, plus commercial ports, insurers, fisheries, and fleet operators that need explainable maritime awareness.",
+        "impact": "A successful prototype would surface meaningful deviations sooner while reducing alert fatigue and storage burden.",
+        "payoff": "An embeddable alerting service with low infrastructure requirements and a defensible audit trail for every alert.",
+        "phase_i_plan": [
+          "Month 1: define maritime scenarios, public/simulated AIS-radar inputs, alert taxonomy, baselines, and acceptance metrics.",
+          "Month 2: implement streaming normalization, compact pattern-of-life state, and rule/statistical baselines.",
+          "Months 3-4: implement regime-change, route/loiter/rendezvous, kinematic, and cross-sensor anomaly detectors with score calibration.",
+          "Month 5: evaluate congestion, sensor dropout, spoofing-like inconsistency, and concept-drift scenarios.",
+          "Base Month 6: deliver the prototype, operator alert views, benchmark package, failure register, and Phase II integration roadmap.",
+          "Option Months 7-12: add representative-data adapters, an SSDS-facing interface and display message prototype, congestion hardening, independent reproducibility review, and Phase II design specifications."
+        ],
+        "metrics": [
+          "Precision, recall, F1, false alerts per track-hour, and detection delay by anomaly class.",
+          "Score calibration and stability as traffic density and operating regimes change.",
+          "Memory, throughput, and latency without a large historical database.",
+          "Alert completeness: track identity, reason, evidence, confidence, and recommended review action."
+        ],
+        "risks": [
+          "Public data may underrepresent adversarial behavior; mitigate with scenario generation and withheld stress tests.",
+          "Adaptive baselines can normalize persistent threats; mitigate with multi-timescale references and operator-pinned rules.",
+          "Sensor disagreement may create false alerts; mitigate with source-quality weighting and explicit inconsistency labels."
+        ],
+        "midterm": "Demonstrate streaming pattern-of-life state and explainable alerts on representative AIS and radar-like scenarios with frozen baselines.",
+        "final": "Demonstrate anomaly-class performance, low-data operation, congestion scaling, and alert explanations with reproducible evidence and a transition architecture."
+      },
+      "required_sections": [
+        "Cover Sheet", "Technical Volume", "Cost Volume",
+        "Company Commercialization Report", "Supporting Documents"
+      ],
+      "page_limits": {"technical_volume_pages": 10}
+    },
+    {
+      "id": "dod_sbir_26bz_nv065",
+      "agency": "U.S. Navy / NAVSEA",
+      "program": "DoD SBIR 2026 Release 3 Phase I",
+      "solicitation_number": "DON26BZ03",
+      "topic_number": "NV065",
+      "topic_area": "Adaptive Sensor Management",
+      "ceiling_usd": 315000,
+      "funding_cap_verified": true,
+      "funding_cap_note": "Verified against NAVY_26BZ Phase I Release 3 instructions dated 2026-06-03: Base <= $200,000; Option <= $115,000; total <= $315,000.",
+      "duration_months": 12,
+      "budget_structure": {
+        "base_max_usd": 200000,
+        "base_months": 6,
+        "option_max_usd": 115000,
+        "option_months": 6
+      },
+      "open_date": "2026-06-24",
+      "close_date": "2026-07-22",
+      "deadline_typical": "2026-07-22 12:00 ET",
+      "current_state": "pre_release_released",
+      "source_verified_utc": "2026-06-13T00:00:00Z",
+      "source_verification_url": "https://www.navysbir.com/n26_3/DON26BZ03-NV065.htm",
+      "url": "https://www.navysbir.com/n26_3/DON26BZ03-NV065.htm",
+      "eligibility": {
+        "small_business": true,
+        "us_owned_majority": true,
+        "employees_lt": 500,
+        "pi_employed_min_pct": 51,
+        "us_research_only": true
+      },
+      "fit_keywords": [
+        "optimization", "forecasting", "regime detection", "time series",
+        "ai", "ml", "explainable", "decision support", "evidence"
+      ],
+      "compliance": [
+        "CMMC Level 2 self-assessment",
+        "ITAR/EAR and foreign-national review",
+        "Topic-specific security requirements",
+        "Phase II facility/personnel clearance planning if required"
+      ],
+      "proposal_strategy": {
+        "title": "SenseDirector: Explainable Adaptive Resource Allocation for Heterogeneous Sensors",
+        "problem": "Operators must allocate limited time, energy, bandwidth, and attention across heterogeneous sensors as targets, threats, weather, and sensor health change.",
+        "innovation": "A receding-horizon sensor manager that forecasts information value, optimizes resource allocation under hard constraints, adapts to regime changes, and explains why each sensor action was selected.",
+        "today": "Build and validate an adaptive sensor-management prototype for four heterogeneous radars in low- and medium-fidelity simulation.",
+        "current_practice": "Static schedules and hand-tuned rules cannot react optimally to changing mission value or sensor health. Opaque optimizers may improve a score but are difficult to certify or override.",
+        "approach": "Luma will compare model-predictive control, Bayesian optimization, and bounded metaheuristics against static and greedy baselines. Forecast uncertainty and sensor health enter the objective directly, while hard mission constraints and operator overrides remain explicit.",
+        "who_cares": "NAVSEA sensor and combat-system teams, plus commercial autonomy, spectrum management, industrial inspection, and distributed sensing operators.",
+        "impact": "A successful Phase I would demonstrate measurable information gain and mission utility under resource constraints without sacrificing real-time response or operator understanding.",
+        "payoff": "A modular decision layer that can sit above heterogeneous sensors and transition from simulation to hardware-in-the-loop testing in Phase II.",
+        "phase_i_plan": [
+          "Month 1: freeze four-radar scenarios, resource constraints, threat/target models, baselines, and acceptance metrics.",
+          "Month 2: implement low-fidelity simulator, sensor-health state, information-value model, and static/greedy baselines.",
+          "Months 3-4: implement receding-horizon optimization with Bayesian and metaheuristic alternatives plus operator constraints.",
+          "Month 5: run Monte Carlo scenario sweeps for target density, failures, communications limits, and abrupt mission changes.",
+          "Month 6: deliver the prototype, benchmark evidence, explainability interface, failure register, and hardware-in-the-loop Phase II plan."
+        ],
+        "metrics": [
+          "Mission-weighted track quality and information gain versus static and greedy schedules.",
+          "Resource use, revisit performance, missed-priority events, and decision latency.",
+          "Robustness to sensor degradation, target-density shifts, and communications constraints.",
+          "Explanation fidelity and constraint compliance for every selected sensor action."
+        ],
+        "risks": [
+          "Simulation fidelity may distort optimizer rankings; mitigate with two fidelity levels and sensitivity analysis.",
+          "Optimization may miss real-time deadlines; mitigate with bounded compute budgets and fallback policies.",
+          "Objectives may encode the wrong mission priorities; mitigate with transparent weights, constraints, and operator overrides."
+        ],
+        "midterm": "Demonstrate four-radar simulation, frozen baselines, and constraint-respecting adaptive allocation in nominal scenarios.",
+        "final": "Demonstrate Monte Carlo performance under failures and regime shifts, real-time bounded execution, explanations, and a Phase II hardware-in-the-loop roadmap."
+      },
+      "required_sections": [
+        "Cover Sheet", "Technical Volume", "Cost Volume",
+        "Company Commercialization Report", "Supporting Documents"
+      ],
+      "page_limits": {"technical_volume_pages": 10}
     }
   ]
 }

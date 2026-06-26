@@ -363,9 +363,6 @@ def fetch_skip_opportunities(profile: Dict[str, Any]) -> List[Dict[str, Any]]:
     use_of_funds = payload.get("use_of_funds_templates", {}) if isinstance(payload, dict) else {}
     evidence = payload.get("evidence_snapshot", {}) if isinstance(payload, dict) else {}
 
-    annual_value = _to_float(evidence.get("annual_value_signal_usd"), 0.0)
-    router_edge = _to_float(evidence.get("router_edge_pct"), 0.0)
-    harmonic = _to_float(evidence.get("harmonic_win_rate_pct"), 0.0)
     website = str((payload.get("business_profile") or {}).get("website") or "https://helloskip.com/")
 
     out: List[Dict[str, Any]] = []
@@ -390,9 +387,7 @@ def fetch_skip_opportunities(profile: Dict[str, Any]) -> List[Dict[str, Any]]:
                 str(row.get("autofill_angle") or ""),
                 str(row.get("paste_ready_answer") or ""),
                 "harmonic ai autonomous execution",
-                f"annual value signal {annual_value:,.2f}",
-                f"router edge {router_edge:.2f}%",
-                f"harmonic win rate {harmonic:.2f}%",
+                "reproducible benchmarking evidence automation risk controls",
                 "small business AI grant application",
             ]
         ).strip()

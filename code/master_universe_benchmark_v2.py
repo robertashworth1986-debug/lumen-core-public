@@ -34,6 +34,7 @@ Scale control via env var:
 from __future__ import annotations
 
 import hashlib
+from importlib import metadata as importlib_metadata
 import json
 import os
 import re
@@ -77,10 +78,19 @@ ENV_FILES = [
 ]
 OUT_ROOT = ROOT / "out" / "master_universe_v2"
 LEDGER = ROOT / "out" / "frozen_delta_ledger.jsonl"
-UTC = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+RESUME_RUN = os.environ.get("MASTER_RESUME_RUN", "").strip()
+if RESUME_RUN and not re.fullmatch(r"\d{8}T\d{6}Z", RESUME_RUN):
+    raise ValueError("MASTER_RESUME_RUN must use YYYYMMDDTHHMMSSZ")
+UTC = RESUME_RUN or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 RUN_DIR = OUT_ROOT / UTC
 RAW_DIR = RUN_DIR / "raw"
 RAW_DIR.mkdir(parents=True, exist_ok=True)
+PARTIAL_ROWS_PATH = RUN_DIR / "results.partial.jsonl"
+PARTIAL_METADATA_PATH = RUN_DIR / "metadata.partial.json"
+RAW_SOURCE_RUN = os.environ.get("MASTER_RAW_SOURCE_RUN", "").strip()
+if RAW_SOURCE_RUN and not re.fullmatch(r"\d{8}T\d{6}Z", RAW_SOURCE_RUN):
+    raise ValueError("MASTER_RAW_SOURCE_RUN must use YYYYMMDDTHHMMSSZ")
+RAW_SOURCE_DIR = OUT_ROOT / RAW_SOURCE_RUN / "raw" if RAW_SOURCE_RUN else None
 
 
 def load_env(path: Path) -> dict:
@@ -117,16 +127,61 @@ def sha256_file(p: Path) -> str:
     return h.hexdigest()
 
 
+def load_cached_raw(ds_name: str) -> pd.DataFrame | None:
+    candidates = [RAW_DIR / f"{ds_name}.csv"]
+    if RAW_SOURCE_DIR is not None:
+        candidates.append(RAW_SOURCE_DIR / f"{ds_name}.csv")
+    for raw_path in candidates:
+        if not raw_path.exists():
+            continue
+        try:
+            df = pd.read_csv(raw_path)
+            if "period" not in df.columns or "value" not in df.columns:
+                continue
+            df["period"] = pd.to_datetime(df["period"], errors="coerce", utc=True)
+            df["value"] = pd.to_numeric(df["value"], errors="coerce")
+            df = df.dropna(subset=["period", "value"]).reset_index(drop=True)
+            if len(df) >= 30:
+                return df
+        except Exception:
+            continue
+    return None
+
+
+def load_partial_rows() -> tuple[list[dict], set[str]]:
+    rows: list[dict] = []
+    completed: set[str] = set()
+    if not PARTIAL_ROWS_PATH.exists():
+        return rows, completed
+    for line in PARTIAL_ROWS_PATH.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except Exception:
+            continue
+        if isinstance(row, dict) and row.get("dataset"):
+            rows.append(row)
+            completed.add(str(row["dataset"]))
+    return rows, completed
+
+
+def append_partial_rows(out_rows: list[dict]) -> None:
+    with PARTIAL_ROWS_PATH.open("a", encoding="utf-8") as handle:
+        for row in out_rows:
+            handle.write(json.dumps(row, default=str) + "\n")
+
+
 # -----------------------------------------------------------------------------
 # Premium models added in v2
 # -----------------------------------------------------------------------------
 def model_g_xgboost_lag(y_train, n_test, n_lags=12):
     try:
         from xgboost import XGBRegressor
-    except Exception:
-        return model_a_naive(y_train, n_test)
+    except Exception as exc:
+        raise RuntimeError("xgboost dependency unavailable") from exc
     if len(y_train) <= n_lags + 5:
-        return model_a_naive(y_train, n_test)
+        raise ValueError("insufficient history for xgboost lag model")
     X, yt = make_lag_features(y_train, n_lags)
     m = XGBRegressor(
         n_estimators=300, max_depth=4, learning_rate=0.05,
@@ -146,10 +201,10 @@ def model_g_xgboost_lag(y_train, n_test, n_lags=12):
 def model_h_lightgbm_lag(y_train, n_test, n_lags=12):
     try:
         from lightgbm import LGBMRegressor
-    except Exception:
-        return model_a_naive(y_train, n_test)
+    except Exception as exc:
+        raise RuntimeError("lightgbm dependency unavailable") from exc
     if len(y_train) <= n_lags + 5:
-        return model_a_naive(y_train, n_test)
+        raise ValueError("insufficient history for lightgbm lag model")
     X, yt = make_lag_features(y_train, n_lags)
     m = LGBMRegressor(
         n_estimators=300, max_depth=-1, num_leaves=31, learning_rate=0.05,
@@ -167,11 +222,11 @@ def model_h_lightgbm_lag(y_train, n_test, n_lags=12):
 
 
 def model_i_sarima(y_train, n_test):
-    """Strong classical baseline. Falls back to naive if it fails to fit."""
+    """Strong classical baseline. Fit failures are reported, never aliased."""
     try:
         from statsmodels.tsa.statespace.sarimax import SARIMAX
-    except Exception:
-        return model_a_naive(y_train, n_test)
+    except Exception as exc:
+        raise RuntimeError("statsmodels dependency unavailable") from exc
     try:
         # Light-weight SARIMA: (1,1,1)x(1,1,1,12)
         m = SARIMAX(
@@ -179,13 +234,13 @@ def model_i_sarima(y_train, n_test):
             enforce_stationarity=False, enforce_invertibility=False,
         ).fit(disp=False, maxiter=50)
         return np.asarray(m.forecast(steps=n_test), dtype=float)
-    except Exception:
-        return model_a_naive(y_train, n_test)
+    except Exception as exc:
+        raise RuntimeError(f"sarima fit failed: {exc}") from exc
 
 
 def model_j_random_forest_lag(y_train, n_test, n_lags=18):
     if len(y_train) <= n_lags + 10:
-        return model_a_naive(y_train, n_test)
+        raise ValueError("insufficient history for random forest lag model")
     X, yt = make_lag_features(y_train, n_lags)
     try:
         m = RandomForestRegressor(
@@ -203,13 +258,13 @@ def model_j_random_forest_lag(y_train, n_test, n_lags=18):
             preds.append(yhat)
             history.append(yhat)
         return np.array(preds)
-    except Exception:
-        return model_a_naive(y_train, n_test)
+    except Exception as exc:
+        raise RuntimeError(f"random forest fit failed: {exc}") from exc
 
 
 def model_k_extra_trees_lag(y_train, n_test, n_lags=18):
     if len(y_train) <= n_lags + 10:
-        return model_a_naive(y_train, n_test)
+        raise ValueError("insufficient history for extra trees lag model")
     X, yt = make_lag_features(y_train, n_lags)
     try:
         m = ExtraTreesRegressor(
@@ -227,13 +282,13 @@ def model_k_extra_trees_lag(y_train, n_test, n_lags=18):
             preds.append(yhat)
             history.append(yhat)
         return np.array(preds)
-    except Exception:
-        return model_a_naive(y_train, n_test)
+    except Exception as exc:
+        raise RuntimeError(f"extra trees fit failed: {exc}") from exc
 
 
 def model_l_hist_gradient_boosting_lag(y_train, n_test, n_lags=18):
     if len(y_train) <= n_lags + 10:
-        return model_a_naive(y_train, n_test)
+        raise ValueError("insufficient history for hist gradient boosting lag model")
     X, yt = make_lag_features(y_train, n_lags)
     try:
         m = HistGradientBoostingRegressor(
@@ -252,8 +307,10 @@ def model_l_hist_gradient_boosting_lag(y_train, n_test, n_lags=18):
             preds.append(yhat)
             history.append(yhat)
         return np.array(preds)
-    except Exception:
-        return model_a_naive(y_train, n_test)
+    except Exception as exc:
+        raise RuntimeError(
+            f"hist gradient boosting fit failed: {exc}"
+        ) from exc
 
 
 MODELS = {
@@ -291,6 +348,32 @@ if MODEL_PACK in {"extended", "full", "max"}:
         "k_extra_trees_lag",
         "l_hist_gradient_boosting_lag",
     ]
+
+
+def model_dependency_status() -> dict[str, dict[str, str | bool | None]]:
+    packages = {
+        "g_xgboost_lag": "xgboost",
+        "h_lightgbm_lag": "lightgbm",
+        "i_sarima": "statsmodels",
+    }
+    status: dict[str, dict[str, str | bool | None]] = {}
+    for model_name, package_name in packages.items():
+        if model_name not in MODELS:
+            continue
+        try:
+            version = importlib_metadata.version(package_name)
+            status[model_name] = {
+                "package": package_name,
+                "available": True,
+                "version": version,
+            }
+        except importlib_metadata.PackageNotFoundError:
+            status[model_name] = {
+                "package": package_name,
+                "available": False,
+                "version": None,
+            }
+    return status
 
 
 # -----------------------------------------------------------------------------
@@ -520,6 +603,22 @@ def evaluate(y, test_frac=0.2):
 # Main
 # -----------------------------------------------------------------------------
 def main():
+    if RESUME_RUN and (RUN_DIR / "summary.json").exists():
+        print(f"run {RESUME_RUN} is already complete: {RUN_DIR}")
+        return
+    dependency_status = model_dependency_status()
+    missing_dependencies = [
+        name
+        for name, status in dependency_status.items()
+        if not status.get("available")
+    ]
+    if missing_dependencies and os.environ.get("MASTER_STRICT_DEPS", "1") != "0":
+        raise SystemExit(
+            "required model dependencies are unavailable: "
+            + ", ".join(missing_dependencies)
+            + ". Use the project venv or set MASTER_STRICT_DEPS=0 only for "
+              "an explicitly incomplete diagnostic run."
+        )
     universe = build_universe()
     selection_meta = getattr(build_universe, "selection_meta", {})
     print(f"=== master_universe_benchmark_v2 @ {UTC} ===")
@@ -530,8 +629,20 @@ def main():
     print(f"output: {RUN_DIR}")
     print()
 
-    rows: list[dict] = []
+    rows, completed_datasets = load_partial_rows() if RESUME_RUN else ([], set())
     metadata: dict = {}
+    if RESUME_RUN and PARTIAL_METADATA_PATH.exists():
+        try:
+            metadata = json.loads(
+                PARTIAL_METADATA_PATH.read_text(encoding="utf-8")
+            )
+        except Exception:
+            metadata = {}
+    if completed_datasets:
+        print(
+            f"[resume] loaded {len(rows)} model rows for "
+            f"{len(completed_datasets)} completed datasets"
+        )
     t_start = time.time()
 
     PARALLEL = os.environ.get("MASTER_PARALLEL", "0") == "1"
@@ -558,7 +669,10 @@ def main():
         def _fetch_one(name_fetch):
             ds_name, fetch = name_fetch
             try:
-                df = fetch()
+                df = load_cached_raw(ds_name)
+                cached = df is not None
+                if df is None:
+                    df = fetch()
                 y = df["value"].to_numpy(dtype=float)
                 if len(y) < 30:
                     return ds_name, None, {"error": "too_short", "n": len(y)}
@@ -569,6 +683,7 @@ def main():
                     "first": str(df["period"].iloc[0].date()),
                     "last": str(df["period"].iloc[-1].date()),
                     "raw_sha256": sha256_file(raw_path),
+                    "resume_cache": cached,
                 }
             except requests.HTTPError as e:
                 code = e.response.status_code if e.response else "?"
@@ -587,7 +702,7 @@ def main():
         ok_items = []
         for ds_name, df, meta in fetch_results:
             metadata[ds_name] = meta
-            if df is not None:
+            if df is not None and ds_name not in completed_datasets:
                 ok_items.append((ds_name, df["value"].to_numpy(dtype=float)))
 
         # ---- Phase 2: parallel evaluate (CPU-bound) ----
@@ -606,20 +721,48 @@ def main():
             return ds_name, n_test, out_rows
 
         t_eval = time.time()
-        eval_results = Parallel(n_jobs=EVAL_JOBS, backend=EVAL_BACKEND, verbose=5)(
-            delayed(_eval_one)(it) for it in ok_items
+        eval_batch_size = max(
+            1, int(os.environ.get("MASTER_EVAL_BATCH_SIZE", "64"))
         )
+        total_batches = max(
+            1, (len(ok_items) + eval_batch_size - 1) // eval_batch_size
+        )
+        for batch_index, batch_start in enumerate(
+            range(0, len(ok_items), eval_batch_size),
+            start=1,
+        ):
+            batch = ok_items[batch_start : batch_start + eval_batch_size]
+            print(
+                f"[parallel] eval batch {batch_index}/{total_batches} "
+                f"datasets={len(batch)}"
+            )
+            eval_results = Parallel(
+                n_jobs=EVAL_JOBS,
+                backend=EVAL_BACKEND,
+                verbose=5,
+            )(
+                delayed(_eval_one)(it) for it in batch
+            )
+            for ds_name, n_test, out_rows in eval_results:
+                rows.extend(out_rows)
+                append_partial_rows(out_rows)
+                metadata.setdefault(ds_name, {})["n_test"] = n_test
+            PARTIAL_METADATA_PATH.write_text(
+                json.dumps(metadata, indent=2), encoding="utf-8"
+            )
         print(f"[parallel] evaluate done in {time.time()-t_eval:.1f}s")
-
-        for ds_name, n_test, out_rows in eval_results:
-            rows.extend(out_rows)
-            metadata.setdefault(ds_name, {})["n_test"] = n_test
     else:
         for i, (ds_name, fetch) in enumerate(universe.items(), start=1):
             prefix = f"[{i:>4}/{len(universe)}] {ds_name:<48}"
+            if ds_name in completed_datasets:
+                print(f"{prefix} checkpointed")
+                continue
             print(prefix, flush=True, end=" ")
             try:
-                df = fetch()
+                df = load_cached_raw(ds_name)
+                cached = df is not None
+                if df is None:
+                    df = fetch()
             except requests.HTTPError as e:
                 print(f"HTTP-FAIL: {e.response.status_code if e.response else '?'}")
                 metadata[ds_name] = {"error": f"http {e.response.status_code if e.response else '?'}"}
@@ -637,8 +780,13 @@ def main():
 
             raw_path = RAW_DIR / f"{ds_name}.csv"
             df.to_csv(raw_path, index=False)
-            print(f"{len(y)} obs", flush=True)
+            print(
+                f"{len(y)} obs"
+                + (" (resume cache)" if cached else ""),
+                flush=True,
+            )
             results, n_test = evaluate(y)
+            out_rows = []
             for model_name, r in results.items():
                 row = {"dataset": ds_name, "model": model_name,
                        "n_train": len(y) - n_test, "n_test": n_test,
@@ -647,10 +795,16 @@ def main():
                            else {"rmse": np.nan, "ci_lo": np.nan, "ci_med": np.nan,
                                  "ci_hi": np.nan, "error": r["error"]})
                 rows.append(row)
+                out_rows.append(row)
+            append_partial_rows(out_rows)
             metadata[ds_name] = {"n_obs": len(y), "n_test": n_test,
                                  "first": str(df["period"].iloc[0].date()),
                                  "last": str(df["period"].iloc[-1].date()),
-                                 "raw_sha256": sha256_file(raw_path)}
+                                 "raw_sha256": sha256_file(raw_path),
+                                 "resume_cache": cached}
+            PARTIAL_METADATA_PATH.write_text(
+                json.dumps(metadata, indent=2), encoding="utf-8"
+            )
 
     elapsed = time.time() - t_start
     print(f"\nfetch+eval done in {elapsed:.1f}s")
@@ -724,8 +878,18 @@ def main():
         "n_datasets_in_universe": len(universe),
         "dataset_selection": selection_meta,
         "n_datasets_succeeded": total,
+        "validation_design": {
+            "split": "single_chronological_80_20_holdout",
+            "walk_forward": False,
+            "submission_grade_v7": False,
+            "limitations": [
+                "This breadth benchmark is not a multi-fold walk-forward study.",
+                "Bootstrap intervals describe RMSE sampling uncertainty, not a complete multiple-comparison claim gate.",
+            ],
+        },
         "models": list(MODELS),
         "families": FAMILIES,
+        "model_dependencies": dependency_status,
         "family_win_counts": counts,
         "harmonic_win_rate": counts["harmonic"] / total if total else None,
         "harmonic_avg_margin_pct": avg_harm_margin,
@@ -733,7 +897,7 @@ def main():
         "elapsed_s": round(elapsed, 1),
         "datasets": metadata,
         "verdict": (
-            f"On {total} live federal/market datasets, the HARMONIC family "
+            f"On {total} frozen public/market series, the HARMONIC family "
             f"wins {counts['harmonic']}/{total} "
             f"({counts['harmonic']/total*100:.1f}%) head-to-head against "
             f"tuned tree boosters (XGBoost+LightGBM), tuned neural nets, "
@@ -748,14 +912,28 @@ def main():
 
     # Markdown scorecard
     md = []
-    md.append("# UNDENIABLE SCORECARD v2 — Premium Stack, Live Data, Hash-Chained")
+    md.append("# EXPLORATORY SCORECARD v2 - Broad Frozen Holdout Benchmark")
     md.append("")
     md.append(f"**Run UTC:** `{UTC}`")
-    md.append(f"**Scale:** `{SCALE}` | **Universe:** {total} live datasets succeeded "
+    md.append(f"**Scale:** `{SCALE}` | **Universe:** {total} frozen series succeeded "
               f"(of {len(universe)} attempted)")
     md.append(f"**Models:** {', '.join(MODELS)}")
-    md.append("**Method:** apples-to-apples 9-model benchmark, 80/20 walk-forward, "
-              "400-iter bootstrap 95% CI on RMSE, 5 model families.")
+    md.append(
+        "**Dependency gate:** "
+        + ", ".join(
+            f"{name}={status.get('package')} {status.get('version')}"
+            for name, status in dependency_status.items()
+        )
+    )
+    md.append(
+        f"**Method:** apples-to-apples {len(MODELS)}-model benchmark, single "
+        f"chronological 80/20 holdout, bootstrap 95% CI on RMSE, "
+        f"{len(FAMILIES)} model families."
+    )
+    md.append(
+        "**Evidence class:** exploratory breadth benchmark; not V7 multi-fold "
+        "walk-forward proof and not live-trading authorization."
+    )
     md.append("")
     md.append("## Headline")
     md.append("")
@@ -774,8 +952,8 @@ def main():
     md.append("")
     md.append("- Every raw data CSV is hashed in `manifest.sha256.json`.")
     md.append("- This run is chained to `out/frozen_delta_ledger.jsonl`.")
-    md.append("- Re-running with the same `MASTER_SCALE` on the same date pulls "
-              "identical historical data and produces identical RMSEs.")
+    md.append("- Re-evaluating the frozen raw CSVs with the recorded code and "
+              "configuration reproduces the model comparison.")
     md.append("- Any post-hoc edit of any artifact breaks the SHA256 chain.")
     md.append("")
     md.append("## Per-dataset family results (top 100)")
@@ -796,8 +974,13 @@ def main():
 
     # manifest
     manifest = {"run_utc": UTC, "scale": SCALE, "files": {}}
+    checkpoint_files = [
+        path
+        for path in (PARTIAL_ROWS_PATH, PARTIAL_METADATA_PATH)
+        if path.exists()
+    ]
     for p in [res_path, pivot_path, ci_pivot_path, fam_path, summary_path,
-              md_path] + list(RAW_DIR.glob("*.csv")):
+              md_path] + checkpoint_files + list(RAW_DIR.glob("*.csv")):
         manifest["files"][str(p.relative_to(RUN_DIR))] = sha256_file(p)
     manifest_path = RUN_DIR / "manifest.sha256.json"
     manifest_path.write_text(json.dumps(manifest, indent=2))
@@ -818,6 +1001,7 @@ def main():
         "n_datasets": total,
         "harmonic_win_rate": counts["harmonic"] / total if total else None,
         "family_win_counts": counts,
+        "model_dependencies": dependency_status,
         "manifest_sha256": sha256_file(manifest_path),
         "summary_sha256": sha256_file(summary_path),
         "scorecard_sha256": sha256_file(md_path),
@@ -827,6 +1011,7 @@ def main():
     entry["entry_sha256"] = hashlib.sha256(entry_str.encode("utf-8")).hexdigest()
     with LEDGER.open("a", encoding="utf-8") as f:
         f.write(json.dumps(entry) + "\n")
+    (OUT_ROOT / "latest.txt").write_text(UTC + "\n", encoding="utf-8")
 
     print()
     print("=== FAMILY SCOREBOARD ===")
