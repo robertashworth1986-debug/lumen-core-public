@@ -41,6 +41,8 @@ def test_buyer_pilot_packet_builds_two_manual_outreach_tracks():
     assert "Energy Forecasting Lead" in kuramoto["priority_buyer_titles"]
     assert "Sensor Fusion Program Manager" in kuramoto["priority_buyer_titles"]
     assert "Resonance Timing" in kuramoto["pilot_name"]
+    assert kuramoto["field_replay_request"]["minimum_holdout_windows"] == 20
+    assert kuramoto["field_replay_request"]["current_status"] == "ready_to_request_field_replay_not_yet_field_validated"
 
 
 def test_buyer_pilot_packet_contains_sow_data_room_and_pilot_questions():
@@ -55,12 +57,37 @@ def test_buyer_pilot_packet_contains_sow_data_room_and_pilot_questions():
         assert len(packet["data_room_artifacts"]) >= 5
         assert "docs/GEOMETRY_REPEAT_UNCERTAINTY_REPORT_2026-06-25.md" in packet["data_room_artifacts"]
         assert "docs/GEOMETRY_FIELD_VALIDATION_PROTOCOL_2026-06-25.md" in packet["data_room_artifacts"]
+        assert "docs/KURAMOTO_HOLDOUT_EXPANSION_2026-06-26.md" in packet["data_room_artifacts"]
         assert len(packet["buyer_data_checklist"]) >= 5
         assert len(packet["baseline_controls"]) >= 5
         assert len(packet["primary_kpis"]) >= 4
         assert len(packet["pre_call_questions"]) >= 6
         assert len(packet["sow_outline"]) >= 5
         assert len(packet["packet_sha256"]) == 64
+
+
+def test_buyer_pilot_packet_surfaces_kuramoto_holdout_without_overclaiming():
+    module = load_module()
+    payload = module.build_payload()
+    by_family = {row["family_id"]: row for row in payload["packets"]}
+    summary = payload["summary"]
+    kuramoto = by_family["kuramoto_phase_coupling"]
+    holdout = kuramoto["latest_holdout_evidence"]
+
+    assert summary["kuramoto_holdout_ready_for_field_replay_request"] is True
+    assert summary["kuramoto_holdout_count"] >= 20
+    assert summary["kuramoto_holdout_wins_vs_kalman"] >= 16
+    assert len(summary["kuramoto_holdout_chain_sha256"]) == 64
+
+    assert holdout["candidate"] == "kuramoto_phase_coupling"
+    assert holdout["named_baseline"] == "kalman_filter"
+    assert holdout["holdout_count"] >= 20
+    assert holdout["wins_vs_kalman"] >= 16
+    assert holdout["passes_internal_20_holdout_gate"] is True
+    assert holdout["ready_for_buyer_authorized_field_replay_request"] is True
+    assert holdout["estimated_rows_replayed"] > 0
+    assert len(holdout["holdout_chain_sha256"]) == 64
+    assert "not field validation" in holdout["claim_boundary"].lower()
 
 
 def test_buyer_pilot_packet_blocks_overclaim_and_bulk_outreach():
@@ -103,3 +130,6 @@ def test_buyer_pilot_markdown_is_actionable_and_compliant():
     assert "`kuramoto_phase_coupling`" in rendered
     assert "To stop further outreach, reply \"remove.\"" in rendered
     assert "Do not run bulk outreach" in rendered
+    assert "Expanded internal holdout evidence" in rendered
+    assert "Kuramoto holdout wins vs Kalman" in rendered
+    assert "not field validation or a dollar claim" in rendered
