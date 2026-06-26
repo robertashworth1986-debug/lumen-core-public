@@ -1,7 +1,7 @@
 # Geometry Champion Of Champions
 
-Generated UTC: `2026-06-26T21:37:14.218097+00:00`
-Board SHA-256: `61a4e37623abbad6f454dff89a6e3e3ae5015be9c5b5d4fb817e212f936c2531`
+Generated UTC: `2026-06-26T22:01:48.035181+00:00`
+Board SHA-256: `288620ab9193769326539fedefa2b17175e014e0453e0d268c26f9d7a2236fa7`
 
 ## Boundary
 
@@ -48,7 +48,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - live_trading_or_autonomous_execution_allowed: `false`
 - vps_domain_live_dashboard_routed: `false`
 - all_registered_families_live_benchmarked: `false`
-- all_families_have_benchmark_specs: `false`
+- all_families_have_benchmark_specs: `true`
 - glyph_or_external_vault_routed: `true`
 - triple_dataset_frozen_assets_present: `true`
 

@@ -1,6 +1,6 @@
 # Geometry Asset Wiring Board
 
-Generated UTC: `2026-06-25T23:18:00.779771+00:00`
+Generated UTC: `2026-06-26T22:01:48.794326+00:00`
 
 Asset wiring only. These rows identify where frozen live-context proof cards can be used for dashboards, grant evidence, buyer outreach, and next validation. They do not establish field validation, realized savings, award certainty, live trading permission, or a real-dollar claim.
 
@@ -28,7 +28,7 @@ Asset wiring only. These rows identify where frozen live-context proof cards can
 - Ready for real-dollar claim: `false`
 - Field validation: `false`
 - Mass email allowed: `false`
-- Board chain SHA-256: `133b01f9a1d9b2d82a3386e09f15db7e5b47e9a8c75215e694a50f867210fad5`
+- Board chain SHA-256: `ef679e99449101af32dd77fc8a245ca4d5f25af672970346244401be9901a7ba`
 
 ## Top Next Actions
 
@@ -42,8 +42,8 @@ Asset wiring only. These rows identify where frozen live-context proof cards can
 
 | Rank | Family | Lane | Evidence | Next Wire |
 | --- | --- | --- | --- | --- |
-| 1 | `brachistochrone_descent` | `optimal_curve_transport` | rolling_champion / rolling_champion_repeat_live_context_not_field_validated | grant_appendix + proof_to_pilot + vps_domain_hash + buyer_authorized_holdouts |
-| 2 | `kuramoto_phase_coupling` | `wave_resonance_timing` | rolling_champion / rolling_champion_repeat_live_context_not_field_validated | additional_holdouts + uncertainty_gate + bounded_grant_appendix |
+| 1 | `kuramoto_phase_coupling` | `wave_resonance_timing` | rolling_champion / expanded_source_conditioned_holdout_winner_not_field_validated | additional_holdouts + uncertainty_gate + bounded_grant_appendix |
+| 2 | `brachistochrone_descent` | `optimal_curve_transport` | rolling_champion / rolling_champion_repeat_live_context_not_field_validated | grant_appendix + proof_to_pilot + vps_domain_hash + buyer_authorized_holdouts |
 | 3 | `thermal_plume_convection` | `thermal_ventilation` | rolling_champion / rolling_champion_repeat_live_context_not_field_validated | additional_holdouts + uncertainty_gate + bounded_grant_appendix |
 | 4 | `leaf_veins` | `branching_transport` | triple_source_candidate / triple_source_live_candidate_needs_repeat_run | repeat_frozen_replay + named_baseline_lock |
 | 5 | `beast_algo_echo_stack` | `time_series_model_routing` | not_in_rolling_gate / proof_value_candidate_not_performance_claim | build_first_live_adapter_or_reroute_to_current_winner |

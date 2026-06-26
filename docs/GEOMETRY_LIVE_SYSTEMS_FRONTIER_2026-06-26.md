@@ -1,6 +1,6 @@
 # Geometry Live Systems Frontier
 
-Generated UTC: `2026-06-26T00:53:17.312037+00:00`
+Generated UTC: `2026-06-26T21:57:34.127554+00:00`
 
 Geometry live-systems frontier only. It ranks local evidence and uploaded measured-data candidates for next benchmark wiring. It does not establish field validation, clinical validation, safety certification, live trading permission, fixed-dollar frozen-delta value, realized savings, or grant-award certainty.
 
@@ -9,7 +9,7 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 - Registered families ranked: `140` / `140`
 - Lanes: `12`
 - Local uploaded/live files inventoried: `2758`
-- Local estimated data rows: `4315989`
+- Local estimated data rows: `4316026`
 - Provider snapshot files: `63`
 - Canonical measured sources: `18`
 - Canonical measured rows: `418`
@@ -19,7 +19,7 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 - Real-dollar savings claim allowed: `false`
 - Live trading/autonomous execution allowed: `false`
 - Medical/addiction-treatment claim allowed: `false`
-- Frontier SHA-256: `9fd6efcb4337e22f59eede70cfba4dff1a2db629b9d45fa6cff8724a653086f4`
+- Frontier SHA-256: `ec1a7c260e8bdf5a917a8cd11204fcfce83ae5f8273c9cd201503e2051ba8739`
 
 ## Next 10 Actions
 
@@ -41,7 +41,7 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 | System | Files | Estimated Rows | Candidate Lanes |
 | --- | --- | --- | --- |
 | `market_data` | `1298` | `2859064` | energy_price_pressure_proxy, market_signal_geometry, wave_resonance_timing |
-| `unclassified_measured_file` | `749` | `630745` |  |
+| `unclassified_measured_file` | `749` | `630782` |  |
 | `energy_grid` | `53` | `447220` | branching_transport, energy_price_pressure_proxy, thermal_ventilation, wave_resonance_timing |
 | `maritime_ais` | `76` | `258680` | branching_transport, field_guided_control, optimal_curve_transport |
 | `federal_opportunity` | `554` | `48351` | multi_agent_coordination, resource_aware_scheduling |
@@ -56,7 +56,7 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 | Rank | Family | Lane | Score | Evidence |
 | --- | --- | --- | --- | --- |
 | `1` | `brachistochrone_descent` | `optimal_curve_transport` | `277.711` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, paid_pilot_scoping_candidate, robust_repeat_uncertainty_gate_passed, rolling_champion |
-| `2` | `kuramoto_phase_coupling` | `wave_resonance_timing` | `248.762` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, paid_pilot_scoping_candidate, rolling_champion |
+| `2` | `kuramoto_phase_coupling` | `wave_resonance_timing` | `266.406` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, paid_pilot_scoping_candidate, rolling_champion |
 | `3` | `thermal_plume_convection` | `thermal_ventilation` | `202.13` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, rolling_champion |
 | `4` | `leaf_veins` | `branching_transport` | `175.101` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, triple_source_candidate |
 | `5` | `fractal_brownian_surface` | `time_series_model_routing` | `109.392` | asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, natural_logic_present, not_promoted |

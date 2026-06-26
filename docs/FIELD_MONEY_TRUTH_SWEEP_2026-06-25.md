@@ -1,6 +1,6 @@
 # Field Money Truth Sweep
 
-Generated UTC: `2026-06-25T17:19:16.872205+00:00`
+Generated UTC: `2026-06-26T21:56:03.721791+00:00`
 
 This sweep is a hard truth gate. It runs or reads the current live-evidence, geometry, proof, vault, and claim artifacts, then states which commercial claims are allowed. It does not turn field validation or real-dollar savings true unless buyer/agency-authorized field data, preregistered holdouts, named baselines, accepted economic conversion factors, and auditable result artifacts exist.
 
@@ -18,7 +18,7 @@ This sweep is a hard truth gate. It runs or reads the current live-evidence, geo
 ## Gates
 
 - registry_has_all_candidate_families: `true`
-- all_families_have_benchmark_specs: `false`
+- all_families_have_benchmark_specs: `true`
 - all_registered_families_live_benchmarked: `false`
 - live_data_available_for_benchmarking: `true`
 - double_dataset_frozen_assets_present: `true`
@@ -57,4 +57,4 @@ Fast run using existing snapshots:
 pwsh -ExecutionPolicy Bypass -File .\tools\Run-FieldMoneyTruthSweep.ps1 -StageGlyphVault
 ```
 
-Truth-sweep hash: `405ce796c1af5af7e25ca17167a8430a9c5b65c36ecdbc6aa10958e5865c5c76`
+Truth-sweep hash: `d2fcd507d84ca68992cc5ca49415373a3bfdd373310fc0af9c01ff5b7b6effbf`

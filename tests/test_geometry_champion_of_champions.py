@@ -47,6 +47,7 @@ def test_board_ranks_all_lanes_and_families_without_global_winner_claim():
     assert board["current_truth_gates"]["field_validation_claim_allowed"] is False
     assert board["current_truth_gates"]["real_dollar_savings_claim_allowed"] is False
     assert board["current_truth_gates"]["live_trading_or_autonomous_execution_allowed"] is False
+    assert board["current_truth_gates"]["all_families_have_benchmark_specs"] is True
 
 
 def test_all_ranked_families_have_benchmark_specs():

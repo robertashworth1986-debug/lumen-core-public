@@ -736,6 +736,9 @@ def build_board() -> dict[str, Any]:
     truth_summary = summary_dict(truth)
     rolling_summary = summary_dict(rolling)
     truth_gates = current_truth_gates(truth)
+    truth_gates["all_families_have_benchmark_specs"] = (
+        bool(family_rows) and spec_summary["specified_count"] == len(family_rows) and spec_summary["missing_count"] == 0
+    )
     registry_cross_lane = bool(registry.get("cross_lane_ranking_allowed"))
 
     payload = {
