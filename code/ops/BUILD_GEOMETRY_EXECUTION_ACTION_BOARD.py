@@ -27,12 +27,17 @@ BOUNDARY = (
     "claims, fixed-dollar frozen-delta sales claims, realized savings claims, or grant-award certainty."
 )
 
+
+def replay_out(lane: str) -> str:
+    return str((ROOT / "out" / "action_replays" / lane).resolve())
+
+
 RUNNER_BY_LANE: dict[str, dict[str, str]] = {
     "optimal_curve_transport": {
         "script": "code/geometry_optimal_curve_transport_benchmark.py",
         "command": (
             "python code\\geometry_optimal_curve_transport_benchmark.py "
-            "--out-root out\\action_replays\\optimal_curve_transport "
+            f"--out-root \"{replay_out('optimal_curve_transport')}\" "
             "--run-tag NEXT_HOLDOUT --development-scenarios 8 --validation-scenarios 20"
         ),
         "side_effects": "Writes local synthetic/controlled replay artifacts under out/action_replays.",
@@ -41,7 +46,7 @@ RUNNER_BY_LANE: dict[str, dict[str, str]] = {
         "script": "code/geometry_wave_resonance_timing_benchmark.py",
         "command": (
             "python code\\geometry_wave_resonance_timing_benchmark.py "
-            "--out-root out\\action_replays\\wave_resonance_timing "
+            f"--out-root \"{replay_out('wave_resonance_timing')}\" "
             "--run-tag NEXT_HOLDOUT --development-scenarios 8 --validation-scenarios 20"
         ),
         "side_effects": "Writes local synthetic/controlled replay artifacts under out/action_replays.",
@@ -50,7 +55,7 @@ RUNNER_BY_LANE: dict[str, dict[str, str]] = {
         "script": "code/geometry_thermal_ventilation_benchmark.py",
         "command": (
             "python code\\geometry_thermal_ventilation_benchmark.py "
-            "--out-root out\\action_replays\\thermal_ventilation "
+            f"--out-root \"{replay_out('thermal_ventilation')}\" "
             "--run-tag NEXT_HOLDOUT --development-scenarios 8 --validation-scenarios 20"
         ),
         "side_effects": "Writes local synthetic/controlled replay artifacts under out/action_replays.",
@@ -59,7 +64,7 @@ RUNNER_BY_LANE: dict[str, dict[str, str]] = {
         "script": "code/geometry_branching_transport_benchmark.py",
         "command": (
             "python code\\geometry_branching_transport_benchmark.py "
-            "--out-root out\\action_replays\\branching_transport "
+            f"--out-root \"{replay_out('branching_transport')}\" "
             "--run-tag NEXT_HOLDOUT --development-scenarios 8 --validation-scenarios 20"
         ),
         "side_effects": "Writes local synthetic/controlled replay artifacts under out/action_replays.",
