@@ -1,7 +1,7 @@
 # Geometry Champion Of Champions
 
-Generated UTC: `2026-06-25T22:45:47.078569+00:00`
-Board SHA-256: `4f99a8d6317b3e345d6548b739709961a920859c682be2e8f95a864768dd6c1e`
+Generated UTC: `2026-06-26T20:20:36.926321+00:00`
+Board SHA-256: `06fff6d1ace5763938396aca68f2fe6080038e9381abdd77dce5f765bdd57d82`
 
 ## Boundary
 
@@ -29,6 +29,10 @@ This board ranks what to validate next. It does not establish field validation, 
 - Robust repeat candidates: `1`
 - Triple-source candidates: `1`
 - Single-run candidates: `0`
+- Kuramoto holdout wins vs Kalman: `24 / 24`
+- Kuramoto holdout mean delta vs Kalman: `0.139875`
+- Kuramoto holdout estimated rows replayed: `2506267`
+- Kuramoto field-replay request ready: `true`
 
 ## Current Truth Gates
 
@@ -48,21 +52,33 @@ This board ranks what to validate next. It does not establish field validation, 
 
 ## Strongest Current Read
 
-- Strongest current candidate: `brachistochrone_descent` (optimal_curve_transport)
-- Evidence status: `rolling_champion_repeat_live_context_not_field_validated`
-- Claim stage: `rolling_champion_not_field_validated`
-- Robust repeat gate: `true`
+- Strongest current candidate: `kuramoto_phase_coupling` (wave_resonance_timing)
+- Evidence status: `expanded_source_conditioned_holdout_winner_not_field_validated`
+- Claim stage: `buyer_authorized_field_replay_request_ready_not_field_validated`
+- Robust repeat gate: `false`
 - Paid pilot ready: `true`
 - Strongest money proxy: `phase_locked_residual_corrector` (energy_price_pressure_proxy) delta `36.387422`
+
+## Kuramoto Holdout Read
+
+- Candidate: `kuramoto_phase_coupling`
+- Baseline: `kalman_filter`
+- Holdout wins: `24 / 24`
+- Mean delta vs baseline: `0.139875`
+- Estimated rows replayed: `2506267`
+- Source systems: `4`
+- Chain SHA-256: `b723b3cf65d3971b0492e41cc27fc82e1fba57a5e0d672a67e9818348313f2e6`
+- Boundary: Internal source-conditioned holdout replay; ready to request buyer-authorized field replay, but not field validation, realized savings, fixed-dollar delta value, or live execution evidence.
 
 ## Category Champions
 
 - operational_proof_priority: `time_series_model_routing` (time_series_model_routing) score `228.72`
-- top_family_asset: `Brachistochrone fastest-descent curve` (optimal_curve_transport) score `273.826`
+- top_family_asset: `Kuramoto phase coupling` (wave_resonance_timing) score `336.069`
 - proof_value_champion: `Beast Algo: Echo Stack` (time_series_model_routing) score `115.0`
-- strict_rolling_champion: `Brachistochrone fastest-descent curve` (optimal_curve_transport) score `273.826`
+- strict_rolling_champion: `Kuramoto phase coupling` (wave_resonance_timing) score `336.069`
 - robust_repeat_candidate: `Brachistochrone fastest-descent curve` (optimal_curve_transport) score `273.826`
-- paid_pilot_scoping_candidate: `Brachistochrone fastest-descent curve` (optimal_curve_transport) score `273.826`
+- buyer_authorized_field_replay_request_candidate: `Kuramoto phase coupling` (wave_resonance_timing) score `336.069`
+- paid_pilot_scoping_candidate: `Kuramoto phase coupling` (wave_resonance_timing) score `336.069`
 - strict_triple_source_candidate: `Leaf veins` (branching_transport) score `151.3`
 - harmonic_phase_lock_candidate: `wave_resonance_timing` (wave_resonance_timing) score `161.032`
 - market_lane_status: `market_signal_geometry` (market_signal_geometry) score `77.64`
@@ -203,8 +219,8 @@ This board ranks what to validate next. It does not establish field validation, 
 
 ## Top Family Assets
 
-- 1. `brachistochrone_descent` (optimal_curve_transport): 273.826 - rolling_champion_repeat_live_context_not_field_validated - rolling `rolling_champion`
-- 2. `kuramoto_phase_coupling` (wave_resonance_timing): 247.069 - rolling_champion_repeat_live_context_not_field_validated - rolling `rolling_champion`
+- 1. `kuramoto_phase_coupling` (wave_resonance_timing): 336.069 - expanded_source_conditioned_holdout_winner_not_field_validated - rolling `rolling_champion`
+- 2. `brachistochrone_descent` (optimal_curve_transport): 273.826 - rolling_champion_repeat_live_context_not_field_validated - rolling `rolling_champion`
 - 3. `thermal_plume_convection` (thermal_ventilation): 188.846 - rolling_champion_repeat_live_context_not_field_validated - rolling `rolling_champion`
 - 4. `leaf_veins` (branching_transport): 151.3 - triple_source_live_candidate_needs_repeat_run - rolling `triple_source_candidate`
 - 5. `beast_algo_echo_stack` (time_series_model_routing): 115.0 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
@@ -235,6 +251,7 @@ This board ranks what to validate next. It does not establish field validation, 
 ## Required Next Wiring
 
 - Route dashboard/data/geometry_champion_of_champions.json and field_money_truth_sweep.json to the live VPS/domain and verify hosted hashes.
+- Route kuramoto_holdout_expansion_latest.json into dashboard/data and the buyer field-replay request packet.
 - Convert brachistochrone_descent and kuramoto_phase_coupling proof cards into grant appendices with the same claim gates.
 - Add benchmark specs for the remaining registered families until all_families_have_benchmark_specs is true.
 - Build adapters for high-value unbenchmarked families before claiming broad family coverage.

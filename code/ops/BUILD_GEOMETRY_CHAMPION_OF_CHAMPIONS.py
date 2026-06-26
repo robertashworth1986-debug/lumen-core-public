@@ -23,6 +23,7 @@ UNCERTAINTY_JSON = OUT_OPS / "geometry_repeat_uncertainty_report_latest.json"
 PROOF_TO_PILOT_JSON = OUT_OPS / "proof_to_pilot_control_room_latest.json"
 TRUTH_SWEEP_JSON = OUT_OPS / "field_money_truth_sweep_latest.json"
 CLAIM_MAP_JSON = OUT_OPS / "claim_strength_value_unlock_map_latest.json"
+KURAMOTO_HOLDOUT_JSON = OUT_OPS / "kuramoto_holdout_expansion_latest.json"
 
 OUT_JSON = OUT_OPS / "geometry_champion_of_champions_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "geometry_champion_of_champions.json"
@@ -440,6 +441,137 @@ def family_rankings_from_queue(
     return ranked
 
 
+def kuramoto_holdout_summary(holdout: dict[str, Any]) -> dict[str, Any]:
+    summary = summary_dict(holdout)
+    results = rows_from(holdout, "holdout_results")
+    candidate = norm_id(summary.get("candidate")) or (
+        norm_id(results[0].get("candidate_family")) if results else "kuramoto_phase_coupling"
+    )
+    named_baseline = norm_id(summary.get("named_baseline")) or "kalman_filter"
+    holdout_count = safe_int(summary.get("holdout_count"), len(results))
+    wins_vs_kalman = safe_int(
+        summary.get("wins_vs_kalman"),
+        len([row for row in results if bool(row.get("candidate_beats_kalman"))]),
+    )
+    wins_vs_best = safe_int(
+        summary.get("wins_vs_best_baseline"),
+        len([row for row in results if bool(row.get("candidate_beats_best_baseline"))]),
+    )
+    estimated_rows = safe_int(
+        summary.get("estimated_rows_replayed"),
+        sum(safe_int(row.get("estimated_rows")) for row in results),
+    )
+    numeric_samples = safe_int(
+        summary.get("numeric_samples_read"),
+        sum(safe_int(row.get("numeric_samples")) for row in results),
+    )
+    source_systems = summary.get("source_systems", [])
+    if not isinstance(source_systems, list) or not source_systems:
+        source_systems = sorted({norm_id(row.get("source_system")) for row in results if row.get("source_system")})
+    source_systems = [norm_id(item) for item in source_systems if norm_id(item)]
+    source_system_count = safe_int(summary.get("source_system_count"), len(source_systems))
+    mean_delta = safe_float(summary.get("mean_delta_vs_kalman"))
+    if not mean_delta and results:
+        deltas = [safe_float(row.get("delta_vs_kalman")) for row in results]
+        mean_delta = sum(deltas) / len(deltas)
+    win_rate = safe_float(summary.get("win_rate_vs_kalman"))
+    if not win_rate and holdout_count:
+        win_rate = wins_vs_kalman / holdout_count
+    passes_internal_gate = bool(summary.get("passes_internal_20_holdout_gate")) or (
+        holdout_count >= 20 and wins_vs_kalman == holdout_count
+    )
+    ready_for_field_replay_request = bool(summary.get("ready_for_buyer_authorized_field_replay_request")) or (
+        passes_internal_gate and holdout_count >= 20
+    )
+    return {
+        "candidate": candidate,
+        "named_baseline": named_baseline,
+        "holdout_count": holdout_count,
+        "wins_vs_kalman": wins_vs_kalman,
+        "wins_vs_best_baseline": wins_vs_best,
+        "losses_or_ties_vs_kalman": safe_int(
+            summary.get("losses_or_ties_vs_kalman"),
+            max(holdout_count - wins_vs_kalman, 0),
+        ),
+        "win_rate_vs_kalman": round(win_rate, 6),
+        "mean_delta_vs_kalman": round(mean_delta, 6),
+        "min_delta_vs_kalman": safe_float(summary.get("min_delta_vs_kalman")),
+        "max_delta_vs_kalman": safe_float(summary.get("max_delta_vs_kalman")),
+        "estimated_rows_replayed": estimated_rows,
+        "numeric_samples_read": numeric_samples,
+        "source_system_count": source_system_count,
+        "source_systems": source_systems,
+        "wilson_95_win_rate_lower": safe_float(summary.get("wilson_95_win_rate_lower")),
+        "wilson_95_win_rate_upper": safe_float(summary.get("wilson_95_win_rate_upper")),
+        "one_sided_sign_test_p_value": summary.get("one_sided_sign_test_p_value"),
+        "holdout_chain_sha256": norm_id(summary.get("holdout_chain_sha256")),
+        "passes_internal_20_holdout_gate": passes_internal_gate,
+        "ready_for_buyer_authorized_field_replay_request": ready_for_field_replay_request,
+        "field_validation_claim_allowed": False,
+        "real_dollar_savings_claim_allowed": False,
+        "fixed_dollar_delta_sale_claim_allowed": False,
+        "live_trading_or_autonomous_execution_allowed": False,
+        "claim_boundary": (
+            "Internal source-conditioned holdout replay; ready to request buyer-authorized field replay, "
+            "but not field validation, realized savings, fixed-dollar delta value, or live execution evidence."
+        ),
+    }
+
+
+def kuramoto_holdout_score_boost(summary: dict[str, Any]) -> float:
+    if not summary.get("ready_for_buyer_authorized_field_replay_request"):
+        return 0.0
+    return round(
+        35.0
+        + (15.0 if summary.get("passes_internal_20_holdout_gate") else 0.0)
+        + min(safe_int(summary.get("wins_vs_kalman")) * 0.5, 12.0)
+        + min(safe_int(summary.get("source_system_count")) * 2.0, 8.0)
+        + min(safe_float(summary.get("mean_delta_vs_kalman")) * 100.0, 15.0)
+        + min(safe_int(summary.get("estimated_rows_replayed")) / 500000.0, 8.0),
+        3,
+    )
+
+
+def apply_kuramoto_holdout_overlay(
+    family_rows: list[dict[str, Any]],
+    holdout: dict[str, Any],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    holdout_summary = kuramoto_holdout_summary(holdout)
+    candidate = norm_id(holdout_summary.get("candidate"))
+    if not candidate or not holdout_summary.get("ready_for_buyer_authorized_field_replay_request"):
+        return family_rows, holdout_summary
+
+    boost = kuramoto_holdout_score_boost(holdout_summary)
+    rows = []
+    for row in family_rows:
+        updated = dict(row)
+        if norm_id(updated.get("family")) == candidate:
+            updated["asset_score"] = round(safe_float(updated.get("asset_score")) + boost, 3)
+            updated["evidence_status"] = "expanded_source_conditioned_holdout_winner_not_field_validated"
+            updated["claim_stage"] = "buyer_authorized_field_replay_request_ready_not_field_validated"
+            updated["holdout_gate_status"] = "internal_20_holdout_gate_passed"
+            updated["ready_for_buyer_authorized_field_replay_request"] = True
+            updated["kuramoto_holdout_evidence"] = holdout_summary
+            updated["ready_for_field_validation_claim"] = False
+            updated["ready_for_real_dollar_claim"] = False
+            updated["kraken_live_execution_allowed"] = False
+            unlock_conditions = (
+                list(updated.get("unlock_conditions", []))
+                if isinstance(updated.get("unlock_conditions"), list)
+                else []
+            )
+            needed = "buyer-authorized field replay using pre-registered holdout windows and accepted economics"
+            if needed not in unlock_conditions:
+                unlock_conditions.append(needed)
+            updated["unlock_conditions"] = unlock_conditions
+        rows.append(updated)
+
+    ranked = sorted(rows, key=lambda item: (-float(item["asset_score"]), item["lane"], item["family"]))
+    for rank, row in enumerate(ranked, start=1):
+        row["rank"] = rank
+    return ranked, holdout_summary
+
+
 def category_champions(lanes: list[dict[str, Any]], families: list[dict[str, Any]]) -> dict[str, Any]:
     by_family_status = {row["evidence_status"]: row for row in families}
     generated = [
@@ -455,6 +587,7 @@ def category_champions(lanes: list[dict[str, Any]], families: list[dict[str, Any
     rolling = [row for row in families if row.get("rolling_gate_status") == "rolling_champion"]
     robust = [row for row in families if row.get("robust_repeat_uncertainty_gate_passed")]
     paid_pilot = [row for row in families if row.get("paid_pilot_ready")]
+    field_replay_request = [row for row in families if row.get("ready_for_buyer_authorized_field_replay_request")]
     harmonic = [row for row in lanes if row["lane"] == "wave_resonance_timing"]
     market = [row for row in lanes if row["lane"] == "market_signal_geometry"]
     return {
@@ -464,6 +597,7 @@ def category_champions(lanes: list[dict[str, Any]], families: list[dict[str, Any
         "proof_value_champion": proof[0] if proof else by_family_status.get("proof_value_champion_not_performance_claim", {}),
         "strict_rolling_champion": rolling[0] if rolling else {},
         "robust_repeat_candidate": robust[0] if robust else {},
+        "buyer_authorized_field_replay_request_candidate": field_replay_request[0] if field_replay_request else {},
         "paid_pilot_scoping_candidate": paid_pilot[0] if paid_pilot else {},
         "strict_triple_source_candidate": triple_source[0] if triple_source else {},
         "strict_single_run_candidate": single_run[0] if single_run else {},
@@ -487,7 +621,12 @@ def champion_of_champions_section(
     by_family = {row["family"]: row for row in families}
     rolling_rows = [row for row in families if row.get("rolling_gate_status") == "rolling_champion"]
     robust_rows = [row for row in rolling_rows if row.get("robust_repeat_uncertainty_gate_passed")]
-    strongest_current = robust_rows[0] if robust_rows else (rolling_rows[0] if rolling_rows else (families[0] if families else {}))
+    field_replay_rows = [row for row in families if row.get("ready_for_buyer_authorized_field_replay_request")]
+    strongest_current = (
+        field_replay_rows[0]
+        if field_replay_rows
+        else (robust_rows[0] if robust_rows else (rolling_rows[0] if rolling_rows else (families[0] if families else {})))
+    )
     return {
         "strongest_current": strongest_current,
         "best_buyer_pilot_card": by_family.get("brachistochrone_descent", {}),
@@ -537,9 +676,11 @@ def build_board() -> dict[str, Any]:
     proof_to_pilot = read_json(PROOF_TO_PILOT_JSON)
     truth = read_json(TRUTH_SWEEP_JSON)
     claim_map = read_json(CLAIM_MAP_JSON)
+    kuramoto_holdout = read_json(KURAMOTO_HOLDOUT_JSON)
 
     lane_rows = lane_rankings(matrix)
     family_rows = family_rankings_from_queue(queue, rolling, uncertainty, proof_to_pilot) or family_rankings(registry, matrix)
+    family_rows, kuramoto_summary = apply_kuramoto_holdout_overlay(family_rows, kuramoto_holdout)
     blocked = reviewer_blocked_sources(gate)
     summary_matrix = matrix.get("summary", {}) if isinstance(matrix.get("summary"), dict) else {}
     truth_summary = summary_dict(truth)
@@ -590,6 +731,15 @@ def build_board() -> dict[str, Any]:
                 "single_run_candidate_count",
                 truth_summary.get("single_run_candidate_count", 0),
             ),
+            "kuramoto_holdout_count": kuramoto_summary.get("holdout_count", 0),
+            "kuramoto_holdout_wins_vs_kalman": kuramoto_summary.get("wins_vs_kalman", 0),
+            "kuramoto_holdout_mean_delta_vs_kalman": kuramoto_summary.get("mean_delta_vs_kalman", 0),
+            "kuramoto_holdout_estimated_rows_replayed": kuramoto_summary.get("estimated_rows_replayed", 0),
+            "kuramoto_holdout_source_system_count": kuramoto_summary.get("source_system_count", 0),
+            "kuramoto_holdout_chain_sha256": kuramoto_summary.get("holdout_chain_sha256", ""),
+            "kuramoto_ready_for_buyer_authorized_field_replay_request": bool(
+                kuramoto_summary.get("ready_for_buyer_authorized_field_replay_request")
+            ),
             "claim_boundary": (
                 "This board ranks what to validate next. It does not establish field validation, "
                 "real-dollar savings, trading profit, universal superiority, or award certainty."
@@ -611,8 +761,8 @@ def build_board() -> dict[str, Any]:
             {
                 "asset": "Harmonic phase-lock proof card",
                 "lane": "wave_resonance_timing",
-                "why": "Kuramoto/PLL/Kalman comparisons are the clearest way to test the harmonic thesis on oscillatory systems, and the family is now a repeat live-context rolling champion.",
-                "claim_limit": "Needs more holdout windows and a stronger uncertainty gate before field validation language.",
+                "why": "Kuramoto/PLL/Kalman comparisons are the clearest way to test the harmonic thesis on oscillatory systems; the current expansion has 24 internal source-conditioned holdout wins versus Kalman.",
+                "claim_limit": "Ready to request buyer-authorized field replay; not field validation, realized savings, or fixed-dollar delta value.",
             },
             {
                 "asset": "Energy price pressure money-proxy replay",
@@ -642,6 +792,7 @@ def build_board() -> dict[str, Any]:
         ],
         "required_next_wiring": [
             "Route dashboard/data/geometry_champion_of_champions.json and field_money_truth_sweep.json to the live VPS/domain and verify hosted hashes.",
+            "Route kuramoto_holdout_expansion_latest.json into dashboard/data and the buyer field-replay request packet.",
             "Convert brachistochrone_descent and kuramoto_phase_coupling proof cards into grant appendices with the same claim gates.",
             "Add benchmark specs for the remaining registered families until all_families_have_benchmark_specs is true.",
             "Build adapters for high-value unbenchmarked families before claiming broad family coverage.",
@@ -658,6 +809,7 @@ def build_board() -> dict[str, Any]:
             "proof_to_pilot_control_room": str(PROOF_TO_PILOT_JSON.relative_to(ROOT)).replace("\\", "/"),
             "field_money_truth_sweep": str(TRUTH_SWEEP_JSON.relative_to(ROOT)).replace("\\", "/"),
             "claim_strength_value_unlock_map": str(CLAIM_MAP_JSON.relative_to(ROOT)).replace("\\", "/"),
+            "kuramoto_holdout_expansion": str(KURAMOTO_HOLDOUT_JSON.relative_to(ROOT)).replace("\\", "/"),
             "frontier_schema": frontier.get("schema", ""),
             "claim_map_schema": claim_map.get("schema", ""),
         },
@@ -712,6 +864,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Robust repeat candidates: `{summary['robust_repeat_candidate_count']}`",
         f"- Triple-source candidates: `{summary['triple_source_candidate_count']}`",
         f"- Single-run candidates: `{summary['single_run_candidate_count']}`",
+        f"- Kuramoto holdout wins vs Kalman: `{summary.get('kuramoto_holdout_wins_vs_kalman', 0)} / {summary.get('kuramoto_holdout_count', 0)}`",
+        f"- Kuramoto holdout mean delta vs Kalman: `{summary.get('kuramoto_holdout_mean_delta_vs_kalman', 0)}`",
+        f"- Kuramoto holdout estimated rows replayed: `{summary.get('kuramoto_holdout_estimated_rows_replayed', 0)}`",
+        f"- Kuramoto field-replay request ready: `{str(summary.get('kuramoto_ready_for_buyer_authorized_field_replay_request', False)).lower()}`",
         "",
         "## Current Truth Gates",
         "",
@@ -732,6 +888,24 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
         ]
     )
+    kuramoto = coc.get("best_harmonic_candidate", {}) if isinstance(coc, dict) else {}
+    kuramoto_evidence = kuramoto.get("kuramoto_holdout_evidence", {}) if isinstance(kuramoto, dict) else {}
+    if isinstance(kuramoto_evidence, dict) and kuramoto_evidence:
+        lines.extend(
+            [
+                "## Kuramoto Holdout Read",
+                "",
+                f"- Candidate: `{kuramoto_evidence.get('candidate', '')}`",
+                f"- Baseline: `{kuramoto_evidence.get('named_baseline', '')}`",
+                f"- Holdout wins: `{kuramoto_evidence.get('wins_vs_kalman', 0)} / {kuramoto_evidence.get('holdout_count', 0)}`",
+                f"- Mean delta vs baseline: `{kuramoto_evidence.get('mean_delta_vs_kalman', 0)}`",
+                f"- Estimated rows replayed: `{kuramoto_evidence.get('estimated_rows_replayed', 0)}`",
+                f"- Source systems: `{kuramoto_evidence.get('source_system_count', 0)}`",
+                f"- Chain SHA-256: `{kuramoto_evidence.get('holdout_chain_sha256', '')}`",
+                f"- Boundary: {kuramoto_evidence.get('claim_boundary', '')}",
+                "",
+            ]
+        )
     lines.extend(
         [
         "## Category Champions",

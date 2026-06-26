@@ -35,6 +35,11 @@ def test_board_ranks_all_lanes_and_families_without_global_winner_claim():
     assert board["summary"]["bounded_estimated_value_claim_allowed"] is True
     assert board["summary"]["paid_pilot_scoping_allowed"] is True
     assert board["summary"]["vault_packet_ready"] is True
+    assert board["summary"]["kuramoto_holdout_count"] >= 20
+    assert board["summary"]["kuramoto_holdout_wins_vs_kalman"] >= 20
+    assert board["summary"]["kuramoto_holdout_estimated_rows_replayed"] >= 2_000_000
+    assert board["summary"]["kuramoto_holdout_source_system_count"] >= 4
+    assert board["summary"]["kuramoto_ready_for_buyer_authorized_field_replay_request"] is True
     assert "field validation" in board["summary"]["claim_boundary"]
     assert board["current_truth_gates"]["field_validation_claim_allowed"] is False
     assert board["current_truth_gates"]["real_dollar_savings_claim_allowed"] is False
@@ -53,9 +58,10 @@ def test_operational_priority_keeps_lane_rank_bounded_and_family_rank_current():
     assert top_lane["measured_source_count"] >= 8
     assert top_lane["ready_for_live_geometry_claim"] is False
     assert top_lane["ready_for_real_dollar_claim"] is False
-    assert top_family["family"] == "brachistochrone_descent"
+    assert top_family["family"] == "kuramoto_phase_coupling"
     assert top_family["rolling_gate_status"] == "rolling_champion"
-    assert top_family["robust_repeat_uncertainty_gate_passed"] is True
+    assert top_family["ready_for_buyer_authorized_field_replay_request"] is True
+    assert top_family["holdout_gate_status"] == "internal_20_holdout_gate_passed"
     assert top_family["paid_pilot_ready"] is True
 
 
@@ -66,7 +72,7 @@ def test_known_champions_are_ranked_but_still_bounded():
 
     assert families["beast_algo_echo_stack"]["evidence_status"] == "proof_value_candidate_not_performance_claim"
     assert families["brachistochrone_descent"]["evidence_status"] == "rolling_champion_repeat_live_context_not_field_validated"
-    assert families["kuramoto_phase_coupling"]["evidence_status"] == "rolling_champion_repeat_live_context_not_field_validated"
+    assert families["kuramoto_phase_coupling"]["evidence_status"] == "expanded_source_conditioned_holdout_winner_not_field_validated"
     assert families["thermal_plume_convection"]["evidence_status"] == "rolling_champion_repeat_live_context_not_field_validated"
     assert families["leaf_veins"]["evidence_status"] == "triple_source_live_candidate_needs_repeat_run"
     assert families["crack_propagation_paths"]["evidence_status"] == "proof_value_candidate_not_performance_claim"
@@ -75,7 +81,9 @@ def test_known_champions_are_ranked_but_still_bounded():
     assert families["thermal_plume_convection"]["rolling_gate_status"] == "rolling_champion"
     assert families["leaf_veins"]["rolling_gate_status"] == "triple_source_candidate"
     assert families["brachistochrone_descent"]["claim_stage"] == "rolling_champion_not_field_validated"
-    assert families["kuramoto_phase_coupling"]["claim_stage"] == "rolling_champion_not_field_validated"
+    assert families["kuramoto_phase_coupling"]["claim_stage"] == "buyer_authorized_field_replay_request_ready_not_field_validated"
+    assert families["kuramoto_phase_coupling"]["kuramoto_holdout_evidence"]["wins_vs_kalman"] >= 20
+    assert families["kuramoto_phase_coupling"]["kuramoto_holdout_evidence"]["field_validation_claim_allowed"] is False
 
     for family in (
         "beast_algo_echo_stack",
@@ -107,8 +115,8 @@ def test_champion_of_champions_surfaces_truth_gated_money_proxy():
     current = board["champion_of_champions"]["strongest_current"]
     money_proxy = board["champion_of_champions"]["strongest_money_proxy"]
 
-    assert current["family"] == "brachistochrone_descent"
-    assert current["robust_repeat_uncertainty_gate_passed"] is True
+    assert current["family"] == "kuramoto_phase_coupling"
+    assert current["ready_for_buyer_authorized_field_replay_request"] is True
     assert current["ready_for_real_dollar_claim"] is False
     assert money_proxy["family_id"] == "phase_locked_residual_corrector"
     assert money_proxy["status"] == "rolling_champion"
@@ -125,7 +133,9 @@ def test_markdown_lists_validation_requirements_and_no_overclaim_terms():
     assert "Ready for field-validation claim: `false`" in rendered
     assert "Strict rolling champions: `4`" in rendered
     assert "Bounded estimated value claim allowed: `true`" in rendered
-    assert "Strongest current candidate: `brachistochrone_descent`" in rendered
+    assert "Strongest current candidate: `kuramoto_phase_coupling`" in rendered
+    assert "Kuramoto Holdout Read" in rendered
+    assert "not field validation" in rendered
     assert "Triple-source candidates" in rendered
     assert "guaranteed funding" not in rendered.lower()
     assert "guaranteed profit" not in rendered.lower()
