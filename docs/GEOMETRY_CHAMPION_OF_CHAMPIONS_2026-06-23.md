@@ -1,7 +1,7 @@
 # Geometry Champion Of Champions
 
-Generated UTC: `2026-06-26T20:20:36.926321+00:00`
-Board SHA-256: `06fff6d1ace5763938396aca68f2fe6080038e9381abdd77dce5f765bdd57d82`
+Generated UTC: `2026-06-26T21:37:14.218097+00:00`
+Board SHA-256: `61a4e37623abbad6f454dff89a6e3e3ae5015be9c5b5d4fb817e212f936c2531`
 
 ## Boundary
 
@@ -10,6 +10,8 @@ This board ranks what to validate next. It does not establish field validation, 
 ## Summary
 
 - Families ranked: 140 / 140
+- Benchmark-specified families: 140 / 140
+- Benchmark spec gaps: 0
 - Lanes ranked: 12 / 12
 - Live measured sources: 18
 - Live measured rows: 418
@@ -253,7 +255,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Route dashboard/data/geometry_champion_of_champions.json and field_money_truth_sweep.json to the live VPS/domain and verify hosted hashes.
 - Route kuramoto_holdout_expansion_latest.json into dashboard/data and the buyer field-replay request packet.
 - Convert brachistochrone_descent and kuramoto_phase_coupling proof cards into grant appendices with the same claim gates.
-- Add benchmark specs for the remaining registered families until all_families_have_benchmark_specs is true.
+- Keep all registered family benchmark specs complete as the registry expands; do not let the spec count drift below the ranked family count.
 - Build adapters for high-value unbenchmarked families before claiming broad family coverage.
 - Acquire buyer or agency authorized field data before any field-validation or real-dollar savings claim.
 

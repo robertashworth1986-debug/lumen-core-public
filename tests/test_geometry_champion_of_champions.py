@@ -23,7 +23,10 @@ def test_board_ranks_all_lanes_and_families_without_global_winner_claim():
     assert board["schema"] == "geometry_champion_of_champions_v1"
     assert board["global_performance_champion_allowed"] is False
     assert board["summary"]["ranked_lane_count"] == 12
-    assert board["summary"]["ranked_family_count"] >= 75
+    assert board["summary"]["ranked_family_count"] == 140
+    assert board["summary"]["benchmark_specified_family_count"] == board["summary"]["ranked_family_count"]
+    assert board["summary"]["benchmark_specified_family_gap_count"] == 0
+    assert board["summary"]["benchmark_specified_family_missing"] == []
     assert board["summary"]["ready_for_field_validation_claim"] is False
     assert board["summary"]["ready_for_real_dollar_claim"] is False
     assert board["summary"]["kraken_live_execution_allowed"] is False
@@ -44,6 +47,30 @@ def test_board_ranks_all_lanes_and_families_without_global_winner_claim():
     assert board["current_truth_gates"]["field_validation_claim_allowed"] is False
     assert board["current_truth_gates"]["real_dollar_savings_claim_allowed"] is False
     assert board["current_truth_gates"]["live_trading_or_autonomous_execution_allowed"] is False
+
+
+def test_all_ranked_families_have_benchmark_specs():
+    module = load_module()
+    board = module.build_board()
+    required = {
+        "natural_logic",
+        "benchmark_hypothesis",
+        "first_test",
+        "promotion_metric",
+        "failure_mode",
+    }
+
+    missing = {
+        row["family"]: sorted(field for field in required if not str(row.get(field, "")).strip())
+        for row in board["family_asset_rankings"]
+        if any(not str(row.get(field, "")).strip() for field in required)
+    }
+
+    assert missing == {}
+    families = {row["family"]: row for row in board["family_asset_rankings"]}
+    assert families["mycelium_network"]["first_test"] == "mycelium_resilient_routing_v1"
+    assert families["toroidal_fields"]["first_test"] == "toroidal_field_control_v1"
+    assert families["frobenius_stability"]["first_test"] == "frobenius_stability_gate_v1"
 
 
 def test_operational_priority_keeps_lane_rank_bounded_and_family_rank_current():

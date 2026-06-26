@@ -113,6 +113,54 @@ def registry_lanes(registry: dict[str, Any]) -> dict[str, Any]:
     return lanes if isinstance(lanes, dict) else {}
 
 
+BENCHMARK_SPEC_FIELDS = (
+    "natural_logic",
+    "benchmark_hypothesis",
+    "first_test",
+    "promotion_metric",
+    "failure_mode",
+)
+
+
+def benchmark_spec_missing_fields(row: dict[str, Any]) -> list[str]:
+    return [field for field in BENCHMARK_SPEC_FIELDS if not norm_id(row.get(field))]
+
+
+def benchmark_spec_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    missing = [
+        {
+            "family": norm_id(row.get("family") or row.get("id")),
+            "lane": norm_id(row.get("lane")),
+            "missing_fields": benchmark_spec_missing_fields(row),
+        }
+        for row in rows
+        if benchmark_spec_missing_fields(row)
+    ]
+    return {
+        "specified_count": max(len(rows) - len(missing), 0),
+        "missing_count": len(missing),
+        "missing": missing,
+    }
+
+
+def apply_registry_spec_overlay(rows: list[dict[str, Any]], registry: dict[str, Any]) -> list[dict[str, Any]]:
+    registry_by_family = {norm_id(row.get("id")): row for row in registry_families(registry) if row.get("id")}
+    overlaid = []
+    for row in rows:
+        family_id = norm_id(row.get("family"))
+        registry_row = registry_by_family.get(family_id, {})
+        merged = dict(row)
+        for field in BENCHMARK_SPEC_FIELDS:
+            if not norm_id(merged.get(field)) and norm_id(registry_row.get(field)):
+                merged[field] = registry_row.get(field, "")
+        if not norm_id(merged.get("label")) and norm_id(registry_row.get("label")):
+            merged["label"] = registry_row.get("label", family_id)
+        if not norm_id(merged.get("lane")) and norm_id(registry_row.get("lane")):
+            merged["lane"] = registry_row.get("lane", "")
+        overlaid.append(merged)
+    return overlaid
+
+
 def matrix_rows(matrix: dict[str, Any]) -> list[dict[str, Any]]:
     rows = matrix.get("matrix", [])
     if not isinstance(rows, list) or not rows:
@@ -681,6 +729,8 @@ def build_board() -> dict[str, Any]:
     lane_rows = lane_rankings(matrix)
     family_rows = family_rankings_from_queue(queue, rolling, uncertainty, proof_to_pilot) or family_rankings(registry, matrix)
     family_rows, kuramoto_summary = apply_kuramoto_holdout_overlay(family_rows, kuramoto_holdout)
+    family_rows = apply_registry_spec_overlay(family_rows, registry)
+    spec_summary = benchmark_spec_summary(family_rows)
     blocked = reviewer_blocked_sources(gate)
     summary_matrix = matrix.get("summary", {}) if isinstance(matrix.get("summary"), dict) else {}
     truth_summary = summary_dict(truth)
@@ -716,7 +766,9 @@ def build_board() -> dict[str, Any]:
             "vault_packet_ready": bool(truth_summary.get("vault_packet_ready")),
             "vault_packet_dir": truth_summary.get("vault_packet_dir", ""),
             "vault_hashes_verified": bool(truth_summary.get("vault_hashes_verified")),
-            "benchmark_specified_family_count": truth_summary.get("benchmark_specified_family_count", 0),
+            "benchmark_specified_family_count": spec_summary["specified_count"],
+            "benchmark_specified_family_gap_count": spec_summary["missing_count"],
+            "benchmark_specified_family_missing": spec_summary["missing"],
             "blocked_or_thin_sources": blocked,
             "strict_rolling_champion_count": rolling_summary.get(
                 "rolling_champion_count",
@@ -794,7 +846,7 @@ def build_board() -> dict[str, Any]:
             "Route dashboard/data/geometry_champion_of_champions.json and field_money_truth_sweep.json to the live VPS/domain and verify hosted hashes.",
             "Route kuramoto_holdout_expansion_latest.json into dashboard/data and the buyer field-replay request packet.",
             "Convert brachistochrone_descent and kuramoto_phase_coupling proof cards into grant appendices with the same claim gates.",
-            "Add benchmark specs for the remaining registered families until all_families_have_benchmark_specs is true.",
+            "Keep all registered family benchmark specs complete as the registry expands; do not let the spec count drift below the ranked family count.",
             "Build adapters for high-value unbenchmarked families before claiming broad family coverage.",
             "Acquire buyer or agency authorized field data before any field-validation or real-dollar savings claim.",
         ],
@@ -845,6 +897,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "## Summary",
         "",
         f"- Families ranked: {summary['ranked_family_count']} / {summary['family_count']}",
+        f"- Benchmark-specified families: {summary['benchmark_specified_family_count']} / {summary['ranked_family_count']}",
+        f"- Benchmark spec gaps: {summary['benchmark_specified_family_gap_count']}",
         f"- Lanes ranked: {summary['ranked_lane_count']} / {summary['lane_count']}",
         f"- Live measured sources: {summary['live_measured_sources']}",
         f"- Live measured rows: {summary['live_total_measured_rows']}",
