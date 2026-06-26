@@ -1,6 +1,6 @@
 # Geometry Asset Wiring Board
 
-Generated UTC: `2026-06-26T22:01:48.794326+00:00`
+Generated UTC: `2026-06-26T22:18:55.310450+00:00`
 
 Asset wiring only. These rows identify where frozen live-context proof cards can be used for dashboards, grant evidence, buyer outreach, and next validation. They do not establish field validation, realized savings, award certainty, live trading permission, or a real-dollar claim.
 
@@ -24,11 +24,14 @@ Asset wiring only. These rows identify where frozen live-context proof cards can
 - Grant packet targets: `7`
 - Buyer/outreach segment count: `5`
 - Validation run rows: `10`
+- Field-validation targets mapped: `10`
+- Buyer-authorized replay-ready targets: `9`
+- External owner required for field validation: `10`
 - Ready for live geometry claim: `false`
 - Ready for real-dollar claim: `false`
 - Field validation: `false`
 - Mass email allowed: `false`
-- Board chain SHA-256: `ef679e99449101af32dd77fc8a245ca4d5f25af672970346244401be9901a7ba`
+- Board chain SHA-256: `a9de1aae608197e54471695e54ad13459e43c049ed172d792ddafd2ae21e4efd`
 
 ## Top Next Actions
 
@@ -37,6 +40,19 @@ Asset wiring only. These rows identify where frozen live-context proof cards can
 3. `phase_locked_residual_corrector` - Promote the energy-price-pressure proxy into a formal registry/replay adapter and keep economics gated. Reason: It has the largest current money-proxy delta but cannot support real-dollar savings until accepted field economics exist.
 4. `thermal_plume_convection` - Increase source depth and connect to real thermal/datacenter or grid-cooling baselines. Reason: It is a rolling champion but source depth is still thin for hardware-energy buyer claims.
 5. `crack_propagation_paths` - Build the next branching/infrastructure replay around crack paths and keep leaf-vein evidence as bounded candidate evidence. Reason: Branching transport is valuable, but the current evidence is not yet strong enough for a performance or dollar claim.
+
+## Field-Validation Target Queue
+
+| Rank | Family | Field System | Locked Baseline | Acceptance Gate | Next Request |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `kuramoto_phase_coupling` | grid/load/price telemetry drift, PLL-like timing, or cyber-physical phase-control system | Kalman, PLL, or incumbent forecast/control baseline locked before replay | at least 20 buyer-authorized holdout windows with lower confidence bound above the locked baseline | ask for buyer-authorized phase/timing holdouts and permission to compare against their Kalman/PLL baseline |
+| 2 | `brachistochrone_descent` | constrained routing, logistics, inspection traversal, or control path planning system | Dijkstra/A*/MPC/current planner locked before replay | pre-registered holdouts beat the named planner with accepted confidence interval and no constraint regressions | ask for buyer-authorized route/topology holdouts and their incumbent Dijkstra/A*/MPC baseline |
+| 3 | `thermal_plume_convection` | data-center, HVAC, grid-cooling, or thermal recovery system with sensor history | current cooling controller, straight-duct/control heuristic, or thermal model locked before replay | buyer-authorized thermal holdouts show lower energy or hotspot burden without safety/comfort regressions | ask for buyer-authorized thermal/cooling holdouts and the incumbent control baseline |
+| 4 | `leaf_veins` | grid, water, maritime, or infrastructure network failure localization and resilience system | MST, min-cost flow, current inspection triage, or standard network resilience model | repeat holdouts beat MST/min-cost-flow/current triage on accepted operational metrics | ask for buyer-authorized network failure holdouts and their current MST/min-cost-flow or triage baseline |
+| 5 | `beast_algo_echo_stack` | operator-owned system with logged inputs, incumbent baseline, and accepted outcome metric | current operator baseline locked before replay | buyer-authorized replay beats the locked incumbent on pre-registered holdouts with confidence bounds | request buyer-authorized data and pre-register the replay protocol |
+| 6 | `fractal_brownian_surface` | operator-owned system with logged inputs, incumbent baseline, and accepted outcome metric | current operator baseline locked before replay | buyer-authorized replay beats the locked incumbent on pre-registered holdouts with confidence bounds | request buyer-authorized data and pre-register the replay protocol |
+| 7 | `crack_propagation_paths` | grid, water, maritime, or infrastructure network failure localization and resilience system | MST, min-cost flow, current inspection triage, or standard network resilience model | repeat holdouts beat MST/min-cost-flow/current triage on accepted operational metrics | ask for buyer-authorized network failure holdouts and their current MST/min-cost-flow or triage baseline |
+| 8 | `rayleigh_benard_cells` | data-center, HVAC, grid-cooling, or thermal recovery system with sensor history | current cooling controller, straight-duct/control heuristic, or thermal model locked before replay | buyer-authorized thermal holdouts show lower energy or hotspot burden without safety/comfort regressions | ask for buyer-authorized thermal/cooling holdouts and the incumbent control baseline |
 
 ## High-Value Wiring Queue
 

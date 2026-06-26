@@ -282,6 +282,142 @@ def validation_run(card: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def field_validation_target(
+    card: dict[str, Any],
+    champion_row: dict[str, Any],
+    pilot_card: dict[str, Any],
+    tier: str,
+) -> dict[str, Any]:
+    family_id = str(card.get("family_id", ""))
+    lane = str(card.get("lane", ""))
+    base = {
+        "field_system": "operator-owned system with logged inputs, incumbent baseline, and accepted outcome metric",
+        "external_owner_needed": "buyer, agency, lab, or infrastructure operator with authority to release field holdouts",
+        "buyer_data_needed": [
+            "pre-registered holdout windows",
+            "raw operational inputs and timestamps",
+            "incumbent baseline outputs",
+            "accepted error/cost/risk metric",
+            "signed or hashable replay manifest",
+        ],
+        "incumbent_baseline": "current operator baseline locked before replay",
+        "candidate_metric": "pre-agreed error, cost, latency, recovery, or risk reduction metric",
+        "acceptance_gate": "buyer-authorized replay beats the locked incumbent on pre-registered holdouts with confidence bounds",
+        "minimum_holdouts": 10,
+        "current_status": "internal replay evidence only; not field validated",
+        "next_request": "request buyer-authorized data and pre-register the replay protocol",
+        "claim_after_success": "field-validated improvement may be claimed only for the exact system, metric, data window, and baseline tested",
+    }
+
+    if family_id == "kuramoto_phase_coupling" or lane == "wave_resonance_timing":
+        base.update(
+            {
+                "field_system": "grid/load/price telemetry drift, PLL-like timing, or cyber-physical phase-control system",
+                "external_owner_needed": "utility, national lab, data-center/grid reliability team, or defense timing reviewer",
+                "buyer_data_needed": [
+                    "pre-registered phase or residual time windows",
+                    "incumbent Kalman/PLL/forecast baseline outputs",
+                    "raw telemetry with timestamps",
+                    "phase-error, forecast-error, or drift-recovery metric",
+                    "holdout hash manifest",
+                ],
+                "incumbent_baseline": "Kalman, PLL, or incumbent forecast/control baseline locked before replay",
+                "candidate_metric": "phase error, residual drift, forecast error, recovery lead time, and false-alarm burden",
+                "acceptance_gate": "at least 20 buyer-authorized holdout windows with lower confidence bound above the locked baseline",
+                "minimum_holdouts": 20,
+                "next_request": "ask for buyer-authorized phase/timing holdouts and permission to compare against their Kalman/PLL baseline",
+            }
+        )
+    elif family_id == "brachistochrone_descent" or lane == "optimal_curve_transport":
+        base.update(
+            {
+                "field_system": "constrained routing, logistics, inspection traversal, or control path planning system",
+                "external_owner_needed": "infrastructure operator, maritime/port team, defense robotics/logistics reviewer, or dispatch owner",
+                "buyer_data_needed": [
+                    "real topology and constraints",
+                    "current route planner outputs",
+                    "cost/time/risk objective",
+                    "blocked, noisy, and failure cases",
+                    "holdout split and replay manifest",
+                ],
+                "incumbent_baseline": "Dijkstra/A*/MPC/current planner locked before replay",
+                "candidate_metric": "path cost, time-to-target, constraint violations, risk exposure, and recovery after blockage",
+                "acceptance_gate": "pre-registered holdouts beat the named planner with accepted confidence interval and no constraint regressions",
+                "minimum_holdouts": 20,
+                "next_request": "ask for buyer-authorized route/topology holdouts and their incumbent Dijkstra/A*/MPC baseline",
+            }
+        )
+    elif family_id == "thermal_plume_convection" or lane == "thermal_ventilation":
+        base.update(
+            {
+                "field_system": "data-center, HVAC, grid-cooling, or thermal recovery system with sensor history",
+                "external_owner_needed": "data-center operator, DOE/ARPA-E reviewer, utility thermal team, or facilities engineering owner",
+                "buyer_data_needed": [
+                    "thermal sensor logs",
+                    "current cooling controller or CFD baseline",
+                    "energy draw and hotspot records",
+                    "weather/load context",
+                    "accepted comfort/safety thresholds",
+                ],
+                "incumbent_baseline": "current cooling controller, straight-duct/control heuristic, or thermal model locked before replay",
+                "candidate_metric": "thermal variance, recovery time, energy draw, hotspot count, and control stability",
+                "acceptance_gate": "buyer-authorized thermal holdouts show lower energy or hotspot burden without safety/comfort regressions",
+                "minimum_holdouts": 20,
+                "next_request": "ask for buyer-authorized thermal/cooling holdouts and the incumbent control baseline",
+            }
+        )
+    elif family_id in {"leaf_veins", "crack_propagation_paths"} or lane in {"branching_transport", "bio_network"}:
+        base.update(
+            {
+                "field_system": "grid, water, maritime, or infrastructure network failure localization and resilience system",
+                "external_owner_needed": "utility, maritime operator, infrastructure inspection team, or maintenance analytics owner",
+                "buyer_data_needed": [
+                    "network topology",
+                    "failure, inspection, or outage history",
+                    "current inspection triage or flow baseline",
+                    "cost/risk/recovery labels",
+                    "source-of-truth event logs",
+                ],
+                "incumbent_baseline": "MST, min-cost flow, current inspection triage, or standard network resilience model",
+                "candidate_metric": "localization speed, recovery priority quality, flow continuity, inspection cost, and missed-event rate",
+                "acceptance_gate": "repeat holdouts beat MST/min-cost-flow/current triage on accepted operational metrics",
+                "minimum_holdouts": 20,
+                "next_request": "ask for buyer-authorized network failure holdouts and their current MST/min-cost-flow or triage baseline",
+            }
+        )
+    elif family_id == "phase_locked_residual_corrector" or "price" in lane or "quant" in lane:
+        base.update(
+            {
+                "field_system": "energy price, load pressure, or market-risk forecasting workflow",
+                "external_owner_needed": "energy analytics team, utility trading-risk team, or market operations reviewer",
+                "buyer_data_needed": [
+                    "live or historical price/load series",
+                    "incumbent forecast outputs",
+                    "imbalance or avoided-cost accounting rules",
+                    "paper-only replay windows",
+                    "economic conversion assumptions",
+                ],
+                "incumbent_baseline": "incumbent price/load model, naive seasonal baseline, and paper-only risk benchmark",
+                "candidate_metric": "forecast error, residual pressure, calibration, drawdown proxy, and avoided imbalance estimate",
+                "acceptance_gate": "buyer accepts both forecast improvement and economic conversion; until then this remains a proxy",
+                "minimum_holdouts": 30,
+                "next_request": "ask for buyer-authorized price/load holdouts and their economic conversion rules",
+                "claim_after_success": "economic claim is limited to accepted paper replay windows and buyer-approved conversion factors",
+            }
+        )
+
+    request_ready = "did_not_beat" not in tier and "single_run" not in tier
+    base.update(
+        {
+            "request_ready": request_ready,
+            "field_validation_claim_allowed_now": False,
+            "real_dollar_claim_allowed_now": False,
+            "paid_pilot_ready": bool(pilot_card) or as_bool(champion_row.get("paid_pilot_ready")),
+        }
+    )
+    return base
+
+
 def build_wiring_row(
     card: dict[str, Any],
     outreach: dict[str, Any],
@@ -302,6 +438,7 @@ def build_wiring_row(
     else:
         next_steps = validation_run(card)["next_steps"]
         next_high_value_step = next_steps[0] if next_steps else "Schedule the next bounded replay or adapter build."
+    field_target = field_validation_target(card, champion_row, pilot_card, tier)
     row = {
         "family_id": card.get("family_id", ""),
         "label": card.get("label", card.get("family_id", "")),
@@ -332,6 +469,7 @@ def build_wiring_row(
         "buyer_segments": buyer_segments(card, outreach),
         "buyer_outreach_position": outreach_position(card, outreach, tier),
         "validation_run": validation_run(card),
+        "field_validation_target": field_target,
         "next_high_value_step": next_high_value_step,
         "blockers": blockers(card, reviewer_gate, dollar_gate, champion_row, pilot_card, tier),
         "allowed_language": card.get("allowed_language", ""),
@@ -398,6 +536,37 @@ def top_next_actions(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "Branching transport is valuable, but the current evidence is not yet strong enough for a performance or dollar claim.",
         )
     return sorted(actions, key=lambda item: item["priority"])
+
+
+def field_validation_target_queue(rows: list[dict[str, Any]], limit: int = 8) -> list[dict[str, Any]]:
+    def score(row: dict[str, Any]) -> float:
+        value = row.get("asset_score")
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return -1.0
+
+    queue: list[dict[str, Any]] = []
+    for index, row in enumerate(sorted(rows, key=score, reverse=True)[:limit], start=1):
+        target = as_dict(row.get("field_validation_target"))
+        queue.append(
+            {
+                "rank": index,
+                "family_id": row.get("family_id", ""),
+                "readiness_tier": row.get("readiness_tier", ""),
+                "field_system": target.get("field_system", ""),
+                "external_owner_needed": target.get("external_owner_needed", ""),
+                "incumbent_baseline": target.get("incumbent_baseline", ""),
+                "candidate_metric": target.get("candidate_metric", ""),
+                "acceptance_gate": target.get("acceptance_gate", ""),
+                "minimum_holdouts": target.get("minimum_holdouts", 0),
+                "next_request": target.get("next_request", ""),
+                "claim_after_success": target.get("claim_after_success", ""),
+                "field_validation_claim_allowed_now": False,
+                "real_dollar_claim_allowed_now": False,
+            }
+        )
+    return queue
 
 
 def high_value_wiring_queue(champion: dict[str, Any], limit: int = 20) -> list[dict[str, Any]]:
@@ -506,6 +675,11 @@ def build_payload() -> dict[str, Any]:
         "candidate_win_count": sum(
             1 for row in rows if row["validation_run"].get("candidate_beats_named_baseline") is True
         ),
+        "field_validation_target_count": sum(1 for row in rows if row.get("field_validation_target")),
+        "buyer_authorized_replay_ready_count": sum(
+            1 for row in rows if as_bool(as_dict(row.get("field_validation_target")).get("request_ready"))
+        ),
+        "external_owner_required_count": sum(1 for row in rows if row.get("field_validation_target")),
         **gates,
         "board_chain_sha256": stable_sha256(rows),
     }
@@ -554,6 +728,7 @@ def build_payload() -> dict[str, Any]:
             "requires_per_recipient_review": True,
         },
         "top_next_actions": top_next_actions(rows),
+        "field_validation_target_queue": field_validation_target_queue(rows),
         "high_value_wiring_queue": high_value_wiring_queue(champion, limit=20),
         "wiring_rows": rows,
     }
@@ -588,6 +763,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Grant packet targets: `{summary['grant_packet_feed_count']}`",
         f"- Buyer/outreach segment count: `{summary['outreach_feed_count']}`",
         f"- Validation run rows: `{summary['validation_run_count']}`",
+        f"- Field-validation targets mapped: `{summary['field_validation_target_count']}`",
+        f"- Buyer-authorized replay-ready targets: `{summary['buyer_authorized_replay_ready_count']}`",
+        f"- External owner required for field validation: `{summary['external_owner_required_count']}`",
         f"- Ready for live geometry claim: `{str(summary['ready_for_live_geometry_claim']).lower()}`",
         f"- Ready for real-dollar claim: `{str(summary['ready_for_real_dollar_claim']).lower()}`",
         f"- Field validation: `{str(summary['field_validation']).lower()}`",
@@ -600,6 +778,21 @@ def render_markdown(payload: dict[str, Any]) -> str:
     for action in payload["top_next_actions"]:
         lines.append(
             f"{action['priority']}. `{action['family_id']}` - {action['action']} Reason: {action['reason']}"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Field-Validation Target Queue",
+            "",
+            "| Rank | Family | Field System | Locked Baseline | Acceptance Gate | Next Request |",
+            "| --- | --- | --- | --- | --- | --- |",
+        ]
+    )
+    for row in payload["field_validation_target_queue"]:
+        lines.append(
+            f"| {row['rank']} | `{row['family_id']}` | {row['field_system']} | "
+            f"{row['incumbent_baseline']} | {row['acceptance_gate']} | {row['next_request']} |"
         )
 
     lines.extend(

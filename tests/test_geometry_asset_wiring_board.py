@@ -37,6 +37,9 @@ def test_asset_wiring_board_builds_reviewer_safe_summary():
     assert summary["outreach_feed_count"] >= 3
     assert summary["validation_run_count"] >= 8
     assert summary["candidate_win_count"] >= 4
+    assert summary["field_validation_target_count"] >= 10
+    assert summary["buyer_authorized_replay_ready_count"] >= 5
+    assert summary["external_owner_required_count"] >= 10
     assert len(summary["board_chain_sha256"]) == 64
 
     assert summary["ready_for_live_geometry_claim"] is False
@@ -49,6 +52,7 @@ def test_asset_wiring_board_builds_reviewer_safe_summary():
     assert summary["vps_domain_live_dashboard_routed"] is False
     assert payload["send_gate"]["send_without_user_review"] is False
     assert len(payload["high_value_wiring_queue"]) >= 20
+    assert len(payload["field_validation_target_queue"]) >= 5
 
 
 def test_key_rows_wire_to_dashboards_grants_outreach_and_blockers():
@@ -73,6 +77,10 @@ def test_key_rows_wire_to_dashboards_grants_outreach_and_blockers():
         assert row["buyer_outreach_position"]["send_gate"]["mass_email_allowed"] is False
         assert row["claim_gate"]["ready_for_real_dollar_claim"] is False
         assert row["claim_gate"]["field_validation"] is False
+        assert row["field_validation_target"]["field_validation_claim_allowed_now"] is False
+        assert row["field_validation_target"]["real_dollar_claim_allowed_now"] is False
+        assert row["field_validation_target"]["external_owner_needed"]
+        assert row["field_validation_target"]["buyer_data_needed"]
         assert len(row["row_sha256"]) == 64
 
     brach = rows["brachistochrone_descent"]
@@ -84,6 +92,8 @@ def test_key_rows_wire_to_dashboards_grants_outreach_and_blockers():
     assert any("buyer or agency authorized field data" in item for item in brach["blockers"])
     assert brach["validation_run"]["candidate_beats_named_baseline"] is True
     assert "DARPA/I2O or DICE-style reviewer evidence annex" in brach["grant_targets"]
+    assert "Dijkstra" in brach["field_validation_target"]["incumbent_baseline"]
+    assert "buyer-authorized" in brach["field_validation_target"]["next_request"]
 
     kuramoto = rows["kuramoto_phase_coupling"]
     assert kuramoto["readiness_tier"] == "rolling_champion_needs_field_authorized_holdouts"
@@ -91,18 +101,24 @@ def test_key_rows_wire_to_dashboards_grants_outreach_and_blockers():
     assert kuramoto["paid_pilot_ready"] is True
     assert "forecast" in kuramoto["dashboard_targets"]
     assert "uncertainty" in json.dumps(kuramoto).lower()
+    assert "Kalman" in kuramoto["field_validation_target"]["incumbent_baseline"]
+    assert "phase" in kuramoto["field_validation_target"]["candidate_metric"]
+    assert kuramoto["field_validation_target"]["minimum_holdouts"] >= 20
 
     thermal = rows["thermal_plume_convection"]
     assert thermal["readiness_tier"] == "rolling_champion_needs_field_authorized_holdouts"
     assert thermal["rolling_gate_status"] == "rolling_champion"
     assert any("three measured source types" in item for item in thermal["blockers"])
     assert any("DOE" in target for target in thermal["grant_targets"])
+    assert "thermal" in thermal["field_validation_target"]["candidate_metric"]
+    assert "cooling" in thermal["field_validation_target"]["next_request"]
 
     leaf = rows["leaf_veins"]
     assert leaf["readiness_tier"] == "triple_source_candidate_needs_repeat"
     assert leaf["rolling_gate_status"] == "triple_source_candidate"
     assert leaf["validation_run"]["candidate_beats_named_baseline"] is True
     assert leaf["claim_gate"]["ready_for_real_dollar_claim"] is False
+    assert "min-cost" in leaf["field_validation_target"]["incumbent_baseline"]
 
     crack = rows["crack_propagation_paths"]
     assert "proof_value" in crack["readiness_tier"]
@@ -110,6 +126,8 @@ def test_key_rows_wire_to_dashboards_grants_outreach_and_blockers():
 
     phase = rows["phase_locked_residual_corrector"]
     assert phase["registry_family"] is False
+    assert "price" in phase["field_validation_target"]["field_system"]
+    assert "proxy" in phase["field_validation_target"]["acceptance_gate"]
     assert any("registry" in action["action"].lower() for action in payload["top_next_actions"])
 
 
@@ -129,6 +147,8 @@ def test_next_actions_and_markdown_keep_claim_boundaries_visible():
 
     assert "Geometry Asset Wiring Board" in rendered
     assert "Rolling champions in wired proof cards: `4`" in rendered
+    assert "Field-Validation Target Queue" in rendered
+    assert "buyer-authorized" in rendered
     assert "High-Value Wiring Queue" in rendered
     assert "Bounded estimated value claim allowed: `true`" in rendered
     assert "Ready for real-dollar claim: `false`" in rendered
