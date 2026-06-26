@@ -27,6 +27,9 @@ def test_current_luma_proof_state_merges_registry_ready_replay_and_repeat_eviden
     assert payload["ready_source_replay"]["routes"] >= 10
     assert payload["ready_source_replay"]["estimated_rows_replayed"] >= 2_000_000
     assert payload["ready_source_replay"]["numeric_samples_read"] >= 30_000
+    assert payload["kuramoto_holdout_expansion"]["holdout_count"] >= 20
+    assert payload["kuramoto_holdout_expansion"]["wins_vs_kalman"] >= 16
+    assert payload["kuramoto_holdout_expansion"]["passes_internal_20_holdout_gate"] is True
 
     by_family = {row["family_id"]: row for row in payload["champion_rankings"]}
     assert "brachistochrone_descent" in by_family
@@ -39,7 +42,9 @@ def test_current_luma_proof_state_merges_registry_ready_replay_and_repeat_eviden
 
     kuramoto = by_family["kuramoto_phase_coupling"]
     assert kuramoto["source_conditioned_evidence"]["source_conditioned_wins"] >= 4
+    assert kuramoto["kuramoto_holdout_evidence"]["holdout_count"] >= 20
     assert "field validation" in kuramoto["safe_claim"].lower()
+    assert "buyer-authorized field replay request" in kuramoto["safe_claim"].lower()
 
 
 def test_current_luma_proof_state_keeps_money_and_execution_gates_closed():
@@ -71,3 +76,4 @@ def test_current_luma_proof_state_markdown_is_reviewer_safe():
     assert "Fixed" not in rendered
     assert "guaranteed" not in rendered.lower()
     assert "Strongest current delta" in rendered
+    assert "Kuramoto holdout expansion" in rendered

@@ -20,6 +20,7 @@ READY_REPLAY_JSON = OUT_OPS / "geometry_ready_source_replay_latest.json"
 SOURCE_MANIFEST_JSON = OUT_OPS / "geometry_live_source_manifest_latest.json"
 REPEAT_VALIDATION_JSON = OUT_OPS / "geometry_repeat_proof_validation_latest.json"
 UNCERTAINTY_JSON = OUT_OPS / "geometry_repeat_uncertainty_report_latest.json"
+KURAMOTO_HOLDOUT_JSON = OUT_OPS / "kuramoto_holdout_expansion_latest.json"
 VALUATION_JSON = OUT_OPS / "valuation_proposal_target_packet_latest.json"
 CLAIM_MAP_JSON = OUT_OPS / "claim_strength_value_unlock_map_latest.json"
 FIELD_MONEY_JSON = OUT_OPS / "field_money_truth_sweep_latest.json"
@@ -275,6 +276,61 @@ def merge_candidates(
     return merged
 
 
+def apply_kuramoto_holdout_expansion(
+    champion_rankings: list[dict[str, Any]],
+    holdout: dict[str, Any],
+) -> list[dict[str, Any]]:
+    summary = holdout.get("summary", {}) if isinstance(holdout.get("summary"), dict) else {}
+    if summary.get("candidate") != "kuramoto_phase_coupling":
+        return champion_rankings
+
+    wins = safe_int(summary.get("wins_vs_kalman"))
+    total = safe_int(summary.get("holdout_count"))
+    mean_delta = safe_float(summary.get("mean_delta_vs_kalman"))
+    passed = bool(summary.get("passes_internal_20_holdout_gate"))
+    stage = (
+        "expanded_source_conditioned_holdout_winner_not_field_validated"
+        if passed
+        else "source_conditioned_holdout_needs_more_external_replay"
+    )
+    holdout_score = 106.0
+    holdout_score += min(wins * 0.70, 17.0)
+    holdout_score += min(max(mean_delta, 0.0) * 70.0, 10.0)
+    holdout_score += min(math.log10(max(safe_int(summary.get("estimated_rows_replayed")), 1)) * 0.70, 5.0)
+    holdout_score += 4.0 if passed else 0.0
+
+    for row in champion_rankings:
+        if row.get("family_id") != "kuramoto_phase_coupling":
+            continue
+        row["evidence_stage"] = stage
+        row["proof_score"] = round(max(safe_float(row.get("proof_score")), holdout_score), 3)
+        row["kuramoto_holdout_evidence"] = {
+            "holdout_count": total,
+            "wins_vs_kalman": wins,
+            "losses_or_ties_vs_kalman": summary.get("losses_or_ties_vs_kalman", 0),
+            "win_rate_vs_kalman": summary.get("win_rate_vs_kalman", 0.0),
+            "wilson_95_win_rate_lower": summary.get("wilson_95_win_rate_lower", 0.0),
+            "one_sided_sign_test_p_value": summary.get("one_sided_sign_test_p_value", 1.0),
+            "mean_delta_vs_kalman": mean_delta,
+            "estimated_rows_replayed": summary.get("estimated_rows_replayed", 0),
+            "numeric_samples_read": summary.get("numeric_samples_read", 0),
+            "holdout_chain_sha256": summary.get("holdout_chain_sha256", ""),
+            "passes_internal_20_holdout_gate": passed,
+        }
+        row["safe_claim"] = (
+            "kuramoto_phase_coupling passed an internal source-conditioned holdout expansion "
+            f"({wins}/{total} wins vs kalman_filter, mean delta {mean_delta}); this supports a "
+            "buyer-authorized field replay request, not field validation or dollar claims."
+        )
+        row["next_move"] = "Use this as the first field-replay ask: external held-out data, incumbent baseline, accepted metric, and signoff."
+        break
+
+    champion_rankings.sort(key=lambda item: (-safe_float(item.get("proof_score")), item.get("family_id", "")))
+    for rank, row in enumerate(champion_rankings, start=1):
+        row["rank"] = rank
+    return champion_rankings
+
+
 def safe_claim(stage: str, evidence: dict[str, Any]) -> str:
     family = evidence.get("family_id", "candidate")
     lane = evidence.get("lane", "lane")
@@ -320,6 +376,7 @@ def build_payload() -> dict[str, Any]:
     manifest = read_json(SOURCE_MANIFEST_JSON)
     repeat = read_json(REPEAT_VALIDATION_JSON)
     uncertainty = read_json(UNCERTAINTY_JSON)
+    kuramoto_holdout = read_json(KURAMOTO_HOLDOUT_JSON)
     valuation = read_json(VALUATION_JSON)
     claim_map = read_json(CLAIM_MAP_JSON)
     field_money = read_json(FIELD_MONEY_JSON)
@@ -328,9 +385,11 @@ def build_payload() -> dict[str, Any]:
     repeat_rows = repeat_candidates(repeat, uncertainty_index(uncertainty), families)
     ready_rows = ready_source_candidates(ready, families)
     champion_rankings = merge_candidates(repeat_rows, ready_rows, families)
+    champion_rankings = apply_kuramoto_holdout_expansion(champion_rankings, kuramoto_holdout)
 
     ready_summary = ready.get("summary", {}) if isinstance(ready.get("summary"), dict) else {}
     manifest_summary = manifest.get("summary", {}) if isinstance(manifest.get("summary"), dict) else {}
+    kuramoto_summary = kuramoto_holdout.get("summary", {}) if isinstance(kuramoto_holdout.get("summary"), dict) else {}
     valuation_state = valuation.get("valuation_state", {}) if isinstance(valuation.get("valuation_state"), dict) else {}
     claim_summary = claim_map.get("summary", {}) if isinstance(claim_map.get("summary"), dict) else {}
     field_summary = field_money.get("summary", {}) if isinstance(field_money.get("summary"), dict) else {}
@@ -370,6 +429,19 @@ def build_payload() -> dict[str, Any]:
         },
         "repeat_validation": repeat.get("summary", {}),
         "uncertainty": uncertainty.get("summary", {}),
+        "kuramoto_holdout_expansion": {
+            "holdout_count": kuramoto_summary.get("holdout_count", 0),
+            "wins_vs_kalman": kuramoto_summary.get("wins_vs_kalman", 0),
+            "losses_or_ties_vs_kalman": kuramoto_summary.get("losses_or_ties_vs_kalman", 0),
+            "mean_delta_vs_kalman": kuramoto_summary.get("mean_delta_vs_kalman", 0.0),
+            "estimated_rows_replayed": kuramoto_summary.get("estimated_rows_replayed", 0),
+            "numeric_samples_read": kuramoto_summary.get("numeric_samples_read", 0),
+            "passes_internal_20_holdout_gate": kuramoto_summary.get("passes_internal_20_holdout_gate", False),
+            "ready_for_buyer_authorized_field_replay_request": kuramoto_summary.get(
+                "ready_for_buyer_authorized_field_replay_request", False
+            ),
+            "holdout_chain_sha256": kuramoto_summary.get("holdout_chain_sha256", ""),
+        },
         "valuation": {
             "strongest_current_claim": claim_summary.get("strongest_current_claim", ""),
             "safe_estimated_hourly_value_usd": claim_summary.get(
@@ -393,6 +465,7 @@ def build_payload() -> dict[str, Any]:
             "source_manifest": str(SOURCE_MANIFEST_JSON.relative_to(ROOT)),
             "repeat_validation": str(REPEAT_VALIDATION_JSON.relative_to(ROOT)),
             "uncertainty": str(UNCERTAINTY_JSON.relative_to(ROOT)),
+            "kuramoto_holdout_expansion": str(KURAMOTO_HOLDOUT_JSON.relative_to(ROOT)),
             "valuation": str(VALUATION_JSON.relative_to(ROOT)),
         },
         "outputs": {
@@ -409,6 +482,7 @@ def build_payload() -> dict[str, Any]:
             "manifest": payload["manifest"],
             "repeat_validation": payload["repeat_validation"],
             "uncertainty": payload["uncertainty"],
+            "kuramoto_holdout_expansion": payload["kuramoto_holdout_expansion"],
             "valuation": payload["valuation"],
             "proposal_target": payload["proposal_target"],
             "champion_rankings": payload["champion_rankings"],
@@ -422,6 +496,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     registry = payload["registry"]
     ready = payload["ready_source_replay"]
     manifest = payload["manifest"]
+    kuramoto = payload["kuramoto_holdout_expansion"]
     valuation = payload["valuation"]
     gates = payload["gates"]
     lines = [
@@ -445,6 +520,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Numeric samples read: `{ready['numeric_samples_read']}`",
         f"- Mean replay delta vs named baselines: `{ready['mean_delta_vs_named_baseline']}`",
         f"- Strongest current delta: `{ready['strongest_positive_delta']}` from `{ready['strongest_positive_family']}`",
+        f"- Kuramoto holdout expansion: `{kuramoto['wins_vs_kalman']}` / `{kuramoto['holdout_count']}` wins vs Kalman",
+        f"- Kuramoto holdout mean delta vs Kalman: `{kuramoto['mean_delta_vs_kalman']}`",
+        f"- Kuramoto internal 20-holdout gate passed: `{str(kuramoto['passes_internal_20_holdout_gate']).lower()}`",
         "",
         "## Champion Ranking",
         "",

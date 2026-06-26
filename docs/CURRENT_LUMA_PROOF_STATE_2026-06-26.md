@@ -1,6 +1,6 @@
 # Current Luma Proof State
 
-Generated UTC: `2026-06-26T04:24:27.282473+00:00`
+Generated UTC: `2026-06-26T05:04:56.262033+00:00`
 
 Current proof-state checkpoint generated from authoritative local artifacts. It ranks the strongest geometry candidates and proposal targets, but it does not grant field-validation, realized-savings, fixed-dollar frozen-delta, clinical, live-trading, or award-certainty claims.
 
@@ -18,13 +18,16 @@ Current proof-state checkpoint generated from authoritative local artifacts. It 
 - Numeric samples read: `37070`
 - Mean replay delta vs named baselines: `0.094602`
 - Strongest current delta: `0.198179` from `kuramoto_phase_coupling`
+- Kuramoto holdout expansion: `24` / `24` wins vs Kalman
+- Kuramoto holdout mean delta vs Kalman: `0.139875`
+- Kuramoto internal 20-holdout gate passed: `true`
 
 ## Champion Ranking
 
 | Rank | Family | Lane | Stage | Score | Main Claim |
 | --- | --- | --- | --- | ---: | --- |
-| 1 | `brachistochrone_descent` | `optimal_curve_transport` | `robust_repeat_plus_current_replay` | 140.41 | brachistochrone_descent is a robust repeat-window benchmark candidate on optimal_curve_transport; this supports paid technical evaluation scoping, not field validation or realized savings. |
-| 2 | `kuramoto_phase_coupling` | `wave_resonance_timing` | `source_conditioned_multi_replay_winner_not_field_validated` | 129.497 | kuramoto_phase_coupling is the strongest current source-conditioned replay candidate on wave_resonance_timing; it needs more holdout windows, buyer-authorized baselines, and field validation before dollar claims. |
+| 1 | `kuramoto_phase_coupling` | `wave_resonance_timing` | `expanded_source_conditioned_holdout_winner_not_field_validated` | 141.071 | kuramoto_phase_coupling passed an internal source-conditioned holdout expansion (24/24 wins vs kalman_filter, mean delta 0.139875); this supports a buyer-authorized field replay request, not field validation or dollar claims. |
+| 2 | `brachistochrone_descent` | `optimal_curve_transport` | `robust_repeat_plus_current_replay` | 140.41 | brachistochrone_descent is a robust repeat-window benchmark candidate on optimal_curve_transport; this supports paid technical evaluation scoping, not field validation or realized savings. |
 | 3 | `thermal_plume_convection` | `thermal_ventilation` | `source_conditioned_candidate_needs_repeat` | 113.239 | thermal_plume_convection remains a research candidate until it wins frozen replays against named baselines. |
 | 4 | `leaf_veins` | `branching_transport` | `negative_current_replay_demote` | 93.147 | leaf_veins lost or tied in the current source-conditioned replay and should be rerouted or demoted. |
 
@@ -55,7 +58,7 @@ Current proof-state checkpoint generated from authoritative local artifacts. It 
 
 ## Next Actions
 
-- Lead with brachistochrone_descent only in bounded benchmark language.
+- Lead with kuramoto_phase_coupling only in bounded benchmark language.
 - Run Kuramoto phase-coupling on at least 20 more EIA/FRED/NOAA/NASA holdout windows.
 - Pull ISO/RTO LMP or accepted electricity-price settlement data before any real-dollar energy claim.
 - Move leaf-vein branching out of winner language until it beats minimum-spanning-tree on fresh source-conditioned routes.
@@ -68,5 +71,6 @@ Current proof-state checkpoint generated from authoritative local artifacts. It 
 - source_manifest: `out\ops\geometry_live_source_manifest_latest.json`
 - repeat_validation: `out\ops\geometry_repeat_proof_validation_latest.json`
 - uncertainty: `out\ops\geometry_repeat_uncertainty_report_latest.json`
+- kuramoto_holdout_expansion: `out\ops\kuramoto_holdout_expansion_latest.json`
 - valuation: `out\ops\valuation_proposal_target_packet_latest.json`
-- Proof-state SHA-256: `324a092c456e0c6e6a5ec93aa2c654594c27a8b0afcb6a6165d37c9a05e107cb`
+- Proof-state SHA-256: `21deb3a72ac23d92007a50e760c9b00d6ea31b70b78bd1fe92fc2f9afd7f242c`
