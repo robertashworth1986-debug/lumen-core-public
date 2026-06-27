@@ -118,6 +118,30 @@
                               text-transform: uppercase; color: var(--neon-a); }
   .mission-drapers .headline { margin-top: 5px; font-family: 'Orbitron', sans-serif; font-size: 16px; color: #fde68a; }
   .mission-drapers .detail { margin-top: 3px; font-size: 11px; color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; }
+  .live-proof-board { margin-bottom: 12px; border: 1px solid rgba(34, 211, 238, 0.34); border-radius: 10px;
+                      padding: 10px 12px; background: linear-gradient(150deg, rgba(8, 24, 36, 0.58), rgba(20, 12, 44, 0.38));
+                      box-shadow: 0 0 18px rgba(34, 211, 238, 0.12); }
+  .live-proof-board .topline { font-family: 'Orbitron', sans-serif; font-size: 11px; letter-spacing: 1.4px;
+                               text-transform: uppercase; color: var(--neon-c); }
+  .live-proof-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+  .live-proof-tile { border: 1px solid var(--border); border-radius: 9px; padding: 9px 10px;
+                     background: rgba(15, 23, 50, 0.42); }
+  .live-proof-k { font-family: 'Orbitron', sans-serif; color: var(--ink-dim); font-size: 9px; letter-spacing: 1.1px; text-transform: uppercase; }
+  .live-proof-v { margin-top: 4px; font-family: 'Orbitron', sans-serif; color: var(--ink); font-size: 13px; }
+  .live-proof-v.good { color: var(--neon-g); }
+  .live-proof-v.warn { color: var(--neon-a); }
+  .live-proof-v.alert { color: var(--neon-r); }
+  .live-proof-sub { margin-top: 3px; font-family: 'JetBrains Mono', monospace; color: var(--ink-dim); font-size: 10px; }
+  .field-validation-queue { margin-top: 10px; display: grid; gap: 8px; }
+  .field-validation-row { border: 1px solid rgba(34, 211, 238, 0.24); border-radius: 9px;
+                          padding: 9px 10px; background: rgba(4, 6, 15, 0.28); }
+  .field-validation-row .head { display: flex; justify-content: space-between; gap: 10px;
+                                font-family: 'Orbitron', sans-serif; font-size: 10px;
+                                color: var(--neon-c); letter-spacing: 1.1px; text-transform: uppercase; }
+  .field-validation-row .body { margin-top: 4px; font-family: 'JetBrains Mono', monospace;
+                                font-size: 10px; color: var(--ink-dim); line-height: 1.45; }
+  .field-validation-row .gate { color: var(--neon-a); }
+  @media (max-width: 1080px) { .live-proof-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   #grants-cinematic-host { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
   .lc-stage { position: relative; z-index: 2; }
   @media (max-width: 1080px) { .mission-pulse-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -160,6 +184,7 @@
     <h2>Mission Pulse</h2>
     <div id="mission-drapers" class="mission-drapers"></div>
     <div id="mission-pulse" class="mission-pulse-grid"></div>
+    <div id="top5-live-proof-board" class="live-proof-board"></div>
   </div>
   <div class="grants-grid">
     <div class="lc-panel">
@@ -268,6 +293,9 @@ const EXTERNAL_SUBMISSIONS_LEDGER_REL = 'ops/grants_live_submission_ledger_lates
 const WAITING_ACTIONS_REL = 'ops/grant_waiting_actions_latest.json';
 const MEET_DRAPERS_REL = 'ops/meet_drapers_capital_projection/meet_drapers_capital_projection_latest.json';
 const GRANT_READINESS_STATUS_REL = 'grant_dashboard_status_feed_latest.json';
+const TOP5_LIVE_PROOF_REL = 'top5_live_proof_submission_board_latest.json';
+const LIVE_PROOF_VALUE_METER_REL = 'live_proof_value_meter_latest.json';
+const GEOMETRY_ASSET_WIRING_REL = 'geometry_asset_wiring_board_latest.json';
 
 let queue = null;
 let activeId = null;
@@ -280,6 +308,9 @@ let externalSubmissionLedger = null;
 let waitingActions = null;
 let meetDrapersProjection = null;
 let grantReadinessStatus = null;
+let top5LiveProofBoard = null;
+let liveProofValueMeter = null;
+let geometryAssetWiringBoard = null;
 let meetDrapersSourcePath = null;
 let cinematicLayer = null;
 let urlBootstrapApplied = false;
@@ -295,6 +326,9 @@ const localCache = {
   waitingActions: undefined,
   meetDrapersProjection: undefined,
   grantReadinessStatus: undefined,
+  top5LiveProofBoard: undefined,
+  liveProofValueMeter: undefined,
+  geometryAssetWiringBoard: undefined,
 };
 
 function uniquePaths(values) {
@@ -323,6 +357,15 @@ function queueItemRoot(item) {
   return String(item?._local_root || localCache.queueRoot || LOCAL_GRANTS_ROOT);
 }
 
+function moneyCompact(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return '$0';
+  const abs = Math.abs(n);
+  if (abs >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
+  if (abs >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
+  if (abs >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
+  return `$${n.toFixed(0)}`;
+}
 function clampPct(value) {
   const n = Number(value);
   if (!Number.isFinite(n)) return 0;
@@ -632,6 +675,71 @@ async function loadGrantReadinessStatus() {
   return null;
 }
 
+async function loadTop5LiveProofBoard() {
+  if (localCache.top5LiveProofBoard !== undefined) {
+    return localCache.top5LiveProofBoard;
+  }
+  const candidates = uniquePaths([
+    './data/top5_live_proof_submission_board.json',
+    'data/top5_live_proof_submission_board.json',
+    ...joinAllPaths(LOCAL_OPS_ROOT_CANDIDATES, TOP5_LIVE_PROOF_REL),
+  ]);
+
+  for (const candidate of candidates) {
+    const payload = await fetchJsonLoose(candidate);
+    if (payload && typeof payload === 'object') {
+      localCache.top5LiveProofBoard = payload;
+      return payload;
+    }
+  }
+
+  localCache.top5LiveProofBoard = null;
+  return null;
+}
+
+async function loadLiveProofValueMeter() {
+  if (localCache.liveProofValueMeter !== undefined) {
+    return localCache.liveProofValueMeter;
+  }
+  const candidates = uniquePaths([
+    './data/live_proof_value_meter.json',
+    'data/live_proof_value_meter.json',
+    ...joinAllPaths(LOCAL_OPS_ROOT_CANDIDATES, LIVE_PROOF_VALUE_METER_REL),
+  ]);
+
+  for (const candidate of candidates) {
+    const payload = await fetchJsonLoose(candidate);
+    if (payload && typeof payload === 'object') {
+      localCache.liveProofValueMeter = payload;
+      return payload;
+    }
+  }
+
+  localCache.liveProofValueMeter = null;
+  return null;
+}
+
+async function loadGeometryAssetWiringBoard() {
+  if (localCache.geometryAssetWiringBoard !== undefined) {
+    return localCache.geometryAssetWiringBoard;
+  }
+  const candidates = uniquePaths([
+    './data/geometry_asset_wiring_board.json',
+    'data/geometry_asset_wiring_board.json',
+    ...joinAllPaths(LOCAL_OPS_ROOT_CANDIDATES, GEOMETRY_ASSET_WIRING_REL),
+  ]);
+
+  for (const candidate of candidates) {
+    const payload = await fetchJsonLoose(candidate);
+    if (payload && typeof payload === 'object') {
+      localCache.geometryAssetWiringBoard = payload;
+      return payload;
+    }
+  }
+
+  localCache.geometryAssetWiringBoard = null;
+  return null;
+}
 function drapersFrame(payload) {
   const rows = Array.isArray(payload?.scenario_projection)
     ? payload.scenario_projection
@@ -847,6 +955,137 @@ function renderMissionPulse() {
   }
 
   updateCinematicLayer(snap);
+}
+
+function renderTop5LiveProofBoard() {
+  const root = $('top5-live-proof-board');
+  if (!root) return;
+
+  const board = top5LiveProofBoard && typeof top5LiveProofBoard === 'object'
+    ? top5LiveProofBoard
+    : null;
+  if (!board) {
+    root.innerHTML = `
+      <div class="topline">Top-5 Live Proof Board</div>
+      <div class="live-proof-sub">Offline. Generate dashboard/data/top5_live_proof_submission_board.json to hydrate the grant proof gate.</div>
+    `;
+    return;
+  }
+
+  const packages = Array.isArray(board.packages) ? board.packages : [];
+  const proofCount = packages.filter((pkg) => pkg?.live_proof?.proposal_specific_live_proof === true).length;
+  const total = packages.length || 5;
+  const missing = packages
+    .filter((pkg) => pkg?.live_proof?.proposal_specific_live_proof !== true)
+    .map((pkg) => pkg.package || pkg.title || pkg.opportunity)
+    .filter(Boolean)
+    .slice(0, 4)
+    .join(', ');
+  const active = board.active_start_package || {};
+  const gate = board.closest_action_gate || {};
+  const discardedRaw = board.discarded_workspaces || {};
+  const discarded = Array.isArray(discardedRaw) ? (discardedRaw[0] || {}) : discardedRaw;
+  const discardedLabel = discarded.status
+    ? `${discarded.agency || discarded.opportunity || 'Workspace'} ${discarded.status}`
+    : 'none';
+  const finalReady = packages.some((pkg) => pkg.ready_for_final_submit === true);
+  const gateTone = proofCount >= total ? 'good' : 'warn';
+  const meter = liveProofValueMeter && typeof liveProofValueMeter === 'object' ? liveProofValueMeter : {};
+  const valueGate = meter.value_gate || {};
+  const safeClaim = valueGate.safe_claim || {};
+  const feed = meter.dashboard_feed_manifest || {};
+  const sectorMath = Array.isArray(meter.sector_capture_math) ? meter.sector_capture_math : [];
+  const billionRow = sectorMath.find((row) => Number(row.sector_or_loss_pool_usd) === 1000000000) || {};
+  const tinyCapture = (Array.isArray(billionRow.capture_examples) ? billionRow.capture_examples : [])
+    .find((row) => Number(row.improvement_or_capture_pct) === 0.01) || {};
+  const safeAnnual = Number(valueGate.allowed_estimated_annual_value_usd || 0);
+  const blockedAnnual = Number(valueGate.blocked_context_only_annual_value_usd || 0);
+  const geometryBoard = geometryAssetWiringBoard && typeof geometryAssetWiringBoard === 'object'
+    ? geometryAssetWiringBoard
+    : {};
+  const geometrySummary = geometryBoard.summary && typeof geometryBoard.summary === 'object'
+    ? geometryBoard.summary
+    : {};
+  const fieldQueue = Array.isArray(geometryBoard.field_validation_target_queue)
+    ? geometryBoard.field_validation_target_queue.slice(0, 3)
+    : [];
+  const fieldMapped = Number(geometrySummary.field_validation_target_count || 0);
+  const buyerReady = Number(geometrySummary.buyer_authorized_replay_ready_count || 0);
+  const fieldValidated = geometrySummary.field_validation === true;
+  const fieldRows = fieldQueue.map((row) => `
+    <div class="field-validation-row">
+      <div class="head">
+        <span>#${escHTML(String(row.rank || '—'))} ${escHTML(String(row.family_id || 'unknown'))}</span>
+        <span>${escHTML(String(row.minimum_holdouts || 0))} holdouts</span>
+      </div>
+      <div class="body">Baseline: ${escHTML(String(row.incumbent_baseline || 'locked incumbent required'))}</div>
+      <div class="body gate">Gate: ${escHTML(String(row.acceptance_gate || 'buyer-authorized acceptance gate required'))}</div>
+      <div class="body">Ask: ${escHTML(String(row.next_request || 'request field data'))}</div>
+    </div>
+  `).join('');
+
+  root.innerHTML = `
+    <div class="topline">Top-5 Live Proof Board · generated ${escHTML(String(board.generated_utc || 'n/a'))}</div>
+    <div class="live-proof-grid">
+      <div class="live-proof-tile">
+        <div class="live-proof-k">Live Proof Gate</div>
+        <div class="live-proof-v ${gateTone}">${proofCount}/${total}</div>
+        <div class="live-proof-sub">${missing ? `Missing: ${escHTML(missing)}` : 'All packages have proposal-specific proof'}</div>
+      </div>
+      <div class="live-proof-tile">
+        <div class="live-proof-k">Active Start</div>
+        <div class="live-proof-v warn">${escHTML(String(active.package || 'n/a'))}</div>
+        <div class="live-proof-sub">${escHTML(String(active.portal || 'portal gated'))} · ${escHTML(String(active.opportunity || ''))}</div>
+      </div>
+      <div class="live-proof-tile">
+        <div class="live-proof-k">Closest Gate</div>
+        <div class="live-proof-v warn">${escHTML(String(gate.portal || 'n/a'))}</div>
+        <div class="live-proof-sub">${escHTML(String(gate.action || 'capture portal facts'))}</div>
+      </div>
+      <div class="live-proof-tile">
+        <div class="live-proof-k">Discarded Workspace</div>
+        <div class="live-proof-v alert">${escHTML(discardedLabel)}</div>
+        <div class="live-proof-sub">${escHTML(String(discarded.reason || 'No cloud delete/withdraw without action-time approval.'))}</div>
+      </div>
+      <div class="live-proof-tile">
+        <div class="live-proof-k">Safe Value Signal</div>
+        <div class="live-proof-v ${safeClaim.estimated_value_signal_allowed ? 'good' : 'warn'}">${escHTML(moneyCompact(safeAnnual))}/yr</div>
+        <div class="live-proof-sub">Estimated avoided-cost signal; not realized savings.</div>
+      </div>
+      <div class="live-proof-tile">
+        <div class="live-proof-k">Context-Only Blocked</div>
+        <div class="live-proof-v alert">${escHTML(moneyCompact(blockedAnnual))}/yr</div>
+        <div class="live-proof-sub">Cannot be promoted until live source + baseline gates pass.</div>
+      </div>
+      <div class="live-proof-tile">
+        <div class="live-proof-k">0.01% of $1B</div>
+        <div class="live-proof-v good">${escHTML(moneyCompact(tinyCapture.gross_value_usd || 100000))}</div>
+        <div class="live-proof-sub">Gross math surface before proof confidence and buyer capture.</div>
+      </div>
+      <div class="live-proof-tile">
+        <div class="live-proof-k">Live Domain Feeds</div>
+        <div class="live-proof-v ${(feed.live_domain_feed_ok || 0) === (feed.live_domain_feed_total || 1) ? 'good' : 'warn'}">${escHTML(String(feed.live_domain_feed_ok || 0))}/${escHTML(String(feed.live_domain_feed_total || 0))}</div>
+        <div class="live-proof-sub">Public pages must hydrate the same JSON before reviewer-facing live claims.</div>
+      </div>
+      <div class="live-proof-tile">
+        <div class="live-proof-k">Field Validation</div>
+        <div class="live-proof-v ${fieldValidated ? 'good' : 'warn'}">${fieldValidated ? 'READY' : 'NOT YET'}</div>
+        <div class="live-proof-sub">${fieldMapped} targets mapped · ${buyerReady} buyer-authorized replay asks ready.</div>
+      </div>
+    </div>
+    ${fieldRows ? `
+      <div class="field-validation-queue">
+        <div class="topline">Field-Validation Target Queue · claim gates remain closed until outside-owner holdouts pass</div>
+        ${fieldRows}
+      </div>
+    ` : `
+      <div class="live-proof-sub" style="margin-top:8px">Geometry field-validation queue offline. Generate geometry_asset_wiring_board to hydrate outside-owner validation targets.</div>
+    `}
+    <div class="live-proof-sub" style="margin-top:8px">
+      Final submit allowed: <b>${finalReady ? 'YES' : 'NO'}</b>.
+      Rule: no final grant submit until proposal-specific live proof plus portal/compliance/action-time gates pass.
+    </div>
+  `;
 }
 
 async function localQueue() {
@@ -1139,6 +1378,9 @@ async function loadQueue() {
     waitingActions = await loadWaitingActions();
     meetDrapersProjection = await loadMeetDrapersProjection();
     grantReadinessStatus = await loadGrantReadinessStatus();
+    top5LiveProofBoard = await loadTop5LiveProofBoard();
+    liveProofValueMeter = await loadLiveProofValueMeter();
+    geometryAssetWiringBoard = await loadGeometryAssetWiringBoard();
     queue = await api('/api/grants');
     try {
       submissionDashboard = await api('/api/grants/submission/dashboard');
@@ -1152,6 +1394,7 @@ async function loadQueue() {
     }
     renderQueue();
     renderMissionPulse();
+    renderTop5LiveProofBoard();
     await applyUrlBootstrap();
     if (!activeId) {
       const preferred = (queue?.items || []).find((it) => it?.opportunity_window?.actionable === true)
@@ -1163,6 +1406,7 @@ async function loadQueue() {
     $('grant-list').innerHTML =
       `<li class="err">Failed: ${e.message}</li>`;
     renderMissionPulse();
+    renderTop5LiveProofBoard();
   }
 }
 
@@ -1998,6 +2242,7 @@ $('opps-autopilot').addEventListener('click', () => runOpportunityAutopilot());
 $('regenerate').addEventListener('click', () => regenerate(null));
 ensureCinematicLayer();
 renderMissionPulse();
+renderTop5LiveProofBoard();
 loadQueue();
 </script>
 <script src="./assets/luma_command_fabric.js"></script>
