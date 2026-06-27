@@ -46,6 +46,7 @@ OPTIONAL_FEEDS = [
     "geometry_asset_wiring_board",
     "luma_context_dashboard_parity_audit",
     "live_domain_deployment_feed",
+    "proof_to_revenue_engine",
 ]
 
 FORBIDDEN_NAME_FRAGMENTS = [

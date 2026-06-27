@@ -1,19 +1,19 @@
 # Live Domain Deployment Feed
 
-Generated UTC: `2026-06-27T20:14:31.703307+00:00`
+Generated UTC: `2026-06-27T21:21:21.093616+00:00`
 Live base: `https://lumen-core.ai`
 
 ## Current Answer
 
-The local proof stack is ready for reviewer packaging, but the live domain still needs hosted hash verification before we should point reviewers to it.
+The live domain is serving matching hashes for every required reviewer proof feed. This is public deployment verification, not field validation.
 
 ## Deployment State
 
 - Required local feeds ready: `7/7`
-- Required hosted feeds reachable: `0/7`
-- Required hosted hash matches: `0/7`
-- Live-domain reviewer-ready: `false`
-- Domain deployment state: `LOCAL_READY_DOMAIN_NOT_VERIFIED_OR_STALE`
+- Required hosted feeds reachable: `7/7`
+- Required hosted hash matches: `7/7`
+- Live-domain reviewer-ready: `true`
+- Domain deployment state: `LIVE_DOMAIN_HASH_VERIFIED`
 
 ## Current Champion Snapshot
 
@@ -31,15 +31,15 @@ The local proof stack is ready for reviewer packaging, but the live domain still
 
 | Feed | Required | Local | Hosted Match | Match URL |
 |---|---:|---:|---:|---|
-| `champion_metric_gauntlet` | `true` | `true` | `false` | - |
-| `kuramoto_holdout_expansion` | `true` | `true` | `false` | - |
-| `geometry_champion_of_champions` | `true` | `true` | `false` | - |
-| `field_money_truth_sweep` | `true` | `true` | `false` | - |
-| `live_proof_value_meter` | `true` | `true` | `false` | - |
-| `field_validated_dollar_claim_ladder` | `true` | `true` | `false` | - |
-| `dollar_claim_gate` | `true` | `true` | `false` | - |
-| `geometry_asset_wiring_board` | `false` | `true` | `false` | - |
-| `luma_context_dashboard_parity_audit` | `false` | `true` | `false` | - |
+| `champion_metric_gauntlet` | `true` | `true` | `true` | https://lumen-core.ai/data/champion_metric_gauntlet.json |
+| `kuramoto_holdout_expansion` | `true` | `true` | `true` | https://lumen-core.ai/data/kuramoto_holdout_expansion.json |
+| `geometry_champion_of_champions` | `true` | `true` | `true` | https://lumen-core.ai/data/geometry_champion_of_champions.json |
+| `field_money_truth_sweep` | `true` | `true` | `true` | https://lumen-core.ai/data/field_money_truth_sweep.json |
+| `live_proof_value_meter` | `true` | `true` | `true` | https://lumen-core.ai/data/live_proof_value_meter.json |
+| `field_validated_dollar_claim_ladder` | `true` | `true` | `true` | https://lumen-core.ai/data/field_validated_dollar_claim_ladder.json |
+| `dollar_claim_gate` | `true` | `true` | `true` | https://lumen-core.ai/data/dollar_claim_gate.json |
+| `geometry_asset_wiring_board` | `false` | `true` | `true` | https://lumen-core.ai/data/geometry_asset_wiring_board.json |
+| `luma_context_dashboard_parity_audit` | `false` | `true` | `true` | https://lumen-core.ai/data/luma_context_dashboard_parity_audit.json |
 
 ## Reviewer URLs
 
@@ -69,4 +69,4 @@ The local proof stack is ready for reviewer packaging, but the live domain still
 
 Live-domain deployment feed only. Matching hosted hashes prove that the public domain is serving the same local proof feeds. They do not prove field validation, realized savings, grant award certainty, fixed frozen delta pricing, medical efficacy, or live trading performance.
 
-Deployment feed SHA-256: `02fc6dc23aef2ace7dc0f0f435eb1ce12b23cb0752a688f564963aded7d84f82`
+Deployment feed SHA-256: `8f7822042c07cfd19c5a69e9aeeb8280b0b832a6e3a46f2b88076d6f11ca5c7e`

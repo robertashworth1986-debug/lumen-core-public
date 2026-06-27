@@ -1,6 +1,6 @@
 # Champion Metric Gauntlet
 
-Generated UTC: `2026-06-27T18:35:52.237413+00:00`
+Generated UTC: `2026-06-27T21:08:03.287584+00:00`
 
 ## What To Ask Me
 
@@ -59,13 +59,12 @@ Kuramoto phase coupling is the current internal champion because it beat kalman_
 - `hash_chain_present`: `PASS` | actual `b723b3cf65d3...` | threshold `64 hex characters`
 - `vault_hashes_verified`: `PASS` | actual `True` | threshold `true`
 - `all_families_live_benchmarked`: `BLOCKED` | actual `False` | threshold `true before broad all-family claims`
-- `live_domain_feed_routed`: `BLOCKED` | actual `False` | threshold `true before hosted reviewer proof claim`
+- `live_domain_feed_routed`: `PASS` | actual `True` | threshold `true before hosted reviewer proof claim`
 - `field_validation`: `BLOCKED` | actual `False` | threshold `true before field validated language`
 
 ## Blockers
 
 - `all_families_live_benchmarked`: Broad all-family language remains blocked.
-- `live_domain_feed_routed`: Live-domain proof claim remains blocked.
 - `field_validation`: Field-validation and realized-savings language remains blocked.
 
 ## Next 10 Tests
@@ -85,4 +84,4 @@ Kuramoto phase coupling is the current internal champion because it beat kalman_
 
 Champion metric gauntlet only. This artifact explains the current internal winner, the tests it has passed, the tests it has not passed, and the safest claim language. It does not create field validation, realized savings, trading profit, medical efficacy, award certainty, or a fixed dollar price for frozen deltas.
 
-Gauntlet SHA-256: `305e98db6ab37f934574a95358b8d9215db46bbe0c4f87538200c25e7b12d7f6`
+Gauntlet SHA-256: `3908fad094c311285c22ce981c411657e23e411045bc059acece27f851926415`

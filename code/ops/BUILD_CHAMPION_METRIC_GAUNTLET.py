@@ -17,6 +17,7 @@ CHAMPION_JSON = OUT_OPS / "geometry_champion_of_champions_latest.json"
 TRUTH_SWEEP_JSON = OUT_OPS / "field_money_truth_sweep_latest.json"
 VALUE_METER_JSON = OUT_OPS / "live_proof_value_meter_latest.json"
 DOLLAR_LADDER_JSON = OUT_OPS / "field_validated_dollar_claim_ladder_latest.json"
+LIVE_DOMAIN_DEPLOYMENT_JSON = OUT_OPS / "live_domain_deployment_feed_latest.json"
 
 OUT_JSON = OUT_OPS / "champion_metric_gauntlet_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "champion_metric_gauntlet.json"
@@ -104,6 +105,16 @@ def metric_gate(
     }
 
 
+def live_domain_verified() -> bool:
+    deployment = read_json(LIVE_DOMAIN_DEPLOYMENT_JSON)
+    summary = as_dict(deployment.get("summary"))
+    return (
+        summary.get("domain_deployment_state") == "LIVE_DOMAIN_HASH_VERIFIED"
+        and bool(summary.get("live_domain_reviewer_ready"))
+        and as_int(summary.get("required_remote_hash_match_count")) >= as_int(summary.get("required_feed_count"), 1)
+    )
+
+
 def strongest_current(champion: dict[str, Any], kuramoto: dict[str, Any]) -> dict[str, Any]:
     board = as_dict(champion.get("champion_of_champions"))
     strongest = as_dict(board.get("strongest_current"))
@@ -163,6 +174,7 @@ def build_metric_gauntlet(
     champion_summary: dict[str, Any],
     truth_summary: dict[str, Any],
     truth_gates: dict[str, Any],
+    live_domain_ready: bool,
 ) -> list[dict[str, Any]]:
     holdout_count = as_int(strongest.get("holdout_count"))
     wins = as_int(strongest.get("wins_vs_named_baseline"))
@@ -266,11 +278,11 @@ def build_metric_gauntlet(
         ),
         metric_gate(
             "live_domain_feed_routed",
-            bool(truth_gates.get("vps_domain_live_dashboard_routed")),
+            bool(truth_gates.get("vps_domain_live_dashboard_routed") or live_domain_ready),
             "true before hosted reviewer proof claim",
-            bool(truth_gates.get("vps_domain_live_dashboard_routed")),
+            bool(truth_gates.get("vps_domain_live_dashboard_routed") or live_domain_ready),
             "A reviewer-facing domain needs fresh hosted hashes, not just local files.",
-            "Live-domain proof claim remains blocked.",
+            "Hosted reviewer proof language is allowed once all required feed hashes match.",
             blocker=True,
         ),
         metric_gate(
@@ -306,12 +318,17 @@ def dashboard_feed_status() -> dict[str, Any]:
             }
         )
     ready = [row for row in rows if row["exists"]]
+    domain_ready = live_domain_verified()
     return {
         "local_feed_count": len(rows),
         "local_feed_ready_count": len(ready),
         "local_feeds_ready": len(ready) == len(rows),
-        "live_domain_routed": False,
-        "status": "LOCAL_READY_DOMAIN_NOT_VERIFIED" if len(ready) == len(rows) else "LOCAL_FEEDS_INCOMPLETE",
+        "live_domain_routed": domain_ready,
+        "status": (
+            "LIVE_DOMAIN_HASH_VERIFIED"
+            if len(ready) == len(rows) and domain_ready
+            else ("LOCAL_READY_DOMAIN_NOT_VERIFIED" if len(ready) == len(rows) else "LOCAL_FEEDS_INCOMPLETE")
+        ),
         "feeds": rows,
     }
 
@@ -383,7 +400,8 @@ def build_payload() -> dict[str, Any]:
     truth_summary = as_dict(truth.get("summary"))
     truth_gates = as_dict(truth.get("gates"))
     strongest = strongest_current(champion, kuramoto)
-    gauntlet = build_metric_gauntlet(strongest, champion_summary, truth_summary, truth_gates)
+    domain_ready = live_domain_verified()
+    gauntlet = build_metric_gauntlet(strongest, champion_summary, truth_summary, truth_gates, domain_ready)
     blockers = [row for row in gauntlet if row.get("blocker")]
     passed = [row for row in gauntlet if row.get("passed")]
     safe_annual = as_float(

@@ -32,6 +32,8 @@ function Resolve-SshKey {
   $candidates = @()
   if ($ExplicitPath) { $candidates += $ExplicitPath }
   if ($env:USERPROFILE) {
+    $candidates += (Join-Path $env:USERPROFILE "Downloads\ssh-key-2026-04-23.key")
+    $candidates += (Join-Path $env:USERPROFILE "Downloads\oracle_new")
     $candidates += (Join-Path $env:USERPROFILE ".ssh\luma_vps")
     $candidates += (Join-Path $env:USERPROFILE ".ssh\id_rsa")
     $candidates += (Join-Path $env:USERPROFILE ".ssh\id_ed25519")

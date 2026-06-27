@@ -51,8 +51,8 @@ def test_gauntlet_has_passes_and_blockers():
     assert gates["row_replay_depth"]["passed"] is True
     assert gates["field_validation"]["passed"] is False
     assert gates["field_validation"]["blocker"] is True
-    assert gates["live_domain_feed_routed"]["blocker"] is True
-    assert payload["summary"]["blocking_gate_count"] >= 2
+    assert gates["live_domain_feed_routed"]["passed"] is payload["summary"]["live_domain_reviewer_ready"]
+    assert payload["summary"]["blocking_gate_count"] >= 1
 
 
 def test_gauntlet_routes_dashboard_feed_and_hashes_itself():
@@ -62,8 +62,8 @@ def test_gauntlet_routes_dashboard_feed_and_hashes_itself():
 
     assert len(payload["gauntlet_sha256"]) == 64
     assert feeds["local_feed_count"] >= 6
-    assert feeds["status"] in {"LOCAL_READY_DOMAIN_NOT_VERIFIED", "LOCAL_FEEDS_INCOMPLETE"}
-    assert feeds["live_domain_routed"] is False
+    assert feeds["status"] in {"LIVE_DOMAIN_HASH_VERIFIED", "LOCAL_READY_DOMAIN_NOT_VERIFIED", "LOCAL_FEEDS_INCOMPLETE"}
+    assert feeds["live_domain_routed"] is payload["summary"]["live_domain_reviewer_ready"]
     assert any(row["relative_path"] == "dashboard/data/champion_metric_gauntlet.json" for row in feeds["feeds"])
 
 
