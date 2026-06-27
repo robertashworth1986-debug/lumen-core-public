@@ -9,6 +9,18 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function Invoke-CheckedNative {
+  param(
+    [Parameter(Mandatory = $true)][string]$FilePath,
+    [Parameter(Mandatory = $true)][string[]]$ArgumentList
+  )
+
+  & $FilePath @ArgumentList
+  if ($LASTEXITCODE -ne 0) {
+    throw "Native command failed with exit code ${LASTEXITCODE}: $FilePath $($ArgumentList -join ' ')"
+  }
+}
+
 function Resolve-RepoRoot {
   $scriptRoot = Split-Path -Parent $MyInvocation.ScriptName
   return (Resolve-Path (Join-Path $scriptRoot "..")).Path
@@ -136,6 +148,7 @@ Write-Host "Feed-only bundle: $resolvedBundleRoot" -ForegroundColor Cyan
 Write-Host "Archive: $archive" -ForegroundColor Cyan
 Write-Host "Required ready: $($manifest.summary.required_ready_count)/$($manifest.summary.required_feed_count)" -ForegroundColor Cyan
 Write-Host "Target: $VpsUser@$VpsIp" -ForegroundColor Cyan
+Write-Host "SSH key: $sshKey" -ForegroundColor Cyan
 Write-Host "Remote web roots: $($RemoteWebRoots -join ', ')" -ForegroundColor Cyan
 
 if ($DryRun) {
@@ -147,9 +160,9 @@ if ($DryRun) {
   exit 0
 }
 
-scp -i $sshKey $archive "$VpsUser@$VpsIp`:$remoteArchive"
+Invoke-CheckedNative -FilePath scp -ArgumentList @("-i", $sshKey, $archive, "$VpsUser@$VpsIp`:$remoteArchive")
 $encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($remoteScript))
-ssh -i $sshKey "$VpsUser@$VpsIp" "echo $encoded | base64 -d | bash"
+Invoke-CheckedNative -FilePath ssh -ArgumentList @("-i", $sshKey, "$VpsUser@$VpsIp", "echo $encoded | base64 -d | bash")
 
 Write-Host "Feed-only deploy complete. Run verification:" -ForegroundColor Green
 Write-Host "python .\code\ops\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py --timeout 8" -ForegroundColor Green
