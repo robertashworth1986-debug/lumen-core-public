@@ -1,8 +1,8 @@
 # Live Domain Proof Feed Deploy Bundle
 
-Generated UTC: `2026-06-27T21:54:18Z`
-Bundle root: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260627T215418Z`
-Archive: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260627T215418Z.tgz`
+Generated UTC: `2026-06-27T23:00:36Z`
+Bundle root: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260627T230036Z`
+Archive: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260627T230036Z.tgz`
 
 ## Decision
 
@@ -31,14 +31,15 @@ The feed-only deploy bundle is ready. It can publish proof JSON feeds to the pub
 | `dollar_claim_gate` | `true` | `dashboard/data/dollar_claim_gate.json` | `2` | `9e64ad63466e` |
 | `geometry_asset_wiring_board` | `false` | `dashboard/data/geometry_asset_wiring_board.json` | `2` | `e3def388208f` |
 | `luma_context_dashboard_parity_audit` | `false` | `dashboard/data/luma_context_dashboard_parity_audit.json` | `2` | `8047d31daef3` |
-| `live_domain_deployment_feed` | `false` | `dashboard/data/live_domain_deployment_feed.json` | `2` | `db74811793a2` |
+| `live_domain_deployment_feed` | `false` | `dashboard/data/live_domain_deployment_feed.json` | `2` | `c6b7ca55d90a` |
 | `proof_to_revenue_engine` | `false` | `dashboard/data/proof_to_revenue_engine.json` | `2` | `dd221bfa4baa` |
 | `champion_stress_test_matrix` | `false` | `dashboard/data/champion_stress_test_matrix.json` | `2` | `44b18614745c` |
+| `first_buyer_target_board` | `false` | `dashboard/data/first_buyer_target_board.json` | `2` | `1ef2afdafad4` |
 
 ## Commands
 
-- Dry run: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260627T215418Z" -DryRun`
-- Deploy feeds: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260627T215418Z"`
+- Dry run: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260627T230036Z" -DryRun`
+- Deploy feeds: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260627T230036Z"`
 - Verify domain hashes: `python .\code\ops\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py --timeout 8`
 
 ## Remote Web Roots Tried By Deploy Script
@@ -51,5 +52,5 @@ The feed-only deploy bundle is ready. It can publish proof JSON feeds to the pub
 
 Feed-only deploy bundle. It stages reviewer proof JSON for domain hash verification. It does not publish secrets, restart execution services, prove field validation, prove realized savings, set a fixed dollar value per frozen delta, or imply autonomous live trading permission. This is not field validation.
 
-Bundle SHA-256: `7414defa778bc17cb307afbc4ae81fc8fd03d9958bc39a5d14d23cc7bcc51da8`
-Archive SHA-256: `a7bc78d18e3e58d756ff1e4ba8f5fd79fcec08db2155aa470db0e0076489e41f`
+Bundle SHA-256: `a82dfb6b994fb9d73e8a6020f274a562869bdc0789e47e317896d35952575bbe`
+Archive SHA-256: `971fa8ce8c94cefb0ca72f24a0701511761ffa70f1b0bff17ca2f6a2cf4b63f3`

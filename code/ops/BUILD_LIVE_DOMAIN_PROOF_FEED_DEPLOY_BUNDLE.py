@@ -48,6 +48,7 @@ OPTIONAL_FEEDS = [
     "live_domain_deployment_feed",
     "proof_to_revenue_engine",
     "champion_stress_test_matrix",
+    "first_buyer_target_board",
 ]
 
 FORBIDDEN_NAME_FRAGMENTS = [

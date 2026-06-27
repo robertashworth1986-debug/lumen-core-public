@@ -90,6 +90,18 @@ PROOF_FEEDS = [
         "required": False,
         "why": "Compact buyer/reviewer-safe stress matrix for the current champion.",
     },
+    {
+        "key": "proof_to_revenue_engine",
+        "local": "dashboard/data/proof_to_revenue_engine.json",
+        "required": False,
+        "why": "Reviewer-safe proof-to-revenue bridge with blocked and allowed claim controls.",
+    },
+    {
+        "key": "first_buyer_target_board",
+        "local": "dashboard/data/first_buyer_target_board.json",
+        "required": False,
+        "why": "Named, source-verified first-buyer and field-replay target board.",
+    },
 ]
 
 REMOTE_TEMPLATES = [
