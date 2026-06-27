@@ -153,6 +153,7 @@ def test_markdown_keeps_public_deployment_separate_from_field_validation(tmp_pat
     assert "Live-domain reviewer-ready: `true`" in rendered
     assert "Field-validation claim allowed: `false`" in rendered
     assert "Real-dollar savings claim allowed: `false`" in rendered
+    assert "PUSH_PROOF_FEEDS_TO_VPS.ps1" in rendered
     assert "not field validation" in rendered.lower()
     assert "guaranteed grant" not in dumped
     assert "guaranteed profit" not in dumped

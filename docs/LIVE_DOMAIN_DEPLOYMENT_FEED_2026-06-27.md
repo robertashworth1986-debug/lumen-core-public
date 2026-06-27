@@ -1,6 +1,6 @@
 # Live Domain Deployment Feed
 
-Generated UTC: `2026-06-27T19:13:06.916148+00:00`
+Generated UTC: `2026-06-27T20:02:09.842204+00:00`
 Live base: `https://lumen-core.ai`
 
 ## Current Answer
@@ -52,7 +52,9 @@ The local proof stack is ready for reviewer packaging, but the live domain still
 
 - `python .\code\ops\BUILD_CHAMPION_METRIC_GAUNTLET.py`
 - `python .\code\ops\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py --skip-live-check`
-- `.\deploy\PUSH_TO_VPS.ps1`
+- `python .\code\ops\BUILD_LIVE_DOMAIN_PROOF_FEED_DEPLOY_BUNDLE.py`
+- `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -DryRun`
+- `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1`
 - `python .\code\ops\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py`
 
 ## What To Ask Next

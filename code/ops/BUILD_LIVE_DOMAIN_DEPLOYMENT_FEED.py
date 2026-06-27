@@ -340,7 +340,9 @@ def build_payload(check_live_domain: bool = True, timeout: int = 10) -> dict[str
         "publish_and_verify_runbook": [
             "python .\\code\\ops\\BUILD_CHAMPION_METRIC_GAUNTLET.py",
             "python .\\code\\ops\\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py --skip-live-check",
-            ".\\deploy\\PUSH_TO_VPS.ps1",
+            "python .\\code\\ops\\BUILD_LIVE_DOMAIN_PROOF_FEED_DEPLOY_BUNDLE.py",
+            ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1 -DryRun",
+            ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1",
             "python .\\code\\ops\\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py",
         ],
         "what_to_ask_next": [
