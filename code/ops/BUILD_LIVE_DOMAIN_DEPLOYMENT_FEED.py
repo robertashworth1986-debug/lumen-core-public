@@ -84,6 +84,12 @@ PROOF_FEEDS = [
         "required": False,
         "why": "General dashboard parity and continuity audit.",
     },
+    {
+        "key": "champion_stress_test_matrix",
+        "local": "dashboard/data/champion_stress_test_matrix.json",
+        "required": False,
+        "why": "Compact buyer/reviewer-safe stress matrix for the current champion.",
+    },
 ]
 
 REMOTE_TEMPLATES = [

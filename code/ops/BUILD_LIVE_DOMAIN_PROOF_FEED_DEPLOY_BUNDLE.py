@@ -47,6 +47,7 @@ OPTIONAL_FEEDS = [
     "luma_context_dashboard_parity_audit",
     "live_domain_deployment_feed",
     "proof_to_revenue_engine",
+    "champion_stress_test_matrix",
 ]
 
 FORBIDDEN_NAME_FRAGMENTS = [
