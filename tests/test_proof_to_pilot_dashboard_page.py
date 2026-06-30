@@ -13,11 +13,15 @@ def test_proof_to_pilot_dashboard_references_control_room_feed():
     assert "Proof To Pilot Control Room" in html
     assert "data/proof_to_pilot_control_room.json" in html
     assert "data/paid_pilot_outreach_queue.json" in html
+    assert "data/field_validation_control_room.json" in html
+    assert "data/field_validation_outreach_board.json" in html
     assert "renderSummary" in html
     assert "renderGates" in html
     assert "renderCards" in html
     assert "renderArtifacts" in html
     assert "renderOutreachQueue" in html
+    assert "renderFieldValidation" in html
+    assert "renderFieldOutreach" in html
 
 
 def test_proof_to_pilot_dashboard_keeps_claim_gates_visible():

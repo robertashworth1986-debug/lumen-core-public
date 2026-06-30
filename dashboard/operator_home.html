@@ -79,11 +79,11 @@
       <div class="actions"><a class="btn primary" href="/grants.html">Open Grants</a></div>
     </article>
     <article class="panel product">
-      <div class="label">LumaScout</div>
-      <div class="metric" id="scout-count">—</div>
-      <div class="state warn" id="scout-state">LOADING</div>
-      <p>Ranks artist discovery signals and produces an auditable shortlist. It is a scouting intelligence prototype, not a label deal, investment recommendation, or verified revenue stream.</p>
-      <div class="actions"><a class="btn primary" href="/lumascout.html">Open LumaScout</a></div>
+      <div class="label">Proof To Pilot</div>
+      <div class="metric" id="scout-count">FIELD</div>
+      <div class="state warn" id="scout-state">BUYER-VALIDATION GATE</div>
+      <p>Turns internal champions into buyer-authorized replay asks: held-out data, locked baselines, acceptance metrics, economic conversion, and paid evaluation scope. This is the money path; it is not a realized-savings claim yet.</p>
+      <div class="actions"><a class="btn primary" href="/proof_to_pilot.html">Open Proof To Pilot</a><a class="btn" href="/data/field_validation_control_room.json">Validation Feed</a></div>
     </article>
   </section>
 
@@ -122,7 +122,7 @@ Promise.allSettled([
   json('/api/snapshot'),
   json('/api/forecast/evidence-overview'),
   json('/api/grants'),
-  json('/api/scout/summary')
+  json('/data/field_validation_control_room.json')
 ]).then(([snapR,forecastR,grantsR,scoutR])=>{
   const snap=snapR.value||{}, gate=snap.runtime?.execution_gate||{}, paper=snap.paper||{};
   const snapshotAvailable=snapR.status==='fulfilled';
@@ -138,9 +138,9 @@ Promise.allSettled([
   const g=grantsR.value||{};
   document.getElementById('grant-actionable').textContent=grantsR.status==='fulfilled'?Number(g.n_actionable||0)+' ACTIONABLE':'UNAVAILABLE';
   document.getElementById('grant-state').textContent=grantsR.status!=='fulfilled'?'CHECK GRANTS API':(Number(g.n_actionable||0)>0?'NEXT: NSF PROJECT PITCH':'NO VERIFIED OPEN SUBMISSION');
-  const s=scoutR.value||{};
-  document.getElementById('scout-count').textContent=scoutR.status==='fulfilled'?Number(s.production_candidate_count||0)+' CANDIDATES':'UNAVAILABLE';
-  document.getElementById('scout-state').textContent=scoutR.status==='fulfilled'?'LAST DATA '+String(s.generated_utc||'UNKNOWN').slice(0,10):'CHECK SCOUT API';
+  const s=scoutR.value||{}, fs=s.summary||{};
+  document.getElementById('scout-count').textContent=scoutR.status==='fulfilled'?Number(fs.broader_measured_provider_count||0)+' SOURCES':'UNAVAILABLE';
+  document.getElementById('scout-state').textContent=scoutR.status==='fulfilled'?(fs.external_approval_received?'EXTERNAL APPROVAL RECEIVED':'EXTERNAL APPROVAL NEEDED'):'CHECK FIELD VALIDATION FEED';
   document.getElementById('stamp').textContent='live snapshot '+String(snap.generated_utc||'unavailable');
 });
 </script>

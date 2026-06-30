@@ -1,6 +1,6 @@
 # Champion Metric Gauntlet
 
-Generated UTC: `2026-06-27T21:08:03.287584+00:00`
+Generated UTC: `2026-06-30T00:21:02.500843+00:00`
 
 ## What To Ask Me
 
@@ -17,7 +17,7 @@ Ask questions that force evidence, gates, and next actions:
 
 ## Current Answer
 
-Kuramoto phase coupling is the current internal champion because it beat kalman_filter on 24/24 source-conditioned holdouts across 4 source systems. That is strong enough to request a buyer-authorized field replay, but it is not field validation or realized dollar savings yet.
+Kuramoto phase coupling is the current internal champion because it beat kalman_filter on 24/24 source-conditioned holdouts across 4 champion-replay source systems. The broader live-source universe currently shows 17 measured providers and 183 mapped source files/feeds available for additional benchmark promotion. That is strong enough to request a buyer-authorized field replay, but it is not field validation or realized dollar savings yet.
 
 ## Strongest Current Candidate
 
@@ -26,13 +26,16 @@ Kuramoto phase coupling is the current internal champion because it beat kalman_
 - Lane: `wave_resonance_timing`
 - Named baseline: `kalman_filter`
 - Holdout wins: `24/24`
-- Mean delta vs baseline: `0.139875`
+- Mean delta vs baseline: `0.143725`
 - Min delta vs baseline: `0.044697`
 - Source systems: `4`
-- Estimated rows replayed: `2506267`
+- Broader measured providers: `17/22`
+- Manifest unique sources: `183`
+- Manifest ready benchmark rows: `317`
+- Estimated rows replayed: `2507379`
 - Sign-test p-value: `6e-08`
 - Wilson lower 95% win-rate bound: `0.862024`
-- Holdout chain SHA-256: `b723b3cf65d3971b0492e41cc27fc82e1fba57a5e0d672a67e9818348313f2e6`
+- Holdout chain SHA-256: `b8c575a1d68ee262837d55ed9c4dff94c1cb9a3071eb9700ce4cb0c8c8d56b79`
 
 ## Safe Claim State
 
@@ -46,6 +49,42 @@ Kuramoto phase coupling is the current internal champion because it beat kalman_
 - Safe estimated hourly value surface: `$4,520.00`
 - Safe estimated annual value surface: `$39,595,200.00`
 
+## Source Breadth Correction
+
+The champion replay source count and the broader live-source universe are intentionally not the same metric. The champion replay count only covers sources promoted into the current Kuramoto holdout expansion. The broader universe counts providers, local/live files, and manifest rows that are available for additional benchmarking but are not automatically part of the current champion win.
+
+- Champion replay source systems: `4`
+- Champion replay source names: `energy_grid, macro_rates_labor, market_data, sports_market`
+- Fresh measured providers: `17` of `22`
+- Fresh measured rows in latest bounded pull: `570`
+- Measured provider names: `ALPACA, ALPHAVANTAGE, BEA, BLS, CENSUS, COINGECKO_PUBLIC, EIA, FINNHUB, FRED, GRANTS_GOV, KRAKEN, KRAKEN_PUBLIC, MASSIVE, NOAA_NCEI, TWELVE_DATA, USGS_WATER, WEBHOOK`
+- Failed or thin provider names: `BINANCE_PUBLIC, EPA_AQS, NASA, NREL, THE_ODDS_API`
+- Manifest unique source count: `183`
+- Manifest ready-for-benchmark row count: `317`
+- Manifest estimated rows mapped: `10050922`
+
+## Grid/RF/PLL Hardware Validation Gate
+
+Grid, RF, and PLL hardware validation can be designed now, but it becomes field validation only after an external lab, buyer, utility, or authorized operator runs or accepts a locked protocol on their instrumented data or test bench.
+
+A fixed dollar or realized-savings claim stays blocked until a buyer, lab, utility, or authorized operator accepts the test protocol, baseline, holdout window, and dollar conversion before the replay.
+
+### What API Keys Are For
+
+- Pull fresh measured rows from many live systems.
+- Create timestamped, hashable source snapshots.
+- Populate benchmarks and dashboards with current evidence.
+- Support buyer discovery by showing where a repeatable anomaly or lift exists.
+- They do not by themselves create realized savings; the acceptance protocol does that.
+
+### Fixed-Dollar Claim Blockers
+
+- No buyer-authorized before/after deployment or accepted field replay yet.
+- No pre-agreed economic conversion factor for each sector and use case.
+- No signed acceptance criteria from the system owner or external lab.
+- No proof that the measured lift survived external holdouts controlled by the buyer.
+- No contract term that prices a frozen delta as a deliverable or paid diagnostic artifact.
+
 ## Metric Gates
 
 - `holdout_depth`: `PASS` | actual `24` | threshold `>= 20 source-conditioned holdouts`
@@ -55,17 +94,113 @@ Kuramoto phase coupling is the current internal champion because it beat kalman_
 - `sign_test_strength`: `PASS` | actual `6e-08` | threshold `<= 0.001`
 - `wilson_lower_bound`: `PASS` | actual `0.862024` | threshold `>= 0.75`
 - `source_system_diversity`: `PASS` | actual `4` | threshold `>= 3 source systems`
-- `row_replay_depth`: `PASS` | actual `2506267` | threshold `>= 1,000,000 estimated rows replayed`
-- `hash_chain_present`: `PASS` | actual `b723b3cf65d3...` | threshold `64 hex characters`
+- `row_replay_depth`: `PASS` | actual `2507379` | threshold `>= 1,000,000 estimated rows replayed`
+- `hash_chain_present`: `PASS` | actual `b8c575a1d68e...` | threshold `64 hex characters`
 - `vault_hashes_verified`: `PASS` | actual `True` | threshold `true`
 - `all_families_live_benchmarked`: `BLOCKED` | actual `False` | threshold `true before broad all-family claims`
-- `live_domain_feed_routed`: `PASS` | actual `True` | threshold `true before hosted reviewer proof claim`
+- `live_domain_feed_routed`: `BLOCKED` | actual `False` | threshold `true before hosted reviewer proof claim`
 - `field_validation`: `BLOCKED` | actual `False` | threshold `true before field validated language`
 
 ## Blockers
 
 - `all_families_live_benchmarked`: Broad all-family language remains blocked.
+- `live_domain_feed_routed`: Hosted reviewer proof language is allowed once all required feed hashes match.
 - `field_validation`: Field-validation and realized-savings language remains blocked.
+
+## Metric Expansion Suite
+
+This is the next flex layer: every promoted champion should be pressure-tested across error, phase, robustness, source-generalization, decision quality, runtime, economics, provenance, field replay, and all-family competition. Status labels preserve the difference between proven, ready-to-run, and externally blocked.
+
+### `forecast_error_and_residuals`
+
+- Status: `EVIDENCED_CORE_READY_TO_EXPAND`
+- Question: Does the champion reduce error against a named incumbent baseline?
+- Metrics: `MAE, RMSE, MAPE_or_SMAPE, WAPE, residual_bias, residual_autocorrelation`
+- Current evidence: 24/24 holdout wins vs kalman_filter with minimum delta 0.044697 and 2,507,379 estimated rows replayed.
+- Next action: Add per-source residual health tables before promoting more live-breadth providers into the champion replay.
+- Claim gate: Internal champion claim allowed; field-performance language remains blocked.
+
+### `phase_lock_and_timing`
+
+- Status: `EVIDENCED_CORE_NEEDS_DIRECT_PHASE_DIAGNOSTICS`
+- Question: Is the win specifically a phase/timing advantage rather than generic smoothing?
+- Metrics: `circular_phase_error, phase_slip_count, lock_duration, recovery_time, coherence, spectral_concentration`
+- Current evidence: Champion lane is wave_resonance_timing with sign-test p-value 6e-08; direct phase diagnostics are still the next strongest proof upgrade.
+- Next action: Run a dedicated phase-error distribution report for grid/EIA, market, macro, and sports-market source slices.
+- Claim gate: Phase-lock language is allowed as a hypothesis-backed internal finding, not as hardware or field validation.
+
+### `robustness_and_stress`
+
+- Status: `READY_FOR_NEXT_RUN`
+- Question: Does the champion survive missingness, spikes, drift, and delayed samples?
+- Metrics: `dropout_sensitivity, outlier_sensitivity, regime_split_delta, rolling_window_stability, bootstrap_ci`
+- Current evidence: Current gauntlet passes minimum-positive-delta and Wilson lower-bound gates; explicit perturbation stress is the next layer.
+- Next action: Replay the champion under frozen perturbation seeds and publish pass/fail by source system.
+- Claim gate: Robustness language waits for perturbation artifacts and frozen seeds.
+
+### `source_generalization`
+
+- Status: `READY_FOR_LIVE_BREADTH_PROMOTION`
+- Question: Does the champion generalize beyond the current four promoted replay systems?
+- Metrics: `leave_one_source_out, source_group_holdout, provider_promotion_rate, schema_normalization_success`
+- Current evidence: Current champion replay uses 4 promoted source systems; broader live breadth has 17/22 measured providers and 317 ready-for-benchmark manifest rows.
+- Next action: Promote one provider at a time only after a named baseline, schema adapter, and acceptance metric exist.
+- Claim gate: Broad live-breadth claims remain blocked until promoted sources pass locked benchmarks.
+
+### `decision_detection_quality`
+
+- Status: `READY_FOR_DOMAIN_SPECIFIC_RUN`
+- Question: Would the champion improve a buyer decision, not just a numerical score?
+- Metrics: `precision, recall, F1, false_alarm_rate, miss_rate, lead_time, precision_recall_auc`
+- Current evidence: Harbor/DICE/MissionWeave style artifacts provide separate decision lanes; the Kuramoto champion needs domain-specific decision mapping.
+- Next action: Map one grid or maritime event dataset to a binary or ranked decision task with a locked baseline.
+- Claim gate: Decision-lift language waits for task-specific labels or accepted event windows.
+
+### `operational_runtime_budget`
+
+- Status: `READY_FOR_NEXT_RUN`
+- Question: Can the champion run fast enough for a real operator cadence?
+- Metrics: `runtime_p50, runtime_p95, memory_mb, throughput_rows_per_second, update_latency, fail_closed_rate`
+- Current evidence: Current proof establishes replay strength, not operational latency or deployment budget.
+- Next action: Add timed benchmark wrappers around the champion replay and publish runtime budgets by source size.
+- Claim gate: Operational-readiness language waits for latency and fail-closed evidence.
+
+### `economic_conversion`
+
+- Status: `BLOCKED_REQUIRES_EXTERNAL_OWNER`
+- Question: How does a metric improvement convert into dollars for a named system?
+- Metrics: `avoided_outage_minutes, energy_waste_reduction, review_burden_reduction, imbalance_or_congestion_cost, false_alarm_cost`
+- Current evidence: Current system has bounded opportunity surfaces, not accepted realized savings.
+- Next action: Ask OpenPOWER AI/EPRI/utility/lab owner to approve baseline, metric, and cost conversion before replay.
+- Claim gate: Real-dollar savings and fixed-dollar frozen-delta claims remain blocked.
+
+### `provenance_and_reproducibility`
+
+- Status: `EVIDENCED_CORE_READY_TO_EXPAND`
+- Question: Can a reviewer reproduce the evidence chain?
+- Metrics: `input_hash, config_hash, output_hash, code_commit, manifest_sha256, domain_hash_match`
+- Current evidence: Champion hash chain exists and dashboard feeds are local-ready; live-domain feed status is LOCAL_READY_DOMAIN_NOT_VERIFIED.
+- Next action: Keep regenerating feed manifests after each run and verify live-domain hashes before public claims.
+- Claim gate: Hash-verified proof language is allowed only for feeds whose local and hosted hashes match.
+
+### `external_field_replay`
+
+- Status: `BLOCKED_REQUIRES_BUYER_OR_LAB`
+- Question: Will an external owner reproduce the win on their held-out data and baseline?
+- Metrics: `locked_holdout_window, incumbent_baseline, acceptance_metric, forbidden_tuning_rules, signed_result`
+- Current evidence: Current evidence is strong enough to request a replay, not to claim external field validation.
+- Next action: Use the OpenPOWER AI/EPRI/EPB/TVA/Tennessee lab outreach lane for one manually reviewed replay ask.
+- Claim gate: Field-validation language remains blocked until an external owner accepts or runs the protocol.
+
+### `all_family_championship`
+
+- Status: `BLOCKED_REQUIRES_FULL_REGISTRY_RUN`
+- Question: Is Kuramoto still champion after every registered family competes under the same metric budget?
+- Metrics: `family_count_tested, baseline_count, matched_budget, winner_by_lane, negative_results_logged`
+- Current evidence: The current champion is strongest in the promoted replay core; all-family live championship remains explicitly blocked.
+- Next action: Run family-by-family live benchmarks from the geometry registry with frozen budgets and publish losers too.
+- Claim gate: Universal geometry-superiority language remains blocked.
+
 
 ## Next 10 Tests
 
@@ -84,4 +219,4 @@ Kuramoto phase coupling is the current internal champion because it beat kalman_
 
 Champion metric gauntlet only. This artifact explains the current internal winner, the tests it has passed, the tests it has not passed, and the safest claim language. It does not create field validation, realized savings, trading profit, medical efficacy, award certainty, or a fixed dollar price for frozen deltas.
 
-Gauntlet SHA-256: `3908fad094c311285c22ce981c411657e23e411045bc059acece27f851926415`
+Gauntlet SHA-256: `cd04780b486b163d87b2eb13aa641f7b32dc19c384373ac5c0ca3e8bf568496a`

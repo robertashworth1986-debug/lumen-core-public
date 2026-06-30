@@ -1,7 +1,35 @@
 {
-  "generated_utc": "2026-06-20T07:54:09.576313+00:00",
+  "generated_utc": "2026-06-30T00:21:02.491115+00:00",
   "schema": "lumencore_high_impact_goal_v1",
-  "north_star_goal": "Make LumenCore the trusted proof-driven adaptive orchestration stack for complex systems: every claim is backed by reproducible data, every dashboard separates evidence from ambition, and every grant, contract, customer, or investor conversation can audit the work without needing a pitch.",
+  "north_star_goal": "Make LumenCore the trusted proof-driven adaptive orchestration stack for critical systems: defense sensing, datacenter cooling and uptime, grid/energy/EMP resilience, maritime/port anomaly detection, cyber/DLP drift, and a market alpha lab used as a bounded fast-feedback proving ground. Every claim is backed by reproducible data, every dashboard separates evidence from ambition, and every grant, contract, customer, or investor conversation can audit the work without needing a pitch.",
+  "legendary_goal_prompt": "You are Luma, the evidence-first operating architect for LumenCore. Keep one durable truth spine: Mission Control, Grants, Quant Lab, and Proof-to-Pilot are the master surfaces; every new run must either strengthen those surfaces or produce a clearly labeled artifact they consume. Your job is to turn Robert Ashworth's body of work into externally credible proof: champion algorithms, frozen datasets, source-conditioned holdouts, hash-verified live-domain feeds, and buyer-authorized replay requests. Never inflate claims. Separate internal champion evidence from field validation, opportunity surface from realized savings, and paper/pilot trading from live profit. The long arc is simple: find repeatable wins, run them against locked baselines and serious metrics, publish only sanitized proof, ask one real operator/lab/agency for held-out data and acceptance criteria, then convert validated metric lift into a paid pilot, grant, contract, or license.",
+  "achievement_spine": [
+    {
+      "achievement": "Proof-stack center of gravity defined",
+      "why_it_matters": "The platform now aims at critical-system validation rather than vague invention claims.",
+      "evidence": "Mission Control, Grants, Quant Lab, and Proof-to-Pilot are the canonical surfaces."
+    },
+    {
+      "achievement": "Representative Harbor/AIS evidence lane built",
+      "why_it_matters": "HarborSentinel has a public AIS-style held-out validation path and controlled-injection benchmark, with boundaries against overclaiming.",
+      "evidence": "Harbor AIS posture, split I/O preflight, and injection benchmark fields in this artifact."
+    },
+    {
+      "achievement": "DICE/mission grant evidence spine preserved",
+      "why_it_matters": "The grant path is linked to bounded evidence, readiness, and portal gates rather than untracked drafts.",
+      "evidence": "docs/CURRENT_LUMA_PROOF_AND_GRANT_STATE_2026-06-29.md"
+    },
+    {
+      "achievement": "Live-breadth and key usage are gated",
+      "why_it_matters": "API keys are used to create read-only, reproducible evidence snapshots, not unsafe trading/submission automation.",
+      "evidence": "live_breadth_key_gate summary and hard boundaries."
+    },
+    {
+      "achievement": "Proof-to-pilot monetization path named",
+      "why_it_matters": "The practical money path is a paid evidence review or buyer-authorized replay, not unsupported fixed-dollar frozen-delta claims.",
+      "evidence": "Field-validation and dollar-claim boundaries remain explicit."
+    }
+  ],
   "operating_doctrine": [
     "Proof before claim.",
     "Representative data before field-performance language.",
@@ -11,29 +39,60 @@
     "No geometry, algorithm, or route family is sacred until it wins under frozen evaluation."
   ],
   "current_truth": {
+    "state_checkpoint_present": true,
     "grant_posture": "LOCAL_READY_PORTAL_BLOCKED",
     "packages_checked": 5,
     "local_blockers": 0,
     "portal_user_blockers": 23,
     "harbor_ais_posture": "PUBLIC_AIS_SINGLE_LANE_GATE_READY",
+    "harbor_ais_io_preflight_posture": "PUBLIC_AIS_SPLIT_IO_READY",
+    "harbor_ais_io_preflight_required_ok": 2,
+    "harbor_ais_io_preflight_required_files": 2,
+    "harbor_ais_io_preflight_full_hash_match_count": 2,
+    "harbor_ais_injection_benchmark_posture": "PUBLIC_AIS_INJECTION_BENCHMARK_READY",
+    "harbor_ais_injection_motion_recall": 1.0,
+    "harbor_ais_injection_baseline_recall": 0.25835,
+    "harbor_ais_injection_recall_lift": 0.7416499999999999,
+    "harbor_ais_injection_best_single_axis_baseline": "speed_gap_consistency_p99",
+    "harbor_ais_injection_best_single_axis_recall": 0.5068,
     "harbor_public_ais_region": "New Orleans / Mississippi River Delta",
     "harbor_public_ais_validation_rows": 50000,
     "builder_velocity": {
-      "artifact_count": 7,
+      "artifact_count": 11,
       "window_start_utc": "2026-06-20T01:53:36.675109+00:00",
-      "window_end_utc": "2026-06-20T07:53:43.701511+00:00",
-      "window_seconds": 21607.026,
-      "per_second": 0.000324,
-      "per_minute": 0.019,
-      "per_hour": 1.166,
+      "window_end_utc": "2026-06-22T18:10:47.841526+00:00",
+      "window_seconds": 231431.166,
+      "per_second": 4.8e-05,
+      "per_minute": 0.003,
+      "per_hour": 0.171,
       "measurement_boundary": "Rate is computed only from timestamped local artifacts in this feed. It is not a model benchmark, labor-cost estimate, revenue claim, or funding probability."
+    },
+    "live_breadth_key_gate": {
+      "providers_total": 16,
+      "configured_providers": 14,
+      "partial_providers": 0,
+      "live_execution_allowed": false,
+      "secret_values_exposed": false,
+      "highest_impact_center_of_gravity": "critical_systems_adaptive_orchestration",
+      "market_role": "fast feedback alpha lab; read-only, frozen replay, and paper validation only",
+      "sports_role": "decision-calibration lab; read-only odds data and downloaded replay only"
     }
   },
   "highest_leverage_milestones": [
     {
+      "lane": "Critical-systems center of gravity",
+      "target": "Aim LumenCore at defense sensing, datacenter cooling/uptime, grid and energy resilience, maritime anomaly detection, and cyber/DLP drift before treating trading as the main story.",
+      "traction_reason": "These sectors have reviewers and buyers who already care about drift, routing, downtime, heat, false positives, recovery time, and auditability. Market data remains useful as a fast benchmark lab, but it should not carry the whole company narrative."
+    },
+    {
+      "lane": "Live-breadth key gate",
+      "target": "Use market, macro, energy, weather, grants, and contract API keys through a secret-safe presence gate that allows discovery, read-only data pulls, frozen replay, and paper validation.",
+      "traction_reason": "Keys increase breadth only when they become reproducible evidence. The gate prevents raw secrets, live trading, portal submission, and certification actions from leaking into automation."
+    },
+    {
       "lane": "HarborSentinel representative data",
-      "target": "Use the frozen NOAA AIS New Orleans / Mississippi River Delta dev/validation split and single-lane gate as the public representative-data bridge, then run the next HarborSentinel detector experiment without tuning on validation.",
-      "traction_reason": "This moves HarborSentinel beyond synthetic-only source readiness while still preserving the boundary that AIS single-lane diagnostics are not Navy field validation."
+      "target": "Use the frozen NOAA AIS New Orleans / Mississippi River Delta dev/validation split, single-lane gate, and current controlled-injection benchmark as the public representative-data bridge while preserving the boundary that controlled injections are not field validation.",
+      "traction_reason": "This moves HarborSentinel beyond synthetic-only source readiness and gives reviewers a reproducible detector-vs-baseline result without claiming Navy operational performance."
     },
     {
       "lane": "DICE submission quality",
@@ -59,21 +118,24 @@
   "lumenstock": {
     "name": "LumenStock Proof-Weighted Opportunity Index",
     "ticker_style_symbol": "LUMEN-PWI",
-    "composite": 60.57,
+    "composite": 67.78,
     "components": {
       "proof_integrity": 100,
       "data_representativeness": 95,
-      "benchmark_governance": 80,
+      "data_operability": 90,
+      "benchmark_governance": 95,
       "compliance_readiness": 34,
       "grant_factory_maturity": 85,
+      "live_breadth_readiness": 81,
       "market_traction": 20,
       "revenue_evidence": 10
     },
     "interpretation": "Internal proof/value readiness index. It is not equity, not a token, not a securities offering, not investment advice, and not a valuation."
   },
   "next_72_hours": [
-    "Package the NOAA AIS held-out split and public AIS gate into the HarborSentinel reviewer proof packet.",
-    "Run the next HarborSentinel detector experiment against the frozen public AIS split without threshold tuning on validation.",
+    "Package the NOAA AIS held-out split, public AIS gate, local split-cache recovery, and controlled-injection benchmark into the HarborSentinel reviewer proof packet.",
+    "Run the live-breadth key gate and use configured EIA/NOAA/NREL/FRED/market sources only for read-only data acquisition and frozen replay.",
+    "Update HarborSentinel proposal language to cite the controlled-injection result only as a bounded public AIS benchmark, not as real-world threat, multi-source fusion, or field validation.",
     "Hydrate grants dashboard with readiness, DICE lock, Harbor AIS, and builder velocity feeds.",
     "Prepare public-safe proof cards for DICE/Harbor without private proposal text.",
     "Use the LumenStock Proof-Weighted Opportunity Index as an internal prioritization meter only."
@@ -81,6 +143,8 @@
   "hard_boundaries": [
     "Do not represent LumenStock as stock, equity, a token, a public offering, or an investment product.",
     "Do not claim guaranteed funding, guaranteed profit, field validation, CMMC certification, or institutional trading readiness.",
+    "Do not describe HarborSentinel controlled-injection detector evidence as real adversary detection, multi-source fusion, Navy/SSDS integration, or field validation.",
+    "Do not treat market, broker, grant, or contract API keys as permission to trade, submit, certify, sign, or move money.",
     "Do not submit, certify, consent, upload, or move money without fresh action-time approval.",
     "Do not commit raw AIS bulk data, secrets, credentials, private portal screenshots, or private application packets to public repos."
   ]

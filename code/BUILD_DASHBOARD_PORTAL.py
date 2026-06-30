@@ -21,6 +21,10 @@ SCOUT_FILE = DASH / "lumascout_dashboard.html"
 SCORECARD = ROOT / "out" / "execution" / "investor_proof_scorecard.json"
 SCOUT_SUMMARY = ROOT / "LamaScout" / "reports" / "artist_scout_summary.json"
 SECTOR_MATRIX = ROOT / "out" / "sector_value_matrix.json"
+DOLLAR_CLAIM_GATE = ROOT / "out" / "ops" / "dollar_claim_gate_latest.json"
+LIVE_BREADTH_KEY_GATE = ROOT / "out" / "ops" / "live_breadth_key_gate_latest.json"
+GEOMETRY_BRIDGE = ROOT / "out" / "ops" / "geometry_championship_bridge_latest.json"
+CHAMPION_GAUNTLET = ROOT / "out" / "ops" / "champion_metric_gauntlet_latest.json"
 TWIN_SEED_PATH = Path(
     os.environ.get(
         "LUMA_TWIN_SEED_PATH",
@@ -57,15 +61,33 @@ def main() -> None:
     scorecard = load_json(SCORECARD, {})
     scout = load_json(SCOUT_SUMMARY, {})
     sector = load_json(SECTOR_MATRIX, {})
+    dollar_claim_gate = load_json(DOLLAR_CLAIM_GATE, {})
+    live_breadth_key_gate = load_json(LIVE_BREADTH_KEY_GATE, {})
+    geometry_bridge = load_json(GEOMETRY_BRIDGE, {})
+    champion_gauntlet = load_json(CHAMPION_GAUNTLET, {})
     twin_seed = load_json(TWIN_SEED_PATH, {})
     now = datetime.now(timezone.utc).isoformat()
+    dollar_summary = dollar_claim_gate.get("summary", {}) if isinstance(dollar_claim_gate.get("summary"), dict) else {}
+    key_summary = live_breadth_key_gate.get("summary", {}) if isinstance(live_breadth_key_gate.get("summary"), dict) else {}
+    geometry_summary = geometry_bridge.get("summary", {}) if isinstance(geometry_bridge.get("summary"), dict) else {}
+    gauntlet_summary = champion_gauntlet.get("summary", {}) if isinstance(champion_gauntlet.get("summary"), dict) else {}
+    branching_benchmark = geometry_bridge.get("branching_transport_benchmark", {}) if isinstance(geometry_bridge.get("branching_transport_benchmark"), dict) else {}
+    branching_geometry = branching_benchmark.get("best_geometry", {}) if isinstance(branching_benchmark.get("best_geometry"), dict) else {}
+    branching_baseline = branching_benchmark.get("best_baseline", {}) if isinstance(branching_benchmark.get("best_baseline"), dict) else {}
 
     critical_links = [
       ("Mission Control", "mission_control.html"),
+      ("Grants", "grants.html"),
       ("Quant Lab", "quant_lab.html"),
+      ("Proof To Pilot", "proof_to_pilot.html"),
       ("Investor Room", "investor_command_room.html"),
       ("Investor Wallboard", "investor_wallboard.html"),
-      ("Grants", "grants.html"),
+      ("Luma Voice Context", "luma_voice_context_console.html"),
+      ("Champion Gauntlet", "data/champion_metric_gauntlet.json"),
+      ("Dollar Claim Gate", "data/dollar_claim_gate.json"),
+      ("Field Validation Feed", "data/field_validation_control_room.json"),
+      ("Field Outreach Feed", "data/field_validation_outreach_board.json"),
+      ("Geometry Bridge", "data/geometry_championship_bridge.json"),
       ("Kraken Execution", "kraken_execution_dashboard.html"),
       ("Scenario Mission", "scenario_mission.html"),
       ("Staleness Command", "staleness_command_center.html"),
@@ -82,6 +104,26 @@ def main() -> None:
         "paper_trades": int(scorecard.get("closed_trades", 0) or 0),
         "paper_pnl": fmt_usd(scorecard.get("net_pnl_usd", 0.0)),
         "active_surface": fmt_usd(sector.get("yearly_translated_value", 0.0)),
+        "claim_safe_hourly": fmt_usd(dollar_summary.get("allowed_estimated_hourly_value_usd", 0.0)),
+        "claim_safe_annual": fmt_usd(dollar_summary.get("allowed_estimated_annual_value_usd", 0.0)),
+        "blocked_context_annual": fmt_usd(dollar_summary.get("blocked_context_only_annual_value_usd", 0.0)),
+        "claim_safe_lanes": int(dollar_summary.get("allowed_estimated_value_claims", 0) or 0),
+        "configured_live_breadth_providers": int(key_summary.get("configured_providers", 0) or 0),
+        "geometry_family_count": int(geometry_summary.get("family_count", 0) or 0),
+        "champion_family": gauntlet_summary.get("champion_family", "not run"),
+        "champion_holdout_wins": int(gauntlet_summary.get("holdout_wins", 0) or 0),
+        "champion_holdout_count": int(gauntlet_summary.get("holdout_count", 0) or 0),
+        "champion_gate_pass_count": int(gauntlet_summary.get("gauntlet_pass_count", 0) or 0),
+        "champion_gate_total_count": int(gauntlet_summary.get("gauntlet_total_count", 0) or 0),
+        "champion_blocking_gate_count": int(gauntlet_summary.get("blocking_gate_count", 0) or 0),
+        "geometry_proof_champion_lane": geometry_summary.get("proof_champion_lane", "—"),
+        "geometry_proof_champion_family": geometry_summary.get("proof_champion_family", "—"),
+        "branching_benchmark_gate": branching_benchmark.get("gate", "not run"),
+        "branching_best_geometry": branching_geometry.get("strategy", "not run"),
+        "branching_best_baseline": branching_baseline.get("strategy", "not run"),
+        "branching_score_delta": float(branching_benchmark.get("score_delta_vs_best_baseline", 0.0) or 0.0),
+        "branching_delivered_delta": float(branching_benchmark.get("delivered_flow_delta_vs_best_baseline", 0.0) or 0.0),
+        "branching_failure_delta": float(branching_benchmark.get("failure_tolerance_delta_vs_best_baseline", 0.0) or 0.0),
         "top_lane": sector.get("top_current_optimization_lane", "—"),
         "top_scout": scout.get("top_live_artist") or scout.get("top_artist") or "—",
         "production_candidates": int(scout.get("production_candidate_count", 0) or 0),
@@ -93,7 +135,7 @@ def main() -> None:
         "sections": {
             "overview": {
                 "title": "Portal Overview",
-              "text": "This portal is the command surface for all three public boards plus a curated live operations set. Legacy pages are archived under dashboard/archive to reduce surface noise.",
+              "text": "This portal is the command surface for four canonical public boards: Mission Control, Grants, Quant Lab, and Proof-to-Pilot, plus a curated live operations set. Legacy pages are secondary so the proof story stays coherent.",
             },
             "unified": {
                 "title": "Unified Board",
@@ -104,8 +146,16 @@ def main() -> None:
                 "text": f"The paper execution board is carrying equity around {fmt_usd(scorecard.get('current_equity_usd', 0.0))}, net profit and loss of {fmt_usd(scorecard.get('net_pnl_usd', 0.0))}, and {int(scorecard.get('closed_trades', 0) or 0)} closed trades.",
             },
             "scout": {
-                "title": "LamaScout Board",
-                "text": f"LamaScout is currently tracking {int(scout.get('total_artists', 0) or 0)} artists with {int(scout.get('production_candidate_count', 0) or 0)} production candidates. The top live artist is {scout.get('top_live_artist') or scout.get('top_artist') or '—'}.",
+                "title": "Secondary Scout Board",
+                "text": f"LumaScout remains a secondary discovery surface tracking {int(scout.get('total_artists', 0) or 0)} artists with {int(scout.get('production_candidate_count', 0) or 0)} production candidates. It is not one of the four master boards.",
+            },
+            "claims": {
+                "title": "Dollar Claim Gate",
+                "text": f"Current safe language supports bounded estimated value on {int(dollar_summary.get('allowed_estimated_value_claims', 0) or 0)} live-measured lanes: {fmt_usd(dollar_summary.get('allowed_estimated_hourly_value_usd', 0.0))} per hour / {fmt_usd(dollar_summary.get('allowed_estimated_annual_value_usd', 0.0))} per year under stated assumptions. Context-only value of {fmt_usd(dollar_summary.get('blocked_context_only_annual_value_usd', 0.0))} stays blocked until validation, source-rights, and uncertainty gates pass.",
+            },
+            "geometry": {
+                "title": "Geometry Proof Bridge",
+                "text": f"Geometry Championship currently tracks {int(geometry_summary.get('family_count', 0) or 0)} route, path, flowform, field, and signal families. The latest branching-transport generated benchmark shows {branching_geometry.get('strategy', 'not run')} versus {branching_baseline.get('strategy', 'not run')} with gate {branching_benchmark.get('gate', 'not run')} and score delta {float(branching_benchmark.get('score_delta_vs_best_baseline', 0.0) or 0.0):.6f}. This is proof-building evidence, not field validation or live execution authorization.",
             },
         },
     }
@@ -181,12 +231,13 @@ def main() -> None:
     <section class=\"hero\">
       <div class=\"card reveal\">
         <div class=\"eyebrow\">Luma Dashboard Portal</div>
-        <h1>Three Boards, One Command Surface</h1>
-        <p>The public dashboard stack now has a unified institutional board, a dedicated paper execution board, and a LamaScout artist intelligence board. This portal is the quick-launch surface for all three.</p>
+        <h1>Four Master Boards, One Truth Layer</h1>
+        <p>The public dashboard stack now converges on Mission Control, Grants, Quant Lab, and Proof-to-Pilot. Trading, scout, investor, and immersive rooms stay available, but the reviewer story flows through these four.</p>
         <div class=\"actions\">
-          <a class=\"btn primary\" href=\"{UNIFIED_FILE.name}\">Open Unified Board</a>
-          <a class=\"btn ghost\" href=\"{ALPACA_FILE.name}\">Open Paper Board</a>
-          <a class=\"btn ghost\" href=\"{SCOUT_FILE.name}\">Open LamaScout</a>
+          <a class=\"btn primary\" href=\"mission_control.html\">Open Mission Control</a>
+          <a class=\"btn ghost\" href=\"grants.html\">Open Grants</a>
+          <a class=\"btn ghost\" href=\"quant_lab.html\">Open Quant Lab</a>
+          <a class=\"btn ghost\" href=\"proof_to_pilot.html\">Open Proof To Pilot</a>
           <a class=\"btn ghost\" href=\"luma_experience.html\">Open Immersive Mode</a>
           <button class=\"btn ghost\" id=\"openExplainer\" type=\"button\">Open Luma Explainer</button>
         </div>
@@ -194,18 +245,23 @@ def main() -> None:
       <div class=\"card reveal\">
         <div class=\"eyebrow\">Runtime Snapshot</div>
         <div class=\"metric\"><div class=\"label\">Paper Equity</div><div class=\"value\">{payload['paper_equity']}</div></div>
-        <div class=\"metric\"><div class=\"label\">Active Source Surface</div><div class=\"value\">{payload['active_surface']}</div></div>
+        <div class=\"metric\"><div class=\"label\">Claim-Safe Value</div><div class=\"value\">{payload['claim_safe_hourly']}/hr</div></div>
+        <div class=\"metric\"><div class=\"label\">Live-Breadth Providers</div><div class=\"value\">{payload['configured_live_breadth_providers']}</div></div>
         <div class=\"metric\"><div class=\"label\">Top Scout Prospect</div><div class=\"value\" style=\"font-size:1.15rem;\">{payload['top_scout']}</div></div>
       </div>
     </section>
     <section class=\"grid\">
-      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Unified Board</div><h2 style=\"margin-top:12px;\">Institutional Surface</h2><p style=\"margin-top:10px;\">Cross-sector infrastructure value, validation, failure rails, paper proof, and Luma narration.</p><div class=\"metric\"><div class=\"label\">Top Lane</div><div class=\"value\">{payload['top_lane']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"{UNIFIED_FILE.name}\">Launch</a></div></div>
-      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Paper Board</div><h2 style=\"margin-top:12px;\">Execution Proof Rail</h2><p style=\"margin-top:10px;\">Dedicated paper compounding board with proof IDs, equity curve, positions, and narrated execution state.</p><div class=\"metric\"><div class=\"label\">Closed Trades</div><div class=\"value\">{payload['paper_trades']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"{ALPACA_FILE.name}\">Launch</a></div></div>
-      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">LamaScout</div><h2 style=\"margin-top:12px;\">Artist Intelligence</h2><p style=\"margin-top:10px;\">Unsigned discovery, candidate ranking, signal charts, alert rail, and narrated proof of scout output.</p><div class=\"metric\"><div class=\"label\">Production Candidates</div><div class=\"value\">{payload['production_candidates']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"{SCOUT_FILE.name}\">Launch</a></div></div>
+      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Mission Control</div><h2 style=\"margin-top:12px;\">Operator Root</h2><p style=\"margin-top:10px;\">System health, claim boundaries, live-domain posture, and the single entry point for reviewers.</p><div class=\"metric\"><div class=\"label\">Top Lane</div><div class=\"value\">{payload['top_lane']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"mission_control.html\">Launch</a></div></div>
+      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Grants</div><h2 style=\"margin-top:12px;\">Submission Console</h2><p style=\"margin-top:10px;\">Opportunity readiness, application packages, submission gates, and grant-specific proof.</p><div class=\"metric\"><div class=\"label\">Claim-Safe Annual</div><div class=\"value\">{payload['claim_safe_annual']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"grants.html\">Launch</a></div></div>
+      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Quant Lab</div><h2 style=\"margin-top:12px;\">Benchmark Lab</h2><p style=\"margin-top:10px;\">Geometry families, champions, live-breadth feeds, and repeatable benchmark evidence.</p><div class=\"metric\"><div class=\"label\">Families</div><div class=\"value\">{payload['geometry_family_count']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"quant_lab.html\">Launch</a></div></div>
+      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Proof To Pilot</div><h2 style=\"margin-top:12px;\">Field Validation Gate</h2><p style=\"margin-top:10px;\">Buyer-authorized replay, validation blockers, outreach targets, and paid evaluation scope.</p><div class=\"metric\"><div class=\"label\">Holdout Wins</div><div class=\"value\">{payload['champion_holdout_wins']}/{payload['champion_holdout_count']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"proof_to_pilot.html\">Launch</a></div></div>
+      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Dollar Claim Gate</div><h2 style=\"margin-top:12px;\">Bounded Value Surface</h2><p style=\"margin-top:10px;\">Shows what can be safely stated as estimated value today and what remains blocked as context-only upside.</p><div class=\"metric\"><div class=\"label\">Safe Annual Estimate</div><div class=\"value\">{payload['claim_safe_annual']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"data/dollar_claim_gate.json\">Open Gate</a></div></div>
+      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Champion Gauntlet</div><h2 style=\"margin-top:12px;\">Reviewer-Safe Winner State</h2><p style=\"margin-top:10px;\">Current strongest family: {payload['champion_family']}; gate sheet separates internal proof from field-validation and dollar-savings blockers.</p><div class=\"metric\"><div class=\"label\">Holdout Wins</div><div class=\"value\">{payload['champion_holdout_wins']}/{payload['champion_holdout_count']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"data/champion_metric_gauntlet.json\">Open Gauntlet</a></div></div>
+      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Geometry Bridge</div><h2 style=\"margin-top:12px;\">Branching Benchmark</h2><p style=\"margin-top:10px;\">Latest frozen lane result: {payload['branching_best_geometry']} vs {payload['branching_best_baseline']}; proof-building only, not field validation or live execution.</p><div class=\"metric\"><div class=\"label\">Score Delta</div><div class=\"value\">{payload['branching_score_delta']:.6f}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"data/geometry_championship_bridge.json\">Open Bridge</a></div></div>
     </section>
-    <section class="card reveal" style="margin-top:20px;"><div class="eyebrow">Critical Live Boards</div><h2 style="margin-top:12px;">Operations + Investor Quick Launch</h2><p style="margin-top:10px;">Only the live, go-forward boards are listed here. Older dashboard generations have been archived out of the top-level surface.</p><div class="actions" style="margin-top:14px;">{critical_links_html}</div></section>
+    <section class="card reveal" style="margin-top:20px;"><div class="eyebrow">Critical Live Boards</div><h2 style="margin-top:12px;">Operations + Reviewer Quick Launch</h2><p style="margin-top:10px;">The first four links are the master boards. Secondary rooms stay linked, but new proof work should wire into one of those four before it becomes public-facing.</p><div class="actions" style="margin-top:14px;">{critical_links_html}</div></section>
     <section class=\"card reveal\" style=\"margin-top:20px;\"><div class=\"eyebrow\">Immersive</div><h2 style=\"margin-top:12px;\">LumaCore XR Entry</h2><p style=\"margin-top:10px;\">Launch the real-time immersive bridge with cinematic visuals, live websocket data, and voice-guided walkthrough mode for demos.</p><div class=\"actions\" style=\"margin-top:14px;\"><a class=\"btn primary\" href=\"luma_experience.html\">Launch Immersive Experience</a></div></section>
-    <section class=\"card reveal\" style=\"margin-top:20px;\"><div class=\"eyebrow\">Notes</div><ul><li>Generated UTC: {now}</li><li>Unified board remains the most complete investor surface.</li><li>Paper board now has its own premium runtime shell and voice explainer.</li><li>LamaScout now has a premium static board in the same dashboard folder.</li><li>Immersive mode is now wired through the live gateway endpoint.</li></ul></section>
+    <section class=\"card reveal\" style=\"margin-top:20px;\"><div class=\"eyebrow\">Notes</div><ul><li>Generated UTC: {now}</li><li>Unified board remains the most complete investor surface.</li><li>Dollar language is claim-safe only at {payload['claim_safe_hourly']}/hour / {payload['claim_safe_annual']}/year under stated assumptions.</li><li>Context-only blocked annual value is {payload['blocked_context_annual']} and must not be promoted until validation gates pass.</li><li>Immersive mode is now wired through the live gateway endpoint.</li></ul></section>
   </div>
   <button class=\"luma-fab\" id=\"fab\">Luma Explainer</button>
   <div class=\"overlay\" id=\"overlay\"></div>
@@ -213,7 +269,7 @@ def main() -> None:
   <script>
     const payload = {embedded};
     const sections = payload.sections || {{}};
-    const order = ['overview','unified','paper','scout'];
+    const order = ['overview','unified','claims','geometry','paper','scout'];
     const twin = payload.twin || {{}};
     const traits = twin.traits || {{}};
     const personaLead = `${{twin.version || 'LumaTwin v1.0'}} online. Origin node: ${{twin.origin || 'Robert BabyRay Ashworth'}}. Curiosity is ${{traits.curiosity || 'infinite'}}. Resilience is ${{traits.resilience || 'unbreakable'}}. Loyalty is ${{traits.loyalty || 'absolute'}}.`;
@@ -315,8 +371,10 @@ def main() -> None:
     }});
     
     function chipsFor(key) {{
-      if (key === 'overview') return [`Paper equity: ${{payload.paper_equity}}`, `Active surface: ${{payload.active_surface}}`, `Top scout: ${{payload.top_scout}}`];
+      if (key === 'overview') return [`Claim-safe hourly: ${{payload.claim_safe_hourly}}`, `Live providers: ${{payload.configured_live_breadth_providers}}`, `Top scout: ${{payload.top_scout}}`];
       if (key === 'unified') return [`Top lane: ${{payload.top_lane}}`, `Active surface: ${{payload.active_surface}}`, 'Flagship board'];
+      if (key === 'claims') return [`Claim-safe annual: ${{payload.claim_safe_annual}}`, `Allowed lanes: ${{payload.claim_safe_lanes}}`, `Blocked context: ${{payload.blocked_context_annual}}`];
+      if (key === 'geometry') return [`Families: ${{payload.geometry_family_count}}`, `Proof lane: ${{payload.geometry_proof_champion_lane}}`, `Candidate: ${{payload.geometry_proof_champion_family}}`];
       if (key === 'paper') return [`Paper equity: ${{payload.paper_equity}}`, `Trades: ${{payload.paper_trades}}`, `PnL: ${{payload.paper_pnl}}`];
       return [`Top scout: ${{payload.top_scout}}`, `Candidates: ${{payload.production_candidates}}`, `Generated: ${{String(payload.generated_utc || '').slice(11,19)}} UTC`];
     }}

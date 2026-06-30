@@ -40,6 +40,9 @@ REQUIRED_FEEDS = [
     "live_proof_value_meter",
     "field_validated_dollar_claim_ladder",
     "dollar_claim_gate",
+    "field_validation_control_room",
+    "field_validation_outreach_board",
+    "proof_to_pilot_control_room",
 ]
 
 OPTIONAL_FEEDS = [
@@ -49,6 +52,7 @@ OPTIONAL_FEEDS = [
     "proof_to_revenue_engine",
     "champion_stress_test_matrix",
     "first_buyer_target_board",
+    "paid_pilot_outreach_queue",
 ]
 
 FORBIDDEN_NAME_FRAGMENTS = [

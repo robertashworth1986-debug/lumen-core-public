@@ -108,11 +108,17 @@ def audit_fixture(tmp_path, monkeypatch):
             ],
         },
         {
-            "key": "kraken_execution",
-            "route": "/kraken_execution_dashboard.html",
-            "path": dashboard / "kraken_execution_dashboard.html",
-            "role": "paper execution, order evidence, positions, market awareness",
-            "must_show": ["paper_or_live_truth", "no_profit_claim_without_audit"],
+            "key": "proof_to_pilot",
+            "route": "/proof_to_pilot.html",
+            "path": dashboard / "proof_to_pilot.html",
+            "role": "field-validation gate, buyer-safe outreach, pilot conversion, claim controls",
+            "must_show": [
+                "proof_to_pilot_control_room",
+                "field_validation_control_room",
+                "field_validation_outreach_board",
+                "buyer_authorized_replay",
+                "claim_boundaries",
+            ],
         },
     ]
     monkeypatch.setattr(module, "CANONICAL_DASHBOARDS", canonical_dashboards)
@@ -133,8 +139,9 @@ def audit_fixture(tmp_path, monkeypatch):
         "geometry_asset_wiring_board field-validation buyer-authorized replay discarded_workspaces",
     )
     write_text(
-        dashboard / "kraken_execution_dashboard.html",
-        "<title>Kraken</title> PAPER LIVE profit guard reasons",
+        dashboard / "proof_to_pilot.html",
+        "<title>Proof To Pilot</title> proof_to_pilot_control_room field_validation_control_room "
+        "field_validation_outreach_board buyer-authorized replay claim boundary",
     )
 
     local_feeds = [
@@ -144,6 +151,10 @@ def audit_fixture(tmp_path, monkeypatch):
         ("geometry_asset_wiring_board", dashboard_data / "geometry_asset_wiring_board.json"),
         ("geometry_proof_frontier_board", dashboard_data / "geometry_proof_frontier_board.json"),
         ("geometry_live_breadth_proof_queue", dashboard_data / "geometry_live_breadth_proof_queue.json"),
+        ("champion_metric_gauntlet", dashboard_data / "champion_metric_gauntlet.json"),
+        ("field_validation_control_room", dashboard_data / "field_validation_control_room.json"),
+        ("field_validation_outreach_board", dashboard_data / "field_validation_outreach_board.json"),
+        ("proof_to_pilot_control_room", dashboard_data / "proof_to_pilot_control_room.json"),
     ]
     monkeypatch.setattr(module, "LOCAL_FEEDS", local_feeds)
     for key, path in local_feeds:
@@ -263,7 +274,7 @@ def test_audit_scores_top_dashboards_and_local_feeds_without_domain_claim(audit_
     _, audit = audit_fixture
 
     dashboards = {row["key"]: row for row in audit["canonical_dashboards"]}
-    assert {"mission_control", "quant_lab", "grants", "kraken_execution"}.issubset(dashboards)
+    assert {"mission_control", "quant_lab", "grants", "proof_to_pilot"}.issubset(dashboards)
     assert dashboards["mission_control"]["references"]["command_fabric_js"] is True
     assert dashboards["mission_control"]["references"]["context_parity_audit"] is True
     assert dashboards["mission_control"]["missing_or_weak_lanes"] == []
@@ -275,6 +286,10 @@ def test_audit_scores_top_dashboards_and_local_feeds_without_domain_claim(audit_
     assert dashboards["quant_lab"]["references"]["command_fabric_js"] is True
     assert dashboards["quant_lab"]["references"]["context_parity_audit"] is True
     assert dashboards["quant_lab"]["references"]["geometry_frontier"] is True
+    assert dashboards["proof_to_pilot"]["references"]["proof_to_pilot_control_room"] is True
+    assert dashboards["proof_to_pilot"]["references"]["field_validation_control_room"] is True
+    assert dashboards["proof_to_pilot"]["references"]["field_validation_outreach_board"] is True
+    assert dashboards["proof_to_pilot"]["missing_or_weak_lanes"] == []
 
     feeds = {row["key"]: row for row in audit["local_dashboard_feeds"]}
     assert feeds["grant_readiness_status"]["exists"] is True
@@ -282,6 +297,10 @@ def test_audit_scores_top_dashboards_and_local_feeds_without_domain_claim(audit_
     assert feeds["geometry_asset_wiring_board"]["exists"] is True
     assert feeds["geometry_proof_frontier_board"]["exists"] is True
     assert feeds["geometry_live_breadth_proof_queue"]["exists"] is True
+    assert feeds["champion_metric_gauntlet"]["exists"] is True
+    assert feeds["field_validation_control_room"]["exists"] is True
+    assert feeds["field_validation_outreach_board"]["exists"] is True
+    assert feeds["proof_to_pilot_control_room"]["exists"] is True
     assert audit["live_domain_parity"]["checked"] is False
     assert audit["live_domain_parity"]["parity_state"] == "NOT_CHECKED"
 
@@ -321,5 +340,8 @@ def test_audit_keeps_grants_geometry_and_kraken_boundaries_separate(audit_fixtur
     assert "Kraken live execution allowed: `false`" in rendered
     assert f"Live-breadth queue families ranked: `{live_queue['families_ranked']}`" in rendered
     assert "geometry_asset=true" in rendered
+    assert "proof_to_pilot=true" in rendered
+    assert "field_control=true" in rendered
+    assert "field_outreach=true" in rendered
     assert "Field-validation targets mapped:" in rendered
     assert "guaranteed profit" not in json.dumps(audit).lower()

@@ -73,6 +73,24 @@ PROOF_FEEDS = [
         "why": "Explicit allowed and blocked dollar-claim states.",
     },
     {
+        "key": "field_validation_control_room",
+        "local": "dashboard/data/field_validation_control_room.json",
+        "required": True,
+        "why": "External validation unlocks, held-out data blockers, and buyer-accepted claim boundaries.",
+    },
+    {
+        "key": "field_validation_outreach_board",
+        "local": "dashboard/data/field_validation_outreach_board.json",
+        "required": True,
+        "why": "Ranked manual outreach targets and reviewer-safe validation request language.",
+    },
+    {
+        "key": "proof_to_pilot_control_room",
+        "local": "dashboard/data/proof_to_pilot_control_room.json",
+        "required": True,
+        "why": "Canonical proof-to-pilot board feed that ties champions to paid evaluation scope.",
+    },
+    {
         "key": "geometry_asset_wiring_board",
         "local": "dashboard/data/geometry_asset_wiring_board.json",
         "required": False,
@@ -352,11 +370,18 @@ def build_payload(check_live_domain: bool = True, timeout: int = 10) -> dict[str
         "reviewer_urls": {
             "mission_control": f"{base}/mission_control.html",
             "grants_console": f"{base}/grants.html?grant_id=nsf_sbir_phase_i",
+            "quant_lab": f"{base}/quant_lab.html",
+            "proof_to_pilot": f"{base}/proof_to_pilot.html",
             "champion_feed_primary": f"{base}/data/champion_metric_gauntlet.json",
             "champion_feed_fallback": f"{base}/dashboard/data/champion_metric_gauntlet.json",
+            "field_validation_control_room": f"{base}/data/field_validation_control_room.json",
+            "field_validation_outreach_board": f"{base}/data/field_validation_outreach_board.json",
         },
         "publish_and_verify_runbook": [
             "python .\\code\\ops\\BUILD_CHAMPION_METRIC_GAUNTLET.py",
+            "python .\\code\\ops\\BUILD_FIELD_VALIDATION_CONTROL_ROOM.py",
+            "python .\\code\\ops\\BUILD_FIELD_VALIDATION_OUTREACH_BOARD.py",
+            "python .\\code\\ops\\BUILD_PROOF_TO_PILOT_CONTROL_ROOM.py",
             "python .\\code\\ops\\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py --skip-live-check",
             "python .\\code\\ops\\BUILD_LIVE_DOMAIN_PROOF_FEED_DEPLOY_BUNDLE.py",
             ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1 -DryRun",

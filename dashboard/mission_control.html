@@ -226,6 +226,13 @@
   .exec-link-green { color: var(--neon-g); text-decoration: none; }
   .exec-link-sep { color: var(--ink-dim); margin: 0 8px; }
   .exec-reason { font-size: 10px; }
+  .continuity-note {
+    margin-top: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    line-height: 1.6;
+  }
 
   /* ---------- Grants table ---------- */
   .grants-list { font-family: 'Inter', sans-serif; font-size: 12px; }
@@ -948,6 +955,7 @@
       <a href="explain.html">Explain</a>
       <a href="lab.html">Lab</a>
       <a href="quant_lab.html">Quant Lab</a>
+      <a href="proof_to_pilot.html">Proof To Pilot</a>
       <a href="kraken_execution_dashboard.html">Kraken</a>
       <a href="vps_growth_proof_3d.html">VPS Proof</a>
     </nav>
@@ -1023,12 +1031,15 @@
     <div class="panel col-12">
       <h3>Cross-Sector Live Breadth Value</h3>
       <div class="lbv-grid">
-        <div class="lbv-tile"><div class="k">Annual Preserved Value</div><div id="lbv-total-annual" class="v">—</div></div>
-        <div class="lbv-tile"><div class="k">Hourly Preserved Value</div><div id="lbv-hourly" class="v">—</div></div>
+        <div class="lbv-tile"><div class="k">Live-Measured Annual Signal</div><div id="lbv-total-annual" class="v">—</div></div>
+        <div class="lbv-tile"><div class="k">Live-Measured Hourly Signal</div><div id="lbv-hourly" class="v">—</div></div>
         <div class="lbv-tile"><div class="k">Measured Coverage</div><div id="lbv-coverage" class="v">—</div></div>
         <div class="lbv-tile"><div class="k">Top Sector</div><div id="lbv-top-sector" class="v">—</div></div>
         <div class="lbv-tile"><div class="k">Router Edge</div><div id="lbv-router" class="v">—</div></div>
         <div class="lbv-tile"><div class="k">Kalisha Score</div><div id="lbv-kalisha" class="v">—</div></div>
+        <div class="lbv-tile"><div class="k">Safe Value Gate</div><div id="lpvm-safe-annual" class="v">—</div></div>
+        <div class="lbv-tile"><div class="k">Context-Only Blocked</div><div id="lpvm-blocked-context" class="v">—</div></div>
+        <div class="lbv-tile"><div class="k">0.01% of $1B</div><div id="lpvm-billion-math" class="v">—</div></div>
       </div>
       <div class="lbv-lanes" id="lbv-lanes"></div>
       <div class="lbv-toplist" id="lbv-toplist"></div>
@@ -1038,8 +1049,8 @@
     <div class="panel col-12">
       <h3>Live Rolling Opportunity and Stability</h3>
       <div class="coh-grid">
-        <div class="coh-tile"><div class="k">Rolling Opportunity</div><div id="roll-opp-hourly" class="v">—</div></div>
-        <div class="coh-tile"><div class="k">Annualized Opportunity</div><div id="roll-opp-annual" class="v">—</div></div>
+        <div class="coh-tile"><div class="k">Rolling Live Signal</div><div id="roll-opp-hourly" class="v">—</div></div>
+        <div class="coh-tile"><div class="k">Annualized Live Signal</div><div id="roll-opp-annual" class="v">—</div></div>
         <div class="coh-tile"><div class="k">Stability Index</div><div id="roll-stability" class="v">—</div></div>
         <div class="coh-tile"><div class="k">Runtime Truth</div><div id="roll-runtime" class="v">—</div></div>
       </div>
@@ -1149,6 +1160,12 @@
     <div class="panel col-12">
       <h3>Active Grant Submissions</h3>
       <div class="grants-list" id="grants-list"></div>
+    </div>
+
+    <div class="panel col-12">
+      <h3>Luma Continuity + Domain Parity</h3>
+      <div class="status-grid" id="continuity-grid"></div>
+      <div class="continuity-note" id="continuity-note">Loading continuity audit and live-domain parity...</div>
     </div>
 
     <!-- Row 4: Calibration + Anomalies + Regime -->
@@ -1605,6 +1622,14 @@ function toFinite(v, fallback = 0) {
   return Number.isFinite(n) ? n : fallback;
 }
 
+function firstFinite(...values) {
+  for (const v of values) {
+    const n = Number(v);
+    if (Number.isFinite(n)) return n;
+  }
+  return 0;
+}
+
 function benchmarkScopeText(succeeded, universe) {
   const s = toFinite(succeeded, 0);
   const u = toFinite(universe, s);
@@ -1960,6 +1985,33 @@ function makeSpark(svgId, values, accent) {
   `;
 }
 
+function renderLiveProofValueMeter(meter) {
+  const payload = (meter && typeof meter === 'object') ? meter : {};
+  const valueGate = (payload.value_gate && typeof payload.value_gate === 'object') ? payload.value_gate : {};
+  const proofGate = (payload.proof_gate && typeof payload.proof_gate === 'object') ? payload.proof_gate : {};
+  const safe = (valueGate.safe_claim && typeof valueGate.safe_claim === 'object') ? valueGate.safe_claim : {};
+  const feed = (payload.dashboard_feed_manifest && typeof payload.dashboard_feed_manifest === 'object') ? payload.dashboard_feed_manifest : {};
+  const answer = (payload.answer && typeof payload.answer === 'object') ? payload.answer : {};
+  const sectorMath = Array.isArray(payload.sector_capture_math) ? payload.sector_capture_math : [];
+  const billionRow = sectorMath.find(row => Number(row.sector_or_loss_pool_usd) === 1000000000) || {};
+  const examples = Array.isArray(billionRow.capture_examples) ? billionRow.capture_examples : [];
+  const tinyCapture = examples.find(row => Number(row.improvement_or_capture_pct) === 0.01) || {};
+
+  const safeAnnualEl = $('lpvm-safe-annual');
+  if (safeAnnualEl) safeAnnualEl.textContent = fmtUsdCompact(toFinite(valueGate.allowed_estimated_annual_value_usd, 0)) + '/yr';
+  const blockedEl = $('lpvm-blocked-context');
+  if (blockedEl) blockedEl.textContent = fmtUsdCompact(toFinite(valueGate.blocked_context_only_annual_value_usd, 0)) + '/yr';
+  const billionEl = $('lpvm-billion-math');
+  if (billionEl) billionEl.textContent = fmtUsdCompact(toFinite(tinyCapture.gross_value_usd, 100000));
+
+  const noteEl = $('lbv-note');
+  if (noteEl) {
+    const proofText = `${proofGate.proposal_specific_live_proof_count || 0}/${proofGate.proposal_specific_live_proof_total || 0} grant proof gate`;
+    const feedText = `${feed.live_domain_feed_ok || 0}/${feed.live_domain_feed_total || 0} live-domain feeds`;
+    const boundary = String(safe.claim_boundary || answer.what_is_not_safe || 'Estimated value is not realized savings.');
+    noteEl.textContent = `${noteEl.textContent} | Value meter: ${proofText}; ${feedText}; ${boundary}`;
+  }
+}
 function renderLiveBreadthPanel(panel, readinessPayload) {
   const headline = (panel && typeof panel === 'object' && panel.headline && typeof panel.headline === 'object')
     ? panel.headline
@@ -1987,13 +2039,34 @@ function renderLiveBreadthPanel(panel, readinessPayload) {
     : readinessFromPanel;
   const topSectors = (panel && Array.isArray(panel.top_sectors)) ? panel.top_sectors : [];
 
-  const annual = toFinite(headline.total_estimated_annual_value_usd, 0);
-  const hourly = toFinite(headline.total_estimated_hourly_value_usd, 0);
+  const hourly = firstFinite(
+    headline.live_measured_estimated_hourly_value_usd,
+    headline.promoted_live_measured_hourly_value_usd,
+    headline.estimated_hourly_value_usd,
+  );
+  const annual = firstFinite(
+    headline.live_measured_estimated_annual_value_usd,
+    headline.promoted_live_measured_annual_value_usd,
+    headline.estimated_annual_value_usd,
+  );
+  const contextHourly = Math.max(0, firstFinite(
+    headline.context_only_estimated_hourly_value_usd,
+    toFinite(headline.total_estimated_hourly_value_usd, 0) - hourly,
+  ));
+  const contextAnnual = Math.max(0, firstFinite(
+    headline.context_only_estimated_annual_value_usd,
+    toFinite(headline.total_estimated_annual_value_usd, 0) - annual,
+  ));
+  const evidenceMode = String(headline.primary_evidence_mode || 'unknown');
   const measured = toFinite(headline.measured_sources, 0);
   const enabled = toFinite(headline.enabled_sources, 0);
   const coverage = toFinite(headline.measured_coverage_pct, 0);
-  const topSector = String(headline.top_sector || 'n/a');
-  const topSectorHourly = toFinite(headline.top_sector_hourly_value_usd, 0);
+  const topSector = String(headline.top_live_measured_sector || headline.top_sector || 'n/a');
+  const topSectorHourly = firstFinite(
+    headline.top_live_measured_sector_hourly_value_usd,
+    headline.live_measured_estimated_hourly_value_usd,
+    headline.top_sector_hourly_value_usd,
+  );
   const routerEdge = toFinite(headline.router_edge_pct, 0);
   const kalisha = toFinite(headline.kalisha_prediction_score, 0);
 
@@ -2078,10 +2151,12 @@ function renderLiveBreadthPanel(panel, readinessPayload) {
   const topHost = $('lbv-toplist');
   if (topHost) {
     if (topSectors.length) {
-      topHost.innerHTML = topSectors.slice(0, 5).map(row => `
+      const liveMeasuredSectors = topSectors.filter(row => row && row.primary_live_evidence);
+      const displaySectors = liveMeasuredSectors.length ? liveMeasuredSectors : topSectors;
+      topHost.innerHTML = displaySectors.slice(0, 5).map(row => `
         <div class="row">
           <span class="rank">#${Math.round(toFinite(row.rank, 0))}</span>
-          <span class="sector">${escHTML(String(row.sector || 'unknown'))}</span>
+          <span class="sector">${escHTML(String(row.sector || 'unknown'))}${row.primary_live_evidence ? '' : ' · context'}</span>
           <span class="gain">${toFinite(row.weighted_optimization_gain_pct, 0).toFixed(2)}%</span>
           <span class="value">${fmtUsdCompact(toFinite(row.total_estimated_hourly_value_usd, 0))}/h</span>
         </div>
@@ -2101,7 +2176,7 @@ function renderLiveBreadthPanel(panel, readinessPayload) {
       ? String(readiness.thursday_plan[0])
       : '';
     const generated = String(panel.generated_utc || 'n/a');
-    noteEl.textContent = `run ${generated} | ${investorMsg} | performance ${readinessStatus}${readinessExplain ? ' | ' + readinessExplain : ''}${thursdayPlan ? ' | thursday: ' + thursdayPlan : ''}${legal ? ' | ' + legal : ''}`;
+    noteEl.textContent = `run ${generated} | mode ${evidenceMode} | promoted live ${fmtUsdCompact(hourly)}/h, ${fmtUsdCompact(annual)}/yr | context-only ${fmtUsdCompact(contextHourly)}/h, ${fmtUsdCompact(contextAnnual)}/yr | ${investorMsg} | performance ${readinessStatus}${readinessExplain ? ' | ' + readinessExplain : ''}${thursdayPlan ? ' | thursday: ' + thursdayPlan : ''}${legal ? ' | ' + legal : ''}`;
   }
 }
 
@@ -2120,8 +2195,21 @@ function renderRollingTruthStrip(panel, readinessPayload, summaryPayload, queueP
     : {};
   const status = String(readinessSummary.status || readinessPanel.status || headline.performance_metrics_status || 'unknown');
 
-  const hourly = toFinite(headline.total_estimated_hourly_value_usd, 0);
-  const annual = toFinite(headline.total_estimated_annual_value_usd, 0);
+  const hourly = firstFinite(
+    headline.live_measured_estimated_hourly_value_usd,
+    headline.promoted_live_measured_hourly_value_usd,
+    headline.estimated_hourly_value_usd,
+  );
+  const annual = firstFinite(
+    headline.live_measured_estimated_annual_value_usd,
+    headline.promoted_live_measured_annual_value_usd,
+    headline.estimated_annual_value_usd,
+  );
+  const evidenceMode = String(headline.primary_evidence_mode || 'unknown');
+  const contextHourly = Math.max(0, firstFinite(
+    headline.context_only_estimated_hourly_value_usd,
+    toFinite(headline.total_estimated_hourly_value_usd, 0) - hourly,
+  ));
 
   const stabilityFromSummary = toFinite(liveMetrics.stability_progress_pct, NaN);
   const stabilityFromPanel = toFinite(readinessPanel.stability_progress_pct, NaN);
@@ -2145,7 +2233,7 @@ function renderRollingTruthStrip(panel, readinessPayload, summaryPayload, queueP
 
   const explain = String(readinessSummary.explanation || readinessPanel.explanation || '').trim();
   $('roll-note').textContent =
-    `status ${status} | coverage ${toFinite(headline.measured_coverage_pct, 0).toFixed(2)}% (${Math.round(toFinite(headline.measured_sources, 0))}/${Math.round(toFinite(headline.enabled_sources, 0))}) | router ${toFinite(headline.router_edge_pct, 0).toFixed(2)}% | ${explain || 'live stability tracks institutional threshold progress from frozen delta evidence chain.'}`;
+    `status ${status} | mode ${evidenceMode} | coverage ${toFinite(headline.measured_coverage_pct, 0).toFixed(2)}% (${Math.round(toFinite(headline.measured_sources, 0))}/${Math.round(toFinite(headline.enabled_sources, 0))}) | context-only ${fmtUsdCompact(contextHourly)}/h | router ${toFinite(headline.router_edge_pct, 0).toFixed(2)}% | ${explain || 'live stability tracks institutional threshold progress from frozen delta evidence chain.'}`;
 }
 
 function toHref(path) {
@@ -2523,6 +2611,11 @@ async function loadAll() {
     ...outCandidates('ops/live_breadth_value_panel.json'),
     ...outCandidates('ops/live_breadth_value_panel_latest.json'),
     ...dashboardCandidates('data/live_breadth_value_panel.json'),
+  ]) || {};
+
+  const liveProofValueMeter = await fetchFirstJson([
+    ...dashboardCandidates('data/live_proof_value_meter.json'),
+    ...outCandidates('ops/live_proof_value_meter_latest.json'),
   ]) || {};
 
   const investorReadiness = await fetchFirstJson([
@@ -2975,6 +3068,7 @@ async function loadAll() {
   $('coh-note').textContent = cohBits.join(' | ');
 
   renderLiveBreadthPanel(liveBreadth, investorReadiness);
+  renderLiveProofValueMeter(liveProofValueMeter);
   renderRollingTruthStrip(liveBreadth, investorReadiness, summary || {}, queue || {});
 
   const exec = (snap && typeof snap.execution === 'object') ? snap.execution : {};
@@ -3165,6 +3259,87 @@ setInterval(tickClock, 1000); tickClock();
 
 loadAll();
 setInterval(loadAll, 8000);
+</script>
+<script>
+(function () {
+  const grid = document.getElementById('continuity-grid');
+  const note = document.getElementById('continuity-note');
+  const candidates = [
+    './data/luma_context_dashboard_parity_audit.json',
+    'data/luma_context_dashboard_parity_audit.json',
+    '../out/ops/luma_context_dashboard_parity_audit_latest.json',
+    '../INSTITUTIONAL_STACK_V2/out/ops/luma_context_dashboard_parity_audit_latest.json'
+  ];
+
+  function esc(value) {
+    return String(value == null ? '' : value).replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+  }
+
+  async function fetchFirstJson(paths) {
+    for (const path of paths) {
+      try {
+        const res = await fetch(path, { cache: 'no-store' });
+        if (!res.ok) continue;
+        const text = await res.text();
+        const data = JSON.parse(text);
+        if (data && typeof data === 'object') return data;
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  function valueClass(value) {
+    const raw = String(value || '').toUpperCase();
+    if (raw.includes('OK') || raw.includes('PRESENT') || raw.includes('CANONICAL')) return 'green';
+    if (raw.includes('MISSING') || raw.includes('BLOCK') || raw.includes('NEEDS')) return 'amber';
+    return 'cyan';
+  }
+
+  function row(key, value, cls) {
+    return `<div class="k">${esc(key)}</div><div class="v ${cls || valueClass(value)}">${esc(value)}</div>`;
+  }
+
+  function render(audit) {
+    if (!grid || !note) return;
+    if (!audit) {
+      grid.innerHTML = row('audit feed', 'OFFLINE', 'amber');
+      note.textContent = 'Continuity audit not found. Run code/ops/BUILD_LUMA_CONTEXT_DASHBOARD_PARITY_AUDIT.py before serious grant/dashboard work.';
+      return;
+    }
+
+    const dirty = audit.dirty_worktree || {};
+    const domain = audit.live_domain_parity || {};
+    const grant = audit.grant_pipeline || {};
+    const geometry = audit.geometry_frontier || {};
+    const gate = geometry.promotion_gate || {};
+    const liveGate = grant.live_proof_gate || {};
+    const grantsSurface = (audit.canonical_dashboards || []).find((row) => row.key === 'grants') || {};
+    const needs = Array.isArray(audit.priority_needs) ? audit.priority_needs : [];
+    grid.innerHTML = [
+      row('dirty worktrail', `${dirty.total_dirty_entries || 0} entries`, 'amber'),
+      row('grants surface', grantsSurface.parity_state || 'UNKNOWN'),
+      row('live domain', domain.parity_state || 'UNKNOWN'),
+      row('data feeds live', `${domain.feed_ok || 0}/${domain.feed_total || 0}`, (domain.feed_ok || 0) === (domain.feed_total || 1) ? 'green' : 'amber'),
+      row('grant posture', grant.dashboard_posture || 'UNKNOWN'),
+      row('live proof gate', liveGate.value || 'n/a'),
+      row('live geometry claim', gate.ready_for_live_geometry_claim ? 'READY' : 'false', gate.ready_for_live_geometry_claim ? 'green' : 'amber'),
+      row('real-dollar claim', gate.ready_for_real_dollar_claim ? 'READY' : 'false', gate.ready_for_real_dollar_claim ? 'green' : 'amber')
+    ].join('');
+
+    note.innerHTML = [
+      `Start here: <b>${esc((audit.context_checkpoints || [])[0]?.path || 'AGENTS.md')}</b>.`,
+      `Priority needs: ${esc(needs.join(', ') || 'none')}.`,
+      'This panel is the anti-drift guard: continue the evidence chain; do not rebuild from scratch.'
+    ].join(' ');
+  }
+
+  async function loadContinuity() {
+    render(await fetchFirstJson(candidates));
+  }
+
+  loadContinuity();
+  setInterval(loadContinuity, 30000);
+})();
 </script>
 <script src="./assets/luma_command_fabric.js"></script>
 </body>

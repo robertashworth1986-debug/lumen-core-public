@@ -69,11 +69,17 @@ CANONICAL_DASHBOARDS = [
         ],
     },
     {
-        "key": "kraken_execution",
-        "route": "/kraken_execution_dashboard.html",
-        "path": DASHBOARD / "kraken_execution_dashboard.html",
-        "role": "paper execution, order evidence, positions, market awareness",
-        "must_show": ["paper_or_live_truth", "no_profit_claim_without_audit", "guard_reasons"],
+        "key": "proof_to_pilot",
+        "route": "/proof_to_pilot.html",
+        "path": DASHBOARD / "proof_to_pilot.html",
+        "role": "field-validation gate, buyer-safe outreach, pilot conversion, claim controls",
+        "must_show": [
+            "proof_to_pilot_control_room",
+            "field_validation_control_room",
+            "field_validation_outreach_board",
+            "buyer_authorized_replay",
+            "claim_boundaries",
+        ],
     },
 ]
 
@@ -84,6 +90,15 @@ LOCAL_FEEDS = [
     ("geometry_asset_wiring_board", DASHBOARD_DATA / "geometry_asset_wiring_board.json"),
     ("geometry_proof_frontier_board", DASHBOARD_DATA / "geometry_proof_frontier_board.json"),
     ("geometry_live_breadth_proof_queue", DASHBOARD_DATA / "geometry_live_breadth_proof_queue.json"),
+    ("champion_metric_gauntlet", DASHBOARD_DATA / "champion_metric_gauntlet.json"),
+    ("kuramoto_holdout_expansion", DASHBOARD_DATA / "kuramoto_holdout_expansion.json"),
+    ("geometry_champion_of_champions", DASHBOARD_DATA / "geometry_champion_of_champions.json"),
+    ("field_validation_control_room", DASHBOARD_DATA / "field_validation_control_room.json"),
+    ("field_validation_outreach_board", DASHBOARD_DATA / "field_validation_outreach_board.json"),
+    ("proof_to_pilot_control_room", DASHBOARD_DATA / "proof_to_pilot_control_room.json"),
+    ("paid_pilot_outreach_queue", DASHBOARD_DATA / "paid_pilot_outreach_queue.json"),
+    ("proof_to_revenue_engine", DASHBOARD_DATA / "proof_to_revenue_engine.json"),
+    ("live_domain_deployment_feed", DASHBOARD_DATA / "live_domain_deployment_feed.json"),
     ("public_visibility_packet", DASHBOARD_DATA / "public_visibility_packet.json"),
     ("lumencore_high_impact_goal", DASHBOARD_DATA / "lumencore_high_impact_goal.json"),
 ]
@@ -95,6 +110,11 @@ LIVE_FEED_PATHS = [
     "/data/geometry_asset_wiring_board.json",
     "/data/geometry_proof_frontier_board.json",
     "/data/geometry_live_breadth_proof_queue.json",
+    "/data/champion_metric_gauntlet.json",
+    "/data/field_validation_control_room.json",
+    "/data/field_validation_outreach_board.json",
+    "/data/proof_to_pilot_control_room.json",
+    "/data/proof_to_revenue_engine.json",
     "/data/public_visibility_packet.json",
     "/dashboard/data/grant_readiness_status.json",
     "/dashboard/data/top5_live_proof_submission_board.json",
@@ -102,6 +122,11 @@ LIVE_FEED_PATHS = [
     "/dashboard/data/geometry_asset_wiring_board.json",
     "/dashboard/data/geometry_proof_frontier_board.json",
     "/dashboard/data/geometry_live_breadth_proof_queue.json",
+    "/dashboard/data/champion_metric_gauntlet.json",
+    "/dashboard/data/field_validation_control_room.json",
+    "/dashboard/data/field_validation_outreach_board.json",
+    "/dashboard/data/proof_to_pilot_control_room.json",
+    "/dashboard/data/proof_to_revenue_engine.json",
     "/dashboard/data/public_visibility_packet.json",
     "/out/ops/grant_dashboard_status_feed_latest.json",
     "/out/ops/geometry_asset_wiring_board_latest.json",
@@ -217,6 +242,11 @@ def dashboard_card(surface: dict[str, Any]) -> dict[str, Any]:
         "top5_live_proof": "top5_live_proof" in text,
         "live_proof_value_meter": "live_proof_value_meter" in text or "Live Proof Value Meter" in text,
         "geometry_asset_wiring_board": "geometry_asset_wiring_board" in text,
+        "champion_metric_gauntlet": "champion_metric_gauntlet" in text,
+        "field_validation_control_room": "field_validation_control_room" in text,
+        "field_validation_outreach_board": "field_validation_outreach_board" in text,
+        "proof_to_pilot_control_room": "proof_to_pilot_control_room" in text,
+        "proof_to_revenue_engine": "proof_to_revenue_engine" in text,
         "field_validation_targets": (
             "field-validation" in text.lower()
             or "field_validation_target_queue" in text
@@ -243,6 +273,14 @@ def dashboard_card(surface: dict[str, Any]) -> dict[str, Any]:
         elif required == "discarded_workspaces" and not refs["discarded_workspaces"]:
             missing.append(required)
         elif required == "field_validation_targets" and not refs["field_validation_targets"]:
+            missing.append(required)
+        elif required == "proof_to_pilot_control_room" and not refs["proof_to_pilot_control_room"]:
+            missing.append(required)
+        elif required == "field_validation_control_room" and not refs["field_validation_control_room"]:
+            missing.append(required)
+        elif required == "field_validation_outreach_board" and not refs["field_validation_outreach_board"]:
+            missing.append(required)
+        elif required == "buyer_authorized_replay" and "buyer-authorized" not in text.lower():
             missing.append(required)
         elif required == "paper_or_live_truth" and "PAPER" not in text and "LIVE" not in text:
             missing.append(required)
@@ -300,7 +338,7 @@ def probe_url(url: str, timeout: int = 12) -> dict[str, Any]:
 
 
 def live_domain_parity(check_live_domain: bool) -> dict[str, Any]:
-    page_routes = [surface["route"] for surface in CANONICAL_DASHBOARDS[:3]]
+    page_routes = [surface["route"] for surface in CANONICAL_DASHBOARDS]
     if not check_live_domain:
         return {
             "checked": False,
@@ -418,8 +456,11 @@ def anti_drift_protocol() -> list[str]:
         "Read LUMAJARVIS_OPERATING_MEMORY_2026-06-20.md next; treat it as operating law unless superseded by a newer audited file.",
         "Run git status and classify dirty entries before editing or committing.",
         "Do not reset, clean, delete, or overwrite unrelated generated/user work.",
+        "Converge public work into four canonical boards: Mission Control, Grants, Quant Lab, and Proof-to-Pilot.",
+        "Treat Kraken Execution, LumaScout, investor rooms, and immersive demos as secondary boards unless this audit promotes them.",
         "Use TOP5_LIVE_PROOF_SUBMISSION_BOARD and GRANT_DEADLINE_TRIAGE for grant ordering.",
-        "Use GEOMETRY_PROOF_FRONTIER_BOARD for geometry claims; do not turn generated wins into live, field, or dollar claims.",
+        "Use GEOMETRY_PROOF_FRONTIER_BOARD and CHAMPION_METRIC_GAUNTLET for geometry claims; do not turn generated wins into live, field, or dollar claims.",
+        "Use Proof-to-Pilot for buyer-authorized replay, outreach, and claim-gate work; do not create a new revenue dashboard first.",
         "Use LOCAL_ICLOUD_EVIDENCE_INTAKE as an index, not as automatic proof.",
         "Verify live domain data feeds before saying the VPS/public site reflects today’s local work.",
         "Keep Kraken/trading output separated from grant proof unless an audited track record exists.",
@@ -501,7 +542,11 @@ def render_markdown(audit: dict[str, Any]) -> str:
             f"value_meter={str(refs['live_proof_value_meter']).lower()}, "
             f"geometry_frontier={str(refs['geometry_frontier']).lower()}, "
             f"geometry_asset={str(refs.get('geometry_asset_wiring_board', False)).lower()}, "
-            f"field_targets={str(refs.get('field_validation_targets', False)).lower()}"
+            f"field_targets={str(refs.get('field_validation_targets', False)).lower()}, "
+            f"champion_gauntlet={str(refs.get('champion_metric_gauntlet', False)).lower()}, "
+            f"proof_to_pilot={str(refs.get('proof_to_pilot_control_room', False)).lower()}, "
+            f"field_control={str(refs.get('field_validation_control_room', False)).lower()}, "
+            f"field_outreach={str(refs.get('field_validation_outreach_board', False)).lower()}"
         )
         if row["missing_or_weak_lanes"]:
             lines.append(f"  - Needs: {', '.join(row['missing_or_weak_lanes'])}")

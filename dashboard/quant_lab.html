@@ -348,6 +348,31 @@
   .ql-card .badge.old { color: var(--neon-a); border-color: var(--neon-a); }
   .ql-card .badge.live { color: var(--neon-c); border-color: var(--neon-c); }
   .ql-card .badge.critical { color: var(--neon-r); border-color: var(--neon-r); background: rgba(239,68,68,0.08); }
+  .ql-continuity {
+    grid-column: 1 / -1;
+    margin: -4px 0 4px;
+    border: 1px solid rgba(34, 211, 238, 0.32);
+    border-radius: 14px;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.08), rgba(168, 85, 247, 0.08));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 0 18px rgba(34,211,238,0.1);
+  }
+  .ql-continuity h4 {
+    margin: 0 0 8px;
+    font-family: 'Orbitron', sans-serif;
+    color: var(--neon-c);
+    font-size: 12px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+  }
+  .ql-continuity-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+  .ql-continuity-tile { border: 1px solid var(--border); border-radius: 10px; padding: 9px; background: rgba(15,23,50,0.42); }
+  .ql-continuity-k { font-family: 'Orbitron', sans-serif; color: var(--ink-dim); font-size: 9px; letter-spacing: 1.1px; text-transform: uppercase; }
+  .ql-continuity-v { margin-top: 4px; font-family: 'Orbitron', sans-serif; color: var(--ink); font-size: 13px; }
+  .ql-continuity-v.good { color: var(--neon-g); }
+  .ql-continuity-v.warn { color: var(--neon-a); }
+  .ql-continuity-v.alert { color: var(--neon-r); }
+  .ql-continuity-note { margin-top: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-dim); line-height: 1.55; }
   .ql-welcome-hero {
     grid-column: 1 / -1;
     padding: 30px 32px;
@@ -823,6 +848,9 @@
     <h3>Capital</h3>
     <div class="ql-tab" data-src="/grants.html" data-title="Grants Console · click-Approve">
       <span class="ico"></span>Grants <span class="meta new">v3</span>
+    </div>
+    <div class="ql-tab" data-src="/proof_to_pilot.html" data-title="Proof To Pilot · buyer validation gate">
+      <span class="ico"></span>Proof To Pilot <span class="meta new">field</span>
     </div>
     <div class="ql-tab" data-src="/investor_wallboard.html" data-title="Investor Wallboard">
       <span class="ico"></span>Wallboard <span class="meta live">board</span>
@@ -1441,6 +1469,83 @@ function syncOverviewFromSnapshot(snapshot) {
   }
 }
 
+function qlEsc(value) {
+  return String(value == null ? '' : value).replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+}
+
+function qlUsdCompact(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return '$0';
+  const abs = Math.abs(n);
+  if (abs >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
+  if (abs >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
+  if (abs >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
+  return `$${n.toFixed(0)}`;
+}
+function qlTone(value) {
+  const raw = String(value || '').toUpperCase();
+  if (raw.includes('OK') || raw.includes('PRESENT') || raw.includes('CANONICAL')) return 'good';
+  if (raw.includes('MISSING') || raw.includes('BLOCK') || raw.includes('NEEDS') || raw === 'FALSE') return 'warn';
+  return '';
+}
+
+function qlContinuityTile(key, value, tone) {
+  return `<div class="ql-continuity-tile">
+    <div class="ql-continuity-k">${qlEsc(key)}</div>
+    <div class="ql-continuity-v ${tone || qlTone(value)}">${qlEsc(value)}</div>
+  </div>`;
+}
+
+async function syncContinuityGuard() {
+  const grid = $('#ql-continuity-grid');
+  const note = $('#ql-continuity-note');
+  if (!grid || !note) return;
+  const audit = await fetchFirstJsonLoose([
+    ...dashboardCandidates('data/luma_context_dashboard_parity_audit.json'),
+    ...outCandidates('ops/luma_context_dashboard_parity_audit_latest.json'),
+  ]);
+  const valueMeter = await fetchFirstJsonLoose([
+    ...dashboardCandidates('data/live_proof_value_meter.json'),
+    ...outCandidates('ops/live_proof_value_meter_latest.json'),
+  ]) || {};
+  if (!audit || typeof audit !== 'object') {
+    grid.innerHTML = qlContinuityTile('Audit', 'OFFLINE', 'warn');
+    note.textContent = 'Continuity audit missing. Generate it before starting new experiments or grant work.';
+    return;
+  }
+  const domain = audit.live_domain_parity || {};
+  const grant = audit.grant_pipeline || {};
+  const liveGate = grant.live_proof_gate || {};
+  const geometry = audit.geometry_frontier || {};
+  const geomGate = geometry.promotion_gate || {};
+  const next = (geometry.champions || {}).recommended_next_live_wiring || geometry.next_live_wiring || {};
+  const dirty = audit.dirty_worktree || {};
+  const proofGate = valueMeter.proof_gate || {};
+  const valueGate = valueMeter.value_gate || {};
+  const safeClaim = valueGate.safe_claim || {};
+  const sectorMath = Array.isArray(valueMeter.sector_capture_math) ? valueMeter.sector_capture_math : [];
+  const billionRow = sectorMath.find(row => Number(row.sector_or_loss_pool_usd) === 1000000000) || {};
+  const tinyCapture = (Array.isArray(billionRow.capture_examples) ? billionRow.capture_examples : [])
+    .find(row => Number(row.improvement_or_capture_pct) === 0.01) || {};
+  const proofValue = proofGate.proposal_specific_live_proof_total
+    ? `${proofGate.proposal_specific_live_proof_count || 0}/${proofGate.proposal_specific_live_proof_total}`
+    : (liveGate.value || 'n/a');
+  grid.innerHTML = [
+    qlContinuityTile('Dirty Worktrail', `${dirty.total_dirty_entries || 0} entries`, 'warn'),
+    qlContinuityTile('Live Domain', domain.parity_state || 'UNKNOWN'),
+    qlContinuityTile('Data Feeds Live', `${domain.feed_ok || 0}/${domain.feed_total || 0}`, (domain.feed_ok || 0) === (domain.feed_total || 1) ? 'good' : 'warn'),
+    qlContinuityTile('Grant Proof Gate', proofValue, 'warn'),
+    qlContinuityTile('Safe Value / yr', qlUsdCompact(valueGate.allowed_estimated_annual_value_usd), safeClaim.estimated_value_signal_allowed ? 'good' : 'warn'),
+    qlContinuityTile('Blocked Context', qlUsdCompact(valueGate.blocked_context_only_annual_value_usd), 'alert'),
+    qlContinuityTile('0.01% of $1B', qlUsdCompact(tinyCapture.gross_value_usd || 100000), 'good'),
+    qlContinuityTile('Next Geometry Wire', next.lane || 'n/a'),
+    qlContinuityTile('Live Geometry Claim', geomGate.ready_for_live_geometry_claim ? 'READY' : 'false', geomGate.ready_for_live_geometry_claim ? 'good' : 'warn'),
+    qlContinuityTile('Kraken Live Exec', geomGate.kraken_live_execution_allowed ? 'READY' : 'false', geomGate.kraken_live_execution_allowed ? 'good' : 'warn')
+  ].join('');
+  const needs = Array.isArray(audit.priority_needs) ? audit.priority_needs.join(', ') : 'none';
+  note.textContent = `Anti-drift guard: read AGENTS.md and continuity audit first. Priority needs: ${needs}. No generated geometry, trading, context-only value surface, or synthetic result becomes a live-dollar claim until the gates pass.`;
+}
+
 function renderOverview() {
   welcome.innerHTML = `
     <div class="ql-welcome-hero">
@@ -1458,6 +1563,14 @@ function renderOverview() {
       </div>
     </div>
 
+    <div class="ql-continuity" id="ql-continuity">
+      <h4>Luma Continuity Guard</h4>
+      <div class="ql-continuity-grid" id="ql-continuity-grid">
+        <div class="ql-continuity-tile"><div class="ql-continuity-k">Audit</div><div class="ql-continuity-v warn">loading</div></div>
+      </div>
+      <div class="ql-continuity-note" id="ql-continuity-note">Reading continuity audit, grant proof gate, geometry frontier, and live-domain parity.</div>
+    </div>
+
     ${card('Core Mission Control', '/mission_control.html',
       'Cinematic command center — 7 evidence layers, KPIs, grants pipeline, anomaly stream, regime breaks.', ['new','live'])}
     ${card('Luma Agent QHI', '/lumaq_brain_command_center.html',
@@ -1472,6 +1585,8 @@ function renderOverview() {
       'Paper/shadow intent review with a fail-closed human gate. Live submission remains disabled until explicit production authorization.', ['live','critical'])}
     ${card('Grants Console', '/grants.html',
       '8 federal programs, 3 approved, $3.53M addressable. Click-Approve drafts, print/PDF, ZIP bundle, run-over-run diff.', ['new','live'])}
+    ${card('Proof To Pilot', '/proof_to_pilot.html',
+      'Buyer-authorized replay, external validation blockers, outreach targets, and paid-evaluation claim gates.', ['new','live','critical'])}
     ${card('Sports +EV · LumaAlpha', '/dashboard_analytics.html',
       'Live Pinnacle no-vig fair-pricing + Kalisha prediction score engine. Kelly-sized stakes, FlowForm α-score fusion. Distinct from time-series math — sports betting domain.', ['live','new'])}
     ${card('Kentucky Derby Paper Picks', '/dashboard_analytics.html#paper_derby_lane',
@@ -1501,6 +1616,7 @@ function renderOverview() {
     ${card('Public Evidence Bundle', '/evidence/',
       'The LinkedIn-shareable evidence pack — meta-router benchmark + grants summary + chain of custody.', ['new'])}
   `;
+  syncContinuityGuard().catch(() => {});
 }
 function card(title, src, desc, badges) {
   const b = badges.map(x => `<span class="badge ${x}">${x === 'live' ? 'active' : x}</span>`).join('');
@@ -2192,6 +2308,9 @@ const VOICE_MAP = [
   ['family',   '/lab.html'],
   ['bench',    '/lab.html'],
   ['grant',    '/grants.html'],
+  ['proof',    '/proof_to_pilot.html'],
+  ['pilot',    '/proof_to_pilot.html'],
+  ['field',    '/proof_to_pilot.html'],
   ['walkforward','/ensemble_walkforward_results.html'],
   ['walk',     '/ensemble_walkforward_results.html'],
   ['infra',    '/infra_audit_dashboard.html'],
@@ -2282,7 +2401,7 @@ const demoPill = $('#demo-pill');
 const demoCd   = $('#demo-cd');
 let demoTimer = null, demoTick = null, demoIdx = 0, demoCountdown = 12;
 const DEMO_PERIOD = 12;
-const DEMO_TABS = ['/lumaq_brain_command_center.html','/lumaq_brain_command_center.html#docker_intel_panel','/lumencore_master_v2.html','/mission_control.html','/staleness_command_center.html','/investor_command_room.html','/kraken_execution_dashboard.html','/lumascout.html','/forecast.html','/grants.html','/investor_wallboard.html','/master_evidence.html'];
+const DEMO_TABS = ['/lumaq_brain_command_center.html','/lumaq_brain_command_center.html#docker_intel_panel','/lumencore_master_v2.html','/mission_control.html','/grants.html','/proof_to_pilot.html','/staleness_command_center.html','/investor_command_room.html','/kraken_execution_dashboard.html','/lumascout.html','/forecast.html','/investor_wallboard.html','/master_evidence.html'];
 function demoStep() {
   const src = DEMO_TABS[demoIdx % DEMO_TABS.length];
   demoIdx++;
