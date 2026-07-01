@@ -109,3 +109,29 @@ def test_airnow_provider_is_registered_as_separate_air_quality_lane() -> None:
     assert providers["AIRNOW"]["sector"] == "air_quality"
     assert providers["AIRNOW"]["env_names"] == ["AIRNOW_API_KEY"]
     assert providers["AIRNOW"]["collector"].__name__ == "rows_from_airnow"
+
+
+def test_public_no_key_sources_expand_live_breadth_without_secret_dependency() -> None:
+    module = load_module()
+    providers = {row["source"]: row for row in module.PROVIDERS}
+
+    expected = {
+        "NWS_PUBLIC": "weather",
+        "OPEN_METEO_PUBLIC": "weather",
+        "TREASURY_FISCAL_PUBLIC": "rates",
+        "SEC_PUBLIC": "market_data",
+        "COINBASE_PUBLIC": "crypto_market",
+        "WORLD_BANK_PUBLIC": "macro",
+    }
+
+    for source, sector in expected.items():
+        assert source in providers
+        assert providers[source]["sector"] == sector
+        assert providers[source]["env_names"] == []
+
+
+def test_nasa_collector_has_open_power_fallback(monkeypatch) -> None:
+    module = load_module()
+    monkeypatch.delenv("NASA_API_KEY", raising=False)
+
+    assert module.rows_from_nasa.__name__ == "rows_from_nasa"

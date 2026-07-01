@@ -127,6 +127,12 @@ PROOF_FEEDS = [
         "why": "Consolidated pass/ready/blocked metric battery for the current champion.",
     },
     {
+        "key": "champion_expanded_metric_rollup",
+        "local": "dashboard/data/champion_expanded_metric_rollup.json",
+        "required": False,
+        "why": "Lane-by-lane expanded metric rollup tying champion wins to baselines, sources, and claim gates.",
+    },
+    {
         "key": "proof_to_revenue_engine",
         "local": "dashboard/data/proof_to_revenue_engine.json",
         "required": False,

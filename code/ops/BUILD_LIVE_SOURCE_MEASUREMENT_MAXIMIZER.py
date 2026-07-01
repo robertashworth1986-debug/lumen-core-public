@@ -443,12 +443,32 @@ def rows_from_bls(max_rows: int, timeout: int) -> tuple[int | None, list[dict[st
 
 def rows_from_nasa(max_rows: int, timeout: int) -> tuple[int | None, list[dict[str, Any]], str]:
     key = env_first("NASA_API_KEY")
-    if not key:
-        return None, [], "missing_env"
-    url = f"https://api.nasa.gov/planetary/apod?api_key={urllib.parse.quote(key)}"
+    if key:
+        try:
+            url = f"https://api.nasa.gov/planetary/apod?api_key={urllib.parse.quote(key)}"
+            code, obj, _ = request_json(url, timeout=timeout)
+            row = obj if isinstance(obj, dict) else {}
+            if row:
+                return code, [row], "nasa_apod"
+        except Exception:
+            pass
+
+    # NASA POWER is a durable open fallback for environmental context when APOD is slow.
+    url = (
+        "https://power.larc.nasa.gov/api/temporal/daily/point?"
+        "parameters=T2M,WS10M&community=RE&longitude=-86.7816&latitude=36.1627"
+        "&start=20260601&end=20260607&format=JSON"
+    )
     code, obj, _ = request_json(url, timeout=timeout)
-    row = obj if isinstance(obj, dict) else {}
-    return code, [row] if row else [], "nasa_apod"
+    properties = obj.get("properties", {}) if isinstance(obj, dict) else {}
+    parameter = properties.get("parameter", {}) if isinstance(properties, dict) else {}
+    rows: list[dict[str, Any]] = []
+    for name, series in parameter.items() if isinstance(parameter, dict) else []:
+        if not isinstance(series, dict):
+            continue
+        for period, value in list(series.items())[:max_rows]:
+            rows.append({"parameter": name, "period": period, "value": value})
+    return code, rows[:max_rows], "nasa_power_daily_point"
 
 
 def rows_from_noaa(max_rows: int, timeout: int) -> tuple[int | None, list[dict[str, Any]], str]:
@@ -597,6 +617,77 @@ def rows_from_webhook(max_rows: int, timeout: int) -> tuple[int | None, list[dic
     return None, [{"configured": True, "secret_present": True}], "internal_webhook_secret_present"
 
 
+def rows_from_nws(max_rows: int, timeout: int) -> tuple[int | None, list[dict[str, Any]], str]:
+    url = "https://api.weather.gov/gridpoints/OHX/50,57/forecast/hourly"
+    code, obj, _ = request_json(
+        url,
+        headers={"User-Agent": "LumenCore evidence replay contact: robertashworth4444@gmail.com"},
+        timeout=timeout,
+    )
+    properties = obj.get("properties", {}) if isinstance(obj, dict) else {}
+    rows = latest_items(properties.get("periods", []) if isinstance(properties, dict) else [], max_rows)
+    return code, rows, "nws_hourly_forecast_nashville"
+
+
+def rows_from_open_meteo(max_rows: int, timeout: int) -> tuple[int | None, list[dict[str, Any]], str]:
+    url = (
+        "https://api.open-meteo.com/v1/forecast?"
+        "latitude=36.1627&longitude=-86.7816&hourly=temperature_2m,wind_speed_10m,relative_humidity_2m"
+        "&forecast_days=2"
+    )
+    code, obj, _ = request_json(url, timeout=timeout)
+    hourly = obj.get("hourly", {}) if isinstance(obj, dict) else {}
+    times = hourly.get("time", []) if isinstance(hourly, dict) else []
+    rows: list[dict[str, Any]] = []
+    for idx, ts in enumerate(times[:max_rows]):
+        row = {"time": ts}
+        for key, values in hourly.items():
+            if key == "time" or not isinstance(values, list) or idx >= len(values):
+                continue
+            row[key] = values[idx]
+        rows.append(row)
+    return code, rows, "open_meteo_hourly_forecast"
+
+
+def rows_from_treasury_fiscal(max_rows: int, timeout: int) -> tuple[int | None, list[dict[str, Any]], str]:
+    url = (
+        "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/avg_interest_rates?"
+        f"sort=-record_date&page[size]={max_rows}"
+    )
+    code, obj, _ = request_json(url, timeout=timeout)
+    rows = latest_items(obj.get("data", []) if isinstance(obj, dict) else [], max_rows)
+    return code, rows, "treasury_average_interest_rates"
+
+
+def rows_from_sec_public(max_rows: int, timeout: int) -> tuple[int | None, list[dict[str, Any]], str]:
+    code, obj, _ = request_json(
+        "https://www.sec.gov/files/company_tickers.json",
+        headers={"User-Agent": "LumenCore evidence replay contact: robertashworth4444@gmail.com"},
+        timeout=timeout,
+    )
+    rows: list[dict[str, Any]] = []
+    if isinstance(obj, dict):
+        for value in list(obj.values())[:max_rows]:
+            if isinstance(value, dict):
+                rows.append(value)
+    return code, rows, "sec_company_tickers"
+
+
+def rows_from_coinbase_public(max_rows: int, timeout: int) -> tuple[int | None, list[dict[str, Any]], str]:
+    code, obj, _ = request_json("https://api.coinbase.com/v2/exchange-rates?currency=BTC", timeout=timeout)
+    data = obj.get("data", {}) if isinstance(obj, dict) else {}
+    rates = data.get("rates", {}) if isinstance(data, dict) else {}
+    rows = [{"currency": key, "btc_rate": value} for key, value in list(rates.items())[:max_rows]]
+    return code, rows, "coinbase_btc_exchange_rates"
+
+
+def rows_from_world_bank(max_rows: int, timeout: int) -> tuple[int | None, list[dict[str, Any]], str]:
+    url = "https://api.worldbank.org/v2/country/USA?format=json"
+    code, obj, _ = request_json(url, timeout=timeout)
+    rows = latest_items(obj[1] if isinstance(obj, list) and len(obj) > 1 else [], max_rows)
+    return code, rows, "world_bank_us_country_metadata"
+
+
 PROVIDERS: list[dict[str, Any]] = [
     {
         "source": "KRAKEN_PUBLIC",
@@ -695,6 +786,22 @@ PROVIDERS: list[dict[str, Any]] = [
         "collector": rows_from_noaa,
     },
     {
+        "source": "NWS_PUBLIC",
+        "sector": "weather",
+        "env_names": [],
+        "constraint_type": "near-term public weather forecast stress",
+        "money_drain_mode": "weather-driven operational blind spots and poor timing windows",
+        "collector": rows_from_nws,
+    },
+    {
+        "source": "OPEN_METEO_PUBLIC",
+        "sector": "weather",
+        "env_names": [],
+        "constraint_type": "open weather forecast comparison lane",
+        "money_drain_mode": "single-provider weather dependence and missed cross-checks",
+        "collector": rows_from_open_meteo,
+    },
+    {
         "source": "NREL",
         "sector": "energy_lab",
         "env_names": ["NREL_API_KEY"],
@@ -773,6 +880,38 @@ PROVIDERS: list[dict[str, Any]] = [
         "constraint_type": "signal/event ingress",
         "money_drain_mode": "dropped internal triggers and missed event flow",
         "collector": rows_from_webhook,
+    },
+    {
+        "source": "TREASURY_FISCAL_PUBLIC",
+        "sector": "rates",
+        "env_names": [],
+        "constraint_type": "public federal rate and debt-cost context",
+        "money_drain_mode": "rate-pressure blind spots and weak macro conversion assumptions",
+        "collector": rows_from_treasury_fiscal,
+    },
+    {
+        "source": "SEC_PUBLIC",
+        "sector": "market_data",
+        "env_names": [],
+        "constraint_type": "public company universe context",
+        "money_drain_mode": "weak issuer universe and poor public-market context",
+        "collector": rows_from_sec_public,
+    },
+    {
+        "source": "COINBASE_PUBLIC",
+        "sector": "crypto_market",
+        "env_names": [],
+        "constraint_type": "public crypto reference-rate context",
+        "money_drain_mode": "single-exchange crypto reference dependence",
+        "collector": rows_from_coinbase_public,
+    },
+    {
+        "source": "WORLD_BANK_PUBLIC",
+        "sector": "macro",
+        "env_names": [],
+        "constraint_type": "global macro and economic scale context",
+        "money_drain_mode": "weak macro normalization and sector-size context",
+        "collector": rows_from_world_bank,
     },
 ]
 

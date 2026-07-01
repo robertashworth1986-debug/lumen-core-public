@@ -108,6 +108,8 @@ def test_feed_contract_includes_expanded_bridge_and_domain_audit():
     assert "Anti-drift operator context" in specs["luma_operator_context"]["why"]
     assert specs["champion_phase_proxy_diagnostics"]["required"] is False
     assert "phase/coherence/residual proxy" in specs["champion_phase_proxy_diagnostics"]["why"]
+    assert specs["champion_expanded_metric_rollup"]["required"] is False
+    assert "Lane-by-lane expanded metric rollup" in specs["champion_expanded_metric_rollup"]["why"]
     assert specs["safe_key_provider_ping"]["required"] is False
     assert "without exposing secrets" in specs["safe_key_provider_ping"]["why"]
     assert specs["live_source_measurement_maximizer"]["required"] is False

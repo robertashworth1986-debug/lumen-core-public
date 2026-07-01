@@ -468,6 +468,8 @@ def build_payload() -> dict[str, Any]:
             "locked_sweep_source_system_count": sweep_evidence.get("source_system_count"),
             "locked_sweep_lane_count": sweep_evidence.get("lane_count"),
             "locked_sweep_replay_chain_sha256": sweep_evidence.get("replay_chain_sha256"),
+            "champion_replay_source_system_count": gauntlet_summary.get("source_system_count")
+            or stress_summary.get("source_system_count"),
             "source_system_count": gauntlet_summary.get("source_system_count") or stress_summary.get("source_system_count"),
             "broader_measured_provider_count": measured_sources or gauntlet_summary.get("broader_measured_provider_count"),
             "broader_enabled_provider_count": enabled_sources or gauntlet_summary.get("broader_enabled_provider_count"),
@@ -483,8 +485,9 @@ def build_payload() -> dict[str, Any]:
             "manual_paid_pilot_outreach_allowed": bool(stress_summary.get("manual_paid_pilot_outreach_allowed")),
             "plain_english_answer": (
                 "The current platform is strongest as an internal, hash-verifiable replay and benchmark engine. "
-                "It has a clear champion and growing live-source breadth, but the next money unlock is an external "
-                "buyer-authorized replay with a locked baseline, not a premature realized-savings claim."
+                "It has a clear champion, an 8-system locked replay sweep, and growing broader live-source breadth. "
+                "The next money unlock is an external buyer-authorized replay with a locked baseline, not a "
+                "premature realized-savings claim."
             ),
         },
         "claim_controls": {
@@ -583,7 +586,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"{summary.get('locked_sweep_lane_count')}`",
         f"- Locked sweep manifest source rows: `{summary.get('locked_sweep_manifest_source_count')}`",
         f"- Locked sweep replay chain: `{summary.get('locked_sweep_replay_chain_sha256')}`",
-        f"- Champion replay source systems: `{summary.get('source_system_count')}`",
+        f"- Champion replay source systems: `{summary.get('champion_replay_source_system_count')}` "
+        "(narrow original champion lane, not total platform breadth)",
         f"- Broader measured providers: `{summary.get('broader_measured_provider_count')}/"
         f"{summary.get('broader_enabled_provider_count')}`",
         f"- Latest bounded measured rows: `{summary.get('total_measured_rows_latest_pull')}`",

@@ -72,6 +72,7 @@ def test_bundle_contract_includes_expanded_bridge_and_domain_audit():
     assert "live_domain_consolidation_audit" in module.OPTIONAL_FEEDS
     assert "luma_operator_context" in module.OPTIONAL_FEEDS
     assert "champion_phase_proxy_diagnostics" in module.OPTIONAL_FEEDS
+    assert "champion_expanded_metric_rollup" in module.OPTIONAL_FEEDS
     assert "safe_key_provider_ping" in module.OPTIONAL_FEEDS
     assert "live_source_measurement_maximizer" in module.OPTIONAL_FEEDS
     assert "geometry_live_wiring_matrix" in module.OPTIONAL_FEEDS

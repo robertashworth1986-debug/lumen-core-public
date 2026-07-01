@@ -1,11 +1,11 @@
 # Champion Metric Battery
 
-Generated UTC: `2026-07-01T13:44:16.306570+00:00`
-Metric battery SHA-256: `401b7b4baa0603348a6ff0323d892ece509b8496291e35adc4afbde9ff1f3a43`
+Generated UTC: `2026-07-01T14:54:40.865175+00:00`
+Metric battery SHA-256: `f853803d67cfdf977104730966edac43b12102d1c0e74988845c2cb094f5fee9`
 
 ## Plain English
 
-The current platform is strongest as an internal, hash-verifiable replay and benchmark engine. It has a clear champion and growing live-source breadth, but the next money unlock is an external buyer-authorized replay with a locked baseline, not a premature realized-savings claim.
+The current platform is strongest as an internal, hash-verifiable replay and benchmark engine. It has a clear champion, an 8-system locked replay sweep, and growing broader live-source breadth. The next money unlock is an external buyer-authorized replay with a locked baseline, not a premature realized-savings claim.
 
 ## Current Champion
 
@@ -19,9 +19,9 @@ The current platform is strongest as an internal, hash-verifiable replay and ben
 - Locked sweep source systems/lanes: `8/5`
 - Locked sweep manifest source rows: `159`
 - Locked sweep replay chain: `825b5b4090a944a6306caeac16a3fc583def8444d9dc232da864dbd627a30587`
-- Champion replay source systems: `4`
-- Broader measured providers: `19/23`
-- Latest bounded measured rows: `516`
+- Champion replay source systems: `4` (narrow original champion lane, not total platform breadth)
+- Broader measured providers: `24/29`
+- Latest bounded measured rows: `835`
 
 ## Battery Status
 

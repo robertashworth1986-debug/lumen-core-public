@@ -55,6 +55,7 @@ OPTIONAL_FEEDS = [
     "proof_to_revenue_engine",
     "champion_stress_test_matrix",
     "champion_metric_battery",
+    "champion_expanded_metric_rollup",
     "first_buyer_target_board",
     "paid_pilot_outreach_queue",
     "luma_operator_context",
