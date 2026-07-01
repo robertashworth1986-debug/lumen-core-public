@@ -37,6 +37,12 @@ PROOF_FEEDS = [
         "why": "Current reviewer-safe champion summary and metric gates.",
     },
     {
+        "key": "locked_source_baseline_replay_sweep",
+        "local": "dashboard/data/locked_source_baseline_replay_sweep.json",
+        "required": True,
+        "why": "Full locked source-conditioned replay sweep across live-breadth rows and baselines.",
+    },
+    {
         "key": "kuramoto_holdout_expansion",
         "local": "dashboard/data/kuramoto_holdout_expansion.json",
         "required": True,
@@ -91,6 +97,12 @@ PROOF_FEEDS = [
         "why": "Canonical proof-to-pilot board feed that ties champions to paid evaluation scope.",
     },
     {
+        "key": "champion_sample_expansion_and_economic_bridge",
+        "local": "dashboard/data/champion_sample_expansion_and_economic_bridge.json",
+        "required": True,
+        "why": "Expanded source breadth, sample-size diagnostics, and disciplined economic claim bridge.",
+    },
+    {
         "key": "geometry_asset_wiring_board",
         "local": "dashboard/data/geometry_asset_wiring_board.json",
         "required": False,
@@ -119,6 +131,12 @@ PROOF_FEEDS = [
         "local": "dashboard/data/first_buyer_target_board.json",
         "required": False,
         "why": "Named, source-verified first-buyer and field-replay target board.",
+    },
+    {
+        "key": "live_domain_consolidation_audit",
+        "local": "dashboard/data/live_domain_consolidation_audit.json",
+        "required": False,
+        "why": "Public-domain surface audit that identifies stale feeds, broken links, and claim-language cleanup.",
     },
 ]
 
@@ -374,15 +392,23 @@ def build_payload(check_live_domain: bool = True, timeout: int = 10) -> dict[str
             "proof_to_pilot": f"{base}/proof_to_pilot.html",
             "champion_feed_primary": f"{base}/data/champion_metric_gauntlet.json",
             "champion_feed_fallback": f"{base}/dashboard/data/champion_metric_gauntlet.json",
+            "locked_source_baseline_replay_sweep": f"{base}/data/locked_source_baseline_replay_sweep.json",
+            "champion_sample_expansion_and_economic_bridge": (
+                f"{base}/data/champion_sample_expansion_and_economic_bridge.json"
+            ),
             "field_validation_control_room": f"{base}/data/field_validation_control_room.json",
             "field_validation_outreach_board": f"{base}/data/field_validation_outreach_board.json",
+            "live_domain_consolidation_audit": f"{base}/data/live_domain_consolidation_audit.json",
         },
         "publish_and_verify_runbook": [
             "python .\\code\\ops\\BUILD_CHAMPION_METRIC_GAUNTLET.py",
+            "python .\\code\\ops\\BUILD_LOCKED_SOURCE_BASELINE_REPLAY_SWEEP.py",
+            "python .\\code\\ops\\BUILD_CHAMPION_SAMPLE_EXPANSION_AND_ECONOMIC_BRIDGE.py",
             "python .\\code\\ops\\BUILD_FIELD_VALIDATION_CONTROL_ROOM.py",
             "python .\\code\\ops\\BUILD_FIELD_VALIDATION_OUTREACH_BOARD.py",
             "python .\\code\\ops\\BUILD_PROOF_TO_PILOT_CONTROL_ROOM.py",
             "python .\\code\\ops\\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py --skip-live-check",
+            "python .\\code\\ops\\BUILD_LIVE_DOMAIN_CONSOLIDATION_AUDIT.py",
             "python .\\code\\ops\\BUILD_LIVE_DOMAIN_PROOF_FEED_DEPLOY_BUNDLE.py",
             ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1 -DryRun",
             ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1",

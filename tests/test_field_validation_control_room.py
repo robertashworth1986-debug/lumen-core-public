@@ -41,6 +41,11 @@ def test_field_validation_control_room_keeps_claim_gates_closed():
 
     assert summary["manual_outreach_ready"] is True
     assert summary["bulk_email_allowed"] is False
+    assert summary["external_validation_unlock_packet_ready"] is True
+    assert summary["external_approval_received"] is False
+    assert summary["grid_rf_pll_protocols_ready"] is True
+    assert summary["broader_measured_provider_count"] >= 4
+    assert summary["manifest_unique_source_count"] >= 4
     assert summary["field_validation_claim_allowed"] is False
     assert summary["real_dollar_savings_claim_allowed"] is False
     assert summary["fixed_dollar_delta_claim_allowed"] is False
@@ -82,6 +87,10 @@ def test_field_validation_control_room_markdown_is_reviewer_safe():
     assert "Field Validation Control Room" in rendered
     assert "Internal wins vs Kalman: `24/24`" in rendered
     assert "Field-validation claim allowed: `false`" in rendered
+    assert "External Validation Unlock" in rendered
+    assert "Grid/RF/PLL Validation Tracks" in rendered
+    assert "held_out_operational_data" in rendered
+    assert "economic_conversion_factor" in rendered
     assert "This supports a field-replay request" in rendered
     assert "does not establish field validation or a realized-dollar claim" in rendered
     assert "Next 10 Actions" in rendered

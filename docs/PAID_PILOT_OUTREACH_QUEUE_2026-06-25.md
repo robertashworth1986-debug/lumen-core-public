@@ -1,6 +1,6 @@
 # Paid Pilot Outreach Queue
 
-Generated UTC: `2026-06-25T15:47:27.180431+00:00`
+Generated UTC: `2026-06-27T17:45:57.356152+00:00`
 
 This queue is a manual paid-pilot outreach worklist. It helps select reviewed buyer or agency technical contacts and match each contact to the strongest current proof card. It does not authorize bulk email, contact scraping, fixed-dollar frozen-delta claims, field-validation claims, realized-savings claims, live trading, or autonomous operational execution.
 
@@ -17,7 +17,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Fixed-dollar delta claim allowed: `false`
 - Field-validation claim allowed: `false`
 - Realized-savings claim allowed: `false`
-- Queue chain SHA-256: `40c0ea0df2f0d2012ea672599b26260452a6d751fe8ee218f8f3635c54cc90db`
+- Queue chain SHA-256: `d7f3306646bfd73d210c7dd158a5fc79bd40e13b6927332b53657315c44d7c95`
 
 ## Commercial Offer Tiers
 
@@ -50,7 +50,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Search phrase: `utility grid analytics innovation reliability pilot`
 - Pain: constraint-heavy routing, dispatch, restoration, and reliability decisions
 - Measured outcome: recovery time, dispatch quality, outage exposure, operator review burden
-- Proof line: 6/6 positive frozen replay windows; lower 95 margin 0.070176; minimum source count 5
+- Proof line: 8/8 positive frozen replay windows; lower 95 margin 0.071919; minimum source count 5
 - Subject: Paid pilot scoping: Constrained Transport / Routing Replay Pilot for utility grid analytics
 - Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
 - Send now allowed: `false`
@@ -65,7 +65,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Search phrase: `energy forecasting grid load timing anomaly pilot`
 - Pain: cyclic load, generation, price, or anomaly timing where phase error matters
 - Measured outcome: forecast error, lead time, drift detection latency, missed-event rate
-- Proof line: 6/6 positive frozen replay windows; lower 95 margin 0.155168; minimum source count 4
+- Proof line: 4/4 positive frozen replay windows; lower 95 margin 0.128296; minimum source count None
 - Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot for energy forecasting
 - Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
 - Send now allowed: `false`
@@ -80,7 +80,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Search phrase: `datacenter cooling optimization airflow reliability analytics`
 - Pain: airflow routing and thermal constraint management under cost and uptime pressure
 - Measured outcome: energy use, hot-spot exposure, cooling response time, thermal guardrail violations
-- Proof line: 6/6 positive frozen replay windows; lower 95 margin 0.070176; minimum source count 5
+- Proof line: 8/8 positive frozen replay windows; lower 95 margin 0.071919; minimum source count 5
 - Subject: Paid pilot scoping: Constrained Transport / Routing Replay Pilot for datacenter cooling optimization
 - Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
 - Send now allowed: `false`
@@ -95,7 +95,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Search phrase: `grid reliability analytics oscillation drift detection pilot`
 - Pain: oscillatory system drift and early warning across measured operating signals
 - Measured outcome: early warning lead time, false positives, missed events, phase error
-- Proof line: 6/6 positive frozen replay windows; lower 95 margin 0.155168; minimum source count 4
+- Proof line: 4/4 positive frozen replay windows; lower 95 margin 0.128296; minimum source count None
 - Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot for grid reliability analytics
 - Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
 - Send now allowed: `false`
@@ -110,7 +110,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Search phrase: `port operations analytics maritime anomaly routing pilot`
 - Pain: vessel, asset, and response routing under traffic, timing, and safety constraints
 - Measured outcome: route quality, response time, false-review burden, constraint violations
-- Proof line: 6/6 positive frozen replay windows; lower 95 margin 0.070176; minimum source count 5
+- Proof line: 8/8 positive frozen replay windows; lower 95 margin 0.071919; minimum source count 5
 - Subject: Paid pilot scoping: Constrained Transport / Routing Replay Pilot for port maritime operations
 - Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
 - Send now allowed: `false`
@@ -125,7 +125,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Search phrase: `sensor fusion timing drift anomaly detection defense pilot`
 - Pain: multi-sensor timing, drift, and cyclic-event alignment under noisy conditions
 - Measured outcome: timing error, drift detection, event alignment, operator review burden
-- Proof line: 6/6 positive frozen replay windows; lower 95 margin 0.155168; minimum source count 4
+- Proof line: 4/4 positive frozen replay windows; lower 95 margin 0.128296; minimum source count None
 - Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot for sensor fusion defense
 - Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
 - Send now allowed: `false`
@@ -140,7 +140,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Search phrase: `critical infrastructure resilience optimization pilot program manager`
 - Pain: resilience routing and recovery planning where small decision-quality gains matter
 - Measured outcome: time-to-recover, exposure reduction, baseline score delta, guardrail failure rate
-- Proof line: 6/6 positive frozen replay windows; lower 95 margin 0.070176; minimum source count 5
+- Proof line: 8/8 positive frozen replay windows; lower 95 margin 0.071919; minimum source count 5
 - Subject: Paid pilot scoping: Constrained Transport / Routing Replay Pilot for critical infrastructure resilience
 - Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
 - Send now allowed: `false`
@@ -155,7 +155,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Search phrase: `industrial process stability oscillation timing analytics pilot`
 - Pain: process oscillations, resonance, and instability that cause manual intervention
 - Measured outcome: phase error, intervention count, stability alarms, false positives
-- Proof line: 6/6 positive frozen replay windows; lower 95 margin 0.155168; minimum source count 4
+- Proof line: 4/4 positive frozen replay windows; lower 95 margin 0.128296; minimum source count None
 - Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot for industrial process stability
 - Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
 - Send now allowed: `false`
@@ -170,7 +170,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Search phrase: `defense cyber physical systems routing optimization pilot`
 - Pain: mission route, sensor, or response choices under changing constraints
 - Measured outcome: constraint violation rate, decision latency, baseline score delta, review burden
-- Proof line: 6/6 positive frozen replay windows; lower 95 margin 0.070176; minimum source count 5
+- Proof line: 8/8 positive frozen replay windows; lower 95 margin 0.071919; minimum source count 5
 - Subject: Paid pilot scoping: Constrained Transport / Routing Replay Pilot for defense cyber physical logistics
 - Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
 - Send now allowed: `false`
@@ -185,7 +185,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Search phrase: `national lab validation signal processing cyber physical systems`
 - Pain: independent validation of reproducible phase/timing benchmark evidence
 - Measured outcome: repeatability, baseline score delta, holdout performance, uncertainty report
-- Proof line: 6/6 positive frozen replay windows; lower 95 margin 0.155168; minimum source count 4
+- Proof line: 4/4 positive frozen replay windows; lower 95 margin 0.128296; minimum source count None
 - Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot for national lab validation
 - Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
 - Send now allowed: `false`
@@ -200,7 +200,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Search phrase: `industrial maintenance routing optimization analytics pilot`
 - Pain: maintenance and inspection path planning across assets with time and risk constraints
 - Measured outcome: coverage, time, exposure, energy, repeatability against incumbent path plans
-- Proof line: 6/6 positive frozen replay windows; lower 95 margin 0.070176; minimum source count 5
+- Proof line: 8/8 positive frozen replay windows; lower 95 margin 0.071919; minimum source count 5
 - Subject: Paid pilot scoping: Constrained Transport / Routing Replay Pilot for industrial maintenance routing
 - Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
 - Send now allowed: `false`
@@ -215,7 +215,7 @@ This queue is a manual paid-pilot outreach worklist. It helps select reviewed bu
 - Search phrase: `infrastructure risk analytics early warning drift detection pilot`
 - Pain: early warning, risk timing, and anomaly triage before operational losses grow
 - Measured outcome: lead time, review burden, false positives, missed-event rate
-- Proof line: 6/6 positive frozen replay windows; lower 95 margin 0.155168; minimum source count 4
+- Proof line: 4/4 positive frozen replay windows; lower 95 margin 0.128296; minimum source count None
 - Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot for infrastructure risk analytics
 - Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
 - Send now allowed: `false`

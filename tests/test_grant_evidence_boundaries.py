@@ -68,6 +68,46 @@ class GrantEvidenceBoundaryTests(unittest.TestCase):
         self.assertEqual(budget["periods"]["phase_i_base"]["months"], 6)
         self.assertEqual(budget["periods"]["phase_i_option"]["months"], 6)
 
+    def test_nv063_volume2_source_preserves_submission_boundaries(self) -> None:
+        draft = (
+            ROOT
+            / "grant_submissions"
+            / "NV063_HarborSentinel"
+            / "NV063_VOLUME2_TECHNICAL_DRAFT_2026-06-19.md"
+        ).read_text(encoding="utf-8")
+        normalized = " ".join(draft.split())
+
+        required_phrases = [
+            "not approved for submission",
+            "Format target: single-column Phase I Technical Volume",
+            "Base budget target: not to exceed $200,000",
+            "Option budget target: not to exceed $115,000",
+            "Evidence boundary: these are generated software results.",
+            "They do not establish operational harbor performance",
+            "No current draft claims access to Navy radar",
+            "no operational claim without authorized operational data",
+            "Do not upload this draft until DSIP account authority",
+            "F1 0.952",
+            "F1 was 0.927",
+            "F1 0.888",
+        ]
+        for phrase in required_phrases:
+            self.assertIn(phrase, normalized)
+
+        forbidden_phrases = [
+            "operationally validated",
+            "field-validated",
+            "field validated",
+            "CMMC certified",
+            "current facility clearance",
+            "completed SSDS integration",
+            "guaranteed",
+            "proven superior",
+        ]
+        lowered = draft.lower()
+        for phrase in forbidden_phrases:
+            self.assertNotIn(phrase.lower(), lowered)
+
 
 if __name__ == "__main__":
     unittest.main()

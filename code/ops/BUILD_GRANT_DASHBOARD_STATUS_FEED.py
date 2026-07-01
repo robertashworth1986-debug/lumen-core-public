@@ -17,6 +17,10 @@ HARBOR_DATA_JSON = OUT_OPS / "harbor_data_source_readiness_audit_latest.json"
 HARBOR_AIS_ACQUISITION_JSON = OUT_OPS / "harbor_ais_pilot_acquisition_latest.json"
 HARBOR_AIS_SPLITS_JSON = OUT_OPS / "harbor_ais_heldout_splits_latest.json"
 HARBOR_PUBLIC_AIS_GATE_JSON = OUT_OPS / "harbor_public_ais_gate_latest.json"
+HARBOR_AIS_IO_PREFLIGHT_JSON = OUT_OPS / "harbor_ais_io_preflight_latest.json"
+HARBOR_AIS_INJECTION_JSON = OUT_OPS / "harbor_ais_injection_benchmark_latest.json"
+SUPPORT_OUTREACH_JSON = OUT_OPS / "grant_support_outreach_pack_latest.json"
+TOP5_LIVE_PROOF_JSON = OUT_OPS / "top5_live_proof_submission_board_latest.json"
 
 OPS_FEED_JSON = OUT_OPS / "grant_dashboard_status_feed_latest.json"
 DASHBOARD_FEED_JSON = DASHBOARD_DATA / "grant_readiness_status.json"
@@ -27,6 +31,8 @@ BOUNDARIES = [
     "Portal authority, certifications, and action-time submit approval remain user gates.",
     "Synthetic benchmarks support bounded software feasibility only, not field validation.",
     "HarborSentinel public AIS has raw acquisition, held-out splits, and a single-lane readiness gate; this is data-readiness evidence, not detection-performance or field validation.",
+    "HarborSentinel controlled-injection benchmarking is detector-vs-baseline evidence on public AIS perturbations, not real adversary detection, multi-source fusion, or field validation.",
+    "No proposal is final-submit-ready unless its proposal-specific live-proof gate and portal/action-time gates pass.",
     "Trading, Kraken, live-breadth, or frozen-delta artifacts must not be cited as profit proof.",
 ]
 
@@ -111,6 +117,97 @@ def source_probe_summary(harbor_ais: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def io_preflight_summary(preflight: dict[str, Any]) -> dict[str, Any]:
+    if not preflight:
+        return {
+            "posture": "NOT_RUN",
+            "required_ok": 0,
+            "required_files": 0,
+            "any_timeout": False,
+            "probes": [],
+            "claim_boundary": (
+                "No AIS split I/O preflight artifact is available in this feed. "
+                "Do not run or cite controlled-injection results until the frozen split is readable."
+            ),
+        }
+    probes = []
+    for row in preflight.get("probes", []) or []:
+        if not isinstance(row, dict):
+            continue
+        probes.append(
+            {
+                "label": str(row.get("label", "")),
+                "status": str(row.get("status", "")),
+                "ok": bool(row.get("ok", False)),
+                "expected_bytes": row.get("expected_bytes"),
+                "actual_bytes": row.get("actual_bytes"),
+                "size_matches": row.get("size_matches"),
+                "sample_bytes_read": row.get("sample_bytes_read"),
+                "timeout_seconds": row.get("timeout_seconds"),
+                "elapsed_seconds": row.get("elapsed_seconds"),
+                "full_hash_requested": bool(row.get("full_hash_requested", False)),
+                "sha256_matches": row.get("sha256_matches"),
+            }
+        )
+    summary = preflight.get("summary", {}) if isinstance(preflight.get("summary"), dict) else {}
+    return {
+        "posture": str(preflight.get("posture", "UNKNOWN")),
+        "required_ok": int(summary.get("required_ok", 0) or 0),
+        "required_files": int(summary.get("required_files", 0) or 0),
+        "all_required_ok": bool(summary.get("all_required_ok", False)),
+        "any_timeout": bool(summary.get("any_timeout", False)),
+        "full_hash_match_count": summary.get("full_hash_match_count"),
+        "timeout_seconds": preflight.get("timeout_seconds"),
+        "sample_bytes": preflight.get("sample_bytes"),
+        "full_hash": bool(preflight.get("full_hash", False)),
+        "probes": probes,
+        "next_gate": str(preflight.get("next_gate", "")),
+        "claim_boundary": str(preflight.get("claim_boundary", "")),
+    }
+
+
+def injection_benchmark_summary(benchmark: dict[str, Any]) -> dict[str, Any]:
+    if not benchmark:
+        return {
+            "posture": "NOT_RUN",
+            "total_injected_segments": 0,
+            "motion_consistency_recall": 0.0,
+            "speed_only_baseline_recall": 0.0,
+            "recall_lift_vs_speed_only": 0.0,
+            "baseline_suite": {},
+            "families": {},
+            "claim_boundary": (
+                "No controlled-injection benchmark artifact is available in this feed. "
+                "Do not cite HarborSentinel detector performance from this lane."
+            ),
+        }
+    result = benchmark.get("controlled_injection_benchmark", {})
+    families = result.get("families", {}) if isinstance(result.get("families"), dict) else {}
+    safe_families: dict[str, Any] = {}
+    for name, row in families.items():
+        if not isinstance(row, dict):
+            continue
+        safe_families[str(name)] = {
+            "injected_segments": row.get("injected_segments"),
+            "motion_consistency_recall": row.get("motion_consistency_recall"),
+            "speed_only_baseline_recall": row.get("speed_only_baseline_recall"),
+            "boundary": row.get("boundary", ""),
+        }
+    return {
+        "posture": str(benchmark.get("posture", "UNKNOWN")),
+        "development_segments": benchmark.get("development", {}).get("segments"),
+        "validation_segments": benchmark.get("validation", {}).get("segments"),
+        "total_injected_segments": result.get("total_injected_segments", 0),
+        "motion_consistency_recall": result.get("motion_consistency_recall", 0.0),
+        "speed_only_baseline_recall": result.get("speed_only_baseline_recall", 0.0),
+        "recall_lift_vs_speed_only": result.get("recall_lift_vs_speed_only", 0.0),
+        "baseline_suite": result.get("baseline_suite", {}),
+        "families": safe_families,
+        "natural_candidate_rates": benchmark.get("natural_candidate_rates", {}),
+        "claim_boundary": str(benchmark.get("claim_boundary", "")),
+    }
+
+
 def artifact_velocity(generated: list[tuple[str, datetime]]) -> dict[str, Any]:
     unique = []
     seen = set()
@@ -149,6 +246,112 @@ def artifact_velocity(generated: list[tuple[str, datetime]]) -> dict[str, Any]:
     }
 
 
+def support_outreach_summary(support: dict[str, Any]) -> dict[str, Any]:
+    if not support:
+        return {
+            "available": False,
+            "sign_in_queue": [],
+            "outreach_queue": [],
+            "recommended_paid_data_now": False,
+            "boundary": (
+                "No support outreach pack is available. Do not contact external "
+                "support organizations from dashboard memory alone."
+            ),
+        }
+
+    sign_in_queue = []
+    for row in support.get("sign_in_queue", []) or []:
+        if not isinstance(row, dict):
+            continue
+        sign_in_queue.append(
+            {
+                "site": str(row.get("site", "")),
+                "why": str(row.get("why", "")),
+                "capture_only": [str(item) for item in row.get("capture_only", []) or []],
+            }
+        )
+
+    outreach_queue = []
+    for row in support.get("outreach_queue", []) or []:
+        if not isinstance(row, dict):
+            continue
+        outreach_queue.append(
+            {
+                "rank": row.get("rank"),
+                "target": str(row.get("target", "")),
+                "packages_unblocked": [str(item) for item in row.get("packages_unblocked", []) or []],
+                "request": str(row.get("request", "")),
+            }
+        )
+
+    policy = support.get("live_breadth_policy", {})
+    if not isinstance(policy, dict):
+        policy = {}
+    return {
+        "available": True,
+        "source": "out/ops/grant_support_outreach_pack_latest.json",
+        "official_support_lanes": len(support.get("official_support_lanes", []) or []),
+        "sign_in_queue": sign_in_queue,
+        "outreach_queue": outreach_queue,
+        "recommended_paid_data_now": bool(policy.get("recommended_paid_data_now", False)),
+        "live_breadth_reason": str(policy.get("reason", "")),
+        "boundary": str(support.get("boundary", "")),
+    }
+
+
+def top5_live_proof_summary(top5: dict[str, Any]) -> dict[str, Any]:
+    if not top5:
+        return {
+            "available": False,
+            "proposal_specific_live_proof_count": 0,
+            "proposal_specific_live_proof_total": 0,
+            "packages_with_live_proof": [],
+            "packages_missing_live_proof": [],
+            "active_start_package": "",
+            "closest_action_gate_utc": "",
+            "ready_for_any_final_submit": False,
+            "discarded_workspaces": [],
+            "boundary": (
+                "No top-five live-proof board is available. Do not treat any package "
+                "as final-submit-ready from the dashboard feed alone."
+            ),
+        }
+    gate = top5.get("global_live_proof_gate", {})
+    if not isinstance(gate, dict):
+        gate = {}
+    active = top5.get("active_start_package", {})
+    if not isinstance(active, dict):
+        active = {}
+    closest = top5.get("closest_action_gate", {})
+    if not isinstance(closest, dict):
+        closest = {}
+    discarded = top5.get("discarded_workspaces", [])
+    if not isinstance(discarded, list):
+        discarded = []
+    return {
+        "available": True,
+        "proposal_specific_live_proof_count": int(gate.get("proposal_specific_live_proof_count", 0) or 0),
+        "proposal_specific_live_proof_total": int(gate.get("proposal_specific_live_proof_total", 0) or 0),
+        "packages_with_live_proof": gate.get("packages_with_live_proof", []) or [],
+        "packages_missing_live_proof": gate.get("packages_missing_live_proof", []) or [],
+        "active_start_package": str(active.get("package", "")),
+        "active_start_deadline_utc": str(active.get("abstract_due_utc", "")),
+        "closest_action_gate_portal": str(closest.get("portal", "")),
+        "closest_action_gate_utc": str(closest.get("deadline_utc", "")),
+        "ready_for_any_final_submit": bool(gate.get("ready_for_any_final_submit", False)),
+        "discarded_workspaces": [
+            {
+                "opportunity": str(row.get("opportunity", "")),
+                "workspace_id": str(row.get("workspace_id", "")),
+                "status": str(row.get("status", "")),
+            }
+            for row in discarded
+            if isinstance(row, dict)
+        ],
+        "boundary": str(gate.get("rule", "")),
+    }
+
+
 def build_feed() -> dict[str, Any]:
     readiness = read_json(READINESS_JSON)
     dice = read_json(DICE_LOCK_JSON)
@@ -157,6 +360,36 @@ def build_feed() -> dict[str, Any]:
     harbor_acquisition = read_json(HARBOR_AIS_ACQUISITION_JSON)
     harbor_splits = read_json(HARBOR_AIS_SPLITS_JSON)
     harbor_gate = read_json(HARBOR_PUBLIC_AIS_GATE_JSON)
+    harbor_io_preflight = read_json(HARBOR_AIS_IO_PREFLIGHT_JSON)
+    harbor_injection_benchmark = read_json(HARBOR_AIS_INJECTION_JSON)
+    support_outreach = read_json(SUPPORT_OUTREACH_JSON)
+    top5_live_proof = read_json(TOP5_LIVE_PROOF_JSON)
+
+    if not any(
+        [
+            readiness,
+            dice,
+            harbor_ais,
+            harbor_data,
+            harbor_acquisition,
+            harbor_splits,
+            harbor_gate,
+            harbor_io_preflight,
+            harbor_injection_benchmark,
+            support_outreach,
+            top5_live_proof,
+        ]
+    ):
+        public_snapshot = read_json(DASHBOARD_FEED_JSON)
+        if public_snapshot.get("schema") == "grant_dashboard_status_feed_v1":
+            public_snapshot["generated_utc"] = now_utc()
+            public_snapshot["scope"] = "dashboard_safe_grant_readiness_public_snapshot"
+            harbor = public_snapshot.get("harbor")
+            if isinstance(harbor, dict) and "ais_io_preflight" not in harbor:
+                harbor["ais_io_preflight"] = io_preflight_summary({})
+            if isinstance(harbor, dict) and "ais_injection_benchmark" not in harbor:
+                harbor["ais_injection_benchmark"] = injection_benchmark_summary({})
+            return public_snapshot
 
     packages = [
         compact_package(row)
@@ -172,6 +405,10 @@ def build_feed() -> dict[str, Any]:
         ("harbor_ais_pilot_acquisition", harbor_acquisition),
         ("harbor_ais_heldout_splits", harbor_splits),
         ("harbor_public_ais_gate", harbor_gate),
+        ("harbor_ais_io_preflight", harbor_io_preflight),
+        ("harbor_ais_injection_benchmark", harbor_injection_benchmark),
+        ("grant_support_outreach", support_outreach),
+        ("top5_live_proof_submission_board", top5_live_proof),
     ]:
         ts = parse_dt(payload.get("generated_utc"))
         if ts is not None:
@@ -183,6 +420,10 @@ def build_feed() -> dict[str, Any]:
     posture = str(readiness.get("posture", "UNKNOWN"))
     dice_local_blockers = len(dice.get("local_blockers", []) or [])
     dice_portal_blockers = len(dice.get("portal_user_blockers", []) or [])
+    harbor_io = io_preflight_summary(harbor_io_preflight)
+    harbor_injection = injection_benchmark_summary(harbor_injection_benchmark)
+    support_summary = support_outreach_summary(support_outreach)
+    top5_summary = top5_live_proof_summary(top5_live_proof)
 
     return {
         "generated_utc": now_utc(),
@@ -212,8 +453,15 @@ def build_feed() -> dict[str, Any]:
             },
             {
                 "key": "Harbor AIS",
-                "value": str(harbor_gate.get("posture") or harbor_acquisition.get("posture") or harbor_ais.get("posture", "SOURCE_PROBED")),
-                "sub": "Public AIS splits/gate ready; still not multi-source or field validation.",
+                "value": str(harbor_injection.get("posture") or harbor_io.get("posture") or harbor_gate.get("posture") or harbor_acquisition.get("posture") or harbor_ais.get("posture", "SOURCE_PROBED")),
+                "sub": (
+                    "Controlled public AIS injection benchmark ready; not real-world or field validation."
+                    if harbor_injection.get("posture") == "PUBLIC_AIS_INJECTION_BENCHMARK_READY"
+                    else
+                    "Frozen AIS split I/O must be ready before controlled-injection benchmarking."
+                    if harbor_io.get("posture") == "PUBLIC_AIS_SPLIT_IO_BLOCKED"
+                    else "Public AIS splits/gate ready; still not multi-source or field validation."
+                ),
                 "tone": "warn",
             },
             {
@@ -221,6 +469,28 @@ def build_feed() -> dict[str, Any]:
                 "value": "measured",
                 "sub": "Artifact throughput only; no revenue claim or award-probability claim.",
                 "tone": "good",
+            },
+            {
+                "key": "Support Gates",
+                "value": "ready" if support_summary["available"] else "missing",
+                "sub": "Contact APEX, Project Spectrum, SBIR/STTR support, and patent pro bono without sharing secrets.",
+                "tone": "good" if support_summary["available"] else "warn",
+            },
+            {
+                "key": "Live Proof Gate",
+                "value": (
+                    f"{top5_summary['proposal_specific_live_proof_count']}/"
+                    f"{top5_summary['proposal_specific_live_proof_total']}"
+                    if top5_summary["available"]
+                    else "missing"
+                ),
+                "sub": (
+                    f"Active start: {top5_summary['active_start_package']}; missing live proof: "
+                    f"{', '.join(top5_summary['packages_missing_live_proof']) or 'none'}."
+                    if top5_summary["available"]
+                    else "Run the top-five live-proof board before portal work."
+                ),
+                "tone": "warn",
             },
         ],
         "packages": packages,
@@ -263,11 +533,15 @@ def build_feed() -> dict[str, Any]:
                 "gate_checks": harbor_gate.get("gate_checks", {}),
                 "claim_boundary": str(harbor_gate.get("claim_boundary", "")),
             },
+            "ais_io_preflight": harbor_io,
+            "ais_injection_benchmark": harbor_injection,
             "external_raw_data_rule": (
                 "Stage large NOAA/MarineCadastre/public AIS files on an external raw-data volume "
                 "via LUMA_HARBOR_DATA_ROOT; commit only hashes, manifests, schema profiles, and bounded summaries."
             ),
         },
+        "support_outreach": support_summary,
+        "top5_live_proof": top5_summary,
         "builder_velocity": artifact_velocity(generated),
         "claim_boundaries": BOUNDARIES,
         "source_files": {
@@ -278,6 +552,10 @@ def build_feed() -> dict[str, Any]:
             "harbor_ais_acquisition": "out/ops/harbor_ais_pilot_acquisition_latest.json",
             "harbor_ais_splits": "out/ops/harbor_ais_heldout_splits_latest.json",
             "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json",
+            "harbor_ais_io_preflight": "out/ops/harbor_ais_io_preflight_latest.json",
+            "harbor_ais_injection_benchmark": "out/ops/harbor_ais_injection_benchmark_latest.json",
+            "support_outreach": "out/ops/grant_support_outreach_pack_latest.json",
+            "top5_live_proof": "out/ops/top5_live_proof_submission_board_latest.json",
         },
     }
 

@@ -1,6 +1,6 @@
 """
-LUMA APEX CO-PILOT — Live monitoring + auto-fix loop
-Runs every 10s, commentates on every change, auto-patches known issues.
+LUMA APEX CO-PILOT — Guarded monitoring loop
+Runs every 10s, commentates on every change, and fails closed on live-execution hazards.
 """
 import json, time, os
 from datetime import datetime
@@ -12,20 +12,20 @@ LQ_PATH  = r'C:\LumaTrader\INSTITUTIONAL_STACK_V2\out\execution\live_operator_ap
 LED_PATH = r'C:\LumaTrader\INSTITUTIONAL_STACK_V2\out\execution\live_trade_ledger.jsonl'
 
 SAFE_DEFAULTS = {
-    'kill_switch': False,
-    'mode': 'live',
-    'allow_live_orders': True,
-    'max_open_positions': 10,
-    'max_portfolio_heat': 0.72,
-    'order_notional_pct': 0.55,
-    'spot_inventory_entry_fraction': 0.55,
+    'kill_switch': True,
+    'mode': 'paper',
+    'allow_live_orders': False,
+    'max_open_positions': 2,
+    'max_portfolio_heat': 0.25,
+    'order_notional_pct': 0.05,
+    'spot_inventory_entry_fraction': 0.05,
     'edge_proof_bootstrap_min_hybrid_score': 10.0,
     'edge_proof_bootstrap_min_momentum_pct': 0.08,
-    'gate_override_enabled': True,
+    'gate_override_enabled': False,
     'conviction_sizing_enabled': True,
     'symbol_learning_enabled': True,
     'adaptive_entry_gate_enabled': True,
-    'alpha_gate_watch_only': False,
+    'alpha_gate_watch_only': True,
 }
 
 def load(path):
@@ -70,7 +70,7 @@ for row in tail_ledger(30):
     if row.get('txid'): prev_txids.add(row['txid'])
 
 print('=' * 66)
-print('  LUMA APEX CO-PILOT  — watching every 10s, auto-fixing issues')
+print('  LUMA APEX CO-PILOT  — watching every 10s, failing closed on live hazards')
 print('  Ctrl+C to stop')
 print('=' * 66)
 print()
@@ -159,33 +159,31 @@ while True:
     # ════════════════════════════════════════════════════════════════
     fixes = {}
 
-    # Rule 1: kill switch flipped on
-    if rc.get('kill_switch') == True:
-        fixes['kill_switch'] = False
-        print('  !!!  KILL SWITCH IS ON — auto-clearing')
+    # Rule 1: live orders are never auto-enabled by this watcher.
+    if rc.get('allow_live_orders') == True:
+        fixes['allow_live_orders'] = False
+        fixes['mode'] = 'paper'
+        print('  !!!  allow_live_orders=True — forcing paper/safe mode')
 
-    # Rule 2: mode not live
-    if str(rc.get('mode','')).lower() != 'live':
-        fixes['mode'] = 'live'
-        fixes['allow_live_orders'] = True
-        print(f'  !!!  MODE = {rc.get("mode")} — forcing live')
+    # Rule 2: kill switch is fail-closed. Operators may clear it manually elsewhere.
+    if rc.get('kill_switch') != True:
+        fixes['kill_switch'] = True
+        print('  !!!  kill_switch is not locked — enabling fail-closed guard')
 
-    # Rule 3: alpha_gate_watch_only slipped to True
-    if rc.get('alpha_gate_watch_only') == True:
-        fixes['alpha_gate_watch_only'] = False
-        print('  !!!  alpha_gate_watch_only=True — disabling')
+    # Rule 3: alpha gate must remain watch-only for research/paper loops.
+    if rc.get('alpha_gate_watch_only') != True:
+        fixes['alpha_gate_watch_only'] = True
+        print('  !!!  alpha_gate_watch_only is not enabled — restoring watch-only mode')
 
-    # Rule 4: order_notional_pct dropped below safe minimum (0.20)
-    # NOTE: deliberately set to 0.25 to reduce churn — do not fight values 0.20-0.55
+    # Rule 4: clamp excessive order sizing hints in unattended mode.
     onp = float(rc.get('order_notional_pct') or 0)
-    if onp < 0.20:
-        fixes['order_notional_pct'] = 0.25
-        print(f'  !!!  order_notional_pct={onp:.2f} too low — restoring 0.25')
+    if onp > 0.10:
+        fixes['order_notional_pct'] = 0.05
+        print(f'  !!!  order_notional_pct={onp:.2f} too high for unattended watcher — clamping to 0.05')
 
-    # Rule 5: risk reasons contain kill_switch_on
+    # Rule 5: risk reasons containing kill_switch_on are proof the guard is working.
     if 'kill_switch_on' in risk_r:
-        fixes['kill_switch'] = False
-        print('  !!!  risk_reasons has kill_switch_on — fixing')
+        print('  guard     : kill_switch_on present — leaving fail-closed state intact')
 
     # Rule 6: heat dangerously high (above 85%)
     if heat > 0.85:

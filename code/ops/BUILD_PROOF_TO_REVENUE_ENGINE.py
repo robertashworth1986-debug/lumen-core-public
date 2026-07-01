@@ -165,6 +165,11 @@ def build_payload() -> dict[str, Any]:
         if live_hash_verified and champion_ready and manual_outreach_ready
         else "proof_stack_not_ready_for_outreach"
     )
+    deployment_phrase = (
+        "public hashes match"
+        if live_hash_verified
+        else "public hash verification is still pending"
+    )
     safest_first_offer = {
         "name": "Paid evidence review / field replay scoping",
         "pricing_posture": "quote after scope; no fixed delta price yet",
@@ -201,7 +206,7 @@ def build_payload() -> dict[str, Any]:
             "fixed_frozen_delta_price_claim_allowed": False,
             "live_trading_or_autonomous_execution_allowed": False,
             "plain_english_answer": (
-                "The proof stack is now strong enough for manually reviewed paid-pilot outreach: public hashes match, "
+                f"The proof stack has manually reviewable pilot material, but {deployment_phrase}. "
                 f"{gauntlet_summary.get('champion_label')} beat {gauntlet_summary.get('named_baseline')} on "
                 f"{gauntlet_summary.get('holdout_wins')}/{gauntlet_summary.get('holdout_count')} holdouts, and the "
                 "next money gate is buyer-authorized field replay. It is not yet a realized savings claim."

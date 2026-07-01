@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-20T07:56:39.338681+00:00",
+  "generated_utc": "2026-06-22T18:11:29.633235+00:00",
   "schema": "grant_dashboard_status_feed_v1",
   "scope": "dashboard_safe_grant_readiness",
   "posture": "LOCAL_READY_PORTAL_BLOCKED",
@@ -26,8 +26,8 @@
     },
     {
       "key": "Harbor AIS",
-      "value": "PUBLIC_AIS_SINGLE_LANE_GATE_READY",
-      "sub": "Public AIS splits/gate ready; still not multi-source or field validation.",
+      "value": "PUBLIC_AIS_INJECTION_BENCHMARK_READY",
+      "sub": "Controlled public AIS injection benchmark ready; not real-world or field validation.",
       "tone": "warn"
     },
     {
@@ -35,6 +35,18 @@
       "value": "measured",
       "sub": "Artifact throughput only; no revenue claim or award-probability claim.",
       "tone": "good"
+    },
+    {
+      "key": "Support Gates",
+      "value": "ready",
+      "sub": "Contact APEX, Project Spectrum, SBIR/STTR support, and patent pro bono without sharing secrets.",
+      "tone": "good"
+    },
+    {
+      "key": "Live Proof Gate",
+      "value": "2/5",
+      "sub": "Active start: DICE; missing live proof: NSF Project Pitch, MissionWeave, NV065.",
+      "tone": "warn"
     }
   ],
   "packages": [
@@ -42,10 +54,10 @@
       "name": "DICE",
       "portal": "DARPA BAAT",
       "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
-      "required_artifacts_present": 8,
-      "required_artifacts_total": 8,
-      "manifest_matched": 6,
-      "manifest_expected": 6,
+      "required_artifacts_present": 13,
+      "required_artifacts_total": 13,
+      "manifest_matched": 11,
+      "manifest_expected": 11,
       "render_ok": true,
       "local_blockers": 0,
       "portal_user_blockers": 6
@@ -54,10 +66,10 @@
       "name": "HarborSentinel",
       "portal": "DSIP",
       "readiness": "LOCAL_READY_PORTAL_BLOCKED_USER_GATES",
-      "required_artifacts_present": 12,
-      "required_artifacts_total": 12,
-      "manifest_matched": 4,
-      "manifest_expected": 4,
+      "required_artifacts_present": 17,
+      "required_artifacts_total": 17,
+      "manifest_matched": 8,
+      "manifest_expected": 8,
       "render_ok": true,
       "local_blockers": 0,
       "portal_user_blockers": 5
@@ -209,16 +221,302 @@
       },
       "claim_boundary": "This gate establishes public AIS single-lane data readiness, schema coverage, track overlap, and frozen development-to-validation diagnostics. It does not establish HarborSentinel detection performance, multi-source fusion performance, ADS-B licensing, radar validation, Navy/SSDS integration, field performance, or operational suitability."
     },
+    "ais_io_preflight": {
+      "posture": "PUBLIC_AIS_SPLIT_IO_READY",
+      "required_ok": 2,
+      "required_files": 2,
+      "all_required_ok": true,
+      "any_timeout": false,
+      "full_hash_match_count": 2,
+      "timeout_seconds": 10.0,
+      "sample_bytes": 4096,
+      "full_hash": true,
+      "probes": [
+        {
+          "label": "development",
+          "status": "ok",
+          "ok": true,
+          "expected_bytes": 5598389,
+          "actual_bytes": 5598389,
+          "size_matches": true,
+          "sample_bytes_read": 4096,
+          "timeout_seconds": null,
+          "elapsed_seconds": 0.0,
+          "full_hash_requested": true,
+          "sha256_matches": true
+        },
+        {
+          "label": "validation",
+          "status": "ok",
+          "ok": true,
+          "expected_bytes": 5595298,
+          "actual_bytes": 5595298,
+          "size_matches": true,
+          "sample_bytes_read": 4096,
+          "timeout_seconds": null,
+          "elapsed_seconds": 0.0,
+          "full_hash_requested": true,
+          "sha256_matches": true
+        }
+      ],
+      "next_gate": "Add stronger baselines and labeled or adjudicated validation before claiming precision, false-positive rate, multi-source fusion, ADS-B/radar validation, or field performance.",
+      "claim_boundary": "This preflight proves that the required frozen public AIS split files are reachable, sample-readable within the configured timeout, and full-file SHA-256 matched against the frozen split manifest. It does not establish HarborSentinel detection performance, multi-source fusion, ADS-B or radar validation, Navy/SSDS integration, field performance, or operational suitability."
+    },
+    "ais_injection_benchmark": {
+      "posture": "PUBLIC_AIS_INJECTION_BENCHMARK_READY",
+      "development_segments": 48624,
+      "validation_segments": 48616,
+      "total_injected_segments": 20000,
+      "motion_consistency_recall": 1.0,
+      "speed_only_baseline_recall": 0.25835,
+      "recall_lift_vs_speed_only": 0.7416499999999999,
+      "baseline_suite": {
+        "baselines": {
+          "reported_speed_sog_p99": {
+            "description": "Flags only segments whose AIS reported SOG exceeds the development p99 SOG threshold.",
+            "recall": 0.25835,
+            "recall_gap_vs_motion_consistency": 0.7416499999999999,
+            "family_recalls": {
+              "speed_burst": 1.0,
+              "position_jump": 0.0116,
+              "heading_snap": 0.009,
+              "consistency_gap": 0.0128
+            }
+          },
+          "derived_trajectory_speed_p99": {
+            "description": "Flags only segments whose point-to-point derived trajectory speed exceeds the development p99 derived-speed threshold.",
+            "recall": 0.5053,
+            "recall_gap_vs_motion_consistency": 0.49470000000000003,
+            "family_recalls": {
+              "speed_burst": 1.0,
+              "position_jump": 1.0,
+              "heading_snap": 0.0104,
+              "consistency_gap": 0.0108
+            }
+          },
+          "speed_gap_consistency_p99": {
+            "description": "Flags only segments whose AIS SOG versus derived-speed gap exceeds the development p99 consistency-gap threshold.",
+            "recall": 0.5068,
+            "recall_gap_vs_motion_consistency": 0.49319999999999997,
+            "family_recalls": {
+              "speed_burst": 0.0156,
+              "position_jump": 1.0,
+              "heading_snap": 0.0116,
+              "consistency_gap": 1.0
+            }
+          },
+          "heading_rate_p99": {
+            "description": "Flags only segments whose heading-change rate exceeds the development p99 turn-rate threshold.",
+            "recall": 0.2575,
+            "recall_gap_vs_motion_consistency": 0.7424999999999999,
+            "family_recalls": {
+              "speed_burst": 0.0104,
+              "position_jump": 0.0096,
+              "heading_snap": 1.0,
+              "consistency_gap": 0.01
+            }
+          }
+        },
+        "best_single_axis_baseline": {
+          "name": "speed_gap_consistency_p99",
+          "recall": 0.5068,
+          "recall_gap_vs_motion_consistency": 0.49319999999999997
+        },
+        "boundary": "Baseline suite compares single-axis frozen p99 detectors on controlled injections. It is not a labeled false-positive or operational-performance comparison."
+      },
+      "families": {
+        "speed_burst": {
+          "injected_segments": 5000,
+          "motion_consistency_recall": 1.0,
+          "speed_only_baseline_recall": 1.0,
+          "boundary": "Controlled kinematic injection on public AIS validation segments; not a real threat label."
+        },
+        "position_jump": {
+          "injected_segments": 5000,
+          "motion_consistency_recall": 1.0,
+          "speed_only_baseline_recall": 0.0116,
+          "boundary": "Controlled kinematic injection on public AIS validation segments; not a real threat label."
+        },
+        "heading_snap": {
+          "injected_segments": 5000,
+          "motion_consistency_recall": 1.0,
+          "speed_only_baseline_recall": 0.009,
+          "boundary": "Controlled kinematic injection on public AIS validation segments; not a real threat label."
+        },
+        "consistency_gap": {
+          "injected_segments": 5000,
+          "motion_consistency_recall": 1.0,
+          "speed_only_baseline_recall": 0.0128,
+          "boundary": "Controlled kinematic injection on public AIS validation segments; not a real threat label."
+        }
+      },
+      "natural_candidate_rates": {
+        "development_motion_candidate_rate": 0.029059723593287266,
+        "validation_motion_candidate_rate": 0.03583182491360869,
+        "development_speed_only_candidate_rate": 0.009912800263244488,
+        "validation_speed_only_candidate_rate": 0.0109428994569689,
+        "baseline_candidate_rates": {
+          "reported_speed_sog_p99": {
+            "development": 0.009912800263244488,
+            "validation": 0.0109428994569689
+          },
+          "derived_trajectory_speed_p99": {
+            "development": 0.010015630141493913,
+            "validation": 0.011045746256376502
+          },
+          "speed_gap_consistency_p99": {
+            "development": 0.010015630141493913,
+            "validation": 0.015550436070429488
+          },
+          "heading_rate_p99": {
+            "development": 0.010015630141493913,
+            "validation": 0.01051094289945697
+          }
+        },
+        "boundary": "Natural candidate rates are unlabeled review queues, not false-positive rates."
+      },
+      "claim_boundary": "This is a held-out public AIS controlled-injection benchmark. It demonstrates that a frozen development-threshold motion-consistency detector catches injected kinematic perturbations on validation AIS segments better than multiple single-axis frozen p99 baselines. It does not establish HarborSentinel operational detection performance, real adversary detection, multi-source fusion, ADS-B/radar validation, Navy/SSDS integration, field performance, or operational suitability."
+    },
     "external_raw_data_rule": "Stage large NOAA/MarineCadastre/public AIS files on an external raw-data volume via LUMA_HARBOR_DATA_ROOT; commit only hashes, manifests, schema profiles, and bounded summaries."
   },
+  "support_outreach": {
+    "available": true,
+    "source": "out/ops/grant_support_outreach_pack_latest.json",
+    "official_support_lanes": 5,
+    "sign_in_queue": [
+      {
+        "site": "DARPA BAAT",
+        "why": "DICE is the first local-ready package; BAAT must confirm organization, role, DICE opportunity visibility, accepted file types, and preview behavior.",
+        "capture_only": [
+          "organization visible",
+          "submitter role",
+          "opportunity visible",
+          "file requirements",
+          "preview status"
+        ]
+      },
+      {
+        "site": "DSIP",
+        "why": "HarborSentinel and later Navy/DLA packages need DSIP topic visibility, organization linkage, forms, and compliance gates.",
+        "capture_only": [
+          "organization linked",
+          "topic visible",
+          "volume/form requirements",
+          "compliance prompts",
+          "preview status"
+        ]
+      },
+      {
+        "site": "PIEE / SPRS",
+        "why": "CMMC/SPRS/Affirming Official status cannot be guessed. We need the factual status or a documented unknown.",
+        "capture_only": [
+          "role access present or missing",
+          "CAGE hierarchy visible or missing",
+          "score/status present or missing",
+          "next required role"
+        ]
+      },
+      {
+        "site": "NSF Project Pitch",
+        "why": "Fastest low-friction non-DoD path if duplicate-pitch status, legal name, PI title, and paste counts are clean.",
+        "capture_only": [
+          "legal business name",
+          "PI/founder title",
+          "duplicate/open-invitation status",
+          "field paste counts"
+        ]
+      },
+      {
+        "site": "USPTO Patent Center / regional Patent Pro Bono intake",
+        "why": "Patent deadline is a real legal-risk gate; a patent attorney or agent must advise the correct rescue path.",
+        "capture_only": [
+          "application number/date if user approves",
+          "one-year deadline",
+          "regional intake requirements",
+          "attorney/agent next step"
+        ]
+      }
+    ],
+    "outreach_queue": [
+      {
+        "rank": 1,
+        "target": "Local APEX Accelerator counselor",
+        "packages_unblocked": [
+          "DICE",
+          "HarborSentinel",
+          "MissionWeave",
+          "NV065"
+        ],
+        "request": "Review federal portal readiness, small-business contracting representations, and submitter-role blockers."
+      },
+      {
+        "rank": 2,
+        "target": "Project Spectrum / DoD cyber support",
+        "packages_unblocked": [
+          "HarborSentinel",
+          "MissionWeave",
+          "NV065"
+        ],
+        "request": "Clarify CMMC/SPRS/PIEE facts and the safest documented path before answering cyber representations."
+      },
+      {
+        "rank": 3,
+        "target": "Regional USPTO Patent Pro Bono intake",
+        "packages_unblocked": [
+          "Patent/legal rescue"
+        ],
+        "request": "Route urgent provisional-to-non-provisional deadline review to a qualified patent attorney or agent."
+      },
+      {
+        "rank": 4,
+        "target": "Local or regional SBIR/STTR FAST support organization",
+        "packages_unblocked": [
+          "DICE",
+          "HarborSentinel",
+          "NSF Project Pitch"
+        ],
+        "request": "Agency-fit and Phase I proposal coaching for the strongest local-ready packages."
+      }
+    ],
+    "recommended_paid_data_now": false,
+    "live_breadth_reason": "The current blockers are portal authority, compliance facts, cost/domain review, and evidence boundaries. More live data should be bought only after a benchmark gate proves that it will test a specific falsifiable edge.",
+    "boundary": "This pack helps the founder contact support organizations and capture non-secret readiness facts. It does not authorize upload, certification, signature, submission, legal representation, trading, or investment claims."
+  },
+  "top5_live_proof": {
+    "available": true,
+    "proposal_specific_live_proof_count": 2,
+    "proposal_specific_live_proof_total": 5,
+    "packages_with_live_proof": [
+      "DICE",
+      "HarborSentinel"
+    ],
+    "packages_missing_live_proof": [
+      "NSF Project Pitch",
+      "MissionWeave",
+      "NV065"
+    ],
+    "active_start_package": "DICE",
+    "active_start_deadline_utc": "2026-06-30T18:00:00+00:00",
+    "closest_action_gate_portal": "DSIP",
+    "closest_action_gate_utc": "2026-06-24T12:00:00+00:00",
+    "ready_for_any_final_submit": false,
+    "discarded_workspaces": [
+      {
+        "opportunity": "PDR-2600-DC-029Q",
+        "workspace_id": "WS01676964",
+        "status": "DISCARD_NO_SUBMIT"
+      }
+    ],
+    "boundary": "No final grant submit until the exact proposal has proposal-specific live proof and portal/compliance/action-time gates pass."
+  },
   "builder_velocity": {
-    "artifact_count": 7,
+    "artifact_count": 11,
     "window_start_utc": "2026-06-20T01:53:36.675109+00:00",
-    "window_end_utc": "2026-06-20T07:54:09.658797+00:00",
-    "window_seconds": 21632.984,
-    "per_second": 0.000324,
-    "per_minute": 0.019,
-    "per_hour": 1.165,
+    "window_end_utc": "2026-06-22T18:10:47.841526+00:00",
+    "window_seconds": 231431.166,
+    "per_second": 4.8e-05,
+    "per_minute": 0.003,
+    "per_hour": 0.171,
     "measurement_boundary": "Rate is computed only from timestamped local artifacts in this feed. It is not a model benchmark, labor-cost estimate, revenue claim, or funding probability."
   },
   "claim_boundaries": [
@@ -226,6 +524,8 @@
     "Portal authority, certifications, and action-time submit approval remain user gates.",
     "Synthetic benchmarks support bounded software feasibility only, not field validation.",
     "HarborSentinel public AIS has raw acquisition, held-out splits, and a single-lane readiness gate; this is data-readiness evidence, not detection-performance or field validation.",
+    "HarborSentinel controlled-injection benchmarking is detector-vs-baseline evidence on public AIS perturbations, not real adversary detection, multi-source fusion, or field validation.",
+    "No proposal is final-submit-ready unless its proposal-specific live-proof gate and portal/action-time gates pass.",
     "Trading, Kraken, live-breadth, or frozen-delta artifacts must not be cited as profit proof."
   ],
   "source_files": {
@@ -235,6 +535,10 @@
     "harbor_data": "out/ops/harbor_data_source_readiness_audit_latest.json",
     "harbor_ais_acquisition": "out/ops/harbor_ais_pilot_acquisition_latest.json",
     "harbor_ais_splits": "out/ops/harbor_ais_heldout_splits_latest.json",
-    "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json"
+    "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json",
+    "harbor_ais_io_preflight": "out/ops/harbor_ais_io_preflight_latest.json",
+    "harbor_ais_injection_benchmark": "out/ops/harbor_ais_injection_benchmark_latest.json",
+    "support_outreach": "out/ops/grant_support_outreach_pack_latest.json",
+    "top5_live_proof": "out/ops/top5_live_proof_submission_board_latest.json"
   }
 }

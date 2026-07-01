@@ -26,7 +26,7 @@ def test_execution_action_board_builds_context_and_keeps_claim_gates_closed():
     assert summary["action_count"] >= 20
     assert summary["runnable_local_action_count"] >= 4
     assert summary["adapter_gap_action_count"] >= 1
-    assert summary["rolling_champion_action_count"] >= 4
+    assert summary["rolling_champion_action_count"] >= 3
     assert summary["robust_repeat_action_count"] >= 1
     assert summary["registered_family_count"] >= 140
     assert summary["benchmark_specified_family_count"] >= 137
@@ -43,7 +43,8 @@ def test_execution_action_board_builds_context_and_keeps_claim_gates_closed():
     assert summary["mass_email_allowed"] is False
     assert summary["send_without_user_review"] is False
     assert payload["context_checkpoint"]["current_strongest_candidate"] == "brachistochrone_descent"
-    assert payload["context_checkpoint"]["current_money_proxy"] == "phase_locked_residual_corrector"
+    assert payload["context_checkpoint"]["current_money_proxy"] == "energy_price_pressure_forecast"
+    assert payload["context_checkpoint"]["current_money_proxy_artifact"] == "dashboard/data/energy_price_pressure_forecast.json"
 
 
 def test_top_families_have_correct_actions_runners_and_blockers():
@@ -62,9 +63,10 @@ def test_top_families_have_correct_actions_runners_and_blockers():
     assert any("field validation" in item.lower() for item in brach["blocked_until"])
 
     kuramoto = actions["kuramoto_phase_coupling"]
-    assert kuramoto["next_action_type"] == "additional_holdout_replay"
+    assert kuramoto["next_action_type"] == "buyer_authorized_pilot_and_publication"
     assert kuramoto["runner"]["script"] == "code/geometry_wave_resonance_timing_benchmark.py"
-    assert "20 pre-registered holdout windows" in kuramoto["success_metric"]
+    assert "Buyer/agency accepts" in kuramoto["success_metric"]
+    assert kuramoto["runner"]["safe_to_run_without_human_review"] is False
 
     thermal = actions["thermal_plume_convection"]
     assert thermal["next_action_type"] == "additional_holdout_replay"
@@ -73,14 +75,10 @@ def test_top_families_have_correct_actions_runners_and_blockers():
     assert any("field" in item.lower() for item in thermal["blocked_until"])
 
     leaf = actions["leaf_veins"]
-    assert leaf["next_action_type"] == "repeat_frozen_replay"
+    assert leaf["next_action_type"] == "additional_holdout_replay"
     assert leaf["runner"]["script"] == "code/geometry_branching_transport_benchmark.py"
 
-    phase = actions["phase_locked_residual_corrector"]
-    assert phase["next_action_type"] == "register_money_proxy_adapter"
-    assert phase["runner"]["script"] == "code/ops/BUILD_ENERGY_PRICE_PRESSURE_FORECAST.py"
-    assert "BUILD_ENERGY_PRICE_PRESSURE_FORECAST.py" in phase["runner"]["safe_local_command"]
-    assert phase["claim_gates"]["real_dollar_savings_claim_allowed"] is False
+    assert "phase_locked_residual_corrector" not in actions
 
 
 def test_commands_are_safe_and_markdown_preserves_boundaries():

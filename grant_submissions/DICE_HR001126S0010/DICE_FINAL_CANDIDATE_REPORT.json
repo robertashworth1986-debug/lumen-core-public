@@ -1,0 +1,25 @@
+{
+  "source_docx": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\grant_submissions\\DICE_HR001126S0010\\LumenCore_DICE_Abstract_WORKING_DRAFT.docx",
+  "final_docx": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\grant_submissions\\DICE_HR001126S0010\\LumenCore_DICE_Abstract_FINAL_CANDIDATE.docx",
+  "portal_zip": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\grant_submissions\\DICE_HR001126S0010\\LumenCore_DICE_Abstract_PORTAL_UPLOAD.zip",
+  "warning_present": false,
+  "required_sections_present": {
+    "1. Goals and Impact": true,
+    "2. Technical Approach": true,
+    "3. Capabilities/Management Plan": true,
+    "4. Cost and Schedule": true,
+    "5. Publications": true,
+    "6. Bibliography": true
+  },
+  "forbidden_placeholders_present": false,
+  "removed_warning_paragraphs": [
+    "WORKING DRAFT - NOT APPROVED FOR SUBMISSION"
+  ],
+  "final_docx_bytes": 33659,
+  "final_docx_sha256": "d54fc647a7eda47bcf31f4d21c0f67d089920e509a4039b7e9cef9f692f76a00",
+  "portal_zip_bytes": 32565,
+  "portal_zip_sha256": "f8486c3ad33f05b11e4ee115923b5d50ff5354cfc92b9a436af2064052c384b9",
+  "zip_members": [
+    "LumenCore_DICE_Abstract_FINAL_CANDIDATE.docx"
+  ]
+}

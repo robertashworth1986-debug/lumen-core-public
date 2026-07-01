@@ -43,6 +43,13 @@ produce a robust median forecasting improvement.
 
 ## Geometry And Phase Work
 
+The LumaUniverse family and provenance audit is recorded in
+`docs/LUMAUNIVERSE_RESEARCH_EVIDENCE_AUDIT_2026-06-18.md`. Fungus, bee, wolf,
+bird, and hibernation paths are currently candidate hypotheses, not completed
+findings: no implementation or frozen run under those names was located in the
+fetched Git refs or current workspace.
+
+
 Use the old concepts only when they map to a falsifiable mathematical role:
 
 - Phase locking: spectral phase stability used as a past-only activation gate.

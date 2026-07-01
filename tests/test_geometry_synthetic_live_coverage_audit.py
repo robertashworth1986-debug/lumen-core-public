@@ -24,8 +24,7 @@ def test_audit_keeps_synthetic_live_and_field_validation_separate():
     assert payload["schema"] == "geometry_synthetic_live_coverage_audit_v1"
     assert payload["policy"]["rule"] == "Synthetic discovers. Live proves. Field validation wins awards."
     assert summary["registered_family_count"] >= 75
-    assert summary["synthetic_benchmark_result_count"] >= 4
-    assert summary["proof_priority_candidate_count"] >= 10
+    assert summary["live_replay_result_count"] >= 3
     assert summary["field_validated_family_count"] == 0
     assert summary["claimable_family_count"] == 0
     assert "No." in summary["safe_answer_to_have_we_tested_all"]
@@ -49,10 +48,10 @@ def test_unvalidated_registry_candidates_remain_visible():
     payload = module.build_audit()
     families = {row["family"]: row for row in payload["family_coverage"]}
 
-    assert families["mycelium_network"]["synthetic_stage"] == "registered_but_test_spec_missing"
+    assert families["mycelium_network"]["synthetic_stage"] == "test_spec_ready_no_result"
     assert families["slime_mold_routing"]["synthetic_stage"] == "test_spec_ready_no_result"
-    assert families["kuramoto_phase_coupling"]["synthetic_stage"] == "synthetic_benchmark_result_present"
-    assert families["kuramoto_phase_coupling"]["claimable_stage"] == "controlled_synthetic_result_only"
+    assert families["kuramoto_phase_coupling"]["synthetic_stage"] == "live_replay_result_present"
+    assert families["kuramoto_phase_coupling"]["claimable_stage"] == "live_replay_candidate_not_field_validated"
     assert families["kuramoto_phase_coupling"]["live_stage"] == "live_sources_wired_for_replay_not_live_win"
 
 

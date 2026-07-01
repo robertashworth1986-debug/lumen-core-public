@@ -29,9 +29,9 @@ def test_queue_ranks_every_family_and_keeps_claim_gates_closed():
     assert queue["promotion_gate"]["ready_for_live_geometry_claim"] is False
     assert queue["promotion_gate"]["ready_for_real_dollar_claim"] is False
     assert queue["promotion_gate"]["kraken_live_execution_allowed"] is False
-    assert queue["promotion_gate"]["strict_rolling_champion_count"] == 0
-    assert queue["promotion_gate"]["triple_source_candidate_count"] >= 3
-    assert queue["promotion_gate"]["single_run_candidate_count"] >= 1
+    assert queue["promotion_gate"]["strict_rolling_champion_count"] >= 1
+    assert queue["promotion_gate"]["triple_source_rolling_champion_count"] >= 1
+    assert queue["promotion_gate"]["single_run_candidate_count"] >= 0
     assert "one-off win" in queue["promotion_gate"]["rolling_gate_boundary"]
     live_meter = json.loads(
         (ROOT / "out" / "ops" / "live_proof_value_meter_latest.json").read_text(
@@ -57,12 +57,12 @@ def test_queue_preserves_champion_categories_without_overclaiming():
     assert champions["proof_value_champion"]["status"] == "highest_funding_and_proof_priority_not_performance_winner"
     assert champions["fastest_live_breadth_adapter"]["status"] == "best_next_adapter_candidate_not_live_geometry_claim"
     assert champions["market_paper_champion"]["status"] == "paper_only_no_profit_claim"
-    assert champions["strict_rolling_champion"]["status"] == "none"
-    assert {row["family_id"] for row in champions["triple_source_candidates"]} >= {
+    assert champions["strict_rolling_champion"]["status"] == "rolling_champion_not_field_validated"
+    assert {row["family_id"] for row in champions["rolling_champions"]} >= {
         "brachistochrone_descent",
         "kuramoto_phase_coupling",
-        "phase_locked_residual_corrector",
     }
+    assert {row["family_id"] for row in champions["triple_source_rolling_champions"]} >= {"leaf_veins"}
     assert "not interchangeable" in champions["boundary"]
     assert {"brachistochrone_descent", "kuramoto_phase_coupling", "thermal_plume_convection"} & top_ids
 

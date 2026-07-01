@@ -120,47 +120,111 @@ becoming a threat candidate. This preserves evidence about missing or
 disagreeing sensors while avoiding the unsupported inference that transmitter
 loss alone establishes hostile intent.
 
+### 3.5 Topic Traceability
+
+The Phase I design maps directly to the public NV063 topic requirements while
+preserving the boundary that no SSDS integration or operational sensor
+performance is currently claimed:
+
+- **360-degree surface and air traffic coverage:** the prototype will ingest
+  generated and representative surface and air tracks and evaluate every track
+  in the operating area rather than only a preselected watch list.
+- **AIS, ADS-B, and radar-like observations:** adapters will normalize
+  cooperative AIS/ADS-B observations and notional radar or composite-track
+  observations with source freshness and quality fields.
+- **No large region-specific historical database:** the core method uses
+  compact per-track and local-regime state instead of requiring large stored
+  pattern-of-life archives for each operating area.
+- **Operator alert content:** each alert will include track identity, source
+  status, anomaly category, supporting observations, machine confidence,
+  uncertainty, and competing benign explanations.
+- **SSDS transition concept:** Phase I will deliver an interface-control
+  concept, alert schema, data-flow assumptions, and latency budget suitable
+  for Navy review, not a completed combat-system integration.
+- **Identification-conflict support:** source-integrity alerts preserve
+  contradictory or missing cooperative-source evidence for operator review
+  without converting source loss alone into a threat label.
+
 ## 4. Preliminary Evidence
 
-Frozen run `20260613T_NV063_V4_FRESH_DEV20_VAL20` selected one threshold on 20
-development scenarios and then held it fixed across seven disjoint validation
-and stress conditions, with 20 scenarios per condition. Inputs represented
-generated AIS/ADS-B and radar-like observations. Injected event classes were
-route deviation, loitering, speed burst, sharp turn, beacon silence, and
-beacon spoofing-like inconsistency.
+Frozen run `20260619T_NV063_V6_SOURCE_LANE_COVERAGE` selected one threshold
+on 20 development scenarios and then held threshold 10.0 fixed across seven
+disjoint validation and stress conditions, with 30 scenarios per condition.
+Inputs represented generated AIS-like surface cooperative beacons, ADS-B-like
+air cooperative beacons, and notional radar-like observations. Injected event
+classes were route deviation, loitering, speed burst, sharp turn, beacon
+silence, and beacon spoofing-like inconsistency.
 
-In the nominal 24-track condition, the prototype produced precision 0.942,
-recall 0.919, and F1 0.930, compared with F1 0.608 for a fixed kinematic-rule
+The v6 scoring stream keeps the v5 source-quality guardrails and adds
+explicit generated source-lane coverage reporting. The guardrails are computed
+from observations only, not from ground-truth labels. First, a scene-wide
+source-quality gate uses median normalized radar/beacon disagreement to reduce
+behavioral confidence when the entire scene indicates a sensor-noise shift.
+Second, a five-observation beacon-loss review gate routes persistent
+cooperative-source loss to source-integrity review without treating loss alone
+as a behavior-based threat candidate.
+
+In the nominal 24-track condition, the prototype produced precision 0.948,
+recall 0.957, and F1 0.952, compared with F1 0.566 for a fixed kinematic-rule
 comparator. It detected every injected event at least once, with median
-detection delay of one simulation step and 100% explanation coverage. The
-maximum counted algorithmic state was 139 bytes per track.
+detection delay of one simulation step and 100% explanation coverage. Nominal
+median beacon-silence delay remained four simulation steps.
 
 The frozen threshold was also tested under congestion, post-warmup sensor
 noise shift, benign point and burst transmitter dropout, and combinations of
 those conditions. Under combined 96-track congestion, 1.5x sensor noise, 2%
-benign point dropout, and 20% benign burst dropout, review-alert F1 was 0.871
-and false alerts rose to 268.1 per 10,000 normal points. Separating
+benign point dropout, and 20% benign burst dropout, review-alert F1 was 0.927
+with 144.9 review false alerts per 10,000 normal points. Separating
 source-integrity alerts from behavior-based threat candidates reduced the
-corresponding threat-candidate false-alert measure to 192.4 per 10,000 normal
+corresponding threat-candidate false-alert measure to 76.5 per 10,000 normal
 points.
 
-A severe breakdown test at 192 tracks, 2.5x sensor noise, 5% point dropout,
-and 35% burst dropout produced review-alert precision 0.340, F1 0.500, and
-2,468.3 false alerts per 10,000 normal points. This is a measured failure
-region, not an operating claim. Beacon-silence events were detected in the
-nominal set, but their median delay was 11 simulation steps, materially slower
-than the other classes.
+A severe stress test at 192 tracks, 2.5x sensor noise, 5% point dropout, and
+35% burst dropout produced review-alert precision 0.865, F1 0.888, and 191.9
+review false alerts per 10,000 normal points. The threat-candidate false-alert
+measure remained 77.0 per 10,000 normal points because the system separated
+source failure from hostile-intent inference. This is still a stress test, not
+an operating claim; source-integrity review volume rises and representative
+data are required before any field-performance assertion.
+
+The source-quality guardrail directly addresses the prior synthetic failure
+mode. Compared with the v4 run, 1.5x sensor-shift review false alerts fell
+from 217.9 to 77.0 per 10,000 normal points, combined-stress review false
+alerts fell from 268.1 to 144.9, and severe-stress review false alerts fell
+from 2,468.3 to 191.9. The measured source-degradation factor stayed near
+1.0 under nominal and congested runs, increased to about 1.27 under
+sensor-shift and combined stress, and capped at 2.25 under severe stress.
+
+The v6 source-lane report also makes the generated input coverage explicit:
+nominal AIS-like availability was 0.960, nominal ADS-B-like availability was
+1.000, and nominal radar-like contact availability was 1.000. Under severe
+combined stress, AIS-like availability was 0.904 and ADS-B-like availability
+was 0.945. These are generated feasibility inputs only; the run does not
+include NOAA AIS, OpenSky ADS-B, Navy radar, SSDS, or government-furnished
+operational data.
 
 **Evidence boundary:** these are deterministic synthetic software results.
 They do not establish operational harbor, SSDS, sensor, adversarial,
 cybersecurity, classified-environment, or field performance. The comparator
-is a simple fixed kinematic rule, not a claimed state-of-the-art system. The
-139-byte measure excludes Python/runtime/integration overhead. Phase I must
-repeat evaluation using representative public and government-furnished data,
-frozen partitions and thresholds, density-aware calibration, degraded-sensor
-abstention, and independent review.
+is a simple fixed kinematic rule, not a claimed state-of-the-art system.
+Software memory measurements exclude Python/runtime/integration overhead.
+Phase I must repeat evaluation using representative public and
+government-furnished data, frozen partitions and thresholds, density-aware
+calibration, degraded-sensor review/abstention, and independent review.
+
+The representative-data path will begin with public AIS surface-traffic data
+from NOAA/MarineCadastre, authorized public or licensed ADS-B data such as
+OpenSky where terms permit, and generated or government-furnished notional
+radar/composite-track assumptions. These lanes will remain separated in the
+scorecard so public cooperative-source validation is not confused with SSDS
+radar or composite-track validation.
 
 ## 5. Phase I Work Plan
+
+The final Navy Volume 2 conversion must fit the official 10-page Phase I
+Technical Volume limit, including clearly identified Base and Option tasks.
+Detailed test reports, benchmark output, resumes, and publications should not
+be placed in Supporting Documents as substitutes for Volume 2 content.
 
 ### Base: Months 1-6, not to exceed $200,000
 
@@ -228,10 +292,10 @@ dependency versions, input hashes, and failures will be preserved.
 - **Adaptive normalization of a persistent threat:** use multi-timescale
   references, change alarms, and operator-pinned constraints.
 - **False alerts from source disagreement:** estimate source quality and show
-  the disagreement in the alert rather than collapsing it.
-- **Noise-shift breakdown:** use covariance-aware tracking, density/regime
-  calibration, degraded-sensor detection, and abstention or confidence
-  reduction outside the validated envelope.
+  the disagreement in the alert rather than collapsing it into a threat label.
+- **Noise-shift breakdown:** extend the v6 source-quality gate with
+  covariance-aware tracking, density/regime calibration, and explicit
+  abstention or confidence reduction outside the validated envelope.
 - **Beacon-silence delay:** tune the persistence/false-alert tradeoff by source
   reliability and operational context, and report class-specific delay rather
   than hiding it in an aggregate.

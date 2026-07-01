@@ -29,7 +29,7 @@ OUT_MD = DOCS / "GEOMETRY_ASSET_WIRING_BOARD_2026-06-25.md"
 BOUNDARY = (
     "Asset wiring only. These rows identify where frozen live-context proof cards can be used for dashboards, "
     "grant evidence, buyer outreach, and next validation. They do not establish field validation, realized savings, "
-    "award certainty, live trading permission, or a real-dollar claim."
+    "guaranteed awards, live trading permission, or a real-dollar claim."
 )
 
 
@@ -662,6 +662,7 @@ def build_payload() -> dict[str, Any]:
         "rolling_champion_count": rolling_count,
         "robust_repeat_candidate_count": robust_count,
         "triple_source_candidate_count": triple_source_count,
+        "triple_source_rolling_champion_count": champion_summary.get("triple_source_rolling_champion_count", 0),
         "single_run_candidate_count": single_run_count,
         "live_measured_sources": truth_summary.get("measured_sources", champion_summary.get("live_measured_sources", 0)),
         "live_measured_rows": truth_summary.get("total_measured_rows", champion_summary.get("live_total_measured_rows", 0)),
@@ -751,6 +752,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Live measured rows: `{summary['live_measured_rows']}`",
         f"- Rolling champions in wired proof cards: `{summary['rolling_champion_count']}`",
         f"- Robust repeat candidates in wired proof cards: `{summary['robust_repeat_candidate_count']}`",
+        f"- Triple-source rolling champions: `{summary['triple_source_rolling_champion_count']}`",
         f"- Triple-source candidates: `{summary['triple_source_candidate_count']}`",
         f"- Single-run candidates: `{summary['single_run_candidate_count']}`",
         f"- Candidate wins against named baseline: `{summary['candidate_win_count']}`",

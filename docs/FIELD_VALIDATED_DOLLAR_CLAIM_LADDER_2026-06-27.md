@@ -1,6 +1,6 @@
 # Field-Validated Dollar Claim Ladder
 
-Generated UTC: `2026-06-27T16:10:57.414405+00:00`
+Generated UTC: `2026-06-27T17:45:58.706212+00:00`
 Claim ladder SHA-256: `309ada767ff1ba72fd2143f1411e5d67e04660e347c268d18e8c713afa206f5c`
 
 ## Boundary

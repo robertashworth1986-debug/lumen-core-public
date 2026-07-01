@@ -1,6 +1,6 @@
 # Rolling Champion Gate
 
-Generated UTC: 2026-06-25T10:53:14.729082+00:00
+Generated UTC: 2026-07-01T08:18:54.633330+00:00
 
 ## Boundary
 
@@ -8,21 +8,21 @@ A champion is not a one-off win. This gate promotes only repeat live-context win
 
 ## Summary
 
-- Ledger entries: 11
-- Rolling champions: 0
-- Triple-source candidates: 3
-- Single-run candidates: 1
+- Ledger entries: 37
+- Rolling champions: 5
+- Triple-source candidates: 0
+- Single-run candidates: 0
 
 ## Promotion Board
 
 | Status | Entity | Repeat wins | Sources | Latest delta |
 |---|---|---:|---:|---:|
-| triple_source_candidate | energy_price_pressure:phase_locked_residual_corrector | 1 | 6 | 36.387422 |
-| triple_source_candidate | optimal_curve_transport:brachistochrone_descent | 1 | 5 | 0.07194 |
-| triple_source_candidate | wave_resonance_timing:kuramoto_phase_coupling | 1 | 4 | 0.164946 |
-| single_run_candidate | thermal_ventilation:thermal_plume_convection | 1 | 2 | 0.106529 |
+| rolling_champion | energy_price_pressure:phase_locked_residual_corrector | 7 | 6 | 36.387422 |
+| rolling_champion | optimal_curve_transport:brachistochrone_descent | 5 | 5 | 0.063803 |
+| rolling_champion | wave_resonance_timing:kuramoto_phase_coupling | 5 | 5 | 0.150958 |
+| rolling_champion | thermal_ventilation:thermal_plume_convection | 5 | 2 | 0.089064 |
+| rolling_champion | branching_transport:leaf_veins | 2 | 4 | -0.032477 |
 | not_promoted | time_series_model_routing:fractal_brownian_surface | 0 | 10 |  |
-| not_promoted | branching_transport:leaf_veins | 0 | 4 | -0.051171 |
 
 ## Rule
 

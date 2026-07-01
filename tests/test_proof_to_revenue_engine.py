@@ -23,7 +23,8 @@ def test_proof_to_revenue_engine_promotes_manual_paid_pilot_not_overclaims():
     summary = payload["summary"]
 
     assert payload["schema"] == "proof_to_revenue_engine_v1"
-    assert summary["live_domain_hash_verified"] is True
+    assert summary["live_domain_hash_verified"] is False
+    assert summary["revenue_stage"] == "proof_stack_not_ready_for_outreach"
     assert summary["manual_reviewed_outreach_allowed"] is True
     assert summary["send_without_user_review_allowed"] is False
     assert summary["bulk_email_allowed"] is False
@@ -61,4 +62,5 @@ def test_proof_to_revenue_markdown_answers_next_questions():
     assert "Deployment Verification" in rendered
     assert "Field Validation Unlock" in rendered
     assert "What To Ask Next" in rendered
-    assert "Live domain hash verified: `true`" in rendered
+    assert "Live domain hash verified: `false`" in rendered
+    assert "public hash verification is still pending" in rendered

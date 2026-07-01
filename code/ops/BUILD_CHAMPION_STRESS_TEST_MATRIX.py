@@ -400,6 +400,17 @@ def build_payload() -> dict[str, Any]:
     geometry_summary = as_dict(geometry.get("summary"))
     revenue_summary = as_dict(revenue.get("summary"))
     live_summary = as_dict(live_domain.get("summary"))
+    live_domain_hash_verified = bool(live_summary.get("live_domain_reviewer_ready"))
+    hosted_feed_phrase = (
+        "public hash-verified feeds"
+        if live_domain_hash_verified
+        else "locally hashable feeds staged for public hash verification"
+    )
+    evidence_stage = (
+        "internal_source_conditioned_replay_public_hash_verified_not_field_validated"
+        if live_domain_hash_verified
+        else "internal_source_conditioned_replay_public_hash_pending_not_field_validated"
+    )
 
     deltas = [as_float(row.get("delta_vs_kalman")) for row in rows]
     best_deltas = [as_float(row.get("delta_vs_best_baseline")) for row in rows]
@@ -424,7 +435,7 @@ def build_payload() -> dict[str, Any]:
             "champion_family": gauntlet_summary.get("champion_family") or "kuramoto_phase_coupling",
             "champion_label": gauntlet_summary.get("champion_label") or "Kuramoto phase coupling",
             "named_baseline": gauntlet_summary.get("named_baseline") or "kalman_filter",
-            "evidence_stage": "internal_source_conditioned_replay_public_hash_verified_not_field_validated",
+            "evidence_stage": evidence_stage,
             "revenue_stage": revenue_summary.get("revenue_stage") or "manual_paid_pilot_scoping_ready",
             "holdout_count": holdout_count,
             "wins_vs_named_baseline": wins_named,
@@ -443,7 +454,7 @@ def build_payload() -> dict[str, Any]:
             "mean_delta_vs_best_same_run_baseline": mean(best_deltas),
             "max_delta_vs_best_same_run_baseline": max_or_zero(best_deltas),
             "rank_histogram": rank_histogram(rows),
-            "live_domain_hash_verified": bool(live_summary.get("live_domain_reviewer_ready")),
+            "live_domain_hash_verified": live_domain_hash_verified,
             "domain_deployment_state": live_summary.get("domain_deployment_state"),
             "metric_gate_pass_count": len(passed_gates),
             "metric_gate_total_count": len(gates),
@@ -457,7 +468,7 @@ def build_payload() -> dict[str, Any]:
                 "This is the current money-printer truth line: Kuramoto phase coupling is a strong internal "
                 f"champion, with {wins_named}/{holdout_count} source-conditioned holdout wins against "
                 f"{gauntlet_summary.get('named_baseline') or 'kalman_filter'} across {len(source_systems)} "
-                "source systems and public hash-verified feeds. The next monetizable step is a paid, "
+                f"source systems and {hosted_feed_phrase}. The next monetizable step is a paid, "
                 "buyer-authorized field replay, not an unverified realized-savings claim."
             ),
         },
@@ -465,7 +476,11 @@ def build_payload() -> dict[str, Any]:
             "allowed_now": [
                 "current internal champion",
                 "source-conditioned holdout winner",
-                "public hash-verified reviewer feed",
+                (
+                    "public hash-verified reviewer feed"
+                    if live_domain_hash_verified
+                    else "local hashable reviewer feed staged for domain verification"
+                ),
                 "manual paid-pilot scoping candidate",
                 "buyer-authorized field replay request ready",
             ],

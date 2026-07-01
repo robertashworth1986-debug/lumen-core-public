@@ -106,6 +106,8 @@ def leaderboard_head(card: dict[str, Any]) -> list[dict[str, Any]]:
 
 def readiness_tier(family: dict[str, Any], replay: dict[str, Any], rolling: dict[str, Any]) -> str:
     rolling_status = str(family.get("rolling_gate_status") or rolling.get("status") or "not_in_rolling_gate")
+    if replay and replay.get("candidate_beats_named_baseline") is False:
+        return "replay_candidate_did_not_beat_named_baseline"
     if rolling_status == "rolling_champion":
         return "repeat_rolling_champion_still_needs_field_validation"
     if rolling_status == "triple_source_candidate" and not replay:
@@ -116,14 +118,17 @@ def readiness_tier(family: dict[str, Any], replay: dict[str, Any], rolling: dict
         return "single_run_candidate_needs_more_sources_or_repeat"
     if family.get("is_proof_value_champion"):
         return "proof_value_priority_needs_live_win"
-    if replay and replay.get("candidate_beats_named_baseline") is False:
-        return "replay_candidate_did_not_beat_named_baseline"
     if replay and replay.get("adapter_status") != "live_context_replay_ran":
         return "source_context_only_needs_lane_adapter"
     return "ranked_for_future_validation"
 
 
 def allowed_language(tier: str, family: dict[str, Any]) -> str:
+    if tier == "repeat_rolling_champion_still_needs_field_validation":
+        return (
+            f"Allowed: {family.get('label') or family.get('family_id')} is a repeat rolling live-context "
+            "champion; use it for pilot scoping and pre-registered validation, not as field validation or a dollar claim."
+        )
     if tier == "triple_source_candidate_ready_for_repeat_replay":
         return (
             f"Allowed: {family.get('label') or family.get('family_id')} is a promising triple-source live-context "
@@ -151,6 +156,12 @@ def next_steps(tier: str, family: dict[str, Any]) -> list[str]:
         return [
             "Repeat this candidate on a second distinct frozen run hash.",
             "Add at least one independent source window not used in the first replay.",
+            *base,
+        ]
+    if tier == "repeat_rolling_champion_still_needs_field_validation":
+        return [
+            "Convert the repeat rolling champion into a buyer-authorized pilot protocol.",
+            "Pre-register the holdout windows, incumbent baseline, and acceptance metric before scoring.",
             *base,
         ]
     if tier == "single_run_candidate_needs_more_sources_or_repeat":
@@ -318,6 +329,11 @@ def build_payload() -> dict[str, Any]:
             "registry_card_count": len(cards),
             "annex_card_count": len(annex_cards),
             "strict_rolling_champion_count": sum(1 for card in all_cards if card["rolling_gate_status"] == "rolling_champion"),
+            "triple_source_rolling_champion_count": sum(
+                1
+                for card in all_cards
+                if card["rolling_gate_status"] == "rolling_champion" and int(card["live_evidence"]["source_count"] or 0) >= 3
+            ),
             "triple_source_candidate_count": sum(1 for card in all_cards if card["rolling_gate_status"] == "triple_source_candidate"),
             "single_run_candidate_count": sum(1 for card in all_cards if card["rolling_gate_status"] == "single_run_candidate"),
             "candidate_win_card_count": sum(1 for card in all_cards if card["replay_result"]["candidate_beats_named_baseline"] is True),
@@ -357,6 +373,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Proof cards: `{summary['proof_card_count']}`",
         f"- Registry cards: `{summary['registry_card_count']}`",
         f"- Annex cards: `{summary['annex_card_count']}`",
+        f"- Triple-source rolling champions: `{summary['triple_source_rolling_champion_count']}`",
         f"- Triple-source candidates: `{summary['triple_source_candidate_count']}`",
         f"- Single-run candidates: `{summary['single_run_candidate_count']}`",
         f"- Candidate win cards: `{summary['candidate_win_card_count']}`",
@@ -403,6 +420,7 @@ def main() -> int:
             {
                 "schema": payload["schema"],
                 "proof_cards": payload["summary"]["proof_card_count"],
+                "triple_source_rolling_champions": payload["summary"]["triple_source_rolling_champion_count"],
                 "triple_source_candidates": payload["summary"]["triple_source_candidate_count"],
                 "single_run_candidates": payload["summary"]["single_run_candidate_count"],
                 "ready_for_live_geometry_claim": payload["summary"]["ready_for_live_geometry_claim"],

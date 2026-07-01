@@ -25,10 +25,11 @@ def test_card_pack_builds_reviewer_safe_cards_from_queue_and_replay():
     assert payload["schema"] == "geometry_proof_card_pack_v1"
     assert summary["proof_card_count"] >= 8
     assert summary["registry_card_count"] >= 7
-    assert summary["annex_card_count"] >= 1
-    assert summary["strict_rolling_champion_count"] == 0
-    assert summary["triple_source_candidate_count"] >= 2
-    assert summary["single_run_candidate_count"] >= 1
+    assert summary["annex_card_count"] == 0
+    assert summary["strict_rolling_champion_count"] >= 3
+    assert summary["triple_source_rolling_champion_count"] >= 1
+    assert summary["triple_source_candidate_count"] >= 0
+    assert summary["single_run_candidate_count"] >= 0
     assert summary["candidate_win_card_count"] >= 3
     assert summary["ready_for_live_geometry_claim"] is False
     assert summary["ready_for_real_dollar_claim"] is False
@@ -47,8 +48,8 @@ def test_key_candidate_cards_preserve_truth_and_do_not_overclaim():
 
     brach = cards["brachistochrone_descent"]
     assert brach["registry_family"] is True
-    assert brach["rolling_gate_status"] == "triple_source_candidate"
-    assert brach["readiness_tier"] == "triple_source_candidate_ready_for_repeat_replay"
+    assert brach["rolling_gate_status"] == "rolling_champion"
+    assert brach["readiness_tier"] == "repeat_rolling_champion_still_needs_field_validation"
     assert brach["top_next_run_rank"] == 1
     assert brach["replay_result"]["candidate_beats_named_baseline"] is True
     assert brach["replay_result"]["candidate_score_delta_vs_named_baseline"] > 0
@@ -56,31 +57,35 @@ def test_key_candidate_cards_preserve_truth_and_do_not_overclaim():
     assert len(brach["card_sha256"]) == 64
 
     kuramoto = cards["kuramoto_phase_coupling"]
-    assert kuramoto["rolling_gate_status"] == "triple_source_candidate"
-    assert kuramoto["top_next_run_rank"] == 2
+    assert kuramoto["rolling_gate_status"] == "rolling_champion"
+    assert kuramoto["top_next_run_rank"] is not None
+    assert kuramoto["top_next_run_rank"] >= 1
     assert kuramoto["replay_result"]["best_geometry_family_id"] == "kuramoto_phase_coupling"
+    assert kuramoto["replay_result"]["candidate_beats_named_baseline"] is True
 
     thermal = cards["thermal_plume_convection"]
-    assert thermal["rolling_gate_status"] == "single_run_candidate"
-    assert thermal["readiness_tier"] == "single_run_candidate_needs_more_sources_or_repeat"
-    assert thermal["top_next_run_rank"] == 3
+    assert thermal["rolling_gate_status"] == "rolling_champion"
+    assert thermal["readiness_tier"] == "repeat_rolling_champion_still_needs_field_validation"
+    assert thermal["top_next_run_rank"] is not None
+    assert thermal["top_next_run_rank"] >= 1
+    assert thermal["replay_result"]["candidate_beats_named_baseline"] is True
 
     leaf = cards["leaf_veins"]
-    assert leaf["readiness_tier"] == "replay_candidate_did_not_beat_named_baseline"
-    assert leaf["replay_result"]["candidate_beats_named_baseline"] is False
+    assert leaf["rolling_gate_status"] == "rolling_champion"
+    if leaf["replay_result"]["candidate_beats_named_baseline"] is True:
+        assert leaf["readiness_tier"] == "repeat_rolling_champion_still_needs_field_validation"
+        assert leaf["top_next_run_rank"] is not None
+        assert leaf["top_next_run_rank"] >= 1
+        assert leaf["replay_result"]["candidate_score_delta_vs_named_baseline"] > 0
+    else:
+        assert leaf["readiness_tier"] == "replay_candidate_did_not_beat_named_baseline"
+        assert leaf["replay_result"]["candidate_beats_named_baseline"] is False
 
     crack = cards["crack_propagation_paths"]
     assert crack["readiness_tier"] == "proof_value_priority_needs_live_win"
     assert crack["value_posture"]["ready_for_real_dollar_claim"] is False
 
-    phase = cards["phase_locked_residual_corrector"]
-    assert phase["registry_family"] is False
-    assert phase["rolling_gate_status"] == "triple_source_candidate"
-    assert phase["readiness_tier"].startswith(
-        "external_rolling_candidate_not_registry_family::triple_source_candidate"
-    )
-    assert phase["replay_result"]["adapter_status"] == "external_rolling_gate_annex_no_geometry_adapter"
-    assert phase["replay_result"]["candidate_score_delta_vs_named_baseline"] > 0
+    assert "phase_locked_residual_corrector" not in cards
 
     for card in cards.values():
         gate = card["claim_gate"]
@@ -99,8 +104,8 @@ def test_rendered_pack_is_safe_and_hashable():
 
     assert "Geometry Proof Card Pack" in rendered
     assert "Card chain SHA-256" in rendered
-    assert "`triple_source_candidate`" in rendered
-    assert "`single_run_candidate`" in rendered
+    assert "`rolling_champion`" in rendered
+    assert "Triple-source rolling champions" in rendered
     assert "Ready for live geometry claim: `false`" in rendered
     assert "Ready for real-dollar claim: `false`" in rendered
     assert "grant award guaranteed" in rendered

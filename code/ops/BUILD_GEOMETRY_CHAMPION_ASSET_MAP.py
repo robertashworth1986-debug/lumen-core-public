@@ -125,6 +125,8 @@ def wiring_stage_score(row: dict[str, Any]) -> float:
 def claim_stage(row: dict[str, Any] | None, queue_row: dict[str, Any] | None) -> str:
     tier = str((row or {}).get("readiness_tier", ""))
     rolling = str((queue_row or {}).get("rolling_gate_status", ""))
+    if rolling == "rolling_champion":
+        return "rolling_champion_not_field_validated"
     if "triple_source" in tier or rolling == "triple_source_candidate":
         return "repeat_live_candidate_not_field_validated"
     if "single_run" in tier or rolling == "single_run_candidate":
@@ -138,6 +140,8 @@ def claim_stage(row: dict[str, Any] | None, queue_row: dict[str, Any] | None) ->
 
 def asset_stage(row: dict[str, Any] | None, queue_row: dict[str, Any] | None) -> str:
     stage = claim_stage(row, queue_row)
+    if stage == "rolling_champion_not_field_validated":
+        return "strict_rolling_champion_not_field_validated"
     if stage == "repeat_live_candidate_not_field_validated":
         return "closest_to_defensible_repeat_proof"
     if stage == "single_run_candidate_needs_repeat_or_more_sources":
@@ -263,6 +267,11 @@ def nearest_valuable_proofs(rows: list[dict[str, Any]]) -> dict[str, Any]:
         for row in rows
         if row["asset_stage"] == "closest_to_defensible_repeat_proof"
     ]
+    rolling_champions = [
+        row
+        for row in rows
+        if row["asset_stage"] == "strict_rolling_champion_not_field_validated"
+    ]
     single_run = [row for row in rows if row["asset_stage"] == "needs_repeat_or_more_sources"]
     adapters = [row for row in rows if row["asset_stage"] == "high_value_next_adapter"]
     negative = [row for row in rows if row["asset_stage"] == "negative_result_use_for_reroute"]
@@ -277,6 +286,7 @@ def nearest_valuable_proofs(rows: list[dict[str, Any]]) -> dict[str, Any]:
         reverse=True,
     )
     return {
+        "rolling_champions": trim_assets(rolling_champions, 8),
         "closest_repeat_candidates": trim_assets(repeat_candidates, 6),
         "single_run_candidates": trim_assets(single_run, 6),
         "highest_value_adapter_targets": trim_assets(adapters, 8),
@@ -373,6 +383,9 @@ def build_payload() -> dict[str, Any]:
         "negative_reroute_count": stage_counts.get("negative_result_use_for_reroute", 0),
         "longer_horizon_candidate_count": stage_counts.get("longer_horizon_registry_candidate", 0),
         "strict_rolling_champion_count": queue.get("promotion_gate", {}).get("strict_rolling_champion_count", 0),
+        "triple_source_rolling_champion_count": queue.get(
+            "promotion_gate", {}
+        ).get("triple_source_rolling_champion_count", 0),
         "triple_source_candidate_count": queue.get("promotion_gate", {}).get("triple_source_candidate_count", 0),
         "proof_card_count": proof_pack.get("summary", {}).get("proof_card_count", 0),
         "asset_chain_sha256": stable_sha256(assets),

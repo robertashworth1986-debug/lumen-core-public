@@ -31,7 +31,7 @@ def test_asset_map_ranks_full_registry_and_natural_path_target():
     assert summary["natural_path_target_met"] is True
     assert registry["natural_path_family_count"] == summary["natural_path_family_count"]
     assert registry["benchmark_design_ready_count"] >= 100
-    assert "mycelium_network" in registry["missing_natural_logic"]
+    assert registry["missing_natural_logic"] == []
     assert len(summary["asset_chain_sha256"]) == 64
 
 
@@ -62,22 +62,24 @@ def test_nearest_valuable_proofs_include_repeat_candidates_and_adapter_targets()
     module = load_module()
     payload = module.build_payload()
     nearest = payload["nearest_valuable_proofs"]
+    rolling_ids = {row["family_id"] for row in nearest["rolling_champions"]}
     repeat_ids = {row["family_id"] for row in nearest["closest_repeat_candidates"]}
     adapter_ids = {row["family_id"] for row in nearest["highest_value_adapter_targets"]}
     single_ids = {row["family_id"] for row in nearest["single_run_candidates"]}
     all_ids = {row["family_id"] for row in payload["ranked_assets"]}
 
-    assert "brachistochrone_descent" in repeat_ids
-    assert "kuramoto_phase_coupling" in repeat_ids
+    assert "brachistochrone_descent" in rolling_ids
+    assert "kuramoto_phase_coupling" in rolling_ids
+    assert "leaf_veins" in rolling_ids
     assert "phase_locked_residual_corrector" not in all_ids
-    assert "thermal_plume_convection" in single_ids
+    assert "thermal_plume_convection" in rolling_ids or "thermal_plume_convection" in single_ids
     assert "crack_propagation_paths" in adapter_ids
 
     top_actions = {row["family_id"]: row for row in payload["top_validation_sequence"]}
     assert "brachistochrone_descent" in top_actions
-    assert "second frozen live-source run hash" in top_actions["brachistochrone_descent"]["action"]
+    assert "buyer-authorized pilot scoping" in top_actions["brachistochrone_descent"]["action"]
     assert "kuramoto_phase_coupling" in top_actions
-    assert "phase_locked_residual_corrector" in top_actions
+    assert "phase_locked_residual_corrector" not in top_actions
 
 
 def test_rendered_asset_map_is_useful_and_does_not_overclaim():

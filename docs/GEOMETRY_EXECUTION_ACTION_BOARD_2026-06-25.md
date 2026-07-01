@@ -1,20 +1,20 @@
 # Geometry Execution Action Board
 
-Generated UTC: `2026-06-26T00:21:59.005789+00:00`
+Generated UTC: `2026-07-01T06:38:20.372094+00:00`
 
 Execution action board only. It converts the current frozen proof/champion state into local benchmark, grant, dashboard, and pilot-scoping actions. It does not authorize live trading, mass email, field-validation claims, fixed-dollar frozen-delta sales claims, realized savings claims, or grant-award certainty.
 
 ## State
 
-- Actions: `22`
-- Runnable local actions: `9`
+- Actions: `21`
+- Runnable local actions: `8`
 - Adapter gaps: `13`
 - Rolling champion actions: `4`
-- Robust repeat actions: `1`
+- Robust repeat actions: `2`
 - Registered families: `140`
-- Benchmark-specified families: `137`
+- Benchmark-specified families: `140`
 - Measured sources: `18`
-- Measured rows: `418`
+- Measured rows: `571`
 - Bounded estimated value claim allowed: `true`
 - Paid pilot scoping allowed: `true`
 - Field validation claim allowed: `false`
@@ -22,16 +22,16 @@ Execution action board only. It converts the current frozen proof/champion state
 - Fixed-dollar frozen-delta sale claim allowed: `false`
 - Live trading/autonomous execution allowed: `false`
 - VPS/domain live dashboard routed: `false`
-- Board chain SHA-256: `e943f2d68bb98f2918aeb3770a6ad2596366f2dab09ccf0dc0d99a869dc37b22`
+- Board chain SHA-256: `f54e932d65afb302bcad1567f2560743ed75201cba742930b3d64aff650d117d`
 
 ## Top Actions
 
 | Priority | Family | Action Type | Runner | Success Metric |
 | --- | --- | --- | --- | --- |
-| 1 | `brachistochrone_descent` | `buyer_authorized_pilot_and_publication` | `python code\geometry_optimal_curve_transport_benchmark.py --out-root "C:\LumaTrader\INSTITUTIONAL_STACK_V2\out\action_replays\optimal_curve_transport" --run-tag NEXT_HOLDOUT --development-scenarios 8 --validation-scenarios 20` | Buyer/agency accepts a pre-registered pilot plan, provides or authorizes field data, and the candidate beats accepted incumbents under identical constraints with signed or traceable artifacts. |
-| 2 | `kuramoto_phase_coupling` | `additional_holdout_replay` | `python code\geometry_wave_resonance_timing_benchmark.py --out-root "C:\LumaTrader\INSTITUTIONAL_STACK_V2\out\action_replays\wave_resonance_timing" --run-tag NEXT_HOLDOUT --development-scenarios 8 --validation-scenarios 20` | At least 20 pre-registered holdout windows are frozen, replayed, and promoted only if the uncertainty gate passes under identical baseline/candidate constraints. |
+| 1 | `kuramoto_phase_coupling` | `buyer_authorized_pilot_and_publication` | `python code\geometry_wave_resonance_timing_benchmark.py --out-root "C:\LumaTrader\INSTITUTIONAL_STACK_V2\out\action_replays\wave_resonance_timing" --run-tag NEXT_HOLDOUT --development-scenarios 8 --validation-scenarios 20` | Buyer/agency accepts a pre-registered pilot plan, provides or authorizes field data, and the candidate beats accepted incumbents under identical constraints with signed or traceable artifacts. |
+| 2 | `brachistochrone_descent` | `buyer_authorized_pilot_and_publication` | `python code\geometry_optimal_curve_transport_benchmark.py --out-root "C:\LumaTrader\INSTITUTIONAL_STACK_V2\out\action_replays\optimal_curve_transport" --run-tag NEXT_HOLDOUT --development-scenarios 8 --validation-scenarios 20` | Buyer/agency accepts a pre-registered pilot plan, provides or authorizes field data, and the candidate beats accepted incumbents under identical constraints with signed or traceable artifacts. |
 | 3 | `thermal_plume_convection` | `additional_holdout_replay` | `python code\geometry_thermal_ventilation_benchmark.py --out-root "C:\LumaTrader\INSTITUTIONAL_STACK_V2\out\action_replays\thermal_ventilation" --run-tag NEXT_HOLDOUT --development-scenarios 8 --validation-scenarios 20` | At least 20 pre-registered holdout windows are frozen, replayed, and promoted only if the uncertainty gate passes under identical baseline/candidate constraints. |
-| 4 | `leaf_veins` | `repeat_frozen_replay` | `python code\geometry_branching_transport_benchmark.py --out-root "C:\LumaTrader\INSTITUTIONAL_STACK_V2\out\action_replays\branching_transport" --run-tag NEXT_HOLDOUT --development-scenarios 8 --validation-scenarios 20` | A second distinct frozen run hash beats the named baseline across the required measured-source set. |
+| 4 | `leaf_veins` | `additional_holdout_replay` | `python code\geometry_branching_transport_benchmark.py --out-root "C:\LumaTrader\INSTITUTIONAL_STACK_V2\out\action_replays\branching_transport" --run-tag NEXT_HOLDOUT --development-scenarios 8 --validation-scenarios 20` | At least 20 pre-registered holdout windows are frozen, replayed, and promoted only if the uncertainty gate passes under identical baseline/candidate constraints. |
 | 5 | `beast_algo_echo_stack` | `build_live_adapter_or_reroute` | `adapter required` | `beast_algo_echo_stack` receives a live adapter or is explicitly demoted behind the current winner. |
 | 6 | `fractal_brownian_surface` | `benchmark_gap_review` | `adapter required` | `fractal_brownian_surface` receives a live adapter or is explicitly demoted behind the current winner. |
 | 7 | `markov_blanket_boundaries` | `build_live_adapter_or_reroute` | `adapter required` | `markov_blanket_boundaries` receives a live adapter or is explicitly demoted behind the current winner. |

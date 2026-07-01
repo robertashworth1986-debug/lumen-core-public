@@ -1,6 +1,6 @@
 # Kuramoto Field Replay Request
 
-Generated UTC: `2026-06-26T20:54:07.136891+00:00`
+Generated UTC: `2026-06-29T16:50:22.653142+00:00`
 
 Convert the strongest current internal replay result into a buyer-authorized field replay request. This is a validation ask, not a completed field-validation claim.
 
@@ -140,4 +140,4 @@ No-go claims:
 - `proven institutional profit`
 - `medical treatment claim`
 
-Packet SHA-256: `a43343753ed38cc223b9f85de554cdf360e07ee0cf41b9d981e3cb13528c73be`
+Packet SHA-256: `90ca642e99c8239d50907cc5576789c3f6f5cac46e94111f0007b09f5098952b`

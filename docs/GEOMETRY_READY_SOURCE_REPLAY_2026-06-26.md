@@ -1,6 +1,6 @@
 # Geometry Ready Source Replay
 
-Generated UTC: `2026-06-26T02:06:15.340361+00:00`
+Generated UTC: `2026-07-01T08:22:22.211094+00:00`
 
 Geometry ready-source replay only. This reads local/uploaded measured files from the live source manifest, derives deterministic source profiles, and runs existing generated geometry benchmark adapters under equal candidate/baseline constraints. It is not field validation, not a clinical or addiction-treatment claim, not a trading signal, not realized savings, and not a fixed-dollar frozen-delta sales claim.
 

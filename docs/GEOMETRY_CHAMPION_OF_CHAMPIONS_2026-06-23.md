@@ -1,7 +1,7 @@
 # Geometry Champion Of Champions
 
-Generated UTC: `2026-06-26T22:01:48.035181+00:00`
-Board SHA-256: `288620ab9193769326539fedefa2b17175e014e0453e0d268c26f9d7a2236fa7`
+Generated UTC: `2026-07-01T06:26:22.743682+00:00`
+Board SHA-256: `d2d276117bae730c015bfe002b7d9c49ae02fe729979b3e91d1809d591a433fa`
 
 ## Boundary
 
@@ -14,7 +14,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Benchmark spec gaps: 0
 - Lanes ranked: 12 / 12
 - Live measured sources: 18
-- Live measured rows: 418
+- Live measured rows: 571
 - Live adapter replays: 4
 - Candidate beats named baseline count: 4
 - Reviewer packet ready: `true`
@@ -27,13 +27,14 @@ This board ranks what to validate next. It does not establish field validation, 
 - Blocked context-only value surface: `$52,288,496,940/year`
 - Vault packet ready: `true`
 - Vault hashes verified: `true`
-- Strict rolling champions: `4`
+- Strict rolling champions: `5`
 - Robust repeat candidates: `1`
-- Triple-source candidates: `1`
+- Triple-source rolling champions: `4`
+- Triple-source candidates: `0`
 - Single-run candidates: `0`
 - Kuramoto holdout wins vs Kalman: `24 / 24`
-- Kuramoto holdout mean delta vs Kalman: `0.139875`
-- Kuramoto holdout estimated rows replayed: `2506267`
+- Kuramoto holdout mean delta vs Kalman: `0.143725`
+- Kuramoto holdout estimated rows replayed: `2507379`
 - Kuramoto field-replay request ready: `true`
 
 ## Current Truth Gates
@@ -49,7 +50,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - vps_domain_live_dashboard_routed: `false`
 - all_registered_families_live_benchmarked: `false`
 - all_families_have_benchmark_specs: `true`
-- glyph_or_external_vault_routed: `true`
+- glyph_or_external_vault_routed: `false`
 - triple_dataset_frozen_assets_present: `true`
 
 ## Strongest Current Read
@@ -57,7 +58,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Strongest current candidate: `kuramoto_phase_coupling` (wave_resonance_timing)
 - Evidence status: `expanded_source_conditioned_holdout_winner_not_field_validated`
 - Claim stage: `buyer_authorized_field_replay_request_ready_not_field_validated`
-- Robust repeat gate: `false`
+- Robust repeat gate: `true`
 - Paid pilot ready: `true`
 - Strongest money proxy: `phase_locked_residual_corrector` (energy_price_pressure_proxy) delta `36.387422`
 
@@ -66,22 +67,21 @@ This board ranks what to validate next. It does not establish field validation, 
 - Candidate: `kuramoto_phase_coupling`
 - Baseline: `kalman_filter`
 - Holdout wins: `24 / 24`
-- Mean delta vs baseline: `0.139875`
-- Estimated rows replayed: `2506267`
+- Mean delta vs baseline: `0.143725`
+- Estimated rows replayed: `2507379`
 - Source systems: `4`
-- Chain SHA-256: `b723b3cf65d3971b0492e41cc27fc82e1fba57a5e0d672a67e9818348313f2e6`
+- Chain SHA-256: `b8c575a1d68ee262837d55ed9c4dff94c1cb9a3071eb9700ce4cb0c8c8d56b79`
 - Boundary: Internal source-conditioned holdout replay; ready to request buyer-authorized field replay, but not field validation, realized savings, fixed-dollar delta value, or live execution evidence.
 
 ## Category Champions
 
 - operational_proof_priority: `time_series_model_routing` (time_series_model_routing) score `228.72`
-- top_family_asset: `Kuramoto phase coupling` (wave_resonance_timing) score `336.069`
+- top_family_asset: `Kuramoto phase coupling` (wave_resonance_timing) score `365.167`
 - proof_value_champion: `Beast Algo: Echo Stack` (time_series_model_routing) score `115.0`
-- strict_rolling_champion: `Kuramoto phase coupling` (wave_resonance_timing) score `336.069`
-- robust_repeat_candidate: `Brachistochrone fastest-descent curve` (optimal_curve_transport) score `273.826`
-- buyer_authorized_field_replay_request_candidate: `Kuramoto phase coupling` (wave_resonance_timing) score `336.069`
-- paid_pilot_scoping_candidate: `Kuramoto phase coupling` (wave_resonance_timing) score `336.069`
-- strict_triple_source_candidate: `Leaf veins` (branching_transport) score `151.3`
+- strict_rolling_champion: `Kuramoto phase coupling` (wave_resonance_timing) score `365.167`
+- robust_repeat_candidate: `Kuramoto phase coupling` (wave_resonance_timing) score `365.167`
+- buyer_authorized_field_replay_request_candidate: `Kuramoto phase coupling` (wave_resonance_timing) score `365.167`
+- paid_pilot_scoping_candidate: `Kuramoto phase coupling` (wave_resonance_timing) score `365.167`
 - harmonic_phase_lock_candidate: `wave_resonance_timing` (wave_resonance_timing) score `161.032`
 - market_lane_status: `market_signal_geometry` (market_signal_geometry) score `77.64`
 
@@ -92,7 +92,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 228.72
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 10
-- Measured rows: 156
+- Measured rows: 259
 - Blocked sources: none
 - Generated champion: `none`
 - Proof champion: `beast_algo_echo_stack`
@@ -103,7 +103,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 170.59
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 5
-- Measured rows: 105
+- Measured rows: 204
 - Blocked sources: none
 - Generated champion: `brachistochrone_descent`
 - Proof champion: `beast_algo_curvature_pressure`
@@ -114,7 +114,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 169.94
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 7
-- Measured rows: 124
+- Measured rows: 202
 - Blocked sources: none
 - Generated champion: `none`
 - Proof champion: `markov_blanket_boundaries`
@@ -125,7 +125,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 161.032
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 5
-- Measured rows: 86
+- Measured rows: 160
 - Blocked sources: none
 - Generated champion: `kuramoto_phase_coupling`
 - Proof champion: `beast_algo_cross_asset_resonance`
@@ -136,7 +136,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 123.7
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 4
-- Measured rows: 38
+- Measured rows: 63
 - Blocked sources: none
 - Generated champion: `none`
 - Proof champion: `atmospheric_jet_stream_paths`
@@ -147,7 +147,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 120.42
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 4
-- Measured rows: 63
+- Measured rows: 91
 - Blocked sources: none
 - Generated champion: `none`
 - Proof champion: `cicada_prime_cycles`
@@ -158,7 +158,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 117.74
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 4
-- Measured rows: 62
+- Measured rows: 112
 - Blocked sources: none
 - Generated champion: `none`
 - Proof champion: `bird_v_formation_flocking`
@@ -169,7 +169,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 113.224
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 4
-- Measured rows: 38
+- Measured rows: 63
 - Blocked sources: NREL
 - Generated champion: `leaf_veins`
 - Proof champion: `crack_propagation_paths`
@@ -180,7 +180,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 111.04
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 4
-- Measured rows: 38
+- Measured rows: 63
 - Blocked sources: SAM_GOV
 - Generated champion: `none`
 - Proof champion: `ant_trails`
@@ -191,7 +191,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 96.648
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 2
-- Measured rows: 36
+- Measured rows: 61
 - Blocked sources: NREL
 - Generated champion: `thermal_plume_convection`
 - Proof champion: `rayleigh_benard_cells`
@@ -202,7 +202,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 90.58
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 3
-- Measured rows: 39
+- Measured rows: 64
 - Blocked sources: NREL
 - Generated champion: `none`
 - Proof champion: `coral_growth_fronts`
@@ -213,7 +213,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 77.64
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 6
-- Measured rows: 88
+- Measured rows: 163
 - Blocked sources: KRAKEN, BINANCE_PUBLIC
 - Generated champion: `none`
 - Proof champion: `beast_strategy_breakout`
@@ -221,10 +221,10 @@ This board ranks what to validate next. It does not establish field validation, 
 
 ## Top Family Assets
 
-- 1. `kuramoto_phase_coupling` (wave_resonance_timing): 336.069 - expanded_source_conditioned_holdout_winner_not_field_validated - rolling `rolling_champion`
-- 2. `brachistochrone_descent` (optimal_curve_transport): 273.826 - rolling_champion_repeat_live_context_not_field_validated - rolling `rolling_champion`
-- 3. `thermal_plume_convection` (thermal_ventilation): 188.846 - rolling_champion_repeat_live_context_not_field_validated - rolling `rolling_champion`
-- 4. `leaf_veins` (branching_transport): 151.3 - triple_source_live_candidate_needs_repeat_run - rolling `triple_source_candidate`
+- 1. `kuramoto_phase_coupling` (wave_resonance_timing): 365.167 - expanded_source_conditioned_holdout_winner_not_field_validated - rolling `rolling_champion`
+- 2. `brachistochrone_descent` (optimal_curve_transport): 274.885 - rolling_champion_repeat_live_context_not_field_validated - rolling `rolling_champion`
+- 3. `thermal_plume_convection` (thermal_ventilation): 185.912 - rolling_champion_repeat_live_context_not_field_validated - rolling `rolling_champion`
+- 4. `leaf_veins` (branching_transport): 182.26 - rolling_champion_repeat_live_context_not_field_validated - rolling `rolling_champion`
 - 5. `beast_algo_echo_stack` (time_series_model_routing): 115.0 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`
 - 6. `fractal_brownian_surface` (time_series_model_routing): 112.177 - live_breadth_source_available_needs_lane_replay - rolling `not_promoted`
 - 7. `markov_blanket_boundaries` (stability_diagnostic): 109.15 - proof_value_candidate_not_performance_claim - rolling `not_in_rolling_gate`

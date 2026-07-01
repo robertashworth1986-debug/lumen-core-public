@@ -36,6 +36,7 @@ dashboard/*.html
 !dashboard/mission_control.html
 !dashboard/quant_lab.html
 !dashboard/kraken_execution_dashboard.html
+!dashboard/agent_approval_hub.html
 !dashboard/grants.html
 !dashboard/forecast.html
 !dashboard/explain.html
@@ -83,7 +84,9 @@ desktop.ini
 
 # Cache / temp
 .cache/
+.playwright-cli/
 __MACOSX/
+*.bak.*
 
 # Old / duplicate stack copies
 INSTITAL_STACK_V2/

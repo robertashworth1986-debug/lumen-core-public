@@ -85,6 +85,16 @@ def rolling_by_family(rolling: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {norm_id(row.get("family_id")): row for row in rows_from(rolling, "promotion_board") if row.get("family_id")}
 
 
+def triple_source_rolling_champion_count(rolling: dict[str, Any]) -> int:
+    return len(
+        [
+            row
+            for row in rows_from(rolling, "promotion_board")
+            if row.get("status") == "rolling_champion" and safe_int(row.get("source_count")) >= 3
+        ]
+    )
+
+
 def uncertainty_by_family(uncertainty: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {norm_id(row.get("family_id")): row for row in rows_from(uncertainty, "analyses") if row.get("family_id")}
 
@@ -735,6 +745,7 @@ def build_board() -> dict[str, Any]:
     summary_matrix = matrix.get("summary", {}) if isinstance(matrix.get("summary"), dict) else {}
     truth_summary = summary_dict(truth)
     rolling_summary = summary_dict(rolling)
+    triple_source_champion_count = triple_source_rolling_champion_count(rolling)
     truth_gates = current_truth_gates(truth)
     truth_gates["all_families_have_benchmark_specs"] = (
         bool(family_rows) and spec_summary["specified_count"] == len(family_rows) and spec_summary["missing_count"] == 0
@@ -782,6 +793,7 @@ def build_board() -> dict[str, Any]:
                 "triple_source_candidate_count",
                 truth_summary.get("triple_source_candidate_count", 0),
             ),
+            "triple_source_rolling_champion_count": triple_source_champion_count,
             "single_run_candidate_count": rolling_summary.get(
                 "single_run_candidate_count",
                 truth_summary.get("single_run_candidate_count", 0),
@@ -919,6 +931,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Vault hashes verified: `{str(summary['vault_hashes_verified']).lower()}`",
         f"- Strict rolling champions: `{summary['strict_rolling_champion_count']}`",
         f"- Robust repeat candidates: `{summary['robust_repeat_candidate_count']}`",
+        f"- Triple-source rolling champions: `{summary['triple_source_rolling_champion_count']}`",
         f"- Triple-source candidates: `{summary['triple_source_candidate_count']}`",
         f"- Single-run candidates: `{summary['single_run_candidate_count']}`",
         f"- Kuramoto holdout wins vs Kalman: `{summary.get('kuramoto_holdout_wins_vs_kalman', 0)} / {summary.get('kuramoto_holdout_count', 0)}`",

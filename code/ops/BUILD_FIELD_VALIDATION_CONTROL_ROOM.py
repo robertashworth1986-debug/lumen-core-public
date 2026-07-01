@@ -19,6 +19,7 @@ KURAMOTO_REQUEST_JSON = OUT_OPS / "kuramoto_field_replay_request_latest.json"
 KURAMOTO_REQUEST_SCRIPT = ROOT / "code" / "ops" / "BUILD_KURAMOTO_FIELD_REPLAY_REQUEST.py"
 BUYER_PACKET_JSON = OUT_OPS / "field_validation_buyer_pilot_packet_latest.json"
 BUYER_PACKET_SCRIPT = ROOT / "code" / "ops" / "BUILD_FIELD_VALIDATION_BUYER_PILOT_PACKET.py"
+CHAMPION_GAUNTLET_JSON = OUT_OPS / "champion_metric_gauntlet_latest.json"
 
 OUT_JSON = OUT_OPS / "field_validation_control_room_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "field_validation_control_room.json"
@@ -51,6 +52,14 @@ def write_text(path: Path, text: str) -> None:
 
 def stable_sha256(payload: Any) -> str:
     return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+
+
+def as_dict(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def as_list(value: Any) -> list[Any]:
+    return value if isinstance(value, list) else []
 
 
 def load_builder_payload(script: Path, module_name: str) -> dict[str, Any]:
@@ -158,6 +167,106 @@ def build_claim_ladder(kuramoto_request: dict[str, Any], champion_board: dict[st
     ]
 
 
+def build_external_validation_unlock(champion_gauntlet: dict[str, Any]) -> dict[str, Any]:
+    source_breadth = as_dict(champion_gauntlet.get("source_breadth_universe"))
+    fresh_sources = as_dict(source_breadth.get("fresh_provider_measurement"))
+    manifest = as_dict(source_breadth.get("geometry_manifest"))
+    return {
+        "status": "go_to_request_external_replay_not_go_to_field_claim",
+        "external_approval_received": False,
+        "field_validation_claim_allowed": False,
+        "real_dollar_savings_claim_allowed": False,
+        "fixed_dollar_delta_claim_allowed": False,
+        "what_is_ready_now": [
+            "internal champion replay evidence",
+            "hashable proof feeds",
+            "buyer/lab/agency validation request language",
+            "data intake checklist",
+            "grid/RF/PLL protocol templates",
+            "economic conversion worksheet template",
+        ],
+        "required_external_inputs": [
+            {
+                "input": "held_out_operational_data",
+                "owner": "buyer, agency, lab, utility, or system owner",
+                "why": "Prevents tuning to self-selected examples.",
+                "status": "missing_external_owner_supply_or_approval",
+            },
+            {
+                "input": "incumbent_baseline",
+                "owner": "external system owner",
+                "why": "Defines what must be beaten under equal constraints.",
+                "status": "missing_external_owner_supply_or_approval",
+            },
+            {
+                "input": "acceptance_metric",
+                "owner": "external technical reviewer or operator",
+                "why": "Pre-registers what counts as a win before replay.",
+                "status": "missing_external_owner_supply_or_approval",
+            },
+            {
+                "input": "economic_conversion_factor",
+                "owner": "buyer finance, operations, or program office",
+                "why": "Converts technical delta into an allowed dollar estimate.",
+                "status": "missing_external_owner_supply_or_approval",
+            },
+            {
+                "input": "data_rights_and_publication_boundary",
+                "owner": "buyer legal/security/data owner",
+                "why": "Determines what can be stored, sold, published, or cited.",
+                "status": "missing_external_owner_supply_or_approval",
+            },
+            {
+                "input": "signed_or_logged_result_acceptance",
+                "owner": "external lab, buyer, agency, or system owner",
+                "why": "Turns internal replay into externally traceable validation evidence.",
+                "status": "missing_external_owner_supply_or_approval",
+            },
+        ],
+        "minimum_acceptance_protocol": {
+            "holdout_windows": "20 or more pre-registered windows unless the buyer defines a stricter domain standard",
+            "baseline_execution": "candidate and incumbent run on identical inputs, clocks, missingness rules, and guardrails",
+            "failure_handling": "failed, tied, missing, and adverse windows remain in the ledger",
+            "hashing": "hash raw input pointers, normalized inputs, configs, outputs, logs, and interpretation memo",
+            "review": "external owner confirms whether the acceptance metric was met",
+        },
+        "current_live_source_estate": {
+            "measured_provider_count": fresh_sources.get("measured_provider_count", 0),
+            "enabled_provider_count": fresh_sources.get("enabled_provider_count", 0),
+            "manifest_unique_source_count": manifest.get("unique_source_count", 0),
+            "manifest_ready_for_benchmark_row_count": manifest.get("ready_for_benchmark_row_count", 0),
+            "claim_boundary": source_breadth.get("claim_boundary", ""),
+        },
+        "allowed_language": (
+            "We are ready to run a buyer-authorized replay against your held-out data, incumbent baseline, "
+            "acceptance metric, and agreed economic conversion."
+        ),
+        "blocked_language": (
+            "We have already field validated this, realized savings, or established a fixed dollar value per frozen delta."
+        ),
+    }
+
+
+def build_hardware_tracks(champion_gauntlet: dict[str, Any]) -> dict[str, Any]:
+    hardware = as_dict(champion_gauntlet.get("hardware_validation_unlock"))
+    if hardware:
+        return hardware
+    return {
+        "claim_boundary": (
+            "Grid, RF, and PLL hardware validation require an external owner-controlled replay or instrumented bench."
+        ),
+        "grid_validation": {"required_inputs": [], "acceptance_metrics": []},
+        "rf_validation": {"required_inputs": [], "acceptance_metrics": []},
+        "pll_validation": {"required_inputs": [], "acceptance_metrics": []},
+        "fixed_dollar_claim_blockers": [
+            "External owner-controlled data and economics are missing.",
+        ],
+        "what_api_keys_do": [
+            "Pull fresh measured rows and populate hashable evidence snapshots.",
+        ],
+    }
+
+
 def build_payload() -> dict[str, Any]:
     champion_board = load_or_build_json(
         CHAMPION_BOARD_JSON,
@@ -177,6 +286,7 @@ def build_payload() -> dict[str, Any]:
         "field_validation_buyer_pilot_packet_v1",
         "buyer_packet_for_field_validation_control_room",
     )
+    champion_gauntlet = read_json(CHAMPION_GAUNTLET_JSON)
 
     champion = champion_board.get("champion_of_champions", {})
     if not isinstance(champion, dict):
@@ -188,6 +298,8 @@ def build_payload() -> dict[str, Any]:
         kuramoto_summary = {}
     kuramoto_packet = select_packet(buyer_packet, "kuramoto_phase_coupling")
     brach_packet = select_packet(buyer_packet, "brachistochrone_descent")
+    external_unlock = build_external_validation_unlock(champion_gauntlet)
+    hardware_tracks = build_hardware_tracks(champion_gauntlet)
 
     control_room = {
         "schema": "field_validation_control_room_v1",
@@ -211,6 +323,13 @@ def build_payload() -> dict[str, Any]:
             "best_buyer_pilot_lane": buyer_card.get("lane", ""),
             "manual_outreach_ready": True,
             "bulk_email_allowed": False,
+            "external_validation_unlock_packet_ready": True,
+            "external_approval_received": False,
+            "grid_rf_pll_protocols_ready": bool(hardware_tracks),
+            "broader_measured_provider_count": external_unlock["current_live_source_estate"][
+                "measured_provider_count"
+            ],
+            "manifest_unique_source_count": external_unlock["current_live_source_estate"]["manifest_unique_source_count"],
             "field_validation_claim_allowed": False,
             "real_dollar_savings_claim_allowed": False,
             "fixed_dollar_delta_claim_allowed": False,
@@ -236,6 +355,8 @@ def build_payload() -> dict[str, Any]:
             "field_replay_request": kuramoto_request.get("request_packet", {}),
             "claim_ladder": build_claim_ladder(kuramoto_request, champion_board),
         },
+        "external_validation_unlock": external_unlock,
+        "hardware_validation_tracks": hardware_tracks,
         "buyer_tracks": [
             {
                 "family_id": "kuramoto_phase_coupling",
@@ -260,11 +381,11 @@ def build_payload() -> dict[str, Any]:
             "Use the Kuramoto field replay request as the primary buyer-facing validation ask.",
             "Select one energy/grid, forecasting, sensor-fusion, or industrial-stability owner with real holdout data.",
             "Ask for 20 pre-registered windows and their accepted incumbent baseline before any replay.",
+            "Ask the owner to approve the exact acceptance metric and economic conversion before any scoring.",
             "Freeze the buyer baseline, metrics, pass/fail threshold, and forbidden tuning rules.",
             "Run candidate and incumbent under identical constraints.",
             "Hash inputs, logs, outputs, and the interpretation memo.",
             "Record failures as first-class evidence rather than deleting them.",
-            "Only convert to dollars after the buyer supplies accepted economic conversion factors.",
             "Keep brachistochrone as the second paid-pilot lane for constrained transport/routing.",
             "Do not use field-validation or fixed-dollar language until the external replay passes.",
         ],
@@ -329,6 +450,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     bridge = payload["proof_bridge"]["internal_replay_result"]
     top_assets = payload["top_assets"]
+    external = payload["external_validation_unlock"]
+    hardware = payload["hardware_validation_tracks"]
     lines = [
         "# Field Validation Control Room",
         "",
@@ -351,6 +474,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- Manual outreach ready: `{str(summary['manual_outreach_ready']).lower()}`",
         f"- Bulk email allowed: `{str(summary['bulk_email_allowed']).lower()}`",
+        f"- External validation unlock packet ready: `{str(summary['external_validation_unlock_packet_ready']).lower()}`",
+        f"- External approval received: `{str(summary['external_approval_received']).lower()}`",
+        f"- Grid/RF/PLL protocols ready: `{str(summary['grid_rf_pll_protocols_ready']).lower()}`",
+        f"- Broader measured providers: `{summary['broader_measured_provider_count']}`",
+        f"- Manifest unique sources: `{summary['manifest_unique_source_count']}`",
         f"- Field-validation claim allowed: `{str(summary['field_validation_claim_allowed']).lower()}`",
         f"- Real-dollar savings claim allowed: `{str(summary['real_dollar_savings_claim_allowed']).lower()}`",
         f"- Fixed-dollar delta claim allowed: `{str(summary['fixed_dollar_delta_claim_allowed']).lower()}`",
@@ -367,9 +495,53 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This supports a field-replay request. It does not establish field validation or a realized-dollar claim.",
         "",
-        "## Top Assets",
+        "## External Validation Unlock",
+        "",
+        f"- Status: `{external['status']}`",
+        f"- External approval received: `{str(external['external_approval_received']).lower()}`",
+        f"- Allowed language: {external['allowed_language']}",
+        f"- Blocked language: {external['blocked_language']}",
+        "",
+        "Required external inputs before field-validation or dollar claims:",
         "",
     ]
+    for row in external["required_external_inputs"]:
+        lines.append(f"- `{row['input']}` from `{row['owner']}`: {row['why']} Status: `{row['status']}`")
+    lines.extend(
+        [
+            "",
+            "Minimum acceptance protocol:",
+            "",
+        ]
+    )
+    for key, value in external["minimum_acceptance_protocol"].items():
+        lines.append(f"- `{key}`: {value}")
+    lines.extend(
+        [
+            "",
+            "## Grid/RF/PLL Validation Tracks",
+            "",
+            hardware.get("claim_boundary", ""),
+            "",
+        ]
+    )
+    for track_name in ["grid_validation", "rf_validation", "pll_validation"]:
+        track = hardware.get(track_name, {})
+        label = track_name.replace("_", " ").title()
+        lines.extend([f"### {label}", "", "Required inputs:"])
+        for item in track.get("required_inputs", []):
+            lines.append(f"- {item}")
+        lines.append("")
+        lines.append("Acceptance metrics:")
+        for item in track.get("acceptance_metrics", []):
+            lines.append(f"- {item}")
+        lines.append("")
+    lines.extend(
+        [
+        "## Top Assets",
+        "",
+        ]
+    )
     for row in top_assets.get("top_family_asset_rankings", []):
         lines.extend(
             [

@@ -96,6 +96,16 @@ def test_skip_live_check_reports_local_ready_but_not_domain_verified(tmp_path):
     assert summary["real_dollar_savings_claim_allowed"] is False
 
 
+def test_feed_contract_includes_expanded_bridge_and_domain_audit():
+    module = load_module()
+    specs = {row["key"]: row for row in module.PROOF_FEEDS}
+
+    assert specs["champion_sample_expansion_and_economic_bridge"]["required"] is True
+    assert "economic claim bridge" in specs["champion_sample_expansion_and_economic_bridge"]["why"]
+    assert specs["live_domain_consolidation_audit"]["required"] is False
+    assert "Public-domain surface audit" in specs["live_domain_consolidation_audit"]["why"]
+
+
 def test_all_required_hosted_hashes_matching_makes_domain_reviewer_ready(tmp_path, monkeypatch):
     module = load_module()
     data_dir = seed_workspace(module, tmp_path)

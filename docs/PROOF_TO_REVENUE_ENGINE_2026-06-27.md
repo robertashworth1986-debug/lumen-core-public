@@ -1,15 +1,15 @@
 # Proof To Revenue Engine
 
-Generated UTC: `2026-06-27T21:13:53.265608+00:00`
+Generated UTC: `2026-07-01T05:53:20.085838+00:00`
 
 ## Current State
 
-The proof stack is now strong enough for manually reviewed paid-pilot outreach: public hashes match, Kuramoto phase coupling beat kalman_filter on 24/24 holdouts, and the next money gate is buyer-authorized field replay. It is not yet a realized savings claim.
+The proof stack has manually reviewable pilot material, but public hash verification is still pending. Kuramoto phase coupling beat kalman_filter on 24/24 holdouts, and the next money gate is buyer-authorized field replay. It is not yet a realized savings claim.
 
 ## Deployment Verification
 
-- Live domain hash verified: `true`
-- Required remote hash matches: `7/7`
+- Live domain hash verified: `false`
+- Required remote hash matches: `0/12`
 - Reviewer champion feed: `https://lumen-core.ai/data/champion_metric_gauntlet.json`
 - Mission control: `https://lumen-core.ai/mission_control.html`
 
@@ -19,13 +19,13 @@ The proof stack is now strong enough for manually reviewed paid-pilot outreach: 
 - Named baseline: `kalman_filter`
 - Holdout wins: `24/24`
 - Source systems: `4`
-- Estimated rows replayed: `2506267`
+- Estimated rows replayed: `2507379`
 - Safe estimated hourly value surface: `$4,520.00`
 - Safe estimated annual value surface: `$39,595,200.00`
 
 ## What We Can Sell Today
 
-- Revenue stage: `manual_paid_pilot_scoping_ready`
+- Revenue stage: `proof_stack_not_ready_for_outreach`
 - Safest first offer: `Paid evidence review / field replay scoping`
 - Pricing posture: `quote after scope; no fixed delta price yet`
 - Manual reviewed outreach allowed: `true`
@@ -70,4 +70,4 @@ The proof stack is now strong enough for manually reviewed paid-pilot outreach: 
 9. Which grant packet should cite this proof feed?
 10. What proof should never be sent without human review?
 
-Proof-to-revenue SHA-256: `712311d7075d0dc9d5d677442c3c319df2dc445485264e39ec338a814ea9bf9f`
+Proof-to-revenue SHA-256: `00368143df3cda8d38725dc0788a601c5acde95c1cf0ee705ca84d09cd173f16`

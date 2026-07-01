@@ -1,6 +1,6 @@
 # First Buyer Target Board
 
-Generated UTC: `2026-06-27T22:59:34.398972+00:00`
+Generated UTC: `2026-06-29T16:50:23.016860+00:00`
 
 First-buyer target board. This artifact selects named, source-verified buyer channels for a manual paid evidence review or buyer-authorized field replay. It does not authorize auto-send, bulk outreach, contact scraping, fixed frozen-delta pricing, field-validation claims, realized-savings claims, live trading, or autonomous operational execution.
 

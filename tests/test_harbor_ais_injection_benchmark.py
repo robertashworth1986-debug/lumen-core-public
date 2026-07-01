@@ -76,5 +76,12 @@ def test_injection_benchmark_preserves_claim_boundary(tmp_path):
     assert payload["controlled_injection_benchmark"]["motion_consistency_recall"] >= (
         payload["controlled_injection_benchmark"]["speed_only_baseline_recall"]
     )
+    suite = payload["controlled_injection_benchmark"]["baseline_suite"]
+    assert set(suite["baselines"]) == {
+        "reported_speed_sog_p99",
+        "derived_trajectory_speed_p99",
+        "speed_gap_consistency_p99",
+        "heading_rate_p99",
+    }
+    assert suite["best_single_axis_baseline"]["recall"] <= payload["controlled_injection_benchmark"]["motion_consistency_recall"]
     assert "does not establish HarborSentinel operational detection performance" in payload["claim_boundary"]
-

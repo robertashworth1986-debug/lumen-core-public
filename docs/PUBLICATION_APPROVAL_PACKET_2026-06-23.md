@@ -1,6 +1,6 @@
 # Publication Approval Packet
 
-Generated UTC: `2026-06-23T20:47:38.931952+00:00`
+Generated UTC: `2026-07-01T07:40:02.832843+00:00`
 
 ## Status
 
@@ -10,10 +10,10 @@ Generated UTC: `2026-06-23T20:47:38.931952+00:00`
 
 ## Evidence Summary
 
-- Registered geometry families: `75`
+- Registered geometry families: `140`
 - Lanes: `12`
-- Generated benchmark-result families: `4`
-- Proof-priority candidates: `11`
+- Generated benchmark-result families: `0`
+- Proof-priority candidates: `0`
 - Field-validated families: `0`
 
 ## Channel Plan
@@ -34,7 +34,7 @@ Founder, LumenCore | Proof-Driven AI Infrastructure | Geometry Benchmarking, Liv
 
 I am building LumenCore, a proof-driven adaptive orchestration stack for complex systems. The work is organized around a simple discipline: synthetic benchmarks discover candidates, frozen live-data replay proves what survives, and field validation is required before real-world performance or dollar claims.
 
-The current public geometry audit ranks 75 route/path families across 12 lanes. It identifies 4 generated benchmark-result families, 11 proof-priority candidates, and 57 test-spec-ready families still awaiting full benchmark execution.
+The current public geometry audit ranks 140 route/path families across 12 lanes. It identifies 0 generated benchmark-result families, 0 proof-priority candidates, and 137 test-spec-ready families still awaiting full benchmark execution.
 
 I am looking for serious technical reviewers, agency-aligned collaborators, and pilot partners who care about reproducible evidence, bounded claims, and practical transition paths.
 
@@ -48,7 +48,7 @@ Featured proof packet: LumenCore geometry synthetic/live coverage audit. It sepa
 
 I published a bounded LumenCore geometry coverage audit.
 
-Current state: 75 route/path families ranked across 12 lanes; 4 have generated benchmark-result evidence; 11 are proof-priority candidates; 0 are field validated.
+Current state: 140 route/path families ranked across 12 lanes; 0 have generated benchmark-result evidence; 0 are proof-priority candidates; 0 are field validated.
 
 The core rule is: synthetic discovers, live proves, field validation wins trust.
 
@@ -68,7 +68,7 @@ Subject: LumenCore public proof audit: geometry coverage and validation boundari
 
 Hello,
 
-I am sharing a public-safe LumenCore proof artifact for technical review. The new geometry coverage audit ranks 75 route/path families across 12 lanes and separates generated benchmark evidence from live replay and field validation.
+I am sharing a public-safe LumenCore proof artifact for technical review. The new geometry coverage audit ranks 140 route/path families across 12 lanes and separates generated benchmark evidence from live replay and field validation.
 
 The purpose is not to claim final performance. The purpose is to make the evidence boundary auditable: what has been ranked, what has synthetic benchmark evidence, what is queued for live replay, and what still requires independent/field validation.
 

@@ -1,9 +1,13 @@
 # DICE Cost Basis - Working Draft
 
-Updated: June 13, 2026
+Updated: June 19, 2026
 
 Status: planning basis only; not a certified cost proposal, accounting
 determination, vendor quote, or commitment by any proposed teammate.
+
+June 19 note: this file is still suitable only as an abstract-stage ROM
+planning basis. It should not be treated as a final DARPA cost volume, audited
+rate support, or validated resource-sharing position.
 
 ## Solicitation Basis
 

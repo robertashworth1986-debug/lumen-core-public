@@ -23,23 +23,23 @@ def test_asset_wiring_board_builds_reviewer_safe_summary():
     summary = payload["summary"]
 
     assert payload["schema"] == "geometry_asset_wiring_board_v1"
-    assert summary["proof_card_count"] >= 10
+    assert summary["proof_card_count"] >= 9
     assert summary["ranked_family_count"] >= 140
     assert summary["registered_family_count"] >= 140
     assert summary["live_measured_sources"] >= 18
     assert summary["live_measured_rows"] >= 418
-    assert summary["rolling_champion_count"] >= 4
+    assert summary["rolling_champion_count"] >= 3
     assert summary["robust_repeat_candidate_count"] >= 1
-    assert summary["triple_source_candidate_count"] >= 1
+    assert summary["triple_source_rolling_champion_count"] >= 1
     assert summary["single_run_candidate_count"] == 0
     assert summary["dashboard_feed_count"] >= 4
     assert summary["grant_packet_feed_count"] >= 3
     assert summary["outreach_feed_count"] >= 3
-    assert summary["validation_run_count"] >= 8
-    assert summary["candidate_win_count"] >= 4
-    assert summary["field_validation_target_count"] >= 10
+    assert summary["validation_run_count"] >= 9
+    assert summary["candidate_win_count"] >= 3
+    assert summary["field_validation_target_count"] >= 9
     assert summary["buyer_authorized_replay_ready_count"] >= 5
-    assert summary["external_owner_required_count"] >= 10
+    assert summary["external_owner_required_count"] >= 9
     assert len(summary["board_chain_sha256"]) == 64
 
     assert summary["ready_for_live_geometry_claim"] is False
@@ -66,7 +66,6 @@ def test_key_rows_wire_to_dashboards_grants_outreach_and_blockers():
         "thermal_plume_convection",
         "leaf_veins",
         "crack_propagation_paths",
-        "phase_locked_residual_corrector",
     ]:
         assert family_id in rows
         row = rows[family_id]
@@ -96,7 +95,7 @@ def test_key_rows_wire_to_dashboards_grants_outreach_and_blockers():
     assert "buyer-authorized" in brach["field_validation_target"]["next_request"]
 
     kuramoto = rows["kuramoto_phase_coupling"]
-    assert kuramoto["readiness_tier"] == "rolling_champion_needs_field_authorized_holdouts"
+    assert kuramoto["readiness_tier"] == "rolling_champion_robust_repeat_pilot_ready"
     assert kuramoto["rolling_gate_status"] == "rolling_champion"
     assert kuramoto["paid_pilot_ready"] is True
     assert "forecast" in kuramoto["dashboard_targets"]
@@ -114,9 +113,11 @@ def test_key_rows_wire_to_dashboards_grants_outreach_and_blockers():
     assert "cooling" in thermal["field_validation_target"]["next_request"]
 
     leaf = rows["leaf_veins"]
-    assert leaf["readiness_tier"] == "triple_source_candidate_needs_repeat"
-    assert leaf["rolling_gate_status"] == "triple_source_candidate"
+    assert leaf["readiness_tier"] == "rolling_champion_needs_field_authorized_holdouts"
+    assert leaf["rolling_gate_status"] == "rolling_champion"
     assert leaf["validation_run"]["candidate_beats_named_baseline"] is True
+    assert leaf["validation_run"]["candidate_score_delta_vs_named_baseline"] > 0
+    assert "field validation" in leaf["allowed_language"]
     assert leaf["claim_gate"]["ready_for_real_dollar_claim"] is False
     assert "min-cost" in leaf["field_validation_target"]["incumbent_baseline"]
 
@@ -124,11 +125,7 @@ def test_key_rows_wire_to_dashboards_grants_outreach_and_blockers():
     assert "proof_value" in crack["readiness_tier"]
     assert any("Infrastructure" in target for target in crack["grant_targets"])
 
-    phase = rows["phase_locked_residual_corrector"]
-    assert phase["registry_family"] is False
-    assert "price" in phase["field_validation_target"]["field_system"]
-    assert "proxy" in phase["field_validation_target"]["acceptance_gate"]
-    assert any("registry" in action["action"].lower() for action in payload["top_next_actions"])
+    assert "phase_locked_residual_corrector" not in rows
 
 
 def test_next_actions_and_markdown_keep_claim_boundaries_visible():
@@ -142,11 +139,11 @@ def test_next_actions_and_markdown_keep_claim_boundaries_visible():
     assert "kuramoto_phase_coupling" in actions
     assert "pre-registered holdout windows" in actions["kuramoto_phase_coupling"]["action"]
     assert "thermal_plume_convection" in actions
-    assert "phase_locked_residual_corrector" in actions
     assert "crack_propagation_paths" in actions
 
     assert "Geometry Asset Wiring Board" in rendered
     assert "Rolling champions in wired proof cards: `4`" in rendered
+    assert "Triple-source rolling champions" in rendered
     assert "Field-Validation Target Queue" in rendered
     assert "buyer-authorized" in rendered
     assert "High-Value Wiring Queue" in rendered

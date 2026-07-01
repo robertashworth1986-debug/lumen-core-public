@@ -1,6 +1,6 @@
 # Claim Strength And Value Unlock Map
 
-Generated UTC: `2026-06-25T17:19:16.830590+00:00`
+Generated UTC: `2026-06-27T17:45:57.472806+00:00`
 
 This artifact converts the current proof stack into the strongest defensible claim ladder. It supports bounded estimated-value language, paid technical evaluation scoping, and buyer-authorized field replay. It does not authorize realized-savings claims, fixed-dollar frozen-delta pricing, award certainty, bulk outreach, live trading, or autonomous operational execution.
 
@@ -40,8 +40,8 @@ Worth money now as a paid technical evaluation or buyer-authorized pilot option,
 
 | Family | Lane | Windows | Lower 95 Delta | Sign-Test P | Claim Boundary |
 |---|---|---:|---:|---:|---|
-| `brachistochrone_descent` | `optimal_curve_transport` | 7/7 | 0.072454 | 0.0078125 | paid evaluation allowed; field validation blocked |
-| `kuramoto_phase_coupling` | `wave_resonance_timing` | 3/3 | 0.16276 | 0.125 | paid evaluation allowed; field validation blocked |
+| `brachistochrone_descent` | `optimal_curve_transport` | 8/8 | 0.071919 | 0.00390625 | paid evaluation allowed; field validation blocked |
+| `kuramoto_phase_coupling` | `wave_resonance_timing` | 4/4 | 0.128296 | 0.0625 | paid evaluation allowed; field validation blocked |
 
 ## Highest-Value Unlocks
 
@@ -74,4 +74,4 @@ Claim boundary: Use circle/Flower-of-Life geometry as a candidate prior until it
 - live trading performance
 - government owes this value
 
-Claim-strength hash: `80d126d7c20374d44b69296d79d94728045a29970c22f3d23ce8b57288ff3054`
+Claim-strength hash: `b5feaea7de190724f339ec3c8edbc8104f6ce992b3d0a953e7980d7589179ed6`

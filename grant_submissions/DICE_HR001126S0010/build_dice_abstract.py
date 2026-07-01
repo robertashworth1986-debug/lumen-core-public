@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
+from zipfile import ZIP_DEFLATED, ZipFile
+import xml.etree.ElementTree as ET
 
 from docx import Document
 from docx.enum.section import WD_SECTION
@@ -25,6 +27,18 @@ INK = RGBColor(0x00, 0x00, 0x00)
 BLUE = RGBColor(0x1F, 0x4E, 0x78)
 GRAY = RGBColor(0x55, 0x55, 0x55)
 LIGHT_BLUE = "D9EAF7"
+
+CONTENT_TYPES_NS = "http://schemas.openxmlformats.org/package/2006/content-types"
+REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
+CORE_NS = "http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
+DC_NS = "http://purl.org/dc/elements/1.1/"
+DCTERMS_NS = "http://purl.org/dc/terms/"
+XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
+
+ET.register_namespace("cp", CORE_NS)
+ET.register_namespace("dc", DC_NS)
+ET.register_namespace("dcterms", DCTERMS_NS)
+ET.register_namespace("xsi", XSI_NS)
 
 
 def set_cell_shading(cell, fill: str) -> None:
@@ -54,9 +68,122 @@ def set_cell_margins(cell, top=80, start=120, bottom=80, end=120) -> None:
 
 def set_repeat_table_header(row) -> None:
     tr_pr = row._tr.get_or_add_trPr()
+    if tr_pr.find(qn("w:tblHeader")) is not None:
+        return
     tbl_header = OxmlElement("w:tblHeader")
     tbl_header.set(qn("w:val"), "true")
     tr_pr.append(tbl_header)
+
+
+def _remove_package_relationships(xml_bytes: bytes) -> bytes:
+    root = ET.fromstring(xml_bytes)
+    changed = False
+    for rel in list(root):
+        rel_type = rel.attrib.get("Type", "")
+        target = rel.attrib.get("Target", "")
+        target_norm = target.replace("\\", "/")
+        remove = (
+            rel_type.endswith("/comments")
+            or rel_type.endswith("/commentsExtended")
+            or rel_type.endswith("/commentsExtensible")
+            or rel_type.endswith("/commentsIds")
+            or rel_type.endswith("/people")
+            or rel_type.endswith("/classificationlabels")
+            or rel_type.endswith("/customXml")
+            or rel_type.endswith("/custom-properties")
+            or target_norm in {
+                "comments.xml",
+                "commentsExtended.xml",
+                "commentsExtensible.xml",
+                "commentsIds.xml",
+                "people.xml",
+                "docMetadata/LabelInfo.xml",
+            }
+            or target_norm.startswith("customXml/")
+            or target_norm.startswith("../customXml/")
+            or target_norm == "docProps/custom.xml"
+        )
+        if remove:
+            root.remove(rel)
+            changed = True
+    return ET.tostring(root, encoding="utf-8", xml_declaration=True) if changed else xml_bytes
+
+
+def _remove_content_type_overrides(xml_bytes: bytes) -> bytes:
+    root = ET.fromstring(xml_bytes)
+    changed = False
+    for override in list(root):
+        part_name = override.attrib.get("PartName", "")
+        if (
+            part_name
+            in {
+                "/word/comments.xml",
+                "/word/commentsExtended.xml",
+                "/word/commentsExtensible.xml",
+                "/word/commentsIds.xml",
+                "/word/people.xml",
+                "/docMetadata/LabelInfo.xml",
+                "/docProps/custom.xml",
+            }
+            or part_name.startswith("/customXml/")
+        ):
+            root.remove(override)
+            changed = True
+    return ET.tostring(root, encoding="utf-8", xml_declaration=True) if changed else xml_bytes
+
+
+def _set_text(root: ET.Element, tag: str, value: str) -> None:
+    node = root.find(tag)
+    if node is None:
+        node = ET.SubElement(root, tag)
+    node.text = value
+
+
+def _clean_core_properties(xml_bytes: bytes) -> bytes:
+    root = ET.fromstring(xml_bytes)
+    _set_text(root, f"{{{DC_NS}}}creator", "Robert Ashworth")
+    _set_text(root, f"{{{CORE_NS}}}lastModifiedBy", "LumenCore")
+    _set_text(root, f"{{{CORE_NS}}}revision", "1")
+    last_printed = root.find(f"{{{CORE_NS}}}lastPrinted")
+    if last_printed is not None:
+        root.remove(last_printed)
+    _set_text(root, f"{{{DCTERMS_NS}}}created", "2026-06-19T00:00:00Z")
+    created = root.find(f"{{{DCTERMS_NS}}}created")
+    if created is not None:
+        created.set(f"{{{XSI_NS}}}type", "dcterms:W3CDTF")
+    _set_text(root, f"{{{DCTERMS_NS}}}modified", "2026-06-19T00:00:00Z")
+    modified = root.find(f"{{{DCTERMS_NS}}}modified")
+    if modified is not None:
+        modified.set(f"{{{XSI_NS}}}type", "dcterms:W3CDTF")
+    return ET.tostring(root, encoding="utf-8", xml_declaration=True)
+
+
+def scrub_template_artifacts(docx_path: Path) -> None:
+    """Remove hidden template review/SharePoint artifacts after generation."""
+    remove_names = {
+        "word/comments.xml",
+        "word/commentsExtended.xml",
+        "word/commentsExtensible.xml",
+        "word/commentsIds.xml",
+        "word/people.xml",
+        "docMetadata/LabelInfo.xml",
+        "docProps/custom.xml",
+    }
+    tmp_path = docx_path.with_suffix(".scrubbed.tmp.docx")
+    with ZipFile(docx_path, "r") as src, ZipFile(tmp_path, "w", ZIP_DEFLATED) as dst:
+        for item in src.infolist():
+            name = item.filename
+            if name in remove_names or name.startswith("customXml/"):
+                continue
+            data = src.read(name)
+            if name == "[Content_Types].xml":
+                data = _remove_content_type_overrides(data)
+            elif name.endswith(".rels"):
+                data = _remove_package_relationships(data)
+            elif name == "docProps/core.xml":
+                data = _clean_core_properties(data)
+            dst.writestr(item, data)
+    tmp_path.replace(docx_path)
 
 
 def configure_styles(doc: Document) -> None:
@@ -81,6 +208,10 @@ def configure_styles(doc: Document) -> None:
         style.paragraph_format.space_before = Pt(before)
         style.paragraph_format.space_after = Pt(after)
         style.paragraph_format.keep_with_next = True
+        p_pr = style.element.get_or_add_pPr()
+        num_pr = p_pr.find(qn("w:numPr"))
+        if num_pr is not None:
+            p_pr.remove(num_pr)
 
 
 def set_run(run, *, bold=False, italic=False, size=12, color=INK) -> None:
@@ -187,9 +318,15 @@ def add_bullet(doc: Document, text: str):
 
 
 def add_heading(doc: Document, text: str, level=1):
-    p = doc.add_heading(text, level=level)
-    for run in p.runs:
-        set_run(run, bold=True, size=14 if level == 1 else 12, color=BLUE)
+    p = doc.add_paragraph()
+    p.style = doc.styles["Normal"]
+    size = 14 if level == 1 else 12
+    before = 12 if level == 1 else 8
+    after = 6 if level == 1 else 4
+    p.paragraph_format.space_before = Pt(before)
+    p.paragraph_format.space_after = Pt(after)
+    p.paragraph_format.keep_with_next = True
+    set_run(p.add_run(text), bold=True, size=size, color=BLUE)
     return p
 
 
@@ -266,7 +403,7 @@ def add_cover(doc: Document) -> None:
         ("Award Instrument Requested", "OT for Research"),
         (
             "Estimated Total Cost (Base + Options)",
-            "$4,920,000 planning estimate; cost basis requires validation before submission",
+            "$4,920,000 abstract-stage ROM planning estimate; validate before full proposal",
         ),
         ("Estimated Period of Performance", "36 months; planning start February 1, 2027"),
         (
@@ -326,7 +463,7 @@ def add_goals(doc: Document) -> None:
         "architecture for heterogeneous open-weight and black-box AI agents. CBPM "
         "replaces a persistent central orchestrator with sparse peer task markets, "
         "reputation-weighted context fusion, and a local inference-control loop that "
-        "exposes measurable role-coherence guarantees to the coordination layer. "
+        "exposes measurable role-coherence bounds to the coordination layer. "
         "The research addresses TA1 and TA2 together because planning depth is limited "
         "by the period over which each agent can remain aligned to its assigned role.",
     )
@@ -454,6 +591,23 @@ def add_technical_approach(doc: Document) -> None:
     )
     add_body_paragraph(
         doc,
+        "A disjoint constraint-contract ablation then compared peer reputation with "
+        "bids carrying explicit role, horizon, evidence-lineage, expiration, and risk "
+        "fields. Across 30 validation scenarios per condition with 500 agents and 1,200 "
+        "tasks, the contract method improved safe completion by 4.16 percentage points "
+        "in benign conditions (95% paired bootstrap CI 3.84-4.46), 3.52 points under "
+        "10% independent compromise (3.04-3.98), 3.50 points under 10% collusion "
+        "(3.05-3.96), 2.10 points under monitor shift (1.69-2.49), and 1.35 points under "
+        "25% high collusion (0.95-1.75). Modeled constraint violations fell by 5.66-7.24 "
+        "points and messages per safe completion fell by 1.07-1.81. The tradeoff was a "
+        "2.5-4.5 point reduction in raw completion from deterministic rejection, with "
+        "false rejection reaching 11.38% under monitor shift. Under high collusion, "
+        "compromised assignments increased by 0.96 points because locally consistent "
+        "forgeries passed field checks. Contract fields were piggybacked on existing "
+        "messages; byte, latency, and cryptographic costs were not measured.",
+    )
+    add_body_paragraph(
+        doc,
         "Evidence boundary: these agents are stochastic task executors, not language "
         "models. The result demonstrates only that the proposed metrics and a narrow "
         "protocol hypothesis can be evaluated reproducibly. It does not establish DICE "
@@ -492,9 +646,9 @@ def add_technical_approach(doc: Document) -> None:
         "centralized multi-engine orchestration, fail-closed runtime controls, streaming "
         "anomaly detection, walk-forward benchmarking, and SHA-256 evidence manifests. "
         "A public demonstration and evidence portal is available at "
-        "https://lumen-core.ai and the public repository is "
-        "https://github.com/robertashworth1986-debug/lumen-core-public. Public code is "
-        "MIT licensed; proposal-specific adaptor research and data-rights assertions "
+        "https://lumen-core.ai and the public repository is available at "
+        "https://github.com/robertashworth1986-debug/lumen-core-public with MIT-licensed "
+        "public code; proposal-specific adaptor research and data-rights assertions "
         "will be identified in the full proposal.",
     )
     add_body_paragraph(
@@ -545,13 +699,13 @@ def add_cost(doc: Document) -> None:
     add_heading(doc, "4. Cost and Schedule", 1)
     add_body_paragraph(
         doc,
-        "The following is a planning estimate for abstract review, not a certified cost "
-        "proposal. The provisional basis is 21,060 direct labor hours at a $100/hour "
-        "blended direct rate, 25% fringe, 28% combined overhead/G&A on labor plus fringe, "
-        "$350,000 of specialized subaward/consultant effort, $1,040,000 of cloud/HPC, "
-        "$80,000 of travel, and $80,000 of software/data/equipment. Rates, indirect "
-        "costs, subaward scopes, resource-sharing terms, and vendor quotations must be "
-        "validated before submission.",
+        "The following is an abstract-stage ROM planning estimate, not a certified cost "
+        "proposal or reviewed cost volume. The provisional basis is 21,060 direct labor "
+        "hours at a $100/hour blended direct rate, 25% fringe, 28% combined overhead/G&A "
+        "on labor plus fringe, $350,000 of specialized subaward/consultant effort, "
+        "$1,040,000 of cloud/HPC, $80,000 of travel, and $80,000 of software/data/"
+        "equipment. Rates, indirect costs, subaward scopes, resource-sharing terms, and "
+        "vendor quotations must be validated before any full-proposal cost submission.",
     )
 
     rows = [
@@ -583,19 +737,20 @@ def add_cost(doc: Document) -> None:
 
     add_body_paragraph(
         doc,
-        "Major milestones: Month 3 adaptor interface prototype; Month 4 self-evaluation; "
-        "Month 6 centralized baseline integration; Month 8 Phase 1 comparison; Months "
-        "13/16/19 adversarial evaluations; Month 23 down-select playoff; Month 30 scaling "
-        "evaluation; Month 33 self-play; Month 35 final competition and transition demo.",
+        "Major milestones: M3 adaptor prototype; M4 self-evaluation; M6 baseline "
+        "integration; M8 Phase 1 comparison; M13/16/19 adversarial evaluations; M23 "
+        "down-select; M30 scaling evaluation; M33 self-play; M35 transition demo.",
     )
 
 
 def add_publications(doc: Document) -> None:
-    doc.add_page_break()
     add_heading(doc, "5. Publications", 1)
     reports = [
         "Ashworth, Robert. \"DICE Preliminary Synthetic Benchmark V1: Sparse Peer Auction "
         "with Local Role-Coherence Control.\" Technical report and SHA-256 manifest, 2026.",
+        "Ashworth, Robert. \"DICE Constraint-Carrying Commitment Benchmark: Role, "
+        "Evidence-Lineage, Expiration, and Coherence-Horizon Ablation.\" Generated "
+        "discrete-event technical report and SHA-256 manifest, 2026.",
         "Ashworth, Robert. \"HarborSentinel Synthetic Benchmark: Explainable Streaming "
         "Maritime Anomaly Detection.\" Technical report and reproducibility package, 2026.",
         "Ashworth, Robert. \"Harmonic Validation Protocol: Leakage-Resistant Walk-Forward "
@@ -612,25 +767,30 @@ def add_publications(doc: Document) -> None:
 def add_bibliography(doc: Document) -> None:
     add_heading(doc, "6. Bibliography", 1)
     refs = [
-        "DARPA. HR001126S0010, Decentralized Artificial Intelligence through Controlled "
-        "Emergence (DICE), 2026. https://www.darpa.mil/research/programs/"
+        "Defense Advanced Research Projects Agency. (2026). HR001126S0010, "
+        "Decentralized Artificial Intelligence through Controlled Emergence (DICE). "
+        "https://www.darpa.mil/research/programs/"
         "decentralized-artificial-intelligence-through-controlled-emergence",
-        "Turner, A. M., et al. \"Steering Language Models with Activation Engineering.\" "
-        "arXiv:2308.10248, 2023. https://arxiv.org/abs/2308.10248",
-        "Shapira, N., et al. \"Prompt Infection: LLM-to-LLM Prompt Injection within "
-        "Multi-Agent Systems.\" arXiv:2410.07283, 2024. "
+        "Turner, A. M., et al. (2023). Steering Language Models with Activation "
+        "Engineering. arXiv:2308.10248. https://arxiv.org/abs/2308.10248",
+        "Shapira, N., et al. (2024). Prompt Infection: LLM-to-LLM Prompt Injection "
+        "within Multi-Agent Systems. arXiv:2410.07283. "
         "https://arxiv.org/abs/2410.07283",
-        "Friston, K. J., et al. \"Designing Ecosystems of Intelligence from First "
-        "Principles.\" Collective Intelligence 3(1), 2024.",
-        "Zhou, H., et al. \"ReSo: A Reward-Driven Self-Organizing LLM-Based Multi-Agent "
-        "System for Reasoning Tasks.\" EMNLP, 2025.",
-        "Lee, H., et al. \"Robust Multi-Agent LLMs under Byzantine Faults.\" "
-        "arXiv:2605.09076, 2026. https://arxiv.org/abs/2605.09076",
-        "Model Context Protocol. https://github.com/modelcontextprotocol",
-        "Agent2Agent Protocol. https://github.com/a2aproject",
-        "vLLM Project. https://docs.vllm.ai/",
-        "Fujimoto, R. M. \"Parallel Discrete Event Simulation.\" Communications of the "
-        "ACM 33(10), 1990.",
+        "Friston, K. J., et al. (2024). Designing Ecosystems of Intelligence from First "
+        "Principles. Collective Intelligence, 3(1). "
+        "https://doi.org/10.1177/26339137231222481",
+        "Zhou, H., et al. (2025). ReSo: A Reward-Driven Self-Organizing LLM-Based "
+        "Multi-Agent System for Reasoning Tasks. Proceedings of EMNLP 2025. "
+        "https://aclanthology.org/2025.emnlp-main.808/",
+        "Lee, H., et al. (2026). Robust Multi-Agent LLMs under Byzantine Faults. "
+        "arXiv:2605.09076. https://arxiv.org/abs/2605.09076",
+        "Model Context Protocol project. (2026). Open protocol repository. "
+        "https://github.com/modelcontextprotocol",
+        "Agent2Agent Protocol project. (2026). Open protocol repository. "
+        "https://github.com/a2aproject",
+        "vLLM project. (2026). vLLM documentation. https://docs.vllm.ai/",
+        "Fujimoto, R. M. (1990). Parallel Discrete Event Simulation. Communications "
+        "of the ACM, 33(10), 30-53. https://doi.org/10.1145/84537.84545",
     ]
     for ref in refs:
         add_bullet(doc, ref)
@@ -671,6 +831,10 @@ def main() -> None:
         "Requires human review, cost validation, teaming, and compliance verification."
     )
     doc.save(OUTPUT)
+    scrub_template_artifacts(OUTPUT)
+    # Normalize the package after template scrubbing so LibreOffice can render it
+    # without retaining stale relationship state from the official DOCX template.
+    Document(OUTPUT).save(OUTPUT)
     print(OUTPUT)
 
 

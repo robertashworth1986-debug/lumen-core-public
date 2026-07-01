@@ -437,7 +437,30 @@ def main() -> None:
 """
 
     HTML_OUT.write_text(html, encoding="utf-8")
-    INDEX_OUT.write_text(html, encoding="utf-8")
+    INDEX_OUT.write_text(
+        """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="refresh" content="0; url=operator_home.html" />
+  <title>LumenCore Public Proof Gateway</title>
+  <style>
+    body{margin:0;min-height:100vh;display:grid;place-items:center;background:#05070f;color:#e9f3ff;font-family:Segoe UI,Arial,sans-serif}
+    a{color:#59f3d0}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>LumenCore Public Proof Gateway</h1>
+    <p>Opening the current reviewer-safe proof surface.</p>
+    <p><a href="operator_home.html">Continue to operator home</a></p>
+  </main>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
     print(json.dumps({"dashboard": str(HTML_OUT), "index": str(INDEX_OUT), "generated_utc": now}, indent=2))
 
 

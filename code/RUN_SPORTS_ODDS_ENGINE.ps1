@@ -4,8 +4,8 @@
 
 .DESCRIPTION
     Scans all sports_data/*_live_odds.json files for:
-      - TRUE arbitrage (cross-bookmaker guaranteed profit)
-      - Value bets (significant edge vs consensus market price)
+      - Cross-bookmaker price-dispersion candidates (not a guaranteed outcome)
+      - Statistical value signals (significant edge vs consensus market price)
       - Line gaps (extreme price dispersion / steam moves)
 
     Outputs to:
@@ -18,7 +18,7 @@
     Seconds between full re-scans (default: 30)
 
 .PARAMETER ValueEdgeMin
-    Minimum value edge % vs consensus to flag a value bet (default: 4.0)
+    Minimum value edge % vs consensus to flag a statistical value signal (default: 4.0)
 
 .PARAMETER TopN
     How many signals to keep in _live_signals.json (default: 50)

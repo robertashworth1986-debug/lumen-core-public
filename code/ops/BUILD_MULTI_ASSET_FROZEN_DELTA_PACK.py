@@ -120,6 +120,9 @@ def build_top_lanes(source_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             continue
         estimated_hourly = as_float(row.get("estimated_hourly_value_usd"), 0.0)
         lane = {
+            "evidence_source": str(row.get("evidence_source") or "live_breadth_panel_source_row").strip(),
+            "provenance": str(row.get("provenance") or "").strip(),
+            "primary_live_evidence": as_bool(row.get("primary_live_evidence")),
             "source": source,
             "sector": str(row.get("sector") or "").strip(),
             "constraint": str(row.get("constraint") or "").strip() or "default",
@@ -145,9 +148,16 @@ def build_top_lanes(source_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return lanes
 
 
+def split_lanes_by_provenance(lanes: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    live_measured = [row for row in lanes if as_bool(row.get("measured_source")) and as_bool(row.get("primary_live_evidence"))]
+    context_only = [row for row in lanes if row not in live_measured]
+    return live_measured, context_only
+
+
 def build_markdown(payload: dict[str, Any]) -> str:
     headline = payload.get("headline", {}) if isinstance(payload.get("headline"), dict) else {}
-    lanes = payload.get("top_lanes", []) if isinstance(payload.get("top_lanes"), list) else []
+    lanes = payload.get("live_measured_top_lanes", []) if isinstance(payload.get("live_measured_top_lanes"), list) else []
+    context_lanes = payload.get("context_only_lanes", []) if isinstance(payload.get("context_only_lanes"), list) else []
 
     lines: list[str] = []
     lines.append("# Multi Asset Frozen Delta Pack")
@@ -155,19 +165,35 @@ def build_markdown(payload: dict[str, Any]) -> str:
     lines.append(f"Generated UTC: {payload.get('generated_utc', '')}")
     lines.append("")
     lines.append("## Headline")
-    lines.append(f"- Estimated annual value (top lanes): {headline.get('estimated_annual_value_usd', 0):,.2f} USD")
-    lines.append(f"- Estimated hourly value (top lanes): {headline.get('estimated_hourly_value_usd', 0):,.2f} USD")
-    lines.append(f"- Lanes in pack: {headline.get('lane_count', 0)}")
-    lines.append(f"- Lanes with >=10k hourly value: {headline.get('ten_k_plus_lane_count', 0)}")
+    lines.append(f"- Primary evidence mode: {headline.get('primary_evidence_mode', 'unknown')}")
+    lines.append(f"- Live-measured annual value signal: {headline.get('live_measured_annual_value_usd', 0):,.2f} USD")
+    lines.append(f"- Live-measured hourly value signal: {headline.get('live_measured_hourly_value_usd', 0):,.2f} USD")
+    lines.append(f"- Live-measured lanes in pack: {headline.get('live_measured_lane_count', 0)}")
+    lines.append(f"- Context-only lanes: {headline.get('context_only_lane_count', 0)}")
+    lines.append(f"- Live-measured lanes with >=10k hourly value: {headline.get('live_measured_ten_k_plus_lane_count', 0)}")
     lines.append(f"- Sources enabled: {headline.get('enabled_source_count', 0)}")
     lines.append(f"- Sources measured: {headline.get('measured_source_count', 0)}")
+    lines.append(f"- Boundary: {payload.get('claim_gate', {}).get('boundary', '')}")
     lines.append("")
-    lines.append("## Top 15 Lanes")
+    lines.append("## Top Live-Measured Lanes")
     lines.append("| # | Source | Sector | Hourly USD | Annual USD | Tier |")
     lines.append("|---:|---|---|---:|---:|---|")
     for idx, row in enumerate(lanes[:15], start=1):
         lines.append(
             f"| {idx} | {row.get('source', '')} | {row.get('sector', '')} | {row.get('estimated_hourly_value_usd', 0):,.2f} | {row.get('estimated_annual_value_usd', 0):,.2f} | {row.get('premium_tier', '')} |"
+        )
+    if not lanes:
+        lines.append("| - | No live-measured lanes resolved | - | 0.00 | 0.00 | gated |")
+    lines.append("")
+    lines.append("## Context-Only Lanes")
+    lines.append("")
+    lines.append("These rows are not promoted as live evidence until the live source registry marks them measured.")
+    lines.append("")
+    lines.append("| # | Source | Sector | Hourly USD | Provenance |")
+    lines.append("|---:|---|---|---:|---|")
+    for idx, row in enumerate(context_lanes[:15], start=1):
+        lines.append(
+            f"| {idx} | {row.get('source', '')} | {row.get('sector', '')} | {row.get('estimated_hourly_value_usd', 0):,.2f} | {row.get('provenance', '') or row.get('evidence_source', '')} |"
         )
     lines.append("")
     return "\n".join(lines)
@@ -181,15 +207,20 @@ def main() -> int:
     panel_rows = panel.get("source_rows") if isinstance(panel.get("source_rows"), list) else []
     latest_panel_rows = pick_latest_rows([r for r in panel_rows if isinstance(r, dict)])
     top_lanes = build_top_lanes(latest_panel_rows)
+    live_measured_lanes, context_only_lanes = split_lanes_by_provenance(top_lanes)
 
     frozen_rows = load_jsonl(INFRA_FROZEN_DELTAS)
     latest_frozen_rows = pick_latest_rows(frozen_rows)
 
-    total_hourly = sum(as_float(r.get("estimated_hourly_value_usd"), 0.0) for r in top_lanes)
-    total_annual = sum(as_float(r.get("estimated_annual_value_usd"), 0.0) for r in top_lanes)
+    total_hourly = sum(as_float(r.get("estimated_hourly_value_usd"), 0.0) for r in live_measured_lanes)
+    total_annual = sum(as_float(r.get("estimated_annual_value_usd"), 0.0) for r in live_measured_lanes)
+    context_hourly = sum(as_float(r.get("estimated_hourly_value_usd"), 0.0) for r in context_only_lanes)
+    context_annual = sum(as_float(r.get("estimated_annual_value_usd"), 0.0) for r in context_only_lanes)
     enabled_count = sum(1 for r in top_lanes if as_bool(r.get("enabled_source")))
-    measured_count = sum(1 for r in top_lanes if as_bool(r.get("measured_source")))
-    ten_k_plus = sum(1 for r in top_lanes if as_float(r.get("estimated_hourly_value_usd"), 0.0) >= 10_000)
+    measured_count = sum(1 for r in live_measured_lanes if as_bool(r.get("measured_source")))
+    ten_k_plus = sum(1 for r in live_measured_lanes if as_float(r.get("estimated_hourly_value_usd"), 0.0) >= 10_000)
+    panel_provenance = panel.get("evidence_provenance", {}) if isinstance(panel.get("evidence_provenance"), dict) else {}
+    primary_mode = str(panel_provenance.get("primary_evidence_mode") or ("live_measured_delta_rows" if live_measured_lanes else "no_live_measured_lanes"))
 
     run_tag = now_tag()
     payload = {
@@ -203,19 +234,39 @@ def main() -> int:
             "panel_latest_rows": len(latest_panel_rows),
             "infra_frozen_rows_raw": len(frozen_rows),
             "infra_frozen_rows_latest": len(latest_frozen_rows),
+            "panel_primary_evidence_mode": primary_mode,
         },
         "headline": {
             "lane_count": len(top_lanes),
-            "ten_k_plus_lane_count": ten_k_plus,
+            "live_measured_lane_count": len(live_measured_lanes),
+            "context_only_lane_count": len(context_only_lanes),
+            "live_measured_ten_k_plus_lane_count": ten_k_plus,
             "enabled_source_count": enabled_count,
             "measured_source_count": measured_count,
+            "primary_evidence_mode": primary_mode,
+            "live_measured_hourly_value_usd": round(total_hourly, 2),
+            "live_measured_annual_value_usd": round(total_annual, 2),
+            "context_only_hourly_value_usd": round(context_hourly, 2),
+            "context_only_annual_value_usd": round(context_annual, 2),
             "estimated_hourly_value_usd": round(total_hourly, 2),
             "estimated_annual_value_usd": round(total_annual, 2),
-            "top_lane_source": top_lanes[0].get("source") if top_lanes else "",
-            "top_lane_sector": top_lanes[0].get("sector") if top_lanes else "",
-            "top_lane_hourly_value_usd": round(as_float(top_lanes[0].get("estimated_hourly_value_usd"), 0.0), 2) if top_lanes else 0.0,
+            "top_lane_source": live_measured_lanes[0].get("source") if live_measured_lanes else "",
+            "top_lane_sector": live_measured_lanes[0].get("sector") if live_measured_lanes else "",
+            "top_lane_hourly_value_usd": round(as_float(live_measured_lanes[0].get("estimated_hourly_value_usd"), 0.0), 2) if live_measured_lanes else 0.0,
+        },
+        "claim_gate": {
+            "live_measured_pack": bool(live_measured_lanes),
+            "synthetic_or_reference_primary": not bool(live_measured_lanes),
+            "grant_merit_proven": False,
+            "trading_profit_proven": False,
+            "boundary": (
+                "Headline values include only rows marked measured_source and primary_live_evidence. "
+                "Unmeasured frozen deltas, synthetic controls, and reference fallbacks are context-only."
+            ),
         },
         "top_lanes": top_lanes,
+        "live_measured_top_lanes": live_measured_lanes,
+        "context_only_lanes": context_only_lanes,
     }
 
     json_tagged = OPS_OUT / f"multi_asset_frozen_delta_pack_{run_tag}.json"
@@ -243,6 +294,9 @@ def main() -> int:
                 "estimated_annual_value_usd": row.get("estimated_annual_value_usd", 0.0),
                 "optimization_gain_pct": row.get("optimization_gain_pct", 0.0),
                 "premium_tier": row.get("premium_tier", ""),
+                "evidence_source": row.get("evidence_source", ""),
+                "provenance": row.get("provenance", ""),
+                "primary_live_evidence": row.get("primary_live_evidence", False),
                 "enabled_source": row.get("enabled_source", False),
                 "measured_source": row.get("measured_source", False),
             }
@@ -259,6 +313,9 @@ def main() -> int:
             "estimated_annual_value_usd",
             "optimization_gain_pct",
             "premium_tier",
+            "evidence_source",
+            "provenance",
+            "primary_live_evidence",
             "enabled_source",
             "measured_source",
         ],
@@ -274,6 +331,9 @@ def main() -> int:
             "estimated_annual_value_usd",
             "optimization_gain_pct",
             "premium_tier",
+            "evidence_source",
+            "provenance",
+            "primary_live_evidence",
             "enabled_source",
             "measured_source",
         ],

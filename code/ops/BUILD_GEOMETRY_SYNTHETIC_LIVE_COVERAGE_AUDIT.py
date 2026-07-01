@@ -268,6 +268,17 @@ def synthetic_stage(row: dict[str, Any]) -> str:
     first_test = str(row.get("first_test", "")).strip()
     if "generated" in evidence:
         return "synthetic_benchmark_result_present"
+    if any(
+        token in evidence
+        for token in (
+            "live_context",
+            "repeat_live",
+            "rolling_champion",
+            "source_conditioned_holdout_winner",
+            "holdout_winner",
+        )
+    ):
+        return "live_replay_result_present"
     if evidence == "proof_value_champion_not_performance_claim":
         return "proof_priority_candidate_needs_live_replay"
     if first_test:
@@ -290,6 +301,17 @@ def claimable_stage(row: dict[str, Any]) -> str:
     evidence = str(row.get("evidence_status", ""))
     if "generated" in evidence:
         return "controlled_synthetic_result_only"
+    if any(
+        token in evidence
+        for token in (
+            "live_context",
+            "repeat_live",
+            "rolling_champion",
+            "source_conditioned_holdout_winner",
+            "holdout_winner",
+        )
+    ):
+        return "live_replay_candidate_not_field_validated"
     if evidence == "proof_value_champion_not_performance_claim":
         return "proof_priority_only"
     return "research_candidate_only"
@@ -413,6 +435,7 @@ def build_audit() -> dict[str, Any]:
         for row in family_rows
         if row["synthetic_stage"] in {
             "synthetic_benchmark_result_present",
+            "live_replay_result_present",
             "proof_priority_candidate_needs_live_replay",
         }
     ][:20]
@@ -447,6 +470,7 @@ def build_audit() -> dict[str, Any]:
             "synthetic_benchmark_result_count": synthetic_counts.get(
                 "synthetic_benchmark_result_present", 0
             ),
+            "live_replay_result_count": synthetic_counts.get("live_replay_result_present", 0),
             "proof_priority_candidate_count": synthetic_counts.get(
                 "proof_priority_candidate_needs_live_replay", 0
             ),
@@ -466,7 +490,7 @@ def build_audit() -> dict[str, Any]:
             "registry_candidate_not_validated_count": evidence_counts.get(
                 "registry_candidate_not_validated", 0
             ),
-            "safe_answer_to_have_we_tested_all": "No. The registered universe is ranked and mostly test-spec-ready, but only a small subset has generated benchmark evidence and none are field validated.",
+            "safe_answer_to_have_we_tested_all": "No. The registered universe is ranked and mostly test-spec-ready, but only a small subset has live replay evidence and none are field validated.",
         },
         "status_counts": dict(status_counts),
         "evidence_counts": dict(evidence_counts),

@@ -176,10 +176,38 @@ def collect_state() -> dict[str, Any]:
     val_inputs = (val.get("inputs", {}) or {}) if isinstance(val, dict) else {}
     readiness_summary = (readiness.get("summary", {}) or {}) if isinstance(readiness, dict) else {}
 
+    promoted_live_hourly = safe_float(live_headline.get("live_measured_estimated_hourly_value_usd"), 0.0)
+    promoted_live_annual = safe_float(live_headline.get("live_measured_estimated_annual_value_usd"), 0.0)
+    context_total_hourly = safe_float(live_headline.get("total_estimated_hourly_value_usd"), 0.0)
+    context_total_annual = safe_float(live_headline.get("total_estimated_annual_value_usd"), 0.0)
+    context_only_hourly = safe_float(
+        live_headline.get("context_only_estimated_hourly_value_usd"),
+        max(0.0, context_total_hourly - promoted_live_hourly),
+    )
+    context_only_annual = safe_float(
+        live_headline.get("context_only_estimated_annual_value_usd"),
+        max(0.0, context_total_annual - promoted_live_annual),
+    )
+
     metrics = {
-        "annual_value_signal_usd": max(
-            safe_float(live_headline.get("total_estimated_annual_value_usd"), 0.0),
-            safe_float(val_inputs.get("annual_value_signal_usd"), 0.0),
+        "annual_value_signal_usd": promoted_live_annual,
+        "promoted_live_measured_annual_value_usd": promoted_live_annual,
+        "promoted_live_measured_hourly_value_usd": promoted_live_hourly,
+        "context_total_annual_value_usd": context_total_annual,
+        "context_total_hourly_value_usd": context_total_hourly,
+        "context_only_annual_value_usd": context_only_annual,
+        "context_only_hourly_value_usd": context_only_hourly,
+        "legacy_valuation_annual_value_signal_usd": safe_float(val_inputs.get("annual_value_signal_usd"), 0.0),
+        "primary_evidence_mode": str(live_headline.get("primary_evidence_mode") or ""),
+        "live_measured_source_row_count": safe_int(live_headline.get("live_measured_source_row_count"), 0),
+        "unmeasured_source_row_count": safe_int(live_headline.get("unmeasured_source_row_count"), 0),
+        "reference_fallback_used": bool(live_headline.get("reference_fallback_used", False)),
+        "claim_boundary": str(
+            live_headline.get("claim_boundary")
+            or (
+                "Annual value signal is promoted only from live-measured rows. "
+                "Context-only, synthetic, reference, and valuation-proxy rows remain supporting context."
+            )
         ),
         "measured_sources": max(
             safe_int(live_headline.get("measured_sources"), 0),
@@ -251,6 +279,8 @@ def collect_state() -> dict[str, Any]:
 def build_numeric_deltas(current: dict[str, Any], previous: dict[str, Any]) -> dict[str, float]:
     out: dict[str, float] = {}
     for key, value in current.items():
+        if isinstance(value, bool):
+            continue
         if isinstance(value, (int, float)) and key in previous and isinstance(previous.get(key), (int, float)):
             out[key] = float(value) - float(previous.get(key))
     return out
@@ -290,6 +320,11 @@ def build_markdown_report(payload: dict[str, Any]) -> str:
     metrics = payload.get("metrics", {}) if isinstance(payload, dict) else {}
     for key in (
         "annual_value_signal_usd",
+        "promoted_live_measured_annual_value_usd",
+        "promoted_live_measured_hourly_value_usd",
+        "context_only_annual_value_usd",
+        "context_total_annual_value_usd",
+        "primary_evidence_mode",
         "measured_sources",
         "enabled_sources",
         "measured_coverage_pct",
@@ -406,6 +441,16 @@ def build_chain(strict: bool) -> int:
 
     live_current = {
         "annual_value_signal_usd": metrics.get("annual_value_signal_usd", 0.0),
+        "promoted_live_measured_annual_value_usd": metrics.get("promoted_live_measured_annual_value_usd", 0.0),
+        "promoted_live_measured_hourly_value_usd": metrics.get("promoted_live_measured_hourly_value_usd", 0.0),
+        "context_only_annual_value_usd": metrics.get("context_only_annual_value_usd", 0.0),
+        "context_only_hourly_value_usd": metrics.get("context_only_hourly_value_usd", 0.0),
+        "context_total_annual_value_usd": metrics.get("context_total_annual_value_usd", 0.0),
+        "context_total_hourly_value_usd": metrics.get("context_total_hourly_value_usd", 0.0),
+        "primary_evidence_mode": metrics.get("primary_evidence_mode", ""),
+        "live_measured_source_row_count": metrics.get("live_measured_source_row_count", 0),
+        "unmeasured_source_row_count": metrics.get("unmeasured_source_row_count", 0),
+        "reference_fallback_used": metrics.get("reference_fallback_used", False),
         "measured_sources": metrics.get("measured_sources", 0),
         "enabled_sources": metrics.get("enabled_sources", 0),
         "measured_coverage_pct": metrics.get("measured_coverage_pct", 0.0),
@@ -417,6 +462,16 @@ def build_chain(strict: bool) -> int:
     }
     live_prev = {
         "annual_value_signal_usd": prev_metrics.get("annual_value_signal_usd", 0.0),
+        "promoted_live_measured_annual_value_usd": prev_metrics.get("promoted_live_measured_annual_value_usd", 0.0),
+        "promoted_live_measured_hourly_value_usd": prev_metrics.get("promoted_live_measured_hourly_value_usd", 0.0),
+        "context_only_annual_value_usd": prev_metrics.get("context_only_annual_value_usd", 0.0),
+        "context_only_hourly_value_usd": prev_metrics.get("context_only_hourly_value_usd", 0.0),
+        "context_total_annual_value_usd": prev_metrics.get("context_total_annual_value_usd", 0.0),
+        "context_total_hourly_value_usd": prev_metrics.get("context_total_hourly_value_usd", 0.0),
+        "primary_evidence_mode": prev_metrics.get("primary_evidence_mode", ""),
+        "live_measured_source_row_count": prev_metrics.get("live_measured_source_row_count", 0),
+        "unmeasured_source_row_count": prev_metrics.get("unmeasured_source_row_count", 0),
+        "reference_fallback_used": prev_metrics.get("reference_fallback_used", False),
         "measured_sources": prev_metrics.get("measured_sources", 0),
         "enabled_sources": prev_metrics.get("enabled_sources", 0),
         "measured_coverage_pct": prev_metrics.get("measured_coverage_pct", 0.0),

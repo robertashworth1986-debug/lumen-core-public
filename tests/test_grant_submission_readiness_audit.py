@@ -1,4 +1,5 @@
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -44,11 +45,66 @@ def test_top_five_have_no_local_readiness_blockers():
     dice_required = {row["path"] for row in by_name["DICE"]["required_artifacts"]}
     harbor_required = {row["path"] for row in by_name["HarborSentinel"]["required_artifacts"]}
     assert "grant_submissions/DICE_HR001126S0010/DICE_REFERENCE_RELEVANCE_MATRIX_2026-06-20.md" in dice_required
+    assert "grant_submissions/DICE_HR001126S0010/DICE_EVIDENCE_SYNTHESIS_2026-06-20.md" in dice_required
+    assert "grant_submissions/DICE_HR001126S0010/DICE_LIVE_BREADTH_REPLAY_2026-06-20.md" in dice_required
+    assert "grant_submissions/LIVE_BREADTH_PROVENANCE_ANNEX_2026-06-21.md" in dice_required
+    assert "grant_submissions/LIVE_BREADTH_PROVENANCE_ANNEX_2026-06-21.md" in harbor_required
     assert "grant_submissions/NV063_HarborSentinel/NV063_DATA_SOURCE_ACCESS_AUDIT_2026-06-20.md" in harbor_required
     assert "grant_submissions/NV063_HarborSentinel/NV063_AIS_PILOT_SOURCE_REGISTRY_2026-06-20.md" in harbor_required
     assert "grant_submissions/NV063_HarborSentinel/NV063_AIS_PILOT_ACQUISITION_2026-06-20.md" in harbor_required
     assert "grant_submissions/NV063_HarborSentinel/NV063_AIS_HELDOUT_SPLIT_MANIFEST_2026-06-20.md" in harbor_required
     assert "grant_submissions/NV063_HarborSentinel/NV063_PUBLIC_AIS_GATE_2026-06-20.md" in harbor_required
+    assert "grant_submissions/NV063_HarborSentinel/NV063_AIS_INJECTION_BENCHMARK_2026-06-20.md" in harbor_required
+    assert "grant_submissions/NV063_HarborSentinel/NV063_AIS_REVIEW_BURDEN_PROFILE_2026-06-21.md" in harbor_required
+    assert any(
+        "controlled-injection benchmark ready" in fact
+        for fact in by_name["HarborSentinel"]["verified_portal_facts"]
+    )
+    assert any(
+        "AIS review-burden profile ready" in fact
+        for fact in by_name["HarborSentinel"]["verified_portal_facts"]
+    )
+    assert any(
+        "harbor_ais_review_burden" in manifest["run_dir"]
+        for manifest in by_name["HarborSentinel"]["evidence_manifests"]
+    )
+    assert any(
+        "DICE frozen live-breadth replay ready" in fact
+        for fact in by_name["DICE"]["verified_portal_facts"]
+    )
+    assert any(
+        "dice_live_breadth_replay" in manifest["run_dir"]
+        for manifest in by_name["DICE"]["evidence_manifests"]
+    )
+
+
+def test_sam_active_capture_clears_only_entity_status_blocker(tmp_path):
+    module = load_module()
+    sam_capture = tmp_path / "sam_capture.json"
+    sam_capture.write_text(
+        json.dumps(
+            {
+                "schema": "sam_gov_entity_status_capture_v1",
+                "registration_status": "Active Registration",
+                "uei": "TESTUEI",
+                "cage_ncage": "TESTCAGE",
+                "purpose_of_registration": "All Awards",
+                "expiration_date": "2026-08-30",
+            }
+        ),
+        encoding="utf-8",
+    )
+    module.SAM_CAPTURE_JSON = sam_capture
+
+    dice = module.package_audit("DICE", module.TOP5["DICE"])
+    blockers = "\n".join(dice["portal_user_blockers"])
+
+    assert "SAM.gov entity status/linkage must be verified." not in blockers
+    assert "BAAT account, organization profile, and submitter authority are unverified." in blockers
+    assert any(
+        "SAM.gov active registration verified from signed-in workspace" in fact
+        for fact in dice["verified_portal_facts"]
+    )
 
 
 def test_nsf_pitch_fields_stay_under_portal_limits():

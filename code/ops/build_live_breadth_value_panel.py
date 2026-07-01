@@ -200,40 +200,43 @@ def build_registry_summary(path: Path) -> dict[str, Any]:
             # Compatibility path: some registries use `sources` entries with `status` + `env`.
             candidate_sources = registry.get("sources", [])
             if isinstance(candidate_sources, list):
-                normalized_rows: list[dict[str, Any]] = []
-                for raw in candidate_sources:
-                    if not isinstance(raw, dict):
-                        continue
-                    status = str(raw.get("status") or "").upper()
-                    env_name = str(raw.get("env") or "").strip()
-                    row_count = to_int(raw.get("rows"), 0)
+                rows = [r for r in candidate_sources if isinstance(r, dict)]
 
-                    enabled = bool(raw.get("enabled", False))
-                    if not enabled:
-                        enabled = bool(env_name) or status in {
-                            "LIVE_KEY_PRESENT",
-                            "LIVE",
-                            "ENABLED",
-                            "OK",
-                            "HEALTHY",
-                        }
+    normalized_rows: list[dict[str, Any]] = []
+    for raw in rows:
+        status = str(raw.get("status") or "").upper()
+        env_name = str(raw.get("env") or "").strip()
+        evidence_basis = str(raw.get("evidence_basis") or "").upper()
+        dollar_basis = str(raw.get("dollar_basis") or "").upper()
+        row_count = to_int(raw.get("rows"), 0)
 
-                    measured = bool(raw.get("measured", False))
-                    if not measured:
-                        measured = row_count > 0 or status in {
-                            "LIVE_KEY_PRESENT",
-                            "MEASURED",
-                            "LIVE",
-                        }
+        enabled = bool(raw.get("enabled", False))
+        if not enabled:
+            enabled = bool(env_name) or status in {
+                "LIVE_KEY_PRESENT",
+                "LIVE",
+                "ENABLED",
+                "OK",
+                "HEALTHY",
+            }
 
-                    normalized = dict(raw)
-                    normalized["enabled"] = enabled
-                    normalized["measured"] = measured
-                    if not isinstance(normalized.get("translated_value"), dict):
-                        normalized["translated_value"] = {}
-                    normalized_rows.append(normalized)
+        measured = bool(raw.get("measured", False))
+        if not measured:
+            measured = (
+                row_count > 0
+                or evidence_basis.startswith("MEASURED")
+                or dollar_basis == "MEASURED"
+                or status in {"MEASURED", "LIVE"}
+            )
 
-                rows = normalized_rows
+        normalized = dict(raw)
+        normalized["enabled"] = enabled
+        normalized["measured"] = measured
+        if not isinstance(normalized.get("translated_value"), dict):
+            normalized["translated_value"] = {}
+        normalized_rows.append(normalized)
+
+    rows = normalized_rows
 
     enabled_rows = [r for r in rows if isinstance(r, dict) and bool(r.get("enabled", False))]
     measured_rows = [r for r in enabled_rows if bool(r.get("measured", False))]
@@ -325,6 +328,9 @@ def build_sector_rollup(
 
         source_rows.append(
             {
+                "evidence_source": "infra_frozen_delta_ledger",
+                "provenance": "live_measured_source" if measured_source else "unmeasured_or_registry_unmatched_source",
+                "primary_live_evidence": measured_source,
                 "generated_utc": generated_utc,
                 "source": source,
                 "sector": sector,
@@ -383,6 +389,12 @@ def build_sector_rollup(
         est_hour = to_float(agg.get("total_estimated_hourly_value_usd"), 0.0)
         sectors.append(
             {
+                "evidence_source": (
+                    "live_measured_frozen_delta"
+                    if to_int(agg.get("measured_source_count"), 0) > 0
+                    else "unmeasured_frozen_delta"
+                ),
+                "primary_live_evidence": to_int(agg.get("measured_source_count"), 0) > 0,
                 "sector": sector,
                 "source_count": to_int(agg.get("source_count"), 0),
                 "measured_source_count": to_int(agg.get("measured_source_count"), 0),
@@ -442,6 +454,8 @@ def fallback_sectors_from_reference(reference_rows: list[dict[str, Any]]) -> lis
         est_hour = to_float(agg.get("total_estimated_hourly_value_usd"), 0.0)
         rows.append(
             {
+                "evidence_source": "reference_fallback_csv",
+                "primary_live_evidence": False,
                 "sector": sector,
                 "source_count": to_int(agg.get("source_count"), 0),
                 "measured_source_count": 0,
@@ -459,6 +473,51 @@ def fallback_sectors_from_reference(reference_rows: list[dict[str, Any]]) -> lis
 
     rows.sort(key=lambda r: to_float(r.get("total_estimated_hourly_value_usd"), 0.0), reverse=True)
     return rows
+
+
+def summarize_evidence_provenance(
+    source_rows: list[dict[str, Any]],
+    sector_rows: list[dict[str, Any]],
+    reference_rows: list[dict[str, Any]],
+    fallback_used: bool,
+) -> dict[str, Any]:
+    measured_rows = [r for r in source_rows if bool(r.get("measured_source"))]
+    unmeasured_rows = [r for r in source_rows if not bool(r.get("measured_source"))]
+    reference_sector_rows = [
+        r for r in sector_rows if str(r.get("evidence_source") or "") == "reference_fallback_csv"
+    ]
+
+    live_measured_hourly = sum(to_float(r.get("estimated_hourly_value_usd"), 0.0) for r in measured_rows)
+    unmeasured_hourly = sum(to_float(r.get("estimated_hourly_value_usd"), 0.0) for r in unmeasured_rows)
+    reference_hourly = sum(
+        to_float(r.get("total_estimated_hourly_value_usd"), 0.0) for r in reference_sector_rows
+    )
+
+    if measured_rows:
+        mode = "live_measured_delta_rows"
+    elif source_rows:
+        mode = "unmeasured_frozen_delta_rows"
+    elif fallback_used:
+        mode = "reference_fallback_only"
+    else:
+        mode = "no_delta_rows"
+
+    return {
+        "primary_evidence_mode": mode,
+        "live_measured_source_rows": len(measured_rows),
+        "unmeasured_source_rows": len(unmeasured_rows),
+        "reference_rows": len(reference_rows),
+        "reference_fallback_used": bool(fallback_used),
+        "live_measured_estimated_hourly_value_usd": round(live_measured_hourly, 4),
+        "live_measured_estimated_annual_value_usd": round(live_measured_hourly * HOURS_PER_DAY * DAYS_PER_YEAR, 4),
+        "unmeasured_estimated_hourly_value_usd": round(unmeasured_hourly, 4),
+        "reference_fallback_estimated_hourly_value_usd": round(reference_hourly, 4),
+        "claim_boundary": (
+            "Only rows marked live_measured_source are promoted as live breadth evidence. "
+            "Unmeasured frozen deltas and reference fallback rows remain calibration or context until "
+            "the live source registry marks the source measured."
+        ),
+    }
 
 
 def mission_kalisha_score(
@@ -934,8 +993,17 @@ def build_panel(
     sector_rows, source_rows = build_sector_rollup(frozen_latest, source_lookup)
 
     reference_rows = load_csv(top_sectors_csv_path)
+    reference_fallback_used = False
     if not sector_rows and reference_rows:
         sector_rows = fallback_sectors_from_reference(reference_rows)
+        reference_fallback_used = True
+
+    provenance = summarize_evidence_provenance(
+        source_rows=source_rows,
+        sector_rows=sector_rows,
+        reference_rows=reference_rows,
+        fallback_used=reference_fallback_used,
+    )
 
     optimization = load_json(optimization_report_path)
     recommended = optimization.get("recommended", {}) if isinstance(optimization, dict) else {}
@@ -956,12 +1024,20 @@ def build_panel(
     total_annual = total_daily * DAYS_PER_YEAR
 
     top_sector_row = sector_rows[0] if sector_rows else {}
+    live_measured_sector_rows = [r for r in sector_rows if bool(r.get("primary_live_evidence"))]
+    top_live_measured_sector_row = live_measured_sector_rows[0] if live_measured_sector_rows else {}
+    live_measured_hourly = to_float(provenance.get("live_measured_estimated_hourly_value_usd"), 0.0)
+    live_measured_annual = to_float(provenance.get("live_measured_estimated_annual_value_usd"), 0.0)
+    context_only_hourly = max(0.0, total_hourly - live_measured_hourly)
+    context_only_annual = max(0.0, total_annual - live_measured_annual)
 
     top_sector_rows: list[dict[str, Any]] = []
     for idx, row in enumerate(sector_rows[: max(1, top_n)]):
         top_sector_rows.append(
             {
                 "rank": idx + 1,
+                "evidence_source": str(row.get("evidence_source") or ""),
+                "primary_live_evidence": bool(row.get("primary_live_evidence", False)),
                 "sector": str(row.get("sector") or "unknown"),
                 "source_count": to_int(row.get("source_count"), 0),
                 "measured_source_count": to_int(row.get("measured_source_count"), 0),
@@ -1015,6 +1091,20 @@ def build_panel(
         "performance_metrics_status": str(metric_readiness.get("status") or "unknown"),
         "performance_metrics_explanation": str(metric_readiness.get("explanation") or ""),
         "first_thursday_action": first_thursday_action,
+        "primary_evidence_mode": provenance["primary_evidence_mode"],
+        "live_measured_source_row_count": provenance["live_measured_source_rows"],
+        "unmeasured_source_row_count": provenance["unmeasured_source_rows"],
+        "reference_fallback_used": provenance["reference_fallback_used"],
+        "live_measured_estimated_hourly_value_usd": round(live_measured_hourly, 2),
+        "live_measured_estimated_annual_value_usd": round(live_measured_annual, 2),
+        "context_only_estimated_hourly_value_usd": round(context_only_hourly, 2),
+        "context_only_estimated_annual_value_usd": round(context_only_annual, 2),
+        "top_live_measured_sector": str(top_live_measured_sector_row.get("sector") or ""),
+        "top_live_measured_sector_hourly_value_usd": round(
+            to_float(top_live_measured_sector_row.get("total_estimated_hourly_value_usd"), 0.0),
+            2,
+        ),
+        "claim_boundary": provenance["claim_boundary"],
     }
 
     patent_bridge = {
@@ -1108,6 +1198,11 @@ def build_panel(
                 "enabled_sources": to_int(registry_summary.get("enabled_sources"), 0),
                 "measured_sources": to_int(registry_summary.get("measured_sources"), 0),
                 "measured_coverage_pct": round(to_float(registry_summary.get("measured_coverage_pct"), 0.0), 2),
+                "primary_evidence_mode": provenance["primary_evidence_mode"],
+                "live_measured_source_rows": provenance["live_measured_source_rows"],
+                "unmeasured_source_rows": provenance["unmeasured_source_rows"],
+                "reference_fallback_used": provenance["reference_fallback_used"],
+                "claim_boundary": provenance["claim_boundary"],
                 "translated_hourly_value_usd": round(to_float(registry_summary.get("translated_hourly_value_usd"), 0.0), 2),
                 "translated_annual_value_usd": round(to_float(registry_summary.get("translated_annual_value_usd"), 0.0), 2),
             },
@@ -1163,9 +1258,12 @@ def build_panel(
         },
         "patent_substrate_bridge": patent_bridge,
         "metric_readiness": metric_readiness,
+        "evidence_provenance": provenance,
         "top_sectors": top_sector_rows,
         "top_optimized_reference": [
             {
+                "evidence_source": "reference_context_csv",
+                "primary_live_evidence": False,
                 "source": str(r.get("source") or ""),
                 "sector": str(r.get("sector") or ""),
                 "optimization_gain_pct": round(to_float(r.get("optimization_gain_pct"), 0.0), 4),
@@ -1193,6 +1291,8 @@ def build_panel(
         csv_rows.append(
             {
                 "rank": row.get("rank"),
+                "evidence_source": row.get("evidence_source"),
+                "primary_live_evidence": row.get("primary_live_evidence"),
                 "sector": row.get("sector"),
                 "source_count": row.get("source_count"),
                 "measured_source_count": row.get("measured_source_count"),

@@ -64,6 +64,14 @@ def test_bundle_copies_each_required_feed_to_both_public_lanes(tmp_path):
         assert all(target["sha256"] == row["sha256"] for target in row["copied_targets"])
 
 
+def test_bundle_contract_includes_expanded_bridge_and_domain_audit():
+    module = load_module()
+
+    assert "locked_source_baseline_replay_sweep" in module.REQUIRED_FEEDS
+    assert "champion_sample_expansion_and_economic_bridge" in module.REQUIRED_FEEDS
+    assert "live_domain_consolidation_audit" in module.OPTIONAL_FEEDS
+
+
 def test_bundle_manifest_and_archive_exclude_secret_or_bulk_data_paths(tmp_path):
     module = load_module()
     seed_workspace(module, tmp_path)

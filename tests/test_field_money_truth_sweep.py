@@ -49,6 +49,7 @@ def test_field_money_truth_sweep_defines_all_family_and_champion_blockers():
     assert gates["registry_has_all_candidate_families"] is True
     assert gates["all_registered_families_live_benchmarked"] is False
     assert summary["adapter_replay_count"] < summary["registered_family_count"]
+    assert summary["triple_source_champion_count"] >= 1
     assert gates["triple_dataset_frozen_assets_present"] is True
     assert isinstance(gates["rolling_champion_present"], bool)
     assert gates["field_validation_claim_allowed"] is False

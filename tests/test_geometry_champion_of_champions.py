@@ -34,7 +34,7 @@ def test_board_ranks_all_lanes_and_families_without_global_winner_claim():
     assert board["summary"]["live_total_measured_rows"] >= 418
     assert board["summary"]["strict_rolling_champion_count"] >= 4
     assert board["summary"]["robust_repeat_candidate_count"] >= 1
-    assert board["summary"]["triple_source_candidate_count"] >= 1
+    assert board["summary"]["triple_source_rolling_champion_count"] >= 1
     assert board["summary"]["bounded_estimated_value_claim_allowed"] is True
     assert board["summary"]["paid_pilot_scoping_allowed"] is True
     assert board["summary"]["vault_packet_ready"] is True
@@ -102,12 +102,12 @@ def test_known_champions_are_ranked_but_still_bounded():
     assert families["brachistochrone_descent"]["evidence_status"] == "rolling_champion_repeat_live_context_not_field_validated"
     assert families["kuramoto_phase_coupling"]["evidence_status"] == "expanded_source_conditioned_holdout_winner_not_field_validated"
     assert families["thermal_plume_convection"]["evidence_status"] == "rolling_champion_repeat_live_context_not_field_validated"
-    assert families["leaf_veins"]["evidence_status"] == "triple_source_live_candidate_needs_repeat_run"
+    assert families["leaf_veins"]["evidence_status"] == "rolling_champion_repeat_live_context_not_field_validated"
     assert families["crack_propagation_paths"]["evidence_status"] == "proof_value_candidate_not_performance_claim"
     assert families["brachistochrone_descent"]["rolling_gate_status"] == "rolling_champion"
     assert families["kuramoto_phase_coupling"]["rolling_gate_status"] == "rolling_champion"
     assert families["thermal_plume_convection"]["rolling_gate_status"] == "rolling_champion"
-    assert families["leaf_veins"]["rolling_gate_status"] == "triple_source_candidate"
+    assert families["leaf_veins"]["rolling_gate_status"] == "rolling_champion"
     assert families["brachistochrone_descent"]["claim_stage"] == "rolling_champion_not_field_validated"
     assert families["kuramoto_phase_coupling"]["claim_stage"] == "buyer_authorized_field_replay_request_ready_not_field_validated"
     assert families["kuramoto_phase_coupling"]["kuramoto_holdout_evidence"]["wins_vs_kalman"] >= 20
@@ -159,11 +159,12 @@ def test_markdown_lists_validation_requirements_and_no_overclaim_terms():
     assert "Geometry Champion Of Champions" in rendered
     assert "Field Validation Requirements" in rendered
     assert "Ready for field-validation claim: `false`" in rendered
-    assert "Strict rolling champions: `4`" in rendered
+    assert "Strict rolling champions: `5`" in rendered
     assert "Bounded estimated value claim allowed: `true`" in rendered
     assert "Strongest current candidate: `kuramoto_phase_coupling`" in rendered
     assert "Kuramoto Holdout Read" in rendered
     assert "not field validation" in rendered
+    assert "Triple-source rolling champions" in rendered
     assert "Triple-source candidates" in rendered
     assert "guaranteed funding" not in rendered.lower()
     assert "guaranteed profit" not in rendered.lower()

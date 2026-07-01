@@ -13,8 +13,13 @@ DASHBOARD_DATA = ROOT / "dashboard" / "data"
 
 READINESS_JSON = OUT_OPS / "grant_submission_readiness_audit_latest.json"
 DASHBOARD_FEED_JSON = OUT_OPS / "grant_dashboard_status_feed_latest.json"
+PUBLIC_DASHBOARD_FEED_JSON = DASHBOARD_DATA / "grant_readiness_status.json"
 HIGH_IMPACT_JSON = OUT_OPS / "lumencore_high_impact_goal_latest.json"
+PUBLIC_HIGH_IMPACT_JSON = DASHBOARD_DATA / "lumencore_high_impact_goal.json"
 HARBOR_GATE_JSON = OUT_OPS / "harbor_public_ais_gate_latest.json"
+HARBOR_INJECTION_JSON = OUT_OPS / "harbor_ais_injection_benchmark_latest.json"
+GEOMETRY_BRIDGE_JSON = OUT_OPS / "geometry_championship_bridge_latest.json"
+GEOMETRY_FRONTIER_JSON = OUT_OPS / "geometry_proof_frontier_board_latest.json"
 
 OUT_JSON = OUT_OPS / "public_visibility_packet_latest.json"
 OUT_MD = DOCS / "PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md"
@@ -82,15 +87,118 @@ def write_text(path: Path, text: str) -> None:
     path.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
 
 
+def geometry_claim_text(geometry: dict[str, Any]) -> tuple[str, str, str]:
+    champion = geometry.get("generated_champion_of_champions", {})
+    if not isinstance(champion, dict):
+        champion = {}
+    summary = geometry.get("summary", {}) if isinstance(geometry.get("summary"), dict) else {}
+    generated = geometry.get("generated_lane_benchmarks", [])
+    if not isinstance(generated, list):
+        generated = []
+    live_gate = geometry.get("live_breadth_promotion_gate", {})
+    if not isinstance(live_gate, dict):
+        live_gate = {}
+    lane_text = []
+    for row in generated:
+        if not isinstance(row, dict):
+            continue
+        lane_text.append(
+            f"{row.get('best_geometry', 'n/a')} beat {row.get('best_baseline', 'n/a')} "
+            f"on {row.get('lane', 'n/a')} by score delta {row.get('score_delta_vs_best_baseline', 0)}"
+        )
+    evidence = "; ".join(lane_text) if lane_text else "No generated geometry lane benchmarks were found."
+    claim = "Geometry Championship has bounded generated-lane winners."
+    if champion:
+        claim = (
+            "Geometry Championship has a bounded generated-lane champion: "
+            f"{champion.get('best_geometry', 'n/a')} on {champion.get('lane', 'n/a')}."
+        )
+    boundary = (
+        "Generated software benchmarks only. This is not CFD, datacenter, grid, HVAC, medical, defense, "
+        "field, customer, safety, certification, live-execution, trading, or real-dollar validation."
+    )
+    if live_gate:
+        synthetic_lanes = ", ".join(live_gate.get("synthetic_only_lanes", []) or [])
+        backed_lanes = ", ".join(live_gate.get("live_breadth_backed_lanes", []) or []) or "none"
+        evidence = (
+            f"Live-breadth-backed geometry lanes: {backed_lanes}; "
+            f"synthetic-only generated lanes: {synthetic_lanes or 'none'}; "
+            + evidence
+        )
+        boundary = (
+            boundary
+            + " Live-breadth source infrastructure is present, but generated geometry lanes are not live-breadth "
+            + "benchmarks until lane-specific frozen input manifests, replay windows, leakage controls, and baselines pass."
+        )
+    if summary.get("proof_champion_lane"):
+        evidence = (
+            f"Proof-build priority lane is {summary.get('proof_champion_lane')} "
+            f"with candidate {summary.get('proof_champion_family')}; " + evidence
+        )
+    return claim, evidence, boundary
+
+
+def geometry_frontier_claim_text(frontier: dict[str, Any]) -> tuple[str, str, str]:
+    champions = frontier.get("champion_board", {}) if isinstance(frontier.get("champion_board"), dict) else {}
+    health = frontier.get("registry_health", {}) if isinstance(frontier.get("registry_health"), dict) else {}
+    gate = frontier.get("promotion_gate", {}) if isinstance(frontier.get("promotion_gate"), dict) else {}
+    generated = champions.get("generated_benchmark_champion", {}) if isinstance(champions.get("generated_benchmark_champion"), dict) else {}
+    proof = champions.get("proof_value_champion", {}) if isinstance(champions.get("proof_value_champion"), dict) else {}
+    wiring = champions.get("recommended_next_live_wiring", {}) if isinstance(champions.get("recommended_next_live_wiring"), dict) else {}
+    claim = "Geometry Proof Frontier ranks champions, proof-value lanes, and next live-wiring targets."
+    evidence = (
+        f"Registry has {health.get('family_count', 0)} families across {health.get('lane_count', 0)} lanes; "
+        f"generated benchmark champion is {generated.get('family', 'n/a')} on {generated.get('lane', 'n/a')}; "
+        f"proof-value champion is {proof.get('family', 'n/a')} on {proof.get('lane', 'n/a')}; "
+        f"recommended next live wiring is {wiring.get('lane', 'n/a')}."
+    )
+    boundary = (
+        "This is a proof-routing board. It does not make field, customer, safety, CFD, trading, "
+        "live-execution, real-dollar, or final-submit claims. "
+        f"Ready for live geometry claim: {gate.get('ready_for_live_geometry_claim', False)}."
+    )
+    return claim, evidence, boundary
+
+
 def build_payload() -> dict[str, Any]:
     readiness = read_json(READINESS_JSON)
     dashboard = read_json(DASHBOARD_FEED_JSON)
+    if not dashboard:
+        dashboard = read_json(PUBLIC_DASHBOARD_FEED_JSON)
+    if not readiness and dashboard:
+        readiness = {
+            "posture": dashboard.get("posture", "UNKNOWN"),
+            "summary": dashboard.get("summary", {}),
+        }
     high_impact = read_json(HIGH_IMPACT_JSON)
+    if not high_impact:
+        high_impact = read_json(PUBLIC_HIGH_IMPACT_JSON)
     harbor_gate = read_json(HARBOR_GATE_JSON)
+    harbor_injection = read_json(HARBOR_INJECTION_JSON)
+    geometry_bridge = read_json(GEOMETRY_BRIDGE_JSON)
+    geometry_frontier = read_json(GEOMETRY_FRONTIER_JSON)
     summary = readiness.get("summary", {}) if isinstance(readiness.get("summary"), dict) else {}
     harbor = dashboard.get("harbor", {}) if isinstance(dashboard.get("harbor"), dict) else {}
     gate = harbor.get("public_ais_gate", {}) if isinstance(harbor.get("public_ais_gate"), dict) else {}
+    if not harbor_gate and gate:
+        harbor_gate = {"posture": gate.get("posture", "UNKNOWN")}
+    if not harbor_injection:
+        harbor_injection = (
+            harbor.get("ais_injection_benchmark", {})
+            if isinstance(harbor.get("ais_injection_benchmark"), dict)
+            else {}
+        )
     gate_checks = gate.get("gate_checks", {}) if isinstance(gate.get("gate_checks"), dict) else {}
+    injection_ready = harbor_injection.get("posture") == "PUBLIC_AIS_INJECTION_BENCHMARK_READY"
+    injection_result = harbor_injection.get("controlled_injection_benchmark", {})
+    if not isinstance(injection_result, dict) or not injection_result:
+        injection_result = harbor_injection
+    best_baseline = (
+        injection_result.get("baseline_suite", {})
+        .get("best_single_axis_baseline", {})
+        if isinstance(injection_result.get("baseline_suite", {}), dict)
+        else {}
+    )
 
     proof_claims = [
         {
@@ -111,7 +219,55 @@ def build_payload() -> dict[str, Any]:
             "evidence": f"Readiness audit reports {summary.get('local_blockers', 0)} local blockers and {summary.get('portal_user_blockers', 0)} portal/user gates across {summary.get('packages', 0)} packages.",
             "boundary": "Portal authority, compliance representations, cost review, teaming, and submit/certification actions remain unresolved.",
         },
+        {
+            "claim": "Public submission gates are explicitly mapped.",
+            "evidence": (
+                "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md separates reproducible evidence from portal authority, "
+                "eligibility, compliance, cost, team, claim, and final submit gates."
+            ),
+            "boundary": (
+                "The gate map is a public coordination artifact. It does not certify eligibility, approve a budget, "
+                "prove compliance status, or submit any application."
+            ),
+        },
     ]
+    if injection_ready:
+        proof_claims.insert(
+            2,
+            {
+                "claim": "HarborSentinel has a bounded public AIS controlled-injection benchmark.",
+                "evidence": (
+                    f"{injection_result.get('total_injected_segments', 0)} injected validation segments; "
+                    f"motion-consistency recall {injection_result.get('motion_consistency_recall', 0)} versus "
+                    f"speed-only baseline recall {injection_result.get('speed_only_baseline_recall', 0)} "
+                    f"(lift {injection_result.get('recall_lift_vs_speed_only', 0)}); "
+                    f"best single-axis baseline {best_baseline.get('name', 'n/a')} recall "
+                    f"{best_baseline.get('recall', 'n/a')}."
+                ),
+                "boundary": (
+                    "Controlled kinematic injections on public AIS validation data are not real adversary labels, "
+                    "multi-source fusion, ADS-B/radar validation, Navy/SSDS integration, field performance, or operational suitability."
+                ),
+            },
+        )
+    if geometry_bridge:
+        claim, evidence, boundary = geometry_claim_text(geometry_bridge)
+        proof_claims.append(
+            {
+                "claim": claim,
+                "evidence": evidence,
+                "boundary": boundary,
+            }
+        )
+    if geometry_frontier:
+        claim, evidence, boundary = geometry_frontier_claim_text(geometry_frontier)
+        proof_claims.append(
+            {
+                "claim": claim,
+                "evidence": evidence,
+                "boundary": boundary,
+            }
+        )
 
     return {
         "generated_utc": now_utc(),
@@ -135,27 +291,42 @@ def build_payload() -> dict[str, Any]:
             "high_impact_goal": "out/ops/lumencore_high_impact_goal_latest.json",
             "dice_lock_packet": "out/ops/dice_submission_lock_packet_latest.json",
             "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json",
+            "harbor_ais_injection_benchmark": "out/ops/harbor_ais_injection_benchmark_latest.json",
             "harbor_heldout_splits": "out/ops/harbor_ais_heldout_splits_latest.json",
             "harbor_ais_acquisition": "out/ops/harbor_ais_pilot_acquisition_latest.json",
+            "public_submission_gate_map": "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md",
+            "geometry_championship_bridge": "out/ops/geometry_championship_bridge_latest.json",
+            "geometry_proof_frontier_board": "out/ops/geometry_proof_frontier_board_latest.json",
         },
         "reviewer_path": [
             "Open the public-safe LumenCore repository/site first for reproducibility posture.",
             "Read the source authority packet and claim boundaries before any performance claim.",
             "Inspect the DICE lock packet for local package hygiene and remaining BAAT/SAM/human gates.",
             "Inspect the Harbor AIS gate for public-data readiness, split hashes, and validation boundaries.",
+            "Inspect the Harbor controlled-injection benchmark only as bounded public AIS detector-vs-baseline evidence.",
+            "Inspect the Geometry Championship bridge only as generated-lane proof-building evidence, not field validation.",
+            "Inspect the Geometry Proof Frontier board to see champion types, live-proof status, and next data wiring targets.",
+            "Inspect the public submission gate map to see what still requires human, legal/compliance, portal, or cost authority.",
             "Only then map the evidence into DICE/Harbor proposal language.",
         ],
         "outreach_copy": {
             "linkedin_short": (
                 "I am building LumenCore as a proof-driven orchestration stack for complex systems. "
                 "The latest milestone: public NOAA AIS data is now acquired, hashed, split into held-out development/validation sets, "
-                "and gated with explicit non-claim boundaries. I am looking for serious reviewers, agency-aligned collaborators, "
+                "gated, and tested with a bounded controlled-injection benchmark against a speed-only baseline. I am looking for serious reviewers, agency-aligned collaborators, "
                 "and teams that care about evidence before claims."
+            ),
+            "linkedin_geometry_short": (
+                "New bounded LumenCore proof lane: the Geometry Championship bridge now ranks 75 natural/path families "
+                "and exposes generated-lane results with explicit boundaries. Current generated-lane champion: thermal plume convection "
+                "on a synthetic thermal-ventilation benchmark; current proof-build priority: branching transport for critical infrastructure. "
+                "This is proof-building evidence, not field validation or a dollar claim."
             ),
             "reviewer_email_subject": "LumenCore proof packet: DICE local lock + public AIS HarborSentinel gate",
             "reviewer_email_body": (
                 "I am sharing a public-safe proof packet for LumenCore. It includes a locally locked DARPA DICE abstract package, "
-                "a HarborSentinel public AIS data-readiness gate built from NOAA AIS, and explicit boundaries on what the evidence does "
+                "a HarborSentinel public AIS data-readiness gate built from NOAA AIS, a bounded controlled-injection benchmark, "
+                "a Geometry Championship bridge for generated natural-path proof lanes, and explicit boundaries on what the evidence does "
                 "and does not prove. I would value technical review focused on reproducibility, claim discipline, and agency fit."
             ),
             "goal_prompt": (
@@ -168,10 +339,14 @@ def build_payload() -> dict[str, Any]:
         "do_not_claim": [
             "Guaranteed awards, funding, wealth, or fame.",
             "CMMC Level 2 certification, clearance, export determination, or portal authority without current proof.",
-            "Harbor/Navy/SSDS/field performance from public AIS single-lane data-readiness.",
+            "Harbor/Navy/SSDS/field performance from public AIS single-lane data-readiness or controlled-injection results.",
             "Trading profitability or institutional-grade execution from governance audits.",
             "Partner, customer, investor, or agency endorsement without written confirmation.",
+            "Generated Geometry Championship lane wins as field validation, CFD validation, safety certification, or dollar claims.",
+            "Geometry Proof Frontier ranking as live geometry validation or real-dollar proof.",
         ],
+        "geometry_bridge_summary": geometry_bridge.get("summary", {}) if isinstance(geometry_bridge.get("summary"), dict) else {},
+        "geometry_frontier_summary": geometry_frontier.get("champion_board", {}) if isinstance(geometry_frontier.get("champion_board"), dict) else {},
         "lumenstock_boundary": high_impact.get("lumenstock", {}).get("interpretation", ""),
         "gate_checks": gate_checks,
     }
@@ -219,6 +394,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.extend(["## Reviewer Path", ""])
     lines.extend(f"{idx}. {step}" for idx, step in enumerate(payload["reviewer_path"], start=1))
     lines.extend(["", "## Outreach Copy", "", "### LinkedIn Short", "", payload["outreach_copy"]["linkedin_short"], ""])
+    if payload["outreach_copy"].get("linkedin_geometry_short"):
+        lines.extend(["### LinkedIn Geometry Short", "", payload["outreach_copy"]["linkedin_geometry_short"], ""])
     lines.extend(
         [
             "### Reviewer Email",

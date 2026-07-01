@@ -182,6 +182,8 @@ def validate_card(top_module: Any, card: dict[str, Any]) -> dict[str, Any]:
         and distinct_win_hash_count >= 2
         and min_source_count >= 3
         and candidate_best_count >= 2
+        and candidate_best_count >= 5
+        and candidate_best_count * 2 >= len(window_results)
     )
     validation = {
         "family_id": card.get("candidate_family_id", ""),

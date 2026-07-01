@@ -32,9 +32,10 @@ def test_linkedin_copy_uses_bounded_evidence_numbers():
     payload = module.build_payload()
     profile = payload["linkedin_profile_draft"]
     posts = payload["social_posts"]
+    registered = str(payload["geometry_audit_summary"]["registered_family_count"])
 
     assert "LumenCore" in profile["headline"]
-    assert "75" in profile["about"]
+    assert registered in profile["about"]
     assert "field validation" in profile["about"]
     assert any("synthetic discovers" in post["copy"].lower() for post in posts)
     assert all(post["status"] == "draft_needs_user_approval" for post in posts)

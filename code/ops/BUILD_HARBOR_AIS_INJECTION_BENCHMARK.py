@@ -183,6 +183,43 @@ def sog_baseline_score(segment: dict[str, float], thresholds: dict[str, float]) 
     return segment["sog_knots"] / thresholds["sog_knots_p99"]
 
 
+def derived_speed_baseline_score(segment: dict[str, float], thresholds: dict[str, float]) -> float:
+    return segment["derived_speed_knots"] / thresholds["derived_speed_knots_p99"]
+
+
+def speed_gap_baseline_score(segment: dict[str, float], thresholds: dict[str, float]) -> float:
+    return segment["speed_gap_knots"] / thresholds["speed_gap_knots_p99"]
+
+
+def heading_rate_baseline_score(segment: dict[str, float], thresholds: dict[str, float]) -> float:
+    return segment["turn_rate_deg_per_min"] / thresholds["turn_rate_deg_per_min_p99"]
+
+
+def baseline_scorers():
+    return [
+        (
+            "reported_speed_sog_p99",
+            sog_baseline_score,
+            "Flags only segments whose AIS reported SOG exceeds the development p99 SOG threshold.",
+        ),
+        (
+            "derived_trajectory_speed_p99",
+            derived_speed_baseline_score,
+            "Flags only segments whose point-to-point derived trajectory speed exceeds the development p99 derived-speed threshold.",
+        ),
+        (
+            "speed_gap_consistency_p99",
+            speed_gap_baseline_score,
+            "Flags only segments whose AIS SOG versus derived-speed gap exceeds the development p99 consistency-gap threshold.",
+        ),
+        (
+            "heading_rate_p99",
+            heading_rate_baseline_score,
+            "Flags only segments whose heading-change rate exceeds the development p99 turn-rate threshold.",
+        ),
+    ]
+
+
 def candidate_rate(segments: list[dict[str, float]], thresholds: dict[str, float], scorer) -> float:
     if not segments:
         return 0.0
@@ -242,32 +279,77 @@ def evaluate_injections(
     total = 0
     detector_hits = 0
     baseline_hits = 0
+    baseline_defs = baseline_scorers()
+    baseline_totals = {name: 0 for name, _, _ in baseline_defs}
+    baseline_family_hits: dict[str, dict[str, int]] = {name: {} for name, _, _ in baseline_defs}
     for family in families:
         sample = deterministic_sample(validation_segments, limit=max_injections_per_family, salt=family)
         detector = 0
         baseline = 0
+        family_baseline_counts = {name: 0 for name, _, _ in baseline_defs}
         for segment in sample:
             mutated = inject(segment, family, thresholds)
             detector += int(motion_score(mutated, thresholds) > 1.0)
             baseline += int(sog_baseline_score(mutated, thresholds) > 1.0)
+            for name, scorer, _description in baseline_defs:
+                hit = int(scorer(mutated, thresholds) > 1.0)
+                baseline_totals[name] += hit
+                family_baseline_counts[name] += hit
         count = len(sample)
         total += count
         detector_hits += detector
         baseline_hits += baseline
+        for name in family_baseline_counts:
+            baseline_family_hits[name][family] = family_baseline_counts[name]
         by_family[family] = {
             "injected_segments": count,
             "motion_consistency_recall": detector / count if count else 0.0,
             "speed_only_baseline_recall": baseline / count if count else 0.0,
             "boundary": "Controlled kinematic injection on public AIS validation segments; not a real threat label.",
         }
+    motion_recall = detector_hits / total if total else 0.0
+    baseline_suite = {}
+    for name, _scorer, description in baseline_defs:
+        recall = baseline_totals[name] / total if total else 0.0
+        baseline_suite[name] = {
+            "description": description,
+            "recall": recall,
+            "recall_gap_vs_motion_consistency": motion_recall - recall if total else 0.0,
+            "family_recalls": {
+                family: (
+                    baseline_family_hits[name].get(family, 0)
+                    / by_family[family]["injected_segments"]
+                    if by_family[family]["injected_segments"]
+                    else 0.0
+                )
+                for family in families
+            },
+        }
+    best_name, best_row = max(
+        baseline_suite.items(),
+        key=lambda item: (float(item[1].get("recall", 0.0)), item[0]),
+        default=("", {"recall": 0.0}),
+    )
     return {
         "families": by_family,
         "total_injected_segments": total,
-        "motion_consistency_recall": detector_hits / total if total else 0.0,
+        "motion_consistency_recall": motion_recall,
         "speed_only_baseline_recall": baseline_hits / total if total else 0.0,
         "recall_lift_vs_speed_only": (
             (detector_hits / total) - (baseline_hits / total) if total else 0.0
         ),
+        "baseline_suite": {
+            "baselines": baseline_suite,
+            "best_single_axis_baseline": {
+                "name": best_name,
+                "recall": best_row.get("recall", 0.0),
+                "recall_gap_vs_motion_consistency": motion_recall - float(best_row.get("recall", 0.0)) if total else 0.0,
+            },
+            "boundary": (
+                "Baseline suite compares single-axis frozen p99 detectors on controlled injections. "
+                "It is not a labeled false-positive or operational-performance comparison."
+            ),
+        },
     }
 
 
@@ -298,6 +380,13 @@ def build_benchmark(
         "validation_motion_candidate_rate": candidate_rate(val_segments, thresholds, motion_score),
         "development_speed_only_candidate_rate": candidate_rate(dev_segments, thresholds, sog_baseline_score),
         "validation_speed_only_candidate_rate": candidate_rate(val_segments, thresholds, sog_baseline_score),
+        "baseline_candidate_rates": {
+            name: {
+                "development": candidate_rate(dev_segments, thresholds, scorer),
+                "validation": candidate_rate(val_segments, thresholds, scorer),
+            }
+            for name, scorer, _description in baseline_scorers()
+        },
         "boundary": "Natural candidate rates are unlabeled review queues, not false-positive rates.",
     }
     enough_data = len(dev_segments) >= min_segments and len(val_segments) >= min_segments
@@ -341,6 +430,7 @@ def build_benchmark(
         "baseline": {
             "name": "speed_only_sog_p99",
             "description": "Flags only segments whose AIS SOG exceeds the development p99 SOG threshold.",
+            "suite": injections["baseline_suite"],
         },
         "detector": {
             "name": "motion_consistency_v1",
@@ -352,7 +442,8 @@ def build_benchmark(
         "claim_boundary": (
             "This is a held-out public AIS controlled-injection benchmark. It demonstrates that a "
             "frozen development-threshold motion-consistency detector catches injected kinematic "
-            "perturbations on validation AIS segments better than a speed-only baseline. It does not "
+            "perturbations on validation AIS segments better than multiple single-axis frozen p99 "
+            "baselines. It does not "
             "establish HarborSentinel operational detection performance, real adversary detection, "
             "multi-source fusion, ADS-B/radar validation, Navy/SSDS integration, field performance, "
             "or operational suitability."
@@ -402,6 +493,19 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Motion-consistency recall: {injection['motion_consistency_recall']:.4f}",
             f"- Speed-only baseline recall: {injection['speed_only_baseline_recall']:.4f}",
             f"- Recall lift versus speed-only: {injection['recall_lift_vs_speed_only']:.4f}",
+            "",
+            "## Stronger Single-Axis Baselines",
+            "",
+            *[
+                (
+                    f"- {name}: recall {metrics['recall']:.4f}; "
+                    f"gap vs motion {metrics['recall_gap_vs_motion_consistency']:.4f}"
+                )
+                for name, metrics in injection["baseline_suite"]["baselines"].items()
+            ],
+            f"- Best single-axis baseline: {injection['baseline_suite']['best_single_axis_baseline']['name']} "
+            f"({injection['baseline_suite']['best_single_axis_baseline']['recall']:.4f})",
+            "- Boundary: single-axis baseline recalls are controlled-injection checks, not precision or field-performance estimates.",
             "",
             "## Family Recall",
             "",

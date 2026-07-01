@@ -317,6 +317,7 @@ def rolling_gate_indexes(rolling_gate: dict[str, Any]) -> dict[str, Any]:
     by_family: dict[str, dict[str, Any]] = {}
     by_entity: dict[str, dict[str, Any]] = {}
     triple_source_candidates: list[dict[str, Any]] = []
+    triple_source_rolling_champions: list[dict[str, Any]] = []
     rolling_champions: list[dict[str, Any]] = []
     single_run_candidates: list[dict[str, Any]] = []
     if not isinstance(board, list):
@@ -333,6 +334,8 @@ def rolling_gate_indexes(rolling_gate: dict[str, Any]) -> dict[str, Any]:
         status = str(row.get("status", ""))
         if status == "rolling_champion":
             rolling_champions.append(row)
+            if int(row.get("source_count") or 0) >= 3:
+                triple_source_rolling_champions.append(row)
         elif status == "triple_source_candidate":
             triple_source_candidates.append(row)
         elif status == "single_run_candidate":
@@ -341,6 +344,7 @@ def rolling_gate_indexes(rolling_gate: dict[str, Any]) -> dict[str, Any]:
         "by_family": by_family,
         "by_entity": by_entity,
         "rolling_champions": rolling_champions,
+        "triple_source_rolling_champions": triple_source_rolling_champions,
         "triple_source_candidates": triple_source_candidates,
         "single_run_candidates": single_run_candidates,
         "summary": rolling_gate.get("summary", {}),
@@ -692,9 +696,29 @@ def build_queue() -> dict[str, Any]:
             "strict_rolling_champion": {
                 "family_id": rolling_champion.get("family_id", ""),
                 "lane": rolling_champion.get("lane", ""),
-                "status": rolling_champion.get("status", "none"),
+                "status": "rolling_champion_not_field_validated" if rolling_champion else "none",
                 "repeat_live_win_count": rolling_champion.get("repeat_live_win_count", 0),
             },
+            "rolling_champions": [
+                {
+                    "family_id": row.get("family_id", ""),
+                    "lane": row.get("lane", ""),
+                    "status": "rolling_champion_not_field_validated",
+                    "repeat_live_win_count": row.get("repeat_live_win_count", 0),
+                    "source_count": row.get("source_count", 0),
+                }
+                for row in rolling_indexes["rolling_champions"]
+            ],
+            "triple_source_rolling_champions": [
+                {
+                    "family_id": row.get("family_id", ""),
+                    "lane": row.get("lane", ""),
+                    "status": "triple_source_rolling_champion_not_field_validated",
+                    "source_count": row.get("source_count", 0),
+                    "repeat_live_win_count": row.get("repeat_live_win_count", 0),
+                }
+                for row in rolling_indexes["triple_source_rolling_champions"]
+            ],
             "triple_source_candidates": [
                 {
                     "family_id": row.get("family_id", ""),
@@ -713,6 +737,7 @@ def build_queue() -> dict[str, Any]:
             "families_ranked": len(rows),
             "live_geometry_winners": 0,
             "strict_rolling_champion_count": len(rolling_indexes["rolling_champions"]),
+            "triple_source_rolling_champion_count": len(rolling_indexes["triple_source_rolling_champions"]),
             "triple_source_candidate_count": len(rolling_indexes["triple_source_candidates"]),
             "single_run_candidate_count": len(rolling_indexes["single_run_candidates"]),
             "rolling_gate_boundary": rolling_indexes["boundary"],
@@ -768,12 +793,14 @@ def render_markdown(queue: dict[str, Any]) -> str:
         f"- Highest blocked context target: `{champions['highest_blocked_context_value_target']['family_id']}` on `{champions['highest_blocked_context_value_target']['lane']}`",
         f"- Market paper champion: `{champions['market_paper_champion']['family_id']}`",
         f"- Strict rolling champion: `{champions['strict_rolling_champion']['family_id'] or 'none'}` on `{champions['strict_rolling_champion']['lane'] or 'none'}`",
+        f"- Triple-source rolling champions: `{len(champions['triple_source_rolling_champions'])}`",
         f"- Triple-source candidates: `{len(champions['triple_source_candidates'])}`",
         f"- Boundary: {champions['boundary']}",
         "",
         "## Strict Rolling Gate",
         "",
         f"- Rolling champions: `{queue['promotion_gate']['strict_rolling_champion_count']}`",
+        f"- Triple-source rolling champions: `{queue['promotion_gate']['triple_source_rolling_champion_count']}`",
         f"- Triple-source candidates: `{queue['promotion_gate']['triple_source_candidate_count']}`",
         f"- Single-run candidates: `{queue['promotion_gate']['single_run_candidate_count']}`",
         f"- Boundary: {queue['promotion_gate']['rolling_gate_boundary']}",

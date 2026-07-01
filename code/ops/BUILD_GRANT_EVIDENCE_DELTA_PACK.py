@@ -5,8 +5,9 @@ Per-ticket "extra polished multi-asset frozen deltas" evidence packet.
 For each grant ticket we are about to fill out / submit, this builds a
 fresh, hash-chained packet that combines:
 
-  1. Multi-asset frozen deltas (latest record per sector) from
-     out/infra_frozen_deltas.jsonl
+  1. Provenance-gated multi-asset frozen deltas from
+     out/ops/multi_asset_frozen_delta_pack_latest.json, promoting only
+     live-measured rows when available
   2. The latest frozen-delta truth-chain entry (chain-of-custody hash)
      from out/ops/frozen_delta_truth_chain/frozen_delta_truth_chain_latest.json
   3. Live breadth signals when available (institutional leaderboard /
@@ -48,6 +49,7 @@ INFRA_DELTAS = OUT / "infra_frozen_deltas.jsonl"
 FROZEN_LEDGER = OUT / "frozen_delta_ledger.jsonl"
 TRUTH_CHAIN_LATEST = OUT_OPS / "frozen_delta_truth_chain" / "frozen_delta_truth_chain_latest.json"
 SNAPSHOT_LATEST = OUT_OPS / "frozen_delta_truth_chain" / "frozen_delta_snapshot_latest.json"
+MULTI_ASSET_PACK = OUT_OPS / "multi_asset_frozen_delta_pack_latest.json"
 
 LANES_LATEST = OUT_OPS / "grant_submit_lanes" / "grant_submit_lanes_latest.json"
 TICKETS_DIR = OUT_OPS / "grant_submit_lanes" / "tickets"
@@ -140,6 +142,13 @@ def _file_age_hours(path: Path) -> float | None:
         return None
 
 
+def _rel_to_root(path: Path) -> str:
+    try:
+        return path.relative_to(ROOT).as_posix()
+    except Exception:
+        return path.as_posix()
+
+
 # ---------------------------------------------------------------------------
 # Memo parsing
 # ---------------------------------------------------------------------------
@@ -181,11 +190,43 @@ def match_agency_section(
 
 
 # ---------------------------------------------------------------------------
-# Frozen delta gathering
+# Frozen delta gathering. The promoted path is live-breadth-first; the raw
+# infra JSONL is a legacy fallback and must remain explicitly non-promoted.
 # ---------------------------------------------------------------------------
 
 def gather_multi_asset_deltas(jsonl_path: Path) -> tuple[list[dict], dict]:
     """Read the deltas jsonl and pick the most-recent record per (sector|source)."""
+    promoted_pack = _load_json(MULTI_ASSET_PACK)
+    if isinstance(promoted_pack, dict):
+        live_lanes = promoted_pack.get("live_measured_top_lanes")
+        if isinstance(live_lanes, list):
+            latest = [row for row in live_lanes if isinstance(row, dict)]
+            headline = promoted_pack.get("headline", {})
+            if not isinstance(headline, dict):
+                headline = {}
+            claim_gate = promoted_pack.get("claim_gate", {})
+            if not isinstance(claim_gate, dict):
+                claim_gate = {}
+            summary = {
+                "source_mode": "live_measured_multi_asset_pack",
+                "rows_total": len(latest),
+                "asset_keys": len({f"{r.get('sector','')}|{r.get('source','')}" for r in latest}),
+                "sectors": sorted({r.get("sector", "") for r in latest if r.get("sector")}),
+                "total_hourly_value_usd": round(float(headline.get("live_measured_hourly_value_usd") or 0.0), 2),
+                "total_avoided_loss_usd": round(
+                    sum(float(r.get("estimated_avoided_loss_usd") or 0.0) for r in latest),
+                    2,
+                ),
+                "trust_tiers": sorted({r.get("trust_tier", "") for r in latest if r.get("trust_tier")}),
+                "context_only_lane_count": int(headline.get("context_only_lane_count") or 0),
+                "primary_evidence_mode": str(headline.get("primary_evidence_mode") or ""),
+                "claim_boundary": str(
+                    claim_gate.get("boundary")
+                    or "Only live-measured lanes are promoted; context-only rows are not live proof."
+                ),
+            }
+            return latest, summary
+
     rows = _load_jsonl(jsonl_path)
     by_key: dict[str, dict] = {}
     for row in rows:
@@ -204,6 +245,7 @@ def gather_multi_asset_deltas(jsonl_path: Path) -> tuple[list[dict], dict]:
         reverse=True,
     )
     summary = {
+        "source_mode": "legacy_infra_frozen_delta_jsonl_no_live_provenance",
         "rows_total": len(rows),
         "asset_keys": len(by_key),
         "sectors": sorted({r.get("sector", "") for r in latest if r.get("sector")}),
@@ -214,6 +256,12 @@ def gather_multi_asset_deltas(jsonl_path: Path) -> tuple[list[dict], dict]:
             sum(float(r.get("estimated_avoided_loss_usd") or 0.0) for r in latest), 2
         ),
         "trust_tiers": sorted({r.get("trust_tier", "") for r in latest if r.get("trust_tier")}),
+        "context_only_lane_count": 0,
+        "primary_evidence_mode": "unprovenanced_legacy_delta_rows",
+        "claim_boundary": (
+            "Legacy fallback: raw frozen-delta rows are not promoted as live-measured evidence "
+            "unless the multi-asset provenance-gated pack is available."
+        ),
     }
     return latest, summary
 
@@ -236,9 +284,27 @@ def gather_live_breadth() -> dict:
                 for key in ("generated_utc", "live_now", "annual_value_signal_usd",
                             "router_edge_pct", "harmonic_win_rate_pct",
                             "measured_sources", "enabled_sources",
+                            "primary_evidence_mode",
+                            "live_measured_estimated_hourly_value_usd",
+                            "live_measured_estimated_annual_value_usd",
+                            "context_only_estimated_hourly_value_usd",
+                            "context_only_estimated_annual_value_usd",
                             "valuation_proxy_usd", "top_sector"):
                     if isinstance(doc, dict) and key in doc:
                         summary[key] = doc[key]
+                headline = doc.get("headline") if isinstance(doc, dict) else {}
+                if isinstance(headline, dict):
+                    for key in (
+                        "primary_evidence_mode",
+                        "live_measured_estimated_hourly_value_usd",
+                        "live_measured_estimated_annual_value_usd",
+                        "context_only_estimated_hourly_value_usd",
+                        "context_only_estimated_annual_value_usd",
+                        "measured_sources",
+                        "enabled_sources",
+                    ):
+                        if key in headline:
+                            summary[key] = headline[key]
                 if not summary and isinstance(doc, dict):
                     metrics = doc.get("metrics") or {}
                     for key in ("annual_value_signal_usd", "router_edge_pct",
@@ -358,7 +424,9 @@ def render_evidence_md(
     # Freshness banner
     fresh_state = freshness.get("state", "unknown")
     lines.append(f"**Freshness:** {fresh_state.upper()}  "
-                 f"(deltas age: {freshness.get('infra_deltas_age_hours','?')}h, "
+                 f"(headline source: {freshness.get('headline_source_mode','unknown')}, "
+                 f"pack age: {freshness.get('multi_asset_pack_age_hours','?')}h, "
+                 f"raw deltas age: {freshness.get('infra_deltas_age_hours','?')}h, "
                  f"truth-chain age: {freshness.get('truth_chain_age_hours','?')}h)")
     lines.append("")
 
@@ -383,16 +451,21 @@ def render_evidence_md(
     lines.append("")
 
     # 2. Multi-Asset Frozen Deltas
-    lines.append("## 2. Multi-Asset Frozen Deltas (live, hash-chained)")
+    lines.append("## 2. Multi-Asset Frozen Deltas (provenance-gated)")
     lines.append("")
     lines.append(
-        f"- Source: `{INFRA_DELTAS.relative_to(ROOT).as_posix()}`  "
+        f"- Source mode: `{delta_summary.get('source_mode', 'unknown')}`"
+    )
+    lines.append(
+        f"- Source: `{_rel_to_root(INFRA_DELTAS)}`  "
         f"({delta_summary.get('rows_total',0)} rows, "
         f"{delta_summary.get('asset_keys',0)} unique sector|source keys)"
     )
+    lines.append(f"- Primary evidence mode: `{delta_summary.get('primary_evidence_mode', 'unknown')}`")
+    lines.append(f"- Context-only lane count: {delta_summary.get('context_only_lane_count', 0)}")
     lines.append(f"- Sectors covered: {', '.join(delta_summary.get('sectors', []) or ['—'])}")
     lines.append(
-        f"- Aggregate hourly value signal: "
+        f"- Live-measured hourly value signal: "
         f"{_fmt_usd(delta_summary.get('total_hourly_value_usd', 0))}"
     )
     lines.append(
@@ -400,6 +473,7 @@ def render_evidence_md(
         f"{_fmt_usd(delta_summary.get('total_avoided_loss_usd', 0))}"
     )
     lines.append(f"- Trust tiers present: {', '.join(delta_summary.get('trust_tiers', []) or ['—'])}")
+    lines.append(f"- Claim boundary: {delta_summary.get('claim_boundary', '')}")
     lines.append("")
     lines.append("| Sector | Source | Constraint | Hourly Value | Avoided Loss | Trust |")
     lines.append("| --- | --- | --- | ---: | ---: | --- |")
@@ -518,22 +592,46 @@ def build_pack(
     ])
     memo_match = match_agency_section(sections, blob)
 
+    source_mode = str(delta_summary.get("source_mode") or "")
+    using_promoted_pack = source_mode == "live_measured_multi_asset_pack"
+    age_pack = _file_age_hours(MULTI_ASSET_PACK)
     age_deltas = _file_age_hours(INFRA_DELTAS)
     age_chain = _file_age_hours(TRUTH_CHAIN_LATEST)
     fresh_state = "fresh"
     notes = []
-    if age_deltas is None:
-        fresh_state = "missing"
-        notes.append("infra_frozen_deltas.jsonl missing")
-    elif age_deltas > freshness_hours:
-        fresh_state = "stale"
-        notes.append(f"infra_frozen_deltas.jsonl age {age_deltas:.1f}h > {freshness_hours}h")
-    if age_chain is not None and age_chain > freshness_hours:
+    if using_promoted_pack:
+        if age_pack is None:
+            fresh_state = "missing"
+            notes.append("multi_asset_frozen_delta_pack_latest.json missing")
+        elif age_pack > freshness_hours:
+            fresh_state = "stale"
+            notes.append(f"multi_asset_frozen_delta_pack_latest.json age {age_pack:.1f}h > {freshness_hours}h")
+        if age_deltas is None:
+            notes.append("raw infra_frozen_deltas.jsonl missing; promoted pack remains the headline source")
+        elif age_deltas > freshness_hours:
+            notes.append(
+                f"raw infra_frozen_deltas.jsonl age {age_deltas:.1f}h > {freshness_hours}h; "
+                "raw/context lineage is stale but not promoted as headline proof"
+            )
+    else:
+        if age_deltas is None:
+            fresh_state = "missing"
+            notes.append("infra_frozen_deltas.jsonl missing")
+        elif age_deltas > freshness_hours:
+            fresh_state = "stale"
+            notes.append(f"infra_frozen_deltas.jsonl age {age_deltas:.1f}h > {freshness_hours}h")
+    if age_chain is None:
+        if fresh_state == "fresh":
+            fresh_state = "partial"
+        notes.append("truth_chain_latest missing")
+    elif age_chain > freshness_hours:
         if fresh_state == "fresh":
             fresh_state = "partial"
         notes.append(f"truth_chain_latest age {age_chain:.1f}h > {freshness_hours}h")
     freshness = {
         "state": fresh_state,
+        "headline_source_mode": source_mode,
+        "multi_asset_pack_age_hours": round(age_pack, 2) if age_pack is not None else None,
         "infra_deltas_age_hours": round(age_deltas, 2) if age_deltas is not None else None,
         "truth_chain_age_hours": round(age_chain, 2) if age_chain is not None else None,
         "threshold_hours": freshness_hours,
@@ -597,7 +695,7 @@ def build_pack(
     }
     for p in (json_path, md_path):
         manifest["files"].append({
-            "path_rel": str(p.relative_to(ROOT)).replace("\\", "/"),
+            "path_rel": _rel_to_root(p),
             "sha256": _sha256_file(p),
             "bytes": p.stat().st_size,
         })
@@ -605,7 +703,7 @@ def build_pack(
     for src in (INFRA_DELTAS, TRUTH_CHAIN_LATEST, SNAPSHOT_LATEST, MEMO_PATH, FROZEN_LEDGER):
         if src.exists():
             manifest["files"].append({
-                "path_rel": str(src.relative_to(ROOT)).replace("\\", "/"),
+                "path_rel": _rel_to_root(src),
                 "sha256": _sha256_file(src),
                 "bytes": src.stat().st_size,
                 "role": "source",

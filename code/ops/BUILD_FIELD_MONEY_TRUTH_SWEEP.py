@@ -223,6 +223,14 @@ def summarize_artifacts() -> dict[str, Any]:
     dollar_summary = dollar_gate.get("summary", {}) if isinstance(dollar_gate.get("summary"), dict) else {}
     control_summary = control_room.get("summary", {}) if isinstance(control_room.get("summary"), dict) else {}
     vault_summary = vault.get("summary", {}) if isinstance(vault.get("summary"), dict) else {}
+    promotion_board = [
+        row for row in rolling.get("promotion_board", []) if isinstance(row, dict)
+    ]
+    triple_source_champions = [
+        row
+        for row in promotion_board
+        if row.get("status") == "rolling_champion" and int(row.get("source_count") or 0) >= 3
+    ]
 
     return {
         **registry_counts(),
@@ -237,6 +245,7 @@ def summarize_artifacts() -> dict[str, Any]:
         "total_live_context_rows_evaluated": live_summary.get("total_live_context_rows_evaluated", 0),
         "unique_snapshot_sha256_count": live_summary.get("unique_snapshot_sha256_count", 0),
         "rolling_champion_count": rolling_summary.get("rolling_champion_count", 0),
+        "triple_source_champion_count": len(triple_source_champions),
         "triple_source_candidate_count": rolling_summary.get("triple_source_candidate_count", 0),
         "single_run_candidate_count": rolling_summary.get("single_run_candidate_count", 0),
         "proof_card_count": proof_summary.get("proof_card_count", len(proof_cards.get("proof_cards", []))),
@@ -272,6 +281,7 @@ def build_gates(summary: dict[str, Any]) -> dict[str, Any]:
     adapter_replays = int(summary.get("adapter_replay_count", 0) or 0)
     benchmark_specified = int(summary.get("benchmark_specified_family_count", 0) or 0)
     rolling_champions = int(summary.get("rolling_champion_count", 0) or 0)
+    triple_champions = int(summary.get("triple_source_champion_count", 0) or 0)
     triple_candidates = int(summary.get("triple_source_candidate_count", 0) or 0)
     measured_sources = int(summary.get("measured_sources", 0) or 0)
     live_rows = int(summary.get("total_measured_rows", 0) or 0)
@@ -283,8 +293,8 @@ def build_gates(summary: dict[str, Any]) -> dict[str, Any]:
         "all_families_have_benchmark_specs": family_count > 0 and benchmark_specified >= family_count,
         "all_registered_families_live_benchmarked": family_count > 0 and adapter_replays >= family_count,
         "live_data_available_for_benchmarking": measured_sources >= 3 and live_rows > 0,
-        "double_dataset_frozen_assets_present": rolling_champions >= 1 or triple_candidates >= 1,
-        "triple_dataset_frozen_assets_present": triple_candidates >= 1,
+        "double_dataset_frozen_assets_present": rolling_champions >= 1 or triple_champions >= 1 or triple_candidates >= 1,
+        "triple_dataset_frozen_assets_present": triple_champions >= 1 or triple_candidates >= 1,
         "rolling_champion_present": rolling_champions >= 1,
         "glyph_or_external_vault_routed": external_vault_target
         and bool(summary.get("vault_packet_ready"))
@@ -394,6 +404,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Live adapter replay count: `{summary.get('adapter_replay_count')}`",
         f"- Measured sources / rows: `{summary.get('measured_sources')}` / `{summary.get('total_measured_rows')}`",
         f"- Candidate beats named baseline count: `{summary.get('candidate_beats_named_baseline_count')}`",
+        f"- Triple-source rolling champions: `{summary.get('triple_source_champion_count')}`",
         f"- Triple-source candidates: `{summary.get('triple_source_candidate_count')}`",
         f"- Rolling champions: `{summary.get('rolling_champion_count')}`",
         f"- Safe estimated value signal: `{money(summary.get('safe_estimated_hourly_value_usd'))}/hour`, `{money(summary.get('safe_estimated_annual_value_usd'))}/year`",

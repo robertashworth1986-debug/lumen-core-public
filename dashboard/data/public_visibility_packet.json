@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-20T07:54:09.623895+00:00",
+  "generated_utc": "2026-06-22T18:25:02.034025+00:00",
   "schema": "public_visibility_packet_v1",
   "author": {
     "name": "Robert Ashworth",
@@ -52,9 +52,29 @@
       "boundary": "Does not establish HarborSentinel detection performance, ADS-B rights, radar validation, Navy/SSDS integration, or field validation."
     },
     {
+      "claim": "HarborSentinel has a bounded public AIS controlled-injection benchmark.",
+      "evidence": "20000 injected validation segments; motion-consistency recall 1.0 versus speed-only baseline recall 0.25835 (lift 0.7416499999999999); best single-axis baseline speed_gap_consistency_p99 recall 0.5068.",
+      "boundary": "Controlled kinematic injections on public AIS validation data are not real adversary labels, multi-source fusion, ADS-B/radar validation, Navy/SSDS integration, field performance, or operational suitability."
+    },
+    {
       "claim": "Top-five grant packets are locally ready but not submitted.",
       "evidence": "Readiness audit reports 0 local blockers and 23 portal/user gates across 5 packages.",
       "boundary": "Portal authority, compliance representations, cost review, teaming, and submit/certification actions remain unresolved."
+    },
+    {
+      "claim": "Public submission gates are explicitly mapped.",
+      "evidence": "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md separates reproducible evidence from portal authority, eligibility, compliance, cost, team, claim, and final submit gates.",
+      "boundary": "The gate map is a public coordination artifact. It does not certify eligibility, approve a budget, prove compliance status, or submit any application."
+    },
+    {
+      "claim": "Geometry Championship has a bounded generated-lane champion: brachistochrone_descent on optimal_curve_transport.",
+      "evidence": "Proof-build priority lane is branching_transport with candidate crack_propagation_paths; Live-breadth-backed geometry lanes: none; synthetic-only generated lanes: optimal_curve_transport, wave_resonance_timing, thermal_ventilation, branching_transport; brachistochrone_descent beat minimum_jerk_curve on optimal_curve_transport by score delta 0.178449; kuramoto_phase_coupling beat kalman_filter on wave_resonance_timing by score delta 0.117356; thermal_plume_convection beat straight_duct on thermal_ventilation by score delta 0.096436; leaf_veins beat minimum_spanning_tree on branching_transport by score delta 0.001023",
+      "boundary": "Generated software benchmarks only. This is not CFD, datacenter, grid, HVAC, medical, defense, field, customer, safety, certification, live-execution, trading, or real-dollar validation. Live-breadth source infrastructure is present, but generated geometry lanes are not live-breadth benchmarks until lane-specific frozen input manifests, replay windows, leakage controls, and baselines pass."
+    },
+    {
+      "claim": "Geometry Proof Frontier ranks champions, proof-value lanes, and next live-wiring targets.",
+      "evidence": "Registry has 75 families across 12 lanes; generated benchmark champion is brachistochrone_descent on optimal_curve_transport; proof-value champion is crack_propagation_paths on branching_transport; recommended next live wiring is optimal_curve_transport.",
+      "boundary": "This is a proof-routing board. It does not make field, customer, safety, CFD, trading, live-execution, real-dollar, or final-submit claims. Ready for live geometry claim: False."
     }
   ],
   "source_backed_artifacts": {
@@ -62,29 +82,146 @@
     "high_impact_goal": "out/ops/lumencore_high_impact_goal_latest.json",
     "dice_lock_packet": "out/ops/dice_submission_lock_packet_latest.json",
     "harbor_public_ais_gate": "out/ops/harbor_public_ais_gate_latest.json",
+    "harbor_ais_injection_benchmark": "out/ops/harbor_ais_injection_benchmark_latest.json",
     "harbor_heldout_splits": "out/ops/harbor_ais_heldout_splits_latest.json",
-    "harbor_ais_acquisition": "out/ops/harbor_ais_pilot_acquisition_latest.json"
+    "harbor_ais_acquisition": "out/ops/harbor_ais_pilot_acquisition_latest.json",
+    "public_submission_gate_map": "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md",
+    "geometry_championship_bridge": "out/ops/geometry_championship_bridge_latest.json",
+    "geometry_proof_frontier_board": "out/ops/geometry_proof_frontier_board_latest.json"
   },
   "reviewer_path": [
     "Open the public-safe LumenCore repository/site first for reproducibility posture.",
     "Read the source authority packet and claim boundaries before any performance claim.",
     "Inspect the DICE lock packet for local package hygiene and remaining BAAT/SAM/human gates.",
     "Inspect the Harbor AIS gate for public-data readiness, split hashes, and validation boundaries.",
+    "Inspect the Harbor controlled-injection benchmark only as bounded public AIS detector-vs-baseline evidence.",
+    "Inspect the Geometry Championship bridge only as generated-lane proof-building evidence, not field validation.",
+    "Inspect the Geometry Proof Frontier board to see champion types, live-proof status, and next data wiring targets.",
+    "Inspect the public submission gate map to see what still requires human, legal/compliance, portal, or cost authority.",
     "Only then map the evidence into DICE/Harbor proposal language."
   ],
   "outreach_copy": {
-    "linkedin_short": "I am building LumenCore as a proof-driven orchestration stack for complex systems. The latest milestone: public NOAA AIS data is now acquired, hashed, split into held-out development/validation sets, and gated with explicit non-claim boundaries. I am looking for serious reviewers, agency-aligned collaborators, and teams that care about evidence before claims.",
+    "linkedin_short": "I am building LumenCore as a proof-driven orchestration stack for complex systems. The latest milestone: public NOAA AIS data is now acquired, hashed, split into held-out development/validation sets, gated, and tested with a bounded controlled-injection benchmark against a speed-only baseline. I am looking for serious reviewers, agency-aligned collaborators, and teams that care about evidence before claims.",
+    "linkedin_geometry_short": "New bounded LumenCore proof lane: the Geometry Championship bridge now ranks 75 natural/path families and exposes generated-lane results with explicit boundaries. Current generated-lane champion: thermal plume convection on a synthetic thermal-ventilation benchmark; current proof-build priority: branching transport for critical infrastructure. This is proof-building evidence, not field validation or a dollar claim.",
     "reviewer_email_subject": "LumenCore proof packet: DICE local lock + public AIS HarborSentinel gate",
-    "reviewer_email_body": "I am sharing a public-safe proof packet for LumenCore. It includes a locally locked DARPA DICE abstract package, a HarborSentinel public AIS data-readiness gate built from NOAA AIS, and explicit boundaries on what the evidence does and does not prove. I would value technical review focused on reproducibility, claim discipline, and agency fit.",
+    "reviewer_email_body": "I am sharing a public-safe proof packet for LumenCore. It includes a locally locked DARPA DICE abstract package, a HarborSentinel public AIS data-readiness gate built from NOAA AIS, a bounded controlled-injection benchmark, a Geometry Championship bridge for generated natural-path proof lanes, and explicit boundaries on what the evidence does and does not prove. I would value technical review focused on reproducibility, claim discipline, and agency fit.",
     "goal_prompt": "Operate as LumenCore's proof-and-traction engine. Every cycle must convert ambition into a verifiable artifact: source, hash, benchmark, split, dashboard feed, grant packet, outreach asset, or blocker board. Maximize respected visibility by publishing only defensible claims, preserving private submission materials, and making the evidence so clean that serious reviewers can audit it without a sales pitch. Do not chase fame directly; build the proof surface that makes attention rational."
   },
   "do_not_claim": [
     "Guaranteed awards, funding, wealth, or fame.",
     "CMMC Level 2 certification, clearance, export determination, or portal authority without current proof.",
-    "Harbor/Navy/SSDS/field performance from public AIS single-lane data-readiness.",
+    "Harbor/Navy/SSDS/field performance from public AIS single-lane data-readiness or controlled-injection results.",
     "Trading profitability or institutional-grade execution from governance audits.",
-    "Partner, customer, investor, or agency endorsement without written confirmation."
+    "Partner, customer, investor, or agency endorsement without written confirmation.",
+    "Generated Geometry Championship lane wins as field validation, CFD validation, safety certification, or dollar claims.",
+    "Geometry Proof Frontier ranking as live geometry validation or real-dollar proof."
   ],
+  "geometry_bridge_summary": {
+    "family_count": 75,
+    "lane_count": 12,
+    "natural_logic_family_count": 72,
+    "benchmark_hypothesis_family_count": 72,
+    "performance_results_generated": false,
+    "performance_champion": null,
+    "branching_transport_benchmark_generated": true,
+    "branching_transport_gate": "candidate_geometry_beats_best_baseline",
+    "branching_transport_best_geometry": "leaf_veins",
+    "branching_transport_best_baseline": "minimum_spanning_tree",
+    "branching_transport_score_delta_vs_best_baseline": 0.001023,
+    "branching_transport_field_validation": false,
+    "thermal_ventilation_benchmark_generated": true,
+    "thermal_ventilation_gate": "candidate_geometry_beats_best_baseline",
+    "thermal_ventilation_best_geometry": "thermal_plume_convection",
+    "thermal_ventilation_best_baseline": "straight_duct",
+    "thermal_ventilation_score_delta_vs_best_baseline": 0.096436,
+    "thermal_ventilation_field_validation": false,
+    "optimal_curve_transport_benchmark_generated": true,
+    "optimal_curve_transport_gate": "candidate_geometry_beats_best_baseline",
+    "optimal_curve_transport_best_geometry": "brachistochrone_descent",
+    "optimal_curve_transport_best_baseline": "minimum_jerk_curve",
+    "optimal_curve_transport_score_delta_vs_best_baseline": 0.178449,
+    "optimal_curve_transport_field_validation": false,
+    "wave_resonance_timing_benchmark_generated": true,
+    "wave_resonance_timing_gate": "candidate_geometry_beats_best_baseline",
+    "wave_resonance_timing_best_geometry": "kuramoto_phase_coupling",
+    "wave_resonance_timing_best_baseline": "kalman_filter",
+    "wave_resonance_timing_score_delta_vs_best_baseline": 0.117356,
+    "wave_resonance_timing_field_validation": false,
+    "generated_lane_benchmark_count": 4,
+    "generated_champion_lane": "optimal_curve_transport",
+    "generated_champion_family": "brachistochrone_descent",
+    "generated_champion_strategy": "brachistochrone_descent",
+    "generated_champion_score_delta_vs_best_baseline": 0.178449,
+    "claim_gate_passed": false,
+    "proof_champion_lane": "branching_transport",
+    "proof_champion_family": "crack_propagation_paths",
+    "raw_readiness_champion_family": "crack_propagation_paths",
+    "allowed_estimated_hourly_value_usd": 8185.0,
+    "allowed_estimated_annual_value_usd": 71700600.0,
+    "live_breadth_configured_providers": 13,
+    "live_breadth_backed_generated_lanes": 0,
+    "synthetic_only_generated_lanes": 4,
+    "ready_for_commit_push_as_live_benchmark": false,
+    "kraken_live_execution_allowed": false
+  },
+  "geometry_frontier_summary": {
+    "generated_benchmark_champion": {
+      "lane": "optimal_curve_transport",
+      "family": "brachistochrone_descent",
+      "score_delta_vs_best_baseline": 0.178449,
+      "status": "generated_lane_champion_not_live_claim"
+    },
+    "proof_value_champion": {
+      "lane": "branching_transport",
+      "family": "crack_propagation_paths",
+      "proof_priority_score": 91.7,
+      "status": "highest_funding_and_proof_priority_not_performance_winner"
+    },
+    "raw_readiness_champion": {
+      "lane": "branching_transport",
+      "family": "crack_propagation_paths",
+      "readiness_score": 84,
+      "status": "registry_readiness_champion_not_performance_winner"
+    },
+    "live_proof_champion": {
+      "rank": 1,
+      "name": "DICE live-breadth replay",
+      "proof_type": "frozen_live_pulled_replay",
+      "source_count": 6,
+      "scenario_count": 14,
+      "primary_delta": 0.043650793650793655,
+      "supporting_delta": -0.1215851079511806,
+      "claim_status": "proposal_specific_live_replay_not_field_validation",
+      "ready_for_submit": false
+    },
+    "recommended_next_live_wiring": {
+      "lane": "optimal_curve_transport",
+      "best_geometry": "brachistochrone_descent",
+      "best_geometry_family_id": "brachistochrone_descent",
+      "best_baseline": "minimum_jerk_curve",
+      "generated_champion_rank": 1,
+      "validation_scenario_count": 50,
+      "score_delta_vs_best_baseline": 0.178449,
+      "impact_score": 84.0,
+      "live_asset_fit_score": 70.0,
+      "grant_fit_score": 72.0,
+      "frontier_score": 86.4,
+      "proof_asset": "Brachistochrone optimal-curve proof card",
+      "target_assets": [
+        "frozen public path-planning maps",
+        "layout/cabling/thermal path scenarios",
+        "curvature, obstacle, drag, and runtime constraints"
+      ],
+      "first_adapter": "Freeze obstacle/path windows, run straight-line, spline, RRT*, minimum-jerk, and brachistochrone candidates on identical constraints.",
+      "why": "It is the strongest generated lane delta and the easiest visual/math story to explain quickly.",
+      "ready_for_live_claim": false,
+      "ready_for_real_dollar_claim": false,
+      "kraken_live_execution_allowed": false,
+      "evidence_status": "generated_software_benchmark_only",
+      "live_wiring_rank": 1
+    },
+    "boundary": "Champion titles are separated so generated software wins, proof-value priorities, and live-proof evidence are never conflated."
+  },
   "lumenstock_boundary": "Internal proof/value readiness index. It is not equity, not a token, not a securities offering, not investment advice, and not a valuation.",
   "gate_checks": {
     "development_rows_at_least_10000": true,

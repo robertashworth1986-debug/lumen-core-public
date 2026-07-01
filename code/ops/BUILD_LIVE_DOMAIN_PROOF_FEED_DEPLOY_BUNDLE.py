@@ -34,6 +34,7 @@ BOUNDARY = (
 
 REQUIRED_FEEDS = [
     "champion_metric_gauntlet",
+    "locked_source_baseline_replay_sweep",
     "kuramoto_holdout_expansion",
     "geometry_champion_of_champions",
     "field_money_truth_sweep",
@@ -43,12 +44,14 @@ REQUIRED_FEEDS = [
     "field_validation_control_room",
     "field_validation_outreach_board",
     "proof_to_pilot_control_room",
+    "champion_sample_expansion_and_economic_bridge",
 ]
 
 OPTIONAL_FEEDS = [
     "geometry_asset_wiring_board",
     "luma_context_dashboard_parity_audit",
     "live_domain_deployment_feed",
+    "live_domain_consolidation_audit",
     "proof_to_revenue_engine",
     "champion_stress_test_matrix",
     "first_buyer_target_board",

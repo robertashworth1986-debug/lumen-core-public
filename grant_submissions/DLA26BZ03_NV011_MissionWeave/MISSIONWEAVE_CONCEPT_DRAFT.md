@@ -36,17 +36,46 @@ observed data, policy constraints, generated scenarios, and recommendations.
 It can compare intervention portfolios while showing confidence, affected
 missions, bottleneck movement, and failure modes.
 
+## 2.1 Topic Traceability
+
+The working design maps to the public NV011 topic while preserving the
+boundary that no DLA data, sponsor, or productivity result is currently
+claimed:
+
+- **Digital twin of the organization:** MissionWeave represents missions,
+  processes, roles, skills, systems, decisions, and constrained resources as a
+  versioned mission-to-work graph.
+- **Real-time data and dynamic insight:** Phase I will define source adapters,
+  update cadence, provenance, and stale-data controls for process-event and
+  workload observations.
+- **Synthetic scenario generation:** the scenario engine will generate surge,
+  absence, disruption, system-outage, and AI-augmentation cases while visibly
+  separating synthetic from observed records.
+- **Workforce capabilities and productivity limitations:** metrics include
+  skill coverage, queue delay, cycle time, service levels, bottleneck movement,
+  and single-point-of-failure exposure rather than a single productivity score.
+- **AI-augmented workforce:** intervention cards will compare human-only,
+  human/AI, automation, and stop-doing options under human approval.
+- **Structural/process pathways toward large gains:** 10x productivity is
+  treated as an exploratory target. Phase I will report measured bounded
+  improvements and failure regions, not promise a 10x result.
+
 ## 3. Phase I Technical Objectives
 
-1. Define a minimum mission-to-work schema and access boundary for sanitized
-   organizational, workflow, skill, workload, and system data.
-2. Implement an event-driven baseline that reproduces known workflow timing
+1. Define a minimum mission-to-work schema and access boundary for one bounded
+   unclassified process. The current working process is Critical Supply
+   Exception Triage and Disposition, documented in
+   `MISSIONWEAVE_BOUNDED_PROCESS_PLAN_2026-06-19.md`. It is a representative
+   DLA-style assumption, not DLA-provided data or domain approval.
+2. Define mission outcomes, workflow events, roles, constraints, baselines,
+   privacy rules, and acceptance metrics for the bounded process.
+3. Implement an event-driven baseline that reproduces known workflow timing
    and resource constraints within stated tolerance.
-3. Generate labeled surge, absence, supply disruption, and AI-augmentation
+4. Generate labeled surge, absence, supply disruption, and AI-augmentation
    scenarios without representing synthetic records as real personnel.
-4. Compare fixed staffing, queue/routing heuristics, and constrained
+5. Compare fixed staffing, queue/routing heuristics, and constrained
    optimization under identical scenarios.
-5. Produce an operator-facing intervention card with mission effect,
+6. Produce an operator-facing intervention card with mission effect,
    uncertainty, assumptions, fairness/safety checks, and rollback conditions.
 
 ## 4. Work Plan

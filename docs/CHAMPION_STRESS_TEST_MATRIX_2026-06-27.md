@@ -1,11 +1,11 @@
 # Champion Stress Test Matrix
 
-Generated UTC: `2026-06-27T21:54:18.769506+00:00`
-Matrix SHA-256: `df62db0e5610f44fad75146e4d5a0e7c2ae2a94de79e1da60b56ea9632f021b6`
+Generated UTC: `2026-06-30T15:09:25.055072+00:00`
+Matrix SHA-256: `be353c8fc38f1e43f6762d6d20ad13f2cc0875467e61010f39c4c341fb4189e0`
 
 ## Truth Line
 
-This is the current money-printer truth line: Kuramoto phase coupling is a strong internal champion, with 24/24 source-conditioned holdout wins against kalman_filter across 4 source systems and public hash-verified feeds. The next monetizable step is a paid, buyer-authorized field replay, not an unverified realized-savings claim.
+This is the current money-printer truth line: Kuramoto phase coupling is a strong internal champion, with 24/24 source-conditioned holdout wins against kalman_filter across 4 source systems and locally hashable feeds staged for public hash verification. The next monetizable step is a paid, buyer-authorized field replay, not an unverified realized-savings claim.
 
 ## Current Champion
 
@@ -14,18 +14,18 @@ This is the current money-printer truth line: Kuramoto phase coupling is a stron
 - Holdout wins: `24/24`
 - Wins vs best same-run baseline: `24/24`
 - Source systems: `4`
-- Estimated rows replayed: `2506267`
+- Estimated rows replayed: `2507379`
 - Numeric samples read: `66690`
-- Mean delta vs named baseline: `0.139875`
+- Mean delta vs named baseline: `0.143725`
 - Weakest delta vs named baseline: `0.044697`
-- Live-domain hash verified: `true`
+- Live-domain hash verified: `false`
 
 ## Claim Boundary
 
 Allowed now:
 - current internal champion
 - source-conditioned holdout winner
-- public hash-verified reviewer feed
+- local hashable reviewer feed staged for domain verification
 - manual paid-pilot scoping candidate
 - buyer-authorized field replay request ready
 
@@ -42,9 +42,9 @@ Not allowed yet:
 | Source | Holdouts | Rows | Numeric Samples | Wins | Mean Delta | Fallbacks |
 |---|---:|---:|---:|---:|---:|---:|
 | `energy_grid` | 2 | 441505 | 3690 | 2 | 0.185622 | 0 |
-| `macro_rates_labor` | 1 | 16044 | 3000 | 1 | 0.159744 | 0 |
+| `macro_rates_labor` | 1 | 17156 | 3000 | 1 | 0.204906 | 0 |
 | `market_data` | 20 | 2048718 | 60000 | 20 | 0.138825 | 0 |
-| `sports_market` | 1 | 0 | 0 | 1 | 0.049503 | 1 |
+| `sports_market` | 1 | 0 | 0 | 1 | 0.096749 | 1 |
 
 ## Metric Battery
 
@@ -56,14 +56,14 @@ Not allowed yet:
 | `weakest_margin_positive` | `PASS` | `0.044697` | > 0.0 |
 | `best_baseline_weakest_margin_positive` | `PASS` | `0.044697` | > 0.0 |
 | `source_system_diversity` | `PASS` | `4` | >= 4 source systems |
-| `estimated_row_depth` | `PASS` | `2506267` | >= 1,000,000 estimated rows |
+| `estimated_row_depth` | `PASS` | `2507379` | >= 1,000,000 estimated rows |
 | `numeric_sample_depth` | `PASS` | `66690` | >= 50,000 numeric samples read |
 | `fallback_rate_low` | `PASS` | `0.041667` | <= 10% fallback-profile holdouts |
 | `rank_1_share` | `PASS` | `0.416667` | >= 40% rank-1 holdouts |
-| `stress_profile_coverage` | `PASS` | `9` | >= 3 stressed-profile holdouts |
+| `stress_profile_coverage` | `PASS` | `10` | >= 3 stressed-profile holdouts |
 | `trend_profile_coverage` | `PASS` | `11` | >= 3 nonflat-trend holdouts |
 | `shock_profile_coverage` | `PASS` | `16` | >= 3 shock-bearing holdouts |
-| `hosted_hash_verification` | `PASS` | `LIVE_DOMAIN_HASH_VERIFIED` | LIVE_DOMAIN_HASH_VERIFIED |
+| `hosted_hash_verification` | `FAIL` | `LOCAL_READY_DOMAIN_NOT_VERIFIED_OR_STALE` | LIVE_DOMAIN_HASH_VERIFIED |
 | `all_registry_families_have_benchmark_specs` | `PASS` | `0` | 0 missing benchmark specs |
 | `statistical_repeat_gate` | `PASS` | `6e-08` | <= 0.001 |
 | `phase_slip_and_amplitude_error` | `NOT_RUN_REQUIRES_NEXT_GATE` | `not measured in current artifact` | instrument or replay logs with phase-slip count and amplitude error |
