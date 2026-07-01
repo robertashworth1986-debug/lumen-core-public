@@ -6,14 +6,23 @@ Purpose: keep the funding lane aligned with the current proof state, current off
 
 ## Repo / Proof State
 
-- Main repo: clean and pushed on `codex/live-domain-proof-feed-bundle`.
+- Main repo: active on `codex/live-domain-proof-feed-bundle`.
 - Latest pushed commits:
   - `5eeea0b` - refresh live domain verification docs.
   - `e796efc` - refresh operator context domain status.
   - `9eead8a` - expose local proof readiness in operator context.
-- Public proof feed: reviewer-ready, with required live-domain hashes matching.
+- Current working pass hardened phase diagnostics and refreshed proof-feed deployment docs; commit/push pending at the time this board was updated.
+- Public proof feed: reviewer-ready, with `12/12` required live-domain hashes matching.
 - Live source maximizer: 25 measured providers out of 29 enabled; 823 fresh measured rows in the latest maximizer run.
 - Outreach sent: Incubatenergy/EPRI lane, Tennessee Advanced Energy lane, LaunchTN, Vanderbilt Wond'ry, and Tennessee Tech protocol-review lane.
+- Additional outreach sent 2026-07-01: OpenPowerAI/EPRI technical-fit request asking for the right reviewer or a buyer-authorized field replay lane. Gmail thread id: `19f1e7f0925ae31c`.
+
+## Current Diagnostic Upgrade
+
+- Champion phase proxy diagnostics now mark flat or low-variance numeric series as degenerate.
+- Current replay diagnostic: `23/24` usable numeric holdouts, `15` non-degenerate numeric holdouts, `8` degenerate numeric holdouts excluded from source-level phase means.
+- Current champion lane: `kuramoto_phase_coupling` against named baseline `kalman_filter`.
+- Claim boundary remains strict: phase proxy diagnostics support mechanism triage only; they do not prove hardware PLL behavior, field validation, realized savings, or a fixed frozen-delta dollar price.
 
 ## Current Submission Reality
 

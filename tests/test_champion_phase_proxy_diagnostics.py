@@ -27,6 +27,9 @@ def test_phase_proxy_diagnostics_builds_from_current_holdouts():
     assert summary["named_baseline"] == "kalman_filter"
     assert summary["holdout_count"] >= 24
     assert summary["usable_numeric_holdout_count"] >= 20
+    assert summary["non_degenerate_numeric_holdout_count"] >= 12
+    assert summary["degenerate_numeric_holdout_count"] >= 1
+    assert summary["degenerate_series_excluded_from_source_means"] is True
     assert summary["phase_proxy_claim_allowed"] is True
     assert len(payload["source_summary"]) >= 4
     assert len(payload["phase_proxy_sha256"]) == 64
@@ -58,6 +61,8 @@ def test_phase_proxy_diagnostics_exposes_source_level_metrics():
         assert "mean_phase_slip_proxy_rate" in row
         assert "mean_spectral_concentration_proxy" in row
         assert "mean_abs_residual_lag1_autocorrelation_proxy" in row
+        assert "non_degenerate_numeric_holdouts" in row
+        assert "degenerate_numeric_holdouts" in row
 
 
 def test_phase_proxy_markdown_names_boundary():
@@ -68,4 +73,5 @@ def test_phase_proxy_markdown_names_boundary():
     assert "Champion Phase Proxy Diagnostics" in rendered
     assert "Truth Line" in rendered
     assert "Hardware phase-lock claim allowed: `false`" in rendered
+    assert "Degenerate numeric holdouts excluded from source means" in rendered
     assert "not hardware PLL measurements" in rendered

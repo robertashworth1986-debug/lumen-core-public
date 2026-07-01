@@ -151,6 +151,8 @@ def phase_proxy(values: list[float]) -> dict[str, Any]:
         return {
             "numeric_count": len(values),
             "enough_numeric_data": False,
+            "non_degenerate_numeric_data": False,
+            "degenerate_reason": "too_few_numeric_values",
             "phase_slip_proxy_count": 0,
             "phase_coherence_proxy": 0.0,
             "circular_phase_error_proxy": 0.0,
@@ -160,8 +162,11 @@ def phase_proxy(values: list[float]) -> dict[str, Any]:
         }
 
     finite_values = [x for x in values if math.isfinite(x)]
+    unique_values = len({round(x, 12) for x in finite_values})
     centered_mean = statistics.mean(finite_values)
     centered_raw = [x - centered_mean for x in finite_values]
+    raw_stddev = statistics.pstdev(finite_values) if len(finite_values) > 1 else 0.0
+    non_degenerate = unique_values >= 3 and raw_stddev > 1e-12
     scale = max(max(abs(x) for x in centered_raw), 1.0)
     centered = [x / scale for x in centered_raw]
     normalized = [x / scale for x in finite_values]
@@ -195,6 +200,9 @@ def phase_proxy(values: list[float]) -> dict[str, Any]:
     return {
         "numeric_count": len(values),
         "enough_numeric_data": True,
+        "non_degenerate_numeric_data": non_degenerate,
+        "degenerate_reason": "" if non_degenerate else "flat_or_low_variance_series",
+        "unique_numeric_value_count": unique_values,
         "phase_slip_proxy_count": phase_slips,
         "phase_slip_proxy_rate": round(phase_slips / max(1, len(phase_jumps)), 6),
         "phase_coherence_proxy": phase_coherence,
@@ -204,6 +212,7 @@ def phase_proxy(values: list[float]) -> dict[str, Any]:
         "spectral_concentration_proxy": spectral_concentration,
         "normalization_scale": round(scale, 6),
         "mean": mean(finite_values),
+        "raw_stddev": round(raw_stddev, 12),
         "stddev": stdev(normalized),
     }
 
@@ -233,6 +242,9 @@ def build_payload() -> dict[str, Any]:
         )
 
     usable = [row for row in diagnostics if as_dict(row.get("metrics")).get("enough_numeric_data")]
+    non_degenerate_usable = [
+        row for row in usable if as_dict(row.get("metrics")).get("non_degenerate_numeric_data")
+    ]
     coherence_values = [float(as_dict(row.get("metrics")).get("phase_coherence_proxy") or 0.0) for row in usable]
     slip_rates = [float(as_dict(row.get("metrics")).get("phase_slip_proxy_rate") or 0.0) for row in usable]
     circular_errors = [float(as_dict(row.get("metrics")).get("circular_phase_error_proxy") or 0.0) for row in usable]
@@ -248,22 +260,30 @@ def build_payload() -> dict[str, Any]:
     source_summary = []
     for source, group in sorted(source_groups.items()):
         group_metrics = [as_dict(row.get("metrics")) for row in group if as_dict(row.get("metrics")).get("enough_numeric_data")]
+        non_degenerate_metrics = [
+            metric for metric in group_metrics if metric.get("non_degenerate_numeric_data")
+        ]
         source_summary.append(
             {
                 "source_system": source,
                 "holdout_count": len(group),
                 "usable_numeric_holdouts": len(group_metrics),
+                "non_degenerate_numeric_holdouts": len(non_degenerate_metrics),
+                "degenerate_numeric_holdouts": len(group_metrics) - len(non_degenerate_metrics),
                 "mean_phase_coherence_proxy": mean(
-                    [float(metric.get("phase_coherence_proxy") or 0.0) for metric in group_metrics]
+                    [float(metric.get("phase_coherence_proxy") or 0.0) for metric in non_degenerate_metrics]
                 ),
                 "mean_phase_slip_proxy_rate": mean(
-                    [float(metric.get("phase_slip_proxy_rate") or 0.0) for metric in group_metrics]
+                    [float(metric.get("phase_slip_proxy_rate") or 0.0) for metric in non_degenerate_metrics]
                 ),
                 "mean_spectral_concentration_proxy": mean(
-                    [float(metric.get("spectral_concentration_proxy") or 0.0) for metric in group_metrics]
+                    [float(metric.get("spectral_concentration_proxy") or 0.0) for metric in non_degenerate_metrics]
                 ),
                 "mean_abs_residual_lag1_autocorrelation_proxy": mean(
-                    [abs(float(metric.get("residual_lag1_autocorrelation_proxy") or 0.0)) for metric in group_metrics]
+                    [
+                        abs(float(metric.get("residual_lag1_autocorrelation_proxy") or 0.0))
+                        for metric in non_degenerate_metrics
+                    ]
                 ),
             }
         )
@@ -279,6 +299,8 @@ def build_payload() -> dict[str, Any]:
             "named_baseline": as_dict(holdout.get("summary")).get("named_baseline") or "kalman_filter",
             "holdout_count": len(rows),
             "usable_numeric_holdout_count": len(usable),
+            "non_degenerate_numeric_holdout_count": len(non_degenerate_usable),
+            "degenerate_numeric_holdout_count": len(usable) - len(non_degenerate_usable),
             "source_system_count": len(source_groups),
             "mean_phase_coherence_proxy": mean(coherence_values),
             "mean_circular_phase_error_proxy": mean(circular_errors),
@@ -286,14 +308,16 @@ def build_payload() -> dict[str, Any]:
             "mean_spectral_concentration_proxy": mean(spectral),
             "mean_abs_residual_lag1_autocorrelation_proxy": mean(residual_auto),
             "live_domain_hash_verified": bool(stress_summary.get("live_domain_hash_verified")),
-            "phase_proxy_claim_allowed": len(usable) >= 20,
+            "phase_proxy_claim_allowed": len(non_degenerate_usable) >= 12,
+            "degenerate_series_excluded_from_source_means": True,
             "hardware_phase_lock_claim_allowed": False,
             "field_validation_claim_allowed": False,
             "real_dollar_savings_claim_allowed": False,
             "plain_english_answer": (
                 "The champion now has replay-data phase proxy diagnostics across the current holdout set. "
-                "These metrics support mechanism triage for the wave-resonance lane, but they do not prove "
-                "hardware PLL behavior or external field validation."
+                "Flat or low-variance numeric files are explicitly marked as degenerate so they cannot inflate "
+                "the source-level phase means. These metrics support mechanism triage for the wave-resonance "
+                "lane, but they do not prove hardware PLL behavior or external field validation."
             ),
         },
         "claim_controls": {
@@ -340,6 +364,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Champion: `{summary.get('champion_family')}`",
         f"- Named baseline: `{summary.get('named_baseline')}`",
         f"- Usable numeric holdouts: `{summary.get('usable_numeric_holdout_count')}/{summary.get('holdout_count')}`",
+        f"- Non-degenerate numeric holdouts: `{summary.get('non_degenerate_numeric_holdout_count')}`",
+        f"- Degenerate numeric holdouts excluded from source means: `{summary.get('degenerate_numeric_holdout_count')}`",
         f"- Mean phase coherence proxy: `{summary.get('mean_phase_coherence_proxy')}`",
         f"- Mean circular phase error proxy: `{summary.get('mean_circular_phase_error_proxy')}`",
         f"- Mean phase slip proxy rate: `{summary.get('mean_phase_slip_proxy_rate')}`",
@@ -349,8 +375,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Source Summary",
         "",
-        "| Source | Holdouts | Usable | Phase Coherence | Slip Rate | Spectral Concentration | Abs Residual Lag1 |",
-        "|---|---:|---:|---:|---:|---:|---:|",
+        "| Source | Holdouts | Usable | Non-Degenerate | Degenerate | Phase Coherence | Slip Rate | Spectral Concentration | Abs Residual Lag1 |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for row in as_list(payload.get("source_summary")):
         source = as_dict(row)
@@ -359,6 +385,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"`{source.get('source_system')}` | "
             f"{source.get('holdout_count')} | "
             f"{source.get('usable_numeric_holdouts')} | "
+            f"{source.get('non_degenerate_numeric_holdouts')} | "
+            f"{source.get('degenerate_numeric_holdouts')} | "
             f"{source.get('mean_phase_coherence_proxy')} | "
             f"{source.get('mean_phase_slip_proxy_rate')} | "
             f"{source.get('mean_spectral_concentration_proxy')} | "

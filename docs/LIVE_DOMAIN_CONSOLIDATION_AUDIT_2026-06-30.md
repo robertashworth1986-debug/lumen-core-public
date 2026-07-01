@@ -1,6 +1,6 @@
 # Live Domain Consolidation Audit
 
-Generated: 2026-06-30T14:16:57.317978+00:00
+Generated: 2026-07-01T16:33:13.497634+00:00
 
 ## Boundary
 
@@ -11,15 +11,15 @@ Live-domain consolidation audit. This artifact reports what the public site appe
 - Public domain up: `True`
 - Pages observed: `16`
 - Core reviewer surfaces: `5`
-- Live-domain reviewer ready: `False`
+- Live-domain reviewer ready: `True`
 - Local required feeds ready: `True`
-- Required feed hash matches: `0` / `12`
-- Required feeds reachable: `0` / `12`
-- Stale required feeds: `12`
+- Required feed hash matches: `12` / `12`
+- Required feeds reachable: `12` / `12`
+- Stale required feeds: `0`
 - Broken internal links observed: `6`
 - Pages needing claim-language review: `10`
 - Wave resonance win rate: `1.0`
-- Estimated rows replayed: `7289287`
+- Estimated rows replayed: `7152281`
 - Field-validation claim allowed: `False`
 - Real-dollar savings claim allowed: `False`
 
@@ -67,18 +67,7 @@ The live domain is online and visually strong, but it should not be treated as r
 
 ## Stale Required Feeds
 
-- `champion_metric_gauntlet`
-- `locked_source_baseline_replay_sweep`
-- `kuramoto_holdout_expansion`
-- `geometry_champion_of_champions`
-- `field_money_truth_sweep`
-- `live_proof_value_meter`
-- `field_validated_dollar_claim_ladder`
-- `dollar_claim_gate`
-- `field_validation_control_room`
-- `field_validation_outreach_board`
-- `proof_to_pilot_control_room`
-- `champion_sample_expansion_and_economic_bridge`
+- none
 
 ## Immediate Cleanup Actions
 
@@ -99,4 +88,4 @@ The live domain is online and visually strong, but it should not be treated as r
 
 ## Audit Hash
 
-`78244169caa2f2b0c436281b56394af902bc42b3259170fdccc6847a86b63184`
+`707ea8efd72ac3fea5f17cfc6491d338bc5add3d4f0fef8e3e2c12c976c1da4f`
