@@ -1,8 +1,8 @@
 # Live Domain Proof Feed Deploy Bundle
 
-Generated UTC: `2026-07-01T13:39:12Z`
-Bundle root: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T133912Z`
-Archive: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T133912Z.tgz`
+Generated UTC: `2026-07-01T13:45:34Z`
+Bundle root: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T134534Z`
+Archive: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T134534Z.tgz`
 
 ## Decision
 
@@ -36,14 +36,14 @@ The feed-only deploy bundle is ready. It can publish proof JSON feeds to the pub
 | `champion_sample_expansion_and_economic_bridge` | `true` | `dashboard/data/champion_sample_expansion_and_economic_bridge.json` | `2` | `f0262523045d` |
 | `geometry_asset_wiring_board` | `false` | `dashboard/data/geometry_asset_wiring_board.json` | `2` | `20be445c8852` |
 | `luma_context_dashboard_parity_audit` | `false` | `dashboard/data/luma_context_dashboard_parity_audit.json` | `2` | `757fe628616e` |
-| `live_domain_deployment_feed` | `false` | `dashboard/data/live_domain_deployment_feed.json` | `2` | `f930aec292af` |
+| `live_domain_deployment_feed` | `false` | `dashboard/data/live_domain_deployment_feed.json` | `2` | `72aaf5ffc30b` |
 | `live_domain_consolidation_audit` | `false` | `dashboard/data/live_domain_consolidation_audit.json` | `2` | `63cfd938154e` |
 | `proof_to_revenue_engine` | `false` | `dashboard/data/proof_to_revenue_engine.json` | `2` | `b611e887434a` |
 | `champion_stress_test_matrix` | `false` | `dashboard/data/champion_stress_test_matrix.json` | `2` | `4f800ce00512` |
-| `champion_metric_battery` | `false` | `dashboard/data/champion_metric_battery.json` | `2` | `d3fce4fea086` |
+| `champion_metric_battery` | `false` | `dashboard/data/champion_metric_battery.json` | `2` | `9756ff635edd` |
 | `first_buyer_target_board` | `false` | `dashboard/data/first_buyer_target_board.json` | `2` | `eab5d0cc7e85` |
 | `paid_pilot_outreach_queue` | `false` | `dashboard/data/paid_pilot_outreach_queue.json` | `2` | `8cea42048365` |
-| `luma_operator_context` | `false` | `dashboard/data/luma_operator_context.json` | `2` | `3b91f5bc0fa2` |
+| `luma_operator_context` | `false` | `dashboard/data/luma_operator_context.json` | `2` | `1f2a0d355449` |
 | `champion_phase_proxy_diagnostics` | `false` | `dashboard/data/champion_phase_proxy_diagnostics.json` | `2` | `259ee745a7d0` |
 | `safe_key_provider_ping` | `false` | `dashboard/data/safe_key_provider_ping.json` | `2` | `e219eeb692bc` |
 | `live_source_measurement_maximizer` | `false` | `dashboard/data/live_source_measurement_maximizer.json` | `2` | `e061a2a3da7a` |
@@ -55,8 +55,8 @@ The feed-only deploy bundle is ready. It can publish proof JSON feeds to the pub
 
 ## Commands
 
-- Dry run: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T133912Z" -DryRun`
-- Deploy feeds: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T133912Z"`
+- Dry run: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T134534Z" -DryRun`
+- Deploy feeds: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T134534Z"`
 - Verify domain hashes: `python .\code\ops\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py --timeout 8`
 
 ## Remote Web Roots Tried By Deploy Script
@@ -69,5 +69,5 @@ The feed-only deploy bundle is ready. It can publish proof JSON feeds to the pub
 
 Feed-only deploy bundle. It stages reviewer proof JSON for domain hash verification. It does not publish secrets, restart execution services, prove field validation, prove realized savings, set a fixed dollar value per frozen delta, or imply autonomous live trading permission. This is not field validation.
 
-Bundle SHA-256: `d5ff346b96240c2bc22e48b632727b601bcffb7b76d6fb6fb5010f933e0454bd`
-Archive SHA-256: `01172fb1e1515a8c2f9bc8aac901d18a958307e4e3b1b6dfb98079cf73cdc2c6`
+Bundle SHA-256: `7aa83af0d765b272fcd0f1e15744905c7eaeca2ca0cf8694b907aea26269735f`
+Archive SHA-256: `a9d4980291cfe5dfc3c949c2fb8ff4d61f468f6b29d94bee2a7673f8b9a651cd`
