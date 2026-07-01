@@ -1,7 +1,7 @@
 # Luma Operator Context
 
-Generated UTC: `2026-07-01T15:38:38.076910+00:00`
-Context SHA-256: `9e69257c0087ca8dd03baa28f7e3df5439eb6edee6d6e1b2a8dd9a1ca3e0b99f`
+Generated UTC: `2026-07-01T15:53:38.279243+00:00`
+Context SHA-256: `f95fe074d985254f41146bcdc55a53e9b3ac1b84f5598c2c3d5a58425bd18966`
 
 ## Current Truth
 
@@ -26,10 +26,10 @@ The strongest current story is not 'everything wins.' It is that one champion fa
 
 ## Live Domain
 
-- State: `LOCAL_READY_DOMAIN_NOT_VERIFIED_OR_STALE`
-- Reviewer ready: `false`
-- Required feeds matched: `11/12`
-- Stale/missing required feeds: `1`
+- State: `LIVE_DOMAIN_HASH_VERIFIED`
+- Reviewer ready: `true`
+- Required feeds matched: `12/12`
+- Stale/missing required feeds: `0`
 
 ## Source Breadth
 
