@@ -1,6 +1,6 @@
 # Geometry Live Systems Frontier
 
-Generated UTC: `2026-07-01T08:16:26.785069+00:00`
+Generated UTC: `2026-07-01T09:35:44.005273+00:00`
 
 Geometry live-systems frontier only. It ranks local evidence and uploaded measured-data candidates for next benchmark wiring. It does not establish field validation, clinical validation, safety certification, live trading permission, fixed-dollar frozen-delta value, realized savings, or grant-award certainty.
 
@@ -9,7 +9,7 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 - Registered families ranked: `140` / `140`
 - Lanes: `12`
 - Local uploaded/live files inventoried: `3063`
-- Local estimated data rows: `4368119`
+- Local estimated data rows: `4367681`
 - Provider snapshot files: `66`
 - Canonical measured sources: `17`
 - Canonical measured rows: `523`
@@ -19,7 +19,7 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 - Real-dollar savings claim allowed: `false`
 - Live trading/autonomous execution allowed: `false`
 - Medical/addiction-treatment claim allowed: `false`
-- Frontier SHA-256: `4e602a4f0d8095be04b06fb2dea0a1491850e2bbce023862c57c174005843689`
+- Frontier SHA-256: `c098b666c95629a7664c4bea7c34a29894993c8c182e8f6f7a0fdd1d95b438e6`
 
 ## Next 10 Actions
 
@@ -40,12 +40,12 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 
 | System | Files | Estimated Rows | Candidate Lanes |
 | --- | --- | --- | --- |
-| `market_data` | `1320` | `2859948` | energy_price_pressure_proxy, market_signal_geometry, wave_resonance_timing |
-| `unclassified_measured_file` | `999` | `681678` |  |
-| `energy_grid` | `58` | `447236` | branching_transport, energy_price_pressure_proxy, thermal_ventilation, wave_resonance_timing |
-| `maritime_ais` | `88` | `259248` | branching_transport, field_guided_control, optimal_curve_transport |
-| `federal_opportunity` | `588` | `48385` | multi_agent_coordination, resource_aware_scheduling |
-| `macro_rates_labor` | `22` | `71823` | energy_price_pressure_proxy, market_signal_geometry, wave_resonance_timing |
+| `market_data` | `1318` | `2859946` | energy_price_pressure_proxy, market_signal_geometry, wave_resonance_timing |
+| `unclassified_measured_file` | `1033` | `681566` |  |
+| `energy_grid` | `54` | `447220` | branching_transport, energy_price_pressure_proxy, thermal_ventilation, wave_resonance_timing |
+| `maritime_ais` | `82` | `258964` | branching_transport, field_guided_control, optimal_curve_transport |
+| `federal_opportunity` | `568` | `48365` | multi_agent_coordination, resource_aware_scheduling |
+| `macro_rates_labor` | `20` | `71819` | energy_price_pressure_proxy, market_signal_geometry, wave_resonance_timing |
 | `sports_market` | `32` | `29` | market_signal_geometry, wave_resonance_timing |
 | `water_hydrology` | `10` | `688` | branching_transport, mission_network_routing |
 | `air_quality` | `7` | `5` | field_guided_control, thermal_ventilation |
