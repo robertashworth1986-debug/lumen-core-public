@@ -243,6 +243,7 @@ def build_payload() -> dict[str, Any]:
         },
         "live_domain": {
             "state": domain_summary.get("domain_deployment_state"),
+            "local_ready": bool(domain_summary.get("local_required_ready")),
             "reviewer_ready": bool(domain_summary.get("live_domain_reviewer_ready")),
             "required_feed_count": domain_summary.get("required_feed_count"),
             "required_remote_hash_match_count": domain_summary.get("required_remote_hash_match_count"),

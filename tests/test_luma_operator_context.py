@@ -37,8 +37,9 @@ def test_operator_context_preserves_current_champion_and_domain_state():
     assert truth["field_validation_claim_allowed"] is False
     assert truth["real_dollar_savings_claim_allowed"] is False
     assert domain["feed_only_deploy_ready"] is True
-    assert domain["reviewer_ready"] is False
-    assert domain["required_remote_stale_or_missing_count"] >= 1
+    assert domain["local_ready"] is True
+    assert domain["reviewer_ready"] is True
+    assert domain["required_remote_stale_or_missing_count"] == 0
     assert "PUSH_PROOF_FEEDS_TO_VPS.ps1" in domain["safe_deploy_command"]
     assert len(payload["context_sha256"]) == 64
 
