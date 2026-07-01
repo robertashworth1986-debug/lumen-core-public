@@ -4,6 +4,13 @@
 
 Keep LumenCore focused on reviewer-safe live proof, grant submission readiness, and the first buyer-authorized field replay. Do not drift into new dashboards unless they consolidate the existing production boards.
 
+## Current Verified State
+
+- Live domain proof feeds are publicly hash-verified: `12/12` required reviewer feeds match the local bundle.
+- `dashboard/data/champion_metric_gauntlet.json` now reports `live_domain_reviewer_ready: true`.
+- Champion gauntlet status: `11/13` gates pass. The two remaining blockers are external field validation and realized dollar savings.
+- This clears the public proof-feed gate for a reviewed buyer outreach message. It does not clear field-validation, realized-savings, grant-award, live-trading, medical, or autonomous-control claims.
+
 ## Commit Just Pushed
 
 - Branch: `codex/live-domain-proof-feed-bundle`
@@ -31,12 +38,12 @@ Keep these closed until an external buyer, agency, lab, or system owner approves
 
 ## Current Strongest Evidence
 
-- Top replay cards: 5.
-- Candidate live replays beating named baselines: 3.
-- Strict rolling champions: 5.
-- Total live-context rows evaluated in the current top replay summary: 150.
-- Key champion lane: Kuramoto phase coupling, with source-conditioned holdout wins reported in the first-buyer board.
-- Important boundary: this is internal, hash-backed, source-conditioned replay evidence, not field validation.
+- Current internal champion: Kuramoto phase coupling.
+- Named baseline: Kalman filter.
+- Source-conditioned holdout result: `24/24` wins.
+- Estimated rows replayed: about `2.5M`.
+- Broader mapped live-source universe: `17` measured providers, `23` enabled providers, `186` mapped source files/feeds, and `313` manifest rows ready for benchmark promotion.
+- Important boundary: this is internal, hash-backed, source-conditioned replay evidence, not field validation or realized savings.
 
 ## First Buyer Lane
 
@@ -76,3 +83,16 @@ Do not chase a giant dollar claim. The fastest credible revenue step is:
 4. Run the replay under those terms.
 5. Convert the result into a pilot proposal.
 
+## Working Rule For Future Passes
+
+Use the existing master boards and feeds first:
+
+- `mission_control.html`
+- `grants.html`
+- `quant_lab.html`
+- `dashboard/data/champion_metric_gauntlet.json`
+- `dashboard/data/live_domain_deployment_feed.json`
+- `dashboard/data/first_buyer_target_board.json`
+- `dashboard/data/field_validated_dollar_claim_ladder.json`
+
+Do not create another parallel dashboard unless it replaces or consolidates an existing one. The platform wins by getting cleaner, more verifiable, and easier for a reviewer or buyer to trust.

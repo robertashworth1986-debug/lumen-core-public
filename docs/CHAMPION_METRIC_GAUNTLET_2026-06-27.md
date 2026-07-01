@@ -1,6 +1,6 @@
 # Champion Metric Gauntlet
 
-Generated UTC: `2026-07-01T09:27:39.446200+00:00`
+Generated UTC: `2026-07-01T10:15:31.074737+00:00`
 
 ## What To Ask Me
 
@@ -98,13 +98,12 @@ A fixed dollar or realized-savings claim stays blocked until a buyer, lab, utili
 - `hash_chain_present`: `PASS` | actual `b8c575a1d68e...` | threshold `64 hex characters`
 - `vault_hashes_verified`: `PASS` | actual `True` | threshold `true`
 - `all_families_live_benchmarked`: `BLOCKED` | actual `False` | threshold `true before broad all-family claims`
-- `live_domain_feed_routed`: `BLOCKED` | actual `3/12 required hosted hashes match; 9 stale/missing` | threshold `all required hosted hashes match before hosted reviewer proof claim`
+- `live_domain_feed_routed`: `PASS` | actual `12/12 required hosted hashes match; 0 stale/missing` | threshold `all required hosted hashes match before hosted reviewer proof claim`
 - `field_validation`: `BLOCKED` | actual `False` | threshold `true before field validated language`
 
 ## Blockers
 
 - `all_families_live_benchmarked`: Broad all-family language remains blocked.
-- `live_domain_feed_routed`: Hosted reviewer proof language is allowed once all required feed hashes match.
 - `field_validation`: Field-validation and realized-savings language remains blocked.
 
 ## Metric Expansion Suite
@@ -179,7 +178,7 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 - Status: `EVIDENCED_CORE_READY_TO_EXPAND`
 - Question: Can a reviewer reproduce the evidence chain?
 - Metrics: `input_hash, config_hash, output_hash, code_commit, manifest_sha256, domain_hash_match`
-- Current evidence: Champion hash chain exists and dashboard feeds are local-ready; live-domain feed status is LOCAL_READY_DOMAIN_NOT_VERIFIED.
+- Current evidence: Champion hash chain exists and dashboard feeds are local-ready; live-domain feed status is LIVE_DOMAIN_HASH_VERIFIED.
 - Next action: Keep regenerating feed manifests after each run and verify live-domain hashes before public claims.
 - Claim gate: Hash-verified proof language is allowed only for feeds whose local and hosted hashes match.
 
@@ -219,4 +218,4 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 
 Champion metric gauntlet only. This artifact explains the current internal winner, the tests it has passed, the tests it has not passed, and the safest claim language. It does not create field validation, realized savings, trading profit, medical efficacy, award certainty, or a fixed dollar price for frozen deltas.
 
-Gauntlet SHA-256: `708ecd535b1aa898a7ce87b20622833c198933e07ad893855e3626ac5ccce4c7`
+Gauntlet SHA-256: `9748f64153daa69f2a33dda7defa2bd1001e44b573731815274785cd22f065bf`
