@@ -148,7 +148,20 @@ def test_stale_required_feed_blocks_reviewer_ready_even_if_reachable(tmp_path, m
 
     assert payload["summary"]["live_domain_reviewer_ready"] is False
     assert payload["summary"]["domain_deployment_state"] == "LOCAL_READY_DOMAIN_NOT_VERIFIED_OR_STALE"
-    assert any(row["key"] == "champion_metric_gauntlet" for row in payload["required_remote_missing_or_stale"])
+    assert payload["summary"]["required_remote_stale_or_missing_count"] == 1
+    assert payload["summary"]["required_remote_reachable_but_stale_count"] == 1
+    stale_rows = payload["required_remote_missing_or_stale"]
+    assert any(row["key"] == "champion_metric_gauntlet" for row in stale_rows)
+    champion_stale = next(row for row in stale_rows if row["key"] == "champion_metric_gauntlet")
+    assert champion_stale["diagnosis"] == "HOSTED_COPY_STALE"
+    assert champion_stale["remote_reachable"] is True
+    assert champion_stale["remote_first_reachable_status"] == 200
+    assert champion_stale["remote_first_reachable_sha256_prefix"]
+    assert champion_stale["local_sha256_prefix"]
+    assert "safe_deploy_command" in payload["summary"]
+    assert "deploy_bundle_feed_only_ready" in payload["summary"]
+    assert "deploy_bundle_archive_sha256" in payload["summary"]
+    assert "next_domain_action" in payload["summary"]
 
 
 def test_markdown_keeps_public_deployment_separate_from_field_validation(tmp_path, monkeypatch):

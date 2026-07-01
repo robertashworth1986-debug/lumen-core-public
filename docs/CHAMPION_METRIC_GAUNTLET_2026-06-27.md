@@ -1,6 +1,6 @@
 # Champion Metric Gauntlet
 
-Generated UTC: `2026-06-30T14:12:12.447780+00:00`
+Generated UTC: `2026-07-01T09:27:39.446200+00:00`
 
 ## What To Ask Me
 
@@ -17,7 +17,7 @@ Ask questions that force evidence, gates, and next actions:
 
 ## Current Answer
 
-Kuramoto phase coupling is the current internal champion because it beat kalman_filter on 24/24 source-conditioned holdouts across 4 champion-replay source systems. The broader live-source universe currently shows 17 measured providers and 183 mapped source files/feeds available for additional benchmark promotion. That is strong enough to request a buyer-authorized field replay, but it is not field validation or realized dollar savings yet.
+Kuramoto phase coupling is the current internal champion because it beat kalman_filter on 24/24 source-conditioned holdouts across 4 champion-replay source systems. The broader live-source universe currently shows 17 measured providers and 186 mapped source files/feeds available for additional benchmark promotion. That is strong enough to request a buyer-authorized field replay, but it is not field validation or realized dollar savings yet.
 
 ## Strongest Current Candidate
 
@@ -29,9 +29,9 @@ Kuramoto phase coupling is the current internal champion because it beat kalman_
 - Mean delta vs baseline: `0.143725`
 - Min delta vs baseline: `0.044697`
 - Source systems: `4`
-- Broader measured providers: `17/22`
-- Manifest unique sources: `183`
-- Manifest ready benchmark rows: `317`
+- Broader measured providers: `17/23`
+- Manifest unique sources: `186`
+- Manifest ready benchmark rows: `313`
 - Estimated rows replayed: `2507379`
 - Sign-test p-value: `6e-08`
 - Wilson lower 95% win-rate bound: `0.862024`
@@ -55,13 +55,13 @@ The champion replay source count and the broader live-source universe are intent
 
 - Champion replay source systems: `4`
 - Champion replay source names: `energy_grid, macro_rates_labor, market_data, sports_market`
-- Fresh measured providers: `17` of `22`
-- Fresh measured rows in latest bounded pull: `570`
-- Measured provider names: `ALPACA, ALPHAVANTAGE, BEA, BLS, CENSUS, COINGECKO_PUBLIC, EIA, FINNHUB, FRED, GRANTS_GOV, KRAKEN, KRAKEN_PUBLIC, MASSIVE, NOAA_NCEI, TWELVE_DATA, USGS_WATER, WEBHOOK`
-- Failed or thin provider names: `BINANCE_PUBLIC, EPA_AQS, NASA, NREL, THE_ODDS_API`
-- Manifest unique source count: `183`
-- Manifest ready-for-benchmark row count: `317`
-- Manifest estimated rows mapped: `10050922`
+- Fresh measured providers: `17` of `23`
+- Fresh measured rows in latest bounded pull: `523`
+- Measured provider names: `AIRNOW, ALPACA, ALPHAVANTAGE, BEA, BLS, CENSUS, COINGECKO_PUBLIC, FINNHUB, FRED, GRANTS_GOV, KRAKEN, KRAKEN_PUBLIC, MASSIVE, NOAA_NCEI, TWELVE_DATA, USGS_WATER, WEBHOOK`
+- Failed or thin provider names: `BINANCE_PUBLIC, EIA, EPA_AQS, NASA, NREL, THE_ODDS_API`
+- Manifest unique source count: `186`
+- Manifest ready-for-benchmark row count: `313`
+- Manifest estimated rows mapped: `9845413`
 
 ## Grid/RF/PLL Hardware Validation Gate
 
@@ -98,7 +98,7 @@ A fixed dollar or realized-savings claim stays blocked until a buyer, lab, utili
 - `hash_chain_present`: `PASS` | actual `b8c575a1d68e...` | threshold `64 hex characters`
 - `vault_hashes_verified`: `PASS` | actual `True` | threshold `true`
 - `all_families_live_benchmarked`: `BLOCKED` | actual `False` | threshold `true before broad all-family claims`
-- `live_domain_feed_routed`: `BLOCKED` | actual `False` | threshold `true before hosted reviewer proof claim`
+- `live_domain_feed_routed`: `BLOCKED` | actual `3/12 required hosted hashes match; 9 stale/missing` | threshold `all required hosted hashes match before hosted reviewer proof claim`
 - `field_validation`: `BLOCKED` | actual `False` | threshold `true before field validated language`
 
 ## Blockers
@@ -143,7 +143,7 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 - Status: `READY_FOR_LIVE_BREADTH_PROMOTION`
 - Question: Does the champion generalize beyond the current four promoted replay systems?
 - Metrics: `leave_one_source_out, source_group_holdout, provider_promotion_rate, schema_normalization_success`
-- Current evidence: Current champion replay uses 4 promoted source systems; broader live breadth has 17/22 measured providers and 317 ready-for-benchmark manifest rows.
+- Current evidence: Current champion replay uses 4 promoted source systems; broader live breadth has 17/23 measured providers and 313 ready-for-benchmark manifest rows.
 - Next action: Promote one provider at a time only after a named baseline, schema adapter, and acceptance metric exist.
 - Claim gate: Broad live-breadth claims remain blocked until promoted sources pass locked benchmarks.
 
@@ -219,4 +219,4 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 
 Champion metric gauntlet only. This artifact explains the current internal winner, the tests it has passed, the tests it has not passed, and the safest claim language. It does not create field validation, realized savings, trading profit, medical efficacy, award certainty, or a fixed dollar price for frozen deltas.
 
-Gauntlet SHA-256: `cd04780b486b163d87b2eb13aa641f7b32dc19c384373ac5c0ca3e8bf568496a`
+Gauntlet SHA-256: `708ecd535b1aa898a7ce87b20622833c198933e07ad893855e3626ac5ccce4c7`

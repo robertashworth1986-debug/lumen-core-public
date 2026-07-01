@@ -286,12 +286,17 @@ def build_feed_row(spec: dict[str, Any], base: str, check_live_domain: bool, tim
         if bool(row.get("ok")) and local_sha and str(row.get("sha256")) == local_sha
     ]
     reachable = [row for row in remotes if bool(row.get("ok"))]
+    first_reachable = reachable[0] if reachable else {}
     card.update(
         {
             "remote_candidates": remotes,
             "remote_reachable": bool(reachable),
             "remote_hash_match": bool(matches),
             "remote_match_url": matches[0]["url"] if matches else "",
+            "remote_first_reachable_url": str(first_reachable.get("url") or ""),
+            "remote_first_reachable_status": first_reachable.get("status"),
+            "remote_first_reachable_sha256": str(first_reachable.get("sha256") or ""),
+            "remote_first_reachable_bytes": as_int(first_reachable.get("bytes"), 0),
             "deployment_state": (
                 "HOSTED_HASH_MATCH"
                 if matches
@@ -333,8 +338,17 @@ def build_payload(check_live_domain: bool = True, timeout: int = 10) -> dict[str
     required_remote_reachable = [row for row in required if row["remote_reachable"]]
     missing_local = [row for row in required if not row["local_exists"]]
     remote_missing_or_stale = [row for row in required if row["local_exists"] and not row["remote_hash_match"]]
+    remote_reachable_but_stale = [
+        row for row in remote_missing_or_stale if row.get("remote_reachable")
+    ]
     local_ready = len(required_local_ready) == len(required)
     domain_verified = check_live_domain and local_ready and len(required_remote_match) == len(required)
+    deploy_bundle = read_json(DASHBOARD_DATA / "live_domain_proof_feed_deploy_bundle.json")
+    deploy_summary = deploy_bundle.get("summary", {}) if isinstance(deploy_bundle.get("summary"), dict) else {}
+    safe_deploy_command = str(
+        deploy_bundle.get("safe_deploy_command")
+        or ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1"
+    )
 
     payload: dict[str, Any] = {
         "generated_utc": generated,
@@ -348,6 +362,8 @@ def build_payload(check_live_domain: bool = True, timeout: int = 10) -> dict[str
             "required_local_ready_count": len(required_local_ready),
             "required_remote_reachable_count": len(required_remote_reachable),
             "required_remote_hash_match_count": len(required_remote_match),
+            "required_remote_stale_or_missing_count": len(remote_missing_or_stale),
+            "required_remote_reachable_but_stale_count": len(remote_reachable_but_stale),
             "optional_feed_count": len(feeds) - len(required),
             "local_required_ready": local_ready,
             "live_domain_reviewer_ready": domain_verified,
@@ -371,6 +387,21 @@ def build_payload(check_live_domain: bool = True, timeout: int = 10) -> dict[str
                     else "Required local reviewer proof feeds are missing, so deployment is not ready."
                 )
             ),
+            "next_domain_action": (
+                "Deploy the local proof feeds to the live domain, then rerun this verifier until every required "
+                "hosted hash matches."
+                if local_ready and not domain_verified
+                else (
+                    "Use the reviewer URLs. Public hash deployment is verified, but field validation and dollar "
+                    "savings claims still require an external system owner."
+                    if domain_verified
+                    else "Regenerate the missing required local proof feeds before deploying."
+                )
+            ),
+            "safe_deploy_command": safe_deploy_command,
+            "deploy_bundle_feed_only_ready": bool(deploy_summary.get("feed_only_deploy_ready")),
+            "deploy_bundle_archive": str(deploy_bundle.get("archive_path") or ""),
+            "deploy_bundle_archive_sha256": str(deploy_bundle.get("archive_sha256") or ""),
         },
         "current_champion": champion_snapshot(),
         "feeds": feeds,
@@ -381,6 +412,18 @@ def build_payload(check_live_domain: bool = True, timeout: int = 10) -> dict[str
             {
                 "key": row["key"],
                 "local_sha256": row["local_sha256"],
+                "local_sha256_prefix": str(row["local_sha256"])[:12],
+                "remote_reachable": bool(row.get("remote_reachable")),
+                "remote_first_reachable_url": row.get("remote_first_reachable_url", ""),
+                "remote_first_reachable_status": row.get("remote_first_reachable_status"),
+                "remote_first_reachable_sha256": row.get("remote_first_reachable_sha256", ""),
+                "remote_first_reachable_sha256_prefix": str(row.get("remote_first_reachable_sha256") or "")[:12],
+                "remote_first_reachable_bytes": row.get("remote_first_reachable_bytes", 0),
+                "diagnosis": (
+                    "HOSTED_COPY_STALE"
+                    if row.get("remote_reachable")
+                    else "HOSTED_COPY_MISSING_OR_UNREACHABLE"
+                ),
                 "candidate_urls": [candidate["url"] for candidate in row["remote_candidates"]],
             }
             for row in remote_missing_or_stale

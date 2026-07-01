@@ -69,6 +69,12 @@ def test_gauntlet_routes_dashboard_feed_and_hashes_itself():
     assert feeds["status"] in {"LIVE_DOMAIN_HASH_VERIFIED", "LOCAL_READY_DOMAIN_NOT_VERIFIED", "LOCAL_FEEDS_INCOMPLETE"}
     assert feeds["live_domain_routed"] is payload["summary"]["live_domain_reviewer_ready"]
     assert any(row["relative_path"] == "dashboard/data/champion_metric_gauntlet.json" for row in feeds["feeds"])
+    assert "required_remote_hash_match_count" in feeds
+    assert "required_remote_stale_or_missing_count" in feeds
+    if feeds["status"] != "LIVE_DOMAIN_HASH_VERIFIED":
+        assert feeds["required_remote_stale_or_missing_count"] >= 0
+        assert isinstance(feeds["required_remote_missing_or_stale_keys"], list)
+        assert feeds["next_domain_action"]
 
 
 def test_markdown_answers_what_to_ask_and_refuses_overclaiming():

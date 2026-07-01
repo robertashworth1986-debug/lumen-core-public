@@ -118,6 +118,37 @@ def live_domain_verified() -> bool:
     )
 
 
+def live_domain_deployment_status() -> dict[str, Any]:
+    deployment = read_json(LIVE_DOMAIN_DEPLOYMENT_JSON)
+    summary = as_dict(deployment.get("summary"))
+    stale_rows = [row for row in as_list(deployment.get("required_remote_missing_or_stale")) if isinstance(row, dict)]
+    stale_keys = [str(row.get("key")) for row in stale_rows if row.get("key")]
+    required = as_int(summary.get("required_feed_count"))
+    matched = as_int(summary.get("required_remote_hash_match_count"))
+    stale_or_missing = as_int(summary.get("required_remote_stale_or_missing_count"), len(stale_rows))
+    reachable_but_stale = as_int(summary.get("required_remote_reachable_but_stale_count"))
+    state = str(summary.get("domain_deployment_state") or "NOT_CHECKED")
+    reviewer_ready = (
+        state == "LIVE_DOMAIN_HASH_VERIFIED"
+        and bool(summary.get("live_domain_reviewer_ready"))
+        and required > 0
+        and matched >= required
+    )
+    return {
+        "live_domain_reviewer_ready": reviewer_ready,
+        "domain_deployment_state": state,
+        "required_feed_count": required,
+        "required_remote_hash_match_count": matched,
+        "required_remote_stale_or_missing_count": stale_or_missing,
+        "required_remote_reachable_but_stale_count": reachable_but_stale,
+        "required_remote_missing_or_stale_keys": stale_keys,
+        "first_required_remote_issue": stale_rows[0] if stale_rows else {},
+        "safe_deploy_command": str(summary.get("safe_deploy_command") or ""),
+        "next_domain_action": str(summary.get("next_domain_action") or ""),
+        "plain_english_answer": str(summary.get("plain_english_answer") or ""),
+    }
+
+
 def strongest_current(champion: dict[str, Any], kuramoto: dict[str, Any]) -> dict[str, Any]:
     board = as_dict(champion.get("champion_of_champions"))
     strongest = as_dict(board.get("strongest_current"))
@@ -177,7 +208,7 @@ def build_metric_gauntlet(
     champion_summary: dict[str, Any],
     truth_summary: dict[str, Any],
     truth_gates: dict[str, Any],
-    live_domain_ready: bool,
+    live_domain_status: dict[str, Any],
 ) -> list[dict[str, Any]]:
     holdout_count = as_int(strongest.get("holdout_count"))
     wins = as_int(strongest.get("wins_vs_named_baseline"))
@@ -188,6 +219,10 @@ def build_metric_gauntlet(
     source_systems = as_int(strongest.get("source_system_count"))
     rows = as_int(strongest.get("estimated_rows_replayed"))
     chain = str(strongest.get("holdout_chain_sha256", ""))
+    live_domain_ready = bool(live_domain_status.get("live_domain_reviewer_ready"))
+    required = as_int(live_domain_status.get("required_feed_count"))
+    matched = as_int(live_domain_status.get("required_remote_hash_match_count"))
+    stale_or_missing = as_int(live_domain_status.get("required_remote_stale_or_missing_count"))
 
     return [
         metric_gate(
@@ -281,8 +316,8 @@ def build_metric_gauntlet(
         ),
         metric_gate(
             "live_domain_feed_routed",
-            bool(truth_gates.get("vps_domain_live_dashboard_routed") or live_domain_ready),
-            "true before hosted reviewer proof claim",
+            f"{matched}/{required} required hosted hashes match; {stale_or_missing} stale/missing",
+            "all required hosted hashes match before hosted reviewer proof claim",
             bool(truth_gates.get("vps_domain_live_dashboard_routed") or live_domain_ready),
             "A reviewer-facing domain needs fresh hosted hashes, not just local files.",
             "Hosted reviewer proof language is allowed once all required feed hashes match.",
@@ -301,6 +336,7 @@ def build_metric_gauntlet(
 
 
 def dashboard_feed_status() -> dict[str, Any]:
+    deployment_status = live_domain_deployment_status()
     feeds = [
         DASHBOARD_DATA / "champion_metric_gauntlet.json",
         DASHBOARD_DATA / "kuramoto_holdout_expansion.json",
@@ -321,12 +357,23 @@ def dashboard_feed_status() -> dict[str, Any]:
             }
         )
     ready = [row for row in rows if row["exists"]]
-    domain_ready = live_domain_verified()
+    domain_ready = bool(deployment_status["live_domain_reviewer_ready"])
     return {
         "local_feed_count": len(rows),
         "local_feed_ready_count": len(ready),
         "local_feeds_ready": len(ready) == len(rows),
         "live_domain_routed": domain_ready,
+        "domain_deployment_state": deployment_status["domain_deployment_state"],
+        "required_feed_count": deployment_status["required_feed_count"],
+        "required_remote_hash_match_count": deployment_status["required_remote_hash_match_count"],
+        "required_remote_stale_or_missing_count": deployment_status["required_remote_stale_or_missing_count"],
+        "required_remote_reachable_but_stale_count": deployment_status[
+            "required_remote_reachable_but_stale_count"
+        ],
+        "required_remote_missing_or_stale_keys": deployment_status["required_remote_missing_or_stale_keys"],
+        "first_required_remote_issue": deployment_status["first_required_remote_issue"],
+        "safe_deploy_command": deployment_status["safe_deploy_command"],
+        "next_domain_action": deployment_status["next_domain_action"],
         "status": (
             "LIVE_DOMAIN_HASH_VERIFIED"
             if len(ready) == len(rows) and domain_ready
@@ -683,8 +730,8 @@ def build_payload() -> dict[str, Any]:
     strongest = strongest_current(champion, kuramoto)
     source_breadth = source_breadth_universe(strongest)
     hardware_unlock = hardware_validation_unlock()
-    domain_ready = live_domain_verified()
-    gauntlet = build_metric_gauntlet(strongest, champion_summary, truth_summary, truth_gates, domain_ready)
+    domain_status = live_domain_deployment_status()
+    gauntlet = build_metric_gauntlet(strongest, champion_summary, truth_summary, truth_gates, domain_status)
     blockers = [row for row in gauntlet if row.get("blocker")]
     passed = [row for row in gauntlet if row.get("passed")]
     safe_annual = as_float(
