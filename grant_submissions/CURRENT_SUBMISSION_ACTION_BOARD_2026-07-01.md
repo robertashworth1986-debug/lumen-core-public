@@ -11,10 +11,10 @@ Purpose: keep the funding lane aligned with the current proof state, current off
   - `5eeea0b` - refresh live domain verification docs.
   - `e796efc` - refresh operator context domain status.
   - `9eead8a` - expose local proof readiness in operator context.
-- Current working pass hardened phase diagnostics and refreshed proof-feed deployment docs; commit/push pending at the time this board was updated.
+- Current working pass hardened phase diagnostics and refreshed proof-feed deployment docs; preserve commit hashes in git as the authoritative audit trail.
 - Public proof feed: reviewer-ready, with `12/12` required live-domain hashes matching.
 - Live source maximizer: 25 measured providers out of 29 enabled; 823 fresh measured rows in the latest maximizer run.
-- Outreach sent: Incubatenergy/EPRI lane, Tennessee Advanced Energy lane, LaunchTN, Vanderbilt Wond'ry, and Tennessee Tech protocol-review lane.
+- Outreach sent: Incubatenergy/EPRI lane, Tennessee Advanced Energy lane, LaunchTN, Vanderbilt Wond'ry, Tennessee Tech protocol-review lane, ORNL partnerships, EPB, and Spark/TVA.
 - Additional outreach sent 2026-07-01: OpenPowerAI/EPRI technical-fit request asking for the right reviewer or a buyer-authorized field replay lane. Gmail thread id: `19f1e7f0925ae31c`.
 
 ## Current Diagnostic Upgrade
@@ -28,7 +28,7 @@ Purpose: keep the funding lane aligned with the current proof state, current off
 
 | Lane | Portal | Current posture | Action |
 | --- | --- | --- | --- |
-| DICE / HR001126S0010 | DARPA BAAT | June 30, 2026 abstract window has passed unless BAAT still shows a valid extension or reopened action. | Preserve as evidence and reuse the strongest DICE proof in future DARPA/AI autonomy lanes. Do not mark as submitted without a BAAT confirmation number. |
+| DICE / HR001126S0010 | DARPA BAAT | Proposal Abstract finalized. DARPA BAAT email confirmation received 2026-06-29 for `HR001126S0010-DICE-PA-052`. | Preserve the confirmation, monitor for BAAT/DARPA follow-up, and reuse the strongest DICE proof in future DARPA/AI autonomy lanes. |
 | HarborSentinel / DON26BZ03-NV063 | DSIP | Official SBIR topic page shows open, due July 22, 2026. | Treat as the strongest near-term defense package. Refresh Volume 2 with the latest live-domain proof feed and public AIS gate, then submit through DSIP only after final portal validation. |
 | NV065 Adaptive Sensor Management / DON26BZ03-NV065 | DSIP | Official SBIR topic page shows open, due July 22, 2026. | Keep as the second defense package. Strengthen with source-conditioned replay and sensor-resource assumptions before upload. |
 | MissionWeave / DLA26BZ03-NV011 | DSIP | Public grant trackers and package records show July 22, 2026 close. | Keep as a strategic organizational-digital-twin package. It needs the clearest buyer story and bounded process metric. |
@@ -41,6 +41,7 @@ Purpose: keep the funding lane aligned with the current proof state, current off
 - The system has internal replay evidence across live public-source measurements and frozen artifacts.
 - The strongest technical claim is a source-conditioned replay and benchmark-selection engine, not universal geometry superiority.
 - The current buyer ask should be: "Please provide or approve a held-out operational dataset, incumbent baseline, acceptance metric, and avoided-cost conversion so we can run an externally valid replay."
+- DARPA BAAT received the DICE Proposal Abstract titled "Coherence-Bounded Peer Mesh: Sparse Task Markets and Local Inference Control for Resilient Heterogeneous AI Collectives" under identifier `HR001126S0010-DICE-PA-052`.
 
 ## What Is Not Yet Unlocked
 
@@ -53,11 +54,12 @@ Purpose: keep the funding lane aligned with the current proof state, current off
 
 ## Next Submit Order
 
-1. HarborSentinel NV063 - strongest near-term defense narrative and public AIS evidence spine.
-2. NV065 Adaptive Sensor Management - strong adjacent Navy sensor-tasking narrative.
-3. MissionWeave DLA NV011 - coherent platform/software story if the bounded-process metric is refreshed.
-4. NSF Project Pitch - quickest non-portal-heavy path, but not a same-day cash path.
-5. DOE Genesis Mission / energy-AI lanes - strategic, but later deadline and likely higher proposal burden.
+1. DICE follow-up watch - preserve DARPA confirmation and answer any BAAT/DARPA requests quickly.
+2. HarborSentinel NV063 - strongest near-term defense narrative and public AIS evidence spine.
+3. NV065 Adaptive Sensor Management - strong adjacent Navy sensor-tasking narrative.
+4. MissionWeave DLA NV011 - coherent platform/software story if the bounded-process metric is refreshed.
+5. NSF Project Pitch - quickest non-portal-heavy path, but not a same-day cash path.
+6. DOE Genesis Mission / energy-AI lanes - strategic, but later deadline and likely higher proposal burden.
 
 ## Decision Rule
 

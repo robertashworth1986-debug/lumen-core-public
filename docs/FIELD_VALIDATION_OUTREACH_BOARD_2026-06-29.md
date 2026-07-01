@@ -2,7 +2,30 @@
 
 Generated UTC: `2026-07-01T15:36:01.243952+00:00`
 
-Field-validation outreach board. This artifact identifies people and organizations that could unlock external validation by supplying or approving held-out operational data, incumbent baselines, acceptance metrics, and economic conversion factors. It creates local draft language only. It does not authorize sending email, bulk outreach, contact scraping, field-validation claims, realized-savings claims, fixed-dollar frozen-delta claims, live trading, or autonomous operational execution.
+Field-validation outreach board. This artifact identifies people and organizations that could unlock external validation by supplying or approving held-out operational data, incumbent baselines, acceptance metrics, and economic conversion factors. It records targeted user-approved outreach and local draft language. It does not authorize bulk outreach, contact scraping, field-validation claims, realized-savings claims, fixed-dollar frozen-delta claims, live trading, or autonomous operational execution.
+
+## Outreach Sent Ledger
+
+Status as of 2026-07-01: targeted outreach has been sent. Gmail search shows sent messages and no substantive external validation reply yet. A LaunchTN newsletter was received, but it is not a response to the validation ask.
+
+| UTC/local date | Recipient | Subject | Status |
+|---|---|---|---|
+| 2026-07-01 | `labs@incubatenergy.org` | `LumenCore field-replay request for utility AI validation` | Sent; waiting for reply. |
+| 2026-07-01 | `elena@piper-communications.com` | `Routing request: Tennessee field-replay validation path for LumenCore` | Sent; waiting for reply. |
+| 2026-07-01 | `info@launchtn.org` | `SBIR/STTR support request: external validation path for LumenCore` | Sent; waiting for reply. |
+| 2026-07-01 | `thewondry@vanderbilt.edu` | `Nashville founder request: technical validation route for LumenCore` | Sent; waiting for reply. |
+| 2026-07-01 | `smahajan@tntech.edu` | `Request for protocol review: grid replay validation for LumenCore` | Sent; waiting for reply. |
+| 2026-07-01 | `partnerships@ornl.gov` | `Request for technical validation path: LumenCore grid/AI replay proof stack` | Sent; waiting for reply. |
+| 2026-07-01 | `BroadbandSolutions@epb.net` | `Technical fit request: offline replay validation for grid reliability analytics` | Sent; waiting for reply. |
+| 2026-07-01 | `sparkcta@tnresearchpark.org` | `Spark/TVA validation path request for LumenCore proof stack` | Sent; waiting for reply. |
+
+## DICE Submission Status
+
+- DARPA BAAT finalization confirmation received 2026-06-29.
+- Submission identifier: `HR001126S0010-DICE-PA-052`
+- Submission type: Proposal Abstract.
+- Title: `Coherence-Bounded Peer Mesh: Sparse Task Markets and Local Inference Control for Resilient Heterogeneous AI Collectives`
+- Boundary: This is a portal submission confirmation, not an award, invitation, field validation, or funding decision.
 
 ## Live Breadth Correction
 
@@ -24,7 +47,7 @@ Field-validation outreach board. This artifact identifies people and organizatio
 
 ## Send Gate
 
-- Send without user review allowed: `false`
+- Targeted user-approved validation outreach allowed: `true`
 - Bulk email allowed: `false`
 - Contact scraping allowed: `false`
 - Field-validation claim allowed: `false`
