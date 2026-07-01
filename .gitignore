@@ -87,6 +87,7 @@ desktop.ini
 .playwright-cli/
 __MACOSX/
 *.bak.*
+render_qa_*/
 
 # Old / duplicate stack copies
 INSTITAL_STACK_V2/

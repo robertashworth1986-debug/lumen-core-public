@@ -1,0 +1,408 @@
+from __future__ import annotations
+
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+
+ROOT = Path(__file__).resolve().parents[2]
+OUT_OPS = ROOT / "out" / "ops"
+DASHBOARD_DATA = ROOT / "dashboard" / "data"
+DOCS = ROOT / "docs"
+
+OUT_JSON = OUT_OPS / "luma_operator_context_latest.json"
+DASHBOARD_JSON = DASHBOARD_DATA / "luma_operator_context.json"
+OUT_MD = DOCS / "LUMA_OPERATOR_CONTEXT_2026-07-01.md"
+
+BOUNDARY = (
+    "Continuity and operator context artifact. It consolidates current proof, source, deployment, "
+    "claim, and outreach state so future passes start from the same truth. It does not authorize "
+    "bulk outreach, external submissions, live trading, field-validation language, realized-savings "
+    "claims, medical claims, or fixed dollar pricing for frozen deltas."
+)
+
+
+def now_utc() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def read_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def write_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+
+
+def write_text(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+
+
+def as_dict(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def as_list(value: Any) -> list[Any]:
+    return value if isinstance(value, list) else []
+
+
+def stable_sha256(payload: Any) -> str:
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+
+
+def load_inputs() -> dict[str, dict[str, Any]]:
+    return {
+        "champion_metric_gauntlet": read_json(DASHBOARD_DATA / "champion_metric_gauntlet.json"),
+        "locked_source_baseline_replay_sweep": read_json(DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json"),
+        "live_domain_deployment_feed": read_json(DASHBOARD_DATA / "live_domain_deployment_feed.json"),
+        "live_domain_proof_feed_deploy_bundle": read_json(DASHBOARD_DATA / "live_domain_proof_feed_deploy_bundle.json"),
+        "dollar_claim_gate": read_json(DASHBOARD_DATA / "dollar_claim_gate.json"),
+        "field_validated_dollar_claim_ladder": read_json(DASHBOARD_DATA / "field_validated_dollar_claim_ladder.json"),
+        "first_buyer_target_board": read_json(DASHBOARD_DATA / "first_buyer_target_board.json"),
+        "safe_key_provider_ping": read_json(DASHBOARD_DATA / "safe_key_provider_ping.json"),
+        "live_key_measurement_audit": read_json(OUT_OPS / "live_key_measurement_audit_latest.json"),
+    }
+
+
+def provider_gap_rows(provider_ping: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row in as_list(provider_ping.get("provider_rows")):
+        provider = as_dict(row)
+        status = as_dict(provider.get("latest_status"))
+        status_name = str(status.get("status") or "NO_LATEST_STATUS")
+        key_ready = bool(provider.get("key_ready"))
+        if key_ready and status_name == "MEASURED":
+            continue
+        rows.append(
+            {
+                "source": provider.get("source"),
+                "sector": provider.get("sector"),
+                "enabled": bool(provider.get("enabled")),
+                "key_ready": key_ready,
+                "missing_env_names": provider.get("missing_env_names") or [],
+                "latest_status": status_name,
+                "http_status": status.get("http_status"),
+                "safe_next_action": provider_next_action(provider),
+            }
+        )
+    return rows
+
+
+def provider_next_action(provider: dict[str, Any]) -> str:
+    source = str(provider.get("source") or "")
+    status = as_dict(provider.get("latest_status"))
+    note = str(status.get("probe_note") or "").lower()
+    if not provider.get("enabled"):
+        return "Enable only if this source is needed for the current proof lane, then bind the expected API key."
+    if not provider.get("key_ready"):
+        return "Bind the missing API key names in the local env file or registry, then rerun safe provider ping."
+    if source == "BINANCE_PUBLIC":
+        return "Do not fight the location restriction; use Kraken/CoinGecko or another allowed market source instead."
+    if source == "EIA":
+        return "Rerun the EIA probe and promote existing local EIA CSV/API pulls; 502 appears upstream, not proof failure."
+    if source == "EPA_AQS":
+        return "Refresh the EPA AQS email/key pair; the latest probe reports invalid email/key."
+    if source == "NASA" and "timeout" in note:
+        return "Rerun with a longer timeout and a smaller endpoint before declaring NASA unavailable."
+    if source == "NREL":
+        return "Retry DNS/network and use a known NREL developer endpoint; current failure is name resolution."
+    if source == "THE_ODDS_API":
+        return "Reactivate or replace the key before using sports-market data in current proof claims."
+    if status == {}:
+        return "Add this provider to the latest safe ping/harvest adapter so key-ready becomes measured, not merely configured."
+    return "Review the redacted probe note, repair the adapter or key, then rerun the provider harvest."
+
+
+def lane_scoreboard(sweep: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row in as_list(sweep.get("lane_scoreboard")):
+        lane = as_dict(row)
+        comparisons = int(lane.get("baseline_comparison_count") or 0)
+        wins = int(lane.get("candidate_win_count") or 0)
+        rows.append(
+            {
+                "lane": lane.get("lane"),
+                "candidate_win_count": wins,
+                "baseline_comparison_count": comparisons,
+                "win_rate": round(wins / comparisons, 6) if comparisons else 0.0,
+                "estimated_rows": lane.get("estimated_rows"),
+                "numeric_samples": lane.get("numeric_samples"),
+                "routes_replayed": lane.get("routes_replayed"),
+                "mean_score_delta": lane.get("mean_score_delta"),
+                "best_score_delta": lane.get("best_score_delta"),
+                "locked_baselines": lane.get("locked_baselines") or [],
+                "metric_names": lane.get("metric_names") or [],
+            }
+        )
+    return rows
+
+
+def next_metric_battery(champion: dict[str, Any]) -> list[dict[str, Any]]:
+    battery: list[dict[str, Any]] = []
+    for row in as_list(champion.get("metric_expansion_suite")):
+        suite = as_dict(row)
+        battery.append(
+            {
+                "family_id": suite.get("family_id"),
+                "status": suite.get("status"),
+                "target_question": suite.get("target_question"),
+                "metrics": suite.get("metrics") or [],
+                "next_action": suite.get("next_action"),
+                "claim_gate": suite.get("claim_gate"),
+            }
+        )
+    return battery
+
+
+def outreach_snapshot(board: dict[str, Any]) -> dict[str, Any]:
+    summary = as_dict(board.get("summary"))
+    candidates = [as_dict(row) for row in as_list(board.get("candidates"))]
+    primary = as_dict(board.get("primary_manual_email"))
+    first = candidates[0] if candidates else {}
+    return {
+        "recommended_first_buyer": summary.get("recommended_first_buyer"),
+        "recommended_first_action": summary.get("recommended_first_action"),
+        "manual_reviewed_outreach_allowed": bool(summary.get("manual_reviewed_outreach_allowed")),
+        "send_without_user_review_allowed": bool(summary.get("send_without_user_review_allowed")),
+        "top_contact_lane": {
+            "organization": first.get("organization"),
+            "fit_score": first.get("fit_score"),
+            "buyer_channel_type": first.get("buyer_channel_type"),
+            "first_ask": first.get("first_ask"),
+            "source_refs": first.get("source_refs") or [],
+        },
+        "manual_email_subject": primary.get("subject"),
+        "manual_email_body": primary.get("body"),
+        "send_gate": "Operator must review recipient, footer, opt-out text, and final page before sending.",
+    }
+
+
+def build_payload() -> dict[str, Any]:
+    inputs = load_inputs()
+    champion = inputs["champion_metric_gauntlet"]
+    champion_summary = as_dict(champion.get("summary"))
+    domain_summary = as_dict(inputs["live_domain_deployment_feed"].get("summary"))
+    bundle_summary = as_dict(inputs["live_domain_proof_feed_deploy_bundle"].get("summary"))
+    dollar_summary = as_dict(inputs["dollar_claim_gate"].get("summary"))
+    key_summary = as_dict(inputs["live_key_measurement_audit"].get("summary"))
+    safe_key_summary = as_dict(inputs["safe_key_provider_ping"].get("summary"))
+
+    payload: dict[str, Any] = {
+        "generated_utc": now_utc(),
+        "schema": "luma_operator_context_v1",
+        "purpose": "Anti-drift memory and execution board for LumenCore proof-to-pilot work.",
+        "boundary": BOUNDARY,
+        "truth_state": {
+            "current_champion": champion_summary.get("champion_family"),
+            "champion_label": champion_summary.get("champion_label"),
+            "named_baseline": champion_summary.get("named_baseline"),
+            "holdout_wins": champion_summary.get("holdout_wins"),
+            "holdout_count": champion_summary.get("holdout_count"),
+            "win_rate": champion_summary.get("holdout_win_rate"),
+            "mean_delta_vs_named_baseline": champion_summary.get("mean_delta_vs_named_baseline"),
+            "min_delta_vs_named_baseline": champion_summary.get("min_delta_vs_named_baseline"),
+            "estimated_rows_replayed": champion_summary.get("estimated_rows_replayed"),
+            "source_system_count": champion_summary.get("source_system_count"),
+            "source_systems": as_dict(champion.get("strongest_current")).get("source_systems") or [],
+            "reviewer_safe_internal_claim_allowed": bool(champion_summary.get("reviewer_safe_internal_claim_allowed")),
+            "buyer_authorized_field_replay_request_ready": bool(
+                champion_summary.get("buyer_authorized_field_replay_request_ready")
+            ),
+            "field_validation_claim_allowed": False,
+            "real_dollar_savings_claim_allowed": False,
+            "fixed_frozen_delta_price_claim_allowed": False,
+            "plain_english": champion_summary.get("plain_english_answer"),
+        },
+        "live_domain": {
+            "state": domain_summary.get("domain_deployment_state"),
+            "reviewer_ready": bool(domain_summary.get("live_domain_reviewer_ready")),
+            "required_feed_count": domain_summary.get("required_feed_count"),
+            "required_remote_hash_match_count": domain_summary.get("required_remote_hash_match_count"),
+            "required_remote_stale_or_missing_count": domain_summary.get("required_remote_stale_or_missing_count"),
+            "feed_only_deploy_ready": bool(bundle_summary.get("feed_only_deploy_ready")),
+            "safe_deploy_command": inputs["live_domain_deployment_feed"].get("safe_deploy_command"),
+        },
+        "source_breadth": {
+            "runtime_bound_keys_total": key_summary.get("runtime_bound_keys_total"),
+            "enabled_sources_total": key_summary.get("enabled_sources_total"),
+            "measured_sources_total": key_summary.get("measured_sources_total"),
+            "measured_coverage_pct": key_summary.get("measured_coverage_pct"),
+            "enabled_sectors_total": key_summary.get("enabled_sectors_total"),
+            "measured_sectors_total": key_summary.get("measured_sectors_total"),
+            "safe_ping_provider_count": safe_key_summary.get("provider_count"),
+            "safe_ping_key_ready_provider_count": safe_key_summary.get("key_ready_provider_count"),
+            "safe_ping_latest_measured_provider_count": safe_key_summary.get("latest_measured_provider_count"),
+            "safe_ping_latest_blocked_or_thin_provider_count": safe_key_summary.get(
+                "latest_blocked_or_thin_provider_count"
+            ),
+            "provider_gaps": provider_gap_rows(inputs["safe_key_provider_ping"]),
+        },
+        "locked_replay_lanes": lane_scoreboard(inputs["locked_source_baseline_replay_sweep"]),
+        "metric_battery": next_metric_battery(champion),
+        "dollar_gate": {
+            "allowed_estimated_hourly_value_usd": dollar_summary.get("allowed_estimated_hourly_value_usd"),
+            "allowed_estimated_annual_value_usd": dollar_summary.get("allowed_estimated_annual_value_usd"),
+            "blocked_context_only_annual_value_usd": dollar_summary.get("blocked_context_only_annual_value_usd"),
+            "realized_savings_allowed": False,
+            "field_validation_required_for_real_dollars": True,
+            "safe_line": (
+                "Use bounded estimated avoided-cost signal language only; realized savings require a buyer-authorized "
+                "field replay with locked baseline, held-out data, acceptance metric, and economic conversion."
+            ),
+        },
+        "outreach": outreach_snapshot(inputs["first_buyer_target_board"]),
+        "next_10_actions": [
+            "Keep generated render-QA folders uncommitted unless a specific packet requires them.",
+            "Run the focused proof tests before every commit.",
+            "Promote EIA, NASA, NREL, EPA_AQS, Alpaca, and Kraken provider rows only after their latest pings are measured.",
+            "Run direct phase-slip, circular error, and amplitude-error diagnostics for the Kuramoto champion.",
+            "Run residual autocorrelation and calibration checks on the promoted source-system holdouts.",
+            "Run leave-one-source-out replay before claiming broader source generalization.",
+            "Keep live-domain hash verification green after every proof feed update.",
+            "Use EPRI AI for Power / Incubatenergy as the first manual paid-pilot outreach lane.",
+            "Ask for buyer-approved held-out data, incumbent baseline, pass/fail metric, and cost conversion.",
+            "Do not claim field validation, realized savings, live trading edge, or fixed frozen-delta price until external gates close.",
+        ],
+        "operator_prompt": (
+            "Operate LumenCore as a measurement-first proof-to-pilot platform. Every improvement claim must name its "
+            "source data, baseline, metric, replay rules, hashes, negative results, claim boundary, and next external "
+            "validation gate. Prioritize one narrow paid field replay over broad hype: buyer-approved held-out data, "
+            "incumbent baseline, acceptance metric, economic conversion, and a signed result. Ship only canonical, "
+            "secret-free proof feeds to the public domain, keep dashboards honest, and preserve this context after "
+            "every pass."
+        ),
+    }
+    payload["context_sha256"] = stable_sha256(
+        {
+            "truth_state": payload["truth_state"],
+            "live_domain": payload["live_domain"],
+            "source_breadth": payload["source_breadth"],
+            "locked_replay_lanes": payload["locked_replay_lanes"],
+            "dollar_gate": payload["dollar_gate"],
+            "next_10_actions": payload["next_10_actions"],
+        }
+    )
+    return payload
+
+
+def render_markdown(payload: dict[str, Any]) -> str:
+    truth = as_dict(payload.get("truth_state"))
+    source_breadth = as_dict(payload.get("source_breadth"))
+    live_domain = as_dict(payload.get("live_domain"))
+    dollar_gate = as_dict(payload.get("dollar_gate"))
+    outreach = as_dict(payload.get("outreach"))
+    lines = [
+        "# Luma Operator Context",
+        "",
+        f"Generated UTC: `{payload.get('generated_utc')}`",
+        f"Context SHA-256: `{payload.get('context_sha256')}`",
+        "",
+        "## Current Truth",
+        "",
+        f"- Champion: `{truth.get('current_champion')}` vs `{truth.get('named_baseline')}`",
+        f"- Holdout wins: `{truth.get('holdout_wins')}/{truth.get('holdout_count')}`",
+        f"- Mean delta: `{truth.get('mean_delta_vs_named_baseline')}`",
+        f"- Weakest delta: `{truth.get('min_delta_vs_named_baseline')}`",
+        f"- Estimated rows replayed: `{truth.get('estimated_rows_replayed')}`",
+        f"- Source systems in champion replay: `{truth.get('source_system_count')}`",
+        f"- Buyer field replay request ready: `{str(truth.get('buyer_authorized_field_replay_request_ready')).lower()}`",
+        f"- Field validation claim allowed: `false`",
+        f"- Real dollar savings claim allowed: `false`",
+        "",
+        str(truth.get("plain_english") or ""),
+        "",
+        "## Live Domain",
+        "",
+        f"- State: `{live_domain.get('state')}`",
+        f"- Reviewer ready: `{str(live_domain.get('reviewer_ready')).lower()}`",
+        f"- Required feeds matched: `{live_domain.get('required_remote_hash_match_count')}/{live_domain.get('required_feed_count')}`",
+        f"- Stale/missing required feeds: `{live_domain.get('required_remote_stale_or_missing_count')}`",
+        "",
+        "## Source Breadth",
+        "",
+        f"- Runtime-bound keys: `{source_breadth.get('runtime_bound_keys_total')}`",
+        f"- Measured enabled sources: `{source_breadth.get('measured_sources_total')}/{source_breadth.get('enabled_sources_total')}`",
+        f"- Measured sectors: `{source_breadth.get('measured_sectors_total')}/{source_breadth.get('enabled_sectors_total')}`",
+        f"- Latest measured providers in safe ping: `{source_breadth.get('safe_ping_latest_measured_provider_count')}`",
+        f"- Latest blocked/thin providers in safe ping: `{source_breadth.get('safe_ping_latest_blocked_or_thin_provider_count')}`",
+        "",
+        "Provider gaps to fix:",
+    ]
+    for row in as_list(source_breadth.get("provider_gaps")):
+        gap = as_dict(row)
+        lines.append(
+            f"- `{gap.get('source')}`: `{gap.get('latest_status')}`; next: {gap.get('safe_next_action')}"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Replay Lanes",
+            "",
+            "| Lane | Wins | Comparisons | Win Rate | Rows | Mean Delta |",
+            "|---|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for row in as_list(payload.get("locked_replay_lanes")):
+        lane = as_dict(row)
+        lines.append(
+            "| "
+            f"`{lane.get('lane')}` | "
+            f"{lane.get('candidate_win_count')} | "
+            f"{lane.get('baseline_comparison_count')} | "
+            f"{lane.get('win_rate')} | "
+            f"{lane.get('estimated_rows')} | "
+            f"{lane.get('mean_score_delta')} |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Dollar Gate",
+            "",
+            f"- Bounded estimated hourly signal: `${dollar_gate.get('allowed_estimated_hourly_value_usd')}`",
+            f"- Bounded estimated annual signal: `${dollar_gate.get('allowed_estimated_annual_value_usd')}`",
+            f"- Blocked context-only annual surface: `${dollar_gate.get('blocked_context_only_annual_value_usd')}`",
+            f"- Safe line: {dollar_gate.get('safe_line')}",
+            "",
+            "## First Outreach Lane",
+            "",
+            f"- Buyer: `{outreach.get('recommended_first_buyer')}`",
+            f"- Action: {outreach.get('recommended_first_action')}",
+            f"- Send gate: {outreach.get('send_gate')}",
+            "",
+            "## Next 10 Actions",
+            "",
+        ]
+    )
+    for action in as_list(payload.get("next_10_actions")):
+        lines.append(f"- {action}")
+
+    lines.extend(["", "## Long-Arc Operator Prompt", "", str(payload.get("operator_prompt") or "")])
+    return "\n".join(lines)
+
+
+def main() -> int:
+    payload = build_payload()
+    write_json(OUT_JSON, payload)
+    write_json(DASHBOARD_JSON, payload)
+    write_text(OUT_MD, render_markdown(payload))
+    print(f"Wrote {OUT_JSON}")
+    print(f"Wrote {DASHBOARD_JSON}")
+    print(f"Wrote {OUT_MD}")
+    print(payload["truth_state"]["plain_english"])
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
