@@ -1,6 +1,6 @@
 # Luma External Proof Vault Packet
 
-Generated UTC: `2026-07-01T08:11:47.917892+00:00`
+Generated UTC: `2026-07-01T09:33:18.509712+00:00`
 
 ## Purpose
 
@@ -10,8 +10,8 @@ Non-destructive staging manifest for high-value proof artifacts on external stor
 
 - Artifacts ready: `35/35`
 - Missing required: `0`
-- Ready bytes: `1663016`
-- Drive free bytes at staging time: `62441062400`
+- Ready bytes: `1667124`
+- Drive free bytes at staging time: `47263416320`
 - Packet ready: `true`
 
 ## Boundary
@@ -27,9 +27,9 @@ A proof vault is provenance and reproducibility infrastructure. It does not crea
 - `out/ops/luma_context_dashboard_parity_audit_latest.json` -> `artifacts/continuity/out/ops/luma_context_dashboard_parity_audit_latest.json` | sha256 `757fe628616e5d0a041e390abc18088b55ec672eb483b410d3571957098b7c20`
 - `docs/LIVE_PROOF_VALUE_METER_2026-06-22.md` -> `artifacts/proof_value/docs/LIVE_PROOF_VALUE_METER_2026-06-22.md` | sha256 `a1dea51a383e6f3c2577a3fa1443d80115963d6f43299021682aa50ace12ae34`
 - `out/ops/live_proof_value_meter_latest.json` -> `artifacts/proof_value/out/ops/live_proof_value_meter_latest.json` | sha256 `07c416189aba2ac78d2a341986bdcde7dd6f229c530785f6e418efce9e05c7c2`
-- `docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md` -> `artifacts/proof_value/docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md` | sha256 `061c215e4fdf2d52a1e109fe2dd22d7ddbc4bfc74817138f069cd3b5eda38b13`
-- `out/ops/champion_metric_gauntlet_latest.json` -> `artifacts/proof_value/out/ops/champion_metric_gauntlet_latest.json` | sha256 `40308a1c8f2447f2b7acea172cd7b9f6bbd6e242859ae1dad27cd849f1f3169f`
-- `dashboard/data/champion_metric_gauntlet.json` -> `artifacts/proof_value/dashboard/data/champion_metric_gauntlet.json` | sha256 `40308a1c8f2447f2b7acea172cd7b9f6bbd6e242859ae1dad27cd849f1f3169f`
+- `docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md` -> `artifacts/proof_value/docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md` | sha256 `04ae84b771ea5776419b947bb24ed096ad16def227508f5738071e3db013cdcd`
+- `out/ops/champion_metric_gauntlet_latest.json` -> `artifacts/proof_value/out/ops/champion_metric_gauntlet_latest.json` | sha256 `59b353e2efbca6cb6e2f743cb07b7280c3e3a7c2e14db30757cc8a85ab025539`
+- `dashboard/data/champion_metric_gauntlet.json` -> `artifacts/proof_value/dashboard/data/champion_metric_gauntlet.json` | sha256 `59b353e2efbca6cb6e2f743cb07b7280c3e3a7c2e14db30757cc8a85ab025539`
 - `docs/DOLLAR_CLAIM_GATE_2026-06-21.md` -> `artifacts/proof_value/docs/DOLLAR_CLAIM_GATE_2026-06-21.md` | sha256 `4628f86d9f6b8cc0b5a8b99a6983d78cc0d6d1a31e08768963be26645fc2d231`
 - `out/ops/dollar_claim_gate_latest.json` -> `artifacts/proof_value/out/ops/dollar_claim_gate_latest.json` | sha256 `9e64ad63466e81cd1499014b97c35f2796ec728e76b72010cd549bb2aa5d741d`
 - `out/ops/live_breadth_value_panel_latest.json` -> `artifacts/live_breadth/out/ops/live_breadth_value_panel_latest.json` | sha256 `b5968b0698f256e34094e8eceb46d2c5ef22d663af058b312de2cd5b69aa2449`
