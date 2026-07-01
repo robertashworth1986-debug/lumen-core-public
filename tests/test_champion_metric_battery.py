@@ -54,9 +54,13 @@ def test_metric_battery_names_real_test_lanes_and_blockers():
     assert lanes["source_conditioned_replay"]["status"] == "PASS"
     assert lanes["best_same_run_baseline"]["status"] == "PASS"
     assert lanes["phase_resonance_proxy"]["status"] == "PASS"
+    assert lanes["live_source_breadth"]["status"] == "PASS"
     assert lanes["residual_calibration"]["status"] == "PASS"
     assert lanes["source_generalization"]["status"] == "PASS"
     assert lanes["runtime_operational_budget"]["status"] == "PASS"
+    assert lanes["live_source_breadth"]["evidence"]["enabled_sources"] >= 20
+    assert lanes["live_source_breadth"]["evidence"]["measured_sources"] >= 18
+    assert lanes["live_source_breadth"]["evidence"]["coverage_percent"] >= 80
     assert lanes["residual_calibration"]["evidence"]["locked_sweep_calibration_error"]["count"] >= 100
     assert lanes["runtime_operational_budget"]["evidence"]["locked_sweep_runtime_ms"]["count"] >= 100
     assert lanes["source_generalization"]["evidence"]["locked_sweep_baseline_comparison_count"] >= 1_000
