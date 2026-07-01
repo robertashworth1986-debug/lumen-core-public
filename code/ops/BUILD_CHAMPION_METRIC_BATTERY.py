@@ -18,6 +18,7 @@ PHASE_JSON = OUT_OPS / "champion_phase_proxy_diagnostics_latest.json"
 SOURCE_JSON = OUT_OPS / "live_source_measurement_maximizer_latest.json"
 DOMAIN_JSON = OUT_OPS / "live_domain_deployment_feed_latest.json"
 DOLLAR_GATE_JSON = DASHBOARD_DATA / "dollar_claim_gate.json"
+LOCKED_SWEEP_JSON = DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json"
 
 OUT_JSON = OUT_OPS / "champion_metric_battery_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "champion_metric_battery.json"
@@ -77,9 +78,98 @@ def as_float(value: Any, default: float = 0.0) -> float:
         return default
 
 
+def first_present(row: dict[str, Any], *keys: str) -> Any:
+    for key in keys:
+        if key in row and row.get(key) is not None:
+            return row.get(key)
+    return None
+
+
 def stable_sha256(payload: Any) -> str:
     encoded = json.dumps(payload, sort_keys=True, default=str).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def percentile(values: list[float], p: float) -> float | None:
+    if not values:
+        return None
+    ordered = sorted(values)
+    if len(ordered) == 1:
+        return round(ordered[0], 6)
+    idx = (len(ordered) - 1) * p
+    lo = int(idx)
+    hi = min(lo + 1, len(ordered) - 1)
+    frac = idx - lo
+    value = ordered[lo] * (1.0 - frac) + ordered[hi] * frac
+    return round(value, 6)
+
+
+def collect_named_numbers(value: Any, name: str) -> list[float]:
+    found: list[float] = []
+    stack: list[Any] = [value]
+    while stack:
+        current = stack.pop()
+        if isinstance(current, dict):
+            for key, child in current.items():
+                if key == name:
+                    try:
+                        found.append(float(child))
+                    except (TypeError, ValueError):
+                        pass
+                if isinstance(child, (dict, list)):
+                    stack.append(child)
+        elif isinstance(current, list):
+            stack.extend(current)
+    return found
+
+
+def number_stats(values: list[float]) -> dict[str, Any]:
+    if not values:
+        return {"count": 0}
+    return {
+        "count": len(values),
+        "min": round(min(values), 6),
+        "p50": percentile(values, 0.50),
+        "p95": percentile(values, 0.95),
+        "max": round(max(values), 6),
+        "mean": round(sum(values) / len(values), 6),
+    }
+
+
+def locked_sweep_evidence(locked_sweep: dict[str, Any]) -> dict[str, Any]:
+    summary = as_dict(locked_sweep.get("summary"))
+    route_results = [row for row in as_list(locked_sweep.get("route_results")) if isinstance(row, dict)]
+    systems = sorted({str(row.get("system")) for row in route_results if row.get("system")})
+    lanes = sorted({str(row.get("lane")) for row in route_results if row.get("lane")})
+    runtime_values = collect_named_numbers(route_results, "runtime_ms")
+    calibration_values = collect_named_numbers(route_results, "calibration_error")
+    lane_scoreboard = [
+        row
+        for row in as_list(locked_sweep.get("lane_scoreboard"))
+        if isinstance(row, dict)
+    ]
+    return {
+        "adapter_backed_routes": summary.get("adapter_backed_routes"),
+        "baseline_comparison_count": summary.get("baseline_comparison_count"),
+        "candidate_win_count": summary.get("candidate_win_count"),
+        "candidate_loss_or_tie_count": summary.get("candidate_loss_or_tie_count"),
+        "estimated_rows_replayed": summary.get("estimated_rows_replayed"),
+        "geometry_routes_replayed": summary.get("geometry_routes_replayed"),
+        "energy_proxy_routes_replayed": summary.get("energy_proxy_routes_replayed"),
+        "lane_count": summary.get("lane_count"),
+        "lanes": lanes,
+        "numeric_samples_read": summary.get("numeric_samples_read"),
+        "ready_rows": summary.get("ready_rows"),
+        "replay_chain_sha256": summary.get("replay_chain_sha256"),
+        "route_result_count": len(route_results),
+        "manifest_source_count": summary.get("source_count"),
+        "source_system_count": len(systems),
+        "source_systems": systems,
+        "source_conditioned_replay_claim_allowed": summary.get("source_conditioned_replay_claim_allowed"),
+        "runtime_ms": number_stats(runtime_values),
+        "calibration_error": number_stats(calibration_values),
+        "lane_scoreboard": lane_scoreboard,
+    }
 
 
 def status_from_pass(passed: bool, blocked: bool = False) -> str:
@@ -117,6 +207,7 @@ def build_categories(inputs: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
     sources = inputs["sources"]
     domain = inputs["domain"]
     dollar_gate = inputs["dollar_gate"]
+    locked_sweep = inputs["locked_sweep"]
 
     g_summary = as_dict(gauntlet.get("summary"))
     s_summary = as_dict(stress.get("summary"))
@@ -124,9 +215,14 @@ def build_categories(inputs: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
     src_summary = as_dict(sources.get("summary"))
     domain_summary = as_dict(domain.get("summary"))
     dollar_summary = as_dict(dollar_gate.get("summary"))
+    enabled_sources = first_present(src_summary, "enabled_source_count", "enabled_sources")
+    measured_sources = first_present(src_summary, "measured_source_count", "measured_sources")
+    failed_or_thin_sources = first_present(src_summary, "failed_or_thin_source_count", "failed_or_thin_sources")
+    coverage_percent = first_present(src_summary, "coverage_percent", "coverage_pct")
 
     stress_gates = {str(row.get("name")): row for row in as_list(stress.get("metric_stress_tests")) if isinstance(row, dict)}
     gauntlet_gates = {str(row.get("name")): row for row in as_list(gauntlet.get("metric_gauntlet")) if isinstance(row, dict)}
+    sweep_evidence = locked_sweep_evidence(locked_sweep)
 
     live_domain_ok = bool(
         s_summary.get("live_domain_hash_verified")
@@ -192,13 +288,14 @@ def build_categories(inputs: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
         category(
             "live_source_breadth",
             "Live-source breadth and provider measurement",
-            status_from_pass(as_int(src_summary.get("measured_source_count")) >= 18),
+            status_from_pass(as_int(measured_sources) >= 18),
             {
-                "enabled_sources": src_summary.get("enabled_source_count"),
-                "measured_sources": src_summary.get("measured_source_count"),
-                "failed_or_thin_sources": src_summary.get("failed_or_thin_source_count"),
+                "enabled_sources": enabled_sources,
+                "measured_sources": measured_sources,
+                "failed_or_thin_sources": failed_or_thin_sources,
+                "failed_or_thin_source_names": src_summary.get("failed_or_thin_source_names"),
                 "total_measured_rows": src_summary.get("total_measured_rows"),
-                "coverage_percent": src_summary.get("coverage_percent"),
+                "coverage_percent": coverage_percent,
             },
             ["provider_ping", "bounded_row_pull", "snapshot_hash", "coverage_percent"],
             "Fix or replace the remaining failed/thin sources: EPA AQS, NREL, odds, and restricted exchange feed.",
@@ -222,40 +319,54 @@ def build_categories(inputs: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
         category(
             "residual_calibration",
             "Residual, calibration, and error-distribution checks",
-            "READY_TO_RUN_OR_EXPAND",
+            status_from_pass(as_int(as_dict(sweep_evidence.get("calibration_error")).get("count")) >= 100),
             {
                 "current_gate": stress_gates.get("residual_autocorrelation_and_calibration", {}),
                 "numeric_samples_read": s_summary.get("numeric_samples_read"),
+                "locked_sweep_calibration_error": sweep_evidence.get("calibration_error"),
+                "locked_sweep_candidate_loss_or_tie_count": sweep_evidence.get("candidate_loss_or_tie_count"),
             },
             ["residual_autocorrelation", "calibration_curve", "coverage_error", "error_tail_risk"],
-            "Compute residual diagnostics per source system and fail closed on drift.",
-            "Required before serious operational-performance language.",
+            "Add residual autocorrelation next; keep calibration/error-tail metrics visible beside the winners.",
+            "Supports internal error-distribution language, not field or realized-savings language.",
         ),
         category(
             "source_generalization",
             "Source generalization and live-breadth promotion",
-            "READY_TO_RUN_OR_EXPAND",
+            status_from_pass(
+                as_int(sweep_evidence.get("source_system_count")) >= 8
+                and as_int(sweep_evidence.get("lane_count")) >= 5
+                and as_int(sweep_evidence.get("baseline_comparison_count")) >= 1_000
+                and as_int(sweep_evidence.get("route_result_count")) >= 300
+            ),
             {
                 "champion_replay_source_systems": s_summary.get("source_systems"),
                 "broader_measured_provider_count": g_summary.get("broader_measured_provider_count"),
                 "manifest_unique_source_count": g_summary.get("manifest_unique_source_count"),
                 "manifest_ready_for_benchmark_row_count": g_summary.get("manifest_ready_for_benchmark_row_count"),
+                "locked_sweep_manifest_source_count": sweep_evidence.get("manifest_source_count"),
+                "locked_sweep_source_system_count": sweep_evidence.get("source_system_count"),
+                "locked_sweep_source_systems": sweep_evidence.get("source_systems"),
+                "locked_sweep_lanes": sweep_evidence.get("lanes"),
+                "locked_sweep_baseline_comparison_count": sweep_evidence.get("baseline_comparison_count"),
+                "locked_sweep_estimated_rows_replayed": sweep_evidence.get("estimated_rows_replayed"),
             },
             ["leave_one_source_out", "source_group_holdout", "provider_promotion_rate", "schema_normalization_success"],
-            "Promote one measured provider at a time into a locked source-conditioned replay.",
-            "Blocks broad all-sector claims until promoted sources pass matched baselines.",
+            "Run leave-one-source-out and source-group holdout so this graduates from broad replay to stronger generalization.",
+            "Allows multi-system internal replay language; still blocks external field claims.",
         ),
         category(
             "runtime_operational_budget",
             "Runtime, latency, and production-budget checks",
-            "READY_TO_RUN_OR_EXPAND",
+            status_from_pass(as_int(as_dict(sweep_evidence.get("runtime_ms")).get("count")) >= 100),
             {
                 "current_gate": stress_gates.get("latency_runtime_budget", {}),
                 "fallback_rate": s_summary.get("fallback_rate"),
+                "locked_sweep_runtime_ms": sweep_evidence.get("runtime_ms"),
             },
             ["p50_latency", "p95_latency", "memory_budget", "fallback_rate", "throughput"],
-            "Run timed replays on the laptop and VPS with fixed budgets.",
-            "Required before production readiness language.",
+            "Repeat timed replays under fixed laptop and VPS budgets before using production-readiness language.",
+            "Supports internal runtime-budget evidence, not production SLA claims.",
         ),
         category(
             "hardware_grid_rf_pll",
@@ -321,6 +432,7 @@ def build_payload() -> dict[str, Any]:
         "sources": read_json(SOURCE_JSON),
         "domain": read_json(DOMAIN_JSON),
         "dollar_gate": read_json(DOLLAR_GATE_JSON),
+        "locked_sweep": read_json(LOCKED_SWEEP_JSON),
     }
     categories = build_categories(inputs)
     pass_count = sum(1 for row in categories if row["status"] == "PASS")
@@ -329,6 +441,9 @@ def build_payload() -> dict[str, Any]:
     gauntlet_summary = as_dict(inputs["gauntlet"].get("summary"))
     stress_summary = as_dict(inputs["stress"].get("summary"))
     source_summary = as_dict(inputs["sources"].get("summary"))
+    sweep_evidence = locked_sweep_evidence(inputs["locked_sweep"])
+    measured_sources = first_present(source_summary, "measured_source_count", "measured_sources")
+    enabled_sources = first_present(source_summary, "enabled_source_count", "enabled_sources")
 
     payload: dict[str, Any] = {
         "generated_utc": now_utc(),
@@ -344,11 +459,18 @@ def build_payload() -> dict[str, Any]:
             "holdout_count": gauntlet_summary.get("holdout_count") or stress_summary.get("holdout_count"),
             "estimated_rows_replayed": gauntlet_summary.get("estimated_rows_replayed")
             or stress_summary.get("estimated_rows_replayed"),
+            "locked_sweep_estimated_rows_replayed": sweep_evidence.get("estimated_rows_replayed"),
+            "locked_sweep_numeric_samples_read": sweep_evidence.get("numeric_samples_read"),
+            "locked_sweep_baseline_comparison_count": sweep_evidence.get("baseline_comparison_count"),
+            "locked_sweep_candidate_win_count": sweep_evidence.get("candidate_win_count"),
+            "locked_sweep_candidate_loss_or_tie_count": sweep_evidence.get("candidate_loss_or_tie_count"),
+            "locked_sweep_manifest_source_count": sweep_evidence.get("manifest_source_count"),
+            "locked_sweep_source_system_count": sweep_evidence.get("source_system_count"),
+            "locked_sweep_lane_count": sweep_evidence.get("lane_count"),
+            "locked_sweep_replay_chain_sha256": sweep_evidence.get("replay_chain_sha256"),
             "source_system_count": gauntlet_summary.get("source_system_count") or stress_summary.get("source_system_count"),
-            "broader_measured_provider_count": source_summary.get("measured_source_count")
-            or gauntlet_summary.get("broader_measured_provider_count"),
-            "broader_enabled_provider_count": source_summary.get("enabled_source_count")
-            or gauntlet_summary.get("broader_enabled_provider_count"),
+            "broader_measured_provider_count": measured_sources or gauntlet_summary.get("broader_measured_provider_count"),
+            "broader_enabled_provider_count": enabled_sources or gauntlet_summary.get("broader_enabled_provider_count"),
             "total_measured_rows_latest_pull": source_summary.get("total_measured_rows"),
             "metric_category_count": len(categories),
             "metric_pass_count": pass_count,
@@ -422,6 +544,7 @@ def build_payload() -> dict[str, Any]:
             "live_source_measurement_maximizer": str(SOURCE_JSON.relative_to(ROOT)),
             "live_domain_deployment_feed": str(DOMAIN_JSON.relative_to(ROOT)),
             "dollar_claim_gate": str(DOLLAR_GATE_JSON.relative_to(ROOT)),
+            "locked_source_baseline_replay_sweep": str(LOCKED_SWEEP_JSON.relative_to(ROOT)),
         },
     }
     payload["metric_battery_sha256"] = stable_sha256(
@@ -452,6 +575,14 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Named baseline: `{summary.get('named_baseline')}`",
         f"- Holdout wins: `{summary.get('holdout_wins')}/{summary.get('holdout_count')}`",
         f"- Estimated rows replayed: `{summary.get('estimated_rows_replayed')}`",
+        f"- Locked sweep estimated rows: `{summary.get('locked_sweep_estimated_rows_replayed')}`",
+        f"- Locked sweep baseline comparisons: `{summary.get('locked_sweep_baseline_comparison_count')}`",
+        f"- Locked sweep candidate wins/losses-or-ties: `{summary.get('locked_sweep_candidate_win_count')}/"
+        f"{summary.get('locked_sweep_candidate_loss_or_tie_count')}`",
+        f"- Locked sweep source systems/lanes: `{summary.get('locked_sweep_source_system_count')}/"
+        f"{summary.get('locked_sweep_lane_count')}`",
+        f"- Locked sweep manifest source rows: `{summary.get('locked_sweep_manifest_source_count')}`",
+        f"- Locked sweep replay chain: `{summary.get('locked_sweep_replay_chain_sha256')}`",
         f"- Champion replay source systems: `{summary.get('source_system_count')}`",
         f"- Broader measured providers: `{summary.get('broader_measured_provider_count')}/"
         f"{summary.get('broader_enabled_provider_count')}`",

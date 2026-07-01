@@ -1,8 +1,8 @@
 # Live Domain Proof Feed Deploy Bundle
 
-Generated UTC: `2026-07-01T13:07:20Z`
-Bundle root: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T130720Z`
-Archive: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T130720Z.tgz`
+Generated UTC: `2026-07-01T13:39:12Z`
+Bundle root: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T133912Z`
+Archive: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T133912Z.tgz`
 
 ## Decision
 
@@ -36,27 +36,27 @@ The feed-only deploy bundle is ready. It can publish proof JSON feeds to the pub
 | `champion_sample_expansion_and_economic_bridge` | `true` | `dashboard/data/champion_sample_expansion_and_economic_bridge.json` | `2` | `f0262523045d` |
 | `geometry_asset_wiring_board` | `false` | `dashboard/data/geometry_asset_wiring_board.json` | `2` | `20be445c8852` |
 | `luma_context_dashboard_parity_audit` | `false` | `dashboard/data/luma_context_dashboard_parity_audit.json` | `2` | `757fe628616e` |
-| `live_domain_deployment_feed` | `false` | `dashboard/data/live_domain_deployment_feed.json` | `2` | `f168b97a5cbb` |
+| `live_domain_deployment_feed` | `false` | `dashboard/data/live_domain_deployment_feed.json` | `2` | `f930aec292af` |
 | `live_domain_consolidation_audit` | `false` | `dashboard/data/live_domain_consolidation_audit.json` | `2` | `63cfd938154e` |
 | `proof_to_revenue_engine` | `false` | `dashboard/data/proof_to_revenue_engine.json` | `2` | `b611e887434a` |
 | `champion_stress_test_matrix` | `false` | `dashboard/data/champion_stress_test_matrix.json` | `2` | `4f800ce00512` |
-| `champion_metric_battery` | `false` | `dashboard/data/champion_metric_battery.json` | `2` | `a4a98b49b005` |
+| `champion_metric_battery` | `false` | `dashboard/data/champion_metric_battery.json` | `2` | `d3fce4fea086` |
 | `first_buyer_target_board` | `false` | `dashboard/data/first_buyer_target_board.json` | `2` | `eab5d0cc7e85` |
 | `paid_pilot_outreach_queue` | `false` | `dashboard/data/paid_pilot_outreach_queue.json` | `2` | `8cea42048365` |
 | `luma_operator_context` | `false` | `dashboard/data/luma_operator_context.json` | `2` | `3b91f5bc0fa2` |
 | `champion_phase_proxy_diagnostics` | `false` | `dashboard/data/champion_phase_proxy_diagnostics.json` | `2` | `259ee745a7d0` |
-| `safe_key_provider_ping` | `false` | `dashboard/data/safe_key_provider_ping.json` | `2` | `dc3ed0a3165c` |
+| `safe_key_provider_ping` | `false` | `dashboard/data/safe_key_provider_ping.json` | `2` | `e219eeb692bc` |
 | `live_source_measurement_maximizer` | `false` | `dashboard/data/live_source_measurement_maximizer.json` | `2` | `e061a2a3da7a` |
-| `geometry_live_wiring_matrix` | `false` | `dashboard/data/geometry_live_wiring_matrix.json` | `2` | `7357b64b2544` |
+| `geometry_live_wiring_matrix` | `false` | `dashboard/data/geometry_live_wiring_matrix.json` | `2` | `b559f3668cda` |
 | `geometry_live_breadth_proof_queue` | `false` | `dashboard/data/geometry_live_breadth_proof_queue.json` | `2` | `088820432c98` |
 | `branching_live_breadth_replay` | `false` | `dashboard/data/branching_live_breadth_replay.json` | `2` | `3abdf878a529` |
-| `rolling_champion_gate` | `false` | `dashboard/data/rolling_champion_gate.json` | `2` | `9cea1af46c81` |
-| `top_geometry_live_replay_results` | `false` | `dashboard/data/top_geometry_live_replay_results.json` | `2` | `cdd238a3936a` |
+| `rolling_champion_gate` | `false` | `dashboard/data/rolling_champion_gate.json` | `2` | `755aaab1a172` |
+| `top_geometry_live_replay_results` | `false` | `dashboard/data/top_geometry_live_replay_results.json` | `2` | `1b4c4644ad06` |
 
 ## Commands
 
-- Dry run: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T130720Z" -DryRun`
-- Deploy feeds: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T130720Z"`
+- Dry run: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T133912Z" -DryRun`
+- Deploy feeds: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260701T133912Z"`
 - Verify domain hashes: `python .\code\ops\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py --timeout 8`
 
 ## Remote Web Roots Tried By Deploy Script
@@ -69,5 +69,5 @@ The feed-only deploy bundle is ready. It can publish proof JSON feeds to the pub
 
 Feed-only deploy bundle. It stages reviewer proof JSON for domain hash verification. It does not publish secrets, restart execution services, prove field validation, prove realized savings, set a fixed dollar value per frozen delta, or imply autonomous live trading permission. This is not field validation.
 
-Bundle SHA-256: `916e2d098e198915168b4bd21aaacdc62d42c8555cff3b9ab1525c244144e42b`
-Archive SHA-256: `46336b29efe940ce95d9c16ece49bbec68bb38af3a45bfdcb456fdc5bdddde66`
+Bundle SHA-256: `d5ff346b96240c2bc22e48b632727b601bcffb7b76d6fb6fb5010f933e0454bd`
+Archive SHA-256: `01172fb1e1515a8c2f9bc8aac901d18a958307e4e3b1b6dfb98079cf73cdc2c6`

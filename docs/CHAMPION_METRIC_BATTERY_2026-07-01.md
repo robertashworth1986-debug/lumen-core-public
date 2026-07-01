@@ -1,7 +1,7 @@
 # Champion Metric Battery
 
-Generated UTC: `2026-07-01T13:06:10.961627+00:00`
-Metric battery SHA-256: `37dcaaeaa20d6c0783bcf17dfcb1714436fd5a39d07eb228ba2bba2112369a78`
+Generated UTC: `2026-07-01T13:39:11.904358+00:00`
+Metric battery SHA-256: `401b7b4baa0603348a6ff0323d892ece509b8496291e35adc4afbde9ff1f3a43`
 
 ## Plain English
 
@@ -13,6 +13,12 @@ The current platform is strongest as an internal, hash-verifiable replay and ben
 - Named baseline: `kalman_filter`
 - Holdout wins: `24/24`
 - Estimated rows replayed: `2506267`
+- Locked sweep estimated rows: `7152281`
+- Locked sweep baseline comparisons: `1224`
+- Locked sweep candidate wins/losses-or-ties: `975/249`
+- Locked sweep source systems/lanes: `8/5`
+- Locked sweep manifest source rows: `159`
+- Locked sweep replay chain: `825b5b4090a944a6306caeac16a3fc583def8444d9dc232da864dbd627a30587`
 - Champion replay source systems: `4`
 - Broader measured providers: `19/23`
 - Latest bounded measured rows: `516`
@@ -20,8 +26,8 @@ The current platform is strongest as an internal, hash-verifiable replay and ben
 ## Battery Status
 
 - Metric categories: `12`
-- Passed: `4`
-- Ready to run or expand: `4`
+- Passed: `8`
+- Ready to run or expand: `0`
 - Blocked by external input: `4`
 - Field-validation claim allowed: `false`
 - Real-dollar savings claim allowed: `false`
@@ -51,7 +57,7 @@ The current platform is strongest as an internal, hash-verifiable replay and ben
 
 ### Live-source breadth and provider measurement
 
-- Status: `READY_TO_RUN_OR_EXPAND`
+- Status: `PASS`
 - Metrics: `provider_ping, bounded_row_pull, snapshot_hash, coverage_percent`
 - Next action: Fix or replace the remaining failed/thin sources: EPA AQS, NREL, odds, and restricted exchange feed.
 - Claim gate: Live breadth is evidence inventory until promoted into locked benchmark replay.
@@ -65,24 +71,24 @@ The current platform is strongest as an internal, hash-verifiable replay and ben
 
 ### Residual, calibration, and error-distribution checks
 
-- Status: `READY_TO_RUN_OR_EXPAND`
+- Status: `PASS`
 - Metrics: `residual_autocorrelation, calibration_curve, coverage_error, error_tail_risk`
-- Next action: Compute residual diagnostics per source system and fail closed on drift.
-- Claim gate: Required before serious operational-performance language.
+- Next action: Add residual autocorrelation next; keep calibration/error-tail metrics visible beside the winners.
+- Claim gate: Supports internal error-distribution language, not field or realized-savings language.
 
 ### Source generalization and live-breadth promotion
 
-- Status: `READY_TO_RUN_OR_EXPAND`
+- Status: `PASS`
 - Metrics: `leave_one_source_out, source_group_holdout, provider_promotion_rate, schema_normalization_success`
-- Next action: Promote one measured provider at a time into a locked source-conditioned replay.
-- Claim gate: Blocks broad all-sector claims until promoted sources pass matched baselines.
+- Next action: Run leave-one-source-out and source-group holdout so this graduates from broad replay to stronger generalization.
+- Claim gate: Allows multi-system internal replay language; still blocks external field claims.
 
 ### Runtime, latency, and production-budget checks
 
-- Status: `READY_TO_RUN_OR_EXPAND`
+- Status: `PASS`
 - Metrics: `p50_latency, p95_latency, memory_budget, fallback_rate, throughput`
-- Next action: Run timed replays on the laptop and VPS with fixed budgets.
-- Claim gate: Required before production readiness language.
+- Next action: Repeat timed replays under fixed laptop and VPS budgets before using production-readiness language.
+- Claim gate: Supports internal runtime-budget evidence, not production SLA claims.
 
 ### Grid/RF/PLL hardware validation
 

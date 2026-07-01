@@ -1,6 +1,6 @@
 # Live Domain Deployment Feed
 
-Generated UTC: `2026-07-01T13:07:11.661998+00:00`
+Generated UTC: `2026-07-01T13:39:13.529081+00:00`
 Live base: `https://lumen-core.ai`
 
 ## Current Answer
@@ -46,7 +46,7 @@ The live domain is serving matching hashes for every required reviewer proof fee
 | `geometry_asset_wiring_board` | `false` | `true` | `true` | https://lumen-core.ai/data/geometry_asset_wiring_board.json |
 | `luma_context_dashboard_parity_audit` | `false` | `true` | `true` | https://lumen-core.ai/data/luma_context_dashboard_parity_audit.json |
 | `champion_stress_test_matrix` | `false` | `true` | `true` | https://lumen-core.ai/data/champion_stress_test_matrix.json |
-| `champion_metric_battery` | `false` | `true` | `true` | https://lumen-core.ai/data/champion_metric_battery.json |
+| `champion_metric_battery` | `false` | `true` | `false` | - |
 | `proof_to_revenue_engine` | `false` | `true` | `true` | https://lumen-core.ai/data/proof_to_revenue_engine.json |
 | `first_buyer_target_board` | `false` | `true` | `true` | https://lumen-core.ai/data/first_buyer_target_board.json |
 | `live_domain_consolidation_audit` | `false` | `true` | `true` | https://lumen-core.ai/data/live_domain_consolidation_audit.json |
@@ -101,4 +101,4 @@ The live domain is serving matching hashes for every required reviewer proof fee
 
 Live-domain deployment feed only. Matching hosted hashes prove that the public domain is serving the same local proof feeds. They do not prove field validation, realized savings, grant award certainty, fixed frozen delta pricing, medical efficacy, or live trading performance.
 
-Deployment feed SHA-256: `ced27074f2d876ee9eb1a045eee694835d7bfaa3467d8e87091cde245f0f1f74`
+Deployment feed SHA-256: `791569cacd9918e70fd57548239c31f89ad590c3e965d23176d369f3ba20ca12`
