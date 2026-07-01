@@ -18,6 +18,8 @@ build/
 luma_live_keys.env
 .env.live
 .env.sports
+config/*token*.json
+config/*credential*.json
 *.key
 *.secret
 *_secret*

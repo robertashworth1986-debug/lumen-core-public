@@ -72,6 +72,13 @@ def test_bundle_contract_includes_expanded_bridge_and_domain_audit():
     assert "live_domain_consolidation_audit" in module.OPTIONAL_FEEDS
     assert "luma_operator_context" in module.OPTIONAL_FEEDS
     assert "champion_phase_proxy_diagnostics" in module.OPTIONAL_FEEDS
+    assert "safe_key_provider_ping" in module.OPTIONAL_FEEDS
+    assert "live_source_measurement_maximizer" in module.OPTIONAL_FEEDS
+    assert "geometry_live_wiring_matrix" in module.OPTIONAL_FEEDS
+    assert "geometry_live_breadth_proof_queue" in module.OPTIONAL_FEEDS
+    assert "branching_live_breadth_replay" in module.OPTIONAL_FEEDS
+    assert "rolling_champion_gate" in module.OPTIONAL_FEEDS
+    assert "top_geometry_live_replay_results" in module.OPTIONAL_FEEDS
 
 
 def test_bundle_manifest_and_archive_exclude_secret_or_bulk_data_paths(tmp_path):

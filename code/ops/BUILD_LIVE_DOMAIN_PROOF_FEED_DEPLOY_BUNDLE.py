@@ -58,6 +58,13 @@ OPTIONAL_FEEDS = [
     "paid_pilot_outreach_queue",
     "luma_operator_context",
     "champion_phase_proxy_diagnostics",
+    "safe_key_provider_ping",
+    "live_source_measurement_maximizer",
+    "geometry_live_wiring_matrix",
+    "geometry_live_breadth_proof_queue",
+    "branching_live_breadth_replay",
+    "rolling_champion_gate",
+    "top_geometry_live_replay_results",
 ]
 
 FORBIDDEN_NAME_FRAGMENTS = [

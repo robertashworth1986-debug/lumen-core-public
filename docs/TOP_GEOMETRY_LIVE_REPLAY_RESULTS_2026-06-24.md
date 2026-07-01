@@ -1,6 +1,6 @@
 # Top Geometry Live Replay Results
 
-Generated UTC: `2026-07-01T08:18:53.924393+00:00`
+Generated UTC: `2026-07-01T11:26:03.516942+00:00`
 
 ## Summary
 
@@ -10,7 +10,7 @@ Generated UTC: `2026-07-01T08:18:53.924393+00:00`
 - Candidate beats named baseline count: 3
 - Live-context rows evaluated: 150
 - Unique snapshot hashes: 16
-- Snapshot chain SHA-256: `71af2571c0f984a5d57dccd08b094ac750f59748263e7b4c2d22c072d4fa0b07`
+- Snapshot chain SHA-256: `8acf03a4c675043a175db10719baa652ca8232c96e7fcea6e6a0eca3634307d9`
 - Strict rolling champions: `5`
 - Triple-source candidate replays: `0`
 - Single-run candidate replays: `0`
@@ -21,9 +21,9 @@ Generated UTC: `2026-07-01T08:18:53.924393+00:00`
 
 | Rank | Lane | Candidate | Named Baseline | Adapter | Candidate Delta | Best Geometry | Rolling Gate | Evidence | Status |
 | ---: | --- | --- | --- | --- | ---: | --- | --- | --- | --- |
-| 1 | `optimal_curve_transport` | `brachistochrone_descent` | `minimum_jerk_curve` | `live_context_replay_ran` | 0.063803 | `brachistochrone_descent` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `true` |
-| 2 | `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `live_context_replay_ran` | 0.150958 | `kuramoto_phase_coupling` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `true` |
-| 3 | `branching_transport` | `leaf_veins` | `minimum_spanning_tree` | `live_context_replay_ran` | -0.032477 | `neural_dendritic_arbors` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `false` |
+| 1 | `optimal_curve_transport` | `brachistochrone_descent` | `minimum_jerk_curve` | `live_context_replay_ran` | 0.089477 | `brachistochrone_descent` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `true` |
+| 2 | `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `live_context_replay_ran` | 0.153002 | `kuramoto_phase_coupling` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `true` |
+| 3 | `branching_transport` | `leaf_veins` | `minimum_spanning_tree` | `live_context_replay_ran` | -0.016073 | `neural_dendritic_arbors` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `false` |
 | 4 | `thermal_ventilation` | `thermal_plume_convection` | `straight_duct` | `live_context_replay_ran` | 0.089064 | `termite_mound_ventilation` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `true` |
 | 5 | `time_series_model_routing` | `fractal_brownian_surface` | `` | `source_context_only_no_lane_adapter` | n/a | `n/a` | `not_promoted` | `live_breadth_source_available_needs_lane_replay` | `false` |
 

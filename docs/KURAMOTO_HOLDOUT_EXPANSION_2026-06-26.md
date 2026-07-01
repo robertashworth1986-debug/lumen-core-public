@@ -1,6 +1,6 @@
 # Kuramoto Holdout Expansion
 
-Generated UTC: `2026-06-29T19:04:06.592233+00:00`
+Generated UTC: `2026-07-01T11:26:05.882035+00:00`
 
 Kuramoto holdout expansion is internal source-conditioned replay evidence. It uses local/uploaded measured source files from the geometry live-source manifest to derive deterministic benchmark stress profiles, then compares kuramoto_phase_coupling against kalman_filter and the best same-run baseline under the existing wave-resonance timing adapter. It is not field validation, not grid/RF/PLL hardware validation, not realized savings, not a fixed-dollar frozen-delta sale claim, not medical treatment evidence, and not a trading signal.
 
@@ -8,7 +8,7 @@ Kuramoto holdout expansion is internal source-conditioned replay evidence. It us
 
 - Holdout routes replayed: `24`
 - Source systems covered: `4` (energy_grid, macro_rates_labor, market_data, sports_market)
-- Estimated rows replayed: `2507379`
+- Estimated rows replayed: `2506267`
 - Numeric samples read: `66690`
 - Candidate: `kuramoto_phase_coupling`
 - Named baseline: `kalman_filter`
@@ -16,11 +16,11 @@ Kuramoto holdout expansion is internal source-conditioned replay evidence. It us
 - Win rate vs Kalman: `1.0`
 - 95% Wilson win-rate interval: `0.862024` to `1.0`
 - One-sided sign-test p-value: `6e-08`
-- Mean delta vs Kalman: `0.143725`
+- Mean delta vs Kalman: `0.140668`
 - Delta range vs Kalman: `0.044697` to `0.220761`
 - Passes internal 20-holdout gate: `true`
 - Ready for buyer-authorized field replay request: `true`
-- Holdout chain SHA-256: `b8c575a1d68ee262837d55ed9c4dff94c1cb9a3071eb9700ce4cb0c8c8d56b79`
+- Holdout chain SHA-256: `2227dd06869d292c82918d3f9cfab2b87cbe441cd44e398ec4a1024c6f5a655c`
 
 ## Reviewer-Safe Interpretation
 
@@ -32,8 +32,8 @@ This is stronger than the prior four-route replay because it broadens the held-o
 | ---: | --- | --- | ---: | ---: | ---: | --- | --- |
 | 1 | `energy_grid` | `C:/Users/Novac/AppData/Local/Temp/Net_generation_United_States_all_sectors_annual (1).csv` | `0.579467` | `0.376377` | `0.20309` | `true` | `5a63a8347cd58ef4` |
 | 2 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_master_index.csv__4839a4e25d.csv` | `0.592508` | `0.406622` | `0.185886` | `true` | `ae5fbc8563f6cc4d` |
-| 3 | `macro_rates_labor` | `C:/Users/Novac/AppData/Local/Temp/bad7a574-0d58-4775-8383-d22a001f05cb_HYBRID_EVOLUTION_V2_20260324T015042Z.zip.5cb/raw/macro/macro_merged.csv` | `0.582762` | `0.377856` | `0.204906` | `true` | `ccbcd1158cafaaf2` |
-| 4 | `sports_market` | `data/live_measured/the_odds_api/the_odds_api_20260629T184753Z.csv` | `0.781179` | `0.68443` | `0.096749` | `true` | `e3b0c44298fc1c14` |
+| 3 | `macro_rates_labor` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/fred_DGS10_e437c5a7fd.csv` | `0.662912` | `0.503168` | `0.159744` | `true` | `7a251ff932340deb` |
+| 4 | `sports_market` | `data/live_measured/the_odds_api/the_odds_api_20260701T060342Z.csv` | `0.845646` | `0.777107` | `0.068539` | `true` | `e3b0c44298fc1c14` |
 | 5 | `energy_grid` | `C:/Users/Novac/AppData/Local/Temp/Net_generation_for_all_sectors (1).csv` | `0.448535` | `0.28038` | `0.168155` | `true` | `06e29941cea5dab8` |
 | 6 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/full_beast_leaderboard.csv` | `0.55108` | `0.341805` | `0.209275` | `true` | `7a3e0a8edd1c4bc1` |
 | 7 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__R.csv__06d36a49d5.csv` | `0.809618` | `0.738934` | `0.070684` | `true` | `8ef08751d25f7512` |

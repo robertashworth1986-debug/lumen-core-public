@@ -108,6 +108,20 @@ def test_feed_contract_includes_expanded_bridge_and_domain_audit():
     assert "Anti-drift operator context" in specs["luma_operator_context"]["why"]
     assert specs["champion_phase_proxy_diagnostics"]["required"] is False
     assert "phase/coherence/residual proxy" in specs["champion_phase_proxy_diagnostics"]["why"]
+    assert specs["safe_key_provider_ping"]["required"] is False
+    assert "without exposing secrets" in specs["safe_key_provider_ping"]["why"]
+    assert specs["live_source_measurement_maximizer"]["required"] is False
+    assert "fresh row count" in specs["live_source_measurement_maximizer"]["why"]
+    assert specs["geometry_live_wiring_matrix"]["required"] is False
+    assert "measured live-source readiness" in specs["geometry_live_wiring_matrix"]["why"]
+    assert specs["geometry_live_breadth_proof_queue"]["required"] is False
+    assert "proof expansion" in specs["geometry_live_breadth_proof_queue"]["why"]
+    assert specs["branching_live_breadth_replay"]["required"] is False
+    assert "negative evidence" in specs["branching_live_breadth_replay"]["why"]
+    assert specs["rolling_champion_gate"]["required"] is False
+    assert "real-dollar claim blockers" in specs["rolling_champion_gate"]["why"]
+    assert specs["top_geometry_live_replay_results"]["required"] is False
+    assert "named-baseline beat counts" in specs["top_geometry_live_replay_results"]["why"]
 
 
 def test_all_required_hosted_hashes_matching_makes_domain_reviewer_ready(tmp_path, monkeypatch):

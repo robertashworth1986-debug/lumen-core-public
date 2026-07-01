@@ -1,7 +1,7 @@
 # Champion Stress Test Matrix
 
-Generated UTC: `2026-07-01T10:59:26.421022+00:00`
-Matrix SHA-256: `ae15a498e095ec6c7a180d7f59ef54e0b033fee83c50873682e73fb8f8bbbee3`
+Generated UTC: `2026-07-01T11:27:15.344676+00:00`
+Matrix SHA-256: `0aa2e3a115a3c3fa660db77a3c02e6f7424299f921eded86f080aa37f2155a15`
 
 ## Truth Line
 
@@ -14,9 +14,9 @@ This is the current money-printer truth line: Kuramoto phase coupling is a stron
 - Holdout wins: `24/24`
 - Wins vs best same-run baseline: `24/24`
 - Source systems: `4`
-- Estimated rows replayed: `2507379`
+- Estimated rows replayed: `2506267`
 - Numeric samples read: `66690`
-- Mean delta vs named baseline: `0.143725`
+- Mean delta vs named baseline: `0.140668`
 - Weakest delta vs named baseline: `0.044697`
 - Live-domain hash verified: `true`
 
@@ -42,9 +42,9 @@ Not allowed yet:
 | Source | Holdouts | Rows | Numeric Samples | Wins | Mean Delta | Fallbacks |
 |---|---:|---:|---:|---:|---:|---:|
 | `energy_grid` | 2 | 441505 | 3690 | 2 | 0.185622 | 0 |
-| `macro_rates_labor` | 1 | 17156 | 3000 | 1 | 0.204906 | 0 |
+| `macro_rates_labor` | 1 | 16044 | 3000 | 1 | 0.159744 | 0 |
 | `market_data` | 20 | 2048718 | 60000 | 20 | 0.138825 | 0 |
-| `sports_market` | 1 | 0 | 0 | 1 | 0.096749 | 1 |
+| `sports_market` | 1 | 0 | 0 | 1 | 0.068539 | 1 |
 
 ## Metric Battery
 
@@ -56,11 +56,11 @@ Not allowed yet:
 | `weakest_margin_positive` | `PASS` | `0.044697` | > 0.0 |
 | `best_baseline_weakest_margin_positive` | `PASS` | `0.044697` | > 0.0 |
 | `source_system_diversity` | `PASS` | `4` | >= 4 source systems |
-| `estimated_row_depth` | `PASS` | `2507379` | >= 1,000,000 estimated rows |
+| `estimated_row_depth` | `PASS` | `2506267` | >= 1,000,000 estimated rows |
 | `numeric_sample_depth` | `PASS` | `66690` | >= 50,000 numeric samples read |
 | `fallback_rate_low` | `PASS` | `0.041667` | <= 10% fallback-profile holdouts |
 | `rank_1_share` | `PASS` | `0.416667` | >= 40% rank-1 holdouts |
-| `stress_profile_coverage` | `PASS` | `10` | >= 3 stressed-profile holdouts |
+| `stress_profile_coverage` | `PASS` | `9` | >= 3 stressed-profile holdouts |
 | `trend_profile_coverage` | `PASS` | `11` | >= 3 nonflat-trend holdouts |
 | `shock_profile_coverage` | `PASS` | `16` | >= 3 shock-bearing holdouts |
 | `hosted_hash_verification` | `PASS` | `LIVE_DOMAIN_HASH_VERIFIED` | LIVE_DOMAIN_HASH_VERIFIED |

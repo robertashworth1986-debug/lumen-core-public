@@ -1,6 +1,6 @@
 # Champion Metric Gauntlet
 
-Generated UTC: `2026-07-01T10:15:31.074737+00:00`
+Generated UTC: `2026-07-01T11:27:18.744447+00:00`
 
 ## What To Ask Me
 
@@ -26,16 +26,16 @@ Kuramoto phase coupling is the current internal champion because it beat kalman_
 - Lane: `wave_resonance_timing`
 - Named baseline: `kalman_filter`
 - Holdout wins: `24/24`
-- Mean delta vs baseline: `0.143725`
+- Mean delta vs baseline: `0.140668`
 - Min delta vs baseline: `0.044697`
 - Source systems: `4`
 - Broader measured providers: `17/23`
 - Manifest unique sources: `186`
 - Manifest ready benchmark rows: `313`
-- Estimated rows replayed: `2507379`
+- Estimated rows replayed: `2506267`
 - Sign-test p-value: `6e-08`
 - Wilson lower 95% win-rate bound: `0.862024`
-- Holdout chain SHA-256: `b8c575a1d68ee262837d55ed9c4dff94c1cb9a3071eb9700ce4cb0c8c8d56b79`
+- Holdout chain SHA-256: `2227dd06869d292c82918d3f9cfab2b87cbe441cd44e398ec4a1024c6f5a655c`
 
 ## Safe Claim State
 
@@ -56,9 +56,9 @@ The champion replay source count and the broader live-source universe are intent
 - Champion replay source systems: `4`
 - Champion replay source names: `energy_grid, macro_rates_labor, market_data, sports_market`
 - Fresh measured providers: `17` of `23`
-- Fresh measured rows in latest bounded pull: `523`
-- Measured provider names: `AIRNOW, ALPACA, ALPHAVANTAGE, BEA, BLS, CENSUS, COINGECKO_PUBLIC, FINNHUB, FRED, GRANTS_GOV, KRAKEN, KRAKEN_PUBLIC, MASSIVE, NOAA_NCEI, TWELVE_DATA, USGS_WATER, WEBHOOK`
-- Failed or thin provider names: `BINANCE_PUBLIC, EIA, EPA_AQS, NASA, NREL, THE_ODDS_API`
+- Fresh measured rows in latest bounded pull: `465`
+- Measured provider names: `AIRNOW, ALPACA, ALPHAVANTAGE, BEA, BLS, CENSUS, COINGECKO_PUBLIC, FINNHUB, FRED, GRANTS_GOV, KRAKEN, KRAKEN_PUBLIC, MASSIVE, NASA, TWELVE_DATA, USGS_WATER, WEBHOOK`
+- Failed or thin provider names: `BINANCE_PUBLIC, EIA, EPA_AQS, NOAA_NCEI, NREL, THE_ODDS_API`
 - Manifest unique source count: `186`
 - Manifest ready-for-benchmark row count: `313`
 - Manifest estimated rows mapped: `9845413`
@@ -94,8 +94,8 @@ A fixed dollar or realized-savings claim stays blocked until a buyer, lab, utili
 - `sign_test_strength`: `PASS` | actual `6e-08` | threshold `<= 0.001`
 - `wilson_lower_bound`: `PASS` | actual `0.862024` | threshold `>= 0.75`
 - `source_system_diversity`: `PASS` | actual `4` | threshold `>= 3 source systems`
-- `row_replay_depth`: `PASS` | actual `2507379` | threshold `>= 1,000,000 estimated rows replayed`
-- `hash_chain_present`: `PASS` | actual `b8c575a1d68e...` | threshold `64 hex characters`
+- `row_replay_depth`: `PASS` | actual `2506267` | threshold `>= 1,000,000 estimated rows replayed`
+- `hash_chain_present`: `PASS` | actual `2227dd06869d...` | threshold `64 hex characters`
 - `vault_hashes_verified`: `PASS` | actual `True` | threshold `true`
 - `all_families_live_benchmarked`: `BLOCKED` | actual `False` | threshold `true before broad all-family claims`
 - `live_domain_feed_routed`: `PASS` | actual `12/12 required hosted hashes match; 0 stale/missing` | threshold `all required hosted hashes match before hosted reviewer proof claim`
@@ -115,7 +115,7 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 - Status: `EVIDENCED_CORE_READY_TO_EXPAND`
 - Question: Does the champion reduce error against a named incumbent baseline?
 - Metrics: `MAE, RMSE, MAPE_or_SMAPE, WAPE, residual_bias, residual_autocorrelation`
-- Current evidence: 24/24 holdout wins vs kalman_filter with minimum delta 0.044697 and 2,507,379 estimated rows replayed.
+- Current evidence: 24/24 holdout wins vs kalman_filter with minimum delta 0.044697 and 2,506,267 estimated rows replayed.
 - Next action: Add per-source residual health tables before promoting more live-breadth providers into the champion replay.
 - Claim gate: Internal champion claim allowed; field-performance language remains blocked.
 
@@ -218,4 +218,4 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 
 Champion metric gauntlet only. This artifact explains the current internal winner, the tests it has passed, the tests it has not passed, and the safest claim language. It does not create field validation, realized savings, trading profit, medical efficacy, award certainty, or a fixed dollar price for frozen deltas.
 
-Gauntlet SHA-256: `9748f64153daa69f2a33dda7defa2bd1001e44b573731815274785cd22f065bf`
+Gauntlet SHA-256: `28582b81760bb2f2d2b522d1c03f3dd5778c5cc69867ee6cfcbf6d79261f767c`

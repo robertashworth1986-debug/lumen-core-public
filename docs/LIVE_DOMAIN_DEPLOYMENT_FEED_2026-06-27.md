@@ -1,6 +1,6 @@
 # Live Domain Deployment Feed
 
-Generated UTC: `2026-07-01T10:59:31.006454+00:00`
+Generated UTC: `2026-07-01T11:48:22.712989+00:00`
 Live base: `https://lumen-core.ai`
 
 ## Current Answer
@@ -21,7 +21,7 @@ The live domain is serving matching hashes for every required reviewer proof fee
 - Label: `Kuramoto phase coupling`
 - Named baseline: `kalman_filter`
 - Holdout wins: `24/24`
-- Estimated rows replayed: `2507379`
+- Estimated rows replayed: `2506267`
 - Source systems: `4`
 - Buyer-authorized field replay request ready: `true`
 - Field-validation claim allowed: `false`
@@ -51,6 +51,13 @@ The live domain is serving matching hashes for every required reviewer proof fee
 | `live_domain_consolidation_audit` | `false` | `true` | `true` | https://lumen-core.ai/data/live_domain_consolidation_audit.json |
 | `luma_operator_context` | `false` | `true` | `true` | https://lumen-core.ai/data/luma_operator_context.json |
 | `champion_phase_proxy_diagnostics` | `false` | `true` | `true` | https://lumen-core.ai/data/champion_phase_proxy_diagnostics.json |
+| `safe_key_provider_ping` | `false` | `true` | `true` | https://lumen-core.ai/data/safe_key_provider_ping.json |
+| `live_source_measurement_maximizer` | `false` | `true` | `true` | https://lumen-core.ai/data/live_source_measurement_maximizer.json |
+| `geometry_live_wiring_matrix` | `false` | `true` | `true` | https://lumen-core.ai/data/geometry_live_wiring_matrix.json |
+| `geometry_live_breadth_proof_queue` | `false` | `true` | `true` | https://lumen-core.ai/data/geometry_live_breadth_proof_queue.json |
+| `branching_live_breadth_replay` | `false` | `true` | `true` | https://lumen-core.ai/data/branching_live_breadth_replay.json |
+| `rolling_champion_gate` | `false` | `true` | `true` | https://lumen-core.ai/data/rolling_champion_gate.json |
+| `top_geometry_live_replay_results` | `false` | `true` | `true` | https://lumen-core.ai/data/top_geometry_live_replay_results.json |
 
 ## Reviewer URLs
 
@@ -93,4 +100,4 @@ The live domain is serving matching hashes for every required reviewer proof fee
 
 Live-domain deployment feed only. Matching hosted hashes prove that the public domain is serving the same local proof feeds. They do not prove field validation, realized savings, grant award certainty, fixed frozen delta pricing, medical efficacy, or live trading performance.
 
-Deployment feed SHA-256: `f81976a329e4e43658cb8031610d53152f4484ffd38d1091b951de19c140b255`
+Deployment feed SHA-256: `ced03e6b9ae6d569c783f988a0184e4d2a5ee6face82ece9ec53f6252f5a1f4b`

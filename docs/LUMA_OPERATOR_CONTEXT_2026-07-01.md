@@ -1,15 +1,15 @@
 # Luma Operator Context
 
-Generated UTC: `2026-07-01T10:59:26.736010+00:00`
-Context SHA-256: `3176948b9c6f146f3f6a97d47da566de337d853dc4973bd63cf697a1c783677d`
+Generated UTC: `2026-07-01T11:51:01.521182+00:00`
+Context SHA-256: `bc34b259ccfe2805a0d44a95b9e4649eca523cc3b98fbc46d44e50862f249f69`
 
 ## Current Truth
 
 - Champion: `kuramoto_phase_coupling` vs `kalman_filter`
 - Holdout wins: `24/24`
-- Mean delta: `0.143725`
+- Mean delta: `0.140668`
 - Weakest delta: `0.044697`
-- Estimated rows replayed: `2507379`
+- Estimated rows replayed: `2506267`
 - Source systems in champion replay: `4`
 - Buyer field replay request ready: `true`
 - Field validation claim allowed: `false`

@@ -150,6 +150,48 @@ PROOF_FEEDS = [
         "required": False,
         "why": "Replay-data phase/coherence/residual proxy diagnostics for the current champion.",
     },
+    {
+        "key": "safe_key_provider_ping",
+        "local": "dashboard/data/safe_key_provider_ping.json",
+        "required": False,
+        "why": "Masked provider-key readiness and API ping status without exposing secrets.",
+    },
+    {
+        "key": "live_source_measurement_maximizer",
+        "local": "dashboard/data/live_source_measurement_maximizer.json",
+        "required": False,
+        "why": "Latest measured-source count, fresh row count, and blocked/thin source diagnostics.",
+    },
+    {
+        "key": "geometry_live_wiring_matrix",
+        "local": "dashboard/data/geometry_live_wiring_matrix.json",
+        "required": False,
+        "why": "Maps geometry lanes to measured live-source readiness and remaining claim gates.",
+    },
+    {
+        "key": "geometry_live_breadth_proof_queue",
+        "local": "dashboard/data/geometry_live_breadth_proof_queue.json",
+        "required": False,
+        "why": "Ranks candidate geometry families for live-breadth proof expansion.",
+    },
+    {
+        "key": "branching_live_breadth_replay",
+        "local": "dashboard/data/branching_live_breadth_replay.json",
+        "required": False,
+        "why": "Branching-family live replay status, including negative evidence when baselines still lead.",
+    },
+    {
+        "key": "rolling_champion_gate",
+        "local": "dashboard/data/rolling_champion_gate.json",
+        "required": False,
+        "why": "Promotion gate for repeat winners, triple-source candidates, and real-dollar claim blockers.",
+    },
+    {
+        "key": "top_geometry_live_replay_results",
+        "local": "dashboard/data/top_geometry_live_replay_results.json",
+        "required": False,
+        "why": "Top geometry replay cards and named-baseline beat counts across current live context.",
+    },
 ]
 
 REMOTE_TEMPLATES = [
