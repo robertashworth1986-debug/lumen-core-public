@@ -1,6 +1,6 @@
 # Live Domain Deployment Feed
 
-Generated UTC: `2026-07-01T13:45:34.827515+00:00`
+Generated UTC: `2026-07-01T13:51:29.981368+00:00`
 Live base: `https://lumen-core.ai`
 
 ## Current Answer
@@ -46,19 +46,19 @@ The live domain is serving matching hashes for every required reviewer proof fee
 | `geometry_asset_wiring_board` | `false` | `true` | `true` | https://lumen-core.ai/data/geometry_asset_wiring_board.json |
 | `luma_context_dashboard_parity_audit` | `false` | `true` | `true` | https://lumen-core.ai/data/luma_context_dashboard_parity_audit.json |
 | `champion_stress_test_matrix` | `false` | `true` | `true` | https://lumen-core.ai/data/champion_stress_test_matrix.json |
-| `champion_metric_battery` | `false` | `true` | `false` | - |
+| `champion_metric_battery` | `false` | `true` | `true` | https://lumen-core.ai/data/champion_metric_battery.json |
 | `proof_to_revenue_engine` | `false` | `true` | `true` | https://lumen-core.ai/data/proof_to_revenue_engine.json |
 | `first_buyer_target_board` | `false` | `true` | `true` | https://lumen-core.ai/data/first_buyer_target_board.json |
 | `live_domain_consolidation_audit` | `false` | `true` | `true` | https://lumen-core.ai/data/live_domain_consolidation_audit.json |
-| `luma_operator_context` | `false` | `true` | `false` | - |
+| `luma_operator_context` | `false` | `true` | `true` | https://lumen-core.ai/data/luma_operator_context.json |
 | `champion_phase_proxy_diagnostics` | `false` | `true` | `true` | https://lumen-core.ai/data/champion_phase_proxy_diagnostics.json |
-| `safe_key_provider_ping` | `false` | `true` | `false` | - |
+| `safe_key_provider_ping` | `false` | `true` | `true` | https://lumen-core.ai/data/safe_key_provider_ping.json |
 | `live_source_measurement_maximizer` | `false` | `true` | `true` | https://lumen-core.ai/data/live_source_measurement_maximizer.json |
-| `geometry_live_wiring_matrix` | `false` | `true` | `false` | - |
+| `geometry_live_wiring_matrix` | `false` | `true` | `true` | https://lumen-core.ai/data/geometry_live_wiring_matrix.json |
 | `geometry_live_breadth_proof_queue` | `false` | `true` | `true` | https://lumen-core.ai/data/geometry_live_breadth_proof_queue.json |
 | `branching_live_breadth_replay` | `false` | `true` | `true` | https://lumen-core.ai/data/branching_live_breadth_replay.json |
-| `rolling_champion_gate` | `false` | `true` | `false` | - |
-| `top_geometry_live_replay_results` | `false` | `true` | `false` | - |
+| `rolling_champion_gate` | `false` | `true` | `true` | https://lumen-core.ai/data/rolling_champion_gate.json |
+| `top_geometry_live_replay_results` | `false` | `true` | `true` | https://lumen-core.ai/data/top_geometry_live_replay_results.json |
 
 ## Reviewer URLs
 
@@ -101,4 +101,4 @@ The live domain is serving matching hashes for every required reviewer proof fee
 
 Live-domain deployment feed only. Matching hosted hashes prove that the public domain is serving the same local proof feeds. They do not prove field validation, realized savings, grant award certainty, fixed frozen delta pricing, medical efficacy, or live trading performance.
 
-Deployment feed SHA-256: `06307de00ba584aa6e8ab329c64389878b1a71d386135f8a16720e0d18ba4a6c`
+Deployment feed SHA-256: `13b472ac2e7d73ade26b98ece7b96400ba6ac62af274b3899a1ac0f1c5e999c7`
