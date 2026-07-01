@@ -1,16 +1,16 @@
 # Top Geometry Live Replay Results
 
-Generated UTC: `2026-07-01T11:26:03.516942+00:00`
+Generated UTC: `2026-07-01T13:08:58.944593+00:00`
 
 ## Summary
 
 - Replay cards: 5
 - Adapter replays run: 4
 - Source-context-only cards: 1
-- Candidate beats named baseline count: 3
+- Candidate beats named baseline count: 4
 - Live-context rows evaluated: 150
 - Unique snapshot hashes: 16
-- Snapshot chain SHA-256: `8acf03a4c675043a175db10719baa652ca8232c96e7fcea6e6a0eca3634307d9`
+- Snapshot chain SHA-256: `60a692c3c47d37ba3051122bc04f08f173fa47cd6476e0b290a801b70133e537`
 - Strict rolling champions: `5`
 - Triple-source candidate replays: `0`
 - Single-run candidate replays: `0`
@@ -21,10 +21,10 @@ Generated UTC: `2026-07-01T11:26:03.516942+00:00`
 
 | Rank | Lane | Candidate | Named Baseline | Adapter | Candidate Delta | Best Geometry | Rolling Gate | Evidence | Status |
 | ---: | --- | --- | --- | --- | ---: | --- | --- | --- | --- |
-| 1 | `optimal_curve_transport` | `brachistochrone_descent` | `minimum_jerk_curve` | `live_context_replay_ran` | 0.089477 | `brachistochrone_descent` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `true` |
-| 2 | `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `live_context_replay_ran` | 0.153002 | `kuramoto_phase_coupling` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `true` |
-| 3 | `branching_transport` | `leaf_veins` | `minimum_spanning_tree` | `live_context_replay_ran` | -0.016073 | `neural_dendritic_arbors` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `false` |
-| 4 | `thermal_ventilation` | `thermal_plume_convection` | `straight_duct` | `live_context_replay_ran` | 0.089064 | `termite_mound_ventilation` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `true` |
+| 1 | `optimal_curve_transport` | `brachistochrone_descent` | `minimum_jerk_curve` | `live_context_replay_ran` | 0.081878 | `brachistochrone_descent` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `true` |
+| 2 | `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `live_context_replay_ran` | 0.134564 | `kuramoto_phase_coupling` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `true` |
+| 3 | `branching_transport` | `leaf_veins` | `minimum_spanning_tree` | `live_context_replay_ran` | 0.007485 | `crack_propagation_paths` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `true` |
+| 4 | `thermal_ventilation` | `thermal_plume_convection` | `straight_duct` | `live_context_replay_ran` | 0.107024 | `thermal_plume_convection` | `rolling_champion` | `repeat_rolling_champion_claim_still_needs_field_validation` | `true` |
 | 5 | `time_series_model_routing` | `fractal_brownian_surface` | `` | `source_context_only_no_lane_adapter` | n/a | `n/a` | `not_promoted` | `live_breadth_source_available_needs_lane_replay` | `false` |
 
 ## Claim Boundary

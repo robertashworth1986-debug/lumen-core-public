@@ -1,7 +1,7 @@
 # Luma Operator Context
 
-Generated UTC: `2026-07-01T11:51:01.521182+00:00`
-Context SHA-256: `bc34b259ccfe2805a0d44a95b9e4649eca523cc3b98fbc46d44e50862f249f69`
+Generated UTC: `2026-07-01T13:06:10.824021+00:00`
+Context SHA-256: `cdc305edc18ac8600ed87b6c641ac438ad57c8416d0ff1f320c562fdd45f9e3d`
 
 ## Current Truth
 
@@ -15,7 +15,7 @@ Context SHA-256: `bc34b259ccfe2805a0d44a95b9e4649eca523cc3b98fbc46d44e50862f249f
 - Field validation claim allowed: `false`
 - Real dollar savings claim allowed: `false`
 
-Kuramoto phase coupling is the current internal champion because it beat kalman_filter on 24/24 source-conditioned holdouts across 4 champion-replay source systems. The broader live-source universe currently shows 17 measured providers and 186 mapped source files/feeds available for additional benchmark promotion. That is strong enough to request a buyer-authorized field replay, but it is not field validation or realized dollar savings yet.
+Kuramoto phase coupling is the current internal champion because it beat kalman_filter on 24/24 source-conditioned holdouts across 4 champion-replay source systems. The broader live-source universe currently shows 19 measured providers and 186 mapped source files/feeds available for additional benchmark promotion. That is strong enough to request a buyer-authorized field replay, but it is not field validation or realized dollar savings yet.
 
 ## Live Domain
 
@@ -29,16 +29,19 @@ Kuramoto phase coupling is the current internal champion because it beat kalman_
 - Runtime-bound keys: `31`
 - Measured enabled sources: `23/23`
 - Measured sectors: `17/17`
-- Latest measured providers in safe ping: `15`
-- Latest blocked/thin providers in safe ping: `7`
+- Fresh HTTP measured sources: `19/23`
+- Fresh HTTP measured rows: `516`
+- Live-context replay rows: `150`
+- Live-context candidate wins vs named baselines: `4`
+- Live-context snapshot chain: `60a692c3c47d37ba3051122bc04f08f173fa47cd6476e0b290a801b70133e537`
+- Latest measured providers in safe ping: `17`
+- Latest blocked/thin providers in safe ping: `5`
 
 Provider gaps to fix:
 - `ALPACA`: `NO_LATEST_STATUS`; next: Add this provider to the latest safe ping/harvest adapter so key-ready becomes measured, not merely configured.
 - `BINANCE_PUBLIC`: `PROBE_FAILED_OR_THIN`; next: Do not fight the location restriction; use Kraken/CoinGecko or another allowed market source instead.
-- `EIA`: `PROBE_FAILED_OR_THIN`; next: Rerun the EIA probe and promote existing local EIA CSV/API pulls; 502 appears upstream, not proof failure.
 - `EPA_AQS`: `PROBE_FAILED_OR_THIN`; next: Refresh the EPA AQS email/key pair; the latest probe reports invalid email/key.
 - `KRAKEN`: `NO_LATEST_STATUS`; next: Add this provider to the latest safe ping/harvest adapter so key-ready becomes measured, not merely configured.
-- `NASA`: `PROBE_FAILED_OR_THIN`; next: Rerun with a longer timeout and a smaller endpoint before declaring NASA unavailable.
 - `NREL`: `PROBE_FAILED_OR_THIN`; next: Retry DNS/network and use a known NREL developer endpoint; current failure is name resolution.
 - `SAM_GOV`: `UNCONFIGURED`; next: Enable only if this source is needed for the current proof lane, then bind the expected API key.
 - `THE_ODDS_API`: `PROBE_FAILED_OR_THIN`; next: Reactivate or replace the key before using sports-market data in current proof claims.

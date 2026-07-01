@@ -1,6 +1,6 @@
 # Geometry Live Systems Frontier
 
-Generated UTC: `2026-07-01T09:35:44.005273+00:00`
+Generated UTC: `2026-07-01T13:03:26.767067+00:00`
 
 Geometry live-systems frontier only. It ranks local evidence and uploaded measured-data candidates for next benchmark wiring. It does not establish field validation, clinical validation, safety certification, live trading permission, fixed-dollar frozen-delta value, realized savings, or grant-award certainty.
 
@@ -9,17 +9,17 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 - Registered families ranked: `140` / `140`
 - Lanes: `12`
 - Local uploaded/live files inventoried: `3063`
-- Local estimated data rows: `4367681`
+- Local estimated data rows: `4406117`
 - Provider snapshot files: `66`
-- Canonical measured sources: `17`
-- Canonical measured rows: `523`
+- Canonical measured sources: `19`
+- Canonical measured rows: `516`
 - Top family: `kuramoto_phase_coupling`
-- Top family score: `284.63`
+- Top family score: `283.155`
 - Field validation claim allowed: `false`
 - Real-dollar savings claim allowed: `false`
 - Live trading/autonomous execution allowed: `false`
 - Medical/addiction-treatment claim allowed: `false`
-- Frontier SHA-256: `c098b666c95629a7664c4bea7c34a29894993c8c182e8f6f7a0fdd1d95b438e6`
+- Frontier SHA-256: `62af282465b288646003451f21ead35824892c001e146b38464b76a3966e1dd0`
 
 ## Next 10 Actions
 
@@ -40,11 +40,11 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 
 | System | Files | Estimated Rows | Candidate Lanes |
 | --- | --- | --- | --- |
-| `market_data` | `1318` | `2859946` | energy_price_pressure_proxy, market_signal_geometry, wave_resonance_timing |
-| `unclassified_measured_file` | `1033` | `681566` |  |
+| `market_data` | `1318` | `2860237` | energy_price_pressure_proxy, market_signal_geometry, wave_resonance_timing |
+| `unclassified_measured_file` | `1037` | `719701` |  |
 | `energy_grid` | `54` | `447220` | branching_transport, energy_price_pressure_proxy, thermal_ventilation, wave_resonance_timing |
 | `maritime_ais` | `82` | `258964` | branching_transport, field_guided_control, optimal_curve_transport |
-| `federal_opportunity` | `568` | `48365` | multi_agent_coordination, resource_aware_scheduling |
+| `federal_opportunity` | `564` | `48361` | multi_agent_coordination, resource_aware_scheduling |
 | `macro_rates_labor` | `20` | `71819` | energy_price_pressure_proxy, market_signal_geometry, wave_resonance_timing |
 | `sports_market` | `32` | `29` | market_signal_geometry, wave_resonance_timing |
 | `water_hydrology` | `10` | `688` | branching_transport, mission_network_routing |
@@ -55,10 +55,10 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 
 | Rank | Family | Lane | Score | Evidence |
 | --- | --- | --- | --- | --- |
-| `1` | `kuramoto_phase_coupling` | `wave_resonance_timing` | `284.63` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, paid_pilot_scoping_candidate, robust_repeat_uncertainty_gate_passed, rolling_champion |
-| `2` | `brachistochrone_descent` | `optimal_curve_transport` | `275.863` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, paid_pilot_scoping_candidate, robust_repeat_uncertainty_gate_passed, rolling_champion |
-| `3` | `thermal_plume_convection` | `thermal_ventilation` | `197.607` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, rolling_champion |
-| `4` | `leaf_veins` | `branching_transport` | `181.551` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, rolling_champion |
+| `1` | `kuramoto_phase_coupling` | `wave_resonance_timing` | `283.155` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, paid_pilot_scoping_candidate, robust_repeat_uncertainty_gate_passed, rolling_champion |
+| `2` | `brachistochrone_descent` | `optimal_curve_transport` | `277.489` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, paid_pilot_scoping_candidate, robust_repeat_uncertainty_gate_passed, rolling_champion |
+| `3` | `thermal_plume_convection` | `thermal_ventilation` | `199.223` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, rolling_champion |
+| `4` | `leaf_veins` | `branching_transport` | `182.224` | action_replay_lane_winner, asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, local_live_system_files_available, natural_logic_present, rolling_champion |
 | `5` | `fractal_brownian_surface` | `time_series_model_routing` | `109.392` | asset_board_ranked, benchmark_hypothesis_present, distinct_run_hash_count_ge_2, live_context_replay_card, natural_logic_present, not_promoted |
 | `6` | `beast_algo_cross_asset_resonance` | `wave_resonance_timing` | `108.333` | asset_board_ranked, benchmark_hypothesis_present, local_live_system_files_available, natural_logic_present |
 | `7` | `beast_algo_curvature_pressure` | `optimal_curve_transport` | `107.333` | asset_board_ranked, benchmark_hypothesis_present, local_live_system_files_available, natural_logic_present |

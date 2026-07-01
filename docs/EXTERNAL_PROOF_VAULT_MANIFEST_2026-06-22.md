@@ -1,6 +1,6 @@
 # Luma External Proof Vault Packet
 
-Generated UTC: `2026-07-01T09:33:18.509712+00:00`
+Generated UTC: `2026-07-01T12:59:47.393339+00:00`
 
 ## Purpose
 
@@ -10,8 +10,8 @@ Non-destructive staging manifest for high-value proof artifacts on external stor
 
 - Artifacts ready: `35/35`
 - Missing required: `0`
-- Ready bytes: `1667124`
-- Drive free bytes at staging time: `47263416320`
+- Ready bytes: `1663661`
+- Drive free bytes at staging time: `43460923392`
 - Packet ready: `true`
 
 ## Boundary
@@ -27,9 +27,9 @@ A proof vault is provenance and reproducibility infrastructure. It does not crea
 - `out/ops/luma_context_dashboard_parity_audit_latest.json` -> `artifacts/continuity/out/ops/luma_context_dashboard_parity_audit_latest.json` | sha256 `757fe628616e5d0a041e390abc18088b55ec672eb483b410d3571957098b7c20`
 - `docs/LIVE_PROOF_VALUE_METER_2026-06-22.md` -> `artifacts/proof_value/docs/LIVE_PROOF_VALUE_METER_2026-06-22.md` | sha256 `a1dea51a383e6f3c2577a3fa1443d80115963d6f43299021682aa50ace12ae34`
 - `out/ops/live_proof_value_meter_latest.json` -> `artifacts/proof_value/out/ops/live_proof_value_meter_latest.json` | sha256 `07c416189aba2ac78d2a341986bdcde7dd6f229c530785f6e418efce9e05c7c2`
-- `docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md` -> `artifacts/proof_value/docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md` | sha256 `04ae84b771ea5776419b947bb24ed096ad16def227508f5738071e3db013cdcd`
-- `out/ops/champion_metric_gauntlet_latest.json` -> `artifacts/proof_value/out/ops/champion_metric_gauntlet_latest.json` | sha256 `59b353e2efbca6cb6e2f743cb07b7280c3e3a7c2e14db30757cc8a85ab025539`
-- `dashboard/data/champion_metric_gauntlet.json` -> `artifacts/proof_value/dashboard/data/champion_metric_gauntlet.json` | sha256 `59b353e2efbca6cb6e2f743cb07b7280c3e3a7c2e14db30757cc8a85ab025539`
+- `docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md` -> `artifacts/proof_value/docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md` | sha256 `5b656dc8d3ae7eb7fd8c2ac93cb4a116db322033bbea1286f6ff9ed92f8a9eb7`
+- `out/ops/champion_metric_gauntlet_latest.json` -> `artifacts/proof_value/out/ops/champion_metric_gauntlet_latest.json` | sha256 `797609dce08f70faa297755349b01b556913e34886989d16a0f7cb0dc5b93bad`
+- `dashboard/data/champion_metric_gauntlet.json` -> `artifacts/proof_value/dashboard/data/champion_metric_gauntlet.json` | sha256 `797609dce08f70faa297755349b01b556913e34886989d16a0f7cb0dc5b93bad`
 - `docs/DOLLAR_CLAIM_GATE_2026-06-21.md` -> `artifacts/proof_value/docs/DOLLAR_CLAIM_GATE_2026-06-21.md` | sha256 `4628f86d9f6b8cc0b5a8b99a6983d78cc0d6d1a31e08768963be26645fc2d231`
 - `out/ops/dollar_claim_gate_latest.json` -> `artifacts/proof_value/out/ops/dollar_claim_gate_latest.json` | sha256 `9e64ad63466e81cd1499014b97c35f2796ec728e76b72010cd549bb2aa5d741d`
 - `out/ops/live_breadth_value_panel_latest.json` -> `artifacts/live_breadth/out/ops/live_breadth_value_panel_latest.json` | sha256 `b5968b0698f256e34094e8eceb46d2c5ef22d663af058b312de2cd5b69aa2449`
@@ -39,9 +39,9 @@ A proof vault is provenance and reproducibility infrastructure. It does not crea
 - `out/ops/geometry_championship_bridge_latest.json` -> `artifacts/geometry/out/ops/geometry_championship_bridge_latest.json` | sha256 `267c80fa6f279f4de7f53f997184026557d54d921e295a01988062cc19bfa0cd`
 - `docs/GEOMETRY_PROOF_FRONTIER_BOARD_2026-06-22.md` -> `artifacts/geometry/docs/GEOMETRY_PROOF_FRONTIER_BOARD_2026-06-22.md` | sha256 `ed81f6203b5ae2464835bee811ba8f9e501c2f2c1ede88aa8723bd0b51c8c669`
 - `out/ops/geometry_proof_frontier_board_latest.json` -> `artifacts/geometry/out/ops/geometry_proof_frontier_board_latest.json` | sha256 `0ba395589d07eed5d3cff8f777f1654c15f12b16f6a83c7f00005cea212daed8`
-- `docs/GEOMETRY_LIVE_BREADTH_PROOF_QUEUE_2026-06-22.md` -> `artifacts/geometry/docs/GEOMETRY_LIVE_BREADTH_PROOF_QUEUE_2026-06-22.md` | sha256 `a9809bca33456e2be7b2a09e2ef1952057678d4322ec6a7cd27e0c3ea8d47870`
-- `out/ops/geometry_live_breadth_proof_queue_latest.json` -> `artifacts/geometry/out/ops/geometry_live_breadth_proof_queue_latest.json` | sha256 `c4889970129734a1b6c37d74f2ad8627e96d82b64de22290873ba395615622bc`
-- `dashboard/data/geometry_live_breadth_proof_queue.json` -> `artifacts/geometry/dashboard/data/geometry_live_breadth_proof_queue.json` | sha256 `c4889970129734a1b6c37d74f2ad8627e96d82b64de22290873ba395615622bc`
+- `docs/GEOMETRY_LIVE_BREADTH_PROOF_QUEUE_2026-06-22.md` -> `artifacts/geometry/docs/GEOMETRY_LIVE_BREADTH_PROOF_QUEUE_2026-06-22.md` | sha256 `3e389cd84184b311fed3ac0ff0c1bf54ee7e0b92e1d54f150dc5570d9ce8bcd5`
+- `out/ops/geometry_live_breadth_proof_queue_latest.json` -> `artifacts/geometry/out/ops/geometry_live_breadth_proof_queue_latest.json` | sha256 `088820432c98c11094d2d8bd052569606789d3d579dc2c75b6ae6683d078ae02`
+- `dashboard/data/geometry_live_breadth_proof_queue.json` -> `artifacts/geometry/dashboard/data/geometry_live_breadth_proof_queue.json` | sha256 `088820432c98c11094d2d8bd052569606789d3d579dc2c75b6ae6683d078ae02`
 - `grant_submissions/GRANT_DEADLINE_TRIAGE_2026-06-22.md` -> `artifacts/grants/grant_submissions/GRANT_DEADLINE_TRIAGE_2026-06-22.md` | sha256 `4dfa12be7d8195e28cc4a480a8c8aec01d2df19701925469a5febdc9d87b9d9e`
 - `grant_submissions/TOP5_LIVE_PROOF_SUBMISSION_BOARD_2026-06-22.md` -> `artifacts/grants/grant_submissions/TOP5_LIVE_PROOF_SUBMISSION_BOARD_2026-06-22.md` | sha256 `70812fc7d908c848d85840fe276b0578231fc9c5852ab62cf1c9684fae1c18eb`
 - `out/ops/top5_live_proof_submission_board_latest.json` -> `artifacts/grants/out/ops/top5_live_proof_submission_board_latest.json` | sha256 `6af5514deafa9b20cbfb4478cd8114df91096450d347f23bcffc34f73354ea3b`

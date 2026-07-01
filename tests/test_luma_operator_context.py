@@ -45,9 +45,13 @@ def test_operator_context_exposes_source_gaps_without_plaintext_secrets():
     sources = {row["source"] for row in provider_gaps}
 
     assert source_breadth["measured_coverage_pct"] == 100.0
-    assert "EIA" in sources
+    assert source_breadth["fresh_http_measured_sources_total"] >= 19
+    assert source_breadth["fresh_http_enabled_sources_total"] >= 23
+    assert source_breadth["fresh_http_total_measured_rows"] >= 500
+    assert source_breadth["live_context_replay_rows_evaluated"] >= 150
+    assert "EIA" in source_breadth["fresh_http_measured_source_names"]
+    assert "NOAA_NCEI" in source_breadth["fresh_http_measured_source_names"]
     assert "EPA_AQS" in sources
-    assert "NASA" in sources
     assert "NREL" in sources
     assert "THE_ODDS_API" in sources
 

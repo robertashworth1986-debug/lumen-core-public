@@ -54,6 +54,7 @@ OPTIONAL_FEEDS = [
     "live_domain_consolidation_audit",
     "proof_to_revenue_engine",
     "champion_stress_test_matrix",
+    "champion_metric_battery",
     "first_buyer_target_board",
     "paid_pilot_outreach_queue",
     "luma_operator_context",

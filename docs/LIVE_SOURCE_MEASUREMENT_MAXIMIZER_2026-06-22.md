@@ -1,15 +1,15 @@
 # Live Source Measurement Maximizer
 
-Generated UTC: `2026-07-01T11:22:33.917556+00:00`
+Generated UTC: `2026-07-01T12:36:36.167442+00:00`
 
 ## Summary
 
 - Enabled sources: 23
-- Measured sources: 17
-- Failed/thin sources: 6
-- Total measured rows: 465
-- Coverage: 73.91%
-- Estimated annual value surface: $7,236,217,096.80
+- Measured sources: 19
+- Failed/thin sources: 4
+- Total measured rows: 516
+- Coverage: 82.61%
+- Estimated annual value surface: $12,173,289,849.60
 - Boundary: This pass proves fresh measured rows and hashes. It does not prove realized savings, field validation, trading profit, or guaranteed award value.
 
 ## Measured Sources
@@ -21,6 +21,7 @@ Generated UTC: `2026-07-01T11:22:33.917556+00:00`
 - `BLS`
 - `CENSUS`
 - `COINGECKO_PUBLIC`
+- `EIA`
 - `FINNHUB`
 - `FRED`
 - `GRANTS_GOV`
@@ -28,6 +29,7 @@ Generated UTC: `2026-07-01T11:22:33.917556+00:00`
 - `KRAKEN_PUBLIC`
 - `MASSIVE`
 - `NASA`
+- `NOAA_NCEI`
 - `TWELVE_DATA`
 - `USGS_WATER`
 - `WEBHOOK`
@@ -35,9 +37,7 @@ Generated UTC: `2026-07-01T11:22:33.917556+00:00`
 ## Failed Or Thin Sources
 
 - `BINANCE_PUBLIC`
-- `EIA`
 - `EPA_AQS`
-- `NOAA_NCEI`
 - `NREL`
 - `THE_ODDS_API`
 
@@ -45,25 +45,25 @@ Generated UTC: `2026-07-01T11:22:33.917556+00:00`
 
 | Source | Sector | Status | Rows | Snapshot | SHA-256 |
 |---|---|---|---:|---|---|
-| KRAKEN_PUBLIC | crypto_market | MEASURED | 40 | `data/live_measured/kraken_public/kraken_public_20260701T112145Z.json` | `af6d626fc68de74234152e09b41ad60c650a42702ef05b4203ddb6e639c81c0e` |
-| BINANCE_PUBLIC | crypto_market | PROBE_FAILED_OR_THIN | 0 | `data/live_measured/binance_public/binance_public_20260701T112145Z.json` | `33b233c88af5ee8eb6ddf82e1d47202ad12ad99342fe5e959cea781ee2b5145a` |
-| COINGECKO_PUBLIC | crypto_market | MEASURED | 6 | `data/live_measured/coingecko_public/coingecko_public_20260701T112145Z.json` | `90a6ce36aa30634eb4462a364fb7bcd9e2439a665bcefc048cd893e1a54ca20e` |
-| FINNHUB | market_data | MEASURED | 4 | `data/live_measured/finnhub/finnhub_20260701T112145Z.json` | `f8a5ff0d211a7df3a36ba5871967b4599f7cbe48e840ae59ee15e825cb468bd8` |
-| ALPHAVANTAGE | market_data | MEASURED | 40 | `data/live_measured/alphavantage/alphavantage_20260701T112145Z.json` | `25a65714abc77dd267d2df5f7dd653b7168f61e984129f9dad7f48e9b7cfa476` |
-| TWELVE_DATA | market_data | MEASURED | 40 | `data/live_measured/twelve_data/twelve_data_20260701T112145Z.json` | `727f0cafeb4088a7f70ba0ccc5d5625d5be38e339a766a2c652a4cdf5b196bc9` |
-| MASSIVE | market_data | MEASURED | 3 | `data/live_measured/massive/massive_20260701T112145Z.json` | `73d0cf98d05bc859263ae0b6f05b4c2ad7108b5d1e1effdc31c27ba8d693cfc9` |
-| FRED | rates | MEASURED | 40 | `data/live_measured/fred/fred_20260701T112145Z.json` | `af580a08135d1720a24802246395e9fd499860e572b19686059ea117e763ba85` |
-| EIA | energy | PROBE_FAILED_OR_THIN | 0 | `data/live_measured/eia/eia_20260701T112145Z.json` | `20601771b3ebf311467de3075798ba2d3111a3fd1670620927a4a4544b3e486c` |
-| BLS | labor | MEASURED | 29 | `data/live_measured/bls/bls_20260701T112145Z.json` | `7042f3179a96181bd3702286195eb50b547131bc3cf540b95bd15bba26a7edb5` |
-| NASA | space | MEASURED | 1 | `data/live_measured/nasa/nasa_20260701T112145Z.json` | `7638b84e3ff3ce1c97b6acdb0791cf1c23da1aaf0e3a368298f815a6b6dc9916` |
-| NOAA_NCEI | weather | PROBE_FAILED_OR_THIN | 0 | `data/live_measured/noaa_ncei/noaa_ncei_20260701T112145Z.json` | `8be8e9ff8b134680795f643b752fcf84df3f7d1bf1b5ca47a1f7a774fa2722b3` |
-| NREL | energy_lab | PROBE_FAILED_OR_THIN | 0 | `data/live_measured/nrel/nrel_20260701T112145Z.json` | `805f4d0cf8e914fbaebdf0b26761f43a4d272beaa6fd37fc6be50bada6249839` |
-| USGS_WATER | water | MEASURED | 1 | `data/live_measured/usgs_water/usgs_water_20260701T112145Z.json` | `f690424bcf4aa518bc2c1546d9e09a7a95bf50cb094ef02891496c8288467c67` |
-| CENSUS | demographic | MEASURED | 1 | `data/live_measured/census/census_20260701T112145Z.json` | `c3670f0330cfea756c7347b897720869eb48f81911ef7b25af8a042e229b573e` |
-| BEA | macro | MEASURED | 13 | `data/live_measured/bea/bea_20260701T112145Z.json` | `9a489dd101e168290f82390e8663bfbd3af6a9907661fe94bc85107e9cd3dd9b` |
-| EPA_AQS | air_quality | PROBE_FAILED_OR_THIN | 0 | `data/live_measured/epa_aqs/epa_aqs_20260701T112145Z.json` | `0d6da6e5e0bb2c4e7d64dfacdaa405f1459da7bcfc696891e72718a7e0bec1b1` |
-| AIRNOW | air_quality | MEASURED | 3 | `data/live_measured/airnow/airnow_20260701T112145Z.json` | `e75479891eb0893221f1d37e031554b3f891be5ed65eef81f2efd9665229c8c0` |
-| THE_ODDS_API | sports_market | PROBE_FAILED_OR_THIN | 0 | `data/live_measured/the_odds_api/the_odds_api_20260701T112145Z.json` | `e539556068e439f3f5dc479b14e21be1652bca743459b575565f4b3dc6d7ee93` |
-| SAM_GOV | federal_opportunity | UNCONFIGURED | 0 | `data/live_measured/sam_gov/sam_gov_20260701T112145Z.json` | `09f62f74b3ea10d790df5bb6b07669f9a15fc36248819889df6d92786f73391d` |
-| GRANTS_GOV | federal_opportunity | MEASURED | 40 | `data/live_measured/grants_gov/grants_gov_20260701T112145Z.json` | `365c4e0ea2ddc0370f9962c97d2641ae024f59331a430b04a326757de259a934` |
-| WEBHOOK | internal | MEASURED | 1 | `data/live_measured/webhook/webhook_20260701T112145Z.json` | `e663f22d14b426752842de0a4372a1c20d19470a9a891697210168dae31a4c94` |
+| KRAKEN_PUBLIC | crypto_market | MEASURED | 40 | `data/live_measured/kraken_public/kraken_public_20260701T123604Z.json` | `cc9ac2266a7a18ca40200f6844338450582c31a5986abb78a45a163c19408424` |
+| BINANCE_PUBLIC | crypto_market | PROBE_FAILED_OR_THIN | 0 | `data/live_measured/binance_public/binance_public_20260701T123604Z.json` | `0045f6fbb544640c0eeb66887be52afcdad06d03aa96e6ca4ea1945501dc86b5` |
+| COINGECKO_PUBLIC | crypto_market | MEASURED | 6 | `data/live_measured/coingecko_public/coingecko_public_20260701T123604Z.json` | `368272756b2c3d6c1a9f4ad61d8b313a086db65a344ac75b4214a6bb159cc565` |
+| FINNHUB | market_data | MEASURED | 4 | `data/live_measured/finnhub/finnhub_20260701T123604Z.json` | `4bbd7112900e08e4cc847ee6155adbb2750fba7ebabd6ee80a78f9361ee8a0d1` |
+| ALPHAVANTAGE | market_data | MEASURED | 40 | `data/live_measured/alphavantage/alphavantage_20260701T123604Z.json` | `9496f7251daeb48c034ef3322c4e9901d585253dd9c44253c37f5d50ba2cfd86` |
+| TWELVE_DATA | market_data | MEASURED | 40 | `data/live_measured/twelve_data/twelve_data_20260701T123604Z.json` | `17664d1bbd6b908162c3dfce9021bde4d83799e811c4f902242e6f46ba074c13` |
+| MASSIVE | market_data | MEASURED | 3 | `data/live_measured/massive/massive_20260701T123604Z.json` | `bf00435d1f695d932b93656c84d881ce25f6f0934419d83a2f523177bf2d0c6c` |
+| FRED | rates | MEASURED | 40 | `data/live_measured/fred/fred_20260701T123604Z.json` | `7f989168b7e5b48a19934c522588cbe57bd30f543b1e866e506e595f4a28dd51` |
+| EIA | energy | MEASURED | 40 | `data/live_measured/eia/eia_20260701T123604Z.json` | `276c1cf59cb02dbb286cd3a6c08d7059a4f416b039c3149f7dcf16cb5bc4aa38` |
+| BLS | labor | MEASURED | 29 | `data/live_measured/bls/bls_20260701T123604Z.json` | `104e22c51dd4de124a5a7d7929c66ec78dff87a671458e9fc48ef6e5cca16c7d` |
+| NASA | space | MEASURED | 1 | `data/live_measured/nasa/nasa_20260701T123604Z.json` | `3016e2968ac17096cd13d36bae5c711b60aa0d0895748adaef6091ac728780f0` |
+| NOAA_NCEI | weather | MEASURED | 11 | `data/live_measured/noaa_ncei/noaa_ncei_20260701T123604Z.json` | `455767b9a7eba0d6df50f6c3c705e1bc7c8e04bee281ccbc43b748fc68fe08d6` |
+| NREL | energy_lab | PROBE_FAILED_OR_THIN | 0 | `data/live_measured/nrel/nrel_20260701T123604Z.json` | `5e415fb67c02ddf25adc0ce406dbb896dd210e780131718d31e78cac2095f65c` |
+| USGS_WATER | water | MEASURED | 1 | `data/live_measured/usgs_water/usgs_water_20260701T123604Z.json` | `d07cf7f159b7f31643ae44699f5355b0feb9aecd99e79a43eda60522ac65ab65` |
+| CENSUS | demographic | MEASURED | 1 | `data/live_measured/census/census_20260701T123604Z.json` | `341152b9df75b41bd1b945d85c8b9e562a0019b6d4b1e464589bec6eb6a1050b` |
+| BEA | macro | MEASURED | 13 | `data/live_measured/bea/bea_20260701T123604Z.json` | `9cf6382689ba3b7bec01d74077cd166eb5ffac9cec489f6dc80ef9e91838b260` |
+| EPA_AQS | air_quality | PROBE_FAILED_OR_THIN | 0 | `data/live_measured/epa_aqs/epa_aqs_20260701T123604Z.json` | `2f5ead14cade6408f2d027b540d4a415793d694fb577eff4b26438a89dd4140a` |
+| AIRNOW | air_quality | MEASURED | 3 | `data/live_measured/airnow/airnow_20260701T123604Z.json` | `779712ebf77f10f1592f6d3f055723f80e0768dda1a28538b2ee6a7c55de4b69` |
+| THE_ODDS_API | sports_market | PROBE_FAILED_OR_THIN | 0 | `data/live_measured/the_odds_api/the_odds_api_20260701T123604Z.json` | `a1893be4858e23419898656a50b7049622b77fb714530080d777fb7c09d65948` |
+| SAM_GOV | federal_opportunity | UNCONFIGURED | 0 | `data/live_measured/sam_gov/sam_gov_20260701T123604Z.json` | `f3f78c36c7f4abdb1dcedb687f8c205dc1875d2a0ae6a5393da828ccdf0da7c1` |
+| GRANTS_GOV | federal_opportunity | MEASURED | 40 | `data/live_measured/grants_gov/grants_gov_20260701T123604Z.json` | `b9dff935730b035c0df90b1b9d909d11e9b6c77927d93262ebc195cdd98a537b` |
+| WEBHOOK | internal | MEASURED | 1 | `data/live_measured/webhook/webhook_20260701T123604Z.json` | `871c437c2082b2df2c47d04b3f9a84fdd3ce4c51c1f1e02f5e4cc731896855fe` |

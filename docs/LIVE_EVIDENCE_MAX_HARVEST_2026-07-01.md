@@ -1,19 +1,19 @@
 # Live Evidence Max Harvest
 
-- Generated UTC: `2026-07-01T08:18:54.746933+00:00`
+- Generated UTC: `2026-07-01T13:08:59.346295+00:00`
 - Mode: `reuse_existing_snapshots`
 - Steps ok: `7/7`
-- Measured sources: `17` / enabled `23`
-- Total measured rows: `523`
+- Measured sources: `19` / enabled `23`
+- Total measured rows: `516`
 - Live-context replay rows: `150`
-- Candidate beats named baseline count: `3`
+- Candidate beats named baseline count: `4`
 - Energy pressure rows/windows: `190` / `24`
 - Energy pressure max band: `high`
 - Energy pressure phase-locked improvement: `36.387422`%
 - Rolling champions / triple-source candidates: `5` / `0`
 - External drive files/candidates/hash-backed top files: `50000` / `20400` / `150`
 - External live-frozen triple-threat candidates: `193`
-- Snapshot chain SHA-256: `71af2571c0f984a5d57dccd08b094ac750f59748263e7b4c2d22c072d4fa0b07`
+- Snapshot chain SHA-256: `60a692c3c47d37ba3051122bc04f08f173fa47cd6476e0b290a801b70133e537`
 - Ready for live geometry claim: `false`
 - Ready for real dollar claim: `false`
 - Kraken live execution allowed: `false`

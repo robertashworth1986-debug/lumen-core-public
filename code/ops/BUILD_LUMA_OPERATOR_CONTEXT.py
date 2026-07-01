@@ -71,6 +71,8 @@ def load_inputs() -> dict[str, dict[str, Any]]:
         "first_buyer_target_board": read_json(DASHBOARD_DATA / "first_buyer_target_board.json"),
         "safe_key_provider_ping": read_json(DASHBOARD_DATA / "safe_key_provider_ping.json"),
         "live_key_measurement_audit": read_json(OUT_OPS / "live_key_measurement_audit_latest.json"),
+        "live_source_measurement_maximizer": read_json(DASHBOARD_DATA / "live_source_measurement_maximizer.json"),
+        "live_evidence_max_harvest": read_json(DASHBOARD_DATA / "live_evidence_max_harvest.json"),
     }
 
 
@@ -196,6 +198,8 @@ def build_payload() -> dict[str, Any]:
     dollar_summary = as_dict(inputs["dollar_claim_gate"].get("summary"))
     key_summary = as_dict(inputs["live_key_measurement_audit"].get("summary"))
     safe_key_summary = as_dict(inputs["safe_key_provider_ping"].get("summary"))
+    source_summary = as_dict(inputs["live_source_measurement_maximizer"].get("summary"))
+    harvest_summary = as_dict(inputs["live_evidence_max_harvest"].get("summary"))
 
     payload: dict[str, Any] = {
         "generated_utc": now_utc(),
@@ -240,6 +244,18 @@ def build_payload() -> dict[str, Any]:
             "measured_coverage_pct": key_summary.get("measured_coverage_pct"),
             "enabled_sectors_total": key_summary.get("enabled_sectors_total"),
             "measured_sectors_total": key_summary.get("measured_sectors_total"),
+            "fresh_http_enabled_sources_total": source_summary.get("enabled_sources"),
+            "fresh_http_measured_sources_total": source_summary.get("measured_sources"),
+            "fresh_http_failed_or_thin_sources_total": source_summary.get("failed_or_thin_sources"),
+            "fresh_http_total_measured_rows": source_summary.get("total_measured_rows"),
+            "fresh_http_coverage_pct": source_summary.get("coverage_pct"),
+            "fresh_http_measured_source_names": source_summary.get("measured_source_names") or [],
+            "fresh_http_failed_or_thin_source_names": source_summary.get("failed_or_thin_source_names") or [],
+            "live_context_replay_rows_evaluated": harvest_summary.get("total_live_context_rows_evaluated"),
+            "live_context_candidate_beats_named_baseline_count": harvest_summary.get(
+                "candidate_beats_named_baseline_count"
+            ),
+            "live_context_snapshot_chain_sha256": harvest_summary.get("snapshot_chain_sha256"),
             "safe_ping_provider_count": safe_key_summary.get("provider_count"),
             "safe_ping_key_ready_provider_count": safe_key_summary.get("key_ready_provider_count"),
             "safe_ping_latest_measured_provider_count": safe_key_summary.get("latest_measured_provider_count"),
@@ -334,6 +350,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Runtime-bound keys: `{source_breadth.get('runtime_bound_keys_total')}`",
         f"- Measured enabled sources: `{source_breadth.get('measured_sources_total')}/{source_breadth.get('enabled_sources_total')}`",
         f"- Measured sectors: `{source_breadth.get('measured_sectors_total')}/{source_breadth.get('enabled_sectors_total')}`",
+        f"- Fresh HTTP measured sources: `{source_breadth.get('fresh_http_measured_sources_total')}/{source_breadth.get('fresh_http_enabled_sources_total')}`",
+        f"- Fresh HTTP measured rows: `{source_breadth.get('fresh_http_total_measured_rows')}`",
+        f"- Live-context replay rows: `{source_breadth.get('live_context_replay_rows_evaluated')}`",
+        f"- Live-context candidate wins vs named baselines: `{source_breadth.get('live_context_candidate_beats_named_baseline_count')}`",
+        f"- Live-context snapshot chain: `{source_breadth.get('live_context_snapshot_chain_sha256')}`",
         f"- Latest measured providers in safe ping: `{source_breadth.get('safe_ping_latest_measured_provider_count')}`",
         f"- Latest blocked/thin providers in safe ping: `{source_breadth.get('safe_ping_latest_blocked_or_thin_provider_count')}`",
         "",

@@ -121,6 +121,12 @@ PROOF_FEEDS = [
         "why": "Compact buyer/reviewer-safe stress matrix for the current champion.",
     },
     {
+        "key": "champion_metric_battery",
+        "local": "dashboard/data/champion_metric_battery.json",
+        "required": False,
+        "why": "Consolidated pass/ready/blocked metric battery for the current champion.",
+    },
+    {
         "key": "proof_to_revenue_engine",
         "local": "dashboard/data/proof_to_revenue_engine.json",
         "required": False,
