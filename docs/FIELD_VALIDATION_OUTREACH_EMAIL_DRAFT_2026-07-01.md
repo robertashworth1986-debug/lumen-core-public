@@ -10,7 +10,7 @@ Do not send this message until `dashboard/data/live_domain_deployment_feed.json`
 - `domain_deployment_state: LIVE_DOMAIN_HASH_VERIFIED`
 - `required_remote_hash_match_count: 12`
 
-Current state on July 1, 2026: local proof feeds are ready, but the live domain still has stale or missing hosted hashes.
+Current state on July 1, 2026: the live domain is serving matching hashes for every required reviewer proof feed. This clears the public-proof-feed send gate. It does not clear the field-validation or realized-savings claim gates.
 
 ## Recommended First Recipient Lane
 
@@ -48,6 +48,13 @@ LumenCore
 [physical mailing address]
 
 To stop further outreach, reply "remove."
+
+## Reviewer Links
+
+- Mission console: https://lumen-core.ai/mission_control.html
+- Champion metric gauntlet: https://lumen-core.ai/data/champion_metric_gauntlet.json
+- Champion stress matrix: https://lumen-core.ai/data/champion_stress_test_matrix.json
+- Dollar claim gate: https://lumen-core.ai/data/dollar_claim_gate.json
 
 ## Why This Is Safe
 
