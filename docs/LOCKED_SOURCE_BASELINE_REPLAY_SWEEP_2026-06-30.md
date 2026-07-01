@@ -1,6 +1,6 @@
 # Locked Source Baseline Replay Sweep
 
-Generated UTC: `2026-07-01T08:20:34.969692+00:00`
+Generated UTC: `2026-07-01T09:38:39.311436+00:00`
 
 Locked source baseline replay sweep. This runs every ready local/uploaded measured source row from the geometry live source manifest through available source-conditioned replay adapters and compares candidates against the locked baselines for their lane. It includes an energy price-pressure proxy adapter so those rows are tested instead of blocked. This is source-conditioned replay evidence, not field validation, not realized savings, not a fixed-dollar frozen-delta sales claim, not live trading, and not a medical or addiction-treatment claim.
 
