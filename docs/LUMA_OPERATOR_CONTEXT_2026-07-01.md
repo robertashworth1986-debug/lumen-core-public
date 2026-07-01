@@ -1,7 +1,7 @@
 # Luma Operator Context
 
-Generated UTC: `2026-07-01T13:45:35.063825+00:00`
-Context SHA-256: `1278087c69121017208a80031d4f684c780380365d6e70c73e6e5a87aab0ee1d`
+Generated UTC: `2026-07-01T15:38:38.076910+00:00`
+Context SHA-256: `9e69257c0087ca8dd03baa28f7e3df5439eb6edee6d6e1b2a8dd9a1ca3e0b99f`
 
 ## Current Truth
 
@@ -11,31 +11,38 @@ Context SHA-256: `1278087c69121017208a80031d4f684c780380365d6e70c73e6e5a87aab0ee
 - Weakest delta: `0.044697`
 - Estimated rows replayed: `2506267`
 - Source systems in champion replay: `4`
+- Expanded sweep source systems: `8`
+- Expanded sweep comparisons: `975/1224` wins
+- Expanded sweep win rate: `79.66%`
+- Expanded sweep rows/samples: `7152281` rows / `93596` numeric samples
+- Expanded field-grade source hygiene passed: `false`
 - Buyer field replay request ready: `true`
 - Field validation claim allowed: `false`
 - Real dollar savings claim allowed: `false`
 
 Kuramoto phase coupling is the current internal champion because it beat kalman_filter on 24/24 source-conditioned holdouts across 4 champion-replay source systems. The broader live-source universe currently shows 19 measured providers and 186 mapped source files/feeds available for additional benchmark promotion. That is strong enough to request a buyer-authorized field replay, but it is not field validation or realized dollar savings yet.
 
+The strongest current story is not 'everything wins.' It is that one champion family has a clear source-conditioned replay win, with the wave/resonance timing lane standing out as the cleanest high-volume internal lane. Energy price pressure is promising but mixed; branching is honest negative evidence where classic baselines still compete.
+
 ## Live Domain
 
-- State: `LIVE_DOMAIN_HASH_VERIFIED`
-- Reviewer ready: `true`
-- Required feeds matched: `12/12`
-- Stale/missing required feeds: `0`
+- State: `LOCAL_READY_DOMAIN_NOT_VERIFIED_OR_STALE`
+- Reviewer ready: `false`
+- Required feeds matched: `11/12`
+- Stale/missing required feeds: `1`
 
 ## Source Breadth
 
 - Runtime-bound keys: `31`
 - Measured enabled sources: `23/23`
 - Measured sectors: `17/17`
-- Fresh HTTP measured sources: `19/23`
-- Fresh HTTP measured rows: `516`
+- Fresh HTTP measured sources: `25/29`
+- Fresh HTTP measured rows: `823`
 - Live-context replay rows: `150`
 - Live-context candidate wins vs named baselines: `4`
 - Live-context snapshot chain: `60a692c3c47d37ba3051122bc04f08f173fa47cd6476e0b290a801b70133e537`
-- Latest measured providers in safe ping: `17`
-- Latest blocked/thin providers in safe ping: `5`
+- Latest measured providers in safe ping: `22`
+- Latest blocked/thin providers in safe ping: `6`
 
 Provider gaps to fix:
 - `ALPACA`: `NO_LATEST_STATUS`; next: Add this provider to the latest safe ping/harvest adapter so key-ready becomes measured, not merely configured.
@@ -45,6 +52,7 @@ Provider gaps to fix:
 - `NREL`: `PROBE_FAILED_OR_THIN`; next: Retry DNS/network and use a known NREL developer endpoint; current failure is name resolution.
 - `SAM_GOV`: `UNCONFIGURED`; next: Enable only if this source is needed for the current proof lane, then bind the expected API key.
 - `THE_ODDS_API`: `PROBE_FAILED_OR_THIN`; next: Reactivate or replace the key before using sports-market data in current proof claims.
+- `WORLD_BANK_PUBLIC`: `PROBE_FAILED_OR_THIN`; next: Review the redacted probe note, repair the adapter or key, then rerun the provider harvest.
 
 ## Replay Lanes
 
@@ -84,4 +92,4 @@ Provider gaps to fix:
 
 ## Long-Arc Operator Prompt
 
-Operate LumenCore as a measurement-first proof-to-pilot platform. Every improvement claim must name its source data, baseline, metric, replay rules, hashes, negative results, claim boundary, and next external validation gate. Prioritize one narrow paid field replay over broad hype: buyer-approved held-out data, incumbent baseline, acceptance metric, economic conversion, and a signed result. Ship only canonical, secret-free proof feeds to the public domain, keep dashboards honest, and preserve this context after every pass.
+Operate LumenCore as a measurement-first proof-to-pilot platform. The standard is not hype; the standard is reviewer-safe proof that survives hostile reading. Every improvement claim must name its source data, baseline, metric, replay rules, code commit, hashes, negative results, claim boundary, and next external validation gate. Treat the current internal champion as a strong lead, not a universal law: Kuramoto phase coupling is 24/24 on the locked champion holdouts, and the expanded sweep currently shows source-conditioned strength across eight lanes/systems, while still preserving mixed and negative evidence. Prioritize one narrow paid field replay over broad claims: buyer-approved held-out data, incumbent baseline, acceptance metric, economic conversion, and a signed result. Ship only canonical, secret-free proof feeds to the public domain, keep dashboards beautiful but honest, preserve this context after every pass, and convert the next action toward a lab, agency, or system owner saying yes to a held-out replay.

@@ -1,6 +1,6 @@
 # Geometry Live Systems Frontier
 
-Generated UTC: `2026-07-01T13:03:26.767067+00:00`
+Generated UTC: `2026-07-01T15:30:31.005139+00:00`
 
 Geometry live-systems frontier only. It ranks local evidence and uploaded measured-data candidates for next benchmark wiring. It does not establish field validation, clinical validation, safety certification, live trading permission, fixed-dollar frozen-delta value, realized savings, or grant-award certainty.
 
@@ -9,17 +9,17 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 - Registered families ranked: `140` / `140`
 - Lanes: `12`
 - Local uploaded/live files inventoried: `3063`
-- Local estimated data rows: `4406117`
-- Provider snapshot files: `66`
-- Canonical measured sources: `19`
-- Canonical measured rows: `516`
+- Local estimated data rows: `4405867`
+- Provider snapshot files: `84`
+- Canonical measured sources: `25`
+- Canonical measured rows: `823`
 - Top family: `kuramoto_phase_coupling`
 - Top family score: `283.155`
 - Field validation claim allowed: `false`
 - Real-dollar savings claim allowed: `false`
 - Live trading/autonomous execution allowed: `false`
 - Medical/addiction-treatment claim allowed: `false`
-- Frontier SHA-256: `62af282465b288646003451f21ead35824892c001e146b38464b76a3966e1dd0`
+- Frontier SHA-256: `b2ae1ff4c7869f41f1c2d566fe63b0aea75f14565b04b2256b215de29b22248b`
 
 ## Next 10 Actions
 
@@ -40,7 +40,7 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 
 | System | Files | Estimated Rows | Candidate Lanes |
 | --- | --- | --- | --- |
-| `market_data` | `1318` | `2860237` | energy_price_pressure_proxy, market_signal_geometry, wave_resonance_timing |
+| `market_data` | `1336` | `2860908` | energy_price_pressure_proxy, market_signal_geometry, wave_resonance_timing |
 | `unclassified_measured_file` | `1037` | `719701` |  |
 | `energy_grid` | `54` | `447220` | branching_transport, energy_price_pressure_proxy, thermal_ventilation, wave_resonance_timing |
 | `maritime_ais` | `82` | `258964` | branching_transport, field_guided_control, optimal_curve_transport |

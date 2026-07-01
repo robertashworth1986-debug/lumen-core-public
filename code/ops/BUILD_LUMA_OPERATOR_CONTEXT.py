@@ -63,6 +63,7 @@ def stable_sha256(payload: Any) -> str:
 def load_inputs() -> dict[str, dict[str, Any]]:
     return {
         "champion_metric_gauntlet": read_json(DASHBOARD_DATA / "champion_metric_gauntlet.json"),
+        "champion_expanded_metric_rollup": read_json(DASHBOARD_DATA / "champion_expanded_metric_rollup.json"),
         "locked_source_baseline_replay_sweep": read_json(DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json"),
         "live_domain_deployment_feed": read_json(DASHBOARD_DATA / "live_domain_deployment_feed.json"),
         "live_domain_proof_feed_deploy_bundle": read_json(DASHBOARD_DATA / "live_domain_proof_feed_deploy_bundle.json"),
@@ -193,6 +194,8 @@ def build_payload() -> dict[str, Any]:
     inputs = load_inputs()
     champion = inputs["champion_metric_gauntlet"]
     champion_summary = as_dict(champion.get("summary"))
+    expanded = inputs["champion_expanded_metric_rollup"]
+    expanded_summary = as_dict(expanded.get("summary")) or expanded
     domain_summary = as_dict(inputs["live_domain_deployment_feed"].get("summary"))
     bundle_summary = as_dict(inputs["live_domain_proof_feed_deploy_bundle"].get("summary"))
     dollar_summary = as_dict(inputs["dollar_claim_gate"].get("summary"))
@@ -218,6 +221,17 @@ def build_payload() -> dict[str, Any]:
             "estimated_rows_replayed": champion_summary.get("estimated_rows_replayed"),
             "source_system_count": champion_summary.get("source_system_count"),
             "source_systems": as_dict(champion.get("strongest_current")).get("source_systems") or [],
+            "expanded_source_system_count": expanded_summary.get("source_system_count"),
+            "expanded_source_systems": expanded_summary.get("source_systems") or [],
+            "expanded_total_baseline_comparisons": expanded_summary.get("total_baseline_comparisons"),
+            "expanded_total_candidate_wins": expanded_summary.get("total_candidate_wins"),
+            "expanded_overall_locked_lane_win_rate_pct": expanded_summary.get("overall_locked_lane_win_rate_pct"),
+            "expanded_estimated_rows_replayed": expanded_summary.get("estimated_rows_replayed"),
+            "expanded_numeric_samples_read": expanded_summary.get("numeric_samples_read"),
+            "expanded_field_grade_source_hygiene_passed": bool(
+                expanded_summary.get("field_grade_source_hygiene_passed")
+            ),
+            "expanded_plain_english": expanded_summary.get("plain_english_answer"),
             "reviewer_safe_internal_claim_allowed": bool(champion_summary.get("reviewer_safe_internal_claim_allowed")),
             "buyer_authorized_field_replay_request_ready": bool(
                 champion_summary.get("buyer_authorized_field_replay_request_ready")
@@ -291,12 +305,16 @@ def build_payload() -> dict[str, Any]:
             "Do not claim field validation, realized savings, live trading edge, or fixed frozen-delta price until external gates close.",
         ],
         "operator_prompt": (
-            "Operate LumenCore as a measurement-first proof-to-pilot platform. Every improvement claim must name its "
-            "source data, baseline, metric, replay rules, hashes, negative results, claim boundary, and next external "
-            "validation gate. Prioritize one narrow paid field replay over broad hype: buyer-approved held-out data, "
-            "incumbent baseline, acceptance metric, economic conversion, and a signed result. Ship only canonical, "
-            "secret-free proof feeds to the public domain, keep dashboards honest, and preserve this context after "
-            "every pass."
+            "Operate LumenCore as a measurement-first proof-to-pilot platform. The standard is not hype; the standard "
+            "is reviewer-safe proof that survives hostile reading. Every improvement claim must name its source data, "
+            "baseline, metric, replay rules, code commit, hashes, negative results, claim boundary, and next external "
+            "validation gate. Treat the current internal champion as a strong lead, not a universal law: Kuramoto phase "
+            "coupling is 24/24 on the locked champion holdouts, and the expanded sweep currently shows source-conditioned "
+            "strength across eight lanes/systems, while still preserving mixed and negative evidence. Prioritize one "
+            "narrow paid field replay over broad claims: buyer-approved held-out data, incumbent baseline, acceptance "
+            "metric, economic conversion, and a signed result. Ship only canonical, secret-free proof feeds to the public "
+            "domain, keep dashboards beautiful but honest, preserve this context after every pass, and convert the next "
+            "action toward a lab, agency, or system owner saying yes to a held-out replay."
         ),
     }
     payload["context_sha256"] = stable_sha256(
@@ -332,11 +350,18 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Weakest delta: `{truth.get('min_delta_vs_named_baseline')}`",
         f"- Estimated rows replayed: `{truth.get('estimated_rows_replayed')}`",
         f"- Source systems in champion replay: `{truth.get('source_system_count')}`",
+        f"- Expanded sweep source systems: `{truth.get('expanded_source_system_count')}`",
+        f"- Expanded sweep comparisons: `{truth.get('expanded_total_candidate_wins')}/{truth.get('expanded_total_baseline_comparisons')}` wins",
+        f"- Expanded sweep win rate: `{truth.get('expanded_overall_locked_lane_win_rate_pct')}%`",
+        f"- Expanded sweep rows/samples: `{truth.get('expanded_estimated_rows_replayed')}` rows / `{truth.get('expanded_numeric_samples_read')}` numeric samples",
+        f"- Expanded field-grade source hygiene passed: `{str(truth.get('expanded_field_grade_source_hygiene_passed')).lower()}`",
         f"- Buyer field replay request ready: `{str(truth.get('buyer_authorized_field_replay_request_ready')).lower()}`",
         f"- Field validation claim allowed: `false`",
         f"- Real dollar savings claim allowed: `false`",
         "",
         str(truth.get("plain_english") or ""),
+        "",
+        str(truth.get("expanded_plain_english") or ""),
         "",
         "## Live Domain",
         "",

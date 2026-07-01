@@ -1,6 +1,6 @@
 # Rolling Champion Gate
 
-Generated UTC: 2026-07-01T13:08:59.264776+00:00
+Generated UTC: 2026-07-01T15:29:00.243392+00:00
 
 ## Boundary
 
@@ -8,7 +8,7 @@ A champion is not a one-off win. This gate promotes only repeat live-context win
 
 ## Summary
 
-- Ledger entries: 43
+- Ledger entries: 44
 - Rolling champions: 5
 - Triple-source candidates: 0
 - Single-run candidates: 0
@@ -17,7 +17,7 @@ A champion is not a one-off win. This gate promotes only repeat live-context win
 
 | Status | Entity | Repeat wins | Sources | Latest delta |
 |---|---|---:|---:|---:|
-| rolling_champion | energy_price_pressure:phase_locked_residual_corrector | 8 | 6 | 36.387422 |
+| rolling_champion | energy_price_pressure:phase_locked_residual_corrector | 9 | 6 | 36.387422 |
 | rolling_champion | optimal_curve_transport:brachistochrone_descent | 6 | 5 | 0.081878 |
 | rolling_champion | wave_resonance_timing:kuramoto_phase_coupling | 6 | 5 | 0.134564 |
 | rolling_champion | thermal_ventilation:thermal_plume_convection | 6 | 2 | 0.107024 |

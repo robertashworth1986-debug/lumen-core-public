@@ -15,6 +15,7 @@ DOCS = ROOT / "docs"
 CONTROL_ROOM_JSON = OUT_OPS / "field_validation_control_room_latest.json"
 GAUNTLET_JSON = OUT_OPS / "champion_metric_gauntlet_latest.json"
 REVENUE_JSON = OUT_OPS / "proof_to_revenue_engine_latest.json"
+LIVE_SOURCE_MAXIMIZER_JSON = OUT_OPS / "live_source_measurement_maximizer_latest.json"
 
 OUT_JSON = OUT_OPS / "field_validation_outreach_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "field_validation_outreach_board.json"
@@ -164,12 +165,14 @@ def proof_snapshot() -> dict[str, Any]:
     control = read_json(CONTROL_ROOM_JSON)
     gauntlet = read_json(GAUNTLET_JSON)
     revenue = read_json(REVENUE_JSON)
+    live_source_maximizer = read_json(LIVE_SOURCE_MAXIMIZER_JSON)
 
     control_summary = as_dict(control.get("summary"))
     gauntlet_summary = as_dict(gauntlet.get("summary"))
     source_breadth = as_dict(gauntlet.get("source_breadth_universe"))
     champion_replay = as_dict(source_breadth.get("champion_replay"))
     fresh = as_dict(source_breadth.get("fresh_provider_measurement"))
+    maximizer_summary = as_dict(live_source_maximizer.get("summary"))
     manifest = as_dict(source_breadth.get("geometry_manifest"))
     revenue_summary = as_dict(revenue.get("summary"))
 
@@ -188,11 +191,22 @@ def proof_snapshot() -> dict[str, Any]:
         ),
         "champion_replay_source_systems": champion_replay.get("source_systems", []),
         "broader_measured_provider_count": as_int(
-            fresh.get("measured_provider_count") or control_summary.get("broader_measured_provider_count")
+            maximizer_summary.get("measured_sources")
+            or fresh.get("measured_provider_count")
+            or control_summary.get("broader_measured_provider_count")
         ),
-        "broader_enabled_provider_count": as_int(fresh.get("enabled_provider_count")),
-        "fresh_rows_returned": as_int(fresh.get("fresh_measured_rows")),
-        "fresh_estimated_annual_value_surface_usd": float(fresh.get("estimated_annual_value_surface_usd") or 0),
+        "broader_enabled_provider_count": as_int(
+            maximizer_summary.get("enabled_sources") or fresh.get("enabled_provider_count")
+        ),
+        "fresh_rows_returned": as_int(maximizer_summary.get("total_measured_rows") or fresh.get("fresh_measured_rows")),
+        "fresh_estimated_annual_value_surface_usd": float(
+            maximizer_summary.get("estimated_annual_value_surface_usd")
+            or fresh.get("estimated_annual_value_surface_usd")
+            or 0
+        ),
+        "fresh_failed_or_thin_source_count": as_int(maximizer_summary.get("failed_or_thin_sources")),
+        "fresh_failed_or_thin_source_names": maximizer_summary.get("failed_or_thin_source_names", []),
+        "fresh_measured_source_names": maximizer_summary.get("measured_source_names", []),
         "manifest_unique_source_count": as_int(
             manifest.get("unique_source_count") or control_summary.get("manifest_unique_source_count")
         ),

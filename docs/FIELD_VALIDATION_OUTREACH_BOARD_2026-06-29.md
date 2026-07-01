@@ -1,6 +1,6 @@
 # Field Validation Outreach Board
 
-Generated UTC: `2026-07-01T15:01:03.491861+00:00`
+Generated UTC: `2026-07-01T15:36:01.243952+00:00`
 
 Field-validation outreach board. This artifact identifies people and organizations that could unlock external validation by supplying or approving held-out operational data, incumbent baselines, acceptance metrics, and economic conversion factors. It creates local draft language only. It does not authorize sending email, bulk outreach, contact scraping, field-validation claims, realized-savings claims, fixed-dollar frozen-delta claims, live trading, or autonomous operational execution.
 
@@ -8,8 +8,8 @@ Field-validation outreach board. This artifact identifies people and organizatio
 
 - Champion replay core: `24/24` wins vs `kalman_filter` across `4` source systems.
 - Champion replay estimated rows: `2506267`
-- Broader measured providers: `19/23`
-- Fresh rows returned by broader live pull: `516`
+- Broader measured providers: `25/29`
+- Fresh rows returned by broader live pull: `823`
 - Mapped source files/feeds: `186`
 - Ready-for-benchmark manifest rows: `313`
 - Boundary: The 24/24 result is the strongest champion replay core. The broader live-breadth universe is larger and ready for promotion, but it is not automatically part of the champion win until each source is run through locked benchmarks.
@@ -19,7 +19,7 @@ Field-validation outreach board. This artifact identifies people and organizatio
 - Claimable today: `paid_evidence_review_or_buyer_authorized_replay_only`
 - Paid evidence review range: `$5,000` to `$15,000` after scope.
 - Safe internal scenario value signal: `$39,595,200/year` under stated assumptions.
-- Broader live-breadth opportunity surface: `$12,173,289,850/year`, not a claim.
+- Broader live-breadth opportunity surface: `$18,041,944,890/year`, not a claim.
 - What unlocks real dollars: external owner supplies or approves held-out operational data; external owner names the incumbent baseline; acceptance metric is locked before replay; economic conversion factor is approved before replay; result artifact is signed, logged, or otherwise traceable
 
 ## Send Gate
@@ -200,7 +200,7 @@ I am Robert Ashworth, founder/inventor of LumenCore. I am looking for the right 
 
 Our strongest current internal champion is `kuramoto_phase_coupling` vs `kalman_filter` with 24/24 source-conditioned holdout wins and 2,506,267 estimated rows replayed.
 
-Separate from that core replay, the broader live-breadth estate currently shows 19 measured providers, 186 mapped source files/feeds, and 313 ready-for-benchmark rows.
+Separate from that core replay, the broader live-breadth estate currently shows 25 measured providers, 186 mapped source files/feeds, and 313 ready-for-benchmark rows.
 
 Important boundary: I am not claiming field validation or realized savings yet. The request is to run or scope a buyer-authorized replay using your held-out data, your incumbent baseline, your acceptance metric, and your approved economic conversion.
 
@@ -228,7 +228,7 @@ I am Robert Ashworth, a Nashville-area founder building LumenCore, a hash-verifi
 
 Our strongest current internal champion is `kuramoto_phase_coupling` vs `kalman_filter` with 24/24 source-conditioned holdout wins and 2,506,267 estimated rows replayed.
 
-Separate from that core replay, the broader live-breadth estate currently shows 19 measured providers, 186 mapped source files/feeds, and 313 ready-for-benchmark rows.
+Separate from that core replay, the broader live-breadth estate currently shows 25 measured providers, 186 mapped source files/feeds, and 313 ready-for-benchmark rows.
 
 I am looking for a local Tennessee path to an external reviewer, lab, utility, or partner who can help lock the held-out data, baseline, acceptance metric, and economic conversion needed for real field validation.
 
@@ -253,7 +253,7 @@ I am Robert Ashworth, building LumenCore, a proof-to-pilot platform for controll
 
 Our strongest current internal champion is `kuramoto_phase_coupling` vs `kalman_filter` with 24/24 source-conditioned holdout wins and 2,506,267 estimated rows replayed.
 
-Separate from that core replay, the broader live-breadth estate currently shows 19 measured providers, 186 mapped source files/feeds, and 313 ready-for-benchmark rows.
+Separate from that core replay, the broader live-breadth estate currently shows 25 measured providers, 186 mapped source files/feeds, and 313 ready-for-benchmark rows.
 
 The honest next funding need is external validation: a buyer/lab/agency-controlled replay using held-out data, an incumbent baseline, pre-registered metrics, and agreed economics. I am seeking non-dilutive funding, a paid evidence review, or an accelerator/partner path that can help turn this into a credible field replay.
 
@@ -279,4 +279,4 @@ To stop further outreach, reply "remove."
 9. Promote the 17-provider broader live-breadth universe through locked benchmarks before broad claims.
 10. Only convert deltas to dollars after an external owner approves the economic conversion.
 
-Outreach board SHA-256: `54ca3eb29802487977c4aef7b587b1b734904f35b2dde0e86888d3e2843b4aa3`
+Outreach board SHA-256: `bf2795f3cfaa6b1aa12debbd565f28b53fa25adb21a35c3e58a4dbe3d914cc44`

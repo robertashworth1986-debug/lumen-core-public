@@ -1,6 +1,6 @@
 # Energy Price-Pressure Forecast Evidence
 
-Generated UTC: 2026-07-01T13:08:59.145252+00:00
+Generated UTC: 2026-07-01T15:29:00.010754+00:00
 
 ## Boundary
 

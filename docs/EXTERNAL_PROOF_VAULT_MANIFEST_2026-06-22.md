@@ -1,6 +1,6 @@
 # Luma External Proof Vault Packet
 
-Generated UTC: `2026-07-01T12:59:47.393339+00:00`
+Generated UTC: `2026-07-01T15:29:00.450274+00:00`
 
 ## Purpose
 
@@ -11,7 +11,7 @@ Non-destructive staging manifest for high-value proof artifacts on external stor
 - Artifacts ready: `35/35`
 - Missing required: `0`
 - Ready bytes: `1663661`
-- Drive free bytes at staging time: `43460923392`
+- Drive free bytes at staging time: `44557680640`
 - Packet ready: `true`
 
 ## Boundary
