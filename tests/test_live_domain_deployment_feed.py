@@ -104,6 +104,10 @@ def test_feed_contract_includes_expanded_bridge_and_domain_audit():
     assert "economic claim bridge" in specs["champion_sample_expansion_and_economic_bridge"]["why"]
     assert specs["live_domain_consolidation_audit"]["required"] is False
     assert "Public-domain surface audit" in specs["live_domain_consolidation_audit"]["why"]
+    assert specs["luma_operator_context"]["required"] is False
+    assert "Anti-drift operator context" in specs["luma_operator_context"]["why"]
+    assert specs["champion_phase_proxy_diagnostics"]["required"] is False
+    assert "phase/coherence/residual proxy" in specs["champion_phase_proxy_diagnostics"]["why"]
 
 
 def test_all_required_hosted_hashes_matching_makes_domain_reviewer_ready(tmp_path, monkeypatch):

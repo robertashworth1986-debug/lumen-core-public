@@ -138,6 +138,18 @@ PROOF_FEEDS = [
         "required": False,
         "why": "Public-domain surface audit that identifies stale feeds, broken links, and claim-language cleanup.",
     },
+    {
+        "key": "luma_operator_context",
+        "local": "dashboard/data/luma_operator_context.json",
+        "required": False,
+        "why": "Anti-drift operator context and proof-to-pilot execution state.",
+    },
+    {
+        "key": "champion_phase_proxy_diagnostics",
+        "local": "dashboard/data/champion_phase_proxy_diagnostics.json",
+        "required": False,
+        "why": "Replay-data phase/coherence/residual proxy diagnostics for the current champion.",
+    },
 ]
 
 REMOTE_TEMPLATES = [

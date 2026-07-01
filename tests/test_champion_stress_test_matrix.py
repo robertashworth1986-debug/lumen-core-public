@@ -32,6 +32,7 @@ def test_champion_stress_matrix_summarizes_current_internal_champion():
     assert summary["estimated_rows_replayed"] >= 1_000_000
     assert summary["numeric_samples_read"] >= 50_000
     assert isinstance(summary["live_domain_hash_verified"], bool)
+    assert summary["phase_proxy_diagnostics_ready"] is True
     assert len(payload["stress_matrix_sha256"]) == 64
 
 
@@ -63,6 +64,7 @@ def test_champion_stress_matrix_has_source_and_blocked_metric_detail():
     gate_by_name = {row["name"]: row for row in payload["metric_stress_tests"]}
     assert gate_by_name["source_conditioned_holdout_depth"]["passed"] is True
     assert gate_by_name["hosted_hash_verification"]["passed"] is summary["live_domain_hash_verified"]
+    assert gate_by_name["replay_phase_proxy_diagnostics"]["passed"] is True
     assert gate_by_name["buyer_authorized_field_replay"]["blocker"] is True
     assert gate_by_name["phase_slip_and_amplitude_error"]["blocker"] is True
     assert gate_by_name["residual_autocorrelation_and_calibration"]["blocker"] is True

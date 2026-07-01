@@ -230,7 +230,8 @@ def build_payload() -> dict[str, Any]:
             "required_remote_hash_match_count": domain_summary.get("required_remote_hash_match_count"),
             "required_remote_stale_or_missing_count": domain_summary.get("required_remote_stale_or_missing_count"),
             "feed_only_deploy_ready": bool(bundle_summary.get("feed_only_deploy_ready")),
-            "safe_deploy_command": inputs["live_domain_deployment_feed"].get("safe_deploy_command"),
+            "safe_deploy_command": domain_summary.get("safe_deploy_command")
+            or inputs["live_domain_deployment_feed"].get("safe_deploy_command"),
         },
         "source_breadth": {
             "runtime_bound_keys_total": key_summary.get("runtime_bound_keys_total"),

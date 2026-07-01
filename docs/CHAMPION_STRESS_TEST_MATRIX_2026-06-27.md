@@ -1,11 +1,11 @@
 # Champion Stress Test Matrix
 
-Generated UTC: `2026-06-30T15:09:25.055072+00:00`
-Matrix SHA-256: `be353c8fc38f1e43f6762d6d20ad13f2cc0875467e61010f39c4c341fb4189e0`
+Generated UTC: `2026-07-01T10:59:26.421022+00:00`
+Matrix SHA-256: `ae15a498e095ec6c7a180d7f59ef54e0b033fee83c50873682e73fb8f8bbbee3`
 
 ## Truth Line
 
-This is the current money-printer truth line: Kuramoto phase coupling is a strong internal champion, with 24/24 source-conditioned holdout wins against kalman_filter across 4 source systems and locally hashable feeds staged for public hash verification. The next monetizable step is a paid, buyer-authorized field replay, not an unverified realized-savings claim.
+This is the current money-printer truth line: Kuramoto phase coupling is a strong internal champion, with 24/24 source-conditioned holdout wins against kalman_filter across 4 source systems and public hash-verified feeds. The next monetizable step is a paid, buyer-authorized field replay, not an unverified realized-savings claim.
 
 ## Current Champion
 
@@ -18,14 +18,14 @@ This is the current money-printer truth line: Kuramoto phase coupling is a stron
 - Numeric samples read: `66690`
 - Mean delta vs named baseline: `0.143725`
 - Weakest delta vs named baseline: `0.044697`
-- Live-domain hash verified: `false`
+- Live-domain hash verified: `true`
 
 ## Claim Boundary
 
 Allowed now:
 - current internal champion
 - source-conditioned holdout winner
-- local hashable reviewer feed staged for domain verification
+- public hash-verified reviewer feed
 - manual paid-pilot scoping candidate
 - buyer-authorized field replay request ready
 
@@ -63,9 +63,10 @@ Not allowed yet:
 | `stress_profile_coverage` | `PASS` | `10` | >= 3 stressed-profile holdouts |
 | `trend_profile_coverage` | `PASS` | `11` | >= 3 nonflat-trend holdouts |
 | `shock_profile_coverage` | `PASS` | `16` | >= 3 shock-bearing holdouts |
-| `hosted_hash_verification` | `FAIL` | `LOCAL_READY_DOMAIN_NOT_VERIFIED_OR_STALE` | LIVE_DOMAIN_HASH_VERIFIED |
+| `hosted_hash_verification` | `PASS` | `LIVE_DOMAIN_HASH_VERIFIED` | LIVE_DOMAIN_HASH_VERIFIED |
 | `all_registry_families_have_benchmark_specs` | `PASS` | `0` | 0 missing benchmark specs |
 | `statistical_repeat_gate` | `PASS` | `6e-08` | <= 0.001 |
+| `replay_phase_proxy_diagnostics` | `PASS` | `22/24 usable holdouts` | >= 20 usable numeric holdouts with replay phase proxies |
 | `phase_slip_and_amplitude_error` | `NOT_RUN_REQUIRES_NEXT_GATE` | `not measured in current artifact` | instrument or replay logs with phase-slip count and amplitude error |
 | `residual_autocorrelation_and_calibration` | `NOT_RUN_REQUIRES_NEXT_GATE` | `not measured in current artifact` | residual autocorrelation, calibration, and post-hoc leakage checks |
 | `latency_runtime_budget` | `NOT_RUN_REQUIRES_NEXT_GATE` | `not measured in current artifact` | measured latency under the target deployment workload |

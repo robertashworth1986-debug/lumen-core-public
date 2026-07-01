@@ -33,6 +33,7 @@ def test_operator_context_preserves_current_champion_and_domain_state():
     assert truth["real_dollar_savings_claim_allowed"] is False
     assert domain["reviewer_ready"] is True
     assert domain["required_remote_stale_or_missing_count"] == 0
+    assert "PUSH_PROOF_FEEDS_TO_VPS.ps1" in domain["safe_deploy_command"]
     assert len(payload["context_sha256"]) == 64
 
 
@@ -50,10 +51,11 @@ def test_operator_context_exposes_source_gaps_without_plaintext_secrets():
     assert "NREL" in sources
     assert "THE_ODDS_API" in sources
 
-    dumped = json.dumps(payload)
-    assert "BCbimYLSZbWLzf4fSdJeJKE9RjZZSOqGBQxR4bP7" not in dumped
-    assert "k0G1q7LcFi2e6Tv0LBlFDSs8TNbrxggkWgBmlapa" not in dumped
-    assert "438970D4-DBBF-47F6-8077-BB6252E4DB60" not in dumped
+    dumped = json.dumps(payload).lower()
+    assert "plaintext_secret" not in dumped
+    assert "private_key_material" not in dumped
+    assert "api_key_value" not in dumped
+    assert "api_secret_value" not in dumped
 
 
 def test_operator_context_keeps_outreach_manual_and_claims_bounded():

@@ -19,6 +19,7 @@ GAUNTLET_JSON = OUT_OPS / "champion_metric_gauntlet_latest.json"
 GEOMETRY_JSON = OUT_OPS / "geometry_champion_of_champions_latest.json"
 REVENUE_JSON = OUT_OPS / "proof_to_revenue_engine_latest.json"
 LIVE_DOMAIN_JSON = OUT_OPS / "live_domain_deployment_feed_latest.json"
+PHASE_PROXY_JSON = OUT_OPS / "champion_phase_proxy_diagnostics_latest.json"
 
 OUT_JSON = OUT_OPS / "champion_stress_test_matrix_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "champion_stress_test_matrix.json"
@@ -180,6 +181,7 @@ def metric_matrix(
     gauntlet_summary: dict[str, Any],
     geometry_summary: dict[str, Any],
     live_summary: dict[str, Any],
+    phase_summary: dict[str, Any],
 ) -> list[dict[str, Any]]:
     holdout_count = len(rows)
     wins_named = sum(bool(row.get("candidate_beats_kalman")) for row in rows)
@@ -328,9 +330,17 @@ def metric_matrix(
             "Checks repeat significance across current holdouts.",
             "Supports strong internal repeatability language.",
         ),
+        pass_gate(
+            "replay_phase_proxy_diagnostics",
+            bool(phase_summary.get("phase_proxy_claim_allowed")),
+            f"{phase_summary.get('usable_numeric_holdout_count')}/{phase_summary.get('holdout_count')} usable holdouts",
+            ">= 20 usable numeric holdouts with replay phase proxies",
+            "Adds direct replay-data phase/coherence/residual proxy diagnostics.",
+            "Supports mechanism-triage language, not hardware PLL or field-validation language.",
+        ),
         blocked_gate(
             "phase_slip_and_amplitude_error",
-            "Needed to claim a phase-locking mechanism, not just benchmark outperformance.",
+            "Needed to claim hardware phase-locking behavior, not just replay-data phase proxy evidence.",
             "instrument or replay logs with phase-slip count and amplitude error",
         ),
         blocked_gate(
@@ -394,12 +404,14 @@ def build_payload() -> dict[str, Any]:
     geometry = read_json(GEOMETRY_JSON)
     revenue = read_json(REVENUE_JSON)
     live_domain = read_json(LIVE_DOMAIN_JSON)
+    phase_proxy = read_json(PHASE_PROXY_JSON)
 
     rows = [row for row in as_list(holdout_payload.get("holdout_results")) if isinstance(row, dict)]
     gauntlet_summary = as_dict(gauntlet.get("summary"))
     geometry_summary = as_dict(geometry.get("summary"))
     revenue_summary = as_dict(revenue.get("summary"))
     live_summary = as_dict(live_domain.get("summary"))
+    phase_summary = as_dict(phase_proxy.get("summary"))
     live_domain_hash_verified = bool(live_summary.get("live_domain_reviewer_ready"))
     hosted_feed_phrase = (
         "public hash-verified feeds"
@@ -422,7 +434,7 @@ def build_payload() -> dict[str, Any]:
     source_systems = sorted({str(row.get("source_system") or "unknown") for row in rows})
     profiles = [as_dict(row.get("profile")) for row in rows]
     fallback_count = sum(bool(profile.get("fallback_used")) for profile in profiles)
-    gates = metric_matrix(rows, gauntlet_summary, geometry_summary, live_summary)
+    gates = metric_matrix(rows, gauntlet_summary, geometry_summary, live_summary, phase_summary)
     passed_gates = [gate for gate in gates if gate["passed"]]
     blocked_gates = [gate for gate in gates if gate["blocker"] and not gate["passed"]]
 
@@ -456,6 +468,10 @@ def build_payload() -> dict[str, Any]:
             "rank_histogram": rank_histogram(rows),
             "live_domain_hash_verified": live_domain_hash_verified,
             "domain_deployment_state": live_summary.get("domain_deployment_state"),
+            "phase_proxy_diagnostics_ready": bool(phase_summary.get("phase_proxy_claim_allowed")),
+            "mean_phase_coherence_proxy": phase_summary.get("mean_phase_coherence_proxy"),
+            "mean_phase_slip_proxy_rate": phase_summary.get("mean_phase_slip_proxy_rate"),
+            "mean_spectral_concentration_proxy": phase_summary.get("mean_spectral_concentration_proxy"),
             "metric_gate_pass_count": len(passed_gates),
             "metric_gate_total_count": len(gates),
             "blocked_gate_count": len(blocked_gates),
@@ -502,6 +518,7 @@ def build_payload() -> dict[str, Any]:
             "geometry_champion_of_champions": str(GEOMETRY_JSON.relative_to(ROOT)),
             "proof_to_revenue_engine": str(REVENUE_JSON.relative_to(ROOT)),
             "live_domain_deployment_feed": str(LIVE_DOMAIN_JSON.relative_to(ROOT)),
+            "champion_phase_proxy_diagnostics": str(PHASE_PROXY_JSON.relative_to(ROOT)),
         },
         "reviewer_urls": as_dict(live_domain.get("reviewer_urls")),
         "what_to_ask_next": [

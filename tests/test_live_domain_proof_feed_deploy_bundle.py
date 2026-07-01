@@ -70,6 +70,8 @@ def test_bundle_contract_includes_expanded_bridge_and_domain_audit():
     assert "locked_source_baseline_replay_sweep" in module.REQUIRED_FEEDS
     assert "champion_sample_expansion_and_economic_bridge" in module.REQUIRED_FEEDS
     assert "live_domain_consolidation_audit" in module.OPTIONAL_FEEDS
+    assert "luma_operator_context" in module.OPTIONAL_FEEDS
+    assert "champion_phase_proxy_diagnostics" in module.OPTIONAL_FEEDS
 
 
 def test_bundle_manifest_and_archive_exclude_secret_or_bulk_data_paths(tmp_path):

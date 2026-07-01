@@ -56,6 +56,8 @@ OPTIONAL_FEEDS = [
     "champion_stress_test_matrix",
     "first_buyer_target_board",
     "paid_pilot_outreach_queue",
+    "luma_operator_context",
+    "champion_phase_proxy_diagnostics",
 ]
 
 FORBIDDEN_NAME_FRAGMENTS = [
