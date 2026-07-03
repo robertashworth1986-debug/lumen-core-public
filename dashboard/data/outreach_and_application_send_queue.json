@@ -1,0 +1,90 @@
+{
+  "schema": "outreach_and_application_send_queue_v1",
+  "generated_local_date": "2026-07-03",
+  "boundary": "Approved for drafting, staging, form preparation, and browser navigation. Final external actions require exact action-time confirmation.",
+  "proof_line": {
+    "safe": "LumenCore is a hash-verified proof-to-pilot platform for live-data replay and benchmark validation. The current strongest internal result is Kuramoto phase coupling beating a named Kalman-filter baseline on 24 of 24 source-conditioned holdout checks, with about 2.5M estimated rows replayed in the champion core and a broader 25-provider live-breadth inventory ready for staged promotion.",
+    "boundary": "Ready for buyer-authorized field replay. Not field validated. Not a realized-savings claim."
+  },
+  "external_action_confirmation_required": [
+    "send_email",
+    "submit_application",
+    "post_or_edit_linkedin",
+    "upload_private_file",
+    "rotate_api_key",
+    "message_or_follow_people"
+  ],
+  "queue": [
+    {
+      "id": "epri_iel_sarah_reply",
+      "priority": 1,
+      "channel": "email_reply",
+      "recipient": "stoews@epri.com",
+      "subject": "Re: LumenCore field-replay request for utility AI validation",
+      "status": "ready_for_final_confirmation",
+      "send_gate": "Confirm exact recipient and whether to include phone number before sending.",
+      "body": "Hi Sarah,\n\nThank you for the clear reply. I understand the current IEL cohort is already underway and that the next cycle is expected to open in September.\n\nI would like to book a short fit call and ask one precise technical question: what would EPRI, IEL, or a participating utility need from LumenCore to scope a buyer-authorized field replay before or during the next cycle?\n\nLumenCore is a hash-verified evidence/replay platform for infrastructure AI validation. The current strongest internal result is narrow: a Kuramoto phase-coupling candidate beat a named Kalman-filter baseline on 24 of 24 source-conditioned holdout checks, with about 2.5M estimated rows replayed in the champion core and a broader 25-provider live-breadth inventory ready for staged promotion.\n\nImportant boundary: I am not claiming field validation or realized savings. The goal is to run the next step correctly: utility-approved held-out data, incumbent baseline, acceptance metric, replay window, and economic conversion locked before scoring.\n\nIf useful, I can send a one-page replay protocol or walk through the live proof feed:\nhttps://lumen-core.ai/mission_control.html\nhttps://lumen-core.ai/data/champion_metric_gauntlet.json\n\nWould your booking link be the right path for a fit call, or is there a better technical reviewer for AI/grid validation pilots?\n\nRespectfully,\nRobert Ashworth\nLumenCore"
+    },
+    {
+      "id": "lvlup_application",
+      "priority": 2,
+      "channel": "funding_application",
+      "url": "https://www.lvlup.vc/apply/funding-application",
+      "status": "ready_to_stage_not_submit",
+      "send_gate": "Confirm legal entity, revenue, runway, raise amount, pitch deck, and personal-hardship disclosure before submit.",
+      "referral": {
+        "how_heard": "Venture Scout",
+        "referrer_name": "Scott Kelly",
+        "referrer_email": "scott@blackdogvp.com"
+      },
+      "suggested_fields": {
+        "company": "LumenCore",
+        "website": "https://lumen-core.ai",
+        "one_line": "Hash-verified live-data replay and benchmark validation for infrastructure AI.",
+        "problem": "Infrastructure, energy, utility, and agency teams need credible ways to test AI and optimization claims before pilots or procurement. Today, many claims are hard to reproduce, disconnected from locked baselines, or not tied to buyer-approved acceptance metrics.",
+        "solution": "LumenCore ingests live and approved datasets, freezes provenance and hashes, runs locked baseline-vs-candidate replays, and publishes reviewer-safe proof feeds.",
+        "traction": "Live domain and reviewer feeds are deployed at lumen-core.ai. Current strongest internal result: Kuramoto phase coupling beat a named Kalman-filter baseline on 24/24 source-conditioned holdout checks, with about 2.5M estimated rows replayed in the champion core. The broader live-source inventory currently measures 25 providers out of 29 enabled sources. LumenCore has submitted a DARPA DICE abstract and has received an Incubatenergy/EPRI response inviting a fit discussion for a future utility validation cycle.",
+        "business_model": "Paid evidence reviews, buyer-authorized field replay pilots, grant-funded validation packages, and annual platform licensing.",
+        "use_of_funds": "Field validation, data partnerships, security/compliance hardening, patent/legal support, pilot delivery, and conversion of the proof feed into a production-grade buyer portal.",
+        "raise_amount_suggested": "$250,000-$500,000 pre-seed validation/pilot bridge",
+        "revenue_assumption": "Pre-revenue / pilot-stage unless Robert confirms active paid revenue."
+      }
+    },
+    {
+      "id": "black_dog_scott_followup",
+      "priority": 3,
+      "channel": "email",
+      "recipient": "scott@blackdogvp.com",
+      "subject": "LumenCore application ready for LvlUp review",
+      "status": "ready_after_lvlup_stage",
+      "send_gate": "Confirm whether to send before or after the LvlUp application is submitted."
+    },
+    {
+      "id": "ornl_epb_field_replay_ask",
+      "priority": 4,
+      "channel": "email_or_contact_form",
+      "recipient": "needs_verified_recipient_from_ornl_thread_or_contact_form",
+      "subject": "Buyer-authorized field replay request: grid AI benchmark validation",
+      "status": "recipient_needed",
+      "send_gate": "Confirm verified recipient."
+    },
+    {
+      "id": "tva_spark_bridge",
+      "priority": 5,
+      "channel": "email_or_contact_form",
+      "recipient": "needs_verified_spark_or_tva_contact_route",
+      "subject": "LumenCore field-replay fit for grid performance validation",
+      "status": "recipient_needed",
+      "send_gate": "Confirm recipient or form target."
+    },
+    {
+      "id": "patent_legal_intake",
+      "priority": 6,
+      "channel": "email_or_contact_form",
+      "recipient": "needs_verified_legal_intake_recipient",
+      "subject": "Urgent patent counsel request for LumenCore non-provisional strategy",
+      "status": "recipient_needed",
+      "send_gate": "Confirm exact legal recipient and whether to attach patent packet."
+    }
+  ]
+}
