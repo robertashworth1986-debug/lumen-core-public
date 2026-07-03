@@ -1,0 +1,1402 @@
+{
+  "boundary": "Live-domain deployment feed only. Matching hosted hashes prove that the public domain is serving the same local proof feeds. They do not prove field validation, realized savings, grant award certainty, fixed frozen delta pricing, medical efficacy, or live trading performance.",
+  "current_champion": {
+    "buyer_authorized_field_replay_request_ready": true,
+    "estimated_rows_replayed": 2506267,
+    "family": "kuramoto_phase_coupling",
+    "field_validation_claim_allowed": false,
+    "holdout_count": 24,
+    "holdout_win_rate": 1.0,
+    "holdout_wins": 24,
+    "label": "Kuramoto phase coupling",
+    "named_baseline": "kalman_filter",
+    "real_dollar_savings_claim_allowed": false,
+    "source_system_count": 4
+  },
+  "deployment_feed_sha256": "619f5cf1970e206380a39dbdee100931e3cdb20b944bd94cd90a10a6452817b5",
+  "feeds": [
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "champion_metric_gauntlet",
+      "local_bytes": 28914,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T16:49:06.536895+00:00",
+      "local_relative_path": "dashboard/data/champion_metric_gauntlet.json",
+      "local_schema": "champion_metric_gauntlet_v1",
+      "local_sha256": "34ed58d4967299b1348186177e47d029949b345324117a5e1f490c6857763d54",
+      "remote_candidates": [
+        {
+          "bytes": 28914,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "34ed58d4967299b1348186177e47d029949b345324117a5e1f490c6857763d54",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/champion_metric_gauntlet.json"
+        },
+        {
+          "bytes": 28914,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "34ed58d4967299b1348186177e47d029949b345324117a5e1f490c6857763d54",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/champion_metric_gauntlet.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 28914,
+      "remote_first_reachable_sha256": "34ed58d4967299b1348186177e47d029949b345324117a5e1f490c6857763d54",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/champion_metric_gauntlet.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/champion_metric_gauntlet.json",
+      "remote_reachable": true,
+      "required": true,
+      "why": "Current reviewer-safe champion summary and metric gates."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "locked_source_baseline_replay_sweep",
+      "local_bytes": 1889079,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T09:38:39.311436+00:00",
+      "local_relative_path": "dashboard/data/locked_source_baseline_replay_sweep.json",
+      "local_schema": "locked_source_baseline_replay_sweep_v1",
+      "local_sha256": "123883dabde27800494c145ee0df3e12d760c41e6420e30b96fce31e01e68139",
+      "remote_candidates": [
+        {
+          "bytes": 1889079,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "123883dabde27800494c145ee0df3e12d760c41e6420e30b96fce31e01e68139",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/locked_source_baseline_replay_sweep.json"
+        },
+        {
+          "bytes": 1889079,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "123883dabde27800494c145ee0df3e12d760c41e6420e30b96fce31e01e68139",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/locked_source_baseline_replay_sweep.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 1889079,
+      "remote_first_reachable_sha256": "123883dabde27800494c145ee0df3e12d760c41e6420e30b96fce31e01e68139",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/locked_source_baseline_replay_sweep.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/locked_source_baseline_replay_sweep.json",
+      "remote_reachable": true,
+      "required": true,
+      "why": "Full locked source-conditioned replay sweep across live-breadth rows and baselines."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "kuramoto_holdout_expansion",
+      "local_bytes": 52368,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T11:26:05.882035+00:00",
+      "local_relative_path": "dashboard/data/kuramoto_holdout_expansion.json",
+      "local_schema": "kuramoto_holdout_expansion_v1",
+      "local_sha256": "1645f3d74f7ea189cc0481ad207e3d87e51ea2ee042f34aa346dbd79af238d8a",
+      "remote_candidates": [
+        {
+          "bytes": 52368,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "1645f3d74f7ea189cc0481ad207e3d87e51ea2ee042f34aa346dbd79af238d8a",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/kuramoto_holdout_expansion.json"
+        },
+        {
+          "bytes": 52368,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "1645f3d74f7ea189cc0481ad207e3d87e51ea2ee042f34aa346dbd79af238d8a",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/kuramoto_holdout_expansion.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 52368,
+      "remote_first_reachable_sha256": "1645f3d74f7ea189cc0481ad207e3d87e51ea2ee042f34aa346dbd79af238d8a",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/kuramoto_holdout_expansion.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/kuramoto_holdout_expansion.json",
+      "remote_reachable": true,
+      "required": true,
+      "why": "Expanded source-conditioned holdout evidence for the current champion."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "geometry_champion_of_champions",
+      "local_bytes": 329523,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T16:50:02.218808+00:00",
+      "local_relative_path": "dashboard/data/geometry_champion_of_champions.json",
+      "local_schema": "geometry_champion_of_champions_v1",
+      "local_sha256": "1d1975246333f4ea129d75657071a73ef7627045c204b1314c7128fd9bcf1194",
+      "remote_candidates": [
+        {
+          "bytes": 329523,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "1d1975246333f4ea129d75657071a73ef7627045c204b1314c7128fd9bcf1194",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/geometry_champion_of_champions.json"
+        },
+        {
+          "bytes": 329523,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "1d1975246333f4ea129d75657071a73ef7627045c204b1314c7128fd9bcf1194",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/geometry_champion_of_champions.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 329523,
+      "remote_first_reachable_sha256": "1d1975246333f4ea129d75657071a73ef7627045c204b1314c7128fd9bcf1194",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/geometry_champion_of_champions.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/geometry_champion_of_champions.json",
+      "remote_reachable": true,
+      "required": true,
+      "why": "Family-level champion ranking and evidence status."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "field_money_truth_sweep",
+      "local_bytes": 4450,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T06:18:06.797925+00:00",
+      "local_relative_path": "dashboard/data/field_money_truth_sweep.json",
+      "local_schema": "field_money_truth_sweep_v1",
+      "local_sha256": "88f8242d07edf59728f60e502bfdce670d9e4340718c820c75a78dd3d3e2e7e3",
+      "remote_candidates": [
+        {
+          "bytes": 4450,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "88f8242d07edf59728f60e502bfdce670d9e4340718c820c75a78dd3d3e2e7e3",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/field_money_truth_sweep.json"
+        },
+        {
+          "bytes": 4450,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "88f8242d07edf59728f60e502bfdce670d9e4340718c820c75a78dd3d3e2e7e3",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/field_money_truth_sweep.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 4450,
+      "remote_first_reachable_sha256": "88f8242d07edf59728f60e502bfdce670d9e4340718c820c75a78dd3d3e2e7e3",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/field_money_truth_sweep.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/field_money_truth_sweep.json",
+      "remote_reachable": true,
+      "required": true,
+      "why": "Safe money-path and truth-boundary gate."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "live_proof_value_meter",
+      "local_bytes": 20352,
+      "local_exists": true,
+      "local_generated_utc": "2026-06-27T17:45:58.555424+00:00",
+      "local_relative_path": "dashboard/data/live_proof_value_meter.json",
+      "local_schema": "live_proof_value_meter_v1",
+      "local_sha256": "07c416189aba2ac78d2a341986bdcde7dd6f229c530785f6e418efce9e05c7c2",
+      "remote_candidates": [
+        {
+          "bytes": 20352,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "07c416189aba2ac78d2a341986bdcde7dd6f229c530785f6e418efce9e05c7c2",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/live_proof_value_meter.json"
+        },
+        {
+          "bytes": 20352,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "07c416189aba2ac78d2a341986bdcde7dd6f229c530785f6e418efce9e05c7c2",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/live_proof_value_meter.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 20352,
+      "remote_first_reachable_sha256": "07c416189aba2ac78d2a341986bdcde7dd6f229c530785f6e418efce9e05c7c2",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/live_proof_value_meter.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/live_proof_value_meter.json",
+      "remote_reachable": true,
+      "required": true,
+      "why": "Bounded estimated-value language and claim boundaries."
+    },
+    {
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
+      "key": "field_validated_dollar_claim_ladder",
+      "local_bytes": 22471,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-03T01:18:39.499888+00:00",
+      "local_relative_path": "dashboard/data/field_validated_dollar_claim_ladder.json",
+      "local_schema": "field_validated_dollar_claim_ladder_v1",
+      "local_sha256": "f4ce0d6887d24180c4fd6019c9b024f36b39c6c35d3ce52e423810dce8164f82",
+      "remote_candidates": [
+        {
+          "bytes": 22424,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "f29d59bbcc97201df6809be1166d227a571778cc3a20d7f35c64c9ea6a461e42",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/field_validated_dollar_claim_ladder.json"
+        },
+        {
+          "bytes": 22424,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "f29d59bbcc97201df6809be1166d227a571778cc3a20d7f35c64c9ea6a461e42",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/field_validated_dollar_claim_ladder.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 22424,
+      "remote_first_reachable_sha256": "f29d59bbcc97201df6809be1166d227a571778cc3a20d7f35c64c9ea6a461e42",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/field_validated_dollar_claim_ladder.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
+      "remote_reachable": true,
+      "required": true,
+      "why": "Ladder from internal proof to authorized field validation."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "dollar_claim_gate",
+      "local_bytes": 21463,
+      "local_exists": true,
+      "local_generated_utc": "2026-06-27T17:45:56.939413+00:00",
+      "local_relative_path": "dashboard/data/dollar_claim_gate.json",
+      "local_schema": "dollar_claim_gate_v1",
+      "local_sha256": "9e64ad63466e81cd1499014b97c35f2796ec728e76b72010cd549bb2aa5d741d",
+      "remote_candidates": [
+        {
+          "bytes": 21463,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "9e64ad63466e81cd1499014b97c35f2796ec728e76b72010cd549bb2aa5d741d",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/dollar_claim_gate.json"
+        },
+        {
+          "bytes": 21463,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "9e64ad63466e81cd1499014b97c35f2796ec728e76b72010cd549bb2aa5d741d",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/dollar_claim_gate.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 21463,
+      "remote_first_reachable_sha256": "9e64ad63466e81cd1499014b97c35f2796ec728e76b72010cd549bb2aa5d741d",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/dollar_claim_gate.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/dollar_claim_gate.json",
+      "remote_reachable": true,
+      "required": true,
+      "why": "Explicit allowed and blocked dollar-claim states."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "field_validation_control_room",
+      "local_bytes": 25300,
+      "local_exists": true,
+      "local_generated_utc": "2026-06-29T20:45:59.130802+00:00",
+      "local_relative_path": "dashboard/data/field_validation_control_room.json",
+      "local_schema": "field_validation_control_room_v1",
+      "local_sha256": "bf7fae7aef0427b010fc592696a48e5392d138d11f1c2d5de32075aa319eacea",
+      "remote_candidates": [
+        {
+          "bytes": 25300,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "bf7fae7aef0427b010fc592696a48e5392d138d11f1c2d5de32075aa319eacea",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/field_validation_control_room.json"
+        },
+        {
+          "bytes": 25300,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "bf7fae7aef0427b010fc592696a48e5392d138d11f1c2d5de32075aa319eacea",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/field_validation_control_room.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 25300,
+      "remote_first_reachable_sha256": "bf7fae7aef0427b010fc592696a48e5392d138d11f1c2d5de32075aa319eacea",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/field_validation_control_room.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/field_validation_control_room.json",
+      "remote_reachable": true,
+      "required": true,
+      "why": "External validation unlocks, held-out data blockers, and buyer-accepted claim boundaries."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "field_validation_outreach_board",
+      "local_bytes": 25899,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T15:36:01.243952+00:00",
+      "local_relative_path": "dashboard/data/field_validation_outreach_board.json",
+      "local_schema": "field_validation_outreach_board_v1",
+      "local_sha256": "16ad10dc8d8a4cb3bc22d141986ffdbb24c9c101f3f29954aebbc4300f86fa7b",
+      "remote_candidates": [
+        {
+          "bytes": 25899,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "16ad10dc8d8a4cb3bc22d141986ffdbb24c9c101f3f29954aebbc4300f86fa7b",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/field_validation_outreach_board.json"
+        },
+        {
+          "bytes": 25899,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "16ad10dc8d8a4cb3bc22d141986ffdbb24c9c101f3f29954aebbc4300f86fa7b",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/field_validation_outreach_board.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 25899,
+      "remote_first_reachable_sha256": "16ad10dc8d8a4cb3bc22d141986ffdbb24c9c101f3f29954aebbc4300f86fa7b",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/field_validation_outreach_board.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/field_validation_outreach_board.json",
+      "remote_reachable": true,
+      "required": true,
+      "why": "Ranked manual outreach targets and reviewer-safe validation request language."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "proof_to_pilot_control_room",
+      "local_bytes": 9936,
+      "local_exists": true,
+      "local_generated_utc": "2026-06-27T17:45:57.240315+00:00",
+      "local_relative_path": "dashboard/data/proof_to_pilot_control_room.json",
+      "local_schema": "proof_to_pilot_control_room_v1",
+      "local_sha256": "20fdcc50fae67e320217b71ca130b00c3dce8b0ba0327441b0cfded23aef9267",
+      "remote_candidates": [
+        {
+          "bytes": 9936,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "20fdcc50fae67e320217b71ca130b00c3dce8b0ba0327441b0cfded23aef9267",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/proof_to_pilot_control_room.json"
+        },
+        {
+          "bytes": 9936,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "20fdcc50fae67e320217b71ca130b00c3dce8b0ba0327441b0cfded23aef9267",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/proof_to_pilot_control_room.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 9936,
+      "remote_first_reachable_sha256": "20fdcc50fae67e320217b71ca130b00c3dce8b0ba0327441b0cfded23aef9267",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/proof_to_pilot_control_room.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/proof_to_pilot_control_room.json",
+      "remote_reachable": true,
+      "required": true,
+      "why": "Canonical proof-to-pilot board feed that ties champions to paid evaluation scope."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "champion_sample_expansion_and_economic_bridge",
+      "local_bytes": 28396,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T15:28:55.185985+00:00",
+      "local_relative_path": "dashboard/data/champion_sample_expansion_and_economic_bridge.json",
+      "local_schema": "champion_sample_expansion_and_economic_bridge_v1",
+      "local_sha256": "09605006a1d80f89278f8b2bd1ab6aadb5f25b751c8de6c64fc56a90916e30da",
+      "remote_candidates": [
+        {
+          "bytes": 28396,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "09605006a1d80f89278f8b2bd1ab6aadb5f25b751c8de6c64fc56a90916e30da",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/champion_sample_expansion_and_economic_bridge.json"
+        },
+        {
+          "bytes": 28396,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "09605006a1d80f89278f8b2bd1ab6aadb5f25b751c8de6c64fc56a90916e30da",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/champion_sample_expansion_and_economic_bridge.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 28396,
+      "remote_first_reachable_sha256": "09605006a1d80f89278f8b2bd1ab6aadb5f25b751c8de6c64fc56a90916e30da",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/champion_sample_expansion_and_economic_bridge.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/champion_sample_expansion_and_economic_bridge.json",
+      "remote_reachable": true,
+      "required": true,
+      "why": "Expanded source breadth, sample-size diagnostics, and disciplined economic claim bridge."
+    },
+    {
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
+      "key": "champion_source_ablation",
+      "local_bytes": 10864,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-03T02:04:58.077252+00:00",
+      "local_relative_path": "dashboard/data/champion_source_ablation.json",
+      "local_schema": "champion_source_ablation_v1",
+      "local_sha256": "8f0b0c7e9333a9caadea4b7a36e208381c8f3278ff152e51ffe9a455504f0e66",
+      "remote_candidates": [
+        {
+          "bytes": 0,
+          "content_type": "application/json",
+          "error": "HTTP Error 404: Not Found",
+          "ok": false,
+          "sha256": "",
+          "status": 404,
+          "url": "https://lumen-core.ai/data/champion_source_ablation.json"
+        },
+        {
+          "bytes": 0,
+          "content_type": "application/json",
+          "error": "HTTP Error 404: Not Found",
+          "ok": false,
+          "sha256": "",
+          "status": 404,
+          "url": "https://lumen-core.ai/dashboard/data/champion_source_ablation.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 0,
+      "remote_first_reachable_sha256": "",
+      "remote_first_reachable_status": null,
+      "remote_first_reachable_url": "",
+      "remote_hash_match": false,
+      "remote_match_url": "",
+      "remote_reachable": false,
+      "required": true,
+      "why": "Leave-one-source-out robustness gate showing the current champion is not carried by one source system."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "geometry_asset_wiring_board",
+      "local_bytes": 88878,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T07:19:52.693678+00:00",
+      "local_relative_path": "dashboard/data/geometry_asset_wiring_board.json",
+      "local_schema": "geometry_asset_wiring_board_v1",
+      "local_sha256": "20be445c88521c72d5538ec91304fc370bca5c9089375757c656a15b14414351",
+      "remote_candidates": [
+        {
+          "bytes": 88878,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "20be445c88521c72d5538ec91304fc370bca5c9089375757c656a15b14414351",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/geometry_asset_wiring_board.json"
+        },
+        {
+          "bytes": 88878,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "20be445c88521c72d5538ec91304fc370bca5c9089375757c656a15b14414351",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/geometry_asset_wiring_board.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 88878,
+      "remote_first_reachable_sha256": "20be445c88521c72d5538ec91304fc370bca5c9089375757c656a15b14414351",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/geometry_asset_wiring_board.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/geometry_asset_wiring_board.json",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Broader dataset and asset wiring context."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "luma_context_dashboard_parity_audit",
+      "local_bytes": 58781,
+      "local_exists": true,
+      "local_generated_utc": "2026-06-29T22:14:01.083282+00:00",
+      "local_relative_path": "dashboard/data/luma_context_dashboard_parity_audit.json",
+      "local_schema": "luma_context_dashboard_parity_audit_v1",
+      "local_sha256": "757fe628616e5d0a041e390abc18088b55ec672eb483b410d3571957098b7c20",
+      "remote_candidates": [
+        {
+          "bytes": 58781,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "757fe628616e5d0a041e390abc18088b55ec672eb483b410d3571957098b7c20",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/luma_context_dashboard_parity_audit.json"
+        },
+        {
+          "bytes": 58781,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "757fe628616e5d0a041e390abc18088b55ec672eb483b410d3571957098b7c20",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/luma_context_dashboard_parity_audit.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 58781,
+      "remote_first_reachable_sha256": "757fe628616e5d0a041e390abc18088b55ec672eb483b410d3571957098b7c20",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/luma_context_dashboard_parity_audit.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/luma_context_dashboard_parity_audit.json",
+      "remote_reachable": true,
+      "required": false,
+      "why": "General dashboard parity and continuity audit."
+    },
+    {
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
+      "key": "champion_stress_test_matrix",
+      "local_bytes": 37169,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-03T02:11:53.419116+00:00",
+      "local_relative_path": "dashboard/data/champion_stress_test_matrix.json",
+      "local_schema": "champion_stress_test_matrix_v1",
+      "local_sha256": "6d3857812135885ad4ba4bc3ef0d2a06829e1e81c5a9ea0ab2db2547a65e935e",
+      "remote_candidates": [
+        {
+          "bytes": 36522,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "d40cf059f0b47a1da46f67b7c7638630be18695bc045a13823b716d9838da1e8",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/champion_stress_test_matrix.json"
+        },
+        {
+          "bytes": 36522,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "d40cf059f0b47a1da46f67b7c7638630be18695bc045a13823b716d9838da1e8",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/champion_stress_test_matrix.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 36522,
+      "remote_first_reachable_sha256": "d40cf059f0b47a1da46f67b7c7638630be18695bc045a13823b716d9838da1e8",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/champion_stress_test_matrix.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Compact buyer/reviewer-safe stress matrix for the current champion."
+    },
+    {
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
+      "key": "champion_metric_battery",
+      "local_bytes": 16864,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-03T00:12:56.959814+00:00",
+      "local_relative_path": "dashboard/data/champion_metric_battery.json",
+      "local_schema": "champion_metric_battery_v1",
+      "local_sha256": "a7cff739cc16ab24aaa6994ff4ee2c9d2d6e8f62078de02399dbc5797bd723cd",
+      "remote_candidates": [
+        {
+          "bytes": 16863,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "39d42e29ebe482485c9611736735a550d59a0c6545e548300359428557c38c58",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/champion_metric_battery.json"
+        },
+        {
+          "bytes": 16863,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "39d42e29ebe482485c9611736735a550d59a0c6545e548300359428557c38c58",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/champion_metric_battery.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 16863,
+      "remote_first_reachable_sha256": "39d42e29ebe482485c9611736735a550d59a0c6545e548300359428557c38c58",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/champion_metric_battery.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Consolidated pass/ready/blocked metric battery for the current champion."
+    },
+    {
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
+      "key": "champion_expanded_metric_rollup",
+      "local_bytes": 41864,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-03T00:12:57.281477+00:00",
+      "local_relative_path": "dashboard/data/champion_expanded_metric_rollup.json",
+      "local_schema": "champion_expanded_metric_rollup_v1",
+      "local_sha256": "0548a5becf7b27ac6d7cdba8eaea06b9dc0483b0700ad5c474ba6d491a31a1e4",
+      "remote_candidates": [
+        {
+          "bytes": 41864,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "f5127fb1f0d315b5aeb596256d5b7da710d19d08c408a9e87bd10db50f1a3129",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/champion_expanded_metric_rollup.json"
+        },
+        {
+          "bytes": 41864,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "f5127fb1f0d315b5aeb596256d5b7da710d19d08c408a9e87bd10db50f1a3129",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/champion_expanded_metric_rollup.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 41864,
+      "remote_first_reachable_sha256": "f5127fb1f0d315b5aeb596256d5b7da710d19d08c408a9e87bd10db50f1a3129",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/champion_expanded_metric_rollup.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Lane-by-lane expanded metric rollup tying champion wins to baselines, sources, and claim gates."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "proof_to_revenue_engine",
+      "local_bytes": 9713,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T05:53:20.085838+00:00",
+      "local_relative_path": "dashboard/data/proof_to_revenue_engine.json",
+      "local_schema": "proof_to_revenue_engine_v1",
+      "local_sha256": "b611e887434a532198807db62bb33970a4ecea87d500873377faa53d488ff80e",
+      "remote_candidates": [
+        {
+          "bytes": 9713,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "b611e887434a532198807db62bb33970a4ecea87d500873377faa53d488ff80e",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/proof_to_revenue_engine.json"
+        },
+        {
+          "bytes": 9713,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "b611e887434a532198807db62bb33970a4ecea87d500873377faa53d488ff80e",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/proof_to_revenue_engine.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 9713,
+      "remote_first_reachable_sha256": "b611e887434a532198807db62bb33970a4ecea87d500873377faa53d488ff80e",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/proof_to_revenue_engine.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/proof_to_revenue_engine.json",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Reviewer-safe proof-to-revenue bridge with blocked and allowed claim controls."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "first_buyer_target_board",
+      "local_bytes": 20224,
+      "local_exists": true,
+      "local_generated_utc": "2026-06-29T16:50:23.016860+00:00",
+      "local_relative_path": "dashboard/data/first_buyer_target_board.json",
+      "local_schema": "first_buyer_target_board_v1",
+      "local_sha256": "eab5d0cc7e858283804657a5cbe7a5f791ba2d7d5abe683fe330edc4b4f60b12",
+      "remote_candidates": [
+        {
+          "bytes": 20224,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "eab5d0cc7e858283804657a5cbe7a5f791ba2d7d5abe683fe330edc4b4f60b12",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/first_buyer_target_board.json"
+        },
+        {
+          "bytes": 20224,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "eab5d0cc7e858283804657a5cbe7a5f791ba2d7d5abe683fe330edc4b4f60b12",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/first_buyer_target_board.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 20224,
+      "remote_first_reachable_sha256": "eab5d0cc7e858283804657a5cbe7a5f791ba2d7d5abe683fe330edc4b4f60b12",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/first_buyer_target_board.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/first_buyer_target_board.json",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Named, source-verified first-buyer and field-replay target board."
+    },
+    {
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
+      "key": "live_domain_consolidation_audit",
+      "local_bytes": 26162,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T16:54:10.556371+00:00",
+      "local_relative_path": "dashboard/data/live_domain_consolidation_audit.json",
+      "local_schema": "live_domain_consolidation_audit_v1",
+      "local_sha256": "84661a38bcd75d25648899322bff144b2b41651c4db2ad74d6330bc0e2c9074f",
+      "remote_candidates": [
+        {
+          "bytes": 26162,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "0e297744df5046f921e12d5e715f2083aeed80d7e6ba817903ef474fc6781e65",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/live_domain_consolidation_audit.json"
+        },
+        {
+          "bytes": 26162,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "0e297744df5046f921e12d5e715f2083aeed80d7e6ba817903ef474fc6781e65",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/live_domain_consolidation_audit.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 26162,
+      "remote_first_reachable_sha256": "0e297744df5046f921e12d5e715f2083aeed80d7e6ba817903ef474fc6781e65",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/live_domain_consolidation_audit.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Public-domain surface audit that identifies stale feeds, broken links, and claim-language cleanup."
+    },
+    {
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
+      "key": "luma_operator_context",
+      "local_bytes": 23464,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-03T00:12:56.655112+00:00",
+      "local_relative_path": "dashboard/data/luma_operator_context.json",
+      "local_schema": "luma_operator_context_v1",
+      "local_sha256": "85427d1cd3ad79b07f27a6546f495ad9571e5799cb99317d0852e986a90764e3",
+      "remote_candidates": [
+        {
+          "bytes": 23464,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "ce67374b57640f7563e9d19152d8a443519b94fece3717d5c839299457fe4bac",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/luma_operator_context.json"
+        },
+        {
+          "bytes": 23464,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "ce67374b57640f7563e9d19152d8a443519b94fece3717d5c839299457fe4bac",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/luma_operator_context.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 23464,
+      "remote_first_reachable_sha256": "ce67374b57640f7563e9d19152d8a443519b94fece3717d5c839299457fe4bac",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/luma_operator_context.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Anti-drift operator context and proof-to-pilot execution state."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "champion_phase_proxy_diagnostics",
+      "local_bytes": 33467,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T16:28:22.438111+00:00",
+      "local_relative_path": "dashboard/data/champion_phase_proxy_diagnostics.json",
+      "local_schema": "champion_phase_proxy_diagnostics_v1",
+      "local_sha256": "0cbb742be1570af67e94df5b0220385aa44846414cb450d25fe79017f0b607a6",
+      "remote_candidates": [
+        {
+          "bytes": 33467,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "0cbb742be1570af67e94df5b0220385aa44846414cb450d25fe79017f0b607a6",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/champion_phase_proxy_diagnostics.json"
+        },
+        {
+          "bytes": 33467,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "0cbb742be1570af67e94df5b0220385aa44846414cb450d25fe79017f0b607a6",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/champion_phase_proxy_diagnostics.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 33467,
+      "remote_first_reachable_sha256": "0cbb742be1570af67e94df5b0220385aa44846414cb450d25fe79017f0b607a6",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/champion_phase_proxy_diagnostics.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/champion_phase_proxy_diagnostics.json",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Replay-data phase/coherence/residual proxy diagnostics for the current champion."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "safe_key_provider_ping",
+      "local_bytes": 22301,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T14:52:15.044615+00:00",
+      "local_relative_path": "dashboard/data/safe_key_provider_ping.json",
+      "local_schema": "safe_key_provider_ping.v1",
+      "local_sha256": "97093efea69a60f11379030d38197c973abbc21e11c940b6b6c4c6492a23adc1",
+      "remote_candidates": [
+        {
+          "bytes": 22301,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "97093efea69a60f11379030d38197c973abbc21e11c940b6b6c4c6492a23adc1",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/safe_key_provider_ping.json"
+        },
+        {
+          "bytes": 22301,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "97093efea69a60f11379030d38197c973abbc21e11c940b6b6c4c6492a23adc1",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/safe_key_provider_ping.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 22301,
+      "remote_first_reachable_sha256": "97093efea69a60f11379030d38197c973abbc21e11c940b6b6c4c6492a23adc1",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/safe_key_provider_ping.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/safe_key_provider_ping.json",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Masked provider-key readiness and API ping status without exposing secrets."
+    },
+    {
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
+      "key": "live_source_measurement_maximizer",
+      "local_bytes": 39808,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-03T01:18:39.405817+00:00",
+      "local_relative_path": "dashboard/data/live_source_measurement_maximizer.json",
+      "local_schema": "live_source_measurement_maximizer_v1",
+      "local_sha256": "472f3095c87eba293c1eaf4a9a665d34b29f87a11d8893dbdb6b5e28d406fb48",
+      "remote_candidates": [
+        {
+          "bytes": 39859,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "f56a09ed0e4a08aa467e8fb3236b2ab0d1c83e3ad08a80056a48568a90299159",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/live_source_measurement_maximizer.json"
+        },
+        {
+          "bytes": 39859,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "f56a09ed0e4a08aa467e8fb3236b2ab0d1c83e3ad08a80056a48568a90299159",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/live_source_measurement_maximizer.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 39859,
+      "remote_first_reachable_sha256": "f56a09ed0e4a08aa467e8fb3236b2ab0d1c83e3ad08a80056a48568a90299159",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/live_source_measurement_maximizer.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Latest measured-source count, fresh row count, and blocked/thin source diagnostics."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "geometry_live_wiring_matrix",
+      "local_bytes": 180193,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T13:08:57.756102+00:00",
+      "local_relative_path": "dashboard/data/geometry_live_wiring_matrix.json",
+      "local_schema": "geometry_live_wiring_matrix_v1",
+      "local_sha256": "b559f3668cda45da162f260cfbdd1804fd52698631a50d2f4a996bb5cd0a42ea",
+      "remote_candidates": [
+        {
+          "bytes": 180193,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "b559f3668cda45da162f260cfbdd1804fd52698631a50d2f4a996bb5cd0a42ea",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/geometry_live_wiring_matrix.json"
+        },
+        {
+          "bytes": 180193,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "b559f3668cda45da162f260cfbdd1804fd52698631a50d2f4a996bb5cd0a42ea",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/geometry_live_wiring_matrix.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 180193,
+      "remote_first_reachable_sha256": "b559f3668cda45da162f260cfbdd1804fd52698631a50d2f4a996bb5cd0a42ea",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/geometry_live_wiring_matrix.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/geometry_live_wiring_matrix.json",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Maps geometry lanes to measured live-source readiness and remaining claim gates."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "geometry_live_breadth_proof_queue",
+      "local_bytes": 463401,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T11:24:50.078212+00:00",
+      "local_relative_path": "dashboard/data/geometry_live_breadth_proof_queue.json",
+      "local_schema": "geometry_live_breadth_proof_queue_v1",
+      "local_sha256": "088820432c98c11094d2d8bd052569606789d3d579dc2c75b6ae6683d078ae02",
+      "remote_candidates": [
+        {
+          "bytes": 463401,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "088820432c98c11094d2d8bd052569606789d3d579dc2c75b6ae6683d078ae02",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/geometry_live_breadth_proof_queue.json"
+        },
+        {
+          "bytes": 463401,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "088820432c98c11094d2d8bd052569606789d3d579dc2c75b6ae6683d078ae02",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/geometry_live_breadth_proof_queue.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 463401,
+      "remote_first_reachable_sha256": "088820432c98c11094d2d8bd052569606789d3d579dc2c75b6ae6683d078ae02",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/geometry_live_breadth_proof_queue.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/geometry_live_breadth_proof_queue.json",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Ranks candidate geometry families for live-breadth proof expansion."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "branching_live_breadth_replay",
+      "local_bytes": 49908,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T11:24:52.288569+00:00",
+      "local_relative_path": "dashboard/data/branching_live_breadth_replay.json",
+      "local_schema": "branching_live_breadth_replay_v1",
+      "local_sha256": "3abdf878a5295a170e744cbbb7019ffe39135bd7db6aa0017050a224b13e68ee",
+      "remote_candidates": [
+        {
+          "bytes": 49908,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "3abdf878a5295a170e744cbbb7019ffe39135bd7db6aa0017050a224b13e68ee",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/branching_live_breadth_replay.json"
+        },
+        {
+          "bytes": 49908,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "3abdf878a5295a170e744cbbb7019ffe39135bd7db6aa0017050a224b13e68ee",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/branching_live_breadth_replay.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 49908,
+      "remote_first_reachable_sha256": "3abdf878a5295a170e744cbbb7019ffe39135bd7db6aa0017050a224b13e68ee",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/branching_live_breadth_replay.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/branching_live_breadth_replay.json",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Branching-family live replay status, including negative evidence when baselines still lead."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "rolling_champion_gate",
+      "local_bytes": 10623,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T15:29:00.243392+00:00",
+      "local_relative_path": "dashboard/data/rolling_champion_gate.json",
+      "local_schema": "rolling_champion_gate.v1",
+      "local_sha256": "be369c59178534fbf38303569cb54a1573cbe60847c83d3271ec2e023f45b882",
+      "remote_candidates": [
+        {
+          "bytes": 10623,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "be369c59178534fbf38303569cb54a1573cbe60847c83d3271ec2e023f45b882",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/rolling_champion_gate.json"
+        },
+        {
+          "bytes": 10623,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "be369c59178534fbf38303569cb54a1573cbe60847c83d3271ec2e023f45b882",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/rolling_champion_gate.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 10623,
+      "remote_first_reachable_sha256": "be369c59178534fbf38303569cb54a1573cbe60847c83d3271ec2e023f45b882",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/rolling_champion_gate.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/rolling_champion_gate.json",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Promotion gate for repeat winners, triple-source candidates, and real-dollar claim blockers."
+    },
+    {
+      "deployment_state": "HOSTED_HASH_MATCH",
+      "key": "top_geometry_live_replay_results",
+      "local_bytes": 56921,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-01T13:08:58.944593+00:00",
+      "local_relative_path": "dashboard/data/top_geometry_live_replay_results.json",
+      "local_schema": "top_geometry_live_replay_results_v1",
+      "local_sha256": "1b4c4644ad0614a0d9c1a0ea6923743ae4a60ba95bb874919570c7e6df455ac3",
+      "remote_candidates": [
+        {
+          "bytes": 56921,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "1b4c4644ad0614a0d9c1a0ea6923743ae4a60ba95bb874919570c7e6df455ac3",
+          "status": 200,
+          "url": "https://lumen-core.ai/data/top_geometry_live_replay_results.json"
+        },
+        {
+          "bytes": 56921,
+          "content_type": "application/json",
+          "error": "",
+          "ok": true,
+          "sha256": "1b4c4644ad0614a0d9c1a0ea6923743ae4a60ba95bb874919570c7e6df455ac3",
+          "status": 200,
+          "url": "https://lumen-core.ai/dashboard/data/top_geometry_live_replay_results.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 56921,
+      "remote_first_reachable_sha256": "1b4c4644ad0614a0d9c1a0ea6923743ae4a60ba95bb874919570c7e6df455ac3",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/top_geometry_live_replay_results.json",
+      "remote_hash_match": true,
+      "remote_match_url": "https://lumen-core.ai/data/top_geometry_live_replay_results.json",
+      "remote_reachable": true,
+      "required": false,
+      "why": "Top geometry replay cards and named-baseline beat counts across current live context."
+    },
+    {
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
+      "key": "real_noise_evidence_boundary_breaker",
+      "local_bytes": 5167,
+      "local_exists": true,
+      "local_generated_utc": null,
+      "local_relative_path": "dashboard/data/real_noise_evidence_boundary_breaker.json",
+      "local_schema": "real_noise_evidence_boundary_breaker_v1",
+      "local_sha256": "5cfaadff7d47b87507e01b50c43748ec6271789ec4793c04c12c95f802c73bd4",
+      "remote_candidates": [
+        {
+          "bytes": 0,
+          "content_type": "application/json",
+          "error": "HTTP Error 404: Not Found",
+          "ok": false,
+          "sha256": "",
+          "status": 404,
+          "url": "https://lumen-core.ai/data/real_noise_evidence_boundary_breaker.json"
+        },
+        {
+          "bytes": 0,
+          "content_type": "application/json",
+          "error": "HTTP Error 404: Not Found",
+          "ok": false,
+          "sha256": "",
+          "status": 404,
+          "url": "https://lumen-core.ai/dashboard/data/real_noise_evidence_boundary_breaker.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 0,
+      "remote_first_reachable_sha256": "",
+      "remote_first_reachable_status": null,
+      "remote_first_reachable_url": "",
+      "remote_hash_match": false,
+      "remote_match_url": "",
+      "remote_reachable": false,
+      "required": false,
+      "why": "Plan for replacing synthetic-only assumptions with real noisy data while preserving claim boundaries."
+    },
+    {
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
+      "key": "real_noise_promotion_sweep",
+      "local_bytes": 698432,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-03T08:01:19.989751+00:00",
+      "local_relative_path": "dashboard/data/real_noise_promotion_sweep.json",
+      "local_schema": "real_noise_promotion_sweep_v1",
+      "local_sha256": "c9581f1e2a145f6710b9827c93da90ff4624bb57557d74ec030d530fa621fa74",
+      "remote_candidates": [
+        {
+          "bytes": 0,
+          "content_type": "application/json",
+          "error": "HTTP Error 404: Not Found",
+          "ok": false,
+          "sha256": "",
+          "status": 404,
+          "url": "https://lumen-core.ai/data/real_noise_promotion_sweep.json"
+        },
+        {
+          "bytes": 0,
+          "content_type": "application/json",
+          "error": "HTTP Error 404: Not Found",
+          "ok": false,
+          "sha256": "",
+          "status": 404,
+          "url": "https://lumen-core.ai/dashboard/data/real_noise_promotion_sweep.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 0,
+      "remote_first_reachable_sha256": "",
+      "remote_first_reachable_status": null,
+      "remote_first_reachable_url": "",
+      "remote_hash_match": false,
+      "remote_match_url": "",
+      "remote_reachable": false,
+      "required": false,
+      "why": "Fresh scan of local/provider CSV snapshots that identifies real-noise datasets ready for locked replay."
+    },
+    {
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
+      "key": "geometry_execution_context_audit",
+      "local_bytes": 6563,
+      "local_exists": true,
+      "local_generated_utc": "2026-07-03T08:01:19.345686+00:00",
+      "local_relative_path": "dashboard/data/geometry_execution_context_audit.json",
+      "local_schema": "geometry_execution_context_audit_v1",
+      "local_sha256": "d3f7db8a84186c5a6b3f0508f493fe17a02e69fe465703792326b26374b4b905",
+      "remote_candidates": [
+        {
+          "bytes": 0,
+          "content_type": "application/json",
+          "error": "HTTP Error 404: Not Found",
+          "ok": false,
+          "sha256": "",
+          "status": 404,
+          "url": "https://lumen-core.ai/data/geometry_execution_context_audit.json"
+        },
+        {
+          "bytes": 0,
+          "content_type": "application/json",
+          "error": "HTTP Error 404: Not Found",
+          "ok": false,
+          "sha256": "",
+          "status": 404,
+          "url": "https://lumen-core.ai/dashboard/data/geometry_execution_context_audit.json"
+        }
+      ],
+      "remote_first_reachable_bytes": 0,
+      "remote_first_reachable_sha256": "",
+      "remote_first_reachable_status": null,
+      "remote_first_reachable_url": "",
+      "remote_hash_match": false,
+      "remote_match_url": "",
+      "remote_reachable": false,
+      "required": false,
+      "why": "Current anti-drift audit covering geometry count, Vesica Piscis status, live-breadth readiness, and trading guardrails."
+    }
+  ],
+  "generated_utc": "2026-07-03T08:07:04.919151+00:00",
+  "live_base": "https://lumen-core.ai",
+  "live_check_performed": true,
+  "missing_required_local_feeds": [],
+  "publish_and_verify_runbook": [
+    "python .\\code\\ops\\BUILD_CHAMPION_METRIC_GAUNTLET.py",
+    "python .\\code\\ops\\BUILD_LOCKED_SOURCE_BASELINE_REPLAY_SWEEP.py",
+    "python .\\code\\ops\\BUILD_CHAMPION_SAMPLE_EXPANSION_AND_ECONOMIC_BRIDGE.py",
+    "python .\\code\\ops\\BUILD_FIELD_VALIDATION_CONTROL_ROOM.py",
+    "python .\\code\\ops\\BUILD_FIELD_VALIDATION_OUTREACH_BOARD.py",
+    "python .\\code\\ops\\BUILD_PROOF_TO_PILOT_CONTROL_ROOM.py",
+    "python .\\code\\ops\\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py --skip-live-check",
+    "python .\\code\\ops\\BUILD_LIVE_DOMAIN_CONSOLIDATION_AUDIT.py",
+    "python .\\code\\ops\\BUILD_LIVE_DOMAIN_PROOF_FEED_DEPLOY_BUNDLE.py",
+    ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1 -DryRun",
+    ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1",
+    "python .\\code\\ops\\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py"
+  ],
+  "purpose": "Hash-verify that the live domain is serving the current reviewer proof feeds.",
+  "required_remote_missing_or_stale": [
+    {
+      "candidate_urls": [
+        "https://lumen-core.ai/data/field_validated_dollar_claim_ladder.json",
+        "https://lumen-core.ai/dashboard/data/field_validated_dollar_claim_ladder.json"
+      ],
+      "diagnosis": "HOSTED_COPY_STALE",
+      "key": "field_validated_dollar_claim_ladder",
+      "local_sha256": "f4ce0d6887d24180c4fd6019c9b024f36b39c6c35d3ce52e423810dce8164f82",
+      "local_sha256_prefix": "f4ce0d6887d2",
+      "remote_first_reachable_bytes": 22424,
+      "remote_first_reachable_sha256": "f29d59bbcc97201df6809be1166d227a571778cc3a20d7f35c64c9ea6a461e42",
+      "remote_first_reachable_sha256_prefix": "f29d59bbcc97",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/field_validated_dollar_claim_ladder.json",
+      "remote_reachable": true
+    },
+    {
+      "candidate_urls": [
+        "https://lumen-core.ai/data/champion_source_ablation.json",
+        "https://lumen-core.ai/dashboard/data/champion_source_ablation.json"
+      ],
+      "diagnosis": "HOSTED_COPY_MISSING_OR_UNREACHABLE",
+      "key": "champion_source_ablation",
+      "local_sha256": "8f0b0c7e9333a9caadea4b7a36e208381c8f3278ff152e51ffe9a455504f0e66",
+      "local_sha256_prefix": "8f0b0c7e9333",
+      "remote_first_reachable_bytes": 0,
+      "remote_first_reachable_sha256": "",
+      "remote_first_reachable_sha256_prefix": "",
+      "remote_first_reachable_status": null,
+      "remote_first_reachable_url": "",
+      "remote_reachable": false
+    }
+  ],
+  "reviewer_urls": {
+    "champion_feed_fallback": "https://lumen-core.ai/dashboard/data/champion_metric_gauntlet.json",
+    "champion_feed_primary": "https://lumen-core.ai/data/champion_metric_gauntlet.json",
+    "champion_sample_expansion_and_economic_bridge": "https://lumen-core.ai/data/champion_sample_expansion_and_economic_bridge.json",
+    "field_validation_control_room": "https://lumen-core.ai/data/field_validation_control_room.json",
+    "field_validation_outreach_board": "https://lumen-core.ai/data/field_validation_outreach_board.json",
+    "grants_console": "https://lumen-core.ai/grants.html?grant_id=nsf_sbir_phase_i",
+    "live_domain_consolidation_audit": "https://lumen-core.ai/data/live_domain_consolidation_audit.json",
+    "locked_source_baseline_replay_sweep": "https://lumen-core.ai/data/locked_source_baseline_replay_sweep.json",
+    "mission_control": "https://lumen-core.ai/mission_control.html",
+    "proof_to_pilot": "https://lumen-core.ai/proof_to_pilot.html",
+    "quant_lab": "https://lumen-core.ai/quant_lab.html"
+  },
+  "schema": "live_domain_deployment_feed_v1",
+  "summary": {
+    "deploy_bundle_archive": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260703T080221Z.tgz",
+    "deploy_bundle_archive_sha256": "70def9308e704b4c003939439534b4abc51976a70a7e05008f4f799ad00df40e",
+    "deploy_bundle_feed_only_ready": true,
+    "domain_deployment_state": "LOCAL_READY_DOMAIN_NOT_VERIFIED_OR_STALE",
+    "field_validation_claim_allowed": false,
+    "fixed_frozen_delta_price_claim_allowed": false,
+    "live_domain_reviewer_ready": false,
+    "live_trading_or_autonomous_execution_allowed": false,
+    "local_required_ready": true,
+    "next_domain_action": "Deploy the local proof feeds to the live domain, then rerun this verifier until every required hosted hash matches.",
+    "optional_feed_count": 20,
+    "plain_english_answer": "The local proof stack is ready for reviewer packaging, but the live domain still needs hosted hash verification before we should point reviewers to it.",
+    "real_dollar_savings_claim_allowed": false,
+    "required_feed_count": 13,
+    "required_local_ready_count": 13,
+    "required_remote_hash_match_count": 11,
+    "required_remote_reachable_but_stale_count": 1,
+    "required_remote_reachable_count": 12,
+    "required_remote_stale_or_missing_count": 2,
+    "safe_deploy_command": ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260703T080221Z\""
+  },
+  "what_to_ask_next": [
+    "Which required proof feed is missing or stale on the live domain?",
+    "What exact URL should a reviewer open first?",
+    "Which claim is safe once hosted hashes match?",
+    "What still blocks field validation after deployment is verified?",
+    "What buyer-authorized replay would turn this from internal proof into a field claim?"
+  ]
+}

@@ -33,6 +33,23 @@ Found:
 - Wefunder email exists, but current visible thread looked like general platform/newsletter material, not a direct validation path.
 - LinkedIn/Lockheed material exists, but the visible thread is informational content, not a direct opportunity by itself.
 
+## Current Evidence Update
+
+Newest local proof posture to use in outreach and profile updates:
+
+- Geometry registry currently reports `140` registered families across `12` lanes.
+- Benchmark specs exist for the registered families, but not every family has completed full live-breadth replay.
+- Current strongest internal geometry is `kuramoto_phase_coupling` in the `wave_resonance_timing` lane.
+- Current Kuramoto internal holdout reports `24/24` wins vs a Kalman baseline, with approximately `2,506,267` estimated rows replayed.
+- Latest live-source maximizer reports `29` enabled sources, `25` measured sources, and `1,326` fresh measured rows in the current provider snapshot layer.
+- Real-noise promotion sweep scanned `601` CSV/provider snapshots, read `34,450` rows, found `67,994` numeric samples, and marked `206` datasets ready for locked replay.
+- Vesica Piscis is a valid geometry candidate: a two-circle lens/overlap geometry useful for testing overlap-gating, resonance-coupling, and phase-window hypotheses. It is not yet registered as a winner and should not be claimed as validated.
+- Trading execution remains blocked for live orders. The trading stack is valuable as noisy-market replay and guardrail research, not as a live institutional trading claim yet.
+
+Claim boundary:
+
+> LumenCore has strong internal benchmark and real-noise replay readiness. It is ready for buyer-authorized field replay, but it is not yet externally field validated and cannot claim realized savings, guaranteed ROI, fixed frozen-delta pricing, medical efficacy, or live trading performance.
+
 ## Black Dog / LvlUp Application Lane
 
 Source email:
@@ -63,7 +80,7 @@ About:
 
 I build LumenCore, a proof-to-pilot platform for turning live infrastructure, energy, market, environmental, and operational datasets into replayable benchmark evidence.
 
-The current strongest internal result is a source-conditioned Kuramoto phase-coupling champion: 24/24 holdout wins against a Kalman-filter baseline, with approximately 2.5M estimated rows replayed and leave-one-source-out robustness passing 4/4 current source-system ablations.
+The current strongest internal result is a source-conditioned Kuramoto phase-coupling champion: 24/24 holdout wins against a Kalman-filter baseline, with approximately 2.5M estimated rows replayed in the champion core. The broader evidence layer now includes 25 measured live-source systems in the current maximizer and 206 real-noise datasets ready for locked replay.
 
 Important boundary: I am not claiming field validation or realized savings yet. The next objective is buyer-authorized field replay using an external owner’s held-out operational data, incumbent baseline, acceptance metric, and approved economic conversion.
 
@@ -82,7 +99,8 @@ Current core result:
 - Kuramoto phase coupling vs Kalman-filter baseline
 - 24/24 internal source-conditioned holdout wins
 - Approximately 2.5M estimated rows replayed in the champion core
-- Leave-one-source-out robustness passed across the current 4 source systems
+- 25 measured live-source systems in the current source maximizer
+- 206 real-noise datasets ready for locked replay
 
 Boundary: this is not field validation or realized savings yet.
 
@@ -112,6 +130,24 @@ Avoid leading with autonomous trading. Trading work can be mentioned only as a g
 4. Update LinkedIn profile and post only after Robert approves the exact text above.
 5. Send one ORNL follow-up that asks for a specific technical reviewer or partnership route, not broad validation.
 
+## Send Path Control
+
+To unblock outreach without creating accidental public mistakes:
+
+1. Draft emails locally or in Gmail.
+2. Use the recipient, subject, and exact final body from the queue/brief.
+3. Robert gives action-time approval for that exact send.
+4. Send from Gmail.
+5. Record the send in `dashboard/data/outreach_and_application_send_queue.json` or the active outreach ledger.
+
+Recommended first send queue:
+
+- Sarah Toews / Incubatenergy Labs: book a fit call and ask what field-replay evidence a September IEL application should contain.
+- ORNL Partnerships: ask for the correct grid/AI validation reviewer or technical partnership lane.
+- Black Dog / LvlUp: submit application after Robert confirms legal entity/revenue/burn/runway/raise amount.
+- Nashville/Tennessee advanced energy contacts: ask for pilot-data owner introductions, not broad endorsement.
+- Patent/pro bono counsel lane: ask for urgent review of patent continuity/deadline posture, not invention validation.
+
 ## Claim Language
 
 Safe:
@@ -132,4 +168,3 @@ Future passes should not create another unrelated dashboard before checking:
 - `dashboard/data/champion_metric_gauntlet.json`
 - `dashboard/data/live_domain_proof_feed_deploy_bundle.json`
 - `dashboard/data/first_buyer_target_board.json`
-

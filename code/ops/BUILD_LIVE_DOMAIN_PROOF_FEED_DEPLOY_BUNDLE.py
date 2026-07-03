@@ -68,6 +68,9 @@ OPTIONAL_FEEDS = [
     "branching_live_breadth_replay",
     "rolling_champion_gate",
     "top_geometry_live_replay_results",
+    "real_noise_evidence_boundary_breaker",
+    "real_noise_promotion_sweep",
+    "geometry_execution_context_audit",
 ]
 
 FORBIDDEN_NAME_FRAGMENTS = [

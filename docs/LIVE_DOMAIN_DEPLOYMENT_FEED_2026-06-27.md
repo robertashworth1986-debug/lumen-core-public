@@ -1,6 +1,6 @@
 # Live Domain Deployment Feed
 
-Generated UTC: `2026-07-03T02:37:36.525711+00:00`
+Generated UTC: `2026-07-03T08:07:04.919151+00:00`
 Live base: `https://lumen-core.ai`
 
 ## Current Answer
@@ -61,6 +61,9 @@ The local proof stack is ready for reviewer packaging, but the live domain still
 | `branching_live_breadth_replay` | `false` | `true` | `true` | https://lumen-core.ai/data/branching_live_breadth_replay.json |
 | `rolling_champion_gate` | `false` | `true` | `true` | https://lumen-core.ai/data/rolling_champion_gate.json |
 | `top_geometry_live_replay_results` | `false` | `true` | `true` | https://lumen-core.ai/data/top_geometry_live_replay_results.json |
+| `real_noise_evidence_boundary_breaker` | `false` | `true` | `false` | - |
+| `real_noise_promotion_sweep` | `false` | `true` | `false` | - |
+| `geometry_execution_context_audit` | `false` | `true` | `false` | - |
 
 ## Reviewer URLs
 
@@ -103,4 +106,4 @@ The local proof stack is ready for reviewer packaging, but the live domain still
 
 Live-domain deployment feed only. Matching hosted hashes prove that the public domain is serving the same local proof feeds. They do not prove field validation, realized savings, grant award certainty, fixed frozen delta pricing, medical efficacy, or live trading performance.
 
-Deployment feed SHA-256: `6477c810fa783e99e7bf8d4033b31b1c9aef76b1db5e9a73680ee833ab7a304b`
+Deployment feed SHA-256: `619f5cf1970e206380a39dbdee100931e3cdb20b944bd94cd90a10a6452817b5`

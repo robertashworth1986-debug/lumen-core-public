@@ -210,6 +210,24 @@ PROOF_FEEDS = [
         "required": False,
         "why": "Top geometry replay cards and named-baseline beat counts across current live context.",
     },
+    {
+        "key": "real_noise_evidence_boundary_breaker",
+        "local": "dashboard/data/real_noise_evidence_boundary_breaker.json",
+        "required": False,
+        "why": "Plan for replacing synthetic-only assumptions with real noisy data while preserving claim boundaries.",
+    },
+    {
+        "key": "real_noise_promotion_sweep",
+        "local": "dashboard/data/real_noise_promotion_sweep.json",
+        "required": False,
+        "why": "Fresh scan of local/provider CSV snapshots that identifies real-noise datasets ready for locked replay.",
+    },
+    {
+        "key": "geometry_execution_context_audit",
+        "local": "dashboard/data/geometry_execution_context_audit.json",
+        "required": False,
+        "why": "Current anti-drift audit covering geometry count, Vesica Piscis status, live-breadth readiness, and trading guardrails.",
+    },
 ]
 
 REMOTE_TEMPLATES = [
