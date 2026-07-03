@@ -1,7 +1,7 @@
 # Champion Stress Test Matrix
 
-Generated UTC: `2026-07-01T16:49:09.807027+00:00`
-Matrix SHA-256: `f96e845d7907efd9d95594cb4bbe307de2e1a9080aa78a8c1ef736304347c2d7`
+Generated UTC: `2026-07-03T02:11:53.419116+00:00`
+Matrix SHA-256: `b5c9dfb9288f86ae412d92aa728539b6633715f68795b1e4cd540b0caad0b91d`
 
 ## Truth Line
 
@@ -67,6 +67,7 @@ Not allowed yet:
 | `all_registry_families_have_benchmark_specs` | `PASS` | `0` | 0 missing benchmark specs |
 | `statistical_repeat_gate` | `PASS` | `6e-08` | <= 0.001 |
 | `replay_phase_proxy_diagnostics` | `PASS` | `23/24 usable holdouts` | >= 20 usable numeric holdouts with replay phase proxies |
+| `leave_one_source_out_ablation` | `PASS` | `4/4 source ablations` | all source-system ablations remain positive against the named baseline |
 | `phase_slip_and_amplitude_error` | `NOT_RUN_REQUIRES_NEXT_GATE` | `not measured in current artifact` | instrument or replay logs with phase-slip count and amplitude error |
 | `residual_autocorrelation_and_calibration` | `NOT_RUN_REQUIRES_NEXT_GATE` | `not measured in current artifact` | residual autocorrelation, calibration, and post-hoc leakage checks |
 | `latency_runtime_budget` | `NOT_RUN_REQUIRES_NEXT_GATE` | `not measured in current artifact` | measured latency under the target deployment workload |

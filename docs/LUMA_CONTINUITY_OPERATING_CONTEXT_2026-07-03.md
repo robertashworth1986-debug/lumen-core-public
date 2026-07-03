@@ -14,6 +14,8 @@ This is the first file a future agent should read before making new dashboards, 
 - Broader live-source universe: `25/29` configured providers measured in the latest live-source refresh.
 - Latest live-source refresh rows: `1,326`.
 - Locked source baseline replay sweep: `975/1,224` candidate wins across `313` adapter-backed routes and `159` sources.
+- Champion source ablation: `4/4` leave-one-source-out source-system ablations passed.
+- Champion stress matrix: `18/23` gates passed; external field replay remains blocked.
 - Live domain proof feed: `12/12` required reviewer feeds ready/hash-routed as feed-only evidence.
 - Field validation: not yet unlocked.
 - Realized dollar savings: not yet unlocked.
@@ -29,7 +31,9 @@ Read these before taking major action:
 - `docs/FIELD_VALIDATION_OUTREACH_BOARD_2026-06-29.md`
 - `docs/LIVE_SOURCE_MEASUREMENT_MAXIMIZER_2026-06-22.md`
 - `docs/FIELD_VALIDATED_DOLLAR_CLAIM_LADDER_2026-06-27.md`
+- `docs/CHAMPION_SOURCE_ABLATION_2026-07-03.md`
 - `dashboard/data/champion_metric_gauntlet.json`
+- `dashboard/data/champion_source_ablation.json`
 - `dashboard/data/live_domain_proof_feed_deploy_bundle.json`
 - `dashboard/data/dollar_claim_gate.json`
 
@@ -108,4 +112,4 @@ High-value inbox targets to inspect when Gmail is available:
 4. Keep the live domain proof feed updated from the canonical dashboard/data files.
 5. Prepare one clean investor/application packet using safe claims and current proof feed links.
 6. Prepare one buyer-authorized field replay ask for EPRI/IEL.
-7. Run the next champion proof upgrades: leave-one-source-out, residual metrics, direct phase diagnostics, perturbation robustness, and one-provider-at-a-time promotion.
+7. Run the next champion proof upgrades: residual metrics, direct phase diagnostics, perturbation robustness, runtime/latency budgets, and one-provider-at-a-time promotion.

@@ -23,9 +23,10 @@ The strongest current technical story is narrow and real:
 - Numeric samples read: `66,690`
 - Estimated rows replayed in champion core: `2,506,267`
 - Champion source systems: `energy_grid`, `macro_rates_labor`, `market_data`, `sports_market`
+- Leave-one-source-out ablation: `4/4` source-system ablations passed
 - Holdout chain SHA-256: `2227dd06869d292c82918d3f9cfab2b87cbe441cd44e398ec4a1024c6f5a655c`
 
-Plain English: this is enough to say LumenCore has a strong internal replay champion and is ready to ask a buyer, lab, utility, or agency for a locked external field replay. It is not enough to say field validated or realized savings.
+Plain English: this is enough to say LumenCore has a strong internal replay champion, and the current champion is not being carried by one source system. It is ready to ask a buyer, lab, utility, or agency for a locked external field replay. It is not enough to say field validated or realized savings.
 
 ## Broader Live Breadth
 
@@ -62,6 +63,7 @@ The locked source baseline replay sweep shows:
 - Mean score delta: `0.118206`
 - Best score delta: `0.421141`
 - Replay chain SHA-256: `825b5b4090a944a6306caeac16a3fc583def8444d9dc232da864dbd627a30587`
+- Current champion stress matrix: `18/23` gates passed after adding source ablation
 
 Safe claim: source-conditioned internal replay evidence exists across a broad locked benchmark sweep.
 
@@ -102,16 +104,16 @@ It is not ready for a fixed claim like "this frozen delta is worth $10,000" or "
 
 Run these in order:
 
-1. Leave-one-source-out replay on the Kuramoto champion.
-2. Per-source residual metrics: MAE, RMSE, WAPE, residual bias, residual autocorrelation.
-3. Direct phase diagnostics: circular phase error, phase-slip count, lock duration, recovery time, coherence.
-4. Robustness perturbation: missingness, delayed samples, spikes, drift, regime split, bootstrap confidence intervals.
-5. Promote one new measured provider at a time into the locked replay suite.
-6. Clean manifest hygiene so package/runtime files stay in stress tests, not field-grade proof.
-7. Fix or demote `BINANCE_PUBLIC`, `EPA_AQS`, `NREL`, and `THE_ODDS_API`.
-8. Add SAM.gov after the safe key helper is run.
-9. Add ISO/RTO and utility event windows for grid/energy buyer relevance.
-10. Convert one top lane into a buyer-ready field replay ask with an external acceptance metric.
+1. Per-source residual metrics: MAE, RMSE, WAPE, residual bias, residual autocorrelation.
+2. Direct phase diagnostics beyond proxy level: circular phase error, phase-slip count, lock duration, recovery time, coherence.
+3. Robustness perturbation: missingness, delayed samples, spikes, drift, regime split, bootstrap confidence intervals.
+4. Promote one new measured provider at a time into the locked replay suite.
+5. Clean manifest hygiene so package/runtime files stay in stress tests, not field-grade proof.
+6. Fix or demote `BINANCE_PUBLIC`, `EPA_AQS`, `NREL`, and `THE_ODDS_API`.
+7. Add SAM.gov after the safe key helper is run.
+8. Add ISO/RTO and utility event windows for grid/energy buyer relevance.
+9. Convert one top lane into a buyer-ready field replay ask with an external acceptance metric.
+10. Add runtime/latency budgets for live-domain operational claims.
 
 ## Exact Claim Language To Use
 
