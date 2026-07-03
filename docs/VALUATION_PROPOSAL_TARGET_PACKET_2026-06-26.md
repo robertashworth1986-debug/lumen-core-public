@@ -1,166 +1,81 @@
 # Valuation Proposal Target Packet
 
-Generated UTC: `2026-06-26T01:58:01.521403+00:00`
-Updated UTC: `2026-07-03T00:00:00-05:00`
+Generated UTC: `2026-07-03T23:27:54.687652+00:00`
 
-Valuation and proposal target packet. This translates the current frozen/source-conditioned replay evidence into bounded business language, a first paid-pilot target, and reviewer-safe proposal numbers. It does not authorize field-validation, realized-savings, fixed-dollar frozen-delta, medical, live-trading, grant-award, or guaranteed ROI claims.
+Valuation and proposal target packet. This translates the current July 2026 frozen/source-conditioned replay evidence into bounded business language, a first paid-pilot target, and reviewer-safe proposal numbers. It does not authorize field-validation, realized-savings, fixed-dollar frozen-delta, medical, live-trading, grant-award, or guaranteed ROI claims.
 
-## 2026-07-03 Current Update
+## Canonical July 2026 Proof Line
 
-The earlier packet used the smaller `7/10` route replay. The current stronger proof is the champion metric gauntlet:
-
-- Current internal champion: `kuramoto_phase_coupling`
-- Champion lane: `wave_resonance_timing`
-- Named incumbent baseline: `kalman_filter`
-- Source-conditioned holdouts: `24`
-- Wins vs named baseline: `24`
-- Losses/ties vs named baseline: `0`
-- Honest internal win rate: `100.0%`
-- Conservative 95% Wilson lower bound: `86.2024%`
+- Champion: `Kuramoto phase coupling` (`kuramoto_phase_coupling`)
+- Lane: `wave_resonance_timing`
+- Named baseline: `kalman_filter`
+- Internal holdout result: `24/24`
+- Internal holdout win rate: `100.0%`
+- Wilson 95% lower bound: `86.2%`
 - Mean delta vs named baseline: `0.140668`
-- Minimum delta vs named baseline: `0.044697`
-- Maximum delta vs named baseline: `0.220761`
-- One-sided sign-test p-value: `0.00000006`
-- Estimated rows replayed: `2506267`
-- Numeric samples read: `66690`
-- Champion replay source systems: `4`
-- Champion replay source systems: `energy_grid`, `macro_rates_labor`, `market_data`, `sports_market`
-- Broader measured provider universe: `25/29`
-- Fresh provider rows measured in the current provider layer: `823`
-- Mapped source files/feeds: `186`
-- Ready-for-benchmark manifest rows: `313`
-- Estimated rows mapped in geometry manifest: `9845371`
-- Registered/ranked geometry families: `140`
-- Live domain proof bundle: `13/13` required feeds staged and ready, plus `22` optional feeds
+- Minimum positive delta: `0.044697`
+- Sign-test p-value: `6e-08`
+- Champion estimated rows replayed: `2,506,267`
+- Champion numeric samples read: `66,690`
+- Champion source systems: `4`
+- Live-domain reviewer feed ready: `true`
 
-The correct claim is: strong internal, hash-verified, source-conditioned replay evidence that is ready for buyer-authorized field replay. It is not external field validation yet.
+## Broader Locked Sweep
 
-## Current Lane Result
+- Adapter-backed routes: `313`
+- Baseline comparisons: `1969`
+- Candidate wins: `1355`
+- Candidate losses/ties: `614`
+- Comparison win rate: `68.8%`
+- Mean score delta: `0.108251`
+- Best score delta: `0.680913`
+- Estimated rows replayed: `7,152,253`
+- Numeric samples read: `92,056`
+- Mapped source count: `159`
+- Replay chain SHA-256: `87f6eccc06b44fc44c18b4cbc0ce3bb334b11a8c680ee736bff0ed2ef8b9ac8a`
 
-| Lane | Candidate | Baseline | Wins/Holdouts | 95% Win Interval | Mean Delta | Min Delta | Max Delta | Rows | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `24/24` | `86.2024%`-`100.0%` | `0.140668` | `0.044697` | `0.220761` | `2506267` | `expanded_source_conditioned_holdout_winner_not_field_validated` |
+## Lane Results
 
-## Earlier Comparison Context
-
-The earlier June 26 valuation packet used this smaller replay batch. Keep it only as historical context, not the lead proof.
-
-| Lane | Candidate | Baseline | Wins/Routes | Mean Delta | Rows | Status |
-| --- | --- | --- | --- | --- | --- | --- |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `4/4` | `0.179576` | `941503` | `superseded_by_24_holdout_gauntlet` |
-| `thermal_ventilation` | `thermal_plume_convection` | `straight_duct` | `2/2` | `0.126604` | `441505` | `older_context_only` |
-| `optimal_curve_transport` | `brachistochrone_descent` | `minimum_jerk_curve` | `1/1` | `0.109345` | `249999` | `older_context_only` |
-| `branching_transport` | `leaf_veins` | `minimum_spanning_tree` | `0/3` | `-0.044946` | `691504` | `negative_result_retained` |
+| Lane | Routes | Comparisons | Wins | Win Rate | Mean Delta | Best Delta | Rows | Baselines |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `wave_resonance_timing` | `147` | `588` | `588` | `100.0%` | `0.186877` | `0.388056` | `2,880,400` | fft_filter, kalman_filter, arima, phase_locked_loop |
+| `optimal_curve_transport` | `3` | `12` | `12` | `100.0%` | `0.16296` | `0.258127` | `254,187` | straight_line, cubic_spline, rrt_star, minimum_jerk_curve |
+| `thermal_ventilation` | `8` | `24` | `24` | `100.0%` | `0.122357` | `0.152324` | `441,538` | straight_duct, conventional_hvac_network, cfd_reference |
+| `energy_price_pressure_proxy` | `144` | `1312` | `719` | `54.8%` | `0.074227` | `0.680913` | `2,880,400` | persistence, seasonal_naive, ridge_feature_baseline, mlp_budget_matched_baseline, rolling_mean, ewma, linear_trend, holt_winters_ets, scalar_kalman_filter, extended_kalman_filter, unscented_kalman_filter, particle_filter, gaussian_process_regression, random_forest_regression, xgboost, lightgbm |
+| `branching_transport` | `11` | `33` | `12` | `36.4%` | `0.02987` | `0.433816` | `695,728` | minimum_spanning_tree, steiner_approximation, min_cost_flow |
 
 ## Honest Valuation State
 
-- Evidence stage: `expanded_source_conditioned_holdout_winner_not_field_validated`
-- Strongest current lane: `wave_resonance_timing`
-- Strongest current candidate: `kuramoto_phase_coupling`
-- Strongest current named baseline: `kalman_filter`
-- Buyer-authorized field replay request ready: `true`
-- Reviewer-safe internal champion claim allowed: `true`
-- Bounded estimated opportunity language allowed: `true`
-- Paid pilot scoping allowed: `true`
-- Field-validation claim allowed: `false`
-- Realized dollar savings claim allowed: `false`
-- Fixed dollar value per frozen delta allowed: `false`
-- Live trading/autonomous execution claim allowed: `false`
-- Broad universal geometry-superiority claim allowed: `false`
-
-## Bounded Value Language
-
-Current safe wording:
-
-> LumenCore has a bounded estimated value opportunity up to `$4520/hour` or `$39595200/year` under stated assumptions. This is not realized savings, not field validation, and not a promise that any buyer will pay.
-
-The larger blocked context surface is useful for internal prioritization only:
-
-- Blocked context annual value surface: `$52288496940`
-- Use this only as a target surface for future buyer-authorized validation. Do not put it in buyer-facing copy as savings.
-
-Illustrative capture from the current safe estimate:
-
-| Capture Rate | Annual Contract Surface | First 3 Months |
-| --- | ---: | ---: |
-| `0.5%` | `$197976` | `$49494` |
-| `1.0%` | `$395952` | `$98988` |
-| `5.0%` | `$1979760` | `$494940` |
-| `10.0%` | `$3959520` | `$989880` |
-| `20.0%` | `$7919040` | `$1979760` |
-
-For a `$1B/year` relevant loss pool, the pure avoided-cost math is:
-
-- `0.001%` improvement = `$10000/year`
-- `0.01%` improvement = `$100000/year`
-- `0.1%` improvement = `$1000000/year`
-- `1.0%` improvement = `$10000000/year`
-
-This is why the near-term business model should be paid replay, validation, and platform licensing, not an unsupported fixed price per delta.
+- Evidence stage: `source_conditioned_replay_with_live_domain_hash_verification`
+- Defensible money status: Price paid technical evaluation, field replay, or validation pilot. Do not price fixed-value frozen deltas or realized savings until an external owner locks data, baseline, metric, and economics.
+- Bounded estimated-value language allowed: `true`
+- Safe estimated opportunity surface: `$4,520/hour` or `$39,595,200/year` under stated assumptions.
+- This is not realized savings, not a promise that a buyer will pay, and not a fixed price for a frozen delta.
+- Investor target: `$10M post-money SAFE cap, negotiable in an $8M-$12M band`
+- Raise target: `$250,000` to `$500,000`
 
 ## First Proposal Target
 
-- Target: Energy Forecasting / Grid Reliability Paid Technical Evaluation
-- Buyer role: Energy Forecasting Lead, Grid Reliability Analytics Lead, Utility Innovation Lead, National Lab validation lead, or field demonstration program manager
-- Why this first: the current strongest proof is a phase/timing-style champion, `kuramoto_phase_coupling`, beating `kalman_filter` on `24/24` source-conditioned holdouts, with no negative holdout, positive minimum delta, and a conservative Wilson lower bound above `86%`.
-- Ask: 20-minute technical fit call, then a paid evidence review or buyer-authorized field replay.
-- Acceptance metric: forecast residual, phase/timing error, drift-detection lead time, false positives, missed-event rate, latency, and operator-approved economic conversion versus incumbent baseline.
+- Target: Energy/Grid AI Field Replay and Paid Evidence Review
+- Buyer role: Utility innovation lead, grid reliability analytics lead, national lab validation lead, or accelerator technical reviewer
+- Why this first: The strongest current proof is a narrow phase/timing result: Kuramoto phase coupling beat kalman_filter on 24/24 source-conditioned holdout checks. The broader locked sweep adds 1969 baseline comparisons across 313 adapter-backed routes.
+- Ask: 20-minute technical fit call, then a paid evidence review or buyer-authorized replay.
+- Paid review scope: `$5,000` to `$15,000`, scoping only.
+- Acceptance metric: pre-registered forecast residual, phase/timing error, drift-detection lead time, false positives, missed events, runtime budget, and buyer-approved avoided-cost conversion
 
 ## Reviewer-Safe Proposal Blurb
 
-LumenCore requests a technical fit call for a paid evidence review and buyer-authorized field replay. The current hash-verified internal champion, `kuramoto_phase_coupling`, beat the named `kalman_filter` baseline on `24/24` source-conditioned holdouts in the `wave_resonance_timing` lane. The current gauntlet reports mean delta `0.140668`, minimum delta `0.044697`, maximum delta `0.220761`, one-sided sign-test p-value `0.00000006`, `2506267` estimated rows replayed, and `66690` numeric samples read across `4` promoted source systems. The broader live-source universe currently contains `25/29` measured providers, `186` mapped source files/feeds, `313` ready-for-benchmark manifest rows, and `140` registered/ranked geometry families. These are benchmark-priority results suitable for a buyer-authorized replay request. They are not field validation or realized savings yet.
+LumenCore requests a technical fit call for a paid evidence review or buyer-authorized field replay. The current strongest internal result is narrow and reproducible: Kuramoto phase coupling beat kalman_filter on 24/24 source-conditioned holdout checks, with about 2,506,267 estimated rows replayed in the champion core. The broader locked-source sweep covers 313 adapter-backed routes, 1969 baseline comparisons, 1355 wins, 7,152,253 estimated rows, and 159 mapped sources. These are internal replay results, not field validation or realized savings. The requested next step is external held-out data, the buyer's incumbent baseline, pre-registered metrics, and an accepted economic conversion.
 
-## Live Domain Proof Posture
+## Best Current Investor Artifact
 
-- Feed-only deploy bundle ready: `true`
-- Required proof feeds ready: `13/13`
-- Optional proof feeds staged: `22`
-- Publishes config or secrets: `false`
-- Service restart required: `false`
-- Current reviewer-safe domain posture: proof-feed staging and hash verification are usable for review.
-- Boundary: live domain proof feeds make evidence easier to inspect; they do not create field validation.
-
-## What Must Happen To Unlock Field Validation
-
-Field validation starts when an external buyer, lab, agency, utility, or system owner supplies or approves:
-
-- held-out operational data or test-bench data
-- incumbent baseline and version
-- LumenCore candidate version
-- pre-registered holdout windows
-- accepted metric
-- forbidden tuning rules
-- acceptance threshold
-- economic conversion factor
-- signed, logged, or otherwise traceable result
-
-After that gate opens, the correct claim format is:
-
-> On `[named system]`, during `[locked window]`, against `[locked baseline]`, LumenCore reduced `[accepted metric]` by `[X% with confidence interval]`, corresponding to an estimated avoided-cost opportunity of `[$Y over 3 months]` and `[$Z annualized]` under the buyer-approved economic model.
-
-## Outreach Positioning
-
-Lead with:
-
-- “hash-verified internal champion”
-- “24/24 source-conditioned holdout wins vs named baseline”
-- “ready for buyer-authorized field replay”
-- “we report negative results and blockers”
-- “we need your held-out baseline and accepted metric”
-
-Do not lead with:
-
-- guaranteed savings
-- fixed frozen-delta pricing
-- universal geometry superiority
-- live trading performance
-- grant certainty
-- unsupported hardware/RF/PLL validation
+- Updated PDF: `C:\Users\Novac\iCloudDrive\Business plan\LumenCore_Business_Plan_Investor_Ready_UPDATED_2026-07-03.pdf`
+- Source markdown: `docs/LUMENCORE_BUSINESS_PLAN_INVESTOR_READY_UPDATED_2026-07-03.md`
+- Use the updated July 3 business plan for LvlUp/Black Dog and investor applications. Treat older April/May decks as background only unless manually claim-reviewed.
 
 ## Boundaries
 
-- Do not state `15%-35%` system efficiency, realized savings, field validation, or fixed frozen-delta dollar value yet.
-- Do not claim the whole `140`-family universe has been live-benchmarked end to end yet.
-- Do not claim all providers are promoted into the champion replay. Current promoted champion replay source systems are `4`; broader measured providers are `25/29`.
-- The strongest current claim is expanded source-conditioned benchmark replay plus paid technical evaluation scoping.
-- The highest-value next proof is buyer-authorized holdout replay with accepted incumbent baselines and economic conversion.
+- Do not state field validation, realized savings, fixed frozen-delta dollar value, live trading edge, medical efficacy, or award certainty.
+- The strongest current claim is: internal source-conditioned replay winner plus live-domain hash-verified reviewer feed.
+- The highest-value next proof is buyer-authorized holdout replay with accepted baseline, accepted metric, and accepted economics.
+- Packet SHA-256: `bf695e6312ff1a96ac0663255b27ca3ca716782b23a75a66e590ca35f67c1901`

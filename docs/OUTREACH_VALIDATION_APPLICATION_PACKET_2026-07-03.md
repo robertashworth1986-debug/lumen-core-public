@@ -47,9 +47,8 @@ Broader evidence surface:
 - Real-noise/provider snapshots scanned: `604`
 - Datasets ready for locked replay: `207`
 - Numeric samples in promotion scan: `68,274`
-- Stable board says broader measured providers: `25/29`
-- Latest volatile provider probe says measured providers: `24/29`
-- Treat this as: one provider needs refresh/recheck before public wording says 25 again.
+- Current public-safe live breadth wording: `24` measured live-source systems in the latest volatile provider probe.
+- Treat the broader `29`-source registry as under refresh until thin/failed sources are rerun and separated from public claims.
 
 Dollar posture:
 
@@ -66,16 +65,28 @@ These are the best searches/targets to use today.
 3. `EPRI AI for Power Challenge 2026`
 4. `OpenPOWER AI EPRI AI for Power contact`
 5. `EPB automated grid innovation ORNL contact`
-6. `TVA Spark Cleantech Accelerator contact`
+6. `Spark Cleantech Accelerator spark@tnresearchpark.org`
 7. `LaunchTN SBIR STTR Tennessee contact`
 8. `Tennessee Advanced Energy Business Council contact`
-9. `Vanderbilt ACCRE research computing contact`
-10. `Vanderbilt ISIS cyber physical systems contact`
+9. `Vanderbilt ACCRE general inquiry research computing consultation`
+10. `Vanderbilt ISIS contact.isis cyber physical systems contact`
 11. `Tennessee Tech Center for Energy Systems Research smart grid`
 12. `Nashville Entrepreneur Center accelerator`
 13. `Baker Donelson patent pro bono Nashville`
 14. `USPTO Patent Pro Bono Program Tennessee`
 15. `Oak Ridge National Laboratory partnerships grid AI`
+
+## Verified / Stronger Contact Lanes
+
+Use these routes first. If Gmail reveals a named contact from the Oak Ridge response, replace the generic ORNL route with that named route before sending.
+
+- EPRI / Incubatenergy Labs: reply to Sarah Toews at `stoews@epri.com`; use the existing thread because she already responded.
+- ORNL Partnerships / GRID-C routing: `partnerships@ornl.gov`; ask specifically for GRID-C, Electrification and Energy Infrastructures, grid AI validation, or Science and Technology Partnerships routing. ORNL public contact pages also list `865-574-1051` for technology/partnership inquiries.
+- Spark Innovation Center: `spark@tnresearchpark.org`; this is the current Spark address. Avoid old Spark addresses unless a recent thread confirms them.
+- TVA Connected Communities / pilot route: `connectedcommunities@tva.gov` for pilot-program questions or submission support. Use this as a pilot/program route, not as a claim of TVA technical review.
+- EPB automated-grid route: `BroadbandSolutions@epb.net` / `423-648-3600` for automated-grid consulting and routing; ask for the correct grid analytics or ORNL/EPB research contact.
+- Vanderbilt ACCRE: use the ACCRE General Inquiry form for non-active-user consultation routing; ACCRE states general inquiries go to directors.
+- Vanderbilt ISIS: `contact.isis@vanderbilt.edu`; use this for cyber-physical systems / complex systems routing.
 
 ## Highest Priority Outreach
 
@@ -111,6 +122,8 @@ LumenCore
 
 Recipient: `partnerships@ornl.gov` unless the ORNL email thread gives a better named contact.
 
+Routing note: ask for GRID-C / Electrification and Energy Infrastructures / grid AI validation / Science and Technology Partnerships routing. If the Oak Ridge response included named contacts, use those before this generic inbox.
+
 Subject: `Follow-up: technical route for LumenCore grid/AI replay validation`
 
 ```text
@@ -140,12 +153,14 @@ https://lumen-core.ai/mission_control.html
 
 ### 3. TVA / Spark Cleantech
 
-Recipient: Spark/TVA program contact or contact form.
+Recipient: `spark@tnresearchpark.org`
+
+Secondary route if the ask is a TVA Connected Communities pilot/program question: `connectedcommunities@tva.gov`
 
 Subject: `Tennessee field-replay fit: LumenCore grid AI validation`
 
 ```text
-Hello,
+Hello Spark team,
 
 I am Robert Ashworth, founder of LumenCore in Tennessee.
 
@@ -153,7 +168,9 @@ LumenCore is a proof-to-pilot platform for hash-verified live-data replay and be
 
 The current strongest internal result is Kuramoto phase coupling beating a named Kalman-filter baseline on 24/24 source-conditioned holdout checks, with about 2.5M estimated rows replayed in the champion core. I am not claiming field validation or realized savings yet. The next correct step is to test against approved external data and an accepted baseline metric.
 
-Could Spark or TVA point me toward the right reviewer for grid performance, utility analytics, or field replay validation?
+Spark appears aligned because the accelerator connects early-stage cleantech companies with mentorship, prototyping, customers, strategic partners, TVA, ORNL, UT, and advanced-energy commercialization pathways.
+
+Could Spark point me toward the right reviewer, mentor, or partner route for a narrow offline replay validation conversation?
 
 Respectfully,
 Robert Ashworth
@@ -176,7 +193,7 @@ I am looking for the correct EPB contact for a narrow offline replay discussion.
 
 The current strongest internal result is Kuramoto phase coupling beating a named Kalman-filter baseline on 24/24 source-conditioned holdout checks, with about 2.5M estimated rows replayed in the champion core. This supports a technical fit conversation, not a field-validation or savings claim.
 
-Could you route me to the right person for automated-grid analytics, outage replay, microgrid research, or ORNL/EPB technical partnership review?
+EPB is a strong fit because its public materials describe automated-grid reliability, microgrid work, real-time usage infrastructure, and ORNL/EPB research collaboration. Could you route me to the right person for automated-grid analytics, outage replay, microgrid research, or ORNL/EPB technical partnership review?
 
 Respectfully,
 Robert Ashworth
@@ -186,7 +203,10 @@ https://lumen-core.ai/mission_control.html
 
 ### 5. Vanderbilt ACCRE / ISIS
 
-Recipient: verified Vanderbilt ACCRE or ISIS contact.
+Recipient lane:
+
+- ACCRE: General Inquiry form for consultation routing if not an active ACCRE user.
+- ISIS: `contact.isis@vanderbilt.edu`
 
 Subject: `Request for protocol review: hash-verified replay benchmarks for infrastructure AI`
 
@@ -197,7 +217,7 @@ I am Robert Ashworth, founder of LumenCore. I am looking for a technical protoco
 
 LumenCore currently has an internal champion result: Kuramoto phase coupling beat a named Kalman-filter baseline on 24 of 24 source-conditioned holdout checks, with about 2.5M estimated rows replayed in the champion core. I want to move this correctly into external review by locking held-out data, baseline, acceptance metric, and replay window before scoring.
 
-Would ACCRE, ISIS, or a Vanderbilt cyber-physical systems group be an appropriate route for protocol review, compute support, or a research collaboration discussion?
+Would ACCRE, ISIS, or a Vanderbilt cyber-physical systems group be an appropriate route for protocol review, compute support, or a research collaboration discussion? If not, could you point me to the correct Vanderbilt lab, center, or faculty route for infrastructure AI validation and complex-systems replay?
 
 Respectfully,
 Robert Ashworth
@@ -230,6 +250,31 @@ LumenCore
 ## Black Dog / LvlUp Application Answers
 
 Use these to complete the application. Confirm legal/financial fields before final submit.
+
+Best deck upload:
+
+```text
+C:\Users\Novac\iCloudDrive\Business plan\LumenCore_Business_Plan_Investor_Ready_UPDATED_2026-07-03.pdf
+```
+
+Use the July 3 updated file as the default deck/business plan. It reflects the current strongest proof posture: `24/24` Kuramoto phase-coupling holdout wins against `kalman_filter`, about `2.5M` champion replay rows, a broader `313` adapter-backed route / `1,969` baseline-comparison sweep, and bounded dollar language only.
+
+Best public proof link:
+
+```text
+https://lumen-core.ai/mission_control.html
+```
+
+If the application requires a public deck URL, use a private share link to the business-plan PDF. Do not paste a local `C:\...` file path into a web form.
+
+Suggested click path:
+
+1. Open `https://www.lvlup.vc/apply/funding-application`.
+2. Start the application.
+3. Use `Venture Scout`, `Scott Kelly`, and `scott@blackdogvp.com` in the referral fields.
+4. Fill the company/founder fields using the blocks below.
+5. Upload the business-plan PDF or paste the private share link.
+6. Review the final rendered application before submit.
 
 Company name:
 
@@ -270,7 +315,7 @@ LumenCore provides a live-source registry, provenance hashes, locked replay base
 Traction:
 
 ```text
-LumenCore has a live reviewer domain at lumen-core.ai, a local proof vault, and a growing benchmark stack. Current internal evidence includes 140 registered geometry/model families across 12 lanes, 207 real-noise datasets ready for locked replay, and a current Kuramoto phase-coupling champion with 24/24 internal source-conditioned holdout wins against a Kalman-filter baseline. Outreach has reached EPRI/Incubatenergy Labs, ORNL, EPB, LaunchTN, Spark/TVA, and Tennessee technical validation channels.
+LumenCore has a live reviewer domain at lumen-core.ai, a local proof vault, and a growing benchmark stack. Current internal evidence includes 140 registered geometry/model families across 12 lanes, 207 real-noise datasets ready for locked replay, 24 measured live-source systems in the latest volatile provider probe, and a current Kuramoto phase-coupling champion with 24/24 internal source-conditioned holdout wins against a Kalman-filter baseline. Outreach has reached EPRI/Incubatenergy Labs, ORNL, EPB, LaunchTN, Spark/TVA, and Tennessee technical validation channels.
 ```
 
 Current stage:
@@ -295,6 +340,12 @@ Raise amount:
 
 ```text
 $250,000-$500,000 validation/pilot bridge. Confirm before submit.
+```
+
+Target valuation / SAFE cap:
+
+```text
+$10M post-money SAFE valuation cap, negotiable within an $8M-$12M band depending on check size, investor fit, and instrument. If the form requires pre-money valuation instead of a SAFE cap, use $8M-$10M target pre-money.
 ```
 
 Competitive advantage:
@@ -336,10 +387,19 @@ Next trading-hardening targets:
 1. Reply to Sarah Toews / EPRI and book the fit call.
 2. Finish LvlUp application using the field bank above; stop at final submit for review.
 3. Send Scott Kelly a short follow-up after the LvlUp application is staged.
-4. Send ORNL follow-up asking for the exact technical reviewer.
-5. Send EPB and Spark/TVA field-replay routing messages.
+4. Reconnect/read Gmail if needed, then extract any named Oak Ridge contacts from the ORNL response before sending ORNL follow-up.
+5. Send EPB and Spark/TVA field-replay routing messages using the verified lanes above.
 6. Send patent/pro bono intake.
 7. Keep the trading system in guarded paper/replay mode while hardening execution gates.
+
+## Public Source Notes For Contact Routing
+
+- ORNL contact pages point business/partnership inquiries to `partnerships@ornl.gov`; ORNL technology-transfer pages also list `865-574-1051` for partnership inquiries.
+- ORNL GRID-C public material says GRID-C supports power and energy systems, power electronics, grid sensors and controls, grid modeling, data analysis, and grid security.
+- Spark Innovation Center states its current address is `spark@tnresearchpark.org`, and its accelerator page describes TVA partnership access, mentorship, prototyping, customer/partner connections, and ORNL/TVA pathways.
+- TVA Connected Communities FAQ lists `connectedcommunities@tva.gov` for pilot submission support and changes.
+- EPB automated-grid consulting lists `BroadbandSolutions@epb.net` and `423-648-3600`; EPB/ORNL public material describes automated-grid, microgrid, energy-resilience, and quantum/research collaboration lanes.
+- Vanderbilt ACCRE says non-active users should submit a General Inquiry for consultations and general questions; Vanderbilt ISIS lists `contact.isis@vanderbilt.edu`.
 
 ## One-Sentence North Star
 

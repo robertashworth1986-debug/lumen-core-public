@@ -1,5 +1,7 @@
 # LumaTrader Institutional Stack
 
+> **Superseded / Internal-Only Archive Notice (2026-07-03):** This May 2026 brief is retained for history and internal context only. It contains stale trading/live-allocation language, older live-breadth counts, and sensitive federal identifiers that should not be copied into public investor, grant, LinkedIn, or outreach materials. Use the current canonical investor artifact instead: `C:\Users\Novac\iCloudDrive\Business plan\LumenCore_Business_Plan_Investor_Ready_UPDATED_2026-07-03.pdf` and `docs/LUMENCORE_BUSINESS_PLAN_INVESTOR_READY_UPDATED_2026-07-03.md`.
+
 ## Executive Investment Brief
 
 **Date:** May 11, 2026  
