@@ -1,0 +1,139 @@
+{
+  "schema": "real_noise_evidence_boundary_breaker_v1",
+  "generated_local_date": "2026-07-03",
+  "purpose": "Promote LumenCore from synthetic oscillatory benchmark evidence toward real-noise replay evidence without overclaiming field validation.",
+  "current_boundary": "Generated oscillatory-signal software benchmark only. Phase drift, noise, dropout, shock, multimode interference, forecast horizon, and stability metrics are synthetic assumptions. Results do not establish grid, PLL hardware, RF, medical, defense, field, safety, certification, trading, or real-dollar performance.",
+  "strategy": "Do not delete the boundary. Outgrow it by adding locked real-noise replay lanes with named sources, baselines, metrics, hashes, and promotion gates.",
+  "real_noise_sources": [
+    "market_microstructure_noise",
+    "energy_load_generation_outage_forecast_residuals",
+    "air_quality_environmental_sensor_variability",
+    "macro_revision_noise",
+    "sports_market_pricing_noise_non_operational",
+    "buyer_owned_grid_rf_pll_maritime_or_industrial_telemetry"
+  ],
+  "claim_ladder": [
+    "synthetic_stress_benchmark",
+    "real_noise_internal_replay_benchmark",
+    "source_conditioned_holdout_benchmark",
+    "buyer_authorized_field_replay",
+    "externally_accepted_field_result",
+    "bounded_avoided_cost_estimate",
+    "contracted_or_realized_savings"
+  ],
+  "promotion_gates_internal_real_noise": [
+    "source_identity_recorded",
+    "source_timestamp_window_locked",
+    "raw_input_hash_frozen",
+    "schema_adapter_documented",
+    "baseline_named_before_run",
+    "candidate_and_baseline_share_same_window",
+    "metric_named_before_run",
+    "no_posthoc_tuning_on_holdout",
+    "negative_results_logged",
+    "output_hash_and_manifest_frozen"
+  ],
+  "field_validation_extra_gates": [
+    "external_owner_or_lab_approves_heldout_data",
+    "external_owner_or_lab_approves_incumbent_baseline",
+    "external_owner_or_lab_approves_acceptance_metric",
+    "economic_conversion_agreed_before_scoring",
+    "result_signed_accepted_or_rerun_by_external_owner_or_lab"
+  ],
+  "lanes": [
+    {
+      "id": "market_noise_replay",
+      "sources": [
+        "Kraken",
+        "Coinbase",
+        "Alpaca",
+        "FRED rates",
+        "Treasury yields"
+      ],
+      "can_support": [
+        "real_noise_replay_robustness",
+        "latency_update_cadence_tests",
+        "directional_prediction_under_noise",
+        "baseline_comparisons",
+        "risk_control_fail_closed_behavior"
+      ],
+      "cannot_support_yet": [
+        "institutional_trading_readiness",
+        "profitable_live_execution",
+        "autonomous_live_trading_permission",
+        "guaranteed_alpha",
+        "agency_or_utility_field_validation"
+      ],
+      "safe_language": "LumenCore uses market data as a high-noise real-world benchmark lane for timing and robustness. It is not being presented as a live trading product or profit claim.",
+      "next_claim_stage_if_passed": "real_noise_internal_replay_benchmark"
+    },
+    {
+      "id": "energy_grid_proxy_replay",
+      "sources": [
+        "EIA",
+        "NOAA",
+        "NWS",
+        "FRED",
+        "AirNow",
+        "EPA"
+      ],
+      "metrics": [
+        "forecast_error_reduction",
+        "drift_lead_time",
+        "false_alarm_rate",
+        "phase_timing_coherence",
+        "source_ablation",
+        "rolling_window_stability"
+      ],
+      "next_claim_stage_if_passed": "grid_energy_proxy_replay_benchmark",
+      "blocked_language": [
+        "utility_field_validation",
+        "avoided_outage_savings",
+        "operational_control_readiness"
+      ]
+    },
+    {
+      "id": "external_buyer_field_replay",
+      "sources": [
+        "EPRI or Incubatenergy utility-approved data",
+        "EPB or ORNL historical grid or microgrid data",
+        "TVA or Spark partner data",
+        "lab-provided PLL or RF bench data"
+      ],
+      "required_owner_inputs": [
+        "heldout_data",
+        "incumbent_baseline",
+        "acceptance_metric",
+        "replay_window",
+        "economic_conversion_terms"
+      ],
+      "next_claim_stage_if_passed": "buyer_authorized_field_replay",
+      "claim_after_external_acceptance_only": "field_validated_result_for_specific_system_metric_and_window"
+    }
+  ],
+  "outreach_approval_status": {
+    "robert_approved_staged_email_send_in_chat": true,
+    "approval_date": "2026-07-03",
+    "staged_messages": [
+      "EPRI / Incubatenergy Labs reply",
+      "Black Dog / Scott Kelly follow-up",
+      "EPB field replay routing request",
+      "Baker Donelson patent/legal intake request"
+    ],
+    "send_status": "manual_send_required_or_connector_reauth_required",
+    "note": "Gmail connector token expired and browser automation was unavailable during staging. Compose URLs were opened and message bodies were copied to clipboard; confirm sent status manually before marking sent."
+  },
+  "next_build_target": "real_noise_promotion_sweep",
+  "required_output_fields": [
+    "source_system",
+    "row_count",
+    "time_window",
+    "raw_hash",
+    "baseline",
+    "candidate_family",
+    "metric",
+    "result",
+    "pass_fail",
+    "next_claim_stage"
+  ]
+}

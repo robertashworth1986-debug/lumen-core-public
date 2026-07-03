@@ -286,3 +286,26 @@ Send gate: confirm exact legal recipient and whether to attach patent packet.
 5. Send TVA/Spark bridge ask through verified contact route.
 6. Send patent/legal intake after confirming recipient and attachments.
 
+## Staging Log
+
+Local date: `2026-07-03`
+
+Staged as browser/Gmail compose URLs, not confirmed sent by Codex:
+
+- EPRI / Sarah Toews reply to `stoews@epri.com`.
+- Black Dog / Scott Kelly follow-up to `scott@blackdogvp.com`.
+- EPB routing request to `BroadbandSolutions@epb.net`.
+- Baker Donelson legal intake request to `contact@bakerdonelson.com`.
+
+Opened:
+
+- LvlUp application page: `https://www.lvlup.vc/apply/funding-application`
+
+Clipboard was used for the latest staged body/application block. If multiple compose windows are open, each Gmail compose URL should already contain its own body; the clipboard is only the fallback.
+
+## Verified Source Notes
+
+- EPB Automated Grid Consulting is a relevant routing lane because EPB describes assessment, goals/metrics alignment, and technical assessment services for automated-grid consulting.
+- EPB's public Automated Grid support page describes thousands of computers, sensors, and switches on an 8,000-mile fiber optic network, with automatic rerouting in seconds. This supports the fit for a replay-validation conversation, not a claim that EPB has validated LumenCore.
+- Baker Donelson's Nashville page lists `contact@bakerdonelson.com`, and its pro bono page says the firm provides IP pro bono services involving patents, trademarks, copyright, and trade secrets for inventors and entrepreneurs.
+- Spark Cleantech Accelerator is a 12-week UT Research Park program offering mentorship, connections, stipends, prototyping services, and business acceleration for early-stage cleantech entrepreneurs. Use this as a next bridge after EPRI/EPB unless an application window is open.
