@@ -45,6 +45,7 @@ REQUIRED_FEEDS = [
     "field_validation_outreach_board",
     "proof_to_pilot_control_room",
     "champion_sample_expansion_and_economic_bridge",
+    "champion_source_ablation",
 ]
 
 OPTIONAL_FEEDS = [

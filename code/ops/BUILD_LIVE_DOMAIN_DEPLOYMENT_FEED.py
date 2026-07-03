@@ -103,6 +103,12 @@ PROOF_FEEDS = [
         "why": "Expanded source breadth, sample-size diagnostics, and disciplined economic claim bridge.",
     },
     {
+        "key": "champion_source_ablation",
+        "local": "dashboard/data/champion_source_ablation.json",
+        "required": True,
+        "why": "Leave-one-source-out robustness gate showing the current champion is not carried by one source system.",
+    },
+    {
         "key": "geometry_asset_wiring_board",
         "local": "dashboard/data/geometry_asset_wiring_board.json",
         "required": False,
