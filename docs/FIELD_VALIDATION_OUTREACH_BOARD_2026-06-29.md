@@ -6,11 +6,11 @@ Field-validation outreach board. This artifact identifies people and organizatio
 
 ## Outreach Sent Ledger
 
-Status as of 2026-07-01: targeted outreach has been sent. Gmail search shows sent messages and no substantive external validation reply yet. A LaunchTN newsletter was received, but it is not a response to the validation ask.
+Status as of 2026-07-01: targeted outreach has been sent. Incubatenergy Labs/EPRI replied with cycle timing and a direct scheduling path. A LaunchTN newsletter was received, but it is not a response to the validation ask.
 
 | UTC/local date | Recipient | Subject | Status |
 |---|---|---|---|
-| 2026-07-01 | `labs@incubatenergy.org` | `LumenCore field-replay request for utility AI validation` | Sent; waiting for reply. |
+| 2026-07-01 | `labs@incubatenergy.org` | `LumenCore field-replay request for utility AI validation` | Reply received from Sarah Toews / EPRI Incubatenergy Labs. Current IEL cycle is already underway; next application/selection cycle expected to kick off in September; scheduling link offered for fit discussion. |
 | 2026-07-01 | `elena@piper-communications.com` | `Routing request: Tennessee field-replay validation path for LumenCore` | Sent; waiting for reply. |
 | 2026-07-01 | `info@launchtn.org` | `SBIR/STTR support request: external validation path for LumenCore` | Sent; waiting for reply. |
 | 2026-07-01 | `thewondry@vanderbilt.edu` | `Nashville founder request: technical validation route for LumenCore` | Sent; waiting for reply. |
@@ -48,10 +48,28 @@ Status as of 2026-07-01: targeted outreach has been sent. Gmail search shows sen
 ## Send Gate
 
 - Targeted user-approved validation outreach allowed: `true`
+- Targeted user-approved live-source/API onboarding allowed: `true`
 - Bulk email allowed: `false`
 - Contact scraping allowed: `false`
 - Field-validation claim allowed: `false`
 - Realized-savings claim allowed: `false`
+- Plaintext secret commit allowed: `false`
+- Password/MFA automation allowed without user present: `false`
+
+## Standing User Approval Boundary
+
+On 2026-07-01, Robert explicitly approved targeted outreach emails and targeted onboarding of additional live-breadth sources/API keys for serious validation credibility. This authorization is limited to relevant validation, funding, lab, utility, agency, and public-data-source lanes. It does not authorize bulk unsolicited campaigns, contact scraping, committing plaintext secrets, misrepresenting field validation, submitting final legal/financial commitments without operator review, or bypassing MFA/password steps without Robert present.
+
+## External Reply Milestones
+
+### Incubatenergy Labs / EPRI
+
+- Reply received: 2026-07-01 local time.
+- Contact: Sarah Toews, Incubatenergy Labs Associate, Technology Innovation, `stoews@epri.com`.
+- Key content: current IEL cycle is already underway and approximately 10 projects were selected by utility partners for demonstration; next IEL application and selection cycle is expected to kick off in September.
+- Offered path: schedule a discussion using Sarah's booking link to learn more or assess company fit.
+- Interpretation: this is not field validation, selection, or funding. It is a credible warm validation doorway and a September cycle target.
+- Next action: prepare a 15-minute technical-fit agenda and book a short call focused on buyer-authorized replay, utility-held-out data, incumbent baseline, acceptance metric, and economic conversion.
 
 ## Ranked Targets
 

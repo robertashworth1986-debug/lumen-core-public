@@ -1,6 +1,6 @@
 # Live Domain Consolidation Audit
 
-Generated: 2026-07-01T16:33:13.497634+00:00
+Generated: 2026-07-01T16:54:10.556371+00:00
 
 ## Boundary
 
@@ -88,4 +88,4 @@ The live domain is online and visually strong, but it should not be treated as r
 
 ## Audit Hash
 
-`707ea8efd72ac3fea5f17cfc6491d338bc5add3d4f0fef8e3e2c12c976c1da4f`
+`4ac5aa6102c684fa7ca425b74eef886f96097d27d42752299bea7a1ce8dacdbf`

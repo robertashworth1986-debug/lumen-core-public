@@ -1,7 +1,7 @@
 # Luma Operator Context
 
-Generated UTC: `2026-07-01T16:33:10.454640+00:00`
-Context SHA-256: `bc5d84d04fe705a934377f80fff454cce3fba14e3d0a99b4289173fda4c6d27f`
+Generated UTC: `2026-07-03T00:12:56.655112+00:00`
+Context SHA-256: `b7b258db14e6a05f296b6c953c5bd50d65ef60c70c4e90d9cbf4cb8b4d2a281d`
 
 ## Current Truth
 
@@ -20,7 +20,7 @@ Context SHA-256: `bc5d84d04fe705a934377f80fff454cce3fba14e3d0a99b4289173fda4c6d2
 - Field validation claim allowed: `false`
 - Real dollar savings claim allowed: `false`
 
-Kuramoto phase coupling is the current internal champion because it beat kalman_filter on 24/24 source-conditioned holdouts across 4 champion-replay source systems. The broader live-source universe currently shows 19 measured providers and 186 mapped source files/feeds available for additional benchmark promotion. That is strong enough to request a buyer-authorized field replay, but it is not field validation or realized dollar savings yet.
+Kuramoto phase coupling is the current internal champion because it beat kalman_filter on 24/24 source-conditioned holdouts across 4 champion-replay source systems. The broader live-source universe currently shows 25 measured providers and 186 mapped source files/feeds available for additional benchmark promotion. That is strong enough to request a buyer-authorized field replay, but it is not field validation or realized dollar savings yet.
 
 The strongest current story is not 'everything wins.' It is that one champion family has a clear source-conditioned replay win, with the wave/resonance timing lane standing out as the cleanest high-volume internal lane. Energy price pressure is promising but mixed; branching is honest negative evidence where classic baselines still compete.
 

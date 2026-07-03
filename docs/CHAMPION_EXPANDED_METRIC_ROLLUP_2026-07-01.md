@@ -1,7 +1,7 @@
 # Champion Expanded Metric Rollup
 
-Generated UTC: `2026-07-01T14:59:39.187353+00:00`
-Rollup SHA-256: `176fbd7806bf07f2db7d9a96c6e5867d16a1651240bc233ab6a6c2322510807d`
+Generated UTC: `2026-07-03T00:12:57.281477+00:00`
+Rollup SHA-256: `afddb05e3dbe5f04eb8513427866bcb026bea8fff8825d84bff4627ae062881e`
 
 ## Plain English
 
@@ -24,8 +24,8 @@ The strongest current story is not 'everything wins.' It is that one champion fa
 - Manifest source entries: `159`
 - Field-grade source hygiene passed: `false`
 - Suspicious route results: `2`
-- Measured sources: `24/29`
-- Latest bounded measured rows: `835`
+- Measured sources: `25/29`
+- Latest bounded measured rows: `823`
 
 ## Lane Scoreboard
 
