@@ -26,6 +26,7 @@ This is the first file a future agent should read before making new dashboards, 
 Read these before taking major action:
 
 - `docs/FUNDING_RESPONSE_TRIAGE_2026-07-03.md`
+- `docs/LINKEDIN_GMAIL_OUTREACH_CONTROL_BRIEF_2026-07-03.md`
 - `docs/CURRENT_PROOF_POSTURE_AND_NEXT_TESTS_2026-07-03.md`
 - `docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md`
 - `docs/FIELD_VALIDATION_OUTREACH_BOARD_2026-06-29.md`
@@ -68,6 +69,7 @@ Not allowed until external validation:
 - ORNL partnerships auto-reply received only.
 - Tennessee Tech/Satish thread exists but requires manual review for substantive content.
 - Black Dog / LvlUp Ventures application lane exists; use the draft file and confirm financial/legal fields before submit.
+- Latest Gmail/LinkedIn/outreach control brief exists at `docs/LINKEDIN_GMAIL_OUTREACH_CONTROL_BRIEF_2026-07-03.md`; use it before changing LinkedIn, sending mail, or submitting investor applications.
 
 ## Credential Handling
 
