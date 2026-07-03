@@ -1,7 +1,8 @@
 param(
     [string]$StackRoot = "C:\LumaTrader\INSTITUTIONAL_STACK_V2",
     [switch]$Validate,
-    [switch]$SetUserEnv
+    [switch]$SetUserEnv,
+    [switch]$FromClipboard
 )
 
 $ErrorActionPreference = "Stop"
@@ -145,8 +146,14 @@ else {
     Write-Host "Current saved SAM key: none"
 }
 
-$secure = Read-Host "Paste the full SAM.gov API key here. It will not be printed" -AsSecureString
-$newKey = (ConvertFrom-SecureStringPlainText -Secure $secure).Trim()
+if ($FromClipboard) {
+    Write-Host "Reading SAM.gov key from clipboard. The key will not be printed." -ForegroundColor Yellow
+    $newKey = (Get-Clipboard -Raw).Trim()
+}
+else {
+    $secure = Read-Host "Paste the full SAM.gov API key here. It will not be printed" -AsSecureString
+    $newKey = (ConvertFrom-SecureStringPlainText -Secure $secure).Trim()
+}
 
 if ([string]::IsNullOrWhiteSpace($newKey)) {
     throw "No key was entered."
@@ -154,6 +161,10 @@ if ([string]::IsNullOrWhiteSpace($newKey)) {
 
 if ($newKey.Length -lt 16) {
     throw "That key looks too short. Nothing was changed."
+}
+
+if ($newKey -notmatch "^SAM-[A-Za-z0-9-]{20,}$") {
+    throw "That does not look like a SAM.gov key. Nothing was changed."
 }
 
 Write-Host "New SAM key hash prefix: $(Get-Sha256Prefix $newKey)"
