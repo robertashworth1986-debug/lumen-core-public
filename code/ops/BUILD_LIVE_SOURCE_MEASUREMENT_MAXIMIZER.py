@@ -582,9 +582,10 @@ def rows_from_sam_gov(max_rows: int, timeout: int) -> tuple[int | None, list[dic
     key = env_first("SAM_API_KEY", "SAM_GOV_API_KEY")
     if not key:
         return None, [], "missing_env"
+    today = datetime.now(timezone.utc).strftime("%m/%d/%Y")
     url = (
         "https://api.sam.gov/opportunities/v2/search?"
-        f"limit={max_rows}&postedFrom=01/01/2026&postedTo=06/22/2026&api_key={urllib.parse.quote(key)}"
+        f"limit={max_rows}&postedFrom=01/01/2026&postedTo={today}&api_key={urllib.parse.quote(key)}"
     )
     code, obj, _ = request_json(url, timeout=timeout)
     rows = latest_items(obj.get("opportunitiesData", []) if isinstance(obj, dict) else [], max_rows)

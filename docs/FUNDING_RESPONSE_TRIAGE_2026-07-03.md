@@ -72,6 +72,15 @@ Safe rotation plan:
 
 Do not rotate silently: changing API keys can break existing pulls if the replacement is not propagated.
 
+Safe helper added:
+
+```powershell
+cd C:\LumaTrader\INSTITUTIONAL_STACK_V2
+pwsh -ExecutionPolicy Bypass -File .\tools\Set-SamApiKey.ps1 -Validate -SetUserEnv
+```
+
+The helper stores `SAM_GOV_API_KEY` locally in `config/luma_live_keys.env`, backs up the previous env file, validates one SAM.gov Opportunities API call, and does not print the key.
+
 ## Live Breadth Correction
 
 Current best evidence from `dashboard/data/champion_metric_gauntlet.json`:
