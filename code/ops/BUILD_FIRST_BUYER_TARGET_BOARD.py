@@ -15,10 +15,16 @@ DASHBOARD_DATA = ROOT / "dashboard" / "data"
 PROOF_REVENUE_JSON = OUT_OPS / "proof_to_revenue_engine_latest.json"
 STRESS_MATRIX_JSON = OUT_OPS / "champion_stress_test_matrix_latest.json"
 LIVE_DOMAIN_JSON = OUT_OPS / "live_domain_deployment_feed_latest.json"
+CHAMPION_JSON = DASHBOARD_DATA / "champion_metric_gauntlet.json"
+LOCKED_SWEEP_JSON = DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json"
+VALUATION_JSON = DASHBOARD_DATA / "valuation_proposal_target_packet.json"
 
 OUT_JSON = OUT_OPS / "first_buyer_target_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "first_buyer_target_board.json"
 OUT_MD = DOCS / "FIRST_BUYER_TARGET_BOARD_2026-06-27.md"
+UPDATED_BUSINESS_PLAN_PDF = Path(
+    r"C:\Users\Novac\iCloudDrive\Business plan\LumenCore_Business_Plan_Investor_Ready_UPDATED_2026-07-03.pdf"
+)
 
 BOUNDARY = (
     "First-buyer target board. This artifact selects named, source-verified buyer channels for a manual paid "
@@ -118,46 +124,134 @@ def proof_snapshot() -> dict[str, Any]:
     revenue = read_json(PROOF_REVENUE_JSON)
     stress = read_json(STRESS_MATRIX_JSON)
     live = read_json(LIVE_DOMAIN_JSON)
+    champion = read_json(CHAMPION_JSON)
+    locked = read_json(LOCKED_SWEEP_JSON)
+    valuation = read_json(VALUATION_JSON)
 
     revenue_summary = as_dict(revenue.get("summary"))
     stress_summary = as_dict(stress.get("summary"))
     live_summary = as_dict(live.get("summary"))
     reviewer_urls = as_dict(live.get("reviewer_urls"))
+    champion_summary = as_dict(champion.get("summary"))
+    locked_summary = as_dict(locked.get("summary"))
+    valuation_truth = as_dict(valuation.get("current_truth"))
+    valuation_overall = as_dict(valuation.get("overall_locked_sweep"))
+
+    holdout_wins = as_int(
+        champion_summary.get("holdout_wins")
+        or stress_summary.get("holdout_wins")
+        or revenue_summary.get("holdout_wins")
+    )
+    holdout_count = as_int(
+        champion_summary.get("holdout_count")
+        or stress_summary.get("holdout_count")
+        or revenue_summary.get("holdout_count")
+    )
+    champion_rows = as_int(
+        champion_summary.get("estimated_rows_replayed")
+        or stress_summary.get("estimated_rows_replayed")
+        or revenue_summary.get("estimated_rows_replayed")
+    )
+    champion_samples = as_int(
+        champion_summary.get("numeric_samples_read")
+        or stress_summary.get("numeric_samples_read")
+        or revenue_summary.get("numeric_samples_read")
+    )
+    locked_comparisons = as_int(
+        locked_summary.get("baseline_comparison_count")
+        or valuation_overall.get("baseline_comparison_count")
+    )
+    locked_wins = as_int(locked_summary.get("candidate_win_count") or valuation_overall.get("candidate_win_count"))
+    live_ready = bool(
+        revenue_summary.get("live_domain_hash_verified")
+        or live_summary.get("domain_deployment_state") == "LIVE_DOMAIN_HASH_VERIFIED"
+        or champion_summary.get("live_domain_reviewer_ready")
+    )
+    revenue_stage = revenue_summary.get("revenue_stage", "")
+    if (
+        holdout_wins >= 20
+        and holdout_count >= holdout_wins
+        and live_ready
+        and not champion_summary.get("field_validation_claim_allowed", False)
+    ):
+        revenue_stage = "manual_paid_pilot_scoping_ready"
 
     return {
-        "revenue_stage": revenue_summary.get("revenue_stage", ""),
-        "champion_family": stress_summary.get("champion_family")
+        "revenue_stage": revenue_stage,
+        "champion_family": champion_summary.get("champion_family")
+        or stress_summary.get("champion_family")
         or revenue_summary.get("champion_family")
         or "kuramoto_phase_coupling",
-        "champion_label": stress_summary.get("champion_label")
+        "champion_label": champion_summary.get("champion_label")
+        or stress_summary.get("champion_label")
         or revenue_summary.get("champion_label")
         or "Kuramoto phase coupling",
-        "named_baseline": stress_summary.get("named_baseline")
+        "named_baseline": champion_summary.get("named_baseline")
+        or stress_summary.get("named_baseline")
         or revenue_summary.get("named_baseline")
         or "kalman_filter",
-        "holdout_wins": as_int(stress_summary.get("holdout_wins") or revenue_summary.get("holdout_wins")),
-        "holdout_count": as_int(stress_summary.get("holdout_count") or revenue_summary.get("holdout_count")),
+        "holdout_wins": holdout_wins,
+        "holdout_count": holdout_count,
+        "holdout_win_rate": as_float(champion_summary.get("holdout_win_rate") or 0.0),
+        "wilson_95_win_rate_lower": as_float(champion_summary.get("wilson_95_win_rate_lower") or 0.0),
         "source_system_count": as_int(
-            stress_summary.get("source_system_count") or revenue_summary.get("source_system_count")
+            champion_summary.get("source_system_count")
+            or stress_summary.get("source_system_count")
+            or revenue_summary.get("source_system_count")
         ),
-        "estimated_rows_replayed": as_int(
-            stress_summary.get("estimated_rows_replayed") or revenue_summary.get("estimated_rows_replayed")
+        "estimated_rows_replayed": champion_rows,
+        "numeric_samples_read": champion_samples,
+        "stress_gates_passed": as_int(stress_summary.get("stress_gates_passed") or champion_summary.get("gauntlet_pass_count")),
+        "stress_gates_total": as_int(stress_summary.get("stress_gates_total") or champion_summary.get("gauntlet_total_count")),
+        "mean_delta_vs_named_baseline": as_float(
+            champion_summary.get("mean_delta_vs_named_baseline") or stress_summary.get("mean_delta_vs_named_baseline")
         ),
-        "numeric_samples_read": as_int(stress_summary.get("numeric_samples_read")),
-        "stress_gates_passed": as_int(stress_summary.get("stress_gates_passed")),
-        "stress_gates_total": as_int(stress_summary.get("stress_gates_total")),
-        "mean_delta_vs_named_baseline": as_float(stress_summary.get("mean_delta_vs_named_baseline")),
-        "safe_estimated_hourly_value_usd": as_float(revenue_summary.get("safe_estimated_hourly_value_usd")),
-        "safe_estimated_annual_value_usd": as_float(revenue_summary.get("safe_estimated_annual_value_usd")),
-        "live_domain_hash_verified": bool(
-            revenue_summary.get("live_domain_hash_verified")
-            or live_summary.get("domain_deployment_state") == "LIVE_DOMAIN_HASH_VERIFIED"
+        "min_delta_vs_named_baseline": as_float(champion_summary.get("min_delta_vs_named_baseline")),
+        "one_sided_sign_test_p_value": as_float(champion_summary.get("one_sided_sign_test_p_value")),
+        "broader_enabled_provider_count": as_int(champion_summary.get("broader_enabled_provider_count")),
+        "broader_measured_provider_count": as_int(champion_summary.get("broader_measured_provider_count")),
+        "manifest_unique_source_count": as_int(champion_summary.get("manifest_unique_source_count")),
+        "manifest_ready_for_benchmark_row_count": as_int(
+            champion_summary.get("manifest_ready_for_benchmark_row_count")
         ),
-        "live_domain_reviewer_ready": bool(live_summary.get("live_domain_reviewer_ready")),
+        "locked_adapter_backed_routes": as_int(
+            locked_summary.get("adapter_backed_routes") or valuation_overall.get("source_conditioned_route_count")
+        ),
+        "locked_baseline_comparison_count": locked_comparisons,
+        "locked_candidate_win_count": locked_wins,
+        "locked_candidate_loss_or_tie_count": as_int(
+            locked_summary.get("candidate_loss_or_tie_count")
+            or valuation_overall.get("candidate_loss_or_tie_count")
+            or max(0, locked_comparisons - locked_wins)
+        ),
+        "locked_comparison_win_rate": round(locked_wins / locked_comparisons, 6) if locked_comparisons else 0.0,
+        "locked_estimated_rows_replayed": as_int(
+            locked_summary.get("estimated_rows_replayed") or valuation_overall.get("estimated_rows_replayed")
+        ),
+        "locked_numeric_samples_read": as_int(
+            locked_summary.get("numeric_samples_read") or valuation_overall.get("numeric_samples_read")
+        ),
+        "locked_source_count": as_int(locked_summary.get("source_count") or valuation_overall.get("source_count")),
+        "locked_mean_score_delta": as_float(locked_summary.get("mean_score_delta") or valuation_overall.get("mean_score_delta")),
+        "locked_best_score_delta": as_float(locked_summary.get("best_score_delta") or valuation_overall.get("best_score_delta")),
+        "locked_replay_chain_sha256": locked_summary.get("replay_chain_sha256")
+        or valuation_overall.get("replay_chain_sha256", ""),
+        "safe_estimated_hourly_value_usd": as_float(
+            valuation_truth.get("safe_estimated_hourly_value_usd") or revenue_summary.get("safe_estimated_hourly_value_usd")
+        ),
+        "safe_estimated_annual_value_usd": as_float(
+            valuation_truth.get("safe_estimated_annual_value_usd") or revenue_summary.get("safe_estimated_annual_value_usd")
+        ),
+        "live_domain_hash_verified": live_ready,
+        "live_domain_reviewer_ready": bool(
+            live_summary.get("live_domain_reviewer_ready") or champion_summary.get("live_domain_reviewer_ready")
+        ),
         "champion_feed_primary": reviewer_urls.get("champion_feed_primary", ""),
         "mission_control": reviewer_urls.get("mission_control", "https://lumen-core.ai/mission_control.html"),
         "proof_to_revenue_feed": "https://lumen-core.ai/data/proof_to_revenue_engine.json",
         "stress_matrix_feed": "https://lumen-core.ai/data/champion_stress_test_matrix.json",
+        "business_plan_pdf": str(UPDATED_BUSINESS_PLAN_PDF),
+        "business_plan_pdf_exists": UPDATED_BUSINESS_PLAN_PDF.exists(),
     }
 
 
@@ -167,7 +261,13 @@ def make_candidates(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
     proof_line = (
         f"{champion} currently shows {snapshot['holdout_wins']}/{snapshot['holdout_count']} internal "
         f"source-conditioned holdout wins vs {baseline}, with {snapshot['estimated_rows_replayed']:,} estimated rows "
-        "replayed. This supports a buyer-authorized field replay request, not a savings claim."
+        "replayed in the champion core. The broader locked sweep covers "
+        f"{snapshot['locked_adapter_backed_routes']} adapter-backed routes, "
+        f"{snapshot['locked_baseline_comparison_count']} baseline comparisons, "
+        f"{snapshot['locked_candidate_win_count']} candidate wins, "
+        f"{snapshot['locked_estimated_rows_replayed']:,} estimated rows, and "
+        f"{snapshot['locked_source_count']} mapped sources. This supports a buyer-authorized field replay request, "
+        "not a savings claim."
     )
 
     candidates = [
@@ -413,6 +513,13 @@ def build_payload() -> dict[str, Any]:
             "proof_live_domain_hash_verified": snapshot["live_domain_hash_verified"],
             "proof_holdout_wins": snapshot["holdout_wins"],
             "proof_holdout_count": snapshot["holdout_count"],
+            "proof_champion_source_system_count": snapshot["source_system_count"],
+            "proof_broader_measured_provider_count": snapshot["broader_measured_provider_count"],
+            "proof_locked_adapter_backed_routes": snapshot["locked_adapter_backed_routes"],
+            "proof_locked_baseline_comparison_count": snapshot["locked_baseline_comparison_count"],
+            "proof_locked_candidate_win_count": snapshot["locked_candidate_win_count"],
+            "proof_locked_source_count": snapshot["locked_source_count"],
+            "proof_locked_estimated_rows_replayed": snapshot["locked_estimated_rows_replayed"],
         },
         "proof_snapshot": snapshot,
         "source_refs": SOURCE_REFS,
@@ -477,8 +584,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Champion: `{snapshot['champion_label']}`",
         f"- Named baseline: `{snapshot['named_baseline']}`",
         f"- Holdout wins: `{snapshot['holdout_wins']}/{snapshot['holdout_count']}`",
-        f"- Estimated rows replayed: `{snapshot['estimated_rows_replayed']:,}`",
+        f"- Champion-core estimated rows replayed: `{snapshot['estimated_rows_replayed']:,}`",
+        f"- Champion-core source systems: `{snapshot['source_system_count']}`",
+        f"- Broader measured providers: `{snapshot['broader_measured_provider_count']}/{snapshot['broader_enabled_provider_count']}`",
+        f"- Broader locked sweep: `{snapshot['locked_adapter_backed_routes']}` routes, `{snapshot['locked_baseline_comparison_count']}` comparisons, `{snapshot['locked_candidate_win_count']}` wins, `{snapshot['locked_source_count']}` mapped sources, `{snapshot['locked_estimated_rows_replayed']:,}` estimated rows",
         f"- Live-domain hash verified: `{str(snapshot['live_domain_hash_verified']).lower()}`",
+        f"- Business plan PDF: `{snapshot['business_plan_pdf']}`",
         f"- Stress matrix feed: {snapshot['stress_matrix_feed']}",
         "",
         "## Ranked Buyer Targets",

@@ -1,6 +1,6 @@
 # First Buyer Target Board
 
-Generated UTC: `2026-06-29T16:50:23.016860+00:00`
+Generated UTC: `2026-07-03T23:53:56.749789+00:00`
 
 First-buyer target board. This artifact selects named, source-verified buyer channels for a manual paid evidence review or buyer-authorized field replay. It does not authorize auto-send, bulk outreach, contact scraping, fixed frozen-delta pricing, field-validation claims, realized-savings claims, live trading, or autonomous operational execution.
 
@@ -19,8 +19,12 @@ First-buyer target board. This artifact selects named, source-verified buyer cha
 - Champion: `Kuramoto phase coupling`
 - Named baseline: `kalman_filter`
 - Holdout wins: `24/24`
-- Estimated rows replayed: `2,506,267`
+- Champion-core estimated rows replayed: `2,506,267`
+- Champion-core source systems: `4`
+- Broader measured providers: `25/29`
+- Broader locked sweep: `313` routes, `1969` comparisons, `1355` wins, `159` mapped sources, `7,152,253` estimated rows
 - Live-domain hash verified: `true`
+- Business plan PDF: `C:\Users\Novac\iCloudDrive\Business plan\LumenCore_Business_Plan_Investor_Ready_UPDATED_2026-07-03.pdf`
 - Stress matrix feed: https://lumen-core.ai/data/champion_stress_test_matrix.json
 
 ## Ranked Buyer Targets
@@ -119,4 +123,4 @@ To stop further outreach, reply "remove."
 - Allowed today: manual inquiry to one reviewed buyer channel, paid evidence review ask, buyer-authorized field replay request, public hash-verified proof feed reference
 - Blocked until buyer replay: field validated, realized savings, fixed price per frozen delta, award certainty, alpha certainty, live operational control
 
-First-buyer board SHA-256: `eee39e9c8a2a5c2810b6892b94eb8209dfd6b826b2ea24e8526bffddb1564c02`
+First-buyer board SHA-256: `0e17c89353f5e33ef7fc7d9a8d5e013b87903c4bf692d3893e5248dafeeab17c`
