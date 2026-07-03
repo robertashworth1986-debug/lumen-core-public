@@ -71,6 +71,20 @@ On 2026-07-01, Robert explicitly approved targeted outreach emails and targeted 
 - Interpretation: this is not field validation, selection, or funding. It is a credible warm validation doorway and a September cycle target.
 - Next action: prepare a 15-minute technical-fit agenda and book a short call focused on buyer-authorized replay, utility-held-out data, incumbent baseline, acceptance metric, and economic conversion.
 
+### 2026-07-03 Gmail Funding Triage
+
+- Gmail connector token was expired, so Chrome/Edge browser control was used against Robert's signed-in Gmail session.
+- Additional outreach checks found:
+  - Tennessee Tech / Satish Mahajan thread present, but no substantive reply text was visible in the browser readout.
+  - ORNL partnerships auto-reply present; receipt only, not validation.
+  - Black Dog / LvlUp Ventures funding lane found. The relevant application is at `https://www.lvlup.vc/apply/funding-application`.
+- LvlUp referral fields from the email lane:
+  - How did you hear about us: `Venture Scout`
+  - Referrer name: `Scott Kelly`
+  - Referrer email: `scott@blackdogvp.com`
+- Draft application answers were captured in `docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md`.
+- SAM.gov API key rotation reminder was found. Rotation should be completed before `2026-07-17`, but the replacement key should be handled only through local secret storage and smoke-tested before cutover.
+
 ## Ranked Targets
 
 ### 1. OpenPOWER AI / EPRI AI for Power / Incubatenergy Labs

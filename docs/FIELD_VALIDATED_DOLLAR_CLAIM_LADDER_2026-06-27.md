@@ -1,7 +1,7 @@
 # Field-Validated Dollar Claim Ladder
 
-Generated UTC: `2026-06-27T17:45:58.706212+00:00`
-Claim ladder SHA-256: `309ada767ff1ba72fd2143f1411e5d67e04660e347c268d18e8c713afa206f5c`
+Generated UTC: `2026-07-03T01:18:39.499888+00:00`
+Claim ladder SHA-256: `f35294f1860a13117a49cc33dc3ff49349e41dcea47018585facb4be636399dd`
 
 ## Boundary
 
@@ -30,7 +30,7 @@ Dollar claim ladder only. This artifact separates today's bounded estimated-valu
 - Lane: `wave_resonance_timing`
 - Baseline: `kalman_filter`
 - Holdout wins: `24 / 24`
-- Mean delta vs baseline: `0.139875`
+- Mean delta vs baseline: `0.140668`
 - Estimated rows replayed: `2506267`
 - Ready for buyer-authorized replay request: `true`
 - Boundary: This is the current internal alpha-flow leader for asking a buyer to run a locked field replay. It is not yet a customer savings claim.
