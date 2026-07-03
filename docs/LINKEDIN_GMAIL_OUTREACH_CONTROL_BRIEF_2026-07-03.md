@@ -203,6 +203,8 @@ Avoid leading with autonomous trading. Trading work can be mentioned only as a g
 
 ## Immediate Best Actions
 
+Use `docs/OUTREACH_VALIDATION_APPLICATION_PACKET_2026-07-03.md` as the current primary outreach/application packet. It consolidates the EPRI reply, ORNL follow-up, EPB, TVA/Spark, Vanderbilt, patent/legal outreach, Black Dog/LvlUp answers, and the current trading truth snapshot.
+
 1. Book Sarah Toews / EPRI fit call. Goal: learn exact field-replay requirements for September IEL or any late technical review path.
 2. Prepare and submit LvlUp application after Robert confirms legal entity, revenue, burn, runway, raise amount, valuation, and pitch deck. Use the professional founder narrative above.
 3. Rotate SAM.gov key with Robert present, save it only in local secrets, then rerun live-source measurement.
@@ -241,6 +243,7 @@ Unsafe:
 
 Future passes should not create another unrelated dashboard before checking:
 
+- `docs/OUTREACH_VALIDATION_APPLICATION_PACKET_2026-07-03.md`
 - `docs/CURRENT_PROOF_POSTURE_AND_NEXT_TESTS_2026-07-03.md`
 - `docs/FUNDING_RESPONSE_TRIAGE_2026-07-03.md`
 - this file
