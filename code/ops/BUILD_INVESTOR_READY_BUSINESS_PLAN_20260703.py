@@ -65,11 +65,13 @@ def get_data() -> dict:
     locked = read_json(DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json")
     dollar = read_json(DASHBOARD_DATA / "field_validated_dollar_claim_ladder.json")
     gate = read_json(DASHBOARD_DATA / "dollar_claim_gate.json")
+    accepted_metrics = read_json(DASHBOARD_DATA / "kuramoto_accepted_metric_audit.json")
     return {
         "champion": champion,
         "locked": locked,
         "dollar": dollar,
         "gate": gate,
+        "accepted_metrics": accepted_metrics,
     }
 
 
@@ -115,6 +117,18 @@ def dollar_summary(data: dict) -> dict:
     return {
         "allowed_hourly": float(gate.get("allowed_estimated_hourly_value_usd", 4520) or 4520),
         "allowed_annual": float(gate.get("allowed_estimated_annual_value_usd", 39595200) or 39595200),
+    }
+
+
+def accepted_metric_summary(data: dict) -> dict:
+    accepted = data.get("accepted_metrics", {})
+    summary = accepted.get("summary", {}) if isinstance(accepted.get("summary"), dict) else {}
+    return {
+        "proxy_allowed": bool(summary.get("accepted_metric_proxy_language_allowed")),
+        "proxy_ready": int(summary.get("proxy_metrics_ready", 0) or 0),
+        "blocked": int(summary.get("external_or_adapter_blocked_metrics", 0) or 0),
+        "business_plan_language": summary.get("business_plan_language", ""),
+        "audit_sha256": str(accepted.get("audit_sha256", "")),
     }
 
 
@@ -323,6 +337,7 @@ def build_story(data: dict) -> list:
     champ = safe_champion(data)
     locked = locked_summary(data)
     dollars = dollar_summary(data)
+    accepted = accepted_metric_summary(data)
 
     story: list = []
     usable_width = 6.5 * inch
@@ -392,6 +407,25 @@ def build_story(data: dict) -> list:
                 "Infrastructure buyers need evidence that survives locked baselines and repeatable replay, not broad AI promises.",
                 "The platform already separates measured sources, generated evidence, claim gates, and dollar gates.",
                 "The next value unlock is not another dashboard; it is an external owner agreeing to held-out data, acceptance metrics, and economic conversion.",
+            ],
+            st,
+        )
+    )
+    story.append(P("Accepted-metric bridge", st["h2"]))
+    story.append(
+        P(
+            accepted["business_plan_language"]
+            or "Accepted-metric proxy diagnostics are staged as a bridge from internal replay to external validation.",
+            st["body"],
+        )
+    )
+    story.append(
+        kv_table(
+            [
+                ("Proxy metrics ready", f"{accepted['proxy_ready']} reviewer-recognizable proxy gates"),
+                ("External/adaptor gates", f"{accepted['blocked']} still require topology, instruments, IEEE cases, or buyer data"),
+                ("Audit SHA-256", accepted["audit_sha256"][:16] + "..." if accepted["audit_sha256"] else "n/a"),
+                ("Boundary", "Order-parameter and phase-bound language is proxy-only; critical coupling and IEEE claims remain locked until implemented."),
             ],
             st,
         )
@@ -497,6 +531,24 @@ def build_story(data: dict) -> list:
             st,
         )
     )
+    story.append(P("Federal validation and contract-readiness lane", st["h2"]))
+    story.append(
+        P(
+            "The strongest non-dilutive path is not to scattershot applications; it is to convert LumenCore into a repeatable government-review package: technical abstract, proof annex, cost template, SAM/UEI readiness, and a reviewer-safe evidence boundary. The downloaded DARPA and NIST materials show real template lanes that can be reused when eligibility, deadline, and portal status are verified.",
+            st["body"],
+        )
+    )
+    story.append(
+        bullets(
+            [
+                "DARPA-style opportunity assets include abstract, executive-summary, technical/management, cost, and accelerated-award templates.",
+                "NIST/SBIR packet assets include technical volume, commercialization plan, budget, cover letter, manifest, and submit instructions.",
+                "SAM.gov and agency opportunity scans should be treated as a weekly pipeline, with only coherent, deadline-valid opportunities promoted to submit-ready status.",
+                "Investor value: a funded bridge increases the odds of external validation, paid evidence reviews, and non-dilutive award capture without exaggerating current proof.",
+            ],
+            st,
+        )
+    )
 
     story.append(PageBreak())
     story.append(P("Business Model and Valuation", st["h1"]))
@@ -525,6 +577,13 @@ def build_story(data: dict) -> list:
     story.append(
         P(
             f"The current dollar gate supports bounded estimated opportunity language up to approximately {money(dollars['allowed_hourly'])}/hour or {money(dollars['allowed_annual'])}/year under stated internal assumptions. This is useful for scoping a pilot conversation, but it is not realized savings, booked revenue, or a fixed-price claim for a frozen delta.",
+            st["body"],
+        )
+    )
+    story.append(P("AI-assisted execution leverage", st["h2"]))
+    story.append(
+        P(
+            "Continuous GPT/Codex-assisted development can support valuation as an execution-leverage story when it produces committed code, repeatable tests, proof hashes, outreach packets, and cleaner decision logs. It should not be priced as a standalone asset; it becomes valuable through the artifacts, speed, and reproducibility it leaves behind.",
             st["body"],
         )
     )
@@ -634,6 +693,7 @@ def write_markdown(data: dict) -> None:
     champ = safe_champion(data)
     locked = locked_summary(data)
     dollars = dollar_summary(data)
+    accepted = accepted_metric_summary(data)
     lines = [
         "# LumenCore Business Plan and Investor Diligence Brief",
         "",
@@ -657,6 +717,18 @@ def write_markdown(data: dict) -> None:
         "",
         "Boundary: internal replay champion; not field validation and not realized savings.",
         "",
+        "## Accepted-Metric Bridge",
+        "",
+        accepted["business_plan_language"]
+        or "Accepted-metric proxy diagnostics are staged as a bridge from internal replay to external validation.",
+        "",
+        f"- Proxy metrics ready: `{accepted['proxy_ready']}`",
+        f"- External/adaptor gates still blocked: `{accepted['blocked']}`",
+        f"- Accepted metric proxy language allowed: `{str(accepted['proxy_allowed']).lower()}`",
+        f"- Audit SHA-256: `{accepted['audit_sha256']}`",
+        "",
+        "Boundary: order-parameter and phase-bound language is proxy-only; critical coupling and IEEE claims remain locked until implemented or supplied by an external owner.",
+        "",
         "## Locked Baseline Sweep",
         "",
         f"- Routes replayed: `{locked['routes']:,}`",
@@ -666,6 +738,15 @@ def write_markdown(data: dict) -> None:
         f"- Estimated rows replayed: `{locked['rows']:,}`",
         f"- Numeric samples: `{locked['numeric']:,}`",
         f"- Source count: `{locked['source_count']:,}`",
+        "",
+        "## Federal Validation And Contract Readiness",
+        "",
+        "LumenCore's highest-value non-dilutive lane is a repeatable government-review package: technical abstract, proof annex, cost template, SAM/UEI readiness, and a reviewer-safe evidence boundary. DARPA-style opportunity assets and NIST/SBIR packet assets are available locally, but any submission should be promoted only after eligibility, deadline, and portal status are verified.",
+        "",
+        "- DARPA-style assets include abstract, executive-summary, technical/management, cost, and accelerated-award templates.",
+        "- NIST/SBIR packet assets include technical volume, commercialization plan, budget, cover letter, manifest, and submit instructions.",
+        "- SAM.gov and agency scans should become a weekly opportunity pipeline, not a one-off scramble.",
+        "- Investor value: a funded bridge improves the chance of external validation, paid evidence reviews, and non-dilutive award capture without overstating current proof.",
         "",
         "## Valuation / Raise",
         "",
@@ -678,6 +759,10 @@ def write_markdown(data: dict) -> None:
         "## Bounded Dollar Language",
         "",
         f"Current internal dollar gate supports bounded estimated opportunity language up to approximately `${dollars['allowed_hourly']:,.0f}/hour` or `${dollars['allowed_annual']:,.0f}/year` under stated assumptions. This is not realized savings.",
+        "",
+        "## AI-Assisted Execution Leverage",
+        "",
+        "Continuous GPT/Codex-assisted work supports valuation only through committed code, repeatable tests, proof hashes, evidence packets, outreach, and reproducible operating leverage. It is not a field-validation claim by itself.",
         "",
         "## First Commercial Ask",
         "",

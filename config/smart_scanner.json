@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "scan_interval_s": 300,
+  "spike_enabled": true,
+  "spike_max_age_minutes": 30.0,
+  "alpha_enabled": false,
+  "alpha_max_age_minutes": 240.0,
+  "alpha_quotes": "ZUSD,USDT",
+  "alpha_top_liquid": 250,
+  "alpha_limit": 250,
+  "alpha_min_turnover_usd": 10000.0,
+  "alpha_max_spread_bps": 250.0,
+  "alpha_spike_threshold_pct": 3.0
+}
