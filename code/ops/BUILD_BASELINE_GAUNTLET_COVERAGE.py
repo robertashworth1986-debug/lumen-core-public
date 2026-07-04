@@ -15,6 +15,7 @@ DOCS = ROOT / "docs"
 
 LOCKED_SWEEP = DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json"
 REGISTRY = ROOT / "config" / "geometry_championship_v1_registry.json"
+KURAMOTO_AUDIT = DASHBOARD_DATA / "kuramoto_accepted_metric_audit.json"
 OUT_JSON = OUT_OPS / "baseline_gauntlet_coverage_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "baseline_gauntlet_coverage.json"
 OUT_MD = DOCS / "BASELINE_GAUNTLET_COVERAGE_2026-07-03.md"
@@ -83,6 +84,12 @@ ALIASES: dict[str, tuple[str, ...]] = {
     "kuramoto_order_parameter": ("kuramoto_order_parameter",),
     "kuramoto_critical_coupling": ("kuramoto_critical_coupling",),
     "kuramoto_phase_bound_stress": ("kuramoto_phase_bound_stress", "phase_bound_stress"),
+}
+
+KURAMOTO_PROXY_MAP: dict[str, str] = {
+    "kuramoto_order_parameter": "kuramoto_order_parameter_proxy",
+    "kuramoto_phase_bound_stress": "kuramoto_phase_bound_stress_proxy",
+    "kuramoto_critical_coupling": "kuramoto_critical_coupling_threshold",
 }
 
 
@@ -162,6 +169,17 @@ def collect_registry_baselines(registry: dict[str, Any]) -> dict[str, list[str]]
     return {key: sorted(set(value)) for key, value in out.items()}
 
 
+def collect_kuramoto_metric_statuses(audit: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
+    for row in audit.get("accepted_metric_rows", []) or []:
+        if not isinstance(row, dict):
+            continue
+        metric_id = str(row.get("metric_id") or "").strip()
+        if metric_id:
+            out[metric_id] = row
+    return out
+
+
 def match_aliases(target_id: str, haystack: dict[str, Any] | dict[str, list[str]]) -> list[str]:
     aliases = ALIASES.get(target_id, (target_id,))
     return [alias for alias in aliases if alias in haystack]
@@ -170,8 +188,10 @@ def match_aliases(target_id: str, haystack: dict[str, Any] | dict[str, list[str]
 def build_payload() -> dict[str, Any]:
     sweep = read_json(LOCKED_SWEEP)
     registry = read_json(REGISTRY)
+    kuramoto_audit = read_json(KURAMOTO_AUDIT)
     locked = collect_locked_baselines(sweep)
     registered = collect_registry_baselines(registry)
+    kuramoto_metric_statuses = collect_kuramoto_metric_statuses(kuramoto_audit)
     packages = sorted({pkg for row in REQUESTED_BASELINES for pkg in row["packages"]})
     package_status = {pkg: module_available(pkg) for pkg in packages}
 
@@ -182,10 +202,16 @@ def build_payload() -> dict[str, Any]:
         registered_keys = match_aliases(target_id, registered)
         required_packages = request["packages"]
         missing_packages = [pkg for pkg in required_packages if not package_status.get(pkg, False)]
+        accepted_metric_id = KURAMOTO_PROXY_MAP.get(target_id)
+        accepted_metric = kuramoto_metric_statuses.get(accepted_metric_id or "")
         if locked_keys:
             status = "EXECUTED_IN_LOCKED_REPLAY"
         elif registered_keys:
             status = "REGISTERED_BASELINE_NOT_ADAPTER_EXECUTED"
+        elif accepted_metric and accepted_metric.get("status") == "REPLAY_PROXY_READY":
+            status = "REPLAY_PROXY_READY_FROM_ACCEPTED_METRIC_AUDIT"
+        elif accepted_metric:
+            status = str(accepted_metric.get("status") or "IMPLEMENTATION_NEEDED")
         elif missing_packages:
             status = "BLOCKED_BY_MISSING_PACKAGE_OR_DATASET"
         else:
@@ -208,12 +234,19 @@ def build_payload() -> dict[str, Any]:
                 "numeric_samples": sum(int(item.get("numeric_samples") or 0) for item in locked_infos),
                 "required_packages": required_packages,
                 "missing_packages": missing_packages,
+                "accepted_metric_id": accepted_metric_id,
+                "accepted_metric_status": accepted_metric.get("status") if accepted_metric else None,
+                "accepted_metric_name": accepted_metric.get("accepted_metric_name") if accepted_metric else None,
+                "next_unlock": accepted_metric.get("next_unlock") if accepted_metric else None,
             }
         )
 
     summary = {
         "requested_baselines": len(rows),
         "executed_in_locked_replay": sum(1 for row in rows if row["status"] == "EXECUTED_IN_LOCKED_REPLAY"),
+        "replay_proxy_ready_from_metric_audit": sum(
+            1 for row in rows if row["status"] == "REPLAY_PROXY_READY_FROM_ACCEPTED_METRIC_AUDIT"
+        ),
         "registered_not_adapter_executed": sum(
             1 for row in rows if row["status"] == "REGISTERED_BASELINE_NOT_ADAPTER_EXECUTED"
         ),
@@ -245,10 +278,14 @@ def build_payload() -> dict[str, Any]:
         "inputs": {
             "locked_sweep": str(LOCKED_SWEEP.relative_to(ROOT)).replace("\\", "/"),
             "registry": str(REGISTRY.relative_to(ROOT)).replace("\\", "/"),
+            "kuramoto_accepted_metric_audit": str(KURAMOTO_AUDIT.relative_to(ROOT)).replace("\\", "/"),
         },
         "summary": summary,
         "package_status": package_status,
         "executed_baseline_ids": [row["id"] for row in rows if row["status"] == "EXECUTED_IN_LOCKED_REPLAY"],
+        "replay_proxy_ready_ids": [
+            row["id"] for row in rows if row["status"] == "REPLAY_PROXY_READY_FROM_ACCEPTED_METRIC_AUDIT"
+        ],
         "registered_not_executed_ids": [
             row["id"] for row in rows if row["status"] == "REGISTERED_BASELINE_NOT_ADAPTER_EXECUTED"
         ],
@@ -274,6 +311,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- Requested baselines: `{summary['requested_baselines']}`",
         f"- Executed in locked replay: `{summary['executed_in_locked_replay']}`",
+        f"- Replay proxy ready from accepted-metric audit: `{summary['replay_proxy_ready_from_metric_audit']}`",
         f"- Registered but not adapter-executed: `{summary['registered_not_adapter_executed']}`",
         f"- Blocked by missing package/dataset: `{summary['blocked_by_missing_package_or_dataset']}`",
         f"- Implementation needed: `{summary['implementation_needed']}`",
@@ -294,17 +332,18 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Requested Baselines",
             "",
-            "| Baseline | Status | Matched Replay Baselines | Route Comparisons | Candidate Wins | Row Exposure | Lanes | Missing Packages |",
-            "| --- | --- | --- | ---: | ---: | ---: | --- | --- |",
+            "| Baseline | Status | Matched Replay Baselines | Route Comparisons | Candidate Wins | Row Exposure | Lanes | Missing Packages | Next Unlock |",
+            "| --- | --- | --- | ---: | ---: | ---: | --- | --- | --- |",
         ]
     )
     for row in payload["baseline_rows"]:
         missing = ", ".join(row["missing_packages"]) if row["missing_packages"] else ""
         matched = ", ".join(row.get("matched_locked_baselines") or row.get("matched_registry_baselines") or [])
         lanes = ", ".join(row.get("lanes_executed") or [])
+        next_unlock = row.get("next_unlock") or ""
         lines.append(
             f"| {row['label']} | `{row['status']}` | `{matched}` | `{row['baseline_comparison_count']}` | "
-            f"`{row['candidate_win_count']}` | `{row['estimated_rows_replayed']}` | `{lanes}` | `{missing}` |"
+            f"`{row['candidate_win_count']}` | `{row['estimated_rows_replayed']}` | `{lanes}` | `{missing}` | {next_unlock} |"
         )
     lines.extend(
         [
@@ -312,8 +351,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "## Interpretation",
             "",
             "- Executed locked replay coverage now includes classical forecast baselines, ETS/Holt-Winters, ARIMA, scalar/standard Kalman plus EKF/UKF/particle filters, Gaussian process, random forest, XGBoost, LightGBM, and min-cost-flow routing.",
+            "- Kuramoto order-parameter and phase-bound stress are now represented as accepted-metric replay proxies through the Kuramoto accepted metric audit; this improves reviewer language without claiming physical field validation.",
             "- MPC, Dijkstra, and A* are registered in the geometry registry but are not executed by this locked replay adapter yet.",
-            "- LSTM/TCN/small-transformer forecasts, DC power-flow/OPF, IEEE 39/118/300 bus cases, and explicit Kuramoto order/coupling/phase-bound metrics still need adapters or accepted benchmark files.",
+            "- LSTM/TCN/small-transformer forecasts, DC power-flow/OPF, IEEE 39/118/300 bus cases, and critical-coupling metrics still need adapters, accepted topology files, or buyer/agency-approved benchmark data.",
             "- This strengthens the technical validation story, but it still does not authorize field-validation, realized-savings, trading-profit, safety, medical, or certification claims.",
         ]
     )

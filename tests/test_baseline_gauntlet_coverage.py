@@ -21,6 +21,7 @@ def test_baseline_gauntlet_coverage_reports_current_locked_replay_truth() -> Non
     assert payload["schema"] == "baseline_gauntlet_coverage_v1"
     assert payload["summary"]["requested_baselines"] == 29
     assert payload["summary"]["executed_in_locked_replay"] >= 15
+    assert payload["summary"]["replay_proxy_ready_from_metric_audit"] >= 2
     assert payload["summary"]["locked_replay_baseline_comparisons"] >= 1900
     assert payload["summary"]["field_validation_claim_allowed"] is False
     assert payload["summary"]["real_dollar_savings_claim_allowed"] is False
@@ -51,12 +52,14 @@ def test_baseline_gauntlet_coverage_reports_current_locked_replay_truth() -> Non
         "ieee_39_bus",
         "ieee_118_bus",
         "ieee_300_bus",
-        "kuramoto_order_parameter",
-        "kuramoto_critical_coupling",
-        "kuramoto_phase_bound_stress",
     ]:
         assert rows[baseline_id]["status"] == "IMPLEMENTATION_NEEDED"
 
+    assert rows["kuramoto_order_parameter"]["status"] == "REPLAY_PROXY_READY_FROM_ACCEPTED_METRIC_AUDIT"
+    assert rows["kuramoto_phase_bound_stress"]["status"] == "REPLAY_PROXY_READY_FROM_ACCEPTED_METRIC_AUDIT"
+    assert rows["kuramoto_critical_coupling"]["status"] == "EXTERNAL_TOPOLOGY_REQUIRED"
+
     rendered = doc_path.read_text(encoding="utf-8")
     assert "MPC, Dijkstra, and A* are registered" in rendered
+    assert "accepted-metric replay proxies" in rendered
     assert "does not authorize field-validation" in rendered
