@@ -415,11 +415,15 @@ server {
         proxy_set_header   X-Forwarded-Proto $scheme;
     }
 
+    # Public proof access is curated. Do not expose /opt/lumencore/out as a
+    # browsable directory; reviewers should enter through proof_to_pilot.html
+    # and hash-verified /data/*.json feeds.
+    location = /proof/ {
+        return 302 /proof_to_pilot.html;
+    }
+
     location /proof/ {
-        alias /opt/lumencore/out/;
-        autoindex on;
-        autoindex_exact_size off;
-        autoindex_localtime on;
+        return 404;
     }
 
     location /evidence/ {

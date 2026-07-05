@@ -1,19 +1,19 @@
 # Live Domain Deployment Feed
 
-Generated UTC: `2026-07-03T08:07:04.919151+00:00`
+Generated UTC: `2026-07-05T06:38:28.643310+00:00`
 Live base: `https://lumen-core.ai`
 
 ## Current Answer
 
-The local proof stack is ready for reviewer packaging, but the live domain still needs hosted hash verification before we should point reviewers to it.
+The live domain is serving matching hashes for every required reviewer proof feed. This is public deployment verification, not field validation.
 
 ## Deployment State
 
-- Required local feeds ready: `13/13`
-- Required hosted feeds reachable: `12/13`
-- Required hosted hash matches: `11/13`
-- Live-domain reviewer-ready: `false`
-- Domain deployment state: `LOCAL_READY_DOMAIN_NOT_VERIFIED_OR_STALE`
+- Required local feeds ready: `14/14`
+- Required hosted feeds reachable: `14/14`
+- Required hosted hash matches: `14/14`
+- Live-domain reviewer-ready: `true`
+- Domain deployment state: `LIVE_DOMAIN_HASH_VERIFIED`
 
 ## Current Champion Snapshot
 
@@ -37,33 +37,40 @@ The local proof stack is ready for reviewer packaging, but the live domain still
 | `geometry_champion_of_champions` | `true` | `true` | `true` | https://lumen-core.ai/data/geometry_champion_of_champions.json |
 | `field_money_truth_sweep` | `true` | `true` | `true` | https://lumen-core.ai/data/field_money_truth_sweep.json |
 | `live_proof_value_meter` | `true` | `true` | `true` | https://lumen-core.ai/data/live_proof_value_meter.json |
-| `field_validated_dollar_claim_ladder` | `true` | `true` | `false` | - |
+| `field_validated_dollar_claim_ladder` | `true` | `true` | `true` | https://lumen-core.ai/data/field_validated_dollar_claim_ladder.json |
 | `dollar_claim_gate` | `true` | `true` | `true` | https://lumen-core.ai/data/dollar_claim_gate.json |
 | `field_validation_control_room` | `true` | `true` | `true` | https://lumen-core.ai/data/field_validation_control_room.json |
 | `field_validation_outreach_board` | `true` | `true` | `true` | https://lumen-core.ai/data/field_validation_outreach_board.json |
 | `proof_to_pilot_control_room` | `true` | `true` | `true` | https://lumen-core.ai/data/proof_to_pilot_control_room.json |
 | `champion_sample_expansion_and_economic_bridge` | `true` | `true` | `true` | https://lumen-core.ai/data/champion_sample_expansion_and_economic_bridge.json |
-| `champion_source_ablation` | `true` | `true` | `false` | - |
+| `champion_source_ablation` | `true` | `true` | `true` | https://lumen-core.ai/data/champion_source_ablation.json |
+| `grant_readiness_status` | `true` | `true` | `true` | https://lumen-core.ai/data/grant_readiness_status.json |
+| `top5_live_proof_submission_board` | `false` | `true` | `true` | https://lumen-core.ai/data/top5_live_proof_submission_board.json |
+| `deadline_evidence_bridge` | `false` | `true` | `true` | https://lumen-core.ai/data/deadline_evidence_bridge.json |
+| `baseline_gauntlet_coverage` | `false` | `true` | `true` | https://lumen-core.ai/data/baseline_gauntlet_coverage.json |
+| `kuramoto_accepted_metric_audit` | `false` | `true` | `true` | https://lumen-core.ai/data/kuramoto_accepted_metric_audit.json |
+| `valuation_proposal_target_packet` | `false` | `true` | `true` | https://lumen-core.ai/data/valuation_proposal_target_packet.json |
+| `outreach_and_application_send_queue` | `false` | `true` | `true` | https://lumen-core.ai/data/outreach_and_application_send_queue.json |
 | `geometry_asset_wiring_board` | `false` | `true` | `true` | https://lumen-core.ai/data/geometry_asset_wiring_board.json |
 | `luma_context_dashboard_parity_audit` | `false` | `true` | `true` | https://lumen-core.ai/data/luma_context_dashboard_parity_audit.json |
-| `champion_stress_test_matrix` | `false` | `true` | `false` | - |
-| `champion_metric_battery` | `false` | `true` | `false` | - |
-| `champion_expanded_metric_rollup` | `false` | `true` | `false` | - |
+| `champion_stress_test_matrix` | `false` | `true` | `true` | https://lumen-core.ai/data/champion_stress_test_matrix.json |
+| `champion_metric_battery` | `false` | `true` | `true` | https://lumen-core.ai/data/champion_metric_battery.json |
+| `champion_expanded_metric_rollup` | `false` | `true` | `true` | https://lumen-core.ai/data/champion_expanded_metric_rollup.json |
 | `proof_to_revenue_engine` | `false` | `true` | `true` | https://lumen-core.ai/data/proof_to_revenue_engine.json |
 | `first_buyer_target_board` | `false` | `true` | `true` | https://lumen-core.ai/data/first_buyer_target_board.json |
-| `live_domain_consolidation_audit` | `false` | `true` | `false` | - |
-| `luma_operator_context` | `false` | `true` | `false` | - |
+| `live_domain_consolidation_audit` | `false` | `true` | `true` | https://lumen-core.ai/data/live_domain_consolidation_audit.json |
+| `luma_operator_context` | `false` | `true` | `true` | https://lumen-core.ai/data/luma_operator_context.json |
 | `champion_phase_proxy_diagnostics` | `false` | `true` | `true` | https://lumen-core.ai/data/champion_phase_proxy_diagnostics.json |
 | `safe_key_provider_ping` | `false` | `true` | `true` | https://lumen-core.ai/data/safe_key_provider_ping.json |
-| `live_source_measurement_maximizer` | `false` | `true` | `false` | - |
+| `live_source_measurement_maximizer` | `false` | `true` | `true` | https://lumen-core.ai/data/live_source_measurement_maximizer.json |
 | `geometry_live_wiring_matrix` | `false` | `true` | `true` | https://lumen-core.ai/data/geometry_live_wiring_matrix.json |
 | `geometry_live_breadth_proof_queue` | `false` | `true` | `true` | https://lumen-core.ai/data/geometry_live_breadth_proof_queue.json |
 | `branching_live_breadth_replay` | `false` | `true` | `true` | https://lumen-core.ai/data/branching_live_breadth_replay.json |
 | `rolling_champion_gate` | `false` | `true` | `true` | https://lumen-core.ai/data/rolling_champion_gate.json |
 | `top_geometry_live_replay_results` | `false` | `true` | `true` | https://lumen-core.ai/data/top_geometry_live_replay_results.json |
-| `real_noise_evidence_boundary_breaker` | `false` | `true` | `false` | - |
-| `real_noise_promotion_sweep` | `false` | `true` | `false` | - |
-| `geometry_execution_context_audit` | `false` | `true` | `false` | - |
+| `real_noise_evidence_boundary_breaker` | `false` | `true` | `true` | https://lumen-core.ai/data/real_noise_evidence_boundary_breaker.json |
+| `real_noise_promotion_sweep` | `false` | `true` | `true` | https://lumen-core.ai/data/real_noise_promotion_sweep.json |
+| `geometry_execution_context_audit` | `false` | `true` | `true` | https://lumen-core.ai/data/geometry_execution_context_audit.json |
 
 ## Reviewer URLs
 
@@ -71,6 +78,8 @@ The local proof stack is ready for reviewer packaging, but the live domain still
 - `grants_console`: https://lumen-core.ai/grants.html?grant_id=nsf_sbir_phase_i
 - `quant_lab`: https://lumen-core.ai/quant_lab.html
 - `proof_to_pilot`: https://lumen-core.ai/proof_to_pilot.html
+- `grant_readiness_status`: https://lumen-core.ai/data/grant_readiness_status.json
+- `top5_live_proof_submission_board`: https://lumen-core.ai/data/top5_live_proof_submission_board.json
 - `champion_feed_primary`: https://lumen-core.ai/data/champion_metric_gauntlet.json
 - `champion_feed_fallback`: https://lumen-core.ai/dashboard/data/champion_metric_gauntlet.json
 - `locked_source_baseline_replay_sweep`: https://lumen-core.ai/data/locked_source_baseline_replay_sweep.json
@@ -106,4 +115,4 @@ The local proof stack is ready for reviewer packaging, but the live domain still
 
 Live-domain deployment feed only. Matching hosted hashes prove that the public domain is serving the same local proof feeds. They do not prove field validation, realized savings, grant award certainty, fixed frozen delta pricing, medical efficacy, or live trading performance.
 
-Deployment feed SHA-256: `619f5cf1970e206380a39dbdee100931e3cdb20b944bd94cd90a10a6452817b5`
+Deployment feed SHA-256: `656afac978c91b4f5079f0c7e5fe1d7ac2b72cc20440ab046d4df9b7ec693f0e`

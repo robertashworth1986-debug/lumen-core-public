@@ -196,3 +196,47 @@ permission.
 - Do not infer legal deadlines from draft files or payment receipts.
 - Browser-assisted submission requires an authenticated user session and final
   human review before any irreversible submission.
+
+## 2026-07-05 Public Domain Reset
+
+Use this as the current public-surface baseline before sending reviewers,
+buyers, investors, or grant contacts to `lumen-core.ai`.
+
+- The live domain reviewer proof feeds were rebuilt and deployed from
+  `.deploy_stage/live_domain_proof_feeds_20260705T060243Z`.
+- `dashboard/data/live_domain_deployment_feed.json` now reports
+  `LIVE_DOMAIN_HASH_VERIFIED`, with 14 of 14 required reviewer proof feeds
+  matching on the live domain and 0 required stale/missing feeds.
+- `https://lumen-core.ai/proof_to_pilot.html` is live and should be the
+  validation/buyer-replay destination.
+- Public `/proof/` directory browsing was disabled on the VPS nginx config.
+  `/proof/` now redirects to `/proof_to_pilot.html`; direct `/proof/*` output
+  browsing returns 404. The deployment template in `deploy/VPS_DEPLOY.sh` was
+  patched so a future broad deploy does not re-enable autoindex.
+- The VPS root disk was recovered from 100% usage to about 70% usage by clearing
+  rebuildable caches and rotating/compressing the oversized paper ticker ledger:
+  `/opt/lumencore/out/execution/multi_exchange_paper_ticker_ledger_20260705T062152Z.jsonl.gz`.
+- The active paper ticker ledger was recreated empty at
+  `/opt/lumencore/out/execution/multi_exchange_paper_ticker_ledger.jsonl`.
+
+Current public pages that passed smoke check:
+
+- `https://lumen-core.ai/`
+- `https://lumen-core.ai/operator_home.html`
+- `https://lumen-core.ai/mission_control.html`
+- `https://lumen-core.ai/quant_lab.html`
+- `https://lumen-core.ai/grants.html`
+- `https://lumen-core.ai/proof_to_pilot.html`
+
+Current public claim posture:
+
+- Allowed: internal replay evidence, locked baseline replay counts, source
+  breadth, accepted-metric proxy diagnostics, and paid pilot scoping language.
+- Allowed: bounded estimated value opportunity under stated assumptions.
+- Not allowed: field-validated savings, guaranteed ROI, live trading profit,
+  fixed dollar price per frozen delta, medical/safety claims, or universal
+  geometric superiority.
+- Strongest current public wording:
+  "LumenCore is ready for buyer-authorized historical replay: held-out data,
+  incumbent baseline, pre-registered metric, and economic conversion only if
+  the replay passes."

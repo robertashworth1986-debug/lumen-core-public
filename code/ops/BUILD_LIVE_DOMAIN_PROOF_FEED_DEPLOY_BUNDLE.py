@@ -46,9 +46,16 @@ REQUIRED_FEEDS = [
     "proof_to_pilot_control_room",
     "champion_sample_expansion_and_economic_bridge",
     "champion_source_ablation",
+    "grant_readiness_status",
 ]
 
 OPTIONAL_FEEDS = [
+    "top5_live_proof_submission_board",
+    "deadline_evidence_bridge",
+    "baseline_gauntlet_coverage",
+    "kuramoto_accepted_metric_audit",
+    "valuation_proposal_target_packet",
+    "outreach_and_application_send_queue",
     "geometry_asset_wiring_board",
     "luma_context_dashboard_parity_audit",
     "live_domain_deployment_feed",
