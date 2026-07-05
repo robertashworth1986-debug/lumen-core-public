@@ -97,6 +97,23 @@ Likely no:
 - Small Business Fund, unless the application specifically supports technology platforms
 - CPG Non-Dilutive
 
+## Current Browser Form State / Last-Mile Choices
+
+The application has branched into extra partner-specific questions because `Marketing Edge Accelerator`, `LvlUp Labs`, non-dilutive funds, and `Power of the Pitch Week` were selected. Use the following choices unless Robert has newer legal or operating facts:
+
+- `Power of the Pitch Week`: choose `Yes`.
+- Any virtual pitch-week / investor-readiness / exposure option: choose `Yes`.
+- Any NYC / in-person travel / consumer product / ecommerce-only option: choose `No` unless Robert explicitly wants that path.
+- `Is your business incorporated in the United States, Canada, United Kingdom, Australia, Ireland, Spain, The Netherlands, Belgium, Denmark, Germany, or Sweden?`: choose `No` if LumenCore is still a sole proprietorship / not legally incorporated. Choose `Yes` only if a formal legal entity exists.
+- `Do you have 6 or more months in business?`: choose `Yes` based on the 2025 founding/work history.
+- `What platform(s) are you currently using for email/SMS/push automations?`: choose `Other`.
+- Mailing-list contacts: enter `0` unless there is a real maintained mailing list count.
+- Newsletters / campaigns per month: enter `0` unless there is a real formal campaign count.
+- Upload deck/business plan if prompted: `C:\Users\Novac\iCloudDrive\Business plan\LumenCore_Business_Plan_Investor_Ready_UPDATED_2026-07-03.pdf`.
+- Public proof link: `https://lumen-core.ai/mission_control.html`.
+
+Do not click the final submit button until Robert has reviewed the rendered application screen.
+
 ## Fields Robert Must Confirm Before Submit
 
 - Legal company/entity name.

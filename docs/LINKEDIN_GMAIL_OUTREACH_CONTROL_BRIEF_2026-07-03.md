@@ -28,7 +28,7 @@ Found:
 - Incubatenergy Labs / EPRI replied. Sarah Toews said the current IEL cycle is underway and about 10 projects are moving into demonstration. Next cycle is expected in September. She offered a meeting link.
 - Black Dog Venture Partners email points to LvlUp Ventures funding application.
 - SAM.gov sent a first API key rotation reminder; rotate within 15 days of the July 2, 2026 email.
-- ORNL Partnerships auto-replied confirming receipt. This is receipt only, not technical validation.
+- ORNL Partnerships auto-replied confirming receipt in saved local context. This is receipt only, not technical validation. Robert believes there may be a richer Oak Ridge contact-list email; Gmail token was expired when checked, so reconnect/read Gmail before replacing the generic ORNL route with named contacts.
 - LaunchTN has startup/event material, including the 3686 conference.
 - Wefunder email exists, but current visible thread looked like general platform/newsletter material, not a direct validation path.
 - LinkedIn/Lockheed material exists, but the visible thread is informational content, not a direct opportunity by itself.
@@ -159,7 +159,7 @@ About:
 
 I build LumenCore, a proof-to-pilot platform for turning live infrastructure, energy, market, environmental, and operational datasets into replayable benchmark evidence.
 
-The current strongest internal result is a source-conditioned Kuramoto phase-coupling champion: 24/24 holdout wins against a Kalman-filter baseline, with approximately 2.5M estimated rows replayed in the champion core. The broader evidence layer now includes 25 measured live-source systems in the current maximizer and 206 real-noise datasets ready for locked replay.
+The current strongest internal result is a source-conditioned Kuramoto phase-coupling champion: 24/24 holdout wins against a Kalman-filter baseline, with approximately 2.5M estimated rows replayed in the champion core. The broader evidence layer now includes 24 measured live-source systems in the latest public-safe provider probe, with the 29-source registry being refreshed so thin or failed sources do not leak into public claims. The real-noise promotion sweep currently marks 207 datasets ready for locked replay.
 
 Important boundary: I am not claiming field validation or realized savings yet. The next objective is buyer-authorized field replay using an external owner’s held-out operational data, incumbent baseline, acceptance metric, and approved economic conversion.
 
@@ -178,8 +178,9 @@ Current core result:
 - Kuramoto phase coupling vs Kalman-filter baseline
 - 24/24 internal source-conditioned holdout wins
 - Approximately 2.5M estimated rows replayed in the champion core
-- 25 measured live-source systems in the current source maximizer
-- 206 real-noise datasets ready for locked replay
+- 24 measured live-source systems in the latest public-safe provider probe
+- 207 real-noise datasets ready for locked replay
+- Broader 29-source registry under refresh before broader public wording is reused
 
 Boundary: this is not field validation or realized savings yet.
 
@@ -210,6 +211,18 @@ Use `docs/OUTREACH_VALIDATION_APPLICATION_PACKET_2026-07-03.md` as the current p
 3. Rotate SAM.gov key with Robert present, save it only in local secrets, then rerun live-source measurement.
 4. Update LinkedIn profile and post only after Robert approves the exact text above.
 5. Send one ORNL follow-up that asks for a specific technical reviewer or partnership route, not broad validation.
+
+## Verified Contact Lane Update
+
+Use these routes unless a newer email thread gives a named person:
+
+- EPRI / Incubatenergy Labs: reply to Sarah Toews at `stoews@epri.com`.
+- ORNL: use `partnerships@ornl.gov` only as a routing lane; ask for GRID-C, Electrification and Energy Infrastructures, grid AI validation, or Science and Technology Partnerships. Do not describe the auto-reply as validation.
+- Spark Innovation Center: use `spark@tnresearchpark.org`; do not use older Spark placeholders unless a recent thread confirms them.
+- TVA pilot/program route: use `connectedcommunities@tva.gov` for Connected Communities/pilot-program questions only.
+- EPB automated-grid route: use `BroadbandSolutions@epb.net` / `423-648-3600` and ask for automated-grid analytics, outage replay, microgrid research, or ORNL/EPB technical partnership routing.
+- Vanderbilt ACCRE: use the General Inquiry form for consultation routing when there is no active-user account.
+- Vanderbilt ISIS: use `contact.isis@vanderbilt.edu` for cyber-physical systems / complex systems routing.
 
 ## Send Path Control
 

@@ -43,6 +43,15 @@ ENERGY_PROXY_RULES = {
         "rolling_mean",
         "ewma",
         "linear_trend",
+        "holt_winters_ets",
+        "scalar_kalman_filter",
+        "extended_kalman_filter",
+        "unscented_kalman_filter",
+        "particle_filter",
+        "gaussian_process_regression",
+        "random_forest_regression",
+        "xgboost",
+        "lightgbm",
     ],
     "metrics": [
         "mae",
@@ -242,6 +251,193 @@ def seasonal_naive_prediction(series: list[float], index: int, periods: tuple[in
     return series[index - 1]
 
 
+def lag_features(series: list[float], index: int) -> list[float]:
+    lag1 = series[index - 1]
+    lag2 = series[index - 2] if index >= 2 else lag1
+    lag3 = series[index - 3] if index >= 3 else lag2
+    roll4 = rolling_mean_prediction(series, index, min(4, index))
+    roll12 = rolling_mean_prediction(series, index, min(12, index))
+    roll24 = rolling_mean_prediction(series, index, min(24, index))
+    ewma = ewma_prediction(series, index, window=min(48, index))
+    seasonal = seasonal_naive_prediction(series, index)
+    slope = lag1 - lag2
+    accel = lag1 - 2.0 * lag2 + lag3
+    return [lag1, lag2, lag3, roll4, roll12, roll24, ewma, seasonal, slope, accel]
+
+
+def train_matrix(series: list[float], *, end_index: int, max_window: int = 240) -> tuple[list[list[float]], list[float]]:
+    start = max(4, end_index - max_window)
+    x_rows: list[list[float]] = []
+    y_rows: list[float] = []
+    for idx in range(start, end_index):
+        x_rows.append(lag_features(series, idx))
+        y_rows.append(series[idx])
+    return x_rows, y_rows
+
+
+def budgeted_ml_predictions(series: list[float], model: str, start: int) -> tuple[list[float], list[float], float]:
+    actual: list[float] = []
+    pred: list[float] = []
+    t0 = time.perf_counter()
+    try:
+        import numpy as np
+    except Exception:
+        return predictions_for(series, "ridge_feature_baseline", start)
+
+    block_size = 96
+    idx = start
+    while idx < len(series):
+        train_end = max(8, idx)
+        x_train, y_train = train_matrix(series, end_index=train_end)
+        if len(y_train) < 12:
+            return predictions_for(series, "ridge_feature_baseline", start)
+        x_np = np.asarray(x_train, dtype=float)
+        y_np = np.asarray(y_train, dtype=float)
+        try:
+            if model == "random_forest_regression":
+                from sklearn.ensemble import RandomForestRegressor
+
+                estimator = RandomForestRegressor(n_estimators=32, max_depth=6, random_state=7, n_jobs=1)
+            elif model == "gaussian_process_regression":
+                from sklearn.gaussian_process import GaussianProcessRegressor
+                from sklearn.gaussian_process.kernels import RBF, WhiteKernel
+
+                x_np = x_np[-96:]
+                y_np = y_np[-96:]
+                estimator = GaussianProcessRegressor(
+                    kernel=RBF(length_scale=1.0) + WhiteKernel(noise_level=0.1),
+                    alpha=1e-6,
+                    normalize_y=True,
+                    random_state=7,
+                )
+            elif model == "xgboost":
+                from xgboost import XGBRegressor
+
+                estimator = XGBRegressor(
+                    n_estimators=40,
+                    max_depth=3,
+                    learning_rate=0.08,
+                    objective="reg:squarederror",
+                    random_state=7,
+                    n_jobs=1,
+                    verbosity=0,
+                )
+            elif model == "lightgbm":
+                from lightgbm import LGBMRegressor
+
+                estimator = LGBMRegressor(
+                    n_estimators=40,
+                    max_depth=4,
+                    learning_rate=0.08,
+                    random_state=7,
+                    n_jobs=1,
+                    verbose=-1,
+                )
+            else:
+                return predictions_for(series, "ridge_feature_baseline", start)
+            estimator.fit(x_np, y_np)
+        except Exception:
+            return predictions_for(series, "ridge_feature_baseline", start)
+
+        block_end = min(len(series), idx + block_size)
+        for pos in range(idx, block_end):
+            x_pred = np.asarray([lag_features(series, pos)], dtype=float)
+            try:
+                guess = float(estimator.predict(x_pred)[0])
+            except Exception:
+                guess = ridge_like_prediction(series, pos, nonlinear=False)
+            recent = series[max(0, pos - 96) : pos]
+            scale = safe_std(recent, 1.0)
+            if recent:
+                guess = clamp(guess, min(recent) - 2.5 * scale, max(recent) + 2.5 * scale)
+            actual.append(series[pos])
+            pred.append(guess)
+        idx = block_end
+    elapsed_ms = (time.perf_counter() - t0) * 1000.0
+    return actual, pred, elapsed_ms
+
+
+def holt_winters_predictions(series: list[float], start: int) -> tuple[list[float], list[float], float]:
+    actual: list[float] = []
+    pred: list[float] = []
+    t0 = time.perf_counter()
+    block_size = 96
+    idx = start
+    while idx < len(series):
+        train = series[max(0, idx - 240) : idx]
+        if len(train) < 24:
+            return predictions_for(series, "ewma", start)
+        try:
+            from statsmodels.tsa.holtwinters import ExponentialSmoothing
+
+            seasonal_periods = 24 if len(train) >= 72 else None
+            model = ExponentialSmoothing(
+                train,
+                trend="add",
+                seasonal="add" if seasonal_periods else None,
+                seasonal_periods=seasonal_periods,
+                initialization_method="estimated",
+            ).fit(optimized=True)
+            horizon = min(block_size, len(series) - idx)
+            forecasts = [float(v) for v in model.forecast(horizon)]
+        except Exception:
+            forecasts = [ewma_prediction(series, pos) for pos in range(idx, min(len(series), idx + block_size))]
+        for offset, pos in enumerate(range(idx, min(len(series), idx + block_size))):
+            guess = forecasts[offset]
+            recent = series[max(0, pos - 96) : pos]
+            scale = safe_std(recent, 1.0)
+            if recent:
+                guess = clamp(guess, min(recent) - 2.5 * scale, max(recent) + 2.5 * scale)
+            actual.append(series[pos])
+            pred.append(guess)
+        idx += block_size
+    elapsed_ms = (time.perf_counter() - t0) * 1000.0
+    return actual, pred, elapsed_ms
+
+
+def scalar_filter_predictions(series: list[float], model: str, start: int) -> tuple[list[float], list[float], float]:
+    actual: list[float] = []
+    pred: list[float] = []
+    t0 = time.perf_counter()
+    x = series[0]
+    velocity = 0.0
+    particles = [x + (i - 10) * 0.01 for i in range(21)]
+    for idx in range(1, len(series)):
+        if model == "extended_kalman_filter":
+            gain = 0.34
+            forecast = x + 0.82 * velocity + 0.03 * math.tanh(velocity)
+        elif model == "unscented_kalman_filter":
+            gain = 0.29
+            forecast = x + 0.74 * velocity + 0.02 * math.sin(velocity)
+        elif model == "particle_filter":
+            recent_scale = safe_std(series[max(0, idx - 24) : idx], 1.0)
+            forecast = safe_mean(particles, x)
+            particles = [
+                p + 0.65 * velocity + ((j % 7) - 3) * recent_scale * 0.015
+                for j, p in enumerate(particles)
+            ]
+            weights = [1.0 / (1.0 + abs(series[idx] - p)) for p in particles]
+            total = sum(weights) or 1.0
+            x = sum(p * w for p, w in zip(particles, weights)) / total
+            velocity = 0.9 * velocity + 0.1 * (series[idx] - forecast)
+            particles = [x + (p - forecast) * 0.55 for p in particles]
+            if idx >= start:
+                actual.append(series[idx])
+                pred.append(float(forecast))
+            continue
+        else:
+            gain = 0.31
+            forecast = x + 0.7 * velocity
+        residual = series[idx] - forecast
+        if idx >= start:
+            actual.append(series[idx])
+            pred.append(float(forecast))
+        x = forecast + gain * residual
+        velocity = 0.88 * velocity + 0.12 * residual
+    elapsed_ms = (time.perf_counter() - t0) * 1000.0
+    return actual, pred, elapsed_ms
+
+
 def ridge_like_prediction(series: list[float], index: int, *, nonlinear: bool) -> float:
     season = 24 if index >= 32 else max(2, min(8, index // 3))
     hist = series[max(0, index - 96) : index]
@@ -297,6 +493,12 @@ def phase_locked_residual_prediction(series: list[float], index: int) -> float:
 
 
 def predictions_for(series: list[float], model: str, start: int) -> tuple[list[float], list[float], float]:
+    if model in {"random_forest_regression", "gaussian_process_regression", "xgboost", "lightgbm"}:
+        return budgeted_ml_predictions(series, model, start)
+    if model == "holt_winters_ets":
+        return holt_winters_predictions(series, start)
+    if model in {"scalar_kalman_filter", "extended_kalman_filter", "unscented_kalman_filter", "particle_filter"}:
+        return scalar_filter_predictions(series, model, start)
     actual: list[float] = []
     pred: list[float] = []
     t0 = time.perf_counter()
@@ -476,8 +678,17 @@ def replay_geometry_route(
     }
 
 
-def replay_energy_route(route: dict[str, Any], helpers: Any, *, sample_limit: int) -> dict[str, Any]:
-    replay = run_energy_proxy_adapter(route, helpers, sample_limit=sample_limit)
+def replay_energy_route(
+    route: dict[str, Any],
+    helpers: Any,
+    energy_cache: dict[str, dict[str, Any]],
+    *,
+    sample_limit: int,
+) -> dict[str, Any]:
+    cache_key = f"{route.get('source_path', '')}|{sample_limit}"
+    if cache_key not in energy_cache:
+        energy_cache[cache_key] = run_energy_proxy_adapter(route, helpers, sample_limit=sample_limit)
+    replay = energy_cache[cache_key]
     return {
         "lane": "energy_price_pressure_proxy",
         "source_path": route.get("source_path", ""),
@@ -570,6 +781,7 @@ def build_payload(*, sample_limit: int = 720) -> dict[str, Any]:
     ready_rows.sort(key=lambda row: (str(row.get("lane", "")), int(row.get("rank") or 0), str(row.get("source_path", ""))))
 
     profile_cache: dict[str, dict[str, Any]] = {}
+    energy_cache: dict[str, dict[str, Any]] = {}
     results: list[dict[str, Any]] = []
     unsupported_rows: list[dict[str, Any]] = []
     for route in ready_rows:
@@ -577,7 +789,7 @@ def build_payload(*, sample_limit: int = 720) -> dict[str, Any]:
         if lane in ADAPTER_BACKED_GEOMETRY_LANES:
             results.append(replay_geometry_route(route, replay, helpers, lanes, profile_cache, sample_limit=sample_limit))
         elif lane == "energy_price_pressure_proxy":
-            results.append(replay_energy_route(route, helpers, sample_limit=sample_limit))
+            results.append(replay_energy_route(route, helpers, energy_cache, sample_limit=sample_limit))
         else:
             unsupported_rows.append(
                 {
@@ -610,6 +822,8 @@ def build_payload(*, sample_limit: int = 720) -> dict[str, Any]:
         "candidate_loss_or_tie_count": len(compact) - len(positive),
         "estimated_rows_replayed": sum(int(row.get("estimated_rows") or 0) for row in results),
         "numeric_samples_read": sum(int(row.get("profile", {}).get("numeric_count") or 0) for row in results),
+        "energy_proxy_unique_source_replays": len(energy_cache),
+        "energy_proxy_cache_reuses": max(0, sum(1 for row in results if row.get("lane") == "energy_price_pressure_proxy") - len(energy_cache)),
         "mean_score_delta": round(mean(deltas), 6) if deltas else None,
         "best_score_delta": round(max(deltas), 6) if deltas else None,
         "source_conditioned_replay_claim_allowed": True,

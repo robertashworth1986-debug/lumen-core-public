@@ -13,7 +13,7 @@ Founder-operator of the LumaTrader and LumenCore platform ecosystem with end-to-
 
 ## INSTITUTIONAL IMPACT SNAPSHOT
 
-- Dataset benchmark breadth: 1212 datasets with reproducible artifacts and hash-linked evidence.
+- Dataset benchmark breadth: 2312 datasets with reproducible artifacts and hash-linked evidence.
 - Annual modeled value signal: $52,331,333,340.00 ($52.33B).
 - Top sector and hourly signal: Financial Market Infra at $3,647,280.00 per hour.
 - Router edge and harmonic consistency: 49.48% edge, 24.51% harmonic win rate.
@@ -37,7 +37,7 @@ Founder-operator of the LumaTrader and LumenCore platform ecosystem with end-to-
 
 ## TECHNOLOGY STACK AND PROVEN PACKAGES
 
-pandas, numpy, requests, scikit-learn, FastAPI, matplotlib, joblib, ccxt, pptx, yfinance, orjson, pydantic, symbol_registry_auto, PyYAML, pillow, polars, duckdb, fpdf, win32com, lightgbm
+pandas, numpy, requests, scikit-learn, FastAPI, matplotlib, joblib, reportlab, ccxt, pptx, yfinance, orjson, pydantic, symbol_registry_auto, PyYAML, lightgbm, pillow, polars, duckdb, fpdf
 
 ## PROFESSIONAL EXPERIENCE
 
@@ -52,7 +52,7 @@ pandas, numpy, requests, scikit-learn, FastAPI, matplotlib, joblib, ccxt, pptx, 
 
 ## GOVERNMENT AND INSTITUTIONAL POSITIONING
 
-- UEI: SQY2XW71ZM51 | CAGE: 14TM8 | SAM status: active.
+- UEI: SQY2XW71ZM51 | CAGE: 14TM8 | SAM status: verification_required.
 - Track record generating federal-style submissions and preflight-ready package artifacts.
 - Operates with evidence-first discipline: every major claim maps to machine-readable outputs.
 

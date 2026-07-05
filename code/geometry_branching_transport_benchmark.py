@@ -227,6 +227,45 @@ def dijkstra_path(
     return path
 
 
+def a_star_path(
+    scenario: Scenario,
+    start: Node,
+    goal: Node,
+    *,
+    risk_weight: float = 0.0,
+    demand_pull: float = 0.0,
+) -> list[Node]:
+    def heuristic(node: Node) -> float:
+        return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
+
+    queue: list[tuple[float, float, Node]] = [(heuristic(start), 0.0, start)]
+    dist: dict[Node, float] = {start: 0.0}
+    parent: dict[Node, Node] = {}
+    while queue:
+        _, cost, node = heapq.heappop(queue)
+        if node == goal:
+            break
+        if cost > dist.get(node, float("inf")):
+            continue
+        for nxt in neighbors(node, scenario.condition.width, scenario.condition.height):
+            edge = canon_edge(node, nxt)
+            weight = edge_cost(scenario, edge, risk_weight=risk_weight, demand_pull=demand_pull, sink=goal)
+            if weight == float("inf"):
+                continue
+            alt = cost + weight
+            if alt < dist.get(nxt, float("inf")):
+                dist[nxt] = alt
+                parent[nxt] = node
+                heapq.heappush(queue, (alt + heuristic(nxt), alt, nxt))
+    if goal not in dist:
+        return []
+    path = [goal]
+    while path[-1] != start:
+        path.append(parent[path[-1]])
+    path.reverse()
+    return path
+
+
 def multi_source_dijkstra_path(
     scenario: Scenario,
     starts: set[Node],
@@ -348,6 +387,17 @@ def strategy_min_cost_flow(scenario: Scenario) -> set[Edge]:
     return connect_from_source(scenario, risk_weight=0.20, demand_pull=0.10)
 
 
+def strategy_dijkstra(scenario: Scenario) -> set[Edge]:
+    return connect_from_source(scenario, risk_weight=0.0, demand_pull=0.0)
+
+
+def strategy_a_star(scenario: Scenario) -> set[Edge]:
+    edges: set[Edge] = set()
+    for sink in terminal_order(scenario):
+        add_path_edges(edges, a_star_path(scenario, scenario.source, sink, risk_weight=0.0, demand_pull=0.0))
+    return edges
+
+
 def strategy_crack_propagation_paths(scenario: Scenario) -> set[Edge]:
     base = connect_greedy_tree(scenario, risk_weight=3.8, demand_pull=0.06)
     return add_redundancy(scenario, base, count=max(1, len(scenario.sinks) // 4), risk_weight=5.0)
@@ -395,6 +445,8 @@ def strategy_kidney_nephron_filtration(scenario: Scenario) -> set[Edge]:
 STRATEGIES: tuple[StrategySpec, ...] = (
     StrategySpec("minimum_spanning_tree", "baseline", "minimum_spanning_tree", "Greedy metric-closure tree baseline.", strategy_minimum_spanning_tree),
     StrategySpec("steiner_approximation", "baseline", "steiner_approximation", "Risk-light greedy Steiner-style baseline.", strategy_steiner_approximation),
+    StrategySpec("dijkstra", "baseline", "dijkstra", "Independent shortest-path routing baseline.", strategy_dijkstra),
+    StrategySpec("a_star", "baseline", "a_star", "A* shortest-path routing baseline with Manhattan heuristic.", strategy_a_star),
     StrategySpec("min_cost_flow", "baseline", "min_cost_flow", "Independent low-cost source-to-sink flow baseline.", strategy_min_cost_flow),
     StrategySpec("crack_propagation_paths", "geometry_family", "crack_propagation_paths", "Routes around predicted crack-risk fronts.", strategy_crack_propagation_paths),
     StrategySpec("leaf_veins", "geometry_family", "leaf_veins", "Reticulate venation with redundant loops.", strategy_leaf_veins),

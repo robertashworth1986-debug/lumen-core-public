@@ -67,6 +67,8 @@
       "baselines": [
         "minimum_spanning_tree",
         "steiner_approximation",
+        "dijkstra",
+        "a_star",
         "min_cost_flow"
       ],
       "metrics": [

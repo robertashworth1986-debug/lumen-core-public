@@ -33,21 +33,21 @@ Plain English: this is enough to say LumenCore has a strong internal replay cham
 The latest live-source maximizer shows:
 
 - Enabled providers: `29`
-- Measured providers: `25`
-- Failed or thin providers: `4`
-- Latest bounded measured rows: `1,326`
+- Measured providers: `24`
+- Failed or thin providers: `5`
+- Latest public-safe provider snapshot rows: `544`
 - Coverage: `86.21%`
-- Bounded estimated annual opportunity surface: `$20,071,845,553.20`
+- Bounded estimated annual opportunity surface: treat as under-refresh until the failed/thin adapters are rerun and the dollar ladder is regenerated
 
 Measured providers:
 
-`AIRNOW`, `ALPACA`, `ALPHAVANTAGE`, `BEA`, `BLS`, `CENSUS`, `COINBASE_PUBLIC`, `COINGECKO_PUBLIC`, `EIA`, `FINNHUB`, `FRED`, `GRANTS_GOV`, `KRAKEN`, `KRAKEN_PUBLIC`, `MASSIVE`, `NASA`, `NOAA_NCEI`, `NWS_PUBLIC`, `OPEN_METEO_PUBLIC`, `SEC_PUBLIC`, `TREASURY_FISCAL_PUBLIC`, `TWELVE_DATA`, `USGS_WATER`, `WEBHOOK`, `WORLD_BANK_PUBLIC`.
+`ALPACA`, `ALPHAVANTAGE`, `BEA`, `BLS`, `CENSUS`, `COINBASE_PUBLIC`, `COINGECKO_PUBLIC`, `EIA`, `FINNHUB`, `FRED`, `GRANTS_GOV`, `KRAKEN`, `KRAKEN_PUBLIC`, `MASSIVE`, `NASA`, `NOAA_NCEI`, `NWS_PUBLIC`, `OPEN_METEO_PUBLIC`, `SEC_PUBLIC`, `TREASURY_FISCAL_PUBLIC`, `TWELVE_DATA`, `USGS_WATER`, `WEBHOOK`, `WORLD_BANK_PUBLIC`.
 
 Failed or thin providers:
 
-`BINANCE_PUBLIC`, `EPA_AQS`, `NREL`, `THE_ODDS_API`.
+`AIRNOW`, `BINANCE_PUBLIC`, `EPA_AQS`, `NREL`, `THE_ODDS_API`.
 
-Important distinction: the 25 measured providers are the broader live-breadth inventory. They do not automatically count as proof for the Kuramoto champion until each provider is promoted through a named baseline, normalized schema, locked metric, and replay manifest.
+Important distinction: the 24 measured providers are the broader live-breadth inventory. They do not automatically count as proof for the Kuramoto champion until each provider is promoted through a named baseline, normalized schema, locked metric, and replay manifest. The 29-source registry remains valuable, but failed/thin sources should be described as under refresh until they pass a fresh probe.
 
 ## Locked Replay Breadth
 
@@ -119,7 +119,7 @@ Run these in order:
 
 Use:
 
-> LumenCore currently has a hashable internal replay champion in the wave/resonance timing lane. Kuramoto phase coupling beat a named Kalman baseline on 24 of 24 source-conditioned holdouts, with 2.5M estimated rows replayed in the champion core and a broader 25-provider live-breadth inventory ready for staged promotion. The system is ready for buyer-authorized field replay, not yet field validated.
+> LumenCore currently has a hashable internal replay champion in the wave/resonance timing lane. Kuramoto phase coupling beat a named Kalman baseline on 24 of 24 source-conditioned holdouts, with 2.5M estimated rows replayed in the champion core and 24 measured live-source systems in the latest public-safe provider probe. The broader 29-source registry is under refresh before broader public wording is reused. The system is ready for buyer-authorized field replay, not yet field validated.
 
 Avoid:
 

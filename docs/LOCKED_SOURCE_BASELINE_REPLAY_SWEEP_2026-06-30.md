@@ -1,24 +1,24 @@
 # Locked Source Baseline Replay Sweep
 
-Generated UTC: `2026-07-01T09:38:39.311436+00:00`
+Generated UTC: `2026-07-05T21:18:13.607433+00:00`
 
 Locked source baseline replay sweep. This runs every ready local/uploaded measured source row from the geometry live source manifest through available source-conditioned replay adapters and compares candidates against the locked baselines for their lane. It includes an energy price-pressure proxy adapter so those rows are tested instead of blocked. This is source-conditioned replay evidence, not field validation, not realized savings, not a fixed-dollar frozen-delta sales claim, not live trading, and not a medical or addiction-treatment claim.
 
 ## Summary
 
-- Manifest rows: `497`
-- Ready rows: `313`
-- Adapter-backed routes replayed: `313`
-- Geometry routes replayed: `169`
-- Energy proxy routes replayed: `144`
-- Baseline comparisons: `1224`
-- Candidate wins: `975`
-- Loss/tie comparisons: `249`
-- Estimated rows replayed: `7152281`
-- Numeric samples read: `93596`
-- Mean score delta: `0.118206`
-- Best score delta: `0.421141`
-- Replay chain SHA-256: `825b5b4090a944a6306caeac16a3fc583def8444d9dc232da864dbd627a30587`
+- Manifest rows: `500`
+- Ready rows: `349`
+- Adapter-backed routes replayed: `349`
+- Geometry routes replayed: `187`
+- Energy proxy routes replayed: `162`
+- Baseline comparisons: `2303`
+- Candidate wins: `1537`
+- Loss/tie comparisons: `766`
+- Estimated rows replayed: `7154095`
+- Numeric samples read: `95964`
+- Mean score delta: `0.099555`
+- Best score delta: `0.680913`
+- Replay chain SHA-256: `8105eef9270d1543cea66111eaaacd6970c14a83084e1393f7ac0309cf37e544`
 - Field validation claim allowed: `false`
 - Real-dollar savings claim allowed: `false`
 
@@ -26,31 +26,31 @@ Locked source baseline replay sweep. This runs every ready local/uploaded measur
 
 | Lane | Routes | Baseline Comparisons | Wins | Rows | Numeric Samples | Mean Delta | Best Delta |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `wave_resonance_timing` | `147` | `588` | `588` | `2880414` | `44614` | `0.18595` | `0.388056` |
-| `energy_price_pressure_proxy` | `144` | `567` | `338` | `2880414` | `44610` | `0.052908` | `0.421141` |
-| `thermal_ventilation` | `8` | `24` | `24` | `441538` | `1451` | `0.118918` | `0.152459` |
-| `branching_transport` | `11` | `33` | `13` | `695728` | `2200` | `0.016296` | `0.32329` |
-| `optimal_curve_transport` | `3` | `12` | `12` | `254187` | `721` | `0.16296` | `0.258127` |
+| `energy_price_pressure_proxy` | `162` | `1552` | `798` | `2881321` | `47925` | `0.057882` | `0.680913` |
+| `wave_resonance_timing` | `165` | `660` | `660` | `2881321` | `47929` | `0.193603` | `0.392073` |
+| `branching_transport` | `11` | `55` | `43` | `695728` | `69` | `0.121072` | `0.331672` |
+| `thermal_ventilation` | `8` | `24` | `24` | `441538` | `41` | `0.10511` | `0.150214` |
+| `optimal_curve_transport` | `3` | `12` | `12` | `254187` | `0` | `0.206883` | `0.259176` |
 
 ## Top Positive Comparisons
 
 | Lane | Candidate | Baseline | Delta | Source |
 | --- | --- | --- | ---: | --- |
-| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `seasonal_naive` | `0.421141` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_O.000_runs_best_timeseries.csv__t.csv__22b46e9294.csv` |
-| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `seasonal_naive` | `0.421141` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_Termius_best_timeseries.csv__t.csv__f51b9fb1ef.csv` |
-| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `seasonal_naive` | `0.421141` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_082348Z_99_RAW_ORIGINALS_iCloud_O.000_runs_best_timeseries.csv__t.csv__b17a35f516.csv` |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `fft_filter` | `0.388056` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/Data_sets__MER_T09_04.csv__641def4c59.csv` |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `fft_filter` | `0.376833` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_O.000_runs_best_timeseries.csv__t.csv__22b46e9294.csv` |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `fft_filter` | `0.374685` | `data/live_measured/eia/eia_latest.json` |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `fft_filter` | `0.374153` | `data/live_measured/kraken_public/kraken_public_20260701T060342Z.json` |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `fft_filter` | `0.367652` | `data/live_measured/fred/fred_20260701T060342Z.json` |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `fft_filter` | `0.366614` | `data/live_measured/grants_gov/grants_gov_latest.json` |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `fft_filter` | `0.365081` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_Termius_best_timeseries.csv__energy.csv__eb90fb4cc8.csv` |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `fft_filter` | `0.364694` | `data/live_measured/bls/bls_20260701T060342Z.csv` |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `fft_filter` | `0.363679` | `data/live_measured/kraken_public/kraken_public_latest.json` |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `fft_filter` | `0.363174` | `data/live_measured/the_odds_api/the_odds_api_20260701T060342Z.json` |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `fft_filter` | `0.359977` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/data/Data sets/EBA.txt` |
-| `wave_resonance_timing` | `kuramoto_phase_coupling` | `fft_filter` | `0.358283` | `data/live_measured/eia/eia_20260701T060342Z.json` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `particle_filter` | `0.680913` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/data/live_fetched/fred_fx_gbpusd.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `particle_filter` | `0.655278` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/data/live_fetched/fred_fx_eurusd.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `lightgbm` | `0.635821` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_O.000_runs_best_timeseries.csv__t.csv__22b46e9294.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `lightgbm` | `0.635821` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_Termius_best_timeseries.csv__t.csv__f51b9fb1ef.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `lightgbm` | `0.635821` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_082348Z_99_RAW_ORIGINALS_iCloud_O.000_runs_best_timeseries.csv__t.csv__b17a35f516.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `xgboost` | `0.626577` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__score.csv__1a55521dbd.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `xgboost` | `0.619218` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_O.000_runs_best_timeseries.csv__t.csv__22b46e9294.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `xgboost` | `0.619218` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_Termius_best_timeseries.csv__t.csv__f51b9fb1ef.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `xgboost` | `0.619218` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_082348Z_99_RAW_ORIGINALS_iCloud_O.000_runs_best_timeseries.csv__t.csv__b17a35f516.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `particle_filter` | `0.611074` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/data/live_fetched/fred_vix.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `random_forest_regression` | `0.584755` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_O.000_runs_best_timeseries.csv__t.csv__22b46e9294.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `random_forest_regression` | `0.584755` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_Termius_best_timeseries.csv__t.csv__f51b9fb1ef.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `random_forest_regression` | `0.584755` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_082348Z_99_RAW_ORIGINALS_iCloud_O.000_runs_best_timeseries.csv__t.csv__b17a35f516.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `particle_filter` | `0.575591` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/data/live_fetched/av_fx_chfusd.csv` |
+| `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `particle_filter` | `0.573832` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/data/live_fetched/av_fx_jpyusd.csv` |
 
 ## Claim Boundaries
 

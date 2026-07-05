@@ -1,6 +1,6 @@
 # Real Noise Promotion Sweep
 
-Generated UTC: 2026-07-03T08:01:19.989751+00:00
+Generated UTC: 2026-07-03T08:30:43.577651+00:00
 
 ## Boundary
 
@@ -8,11 +8,11 @@ Real-noise promotion sweep only. It hashes local/provider snapshots, measures no
 
 ## Summary
 
-- CSV snapshots scanned: 601
-- Ready for locked replay: 206
+- CSV snapshots scanned: 604
+- Ready for locked replay: 207
 - Strong real-noise candidates: 15
-- Rows read: 34,450
-- Numeric samples: 67,994
+- Rows read: 34,481
+- Numeric samples: 68,274
 - Lanes with ready data: 6
 
 ## Strongest Ready Sources

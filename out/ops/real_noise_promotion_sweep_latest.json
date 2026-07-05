@@ -1,5 +1,5 @@
 {
-  "artifact_sha256": "25edbd0812741fec8d28c2e3af0b4169438833bab2ea6f326ff30828530f1739",
+  "artifact_sha256": "088d84067600ed6e953b9e5679ebc5007cfd36a0223664a27355053b9f3138e0",
   "boundary": "Real-noise promotion sweep only. It hashes local/provider snapshots, measures noise and baseline-probe readiness, and identifies datasets ready for locked replay. It does not prove field validation, realized savings, fixed frozen-delta pricing, safety certification, medical efficacy, or autonomous live trading.",
   "claim_ladder": [
     {
@@ -18,7 +18,7 @@
       "stage": "field_validated_savings"
     }
   ],
-  "generated_utc": "2026-07-03T08:01:19.989751+00:00",
+  "generated_utc": "2026-07-03T08:30:43.577651+00:00",
   "lane_rollup": {
     "air_weather_water": {
       "numeric_samples": 1884,
@@ -183,10 +183,10 @@
       ]
     },
     "market_noise": {
-      "numeric_samples": 24797,
-      "ready_sources": 84,
-      "rows_read": 4356,
-      "sources": 185,
+      "numeric_samples": 25077,
+      "ready_sources": 85,
+      "rows_read": 4387,
+      "sources": 188,
       "strongest_providers": [
         "ALPHAVANTAGE",
         "ALPHAVANTAGE",
@@ -220,6 +220,7 @@
         "COINBASE_PUBLIC",
         "COINBASE_PUBLIC",
         "COINBASE_PUBLIC",
+        "KRAKEN_PUBLIC",
         "KRAKEN_PUBLIC",
         "KRAKEN_PUBLIC",
         "KRAKEN_PUBLIC",
@@ -2722,6 +2723,21 @@
       "numeric_samples": 0,
       "parse_error": null,
       "path": "data/live_measured/binance_public/binance_public_20260703T011824Z.csv",
+      "promotion_state": "blocked_parse_or_empty",
+      "provider": "BINANCE_PUBLIC",
+      "ready_for_locked_replay": false,
+      "rows_read": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_measured\\binance_public\\binance_public_20260703T083038Z.csv",
+      "bytes": 0,
+      "claim_use": "inventory_only",
+      "columns": 0,
+      "lane": "market_noise",
+      "numeric_samples": 0,
+      "parse_error": null,
+      "path": "data/live_measured/binance_public/binance_public_20260703T083038Z.csv",
       "promotion_state": "blocked_parse_or_empty",
       "provider": "BINANCE_PUBLIC",
       "ready_for_locked_replay": false,
@@ -5739,6 +5755,51 @@
       "ready_for_locked_replay": false,
       "rows_read": 6,
       "sha256": "6b47f36587d076510fe265e20a52fe9ac4eaae1165b6fa08bc25c450b2c709e3",
+      "timestamp_like_columns": [
+        "ath_date",
+        "atl_date",
+        "last_updated"
+      ]
+    },
+    {
+      "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_measured\\coingecko_public\\coingecko_public_20260703T083038Z.csv",
+      "bytes": 2529,
+      "claim_use": "inventory_only",
+      "columns": 26,
+      "lane": "market_noise",
+      "missing_cells": 8,
+      "numeric_columns": 18,
+      "numeric_samples": 105,
+      "parse_error": null,
+      "path": "data/live_measured/coingecko_public/coingecko_public_20260703T083038Z.csv",
+      "primary_signal_column": "current_price",
+      "primary_signal_metrics": {
+        "baseline_probe": {
+          "all_mae": {
+            "exp_smoothing_0_3": 34130.06433856,
+            "persistence": 12372.1629488,
+            "rolling_mean_5": 28265.12762517
+          },
+          "best_mae": 12372.1629488,
+          "best_named_baseline": "persistence"
+        },
+        "delta_abs_max": 59983.23,
+        "delta_abs_median": 80.924894,
+        "lag1_autocorr": 0.99816733,
+        "max": 61701.0,
+        "mean": 10583.51834367,
+        "min": 0.075106,
+        "n": 6,
+        "robust_outlier_count": 2,
+        "shock_count_delta_mad_6": 2,
+        "stdev": 25051.5689482
+      },
+      "primary_signal_selection": "value_column",
+      "promotion_state": "thin_real_noise_inventory",
+      "provider": "COINGECKO_PUBLIC",
+      "ready_for_locked_replay": false,
+      "rows_read": 6,
+      "sha256": "3a2c3d0e44b2d08b1fbe6e082ffe6bd39fcec0a324f8ba98d2263f7365da7d58",
       "timestamp_like_columns": [
         "ath_date",
         "atl_date",
@@ -11387,6 +11448,49 @@
       "ready_for_locked_replay": true,
       "rows_read": 100,
       "sha256": "42f3608881c4254a148e98f465564c3682edc91dbcd9571c6acf958ba2030d11",
+      "timestamp_like_columns": [
+        "time"
+      ]
+    },
+    {
+      "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\data\\live_measured\\kraken_public\\kraken_public_20260703T083038Z.csv",
+      "bytes": 1878,
+      "claim_use": "locked_replay_ready_not_field_validated",
+      "columns": 8,
+      "lane": "market_noise",
+      "missing_cells": 0,
+      "numeric_columns": 7,
+      "numeric_samples": 175,
+      "parse_error": null,
+      "path": "data/live_measured/kraken_public/kraken_public_20260703T083038Z.csv",
+      "primary_signal_column": "open",
+      "primary_signal_metrics": {
+        "baseline_probe": {
+          "all_mae": {
+            "exp_smoothing_0_3": 268.00801136,
+            "persistence": 162.0875,
+            "rolling_mean_5": 245.92208333
+          },
+          "best_mae": 162.0875,
+          "best_named_baseline": "persistence"
+        },
+        "delta_abs_max": 670.2000000000044,
+        "delta_abs_median": 99.0,
+        "lag1_autocorr": 0.83774382,
+        "max": 61866.5,
+        "mean": 61385.464,
+        "min": 60069.2,
+        "n": 25,
+        "robust_outlier_count": 2,
+        "shock_count_delta_mad_6": 1,
+        "stdev": 387.01735844
+      },
+      "primary_signal_selection": "value_column",
+      "promotion_state": "real_noise_replay_candidate",
+      "provider": "KRAKEN_PUBLIC",
+      "ready_for_locked_replay": true,
+      "rows_read": 25,
+      "sha256": "74f9d0d0f3c99c824af0087926873a5c086c98146b88a676a73201088acfbc46",
       "timestamp_like_columns": [
         "time"
       ]
@@ -19079,14 +19183,14 @@
     }
   ],
   "summary": {
-    "csv_snapshots_scanned": 601,
+    "csv_snapshots_scanned": 604,
     "field_validation_claim_allowed": false,
     "fixed_dollar_claim_allowed": false,
     "lanes_with_ready_data": 6,
     "next_claim_stage": "internal_real_noise_locked_replay",
-    "numeric_samples": 67994,
-    "ready_for_locked_replay": 206,
-    "rows_read": 34450,
+    "numeric_samples": 68274,
+    "ready_for_locked_replay": 207,
+    "rows_read": 34481,
     "strong_real_noise_candidates": 15
   }
 }

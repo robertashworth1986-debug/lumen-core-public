@@ -1,6 +1,6 @@
 # Top Geometry Live Replay Results
 
-Generated UTC: `2026-07-01T13:08:58.944593+00:00`
+Generated UTC: `2026-07-05T20:56:59.883855+00:00`
 
 ## Summary
 
@@ -8,7 +8,7 @@ Generated UTC: `2026-07-01T13:08:58.944593+00:00`
 - Adapter replays run: 4
 - Source-context-only cards: 1
 - Candidate beats named baseline count: 4
-- Live-context rows evaluated: 150
+- Live-context rows evaluated: 158
 - Unique snapshot hashes: 16
 - Snapshot chain SHA-256: `60a692c3c47d37ba3051122bc04f08f173fa47cd6476e0b290a801b70133e537`
 - Strict rolling champions: `5`

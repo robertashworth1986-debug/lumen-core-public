@@ -1,6 +1,6 @@
 # Geometry Execution Context Audit
 
-Generated UTC: `2026-07-03T08:01:19.345686+00:00`
+Generated UTC: `2026-07-03T08:32:16.231714+00:00`
 
 ## Boundary
 
@@ -44,13 +44,13 @@ Strong internal holdout evidence, especially for Kuramoto phase coupling, but st
 ## Live Breadth
 
 - Registry enabled sources: `29`
-- Measured sources: `25`
-- Failed or thin sources: `4`
-- Total measured rows from maximizer: `1326`
-- Real-noise CSV snapshots scanned: `601`
-- Real-noise rows read: `34450`
-- Real-noise numeric samples: `67994`
-- Real-noise datasets ready for locked replay: `206`
+- Measured sources: `24`
+- Failed or thin sources: `5`
+- Total measured rows from maximizer: `544`
+- Real-noise CSV snapshots scanned: `604`
+- Real-noise rows read: `34481`
+- Real-noise numeric samples: `68274`
+- Real-noise datasets ready for locked replay: `207`
 - Strong real-noise candidates: `15`
 
 ## Claim Gates

@@ -27,7 +27,7 @@
     "paid_technical_evaluation_scoping_allowed": true,
     "real_dollar_savings_claim_allowed": false
   },
-  "generated_utc": "2026-07-03T08:01:19.345686+00:00",
+  "generated_utc": "2026-07-03T08:32:16.231714+00:00",
   "geometry_state": {
     "all_registered_families_live_benchmarked": false,
     "benchmark_specified_family_count": 140,
@@ -64,14 +64,14 @@
   },
   "live_breadth_state": {
     "failed_or_thin_source_names": [
+      "AIRNOW",
       "BINANCE_PUBLIC",
       "EPA_AQS",
       "NREL",
       "THE_ODDS_API"
     ],
-    "failed_or_thin_sources": 4,
+    "failed_or_thin_sources": 5,
     "measured_source_names": [
-      "AIRNOW",
       "ALPACA",
       "ALPHAVANTAGE",
       "BEA",
@@ -97,15 +97,15 @@
       "WEBHOOK",
       "WORLD_BANK_PUBLIC"
     ],
-    "measured_sources": 25,
-    "real_noise_csv_snapshots_scanned": 601,
+    "measured_sources": 24,
+    "real_noise_csv_snapshots_scanned": 604,
     "real_noise_lanes_with_ready_data": 6,
-    "real_noise_numeric_samples": 67994,
-    "real_noise_ready_for_locked_replay": 206,
-    "real_noise_rows_read": 34450,
+    "real_noise_numeric_samples": 68274,
+    "real_noise_ready_for_locked_replay": 207,
+    "real_noise_rows_read": 34481,
     "real_noise_strong_candidates": 15,
     "registry_enabled_sources": 29,
-    "total_measured_rows": 1326
+    "total_measured_rows": 544
   },
   "next_actions": [
     "Run locked replay on the 206 real-noise-ready datasets and write pass/fail deltas back into champion feeds.",
