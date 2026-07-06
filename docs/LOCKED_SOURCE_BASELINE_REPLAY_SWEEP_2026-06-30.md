@@ -1,6 +1,6 @@
 # Locked Source Baseline Replay Sweep
 
-Generated UTC: `2026-07-05T21:18:13.607433+00:00`
+Generated UTC: `2026-07-06T01:04:35.793990+00:00`
 
 Locked source baseline replay sweep. This runs every ready local/uploaded measured source row from the geometry live source manifest through available source-conditioned replay adapters and compares candidates against the locked baselines for their lane. It includes an energy price-pressure proxy adapter so those rows are tested instead of blocked. This is source-conditioned replay evidence, not field validation, not realized savings, not a fixed-dollar frozen-delta sales claim, not live trading, and not a medical or addiction-treatment claim.
 
@@ -12,13 +12,13 @@ Locked source baseline replay sweep. This runs every ready local/uploaded measur
 - Geometry routes replayed: `187`
 - Energy proxy routes replayed: `162`
 - Baseline comparisons: `2303`
-- Candidate wins: `1537`
-- Loss/tie comparisons: `766`
+- Candidate wins: `1540`
+- Loss/tie comparisons: `763`
 - Estimated rows replayed: `7154095`
-- Numeric samples read: `95964`
-- Mean score delta: `0.099555`
+- Numeric samples read: `98056`
+- Mean score delta: `0.099291`
 - Best score delta: `0.680913`
-- Replay chain SHA-256: `8105eef9270d1543cea66111eaaacd6970c14a83084e1393f7ac0309cf37e544`
+- Replay chain SHA-256: `a0bb9ff93c7b046bad7c6484ffa93f8b2ae5f96f9d070fd5d6ff3afbbb6b3024`
 - Field validation claim allowed: `false`
 - Real-dollar savings claim allowed: `false`
 
@@ -26,10 +26,10 @@ Locked source baseline replay sweep. This runs every ready local/uploaded measur
 
 | Lane | Routes | Baseline Comparisons | Wins | Rows | Numeric Samples | Mean Delta | Best Delta |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `energy_price_pressure_proxy` | `162` | `1552` | `798` | `2881321` | `47925` | `0.057882` | `0.680913` |
-| `wave_resonance_timing` | `165` | `660` | `660` | `2881321` | `47929` | `0.193603` | `0.392073` |
-| `branching_transport` | `11` | `55` | `43` | `695728` | `69` | `0.121072` | `0.331672` |
-| `thermal_ventilation` | `8` | `24` | `24` | `441538` | `41` | `0.10511` | `0.150214` |
+| `energy_price_pressure_proxy` | `162` | `1552` | `801` | `2881321` | `48971` | `0.057444` | `0.680913` |
+| `wave_resonance_timing` | `165` | `660` | `660` | `2881321` | `48975` | `0.19377` | `0.388056` |
+| `branching_transport` | `11` | `55` | `43` | `695728` | `69` | `0.120934` | `0.331672` |
+| `thermal_ventilation` | `8` | `24` | `24` | `441538` | `41` | `0.103805` | `0.150738` |
 | `optimal_curve_transport` | `3` | `12` | `12` | `254187` | `0` | `0.206883` | `0.259176` |
 
 ## Top Positive Comparisons

@@ -1,6 +1,6 @@
 # Geometry Repeat Proof Validation
 
-Generated UTC: `2026-07-05T20:57:44.541242+00:00`
+Generated UTC: `2026-07-05T21:21:49.232169+00:00`
 
 Repeat proof validation replays existing lane adapters against multiple distinct frozen live-source snapshots. It can strengthen candidate evidence, but it is not field validation, not realized savings, not a real-dollar claim, not award certainty, and not live trading permission.
 
@@ -8,26 +8,26 @@ Repeat proof validation replays existing lane adapters against multiple distinct
 
 - Validated families: `4`
 - Repeat candidate gates passed: `2`
-- Total windows replayed: `84`
-- Live-context rows evaluated: `3274`
+- Total windows replayed: `88`
+- Live-context rows evaluated: `3432`
 - Ready for live geometry claim: `false`
 - Ready for real-dollar claim: `false`
 - Field validation: `false`
-- Validation chain SHA-256: `37a06eff7a360fda306cee30a65455c6d3405a04bd3448534e4d9978ae4371e7`
+- Validation chain SHA-256: `bb1f35764e613d0bc024de2fa3fd292c9ce3d11fcdaf15101b1f223428fc3942`
 
 ## Repeat Candidates
 
-- `brachistochrone_descent` (optimal_curve_transport): 23 repeat wins, 23 distinct winning source hashes, minimum source count `5`.
-- `kuramoto_phase_coupling` (wave_resonance_timing): 15 repeat wins, 15 distinct winning source hashes, minimum source count `5`.
+- `brachistochrone_descent` (optimal_curve_transport): 24 repeat wins, 24 distinct winning source hashes, minimum source count `5`.
+- `kuramoto_phase_coupling` (wave_resonance_timing): 16 repeat wins, 16 distinct winning source hashes, minimum source count `5`.
 
 ## Family Results
 
 | Family | Lane | Windows | Wins | Distinct Win Hashes | Min Sources | Gate |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `brachistochrone_descent` | `optimal_curve_transport` | 23 | 23 | 23 | 5 | `true` |
-| `kuramoto_phase_coupling` | `wave_resonance_timing` | 15 | 15 | 15 | 5 | `true` |
-| `leaf_veins` | `branching_transport` | 23 | 13 | 13 | 4 | `false` |
-| `thermal_plume_convection` | `thermal_ventilation` | 23 | 23 | 23 | 2 | `false` |
+| `brachistochrone_descent` | `optimal_curve_transport` | 24 | 24 | 24 | 5 | `true` |
+| `kuramoto_phase_coupling` | `wave_resonance_timing` | 16 | 16 | 16 | 5 | `true` |
+| `leaf_veins` | `branching_transport` | 24 | 13 | 13 | 4 | `false` |
+| `thermal_plume_convection` | `thermal_ventilation` | 24 | 24 | 24 | 2 | `false` |
 
 ## Controls
 

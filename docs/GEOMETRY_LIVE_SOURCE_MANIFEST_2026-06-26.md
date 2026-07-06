@@ -1,6 +1,6 @@
 # Geometry Live Source Manifest
 
-Generated UTC: `2026-07-05T20:56:58.249281+00:00`
+Generated UTC: `2026-07-05T21:20:47.485412+00:00`
 
 Geometry live source manifest only. It maps local/uploaded/live snapshot files to candidate benchmark lanes. A row in this manifest is not a validated result, not field validation, not a clinical claim, not a trading signal, and not a real-dollar savings claim.
 

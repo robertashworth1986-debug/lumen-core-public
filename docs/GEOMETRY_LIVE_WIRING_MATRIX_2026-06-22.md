@@ -1,6 +1,6 @@
 # Geometry Live Wiring Matrix
 
-Generated UTC: `2026-07-05T20:57:05.015394+00:00`
+Generated UTC: `2026-07-05T21:21:03.609077+00:00`
 
 ## Summary
 
@@ -8,9 +8,9 @@ Generated UTC: `2026-07-05T20:57:05.015394+00:00`
 - Families: 140
 - Fresh measured sources: 23
 - Fresh failed/thin sources: 4
-- Total measured rows: 1303
-- EIA status: `MEASURED` with 120 rows
-- Estimated annual source surface: $20,586,213,130.80
+- Total measured rows: 2377
+- EIA status: `MEASURED` with 250 rows
+- Estimated annual source surface: $22,495,647,588.00
 - Lanes ready for live replay build: 12
 - Top live replay source-map cards: 5
 - Top replay cards ready for build: 5

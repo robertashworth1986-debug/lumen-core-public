@@ -1,6 +1,6 @@
 # Frozen Delta Buyer Outreach Pack
 
-Generated UTC: `2026-06-25T07:56:49.269838+00:00`
+Generated UTC: `2026-07-06T13:18:07.186732+00:00`
 
 ## Buyer-Safe Positioning
 
@@ -8,12 +8,12 @@ LumenCore offers a paid pilot to review hash-backed frozen live-context evidence
 
 ## Current Truth
 
-- Measured sources: `17`
-- Measured rows: `417`
-- Live-context replay rows: `141`
-- Candidate wins against named baselines: `3`
-- Rolling champions: `0`
-- Triple-source candidates: `3`
+- Measured sources: `19`
+- Measured rows: `516`
+- Live-context replay rows: `150`
+- Candidate wins against named baselines: `4`
+- Rolling champions: `5`
+- Triple-source candidates: `0`
 - Glyph Drive files scanned: `50000`
 - Glyph Drive candidates: `20400`
 - Glyph Drive live/frozen triple-threat candidates: `193`
