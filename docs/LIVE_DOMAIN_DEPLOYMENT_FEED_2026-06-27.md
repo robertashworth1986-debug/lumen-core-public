@@ -1,6 +1,6 @@
 # Live Domain Deployment Feed
 
-Generated UTC: `2026-07-05T06:38:28.643310+00:00`
+Generated UTC: `2026-07-09T02:54:56.655436+00:00`
 Live base: `https://lumen-core.ai`
 
 ## Current Answer
@@ -115,4 +115,4 @@ The live domain is serving matching hashes for every required reviewer proof fee
 
 Live-domain deployment feed only. Matching hosted hashes prove that the public domain is serving the same local proof feeds. They do not prove field validation, realized savings, grant award certainty, fixed frozen delta pricing, medical efficacy, or live trading performance.
 
-Deployment feed SHA-256: `656afac978c91b4f5079f0c7e5fe1d7ac2b72cc20440ab046d4df9b7ec693f0e`
+Deployment feed SHA-256: `d2a0205417858385a20b7764846b4b84d96cc48719b59f9c7b21846a5ca160cb`

@@ -1,22 +1,22 @@
 {
-  "archive_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z.tgz",
-  "archive_sha256": "6f960c733b8791f35e62237795d3c1f8848c64704c3f3e8b6f764bc31197efd1",
+  "archive_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z.tgz",
+  "archive_sha256": "e1a318899a36fabb7ec3cbf0d22a9229371db19dd05a28943ccc968f8d488955",
   "boundary": "Feed-only deploy bundle. It stages reviewer proof JSON for domain hash verification. It does not publish secrets, restart execution services, prove field validation, prove realized savings, set a fixed dollar value per frozen delta, or imply autonomous live trading permission. This is not field validation.",
-  "bundle_root": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z",
-  "bundle_sha256": "7b276cd89de9de33b49ac0bed801e06d8648ac86bcd6c0a8eb5641083c0e02f3",
-  "dry_run_command": ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\" -DryRun",
+  "bundle_root": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z",
+  "bundle_sha256": "71aeb2292f023aa61a894f674f09ced27ad5179cdc8c2a70704d52456c5cbb65",
+  "dry_run_command": ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\" -DryRun",
   "feeds": [
     {
       "bytes": 28914,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\champion_metric_gauntlet.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\champion_metric_gauntlet.json",
           "bytes": 28914,
           "relative_path": "data/champion_metric_gauntlet.json",
           "sha256": "34ed58d4967299b1348186177e47d029949b345324117a5e1f490c6857763d54"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\champion_metric_gauntlet.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\champion_metric_gauntlet.json",
           "bytes": 28914,
           "relative_path": "dashboard/data/champion_metric_gauntlet.json",
           "sha256": "34ed58d4967299b1348186177e47d029949b345324117a5e1f490c6857763d54"
@@ -35,19 +35,19 @@
       "target_hashes_match": true
     },
     {
-      "bytes": 3003242,
+      "bytes": 3472261,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\locked_source_baseline_replay_sweep.json",
-          "bytes": 3003242,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\locked_source_baseline_replay_sweep.json",
+          "bytes": 3472261,
           "relative_path": "data/locked_source_baseline_replay_sweep.json",
-          "sha256": "fe82c1e6b5a6df3fe83d647cf7d5027b07c8162d9b5c47b4f312b145e36c1f76"
+          "sha256": "56e4957a7c17e51010067570e151ff6cbe439e0b66f487fa31868259a38962d5"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\locked_source_baseline_replay_sweep.json",
-          "bytes": 3003242,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\locked_source_baseline_replay_sweep.json",
+          "bytes": 3472261,
           "relative_path": "dashboard/data/locked_source_baseline_replay_sweep.json",
-          "sha256": "fe82c1e6b5a6df3fe83d647cf7d5027b07c8162d9b5c47b4f312b145e36c1f76"
+          "sha256": "56e4957a7c17e51010067570e151ff6cbe439e0b66f487fa31868259a38962d5"
         }
       ],
       "domain_candidate_paths": [
@@ -57,7 +57,7 @@
       "error": "",
       "key": "locked_source_baseline_replay_sweep",
       "required": true,
-      "sha256": "fe82c1e6b5a6df3fe83d647cf7d5027b07c8162d9b5c47b4f312b145e36c1f76",
+      "sha256": "56e4957a7c17e51010067570e151ff6cbe439e0b66f487fa31868259a38962d5",
       "source": "dashboard/data/locked_source_baseline_replay_sweep.json",
       "source_exists": true,
       "target_hashes_match": true
@@ -66,13 +66,13 @@
       "bytes": 52368,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\kuramoto_holdout_expansion.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\kuramoto_holdout_expansion.json",
           "bytes": 52368,
           "relative_path": "data/kuramoto_holdout_expansion.json",
           "sha256": "1645f3d74f7ea189cc0481ad207e3d87e51ea2ee042f34aa346dbd79af238d8a"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\kuramoto_holdout_expansion.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\kuramoto_holdout_expansion.json",
           "bytes": 52368,
           "relative_path": "dashboard/data/kuramoto_holdout_expansion.json",
           "sha256": "1645f3d74f7ea189cc0481ad207e3d87e51ea2ee042f34aa346dbd79af238d8a"
@@ -94,13 +94,13 @@
       "bytes": 329523,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\geometry_champion_of_champions.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\geometry_champion_of_champions.json",
           "bytes": 329523,
           "relative_path": "data/geometry_champion_of_champions.json",
           "sha256": "1d1975246333f4ea129d75657071a73ef7627045c204b1314c7128fd9bcf1194"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\geometry_champion_of_champions.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\geometry_champion_of_champions.json",
           "bytes": 329523,
           "relative_path": "dashboard/data/geometry_champion_of_champions.json",
           "sha256": "1d1975246333f4ea129d75657071a73ef7627045c204b1314c7128fd9bcf1194"
@@ -122,13 +122,13 @@
       "bytes": 4450,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\field_money_truth_sweep.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\field_money_truth_sweep.json",
           "bytes": 4450,
           "relative_path": "data/field_money_truth_sweep.json",
           "sha256": "88f8242d07edf59728f60e502bfdce670d9e4340718c820c75a78dd3d3e2e7e3"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\field_money_truth_sweep.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\field_money_truth_sweep.json",
           "bytes": 4450,
           "relative_path": "dashboard/data/field_money_truth_sweep.json",
           "sha256": "88f8242d07edf59728f60e502bfdce670d9e4340718c820c75a78dd3d3e2e7e3"
@@ -150,13 +150,13 @@
       "bytes": 20352,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\live_proof_value_meter.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\live_proof_value_meter.json",
           "bytes": 20352,
           "relative_path": "data/live_proof_value_meter.json",
           "sha256": "07c416189aba2ac78d2a341986bdcde7dd6f229c530785f6e418efce9e05c7c2"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\live_proof_value_meter.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\live_proof_value_meter.json",
           "bytes": 20352,
           "relative_path": "dashboard/data/live_proof_value_meter.json",
           "sha256": "07c416189aba2ac78d2a341986bdcde7dd6f229c530785f6e418efce9e05c7c2"
@@ -178,13 +178,13 @@
       "bytes": 22471,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\field_validated_dollar_claim_ladder.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\field_validated_dollar_claim_ladder.json",
           "bytes": 22471,
           "relative_path": "data/field_validated_dollar_claim_ladder.json",
           "sha256": "f4ce0d6887d24180c4fd6019c9b024f36b39c6c35d3ce52e423810dce8164f82"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\field_validated_dollar_claim_ladder.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\field_validated_dollar_claim_ladder.json",
           "bytes": 22471,
           "relative_path": "dashboard/data/field_validated_dollar_claim_ladder.json",
           "sha256": "f4ce0d6887d24180c4fd6019c9b024f36b39c6c35d3ce52e423810dce8164f82"
@@ -206,13 +206,13 @@
       "bytes": 21463,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\dollar_claim_gate.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\dollar_claim_gate.json",
           "bytes": 21463,
           "relative_path": "data/dollar_claim_gate.json",
           "sha256": "9e64ad63466e81cd1499014b97c35f2796ec728e76b72010cd549bb2aa5d741d"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\dollar_claim_gate.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\dollar_claim_gate.json",
           "bytes": 21463,
           "relative_path": "dashboard/data/dollar_claim_gate.json",
           "sha256": "9e64ad63466e81cd1499014b97c35f2796ec728e76b72010cd549bb2aa5d741d"
@@ -234,13 +234,13 @@
       "bytes": 25300,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\field_validation_control_room.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\field_validation_control_room.json",
           "bytes": 25300,
           "relative_path": "data/field_validation_control_room.json",
           "sha256": "bf7fae7aef0427b010fc592696a48e5392d138d11f1c2d5de32075aa319eacea"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\field_validation_control_room.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\field_validation_control_room.json",
           "bytes": 25300,
           "relative_path": "dashboard/data/field_validation_control_room.json",
           "sha256": "bf7fae7aef0427b010fc592696a48e5392d138d11f1c2d5de32075aa319eacea"
@@ -262,13 +262,13 @@
       "bytes": 25899,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\field_validation_outreach_board.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\field_validation_outreach_board.json",
           "bytes": 25899,
           "relative_path": "data/field_validation_outreach_board.json",
           "sha256": "16ad10dc8d8a4cb3bc22d141986ffdbb24c9c101f3f29954aebbc4300f86fa7b"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\field_validation_outreach_board.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\field_validation_outreach_board.json",
           "bytes": 25899,
           "relative_path": "dashboard/data/field_validation_outreach_board.json",
           "sha256": "16ad10dc8d8a4cb3bc22d141986ffdbb24c9c101f3f29954aebbc4300f86fa7b"
@@ -290,13 +290,13 @@
       "bytes": 9936,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\proof_to_pilot_control_room.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\proof_to_pilot_control_room.json",
           "bytes": 9936,
           "relative_path": "data/proof_to_pilot_control_room.json",
           "sha256": "20fdcc50fae67e320217b71ca130b00c3dce8b0ba0327441b0cfded23aef9267"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\proof_to_pilot_control_room.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\proof_to_pilot_control_room.json",
           "bytes": 9936,
           "relative_path": "dashboard/data/proof_to_pilot_control_room.json",
           "sha256": "20fdcc50fae67e320217b71ca130b00c3dce8b0ba0327441b0cfded23aef9267"
@@ -318,13 +318,13 @@
       "bytes": 28396,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\champion_sample_expansion_and_economic_bridge.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\champion_sample_expansion_and_economic_bridge.json",
           "bytes": 28396,
           "relative_path": "data/champion_sample_expansion_and_economic_bridge.json",
           "sha256": "09605006a1d80f89278f8b2bd1ab6aadb5f25b751c8de6c64fc56a90916e30da"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\champion_sample_expansion_and_economic_bridge.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\champion_sample_expansion_and_economic_bridge.json",
           "bytes": 28396,
           "relative_path": "dashboard/data/champion_sample_expansion_and_economic_bridge.json",
           "sha256": "09605006a1d80f89278f8b2bd1ab6aadb5f25b751c8de6c64fc56a90916e30da"
@@ -346,13 +346,13 @@
       "bytes": 10864,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\champion_source_ablation.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\champion_source_ablation.json",
           "bytes": 10864,
           "relative_path": "data/champion_source_ablation.json",
           "sha256": "8f0b0c7e9333a9caadea4b7a36e208381c8f3278ff152e51ffe9a455504f0e66"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\champion_source_ablation.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\champion_source_ablation.json",
           "bytes": 10864,
           "relative_path": "dashboard/data/champion_source_ablation.json",
           "sha256": "8f0b0c7e9333a9caadea4b7a36e208381c8f3278ff152e51ffe9a455504f0e66"
@@ -371,19 +371,19 @@
       "target_hashes_match": true
     },
     {
-      "bytes": 22607,
+      "bytes": 22604,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\grant_readiness_status.json",
-          "bytes": 22607,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\grant_readiness_status.json",
+          "bytes": 22604,
           "relative_path": "data/grant_readiness_status.json",
-          "sha256": "4ec386f09c7c5dcbf62ee40ba45d2f6b57fcec4f00995891e1d3bc92a8ae088c"
+          "sha256": "723ecc50e7694d4e75a7d1b63824b86bdb1697068dc70c8c6f4b0e60b7f2c3c8"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\grant_readiness_status.json",
-          "bytes": 22607,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\grant_readiness_status.json",
+          "bytes": 22604,
           "relative_path": "dashboard/data/grant_readiness_status.json",
-          "sha256": "4ec386f09c7c5dcbf62ee40ba45d2f6b57fcec4f00995891e1d3bc92a8ae088c"
+          "sha256": "723ecc50e7694d4e75a7d1b63824b86bdb1697068dc70c8c6f4b0e60b7f2c3c8"
         }
       ],
       "domain_candidate_paths": [
@@ -393,7 +393,7 @@
       "error": "",
       "key": "grant_readiness_status",
       "required": true,
-      "sha256": "4ec386f09c7c5dcbf62ee40ba45d2f6b57fcec4f00995891e1d3bc92a8ae088c",
+      "sha256": "723ecc50e7694d4e75a7d1b63824b86bdb1697068dc70c8c6f4b0e60b7f2c3c8",
       "source": "dashboard/data/grant_readiness_status.json",
       "source_exists": true,
       "target_hashes_match": true
@@ -402,13 +402,13 @@
       "bytes": 17222,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\top5_live_proof_submission_board.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\top5_live_proof_submission_board.json",
           "bytes": 17222,
           "relative_path": "data/top5_live_proof_submission_board.json",
           "sha256": "6af5514deafa9b20cbfb4478cd8114df91096450d347f23bcffc34f73354ea3b"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\top5_live_proof_submission_board.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\top5_live_proof_submission_board.json",
           "bytes": 17222,
           "relative_path": "dashboard/data/top5_live_proof_submission_board.json",
           "sha256": "6af5514deafa9b20cbfb4478cd8114df91096450d347f23bcffc34f73354ea3b"
@@ -430,13 +430,13 @@
       "bytes": 60911,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\deadline_evidence_bridge.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\deadline_evidence_bridge.json",
           "bytes": 60911,
           "relative_path": "data/deadline_evidence_bridge.json",
           "sha256": "0b7d583ded97f1032794653fcbf7628acc62d2376d88a3a1aab6b4accceabcf1"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\deadline_evidence_bridge.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\deadline_evidence_bridge.json",
           "bytes": 60911,
           "relative_path": "dashboard/data/deadline_evidence_bridge.json",
           "sha256": "0b7d583ded97f1032794653fcbf7628acc62d2376d88a3a1aab6b4accceabcf1"
@@ -458,13 +458,13 @@
       "bytes": 25019,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\baseline_gauntlet_coverage.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\baseline_gauntlet_coverage.json",
           "bytes": 25019,
           "relative_path": "data/baseline_gauntlet_coverage.json",
           "sha256": "1e235b0e874717a6c4f2b3857d6f2e301a02b8002b159998cc78519f5afed734"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\baseline_gauntlet_coverage.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\baseline_gauntlet_coverage.json",
           "bytes": 25019,
           "relative_path": "dashboard/data/baseline_gauntlet_coverage.json",
           "sha256": "1e235b0e874717a6c4f2b3857d6f2e301a02b8002b159998cc78519f5afed734"
@@ -486,13 +486,13 @@
       "bytes": 5868,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\kuramoto_accepted_metric_audit.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\kuramoto_accepted_metric_audit.json",
           "bytes": 5868,
           "relative_path": "data/kuramoto_accepted_metric_audit.json",
           "sha256": "c11a88f12b063d80d067063213d93f5dd2c64e42202c7cb15b44662ca5146594"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\kuramoto_accepted_metric_audit.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\kuramoto_accepted_metric_audit.json",
           "bytes": 5868,
           "relative_path": "dashboard/data/kuramoto_accepted_metric_audit.json",
           "sha256": "c11a88f12b063d80d067063213d93f5dd2c64e42202c7cb15b44662ca5146594"
@@ -514,13 +514,13 @@
       "bytes": 10710,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\valuation_proposal_target_packet.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\valuation_proposal_target_packet.json",
           "bytes": 10710,
           "relative_path": "data/valuation_proposal_target_packet.json",
           "sha256": "fa5c6b214c12e842596b3286a49e9139393f5c24ebd4dd6401c2115cb6780fbf"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\valuation_proposal_target_packet.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\valuation_proposal_target_packet.json",
           "bytes": 10710,
           "relative_path": "dashboard/data/valuation_proposal_target_packet.json",
           "sha256": "fa5c6b214c12e842596b3286a49e9139393f5c24ebd4dd6401c2115cb6780fbf"
@@ -542,13 +542,13 @@
       "bytes": 6950,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\outreach_and_application_send_queue.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\outreach_and_application_send_queue.json",
           "bytes": 6950,
           "relative_path": "data/outreach_and_application_send_queue.json",
           "sha256": "c573cefc40596a350ff0c34860f3719e1bbcd274bbfa486a32c16d136763f360"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\outreach_and_application_send_queue.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\outreach_and_application_send_queue.json",
           "bytes": 6950,
           "relative_path": "dashboard/data/outreach_and_application_send_queue.json",
           "sha256": "c573cefc40596a350ff0c34860f3719e1bbcd274bbfa486a32c16d136763f360"
@@ -570,13 +570,13 @@
       "bytes": 88878,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\geometry_asset_wiring_board.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\geometry_asset_wiring_board.json",
           "bytes": 88878,
           "relative_path": "data/geometry_asset_wiring_board.json",
           "sha256": "20be445c88521c72d5538ec91304fc370bca5c9089375757c656a15b14414351"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\geometry_asset_wiring_board.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\geometry_asset_wiring_board.json",
           "bytes": 88878,
           "relative_path": "dashboard/data/geometry_asset_wiring_board.json",
           "sha256": "20be445c88521c72d5538ec91304fc370bca5c9089375757c656a15b14414351"
@@ -598,13 +598,13 @@
       "bytes": 58781,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\luma_context_dashboard_parity_audit.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\luma_context_dashboard_parity_audit.json",
           "bytes": 58781,
           "relative_path": "data/luma_context_dashboard_parity_audit.json",
           "sha256": "757fe628616e5d0a041e390abc18088b55ec672eb483b410d3571957098b7c20"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\luma_context_dashboard_parity_audit.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\luma_context_dashboard_parity_audit.json",
           "bytes": 58781,
           "relative_path": "dashboard/data/luma_context_dashboard_parity_audit.json",
           "sha256": "757fe628616e5d0a041e390abc18088b55ec672eb483b410d3571957098b7c20"
@@ -623,19 +623,19 @@
       "target_hashes_match": true
     },
     {
-      "bytes": 63676,
+      "bytes": 77591,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\live_domain_deployment_feed.json",
-          "bytes": 63676,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\live_domain_deployment_feed.json",
+          "bytes": 77591,
           "relative_path": "data/live_domain_deployment_feed.json",
-          "sha256": "f11a07d228726d730383bde430800e4c51c433054125c870da0c8ac84737f22c"
+          "sha256": "742a427e8e5d15bffef01086acedc5169f8bc74e54ff26c7d4e902af5251acc4"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\live_domain_deployment_feed.json",
-          "bytes": 63676,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\live_domain_deployment_feed.json",
+          "bytes": 77591,
           "relative_path": "dashboard/data/live_domain_deployment_feed.json",
-          "sha256": "f11a07d228726d730383bde430800e4c51c433054125c870da0c8ac84737f22c"
+          "sha256": "742a427e8e5d15bffef01086acedc5169f8bc74e54ff26c7d4e902af5251acc4"
         }
       ],
       "domain_candidate_paths": [
@@ -645,7 +645,7 @@
       "error": "",
       "key": "live_domain_deployment_feed",
       "required": false,
-      "sha256": "f11a07d228726d730383bde430800e4c51c433054125c870da0c8ac84737f22c",
+      "sha256": "742a427e8e5d15bffef01086acedc5169f8bc74e54ff26c7d4e902af5251acc4",
       "source": "dashboard/data/live_domain_deployment_feed.json",
       "source_exists": true,
       "target_hashes_match": true
@@ -654,13 +654,13 @@
       "bytes": 26162,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\live_domain_consolidation_audit.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\live_domain_consolidation_audit.json",
           "bytes": 26162,
           "relative_path": "data/live_domain_consolidation_audit.json",
           "sha256": "84661a38bcd75d25648899322bff144b2b41651c4db2ad74d6330bc0e2c9074f"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\live_domain_consolidation_audit.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\live_domain_consolidation_audit.json",
           "bytes": 26162,
           "relative_path": "dashboard/data/live_domain_consolidation_audit.json",
           "sha256": "84661a38bcd75d25648899322bff144b2b41651c4db2ad74d6330bc0e2c9074f"
@@ -682,13 +682,13 @@
       "bytes": 9713,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\proof_to_revenue_engine.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\proof_to_revenue_engine.json",
           "bytes": 9713,
           "relative_path": "data/proof_to_revenue_engine.json",
           "sha256": "b611e887434a532198807db62bb33970a4ecea87d500873377faa53d488ff80e"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\proof_to_revenue_engine.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\proof_to_revenue_engine.json",
           "bytes": 9713,
           "relative_path": "dashboard/data/proof_to_revenue_engine.json",
           "sha256": "b611e887434a532198807db62bb33970a4ecea87d500873377faa53d488ff80e"
@@ -710,13 +710,13 @@
       "bytes": 37169,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\champion_stress_test_matrix.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\champion_stress_test_matrix.json",
           "bytes": 37169,
           "relative_path": "data/champion_stress_test_matrix.json",
           "sha256": "6d3857812135885ad4ba4bc3ef0d2a06829e1e81c5a9ea0ab2db2547a65e935e"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\champion_stress_test_matrix.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\champion_stress_test_matrix.json",
           "bytes": 37169,
           "relative_path": "dashboard/data/champion_stress_test_matrix.json",
           "sha256": "6d3857812135885ad4ba4bc3ef0d2a06829e1e81c5a9ea0ab2db2547a65e935e"
@@ -738,13 +738,13 @@
       "bytes": 16864,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\champion_metric_battery.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\champion_metric_battery.json",
           "bytes": 16864,
           "relative_path": "data/champion_metric_battery.json",
           "sha256": "a7cff739cc16ab24aaa6994ff4ee2c9d2d6e8f62078de02399dbc5797bd723cd"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\champion_metric_battery.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\champion_metric_battery.json",
           "bytes": 16864,
           "relative_path": "dashboard/data/champion_metric_battery.json",
           "sha256": "a7cff739cc16ab24aaa6994ff4ee2c9d2d6e8f62078de02399dbc5797bd723cd"
@@ -766,13 +766,13 @@
       "bytes": 41864,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\champion_expanded_metric_rollup.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\champion_expanded_metric_rollup.json",
           "bytes": 41864,
           "relative_path": "data/champion_expanded_metric_rollup.json",
           "sha256": "0548a5becf7b27ac6d7cdba8eaea06b9dc0483b0700ad5c474ba6d491a31a1e4"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\champion_expanded_metric_rollup.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\champion_expanded_metric_rollup.json",
           "bytes": 41864,
           "relative_path": "dashboard/data/champion_expanded_metric_rollup.json",
           "sha256": "0548a5becf7b27ac6d7cdba8eaea06b9dc0483b0700ad5c474ba6d491a31a1e4"
@@ -794,13 +794,13 @@
       "bytes": 22506,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\first_buyer_target_board.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\first_buyer_target_board.json",
           "bytes": 22506,
           "relative_path": "data/first_buyer_target_board.json",
           "sha256": "92c19834aa794679df7f2449b2dca5cc6c141f36c8fd8c005928bb16f91c69a1"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\first_buyer_target_board.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\first_buyer_target_board.json",
           "bytes": 22506,
           "relative_path": "dashboard/data/first_buyer_target_board.json",
           "sha256": "92c19834aa794679df7f2449b2dca5cc6c141f36c8fd8c005928bb16f91c69a1"
@@ -822,13 +822,13 @@
       "bytes": 36332,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\paid_pilot_outreach_queue.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\paid_pilot_outreach_queue.json",
           "bytes": 36332,
           "relative_path": "data/paid_pilot_outreach_queue.json",
           "sha256": "8cea4204836505336d076c10485f6382779e2bedf723d64a845a73a6b7f32a73"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\paid_pilot_outreach_queue.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\paid_pilot_outreach_queue.json",
           "bytes": 36332,
           "relative_path": "dashboard/data/paid_pilot_outreach_queue.json",
           "sha256": "8cea4204836505336d076c10485f6382779e2bedf723d64a845a73a6b7f32a73"
@@ -850,13 +850,13 @@
       "bytes": 23464,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\luma_operator_context.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\luma_operator_context.json",
           "bytes": 23464,
           "relative_path": "data/luma_operator_context.json",
           "sha256": "85427d1cd3ad79b07f27a6546f495ad9571e5799cb99317d0852e986a90764e3"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\luma_operator_context.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\luma_operator_context.json",
           "bytes": 23464,
           "relative_path": "dashboard/data/luma_operator_context.json",
           "sha256": "85427d1cd3ad79b07f27a6546f495ad9571e5799cb99317d0852e986a90764e3"
@@ -878,13 +878,13 @@
       "bytes": 33467,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\champion_phase_proxy_diagnostics.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\champion_phase_proxy_diagnostics.json",
           "bytes": 33467,
           "relative_path": "data/champion_phase_proxy_diagnostics.json",
           "sha256": "0cbb742be1570af67e94df5b0220385aa44846414cb450d25fe79017f0b607a6"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\champion_phase_proxy_diagnostics.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\champion_phase_proxy_diagnostics.json",
           "bytes": 33467,
           "relative_path": "dashboard/data/champion_phase_proxy_diagnostics.json",
           "sha256": "0cbb742be1570af67e94df5b0220385aa44846414cb450d25fe79017f0b607a6"
@@ -903,19 +903,19 @@
       "target_hashes_match": true
     },
     {
-      "bytes": 22301,
+      "bytes": 21803,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\safe_key_provider_ping.json",
-          "bytes": 22301,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\safe_key_provider_ping.json",
+          "bytes": 21803,
           "relative_path": "data/safe_key_provider_ping.json",
-          "sha256": "97093efea69a60f11379030d38197c973abbc21e11c940b6b6c4c6492a23adc1"
+          "sha256": "f7612be15175db4550cfe8cadba1bd2e7ce96fd4a6f8ac3a983ebe954c1141d2"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\safe_key_provider_ping.json",
-          "bytes": 22301,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\safe_key_provider_ping.json",
+          "bytes": 21803,
           "relative_path": "dashboard/data/safe_key_provider_ping.json",
-          "sha256": "97093efea69a60f11379030d38197c973abbc21e11c940b6b6c4c6492a23adc1"
+          "sha256": "f7612be15175db4550cfe8cadba1bd2e7ce96fd4a6f8ac3a983ebe954c1141d2"
         }
       ],
       "domain_candidate_paths": [
@@ -925,25 +925,25 @@
       "error": "",
       "key": "safe_key_provider_ping",
       "required": false,
-      "sha256": "97093efea69a60f11379030d38197c973abbc21e11c940b6b6c4c6492a23adc1",
+      "sha256": "f7612be15175db4550cfe8cadba1bd2e7ce96fd4a6f8ac3a983ebe954c1141d2",
       "source": "dashboard/data/safe_key_provider_ping.json",
       "source_exists": true,
       "target_hashes_match": true
     },
     {
-      "bytes": 39811,
+      "bytes": 39808,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\live_source_measurement_maximizer.json",
-          "bytes": 39811,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\live_source_measurement_maximizer.json",
+          "bytes": 39808,
           "relative_path": "data/live_source_measurement_maximizer.json",
-          "sha256": "a1cd1ac97295537b7e098153387bc32d757b8604b6e735038518ab8bf614e586"
+          "sha256": "1f9a036f47df94f49e27f2ee39273791b503f9c1dd85d06e3bd3d17f230ec4f9"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\live_source_measurement_maximizer.json",
-          "bytes": 39811,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\live_source_measurement_maximizer.json",
+          "bytes": 39808,
           "relative_path": "dashboard/data/live_source_measurement_maximizer.json",
-          "sha256": "a1cd1ac97295537b7e098153387bc32d757b8604b6e735038518ab8bf614e586"
+          "sha256": "1f9a036f47df94f49e27f2ee39273791b503f9c1dd85d06e3bd3d17f230ec4f9"
         }
       ],
       "domain_candidate_paths": [
@@ -953,25 +953,25 @@
       "error": "",
       "key": "live_source_measurement_maximizer",
       "required": false,
-      "sha256": "a1cd1ac97295537b7e098153387bc32d757b8604b6e735038518ab8bf614e586",
+      "sha256": "1f9a036f47df94f49e27f2ee39273791b503f9c1dd85d06e3bd3d17f230ec4f9",
       "source": "dashboard/data/live_source_measurement_maximizer.json",
       "source_exists": true,
       "target_hashes_match": true
     },
     {
-      "bytes": 180193,
+      "bytes": 180524,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\geometry_live_wiring_matrix.json",
-          "bytes": 180193,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\geometry_live_wiring_matrix.json",
+          "bytes": 180524,
           "relative_path": "data/geometry_live_wiring_matrix.json",
-          "sha256": "b559f3668cda45da162f260cfbdd1804fd52698631a50d2f4a996bb5cd0a42ea"
+          "sha256": "90e4c4d51b674f90fc62b3f7b6e48af677819f8a16cf7321cab380113bc11cef"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\geometry_live_wiring_matrix.json",
-          "bytes": 180193,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\geometry_live_wiring_matrix.json",
+          "bytes": 180524,
           "relative_path": "dashboard/data/geometry_live_wiring_matrix.json",
-          "sha256": "b559f3668cda45da162f260cfbdd1804fd52698631a50d2f4a996bb5cd0a42ea"
+          "sha256": "90e4c4d51b674f90fc62b3f7b6e48af677819f8a16cf7321cab380113bc11cef"
         }
       ],
       "domain_candidate_paths": [
@@ -981,7 +981,7 @@
       "error": "",
       "key": "geometry_live_wiring_matrix",
       "required": false,
-      "sha256": "b559f3668cda45da162f260cfbdd1804fd52698631a50d2f4a996bb5cd0a42ea",
+      "sha256": "90e4c4d51b674f90fc62b3f7b6e48af677819f8a16cf7321cab380113bc11cef",
       "source": "dashboard/data/geometry_live_wiring_matrix.json",
       "source_exists": true,
       "target_hashes_match": true
@@ -990,13 +990,13 @@
       "bytes": 463401,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\geometry_live_breadth_proof_queue.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\geometry_live_breadth_proof_queue.json",
           "bytes": 463401,
           "relative_path": "data/geometry_live_breadth_proof_queue.json",
           "sha256": "088820432c98c11094d2d8bd052569606789d3d579dc2c75b6ae6683d078ae02"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\geometry_live_breadth_proof_queue.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\geometry_live_breadth_proof_queue.json",
           "bytes": 463401,
           "relative_path": "dashboard/data/geometry_live_breadth_proof_queue.json",
           "sha256": "088820432c98c11094d2d8bd052569606789d3d579dc2c75b6ae6683d078ae02"
@@ -1018,13 +1018,13 @@
       "bytes": 49908,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\branching_live_breadth_replay.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\branching_live_breadth_replay.json",
           "bytes": 49908,
           "relative_path": "data/branching_live_breadth_replay.json",
           "sha256": "3abdf878a5295a170e744cbbb7019ffe39135bd7db6aa0017050a224b13e68ee"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\branching_live_breadth_replay.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\branching_live_breadth_replay.json",
           "bytes": 49908,
           "relative_path": "dashboard/data/branching_live_breadth_replay.json",
           "sha256": "3abdf878a5295a170e744cbbb7019ffe39135bd7db6aa0017050a224b13e68ee"
@@ -1046,13 +1046,13 @@
       "bytes": 10623,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\rolling_champion_gate.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\rolling_champion_gate.json",
           "bytes": 10623,
           "relative_path": "data/rolling_champion_gate.json",
           "sha256": "be369c59178534fbf38303569cb54a1573cbe60847c83d3271ec2e023f45b882"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\rolling_champion_gate.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\rolling_champion_gate.json",
           "bytes": 10623,
           "relative_path": "dashboard/data/rolling_champion_gate.json",
           "sha256": "be369c59178534fbf38303569cb54a1573cbe60847c83d3271ec2e023f45b882"
@@ -1071,19 +1071,19 @@
       "target_hashes_match": true
     },
     {
-      "bytes": 56921,
+      "bytes": 57859,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\top_geometry_live_replay_results.json",
-          "bytes": 56921,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\top_geometry_live_replay_results.json",
+          "bytes": 57859,
           "relative_path": "data/top_geometry_live_replay_results.json",
-          "sha256": "1b4c4644ad0614a0d9c1a0ea6923743ae4a60ba95bb874919570c7e6df455ac3"
+          "sha256": "64a332f86b80ee9c027842b91b6c7d9293293e564562b6e2112c3e91a276e78f"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\top_geometry_live_replay_results.json",
-          "bytes": 56921,
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\top_geometry_live_replay_results.json",
+          "bytes": 57859,
           "relative_path": "dashboard/data/top_geometry_live_replay_results.json",
-          "sha256": "1b4c4644ad0614a0d9c1a0ea6923743ae4a60ba95bb874919570c7e6df455ac3"
+          "sha256": "64a332f86b80ee9c027842b91b6c7d9293293e564562b6e2112c3e91a276e78f"
         }
       ],
       "domain_candidate_paths": [
@@ -1093,7 +1093,7 @@
       "error": "",
       "key": "top_geometry_live_replay_results",
       "required": false,
-      "sha256": "1b4c4644ad0614a0d9c1a0ea6923743ae4a60ba95bb874919570c7e6df455ac3",
+      "sha256": "64a332f86b80ee9c027842b91b6c7d9293293e564562b6e2112c3e91a276e78f",
       "source": "dashboard/data/top_geometry_live_replay_results.json",
       "source_exists": true,
       "target_hashes_match": true
@@ -1102,13 +1102,13 @@
       "bytes": 5167,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\real_noise_evidence_boundary_breaker.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\real_noise_evidence_boundary_breaker.json",
           "bytes": 5167,
           "relative_path": "data/real_noise_evidence_boundary_breaker.json",
           "sha256": "5cfaadff7d47b87507e01b50c43748ec6271789ec4793c04c12c95f802c73bd4"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\real_noise_evidence_boundary_breaker.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\real_noise_evidence_boundary_breaker.json",
           "bytes": 5167,
           "relative_path": "dashboard/data/real_noise_evidence_boundary_breaker.json",
           "sha256": "5cfaadff7d47b87507e01b50c43748ec6271789ec4793c04c12c95f802c73bd4"
@@ -1130,13 +1130,13 @@
       "bytes": 702247,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\real_noise_promotion_sweep.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\real_noise_promotion_sweep.json",
           "bytes": 702247,
           "relative_path": "data/real_noise_promotion_sweep.json",
           "sha256": "f20b21e53ea5d145b2c4c03c529868b4f4542fc79de0fad2c7bd3d1c0094b52e"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\real_noise_promotion_sweep.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\real_noise_promotion_sweep.json",
           "bytes": 702247,
           "relative_path": "dashboard/data/real_noise_promotion_sweep.json",
           "sha256": "f20b21e53ea5d145b2c4c03c529868b4f4542fc79de0fad2c7bd3d1c0094b52e"
@@ -1158,13 +1158,13 @@
       "bytes": 6562,
       "copied_targets": [
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\data\\geometry_execution_context_audit.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\data\\geometry_execution_context_audit.json",
           "bytes": 6562,
           "relative_path": "data/geometry_execution_context_audit.json",
           "sha256": "3a4a556c0176d37f6d58b15bd6a2f32d250594e50e717157d11040ba90afdcc6"
         },
         {
-          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\\dashboard\\data\\geometry_execution_context_audit.json",
+          "absolute_path": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\\dashboard\\data\\geometry_execution_context_audit.json",
           "bytes": 6562,
           "relative_path": "dashboard/data/geometry_execution_context_audit.json",
           "sha256": "3a4a556c0176d37f6d58b15bd6a2f32d250594e50e717157d11040ba90afdcc6"
@@ -1183,7 +1183,7 @@
       "target_hashes_match": true
     }
   ],
-  "generated_utc": "2026-07-05T06:02:43Z",
+  "generated_utc": "2026-07-09T02:54:43Z",
   "optional_feeds": [
     "top5_live_proof_submission_board",
     "deadline_evidence_bridge",
@@ -1237,7 +1237,7 @@
     "champion_source_ablation",
     "grant_readiness_status"
   ],
-  "safe_deploy_command": ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260705T060243Z\"",
+  "safe_deploy_command": ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\"",
   "schema": "live_domain_proof_feed_deploy_bundle_v1",
   "summary": {
     "broad_stack_deploy_allowed": false,
