@@ -26,8 +26,8 @@
       "patented"
     ]
   },
-  "gate_sha256": "52abc69fab439cfc567098eaa89f49e4bf6ca282ae4c61ecbf74aedd99a37928",
-  "generated_utc": "2026-07-09T04:12:32.464035+00:00",
+  "gate_sha256": "b3cf2990a73296585f1459fac0fe475954a9313247af4c48516d10dd95a1d4f1",
+  "generated_utc": "2026-07-09T04:17:19.716183+00:00",
   "manifest": [
     {
       "bytes": 8929,
@@ -63,6 +63,13 @@
       "name": "CURRENT_LANE_SYNC_STATUS_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/CURRENT_LANE_SYNC_STATUS_2026-07-09.md",
       "sha256": "c982dde7c868f4f9ac52829518edf2a3fe0bd87742e168cbbe3dfd409736a080"
+    },
+    {
+      "bytes": 10024,
+      "classification": "public_safe_markdown_review_required",
+      "name": "DATA_ROOM_MANIFEST_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
+      "sha256": "d3a5b0aaf45843cd66311e968a5a83d5af1dbb9225f83be098640a2021dd924c"
     },
     {
       "bytes": 5275,
@@ -568,7 +575,7 @@
     "boundary_hit_count": 39,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 23,
+    "markdown_file_count": 24,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0
