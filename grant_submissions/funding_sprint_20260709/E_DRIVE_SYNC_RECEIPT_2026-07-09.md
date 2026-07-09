@@ -23,6 +23,7 @@ Contents:
 - Reviewer approval crosswalk: `REVIEWER_APPROVAL_CROSSWALK_2026-07-09.md`.
 - Institutional trust gate: `INSTITUTIONAL_TRUST_GATE_2026-07-09.md`.
 - Key governance firewall: `KEY_GOVERNANCE_FIREWALL_2026-07-09.md`.
+- Reviewer/investor fast-lane router: `REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md`.
 - Kraken paper innovation control room: `docs/KRAKEN_PAPER_INNOVATION_CONTROL_ROOM_2026-07-09.md`.
 - Kraken institutional alpha gauntlet: `docs/KRAKEN_INSTITUTIONAL_ALPHA_GAUNTLET_2026-07-09.md`.
 - Air Force AAC RFI capability statement: `LUMENCORE_AAC_RFI_RESPONSE_SAF-AQ-RFI-26-0001_2026-07-09.pdf`.
@@ -49,6 +50,7 @@ Contents:
 - Reviewer approval crosswalk.
 - Institutional trust gate.
 - Key governance firewall.
+- Reviewer/investor fast-lane router.
 - Kraken paper innovation control room.
 - Kraken institutional alpha gauntlet.
 - Air Force AAC RFI capability statement.
@@ -71,6 +73,7 @@ Contents:
 - Reviewer approval crosswalk.
 - Institutional trust gate.
 - Key governance firewall.
+- Reviewer/investor fast-lane router.
 - Kraken paper innovation control room.
 - Kraken institutional alpha gauntlet.
 - Air Force AAC RFI capability statement.
@@ -91,6 +94,8 @@ The reviewer approval crosswalk is the post-SAM front-door navigation layer. It 
 The institutional trust gate is the master reviewer/investor/agency/IP/quant diligence gate. It unifies agency protocol, commercial diligence, IP defense, technical evidence, autonomous quant safety, and custody readiness while preserving human gates for final submissions, filings, terms, trading, and capital-impacting actions.
 
 The key governance firewall makes the local live-key posture inspectable without exposing credential values. It tracks presence, provider purpose, LumaScout media-source posture, and blocked write/spend/account-mutation actions while keeping all final use human-gated.
+
+The reviewer/investor fast-lane router is the newest front-door navigation layer. It routes eight common diligence questions to exact artifacts for reviewer start, agency protocol, IP/counsel, live-source governance, traction/deadline action, autonomous quant safety, commercialization/customer value, and investor profile/terms while preserving human gates.
 
 The Kraken paper innovation and institutional alpha gauntlet layers prove paper/replay research posture, public-market alpha scanning, and strict live-promotion blockers. They do not authorize live trading, private API use, order placement, capital movement, investment advice, performance claims, hedge-fund suitability, or custody/compliance approval.
 

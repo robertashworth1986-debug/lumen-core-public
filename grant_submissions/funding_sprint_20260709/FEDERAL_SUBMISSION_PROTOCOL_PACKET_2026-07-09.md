@@ -16,7 +16,7 @@ This packet is a protocol-control artifact. It does not authorize external sends
 - Unsafe claim hits: `0`
 - All final actions blocked without human: `true`
 - Human protocol required: `true`
-- Data-room Markdown artifacts: `35`
+- Data-room Markdown artifacts: `43`
 - Autonomous governance ready: `true`
 - IP counsel packet ready: `true`
 - External send without human: `false`
@@ -26,7 +26,7 @@ This packet is a protocol-control artifact. It does not authorize external sends
 - CUI processing claimed: `false`
 - CMMC status claimed: `false`
 - Award eligibility claimed: `false`
-- Packet SHA-256: `59015b4a1f6e9c19a0f4d2a578538e190b73fbf0a9b1d86ce64f126ab625b47f`
+- Packet SHA-256: `d6d0d121b12a72b21e806867b9239e88dee57f62c5787f0d0caa552442923785`
 
 ## Local Readiness Snapshot
 
@@ -161,11 +161,11 @@ This packet is a protocol-control artifact. It does not authorize external sends
 ## Evidence Sources
 
 - `grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md` | present=`true` | bytes=`8929` | sha256=`fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82`
-- `grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md` | present=`true` | bytes=`12244` | sha256=`33729e97c76654038738ed2e09d489443fd47f66ab56c317b86593d1643f9f62`
-- `grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md` | present=`true` | bytes=`18779` | sha256=`1271ddbcfe306c67b25eebddf3c5cce71eb1e9db1fa70ec8d928e40d43d86eb2`
-- `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` | present=`true` | bytes=`14015` | sha256=`b1af6ea2924704771b432efb419b0523a41d1f0c7f085ed60de62fc4b5991052`
-- `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` | present=`true` | bytes=`9907` | sha256=`0e5cf6b23334fed68895f117a61a47238e0ea27ba9bed7103739fc19f9ba8d59`
+- `grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md` | present=`true` | bytes=`12244` | sha256=`2ad9dc23db613c11f71c7f2df29cecfe437ff43744f52f2f98ef5a9f64bf39ec`
+- `grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md` | present=`true` | bytes=`24099` | sha256=`cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390`
+- `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` | present=`true` | bytes=`20001` | sha256=`81a4f42d51f72e9c51e7cd645b804c3a47e64dbe65cf6ca02faa99d7b45419b6`
+- `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` | present=`true` | bytes=`9907` | sha256=`628e5b547f0ffbc826b736f5c6943e5ffe00cd53e70964476b07b8b6ded526b6`
 - `grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md` | present=`true` | bytes=`6300` | sha256=`f04cfca6d7b388c97303e354aaf9229ba3d46d57f54c6f56110d4ade89dd82b3`
-- `grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md` | present=`true` | bytes=`19009` | sha256=`07d7e86cb5205503c0b9a32df7965dec95791afaeef12d44d15aad3aa5847b85`
-- `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` | present=`true` | bytes=`6279` | sha256=`658b8bb447ef10afedff9f24bb85d62888fd9e4ff09b7e9acc5ad488f809335e`
+- `grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md` | present=`true` | bytes=`24904` | sha256=`605727c98501b70d27bd4382788a91a0dc0dab33eff7ca4fea241ff5a1bf2f2d`
+- `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` | present=`true` | bytes=`6279` | sha256=`4991e2987170730bdae09dde8716d651e1f835cdbbc032653273367fc68fb6e3`
 - `data/company_profile.json` | present=`true` | bytes=`3682` | sha256=`16086b05d3d5e4af4910fec49cafefc8918ac05ed237f68f471a2834898efe55`

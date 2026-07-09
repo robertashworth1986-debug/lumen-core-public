@@ -48,22 +48,22 @@
       "sha256": "78f1356655372083a0906010cbfd669a409077c26bd1e46998fb1aaf6da7fcf8"
     },
     {
-      "bytes": 13119,
+      "bytes": 14808,
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
       "present": true,
-      "sha256": "ca7426b9764be2fcb4448abd07d823a260a42b906ad79bdfddd97c25cc41b677"
+      "sha256": "4ed880fa0e89bee869977d7da83b8e6c9aba6c1f57d73e4dc2b905da965e1a02"
     },
     {
-      "bytes": 18765,
+      "bytes": 24099,
       "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
       "present": true,
-      "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
+      "sha256": "cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390"
     },
     {
-      "bytes": 13939,
+      "bytes": 20001,
       "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
       "present": true,
-      "sha256": "7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672"
+      "sha256": "81a4f42d51f72e9c51e7cd645b804c3a47e64dbe65cf6ca02faa99d7b45419b6"
     },
     {
       "bytes": 9037,
@@ -72,19 +72,19 @@
       "sha256": "95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762"
     },
     {
-      "bytes": 11607,
+      "bytes": 24904,
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
       "present": true,
-      "sha256": "5f1bd8ab1877f7dc3a758f05e6d783373573c1683a7f447c1b3618777731323c"
+      "sha256": "605727c98501b70d27bd4382788a91a0dc0dab33eff7ca4fea241ff5a1bf2f2d"
     },
     {
       "bytes": 6279,
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "present": true,
-      "sha256": "d6f0d7892ef604905266dc6db3b15c5ea7beeb066770bb13b2b0f8e3bf75b412"
+      "sha256": "4991e2987170730bdae09dde8716d651e1f835cdbbc032653273367fc68fb6e3"
     }
   ],
-  "generated_utc": "2026-07-09T18:55:44.403372+00:00",
+  "generated_utc": "2026-07-09T22:46:21.278817+00:00",
   "human_gate": {
     "investor_ip_claim_expansion_allowed_without_human": false,
     "legal_filing_allowed_without_human": false,
@@ -130,7 +130,7 @@
       "reviewer_safe_summary": "Autonomous research and replay evaluation loops operate under human-gated execution controls and immutable audit logging."
     }
   ],
-  "ip_counsel_diligence_packet_sha256": "ca8278642d5dfe1b0ee45b9698b4cdf272550a3000e2b69140dcf7e88cdc2839",
+  "ip_counsel_diligence_packet_sha256": "08a573a732c44da601bf557256fb56edeb9d5f6e97bd0d4aa1a9f15774e99504",
   "official_sources": [
     {
       "label": "USPTO provisional application guidance",
@@ -190,7 +190,7 @@
     "all_final_actions_blocked_without_human": true,
     "clearance_to_operate_claimed": false,
     "counsel_question_count": 6,
-    "data_room_markdown_count": 26,
+    "data_room_markdown_count": 43,
     "evidence_artifact_count": 8,
     "human_patent_center_check_required": true,
     "intake_item_count": 5,
@@ -202,7 +202,7 @@
     "official_source_count": 5,
     "patent_grant_claimed": false,
     "public_disclosure_review_required": true,
-    "qa_count": 12,
+    "qa_count": 13,
     "reviewer_gate_clear": true,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0

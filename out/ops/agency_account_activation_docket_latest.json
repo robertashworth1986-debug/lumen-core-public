@@ -1,5 +1,5 @@
 {
-  "activation_docket_sha256": "45542f3a53eb7b7d0779721ad0a3ce3a0ee6ee9bd7f3baffe5b9cc7f9e9784fb",
+  "activation_docket_sha256": "7b727dcadd33b4619f64fc94861d6b1179fdb35aeca5ee000728da906861b767",
   "activation_rows": [
     {
       "blocks": [
@@ -196,31 +196,31 @@
       "bytes": 12389,
       "path": "out/ops/federal_submission_protocol_packet_latest.json",
       "present": true,
-      "sha256": "67e0c97d97eaad6b2d3d97e212214ca089c025057fb3b117a87c042591085adb"
+      "sha256": "d2964bb2f758d8d12f6b1b9b7c17650d9587c6b6bb142a1ab195e631197b1267"
     },
     {
-      "bytes": 26227,
+      "bytes": 33418,
       "path": "out/ops/submission_authority_matrix_latest.json",
       "present": true,
-      "sha256": "157a95c4f9607beba3fa7aa9894c586a80cec2ace86632b60b2bc567baf7239c"
+      "sha256": "616519280f524711e6e11c43e059a90cb5490efbcd3f29f4e22530dd3f6fa1ca"
     },
     {
-      "bytes": 33617,
+      "bytes": 44204,
       "path": "out/ops/data_room_manifest_latest.json",
       "present": true,
-      "sha256": "5db8855fd7e825ed6fd64d1d261a47aa33e18989518777877d8d92cb2eeba633"
+      "sha256": "b34649d4ce5f7e14e99c2f907ecdd5c59810a5fd27e572d351c59d10a3172976"
     },
     {
-      "bytes": 37344,
+      "bytes": 43851,
       "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
       "present": true,
-      "sha256": "e6f4f78ab0625f3e4f1a4c6c13c93943afd537df2fd9fcb300ffd3abfa7ea345"
+      "sha256": "91c64eb492f94298a555dadbfc7b060105b5d93b54c6927e7459acdb401a27a0"
     },
     {
       "bytes": 11291,
       "path": "out/ops/ip_counsel_diligence_packet_latest.json",
       "present": true,
-      "sha256": "51fed2d69e85dc589429af22f19590f4db11ce1e0e593257ceaea512cc423ba1"
+      "sha256": "c5a45e976a556482c349a09e931f6bd5fc5c3a4867c387893e559378211edf70"
     },
     {
       "bytes": 10038,
@@ -229,7 +229,7 @@
       "sha256": "fb2fa17cfc4da39ec4c95659e679462fba202af881d2ebad4307419261a77c81"
     }
   ],
-  "generated_utc": "2026-07-09T20:24:17.682255+00:00",
+  "generated_utc": "2026-07-09T22:46:21.989120+00:00",
   "human_stop_rule": "Prepare only. Human controls credentials, legal authority certifications, portal submit, uploads, shares, pricing, representations, and final acceptance.",
   "local_readiness": {
     "blocked_readiness_count": 6,
@@ -314,8 +314,8 @@
     "calendar_or_meeting_invite_allowed_without_human": false,
     "certification_allowed_without_human": false,
     "credential_entry_allowed_without_human": false,
-    "data_room_control_artifact_count": 34,
-    "data_room_markdown_count": 35,
+    "data_room_control_artifact_count": 48,
+    "data_room_markdown_count": 43,
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "human_required_item_count": 8,

@@ -67,7 +67,7 @@ QA_ROWS = [
     },
     {
         "question": "What traction is strongest right now?",
-        "answer": "The strongest live signals are EVTit/Black Dog meeting prep, LvlUp First Check review watch, DARPA DICE full-proposal sprint, FHWA TSMO, NASA data-center RFI, DSIP MissionWeave, NSF Project Pitch, and patent counsel urgency.",
+        "answer": "The strongest live signals are SAM.gov validation watch, EVTit/Black Dog meeting prep, LANL VISION licensing follow-up, USPTO Georgia PATENTS routing, LvlUp First Check review watch, DARPA DICE full-proposal sprint, FHWA TSMO, NASA data-center RFI, DSIP MissionWeave, NSF Project Pitch, and buyer-discovery signals such as Protecnium ITS infrastructure.",
         "evidence_artifacts": [
             "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
@@ -78,7 +78,7 @@ QA_ROWS = [
     },
     {
         "question": "Which actions are urgent?",
-        "answer": "The current urgent actions are EVTit meeting prep, DICE full-proposal compliance build, and OpenAI API continuity routing.",
+        "answer": "The current urgent actions are SAM.gov validation monitoring, EVTit meeting/build-scope follow-up, LANL VISION licensing follow-up, USPTO Georgia PATENTS counsel routing, DARPA DICE full-proposal compliance build, and OpenAI API continuity routing.",
         "evidence_artifacts": [
             "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
@@ -96,6 +96,18 @@ QA_ROWS = [
         "claim_boundary": "Internal preparation is not external authorization.",
         "decision_use": "Preserve speed while respecting legal, agency, and account gates.",
         "human_gate": "Named authority gate per lane in the authority matrix.",
+    },
+    {
+        "question": "How are live-source credentials and premium social lanes protected?",
+        "answer": "The key governance firewall keeps YouTube, Spotify, Meta/Facebook, and other live-source lanes environment-driven and read-only for proof generation, while blocking public posting, ad spend, account mutation, live trading, withdrawals, and capital movement.",
+        "evidence_artifacts": [
+            "grant_submissions/funding_sprint_20260709/KEY_GOVERNANCE_FIREWALL_2026-07-09.md",
+            "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
+            "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
+        ],
+        "claim_boundary": "Credential presence is not permission to write, spend, trade, mutate accounts, publish private provider data, or bypass human approval.",
+        "decision_use": "Show technical reviewers and investors that premium/live data can increase proof quality without increasing account-control risk.",
+        "human_gate": "Human approval before any external account action, write action, spend, credential rotation, or public release.",
     },
     {
         "question": "What proof exists for government protocol readiness?",

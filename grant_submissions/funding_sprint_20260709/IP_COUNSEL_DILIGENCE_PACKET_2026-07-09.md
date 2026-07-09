@@ -23,7 +23,7 @@ This packet is not legal advice. It does not claim patent grant, patentability, 
 - Public disclosure review required: `true`
 - Licensed counsel required: `true`
 - Human Patent Center check required: `true`
-- Packet SHA-256: `ca8278642d5dfe1b0ee45b9698b4cdf272550a3000e2b69140dcf7e88cdc2839`
+- Packet SHA-256: `08a573a732c44da601bf557256fb56edeb9d5f6e97bd0d4aa1a9f15774e99504`
 
 ## Official Sources
 
@@ -155,9 +155,9 @@ This packet is not legal advice. It does not claim patent grant, patentability, 
 
 - `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md` | present=`true` | bytes=`7643` | sha256=`274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb`
 - `grant_submissions/PATENT_LEGAL_RESCUE_PACKET_2026-06-20.md` | present=`true` | bytes=`6455` | sha256=`78f1356655372083a0906010cbfd669a409077c26bd1e46998fb1aaf6da7fcf8`
-- `grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md` | present=`true` | bytes=`13119` | sha256=`ca7426b9764be2fcb4448abd07d823a260a42b906ad79bdfddd97c25cc41b677`
-- `grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md` | present=`true` | bytes=`18765` | sha256=`f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd`
-- `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` | present=`true` | bytes=`13939` | sha256=`7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672`
+- `grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md` | present=`true` | bytes=`14808` | sha256=`4ed880fa0e89bee869977d7da83b8e6c9aba6c1f57d73e4dc2b905da965e1a02`
+- `grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md` | present=`true` | bytes=`24099` | sha256=`cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390`
+- `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` | present=`true` | bytes=`20001` | sha256=`81a4f42d51f72e9c51e7cd645b804c3a47e64dbe65cf6ca02faa99d7b45419b6`
 - `grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md` | present=`true` | bytes=`9037` | sha256=`95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762`
-- `grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md` | present=`true` | bytes=`11607` | sha256=`5f1bd8ab1877f7dc3a758f05e6d783373573c1683a7f447c1b3618777731323c`
-- `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` | present=`true` | bytes=`6279` | sha256=`d6f0d7892ef604905266dc6db3b15c5ea7beeb066770bb13b2b0f8e3bf75b412`
+- `grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md` | present=`true` | bytes=`24904` | sha256=`605727c98501b70d27bd4382788a91a0dc0dab33eff7ca4fea241ff5a1bf2f2d`
+- `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` | present=`true` | bytes=`6279` | sha256=`4991e2987170730bdae09dde8716d651e1f835cdbbc032653273367fc68fb6e3`
