@@ -17,15 +17,15 @@ This docket is preparation-only. It does not authorize credentials, certificatio
 - Reviewer gate clear: `true`
 - Unsafe sensitive hits: `0`
 - Unsafe claim hits: `0`
-- Data-room Markdown artifacts: `31`
-- Data-room control artifacts: `26`
+- Data-room Markdown artifacts: `32`
+- Data-room control artifacts: `28`
 - Portal action without human: `false`
 - Credential entry without human: `false`
 - Certification without human: `false`
 - Final submission without human: `false`
 - External send without human: `false`
 - Live trading allowed: `false`
-- Docket SHA-256: `cd2b3e1b3621ba5031b777100260ed6330c45b40a3d514c4505d8a48c8a6fc97`
+- Docket SHA-256: `e798ae2f0895b601cc9c2ac7b22c83add56a06da68c973d6bc31957917197963`
 
 ## Local Readiness Signals
 
@@ -271,10 +271,10 @@ Blocks:
 
 - `data/company_profile.json` | present=`true` | bytes=`3682` | sha256=`16086b05d3d5e4af4910fec49cafefc8918ac05ed237f68f471a2834898efe55`
 - `out/ops/sam_gov_entity_status_capture_latest.json` | present=`true` | bytes=`1655` | sha256=`570ab86d35f12b860b4e7929f2b406fa09571c570b84b77c09c75f654ab66228`
-- `out/ops/federal_submission_protocol_packet_latest.json` | present=`true` | bytes=`12389` | sha256=`1680a32214f50979a1b80b75dfd0723017fbbdf78dff7d14e37305b5edc39a59`
+- `out/ops/federal_submission_protocol_packet_latest.json` | present=`true` | bytes=`12389` | sha256=`03a8044008e815f0f3cbd5b65492db62870ee026ac3a0f41db99bd599a1a8ac1`
 - `out/ops/submission_authority_matrix_latest.json` | present=`true` | bytes=`26227` | sha256=`157a95c4f9607beba3fa7aa9894c586a80cec2ace86632b60b2bc567baf7239c`
-- `out/ops/data_room_manifest_latest.json` | present=`true` | bytes=`27649` | sha256=`818d490ef40dd82f78c1ab6aef5b8abb0708c51971550de9b0cf825c09a4aaf9`
-- `out/ops/funding_sprint_reviewer_gate_latest.json` | present=`true` | bytes=`34804` | sha256=`8fc26fe9d0c72ba9bf1c6f46f4cbc0245206ebd3aefe7bd67848b770aeb97002`
+- `out/ops/data_room_manifest_latest.json` | present=`true` | bytes=`29123` | sha256=`75fc37a822076549b422adceb68d45283de20530f33835b30f31b89d5cc48280`
+- `out/ops/funding_sprint_reviewer_gate_latest.json` | present=`true` | bytes=`36251` | sha256=`3e22621b3b01aa88c827f36c330c0030636c67e89161198ad14038b3c3c8ef63`
 - `out/ops/ip_counsel_diligence_packet_latest.json` | present=`true` | bytes=`11291` | sha256=`51fed2d69e85dc589429af22f19590f4db11ce1e0e593257ceaea512cc423ba1`
 - `out/ops/autonomous_quant_governance_packet_latest.json` | present=`true` | bytes=`10038` | sha256=`fb2fa17cfc4da39ec4c95659e679462fba202af881d2ebad4307419261a77c81`
 

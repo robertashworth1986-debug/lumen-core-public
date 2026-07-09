@@ -26,15 +26,15 @@
       "patented"
     ]
   },
-  "gate_sha256": "06a688a2fd6054ee33f7c9321ceb3985928020c2d3daf80686f8674ef41317fd",
-  "generated_utc": "2026-07-09T19:43:58.830196+00:00",
+  "gate_sha256": "2375d4b3b3823aa9bde7869719182f156db58276f887ef39999393bb770b83d4",
+  "generated_utc": "2026-07-09T20:05:00.874659+00:00",
   "manifest": [
     {
       "bytes": 12244,
       "classification": "public_safe_markdown_review_required",
       "name": "AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
-      "sha256": "fad6596005d8865a518884ffbd640c390f2f942ca1ed0eb85c048bd8fb57930d"
+      "sha256": "e3f74c67625abbbdedc5875fe6c6bd2259e557073bf26b0f5b85aad4fb4bc289"
     },
     {
       "bytes": 8929,
@@ -79,11 +79,11 @@
       "sha256": "c982dde7c868f4f9ac52829518edf2a3fe0bd87742e168cbbe3dfd409736a080"
     },
     {
-      "bytes": 15645,
+      "bytes": 16472,
       "classification": "public_safe_markdown_review_required",
       "name": "DATA_ROOM_MANIFEST_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
-      "sha256": "c40bd4faaf4c5f4eeff73250da3956f5b0d526dbe2c52aa3c322f0f485c2a3c2"
+      "sha256": "cc75babf0d875d91b6b3049dffe3da090a835af24544f74e02d7200beb040948"
     },
     {
       "bytes": 5275,
@@ -93,11 +93,11 @@
       "sha256": "cf0d3fd466ecfd8396d17f1c4787a7fa2898f49ee5f81ed377df05aa161029c4"
     },
     {
-      "bytes": 2257,
+      "bytes": 2426,
       "classification": "public_safe_markdown_review_required",
       "name": "E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-      "sha256": "f04b12dfd301a795b56ad0ab10a6672b48485769f82e2ce3d30234e5faeaab33"
+      "sha256": "1b0133a24c0b0a16706bef355def40936ecd7f850d0694188d8ff2eafb4d2993"
     },
     {
       "bytes": 1263,
@@ -118,7 +118,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
-      "sha256": "11b7a2c77c5fa59223da880c23b7d6335adc35199688453b112a99e84a2883a6"
+      "sha256": "3059f5404934b81bc5ad670a7005c0448803c4591b61496542555b6e2b25a679"
     },
     {
       "bytes": 6109,
@@ -161,6 +161,13 @@
       "name": "LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
       "sha256": "95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762"
+    },
+    {
+      "bytes": 7867,
+      "classification": "public_safe_markdown_review_required",
+      "name": "MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
+      "sha256": "2aa3e2e80e5ebb68a085080b0466b3f40d42df8cfb67ab98dfbdcf5957fd7e7c"
     },
     {
       "bytes": 5614,
@@ -334,7 +341,7 @@
   ],
   "reviewer_gate_clear": true,
   "scan": {
-    "boundary_hit_count": 42,
+    "boundary_hit_count": 45,
     "boundary_hits": [
       {
         "classification": "boundary_language",
@@ -479,14 +486,14 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-        "line": 54,
+        "line": 57,
         "phrase": "realized savings",
         "text": "This sync proves file custody and package availability. It does not prove agency approval, cybersecurity certification, patentability, patent ownership, freedom to operate, investor value, trading performance, field validation, realized savings, or final submission acceptance."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-        "line": 54,
+        "line": 57,
         "phrase": "freedom to operate",
         "text": "This sync proves file custody and package availability. It does not prove agency approval, cybersecurity certification, patentability, patent ownership, freedom to operate, investor value, trading performance, field validation, realized savings, or final submission acceptance."
       },
@@ -552,6 +559,27 @@
         "line": 235,
         "pattern": "secret",
         "text": "- \"trade secrets disclosed in full.\""
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
+        "line": 5,
+        "phrase": "realized savings",
+        "text": "This register is an evidence inventory. It does not authorize source-rights claims, field validation language, realized savings language, final submissions, live trading, or autonomous external actions."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
+        "line": 47,
+        "phrase": "realized savings",
+        "text": "- Do not claim realized savings."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
+        "line": 48,
+        "phrase": "guaranteed award",
+        "text": "- Do not claim guaranteed award."
       },
       {
         "classification": "boundary_language",
@@ -642,10 +670,10 @@
   "summary": {
     "all_cards_present": true,
     "autonomous_external_action_allowed": false,
-    "boundary_hit_count": 42,
+    "boundary_hit_count": 45,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 31,
+    "markdown_file_count": 32,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0

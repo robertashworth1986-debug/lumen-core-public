@@ -11,6 +11,7 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - `AUTONOMOUS_QUANT_INNOVATION_SAFETY_PROTOCOL_2026-07-09.md`
 - `FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md`
 - `AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md`
+- `MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md`
 - `EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md`
 
 ## New Machine Control Files
@@ -19,21 +20,23 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - `dashboard/data/federal_submission_protocol_packet.json`
 - `out/ops/agency_account_activation_docket_latest.json`
 - `dashboard/data/agency_account_activation_docket.json`
+- `out/ops/measured_source_evidence_register_latest.json`
+- `dashboard/data/measured_source_evidence_register.json`
 - `out/ops/traction_followup_packet_latest.json`
 - `dashboard/data/traction_followup_packet.json`
 
 ## Latest Verified Sync Result
 
-- Latest layer: `agency_account_activation_docket`
-- Source files: `60`
+- Latest layer: `measured_source_evidence_register`
+- Source files: `63`
 - Target count: `3`
-- Total copied artifacts across targets: `267`
-- Total SHA-256 checks: `267`
+- Total copied artifacts across targets: `282`
+- Total SHA-256 checks: `282`
 - Problem count: `0`
 - Reviewer gate status: `REVIEWER_GATE_CLEAR_HUMAN_SUBMISSION_REQUIRED`
 - Data-room status: `DATA_ROOM_MANIFEST_READY`
-- Data-room Markdown artifacts: `31`
-- Data-room machine controls: `26`
+- Data-room Markdown artifacts: `32`
+- Data-room machine controls: `28`
 
 ## Destination Set
 
