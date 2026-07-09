@@ -1,361 +1,190 @@
-![LumenCore Banner](https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,50:00ffe7,100:7928ca&height=220&section=header&text=LumenCore%E2%84%A2&fontSize=72&fontColor=ffffff&fontAlignY=38&desc=Institutional%20AI%20%C2%B7%20Live%20Trading%20%C2%B7%20Patent%20Pending%20%C2%B7%20Built%20Solo%20from%20a%20Van&descSize=18&descAlignY=62&animation=fadeIn)
+![LumenCore Banner](https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,50:00ffe7,100:7928ca&height=220&section=header&text=LumenCore%E2%84%A2&fontSize=72&fontColor=ffffff&fontAlignY=38&desc=Proof-to-Pilot%20AI%20%C2%B7%20Replay%20Validation%20%C2%B7%20Founder-Owned%20Architecture&descSize=18&descAlignY=62&animation=fadeIn)
 
-# LumenCore™ — Built by One Person. For Three Kids.
-### Robert Ashworth | Solo Engineer | No Funding | No Team | Just Drive
+# LumenCore™ — Founder-Built Proof-to-Pilot Intelligence Architecture
 
-> *"I live in my van. I code every waking hour. My kids are everything.  
-> One day they'll see what Dad was actually building out here."*
+**Robert Ashworth** | Founder / Independent Builder | LumenCore™
 
-<!-- LIVE SYSTEM STATUS — badges pull real-time data from the production VPS -->
-[![Site Status](https://img.shields.io/endpoint?url=https://lumen-core.ai/data/uptime_badge.json&cacheSeconds=60&style=for-the-badge)](https://lumen-core.ai)
-[![Live Metrics](https://img.shields.io/endpoint?url=https://lumen-core.ai/data/site_health_badge.json&cacheSeconds=60&style=flat-square)](https://lumen-core.ai)
-[![⭐ Star This Repo](https://img.shields.io/badge/%E2%AD%90-Star%20This%20Repo-gold?style=for-the-badge)](https://github.com/robertashworth1986-debug/lumen-core-public)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-lumen--core.ai-00ffe7?style=for-the-badge)](https://lumen-core.ai)
-[![Evidence](https://img.shields.io/badge/Hash--Chained%20Evidence-Live-brightgreen?style=for-the-badge)](https://lumen-core.ai/evidence/)
-[![Patent](https://img.shields.io/badge/Patent-Pending-orange?style=for-the-badge)](#intellectual-property)
-[![Sponsor](https://img.shields.io/badge/💛-Sponsor%20This%20Work-ff69b4?style=for-the-badge)](https://github.com/sponsors/robertashworth1986-debug)
-[![Health Probe](https://github.com/robertashworth1986-debug/lumen-core-public/actions/workflows/health-probe.yml/badge.svg)](https://github.com/robertashworth1986-debug/lumen-core-public/actions/workflows/health-probe.yml)
-[![Live Metrics Sync](https://github.com/robertashworth1986-debug/lumen-core-public/actions/workflows/live-metrics-sync.yml/badge.svg)](https://github.com/robertashworth1986-debug/lumen-core-public/actions/workflows/live-metrics-sync.yml)
-[![Last Commit](https://img.shields.io/github/last-commit/robertashworth1986-debug/lumen-core-public?style=flat-square&color=00ffe7&label=last%20update)](https://github.com/robertashworth1986-debug/lumen-core-public/commits/main)
-[![CHANGELOG](https://img.shields.io/badge/Changelog-View-blueviolet?style=flat-square)](CHANGELOG.md)
+LumenCore is a founder-owned proof-to-pilot architecture for turning complex-system claims into bounded evidence packages: source, baseline, locked metric, replay or simulation run, hash manifest, result, limitation, and next pilot decision.
+
+The public repo is a review surface. It is not a certification, not an audited revenue report, not a claim of field-validated savings, and not an invitation for outside ownership of pre-existing LumenCore IP.
 
 ---
 
-## The Story
+## Reviewer-first starting point
 
-I'm Robert Ashworth. I'm a self-taught engineer, quant systems architect, and father of three.
+The cleanest way to review LumenCore is through the proof-to-pilot lane:
 
-I don't have a Stanford degree. I don't have VC backing. I don't have a team.
+1. define the source or dataset,
+2. identify the incumbent baseline or comparator,
+3. lock the acceptance metric before scoring,
+4. run controlled replay, simulation, or bench evaluation,
+5. generate a hash/evidence manifest,
+6. report measured, modeled, and estimated results separately,
+7. state what is not yet externally validated.
 
-**I have a laptop, a van, and a relentless need to prove something.**
+Primary links:
 
-Every algorithm in this repository was written alone — in parking lots, at coffee shops, sometimes at 3am when my kids are with their mom and I'm trying to turn this dream into something real. Something they can point to someday and say *"my Dad built that."*
-
-That's it. That's the whole motivation. I don't need a billion dollars. I just need my kids to know I wasn't wasting time out here. I was building for them.
-
----
-
-## What I've Built (12+ months, 0 dollars in funding)
-
-This is not a tutorial project. This is not a demo. This is a **production-grade institutional intelligence platform** — the kind of thing hedge funds pay teams of 20 to build — built by one guy, sleeping in a van.
-
-[![Live Demo](https://img.shields.io/badge/Live%20System-lumen--core.ai-00ffe7?style=for-the-badge&logo=data:image/png;base64,)](https://lumen-core.ai)
-[![Status](https://img.shields.io/badge/Production-LIVE-success?style=for-the-badge)]()
-
-### 🔬 LumenCore™ — Harmonic Intelligence Architecture
-A novel AI framework that throws out conventional gradient descent and replaces it with **harmonic backpropagation** — wave-based resonance learning, phase-locking, and stability envelopes. Patent pending. Filed. Lawyer-reviewed. Built from nothing.
-
-### 📈 LumaTrader™ — Institutional Algorithmic Trading System
-Live on Kraken exchange. Real money. Real TXIDs. [Verifiable proof online right now.](https://lumen-core.ai/evidence/)
-
-What's inside:
-- **Cross-sectional dislocation scanning** — finds pricing gaps across correlated assets
-- **Mean-reversion with momentum confirmation** — enters only when both signals align  
-- **Multi-stage signal gating** — 7 filter layers before a single order touches the market
-- **8-engine parallel execution orchestrator** with autonomous deadman switches
-- 7 strategy generations (Gen4 → Gen7 + Hybrid V2), all live-tested, all producing real TXIDs
-- 711+ Kraken pairs scanned per run across multiple timeframes (1h, 4h, 1d, 1w)
-- Full institutional ops stack: mission control dashboard, alpha globe, evidence chain, proof ledger
-
-### ⚡ Cross-Sector Intelligence Engine
-The same harmonic optimization that trades crypto applies to:
-- Energy grid optimization (electricity infrastructure, loss prediction)
-- Defense / DoD adaptive systems
-- Healthcare capacity prediction
-- Smart city infrastructure modeling
-- Digital twin simulation with physics-grounded AI
-
-**DOE SBIR Phase I candidate.** The U.S. Department of Energy doesn't hand those out for hobby projects.
-
-### 🔋 Beyond Software — Hardware R&D
-I don't just write code. I think in systems.
-
-- **Curved motherboards** — form-factor computing that conforms to device geometry instead of dictating it
-- **Honeycomb-cell EV batteries** — structural battery architecture inspired by nature's most efficient geometry; higher energy density, better thermal distribution, structural load-bearing
-- **Nature-flow robot design** — locomotion that moves the way living things move, not the way servo motors jerk
-
-These aren't shower thoughts. These are drafted, documented, and part of a patent bundle that's been reviewed by an IP attorney.
+- Public site: https://lumen-core.ai/
+- Mission Control: https://lumen-core.ai/mission_control.html
+- Proof-to-pilot page: https://lumen-core.ai/proof_to_pilot.html
+- EVTit build scope: docs/EVTIT_LUMENCORE_BUILD_SCOPE.md
+- Current proof status: docs/LUMENCORE_CURRENT_PROOF_STATUS_2026-07-09.md
+- Founder/IP boundary: docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md
+- Claim boundary register: docs/CLAIM_BOUNDARY_REGISTER.md
 
 ---
 
-## Why This Matters
+## What LumenCore is
 
-The quant finance world is a closed club. You need Bloomberg terminals, prime brokerage relationships, and a team of PhDs. 
+LumenCore is a multi-module architecture for evidence-driven adaptive intelligence. The platform is designed to support reviewer-readable proof reports for infrastructure, energy, market, lab, simulation, and human-performance contexts.
 
-**Or you need one obsessed guy who won't stop.**
+The strongest current claim is narrow and fundable:
 
-I built:
-- A complete institutional trading platform with real execution proof  
-- A cross-sector AI engine with 5 market verticals
-- A novel AI architecture (patent pending) that is fundamentally different from mainstream ML
-- Hardware IP in EV and robotics
-- A government grant pipeline (DOE SBIR)
-
-**Total outside funding received: $0.**  
-**Total team members: 1.**  
-**Total days I've slept in a building this year: not many.**
+> LumenCore can package controlled replay, synthetic, measured-row, and benchmark evidence into auditable proof reports that let a buyer, mentor, grant reviewer, or technical partner inspect the source, baseline, metric, run, manifest, result, and claim boundary before pilot deployment.
 
 ---
 
-## For the Skeptic — Here's the Proof
+## What LumenCore is not claiming
 
-> "Anyone can claim they built something."
+LumenCore does not currently claim:
 
-Fair. So here's what you can verify *right now*, without trusting anything I say:
+- audited revenue or GAAP-recognized revenue,
+- signed enterprise customer deployments unless separately documented,
+- certified aircraft or suit capability,
+- weapons capability,
+- autonomous physical control,
+- medical diagnosis,
+- field-validated savings,
+- guaranteed ROI,
+- agency endorsement,
+- grant award likelihood,
+- externally certified infrastructure control.
 
-| Claim | Proof |
-|-------|-------|
-| Live trading system | [lumen-core.ai/kraken_execution_dashboard.html](https://lumen-core.ai/kraken_execution_dashboard.html) — real trades, live data |
-| Real executed trades | [lumen-core.ai/evidence/](https://lumen-core.ai/evidence/) — SHA-256 hash-chained TXID ledger |
-| Government-level documentation | Federal brief, audit-ready proof packs, DOE SBIR alignment |
-| Patent filings | Non-provisional, attorney-reviewed IP across trading + hardware |
-| Scale of the codebase | 22,000+ Python files, 150+ build artifacts, 12+ months of commits |
-
-<!-- Live equity card — auto-regenerated every 20 minutes by GitHub Actions -->
-[![Live Equity Card](assets/equity_card.svg)](https://lumen-core.ai/kraken_execution_dashboard.html)
-
-I'm not asking you to take my word for it. I'm asking you to look.
-
----
-
-## Core Systems
-
-| System | Description |
-|--------|-------------|
-| **LumaTrader™** | Live institutional crypto/equity algorithmic trading platform with 7 strategy generations (Gen4–Gen7 + Hybrid V2) |
-| **LumenCore Engine** | Cross-sector AI optimization: energy grids, financial infrastructure, defense systems |
-| **NovaCore™** | Multi-sector intelligence orchestration with real-time sector dashboards |
-| **FlowForm™** | FLOWFORM natural optimization geometry — phase-locked adaptive learning |
-| **EchoLock™** | Harmonic phase-locking technology for coherence-driven system adaptation |
-| **AlphaGlobe 3D** | Live Three.js holographic globe showing real-time crypto alpha map (711 pairs scanned) |
-| **Agent Approval Hub** | Human-in-the-loop autonomous agent command center (trades, grants, jobs, outreach) |
-| **Kraken Multi-TF Alpha Map** | Multi-timeframe alpha scoring across 711+ Kraken pairs, live-streamed |
-| **Evidence Chain** | Hash-chained tamper-evident proof ledger of all live executions and predictions |
-| **World Model Lab** | LumenCore_WorldModel_Lab — physics-grounded AI reality simulation |
+Economic figures, when present, are internal translated-value or modeled opportunity estimates unless explicitly supported by external customer records. Synthetic and replay results are evidence leads, not field performance claims.
 
 ---
 
-## Live Dashboards (Production at lumen-core.ai)
+## Founder-owned Luma Universe spine
 
-- **[Mission Control](https://lumen-core.ai/mission_control.html)** — Full institutional ops nerve center
-- **[Kraken Execution Mission Control](https://lumen-core.ai/kraken_execution_dashboard.html)** — Live trade execution with 3D alpha globe
-- **[Agent Approval Hub](https://lumen-core.ai/agent_approval_hub.html)** — Autonomous multi-agent command center
-- **[Evidence Ledger](https://lumen-core.ai/evidence/)** — Hash-chained live proof (SHA-256 verified)
-- **[Forecast](https://lumen-core.ai/forecast.html)** — Predictive alpha forecasting
-- **[Anomalies](https://lumen-core.ai/anomalies.html)** — Cross-sector anomaly detection
+LumenCore is the platform spine. The named modules are separate branches of the same founder-owned architecture:
 
----
-
-## Quantitative Trading Performance
-
-- **Exchange:** Kraken (institutional REST + WebSocket execution)
-- **Execution Proof:** Real TXIDs archived in `investor_txids/` — cryptographically verified
-- **Strategy Generations:** Gen4, Gen5, Gen6, Gen7, Hybrid V2 — all live-tested
-- **Alpha Map:** 711 pairs scanned per run, multi-timeframe (1h, 4h, 1d, 1w)
-- **Architecture:** 8-engine parallel execution orchestrator with deadman switches
-- **Risk Management:** Cross-sector failure prediction, walk-forward validation, edge-proof gating
+| Module | Safe public role |
+|---|---|
+| **FlowForm™** | Geometry/routing layer for biomimetic, curved, stability-aware pathway modeling. |
+| **LumaSpiral / LumenSpiral™** | Spiral geometry layer for compact pathing, phase organization, and harmonic routing experiments. |
+| **EtherFrame™** | Logic/routing layer for system-state organization, proof coordination, and stability controls. |
+| **AetherReach™** | Human interface layer for gesture, biometric, symbolic, and operator-facing input concepts. |
+| **LumenShell™** | Embodiment/smart-skin boundary layer for robotics, haptics, thermal balance, and resonant system design. |
+| **EchoForm / Identity Architecture** | Identity-consistent digital twin and bio-digital signature layer. |
+| **LumaTrader™** | Market-data, runtime-control, dashboard, scoring, and evidence-discipline branch. Not an audited profit claim. |
+| **LumaScout™** | Discovery/scouting intelligence branch. Operational dependency and billing status must be verified before live demo use. |
+| **LumaJet™** | Simulation-first geometry/e-drive/routing/thermal/resilience proof branch. Not aircraft certification or flight capability. |
+| **LumaSuit / LumaSkin™** | Non-actuating smart-skin and human-performance digital twin branch. Not powered armor, medical diagnosis, or certified safety. |
 
 ---
 
-## Cross-Sector Intelligence
+## Current evidence lanes
 
-The LumenCore engine applies adaptive harmonic intelligence across sectors:
+### 1. Live-breadth and measured-row evidence
 
-| Sector | Application |
-|--------|-------------|
-| Energy | Grid optimization, electricity infrastructure loss prediction |
-| Finance | Institutional quant signals, cross-sector capital routing |
-| Defense / DoD | Adaptive system optimization for defense infrastructure |
-| Healthcare | Predictive analytics for healthcare access and capacity |
-| Smart Cities | Infrastructure money-loss ladder modeling |
-| Digital Twins | Live world-model simulation with physics-grounded AI |
+LumenCore tracks live and historical source ingestion, measured-vs-estimated status, and sector-level row counts. Older public live-breadth snapshots should be treated as superseded until a current manifest is promoted. The current internal target state is approximately 29 enabled live sources with approximately 25 measured providers/sources, pending public-safe freeze and hash promotion.
 
----
+### 2. Named-dataset and baseline evidence
 
-## Harmonic Intelligence Architecture (Patent Pending)
+The platform contains leaderboard-style outputs and benchmark records that compare candidate flowform/algorithm/strategy combinations against named datasets and baseline behaviors. These are internal technical evidence until externally reviewed.
 
-LumenCore is built on a novel **harmonic backpropagation** framework — fundamentally different from conventional gradient descent:
+### 3. DICE / replay evidence
 
-```
-INPUT WAVE → BUBBLE LATTICE → WAVE PROPAGATION → OUTPUT WAVE
-    → HARMONIC ERROR COMPUTATION
-    → RESONANCE RETUNING (Δf, Δφ, Δk)
-    → FROBENIUS STABILITY ENVELOPE
-    → EQUILIBRIUM
-```
+The DICE lane is a controlled-evaluation and proposal evidence lane for bounded AI coordination, local inference control, sparse task-market logic, coherence constraints, metric locking, and failure-mode reporting. It should be described as simulation/replay evidence unless and until program authority or external validation says otherwise.
 
-**Core constants:**
-- **Q-NBDEFS** — Quantum coherence / identity stabilizer
-- **HIC** — Harmonic gravity / attraction field
-- **RPMC** — Resonant phase-motion curvature / energy-flow geometry
-- **ELCC** — Echo lattice continuity / network topology
-- **TCC** — Temporal coherence / persistence law
+### 4. LumaJet synthetic baseline evidence
 
-Coined term: **Living Architecture™** — self-stabilizing harmonic intelligence that adapts like a living system rather than optimizing like a static model.
+LumaJet has internal synthetic baseline benchmark activity, including the `LUMAJET_BASELINE_DONE` lane. It should be promoted only as synthetic/simulation evidence: geometry/routing/thermal/resilience scoring against baseline patterns, not certified flight or autonomous vehicle control.
+
+### 5. LumaSuit / LumaSkin Phase I evidence
+
+LumaSuit and LumaSkin are safe as non-actuating, simulation-first, human-reviewed smart-skin and human-performance digital twin concepts. Phase I language must stay limited to sensing, scoring, simulation, fatigue/thermal/strain risk modeling, bench validation, and mentor/lab review.
 
 ---
 
-## Intellectual Property
+## Proof Capsule schema
 
-- **Patent Pending** — LumenCore harmonic intelligence architecture, FlowForm™ geometry, EchoLock™ phase-locking (Non-provisional filings, attorney-reviewed)
-- **Trade Secrets** — Core algorithm implementations (not in this repo)
-- **LumenCore™, LumaTrader™, FlowForm™, EchoLock™, NovaCore™** are trademarks of Robert Ashworth
+Every promoted result should become a Proof Capsule:
 
----
-
-## Institutional & Government Credentials
-
-- **DOE SBIR Phase I** — U.S. Department of Energy Small Business Innovation Research candidate
-- **DoD Integration Track** — Defense Department variant architecture
-- **PWC Validation** — ECHOLOCK_EARLY_SIGNAL_PROOF (independently documented)
-- **Federal Grade Documentation** — Audit-ready federal brief with daemon heartbeat proofs
-- **Evidence API** — Live SHA-256 hash-chained execution ledger at lumen-core.ai/evidence/
-
----
-
-## System Architecture
-
-```mermaid
-graph TB
-    subgraph INTEL ["🧠 LumenCore™ Intelligence Layer"]
-        direction LR
-        HB["Harmonic Backprop\nPhase-Lock AI\n(Patent Pending)"]
-        ALPHA["Multi-TF Alpha Map\n711 Pairs · 4 Timeframes\n1h / 4h / 1d / 1w"]
-        SECTOR["Cross-Sector Engine\nEnergy · Finance\nDefense · Healthcare"]
-        HB --> ALPHA --> SECTOR
-    end
-
-    subgraph EXEC ["⚡ LumaTrader™ Execution Layer"]
-        direction LR
-        SCAN["Symbol Scanner\n711+ Kraken Pairs"]
-        GATE["7-Layer Signal Gate\nEdge · Risk · Heat\nApproval · Cooldown"]
-        APPR["Agent Approval Hub\nHuman-in-Loop\nAuto-fire Daemon"]
-        ORDER["Kraken Exchange\nREST + WebSocket\nReal TXIDs"]
-        SCAN --> GATE --> APPR --> ORDER
-    end
-
-    subgraph PROOF ["🔐 Evidence & Ops Layer"]
-        direction LR
-        CHAIN["SHA-256 Hash Chain\nTamper-Evident\nExecution Ledger"]
-        DASH["Mission Control\nlumen-core.ai\nLive Dashboards"]
-        VPS["Oracle Cloud VPS\nnginx · systemd\nHTTPS"]
-        CHAIN --> DASH --> VPS
-    end
-
-    subgraph RISK ["🛡️ Risk Management"]
-        direction TB
-        HB2["Portfolio Heat Gate\nmax 35% exposure"]
-        DM["Deadman Switch\nAuto-halt on breach"]
-        WF["Walk-Forward\nValidator"]
-        HB2 --- DM --- WF
-    end
-
-    SECTOR -->|alpha signals| SCAN
-    ORDER -->|execution proof| CHAIN
-    GATE <-->|heat / exposure| RISK
-    DASH -.->|live data feed| PROOF
-
-    style INTEL fill:#0d1117,color:#00ffe7,stroke:#00ffe7
-    style EXEC fill:#0d1117,color:#7ee787,stroke:#7ee787
-    style PROOF fill:#0d1117,color:#f78166,stroke:#f78166
-    style RISK fill:#0d1117,color:#ffa657,stroke:#ffa657
+```json
+{
+  "source": "dataset, stream, sensor, benchmark, or sample window",
+  "baseline": "incumbent, naive, named comparator, or synthetic control",
+  "locked_metric": "metric selected before scoring",
+  "run_type": "measured | replay | synthetic | modeled | estimated",
+  "manifest": "hashes, timestamp, commit, dependencies, run ID",
+  "result": "bounded result summary",
+  "failure_notes": "known issues and negative results",
+  "claim_boundary": "what this proves and does not prove",
+  "pilot_decision": "review, rerun, external validation, or pilot scope"
+}
 ```
 
 ---
 
-## Technology Stack
+## Intellectual property and external review boundary
 
-```
-Backend:    Python 3.11, FastAPI, asyncio, pandas, numpy
-Execution:  Kraken REST/WebSocket API, Alpaca Markets API
-Frontend:   Vanilla JS, Three.js (3D globe), Chart.js, HTML5 Canvas
-Deployment: Oracle Cloud VPS, nginx, systemd, HTTPS
-Ops:        PowerShell automation scripts, parallel execution pipelines
-AI/ML:      Custom harmonic optimizer, RL policy (Q-table), walk-forward backtester
-Data:       Yahoo Finance, Alpha Vantage, DraftKings odds API, real Kraken feed
-```
+LumenCore, FlowForm, LumaTrader, LumaScout, LumaJet, LumaSuit, LumaSkin, EchoForm, EtherFrame, AetherReach, LumenShell, and related architecture/lexicon elements are founder-originated and founder-controlled unless a written agreement says otherwise.
+
+External parties may review, advise, introduce pilots, provide scoped services, or support grant/investor packaging. They do not receive rights to pre-existing LumenCore code, architecture, names, constants, proof materials, or patentable structure by reviewing this repo, joining a call, writing comments, or proposing services.
 
 ---
 
-## Repository Structure
+## Public dashboards
 
-This public repo contains:
-- `index.html` — Public-facing portal
-- `data/` — Live pipeline JSON, proof ledger, summary metrics
-- `evidence-ledger/` — Hash-chained execution proof snapshots
+The public site and dashboards are useful review surfaces. Some pages are live status surfaces, some are research/proof surfaces, and some are historical or internal workflow surfaces. Reviewers should rely on the relevant claim-boundary document before interpreting any dashboard as a production, financial, safety, or certification claim.
 
-Full production stack (22,000+ Python files, 150+ artifacts) is maintained privately in the institutional deployment environment.
-
----
-
-## Pilot Programs
-
-- **Cumberland Science Museum** — Real-world intelligent infrastructure deployment
-- **FSI (Financial Services Initiative)** — Enterprise finance sector deployment
-- **InlineLighting** — Smart infrastructure / energy optimization
+- Mission Control: https://lumen-core.ai/mission_control.html
+- Proof-to-pilot: https://lumen-core.ai/proof_to_pilot.html
+- Evidence surface: https://lumen-core.ai/evidence/
 
 ---
 
-## How You Can Help
+## Collaboration stance
 
-I'm not asking for much. I'm asking for visibility.
+LumenCore is not seeking outside parties to own or rewrite the platform. The useful outside roles are:
 
-**If you're a developer:**
-- ⭐ **Star this repo.** It costs nothing. It means everything.
-- Share it with someone in quant finance, AI, or robotics who might appreciate what's here.
-- Fork it. Break it. Tell me what you find.
+- technical review,
+- pilot routing,
+- grant/SBIR review,
+- investor introductions,
+- scoped UI/report support,
+- data-owner validation,
+- mentor/lab review.
 
-**If you're an investor or employer:**
-- I'm available. Immediately. I will outwork any team you have, for a fraction of the cost.
-- [lumen-core.ai](https://lumen-core.ai) is live right now. Come verify the system works before we ever have a conversation.
-- Business inquiries: reach out via GitHub or the contact on [lumen-core.ai](https://lumen-core.ai)
-
-**If you're a crowdfunding supporter:**
-- Everything I've built was done with zero budget. A laptop, a van, and public APIs.
-- With $5,000 I could: get cloud compute time to run proper backtests, file continuation patents, get a real address so my kids can visit.
-- With $50,000 I could: build a proper team, file the hardware patents internationally, launch the EV battery and robotics projects properly.
-- With $500,000 I could: change the trajectory of AI, energy infrastructure, and algorithmic finance simultaneously.
-- 💛 [GitHub Sponsors](https://github.com/sponsors/robertashworth1986-debug) — even $5/month tells me to keep going.
-
-**If you're press, media, or a storyteller:**
-- This is a story. Solo engineer. Van. Three kids. Institutional-grade AI. Patent-pending hardware.
-- I'm an open book. Ask me anything.
+All collaboration should preserve founder ownership of pre-existing IP and keep evidence claims bounded.
 
 ---
 
-## What Keeps Me Going
+## Repository status
 
-I have three kids. They don't fully understand what I do yet. But one day they will.
+This public repo contains reviewer-safe code, dashboards, docs, manifests, and proof artifacts. Large private artifacts, credentials, API keys, raw submission materials, and sensitive operational files should not be committed here.
 
-One day one of them will Google their dad's name and this will come up. And they'll read about the trading system, the harmonic AI, the robot design, the EV batteries. And they'll understand that the nights I wasn't there — I was building something for them.
+Status language:
 
-That's not a pitch. That's just the truth.
-
-**If this work resonates with you — for any reason — please star it, share it, or reach out.**
-
-I build alone. But I don't have to stay unknown alone.
+- **Measured** means rows, files, commits, outputs, or runs exist.
+- **Replay** means controlled replay output exists but is not field validation.
+- **Synthetic** means generated or simulated benchmark evidence.
+- **Modeled** means simulation or internal modeling output.
+- **Estimated** means economic translation or opportunity framing.
+- **Externally validated** means a qualified outside party or buyer has verified the result under agreed conditions.
 
 ---
 
 ## Contact
 
-**Robert Ashworth** — Solo Engineer, Quant Architect, Father
+**Robert Ashworth** — Founder, LumenCore
 
-- 🌐 **Live System:** [lumen-core.ai](https://lumen-core.ai)
-- 📊 **Verifiable Proof:** [lumen-core.ai/evidence/](https://lumen-core.ai/evidence/)
-- ⭐ **[Star this repo](https://github.com/robertashworth1986-debug/lumen-core-public)** — takes 1 second, means the world
-- 💛 **[Sponsor this work](https://github.com/sponsors/robertashworth1986-debug)**
-
-> *"I don't need a billion dollars. I need someone to see what I've built and understand what it means."*
+- Site: https://lumen-core.ai
+- GitHub: https://github.com/robertashworth1986-debug/lumen-core-public
 
 ---
 
-## Keywords
+*Built 2025-2026. Founder-owned. Evidence before claims.*
 
-Robert Ashworth · LumenCore · LumaTrader · algorithmic trading · quantitative trading · solo quant developer · self-taught engineer · cross-sector AI · infrastructure intelligence · harmonic AI · patent pending · institutional trading platform · crypto algorithmic trading · Kraken trading bot · multi-agent AI · DOE SBIR · energy grid optimization · defense AI · smart infrastructure · FlowForm · EchoLock · Living Architecture · autonomous trading system · quant lab · alpha map · multi-timeframe analysis · curved motherboards · honeycomb EV battery · nature-flow robotics · van life developer · solo founder · no funding · bootstrap AI
-
----
-
-*Built: 2025–2026 | Status: LIVE | Team: 1 | Funding: $0 | Motivation: Everything*
-
-![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:7928ca,100:00ffe7&height=120&section=footer&text=lumen-core.ai%20%C2%B7%20Built%20for%20three%20kids&fontSize=16&fontColor=ffffff&fontAlignY=65)
+![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:7928ca,100:00ffe7&height=120&section=footer&text=lumen-core.ai%20%C2%B7%20Evidence%20before%20claims&fontSize=16&fontColor=ffffff&fontAlignY=65)
