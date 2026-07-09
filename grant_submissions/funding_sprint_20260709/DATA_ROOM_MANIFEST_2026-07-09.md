@@ -7,8 +7,8 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 ## Status
 
 - Status: `DATA_ROOM_MANIFEST_READY`
-- Manifested Markdown artifacts: `26`
-- Control artifacts: `16`
+- Manifested Markdown artifacts: `27`
+- Control artifacts: `18`
 - Missing control artifacts: `0`
 - Reviewer gate clear: `true`
 - Unsafe sensitive hits: `0`
@@ -22,14 +22,15 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Manifest seed SHA-256: `7d7ba6c8bf85cd3140ff61cc60019bfdcaf62b1cc64ab3cf44711cc3895daf87`
-- Data-room manifest SHA-256: `54127272b330651a99af5160ee0e0b7cad1d51698de9007e6551554ab8d5fff8`
+- Manifest seed SHA-256: `4eedd26f6803684dd9a4bb70e6519db9c3b590b14d1c70f2b34e7a568621ccff`
+- Data-room manifest SHA-256: `1273b94c2e9f209beae9c0a204127457f977ca940cedf8b11a6218cb17ceee56`
 
 ## Front Door Order
 
 - `grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md`
 - `grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md`
 - `grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md`
+- `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md`
 - `grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md`
 - `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md`
 - `grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md`
@@ -39,7 +40,7 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 ## Category Counts
 
 - `claim_protocol_boundary`: `7`
-- `front_door_control`: `8`
+- `front_door_control`: `9`
 - `lane_package`: `8`
 - `supporting_markdown`: `1`
 - `sync_receipt`: `2`
@@ -54,6 +55,7 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 - `reviewer_decision_brief`: `REVIEWER_DECISION_BRIEF_READY`
 - `reviewer_diligence_qa_matrix`: `REVIEWER_DILIGENCE_QA_READY`
 - `linkedin_universe_profile_packet`: `LINKEDIN_UNIVERSE_PROFILE_READY_HUMAN_POST_REQUIRED`
+- `ip_counsel_diligence_packet`: `IP_COUNSEL_DILIGENCE_READY_HUMAN_COUNSEL_REQUIRED`
 
 ## Markdown Artifacts
 
@@ -67,8 +69,9 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 - `sync_receipt` `grant_submissions/funding_sprint_20260709/E_DRIVE_SYNC_RECEIPT_2026-07-09.md` sha256=`fa69d372437e8190edb46477660ce9ddc76725a65ae7a16266f1076222d5fd60` bytes=`1263`
 - `lane_package` `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md` sha256=`f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046` bytes=`6109`
 - `claim_protocol_boundary` `grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md` sha256=`684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9` bytes=`8338`
-- `front_door_control` `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` sha256=`ae96b2e13137be82dd2e29661033930f09b29ed247e75b0fa708cf76f7a48ee7` bytes=`6279`
+- `front_door_control` `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` sha256=`d6f0d7892ef604905266dc6db3b15c5ea7beeb066770bb13b2b0f8e3bf75b412` bytes=`6279`
 - `front_door_control` `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` sha256=`7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672` bytes=`13939`
+- `front_door_control` `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`0e5cf6b23334fed68895f117a61a47238e0ea27ba9bed7103739fc19f9ba8d59` bytes=`9907`
 - `claim_protocol_boundary` `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md` sha256=`274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb` bytes=`7643`
 - `front_door_control` `grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md` sha256=`95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762` bytes=`9037`
 - `lane_package` `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md` sha256=`bcfdd40dfafc7ca0e7822679dba9d2504c2196b5701704d0ba3d46c5ce9448f6` bytes=`5614`
@@ -86,8 +89,8 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 
 ## Machine Control Artifacts
 
-- `present` `out/ops/funding_sprint_reviewer_gate_latest.json` control=`funding_sprint_reviewer_gate` role=`machine_control_json` sha256=`8082ac4e64fad438c6b0df642ffbd2cd6d4c13f8809b6e850e6e1dc7e677ce6a`
-- `present` `dashboard/data/funding_sprint_reviewer_gate.json` control=`funding_sprint_reviewer_gate` role=`dashboard_control_json` sha256=`8082ac4e64fad438c6b0df642ffbd2cd6d4c13f8809b6e850e6e1dc7e677ce6a`
+- `present` `out/ops/funding_sprint_reviewer_gate_latest.json` control=`funding_sprint_reviewer_gate` role=`machine_control_json` sha256=`3ab5807fd7cbde16310085dd9b439ddd796af99ce2ef1244f1bdb8f3308ec3d7`
+- `present` `dashboard/data/funding_sprint_reviewer_gate.json` control=`funding_sprint_reviewer_gate` role=`dashboard_control_json` sha256=`3ab5807fd7cbde16310085dd9b439ddd796af99ce2ef1244f1bdb8f3308ec3d7`
 - `present` `out/ops/traction_opportunity_intake_ledger_latest.json` control=`traction_opportunity_intake_ledger` role=`machine_control_json` sha256=`3d71c11ce437b4fc46ac24d58e5a836cfe6c39c8a6af73be172a6913ac5cb70e`
 - `present` `dashboard/data/traction_opportunity_intake_ledger.json` control=`traction_opportunity_intake_ledger` role=`dashboard_control_json` sha256=`3d71c11ce437b4fc46ac24d58e5a836cfe6c39c8a6af73be172a6913ac5cb70e`
 - `present` `out/ops/reviewer_concierge_packet_latest.json` control=`reviewer_concierge_packet` role=`machine_control_json` sha256=`021ca50e66a69411ecca9879921c732cedf9a3a141bf3919d59704652b508ffe`
@@ -102,6 +105,8 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 - `present` `dashboard/data/reviewer_diligence_qa_matrix.json` control=`reviewer_diligence_qa_matrix` role=`dashboard_control_json` sha256=`6fb234d69f8f084aa8ca0b52ae3f838a7a6318aa36094a1e0370584436de95a8`
 - `present` `out/ops/linkedin_universe_profile_packet_latest.json` control=`linkedin_universe_profile_packet` role=`machine_control_json` sha256=`44383125a66057ce53e91fef50d338f12cd7f56b7958c386b5949245ff7fe6f8`
 - `present` `dashboard/data/linkedin_universe_profile_packet.json` control=`linkedin_universe_profile_packet` role=`dashboard_control_json` sha256=`44383125a66057ce53e91fef50d338f12cd7f56b7958c386b5949245ff7fe6f8`
+- `present` `out/ops/ip_counsel_diligence_packet_latest.json` control=`ip_counsel_diligence_packet` role=`machine_control_json` sha256=`51fed2d69e85dc589429af22f19590f4db11ce1e0e593257ceaea512cc423ba1`
+- `present` `dashboard/data/ip_counsel_diligence_packet.json` control=`ip_counsel_diligence_packet` role=`dashboard_control_json` sha256=`51fed2d69e85dc589429af22f19590f4db11ce1e0e593257ceaea512cc423ba1`
 
 ## E-Drive Mirror Targets
 

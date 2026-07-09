@@ -8,7 +8,7 @@
       "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "8082ac4e64fad438c6b0df642ffbd2cd6d4c13f8809b6e850e6e1dc7e677ce6a"
+      "sha256": "3ab5807fd7cbde16310085dd9b439ddd796af99ce2ef1244f1bdb8f3308ec3d7"
     },
     {
       "bytes": 32394,
@@ -18,7 +18,7 @@
       "path": "dashboard/data/funding_sprint_reviewer_gate.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "8082ac4e64fad438c6b0df642ffbd2cd6d4c13f8809b6e850e6e1dc7e677ce6a"
+      "sha256": "3ab5807fd7cbde16310085dd9b439ddd796af99ce2ef1244f1bdb8f3308ec3d7"
     },
     {
       "bytes": 23129,
@@ -159,11 +159,32 @@
       "present": true,
       "role": "dashboard_control_json",
       "sha256": "44383125a66057ce53e91fef50d338f12cd7f56b7958c386b5949245ff7fe6f8"
+    },
+    {
+      "bytes": 11291,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "ip_counsel_diligence_packet",
+      "name": "ip_counsel_diligence_packet_latest.json",
+      "path": "out/ops/ip_counsel_diligence_packet_latest.json",
+      "present": true,
+      "role": "machine_control_json",
+      "sha256": "51fed2d69e85dc589429af22f19590f4db11ce1e0e593257ceaea512cc423ba1"
+    },
+    {
+      "bytes": 11291,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "ip_counsel_diligence_packet",
+      "name": "ip_counsel_diligence_packet.json",
+      "path": "dashboard/data/ip_counsel_diligence_packet.json",
+      "present": true,
+      "role": "dashboard_control_json",
+      "sha256": "51fed2d69e85dc589429af22f19590f4db11ce1e0e593257ceaea512cc423ba1"
     }
   ],
   "control_statuses": {
     "funding_sprint_reviewer_gate": "REVIEWER_GATE_CLEAR_HUMAN_SUBMISSION_REQUIRED",
     "human_action_docket": "HUMAN_ACTION_DOCKET_READY",
+    "ip_counsel_diligence_packet": "IP_COUNSEL_DILIGENCE_READY_HUMAN_COUNSEL_REQUIRED",
     "linkedin_universe_profile_packet": "LINKEDIN_UNIVERSE_PROFILE_READY_HUMAN_POST_REQUIRED",
     "reviewer_concierge_packet": "REVIEWER_CONCIERGE_READY_HUMAN_ACTION_REQUIRED",
     "reviewer_decision_brief": "REVIEWER_DECISION_BRIEF_READY",
@@ -171,7 +192,7 @@
     "submission_authority_matrix": "SUBMISSION_AUTHORITY_MATRIX_READY",
     "traction_opportunity_intake_ledger": "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED"
   },
-  "data_room_manifest_sha256": "54127272b330651a99af5160ee0e0b7cad1d51698de9007e6551554ab8d5fff8",
+  "data_room_manifest_sha256": "1273b94c2e9f209beae9c0a204127457f977ca940cedf8b11a6218cb17ceee56",
   "e_drive_targets": [
     "E:\\LumaProofVault\\LUMA_FUNDING_SPRINT_20260709_20260709T030617Z",
     "E:\\LumenCoreSync\\funding_sprint_20260709",
@@ -181,14 +202,15 @@
     "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
+    "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md"
   ],
-  "generated_utc": "2026-07-09T13:26:53.280121+00:00",
-  "manifest_seed_sha256": "7d7ba6c8bf85cd3140ff61cc60019bfdcaf62b1cc64ab3cf44711cc3895daf87",
+  "generated_utc": "2026-07-09T18:55:45.248971+00:00",
+  "manifest_seed_sha256": "4eedd26f6803684dd9a4bb70e6519db9c3b590b14d1c70f2b34e7a568621ccff",
   "markdown_artifacts": [
     {
       "bytes": 8929,
@@ -276,7 +298,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
-      "sha256": "ae96b2e13137be82dd2e29661033930f09b29ed247e75b0fa708cf76f7a48ee7"
+      "sha256": "d6f0d7892ef604905266dc6db3b15c5ea7beeb066770bb13b2b0f8e3bf75b412"
     },
     {
       "bytes": 13939,
@@ -285,6 +307,14 @@
       "name": "HUMAN_ACTION_DOCKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
       "sha256": "7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672"
+    },
+    {
+      "bytes": 9907,
+      "category": "front_door_control",
+      "classification": "public_safe_markdown_review_required",
+      "name": "IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+      "sha256": "0e5cf6b23334fed68895f117a61a47238e0ea27ba9bed7103739fc19f9ba8d59"
     },
     {
       "bytes": 7643,
@@ -418,12 +448,12 @@
     "authority_status": "SUBMISSION_AUTHORITY_MATRIX_READY",
     "category_counts": {
       "claim_protocol_boundary": 7,
-      "front_door_control": 8,
+      "front_door_control": 9,
       "lane_package": 8,
       "supporting_markdown": 1,
       "sync_receipt": 2
     },
-    "control_artifact_count": 16,
+    "control_artifact_count": 18,
     "decision_lane_count": 15,
     "decision_status": "REVIEWER_DECISION_BRIEF_READY",
     "decision_top_ready_lane_count": 7,
@@ -432,7 +462,7 @@
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "manifested_markdown_count": 26,
+    "manifested_markdown_count": 27,
     "missing_control_artifact_count": 0,
     "reviewer_gate_clear": true,
     "unsafe_claim_count": 0,
