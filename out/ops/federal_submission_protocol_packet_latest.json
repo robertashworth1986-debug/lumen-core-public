@@ -10,7 +10,7 @@
       "bytes": 12244,
       "path": "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
       "present": true,
-      "sha256": "e3f74c67625abbbdedc5875fe6c6bd2259e557073bf26b0f5b85aad4fb4bc289"
+      "sha256": "787077d6a41d066f588bbc194e96868fea68ec412c68718eeea562b6934f3dc7"
     },
     {
       "bytes": 18779,
@@ -37,16 +37,16 @@
       "sha256": "f04cfca6d7b388c97303e354aaf9229ba3d46d57f54c6f56110d4ade89dd82b3"
     },
     {
-      "bytes": 16472,
+      "bytes": 17314,
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
       "present": true,
-      "sha256": "72a6db3a551448210ba3cae821b8a076fbc74e439eb10d541a6255d871d7c866"
+      "sha256": "08539443f4cf4a6f9ad9b9eec9f22af2612098cecba6e8f93f2294e2a535363c"
     },
     {
       "bytes": 6279,
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "present": true,
-      "sha256": "d14b8c3d86223e7e85072045d7a3d887b45b2e95bdf8e30baca7d9e7e75f091c"
+      "sha256": "77cf52392c156922c08ab8fa0f5759011a33ec93425a6377612303b4686d2bc0"
     },
     {
       "bytes": 3682,
@@ -55,8 +55,8 @@
       "sha256": "16086b05d3d5e4af4910fec49cafefc8918ac05ed237f68f471a2834898efe55"
     }
   ],
-  "federal_submission_protocol_packet_sha256": "695dac3686b6556205114293af605254c556023d806be640bd917eba13f5b5db",
-  "generated_utc": "2026-07-09T20:05:01.889504+00:00",
+  "federal_submission_protocol_packet_sha256": "4b4c55bf5cff1a4c908343a99ac39f5696d7f807dfd1686bb0a04eed72e17a4e",
+  "generated_utc": "2026-07-09T20:11:44.616776+00:00",
   "human_gate": {
     "cybersecurity_representation_allowed_without_human": false,
     "dsip_submit_allowed_without_human": false,
@@ -209,7 +209,7 @@
     "certification_allowed_without_human": false,
     "cmmc_status_claimed": false,
     "cui_processing_claimed": false,
-    "data_room_markdown_count": 32,
+    "data_room_markdown_count": 33,
     "docket_lane_count": 15,
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,

@@ -30,6 +30,7 @@ CONTROL_NAMES = [
     "federal_submission_protocol_packet",
     "agency_account_activation_docket",
     "measured_source_evidence_register",
+    "evtit_technical_sprint_scope_packet",
     "traction_followup_packet",
 ]
 
@@ -42,6 +43,7 @@ FRONT_DOOR_FILES = {
     "FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
     "AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
     "MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
+    "EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
     "EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
     "SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
     "HUMAN_ACTION_DOCKET_2026-07-09.md",
@@ -240,6 +242,7 @@ def build_payload() -> dict[str, Any]:
             "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
+            "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",

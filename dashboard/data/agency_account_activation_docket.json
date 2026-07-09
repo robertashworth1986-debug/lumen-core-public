@@ -1,5 +1,5 @@
 {
-  "activation_docket_sha256": "e798ae2f0895b601cc9c2ac7b22c83add56a06da68c973d6bc31957917197963",
+  "activation_docket_sha256": "795ec509191a315128bb4e7eb6575852a97f7ec679a069d9bf2318fc2c6e9d40",
   "activation_rows": [
     {
       "blocks": [
@@ -196,7 +196,7 @@
       "bytes": 12389,
       "path": "out/ops/federal_submission_protocol_packet_latest.json",
       "present": true,
-      "sha256": "03a8044008e815f0f3cbd5b65492db62870ee026ac3a0f41db99bd599a1a8ac1"
+      "sha256": "3cbd27bfe5966b188e92d78206d00c69251040398529585e24609482f3bf56d8"
     },
     {
       "bytes": 26227,
@@ -205,16 +205,16 @@
       "sha256": "157a95c4f9607beba3fa7aa9894c586a80cec2ace86632b60b2bc567baf7239c"
     },
     {
-      "bytes": 29123,
+      "bytes": 30618,
       "path": "out/ops/data_room_manifest_latest.json",
       "present": true,
-      "sha256": "75fc37a822076549b422adceb68d45283de20530f33835b30f31b89d5cc48280"
+      "sha256": "a76ac7df79ba4d25bf479b43b581377e5bdb591ed24cd89008a6d0b761edd39e"
     },
     {
-      "bytes": 36251,
+      "bytes": 36615,
       "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
       "present": true,
-      "sha256": "3e22621b3b01aa88c827f36c330c0030636c67e89161198ad14038b3c3c8ef63"
+      "sha256": "550c4690c7864e31398af439432464ab196f8f7b73b3c59d670a8847619017d8"
     },
     {
       "bytes": 11291,
@@ -229,7 +229,7 @@
       "sha256": "fb2fa17cfc4da39ec4c95659e679462fba202af881d2ebad4307419261a77c81"
     }
   ],
-  "generated_utc": "2026-07-09T20:05:02.149672+00:00",
+  "generated_utc": "2026-07-09T20:11:44.989361+00:00",
   "human_stop_rule": "Prepare only. Human controls credentials, legal authority certifications, portal submit, uploads, shares, pricing, representations, and final acceptance.",
   "local_readiness": {
     "blocked_readiness_count": 6,
@@ -314,8 +314,8 @@
     "calendar_or_meeting_invite_allowed_without_human": false,
     "certification_allowed_without_human": false,
     "credential_entry_allowed_without_human": false,
-    "data_room_control_artifact_count": 28,
-    "data_room_markdown_count": 32,
+    "data_room_control_artifact_count": 30,
+    "data_room_markdown_count": 33,
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "human_required_item_count": 8,

@@ -26,15 +26,15 @@
       "patented"
     ]
   },
-  "gate_sha256": "2375d4b3b3823aa9bde7869719182f156db58276f887ef39999393bb770b83d4",
-  "generated_utc": "2026-07-09T20:05:00.874659+00:00",
+  "gate_sha256": "de6e65fbf78e54b55b581c67ccbf30201309c67a76fdc81368633849fe656c3a",
+  "generated_utc": "2026-07-09T20:11:45.979146+00:00",
   "manifest": [
     {
       "bytes": 12244,
       "classification": "public_safe_markdown_review_required",
       "name": "AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
-      "sha256": "e3f74c67625abbbdedc5875fe6c6bd2259e557073bf26b0f5b85aad4fb4bc289"
+      "sha256": "47eead8ccd081ae7c807a8dc784f6ce23b4957d9cb96f35900c068a4ed73f000"
     },
     {
       "bytes": 8929,
@@ -79,11 +79,11 @@
       "sha256": "c982dde7c868f4f9ac52829518edf2a3fe0bd87742e168cbbe3dfd409736a080"
     },
     {
-      "bytes": 16472,
+      "bytes": 17314,
       "classification": "public_safe_markdown_review_required",
       "name": "DATA_ROOM_MANIFEST_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
-      "sha256": "cc75babf0d875d91b6b3049dffe3da090a835af24544f74e02d7200beb040948"
+      "sha256": "08539443f4cf4a6f9ad9b9eec9f22af2612098cecba6e8f93f2294e2a535363c"
     },
     {
       "bytes": 5275,
@@ -93,11 +93,11 @@
       "sha256": "cf0d3fd466ecfd8396d17f1c4787a7fa2898f49ee5f81ed377df05aa161029c4"
     },
     {
-      "bytes": 2426,
+      "bytes": 2602,
       "classification": "public_safe_markdown_review_required",
       "name": "E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-      "sha256": "1b0133a24c0b0a16706bef355def40936ecd7f850d0694188d8ff2eafb4d2993"
+      "sha256": "0078ab4e615c967caedb39a1ea059df3660824b24b87c64c9a0877fde074817d"
     },
     {
       "bytes": 1263,
@@ -105,6 +105,13 @@
       "name": "E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
       "sha256": "fa69d372437e8190edb46477660ce9ddc76725a65ae7a16266f1076222d5fd60"
+    },
+    {
+      "bytes": 8261,
+      "classification": "public_safe_markdown_review_required",
+      "name": "EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
+      "sha256": "f8d24dae2c8367f3442aa3d2b2770d88b7087dd16e21ce442530feabbb2e9707"
     },
     {
       "bytes": 8278,
@@ -118,7 +125,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
-      "sha256": "3059f5404934b81bc5ad670a7005c0448803c4591b61496542555b6e2b25a679"
+      "sha256": "8309c5a53faddef22112ca09de2e4742f79e1ec7426080b0a45646e25d587aaf"
     },
     {
       "bytes": 6109,
@@ -486,14 +493,14 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-        "line": 57,
+        "line": 60,
         "phrase": "realized savings",
         "text": "This sync proves file custody and package availability. It does not prove agency approval, cybersecurity certification, patentability, patent ownership, freedom to operate, investor value, trading performance, field validation, realized savings, or final submission acceptance."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-        "line": 57,
+        "line": 60,
         "phrase": "freedom to operate",
         "text": "This sync proves file custody and package availability. It does not prove agency approval, cybersecurity certification, patentability, patent ownership, freedom to operate, investor value, trading performance, field validation, realized savings, or final submission acceptance."
       },
@@ -673,7 +680,7 @@
     "boundary_hit_count": 45,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 32,
+    "markdown_file_count": 33,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0
