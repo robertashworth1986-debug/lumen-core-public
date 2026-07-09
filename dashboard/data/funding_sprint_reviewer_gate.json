@@ -26,8 +26,8 @@
       "patented"
     ]
   },
-  "gate_sha256": "9ef902cf7e2d63a52e3a2a77cf2175e5413f05174dacfd775ddb20afb24fb896",
-  "generated_utc": "2026-07-09T22:06:31.285581+00:00",
+  "gate_sha256": "6cf0b05c11a5b8900b97f56cdceb6bff3fb61f0f1bc63036daed4b8f327a5885",
+  "generated_utc": "2026-07-09T22:12:43.134704+00:00",
   "manifest": [
     {
       "bytes": 12244,
@@ -86,11 +86,11 @@
       "sha256": "b1034846561675a25ff85134813c6e4bc0d71a5a48bad92f78610273c4499d28"
     },
     {
-      "bytes": 22593,
+      "bytes": 23346,
       "classification": "public_safe_markdown_review_required",
       "name": "DATA_ROOM_MANIFEST_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
-      "sha256": "e1612c3c1040fa3bd1c559ff8e7977c7ac6d1b8ba3d02214017f14c66c8651b9"
+      "sha256": "8ccec50811b62886c1d2b6e9eec4a8b6fc2f4bb7f370b53d0b51507f90376513"
     },
     {
       "bytes": 5275,
@@ -100,18 +100,18 @@
       "sha256": "cf0d3fd466ecfd8396d17f1c4787a7fa2898f49ee5f81ed377df05aa161029c4"
     },
     {
-      "bytes": 5030,
+      "bytes": 5599,
       "classification": "public_safe_markdown_review_required",
       "name": "E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-      "sha256": "ec831bf581f14588d394d32fee22100a7de4d83cb0dbfba6a27f739a14d1e1ed"
+      "sha256": "ae224a33c33fe7225d591ce5fc846db72ad8bc377c5a7c08c7ac0092e6bb2bf3"
     },
     {
-      "bytes": 5025,
+      "bytes": 5482,
       "classification": "public_safe_markdown_review_required",
       "name": "E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
-      "sha256": "57b1e2ff9da0bcdaf497b046d3b150a75471c0dd72270a0d3dcc373d54e36c19"
+      "sha256": "090661f4025e631b2451c28e7d38d77bbb75e673fa33c1d7f1cff96dde90ccbf"
     },
     {
       "bytes": 8261,
@@ -161,6 +161,13 @@
       "name": "IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_2026-07-09.md",
       "sha256": "af9bed8eae758770500ef619fd636120350b6d3d5f826d80b0f29e19a585d6ba"
+    },
+    {
+      "bytes": 12677,
+      "classification": "public_safe_markdown_review_required",
+      "name": "INSTITUTIONAL_TRUST_GATE_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/INSTITUTIONAL_TRUST_GATE_2026-07-09.md",
+      "sha256": "43025b72c75f97cd24d09def3397606baa47afc471626f6a411b93988e3a6fce"
     },
     {
       "bytes": 9907,
@@ -397,7 +404,7 @@
   ],
   "reviewer_gate_clear": true,
   "scan": {
-    "boundary_hit_count": 52,
+    "boundary_hit_count": 54,
     "boundary_hits": [
       {
         "classification": "boundary_language",
@@ -542,28 +549,28 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-        "line": 86,
+        "line": 90,
         "phrase": "realized savings",
         "text": "This sync proves file custody and package availability. It does not prove agency approval, cybersecurity certification, patentability, patent ownership, freedom to operate, investor value, trading performance, field validation, realized savings, or final submission acceptance."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-        "line": 86,
+        "line": 90,
         "phrase": "freedom to operate",
         "text": "This sync proves file custody and package availability. It does not prove agency approval, cybersecurity certification, patentability, patent ownership, freedom to operate, investor value, trading performance, field validation, realized savings, or final submission acceptance."
       },
       {
         "classification": "boundary_language",
         "file": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-        "line": 92,
+        "line": 98,
         "pattern": "secret",
         "text": "The Kraken alpha additions are paper/replay-only proof artifacts. They harden signal scoring, execution quality, liquidity/capacity, stress survivability, replay readiness, and promotion blockers without reading secrets, placing orders, or making performance claims."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
-        "line": 75,
+        "line": 78,
         "phrase": "realized savings",
         "text": "This sync proves file custody and package availability on the E drive. It does not prove award eligibility, field validation, realized savings, valuation, or final submission acceptance."
       },
@@ -587,6 +594,20 @@
         "line": 107,
         "phrase": "airworthiness",
         "text": "- LumaJet evidence: synthetic simulation baseline only; not airworthiness, flight control, propulsion certification, or swarm control."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/INSTITUTIONAL_TRUST_GATE_2026-07-09.md",
+        "line": 110,
+        "phrase": "certified assurance",
+        "text": "- Claim boundary: Internal evidence readiness is not field validation, certified assurance, or realized customer savings."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/INSTITUTIONAL_TRUST_GATE_2026-07-09.md",
+        "line": 207,
+        "phrase": "realized savings",
+        "text": "- No award, acceptance, investment, partnership, legal opinion, patent grant, field validation, realized savings, live trading readiness, or large-capital suitability is claimed."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
@@ -775,10 +796,10 @@
   "summary": {
     "all_cards_present": true,
     "autonomous_external_action_allowed": false,
-    "boundary_hit_count": 52,
+    "boundary_hit_count": 54,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 40,
+    "markdown_file_count": 41,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0

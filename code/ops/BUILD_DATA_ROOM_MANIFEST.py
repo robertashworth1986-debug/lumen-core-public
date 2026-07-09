@@ -36,6 +36,7 @@ CONTROL_NAMES = [
     "technical_gov_reviewer_approval_stack",
     "sam_submission_and_today_opportunity_push",
     "reviewer_approval_crosswalk",
+    "institutional_trust_gate",
     "evtit_technical_sprint_scope_packet",
     "traction_followup_packet",
 ]
@@ -55,6 +56,7 @@ FRONT_DOOR_FILES = {
     "TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md",
     "SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
     "REVIEWER_APPROVAL_CROSSWALK_2026-07-09.md",
+    "INSTITUTIONAL_TRUST_GATE_2026-07-09.md",
     "EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
     "EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
     "SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
@@ -260,6 +262,7 @@ def build_payload() -> dict[str, Any]:
             "grant_submissions/funding_sprint_20260709/TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/REVIEWER_APPROVAL_CROSSWALK_2026-07-09.md",
+            "grant_submissions/funding_sprint_20260709/INSTITUTIONAL_TRUST_GATE_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
