@@ -34,6 +34,7 @@ CONTROL_NAMES = [
     "measured_source_evidence_register",
     "immediate_federal_ai_opportunity_radar",
     "technical_gov_reviewer_approval_stack",
+    "sam_submission_and_today_opportunity_push",
     "evtit_technical_sprint_scope_packet",
     "traction_followup_packet",
 ]
@@ -51,6 +52,7 @@ FRONT_DOOR_FILES = {
     "MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
     "IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_2026-07-09.md",
     "TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md",
+    "SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
     "EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
     "EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
     "SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
@@ -254,6 +256,7 @@ def build_payload() -> dict[str, Any]:
             "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md",
+            "grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",

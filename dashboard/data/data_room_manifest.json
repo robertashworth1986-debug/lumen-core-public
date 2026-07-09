@@ -341,6 +341,26 @@
       "sha256": "9a6f86ac2c2a265cedd27706940e32993b43e921b8edb3769c95fe3299be4ccd"
     },
     {
+      "bytes": 5816,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "sam_submission_and_today_opportunity_push",
+      "name": "sam_submission_and_today_opportunity_push_latest.json",
+      "path": "out/ops/sam_submission_and_today_opportunity_push_latest.json",
+      "present": true,
+      "role": "machine_control_json",
+      "sha256": "075eda3340a57bebdb52d83e8a57f5afac0847851305023591b3c661eddb49f0"
+    },
+    {
+      "bytes": 5816,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "sam_submission_and_today_opportunity_push",
+      "name": "sam_submission_and_today_opportunity_push.json",
+      "path": "dashboard/data/sam_submission_and_today_opportunity_push.json",
+      "present": true,
+      "role": "dashboard_control_json",
+      "sha256": "075eda3340a57bebdb52d83e8a57f5afac0847851305023591b3c661eddb49f0"
+    },
+    {
       "bytes": 10148,
       "classification": "machine_readable_proof_receipt",
       "control_name": "evtit_technical_sprint_scope_packet",
@@ -396,13 +416,14 @@
     "reviewer_concierge_packet": "REVIEWER_CONCIERGE_READY_HUMAN_ACTION_REQUIRED",
     "reviewer_decision_brief": "REVIEWER_DECISION_BRIEF_READY",
     "reviewer_diligence_qa_matrix": "REVIEWER_DILIGENCE_QA_READY",
+    "sam_submission_and_today_opportunity_push": "SAM_SUBMITTED_AND_TODAY_OPPORTUNITY_PUSH_READY",
     "submission_authority_matrix": "SUBMISSION_AUTHORITY_MATRIX_READY",
     "technical_gov_reviewer_approval_stack": "TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_READY_HUMAN_ACTION_REQUIRED",
     "traction_followup_packet": "TRACTION_FOLLOWUP_READY_HUMAN_SEND_REQUIRED",
     "traction_opportunity_intake_ledger": "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED",
     "venture_studio_terms_guardrail_packet": "VENTURE_STUDIO_TERMS_GUARDRAIL_READY_COUNSEL_REVIEW_REQUIRED"
   },
-  "data_room_manifest_sha256": "a80945d491d3c35b81aec71f2364fdd9901e2603d85d08edeb8d2b19a751403d",
+  "data_room_manifest_sha256": "5ddb5a07e3e9635ec7cfaf94561a10fe290a4937beb006201c7ff9b01d14ab36",
   "e_drive_targets": [
     "E:\\LumaProofVault\\LUMA_FUNDING_SPRINT_20260709_20260709T030617Z",
     "E:\\LumenCoreSync\\funding_sprint_20260709",
@@ -421,6 +442,7 @@
     "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md",
+    "grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
@@ -429,8 +451,8 @@
     "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md"
   ],
-  "generated_utc": "2026-07-09T21:00:44.932261+00:00",
-  "manifest_seed_sha256": "1f31a633b94aa7dcfb1a301aec1139a0e8d596f3f237522bacf81cab12507f3d",
+  "generated_utc": "2026-07-09T21:46:14.449600+00:00",
+  "manifest_seed_sha256": "54ecd48f81d14db7015747a2edb6e8cdded9b0079ca767a5b557d69b7844eec7",
   "markdown_artifacts": [
     {
       "bytes": 12244,
@@ -697,6 +719,14 @@
       "sha256": "bb467f56a4cb0266e556e31e5ad388cbb6cb48a4d3ca456b96968b3d6b05802b"
     },
     {
+      "bytes": 4583,
+      "category": "front_door_control",
+      "classification": "public_safe_markdown_review_required",
+      "name": "SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
+      "sha256": "7f4f1a90c08f3c4df1b6f2b6d32b5b863a008a300f304feb807823846cdbf528"
+    },
+    {
       "bytes": 6675,
       "category": "claim_protocol_boundary",
       "classification": "public_safe_markdown_review_required",
@@ -756,12 +786,12 @@
     "authority_status": "SUBMISSION_AUTHORITY_MATRIX_READY",
     "category_counts": {
       "claim_protocol_boundary": 7,
-      "front_door_control": 19,
+      "front_door_control": 20,
       "lane_package": 8,
       "supporting_markdown": 2,
       "sync_receipt": 2
     },
-    "control_artifact_count": 38,
+    "control_artifact_count": 40,
     "decision_lane_count": 15,
     "decision_status": "REVIEWER_DECISION_BRIEF_READY",
     "decision_top_ready_lane_count": 7,
@@ -770,7 +800,7 @@
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "manifested_markdown_count": 38,
+    "manifested_markdown_count": 39,
     "missing_control_artifact_count": 0,
     "reviewer_gate_clear": true,
     "unsafe_claim_count": 0,

@@ -14,6 +14,9 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - `MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md`
 - `EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md`
 - `EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md`
+- `SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md`
+- `LUMENCORE_AAC_RFI_RESPONSE_SAF-AQ-RFI-26-0001_2026-07-09.pdf`
+- `LUMENCORE_FHWA_TSMO_CAPABILITY_NOTE_693JJ326R000012_2026-07-09.pdf`
 
 ## New Machine Control Files
 
@@ -27,6 +30,8 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - `dashboard/data/evtit_technical_sprint_scope_packet.json`
 - `out/ops/traction_followup_packet_latest.json`
 - `dashboard/data/traction_followup_packet.json`
+- `out/ops/sam_submission_and_today_opportunity_push_latest.json`
+- `dashboard/data/sam_submission_and_today_opportunity_push.json`
 
 ## Latest Verified Sync Result
 
@@ -40,6 +45,9 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - Data-room status: `DATA_ROOM_MANIFEST_READY`
 - Data-room Markdown artifacts: `33`
 - Data-room machine controls: `30`
+- SAM/opportunity push status: `SAM_SUBMITTED_AAC_SENT_FHWA_INSTRUCTION_REQUEST_SENT`
+- Same-day opportunity files added: `3`
+- Same-day machine controls added: `2`
 
 ## Destination Set
 
@@ -58,6 +66,8 @@ E-drive repo mirror copy:
 ## Claim Boundary
 
 This sync proves file custody and package availability. It does not prove agency approval, cybersecurity certification, patentability, patent ownership, freedom to operate, investor value, trading performance, field validation, realized savings, or final submission acceptance.
+
+The SAM/opportunity push addition proves custody for the SAM renewal confirmation receipt and two bounded sent-opportunity packets. It does not prove FHWA final proposal submission, DSIP MissionWeave submission, NSF SBIR/STTR invitation, source selection, contract award, or customer deployment acceptance.
 
 ## Verification Rule
 
