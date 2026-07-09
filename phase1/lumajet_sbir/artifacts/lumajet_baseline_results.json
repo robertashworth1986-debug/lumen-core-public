@@ -1,0 +1,90 @@
+{
+  "generated_utc": "2026-07-09T00:42:29.670616+00:00",
+  "project": "LumaJet",
+  "scope": "synthetic_aerospace_baseline_comparison",
+  "claim_boundary": "Simulation-only synthetic benchmark. Not flight control, not aircraft certification, not airworthiness evidence, not propulsion design, not drone swarm control.",
+  "patterns_tested": [
+    "straight_grid",
+    "random_walk",
+    "uniform_ring",
+    "lumajet_champion_flowform"
+  ],
+  "best_pattern": "lumajet_champion_flowform",
+  "champion_pattern": {
+    "pattern": "lumajet_champion_flowform",
+    "cell_count": 169,
+    "mean_route_distance": 0.821186,
+    "mean_coverage": 0.575357,
+    "thermal_mean_proxy": 0.027126,
+    "thermal_std_proxy": 0.07601,
+    "thermal_balance_score": 0.92936,
+    "routing_efficiency_score": 0.549093,
+    "composite_simulation_score": 0.716128,
+    "claim_boundary": "Simulation-only synthetic benchmark. Not flight control, not aircraft certification, not airworthiness evidence, not propulsion design, not drone swarm control."
+  },
+  "best_non_lumajet_baseline": {
+    "pattern": "uniform_ring",
+    "cell_count": 169,
+    "mean_route_distance": 2.333607,
+    "mean_coverage": 0.38229,
+    "thermal_mean_proxy": 0.087324,
+    "thermal_std_proxy": 0.13025,
+    "thermal_balance_score": 0.88476,
+    "routing_efficiency_score": 0.299975,
+    "composite_simulation_score": 0.570308,
+    "claim_boundary": "Simulation-only synthetic benchmark. Not flight control, not aircraft certification, not airworthiness evidence, not propulsion design, not drone swarm control."
+  },
+  "champion_lift_vs_best_baseline_points": 0.14582,
+  "champion_lift_vs_best_baseline_pct": 25.569,
+  "interpretation": "If lift is positive, LumaJet champion flowform beat the simple synthetic baselines inside this toy simulation only. It does not prove aircraft performance.",
+  "all_results": [
+    {
+      "pattern": "lumajet_champion_flowform",
+      "cell_count": 169,
+      "mean_route_distance": 0.821186,
+      "mean_coverage": 0.575357,
+      "thermal_mean_proxy": 0.027126,
+      "thermal_std_proxy": 0.07601,
+      "thermal_balance_score": 0.92936,
+      "routing_efficiency_score": 0.549093,
+      "composite_simulation_score": 0.716128,
+      "claim_boundary": "Simulation-only synthetic benchmark. Not flight control, not aircraft certification, not airworthiness evidence, not propulsion design, not drone swarm control."
+    },
+    {
+      "pattern": "uniform_ring",
+      "cell_count": 169,
+      "mean_route_distance": 2.333607,
+      "mean_coverage": 0.38229,
+      "thermal_mean_proxy": 0.087324,
+      "thermal_std_proxy": 0.13025,
+      "thermal_balance_score": 0.88476,
+      "routing_efficiency_score": 0.299975,
+      "composite_simulation_score": 0.570308,
+      "claim_boundary": "Simulation-only synthetic benchmark. Not flight control, not aircraft certification, not airworthiness evidence, not propulsion design, not drone swarm control."
+    },
+    {
+      "pattern": "straight_grid",
+      "cell_count": 169,
+      "mean_route_distance": 4.974094,
+      "mean_coverage": 0.267377,
+      "thermal_mean_proxy": 0.123514,
+      "thermal_std_proxy": 0.080897,
+      "thermal_balance_score": 0.925158,
+      "routing_efficiency_score": 0.167389,
+      "composite_simulation_score": 0.506982,
+      "claim_boundary": "Simulation-only synthetic benchmark. Not flight control, not aircraft certification, not airworthiness evidence, not propulsion design, not drone swarm control."
+    },
+    {
+      "pattern": "random_walk",
+      "cell_count": 169,
+      "mean_route_distance": 5.475529,
+      "mean_coverage": 0.230767,
+      "thermal_mean_proxy": 0.131989,
+      "thermal_std_proxy": 0.071897,
+      "thermal_balance_score": 0.932926,
+      "routing_efficiency_score": 0.154428,
+      "composite_simulation_score": 0.49141,
+      "claim_boundary": "Simulation-only synthetic benchmark. Not flight control, not aircraft certification, not airworthiness evidence, not propulsion design, not drone swarm control."
+    }
+  ]
+}

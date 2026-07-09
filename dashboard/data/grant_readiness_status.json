@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-22T18:11:29.633235+00:00",
+  "generated_utc": "2026-07-09T00:42:47.442855+00:00",
   "schema": "grant_dashboard_status_feed_v1",
   "scope": "dashboard_safe_grant_readiness",
   "posture": "LOCAL_READY_PORTAL_BLOCKED",
@@ -512,11 +512,11 @@
   "builder_velocity": {
     "artifact_count": 11,
     "window_start_utc": "2026-06-20T01:53:36.675109+00:00",
-    "window_end_utc": "2026-06-22T18:10:47.841526+00:00",
-    "window_seconds": 231431.166,
-    "per_second": 4.8e-05,
-    "per_minute": 0.003,
-    "per_hour": 0.171,
+    "window_end_utc": "2026-07-09T00:42:45.416683+00:00",
+    "window_seconds": 1637348.742,
+    "per_second": 7e-06,
+    "per_minute": 0.0,
+    "per_hour": 0.024,
     "measurement_boundary": "Rate is computed only from timestamped local artifacts in this feed. It is not a model benchmark, labor-cost estimate, revenue claim, or funding probability."
   },
   "claim_boundaries": [

@@ -1,6 +1,6 @@
 # Frozen Delta Buyer Outreach Pack
 
-Generated UTC: `2026-07-06T13:18:07.186732+00:00`
+Generated UTC: `2026-07-07T02:39:39.847678+00:00`
 
 ## Buyer-Safe Positioning
 

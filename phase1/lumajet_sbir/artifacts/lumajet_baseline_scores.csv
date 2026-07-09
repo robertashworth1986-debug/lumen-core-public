@@ -1,0 +1,5 @@
+pattern,cell_count,mean_route_distance,mean_coverage,thermal_mean_proxy,thermal_std_proxy,thermal_balance_score,routing_efficiency_score,composite_simulation_score,claim_boundary
+lumajet_champion_flowform,169,0.821186,0.575357,0.027126,0.07601,0.92936,0.549093,0.716128,"Simulation-only synthetic benchmark. Not flight control, not aircraft certification, not airworthiness evidence, not propulsion design, not drone swarm control."
+uniform_ring,169,2.333607,0.38229,0.087324,0.13025,0.88476,0.299975,0.570308,"Simulation-only synthetic benchmark. Not flight control, not aircraft certification, not airworthiness evidence, not propulsion design, not drone swarm control."
+straight_grid,169,4.974094,0.267377,0.123514,0.080897,0.925158,0.167389,0.506982,"Simulation-only synthetic benchmark. Not flight control, not aircraft certification, not airworthiness evidence, not propulsion design, not drone swarm control."
+random_walk,169,5.475529,0.230767,0.131989,0.071897,0.932926,0.154428,0.49141,"Simulation-only synthetic benchmark. Not flight control, not aircraft certification, not airworthiness evidence, not propulsion design, not drone swarm control."

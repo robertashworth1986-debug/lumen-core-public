@@ -1,0 +1,15 @@
+{
+  "generated_utc": "2026-07-09T00:42:29.672090+00:00",
+  "files": {
+    "lumajet_baseline_scores.csv": {
+      "sha256": "f56a6d63f4f978453512f906483ce8ac3378e55f2b619b744bc7060b2f1bf958"
+    },
+    "lumajet_baseline_results.json": {
+      "sha256": "405d07233b6cd8a596c099f00049537d10737cb1206fa3e4c3ee43338e255d23"
+    },
+    "LUMAJET_BASELINE_REPORT.md": {
+      "sha256": "c3c1e2c1e560c8276e1409383adca4738c9f0e6d37da2b40e4352f17dd6d90f0"
+    }
+  },
+  "claim_boundary": "Simulation-only synthetic benchmark. Not flight control, not aircraft certification, not airworthiness evidence, not propulsion design, not drone swarm control."
+}

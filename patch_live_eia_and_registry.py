@@ -12,6 +12,37 @@ except Exception:
     requests = None
 
 
+def parse_env_file(path: Path) -> dict[str, str]:
+    values: dict[str, str] = {}
+    if not path.exists():
+        return values
+    for raw in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        if key:
+            values[key] = value.strip().strip('"').strip("'")
+    return values
+
+
+def hydrate_env_from_files() -> None:
+    paths = [
+        Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2\config\luma_live_keys.env"),
+        Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2\config\luma_market_keys.env"),
+        Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2\config\live_breadth_keys.env"),
+    ]
+    external = os.environ.get("LUMA_LIVE_KEYS_FILE") or os.environ.get("LUMA_MARKET_KEYS_FILE")
+    if external:
+        paths.append(Path(external))
+
+    for path in paths:
+        for key, value in parse_env_file(path).items():
+            if value and not os.environ.get(key):
+                os.environ[key] = value
+
+
 ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
 CODE = ROOT / "code"
 OUT = ROOT / "out"
@@ -53,6 +84,7 @@ def load_config() -> dict:
     return json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
 
 
+hydrate_env_from_files()
 cfg = load_config()
 
 

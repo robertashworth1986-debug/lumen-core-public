@@ -223,6 +223,15 @@ def next_actions(summary: dict[str, Any]) -> list[str]:
     ]
     if summary.get("total_live_context_rows_evaluated", 0) and summary.get("candidate_beats_named_baseline_count", 0):
         actions.append("Keep the current claim language at live-context replay, not field validation, until a named external site or partner confirms outcomes.")
+    actions.extend(
+        [
+            "Convert the measured economic surface into lane-specific investment signals by mapping measured rows to annualized value and replay-ready champion deltas.",
+            "Execute the top live replay wiring cards against hashed measured snapshots so every geometry lane has a second validation path.",
+            "Raise the sector breadth target: at least 10 live-measured sectors, with energy, rates, weather, market_data, and federal_opportunity all represented.",
+            "Promote only hash-backed fresh measured snapshots into the proof rail; keep context-only or blocked sources as secondary support material.",
+            "Use the external drive scan to add live/frozen triple-threat candidates only when they pass the same measured-source and hash-backed evidence gate.",
+        ]
+    )
     return actions
 
 
