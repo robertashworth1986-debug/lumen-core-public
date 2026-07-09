@@ -1,9 +1,9 @@
-# LumenCore x EVTit — One-Page Build Scope
+# LumenCore x EVTit — Founder-Protected Review / Build Scope
 
 **Founder:** Robert Ashworth  
 **Company:** LumenCore  
-**Purpose:** Prepare for EVTit / Black Dog code-for-equity evaluation.  
-**Current ask:** Engineering partnership to harden the LumenCore live proof stack into a customer-ready validation platform.
+**Purpose:** Prepare for EVTit / Black Dog review while preserving founder ownership of pre-existing LumenCore / Luma Universe IP.  
+**Current ask:** Optional scoped review, pilot-routing, grant/investor packaging, and/or service support to harden the founder-built proof stack into a customer-ready validation surface.
 
 ---
 
@@ -16,7 +16,7 @@ It helps utilities, labs, data centers, infrastructure operators, and technical 
 - frozen or controlled datasets,
 - pre-selected incumbent baselines,
 - locked acceptance metrics,
-- replay benchmark runners,
+- replay/synthetic/bench runners,
 - hash/evidence manifests,
 - operator-facing proof reports,
 - pilot-readiness packaging.
@@ -25,38 +25,66 @@ It helps utilities, labs, data centers, infrastructure operators, and technical 
 
 ---
 
-## 2. What exists today
+## 2. Founder-control boundary
 
-LumenCore already has early live/public assets and internal proof-stack tooling:
+LumenCore is not a generic app looking for an outside party to own or define it.
 
-- public LumenCore site,
-- mission-control dashboard,
-- grant/SBIR automation lane,
-- replay/benchmark evidence concepts,
-- GitHub-backed development trail,
-- investor/proof-to-pilot materials,
-- DSIP/DARPA/SBIR-related workstreams,
-- outreach underway to utility, lab, investor, and federal channels.
+EVTit, Black Dog, mentors, investors, reviewers, or service providers may help with review, routing, scoped services, or pilot acceleration. That does **not** grant ownership of pre-existing LumenCore IP, code, names, architecture, lexicon, proof materials, constants, dashboards, invention disclosures, or module families.
+
+Any code-for-equity, in-kind engineering, or service structure must clearly separate:
+
+1. pre-existing founder IP,
+2. confidential trade secrets,
+3. public-safe review materials,
+4. scoped deliverables,
+5. new work product,
+6. license scope,
+7. publicity rights,
+8. handoff terms.
+
+Default position: LumenCore retains ownership of all pre-existing IP and architecture.
 
 ---
 
-## 3. What EVTit could help build
+## 3. What exists today
 
-The near-term build is not a generic app. It is productizing the evidence stack into a buyer-ready system.
+LumenCore already has public assets, internal proof-stack tooling, and module families:
+
+- public LumenCore site,
+- mission-control dashboard,
+- proof-to-pilot materials,
+- replay/benchmark evidence concepts,
+- GitHub-backed development trail,
+- grant/SBIR automation lane,
+- DSIP/DARPA/SBIR-related workstreams,
+- LumaTrader market-data/runtime-control proof branch,
+- LumaScout discovery branch,
+- LumaJet synthetic geometry/e-drive proof branch,
+- LumaSuit/LumaSkin non-actuating smart-skin/digital-twin proof branch,
+- FlowForm / LumaSpiral / EtherFrame / AetherReach / LumenShell / EchoForm architecture spine,
+- outreach underway to utility, lab, investor, and federal channels.
+
+Older public live-breadth snapshots are historical. Current internal proof status targets approximately 29 enabled live sources with approximately 25 measured providers/sources, pending a public-safe frozen manifest.
+
+---
+
+## 4. What EVTit could help with
+
+The near-term work is **not** to invent LumenCore. It is to productize the evidence stack into a buyer-ready system while preserving founder ownership.
 
 ### Milestone A — Customer-ready proof portal
 
 - clean external landing page,
 - proof-to-pilot product page,
 - role-specific views for utility/lab/data center/federal reviewers,
-- clear claim boundary: measured vs modeled vs estimated.
+- clear claim boundary: measured vs replay vs synthetic vs modeled vs estimated.
 
-### Milestone B — Replay validation runner
+### Milestone B — Replay / synthetic validation runner
 
 - upload or connect dataset,
 - select incumbent baseline,
 - lock acceptance metric before scoring,
-- run champion-vs-baseline comparison,
+- run champion-vs-baseline or candidate-vs-control comparison,
 - export reproducible report.
 
 ### Milestone C — Evidence manifest layer
@@ -83,31 +111,34 @@ The near-term build is not a generic app. It is productizing the evidence stack 
 
 ---
 
-## 4. First build scope
+## 5. First scoped output
 
-A strong 30-day EVTit sprint could deliver:
+A strong 30-day scope could deliver:
 
 1. a clean LumenCore proof-to-pilot web portal,
-2. one working replay-demo workflow using controlled sample data,
+2. one working replay/synthetic demo workflow using controlled sample data,
 3. generated evidence manifest,
 4. customer-ready proof report template,
 5. investor/federal demo packet,
-6. deployment and maintenance plan.
+6. deployment and maintenance plan,
+7. founder-IP boundary preserved in writing.
+
+This scope is optional and must remain founder-protective.
 
 ---
 
-## 5. Commercial route
+## 6. Commercial route
 
-1. **Free/low-cost technical review:** prove that the flow is credible.
-2. **Paid pilot:** buyer provides data, baseline, and acceptance metric.
-3. **Evidence package:** LumenCore returns proof report and economic conversion.
-4. **Expansion:** subscription or licensing for repeated replay validation.
+1. **Technical review:** prove the flow is credible.
+2. **Pilot scoping:** buyer provides data, baseline, and acceptance metric.
+3. **Evidence package:** LumenCore returns proof report and bounded economic interpretation.
+4. **Expansion:** subscription, licensing, or repeated replay validation.
 
 ---
 
-## 6. Important claim boundary
+## 7. Important claim boundary
 
-LumenCore should not be presented as certified infrastructure control, guaranteed savings, live autonomous trading performance, or field-validated customer ROI until external validation exists.
+LumenCore should not be presented as certified infrastructure control, guaranteed savings, live autonomous trading performance, certified aircraft/suit capability, medical diagnosis, weapons capability, autonomous physical control, or field-validated customer ROI until external validation exists.
 
 The strongest claim is narrower and more fundable:
 
@@ -115,13 +146,16 @@ The strongest claim is narrower and more fundable:
 
 ---
 
-## 7. Links for review
+## 8. Links for review
 
 Primary review links:
 
 - Public site: https://lumen-core.ai/
 - Mission Control: https://lumen-core.ai/mission_control.html
 - Proof-to-pilot page: https://lumen-core.ai/proof_to_pilot.html
+- Current proof status: docs/LUMENCORE_CURRENT_PROOF_STATUS_2026-07-09.md
+- Founder/IP boundary: docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md
+- Claim boundary register: docs/CLAIM_BOUNDARY_REGISTER.md
 - GitHub repository: https://github.com/robertashworth1986-debug/lumen-core-public
 
-Use the public site and this one-page scope as the cleanest starting points. Some live dashboard panels may show placeholders or research lanes; those should be treated as internal evidence-stack infrastructure, not final customer UI.
+Use the public site and these boundary docs as the cleanest starting points. Some live dashboard panels may show placeholders, research lanes, historical artifacts, or internal workflow surfaces; those should be treated as evidence-stack infrastructure, not final customer UI or certification claims.
