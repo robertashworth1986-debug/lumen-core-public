@@ -31,6 +31,12 @@ Primary links:
 - Current proof status: docs/LUMENCORE_CURRENT_PROOF_STATUS_2026-07-09.md
 - Founder/IP boundary: docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md
 - Claim boundary register: docs/CLAIM_BOUNDARY_REGISTER.md
+- Luma Universe module catalog: docs/LUMA_UNIVERSE_MODULE_CATALOG.md
+- Proof Capsule schema: docs/PROOF_CAPSULE_SCHEMA.md
+- Pilot report template: docs/PILOT_REPORT_TEMPLATE.md
+- LumaJet / LumaSuit safe promotion packet: docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md
+- API and demo continuity checklist: docs/API_AND_DEMO_CONTINUITY_CHECKLIST.md
+- Current proof promotion backlog: docs/CURRENT_PROOF_PROMOTION_BACKLOG.md
 
 ---
 
@@ -114,6 +120,19 @@ LumaJet has internal synthetic baseline benchmark activity, including the `LUMAJ
 ### 5. LumaSuit / LumaSkin Phase I evidence
 
 LumaSuit and LumaSkin are safe as non-actuating, simulation-first, human-reviewed smart-skin and human-performance digital twin concepts. Phase I language must stay limited to sensing, scoring, simulation, fatigue/thermal/strain risk modeling, bench validation, and mentor/lab review.
+
+---
+
+## Missing pieces now tracked
+
+The missing proof-promotion pieces are now explicit repo docs rather than loose conversation context:
+
+- module map: `docs/LUMA_UNIVERSE_MODULE_CATALOG.md`,
+- evidence unit format: `docs/PROOF_CAPSULE_SCHEMA.md`,
+- customer/mentor report format: `docs/PILOT_REPORT_TEMPLATE.md`,
+- LumaJet / LumaSuit safe promotion lane: `docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md`,
+- API and demo continuity lane: `docs/API_AND_DEMO_CONTINUITY_CHECKLIST.md`,
+- proof backlog: `docs/CURRENT_PROOF_PROMOTION_BACKLOG.md`.
 
 ---
 
