@@ -26,8 +26,8 @@
       "patented"
     ]
   },
-  "gate_sha256": "4dcaaef300a82bcba93b2c5a7d26aa340509bee48a282c259a87571f806b913c",
-  "generated_utc": "2026-07-09T19:00:22.911687+00:00",
+  "gate_sha256": "4ddd10d3a60fed6167024d573c5d6304dd6c16dc9ffb87fac7cb9521511a93c3",
+  "generated_utc": "2026-07-09T19:11:45.819584+00:00",
   "manifest": [
     {
       "bytes": 8929,
@@ -72,11 +72,11 @@
       "sha256": "c982dde7c868f4f9ac52829518edf2a3fe0bd87742e168cbbe3dfd409736a080"
     },
     {
-      "bytes": 13224,
+      "bytes": 14060,
       "classification": "public_safe_markdown_review_required",
       "name": "DATA_ROOM_MANIFEST_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
-      "sha256": "b9eaf3944021f2eab7f798bb45a91cc56f78cee7f53ad62d5080542bbe1b5b4f"
+      "sha256": "0649a7c857b4e7ecfa165c0c5ec71366f3f30b3758736e88650f2c0fb9528eeb"
     },
     {
       "bytes": 5275,
@@ -86,11 +86,11 @@
       "sha256": "cf0d3fd466ecfd8396d17f1c4787a7fa2898f49ee5f81ed377df05aa161029c4"
     },
     {
-      "bytes": 1329,
+      "bytes": 1947,
       "classification": "public_safe_markdown_review_required",
       "name": "E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-      "sha256": "f3222c5184a015f5aa302f474b5f62f9c4f4d0ee76ec3063928ecee8d79ae11b"
+      "sha256": "b38796654297f4f989040079a0e5d12702a98792958e5d030a1f0fc0f1243448"
     },
     {
       "bytes": 1263,
@@ -98,6 +98,13 @@
       "name": "E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
       "sha256": "fa69d372437e8190edb46477660ce9ddc76725a65ae7a16266f1076222d5fd60"
+    },
+    {
+      "bytes": 10506,
+      "classification": "public_safe_markdown_review_required",
+      "name": "FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
+      "sha256": "184173c25f5d3e94db3d364f3cb9da3c57be3a697427ea760e662279f8e7715e"
     },
     {
       "bytes": 6109,
@@ -458,14 +465,14 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-        "line": 29,
+        "line": 48,
         "phrase": "realized savings",
         "text": "This sync proves file custody and package availability. It does not prove agency approval, cybersecurity certification, patentability, patent ownership, freedom to operate, investor value, trading performance, field validation, realized savings, or final submission acceptance."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-        "line": 29,
+        "line": 48,
         "phrase": "freedom to operate",
         "text": "This sync proves file custody and package availability. It does not prove agency approval, cybersecurity certification, patentability, patent ownership, freedom to operate, investor value, trading performance, field validation, realized savings, or final submission acceptance."
       },
@@ -624,7 +631,7 @@
     "boundary_hit_count": 42,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 28,
+    "markdown_file_count": 29,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0

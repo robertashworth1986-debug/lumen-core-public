@@ -1,0 +1,221 @@
+{
+  "evidence_status": [
+    {
+      "bytes": 8929,
+      "path": "grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md",
+      "present": true,
+      "sha256": "fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82"
+    },
+    {
+      "bytes": 18765,
+      "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
+      "present": true,
+      "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
+    },
+    {
+      "bytes": 13939,
+      "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
+      "present": true,
+      "sha256": "7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672"
+    },
+    {
+      "bytes": 9907,
+      "path": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+      "present": true,
+      "sha256": "0e5cf6b23334fed68895f117a61a47238e0ea27ba9bed7103739fc19f9ba8d59"
+    },
+    {
+      "bytes": 6300,
+      "path": "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
+      "present": true,
+      "sha256": "f04cfca6d7b388c97303e354aaf9229ba3d46d57f54c6f56110d4ade89dd82b3"
+    },
+    {
+      "bytes": 13224,
+      "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
+      "present": true,
+      "sha256": "b9eaf3944021f2eab7f798bb45a91cc56f78cee7f53ad62d5080542bbe1b5b4f"
+    },
+    {
+      "bytes": 6279,
+      "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
+      "present": true,
+      "sha256": "fed8a3e2a688d0ec7423c36ac0369641f1712689fe2afa2097864774910fd6d7"
+    },
+    {
+      "bytes": 3682,
+      "path": "data/company_profile.json",
+      "present": true,
+      "sha256": "16086b05d3d5e4af4910fec49cafefc8918ac05ed237f68f471a2834898efe55"
+    }
+  ],
+  "federal_submission_protocol_packet_sha256": "c57f6218556d76404a0a26671c44bf0ae2175494b6445fd75bd923100c1332a3",
+  "generated_utc": "2026-07-09T19:07:34.171427+00:00",
+  "human_gate": {
+    "cybersecurity_representation_allowed_without_human": false,
+    "dsip_submit_allowed_without_human": false,
+    "grants_gov_submit_allowed_without_human": false,
+    "pricing_or_cost_submission_allowed_without_human": false,
+    "research_gov_submit_allowed_without_human": false,
+    "rule": "Federal submissions remain preparation-only until Robert verifies official portal status, authority, package contents, cybersecurity implications, cost, and final submission intent.",
+    "sam_update_allowed_without_human": false
+  },
+  "official_sources": [
+    {
+      "label": "SAM.gov entity registration",
+      "lumen_gate": "Robert verifies active registration, UEI/CAGE status, renewal date, entity roles, assertions, and representations directly in SAM.gov.",
+      "protocol_fact": "SAM.gov assigns the Unique Entity ID during entity registration and says registrations must be renewed every 365 days to stay active.",
+      "url": "https://sam.gov/entity-registration"
+    },
+    {
+      "label": "SAM.gov entity registration checklist",
+      "lumen_gate": "Do not treat a local profile field as award eligibility; portal status must be checked before final submission.",
+      "protocol_fact": "The checklist says to allow at least ten business days after submitting a SAM registration for it to become active.",
+      "url": "https://sam.gov/sites/default/files/2024-11/entity-checklist.pdf"
+    },
+    {
+      "label": "Grants.gov applicant registration",
+      "lumen_gate": "Robert verifies profile, role, workspace, and application package state before any Grants.gov action.",
+      "protocol_fact": "Grants.gov says an organization profile uses the SAM.gov UEI and the EBiz POC assigns roles such as AOR and Workspace Manager.",
+      "url": "https://www.grants.gov/applicants/applicant-registration"
+    },
+    {
+      "label": "Grants.gov EBiz POC role authorization",
+      "lumen_gate": "AOR authority and signing responsibility remain human verified before final submit.",
+      "protocol_fact": "Grants.gov says the EBiz POC must authorize roles before a user can complete or submit application packages on behalf of the organization.",
+      "url": "https://www.grants.gov/applicants/applicant-registration/ebiz-poc-authorizes-profile-roles"
+    },
+    {
+      "label": "Grants.gov Workspace roles",
+      "lumen_gate": "Workspace participation and AOR privileges must be checked opportunity by opportunity.",
+      "protocol_fact": "Grants.gov says Standard AOR can submit the final application and Workspace Manager is the minimum core role to create and start a workspace.",
+      "url": "https://www.grants.gov/applicants/workspace-overview/workspace-roles"
+    },
+    {
+      "label": "SBIR/STTR eligibility tutorial",
+      "lumen_gate": "Ownership, affiliate, PI employment, for-profit status, and award-time eligibility stay human verified.",
+      "protocol_fact": "SBIR.gov states the small business must be primarily U.S. owned, generally at least 51% by U.S. citizens or permanent residents.",
+      "url": "https://www.sbir.gov/tutorials/program-basics/tutorial-2"
+    },
+    {
+      "label": "SBIR/STTR eligibility FAQ",
+      "lumen_gate": "Local small-business posture is evidence for review, not final eligibility certification.",
+      "protocol_fact": "SBIR.gov says the awardee must qualify as a Small Business Concern under SBA SBIR/STTR rules.",
+      "url": "https://www.sbir.gov/faq/all"
+    },
+    {
+      "label": "Defense SBIR/STTR funding opportunities",
+      "lumen_gate": "DSIP organization linkage, Firm PIN, topic forms, cost package, certifications, and submit button remain human controlled.",
+      "protocol_fact": "Defense SBIR/STTR says all DoW SBIR and STTR proposals must be submitted electronically through DSIP as described in the BAA or CSO.",
+      "url": "https://www.defensesbirsttr.mil/SBIR-STTR/Opportunities/"
+    },
+    {
+      "label": "DARPA SBIR/STTR participation guide",
+      "lumen_gate": "DICE and other DARPA-package final submit stays blocked until Robert verifies the complete package and portal status.",
+      "protocol_fact": "DARPA says SBIR/STTR proposals are prepared and submitted through DSIP and are not considered submitted until Submit Proposal is clicked.",
+      "url": "https://www.darpa.mil/work-with-us/communities/small-business/sbir-sttr-participate"
+    },
+    {
+      "label": "DoW CIO CMMC program",
+      "lumen_gate": "No CMMC, SPRS, FCI, CUI, or enclave representation is made unless official evidence supports the exact claim.",
+      "protocol_fact": "DoW CIO says CMMC Phase 1 implementation runs November 10, 2025 through November 9, 2026 and focuses primarily on Level 1 and Level 2 self-assessments.",
+      "url": "https://dodcio.defense.gov/CMMC/"
+    },
+    {
+      "label": "DoW CIO About CMMC",
+      "lumen_gate": "Any FCI/CUI work requires a scoped environment, solicitation-specific requirements, and human-approved cybersecurity representation.",
+      "protocol_fact": "DoW CIO says CMMC addresses safeguarding requirements for FCI and CUI and requires specified levels as a condition of contract award when applicable.",
+      "url": "https://dodcio.defense.gov/cmmc/About/"
+    }
+  ],
+  "outputs": {
+    "dashboard_json": "dashboard/data/federal_submission_protocol_packet.json",
+    "json": "out/ops/federal_submission_protocol_packet_latest.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md"
+  },
+  "protocol_rows": [
+    {
+      "blocked_without_check": "Do not submit federal contract or assistance material as eligible from local profile alone.",
+      "gate": "SAM/UEI/CAGE",
+      "local_signal": "company_profile.sam_gov_status",
+      "required_human_check": "Confirm active SAM.gov status, UEI, CAGE if assigned, renewal date, entity administrator, entity POCs, and current representations."
+    },
+    {
+      "blocked_without_check": "Do not click final submission, certification, or signature-equivalent steps.",
+      "gate": "Grants.gov AOR/Workspace",
+      "local_signal": "submission_readiness.grants_gov_account_verified and aor_authority_verified",
+      "required_human_check": "Confirm Grants.gov account, organization profile, EBiz POC authorization, AOR role, workspace access, and package status."
+    },
+    {
+      "blocked_without_check": "Do not represent an NSF invitation or full-proposal eligibility unless NSF issued it.",
+      "gate": "Research.gov / NSF",
+      "local_signal": "submission_readiness.research_gov_account_verified and nsf_project_pitch_submitted",
+      "required_human_check": "Confirm NSF Project Pitch pending status, invitation status, Research.gov access, PI eligibility, and one-pending-pitch rule."
+    },
+    {
+      "blocked_without_check": "Do not submit, certify, or claim DoW integration or procurement readiness.",
+      "gate": "DSIP / Defense SBIR-STTR",
+      "local_signal": "submission_readiness.dsip_account_verified and dod_compliance_verified",
+      "required_human_check": "Confirm DSIP account, firm linkage, Firm PIN, topic forms, cost volume, reps, certifications, and final upload preview."
+    },
+    {
+      "blocked_without_check": "Do not process protected federal information in general-purpose public tooling or ordinary sync folders.",
+      "gate": "Cyber / FCI / CUI",
+      "local_signal": "proposal material currently treated as Unclassified and non-CUI unless official source marks otherwise",
+      "required_human_check": "Confirm whether the solicitation involves FCI, CUI, export controls, SPRS, CMMC level, enclave scope, or flow-down obligations."
+    },
+    {
+      "blocked_without_check": "Do not expand patent-rights or exclusivity language in agency or investor materials.",
+      "gate": "IP / Disclosure",
+      "local_signal": "ip_counsel_diligence_packet",
+      "required_human_check": "Confirm official patent status, support, new-matter risk, disclosure limits, and counsel-approved language."
+    },
+    {
+      "blocked_without_check": "Do not let autonomous systems submit, sign, certify, transact, or move capital.",
+      "gate": "Runtime / Autonomy",
+      "local_signal": "autonomous_quant_governance_packet",
+      "required_human_check": "Confirm paper/runtime state, external-action authority, and no capital-impacting step before any operational escalation."
+    }
+  ],
+  "schema": "federal_submission_protocol_packet_v1",
+  "status": "FEDERAL_SUBMISSION_PROTOCOL_READY_HUMAN_PORTAL_REQUIRED",
+  "submission_readiness": {
+    "blocked_readiness_count": 6,
+    "blocked_readiness_flags": [
+      "grants_gov_account_verified",
+      "research_gov_account_verified",
+      "nsf_project_pitch_submitted",
+      "aor_authority_verified",
+      "dsip_account_verified",
+      "dod_compliance_verified"
+    ],
+    "cage_present_locally": true,
+    "profile_source": "data/company_profile.json",
+    "ready_flag_count": 0,
+    "sam_gov_status": "verification_required",
+    "uei_present_locally": true
+  },
+  "summary": {
+    "all_final_actions_blocked_without_human": true,
+    "autonomous_governance_ready": true,
+    "award_eligibility_claimed": false,
+    "blocked_readiness_count": 6,
+    "certification_allowed_without_human": false,
+    "cmmc_status_claimed": false,
+    "cui_processing_claimed": false,
+    "data_room_markdown_count": 28,
+    "docket_lane_count": 15,
+    "external_send_allowed_without_human": false,
+    "final_submission_allowed_without_human": false,
+    "human_protocol_required": true,
+    "ip_counsel_ready": true,
+    "official_source_count": 11,
+    "portal_submit_allowed_without_human": false,
+    "protocol_gate_count": 7,
+    "ready_flag_count": 0,
+    "reviewer_gate_clear": true,
+    "unsafe_claim_count": 0,
+    "unsafe_secret_count": 0,
+    "urgent_lane_count": 3
+  }
+}

@@ -9,6 +9,25 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - `AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md`
 - `IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md`
 - `AUTONOMOUS_QUANT_INNOVATION_SAFETY_PROTOCOL_2026-07-09.md`
+- `FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md`
+
+## New Machine Control Files
+
+- `out/ops/federal_submission_protocol_packet_latest.json`
+- `dashboard/data/federal_submission_protocol_packet.json`
+
+## Latest Verified Sync Result
+
+- Latest layer: `federal_submission_protocol_packet`
+- Source files: `54`
+- Target count: `3`
+- Total copied artifacts across targets: `237`
+- Total SHA-256 checks: `237`
+- Problem count: `0`
+- Reviewer gate status: `REVIEWER_GATE_CLEAR_HUMAN_SUBMISSION_REQUIRED`
+- Data-room status: `DATA_ROOM_MANIFEST_READY`
+- Data-room Markdown artifacts: `29`
+- Data-room machine controls: `22`
 
 ## Destination Set
 
