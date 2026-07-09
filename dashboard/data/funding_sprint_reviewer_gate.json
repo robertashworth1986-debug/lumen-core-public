@@ -26,8 +26,8 @@
       "patented"
     ]
   },
-  "gate_sha256": "05983e63b6b11c79315dfd42a852d8419e1cb512da93381fa157e78c724b2140",
-  "generated_utc": "2026-07-09T03:54:14.126577+00:00",
+  "gate_sha256": "9c6081fcbf99927dad935fa89f14e3be3108b43bb18ad2ca6ba9c260c943e0f7",
+  "generated_utc": "2026-07-09T03:59:06.089126+00:00",
   "manifest": [
     {
       "bytes": 8929,
@@ -147,6 +147,13 @@
       "name": "PROOF_STACK_EDGE_INDEX_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/PROOF_STACK_EDGE_INDEX_2026-07-09.md",
       "sha256": "3a814a6751a89939d540381a20acd7eaa0ccec1b970d045191dc64d7a5b49596"
+    },
+    {
+      "bytes": 23242,
+      "classification": "public_safe_markdown_review_required",
+      "name": "REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
+      "sha256": "f7b9a4fcda217537da466a81fcce8b01017635295dac124592740e84634e9337"
     },
     {
       "bytes": 6675,
@@ -540,7 +547,7 @@
     "boundary_hit_count": 39,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 19,
+    "markdown_file_count": 20,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0

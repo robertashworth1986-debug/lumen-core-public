@@ -1,0 +1,658 @@
+{
+  "concierge_cards": [
+    {
+      "artifact_count": 4,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 4,
+      "artifacts": [
+        {
+          "bytes": 16958,
+          "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+          "present": true,
+          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+        },
+        {
+          "bytes": 4065,
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+          "present": true,
+          "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957"
+        },
+        {
+          "bytes": 3471,
+          "path": "docs/PROOF_TO_PILOT_CONTROL_ROOM_2026-06-25.md",
+          "present": true,
+          "sha256": "2aaa3ade058e88eef43d9ec54a0d63271de034596abd8fdb8570c6aa9eee7de3"
+        },
+        {
+          "bytes": 7045,
+          "path": "docs/LIVE_DOMAIN_PROOF_FEED_DEPLOY_BUNDLE_2026-06-27.md",
+          "present": true,
+          "sha256": "b01d392e1e003b5e0c1d910bda52901cea0ad8e04c724cd3c88babf5f26ebfaf"
+        }
+      ],
+      "audience": "engineering-for-equity reviewer",
+      "best_first_read": "Live proof stack, build scope, validation workflow, and productization gaps.",
+      "channel": "venture_engineering",
+      "claim_boundary": "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
+      "concierge_card_sha256": "b6428ffe6ac2d75d2c442bed0a841ff5824f54fbe002a56ffc0b068e3cd8d05f",
+      "deadline_or_gate": "Discovery meeting booked from Gmail invite; public launch event July 22, 2026.",
+      "decision_question": "Can an in-kind engineering team accelerate proof portal, replay runner, manifest, and pilot onboarding?",
+      "fit_score": 92,
+      "human_gate": "Human attends meeting and decides any equity-for-services terms.",
+      "lane_id": "evtit_blackdog_inkind",
+      "name": "EVTit / Black Dog in-kind engineering fund",
+      "priority": 1,
+      "reviewer_action": "Prepare a pre-call technical walkthrough, build-scope menu, and proof-card appendix.",
+      "source_refs": [
+        "gmail:19f43c8a4ba9346e",
+        "gmail:19f44a7aa0a8a011",
+        "public:evtit_event",
+        "public:black_dog"
+      ],
+      "status": "LIVE_MEETING_PREP"
+    },
+    {
+      "artifact_count": 3,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 3,
+      "artifacts": [
+        {
+          "bytes": 16958,
+          "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+          "present": true,
+          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+        },
+        {
+          "bytes": 2960,
+          "path": "docs/PROOF_TO_REVENUE_ENGINE_2026-06-27.md",
+          "present": true,
+          "sha256": "7c3a46f3a679a6f1c345c1028b6877630d3c3c09f65295e1b1bbb091cd38b992"
+        },
+        {
+          "bytes": 6080,
+          "path": "docs/BUSINESS_PLAN_AND_LIVE_BREADTH_SEND_PACKET_2026-07-05.md",
+          "present": true,
+          "sha256": "150b3b3f519f545230f5640f154f4f1fcc0850eafa869169a22c77cea9539769"
+        }
+      ],
+      "audience": "early-check investor",
+      "best_first_read": "Traction ledger, proof-to-revenue engine, and clean proof-to-pilot public link.",
+      "channel": "venture_cash",
+      "claim_boundary": "Submission and acknowledgement only; no funding decision is represented.",
+      "concierge_card_sha256": "16319fdf5b3a2c1f0d564a30d2cc334f2b0b123fb79747b4c711b3ba5ebb2265",
+      "deadline_or_gate": "Submitted July 9, 2026; Gmail reply acknowledged the update.",
+      "decision_question": "Is a small first check useful enough to preserve execution velocity and unlock pilots?",
+      "fit_score": 86,
+      "human_gate": "Human approves any diligence reply or investor terms.",
+      "lane_id": "lvlup_first_check",
+      "name": "LvlUp Ventures First Check Fund",
+      "priority": 2,
+      "reviewer_action": "Keep investor brief and short walkthrough ready for under-one-week review.",
+      "source_refs": [
+        "gmail:19f44c59a4189d31",
+        "public:lvlup_first_check"
+      ],
+      "status": "WAITING_REVIEW"
+    },
+    {
+      "artifact_count": 5,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 5,
+      "artifacts": [
+        {
+          "bytes": 16958,
+          "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+          "present": true,
+          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+        },
+        {
+          "bytes": 9465,
+          "path": "grant_submissions/DICE_HR001126S0010/DICE_SUBMISSION_READINESS.md",
+          "present": true,
+          "sha256": "783af4c8d658be2b90c1a2419fb7728455e91652b00dda740b5c39d9502359ad"
+        },
+        {
+          "bytes": 14386,
+          "path": "grant_submissions/DICE_HR001126S0010/DICE_HEILMEIER_REVIEWER_MATRIX_2026-06-20.md",
+          "present": true,
+          "sha256": "a42695523227bb7e2270187722a2ac2e2359dd3d0493eb4e0f014538927d0be8"
+        },
+        {
+          "bytes": 8519,
+          "path": "grant_submissions/DICE_HR001126S0010/DICE_EVIDENCE_SYNTHESIS_2026-06-20.md",
+          "present": true,
+          "sha256": "291047ec5573f3461b050cc870ff19bacfb2035a513f6ba166b4f649c836c300"
+        },
+        {
+          "bytes": 7108,
+          "path": "grant_submissions/DICE_HR001126S0010/DICE_REFERENCE_RELEVANCE_MATRIX_2026-06-20.md",
+          "present": true,
+          "sha256": "e83685b7603c05aa28228765ee0c4c4c6a8b466ec75dc1f11cdffb8e53eeea4c"
+        }
+      ],
+      "audience": "BAA technical evaluator",
+      "best_first_read": "Heilmeier matrix, evidence synthesis, compliance matrix, and human-gated submission controls.",
+      "channel": "federal_baa",
+      "claim_boundary": "Abstract receipt is not award selection and not permission to skip BAA instructions.",
+      "concierge_card_sha256": "16f3dc6829c8ceeb98ccd24df5fdc36c5a9fd7220b9ecf5f8a3b12fccbd2282f",
+      "deadline_or_gate": "Abstract ID HR001126S0010-DICE-PA-052 recorded; full proposal instructions must be confirmed against the controlling BAA before upload.",
+      "decision_question": "Does the proposal map a credible research objective to a bounded validation method?",
+      "fit_score": 90,
+      "human_gate": "Human confirms BAA requirements, reps, budgets, and submission package before any portal action.",
+      "lane_id": "darpa_dice_full_submission",
+      "name": "DARPA DICE full proposal sprint",
+      "priority": 3,
+      "reviewer_action": "Build full submission matrix, compute plan, performer/team map, and acceptance-test narrative.",
+      "source_refs": [
+        "gmail:19f4332ca917d603",
+        "public:darpa_dice"
+      ],
+      "status": "FULL_PROPOSAL_SPRINT"
+    },
+    {
+      "artifact_count": 3,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 3,
+      "artifacts": [
+        {
+          "bytes": 6109,
+          "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
+          "present": true,
+          "sha256": "f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046"
+        },
+        {
+          "bytes": 6754,
+          "path": "grant_submissions/funding_sprint_20260709/PROOF_STACK_EDGE_INDEX_2026-07-09.md",
+          "present": true,
+          "sha256": "3a814a6751a89939d540381a20acd7eaa0ccec1b970d045191dc64d7a5b49596"
+        },
+        {
+          "bytes": 8929,
+          "path": "grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md",
+          "present": true,
+          "sha256": "fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82"
+        }
+      ],
+      "audience": "contracting or technical capability reviewer",
+      "best_first_read": "Capability outline, source provenance, risk boundaries, and agency protocol controls.",
+      "channel": "federal_contract",
+      "claim_boundary": "Prepared capability material only; no FHWA field result, safety benefit, or deployment claim.",
+      "concierge_card_sha256": "1328e8f4d489da72e8e3fd87fe9f0a3cdea8a82b97b852c61098473a6b7b6f71",
+      "deadline_or_gate": "Active until 2026-08-03 13:00 UTC per Sweetspot search; official SAM notice ID 693JJ326R000012 located.",
+      "decision_question": "Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?",
+      "fit_score": 95,
+      "human_gate": "Human verifies SAM attachments, terms, pricing, reps/certs, and final submission authority.",
+      "lane_id": "fhwa_tsmo_data_initiative",
+      "name": "FHWA TSMO Data Initiative",
+      "priority": 4,
+      "reviewer_action": "Convert the existing outline into a compliance matrix, capability volume, and teaming decision.",
+      "source_refs": [
+        "public:sam_fhwa_tsmo",
+        "sweetspot:693JJ326R000012"
+      ],
+      "status": "PHASE_I_TECH_VOLUME"
+    },
+    {
+      "artifact_count": 3,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 3,
+      "artifacts": [
+        {
+          "bytes": 5614,
+          "path": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md",
+          "present": true,
+          "sha256": "bcfdd40dfafc7ca0e7822679dba9d2504c2196b5701704d0ba3d46c5ce9448f6"
+        },
+        {
+          "bytes": 6754,
+          "path": "grant_submissions/funding_sprint_20260709/PROOF_STACK_EDGE_INDEX_2026-07-09.md",
+          "present": true,
+          "sha256": "3a814a6751a89939d540381a20acd7eaa0ccec1b970d045191dc64d7a5b49596"
+        },
+        {
+          "bytes": 8929,
+          "path": "grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md",
+          "present": true,
+          "sha256": "fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82"
+        }
+      ],
+      "audience": "market research reviewer",
+      "best_first_read": "RFI response outline and source-backed concept map.",
+      "channel": "federal_rfi",
+      "claim_boundary": "RFI response only; no NASA partnership, contract, or infrastructure result is represented.",
+      "concierge_card_sha256": "5cf3ef5242a4b758bfea94dfe4aac3c46529a67d01b3ba226247a3f18124ebfc",
+      "deadline_or_gate": "Active until 2026-07-17 21:00 UTC per Sweetspot search; official RFI number 80TECH26RFI0020 located.",
+      "decision_question": "Does the response provide useful market intelligence without claiming award readiness?",
+      "fit_score": 89,
+      "human_gate": "Human verifies official response instructions, page limits, contacts, and final send.",
+      "lane_id": "nasa_data_center_rfi",
+      "name": "NASA Data Center Infrastructure RFI",
+      "priority": 5,
+      "reviewer_action": "Package the RFI response as architecture, evidence manifest, and operations-risk framing.",
+      "source_refs": [
+        "public:sam_nasa_data_center",
+        "sweetspot:80TECH26RFI0020"
+      ],
+      "status": "RFI_RESPONSE_PREP"
+    },
+    {
+      "artifact_count": 3,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 3,
+      "artifacts": [
+        {
+          "bytes": 5275,
+          "path": "grant_submissions/funding_sprint_20260709/DSIP_MISSIONWEAVE_FAST_SUBMISSION_PLAN_2026-07-09.md",
+          "present": true,
+          "sha256": "cf0d3fd466ecfd8396d17f1c4787a7fa2898f49ee5f81ed377df05aa161029c4"
+        },
+        {
+          "bytes": 3242,
+          "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_READINESS.md",
+          "present": true,
+          "sha256": "56312a5fcef4b6f49f4ed7e41c9cc48ed1d50cf40a07c9ee4dc6f6a82e570865"
+        },
+        {
+          "bytes": 3952,
+          "path": "docs/MISSIONWEAVE_GENERATED_WORKFLOW_VALIDATION_2026-06-13.md",
+          "present": true,
+          "sha256": "64f7006b19a8eed3ba3eab27fc513ab602b03daacd20849614e0690fb25f9ad0"
+        }
+      ],
+      "audience": "SBIR reviewer",
+      "best_first_read": "Phase I technical plan, innovation boundary, commercialization path, and proof-to-pilot evidence.",
+      "channel": "federal_sbir",
+      "claim_boundary": "No DLA integration, procurement, or certified readiness claim.",
+      "concierge_card_sha256": "34c7baccce03f5ee0f417a1d84f15db7718b09a929ca8067980fd4b027e21bfd",
+      "deadline_or_gate": "Current sprint records July 22, 2026 as the active DSIP gate; verify DSIP before final action.",
+      "decision_question": "Is the Phase I work scoped to produce independently reviewable technical evidence?",
+      "fit_score": 87,
+      "human_gate": "Human-only Firm PIN, certifications, cost approval, and final submit.",
+      "lane_id": "dla_missionweave_sbir",
+      "name": "DLA MissionWeave DSIP SBIR",
+      "priority": 6,
+      "reviewer_action": "Prepare DSIP technical volume, cost notes, and Firm PIN handoff checklist.",
+      "source_refs": [
+        "public:sbir_topics",
+        "local:DSIP_MISSIONWEAVE_FAST_SUBMISSION_PLAN_2026-07-09.md"
+      ],
+      "status": "DSIP_PACKAGE_PREP"
+    },
+    {
+      "artifact_count": 3,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 3,
+      "artifacts": [
+        {
+          "bytes": 8895,
+          "path": "grant_submissions/funding_sprint_20260709/NSF_PROJECT_PITCH_DRAFT_2026-07-09.md",
+          "present": true,
+          "sha256": "baa66ab948fdc1bb57e898d8a6e4e0bf776c65ff4c6722ef658720c148f40e6f"
+        },
+        {
+          "bytes": 2792,
+          "path": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_READINESS.md",
+          "present": true,
+          "sha256": "7ba4f6c8a371dca2c0b6472424b5f7c5866063df014f1d8691855f4e81d3dacb"
+        },
+        {
+          "bytes": 9134,
+          "path": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-06-19.md",
+          "present": true,
+          "sha256": "f4b07fcdd718b53a854f6e96451276392487c725ca25c7e3e3c792e189848602"
+        }
+      ],
+      "audience": "SBIR reviewer",
+      "best_first_read": "Phase I technical plan, innovation boundary, commercialization path, and proof-to-pilot evidence.",
+      "channel": "federal_sbir",
+      "claim_boundary": "No NSF invitation or full-proposal eligibility is represented unless NSF issues it.",
+      "concierge_card_sha256": "d5839df683b593e54ed9ed74dfef2e6967d170c95df1cbaa90b2f3915cb178e2",
+      "deadline_or_gate": "Rolling pitch gate; NSF requires waiting if a Project Pitch, open invitation, or full proposal is already pending.",
+      "decision_question": "Is the Phase I work scoped to produce independently reviewable technical evidence?",
+      "fit_score": 78,
+      "human_gate": "Human approves pitch content and submission.",
+      "lane_id": "nsf_project_pitch",
+      "name": "NSF SBIR/STTR Project Pitch",
+      "priority": 7,
+      "reviewer_action": "Check the one-pending-pitch rule and submit only if no conflicting NSF item is pending.",
+      "source_refs": [
+        "public:nsf_project_pitch",
+        "public:nsf_project_pitch_apply",
+        "local:NSF_PROJECT_PITCH_DRAFT_2026-07-09.md"
+      ],
+      "status": "PITCH_READY_HUMAN_CHECK"
+    },
+    {
+      "artifact_count": 2,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 2,
+      "artifacts": [
+        {
+          "bytes": 16958,
+          "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+          "present": true,
+          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+        },
+        {
+          "bytes": 8338,
+          "path": "grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md",
+          "present": true,
+          "sha256": "684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9"
+        }
+      ],
+      "audience": "agency routing contact",
+      "best_first_read": "Boundary-safe routing note and partner-only decision record.",
+      "channel": "federal_market_research",
+      "claim_boundary": "No instrument supply, OEM, reseller, or lab-services qualification claim.",
+      "concierge_card_sha256": "c19c4b82bd2b1eeca94e44c1a42bb5ba46bb4e5b6b3129a3641ebde1a526bad1",
+      "deadline_or_gate": "Active until 2026-07-21 21:30 UTC per Sweetspot search; official notice ID 68HE0726Q0027 located.",
+      "decision_question": "Should LumenCore be routed to a data QA or validation need instead of a hardware buy?",
+      "fit_score": 42,
+      "human_gate": "Human approves any further agency contact.",
+      "lane_id": "epa_r10_icpoes_route",
+      "name": "EPA Region 10 ICP-OES RFI route",
+      "priority": 8,
+      "reviewer_action": "Wait for agency routing response; do not prepare a hardware quote.",
+      "source_refs": [
+        "gmail:19f4332fa2615bd6",
+        "public:sam_epa_icpoes",
+        "sweetspot:68HE0726Q0027"
+      ],
+      "status": "ROUTE_ONLY_LOW_FIT"
+    },
+    {
+      "artifact_count": 2,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 2,
+      "artifacts": [
+        {
+          "bytes": 16958,
+          "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+          "present": true,
+          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+        },
+        {
+          "bytes": 8338,
+          "path": "grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md",
+          "present": true,
+          "sha256": "684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9"
+        }
+      ],
+      "audience": "sources-sought reviewer",
+      "best_first_read": "Partner-only filter and qualification boundary.",
+      "channel": "federal_sources_sought",
+      "claim_boundary": "No testing lab, contaminant monitoring, or regulated lab-services claim.",
+      "concierge_card_sha256": "5b24898483875e278e6a42a66b2530619ca6f1fdca468ee61881b3ff03d881e6",
+      "deadline_or_gate": "Active until 2026-07-21 20:00 UTC per Sweetspot search.",
+      "decision_question": "Is there a qualified prime or lab partner before any response is drafted?",
+      "fit_score": 46,
+      "human_gate": "Human approves partner outreach.",
+      "lane_id": "epa_ucmr6_partner_only",
+      "name": "EPA UCMR 6 analytical chemistry lab services",
+      "priority": 9,
+      "reviewer_action": "Hold for qualified lab partner; do not chase as prime.",
+      "source_refs": [
+        "sweetspot:68HERW26R0020"
+      ],
+      "status": "PARTNER_ONLY"
+    },
+    {
+      "artifact_count": 2,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 2,
+      "artifacts": [
+        {
+          "bytes": 16958,
+          "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+          "present": true,
+          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+        },
+        {
+          "bytes": 6109,
+          "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
+          "present": true,
+          "sha256": "f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046"
+        }
+      ],
+      "audience": "BAA technical evaluator",
+      "best_first_read": "Heilmeier matrix, evidence synthesis, compliance matrix, and human-gated submission controls.",
+      "channel": "federal_baa",
+      "claim_boundary": "No claim that LumenCore fits all BAA topics.",
+      "concierge_card_sha256": "d4e4c0b56c90d8f98cf17b14e5b88755b310b5f12a72cb6907214383896b0d4f",
+      "deadline_or_gate": "Active until 2026-07-24 17:00 UTC per Sweetspot search; official SAM call located.",
+      "decision_question": "Does the proposal map a credible research objective to a bounded validation method?",
+      "fit_score": 64,
+      "human_gate": "Human approves topic selection and submission.",
+      "lane_id": "fhwa_infrastructure_baa_call3",
+      "name": "FHWA Infrastructure R&D BAA Call 3.0",
+      "priority": 10,
+      "reviewer_action": "Download official attachments and score each Appendix C topic before drafting.",
+      "source_refs": [
+        "public:sam_fhwa_baa_call_3",
+        "sweetspot:693JJ3-23-BAA-0002-3"
+      ],
+      "status": "SCOUT_TOPIC_MATCH"
+    },
+    {
+      "artifact_count": 2,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 2,
+      "artifacts": [
+        {
+          "bytes": 16958,
+          "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+          "present": true,
+          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+        },
+        {
+          "bytes": 8929,
+          "path": "grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md",
+          "present": true,
+          "sha256": "fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82"
+        }
+      ],
+      "audience": "contracting or technical capability reviewer",
+      "best_first_read": "Capability outline, source provenance, risk boundaries, and agency protocol controls.",
+      "channel": "federal_contract",
+      "claim_boundary": "No FedRAMP, ATO, HHS pilot, or government production-access claim.",
+      "concierge_card_sha256": "d59346d02effc0dfc2e572f176c60da12a77da61aa0419cd2a69892ed15e9c57",
+      "deadline_or_gate": "Active until 2026-07-14 21:00 UTC per Sweetspot search.",
+      "decision_question": "Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?",
+      "fit_score": 38,
+      "human_gate": "Human approves any partner route.",
+      "lane_id": "hhs_ai_power_user_pilot",
+      "name": "HHS AI Power User Advanced Models and Features Pilot",
+      "priority": 11,
+      "reviewer_action": "Do not chase solo; use as partner-target intelligence only.",
+      "source_refs": [
+        "sweetspot:7571TE26R00004"
+      ],
+      "status": "DO_NOT_PRIME_SOLO"
+    },
+    {
+      "artifact_count": 2,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 2,
+      "artifacts": [
+        {
+          "bytes": 16958,
+          "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+          "present": true,
+          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+        },
+        {
+          "bytes": 8929,
+          "path": "grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md",
+          "present": true,
+          "sha256": "fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82"
+        }
+      ],
+      "audience": "contracting or technical capability reviewer",
+      "best_first_read": "Capability outline, source provenance, risk boundaries, and agency protocol controls.",
+      "channel": "federal_contract",
+      "claim_boundary": "No public-safety deployment, law-enforcement feed integration, or FedRAMP authorization claim.",
+      "concierge_card_sha256": "b90f18a616b6abae65a1b76e0e556d71e4d58a6a9af5ada270b4a28a8d1d8c76",
+      "deadline_or_gate": "Active until 2026-07-14 16:00 UTC per Sweetspot search.",
+      "decision_question": "Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?",
+      "fit_score": 35,
+      "human_gate": "Human approves any partner route.",
+      "lane_id": "csosa_public_safety_analytics",
+      "name": "CSOSA Public Safety Data Analytics Platform",
+      "priority": 12,
+      "reviewer_action": "Park as a partner-only signal; do not spend proposal time as prime.",
+      "source_refs": [
+        "sweetspot:9594CS26Q0053"
+      ],
+      "status": "DO_NOT_PRIME_SOLO"
+    },
+    {
+      "artifact_count": 2,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 2,
+      "artifacts": [
+        {
+          "bytes": 16958,
+          "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+          "present": true,
+          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+        },
+        {
+          "bytes": 3471,
+          "path": "docs/PROOF_TO_PILOT_CONTROL_ROOM_2026-06-25.md",
+          "present": true,
+          "sha256": "2aaa3ade058e88eef43d9ec54a0d63271de034596abd8fdb8570c6aa9eee7de3"
+        }
+      ],
+      "audience": "contracting or technical capability reviewer",
+      "best_first_read": "Capability outline, source provenance, risk boundaries, and agency protocol controls.",
+      "channel": "federal_contract",
+      "claim_boundary": "No consortium management, energy project financing, or installation-performance claim.",
+      "concierge_card_sha256": "6c88baf22a2b369b38950e6c1266fd753551a57fbfc11f60c5bb28388838cfed",
+      "deadline_or_gate": "Active until 2026-07-30 19:00 UTC per Sweetspot search.",
+      "decision_question": "Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?",
+      "fit_score": 58,
+      "human_gate": "Human approves any partner or investor intro.",
+      "lane_id": "defense_energy_consortium",
+      "name": "Defense Energy Consortium CMO",
+      "priority": 13,
+      "reviewer_action": "Use as investor/strategic-partner conversation material, not immediate solo proposal.",
+      "source_refs": [
+        "sweetspot:FA8003-26-R-0023"
+      ],
+      "status": "PARTNER_INTRO_ONLY"
+    },
+    {
+      "artifact_count": 2,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 2,
+      "artifacts": [
+        {
+          "bytes": 16958,
+          "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+          "present": true,
+          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+        },
+        {
+          "bytes": 6532,
+          "path": "docs/CURRENT_PROOF_POSTURE_AND_NEXT_TESTS_2026-07-03.md",
+          "present": true,
+          "sha256": "d96de76ff8b4f4a7df247ca9143ca62621765a2ed90f89558b88cde70a29a022"
+        }
+      ],
+      "audience": "vendor credit or partner-program reviewer",
+      "best_first_read": "Proof-stack continuity case and API continuity request.",
+      "channel": "vendor_credit_or_partner_route",
+      "claim_boundary": "No credit, free account, or vendor approval is represented.",
+      "concierge_card_sha256": "cbf674e70ff9ecd03e671ed1866711a0318804b6332e16afac76dd2bc5267bac",
+      "deadline_or_gate": "No deadline found; request should be submitted through official contact-sales path if still needed.",
+      "decision_question": "Can a temporary credit or startup route preserve grant/proof-factory continuity?",
+      "fit_score": 80,
+      "human_gate": "Human submits the vendor form and approves any billing or credit terms.",
+      "lane_id": "openai_api_continuity",
+      "name": "OpenAI API continuity request",
+      "priority": 14,
+      "reviewer_action": "Submit or update the official contact request with conservative proof-to-pilot framing.",
+      "source_refs": [
+        "gmail:19f43a156bcf0ab6",
+        "public:openai_contact_sales"
+      ],
+      "status": "HUMAN_FORM_READY"
+    },
+    {
+      "artifact_count": 2,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 2,
+      "artifacts": [
+        {
+          "bytes": 7643,
+          "path": "grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md",
+          "present": true,
+          "sha256": "274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb"
+        },
+        {
+          "bytes": 6455,
+          "path": "grant_submissions/PATENT_LEGAL_RESCUE_PACKET_2026-06-20.md",
+          "present": true,
+          "sha256": "78f1356655372083a0906010cbfd669a409077c26bd1e46998fb1aaf6da7fcf8"
+        }
+      ],
+      "audience": "patent counsel or IP reviewer",
+      "best_first_read": "Claim-boundary register and legal rescue packet.",
+      "channel": "ip_readiness",
+      "claim_boundary": "This ledger is not legal advice and does not assert patentability, ownership, or filing sufficiency.",
+      "concierge_card_sha256": "bc26b63656de6875a9bc12376b4a00bd7520aa87fd8aefb2fb0fad70c73ced22",
+      "deadline_or_gate": "Dossier email states a July 25, 2025 filing date; counsel must verify all actual patent deadlines before action.",
+      "decision_question": "What filing or claim action must licensed counsel verify before public expansion?",
+      "fit_score": 100,
+      "human_gate": "Human and licensed counsel decide any filing, claim, continuation, PCT, or disclosure action.",
+      "lane_id": "patent_deadline_counsel",
+      "name": "Patent counsel / IP deadline defense",
+      "priority": 15,
+      "reviewer_action": "Monitor replies, prepare filed-materials packet, and avoid public claim expansion until counsel reviews.",
+      "source_refs": [
+        "gmail:19f43b89dd51e2fd",
+        "public:uspto_provisional",
+        "public:uspto_utility"
+      ],
+      "status": "URGENT_COUNSEL_WATCH"
+    }
+  ],
+  "concierge_sha256": "90bcbbb467b79c93800552c2797749d78d80cfefa70547d92dfc2c057df41467",
+  "generated_utc": "2026-07-09T03:59:00.183075+00:00",
+  "missing_artifacts": [],
+  "outputs": {
+    "dashboard_json": "dashboard/data/reviewer_concierge_packet.json",
+    "json": "out/ops/reviewer_concierge_packet_latest.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md"
+  },
+  "public_packet_rules": {
+    "exclude_credentials": true,
+    "exclude_meeting_access_details": true,
+    "exclude_personal_financial_data": true,
+    "exclude_unreviewed_archives": true
+  },
+  "reviewer_route": [
+    "Start with the priority queue.",
+    "Open only the artifact rows for the lane being reviewed.",
+    "Check the claim boundary before reusing text externally.",
+    "Use the human gate as the stop condition before any send, upload, filing, or commitment."
+  ],
+  "schema": "reviewer_concierge_packet_v1",
+  "source_ledgers": {
+    "reviewer_gate": "out/ops/funding_sprint_reviewer_gate_latest.json",
+    "traction_ledger": "out/ops/traction_opportunity_intake_ledger_latest.json"
+  },
+  "status": "REVIEWER_CONCIERGE_READY_HUMAN_ACTION_REQUIRED",
+  "summary": {
+    "external_send_allowed_without_human": false,
+    "final_submission_allowed_without_human": false,
+    "human_action_required": true,
+    "lane_count": 15,
+    "missing_artifact_count": 0,
+    "reviewer_gate_clear": true,
+    "top_priority_artifacts_complete": true,
+    "top_priority_count": 7,
+    "unsafe_claim_count": 0,
+    "unsafe_secret_count": 0
+  }
+}
