@@ -75,9 +75,17 @@
 - Best LumenCore fit: AI-powered orchestration, secure data fabric, reproducibility/evidence layer, hybrid cloud validation.
 - Do-not-submit gate: position as capability statement / RFI response, not a grant funding ask.
 
+### 11. DOE Advanced Nuclear Energy Licensing Cost-Share - DE-FOA-0003339
+- Primary source: https://simpler.grants.gov/opportunity/9ea4ff0a-477c-47df-9892-f1c93740c579
+- Current close date: September 30, 2026.
+- Program funding shown: $50M; award range shown: $5k-$8M; cost share required.
+- Best LumenCore fit: evidence/validation partner for a qualified nuclear applicant, not solo prime.
+- Partner ask: source provenance, AI/software workflow validation, grid-integration replay, locked baseline/metric proof packet, and claim-boundary packaging.
+- Do-not-submit gate: needs nuclear developer, utility, licensing consultant, reactor applicant, or qualified engineering partner before submission. Do not claim NRC licensing authority, reactor safety validation, nuclear QA, nuclear cybersecurity compliance, or nuclear plant operational performance.
+
 ## Partner-Only / Do Not Prime Alone
 
-### 11. HUD Robotics and AI for Home Construction - PDR-2600-DC-029Q
+### 12. HUD Robotics and AI for Home Construction - PDR-2600-DC-029Q
 - Primary source: https://www.huduser.gov/portal/ota/funding-opportunities.html
 - Simpler Grants: https://simpler.grants.gov/opportunity/b5b96f6f-6325-418b-862c-e8e5c8ed28fd
 - Deadline: July 13, 2026, 11:59:59 PM Eastern.
@@ -85,7 +93,7 @@
 - Local portal audit found an active workspace, but material gaps remain.
 - Do-not-submit gate: needs named factory-built/offsite construction partner, production baseline, robotics/AI deployment role, budget, past performance, personnel, and letters. LumenCore can be evidence/AI validation partner, not a credible solo prime today.
 
-### 12. HUD Automated Building Code Permitting - PDR-2600-DC-029O
+### 13. HUD Automated Building Code Permitting - PDR-2600-DC-029O
 - Primary source: https://www.huduser.gov/portal/ota/funding-opportunities.html
 - Deadline: July 13, 2026.
 - Best LumenCore fit: validation/evidence partner for an eligible jurisdiction deploying automated permitting.
