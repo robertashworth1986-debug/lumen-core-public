@@ -1,124 +1,124 @@
 {
   "control_artifacts": [
     {
-      "bytes": 43275,
+      "bytes": 43099,
       "classification": "machine_readable_proof_receipt",
       "control_name": "funding_sprint_reviewer_gate",
       "name": "funding_sprint_reviewer_gate_latest.json",
       "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "befd879b64ca9f4de37b4348d6ae18735d4b6eea9d4eee18aef05db8b8b48734"
+      "sha256": "348b40d856625e3634e274928777f26b7303ac16e8bf7f0b3cf33632f0094cf8"
     },
     {
-      "bytes": 43275,
+      "bytes": 43099,
       "classification": "machine_readable_proof_receipt",
       "control_name": "funding_sprint_reviewer_gate",
       "name": "funding_sprint_reviewer_gate.json",
       "path": "dashboard/data/funding_sprint_reviewer_gate.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "befd879b64ca9f4de37b4348d6ae18735d4b6eea9d4eee18aef05db8b8b48734"
+      "sha256": "348b40d856625e3634e274928777f26b7303ac16e8bf7f0b3cf33632f0094cf8"
     },
     {
-      "bytes": 23378,
+      "bytes": 30819,
       "classification": "machine_readable_proof_receipt",
       "control_name": "traction_opportunity_intake_ledger",
       "name": "traction_opportunity_intake_ledger_latest.json",
       "path": "out/ops/traction_opportunity_intake_ledger_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "6d8b07f3454aa843f0095e51f578d110355c5f0a0b7899e7d70a8c85724e6278"
+      "sha256": "ce5c5064a6b810bf0bd1a8adbe8056a197ca51f3d61e8c162de474c5e21b406e"
     },
     {
-      "bytes": 23378,
+      "bytes": 30819,
       "classification": "machine_readable_proof_receipt",
       "control_name": "traction_opportunity_intake_ledger",
       "name": "traction_opportunity_intake_ledger.json",
       "path": "dashboard/data/traction_opportunity_intake_ledger.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "6d8b07f3454aa843f0095e51f578d110355c5f0a0b7899e7d70a8c85724e6278"
+      "sha256": "ce5c5064a6b810bf0bd1a8adbe8056a197ca51f3d61e8c162de474c5e21b406e"
     },
     {
-      "bytes": 31916,
+      "bytes": 41816,
       "classification": "machine_readable_proof_receipt",
       "control_name": "reviewer_concierge_packet",
       "name": "reviewer_concierge_packet_latest.json",
       "path": "out/ops/reviewer_concierge_packet_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "820ae46ed38630d5b748adb83770d92717cefacf3ebcf6bc3b78ca745969579e"
+      "sha256": "6e9a3b6711fcc7297032078edfd104a02ac01067a052fa6bb7da69ad87582f45"
     },
     {
-      "bytes": 31916,
+      "bytes": 41816,
       "classification": "machine_readable_proof_receipt",
       "control_name": "reviewer_concierge_packet",
       "name": "reviewer_concierge_packet.json",
       "path": "dashboard/data/reviewer_concierge_packet.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "820ae46ed38630d5b748adb83770d92717cefacf3ebcf6bc3b78ca745969579e"
+      "sha256": "6e9a3b6711fcc7297032078edfd104a02ac01067a052fa6bb7da69ad87582f45"
     },
     {
-      "bytes": 22776,
+      "bytes": 29106,
       "classification": "machine_readable_proof_receipt",
       "control_name": "human_action_docket",
       "name": "human_action_docket_latest.json",
       "path": "out/ops/human_action_docket_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "2da42c126052fcc84e35d27ae9c29198f5f3bd0a813ade5d080517ab9ff9a084"
+      "sha256": "a5c76dc1bc171ae77cb6e4ccebfa694422df86e66c7179816f346670b8084fe4"
     },
     {
-      "bytes": 22776,
+      "bytes": 29106,
       "classification": "machine_readable_proof_receipt",
       "control_name": "human_action_docket",
       "name": "human_action_docket.json",
       "path": "dashboard/data/human_action_docket.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "2da42c126052fcc84e35d27ae9c29198f5f3bd0a813ade5d080517ab9ff9a084"
+      "sha256": "a5c76dc1bc171ae77cb6e4ccebfa694422df86e66c7179816f346670b8084fe4"
     },
     {
-      "bytes": 26227,
+      "bytes": 33418,
       "classification": "machine_readable_proof_receipt",
       "control_name": "submission_authority_matrix",
       "name": "submission_authority_matrix_latest.json",
       "path": "out/ops/submission_authority_matrix_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "157a95c4f9607beba3fa7aa9894c586a80cec2ace86632b60b2bc567baf7239c"
+      "sha256": "616519280f524711e6e11c43e059a90cb5490efbcd3f29f4e22530dd3f6fa1ca"
     },
     {
-      "bytes": 26227,
+      "bytes": 33418,
       "classification": "machine_readable_proof_receipt",
       "control_name": "submission_authority_matrix",
       "name": "submission_authority_matrix.json",
       "path": "dashboard/data/submission_authority_matrix.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "157a95c4f9607beba3fa7aa9894c586a80cec2ace86632b60b2bc567baf7239c"
+      "sha256": "616519280f524711e6e11c43e059a90cb5490efbcd3f29f4e22530dd3f6fa1ca"
     },
     {
-      "bytes": 23610,
+      "bytes": 29699,
       "classification": "machine_readable_proof_receipt",
       "control_name": "reviewer_decision_brief",
       "name": "reviewer_decision_brief_latest.json",
       "path": "out/ops/reviewer_decision_brief_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "b68e3b73cee244fa5c2caa2d4dd5c7921830de512dfa8fa4cd27bb7168162633"
+      "sha256": "438cc9e9b9f330980b171e7268ad35c269fadd8f16dfdf8f98681d79c9537271"
     },
     {
-      "bytes": 23610,
+      "bytes": 29699,
       "classification": "machine_readable_proof_receipt",
       "control_name": "reviewer_decision_brief",
       "name": "reviewer_decision_brief.json",
       "path": "dashboard/data/reviewer_decision_brief.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "b68e3b73cee244fa5c2caa2d4dd5c7921830de512dfa8fa4cd27bb7168162633"
+      "sha256": "438cc9e9b9f330980b171e7268ad35c269fadd8f16dfdf8f98681d79c9537271"
     },
     {
       "bytes": 14800,
@@ -401,6 +401,26 @@
       "sha256": "4349801d9aa7442ec4112c9a7be1ebbbfa32253ff66c8e07e1b81c6b9faaf5d0"
     },
     {
+      "bytes": 6955,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "key_governance_firewall",
+      "name": "key_governance_firewall_latest.json",
+      "path": "out/ops/key_governance_firewall_latest.json",
+      "present": true,
+      "role": "machine_control_json",
+      "sha256": "1bd2f09dd5029f2caae3d9ae79237bfee52cd29fbd7f1b11684989f9c1c780d3"
+    },
+    {
+      "bytes": 6955,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "key_governance_firewall",
+      "name": "key_governance_firewall.json",
+      "path": "dashboard/data/key_governance_firewall.json",
+      "present": true,
+      "role": "dashboard_control_json",
+      "sha256": "1bd2f09dd5029f2caae3d9ae79237bfee52cd29fbd7f1b11684989f9c1c780d3"
+    },
+    {
       "bytes": 10148,
       "classification": "machine_readable_proof_receipt",
       "control_name": "evtit_technical_sprint_scope_packet",
@@ -421,24 +441,24 @@
       "sha256": "4e20b1b7f213646ad965624c2b037366549a254ecc128ba68331174bf1910b78"
     },
     {
-      "bytes": 10154,
+      "bytes": 10416,
       "classification": "machine_readable_proof_receipt",
       "control_name": "traction_followup_packet",
       "name": "traction_followup_packet_latest.json",
       "path": "out/ops/traction_followup_packet_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "e82ac1ef626d962395244228f0506b1cb7a914594a87a58f0d71c1232ff53178"
+      "sha256": "03f7770c5533b39755215cbc66b899d0881e4bb6280f3bb9eb3da6f61a6c30bf"
     },
     {
-      "bytes": 10154,
+      "bytes": 10416,
       "classification": "machine_readable_proof_receipt",
       "control_name": "traction_followup_packet",
       "name": "traction_followup_packet.json",
       "path": "dashboard/data/traction_followup_packet.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "e82ac1ef626d962395244228f0506b1cb7a914594a87a58f0d71c1232ff53178"
+      "sha256": "03f7770c5533b39755215cbc66b899d0881e4bb6280f3bb9eb3da6f61a6c30bf"
     }
   ],
   "control_statuses": {
@@ -452,6 +472,7 @@
     "immediate_federal_ai_opportunity_radar": "IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_READY_HUMAN_ACTION_REQUIRED",
     "institutional_trust_gate": "INSTITUTIONAL_TRUST_GATE_READY_HUMAN_GATED",
     "ip_counsel_diligence_packet": "IP_COUNSEL_DILIGENCE_READY_HUMAN_COUNSEL_REQUIRED",
+    "key_governance_firewall": "KEY_FIREWALL_READY_HUMAN_GATED",
     "linkedin_universe_profile_packet": "LINKEDIN_UNIVERSE_PROFILE_READY_HUMAN_POST_REQUIRED",
     "measured_source_evidence_register": "MEASURED_SOURCE_REGISTER_READY_RECONCILIATION_REQUIRED",
     "reviewer_approval_crosswalk": "REVIEWER_APPROVAL_CROSSWALK_READY_POST_SAM",
@@ -465,7 +486,7 @@
     "traction_opportunity_intake_ledger": "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED",
     "venture_studio_terms_guardrail_packet": "VENTURE_STUDIO_TERMS_GUARDRAIL_READY_COUNSEL_REVIEW_REQUIRED"
   },
-  "data_room_manifest_sha256": "b3271e0fc9900a943b8aed91f5a9d924013604e2eaecc6c99921d4e2ef31f77a",
+  "data_room_manifest_sha256": "34bcecde6eecaa1cca05ad64e666bee25390d342665de66c9e721069c6a08eee",
   "e_drive_targets": [
     "E:\\LumaProofVault\\LUMA_FUNDING_SPRINT_20260709_20260709T030617Z",
     "E:\\LumenCoreSync\\funding_sprint_20260709",
@@ -487,6 +508,7 @@
     "grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/REVIEWER_APPROVAL_CROSSWALK_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/INSTITUTIONAL_TRUST_GATE_2026-07-09.md",
+    "grant_submissions/funding_sprint_20260709/KEY_GOVERNANCE_FIREWALL_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
@@ -495,8 +517,8 @@
     "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md"
   ],
-  "generated_utc": "2026-07-09T22:12:43.581825+00:00",
-  "manifest_seed_sha256": "6bc03f6e41913c76b73fd973d02b6e97dc05fbe278463ebe76d6cd45773a47b2",
+  "generated_utc": "2026-07-09T22:36:29.495814+00:00",
+  "manifest_seed_sha256": "c837a259fef868eedc3a8c89475ba404837f83c42963a6fb55debc8b3ef3af51",
   "markdown_artifacts": [
     {
       "bytes": 12244,
@@ -571,20 +593,20 @@
       "sha256": "cf0d3fd466ecfd8396d17f1c4787a7fa2898f49ee5f81ed377df05aa161029c4"
     },
     {
-      "bytes": 5599,
+      "bytes": 6263,
       "category": "sync_receipt",
       "classification": "public_safe_markdown_review_required",
       "name": "E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-      "sha256": "ae224a33c33fe7225d591ce5fc846db72ad8bc377c5a7c08c7ac0092e6bb2bf3"
+      "sha256": "44e98ff5b27b67b41f00dc12a4c5f1bad014752e29384d22db65a378627cad37"
     },
     {
-      "bytes": 5482,
+      "bytes": 5874,
       "category": "sync_receipt",
       "classification": "public_safe_markdown_review_required",
       "name": "E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
-      "sha256": "090661f4025e631b2451c28e7d38d77bbb75e673fa33c1d7f1cff96dde90ccbf"
+      "sha256": "490227dd2f7ab0859b20d255d158c52c0f25de477d1eff252099790640556433"
     },
     {
       "bytes": 8261,
@@ -595,12 +617,12 @@
       "sha256": "fa8fd779a9cce41f8169d77611417249ada18263e420da0271c44bd3d0bf6df8"
     },
     {
-      "bytes": 8278,
+      "bytes": 8493,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
       "name": "EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
-      "sha256": "2a3ac81ea687dcd5653c480850112dbcde2bbb2103345a34be7e6ae05094b9be"
+      "sha256": "a9a309f607bd50ffe0b2ce773db08b135a932a42849f495730b61e160e42f5c9"
     },
     {
       "bytes": 10709,
@@ -632,15 +654,15 @@
       "classification": "public_safe_markdown_review_required",
       "name": "FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
-      "sha256": "471c2a4bc36bb39b0eb1da98cc20aab6062830ec3b1c5d26c0369627ad0e93d3"
+      "sha256": "8cb957c8ef24fa73891642c943847d856ab498d19096936f1f6ed6f5a2325a4a"
     },
     {
-      "bytes": 14015,
+      "bytes": 20001,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
       "name": "HUMAN_ACTION_DOCKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
-      "sha256": "b1af6ea2924704771b432efb419b0523a41d1f0c7f085ed60de62fc4b5991052"
+      "sha256": "81a4f42d51f72e9c51e7cd645b804c3a47e64dbe65cf6ca02faa99d7b45419b6"
     },
     {
       "bytes": 14268,
@@ -673,6 +695,14 @@
       "name": "IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md",
       "sha256": "274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb"
+    },
+    {
+      "bytes": 3901,
+      "category": "front_door_control",
+      "classification": "public_safe_markdown_review_required",
+      "name": "KEY_GOVERNANCE_FIREWALL_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/KEY_GOVERNANCE_FIREWALL_2026-07-09.md",
+      "sha256": "af04f6cb53f8320292902aae23825970fe35785e263f7851122eb1506c159d52"
     },
     {
       "bytes": 9037,
@@ -755,20 +785,20 @@
       "sha256": "a00f0e2f9fb7bb162ff1adf5ca6bd72279c4be6832e7c77adae6cb05d1f091df"
     },
     {
-      "bytes": 23612,
+      "bytes": 30996,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
       "name": "REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
-      "sha256": "f351b54b0880b199fcd520dbb003ff35dfbe916ab45e8f4f529b97b9d97b6ddb"
+      "sha256": "04fae167c7755ac30ea8db7e7b8e9eccb48c16bbd8a456b7288602ef674c1e47"
     },
     {
-      "bytes": 18715,
+      "bytes": 23598,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
       "name": "REVIEWER_DECISION_BRIEF_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
-      "sha256": "767720b50d1012b95e6716377b315b74181236ede4412d616171b87b1e73cd48"
+      "sha256": "b9fcb9149ab06d23149883e94437dc9cfaabb23648c25eab0377755eaa8708f1"
     },
     {
       "bytes": 13119,
@@ -795,12 +825,12 @@
       "sha256": "9b57a099e9cb7de15e75d76c5060d155770e42ddedd5c6668fdf5b2cceb54df1"
     },
     {
-      "bytes": 18779,
+      "bytes": 24099,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
       "name": "SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
-      "sha256": "1271ddbcfe306c67b25eebddf3c5cce71eb1e9db1fa70ec8d928e40d43d86eb2"
+      "sha256": "cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390"
     },
     {
       "bytes": 9967,
@@ -811,12 +841,12 @@
       "sha256": "2a99e42dd552ba573d55caf6fb7f14414fad25234966abf33debf4c5902e9dc5"
     },
     {
-      "bytes": 17167,
+      "bytes": 22779,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
       "name": "TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
-      "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
+      "sha256": "e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55"
     },
     {
       "bytes": 7293,
@@ -846,21 +876,21 @@
     "authority_status": "SUBMISSION_AUTHORITY_MATRIX_READY",
     "category_counts": {
       "claim_protocol_boundary": 7,
-      "front_door_control": 22,
+      "front_door_control": 23,
       "lane_package": 8,
       "supporting_markdown": 2,
       "sync_receipt": 2
     },
-    "control_artifact_count": 44,
-    "decision_lane_count": 15,
+    "control_artifact_count": 46,
+    "decision_lane_count": 19,
     "decision_status": "REVIEWER_DECISION_BRIEF_READY",
-    "decision_top_ready_lane_count": 7,
-    "decision_urgent_lane_count": 3,
+    "decision_top_ready_lane_count": 10,
+    "decision_urgent_lane_count": 6,
     "e_drive_target_count": 3,
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "manifested_markdown_count": 41,
+    "manifested_markdown_count": 42,
     "missing_control_artifact_count": 0,
     "reviewer_gate_clear": true,
     "unsafe_claim_count": 0,

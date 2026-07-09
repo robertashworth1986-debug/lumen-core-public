@@ -10,7 +10,7 @@ This packet prepares language, scope, and diligence links. It does not send emai
 - Lane ID: `evtit_blackdog_inkind`
 - Lane status: `RESET_NOTE_SENT_TECH_REVIEW_PENDING`
 - Fit score: `92`
-- Thread signals: `6`
+- Thread signals: `7`
 - Build scopes: `6`
 - Drafts: `2`
 - Diligence artifacts present: `true`
@@ -24,7 +24,7 @@ This packet prepares language, scope, and diligence links. It does not send emai
 - Investment claimed: `false`
 - Services award claimed: `false`
 - Field validation claimed: `false`
-- Packet SHA-256: `504c73768bfe75b96cdc1933c2cdb3992f1283ab69a823ea78f775c0121df6fc`
+- Packet SHA-256: `ec234542c2b889ea83160946750133a516016a00cd331f6df59f096d0e2f494c`
 
 ## Claim Boundary
 
@@ -61,6 +61,11 @@ Meeting and application evidence only; no investment, services award, or partner
 
 - Safe signal: Robert sent the same-day note that he was present and the issue was timing confusion.
 - Action meaning: Do not send another apology-only message; pair the reset with a concrete next step.
+
+### gmail:19f485a69ba2410d
+
+- Safe signal: EVTit sent a 4 PM invite after the timing-reset note.
+- Action meaning: A follow-up should acknowledge the reset and move directly to a technical-team decision path.
 
 ## 30-Day Build Scope Menu
 
@@ -142,11 +147,11 @@ Robert
 
 ## Diligence Artifacts
 
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b` bytes=`17167`
-- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md` sha256=`cd467e7b2119cbd5e77b19158d1efd6116dba66ea8cd2c8b5c3d2b435a3deeb1` bytes=`18719`
-- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md` sha256=`f7b9a4fcda217537da466a81fcce8b01017635295dac124592740e84634e9337` bytes=`23242`
-- `present` `grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md` sha256=`0649a7c857b4e7ecfa165c0c5ec71366f3f30b3758736e88650f2c0fb9528eeb` bytes=`14060`
-- `present` `grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md` sha256=`184173c25f5d3e94db3d364f3cb9da3c57be3a697427ea760e662279f8e7715e` bytes=`10506`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55` bytes=`22779`
+- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md` sha256=`b9fcb9149ab06d23149883e94437dc9cfaabb23648c25eab0377755eaa8708f1` bytes=`23598`
+- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md` sha256=`04fae167c7755ac30ea8db7e7b8e9eccb48c16bbd8a456b7288602ef674c1e47` bytes=`30996`
+- `present` `grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md` sha256=`322021caf7a67ca98380b181c9cf3d2c89e1a10704388d1ee2158301d357f8aa` bytes=`23346`
+- `present` `grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md` sha256=`2f3859baa8f84ef704ab0934c431a2b97d6210cc617303e35a9b626a861a06e7` bytes=`10709`
 - `present` `grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md` sha256=`95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762` bytes=`9037`
 - `present` `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`0e5cf6b23334fed68895f117a61a47238e0ea27ba9bed7103739fc19f9ba8d59` bytes=`9907`
 - `present` `grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md` sha256=`f04cfca6d7b388c97303e354aaf9229ba3d46d57f54c6f56110d4ade89dd82b3` bytes=`6300`

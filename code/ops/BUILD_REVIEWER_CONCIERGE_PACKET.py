@@ -32,6 +32,28 @@ SENSITIVE_MARKERS = [
 ]
 
 ARTIFACT_MAP: dict[str, list[str]] = {
+    "sam_registration_external_validation_watch": [
+        "grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
+        "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
+        "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
+        "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+    ],
+    "lanl_vision_licensing_followup": [
+        "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+        "grant_submissions/funding_sprint_20260709/PROOF_STACK_EDGE_INDEX_2026-07-09.md",
+        "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+    ],
+    "uspto_georgia_patents_route": [
+        "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+        "grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md",
+        "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+    ],
+    "protecnium_its_infrastructure_signal": [
+        "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
+        "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
+        "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+    ],
     "evtit_blackdog_inkind": [
         "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
@@ -126,6 +148,16 @@ REVIEWER_PACKS = {
         "best_first_read": "Capability outline, source provenance, risk boundaries, and agency protocol controls.",
         "decision_question": "Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?",
     },
+    "federal_registration": {
+        "audience": "federal registration or contracting-readiness reviewer",
+        "best_first_read": "SAM submission receipt, account activation docket, and federal protocol packet.",
+        "decision_question": "What external validation or entity-administrator action is needed before active-registration claims are safe?",
+    },
+    "federal_lab_tech_transfer": {
+        "audience": "federal lab technology-transfer reviewer",
+        "best_first_read": "Licensing-fit note, IP boundary packet, proof-stack edge index, and commercialization map.",
+        "decision_question": "Is there a bounded licensing or validation conversation worth pursuing with the named lab POC?",
+    },
     "federal_rfi": {
         "audience": "market research reviewer",
         "best_first_read": "RFI response outline and source-backed concept map.",
@@ -145,6 +177,11 @@ REVIEWER_PACKS = {
         "audience": "sources-sought reviewer",
         "best_first_read": "Partner-only filter and qualification boundary.",
         "decision_question": "Is there a qualified prime or lab partner before any response is drafted?",
+    },
+    "infrastructure_market_signal": {
+        "audience": "infrastructure buyer-discovery reviewer",
+        "best_first_read": "Customer commercialization packet, FHWA/TSMO capability outline, and traction ledger.",
+        "decision_question": "Does the ITS signal sharpen customer-discovery language without claiming a customer or pilot?",
     },
     "ip_readiness": {
         "audience": "patent counsel or IP reviewer",

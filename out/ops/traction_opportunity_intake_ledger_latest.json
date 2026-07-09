@@ -1,12 +1,38 @@
 {
   "connected_evidence": {
     "calendar_window": "Google Calendar located the July 9 EVTit discovery meeting; public artifacts intentionally exclude meeting access details.",
+    "gmail_latest_response_window": "Gmail searched the July 9, 2026 inbox/new-response window for SAM, Terry/EVTit, LANL, USPTO, LinkedIn, venture, and account-notice updates.",
     "gmail_profile": "Robert Ashworth mailbox confirmed through Gmail connector.",
     "gmail_window": "Gmail searched in:anywhere after 2026-04-09 for funding, SBIR, RFI/RFP, deadline, calendar, and application terms.",
     "sweetspot_window": "Sweetspot federal contracts searched for active opportunities after 2026-07-09 and before 2026-08-31 across AI validation, lab data QA, data center, and transportation operations lanes."
   },
-  "generated_utc": "2026-07-09T19:17:37.252023+00:00",
+  "generated_utc": "2026-07-09T22:32:27.905347+00:00",
   "lanes": [
+    {
+      "channel": "federal_registration",
+      "claim_boundary": "Submitted is not Active; no award eligibility, active registration, or CAGE validation is claimed until SAM confirms it.",
+      "deadline_or_gate": "SAM confirmation says the entity registration remains Submitted until IRS TIN validation and DLA CAGE validation complete; DLA may contact the Government Business POC.",
+      "evidence_date": "2026-07-09",
+      "fit_score": 100,
+      "human_gate": "Human handles any DLA response, notarized letter, registration correction, or federal certification.",
+      "human_gate_required": true,
+      "lane_id": "sam_registration_external_validation_watch",
+      "lane_sha256": "e1d3b13f7730556520325e8f516c95b0a1108832cba74e250a51d31b57fac2d3",
+      "name": "SAM.gov registration external validation watch",
+      "priority": 0,
+      "reviewer_action": "Monitor SAM status and any DLA email; prepare notarized Entity Administrator letter if required.",
+      "source_kind": "gmail_system_confirmation",
+      "source_refs": [
+        "gmail:19f48d20c59295b2"
+      ],
+      "status": "SUBMITTED_EXTERNAL_VALIDATION_PENDING",
+      "traction_evidence": [
+        "SAM.gov confirmed the entity registration was successfully submitted.",
+        "The confirmation states IRS validation can take two business days.",
+        "The confirmation states DLA CAGE validation averages two business days and can take up to ten business days or longer in peak periods.",
+        "The confirmation warns that DLA questions must be answered promptly or the registration can return to Work in Progress."
+      ]
+    },
     {
       "channel": "venture_engineering",
       "claim_boundary": "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
@@ -16,7 +42,7 @@
       "human_gate": "Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.",
       "human_gate_required": true,
       "lane_id": "evtit_blackdog_inkind",
-      "lane_sha256": "cb7703334dd6676df89a7ed9eec4ebb2cda49d598cc83e6cfe40d0b6c9271920",
+      "lane_sha256": "4033f54c72eae8c8e4278d2e5f31ebf0f13578e8f968b4abecabd42b1b72e87b",
       "name": "EVTit / Black Dog in-kind engineering fund",
       "priority": 1,
       "reviewer_action": "Prepare a concise follow-up packet, technical walkthrough, build-scope menu, and proof-card appendix.",
@@ -27,6 +53,7 @@
         "gmail:19f47e797960c0cd",
         "gmail:19f4822c21a4a861",
         "gmail:19f484a1fe4aea3b",
+        "gmail:19f485a69ba2410d",
         "public:evtit_event",
         "public:black_dog"
       ],
@@ -35,7 +62,32 @@
         "EVTit internal process form requested by Terry Anderton.",
         "LumenCore reply indicates the EVTit application form was submitted.",
         "EVTit email indicated Bruno and Aron were reviewing the materials already sent.",
-        "Robert sent a same-day reset note after the meeting-time confusion."
+        "Robert sent a same-day reset note after the meeting-time confusion.",
+        "Latest thread evidence shows Terry sent a 4 PM invite after the reset note."
+      ]
+    },
+    {
+      "channel": "federal_lab_tech_transfer",
+      "claim_boundary": "This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.",
+      "deadline_or_gate": "LANL reply says Mike Erickson is the main point of contact and is out until next week.",
+      "evidence_date": "2026-07-08",
+      "fit_score": 88,
+      "human_gate": "Human approves any LANL reply, NDA, licensing discussion, export-control response, or disclosure package.",
+      "human_gate_required": true,
+      "lane_id": "lanl_vision_licensing_followup",
+      "lane_sha256": "f497bc4dd5b01b6841839db9f35b91dd1253b9638ef5a9ce69143ab3843c35af",
+      "name": "LANL VISION licensing opportunity follow-up",
+      "priority": 2,
+      "reviewer_action": "Prepare a short licensing-fit note, evidence-replay boundary, and technical questions for Mike Erickson.",
+      "source_kind": "gmail_lab_response",
+      "source_refs": [
+        "gmail:19f43fa33e165230"
+      ],
+      "status": "WAITING_POC_RETURN",
+      "traction_evidence": [
+        "LANL replied to the VISION licensing opportunity outreach.",
+        "The reply identified Mike Erickson as the main point of contact.",
+        "The reply indicates follow-up is expected after the POC returns next week."
       ]
     },
     {
@@ -61,6 +113,32 @@
         "LumenCore application submitted with proof-to-pilot public proof link.",
         "Jackson Hellmann replied positively to the submitted-update email.",
         "Public program describes first-check funding and startup perks for early founders."
+      ]
+    },
+    {
+      "channel": "ip_readiness",
+      "claim_boundary": "This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.",
+      "deadline_or_gate": "USPTO Pro Bono response says Georgia PATENTS serves Tennessee inventors; counsel must verify actual patent deadlines and filing posture.",
+      "evidence_date": "2026-07-09",
+      "fit_score": 100,
+      "human_gate": "Human and licensed counsel decide any filing, claim, continuation, PCT, disclosure, or legal strategy.",
+      "human_gate_required": true,
+      "lane_id": "uspto_georgia_patents_route",
+      "lane_sha256": "022552f991c7f796cd67f0d57a1835f0d7dbd5b271d7703020e03958f3a389c5",
+      "name": "USPTO / Georgia PATENTS pro bono routing",
+      "priority": 3,
+      "reviewer_action": "Prepare Georgia PATENTS intake packet: filed materials, invention timeline, public disclosure map, claim boundary, and counsel questions.",
+      "source_kind": "gmail_uspto_response_plus_public_program",
+      "source_refs": [
+        "gmail:19f47bc2564305ae",
+        "public:uspto_probono",
+        "public:georgia_patents"
+      ],
+      "status": "PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED",
+      "traction_evidence": [
+        "USPTO Pro Bono replied to the urgent patent routing request.",
+        "The reply points Tennessee inventors to Georgia PATENTS, sponsored by Georgia Lawyers for the Arts.",
+        "The route gives LumenCore a concrete counsel-intake path instead of a generic legal search."
       ]
     },
     {
@@ -182,6 +260,31 @@
       "traction_evidence": [
         "Existing sprint contains an NSF Project Pitch draft.",
         "NSF public guidance confirms the Project Pitch is the gate before invited full proposal submission."
+      ]
+    },
+    {
+      "channel": "infrastructure_market_signal",
+      "claim_boundary": "This is not a customer commitment, contract, employment acceptance, or pilot demand signal.",
+      "deadline_or_gate": "Recruiter asked Robert to apply for an ITS Engineer role on a Georgia highway infrastructure project if interested.",
+      "evidence_date": "2026-07-09",
+      "fit_score": 66,
+      "human_gate": "Human decides whether to reply, apply, or use it only as a customer-discovery clue.",
+      "human_gate_required": true,
+      "lane_id": "protecnium_its_infrastructure_signal",
+      "lane_sha256": "6531fbe0250e2583c922fdd0026c8757d1492ecb6c3ed5cfff1b80ea3677693c",
+      "name": "Protecnium ITS infrastructure signal",
+      "priority": 8,
+      "reviewer_action": "Use as market-context evidence; optionally respond only if it supports partner/customer-discovery.",
+      "source_kind": "linkedin_recruiter_inmail_plus_public_role",
+      "source_refs": [
+        "gmail:19f485d99c69a63a",
+        "public:protecnium_its_georgia"
+      ],
+      "status": "CUSTOMER_DISCOVERY_SIGNAL_ONLY",
+      "traction_evidence": [
+        "LinkedIn recruiter message indicates external recognition of Robert's infrastructure systems profile.",
+        "The role maps to highway infrastructure, ITS, and Georgia deployment context.",
+        "The signal can inform customer-discovery language for FHWA/TSMO and infrastructure validation, without reframing LumenCore as a job search."
       ]
     },
     {
@@ -352,30 +455,34 @@
     {
       "channel": "ip_readiness",
       "claim_boundary": "This ledger is not legal advice and does not assert patentability, ownership, or filing sufficiency.",
-      "deadline_or_gate": "Dossier email states a July 25, 2025 filing date; counsel must verify all actual patent deadlines before action.",
-      "evidence_date": "2026-07-08",
+      "deadline_or_gate": "Dossier email states a July 25, 2025 filing date; USPTO Pro Bono routed Tennessee inventors to Georgia PATENTS; counsel must verify all actual patent deadlines before action.",
+      "evidence_date": "2026-07-09",
       "fit_score": 100,
       "human_gate": "Human and licensed counsel decide any filing, claim, continuation, PCT, or disclosure action.",
       "human_gate_required": true,
       "lane_id": "patent_deadline_counsel",
-      "lane_sha256": "7423e6cb4e949c911ec9687f2d2000cc70cbf1a0eba6e1edd6d76e055901854c",
+      "lane_sha256": "550b4cabefcf3b9407ced6d7850379351173b3de563ecd1997e3430b9f7fc58d",
       "name": "Patent counsel / IP deadline defense",
       "priority": 15,
-      "reviewer_action": "Monitor replies, prepare filed-materials packet, and avoid public claim expansion until counsel reviews.",
+      "reviewer_action": "Prepare Georgia PATENTS intake packet, monitor counsel replies, and avoid public claim expansion until counsel reviews.",
       "source_kind": "gmail_plus_uspto_public_guidance",
       "source_refs": [
         "gmail:19f43b89dd51e2fd",
+        "gmail:19f47bc2564305ae",
         "public:uspto_provisional",
-        "public:uspto_utility"
+        "public:uspto_utility",
+        "public:uspto_probono",
+        "public:georgia_patents"
       ],
-      "status": "URGENT_COUNSEL_WATCH",
+      "status": "PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED",
       "traction_evidence": [
         "Patent counsel outreach was sent with application number, title, and requested limited-scope/pro bono routing.",
+        "USPTO Pro Bono response identified Georgia PATENTS as the Tennessee inventor route.",
         "USPTO public guidance confirms provisional-to-nonprovisional timing is deadline-sensitive when applicable."
       ]
     }
   ],
-  "ledger_sha256": "acc50b01f7135eb7a2d12c9c21ab1471cbbb94e96026011c331d9fb3597b21ea",
+  "ledger_sha256": "c8960e0cbd99faf8d4f3aa01ebadd16c39e8d90eb2e4df07275881ec66e3a6c0",
   "next_actions": [
     "Review the EVTit follow-up packet and send only after human approval.",
     "Advance NASA RFI and FHWA TSMO drafts into final human-review packages.",
@@ -392,15 +499,18 @@
     "black_dog": "https://blackdogceo.com/",
     "darpa_dice": "https://www.darpa.mil/research/programs/decentralized-artificial-intelligence-through-controlled-emergence",
     "evtit_event": "https://www.eventbrite.com/e/the-equity-for-code-revolution-evtits-10m-in-kind-venture-fund-tickets-1993026582158",
+    "georgia_patents": "https://glarts.org/georgia-patents/",
     "lvlup_first_check": "https://www.lvlup.vc/fund/first-check-fund",
     "nsf_project_pitch": "https://seedfund.nsf.gov/project-pitch/",
     "nsf_project_pitch_apply": "https://seedfund.nsf.gov/apply/project-pitch/",
     "openai_contact_sales": "https://openai.com/contact-sales/",
+    "protecnium_its_georgia": "https://protecnium.viterbit.site/its-engineer-highway-infrastructure-project-georgia-usa-rvXJvh2d6fuH/",
     "sam_epa_icpoes": "https://sam.gov/opp/d9cebf54026d4eae918897e0c34d5a28/view",
     "sam_fhwa_baa_call_3": "https://sam.gov/opp/99e6bba615c746e9af27e1527a05a897/view",
     "sam_fhwa_tsmo": "https://sam.gov/opp/0ebbe1e43167440ebb111f80fd065ed4/view",
     "sam_nasa_data_center": "https://sam.gov/workspace/contract/opp/b6d14a4b9eac476b997894d0c5a47a27/view",
     "sbir_topics": "https://www.sbir.gov/topics",
+    "uspto_probono": "https://www.uspto.gov/patents/basics/using-legal-services/pro-bono/patent-pro-bono-program",
     "uspto_provisional": "https://www.uspto.gov/patents/basics/apply/provisional-application",
     "uspto_utility": "https://www.uspto.gov/patents/basics/apply/utility-patent"
   },
@@ -415,33 +525,41 @@
     "channel_counts": {
       "federal_baa": 2,
       "federal_contract": 4,
+      "federal_lab_tech_transfer": 1,
       "federal_market_research": 1,
+      "federal_registration": 1,
       "federal_rfi": 1,
       "federal_sbir": 2,
       "federal_sources_sought": 1,
-      "ip_readiness": 1,
+      "infrastructure_market_signal": 1,
+      "ip_readiness": 2,
       "vendor_credit_or_partner_route": 1,
       "venture_cash": 1,
       "venture_engineering": 1
     },
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
-    "gmail_reference_count": 10,
+    "gmail_reference_count": 16,
     "human_action_required": true,
-    "lane_count": 15,
-    "public_reference_count": 14,
+    "lane_count": 19,
+    "public_reference_count": 19,
     "source_kind_counts": {
       "existing_sprint_plus_public_sbir": 1,
+      "gmail_lab_response": 1,
       "gmail_plus_official_page": 1,
       "gmail_plus_official_program": 1,
       "gmail_plus_public_program": 2,
       "gmail_plus_sweetspot_plus_sam": 1,
       "gmail_plus_uspto_public_guidance": 1,
+      "gmail_system_confirmation": 1,
+      "gmail_uspto_response_plus_public_program": 1,
+      "linkedin_recruiter_inmail_plus_public_role": 1,
       "official_public_program": 1,
       "sweetspot_federal_search": 4,
       "sweetspot_plus_sam": 3
     },
     "status_counts": {
+      "CUSTOMER_DISCOVERY_SIGNAL_ONLY": 1,
       "DO_NOT_PRIME_SOLO": 2,
       "DSIP_PACKAGE_PREP": 1,
       "FULL_PROPOSAL_SPRINT": 1,
@@ -450,14 +568,16 @@
       "PARTNER_ONLY": 1,
       "PHASE_I_TECH_VOLUME": 1,
       "PITCH_READY_HUMAN_CHECK": 1,
+      "PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED": 2,
       "RESET_NOTE_SENT_TECH_REVIEW_PENDING": 1,
       "RFI_RESPONSE_PREP": 1,
       "ROUTE_ONLY_LOW_FIT": 1,
       "SCOUT_TOPIC_MATCH": 1,
-      "URGENT_COUNSEL_WATCH": 1,
+      "SUBMITTED_EXTERNAL_VALIDATION_PENDING": 1,
+      "WAITING_POC_RETURN": 1,
       "WAITING_REVIEW": 1
     },
     "sweetspot_reference_count": 8,
-    "top_priority_count": 7
+    "top_priority_count": 10
   }
 }

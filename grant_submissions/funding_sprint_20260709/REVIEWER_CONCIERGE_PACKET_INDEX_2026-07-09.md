@@ -7,8 +7,8 @@ This index is a navigation and decision-support artifact. It does not authorize 
 ## Gate Status
 
 - Status: `REVIEWER_CONCIERGE_READY_HUMAN_ACTION_REQUIRED`
-- Lanes indexed: `15`
-- Top priority lanes: `7`
+- Lanes indexed: `19`
+- Top priority lanes: `10`
 - Top priority artifacts complete: `true`
 - Missing artifact references: `0`
 - Reviewer gate clear: `true`
@@ -16,7 +16,7 @@ This index is a navigation and decision-support artifact. It does not authorize 
 - Unsafe claim hits: `0`
 - External send without human: `false`
 - Final submission without human: `false`
-- Concierge SHA-256: `bb2723a0cb2a70c533736935865ff9ca562b81ea70e4d66cef32eff573bd2fa0`
+- Concierge SHA-256: `f2568854e0de6f3c63e10e46cda10ca0d87d0ea419d906364bd7cf04f6f28cba`
 
 ## Reviewer Route
 
@@ -26,6 +26,31 @@ This index is a navigation and decision-support artifact. It does not authorize 
 - Use the human gate as the stop condition before any send, upload, filing, or commitment.
 
 ## Priority Concierge Cards
+
+### 0. SAM.gov registration external validation watch
+
+- Lane ID: `sam_registration_external_validation_watch`
+- Audience: federal registration or contracting-readiness reviewer
+- Channel: `federal_registration`
+- Status: `SUBMITTED_EXTERNAL_VALIDATION_PENDING`
+- Fit score: `100`
+- Gate: SAM confirmation says the entity registration remains Submitted until IRS TIN validation and DLA CAGE validation complete; DLA may contact the Government Business POC.
+- Best first read: SAM submission receipt, account activation docket, and federal protocol packet.
+- Decision question: What external validation or entity-administrator action is needed before active-registration claims are safe?
+- Reviewer action: Monitor SAM status and any DLA email; prepare notarized Entity Administrator letter if required.
+- Human gate: Human handles any DLA response, notarized letter, registration correction, or federal certification.
+- Claim boundary: Submitted is not Active; no award eligibility, active registration, or CAGE validation is claimed until SAM confirms it.
+- Artifacts present: `4/4`
+- Card SHA-256: `115e625c2efc163692bd215083392123e344fa1b078d08dfa329f71c57db9974`
+
+Artifacts:
+- `present` `grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md` sha256=`7f4f1a90c08f3c4df1b6f2b6d32b5b863a008a300f304feb807823846cdbf528`
+- `present` `grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md` sha256=`6903e94da0afb1aa1c915e12b76528a70c538aebcd7728600c623558282fbebe`
+- `present` `grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md` sha256=`2f3859baa8f84ef704ab0934c431a2b97d6210cc617303e35a9b626a861a06e7`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+
+Source refs:
+- `gmail:19f48d20c59295b2`
 
 ### 1. EVTit / Black Dog in-kind engineering fund
 
@@ -41,11 +66,11 @@ This index is a navigation and decision-support artifact. It does not authorize 
 - Human gate: Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.
 - Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
 - Artifacts present: `5/5`
-- Card SHA-256: `1f6b082ad19f1368cd6bbad25e6ff3e855e2c0b67ceec9c4b9a2b0d11ffe7840`
+- Card SHA-256: `c58af7826af5623308f0e38ef4a489338d700a5c3a490f052b15d8e4e2ef29e1`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md` sha256=`2a3ac81ea687dcd5653c480850112dbcde2bbb2103345a34be7e6ae05094b9be`
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
+- `present` `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md` sha256=`774e179a6273e9967d006de0169b09455b9d6f874ac8737aa8516a3e6bf05385`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
 - `present` `docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md` sha256=`a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957`
 - `present` `docs/PROOF_TO_PILOT_CONTROL_ROOM_2026-06-25.md` sha256=`2aaa3ade058e88eef43d9ec54a0d63271de034596abd8fdb8570c6aa9eee7de3`
 - `present` `docs/LIVE_DOMAIN_PROOF_FEED_DEPLOY_BUNDLE_2026-06-27.md` sha256=`b01d392e1e003b5e0c1d910bda52901cea0ad8e04c724cd3c88babf5f26ebfaf`
@@ -56,8 +81,34 @@ Source refs:
 - `gmail:19f47e797960c0cd`
 - `gmail:19f4822c21a4a861`
 - `gmail:19f484a1fe4aea3b`
+- `gmail:19f485a69ba2410d`
 - `public:evtit_event`
 - `public:black_dog`
+
+### 2. LANL VISION licensing opportunity follow-up
+
+- Lane ID: `lanl_vision_licensing_followup`
+- Audience: federal lab technology-transfer reviewer
+- Channel: `federal_lab_tech_transfer`
+- Status: `WAITING_POC_RETURN`
+- Fit score: `88`
+- Gate: LANL reply says Mike Erickson is the main point of contact and is out until next week.
+- Best first read: Licensing-fit note, IP boundary packet, proof-stack edge index, and commercialization map.
+- Decision question: Is there a bounded licensing or validation conversation worth pursuing with the named lab POC?
+- Reviewer action: Prepare a short licensing-fit note, evidence-replay boundary, and technical questions for Mike Erickson.
+- Human gate: Human approves any LANL reply, NDA, licensing discussion, export-control response, or disclosure package.
+- Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
+- Artifacts present: `4/4`
+- Card SHA-256: `c98887031f311b7619797626dc5102df671bf16536ead1420d5f5b0803e635d5`
+
+Artifacts:
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- `present` `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`0e5cf6b23334fed68895f117a61a47238e0ea27ba9bed7103739fc19f9ba8d59`
+- `present` `grant_submissions/funding_sprint_20260709/PROOF_STACK_EDGE_INDEX_2026-07-09.md` sha256=`3a814a6751a89939d540381a20acd7eaa0ccec1b970d045191dc64d7a5b49596`
+- `present` `docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md` sha256=`a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957`
+
+Source refs:
+- `gmail:19f43fa33e165230`
 
 ### 2. LvlUp Ventures First Check Fund
 
@@ -73,16 +124,42 @@ Source refs:
 - Human gate: Human approves any diligence reply or investor terms.
 - Claim boundary: Submission and acknowledgement only; no funding decision is represented.
 - Artifacts present: `3/3`
-- Card SHA-256: `de14838a4bea5693a1a3c67d184e01f93174204d9c57a2dc7e44dbb5cdb7eb51`
+- Card SHA-256: `6a081c5f6deac960564ebfce338aa0ebfc45f7f5ca045ea1658553cc20cbd7bf`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
 - `present` `docs/PROOF_TO_REVENUE_ENGINE_2026-06-27.md` sha256=`7c3a46f3a679a6f1c345c1028b6877630d3c3c09f65295e1b1bbb091cd38b992`
 - `present` `docs/BUSINESS_PLAN_AND_LIVE_BREADTH_SEND_PACKET_2026-07-05.md` sha256=`150b3b3f519f545230f5640f154f4f1fcc0850eafa869169a22c77cea9539769`
 
 Source refs:
 - `gmail:19f44c59a4189d31`
 - `public:lvlup_first_check`
+
+### 3. USPTO / Georgia PATENTS pro bono routing
+
+- Lane ID: `uspto_georgia_patents_route`
+- Audience: patent counsel or IP reviewer
+- Channel: `ip_readiness`
+- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- Fit score: `100`
+- Gate: USPTO Pro Bono response says Georgia PATENTS serves Tennessee inventors; counsel must verify actual patent deadlines and filing posture.
+- Best first read: Claim-boundary register and legal rescue packet.
+- Decision question: What filing or claim action must licensed counsel verify before public expansion?
+- Reviewer action: Prepare Georgia PATENTS intake packet: filed materials, invention timeline, public disclosure map, claim boundary, and counsel questions.
+- Human gate: Human and licensed counsel decide any filing, claim, continuation, PCT, disclosure, or legal strategy.
+- Claim boundary: This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.
+- Artifacts present: `3/3`
+- Card SHA-256: `328fce40957a3a79b7adc6395771dadbdd73877e38cd77e18ef83355623681a8`
+
+Artifacts:
+- `present` `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`0e5cf6b23334fed68895f117a61a47238e0ea27ba9bed7103739fc19f9ba8d59`
+- `present` `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md` sha256=`274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+
+Source refs:
+- `gmail:19f47bc2564305ae`
+- `public:uspto_probono`
+- `public:georgia_patents`
 
 ### 3. DARPA DICE full proposal sprint
 
@@ -98,10 +175,10 @@ Source refs:
 - Human gate: Human confirms BAA requirements, reps, budgets, and submission package before any portal action.
 - Claim boundary: Abstract receipt is not award selection and not permission to skip BAA instructions.
 - Artifacts present: `5/5`
-- Card SHA-256: `ee3dde99ff910a3ff8884e04a387d7b70ca2d42e58cef3521822e00881bd63d0`
+- Card SHA-256: `862884c51273043a34b6305a0c284de05634caadc3e6d5feedd3a9dab1cf4fb5`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
 - `present` `grant_submissions/DICE_HR001126S0010/DICE_SUBMISSION_READINESS.md` sha256=`783af4c8d658be2b90c1a2419fb7728455e91652b00dda740b5c39d9502359ad`
 - `present` `grant_submissions/DICE_HR001126S0010/DICE_HEILMEIER_REVIEWER_MATRIX_2026-06-20.md` sha256=`a42695523227bb7e2270187722a2ac2e2359dd3d0493eb4e0f014538927d0be8`
 - `present` `grant_submissions/DICE_HR001126S0010/DICE_EVIDENCE_SYNTHESIS_2026-06-20.md` sha256=`291047ec5573f3461b050cc870ff19bacfb2035a513f6ba166b4f649c836c300`
@@ -212,6 +289,31 @@ Source refs:
 - `public:nsf_project_pitch_apply`
 - `local:NSF_PROJECT_PITCH_DRAFT_2026-07-09.md`
 
+### 8. Protecnium ITS infrastructure signal
+
+- Lane ID: `protecnium_its_infrastructure_signal`
+- Audience: infrastructure buyer-discovery reviewer
+- Channel: `infrastructure_market_signal`
+- Status: `CUSTOMER_DISCOVERY_SIGNAL_ONLY`
+- Fit score: `66`
+- Gate: Recruiter asked Robert to apply for an ITS Engineer role on a Georgia highway infrastructure project if interested.
+- Best first read: Customer commercialization packet, FHWA/TSMO capability outline, and traction ledger.
+- Decision question: Does the ITS signal sharpen customer-discovery language without claiming a customer or pilot?
+- Reviewer action: Use as market-context evidence; optionally respond only if it supports partner/customer-discovery.
+- Human gate: Human decides whether to reply, apply, or use it only as a customer-discovery clue.
+- Claim boundary: This is not a customer commitment, contract, employment acceptance, or pilot demand signal.
+- Artifacts present: `3/3`
+- Card SHA-256: `e585cc687bac0821298d8dd42ad25f19d36cd00c11c1e10f5b1bb75e67bd195f`
+
+Artifacts:
+- `present` `grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md` sha256=`b1034846561675a25ff85134813c6e4bc0d71a5a48bad92f78610273c4499d28`
+- `present` `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md` sha256=`f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+
+Source refs:
+- `gmail:19f485d99c69a63a`
+- `public:protecnium_its_georgia`
+
 ### 8. EPA Region 10 ICP-OES RFI route
 
 - Lane ID: `epa_r10_icpoes_route`
@@ -226,10 +328,10 @@ Source refs:
 - Human gate: Human approves any further agency contact.
 - Claim boundary: No instrument supply, OEM, reseller, or lab-services qualification claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `269931196afe69bc414091b77640f9ab8caf041a296474a2be70a48672b00102`
+- Card SHA-256: `6176133d0bacf627aaad6eee9a0ecfe3ca021bb9056d805b56ec2414287be1a4`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
 - `present` `grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md` sha256=`684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9`
 
 Source refs:
@@ -251,10 +353,10 @@ Source refs:
 - Human gate: Human approves partner outreach.
 - Claim boundary: No testing lab, contaminant monitoring, or regulated lab-services claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `a0e37cf56de983f92e6d605188c5ec7ec33c03b1a9317b7d5d71a773b4aeb73a`
+- Card SHA-256: `fd786f9139d4aa291074157fcabe669ed45132fb914cf537b30ae25c614ad68e`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
 - `present` `grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md` sha256=`684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9`
 
 Source refs:
@@ -274,10 +376,10 @@ Source refs:
 - Human gate: Human approves topic selection and submission.
 - Claim boundary: No claim that LumenCore fits all BAA topics.
 - Artifacts present: `2/2`
-- Card SHA-256: `ed3d80c95a24ff4d3519339d150295e5bbd1c08e249e926265619b098e2e27a8`
+- Card SHA-256: `f5e4d3f01340e4a562e8aed901f97f88ed995ec9afe2579810e864a90ec0dd86`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
 - `present` `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md` sha256=`f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046`
 
 Source refs:
@@ -298,10 +400,10 @@ Source refs:
 - Human gate: Human approves any partner route.
 - Claim boundary: No FedRAMP, ATO, HHS pilot, or government production-access claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `77c98d58b8ba8d70c6ee5f7eb9f9ab0c19426c9e90a606948a0ac7fd4d7c8dd3`
+- Card SHA-256: `aae83fe4e83943be7d4838517f0bdec202cba40a0745bd04724173c6d7070241`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
 - `present` `grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md` sha256=`fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82`
 
 Source refs:
@@ -321,10 +423,10 @@ Source refs:
 - Human gate: Human approves any partner route.
 - Claim boundary: No public-safety deployment, law-enforcement feed integration, or FedRAMP authorization claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `df1cba1b1830d6e6900dfd100bac516783ed6e2340a23f07f704b35a0defd5bc`
+- Card SHA-256: `c1f8294701a8b98da2311e4372a40b2849f16f2e817e940a41df1d291096c260`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
 - `present` `grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md` sha256=`fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82`
 
 Source refs:
@@ -344,10 +446,10 @@ Source refs:
 - Human gate: Human approves any partner or investor intro.
 - Claim boundary: No consortium management, energy project financing, or installation-performance claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `6eb4319fac3b930b432a166ff721f47a4d4b68b7c4cd98c0bc1e9159ede0075a`
+- Card SHA-256: `9863021e6750ef64e5881d40a1be19d664728170958892465cf3a935d1a0a0d0`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
 - `present` `docs/PROOF_TO_PILOT_CONTROL_ROOM_2026-06-25.md` sha256=`2aaa3ade058e88eef43d9ec54a0d63271de034596abd8fdb8570c6aa9eee7de3`
 
 Source refs:
@@ -367,10 +469,10 @@ Source refs:
 - Human gate: Human submits the vendor form and approves any billing or credit terms.
 - Claim boundary: No credit, free account, or vendor approval is represented.
 - Artifacts present: `2/2`
-- Card SHA-256: `15ac73d368c8b65b4f932d572fb17abaab73954cce99876c74cb6d4a34b45823`
+- Card SHA-256: `3cbe7230d28817a07f9a625a4d8b511bf585f0a08a3b9a7fe78eb763bd46b8f5`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
 - `present` `docs/CURRENT_PROOF_POSTURE_AND_NEXT_TESTS_2026-07-03.md` sha256=`d96de76ff8b4f4a7df247ca9143ca62621765a2ed90f89558b88cde70a29a022`
 
 Source refs:
@@ -382,16 +484,16 @@ Source refs:
 - Lane ID: `patent_deadline_counsel`
 - Audience: patent counsel or IP reviewer
 - Channel: `ip_readiness`
-- Status: `URGENT_COUNSEL_WATCH`
+- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
 - Fit score: `100`
-- Gate: Dossier email states a July 25, 2025 filing date; counsel must verify all actual patent deadlines before action.
+- Gate: Dossier email states a July 25, 2025 filing date; USPTO Pro Bono routed Tennessee inventors to Georgia PATENTS; counsel must verify all actual patent deadlines before action.
 - Best first read: Claim-boundary register and legal rescue packet.
 - Decision question: What filing or claim action must licensed counsel verify before public expansion?
-- Reviewer action: Monitor replies, prepare filed-materials packet, and avoid public claim expansion until counsel reviews.
+- Reviewer action: Prepare Georgia PATENTS intake packet, monitor counsel replies, and avoid public claim expansion until counsel reviews.
 - Human gate: Human and licensed counsel decide any filing, claim, continuation, PCT, or disclosure action.
 - Claim boundary: This ledger is not legal advice and does not assert patentability, ownership, or filing sufficiency.
 - Artifacts present: `2/2`
-- Card SHA-256: `bc26b63656de6875a9bc12376b4a00bd7520aa87fd8aefb2fb0fad70c73ced22`
+- Card SHA-256: `aaa69bbe8840dedb1e2c7f9d1bea97d3cd5e5469e15d55a6ced6671810eea675`
 
 Artifacts:
 - `present` `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md` sha256=`274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb`
@@ -399,8 +501,11 @@ Artifacts:
 
 Source refs:
 - `gmail:19f43b89dd51e2fd`
+- `gmail:19f47bc2564305ae`
 - `public:uspto_provisional`
 - `public:uspto_utility`
+- `public:uspto_probono`
+- `public:georgia_patents`
 
 ## Packet Rules
 

@@ -7,20 +7,44 @@ This matrix is not a submission approval. It separates preparation work from the
 ## Gate Status
 
 - Status: `SUBMISSION_AUTHORITY_MATRIX_READY`
-- Lanes: `15`
+- Lanes: `19`
 - All artifacts present: `true`
 - Reviewer gate clear: `true`
 - All final actions blocked without human: `true`
-- Internal prepare allowed: `13`
+- Internal prepare allowed: `17`
 - No-solo or partner-only lanes: `4`
 - Unsafe sensitive hits: `0`
 - Unsafe claim hits: `0`
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Authority matrix SHA-256: `d028a949e3dd6949ce9c586acc12c38cab97b262705089257bbd15d3589a74b7`
+- Authority matrix SHA-256: `cffd27222b02fb13a027d956d1fb7e86293cfd89f77e09f79ce79a7b92d1ea4d`
 
 ## Authority Rows
+
+### 0. SAM.gov registration external validation watch
+
+- Lane ID: `sam_registration_external_validation_watch`
+- Channel: `federal_registration`
+- Status: `SUBMITTED_EXTERNAL_VALIDATION_PENDING`
+- Action type: `federal_registration_watch`
+- Urgency: `URGENT_5D`
+- Action due: `2026-07-13`
+- Readiness mode: `FEDERAL_REGISTRATION_SUBMITTED_VALIDATION_PENDING`
+- Can prepare internally: `true`
+- Can send externally without human: `false`
+- Can submit without human: `false`
+- Can accept terms without human: `false`
+- Required authority: Robert verifies SAM status, responds to any official DLA or SAM request, and approves any notarized Entity Administrator letter or correction.
+- First artifact: `grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md`
+- Claim boundary: Submitted is not Active; no award eligibility, active registration, or CAGE validation is claimed until SAM confirms it.
+- Decision question: What external validation or entity-administrator action is needed before active-registration claims are safe?
+- Row SHA-256: `1bfb77b2b0a961f58a3cad1ce988faf98ca92be1ab5a296f01929635b1610fcf`
+
+Pre-action checks:
+- Do not claim Active registration until SAM confirms Active status.
+- Respond only to official SAM.gov, FSD, or DLA channels verified by the human.
+- Human approves any notarized letter, correction, or certification.
 
 ### 1. EVTit / Black Dog in-kind engineering fund
 
@@ -46,6 +70,30 @@ Pre-action checks:
 - Keep valuation, equity, and services terms human-decided.
 - Do not include meeting access details in public or repo artifacts.
 
+### 2. LANL VISION licensing opportunity follow-up
+
+- Lane ID: `lanl_vision_licensing_followup`
+- Channel: `federal_lab_tech_transfer`
+- Status: `WAITING_POC_RETURN`
+- Action type: `lab_poc_followup`
+- Urgency: `URGENT_5D`
+- Action due: `2026-07-13`
+- Readiness mode: `LAB_POC_FOLLOWUP_READY_HUMAN_SEND_REQUIRED`
+- Can prepare internally: `true`
+- Can send externally without human: `false`
+- Can submit without human: `false`
+- Can accept terms without human: `false`
+- Required authority: Robert approves any lab POC reply, NDA, licensing discussion, export-control response, or disclosure packet.
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
+- Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
+- Decision question: Is there a bounded licensing or validation conversation worth pursuing with the named lab POC?
+- Row SHA-256: `475e6f42562f1c09b1a01611185c5d97f99665d7f8010b39ab897219c378e6d6`
+
+Pre-action checks:
+- Keep the note limited to licensing-fit and validation questions.
+- Do not send private archives, unreleased IP detail, or export-sensitive material without review.
+- Human approves any NDA, licensing, or disclosure step.
+
 ### 2. LvlUp Ventures First Check Fund
 
 - Lane ID: `lvlup_first_check`
@@ -69,6 +117,30 @@ Pre-action checks:
 - Send only requested materials or a measured follow-up after the review window.
 - Reconfirm no performance, revenue, valuation, or award claim is overstated.
 - Human reviews any instrument, SAFE, note, equity, or services term.
+
+### 3. USPTO / Georgia PATENTS pro bono routing
+
+- Lane ID: `uspto_georgia_patents_route`
+- Channel: `ip_readiness`
+- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- Action type: `licensed_counsel_review`
+- Urgency: `IMMEDIATE_24H`
+- Action due: `2026-07-10`
+- Readiness mode: `IP_PACKET_READY_COUNSEL_REQUIRED`
+- Can prepare internally: `true`
+- Can send externally without human: `false`
+- Can submit without human: `false`
+- Can accept terms without human: `false`
+- Required authority: Licensed patent counsel and Robert decide any filing, continuation, PCT, disclosure, or claim strategy action.
+- First artifact: `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md`
+- Claim boundary: This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.
+- Decision question: What filing or claim action must licensed counsel verify before public expansion?
+- Row SHA-256: `e66aed7beadedf4374a8b9fe19381c5595026e6f98cd26152904f7c2608a1517`
+
+Pre-action checks:
+- Prepare filed materials and claim-boundary packet.
+- Do not expand public patent, ownership, or freedom-to-operate claims without counsel.
+- Human and counsel approve any filing or disclosure action.
 
 ### 3. DARPA DICE full proposal sprint
 
@@ -213,6 +285,30 @@ Pre-action checks:
 - Do not prepare a hardware or prime quote.
 - Wait for routing signal or partner path.
 - Human approves any follow-up message.
+
+### 8. Protecnium ITS infrastructure signal
+
+- Lane ID: `protecnium_its_infrastructure_signal`
+- Channel: `infrastructure_market_signal`
+- Status: `CUSTOMER_DISCOVERY_SIGNAL_ONLY`
+- Action type: `customer_discovery_watch`
+- Urgency: `ROLLING_OR_EVENT_GATED`
+- Action due: `None`
+- Readiness mode: `CUSTOMER_DISCOVERY_SIGNAL_READY_HUMAN_REPLY_REQUIRED`
+- Can prepare internally: `true`
+- Can send externally without human: `false`
+- Can submit without human: `false`
+- Can accept terms without human: `false`
+- Required authority: Robert decides whether the infrastructure signal should become a reply, customer-discovery call, partner outreach, or no action.
+- First artifact: `grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md`
+- Claim boundary: This is not a customer commitment, contract, employment acceptance, or pilot demand signal.
+- Decision question: Does the ITS signal sharpen customer-discovery language without claiming a customer or pilot?
+- Row SHA-256: `e09736ada254d0553ec6ed79adfc84f4edad9c9829af25799f503a5398abf2df`
+
+Pre-action checks:
+- Use the signal to sharpen buyer language only.
+- Do not claim a customer, pilot, contract, or employment commitment.
+- Human approves any reply or discovery call.
 
 ### 9. EPA UCMR 6 analytical chemistry lab services
 
@@ -362,7 +458,7 @@ Pre-action checks:
 
 - Lane ID: `patent_deadline_counsel`
 - Channel: `ip_readiness`
-- Status: `URGENT_COUNSEL_WATCH`
+- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
 - Action type: `licensed_counsel_review`
 - Urgency: `WATCHLIST`
 - Action due: `2026-07-25`
@@ -375,7 +471,7 @@ Pre-action checks:
 - First artifact: `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md`
 - Claim boundary: This ledger is not legal advice and does not assert patentability, ownership, or filing sufficiency.
 - Decision question: What filing or claim action must licensed counsel verify before public expansion?
-- Row SHA-256: `3ea04e892d2f820680cdf722abb85dfbc5deeabe0112310472658b1ba3dcd8ba`
+- Row SHA-256: `c2eff942129bb6ce895de0f2d1e8968b9e69bab695030a9ac35addca7da2ef2c`
 
 Pre-action checks:
 - Prepare filed materials and claim-boundary packet.

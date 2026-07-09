@@ -7,9 +7,9 @@ This brief is a decision-support front page. It does not authorize any final ext
 ## Readiness Snapshot
 
 - Status: `REVIEWER_DECISION_BRIEF_READY`
-- Lanes: `15`
-- Top ready lanes: `7`
-- Immediate/urgent lanes: `3`
+- Lanes: `19`
+- Top ready lanes: `10`
+- Immediate/urgent lanes: `6`
 - Partner-blocked lanes: `4`
 - Reviewer gate clear: `true`
 - All final actions blocked without human: `true`
@@ -18,7 +18,7 @@ This brief is a decision-support front page. It does not authorize any final ext
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Decision brief SHA-256: `d71949f18307cddf4540a6d5b25b4483ebaf5da94e977f12fa7869f40d1168b1`
+- Decision brief SHA-256: `8172f556577086ea46441a46df196785b6528fb2c53597fb2a6d8cc6965eded6`
 
 ## Reviewer Answer
 
@@ -52,6 +52,25 @@ This brief is a decision-support front page. It does not authorize any final ext
 
 ## Decision Cards
 
+### 0. SAM.gov registration external validation watch
+
+- Audience: federal registration reviewer
+- Lane ID: `sam_registration_external_validation_watch`
+- Channel: `federal_registration`
+- Urgency: `URGENT_5D`
+- Action due: `2026-07-13`
+- Readiness mode: `FEDERAL_REGISTRATION_SUBMITTED_VALIDATION_PENDING`
+- Decision stance: Monitor validation; do not claim Active status until SAM confirms it.
+- Reviewer decision: What external validation or entity-administrator action is needed before active-registration claims are safe?
+- Next human action: Check SAM status and watch for any DLA email; prepare Entity Administrator letter packet if required.
+- Required authority: Robert verifies SAM status, responds to any official DLA or SAM request, and approves any notarized Entity Administrator letter or correction.
+- First artifact: `grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md`
+- Claim boundary: Submitted is not Active; no award eligibility, active registration, or CAGE validation is claimed until SAM confirms it.
+- Can send externally without human: `false`
+- Can submit without human: `false`
+- Can accept terms without human: `false`
+- Card SHA-256: `3edc55008d35d5215f90c65eb3569c2cf1ef9396c3aecf60eb23b11d12ce5837`
+
 ### 1. EVTit / Black Dog in-kind engineering fund
 
 - Audience: engineering partner
@@ -71,6 +90,25 @@ This brief is a decision-support front page. It does not authorize any final ext
 - Can accept terms without human: `false`
 - Card SHA-256: `853c2c0aac6a76a732a8c8068de9b558b260e826fc4a6b271837d97ed0b6fd48`
 
+### 2. LANL VISION licensing opportunity follow-up
+
+- Audience: federal lab technology-transfer reviewer
+- Lane ID: `lanl_vision_licensing_followup`
+- Channel: `federal_lab_tech_transfer`
+- Urgency: `URGENT_5D`
+- Action due: `2026-07-13`
+- Readiness mode: `LAB_POC_FOLLOWUP_READY_HUMAN_SEND_REQUIRED`
+- Decision stance: Prepare lab follow-up; human approves any POC reply or disclosure.
+- Reviewer decision: Is there a bounded licensing or validation conversation worth pursuing with the named lab POC?
+- Next human action: Prepare concise licensing-fit note and technical questions for the named LANL POC return window.
+- Required authority: Robert approves any lab POC reply, NDA, licensing discussion, export-control response, or disclosure packet.
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
+- Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
+- Can send externally without human: `false`
+- Can submit without human: `false`
+- Can accept terms without human: `false`
+- Card SHA-256: `f1630e9875028974cbdd6e8a63fed763cecab0ccbb14ebe55a687ff8b15245cd`
+
 ### 2. LvlUp Ventures First Check Fund
 
 - Audience: early investor
@@ -89,6 +127,25 @@ This brief is a decision-support front page. It does not authorize any final ext
 - Can submit without human: `false`
 - Can accept terms without human: `false`
 - Card SHA-256: `a734c7b2b6416d29a06923146dd0917e7211351da89bfccd9344e516912428df`
+
+### 3. USPTO / Georgia PATENTS pro bono routing
+
+- Audience: patent counsel
+- Lane ID: `uspto_georgia_patents_route`
+- Channel: `ip_readiness`
+- Urgency: `IMMEDIATE_24H`
+- Action due: `2026-07-10`
+- Readiness mode: `IP_PACKET_READY_COUNSEL_REQUIRED`
+- Decision stance: Counsel review required before public claim expansion.
+- Reviewer decision: What filing or claim action must licensed counsel verify before public expansion?
+- Next human action: Prepare Georgia PATENTS intake packet and counsel questions.
+- Required authority: Licensed patent counsel and Robert decide any filing, continuation, PCT, disclosure, or claim strategy action.
+- First artifact: `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md`
+- Claim boundary: This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.
+- Can send externally without human: `false`
+- Can submit without human: `false`
+- Can accept terms without human: `false`
+- Card SHA-256: `d84196223094cd984d6b16dcdb1e22577c3c8dae37d30fe283f298eb0525825d`
 
 ### 3. DARPA DICE full proposal sprint
 
@@ -203,6 +260,25 @@ This brief is a decision-support front page. It does not authorize any final ext
 - Can submit without human: `false`
 - Can accept terms without human: `false`
 - Card SHA-256: `1b4b7c3deb1ead5e064e698e9cff0530c55f37b92538465ba0c6d2f2dc260eb1`
+
+### 8. Protecnium ITS infrastructure signal
+
+- Audience: infrastructure buyer-discovery reviewer
+- Lane ID: `protecnium_its_infrastructure_signal`
+- Channel: `infrastructure_market_signal`
+- Urgency: `ROLLING_OR_EVENT_GATED`
+- Action due: `None`
+- Readiness mode: `CUSTOMER_DISCOVERY_SIGNAL_READY_HUMAN_REPLY_REQUIRED`
+- Decision stance: Use as buyer-discovery signal; human decides whether to reply.
+- Reviewer decision: Does the ITS signal sharpen customer-discovery language without claiming a customer or pilot?
+- Next human action: Use as customer-discovery context for infrastructure/ITS buyers; reply only if Robert wants partner or market discovery.
+- Required authority: Robert decides whether the infrastructure signal should become a reply, customer-discovery call, partner outreach, or no action.
+- First artifact: `grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md`
+- Claim boundary: This is not a customer commitment, contract, employment acceptance, or pilot demand signal.
+- Can send externally without human: `false`
+- Can submit without human: `false`
+- Can accept terms without human: `false`
+- Card SHA-256: `d51219fc5a2e94b1e8c6f7036d6b05cb680748a28c1ee00e52e7cf64d044e4bf`
 
 ### 9. EPA UCMR 6 analytical chemistry lab services
 

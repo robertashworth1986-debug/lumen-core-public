@@ -22,14 +22,14 @@ def test_reviewer_decision_brief_summarizes_full_control_stack():
 
     assert payload["schema"] == "reviewer_decision_brief_v1"
     assert payload["status"] == "REVIEWER_DECISION_BRIEF_READY"
-    assert payload["summary"]["lane_count"] == 15
-    assert payload["summary"]["top_ready_lane_count"] == 7
-    assert payload["summary"]["urgent_lane_count"] == 3
+    assert payload["summary"]["lane_count"] == 19
+    assert payload["summary"]["top_ready_lane_count"] == 10
+    assert payload["summary"]["urgent_lane_count"] == 6
     assert payload["summary"]["partner_blocked_lane_count"] == 4
-    assert payload["summary"]["authority_lane_count"] == 15
-    assert payload["summary"]["docket_lane_count"] == 15
-    assert payload["summary"]["concierge_lane_count"] == 15
-    assert payload["summary"]["traction_lane_count"] == 15
+    assert payload["summary"]["authority_lane_count"] == 19
+    assert payload["summary"]["docket_lane_count"] == 19
+    assert payload["summary"]["concierge_lane_count"] == 19
+    assert payload["summary"]["traction_lane_count"] == 19
     assert payload["summary"]["reviewer_gate_clear"] is True
     assert payload["summary"]["all_final_actions_blocked_without_human"] is True
     assert payload["summary"]["unsafe_secret_count"] == 0
@@ -46,7 +46,10 @@ def test_decision_cards_keep_review_artifacts_and_final_action_blocks():
     cards = {card["lane_id"]: card for card in payload["decision_cards"]}
 
     assert set(payload["top_ready_lane_ids"]) == {
+        "sam_registration_external_validation_watch",
         "evtit_blackdog_inkind",
+        "lanl_vision_licensing_followup",
+        "uspto_georgia_patents_route",
         "lvlup_first_check",
         "darpa_dice_full_submission",
         "fhwa_tsmo_data_initiative",
@@ -55,7 +58,10 @@ def test_decision_cards_keep_review_artifacts_and_final_action_blocks():
         "nsf_project_pitch",
     }
     assert set(payload["urgent_lane_ids"]) == {
+        "sam_registration_external_validation_watch",
         "evtit_blackdog_inkind",
+        "lanl_vision_licensing_followup",
+        "uspto_georgia_patents_route",
         "darpa_dice_full_submission",
         "openai_api_continuity",
     }
@@ -73,6 +79,9 @@ def test_decision_cards_keep_review_artifacts_and_final_action_blocks():
 
     assert cards["hhs_ai_power_user_pilot"]["decision_stance"] == "Do not pursue solo."
     assert cards["csosa_public_safety_analytics"]["decision_stance"] == "Do not pursue solo."
+    assert cards["sam_registration_external_validation_watch"]["decision_stance"] == "Monitor validation; do not claim Active status until SAM confirms it."
+    assert "lab follow-up" in cards["lanl_vision_licensing_followup"]["decision_stance"]
+    assert "buyer-discovery" in cards["protecnium_its_infrastructure_signal"]["decision_stance"]
     assert "Firm PIN" in cards["dla_missionweave_sbir"]["required_authority"]
     assert "Counsel" in cards["patent_deadline_counsel"]["decision_stance"]
 

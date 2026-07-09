@@ -25,7 +25,7 @@ def test_traction_followup_packet_is_ready_and_human_gated():
     assert payload["status"] == "TRACTION_FOLLOWUP_READY_HUMAN_SEND_REQUIRED"
     assert payload["lane"]["lane_id"] == "evtit_blackdog_inkind"
     assert payload["lane"]["status"] == "RESET_NOTE_SENT_TECH_REVIEW_PENDING"
-    assert summary["thread_signal_count"] == 6
+    assert summary["thread_signal_count"] == 7
     assert summary["build_scope_count"] == 6
     assert summary["draft_count"] == 2
     assert summary["diligence_artifacts_present"] is True
@@ -51,6 +51,7 @@ def test_thread_signals_include_latest_reset_message_without_credentials():
     assert "gmail:19f47e797960c0cd" in refs
     assert "gmail:19f4822c21a4a861" in refs
     assert "gmail:19f484a1fe4aea3b" in refs
+    assert "gmail:19f485a69ba2410d" in refs
     for signal in payload["thread_signals"]:
         combined = f"{signal['safe_signal']} {signal['action_meaning']}".lower()
         assert "zoom.us" not in combined

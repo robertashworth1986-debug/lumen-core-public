@@ -22,8 +22,8 @@ def test_concierge_packet_indexes_all_live_lanes_with_complete_artifacts():
 
     assert payload["schema"] == "reviewer_concierge_packet_v1"
     assert payload["status"] == "REVIEWER_CONCIERGE_READY_HUMAN_ACTION_REQUIRED"
-    assert payload["summary"]["lane_count"] == 15
-    assert payload["summary"]["top_priority_count"] == 7
+    assert payload["summary"]["lane_count"] == 19
+    assert payload["summary"]["top_priority_count"] == 10
     assert payload["summary"]["top_priority_artifacts_complete"] is True
     assert payload["summary"]["missing_artifact_count"] == 0
     assert payload["summary"]["reviewer_gate_clear"] is True
@@ -40,6 +40,10 @@ def test_concierge_cards_keep_decision_questions_hashes_and_human_gates():
     cards = {card["lane_id"]: card for card in payload["concierge_cards"]}
 
     expected = {
+        "sam_registration_external_validation_watch",
+        "lanl_vision_licensing_followup",
+        "uspto_georgia_patents_route",
+        "protecnium_its_infrastructure_signal",
         "evtit_blackdog_inkind",
         "lvlup_first_check",
         "darpa_dice_full_submission",

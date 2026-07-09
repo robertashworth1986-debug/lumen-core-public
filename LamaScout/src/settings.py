@@ -2,9 +2,21 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-load_dotenv()
-
 ROOT = Path(__file__).resolve().parents[1]
+STACK_ROOT = ROOT.parents[0]
+
+for env_path in [
+    ROOT / ".env",
+    ROOT / "config" / ".env",
+    STACK_ROOT / ".env",
+    STACK_ROOT / "config" / "luma_live_keys.env",
+    STACK_ROOT / "config" / "luma_outreach_keys.env",
+]:
+    if env_path.exists():
+        load_dotenv(env_path, override=False)
+
+load_dotenv(override=False)
+
 CONFIG = ROOT / "config"
 DATA = ROOT / "data"
 RAW = DATA / "raw"

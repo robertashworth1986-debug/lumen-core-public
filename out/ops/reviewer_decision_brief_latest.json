@@ -1,6 +1,28 @@
 {
-  "decision_brief_sha256": "d71949f18307cddf4540a6d5b25b4483ebaf5da94e977f12fa7869f40d1168b1",
+  "decision_brief_sha256": "8172f556577086ea46441a46df196785b6528fb2c53597fb2a6d8cc6965eded6",
   "decision_cards": [
+    {
+      "action_due": "2026-07-13",
+      "artifact_missing_count": 0,
+      "audience": "federal registration reviewer",
+      "can_accept_terms_without_human": false,
+      "can_prepare_internal": true,
+      "can_send_external_without_human": false,
+      "can_submit_without_human": false,
+      "channel": "federal_registration",
+      "claim_boundary": "Submitted is not Active; no award eligibility, active registration, or CAGE validation is claimed until SAM confirms it.",
+      "decision_card_sha256": "3edc55008d35d5215f90c65eb3569c2cf1ef9396c3aecf60eb23b11d12ce5837",
+      "decision_stance": "Monitor validation; do not claim Active status until SAM confirms it.",
+      "first_artifact": "grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
+      "lane_id": "sam_registration_external_validation_watch",
+      "name": "SAM.gov registration external validation watch",
+      "next_human_action": "Check SAM status and watch for any DLA email; prepare Entity Administrator letter packet if required.",
+      "priority": 0,
+      "readiness_mode": "FEDERAL_REGISTRATION_SUBMITTED_VALIDATION_PENDING",
+      "required_authority": "Robert verifies SAM status, responds to any official DLA or SAM request, and approves any notarized Entity Administrator letter or correction.",
+      "reviewer_decision": "What external validation or entity-administrator action is needed before active-registration claims are safe?",
+      "urgency": "URGENT_5D"
+    },
     {
       "action_due": "2026-07-09",
       "artifact_missing_count": 0,
@@ -24,6 +46,28 @@
       "urgency": "IMMEDIATE_24H"
     },
     {
+      "action_due": "2026-07-13",
+      "artifact_missing_count": 0,
+      "audience": "federal lab technology-transfer reviewer",
+      "can_accept_terms_without_human": false,
+      "can_prepare_internal": true,
+      "can_send_external_without_human": false,
+      "can_submit_without_human": false,
+      "channel": "federal_lab_tech_transfer",
+      "claim_boundary": "This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.",
+      "decision_card_sha256": "f1630e9875028974cbdd6e8a63fed763cecab0ccbb14ebe55a687ff8b15245cd",
+      "decision_stance": "Prepare lab follow-up; human approves any POC reply or disclosure.",
+      "first_artifact": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+      "lane_id": "lanl_vision_licensing_followup",
+      "name": "LANL VISION licensing opportunity follow-up",
+      "next_human_action": "Prepare concise licensing-fit note and technical questions for the named LANL POC return window.",
+      "priority": 2,
+      "readiness_mode": "LAB_POC_FOLLOWUP_READY_HUMAN_SEND_REQUIRED",
+      "required_authority": "Robert approves any lab POC reply, NDA, licensing discussion, export-control response, or disclosure packet.",
+      "reviewer_decision": "Is there a bounded licensing or validation conversation worth pursuing with the named lab POC?",
+      "urgency": "URGENT_5D"
+    },
+    {
       "action_due": "2026-07-16",
       "artifact_missing_count": 0,
       "audience": "early investor",
@@ -44,6 +88,28 @@
       "required_authority": "Robert approves any investor reply, diligence material, investor terms, or capital commitment.",
       "reviewer_decision": "Is a small first check useful enough to preserve execution velocity and unlock pilots?",
       "urgency": "ACTIVE_14D"
+    },
+    {
+      "action_due": "2026-07-10",
+      "artifact_missing_count": 0,
+      "audience": "patent counsel",
+      "can_accept_terms_without_human": false,
+      "can_prepare_internal": true,
+      "can_send_external_without_human": false,
+      "can_submit_without_human": false,
+      "channel": "ip_readiness",
+      "claim_boundary": "This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.",
+      "decision_card_sha256": "d84196223094cd984d6b16dcdb1e22577c3c8dae37d30fe283f298eb0525825d",
+      "decision_stance": "Counsel review required before public claim expansion.",
+      "first_artifact": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+      "lane_id": "uspto_georgia_patents_route",
+      "name": "USPTO / Georgia PATENTS pro bono routing",
+      "next_human_action": "Prepare Georgia PATENTS intake packet and counsel questions.",
+      "priority": 3,
+      "readiness_mode": "IP_PACKET_READY_COUNSEL_REQUIRED",
+      "required_authority": "Licensed patent counsel and Robert decide any filing, continuation, PCT, disclosure, or claim strategy action.",
+      "reviewer_decision": "What filing or claim action must licensed counsel verify before public expansion?",
+      "urgency": "IMMEDIATE_24H"
     },
     {
       "action_due": "2026-07-12",
@@ -176,6 +242,28 @@
       "required_authority": "Robert approves any further agency contact after a routing response.",
       "reviewer_decision": "Should LumenCore be routed to a data QA or validation need instead of a hardware buy?",
       "urgency": "ACTIVE_14D"
+    },
+    {
+      "action_due": null,
+      "artifact_missing_count": 0,
+      "audience": "infrastructure buyer-discovery reviewer",
+      "can_accept_terms_without_human": false,
+      "can_prepare_internal": true,
+      "can_send_external_without_human": false,
+      "can_submit_without_human": false,
+      "channel": "infrastructure_market_signal",
+      "claim_boundary": "This is not a customer commitment, contract, employment acceptance, or pilot demand signal.",
+      "decision_card_sha256": "d51219fc5a2e94b1e8c6f7036d6b05cb680748a28c1ee00e52e7cf64d044e4bf",
+      "decision_stance": "Use as buyer-discovery signal; human decides whether to reply.",
+      "first_artifact": "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
+      "lane_id": "protecnium_its_infrastructure_signal",
+      "name": "Protecnium ITS infrastructure signal",
+      "next_human_action": "Use as customer-discovery context for infrastructure/ITS buyers; reply only if Robert wants partner or market discovery.",
+      "priority": 8,
+      "readiness_mode": "CUSTOMER_DISCOVERY_SIGNAL_READY_HUMAN_REPLY_REQUIRED",
+      "required_authority": "Robert decides whether the infrastructure signal should become a reply, customer-discovery call, partner outreach, or no action.",
+      "reviewer_decision": "Does the ITS signal sharpen customer-discovery language without claiming a customer or pilot?",
+      "urgency": "ROLLING_OR_EVENT_GATED"
     },
     {
       "action_due": "2026-07-21",
@@ -333,7 +421,7 @@
     }
   ],
   "decision_headline": "LumenCore has a reviewer-ready proof packet with live traction, current funding lanes, explicit human authority gates, and no autonomous final-action authority.",
-  "generated_utc": "2026-07-09T19:18:01.552064+00:00",
+  "generated_utc": "2026-07-09T22:32:29.832884+00:00",
   "outputs": {
     "dashboard_json": "dashboard/data/reviewer_decision_brief.json",
     "json": "out/ops/reviewer_decision_brief_latest.json",
@@ -382,24 +470,27 @@
   "status": "REVIEWER_DECISION_BRIEF_READY",
   "summary": {
     "all_final_actions_blocked_without_human": true,
-    "authority_lane_count": 15,
-    "concierge_lane_count": 15,
-    "docket_lane_count": 15,
+    "authority_lane_count": 19,
+    "concierge_lane_count": 19,
+    "docket_lane_count": 19,
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
-    "lane_count": 15,
+    "lane_count": 19,
     "live_trading_allowed": false,
     "partner_blocked_lane_count": 4,
     "reviewer_gate_clear": true,
-    "top_ready_lane_count": 7,
-    "traction_lane_count": 15,
+    "top_ready_lane_count": 10,
+    "traction_lane_count": 19,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0,
-    "urgent_lane_count": 3
+    "urgent_lane_count": 6
   },
   "top_ready_lane_ids": [
+    "sam_registration_external_validation_watch",
     "evtit_blackdog_inkind",
+    "lanl_vision_licensing_followup",
     "lvlup_first_check",
+    "uspto_georgia_patents_route",
     "darpa_dice_full_submission",
     "fhwa_tsmo_data_initiative",
     "nasa_data_center_rfi",
@@ -407,7 +498,10 @@
     "nsf_project_pitch"
   ],
   "urgent_lane_ids": [
+    "sam_registration_external_validation_watch",
     "evtit_blackdog_inkind",
+    "lanl_vision_licensing_followup",
+    "uspto_georgia_patents_route",
     "darpa_dice_full_submission",
     "openai_api_continuity"
   ]

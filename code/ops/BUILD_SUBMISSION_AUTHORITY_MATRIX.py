@@ -90,6 +90,32 @@ AUTHORITY_BY_ACTION_TYPE: dict[str, dict[str, Any]] = {
             "Keep claims bounded to proof-to-pilot evidence and no field deployment claim.",
         ],
     },
+    "federal_registration_watch": {
+        "required_authority": "Robert verifies SAM status, responds to any official DLA or SAM request, and approves any notarized Entity Administrator letter or correction.",
+        "readiness_mode": "FEDERAL_REGISTRATION_SUBMITTED_VALIDATION_PENDING",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Do not claim Active registration until SAM confirms Active status.",
+            "Respond only to official SAM.gov, FSD, or DLA channels verified by the human.",
+            "Human approves any notarized letter, correction, or certification.",
+        ],
+    },
+    "lab_poc_followup": {
+        "required_authority": "Robert approves any lab POC reply, NDA, licensing discussion, export-control response, or disclosure packet.",
+        "readiness_mode": "LAB_POC_FOLLOWUP_READY_HUMAN_SEND_REQUIRED",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Keep the note limited to licensing-fit and validation questions.",
+            "Do not send private archives, unreleased IP detail, or export-sensitive material without review.",
+            "Human approves any NDA, licensing, or disclosure step.",
+        ],
+    },
     "federal_rfi_build": {
         "required_authority": "Robert verifies official RFI instructions, contact address, page limits, and final send approval.",
         "readiness_mode": "RFI_DRAFT_READY_SEND_BLOCKED",
@@ -179,6 +205,19 @@ AUTHORITY_BY_ACTION_TYPE: dict[str, dict[str, Any]] = {
             "Identify qualified prime or regulated-domain partner first.",
             "Do not claim prime qualifications LumenCore does not hold.",
             "Human approves outreach and role boundary.",
+        ],
+    },
+    "customer_discovery_watch": {
+        "required_authority": "Robert decides whether the infrastructure signal should become a reply, customer-discovery call, partner outreach, or no action.",
+        "readiness_mode": "CUSTOMER_DISCOVERY_SIGNAL_READY_HUMAN_REPLY_REQUIRED",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Use the signal to sharpen buyer language only.",
+            "Do not claim a customer, pilot, contract, or employment commitment.",
+            "Human approves any reply or discovery call.",
         ],
     },
     "partner_intro_only": {

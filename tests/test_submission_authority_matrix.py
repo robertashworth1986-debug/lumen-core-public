@@ -22,9 +22,9 @@ def test_submission_authority_matrix_blocks_all_final_actions():
 
     assert payload["schema"] == "submission_authority_matrix_v1"
     assert payload["status"] == "SUBMISSION_AUTHORITY_MATRIX_READY"
-    assert payload["summary"]["lane_count"] == 15
-    assert payload["summary"]["docket_lane_count"] == 15
-    assert payload["summary"]["concierge_lane_count"] == 15
+    assert payload["summary"]["lane_count"] == 19
+    assert payload["summary"]["docket_lane_count"] == 19
+    assert payload["summary"]["concierge_lane_count"] == 19
     assert payload["summary"]["all_artifacts_present"] is True
     assert payload["summary"]["reviewer_gate_clear"] is True
     assert payload["summary"]["all_final_actions_blocked_without_human"] is True
@@ -52,6 +52,12 @@ def test_specific_authority_gates_match_high_risk_lanes():
     payload = module.build_payload()
     rows = {row["lane_id"]: row for row in payload["authority_rows"]}
 
+    assert rows["sam_registration_external_validation_watch"]["readiness_mode"] == "FEDERAL_REGISTRATION_SUBMITTED_VALIDATION_PENDING"
+    assert "Active registration" in rows["sam_registration_external_validation_watch"]["pre_action_checks"][0]
+    assert rows["lanl_vision_licensing_followup"]["readiness_mode"] == "LAB_POC_FOLLOWUP_READY_HUMAN_SEND_REQUIRED"
+    assert "lab POC reply" in rows["lanl_vision_licensing_followup"]["required_authority"]
+    assert rows["uspto_georgia_patents_route"]["readiness_mode"] == "IP_PACKET_READY_COUNSEL_REQUIRED"
+    assert rows["protecnium_its_infrastructure_signal"]["readiness_mode"] == "CUSTOMER_DISCOVERY_SIGNAL_READY_HUMAN_REPLY_REQUIRED"
     assert rows["darpa_dice_full_submission"]["readiness_mode"] == "FEDERAL_DRAFT_READY_SUBMISSION_BLOCKED"
     assert "BAA" in rows["darpa_dice_full_submission"]["required_authority"]
     assert rows["fhwa_tsmo_data_initiative"]["readiness_mode"] == "FEDERAL_DRAFT_READY_SUBMISSION_BLOCKED"

@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 import re
 import time
 from typing import Any, Dict, List
@@ -182,9 +183,32 @@ def is_emerging_artist(followers: int, avg_views: int, monthly_listeners: int, p
     return True
 
 
+def _first_env_value(names: List[str]) -> str:
+    for name in names:
+        value = os.environ.get(str(name).strip(), "")
+        if value and value.strip():
+            return value.strip()
+    return ""
+
+
+def _auth_value(auth: Dict[str, Any], direct_key: str, env_key: str, alias_key: str = "aliases") -> str:
+    direct = str(auth.get(direct_key, "") or "").strip()
+    if direct and not direct.startswith("YOUR_") and not direct.startswith("${"):
+        return direct
+    names: List[str] = []
+    env_name = str(auth.get(env_key, "") or "").strip()
+    if env_name:
+        names.append(env_name)
+    aliases = auth.get(alias_key, []) or []
+    if isinstance(aliases, str):
+        aliases = [aliases]
+    names.extend([str(item).strip() for item in aliases if str(item).strip()])
+    return _first_env_value(names)
+
+
 class YouTubeClient(BaseClient):
     def fetch_artist_rows(self) -> List[Dict[str, Any]]:
-        key = self.config.get("auth", {}).get("api_key")
+        key = _auth_value(self.config.get("auth", {}), "api_key", "api_key_env")
         search_terms = self.config.get("search_terms", []) or []
         if not key or not search_terms:
             return []
@@ -254,8 +278,8 @@ class SpotifyClient(BaseClient):
         if spotipy is None:
             return []
         auth = self.config.get("auth", {})
-        client_id = auth.get("client_id")
-        client_secret = auth.get("client_secret")
+        client_id = _auth_value(auth, "client_id", "client_id_env", "client_id_aliases")
+        client_secret = _auth_value(auth, "client_secret", "client_secret_env", "client_secret_aliases")
         if not client_id or not client_secret:
             return []
 
@@ -294,7 +318,7 @@ class SpotifyClient(BaseClient):
 
 class MetaClient(BaseClient):
     def fetch_artist_rows(self) -> List[Dict[str, Any]]:
-        token = self.config.get("auth", {}).get("access_token")
+        token = _auth_value(self.config.get("auth", {}), "access_token", "access_token_env")
         if not token:
             return []
         rows: List[Dict[str, Any]] = []
@@ -416,7 +440,7 @@ class TwitterXClient(BaseClient):
     def fetch_artist_rows(self) -> List[Dict[str, Any]]:
         if tweepy is None:
             return []
-        bearer = self.config.get("auth", {}).get("bearer_token")
+        bearer = _auth_value(self.config.get("auth", {}), "bearer_token", "bearer_token_env")
         if not bearer:
             return []
         rows: List[Dict[str, Any]] = []
@@ -443,7 +467,7 @@ class NewsApiClientSource(BaseClient):
     def fetch_artist_rows(self) -> List[Dict[str, Any]]:
         if NewsApiClient is None:
             return []
-        api_key = self.config.get("auth", {}).get("api_key")
+        api_key = _auth_value(self.config.get("auth", {}), "api_key", "api_key_env")
         if not api_key:
             return []
         rows: List[Dict[str, Any]] = []
@@ -467,7 +491,7 @@ class NewsApiClientSource(BaseClient):
 
 class VenueClient(BaseClient):
     def fetch_artist_rows(self) -> List[Dict[str, Any]]:
-        api_key = self.config.get("auth", {}).get("api_key")
+        api_key = _auth_value(self.config.get("auth", {}), "api_key", "api_key_env")
         if not api_key:
             return []
         rows: List[Dict[str, Any]] = []

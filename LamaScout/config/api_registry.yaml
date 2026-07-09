@@ -3,202 +3,86 @@ sources:
     display_name: YouTube
     source_type: streaming_platform
     active: true
+    access_mode: read_only_metrics
     auth:
-      api_key: "AIzaSyCd-ChmsbaNnREOwaX1nWOTajQFZd_-ysM"
+      api_key_env: YOUTUBE_API_KEY
+      aliases:
+        - GOOGLE_YOUTUBE_API_KEY
+        - GOOGLE_API_KEY
     endpoint: "https://www.googleapis.com/youtube/v3"
     search_terms:
-      - new country singer 2026 official
-      - new hip hop artist 2026 official music video
-      - indie pop singer official 2026
-      - breakout r&b vocalist 2026
-      - new folk singer songwriter official
+      - emerging country artist usa 2026
+      - rising hiphop artist
+      - breakthrough indie rock
+      - viral singer songwriter
+      - unsigned pop talent
+      - breakthrough edm producer
+      - rising local festival performer
+      - unsigned open mic act
+      - regional showcase artist
+      - breakout live circuit
       - independent artist debut single 2026
-      - new trap artist official video 2026
-      - alternative pop singer new single
-      - afrobeats emerging artist official 2026
-      - latin pop new artist official video 2026
-      - soul singer debut album 2026
-      - gospel singer new song 2026 official
-    notes: "Video and channel metrics for national artist discovery."
+      - new r&b vocalist official 2026
+    notes: "Video/channel metrics for national artist discovery. No posting, comments, uploads, or account mutation."
 
   - name: spotify
     display_name: Spotify
     source_type: audio_platform
     active: true
+    access_mode: read_only_metrics
     auth:
-      client_id: "2f7740e79932488fb70892f4897348fa"
-      client_secret: "78ec3f38de53418497c006c4af97882b"
+      client_id_env: SPOTIFY_CLIENT_ID
+      client_secret_env: SPOTIFY_CLIENT_SECRET
+      client_id_aliases:
+        - SPOTIFY_API_CLIENT_ID
+      client_secret_aliases:
+        - SPOTIFY_API_CLIENT_SECRET
     endpoint: "https://api.spotify.com/v1"
     search_terms:
-      - country singer
-      - hip hop rap independent
-      - indie pop acoustic
-      - r&b soul vocalist
-      - trap rap new
-      - folk singer songwriter
-      - alternative rock debut
-      - afrobeats independent
-      - latin pop independent
-      - gospel contemporary
+      - emerging country artist usa 2026
+      - rising hiphop artist
+      - breakthrough indie rock
+      - viral singer songwriter
+      - unsigned pop talent
+      - breakthrough edm producer
+      - rising local festival performer
+      - unsigned open mic act
+      - regional showcase artist
+      - breakout live circuit
       - bedroom pop indie
       - lo-fi singer songwriter
-    notes: "Monthly listener and release metrics for broad talent discovery."
+    notes: "Artist, follower, genre, and popularity signals through client-credentials read-only flow."
 
   - name: meta
-    display_name: Meta Graph (Instagram/Facebook)
+    display_name: Meta Graph (Facebook/Instagram)
     source_type: social_platform
-    active: false
+    active: true
+    access_mode: read_only_public_signal
     auth:
-      access_token: "YOUR_META_ACCESS_TOKEN"
+      access_token_env: META_ACCESS_TOKEN
+      aliases:
+        - FACEBOOK_ACCESS_TOKEN
+        - FACEBOOK_GRAPH_ACCESS_TOKEN
+        - INSTAGRAM_ACCESS_TOKEN
     endpoint: "https://graph.facebook.com"
     search_terms:
+      - emerging country artist usa 2026
+      - rising hiphop artist
+      - breakthrough indie rock
+      - viral singer songwriter
+      - unsigned pop talent
+      - rising local festival performer
+      - regional showcase artist
       - independent artist music
       - new country singer
-      - rising hip hop artist
       - indie pop musician
-      - unsigned r&b artist
-    notes: "Instagram/FB creator and business signal."
+    notes: "Facebook/Instagram creator signal lane. No posting, messaging, ads, page edits, comments, or account mutation."
 
   - name: google_trends
     display_name: Google Trends
     source_type: cultural_trend
     active: true
-    auth: {}
-    endpoint: "https://trends.google.com/trends/api"
-    search_terms:
-      - Zach Bryan
-      - Ice Spice
-      - Gracie Abrams
-      - Noah Kahan
-      - Victoria Monet
-      - Sexyy Red
-      - Benson Boone
-      - Sabrina Carpenter
-      - Tyla
-      - Peso Pluma
-      - Jelly Roll
-      - Teddy Swims
-    notes: "Search interest and trend momentum — uses known breakout artists for calibration."
-
-  - name: musicbrainz
-    display_name: MusicBrainz
-    source_type: music_metadata
-    active: true
-    auth: {}
-    endpoint: "https://musicbrainz.org/ws/2/artist/"
-    search_terms:
-      - country singer United States
-      - hip hop artist United States
-      - indie pop artist
-      - r&b vocalist
-      - folk singer United States
-      - alternative rock
-      - trap rapper
-      - bedroom pop artist
-      - afrobeats United States
-      - latin pop United States
-    notes: "Open artist metadata from MusicBrainz, no API key required."
-
-  - name: wikipedia
-    display_name: Wikipedia
-    source_type: press_signal
-    active: true
-    auth: {}
-    endpoint: "https://en.wikipedia.org/w/api.php"
-    search_terms:
-      - emerging country music artist
-      - rising hip hop artist
-      - breakthrough indie artist
-      - new r&b singer
-      - independent music artist debut
-    notes: "Open Wikipedia search-based press and artist concept signal."
-
-  - name: twitter_x
-    display_name: X / Twitter
-    source_type: social_platform
-    active: false
-    auth:
-      bearer_token: "YOUR_TWITTER_BEARER_TOKEN"
-    endpoint: "https://api.twitter.com/2"
-    search_terms:
-      - independent music artist
-      - new single release
-      - unsigned artist debut
-    notes: "Buzz, mentions, and social signal."
-
-  - name: ticketmaster
-    display_name: Ticketmaster
-    source_type: venue_signal
-    active: false
-    auth:
-      api_key: "YOUR_TICKETMASTER_API_KEY"
-    endpoint: "https://app.ticketmaster.com/discovery/v2"
-    search_terms:
-      - emerging live show artist
-      - regional festival breakout
-      - headline support act
-    notes: "Live event and venue mention signal."
-
-  - name: news_api
-    display_name: NewsAPI
-    source_type: press_signal
-    active: false
-    auth:
-      api_key: "YOUR_NEWSAPI_KEY"
-    search_terms:
-      - emerging country artist
-      - rising hip hop artist
-      - breakthrough indie artist
-      - new r&b singer music
-      - independent artist record deal
-    endpoint: "https://newsapi.org/v2"
-    notes: "Media mention signal for national press coverage."
-
-  - name: spotify
-    display_name: Spotify
-    source_type: audio_platform
-    active: true
-    auth:
-      client_id: "2f7740e79932488fb70892f4897348fa"
-      client_secret: "78ec3f38de53418497c006c4af97882b"
-    endpoint: "https://api.spotify.com/v1"
-    search_terms:
-      - emerging country artist usa 2026
-      - rising hiphop artist
-      - breakthrough indie rock
-      - viral singer songwriter
-      - unsigned pop talent
-      - breakthrough edm producer
-      - rising local festival performer
-      - unsigned open mic act
-      - regional showcase artist
-      - breakout live circuit
-    notes: "Monthly listener and release metrics for broad talent discovery."
-
-  - name: meta
-    display_name: Meta Graph (Instagram/Facebook)
-    source_type: social_platform
-    active: false
-    auth:
-      access_token: "YOUR_META_ACCESS_TOKEN"
-    endpoint: "https://graph.facebook.com"
-    search_terms:
-      - emerging country artist usa 2026
-      - rising hiphop artist
-      - breakthrough indie rock
-      - viral singer songwriter
-      - unsigned pop talent
-      - breakthrough edm producer
-      - rising local festival performer
-      - unsigned open mic act
-      - regional showcase artist
-      - breakout live circuit
-    notes: "Instagram/FB creator and business signal."
-
-  - name: google_trends
-    display_name: Google Trends
-    source_type: cultural_trend
-    active: true
+    access_mode: public_signal
     auth: {}
     endpoint: "https://trends.google.com/trends/api"
     search_terms:
@@ -218,6 +102,7 @@ sources:
     display_name: MusicBrainz
     source_type: music_metadata
     active: true
+    access_mode: public_open_api
     auth: {}
     endpoint: "https://musicbrainz.org/ws/2/artist/"
     search_terms:
@@ -237,6 +122,7 @@ sources:
     display_name: Wikipedia
     source_type: press_signal
     active: true
+    access_mode: public_open_api
     auth: {}
     endpoint: "https://en.wikipedia.org/w/api.php"
     search_terms:
@@ -256,28 +142,25 @@ sources:
     display_name: X / Twitter
     source_type: social_platform
     active: false
+    access_mode: read_only_metrics
     auth:
-      bearer_token: "YOUR_TWITTER_BEARER_TOKEN"
+      bearer_token_env: TWITTER_BEARER_TOKEN
+      aliases:
+        - X_BEARER_TOKEN
     endpoint: "https://api.twitter.com/2"
     search_terms:
-      - emerging country artist usa 2026
-      - rising hiphop artist
-      - breakthrough indie rock
-      - viral singer songwriter
-      - unsigned pop talent
-      - breakthrough edm producer
-      - rising local festival performer
-      - unsigned open mic act
-      - regional showcase artist
-      - breakout live circuit
-    notes: "Buzz, mentions, and social signal."
+      - independent music artist
+      - new single release
+      - unsigned artist debut
+    notes: "Buzz, mentions, and social signal. Kept inactive until key and rate-limit policy are reviewed."
 
   - name: ticketmaster
     display_name: Ticketmaster
     source_type: venue_signal
     active: false
+    access_mode: read_only_events
     auth:
-      api_key: "YOUR_TICKETMASTER_API_KEY"
+      api_key_env: TICKETMASTER_API_KEY
     endpoint: "https://app.ticketmaster.com/discovery/v2"
     search_terms:
       - emerging live show artist
@@ -289,18 +172,16 @@ sources:
     display_name: NewsAPI
     source_type: press_signal
     active: false
+    access_mode: read_only_press
     auth:
-      api_key: "YOUR_NEWSAPI_KEY"
+      api_key_env: NEWSAPI_KEY
+      aliases:
+        - NEWS_API_KEY
     search_terms:
-      - emerging country artist usa 2026
-      - rising hiphop artist
-      - breakthrough indie rock
-      - viral singer songwriter
-      - unsigned pop talent
-      - breakthrough edm producer
-      - rising local festival performer
-      - unsigned open mic act
-      - regional showcase artist
-      - breakout live circuit
+      - emerging country artist
+      - rising hip hop artist
+      - breakthrough indie artist
+      - new r&b singer music
+      - independent artist record deal
     endpoint: "https://newsapi.org/v2"
     notes: "Media mention signal for national press coverage."

@@ -1,0 +1,208 @@
+{
+  "allowed_actions": [
+    "presence_audit",
+    "purpose_mapping",
+    "read_only_source_metrics",
+    "dashboard_receipt",
+    "reviewer_safe_summary"
+  ],
+  "api_key_registry_report": {
+    "coverage_pct": 58.73,
+    "notes": [
+      "Values are never stored here; only presence booleans and purpose mapping.",
+      "Use this for route ownership and avoiding crossed engine roots."
+    ],
+    "path": "out/execution/api_key_registry_report.json",
+    "present_keys": 37,
+    "schema": "api_key_registry_report_v1",
+    "total_keys": 63
+  },
+  "blocked_actions": [
+    "ad",
+    "ad_spend",
+    "comment",
+    "dm",
+    "follow",
+    "message",
+    "order",
+    "page_edit",
+    "post",
+    "trade",
+    "upload",
+    "withdraw"
+  ],
+  "firewall_rules": [
+    "Never commit raw API values to tracked registry files.",
+    "Use *_env fields and ignored local env files for all credential material.",
+    "LumaScout media sources are read-only metric/source-intelligence lanes.",
+    "No posting, messaging, comments, uploads, page edits, ad spend, trading, withdrawals, or capital movement without explicit human approval and a separate purpose-built workflow.",
+    "Public reports may show provider names, key presence booleans, source counts, hashes, and claim boundaries only."
+  ],
+  "generated_utc": "2026-07-09T22:32:27.700322+00:00",
+  "inline_secret_hits": [],
+  "key_firewall_sha256": "387c320ac5bf549405462954f2c7d826cacd9a1f36812de5bb02a919479eab8f",
+  "lamascout_sources": [
+    {
+      "access_mode": "read_only_metrics",
+      "active": true,
+      "credential_present": false,
+      "display_name": "YouTube",
+      "endpoint": "https://www.googleapis.com/youtube/v3",
+      "env_candidates": [
+        "YOUTUBE_API_KEY",
+        "GOOGLE_YOUTUBE_API_KEY",
+        "GOOGLE_API_KEY"
+      ],
+      "human_action_required_for_account_mutation": true,
+      "name": "youtube",
+      "search_term_count": 12,
+      "source_type": "streaming_platform",
+      "write_or_spend_allowed": false
+    },
+    {
+      "access_mode": "read_only_metrics",
+      "active": true,
+      "credential_present": false,
+      "display_name": "Spotify",
+      "endpoint": "https://api.spotify.com/v1",
+      "env_candidates": [
+        "SPOTIFY_CLIENT_ID",
+        "SPOTIFY_CLIENT_SECRET",
+        "SPOTIFY_API_CLIENT_ID",
+        "SPOTIFY_API_CLIENT_SECRET"
+      ],
+      "human_action_required_for_account_mutation": true,
+      "name": "spotify",
+      "search_term_count": 12,
+      "source_type": "audio_platform",
+      "write_or_spend_allowed": false
+    },
+    {
+      "access_mode": "read_only_public_signal",
+      "active": true,
+      "credential_present": false,
+      "display_name": "Meta Graph (Facebook/Instagram)",
+      "endpoint": "https://graph.facebook.com",
+      "env_candidates": [
+        "META_ACCESS_TOKEN",
+        "FACEBOOK_ACCESS_TOKEN",
+        "FACEBOOK_GRAPH_ACCESS_TOKEN",
+        "INSTAGRAM_ACCESS_TOKEN"
+      ],
+      "human_action_required_for_account_mutation": true,
+      "name": "meta",
+      "search_term_count": 10,
+      "source_type": "social_platform",
+      "write_or_spend_allowed": false
+    },
+    {
+      "access_mode": "public_signal",
+      "active": true,
+      "credential_present": true,
+      "display_name": "Google Trends",
+      "endpoint": "https://trends.google.com/trends/api",
+      "env_candidates": [],
+      "human_action_required_for_account_mutation": true,
+      "name": "google_trends",
+      "search_term_count": 10,
+      "source_type": "cultural_trend",
+      "write_or_spend_allowed": false
+    },
+    {
+      "access_mode": "public_open_api",
+      "active": true,
+      "credential_present": true,
+      "display_name": "MusicBrainz",
+      "endpoint": "https://musicbrainz.org/ws/2/artist/",
+      "env_candidates": [],
+      "human_action_required_for_account_mutation": true,
+      "name": "musicbrainz",
+      "search_term_count": 10,
+      "source_type": "music_metadata",
+      "write_or_spend_allowed": false
+    },
+    {
+      "access_mode": "public_open_api",
+      "active": true,
+      "credential_present": true,
+      "display_name": "Wikipedia",
+      "endpoint": "https://en.wikipedia.org/w/api.php",
+      "env_candidates": [],
+      "human_action_required_for_account_mutation": true,
+      "name": "wikipedia",
+      "search_term_count": 10,
+      "source_type": "press_signal",
+      "write_or_spend_allowed": false
+    },
+    {
+      "access_mode": "read_only_metrics",
+      "active": false,
+      "credential_present": false,
+      "display_name": "X / Twitter",
+      "endpoint": "https://api.twitter.com/2",
+      "env_candidates": [
+        "TWITTER_BEARER_TOKEN",
+        "X_BEARER_TOKEN"
+      ],
+      "human_action_required_for_account_mutation": true,
+      "name": "twitter_x",
+      "search_term_count": 3,
+      "source_type": "social_platform",
+      "write_or_spend_allowed": false
+    },
+    {
+      "access_mode": "read_only_events",
+      "active": false,
+      "credential_present": false,
+      "display_name": "Ticketmaster",
+      "endpoint": "https://app.ticketmaster.com/discovery/v2",
+      "env_candidates": [
+        "TICKETMASTER_API_KEY"
+      ],
+      "human_action_required_for_account_mutation": true,
+      "name": "ticketmaster",
+      "search_term_count": 3,
+      "source_type": "venue_signal",
+      "write_or_spend_allowed": false
+    },
+    {
+      "access_mode": "read_only_press",
+      "active": false,
+      "credential_present": false,
+      "display_name": "NewsAPI",
+      "endpoint": "https://newsapi.org/v2",
+      "env_candidates": [
+        "NEWSAPI_KEY",
+        "NEWS_API_KEY"
+      ],
+      "human_action_required_for_account_mutation": true,
+      "name": "news_api",
+      "search_term_count": 5,
+      "source_type": "press_signal",
+      "write_or_spend_allowed": false
+    }
+  ],
+  "outputs": {
+    "dashboard_json": "dashboard/data/key_governance_firewall.json",
+    "json": "out/ops/key_governance_firewall_latest.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/KEY_GOVERNANCE_FIREWALL_2026-07-09.md"
+  },
+  "schema": "api_key_governance_firewall_v1",
+  "status": "KEY_FIREWALL_READY_HUMAN_GATED",
+  "summary": {
+    "ad_spend_allowed": false,
+    "final_action_allowed_without_human": false,
+    "lamascout_active_source_count": 6,
+    "lamascout_active_sources_with_credentials": 3,
+    "lamascout_inline_credential_hit_count": 0,
+    "lamascout_source_count": 9,
+    "live_trading_allowed": false,
+    "raw_credential_values_stored": false,
+    "registry_coverage_pct": 58.73,
+    "registry_missing_key_slots": 26,
+    "registry_present_key_slots": 37,
+    "registry_total_key_slots": 63,
+    "social_posting_allowed": false,
+    "write_or_spend_allowed_count": 0
+  }
+}

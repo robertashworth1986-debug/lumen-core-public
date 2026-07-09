@@ -37,6 +37,30 @@ SENSITIVE_MARKERS = [
 ]
 
 ACTION_OVERRIDES: dict[str, dict[str, Any]] = {
+    "sam_registration_external_validation_watch": {
+        "docket_action": "Check SAM status and watch for any DLA email; prepare Entity Administrator letter packet if required.",
+        "action_due": "2026-07-13",
+        "time_basis": "SAM confirmation says IRS validation can take two business days and DLA CAGE validation averages two business days after routing.",
+        "action_type": "federal_registration_watch",
+    },
+    "lanl_vision_licensing_followup": {
+        "docket_action": "Prepare concise licensing-fit note and technical questions for the named LANL POC return window.",
+        "action_due": "2026-07-13",
+        "time_basis": "LANL response says the main POC is out until next week.",
+        "action_type": "lab_poc_followup",
+    },
+    "uspto_georgia_patents_route": {
+        "docket_action": "Prepare Georgia PATENTS intake packet and counsel questions.",
+        "action_due": "2026-07-10",
+        "time_basis": "USPTO Pro Bono routed Tennessee inventors to Georgia PATENTS; patent timing must be verified by counsel.",
+        "action_type": "licensed_counsel_review",
+    },
+    "protecnium_its_infrastructure_signal": {
+        "docket_action": "Use as customer-discovery context for infrastructure/ITS buyers; reply only if Robert wants partner or market discovery.",
+        "action_due": None,
+        "time_basis": "LinkedIn InMail is a market signal, not a funding deadline.",
+        "action_type": "customer_discovery_watch",
+    },
     "evtit_blackdog_inkind": {
         "docket_action": "Prepare call packet and proof walkthrough.",
         "action_due": "2026-07-09",
@@ -87,7 +111,11 @@ STATUS_ACTION_TYPES: dict[str, str] = {
     "FULL_PROPOSAL_SPRINT": "federal_baa_build",
     "PITCH_READY_HUMAN_CHECK": "rolling_human_check",
     "HUMAN_FORM_READY": "vendor_route",
+    "PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED": "licensed_counsel_review",
     "URGENT_COUNSEL_WATCH": "licensed_counsel_review",
+    "SUBMITTED_EXTERNAL_VALIDATION_PENDING": "federal_registration_watch",
+    "WAITING_POC_RETURN": "lab_poc_followup",
+    "CUSTOMER_DISCOVERY_SIGNAL_ONLY": "customer_discovery_watch",
     "WAITING_REVIEW": "investor_watch",
     "LIVE_MEETING_PREP": "meeting_prep",
 }
@@ -100,6 +128,9 @@ DOCKET_ACTIONS_BY_TYPE: dict[str, str] = {
     "rolling_human_check": "Verify platform rules before any submit action.",
     "vendor_route": "Prepare official-form language and human billing/terms review.",
     "licensed_counsel_review": "Prepare counsel packet and do not expand public IP claims without licensed review.",
+    "federal_registration_watch": "Monitor entity registration validations and respond to official requests only through human-approved channels.",
+    "lab_poc_followup": "Prepare a concise tech-transfer follow-up packet for the named lab POC.",
+    "customer_discovery_watch": "Use as market-context evidence; do not claim a customer or pilot.",
     "investor_watch": "Keep brief ready and avoid repeated follow-up until the stated review window passes or the reviewer asks.",
     "meeting_prep": "Prepare walkthrough, build-scope menu, proof links, and terms questions.",
     "agency_routing_watch": "Wait for routing response; do not prepare a prime bid.",

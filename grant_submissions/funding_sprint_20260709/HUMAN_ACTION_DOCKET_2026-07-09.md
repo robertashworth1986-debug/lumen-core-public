@@ -7,8 +7,8 @@ Current date for this docket: `2026-07-09`.
 ## Gate Status
 
 - Status: `HUMAN_ACTION_DOCKET_READY`
-- Lanes: `15`
-- Immediate or urgent lanes: `3`
+- Lanes: `19`
+- Immediate or urgent lanes: `6`
 - All artifacts present: `true`
 - Reviewer gate clear: `true`
 - Unsafe sensitive hits: `0`
@@ -16,7 +16,7 @@ Current date for this docket: `2026-07-09`.
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Docket SHA-256: `cf5a38c34730d5586be41598ccdf65e3909cd0442e37e94b5fd498d25f629797`
+- Docket SHA-256: `018d18656838ba7cc7100a1e953318f0cef6e3b4bfb25242e8edfeb85532f600`
 
 ## Immediate And Urgent Lanes
 
@@ -32,6 +32,19 @@ Current date for this docket: `2026-07-09`.
 - Human gate: Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.
 - Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
 - Item SHA-256: `1c654f2696837d96d1b1fcfa1ffe8229f7f49f91a4e35cdc75eda4b75aec1b4a`
+
+### USPTO / Georgia PATENTS pro bono routing
+
+- Lane ID: `uspto_georgia_patents_route`
+- Urgency: `IMMEDIATE_24H`
+- Action due: `2026-07-10`
+- Days until due: `1`
+- Action: Prepare Georgia PATENTS intake packet and counsel questions.
+- Time basis: USPTO Pro Bono routed Tennessee inventors to Georgia PATENTS; patent timing must be verified by counsel.
+- First artifact: `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md`
+- Human gate: Human and licensed counsel decide any filing, claim, continuation, PCT, disclosure, or legal strategy.
+- Claim boundary: This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.
+- Item SHA-256: `3e87b1ce8ce788f218587ad8df5b7ab6d79425c19ea14a49d6f27cda5534739c`
 
 ### OpenAI API continuity request
 
@@ -59,6 +72,32 @@ Current date for this docket: `2026-07-09`.
 - Claim boundary: Abstract receipt is not award selection and not permission to skip BAA instructions.
 - Item SHA-256: `ee8f884fbad49732b5fa14238ccf480f3be8101cb840a65ea182d1f266e49ec5`
 
+### SAM.gov registration external validation watch
+
+- Lane ID: `sam_registration_external_validation_watch`
+- Urgency: `URGENT_5D`
+- Action due: `2026-07-13`
+- Days until due: `4`
+- Action: Check SAM status and watch for any DLA email; prepare Entity Administrator letter packet if required.
+- Time basis: SAM confirmation says IRS validation can take two business days and DLA CAGE validation averages two business days after routing.
+- First artifact: `grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md`
+- Human gate: Human handles any DLA response, notarized letter, registration correction, or federal certification.
+- Claim boundary: Submitted is not Active; no award eligibility, active registration, or CAGE validation is claimed until SAM confirms it.
+- Item SHA-256: `1d744ae26e9f88549471aec96b6717e1dcc156156d398d76a8710566416defce`
+
+### LANL VISION licensing opportunity follow-up
+
+- Lane ID: `lanl_vision_licensing_followup`
+- Urgency: `URGENT_5D`
+- Action due: `2026-07-13`
+- Days until due: `4`
+- Action: Prepare concise licensing-fit note and technical questions for the named LANL POC return window.
+- Time basis: LANL response says the main POC is out until next week.
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
+- Human gate: Human approves any LANL reply, NDA, licensing discussion, export-control response, or disclosure package.
+- Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
+- Item SHA-256: `8c8ce8aa3ef07b3484285b75b99c855427b907eca3141a0cc188a0edc31ba7b3`
+
 ## Full Docket
 
 ### 1. EVTit / Black Dog in-kind engineering fund
@@ -74,6 +113,20 @@ Current date for this docket: `2026-07-09`.
 - Decision question: Can an in-kind engineering team accelerate proof portal, replay runner, manifest, and pilot onboarding?
 - Human gate: Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.
 - Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
+
+### 3. USPTO / Georgia PATENTS pro bono routing
+
+- Lane ID: `uspto_georgia_patents_route`
+- Channel: `ip_readiness`
+- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- Action type: `licensed_counsel_review`
+- Urgency: `IMMEDIATE_24H`
+- Action due: `2026-07-10`
+- Action: Prepare Georgia PATENTS intake packet and counsel questions.
+- First artifact: `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md`
+- Decision question: What filing or claim action must licensed counsel verify before public expansion?
+- Human gate: Human and licensed counsel decide any filing, claim, continuation, PCT, disclosure, or legal strategy.
+- Claim boundary: This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.
 
 ### 14. OpenAI API continuity request
 
@@ -102,6 +155,34 @@ Current date for this docket: `2026-07-09`.
 - Decision question: Does the proposal map a credible research objective to a bounded validation method?
 - Human gate: Human confirms BAA requirements, reps, budgets, and submission package before any portal action.
 - Claim boundary: Abstract receipt is not award selection and not permission to skip BAA instructions.
+
+### 0. SAM.gov registration external validation watch
+
+- Lane ID: `sam_registration_external_validation_watch`
+- Channel: `federal_registration`
+- Status: `SUBMITTED_EXTERNAL_VALIDATION_PENDING`
+- Action type: `federal_registration_watch`
+- Urgency: `URGENT_5D`
+- Action due: `2026-07-13`
+- Action: Check SAM status and watch for any DLA email; prepare Entity Administrator letter packet if required.
+- First artifact: `grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md`
+- Decision question: What external validation or entity-administrator action is needed before active-registration claims are safe?
+- Human gate: Human handles any DLA response, notarized letter, registration correction, or federal certification.
+- Claim boundary: Submitted is not Active; no award eligibility, active registration, or CAGE validation is claimed until SAM confirms it.
+
+### 2. LANL VISION licensing opportunity follow-up
+
+- Lane ID: `lanl_vision_licensing_followup`
+- Channel: `federal_lab_tech_transfer`
+- Status: `WAITING_POC_RETURN`
+- Action type: `lab_poc_followup`
+- Urgency: `URGENT_5D`
+- Action due: `2026-07-13`
+- Action: Prepare concise licensing-fit note and technical questions for the named LANL POC return window.
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
+- Decision question: Is there a bounded licensing or validation conversation worth pursuing with the named lab POC?
+- Human gate: Human approves any LANL reply, NDA, licensing discussion, export-control response, or disclosure package.
+- Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
 
 ### 2. LvlUp Ventures First Check Fund
 
@@ -163,7 +244,7 @@ Current date for this docket: `2026-07-09`.
 
 - Lane ID: `patent_deadline_counsel`
 - Channel: `ip_readiness`
-- Status: `URGENT_COUNSEL_WATCH`
+- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
 - Action type: `licensed_counsel_review`
 - Urgency: `WATCHLIST`
 - Action due: `2026-07-25`
@@ -214,6 +295,20 @@ Current date for this docket: `2026-07-09`.
 - Decision question: Is the Phase I work scoped to produce independently reviewable technical evidence?
 - Human gate: Human approves pitch content and submission.
 - Claim boundary: No NSF invitation or full-proposal eligibility is represented unless NSF issues it.
+
+### 8. Protecnium ITS infrastructure signal
+
+- Lane ID: `protecnium_its_infrastructure_signal`
+- Channel: `infrastructure_market_signal`
+- Status: `CUSTOMER_DISCOVERY_SIGNAL_ONLY`
+- Action type: `customer_discovery_watch`
+- Urgency: `ROLLING_OR_EVENT_GATED`
+- Action due: `None`
+- Action: Use as customer-discovery context for infrastructure/ITS buyers; reply only if Robert wants partner or market discovery.
+- First artifact: `grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md`
+- Decision question: Does the ITS signal sharpen customer-discovery language without claiming a customer or pilot?
+- Human gate: Human decides whether to reply, apply, or use it only as a customer-discovery clue.
+- Claim boundary: This is not a customer commitment, contract, employment acceptance, or pilot demand signal.
 
 ### 11. HHS AI Power User Advanced Models and Features Pilot
 

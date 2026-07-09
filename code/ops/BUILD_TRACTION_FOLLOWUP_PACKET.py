@@ -66,6 +66,11 @@ THREAD_SIGNALS = [
         "safe_signal": "Robert sent the same-day note that he was present and the issue was timing confusion.",
         "action_meaning": "Do not send another apology-only message; pair the reset with a concrete next step.",
     },
+    {
+        "source_ref": "gmail:19f485a69ba2410d",
+        "safe_signal": "EVTit sent a 4 PM invite after the timing-reset note.",
+        "action_meaning": "A follow-up should acknowledge the reset and move directly to a technical-team decision path.",
+    },
 ]
 
 BUILD_SCOPE_MENU = [
