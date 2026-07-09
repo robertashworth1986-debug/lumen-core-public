@@ -29,7 +29,7 @@ This packet is preparation-only. It does not send email, schedule a meeting, acc
 - Services award claimed: `false`
 - Customer outcome value claimed: `false`
 - Production deployment claimed: `false`
-- Packet SHA-256: `457b660f34f0bd715a0da7a52728fd695e98ee3494849683bc0a12ed94f7fb64`
+- Packet SHA-256: `4fb2236f561cc8555d5f97390163ab685f6c1b1ad4a35b1fb6367c0af8b1a7b6`
 
 ## Positioning
 
@@ -129,13 +129,13 @@ Meeting and application evidence only; no investment, services award, or partner
 
 ## Evidence Sources
 
-- `out/ops/evtit_technical_sprint_scope_packet_latest.json` | present=`true` | bytes=`10147` | sha256=`2c0af339310fa1f6cf3cad6ec5f3e1e4cbb0e60131091466190adde721e6427e`
+- `out/ops/evtit_technical_sprint_scope_packet_latest.json` | present=`true` | bytes=`10148` | sha256=`f16e60392e1258fe44dc1e6e029f3a03c2a1561c295ecb983b3a00c6ee8e9416`
 - `out/ops/traction_opportunity_intake_ledger_latest.json` | present=`true` | bytes=`23378` | sha256=`6d8b07f3454aa843f0095e51f578d110355c5f0a0b7899e7d70a8c85724e6278`
 - `out/ops/traction_followup_packet_latest.json` | present=`true` | bytes=`10154` | sha256=`e82ac1ef626d962395244228f0506b1cb7a914594a87a58f0d71c1232ff53178`
-- `out/ops/funding_sprint_reviewer_gate_latest.json` | present=`true` | bytes=`36615` | sha256=`550c4690c7864e31398af439432464ab196f8f7b73b3c59d670a8847619017d8`
-- `out/ops/data_room_manifest_latest.json` | present=`true` | bytes=`30618` | sha256=`a76ac7df79ba4d25bf479b43b581377e5bdb591ed24cd89008a6d0b761edd39e`
+- `out/ops/funding_sprint_reviewer_gate_latest.json` | present=`true` | bytes=`37344` | sha256=`e6f4f78ab0625f3e4f1a4c6c13c93943afd537df2fd9fcb300ffd3abfa7ea345`
+- `out/ops/data_room_manifest_latest.json` | present=`true` | bytes=`33617` | sha256=`5db8855fd7e825ed6fd64d1d261a47aa33e18989518777877d8d92cb2eeba633`
 - `out/ops/measured_source_evidence_register_latest.json` | present=`true` | bytes=`42569` | sha256=`7fbadbbcc2304df545bc99b089115aee1bb72ede154743aab8eb4af910539646`
-- `out/ops/federal_submission_protocol_packet_latest.json` | present=`true` | bytes=`12389` | sha256=`3cbd27bfe5966b188e92d78206d00c69251040398529585e24609482f3bf56d8`
+- `out/ops/federal_submission_protocol_packet_latest.json` | present=`true` | bytes=`12389` | sha256=`67e0c97d97eaad6b2d3d97e212214ca089c025057fb3b117a87c042591085adb`
 - `out/ops/submission_authority_matrix_latest.json` | present=`true` | bytes=`26227` | sha256=`157a95c4f9607beba3fa7aa9894c586a80cec2ace86632b60b2bc567baf7239c`
 - `out/ops/ip_counsel_diligence_packet_latest.json` | present=`true` | bytes=`11291` | sha256=`51fed2d69e85dc589429af22f19590f4db11ce1e0e593257ceaea512cc423ba1`
 - `out/ops/autonomous_quant_governance_packet_latest.json` | present=`true` | bytes=`10038` | sha256=`fb2fa17cfc4da39ec4c95659e679462fba202af881d2ebad4307419261a77c81`

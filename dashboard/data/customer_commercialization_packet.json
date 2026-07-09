@@ -1,0 +1,259 @@
+{
+  "business_model": {
+    "first_revenue_motion": "Paid reviewer proof sprint or paid replay-scope package.",
+    "funding_motion": "SBIR, RFI/BAA response, grants, in-kind engineering, venture diligence, and strategic partner routes.",
+    "pricing_rule": "Human quotes only after scope, data boundary, authority, and deliverables are reviewed.",
+    "second_revenue_motion": "Pilot intake and partner diligence room for a named validation path.",
+    "third_revenue_motion": "Recurring proof portal, dashboard, and packet refresh access after setup."
+  },
+  "buyer_proof_checklist": [
+    "Named customer segment and buyer role",
+    "Problem tied to a deadline, decision, or reviewer burden",
+    "First paid offer with a bounded deliverable",
+    "Evidence artifact that proves the packet exists",
+    "Human approval gate for send, submit, schedule, terms, and access",
+    "No unearned customer result or award language",
+    "Source-count and current-measurement posture visible to reviewer",
+    "Next decision phrased as a low-friction funded sprint or pilot-scope step"
+  ],
+  "customer_cards": [
+    {
+      "buyer_role": "Program lead, technical evaluator, contracting specialist, or SBIR topic reviewer",
+      "customer_card_sha256": "ab389c6f7eea706ecf34646e0d2a1bb9edff7d48cb204ea61009a4dbf05e91e0",
+      "customer_result_claimed": false,
+      "decision_trigger": "A live opportunity, RFI, SBIR topic, BAA call, or agency meeting creates a deadline.",
+      "external_send_allowed_without_human": false,
+      "first_offer": "Submission preparation and reviewer proof packet",
+      "human_terms_required": true,
+      "job_to_be_done": "Decide whether LumenCore is credible enough to fund, invite, or route to a pilot path.",
+      "mapped_offer_id": "agency_submission_factory",
+      "mapped_offer_name": "Agency submission preparation package",
+      "name": "Agency program or SBIR reviewer",
+      "pain": "Advanced claims arrive faster than a reviewer can verify source, boundary, and repeatability.",
+      "priority": 1,
+      "proof_needed": "Source-backed packet, official-opportunity fit, human authority gates, and a clear no-final-action boundary.",
+      "segment_id": "agency_program_reviewer"
+    },
+    {
+      "buyer_role": "Data owner, lab lead, platform engineer, or applied AI reviewer",
+      "customer_card_sha256": "a4ca01301fbaa7bec49d4517d7044ec90d7f816e4ddd5a38b68a054322da7123",
+      "customer_result_claimed": false,
+      "decision_trigger": "A partner needs to know what data, metric, and baseline would make a pilot defensible.",
+      "external_send_allowed_without_human": false,
+      "first_offer": "Paid evidence review and replay-scope sprint",
+      "human_terms_required": true,
+      "job_to_be_done": "Convert a complex model or proof stack into a repeatable validation receipt.",
+      "mapped_offer_id": "paid_replay_scope",
+      "mapped_offer_name": "Paid replay-scope package",
+      "name": "Technical validation owner",
+      "pain": "Manual review is slow when source freshness, baselines, metrics, and replay receipts are scattered.",
+      "priority": 2,
+      "proof_needed": "Measured-source register, replay runner scope, baseline lock, and hash-backed receipt plan.",
+      "segment_id": "technical_validation_owner"
+    },
+    {
+      "buyer_role": "Venture studio partner, early investor, accelerator reviewer, or technical diligence lead",
+      "customer_card_sha256": "1665cf23266df7ecc150a3974d5471d3c708a517bf1da35e96626dc5f497192a",
+      "customer_result_claimed": false,
+      "decision_trigger": "A diligence call asks for the business model, first customer, and near-term revenue motion.",
+      "external_send_allowed_without_human": false,
+      "first_offer": "30-day commercialization and technical sprint",
+      "human_terms_required": true,
+      "job_to_be_done": "See whether the company can turn evidence into funded work without unsupported promises.",
+      "mapped_offer_id": "reviewer_proof_sprint",
+      "mapped_offer_name": "Reviewer proof sprint",
+      "name": "Venture builder or investor",
+      "pain": "Diligence slows down when technical excitement is not paired with a buyer path and claim controls.",
+      "priority": 3,
+      "proof_needed": "Customer segments, productized offers, traction lanes, data-room map, and blocked-claim policy.",
+      "segment_id": "venture_builder_or_investor"
+    },
+    {
+      "buyer_role": "University lab, enterprise innovation team, infrastructure operator, or qualified prime",
+      "customer_card_sha256": "dfd143fe6790127188d228d804636ceb99091fa9597024d0c29e40e0e35df3b7",
+      "customer_result_claimed": false,
+      "decision_trigger": "The partner has a problem area and needs a controlled way to test fit.",
+      "external_send_allowed_without_human": false,
+      "first_offer": "Pilot intake and acceptance-standard design",
+      "human_terms_required": true,
+      "job_to_be_done": "Start a bounded study without exposing private data or accepting broad terms too early.",
+      "mapped_offer_id": "partner_diligence_room",
+      "mapped_offer_name": "Partner diligence room",
+      "name": "Pilot partner",
+      "pain": "Partners need the work scoped before they can share data, assign reviewers, or commit budget.",
+      "priority": 4,
+      "proof_needed": "Pilot intake path, human approvals, data boundary, acceptance standard, and review artifacts.",
+      "segment_id": "pilot_partner"
+    },
+    {
+      "buyer_role": "Patent counsel, compliance lead, or governance reviewer",
+      "customer_card_sha256": "c816169023a125e6d0ea06959c956084f7b3b9f2c3263d3881785aeee8241e30",
+      "customer_result_claimed": false,
+      "decision_trigger": "A filing, investor review, public packet, or agency account step approaches.",
+      "external_send_allowed_without_human": false,
+      "first_offer": "Claim-boundary and diligence-room cleanup",
+      "human_terms_required": true,
+      "job_to_be_done": "Separate defensible claims from language that needs counsel, agency, or security review.",
+      "mapped_offer_id": "partner_diligence_room",
+      "mapped_offer_name": "Partner diligence room",
+      "name": "IP or compliance reviewer",
+      "pain": "Public materials can drift into overclaiming unless every claim has an owner and evidence boundary.",
+      "priority": 5,
+      "proof_needed": "IP diligence packet, federal protocol packet, authority matrix, and public-safe data-room manifest.",
+      "segment_id": "ip_or_compliance_reviewer"
+    }
+  ],
+  "customer_commercialization_sha256": "2ac468847ad9a0b7b77db7412cf7e89217f96521a29fb82a930fb9413a9841db",
+  "evidence_artifacts": [
+    {
+      "bytes": 18715,
+      "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
+      "present": true,
+      "sha256": "767720b50d1012b95e6716377b315b74181236ede4412d616171b87b1e73cd48"
+    },
+    {
+      "bytes": 17167,
+      "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+      "present": true,
+      "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
+    },
+    {
+      "bytes": 7867,
+      "path": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
+      "present": true,
+      "sha256": "2aa3e2e80e5ebb68a085080b0466b3f40d42df8cfb67ab98dfbdcf5957fd7e7c"
+    },
+    {
+      "bytes": 8261,
+      "path": "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
+      "present": true,
+      "sha256": "fa8fd779a9cce41f8169d77611417249ada18263e420da0271c44bd3d0bf6df8"
+    },
+    {
+      "bytes": 10709,
+      "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
+      "present": true,
+      "sha256": "2f3859baa8f84ef704ab0934c431a2b97d6210cc617303e35a9b626a861a06e7"
+    },
+    {
+      "bytes": 18779,
+      "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
+      "present": true,
+      "sha256": "1271ddbcfe306c67b25eebddf3c5cce71eb1e9db1fa70ec8d928e40d43d86eb2"
+    }
+  ],
+  "executive_summary": "LumenCore sells proof-to-pilot infrastructure for reviewers who need complex R&D translated into inspectable, source-backed, human-gated decision material. The first money motion is a paid proof or replay-scope sprint; the expansion path is pilot support, agency submission preparation, partner diligence rooms, and eventually recurring proof portal access.",
+  "fastest_funding_path": [
+    "Use the executive summary to anchor the buyer and business model.",
+    "Offer a paid reviewer proof sprint or replay-scope package as the first concrete purchase.",
+    "Route agencies through official-source submission preparation with final action blocked until human approval.",
+    "Route investors and venture builders to the 30-day technical and commercialization sprint.",
+    "Route pilot partners to a data-boundary and acceptance-standard discussion before any private data exchange."
+  ],
+  "generated_utc": "2026-07-09T20:24:18.710649+00:00",
+  "human_gate": {
+    "accept_terms_allowed_without_human": false,
+    "quote_price_allowed_without_human": false,
+    "rule": "This packet prepares the business-side answer. Robert approves any send, schedule, terms, price, file share, or portal action.",
+    "schedule_meeting_allowed_without_human": false,
+    "send_email_allowed_without_human": false,
+    "share_private_files_allowed_without_human": false,
+    "submit_portal_allowed_without_human": false
+  },
+  "offers": [
+    {
+      "buyer": "Agency, SBIR, investor, or partner reviewer",
+      "deliverable": "Proof-card index, source register, decision brief, reviewer Q&A, and claim-boundary map.",
+      "duration": "5 to 10 business days",
+      "name": "Reviewer proof sprint",
+      "offer_id": "reviewer_proof_sprint",
+      "price_posture": "Quoted after scope; no fixed price promise in this packet.",
+      "success_gate": "Reviewer can answer what is ready, what is blocked, and what decision is being requested."
+    },
+    {
+      "buyer": "Technical validation owner or data owner",
+      "deliverable": "Baseline, metric, holdout window, data boundary, replay receipt schema, and dry-run report.",
+      "duration": "10 to 20 business days",
+      "name": "Paid replay-scope package",
+      "offer_id": "paid_replay_scope",
+      "price_posture": "Quoted after data and acceptance criteria are reviewed.",
+      "success_gate": "Buyer knows what evidence would support a paid validation study."
+    },
+    {
+      "buyer": "Founder, prime, partner team, or grant reviewer",
+      "deliverable": "Opportunity fit matrix, official-source checklist, technical volume outline, and final-action docket.",
+      "duration": "Deadline-driven",
+      "name": "Agency submission preparation package",
+      "offer_id": "agency_submission_factory",
+      "price_posture": "Quoted after portal, eligibility, reps/certs, and attachment requirements are verified.",
+      "success_gate": "Human has a clean package ready for final portal review and submission authority."
+    },
+    {
+      "buyer": "Investor, partner, or internal reviewer team",
+      "deliverable": "Dashboard JSON, proof-room navigation, source freshness, packet refreshes, and evidence receipts.",
+      "duration": "Monthly or sprint-retainer after a paid setup",
+      "name": "Proof portal and dashboard subscription",
+      "offer_id": "proof_portal_subscription",
+      "price_posture": "Post-pilot subscription; not quoted before a buyer-specific scope.",
+      "success_gate": "Reviewer has a repeatable portal for source-backed updates and diligence refreshes."
+    },
+    {
+      "buyer": "Qualified prime, venture builder, lab, or strategic partner",
+      "deliverable": "Data-room manifest, claim controls, technical scope, customer path, and partner-only action list.",
+      "duration": "2 to 4 weeks",
+      "name": "Partner diligence room",
+      "offer_id": "partner_diligence_room",
+      "price_posture": "Quoted after partner role, data boundary, and deliverable ownership are clear.",
+      "success_gate": "Partner can decide whether to intro, team, sponsor, or fund the next scoped sprint."
+    }
+  ],
+  "outputs": {
+    "dashboard_json": "dashboard/data/customer_commercialization_packet.json",
+    "json": "out/ops/customer_commercialization_packet_latest.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md"
+  },
+  "schema": "customer_commercialization_packet_v1",
+  "source_ledgers": {
+    "authority": "out/ops/submission_authority_matrix_latest.json",
+    "data_room": "out/ops/data_room_manifest_latest.json",
+    "evtit_scope": "out/ops/evtit_technical_sprint_scope_packet_latest.json",
+    "federal_protocol": "out/ops/federal_submission_protocol_packet_latest.json",
+    "measured_source": "out/ops/measured_source_evidence_register_latest.json",
+    "reviewer_decision": "out/ops/reviewer_decision_brief_latest.json",
+    "reviewer_gate": "out/ops/funding_sprint_reviewer_gate_latest.json",
+    "traction": "out/ops/traction_opportunity_intake_ledger_latest.json"
+  },
+  "status": "CUSTOMER_COMMERCIALIZATION_PACKET_READY_HUMAN_TERMS_REQUIRED",
+  "summary": {
+    "all_final_actions_blocked_without_human": true,
+    "authority_status": "SUBMISSION_AUTHORITY_MATRIX_READY",
+    "award_claimed": false,
+    "buyer_proof_check_count": 8,
+    "current_probe_measured_sources": 23,
+    "customer_result_claimed": false,
+    "customer_segment_count": 5,
+    "data_room_control_artifact_count": 34,
+    "data_room_markdown_count": 35,
+    "decision_lane_count": 15,
+    "evidence_artifacts_present": true,
+    "evtit_workstream_count": 6,
+    "external_send_allowed_without_human": false,
+    "federal_protocol_status": "FEDERAL_SUBMISSION_PROTOCOL_READY_HUMAN_PORTAL_REQUIRED",
+    "final_submission_allowed_without_human": false,
+    "human_terms_required": true,
+    "investment_claimed": false,
+    "offer_count": 5,
+    "partnership_claimed": false,
+    "paying_customer_claimed": false,
+    "pricing_commitment_allowed_without_human": false,
+    "private_file_share_allowed_without_human": false,
+    "production_deployment_claimed": false,
+    "registry_enabled_sources": 29,
+    "registry_measured_sources": 25,
+    "reviewer_gate_clear": true,
+    "schedule_allowed_without_human": false,
+    "traction_lane_count": 15,
+    "unsafe_claim_count": 0,
+    "unsafe_secret_count": 0
+  }
+}

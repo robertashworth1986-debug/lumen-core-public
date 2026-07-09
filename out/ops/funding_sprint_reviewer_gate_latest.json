@@ -26,15 +26,15 @@
       "patented"
     ]
   },
-  "gate_sha256": "de6e65fbf78e54b55b581c67ccbf30201309c67a76fdc81368633849fe656c3a",
-  "generated_utc": "2026-07-09T20:11:45.979146+00:00",
+  "gate_sha256": "5843d690a1624f29a15368b1f984a72eaf596b040ca205b8aa94d42b1566527a",
+  "generated_utc": "2026-07-09T20:24:19.399995+00:00",
   "manifest": [
     {
       "bytes": 12244,
       "classification": "public_safe_markdown_review_required",
       "name": "AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
-      "sha256": "47eead8ccd081ae7c807a8dc784f6ce23b4957d9cb96f35900c068a4ed73f000"
+      "sha256": "6903e94da0afb1aa1c915e12b76528a70c538aebcd7728600c623558282fbebe"
     },
     {
       "bytes": 8929,
@@ -79,11 +79,18 @@
       "sha256": "c982dde7c868f4f9ac52829518edf2a3fe0bd87742e168cbbe3dfd409736a080"
     },
     {
-      "bytes": 17314,
+      "bytes": 11451,
+      "classification": "public_safe_markdown_review_required",
+      "name": "CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
+      "sha256": "b1034846561675a25ff85134813c6e4bc0d71a5a48bad92f78610273c4499d28"
+    },
+    {
+      "bytes": 19009,
       "classification": "public_safe_markdown_review_required",
       "name": "DATA_ROOM_MANIFEST_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
-      "sha256": "08539443f4cf4a6f9ad9b9eec9f22af2612098cecba6e8f93f2294e2a535363c"
+      "sha256": "07d7e86cb5205503c0b9a32df7965dec95791afaeef12d44d15aad3aa5847b85"
     },
     {
       "bytes": 5275,
@@ -111,7 +118,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
-      "sha256": "f8d24dae2c8367f3442aa3d2b2770d88b7087dd16e21ce442530feabbb2e9707"
+      "sha256": "fa8fd779a9cce41f8169d77611417249ada18263e420da0271c44bd3d0bf6df8"
     },
     {
       "bytes": 8278,
@@ -125,7 +132,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
-      "sha256": "8309c5a53faddef22112ca09de2e4742f79e1ec7426080b0a45646e25d587aaf"
+      "sha256": "2f3859baa8f84ef704ab0934c431a2b97d6210cc617303e35a9b626a861a06e7"
     },
     {
       "bytes": 6109,
@@ -259,6 +266,13 @@
       "name": "TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
       "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
+    },
+    {
+      "bytes": 7293,
+      "classification": "public_safe_markdown_review_required",
+      "name": "VENTURE_STUDIO_TERMS_GUARDRAIL_PACKET_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/VENTURE_STUDIO_TERMS_GUARDRAIL_PACKET_2026-07-09.md",
+      "sha256": "6c29546acb06e2ae3527d957a1f906beef42153b099ac6c04ef96a943d5399bb"
     }
   ],
   "outputs": {
@@ -680,7 +694,7 @@
     "boundary_hit_count": 45,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 33,
+    "markdown_file_count": 35,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0

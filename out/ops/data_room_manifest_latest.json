@@ -1,24 +1,24 @@
 {
   "control_artifacts": [
     {
-      "bytes": 36615,
+      "bytes": 37344,
       "classification": "machine_readable_proof_receipt",
       "control_name": "funding_sprint_reviewer_gate",
       "name": "funding_sprint_reviewer_gate_latest.json",
       "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "7f74e2f4d822bba71f58a933f95958bfbed174750be20a092547ac72301b4086"
+      "sha256": "7a05f9cf68d35a21fe37dd781961b67632e5fe512cecfdf2d6b04ed6da06997d"
     },
     {
-      "bytes": 36615,
+      "bytes": 37344,
       "classification": "machine_readable_proof_receipt",
       "control_name": "funding_sprint_reviewer_gate",
       "name": "funding_sprint_reviewer_gate.json",
       "path": "dashboard/data/funding_sprint_reviewer_gate.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "7f74e2f4d822bba71f58a933f95958bfbed174750be20a092547ac72301b4086"
+      "sha256": "7a05f9cf68d35a21fe37dd781961b67632e5fe512cecfdf2d6b04ed6da06997d"
     },
     {
       "bytes": 23378,
@@ -121,6 +121,46 @@
       "sha256": "b68e3b73cee244fa5c2caa2d4dd5c7921830de512dfa8fa4cd27bb7168162633"
     },
     {
+      "bytes": 14800,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "customer_commercialization_packet",
+      "name": "customer_commercialization_packet_latest.json",
+      "path": "out/ops/customer_commercialization_packet_latest.json",
+      "present": true,
+      "role": "machine_control_json",
+      "sha256": "1e98c1fd298cd8549efbc7485440a654414951512cabb14858191aa66a74870b"
+    },
+    {
+      "bytes": 14800,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "customer_commercialization_packet",
+      "name": "customer_commercialization_packet.json",
+      "path": "dashboard/data/customer_commercialization_packet.json",
+      "present": true,
+      "role": "dashboard_control_json",
+      "sha256": "1e98c1fd298cd8549efbc7485440a654414951512cabb14858191aa66a74870b"
+    },
+    {
+      "bytes": 8942,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "venture_studio_terms_guardrail_packet",
+      "name": "venture_studio_terms_guardrail_packet_latest.json",
+      "path": "out/ops/venture_studio_terms_guardrail_packet_latest.json",
+      "present": true,
+      "role": "machine_control_json",
+      "sha256": "8a1b1bb4205cbcb2d77ffde02d447e4bb7124cff1e1bcf6c4f2340bc3aead15f"
+    },
+    {
+      "bytes": 8942,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "venture_studio_terms_guardrail_packet",
+      "name": "venture_studio_terms_guardrail_packet.json",
+      "path": "dashboard/data/venture_studio_terms_guardrail_packet.json",
+      "present": true,
+      "role": "dashboard_control_json",
+      "sha256": "8a1b1bb4205cbcb2d77ffde02d447e4bb7124cff1e1bcf6c4f2340bc3aead15f"
+    },
+    {
       "bytes": 20782,
       "classification": "machine_readable_proof_receipt",
       "control_name": "reviewer_diligence_qa_matrix",
@@ -208,7 +248,7 @@
       "path": "out/ops/federal_submission_protocol_packet_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "3cbd27bfe5966b188e92d78206d00c69251040398529585e24609482f3bf56d8"
+      "sha256": "67e0c97d97eaad6b2d3d97e212214ca089c025057fb3b117a87c042591085adb"
     },
     {
       "bytes": 12389,
@@ -218,7 +258,7 @@
       "path": "dashboard/data/federal_submission_protocol_packet.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "3cbd27bfe5966b188e92d78206d00c69251040398529585e24609482f3bf56d8"
+      "sha256": "67e0c97d97eaad6b2d3d97e212214ca089c025057fb3b117a87c042591085adb"
     },
     {
       "bytes": 15041,
@@ -228,7 +268,7 @@
       "path": "out/ops/agency_account_activation_docket_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "f582229736312603ed16f477a16460d53dd8f3baa5c9061f2a51c272a0515f85"
+      "sha256": "6b7d611726d57c67eea04429e8e8cbf1ee822fec630865b29049264b79a7f7ae"
     },
     {
       "bytes": 15041,
@@ -238,7 +278,7 @@
       "path": "dashboard/data/agency_account_activation_docket.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "f582229736312603ed16f477a16460d53dd8f3baa5c9061f2a51c272a0515f85"
+      "sha256": "6b7d611726d57c67eea04429e8e8cbf1ee822fec630865b29049264b79a7f7ae"
     },
     {
       "bytes": 42569,
@@ -268,7 +308,7 @@
       "path": "out/ops/evtit_technical_sprint_scope_packet_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "4db494c32be84e0e339cd295f10f72dcda4ddc8a89d5d5b3bb0c876fad3c9cbe"
+      "sha256": "4e20b1b7f213646ad965624c2b037366549a254ecc128ba68331174bf1910b78"
     },
     {
       "bytes": 10148,
@@ -278,7 +318,7 @@
       "path": "dashboard/data/evtit_technical_sprint_scope_packet.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "4db494c32be84e0e339cd295f10f72dcda4ddc8a89d5d5b3bb0c876fad3c9cbe"
+      "sha256": "4e20b1b7f213646ad965624c2b037366549a254ecc128ba68331174bf1910b78"
     },
     {
       "bytes": 10154,
@@ -304,6 +344,7 @@
   "control_statuses": {
     "agency_account_activation_docket": "AGENCY_ACCOUNT_ACTIVATION_READY_HUMAN_PORTAL_REQUIRED",
     "autonomous_quant_governance_packet": "AUTONOMOUS_QUANT_GOVERNANCE_READY_HUMAN_RUNTIME_REQUIRED",
+    "customer_commercialization_packet": "CUSTOMER_COMMERCIALIZATION_PACKET_READY_HUMAN_TERMS_REQUIRED",
     "evtit_technical_sprint_scope_packet": "EVTIT_TECHNICAL_SPRINT_SCOPE_READY_HUMAN_TERMS_REQUIRED",
     "federal_submission_protocol_packet": "FEDERAL_SUBMISSION_PROTOCOL_READY_HUMAN_PORTAL_REQUIRED",
     "funding_sprint_reviewer_gate": "REVIEWER_GATE_CLEAR_HUMAN_SUBMISSION_REQUIRED",
@@ -316,9 +357,10 @@
     "reviewer_diligence_qa_matrix": "REVIEWER_DILIGENCE_QA_READY",
     "submission_authority_matrix": "SUBMISSION_AUTHORITY_MATRIX_READY",
     "traction_followup_packet": "TRACTION_FOLLOWUP_READY_HUMAN_SEND_REQUIRED",
-    "traction_opportunity_intake_ledger": "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED"
+    "traction_opportunity_intake_ledger": "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED",
+    "venture_studio_terms_guardrail_packet": "VENTURE_STUDIO_TERMS_GUARDRAIL_READY_COUNSEL_REVIEW_REQUIRED"
   },
-  "data_room_manifest_sha256": "089e2237cf768c872520562b93d001d43fdf3b8ba4f69d1d169545500d9a9e54",
+  "data_room_manifest_sha256": "86a874807114bc6a02b73f30f04f84d0d77c0a78311ed83ef6fff7579eb0074a",
   "e_drive_targets": [
     "E:\\LumaProofVault\\LUMA_FUNDING_SPRINT_20260709_20260709T030617Z",
     "E:\\LumenCoreSync\\funding_sprint_20260709",
@@ -326,6 +368,8 @@
   ],
   "front_door_order": [
     "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
+    "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
+    "grant_submissions/funding_sprint_20260709/VENTURE_STUDIO_TERMS_GUARDRAIL_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
@@ -341,8 +385,8 @@
     "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md"
   ],
-  "generated_utc": "2026-07-09T20:11:46.465593+00:00",
-  "manifest_seed_sha256": "36b1f0561d06a39ed9502a7bb0a32e3cdca7f84187dca6de3cbf17f08eeb8922",
+  "generated_utc": "2026-07-09T20:24:20.667556+00:00",
+  "manifest_seed_sha256": "8909190e64f2a4848f114749b9072b2596e5ad88ba44200e998391631934ad10",
   "markdown_artifacts": [
     {
       "bytes": 12244,
@@ -350,7 +394,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
-      "sha256": "47eead8ccd081ae7c807a8dc784f6ce23b4957d9cb96f35900c068a4ed73f000"
+      "sha256": "6903e94da0afb1aa1c915e12b76528a70c538aebcd7728600c623558282fbebe"
     },
     {
       "bytes": 8929,
@@ -401,6 +445,14 @@
       "sha256": "c982dde7c868f4f9ac52829518edf2a3fe0bd87742e168cbbe3dfd409736a080"
     },
     {
+      "bytes": 11451,
+      "category": "front_door_control",
+      "classification": "public_safe_markdown_review_required",
+      "name": "CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
+      "sha256": "b1034846561675a25ff85134813c6e4bc0d71a5a48bad92f78610273c4499d28"
+    },
+    {
       "bytes": 5275,
       "category": "lane_package",
       "classification": "public_safe_markdown_review_required",
@@ -430,7 +482,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
-      "sha256": "f8d24dae2c8367f3442aa3d2b2770d88b7087dd16e21ce442530feabbb2e9707"
+      "sha256": "fa8fd779a9cce41f8169d77611417249ada18263e420da0271c44bd3d0bf6df8"
     },
     {
       "bytes": 8278,
@@ -446,7 +498,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
-      "sha256": "8309c5a53faddef22112ca09de2e4742f79e1ec7426080b0a45646e25d587aaf"
+      "sha256": "2f3859baa8f84ef704ab0934c431a2b97d6210cc617303e35a9b626a861a06e7"
     },
     {
       "bytes": 6109,
@@ -470,7 +522,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
-      "sha256": "d5dc874d8f5d9652d5186da9844a8da17868e8d440af4077399d77797ab7a25c"
+      "sha256": "ec1aa49db6db97421c0be250e0ec328dbe3f64c338b6580d089c58b59c4119c5"
     },
     {
       "bytes": 14015,
@@ -607,6 +659,14 @@
       "name": "TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
       "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
+    },
+    {
+      "bytes": 7293,
+      "category": "front_door_control",
+      "classification": "public_safe_markdown_review_required",
+      "name": "VENTURE_STUDIO_TERMS_GUARDRAIL_PACKET_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/VENTURE_STUDIO_TERMS_GUARDRAIL_PACKET_2026-07-09.md",
+      "sha256": "6c29546acb06e2ae3527d957a1f906beef42153b099ac6c04ef96a943d5399bb"
     }
   ],
   "outputs": {
@@ -628,12 +688,12 @@
     "authority_status": "SUBMISSION_AUTHORITY_MATRIX_READY",
     "category_counts": {
       "claim_protocol_boundary": 7,
-      "front_door_control": 15,
+      "front_door_control": 17,
       "lane_package": 8,
       "supporting_markdown": 1,
       "sync_receipt": 2
     },
-    "control_artifact_count": 30,
+    "control_artifact_count": 34,
     "decision_lane_count": 15,
     "decision_status": "REVIEWER_DECISION_BRIEF_READY",
     "decision_top_ready_lane_count": 7,
@@ -642,7 +702,7 @@
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "manifested_markdown_count": 33,
+    "manifested_markdown_count": 35,
     "missing_control_artifact_count": 0,
     "reviewer_gate_clear": true,
     "unsafe_claim_count": 0,

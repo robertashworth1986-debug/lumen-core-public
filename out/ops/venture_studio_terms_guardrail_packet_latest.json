@@ -1,0 +1,170 @@
+{
+  "acceptance_blockers": [
+    "No written scope and statement of work reviewed.",
+    "No cap table and dilution model reviewed.",
+    "No cash budget and runway impact reviewed.",
+    "No IP ownership and work-product assignment reviewed.",
+    "No milestone vesting or termination treatment reviewed.",
+    "No counsel review completed."
+  ],
+  "diligence_questions": [
+    {
+      "question": "Is the 20% equity fixed at signing, or does it vest against named milestones?",
+      "question_id": "equity_vesting",
+      "why_it_matters": "Milestone vesting protects the company if deliverables, intros, or validation support do not happen."
+    },
+    {
+      "question": "What exact cash does Luma need to fund during the first 30, 60, and 90 days?",
+      "question_id": "cash_budget",
+      "why_it_matters": "Founder-funded services can quietly become more expensive than the equity headline suggests."
+    },
+    {
+      "question": "Who owns all code, data, models, proof artifacts, brand work, and derivative IP created during the engagement?",
+      "question_id": "ip_ownership",
+      "why_it_matters": "Luma must preserve ownership and clean chain-of-title for future financing, grants, and patents."
+    },
+    {
+      "question": "What are the named deliverables in the first 30 days, and what acceptance criteria prove completion?",
+      "question_id": "deliverables",
+      "why_it_matters": "Credibility support should become inspectable assets, not vague advice."
+    },
+    {
+      "question": "What investor, grant, customer, or partner introductions are committed versus best-efforts?",
+      "question_id": "funding_support",
+      "why_it_matters": "Equity should buy leverage, not only service capacity."
+    },
+    {
+      "question": "What happens to equity, work product, data access, and confidentiality if either side stops early?",
+      "question_id": "termination",
+      "why_it_matters": "Exit terms prevent dead equity and stranded IP."
+    },
+    {
+      "question": "Do they work with any overlapping companies or investors that create conflicts?",
+      "question_id": "conflicts",
+      "why_it_matters": "The proof stack and patent narrative need protected strategic boundaries."
+    },
+    {
+      "question": "Can the relationship start with a lower-risk paid or option sprint before final equity?",
+      "question_id": "safer_start",
+      "why_it_matters": "A short credibility sprint can prove fit before major dilution."
+    }
+  ],
+  "generated_utc": "2026-07-09T20:24:18.350058+00:00",
+  "human_gate": {
+    "accept_equity_allowed_without_human": false,
+    "accept_services_terms_without_human": false,
+    "commit_cash_without_human": false,
+    "rule": "This packet records guardrails only. Robert and counsel approve any equity, cash, service, IP, file-sharing, or counteroffer action.",
+    "send_counteroffer_without_human": false,
+    "share_private_files_without_human": false
+  },
+  "outputs": {
+    "dashboard_json": "dashboard/data/venture_studio_terms_guardrail_packet.json",
+    "json": "out/ops/venture_studio_terms_guardrail_packet_latest.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/VENTURE_STUDIO_TERMS_GUARDRAIL_PACKET_2026-07-09.md"
+  },
+  "position": {
+    "call_posture": "Interested, not committed.",
+    "plain_english": "A soft-tech venture studio may help Luma become more credible, but a 20% equity model plus founder-funded remaining costs needs written scope, milestone economics, IP ownership, funding support, and counsel review before any acceptance.",
+    "preferred_next_step": "Written 30-day credibility sprint scope before equity acceptance."
+  },
+  "safe_counterproposals": [
+    {
+      "best_when": "The studio can deliver a proof portal, pitch, first-customer path, and diligence room quickly.",
+      "counter_id": "paid_credibility_sprint",
+      "name": "Paid 30-day credibility sprint",
+      "structure": "Cash or deferred fee for a bounded scope; no immediate 20% equity."
+    },
+    {
+      "best_when": "The studio wants upside but the founder needs protection against under-delivery.",
+      "counter_id": "milestone_equity_option",
+      "name": "Milestone-based equity option",
+      "structure": "Equity vests only after written deliverables, funding intros, or customer validation milestones."
+    },
+    {
+      "best_when": "Their highest claimed value is fundraising, customer access, or partner conversion.",
+      "counter_id": "smaller_equity_plus_success",
+      "name": "Smaller equity plus success fee",
+      "structure": "Lower upfront equity with success-based economics tied to funded outcomes."
+    },
+    {
+      "best_when": "YC's public deal and brand provide a strong external reference point.",
+      "counter_id": "yc_parallel_path",
+      "name": "YC-parallel application path",
+      "structure": "Prepare YC and venture-studio materials in parallel; compare terms before accepting dilution."
+    }
+  ],
+  "schema": "venture_studio_terms_guardrail_packet_v1",
+  "source_ledgers": {
+    "authority": "out/ops/submission_authority_matrix_latest.json",
+    "customer_commercialization": "out/ops/customer_commercialization_packet_latest.json",
+    "data_room": "out/ops/data_room_manifest_latest.json",
+    "evtit_scope": "out/ops/evtit_technical_sprint_scope_packet_latest.json",
+    "ip_counsel": "out/ops/ip_counsel_diligence_packet_latest.json",
+    "reviewer_gate": "out/ops/funding_sprint_reviewer_gate_latest.json"
+  },
+  "status": "VENTURE_STUDIO_TERMS_GUARDRAIL_READY_COUNSEL_REVIEW_REQUIRED",
+  "summary": {
+    "all_final_actions_blocked_without_human": true,
+    "cash_commitment_accepted": false,
+    "commercial_offer_count": 5,
+    "counsel_review_required": true,
+    "counterproposal_count": 4,
+    "customer_segment_count": 5,
+    "data_room_control_artifact_count": 34,
+    "data_room_markdown_count": 35,
+    "diligence_question_count": 8,
+    "equity_terms_accepted": false,
+    "evtit_workstream_count": 6,
+    "external_send_allowed_without_human": false,
+    "funding_intro_committed": false,
+    "investment_claimed": false,
+    "partnership_claimed": false,
+    "pricing_commitment_allowed_without_human": false,
+    "private_file_share_allowed_without_human": false,
+    "reviewer_gate_clear": true,
+    "services_terms_accepted": false,
+    "terms_signal_count": 4,
+    "unsafe_claim_count": 0,
+    "unsafe_secret_count": 0
+  },
+  "terms_signals": [
+    {
+      "boundary": "Do not treat this as accepted terms, funding, services award, or partnership.",
+      "fact": "Terry described the lane as a soft-tech venture studio credibility path.",
+      "meaning": "Treat the partner as a potential credibility, packaging, validation, and venture-building helper.",
+      "signal_id": "soft_tech_venture_studio",
+      "source": "live_call_note"
+    },
+    {
+      "boundary": "No equity grant is accepted without written terms, cap table review, and counsel review.",
+      "fact": "The model discussed was 20% equity.",
+      "meaning": "Founder should compare the request against cash, deliverables, brand value, funding access, and dilution alternatives.",
+      "signal_id": "twenty_percent_equity_model",
+      "source": "live_call_note"
+    },
+    {
+      "boundary": "No cash commitment is accepted by this packet.",
+      "fact": "Robert understood that he may need to fund the rest of the work.",
+      "meaning": "Cash budget, runway impact, vendor pass-throughs, and who pays for development must be explicit before agreement.",
+      "signal_id": "founder_funds_remaining_cost",
+      "source": "live_call_note"
+    },
+    {
+      "boundary": "This is a benchmark, not a legal, tax, valuation, or securities opinion.",
+      "fact": "YC's public standard deal is a useful external benchmark: $500k investment for 7% plus an additional uncapped MFN SAFE component.",
+      "meaning": "A 20% studio model should clear a higher-value justification bar if it brings less cash or more founder-funded cost.",
+      "signal_id": "yc_benchmark",
+      "source": "official_public_yc_pages_checked_2026-07-09"
+    }
+  ],
+  "venture_studio_terms_guardrail_sha256": "e2e3414d7b8957d3292f2afe700861ec4da587163d9e7f5f5e24ae7a8e6bc6f1",
+  "yc_benchmark": {
+    "apply_source": "https://www.ycombinator.com/apply",
+    "current_deadline_summary": "On-time Fall 2026 application deadline listed as July 27, 2026 at 8pm PT, with decisions by August 28 for on-time applications.",
+    "public_terms_summary": "$500k investment for 7% plus an additional uncapped MFN SAFE component.",
+    "source_checked_utc": "2026-07-09",
+    "standard_deal_source": "https://www.ycombinator.com/deal",
+    "use": "Benchmark dilution, cash, network, brand, and investor-access value against any 20% studio request."
+  }
+}
