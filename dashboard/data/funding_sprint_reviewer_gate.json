@@ -26,8 +26,8 @@
       "patented"
     ]
   },
-  "gate_sha256": "e574a172bb1c0720cf9108679abd267bad872b82cc7cd18ce401ed7fde5d1f64",
-  "generated_utc": "2026-07-09T04:03:30.829194+00:00",
+  "gate_sha256": "5cc18df25bb1a1149201155a846ec90cd0a49f3703393a54e0b1248663b366a8",
+  "generated_utc": "2026-07-09T04:07:54.233795+00:00",
   "manifest": [
     {
       "bytes": 8929,
@@ -168,6 +168,13 @@
       "name": "SBIR_PHASE1_TRIAGE_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/SBIR_PHASE1_TRIAGE_2026-07-09.md",
       "sha256": "9b57a099e9cb7de15e75d76c5060d155770e42ddedd5c6668fdf5b2cceb54df1"
+    },
+    {
+      "bytes": 18765,
+      "classification": "public_safe_markdown_review_required",
+      "name": "SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
+      "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
     },
     {
       "bytes": 16958,
@@ -554,7 +561,7 @@
     "boundary_hit_count": 39,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 21,
+    "markdown_file_count": 22,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0
