@@ -1,5 +1,5 @@
 {
-  "decision_brief_sha256": "7c56728c6f3331967fd97a6b8f54ca213c76ab0b71736d3f69160643ac5e2b1a",
+  "decision_brief_sha256": "d71949f18307cddf4540a6d5b25b4483ebaf5da94e977f12fa7869f40d1168b1",
   "decision_cards": [
     {
       "action_due": "2026-07-09",
@@ -11,9 +11,9 @@
       "can_submit_without_human": false,
       "channel": "venture_engineering",
       "claim_boundary": "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
-      "decision_card_sha256": "384634ec8250bbcce8711b5b581c94852e5b0fe2336fac842b0016cfeec90f34",
+      "decision_card_sha256": "853c2c0aac6a76a732a8c8068de9b558b260e826fc4a6b271837d97ed0b6fd48",
       "decision_stance": "Review now; human handles meeting and terms.",
-      "first_artifact": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+      "first_artifact": "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
       "lane_id": "evtit_blackdog_inkind",
       "name": "EVTit / Black Dog in-kind engineering fund",
       "next_human_action": "Prepare call packet and proof walkthrough.",
@@ -333,7 +333,7 @@
     }
   ],
   "decision_headline": "LumenCore has a reviewer-ready proof packet with live traction, current funding lanes, explicit human authority gates, and no autonomous final-action authority.",
-  "generated_utc": "2026-07-09T04:12:24.540879+00:00",
+  "generated_utc": "2026-07-09T19:18:01.552064+00:00",
   "outputs": {
     "dashboard_json": "dashboard/data/reviewer_decision_brief.json",
     "json": "out/ops/reviewer_decision_brief_latest.json",

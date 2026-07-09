@@ -49,7 +49,7 @@ PUBLIC_SOURCES = {
 CONNECTED_EVIDENCE = {
     "gmail_profile": "Robert Ashworth mailbox confirmed through Gmail connector.",
     "gmail_window": "Gmail searched in:anywhere after 2026-04-09 for funding, SBIR, RFI/RFP, deadline, calendar, and application terms.",
-    "calendar_window": "Google Calendar searched 2026-07-09 through 2026-07-11 for the EVTit booking; no matching calendar event was returned, so Gmail invite evidence is authoritative for this ledger.",
+    "calendar_window": "Google Calendar located the July 9 EVTit discovery meeting; public artifacts intentionally exclude meeting access details.",
     "sweetspot_window": "Sweetspot federal contracts searched for active opportunities after 2026-07-09 and before 2026-08-31 across AI validation, lab data QA, data center, and transportation operations lanes.",
 }
 
@@ -60,19 +60,28 @@ LANES: list[dict[str, Any]] = [
         "channel": "venture_engineering",
         "source_kind": "gmail_plus_public_program",
         "evidence_date": "2026-07-09",
-        "deadline_or_gate": "Discovery meeting booked from Gmail invite; public launch event July 22, 2026.",
-        "status": "LIVE_MEETING_PREP",
+        "deadline_or_gate": "Discovery call window occurred July 9, 2026; reset note sent after the timing mix-up; public launch event July 22, 2026.",
+        "status": "RESET_NOTE_SENT_TECH_REVIEW_PENDING",
         "fit_score": 92,
         "priority": 1,
         "traction_evidence": [
             "EVTit internal process form requested by Terry Anderton.",
             "LumenCore reply indicates the EVTit application form was submitted.",
-            "Discovery meeting invite received with LumenCore proof-to-pilot context.",
+            "EVTit email indicated Bruno and Aron were reviewing the materials already sent.",
+            "Robert sent a same-day reset note after the meeting-time confusion.",
         ],
-        "reviewer_action": "Prepare a pre-call technical walkthrough, build-scope menu, and proof-card appendix.",
-        "human_gate": "Human attends meeting and decides any equity-for-services terms.",
+        "reviewer_action": "Prepare a concise follow-up packet, technical walkthrough, build-scope menu, and proof-card appendix.",
+        "human_gate": "Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.",
         "claim_boundary": "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
-        "source_refs": ["gmail:19f43c8a4ba9346e", "gmail:19f44a7aa0a8a011", "public:evtit_event", "public:black_dog"],
+        "source_refs": [
+            "gmail:19f43c8a4ba9346e",
+            "gmail:19f44a3d4a48d2c6",
+            "gmail:19f47e797960c0cd",
+            "gmail:19f4822c21a4a861",
+            "gmail:19f484a1fe4aea3b",
+            "public:evtit_event",
+            "public:black_dog",
+        ],
     },
     {
         "lane_id": "lvlup_first_check",
@@ -430,7 +439,7 @@ def build_payload() -> dict[str, Any]:
         "public_sources": PUBLIC_SOURCES,
         "lanes": sorted(lanes, key=lambda item: int(item["priority"])),
         "next_actions": [
-            "Prepare EVTit call packet and short technical walkthrough without meeting credentials.",
+            "Review the EVTit follow-up packet and send only after human approval.",
             "Advance NASA RFI and FHWA TSMO drafts into final human-review packages.",
             "Build DICE full-proposal compliance matrix after confirming controlling BAA instructions.",
             "Submit or refresh OpenAI API continuity request through official contact route if still needed.",

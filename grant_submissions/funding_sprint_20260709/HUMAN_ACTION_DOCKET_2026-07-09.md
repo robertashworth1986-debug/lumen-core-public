@@ -16,7 +16,7 @@ Current date for this docket: `2026-07-09`.
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Docket SHA-256: `ab94b0740b490a9ab650df00ef0328ed3148b12236c3d2cb7b8c3ef61fdad941`
+- Docket SHA-256: `cf5a38c34730d5586be41598ccdf65e3909cd0442e37e94b5fd498d25f629797`
 
 ## Immediate And Urgent Lanes
 
@@ -28,10 +28,10 @@ Current date for this docket: `2026-07-09`.
 - Days until due: `0`
 - Action: Prepare call packet and proof walkthrough.
 - Time basis: Gmail invite received; exact event time is intentionally excluded from the public docket.
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
-- Human gate: Human attends meeting and decides any equity-for-services terms.
+- First artifact: `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md`
+- Human gate: Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.
 - Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
-- Item SHA-256: `568be7ce032098158fa6b9a10fa633de4f340db2c1dab3a4d30314e223eadfcd`
+- Item SHA-256: `1c654f2696837d96d1b1fcfa1ffe8229f7f49f91a4e35cdc75eda4b75aec1b4a`
 
 ### OpenAI API continuity request
 
@@ -65,14 +65,14 @@ Current date for this docket: `2026-07-09`.
 
 - Lane ID: `evtit_blackdog_inkind`
 - Channel: `venture_engineering`
-- Status: `LIVE_MEETING_PREP`
+- Status: `RESET_NOTE_SENT_TECH_REVIEW_PENDING`
 - Action type: `meeting_prep`
 - Urgency: `IMMEDIATE_24H`
 - Action due: `2026-07-09`
 - Action: Prepare call packet and proof walkthrough.
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
+- First artifact: `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md`
 - Decision question: Can an in-kind engineering team accelerate proof portal, replay runner, manifest, and pilot onboarding?
-- Human gate: Human attends meeting and decides any equity-for-services terms.
+- Human gate: Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.
 - Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
 
 ### 14. OpenAI API continuity request

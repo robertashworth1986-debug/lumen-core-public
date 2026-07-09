@@ -33,6 +33,7 @@ SENSITIVE_MARKERS = [
 
 ARTIFACT_MAP: dict[str, list[str]] = {
     "evtit_blackdog_inkind": [
+        "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
         "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
         "docs/PROOF_TO_PILOT_CONTROL_ROOM_2026-06-25.md",

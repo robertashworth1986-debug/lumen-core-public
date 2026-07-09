@@ -1,11 +1,11 @@
 {
-  "generated_utc": "2026-07-09T13:26:51.955741+00:00",
+  "generated_utc": "2026-07-09T19:18:02.175488+00:00",
   "outputs": {
     "dashboard_json": "dashboard/data/reviewer_diligence_qa_matrix.json",
     "json": "out/ops/reviewer_diligence_qa_matrix_latest.json",
     "markdown": "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md"
   },
-  "qa_matrix_sha256": "98c5106a71364ffe961ab1d7d0a16a825f8833e0e91f14ee45ae620897aaf998",
+  "qa_matrix_sha256": "901327e54ba8bd0febcef553a1a66202042de225920a602d7bd247f54e193362",
   "qa_rows": [
     {
       "answer": "Start with the decision brief, then use the authority matrix for final-action gates, the human docket for dates, and the data-room manifest for hashes and custody.",
@@ -19,34 +19,34 @@
       ],
       "evidence_status": [
         {
-          "bytes": 18719,
+          "bytes": 18715,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
           "present": true,
-          "sha256": "cd467e7b2119cbd5e77b19158d1efd6116dba66ea8cd2c8b5c3d2b435a3deeb1"
+          "sha256": "767720b50d1012b95e6716377b315b74181236ede4412d616171b87b1e73cd48"
         },
         {
-          "bytes": 18765,
+          "bytes": 18779,
           "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
           "present": true,
-          "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
+          "sha256": "1271ddbcfe306c67b25eebddf3c5cce71eb1e9db1fa70ec8d928e40d43d86eb2"
         },
         {
-          "bytes": 13939,
+          "bytes": 14015,
           "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
           "present": true,
-          "sha256": "7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672"
+          "sha256": "b1af6ea2924704771b432efb419b0523a41d1f0c7f085ed60de62fc4b5991052"
         },
         {
-          "bytes": 11607,
+          "bytes": 14060,
           "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
           "present": true,
-          "sha256": "62574d49e95169d05589e95027bdadd7220d11b3c8ff929b08fb4225fad4513e"
+          "sha256": "0649a7c857b4e7ecfa165c0c5ec71366f3f30b3758736e88650f2c0fb9528eeb"
         }
       ],
       "human_gate": "Human approval before external send or portal action.",
       "index": 1,
       "missing_evidence_count": 0,
-      "qa_row_sha256": "55c7dc4b691c9db1cb898ce8879b1817796c687eff4f09c427d4237d54094ac9",
+      "qa_row_sha256": "194c92a73e28c0bf46877e2418b9dd1a5ef07f3710d3935a6f019a80ace2a689",
       "question": "What is the shortest safe reviewer path through the packet?"
     },
     {
@@ -59,22 +59,22 @@
       ],
       "evidence_status": [
         {
-          "bytes": 18719,
+          "bytes": 18715,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
           "present": true,
-          "sha256": "cd467e7b2119cbd5e77b19158d1efd6116dba66ea8cd2c8b5c3d2b435a3deeb1"
+          "sha256": "767720b50d1012b95e6716377b315b74181236ede4412d616171b87b1e73cd48"
         },
         {
           "bytes": 6279,
           "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
           "present": true,
-          "sha256": "92d76bd51527cbe812881871c81e3e83dd60803d2aa73c28650f2aaca69ddd99"
+          "sha256": "f607d3414c5e6f48e512ca52e22c6ae1533817bc187a6348fedd63941d24a018"
         }
       ],
       "human_gate": "Human review before any public claim reuse.",
       "index": 2,
       "missing_evidence_count": 0,
-      "qa_row_sha256": "080e0ccdb5fa8bb3ef037698b289d9619c663fcdfe5ef299ff9f9d7e677a33b4",
+      "qa_row_sha256": "489a1a3af8cf4dcf109be4124b86a3340f73cfa9d401b83f5182734cefb9c972",
       "question": "Is LumenCore claiming award, investment, or agency approval?"
     },
     {
@@ -87,22 +87,22 @@
       ],
       "evidence_status": [
         {
-          "bytes": 16958,
+          "bytes": 17167,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+          "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
         },
         {
-          "bytes": 13939,
+          "bytes": 14015,
           "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
           "present": true,
-          "sha256": "7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672"
+          "sha256": "b1af6ea2924704771b432efb419b0523a41d1f0c7f085ed60de62fc4b5991052"
         }
       ],
       "human_gate": "Human decides follow-up timing and content.",
       "index": 3,
       "missing_evidence_count": 0,
-      "qa_row_sha256": "d2a91c536ec541a2e8e07c6011c39000620362dea953889e280986b3a0f6c84a",
+      "qa_row_sha256": "ecbb2fa4a8b4314204dd086b5fdf97d054bc5b0029bcc309a543da5aa25890e4",
       "question": "What traction is strongest right now?"
     },
     {
@@ -115,22 +115,22 @@
       ],
       "evidence_status": [
         {
-          "bytes": 13939,
+          "bytes": 14015,
           "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
           "present": true,
-          "sha256": "7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672"
+          "sha256": "b1af6ea2924704771b432efb419b0523a41d1f0c7f085ed60de62fc4b5991052"
         },
         {
-          "bytes": 18719,
+          "bytes": 18715,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
           "present": true,
-          "sha256": "cd467e7b2119cbd5e77b19158d1efd6116dba66ea8cd2c8b5c3d2b435a3deeb1"
+          "sha256": "767720b50d1012b95e6716377b315b74181236ede4412d616171b87b1e73cd48"
         }
       ],
       "human_gate": "Human approval for meeting actions, BAA package action, or vendor account action.",
       "index": 4,
       "missing_evidence_count": 0,
-      "qa_row_sha256": "98be1ea60c582e799f7a88e9decb04004f5c5aa4dab1bd0b3737f7bd02fab1b4",
+      "qa_row_sha256": "08a1f8d7d7d5fa1d09f1f8a0aa39d8a2a05f99f51afe590d6f900bda0f1a8fd9",
       "question": "Which actions are urgent?"
     },
     {
@@ -142,16 +142,16 @@
       ],
       "evidence_status": [
         {
-          "bytes": 18765,
+          "bytes": 18779,
           "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
           "present": true,
-          "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
+          "sha256": "1271ddbcfe306c67b25eebddf3c5cce71eb1e9db1fa70ec8d928e40d43d86eb2"
         }
       ],
       "human_gate": "Named authority gate per lane in the authority matrix.",
       "index": 5,
       "missing_evidence_count": 0,
-      "qa_row_sha256": "b84f7ed3b79834b388889fb99a4e2d3e040ae08e2527babca3f7c7f2df0b08ed",
+      "qa_row_sha256": "f6d90731fdd9f00d409a720bc837276f9baa6253bde6d1f8e934a76188a3bbba",
       "question": "What can be prepared internally without human final approval?"
     },
     {
@@ -171,22 +171,22 @@
           "sha256": "fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82"
         },
         {
-          "bytes": 18765,
+          "bytes": 18779,
           "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
           "present": true,
-          "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
+          "sha256": "1271ddbcfe306c67b25eebddf3c5cce71eb1e9db1fa70ec8d928e40d43d86eb2"
         },
         {
           "bytes": 6279,
           "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
           "present": true,
-          "sha256": "92d76bd51527cbe812881871c81e3e83dd60803d2aa73c28650f2aaca69ddd99"
+          "sha256": "f607d3414c5e6f48e512ca52e22c6ae1533817bc187a6348fedd63941d24a018"
         }
       ],
       "human_gate": "SAM/AOR, DSIP Firm PIN, BAA, RFI, and portal gates remain human-controlled.",
       "index": 6,
       "missing_evidence_count": 0,
-      "qa_row_sha256": "abffd04a294f985949e1d54c6c7b8e02b6d82be90e9563b6d6787224e290f24d",
+      "qa_row_sha256": "fc81c0d643cf141823a912016ed82657394d44b43172411c7264d153b4533104",
       "question": "What proof exists for government protocol readiness?"
     },
     {
@@ -205,16 +205,16 @@
           "sha256": "274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb"
         },
         {
-          "bytes": 18765,
+          "bytes": 18779,
           "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
           "present": true,
-          "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
+          "sha256": "1271ddbcfe306c67b25eebddf3c5cce71eb1e9db1fa70ec8d928e40d43d86eb2"
         }
       ],
       "human_gate": "Licensed patent counsel and Robert decide filing or disclosure action.",
       "index": 7,
       "missing_evidence_count": 0,
-      "qa_row_sha256": "8385e65e21cc3148ef6395c4275f03ee664035b5f01f5c1510549ff9fae2f3e0",
+      "qa_row_sha256": "09fda66ede23bbdd4a8d8766efce72d97859f6e2b7db0c97a53f2777550836f5",
       "question": "How is IP and patent-risk handled?"
     },
     {
@@ -237,19 +237,19 @@
           "bytes": 6279,
           "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
           "present": true,
-          "sha256": "92d76bd51527cbe812881871c81e3e83dd60803d2aa73c28650f2aaca69ddd99"
+          "sha256": "f607d3414c5e6f48e512ca52e22c6ae1533817bc187a6348fedd63941d24a018"
         },
         {
-          "bytes": 18765,
+          "bytes": 18779,
           "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
           "present": true,
-          "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
+          "sha256": "1271ddbcfe306c67b25eebddf3c5cce71eb1e9db1fa70ec8d928e40d43d86eb2"
         }
       ],
       "human_gate": "Human authority before trading, capital movement, send, submit, or certification.",
       "index": 8,
       "missing_evidence_count": 0,
-      "qa_row_sha256": "31357a74e34aec0b27aadcf57106a7f07738b0c53034cfd0492e9ba7e3906075",
+      "qa_row_sha256": "2c5e9d86e1fc176b7c11bcb5a1daaf3adff09f65bf8bf9f0baa05c2f6085cb95",
       "question": "How is autonomous quant or AI-risk controlled?"
     },
     {
@@ -262,22 +262,22 @@
       ],
       "evidence_status": [
         {
-          "bytes": 18765,
+          "bytes": 18779,
           "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
           "present": true,
-          "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
+          "sha256": "1271ddbcfe306c67b25eebddf3c5cce71eb1e9db1fa70ec8d928e40d43d86eb2"
         },
         {
-          "bytes": 18719,
+          "bytes": 18715,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
           "present": true,
-          "sha256": "cd467e7b2119cbd5e77b19158d1efd6116dba66ea8cd2c8b5c3d2b435a3deeb1"
+          "sha256": "767720b50d1012b95e6716377b315b74181236ede4412d616171b87b1e73cd48"
         }
       ],
       "human_gate": "Qualified partner and human approval before reactivation.",
       "index": 9,
       "missing_evidence_count": 0,
-      "qa_row_sha256": "346f3eb11489ae8afedef735f8878e77559cd298a3d444454d8c49a294b12ec6",
+      "qa_row_sha256": "a67c7e1176b2f3cfcb6208b01d5d4c3057b0004b1098b810d26ac3bb5c7f82c1",
       "question": "Which lanes should not be pursued solo?"
     },
     {
@@ -290,22 +290,22 @@
       ],
       "evidence_status": [
         {
-          "bytes": 11607,
+          "bytes": 14060,
           "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
           "present": true,
-          "sha256": "62574d49e95169d05589e95027bdadd7220d11b3c8ff929b08fb4225fad4513e"
+          "sha256": "0649a7c857b4e7ecfa165c0c5ec71366f3f30b3758736e88650f2c0fb9528eeb"
         },
         {
-          "bytes": 23242,
+          "bytes": 23612,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
           "present": true,
-          "sha256": "f7b9a4fcda217537da466a81fcce8b01017635295dac124592740e84634e9337"
+          "sha256": "f351b54b0880b199fcd520dbb003ff35dfbe916ab45e8f4f529b97b9d97b6ddb"
         }
       ],
       "human_gate": "Human chooses what to share externally.",
       "index": 10,
       "missing_evidence_count": 0,
-      "qa_row_sha256": "f964fd6420e284a320598b67f9d017400f0675ab7819cdd3cf59fa6b0dba3608",
+      "qa_row_sha256": "74862b93b1226cdbd06164093adc067a8d9f330f0cce5b2404a02c41b3d35e98",
       "question": "What makes this easier for a reviewer or investor?"
     },
     {
@@ -318,22 +318,22 @@
       ],
       "evidence_status": [
         {
-          "bytes": 18719,
+          "bytes": 18715,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
           "present": true,
-          "sha256": "cd467e7b2119cbd5e77b19158d1efd6116dba66ea8cd2c8b5c3d2b435a3deeb1"
+          "sha256": "767720b50d1012b95e6716377b315b74181236ede4412d616171b87b1e73cd48"
         },
         {
-          "bytes": 11607,
+          "bytes": 14060,
           "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
           "present": true,
-          "sha256": "62574d49e95169d05589e95027bdadd7220d11b3c8ff929b08fb4225fad4513e"
+          "sha256": "0649a7c857b4e7ecfa165c0c5ec71366f3f30b3758736e88650f2c0fb9528eeb"
         }
       ],
       "human_gate": "Human approval before any external send.",
       "index": 11,
       "missing_evidence_count": 0,
-      "qa_row_sha256": "745189329841a24d76b4d0ace1ee6579de66ef0bfe050e37a13226f552ffcb0c",
+      "qa_row_sha256": "01746ace22c2d9ce5dc82f93dfc0fa68c109d826c9e0428741add3db72649903",
       "question": "What should be shared first externally?"
     },
     {
@@ -355,13 +355,13 @@
           "bytes": 6279,
           "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
           "present": true,
-          "sha256": "92d76bd51527cbe812881871c81e3e83dd60803d2aa73c28650f2aaca69ddd99"
+          "sha256": "f607d3414c5e6f48e512ca52e22c6ae1533817bc187a6348fedd63941d24a018"
         }
       ],
       "human_gate": "External validation owner or licensed reviewer must confirm future claims.",
       "index": 12,
       "missing_evidence_count": 0,
-      "qa_row_sha256": "dd161eb20eea8a4631043c6b50f7a5ccb3e067f5d7c7d7a4240965016fdc1bbb",
+      "qa_row_sha256": "c1ee8e6fafaba8f28a675813ca8ece06e37a2d66cd01f22e6f1fbb8908a09831",
       "question": "What remains unproven or still needs external validation?"
     }
   ],
@@ -382,7 +382,7 @@
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "manifested_markdown_count": 26,
+    "manifested_markdown_count": 29,
     "missing_evidence_count": 0,
     "qa_count": 12,
     "reviewer_gate_clear": true,

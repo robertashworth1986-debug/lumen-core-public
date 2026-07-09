@@ -9,19 +9,19 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 - Status: `TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED`
 - Lanes tracked: `15`
 - Top priority lanes: `7`
-- Gmail references: `7`
+- Gmail references: `10`
 - Sweetspot references: `8`
 - Public references: `14`
 - Human action required: `true`
 - External send without human: `false`
 - Final submission without human: `false`
-- Ledger SHA-256: `cdcefa99ef747cddf7f51f4ad3f8bfdc9e3fd766cffee22bb4aac92ed4afadf9`
+- Ledger SHA-256: `acc50b01f7135eb7a2d12c9c21ab1471cbbb94e96026011c331d9fb3597b21ea`
 
 ## Source Coverage
 
 - gmail_profile: Robert Ashworth mailbox confirmed through Gmail connector.
 - gmail_window: Gmail searched in:anywhere after 2026-04-09 for funding, SBIR, RFI/RFP, deadline, calendar, and application terms.
-- calendar_window: Google Calendar searched 2026-07-09 through 2026-07-11 for the EVTit booking; no matching calendar event was returned, so Gmail invite evidence is authoritative for this ledger.
+- calendar_window: Google Calendar located the July 9 EVTit discovery meeting; public artifacts intentionally exclude meeting access details.
 - sweetspot_window: Sweetspot federal contracts searched for active opportunities after 2026-07-09 and before 2026-08-31 across AI validation, lab data QA, data center, and transportation operations lanes.
 
 ## Priority Queue
@@ -30,20 +30,24 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 
 - Lane ID: `evtit_blackdog_inkind`
 - Channel: `venture_engineering`
-- Status: `LIVE_MEETING_PREP`
+- Status: `RESET_NOTE_SENT_TECH_REVIEW_PENDING`
 - Fit score: `92`
-- Gate: Discovery meeting booked from Gmail invite; public launch event July 22, 2026.
-- Reviewer action: Prepare a pre-call technical walkthrough, build-scope menu, and proof-card appendix.
-- Human gate: Human attends meeting and decides any equity-for-services terms.
+- Gate: Discovery call window occurred July 9, 2026; reset note sent after the timing mix-up; public launch event July 22, 2026.
+- Reviewer action: Prepare a concise follow-up packet, technical walkthrough, build-scope menu, and proof-card appendix.
+- Human gate: Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.
 - Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
-- Evidence hash: `77684a0f6a52e346b745b1994f3b2bdd55b8c5631f939bb7fa13362c1e7271a5`
+- Evidence hash: `cb7703334dd6676df89a7ed9eec4ebb2cda49d598cc83e6cfe40d0b6c9271920`
 - Evidence:
   - EVTit internal process form requested by Terry Anderton.
   - LumenCore reply indicates the EVTit application form was submitted.
-  - Discovery meeting invite received with LumenCore proof-to-pilot context.
+  - EVTit email indicated Bruno and Aron were reviewing the materials already sent.
+  - Robert sent a same-day reset note after the meeting-time confusion.
 - Sources:
   - `gmail:19f43c8a4ba9346e`
-  - `gmail:19f44a7aa0a8a011`
+  - `gmail:19f44a3d4a48d2c6`
+  - `gmail:19f47e797960c0cd`
+  - `gmail:19f4822c21a4a861`
+  - `gmail:19f484a1fe4aea3b`
   - `public:evtit_event`
   - `public:black_dog`
 
@@ -318,7 +322,7 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 
 ## Immediate Next Actions
 
-- Prepare EVTit call packet and short technical walkthrough without meeting credentials.
+- Review the EVTit follow-up packet and send only after human approval.
 - Advance NASA RFI and FHWA TSMO drafts into final human-review packages.
 - Build DICE full-proposal compliance matrix after confirming controlling BAA instructions.
 - Submit or refresh OpenAI API continuity request through official contact route if still needed.

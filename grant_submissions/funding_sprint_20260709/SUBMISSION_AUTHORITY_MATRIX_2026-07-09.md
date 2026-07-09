@@ -18,7 +18,7 @@ This matrix is not a submission approval. It separates preparation work from the
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Authority matrix SHA-256: `636c95a3b5547de6dfa09921ff3e95f4e346fa34ab34e3f5fe23d780f6b7f811`
+- Authority matrix SHA-256: `d028a949e3dd6949ce9c586acc12c38cab97b262705089257bbd15d3589a74b7`
 
 ## Authority Rows
 
@@ -26,7 +26,7 @@ This matrix is not a submission approval. It separates preparation work from the
 
 - Lane ID: `evtit_blackdog_inkind`
 - Channel: `venture_engineering`
-- Status: `LIVE_MEETING_PREP`
+- Status: `RESET_NOTE_SENT_TECH_REVIEW_PENDING`
 - Action type: `meeting_prep`
 - Urgency: `IMMEDIATE_24H`
 - Action due: `2026-07-09`
@@ -36,10 +36,10 @@ This matrix is not a submission approval. It separates preparation work from the
 - Can submit without human: `false`
 - Can accept terms without human: `false`
 - Required authority: Robert attends the meeting and approves any follow-up, build scope, or equity-for-services discussion.
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
+- First artifact: `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md`
 - Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
 - Decision question: Can an in-kind engineering team accelerate proof portal, replay runner, manifest, and pilot onboarding?
-- Row SHA-256: `7bab3addf886edc59d43f79d868b52c318709c7ecb8a26614b19ae096fa46902`
+- Row SHA-256: `9ae3b0c8de662759cdbbd5d69c863a5705590071dcdb60efb36119b8edf3faeb`
 
 Pre-action checks:
 - Use only the public proof links and sanitized packet artifacts.

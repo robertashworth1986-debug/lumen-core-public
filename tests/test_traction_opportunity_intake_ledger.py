@@ -38,7 +38,7 @@ def test_priority_lanes_keep_expected_statuses_and_claim_boundaries():
     payload = module.build_payload()
     lanes = {lane["lane_id"]: lane for lane in payload["lanes"]}
 
-    assert lanes["evtit_blackdog_inkind"]["status"] == "LIVE_MEETING_PREP"
+    assert lanes["evtit_blackdog_inkind"]["status"] == "RESET_NOTE_SENT_TECH_REVIEW_PENDING"
     assert lanes["lvlup_first_check"]["status"] == "WAITING_REVIEW"
     assert lanes["darpa_dice_full_submission"]["status"] == "FULL_PROPOSAL_SPRINT"
     assert lanes["fhwa_tsmo_data_initiative"]["status"] == "PHASE_I_TECH_VOLUME"

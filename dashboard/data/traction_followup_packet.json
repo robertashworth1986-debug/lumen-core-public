@@ -1,0 +1,215 @@
+{
+  "build_scope_menu": [
+    {
+      "outcome": "Cleaner reviewer entry point, proof-card navigation, and public-safe claim gates.",
+      "owner_gate": "Robert approves public wording and any external share.",
+      "scope_id": "proof_portal_hardening",
+      "title": "Proof portal hardening"
+    },
+    {
+      "outcome": "Hash-backed replay receipts, source provenance, baseline locking, and reproducibility handoff.",
+      "owner_gate": "External data owner or reviewer chooses any buyer-specific data, metric, and baseline.",
+      "scope_id": "replay_runner_manifest",
+      "title": "Replay runner and evidence manifest"
+    },
+    {
+      "outcome": "A 30-day path from technical fit call to scoped validation study or engineering sprint.",
+      "owner_gate": "Human approves pilot terms, data boundary, schedule, and economics.",
+      "scope_id": "pilot_onboarding",
+      "title": "Pilot onboarding path"
+    },
+    {
+      "outcome": "Usage guardrails, retry limits, model routing, and operating receipts for proof-stack continuity.",
+      "owner_gate": "Human approves vendor terms, billing, and operational limits.",
+      "scope_id": "api_reliability_cost_controls",
+      "title": "API reliability and cost controls"
+    },
+    {
+      "outcome": "Sharper SBIR, RFI, investor, and partner materials with official-source protocol gates.",
+      "owner_gate": "Human approves every portal action, send, certification, and term.",
+      "scope_id": "grant_investor_packet_support",
+      "title": "Grant and investor packet support"
+    },
+    {
+      "outcome": "A stricter separation between evidence, draft claims, counsel review, and final authority.",
+      "owner_gate": "No cybersecurity, IP, field result, or government-readiness claim without exact evidence.",
+      "scope_id": "security_claim_boundary",
+      "title": "Security and claim-boundary layer"
+    }
+  ],
+  "diligence_artifacts": [
+    {
+      "bytes": 17167,
+      "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+      "present": true,
+      "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
+    },
+    {
+      "bytes": 18719,
+      "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
+      "present": true,
+      "sha256": "cd467e7b2119cbd5e77b19158d1efd6116dba66ea8cd2c8b5c3d2b435a3deeb1"
+    },
+    {
+      "bytes": 23242,
+      "path": "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
+      "present": true,
+      "sha256": "f7b9a4fcda217537da466a81fcce8b01017635295dac124592740e84634e9337"
+    },
+    {
+      "bytes": 14060,
+      "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
+      "present": true,
+      "sha256": "0649a7c857b4e7ecfa165c0c5ec71366f3f30b3758736e88650f2c0fb9528eeb"
+    },
+    {
+      "bytes": 10506,
+      "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
+      "present": true,
+      "sha256": "184173c25f5d3e94db3d364f3cb9da3c57be3a697427ea760e662279f8e7715e"
+    },
+    {
+      "bytes": 9037,
+      "path": "grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
+      "present": true,
+      "sha256": "95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762"
+    },
+    {
+      "bytes": 9907,
+      "path": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+      "present": true,
+      "sha256": "0e5cf6b23334fed68895f117a61a47238e0ea27ba9bed7103739fc19f9ba8d59"
+    },
+    {
+      "bytes": 6300,
+      "path": "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
+      "present": true,
+      "sha256": "f04cfca6d7b388c97303e354aaf9229ba3d46d57f54c6f56110d4ade89dd82b3"
+    },
+    {
+      "bytes": 3471,
+      "path": "docs/PROOF_TO_PILOT_CONTROL_ROOM_2026-06-25.md",
+      "present": true,
+      "sha256": "2aaa3ade058e88eef43d9ec54a0d63271de034596abd8fdb8570c6aa9eee7de3"
+    },
+    {
+      "bytes": 4065,
+      "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+      "present": true,
+      "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957"
+    }
+  ],
+  "followup_drafts": [
+    {
+      "body": [
+        "Hi Terry,",
+        "",
+        "Thank you for the grace on the timing confusion today. I do not want the miss to turn into noise for your team, so I tightened the follow-up into the concrete decision point.",
+        "",
+        "The clean fit question is whether EVTit / Black Dog wants to help turn LumenCore's proof-to-pilot stack into a 30-day productization sprint: proof portal, replay runner, evidence manifest, pilot onboarding, API reliability controls, and grant/investor packet support.",
+        "",
+        "If the team is still open to it, the useful next step would be a 30-minute technical fit call with Bruno and Aron focused on build scope, validation path, and what an in-kind engineering sprint would actually deliver.",
+        "",
+        "I will keep the claims tight: no partnership, investment, field validation, savings, or production deployment is represented unless your team formally confirms it.",
+        "",
+        "Thank you,",
+        "Robert"
+      ],
+      "draft_id": "same_day_reset_next_step",
+      "human_send_required": true,
+      "subject": "LumenCore x EVTit - short reset and next technical step"
+    },
+    {
+      "body": [
+        "Hi Terry, Bruno, Aron, and Scott,",
+        "",
+        "For technical review, I would frame LumenCore as a proof-to-pilot infrastructure layer: source registry, hash-backed replay, locked baselines, reviewer-safe dashboards, and claim gates that keep unsupported claims out of the materials.",
+        "",
+        "The most useful EVTit contribution would be engineering lift around the reviewer portal, repeatable replay runner, evidence manifest, pilot onboarding flow, API/cost reliability, and packaged grant/investor review surfaces.",
+        "",
+        "My ask is not for anyone to accept a broad claim. It is to choose a narrow 30-day build sprint that makes the evidence easier for serious reviewers, agencies, and pilot partners to inspect.",
+        "",
+        "Best,",
+        "Robert"
+      ],
+      "draft_id": "technical_team_packet_note",
+      "human_send_required": true,
+      "subject": "Technical packet: LumenCore proof-to-pilot sprint scope"
+    }
+  ],
+  "generated_utc": "2026-07-09T19:17:44.633085+00:00",
+  "human_gate": {
+    "accept_equity_or_services_terms_without_human": false,
+    "rule": "This packet prepares follow-up language and review scope only. Robert approves any send, schedule, terms, or file sharing.",
+    "schedule_followup_allowed_without_human": false,
+    "send_email_allowed_without_human": false,
+    "share_private_files_without_human": false
+  },
+  "lane": {
+    "claim_boundary": "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
+    "fit_score": 92,
+    "lane_id": "evtit_blackdog_inkind",
+    "name": "EVTit / Black Dog in-kind engineering fund",
+    "priority": 1,
+    "status": "RESET_NOTE_SENT_TECH_REVIEW_PENDING"
+  },
+  "outputs": {
+    "dashboard_json": "dashboard/data/traction_followup_packet.json",
+    "json": "out/ops/traction_followup_packet_latest.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md"
+  },
+  "schema": "traction_followup_packet_v1",
+  "status": "TRACTION_FOLLOWUP_READY_HUMAN_SEND_REQUIRED",
+  "summary": {
+    "build_scope_count": 6,
+    "data_room_markdown_count": 29,
+    "data_room_status": "DATA_ROOM_MANIFEST_READY",
+    "diligence_artifact_count": 10,
+    "diligence_artifacts_present": true,
+    "draft_count": 2,
+    "equity_terms_allowed_without_human": false,
+    "external_send_allowed_without_human": false,
+    "field_validation_claimed": false,
+    "human_send_required": true,
+    "investment_claimed": false,
+    "partnership_claimed": false,
+    "reviewer_gate_clear": true,
+    "services_award_claimed": false,
+    "thread_signal_count": 6,
+    "unsafe_claim_count": 0,
+    "unsafe_secret_count": 0
+  },
+  "thread_signals": [
+    {
+      "action_meaning": "Application and review process exists; keep next response concise and source-backed.",
+      "safe_signal": "EVTit requested the internal application form so its process could start.",
+      "source_ref": "gmail:19f43c8a4ba9346e"
+    },
+    {
+      "action_meaning": "Follow-up should assume intake is in motion, not resubmit the same material.",
+      "safe_signal": "Robert recorded that the EVTit application form was submitted.",
+      "source_ref": "gmail:19f44a3d4a48d2c6"
+    },
+    {
+      "action_meaning": "Provide a reviewer index and build-scope menu instead of a long narrative reset.",
+      "safe_signal": "EVTit indicated its technical team was reviewing the materials already sent.",
+      "source_ref": "gmail:19f47e797960c0cd"
+    },
+    {
+      "action_meaning": "Ask for a 30-minute technical follow-up if there is still fit.",
+      "safe_signal": "EVTit offered a short first conversation and indicated a longer technical-team call could follow.",
+      "source_ref": "gmail:19f47fa385e22fce"
+    },
+    {
+      "action_meaning": "Keep the tone calm, accountable, and forward-moving.",
+      "safe_signal": "EVTit acknowledged the missed-window note without escalation.",
+      "source_ref": "gmail:19f4822c21a4a861"
+    },
+    {
+      "action_meaning": "Do not send another apology-only message; pair the reset with a concrete next step.",
+      "safe_signal": "Robert sent the same-day note that he was present and the issue was timing confusion.",
+      "source_ref": "gmail:19f484a1fe4aea3b"
+    }
+  ],
+  "traction_followup_packet_sha256": "504c73768bfe75b96cdc1933c2cdb3992f1283ab69a823ea78f775c0121df6fc"
+}

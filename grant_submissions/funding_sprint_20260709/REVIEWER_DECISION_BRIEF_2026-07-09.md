@@ -18,7 +18,7 @@ This brief is a decision-support front page. It does not authorize any final ext
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Decision brief SHA-256: `7c56728c6f3331967fd97a6b8f54ca213c76ab0b71736d3f69160643ac5e2b1a`
+- Decision brief SHA-256: `d71949f18307cddf4540a6d5b25b4483ebaf5da94e977f12fa7869f40d1168b1`
 
 ## Reviewer Answer
 
@@ -64,12 +64,12 @@ This brief is a decision-support front page. It does not authorize any final ext
 - Reviewer decision: Can an in-kind engineering team accelerate proof portal, replay runner, manifest, and pilot onboarding?
 - Next human action: Prepare call packet and proof walkthrough.
 - Required authority: Robert attends the meeting and approves any follow-up, build scope, or equity-for-services discussion.
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
+- First artifact: `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md`
 - Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
 - Can send externally without human: `false`
 - Can submit without human: `false`
 - Can accept terms without human: `false`
-- Card SHA-256: `384634ec8250bbcce8711b5b581c94852e5b0fe2336fac842b0016cfeec90f34`
+- Card SHA-256: `853c2c0aac6a76a732a8c8068de9b558b260e826fc4a6b271837d97ed0b6fd48`
 
 ### 2. LvlUp Ventures First Check Fund
 

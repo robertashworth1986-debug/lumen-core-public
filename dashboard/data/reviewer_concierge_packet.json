@@ -1,15 +1,21 @@
 {
   "concierge_cards": [
     {
-      "artifact_count": 4,
+      "artifact_count": 5,
       "artifact_missing_count": 0,
-      "artifact_present_count": 4,
+      "artifact_present_count": 5,
       "artifacts": [
         {
-          "bytes": 16958,
+          "bytes": 8278,
+          "path": "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
+          "present": true,
+          "sha256": "2a3ac81ea687dcd5653c480850112dbcde2bbb2103345a34be7e6ae05094b9be"
+        },
+        {
+          "bytes": 17167,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+          "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
         },
         {
           "bytes": 4065,
@@ -34,22 +40,25 @@
       "best_first_read": "Live proof stack, build scope, validation workflow, and productization gaps.",
       "channel": "venture_engineering",
       "claim_boundary": "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
-      "concierge_card_sha256": "b6428ffe6ac2d75d2c442bed0a841ff5824f54fbe002a56ffc0b068e3cd8d05f",
-      "deadline_or_gate": "Discovery meeting booked from Gmail invite; public launch event July 22, 2026.",
+      "concierge_card_sha256": "1f6b082ad19f1368cd6bbad25e6ff3e855e2c0b67ceec9c4b9a2b0d11ffe7840",
+      "deadline_or_gate": "Discovery call window occurred July 9, 2026; reset note sent after the timing mix-up; public launch event July 22, 2026.",
       "decision_question": "Can an in-kind engineering team accelerate proof portal, replay runner, manifest, and pilot onboarding?",
       "fit_score": 92,
-      "human_gate": "Human attends meeting and decides any equity-for-services terms.",
+      "human_gate": "Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.",
       "lane_id": "evtit_blackdog_inkind",
       "name": "EVTit / Black Dog in-kind engineering fund",
       "priority": 1,
-      "reviewer_action": "Prepare a pre-call technical walkthrough, build-scope menu, and proof-card appendix.",
+      "reviewer_action": "Prepare a concise follow-up packet, technical walkthrough, build-scope menu, and proof-card appendix.",
       "source_refs": [
         "gmail:19f43c8a4ba9346e",
-        "gmail:19f44a7aa0a8a011",
+        "gmail:19f44a3d4a48d2c6",
+        "gmail:19f47e797960c0cd",
+        "gmail:19f4822c21a4a861",
+        "gmail:19f484a1fe4aea3b",
         "public:evtit_event",
         "public:black_dog"
       ],
-      "status": "LIVE_MEETING_PREP"
+      "status": "RESET_NOTE_SENT_TECH_REVIEW_PENDING"
     },
     {
       "artifact_count": 3,
@@ -57,10 +66,10 @@
       "artifact_present_count": 3,
       "artifacts": [
         {
-          "bytes": 16958,
+          "bytes": 17167,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+          "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
         },
         {
           "bytes": 2960,
@@ -79,7 +88,7 @@
       "best_first_read": "Traction ledger, proof-to-revenue engine, and clean proof-to-pilot public link.",
       "channel": "venture_cash",
       "claim_boundary": "Submission and acknowledgement only; no funding decision is represented.",
-      "concierge_card_sha256": "16319fdf5b3a2c1f0d564a30d2cc334f2b0b123fb79747b4c711b3ba5ebb2265",
+      "concierge_card_sha256": "de14838a4bea5693a1a3c67d184e01f93174204d9c57a2dc7e44dbb5cdb7eb51",
       "deadline_or_gate": "Submitted July 9, 2026; Gmail reply acknowledged the update.",
       "decision_question": "Is a small first check useful enough to preserve execution velocity and unlock pilots?",
       "fit_score": 86,
@@ -100,10 +109,10 @@
       "artifact_present_count": 5,
       "artifacts": [
         {
-          "bytes": 16958,
+          "bytes": 17167,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+          "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
         },
         {
           "bytes": 9465,
@@ -134,7 +143,7 @@
       "best_first_read": "Heilmeier matrix, evidence synthesis, compliance matrix, and human-gated submission controls.",
       "channel": "federal_baa",
       "claim_boundary": "Abstract receipt is not award selection and not permission to skip BAA instructions.",
-      "concierge_card_sha256": "16f3dc6829c8ceeb98ccd24df5fdc36c5a9fd7220b9ecf5f8a3b12fccbd2282f",
+      "concierge_card_sha256": "ee3dde99ff910a3ff8884e04a387d7b70ca2d42e58cef3521822e00881bd63d0",
       "deadline_or_gate": "Abstract ID HR001126S0010-DICE-PA-052 recorded; full proposal instructions must be confirmed against the controlling BAA before upload.",
       "decision_question": "Does the proposal map a credible research objective to a bounded validation method?",
       "fit_score": 90,
@@ -328,10 +337,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 16958,
+          "bytes": 17167,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+          "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
         },
         {
           "bytes": 8338,
@@ -344,7 +353,7 @@
       "best_first_read": "Boundary-safe routing note and partner-only decision record.",
       "channel": "federal_market_research",
       "claim_boundary": "No instrument supply, OEM, reseller, or lab-services qualification claim.",
-      "concierge_card_sha256": "c19c4b82bd2b1eeca94e44c1a42bb5ba46bb4e5b6b3129a3641ebde1a526bad1",
+      "concierge_card_sha256": "269931196afe69bc414091b77640f9ab8caf041a296474a2be70a48672b00102",
       "deadline_or_gate": "Active until 2026-07-21 21:30 UTC per Sweetspot search; official notice ID 68HE0726Q0027 located.",
       "decision_question": "Should LumenCore be routed to a data QA or validation need instead of a hardware buy?",
       "fit_score": 42,
@@ -366,10 +375,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 16958,
+          "bytes": 17167,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+          "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
         },
         {
           "bytes": 8338,
@@ -382,7 +391,7 @@
       "best_first_read": "Partner-only filter and qualification boundary.",
       "channel": "federal_sources_sought",
       "claim_boundary": "No testing lab, contaminant monitoring, or regulated lab-services claim.",
-      "concierge_card_sha256": "5b24898483875e278e6a42a66b2530619ca6f1fdca468ee61881b3ff03d881e6",
+      "concierge_card_sha256": "a0e37cf56de983f92e6d605188c5ec7ec33c03b1a9317b7d5d71a773b4aeb73a",
       "deadline_or_gate": "Active until 2026-07-21 20:00 UTC per Sweetspot search.",
       "decision_question": "Is there a qualified prime or lab partner before any response is drafted?",
       "fit_score": 46,
@@ -402,10 +411,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 16958,
+          "bytes": 17167,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+          "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
         },
         {
           "bytes": 6109,
@@ -418,7 +427,7 @@
       "best_first_read": "Heilmeier matrix, evidence synthesis, compliance matrix, and human-gated submission controls.",
       "channel": "federal_baa",
       "claim_boundary": "No claim that LumenCore fits all BAA topics.",
-      "concierge_card_sha256": "d4e4c0b56c90d8f98cf17b14e5b88755b310b5f12a72cb6907214383896b0d4f",
+      "concierge_card_sha256": "ed3d80c95a24ff4d3519339d150295e5bbd1c08e249e926265619b098e2e27a8",
       "deadline_or_gate": "Active until 2026-07-24 17:00 UTC per Sweetspot search; official SAM call located.",
       "decision_question": "Does the proposal map a credible research objective to a bounded validation method?",
       "fit_score": 64,
@@ -439,10 +448,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 16958,
+          "bytes": 17167,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+          "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
         },
         {
           "bytes": 8929,
@@ -455,7 +464,7 @@
       "best_first_read": "Capability outline, source provenance, risk boundaries, and agency protocol controls.",
       "channel": "federal_contract",
       "claim_boundary": "No FedRAMP, ATO, HHS pilot, or government production-access claim.",
-      "concierge_card_sha256": "d59346d02effc0dfc2e572f176c60da12a77da61aa0419cd2a69892ed15e9c57",
+      "concierge_card_sha256": "77c98d58b8ba8d70c6ee5f7eb9f9ab0c19426c9e90a606948a0ac7fd4d7c8dd3",
       "deadline_or_gate": "Active until 2026-07-14 21:00 UTC per Sweetspot search.",
       "decision_question": "Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?",
       "fit_score": 38,
@@ -475,10 +484,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 16958,
+          "bytes": 17167,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+          "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
         },
         {
           "bytes": 8929,
@@ -491,7 +500,7 @@
       "best_first_read": "Capability outline, source provenance, risk boundaries, and agency protocol controls.",
       "channel": "federal_contract",
       "claim_boundary": "No public-safety deployment, law-enforcement feed integration, or FedRAMP authorization claim.",
-      "concierge_card_sha256": "b90f18a616b6abae65a1b76e0e556d71e4d58a6a9af5ada270b4a28a8d1d8c76",
+      "concierge_card_sha256": "df1cba1b1830d6e6900dfd100bac516783ed6e2340a23f07f704b35a0defd5bc",
       "deadline_or_gate": "Active until 2026-07-14 16:00 UTC per Sweetspot search.",
       "decision_question": "Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?",
       "fit_score": 35,
@@ -511,10 +520,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 16958,
+          "bytes": 17167,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+          "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
         },
         {
           "bytes": 3471,
@@ -527,7 +536,7 @@
       "best_first_read": "Capability outline, source provenance, risk boundaries, and agency protocol controls.",
       "channel": "federal_contract",
       "claim_boundary": "No consortium management, energy project financing, or installation-performance claim.",
-      "concierge_card_sha256": "6c88baf22a2b369b38950e6c1266fd753551a57fbfc11f60c5bb28388838cfed",
+      "concierge_card_sha256": "6eb4319fac3b930b432a166ff721f47a4d4b68b7c4cd98c0bc1e9159ede0075a",
       "deadline_or_gate": "Active until 2026-07-30 19:00 UTC per Sweetspot search.",
       "decision_question": "Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?",
       "fit_score": 58,
@@ -547,10 +556,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 16958,
+          "bytes": 17167,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c"
+          "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
         },
         {
           "bytes": 6532,
@@ -563,7 +572,7 @@
       "best_first_read": "Proof-stack continuity case and API continuity request.",
       "channel": "vendor_credit_or_partner_route",
       "claim_boundary": "No credit, free account, or vendor approval is represented.",
-      "concierge_card_sha256": "cbf674e70ff9ecd03e671ed1866711a0318804b6332e16afac76dd2bc5267bac",
+      "concierge_card_sha256": "15ac73d368c8b65b4f932d572fb17abaab73954cce99876c74cb6d4a34b45823",
       "deadline_or_gate": "No deadline found; request should be submitted through official contact-sales path if still needed.",
       "decision_question": "Can a temporary credit or startup route preserve grant/proof-factory continuity?",
       "fit_score": 80,
@@ -617,8 +626,8 @@
       "status": "URGENT_COUNSEL_WATCH"
     }
   ],
-  "concierge_sha256": "90bcbbb467b79c93800552c2797749d78d80cfefa70547d92dfc2c057df41467",
-  "generated_utc": "2026-07-09T03:59:00.183075+00:00",
+  "concierge_sha256": "bb2723a0cb2a70c533736935865ff9ca562b81ea70e4d66cef32eff573bd2fa0",
+  "generated_utc": "2026-07-09T19:17:53.603945+00:00",
   "missing_artifacts": [],
   "outputs": {
     "dashboard_json": "dashboard/data/reviewer_concierge_packet.json",

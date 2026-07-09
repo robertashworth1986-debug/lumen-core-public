@@ -1,11 +1,11 @@
 {
-  "authority_matrix_sha256": "636c95a3b5547de6dfa09921ff3e95f4e346fa34ab34e3f5fe23d780f6b7f811",
+  "authority_matrix_sha256": "d028a949e3dd6949ce9c586acc12c38cab97b262705089257bbd15d3589a74b7",
   "authority_rows": [
     {
       "action_due": "2026-07-09",
       "action_type": "meeting_prep",
       "artifact_missing_count": 0,
-      "authority_row_sha256": "7bab3addf886edc59d43f79d868b52c318709c7ecb8a26614b19ae096fa46902",
+      "authority_row_sha256": "9ae3b0c8de662759cdbbd5d69c863a5705590071dcdb60efb36119b8edf3faeb",
       "authority_stop_rule": "No lane may be sent, uploaded, certified, filed, priced, accepted, traded, or funded without the named human authority gate.",
       "can_accept_terms_without_human": false,
       "can_prepare_internal": true,
@@ -14,7 +14,7 @@
       "channel": "venture_engineering",
       "claim_boundary": "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
       "decision_question": "Can an in-kind engineering team accelerate proof portal, replay runner, manifest, and pilot onboarding?",
-      "first_artifact": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+      "first_artifact": "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
       "lane_id": "evtit_blackdog_inkind",
       "name": "EVTit / Black Dog in-kind engineering fund",
       "pre_action_checks": [
@@ -25,7 +25,7 @@
       "priority": 1,
       "readiness_mode": "MEETING_PREP_READY_FINAL_TERMS_BLOCKED",
       "required_authority": "Robert attends the meeting and approves any follow-up, build scope, or equity-for-services discussion.",
-      "status": "LIVE_MEETING_PREP",
+      "status": "RESET_NOTE_SENT_TECH_REVIEW_PENDING",
       "urgency": "IMMEDIATE_24H"
     },
     {
@@ -408,7 +408,7 @@
     }
   ],
   "authority_stop_rule": "No lane may be sent, uploaded, certified, filed, priced, accepted, traded, or funded without the named human authority gate.",
-  "generated_utc": "2026-07-09T04:07:45.407329+00:00",
+  "generated_utc": "2026-07-09T19:18:01.095154+00:00",
   "outputs": {
     "dashboard_json": "dashboard/data/submission_authority_matrix.json",
     "json": "out/ops/submission_authority_matrix_latest.json",

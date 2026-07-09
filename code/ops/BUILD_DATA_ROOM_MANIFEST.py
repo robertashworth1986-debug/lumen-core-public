@@ -28,6 +28,7 @@ CONTROL_NAMES = [
     "ip_counsel_diligence_packet",
     "autonomous_quant_governance_packet",
     "federal_submission_protocol_packet",
+    "traction_followup_packet",
 ]
 
 FRONT_DOOR_FILES = {
@@ -37,6 +38,7 @@ FRONT_DOOR_FILES = {
     "IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
     "AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
     "FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
+    "EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
     "SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
     "HUMAN_ACTION_DOCKET_2026-07-09.md",
     "REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
@@ -232,6 +234,7 @@ def build_payload() -> dict[str, Any]:
             "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
+            "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",

@@ -16,7 +16,7 @@ This index is a navigation and decision-support artifact. It does not authorize 
 - Unsafe claim hits: `0`
 - External send without human: `false`
 - Final submission without human: `false`
-- Concierge SHA-256: `90bcbbb467b79c93800552c2797749d78d80cfefa70547d92dfc2c057df41467`
+- Concierge SHA-256: `bb2723a0cb2a70c533736935865ff9ca562b81ea70e4d66cef32eff573bd2fa0`
 
 ## Reviewer Route
 
@@ -32,26 +32,30 @@ This index is a navigation and decision-support artifact. It does not authorize 
 - Lane ID: `evtit_blackdog_inkind`
 - Audience: engineering-for-equity reviewer
 - Channel: `venture_engineering`
-- Status: `LIVE_MEETING_PREP`
+- Status: `RESET_NOTE_SENT_TECH_REVIEW_PENDING`
 - Fit score: `92`
-- Gate: Discovery meeting booked from Gmail invite; public launch event July 22, 2026.
+- Gate: Discovery call window occurred July 9, 2026; reset note sent after the timing mix-up; public launch event July 22, 2026.
 - Best first read: Live proof stack, build scope, validation workflow, and productization gaps.
 - Decision question: Can an in-kind engineering team accelerate proof portal, replay runner, manifest, and pilot onboarding?
-- Reviewer action: Prepare a pre-call technical walkthrough, build-scope menu, and proof-card appendix.
-- Human gate: Human attends meeting and decides any equity-for-services terms.
+- Reviewer action: Prepare a concise follow-up packet, technical walkthrough, build-scope menu, and proof-card appendix.
+- Human gate: Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.
 - Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
-- Artifacts present: `4/4`
-- Card SHA-256: `b6428ffe6ac2d75d2c442bed0a841ff5824f54fbe002a56ffc0b068e3cd8d05f`
+- Artifacts present: `5/5`
+- Card SHA-256: `1f6b082ad19f1368cd6bbad25e6ff3e855e2c0b67ceec9c4b9a2b0d11ffe7840`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c`
+- `present` `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md` sha256=`2a3ac81ea687dcd5653c480850112dbcde2bbb2103345a34be7e6ae05094b9be`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
 - `present` `docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md` sha256=`a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957`
 - `present` `docs/PROOF_TO_PILOT_CONTROL_ROOM_2026-06-25.md` sha256=`2aaa3ade058e88eef43d9ec54a0d63271de034596abd8fdb8570c6aa9eee7de3`
 - `present` `docs/LIVE_DOMAIN_PROOF_FEED_DEPLOY_BUNDLE_2026-06-27.md` sha256=`b01d392e1e003b5e0c1d910bda52901cea0ad8e04c724cd3c88babf5f26ebfaf`
 
 Source refs:
 - `gmail:19f43c8a4ba9346e`
-- `gmail:19f44a7aa0a8a011`
+- `gmail:19f44a3d4a48d2c6`
+- `gmail:19f47e797960c0cd`
+- `gmail:19f4822c21a4a861`
+- `gmail:19f484a1fe4aea3b`
 - `public:evtit_event`
 - `public:black_dog`
 
@@ -69,10 +73,10 @@ Source refs:
 - Human gate: Human approves any diligence reply or investor terms.
 - Claim boundary: Submission and acknowledgement only; no funding decision is represented.
 - Artifacts present: `3/3`
-- Card SHA-256: `16319fdf5b3a2c1f0d564a30d2cc334f2b0b123fb79747b4c711b3ba5ebb2265`
+- Card SHA-256: `de14838a4bea5693a1a3c67d184e01f93174204d9c57a2dc7e44dbb5cdb7eb51`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
 - `present` `docs/PROOF_TO_REVENUE_ENGINE_2026-06-27.md` sha256=`7c3a46f3a679a6f1c345c1028b6877630d3c3c09f65295e1b1bbb091cd38b992`
 - `present` `docs/BUSINESS_PLAN_AND_LIVE_BREADTH_SEND_PACKET_2026-07-05.md` sha256=`150b3b3f519f545230f5640f154f4f1fcc0850eafa869169a22c77cea9539769`
 
@@ -94,10 +98,10 @@ Source refs:
 - Human gate: Human confirms BAA requirements, reps, budgets, and submission package before any portal action.
 - Claim boundary: Abstract receipt is not award selection and not permission to skip BAA instructions.
 - Artifacts present: `5/5`
-- Card SHA-256: `16f3dc6829c8ceeb98ccd24df5fdc36c5a9fd7220b9ecf5f8a3b12fccbd2282f`
+- Card SHA-256: `ee3dde99ff910a3ff8884e04a387d7b70ca2d42e58cef3521822e00881bd63d0`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
 - `present` `grant_submissions/DICE_HR001126S0010/DICE_SUBMISSION_READINESS.md` sha256=`783af4c8d658be2b90c1a2419fb7728455e91652b00dda740b5c39d9502359ad`
 - `present` `grant_submissions/DICE_HR001126S0010/DICE_HEILMEIER_REVIEWER_MATRIX_2026-06-20.md` sha256=`a42695523227bb7e2270187722a2ac2e2359dd3d0493eb4e0f014538927d0be8`
 - `present` `grant_submissions/DICE_HR001126S0010/DICE_EVIDENCE_SYNTHESIS_2026-06-20.md` sha256=`291047ec5573f3461b050cc870ff19bacfb2035a513f6ba166b4f649c836c300`
@@ -222,10 +226,10 @@ Source refs:
 - Human gate: Human approves any further agency contact.
 - Claim boundary: No instrument supply, OEM, reseller, or lab-services qualification claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `c19c4b82bd2b1eeca94e44c1a42bb5ba46bb4e5b6b3129a3641ebde1a526bad1`
+- Card SHA-256: `269931196afe69bc414091b77640f9ab8caf041a296474a2be70a48672b00102`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
 - `present` `grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md` sha256=`684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9`
 
 Source refs:
@@ -247,10 +251,10 @@ Source refs:
 - Human gate: Human approves partner outreach.
 - Claim boundary: No testing lab, contaminant monitoring, or regulated lab-services claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `5b24898483875e278e6a42a66b2530619ca6f1fdca468ee61881b3ff03d881e6`
+- Card SHA-256: `a0e37cf56de983f92e6d605188c5ec7ec33c03b1a9317b7d5d71a773b4aeb73a`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
 - `present` `grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md` sha256=`684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9`
 
 Source refs:
@@ -270,10 +274,10 @@ Source refs:
 - Human gate: Human approves topic selection and submission.
 - Claim boundary: No claim that LumenCore fits all BAA topics.
 - Artifacts present: `2/2`
-- Card SHA-256: `d4e4c0b56c90d8f98cf17b14e5b88755b310b5f12a72cb6907214383896b0d4f`
+- Card SHA-256: `ed3d80c95a24ff4d3519339d150295e5bbd1c08e249e926265619b098e2e27a8`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
 - `present` `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md` sha256=`f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046`
 
 Source refs:
@@ -294,10 +298,10 @@ Source refs:
 - Human gate: Human approves any partner route.
 - Claim boundary: No FedRAMP, ATO, HHS pilot, or government production-access claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `d59346d02effc0dfc2e572f176c60da12a77da61aa0419cd2a69892ed15e9c57`
+- Card SHA-256: `77c98d58b8ba8d70c6ee5f7eb9f9ab0c19426c9e90a606948a0ac7fd4d7c8dd3`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
 - `present` `grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md` sha256=`fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82`
 
 Source refs:
@@ -317,10 +321,10 @@ Source refs:
 - Human gate: Human approves any partner route.
 - Claim boundary: No public-safety deployment, law-enforcement feed integration, or FedRAMP authorization claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `b90f18a616b6abae65a1b76e0e556d71e4d58a6a9af5ada270b4a28a8d1d8c76`
+- Card SHA-256: `df1cba1b1830d6e6900dfd100bac516783ed6e2340a23f07f704b35a0defd5bc`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
 - `present` `grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md` sha256=`fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82`
 
 Source refs:
@@ -340,10 +344,10 @@ Source refs:
 - Human gate: Human approves any partner or investor intro.
 - Claim boundary: No consortium management, energy project financing, or installation-performance claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `6c88baf22a2b369b38950e6c1266fd753551a57fbfc11f60c5bb28388838cfed`
+- Card SHA-256: `6eb4319fac3b930b432a166ff721f47a4d4b68b7c4cd98c0bc1e9159ede0075a`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
 - `present` `docs/PROOF_TO_PILOT_CONTROL_ROOM_2026-06-25.md` sha256=`2aaa3ade058e88eef43d9ec54a0d63271de034596abd8fdb8570c6aa9eee7de3`
 
 Source refs:
@@ -363,10 +367,10 @@ Source refs:
 - Human gate: Human submits the vendor form and approves any billing or credit terms.
 - Claim boundary: No credit, free account, or vendor approval is represented.
 - Artifacts present: `2/2`
-- Card SHA-256: `cbf674e70ff9ecd03e671ed1866711a0318804b6332e16afac76dd2bc5267bac`
+- Card SHA-256: `15ac73d368c8b65b4f932d572fb17abaab73954cce99876c74cb6d4a34b45823`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`c760ac217fa2801f4db29d199141978a6354eb6031cae781919d72a19ae5da4c`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b`
 - `present` `docs/CURRENT_PROOF_POSTURE_AND_NEXT_TESTS_2026-07-03.md` sha256=`d96de76ff8b4f4a7df247ca9143ca62621765a2ed90f89558b88cde70a29a022`
 
 Source refs:
