@@ -1,6 +1,6 @@
 # Geometry Live Systems Frontier
 
-Generated UTC: `2026-07-09T20:03:43.233752+00:00`
+Generated UTC: `2026-07-09T20:48:04.809681+00:00`
 
 Geometry live-systems frontier only. It ranks local evidence and uploaded measured-data candidates for next benchmark wiring. It does not establish field validation, clinical validation, safety certification, live trading permission, fixed-dollar frozen-delta value, realized savings, or grant-award certainty.
 
@@ -8,8 +8,8 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 
 - Registered families ranked: `140` / `140`
 - Lanes: `12`
-- Local uploaded/live files inventoried: `3133`
-- Local estimated data rows: `3736112`
+- Local uploaded/live files inventoried: `3149`
+- Local estimated data rows: `3736114`
 - Provider snapshot files: `84`
 - Canonical measured sources: `25`
 - Canonical measured rows: `2580`
@@ -19,7 +19,7 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 - Real-dollar savings claim allowed: `false`
 - Live trading/autonomous execution allowed: `false`
 - Medical/addiction-treatment claim allowed: `false`
-- Frontier SHA-256: `140439d6dfcfad4b90e700d0f4ac30bd51ccd9f1ee18ec2b3caa4dc3dbf05687`
+- Frontier SHA-256: `bbc564b18bdfe8c190221f44e647a682896d9796254a9fd5138a1c88bf9cb1ac`
 
 ## Next 10 Actions
 
@@ -41,7 +41,7 @@ Geometry live-systems frontier only. It ranks local evidence and uploaded measur
 | System | Files | Estimated Rows | Candidate Lanes |
 | --- | --- | --- | --- |
 | `market_data` | `1334` | `2867414` | energy_price_pressure_proxy, market_signal_geometry, wave_resonance_timing |
-| `unclassified_measured_file` | `1382` | `736769` |  |
+| `unclassified_measured_file` | `1398` | `736771` |  |
 | `federal_opportunity` | `303` | `52969` | multi_agent_coordination, resource_aware_scheduling |
 | `macro_rates_labor` | `17` | `71817` | energy_price_pressure_proxy, market_signal_geometry, wave_resonance_timing |
 | `maritime_ais` | `103` | `7633` | branching_transport, field_guided_control, optimal_curve_transport |

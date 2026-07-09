@@ -1,6 +1,6 @@
 # Luma External Proof Vault Packet
 
-Generated UTC: `2026-07-01T15:29:00.450274+00:00`
+Generated UTC: `2026-07-09T20:45:31.979734+00:00`
 
 ## Purpose
 
@@ -10,8 +10,8 @@ Non-destructive staging manifest for high-value proof artifacts on external stor
 
 - Artifacts ready: `35/35`
 - Missing required: `0`
-- Ready bytes: `1663661`
-- Drive free bytes at staging time: `44557680640`
+- Ready bytes: `1664134`
+- Drive free bytes at staging time: `7474941952`
 - Packet ready: `true`
 
 ## Boundary
@@ -27,14 +27,14 @@ A proof vault is provenance and reproducibility infrastructure. It does not crea
 - `out/ops/luma_context_dashboard_parity_audit_latest.json` -> `artifacts/continuity/out/ops/luma_context_dashboard_parity_audit_latest.json` | sha256 `757fe628616e5d0a041e390abc18088b55ec672eb483b410d3571957098b7c20`
 - `docs/LIVE_PROOF_VALUE_METER_2026-06-22.md` -> `artifacts/proof_value/docs/LIVE_PROOF_VALUE_METER_2026-06-22.md` | sha256 `a1dea51a383e6f3c2577a3fa1443d80115963d6f43299021682aa50ace12ae34`
 - `out/ops/live_proof_value_meter_latest.json` -> `artifacts/proof_value/out/ops/live_proof_value_meter_latest.json` | sha256 `07c416189aba2ac78d2a341986bdcde7dd6f229c530785f6e418efce9e05c7c2`
-- `docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md` -> `artifacts/proof_value/docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md` | sha256 `5b656dc8d3ae7eb7fd8c2ac93cb4a116db322033bbea1286f6ff9ed92f8a9eb7`
-- `out/ops/champion_metric_gauntlet_latest.json` -> `artifacts/proof_value/out/ops/champion_metric_gauntlet_latest.json` | sha256 `797609dce08f70faa297755349b01b556913e34886989d16a0f7cb0dc5b93bad`
-- `dashboard/data/champion_metric_gauntlet.json` -> `artifacts/proof_value/dashboard/data/champion_metric_gauntlet.json` | sha256 `797609dce08f70faa297755349b01b556913e34886989d16a0f7cb0dc5b93bad`
+- `docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md` -> `artifacts/proof_value/docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md` | sha256 `738d09c2c880ece719dc284ba5407337d46bd597a2d9d98004b092e457503814`
+- `out/ops/champion_metric_gauntlet_latest.json` -> `artifacts/proof_value/out/ops/champion_metric_gauntlet_latest.json` | sha256 `34ed58d4967299b1348186177e47d029949b345324117a5e1f490c6857763d54`
+- `dashboard/data/champion_metric_gauntlet.json` -> `artifacts/proof_value/dashboard/data/champion_metric_gauntlet.json` | sha256 `34ed58d4967299b1348186177e47d029949b345324117a5e1f490c6857763d54`
 - `docs/DOLLAR_CLAIM_GATE_2026-06-21.md` -> `artifacts/proof_value/docs/DOLLAR_CLAIM_GATE_2026-06-21.md` | sha256 `4628f86d9f6b8cc0b5a8b99a6983d78cc0d6d1a31e08768963be26645fc2d231`
 - `out/ops/dollar_claim_gate_latest.json` -> `artifacts/proof_value/out/ops/dollar_claim_gate_latest.json` | sha256 `9e64ad63466e81cd1499014b97c35f2796ec728e76b72010cd549bb2aa5d741d`
 - `out/ops/live_breadth_value_panel_latest.json` -> `artifacts/live_breadth/out/ops/live_breadth_value_panel_latest.json` | sha256 `b5968b0698f256e34094e8eceb46d2c5ef22d663af058b312de2cd5b69aa2449`
 - `out/ops/live_breadth_value_panel_latest.csv` -> `artifacts/live_breadth/out/ops/live_breadth_value_panel_latest.csv` | sha256 `86312e7712c1f85c32e4e0a51304b9548149250679701bb505783c8953eefab1`
-- `config/geometry_championship_v1_registry.json` -> `artifacts/geometry/config/geometry_championship_v1_registry.json` | sha256 `a1417fc433a15a5612ca1adc82cc7f2f7219b0114fe4569ae0713e0ace739ec2`
+- `config/geometry_championship_v1_registry.json` -> `artifacts/geometry/config/geometry_championship_v1_registry.json` | sha256 `3f7f17c8a40151fd54b9bdcfff3bb5eef89a49051a27529944c8cdc0153c8728`
 - `docs/GEOMETRY_CHAMPIONSHIP_BRIDGE_2026-06-21.md` -> `artifacts/geometry/docs/GEOMETRY_CHAMPIONSHIP_BRIDGE_2026-06-21.md` | sha256 `e899be4665a9ae6657bcb2cf76ccdb681ca5dcb1309a56a4a2ddd3eaa9a581f2`
 - `out/ops/geometry_championship_bridge_latest.json` -> `artifacts/geometry/out/ops/geometry_championship_bridge_latest.json` | sha256 `267c80fa6f279f4de7f53f997184026557d54d921e295a01988062cc19bfa0cd`
 - `docs/GEOMETRY_PROOF_FRONTIER_BOARD_2026-06-22.md` -> `artifacts/geometry/docs/GEOMETRY_PROOF_FRONTIER_BOARD_2026-06-22.md` | sha256 `ed81f6203b5ae2464835bee811ba8f9e501c2f2c1ede88aa8723bd0b51c8c669`

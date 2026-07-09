@@ -1,6 +1,6 @@
 # Champion Sample Expansion And Economic Bridge
 
-Generated: 2026-07-01T15:28:55.185985+00:00
+Generated: 2026-07-09T20:45:22.837755+00:00
 
 ## Boundary
 
@@ -8,12 +8,12 @@ Champion sample-expansion and economic bridge. This artifact explains which live
 
 ## Current Replay Strength
 
-- Ready rows: `313`
-- Sources: `159`
-- Estimated rows replayed: `7152281`
-- Numeric samples read: `93596`
-- Locked baseline comparisons: `1224`
-- Candidate wins: `975`
+- Ready rows: `349`
+- Sources: `177`
+- Estimated rows replayed: `7154095`
+- Numeric samples read: `98056`
+- Locked baseline comparisons: `2303`
+- Candidate wins: `1540`
 - Wave resonance win rate: `1.0`
 - Live-domain reviewer ready: `true`
 - Field-validation claim allowed: `false`
@@ -21,7 +21,7 @@ Champion sample-expansion and economic bridge. This artifact explains which live
 
 ## What 600/600 Means
 
-The wave-resonance candidate beat every locked wave baseline comparison in the replay: 147 source-conditioned routes x 4 locked baselines = 588 comparisons. It is a repeatability signal, not a direct percent savings claim.
+The wave-resonance candidate beat every locked wave baseline comparison in the replay: 165 source-conditioned routes x 4 locked baselines = 660 comparisons. It is a repeatability signal, not a direct percent savings claim.
 
 It is meaningful because it survived locked, repeated replay comparisons. It is not a direct percent-savings claim.
 
@@ -29,15 +29,15 @@ It is meaningful because it survived locked, repeated replay comparisons. It is 
 
 | Lane | Status | Routes | Comparisons | Wins | Mean Delta | Best Delta | Gap |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| branching_transport | promising_but_underpowered | 11 | 33 | 13 | 0.016296 | 0.32329 | 29 routes / 87 comps |
-| energy_price_pressure_proxy | promising_but_underpowered | 144 | 567 | 338 | 0.052908 | 0.421141 | 6 routes / 33 comps |
+| branching_transport | promising_but_underpowered | 11 | 55 | 43 | 0.120934 | 0.331672 | 29 routes / 65 comps |
+| energy_price_pressure_proxy | mixed_or_not_promoted | 162 | 1552 | 801 | 0.057444 | 0.680913 | 0 routes / 0 comps |
 | field_guided_control | adapter_needed_before_claim | 0 | 0 | 0 | 0.0 | 0.0 | 30 routes / 120 comps |
 | market_signal_geometry | adapter_needed_before_claim | 0 | 0 | 0 | 0.0 | 0.0 | 100 routes / 400 comps |
 | mission_network_routing | adapter_needed_before_claim | 0 | 0 | 0 | 0.0 | 0.0 | 30 routes / 120 comps |
-| optimal_curve_transport | promising_but_underpowered | 3 | 12 | 12 | 0.16296 | 0.258127 | 27 routes / 108 comps |
-| thermal_ventilation | promising_but_underpowered | 8 | 24 | 24 | 0.118918 | 0.152459 | 32 routes / 136 comps |
+| optimal_curve_transport | promising_but_underpowered | 3 | 12 | 12 | 0.206883 | 0.259176 | 27 routes / 108 comps |
+| thermal_ventilation | promising_but_underpowered | 8 | 24 | 24 | 0.103805 | 0.150738 | 32 routes / 136 comps |
 | unclassified | adapter_needed_before_claim | 0 | 0 | 0 | 0.0 | 0.0 | 30 routes / 120 comps |
-| wave_resonance_timing | promising_but_underpowered | 147 | 588 | 588 | 0.18595 | 0.388056 | 3 routes / 12 comps |
+| wave_resonance_timing | strong_internal_replay_champion | 165 | 660 | 660 | 0.19377 | 0.388056 | 0 routes / 0 comps |
 
 ## Economic Bridge
 
@@ -57,8 +57,8 @@ Buyer-authorized annual value = addressable annual cost or value pool x accepted
 - 4. `field_guided_control` (adapter_needed_before_claim): Build a source-specific adapter and run locked baselines before promotion.
 - 5. `mission_network_routing` (adapter_needed_before_claim): Build a source-specific adapter and run locked baselines before promotion.
 - 6. `market_signal_geometry` (adapter_needed_before_claim): Build a source-specific adapter and run locked baselines before promotion.
-- 7. `energy_price_pressure_proxy` (promising_but_underpowered): Acquire or map more live sources and rerun the locked sweep until sample target is met.
-- 8. `wave_resonance_timing` (promising_but_underpowered): Acquire or map more live sources and rerun the locked sweep until sample target is met.
+- 7. `energy_price_pressure_proxy` (mixed_or_not_promoted): Treat as research lane; add ablations and only promote subsets that beat the best baseline.
+- 8. `wave_resonance_timing` (strong_internal_replay_champion): Keep as flagship; focus on buyer-authorized held-out data and uncertainty bands.
 - 99. `unclassified` (adapter_needed_before_claim): Build a source-specific adapter and run locked baselines before promotion.
 
 ## Field Validation Targets
