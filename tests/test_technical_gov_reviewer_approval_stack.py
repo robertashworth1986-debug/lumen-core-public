@@ -26,6 +26,8 @@ def test_stack_routes_to_real_technical_government_and_ip_reviewers():
     assert payload["summary"]["official_data_source_count"] >= 6
     assert payload["summary"]["venture_studio_deprioritized"] is True
     assert payload["summary"]["technical_reviewer_first"] is True
+    assert payload["summary"]["sam_submission_confirmed"] is True
+    assert payload["summary"]["sam_renewal_status"] == "submitted_confirmation_received_monitor_active_status"
     assert payload["summary"]["human_action_required"] is True
     assert payload["summary"]["external_send_allowed_without_human"] is False
     assert payload["summary"]["portal_submission_allowed_without_human"] is False
@@ -59,7 +61,7 @@ def test_sam_email_and_faa_routes_are_human_gated_and_public_safe():
 
     assert tracks["patent_counsel_and_pro_bono"]["status"] == "URGENT_REAL_IP_ROUTE"
     assert tracks["national_lab_or_technical_reviewer"]["status"] == "REAL_TECHNICAL_REVIEW_ROUTE"
-    assert tracks["agency_reviewer"]["status"] == "ACCOUNT_RENEWAL_AND_REVIEWER_ROUTE"
+    assert tracks["agency_reviewer"]["status"] == "POST_SAM_AGENCY_REVIEWER_ROUTE"
     assert sources["aviation_weather_center_api"]["integration_posture"] == "candidate_fast_adapter"
     assert sources["faa_swim"]["integration_posture"] == "access_required"
     assert "SAM Renewal Support" in rendered

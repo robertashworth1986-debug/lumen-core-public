@@ -1,6 +1,6 @@
 # Trading Stack Safety Audit
 
-Generated UTC: 2026-06-20T00:46:43.880523+00:00
+Generated UTC: 2026-07-09T21:59:43.411326+00:00
 
 Posture: BLOCK_LIVE
 
@@ -16,23 +16,22 @@ Posture: BLOCK_LIVE
 
 ## Evidence Readout
 
-- executor heartbeat age min: 13594.905
+- executor heartbeat age min: 42227.898
 - executor status/reason: running / scan_cycle_start
 - symbol intel stale: True
-- autofire heartbeat age min: 13594.605
+- autofire heartbeat age min: 42227.598
 - autofire eligible/approved buy: 0 / 0
 - growth mode: SAFE_DRY_RUN
 - growth guard reasons: ['executor_heartbeat_stale', 'engine_heartbeat_stale']
-- actionable/emitted/auto-fired: 0 / 0 / 0
+- actionable/emitted/auto-fired: 1 / 1 / 0
 - portfolio estimate USD: 101.527534
 - operator pending tickets: 12
 
 ## Live Promotion Blockers
 
-- executor heartbeat stale or missing: 13594.905
-- autofire heartbeat stale or missing: 13594.605
+- executor heartbeat stale or missing: 42227.898
+- autofire heartbeat stale or missing: 42227.598
 - growth controller heartbeat check is not ok
-- no actionable candidates in latest growth controller run
 
 ## Warnings
 

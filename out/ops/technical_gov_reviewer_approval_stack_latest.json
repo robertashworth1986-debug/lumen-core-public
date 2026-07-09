@@ -1,5 +1,5 @@
 {
-  "approval_stack_sha256": "6407b39a5ff2f8c663257ae83ad8956a00acfe3d625619fbc54d6366e413b267",
+  "approval_stack_sha256": "d686faa3b4e436fb47cc219c78d4604088bd23df5621baeeb7c18c2c5efd6867",
   "core_truth": {
     "blocked_claims": [
       "external field-validation approval",
@@ -13,8 +13,8 @@
     ],
     "metrics": {
       "blocked_context_annual_value_usd": 52288496940.0,
-      "data_room_control_artifacts": 38,
-      "data_room_markdown_artifacts": 38,
+      "data_room_control_artifacts": 42,
+      "data_room_markdown_artifacts": 40,
       "field_validation_claim_allowed": false,
       "kuramoto_estimated_rows_replayed": 2506267,
       "kuramoto_holdout_count": 24,
@@ -45,7 +45,7 @@
       "SAM.gov expiration notice confirms entity renewal is a real blocker before federal award eligibility."
     ]
   },
-  "generated_utc": "2026-07-09T20:59:59.662034+00:00",
+  "generated_utc": "2026-07-09T21:55:08.955537+00:00",
   "next_48_hours": [
     "Finish SAM renewal in the browser with human certification.",
     "Prepare Georgia PATENTS intake packet and Pro Se fallback checklist.",
@@ -140,16 +140,17 @@
     {
       "human_gate": "Human signs SAM terms, reps/certs, entity renewal, and portal submissions.",
       "name": "Agency reviewer / contracting technical evaluator",
-      "next_action": "Finish SAM renewal with human certifications, then use the agency radar to prioritize official reviewer-facing packages.",
+      "next_action": "Monitor SAM active-renewal status, then prioritize FHWA full proposal, DSIP MissionWeave, and NSF pitch/invitation gates under human authority.",
       "proof_to_show": [
+        "SAM submission and same-day opportunity push receipt.",
         "Federal submission protocol packet.",
         "Submission authority matrix.",
         "Immediate federal AI opportunity radar.",
         "Reviewer diligence QA matrix."
       ],
-      "status": "ACCOUNT_RENEWAL_AND_REVIEWER_ROUTE",
+      "status": "POST_SAM_AGENCY_REVIEWER_ROUTE",
       "track_id": "agency_reviewer",
-      "why_this_is_real": "SAM, DSIP, FHWA, DARPA DICE, and federal protocol packets already exist; SAM renewal is now the active account blocker."
+      "why_this_is_real": "SAM renewal submission is confirmed by portal state and email; federal opportunity review can continue while final active renewal status is monitored."
     },
     {
       "human_gate": "Human accepts any FAA account terms or access agreements.",
@@ -182,17 +183,17 @@
   ],
   "sam_renewal_support": {
     "codex_safe_support": [
-      "Navigate to Workspace > Entity Management > Entities.",
-      "Open Robert Ashworth / SQY2XW71ZM51 / 14TM8 if shown.",
-      "Prepare renewal checklist and flag changed fields.",
-      "Do not submit reps/certs or final renewal without human confirmation."
+      "Record SAM submission evidence without exposing OTPs, bank data, or private portal fields.",
+      "Monitor status and surface any follow-up notices.",
+      "Prepare next opportunity packages from official instructions.",
+      "Do not submit future reps/certs, pricing, or portal packages without human confirmation."
     ],
-    "current_browser_state": "SAM.gov redirected to the public home page and displayed a Terms of Use modal.",
-    "human_next_step": "Click Agree if you accept the SAM.gov terms, then complete login.gov/MFA.",
+    "current_browser_state": "SAM.gov displayed Entity Registration Submitted and a confirmation email was received.",
+    "human_next_step": "Monitor SAM active-renewal status and keep final portal actions human-approved.",
     "known_email_context": [
-      "SAM.gov sent a 60-day expiration notice for August 30, 2026.",
-      "A prior SAM.gov one-time code email exists but is expired and must not be reused.",
-      "SAM account key rotation reminder exists and should be handled separately from entity renewal."
+      "SAM.gov sent a confirmation email for the submitted entity registration.",
+      "SAM submission is evidence of renewal submission, not an award or source-selection event.",
+      "Any SAM account key rotation reminder should be handled separately from entity renewal."
     ]
   },
   "schema": "technical_gov_reviewer_approval_stack_v1",
@@ -205,7 +206,8 @@
     "official_data_source_count": 6,
     "portal_submission_allowed_without_human": false,
     "reviewer_track_count": 5,
-    "sam_renewal_blocker": "SAM.gov Terms of Use and login.gov/MFA require the human user in browser.",
+    "sam_renewal_status": "submitted_confirmation_received_monitor_active_status",
+    "sam_submission_confirmed": true,
     "technical_reviewer_first": true,
     "venture_studio_deprioritized": true
   }

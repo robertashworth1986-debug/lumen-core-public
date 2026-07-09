@@ -15,6 +15,9 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - `EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md`
 - `EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md`
 - `SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md`
+- `REVIEWER_APPROVAL_CROSSWALK_2026-07-09.md`
+- `docs/KRAKEN_PAPER_INNOVATION_CONTROL_ROOM_2026-07-09.md`
+- `docs/KRAKEN_INSTITUTIONAL_ALPHA_GAUNTLET_2026-07-09.md`
 - `LUMENCORE_AAC_RFI_RESPONSE_SAF-AQ-RFI-26-0001_2026-07-09.pdf`
 - `LUMENCORE_FHWA_TSMO_CAPABILITY_NOTE_693JJ326R000012_2026-07-09.pdf`
 
@@ -32,6 +35,15 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - `dashboard/data/traction_followup_packet.json`
 - `out/ops/sam_submission_and_today_opportunity_push_latest.json`
 - `dashboard/data/sam_submission_and_today_opportunity_push.json`
+- `out/ops/reviewer_approval_crosswalk_latest.json`
+- `dashboard/data/reviewer_approval_crosswalk.json`
+- `out/ops/kraken_paper_innovation_control_room_latest.json`
+- `dashboard/data/kraken_paper_innovation_control_room.json`
+- `out/ops/kraken_institutional_alpha_gauntlet_latest.json`
+- `dashboard/data/kraken_institutional_alpha_gauntlet.json`
+- `out/ops/kraken_multi_tf_alpha_map_latest.json`
+- `out/ops/kraken_multi_tf_alpha_map_latest.csv`
+- `out/ops/kraken_multi_tf_alpha_map_latest.md`
 
 ## Latest Verified Sync Result
 
@@ -48,6 +60,12 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - SAM/opportunity push status: `SAM_SUBMITTED_AAC_SENT_FHWA_INSTRUCTION_REQUEST_SENT`
 - Same-day opportunity files added: `3`
 - Same-day machine controls added: `2`
+- Reviewer approval crosswalk status: `REVIEWER_APPROVAL_CROSSWALK_READY_POST_SAM`
+- Latest data-room Markdown artifacts: `40`
+- Latest data-room machine controls: `42`
+- Kraken paper innovation status: `KRAKEN_PAPER_INNOVATION_READY_LIVE_BLOCKED`
+- Kraken institutional alpha gauntlet status: `INSTITUTIONAL_ALPHA_GAUNTLET_READY_LIVE_BLOCKED`
+- Kraken latest scan: `686` pairs discovered, `11` analyzed, `0` live actions authorized.
 
 ## Destination Set
 
@@ -68,6 +86,10 @@ E-drive repo mirror copy:
 This sync proves file custody and package availability. It does not prove agency approval, cybersecurity certification, patentability, patent ownership, freedom to operate, investor value, trading performance, field validation, realized savings, or final submission acceptance.
 
 The SAM/opportunity push addition proves custody for the SAM renewal confirmation receipt and two bounded sent-opportunity packets. It does not prove FHWA final proposal submission, DSIP MissionWeave submission, NSF SBIR/STTR invitation, source selection, contract award, or customer deployment acceptance.
+
+The reviewer approval crosswalk addition makes the post-SAM state the newest reviewer front door and routes approval questions to primary evidence, while preserving human gates for portal submissions, filings, terms, pricing, trading, and capital-impacting actions.
+
+The Kraken alpha additions are paper/replay-only proof artifacts. They harden signal scoring, execution quality, liquidity/capacity, stress survivability, replay readiness, and promotion blockers without reading secrets, placing orders, or making performance claims.
 
 ## Verification Rule
 

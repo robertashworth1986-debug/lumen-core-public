@@ -20,6 +20,9 @@ Contents:
 - Immediate federal AI opportunity radar: `IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_2026-07-09.md`.
 - Technical/government reviewer approval stack: `TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md`.
 - SAM submission and same-day opportunity push receipt: `SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md`.
+- Reviewer approval crosswalk: `REVIEWER_APPROVAL_CROSSWALK_2026-07-09.md`.
+- Kraken paper innovation control room: `docs/KRAKEN_PAPER_INNOVATION_CONTROL_ROOM_2026-07-09.md`.
+- Kraken institutional alpha gauntlet: `docs/KRAKEN_INSTITUTIONAL_ALPHA_GAUNTLET_2026-07-09.md`.
 - Air Force AAC RFI capability statement: `LUMENCORE_AAC_RFI_RESPONSE_SAF-AQ-RFI-26-0001_2026-07-09.pdf`.
 - FHWA TSMO capability note: `LUMENCORE_FHWA_TSMO_CAPABILITY_NOTE_693JJ326R000012_2026-07-09.pdf`.
 - `README_FOR_REVIEWERS.md`, copied from `PROOF_STACK_EDGE_INDEX_2026-07-09.md`.
@@ -41,6 +44,9 @@ Contents:
 - Immediate federal AI opportunity radar.
 - Technical/government reviewer approval stack.
 - SAM submission and same-day opportunity push receipt.
+- Reviewer approval crosswalk.
+- Kraken paper innovation control room.
+- Kraken institutional alpha gauntlet.
 - Air Force AAC RFI capability statement.
 - FHWA TSMO capability note.
 
@@ -58,6 +64,9 @@ Contents:
 - Immediate federal AI opportunity radar.
 - Technical/government reviewer approval stack.
 - SAM submission and same-day opportunity push receipt.
+- Reviewer approval crosswalk.
+- Kraken paper innovation control room.
+- Kraken institutional alpha gauntlet.
 - Air Force AAC RFI capability statement.
 - FHWA TSMO capability note.
 
@@ -70,5 +79,9 @@ The July 9 pitch deck send layer proves only that the deck existed, was sent as 
 The technical/government reviewer layer deprioritizes pay-to-pitch and venture-studio pressure while elevating real review paths: SAM renewal, USPTO pro bono/IP routing, LANL/VISION technical routing, federal AI opportunity triage, and official FAA live-data expansion candidates. It does not authorize legal certifications, portal submissions, agency approval claims, or live-trading actions.
 
 The SAM/opportunity push layer proves that the SAM renewal reached the submitted-confirmation state, that a SAM confirmation email was received, and that two same-day opportunity communications were sent through Gmail with bounded attachments: the Air Force Advanced Automation Contract RFI response and the FHWA TSMO capability/instruction request. It does not prove award acceptance, source selection, FHWA final-proposal compliance, DSIP completion, NSF invitation status, field validation, FedRAMP/ATO approval, or realized customer savings.
+
+The reviewer approval crosswalk is the post-SAM front-door navigation layer. It maps federal identity, product shape, technical evidence, IP/counsel posture, governance, traction, and custody questions to exact primary artifacts and remaining gates. It supersedes older pre-SAM-renewal wording only for the SAM-submission state; it does not prove final active renewal acceptance, award eligibility, agency acceptance, legal advice, or outside validation.
+
+The Kraken paper innovation and institutional alpha gauntlet layers prove paper/replay research posture, public-market alpha scanning, and strict live-promotion blockers. They do not authorize live trading, private API use, order placement, capital movement, investment advice, performance claims, hedge-fund suitability, or custody/compliance approval.
 
 The vault value increases when each packet is matched to an external validation gate: portal confirmation, sent-response receipt, reviewer reply, accepted baseline, accepted metric, or paid pilot authorization.

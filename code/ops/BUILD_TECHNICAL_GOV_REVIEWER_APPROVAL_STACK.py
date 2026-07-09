@@ -15,6 +15,7 @@ DASHBOARD_DATA = ROOT / "dashboard" / "data"
 CURRENT_PROOF = OUT_OPS / "current_luma_proof_state_latest.json"
 CHAMPION = OUT_OPS / "geometry_champion_of_champions_latest.json"
 MANIFEST = OUT_OPS / "data_room_manifest_latest.json"
+SAM_SUBMISSION = OUT_OPS / "sam_submission_and_today_opportunity_push_latest.json"
 
 OUT_JSON = OUT_OPS / "technical_gov_reviewer_approval_stack_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "technical_gov_reviewer_approval_stack.json"
@@ -157,7 +158,18 @@ def metric_snapshot(current: dict[str, Any], champion: dict[str, Any], manifest:
     }
 
 
-def reviewer_tracks(metrics: dict[str, Any]) -> list[dict[str, Any]]:
+def reviewer_tracks(metrics: dict[str, Any], sam_submitted: bool) -> list[dict[str, Any]]:
+    agency_status = "POST_SAM_AGENCY_REVIEWER_ROUTE" if sam_submitted else "ACCOUNT_RENEWAL_AND_REVIEWER_ROUTE"
+    agency_why = (
+        "SAM renewal submission is confirmed by portal state and email; federal opportunity review can continue while final active renewal status is monitored."
+        if sam_submitted
+        else "SAM, DSIP, FHWA, DARPA DICE, and federal protocol packets already exist; SAM renewal is now the active account blocker."
+    )
+    agency_next = (
+        "Monitor SAM active-renewal status, then prioritize FHWA full proposal, DSIP MissionWeave, and NSF pitch/invitation gates under human authority."
+        if sam_submitted
+        else "Finish SAM renewal with human certifications, then use the agency radar to prioritize official reviewer-facing packages."
+    )
     return [
         {
             "track_id": "national_lab_or_technical_reviewer",
@@ -190,16 +202,17 @@ def reviewer_tracks(metrics: dict[str, Any]) -> list[dict[str, Any]]:
         {
             "track_id": "agency_reviewer",
             "name": "Agency reviewer / contracting technical evaluator",
-            "why_this_is_real": "SAM, DSIP, FHWA, DARPA DICE, and federal protocol packets already exist; SAM renewal is now the active account blocker.",
+            "why_this_is_real": agency_why,
             "proof_to_show": [
+                "SAM submission and same-day opportunity push receipt.",
                 "Federal submission protocol packet.",
                 "Submission authority matrix.",
                 "Immediate federal AI opportunity radar.",
                 "Reviewer diligence QA matrix.",
             ],
-            "next_action": "Finish SAM renewal with human certifications, then use the agency radar to prioritize official reviewer-facing packages.",
+            "next_action": agency_next,
             "human_gate": "Human signs SAM terms, reps/certs, entity renewal, and portal submissions.",
-            "status": "ACCOUNT_RENEWAL_AND_REVIEWER_ROUTE",
+            "status": agency_status,
         },
         {
             "track_id": "aviation_faa_live_data",
@@ -236,8 +249,13 @@ def build_payload() -> dict[str, Any]:
     current = read_json(CURRENT_PROOF)
     champion = read_json(CHAMPION)
     manifest = read_json(MANIFEST)
+    sam_submission = read_json(SAM_SUBMISSION)
+    sam_summary = as_dict(sam_submission.get("summary"))
+    sam_submitted = bool(sam_summary.get("sam_registration_submitted")) and bool(
+        sam_summary.get("sam_confirmation_email_received")
+    )
     metrics = metric_snapshot(current, champion, manifest)
-    tracks = reviewer_tracks(metrics)
+    tracks = reviewer_tracks(metrics, sam_submitted=sam_submitted)
 
     payload = {
         "schema": "technical_gov_reviewer_approval_stack_v1",
@@ -246,7 +264,8 @@ def build_payload() -> dict[str, Any]:
         "summary": {
             "reviewer_track_count": len(tracks),
             "official_data_source_count": len(OFFICIAL_DATA_SOURCES),
-            "sam_renewal_blocker": "SAM.gov Terms of Use and login.gov/MFA require the human user in browser.",
+            "sam_submission_confirmed": sam_submitted,
+            "sam_renewal_status": "submitted_confirmation_received_monitor_active_status" if sam_submitted else "human_portal_renewal_required",
             "venture_studio_deprioritized": True,
             "technical_reviewer_first": True,
             "human_action_required": True,
@@ -280,18 +299,26 @@ def build_payload() -> dict[str, Any]:
         "reviewer_tracks": tracks,
         "official_live_data_targets": OFFICIAL_DATA_SOURCES,
         "sam_renewal_support": {
-            "current_browser_state": "SAM.gov redirected to the public home page and displayed a Terms of Use modal.",
-            "human_next_step": "Click Agree if you accept the SAM.gov terms, then complete login.gov/MFA.",
+            "current_browser_state": (
+                "SAM.gov displayed Entity Registration Submitted and a confirmation email was received."
+                if sam_submitted
+                else "SAM.gov redirected to the public home page and displayed a Terms of Use modal."
+            ),
+            "human_next_step": (
+                "Monitor SAM active-renewal status and keep final portal actions human-approved."
+                if sam_submitted
+                else "Click Agree if you accept the SAM.gov terms, then complete login.gov/MFA."
+            ),
             "codex_safe_support": [
-                "Navigate to Workspace > Entity Management > Entities.",
-                "Open Robert Ashworth / SQY2XW71ZM51 / 14TM8 if shown.",
-                "Prepare renewal checklist and flag changed fields.",
-                "Do not submit reps/certs or final renewal without human confirmation.",
+                "Record SAM submission evidence without exposing OTPs, bank data, or private portal fields.",
+                "Monitor status and surface any follow-up notices.",
+                "Prepare next opportunity packages from official instructions.",
+                "Do not submit future reps/certs, pricing, or portal packages without human confirmation.",
             ],
             "known_email_context": [
-                "SAM.gov sent a 60-day expiration notice for August 30, 2026.",
-                "A prior SAM.gov one-time code email exists but is expired and must not be reused.",
-                "SAM account key rotation reminder exists and should be handled separately from entity renewal.",
+                "SAM.gov sent a confirmation email for the submitted entity registration.",
+                "SAM submission is evidence of renewal submission, not an award or source-selection event.",
+                "Any SAM account key rotation reminder should be handled separately from entity renewal.",
             ],
         },
         "email_signal_triage": {
@@ -340,6 +367,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Official live-data targets: `{summary['official_data_source_count']}`",
         f"- Venture studio deprioritized: `{str(summary['venture_studio_deprioritized']).lower()}`",
         f"- Technical reviewer first: `{str(summary['technical_reviewer_first']).lower()}`",
+        f"- SAM submission confirmed: `{str(summary['sam_submission_confirmed']).lower()}`",
+        f"- SAM renewal status: `{summary['sam_renewal_status']}`",
         f"- External send without human: `{str(summary['external_send_allowed_without_human']).lower()}`",
         f"- Portal submission without human: `{str(summary['portal_submission_allowed_without_human']).lower()}`",
         f"- Live trading allowed: `{str(summary['live_trading_allowed']).lower()}`",

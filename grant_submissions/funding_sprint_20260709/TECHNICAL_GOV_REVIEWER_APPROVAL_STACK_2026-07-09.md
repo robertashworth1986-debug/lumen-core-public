@@ -11,10 +11,12 @@ This artifact is a reviewer-readiness and action-control packet. It does not aut
 - Official live-data targets: `6`
 - Venture studio deprioritized: `true`
 - Technical reviewer first: `true`
+- SAM submission confirmed: `true`
+- SAM renewal status: `submitted_confirmation_received_monitor_active_status`
 - External send without human: `false`
 - Portal submission without human: `false`
 - Live trading allowed: `false`
-- Approval stack SHA-256: `6407b39a5ff2f8c663257ae83ad8956a00acfe3d625619fbc54d6366e413b267`
+- Approval stack SHA-256: `d686faa3b4e436fb47cc219c78d4604088bd23df5621baeeb7c18c2c5efd6867`
 
 ## Core Truth
 
@@ -27,8 +29,8 @@ LumenCore's strongest current story is not a sales pitch. It is a measured proof
 - Kuramoto holdouts: `24`
 - Kuramoto wins vs Kalman: `24`
 - Kuramoto estimated replay rows: `2506267`
-- Data-room markdown artifacts: `38`
-- Data-room control artifacts: `38`
+- Data-room markdown artifacts: `40`
+- Data-room control artifacts: `42`
 - Field validation claim allowed: `false`
 - Real-dollar savings claim allowed: `false`
 
@@ -72,14 +74,15 @@ Blocked claims:
 
 ### Agency reviewer / contracting technical evaluator
 
-- Status: `ACCOUNT_RENEWAL_AND_REVIEWER_ROUTE`
-- Why this is real: SAM, DSIP, FHWA, DARPA DICE, and federal protocol packets already exist; SAM renewal is now the active account blocker.
+- Status: `POST_SAM_AGENCY_REVIEWER_ROUTE`
+- Why this is real: SAM renewal submission is confirmed by portal state and email; federal opportunity review can continue while final active renewal status is monitored.
 - Proof to show:
+  - SAM submission and same-day opportunity push receipt.
   - Federal submission protocol packet.
   - Submission authority matrix.
   - Immediate federal AI opportunity radar.
   - Reviewer diligence QA matrix.
-- Next action: Finish SAM renewal with human certifications, then use the agency radar to prioritize official reviewer-facing packages.
+- Next action: Monitor SAM active-renewal status, then prioritize FHWA full proposal, DSIP MissionWeave, and NSF pitch/invitation gates under human authority.
 - Human gate: Human signs SAM terms, reps/certs, entity renewal, and portal submissions.
 
 ### FAA / aviation live-data expansion
@@ -158,17 +161,17 @@ Blocked claims:
 
 ## SAM Renewal Support
 
-- Current browser state: SAM.gov redirected to the public home page and displayed a Terms of Use modal.
-- Human next step: Click Agree if you accept the SAM.gov terms, then complete login.gov/MFA.
+- Current browser state: SAM.gov displayed Entity Registration Submitted and a confirmation email was received.
+- Human next step: Monitor SAM active-renewal status and keep final portal actions human-approved.
 - Codex safe support:
-  - Navigate to Workspace > Entity Management > Entities.
-  - Open Robert Ashworth / SQY2XW71ZM51 / 14TM8 if shown.
-  - Prepare renewal checklist and flag changed fields.
-  - Do not submit reps/certs or final renewal without human confirmation.
+  - Record SAM submission evidence without exposing OTPs, bank data, or private portal fields.
+  - Monitor status and surface any follow-up notices.
+  - Prepare next opportunity packages from official instructions.
+  - Do not submit future reps/certs, pricing, or portal packages without human confirmation.
 - Known email context:
-  - SAM.gov sent a 60-day expiration notice for August 30, 2026.
-  - A prior SAM.gov one-time code email exists but is expired and must not be reused.
-  - SAM account key rotation reminder exists and should be handled separately from entity renewal.
+  - SAM.gov sent a confirmation email for the submitted entity registration.
+  - SAM submission is evidence of renewal submission, not an award or source-selection event.
+  - Any SAM account key rotation reminder should be handled separately from entity renewal.
 
 ## Email Signal Triage
 
