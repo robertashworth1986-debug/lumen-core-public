@@ -4,27 +4,35 @@
 
 | Priority | Lane | Next action |
 |---|---|---|
-| 1 | EVTit / Black Dog | Book Terry Anderton call and use EVTit call agenda |
-| 2 | LvlUp Labs | Attend info session and track follow-up |
-| 3 | Patent | Secure qualified patent review before July 2026 deadline window |
-| 4 | DICE | Build full submission packet around abstract ID HR001126S0010-DICE-PA-052 |
-| 5 | OpenAI API | Submit continuity request and preserve API access |
-| 6 | EPRI / ORNL / DOE | Track validation-routing replies |
-| 7 | Sweetspot | Review only strong active federal opportunities |
-| 8 | LinkedIn | Track roles and recruiter replies that match AI infrastructure |
+| 1 | Public claim cleanup | Keep README, PRs, and proof docs aligned with founder-owned proof-to-pilot language |
+| 2 | EVTit / Black Dog | Use founder-protected call agenda; ask for review/routing/scoped support, not ownership transfer |
+| 3 | Current proof status | Freeze and promote the newer 29-enabled / 25-measured live-source manifest before using it as headline proof |
+| 4 | LumaJet | Promote synthetic baseline evidence only as simulation/synthetic proof; no aircraft or autonomous-control claim |
+| 5 | LumaSuit / LumaSkin | Promote non-actuating smart-skin/digital-twin Phase I evidence; no powered armor, medical, flight, or certified-safety claim |
+| 6 | DICE | Build full submission packet around abstract ID HR001126S0010-DICE-PA-052 with bounded simulation/replay language |
+| 7 | Patent | Secure qualified patent review before July 2026 deadline window; keep architecture/IP spine founder-controlled |
+| 8 | API continuity | Preserve OpenAI/API and LumaScout billing continuity for demos |
+| 9 | EPRI / ORNL / DOE | Track validation-routing replies and ask only for scoped replay-validation review |
+| 10 | LvlUp / investors | Keep stage language pre-revenue/pilot-stage unless funding or revenue is externally confirmed |
 
 ## One-line pitch
 
-LumenCore is a proof-to-pilot AI infrastructure validation platform that helps buyers test proposed methods against accepted baselines through controlled replay, locked metrics, evidence manifests, and buyer-readable proof reports.
+LumenCore is a founder-owned proof-to-pilot AI infrastructure validation architecture that helps buyers test proposed methods against accepted baselines through controlled replay, locked metrics, evidence manifests, and buyer-readable proof reports.
 
 ## Material order
 
-1. One-page build scope
-2. Live breadth addendum
-3. Business plan
-4. Technical packet
-5. Dashboard/code references
+1. README front door
+2. Current proof status
+3. Founder/IP boundary
+4. Claim boundary register
+5. EVTit build scope
+6. Live breadth addendum
+7. Business plan
+8. Technical packet
+9. Dashboard/code references
 
 ## Core discipline
 
-Keep every lead tied to a next action, deadline, owner, and review link.
+Keep every lead tied to a next action, deadline, owner, review link, evidence type, and claim boundary.
+
+No audited revenue, certified aircraft/suit capability, weapons capability, autonomous physical control, field validation, guaranteed ROI, or agency endorsement unless externally supported in writing.
