@@ -1,0 +1,289 @@
+{
+  "company_page_url": "https://www.linkedin.com/company/1337",
+  "evidence_status": [
+    {
+      "bytes": 18719,
+      "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
+      "present": true,
+      "sha256": "cd467e7b2119cbd5e77b19158d1efd6116dba66ea8cd2c8b5c3d2b435a3deeb1"
+    },
+    {
+      "bytes": 13119,
+      "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
+      "present": true,
+      "sha256": "ca7426b9764be2fcb4448abd07d823a260a42b906ad79bdfddd97c25cc41b677"
+    },
+    {
+      "bytes": 18765,
+      "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
+      "present": true,
+      "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
+    },
+    {
+      "bytes": 13939,
+      "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
+      "present": true,
+      "sha256": "7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672"
+    },
+    {
+      "bytes": 11607,
+      "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
+      "present": true,
+      "sha256": "62574d49e95169d05589e95027bdadd7220d11b3c8ff929b08fb4225fad4513e"
+    },
+    {
+      "bytes": 6279,
+      "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
+      "present": true,
+      "sha256": "ae96b2e13137be82dd2e29661033930f09b29ed247e75b0fa708cf76f7a48ee7"
+    }
+  ],
+  "generated_utc": "2026-07-09T13:26:52.779631+00:00",
+  "human_gate": {
+    "company_page_change_allowed_without_human": false,
+    "message_allowed_without_human": false,
+    "post_allowed_without_human": false,
+    "profile_edit_allowed_without_human": false,
+    "rule": "Human approval is required before any public LinkedIn action."
+  },
+  "launchpack": {
+    "company_page_url": "https://www.linkedin.com/company/1337",
+    "logo_present": true,
+    "profile_url": "https://www.linkedin.com/in/robert-ashworth-40a9b7376",
+    "readiness_score_pct": 100,
+    "status": "submission_ready",
+    "status_reason": "ready"
+  },
+  "linkedin_universe_profile_packet_sha256": "d44724b7cee6dbb223ea7af050b237df0a94c0d400a0c81c97ab1b37e8ff3ca5",
+  "outputs": {
+    "dashboard_json": "dashboard/data/linkedin_universe_profile_packet.json",
+    "json": "out/ops/linkedin_universe_profile_packet_latest.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md"
+  },
+  "profile_copy": {
+    "about_full": "I build LumenCore, a proof-to-pilot platform for turning infrastructure, energy, environmental, market, and operational data into source-provenance records, baseline-vs-candidate replay plans, and reviewer-ready proof packets. The July 2026 proof room is organized around live-source measurement, replay evidence, claim-boundary gates, authority matrices, human action dockets, and E-drive custody mirrors. Current data-room posture: 26 public-safe Markdown artifacts and 16 machine-readable control receipts. The active universe includes EVTit/Black Dog meeting prep, LvlUp First Check review watch, DARPA DICE full-proposal sprint, FHWA TSMO, NASA data-center RFI, DSIP MissionWeave, NSF Project Pitch, and patent-counsel review. Boundary: this profile does not claim award, agency approval, production deployment, external field validation, trading performance, legal IP conclusions, or external operational savings results. The next milestone is buyer or agency authorized replay with held-out data, incumbent baseline, acceptance metric, replay window, and approved economic conversion. I am looking for utility, lab, agency, investor, and engineering partners who want disciplined measurement before they trust AI/control methods in infrastructure settings.",
+    "about_short": "I build LumenCore, a proof-to-pilot platform for source provenance, baseline-vs-candidate replay, hash-backed proof rooms, and human-gated agency and investor packets.",
+    "experience": {
+      "bullets": [
+        "Built a reviewer-ready proof stack with decision briefs, Q&A matrices, authority gates, human dockets, and data-room manifests.",
+        "Organized active SBIR, RFI, BAA, investor, and partner lanes into public-safe packages with final-action gates.",
+        "Developed source-provenance and baseline-vs-candidate replay workflows for infrastructure, energy, environmental, market, and operational data.",
+        "Maintained explicit public-claim boundaries across agency, investor, IP, and autonomous systems materials.",
+        "Mirrored reviewer packets and machine-readable receipts into E-drive proof vault targets for custody continuity."
+      ],
+      "company": "LumenCore / LumaTrader",
+      "date_range": "2014 - Present",
+      "location": "Nashville, Tennessee, United States",
+      "title": "Founder, Chief Scientist & Principal Systems Engineer"
+    },
+    "featured_links": [
+      {
+        "label": "Proof-to-Pilot Control Room",
+        "placement": 1,
+        "reason": "Lead with the clearest public proof-to-pilot experience.",
+        "url": "https://lumen-core.ai/proof_to_pilot.html"
+      },
+      {
+        "label": "Mission Control",
+        "placement": 2,
+        "reason": "Show the operating surface behind the proof universe.",
+        "url": "https://lumen-core.ai/mission_control.html"
+      },
+      {
+        "label": "Evidence Index",
+        "placement": 3,
+        "reason": "Give technical reviewers a route into public evidence artifacts.",
+        "url": "https://lumen-core.ai/evidence/"
+      }
+    ],
+    "headline_variants": [
+      "Founder, LumenCore | Proof-to-Pilot AI Infrastructure Validation | Source Provenance, Replay Evidence & Human-Gated Packets",
+      "Founder, LumenCore | Infrastructure AI Validation | Replay Evidence & Public-Safe Proof Feeds",
+      "Proof-to-Pilot Systems Builder | LumenCore | Agency, Investor & Utility Validation Packets",
+      "Founder & Chief Scientist | LumenCore / LumaTrader | Evidence-Gated AI Infrastructure"
+    ],
+    "manual_update_sequence": [
+      "Open the LinkedIn profile and review the current headline/About before editing.",
+      "Paste the recommended headline or a selected variant.",
+      "Paste About (Full), preserving the boundary paragraph.",
+      "Add or reorder featured links in the listed order.",
+      "Refresh the LumenCore / LumaTrader experience entry from the bullet pack.",
+      "Publish at most one post after human review of the exact text."
+    ],
+    "post_templates": [
+      {
+        "text": "LumenCore July proof-room update: the platform now has a reviewer path that starts with a decision brief, moves through a diligence Q&A matrix, and lands in a data-room manifest with 26 public-safe artifacts and 16 machine-readable control receipts. The purpose is simple: make AI/control claims easier to inspect before a pilot, contract, or investment decision. This is not an award or deployment claim. It is a proof-to-pilot validation layer built for disciplined external review.",
+        "title": "Proof room upgrade"
+      },
+      {
+        "text": "I am looking for one serious utility, lab, agency, infrastructure, or engineering partner that wants a measured replay path: approved held-out data, incumbent baseline, acceptance metric, replay window, and a clear report on what improved, what failed, and what still cannot be claimed.",
+        "title": "Partner ask"
+      },
+      {
+        "text": "LumenCore is organizing active SBIR, RFI, BAA, investor, and partner lanes around one rule: prepare fast, but keep final sends, submissions, filings, terms, and public claims under human review. The evidence stack should make decisions faster without making claims bigger than the proof.",
+        "title": "Funding sprint posture"
+      }
+    ],
+    "profile_url": "https://www.linkedin.com/in/robert-ashworth-40a9b7376",
+    "public_action_gate": "Human approval is required before any LinkedIn profile edit, post, comment, follow, message, or company-page change.",
+    "recommended_headline": "Founder, LumenCore | Proof-to-Pilot AI Infrastructure Validation | Source Provenance, Replay Evidence & Human-Gated Packets",
+    "skills": [
+      "Proof-to-pilot validation",
+      "Infrastructure AI",
+      "Source provenance",
+      "Replay evaluation",
+      "Baseline benchmarking",
+      "Evidence packaging",
+      "SBIR/STTR readiness",
+      "Federal opportunity triage",
+      "Reviewer diligence",
+      "Human-gated automation",
+      "Python",
+      "FastAPI",
+      "PowerShell",
+      "Data-room operations",
+      "Claim-boundary governance"
+    ]
+  },
+  "profile_url": "https://www.linkedin.com/in/robert-ashworth-40a9b7376",
+  "proof_stack_alignment": {
+    "top_decision_cards": [
+      {
+        "audience": "engineering partner",
+        "claim_boundary": "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
+        "first_artifact": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "human_gate": "Robert attends the meeting and approves any follow-up, build scope, or equity-for-services discussion.",
+        "lane_id": "evtit_blackdog_inkind",
+        "name": "EVTit / Black Dog in-kind engineering fund",
+        "priority": 1,
+        "readiness_mode": "MEETING_PREP_READY_FINAL_TERMS_BLOCKED"
+      },
+      {
+        "audience": "early investor",
+        "claim_boundary": "Submission and acknowledgement only; no funding decision is represented.",
+        "first_artifact": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "human_gate": "Robert approves any investor reply, diligence material, investor terms, or capital commitment.",
+        "lane_id": "lvlup_first_check",
+        "name": "LvlUp Ventures First Check Fund",
+        "priority": 2,
+        "readiness_mode": "INVESTOR_WATCH_READY_RESPONSE_BLOCKED"
+      },
+      {
+        "audience": "technical program reviewer",
+        "claim_boundary": "Abstract receipt is not award selection and not permission to skip BAA instructions.",
+        "first_artifact": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "human_gate": "Robert verifies the controlling BAA instructions, submission account authority, budget, representations, and final package.",
+        "lane_id": "darpa_dice_full_submission",
+        "name": "DARPA DICE full proposal sprint",
+        "priority": 3,
+        "readiness_mode": "FEDERAL_DRAFT_READY_SUBMISSION_BLOCKED"
+      },
+      {
+        "audience": "contracting or capability reviewer",
+        "claim_boundary": "Prepared capability material only; no FHWA field result, safety benefit, or deployment claim.",
+        "first_artifact": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
+        "human_gate": "Robert verifies SAM access, solicitation attachments, pricing, reps/certs, and authorized representative status before submission.",
+        "lane_id": "fhwa_tsmo_data_initiative",
+        "name": "FHWA TSMO Data Initiative",
+        "priority": 4,
+        "readiness_mode": "FEDERAL_DRAFT_READY_SUBMISSION_BLOCKED"
+      },
+      {
+        "audience": "market research reviewer",
+        "claim_boundary": "RFI response only; no NASA partnership, contract, or infrastructure result is represented.",
+        "first_artifact": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md",
+        "human_gate": "Robert verifies official RFI instructions, contact address, page limits, and final send approval.",
+        "lane_id": "nasa_data_center_rfi",
+        "name": "NASA Data Center Infrastructure RFI",
+        "priority": 5,
+        "readiness_mode": "RFI_DRAFT_READY_SEND_BLOCKED"
+      },
+      {
+        "audience": "SBIR reviewer",
+        "claim_boundary": "No DLA integration, procurement, or certified readiness claim.",
+        "first_artifact": "grant_submissions/funding_sprint_20260709/DSIP_MISSIONWEAVE_FAST_SUBMISSION_PLAN_2026-07-09.md",
+        "human_gate": "Robert controls DSIP or SBIR portal login, Firm PIN, cost approval, certifications, and final submit.",
+        "lane_id": "dla_missionweave_sbir",
+        "name": "DLA MissionWeave DSIP SBIR",
+        "priority": 6,
+        "readiness_mode": "SBIR_DRAFT_READY_PORTAL_BLOCKED"
+      },
+      {
+        "audience": "SBIR reviewer",
+        "claim_boundary": "No NSF invitation or full-proposal eligibility is represented unless NSF issues it.",
+        "first_artifact": "grant_submissions/funding_sprint_20260709/NSF_PROJECT_PITCH_DRAFT_2026-07-09.md",
+        "human_gate": "Robert verifies account status, platform-specific rules, one-pending-pitch limits, and final content before submit.",
+        "lane_id": "nsf_project_pitch",
+        "name": "NSF SBIR/STTR Project Pitch",
+        "priority": 7,
+        "readiness_mode": "ROLLING_GATE_READY_RULE_CHECK_REQUIRED"
+      }
+    ],
+    "urgent_docket_items": [
+      {
+        "action_due": "2026-07-09",
+        "docket_action": "Prepare call packet and proof walkthrough.",
+        "human_gate": "Human attends meeting and decides any equity-for-services terms.",
+        "name": "EVTit / Black Dog in-kind engineering fund",
+        "priority": 1,
+        "status": "LIVE_MEETING_PREP"
+      },
+      {
+        "action_due": "2026-07-16",
+        "docket_action": "Hold investor brief and walkthrough ready; follow up only if reviewer asks or the under-one-week window passes.",
+        "human_gate": "Human approves any diligence reply or investor terms.",
+        "name": "LvlUp Ventures First Check Fund",
+        "priority": 2,
+        "status": "WAITING_REVIEW"
+      },
+      {
+        "action_due": "2026-07-12",
+        "docket_action": "Build full-proposal compliance matrix and confirm controlling BAA instructions.",
+        "human_gate": "Human confirms BAA requirements, reps, budgets, and submission package before any portal action.",
+        "name": "DARPA DICE full proposal sprint",
+        "priority": 3,
+        "status": "FULL_PROPOSAL_SPRINT"
+      },
+      {
+        "action_due": "2026-08-03",
+        "docket_action": "Convert the current outline into a human-review package with compliance checklist, pricing stop, and source attachment check.",
+        "human_gate": "Human verifies SAM attachments, terms, pricing, reps/certs, and final submission authority.",
+        "name": "FHWA TSMO Data Initiative",
+        "priority": 4,
+        "status": "PHASE_I_TECH_VOLUME"
+      },
+      {
+        "action_due": "2026-07-17",
+        "docket_action": "Prepare a bounded response draft and verify official response instructions before send.",
+        "human_gate": "Human verifies official response instructions, page limits, contacts, and final send.",
+        "name": "NASA Data Center Infrastructure RFI",
+        "priority": 5,
+        "status": "RFI_RESPONSE_PREP"
+      }
+    ]
+  },
+  "public_copy_scan": {
+    "sensitive_count": 0,
+    "sensitive_hits": [],
+    "unsafe_public_count": 0,
+    "unsafe_public_hits": []
+  },
+  "schema": "linkedin_universe_profile_packet_v1",
+  "status": "LINKEDIN_UNIVERSE_PROFILE_READY_HUMAN_POST_REQUIRED",
+  "summary": {
+    "about_character_count": 1263,
+    "all_final_actions_blocked_without_human": true,
+    "control_artifact_count": 16,
+    "decision_lane_count": 15,
+    "featured_link_count": 3,
+    "headline_character_count": 123,
+    "linkedin_public_action_requires_human": true,
+    "manifested_markdown_count": 26,
+    "post_template_count": 3,
+    "public_copy_sensitive_count": 0,
+    "public_copy_unsafe_count": 0,
+    "qa_count": 12,
+    "reviewer_gate_clear": true,
+    "skill_count": 15
+  }
+}

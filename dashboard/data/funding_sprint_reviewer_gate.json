@@ -26,8 +26,8 @@
       "patented"
     ]
   },
-  "gate_sha256": "b3cf2990a73296585f1459fac0fe475954a9313247af4c48516d10dd95a1d4f1",
-  "generated_utc": "2026-07-09T04:17:19.716183+00:00",
+  "gate_sha256": "d79e7a43a9ef30d8f3f1c53450621ae1144e13851698342b758bd58f7189e80f",
+  "generated_utc": "2026-07-09T13:26:53.664566+00:00",
   "manifest": [
     {
       "bytes": 8929,
@@ -65,11 +65,11 @@
       "sha256": "c982dde7c868f4f9ac52829518edf2a3fe0bd87742e168cbbe3dfd409736a080"
     },
     {
-      "bytes": 10024,
+      "bytes": 11607,
       "classification": "public_safe_markdown_review_required",
       "name": "DATA_ROOM_MANIFEST_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
-      "sha256": "d3a5b0aaf45843cd66311e968a5a83d5af1dbb9225f83be098640a2021dd924c"
+      "sha256": "5f1bd8ab1877f7dc3a758f05e6d783373573c1683a7f447c1b3618777731323c"
     },
     {
       "bytes": 5275,
@@ -119,6 +119,13 @@
       "name": "IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md",
       "sha256": "274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb"
+    },
+    {
+      "bytes": 9037,
+      "classification": "public_safe_markdown_review_required",
+      "name": "LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
+      "sha256": "95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762"
     },
     {
       "bytes": 5614,
@@ -175,6 +182,13 @@
       "name": "REVIEWER_DECISION_BRIEF_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
       "sha256": "cd467e7b2119cbd5e77b19158d1efd6116dba66ea8cd2c8b5c3d2b435a3deeb1"
+    },
+    {
+      "bytes": 13119,
+      "classification": "public_safe_markdown_review_required",
+      "name": "REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
+      "sha256": "ca7426b9764be2fcb4448abd07d823a260a42b906ad79bdfddd97c25cc41b677"
     },
     {
       "bytes": 6675,
@@ -285,7 +299,7 @@
   ],
   "reviewer_gate_clear": true,
   "scan": {
-    "boundary_hit_count": 39,
+    "boundary_hit_count": 40,
     "boundary_hits": [
       {
         "classification": "boundary_language",
@@ -555,6 +569,13 @@
       },
       {
         "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
+        "line": 122,
+        "phrase": "risk-free",
+        "text": "- Claim boundary: No live-profit, risk-free, autonomous-trading-ready, or capital-control claim."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/SBIR_PHASE1_TRIAGE_2026-07-09.md",
         "line": 120,
         "phrase": "airworthiness",
@@ -572,10 +593,10 @@
   "summary": {
     "all_cards_present": true,
     "autonomous_external_action_allowed": false,
-    "boundary_hit_count": 39,
+    "boundary_hit_count": 40,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 24,
+    "markdown_file_count": 26,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0
