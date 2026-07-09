@@ -22,8 +22,8 @@ def test_data_room_manifest_indexes_markdown_controls_and_mirrors():
 
     assert payload["schema"] == "data_room_manifest_v1"
     assert payload["status"] == "DATA_ROOM_MANIFEST_READY"
-    assert payload["summary"]["manifested_markdown_count"] >= 27
-    assert payload["summary"]["control_artifact_count"] == 18
+    assert payload["summary"]["manifested_markdown_count"] >= 28
+    assert payload["summary"]["control_artifact_count"] == 20
     assert payload["summary"]["missing_control_artifact_count"] == 0
     assert payload["summary"]["reviewer_gate_clear"] is True
     assert payload["summary"]["unsafe_secret_count"] == 0
@@ -49,6 +49,7 @@ def test_manifest_artifacts_have_hashes_and_front_door_order():
         "REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
         "LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
         "IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+        "AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
         "SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
         "HUMAN_ACTION_DOCKET_2026-07-09.md",
         "REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",

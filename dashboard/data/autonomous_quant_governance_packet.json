@@ -1,0 +1,270 @@
+{
+  "allowed_modes": [
+    {
+      "allowed": "Approved public, synthetic, or local datasets may be used for baseline-vs-candidate comparison.",
+      "gate": "No external system action, no order placement, and no capital movement.",
+      "mode": "replay_lab"
+    },
+    {
+      "allowed": "Paper simulation may produce research receipts, negative-result records, and benchmark dashboards.",
+      "gate": "Paper output cannot be represented as external validation or deployable capital performance.",
+      "mode": "paper_evaluation"
+    },
+    {
+      "allowed": "Official opportunities may be watched, ranked, and drafted into human-review packets.",
+      "gate": "Human approval remains required before send, upload, filing, certification, pricing, or term action.",
+      "mode": "opportunity_monitor"
+    },
+    {
+      "allowed": "Artifacts may be hashed, mirrored, classified, and scanned into the reviewer data room.",
+      "gate": "Public claims remain bounded by reviewer gate and authority matrix.",
+      "mode": "proof_factory"
+    }
+  ],
+  "autonomous_quant_governance_packet_sha256": "10827112918b87598de4c2c331a1e1f744994e42f4fc931bd3ea2a9df59f33da",
+  "evidence_status": [
+    {
+      "bytes": 5263,
+      "path": "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_INNOVATION_SAFETY_PROTOCOL_2026-07-09.md",
+      "present": true,
+      "sha256": "050f64e5c86a866a3fd125e00911e4f3caeb387625f7c4386c355727ab3ac30a"
+    },
+    {
+      "bytes": 18765,
+      "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
+      "present": true,
+      "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
+    },
+    {
+      "bytes": 13939,
+      "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
+      "present": true,
+      "sha256": "7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672"
+    },
+    {
+      "bytes": 6279,
+      "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
+      "present": true,
+      "sha256": "ef70be49e4a5356a82bbd223dbcfdb565b6a6dd68d488847e2712cb8d6e52754"
+    },
+    {
+      "bytes": 14975,
+      "path": "config/runtime_control.json",
+      "present": true,
+      "sha256": "ad8cb516d3145d43e39300f35ae03304efc58070bd643a2bf8ee5b177909c448"
+    },
+    {
+      "bytes": 211,
+      "path": "out/execution_status.json",
+      "present": true,
+      "sha256": "4c206c4c8120a23c496b6f0aa1a46cd8df723b947e490ff1bfa88ed9c9c0a64a"
+    },
+    {
+      "bytes": 20076,
+      "path": "code/autonomous_agent_manifest.py",
+      "present": true,
+      "sha256": "4594995d9c16d8cee32acc8ef1056c0611ed93662a2e79a04fc8724f50c46112"
+    },
+    {
+      "bytes": 489,
+      "path": "config/accounts/KRAKEN_PRIMARY/runtime_control.json",
+      "present": true,
+      "sha256": "341775322d161c6f7fe96dce4ecfe264c6694d60a1df1c19c1f54b32fedf0e39"
+    },
+    {
+      "bytes": 488,
+      "path": "config/accounts/ALPACA_PRIMARY/runtime_control.json",
+      "present": true,
+      "sha256": "06381e2a555aa912c1d8c66f986a7a2ade78107cbfcba57cd8333d164ec7d708"
+    },
+    {
+      "bytes": 5,
+      "path": "control/LIVE.flag",
+      "present": true,
+      "sha256": "3c1e6ffb9a2aa25c21bc68f118f83d2e8507a26578b5923d6430cc46a68b0217"
+    },
+    {
+      "bytes": 23,
+      "path": "config/live_arm.confirm",
+      "present": true,
+      "sha256": "a7f1a08f45fbf14175b8f456c8ee62a306b211717c8fb2756c5452417bd5ab04"
+    },
+    {
+      "bytes": 24,
+      "path": "config/multi_live_arm.confirm",
+      "present": true,
+      "sha256": "d97e05feffecfe9d5059954f0da44897b4155fdcc26986bcbd99b44673bb5a39"
+    }
+  ],
+  "generated_utc": "2026-07-09T19:00:20.807784+00:00",
+  "human_gate": {
+    "agency_action_allowed_without_human": false,
+    "capital_movement_allowed_without_human": false,
+    "order_placement_allowed_without_human": false,
+    "public_performance_claim_allowed_without_human": false,
+    "rule": "Autonomous quant work may build replay and paper-evaluation evidence only; human approval is required before runtime escalation, external action, or any capital-impacting step.",
+    "runtime_escalation_allowed_without_human": false
+  },
+  "outputs": {
+    "dashboard_json": "dashboard/data/autonomous_quant_governance_packet.json",
+    "json": "out/ops/autonomous_quant_governance_packet_latest.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md"
+  },
+  "runtime_snapshot": {
+    "account_runtimes": [
+      {
+        "account_execution_mode": "crypto_exec",
+        "account_id": "KRAKEN_PRIMARY",
+        "account_provider": "KRAKEN",
+        "allow_live_orders": false,
+        "inherits_global_live_gate": true,
+        "kill_switch": false,
+        "loop_seconds": 1.0,
+        "mode": "paper",
+        "paper_enabled": true,
+        "path": "config/accounts/KRAKEN_PRIMARY/runtime_control.json",
+        "symbol": "UNIVERSE",
+        "universe_executable_count": 10,
+        "universe_shadow_count": 10,
+        "x1000_auto_apply": false,
+        "x1000_auto_enabled": false,
+        "x1000_interval_loops": 60,
+        "x1000_passes": 2
+      },
+      {
+        "account_execution_mode": "equity_exec",
+        "account_id": "ALPACA_PRIMARY",
+        "account_provider": "ALPACA",
+        "allow_live_orders": false,
+        "inherits_global_live_gate": true,
+        "kill_switch": false,
+        "loop_seconds": 0.5,
+        "mode": "paper",
+        "paper_enabled": true,
+        "path": "config/accounts/ALPACA_PRIMARY/runtime_control.json",
+        "symbol": "UNIVERSE",
+        "universe_executable_count": 10,
+        "universe_shadow_count": 10,
+        "x1000_auto_apply": false,
+        "x1000_auto_enabled": true,
+        "x1000_interval_loops": 20,
+        "x1000_passes": 2
+      }
+    ],
+    "agent_registry": [
+      {
+        "approval_endpoint": "/api/agents/approve",
+        "auto_fire": false,
+        "channel": "email",
+        "id": "email_dispatch",
+        "name": "Resume Email Dispatcher",
+        "queue_source": "opportunities/email/email_opportunities_latest.json",
+        "requires_approval": true
+      },
+      {
+        "approval_endpoint": "/api/agents/approve",
+        "auto_fire": false,
+        "channel": "grants_gov",
+        "id": "grant_submission",
+        "name": "Grant Submission Agent",
+        "queue_source": "funding/funding_approval_queue.json",
+        "requires_approval": true
+      },
+      {
+        "approval_endpoint": "/api/agents/approve",
+        "auto_fire": false,
+        "channel": "linkedin_usajobs",
+        "id": "job_application",
+        "name": "Job Application Factory",
+        "queue_source": "jobs/_queue/index.json",
+        "requires_approval": true
+      },
+      {
+        "approval_endpoint": "/api/agents/approve",
+        "auto_fire": false,
+        "channel": "linkedin",
+        "id": "linkedin_post",
+        "name": "LinkedIn Profile Publisher",
+        "queue_source": "opportunities/linkedin/lumalinkedin_v1_latest.json",
+        "requires_approval": true
+      },
+      {
+        "approval_endpoint": "/api/master/approval/decide",
+        "auto_fire": false,
+        "channel": "kraken",
+        "id": "trade_ticket",
+        "name": "Live Trade Executor",
+        "queue_source": "execution_approval_queue.json",
+        "requires_approval": true
+      }
+    ],
+    "execution_status": {
+      "execution_mode": "paper",
+      "kill_switch": false,
+      "live_arm": "OFF",
+      "note": "Paper + universe truth sync only. No live autonomous orders.",
+      "path": "out/execution_status.json"
+    },
+    "global_runtime": {
+      "allow_live_orders": false,
+      "force_live_mode": false,
+      "kill_switch": false,
+      "live_operator_queue_enabled": false,
+      "mode": "paper",
+      "paper_enabled": true,
+      "path": "config/runtime_control.json",
+      "strict_live_only": false,
+      "x1000_auto_apply": false,
+      "x1000_auto_enabled": false
+    },
+    "runtime_markers": [
+      {
+        "path": "control/LIVE.flag",
+        "present": true,
+        "requires_reconciliation": false,
+        "sha256": "3c1e6ffb9a2aa25c21bc68f118f83d2e8507a26578b5923d6430cc46a68b0217",
+        "value": "OFF"
+      },
+      {
+        "path": "config/live_arm.confirm",
+        "present": true,
+        "requires_reconciliation": true,
+        "sha256": "a7f1a08f45fbf14175b8f456c8ee62a306b211717c8fb2756c5452417bd5ab04",
+        "value": "ARM_LIVE_SUPER_SNIPER"
+      },
+      {
+        "path": "config/multi_live_arm.confirm",
+        "present": true,
+        "requires_reconciliation": true,
+        "sha256": "d97e05feffecfe9d5059954f0da44897b4155fdcc26986bcbd99b44673bb5a39",
+        "value": "ARM_MULTI_ACCOUNT_LIVE"
+      }
+    ]
+  },
+  "schema": "autonomous_quant_governance_packet_v1",
+  "status": "AUTONOMOUS_QUANT_GOVERNANCE_READY_HUMAN_RUNTIME_REQUIRED",
+  "summary": {
+    "account_live_orders_disabled": true,
+    "account_runtime_count": 2,
+    "agency_action_allowed_without_human": false,
+    "agent_count": 5,
+    "all_agents_require_approval": true,
+    "all_final_actions_blocked_without_human": true,
+    "allowed_mode_count": 4,
+    "auto_fire_enabled_count": 0,
+    "capital_movement_allowed": false,
+    "data_room_markdown_count": 27,
+    "evidence_artifact_count": 12,
+    "execution_status_paper": true,
+    "external_system_action_allowed_without_human": false,
+    "global_live_orders_disabled": true,
+    "global_runtime_paper": true,
+    "missing_evidence_count": 0,
+    "order_placement_allowed": false,
+    "reviewer_gate_clear": true,
+    "runtime_marker_count": 3,
+    "runtime_marker_reconciliation_count": 2,
+    "unsafe_claim_count": 0,
+    "unsafe_sensitive_count": 0
+  }
+}

@@ -26,8 +26,8 @@
       "patented"
     ]
   },
-  "gate_sha256": "0c80070ffe8d2affff6631aa1f8e877228e0d8a2f154846d52be104a7df3cb88",
-  "generated_utc": "2026-07-09T18:55:45.720405+00:00",
+  "gate_sha256": "4dcaaef300a82bcba93b2c5a7d26aa340509bee48a282c259a87571f806b913c",
+  "generated_utc": "2026-07-09T19:00:22.911687+00:00",
   "manifest": [
     {
       "bytes": 8929,
@@ -42,6 +42,13 @@
       "name": "AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
       "sha256": "8d44ce2a3e555ec99a6c6d82a904933b1f09196fa6f8b516b6c05b4cab935aab"
+    },
+    {
+      "bytes": 6300,
+      "classification": "public_safe_markdown_review_required",
+      "name": "AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
+      "sha256": "f04cfca6d7b388c97303e354aaf9229ba3d46d57f54c6f56110d4ade89dd82b3"
     },
     {
       "bytes": 5263,
@@ -65,11 +72,11 @@
       "sha256": "c982dde7c868f4f9ac52829518edf2a3fe0bd87742e168cbbe3dfd409736a080"
     },
     {
-      "bytes": 12387,
+      "bytes": 13224,
       "classification": "public_safe_markdown_review_required",
       "name": "DATA_ROOM_MANIFEST_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
-      "sha256": "252b321fc4e5d9246a4a6ecc8924f3738d0b24b6117edd4b42f572c61f1fd599"
+      "sha256": "b9eaf3944021f2eab7f798bb45a91cc56f78cee7f53ad62d5080542bbe1b5b4f"
     },
     {
       "bytes": 5275,
@@ -617,7 +624,7 @@
     "boundary_hit_count": 42,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 27,
+    "markdown_file_count": 28,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0

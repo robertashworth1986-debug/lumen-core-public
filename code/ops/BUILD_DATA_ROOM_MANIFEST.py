@@ -26,6 +26,7 @@ CONTROL_NAMES = [
     "reviewer_diligence_qa_matrix",
     "linkedin_universe_profile_packet",
     "ip_counsel_diligence_packet",
+    "autonomous_quant_governance_packet",
 ]
 
 FRONT_DOOR_FILES = {
@@ -33,6 +34,7 @@ FRONT_DOOR_FILES = {
     "REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
     "LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
     "IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+    "AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
     "SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
     "HUMAN_ACTION_DOCKET_2026-07-09.md",
     "REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
@@ -226,6 +228,7 @@ def build_payload() -> dict[str, Any]:
             "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+            "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
