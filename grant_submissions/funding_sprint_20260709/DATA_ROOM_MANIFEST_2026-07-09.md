@@ -7,7 +7,7 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 ## Status
 
 - Status: `DATA_ROOM_MANIFEST_READY`
-- Manifested Markdown artifacts: `35`
+- Manifested Markdown artifacts: `36`
 - Control artifacts: `34`
 - Missing control artifacts: `0`
 - Reviewer gate clear: `true`
@@ -22,8 +22,8 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Manifest seed SHA-256: `8909190e64f2a4848f114749b9072b2596e5ad88ba44200e998391631934ad10`
-- Data-room manifest SHA-256: `86a874807114bc6a02b73f30f04f84d0d77c0a78311ed83ef6fff7579eb0074a`
+- Manifest seed SHA-256: `4055432ea3fc1c268e2b67f14c15bf84b1b01ae637c7904ac00dc52f4514f998`
+- Data-room manifest SHA-256: `d6ba6f7f4dede24ae5e8a7c12cb7ea1036c0630c5957105ad535b7f556a65f74`
 
 ## Front Door Order
 
@@ -50,7 +50,7 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 - `claim_protocol_boundary`: `7`
 - `front_door_control`: `17`
 - `lane_package`: `8`
-- `supporting_markdown`: `1`
+- `supporting_markdown`: `2`
 - `sync_receipt`: `2`
 
 ## Control Statuses
@@ -85,13 +85,13 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 - `front_door_control` `grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md` sha256=`b1034846561675a25ff85134813c6e4bc0d71a5a48bad92f78610273c4499d28` bytes=`11451`
 - `lane_package` `grant_submissions/funding_sprint_20260709/DSIP_MISSIONWEAVE_FAST_SUBMISSION_PLAN_2026-07-09.md` sha256=`cf0d3fd466ecfd8396d17f1c4787a7fa2898f49ee5f81ed377df05aa161029c4` bytes=`5275`
 - `sync_receipt` `grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md` sha256=`0078ab4e615c967caedb39a1ea059df3660824b24b87c64c9a0877fde074817d` bytes=`2602`
-- `sync_receipt` `grant_submissions/funding_sprint_20260709/E_DRIVE_SYNC_RECEIPT_2026-07-09.md` sha256=`fa69d372437e8190edb46477660ce9ddc76725a65ae7a16266f1076222d5fd60` bytes=`1263`
+- `sync_receipt` `grant_submissions/funding_sprint_20260709/E_DRIVE_SYNC_RECEIPT_2026-07-09.md` sha256=`db8ef6413acaa602fd2f9570ed71edbd4e4e1eb9bbe2fc08cd0281b22990b6a9` bytes=`1825`
 - `front_door_control` `grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md` sha256=`fa8fd779a9cce41f8169d77611417249ada18263e420da0271c44bd3d0bf6df8` bytes=`8261`
 - `front_door_control` `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md` sha256=`2a3ac81ea687dcd5653c480850112dbcde2bbb2103345a34be7e6ae05094b9be` bytes=`8278`
 - `front_door_control` `grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md` sha256=`2f3859baa8f84ef704ab0934c431a2b97d6210cc617303e35a9b626a861a06e7` bytes=`10709`
 - `lane_package` `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md` sha256=`f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046` bytes=`6109`
 - `claim_protocol_boundary` `grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md` sha256=`684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9` bytes=`8338`
-- `front_door_control` `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` sha256=`ec1aa49db6db97421c0be250e0ec328dbe3f64c338b6580d089c58b59c4119c5` bytes=`6279`
+- `front_door_control` `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` sha256=`dbdf7ee19bc1f1efc4185b8aa89bd815caa2dfe14950a2f3537a075966f8d6f0` bytes=`6279`
 - `front_door_control` `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` sha256=`b1af6ea2924704771b432efb419b0523a41d1f0c7f085ed60de62fc4b5991052` bytes=`14015`
 - `front_door_control` `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`0e5cf6b23334fed68895f117a61a47238e0ea27ba9bed7103739fc19f9ba8d59` bytes=`9907`
 - `claim_protocol_boundary` `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md` sha256=`274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb` bytes=`7643`
@@ -102,6 +102,7 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 - `lane_package` `grant_submissions/funding_sprint_20260709/NUCLEAR_LICENSING_EVIDENCE_PARTNER_ONE_PAGER_2026-07-09.md` sha256=`5d95bca13c79ed450a91e9330729106969e6c9b28fd6557e9c80d52f509c5b41` bytes=`5307`
 - `lane_package` `grant_submissions/funding_sprint_20260709/NUCLEAR_OPPORTUNITY_TIMING_2026-07-09.md` sha256=`2401173be2d099a982f8f59c33f2b6bce664a8320fb0928ba90a30fa12a78afa` bytes=`5064`
 - `lane_package` `grant_submissions/funding_sprint_20260709/NUCLEAR_PARTNER_OUTREACH_DRAFTS_2026-07-09.md` sha256=`48aee2b847dccfa3f748743fcf3778c0810d7b92f462368008c26496a7ab5439` bytes=`4255`
+- `supporting_markdown` `grant_submissions/funding_sprint_20260709/PITCH_DECK_SEND_RECEIPT_2026-07-09.md` sha256=`ae6f04ec0837e51833e36164b8671812db1a3547cb1c64790ca20d2435a0bef8` bytes=`2407`
 - `claim_protocol_boundary` `grant_submissions/funding_sprint_20260709/PROOF_STACK_EDGE_INDEX_2026-07-09.md` sha256=`3a814a6751a89939d540381a20acd7eaa0ccec1b970d045191dc64d7a5b49596` bytes=`6754`
 - `front_door_control` `grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md` sha256=`f351b54b0880b199fcd520dbb003ff35dfbe916ab45e8f4f529b97b9d97b6ddb` bytes=`23612`
 - `front_door_control` `grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md` sha256=`767720b50d1012b95e6716377b315b74181236ede4412d616171b87b1e73cd48` bytes=`18715`
@@ -113,8 +114,8 @@ This manifest is a navigation and custody artifact. It does not authorize extern
 
 ## Machine Control Artifacts
 
-- `present` `out/ops/funding_sprint_reviewer_gate_latest.json` control=`funding_sprint_reviewer_gate` role=`machine_control_json` sha256=`7a05f9cf68d35a21fe37dd781961b67632e5fe512cecfdf2d6b04ed6da06997d`
-- `present` `dashboard/data/funding_sprint_reviewer_gate.json` control=`funding_sprint_reviewer_gate` role=`dashboard_control_json` sha256=`7a05f9cf68d35a21fe37dd781961b67632e5fe512cecfdf2d6b04ed6da06997d`
+- `present` `out/ops/funding_sprint_reviewer_gate_latest.json` control=`funding_sprint_reviewer_gate` role=`machine_control_json` sha256=`f84f16aa6df0a22f2b6ab51fad9b639d34bff50cdf1c8c3ab2dd79958892ee6e`
+- `present` `dashboard/data/funding_sprint_reviewer_gate.json` control=`funding_sprint_reviewer_gate` role=`dashboard_control_json` sha256=`f84f16aa6df0a22f2b6ab51fad9b639d34bff50cdf1c8c3ab2dd79958892ee6e`
 - `present` `out/ops/traction_opportunity_intake_ledger_latest.json` control=`traction_opportunity_intake_ledger` role=`machine_control_json` sha256=`6d8b07f3454aa843f0095e51f578d110355c5f0a0b7899e7d70a8c85724e6278`
 - `present` `dashboard/data/traction_opportunity_intake_ledger.json` control=`traction_opportunity_intake_ledger` role=`dashboard_control_json` sha256=`6d8b07f3454aa843f0095e51f578d110355c5f0a0b7899e7d70a8c85724e6278`
 - `present` `out/ops/reviewer_concierge_packet_latest.json` control=`reviewer_concierge_packet` role=`machine_control_json` sha256=`820ae46ed38630d5b748adb83770d92717cefacf3ebcf6bc3b78ca745969579e`

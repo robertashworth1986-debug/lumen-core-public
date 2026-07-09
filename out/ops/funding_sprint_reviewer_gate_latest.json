@@ -26,8 +26,8 @@
       "patented"
     ]
   },
-  "gate_sha256": "5843d690a1624f29a15368b1f984a72eaf596b040ca205b8aa94d42b1566527a",
-  "generated_utc": "2026-07-09T20:24:19.399995+00:00",
+  "gate_sha256": "a10aa6c44edc98305b6b033db02b4341c6f3622dcec7f70df6980bf66003db1c",
+  "generated_utc": "2026-07-09T20:43:32.779084+00:00",
   "manifest": [
     {
       "bytes": 12244,
@@ -86,11 +86,11 @@
       "sha256": "b1034846561675a25ff85134813c6e4bc0d71a5a48bad92f78610273c4499d28"
     },
     {
-      "bytes": 19009,
+      "bytes": 19203,
       "classification": "public_safe_markdown_review_required",
       "name": "DATA_ROOM_MANIFEST_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
-      "sha256": "07d7e86cb5205503c0b9a32df7965dec95791afaeef12d44d15aad3aa5847b85"
+      "sha256": "a166108f85e02c98fc6c6e8523edc34c10209098c23b691b132109f0f6b3b98a"
     },
     {
       "bytes": 5275,
@@ -107,11 +107,11 @@
       "sha256": "0078ab4e615c967caedb39a1ea059df3660824b24b87c64c9a0877fde074817d"
     },
     {
-      "bytes": 1263,
+      "bytes": 1825,
       "classification": "public_safe_markdown_review_required",
       "name": "E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
-      "sha256": "fa69d372437e8190edb46477660ce9ddc76725a65ae7a16266f1076222d5fd60"
+      "sha256": "db8ef6413acaa602fd2f9570ed71edbd4e4e1eb9bbe2fc08cd0281b22990b6a9"
     },
     {
       "bytes": 8261,
@@ -217,6 +217,13 @@
       "name": "NUCLEAR_PARTNER_OUTREACH_DRAFTS_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/NUCLEAR_PARTNER_OUTREACH_DRAFTS_2026-07-09.md",
       "sha256": "48aee2b847dccfa3f748743fcf3778c0810d7b92f462368008c26496a7ab5439"
+    },
+    {
+      "bytes": 2407,
+      "classification": "public_safe_markdown_review_required",
+      "name": "PITCH_DECK_SEND_RECEIPT_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/PITCH_DECK_SEND_RECEIPT_2026-07-09.md",
+      "sha256": "ae6f04ec0837e51833e36164b8671812db1a3547cb1c64790ca20d2435a0bef8"
     },
     {
       "bytes": 6754,
@@ -521,7 +528,7 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
-        "line": 45,
+        "line": 51,
         "phrase": "realized savings",
         "text": "This sync proves file custody and package availability on the E drive. It does not prove award eligibility, field validation, realized savings, valuation, or final submission acceptance."
       },
@@ -694,7 +701,7 @@
     "boundary_hit_count": 45,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 35,
+    "markdown_file_count": 36,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0

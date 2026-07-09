@@ -1,24 +1,24 @@
 {
   "control_artifacts": [
     {
-      "bytes": 37344,
+      "bytes": 37684,
       "classification": "machine_readable_proof_receipt",
       "control_name": "funding_sprint_reviewer_gate",
       "name": "funding_sprint_reviewer_gate_latest.json",
       "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "7a05f9cf68d35a21fe37dd781961b67632e5fe512cecfdf2d6b04ed6da06997d"
+      "sha256": "f84f16aa6df0a22f2b6ab51fad9b639d34bff50cdf1c8c3ab2dd79958892ee6e"
     },
     {
-      "bytes": 37344,
+      "bytes": 37684,
       "classification": "machine_readable_proof_receipt",
       "control_name": "funding_sprint_reviewer_gate",
       "name": "funding_sprint_reviewer_gate.json",
       "path": "dashboard/data/funding_sprint_reviewer_gate.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "7a05f9cf68d35a21fe37dd781961b67632e5fe512cecfdf2d6b04ed6da06997d"
+      "sha256": "f84f16aa6df0a22f2b6ab51fad9b639d34bff50cdf1c8c3ab2dd79958892ee6e"
     },
     {
       "bytes": 23378,
@@ -360,7 +360,7 @@
     "traction_opportunity_intake_ledger": "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED",
     "venture_studio_terms_guardrail_packet": "VENTURE_STUDIO_TERMS_GUARDRAIL_READY_COUNSEL_REVIEW_REQUIRED"
   },
-  "data_room_manifest_sha256": "86a874807114bc6a02b73f30f04f84d0d77c0a78311ed83ef6fff7579eb0074a",
+  "data_room_manifest_sha256": "d6ba6f7f4dede24ae5e8a7c12cb7ea1036c0630c5957105ad535b7f556a65f74",
   "e_drive_targets": [
     "E:\\LumaProofVault\\LUMA_FUNDING_SPRINT_20260709_20260709T030617Z",
     "E:\\LumenCoreSync\\funding_sprint_20260709",
@@ -385,8 +385,8 @@
     "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md"
   ],
-  "generated_utc": "2026-07-09T20:24:20.667556+00:00",
-  "manifest_seed_sha256": "8909190e64f2a4848f114749b9072b2596e5ad88ba44200e998391631934ad10",
+  "generated_utc": "2026-07-09T20:43:38.826154+00:00",
+  "manifest_seed_sha256": "4055432ea3fc1c268e2b67f14c15bf84b1b01ae637c7904ac00dc52f4514f998",
   "markdown_artifacts": [
     {
       "bytes": 12244,
@@ -469,12 +469,12 @@
       "sha256": "0078ab4e615c967caedb39a1ea059df3660824b24b87c64c9a0877fde074817d"
     },
     {
-      "bytes": 1263,
+      "bytes": 1825,
       "category": "sync_receipt",
       "classification": "public_safe_markdown_review_required",
       "name": "E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
-      "sha256": "fa69d372437e8190edb46477660ce9ddc76725a65ae7a16266f1076222d5fd60"
+      "sha256": "db8ef6413acaa602fd2f9570ed71edbd4e4e1eb9bbe2fc08cd0281b22990b6a9"
     },
     {
       "bytes": 8261,
@@ -522,7 +522,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
-      "sha256": "ec1aa49db6db97421c0be250e0ec328dbe3f64c338b6580d089c58b59c4119c5"
+      "sha256": "dbdf7ee19bc1f1efc4185b8aa89bd815caa2dfe14950a2f3537a075966f8d6f0"
     },
     {
       "bytes": 14015,
@@ -603,6 +603,14 @@
       "name": "NUCLEAR_PARTNER_OUTREACH_DRAFTS_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/NUCLEAR_PARTNER_OUTREACH_DRAFTS_2026-07-09.md",
       "sha256": "48aee2b847dccfa3f748743fcf3778c0810d7b92f462368008c26496a7ab5439"
+    },
+    {
+      "bytes": 2407,
+      "category": "supporting_markdown",
+      "classification": "public_safe_markdown_review_required",
+      "name": "PITCH_DECK_SEND_RECEIPT_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/PITCH_DECK_SEND_RECEIPT_2026-07-09.md",
+      "sha256": "ae6f04ec0837e51833e36164b8671812db1a3547cb1c64790ca20d2435a0bef8"
     },
     {
       "bytes": 6754,
@@ -690,7 +698,7 @@
       "claim_protocol_boundary": 7,
       "front_door_control": 17,
       "lane_package": 8,
-      "supporting_markdown": 1,
+      "supporting_markdown": 2,
       "sync_receipt": 2
     },
     "control_artifact_count": 34,
@@ -702,7 +710,7 @@
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "manifested_markdown_count": 35,
+    "manifested_markdown_count": 36,
     "missing_control_artifact_count": 0,
     "reviewer_gate_clear": true,
     "unsafe_claim_count": 0,

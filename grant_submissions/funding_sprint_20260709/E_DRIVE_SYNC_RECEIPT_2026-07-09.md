@@ -15,6 +15,8 @@ Path:
 Contents:
 
 - July 9 funding sprint markdown package.
+- Send-ready LumenCore pitch deck: `LUMENCORE_PITCH_DECK_SEND_READY_2026-07-09.pptx`.
+- Pitch deck Gmail send receipt: `PITCH_DECK_SEND_RECEIPT_2026-07-09.md`.
 - `README_FOR_REVIEWERS.md`, copied from `PROOF_STACK_EDGE_INDEX_2026-07-09.md`.
 - `MANIFEST_SHA256.json`.
 - `manifest.sha256.txt`.
@@ -29,6 +31,8 @@ Path:
 Contents:
 
 - July 9 funding sprint markdown package.
+- Send-ready LumenCore pitch deck.
+- Pitch deck Gmail send receipt.
 
 ### E-Drive Repo Mirror Copy
 
@@ -39,9 +43,13 @@ Path:
 Contents:
 
 - July 9 funding sprint markdown package.
+- Send-ready LumenCore pitch deck.
+- Pitch deck Gmail send receipt.
 
 ## Review Boundary
 
 This sync proves file custody and package availability on the E drive. It does not prove award eligibility, field validation, realized savings, valuation, or final submission acceptance.
+
+The July 9 pitch deck send layer proves only that the deck existed, was sent as an attachment through Gmail, and was mirrored into the E-drive proof locations. It does not prove that the recipient accepted the product, terms, funding request, or validation claims.
 
 The vault value increases when each packet is matched to an external validation gate: portal confirmation, sent-response receipt, reviewer reply, accepted baseline, accepted metric, or paid pilot authorization.
