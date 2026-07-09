@@ -17,6 +17,8 @@ Contents:
 - July 9 funding sprint markdown package.
 - Send-ready LumenCore pitch deck: `LUMENCORE_PITCH_DECK_SEND_READY_2026-07-09.pptx`.
 - Pitch deck Gmail send receipt: `PITCH_DECK_SEND_RECEIPT_2026-07-09.md`.
+- Immediate federal AI opportunity radar: `IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_2026-07-09.md`.
+- Technical/government reviewer approval stack: `TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md`.
 - `README_FOR_REVIEWERS.md`, copied from `PROOF_STACK_EDGE_INDEX_2026-07-09.md`.
 - `MANIFEST_SHA256.json`.
 - `manifest.sha256.txt`.
@@ -33,6 +35,8 @@ Contents:
 - July 9 funding sprint markdown package.
 - Send-ready LumenCore pitch deck.
 - Pitch deck Gmail send receipt.
+- Immediate federal AI opportunity radar.
+- Technical/government reviewer approval stack.
 
 ### E-Drive Repo Mirror Copy
 
@@ -45,11 +49,15 @@ Contents:
 - July 9 funding sprint markdown package.
 - Send-ready LumenCore pitch deck.
 - Pitch deck Gmail send receipt.
+- Immediate federal AI opportunity radar.
+- Technical/government reviewer approval stack.
 
 ## Review Boundary
 
 This sync proves file custody and package availability on the E drive. It does not prove award eligibility, field validation, realized savings, valuation, or final submission acceptance.
 
 The July 9 pitch deck send layer proves only that the deck existed, was sent as an attachment through Gmail, and was mirrored into the E-drive proof locations. It does not prove that the recipient accepted the product, terms, funding request, or validation claims.
+
+The technical/government reviewer layer deprioritizes pay-to-pitch and venture-studio pressure while elevating real review paths: SAM renewal, USPTO pro bono/IP routing, LANL/VISION technical routing, federal AI opportunity triage, and official FAA live-data expansion candidates. It does not authorize legal certifications, portal submissions, agency approval claims, or live-trading actions.
 
 The vault value increases when each packet is matched to an external validation gate: portal confirmation, sent-response receipt, reviewer reply, accepted baseline, accepted metric, or paid pilot authorization.

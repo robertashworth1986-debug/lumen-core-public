@@ -8,15 +8,15 @@ This gate does not authorize final submission. It confirms the packet is organiz
 
 - Status: `REVIEWER_GATE_CLEAR_HUMAN_SUBMISSION_REQUIRED`
 - Reviewer gate clear: `true`
-- Markdown files scanned: `36`
+- Markdown files scanned: `38`
 - Proof cards: `6`
 - Unsafe secret hits: `0`
 - Unsafe claim hits: `0`
-- Boundary/blocked-language hits: `45`
+- Boundary/blocked-language hits: `46`
 - Autonomous external action allowed: `false`
 - Live trading allowed: `false`
 - Final submission without human allowed: `false`
-- Gate SHA-256: `a10aa6c44edc98305b6b033db02b4341c6f3622dcec7f70df6980bf66003db1c`
+- Gate SHA-256: `93778603b47804be2445d3d333bf6b65086cabc32b42435c6d7b93f0e7c211d8`
 
 ## Reviewer Proof Cards
 

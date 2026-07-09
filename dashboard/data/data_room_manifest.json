@@ -1,24 +1,24 @@
 {
   "control_artifacts": [
     {
-      "bytes": 37684,
+      "bytes": 38903,
       "classification": "machine_readable_proof_receipt",
       "control_name": "funding_sprint_reviewer_gate",
       "name": "funding_sprint_reviewer_gate_latest.json",
       "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "f84f16aa6df0a22f2b6ab51fad9b639d34bff50cdf1c8c3ab2dd79958892ee6e"
+      "sha256": "1556d4ef2d00f4f81c6cc9674923d5b2dc58f2843e2fe23b46e3ec8f9cf18845"
     },
     {
-      "bytes": 37684,
+      "bytes": 38903,
       "classification": "machine_readable_proof_receipt",
       "control_name": "funding_sprint_reviewer_gate",
       "name": "funding_sprint_reviewer_gate.json",
       "path": "dashboard/data/funding_sprint_reviewer_gate.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "f84f16aa6df0a22f2b6ab51fad9b639d34bff50cdf1c8c3ab2dd79958892ee6e"
+      "sha256": "1556d4ef2d00f4f81c6cc9674923d5b2dc58f2843e2fe23b46e3ec8f9cf18845"
     },
     {
       "bytes": 23378,
@@ -301,6 +301,46 @@
       "sha256": "7fbadbbcc2304df545bc99b089115aee1bb72ede154743aab8eb4af910539646"
     },
     {
+      "bytes": 20366,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "immediate_federal_ai_opportunity_radar",
+      "name": "immediate_federal_ai_opportunity_radar_latest.json",
+      "path": "out/ops/immediate_federal_ai_opportunity_radar_latest.json",
+      "present": true,
+      "role": "machine_control_json",
+      "sha256": "c308eb5e651bdb735ce99bd41dca12edb60e64d7947831fcd2a8453cafe9654d"
+    },
+    {
+      "bytes": 20366,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "immediate_federal_ai_opportunity_radar",
+      "name": "immediate_federal_ai_opportunity_radar.json",
+      "path": "dashboard/data/immediate_federal_ai_opportunity_radar.json",
+      "present": true,
+      "role": "dashboard_control_json",
+      "sha256": "c308eb5e651bdb735ce99bd41dca12edb60e64d7947831fcd2a8453cafe9654d"
+    },
+    {
+      "bytes": 11698,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "technical_gov_reviewer_approval_stack",
+      "name": "technical_gov_reviewer_approval_stack_latest.json",
+      "path": "out/ops/technical_gov_reviewer_approval_stack_latest.json",
+      "present": true,
+      "role": "machine_control_json",
+      "sha256": "9a6f86ac2c2a265cedd27706940e32993b43e921b8edb3769c95fe3299be4ccd"
+    },
+    {
+      "bytes": 11698,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "technical_gov_reviewer_approval_stack",
+      "name": "technical_gov_reviewer_approval_stack.json",
+      "path": "dashboard/data/technical_gov_reviewer_approval_stack.json",
+      "present": true,
+      "role": "dashboard_control_json",
+      "sha256": "9a6f86ac2c2a265cedd27706940e32993b43e921b8edb3769c95fe3299be4ccd"
+    },
+    {
       "bytes": 10148,
       "classification": "machine_readable_proof_receipt",
       "control_name": "evtit_technical_sprint_scope_packet",
@@ -349,6 +389,7 @@
     "federal_submission_protocol_packet": "FEDERAL_SUBMISSION_PROTOCOL_READY_HUMAN_PORTAL_REQUIRED",
     "funding_sprint_reviewer_gate": "REVIEWER_GATE_CLEAR_HUMAN_SUBMISSION_REQUIRED",
     "human_action_docket": "HUMAN_ACTION_DOCKET_READY",
+    "immediate_federal_ai_opportunity_radar": "IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_READY_HUMAN_ACTION_REQUIRED",
     "ip_counsel_diligence_packet": "IP_COUNSEL_DILIGENCE_READY_HUMAN_COUNSEL_REQUIRED",
     "linkedin_universe_profile_packet": "LINKEDIN_UNIVERSE_PROFILE_READY_HUMAN_POST_REQUIRED",
     "measured_source_evidence_register": "MEASURED_SOURCE_REGISTER_READY_RECONCILIATION_REQUIRED",
@@ -356,11 +397,12 @@
     "reviewer_decision_brief": "REVIEWER_DECISION_BRIEF_READY",
     "reviewer_diligence_qa_matrix": "REVIEWER_DILIGENCE_QA_READY",
     "submission_authority_matrix": "SUBMISSION_AUTHORITY_MATRIX_READY",
+    "technical_gov_reviewer_approval_stack": "TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_READY_HUMAN_ACTION_REQUIRED",
     "traction_followup_packet": "TRACTION_FOLLOWUP_READY_HUMAN_SEND_REQUIRED",
     "traction_opportunity_intake_ledger": "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED",
     "venture_studio_terms_guardrail_packet": "VENTURE_STUDIO_TERMS_GUARDRAIL_READY_COUNSEL_REVIEW_REQUIRED"
   },
-  "data_room_manifest_sha256": "d6ba6f7f4dede24ae5e8a7c12cb7ea1036c0630c5957105ad535b7f556a65f74",
+  "data_room_manifest_sha256": "a80945d491d3c35b81aec71f2364fdd9901e2603d85d08edeb8d2b19a751403d",
   "e_drive_targets": [
     "E:\\LumaProofVault\\LUMA_FUNDING_SPRINT_20260709_20260709T030617Z",
     "E:\\LumenCoreSync\\funding_sprint_20260709",
@@ -377,6 +419,8 @@
     "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
+    "grant_submissions/funding_sprint_20260709/IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_2026-07-09.md",
+    "grant_submissions/funding_sprint_20260709/TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
@@ -385,8 +429,8 @@
     "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md"
   ],
-  "generated_utc": "2026-07-09T20:43:38.826154+00:00",
-  "manifest_seed_sha256": "4055432ea3fc1c268e2b67f14c15bf84b1b01ae637c7904ac00dc52f4514f998",
+  "generated_utc": "2026-07-09T21:00:44.932261+00:00",
+  "manifest_seed_sha256": "1f31a633b94aa7dcfb1a301aec1139a0e8d596f3f237522bacf81cab12507f3d",
   "markdown_artifacts": [
     {
       "bytes": 12244,
@@ -469,12 +513,12 @@
       "sha256": "0078ab4e615c967caedb39a1ea059df3660824b24b87c64c9a0877fde074817d"
     },
     {
-      "bytes": 1825,
+      "bytes": 2601,
       "category": "sync_receipt",
       "classification": "public_safe_markdown_review_required",
       "name": "E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_SYNC_RECEIPT_2026-07-09.md",
-      "sha256": "db8ef6413acaa602fd2f9570ed71edbd4e4e1eb9bbe2fc08cd0281b22990b6a9"
+      "sha256": "de237b73e7620094e2efdce97c0586cb3b536352d37bee681edfd495b5e80240"
     },
     {
       "bytes": 8261,
@@ -522,7 +566,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
-      "sha256": "dbdf7ee19bc1f1efc4185b8aa89bd815caa2dfe14950a2f3537a075966f8d6f0"
+      "sha256": "2fe369e479e9bcfe8127e9cd327893c6e80a1f019da5abab5a5007a845426843"
     },
     {
       "bytes": 14015,
@@ -531,6 +575,14 @@
       "name": "HUMAN_ACTION_DOCKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
       "sha256": "b1af6ea2924704771b432efb419b0523a41d1f0c7f085ed60de62fc4b5991052"
+    },
+    {
+      "bytes": 14268,
+      "category": "front_door_control",
+      "classification": "public_safe_markdown_review_required",
+      "name": "IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_2026-07-09.md",
+      "sha256": "af9bed8eae758770500ef619fd636120350b6d3d5f826d80b0f29e19a585d6ba"
     },
     {
       "bytes": 9907,
@@ -661,6 +713,14 @@
       "sha256": "1271ddbcfe306c67b25eebddf3c5cce71eb1e9db1fa70ec8d928e40d43d86eb2"
     },
     {
+      "bytes": 9653,
+      "category": "front_door_control",
+      "classification": "public_safe_markdown_review_required",
+      "name": "TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md",
+      "sha256": "209e2f17fcd2d60320dbdf6e56586188ce0db7f4bcb4023329cb3cd3cfd83232"
+    },
+    {
       "bytes": 17167,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
@@ -696,12 +756,12 @@
     "authority_status": "SUBMISSION_AUTHORITY_MATRIX_READY",
     "category_counts": {
       "claim_protocol_boundary": 7,
-      "front_door_control": 17,
+      "front_door_control": 19,
       "lane_package": 8,
       "supporting_markdown": 2,
       "sync_receipt": 2
     },
-    "control_artifact_count": 34,
+    "control_artifact_count": 38,
     "decision_lane_count": 15,
     "decision_status": "REVIEWER_DECISION_BRIEF_READY",
     "decision_top_ready_lane_count": 7,
@@ -710,7 +770,7 @@
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "manifested_markdown_count": 36,
+    "manifested_markdown_count": 38,
     "missing_control_artifact_count": 0,
     "reviewer_gate_clear": true,
     "unsafe_claim_count": 0,

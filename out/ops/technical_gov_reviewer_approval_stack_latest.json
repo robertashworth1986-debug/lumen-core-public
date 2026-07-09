@@ -1,0 +1,212 @@
+{
+  "approval_stack_sha256": "6407b39a5ff2f8c663257ae83ad8956a00acfe3d625619fbc54d6366e413b267",
+  "core_truth": {
+    "blocked_claims": [
+      "external field-validation approval",
+      "realized government savings",
+      "guaranteed ROI",
+      "live trading profit",
+      "FAA validation",
+      "agency approval",
+      "patent allowance",
+      "award certainty"
+    ],
+    "metrics": {
+      "blocked_context_annual_value_usd": 52288496940.0,
+      "data_room_control_artifacts": 38,
+      "data_room_markdown_artifacts": 38,
+      "field_validation_claim_allowed": false,
+      "kuramoto_estimated_rows_replayed": 2506267,
+      "kuramoto_holdout_count": 24,
+      "kuramoto_one_sided_sign_test_p": 6e-08,
+      "kuramoto_wins_vs_kalman": 24,
+      "live_measured_sources": 18,
+      "live_total_measured_rows": 571,
+      "live_trading_allowed": false,
+      "ready_benchmark_routes": 309,
+      "real_dollar_savings_claim_allowed": false,
+      "registered_geometry_family_count": 140,
+      "safe_estimated_annual_value_usd": 39595200.0,
+      "unique_source_count": 183,
+      "unique_source_estimated_rows": 3751192
+    },
+    "plain_english": "LumenCore's strongest current story is not a sales pitch. It is a measured proof stack with internal holdout evidence, live-source breadth, and clear locks against unsupported field-validation, revenue, award, or trading claims.",
+    "safe_technical_claim": "Kuramoto phase coupling is ready for a buyer-authorized field replay request after internal source-conditioned holdout evidence; it is not yet field validation or realized savings."
+  },
+  "email_signal_triage": {
+    "deprioritized_signals": [
+      "Pitch-event or pay-before-pitch routes should not drive the proof stack.",
+      "Venture studio help is useful only if they bring technical validation, real customers, or non-extractive terms."
+    ],
+    "real_signals": [
+      "USPTO Patent Pro Bono routed Tennessee inventors to Georgia PATENTS and noted the Pro Se Assistance Program as a deadline fallback.",
+      "LANL replied that Mike Erickson is the main contact for the VISION licensing opportunity when he returns.",
+      "Login.gov confirms DSIP connection, which supports the federal submission route.",
+      "SAM.gov expiration notice confirms entity renewal is a real blocker before federal award eligibility."
+    ]
+  },
+  "generated_utc": "2026-07-09T20:59:59.662034+00:00",
+  "next_48_hours": [
+    "Finish SAM renewal in the browser with human certification.",
+    "Prepare Georgia PATENTS intake packet and Pro Se fallback checklist.",
+    "Prepare LANL/VISION technical review packet with claim boundaries and current proof hashes.",
+    "Build FAA AWC Data API and FAA NASR source adapters as the next live-data expansion path.",
+    "Promote FHWA TSMO and Air Force AAC only as official reviewer packages, not broad sales pitches."
+  ],
+  "official_live_data_targets": [
+    {
+      "integration_posture": "public_source_watch",
+      "luma_use": "Target aviation delay, routing, weather, and operational proof routes after source terms are reviewed.",
+      "name": "FAA Data Portal",
+      "official_url": "https://www.faa.gov/data",
+      "reviewer_value": "Public FAA clearinghouse for datasets and APIs, including aviation and NAS-related data.",
+      "source_id": "faa_data_portal"
+    },
+    {
+      "integration_posture": "candidate_fast_adapter",
+      "luma_use": "Use as a live measured source for turbulence, weather timing, route-risk, and delay-risk replay experiments.",
+      "name": "Aviation Weather Center Data API",
+      "official_url": "https://aviationweather.gov/data/api/",
+      "reviewer_value": "Machine-to-machine aviation weather access with recent historical coverage.",
+      "source_id": "aviation_weather_center_api"
+    },
+    {
+      "integration_posture": "access_required",
+      "luma_use": "Use as a higher-bar aviation operations source after access, terms, and message transport are approved.",
+      "name": "FAA System Wide Information Management",
+      "official_url": "https://www.faa.gov/air_traffic/technology/swim",
+      "reviewer_value": "Near-real-time aeronautical, flight, weather, and surveillance information backbone for the NAS.",
+      "source_id": "faa_swim"
+    },
+    {
+      "integration_posture": "human_account_required",
+      "luma_use": "Candidate route for official aviation operations data once account/access rules are accepted by the user.",
+      "name": "FAA SWIFT Portal for SWIM access",
+      "official_url": "https://www.faa.gov/air_traffic/technology/swim/products/get_connected",
+      "reviewer_value": "Publicly accessible cloud system for obtaining near-real-time SWIM data access.",
+      "source_id": "faa_swift_portal"
+    },
+    {
+      "integration_posture": "candidate_batch_adapter",
+      "luma_use": "Use as stable public reference geometry for airport, airspace, route, and facility graph replay.",
+      "name": "FAA 28 Day NASR Subscription",
+      "official_url": "https://www.faa.gov/air_traffic/flight_info/aeronav/aero_data/NASR_Subscription/",
+      "reviewer_value": "Authoritative aeronautical data releases on a 28-day cycle.",
+      "source_id": "faa_nasr_subscription"
+    },
+    {
+      "integration_posture": "human_account_required",
+      "luma_use": "Candidate source for airport-data validation workflows after access boundaries are reviewed.",
+      "name": "FAA Airport Data and Information Portal",
+      "official_url": "https://adip.faa.gov/",
+      "reviewer_value": "Centralized airport data collection, validation, and management portal.",
+      "source_id": "faa_adip"
+    }
+  ],
+  "outputs": {
+    "dashboard_json": "dashboard/data/technical_gov_reviewer_approval_stack.json",
+    "json": "out/ops/technical_gov_reviewer_approval_stack_latest.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md"
+  },
+  "reviewer_tracks": [
+    {
+      "human_gate": "Human approves any LANL reply, licensing request, NDA, or disclosure.",
+      "name": "National lab or independent technical reviewer",
+      "next_action": "Prepare a no-hype technical review packet and ask for fit, validation route, or licensing pathway.",
+      "proof_to_show": [
+        "Kuramoto 24/24 internal source-conditioned holdout wins versus Kalman.",
+        "2,506,267 estimated replay rows for the harmonic holdout expansion.",
+        "Current proof-state hash and data-room manifest hash.",
+        "Failure boundaries showing field validation and real-dollar claims are still locked."
+      ],
+      "status": "REAL_TECHNICAL_REVIEW_ROUTE",
+      "track_id": "national_lab_or_technical_reviewer",
+      "why_this_is_real": "LANL routed the VISION licensing inquiry to a named main contact returning next week."
+    },
+    {
+      "human_gate": "Human and licensed counsel decide all filings, claims, deadlines, continuations, PCT, and disclosures.",
+      "name": "Patent counsel / USPTO pro bono route",
+      "next_action": "Prepare Georgia PATENTS intake package and a Pro Se fallback checklist before the July 2026 deadline window.",
+      "proof_to_show": [
+        "Claim-boundary register.",
+        "IP counsel diligence packet.",
+        "Technical invention map and proof-state boundaries.",
+        "No public expansion of claims until counsel review."
+      ],
+      "status": "URGENT_REAL_IP_ROUTE",
+      "track_id": "patent_counsel_and_pro_bono",
+      "why_this_is_real": "USPTO Patent Pro Bono replied and identified Georgia PATENTS as the Tennessee-serving program, with Pro Se assistance as a deadline fallback."
+    },
+    {
+      "human_gate": "Human signs SAM terms, reps/certs, entity renewal, and portal submissions.",
+      "name": "Agency reviewer / contracting technical evaluator",
+      "next_action": "Finish SAM renewal with human certifications, then use the agency radar to prioritize official reviewer-facing packages.",
+      "proof_to_show": [
+        "Federal submission protocol packet.",
+        "Submission authority matrix.",
+        "Immediate federal AI opportunity radar.",
+        "Reviewer diligence QA matrix."
+      ],
+      "status": "ACCOUNT_RENEWAL_AND_REVIEWER_ROUTE",
+      "track_id": "agency_reviewer",
+      "why_this_is_real": "SAM, DSIP, FHWA, DARPA DICE, and federal protocol packets already exist; SAM renewal is now the active account blocker."
+    },
+    {
+      "human_gate": "Human accepts any FAA account terms or access agreements.",
+      "name": "FAA / aviation live-data expansion",
+      "next_action": "Build AWC Data API and NASR batch adapter first; treat SWIM/ADIP as human-account gated.",
+      "proof_to_show": [
+        "Live-breadth source manifest.",
+        "Geometry live systems frontier.",
+        "Candidate aviation adapters from AWC, NASR, ADIP, and SWIM.",
+        "No aviation safety or FAA validation claim until official access and replay pass."
+      ],
+      "status": "NEW_LIVE_SOURCE_ROUTE",
+      "track_id": "aviation_faa_live_data",
+      "why_this_is_real": "FAA and NWS aviation sources expose official weather, NAS, airport, and SWIM data routes that map to noisy live-system replay."
+    },
+    {
+      "human_gate": "Human runtime approval is required for any live trading, brokerage action, or capital movement.",
+      "name": "Trading/noisy-market proof reviewer",
+      "next_action": "Use trading data as a stress-test substrate and proof-deck strengthening layer, not as an investor promise.",
+      "proof_to_show": [
+        "Market-signal geometry candidates.",
+        "Live breadth replay reports.",
+        "Sharpe/edge score artifacts only where backed by frozen walk-forward tests.",
+        "Explicit no-live-trading gate."
+      ],
+      "status": "NOISY_PROOF_LAB_NOT_LIVE_EXECUTION",
+      "track_id": "trading_alpha_reviewer",
+      "why_this_is_real": "The trading lane is useful as a noisy proof laboratory, but live execution and profit claims remain blocked."
+    }
+  ],
+  "sam_renewal_support": {
+    "codex_safe_support": [
+      "Navigate to Workspace > Entity Management > Entities.",
+      "Open Robert Ashworth / SQY2XW71ZM51 / 14TM8 if shown.",
+      "Prepare renewal checklist and flag changed fields.",
+      "Do not submit reps/certs or final renewal without human confirmation."
+    ],
+    "current_browser_state": "SAM.gov redirected to the public home page and displayed a Terms of Use modal.",
+    "human_next_step": "Click Agree if you accept the SAM.gov terms, then complete login.gov/MFA.",
+    "known_email_context": [
+      "SAM.gov sent a 60-day expiration notice for August 30, 2026.",
+      "A prior SAM.gov one-time code email exists but is expired and must not be reused.",
+      "SAM account key rotation reminder exists and should be handled separately from entity renewal."
+    ]
+  },
+  "schema": "technical_gov_reviewer_approval_stack_v1",
+  "status": "TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_READY_HUMAN_ACTION_REQUIRED",
+  "summary": {
+    "external_send_allowed_without_human": false,
+    "human_action_required": true,
+    "legal_or_ip_action_allowed_without_human": false,
+    "live_trading_allowed": false,
+    "official_data_source_count": 6,
+    "portal_submission_allowed_without_human": false,
+    "reviewer_track_count": 5,
+    "sam_renewal_blocker": "SAM.gov Terms of Use and login.gov/MFA require the human user in browser.",
+    "technical_reviewer_first": true,
+    "venture_studio_deprioritized": true
+  }
+}
