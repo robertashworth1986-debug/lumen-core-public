@@ -26,8 +26,8 @@
       "patented"
     ]
   },
-  "gate_sha256": "9c6081fcbf99927dad935fa89f14e3be3108b43bb18ad2ca6ba9c260c943e0f7",
-  "generated_utc": "2026-07-09T03:59:06.089126+00:00",
+  "gate_sha256": "e574a172bb1c0720cf9108679abd267bad872b82cc7cd18ce401ed7fde5d1f64",
+  "generated_utc": "2026-07-09T04:03:30.829194+00:00",
   "manifest": [
     {
       "bytes": 8929,
@@ -98,6 +98,13 @@
       "name": "FUNDING_ACTION_MATRIX_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md",
       "sha256": "684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9"
+    },
+    {
+      "bytes": 13939,
+      "classification": "public_safe_markdown_review_required",
+      "name": "HUMAN_ACTION_DOCKET_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
+      "sha256": "7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672"
     },
     {
       "bytes": 7643,
@@ -547,7 +554,7 @@
     "boundary_hit_count": 39,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 20,
+    "markdown_file_count": 21,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0
