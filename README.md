@@ -2,7 +2,7 @@
 
 # LumenCore™ — Founder-Built Proof-to-Pilot Intelligence Architecture
 
-**Robert Ashworth** | Founder / Independent Builder | LumenCore™
+**Robert Ashworth** | Founder / Systems Architect | LumenCore™
 
 LumenCore is a founder-owned proof-to-pilot architecture for turning complex-system claims into bounded evidence packages: source, baseline, locked metric, replay or simulation run, hash manifest, result, limitation, and next pilot decision.
 
@@ -41,6 +41,16 @@ LumenCore is a multi-module architecture for evidence-driven adaptive intelligen
 The strongest current claim is narrow and fundable:
 
 > LumenCore can package controlled replay, synthetic, measured-row, and benchmark evidence into auditable proof reports that let a buyer, mentor, grant reviewer, or technical partner inspect the source, baseline, metric, run, manifest, result, and claim boundary before pilot deployment.
+
+---
+
+## Founder thesis
+
+Robert Ashworth is the founder and systems architect behind LumenCore. The work is founder-built, not committee-built: a unified architecture connecting proof packaging, geometry-informed routing, identity architecture, replay validation, measured-source ingestion, and pilot-ready reporting.
+
+The founder advantage is speed of synthesis. LumenCore was built by directly combining systems thinking, software automation, evidence discipline, infrastructure intuition, and original module design into one coherent platform spine. The result is not a single app; it is a repeatable method for turning complex technical claims into inspectable proof artifacts.
+
+The company’s posture is disciplined: build evidence first, separate measured from modeled, protect pre-existing IP, and invite outside reviewers to evaluate bounded proof instead of accepting broad claims. External parties may review, route pilots, or provide scoped services, but the architecture, lexicon, module families, and prior work remain founder-controlled unless a written agreement says otherwise.
 
 ---
 
@@ -178,7 +188,7 @@ Status language:
 
 ## Contact
 
-**Robert Ashworth** — Founder, LumenCore
+**Robert Ashworth** — Founder / Systems Architect, LumenCore
 
 - Site: https://lumen-core.ai
 - GitHub: https://github.com/robertashworth1986-debug/lumen-core-public
