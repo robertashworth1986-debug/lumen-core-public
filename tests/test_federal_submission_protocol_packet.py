@@ -88,6 +88,7 @@ def test_protocol_evidence_sources_are_present_and_hash_backed():
 
     expected_fragments = [
         "AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md",
+        "AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
         "SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
         "HUMAN_ACTION_DOCKET_2026-07-09.md",
         "IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",

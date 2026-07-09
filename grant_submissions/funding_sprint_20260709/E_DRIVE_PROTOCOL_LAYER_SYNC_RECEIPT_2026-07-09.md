@@ -10,27 +10,30 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - `IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md`
 - `AUTONOMOUS_QUANT_INNOVATION_SAFETY_PROTOCOL_2026-07-09.md`
 - `FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md`
+- `AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md`
 - `EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md`
 
 ## New Machine Control Files
 
 - `out/ops/federal_submission_protocol_packet_latest.json`
 - `dashboard/data/federal_submission_protocol_packet.json`
+- `out/ops/agency_account_activation_docket_latest.json`
+- `dashboard/data/agency_account_activation_docket.json`
 - `out/ops/traction_followup_packet_latest.json`
 - `dashboard/data/traction_followup_packet.json`
 
 ## Latest Verified Sync Result
 
-- Latest layer: `evtit_traction_followup_packet`
-- Source files: `57`
+- Latest layer: `agency_account_activation_docket`
+- Source files: `60`
 - Target count: `3`
-- Total copied artifacts across targets: `252`
-- Total SHA-256 checks: `252`
+- Total copied artifacts across targets: `267`
+- Total SHA-256 checks: `267`
 - Problem count: `0`
 - Reviewer gate status: `REVIEWER_GATE_CLEAR_HUMAN_SUBMISSION_REQUIRED`
 - Data-room status: `DATA_ROOM_MANIFEST_READY`
-- Data-room Markdown artifacts: `30`
-- Data-room machine controls: `24`
+- Data-room Markdown artifacts: `31`
+- Data-room machine controls: `26`
 
 ## Destination Set
 

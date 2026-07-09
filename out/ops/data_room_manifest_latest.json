@@ -1,24 +1,24 @@
 {
   "control_artifacts": [
     {
-      "bytes": 34445,
+      "bytes": 34804,
       "classification": "machine_readable_proof_receipt",
       "control_name": "funding_sprint_reviewer_gate",
       "name": "funding_sprint_reviewer_gate_latest.json",
       "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "a8c6f8ba3cf725c27b13c9721f61a1af3030e026cea4ee929945baf9cab83f57"
+      "sha256": "8fc26fe9d0c72ba9bf1c6f46f4cbc0245206ebd3aefe7bd67848b770aeb97002"
     },
     {
-      "bytes": 34445,
+      "bytes": 34804,
       "classification": "machine_readable_proof_receipt",
       "control_name": "funding_sprint_reviewer_gate",
       "name": "funding_sprint_reviewer_gate.json",
       "path": "dashboard/data/funding_sprint_reviewer_gate.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "a8c6f8ba3cf725c27b13c9721f61a1af3030e026cea4ee929945baf9cab83f57"
+      "sha256": "8fc26fe9d0c72ba9bf1c6f46f4cbc0245206ebd3aefe7bd67848b770aeb97002"
     },
     {
       "bytes": 23378,
@@ -201,24 +201,44 @@
       "sha256": "fb2fa17cfc4da39ec4c95659e679462fba202af881d2ebad4307419261a77c81"
     },
     {
-      "bytes": 12136,
+      "bytes": 12389,
       "classification": "machine_readable_proof_receipt",
       "control_name": "federal_submission_protocol_packet",
       "name": "federal_submission_protocol_packet_latest.json",
       "path": "out/ops/federal_submission_protocol_packet_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "6cd4f58d80ccee3affb2e9b526dc706dbe453a99215f8a47841ce42caf8d8a80"
+      "sha256": "1680a32214f50979a1b80b75dfd0723017fbbdf78dff7d14e37305b5edc39a59"
     },
     {
-      "bytes": 12136,
+      "bytes": 12389,
       "classification": "machine_readable_proof_receipt",
       "control_name": "federal_submission_protocol_packet",
       "name": "federal_submission_protocol_packet.json",
       "path": "dashboard/data/federal_submission_protocol_packet.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "6cd4f58d80ccee3affb2e9b526dc706dbe453a99215f8a47841ce42caf8d8a80"
+      "sha256": "1680a32214f50979a1b80b75dfd0723017fbbdf78dff7d14e37305b5edc39a59"
+    },
+    {
+      "bytes": 15041,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "agency_account_activation_docket",
+      "name": "agency_account_activation_docket_latest.json",
+      "path": "out/ops/agency_account_activation_docket_latest.json",
+      "present": true,
+      "role": "machine_control_json",
+      "sha256": "e4fe95da8c7473feb031a5310e637d1b7c61b45aca2c74ae96bcd567b29292d4"
+    },
+    {
+      "bytes": 15041,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "agency_account_activation_docket",
+      "name": "agency_account_activation_docket.json",
+      "path": "dashboard/data/agency_account_activation_docket.json",
+      "present": true,
+      "role": "dashboard_control_json",
+      "sha256": "e4fe95da8c7473feb031a5310e637d1b7c61b45aca2c74ae96bcd567b29292d4"
     },
     {
       "bytes": 10154,
@@ -242,6 +262,7 @@
     }
   ],
   "control_statuses": {
+    "agency_account_activation_docket": "AGENCY_ACCOUNT_ACTIVATION_READY_HUMAN_PORTAL_REQUIRED",
     "autonomous_quant_governance_packet": "AUTONOMOUS_QUANT_GOVERNANCE_READY_HUMAN_RUNTIME_REQUIRED",
     "federal_submission_protocol_packet": "FEDERAL_SUBMISSION_PROTOCOL_READY_HUMAN_PORTAL_REQUIRED",
     "funding_sprint_reviewer_gate": "REVIEWER_GATE_CLEAR_HUMAN_SUBMISSION_REQUIRED",
@@ -255,7 +276,7 @@
     "traction_followup_packet": "TRACTION_FOLLOWUP_READY_HUMAN_SEND_REQUIRED",
     "traction_opportunity_intake_ledger": "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED"
   },
-  "data_room_manifest_sha256": "e41825b362f522ba736ad63737856978371fd6a91d682049f1a4aa9bf7c8c7b5",
+  "data_room_manifest_sha256": "1b13c6b23573851ea8f304efe81db824888d0c10a8076c67433963ca2e96a722",
   "e_drive_targets": [
     "E:\\LumaProofVault\\LUMA_FUNDING_SPRINT_20260709_20260709T030617Z",
     "E:\\LumenCoreSync\\funding_sprint_20260709",
@@ -268,6 +289,7 @@
     "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
+    "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
@@ -275,9 +297,17 @@
     "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md"
   ],
-  "generated_utc": "2026-07-09T19:18:59.794962+00:00",
-  "manifest_seed_sha256": "e8327dc3dec50dace109efa1ed07add4b400aba1b05a470afa838a9054a8fb56",
+  "generated_utc": "2026-07-09T19:43:48.708305+00:00",
+  "manifest_seed_sha256": "472d65567878f6de44c1719c69f9191d0800142c838d523cebfc422a9a3bb6a1",
   "markdown_artifacts": [
+    {
+      "bytes": 12244,
+      "category": "front_door_control",
+      "classification": "public_safe_markdown_review_required",
+      "name": "AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
+      "path": "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
+      "sha256": "fad6596005d8865a518884ffbd640c390f2f942ca1ed0eb85c048bd8fb57930d"
+    },
     {
       "bytes": 8929,
       "category": "claim_protocol_boundary",
@@ -335,12 +365,12 @@
       "sha256": "cf0d3fd466ecfd8396d17f1c4787a7fa2898f49ee5f81ed377df05aa161029c4"
     },
     {
-      "bytes": 2090,
+      "bytes": 2257,
       "category": "sync_receipt",
       "classification": "public_safe_markdown_review_required",
       "name": "E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/E_DRIVE_PROTOCOL_LAYER_SYNC_RECEIPT_2026-07-09.md",
-      "sha256": "419b1c821342dd74309c485b25900ecabd06ae69fe7a52de669d8c2cdaee97f2"
+      "sha256": "f04b12dfd301a795b56ad0ab10a6672b48485769f82e2ce3d30234e5faeaab33"
     },
     {
       "bytes": 1263,
@@ -359,12 +389,12 @@
       "sha256": "2a3ac81ea687dcd5653c480850112dbcde2bbb2103345a34be7e6ae05094b9be"
     },
     {
-      "bytes": 10506,
+      "bytes": 10709,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
       "name": "FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
-      "sha256": "184173c25f5d3e94db3d364f3cb9da3c57be3a697427ea760e662279f8e7715e"
+      "sha256": "b78ca8fb69c775cc36ad4632b5aff8322d1d59e3c86d005e657068f3a4a0959a"
     },
     {
       "bytes": 6109,
@@ -388,7 +418,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
-      "sha256": "5142ac34058408900103595a9d88288c684447cf655e23df3f7e029470eb15a6"
+      "sha256": "50afca89af7fd8f27c06661b2244f633c9410f615e0a6a69a8b952e5c344d216"
     },
     {
       "bytes": 14015,
@@ -538,12 +568,12 @@
     "authority_status": "SUBMISSION_AUTHORITY_MATRIX_READY",
     "category_counts": {
       "claim_protocol_boundary": 7,
-      "front_door_control": 12,
+      "front_door_control": 13,
       "lane_package": 8,
       "supporting_markdown": 1,
       "sync_receipt": 2
     },
-    "control_artifact_count": 24,
+    "control_artifact_count": 26,
     "decision_lane_count": 15,
     "decision_status": "REVIEWER_DECISION_BRIEF_READY",
     "decision_top_ready_lane_count": 7,
@@ -552,7 +582,7 @@
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "manifested_markdown_count": 30,
+    "manifested_markdown_count": 31,
     "missing_control_artifact_count": 0,
     "reviewer_gate_clear": true,
     "unsafe_claim_count": 0,
