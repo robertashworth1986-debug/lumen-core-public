@@ -17,15 +17,15 @@ This docket is preparation-only. It does not authorize credentials, certificatio
 - Reviewer gate clear: `true`
 - Unsafe sensitive hits: `0`
 - Unsafe claim hits: `0`
-- Data-room Markdown artifacts: `43`
-- Data-room control artifacts: `48`
+- Data-room Markdown artifacts: `44`
+- Data-room control artifacts: `50`
 - Portal action without human: `false`
 - Credential entry without human: `false`
 - Certification without human: `false`
 - Final submission without human: `false`
 - External send without human: `false`
 - Live trading allowed: `false`
-- Docket SHA-256: `7b727dcadd33b4619f64fc94861d6b1179fdb35aeca5ee000728da906861b767`
+- Docket SHA-256: `f9718f8d2f9758399240c8ba36e3beb1b310f7bab7d43308e8ca978027b68add`
 
 ## Local Readiness Signals
 
@@ -271,11 +271,11 @@ Blocks:
 
 - `data/company_profile.json` | present=`true` | bytes=`3682` | sha256=`16086b05d3d5e4af4910fec49cafefc8918ac05ed237f68f471a2834898efe55`
 - `out/ops/sam_gov_entity_status_capture_latest.json` | present=`true` | bytes=`1655` | sha256=`570ab86d35f12b860b4e7929f2b406fa09571c570b84b77c09c75f654ab66228`
-- `out/ops/federal_submission_protocol_packet_latest.json` | present=`true` | bytes=`12389` | sha256=`d2964bb2f758d8d12f6b1b9b7c17650d9587c6b6bb142a1ab195e631197b1267`
+- `out/ops/federal_submission_protocol_packet_latest.json` | present=`true` | bytes=`12389` | sha256=`dbf19b6dcb218b1beba9824e1da8178c59c41856b2c542839b5e6362e9fb1d88`
 - `out/ops/submission_authority_matrix_latest.json` | present=`true` | bytes=`33418` | sha256=`616519280f524711e6e11c43e059a90cb5490efbcd3f29f4e22530dd3f6fa1ca`
-- `out/ops/data_room_manifest_latest.json` | present=`true` | bytes=`44204` | sha256=`b34649d4ce5f7e14e99c2f907ecdd5c59810a5fd27e572d351c59d10a3172976`
-- `out/ops/funding_sprint_reviewer_gate_latest.json` | present=`true` | bytes=`43851` | sha256=`91c64eb492f94298a555dadbfc7b060105b5d93b54c6927e7459acdb401a27a0`
-- `out/ops/ip_counsel_diligence_packet_latest.json` | present=`true` | bytes=`11291` | sha256=`c5a45e976a556482c349a09e931f6bd5fc5c3a4867c387893e559378211edf70`
+- `out/ops/data_room_manifest_latest.json` | present=`true` | bytes=`45649` | sha256=`d0d2b35ea22b7e40c6d0d8825f0d3b2d233fdb9156fff035e8aef31b19f76594`
+- `out/ops/funding_sprint_reviewer_gate_latest.json` | present=`true` | bytes=`44208` | sha256=`7eb55a1d058a1aff3fd536988d8c4b4d2f51940daf126af9e8f2d311e8587ee0`
+- `out/ops/ip_counsel_diligence_packet_latest.json` | present=`true` | bytes=`11291` | sha256=`d7904915f51386724c5e5740af9da7e7ed806eaaafe4e09ea04b9cb88fc53648`
 - `out/ops/autonomous_quant_governance_packet_latest.json` | present=`true` | bytes=`10038` | sha256=`fb2fa17cfc4da39ec4c95659e679462fba202af881d2ebad4307419261a77c81`
 
 ## Human Stop Rule

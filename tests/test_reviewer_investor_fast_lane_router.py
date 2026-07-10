@@ -77,6 +77,9 @@ def test_fast_lane_routes_cover_core_diligence_surfaces():
             assert artifact["bytes"] > 0
             assert len(artifact["sha256"]) == 64
 
+    agency_artifacts = {Path(row["path"]).name for row in routes["agency_submission_protocol"]["artifact_status"]}
+    assert "AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md" in agency_artifacts
+
 
 def test_rendered_fast_lane_router_is_public_safe():
     module = load_module()

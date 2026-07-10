@@ -98,6 +98,18 @@ QA_ROWS = [
         "human_gate": "Named authority gate per lane in the authority matrix.",
     },
     {
+        "question": "Which agency/IP packages are assembled enough for review?",
+        "answer": "The assembly gate separates review-ready packages from validation watch, counsel-required, partner-only, and scout-only lanes. It shows 15 federal/IP assembly lanes, component states, first artifacts, blockers, and the required human authority for each lane.",
+        "evidence_artifacts": [
+            "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
+            "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
+            "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
+        ],
+        "claim_boundary": "Assembly readiness means reviewer packet organization, not final portal readiness, legal certification, award eligibility, or permission to submit.",
+        "decision_use": "Let an agency reviewer or investor see exactly what is ready to review and what still blocks final action.",
+        "human_gate": "Human approval before send, upload, certification, filing, pricing, or final submission.",
+    },
+    {
         "question": "How are live-source credentials and premium social lanes protected?",
         "answer": "The key governance firewall keeps YouTube, Spotify, Meta/Facebook, and other live-source lanes environment-driven and read-only for proof generation, while blocking public posting, ad spend, account mutation, live trading, withdrawals, and capital movement.",
         "evidence_artifacts": [

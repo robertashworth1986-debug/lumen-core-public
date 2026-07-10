@@ -19,6 +19,7 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - `INSTITUTIONAL_TRUST_GATE_2026-07-09.md`
 - `KEY_GOVERNANCE_FIREWALL_2026-07-09.md`
 - `REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md`
+- `AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md`
 - `docs/KRAKEN_PAPER_INNOVATION_CONTROL_ROOM_2026-07-09.md`
 - `docs/KRAKEN_INSTITUTIONAL_ALPHA_GAUNTLET_2026-07-09.md`
 - `LUMENCORE_AAC_RFI_RESPONSE_SAF-AQ-RFI-26-0001_2026-07-09.pdf`
@@ -46,6 +47,8 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - `dashboard/data/key_governance_firewall.json`
 - `out/ops/reviewer_investor_fast_lane_router_latest.json`
 - `dashboard/data/reviewer_investor_fast_lane_router.json`
+- `out/ops/agency_submission_assembly_gate_latest.json`
+- `dashboard/data/agency_submission_assembly_gate.json`
 - `out/ops/kraken_paper_innovation_control_room_latest.json`
 - `dashboard/data/kraken_paper_innovation_control_room.json`
 - `out/ops/kraken_institutional_alpha_gauntlet_latest.json`
@@ -64,19 +67,21 @@ Sync mode: additive copy only. No delete, purge, or destructive mirror operation
 - Problem count: `0`
 - Reviewer gate status: `REVIEWER_GATE_CLEAR_HUMAN_SUBMISSION_REQUIRED`
 - Data-room status: `DATA_ROOM_MANIFEST_READY`
-- Data-room Markdown artifacts: `43`
-- Data-room machine controls: `48`
+- Data-room Markdown artifacts: `44`
+- Data-room machine controls: `50`
 - SAM/opportunity push status: `SAM_SUBMITTED_AAC_SENT_FHWA_INSTRUCTION_REQUEST_SENT`
 - Same-day opportunity files added: `3`
 - Same-day machine controls added: `2`
 - Reviewer approval crosswalk status: `REVIEWER_APPROVAL_CROSSWALK_READY_POST_SAM`
 - Institutional trust gate status: `INSTITUTIONAL_TRUST_GATE_READY_HUMAN_GATED`
-- Latest data-room Markdown artifacts: `43`
-- Latest data-room machine controls: `48`
+- Latest data-room Markdown artifacts: `44`
+- Latest data-room machine controls: `50`
 - Key governance firewall status: `KEY_FIREWALL_READY_HUMAN_GATED`
 - API/key registry coverage: `37/63` present key slots; raw credential values not stored in the public packet.
 - Reviewer/investor fast-lane router status: `FAST_LANE_ROUTER_READY_HUMAN_SHARE_REQUIRED`
 - Reviewer/investor fast-lane routes: `8`; missing artifacts: `0`
+- Agency submission assembly gate status: `AGENCY_SUBMISSION_ASSEMBLY_READY_HUMAN_GATED`
+- Agency/IP assembly lanes: `15`; first artifacts present: `true`
 - Latest traction lanes: `19`
 - Kraken paper innovation status: `KRAKEN_PAPER_INNOVATION_READY_LIVE_BLOCKED`
 - Kraken institutional alpha gauntlet status: `INSTITUTIONAL_ALPHA_GAUNTLET_READY_LIVE_BLOCKED`
@@ -109,6 +114,8 @@ The institutional trust gate addition makes the master diligence state inspectab
 The key governance firewall addition makes live-key breadth reviewer-safe: provider purpose and credential-presence booleans are tracked, while raw credential values, social posting, ad spend, account mutation, live trading, withdrawals, and capital movement remain blocked without explicit human approval.
 
 The reviewer/investor fast-lane router addition gives a single front-door route map from reviewer question to evidence packet across agency protocol, IP/counsel, live-source governance, traction, autonomous quant safety, commercialization, and investor/profile readiness. It does not authorize sending, filing, posting, trading, spending, or accepting terms.
+
+The agency submission assembly gate addition converts the near-term federal, SBIR, RFI, lab, and IP lanes into package assembly rows with component states, first artifacts, blockers, and required human authority. It does not authorize portal upload, certification, filing, legal action, pricing, final submission, trading, or capital movement.
 
 The Kraken alpha additions are paper/replay-only proof artifacts. They harden signal scoring, execution quality, liquidity/capacity, stress survivability, replay readiness, and promotion blockers without reading credential values, placing orders, or making performance claims.
 

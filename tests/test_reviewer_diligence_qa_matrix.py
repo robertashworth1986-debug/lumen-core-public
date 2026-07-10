@@ -22,7 +22,7 @@ def test_diligence_qa_matrix_builds_evidence_backed_answers():
 
     assert payload["schema"] == "reviewer_diligence_qa_matrix_v1"
     assert payload["status"] == "REVIEWER_DILIGENCE_QA_READY"
-    assert payload["summary"]["qa_count"] >= 13
+    assert payload["summary"]["qa_count"] >= 14
     assert payload["summary"]["missing_evidence_count"] == 0
     assert payload["summary"]["decision_lane_count"] == 19
     assert payload["summary"]["authority_lane_count"] == 19
@@ -43,6 +43,7 @@ def test_diligence_rows_have_boundaries_hashes_and_present_evidence():
     questions = {row["question"]: row for row in payload["qa_rows"]}
 
     assert "What traction is strongest right now?" in questions
+    assert "Which agency/IP packages are assembled enough for review?" in questions
     assert "How are live-source credentials and premium social lanes protected?" in questions
     assert "How is IP and patent-risk handled?" in questions
     assert "How is autonomous quant or AI-risk controlled?" in questions

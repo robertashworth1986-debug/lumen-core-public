@@ -1,6 +1,6 @@
 {
-  "fast_lane_router_sha256": "bfdedd4248e51be371a325f83e1ed90cd603558fad2f3bacf668897c0c1a81f1",
-  "generated_utc": "2026-07-09T22:46:22.345056+00:00",
+  "fast_lane_router_sha256": "eb5573972426bc99d8e9566555941b6e62bd353744f2668a5040e0444f221b50",
+  "generated_utc": "2026-07-09T22:54:07.746466+00:00",
   "outputs": {
     "dashboard_json": "dashboard/data/reviewer_investor_fast_lane_router.json",
     "json": "out/ops/reviewer_investor_fast_lane_router_latest.json",
@@ -18,10 +18,10 @@
           "sha256": "b9fcb9149ab06d23149883e94437dc9cfaabb23648c25eab0377755eaa8708f1"
         },
         {
-          "bytes": 14808,
+          "bytes": 16206,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
           "present": true,
-          "sha256": "4ed880fa0e89bee869977d7da83b8e6c9aba6c1f57d73e4dc2b905da965e1a02"
+          "sha256": "b670cb506ec97a24910515a39a8987a2a6d1659bece6817912d1ed39f5ba1a18"
         },
         {
           "bytes": 24099,
@@ -30,10 +30,10 @@
           "sha256": "cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390"
         },
         {
-          "bytes": 24904,
+          "bytes": 25708,
           "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
           "present": true,
-          "sha256": "605727c98501b70d27bd4382788a91a0dc0dab33eff7ca4fea241ff5a1bf2f2d"
+          "sha256": "5f75f6f5d698ae76c3794499b35efd43fa0c9be4258e08d8d0f3415fbca924f0"
         }
       ],
       "audience": "reviewer_or_investor",
@@ -47,7 +47,7 @@
       "missing_artifact_count": 0,
       "question": "Where should a busy reviewer start?",
       "route_id": "five_minute_reviewer_start",
-      "route_sha256": "101d89a15e6c0b4f1b8c73b0bb46133bdb37deebbbc0652b6e2438d25cfbf8e2",
+      "route_sha256": "5e40155ae1e58b1d28d0b3c571db40f8b45e1552567c824398d4b5dc49493680",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
@@ -61,13 +61,19 @@
           "bytes": 10709,
           "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
           "present": true,
-          "sha256": "73597024a5251e81950274b4b328c4d59476f9d6a77021e42b02d4b95dfb8b21"
+          "sha256": "ae8a41916c20207d4a2732d58c0e09a9a089809496696dfd822543751d27c13c"
+        },
+        {
+          "bytes": 32810,
+          "path": "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
+          "present": true,
+          "sha256": "df352e21244a5719742c84146e69112489ff582384a916f097811e036fd76f91"
         },
         {
           "bytes": 12244,
           "path": "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
           "present": true,
-          "sha256": "ed91ac51f0773611d01e175926e254d613dc2d00f02c307d14197c326d866b46"
+          "sha256": "77be584815223c7940817ba6355603ff6f93f8475a6ec1fdcabdbad0d43479e5"
         },
         {
           "bytes": 8929,
@@ -93,8 +99,9 @@
       "missing_artifact_count": 0,
       "question": "Is LumenCore disciplined enough for agency protocol?",
       "route_id": "agency_submission_protocol",
-      "route_sha256": "03babd3f2367966b4c5a4f8e7d73c8112c6c9baad5c189aaa64be51d1752d391",
+      "route_sha256": "b072d65c1ed20abb656a20dfb214ca3803539c248f99c0986e6f07761e79337e",
       "supporting_artifacts": [
+        "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md"
@@ -107,7 +114,7 @@
           "bytes": 9907,
           "path": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
           "present": true,
-          "sha256": "628e5b547f0ffbc826b736f5c6943e5ffe00cd53e70964476b07b8b6ded526b6"
+          "sha256": "a3354fec70f9ae12a0bf42c24a2f1699f05ba0d05880afa16264080b1a1860ee"
         },
         {
           "bytes": 7643,
@@ -122,10 +129,10 @@
           "sha256": "78f1356655372083a0906010cbfd669a409077c26bd1e46998fb1aaf6da7fcf8"
         },
         {
-          "bytes": 14808,
+          "bytes": 16206,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
           "present": true,
-          "sha256": "4ed880fa0e89bee869977d7da83b8e6c9aba6c1f57d73e4dc2b905da965e1a02"
+          "sha256": "b670cb506ec97a24910515a39a8987a2a6d1659bece6817912d1ed39f5ba1a18"
         }
       ],
       "audience": "patent_counsel_or_ip_diligence",
@@ -139,7 +146,7 @@
       "missing_artifact_count": 0,
       "question": "What can be said about IP without overclaiming?",
       "route_id": "ip_patent_claim_boundary",
-      "route_sha256": "7924209a08ce071e4dec7175967144f918cb74a7efbc9a2039a25a4297688c52",
+      "route_sha256": "21a83dce2a1aa88ec305803a957fc428e5f58c8190849d7e7451cd06dccc9dbe",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md",
         "grant_submissions/PATENT_LEGAL_RESCUE_PACKET_2026-06-20.md",
@@ -171,7 +178,7 @@
           "bytes": 6279,
           "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
           "present": true,
-          "sha256": "4991e2987170730bdae09dde8716d651e1f835cdbbc032653273367fc68fb6e3"
+          "sha256": "c56fed102e513a1373d9d23317b7ff20c51adc77faa1cc1c5e1dd88e255cdd95"
         }
       ],
       "audience": "technical_diligence_or_security_reviewer",
@@ -185,7 +192,7 @@
       "missing_artifact_count": 0,
       "question": "Can live sources be used without turning credentials into risk?",
       "route_id": "live_source_and_key_governance",
-      "route_sha256": "897a2f5c17052034cc63420b35a956e710b6b2ae4a471d1210db5d86ddf67c09",
+      "route_sha256": "a8cf8a6ac14815963cab53c058e0adf226968e5ac82f473bbd0cb2f0e488a046",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
@@ -306,10 +313,10 @@
           "sha256": "3a814a6751a89939d540381a20acd7eaa0ccec1b970d045191dc64d7a5b49596"
         },
         {
-          "bytes": 14808,
+          "bytes": 16206,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
           "present": true,
-          "sha256": "4ed880fa0e89bee869977d7da83b8e6c9aba6c1f57d73e4dc2b905da965e1a02"
+          "sha256": "b670cb506ec97a24910515a39a8987a2a6d1659bece6817912d1ed39f5ba1a18"
         }
       ],
       "audience": "pilot_buyer_or_commercialization_reviewer",
@@ -323,7 +330,7 @@
       "missing_artifact_count": 0,
       "question": "How does this become customer value without overclaiming savings?",
       "route_id": "commercialization_customer_roi",
-      "route_sha256": "ded106992214bc49c289a5cea18257a1ff4b9469d3a1f56d9c0510f1a0f733bc",
+      "route_sha256": "b3ab804403a962af73fc5c9b280aaa3a86512105baf2e545d715c2e0edccd919",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/PROOF_STACK_EDGE_INDEX_2026-07-09.md",
@@ -416,7 +423,7 @@
     "legal_filing_allowed_without_human": false,
     "live_trading_allowed": false,
     "missing_artifact_count": 0,
-    "qa_count": 13,
+    "qa_count": 14,
     "reviewer_gate_clear": true,
     "route_count": 8,
     "social_posting_allowed_without_human": false,

@@ -1,5 +1,5 @@
 {
-  "activation_docket_sha256": "7b727dcadd33b4619f64fc94861d6b1179fdb35aeca5ee000728da906861b767",
+  "activation_docket_sha256": "f9718f8d2f9758399240c8ba36e3beb1b310f7bab7d43308e8ca978027b68add",
   "activation_rows": [
     {
       "blocks": [
@@ -196,7 +196,7 @@
       "bytes": 12389,
       "path": "out/ops/federal_submission_protocol_packet_latest.json",
       "present": true,
-      "sha256": "d2964bb2f758d8d12f6b1b9b7c17650d9587c6b6bb142a1ab195e631197b1267"
+      "sha256": "dbf19b6dcb218b1beba9824e1da8178c59c41856b2c542839b5e6362e9fb1d88"
     },
     {
       "bytes": 33418,
@@ -205,22 +205,22 @@
       "sha256": "616519280f524711e6e11c43e059a90cb5490efbcd3f29f4e22530dd3f6fa1ca"
     },
     {
-      "bytes": 44204,
+      "bytes": 45649,
       "path": "out/ops/data_room_manifest_latest.json",
       "present": true,
-      "sha256": "b34649d4ce5f7e14e99c2f907ecdd5c59810a5fd27e572d351c59d10a3172976"
+      "sha256": "d0d2b35ea22b7e40c6d0d8825f0d3b2d233fdb9156fff035e8aef31b19f76594"
     },
     {
-      "bytes": 43851,
+      "bytes": 44208,
       "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
       "present": true,
-      "sha256": "91c64eb492f94298a555dadbfc7b060105b5d93b54c6927e7459acdb401a27a0"
+      "sha256": "7eb55a1d058a1aff3fd536988d8c4b4d2f51940daf126af9e8f2d311e8587ee0"
     },
     {
       "bytes": 11291,
       "path": "out/ops/ip_counsel_diligence_packet_latest.json",
       "present": true,
-      "sha256": "c5a45e976a556482c349a09e931f6bd5fc5c3a4867c387893e559378211edf70"
+      "sha256": "d7904915f51386724c5e5740af9da7e7ed806eaaafe4e09ea04b9cb88fc53648"
     },
     {
       "bytes": 10038,
@@ -229,7 +229,7 @@
       "sha256": "fb2fa17cfc4da39ec4c95659e679462fba202af881d2ebad4307419261a77c81"
     }
   ],
-  "generated_utc": "2026-07-09T22:46:21.989120+00:00",
+  "generated_utc": "2026-07-09T22:53:59.676673+00:00",
   "human_stop_rule": "Prepare only. Human controls credentials, legal authority certifications, portal submit, uploads, shares, pricing, representations, and final acceptance.",
   "local_readiness": {
     "blocked_readiness_count": 6,
@@ -314,8 +314,8 @@
     "calendar_or_meeting_invite_allowed_without_human": false,
     "certification_allowed_without_human": false,
     "credential_entry_allowed_without_human": false,
-    "data_room_control_artifact_count": 48,
-    "data_room_markdown_count": 43,
+    "data_room_control_artifact_count": 50,
+    "data_room_markdown_count": 44,
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "human_required_item_count": 8,

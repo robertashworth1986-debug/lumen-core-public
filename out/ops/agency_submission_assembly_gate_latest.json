@@ -1,0 +1,1453 @@
+{
+  "assembly_gate_sha256": "70a60614ffbd17ba49b9143dc481099367c91f93cfa51bc633d924c7227ea338",
+  "assembly_rows": [
+    {
+      "action_due": "2026-07-13",
+      "assembly_blockers": [
+        "SAM.gov submission is not the same as Active status.",
+        "External IRS/CAGE/DLA or SAM validation must clear before eligibility language is promoted."
+      ],
+      "assembly_row_sha256": "fff8f2b49219b6072bd225cae4ef3c7c4cd150d7848ec9395096e5757e4761d9",
+      "can_prepare_internal": true,
+      "channel": "federal_registration",
+      "claim_boundary": "Submitted is not Active; no award eligibility, active registration, or CAGE validation is claimed until SAM confirms it.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "not_required_for_registration_watch"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "human_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "not_required_for_registration_watch"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "watch_only"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "watch_only"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 4583,
+        "path": "grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
+        "present": true,
+        "sha256": "7f4f1a90c08f3c4df1b6f2b6d32b5b863a008a300f304feb807823846cdbf528"
+      },
+      "lane_id": "sam_registration_external_validation_watch",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "SAM.gov registration external validation watch",
+      "next_human_action": "Check SAM status and watch for any DLA email; prepare Entity Administrator letter packet if required.",
+      "package_status": "VALIDATION_WATCH_NOT_SUBMISSION",
+      "pre_action_checks": [
+        "Do not claim Active registration until SAM confirms Active status.",
+        "Respond only to official SAM.gov, FSD, or DLA channels verified by the human.",
+        "Human approves any notarized letter, correction, or certification."
+      ],
+      "priority": 0,
+      "readiness_mode": "FEDERAL_REGISTRATION_SUBMITTED_VALIDATION_PENDING",
+      "required_authority": "Robert verifies SAM status, responds to any official DLA or SAM request, and approves any notarized Entity Administrator letter or correction.",
+      "review_ready_component_count": 8,
+      "status": "SUBMITTED_EXTERNAL_VALIDATION_PENDING",
+      "urgency": "URGENT_5D"
+    },
+    {
+      "action_due": "2026-07-13",
+      "assembly_blockers": [
+        "No lab license, partnership, or technology-transfer relationship is claimed.",
+        "Human approves any follow-up content and disclosure boundary."
+      ],
+      "assembly_row_sha256": "dad3c03d4f2dbb0437232991813706152db271627545b9cd54b76c253aff5774",
+      "can_prepare_internal": true,
+      "channel": "federal_lab_tech_transfer",
+      "claim_boundary": "This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "primary_artifact_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "human_followup_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "not_required_for_initial_followup"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "fci_cui_export_cyber_check_required"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 22779,
+        "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "present": true,
+        "sha256": "e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55"
+      },
+      "lane_id": "lanl_vision_licensing_followup",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "LANL VISION licensing opportunity follow-up",
+      "next_human_action": "Prepare concise licensing-fit note and technical questions for the named LANL POC return window.",
+      "package_status": "FOLLOWUP_PACKET_READY_HUMAN_SEND_REQUIRED",
+      "pre_action_checks": [
+        "Keep the note limited to licensing-fit and validation questions.",
+        "Do not send private archives, unreleased IP detail, or export-sensitive material without review.",
+        "Human approves any NDA, licensing, or disclosure step."
+      ],
+      "priority": 2,
+      "readiness_mode": "LAB_POC_FOLLOWUP_READY_HUMAN_SEND_REQUIRED",
+      "required_authority": "Robert approves any lab POC reply, NDA, licensing discussion, export-control response, or disclosure packet.",
+      "review_ready_component_count": 8,
+      "status": "WAITING_POC_RETURN",
+      "urgency": "URGENT_5D"
+    },
+    {
+      "action_due": "2026-07-10",
+      "assembly_blockers": [
+        "Licensed counsel must verify status, support, disclosure limits, and exact wording before IP claim expansion."
+      ],
+      "assembly_row_sha256": "8ce0abfa57e004025e2f821057a5bf2c5a88db9c8580d9d55b4b25b8e1f8b6db",
+      "can_prepare_internal": true,
+      "channel": "ip_readiness",
+      "claim_boundary": "This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "counsel_or_official_record_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "invention_family_summary_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "inventor_and_assignment_facts_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "not_required_for_counsel_packet"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "not_primary_gate"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 9907,
+        "path": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+        "present": true,
+        "sha256": "a3354fec70f9ae12a0bf42c24a2f1699f05ba0d05880afa16264080b1a1860ee"
+      },
+      "lane_id": "uspto_georgia_patents_route",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "USPTO / Georgia PATENTS pro bono routing",
+      "next_human_action": "Prepare Georgia PATENTS intake packet and counsel questions.",
+      "package_status": "COUNSEL_PACKET_READY_LEGAL_ACTION_BLOCKED",
+      "pre_action_checks": [
+        "Prepare filed materials and claim-boundary packet.",
+        "Do not expand public patent, ownership, or freedom-to-operate claims without counsel.",
+        "Human and counsel approve any filing or disclosure action."
+      ],
+      "priority": 3,
+      "readiness_mode": "IP_PACKET_READY_COUNSEL_REQUIRED",
+      "required_authority": "Licensed patent counsel and Robert decide any filing, continuation, PCT, disclosure, or claim strategy action.",
+      "review_ready_component_count": 8,
+      "status": "PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED",
+      "urgency": "IMMEDIATE_24H"
+    },
+    {
+      "action_due": "2026-07-12",
+      "assembly_blockers": [
+        "Official BAA/RFI instructions, attachment limits, and submission channel must be checked at action time.",
+        "Cost, team, compliance, and upload preview remain human-gated."
+      ],
+      "assembly_row_sha256": "0e35771a739505864d533c21ecf9508674ec48c149df72679dab8d752b30793b",
+      "can_prepare_internal": true,
+      "channel": "federal_baa",
+      "claim_boundary": "Abstract receipt is not award selection and not permission to skip BAA instructions.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "primary_artifact_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "sam_portal_and_signer_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "cost_or_price_review_required"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "fci_cui_export_cyber_check_required"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 22779,
+        "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "present": true,
+        "sha256": "e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55"
+      },
+      "lane_id": "darpa_dice_full_submission",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "DARPA DICE full proposal sprint",
+      "next_human_action": "Build full-proposal compliance matrix and confirm controlling BAA instructions.",
+      "package_status": "ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED",
+      "pre_action_checks": [
+        "Download or verify the controlling BAA package before final formatting.",
+        "Build compliance matrix and attach only reviewed materials.",
+        "Human approves budget, reps, certifications, and final upload."
+      ],
+      "priority": 3,
+      "readiness_mode": "FEDERAL_DRAFT_READY_SUBMISSION_BLOCKED",
+      "required_authority": "Robert verifies the controlling BAA instructions, submission account authority, budget, representations, and final package.",
+      "review_ready_component_count": 8,
+      "status": "FULL_PROPOSAL_SPRINT",
+      "urgency": "URGENT_5D"
+    },
+    {
+      "action_due": "2026-08-03",
+      "assembly_blockers": [
+        "Official BAA/RFI instructions, attachment limits, and submission channel must be checked at action time.",
+        "Cost, team, compliance, and upload preview remain human-gated."
+      ],
+      "assembly_row_sha256": "aa4199c6af91836b4cccbdc40451dc60ca3522cd1abe8102faf45cd5b7cd9073",
+      "can_prepare_internal": true,
+      "channel": "federal_contract",
+      "claim_boundary": "Prepared capability material only; no FHWA field result, safety benefit, or deployment claim.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "primary_artifact_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "sam_portal_and_signer_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "cost_or_price_review_required"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "fci_cui_export_cyber_check_required"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 6109,
+        "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
+        "present": true,
+        "sha256": "f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046"
+      },
+      "lane_id": "fhwa_tsmo_data_initiative",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "FHWA TSMO Data Initiative",
+      "next_human_action": "Convert the current outline into a human-review package with compliance checklist, pricing stop, and source attachment check.",
+      "package_status": "ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED",
+      "pre_action_checks": [
+        "Verify current SAM.gov package, amendments, contacts, due time, and required volumes.",
+        "Human approves price, exceptions, representations, and signature authority.",
+        "Keep claims bounded to proof-to-pilot evidence and no field deployment claim."
+      ],
+      "priority": 4,
+      "readiness_mode": "FEDERAL_DRAFT_READY_SUBMISSION_BLOCKED",
+      "required_authority": "Robert verifies SAM access, solicitation attachments, pricing, reps/certs, and authorized representative status before submission.",
+      "review_ready_component_count": 8,
+      "status": "PHASE_I_TECH_VOLUME",
+      "urgency": "WATCHLIST"
+    },
+    {
+      "action_due": "2026-07-17",
+      "assembly_blockers": [
+        "Official RFI send route, page limits, and attachment rules must be verified.",
+        "Human must approve response wording before send."
+      ],
+      "assembly_row_sha256": "ff354396c87764aca4ae3f0968cc2f3215bd5dcadb1d823666427cc12e910231",
+      "can_prepare_internal": true,
+      "channel": "federal_rfi",
+      "claim_boundary": "RFI response only; no NASA partnership, contract, or infrastructure result is represented.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "primary_artifact_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "sam_portal_and_signer_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "not_required_for_initial_response"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "fci_cui_export_cyber_check_required"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 5614,
+        "path": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md",
+        "present": true,
+        "sha256": "bcfdd40dfafc7ca0e7822679dba9d2504c2196b5701704d0ba3d46c5ce9448f6"
+      },
+      "lane_id": "nasa_data_center_rfi",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "NASA Data Center Infrastructure RFI",
+      "next_human_action": "Prepare a bounded response draft and verify official response instructions before send.",
+      "package_status": "ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED",
+      "pre_action_checks": [
+        "Verify official response instructions and deadline.",
+        "Use market-research framing, not award or deployment language.",
+        "Human approves final email or portal upload."
+      ],
+      "priority": 5,
+      "readiness_mode": "RFI_DRAFT_READY_SEND_BLOCKED",
+      "required_authority": "Robert verifies official RFI instructions, contact address, page limits, and final send approval.",
+      "review_ready_component_count": 8,
+      "status": "RFI_RESPONSE_PREP",
+      "urgency": "ACTIVE_14D"
+    },
+    {
+      "action_due": null,
+      "assembly_blockers": [
+        "DSIP firm linkage, Firm PIN, topic workspace, forms, cost volume, and certifications remain human-gated.",
+        "No DSIP submit or certification action is authorized by local files."
+      ],
+      "assembly_row_sha256": "80e6c84f4928f283f8d7a23177d60f964531ddfbe70418e89823c4e21631270b",
+      "can_prepare_internal": true,
+      "channel": "federal_sbir",
+      "claim_boundary": "No DLA integration, procurement, or certified readiness claim.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "primary_artifact_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "dsip_or_sbir_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "cost_or_price_review_required"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "fci_cui_export_cyber_check_required"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 5275,
+        "path": "grant_submissions/funding_sprint_20260709/DSIP_MISSIONWEAVE_FAST_SUBMISSION_PLAN_2026-07-09.md",
+        "present": true,
+        "sha256": "cf0d3fd466ecfd8396d17f1c4787a7fa2898f49ee5f81ed377df05aa161029c4"
+      },
+      "lane_id": "dla_missionweave_sbir",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "DLA MissionWeave DSIP SBIR",
+      "next_human_action": "Prepare technical volume, cost notes, and Firm PIN handoff checklist.",
+      "package_status": "ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED",
+      "pre_action_checks": [
+        "Human enters Firm PIN and confirms organization authority.",
+        "Human approves cost volume, certifications, and upload preview.",
+        "No integration or procurement readiness claim without agency evidence."
+      ],
+      "priority": 6,
+      "readiness_mode": "SBIR_DRAFT_READY_PORTAL_BLOCKED",
+      "required_authority": "Robert controls DSIP or SBIR portal login, Firm PIN, cost approval, certifications, and final submit.",
+      "review_ready_component_count": 8,
+      "status": "DSIP_PACKAGE_PREP",
+      "urgency": "ROLLING_OR_EVENT_GATED"
+    },
+    {
+      "action_due": null,
+      "assembly_blockers": [
+        "NSF account, pending-pitch status, invitation state, and one-pending-pitch rule must be checked.",
+        "No Research.gov or NSF final action is authorized by local files."
+      ],
+      "assembly_row_sha256": "e21bd5a7a4e9095ba712b74084984f35ad60bdd232720823d279a76f2369430c",
+      "can_prepare_internal": true,
+      "channel": "federal_sbir",
+      "claim_boundary": "No NSF invitation or full-proposal eligibility is represented unless NSF issues it.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "primary_artifact_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "dsip_or_sbir_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "cost_or_price_review_required"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "fci_cui_export_cyber_check_required"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 8895,
+        "path": "grant_submissions/funding_sprint_20260709/NSF_PROJECT_PITCH_DRAFT_2026-07-09.md",
+        "present": true,
+        "sha256": "baa66ab948fdc1bb57e898d8a6e4e0bf776c65ff4c6722ef658720c148f40e6f"
+      },
+      "lane_id": "nsf_project_pitch",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "NSF SBIR/STTR Project Pitch",
+      "next_human_action": "Check the one-pending-pitch rule before any Project Pitch submit.",
+      "package_status": "ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED",
+      "pre_action_checks": [
+        "Check whether any related pitch, invitation, or proposal is already pending.",
+        "Confirm eligibility and portal account state before pressing submit.",
+        "Human approves final text."
+      ],
+      "priority": 7,
+      "readiness_mode": "ROLLING_GATE_READY_RULE_CHECK_REQUIRED",
+      "required_authority": "Robert verifies account status, platform-specific rules, one-pending-pitch limits, and final content before submit.",
+      "review_ready_component_count": 8,
+      "status": "PITCH_READY_HUMAN_CHECK",
+      "urgency": "ROLLING_OR_EVENT_GATED"
+    },
+    {
+      "action_due": "2026-07-21",
+      "assembly_blockers": [
+        "Wait for official routing response before claiming a submission path or agency interest."
+      ],
+      "assembly_row_sha256": "33cc48f5664d89455678fe10589460221358862d0b06d372f0610ce348b5762a",
+      "can_prepare_internal": true,
+      "channel": "federal_market_research",
+      "claim_boundary": "No instrument supply, OEM, reseller, or lab-services qualification claim.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "primary_artifact_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "human_routing_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "not_required_for_routing_watch"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "fci_cui_export_cyber_check_required"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 22779,
+        "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "present": true,
+        "sha256": "e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55"
+      },
+      "lane_id": "epa_r10_icpoes_route",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "EPA Region 10 ICP-OES RFI route",
+      "next_human_action": "Wait for routing response; do not prepare a prime bid.",
+      "package_status": "WAIT_FOR_RESPONSE",
+      "pre_action_checks": [
+        "Do not prepare a hardware or prime quote.",
+        "Wait for routing signal or partner path.",
+        "Human approves any follow-up message."
+      ],
+      "priority": 8,
+      "readiness_mode": "ROUTING_SENT_WAIT_FOR_RESPONSE",
+      "required_authority": "Robert approves any further agency contact after a routing response.",
+      "review_ready_component_count": 8,
+      "status": "ROUTE_ONLY_LOW_FIT",
+      "urgency": "ACTIVE_14D"
+    },
+    {
+      "action_due": "2026-07-21",
+      "assembly_blockers": [
+        "Qualified prime, jurisdictional owner, lab, testbed, or domain partner is required before any solo package is promoted."
+      ],
+      "assembly_row_sha256": "8cb6190184f78cc75db67b667c668eab645cef1d3290ce58cb1d5f56a799aafd",
+      "can_prepare_internal": true,
+      "channel": "federal_sources_sought",
+      "claim_boundary": "No testing lab, contaminant monitoring, or regulated lab-services claim.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "primary_artifact_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "partner_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "not_required_until_partner_or_sources_sought_response"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "fci_cui_export_cyber_check_required"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 22779,
+        "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "present": true,
+        "sha256": "e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55"
+      },
+      "lane_id": "epa_ucmr6_partner_only",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "EPA UCMR 6 analytical chemistry lab services",
+      "next_human_action": "Find qualified partner before any response draft.",
+      "package_status": "PARTNER_OR_NO_SOLO_BLOCKED",
+      "pre_action_checks": [
+        "Identify qualified prime or regulated-domain partner first.",
+        "Do not claim prime qualifications LumenCore does not hold.",
+        "Human approves outreach and role boundary."
+      ],
+      "priority": 9,
+      "readiness_mode": "PARTNER_REQUIRED_NO_SOLO_SUBMISSION",
+      "required_authority": "Qualified partner and Robert approve any partner-led response.",
+      "review_ready_component_count": 8,
+      "status": "PARTNER_ONLY",
+      "urgency": "PARKED_UNLESS_PARTNER"
+    },
+    {
+      "action_due": "2026-07-24",
+      "assembly_blockers": [
+        "Topic fit and official package requirements must be selected before drafting becomes submission assembly."
+      ],
+      "assembly_row_sha256": "9de3e0ae8ad03f06d62f25f8b827df9cc6f729c40ab3ad713606181a66d3787f",
+      "can_prepare_internal": true,
+      "channel": "federal_baa",
+      "claim_boundary": "No claim that LumenCore fits all BAA topics.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "primary_artifact_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "sam_portal_and_signer_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "cost_or_price_review_required"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "fci_cui_export_cyber_check_required"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 22779,
+        "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "present": true,
+        "sha256": "e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55"
+      },
+      "lane_id": "fhwa_infrastructure_baa_call3",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "FHWA Infrastructure R&D BAA Call 3.0",
+      "next_human_action": "Review official attachments and score topic fit before drafting.",
+      "package_status": "SCOUT_READY_NOT_ASSEMBLED",
+      "pre_action_checks": [
+        "Download official attachments.",
+        "Score topic fit before drafting.",
+        "Human approves the selected topic and response plan."
+      ],
+      "priority": 10,
+      "readiness_mode": "TOPIC_SCOUT_READY_SELECTION_REQUIRED",
+      "required_authority": "Robert approves topic selection after official attachments and topic fit are reviewed.",
+      "review_ready_component_count": 8,
+      "status": "SCOUT_TOPIC_MATCH",
+      "urgency": "WATCHLIST"
+    },
+    {
+      "action_due": "2026-07-14",
+      "assembly_blockers": [
+        "This lane should not be pursued solo without a qualified partner or lead organization."
+      ],
+      "assembly_row_sha256": "e750b5b627a51fd2bfaa88e2bf704514c20af45f2ed05ae16a61de2fe369cae5",
+      "can_prepare_internal": false,
+      "channel": "federal_contract",
+      "claim_boundary": "No FedRAMP, ATO, HHS pilot, or government production-access claim.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "primary_artifact_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "sam_portal_and_signer_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "cost_or_price_review_required"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "fci_cui_export_cyber_check_required"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 22779,
+        "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "present": true,
+        "sha256": "e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55"
+      },
+      "lane_id": "hhs_ai_power_user_pilot",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "HHS AI Power User Advanced Models and Features Pilot",
+      "next_human_action": "Park as non-solo lane unless a qualified platform or prime partner leads.",
+      "package_status": "PARTNER_OR_NO_SOLO_BLOCKED",
+      "pre_action_checks": [
+        "Do not spend proposal time without a qualified partner.",
+        "Keep as market intelligence only.",
+        "Human approves any partner-specific reactivation."
+      ],
+      "priority": 11,
+      "readiness_mode": "PARKED_NO_SOLO_ACTION",
+      "required_authority": "Qualified compliant platform or prime partner must lead before this lane is reopened.",
+      "review_ready_component_count": 8,
+      "status": "DO_NOT_PRIME_SOLO",
+      "urgency": "PARKED_UNLESS_PARTNER"
+    },
+    {
+      "action_due": "2026-07-14",
+      "assembly_blockers": [
+        "This lane should not be pursued solo without a qualified partner or lead organization."
+      ],
+      "assembly_row_sha256": "3a7b0d825d28da6d0cbe625d4bac20e629ffea703c6ce642720a720192818a95",
+      "can_prepare_internal": false,
+      "channel": "federal_contract",
+      "claim_boundary": "No public-safety deployment, law-enforcement feed integration, or FedRAMP authorization claim.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "primary_artifact_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "sam_portal_and_signer_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "cost_or_price_review_required"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "fci_cui_export_cyber_check_required"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 22779,
+        "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "present": true,
+        "sha256": "e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55"
+      },
+      "lane_id": "csosa_public_safety_analytics",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "CSOSA Public Safety Data Analytics Platform",
+      "next_human_action": "Park as non-solo lane unless a qualified platform or prime partner leads.",
+      "package_status": "PARTNER_OR_NO_SOLO_BLOCKED",
+      "pre_action_checks": [
+        "Do not spend proposal time without a qualified partner.",
+        "Keep as market intelligence only.",
+        "Human approves any partner-specific reactivation."
+      ],
+      "priority": 12,
+      "readiness_mode": "PARKED_NO_SOLO_ACTION",
+      "required_authority": "Qualified compliant platform or prime partner must lead before this lane is reopened.",
+      "review_ready_component_count": 8,
+      "status": "DO_NOT_PRIME_SOLO",
+      "urgency": "PARKED_UNLESS_PARTNER"
+    },
+    {
+      "action_due": "2026-07-30",
+      "assembly_blockers": [
+        "Only intro material is ready; no solo proposal, pricing, or certification should be sent."
+      ],
+      "assembly_row_sha256": "91eed77a9c6537a1e6d766a57cb3c87bb6717b0252b55b90da3fe49548365419",
+      "can_prepare_internal": true,
+      "channel": "federal_contract",
+      "claim_boundary": "No consortium management, energy project financing, or installation-performance claim.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "source_identified_human_recheck_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "primary_artifact_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "sam_portal_and_signer_authority_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "cost_or_price_review_required"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "fci_cui_export_cyber_check_required"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 22779,
+        "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "present": true,
+        "sha256": "e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55"
+      },
+      "lane_id": "defense_energy_consortium",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "Defense Energy Consortium CMO",
+      "next_human_action": "Use as strategic-intro material, not a solo proposal.",
+      "package_status": "PARTNER_OR_NO_SOLO_BLOCKED",
+      "pre_action_checks": [
+        "Use as partner/investor context, not a solo bid.",
+        "Human approves the intro target and positioning.",
+        "No project-financing or performance claim unless externally documented."
+      ],
+      "priority": 13,
+      "readiness_mode": "INTRO_MATERIAL_READY_NO_SOLO_PROPOSAL",
+      "required_authority": "Robert approves any strategic partner or investor introduction before outreach.",
+      "review_ready_component_count": 8,
+      "status": "PARTNER_INTRO_ONLY",
+      "urgency": "PARKED_UNLESS_PARTNER"
+    },
+    {
+      "action_due": "2026-07-25",
+      "assembly_blockers": [
+        "Licensed counsel must verify status, support, disclosure limits, and exact wording before IP claim expansion."
+      ],
+      "assembly_row_sha256": "8c68c7932bab9a32e707a5fb16aa102c9afad9cdc437d45cc3e196c75558b4dc",
+      "can_prepare_internal": true,
+      "channel": "ip_readiness",
+      "claim_boundary": "This ledger is not legal advice and does not assert patentability, ownership, or filing sufficiency.",
+      "component_count": 8,
+      "components": [
+        {
+          "component": "official_source_and_instructions",
+          "final_action_blocked": true,
+          "gate": "Official opportunity instructions, amendments, due date, format, and submission route checked by a human.",
+          "ready_for_review": true,
+          "state": "counsel_or_official_record_required"
+        },
+        {
+          "component": "capability_or_technical_narrative",
+          "final_action_blocked": true,
+          "gate": "Human-approved narrative or technical volume aligned to the opportunity.",
+          "ready_for_review": true,
+          "state": "invention_family_summary_ready"
+        },
+        {
+          "component": "evidence_annex_and_proof_boundary",
+          "final_action_blocked": true,
+          "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
+          "ready_for_review": true,
+          "state": "hashable_artifacts_claim_bounded"
+        },
+        {
+          "component": "eligibility_account_and_signer_authority",
+          "final_action_blocked": true,
+          "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
+          "ready_for_review": true,
+          "state": "inventor_and_assignment_facts_required"
+        },
+        {
+          "component": "cost_price_or_budget_basis",
+          "final_action_blocked": true,
+          "gate": "Cost, price, budget, or ROM language is reviewed and permitted by the opportunity.",
+          "ready_for_review": true,
+          "state": "not_required_for_counsel_packet"
+        },
+        {
+          "component": "cyber_export_and_protected_data_boundary",
+          "final_action_blocked": true,
+          "gate": "FCI/CUI/export/CMMC/SPRS/ATO/FedRAMP implications are checked before representation.",
+          "ready_for_review": true,
+          "state": "not_primary_gate"
+        },
+        {
+          "component": "ip_disclosure_and_counsel_boundary",
+          "final_action_blocked": true,
+          "gate": "Patent, ownership, disclosure, and claim-scope language remains counsel-gated.",
+          "ready_for_review": true,
+          "state": "counsel_boundary_required"
+        },
+        {
+          "component": "human_final_action_authority",
+          "final_action_blocked": true,
+          "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
+          "ready_for_review": true,
+          "state": "blocked_until_human_approval"
+        }
+      ],
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "first_artifact": {
+        "bytes": 7643,
+        "path": "grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md",
+        "present": true,
+        "sha256": "274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb"
+      },
+      "lane_id": "patent_deadline_counsel",
+      "legal_or_certification_action_allowed_without_human": false,
+      "name": "Patent counsel / IP deadline defense",
+      "next_human_action": "Monitor counsel replies and prepare filed-materials packet for licensed review.",
+      "package_status": "COUNSEL_PACKET_READY_LEGAL_ACTION_BLOCKED",
+      "pre_action_checks": [
+        "Prepare filed materials and claim-boundary packet.",
+        "Do not expand public patent, ownership, or freedom-to-operate claims without counsel.",
+        "Human and counsel approve any filing or disclosure action."
+      ],
+      "priority": 15,
+      "readiness_mode": "IP_PACKET_READY_COUNSEL_REQUIRED",
+      "required_authority": "Licensed patent counsel and Robert decide any filing, continuation, PCT, disclosure, or claim strategy action.",
+      "review_ready_component_count": 8,
+      "status": "PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED",
+      "urgency": "WATCHLIST"
+    }
+  ],
+  "generated_utc": "2026-07-09T22:54:03.693241+00:00",
+  "global_stop_rule": "No federal, SBIR, RFI, lab, IP, certification, legal, pricing, portal, trading, or capital-impacting final action is authorized by this packet. It is an assembly and review gate only.",
+  "outputs": {
+    "dashboard_json": "dashboard/data/agency_submission_assembly_gate.json",
+    "json": "out/ops/agency_submission_assembly_gate_latest.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md"
+  },
+  "purpose": "Convert near-term federal, SBIR, RFI, lab, and IP lanes into an assembly checklist showing what is review-ready, what remains blocked, and who must authorize final action.",
+  "schema": "agency_submission_assembly_gate_v1",
+  "source_ledgers": {
+    "agency_activation": "out/ops/agency_account_activation_docket_latest.json",
+    "authority": "out/ops/submission_authority_matrix_latest.json",
+    "concierge": "out/ops/reviewer_concierge_packet_latest.json",
+    "docket": "out/ops/human_action_docket_latest.json",
+    "federal_protocol": "out/ops/federal_submission_protocol_packet_latest.json",
+    "reviewer_gate": "out/ops/funding_sprint_reviewer_gate_latest.json",
+    "traction": "out/ops/traction_opportunity_intake_ledger_latest.json"
+  },
+  "status": "AGENCY_SUBMISSION_ASSEMBLY_READY_HUMAN_GATED",
+  "summary": {
+    "agency_activation_item_count": 8,
+    "agency_activation_status": "AGENCY_ACCOUNT_ACTIVATION_READY_HUMAN_PORTAL_REQUIRED",
+    "agency_blocked_item_count": 6,
+    "all_final_actions_blocked_without_human": true,
+    "assembly_lane_count": 15,
+    "authority_lane_count": 19,
+    "capital_movement_allowed": false,
+    "external_send_allowed_without_human": false,
+    "federal_protocol_status": "FEDERAL_SUBMISSION_PROTOCOL_READY_HUMAN_PORTAL_REQUIRED",
+    "final_submission_allowed_without_human": false,
+    "first_artifacts_present": true,
+    "legal_or_certification_action_allowed_without_human": false,
+    "live_trading_allowed": false,
+    "reviewer_gate_clear": true,
+    "status_counts": {
+      "ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED": 5,
+      "COUNSEL_PACKET_READY_LEGAL_ACTION_BLOCKED": 2,
+      "FOLLOWUP_PACKET_READY_HUMAN_SEND_REQUIRED": 1,
+      "PARTNER_OR_NO_SOLO_BLOCKED": 4,
+      "SCOUT_READY_NOT_ASSEMBLED": 1,
+      "VALIDATION_WATCH_NOT_SUBMISSION": 1,
+      "WAIT_FOR_RESPONSE": 1
+    },
+    "unsafe_claim_count": 0,
+    "unsafe_secret_count": 0
+  }
+}

@@ -48,10 +48,10 @@
       "sha256": "78f1356655372083a0906010cbfd669a409077c26bd1e46998fb1aaf6da7fcf8"
     },
     {
-      "bytes": 14808,
+      "bytes": 16206,
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
       "present": true,
-      "sha256": "4ed880fa0e89bee869977d7da83b8e6c9aba6c1f57d73e4dc2b905da965e1a02"
+      "sha256": "4e8e5f65d25c69cb38af1ddc5ede9560a7cd32aaf3277cafd0caeec820b438b3"
     },
     {
       "bytes": 24099,
@@ -72,19 +72,19 @@
       "sha256": "95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762"
     },
     {
-      "bytes": 24904,
+      "bytes": 25708,
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
       "present": true,
-      "sha256": "605727c98501b70d27bd4382788a91a0dc0dab33eff7ca4fea241ff5a1bf2f2d"
+      "sha256": "5f75f6f5d698ae76c3794499b35efd43fa0c9be4258e08d8d0f3415fbca924f0"
     },
     {
       "bytes": 6279,
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "present": true,
-      "sha256": "4991e2987170730bdae09dde8716d651e1f835cdbbc032653273367fc68fb6e3"
+      "sha256": "c56fed102e513a1373d9d23317b7ff20c51adc77faa1cc1c5e1dd88e255cdd95"
     }
   ],
-  "generated_utc": "2026-07-09T22:46:21.278817+00:00",
+  "generated_utc": "2026-07-09T22:53:56.239164+00:00",
   "human_gate": {
     "investor_ip_claim_expansion_allowed_without_human": false,
     "legal_filing_allowed_without_human": false,
@@ -130,7 +130,7 @@
       "reviewer_safe_summary": "Autonomous research and replay evaluation loops operate under human-gated execution controls and immutable audit logging."
     }
   ],
-  "ip_counsel_diligence_packet_sha256": "08a573a732c44da601bf557256fb56edeb9d5f6e97bd0d4aa1a9f15774e99504",
+  "ip_counsel_diligence_packet_sha256": "8141d3b37e71ff15d0228f6102d7bc87bd53ae3c719cd150fcceac0b3dceaaa4",
   "official_sources": [
     {
       "label": "USPTO provisional application guidance",
@@ -190,7 +190,7 @@
     "all_final_actions_blocked_without_human": true,
     "clearance_to_operate_claimed": false,
     "counsel_question_count": 6,
-    "data_room_markdown_count": 43,
+    "data_room_markdown_count": 44,
     "evidence_artifact_count": 8,
     "human_patent_center_check_required": true,
     "intake_item_count": 5,
@@ -202,7 +202,7 @@
     "official_source_count": 5,
     "patent_grant_claimed": false,
     "public_disclosure_review_required": true,
-    "qa_count": 13,
+    "qa_count": 14,
     "reviewer_gate_clear": true,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0

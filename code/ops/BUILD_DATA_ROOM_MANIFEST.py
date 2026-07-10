@@ -24,6 +24,7 @@ CONTROL_NAMES = [
     "submission_authority_matrix",
     "reviewer_decision_brief",
     "reviewer_investor_fast_lane_router",
+    "agency_submission_assembly_gate",
     "customer_commercialization_packet",
     "venture_studio_terms_guardrail_packet",
     "reviewer_diligence_qa_matrix",
@@ -46,6 +47,7 @@ CONTROL_NAMES = [
 FRONT_DOOR_FILES = {
     "REVIEWER_DECISION_BRIEF_2026-07-09.md",
     "REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md",
+    "AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
     "CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
     "VENTURE_STUDIO_TERMS_GUARDRAIL_PACKET_2026-07-09.md",
     "REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
@@ -254,6 +256,7 @@ def build_payload() -> dict[str, Any]:
         "front_door_order": [
             "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md",
+            "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/VENTURE_STUDIO_TERMS_GUARDRAIL_PACKET_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
