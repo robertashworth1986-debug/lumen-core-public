@@ -1,0 +1,538 @@
+{
+  "board_sha256": "1f8153c80d1d1876d7957e9bcb9c0a231a1cb98a6f024eaefb9dfe709a3aaa1f",
+  "generated_utc": "2026-07-10T17:17:18.392822+00:00",
+  "no_bid_or_do_not_prime": [
+    {
+      "deadline_utc": "2026-07-14T21:00:00Z",
+      "posture": "NO_SOLO_BID_PLATFORM_GATE",
+      "rank": 9,
+      "solicitation_number": "7571TE26R00004",
+      "title": "HHS AI Power User Advanced Models and Features Pilot"
+    },
+    {
+      "deadline_utc": "2026-07-20T16:00:00Z",
+      "posture": "NO_BID_AWS_RESELLER_GATE",
+      "rank": 10,
+      "solicitation_number": "FA460026Q0071",
+      "title": "16WS Cloud Platform BPA"
+    }
+  ],
+  "opportunities": [
+    {
+      "action_bucket": "submit_ready_human_gate",
+      "agency": "Federal Highway Administration",
+      "award_fit": "Strongest solo or small-team agency fit.",
+      "days_to_deadline_from_2026_07_10": 24,
+      "deadline_bucket": "thirty_day_sprint",
+      "deadline_utc": "2026-08-03T13:00:00Z",
+      "department": "Department of Transportation",
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "fit_score": 97,
+      "human_gate_required": true,
+      "human_gates": [
+        "Official attachments and amendments reviewed.",
+        "Phase I volume, reps/certs, and any price/cost language approved by Robert.",
+        "Final SAM.gov upload/submission preview approved by Robert."
+      ],
+      "notice_type": "Solicitation",
+      "official_url": "https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view",
+      "opportunity_id": "fhwa_tsmo_data_initiative",
+      "opportunity_sha256": "3f5e99cad9960197a65d723956b5419ecf804c2ee39978dbbb4411eca13bf979",
+      "package_files": [
+        "FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
+        "LUMENCORE_FHWA_TSMO_CAPABILITY_NOTE_693JJ326R000012_2026-07-09.pdf",
+        "FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md"
+      ],
+      "posture": "PRIMARY_SUBMISSION_PACKAGE_READY_HUMAN_SUBMIT",
+      "pricing_allowed_without_human": false,
+      "rank": 1,
+      "secondary_url": "https://console.sweetspotgov.com/federal-contracts/bc3fd412-e7f6-578a-b86a-7ced6686e715",
+      "set_aside": "Full and open",
+      "solicitation_number": "693JJ326R000012",
+      "submission_route": "SAM.gov / official solicitation instructions",
+      "submit_now_work": [
+        "Use the existing FHWA Phase I technical capability outline as the base volume.",
+        "Add a compliance matrix against the official solicitation attachments.",
+        "Attach evidence-register excerpts only after reviewing attachment limits.",
+        "Keep field-validation claims bounded to proposed pilots unless a transportation partner signs off."
+      ],
+      "title": "Transportation Systems Management and Operations Data Initiative",
+      "urgency_score": 70,
+      "why_fit": "The notice is explicitly about data barriers limiting AI in TSMO, prototype algorithms/models, prioritized use cases, and benchmarkable outcomes. LumenCore's measured-source proof stack, replay receipts, and validation ledger can be framed as the AI-readiness and prototype-evaluation layer."
+    },
+    {
+      "action_bucket": "submit_ready_human_gate",
+      "agency": "NASA IT Procurement Office",
+      "award_fit": "Fast RFI response, strong credibility signal.",
+      "days_to_deadline_from_2026_07_10": 7,
+      "deadline_bucket": "seven_day_sprint",
+      "deadline_utc": "2026-07-17T21:00:00Z",
+      "department": "National Aeronautics and Space Administration",
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "fit_score": 91,
+      "human_gate_required": true,
+      "human_gates": [
+        "Confirm RFI email recipients and page limit from the official SAM notice.",
+        "Approve any company capability, past-performance, and availability statements.",
+        "Approve final email send."
+      ],
+      "notice_type": "Sources Sought / RFI",
+      "official_url": "https://sam.gov/opp/312af51a7fc14110b1239bdd32252213/view",
+      "opportunity_id": "nasa_data_center_infrastructure_rfi",
+      "opportunity_sha256": "d6b332a11949c534cfaebd91ab2766e94b2bcef2661bb907b0561d3fa5f93b2e",
+      "package_files": [
+        "NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md",
+        "NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md"
+      ],
+      "posture": "RFI_RESPONSE_READY_HUMAN_SEND",
+      "pricing_allowed_without_human": false,
+      "rank": 2,
+      "secondary_url": "https://console.sweetspotgov.com/federal-contracts/cd3ba4d9-cc57-52f7-8a10-95ac309aa0f4",
+      "set_aside": "Market research",
+      "solicitation_number": "80TECH26RFI0020",
+      "submission_route": "Email response per RFI instructions",
+      "submit_now_work": [
+        "Convert existing NASA outline into a 6-10 page RFI response.",
+        "Use measured proof language: evidence manifest, replay harness, resilience scoring, governance receipts.",
+        "State that no NASA production access or agency validation is claimed."
+      ],
+      "title": "Strategic Partnerships for NASA Data Center Infrastructure",
+      "urgency_score": 90,
+      "why_fit": "NASA asked for strategic ideas for modern, resilient, secure, scalable, cost-effective data-center infrastructure, including hybrid/cloud approaches and AI-driven operations. LumenCore can offer a bounded validation and decision-evidence layer for comparing modernization paths before large capital commitments."
+    },
+    {
+      "action_bucket": "submit_ready_human_gate",
+      "agency": "ERDC Information Technology Laboratory / HPCMP",
+      "award_fit": "Strong concept-paper lane if framed as a modular proof fabric, not a full cloud prime.",
+      "days_to_deadline_from_2026_07_10": 28,
+      "deadline_bucket": "thirty_day_sprint",
+      "deadline_utc": "2026-08-07T21:00:00Z",
+      "department": "Department of the Army",
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "fit_score": 88,
+      "human_gate_required": true,
+      "human_gates": [
+        "Open ERDCWERX form and confirm required fields.",
+        "Approve solution title, commercial item framing, data-rights language, and any pricing.",
+        "Approve final portal submit."
+      ],
+      "notice_type": "Special Notice / CSO",
+      "official_url": "https://sam.gov/opp/8e32f0dfcdee42eeb3b2b03819a6ed25/view",
+      "opportunity_id": "erdc_sovereign_defense_cloud_cso",
+      "opportunity_sha256": "80ba78562437c3bd47ccbc31e2d0900e836a409d756cebd7ce306435157b3d85",
+      "package_files": [
+        "ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md"
+      ],
+      "posture": "CSO_CONCEPT_READY_HUMAN_PORTAL_SUBMIT",
+      "pricing_allowed_without_human": false,
+      "rank": 3,
+      "secondary_url": "https://www.erdcwerx.org/sovereign-defense-cloud-for-high-performance-computing/",
+      "set_aside": "Full and open",
+      "solicitation_number": "W912HZ26SC005",
+      "submission_route": "ERDCWERX Commercial Solutions Opening portal",
+      "submit_now_work": [
+        "Use ERDCWERX CSO route and select Commercial Solutions Opening.",
+        "Frame LumenCore as a modular verification, replay, and evidence-control layer.",
+        "Avoid claiming ownership of a complete sovereign cloud platform."
+      ],
+      "title": "Sovereign Defense Cloud for High-Performance Computing Commercial Solutions Opening",
+      "urgency_score": 64,
+      "why_fit": "The CSO targets hybrid cloud, workflow automation, secure data fabric, portability, interoperability, and a sovereign AI-driven government capability. LumenCore can credibly propose a proof and validation fabric for measuring workflow reliability, data lineage, and governance readiness across HPC/cloud environments."
+    },
+    {
+      "action_bucket": "submit_ready_human_gate",
+      "agency": "Federal Bureau of Prisons",
+      "award_fit": "Fast small-business analytics quote if requirements and pricing are supportable.",
+      "days_to_deadline_from_2026_07_10": 13,
+      "deadline_bucket": "two_week_sprint",
+      "deadline_utc": "2026-07-23T15:00:00Z",
+      "department": "Department of Justice",
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "fit_score": 78,
+      "human_gate_required": true,
+      "human_gates": [
+        "Download official solicitation and confirm deliverables, clauses, and quote format.",
+        "Robert approves price and any past-performance statement.",
+        "Final email quote approved by Robert."
+      ],
+      "notice_type": "Combined Synopsis/Solicitation",
+      "official_url": "",
+      "opportunity_id": "doj_bop_historical_medical_claims_analysis",
+      "opportunity_sha256": "f75a91466d496d2ad9a6b3fe3b0259eea23695089bcfb96d136c5744d9081a48",
+      "package_files": [
+        "DOJ_BOP_MEDICAL_CLAIMS_ANALYSIS_QUOTE_STUB_2026-07-10.md"
+      ],
+      "posture": "QUOTE_STUB_READY_PRICE_AND_COMPLIANCE_GATE",
+      "pricing_allowed_without_human": false,
+      "rank": 4,
+      "secondary_url": "https://console.sweetspotgov.com/federal-contracts/8f7dec78-58cd-59be-bad1-d581c166f4a1",
+      "set_aside": "Total small business set-aside",
+      "solicitation_number": "15BCMS26Q70000005",
+      "submission_route": "Email quote per solicitation instructions",
+      "submit_now_work": [
+        "Build a quote response around fixed deliverables, human-reviewed analytics, and report formats.",
+        "Explicitly disclose any AI-assisted analysis and prohibit government data training.",
+        "Keep price, schedule, and responsibility determinations human-approved."
+      ],
+      "title": "Historical Medical Claims Data Analysis",
+      "urgency_score": 82,
+      "why_fit": "The work is bounded historical claims analysis with deliverable reports and a stated path for AI use if disclosed, kept out of model training, and human-reviewed. LumenCore can offer measured analytics, anomaly detection, human-reviewed findings, and transparent report custody."
+    },
+    {
+      "action_bucket": "partner_or_watch",
+      "agency": "United States Trade and Development Agency",
+      "award_fit": "Possible consulting/scoping lane, better with a senior infrastructure partner.",
+      "days_to_deadline_from_2026_07_10": 12,
+      "deadline_bucket": "two_week_sprint",
+      "deadline_utc": "2026-07-22T17:00:00Z",
+      "department": "USTDA",
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "fit_score": 72,
+      "human_gate_required": true,
+      "human_gates": [
+        "Confirm staffing, travel, and project-report requirements.",
+        "Decide whether to prime or partner.",
+        "Approve any proposal or partner outreach."
+      ],
+      "notice_type": "Combined Synopsis/Solicitation",
+      "official_url": "https://sam.gov/workspace/contract/opp/fdefc4a420e04049a6a768f744d040c9/view",
+      "opportunity_id": "ustda_indo_pacific_digital_infrastructure_scoping",
+      "opportunity_sha256": "6ed99b1c7fb9370fba14542c74723136b737b547fbbfcbe9e684218606a6e438",
+      "package_files": [
+        "USTDA_INDO_PACIFIC_DIGITAL_INFRA_SCOPING_STUB_2026-07-10.md"
+      ],
+      "posture": "PARTNER_OR_SCOPING_NOTE_ONLY",
+      "pricing_allowed_without_human": false,
+      "rank": 5,
+      "secondary_url": "https://console.sweetspotgov.com/federal-contracts/ee4a2cbe-98ea-56df-aef1-11106cf6105c",
+      "set_aside": "Total small business set-aside",
+      "solicitation_number": "1131PL26R0049",
+      "submission_route": "SAM.gov / official solicitation instructions",
+      "submit_now_work": [
+        "Prepare a narrow capability appendix for a prime or partner.",
+        "Do not present as a full international infrastructure scoping prime without confirming travel and staffing."
+      ],
+      "title": "Indo-Pacific Digital Infrastructure Project Scoping Services",
+      "urgency_score": 84,
+      "why_fit": "The scope includes digital connectivity, cloud/data infrastructure, cybersecurity, digital public services, and AI applications. LumenCore can contribute a technical evaluation matrix and proof stack, but the lead likely needs international scoping and travel capacity."
+    },
+    {
+      "action_bucket": "partner_or_watch",
+      "agency": "Army Contracting Command - Aberdeen Proving Ground",
+      "award_fit": "Useful defense-data platform signal, not a solo-prime bid.",
+      "days_to_deadline_from_2026_07_10": 5,
+      "deadline_bucket": "seven_day_sprint",
+      "deadline_utc": "2026-07-15T21:00:00Z",
+      "department": "Department of the Army",
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "fit_score": 70,
+      "human_gate_required": true,
+      "human_gates": [
+        "Official markings and distribution reviewed.",
+        "Partner or agency-contact route approved.",
+        "Final send approved by Robert."
+      ],
+      "notice_type": "Sources Sought / RFI",
+      "official_url": "https://sam.gov/workspace/contract/opp/3d72f2df3aaf459797c14cefb41fd235/view",
+      "opportunity_id": "army_aidp_rfi4",
+      "opportunity_sha256": "915598448235877d06c66edfa4216ad00370098f43d75d26901b4d601abf079b",
+      "package_files": [
+        "ARMY_AIDP_RFI4_PARTNER_NOTE_STUB_2026-07-10.md"
+      ],
+      "posture": "PARTNER_CAPABILITY_NOTE_ONLY",
+      "pricing_allowed_without_human": false,
+      "rank": 6,
+      "secondary_url": "https://console.sweetspotgov.com/federal-contracts/0c046e88-3d0d-5e26-bcc9-f78afc14164c",
+      "set_aside": "Market research",
+      "solicitation_number": "ACCAPGAIDPRFI4",
+      "submission_route": "Email RFI feedback per official instructions",
+      "submit_now_work": [
+        "Prepare a one-page partner note.",
+        "Do not claim classified, SIPR, or full Army intelligence platform delivery capability."
+      ],
+      "title": "Army Intelligence Data Platform RFI #4",
+      "urgency_score": 94,
+      "why_fit": "The RFI asks about modular data platform modernization across enterprise cloud and tactical edge. LumenCore can offer traceability, replay receipts, degraded-network evidence packs, and model/data validation as a module."
+    },
+    {
+      "action_bucket": "partner_or_watch",
+      "agency": "ACC-Orlando / PEO STRI",
+      "award_fit": "Good longer-window validation/replay module lane.",
+      "days_to_deadline_from_2026_07_10": 36,
+      "deadline_bucket": "watchlist",
+      "deadline_utc": "2026-08-15T21:00:00Z",
+      "department": "Department of the Army",
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "fit_score": 69,
+      "human_gate_required": true,
+      "human_gates": [
+        "Confirm official status because search snippets showed active/inactive ambiguity.",
+        "Approve partner or agency send route."
+      ],
+      "notice_type": "Special Notice / RFI",
+      "official_url": "https://sam.gov/opp/e577d0eef9a84d51aa46bce6ed779233/view",
+      "opportunity_id": "army_training_simulation_rfi",
+      "opportunity_sha256": "94a9aeb1b2234e60b5133a902e7aa5093f2afdcf863b56bc9d2385181044b221",
+      "package_files": [],
+      "posture": "WATCH_AND_PARTNER_FEEDBACK",
+      "pricing_allowed_without_human": false,
+      "rank": 7,
+      "secondary_url": "https://console.sweetspotgov.com/federal-contracts/937726e0-c87a-5c19-974c-f15392b57483",
+      "set_aside": "Market research",
+      "solicitation_number": "W900KK-26-R-0001",
+      "submission_route": "Email RFI feedback per official instructions",
+      "submit_now_work": [
+        "Track as a partner lane after the urgent July deadlines.",
+        "Prepare a validation/replay module paragraph for future partner conversations."
+      ],
+      "title": "Request for Information: Training & Simulation",
+      "urgency_score": 48,
+      "why_fit": "The RFI is for an integrated LVC simulation environment with AI, commercial gaming, cloud computing, and realistic multi-domain training/test experimentation. LumenCore can contribute telemetry proof, scenario replay, and evaluation scorecards as a narrow validation module."
+    },
+    {
+      "action_bucket": "partner_or_watch",
+      "agency": "Federal Highway Administration",
+      "award_fit": "Large potential, but requires jurisdiction/testbed team.",
+      "days_to_deadline_from_2026_07_10": 10,
+      "deadline_bucket": "two_week_sprint",
+      "deadline_utc": "2026-07-20T19:00:00Z",
+      "department": "Department of Transportation",
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "fit_score": 66,
+      "human_gate_required": true,
+      "human_gates": [
+        "A qualified public-sector partner and testbed operator are confirmed.",
+        "Team role, IP, and pricing are approved."
+      ],
+      "notice_type": "Solicitation / BAA",
+      "official_url": "",
+      "opportunity_id": "fhwa_intersection_safety_systems_baa",
+      "opportunity_sha256": "ab2bc41349698d7821efcc50f90478ca3d45bb144b02bf07c2d380f64680e693",
+      "package_files": [],
+      "posture": "PARTNER_ONLY_TESTBED_REQUIRED",
+      "pricing_allowed_without_human": false,
+      "rank": 8,
+      "secondary_url": "https://console.sweetspotgov.com/federal-contracts/0f453e7c-d159-5512-b083-9ac58b3c4eb0",
+      "set_aside": "Full and open",
+      "solicitation_number": "693JJ3-26-BAA-0004",
+      "submission_route": "Email proposal per BAA instructions",
+      "submit_now_work": [
+        "Do not solo-submit.",
+        "Use as a field-validation partner target with cities, DOTs, universities, or testbed operators."
+      ],
+      "title": "Intersection Safety Systems Prototyping",
+      "urgency_score": 86,
+      "why_fit": "LumenCore can support conflict-prediction validation and evidence scoring, but the opportunity requires a lead system developer, public-sector jurisdiction partner, and access-controlled testbed operator."
+    },
+    {
+      "action_bucket": "no_bid",
+      "agency": "Department of Health and Human Services",
+      "award_fit": "Partner intelligence only unless a compliant AI platform leads.",
+      "days_to_deadline_from_2026_07_10": 4,
+      "deadline_bucket": "seven_day_sprint",
+      "deadline_utc": "2026-07-14T21:00:00Z",
+      "department": "HHS",
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "fit_score": 52,
+      "human_gate_required": true,
+      "human_gates": [
+        "Qualified platform partner identified.",
+        "Security, pricing, and service obligations reviewed."
+      ],
+      "notice_type": "Combined Synopsis/Solicitation",
+      "official_url": "",
+      "opportunity_id": "hhs_ai_power_user_pilot",
+      "opportunity_sha256": "534b916721cd0fe4bc326155799f86d290d5bb40515747c350f4fdc684df4a96",
+      "package_files": [],
+      "posture": "NO_SOLO_BID_PLATFORM_GATE",
+      "pricing_allowed_without_human": false,
+      "rank": 9,
+      "secondary_url": "https://console.sweetspotgov.com/federal-contracts/f1005384-03c0-5bc7-be84-d193c876ddd8",
+      "set_aside": "Full and open",
+      "solicitation_number": "7571TE26R00004",
+      "submission_route": "SAM.gov / solicitation instructions",
+      "submit_now_work": [
+        "Do not rush a solo bid.",
+        "Use as evidence that agencies are buying AI baselines and telemetry."
+      ],
+      "title": "HHS AI Power User Advanced Models and Features Pilot",
+      "urgency_score": 96,
+      "why_fit": "The measurement and telemetry language is relevant, but the buyer appears to need commercial AI platform access bundles and security-path documentation at production scale."
+    },
+    {
+      "action_bucket": "no_bid",
+      "agency": "16th Weather Squadron",
+      "award_fit": "No-bid unless AWS resale partner status exists.",
+      "days_to_deadline_from_2026_07_10": 10,
+      "deadline_bucket": "two_week_sprint",
+      "deadline_utc": "2026-07-20T16:00:00Z",
+      "department": "Department of the Air Force",
+      "external_send_allowed_without_human": false,
+      "final_submission_allowed_without_human": false,
+      "fit_score": 35,
+      "human_gate_required": true,
+      "human_gates": [
+        "AWS resale eligibility confirmed.",
+        "Cloud compliance and quote terms approved."
+      ],
+      "notice_type": "Combined Synopsis/Solicitation",
+      "official_url": "",
+      "opportunity_id": "air_force_16ws_cloud_platform_bpa",
+      "opportunity_sha256": "1e0f5d579aacfcc07b3b57167ae9237ce17820ad05e1d8adf53991b0217ac523",
+      "package_files": [],
+      "posture": "NO_BID_AWS_RESELLER_GATE",
+      "pricing_allowed_without_human": false,
+      "rank": 10,
+      "secondary_url": "https://console.sweetspotgov.com/federal-contracts/56c789df-7326-546d-8be5-82fefd289e30",
+      "set_aside": "Total small business set-aside",
+      "solicitation_number": "FA460026Q0071",
+      "submission_route": "Email quote per solicitation instructions",
+      "submit_now_work": [
+        "Skip unless AWS Partner Status for resale is confirmed."
+      ],
+      "title": "16WS Cloud Platform BPA",
+      "urgency_score": 86,
+      "why_fit": "It mentions AI weather prototypes and cloud, but the procurement is mainly AWS credit resale under FedRAMP/DoD cloud rules."
+    }
+  ],
+  "outputs": {
+    "dashboard_json": "dashboard/data/sam_rush_submission_board.json",
+    "json": "out/ops/sam_rush_submission_board_latest.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/SAM_RUSH_SUBMISSION_BOARD_2026-07-10.md",
+    "stub_files": [
+      "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md",
+      "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md",
+      "grant_submissions/funding_sprint_20260709/ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md",
+      "grant_submissions/funding_sprint_20260709/DOJ_BOP_MEDICAL_CLAIMS_ANALYSIS_QUOTE_STUB_2026-07-10.md",
+      "grant_submissions/funding_sprint_20260709/USTDA_INDO_PACIFIC_DIGITAL_INFRA_SCOPING_STUB_2026-07-10.md",
+      "grant_submissions/funding_sprint_20260709/ARMY_AIDP_RFI4_PARTNER_NOTE_STUB_2026-07-10.md"
+    ]
+  },
+  "partner_or_watch": [
+    {
+      "deadline_utc": "2026-07-22T17:00:00Z",
+      "posture": "PARTNER_OR_SCOPING_NOTE_ONLY",
+      "rank": 5,
+      "solicitation_number": "1131PL26R0049",
+      "title": "Indo-Pacific Digital Infrastructure Project Scoping Services"
+    },
+    {
+      "deadline_utc": "2026-07-15T21:00:00Z",
+      "posture": "PARTNER_CAPABILITY_NOTE_ONLY",
+      "rank": 6,
+      "solicitation_number": "ACCAPGAIDPRFI4",
+      "title": "Army Intelligence Data Platform RFI #4"
+    },
+    {
+      "deadline_utc": "2026-08-15T21:00:00Z",
+      "posture": "WATCH_AND_PARTNER_FEEDBACK",
+      "rank": 7,
+      "solicitation_number": "W900KK-26-R-0001",
+      "title": "Request for Information: Training & Simulation"
+    },
+    {
+      "deadline_utc": "2026-07-20T19:00:00Z",
+      "posture": "PARTNER_ONLY_TESTBED_REQUIRED",
+      "rank": 8,
+      "solicitation_number": "693JJ3-26-BAA-0004",
+      "title": "Intersection Safety Systems Prototyping"
+    }
+  ],
+  "scan_date": "2026-07-10",
+  "schema": "sam_rush_submission_board_v1",
+  "source_notes": {
+    "sam_official": "SAM.gov search results were used for official notice IDs, status snippets, and public opportunity URLs where available.",
+    "submission_boundary": "This file prepares submission materials. It does not click final submit, certify representations, set pricing, or claim agency approval without human review.",
+    "sweetspot_primary": "Sweetspot federal-contract searches were run on July 10, 2026 for active AI validation, transportation systems management, data-center infrastructure, cyber/cloud, and data-product opportunities."
+  },
+  "status": "SAM_RUSH_BOARD_READY_HUMAN_SUBMIT_REQUIRED",
+  "submission_rule": {
+    "can_create_drafts": true,
+    "can_final_submit_without_human": false,
+    "can_open_pages": true,
+    "can_prepare": true,
+    "must_stop_before": [
+      "legal certification",
+      "final portal submit",
+      "price offer",
+      "term acceptance",
+      "signature",
+      "claim of agency validation or award"
+    ]
+  },
+  "submit_ready_human_gate": [
+    {
+      "deadline_utc": "2026-08-03T13:00:00Z",
+      "package_files": [
+        "FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
+        "LUMENCORE_FHWA_TSMO_CAPABILITY_NOTE_693JJ326R000012_2026-07-09.pdf",
+        "FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md"
+      ],
+      "posture": "PRIMARY_SUBMISSION_PACKAGE_READY_HUMAN_SUBMIT",
+      "rank": 1,
+      "solicitation_number": "693JJ326R000012",
+      "submission_route": "SAM.gov / official solicitation instructions",
+      "title": "Transportation Systems Management and Operations Data Initiative"
+    },
+    {
+      "deadline_utc": "2026-07-17T21:00:00Z",
+      "package_files": [
+        "NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md",
+        "NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md"
+      ],
+      "posture": "RFI_RESPONSE_READY_HUMAN_SEND",
+      "rank": 2,
+      "solicitation_number": "80TECH26RFI0020",
+      "submission_route": "Email response per RFI instructions",
+      "title": "Strategic Partnerships for NASA Data Center Infrastructure"
+    },
+    {
+      "deadline_utc": "2026-08-07T21:00:00Z",
+      "package_files": [
+        "ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md"
+      ],
+      "posture": "CSO_CONCEPT_READY_HUMAN_PORTAL_SUBMIT",
+      "rank": 3,
+      "solicitation_number": "W912HZ26SC005",
+      "submission_route": "ERDCWERX Commercial Solutions Opening portal",
+      "title": "Sovereign Defense Cloud for High-Performance Computing Commercial Solutions Opening"
+    },
+    {
+      "deadline_utc": "2026-07-23T15:00:00Z",
+      "package_files": [
+        "DOJ_BOP_MEDICAL_CLAIMS_ANALYSIS_QUOTE_STUB_2026-07-10.md"
+      ],
+      "posture": "QUOTE_STUB_READY_PRICE_AND_COMPLIANCE_GATE",
+      "rank": 4,
+      "solicitation_number": "15BCMS26Q70000005",
+      "submission_route": "Email quote per solicitation instructions",
+      "title": "Historical Medical Claims Data Analysis"
+    }
+  ],
+  "summary": {
+    "external_send_allowed_without_human": false,
+    "fast_small_business_lane": "15BCMS26Q70000005 DOJ/BOP Historical Medical Claims Data Analysis",
+    "fastest_rfi_lane": "80TECH26RFI0020 NASA Data Center Infrastructure RFI",
+    "final_submission_allowed_without_human": false,
+    "human_action_required": true,
+    "legal_certification_allowed_without_human": false,
+    "live_trading_allowed": false,
+    "no_bid_count": 2,
+    "opportunity_count": 10,
+    "partner_or_watch_count": 4,
+    "pricing_allowed_without_human": false,
+    "strongest_cso_lane": "W912HZ26SC005 ERDC Sovereign Defense Cloud CSO",
+    "submit_ready_human_gate_count": 4,
+    "top_submission_lane": "693JJ326R000012 FHWA TSMO Data Initiative",
+    "urgent_14_day_count": 7
+  }
+}

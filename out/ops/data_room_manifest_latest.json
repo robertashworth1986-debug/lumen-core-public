@@ -401,6 +401,26 @@
       "sha256": "075eda3340a57bebdb52d83e8a57f5afac0847851305023591b3c661eddb49f0"
     },
     {
+      "bytes": 27651,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "sam_rush_submission_board",
+      "name": "sam_rush_submission_board_latest.json",
+      "path": "out/ops/sam_rush_submission_board_latest.json",
+      "present": true,
+      "role": "machine_control_json",
+      "sha256": "4c60072e0b0294de5e80f29f3af263c7fb00d07b0767bdf1357bcf84970c720d"
+    },
+    {
+      "bytes": 27651,
+      "classification": "machine_readable_proof_receipt",
+      "control_name": "sam_rush_submission_board",
+      "name": "sam_rush_submission_board.json",
+      "path": "dashboard/data/sam_rush_submission_board.json",
+      "present": true,
+      "role": "dashboard_control_json",
+      "sha256": "4c60072e0b0294de5e80f29f3af263c7fb00d07b0767bdf1357bcf84970c720d"
+    },
+    {
       "bytes": 23299,
       "classification": "machine_readable_proof_receipt",
       "control_name": "reviewer_approval_crosswalk",
@@ -521,6 +541,7 @@
     "reviewer_decision_brief": "REVIEWER_DECISION_BRIEF_READY",
     "reviewer_diligence_qa_matrix": "REVIEWER_DILIGENCE_QA_READY",
     "reviewer_investor_fast_lane_router": "FAST_LANE_ROUTER_READY_HUMAN_SHARE_REQUIRED",
+    "sam_rush_submission_board": "SAM_RUSH_BOARD_READY_HUMAN_SUBMIT_REQUIRED",
     "sam_submission_and_today_opportunity_push": "SAM_SUBMITTED_AND_TODAY_OPPORTUNITY_PUSH_READY",
     "submission_authority_matrix": "SUBMISSION_AUTHORITY_MATRIX_READY",
     "technical_gov_reviewer_approval_stack": "TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_READY_HUMAN_ACTION_REQUIRED",
@@ -528,7 +549,7 @@
     "traction_opportunity_intake_ledger": "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED",
     "venture_studio_terms_guardrail_packet": "VENTURE_STUDIO_TERMS_GUARDRAIL_READY_COUNSEL_REVIEW_REQUIRED"
   },
-  "data_room_manifest_sha256": "d38903e7c1cb1b4384c4a1d3f1471791f61fe7269c3260c177d51c955426a9f6",
+  "data_room_manifest_sha256": "84ae23c7e6a76f0e8f23fc9fcd06ea3099369d83ca6a893e2ce32eab6051c90a",
   "e_drive_targets": [
     "E:\\LumaProofVault\\LUMA_FUNDING_SPRINT_20260709_20260709T030617Z",
     "E:\\LumenCoreSync\\funding_sprint_20260709",
@@ -550,6 +571,7 @@
     "grant_submissions/funding_sprint_20260709/IMMEDIATE_FEDERAL_AI_OPPORTUNITY_RADAR_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
+    "grant_submissions/funding_sprint_20260709/SAM_RUSH_SUBMISSION_BOARD_2026-07-10.md",
     "grant_submissions/funding_sprint_20260709/REVIEWER_APPROVAL_CROSSWALK_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/INSTITUTIONAL_TRUST_GATE_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/KEY_GOVERNANCE_FIREWALL_2026-07-09.md",
@@ -561,8 +583,8 @@
     "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md"
   ],
-  "generated_utc": "2026-07-09T22:54:12.717611+00:00",
-  "manifest_seed_sha256": "941fba170f3e3f0173f89bdca1707537c590288eb7e6d1a2d5550fa628c96dc5",
+  "generated_utc": "2026-07-10T17:17:27.567215+00:00",
+  "manifest_seed_sha256": "2a86a62e6131f606688c49f3aa506d23c78e7dc61fb548ad4284e3bceb819a5b",
   "markdown_artifacts": [
     {
       "bytes": 12244,
@@ -595,6 +617,14 @@
       "name": "AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
       "sha256": "8d44ce2a3e555ec99a6c6d82a904933b1f09196fa6f8b516b6c05b4cab935aab"
+    },
+    {
+      "bytes": 1213,
+      "category": "lane_package",
+      "classification": "public_safe_markdown_review_required",
+      "name": "ARMY_AIDP_RFI4_PARTNER_NOTE_STUB_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/ARMY_AIDP_RFI4_PARTNER_NOTE_STUB_2026-07-10.md",
+      "sha256": "3bca95adbee97d6f7a6613e07348baae40d27320bf41c0c00da6e67781c1f4d7"
     },
     {
       "bytes": 6300,
@@ -637,6 +667,14 @@
       "sha256": "b1034846561675a25ff85134813c6e4bc0d71a5a48bad92f78610273c4499d28"
     },
     {
+      "bytes": 1443,
+      "category": "lane_package",
+      "classification": "public_safe_markdown_review_required",
+      "name": "DOJ_BOP_MEDICAL_CLAIMS_ANALYSIS_QUOTE_STUB_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/DOJ_BOP_MEDICAL_CLAIMS_ANALYSIS_QUOTE_STUB_2026-07-10.md",
+      "sha256": "883b6164cd806d63add44194dd5ad9eaa2b798a553cfdf74e0ff076f9e397a19"
+    },
+    {
       "bytes": 5275,
       "category": "lane_package",
       "classification": "public_safe_markdown_review_required",
@@ -661,6 +699,14 @@
       "sha256": "2ef421abdd3c777f95e4ade019b1e998d04b2f2cdfebccc27904a6ea3ead87af"
     },
     {
+      "bytes": 1531,
+      "category": "lane_package",
+      "classification": "public_safe_markdown_review_required",
+      "name": "ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md",
+      "sha256": "da16f4de1cde669300680e230da53d57bc6072fc487b12bd78d77b0c67f99df9"
+    },
+    {
       "bytes": 8261,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
@@ -683,6 +729,14 @@
       "name": "FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
       "sha256": "ae8a41916c20207d4a2732d58c0e09a9a089809496696dfd822543751d27c13c"
+    },
+    {
+      "bytes": 1388,
+      "category": "lane_package",
+      "classification": "public_safe_markdown_review_required",
+      "name": "FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md",
+      "sha256": "ef9644f44b66a979b743b0223efe7361e5e777dbed26c1838de13d991eb484d0"
     },
     {
       "bytes": 6109,
@@ -781,6 +835,14 @@
       "sha256": "bcfdd40dfafc7ca0e7822679dba9d2504c2196b5701704d0ba3d46c5ce9448f6"
     },
     {
+      "bytes": 1395,
+      "category": "lane_package",
+      "classification": "public_safe_markdown_review_required",
+      "name": "NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md",
+      "sha256": "3c446a7b28b3cb921b30269655f94714986317a90d92096c76a463e8c5d5957c"
+    },
+    {
       "bytes": 8895,
       "category": "lane_package",
       "classification": "public_safe_markdown_review_required",
@@ -869,6 +931,14 @@
       "sha256": "0aa291778092b21187a00266a0eeb2ce033804162aa12345e0ed5f596966ed5a"
     },
     {
+      "bytes": 18526,
+      "category": "front_door_control",
+      "classification": "public_safe_markdown_review_required",
+      "name": "SAM_RUSH_SUBMISSION_BOARD_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/SAM_RUSH_SUBMISSION_BOARD_2026-07-10.md",
+      "sha256": "a6cabe6659c6f468bed9fb87818d24c4b60003c13a85c986d57e1880b6dd3c6c"
+    },
+    {
       "bytes": 4583,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
@@ -909,6 +979,14 @@
       "sha256": "e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55"
     },
     {
+      "bytes": 1324,
+      "category": "lane_package",
+      "classification": "public_safe_markdown_review_required",
+      "name": "USTDA_INDO_PACIFIC_DIGITAL_INFRA_SCOPING_STUB_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/USTDA_INDO_PACIFIC_DIGITAL_INFRA_SCOPING_STUB_2026-07-10.md",
+      "sha256": "c58d37b8ff6d50044599528adc5af801285bcdddf8397dd234ce07b06810f331"
+    },
+    {
       "bytes": 7293,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
@@ -936,12 +1014,12 @@
     "authority_status": "SUBMISSION_AUTHORITY_MATRIX_READY",
     "category_counts": {
       "claim_protocol_boundary": 7,
-      "front_door_control": 25,
-      "lane_package": 8,
+      "front_door_control": 26,
+      "lane_package": 14,
       "supporting_markdown": 2,
       "sync_receipt": 2
     },
-    "control_artifact_count": 50,
+    "control_artifact_count": 52,
     "decision_lane_count": 19,
     "decision_status": "REVIEWER_DECISION_BRIEF_READY",
     "decision_top_ready_lane_count": 10,
@@ -950,7 +1028,7 @@
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "manifested_markdown_count": 44,
+    "manifested_markdown_count": 51,
     "missing_control_artifact_count": 0,
     "reviewer_gate_clear": true,
     "unsafe_claim_count": 0,
