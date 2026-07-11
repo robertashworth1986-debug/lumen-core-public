@@ -1,7 +1,7 @@
 # Geometry Champion Of Champions
 
-Generated UTC: `2026-07-01T16:50:02.218808+00:00`
-Board SHA-256: `01c49a797cd36df9145bc9fa00de5f98eee50432e3f2ab2ceff0beda24c1e087`
+Generated UTC: `2026-07-11T13:24:41.550880+00:00`
+Board SHA-256: `f08928ea93276784ea316b1ab248fddecabbbdae1d0131e329f41745e83065f6`
 
 ## Boundary
 
@@ -92,7 +92,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 228.72
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 10
-- Measured rows: 221
+- Measured rows: 910
 - Blocked sources: none
 - Generated champion: `none`
 - Proof champion: `beast_algo_echo_stack`
@@ -103,7 +103,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 170.59
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 5
-- Measured rows: 166
+- Measured rows: 1004
 - Blocked sources: none
 - Generated champion: `brachistochrone_descent`
 - Proof champion: `beast_algo_curvature_pressure`
@@ -114,7 +114,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 169.94
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 7
-- Measured rows: 174
+- Measured rows: 803
 - Blocked sources: none
 - Generated champion: `none`
 - Proof champion: `markov_blanket_boundaries`
@@ -125,7 +125,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 161.032
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 5
-- Measured rows: 132
+- Measured rows: 760
 - Blocked sources: none
 - Generated champion: `kuramoto_phase_coupling`
 - Proof champion: `beast_algo_cross_asset_resonance`
@@ -136,7 +136,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 123.7
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 4
-- Measured rows: 53
+- Measured rows: 263
 - Blocked sources: none
 - Generated champion: `none`
 - Proof champion: `atmospheric_jet_stream_paths`
@@ -147,7 +147,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 120.42
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 4
-- Measured rows: 83
+- Measured rows: 292
 - Blocked sources: none
 - Generated champion: `none`
 - Proof champion: `cicada_prime_cycles`
@@ -158,7 +158,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 117.74
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 4
-- Measured rows: 92
+- Measured rows: 512
 - Blocked sources: none
 - Generated champion: `none`
 - Proof champion: `bird_v_formation_flocking`
@@ -169,7 +169,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 113.224
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 4
-- Measured rows: 53
+- Measured rows: 263
 - Blocked sources: NREL
 - Generated champion: `leaf_veins`
 - Proof champion: `crack_propagation_paths`
@@ -180,7 +180,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 111.04
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 4
-- Measured rows: 53
+- Measured rows: 263
 - Blocked sources: SAM_GOV
 - Generated champion: `none`
 - Proof champion: `ant_trails`
@@ -191,7 +191,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 96.648
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 2
-- Measured rows: 51
+- Measured rows: 261
 - Blocked sources: NREL
 - Generated champion: `thermal_plume_convection`
 - Proof champion: `rayleigh_benard_cells`
@@ -202,7 +202,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 90.58
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 3
-- Measured rows: 54
+- Measured rows: 264
 - Blocked sources: NREL
 - Generated champion: `none`
 - Proof champion: `coral_growth_fronts`
@@ -213,7 +213,7 @@ This board ranks what to validate next. It does not establish field validation, 
 - Operational proof score: 77.64
 - Claim stage: `live_replay_ready_not_field_validated`
 - Measured sources: 6
-- Measured rows: 133
+- Measured rows: 613
 - Blocked sources: KRAKEN, BINANCE_PUBLIC
 - Generated champion: `none`
 - Proof champion: `beast_strategy_breakout`

@@ -13,7 +13,7 @@
     "real_dollar_savings_claim_allowed": false,
     "source_system_count": 4
   },
-  "deployment_feed_sha256": "d2a0205417858385a20b7764846b4b84d96cc48719b59f9c7b21846a5ca160cb",
+  "deployment_feed_sha256": "7ce4ef92eb465d365125ce355db4b11d31f504bb5ddbaba352017919334eb12f",
   "feeds": [
     {
       "deployment_state": "HOSTED_HASH_MATCH",
@@ -133,14 +133,14 @@
       "why": "Expanded source-conditioned holdout evidence for the current champion."
     },
     {
-      "deployment_state": "HOSTED_HASH_MATCH",
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
       "key": "geometry_champion_of_champions",
-      "local_bytes": 329523,
+      "local_bytes": 329535,
       "local_exists": true,
-      "local_generated_utc": "2026-07-01T16:50:02.218808+00:00",
+      "local_generated_utc": "2026-07-11T13:24:41.550880+00:00",
       "local_relative_path": "dashboard/data/geometry_champion_of_champions.json",
       "local_schema": "geometry_champion_of_champions_v1",
-      "local_sha256": "1d1975246333f4ea129d75657071a73ef7627045c204b1314c7128fd9bcf1194",
+      "local_sha256": "45998fff44365e34fd47d71204b9432dd17bdc2ff02332c3c0ff6779ed69c09b",
       "remote_candidates": [
         {
           "bytes": 329523,
@@ -165,8 +165,8 @@
       "remote_first_reachable_sha256": "1d1975246333f4ea129d75657071a73ef7627045c204b1314c7128fd9bcf1194",
       "remote_first_reachable_status": 200,
       "remote_first_reachable_url": "https://lumen-core.ai/data/geometry_champion_of_champions.json",
-      "remote_hash_match": true,
-      "remote_match_url": "https://lumen-core.ai/data/geometry_champion_of_champions.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
       "remote_reachable": true,
       "required": true,
       "why": "Family-level champion ranking and evidence status."
@@ -445,14 +445,14 @@
       "why": "Canonical proof-to-pilot board feed that ties champions to paid evaluation scope."
     },
     {
-      "deployment_state": "HOSTED_HASH_MATCH",
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
       "key": "champion_sample_expansion_and_economic_bridge",
-      "local_bytes": 28396,
+      "local_bytes": 28515,
       "local_exists": true,
-      "local_generated_utc": "2026-07-01T15:28:55.185985+00:00",
+      "local_generated_utc": "2026-07-09T20:45:22.837755+00:00",
       "local_relative_path": "dashboard/data/champion_sample_expansion_and_economic_bridge.json",
       "local_schema": "champion_sample_expansion_and_economic_bridge_v1",
-      "local_sha256": "09605006a1d80f89278f8b2bd1ab6aadb5f25b751c8de6c64fc56a90916e30da",
+      "local_sha256": "de730ae1a47307da64a664088f42b17cd3362c50dde5a37917f6e591fc61a036",
       "remote_candidates": [
         {
           "bytes": 28396,
@@ -477,8 +477,8 @@
       "remote_first_reachable_sha256": "09605006a1d80f89278f8b2bd1ab6aadb5f25b751c8de6c64fc56a90916e30da",
       "remote_first_reachable_status": 200,
       "remote_first_reachable_url": "https://lumen-core.ai/data/champion_sample_expansion_and_economic_bridge.json",
-      "remote_hash_match": true,
-      "remote_match_url": "https://lumen-core.ai/data/champion_sample_expansion_and_economic_bridge.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
       "remote_reachable": true,
       "required": true,
       "why": "Expanded source breadth, sample-size diagnostics, and disciplined economic claim bridge."
@@ -523,14 +523,14 @@
       "why": "Leave-one-source-out robustness gate showing the current champion is not carried by one source system."
     },
     {
-      "deployment_state": "HOSTED_HASH_MATCH",
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
       "key": "grant_readiness_status",
       "local_bytes": 22604,
       "local_exists": true,
-      "local_generated_utc": "2026-07-09T00:42:47.442855+00:00",
+      "local_generated_utc": "2026-07-11T12:48:23.097030+00:00",
       "local_relative_path": "dashboard/data/grant_readiness_status.json",
       "local_schema": "grant_dashboard_status_feed_v1",
-      "local_sha256": "723ecc50e7694d4e75a7d1b63824b86bdb1697068dc70c8c6f4b0e60b7f2c3c8",
+      "local_sha256": "2eb6ca94b6c8fa98c8883345df41b1250436c062b7d6d15b9810a0c43db2fa4b",
       "remote_candidates": [
         {
           "bytes": 22604,
@@ -555,8 +555,8 @@
       "remote_first_reachable_sha256": "723ecc50e7694d4e75a7d1b63824b86bdb1697068dc70c8c6f4b0e60b7f2c3c8",
       "remote_first_reachable_status": 200,
       "remote_first_reachable_url": "https://lumen-core.ai/data/grant_readiness_status.json",
-      "remote_hash_match": true,
-      "remote_match_url": "https://lumen-core.ai/data/grant_readiness_status.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
       "remote_reachable": true,
       "required": true,
       "why": "Public grants console and operator-home readiness feed for submission state, blockers, and approval boundary."
@@ -640,14 +640,14 @@
       "why": "Deadline triage and evidence-to-submission routing context for time-sensitive grants."
     },
     {
-      "deployment_state": "HOSTED_HASH_MATCH",
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
       "key": "baseline_gauntlet_coverage",
-      "local_bytes": 25019,
+      "local_bytes": 25145,
       "local_exists": true,
-      "local_generated_utc": "2026-07-04T02:11:24.641020+00:00",
+      "local_generated_utc": "2026-07-09T20:45:02.705272+00:00",
       "local_relative_path": "dashboard/data/baseline_gauntlet_coverage.json",
       "local_schema": "baseline_gauntlet_coverage_v1",
-      "local_sha256": "1e235b0e874717a6c4f2b3857d6f2e301a02b8002b159998cc78519f5afed734",
+      "local_sha256": "a976cf22a889ba4b5b70febaf55a71eb4fa43339d037d1e93eed49f779c55055",
       "remote_candidates": [
         {
           "bytes": 25019,
@@ -672,8 +672,8 @@
       "remote_first_reachable_sha256": "1e235b0e874717a6c4f2b3857d6f2e301a02b8002b159998cc78519f5afed734",
       "remote_first_reachable_status": 200,
       "remote_first_reachable_url": "https://lumen-core.ai/data/baseline_gauntlet_coverage.json",
-      "remote_hash_match": true,
-      "remote_match_url": "https://lumen-core.ai/data/baseline_gauntlet_coverage.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
       "remote_reachable": true,
       "required": false,
       "why": "Named-baseline coverage and remaining comparison gaps for reviewer-facing technical credibility."
@@ -1225,14 +1225,14 @@
       "why": "Masked provider-key readiness and API ping status without exposing secrets."
     },
     {
-      "deployment_state": "HOSTED_HASH_MATCH",
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
       "key": "live_source_measurement_maximizer",
-      "local_bytes": 39808,
+      "local_bytes": 39645,
       "local_exists": true,
-      "local_generated_utc": "2026-07-05T21:20:44.262856+00:00",
+      "local_generated_utc": "2026-07-11T13:24:37.672963+00:00",
       "local_relative_path": "dashboard/data/live_source_measurement_maximizer.json",
       "local_schema": "live_source_measurement_maximizer_v1",
-      "local_sha256": "1f9a036f47df94f49e27f2ee39273791b503f9c1dd85d06e3bd3d17f230ec4f9",
+      "local_sha256": "de44fa3ce1056842fb9fa8d45511919ef9a352afb2dda02788c16af7c938487a",
       "remote_candidates": [
         {
           "bytes": 39808,
@@ -1257,8 +1257,8 @@
       "remote_first_reachable_sha256": "1f9a036f47df94f49e27f2ee39273791b503f9c1dd85d06e3bd3d17f230ec4f9",
       "remote_first_reachable_status": 200,
       "remote_first_reachable_url": "https://lumen-core.ai/data/live_source_measurement_maximizer.json",
-      "remote_hash_match": true,
-      "remote_match_url": "https://lumen-core.ai/data/live_source_measurement_maximizer.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
       "remote_reachable": true,
       "required": false,
       "why": "Latest measured-source count, fresh row count, and blocked/thin source diagnostics."
@@ -1381,14 +1381,14 @@
       "why": "Branching-family live replay status, including negative evidence when baselines still lead."
     },
     {
-      "deployment_state": "HOSTED_HASH_MATCH",
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
       "key": "rolling_champion_gate",
-      "local_bytes": 10623,
+      "local_bytes": 10625,
       "local_exists": true,
-      "local_generated_utc": "2026-07-01T15:29:00.243392+00:00",
+      "local_generated_utc": "2026-07-09T20:45:31.408739+00:00",
       "local_relative_path": "dashboard/data/rolling_champion_gate.json",
       "local_schema": "rolling_champion_gate.v1",
-      "local_sha256": "be369c59178534fbf38303569cb54a1573cbe60847c83d3271ec2e023f45b882",
+      "local_sha256": "a5fb247d84cece115fd53abe2a349c2a739bed511bf75b2a1be265aff88ed6f6",
       "remote_candidates": [
         {
           "bytes": 10623,
@@ -1413,8 +1413,8 @@
       "remote_first_reachable_sha256": "be369c59178534fbf38303569cb54a1573cbe60847c83d3271ec2e023f45b882",
       "remote_first_reachable_status": 200,
       "remote_first_reachable_url": "https://lumen-core.ai/data/rolling_champion_gate.json",
-      "remote_hash_match": true,
-      "remote_match_url": "https://lumen-core.ai/data/rolling_champion_gate.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
       "remote_reachable": true,
       "required": false,
       "why": "Promotion gate for repeat winners, triple-source candidates, and real-dollar claim blockers."
@@ -1537,14 +1537,14 @@
       "why": "Fresh scan of local/provider CSV snapshots that identifies real-noise datasets ready for locked replay."
     },
     {
-      "deployment_state": "HOSTED_HASH_MATCH",
+      "deployment_state": "LOCAL_READY_REMOTE_STALE_OR_MISSING",
       "key": "geometry_execution_context_audit",
-      "local_bytes": 6562,
+      "local_bytes": 6496,
       "local_exists": true,
-      "local_generated_utc": "2026-07-03T08:32:16.231714+00:00",
+      "local_generated_utc": "2026-07-11T13:24:39.590518+00:00",
       "local_relative_path": "dashboard/data/geometry_execution_context_audit.json",
       "local_schema": "geometry_execution_context_audit_v1",
-      "local_sha256": "3a4a556c0176d37f6d58b15bd6a2f32d250594e50e717157d11040ba90afdcc6",
+      "local_sha256": "e9cb5f159488e6dc5266fce8d813850831e84e481450139d170aed0680758cba",
       "remote_candidates": [
         {
           "bytes": 6562,
@@ -1569,14 +1569,14 @@
       "remote_first_reachable_sha256": "3a4a556c0176d37f6d58b15bd6a2f32d250594e50e717157d11040ba90afdcc6",
       "remote_first_reachable_status": 200,
       "remote_first_reachable_url": "https://lumen-core.ai/data/geometry_execution_context_audit.json",
-      "remote_hash_match": true,
-      "remote_match_url": "https://lumen-core.ai/data/geometry_execution_context_audit.json",
+      "remote_hash_match": false,
+      "remote_match_url": "",
       "remote_reachable": true,
       "required": false,
       "why": "Current anti-drift audit covering geometry count, Vesica Piscis status, live-breadth readiness, and trading guardrails."
     }
   ],
-  "generated_utc": "2026-07-09T02:54:56.655436+00:00",
+  "generated_utc": "2026-07-11T13:24:43.387403+00:00",
   "live_base": "https://lumen-core.ai",
   "live_check_performed": true,
   "missing_required_local_feeds": [],
@@ -1595,7 +1595,56 @@
     "python .\\code\\ops\\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py"
   ],
   "purpose": "Hash-verify that the live domain is serving the current reviewer proof feeds.",
-  "required_remote_missing_or_stale": [],
+  "required_remote_missing_or_stale": [
+    {
+      "candidate_urls": [
+        "https://lumen-core.ai/data/geometry_champion_of_champions.json",
+        "https://lumen-core.ai/dashboard/data/geometry_champion_of_champions.json"
+      ],
+      "diagnosis": "HOSTED_COPY_STALE",
+      "key": "geometry_champion_of_champions",
+      "local_sha256": "45998fff44365e34fd47d71204b9432dd17bdc2ff02332c3c0ff6779ed69c09b",
+      "local_sha256_prefix": "45998fff4436",
+      "remote_first_reachable_bytes": 329523,
+      "remote_first_reachable_sha256": "1d1975246333f4ea129d75657071a73ef7627045c204b1314c7128fd9bcf1194",
+      "remote_first_reachable_sha256_prefix": "1d1975246333",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/geometry_champion_of_champions.json",
+      "remote_reachable": true
+    },
+    {
+      "candidate_urls": [
+        "https://lumen-core.ai/data/champion_sample_expansion_and_economic_bridge.json",
+        "https://lumen-core.ai/dashboard/data/champion_sample_expansion_and_economic_bridge.json"
+      ],
+      "diagnosis": "HOSTED_COPY_STALE",
+      "key": "champion_sample_expansion_and_economic_bridge",
+      "local_sha256": "de730ae1a47307da64a664088f42b17cd3362c50dde5a37917f6e591fc61a036",
+      "local_sha256_prefix": "de730ae1a473",
+      "remote_first_reachable_bytes": 28396,
+      "remote_first_reachable_sha256": "09605006a1d80f89278f8b2bd1ab6aadb5f25b751c8de6c64fc56a90916e30da",
+      "remote_first_reachable_sha256_prefix": "09605006a1d8",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/champion_sample_expansion_and_economic_bridge.json",
+      "remote_reachable": true
+    },
+    {
+      "candidate_urls": [
+        "https://lumen-core.ai/data/grant_readiness_status.json",
+        "https://lumen-core.ai/dashboard/data/grant_readiness_status.json"
+      ],
+      "diagnosis": "HOSTED_COPY_STALE",
+      "key": "grant_readiness_status",
+      "local_sha256": "2eb6ca94b6c8fa98c8883345df41b1250436c062b7d6d15b9810a0c43db2fa4b",
+      "local_sha256_prefix": "2eb6ca94b6c8",
+      "remote_first_reachable_bytes": 22604,
+      "remote_first_reachable_sha256": "723ecc50e7694d4e75a7d1b63824b86bdb1697068dc70c8c6f4b0e60b7f2c3c8",
+      "remote_first_reachable_sha256_prefix": "723ecc50e769",
+      "remote_first_reachable_status": 200,
+      "remote_first_reachable_url": "https://lumen-core.ai/data/grant_readiness_status.json",
+      "remote_reachable": true
+    }
+  ],
   "reviewer_urls": {
     "champion_feed_fallback": "https://lumen-core.ai/dashboard/data/champion_metric_gauntlet.json",
     "champion_feed_primary": "https://lumen-core.ai/data/champion_metric_gauntlet.json",
@@ -1616,22 +1665,22 @@
     "deploy_bundle_archive": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z.tgz",
     "deploy_bundle_archive_sha256": "e1a318899a36fabb7ec3cbf0d22a9229371db19dd05a28943ccc968f8d488955",
     "deploy_bundle_feed_only_ready": true,
-    "domain_deployment_state": "LIVE_DOMAIN_HASH_VERIFIED",
+    "domain_deployment_state": "LOCAL_READY_DOMAIN_NOT_VERIFIED_OR_STALE",
     "field_validation_claim_allowed": false,
     "fixed_frozen_delta_price_claim_allowed": false,
-    "live_domain_reviewer_ready": true,
+    "live_domain_reviewer_ready": false,
     "live_trading_or_autonomous_execution_allowed": false,
     "local_required_ready": true,
-    "next_domain_action": "Use the reviewer URLs. Public hash deployment is verified, but field validation and dollar savings claims still require an external system owner.",
+    "next_domain_action": "Deploy the local proof feeds to the live domain, then rerun this verifier until every required hosted hash matches.",
     "optional_feed_count": 26,
-    "plain_english_answer": "The live domain is serving matching hashes for every required reviewer proof feed. This is public deployment verification, not field validation.",
+    "plain_english_answer": "The local proof stack is ready for reviewer packaging, but the live domain still needs hosted hash verification before we should point reviewers to it.",
     "real_dollar_savings_claim_allowed": false,
     "required_feed_count": 14,
     "required_local_ready_count": 14,
-    "required_remote_hash_match_count": 14,
-    "required_remote_reachable_but_stale_count": 0,
+    "required_remote_hash_match_count": 11,
+    "required_remote_reachable_but_stale_count": 3,
     "required_remote_reachable_count": 14,
-    "required_remote_stale_or_missing_count": 0,
+    "required_remote_stale_or_missing_count": 3,
     "safe_deploy_command": ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot \"C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\.deploy_stage\\live_domain_proof_feeds_20260709T025443Z\""
   },
   "what_to_ask_next": [

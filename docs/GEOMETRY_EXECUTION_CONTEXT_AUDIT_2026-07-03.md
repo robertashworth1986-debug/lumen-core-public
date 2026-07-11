@@ -1,6 +1,6 @@
 # Geometry Execution Context Audit
 
-Generated UTC: `2026-07-03T08:32:16.231714+00:00`
+Generated UTC: `2026-07-11T13:24:39.590518+00:00`
 
 ## Boundary
 
@@ -44,9 +44,9 @@ Strong internal holdout evidence, especially for Kuramoto phase coupling, but st
 ## Live Breadth
 
 - Registry enabled sources: `29`
-- Measured sources: `24`
-- Failed or thin sources: `5`
-- Total measured rows from maximizer: `544`
+- Measured sources: `25`
+- Failed or thin sources: `4`
+- Total measured rows from maximizer: `2940`
 - Real-noise CSV snapshots scanned: `604`
 - Real-noise rows read: `34481`
 - Real-noise numeric samples: `68274`
@@ -71,10 +71,9 @@ Strong internal holdout evidence, especially for Kuramoto phase coupling, but st
 - Code posture: `BLOCK_LEGACY_LIVE`
 
 Runtime blockers:
-- executor heartbeat stale or missing: 13594.905
-- autofire heartbeat stale or missing: 13594.605
+- executor heartbeat stale or missing: 42227.898
+- autofire heartbeat stale or missing: 42227.598
 - growth controller heartbeat check is not ok
-- no actionable candidates in latest growth controller run
 
 Code blockers:
 - code/kraken_auto_withdraw_btc.py: withdraw/liquidation path lacks explicit execute confirmation

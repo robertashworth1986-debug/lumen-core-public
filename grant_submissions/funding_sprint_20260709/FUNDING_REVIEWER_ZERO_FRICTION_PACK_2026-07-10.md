@@ -40,7 +40,7 @@ This packet is decision support only. It does not authorize external sends, fina
 - Legal/IP action without human: `false`
 - Live trading allowed: `false`
 - Capital movement without human: `false`
-- Pack SHA-256: `cd3698015851d2ea74aa8b3d363af937f09a6ecbdb13e3a0f0fab1f9b536df03`
+- Pack SHA-256: `b5d4ae5dba03cc6ebf0948e8d80f6c33cb7eee5a5aadf3c9747a07103d29f639`
 
 ## Defensible Claims
 

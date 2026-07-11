@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-05T21:20:44.262856+00:00",
+  "generated_utc": "2026-07-11T13:24:37.672963+00:00",
   "providers": {
     "AIRNOW": {
       "enabled": true,
@@ -16,9 +16,9 @@
       "measured": true,
       "rows": 3,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:37.174099+00:00",
-      "snapshot_json": "data/live_measured/airnow/airnow_20260705T212018Z.json",
-      "snapshot_sha256": "b73d64d3d4166fb56239ab85ae8645a511d2c3db2edcdf1e6da50be0d700a5fa"
+      "last_truth_sync_utc": "2026-07-11T13:24:32.296283+00:00",
+      "snapshot_json": "data/live_measured/airnow/airnow_20260711T132415Z.json",
+      "snapshot_sha256": "b92ecec889c6a54beddd4942a08e99192bea0132a673301281e5a2db37216f3a"
     },
     "ALPACA": {
       "enabled": true,
@@ -56,9 +56,9 @@
       "measured": true,
       "rows": 100,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:21.265056+00:00",
-      "snapshot_json": "data/live_measured/alphavantage/alphavantage_20260705T212018Z.json",
-      "snapshot_sha256": "8e0cb6763783a5585be34f978713b9cab028865505b3169eb75444e729305520"
+      "last_truth_sync_utc": "2026-07-11T13:24:18.756197+00:00",
+      "snapshot_json": "data/live_measured/alphavantage/alphavantage_20260711T132415Z.json",
+      "snapshot_sha256": "305403d94ffb9fa17f85a1ca8f6d605d12f59c576b51518c739ad11b351007ab"
     },
     "BEA": {
       "enabled": true,
@@ -75,9 +75,9 @@
       "measured": true,
       "rows": 13,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:36.568543+00:00",
-      "snapshot_json": "data/live_measured/bea/bea_20260705T212018Z.json",
-      "snapshot_sha256": "dc33a3efdacc8f2d49e6a20201b586c98e82eab2edca0d4fef60f123f70dc7a6"
+      "last_truth_sync_utc": "2026-07-11T13:24:31.531186+00:00",
+      "snapshot_json": "data/live_measured/bea/bea_20260711T132415Z.json",
+      "snapshot_sha256": "8b5e04c9478c1c83381424b98a965481b9772f5a08cb46398e70202ca6eb6015"
     },
     "BINANCE_PUBLIC": {
       "enabled": true,
@@ -90,9 +90,9 @@
       "measured": false,
       "rows": 0,
       "http_status": 451,
-      "last_truth_sync_utc": "2026-07-05T21:20:19.812600+00:00",
-      "snapshot_json": "data/live_measured/binance_public/binance_public_20260705T212018Z.json",
-      "snapshot_sha256": "e59c8b79f5b264ba573365430161c90fe59b211ef720ed3e3b36a01fd29074ae"
+      "last_truth_sync_utc": "2026-07-11T13:24:17.072883+00:00",
+      "snapshot_json": "data/live_measured/binance_public/binance_public_20260711T132415Z.json",
+      "snapshot_sha256": "26460c3e3636ed849ee1122dd996c4f39d4e1aa70d7bbce158762328b5654ef0"
     },
     "BLS": {
       "enabled": true,
@@ -109,9 +109,9 @@
       "measured": true,
       "rows": 30,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:31.828573+00:00",
-      "snapshot_json": "data/live_measured/bls/bls_20260705T212018Z.json",
-      "snapshot_sha256": "df3ff0dc9b2bb42a5d70c4de09ccce9d9b9c3654125ef2118bc2574897bbd144"
+      "last_truth_sync_utc": "2026-07-11T13:24:25.284132+00:00",
+      "snapshot_json": "data/live_measured/bls/bls_20260711T132415Z.json",
+      "snapshot_sha256": "ec442c24f3c4c74d7104c647a6eefb5b5c96e9a12d1acf5ad3d797eb86e7c289"
     },
     "CENSUS": {
       "enabled": true,
@@ -128,9 +128,9 @@
       "measured": true,
       "rows": 1,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:36.150665+00:00",
-      "snapshot_json": "data/live_measured/census/census_20260705T212018Z.json",
-      "snapshot_sha256": "6a6b1e623277eaf31ee2f33244c319f829a428002c60c4975e0efec7aa0d3274"
+      "last_truth_sync_utc": "2026-07-11T13:24:30.972887+00:00",
+      "snapshot_json": "data/live_measured/census/census_20260711T132415Z.json",
+      "snapshot_sha256": "515c6076ed7da6c62efe9bdddc7ee37bff2d53cdc5e19f1dd9666476d3f1766e"
     },
     "COINBASE_PUBLIC": {
       "enabled": true,
@@ -141,11 +141,11 @@
       "probe_ok": true,
       "probe_note": "coinbase_btc_exchange_rates",
       "measured": true,
-      "rows": 250,
+      "rows": 300,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:43.531741+00:00",
-      "snapshot_json": "data/live_measured/coinbase_public/coinbase_public_20260705T212018Z.json",
-      "snapshot_sha256": "2f19143980016e3e2d82225a670d5cb8389ad9248441b12a8322f15bec22ca5d"
+      "last_truth_sync_utc": "2026-07-11T13:24:37.289654+00:00",
+      "snapshot_json": "data/live_measured/coinbase_public/coinbase_public_20260711T132415Z.json",
+      "snapshot_sha256": "2473621294112fcd5623b03b2fe03d6a8cef19fc49667fcc4e452661ecd3decf"
     },
     "COINGECKO_PUBLIC": {
       "enabled": true,
@@ -158,9 +158,9 @@
       "measured": true,
       "rows": 6,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:20.081564+00:00",
-      "snapshot_json": "data/live_measured/coingecko_public/coingecko_public_20260705T212018Z.json",
-      "snapshot_sha256": "8b975c39a3842802c96bbbc759d77f473758c7aa72490636d0d2830575c1c9ab"
+      "last_truth_sync_utc": "2026-07-11T13:24:17.339546+00:00",
+      "snapshot_json": "data/live_measured/coingecko_public/coingecko_public_20260711T132415Z.json",
+      "snapshot_sha256": "497851f72bd09299b5a366b3543f3a6fdced5e0ca20a64045dc905638233007d"
     },
     "EIA": {
       "enabled": true,
@@ -176,11 +176,11 @@
       "probe_ok": true,
       "probe_note": "eia_daily_region_data",
       "measured": true,
-      "rows": 250,
+      "rows": 300,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:31.359153+00:00",
-      "snapshot_json": "data/live_measured/eia/eia_20260705T212018Z.json",
-      "snapshot_sha256": "2ce7824a4c55692a840088910d0880671ce9c1e689705242419ccaa5c4671003"
+      "last_truth_sync_utc": "2026-07-11T13:24:24.806208+00:00",
+      "snapshot_json": "data/live_measured/eia/eia_20260711T132415Z.json",
+      "snapshot_sha256": "99df72507f5c9ae461818cbae68a08b9f11c1cba9d51f5cc8146f9ee91ad83dc"
     },
     "EPA_AQS": {
       "enabled": true,
@@ -197,13 +197,13 @@
       ],
       "status": "LIVE_KEY_PRESENT",
       "probe_ok": false,
-      "probe_note": "http_error:{\n  \"Header\": [\n    {\n      \"status\": \"Failed\",\n      \"request_time\": \"2026-07-05T17:20:43.481-04:00\",\n      \"url\": \"https://aqs.epa.gov/data/api/list/states?email=[REDACTED]&key=[REDACTED]\",\n      \"error\": [\n        \"Email and/or key are invalid.\"\n      ]\n    }\n  ]\n}",
+      "probe_note": "http_error:\"No matching service was found, please check spelling and case. Link to API Documentation: https://aqs.epa.gov/aqsweb/documents/data_api.html\"",
       "measured": false,
       "rows": 0,
-      "http_status": 400,
-      "last_truth_sync_utc": "2026-07-05T21:20:36.835296+00:00",
-      "snapshot_json": "data/live_measured/epa_aqs/epa_aqs_20260705T212018Z.json",
-      "snapshot_sha256": "724e6a208ada7eed97567ea31723dc86ab6f780e019e383ec86df33f2ae0d95f"
+      "http_status": 422,
+      "last_truth_sync_utc": "2026-07-11T13:24:31.881184+00:00",
+      "snapshot_json": "data/live_measured/epa_aqs/epa_aqs_20260711T132415Z.json",
+      "snapshot_sha256": "39a7056ac0fbb8a486ba1f7eeda4c4150e54ca1a575f9e0387506efacd4fb16f"
     },
     "FINNHUB": {
       "enabled": true,
@@ -220,9 +220,9 @@
       "measured": true,
       "rows": 4,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:20.782256+00:00",
-      "snapshot_json": "data/live_measured/finnhub/finnhub_20260705T212018Z.json",
-      "snapshot_sha256": "9f86539c927b7c00951919dc7867c730e8982cb8200077e5daaeece159992209"
+      "last_truth_sync_utc": "2026-07-11T13:24:18.331208+00:00",
+      "snapshot_json": "data/live_measured/finnhub/finnhub_20260711T132415Z.json",
+      "snapshot_sha256": "07736042be43fcea4150985d7e232ae9acca813dea1564ae811b88548352d43a"
     },
     "FRED": {
       "enabled": true,
@@ -237,11 +237,11 @@
       "probe_ok": true,
       "probe_note": "fred_observations",
       "measured": true,
-      "rows": 248,
+      "rows": 300,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:27.493272+00:00",
-      "snapshot_json": "data/live_measured/fred/fred_20260705T212018Z.json",
-      "snapshot_sha256": "aee05642909c4f0dffc9f21113964db0ed0c2b89053589748a50a50e75710f6d"
+      "last_truth_sync_utc": "2026-07-11T13:24:22.540236+00:00",
+      "snapshot_json": "data/live_measured/fred/fred_20260711T132415Z.json",
+      "snapshot_sha256": "a25b593fb2fbab47a3a959bd28ca4ecad9720ffbef5cbb8a22607bdbd3bfbf01"
     },
     "GRANTS_GOV": {
       "enabled": true,
@@ -252,11 +252,11 @@
       "probe_ok": true,
       "probe_note": "grants_gov_search2",
       "measured": true,
-      "rows": 250,
+      "rows": 258,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:39.640516+00:00",
-      "snapshot_json": "data/live_measured/grants_gov/grants_gov_20260705T212018Z.json",
-      "snapshot_sha256": "e29c5f9834f04cc4e53c4264eb93adfff336aa2deab6f6b2ab7fd8e8bccf5c7e"
+      "last_truth_sync_utc": "2026-07-11T13:24:33.825735+00:00",
+      "snapshot_json": "data/live_measured/grants_gov/grants_gov_20260711T132415Z.json",
+      "snapshot_sha256": "e107562047022294ade015b8ac46935c56dd302920c90c20bebd2ddfab232089"
     },
     "KRAKEN": {
       "enabled": true,
@@ -288,11 +288,11 @@
       "probe_ok": true,
       "probe_note": "kraken_public_ohlc",
       "measured": true,
-      "rows": 250,
+      "rows": 300,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:19.689515+00:00",
-      "snapshot_json": "data/live_measured/kraken_public/kraken_public_20260705T212018Z.json",
-      "snapshot_sha256": "b4e6d9d6928ca82a95ebe7d3ea136cfbb040892c7b63d4ca35f8c7ac503f307a"
+      "last_truth_sync_utc": "2026-07-11T13:24:16.906226+00:00",
+      "snapshot_json": "data/live_measured/kraken_public/kraken_public_20260711T132415Z.json",
+      "snapshot_sha256": "07166ae8b2a9e246d10c98cf959ddbd19a5410e5e2b913b2f982bd54b9d48963"
     },
     "MASSIVE": {
       "enabled": true,
@@ -311,9 +311,9 @@
       "measured": true,
       "rows": 3,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:23.775784+00:00",
-      "snapshot_json": "data/live_measured/massive/massive_20260705T212018Z.json",
-      "snapshot_sha256": "d5d052e4a563b4deae8b3b1932844b6c33d9f8b6ea72cf26d686637388f29ecf"
+      "last_truth_sync_utc": "2026-07-11T13:24:20.506265+00:00",
+      "snapshot_json": "data/live_measured/massive/massive_20260711T132415Z.json",
+      "snapshot_sha256": "1a4cfef058be4ef3fe089506b62fdef50f0f2daf55d6b22148b3426e90af23c0"
     },
     "NASA": {
       "enabled": true,
@@ -330,9 +330,9 @@
       "measured": true,
       "rows": 1,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:32.560389+00:00",
-      "snapshot_json": "data/live_measured/nasa/nasa_20260705T212018Z.json",
-      "snapshot_sha256": "131379a8ff6abb7a1223b03c166d3e5f8980de37ba7427073d0ca40691f8f0e0"
+      "last_truth_sync_utc": "2026-07-11T13:24:27.897893+00:00",
+      "snapshot_json": "data/live_measured/nasa/nasa_20260711T132415Z.json",
+      "snapshot_sha256": "2854ceb9cae456595dbe86bb2c3d8c5b86f4f173d1d1f1c99bbd1aea7332598c"
     },
     "NOAA_NCEI": {
       "enabled": true,
@@ -351,9 +351,9 @@
       "measured": true,
       "rows": 11,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:32.816231+00:00",
-      "snapshot_json": "data/live_measured/noaa_ncei/noaa_ncei_20260705T212018Z.json",
-      "snapshot_sha256": "68e8aad64e9b9fd0d642a15661f1e24c953e1b461466e565fe8e2350fd041db5"
+      "last_truth_sync_utc": "2026-07-11T13:24:28.164483+00:00",
+      "snapshot_json": "data/live_measured/noaa_ncei/noaa_ncei_20260711T132415Z.json",
+      "snapshot_sha256": "43bbf28ba06ddc0ad42975509bfe4eff21a235f9a85bf5c013f718ca0e0da8aa"
     },
     "NREL": {
       "enabled": true,
@@ -370,9 +370,9 @@
       "measured": false,
       "rows": 0,
       "http_status": null,
-      "last_truth_sync_utc": "2026-07-05T21:20:35.182221+00:00",
-      "snapshot_json": "data/live_measured/nrel/nrel_20260705T212018Z.json",
-      "snapshot_sha256": "90acadbeece36b3b691301ded2625b16e2e053b8f48f8415d430dd0fd60d7af2"
+      "last_truth_sync_utc": "2026-07-11T13:24:29.855263+00:00",
+      "snapshot_json": "data/live_measured/nrel/nrel_20260711T132415Z.json",
+      "snapshot_sha256": "daca0ed3cfa4bf0654d4a48e0e5d4585eb46c1abe6b7e3b7090175e3c61ef350"
     },
     "NWS_PUBLIC": {
       "enabled": true,
@@ -385,9 +385,9 @@
       "measured": true,
       "rows": 156,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:34.415486+00:00",
-      "snapshot_json": "data/live_measured/nws_public/nws_public_20260705T212018Z.json",
-      "snapshot_sha256": "ec0988170021b5e089a2a2c521f0813c21841d1840f7a9e66041df4b52cdfc2f"
+      "last_truth_sync_utc": "2026-07-11T13:24:29.072898+00:00",
+      "snapshot_json": "data/live_measured/nws_public/nws_public_20260711T132415Z.json",
+      "snapshot_sha256": "28574d15a88b8c3a3a3e9bd57abe5572852f2bf65066379e46470d0f7d1caa09"
     },
     "OPEN_METEO_PUBLIC": {
       "enabled": true,
@@ -400,9 +400,9 @@
       "measured": true,
       "rows": 48,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:35.103628+00:00",
-      "snapshot_json": "data/live_measured/open_meteo_public/open_meteo_public_20260705T212018Z.json",
-      "snapshot_sha256": "56e0bafb4065ba3807ad388b7d0b8c46fa730f129c52c7b1ed2c634313f633ce"
+      "last_truth_sync_utc": "2026-07-11T13:24:29.801800+00:00",
+      "snapshot_json": "data/live_measured/open_meteo_public/open_meteo_public_20260711T132415Z.json",
+      "snapshot_sha256": "46a11ef8eb13542cde16b36c4125c070f17eece9074745ff6294d83f59ef8a5a"
     },
     "SAM_GOV": {
       "enabled": false,
@@ -418,9 +418,9 @@
       "measured": false,
       "rows": 0,
       "http_status": null,
-      "last_truth_sync_utc": "2026-07-05T21:20:37.487253+00:00",
-      "snapshot_json": "data/live_measured/sam_gov/sam_gov_20260705T212018Z.json",
-      "snapshot_sha256": "97a31a0ac6172d7dfbf317bb16a70db2af43969e0bb2d23fb15863172487a1ba"
+      "last_truth_sync_utc": "2026-07-11T13:24:32.507441+00:00",
+      "snapshot_json": "data/live_measured/sam_gov/sam_gov_20260711T132415Z.json",
+      "snapshot_sha256": "3f1a64ac44449e502792cdb504ff98d16a17e07d2c4f2fc95164760f342d9c41"
     },
     "SEC_PUBLIC": {
       "enabled": true,
@@ -431,11 +431,11 @@
       "probe_ok": true,
       "probe_note": "sec_company_tickers",
       "measured": true,
-      "rows": 250,
+      "rows": 300,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:42.964920+00:00",
-      "snapshot_json": "data/live_measured/sec_public/sec_public_20260705T212018Z.json",
-      "snapshot_sha256": "99971d8a5ed3d8f65667517c0b4faa4f75e0db2e021602127fc770a0e35ed9c3"
+      "last_truth_sync_utc": "2026-07-11T13:24:36.482169+00:00",
+      "snapshot_json": "data/live_measured/sec_public/sec_public_20260711T132415Z.json",
+      "snapshot_sha256": "c146593894f77976a28e4aa74eef6b4b458fed9eef6a4072915b5fd1b151b896"
     },
     "THE_ODDS_API": {
       "enabled": true,
@@ -455,9 +455,9 @@
       "measured": false,
       "rows": 0,
       "http_status": 401,
-      "last_truth_sync_utc": "2026-07-05T21:20:37.479878+00:00",
-      "snapshot_json": "data/live_measured/the_odds_api/the_odds_api_20260705T212018Z.json",
-      "snapshot_sha256": "ef73603a11f6eb8bff9652f3d68ef7da29a7efaa80955495ab0e0ab9ae588837"
+      "last_truth_sync_utc": "2026-07-11T13:24:32.507441+00:00",
+      "snapshot_json": "data/live_measured/the_odds_api/the_odds_api_20260711T132415Z.json",
+      "snapshot_sha256": "1acc22e320d192b63b323d569b7e44551e065c8b699dd41ec6ee55a08ae64af1"
     },
     "TREASURY_FISCAL_PUBLIC": {
       "enabled": true,
@@ -468,11 +468,11 @@
       "probe_ok": true,
       "probe_note": "treasury_average_interest_rates",
       "measured": true,
-      "rows": 250,
+      "rows": 300,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:42.215190+00:00",
-      "snapshot_json": "data/live_measured/treasury_fiscal_public/treasury_fiscal_public_20260705T212018Z.json",
-      "snapshot_sha256": "f4eeeccda65ebcb486cb4f713685cf3658e9024d4c7debd1c4a0f402b470c386"
+      "last_truth_sync_utc": "2026-07-11T13:24:35.740832+00:00",
+      "snapshot_json": "data/live_measured/treasury_fiscal_public/treasury_fiscal_public_20260711T132415Z.json",
+      "snapshot_sha256": "bd617210eca71310b8863d1916b56f6f8f4ef8530fbd1b73d68b8117c541e959"
     },
     "TWELVE_DATA": {
       "enabled": true,
@@ -487,11 +487,11 @@
       "probe_ok": true,
       "probe_note": "twelve_data_time_series",
       "measured": true,
-      "rows": 250,
+      "rows": 300,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:22.652017+00:00",
-      "snapshot_json": "data/live_measured/twelve_data/twelve_data_20260705T212018Z.json",
-      "snapshot_sha256": "81e99282d5e94e60713b60bba4d74e5e8837ad2405af25a9eb1ddfbf2e6986bf"
+      "last_truth_sync_utc": "2026-07-11T13:24:19.725562+00:00",
+      "snapshot_json": "data/live_measured/twelve_data/twelve_data_20260711T132415Z.json",
+      "snapshot_sha256": "eb4b2fe416d91cee77c7054488d4db028afbe51c901a0da00b4c0301ff2e5acf"
     },
     "USGS_WATER": {
       "enabled": true,
@@ -508,9 +508,9 @@
       "measured": true,
       "rows": 1,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:35.676068+00:00",
-      "snapshot_json": "data/live_measured/usgs_water/usgs_water_20260705T212018Z.json",
-      "snapshot_sha256": "160f0e53fd98ea34445bbd1258c6043a807a1d545ef69cf9ff0ace7ecc7dcda9"
+      "last_truth_sync_utc": "2026-07-11T13:24:30.289530+00:00",
+      "snapshot_json": "data/live_measured/usgs_water/usgs_water_20260711T132415Z.json",
+      "snapshot_sha256": "61349bf6484c389f117a14478cf39713def6f6c395094eb6d9b69e180172f25f"
     },
     "WEBHOOK": {
       "enabled": true,
@@ -527,9 +527,9 @@
       "measured": true,
       "rows": 1,
       "http_status": null,
-      "last_truth_sync_utc": "2026-07-05T21:20:39.649865+00:00",
-      "snapshot_json": "data/live_measured/webhook/webhook_20260705T212018Z.json",
-      "snapshot_sha256": "22fdceef38a876332d07f68468e9ef4ab89004de0f5bf15af30ae9bd93c9780a"
+      "last_truth_sync_utc": "2026-07-11T13:24:33.827741+00:00",
+      "snapshot_json": "data/live_measured/webhook/webhook_20260711T132415Z.json",
+      "snapshot_sha256": "34913602ab07267a24998122b44dbb9942b19f4fe6dc7f0e61843b64066bae5d"
     },
     "WORLD_BANK_PUBLIC": {
       "enabled": true,
@@ -542,9 +542,9 @@
       "measured": true,
       "rows": 1,
       "http_status": 200,
-      "last_truth_sync_utc": "2026-07-05T21:20:44.261857+00:00",
-      "snapshot_json": "data/live_measured/world_bank_public/world_bank_public_20260705T212018Z.json",
-      "snapshot_sha256": "2e297a5ab0afbced7a840789e02c7dc395b49c8eb5bd07846f8e3f1557939839"
+      "last_truth_sync_utc": "2026-07-11T13:24:37.672963+00:00",
+      "snapshot_json": "data/live_measured/world_bank_public/world_bank_public_20260711T132415Z.json",
+      "snapshot_sha256": "f11e8ae95cb44ecc77d5a62e83c2d026b8a5255b1ed788d80a5f69a9d0633197"
     }
   }
 }
