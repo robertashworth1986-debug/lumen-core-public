@@ -108,7 +108,7 @@ $Steps = New-Object "System.Collections.Generic.List[object]"
 Push-Location $StackRoot
 try {
     $Scripts = @(
-        @{ name = "grant_hunter_v2"; path = Join-Path $StackRoot "code\grant_hunter_v2.py"; args = @() },
+        @{ name = "grant_hunter_v2"; path = Join-Path $StackRoot "code\grant_hunter_v2.py"; args = @("--profile", (Join-Path $StackRoot "code\grants_profile_lumencore.json"), "hunt") },
         @{ name = "grant_submission_readiness_audit"; path = Join-Path $OpsRoot "BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py"; args = @() },
         @{ name = "grant_waiting_actions"; path = Join-Path $OpsRoot "BUILD_GRANT_WAITING_ACTIONS.py"; args = @() },
         @{ name = "grant_followup_tracker"; path = Join-Path $OpsRoot "BUILD_GRANT_FOLLOWUP_TRACKER.py"; args = @() },
@@ -126,7 +126,7 @@ try {
     foreach ($s in $Scripts) {
         if (Test-Path -LiteralPath $s.path) {
             $Steps.Add((Run-Step -Name $s.name -Action {
-                & $Python $s.path
+                & $Python $s.path @($s.args)
                 if ($LASTEXITCODE -ne 0) { throw "$($s.name) exit code $LASTEXITCODE" }
             }))
         }
@@ -156,6 +156,8 @@ foreach ($rel in $Watch) {
 $Errors = @($Steps | Where-Object { $_.status -ne "ok" }).Count
 $Missing = @($Freshness | Where-Object { $_.freshness -eq "MISSING" }).Count
 $Stale = @($Freshness | Where-Object { $_.freshness -eq "STALE" }).Count
+$StepRows = @($Steps.ToArray())
+$FreshnessRows = @($Freshness)
 
 $Overall = if ($Errors -gt 0) {
     "ERRORS_NEED_REVIEW"
@@ -175,8 +177,8 @@ $Payload = [ordered]@{
     step_errors = $Errors
     missing_artifacts = $Missing
     stale_artifacts = $Stale
-    steps = @($Steps)
-    artifact_freshness = @($Freshness)
+    steps = $StepRows
+    artifact_freshness = $FreshnessRows
     boundaries = @(
         "This audit does not submit grants.",
         "Portal certifications and final submission remain user-controlled.",

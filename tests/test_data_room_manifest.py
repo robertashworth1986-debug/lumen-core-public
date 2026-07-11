@@ -22,8 +22,8 @@ def test_data_room_manifest_indexes_markdown_controls_and_mirrors():
 
     assert payload["schema"] == "data_room_manifest_v1"
     assert payload["status"] == "DATA_ROOM_MANIFEST_READY"
-    assert payload["summary"]["manifested_markdown_count"] >= 51
-    assert payload["summary"]["control_artifact_count"] == 52
+    assert payload["summary"]["manifested_markdown_count"] >= 53
+    assert payload["summary"]["control_artifact_count"] == 56
     assert payload["summary"]["missing_control_artifact_count"] == 0
     assert payload["summary"]["reviewer_gate_clear"] is True
     assert payload["summary"]["unsafe_secret_count"] == 0
@@ -46,6 +46,8 @@ def test_manifest_artifacts_have_hashes_and_front_door_order():
 
     expected_front_doors = {
         "REVIEWER_DECISION_BRIEF_2026-07-09.md",
+        "FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
+        "LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md",
         "REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md",
         "AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
         "CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
@@ -74,8 +76,9 @@ def test_manifest_artifacts_have_hashes_and_front_door_order():
     }
     assert expected_front_doors.issubset(markdown_by_name)
     assert payload["front_door_order"][0].endswith("REVIEWER_DECISION_BRIEF_2026-07-09.md")
-    assert payload["front_door_order"][1].endswith("REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md")
-    assert payload["front_door_order"][2].endswith("AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md")
+    assert payload["front_door_order"][1].endswith("FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md")
+    assert payload["front_door_order"][2].endswith("LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md")
+    assert payload["front_door_order"][3].endswith("REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md")
 
     for row in payload["markdown_artifacts"]:
         assert row["classification"] == "public_safe_markdown_review_required"

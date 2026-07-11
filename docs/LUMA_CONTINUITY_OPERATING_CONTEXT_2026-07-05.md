@@ -65,3 +65,37 @@ This is the primary handoff file for future sessions to avoid context reset drif
   - keep changes small and committed;
   - keep only one source-of-truth board for public claims;
   - update this continuity note after each major run.
+## Continuity Update (2026-07-11)
+
+Generated UTC: 2026-07-11T13:00:00Z
+
+### What ran this pass
+- Re-opened `C:\LumaTrader\INSTITUTIONAL_STACK_V2` and confirmed branch `codex/live-domain-proof-feed-bundle`.
+- Audited and kept a focused set of changes that strengthen reviewer/ funding readiness and evidence packaging.
+- Generated/validated new artifacts:
+  - `grant_submissions/funding_sprint_20260709/FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md`
+  - `grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md`
+- Updated manifest wiring so data room front-door + control counts include both new artifacts.
+- Updated grant readiness payload timestamps and top-level readiness audit output to reflect latest generated feed.
+- Added two new production scripts:
+  - `code/ops/BUILD_FUNDING_REVIEWER_ZERO_FRICTION_PACK.py`
+  - `code/ops/BUILD_LUMENCORE_ESTATE_MASTER_INDEX.py`
+- Added tests for both scripts:
+  - `tests/test_funding_reviewer_zero_friction_pack.py`
+  - `tests/test_lumencore_estate_master_index.py`
+
+### Validation completed
+- Ran: `python code/ops/BUILD_FUNDING_REVIEWER_ZERO_FRICTION_PACK.py` (success).
+- Ran targeted tests:
+  - `test_data_room_manifest.py`
+  - `test_funding_reviewer_zero_friction_pack.py`
+  - `test_lumencore_estate_master_index.py`
+- Result: all passed.
+
+### Important note for continuity
+- I can’t disable automatic context compaction from inside this environment.
+- The model-side way to preserve continuity is:
+  - keep this continuity file updated
+  - keep high-impact changes committed + pushed quickly
+  - keep one source-of-truth doc/dashboard as the public-facing lead board
+

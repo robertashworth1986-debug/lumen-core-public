@@ -23,6 +23,8 @@ CONTROL_NAMES = [
     "human_action_docket",
     "submission_authority_matrix",
     "reviewer_decision_brief",
+    "funding_reviewer_zero_friction_pack",
+    "lumencore_estate_master_index",
     "reviewer_investor_fast_lane_router",
     "agency_submission_assembly_gate",
     "customer_commercialization_packet",
@@ -47,6 +49,8 @@ CONTROL_NAMES = [
 
 FRONT_DOOR_FILES = {
     "REVIEWER_DECISION_BRIEF_2026-07-09.md",
+    "FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
+    "LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md",
     "REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md",
     "AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
     "CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
@@ -263,6 +267,8 @@ def build_payload() -> dict[str, Any]:
         },
         "front_door_order": [
             "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
+            "grant_submissions/funding_sprint_20260709/FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
+            "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md",
             "grant_submissions/funding_sprint_20260709/REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
