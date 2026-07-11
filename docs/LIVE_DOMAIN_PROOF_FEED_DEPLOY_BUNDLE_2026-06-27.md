@@ -1,8 +1,8 @@
 # Live Domain Proof Feed Deploy Bundle
 
-Generated UTC: `2026-07-11T13:25:10Z`
-Bundle root: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260711T132510Z`
-Archive: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260711T132510Z.tgz`
+Generated UTC: `2026-07-11T13:35:17Z`
+Bundle root: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260711T133517Z`
+Archive: `C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260711T133517Z.tgz`
 
 ## Decision
 
@@ -22,20 +22,20 @@ The feed-only deploy bundle is ready. It can publish proof JSON feeds to the pub
 
 | Feed | Required | Source | Copied | SHA-256 |
 |---|---:|---|---:|---|
-| `champion_metric_gauntlet` | `true` | `dashboard/data/champion_metric_gauntlet.json` | `2` | `34ed58d49672` |
-| `locked_source_baseline_replay_sweep` | `true` | `dashboard/data/locked_source_baseline_replay_sweep.json` | `2` | `56e4957a7c17` |
+| `champion_metric_gauntlet` | `true` | `dashboard/data/champion_metric_gauntlet.json` | `2` | `83704a934def` |
+| `locked_source_baseline_replay_sweep` | `true` | `dashboard/data/locked_source_baseline_replay_sweep.json` | `2` | `bb5b7ec1091f` |
 | `kuramoto_holdout_expansion` | `true` | `dashboard/data/kuramoto_holdout_expansion.json` | `2` | `1645f3d74f7e` |
 | `geometry_champion_of_champions` | `true` | `dashboard/data/geometry_champion_of_champions.json` | `2` | `45998fff4436` |
 | `field_money_truth_sweep` | `true` | `dashboard/data/field_money_truth_sweep.json` | `2` | `88f8242d07ed` |
 | `live_proof_value_meter` | `true` | `dashboard/data/live_proof_value_meter.json` | `2` | `07c416189aba` |
 | `field_validated_dollar_claim_ladder` | `true` | `dashboard/data/field_validated_dollar_claim_ladder.json` | `2` | `f4ce0d6887d2` |
 | `dollar_claim_gate` | `true` | `dashboard/data/dollar_claim_gate.json` | `2` | `9e64ad63466e` |
-| `field_validation_control_room` | `true` | `dashboard/data/field_validation_control_room.json` | `2` | `bf7fae7aef04` |
-| `field_validation_outreach_board` | `true` | `dashboard/data/field_validation_outreach_board.json` | `2` | `16ad10dc8d8a` |
-| `proof_to_pilot_control_room` | `true` | `dashboard/data/proof_to_pilot_control_room.json` | `2` | `20fdcc50fae6` |
-| `champion_sample_expansion_and_economic_bridge` | `true` | `dashboard/data/champion_sample_expansion_and_economic_bridge.json` | `2` | `de730ae1a473` |
+| `field_validation_control_room` | `true` | `dashboard/data/field_validation_control_room.json` | `2` | `43a5f9903d10` |
+| `field_validation_outreach_board` | `true` | `dashboard/data/field_validation_outreach_board.json` | `2` | `3c86f744bb3b` |
+| `proof_to_pilot_control_room` | `true` | `dashboard/data/proof_to_pilot_control_room.json` | `2` | `e36fc90626f9` |
+| `champion_sample_expansion_and_economic_bridge` | `true` | `dashboard/data/champion_sample_expansion_and_economic_bridge.json` | `2` | `4c6af30a1425` |
 | `champion_source_ablation` | `true` | `dashboard/data/champion_source_ablation.json` | `2` | `8f0b0c7e9333` |
-| `grant_readiness_status` | `true` | `dashboard/data/grant_readiness_status.json` | `2` | `2eb6ca94b6c8` |
+| `grant_readiness_status` | `true` | `dashboard/data/grant_readiness_status.json` | `2` | `949d8a248923` |
 | `top5_live_proof_submission_board` | `false` | `dashboard/data/top5_live_proof_submission_board.json` | `2` | `6af5514deafa` |
 | `deadline_evidence_bridge` | `false` | `dashboard/data/deadline_evidence_bridge.json` | `2` | `0b7d583ded97` |
 | `baseline_gauntlet_coverage` | `false` | `dashboard/data/baseline_gauntlet_coverage.json` | `2` | `a976cf22a889` |
@@ -44,8 +44,8 @@ The feed-only deploy bundle is ready. It can publish proof JSON feeds to the pub
 | `outreach_and_application_send_queue` | `false` | `dashboard/data/outreach_and_application_send_queue.json` | `2` | `c573cefc4059` |
 | `geometry_asset_wiring_board` | `false` | `dashboard/data/geometry_asset_wiring_board.json` | `2` | `20be445c8852` |
 | `luma_context_dashboard_parity_audit` | `false` | `dashboard/data/luma_context_dashboard_parity_audit.json` | `2` | `757fe628616e` |
-| `live_domain_deployment_feed` | `false` | `dashboard/data/live_domain_deployment_feed.json` | `2` | `18a52efbeef7` |
-| `live_domain_consolidation_audit` | `false` | `dashboard/data/live_domain_consolidation_audit.json` | `2` | `84661a38bcd7` |
+| `live_domain_deployment_feed` | `false` | `dashboard/data/live_domain_deployment_feed.json` | `2` | `ad1c90942cf2` |
+| `live_domain_consolidation_audit` | `false` | `dashboard/data/live_domain_consolidation_audit.json` | `2` | `5845a35e5bd9` |
 | `proof_to_revenue_engine` | `false` | `dashboard/data/proof_to_revenue_engine.json` | `2` | `b611e887434a` |
 | `champion_stress_test_matrix` | `false` | `dashboard/data/champion_stress_test_matrix.json` | `2` | `6d3857812135` |
 | `champion_metric_battery` | `false` | `dashboard/data/champion_metric_battery.json` | `2` | `a7cff739cc16` |
@@ -67,8 +67,8 @@ The feed-only deploy bundle is ready. It can publish proof JSON feeds to the pub
 
 ## Commands
 
-- Dry run: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260711T132510Z" -DryRun`
-- Deploy feeds: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260711T132510Z"`
+- Dry run: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260711T133517Z" -DryRun`
+- Deploy feeds: `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260711T133517Z"`
 - Verify domain hashes: `python .\code\ops\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py --timeout 8`
 
 ## Remote Web Roots Tried By Deploy Script
@@ -81,5 +81,5 @@ The feed-only deploy bundle is ready. It can publish proof JSON feeds to the pub
 
 Feed-only deploy bundle. It stages reviewer proof JSON for domain hash verification. It does not publish secrets, restart execution services, prove field validation, prove realized savings, set a fixed dollar value per frozen delta, or imply autonomous live trading permission. This is not field validation.
 
-Bundle SHA-256: `0c55a855eadf7caa788fa49ec86dc73fdcca4c8eb25265514c519bc95d902b9e`
-Archive SHA-256: `231984e30394647498a7dcd383a5b5427bdd5fb5e3542ffd22a28caaf1989efd`
+Bundle SHA-256: `ed00026403ce2afed86ec904149937a045f4be70f6dc09876561a094bf685c17`
+Archive SHA-256: `ca00fc0349a93997b9adb8dc353d26ecef3b25ef4fbe0cf6f3b89ba293d37e41`

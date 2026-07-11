@@ -151,7 +151,12 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
                     "NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md",
                     "NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md",
                 ],
-            ),
+            )
+            + [
+                "NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.md",
+                "NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.pdf",
+                "NASA_DATA_CENTER_RFI_EMAIL_DRAFT_2026-07-11.md",
+            ],
             "why_now": "Fastest clean federal market-research lane: no pricing needed, response can be bounded to capability, proof-to-decision validation, and no agency-validation claims.",
             "today_work": [
                 "Confirm official RFI email recipients, page cap, attachments, and amendments.",
@@ -185,7 +190,10 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
                     "LUMENCORE_FHWA_TSMO_CAPABILITY_NOTE_693JJ326R000012_2026-07-09.pdf",
                     "FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md",
                 ],
-            ),
+            )
+            + [
+                "FHWA_TSMO_COMPLIANCE_MATRIX_DRAFT_2026-07-11.md",
+            ],
             "why_now": "Best fit for LumenCore's measured-source validation story: TSMO data barriers, prototype algorithms, use-case prioritization, and evidence-backed evaluation.",
             "today_work": [
                 "Download/review official attachments and amendments.",
@@ -218,6 +226,7 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
             "secondary_url": "https://seedfund.nsf.gov/project-pitch/",
             "package_files": [
                 "NSF_PROJECT_PITCH_DRAFT_2026-07-09.md",
+                "NSF_PROJECT_PITCH_PORTAL_FIELD_MAP_2026-07-11.md",
                 "FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
             ],
             "why_now": "Strongest grants-side fit: small business, SBIR/STTR, Phase I, instrumentation emphasis. This is a better match than most broad human-services grants.",
@@ -250,6 +259,7 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
             "submission_route": "Grants.gov Workspace package if eligibility and demonstration facts are supportable",
             "official_url": "https://www.grants.gov/search-results-detail/362360",
             "package_files": [
+                "HUD_ROBOTICS_AI_EMERGENCY_ELIGIBILITY_GATE_2026-07-11.md",
                 "NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-11.md",
                 "FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
             ],

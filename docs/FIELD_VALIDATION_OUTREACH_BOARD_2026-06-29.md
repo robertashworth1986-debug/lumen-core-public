@@ -1,38 +1,15 @@
 # Field Validation Outreach Board
 
-Generated UTC: `2026-07-01T15:36:01.243952+00:00`
+Generated UTC: `2026-07-11T13:27:51.933485+00:00`
 
-Field-validation outreach board. This artifact identifies people and organizations that could unlock external validation by supplying or approving held-out operational data, incumbent baselines, acceptance metrics, and economic conversion factors. It records targeted user-approved outreach and local draft language. It does not authorize bulk outreach, contact scraping, field-validation claims, realized-savings claims, fixed-dollar frozen-delta claims, live trading, or autonomous operational execution.
-
-## Outreach Sent Ledger
-
-Status as of 2026-07-01: targeted outreach has been sent. Incubatenergy Labs/EPRI replied with cycle timing and a direct scheduling path. A LaunchTN newsletter was received, but it is not a response to the validation ask.
-
-| UTC/local date | Recipient | Subject | Status |
-|---|---|---|---|
-| 2026-07-01 | `labs@incubatenergy.org` | `LumenCore field-replay request for utility AI validation` | Reply received from Sarah Toews / EPRI Incubatenergy Labs. Current IEL cycle is already underway; next application/selection cycle expected to kick off in September; scheduling link offered for fit discussion. |
-| 2026-07-01 | `elena@piper-communications.com` | `Routing request: Tennessee field-replay validation path for LumenCore` | Sent; waiting for reply. |
-| 2026-07-01 | `info@launchtn.org` | `SBIR/STTR support request: external validation path for LumenCore` | Sent; waiting for reply. |
-| 2026-07-01 | `thewondry@vanderbilt.edu` | `Nashville founder request: technical validation route for LumenCore` | Sent; waiting for reply. |
-| 2026-07-01 | `smahajan@tntech.edu` | `Request for protocol review: grid replay validation for LumenCore` | Sent; waiting for reply. |
-| 2026-07-01 | `partnerships@ornl.gov` | `Request for technical validation path: LumenCore grid/AI replay proof stack` | Sent; waiting for reply. |
-| 2026-07-01 | `BroadbandSolutions@epb.net` | `Technical fit request: offline replay validation for grid reliability analytics` | Sent; waiting for reply. |
-| 2026-07-01 | `sparkcta@tnresearchpark.org` | `Spark/TVA validation path request for LumenCore proof stack` | Sent; waiting for reply. |
-
-## DICE Submission Status
-
-- DARPA BAAT finalization confirmation received 2026-06-29.
-- Submission identifier: `HR001126S0010-DICE-PA-052`
-- Submission type: Proposal Abstract.
-- Title: `Coherence-Bounded Peer Mesh: Sparse Task Markets and Local Inference Control for Resilient Heterogeneous AI Collectives`
-- Boundary: This is a portal submission confirmation, not an award, invitation, field validation, or funding decision.
+Field-validation outreach board. This artifact identifies people and organizations that could unlock external validation by supplying or approving held-out operational data, incumbent baselines, acceptance metrics, and economic conversion factors. It creates local draft language only. It does not authorize sending email, bulk outreach, contact scraping, field-validation claims, realized-savings claims, fixed-dollar frozen-delta claims, live trading, or autonomous operational execution.
 
 ## Live Breadth Correction
 
 - Champion replay core: `24/24` wins vs `kalman_filter` across `4` source systems.
 - Champion replay estimated rows: `2506267`
 - Broader measured providers: `25/29`
-- Fresh rows returned by broader live pull: `823`
+- Fresh rows returned by broader live pull: `2940`
 - Mapped source files/feeds: `186`
 - Ready-for-benchmark manifest rows: `313`
 - Boundary: The 24/24 result is the strongest champion replay core. The broader live-breadth universe is larger and ready for promotion, but it is not automatically part of the champion win until each source is run through locked benchmarks.
@@ -42,48 +19,16 @@ Status as of 2026-07-01: targeted outreach has been sent. Incubatenergy Labs/EPR
 - Claimable today: `paid_evidence_review_or_buyer_authorized_replay_only`
 - Paid evidence review range: `$5,000` to `$15,000` after scope.
 - Safe internal scenario value signal: `$39,595,200/year` under stated assumptions.
-- Broader live-breadth opportunity surface: `$18,041,944,890/year`, not a claim.
+- Broader live-breadth opportunity surface: `$22,926,347,617/year`, not a claim.
 - What unlocks real dollars: external owner supplies or approves held-out operational data; external owner names the incumbent baseline; acceptance metric is locked before replay; economic conversion factor is approved before replay; result artifact is signed, logged, or otherwise traceable
 
 ## Send Gate
 
-- Targeted user-approved validation outreach allowed: `true`
-- Targeted user-approved live-source/API onboarding allowed: `true`
+- Send without user review allowed: `false`
 - Bulk email allowed: `false`
 - Contact scraping allowed: `false`
 - Field-validation claim allowed: `false`
 - Realized-savings claim allowed: `false`
-- Plaintext secret commit allowed: `false`
-- Password/MFA automation allowed without user present: `false`
-
-## Standing User Approval Boundary
-
-On 2026-07-01, Robert explicitly approved targeted outreach emails and targeted onboarding of additional live-breadth sources/API keys for serious validation credibility. This authorization is limited to relevant validation, funding, lab, utility, agency, and public-data-source lanes. It does not authorize bulk unsolicited campaigns, contact scraping, committing plaintext secrets, misrepresenting field validation, submitting final legal/financial commitments without operator review, or bypassing MFA/password steps without Robert present.
-
-## External Reply Milestones
-
-### Incubatenergy Labs / EPRI
-
-- Reply received: 2026-07-01 local time.
-- Contact: Sarah Toews, Incubatenergy Labs Associate, Technology Innovation, `stoews@epri.com`.
-- Key content: current IEL cycle is already underway and approximately 10 projects were selected by utility partners for demonstration; next IEL application and selection cycle is expected to kick off in September.
-- Offered path: schedule a discussion using Sarah's booking link to learn more or assess company fit.
-- Interpretation: this is not field validation, selection, or funding. It is a credible warm validation doorway and a September cycle target.
-- Next action: prepare a 15-minute technical-fit agenda and book a short call focused on buyer-authorized replay, utility-held-out data, incumbent baseline, acceptance metric, and economic conversion.
-
-### 2026-07-03 Gmail Funding Triage
-
-- Gmail connector token was expired, so Chrome/Edge browser control was used against Robert's signed-in Gmail session.
-- Additional outreach checks found:
-  - Tennessee Tech / Satish Mahajan thread present, but no substantive reply text was visible in the browser readout.
-  - ORNL partnerships auto-reply present; receipt only, not validation.
-  - Black Dog / LvlUp Ventures funding lane found. The relevant application is at `https://www.lvlup.vc/apply/funding-application`.
-- LvlUp referral fields from the email lane:
-  - How did you hear about us: `Venture Scout`
-  - Referrer name: `Scott Kelly`
-  - Referrer email: `scott@blackdogvp.com`
-- Draft application answers were captured in `docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md`.
-- SAM.gov API key rotation reminder was found. Rotation should be completed before `2026-07-17`, but the replacement key should be handled only through local secret storage and smoke-tested before cutover.
 
 ## Ranked Targets
 
@@ -334,4 +279,4 @@ To stop further outreach, reply "remove."
 9. Promote the 17-provider broader live-breadth universe through locked benchmarks before broad claims.
 10. Only convert deltas to dollars after an external owner approves the economic conversion.
 
-Outreach board SHA-256: `bf2795f3cfaa6b1aa12debbd565f28b53fa25adb21a35c3e58a4dbe3d914cc44`
+Outreach board SHA-256: `6f2cdc86af1af2e69c2279b41fd71692847d94973c41fd6cce4b3354ba045f28`

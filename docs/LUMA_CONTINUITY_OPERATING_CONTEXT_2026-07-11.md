@@ -63,6 +63,26 @@ Generated UTC: 2026-07-11T19:00:00Z
 3. Keep only one public-facing board for reviewer exposure until the live domain is synchronized.
 4. Continue outreach/application updates from queue files after public claims are updated and synchronized.
 
+## 2026-07-11 Recovery Update (13:53 UTC)
+
+- Ran `BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py` and rebuilt all near-deadline, live-domain proof, and validation artifacts.
+- Rebuilt and deployed bundle: `.deploy_stage\live_domain_proof_feeds_20260711T133517Z`.
+- Ran deploy with explicit bundle root:
+  - `.\deploy\PUSH_PROOF_FEEDS_TO_VPS.ps1 -BundleRoot "C:\LumaTrader\INSTITUTIONAL_STACK_V2\.deploy_stage\live_domain_proof_feeds_20260711T133517Z"`
+- Re-verified live domain integrity:
+  - `required_remote_hash_match_count = 14/14`
+  - `required_remote_reachable_stale_count = 0`
+  - `live_domain_reviewer_ready = true`
+- New grant/outreach files captured in this pass:
+  - `grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-11.md`
+  - `grant_submissions/funding_sprint_20260709/FHWA_TSMO_COMPLIANCE_MATRIX_DRAFT_2026-07-11.md`
+  - `grant_submissions/funding_sprint_20260709/HUD_ROBOTICS_AI_EMERGENCY_ELIGIBILITY_GATE_2026-07-11.md`
+  - `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_EMAIL_DRAFT_2026-07-11.md`
+  - `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.md`
+  - `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.pdf`
+  - `grant_submissions/funding_sprint_20260709/NSF_PROJECT_PITCH_PORTAL_FIELD_MAP_2026-07-11.md`
+- Important: these are still **synthetic-benchmark proofs** unless explicitly labeled as field-validated.
+
 ## Context-compaction answer (direct)
 
 - You cannot disable automatic context compaction from this environment.
@@ -71,3 +91,10 @@ Generated UTC: 2026-07-11T19:00:00Z
   - keep changes small and committed quickly,
   - push after each stable commit,
   - keep one canonical continuity file and one canonical public-facing artifact set.
+  
+- We cannot disable automatic context compaction directly from this thread.
+  To keep continuity strong:
+  1) Keep this file current,
+  2) Keep a single canonical handoff file per area,
+  3) Commit and push after meaningful updates,
+  4) Resume from `git pull` + this file only.

@@ -1,6 +1,6 @@
 # Champion Metric Gauntlet
 
-Generated UTC: `2026-07-01T16:49:06.536895+00:00`
+Generated UTC: `2026-07-11T13:27:51.907856+00:00`
 
 ## What To Ask Me
 
@@ -17,7 +17,7 @@ Ask questions that force evidence, gates, and next actions:
 
 ## Current Answer
 
-Kuramoto phase coupling is the current internal champion because it beat kalman_filter on 24/24 source-conditioned holdouts across 4 champion-replay source systems. The broader live-source universe currently shows 25 measured providers and 186 mapped source files/feeds available for additional benchmark promotion. That is strong enough to request a buyer-authorized field replay, but it is not field validation or realized dollar savings yet.
+Kuramoto phase coupling is the current internal champion because it beat kalman_filter on 24/24 source-conditioned holdouts across 4 champion-replay source systems. The broader live-source universe currently shows 25 measured providers and 204 mapped source files/feeds available for additional benchmark promotion. That is strong enough to request a buyer-authorized field replay, but it is not field validation or realized dollar savings yet.
 
 ## Strongest Current Candidate
 
@@ -30,8 +30,8 @@ Kuramoto phase coupling is the current internal champion because it beat kalman_
 - Min delta vs baseline: `0.044697`
 - Source systems: `4`
 - Broader measured providers: `25/29`
-- Manifest unique sources: `186`
-- Manifest ready benchmark rows: `313`
+- Manifest unique sources: `204`
+- Manifest ready benchmark rows: `349`
 - Estimated rows replayed: `2506267`
 - Sign-test p-value: `6e-08`
 - Wilson lower 95% win-rate bound: `0.862024`
@@ -56,12 +56,12 @@ The champion replay source count and the broader live-source universe are intent
 - Champion replay source systems: `4`
 - Champion replay source names: `energy_grid, macro_rates_labor, market_data, sports_market`
 - Fresh measured providers: `25` of `29`
-- Fresh measured rows in latest bounded pull: `823`
+- Fresh measured rows in latest bounded pull: `2940`
 - Measured provider names: `AIRNOW, ALPACA, ALPHAVANTAGE, BEA, BLS, CENSUS, COINBASE_PUBLIC, COINGECKO_PUBLIC, EIA, FINNHUB, FRED, GRANTS_GOV, KRAKEN, KRAKEN_PUBLIC, MASSIVE, NASA, NOAA_NCEI, NWS_PUBLIC, OPEN_METEO_PUBLIC, SEC_PUBLIC, TREASURY_FISCAL_PUBLIC, TWELVE_DATA, USGS_WATER, WEBHOOK, WORLD_BANK_PUBLIC`
 - Failed or thin provider names: `BINANCE_PUBLIC, EPA_AQS, NREL, THE_ODDS_API`
-- Manifest unique source count: `186`
-- Manifest ready-for-benchmark row count: `313`
-- Manifest estimated rows mapped: `9845371`
+- Manifest unique source count: `204`
+- Manifest ready-for-benchmark row count: `349`
+- Manifest estimated rows mapped: `9848134`
 
 ## Grid/RF/PLL Hardware Validation Gate
 
@@ -98,12 +98,13 @@ A fixed dollar or realized-savings claim stays blocked until a buyer, lab, utili
 - `hash_chain_present`: `PASS` | actual `2227dd06869d...` | threshold `64 hex characters`
 - `vault_hashes_verified`: `PASS` | actual `True` | threshold `true`
 - `all_families_live_benchmarked`: `BLOCKED` | actual `False` | threshold `true before broad all-family claims`
-- `live_domain_feed_routed`: `PASS` | actual `12/12 required hosted hashes match; 0 stale/missing` | threshold `all required hosted hashes match before hosted reviewer proof claim`
+- `live_domain_feed_routed`: `BLOCKED` | actual `11/14 required hosted hashes match; 3 stale/missing` | threshold `all required hosted hashes match before hosted reviewer proof claim`
 - `field_validation`: `BLOCKED` | actual `False` | threshold `true before field validated language`
 
 ## Blockers
 
 - `all_families_live_benchmarked`: Broad all-family language remains blocked.
+- `live_domain_feed_routed`: Hosted reviewer proof language is allowed once all required feed hashes match.
 - `field_validation`: Field-validation and realized-savings language remains blocked.
 
 ## Metric Expansion Suite
@@ -142,7 +143,7 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 - Status: `READY_FOR_LIVE_BREADTH_PROMOTION`
 - Question: Does the champion generalize beyond the current four promoted replay systems?
 - Metrics: `leave_one_source_out, source_group_holdout, provider_promotion_rate, schema_normalization_success`
-- Current evidence: Current champion replay uses 4 promoted source systems; broader live breadth has 25/29 measured providers and 313 ready-for-benchmark manifest rows.
+- Current evidence: Current champion replay uses 4 promoted source systems; broader live breadth has 25/29 measured providers and 349 ready-for-benchmark manifest rows.
 - Next action: Promote one provider at a time only after a named baseline, schema adapter, and acceptance metric exist.
 - Claim gate: Broad live-breadth claims remain blocked until promoted sources pass locked benchmarks.
 
@@ -178,7 +179,7 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 - Status: `EVIDENCED_CORE_READY_TO_EXPAND`
 - Question: Can a reviewer reproduce the evidence chain?
 - Metrics: `input_hash, config_hash, output_hash, code_commit, manifest_sha256, domain_hash_match`
-- Current evidence: Champion hash chain exists and dashboard feeds are local-ready; live-domain feed status is LIVE_DOMAIN_HASH_VERIFIED.
+- Current evidence: Champion hash chain exists and dashboard feeds are local-ready; live-domain feed status is LOCAL_READY_DOMAIN_NOT_VERIFIED.
 - Next action: Keep regenerating feed manifests after each run and verify live-domain hashes before public claims.
 - Claim gate: Hash-verified proof language is allowed only for feeds whose local and hosted hashes match.
 
@@ -218,4 +219,4 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 
 Champion metric gauntlet only. This artifact explains the current internal winner, the tests it has passed, the tests it has not passed, and the safest claim language. It does not create field validation, realized savings, trading profit, medical efficacy, award certainty, or a fixed dollar price for frozen deltas.
 
-Gauntlet SHA-256: `d3d0f031355d80a2552e6b33f32a685e246eb96bf49f74d5129bd62e3116673d`
+Gauntlet SHA-256: `6b4ea45360c376f8d699de12ac70efd12ecf004b67286e5a859c4cc53d027daa`

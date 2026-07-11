@@ -1,6 +1,6 @@
 # Field Validation Control Room
 
-Generated UTC: `2026-06-29T20:45:59.130802+00:00`
+Generated UTC: `2026-07-11T13:27:51.926258+00:00`
 
 One reviewer/buyer control surface for the strongest geometry evidence, current claim gates, field-validation blockers, and next validation actions.
 
@@ -8,7 +8,7 @@ One reviewer/buyer control surface for the strongest geometry evidence, current 
 
 - Strongest current family: `kuramoto_phase_coupling`
 - Lane: `wave_resonance_timing`
-- Asset score: `332.412`
+- Asset score: `367.535`
 - Status: `ready_to_request_field_replay_not_yet_field_validated`
 - Internal wins vs Kalman: `24/24`
 - Estimated rows replayed: `2506267`
@@ -22,8 +22,8 @@ One reviewer/buyer control surface for the strongest geometry evidence, current 
 - External validation unlock packet ready: `true`
 - External approval received: `false`
 - Grid/RF/PLL protocols ready: `true`
-- Broader measured providers: `17`
-- Manifest unique sources: `183`
+- Broader measured providers: `25`
+- Manifest unique sources: `186`
 - Field-validation claim allowed: `false`
 - Real-dollar savings claim allowed: `false`
 - Fixed-dollar delta claim allowed: `false`
@@ -122,7 +122,7 @@ Acceptance metrics:
 ### `kuramoto_phase_coupling`
 
 - Lane: `wave_resonance_timing`
-- Asset score: `332.412`
+- Asset score: `367.535`
 - Evidence status: `expanded_source_conditioned_holdout_winner_not_field_validated`
 - Claim stage: `buyer_authorized_field_replay_request_ready_not_field_validated`
 - Benchmark hypothesis: Test phase-locking features for oscillatory datasets.
@@ -130,7 +130,7 @@ Acceptance metrics:
 ### `brachistochrone_descent`
 
 - Lane: `optimal_curve_transport`
-- Asset score: `272.058`
+- Asset score: `273.188`
 - Evidence status: `rolling_champion_repeat_live_context_not_field_validated`
 - Claim stage: `rolling_champion_not_field_validated`
 - Benchmark hypothesis: Test fastest constrained descent versus straight/spline/minimum-jerk routes.
@@ -138,7 +138,7 @@ Acceptance metrics:
 ### `thermal_plume_convection`
 
 - Lane: `thermal_ventilation`
-- Asset score: `187.193`
+- Asset score: `186.702`
 - Evidence status: `rolling_champion_repeat_live_context_not_field_validated`
 - Claim stage: `rolling_champion_not_field_validated`
 - Benchmark hypothesis: Test passive heat evacuation under hotspots.
@@ -146,9 +146,9 @@ Acceptance metrics:
 ### `leaf_veins`
 
 - Lane: `branching_transport`
-- Asset score: `147.0`
-- Evidence status: `triple_source_live_candidate_needs_repeat_run`
-- Claim stage: `live_replay_candidate_needs_repeat`
+- Asset score: `182.749`
+- Evidence status: `rolling_champion_repeat_live_context_not_field_validated`
+- Claim stage: `rolling_champion_not_field_validated`
 - Benchmark hypothesis: Test transport under random vein failures.
 
 ### `beast_algo_echo_stack`
@@ -210,4 +210,4 @@ Acceptance metrics:
 - `medical or addiction treatment claims`
 - `bulk outreach`
 
-Control room SHA-256: `b5a744bb004d3763733b52fc95a1c304ae6876f1cd451165f11148120b35ef56`
+Control room SHA-256: `f9c87df674938370b73fa02f8be62d520bb459555175a4c930c521387c3b6fa9`

@@ -21,7 +21,7 @@ Direct answer: stage NASA first for speed, NSF and FHWA next for strongest fit, 
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `f796419ed72fe60306a6373a1dbc89da69c803ed3a19228550f96bd70fd43e67`
+- Command board SHA-256: `737c8d926d21fbda02cfd23f3d48aad21d5bd98a0202e968f4b86b19c8ce2f3e`
 
 ## Stage Now
 
@@ -33,6 +33,9 @@ Direct answer: stage NASA first for speed, NSF and FHWA next for strongest fit, 
 - Package files:
   - `NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md`
   - `NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md`
+  - `NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.md`
+  - `NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.pdf`
+  - `NASA_DATA_CENTER_RFI_EMAIL_DRAFT_2026-07-11.md`
 
 ### 2. 693JJ326R000012 - Transportation Systems Management and Operations Data Initiative
 
@@ -43,6 +46,7 @@ Direct answer: stage NASA first for speed, NSF and FHWA next for strongest fit, 
   - `FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md`
   - `LUMENCORE_FHWA_TSMO_CAPABILITY_NOTE_693JJ326R000012_2026-07-09.pdf`
   - `FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md`
+  - `FHWA_TSMO_COMPLIANCE_MATRIX_DRAFT_2026-07-11.md`
 
 ### 3. 26-511 - Small Business Innovation Research / Small Business Technology Transfer Phase I, Phase II, Fast-Track Programs (SBIR/STTR): A Pilot Emphasis on Scientific Instrumentation.
 
@@ -51,6 +55,7 @@ Direct answer: stage NASA first for speed, NSF and FHWA next for strongest fit, 
 - Official URL: https://www.grants.gov/search-results-detail/362551
 - Package files:
   - `NSF_PROJECT_PITCH_DRAFT_2026-07-09.md`
+  - `NSF_PROJECT_PITCH_PORTAL_FIELD_MAP_2026-07-11.md`
   - `FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md`
 
 ### 5. W912HZ26SC005 - Sovereign Defense Cloud for High-Performance Computing Commercial Solutions Opening
@@ -95,9 +100,12 @@ Direct answer: stage NASA first for speed, NSF and FHWA next for strongest fit, 
 - Package files:
   - `NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md`
   - `NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md`
+  - `NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.md`
+  - `NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.pdf`
+  - `NASA_DATA_CENTER_RFI_EMAIL_DRAFT_2026-07-11.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `fbc20cd32d7470a07310423d0bc738b22bd1f23aa10448b46174d3eedabd2a31`
+- Lane SHA-256: `62c643830ce5bdab68e18e88cfdac05017956a0f6d23ea87fa5986270148774a`
 
 ### 2. 693JJ326R000012 - Transportation Systems Management and Operations Data Initiative
 
@@ -121,9 +129,10 @@ Direct answer: stage NASA first for speed, NSF and FHWA next for strongest fit, 
   - `FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md`
   - `LUMENCORE_FHWA_TSMO_CAPABILITY_NOTE_693JJ326R000012_2026-07-09.pdf`
   - `FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md`
+  - `FHWA_TSMO_COMPLIANCE_MATRIX_DRAFT_2026-07-11.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `3592a6e17ead8dd632124ad9bc06d65c69a74e55e8ff171a0fce518ba636b617`
+- Lane SHA-256: `aebd30b3d0f50969c94ea456c72636af6dac7dd23b214d0c43cee38e8acc7670`
 
 ### 3. 26-511 - Small Business Innovation Research / Small Business Technology Transfer Phase I, Phase II, Fast-Track Programs (SBIR/STTR): A Pilot Emphasis on Scientific Instrumentation.
 
@@ -146,10 +155,11 @@ Direct answer: stage NASA first for speed, NSF and FHWA next for strongest fit, 
   - Robert approves final pitch submit.
 - Package files:
   - `NSF_PROJECT_PITCH_DRAFT_2026-07-09.md`
+  - `NSF_PROJECT_PITCH_PORTAL_FIELD_MAP_2026-07-11.md`
   - `FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `19bf17755f9ff25134b21221da164d8fb4f4966d58e0d5bce405fe68d91ebc84`
+- Lane SHA-256: `a13576f89892d13f23052314d7f710ca0ae5cc64cb0176cf06834430a90e4be6`
 
 ### 4. PDR-2600-DC-029Q - Mass Market Solutions for Leveraging Robotics and AI Technologies for Home Construction Demonstration
 
@@ -170,11 +180,12 @@ Direct answer: stage NASA first for speed, NSF and FHWA next for strongest fit, 
   - Robert confirms eligible applicant status and real project/demonstration facts.
   - Robert approves all Grants.gov certifications and final submission.
 - Package files:
+  - `HUD_ROBOTICS_AI_EMERGENCY_ELIGIBILITY_GATE_2026-07-11.md`
   - `NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-11.md`
   - `FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `3114c1e004f2b8a680fdff82e77d3c69be573604d09fc062c84346960c6530a9`
+- Lane SHA-256: `737dfab9bad6ecd8ccc416a0fbf69f3cdc4a7ea942e7ce1c32971939655867c0`
 
 ### 5. W912HZ26SC005 - Sovereign Defense Cloud for High-Performance Computing Commercial Solutions Opening
 
