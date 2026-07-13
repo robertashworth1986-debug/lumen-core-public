@@ -1,0 +1,169 @@
+{
+  "schema": "eia_grid_prospective_hybrid_router_protocol.v1",
+  "protocol_id": "EIA_GRID_PROSPECTIVE_HYBRID_ROUTER_20260713",
+  "version": 1,
+  "preregistered_date_utc": "2026-07-13",
+  "status": "preregistered_before_prospective_target_collection",
+  "purpose": "Test the LumenCore routing and orchestration hypothesis by prospectively choosing an authority-specific specialist before actual demand is available.",
+  "core_hypothesis": "A frozen hybrid specialist router has lower prospective seasonal-MASE than the best fixed specialist evaluated over the same future common-intersection targets.",
+  "design_boundary": "The route map was designed after inspecting data through 2026-07-12. Historical improvements are exploratory only. No target dated after the cutoff may influence the route map, specialist settings, features, or gates.",
+  "historical_design_evidence": {
+    "panel_path": "data/live_measured/eia_grid_validation/eia_grid_validation_panel_latest.json",
+    "panel_sha256": "8b480ec4923c17d3782eacd428ee5ea599525145ce2a0772ba934aba0a40da59",
+    "panel_last_target_date": "2026-07-12",
+    "residual_protocol_commit": "9fdde5f0d9836e3bdc995df22b04b8c3b72188cd",
+    "residual_result_path": "out/eia_grid_residual_moe/eia_grid_residual_moe_benchmark_latest.json",
+    "residual_result_sha256": "e2e0bc779823e543784c24675e18c12bcb821e65911168c2d3339b6da67ea744",
+    "residual_rows_sha256": "3b2e130ed750878f893b59931dd55c4fef333f70710c19fbb60a696ac8a4000d",
+    "exploratory_routed_mean_mase": 0.19687293485989615,
+    "exploratory_best_fixed_mean_mase": 0.21211186326437867,
+    "exploratory_relative_improvement": 0.07184382886443527,
+    "claim_rule": "These historical routed figures explain the frozen design but are not confirmation evidence because they informed the route map."
+  },
+  "source": {
+    "publisher": "U.S. Energy Information Administration",
+    "product": "Form EIA-930 daily demand and day-ahead demand forecast by balancing authority",
+    "api_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/",
+    "frequency": "daily",
+    "actual_type": "D",
+    "official_forecast_type": "DF",
+    "native_unit": "megawatthours",
+    "credential_policy": "Read EIA_API_KEY or EIA_API_KEY_PREMIUM from the process environment and never serialize the credential."
+  },
+  "prospective_window": {
+    "first_allowed_target_date": "2026-07-14",
+    "preliminary_gate_common_days_per_authority": 30,
+    "confirmatory_gate_common_days_per_authority": 90,
+    "durability_gate_common_days_per_authority": 180,
+    "target_end_date": null,
+    "backfilled_predictions_allowed": false
+  },
+  "balancing_authorities": [
+    "CISO",
+    "ERCO",
+    "ISNE",
+    "MISO",
+    "NYIS",
+    "PJM",
+    "SWPP",
+    "TVA"
+  ],
+  "specialists": [
+    {
+      "id": "xgboost_residual",
+      "definition": "The fixed residual XGBoost feature and hyperparameter contract from EIA_GRID_RESIDUAL_MOE_20260713, fitted on eligible observations available before the target."
+    },
+    {
+      "id": "direct_lightgbm_stack",
+      "definition": "The fixed direct LightGBM feature and hyperparameter contract from EIA_GRID_RESIDUAL_MOE_20260713, fitted on eligible observations available before the target."
+    },
+    {
+      "id": "autoregressive_ridge_p14",
+      "definition": "The fixed fourteen-lag autoregressive ridge forecast using actual demand dated before the target only."
+    },
+    {
+      "id": "eia_day_ahead_forecast",
+      "definition": "The EIA type DF value for the same authority and target date."
+    }
+  ],
+  "router": {
+    "id": "authority_specialist_router_v1",
+    "kind": "deterministic_hybrid_orchestrator",
+    "route_map": {
+      "CISO": "xgboost_residual",
+      "ERCO": "xgboost_residual",
+      "ISNE": "xgboost_residual",
+      "MISO": "xgboost_residual",
+      "NYIS": "direct_lightgbm_stack",
+      "PJM": "xgboost_residual",
+      "SWPP": "autoregressive_ridge_p14",
+      "TVA": "xgboost_residual"
+    },
+    "fallback": "eia_day_ahead_forecast",
+    "route_reason_code": "FROZEN_AUTHORITY_SPECIALIST_MAP_V1",
+    "dynamic_override_allowed": false,
+    "post_target_override_allowed": false
+  },
+  "specialist_fit_rule": {
+    "history_start": "2024-04-01",
+    "expanding_window": true,
+    "latest_training_target": "The latest date strictly before the forecast target for which actual demand and all required lagged features are complete.",
+    "minimum_history_days": 90,
+    "maximum_history_days_for_ar": 730,
+    "target_actual_may_be_used": false,
+    "future_observation_may_be_used": false,
+    "hyperparameter_change_allowed": false
+  },
+  "prediction_seal": {
+    "require_target_official_forecast": true,
+    "require_target_actual_absent_at_seal": true,
+    "required_fields": [
+      "target_date",
+      "respondent",
+      "sealed_utc",
+      "source_response_sha256",
+      "protocol_sha256",
+      "protocol_commit",
+      "specialist_predictions_mwh",
+      "selected_specialist",
+      "router_prediction_mwh",
+      "route_reason_code",
+      "prior_record_chain_sha256",
+      "record_sha256"
+    ],
+    "append_only": true,
+    "replacement_allowed": false,
+    "settlement_rule": "Actual demand may be joined only after a sealed prediction exists."
+  },
+  "comparators": {
+    "predeclared_fixed_specialists": [
+      "xgboost_residual",
+      "direct_lightgbm_stack",
+      "autoregressive_ridge_p14",
+      "eia_day_ahead_forecast"
+    ],
+    "primary_comparator": "The single fixed specialist with the lowest mean seasonal-MASE over the complete prospective common-intersection window, selected only for final comparison after the window closes.",
+    "oracle": "The per-target lowest-error specialist, used only to measure routing regret and never available to the router."
+  },
+  "metrics": {
+    "primary": "seasonal_mase_7",
+    "secondary": [
+      "absolute_error_mwh",
+      "absolute_percentage_error",
+      "directional_accuracy",
+      "router_regret_to_oracle",
+      "route_hit_rate",
+      "specialist_usage_rate",
+      "fallback_rate"
+    ],
+    "aggregation_unit": "balancing_authority_calendar_month"
+  },
+  "inference": {
+    "paired_delta": "Best-fixed-specialist seasonal-MASE minus router seasonal-MASE; positive favors the router.",
+    "bootstrap": "10000 deterministic balancing-authority cluster-bootstrap draws with seed 20260713.",
+    "sign_test": "Exact two-sided sign test over nonzero balancing-authority-month mean deltas.",
+    "reporting": "Report every authority, month, route, fallback, and negative result before any aggregate summary."
+  },
+  "promotion_gates": {
+    "preliminary": {
+      "minimum_common_days_per_authority": 30,
+      "label": "prospective_preliminary_signal",
+      "external_generalization_allowed": false
+    },
+    "confirmatory": {
+      "minimum_common_days_per_authority": 90,
+      "must_beat_best_fixed_specialist": true,
+      "minimum_authority_mean_wins": 6,
+      "minimum_month_win_rate": 0.6,
+      "maximum_single_authority_mase_regression": 0.05,
+      "require_positive_cluster_bootstrap_lower_bound": true,
+      "require_two_sided_sign_test_p_at_most": 0.05
+    },
+    "durability": {
+      "minimum_common_days_per_authority": 180,
+      "require_confirmatory_gate": true,
+      "external_partner_replication_required": true
+    }
+  },
+  "claim_boundary": "A passing result supports prospective public-data evidence for a frozen hybrid forecast router. It does not establish patent validity or scope, utility field control, realized savings, grid reliability improvement, production readiness, trading edge, or universal model superiority."
+}
