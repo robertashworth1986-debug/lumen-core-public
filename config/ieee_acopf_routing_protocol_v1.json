@@ -1,0 +1,120 @@
+{
+  "protocol_id": "ieee-acopf-routing-v1",
+  "protocol_version": "1.0.0",
+  "preregistered_at": "2026-07-13T21:15:00-05:00",
+  "status": "preregistered_before_candidate_execution",
+  "purpose": "Test whether a deterministic pre-solve router can improve AC optimal-power-flow reliability or time without changing the objective, constraints, or feasibility standard.",
+  "claim_boundary": "This is an IEEE reference-network benchmark. It is not field validation, a utility deployment, a realized-savings study, or evidence that a heuristic beats the mathematical optimum.",
+  "environment": {
+    "python": "current locked project environment",
+    "pandapower": "3.4.0",
+    "numpy": "2.3.5",
+    "scipy": "1.16.3",
+    "solver_family": "pandapower.runopp using the PYPOWER AC OPF implementation"
+  },
+  "reference_networks": [
+    "case14",
+    "case30",
+    "case39",
+    "case57",
+    "case118"
+  ],
+  "random_seed": 20260713,
+  "scenario_families": {
+    "buswise_load_stress": {
+      "description": "Apply seeded active- and reactive-load multipliers while preserving each bus power factor.",
+      "global_multiplier_range": [0.8, 1.2],
+      "bus_multiplier_range": [0.7, 1.3]
+    },
+    "connected_n_minus_one": {
+      "description": "Remove one in-service branch only when the resulting topology remains connected; record excluded islanding outages separately.",
+      "load_multiplier_range": [0.9, 1.1]
+    }
+  },
+  "scenario_count_per_network": {
+    "development": 128,
+    "locked_holdout": 256
+  },
+  "split_rule": "Generate scenario records from the fixed seed, sort by SHA-256 of the canonical scenario specification, assign the first one-third to development and the remaining two-thirds to the locked holdout, and never tune on holdout outputs.",
+  "baselines": [
+    {
+      "id": "acopf_flat",
+      "description": "Full AC OPF with flat initialization and no router."
+    },
+    {
+      "id": "acopf_pf_init",
+      "description": "Full AC OPF initialized from a power-flow solution and no router."
+    },
+    {
+      "id": "best_fixed_dev_route",
+      "description": "The single initialization route selected using development results and then frozen."
+    }
+  ],
+  "candidate": {
+    "id": "lumaroute_v1",
+    "description": "A deterministic pre-solve router trained only on development scenarios. It may choose flat initialization, power-flow initialization, or a declared retry sequence using only pre-solve network descriptors.",
+    "allowed_features": [
+      "network_id",
+      "bus_count",
+      "branch_count",
+      "connected_component_count",
+      "aggregate_active_load",
+      "aggregate_reactive_load",
+      "load_to_online_generation_capacity_ratio",
+      "maximum_bus_load_share",
+      "mean_node_degree",
+      "minimum_node_degree",
+      "outage_indicator"
+    ],
+    "forbidden_features": [
+      "locked-holdout outcomes",
+      "post-solve values",
+      "scenario identifiers used as lookup keys",
+      "manual per-holdout overrides"
+    ]
+  },
+  "timing_protocol": {
+    "warmup_runs": 2,
+    "measured_repetitions": 7,
+    "summary": "median wall-clock seconds",
+    "scope": "Include all preprocessing, routing, failed attempts, and retries in candidate time."
+  },
+  "primary_metrics": [
+    "convergence_rate",
+    "feasible_solution_rate",
+    "median_end_to_end_wall_time",
+    "objective_relative_gap_when_both_routes_are_feasible",
+    "maximum_voltage_constraint_violation",
+    "maximum_branch_constraint_violation"
+  ],
+  "statistical_plan": {
+    "confidence_level": 0.95,
+    "bootstrap_resamples": 10000,
+    "unit_of_resampling": "scenario within reference network",
+    "multiple_network_summary": "Report every network and scenario family separately before any macro average."
+  },
+  "win_rules": {
+    "objective_equivalence_tolerance": 1e-6,
+    "maximum_absolute_constraint_violation": 1e-6,
+    "maximum_worst_network_convergence_regression_percentage_points": 2.0,
+    "minimum_aggregate_median_speedup_fraction": 0.15,
+    "speedup_confidence_interval_lower_bound_must_exceed": 0.0,
+    "full_champion_requires_all_guardrails": true
+  },
+  "failure_rules": [
+    "A lower reported cost is not a win unless the candidate satisfies the identical objective and constraints and an independent feasibility check passes.",
+    "A speed result is not a win if failed attempts or retries are omitted from elapsed time.",
+    "An aggregate win is blocked by a guardrail failure on any reference network.",
+    "A post-hoc router designed from locked-holdout outcomes is exploratory and requires a new prospective holdout."
+  ],
+  "required_outputs": [
+    "canonical scenario manifest with hashes",
+    "environment and dependency manifest",
+    "per-attempt result rows",
+    "per-scenario feasibility and timing rows",
+    "network-level and aggregate summaries",
+    "bootstrap intervals",
+    "negative-result section",
+    "artifact SHA-256 chain"
+  ]
+}
