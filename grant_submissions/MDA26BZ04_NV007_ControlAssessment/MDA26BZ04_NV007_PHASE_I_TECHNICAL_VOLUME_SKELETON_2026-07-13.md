@@ -4,7 +4,7 @@ Generated: 2026-07-13
 
 Working title: Evidence-First Assessment Orchestration for Hybrid and Disconnected Environments
 
-Status: `STRUCTURE_READY_CONTENT_IN_PROGRESS`
+Status: `STRUCTURE_READY_CONTENT_IN_PROGRESS_WITH_SYNTHETIC_RISK_EVIDENCE`
 
 ## Page Budget
 
@@ -100,6 +100,8 @@ Expected Phase I deliverables:
 ## 6. Related Work and Current Capability Boundary
 
 Existing LumenCore assets provide reusable patterns for hashed source manifests, frozen replay, baseline comparison, portable execution, evidence receipts, and human approval gates. The proposed effort adapts those patterns to cyber assessment.
+
+Two preregistered synthetic experiments now provide bounded evidence about the proposed correlation mechanics. V1 failed because it mapped every unsupported holdout record and did not clear its minimum improvement over the best baseline. A new-seed v2 used explicit open-set score and margin constraints, achieved zero unsupported mappings and 95.8% supported-case coverage on its synthetic blind holdout, but still missed its frozen minimum baseline-delta gate. The negative verdicts are retained. Phase I is therefore framed around the demonstrated unresolved risk: representative-corpus performance, open-set calibration, human correction burden, and independent replay against accepted operational baselines.
 
 Cyber-specific ACAS/SCAP parsers, authoritative STIG/CVE/NIST mappings, MDA integration, CMMC assessment capability, and operational validation are proposed work, not current accomplishments.
 
