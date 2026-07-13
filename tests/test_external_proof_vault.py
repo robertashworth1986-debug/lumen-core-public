@@ -28,7 +28,7 @@ def test_manifest_selects_high_value_proof_artifacts_without_moving_sources(tmp_
     module = load_module()
     manifest = module.build_manifest(tmp_path, package_name="TEST_PACKET")
 
-    assert manifest["schema"] == "external_proof_vault_manifest_v1"
+    assert manifest["schema"] == "external_proof_vault_manifest_v2"
     assert manifest["packet_dir"].endswith("TEST_PACKET")
     assert manifest["summary"]["artifact_count"] >= 25
     assert manifest["summary"]["ready_count"] >= 20
@@ -40,6 +40,11 @@ def test_manifest_selects_high_value_proof_artifacts_without_moving_sources(tmp_
     assert "out/ops/live_proof_value_meter_latest.json" in relative_paths
     assert "out/ops/dollar_claim_gate_latest.json" in relative_paths
     assert "grant_submissions/TOP5_LIVE_PROOF_SUBMISSION_BOARD_2026-06-22.md" in relative_paths
+    assert "out/ops/top_geometry_live_replay_results_latest.json" in relative_paths
+    assert "out/ops/sector_validation_priority_board_latest.json" in relative_paths
+    assert "out/ops/lumencore_estate_master_index_manifest_latest.json" in relative_paths
+    assert "code/geometry_time_series_model_routing_benchmark.py" in relative_paths
+    assert manifest["summary"]["frozen_input_count"] >= 5
 
 
 def test_stage_vault_copies_and_hash_verifies_to_temp_packet(tmp_path):

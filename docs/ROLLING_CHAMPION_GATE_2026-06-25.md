@@ -1,6 +1,6 @@
 # Rolling Champion Gate
 
-Generated UTC: 2026-07-09T20:45:31.408739+00:00
+Generated UTC: 2026-07-13T19:42:26.545716+00:00
 
 ## Boundary
 
@@ -8,7 +8,7 @@ A champion is not a one-off win. This gate promotes only repeat live-context win
 
 ## Summary
 
-- Ledger entries: 45
+- Ledger entries: 62
 - Rolling champions: 5
 - Triple-source candidates: 0
 - Single-run candidates: 0
@@ -17,12 +17,12 @@ A champion is not a one-off win. This gate promotes only repeat live-context win
 
 | Status | Entity | Repeat wins | Sources | Latest delta |
 |---|---|---:|---:|---:|
-| rolling_champion | energy_price_pressure:phase_locked_residual_corrector | 10 | 6 | 36.387422 |
-| rolling_champion | optimal_curve_transport:brachistochrone_descent | 6 | 5 | 0.081878 |
-| rolling_champion | wave_resonance_timing:kuramoto_phase_coupling | 6 | 5 | 0.134564 |
-| rolling_champion | thermal_ventilation:thermal_plume_convection | 6 | 2 | 0.107024 |
-| rolling_champion | branching_transport:leaf_veins | 3 | 4 | 0.007485 |
-| not_promoted | time_series_model_routing:fractal_brownian_surface | 0 | 10 |  |
+| rolling_champion | energy_price_pressure:phase_locked_residual_corrector | 12 | 6 | 36.387422 |
+| rolling_champion | optimal_curve_transport:brachistochrone_descent | 9 | 5 | 0.081332 |
+| rolling_champion | wave_resonance_timing:kuramoto_phase_coupling | 9 | 5 | 0.154018 |
+| rolling_champion | thermal_ventilation:thermal_plume_convection | 9 | 2 | 0.113841 |
+| rolling_champion | branching_transport:leaf_veins | 4 | 4 | 0.019447 |
+| not_promoted | time_series_model_routing:fractal_brownian_surface | 0 | 10 | -0.014244 |
 
 ## Rule
 

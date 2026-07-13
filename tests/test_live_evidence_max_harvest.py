@@ -39,10 +39,14 @@ def test_live_evidence_harvest_skip_network_keeps_claim_gates_closed() -> None:
     payload = json.loads(payload_path.read_text(encoding="utf-8"))
     summary = payload["summary"]
 
-    assert payload["schema"] == "live_evidence_max_harvest.v1"
+    assert payload["schema"] == "live_evidence_max_harvest.v2"
     assert payload["mode"] == "reuse_existing_snapshots"
     assert summary["steps_ok"] == summary["steps_count"]
     assert summary["kraken_live_execution_allowed"] is False
     assert summary["ready_for_live_geometry_claim"] is False
     assert summary["ready_for_real_dollar_claim"] is False
+    assert summary["requested_max_rows_per_source"] == 250
+    assert summary["requested_source_timeout_seconds"] == 30
+    assert summary["paired_inference_card_count"] == 5
+    assert 0 <= summary["holm_positive_card_count"] <= summary["paired_inference_card_count"]
     assert len(payload["next_actions"]) >= 5

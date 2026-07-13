@@ -2,7 +2,11 @@ param(
     [string]$PythonExe = "python",
     [switch]$SkipNetwork,
     [switch]$OpenReport,
-    [string]$ExtraKeyFile = "C:\Users\Novac\iCloudDrive\Kraken api\text.txt"
+    [string]$ExtraKeyFile = "C:\Users\Novac\iCloudDrive\Kraken api\text.txt",
+    [ValidateRange(1, 5000)]
+    [int]$MaxRows = 250,
+    [ValidateRange(3, 120)]
+    [int]$SourceTimeoutSeconds = 30
 )
 
 $ErrorActionPreference = "Stop"
@@ -37,6 +41,10 @@ Import-LumaEnv -Path $EnvPath
 
 $argsList = @($Runner)
 if ($SkipNetwork) { $argsList += "--skip-network" }
+$argsList += "--max-rows"
+$argsList += $MaxRows
+$argsList += "--source-timeout"
+$argsList += $SourceTimeoutSeconds
 if ($ExtraKeyFile -and (Test-Path -LiteralPath $ExtraKeyFile)) {
     $argsList += "--extra-key-file"
     $argsList += $ExtraKeyFile

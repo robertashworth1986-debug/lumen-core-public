@@ -1,6 +1,6 @@
 # Top-Five Grant Submission Readiness Audit
 
-Generated UTC: 2026-07-11T13:25:25.293672+00:00
+Generated UTC: 2026-07-13T18:32:34.640737+00:00
 
 Posture: LOCAL_READY_PORTAL_BLOCKED
 

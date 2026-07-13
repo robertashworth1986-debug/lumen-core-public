@@ -114,7 +114,9 @@ def replay_window(
     source_rows: list[dict[str, Any]],
 ) -> dict[str, Any]:
     profiles = [top_module.snapshot_profile(row) for row in source_rows]
-    adapter = top_module.run_lane_adapter(str(card.get("lane", "")), profiles)
+    adapter = top_module.run_lane_adapter(
+        str(card.get("lane", "")), profiles, source_rows
+    )
     leaderboard = adapter.get("leaderboard", [])
     candidate = str(card.get("candidate_family_id", ""))
     named_baseline = str(card.get("named_baseline", ""))

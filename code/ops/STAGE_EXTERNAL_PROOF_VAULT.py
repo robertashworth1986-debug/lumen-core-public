@@ -33,6 +33,10 @@ PROOF_ARTIFACTS: list[tuple[str, str, bool]] = [
     ("proof_value", "out/ops/dollar_claim_gate_latest.json", True),
     ("live_breadth", "out/ops/live_breadth_value_panel_latest.json", True),
     ("live_breadth", "out/ops/live_breadth_value_panel_latest.csv", False),
+    ("live_breadth", "docs/LIVE_EVIDENCE_MAX_HARVEST_2026-07-13.md", True),
+    ("live_breadth", "out/ops/live_evidence_max_harvest_latest.json", True),
+    ("live_breadth", "config/live_source_registry.json", True),
+    ("live_breadth", "config/live_sources.json", True),
     ("geometry", "config/geometry_championship_v1_registry.json", True),
     ("geometry", "docs/GEOMETRY_CHAMPIONSHIP_BRIDGE_2026-06-21.md", False),
     ("geometry", "out/ops/geometry_championship_bridge_latest.json", False),
@@ -41,10 +45,34 @@ PROOF_ARTIFACTS: list[tuple[str, str, bool]] = [
     ("geometry", "docs/GEOMETRY_LIVE_BREADTH_PROOF_QUEUE_2026-06-22.md", True),
     ("geometry", "out/ops/geometry_live_breadth_proof_queue_latest.json", True),
     ("geometry", "dashboard/data/geometry_live_breadth_proof_queue.json", True),
+    ("geometry", "docs/TOP_GEOMETRY_LIVE_REPLAY_RESULTS_2026-06-24.md", True),
+    ("geometry", "out/ops/top_geometry_live_replay_results_latest.json", True),
+    ("geometry", "dashboard/data/top_geometry_live_replay_results.json", True),
+    ("geometry", "docs/SECTOR_VALIDATION_PRIORITY_BOARD_2026-07-13.md", True),
+    ("geometry", "out/ops/sector_validation_priority_board_latest.json", True),
+    ("geometry", "out/ops/sector_validation_priority_board_manifest_latest.json", True),
+    ("geometry", "dashboard/data/sector_validation_priority_board.json", True),
     ("grants", "grant_submissions/GRANT_DEADLINE_TRIAGE_2026-06-22.md", True),
     ("grants", "grant_submissions/TOP5_LIVE_PROOF_SUBMISSION_BOARD_2026-06-22.md", True),
     ("grants", "out/ops/top5_live_proof_submission_board_latest.json", True),
     ("grants", "grant_submissions/LIVE_BREADTH_PROVENANCE_ANNEX_2026-06-21.md", False),
+    ("grants", "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-13.md", True),
+    ("grants", "out/ops/near_deadline_submission_command_board_latest.json", True),
+    ("estate", "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md", True),
+    ("estate", "out/ops/lumencore_estate_master_index_latest.json", True),
+    ("estate", "out/ops/lumencore_estate_master_index_manifest_latest.json", True),
+    ("estate", "out/ops/lumencore_estate_file_inventory_latest.csv", True),
+    ("reproducibility", "code/geometry_time_series_model_routing_benchmark.py", True),
+    ("reproducibility", "code/ops/BUILD_TOP_GEOMETRY_LIVE_REPLAY_RESULTS.py", True),
+    ("reproducibility", "code/ops/BUILD_LIVE_EVIDENCE_MAX_HARVEST.py", True),
+    ("reproducibility", "code/ops/BUILD_SECTOR_VALIDATION_PRIORITY_BOARD.py", True),
+    ("reproducibility", "code/ops/BUILD_LUMENCORE_ESTATE_MASTER_INDEX.py", True),
+    ("reproducibility", "tools/Run-LiveEvidenceMaxHarvest.ps1", True),
+    ("reproducibility", "tests/test_geometry_time_series_model_routing_benchmark.py", True),
+    ("reproducibility", "tests/test_top_geometry_live_replay_results.py", True),
+    ("reproducibility", "tests/test_live_evidence_max_harvest.py", True),
+    ("reproducibility", "tests/test_sector_validation_priority_board.py", True),
+    ("reproducibility", "tests/test_lumencore_estate_master_index.py", True),
     ("dice", "grant_submissions/DICE_HR001126S0010/DICE_LIVE_BREADTH_REPLAY_2026-06-20.md", True),
     ("dice", "out/ops/dice_live_breadth_replay_latest.json", True),
     ("dice", "grant_submissions/DICE_HR001126S0010/DICE_EVIDENCE_SYNTHESIS_2026-06-20.md", True),
@@ -55,6 +83,31 @@ PROOF_ARTIFACTS: list[tuple[str, str, bool]] = [
     ("dashboards", "dashboard/data/top5_live_proof_submission_board.json", True),
     ("dashboards", "dashboard/data/luma_context_dashboard_parity_audit.json", True),
 ]
+
+
+def selected_proof_artifacts() -> list[tuple[str, str, bool]]:
+    selected = list(PROOF_ARTIFACTS)
+    seen = {rel_path.casefold() for _, rel_path, _ in selected}
+    replay_path = OUT_OPS / "top_geometry_live_replay_results_latest.json"
+    if not replay_path.exists():
+        return selected
+
+    replay = json.loads(replay_path.read_text(encoding="utf-8"))
+    for card in replay.get("replay_cards", []):
+        for profile in card.get("source_profiles", []):
+            rel_path = str(profile.get("snapshot_json") or "").replace("\\", "/")
+            if not rel_path or rel_path.casefold() in seen:
+                continue
+            candidate = (ROOT / rel_path).resolve()
+            try:
+                candidate.relative_to(ROOT.resolve())
+            except ValueError:
+                continue
+            if candidate.suffix.lower() != ".json":
+                continue
+            selected.append(("frozen_inputs", rel_path, True))
+            seen.add(rel_path.casefold())
+    return selected
 
 
 def now_utc() -> str:
@@ -106,13 +159,16 @@ def build_manifest(target_root: Path, package_name: str | None = None) -> dict[s
     package = package_name or f"LUMA_PROOF_VAULT_PACKET_{stamp}Z"
     packet_dir = target_root / package
     disk = shutil.disk_usage(target_root.anchor or target_root.drive or ".") if target_root.anchor else shutil.disk_usage(".")
-    artifacts = [artifact_card(category, rel_path, required, packet_dir) for category, rel_path, required in PROOF_ARTIFACTS]
+    artifacts = [
+        artifact_card(category, rel_path, required, packet_dir)
+        for category, rel_path, required in selected_proof_artifacts()
+    ]
     ready = [row for row in artifacts if row["exists"]]
     missing_required = [row for row in artifacts if row["required"] and not row["exists"]]
     total_bytes = sum(int(row["bytes"]) for row in ready)
     return {
         "generated_utc": generated,
-        "schema": "external_proof_vault_manifest_v1",
+        "schema": "external_proof_vault_manifest_v2",
         "purpose": "Non-destructive staging manifest for high-value proof artifacts on external storage.",
         "repo_root": str(ROOT),
         "target_root": str(target_root),
@@ -132,6 +188,7 @@ def build_manifest(target_root: Path, package_name: str | None = None) -> dict[s
             "total_ready_bytes": total_bytes,
             "ready_megabytes": round(total_bytes / 1024 / 1024, 3),
             "packet_ready": len(missing_required) == 0,
+            "frozen_input_count": sum(1 for row in artifacts if row["category"] == "frozen_inputs"),
         },
         "claim_boundary": (
             "A proof vault is provenance and reproducibility infrastructure. It does not create revenue, "

@@ -182,6 +182,15 @@ def extract_summary() -> dict[str, Any]:
         "top_live_replay_measured_source_count": wiring_summary.get("top_live_replay_measured_source_count"),
         "adapter_replay_count": replay_summary.get("adapter_replay_count") or replay.get("adapter_replay_count"),
         "candidate_beats_named_baseline_count": replay_summary.get("candidate_beats_named_baseline_count") or replay.get("candidate_beats_named_baseline_count"),
+        "paired_inference_card_count": replay_summary.get("paired_inference_card_count"),
+        "holm_positive_card_count": replay_summary.get("holm_positive_card_count"),
+        "registered_baseline_comparison_count": replay_summary.get("registered_baseline_comparison_count"),
+        "registered_baseline_mean_win_count": replay_summary.get("registered_baseline_mean_win_count"),
+        "registered_baseline_global_holm_positive_count": replay_summary.get("registered_baseline_global_holm_positive_count"),
+        "cards_beating_all_registered_baselines_mean_count": replay_summary.get("cards_beating_all_registered_baselines_mean_count"),
+        "cards_beating_all_registered_baselines_global_holm_count": replay_summary.get("cards_beating_all_registered_baselines_global_holm_count"),
+        "time_series_measured_source_count": replay_summary.get("time_series_measured_source_count"),
+        "time_series_measured_series_count": replay_summary.get("time_series_measured_series_count"),
         "total_live_context_rows_evaluated": replay_summary.get("total_live_context_rows_evaluated") or replay.get("total_live_context_rows_evaluated"),
         "unique_snapshot_sha256_count": replay_summary.get("unique_snapshot_sha256_count") or replay.get("unique_snapshot_sha256_count"),
         "snapshot_chain_sha256": replay_summary.get("snapshot_chain_sha256") or replay.get("snapshot_chain_sha256"),
@@ -215,7 +224,7 @@ def next_actions(summary: dict[str, Any]) -> list[str]:
         "Add or rehydrate SAM_GOV_API_KEY so contract-bid discovery becomes measured instead of unconfigured.",
         "Fix the EPA_AQS email/key pair; the latest probe says the pair is invalid, not that the science lane is bad.",
         "Retry NASA and NREL from an unrestricted network session; the latest failures look like timeout/DNS, not rejected credentials.",
-        "Build the time_series_model_routing replay adapter so fractal_brownian_surface can compete instead of staying source-context-only.",
+        "Retain the measured time-series loss against naive_last; redesign the candidate on a separate development set before another frozen evaluation.",
         "Keep appending distinct frozen live runs into the rolling champion ledger; do not promote a one-off win as a champion.",
         "Connect auditable ISO/RTO LMP or settlement price data to convert the energy pressure proxy into an actual price backtest.",
         "Convert the best live-context replay cards into a grant appendix with hashes, rows, baselines, and explicit claim boundaries.",
@@ -247,6 +256,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Total measured rows: `{summary.get('total_measured_rows')}`",
         f"- Live-context replay rows: `{summary.get('total_live_context_rows_evaluated')}`",
         f"- Candidate beats named baseline count: `{summary.get('candidate_beats_named_baseline_count')}`",
+        f"- Cards with paired inference / positive after Holm: `{summary.get('paired_inference_card_count')}` / `{summary.get('holm_positive_card_count')}`",
+        f"- Registered baseline comparisons / mean wins / global-Holm wins: `{summary.get('registered_baseline_comparison_count')}` / `{summary.get('registered_baseline_mean_win_count')}` / `{summary.get('registered_baseline_global_holm_positive_count')}`",
+        f"- Cards beating all registered baselines by mean / global Holm: `{summary.get('cards_beating_all_registered_baselines_mean_count')}` / `{summary.get('cards_beating_all_registered_baselines_global_holm_count')}`",
+        f"- Time-series measured sources/series: `{summary.get('time_series_measured_source_count')}` / `{summary.get('time_series_measured_series_count')}`",
         f"- Energy pressure rows/windows: `{summary.get('energy_pressure_hourly_grid_rows')}` / `{summary.get('energy_pressure_forecast_rows')}`",
         f"- Energy pressure max band: `{summary.get('energy_pressure_max_band')}`",
         f"- Energy pressure phase-locked improvement: `{summary.get('energy_pressure_phase_locked_improvement_pct')}`%",
@@ -280,6 +293,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Run the safe live evidence harvest pipeline.")
     parser.add_argument("--skip-network", action="store_true", help="Skip the live-source maximizer network pull and reuse existing snapshots.")
     parser.add_argument("--extra-key-file", default="", help="Optional local key file to summarize without printing values.")
+    parser.add_argument("--max-rows", type=int, default=250, help="Maximum rows requested from each provider.")
+    parser.add_argument("--source-timeout", type=int, default=30, help="Per-provider network timeout in seconds.")
     args = parser.parse_args()
 
     hydrate_env()
@@ -303,7 +318,21 @@ def main() -> int:
             }
         )
     else:
-        steps.append(run_step("live_source_measurement_maximizer", MAXIMIZER, env=run_env, timeout=300))
+        maximizer_args = [
+            "--max-rows",
+            str(max(1, args.max_rows)),
+            "--timeout",
+            str(max(3, args.source_timeout)),
+        ]
+        steps.append(
+            run_step(
+                "live_source_measurement_maximizer",
+                MAXIMIZER,
+                env=run_env,
+                timeout=max(300, len(maximizer_args) * max(3, args.source_timeout) * 10),
+                args=maximizer_args,
+            )
+        )
     steps.append(run_step("geometry_live_wiring_matrix", WIRING, env=run_env, timeout=180))
     steps.append(run_step("top_geometry_live_replay_results", REPLAY, env=run_env, timeout=180))
     steps.append(run_step("energy_price_pressure_forecast", ENERGY_PRESSURE, env=run_env, timeout=180))
@@ -313,10 +342,12 @@ def main() -> int:
     summary["steps_count"] = len(steps)
     summary["steps_ok"] = len([step for step in steps if step.get("ok")])
     summary["mode"] = "reuse_existing_snapshots" if args.skip_network else "fresh_live_pull"
+    summary["requested_max_rows_per_source"] = max(1, args.max_rows)
+    summary["requested_source_timeout_seconds"] = max(3, args.source_timeout)
 
     payload = {
         "generated_utc": now_utc(),
-        "schema": "live_evidence_max_harvest.v1",
+        "schema": "live_evidence_max_harvest.v2",
         "mode": summary["mode"],
         "summary": summary,
         "steps": steps,

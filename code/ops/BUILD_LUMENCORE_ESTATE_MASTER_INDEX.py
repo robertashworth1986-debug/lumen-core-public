@@ -14,11 +14,13 @@ ROOT = Path(__file__).resolve().parents[2]
 SPRINT_DIR = ROOT / "grant_submissions" / "funding_sprint_20260709"
 OUT_OPS = ROOT / "out" / "ops"
 DASHBOARD_DATA = ROOT / "dashboard" / "data"
+RUN_DATE = datetime.now(timezone.utc).date().isoformat()
 
 OUT_JSON = OUT_OPS / "lumencore_estate_master_index_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "lumencore_estate_master_index.json"
-OUT_MD = SPRINT_DIR / "LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md"
+OUT_MD = SPRINT_DIR / f"LUMENCORE_ESTATE_MASTER_INDEX_{RUN_DATE}.md"
 OUT_CSV = OUT_OPS / "lumencore_estate_file_inventory_latest.csv"
+OUT_MANIFEST = OUT_OPS / "lumencore_estate_master_index_manifest_latest.json"
 
 MAX_CONTENT_HASH_BYTES = 50 * 1024 * 1024
 
@@ -151,6 +153,20 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def load_previous_inventory() -> dict[str, dict[str, str]]:
+    if not OUT_CSV.exists():
+        return {}
+    try:
+        with OUT_CSV.open(newline="", encoding="utf-8") as handle:
+            return {
+                row["relative_path"]: row
+                for row in csv.DictReader(handle)
+                if row.get("relative_path")
+            }
+    except (OSError, csv.Error, KeyError):
+        return {}
+
+
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
@@ -159,6 +175,40 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
 def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+
+
+def inventory_chain_sha256(rows: list[dict[str, Any]]) -> str:
+    digest = hashlib.sha256()
+    for row in sorted(rows, key=lambda item: str(item["relative_path"]).lower()):
+        custody_hash = row["content_sha256"] or row["metadata_sha256"]
+        record = {
+            "relative_path": row["relative_path"],
+            "size_bytes": row["size_bytes"],
+            "hash_mode": row["hash_mode"],
+            "custody_sha256": custody_hash,
+        }
+        digest.update(json.dumps(record, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+        digest.update(b"\n")
+    return digest.hexdigest()
+
+
+def output_manifest(payload: dict[str, Any]) -> dict[str, Any]:
+    files = {}
+    for path in (OUT_JSON, DASHBOARD_JSON, OUT_MD, OUT_CSV):
+        files[rel(path)] = {
+            "size_bytes": path.stat().st_size,
+            "sha256": sha256_file(path),
+        }
+    manifest = {
+        "schema": "lumencore_estate_output_manifest_v1",
+        "generated_utc": now_utc(),
+        "estate_index_sha256": payload["estate_index_sha256"],
+        "inventory_chain_sha256": payload["summary"]["inventory_chain_sha256"],
+        "files": files,
+        "self_reference_excluded": True,
+    }
+    manifest["manifest_sha256"] = stable_sha256(manifest)
+    return manifest
 
 
 def is_sensitive_path(relative_path: str) -> bool:
@@ -230,11 +280,12 @@ def hash_mode(relative_path: str, size_bytes: int) -> str:
     return "content_sha256"
 
 
-def file_row(path: Path) -> dict[str, Any]:
+def file_row(path: Path, previous: dict[str, str] | None = None) -> dict[str, Any]:
     stat = path.stat()
     relative_path = rel(path)
     cls = asset_class(path, relative_path)
     mode = hash_mode(relative_path, stat.st_size)
+    modified_utc = datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat()
     metadata_hash = stable_sha256(
         {
             "relative_path": relative_path,
@@ -243,14 +294,28 @@ def file_row(path: Path) -> dict[str, Any]:
             "extension": path.suffix.lower(),
         }
     )
-    content_hash = sha256_file(path) if mode == "content_sha256" else ""
+    can_reuse_content_hash = bool(
+        previous
+        and mode == "content_sha256"
+        and previous.get("hash_mode") == mode
+        and previous.get("size_bytes") == str(stat.st_size)
+        and previous.get("modified_utc") == modified_utc
+        and len(previous.get("content_sha256", "")) == 64
+    )
+    content_hash = (
+        str(previous["content_sha256"])
+        if can_reuse_content_hash and previous
+        else sha256_file(path)
+        if mode == "content_sha256"
+        else ""
+    )
     tags = concept_tags(relative_path)
     return {
         "relative_path": relative_path,
         "name": path.name,
         "extension": path.suffix.lower(),
         "size_bytes": stat.st_size,
-        "modified_utc": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat(),
+        "modified_utc": modified_utc,
         "asset_class": cls,
         "custody_tier": custody_tier(relative_path, cls, stat.st_size),
         "concept_tags": ";".join(tags),
@@ -259,17 +324,19 @@ def file_row(path: Path) -> dict[str, Any]:
         "hash_mode": mode,
         "content_sha256": content_hash,
         "metadata_sha256": metadata_hash,
+        "_content_hash_reused": can_reuse_content_hash,
     }
 
 
 def iter_files() -> list[Path]:
     files: list[Path] = []
+    generated_outputs = {OUT_JSON, DASHBOARD_JSON, OUT_MD, OUT_CSV, OUT_MANIFEST}
     for current_root, dirnames, filenames in os.walk(ROOT):
         dirnames[:] = [dirname for dirname in dirnames if not should_skip_dir(dirname)]
         root_path = Path(current_root)
         for filename in filenames:
             path = root_path / filename
-            if path == OUT_CSV:
+            if path in generated_outputs:
                 continue
             files.append(path)
     return sorted(files, key=lambda item: rel(item).lower())
@@ -302,9 +369,11 @@ def write_inventory_csv(rows: list[dict[str, Any]]) -> None:
 def build_payload() -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     scan_errors: list[dict[str, str]] = []
+    previous_inventory = load_previous_inventory()
     for path in iter_files():
         try:
-            rows.append(file_row(path))
+            relative_path = rel(path)
+            rows.append(file_row(path, previous_inventory.get(relative_path)))
         except (FileNotFoundError, PermissionError, OSError) as exc:
             scan_errors.append(
                 {
@@ -319,22 +388,33 @@ def build_payload() -> dict[str, Any]:
     custody_counts = Counter(row["custody_tier"] for row in rows)
     extension_counts = Counter(row["extension"] or "[none]" for row in rows)
     hash_mode_counts = Counter(row["hash_mode"] for row in rows)
+    reused_content_hash_count = sum(1 for row in rows if row["_content_hash_reused"])
+    computed_content_hash_count = sum(
+        1
+        for row in rows
+        if row["hash_mode"] == "content_sha256" and not row["_content_hash_reused"]
+    )
     concept_counts: Counter[str] = Counter()
     concept_examples: dict[str, list[str]] = defaultdict(list)
     for row in rows:
         tags = [tag for tag in row["concept_tags"].split(";") if tag]
         for tag in tags:
             concept_counts[tag] += 1
-            if len(concept_examples[tag]) < 8:
+            if not row["sensitive_path"] and len(concept_examples[tag]) < 8:
                 concept_examples[tag].append(row["relative_path"])
 
     total_bytes = sum(int(row["size_bytes"]) for row in rows)
     large_deferred = [row for row in rows if row["hash_mode"] == "metadata_hash_only_large_file"]
     sensitive = [row for row in rows if row["sensitive_path"]]
-    largest = sorted(rows, key=lambda row: int(row["size_bytes"]), reverse=True)[:25]
+    largest = sorted(
+        [row for row in rows if not row["sensitive_path"]],
+        key=lambda row: int(row["size_bytes"]),
+        reverse=True,
+    )[:25]
     high_signal = [
         row
         for row in rows
+        if not row["sensitive_path"]
         if row["asset_class"]
         in {
             "funding_submission_artifact",
@@ -357,7 +437,7 @@ def build_payload() -> dict[str, Any]:
         )
 
     payload = {
-        "schema": "lumencore_estate_master_index_v1",
+        "schema": "lumencore_estate_master_index_v2",
         "generated_utc": now_utc(),
         "status": "LUMENCORE_ESTATE_MASTER_INDEX_READY",
         "summary": {
@@ -368,13 +448,19 @@ def build_payload() -> dict[str, Any]:
             "concept_tag_count": len(concept_counts),
             "named_concept_count": len(NAMED_CONCEPTS),
             "content_sha256_file_count": hash_mode_counts.get("content_sha256", 0),
+            "content_sha256_reused_count": reused_content_hash_count,
+            "content_sha256_computed_count": computed_content_hash_count,
             "large_file_deferred_content_hash_count": hash_mode_counts.get("metadata_hash_only_large_file", 0),
             "sensitive_metadata_only_count": hash_mode_counts.get("metadata_hash_only_sensitive_path", 0),
+            "inventory_chain_sha256": inventory_chain_sha256(rows),
+            "inventory_csv_sha256": sha256_file(OUT_CSV),
             "full_inventory_csv": rel(OUT_CSV),
             "full_inventory_csv_bytes": OUT_CSV.stat().st_size if OUT_CSV.exists() else 0,
             "scan_error_count": len(scan_errors),
             "public_safe_markdown": True,
             "secret_content_indexed": False,
+            "sensitive_paths_redacted_from_public_payload": True,
+            "generated_outputs_excluded_from_inventory": True,
             "final_submission_allowed_without_human": False,
             "legal_or_ip_action_allowed_without_human": False,
             "live_trading_allowed": False,
@@ -397,7 +483,6 @@ def build_payload() -> dict[str, Any]:
         ],
         "sensitive_metadata_only_examples": [
             {
-                "relative_path": row["relative_path"],
                 "asset_class": row["asset_class"],
                 "custody_tier": row["custody_tier"],
                 "metadata_sha256": row["metadata_sha256"],
@@ -423,6 +508,8 @@ def build_payload() -> dict[str, Any]:
             "sensitive_paths_metadata_only": True,
             "large_files_metadata_hash_until_dedicated_custody_pass": True,
             "reviewer_markdown_is_summary_only": True,
+            "public_payload_redacts_sensitive_paths": True,
+            "generated_outputs_excluded_to_prevent_self_reference": True,
             "full_inventory_csv_is_local_custody_artifact": True,
         },
         "outputs": {
@@ -430,6 +517,7 @@ def build_payload() -> dict[str, Any]:
             "dashboard_json": rel(DASHBOARD_JSON),
             "markdown": rel(OUT_MD),
             "full_inventory_csv": rel(OUT_CSV),
+            "output_manifest": rel(OUT_MANIFEST),
         },
     }
     payload["estate_index_sha256"] = stable_sha256(payload)
@@ -439,7 +527,7 @@ def build_payload() -> dict[str, Any]:
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     lines = [
-        "# LumenCore Estate Master Index - 2026-07-10",
+        f"# LumenCore Estate Master Index - {RUN_DATE}",
         "",
         "Purpose: make the LumenCore universe estate-grade by inventorying the managed workspace, classifying every managed file, connecting concept families to evidence lanes, and keeping sensitive material private.",
         "",
@@ -455,12 +543,18 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Concept tags: `{summary['concept_tag_count']}`",
         f"- Named concepts: `{summary['named_concept_count']}`",
         f"- Content SHA-256 file count: `{summary['content_sha256_file_count']}`",
+        f"- Reused unchanged content hashes: `{summary['content_sha256_reused_count']}`",
+        f"- Computed new or changed content hashes: `{summary['content_sha256_computed_count']}`",
         f"- Large-file deferred content hashes: `{summary['large_file_deferred_content_hash_count']}`",
         f"- Sensitive metadata-only files: `{summary['sensitive_metadata_only_count']}`",
+        f"- Inventory chain SHA-256: `{summary['inventory_chain_sha256']}`",
+        f"- Inventory CSV SHA-256: `{summary['inventory_csv_sha256']}`",
         f"- Full inventory CSV: `{summary['full_inventory_csv']}`",
         f"- Full inventory CSV bytes: `{summary['full_inventory_csv_bytes']}`",
         f"- Scan errors recorded: `{summary['scan_error_count']}`",
         f"- Secret content indexed: `{str(summary['secret_content_indexed']).lower()}`",
+        f"- Sensitive paths redacted from public payload: `{str(summary['sensitive_paths_redacted_from_public_payload']).lower()}`",
+        f"- Generated outputs excluded from inventory: `{str(summary['generated_outputs_excluded_from_inventory']).lower()}`",
         f"- Final submission without human: `{str(summary['final_submission_allowed_without_human']).lower()}`",
         f"- Legal/IP action without human: `{str(summary['legal_or_ip_action_allowed_without_human']).lower()}`",
         f"- Live trading allowed: `{str(summary['live_trading_allowed']).lower()}`",
@@ -534,6 +628,8 @@ def main() -> None:
     write_json(OUT_JSON, payload)
     write_json(DASHBOARD_JSON, payload)
     write_text(OUT_MD, markdown)
+    manifest = output_manifest(payload)
+    write_json(OUT_MANIFEST, manifest)
     print(
         json.dumps(
             {
@@ -541,6 +637,9 @@ def main() -> None:
                 "managed_file_count": payload["summary"]["managed_file_count"],
                 "full_inventory_csv": payload["summary"]["full_inventory_csv"],
                 "markdown": rel(OUT_MD),
+                "inventory_chain_sha256": payload["summary"]["inventory_chain_sha256"],
+                "output_manifest": rel(OUT_MANIFEST),
+                "output_manifest_sha256": manifest["manifest_sha256"],
             },
             indent=2,
         )

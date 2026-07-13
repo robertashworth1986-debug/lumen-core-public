@@ -18,9 +18,21 @@ ZERO_FRICTION = OUT_OPS / "funding_reviewer_zero_friction_pack_latest.json"
 
 OUT_JSON = OUT_OPS / "near_deadline_submission_command_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "near_deadline_submission_command_board.json"
-OUT_MD = SPRINT_DIR / "NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-11.md"
+SCAN_DATE = date.today()
+OUT_MD = SPRINT_DIR / f"NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_{SCAN_DATE.isoformat()}.md"
 
-SCAN_DATE = date(2026, 7, 11)
+STAGE_COMMANDS = {
+    "STAGE_NOW",
+    "STAGE_RFI_FEEDBACK",
+    "BUILD_PRIMARY_VOLUME",
+    "STAGE_PROJECT_PITCH",
+    "STAGE_CONCEPT_PAPER",
+}
+NO_BID_COMMANDS = {
+    "NO_BID_MISSED_PREREQUISITE",
+    "NO_SOLO_SUBMIT_PARTNER_ONLY",
+    "PARTNER_OR_NO_BID",
+}
 
 SENSITIVE_MARKERS = [
     "password",
@@ -82,6 +94,20 @@ def deadline_bucket(days: int | None) -> str:
     return "later"
 
 
+def days_to_close(deadline_date: str, scan_date: date = SCAN_DATE) -> int:
+    return (date.fromisoformat(deadline_date) - scan_date).days
+
+
+def normalize_lane_deadlines(lanes: list[dict[str, Any]]) -> None:
+    for lane in lanes:
+        deadline_date = str(lane.get("deadline_date") or lane.get("deadline_utc", "")[:10])
+        lane["deadline_date"] = deadline_date
+        days = days_to_close(deadline_date)
+        lane["days_to_close"] = days
+        lane["days_to_close_from_scan_date"] = days
+        lane["deadline_bucket"] = deadline_bucket(days)
+
+
 def sam_lookup(sam_board: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {
         str(row.get("solicitation_number")): row
@@ -140,9 +166,10 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
             "title": nasa.get("title", "Strategic Partnerships for NASA Data Center Infrastructure"),
             "agency": nasa.get("agency", "NASA IT Procurement Office"),
             "deadline_utc": nasa.get("deadline_utc", "2026-07-17T21:00:00Z"),
-            "days_to_close_from_2026_07_11": 6,
-            "deadline_bucket": "seven_day_sprint",
+            "deadline_date": "2026-07-17",
             "command": "STAGE_NOW",
+            "eligibility_state": "OPEN_RFI_RESPONSE",
+            "fit_state": "STRONG_CAPABILITY_RESPONSE_FIT",
             "submission_route": nasa.get("submission_route", "Email response per RFI instructions"),
             "official_url": nasa.get("official_url", "https://sam.gov/opp/312af51a7fc14110b1239bdd32252213/view"),
             "package_files": nasa.get(
@@ -171,16 +198,17 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
             "final_submit_allowed_without_human": False,
         },
         {
-            "rank": 2,
+            "rank": 3,
             "lane_id": "fhwa_tsmo_data_initiative",
             "source_system": "SAM.gov",
             "opportunity_number": "693JJ326R000012",
             "title": fhwa.get("title", "Transportation Systems Management and Operations Data Initiative"),
             "agency": fhwa.get("agency", "Federal Highway Administration"),
             "deadline_utc": fhwa.get("deadline_utc", "2026-08-03T13:00:00Z"),
-            "days_to_close_from_2026_07_11": 23,
-            "deadline_bucket": "thirty_day_sprint",
+            "deadline_date": "2026-08-03",
             "command": "BUILD_PRIMARY_VOLUME",
+            "eligibility_state": "SOLICITATION_REVIEW_REQUIRED",
+            "fit_state": "STRONG_MEASUREMENT_AND_TSMO_FIT",
             "submission_route": fhwa.get("submission_route", "SAM.gov / official solicitation instructions"),
             "official_url": fhwa.get("official_url", "https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view"),
             "package_files": fhwa.get(
@@ -208,7 +236,7 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
             "final_submit_allowed_without_human": False,
         },
         {
-            "rank": 3,
+            "rank": 4,
             "lane_id": "nsf_sbir_scientific_instrumentation",
             "source_system": "Grants.gov / NSF Seed Fund",
             "opportunity_number": "26-511",
@@ -217,10 +245,12 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
                 "SBIR/STTR Pilot Emphasis on Scientific Instrumentation",
             ),
             "agency": nsf.get("raw", {}).get("agency", "U.S. National Science Foundation"),
-            "deadline_utc": "2026-07-27T23:59:59Z",
-            "days_to_close_from_2026_07_11": 16,
-            "deadline_bucket": "thirty_day_sprint",
+            "deadline_utc": None,
+            "deadline_date": "2026-07-27",
+            "official_deadline_text": "July 27, 2026 at 5:00 PM submitting organization's local time",
             "command": "STAGE_PROJECT_PITCH",
+            "eligibility_state": "SMALL_BUSINESS_ELIGIBLE_INVITATION_AND_PORTAL_STATE_UNVERIFIED",
+            "fit_state": "STRONG_SCIENTIFIC_INSTRUMENTATION_FIT",
             "submission_route": "NSF Seed Fund Project Pitch / Grants.gov full proposal if invited",
             "official_url": "https://www.grants.gov/search-results-detail/362551",
             "secondary_url": "https://seedfund.nsf.gov/project-pitch/",
@@ -243,7 +273,7 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
             "final_submit_allowed_without_human": False,
         },
         {
-            "rank": 4,
+            "rank": 10,
             "lane_id": "hud_robotics_ai_home_construction",
             "source_system": "Grants.gov / HUD",
             "opportunity_number": "PDR-2600-DC-029Q",
@@ -252,10 +282,12 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
                 "Mass Market Solutions for Leveraging Robotics and AI Technologies for Home Construction Demonstration",
             ),
             "agency": hud.get("raw", {}).get("agency", "Department of Housing and Urban Development"),
-            "deadline_utc": "2026-07-13T23:59:59Z",
-            "days_to_close_from_2026_07_11": 2,
-            "deadline_bucket": "48_hour_sprint",
+            "deadline_utc": "2026-07-14T03:59:59Z",
+            "deadline_date": "2026-07-13",
+            "official_deadline_text": "July 13, 2026 at 11:59:59 PM Eastern Time",
             "command": "ELIGIBILITY_AND_PARTNER_GATE",
+            "eligibility_state": "BUSINESS_ELIGIBILITY_POSSIBLE_PROJECT_CAPACITY_UNPROVEN",
+            "fit_state": "TITLE_MATCH_ONLY_NO_CONSTRUCTION_DEMONSTRATION_EVIDENCE",
             "submission_route": "Grants.gov Workspace package if eligibility and demonstration facts are supportable",
             "official_url": "https://www.grants.gov/search-results-detail/362360",
             "package_files": [
@@ -284,9 +316,11 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
             "title": erdc.get("title", "Sovereign Defense Cloud for High-Performance Computing CSO"),
             "agency": erdc.get("agency", "ERDC Information Technology Laboratory / HPCMP"),
             "deadline_utc": erdc.get("deadline_utc", "2026-08-07T21:00:00Z"),
-            "days_to_close_from_2026_07_11": 27,
-            "deadline_bucket": "thirty_day_sprint",
+            "deadline_date": "2026-08-07",
+            "official_deadline_text": "August 7, 2026 at 4:00 PM Central Time",
             "command": "STAGE_CONCEPT_PAPER",
+            "eligibility_state": "OPEN_CSO_COMMERCIAL_SOLUTION",
+            "fit_state": "STRONG_MODULAR_PROOF_FABRIC_COMPONENT_FIT",
             "submission_route": erdc.get("submission_route", "ERDCWERX Commercial Solutions Opening portal"),
             "official_url": erdc.get("official_url", "https://sam.gov/opp/8e32f0dfcdee42eeb3b2b03819a6ed25/view"),
             "secondary_url": erdc.get("secondary_url", "https://www.erdcwerx.org/sovereign-defense-cloud-for-high-performance-computing/"),
@@ -311,9 +345,10 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
             "title": bop.get("title", "Historical Medical Claims Data Analysis"),
             "agency": bop.get("agency", "Federal Bureau of Prisons"),
             "deadline_utc": bop.get("deadline_utc", "2026-07-23T15:00:00Z"),
-            "days_to_close_from_2026_07_11": 12,
-            "deadline_bucket": "two_week_sprint",
+            "deadline_date": "2026-07-23",
             "command": "PRICE_AND_COMPLIANCE_GATE",
+            "eligibility_state": "SMALL_BUSINESS_SET_ASIDE_REQUIRES_SOLICITATION_CONFIRMATION",
+            "fit_state": "MODERATE_ANALYTICS_FIT_DATA_HANDLING_AND_PRICE_UNPROVEN",
             "submission_route": bop.get("submission_route", "Email quote per solicitation instructions"),
             "official_url": bop.get("official_url") or "https://sam.gov/search/?index=opp&keywords=15BCMS26Q70000005&sort=-modifiedDate&sfm%5Bstatus%5D%5Bis_active%5D=true",
             "package_files": bop.get("package_files", ["DOJ_BOP_MEDICAL_CLAIMS_ANALYSIS_QUOTE_STUB_2026-07-10.md"]),
@@ -331,16 +366,17 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
             "final_submit_allowed_without_human": False,
         },
         {
-            "rank": 7,
+            "rank": 14,
             "lane_id": "hhs_predictive_analytics_child_welfare",
             "source_system": "Grants.gov",
             "opportunity_number": "HHS-2026-ACF-ACYF-CA-0037",
             "title": hhs_child.get("title", "Predictive Analytics in Child Welfare Demonstration Grants"),
             "agency": hhs_child.get("raw", {}).get("agency", "Administration for Children and Families"),
-            "deadline_utc": "2026-07-13T23:59:59Z",
-            "days_to_close_from_2026_07_11": 2,
-            "deadline_bucket": "48_hour_sprint",
+            "deadline_utc": "2026-07-14T03:59:00Z",
+            "deadline_date": "2026-07-13",
             "command": "NO_SOLO_SUBMIT_PARTNER_ONLY",
+            "eligibility_state": "INELIGIBLE_AS_SOLO_SMALL_BUSINESS",
+            "fit_state": "PARTNER_ONLY_CHILD_WELFARE_DOMAIN",
             "submission_route": "Partner with eligible public/tribal child-welfare agency only",
             "official_url": "https://www.grants.gov/search-results-detail/361912",
             "package_files": [],
@@ -358,6 +394,213 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
         },
     ]
 
+    lanes.extend(
+        [
+            {
+                "rank": 2,
+                "lane_id": "army_aidp_rfi4",
+                "source_system": "SAM.gov",
+                "opportunity_number": "ACCAPGAIDPRFI4",
+                "title": "Army Intelligence Data Platform RFI #4",
+                "agency": "U.S. Army Contracting Command - Aberdeen Proving Ground",
+                "deadline_utc": "2026-07-15T21:00:00Z",
+                "deadline_date": "2026-07-15",
+                "official_deadline_text": "July 15, 2026 at 5:00 PM Eastern Time",
+                "command": "STAGE_RFI_FEEDBACK",
+                "eligibility_state": "OPEN_RFI_FEEDBACK_ATTACHMENT_ACCESS_REQUIRED",
+                "fit_state": "STRONG_DATA_PLATFORM_AND_AUDITABILITY_FEEDBACK_FIT",
+                "submission_route": "Email questions and feedback using the official spreadsheet attachment",
+                "official_url": "https://sam.gov/workspace/contract/opp/3d72f2df3aaf459797c14cefb41fd235/view",
+                "package_files": ["ARMY_AIDP_RFI4_PARTNER_NOTE_STUB_2026-07-10.md"],
+                "why_now": "The Army is requesting structured feedback on a draft data-platform solution. LumenCore can contribute bounded comments on evidence provenance, replay, observability, and decision auditability without claiming to supply the entire platform.",
+                "today_work": [
+                    "Download the public instructions and questions-and-feedback spreadsheet.",
+                    "Map only documented LumenCore capabilities to draft requirements.",
+                    "Stage the completed feedback sheet and email for review.",
+                ],
+                "human_gate": [
+                    "Robert approves every capability and past-performance statement.",
+                    "Robert approves the final feedback email.",
+                ],
+                "external_send_allowed_without_human": False,
+                "final_submit_allowed_without_human": False,
+            },
+            {
+                "rank": 7,
+                "lane_id": "ustda_indo_pacific_digital_infrastructure",
+                "source_system": "SAM.gov",
+                "opportunity_number": "1131PL26R0049",
+                "title": "Indo-Pacific Digital Infrastructure Project Scoping Services",
+                "agency": "U.S. Trade and Development Agency",
+                "deadline_utc": "2026-07-22T17:00:00Z",
+                "deadline_date": "2026-07-22",
+                "official_deadline_text": "July 22, 2026 at 1:00 PM Eastern Time",
+                "command": "PRICE_PAST_PERFORMANCE_AND_CAPACITY_GATE",
+                "eligibility_state": "TOTAL_SMALL_BUSINESS_SET_ASIDE_US_FIRM",
+                "fit_state": "ADJACENT_DIGITAL_INFRASTRUCTURE_FIT_SCOPING_CAPACITY_UNPROVEN",
+                "submission_route": "Proposal under the official RFP instructions",
+                "official_url": "https://sam.gov/workspace/contract/opp/fdefc4a420e04049a6a768f744d040c9/view",
+                "package_files": ["USTDA_INDO_PACIFIC_DIGITAL_INFRA_SCOPING_STUB_2026-07-10.md"],
+                "why_now": "It is a total small-business set-aside and adjacent to digital-infrastructure evaluation, but the prime must prove project-scoping capacity, international delivery, price, and relevant past performance.",
+                "today_work": [
+                    "Review Sections B through E and the performance work statement.",
+                    "Run a strict responsibility, staffing, travel, and past-performance gate.",
+                    "Proceed only if every mandatory role and deliverable can be evidenced.",
+                ],
+                "human_gate": [
+                    "Robert confirms staffing, international-delivery capacity, and past performance.",
+                    "Robert approves price, representations, and final proposal submission.",
+                ],
+                "external_send_allowed_without_human": False,
+                "final_submit_allowed_without_human": False,
+            },
+            {
+                "rank": 8,
+                "lane_id": "acl_ai_assistive_rehabilitation_rerc",
+                "source_system": "Grants.gov / Simpler.Grants.gov",
+                "opportunity_number": "HHS-2026-ACL-NIDILRR-REGE-0212",
+                "title": "RERC on AI-Driven Assistive and Rehabilitation Technologies",
+                "agency": "Administration for Community Living",
+                "deadline_utc": "2026-07-17T03:59:00Z",
+                "deadline_date": "2026-07-16",
+                "official_deadline_text": "July 16, 2026 at 11:59 PM Eastern Time",
+                "command": "TECHNICAL_CAPACITY_AND_DOMAIN_GATE",
+                "eligibility_state": "SMALL_BUSINESS_ELIGIBLE",
+                "fit_state": "POTENTIAL_LUMA_SKIN_SUIT_FIT_NOT_YET_EVIDENCED_IN_REPOSITORY",
+                "submission_route": "Grants.gov Workspace",
+                "official_url": "https://simpler.grants.gov/opportunity/c08bbf7a-563b-4af4-a79b-b1cb7bdd71ad",
+                "package_files": [],
+                "why_now": "Small businesses are eligible and the topic could fit an assistive-technology lane, but this is a five-year research center award. No repository evidence currently proves the required rehabilitation domain, team, facilities, or evaluation plan.",
+                "today_work": [
+                    "Open the NOFO and extract all mandatory research-center and domain requirements.",
+                    "Locate dated Luma Skin/Suit evidence, investigators, facilities, and disability-community participation.",
+                    "Do not start portal certifications unless the capacity gate passes.",
+                ],
+                "human_gate": [
+                    "Robert confirms the proposed technology, investigators, facilities, and community partners are real and available.",
+                    "Robert approves all certifications and final submission.",
+                ],
+                "external_send_allowed_without_human": False,
+                "final_submit_allowed_without_human": False,
+            },
+            {
+                "rank": 9,
+                "lane_id": "usda_farm_business_benchmarking",
+                "source_system": "Grants.gov / NIFA",
+                "opportunity_number": "USDA-NIFA-KFBMB-32830",
+                "title": "Farm Business Management and Benchmarking Competitive Grants Program",
+                "agency": "USDA National Institute of Food and Agriculture",
+                "deadline_utc": "2026-07-20T21:00:00Z",
+                "deadline_date": "2026-07-20",
+                "official_deadline_text": "July 20, 2026 at 5:00 PM Eastern Time",
+                "command": "AGRICULTURE_PARTNER_AND_DATA_GATE",
+                "eligibility_state": "PRIVATE_ORGANIZATIONS_AND_CORPORATIONS_ELIGIBLE",
+                "fit_state": "BENCHMARKING_METHOD_FIT_FARM_NETWORK_AND_FINBIN_DELIVERY_UNPROVEN",
+                "submission_route": "Grants.gov Workspace",
+                "official_url": "https://simpler.grants.gov/opportunity/a6c41cc0-e597-45c5-8507-1037d8cf7360",
+                "secondary_url": "https://www.nifa.usda.gov/grants/funding-opportunities/farm-business-management-benchmarking-competitive-grants-program",
+                "package_files": [],
+                "why_now": "LumenCore's measurement methods are adjacent and private corporations are eligible, but the program requires genuine farm-management delivery, partner associations, outreach, and required farm-data contributions.",
+                "today_work": [
+                    "Extract the mandatory partner, farm-record, outreach, and FINBIN requirements.",
+                    "Stop unless real agriculture partners and qualifying farm records are already available.",
+                ],
+                "human_gate": [
+                    "Robert confirms qualifying agriculture partners, farm records, and program-delivery capacity.",
+                    "Robert approves the budget, certifications, and final submission.",
+                ],
+                "external_send_allowed_without_human": False,
+                "final_submit_allowed_without_human": False,
+            },
+            {
+                "rank": 11,
+                "lane_id": "fhwa_intersection_safety_prototyping",
+                "source_system": "SAM.gov",
+                "opportunity_number": "693JJ3-26-BAA-0004",
+                "title": "Intersection Safety Systems Prototyping",
+                "agency": "Federal Highway Administration",
+                "deadline_utc": "2026-07-20T19:00:00Z",
+                "deadline_date": "2026-07-20",
+                "official_deadline_text": "July 20, 2026 at 3:00 PM Eastern Time",
+                "command": "NO_SOLO_SUBMIT_PARTNER_ONLY",
+                "eligibility_state": "OPEN_BAA_TEAM_COMPOSITION_REQUIRED",
+                "fit_state": "STRONG_MEASUREMENT_FIT_TESTBED_AND_PUBLIC_SECTOR_PARTNERS_MISSING",
+                "submission_route": "Email proposal per the BAA instructions",
+                "official_url": "https://sam.gov/opp/a08fe6151b524fbd87e4c7ce8f6a4abb/view",
+                "package_files": [],
+                "why_now": "The measurement and data-fusion problem is relevant, but a compliant team needs a lead system developer, an access-controlled roadway testbed, and a public-sector partner with jurisdictional authority.",
+                "today_work": [
+                    "Treat as a teaming lane, not a solo proposal.",
+                    "Stage a bounded validation work-package only if qualified partners are already identified.",
+                ],
+                "human_gate": [
+                    "Qualified lead, testbed, and public-sector partners confirm participation.",
+                    "Robert approves role, price, representations, and final proposal.",
+                ],
+                "external_send_allowed_without_human": False,
+                "final_submit_allowed_without_human": False,
+            },
+            {
+                "rank": 12,
+                "lane_id": "hhs_ai_power_user_pilot",
+                "source_system": "SAM.gov",
+                "opportunity_number": "7571TE26R00004",
+                "title": "HHS AI Power User Advanced Models and Features Pilot",
+                "agency": "Department of Health and Human Services",
+                "deadline_utc": "2026-07-14T21:00:00Z",
+                "deadline_date": "2026-07-14",
+                "official_deadline_text": "July 14, 2026 at 5:00 PM Eastern Time",
+                "command": "PARTNER_OR_NO_BID",
+                "eligibility_state": "OPEN_SOLICITATION_NO_SET_ASIDE",
+                "fit_state": "THEMATIC_MEASUREMENT_FIT_PRIME_DELIVERY_REQUIREMENTS_NOT_MET",
+                "submission_route": "SAM.gov solicitation instructions",
+                "official_url": "https://sam.gov/workspace/contract/opp/d60ae511937b410fa6f13473acbae762/view",
+                "package_files": [],
+                "why_now": "The baselining and auditability language is highly relevant, but the prime must provide an integrated enterprise model-access bundle for up to 1,000 users plus security, administration, reporting, and authorization-path artifacts. LumenCore should not represent that capacity without an eligible platform prime.",
+                "today_work": [
+                    "Do not submit as a solo prime.",
+                    "Preserve the solicitation as market validation for LumenCore's measurement and persistent-validation architecture.",
+                ],
+                "human_gate": [
+                    "A qualified enterprise AI platform prime requests a documented subcontract role.",
+                    "Robert approves any teaming terms, price, and external response.",
+                ],
+                "external_send_allowed_without_human": False,
+                "final_submit_allowed_without_human": False,
+            },
+            {
+                "rank": 13,
+                "lane_id": "nsf_techaccess_ai_ready_america_round1",
+                "source_system": "NSF / Research.gov",
+                "opportunity_number": "26-508",
+                "title": "TechAccess: AI-Ready America - State/Territory Coordination Hubs",
+                "agency": "U.S. National Science Foundation",
+                "deadline_utc": None,
+                "deadline_date": "2026-07-16",
+                "official_deadline_text": "July 16, 2026 at 5:00 PM submitting organization's local time",
+                "command": "NO_BID_MISSED_PREREQUISITE",
+                "eligibility_state": "ROUND_ONE_REQUIRED_LOI_DUE_JUNE_16_WAS_MISSED",
+                "fit_state": "STRATEGIC_PARTNER_FIT_WATCH_ROUND_TWO",
+                "submission_route": "Research.gov or Grants.gov after required Letter of Intent",
+                "official_url": "https://www.nsf.gov/funding/opportunities/techaccess-ai-ready-america/nsf26-508/solicitation",
+                "package_files": [],
+                "why_now": "Round one cannot be pursued because the required June 16 Letter of Intent deadline passed. The January 15, 2027 round-two deadline remains a legitimate statewide consortium target.",
+                "today_work": [
+                    "Mark round one no-bid; do not waste portal time.",
+                    "Start a round-two partner map with statewide conveners, workforce organizations, universities, and government stakeholders.",
+                ],
+                "human_gate": [
+                    "Robert approves partner outreach for the round-two consortium.",
+                    "An eligible lead institution and statewide partner structure are confirmed.",
+                ],
+                "external_send_allowed_without_human": False,
+                "final_submit_allowed_without_human": False,
+            },
+        ]
+    )
+
+    normalize_lane_deadlines(lanes)
+    lanes.sort(key=lambda row: row["rank"])
     for lane in lanes:
         lane["lane_sha256"] = stable_sha256(lane)
     return lanes
@@ -368,12 +611,13 @@ def build_payload() -> dict[str, Any]:
     grants_ranked = read_json(GRANTS_RANKED)
     zero = read_json(ZERO_FRICTION)
     lanes = build_command_lanes(sam_board, grants_ranked)
-    stage_now = [row for row in lanes if row["command"] in {"STAGE_NOW", "BUILD_PRIMARY_VOLUME", "STAGE_PROJECT_PITCH", "STAGE_CONCEPT_PAPER"}]
+    stage_now = [row for row in lanes if row["command"] in STAGE_COMMANDS]
     emergency_gate = [row for row in lanes if row["command"] == "ELIGIBILITY_AND_PARTNER_GATE"]
+    no_bid = [row for row in lanes if row["command"] in NO_BID_COMMANDS]
     human_gated = [row for row in lanes if row["human_gate"]]
 
     payload: dict[str, Any] = {
-        "schema": "near_deadline_submission_command_board_v1",
+        "schema": "near_deadline_submission_command_board_v2",
         "generated_utc": now_utc(),
         "scan_date": SCAN_DATE.isoformat(),
         "status": "NEAR_DEADLINE_COMMAND_BOARD_READY_HUMAN_SUBMIT_REQUIRED",
@@ -382,9 +626,10 @@ def build_payload() -> dict[str, Any]:
             "lane_count": len(lanes),
             "stage_now_count": len(stage_now),
             "emergency_eligibility_gate_count": len(emergency_gate),
+            "no_bid_or_partner_only_count": len(no_bid),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Promote NASA RFI response first, then NSF Project Pitch and FHWA TSMO volume.",
-            "closest_deadline_lane": "PDR-2600-DC-029Q HUD robotics/AI home construction demonstration, due 2026-07-13, eligibility/project gate required.",
+            "strongest_today_action": "Stage the NASA response and Army AIDP feedback first; build NSF scientific-instrumentation and FHWA TSMO packages next.",
+            "closest_deadline_lane": "PDR-2600-DC-029Q HUD robotics/AI home construction demonstration, due July 13 at 11:59:59 PM ET, but only after the construction-demonstration capacity gate passes.",
             "best_grants_lane": "26-511 NSF SBIR/STTR scientific instrumentation, due 2026-07-27.",
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03.",
             "fastest_low_friction_lane": "80TECH26RFI0020 NASA Data Center Infrastructure RFI, due 2026-07-17.",
@@ -402,6 +647,7 @@ def build_payload() -> dict[str, Any]:
                 "title": row["title"],
                 "command": row["command"],
                 "deadline_utc": row["deadline_utc"],
+                "official_deadline_text": row.get("official_deadline_text"),
                 "official_url": row["official_url"],
                 "package_files": row["package_files"],
             }
@@ -418,6 +664,19 @@ def build_payload() -> dict[str, Any]:
                 "human_gate": row["human_gate"],
             }
             for row in emergency_gate
+        ],
+        "no_bid_or_partner_only": [
+            {
+                "rank": row["rank"],
+                "opportunity_number": row["opportunity_number"],
+                "title": row["title"],
+                "command": row["command"],
+                "deadline_date": row["deadline_date"],
+                "eligibility_state": row["eligibility_state"],
+                "fit_state": row["fit_state"],
+                "official_url": row["official_url"],
+            }
+            for row in no_bid
         ],
         "zero_friction_pack_status": zero.get("status", "UNKNOWN"),
         "submission_boundary": {
@@ -449,11 +708,11 @@ def build_payload() -> dict[str, Any]:
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     lines = [
-        "# Near-Deadline Submission Command Board - 2026-07-11",
+        f"# Near-Deadline Submission Command Board - {payload['scan_date']}",
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        "Direct answer: stage NASA first for speed, NSF and FHWA next for strongest fit, HUD only if the live Grants.gov package confirms eligibility and we can support a real construction-demonstration narrative.",
+        "Direct answer: stage NASA and Army RFI work first, build NSF and FHWA next, and reject or partner-route opportunities whose prerequisites, delivery capacity, or team composition are not supported by evidence.",
         "",
         "## Control Line",
         "",
@@ -462,6 +721,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Lane count: `{summary['lane_count']}`",
         f"- Stage-now lanes: `{summary['stage_now_count']}`",
         f"- Emergency eligibility gates: `{summary['emergency_eligibility_gate_count']}`",
+        f"- No-bid or partner-only lanes: `{summary['no_bid_or_partner_only_count']}`",
         f"- Human-gated lanes: `{summary['human_gated_count']}`",
         f"- Strongest today action: {summary['strongest_today_action']}",
         f"- Closest deadline lane: {summary['closest_deadline_lane']}",
@@ -484,6 +744,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 "",
                 f"- Command: `{row['command']}`",
                 f"- Deadline UTC: `{row['deadline_utc']}`",
+                f"- Official deadline: {row.get('official_deadline_text') or row['deadline_utc']}",
                 f"- Official URL: {row['official_url']}",
                 "- Package files:",
             ]
@@ -508,6 +769,21 @@ def render_markdown(payload: dict[str, Any]) -> str:
             lines.append(f"  - {gate}")
         lines.append("")
 
+    lines.extend(["## No-Bid Or Partner-Only", ""])
+    for row in payload["no_bid_or_partner_only"]:
+        lines.extend(
+            [
+                f"### {row['rank']}. {row['opportunity_number']} - {row['title']}",
+                "",
+                f"- Command: `{row['command']}`",
+                f"- Deadline date: `{row['deadline_date']}`",
+                f"- Eligibility: `{row['eligibility_state']}`",
+                f"- Fit: `{row['fit_state']}`",
+                f"- Official URL: {row['official_url']}",
+                "",
+            ]
+        )
+
     lines.extend(["## Full Lane Detail", ""])
     for lane in payload["lanes"]:
         lines.extend(
@@ -517,9 +793,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Source: `{lane['source_system']}`",
                 f"- Agency: `{lane['agency']}`",
                 f"- Deadline UTC: `{lane['deadline_utc']}`",
-                f"- Days to close from 2026-07-11: `{lane['days_to_close_from_2026_07_11']}`",
+                f"- Official deadline: {lane.get('official_deadline_text') or lane['deadline_utc']}",
+                f"- Days to close from scan date: `{lane['days_to_close']}`",
                 f"- Deadline bucket: `{lane['deadline_bucket']}`",
                 f"- Command: `{lane['command']}`",
+                f"- Eligibility: `{lane['eligibility_state']}`",
+                f"- Fit: `{lane['fit_state']}`",
                 f"- Route: {lane['submission_route']}",
                 f"- Official URL: {lane['official_url']}",
             ]

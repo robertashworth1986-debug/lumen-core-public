@@ -1,7 +1,7 @@
 # LumaJarvis Operating Memory
 
 Generated: 2026-06-20
-Last Continuity Update: 2026-06-24
+Last Continuity Update: 2026-07-13
 
 ## Purpose
 
@@ -318,3 +318,99 @@ Use the generated frozen-delta outreach packet to request tightly targeted paid 
 ### Next Highest-Value Action
 
 Pick 10 high-fit targets across defense teaming, grid/data-center resilience, maritime/AIS analytics, energy risk, and independent validation labs. For each one, tailor the buyer-safe email from `docs/FROZEN_DELTA_BUYER_OUTREACH_2026-06-25.md`, then ask for a paid pilot or validation review call.
+
+## Continuity Checkpoint - 2026-07-13 Top-Card Statistical Gate
+
+### What Changed
+
+- Added `code/geometry_time_series_model_routing_benchmark.py`.
+- Upgraded `code/ops/BUILD_TOP_GEOMETRY_LIVE_REPLAY_RESULTS.py` to schema v2.
+- Added frozen measured-source, expanding-window time-series evaluation with MASE-scaled scoring and explicit leakage control.
+- Added paired bootstrap mean-delta intervals, exact two-sided sign tests, and Holm correction across the five preselected replay cards.
+- Updated `code/ops/BUILD_GEOMETRY_REPEAT_PROOF_VALIDATION.py` to pass frozen source references through the upgraded adapter API.
+- Added and updated focused tests for extraction, chronological ordering, future-tail leakage resistance, measured-source intake, paired inference, and Holm adjustment.
+
+### Verified Result
+
+- Top replay cards: `5`.
+- Adapter replays run: `5/5`.
+- Cards with paired inference: `5/5`.
+- Live-context evaluation rows: `5360`.
+- Unique frozen snapshot hashes: `16`.
+- Time-series measured sources accepted: `5`; measured series accepted: `8`.
+- Candidate mean-score wins against named baselines: `3/5`.
+- Candidates positive after the five-card Holm gate: `0/5`.
+- The `fractal_brownian_surface` candidate lost to `naive_last` by `-0.028894` mean score across `867` paired forecast units; bootstrap 95% interval `[-0.04199188, -0.01618116]`.
+- The negative time-series result is retained as falsification evidence; it is not relabeled or promoted.
+
+### Tests Run
+
+- `python -m py_compile code\geometry_time_series_model_routing_benchmark.py code\ops\BUILD_TOP_GEOMETRY_LIVE_REPLAY_RESULTS.py` passed.
+- `python -m pytest tests\test_geometry_time_series_model_routing_benchmark.py tests\test_top_geometry_live_replay_results.py -q` passed: `7` tests.
+- `python -m pytest tests\test_geometry_repeat_proof_validation.py -q` passed: `4` tests.
+- Downstream proof-card, live-systems, asset-wiring, energy/rolling-champion, and live-evidence tests passed: `13` tests.
+
+### Claim Boundary
+
+This is measured-source software replay with top-card statistical controls. It is not full-registry familywise control, field validation, operational forecasting, realized savings, a real-dollar claim, grant-award certainty, or live-trading permission. Positive bootstrap intervals on small card counts do not pass the Holm gate by themselves.
+
+### Next Highest-Value Action
+
+Increase independent frozen evaluation units for the optimal, wave, and thermal cards; pre-register the next card set before running it; then replace or redesign the losing time-series candidate without tuning on the frozen evaluation rows used here.
+
+## Continuity Checkpoint - 2026-07-13 Fresh Breadth, Full Baseline Gauntlet, and Sector Priority
+
+### What Changed
+
+- Ran `tools/Run-LiveEvidenceMaxHarvest.ps1` with `MaxRows=250` and `SourceTimeoutSeconds=30`.
+- Expanded the top-card replay from named-baseline checks to every internally registered baseline exposed by the five executable adapters.
+- Added a separate global Holm correction across all `21` candidate-versus-baseline comparisons.
+- Added `code/ops/BUILD_SECTOR_VALIDATION_PRIORITY_BOARD.py` and its tests.
+- Generated hashed JSON, dashboard, Markdown, and manifest artifacts for the five-sector validation decision.
+- Replaced outcome-hard-coded assertions with consistency assertions so fresh snapshots can change a measured winner without changing the scientific rule.
+
+### Fresh Breadth Receipt
+
+- Live harvest steps: `7/7` succeeded.
+- Enabled / measured / failed-or-thin sources: `29 / 25 / 4`.
+- Fresh measured rows: `2580`.
+- Measured-source coverage: `86.21%`.
+- Live-context replay rows: `4874`.
+- Unique frozen snapshot hashes: `16`.
+- Snapshot chain SHA-256: `851c1c807028ed20497b08220e77648e5c7bc315a2d87558a7dc5360403bd47e`.
+- External drive scan remained read-only: `50000` files scanned, `20400` candidates, `150` content hashes, delete performed `false`.
+
+### Current Snapshot-Specific Champion Posture
+
+- Named-baseline mean wins: `4/5`; named-card Holm-positive results: `0/5`.
+- Registered-baseline comparisons: `21`; candidate mean wins: `19`; globally Holm-positive comparisons: `2`.
+- Cards beating every registered baseline by mean: `4/5`; cards beating every registered baseline after global Holm correction: `0/5`.
+- `kuramoto_phase_coupling` versus `kalman_filter`: mean delta `+0.154018`, bootstrap 95% interval `[0.0994196, 0.198197]`, `5` paired units, raw two-sided sign-test p-value `0.0625`, named-card Holm p-value `0.25`.
+- Kuramoto beat all four internally registered wave baselines by mean: `kalman_filter`, `phase_locked_loop`, `fft_filter`, and `arima`; it beat `0/4` after the global Holm correction. These are internally registered software baselines, not externally approved standards.
+- `leaf_veins` versus `minimum_spanning_tree`: mean delta `+0.019447`, but its interval `[-0.052843, 0.145357]` crosses zero.
+- `thermal_plume_convection` versus `straight_duct`: mean delta `+0.113841`, but only `2` paired units are present.
+- `fractal_brownian_surface` versus `naive_last`: mean delta `-0.014244` across `786` paired forecast units, interval `[-0.02830713, -0.00121097]`. It is retained as a measured loss/falsification result.
+
+### 140-Family Boundary
+
+The registry contains `140` families across `12` lanes, but the current live-context proof surface contains only `5` executable adapters. The full 140-family locked-protocol gauntlet has not run. Registry rank, analogue text, or a benchmark hypothesis cannot be described as executable superiority. Each family needs real code, lane-specific contracts, compute-budget parity, frozen development data, untouched holdout data, protocol baselines, global multiplicity control, and an external rerun.
+
+### Sector Decision
+
+The current validation order is:
+
+1. Electric-grid reliability, loss, and congestion.
+2. Maritime port flow, routing, and resilience.
+3. Aviation delay and surface/airspace flow.
+4. Data-center energy and cooling.
+5. Water-distribution leak, pump, and resilience optimization.
+
+This ranking uses official-data access, measurable loss/exposure, current Luma evidence, baseline maturity, and access to an external validator. It is a prioritization score, not market value, recoverable savings, or revenue proof.
+
+### Tests Run
+
+- `python -m pytest tests/test_sector_validation_priority_board.py tests/test_geometry_time_series_model_routing_benchmark.py tests/test_top_geometry_live_replay_results.py tests/test_live_evidence_max_harvest.py -q` passed: `12` tests.
+
+### Next Highest-Value Action
+
+Freeze one grid protocol and secure aligned utility, ISO/RTO, or laboratory data plus an operator-approved native loss definition. Increase independent wave-card units before any further Kuramoto claim, and implement additional 140-family candidates only behind the frozen protocol rather than widening the registry language.
