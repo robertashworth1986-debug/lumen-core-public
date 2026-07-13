@@ -21,6 +21,7 @@ V1 holdout records are not used to build, select, or score v2. V1 supplies only 
 - unsupported titles that cannot contain a supported archetype or control name;
 - 56 development, 36 validation, and 36 blind-holdout records;
 - static and unconstrained lexical baselines;
+- deterministic validation-only baseline threshold selection with frozen tie-breaks;
 - static-first candidate with joint score and top-two-margin thresholds;
 - validation constraints for unsupported mapping and supported coverage;
 - a deterministic feasible and infeasible threshold-selection order;

@@ -130,7 +130,16 @@
     },
     {
       "id": "tfidf_lexical_retrieval",
-      "definition": "Fit TF-IDF control prototypes on v2 development records only and return the highest-cosine control above a validation-selected score threshold, without a margin constraint."
+      "definition": "Fit TF-IDF control prototypes on v2 development records only and return the highest-cosine control above a validation-selected score threshold, without a margin constraint.",
+      "score_threshold_grid_source": "candidate.score_threshold_grid",
+      "selection_split": "validation",
+      "selection_order": [
+        "highest_macro_f1",
+        "highest_micro_f1",
+        "lowest_unsupported_mapping_rate",
+        "highest_supported_coverage",
+        "highest_score_threshold"
+      ]
     }
   ],
   "candidate": {
@@ -141,6 +150,7 @@
       "open_set_lexical_retrieval",
       "abstain"
     ],
+    "model_fit_split": "development",
     "score_threshold_grid": [0.30, 0.40, 0.50, 0.60, 0.70],
     "margin_threshold_grid": [0.00, 0.05, 0.10, 0.15, 0.20],
     "selection_split": "validation",
