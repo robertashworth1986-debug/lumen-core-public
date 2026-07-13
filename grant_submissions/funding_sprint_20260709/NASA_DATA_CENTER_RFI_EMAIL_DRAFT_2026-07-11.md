@@ -1,13 +1,21 @@
 # NASA Data Center Infrastructure RFI Email Draft - 2026-07-11
 
 - Opportunity: `80TECH26RFI0020`
-- Status: `READY_FOR_HUMAN_REVIEW`
+- Status: `SENT_VERIFIED`
 - External send without human: `false`
 - Final email send without human: `false`
 
+## Transmission
+
+- Sent UTC: `2026-07-13T21:27:12Z`
+- Result: `SENT_WITH_ATTACHMENT`
+- Receipt: `EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json`
+- Gmail message ID: `19f5d607f0a0af24`
+
 ## To
 
-Use the official recipients listed in the live SAM.gov notice after confirmation.
+- `michelle.m.downs@nasa.gov`
+- `kimberly.r.sandoz@nasa.gov`
 
 ## Subject
 
@@ -29,16 +37,14 @@ Robert Ashworth
 LumenCore
 https://lumen-core.ai/proof_to_pilot.html
 
-## Proposed Attachments
+## Attachment
 
-- `NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.md` exported as PDF if required.
-- Optional proof appendix only if attachment rules allow it:
-  - `FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md`
-  - `TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md`
+`NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.pdf`
 
-## Final Human Gate
+Expected SHA-256: `88A606678ACC62C60C914C515605D5D590CEACDC1A82AA20B47028B3444EEB0D`
 
-- Confirm official recipients and file requirements.
-- Confirm whether a PDF export is required.
-- Robert approves the final email send.
+## Completed Human Gate
 
+- Reconfirm the live deadline, recipients, and file requirements against the current SAM.gov notice.
+- Inspect the five-page PDF one final time.
+- Obtain fresh approval for the send action.

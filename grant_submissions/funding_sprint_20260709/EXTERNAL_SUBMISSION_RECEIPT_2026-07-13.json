@@ -1,0 +1,42 @@
+{
+  "schema": "external_submission_receipt.v1",
+  "recorded_date": "2026-07-13",
+  "authorization": "Fresh user approval received immediately before each send.",
+  "verification": "Each resulting Gmail message was read back with the SENT label and expected attachment presence.",
+  "submissions": [
+    {
+      "notice_id": "ACCAPGAIDPRFI4",
+      "result": "SENT_WITH_ATTACHMENT",
+      "sent_utc": "2026-07-13T21:27:05Z",
+      "subject": "Questions and/or Feedback Submission AIDP Draft CfS 2",
+      "recipients": [
+        "usarmy.apg.cpe-isw.mbx.pm-isa-aidp-next@army.mil",
+        "scott.d.butterfield2.civ@army.mil",
+        "rachel.l.moresi.civ@army.mil"
+      ],
+      "attachment": "outputs/aidp-rfi4-20260713/AIDP - Questions and Feedback Submission Sheet - LumenCore Draft.xlsx",
+      "attachment_bytes": 5405,
+      "attachment_sha256": "D0528488B91C940E2A8401E3571BE72C59124F714883E25CF6D7D7716427B8BF",
+      "gmail_message_id": "19f5d606145533e4",
+      "submission_kind": "market_research_feedback",
+      "claim_boundary": "Transmission does not establish agency acceptance, evaluation, validation, an award, or a contract."
+    },
+    {
+      "notice_id": "80TECH26RFI0020",
+      "result": "SENT_WITH_ATTACHMENT",
+      "sent_utc": "2026-07-13T21:27:12Z",
+      "subject": "Response to RFI 80TECH26RFI0020 - LumenCore Proof-to-Pilot Validation Layer for AI-Ready Infrastructure Modernization",
+      "recipients": [
+        "michelle.m.downs@nasa.gov",
+        "kimberly.r.sandoz@nasa.gov"
+      ],
+      "attachment": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.pdf",
+      "attachment_bytes": 15465,
+      "attachment_sha256": "88A606678ACC62C60C914C515605D5D590CEACDC1A82AA20B47028B3444EEB0D",
+      "page_count": 5,
+      "gmail_message_id": "19f5d607f0a0af24",
+      "submission_kind": "market_research_capability_response",
+      "claim_boundary": "Transmission does not establish agency acceptance, evaluation, validation, an award, or a contract."
+    }
+  ]
+}

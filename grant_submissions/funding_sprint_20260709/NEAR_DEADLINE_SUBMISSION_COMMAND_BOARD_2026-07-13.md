@@ -2,51 +2,46 @@
 
 This is the action board for getting the closest credible grants and federal contract responses fully staged.
 
-Direct answer: stage NASA and Army RFI work first, build NSF and FHWA next, and reject or partner-route opportunities whose prerequisites, delivery capacity, or team composition are not supported by evidence.
+Direct answer: NASA and Army are sent and verified; build NSF and FHWA next, and reject or partner-route opportunities whose prerequisites, delivery capacity, or team composition are not supported by evidence.
 
 ## Control Line
 
-- Status: `NEAR_DEADLINE_COMMAND_BOARD_READY_HUMAN_SUBMIT_REQUIRED`
+- Status: `NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS`
 - Scan date: `2026-07-13`
 - Lane count: `14`
-- Stage-now lanes: `5`
+- Stage-now lanes: `3`
+- Sent and verified lanes: `2`
 - Emergency eligibility gates: `1`
 - No-bid or partner-only lanes: `4`
-- Human-gated lanes: `14`
-- Strongest today action: Stage the NASA response and Army AIDP feedback first; build NSF scientific-instrumentation and FHWA TSMO packages next.
+- Human-gated lanes: `12`
+- Strongest today action: Build the NSF scientific-instrumentation Project Pitch and FHWA TSMO primary volume next; NASA and Army are already sent and verified.
 - Closest deadline lane: PDR-2600-DC-029Q HUD robotics/AI home construction demonstration, due July 13 at 11:59:59 PM ET, but only after the construction-demonstration capacity gate passes.
 - Best grants lane: 26-511 NSF SBIR/STTR scientific instrumentation, due 2026-07-27.
 - Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03.
-- Fastest low-friction lane: 80TECH26RFI0020 NASA Data Center Infrastructure RFI, due 2026-07-17.
+- Fastest low-friction lane: NASA RFI was sent on 2026-07-13; no remaining lane is both complete and low-friction.
 - Final submit without human: `false`
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `559e8bca98e5317451b54c1314f771f9b21f0bd26e967963d2be6560b39aac3d`
+- Command board SHA-256: `cc111ec527c5db7466bc0bfeef6751c6c7ff15d29ee801a11055f754da47031c`
 
-## Stage Now
+## Sent And Verified
 
 ### 1. 80TECH26RFI0020 - Strategic Partnerships for NASA Data Center Infrastructure
 
-- Command: `STAGE_NOW`
-- Deadline UTC: `2026-07-17T21:00:00Z`
-- Official deadline: 2026-07-17T21:00:00Z
-- Official URL: https://sam.gov/opp/312af51a7fc14110b1239bdd32252213/view
-- Package files:
-  - `NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md`
-  - `NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md`
-  - `NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.md`
-  - `NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.pdf`
-  - `NASA_DATA_CENTER_RFI_EMAIL_DRAFT_2026-07-11.md`
+- Status: `SENT_WITH_ATTACHMENT`
+- Sent UTC: `2026-07-13T21:27:12Z`
+- Receipt: `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json`
+- Attachment SHA-256: `88A606678ACC62C60C914C515605D5D590CEACDC1A82AA20B47028B3444EEB0D`
 
 ### 2. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
 
-- Command: `STAGE_RFI_FEEDBACK`
-- Deadline UTC: `2026-07-15T21:00:00Z`
-- Official deadline: July 15, 2026 at 5:00 PM Eastern Time
-- Official URL: https://sam.gov/workspace/contract/opp/3d72f2df3aaf459797c14cefb41fd235/view
-- Package files:
-  - `ARMY_AIDP_RFI4_PARTNER_NOTE_STUB_2026-07-10.md`
+- Status: `SENT_WITH_ATTACHMENT`
+- Sent UTC: `2026-07-13T21:27:05Z`
+- Receipt: `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json`
+- Attachment SHA-256: `D0528488B91C940E2A8401E3571BE72C59124F714883E25CF6D7D7716427B8BF`
+
+## Stage Now
 
 ### 3. 693JJ326R000012 - Transportation Systems Management and Operations Data Initiative
 
@@ -135,19 +130,16 @@ Direct answer: stage NASA and Army RFI work first, build NSF and FHWA next, and 
 - Official deadline: 2026-07-17T21:00:00Z
 - Days to close from scan date: `4`
 - Deadline bucket: `seven_day_sprint`
-- Command: `STAGE_NOW`
+- Command: `SENT_VERIFIED`
 - Eligibility: `OPEN_RFI_RESPONSE`
 - Fit: `STRONG_CAPABILITY_RESPONSE_FIT`
 - Route: Email response per RFI instructions
 - Official URL: https://sam.gov/opp/312af51a7fc14110b1239bdd32252213/view
 - Why now: Fastest clean federal market-research lane: no pricing needed, response can be bounded to capability, proof-to-decision validation, and no agency-validation claims.
 - Today work:
-  - Confirm official RFI email recipients, page cap, attachments, and amendments.
-  - Promote the NASA outline/stub into a reviewer-ready RFI response.
-  - Stage email subject/body and attachment list for human approval.
+  - Monitor for an inbound response, amendment, or clarification request.
+  - Do not resend unless the agency requests a replacement or the receipt fails verification.
 - Human gate:
-  - Robert approves final capability language and any past-performance statement.
-  - Robert approves the final email send.
 - Package files:
   - `NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md`
   - `NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md`
@@ -156,7 +148,7 @@ Direct answer: stage NASA and Army RFI work first, build NSF and FHWA next, and 
   - `NASA_DATA_CENTER_RFI_EMAIL_DRAFT_2026-07-11.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `83ea36ae93a50f8b3c0556678e2a2b7c6491b6e0104f3560aae87f3c1ce13f1f`
+- Lane SHA-256: `62823bd189796697717a53387b65e894be19ac06d80c2773f544f8b465b12980`
 
 ### 2. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
 
@@ -166,24 +158,21 @@ Direct answer: stage NASA and Army RFI work first, build NSF and FHWA next, and 
 - Official deadline: July 15, 2026 at 5:00 PM Eastern Time
 - Days to close from scan date: `2`
 - Deadline bucket: `48_hour_sprint`
-- Command: `STAGE_RFI_FEEDBACK`
+- Command: `SENT_VERIFIED`
 - Eligibility: `OPEN_RFI_FEEDBACK_ATTACHMENT_ACCESS_REQUIRED`
 - Fit: `STRONG_DATA_PLATFORM_AND_AUDITABILITY_FEEDBACK_FIT`
 - Route: Email questions and feedback using the official spreadsheet attachment
 - Official URL: https://sam.gov/workspace/contract/opp/3d72f2df3aaf459797c14cefb41fd235/view
 - Why now: The Army is requesting structured feedback on a draft data-platform solution. LumenCore can contribute bounded comments on evidence provenance, replay, observability, and decision auditability without claiming to supply the entire platform.
 - Today work:
-  - Download the public instructions and questions-and-feedback spreadsheet.
-  - Map only documented LumenCore capabilities to draft requirements.
-  - Stage the completed feedback sheet and email for review.
+  - Monitor for an inbound response, amendment, or clarification request.
+  - Do not resend unless the agency requests a replacement or the receipt fails verification.
 - Human gate:
-  - Robert approves every capability and past-performance statement.
-  - Robert approves the final feedback email.
 - Package files:
   - `ARMY_AIDP_RFI4_PARTNER_NOTE_STUB_2026-07-10.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `4ca304a32063f3b88efdc92d91636fedae0fb1f0758aa3683473fc42f7c79b94`
+- Lane SHA-256: `baff45bb05893b85626568e49351eb1e854f73b4d6e937ccf465260364c9f4d9`
 
 ### 3. 693JJ326R000012 - Transportation Systems Management and Operations Data Initiative
 
@@ -522,3 +511,4 @@ Direct answer: stage NASA and Army RFI work first, build NSF and FHWA next, and 
 - `sam_rush_board`: `out/ops/sam_rush_submission_board_latest.json` present=`true` sha256=`4c60072e0b0294de5e80f29f3af263c7fb00d07b0767bdf1357bcf84970c720d`
 - `grants_ranked`: `out/grants/grants_ranked_v2.json` present=`true` sha256=`acf5df0330e5d281c2c504e943f6ba752516449ff5356d53ca5019b97b48743d`
 - `funding_reviewer_zero_friction_pack`: `out/ops/funding_reviewer_zero_friction_pack_latest.json` present=`true` sha256=`9d893142736fde4fd15f834bbf5eb4c579ab8feb886d3cdc54b9f92cfb3acee1`
+- `external_submission_receipt`: `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json` present=`true` sha256=`2dac72c484bb39a6ab5891405c00ad68c66a2d99a5152d0e53ccbe8603fbae01`

@@ -15,6 +15,7 @@ DASHBOARD_DATA = ROOT / "dashboard" / "data"
 SAM_BOARD = OUT_OPS / "sam_rush_submission_board_latest.json"
 GRANTS_RANKED = ROOT / "out" / "grants" / "grants_ranked_v2.json"
 ZERO_FRICTION = OUT_OPS / "funding_reviewer_zero_friction_pack_latest.json"
+SUBMISSION_RECEIPT = SPRINT_DIR / "EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json"
 
 OUT_JSON = OUT_OPS / "near_deadline_submission_command_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "near_deadline_submission_command_board.json"
@@ -131,6 +132,7 @@ def base_sources() -> dict[str, Any]:
         "sam_rush_board": SAM_BOARD,
         "grants_ranked": GRANTS_RANKED,
         "funding_reviewer_zero_friction_pack": ZERO_FRICTION,
+        "external_submission_receipt": SUBMISSION_RECEIPT,
     }.items():
         if path.exists():
             data = path.read_bytes()
@@ -145,7 +147,34 @@ def base_sources() -> dict[str, Any]:
     return sources
 
 
-def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]) -> list[dict[str, Any]]:
+def apply_submission_receipts(lanes: list[dict[str, Any]], receipt: dict[str, Any]) -> None:
+    sent_by_notice = {
+        str(row.get("notice_id")): row
+        for row in receipt.get("submissions", [])
+        if str(row.get("result", "")).startswith("SENT_")
+    }
+    for lane in lanes:
+        sent = sent_by_notice.get(str(lane.get("opportunity_number")))
+        if sent is None:
+            continue
+        lane["pre_send_command"] = lane["command"]
+        lane["command"] = "SENT_VERIFIED"
+        lane["submission_status"] = sent["result"]
+        lane["sent_utc"] = sent["sent_utc"]
+        lane["receipt_path"] = rel(SUBMISSION_RECEIPT)
+        lane["receipt_attachment_sha256"] = sent["attachment_sha256"]
+        lane["today_work"] = [
+            "Monitor for an inbound response, amendment, or clarification request.",
+            "Do not resend unless the agency requests a replacement or the receipt fails verification.",
+        ]
+        lane["human_gate"] = []
+
+
+def build_command_lanes(
+    sam_board: dict[str, Any],
+    grants_ranked: dict[str, Any],
+    submission_receipt: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
     sam = sam_lookup(sam_board)
     grants = grant_lookup(grants_ranked)
 
@@ -599,6 +628,7 @@ def build_command_lanes(sam_board: dict[str, Any], grants_ranked: dict[str, Any]
         ]
     )
 
+    apply_submission_receipts(lanes, submission_receipt or {})
     normalize_lane_deadlines(lanes)
     lanes.sort(key=lambda row: row["rank"])
     for lane in lanes:
@@ -610,8 +640,10 @@ def build_payload() -> dict[str, Any]:
     sam_board = read_json(SAM_BOARD)
     grants_ranked = read_json(GRANTS_RANKED)
     zero = read_json(ZERO_FRICTION)
-    lanes = build_command_lanes(sam_board, grants_ranked)
+    submission_receipt = read_json(SUBMISSION_RECEIPT)
+    lanes = build_command_lanes(sam_board, grants_ranked, submission_receipt)
     stage_now = [row for row in lanes if row["command"] in STAGE_COMMANDS]
+    sent_verified = [row for row in lanes if row["command"] == "SENT_VERIFIED"]
     emergency_gate = [row for row in lanes if row["command"] == "ELIGIBILITY_AND_PARTNER_GATE"]
     no_bid = [row for row in lanes if row["command"] in NO_BID_COMMANDS]
     human_gated = [row for row in lanes if row["human_gate"]]
@@ -620,19 +652,20 @@ def build_payload() -> dict[str, Any]:
         "schema": "near_deadline_submission_command_board_v2",
         "generated_utc": now_utc(),
         "scan_date": SCAN_DATE.isoformat(),
-        "status": "NEAR_DEADLINE_COMMAND_BOARD_READY_HUMAN_SUBMIT_REQUIRED",
+        "status": "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS",
         "source_ledgers": base_sources(),
         "summary": {
             "lane_count": len(lanes),
             "stage_now_count": len(stage_now),
+            "sent_verified_count": len(sent_verified),
             "emergency_eligibility_gate_count": len(emergency_gate),
             "no_bid_or_partner_only_count": len(no_bid),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Stage the NASA response and Army AIDP feedback first; build NSF scientific-instrumentation and FHWA TSMO packages next.",
+            "strongest_today_action": "Build the NSF scientific-instrumentation Project Pitch and FHWA TSMO primary volume next; NASA and Army are already sent and verified.",
             "closest_deadline_lane": "PDR-2600-DC-029Q HUD robotics/AI home construction demonstration, due July 13 at 11:59:59 PM ET, but only after the construction-demonstration capacity gate passes.",
             "best_grants_lane": "26-511 NSF SBIR/STTR scientific instrumentation, due 2026-07-27.",
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03.",
-            "fastest_low_friction_lane": "80TECH26RFI0020 NASA Data Center Infrastructure RFI, due 2026-07-17.",
+            "fastest_low_friction_lane": "NASA RFI was sent on 2026-07-13; no remaining lane is both complete and low-friction.",
             "all_final_actions_blocked_without_human": True,
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,
@@ -640,6 +673,18 @@ def build_payload() -> dict[str, Any]:
             "legal_certification_allowed_without_human": False,
         },
         "lanes": lanes,
+        "sent_verified": [
+            {
+                "rank": row["rank"],
+                "opportunity_number": row["opportunity_number"],
+                "title": row["title"],
+                "submission_status": row["submission_status"],
+                "sent_utc": row["sent_utc"],
+                "receipt_path": row["receipt_path"],
+                "receipt_attachment_sha256": row["receipt_attachment_sha256"],
+            }
+            for row in sent_verified
+        ],
         "stage_now": [
             {
                 "rank": row["rank"],
@@ -712,7 +757,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        "Direct answer: stage NASA and Army RFI work first, build NSF and FHWA next, and reject or partner-route opportunities whose prerequisites, delivery capacity, or team composition are not supported by evidence.",
+        "Direct answer: NASA and Army are sent and verified; build NSF and FHWA next, and reject or partner-route opportunities whose prerequisites, delivery capacity, or team composition are not supported by evidence.",
         "",
         "## Control Line",
         "",
@@ -720,6 +765,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Scan date: `{payload['scan_date']}`",
         f"- Lane count: `{summary['lane_count']}`",
         f"- Stage-now lanes: `{summary['stage_now_count']}`",
+        f"- Sent and verified lanes: `{summary['sent_verified_count']}`",
         f"- Emergency eligibility gates: `{summary['emergency_eligibility_gate_count']}`",
         f"- No-bid or partner-only lanes: `{summary['no_bid_or_partner_only_count']}`",
         f"- Human-gated lanes: `{summary['human_gated_count']}`",
@@ -734,9 +780,23 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Legal certification without human: `{str(summary['legal_certification_allowed_without_human']).lower()}`",
         f"- Command board SHA-256: `{payload['command_board_sha256']}`",
         "",
-        "## Stage Now",
+        "## Sent And Verified",
         "",
     ]
+    for row in payload["sent_verified"]:
+        lines.extend(
+            [
+                f"### {row['rank']}. {row['opportunity_number']} - {row['title']}",
+                "",
+                f"- Status: `{row['submission_status']}`",
+                f"- Sent UTC: `{row['sent_utc']}`",
+                f"- Receipt: `{row['receipt_path']}`",
+                f"- Attachment SHA-256: `{row['receipt_attachment_sha256']}`",
+                "",
+            ]
+        )
+
+    lines.extend(["## Stage Now", ""])
     for row in payload["stage_now"]:
         lines.extend(
             [

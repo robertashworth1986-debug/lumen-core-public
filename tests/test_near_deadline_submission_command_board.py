@@ -21,23 +21,27 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     payload = module.build_payload()
 
     assert payload["schema"] == "near_deadline_submission_command_board_v2"
-    assert payload["status"] == "NEAR_DEADLINE_COMMAND_BOARD_READY_HUMAN_SUBMIT_REQUIRED"
+    assert payload["status"] == "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS"
     assert payload["summary"]["lane_count"] == 14
-    assert payload["summary"]["stage_now_count"] == 5
+    assert payload["summary"]["stage_now_count"] == 3
+    assert payload["summary"]["sent_verified_count"] == 2
     assert payload["summary"]["emergency_eligibility_gate_count"] == 1
     assert payload["summary"]["no_bid_or_partner_only_count"] == 4
-    assert payload["summary"]["human_gated_count"] == 14
+    assert payload["summary"]["human_gated_count"] == 12
     assert payload["summary"]["final_submit_allowed_without_human"] is False
     assert payload["summary"]["external_send_allowed_without_human"] is False
     assert payload["summary"]["pricing_allowed_without_human"] is False
     assert payload["summary"]["legal_certification_allowed_without_human"] is False
 
     stage_ids = {row["opportunity_number"] for row in payload["stage_now"]}
-    assert "80TECH26RFI0020" in stage_ids
-    assert "ACCAPGAIDPRFI4" in stage_ids
+    assert "80TECH26RFI0020" not in stage_ids
+    assert "ACCAPGAIDPRFI4" not in stage_ids
     assert "693JJ326R000012" in stage_ids
     assert "26-511" in stage_ids
     assert "W912HZ26SC005" in stage_ids
+
+    sent_ids = {row["opportunity_number"] for row in payload["sent_verified"]}
+    assert sent_ids == {"80TECH26RFI0020", "ACCAPGAIDPRFI4"}
 
 
 def test_near_deadline_board_keeps_hud_and_bop_behind_correct_gates():
@@ -74,6 +78,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "Final submit without human: `false`" in rendered
     assert "https://seedfund.nsf.gov/project-pitch/" in rendered
     assert "https://www.grants.gov/search-results-detail/362360" in rendered
+    assert "Sent And Verified" in rendered
     assert "No-Bid Or Partner-Only" in rendered
     assert len(payload["command_board_sha256"]) == 64
 
