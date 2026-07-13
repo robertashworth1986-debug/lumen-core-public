@@ -31,9 +31,10 @@ if (-not (Test-Path -LiteralPath $Runner -PathType Leaf)) {
 }
 
 $PowerShell = (Get-Command powershell.exe -ErrorAction Stop).Source
+$PythonExe = (Get-Command python -ErrorAction Stop).Source
 $Arguments =
     "-NoProfile -ExecutionPolicy Bypass -File `"$Runner`" " +
-    "-TimeoutSeconds $TimeoutSeconds -Quiet"
+    "-TimeoutSeconds $TimeoutSeconds -Quiet -PythonExe `"$PythonExe`""
 $StartAt = (Get-Date).AddMinutes(2)
 
 if ($WhatIfOnly) {
@@ -42,6 +43,7 @@ if ($WhatIfOnly) {
         IntervalMinutes = $IntervalMinutes
         StartAt = $StartAt
         Execute = $PowerShell
+        PythonExe = $PythonExe
         Arguments = $Arguments
         WorkingDirectory = $RepoRoot
         UserKeyPresent = $UserKeyPresent
