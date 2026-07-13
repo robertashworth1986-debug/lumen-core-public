@@ -44,6 +44,13 @@ def test_manifest_selects_high_value_proof_artifacts_without_moving_sources(tmp_
     assert "out/ops/sector_validation_priority_board_latest.json" in relative_paths
     assert "out/ops/lumencore_estate_master_index_manifest_latest.json" in relative_paths
     assert "code/geometry_time_series_model_routing_benchmark.py" in relative_paths
+    assert "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.md" in relative_paths
+    assert "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json" in relative_paths
+    assert "config/eia_grid_prospective_hybrid_router_protocol_v1.json" in relative_paths
+    assert "docs/EIA_GRID_PROSPECTIVE_HYBRID_ROUTER_2026-07-13.md" in relative_paths
+    assert "config/ieee_acopf_routing_protocol_v1.json" in relative_paths
+    assert "grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_DSIP_ASSEMBLY_MAP_2026-07-13.md" in relative_paths
+    assert not any("PRIVATE_ESTATE" in path for path in relative_paths)
     assert manifest["summary"]["frozen_input_count"] >= 5
 
 

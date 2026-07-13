@@ -1,6 +1,6 @@
 # Luma External Proof Vault Packet
 
-Generated UTC: `2026-07-13T19:47:06.195530+00:00`
+Generated UTC: `2026-07-13T21:51:45.290077+00:00`
 
 ## Purpose
 
@@ -8,10 +8,10 @@ Non-destructive staging manifest for high-value proof artifacts on external stor
 
 ## Summary
 
-- Artifacts ready: `79/79`
+- Artifacts ready: `120/120`
 - Missing required: `0`
-- Ready bytes: `38553256`
-- Drive free bytes at staging time: `412973273088`
+- Ready bytes: `47248724`
+- Drive free bytes at staging time: `412884291584`
 - Packet ready: `true`
 
 ## Boundary
@@ -57,23 +57,64 @@ A proof vault is provenance and reproducibility infrastructure. It does not crea
 - `grant_submissions/TOP5_LIVE_PROOF_SUBMISSION_BOARD_2026-06-22.md` -> `artifacts/grants/grant_submissions/TOP5_LIVE_PROOF_SUBMISSION_BOARD_2026-06-22.md` | sha256 `70812fc7d908c848d85840fe276b0578231fc9c5852ab62cf1c9684fae1c18eb`
 - `out/ops/top5_live_proof_submission_board_latest.json` -> `artifacts/grants/out/ops/top5_live_proof_submission_board_latest.json` | sha256 `6af5514deafa9b20cbfb4478cd8114df91096450d347f23bcffc34f73354ea3b`
 - `grant_submissions/LIVE_BREADTH_PROVENANCE_ANNEX_2026-06-21.md` -> `artifacts/grants/grant_submissions/LIVE_BREADTH_PROVENANCE_ANNEX_2026-06-21.md` | sha256 `bb729f2e4e359663ec74b9b21e89451b68fce23b35bf833a04a6e3495038ac6e`
-- `grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-13.md` -> `artifacts/grants/grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-13.md` | sha256 `53a5d399d9f4d3948941f29a1e73b99963ac4db46033370fab081be68e703e8c`
-- `out/ops/near_deadline_submission_command_board_latest.json` -> `artifacts/grants/out/ops/near_deadline_submission_command_board_latest.json` | sha256 `ccf3544c072c424bc0819df61c48b66c81396f740d959c0bb9a8b80695ef10c6`
-- `grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md` -> `artifacts/estate/grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md` | sha256 `9e23cf329e5c889f8bb9691d8569a4e86832ce7976435ac5376017f76b7523bb`
-- `out/ops/lumencore_estate_master_index_latest.json` -> `artifacts/estate/out/ops/lumencore_estate_master_index_latest.json` | sha256 `a5c33f55036ccacea90b043451c8b621db4fee372a1de47ccc1303a3335b114b`
-- `out/ops/lumencore_estate_master_index_manifest_latest.json` -> `artifacts/estate/out/ops/lumencore_estate_master_index_manifest_latest.json` | sha256 `f2348b3380c02d7b001d8b11bef9e7f9fecbbff5f8fec01c688637d27c9a1bbf`
-- `out/ops/lumencore_estate_file_inventory_latest.csv` -> `artifacts/estate/out/ops/lumencore_estate_file_inventory_latest.csv` | sha256 `431b88d2e0f34a1c7a8cddd6c6f0eb28ccd5dea79257ca0bab613200b080b04e`
+- `grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-13.md` -> `artifacts/grants/grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-13.md` | sha256 `eb9546f59cfe54da6f1216e31ef33a4d406a412256d64613922fda3007215d8d`
+- `out/ops/near_deadline_submission_command_board_latest.json` -> `artifacts/grants/out/ops/near_deadline_submission_command_board_latest.json` | sha256 `148a88d327d3c10140855e93b9d3accd7b3096d11bf8dbc52d9af236d7895370`
+- `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.md` -> `artifacts/submissions/grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.md` | sha256 `c19902f8d654a4893f6b959e46459a51b76ba012b9f237b191c3754af99a098a`
+- `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json` -> `artifacts/submissions/grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json` | sha256 `2dac72c484bb39a6ab5891405c00ad68c66a2d99a5152d0e53ccbe8603fbae01`
+- `grant_submissions/funding_sprint_20260709/ARMY_AIDP_RFI4_EMAIL_DRAFT_2026-07-13.md` -> `artifacts/submissions/grant_submissions/funding_sprint_20260709/ARMY_AIDP_RFI4_EMAIL_DRAFT_2026-07-13.md` | sha256 `c6ae2ebafa9c8f014bc1a01f571d33ba62fa36c85a8e90ba41edd34b69bc9c6f`
+- `grant_submissions/funding_sprint_20260709/ARMY_AIDP_RFI4_SOURCE_MANIFEST_2026-07-13.md` -> `artifacts/submissions/grant_submissions/funding_sprint_20260709/ARMY_AIDP_RFI4_SOURCE_MANIFEST_2026-07-13.md` | sha256 `301b54144ec25b853fd74038e46d2d541ea3d3d64f3545e782de2981ec6c1e41`
+- `outputs/aidp-rfi4-20260713/AIDP - Questions and Feedback Submission Sheet - LumenCore Draft.xlsx` -> `artifacts/submissions/outputs/aidp-rfi4-20260713/AIDP - Questions and Feedback Submission Sheet - LumenCore Draft.xlsx` | sha256 `d0528488b91c940e2a8401e3571be72c59124f714883e25cf6d7d7716427b8bf`
+- `outputs/aidp-rfi4-20260713/AIDP - Questions and Feedback Submission Sheet - LumenCore Draft.xlsx.inspect.ndjson` -> `artifacts/submissions/outputs/aidp-rfi4-20260713/AIDP - Questions and Feedback Submission Sheet - LumenCore Draft.xlsx.inspect.ndjson` | sha256 `cf678407534f6d4263abf0628d26366216d0ff6520722782eda2771f54601506`
+- `outputs/aidp-rfi4-20260713/AIDP_RFI4_feedback_preview.png` -> `artifacts/submissions/outputs/aidp-rfi4-20260713/AIDP_RFI4_feedback_preview.png` | sha256 `754498ff047307b476e9ac90b3eb1cfee1dcd9c17893ab8ae9a36a4033bf4f99`
+- `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_EMAIL_DRAFT_2026-07-11.md` -> `artifacts/submissions/grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_EMAIL_DRAFT_2026-07-11.md` | sha256 `ad69ebbecb0303ec9cb073dfa92b6bd45958874a070a9e33ba4dab0f212e6f76`
+- `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.md` -> `artifacts/submissions/grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.md` | sha256 `5c5e5ca6a635092f2d7877c9b63cef8aab66d3b21880fa11f75526447ac223aa`
+- `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.pdf` -> `artifacts/submissions/grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.pdf` | sha256 `88a606678acc62c60c914c515605d5d590ceacdc1a82aa20b47028b3444eeb0d`
+- `config/eia_grid_wave_champion_protocol_v1.json` -> `artifacts/routing/config/eia_grid_wave_champion_protocol_v1.json` | sha256 `273eb823b0be4b2d403d0aaa591673c2e470e3d7f30abb166a43fe6e311a1c3d`
+- `config/eia_grid_residual_moe_protocol_v1.json` -> `artifacts/routing/config/eia_grid_residual_moe_protocol_v1.json` | sha256 `79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8`
+- `config/eia_grid_prospective_hybrid_router_protocol_v1.json` -> `artifacts/routing/config/eia_grid_prospective_hybrid_router_protocol_v1.json` | sha256 `77a67f201884f70110c840d4d6b98b4194dca6f32a34c63c4a09c9dd786afb86`
+- `code/eia_grid_wave_champion_benchmark.py` -> `artifacts/routing/code/eia_grid_wave_champion_benchmark.py` | sha256 `b3586ddc568f6bd4aa6ae48bbb289ab579eab773699dba5ac32234d393627791`
+- `code/eia_grid_residual_moe_benchmark.py` -> `artifacts/routing/code/eia_grid_residual_moe_benchmark.py` | sha256 `1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100`
+- `code/eia_grid_prospective_hybrid_router.py` -> `artifacts/routing/code/eia_grid_prospective_hybrid_router.py` | sha256 `e35cc9b7e2c9a1e88e669b03e07f8e439e5f4c19d6d3a07b054d0fabe8968a40`
+- `docs/EIA_GRID_WAVE_CHAMPION_BENCHMARK_2026-07-13.md` -> `artifacts/routing/docs/EIA_GRID_WAVE_CHAMPION_BENCHMARK_2026-07-13.md` | sha256 `2969d2aca025c376a6fd7395a2fc10436f72be2f078f7be0a5e6d31ee51746bf`
+- `docs/EIA_GRID_RESIDUAL_MOE_BENCHMARK_2026-07-13.md` -> `artifacts/routing/docs/EIA_GRID_RESIDUAL_MOE_BENCHMARK_2026-07-13.md` | sha256 `5aca894ad130d863b6431a46c47160105dee79fc027fa5c0b53dcff1b579e2f9`
+- `docs/EIA_GRID_PROSPECTIVE_HYBRID_ROUTER_2026-07-13.md` -> `artifacts/routing/docs/EIA_GRID_PROSPECTIVE_HYBRID_ROUTER_2026-07-13.md` | sha256 `c69d4112442ed738a8c5d11b5cf260fce15f60fb764b738a91f0a1826a3d068f`
+- `out/eia_grid_wave_champion/eia_grid_wave_champion_benchmark_latest.json` -> `artifacts/routing/out/eia_grid_wave_champion/eia_grid_wave_champion_benchmark_latest.json` | sha256 `5488b02b72abf4bf38a7777e19db1b8bd472a63c0103e208818ee48abbbc0dc6`
+- `out/eia_grid_wave_champion/eia_grid_wave_champion_manifest_latest.json` -> `artifacts/routing/out/eia_grid_wave_champion/eia_grid_wave_champion_manifest_latest.json` | sha256 `304244ff1b252e0b339feeec38cc3bd2854648a8b9409e936e4eac7a4fe98262`
+- `out/eia_grid_wave_champion/eia_grid_wave_champion_rows_latest.csv` -> `artifacts/routing/out/eia_grid_wave_champion/eia_grid_wave_champion_rows_latest.csv` | sha256 `dc125d2e843ed27aae910589b215791efedc048c2594e02cab06b28410dde8f3`
+- `out/eia_grid_residual_moe/eia_grid_residual_moe_benchmark_latest.json` -> `artifacts/routing/out/eia_grid_residual_moe/eia_grid_residual_moe_benchmark_latest.json` | sha256 `e2e0bc779823e543784c24675e18c12bcb821e65911168c2d3339b6da67ea744`
+- `out/eia_grid_residual_moe/eia_grid_residual_moe_manifest_latest.json` -> `artifacts/routing/out/eia_grid_residual_moe/eia_grid_residual_moe_manifest_latest.json` | sha256 `c0869b98b317d4783adc8406384a9b95b523e412c630f87916cac8cb3f643087`
+- `out/eia_grid_residual_moe/eia_grid_residual_moe_rows_latest.csv` -> `artifacts/routing/out/eia_grid_residual_moe/eia_grid_residual_moe_rows_latest.csv` | sha256 `3b2e130ed750878f893b59931dd55c4fef333f70710c19fbb60a696ac8a4000d`
+- `tests/test_eia_grid_wave_champion_benchmark.py` -> `artifacts/routing/tests/test_eia_grid_wave_champion_benchmark.py` | sha256 `175010b5aa97951fe1770d4f67b1b9b4597baff113d55b34021a103ca04055bb`
+- `tests/test_eia_grid_residual_moe_benchmark.py` -> `artifacts/routing/tests/test_eia_grid_residual_moe_benchmark.py` | sha256 `0aa6af3aa74ecb561c15a1b9560ed80014bc692679e61e6c6fa93bb75cc8ba68`
+- `tests/test_eia_grid_prospective_hybrid_router.py` -> `artifacts/routing/tests/test_eia_grid_prospective_hybrid_router.py` | sha256 `97b39a2c71c55cc03c617c2b7975799357d6a1bdbeb9b9620113174643628eb7`
+- `config/ieee_acopf_routing_protocol_v1.json` -> `artifacts/opf/config/ieee_acopf_routing_protocol_v1.json` | sha256 `07774ce77f3b7ab95ffdc1a84ceecbe92b8ed3783cf9da34b3fddb60097b12b6`
+- `docs/IEEE_ACOPF_ROUTE_READINESS_2026-07-13.md` -> `artifacts/opf/docs/IEEE_ACOPF_ROUTE_READINESS_2026-07-13.md` | sha256 `9d83d795508ed08d75dd877625880478b095b44098e7ca70c9256ec2af64b5d7`
+- `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_SOURCE_MANIFEST_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_SOURCE_MANIFEST_2026-07-13.md` | sha256 `c3940d15240b63a65af95b0dd26f30d7abc26b63ba1b3237201bd375da495916`
+- `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_GO_NO_GO_AND_PROPOSAL_MAP_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_GO_NO_GO_AND_PROPOSAL_MAP_2026-07-13.md` | sha256 `05a49a798803946112537fdf7177f1b1d4c02133bb79c6d96b70c3d138b8be8f`
+- `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_PHASE_I_TECHNICAL_VOLUME_SKELETON_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_PHASE_I_TECHNICAL_VOLUME_SKELETON_2026-07-13.md` | sha256 `7de562763c97591f4cab830de3bcc96cc04673deed78967ad8467b251ad96085`
+- `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_DSIP_ASSEMBLY_MAP_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_DSIP_ASSEMBLY_MAP_2026-07-13.md` | sha256 `e93ebfcc317663322c9a5fbb2ec60825ad09090bbff9b32501c9077cca3b6a9b`
+- `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_CURRENT_CAPABILITY_BOUNDARY_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_CURRENT_CAPABILITY_BOUNDARY_2026-07-13.md` | sha256 `e3d6e225b41e0856b8f336aa29800385f175d7071b1adfe84157c065ec9a6431`
+- `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_LAWFUL_CORPUS_AND_BENCHMARK_PLAN_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_LAWFUL_CORPUS_AND_BENCHMARK_PLAN_2026-07-13.md` | sha256 `a9edf476eba10786ce9348a1a3b28dda5fcdcb97d839c2539267a23fc77bf1f7`
+- `grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md` -> `artifacts/estate/grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md` | sha256 `56efcfddea55b56b343ce764067b9f0475fb2397e756119949a4ae0ced9f676a`
+- `out/ops/lumencore_estate_master_index_latest.json` -> `artifacts/estate/out/ops/lumencore_estate_master_index_latest.json` | sha256 `54a01a18f9ebafcdf545fb4cb5ad4723d92e8a744e2144fbf183d36bb840c60d`
+- `out/ops/lumencore_estate_master_index_manifest_latest.json` -> `artifacts/estate/out/ops/lumencore_estate_master_index_manifest_latest.json` | sha256 `0a359ef0b54b4edabca308136a703a89daa556ace448589a7dd094dfd77280c7`
+- `out/ops/lumencore_estate_file_inventory_latest.csv` -> `artifacts/estate/out/ops/lumencore_estate_file_inventory_latest.csv` | sha256 `a1d6f6a4cf27235613e2df09f031c194223e66979a12711d87f52b74b4937edb`
 - `code/geometry_time_series_model_routing_benchmark.py` -> `artifacts/reproducibility/code/geometry_time_series_model_routing_benchmark.py` | sha256 `02498261a4d7025905e912871cb40d4acd38d25b587e7369a73a1f738b5223d3`
 - `code/ops/BUILD_TOP_GEOMETRY_LIVE_REPLAY_RESULTS.py` -> `artifacts/reproducibility/code/ops/BUILD_TOP_GEOMETRY_LIVE_REPLAY_RESULTS.py` | sha256 `14868505c305ab455993c0680fe2f9925fb85920da9f8831867fca75765da708`
 - `code/ops/BUILD_LIVE_EVIDENCE_MAX_HARVEST.py` -> `artifacts/reproducibility/code/ops/BUILD_LIVE_EVIDENCE_MAX_HARVEST.py` | sha256 `ed20ebaa30ec34a18e18757201abe7fe90d2707ddeef8c79169b1eb4b47d9bf7`
 - `code/ops/BUILD_SECTOR_VALIDATION_PRIORITY_BOARD.py` -> `artifacts/reproducibility/code/ops/BUILD_SECTOR_VALIDATION_PRIORITY_BOARD.py` | sha256 `7ff94351e93e89e66124e0646e119a8b7498475dfc3e0784ba3861770a104429`
 - `code/ops/BUILD_LUMENCORE_ESTATE_MASTER_INDEX.py` -> `artifacts/reproducibility/code/ops/BUILD_LUMENCORE_ESTATE_MASTER_INDEX.py` | sha256 `46de89214b3a6c669704d3d18c8019dbc3f87614db24a6f248cb21ad1e180ccc`
+- `code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py` -> `artifacts/reproducibility/code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py` | sha256 `45a9c321341f0365e4fa734070754b46325cbe9a6e2bd30ce17a08bbadf29113`
+- `code/render_nasa_data_center_rfi_response.py` -> `artifacts/reproducibility/code/render_nasa_data_center_rfi_response.py` | sha256 `09169c112481798932739bd4e986665c12d76185e90c47f477e913f6d3fefcd9`
 - `tools/Run-LiveEvidenceMaxHarvest.ps1` -> `artifacts/reproducibility/tools/Run-LiveEvidenceMaxHarvest.ps1` | sha256 `92546f880da83d8e55e6d48154d6b5564de12a4fce9343272354dd0c9a6caaed`
 - `tests/test_geometry_time_series_model_routing_benchmark.py` -> `artifacts/reproducibility/tests/test_geometry_time_series_model_routing_benchmark.py` | sha256 `2bb25b078e62022df1b77054b813fa5cb97a7b58866648fd458ecf8f2938aae9`
 - `tests/test_top_geometry_live_replay_results.py` -> `artifacts/reproducibility/tests/test_top_geometry_live_replay_results.py` | sha256 `b1b72206e857fb988cb81e0356a1617b86a795f36baeeef22a8b7ba6f2d44233`
 - `tests/test_live_evidence_max_harvest.py` -> `artifacts/reproducibility/tests/test_live_evidence_max_harvest.py` | sha256 `0ad29ba0e504535fb4a585ec1a9d8c5247181510d96cfebe3786e3e7cfc5cd99`
 - `tests/test_sector_validation_priority_board.py` -> `artifacts/reproducibility/tests/test_sector_validation_priority_board.py` | sha256 `44100e90763312d6d5fc8c9fdf3fb8c2051c3720912d3a10279e555f52f46049`
 - `tests/test_lumencore_estate_master_index.py` -> `artifacts/reproducibility/tests/test_lumencore_estate_master_index.py` | sha256 `c4f9ea969e58e4e82ccaf01d590187ca82613a90dd0cf9421c66368c689e2675`
+- `tests/test_near_deadline_submission_command_board.py` -> `artifacts/reproducibility/tests/test_near_deadline_submission_command_board.py` | sha256 `9843cc10159d900becb4d530891395ac92677f68a393497836a87eb27e59b512`
+- `tests/test_nasa_data_center_rfi_response.py` -> `artifacts/reproducibility/tests/test_nasa_data_center_rfi_response.py` | sha256 `21d089180fee3739e598a033c364e6ade3c9c7c14e6dde65e2aae1c94a2c8dbe`
+- `tests/test_external_submission_receipt.py` -> `artifacts/reproducibility/tests/test_external_submission_receipt.py` | sha256 `d61eb298de1125f8570113ceeca05e0715fe9c33005a34df6cefd2a050194d2b`
 - `grant_submissions/DICE_HR001126S0010/DICE_LIVE_BREADTH_REPLAY_2026-06-20.md` -> `artifacts/dice/grant_submissions/DICE_HR001126S0010/DICE_LIVE_BREADTH_REPLAY_2026-06-20.md` | sha256 `1ed27bb4314f9bbfc8eb502136cee3fdd354c350128f8daa497c963dbf0cd58a`
 - `out/ops/dice_live_breadth_replay_latest.json` -> `artifacts/dice/out/ops/dice_live_breadth_replay_latest.json` | sha256 `15ca6c710457f30f3404bd8988a8178dd732b0d49a5f13414b0938801f4c08fd`
 - `grant_submissions/DICE_HR001126S0010/DICE_EVIDENCE_SYNTHESIS_2026-06-20.md` -> `artifacts/dice/grant_submissions/DICE_HR001126S0010/DICE_EVIDENCE_SYNTHESIS_2026-06-20.md` | sha256 `291047ec5573f3461b050cc870ff19bacfb2035a513f6ba166b4f649c836c300`
