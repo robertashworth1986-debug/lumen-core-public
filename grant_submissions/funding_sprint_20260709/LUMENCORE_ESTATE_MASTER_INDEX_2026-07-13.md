@@ -7,21 +7,21 @@ This is an audit and custody artifact. It does not claim a valuation, patent gra
 ## Status
 
 - Status: `LUMENCORE_ESTATE_MASTER_INDEX_READY`
-- Managed file count: `100695`
-- Managed total bytes: `58176616185`
+- Managed file count: `101014`
+- Managed total bytes: `58220081958`
 - Asset classes: `11`
 - Custody tiers: `7`
 - Concept tags: `14`
 - Named concepts: `6`
-- Content SHA-256 file count: `100536`
-- Reused unchanged content hashes: `100495`
-- Computed new or changed content hashes: `41`
+- Content SHA-256 file count: `100855`
+- Reused unchanged content hashes: `100302`
+- Computed new or changed content hashes: `553`
 - Large-file deferred content hashes: `57`
 - Sensitive metadata-only files: `102`
-- Inventory chain SHA-256: `b05e40321606114f561a98334e98f2280e0b8a4c74c7d4d80f047e7252e4c4ae`
-- Inventory CSV SHA-256: `431b88d2e0f34a1c7a8cddd6c6f0eb28ccd5dea79257ca0bab613200b080b04e`
+- Inventory chain SHA-256: `517c1adaa9c929b52605425f6bb215c20e83d7d55c3188b0900dfa83ddc4e9bd`
+- Inventory CSV SHA-256: `e5120993b8de75e3bf782fb4fe1d480e98e89041db7d795a58022693ed2eae30`
 - Full inventory CSV: `out/ops/lumencore_estate_file_inventory_latest.csv`
-- Full inventory CSV bytes: `35853884`
+- Full inventory CSV bytes: `35968015`
 - Scan errors recorded: `1`
 - Secret content indexed: `false`
 - Sensitive paths redacted from public payload: `true`
@@ -29,38 +29,38 @@ This is an audit and custody artifact. It does not claim a valuation, patent gra
 - Final submission without human: `false`
 - Legal/IP action without human: `false`
 - Live trading allowed: `false`
-- Estate index SHA-256: `7a6d9bfafbc4fee4e06e0456b7ece6d56e4b64efd5541762a8a2f839c099545c`
+- Estate index SHA-256: `dc7b1182cec754a2d44deec8539ee0626c3e6788c6a13d32485c8d8807cae5be`
 
 ## Asset Classes
 
 - `archive_asset`: `55`
-- `dashboard_or_frontend`: `2075`
-- `data_asset`: `9216`
-- `document_or_review_packet`: `22277`
-- `funding_submission_artifact`: `200`
-- `machine_output_or_ledger`: `64743`
+- `dashboard_or_frontend`: `2077`
+- `data_asset`: `9220`
+- `document_or_review_packet`: `22294`
+- `funding_submission_artifact`: `219`
+- `machine_output_or_ledger`: `64913`
 - `restricted_sensitive_metadata`: `102`
-- `source_code_or_automation`: `1473`
-- `structured_state_or_config`: `467`
-- `visual_media_asset`: `44`
-- `working_material`: `43`
+- `source_code_or_automation`: `1482`
+- `structured_state_or_config`: `471`
+- `visual_media_asset`: `76`
+- `working_material`: `105`
 
 ## Custody Tiers
 
-- `data_asset_hash_backed`: `9166`
-- `estate_inventory_hash_backed`: `2737`
+- `data_asset_hash_backed`: `9170`
+- `estate_inventory_hash_backed`: `2841`
 - `large_asset_metadata_hash_content_hash_deferred`: `57`
-- `machine_receipt_hash_backed`: `64737`
+- `machine_receipt_hash_backed`: `64907`
 - `restricted_private_metadata_only`: `102`
-- `reviewer_packet_public_safe_after_human_review`: `22423`
-- `source_code_audit_ready`: `1473`
+- `reviewer_packet_public_safe_after_human_review`: `22455`
+- `source_code_audit_ready`: `1482`
 
 ## Concept Registry
 
 ### live_source
 
-- File count: `30118`
-- Concept SHA-256: `afd1cbcef6afb6d2be69e947d731b3b58c47d54c22f4a56b6cf9a6ce9ee927d8`
+- File count: `30309`
+- Concept SHA-256: `1f0fe498bdc686ffabf2b0e891dde794a7869802ea19b390c6a1302b516fcf87`
 - Example paths:
   - `.deploy_stage/code/BUILD_ADAPTIVE_UNIVERSE_FROM_LIVE_KEYS.py`
   - `.deploy_stage/code/BUILD_APPROVED_SOURCE_BREADTH.py`
@@ -70,8 +70,8 @@ This is an audit and custody artifact. It does not claim a valuation, patent gra
 
 ### quant_trading
 
-- File count: `22514`
-- Concept SHA-256: `dfff0f7c65f7f61abbcb1a97bab1e65c37ee9930b4233912d73be13a52850e2e`
+- File count: `22521`
+- Concept SHA-256: `e4123c1060a37893244fec573490520075d54ac999abd8b51796ff3211e362eb`
 - Example paths:
   - `.deploy_stage/code/.multi_exchange_paper_ticker.lock`
   - `.deploy_stage/code/alpaca_paper_loop_builder.py`
@@ -81,8 +81,8 @@ This is an audit and custody artifact. It does not claim a valuation, patent gra
 
 ### agency_protocol
 
-- File count: `12797`
-- Concept SHA-256: `defe759797b6fd909333b81cafa114c65fe0c37dd445e4c8059d106641f281ac`
+- File count: `12874`
+- Concept SHA-256: `a66fbde1272f4932a628b1f7456abe9c583f23afb68e45d704c7e69df4fb9c28`
 - Example paths:
   - `.deploy_stage/code/execution/federal_brief_builder.py`
   - `.deploy_stage/code/execution/run_federal_brief.py`
@@ -92,8 +92,8 @@ This is an audit and custody artifact. It does not claim a valuation, patent gra
 
 ### proof_stack
 
-- File count: `12422`
-- Concept SHA-256: `105bd9f7ec1686d113df4b6c922f7a143d706931e81c4bb145f13a896109af83`
+- File count: `12431`
+- Concept SHA-256: `cd06242c95991f6c8d35cdd6b43a979e5f5e5b2500912031177ae2836320468b`
 - Example paths:
   - `.deploy_stage/code/ADVANCED_FLEET_VALIDATION.py`
   - `.deploy_stage/code/BUILD_AUDIT_GRADE_DERIVATION_PACK.py`
@@ -103,8 +103,8 @@ This is an audit and custody artifact. It does not claim a valuation, patent gra
 
 ### dashboard_ops
 
-- File count: `8320`
-- Concept SHA-256: `28c660c950685497f759b299c0fa284b546a53160952cc9318735a4087464e8d`
+- File count: `8356`
+- Concept SHA-256: `d17bf295ea68658b71c0c20a3ab54e48e30f472712a1297037e08c6db611890f`
 - Example paths:
   - `.deploy_stage/code/build_cold_case_dashboard.py`
   - `.deploy_stage/code/build_xinfit_dashboard.py`
@@ -114,8 +114,8 @@ This is an audit and custody artifact. It does not claim a valuation, patent gra
 
 ### infrastructure_energy
 
-- File count: `6731`
-- Concept SHA-256: `f0791a29cf9fe3470c391d2a7b38a2a4ca8bd389035ee1a7bda2e857c82a2709`
+- File count: `6753`
+- Concept SHA-256: `68e4822e4d8e41e576e60bd6b9bbbcc19c2f1423b70ffbfca525b80e2c7e00ea`
 - Example paths:
   - `.deploy_stage/code/institutional_harmonic_infrastructure.py`
   - `AUDIT_PACK/AUDIT_20260213T233823Z/03_DATACENTER_PILOT_PROPOSAL.txt`
@@ -125,8 +125,8 @@ This is an audit and custody artifact. It does not claim a valuation, patent gra
 
 ### ip_patent
 
-- File count: `4349`
-- Concept SHA-256: `84d6730446eb31eb77df32ef091aa672291489508c5c19fcb75606c59f2ba1e6`
+- File count: `4358`
+- Concept SHA-256: `c690222c35e2ac8f81d77b7a9a9ed00cefe643f57f09cdb46d77ca017dae435c`
 - Example paths:
   - `.deploy_stage/code/execution/cross_sector_intel_pipeline.py`
   - `.deploy_stage/code/execution/trade_log_duckdb_pipeline.py`
@@ -136,8 +136,8 @@ This is an audit and custody artifact. It does not claim a valuation, patent gra
 
 ### geometry_engine
 
-- File count: `1702`
-- Concept SHA-256: `3ffd522a299be35437171bd4a99e61dc29d010733184f3f65a805cbb470fb610`
+- File count: `1712`
+- Concept SHA-256: `bb91ccc4477cf3a265f51457fa5e4d45f985e039046677d30485c4246ae8a096`
 - Example paths:
   - `.deploy_stage/code/execution/harmonic_signal_connector.py`
   - `.deploy_stage/code/execution/institutional_harmonic_suite.py`

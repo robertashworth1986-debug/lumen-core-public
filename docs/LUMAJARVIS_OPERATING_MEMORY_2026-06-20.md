@@ -414,3 +414,75 @@ This ranking uses official-data access, measurable loss/exposure, current Luma e
 ### Next Highest-Value Action
 
 Freeze one grid protocol and secure aligned utility, ISO/RTO, or laboratory data plus an operator-approved native loss definition. Increase independent wave-card units before any further Kuramoto claim, and implement additional 140-family candidates only behind the frozen protocol rather than widening the registry language.
+
+## Continuity Checkpoint - 2026-07-13 Federal Sends, EIA Router, MDA, Patent Triage, and Vault
+
+### External Actions Completed
+
+- Army AIDP RFI #4 market-research feedback was sent and read back with the `SENT` label at `2026-07-13T21:27:05Z`.
+- NASA Data Center Infrastructure RFI response was sent and read back with the `SENT` label at `2026-07-13T21:27:12Z`.
+- The USPTO Pro Se Assistance Center request for urgent procedural help on application `19/281,546` was sent at `2026-07-13T21:27:19Z`.
+- Public machine receipt: `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json`.
+- Private patent send receipt remains under `C:\LumaTrader\PRIVATE_ESTATE\PATENT_19_281_546` and must not enter the public repository.
+
+Transmission is not agency acceptance, evaluation, validation, award, contract, patent relief, or deadline extension.
+
+### EIA Wave and Residual Results
+
+- The preregistered official EIA wave holdout rejected every wave candidate. Holdout MASE: AR ridge `0.479459`, EIA official forecast `0.569405`, Lissajous `1.253218`, Kuramoto `1.253509`, Firefly `1.253944`.
+- This falsifies promotion of the earlier synthetic Kuramoto result to an official grid-forecasting claim.
+- The separately preregistered residual lane selected XGBoost residual on development data only.
+- Holdout mean MASE: XGBoost residual `0.212112`, direct LightGBM `0.235871`, direct XGBoost `0.264246`, AR ridge `0.491378`, EIA official `0.579383`, seasonal naive `1.066175`.
+- The residual candidate beat all six aggregate baselines but failed the full champion gate because SWPP regressed versus AR beyond the predeclared worst-authority guardrail.
+
+### Prospective Hybrid Router
+
+- Exploratory historical authority routing produced mean MASE `0.196873` versus best fixed XGBoost residual `0.212112`, a relative improvement of `7.184%`.
+- This historical delta is design evidence only because the same window informed the route map.
+- The route protocol was frozen before future collection in commits `259dced` and `3130a9b`; implementation commit is `9a473cd`.
+- First allowed target date: `2026-07-14`.
+- A live dry-run read `14,711` EIA rows, sealed zero predictions, and correctly refused all already-observed targets.
+- Prediction and settlement ledgers are append-only hash chains; no backfill or post-target override is allowed.
+
+### AC Optimal Power Flow
+
+- `pandapower 3.4.0` AC OPF converged on case14, case30, case39, and case118 reference networks.
+- Protocol commit: `3ed26fd`.
+- Valid research targets are equivalent feasible objective with lower end-to-end time, better convergence under declared stress, high-recall constraint screening, or robust/stochastic performance under uncertainty.
+- Never claim a heuristic beats the accepted optimum under the same objective and constraints.
+
+### MDA Phase I Lane
+
+- Topic: `MDA26BZ04-NV007`, Universal Automated Control Assessment, Validation and Risk Correlation Platform.
+- Opens 2026-07-22; closes 2026-08-19 at noon Eastern under the current official files.
+- Conditional go: build the package, but do not claim current ACAS, SCAP, STIG, CVE-to-control, RMF, CMMC, MDA, CUI, classified, or air-gapped operational capability.
+- Package commit: `d7ed425`.
+- Current package includes the official source manifest, seven-volume DSIP map, 15-page technical-volume structure, capability boundary, and lawful-corpus benchmark plan.
+- Open gates include PI and personnel facts, a cyber/RMF reviewer, lawful representative scanner data, facilities, cost basis, foreign-affiliation form, FWA training, and corporate certification.
+
+### Patent Triage
+
+- Application: `19/281,546`; title: `LumenCore: A Modular AI Node Framework for Conscious Systems Integration`.
+- The saved payment receipt proves only fee code `3011`, basic filing fee, `$70.00`.
+- It does not prove that search, examination, oath/declaration, missing-parts, or later prosecution requirements were satisfied.
+- Do not infer a July 25, 2026 legal deadline from the filing anniversary.
+- The next required evidence is the full Patent Center correspondence, transaction history, status, fee history, and every notice or office action. Legal conclusions and deadline strategy require qualified counsel or official USPTO procedural assistance.
+
+### Custody and Verification
+
+- E-drive packet: `E:\LumaProofVault\LUMA_PROOF_VAULT_PACKET_20260713_SENT_ROUTING_MDA_V2`.
+- Artifact count: `120/120` ready and copied.
+- Destination hashes verified: `120/120`.
+- Manifest SHA-256: `DFCB65191959D4E7A7D2DD20A38396D468EFC6388A1C1AAFD5058B5A85B81597`.
+- Private patent custody is mirrored separately at `E:\LumaProofVault\PRIVATE_PATENT_19_281_546`.
+
+### Focused Verification
+
+- Prospective router, residual, wave, NASA renderer, external send receipt, near-deadline board, and external vault tests passed in focused runs.
+- The prospective/residual/wave/NASA set passed `15` tests.
+- Federal send receipt and board/NASA set passed `6` tests.
+- External vault suite passed `3` tests.
+
+### Next Highest-Value Action
+
+Collect the first eligible EIA prospective predictions before target-local midnight; retrieve the complete Patent Center correspondence; complete the MDA personnel, corpus, and cost gates; then build the NSF scientific-instrumentation Project Pitch and FHWA TSMO primary volume. Do not resend NASA or Army unless an agency asks for a replacement or clarification.
