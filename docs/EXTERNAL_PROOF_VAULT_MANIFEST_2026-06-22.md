@@ -1,6 +1,6 @@
 # Luma External Proof Vault Packet
 
-Generated UTC: `2026-07-13T21:51:45.290077+00:00`
+Generated UTC: `2026-07-13T21:54:14.620834+00:00`
 
 ## Purpose
 
@@ -10,8 +10,8 @@ Non-destructive staging manifest for high-value proof artifacts on external stor
 
 - Artifacts ready: `120/120`
 - Missing required: `0`
-- Ready bytes: `47248724`
-- Drive free bytes at staging time: `412884291584`
+- Ready bytes: `47408199`
+- Drive free bytes at staging time: `412836573184`
 - Packet ready: `true`
 
 ## Boundary
@@ -21,7 +21,7 @@ A proof vault is provenance and reproducibility infrastructure. It does not crea
 ## Included Artifacts
 
 - `AGENTS.md` -> `artifacts/continuity/AGENTS.md` | sha256 `2823fe08f87d5ae38abe3ccf21c4b716367c4a42fc9399b97ac2e0dd0e47e7ce`
-- `docs/LUMAJARVIS_OPERATING_MEMORY_2026-06-20.md` -> `artifacts/continuity/docs/LUMAJARVIS_OPERATING_MEMORY_2026-06-20.md` | sha256 `8d01d51ac25c4fc4449526c3150c58af129e05c6064f74978ab8760c7025d9dc`
+- `docs/LUMAJARVIS_OPERATING_MEMORY_2026-06-20.md` -> `artifacts/continuity/docs/LUMAJARVIS_OPERATING_MEMORY_2026-06-20.md` | sha256 `78643778a4efb555b8ce69ac43e49bf0eeb08adea8ef8454cd143060740beecd`
 - `docs/LUMAJARVIS_LEGENDARY_GOAL_PROMPT_2026-06-21.md` -> `artifacts/continuity/docs/LUMAJARVIS_LEGENDARY_GOAL_PROMPT_2026-06-21.md` | sha256 `be1b09f1850007820966039ba5bdf08965c9619f4812357a263c2b6e484cfaeb`
 - `docs/LUMA_CONTEXT_DASHBOARD_PARITY_AUDIT_2026-06-22.md` -> `artifacts/continuity/docs/LUMA_CONTEXT_DASHBOARD_PARITY_AUDIT_2026-06-22.md` | sha256 `361e741551948047990e75b5d20aa5ace0f5476e777e21f803ffe5bc3abee2ce`
 - `out/ops/luma_context_dashboard_parity_audit_latest.json` -> `artifacts/continuity/out/ops/luma_context_dashboard_parity_audit_latest.json` | sha256 `757fe628616e5d0a041e390abc18088b55ec672eb483b410d3571957098b7c20`
@@ -95,10 +95,10 @@ A proof vault is provenance and reproducibility infrastructure. It does not crea
 - `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_DSIP_ASSEMBLY_MAP_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_DSIP_ASSEMBLY_MAP_2026-07-13.md` | sha256 `e93ebfcc317663322c9a5fbb2ec60825ad09090bbff9b32501c9077cca3b6a9b`
 - `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_CURRENT_CAPABILITY_BOUNDARY_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_CURRENT_CAPABILITY_BOUNDARY_2026-07-13.md` | sha256 `e3d6e225b41e0856b8f336aa29800385f175d7071b1adfe84157c065ec9a6431`
 - `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_LAWFUL_CORPUS_AND_BENCHMARK_PLAN_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_LAWFUL_CORPUS_AND_BENCHMARK_PLAN_2026-07-13.md` | sha256 `a9edf476eba10786ce9348a1a3b28dda5fcdcb97d839c2539267a23fc77bf1f7`
-- `grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md` -> `artifacts/estate/grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md` | sha256 `56efcfddea55b56b343ce764067b9f0475fb2397e756119949a4ae0ced9f676a`
-- `out/ops/lumencore_estate_master_index_latest.json` -> `artifacts/estate/out/ops/lumencore_estate_master_index_latest.json` | sha256 `54a01a18f9ebafcdf545fb4cb5ad4723d92e8a744e2144fbf183d36bb840c60d`
-- `out/ops/lumencore_estate_master_index_manifest_latest.json` -> `artifacts/estate/out/ops/lumencore_estate_master_index_manifest_latest.json` | sha256 `0a359ef0b54b4edabca308136a703a89daa556ace448589a7dd094dfd77280c7`
-- `out/ops/lumencore_estate_file_inventory_latest.csv` -> `artifacts/estate/out/ops/lumencore_estate_file_inventory_latest.csv` | sha256 `a1d6f6a4cf27235613e2df09f031c194223e66979a12711d87f52b74b4937edb`
+- `grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md` -> `artifacts/estate/grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md` | sha256 `fdbd657b52ba01d1967011f21ec24249de0ad13a6f32dd3aa2f2919eb02ffe53`
+- `out/ops/lumencore_estate_master_index_latest.json` -> `artifacts/estate/out/ops/lumencore_estate_master_index_latest.json` | sha256 `e073a44231045764739b5d4e74c263f07f30b50b971566b0c812aa152f81a233`
+- `out/ops/lumencore_estate_master_index_manifest_latest.json` -> `artifacts/estate/out/ops/lumencore_estate_master_index_manifest_latest.json` | sha256 `91b081fc876494737c2556480dce2fe88bd2de89abc2a783d08b1e41678936af`
+- `out/ops/lumencore_estate_file_inventory_latest.csv` -> `artifacts/estate/out/ops/lumencore_estate_file_inventory_latest.csv` | sha256 `e5120993b8de75e3bf782fb4fe1d480e98e89041db7d795a58022693ed2eae30`
 - `code/geometry_time_series_model_routing_benchmark.py` -> `artifacts/reproducibility/code/geometry_time_series_model_routing_benchmark.py` | sha256 `02498261a4d7025905e912871cb40d4acd38d25b587e7369a73a1f738b5223d3`
 - `code/ops/BUILD_TOP_GEOMETRY_LIVE_REPLAY_RESULTS.py` -> `artifacts/reproducibility/code/ops/BUILD_TOP_GEOMETRY_LIVE_REPLAY_RESULTS.py` | sha256 `14868505c305ab455993c0680fe2f9925fb85920da9f8831867fca75765da708`
 - `code/ops/BUILD_LIVE_EVIDENCE_MAX_HARVEST.py` -> `artifacts/reproducibility/code/ops/BUILD_LIVE_EVIDENCE_MAX_HARVEST.py` | sha256 `ed20ebaa30ec34a18e18757201abe7fe90d2707ddeef8c79169b1eb4b47d9bf7`
