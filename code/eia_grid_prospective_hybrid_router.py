@@ -292,6 +292,9 @@ def latest_eligible_targets(
     panel: dict[str, Any], protocol: dict[str, Any], sealed_at: datetime
 ) -> tuple[dict[str, str], dict[str, str]]:
     series = series_by_authority(panel, protocol)
+    first_allowed = date.fromisoformat(
+        protocol["prospective_window"]["first_allowed_target_date"]
+    )
     selected: dict[str, str] = {}
     skipped: dict[str, str] = {}
     for respondent in protocol["balancing_authorities"]:
@@ -299,8 +302,9 @@ def latest_eligible_targets(
         official = series[respondent]["official"]
         reasons: Counter[str] = Counter()
         for target in sorted(official, reverse=True):
+            if date.fromisoformat(target) < first_allowed:
+                continue
             if target in actual:
-                reasons["actual_already_present"] += 1
                 continue
             eligible, reason = seal_eligibility(protocol, respondent, target, sealed_at)
             if not eligible:
@@ -309,7 +313,20 @@ def latest_eligible_targets(
             selected[respondent] = target
             break
         if respondent not in selected:
-            skipped[respondent] = reasons.most_common(1)[0][0] if reasons else "no_official_forecast"
+            eligible_window = [
+                target
+                for target in official
+                if date.fromisoformat(target) >= first_allowed
+            ]
+            unobserved = [target for target in eligible_window if target not in actual]
+            if reasons:
+                skipped[respondent] = reasons.most_common(1)[0][0]
+            elif not eligible_window:
+                skipped[respondent] = "no_official_forecast_on_or_after_first_allowed"
+            elif not unobserved:
+                skipped[respondent] = "no_unobserved_official_forecast"
+            else:
+                skipped[respondent] = "no_eligible_official_forecast"
     return selected, skipped
 
 

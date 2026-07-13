@@ -117,6 +117,29 @@ def test_latest_target_rejects_backfill_and_accepts_future_forecast():
     assert skipped == {}
 
 
+def test_latest_target_reports_no_unobserved_forecast_without_backfill():
+    module = load_module()
+    protocol = module.load_protocol(PROTOCOL_PATH)
+    panel = synthetic_panel(module, protocol)
+    for respondent in protocol["balancing_authorities"]:
+        panel["rows"].append(
+            {
+                "period": "2026-07-14",
+                "respondent": respondent,
+                "respondent_name": respondent,
+                "timezone": module.EIA_FACET_TIMEZONES[respondent],
+                "type": "D",
+                "type_name": "Demand",
+                "value": 2001.0,
+                "value_units": "megawatthours",
+            }
+        )
+    sealed_at = datetime(2026, 7, 13, 20, 0, tzinfo=timezone.utc)
+    selected, skipped = module.latest_eligible_targets(panel, protocol, sealed_at)
+    assert selected == {}
+    assert set(skipped.values()) == {"no_unobserved_official_forecast"}
+
+
 def test_append_only_hash_chain_detects_tampering(tmp_path):
     module = load_module()
     path = tmp_path / "chain.jsonl"
