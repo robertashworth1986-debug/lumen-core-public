@@ -1,0 +1,153 @@
+{
+  "schema": "mda_control_mapping_feasibility_protocol.v1",
+  "protocol_id": "MDA_CONTROL_MAPPING_SYNTHETIC_FEASIBILITY_20260713",
+  "version": 1,
+  "topic": "MDA26BZ04-NV007",
+  "prepared_date_utc": "2026-07-13",
+  "status": "preregistered_before_candidate_execution",
+  "purpose": "Test parser, provenance, control-correlation, confidence, abstention, and hybrid-routing mechanics on deterministic synthetic fixtures before seeking lawful representative ACAS or SCAP artifacts.",
+  "evidence_class": "synthetic_conformance_and_feasibility_only",
+  "random_seed": 20260713,
+  "fixture_contract": {
+    "total_records": 96,
+    "development_records": 48,
+    "validation_records": 24,
+    "blind_holdout_records": 24,
+    "split_rule": "Deterministic stratified assignment by archetype using the frozen seed; holdout labels are not used for threshold selection.",
+    "source_kinds": [
+      "synthetic_acas_like",
+      "synthetic_scap_like"
+    ],
+    "control_ids": [
+      "AC-2",
+      "AU-6",
+      "CM-6",
+      "IA-5",
+      "RA-5",
+      "SC-7",
+      "SI-2",
+      "SI-3"
+    ],
+    "archetypes": [
+      {
+        "id": "account_management",
+        "expected_controls": ["AC-2"],
+        "tokens": ["account", "disable", "inactive", "privilege", "identity"]
+      },
+      {
+        "id": "audit_review",
+        "expected_controls": ["AU-6"],
+        "tokens": ["audit", "log", "review", "correlation", "event"]
+      },
+      {
+        "id": "configuration_settings",
+        "expected_controls": ["CM-6"],
+        "tokens": ["configuration", "setting", "baseline", "harden", "parameter"]
+      },
+      {
+        "id": "authenticator_management",
+        "expected_controls": ["IA-5"],
+        "tokens": ["password", "authenticator", "credential", "rotate", "secret"]
+      },
+      {
+        "id": "vulnerability_scanning",
+        "expected_controls": ["RA-5"],
+        "tokens": ["vulnerability", "scan", "cve", "remediation", "assessment"]
+      },
+      {
+        "id": "boundary_protection",
+        "expected_controls": ["SC-7"],
+        "tokens": ["boundary", "firewall", "network", "ingress", "egress"]
+      },
+      {
+        "id": "flaw_remediation",
+        "expected_controls": ["SI-2"],
+        "tokens": ["patch", "flaw", "update", "remediate", "software"]
+      },
+      {
+        "id": "malicious_code",
+        "expected_controls": ["SI-3"],
+        "tokens": ["malware", "antivirus", "malicious", "quarantine", "signature"]
+      }
+    ],
+    "ambiguous_fraction": 0.1666666667,
+    "unsupported_fraction": 0.0833333333,
+    "noise_tokens_per_record": 3,
+    "prohibited_fixture_claim": "Synthetic records are not ACAS, Nessus, SCAP, STIG, MDA, CUI, classified, or operational assessment evidence."
+  },
+  "record_contract": {
+    "required_fields": [
+      "fixture_id",
+      "source_kind",
+      "source_record_sha256",
+      "parser_version",
+      "finding_id",
+      "title",
+      "description",
+      "references",
+      "expected_controls",
+      "label_status",
+      "split"
+    ],
+    "provenance_completeness_target": 1.0,
+    "invalid_input_policy": "Reject malformed required fields and record the failure; never silently coerce a missing control label."
+  },
+  "baselines": [
+    {
+      "id": "static_identifier_crosswalk",
+      "definition": "Map only explicit frozen synthetic identifiers to controls; abstain when no identifier is registered."
+    },
+    {
+      "id": "tfidf_lexical_retrieval",
+      "definition": "Fit TF-IDF control prototypes on development text only and return the highest-cosine control above a threshold selected on validation data."
+    }
+  ],
+  "candidate": {
+    "id": "hybrid_static_then_lexical_v1",
+    "definition": "Use the static route when a registered identifier has an exact mapping; otherwise use TF-IDF retrieval above the frozen validation-selected threshold; otherwise abstain.",
+    "router_priority": [
+      "static_identifier_crosswalk",
+      "tfidf_lexical_retrieval",
+      "abstain"
+    ],
+    "threshold_grid": [0.2, 0.3, 0.4, 0.5, 0.6],
+    "threshold_selection_metric": "validation_macro_f1_with_unsupported_mapping_rate_tiebreak",
+    "post_holdout_change_allowed": false
+  },
+  "metrics": {
+    "primary": "micro_f1_over_supported_control_labels",
+    "secondary": [
+      "macro_f1",
+      "exact_set_match",
+      "precision",
+      "recall",
+      "coverage",
+      "abstention_rate",
+      "unsupported_mapping_rate",
+      "provenance_completeness",
+      "parser_rejection_count"
+    ]
+  },
+  "promotion_gates": {
+    "parser_conformance_rate": 1.0,
+    "provenance_completeness": 1.0,
+    "minimum_holdout_coverage": 0.8,
+    "maximum_holdout_unsupported_mapping_rate": 0.02,
+    "minimum_micro_f1_delta_over_best_baseline": 0.05,
+    "all_baselines_required": true,
+    "negative_results_retained": true,
+    "operational_or_field_claim_allowed": false
+  },
+  "required_outputs": [
+    "fixture_manifest",
+    "split_manifest",
+    "full_predictions",
+    "per_strategy_metrics",
+    "threshold_selection_receipt",
+    "failure_and_abstention_log",
+    "artifact_chain_manifest",
+    "claim_boundary"
+  ],
+  "next_evidence_gate": "Rerun the frozen protocol on lawfully obtained representative artifacts with a qualified cyber and RMF reviewer and an independently held blind set.",
+  "claim_boundary": "A passing result supports synthetic software conformance and feasibility only. It does not establish operational ACAS or SCAP parsing, authoritative STIG or CVE mapping, NIST or RMF compliance, CMMC status, MDA validation, field performance, labor savings, production readiness, or authorization to operate."
+}
