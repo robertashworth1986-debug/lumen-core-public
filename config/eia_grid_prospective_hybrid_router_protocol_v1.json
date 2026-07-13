@@ -48,6 +48,16 @@
     "SWPP",
     "TVA"
   ],
+  "authority_timezones": {
+    "CISO": "America/Los_Angeles",
+    "ERCO": "America/Chicago",
+    "ISNE": "America/New_York",
+    "MISO": "America/Chicago",
+    "NYIS": "America/New_York",
+    "PJM": "America/New_York",
+    "SWPP": "America/Chicago",
+    "TVA": "America/Chicago"
+  },
   "specialists": [
     {
       "id": "xgboost_residual",
@@ -97,6 +107,8 @@
   "prediction_seal": {
     "require_target_official_forecast": true,
     "require_target_actual_absent_at_seal": true,
+    "require_sealed_before_target_local_midnight": true,
+    "late_or_backfilled_target_rule": "Skip the target and record the reason. Never create a scored prediction after target-local midnight.",
     "required_fields": [
       "target_date",
       "respondent",
