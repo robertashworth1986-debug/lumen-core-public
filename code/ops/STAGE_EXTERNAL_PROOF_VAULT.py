@@ -317,14 +317,20 @@ def write_packet_manifest(manifest: dict[str, Any]) -> None:
     write_text(packet_dir / "manifest.sha256.txt", "\n".join(sha_lines))
 
 
-def stage_vault(target_root: Path, package_name: str | None = None, copy_files: bool = True) -> dict[str, Any]:
+def stage_vault(
+    target_root: Path,
+    package_name: str | None = None,
+    copy_files: bool = True,
+    write_local_receipts: bool = True,
+) -> dict[str, Any]:
     target_root.mkdir(parents=True, exist_ok=True)
     manifest = build_manifest(target_root=target_root, package_name=package_name)
     if copy_files:
         manifest = copy_artifacts(manifest)
     write_packet_manifest(manifest)
-    write_json(LOCAL_MANIFEST, manifest)
-    write_text(LOCAL_MD, render_readme(manifest))
+    if write_local_receipts:
+        write_json(LOCAL_MANIFEST, manifest)
+        write_text(LOCAL_MD, render_readme(manifest))
     return manifest
 
 

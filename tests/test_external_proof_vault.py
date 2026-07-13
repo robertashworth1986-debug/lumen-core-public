@@ -56,7 +56,14 @@ def test_manifest_selects_high_value_proof_artifacts_without_moving_sources(tmp_
 
 def test_stage_vault_copies_and_hash_verifies_to_temp_packet(tmp_path):
     module = load_module()
-    manifest = module.stage_vault(tmp_path, package_name="TEST_PACKET", copy_files=True)
+    local_manifest_before = module.LOCAL_MANIFEST.read_bytes() if module.LOCAL_MANIFEST.exists() else None
+    local_markdown_before = module.LOCAL_MD.read_bytes() if module.LOCAL_MD.exists() else None
+    manifest = module.stage_vault(
+        tmp_path,
+        package_name="TEST_PACKET",
+        copy_files=True,
+        write_local_receipts=False,
+    )
 
     packet_dir = Path(manifest["packet_dir"])
     assert (packet_dir / "manifest.json").exists()
@@ -67,6 +74,10 @@ def test_stage_vault_copies_and_hash_verifies_to_temp_packet(tmp_path):
 
     queue_copy = packet_dir / "artifacts" / "geometry" / "out" / "ops" / "geometry_live_breadth_proof_queue_latest.json"
     assert queue_copy.exists()
+    if local_manifest_before is not None:
+        assert module.LOCAL_MANIFEST.read_bytes() == local_manifest_before
+    if local_markdown_before is not None:
+        assert module.LOCAL_MD.read_bytes() == local_markdown_before
 
 def test_external_drive_intake_scores_proof_tokens_without_path_mangling(tmp_path):
     module = load_intake_module()
