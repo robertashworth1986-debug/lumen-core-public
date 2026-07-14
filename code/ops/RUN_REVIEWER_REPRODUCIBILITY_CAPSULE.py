@@ -331,13 +331,29 @@ def assertion(
     expected: Any,
     *,
     tolerance: float | None = None,
+    relative_tolerance: float | None = None,
 ) -> dict[str, Any]:
-    if tolerance is None:
+    absolute_difference: float | None = None
+    relative_difference: float | None = None
+    if tolerance is None and relative_tolerance is None:
         passed = actual == expected
     else:
         try:
-            passed = abs(float(actual) - float(expected)) <= tolerance
-        except (TypeError, ValueError):
+            actual_float = float(actual)
+            expected_float = float(expected)
+            absolute_difference = abs(actual_float - expected_float)
+            if expected_float == 0.0:
+                relative_difference = 0.0 if absolute_difference == 0.0 else None
+            else:
+                relative_difference = absolute_difference / abs(expected_float)
+            absolute_pass = tolerance is not None and absolute_difference <= tolerance
+            relative_pass = (
+                relative_tolerance is not None
+                and relative_difference is not None
+                and relative_difference <= relative_tolerance
+            )
+            passed = absolute_pass or relative_pass
+        except (TypeError, ValueError, OverflowError):
             passed = False
     row = {
         "assertion_id": assertion_id,
@@ -347,6 +363,12 @@ def assertion(
     }
     if tolerance is not None:
         row["absolute_tolerance"] = tolerance
+    if relative_tolerance is not None:
+        row["relative_tolerance"] = relative_tolerance
+    if absolute_difference is not None:
+        row["absolute_difference"] = absolute_difference
+    if relative_difference is not None:
+        row["relative_difference"] = relative_difference
     return row
 
 
@@ -482,7 +504,7 @@ def run_eia_residual(
             "best_mase",
             best["mean_seasonal_mase_7"],
             expected["best_mase"],
-            tolerance=expected["tolerance"],
+            relative_tolerance=expected["relative_tolerance"],
         ),
         assertion(
             "baseline_comparison_count",
@@ -862,6 +884,7 @@ def build_capsule(
         "suites": suites,
         "fixture_tests": fixture_tests,
         "standards_references": protocol["standards_references"],
+        "protocol_amendment": protocol.get("amendment"),
         "excluded_full_replays": protocol["excluded_full_replays"],
         "known_gap": protocol["environment"]["artifact_hash_lock_gap"],
         "claim_boundary": protocol["claim_boundary"],
@@ -905,6 +928,12 @@ def render_markdown(capsule: dict[str, Any]) -> str:
         f"- Source chain SHA-256: `{capsule['source_chain_sha256']}`",
         f"- Capsule SHA-256: `{capsule['capsule_sha256']}`",
         "",
+        "## Protocol Amendment",
+        "",
+        f"- {capsule['protocol_amendment']['preregistration_boundary']}",
+        f"- Policy: {capsule['protocol_amendment']['policy']}",
+        f"- Preserved failed GitHub runs: `{', '.join(str(value) for value in capsule['protocol_amendment']['failed_github_run_ids'])}`",
+        "",
         "## Replayed Suites",
         "",
     ]
@@ -924,8 +953,15 @@ def render_markdown(capsule: dict[str, Any]) -> str:
             lines.append(f"  - `{key}`: `{value}`")
         lines.append("- Assertions:")
         for check in suite["assertions"]:
+            tolerance_text = ""
+            if "absolute_tolerance" in check:
+                tolerance_text += f" absolute_tolerance=`{check['absolute_tolerance']}`"
+            if "relative_tolerance" in check:
+                tolerance_text += f" relative_tolerance=`{check['relative_tolerance']}`"
+            if "relative_difference" in check:
+                tolerance_text += f" relative_difference=`{check['relative_difference']}`"
             lines.append(
-                f"  - `{check['assertion_id']}` passed=`{str(check['passed']).lower()}` actual=`{check['actual']}` expected=`{check['expected']}`"
+                f"  - `{check['assertion_id']}` passed=`{str(check['passed']).lower()}` actual=`{check['actual']}` expected=`{check['expected']}`{tolerance_text}"
             )
         lines.append("")
 

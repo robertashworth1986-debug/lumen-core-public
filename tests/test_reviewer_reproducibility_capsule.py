@@ -48,6 +48,14 @@ def test_protocol_is_frozen_version_pinned_and_claim_bounded():
         in protocol["excluded_full_replays"][2]["reason"]
     )
     assert "TO_BE_FROZEN" not in json.dumps(protocol)
+    assert protocol["amendment"]["failed_github_run_ids"] == [
+        29335084468,
+        29335574945,
+    ]
+    assert "post-observation" in protocol["amendment"]["preregistration_boundary"]
+    residual = next(row for row in protocol["suites"] if row["runner"] == "eia_residual")
+    assert residual["expected"]["relative_tolerance"] == 0.01
+    assert "tolerance" not in residual["expected"]
 
     pins = {
         line.split("==", 1)[0]: line.split("==", 1)[1]
@@ -122,6 +130,15 @@ def test_failed_suite_receipt_is_bounded_and_redacts_local_paths():
     assert "C:\\Users" not in receipt["error"]["message"]
     assert receipt["fact_projection_sha256"] == module.canonical_sha256({})
 
+    portability = module.assertion(
+        "portable_metric",
+        0.2112062642583228,
+        0.21211186326437864,
+        relative_tolerance=0.01,
+    )
+    assert portability["passed"] is True
+    assert portability["relative_difference"] < portability["relative_tolerance"]
+
 
 def test_published_receipt_reconciles_hashes_assertions_and_public_projection():
     module = load_module()
@@ -144,6 +161,9 @@ def test_published_receipt_reconciles_hashes_assertions_and_public_projection():
     assert receipt["summary"]["artifact_hash_lock_complete"] is False
     assert receipt["summary"]["external_validation_complete"] is False
     assert receipt["summary"]["agency_certification_complete"] is False
+    assert "post-observation" in receipt["protocol_amendment"][
+        "preregistration_boundary"
+    ]
     if receipt["summary"]["fixture_tests_executed"]:
         assert receipt["summary"]["fixture_tests_passed"] is True
     assert receipt["privacy_scan"] == {
@@ -215,5 +235,8 @@ def test_markdown_reports_failures_and_unmet_external_gates_plainly():
     assert "Deterministic environment matched: `true`" in rendered
     assert "Fixture tests executed: `" in rendered
     assert "Fixture tests passed: `" in rendered
+    assert "## Protocol Amendment" in rendered
+    assert "post-observation" in rendered
+    assert "relative_tolerance=`0.01`" in rendered
     assert "not a complete product SBOM" in rendered
     assert "about 114 MB" in rendered

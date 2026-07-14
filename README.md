@@ -121,6 +121,8 @@ python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests
 
 The corresponding GitHub Actions workflow runs on a clean Ubuntu runner with read-only repository permissions and publishes the receipt, logs, SBOM, and SHA-256 checksum list as a workflow artifact. Start with [`REVIEWER_REPRODUCIBILITY_CAPSULE_2026-07-14.md`](docs/REVIEWER_REPRODUCIBILITY_CAPSULE_2026-07-14.md) and the frozen protocol in [`reviewer_reproducibility_protocol_v1.json`](config/reviewer_reproducibility_protocol_v1.json).
 
+The protocol preserves two failed clean-runner attempts. The second passed 30/31 assertions and exposed a 0.4269% XGBoost CPU-platform MASE drift while preserving champion identity, coverage, comparison count, and gate outcomes. A disclosed post-observation amendment now allows at most 1% relative drift for that metric only; all structural and decision assertions remain exact, and each receipt keeps the exact measured value.
+
 This capsule does not bundle the roughly 114 MB FAA SDR source corpus or the wider local/private source universe. Dependency versions are exact-pinned, but cross-platform wheel and source-distribution hashes are not yet fully locked. A green CI run is software reproducibility evidence, not independent scientific validation, security certification, agency approval, or field performance.
 
 ## Reviewer Path
