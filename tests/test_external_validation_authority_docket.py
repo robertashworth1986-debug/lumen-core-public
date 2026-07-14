@@ -141,10 +141,18 @@ def test_current_docket_is_integrity_ready_but_keeps_level_5_closed():
     assert summary["external_validation_complete"] is False
     assert summary["independent_evaluator_named"] is False
     assert summary["ready_to_invite_independent_evaluator"] is True
+    assert summary["evaluator_acceptance_template_ready"] is True
     assert summary["agency_certification_complete"] is False
     assert summary["field_validation_complete"] is False
     assert summary["realized_savings_claim_allowed"] is False
     assert payload["evaluator_acceptance"]["complete"] is False
+    package = payload["evaluator_acceptance_package"]
+    assert package["template_ready"] is True
+    assert package["external_identity_verified"] is False
+    assert package["evaluator_independence_verified"] is False
+    assert package["result_signoff_complete"] is False
+    assert package["level_5_promotion_allowed"] is False
+    assert all(package["checks"].values())
     assert all(
         value is None
         for key, value in payload["evaluator_acceptance"].items()
@@ -185,4 +193,6 @@ def test_published_docket_and_markdown_reconcile_without_overclaiming():
     assert "Current supported level: `3`" in rendered
     assert "Level 5 gate passed: `false`" in rendered
     assert "External validation complete: `false`" in rendered
+    assert "Evaluator acceptance template ready: `true`" in rendered
+    assert "Level 5 promotion allowed: `false`" in rendered
     assert "not a NIST certification" in rendered

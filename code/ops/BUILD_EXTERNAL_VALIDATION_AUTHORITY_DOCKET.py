@@ -110,6 +110,70 @@ def artifact_row(path: Path, *, root: Path = ROOT) -> dict[str, Any]:
     }
 
 
+def project_acceptance_package(
+    config: dict[str, Any], *, root: Path = ROOT
+) -> dict[str, Any]:
+    package = config["evaluator_acceptance_package"]
+    template_path = root / package["template_path"]
+    validator_path = root / package["validator_path"]
+    handoff_path = root / package["handoff_path"]
+    template = read_json(template_path)
+    evaluator = template.get("evaluator") or {}
+    acceptance = template.get("acceptance") or {}
+    signature = template.get("signature") or {}
+    checks = {
+        "schema_matched": template.get("schema") == package["expected_schema"],
+        "protocol_id_matched": template.get("protocol_id")
+        == config["protocol_id"],
+        "lane_id_matched": template.get("evidence_lane_id")
+        == config["evidence_lane"]["lane_id"],
+        "accepted_hashes_blank": template.get("accepted_protocol_sha256") is None
+        and template.get("accepted_docket_sha256") is None,
+        "evaluator_fields_blank": bool(evaluator)
+        and all(value is None for value in evaluator.values()),
+        "acceptance_fields_blank": bool(acceptance)
+        and all(value is None for value in acceptance.values()),
+        "signature_fields_blank": bool(signature)
+        and all(value is None for value in signature.values()),
+        "operator_substitution_prohibited": template.get(
+            "operator_may_fill_evaluator_fields"
+        )
+        is False
+        and package["operator_may_fill_evaluator_fields"] is False,
+        "level_5_auto_promotion_prohibited": template.get(
+            "level_5_auto_promotion_allowed"
+        )
+        is False
+        and package["level_5_auto_promotion_allowed"] is False,
+        "validator_present": validator_path.is_file(),
+        "handoff_present": handoff_path.is_file(),
+    }
+    return {
+        **package,
+        "template_ready": all(checks.values()),
+        "checks": checks,
+        "template_artifact": artifact_row(template_path, root=root),
+        "validator_artifact": artifact_row(validator_path, root=root),
+        "handoff_artifact": artifact_row(handoff_path, root=root),
+        "template_state": "UNSIGNED_EVALUATOR_TEMPLATE",
+        "external_identity_verified": False,
+        "evaluator_independence_verified": False,
+        "result_signoff_complete": False,
+        "level_5_promotion_allowed": False,
+        "validator_command": (
+            "python code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py "
+            "--expect-template"
+        ),
+        "claim_boundary": (
+            "The acceptance package verifies blank-template custody and can "
+            "validate completed-record structure and supplied artifact hashes. "
+            "It does not authenticate an evaluator, establish independence or "
+            "legal authority, interpret a signature, complete result signoff, "
+            "or authorize Level 5 promotion."
+        ),
+    }
+
+
 def parse_checksum_manifest(manifest_path: Path) -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
     for line_number, line in enumerate(
@@ -361,6 +425,7 @@ def build_payload(
     ci_bundle = verify_ci_bundle(archive_dir, config, root=root)
     runtime_path = root / lane["runtime_status_path"]
     runtime = project_runtime_status(runtime_path, protocol_sha256)
+    acceptance_package = project_acceptance_package(config, root=root)
 
     source_paths = [
         config_path,
@@ -401,6 +466,7 @@ def build_payload(
         bool(ci_bundle.get("verified"))
         and all(protocol_identity.values())
         and runtime_protocol_identity_passed
+        and acceptance_package["template_ready"]
     )
     status = derive_status(
         integrity_passed=integrity_passed,
@@ -430,6 +496,9 @@ def build_payload(
             ],
             "independent_evaluator_named": False,
             "ready_to_invite_independent_evaluator": integrity_passed,
+            "evaluator_acceptance_template_ready": acceptance_package[
+                "template_ready"
+            ],
             "agency_certification_complete": False,
             "field_validation_complete": False,
             "realized_savings_claim_allowed": False,
@@ -448,12 +517,15 @@ def build_payload(
         "maturity": maturity,
         "maturity_gates": config["maturity_gates"],
         "evaluator_acceptance": evaluator_acceptance,
+        "evaluator_acceptance_package": acceptance_package,
         "evaluator_authority_contract": config["evaluator_authority_contract"],
         "reviewer_decision_request": config["reviewer_decision_request"],
         "reviewer_handoff_steps": [
             "Rehash every portable input and every archived clean-runner artifact.",
             "Review the frozen EIA protocol before inspecting prospective outcomes.",
-            "Complete identity, authority, and conflict-of-interest fields without operator substitution.",
+            "Copy the blank evaluator-owned acceptance receipt outside the public repository.",
+            "Complete identity, authority, conflict, attestation, and signature-artifact fields without operator substitution.",
+            "Run the fail-closed acceptance validator and preserve only a private or redacted hash receipt by default.",
             "Observe prediction seals and settlements through the agreed evaluation window.",
             "Inspect all routes, fallbacks, exclusions, negative results, and chain-verification events.",
             "Independently reproduce the final metric and statistical decision.",
@@ -502,6 +574,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Level 5 gate passed: `{str(summary['level_5_gate_passed']).lower()}`",
         f"- External validation complete: `{str(summary['external_validation_complete']).lower()}`",
         f"- Independent evaluator named: `{str(summary['independent_evaluator_named']).lower()}`",
+        f"- Evaluator acceptance template ready: `{str(summary['evaluator_acceptance_template_ready']).lower()}`",
         f"- Clean-runner bundle verified: `{str(summary['clean_runner_bundle_verified']).lower()}`",
         f"- Predictions sealed: `{summary['prediction_count']}`",
         f"- Settlements recorded: `{summary['settlement_count']}`",
@@ -513,6 +586,24 @@ def render_markdown(payload: dict[str, Any]) -> str:
     ]
     for index, step in enumerate(payload["reviewer_handoff_steps"], start=1):
         lines.append(f"{index}. {step}")
+    acceptance_package = payload["evaluator_acceptance_package"]
+    lines.extend(
+        [
+            "",
+            "## Acceptance Package",
+            "",
+            f"- Blank template: `{acceptance_package['template_path']}`",
+            f"- Template SHA-256: `{acceptance_package['template_artifact']['sha256']}`",
+            f"- Validator: `{acceptance_package['validator_path']}`",
+            f"- Handoff guide: `{acceptance_package['handoff_path']}`",
+            f"- Template ready: `{str(acceptance_package['template_ready']).lower()}`",
+            f"- External identity verified: `{str(acceptance_package['external_identity_verified']).lower()}`",
+            f"- Level 5 promotion allowed: `{str(acceptance_package['level_5_promotion_allowed']).lower()}`",
+            f"- Template check: `{acceptance_package['validator_command']}`",
+            "",
+            acceptance_package["claim_boundary"],
+        ]
+    )
     lines.extend(["", "## Maturity Gates", ""])
     level_4 = payload["maturity_gates"]["level_4"]
     level_5 = payload["maturity_gates"]["level_5"]

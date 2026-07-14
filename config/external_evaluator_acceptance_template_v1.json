@@ -1,0 +1,36 @@
+{
+  "schema": "external_evaluator_acceptance_receipt.v1",
+  "template_version": 1,
+  "protocol_id": "LUMENCORE_EIA_EXTERNAL_VALIDATION_AUTHORITY_20260714",
+  "evidence_lane_id": "eia_grid_prospective_hybrid_router",
+  "accepted_protocol_sha256": null,
+  "accepted_docket_sha256": null,
+  "evaluator": {
+    "name": null,
+    "organization": null,
+    "technical_role": null,
+    "authority_to_review": null,
+    "contact_channel": null,
+    "conflict_of_interest_disclosure": null,
+    "authority_evidence_sha256": null
+  },
+  "acceptance": {
+    "accepted_utc": null,
+    "decision": null,
+    "evaluation_scope": null,
+    "operator_filled_evaluator_fields": null,
+    "will_rehash_portable_inputs": null,
+    "will_review_negative_results": null,
+    "will_reject_backfill_or_post_target_changes": null,
+    "will_sign_only_supported_maturity_level": null
+  },
+  "signature": {
+    "method": null,
+    "signed_payload_sha256": null,
+    "detached_signature_artifact_sha256": null
+  },
+  "operator_may_fill_evaluator_fields": false,
+  "level_5_auto_promotion_allowed": false,
+  "privacy_rule": "Keep completed identity and contact fields evaluator-controlled or in the private proof vault unless the evaluator explicitly authorizes publication. Publish only a redacted receipt or its hash by default.",
+  "claim_boundary": "A completed receipt can bind an evaluator-supplied record to frozen protocol, docket, authority-evidence, and signature-artifact hashes. It does not prove evaluator identity, independence, legal authority, signature semantics, result validity, field performance, or agency approval, and it does not authorize Level 5 promotion."
+}

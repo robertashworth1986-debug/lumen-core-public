@@ -6,22 +6,30 @@ on:
     paths:
       - ".github/workflows/external-validation-docket.yml"
       - "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py"
+      - "code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py"
       - "config/external_validation_authority_docket_v1.json"
+      - "config/external_evaluator_acceptance_template_v1.json"
       - "config/eia_grid_prospective_hybrid_router_protocol_v1.json"
+      - "docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md"
       - "docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md"
       - "evidence/external_validation/**"
       - "evidence/reproducibility/github_run_29337177292/**"
       - "tests/test_external_validation_authority_docket.py"
+      - "tests/test_external_evaluator_acceptance.py"
   push:
     paths:
       - ".github/workflows/external-validation-docket.yml"
       - "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py"
+      - "code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py"
       - "config/external_validation_authority_docket_v1.json"
+      - "config/external_evaluator_acceptance_template_v1.json"
       - "config/eia_grid_prospective_hybrid_router_protocol_v1.json"
+      - "docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md"
       - "docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md"
       - "evidence/external_validation/**"
       - "evidence/reproducibility/github_run_29337177292/**"
       - "tests/test_external_validation_authority_docket.py"
+      - "tests/test_external_evaluator_acceptance.py"
 
 permissions:
   contents: read
@@ -53,5 +61,6 @@ jobs:
 
       - name: Verify the archived clean-runner bundle and authority gates
         run: |
+          python code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py --expect-template
           python code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py --check-only
-          python -m pytest -q tests/test_external_validation_authority_docket.py
+          python -m pytest -q tests/test_external_evaluator_acceptance.py tests/test_external_validation_authority_docket.py
