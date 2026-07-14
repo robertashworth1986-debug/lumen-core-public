@@ -202,8 +202,24 @@ def test_published_receipt_reconciles_hashes_assertions_and_public_projection():
     for path_text, artifact in artifacts.items():
         path = ROOT / path_text
         assert path.is_file()
-        assert path.stat().st_size == artifact["bytes"]
-        assert module.file_sha256(path) == artifact["sha256"]
+        content = module.portable_file_bytes(path, artifact["hash_mode"])
+        assert len(content) == artifact["bytes"]
+        assert module.hashlib.sha256(content).hexdigest() == artifact["sha256"]
+
+
+def test_portable_source_hash_normalizes_text_but_preserves_binary(tmp_path):
+    module = load_module()
+    text_path = tmp_path / "portable.py"
+    text_path.write_bytes(b"alpha\r\nbeta\r\n")
+    windows_bytes = module.portable_file_bytes(text_path)
+    text_path.write_bytes(b"alpha\nbeta\n")
+    linux_bytes = module.portable_file_bytes(text_path)
+
+    binary_path = tmp_path / "frozen.json.gz"
+    binary_path.write_bytes(b"\x1f\x8b\r\n\x00")
+
+    assert windows_bytes == linux_bytes == b"alpha\nbeta\n"
+    assert module.portable_file_bytes(binary_path) == b"\x1f\x8b\r\n\x00"
 
 
 def test_sbom_has_scoped_component_identity_and_dependency_relationships():

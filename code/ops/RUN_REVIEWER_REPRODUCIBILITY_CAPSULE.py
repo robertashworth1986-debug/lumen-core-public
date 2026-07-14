@@ -51,6 +51,18 @@ PRIVATE_PATTERNS = (
     ),
 )
 
+BINARY_SOURCE_SUFFIXES = {
+    ".7z",
+    ".gz",
+    ".jpeg",
+    ".jpg",
+    ".pdf",
+    ".png",
+    ".tar",
+    ".tgz",
+    ".zip",
+}
+
 
 def now_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -70,6 +82,19 @@ def file_sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def portable_file_bytes(path: Path, hash_mode: str | None = None) -> bytes:
+    raw = path.read_bytes()
+    mode = hash_mode or (
+        "raw" if path.suffix.lower() in BINARY_SOURCE_SUFFIXES else "utf8_lf"
+    )
+    if mode == "raw":
+        return raw
+    if mode != "utf8_lf":
+        raise ValueError(f"unsupported portable hash mode: {mode}")
+    text = raw.decode("utf-8")
+    return text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -149,11 +174,16 @@ def source_artifacts(
             raise FileNotFoundError(
                 f"required capsule artifact is missing: {repo_path(path)}"
             )
+        hash_mode = (
+            "raw" if path.suffix.lower() in BINARY_SOURCE_SUFFIXES else "utf8_lf"
+        )
+        content = portable_file_bytes(path, hash_mode)
         artifacts.append(
             {
                 "path": repo_path(path),
-                "bytes": path.stat().st_size,
-                "sha256": file_sha256(path),
+                "hash_mode": hash_mode,
+                "bytes": len(content),
+                "sha256": hashlib.sha256(content).hexdigest(),
             }
         )
     return artifacts
