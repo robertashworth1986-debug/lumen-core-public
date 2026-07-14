@@ -1,0 +1,59 @@
+{
+  "claim_boundary": "This is a local baseline-execution receipt on public IEEE-style fixtures. It does not show that LumenCore beats an optimum, improves a utility operation, creates savings, or is field validated.",
+  "environment": {
+    "numpy": "2.3.5",
+    "pandapower": "3.4.0",
+    "scipy": "1.16.3",
+    "solver": "pandapower.runopp / PYPOWER AC OPF"
+  },
+  "equation": "min sum_g C_g(P_g), subject to AC power balance and declared voltage, generator, and branch limits",
+  "generated_utc": "2026-07-14T10:31:08.091973+00:00",
+  "protocol": "config/ieee_acopf_routing_protocol_v1.json",
+  "purpose": "Verify that the unchanged nonlinear AC-OPF reference engine executes locally before candidate routing.",
+  "receipt_sha256": "989cafe22073816df0b7729e47afbd9592328a38266734b534109d730f513bf0",
+  "results": [
+    {
+      "bus_count": 14,
+      "converged": true,
+      "line_count": 15,
+      "network": "case14",
+      "reported_objective": 8081.526614,
+      "wall_seconds": 0.811138
+    },
+    {
+      "bus_count": 30,
+      "converged": true,
+      "line_count": 41,
+      "network": "case30",
+      "reported_objective": 578.486251,
+      "wall_seconds": 0.190643
+    },
+    {
+      "bus_count": 39,
+      "converged": true,
+      "line_count": 35,
+      "network": "case39",
+      "reported_objective": 41872.302574,
+      "wall_seconds": 0.268826
+    },
+    {
+      "bus_count": 118,
+      "converged": true,
+      "line_count": 173,
+      "network": "case118",
+      "reported_objective": 129704.7402,
+      "wall_seconds": 0.375249
+    }
+  ],
+  "schema": "ieee_acopf_baseline_smoke_v1",
+  "summary": {
+    "all_converged": true,
+    "baseline_execution_verified": true,
+    "beats_optimum_claim_allowed": false,
+    "candidate_execution_started": false,
+    "converged_count": 4,
+    "field_validation_claim_allowed": false,
+    "network_count": 4,
+    "realized_savings_claim_allowed": false
+  }
+}
