@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Proof To Pilot Control Room</title>
+  <title>LumenCore — Proof-to-Pilot Review Room</title>
   <style>
     :root {
       --paper: #f4f5f2;
@@ -21,6 +21,10 @@
     header { background: var(--surface); border-bottom: 1px solid var(--line); }
     .wrap { width: min(1220px, calc(100% - 32px)); margin: 0 auto; }
     .head { min-height: 78px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+    .head-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 14px; }
+    .nav a { color: var(--blue); font-weight: 700; text-decoration: none; }
+    .nav a:hover { text-decoration: underline; }
     h1 { margin: 0; font-size: 23px; letter-spacing: 0; }
     h2 { margin: 0 0 12px; font-size: 17px; }
     .label { color: var(--green); font-size: 12px; font-weight: 700; text-transform: uppercase; }
@@ -40,23 +44,244 @@
     .card h3 { margin: 0 0 8px; font-size: 15px; }
     .card p { margin: 6px 0; color: var(--muted); overflow-wrap: anywhere; }
     .list { margin: 0; padding-left: 20px; columns: 2; column-gap: 40px; }
-    .list li { break-inside: avoid; margin-bottom: 8px; }
+    .list li { break-inside: avoid; margin-bottom: 8px; overflow-wrap: anywhere; }
     .boundary { padding: 16px; background: #eef4ff; border-left: 4px solid var(--blue); }
     .error { color: var(--red); }
+    .section-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 14px; }
+    .section-head h2 { margin-bottom: 4px; }
+    .section-note { margin: 0; color: var(--muted); max-width: 760px; }
+    .feed-meta { color: #27485d; font: 700 12px/1.5 Consolas, monospace; text-align: right; }
+    .holo-panel {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      min-height: 360px;
+      padding: 24px;
+      border: 1px solid #277b96;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 50% 12%, rgba(45, 212, 255, .18), transparent 36%),
+        radial-gradient(circle at 15% 90%, rgba(73, 220, 159, .12), transparent 34%),
+        linear-gradient(145deg, #071722 0%, #0b2634 48%, #07131d 100%);
+      box-shadow: 0 24px 60px rgba(4, 24, 36, .24), inset 0 0 44px rgba(91, 225, 255, .08);
+      color: #f4fbff;
+      perspective: 1100px;
+    }
+    .holo-panel::before {
+      content: "";
+      position: absolute;
+      z-index: -2;
+      inset: 28% -20% -65%;
+      background-image:
+        linear-gradient(rgba(96, 221, 255, .13) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(96, 221, 255, .13) 1px, transparent 1px);
+      background-size: 38px 38px;
+      transform: rotateX(64deg) translateZ(-80px);
+      transform-origin: center top;
+      animation: holo-grid-drift 16s linear infinite;
+    }
+    .holo-panel::after {
+      content: "";
+      position: absolute;
+      z-index: 3;
+      left: 0;
+      right: 0;
+      top: -16%;
+      height: 18%;
+      pointer-events: none;
+      background: linear-gradient(180deg, transparent, rgba(122, 231, 255, .09), transparent);
+      animation: holo-scan 12s ease-in-out infinite;
+    }
+    .holo-orbit { position: absolute; z-index: -1; inset: 60px 0 auto 50%; width: 280px; height: 280px; transform: translateX(-50%); opacity: .42; }
+    .holo-orbit span { position: absolute; inset: 0; border: 1px solid rgba(111, 231, 255, .48); border-radius: 50%; box-shadow: 0 0 26px rgba(71, 214, 255, .14); }
+    .holo-orbit span:nth-child(1) { transform: rotateX(64deg); }
+    .holo-orbit span:nth-child(2) { transform: rotateY(66deg); }
+    .holo-orbit span:nth-child(3) { transform: rotateX(54deg) rotateY(54deg); }
+    .proof-constellation { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; transform-style: preserve-3d; }
+    .constellation-card {
+      --card-tilt: 0deg;
+      position: relative;
+      overflow: hidden;
+      min-width: 0;
+      padding: 17px;
+      border: 1px solid rgba(126, 229, 255, .55);
+      border-radius: 12px;
+      background: linear-gradient(155deg, rgba(15, 52, 68, .94), rgba(6, 25, 36, .96));
+      box-shadow: 0 14px 30px rgba(0, 7, 13, .35), inset 0 0 22px rgba(100, 227, 255, .05);
+      color: #f5fcff;
+      transform: rotateY(var(--card-tilt)) translateZ(8px);
+      transform-style: preserve-3d;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+    .constellation-card:nth-child(3n + 1) { --card-tilt: 1.1deg; }
+    .constellation-card:nth-child(3n) { --card-tilt: -1.1deg; }
+    .constellation-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, transparent, #77e8ff, transparent); opacity: .72; }
+    .constellation-card:hover,
+    .constellation-card:focus-visible { transform: translateY(-4px) translateZ(24px) rotateY(0); border-color: #9bf1ff; box-shadow: 0 18px 36px rgba(0, 8, 15, .48), 0 0 0 1px rgba(155, 241, 255, .24); }
+    .constellation-card:focus-visible { outline: 3px solid #ffd166; outline-offset: 3px; }
+    .constellation-card.is-unavailable { grid-column: 1 / -1; transform: none; }
+    .proof-kicker { margin: 0 0 8px; color: #8beaff; font: 700 11px/1.4 Consolas, monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .constellation-card h3 { margin: 0; font-size: 17px; line-height: 1.3; color: #fff; }
+    .proof-meta { display: flex; flex-wrap: wrap; gap: 7px; margin: 11px 0; }
+    .proof-pill { padding: 3px 7px; border: 1px solid rgba(128, 228, 255, .46); border-radius: 999px; background: rgba(4, 17, 26, .55); color: #dff8ff; font-size: 11px; font-weight: 700; }
+    .proof-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin: 0 0 12px; }
+    .fact-chip { min-width: 0; padding: 8px; border-left: 2px solid #4edfb0; background: rgba(3, 17, 25, .56); }
+    .fact-chip dt { color: #bfe5ef; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
+    .fact-chip dd { margin: 3px 0 0; color: #fff; font-weight: 750; overflow-wrap: anywhere; }
+    .claim-boundary { margin: 0; padding-top: 10px; border-top: 1px solid rgba(139, 226, 247, .2); color: #d3e8ef; font-size: 12px; }
+    .claim-boundary strong { color: #ffd166; }
+    .modeled-panel {
+      position: relative;
+      overflow: hidden;
+      padding: 22px;
+      border: 1px solid #356d87;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #092131, #103647 58%, #0b2534);
+      color: #f7fcff;
+      box-shadow: 0 18px 44px rgba(7, 32, 46, .2);
+    }
+    .modeled-panel::after { content: "MODELED · BOUNDED · NOT REALIZED"; position: absolute; right: -38px; top: 28px; padding: 4px 42px; transform: rotate(35deg); background: #ffd166; color: #342400; font-size: 9px; font-weight: 900; letter-spacing: .08em; }
+    .modeled-values { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .modeled-metric { min-width: 0; padding: 18px; border: 1px solid rgba(134, 225, 247, .42); border-radius: 10px; background: rgba(3, 19, 29, .62); }
+    .modeled-metric strong { display: block; color: #fff; font-size: clamp(24px, 4vw, 38px); line-height: 1.1; overflow-wrap: anywhere; }
+    .modeled-metric span { display: block; margin-top: 7px; color: #c9e7ef; font-weight: 700; }
+    .modeled-boundary { margin: 16px 0 0; padding: 13px 15px; border-left: 4px solid #ffd166; background: rgba(2, 15, 23, .66); color: #f3f8fa; }
+    .modeled-boundary strong { color: #ffd166; }
+    .modeled-unavailable { grid-column: 1 / -1; color: #fff; }
+    .evidence-lattice { padding: 20px; border: 1px solid #b8cbd5; border-radius: 14px; background: linear-gradient(145deg, #f8fbfc, #eaf3f6); box-shadow: 0 15px 36px rgba(31, 67, 82, .11); }
+    .source-layers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .source-layer { min-width: 0; padding: 17px; border: 1px solid #8fb2c1; border-radius: 11px; background: #fff; }
+    .source-layer.current { border-color: #3e9276; background: #f3fbf7; }
+    .source-layer h3 { margin: 0 0 11px; font-size: 15px; }
+    .signal-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+    .signal-tile { min-width: 0; padding: 11px; border: 1px solid #b7c9d1; border-radius: 8px; background: #fff; }
+    .signal-tile strong { display: block; color: #12394a; font-size: 17px; overflow-wrap: anywhere; }
+    .signal-tile span { display: block; margin-top: 4px; color: #435d69; font-size: 11px; }
+    .signal-tile.caution { border-color: #c87a16; background: #fff8eb; }
+    .signal-tile.negative { border-color: #b42318; background: #fff3f2; }
+    .signal-tile.negative strong { color: #8f1d14; }
+    .reconciliation-note, .inference-note, .supporting-note { margin: 13px 0 0; padding: 12px 14px; border-left: 4px solid #315e72; background: rgba(255, 255, 255, .8); color: #243f4b; }
+    .reconciliation-note strong, .inference-note strong { color: #8f1d14; }
+    .supporting-note { border-left-color: #6d7f87; font-size: 12px; }
+    .inference-block { margin-top: 20px; padding-top: 18px; border-top: 1px solid #b7cbd3; }
+    .inference-block .section-head { margin-bottom: 11px; }
+    .holm-detail { margin-top: 16px; padding: 16px; border: 1px solid #759bab; border-radius: 11px; background: #f6fbfc; }
+    .holm-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .holm-summary .signal-tile { border-width: 2px; }
+    .comparison-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; margin-top: 12px; perspective: 900px; }
+    .comparison-card { min-width: 0; padding: 14px; border: 1px solid #3982a0; border-radius: 10px; background: linear-gradient(145deg, #0b3041, #071d29); color: #f5fbff; box-shadow: 0 12px 25px rgba(11, 51, 68, .19); transform: rotateX(1deg) translateZ(4px); }
+    .comparison-card:focus-visible { outline: 3px solid #ffd166; outline-offset: 3px; transform: translateZ(16px); }
+    .comparison-card h4 { margin: 0 0 9px; color: #fff; font-size: 14px; overflow-wrap: anywhere; }
+    .comparison-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin: 0; }
+    .comparison-stats div { min-width: 0; padding: 7px; border-left: 2px solid #6be7bb; background: rgba(2, 16, 24, .68); }
+    .comparison-stats dt { color: #bfe6ef; font-size: 10px; text-transform: uppercase; }
+    .comparison-stats dd { margin: 2px 0 0; color: #fff; font: 700 12px/1.4 Consolas, monospace; overflow-wrap: anywhere; }
+    .frozen-hybrid { position: relative; z-index: 1; margin-top: 15px; padding: 17px; border: 1px solid #e5bd55; border-radius: 12px; background: linear-gradient(135deg, rgba(35, 37, 29, .96), rgba(8, 30, 38, .97)); color: #f8fcff; box-shadow: 0 16px 32px rgba(0, 8, 14, .34); transform: translateZ(10px); }
+    .frozen-hybrid h3 { margin: 0; color: #fff; font-size: 17px; }
+    .hybrid-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+    .hybrid-state { padding: 5px 9px; border: 1px solid #ffd166; border-radius: 999px; color: #ffe29a; font-size: 11px; font-weight: 800; text-align: right; }
+    .hybrid-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+    .hybrid-metric { min-width: 0; padding: 9px; border: 1px solid rgba(139, 225, 245, .36); border-radius: 8px; background: rgba(3, 17, 25, .6); }
+    .hybrid-metric strong { display: block; color: #fff; overflow-wrap: anywhere; }
+    .hybrid-metric span { color: #c7e4ec; font-size: 10px; text-transform: uppercase; }
+    .sample-gates { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+    .sample-gate { padding: 4px 7px; border: 1px solid #e09b8f; border-radius: 999px; color: #ffd3cb; font-size: 11px; font-weight: 700; }
+    @keyframes holo-grid-drift { from { background-position: 0 0, 0 0; } to { background-position: 76px 76px, 76px 76px; } }
+    @keyframes holo-scan { 0%, 12% { transform: translateY(-120%); opacity: 0; } 30%, 70% { opacity: 1; } 88%, 100% { transform: translateY(720%); opacity: 0; } }
+    @media (max-width: 980px) {
+      .proof-constellation { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
     @media (max-width: 760px) {
       .head { align-items: flex-start; flex-direction: column; padding: 16px 0; }
+      .head-side { align-items: flex-start; }
+      .nav { justify-content: flex-start; }
       .summary, .gates, .cards { grid-template-columns: 1fr; }
+      .section-head { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .feed-meta { text-align: left; }
+      .holo-panel, .modeled-panel { padding: 16px; }
+      .proof-constellation, .modeled-values, .source-layers, .signal-strip, .holm-summary, .comparison-grid, .hybrid-grid { grid-template-columns: 1fr; }
+      .hybrid-head { flex-direction: column; }
+      .hybrid-state { text-align: left; }
+      .proof-facts { grid-template-columns: 1fr; }
+      .modeled-panel::after { display: none; }
       .metric { border-right: 0; border-bottom: 1px solid var(--line); }
       .metric:last-child { border-bottom: 0; }
       .list { columns: 1; }
     }
+    @media (prefers-reduced-motion: reduce) {
+      .holo-panel::before, .holo-panel::after { animation: none; }
+      .constellation-card, .constellation-card:hover, .constellation-card:focus-visible, .comparison-card, .frozen-hybrid { transform: none; transition: none; }
+    }
+    @media (forced-colors: active) {
+      .holo-panel, .constellation-card, .fact-chip, .modeled-panel, .modeled-metric, .modeled-boundary, .evidence-lattice, .source-layer, .signal-tile, .reconciliation-note, .inference-note, .supporting-note, .holm-detail, .comparison-card, .comparison-stats div, .frozen-hybrid, .hybrid-metric { background: Canvas; color: CanvasText; border-color: CanvasText; box-shadow: none; }
+      .proof-kicker, .constellation-card h3, .proof-pill, .fact-chip dt, .fact-chip dd, .claim-boundary, .modeled-metric strong, .modeled-metric span, .modeled-boundary strong { color: CanvasText; }
+    }
   </style>
 </head>
 <body>
-  <header><div class="wrap head"><div><div class="label">Quant Hub evidence operations</div><h1>Proof To Pilot Control Room</h1></div><div id="stamp" class="stamp">Loading evidence feeds...</div></div></header>
+  <header><div class="wrap head">
+    <div><div class="label">LumenCore external validation</div><h1>Proof-to-Pilot Review Room</h1></div>
+    <div class="head-side">
+      <nav class="nav" aria-label="Reviewer navigation">
+        <a href="/">Overview</a>
+        <a href="evidence/">Evidence ledger</a>
+        <a href="grants.html">Funding readiness</a>
+        <a href="https://github.com/robertashworth1986-debug/lumen-core-public" target="_blank" rel="noopener">Public repo</a>
+      </nav>
+      <div id="stamp" class="stamp">Loading evidence feeds...</div>
+    </div>
+  </div></header>
   <main class="wrap">
     <section class="summary" id="summary" aria-label="Evidence summary"></section>
     <section class="band"><h2>Claim gates</h2><div class="gates" id="gates"></div></section>
+    <section class="band" aria-labelledby="constellation-title">
+      <div class="section-head">
+        <div><div class="label">Canonical reviewer evidence</div><h2 id="constellation-title">Evidence constellation</h2><p class="section-note" id="reviewer-count-note" aria-live="polite">Reviewer proof-card count loading…</p></div>
+        <div class="feed-meta" id="reviewer-source" aria-live="polite">Reviewer context loading…</div>
+      </div>
+      <div class="holo-panel">
+        <div class="holo-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="proof-constellation" id="canonical-proof-cards" role="list"></div>
+        <article class="frozen-hybrid" id="frozen-hybrid-status" aria-live="polite"></article>
+      </div>
+    </section>
+    <section class="band" aria-labelledby="source-evidence-title">
+      <div class="section-head">
+        <div><div class="label">Breadth reconciliation</div><h2 id="source-evidence-title">Registered, continuity, and current evidence</h2><p class="section-note">The continuity registry and the latest hash-backed probe are separate evidence layers. The current layer is the narrower freshness claim.</p></div>
+        <div class="feed-meta" id="source-register-meta" aria-live="polite">Source register loading…</div>
+      </div>
+      <div class="evidence-lattice">
+        <div class="source-layers" id="source-layers"></div>
+        <p class="reconciliation-note" id="reconciliation-note"><strong>Reconciliation required:</strong> Loading source boundary…</p>
+        <p class="supporting-note" id="measurement-source" aria-live="polite">Continuity measurement support loading…</p>
+        <div class="inference-block">
+          <div class="section-head">
+            <div><h3>Evaluated-evidence inference strip</h3><p class="section-note">Mean-result counts are shown separately from multiplicity-adjusted inference.</p></div>
+            <div class="feed-meta" id="harvest-source" aria-live="polite">Harvest evidence loading…</div>
+          </div>
+          <div class="signal-strip" id="harvest-signals"></div>
+          <p class="inference-note" id="inference-note"><strong>Promotion boundary:</strong> Loading paired-inference results…</p>
+          <div class="holm-detail">
+            <div class="section-head">
+              <div><h3>Global-Holm comparison detail</h3><p class="section-note">Comparison-level passes remain distinct from complete-card promotion across all registered baselines.</p></div>
+              <div class="feed-meta" id="top-replay-source" aria-live="polite">Top replay evidence loading…</div>
+            </div>
+            <div class="holm-summary" id="top-replay-summary"></div>
+            <div class="comparison-grid" id="global-holm-comparisons" role="list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="band" aria-labelledby="modeled-title">
+      <div class="section-head">
+        <div><div class="label">Assumption-bounded prioritization</div><h2 id="modeled-title">Modeled opportunity boundary</h2><p class="section-note">Only explicitly allowed estimated signals are displayed; this panel does not authorize an external claim or action.</p></div>
+        <div class="feed-meta" id="value-source" aria-live="polite">Value boundary loading…</div>
+      </div>
+      <div class="modeled-panel">
+        <div class="modeled-values" id="modeled-values"></div>
+        <p class="modeled-boundary" id="modeled-boundary"><strong>Claim boundary:</strong> Loading bounded source language…</p>
+      </div>
+    </section>
     <section class="band"><h2>Reviewer proof cards</h2><div class="cards" id="cards"></div></section>
     <section class="band"><h2>Evidence artifacts</h2><ul class="list" id="artifacts"></ul></section>
     <section class="band"><h2>Manual reviewed outreach queue</h2><div class="cards" id="outreach"></div></section>
@@ -69,7 +294,13 @@
       control: 'data/proof_to_pilot_control_room.json',
       outreach: 'data/paid_pilot_outreach_queue.json',
       field: 'data/field_validation_control_room.json',
-      fieldOutreach: 'data/field_validation_outreach_board.json'
+      fieldOutreach: 'data/field_validation_outreach_board.json',
+      reviewerContext: 'data/quant_hub_reviewer_context.json',
+      valueMeter: 'data/live_proof_value_meter.json',
+      sourceRegister: 'data/measured_source_evidence_register.json',
+      sourceMeasurement: 'data/live_source_measurement_maximizer.json',
+      evidenceHarvest: 'data/live_evidence_max_harvest.json',
+      topReplay: 'data/top_geometry_live_replay_results.json'
     };
     const gateLabels = [
       ['manual_reviewed_outreach_allowed', 'Manual reviewed outreach allowed'],
@@ -91,12 +322,13 @@
     };
     const escapeText = (value) => String(value ?? '');
 
-    function renderSummary(payload) {
+    function renderSummary(payload, reviewerPayload = {}) {
       const summary = object(payload.summary);
+      const canonicalCards = pickArray(reviewerPayload, ['proof_cards']);
       const values = [
-        ['Proof cards', summary.proof_card_count ?? pickArray(payload, ['proof_cards', 'cards']).length],
-        ['Evidence artifacts', summary.artifact_count ?? pickArray(payload, ['artifacts', 'evidence_artifacts']).length],
-        ['Ready lanes', summary.ready_lane_count ?? summary.lane_count ?? 0],
+        ['Proof cards', canonicalCards.length || summary.proof_card_count || pickArray(payload, ['top_cards', 'proof_cards', 'cards']).length],
+        ['Evidence artifacts', summary.artifact_count ?? pickArray(payload, ['artifact_health', 'artifacts', 'evidence_artifacts']).length],
+        ['Ready lanes', summary.ready_lane_count ?? summary.robust_candidate_count ?? summary.pilot_packet_count ?? summary.lane_count ?? 0],
         ['Human gate', 'Required']
       ];
       document.getElementById('summary').replaceChildren(...values.map(([label, value]) => {
@@ -108,7 +340,7 @@
     }
 
     function renderGates(payload) {
-      const source = { ...object(payload.summary), ...object(payload.claim_gates), ...object(payload.gates) };
+      const source = { ...object(payload.summary), ...object(payload.claim_controls), ...object(payload.claim_gates), ...object(payload.gates) };
       document.getElementById('gates').replaceChildren(...gateLabels.map(([key, label]) => {
         const row = document.createElement('div'); row.className = 'gate';
         const name = document.createElement('span'); name.textContent = label;
@@ -119,19 +351,472 @@
 
     function cardNode(row) {
       const card = document.createElement('article'); card.className = 'card';
-      const title = document.createElement('h3'); title.textContent = escapeText(row.title || row.lane || row.target || row.name || row.id || 'Evidence item');
-      const detail = document.createElement('p'); detail.textContent = escapeText(row.summary || row.status || row.next_gate || row.ask || row.claim_boundary || 'Review required');
-      card.append(title, detail); return card;
+      const title = document.createElement('h3'); title.textContent = escapeText(row.pilot_name || row.title || row.lane || row.target || row.name || row.id || 'Evidence item');
+      const detail = document.createElement('p'); detail.textContent = escapeText(row.pilot_question || row.summary || row.status || row.next_gate || row.ask || row.claim_boundary || 'Review required');
+      card.append(title, detail);
+      const repeat = object(row.repeat_window_evidence);
+      if (repeat.windows != null) {
+        const receipt = document.createElement('p');
+        receipt.textContent = `Internal repeat-window evidence: ${escapeText(repeat.wins)}/${escapeText(repeat.windows)} wins · sign-test p ${escapeText(repeat.sign_test_p)} · external validation pending.`;
+        card.append(receipt);
+      }
+      return card;
     }
-    function renderCards(payload) { document.getElementById('cards').replaceChildren(...pickArray(payload, ['proof_cards', 'cards', 'pilot_cards']).map(cardNode)); }
+    function outreachCardNode(row) {
+      const card = document.createElement('article'); card.className = 'card';
+      const title = document.createElement('h3'); title.textContent = escapeText(row.buyer_role || row.target_segment || 'Reviewed buyer role');
+      const detail = document.createElement('p');
+      const segment = escapeText(row.target_segment || '').replaceAll('_', ' ');
+      detail.textContent = `${segment}${row.fit_score != null ? ` · fit ${escapeText(row.fit_score)}%` : ''}`;
+      const ask = document.createElement('p'); ask.textContent = escapeText(row.primary_ask || row.why_not_send_now || 'Human review required.');
+      card.append(title, detail, ask); return card;
+    }
+    function renderCards(payload) { document.getElementById('cards').replaceChildren(...pickArray(payload, ['top_cards', 'proof_cards', 'cards', 'pilot_cards']).map(cardNode)); }
     function renderArtifacts(payload) {
-      document.getElementById('artifacts').replaceChildren(...pickArray(payload, ['artifacts', 'evidence_artifacts', 'reviewer_artifacts']).map((row) => {
-        const li = document.createElement('li'); li.textContent = escapeText(row.path || row.name || row.artifact || row); return li;
+      document.getElementById('artifacts').replaceChildren(...pickArray(payload, ['artifact_health', 'artifacts', 'evidence_artifacts', 'reviewer_artifacts']).map((row) => {
+        const li = document.createElement('li');
+        const digest = row.sha256 ? ` · sha256 ${escapeText(row.sha256).slice(0, 12)}…` : '';
+        li.textContent = `${escapeText(row.path || row.name || row.artifact || row)}${digest}`;
+        return li;
       }));
     }
-    function renderOutreachQueue(payload) { document.getElementById('outreach').replaceChildren(...pickArray(payload, ['queue', 'outreach_queue', 'targets']).map(cardNode)); }
-    function renderFieldValidation(payload) { document.getElementById('field-validation').replaceChildren(...pickArray(payload, ['protocols', 'cards', 'validation_cards', 'lanes']).map(cardNode)); }
-    function renderFieldOutreach(payload) { document.getElementById('field-outreach').replaceChildren(...pickArray(payload, ['queue', 'targets', 'reviewer_routes', 'cards']).map(cardNode)); }
+    function renderOutreachQueue(payload) { document.getElementById('outreach').replaceChildren(...pickArray(payload, ['queue', 'outreach_queue', 'targets']).slice(0, 6).map(outreachCardNode)); }
+    function renderFieldValidation(payload) { document.getElementById('field-validation').replaceChildren(...pickArray(payload, ['dashboard_cards', 'protocols', 'cards', 'validation_cards', 'lanes']).map(cardNode)); }
+    function renderFieldOutreach(payload) { document.getElementById('field-outreach').replaceChildren(...pickArray(payload, ['ranked_targets', 'queue', 'targets', 'reviewer_routes', 'cards']).slice(0, 6).map(outreachCardNode)); }
+
+    function humanize(value) {
+      return escapeText(value).replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+    }
+
+    function formatInteger(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? Math.round(number).toLocaleString('en-US') : 'Unavailable';
+    }
+
+    function formatProofFact(key, value) {
+      if (typeof value === 'boolean') return value ? 'true' : 'false';
+      if (typeof value === 'number') return value.toLocaleString('en-US', { maximumFractionDigits: 4 });
+      const text = escapeText(value);
+      if (key.toLowerCase().includes('sha256') && text.length > 16) return `${text.slice(0, 12)}…`;
+      return text.replaceAll('_', ' ');
+    }
+
+    function describeFreshness(value) {
+      const parsed = new Date(value || '');
+      if (Number.isNaN(parsed.getTime())) return 'generated UTC unavailable · freshness unknown';
+      const ageMs = Date.now() - parsed.getTime();
+      const absoluteMinutes = Math.round(Math.abs(ageMs) / 60000);
+      let freshness;
+      if (ageMs < -300000) freshness = `${absoluteMinutes}m ahead of local clock`;
+      else if (absoluteMinutes < 60) freshness = `${absoluteMinutes}m old`;
+      else if (absoluteMinutes < 2880) freshness = `${Math.round(absoluteMinutes / 60)}h old`;
+      else freshness = `${Math.round(absoluteMinutes / 1440)}d old`;
+      return `generated UTC ${formatGeneratedUtc(value)} · freshness ${freshness}`;
+    }
+
+    function constellationCardNode(row, index) {
+      const card = document.createElement('article');
+      card.className = 'constellation-card';
+      card.setAttribute('role', 'listitem');
+      card.setAttribute('aria-label', `${escapeText(row.title || row.proof_id || 'Proof card')}, maturity level ${escapeText(row.attained_maturity_level ?? 'unrated')}`);
+      card.tabIndex = 0;
+
+      const kicker = document.createElement('p');
+      kicker.className = 'proof-kicker';
+      kicker.textContent = `Proof ${String(index + 1).padStart(2, '0')} · ${humanize(row.evidence_class || 'bounded evidence')}`;
+      const title = document.createElement('h3');
+      title.textContent = escapeText(row.title || row.proof_id || 'Canonical proof card');
+
+      const meta = document.createElement('div'); meta.className = 'proof-meta';
+      const level = document.createElement('span'); level.className = 'proof-pill'; level.textContent = `Level ${escapeText(row.attained_maturity_level ?? 'unrated')}`;
+      const status = document.createElement('span'); status.className = 'proof-pill'; status.textContent = `Status: ${humanize(row.status || 'reported')}`;
+      meta.append(level, status);
+
+      const facts = document.createElement('dl'); facts.className = 'proof-facts';
+      Object.entries(object(row.facts))
+        .filter(([, value]) => ['string', 'number', 'boolean'].includes(typeof value))
+        .slice(0, 4)
+        .forEach(([key, value]) => {
+          const chip = document.createElement('div'); chip.className = 'fact-chip';
+          const term = document.createElement('dt'); term.textContent = humanize(key);
+          const detail = document.createElement('dd'); detail.textContent = formatProofFact(key, value);
+          chip.append(term, detail); facts.append(chip);
+        });
+
+      const boundary = document.createElement('p'); boundary.className = 'claim-boundary';
+      const boundaryLabel = document.createElement('strong'); boundaryLabel.textContent = 'Claim boundary: ';
+      boundary.append(boundaryLabel, document.createTextNode(escapeText(row.claim_boundary || 'No broader claim is authorized.')));
+      card.append(kicker, title, meta, facts, boundary);
+      return card;
+    }
+
+    function renderReviewerContext(payload) {
+      const cards = pickArray(payload, ['proof_cards']);
+      document.getElementById('canonical-proof-cards').replaceChildren(...cards.map(constellationCardNode));
+      document.getElementById('reviewer-count-note').textContent = `${cards.length} source-backed proof ${cards.length === 1 ? 'card' : 'cards'} spanning custody, measured replay, prospective protocols, preserved non-promotions, and packaging controls.`;
+      document.getElementById('reviewer-source').textContent = `${describeFreshness(payload.generated_utc)} · ${cards.length} canonical proof cards`;
+    }
+
+    function renderReviewerContextUnavailable(result) {
+      const card = document.createElement('article'); card.className = 'constellation-card is-unavailable'; card.setAttribute('role', 'listitem');
+      const title = document.createElement('h3'); title.textContent = 'Canonical reviewer context unavailable';
+      const detail = document.createElement('p'); detail.className = 'claim-boundary';
+      detail.textContent = `${escapeText(result?.reason?.message || 'Feed unavailable')}. No proof-card promotion is inferred and all claim gates remain closed.`;
+      card.append(title, detail);
+      document.getElementById('canonical-proof-cards').replaceChildren(card);
+      document.getElementById('reviewer-count-note').textContent = 'Reviewer proof-card count unavailable; no proof-card promotion is inferred.';
+      document.getElementById('reviewer-source').textContent = 'Reviewer context unavailable · freshness unknown';
+    }
+
+    function frozenHybridCard(payload) {
+      return pickArray(payload, ['proof_cards']).find((row) => row.proof_id === 'eia_prospective_router') || null;
+    }
+
+    function hybridMetricNode(value, label) {
+      const metric = document.createElement('div'); metric.className = 'hybrid-metric';
+      const strong = document.createElement('strong'); strong.textContent = escapeText(value);
+      const span = document.createElement('span'); span.textContent = label;
+      metric.append(strong, span); return metric;
+    }
+
+    function renderFrozenHybridStatus(payload) {
+      const sourceCard = frozenHybridCard(payload);
+      if (!sourceCard) {
+        renderFrozenHybridUnavailable({ reason: new Error('eia_prospective_router proof card missing') });
+        return;
+      }
+      const facts = object(sourceCard.facts);
+      const sampleGates = [
+        ['30-day sample gate', facts.preliminary_30_days_ready],
+        ['90-day sample gate', facts.confirmatory_90_days_ready],
+        ['180-day sample gate', facts.durability_180_days_ready],
+      ];
+      const hasPassed = facts.promotion_evaluation_complete === true
+        && sampleGates.every(([, ready]) => ready === true)
+        && Number(facts.prediction_count) > 0
+        && Number(facts.settlement_count) > 0;
+
+      const host = document.getElementById('frozen-hybrid-status');
+      const head = document.createElement('div'); head.className = 'hybrid-head';
+      const identity = document.createElement('div');
+      const kicker = document.createElement('p'); kicker.className = 'proof-kicker'; kicker.textContent = 'Frozen prospective hybrid';
+      const title = document.createElement('h3'); title.textContent = escapeText(sourceCard.title || 'EIA prospective router');
+      identity.append(kicker, title);
+      const state = document.createElement('div'); state.className = 'hybrid-state';
+      state.textContent = hasPassed ? 'Sample gates complete · external validation separate' : 'Collecting evidence · has not passed';
+      head.append(identity, state);
+
+      const metrics = document.createElement('div'); metrics.className = 'hybrid-grid';
+      metrics.append(
+        hybridMetricNode(humanize(sourceCard.status || 'unreported'), 'Protocol status'),
+        hybridMetricNode(facts.first_allowed_target_date || 'Unavailable', 'First allowed date'),
+        hybridMetricNode(formatInteger(facts.prediction_count), 'Predictions'),
+        hybridMetricNode(formatInteger(facts.settlement_count), 'Settlements')
+      );
+      const gates = document.createElement('div'); gates.className = 'sample-gates';
+      sampleGates.forEach(([label, ready]) => {
+        const gate = document.createElement('span'); gate.className = 'sample-gate';
+        gate.textContent = `${label}: ${ready === true ? 'ready' : 'not ready'}`;
+        gates.append(gate);
+      });
+      const boundary = document.createElement('p'); boundary.className = 'claim-boundary';
+      const boundaryLabel = document.createElement('strong'); boundaryLabel.textContent = 'Claim boundary: ';
+      boundary.append(boundaryLabel, document.createTextNode(escapeText(sourceCard.claim_boundary || 'No prospective performance claim is authorized.')));
+      host.replaceChildren(head, metrics, gates, boundary);
+    }
+
+    function renderFrozenHybridUnavailable(result) {
+      const host = document.getElementById('frozen-hybrid-status');
+      const title = document.createElement('h3'); title.textContent = 'Frozen prospective hybrid unavailable';
+      const detail = document.createElement('p'); detail.className = 'claim-boundary';
+      detail.textContent = `${escapeText(result?.reason?.message || 'Proof card unavailable')}. The hybrid is not treated as passed and all claim gates remain closed.`;
+      host.replaceChildren(title, detail);
+    }
+
+    function metricNode(value, label) {
+      const metric = document.createElement('div'); metric.className = 'modeled-metric';
+      const strong = document.createElement('strong'); strong.textContent = value;
+      const span = document.createElement('span'); span.textContent = label;
+      metric.append(strong, span); return metric;
+    }
+
+    function formatUsdCompact(value) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return 'Unavailable';
+      if (Math.abs(number) >= 1e9) return `$${(number / 1e9).toFixed(2)}B`;
+      if (Math.abs(number) >= 1e6) return `$${(number / 1e6).toFixed(2)}M`;
+      if (Math.abs(number) >= 1e3) return `$${(number / 1e3).toFixed(2)}K`;
+      return `$${number.toFixed(2)}`;
+    }
+
+    function renderModeledOpportunity(payload) {
+      const valueGate = object(payload.value_gate);
+      const safeClaim = object(valueGate.safe_claim);
+      document.getElementById('modeled-values').replaceChildren(
+        metricNode(formatInteger(valueGate.allowed_estimated_value_claims), 'Bounded estimated signal lanes'),
+        metricNode(formatUsdCompact(valueGate.allowed_estimated_hourly_value_usd), 'Bounded estimated signal / hour'),
+        metricNode(formatUsdCompact(valueGate.allowed_estimated_annual_value_usd), 'Bounded estimated signal / year')
+      );
+      const boundary = document.getElementById('modeled-boundary');
+      const label = document.createElement('strong'); label.textContent = 'Claim boundary: ';
+      boundary.replaceChildren(label, document.createTextNode(escapeText(safeClaim.claim_boundary || 'No value claim is authorized without a source claim boundary.')));
+      document.getElementById('value-source').textContent = describeFreshness(payload.generated_utc);
+    }
+
+    function renderModeledOpportunityUnavailable(result) {
+      const unavailable = document.createElement('div'); unavailable.className = 'modeled-metric modeled-unavailable';
+      unavailable.textContent = `${escapeText(result?.reason?.message || 'Modeled opportunity feed unavailable')}. No modeled value is shown and all claim gates remain closed.`;
+      document.getElementById('modeled-values').replaceChildren(unavailable);
+      const boundary = document.getElementById('modeled-boundary');
+      const label = document.createElement('strong'); label.textContent = 'Claim boundary: ';
+      boundary.replaceChildren(label, document.createTextNode('Unavailable; no economic interpretation is authorized.'));
+      document.getElementById('value-source').textContent = 'Value boundary unavailable · freshness unknown';
+    }
+
+    function signalTileNode(primary, detail, tone = '') {
+      const tile = document.createElement('div'); tile.className = `signal-tile${tone ? ` ${tone}` : ''}`;
+      const strong = document.createElement('strong'); strong.textContent = primary;
+      const span = document.createElement('span'); span.textContent = detail;
+      tile.append(strong, span); return tile;
+    }
+
+    function renderSourceRegister(payload) {
+      const summary = object(payload.summary);
+      const refreshSources = array(summary.registry_measured_without_snapshot_hash);
+      const registry = document.createElement('article'); registry.className = 'source-layer';
+      const registryTitle = document.createElement('h3'); registryTitle.textContent = 'Continuity registry layer';
+      const registrySignals = document.createElement('div'); registrySignals.className = 'signal-strip';
+      registrySignals.append(
+        signalTileNode(`${formatInteger(summary.registry_total_sources)} registered sources`, 'Inventory count; not a measured count.'),
+        signalTileNode(`${formatInteger(summary.registry_enabled_sources)} enabled`, 'Registry-enabled sources.'),
+        signalTileNode(`${formatInteger(summary.registry_measured_sources)} registry-measured / ${formatInteger(summary.registry_total_measured_rows)} continuity-layer rows`, 'Merged continuity history; not all current or hash-backed.')
+      );
+      registry.append(registryTitle, registrySignals);
+
+      const current = document.createElement('article'); current.className = 'source-layer current';
+      const currentTitle = document.createElement('h3'); currentTitle.textContent = 'Current hash-backed probe layer';
+      const currentSignals = document.createElement('div'); currentSignals.className = 'signal-strip';
+      currentSignals.append(
+        signalTileNode(`${formatInteger(summary.current_probe_hash_backed_measured_sources)} current hash-backed measured / ${formatInteger(summary.current_probe_total_measured_rows)} current-probe rows`, 'Narrower current evidence layer.'),
+        signalTileNode(`${formatInteger(refreshSources.length)} measured registry-only sources need hash refresh`, refreshSources.length ? refreshSources.join(' · ') : 'No registry-only refresh gap reported.', 'caution'),
+        signalTileNode(`${formatInteger(summary.current_probe_failed_or_thin_sources)} current failed/thin`, 'Negative source outcomes preserved.', 'negative')
+      );
+      current.append(currentTitle, currentSignals);
+      document.getElementById('source-layers').replaceChildren(registry, current);
+
+      const note = document.getElementById('reconciliation-note');
+      const label = document.createElement('strong'); label.textContent = `Reconciliation required=${escapeText(summary.reconciliation_required)}: `;
+      note.replaceChildren(label, document.createTextNode(escapeText(object(payload.claim_policy).reconciliation_note || 'Registry and current-probe layers remain separate.')));
+      document.getElementById('source-register-meta').textContent = describeFreshness(payload.generated_utc);
+    }
+
+    function renderSourceRegisterUnavailable(result) {
+      const unavailable = document.createElement('article'); unavailable.className = 'source-layer';
+      const title = document.createElement('h3'); title.textContent = 'Primary breadth reconciliation unavailable';
+      const detail = document.createElement('p'); detail.textContent = `${escapeText(result?.reason?.message || 'Feed unavailable')}. No registered or current source count is inferred.`;
+      unavailable.append(title, detail);
+      document.getElementById('source-layers').replaceChildren(unavailable);
+      document.getElementById('reconciliation-note').textContent = 'Reconciliation required=unknown. Claim and action gates remain closed.';
+      document.getElementById('source-register-meta').textContent = 'Source register unavailable · freshness unknown';
+    }
+
+    function renderSourceMeasurement(payload) {
+      const summary = object(payload.summary);
+      const coverage = Number(summary.coverage_pct);
+      const coverageText = Number.isFinite(coverage) ? `${coverage.toFixed(2)}% continuity-layer coverage` : 'continuity-layer coverage unavailable';
+      document.getElementById('measurement-source').textContent = `Continuity support · ${describeFreshness(payload.generated_utc)} · ${coverageText}. ${escapeText(summary.claim_boundary || 'Primary breadth reconciliation controls current-source labels.')}`;
+    }
+
+    function renderSourceMeasurementUnavailable(result) {
+      document.getElementById('measurement-source').textContent = `Continuity measurement support unavailable: ${escapeText(result?.reason?.message || 'Feed unavailable')}. Primary reconciliation remains separate.`;
+    }
+
+    function renderEvidenceHarvest(payload) {
+      const summary = object(payload.summary);
+      const cards = Number(summary.paired_inference_card_count);
+      const pairedCards = Number.isFinite(cards) ? Math.round(cards) : 0;
+      const holmPositive = Number(summary.holm_positive_card_count);
+      const allMean = Number(summary.cards_beating_all_registered_baselines_mean_count);
+      const allGlobal = Number(summary.cards_beating_all_registered_baselines_global_holm_count);
+      document.getElementById('harvest-signals').replaceChildren(
+        signalTileNode(`${formatInteger(summary.total_live_context_rows_evaluated)} live context rows evaluated`, 'Evaluated context volume.'),
+        signalTileNode(`${formatInteger(summary.paired_inference_card_count)} paired-inference cards`, 'Paired inference was attempted.'),
+        signalTileNode(`${formatInteger(summary.candidate_beats_named_baseline_count)} candidate mean wins`, 'Descriptive mean comparison only.'),
+        signalTileNode(`${formatInteger(holmPositive)}/${formatInteger(pairedCards)} Holm-positive`, 'Multiplicity-adjusted paired result.', 'negative'),
+        signalTileNode(`${formatInteger(allMean)}/${formatInteger(pairedCards)} beat all registered baselines by mean`, 'Mean result; not global inference.'),
+        signalTileNode(`${formatInteger(allGlobal)}/${formatInteger(pairedCards)} globally Holm-positive`, 'No globally adjusted card promotion.', 'negative')
+      );
+      const note = document.getElementById('inference-note');
+      const label = document.createElement('strong'); label.textContent = 'Promotion boundary: ';
+      note.replaceChildren(label, document.createTextNode(`Mean wins are descriptive point estimates. ${formatInteger(holmPositive)}/${formatInteger(pairedCards)} paired cards and ${formatInteger(allGlobal)}/${formatInteger(pairedCards)} all-baseline cards are Holm-positive; no global statistical promotion is claimed.`));
+      document.getElementById('harvest-source').textContent = describeFreshness(payload.generated_utc);
+    }
+
+    function renderEvidenceHarvestUnavailable(result) {
+      const unavailable = signalTileNode('Evaluated evidence unavailable', escapeText(result?.reason?.message || 'Feed unavailable'), 'negative');
+      document.getElementById('harvest-signals').replaceChildren(unavailable);
+      document.getElementById('inference-note').textContent = 'Promotion boundary: unavailable; no mean or multiplicity-adjusted result is inferred.';
+      document.getElementById('harvest-source').textContent = 'Harvest evidence unavailable · freshness unknown';
+    }
+
+    function formatStatNumber(value) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return 'Unavailable';
+      if (number !== 0 && Math.abs(number) < 0.000001) return number.toExponential(3);
+      return number.toFixed(8).replace(/0+$/, '').replace(/\.$/, '');
+    }
+
+    function deriveGlobalHolmRows(payload) {
+      const rows = [];
+      array(payload.replay_cards).forEach((card) => {
+        array(card.baseline_comparisons).forEach((comparison) => {
+          if (comparison.statistically_positive_after_global_holm === true) {
+            const inference = object(comparison.paired_inference);
+            rows.push({
+              candidate: card.candidate_family_id,
+              baseline: comparison.baseline_family_id,
+              pairedUnits: inference.paired_unit_count,
+              wins: inference.win_count,
+              losses: inference.loss_count,
+              ties: inference.tie_count,
+              meanScoreDelta: inference.mean_score_delta,
+              rawP: inference.raw_two_sided_sign_test_p_value,
+              globalHolmP: comparison.global_holm_adjusted_p_value,
+              ci95: array(inference.bootstrap_mean_delta_ci95),
+            });
+          }
+        });
+      });
+      return rows;
+    }
+
+    function validNonnegativeInteger(value) {
+      const number = Number(value);
+      return Number.isInteger(number) && number >= 0;
+    }
+
+    function finiteStatistic(value) {
+      return Number.isFinite(Number(value));
+    }
+
+    function topReplayEvidenceValid(payload) {
+      const summary = object(payload.summary);
+      const positiveRows = deriveGlobalHolmRows(payload);
+      const positiveCount = Number(summary.registered_baseline_global_holm_positive_count);
+      const comparisonCount = Number(summary.registered_baseline_comparison_count);
+      const completeCardCount = Number(summary.cards_beating_all_registered_baselines_global_holm_count);
+      const replayCards = array(payload.replay_cards);
+      const actualComparisonCount = replayCards.reduce((total, card) => total + array(card.baseline_comparisons).length, 0);
+      const actualCompleteCardCount = replayCards.filter((card) => object(card.baseline_gauntlet).candidate_beats_all_registered_baselines_after_global_holm === true).length;
+
+      if (!validNonnegativeInteger(positiveCount) || positiveCount !== positiveRows.length) return false;
+      if (!validNonnegativeInteger(comparisonCount) || comparisonCount === 0 || comparisonCount !== actualComparisonCount) return false;
+      if (!validNonnegativeInteger(completeCardCount) || completeCardCount !== actualCompleteCardCount) return false;
+
+      return positiveRows.every((row) => {
+        const ci95 = array(row.ci95);
+        const rawP = Number(row.rawP);
+        const globalHolmP = Number(row.globalHolmP);
+        return typeof row.candidate === 'string'
+          && row.candidate.trim().length > 0
+          && typeof row.baseline === 'string'
+          && row.baseline.trim().length > 0
+          && validNonnegativeInteger(row.pairedUnits)
+          && row.pairedUnits > 0
+          && validNonnegativeInteger(row.wins)
+          && validNonnegativeInteger(row.losses)
+          && validNonnegativeInteger(row.ties)
+          && row.wins + row.losses + row.ties === row.pairedUnits
+          && finiteStatistic(row.meanScoreDelta)
+          && Number(row.meanScoreDelta) > 0
+          && finiteStatistic(rawP)
+          && rawP >= 0
+          && rawP <= 1
+          && finiteStatistic(globalHolmP)
+          && globalHolmP >= 0
+          && globalHolmP <= 0.05
+          && ci95.length === 2
+          && ci95.every(finiteStatistic)
+          && Number(ci95[0]) > 0;
+      });
+    }
+
+    function comparisonStatNode(label, value) {
+      const item = document.createElement('div');
+      const term = document.createElement('dt'); term.textContent = label;
+      const detail = document.createElement('dd'); detail.textContent = escapeText(value);
+      item.append(term, detail); return item;
+    }
+
+    function comparisonCardNode(row) {
+      const card = document.createElement('article'); card.className = 'comparison-card'; card.setAttribute('role', 'listitem'); card.tabIndex = 0;
+      const title = document.createElement('h4'); title.textContent = `${humanize(row.candidate)} vs ${humanize(row.baseline)}`;
+      const stats = document.createElement('dl'); stats.className = 'comparison-stats';
+      stats.append(
+        comparisonStatNode('Paired units', formatInteger(row.pairedUnits)),
+        comparisonStatNode('Wins / losses / ties', `${formatInteger(row.wins)} / ${formatInteger(row.losses)} / ${formatInteger(row.ties)}`),
+        comparisonStatNode('Mean score delta', formatStatNumber(row.meanScoreDelta)),
+        comparisonStatNode('Raw sign-test p', formatStatNumber(row.rawP)),
+        comparisonStatNode('Global-Holm adjusted p', formatStatNumber(row.globalHolmP)),
+        comparisonStatNode('Bootstrap mean delta CI95', row.ci95.length >= 2 ? `[${formatStatNumber(row.ci95[0])}, ${formatStatNumber(row.ci95[1])}]` : 'Unavailable')
+      );
+      card.append(title, stats); return card;
+    }
+
+    function renderTopReplay(payload) {
+      if (!topReplayEvidenceValid(payload)) {
+        renderTopReplayIntegrityMismatch();
+        return;
+      }
+      const summary = object(payload.summary);
+      const positiveRows = deriveGlobalHolmRows(payload);
+      const positiveComparisons = summary.registered_baseline_global_holm_positive_count;
+      const comparisonCount = summary.registered_baseline_comparison_count;
+      const completeCardPasses = summary.cards_beating_all_registered_baselines_global_holm_count;
+      document.getElementById('top-replay-summary').replaceChildren(
+        signalTileNode(`${formatInteger(positiveComparisons)} / ${formatInteger(comparisonCount)} comparison-level passes`, 'Registered-baseline comparisons positive after global Holm.'),
+        signalTileNode(`${formatInteger(completeCardPasses)} complete cards pass all registered baselines`, 'Comparison passes do not promote a complete card.', 'negative')
+      );
+      document.getElementById('global-holm-comparisons').replaceChildren(...positiveRows.map(comparisonCardNode));
+      document.getElementById('top-replay-source').textContent = `${describeFreshness(payload.generated_utc)} · ${positiveRows.length} derived globally-positive comparisons`;
+    }
+
+    function renderTopReplayUnavailable(result) {
+      document.getElementById('top-replay-summary').replaceChildren(
+        signalTileNode('Comparison-level inference unavailable', escapeText(result?.reason?.message || 'Top replay feed unavailable'), 'negative'),
+        signalTileNode('0 complete-card promotions inferred', 'All claim and action gates remain closed.', 'negative')
+      );
+      const unavailable = document.createElement('article'); unavailable.className = 'comparison-card'; unavailable.setAttribute('role', 'listitem');
+      const title = document.createElement('h4'); title.textContent = 'Global-Holm comparison rows unavailable';
+      unavailable.append(title);
+      document.getElementById('global-holm-comparisons').replaceChildren(unavailable);
+      document.getElementById('top-replay-source').textContent = 'Top replay evidence unavailable · freshness unknown';
+    }
+
+    function renderTopReplayIntegrityMismatch() {
+      renderTopReplayUnavailable({ reason: new Error('Integrity mismatch: the global-Holm summary does not reconcile with complete strict comparison rows') });
+      document.getElementById('top-replay-source').textContent = 'Top replay evidence unavailable · integrity mismatch · claim gates closed';
+    }
+
+    function renderUnavailableCards(containerId, label, result) {
+      const card = document.createElement('article'); card.className = 'card';
+      const title = document.createElement('h3'); title.textContent = `${label} unavailable`;
+      const detail = document.createElement('p');
+      detail.textContent = `${escapeText(result?.reason?.message || 'Feed unavailable')}. Claim and action gates remain closed.`;
+      card.append(title, detail);
+      document.getElementById(containerId).replaceChildren(card);
+    }
+
+    function renderUnavailableArtifacts(result) {
+      const item = document.createElement('li');
+      item.textContent = `Control-room artifact feed unavailable: ${escapeText(result?.reason?.message || 'Feed unavailable')}.`;
+      document.getElementById('artifacts').replaceChildren(item);
+    }
+
+    function formatGeneratedUtc(value) {
+      const parsed = new Date(value || '');
+      return Number.isNaN(parsed.getTime()) ? 'unavailable' : parsed.toISOString().replace('.000Z', 'Z');
+    }
 
     async function loadFeed(url) {
       const response = await fetch(url, { cache: 'no-store' });
@@ -139,12 +824,75 @@
       return response.json();
     }
     async function boot() {
+      // Fail closed immediately: claim gates remain visible even before feeds resolve.
+      renderSummary({});
+      renderGates({});
       try {
-        const [control, outreach, field, fieldOutreach] = await Promise.all(Object.values(feeds).map(loadFeed));
-        renderSummary(control); renderGates(control); renderCards(control); renderArtifacts(control);
+        const feedEntries = Object.entries(feeds);
+        const results = await Promise.allSettled(feedEntries.map(([, url]) => loadFeed(url)));
+        const settled = Object.fromEntries(feedEntries.map(([key], index) => [key, results[index]]));
+        const payload = (key) => settled[key].status === 'fulfilled' ? settled[key].value : {};
+        const control = payload('control');
+        const outreach = payload('outreach');
+        const field = payload('field');
+        const fieldOutreach = payload('fieldOutreach');
+        const reviewerContext = payload('reviewerContext');
+        const valueMeter = payload('valueMeter');
+        const sourceRegister = payload('sourceRegister');
+        const sourceMeasurement = payload('sourceMeasurement');
+        const evidenceHarvest = payload('evidenceHarvest');
+        const topReplay = payload('topReplay');
+        const hybridCardReady = frozenHybridCard(reviewerContext) !== null;
+        const topReplayValid = settled.topReplay.status === 'fulfilled' && topReplayEvidenceValid(topReplay);
+        const evidenceFeedsReady = ['reviewerContext', 'valueMeter', 'sourceRegister', 'sourceMeasurement', 'evidenceHarvest', 'topReplay']
+          .every((key) => settled[key].status === 'fulfilled') && hybridCardReady && topReplayValid;
+
+        renderSummary(control, reviewerContext); renderGates(evidenceFeedsReady ? control : {}); renderCards(control); renderArtifacts(control);
         renderOutreachQueue(outreach); renderFieldValidation(field); renderFieldOutreach(fieldOutreach);
-        document.getElementById('stamp').textContent = `Evidence synchronized ${new Date().toLocaleTimeString()}`;
+
+        if (settled.reviewerContext.status === 'fulfilled') renderReviewerContext(reviewerContext);
+        else renderReviewerContextUnavailable(settled.reviewerContext);
+        if (settled.reviewerContext.status === 'fulfilled' && hybridCardReady) renderFrozenHybridStatus(reviewerContext);
+        else renderFrozenHybridUnavailable(settled.reviewerContext.status === 'fulfilled'
+          ? { reason: new Error('eia_prospective_router proof card missing') }
+          : settled.reviewerContext);
+        if (settled.valueMeter.status === 'fulfilled') renderModeledOpportunity(valueMeter);
+        else renderModeledOpportunityUnavailable(settled.valueMeter);
+        if (settled.sourceRegister.status === 'fulfilled') renderSourceRegister(sourceRegister);
+        else renderSourceRegisterUnavailable(settled.sourceRegister);
+        if (settled.sourceMeasurement.status === 'fulfilled') renderSourceMeasurement(sourceMeasurement);
+        else renderSourceMeasurementUnavailable(settled.sourceMeasurement);
+        if (settled.evidenceHarvest.status === 'fulfilled') renderEvidenceHarvest(evidenceHarvest);
+        else renderEvidenceHarvestUnavailable(settled.evidenceHarvest);
+        if (settled.topReplay.status === 'fulfilled' && topReplayValid) renderTopReplay(topReplay);
+        else if (settled.topReplay.status === 'fulfilled') renderTopReplayIntegrityMismatch();
+        else renderTopReplayUnavailable(settled.topReplay);
+
+        if (settled.control.status !== 'fulfilled') {
+          renderUnavailableCards('cards', 'Control-room proof feed', settled.control);
+          renderUnavailableArtifacts(settled.control);
+        }
+        if (settled.outreach.status !== 'fulfilled') renderUnavailableCards('outreach', 'Outreach queue feed', settled.outreach);
+        if (settled.field.status !== 'fulfilled') renderUnavailableCards('field-validation', 'Field-validation feed', settled.field);
+        if (settled.fieldOutreach.status !== 'fulfilled') renderUnavailableCards('field-outreach', 'Field-reviewer routing feed', settled.fieldOutreach);
+
+        const failedKeys = feedEntries
+          .filter(([key]) => settled[key].status !== 'fulfilled')
+          .map(([key]) => key);
+        const stamp = document.getElementById('stamp');
+        stamp.textContent = `Evidence source ${formatGeneratedUtc(control.generated_utc)}${failedKeys.length ? ` · degraded: ${failedKeys.join(', ')}` : ''}`;
+        stamp.classList.toggle('error', failedKeys.length > 0);
       } catch (error) {
+        renderSummary({});
+        renderGates({});
+        const failed = { reason: error };
+        renderReviewerContextUnavailable(failed);
+        renderModeledOpportunityUnavailable(failed);
+        renderSourceRegisterUnavailable(failed);
+        renderSourceMeasurementUnavailable(failed);
+        renderEvidenceHarvestUnavailable(failed);
+        renderFrozenHybridUnavailable(failed);
+        renderTopReplayUnavailable(failed);
         document.getElementById('stamp').textContent = `Evidence feed unavailable: ${escapeText(error.message)}`;
         document.getElementById('stamp').classList.add('error');
       }

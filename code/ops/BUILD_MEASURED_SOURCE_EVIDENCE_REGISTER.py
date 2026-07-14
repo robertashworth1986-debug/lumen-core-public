@@ -102,6 +102,7 @@ def count_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "failed_or_thin_sources": len(failed),
         "hash_backed_measured_sources": len(hash_backed),
         "total_measured_rows": sum(int(row.get("rows") or 0) for row in measured),
+        "coverage_pct": round((len(measured) / len(enabled) * 100.0), 2) if enabled else 0.0,
         "measured_source_names": sorted(str(row.get("source")) for row in measured),
         "failed_or_thin_source_names": sorted(str(row.get("source")) for row in failed),
     }
@@ -218,6 +219,14 @@ def build_payload() -> dict[str, Any]:
 
     registry_names = {str(row.get("source") or "").upper() for row in registry_rows if row.get("source")}
     provider_names = {str(row.get("source") or "").upper() for row in provider_rows if row.get("source")}
+    registry_by_name = by_source(registry_rows)
+    registry_only_names = sorted(registry_names - provider_names)
+    registry_only_measured_names = [
+        name for name in registry_only_names if bool(registry_by_name.get(name, {}).get("measured"))
+    ]
+    registry_only_measured_rows = sum(
+        int(registry_by_name.get(name, {}).get("rows") or 0) for name in registry_only_measured_names
+    )
     measured_no_hash = [
         row["source"]
         for row in register_rows
@@ -248,18 +257,24 @@ def build_payload() -> dict[str, Any]:
             "registry_failed_or_thin_sources": registry_counts["failed_or_thin_sources"],
             "registry_hash_backed_measured_sources": registry_counts["hash_backed_measured_sources"],
             "registry_total_measured_rows": registry_counts["total_measured_rows"],
+            "registry_coverage_pct": registry_counts["coverage_pct"],
             "current_probe_total_sources": provider_counts["total_sources"],
             "current_probe_enabled_sources": provider_counts["enabled_sources"],
             "current_probe_measured_sources": provider_counts["measured_sources"],
             "current_probe_failed_or_thin_sources": provider_counts["failed_or_thin_sources"],
             "current_probe_hash_backed_measured_sources": provider_counts["hash_backed_measured_sources"],
             "current_probe_total_measured_rows": provider_counts["total_measured_rows"],
+            "current_probe_coverage_pct": provider_counts["coverage_pct"],
             "source_register_rows": len(register_rows),
-            "registry_only_sources": sorted(registry_names - provider_names),
+            "registry_only_sources": registry_only_names,
+            "registry_only_measured_sources": registry_only_measured_names,
+            "registry_only_measured_rows": registry_only_measured_rows,
             "current_probe_only_sources": sorted(provider_names - registry_names),
             "registry_measured_without_snapshot_hash": measured_no_hash,
             "current_hash_backed_measured_sources": current_hash_backed,
             "reconciliation_required": reconciliation_required,
+            "registry_source_generated_utc": str(registry.get("generated_utc") or ""),
+            "current_probe_source_generated_utc": str(maximizer.get("generated_utc") or ""),
             "geometry_manifest_unique_source_count": int(geometry_summary.get("unique_source_count") or 0),
             "geometry_manifest_row_count": int(geometry_summary.get("manifest_row_count") or 0),
             "claim_map_safe_estimated_annual_value_usd": float(claim_summary.get("safe_estimated_annual_value_usd") or 0.0),
@@ -277,7 +292,7 @@ def build_payload() -> dict[str, Any]:
         "source_rows": register_rows,
         "claim_policy": {
             "allowed": [
-                "registry-backed 29-source inventory",
+                "30-source registry inventory with 29 currently enabled sources",
                 "current-probe measured source rows when snapshot hashes are present",
                 "bounded estimated-value context under stated assumptions",
                 "source coverage for reviewer diligence and benchmark routing",
@@ -333,12 +348,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Registry-backed measured sources: `{summary['registry_measured_sources']}`",
         f"- Registry-backed hash-backed measured sources: `{summary['registry_hash_backed_measured_sources']}`",
         f"- Registry-backed measured rows: `{summary['registry_total_measured_rows']}`",
+        f"- Registry coverage: `{summary['registry_coverage_pct']}`%",
         f"- Current probe sources: `{summary['current_probe_total_sources']}`",
         f"- Current probe enabled sources: `{summary['current_probe_enabled_sources']}`",
         f"- Current probe measured sources: `{summary['current_probe_measured_sources']}`",
         f"- Current probe hash-backed measured sources: `{summary['current_probe_hash_backed_measured_sources']}`",
         f"- Current probe measured rows: `{summary['current_probe_total_measured_rows']}`",
+        f"- Current probe coverage: `{summary['current_probe_coverage_pct']}`%",
         f"- Registry-only sources: `{', '.join(summary['registry_only_sources'])}`",
+        f"- Registry-only measured rows awaiting current hash refresh: `{summary['registry_only_measured_rows']}`",
         f"- Registry measured without snapshot hash: `{', '.join(summary['registry_measured_without_snapshot_hash'])}`",
         f"- Reconciliation required: `{str(summary['reconciliation_required']).lower()}`",
         f"- Geometry manifest unique sources: `{summary['geometry_manifest_unique_source_count']}`",

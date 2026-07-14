@@ -1,6 +1,6 @@
 # Quant Hub Reviewer Context
 
-Generated UTC: `2026-07-14T03:32:41.877991+00:00`
+Generated UTC: `2026-07-14T10:47:29.468797+00:00`
 
 ## Identity
 
@@ -15,7 +15,7 @@ Generated UTC: `2026-07-14T03:32:41.877991+00:00`
 
 - Highest repository-wide supported maturity: `Level 3`
 - Level 5 attained: `false`
-- Summary: Level 3 source-conditioned replay is supported. Level 4 prospective evidence is still waiting for eligible EIA forecasts and settlements. Level 5 independent external validation has not been attained.
+- Summary: Level 3 source-conditioned replay and frozen EIA holdout evidence are supported. The EIA residual candidate has 6/6 Holm-positive internal comparisons, but its full protocol gate is CLOSED. Level 4 prospective evidence is still waiting for eligible EIA forecasts and settlements. Level 5 independent external validation has not been attained.
 
 Maturity is claim-specific. It is not a product-readiness, agency-approval, patent, security, or valuation grade.
 
@@ -25,8 +25,12 @@ Maturity is claim-specific. It is not a product-readiness, agency-approval, pate
 |---|---|---:|---|---|
 | Prior external proof-vault custody | `provenance_and_custody` | 3 | `verified` | artifact_count=156, ready_count=156, verified_count=156, all_copied_hashes_verified=True, packet_name=LUMA_PROOF_VAULT_PACKET_20260713_LEVEL5_V4 |
 | Public-safe estate inventory | `asset_inventory` | 1 | `indexed` | managed_file_count=101014, managed_total_bytes=58220081958, inventory_chain_sha256=517c1adaa9c929b52605425f6bb215c20e83d7d55c3188b0900dfa83ddc4e9bd, secret_content_indexed=False, sensitive_paths_redacted=True |
+| Private-universe zero-copy candidate custody federation | `internal_custody_evidence` | 1 | `PRIVATE_UNIVERSE_ZERO_COPY_FEDERATION_READY_LIMITED` | status=PRIVATE_UNIVERSE_ZERO_COPY_FEDERATION_READY_LIMITED, generation_id=generation_11d3ae53a7624a36a16d409e6245048e, federation_mode=zero_copy_manifest_federation, freshness=mixed_freshness, fresh_full_scan_completed=False |
+| Hardware and 3D design-prior metadata custody | `internal_metadata_custody` | 1 | `candidate_design_priors_only` | intake_records=8252, geometry_hardware_candidates=343, design_prior_candidates=36, distinct_valid_sha256_count=114, valid_sha256_record_count=343 |
+| Local system-health history custody audit | `internal_observational_evidence` | 2 | `defects_present` | valid_snapshot_count=1250, active_utc_date_count=155, first_observed_utc=2026-01-13T17:00:09Z, last_observed_utc=2026-07-14T10:00:02Z, elapsed_days=181.708252 |
 | Measured source breadth | `fresh_source_measurement` | 3 | `measured_with_thin_sources` | enabled_sources=29, measured_sources=25, failed_or_thin_sources=4, total_measured_rows=2580, coverage_pct=86.21 |
-| Locked source-conditioned baseline replay | `source_conditioned_replay` | 3 | `complete_with_wins_and_non_wins` | adapter_backed_routes=404, baseline_comparison_count=2861, candidate_win_count=1456, candidate_loss_or_tie_count=1405, estimated_rows_replayed=96258 |
+| Locked source-conditioned baseline replay | `source_conditioned_replay` | 3 | `complete_with_wins_and_non_wins` | adapter_backed_routes=404, baseline_comparison_count=2861, candidate_win_count=1456, candidate_loss_or_tie_count=1405, estimated_rows_replayed=96223 |
+| EIA residual hybrid frozen holdout | `source_conditioned_frozen_holdout` | 3 | `all_internal_comparisons_holm_positive_full_protocol_gate_closed` | holm_result=6/6 Holm-positive internal comparisons, full_protocol_gate=CLOSED, coverage_result=90/150 minimum common days, selected_candidate=xgboost_residual, holdout_rows=1176 |
 | Frozen EIA prospective router | `prospective_protocol` | 1 | `WAITING_FOR_FIRST_ELIGIBLE_FORECAST` | first_allowed_target_date=2026-07-14, prediction_count=0, settlement_count=0, promotion_evaluation_complete=False, preliminary_30_days_ready=False |
 | MDA mapping synthetic feasibility v1 | `frozen_synthetic_benchmark` | 2 | `gate_failed_preserved` | fixture_count=96, candidate_micro_f1=0.9166666666666666, candidate_unsupported_mapping_rate=1.0, micro_f1_delta_over_best_baseline=0.023049645390070927, gate_passed=False |
 | MDA mapping independent open-set v2 | `frozen_synthetic_benchmark` | 2 | `safer_unsupported_behavior_but_gate_failed` | fixture_count=128, candidate_micro_f1=0.9433962264150945, supported_coverage=0.9583333333333334, unsupported_mapping_rate=0.0, micro_f1_delta_over_best_baseline=0.020319303338171446 |
@@ -39,6 +43,10 @@ Maturity is claim-specific. It is not a product-readiness, agency-approval, pate
 - The locked sweep is a source-conditioned replay with named baselines, wins, and non-wins.
 - The MDA v1 and v2 synthetic promotion gates failed and the negative results are preserved.
 - The frozen FAA SDR 10,000-report benchmark completed and did not promote the hybrid candidate.
+- The local metadata intake identifies hardware and 3D design-prior candidates; it establishes no hardware build, field deployment, hardware degradation, or performance result, and it names no independent evaluator.
+- The local system-health history audit preserves sparse one-second point observations and custody defects across 30/90/180-day windows; it is not hardware-degradation proof and names no independent evaluator.
+- The optional private-universe receipt federates existing manifests and represents no fresh full universe scan, manifest-referenced file byte read, broad-root scan, archive extraction, or live reconciliation; only individually authorized explicit files may be read for SHA-256, and candidate lane counts remain metadata heuristics rather than content validation. The receipt names no independent evaluator.
+- The development-selected EIA residual hybrid has 6/6 Holm-positive internal comparisons on its frozen internal holdout, but the full protocol gate is CLOSED.
 - The EIA prospective protocol is frozen and operational but has not produced an eligible prediction or settlement in this snapshot.
 - A prior external proof packet reports all copied artifact hashes verified.
 
@@ -75,9 +83,9 @@ Remaining gate: An authoritative external corpus and independent evaluation owne
 
 ### Assess prospective readiness
 
-Evidence: Verify the frozen EIA protocol, scheduler receipts, and zero-count waiting state.
+Evidence: Inspect the frozen EIA residual holdout, its Holm-adjusted internal comparisons, the closed composite gate, the prospective protocol, scheduler receipts, and zero-count waiting state.
 
-Remaining gate: 30-, 90-, and 180-day prospective settlement gates.
+Remaining gate: Raise minimum common holdout coverage from 90 to 150 days without post-holdout tuning, satisfy the authority robustness gate, then complete the 30-, 90-, and 180-day prospective settlement gates.
 
 ### Assess economic relevance
 
@@ -121,15 +129,20 @@ Public builders may report metadata and public-safe evidence only. They must not
 
 ## Source Chain
 
-Input chain SHA-256: `96f00c43b7a09e6807013bdf4c57c145ac99cb2079243f0830b20262d9a3c11b`
+Input chain SHA-256: `ba68902253b357cacb8be909ef3e5d5509785c9289dd92994d245b0d12f0ea19`
 
-- `out/eia_grid_prospective_hybrid_router/prospective_status_latest.json` | `ecca8ba1e7167976f66292748208c161a96730459778200d9e32b3ea79213b24` | `1989` bytes
+- `out/eia_grid_prospective_hybrid_router/prospective_status_latest.json` | `9dd01ede40c4006d7353cea680ab9ca2a85ee3b8f8fc5e6136cd34e75fd99d46` | `1989` bytes
+- `out/eia_grid_residual_moe/eia_grid_residual_moe_benchmark_latest.json` | `e2e0bc779823e543784c24675e18c12bcb821e65911168c2d3339b6da67ea744` | `19279` bytes
+- `config/eia_grid_residual_moe_protocol_v1.json` | `79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8` | `8422` bytes
 - `out/ops/lumencore_estate_master_index_latest.json` | `e073a44231045764739b5d4e74c263f07f30b50b971566b0c812aa152f81a233` | `52897` bytes
 - `out/ops/faa_sdr_10k_benchmark_latest.json` | `f5ff18ce8c87749e724ab0f393a56d58fd517144bd84d0ac44186cfcd2756074` | `13854` bytes
 - `config/quant_hub_lexicon_v1.json` | `51df7ebd003400452b0fd638ebc015c127de3e3923625ef5c73e3482c6858573` | `5879` bytes
 - `out/ops/live_source_measurement_maximizer_latest.json` | `a208ea39d59574cc501d9920d402e2a277a7804afd9c3dfd88f8ca7db063646b` | `39808` bytes
-- `out/ops/locked_source_baseline_replay_sweep_latest.json` | `af1541cc4f9d5e314e4f033113dba250ec5d309a3ed9a8b0b0577d37780c8ead` | `4333872` bytes
+- `out/ops/local_icloud_evidence_intake_latest.json` | `7970fef5bf2b41020fe4dff064d7307eb27058aca64913a12cd0074360d369f6` | `5927285` bytes
+- `out/ops/local_system_health_history_audit_latest.json` | `5ee49ec53ff1ae1607557c9d6b29653e8eab0f07144ae3018e44706ad4d49d86` | `16131` bytes
+- `out/ops/locked_source_baseline_replay_sweep_latest.json` | `6f2cedc0cd76c6ffb3d8697c4b5de0df2699f9fd577bc4b33fffdd1f2a17271b` | `4333517` bytes
 - `out/mda_control_mapping_feasibility/mda_control_mapping_feasibility_latest.json` | `49fbaf30f403fa0439cccf03908139f1772647f915cd1e4fe283b0b2454061ae` | `13314` bytes
 - `out/mda_control_mapping_open_set_v2/mda_control_mapping_open_set_latest.json` | `d8c99f8b49171dd78e4586ba4f46be9e16e7faa2aeacfe6a484229d344a3d43a` | `40346` bytes
 - `out/ops/external_proof_vault_manifest_latest.json` | `3f8029172ad0391666db04c065d05eb17210216f2d828b9ba930b18e49ed9687` | `179725` bytes
+- `out/ops/lumencore_private_universe_receipt_latest.json` | `fe8b6a3041a11a61285105c50b8d971f54f7873d057e564473877312cb013356` | `8043` bytes
 - `out/ops/funding_sprint_reviewer_gate_latest.json` | `f87df88b282493cf511e441a6272cc60e2131a27ca93add662691aeb0d27f49a` | `44208` bytes

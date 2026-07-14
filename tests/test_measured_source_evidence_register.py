@@ -27,12 +27,19 @@ def test_register_reconciles_registry_and_current_probe_layers():
     assert summary["registry_enabled_sources"] == 29
     assert summary["registry_measured_sources"] == 25
     assert summary["registry_total_measured_rows"] == 2580
+    assert summary["registry_coverage_pct"] == 86.21
     assert summary["current_probe_total_sources"] == 28
     assert summary["current_probe_enabled_sources"] == 27
     assert summary["current_probe_measured_sources"] == 23
     assert summary["current_probe_hash_backed_measured_sources"] == 23
+    assert summary["current_probe_total_measured_rows"] == 2377
+    assert summary["current_probe_coverage_pct"] == 85.19
     assert summary["registry_only_sources"] == ["ALPACA", "KRAKEN"]
+    assert summary["registry_only_measured_sources"] == ["ALPACA", "KRAKEN"]
+    assert summary["registry_only_measured_rows"] == 203
     assert summary["registry_measured_without_snapshot_hash"] == ["ALPACA", "KRAKEN"]
+    assert summary["registry_source_generated_utc"]
+    assert summary["current_probe_source_generated_utc"]
     assert summary["reconciliation_required"] is True
     assert len(payload["measured_source_register_sha256"]) == 64
 
@@ -72,6 +79,9 @@ def test_register_keeps_high_risk_claim_gates_closed():
     assert summary["autonomous_external_action_allowed"] is False
     assert "Measured Source Evidence Register" in rendered
     assert "Reconciliation required: `true`" in rendered
+    assert "30-source registry inventory with 29 currently enabled sources" in rendered
+    assert "Current probe coverage: `85.19`%" in rendered
+    assert "Registry-only measured rows awaiting current hash refresh: `203`" in rendered
     assert "Do not claim field validation." in rendered
     assert "api_key" not in lowered
     assert "client_secret" not in lowered

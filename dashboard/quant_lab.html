@@ -590,10 +590,14 @@
 
   @media (max-width: 1100px) {
     .ql-shell {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto auto auto 1fr;
       height: auto;
       min-height: 100dvh;
+    }
+    .ql-bar, .ql-pulse, .ql-side, .ql-main {
+      min-width: 0;
+      width: 100%;
     }
     .ql-bar {
       grid-column: 1;
@@ -653,6 +657,9 @@
       letter-spacing: 2px;
     }
     .help-grid { grid-template-columns: 1fr; }
+    .ql-continuity-tile { min-width: 0; }
+    .ql-continuity-v { overflow-wrap: anywhere; white-space: normal; }
+    .lcf-nav { max-width: 100%; overflow-x: auto; }
   }
 
   @media (max-width: 760px) {
@@ -1218,7 +1225,7 @@ async function getBenchmarkContext(force = false) {
 }
 
 async function buildLocalContext() {
-  const [rolling, sports, scout, infra, pkg, grants, balance, tradeLog, investorPerf, breadth, benchCtx] = await Promise.all([
+  const [rolling, sports, scout, infra, pkg, grants, balance, tradeLog, investorPerf, breadth, sourceRegister, benchCtx] = await Promise.all([
     fetchFirstJsonLoose(outCandidates('rolling_performance.json')),
     fetchFirstJsonLoose(outCandidates('sports_intelligence/_dk_alpha_board.json')),
     fetchFirstJsonLoose(dashboardCandidates('data/lumascout_summary.json')),
@@ -1229,6 +1236,10 @@ async function buildLocalContext() {
     fetchFirstJsonLoose(outCandidates('execution/live_trade_log.json')),
     fetchFirstJsonLoose(outCandidates('execution/investor_performance_report.json')),
     fetchFirstJsonLoose(outCandidates('ops/live_breadth_value_panel_latest.json')),
+    fetchFirstJsonLoose([
+      ...dashboardCandidates('data/measured_source_evidence_register.json'),
+      ...outCandidates('ops/measured_source_evidence_register_latest.json'),
+    ]),
     getBenchmarkContext(),
   ]);
 
@@ -1282,12 +1293,10 @@ async function buildLocalContext() {
   const activePackageCount = toFiniteOrNull(pkg?.active_package_count ?? pkg?.used_package_count);
 
   const liveSourceMeasured = toFiniteOrNull(
-    breadth?.headline?.measured_sources
-    ?? breadth?.lanes?.live_source_translation?.measured_sources
+    sourceRegister?.summary?.current_probe_hash_backed_measured_sources
   );
   const liveSourceEnabled = toFiniteOrNull(
-    breadth?.headline?.enabled_sources
-    ?? breadth?.lanes?.live_source_translation?.enabled_sources
+    sourceRegister?.summary?.current_probe_enabled_sources
   );
 
   const sessionRealized = Number.isFinite(Number(investorPerf?.total_net_pnl_pct))
