@@ -78,7 +78,7 @@
     },
     "verified": true
   },
-  "docket_sha256": "7ba8b740cdcdee5740943e69360b69857f2bc9d37960d887b723f87ac40b391f",
+  "docket_sha256": "ea986aa9f6a1b6447ed2dbf664a07c2fa06c50db64b9b6e574d99470bfc1eb53",
   "evaluator_acceptance": {
     "accepted_protocol_sha256": null,
     "accepted_utc": null,
@@ -175,12 +175,13 @@
     "protocol_commit": "3130a9bb1632eab25a64e388b92263ac833a729e",
     "protocol_path": "config/eia_grid_prospective_hybrid_router_protocol_v1.json",
     "protocol_sha256": "77a67f201884f70110c840d4d6b98b4194dca6f32a34c63c4a09c9dd786afb86",
+    "runtime_projection_path": "evidence/external_validation/eia_grid_prospective_runtime_projection_20260714.json",
     "runtime_status_path": "out/eia_grid_prospective_hybrid_router/prospective_status_latest.json",
     "source_product": "Form EIA-930 daily demand and day-ahead demand forecast by balancing authority",
     "source_publisher": "U.S. Energy Information Administration",
     "source_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/"
   },
-  "generated_utc": "2026-07-14T22:40:19.846623+00:00",
+  "generated_utc": "2026-07-14T23:46:47.289286+00:00",
   "maturity": {
     "current_supported_level": 3,
     "external_validation_complete": false,
@@ -235,25 +236,25 @@
       "remaining_gap": "No external organization has adopted an incident, escalation, or production-use decision process for this experiment."
     }
   ],
-  "portable_input_chain_sha256": "cd9b11f0242c21e3b29c556f7aadf7b38ef555ccfab766b4de66a5f425967ade",
+  "portable_input_chain_sha256": "701f5fefc9929e4652312ced3c081fe647c2bbbc12724192f0ee88a124bf6c12",
   "portable_inputs": [
     {
-      "bytes": 9073,
+      "bytes": 9363,
       "hash_mode": "utf8_lf",
       "path": "config/external_validation_authority_docket_v1.json",
-      "sha256": "27823c19e80cc688129620a92e9345ee4c7baa2e5f019d3da5d05b02ce7654c1"
+      "sha256": "9889965b54a6b54548e2f49f0026a9e3e54b45deffc2550d7b6555471e6f99a7"
     },
     {
-      "bytes": 27445,
+      "bytes": 31959,
       "hash_mode": "utf8_lf",
       "path": "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py",
-      "sha256": "0de5001ad6528764b376eb4ae8052d3eccf4338040368c15efac06c4e698662c"
+      "sha256": "3bae7284e69e08be04ccb5aa494e1b8e9885f48d7c1b4e469c0554a45b4e236c"
     },
     {
-      "bytes": 8205,
+      "bytes": 10502,
       "hash_mode": "utf8_lf",
       "path": "tests/test_external_validation_authority_docket.py",
-      "sha256": "ebf9f5d4b198861c8840cb2c465a604180d9e8742b2ee7219f3f3b39f3b93516"
+      "sha256": "a1413d39bc1ce4a7bf2887d6f0d2e0ecae96315cb1d62bad8c8d527e8195e69c"
     },
     {
       "bytes": 120,
@@ -262,10 +263,10 @@
       "sha256": "bc305d667254f6bc02227ef18dcb8acae9c1c5a0cf668b8bdd918c42e039e3d0"
     },
     {
-      "bytes": 2695,
+      "bytes": 3100,
       "hash_mode": "utf8_lf",
       "path": ".github/workflows/external-validation-docket.yml",
-      "sha256": "0d6052ef3a92c4f5973f00d5d8667bde3ccd4ee23a99e1616a1e0b6ca4fa79ee"
+      "sha256": "16ea15e1f686be74c0b9d18cfcd4cc82a8f025dc80ce954548913b1c715ce88c"
     },
     {
       "bytes": 11816,
@@ -298,6 +299,12 @@
       "sha256": "bc2cd0a05732e1f6baa330a2756222dfd6cc058a76504d24b64fbb21be6800ed"
     },
     {
+      "bytes": 1469,
+      "hash_mode": "utf8_lf",
+      "path": "evidence/external_validation/eia_grid_prospective_runtime_projection_20260714.json",
+      "sha256": "ed3698e446b5bd98ccafeab0c0e0b4631b5973a84f32b385371da7c68ca6af98"
+    },
+    {
       "bytes": 3481,
       "hash_mode": "utf8_lf",
       "path": "docs/EIA_GRID_PROSPECTIVE_HYBRID_ROUTER_2026-07-13.md",
@@ -322,6 +329,12 @@
       "sha256": "e95c3d7d88cdc732b86b28d93d7dba6db5216941c46edd2676822855e492243b"
     },
     {
+      "bytes": 4511,
+      "hash_mode": "utf8_lf",
+      "path": "docs/REVIEWER_START_HERE.md",
+      "sha256": "a638f7e291ad8f7a6d110592e852a9a5c18868ac024691fba64561f5239d062b"
+    },
+    {
       "bytes": 7244,
       "hash_mode": "utf8_lf",
       "path": "docs/REVIEWER_REPRODUCIBILITY_CAPSULE_2026-07-14.md",
@@ -332,6 +345,12 @@
       "hash_mode": "utf8_lf",
       "path": "tests/test_external_evaluator_acceptance.py",
       "sha256": "837de83d0a1d3e18ac288d09eee99c26051beaffa37996189a26336c2781a45f"
+    },
+    {
+      "bytes": 1818,
+      "hash_mode": "utf8_lf",
+      "path": "tests/test_github_workflow_governance.py",
+      "sha256": "a1ec52540c1f04842012e3475c28138b2b07bfff743c2cf2cb5d2db35d16bb91"
     }
   ],
   "privacy_scan": {
@@ -342,9 +361,9 @@
     "available": true,
     "common_settled_day_count": 0,
     "first_common_settled_date": null,
-    "generated_utc": "2026-07-14T22:16:58.811415+00:00",
+    "generated_utc": "2026-07-14T23:46:24.509492+00:00",
     "latest_common_settled_date": null,
-    "operational_receipt_sha256": "c6b25bef4413904a1a19cafcb4b4c03f8deda458e741e4fdd68c4f4e34739da1",
+    "operational_receipt_sha256": "9b0151f297132f9763f17b68f9abe1c651e7f5766b40366e690697a61ff56e69",
     "prediction_count": 0,
     "prediction_count_by_authority": {
       "CISO": 0,
@@ -356,6 +375,14 @@
       "SWPP": 0,
       "TVA": 0
     },
+    "projection_integrity_passed": true,
+    "projection_privacy_scan": {
+      "configured_pattern_hit_count": 0,
+      "passed": true
+    },
+    "projection_schema": "external_validation_runtime_projection.v1",
+    "projection_schema_matched": true,
+    "projection_unexpected_keys": [],
     "promotion_evaluation_complete": false,
     "protocol_commit": "3130a9bb1632eab25a64e388b92263ac833a729e",
     "protocol_identity_matched": true,
@@ -378,7 +405,7 @@
       "SWPP": 0,
       "TVA": 0
     },
-    "snapshot_sha256": "727d687dc937b1ac3b9cf4171e0e657c24a17d2cc8daf87c03bb1bd151d6e491",
+    "snapshot_sha256": "68cd6d9da6f32e1174811d31ea75c7e64e1a041a948166d49abc9a82438adfb1",
     "state": "WAITING_FOR_FIRST_ELIGIBLE_FORECAST"
   },
   "protocol_id": "LUMENCORE_EIA_EXTERNAL_VALIDATION_AUTHORITY_20260714",
@@ -442,7 +469,7 @@
     "integrity_gate_passed": true,
     "level_4_gate_passed": false,
     "level_5_gate_passed": false,
-    "portable_input_count": 16,
+    "portable_input_count": 19,
     "prediction_count": 0,
     "prospective_runtime_snapshot_available": true,
     "ready_to_invite_independent_evaluator": true,

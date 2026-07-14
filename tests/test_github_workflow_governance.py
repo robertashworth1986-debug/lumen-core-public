@@ -32,3 +32,14 @@ def test_reviewer_entrypoint_and_citation_are_present() -> None:
     assert "VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py --expect-template" in reviewer
     assert "Independent Review Roles" in reviewer
     assert "cff-version: 1.2.0" in citation
+
+
+def test_reviewer_entrypoint_changes_trigger_external_validation_ci() -> None:
+    workflow = (WORKFLOWS / "external-validation-docket.yml").read_text(
+        encoding="utf-8"
+    )
+    assert workflow.count('"docs/REVIEWER_START_HERE.md"') == 2
+    assert workflow.count('"tests/test_github_workflow_governance.py"') == 2
+    assert "tests/test_github_workflow_governance.py" in workflow.split(
+        "python -m pytest -q", maxsplit=1
+    )[1]

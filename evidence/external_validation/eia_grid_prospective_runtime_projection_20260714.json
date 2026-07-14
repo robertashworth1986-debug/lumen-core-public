@@ -1,0 +1,48 @@
+{
+  "available": true,
+  "common_settled_day_count": 0,
+  "first_common_settled_date": null,
+  "generated_utc": "2026-07-14T23:46:24.509492+00:00",
+  "latest_common_settled_date": null,
+  "operational_receipt_sha256": "9b0151f297132f9763f17b68f9abe1c651e7f5766b40366e690697a61ff56e69",
+  "prediction_count": 0,
+  "prediction_count_by_authority": {
+    "CISO": 0,
+    "ERCO": 0,
+    "ISNE": 0,
+    "MISO": 0,
+    "NYIS": 0,
+    "PJM": 0,
+    "SWPP": 0,
+    "TVA": 0
+  },
+  "projection_privacy_scan": {
+    "configured_pattern_hit_count": 0,
+    "passed": true
+  },
+  "projection_schema": "external_validation_runtime_projection.v1",
+  "promotion_evaluation_complete": false,
+  "protocol_commit": "3130a9bb1632eab25a64e388b92263ac833a729e",
+  "protocol_identity_matched": true,
+  "protocol_sha256": "77a67f201884f70110c840d4d6b98b4194dca6f32a34c63c4a09c9dd786afb86",
+  "sample_gates": {
+    "confirmatory_90_days_ready": false,
+    "durability_180_days_ready": false,
+    "note": "Sample readiness does not mean a scientific promotion gate passed.",
+    "preliminary_30_days_ready": false
+  },
+  "schema": "eia_grid_prospective_router_status.v1",
+  "settlement_count": 0,
+  "settlement_count_by_authority": {
+    "CISO": 0,
+    "ERCO": 0,
+    "ISNE": 0,
+    "MISO": 0,
+    "NYIS": 0,
+    "PJM": 0,
+    "SWPP": 0,
+    "TVA": 0
+  },
+  "snapshot_sha256": "68cd6d9da6f32e1174811d31ea75c7e64e1a041a948166d49abc9a82438adfb1",
+  "state": "WAITING_FOR_FIRST_ELIGIBLE_FORECAST"
+}

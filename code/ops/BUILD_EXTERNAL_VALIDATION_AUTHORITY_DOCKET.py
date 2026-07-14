@@ -35,6 +35,26 @@ PRIVATE_PATTERNS = (
         re.I,
     ),
 )
+RUNTIME_PROJECTION_SCHEMA = "external_validation_runtime_projection.v1"
+RUNTIME_SAFE_KEYS = (
+    "schema",
+    "generated_utc",
+    "state",
+    "prediction_count",
+    "prediction_count_by_authority",
+    "settlement_count",
+    "settlement_count_by_authority",
+    "common_settled_day_count",
+    "first_common_settled_date",
+    "latest_common_settled_date",
+    "sample_gates",
+    "promotion_evaluation_complete",
+    "confirmatory_gate_passed",
+    "external_partner_replication_complete",
+    "operational_receipt_sha256",
+    "protocol_sha256",
+    "protocol_commit",
+)
 
 
 def now_utc() -> str:
@@ -85,6 +105,13 @@ def repo_path(path: Path, *, root: Path = ROOT) -> str:
     return path.resolve().relative_to(root.resolve()).as_posix()
 
 
+def display_path(path: Path) -> str:
+    try:
+        return repo_path(path)
+    except ValueError:
+        return path.resolve().as_posix()
+
+
 def scan_private(value: Any) -> list[str]:
     text = json.dumps(value, sort_keys=True, default=str)
     return [pattern.pattern for pattern in PRIVATE_PATTERNS if pattern.search(text)]
@@ -98,6 +125,10 @@ def portable_file_bytes(path: Path, hash_mode: str = "utf8_lf") -> bytes:
         raise ValueError(f"unsupported portable hash mode: {hash_mode}")
     text = raw.decode("utf-8")
     return text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+
+
+def portable_file_sha256(path: Path, hash_mode: str = "utf8_lf") -> str:
+    return hashlib.sha256(portable_file_bytes(path, hash_mode)).hexdigest()
 
 
 def artifact_row(path: Path, *, root: Path = ROOT) -> dict[str, Any]:
@@ -320,6 +351,7 @@ def project_runtime_status(
     status = read_json(runtime_path, required=False)
     if not status:
         return {
+            "projection_schema": RUNTIME_PROJECTION_SCHEMA,
             "available": False,
             "state": "RUNTIME_SNAPSHOT_UNAVAILABLE",
             "protocol_identity_matched": False,
@@ -330,32 +362,90 @@ def project_runtime_status(
             "confirmatory_gate_passed": False,
             "external_partner_replication_complete": False,
         }
-    safe_keys = (
-        "schema",
-        "generated_utc",
-        "state",
-        "prediction_count",
-        "prediction_count_by_authority",
-        "settlement_count",
-        "settlement_count_by_authority",
-        "common_settled_day_count",
-        "first_common_settled_date",
-        "latest_common_settled_date",
-        "sample_gates",
-        "promotion_evaluation_complete",
-        "confirmatory_gate_passed",
-        "external_partner_replication_complete",
-        "operational_receipt_sha256",
-        "protocol_sha256",
-        "protocol_commit",
-    )
-    projection = {key: status.get(key) for key in safe_keys if key in status}
+    projection = {
+        key: status.get(key) for key in RUNTIME_SAFE_KEYS if key in status
+    }
     projection.update(
         {
+            "projection_schema": RUNTIME_PROJECTION_SCHEMA,
             "available": True,
             "snapshot_sha256": file_sha256(runtime_path),
             "protocol_identity_matched": status.get("protocol_sha256")
             == expected_protocol_sha256,
+        }
+    )
+    private_hits = scan_private(projection)
+    projection["projection_privacy_scan"] = {
+        "passed": not private_hits,
+        "configured_pattern_hit_count": len(private_hits),
+    }
+    if private_hits:
+        raise ValueError("runtime projection failed privacy scan")
+    return projection
+
+
+def refresh_runtime_projection(config: dict[str, Any], *, root: Path = ROOT) -> bool:
+    lane = config["evidence_lane"]
+    runtime_path = root / lane["runtime_status_path"]
+    if not runtime_path.is_file():
+        return False
+    protocol_path = root / lane["protocol_path"]
+    projection = project_runtime_status(
+        runtime_path, portable_file_sha256(protocol_path)
+    )
+    write_json(root / lane["runtime_projection_path"], projection)
+    return True
+
+
+def load_runtime_projection(
+    projection_path: Path, expected_protocol_sha256: str
+) -> dict[str, Any]:
+    status = read_json(projection_path, required=False)
+    if not status:
+        return {
+            "projection_schema": RUNTIME_PROJECTION_SCHEMA,
+            "available": False,
+            "state": "PORTABLE_RUNTIME_PROJECTION_UNAVAILABLE",
+            "projection_integrity_passed": False,
+            "protocol_identity_matched": False,
+            "prediction_count": 0,
+            "settlement_count": 0,
+            "common_settled_day_count": 0,
+            "promotion_evaluation_complete": False,
+            "confirmatory_gate_passed": False,
+            "external_partner_replication_complete": False,
+        }
+    allowed = set(RUNTIME_SAFE_KEYS) | {
+        "projection_schema",
+        "projection_privacy_scan",
+        "available",
+        "snapshot_sha256",
+        "protocol_identity_matched",
+    }
+    unexpected_keys = sorted(set(status) - allowed)
+    private_hits = scan_private(status)
+    projection = {key: status[key] for key in status if key in allowed}
+    schema_matched = status.get("projection_schema") == RUNTIME_PROJECTION_SCHEMA
+    snapshot_sha256 = str(status.get("snapshot_sha256") or "")
+    snapshot_hash_valid = bool(re.fullmatch(r"[0-9a-f]{64}", snapshot_sha256))
+    protocol_identity_matched = (
+        status.get("protocol_sha256") == expected_protocol_sha256
+    )
+    privacy_passed = not private_hits and bool(
+        (status.get("projection_privacy_scan") or {}).get("passed")
+    )
+    projection.update(
+        {
+            "protocol_identity_matched": protocol_identity_matched,
+            "projection_schema_matched": schema_matched,
+            "projection_unexpected_keys": unexpected_keys,
+            "projection_integrity_passed": bool(
+                schema_matched
+                and snapshot_hash_valid
+                and protocol_identity_matched
+                and privacy_passed
+                and not unexpected_keys
+            ),
         }
     )
     return projection
@@ -420,11 +510,11 @@ def build_payload(
     lane = config["evidence_lane"]
     protocol_path = root / lane["protocol_path"]
     protocol = read_json(protocol_path)
-    protocol_sha256 = file_sha256(protocol_path)
+    protocol_sha256 = portable_file_sha256(protocol_path)
     archive_dir = root / config["clean_runner_verification"]["archive_path"]
     ci_bundle = verify_ci_bundle(archive_dir, config, root=root)
-    runtime_path = root / lane["runtime_status_path"]
-    runtime = project_runtime_status(runtime_path, protocol_sha256)
+    runtime_projection_path = root / lane["runtime_projection_path"]
+    runtime = load_runtime_projection(runtime_projection_path, protocol_sha256)
     acceptance_package = project_acceptance_package(config, root=root)
 
     source_paths = [
@@ -466,6 +556,7 @@ def build_payload(
         bool(ci_bundle.get("verified"))
         and all(protocol_identity.values())
         and runtime_protocol_identity_passed
+        and bool(runtime.get("projection_integrity_passed"))
         and acceptance_package["template_ready"]
     )
     status = derive_status(
@@ -635,6 +726,27 @@ def write_outputs(payload: dict[str, Any]) -> None:
     write_text(OUT_MD, render_markdown(payload))
 
 
+def published_output_differences(
+    payload: dict[str, Any],
+    *,
+    json_path: Path = OUT_JSON,
+    markdown_path: Path = OUT_MD,
+) -> list[str]:
+    expected = {
+        json_path: json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
+        markdown_path: render_markdown(payload).rstrip("\r\n") + "\n",
+    }
+    differences: list[str] = []
+    for path, expected_text in expected.items():
+        if not path.is_file():
+            differences.append(f"missing:{display_path(path)}")
+            continue
+        actual_text = path.read_text(encoding="utf-8").rstrip("\r\n") + "\n"
+        if actual_text != expected_text:
+            differences.append(f"stale:{display_path(path)}")
+    return differences
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--archive-ci-dir", type=Path)
@@ -645,8 +757,14 @@ def main() -> int:
     archive_dir = ROOT / config["clean_runner_verification"]["archive_path"]
     if args.archive_ci_dir:
         archive_ci_bundle(args.archive_ci_dir.resolve(), archive_dir, config)
+    if not args.check_only:
+        refresh_runtime_projection(config)
 
-    payload = build_payload()
+    published = read_json(OUT_JSON, required=False) if args.check_only else {}
+    payload = build_payload(generated_utc=published.get("generated_utc"))
+    stale_outputs = (
+        published_output_differences(payload) if args.check_only else []
+    )
     if not args.check_only:
         write_outputs(payload)
     print(
@@ -664,11 +782,13 @@ def main() -> int:
                 ],
                 "prediction_count": payload["summary"]["prediction_count"],
                 "docket_sha256": payload["docket_sha256"],
+                "published_outputs_current": not stale_outputs,
+                "stale_output_paths": stale_outputs,
             },
             indent=2,
         )
     )
-    return 0 if payload["summary"]["integrity_gate_passed"] else 1
+    return 0 if payload["summary"]["integrity_gate_passed"] and not stale_outputs else 1
 
 
 if __name__ == "__main__":
