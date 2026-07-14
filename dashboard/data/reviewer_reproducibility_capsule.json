@@ -1,5 +1,5 @@
 {
-  "capsule_sha256": "8423458e102635dcbb3110163175a1c5548724a961a2a9c42bc7b696bbe4d78f",
+  "capsule_sha256": "32f24874ce5b3360ddb5eb982ab2c70a3d13fb16df54ab4c46005f1cb10329ad",
   "claim_boundary": "A passing capsule proves that the named code reproduced the declared bounded facts from the packaged input under the recorded environment. It does not prove agency approval, cybersecurity certification, external validation, field performance, realized savings, patent scope, trading performance, or funding eligibility.",
   "dependencies": [
     {
@@ -146,12 +146,12 @@
       "tests/test_faa_sdr_10k_benchmark.py",
       "tests/test_reviewer_reproducibility_capsule.py",
       "-k",
-      "not frozen_eia_panel_and_result_manifests_are_hash_valid_and_claim_safe"
+      "not frozen_eia_panel_and_result_manifests_are_hash_valid_and_claim_safe and not published_receipt_reconciles_hashes_assertions_and_public_projection"
     ],
-    "elapsed_seconds": 6.523,
+    "elapsed_seconds": 7.28,
     "exit_code": 0,
     "log_path": "out/reproducibility/reviewer_capsule_latest/logs/fixture_tests.log",
-    "log_sha256": "85d5cf669863b541ab7b0329d33199722bd2959558d10a9603b1abef88f3efce",
+    "log_sha256": "85926d58a0c97b9b92785c11b223c645ef056ebf8eb0156ae63852718868e524",
     "passed": true
   },
   "frozen_input": {
@@ -191,10 +191,10 @@
     "passed": true,
     "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz"
   },
-  "generated_utc": "2026-07-14T13:27:48.471857+00:00",
+  "generated_utc": "2026-07-14T13:34:33.376033+00:00",
   "git": {
     "branch": "codex/live-domain-proof-feed-bundle",
-    "commit": "48fb8f04119711a586df930f258445448cb60fd1",
+    "commit": "297796288e0634623dc0d81d33ccca1b71793bcb",
     "relevant_change_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "relevant_change_line_count": 0,
     "relevant_source_clean": true
@@ -225,9 +225,9 @@
   "schema": "reviewer_reproducibility_capsule.v1",
   "source_artifacts": [
     {
-      "bytes": 3787,
+      "bytes": 3819,
       "path": ".github/workflows/reviewer-reproducibility.yml",
-      "sha256": "26c5b7c1483d3591bb60e85aa4c1d75113557e6d66a55ef4ba5cf23dc8373967"
+      "sha256": "ce43f6acb5c411f56f42aff37b9f5a0d1c754c9dc82fd9800bc033536823748c"
     },
     {
       "bytes": 11274,
@@ -270,9 +270,9 @@
       "sha256": "9a694ed6f194137880c070e73355ef826a51d3fed438ccf65adf6d4726ca80f0"
     },
     {
-      "bytes": 8146,
+      "bytes": 8223,
       "path": "config/reviewer_reproducibility_protocol_v1.json",
-      "sha256": "a71bc16cc1c031d5374fb4de1ca6b879ba04747b5dd90c06a8706df6afa8fd0e"
+      "sha256": "f2f33ed885b2d26902a01b008882a1f9485e7afed91939d2a2bca5bea8bd8c5f"
     },
     {
       "bytes": 114366,
@@ -305,12 +305,12 @@
       "sha256": "0798b6a130f48b012c75877fd56d9aeb36be033b5620b974e89fc46b76585db8"
     },
     {
-      "bytes": 9495,
+      "bytes": 10040,
       "path": "tests/test_reviewer_reproducibility_capsule.py",
-      "sha256": "06865c01af2d69d77d1e9395dfa447cdb7458a8649738721b7a48709a8c8e74e"
+      "sha256": "1d15acbbc1101cfd0dd32a3c2da4728c6e4c5718cba33ce5f873aa56fb106234"
     }
   ],
-  "source_chain_sha256": "b37baa06427235e410d23eb11cc7564dd1ce791c68129baddf78a9fe1f24a5db",
+  "source_chain_sha256": "e20cb804625ed0b8053da4f17077e3cfd381e944889e78cc363856468dbb9e28",
   "standards_references": [
     {
       "name": "NIST SP 800-218 Secure Software Development Framework 1.1",
@@ -388,7 +388,7 @@
           "passed": true
         }
       ],
-      "elapsed_seconds": 36.839,
+      "elapsed_seconds": 38.787,
       "fact_projection": {
         "baseline_comparison_count": 6,
         "best_mase": 0.47945937271811834,
@@ -471,7 +471,7 @@
           "passed": true
         }
       ],
-      "elapsed_seconds": 11.47,
+      "elapsed_seconds": 12.355,
       "fact_projection": {
         "baseline_comparison_count": 6,
         "best_mase": 0.21211186326437864,
@@ -543,7 +543,7 @@
           "passed": true
         }
       ],
-      "elapsed_seconds": 0.216,
+      "elapsed_seconds": 0.223,
       "fact_projection": {
         "candidate_micro_f1": 0.9433962264150945,
         "candidate_supported_coverage": 0.9583333333333334,

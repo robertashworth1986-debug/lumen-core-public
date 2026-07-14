@@ -20,8 +20,8 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 - Agency certification complete: `false`
 - Fixture tests executed: `true`
 - Fixture tests passed: `true`
-- Source chain SHA-256: `b37baa06427235e410d23eb11cc7564dd1ce791c68129baddf78a9fe1f24a5db`
-- Capsule SHA-256: `8423458e102635dcbb3110163175a1c5548724a961a2a9c42bc7b696bbe4d78f`
+- Source chain SHA-256: `e20cb804625ed0b8053da4f17077e3cfd381e944889e78cc363856468dbb9e28`
+- Capsule SHA-256: `32f24874ce5b3360ddb5eb982ab2c70a3d13fb16df54ab4c46005f1cb10329ad`
 
 ## Protocol Amendment
 
@@ -35,7 +35,7 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - Kind: `measured_public_data_replay`
 - Passed: `true`
-- Elapsed seconds: `36.839`
+- Elapsed seconds: `38.787`
 - Fact projection SHA-256: `66f4fde9d3935fb2ea519fc639ec55fd582f0b2f454d33d973ea365e42c98bbf`
 - Facts:
   - `evaluation_rows`: `22530`
@@ -61,7 +61,7 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - Kind: `measured_public_data_replay`
 - Passed: `true`
-- Elapsed seconds: `11.47`
+- Elapsed seconds: `12.355`
 - Fact projection SHA-256: `c34a50a95474700e60cd1e162ac371f4bb0233c6a1b207d0f11603b3a2320405`
 - Facts:
   - `evaluation_rows`: `16975`
@@ -89,7 +89,7 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - Kind: `deterministic_synthetic_falsification_replay`
 - Passed: `true`
-- Elapsed seconds: `0.216`
+- Elapsed seconds: `0.223`
 - Fact projection SHA-256: `6cbbc86400aa77f0305dd13c3d08b9a46dce26e731b96aade2abf2933d7f56e4`
 - Facts:
   - `fixture_chain_sha256`: `25f32a2e03157f6f058f1022bec7d0f0ea151991fc4e1c68d0b91fe59b1e278e`
