@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="data:," />
   <title>LumenCore — Proof-to-Pilot Review Room</title>
   <style>
     :root {
@@ -326,7 +327,7 @@
       const summary = object(payload.summary);
       const canonicalCards = pickArray(reviewerPayload, ['proof_cards']);
       const values = [
-        ['Proof cards', canonicalCards.length || summary.proof_card_count || pickArray(payload, ['top_cards', 'proof_cards', 'cards']).length],
+        ['Canonical cards', canonicalCards.length || summary.proof_card_count || pickArray(payload, ['top_cards', 'proof_cards', 'cards']).length],
         ['Evidence artifacts', summary.artifact_count ?? pickArray(payload, ['artifact_health', 'artifacts', 'evidence_artifacts']).length],
         ['Ready lanes', summary.ready_lane_count ?? summary.robust_candidate_count ?? summary.pilot_packet_count ?? summary.lane_count ?? 0],
         ['Human gate', 'Required']
@@ -352,8 +353,16 @@
     function cardNode(row) {
       const card = document.createElement('article'); card.className = 'card';
       const title = document.createElement('h3'); title.textContent = escapeText(row.pilot_name || row.title || row.lane || row.target || row.name || row.id || 'Evidence item');
-      const detail = document.createElement('p'); detail.textContent = escapeText(row.pilot_question || row.summary || row.status || row.next_gate || row.ask || row.claim_boundary || 'Review required');
+      const detailText = row.pilot_question || row.subtitle || row.summary || row.next_gate || row.ask || row.claim_boundary || row.status || 'Review required';
+      const detail = document.createElement('p'); detail.textContent = escapeText(detailText);
       card.append(title, detail);
+      const metadata = [];
+      if (row.metric != null && row.metric !== '') metadata.push(escapeText(row.metric));
+      if (row.status && row.status !== detailText) metadata.push(humanize(row.status));
+      if (metadata.length) {
+        const meta = document.createElement('p'); meta.textContent = metadata.join(' · ');
+        card.append(meta);
+      }
       const repeat = object(row.repeat_window_evidence);
       if (repeat.windows != null) {
         const receipt = document.createElement('p');
@@ -364,11 +373,11 @@
     }
     function outreachCardNode(row) {
       const card = document.createElement('article'); card.className = 'card';
-      const title = document.createElement('h3'); title.textContent = escapeText(row.buyer_role || row.target_segment || 'Reviewed buyer role');
+      const title = document.createElement('h3'); title.textContent = escapeText(row.organization || row.buyer_role || row.target_segment || 'Reviewed buyer role');
       const detail = document.createElement('p');
-      const segment = escapeText(row.target_segment || '').replaceAll('_', ' ');
+      const segment = escapeText(row.validation_lane || row.target_segment || row.locality || '').replaceAll('_', ' ');
       detail.textContent = `${segment}${row.fit_score != null ? ` · fit ${escapeText(row.fit_score)}%` : ''}`;
-      const ask = document.createElement('p'); ask.textContent = escapeText(row.primary_ask || row.why_not_send_now || 'Human review required.');
+      const ask = document.createElement('p'); ask.textContent = escapeText(row.first_ask || row.primary_ask || row.why_this_matters || row.why_not_send_now || 'Human review required.');
       card.append(title, detail, ask); return card;
     }
     function renderCards(payload) { document.getElementById('cards').replaceChildren(...pickArray(payload, ['top_cards', 'proof_cards', 'cards', 'pilot_cards']).map(cardNode)); }

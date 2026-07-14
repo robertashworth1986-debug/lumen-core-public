@@ -49,8 +49,26 @@ def test_proof_to_pilot_surface_tracks_current_feed_schema() -> None:
         "ranked_targets",
     ):
         assert current_key in page
+    assert "['Canonical cards', canonicalCards.length" in page
     assert "External repeat-window evidence" not in page
     assert "external validation pending" in page
+
+
+def test_proof_to_pilot_maps_field_protocol_and_reviewer_route_fields() -> None:
+    page = PROOF_TO_PILOT.read_text(encoding="utf-8")
+    field = json.loads((DATA / "field_validation_control_room.json").read_text(encoding="utf-8"))
+    routes = json.loads((DATA / "field_validation_outreach_board.json").read_text(encoding="utf-8"))
+
+    assert field["dashboard_cards"]
+    assert {"title", "subtitle", "metric", "status"} <= set(field["dashboard_cards"][0])
+    assert routes["ranked_targets"]
+    assert {"organization", "validation_lane", "first_ask"} <= set(routes["ranked_targets"][0])
+
+    assert "row.pilot_question || row.subtitle" in page
+    assert "row.metric != null" in page
+    assert "row.organization || row.buyer_role" in page
+    assert "row.validation_lane || row.target_segment || row.locality" in page
+    assert "row.first_ask || row.primary_ask || row.why_this_matters" in page
 
 
 def test_proof_to_pilot_public_evidence_counts_remain_reconciled() -> None:
