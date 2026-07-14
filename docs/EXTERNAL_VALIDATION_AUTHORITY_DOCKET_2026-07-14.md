@@ -1,6 +1,6 @@
 # External Validation Authority Docket
 
-Generated UTC: `2026-07-14T18:58:19.477212+00:00`
+Generated UTC: `2026-07-14T22:18:41.960989+00:00`
 
 This docket proves only the identity and readiness of a bounded external-validation process. It does not prove Level 4 or Level 5 maturity, independent validation, agency approval, NIST certification, field performance, grid reliability improvement, realized savings, patent validity or scope, production readiness, trading performance, or universal model superiority.
 
@@ -9,7 +9,7 @@ This docket proves only the identity and readiness of a bounded external-validat
 - Status: `PROSPECTIVE_COLLECTION_ACTIVE_AWAITING_FIRST_ELIGIBLE_SEAL`
 - Requested decision: Accept or decline the independent technical evaluator role for the frozen prospective experiment.
 - Fundable scope: A bounded independent evaluation and replication engagement may be funded without asserting that Level 4, Level 5, field performance, or economic savings already exist.
-- Docket SHA-256: `d30b7fbb48688319a2ec0539f8836ff1f4b0451cbd30a5a7368a91999b2c404e`
+- Docket SHA-256: `41ed8cdc61ce6614ea482a975461e5b6f733adf478f5e968a5fda2a0431f1137`
 
 ## Current Evidence
 
@@ -18,6 +18,7 @@ This docket proves only the identity and readiness of a bounded external-validat
 - Level 5 gate passed: `false`
 - External validation complete: `false`
 - Independent evaluator named: `false`
+- Evaluator acceptance template ready: `true`
 - Clean-runner bundle verified: `true`
 - Predictions sealed: `0`
 - Settlements recorded: `0`
@@ -28,11 +29,26 @@ This docket proves only the identity and readiness of a bounded external-validat
 
 1. Rehash every portable input and every archived clean-runner artifact.
 2. Review the frozen EIA protocol before inspecting prospective outcomes.
-3. Complete identity, authority, and conflict-of-interest fields without operator substitution.
-4. Observe prediction seals and settlements through the agreed evaluation window.
-5. Inspect all routes, fallbacks, exclusions, negative results, and chain-verification events.
-6. Independently reproduce the final metric and statistical decision.
-7. Sign only the maturity level supported by the complete evidence record.
+3. Copy the blank evaluator-owned acceptance receipt outside the public repository.
+4. Complete identity, authority, conflict, attestation, and signature-artifact fields without operator substitution.
+5. Run the fail-closed acceptance validator and preserve only a private or redacted hash receipt by default.
+6. Observe prediction seals and settlements through the agreed evaluation window.
+7. Inspect all routes, fallbacks, exclusions, negative results, and chain-verification events.
+8. Independently reproduce the final metric and statistical decision.
+9. Sign only the maturity level supported by the complete evidence record.
+
+## Acceptance Package
+
+- Blank template: `config/external_evaluator_acceptance_template_v1.json`
+- Template SHA-256: `abc3b961c7e0d17c2f8da95515a0cc51f0d0466acceb2e412340619f440ddf13`
+- Validator: `code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py`
+- Handoff guide: `docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md`
+- Template ready: `true`
+- External identity verified: `false`
+- Level 5 promotion allowed: `false`
+- Template check: `python code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py --expect-template`
+
+The acceptance package verifies blank-template custody and can validate completed-record structure and supplied artifact hashes. It does not authenticate an evaluator, establish independence or legal authority, interpret a signature, complete result signoff, or authorize Level 5 promotion.
 
 ## Maturity Gates
 

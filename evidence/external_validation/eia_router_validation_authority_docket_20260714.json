@@ -78,7 +78,7 @@
     },
     "verified": true
   },
-  "docket_sha256": "d30b7fbb48688319a2ec0539f8836ff1f4b0451cbd30a5a7368a91999b2c404e",
+  "docket_sha256": "41ed8cdc61ce6614ea482a975461e5b6f733adf478f5e968a5fda2a0431f1137",
   "evaluator_acceptance": {
     "accepted_protocol_sha256": null,
     "accepted_utc": null,
@@ -90,6 +90,54 @@
     "organization": null,
     "signed_result_receipt_sha256": null,
     "technical_role": null
+  },
+  "evaluator_acceptance_package": {
+    "checks": {
+      "acceptance_fields_blank": true,
+      "accepted_hashes_blank": true,
+      "evaluator_fields_blank": true,
+      "handoff_present": true,
+      "lane_id_matched": true,
+      "level_5_auto_promotion_prohibited": true,
+      "operator_substitution_prohibited": true,
+      "protocol_id_matched": true,
+      "schema_matched": true,
+      "signature_fields_blank": true,
+      "validator_present": true
+    },
+    "claim_boundary": "The acceptance package verifies blank-template custody and can validate completed-record structure and supplied artifact hashes. It does not authenticate an evaluator, establish independence or legal authority, interpret a signature, complete result signoff, or authorize Level 5 promotion.",
+    "completed_receipt_publication_default": "private_or_redacted_hash_only",
+    "evaluator_independence_verified": false,
+    "expected_schema": "external_evaluator_acceptance_receipt.v1",
+    "external_identity_verified": false,
+    "handoff_artifact": {
+      "bytes": 2410,
+      "hash_mode": "utf8_lf",
+      "path": "docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md",
+      "sha256": "f1b45851dab44b4428e32fcba0cd768e385b20ce4a2c5d2b24906ae628c84306"
+    },
+    "handoff_path": "docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md",
+    "level_5_auto_promotion_allowed": false,
+    "level_5_promotion_allowed": false,
+    "operator_may_fill_evaluator_fields": false,
+    "result_signoff_complete": false,
+    "template_artifact": {
+      "bytes": 1657,
+      "hash_mode": "utf8_lf",
+      "path": "config/external_evaluator_acceptance_template_v1.json",
+      "sha256": "abc3b961c7e0d17c2f8da95515a0cc51f0d0466acceb2e412340619f440ddf13"
+    },
+    "template_path": "config/external_evaluator_acceptance_template_v1.json",
+    "template_ready": true,
+    "template_state": "UNSIGNED_EVALUATOR_TEMPLATE",
+    "validator_artifact": {
+      "bytes": 11816,
+      "hash_mode": "utf8_lf",
+      "path": "code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py",
+      "sha256": "eac0f84a92449cf387229d0ca15f021945df2ed831df735edfa5e6d163c5f359"
+    },
+    "validator_command": "python code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py --expect-template",
+    "validator_path": "code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py"
   },
   "evaluator_authority_contract": {
     "decision_rights": [
@@ -132,7 +180,7 @@
     "source_publisher": "U.S. Energy Information Administration",
     "source_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/"
   },
-  "generated_utc": "2026-07-14T18:58:19.477212+00:00",
+  "generated_utc": "2026-07-14T22:18:41.960989+00:00",
   "maturity": {
     "current_supported_level": 3,
     "external_validation_complete": false,
@@ -187,25 +235,25 @@
       "remaining_gap": "No external organization has adopted an incident, escalation, or production-use decision process for this experiment."
     }
   ],
-  "portable_input_chain_sha256": "6fa1cb21f551bdabb23caf2448f678ad8e2aaf875e5beefe474b51ff98eb4c0d",
+  "portable_input_chain_sha256": "f3e7e216dbc57ae544739ddf935f440a7e12cd6c6ca981a3aa3c660b956bafa5",
   "portable_inputs": [
     {
-      "bytes": 8330,
+      "bytes": 9073,
       "hash_mode": "utf8_lf",
       "path": "config/external_validation_authority_docket_v1.json",
-      "sha256": "ebf9110602dba121baf1a4ea58e1bc47f8e998141d8b517112612f51d1316cc5"
+      "sha256": "27823c19e80cc688129620a92e9345ee4c7baa2e5f019d3da5d05b02ce7654c1"
     },
     {
-      "bytes": 22959,
+      "bytes": 27445,
       "hash_mode": "utf8_lf",
       "path": "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py",
-      "sha256": "16462d7f5f8ab06027f64c8f1958f98fa259ede00fe5a20bcd9bc7942c8c6797"
+      "sha256": "0de5001ad6528764b376eb4ae8052d3eccf4338040368c15efac06c4e698662c"
     },
     {
-      "bytes": 7635,
+      "bytes": 8205,
       "hash_mode": "utf8_lf",
       "path": "tests/test_external_validation_authority_docket.py",
-      "sha256": "d910f77180897174c4e64f9419310491d4201d1ea34ceaa60a621050d4265573"
+      "sha256": "ebf9f5d4b198861c8840cb2c465a604180d9e8742b2ee7219f3f3b39f3b93516"
     },
     {
       "bytes": 120,
@@ -214,16 +262,28 @@
       "sha256": "bc305d667254f6bc02227ef18dcb8acae9c1c5a0cf668b8bdd918c42e039e3d0"
     },
     {
-      "bytes": 2079,
+      "bytes": 2695,
       "hash_mode": "utf8_lf",
       "path": ".github/workflows/external-validation-docket.yml",
-      "sha256": "adf3518bed984f3f5015b741d6ee72e190835be64fcc526e09f06b4245703038"
+      "sha256": "0d6052ef3a92c4f5973f00d5d8667bde3ccd4ee23a99e1616a1e0b6ca4fa79ee"
+    },
+    {
+      "bytes": 11816,
+      "hash_mode": "utf8_lf",
+      "path": "code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py",
+      "sha256": "eac0f84a92449cf387229d0ca15f021945df2ed831df735edfa5e6d163c5f359"
     },
     {
       "bytes": 8106,
       "hash_mode": "utf8_lf",
       "path": "config/eia_grid_prospective_hybrid_router_protocol_v1.json",
       "sha256": "77a67f201884f70110c840d4d6b98b4194dca6f32a34c63c4a09c9dd786afb86"
+    },
+    {
+      "bytes": 1657,
+      "hash_mode": "utf8_lf",
+      "path": "config/external_evaluator_acceptance_template_v1.json",
+      "sha256": "abc3b961c7e0d17c2f8da95515a0cc51f0d0466acceb2e412340619f440ddf13"
     },
     {
       "bytes": 8223,
@@ -250,6 +310,12 @@
       "sha256": "b37f087da2a97860a57bd999d698e0e6790f6b8849713c12d294b59ef8fae944"
     },
     {
+      "bytes": 2410,
+      "hash_mode": "utf8_lf",
+      "path": "docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md",
+      "sha256": "f1b45851dab44b4428e32fcba0cd768e385b20ce4a2c5d2b24906ae628c84306"
+    },
+    {
       "bytes": 7860,
       "hash_mode": "utf8_lf",
       "path": "docs/FIELD_VALIDATION_BUYER_PILOT_PACKET_2026-06-25.md",
@@ -260,6 +326,12 @@
       "hash_mode": "utf8_lf",
       "path": "docs/REVIEWER_REPRODUCIBILITY_CAPSULE_2026-07-14.md",
       "sha256": "9a4c54cf91e39eac6536ee9d1671b222d33793907527e294cf735c0eb7c39795"
+    },
+    {
+      "bytes": 6408,
+      "hash_mode": "utf8_lf",
+      "path": "tests/test_external_evaluator_acceptance.py",
+      "sha256": "837de83d0a1d3e18ac288d09eee99c26051beaffa37996189a26336c2781a45f"
     }
   ],
   "privacy_scan": {
@@ -270,9 +342,9 @@
     "available": true,
     "common_settled_day_count": 0,
     "first_common_settled_date": null,
-    "generated_utc": "2026-07-14T18:57:57.695901+00:00",
+    "generated_utc": "2026-07-14T22:16:58.811415+00:00",
     "latest_common_settled_date": null,
-    "operational_receipt_sha256": "7ffcdbc0ee44faf022ef5c29a210df659632affecb9f03fd6f209188ef187c6e",
+    "operational_receipt_sha256": "c6b25bef4413904a1a19cafcb4b4c03f8deda458e741e4fdd68c4f4e34739da1",
     "prediction_count": 0,
     "prediction_count_by_authority": {
       "CISO": 0,
@@ -306,7 +378,7 @@
       "SWPP": 0,
       "TVA": 0
     },
-    "snapshot_sha256": "c53b136e7d1f1f7c2118673e75d69b39b916551694a7c02b5bc9d16cefe42ed5",
+    "snapshot_sha256": "727d687dc937b1ac3b9cf4171e0e657c24a17d2cc8daf87c03bb1bd151d6e491",
     "state": "WAITING_FOR_FIRST_ELIGIBLE_FORECAST"
   },
   "protocol_id": "LUMENCORE_EIA_EXTERNAL_VALIDATION_AUTHORITY_20260714",
@@ -325,7 +397,9 @@
   "reviewer_handoff_steps": [
     "Rehash every portable input and every archived clean-runner artifact.",
     "Review the frozen EIA protocol before inspecting prospective outcomes.",
-    "Complete identity, authority, and conflict-of-interest fields without operator substitution.",
+    "Copy the blank evaluator-owned acceptance receipt outside the public repository.",
+    "Complete identity, authority, conflict, attestation, and signature-artifact fields without operator substitution.",
+    "Run the fail-closed acceptance validator and preserve only a private or redacted hash receipt by default.",
     "Observe prediction seals and settlements through the agreed evaluation window.",
     "Inspect all routes, fallbacks, exclusions, negative results, and chain-verification events.",
     "Independently reproduce the final metric and statistical decision.",
@@ -361,13 +435,14 @@
     "clean_runner_bundle_verified": true,
     "common_settled_day_count": 0,
     "current_supported_level": 3,
+    "evaluator_acceptance_template_ready": true,
     "external_validation_complete": false,
     "field_validation_complete": false,
     "independent_evaluator_named": false,
     "integrity_gate_passed": true,
     "level_4_gate_passed": false,
     "level_5_gate_passed": false,
-    "portable_input_count": 12,
+    "portable_input_count": 16,
     "prediction_count": 0,
     "prospective_runtime_snapshot_available": true,
     "ready_to_invite_independent_evaluator": true,
