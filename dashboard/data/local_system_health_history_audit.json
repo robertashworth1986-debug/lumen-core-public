@@ -1,0 +1,431 @@
+{
+  "audit_receipt_sha256": "917ca393dcde64c63909a0049cf431d8dbb257999f514acdea6b1d1e44cb372a",
+  "claim_boundary": "This audit summarizes local, unevenly spaced point observations. Each legacy CPU value is a single one-second sample, not continuous utilization. Sparse point samples and free-space deltas can identify observed pressure and capacity change, but they cannot establish hardware degradation, root cause, prevented failure, field validation, independent validation, or a medical or safety diagnosis. The legacy collector does not measure temperature, SMART or NVMe wear, battery health or cycles, fan speed, GPU state, power state, network health, or per-process attribution.",
+  "claim_controls": {
+    "field_validation_claim_allowed": false,
+    "free_space_change_observations_allowed": true,
+    "hardware_degradation_claim_allowed": false,
+    "independent_validation_claim_allowed": false,
+    "local_pressure_observations_allowed": true,
+    "prevented_failure_claim_allowed": false,
+    "root_cause_claim_allowed": false
+  },
+  "evidence_class": "local_unevenly_spaced_point_observation",
+  "generated_utc": "2026-07-14T10:13:25.915582Z",
+  "integrity": {
+    "counts": {
+      "complete_ledger_receipts": 1248,
+      "defect_count": 13,
+      "ledger_meso_records": 1248,
+      "proof_archives": 1249,
+      "snapshot_files": 1252,
+      "snapshot_sidecars": 1249,
+      "valid_snapshots": 1250
+    },
+    "defect_counts": {
+      "proof_unledgered": 1,
+      "proof_zero_bytes": 1,
+      "snapshot_json_invalid": 2,
+      "snapshot_sidecar_missing": 3,
+      "snapshot_unledgered": 4,
+      "snapshot_zero_bytes": 2
+    },
+    "defects": [
+      {
+        "artifact_alias": "legacy_proof_20260707T144456Z",
+        "code": "proof_unledgered",
+        "detail": "Proof archive has no MESO custody-ledger row.",
+        "severity": "high"
+      },
+      {
+        "artifact_alias": "legacy_proof_20260707T144456Z",
+        "code": "proof_zero_bytes",
+        "detail": "Proof archive is empty.",
+        "severity": "high"
+      },
+      {
+        "artifact_alias": "legacy_snapshot_20260531T000002Z",
+        "code": "snapshot_json_invalid",
+        "detail": "Snapshot is not valid UTF-8 JSON.",
+        "severity": "high"
+      },
+      {
+        "artifact_alias": "legacy_snapshot_20260531T080016Z",
+        "code": "snapshot_json_invalid",
+        "detail": "Snapshot is not valid UTF-8 JSON.",
+        "severity": "high"
+      },
+      {
+        "artifact_alias": "legacy_snapshot_20260531T000002Z",
+        "code": "snapshot_sidecar_missing",
+        "detail": "Snapshot has no SHA-256 sidecar.",
+        "severity": "high"
+      },
+      {
+        "artifact_alias": "legacy_snapshot_20260531T080016Z",
+        "code": "snapshot_sidecar_missing",
+        "detail": "Snapshot has no SHA-256 sidecar.",
+        "severity": "high"
+      },
+      {
+        "artifact_alias": "legacy_snapshot_20260706T015023Z",
+        "code": "snapshot_sidecar_missing",
+        "detail": "Snapshot has no SHA-256 sidecar.",
+        "severity": "high"
+      },
+      {
+        "artifact_alias": "legacy_snapshot_20260531T000002Z",
+        "code": "snapshot_unledgered",
+        "detail": "Snapshot has no MESO custody-ledger row.",
+        "severity": "high"
+      },
+      {
+        "artifact_alias": "legacy_snapshot_20260531T080016Z",
+        "code": "snapshot_unledgered",
+        "detail": "Snapshot has no MESO custody-ledger row.",
+        "severity": "high"
+      },
+      {
+        "artifact_alias": "legacy_snapshot_20260706T015023Z",
+        "code": "snapshot_unledgered",
+        "detail": "Snapshot has no MESO custody-ledger row.",
+        "severity": "high"
+      },
+      {
+        "artifact_alias": "legacy_snapshot_20260707T143346Z",
+        "code": "snapshot_unledgered",
+        "detail": "Snapshot has no MESO custody-ledger row.",
+        "severity": "high"
+      },
+      {
+        "artifact_alias": "legacy_snapshot_20260531T000002Z",
+        "code": "snapshot_zero_bytes",
+        "detail": "Snapshot file is empty.",
+        "severity": "high"
+      },
+      {
+        "artifact_alias": "legacy_snapshot_20260531T080016Z",
+        "code": "snapshot_zero_bytes",
+        "detail": "Snapshot file is empty.",
+        "severity": "high"
+      }
+    ],
+    "status": "defects_present"
+  },
+  "measurement_boundary": {
+    "continuous_cpu_observation": false,
+    "duration_coverage_calculable": false,
+    "legacy_cpu_point_sample_seconds": 1,
+    "source_files_repaired_or_rewritten": false,
+    "uneven_cadence_preserved": true,
+    "unmeasured_hardware_domains": [
+      "battery_health_and_cycles",
+      "fan_speed",
+      "gpu_state",
+      "network_health",
+      "power_state",
+      "process_attribution",
+      "smart_or_nvme_wear",
+      "temperature"
+    ]
+  },
+  "mode": "read_only_legacy_evidence_audit",
+  "schema": "luma.local_system_health_history_audit.v1",
+  "source_manifest": {
+    "custody_ledger": {
+      "alias": "legacy_health_custody_ledger",
+      "available": true,
+      "bytes": 1068315,
+      "meso_record_count": 1248,
+      "record_count": 3749,
+      "sha256": "3183d5e98766fcfa2d749b91852b7a1bd1fb5ddd73230e77c3414f7167934c48"
+    },
+    "legacy_collector": {
+      "alias": "legacy_health_collector",
+      "available": true,
+      "bytes": 4784,
+      "record_count": 1,
+      "sha256": "bb57e55ea5b096db84045c4f37283c2e6b9fa9242ba7644e63ec9e5c716b5c4f"
+    },
+    "proof_set": {
+      "alias": "legacy_health_proof_set",
+      "logical_bytes": 726509,
+      "manifest_sha256": "dec53d12f8b5d803f30b638ce45899a1df61dfce187b5244d4e7b1141ae2a5ca",
+      "record_count": 1249
+    },
+    "schema": "luma.local_system_health_history_source_manifest.v1",
+    "snapshot_set": {
+      "alias": "legacy_health_snapshot_set",
+      "logical_bytes": 857556,
+      "manifest_sha256": "2a19f4feb74537507dcdc5f2b8a3752429a05502d1f73b983ef98bfd0c06365c",
+      "record_count": 1252
+    },
+    "snapshot_sidecar_set": {
+      "alias": "legacy_health_snapshot_sidecar_set",
+      "logical_bytes": 82434,
+      "manifest_sha256": "45701659595002fabbc79eb2ffde82b065de938404b3c9963eb50b7446484e2c",
+      "record_count": 1249
+    }
+  },
+  "source_manifest_sha256": "01ab6f1b45499d375c25f72e960f9ad9df2c84dc68626a587d1e6a5ac4f17a74",
+  "summary": {
+    "active_utc_date_count": 155,
+    "cadence": {
+      "gap_count": 1249,
+      "max_gap_minutes": 6180.0,
+      "median_gap_minutes": 60.0,
+      "p95_gap_minutes": 912.466667
+    },
+    "elapsed_days": 181.708252,
+    "expected_hour_bucket_count": 4362,
+    "first_observed_utc": "2026-01-13T17:00:09Z",
+    "hour_bucket_coverage_pct": 28.610729,
+    "last_observed_utc": "2026-07-14T10:00:02Z",
+    "observed_hour_bucket_count": 1248,
+    "unique_snapshot_time_count": 1250,
+    "valid_snapshot_count": 1250
+  },
+  "trailing_windows": {
+    "180": {
+      "active_utc_date_count": 153,
+      "cadence": {
+        "gap_count": 1232,
+        "max_gap_minutes": 6180.0,
+        "median_gap_minutes": 60.0,
+        "p95_gap_minutes": 909.354167
+      },
+      "coverage_definition": "UTC hour buckets containing at least one point sample divided by expected buckets; not duration coverage.",
+      "cpu_point_samples": {
+        "maximum_percent": 81.68,
+        "median_percent": 24.94,
+        "p95_percent": 56.148,
+        "sample_seconds_each": 1,
+        "sustained_utilization_claim_allowed": false,
+        "valid_sample_count": 1233
+      },
+      "expected_hour_bucket_count": 4321,
+      "hardware_degradation_claim_allowed": false,
+      "hour_bucket_coverage_pct": 28.535061,
+      "memory_free": {
+        "median_percent": 33.15919,
+        "minimum_percent": 1.052415,
+        "p10_percent": 12.18116,
+        "samples_below_10_percent": 92,
+        "samples_below_20_percent": 298,
+        "samples_below_5_percent": 42,
+        "valid_sample_count": 1233
+      },
+      "observed_hour_bucket_count": 1233,
+      "snapshot_count": 1233,
+      "unique_snapshot_time_count": 1233,
+      "volume_free_space": {
+        "auxiliary_volume_1": {
+          "delta_free_gb": -575.14,
+          "first_free_gb": 955.21,
+          "first_observed_utc": "2026-01-15T10:00:02Z",
+          "last_free_gb": 380.07,
+          "last_observed_utc": "2026-07-14T10:00:02Z",
+          "minimum_free_gb": 344.86,
+          "minimum_free_observed_utc": "2026-07-07T13:09:13Z",
+          "sample_count": 1233
+        },
+        "auxiliary_volume_2": {
+          "delta_free_gb": 0.0,
+          "first_free_gb": 1.47,
+          "first_observed_utc": "2026-01-15T10:00:02Z",
+          "last_free_gb": 1.47,
+          "last_observed_utc": "2026-07-14T10:00:02Z",
+          "minimum_free_gb": 1.47,
+          "minimum_free_observed_utc": "2026-01-15T10:00:02Z",
+          "sample_count": 1233
+        },
+        "auxiliary_volume_3": {
+          "delta_free_gb": -0.03,
+          "first_free_gb": 931.06,
+          "first_observed_utc": "2026-01-22T03:00:02Z",
+          "last_free_gb": 931.03,
+          "last_observed_utc": "2026-02-13T23:00:01Z",
+          "minimum_free_gb": 931.03,
+          "minimum_free_observed_utc": "2026-01-31T19:00:02Z",
+          "sample_count": 54
+        },
+        "auxiliary_volume_4": {
+          "delta_free_gb": -78.1,
+          "first_free_gb": 930.99,
+          "first_observed_utc": "2026-03-24T02:00:02Z",
+          "last_free_gb": 852.89,
+          "last_observed_utc": "2026-06-20T15:32:15Z",
+          "minimum_free_gb": 852.88,
+          "minimum_free_observed_utc": "2026-06-20T07:15:25Z",
+          "sample_count": 9
+        },
+        "system_volume": {
+          "delta_free_gb": -788.6,
+          "first_free_gb": 807.31,
+          "first_observed_utc": "2026-01-15T10:00:02Z",
+          "last_free_gb": 18.71,
+          "last_observed_utc": "2026-07-14T10:00:02Z",
+          "minimum_free_gb": 0.86,
+          "minimum_free_observed_utc": "2026-07-07T14:33:46Z",
+          "sample_count": 1233
+        }
+      },
+      "window_end_utc": "2026-07-14T10:00:02Z",
+      "window_start_utc": "2026-01-15T10:00:02Z"
+    },
+    "30": {
+      "active_utc_date_count": 28,
+      "cadence": {
+        "gap_count": 176,
+        "max_gap_minutes": 2340.0,
+        "median_gap_minutes": 60.0,
+        "p95_gap_minutes": 1249.745833
+      },
+      "coverage_definition": "UTC hour buckets containing at least one point sample divided by expected buckets; not duration coverage.",
+      "cpu_point_samples": {
+        "maximum_percent": 69.77,
+        "median_percent": 35.09,
+        "p95_percent": 59.926,
+        "sample_seconds_each": 1,
+        "sustained_utilization_claim_allowed": false,
+        "valid_sample_count": 177
+      },
+      "expected_hour_bucket_count": 721,
+      "hardware_degradation_claim_allowed": false,
+      "hour_bucket_coverage_pct": 24.549237,
+      "memory_free": {
+        "median_percent": 33.977031,
+        "minimum_percent": 1.052415,
+        "p10_percent": 5.614624,
+        "samples_below_10_percent": 23,
+        "samples_below_20_percent": 26,
+        "samples_below_5_percent": 15,
+        "valid_sample_count": 177
+      },
+      "observed_hour_bucket_count": 177,
+      "snapshot_count": 177,
+      "unique_snapshot_time_count": 177,
+      "volume_free_space": {
+        "auxiliary_volume_1": {
+          "delta_free_gb": -6.67,
+          "first_free_gb": 386.74,
+          "first_observed_utc": "2026-06-14T17:44:19Z",
+          "last_free_gb": 380.07,
+          "last_observed_utc": "2026-07-14T10:00:02Z",
+          "minimum_free_gb": 344.86,
+          "minimum_free_observed_utc": "2026-07-07T13:09:13Z",
+          "sample_count": 177
+        },
+        "auxiliary_volume_2": {
+          "delta_free_gb": 0.0,
+          "first_free_gb": 1.47,
+          "first_observed_utc": "2026-06-14T17:44:19Z",
+          "last_free_gb": 1.47,
+          "last_observed_utc": "2026-07-14T10:00:02Z",
+          "minimum_free_gb": 1.47,
+          "minimum_free_observed_utc": "2026-06-14T17:44:19Z",
+          "sample_count": 177
+        },
+        "auxiliary_volume_4": {
+          "delta_free_gb": 0.0,
+          "first_free_gb": 852.89,
+          "first_observed_utc": "2026-06-20T03:00:01Z",
+          "last_free_gb": 852.89,
+          "last_observed_utc": "2026-06-20T15:32:15Z",
+          "minimum_free_gb": 852.88,
+          "minimum_free_observed_utc": "2026-06-20T07:15:25Z",
+          "sample_count": 3
+        },
+        "system_volume": {
+          "delta_free_gb": -77.01,
+          "first_free_gb": 95.72,
+          "first_observed_utc": "2026-06-14T17:44:19Z",
+          "last_free_gb": 18.71,
+          "last_observed_utc": "2026-07-14T10:00:02Z",
+          "minimum_free_gb": 0.86,
+          "minimum_free_observed_utc": "2026-07-07T14:33:46Z",
+          "sample_count": 177
+        }
+      },
+      "window_end_utc": "2026-07-14T10:00:02Z",
+      "window_start_utc": "2026-06-14T10:00:02Z"
+    },
+    "90": {
+      "active_utc_date_count": 87,
+      "cadence": {
+        "gap_count": 698,
+        "max_gap_minutes": 3106.3,
+        "median_gap_minutes": 60.0,
+        "p95_gap_minutes": 886.0725
+      },
+      "coverage_definition": "UTC hour buckets containing at least one point sample divided by expected buckets; not duration coverage.",
+      "cpu_point_samples": {
+        "maximum_percent": 81.68,
+        "median_percent": 30.74,
+        "p95_percent": 61.544,
+        "sample_seconds_each": 1,
+        "sustained_utilization_claim_allowed": false,
+        "valid_sample_count": 699
+      },
+      "expected_hour_bucket_count": 2161,
+      "hardware_degradation_claim_allowed": false,
+      "hour_bucket_coverage_pct": 32.346136,
+      "memory_free": {
+        "median_percent": 30.758077,
+        "minimum_percent": 1.052415,
+        "p10_percent": 8.556716,
+        "samples_below_10_percent": 78,
+        "samples_below_20_percent": 197,
+        "samples_below_5_percent": 36,
+        "valid_sample_count": 699
+      },
+      "observed_hour_bucket_count": 699,
+      "snapshot_count": 699,
+      "unique_snapshot_time_count": 699,
+      "volume_free_space": {
+        "auxiliary_volume_1": {
+          "delta_free_gb": -575.09,
+          "first_free_gb": 955.16,
+          "first_observed_utc": "2026-04-15T19:31:38Z",
+          "last_free_gb": 380.07,
+          "last_observed_utc": "2026-07-14T10:00:02Z",
+          "minimum_free_gb": 344.86,
+          "minimum_free_observed_utc": "2026-07-07T13:09:13Z",
+          "sample_count": 699
+        },
+        "auxiliary_volume_2": {
+          "delta_free_gb": 0.0,
+          "first_free_gb": 1.47,
+          "first_observed_utc": "2026-04-15T19:31:38Z",
+          "last_free_gb": 1.47,
+          "last_observed_utc": "2026-07-14T10:00:02Z",
+          "minimum_free_gb": 1.47,
+          "minimum_free_observed_utc": "2026-04-15T19:31:38Z",
+          "sample_count": 699
+        },
+        "auxiliary_volume_4": {
+          "delta_free_gb": -78.1,
+          "first_free_gb": 930.99,
+          "first_observed_utc": "2026-04-24T01:00:02Z",
+          "last_free_gb": 852.89,
+          "last_observed_utc": "2026-06-20T15:32:15Z",
+          "minimum_free_gb": 852.88,
+          "minimum_free_observed_utc": "2026-06-20T07:15:25Z",
+          "sample_count": 7
+        },
+        "system_volume": {
+          "delta_free_gb": -318.82,
+          "first_free_gb": 337.53,
+          "first_observed_utc": "2026-04-15T19:31:38Z",
+          "last_free_gb": 18.71,
+          "last_observed_utc": "2026-07-14T10:00:02Z",
+          "minimum_free_gb": 0.86,
+          "minimum_free_observed_utc": "2026-07-07T14:33:46Z",
+          "sample_count": 699
+        }
+      },
+      "window_end_utc": "2026-07-14T10:00:02Z",
+      "window_start_utc": "2026-04-15T10:00:02Z"
+    }
+  }
+}
