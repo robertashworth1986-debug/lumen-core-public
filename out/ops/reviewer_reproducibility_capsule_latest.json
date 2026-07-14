@@ -1,5 +1,5 @@
 {
-  "capsule_sha256": "32f24874ce5b3360ddb5eb982ab2c70a3d13fb16df54ab4c46005f1cb10329ad",
+  "capsule_sha256": "865671b83dc0d2086a47508a79335d7b841426504c11d2439a4656da143ecdd1",
   "claim_boundary": "A passing capsule proves that the named code reproduced the declared bounded facts from the packaged input under the recorded environment. It does not prove agency approval, cybersecurity certification, external validation, field performance, realized savings, patent scope, trading performance, or funding eligibility.",
   "dependencies": [
     {
@@ -148,10 +148,10 @@
       "-k",
       "not frozen_eia_panel_and_result_manifests_are_hash_valid_and_claim_safe and not published_receipt_reconciles_hashes_assertions_and_public_projection"
     ],
-    "elapsed_seconds": 7.28,
+    "elapsed_seconds": 6.686,
     "exit_code": 0,
     "log_path": "out/reproducibility/reviewer_capsule_latest/logs/fixture_tests.log",
-    "log_sha256": "85926d58a0c97b9b92785c11b223c645ef056ebf8eb0156ae63852718868e524",
+    "log_sha256": "ff75768d7ed7d427c55e7cdca1c4958b7dfe0712b279f5b7fa0da5a77ff98da2",
     "passed": true
   },
   "frozen_input": {
@@ -191,10 +191,10 @@
     "passed": true,
     "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz"
   },
-  "generated_utc": "2026-07-14T13:34:33.376033+00:00",
+  "generated_utc": "2026-07-14T13:54:10.473629+00:00",
   "git": {
     "branch": "codex/live-domain-proof-feed-bundle",
-    "commit": "297796288e0634623dc0d81d33ccca1b71793bcb",
+    "commit": "4c924ab498aef4ebcd2b314fb25fbc574ce96655",
     "relevant_change_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "relevant_change_line_count": 0,
     "relevant_source_clean": true
@@ -225,14 +225,14 @@
   "schema": "reviewer_reproducibility_capsule.v1",
   "source_artifacts": [
     {
-      "bytes": 3819,
+      "bytes": 3859,
       "path": ".github/workflows/reviewer-reproducibility.yml",
-      "sha256": "ce43f6acb5c411f56f42aff37b9f5a0d1c754c9dc82fd9800bc033536823748c"
+      "sha256": "b83bb4fb9da7ba13c3dc3440abad3880011e46352774665a54c1e1309d571002"
     },
     {
-      "bytes": 11274,
+      "bytes": 12629,
       "path": "README.md",
-      "sha256": "86c73c0ff972b98c55ddd1518f686fc884c8a4533329cfd05ea511aeb5afb741"
+      "sha256": "1cecf464bcd6fedbfe3386db698786173d10ef859a2bb9d88944faac8cab1f03"
     },
     {
       "bytes": 41017,
@@ -305,12 +305,12 @@
       "sha256": "0798b6a130f48b012c75877fd56d9aeb36be033b5620b974e89fc46b76585db8"
     },
     {
-      "bytes": 10040,
+      "bytes": 10088,
       "path": "tests/test_reviewer_reproducibility_capsule.py",
-      "sha256": "1d15acbbc1101cfd0dd32a3c2da4728c6e4c5718cba33ce5f873aa56fb106234"
+      "sha256": "66b5594e1c0067c2b63f147fd08b766edf966444c26628461f542b455c47d1f4"
     }
   ],
-  "source_chain_sha256": "e20cb804625ed0b8053da4f17077e3cfd381e944889e78cc363856468dbb9e28",
+  "source_chain_sha256": "196590870ff0c6a033b78eb739744087dca588da552cd2c844e8538bca6aa2de",
   "standards_references": [
     {
       "name": "NIST SP 800-218 Secure Software Development Framework 1.1",
@@ -388,7 +388,7 @@
           "passed": true
         }
       ],
-      "elapsed_seconds": 38.787,
+      "elapsed_seconds": 35.822,
       "fact_projection": {
         "baseline_comparison_count": 6,
         "best_mase": 0.47945937271811834,
@@ -471,7 +471,7 @@
           "passed": true
         }
       ],
-      "elapsed_seconds": 12.355,
+      "elapsed_seconds": 11.585,
       "fact_projection": {
         "baseline_comparison_count": 6,
         "best_mase": 0.21211186326437864,
@@ -543,7 +543,7 @@
           "passed": true
         }
       ],
-      "elapsed_seconds": 0.223,
+      "elapsed_seconds": 0.216,
       "fact_projection": {
         "candidate_micro_f1": 0.9433962264150945,
         "candidate_supported_coverage": 0.9583333333333334,
