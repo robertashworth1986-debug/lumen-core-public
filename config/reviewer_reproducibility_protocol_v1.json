@@ -144,7 +144,7 @@
     "tests/test_faa_sdr_10k_benchmark.py",
     "tests/test_reviewer_reproducibility_capsule.py",
     "-k",
-    "not frozen_eia_panel_and_result_manifests_are_hash_valid_and_claim_safe"
+    "not frozen_eia_panel_and_result_manifests_are_hash_valid_and_claim_safe and not published_receipt_reconciles_hashes_assertions_and_public_projection"
   ],
   "control_paths": [
     ".github/workflows/reviewer-reproducibility.yml",

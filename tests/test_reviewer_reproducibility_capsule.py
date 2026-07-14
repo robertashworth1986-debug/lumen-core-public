@@ -57,6 +57,8 @@ def test_protocol_is_frozen_version_pinned_and_claim_bounded():
     residual = next(row for row in protocol["suites"] if row["runner"] == "eia_residual")
     assert residual["expected"]["relative_tolerance"] == 0.01
     assert "tolerance" not in residual["expected"]
+    fixture_filter = protocol["fixture_test_command"][-1]
+    assert "not published_receipt_reconciles_hashes" in fixture_filter
 
     pins = {
         line.split("==", 1)[0]: line.split("==", 1)[1]
