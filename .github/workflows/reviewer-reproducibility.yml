@@ -1,0 +1,102 @@
+name: Reviewer reproducibility capsule
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/reviewer-reproducibility.yml"
+      - "code/eia_grid_residual_moe_benchmark.py"
+      - "code/eia_grid_wave_champion_benchmark.py"
+      - "code/mda_control_mapping_open_set_benchmark.py"
+      - "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py"
+      - "config/eia_grid_residual_moe_protocol_v1.json"
+      - "config/eia_grid_wave_champion_protocol_v1.json"
+      - "config/mda_control_mapping_open_set_protocol_v2.json"
+      - "config/reviewer_reproducibility_protocol_v1.json"
+      - "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz"
+      - "requirements-reviewer.txt"
+      - "tests/test_eia_grid_residual_moe_benchmark.py"
+      - "tests/test_eia_grid_wave_champion_benchmark.py"
+      - "tests/test_faa_sdr_10k_benchmark.py"
+      - "tests/test_mda_control_mapping_open_set_benchmark.py"
+      - "tests/test_reviewer_reproducibility_capsule.py"
+  push:
+    paths:
+      - ".github/workflows/reviewer-reproducibility.yml"
+      - "code/eia_grid_residual_moe_benchmark.py"
+      - "code/eia_grid_wave_champion_benchmark.py"
+      - "code/mda_control_mapping_open_set_benchmark.py"
+      - "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py"
+      - "config/eia_grid_residual_moe_protocol_v1.json"
+      - "config/eia_grid_wave_champion_protocol_v1.json"
+      - "config/mda_control_mapping_open_set_protocol_v2.json"
+      - "config/reviewer_reproducibility_protocol_v1.json"
+      - "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz"
+      - "requirements-reviewer.txt"
+      - "tests/test_eia_grid_residual_moe_benchmark.py"
+      - "tests/test_eia_grid_wave_champion_benchmark.py"
+      - "tests/test_faa_sdr_10k_benchmark.py"
+      - "tests/test_mda_control_mapping_open_set_benchmark.py"
+      - "tests/test_reviewer_reproducibility_capsule.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reviewer-reproducibility-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  clean-room-replay:
+    name: Frozen public-data replay
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PYTHONHASHSEED: "0"
+      TZ: UTC
+      OMP_NUM_THREADS: "4"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+
+    steps:
+      - name: Check out the reviewed source
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Install the pinned Python runtime
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11.9"
+
+      - name: Install the reviewer-suite dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --requirement requirements-reviewer.txt
+
+      - name: Verify the capsule controls
+        run: |
+          python -m pytest -q tests/test_reviewer_reproducibility_capsule.py
+
+      - name: Replay the frozen evidence and fixture gates
+        run: |
+          python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py \
+            --with-fixture-tests \
+            --run-dir out/reproducibility/ci
+
+      - name: Hash the run artifacts
+        if: always()
+        shell: bash
+        run: |
+          if [ -d out/reproducibility/ci ]; then
+            find out/reproducibility/ci -type f -print0 \
+              | sort -z \
+              | xargs -0 sha256sum \
+              > out/reproducibility/ci/SHA256SUMS
+          fi
+
+      - name: Publish the bounded replay receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: reviewer-reproducibility-${{ github.sha }}
+          path: out/reproducibility/ci/
+          if-no-files-found: error
+          retention-days: 30

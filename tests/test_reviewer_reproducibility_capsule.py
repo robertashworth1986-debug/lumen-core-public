@@ -1,0 +1,179 @@
+from __future__ import annotations
+
+import gzip
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / "code" / "ops" / "RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py"
+PROTOCOL = ROOT / "config" / "reviewer_reproducibility_protocol_v1.json"
+PUBLISHED = ROOT / "out" / "ops" / "reviewer_reproducibility_capsule_latest.json"
+DASHBOARD = ROOT / "dashboard" / "data" / "reviewer_reproducibility_capsule.json"
+SBOM = ROOT / "evidence" / "reproducibility" / "reviewer_suite_sbom_20260714.cdx.json"
+MARKDOWN = ROOT / "docs" / "REVIEWER_REPRODUCIBILITY_CAPSULE_2026-07-14.md"
+
+
+def load_module():
+    spec = importlib.util.spec_from_file_location(
+        "reviewer_reproducibility_capsule", SCRIPT
+    )
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_protocol_is_frozen_version_pinned_and_claim_bounded():
+    protocol = json.loads(PROTOCOL.read_text(encoding="utf-8"))
+
+    assert protocol["schema"] == "reviewer_reproducibility_protocol.v1"
+    assert protocol["protocol_id"] == "LUMENCORE_REVIEWER_REPRODUCIBILITY_20260714"
+    assert protocol["environment"]["python"] == "3.11.9"
+    assert protocol["environment"]["artifact_hash_lock_complete"] is False
+    assert len(protocol["dependencies"]) == 8
+    assert len(protocol["suites"]) == 3
+    assert {row["runner"] for row in protocol["suites"]} == {
+        "eia_wave",
+        "eia_residual",
+        "mda_open_set",
+    }
+    assert all(
+        row["expected"]["promotion_gate_passed"] is False for row in protocol["suites"]
+    )
+    assert "not a NIST certification" in protocol["standards_references"][0]["use"]
+    assert (
+        "not independent scientific or field validation"
+        in protocol["excluded_full_replays"][2]["reason"]
+    )
+    assert "TO_BE_FROZEN" not in json.dumps(protocol)
+
+    pins = {
+        line.split("==", 1)[0]: line.split("==", 1)[1]
+        for line in (ROOT / protocol["environment"]["requirements_path"])
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line.strip()
+    }
+    assert pins == {
+        row["distribution"]: row["version"] for row in protocol["dependencies"]
+    }
+
+
+def test_packaged_eia_panel_is_deterministic_secret_free_and_hash_valid():
+    module = load_module()
+    protocol = module.load_protocol()
+    frozen = protocol["frozen_inputs"][0]
+    path = ROOT / frozen["path"]
+    compressed = path.read_bytes()
+
+    assert compressed[4:8] == b"\x00\x00\x00\x00"
+    assert hashlib.sha256(compressed).hexdigest() == frozen["compressed_sha256"]
+    raw = gzip.decompress(compressed)
+    assert hashlib.sha256(raw).hexdigest() == frozen["uncompressed_sha256"]
+
+    panel = json.loads(raw.decode("utf-8"))
+    assert panel["schema"] == "eia_grid_validation_panel.v1"
+    assert panel["quality"]["row_count"] == 14_704
+    assert panel["quality"]["authority_count"] == 8
+    assert panel["quality"]["duplicate_conflict_count"] == 0
+    assert panel["source"]["credential_serialized"] is False
+    assert module.canonical_sha256(panel["rows"]) == frozen["row_chain_sha256"]
+    assert not module.scan_private(panel)
+
+
+def test_published_receipt_reconciles_hashes_assertions_and_public_projection():
+    module = load_module()
+    receipt = json.loads(PUBLISHED.read_text(encoding="utf-8"))
+    dashboard = json.loads(DASHBOARD.read_text(encoding="utf-8"))
+
+    assert receipt == dashboard
+    assert receipt["status"] == "BOUNDED_REPRODUCIBILITY_PASS"
+    assert (
+        receipt["summary"]["suite_pass_count"] == receipt["summary"]["suite_count"] == 3
+    )
+    assert (
+        receipt["summary"]["assertion_pass_count"]
+        == receipt["summary"]["assertion_count"]
+        == 31
+    )
+    assert receipt["summary"]["dependency_versions_exact_match"] is True
+    assert receipt["summary"]["sbom_component_count"] >= 8
+    assert receipt["summary"]["deterministic_environment_match"] is True
+    assert receipt["summary"]["artifact_hash_lock_complete"] is False
+    assert receipt["summary"]["external_validation_complete"] is False
+    assert receipt["summary"]["agency_certification_complete"] is False
+    if receipt["summary"]["fixture_tests_executed"]:
+        assert receipt["summary"]["fixture_tests_passed"] is True
+    assert receipt["privacy_scan"] == {
+        "configured_pattern_hit_count": 0,
+        "passed": True,
+    }
+    assert all(suite["passed"] for suite in receipt["suites"])
+    assert all(
+        check["passed"] for suite in receipt["suites"] for check in suite["assertions"]
+    )
+    assert receipt["source_chain_sha256"] == module.canonical_sha256(
+        receipt["source_artifacts"]
+    )
+    without_hash = {
+        key: value for key, value in receipt.items() if key != "capsule_sha256"
+    }
+    assert receipt["capsule_sha256"] == module.canonical_sha256(without_hash)
+    assert not module.scan_private(receipt)
+
+    artifacts = {row["path"]: row for row in receipt["source_artifacts"]}
+    for path_text, artifact in artifacts.items():
+        path = ROOT / path_text
+        assert path.is_file()
+        assert path.stat().st_size == artifact["bytes"]
+        assert module.file_sha256(path) == artifact["sha256"]
+
+
+def test_sbom_has_scoped_component_identity_and_dependency_relationships():
+    payload = json.loads(SBOM.read_text(encoding="utf-8"))
+    protocol = json.loads(PROTOCOL.read_text(encoding="utf-8"))
+
+    assert payload["bomFormat"] == "CycloneDX"
+    assert payload["specVersion"] == "1.6"
+    assert payload["serialNumber"].startswith("urn:uuid:")
+    assert (
+        payload["metadata"]["component"]["name"]
+        == "LumenCore reviewer reproducibility capsule"
+    )
+    assert len(payload["components"]) >= 8
+    assert all(
+        row["name"] and row["version"] and row["purl"] for row in payload["components"]
+    )
+    root_ref = payload["metadata"]["component"]["bom-ref"]
+    dependency_row = next(
+        row for row in payload["dependencies"] if row["ref"] == root_ref
+    )
+    components_by_name = {row["name"].casefold(): row for row in payload["components"]}
+    expected_direct_refs = {
+        components_by_name[row["distribution"].casefold()]["bom-ref"]
+        for row in protocol["dependencies"]
+    }
+    assert set(dependency_row["dependsOn"]) == expected_direct_refs
+    valid_refs = {root_ref, *(row["bom-ref"] for row in payload["components"])}
+    assert all(row["ref"] in valid_refs for row in payload["dependencies"])
+    assert all(
+        set(row["dependsOn"]).issubset(valid_refs) for row in payload["dependencies"]
+    )
+
+
+def test_markdown_reports_failures_and_unmet_external_gates_plainly():
+    rendered = MARKDOWN.read_text(encoding="utf-8")
+
+    assert "Suites passed: `3/3`" in rendered
+    assert "Assertions passed: `31/31`" in rendered
+    assert "`promotion_gate_passed`: `False`" in rendered
+    assert "`coverage_gate_passed`: `False`" in rendered
+    assert "External validation complete: `false`" in rendered
+    assert "Agency certification complete: `false`" in rendered
+    assert "Deterministic environment matched: `true`" in rendered
+    assert "Fixture tests executed: `" in rendered
+    assert "Fixture tests passed: `" in rendered
+    assert "not a complete product SBOM" in rendered
+    assert "about 114 MB" in rendered
