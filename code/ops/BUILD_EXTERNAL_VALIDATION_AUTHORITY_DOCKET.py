@@ -90,11 +90,23 @@ def scan_private(value: Any) -> list[str]:
     return [pattern.pattern for pattern in PRIVATE_PATTERNS if pattern.search(text)]
 
 
+def portable_file_bytes(path: Path, hash_mode: str = "utf8_lf") -> bytes:
+    raw = path.read_bytes()
+    if hash_mode == "raw":
+        return raw
+    if hash_mode != "utf8_lf":
+        raise ValueError(f"unsupported portable hash mode: {hash_mode}")
+    text = raw.decode("utf-8")
+    return text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+
+
 def artifact_row(path: Path, *, root: Path = ROOT) -> dict[str, Any]:
+    content = portable_file_bytes(path)
     return {
         "path": repo_path(path, root=root),
-        "bytes": path.stat().st_size,
-        "sha256": file_sha256(path),
+        "hash_mode": "utf8_lf",
+        "bytes": len(content),
+        "sha256": hashlib.sha256(content).hexdigest(),
     }
 
 

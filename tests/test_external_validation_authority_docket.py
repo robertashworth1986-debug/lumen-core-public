@@ -114,6 +114,19 @@ def test_missing_private_runtime_stays_reviewable_and_fail_closed(tmp_path):
     assert status == "EVALUATOR_DOCKET_READY_RUNTIME_SNAPSHOT_UNAVAILABLE"
 
 
+def test_portable_input_hash_normalizes_windows_and_linux_line_endings(tmp_path):
+    module = load_module()
+    path = tmp_path / "portable.txt"
+    path.write_bytes(b"alpha\r\nbeta\r\n")
+    windows_row = module.artifact_row(path, root=tmp_path)
+    path.write_bytes(b"alpha\nbeta\n")
+    linux_row = module.artifact_row(path, root=tmp_path)
+
+    assert windows_row == linux_row
+    assert windows_row["hash_mode"] == "utf8_lf"
+    assert windows_row["bytes"] == len(b"alpha\nbeta\n")
+
+
 def test_current_docket_is_integrity_ready_but_keeps_level_5_closed():
     module = load_module()
     payload = module.build_payload()
@@ -164,8 +177,9 @@ def test_published_docket_and_markdown_reconcile_without_overclaiming():
     for row in payload["portable_inputs"]:
         path = ROOT / row["path"]
         assert path.is_file()
-        assert path.stat().st_size == row["bytes"]
-        assert module.file_sha256(path) == row["sha256"]
+        content = module.portable_file_bytes(path, row["hash_mode"])
+        assert len(content) == row["bytes"]
+        assert module.hashlib.sha256(content).hexdigest() == row["sha256"]
 
     assert "External Validation Authority Docket" in rendered
     assert "Current supported level: `3`" in rendered
