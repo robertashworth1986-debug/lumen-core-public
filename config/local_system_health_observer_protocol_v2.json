@@ -1,0 +1,159 @@
+{
+  "schema": "luma.local_system_health_observer_protocol.v2",
+  "protocol_id": "local_system_health_observer_v2",
+  "protocol_version": "2.0.0",
+  "frozen_at_utc": "2026-07-14T10:00:00Z",
+  "mode": "observation_only",
+  "evidence_maturity": "local_operational_observation",
+  "cadence": {
+    "interval_minutes": 5,
+    "single_run_timeout_minutes": 4,
+    "docker_unavailable_backoff_minutes": 60
+  },
+  "observations": {
+    "cpu": {
+      "enabled": true,
+      "sample_seconds": 1.0,
+      "exclude_collector_process_time": true
+    },
+    "uptime": {
+      "enabled": true
+    },
+    "memory": {
+      "enabled": true,
+      "exclude_collector_working_set": true
+    },
+    "disk": {
+      "enabled": true,
+      "volume_aliases_only": true,
+      "exclude_collector_output_bytes": true
+    },
+    "battery": {
+      "enabled": true
+    },
+    "windows_update_service": {
+      "enabled": true,
+      "service_alias": "windows_update_service",
+      "collect_status": true,
+      "collect_start_mode": true,
+      "mutation_allowed": false
+    },
+    "docker": {
+      "enabled": true,
+      "daemon_query_limit_per_eligible_run": 1,
+      "container_inventory_query_limit_per_eligible_run": 1,
+      "include_all_states": true,
+      "public_safe_container_names": [
+        "prometheus",
+        "grafana",
+        "lumen-exporter",
+        "node_exporter"
+      ],
+      "container_mutation_allowed": false
+    }
+  },
+  "mutation_policy": {
+    "start_or_restart_services": false,
+    "start_or_restart_containers": false,
+    "install_or_upgrade_software": false,
+    "change_accounts_or_credentials": false,
+    "external_send": false
+  },
+  "output_contract": {
+    "latest_filename": "health_observer_v2_latest.json",
+    "daily_segment_prefix": "health_observer_v2_",
+    "daily_segment_suffix": ".jsonl",
+    "single_writer_lock_filename": ".health_observer_v2.lock",
+    "absolute_paths_allowed": false,
+    "usernames_allowed": false,
+    "credentials_allowed": false,
+    "unconfigured_container_details_allowed": false,
+    "self_observation_allowed": false
+  },
+  "integrity": {
+    "hash_algorithm": "sha256",
+    "canonical_json": "utf8_sorted_keys_compact_no_nan",
+    "append_flush_fsync_required": true,
+    "atomic_latest_replace_required": true,
+    "monotonic_sequence_required": true,
+    "prior_event_hash_required": true,
+    "snapshot_content_hash_required": true,
+    "protocol_hash_required": true,
+    "collector_script_hash_required": true,
+    "task_staging_script_hash_required": true
+  },
+  "readiness": {
+    "horizons_observed_v2_dates": [
+      30,
+      90,
+      180
+    ],
+    "require_distinct_utc_dates_with_v2_observations": true,
+    "legacy_dates_credited": 0,
+    "calendar_elapsed_days_without_observations_credited": false
+  },
+  "legacy_v1_genesis_reference": {
+    "boundary": "reference_only_do_not_repair_or_rewrite_v1",
+    "repair_attempted": false,
+    "legacy_dates_eligible_for_v2_readiness": false,
+    "declared_chain_break_count": 288,
+    "declared_fork_count": 6,
+    "artifacts": [
+      {
+        "alias": "legacy_audit_chain",
+        "sha256": "a861401d81ee8ca7549218b118e7744a31c3a6d639273cbcd78ae6b49e79b77a",
+        "bytes": 2479438,
+        "record_count": 4765,
+        "count_unit": "jsonl_rows",
+        "first_event_time_utc": "2026-04-30T17:37:16.143696+00:00",
+        "first_event_hash": "6b6b84a782b2f973c50696ae1a2a6d0e23218be8696a45aa0917c2d0f5c5fe6e",
+        "last_event_time_utc": "2026-07-14T01:52:48.541109+00:00",
+        "tail_event_hash": "bb0274e5bdaa13efcb7f2e12e11cad957f866a962156d78be46c1d90f7f50184"
+      },
+      {
+        "alias": "legacy_frozen_deltas",
+        "sha256": "4a983311f380e3aacee69a46ba41440d62b7379a405166468d2043862dca3bb7",
+        "bytes": 942710,
+        "record_count": 4787,
+        "count_unit": "jsonl_rows",
+        "first_event_time_utc": "2026-04-30T17:37:16.137633+00:00",
+        "last_event_time_utc": "2026-07-14T01:57:50.266322+00:00"
+      },
+      {
+        "alias": "legacy_docker_task_definition",
+        "sha256": "4ed3e706b7b2d61fbf7a92fc4d9a1cbdd2e120c8c86521fb1bf700b195c7cbbf",
+        "bytes": 3732,
+        "record_count": 1,
+        "count_unit": "file"
+      },
+      {
+        "alias": "legacy_service_task_definition",
+        "sha256": "afd209ae0332a959bfdef0c601080c52c5a2ba22b0244560431f47a8d7636a36",
+        "bytes": 3706,
+        "record_count": 1,
+        "count_unit": "file"
+      },
+      {
+        "alias": "legacy_docker_observer_script",
+        "sha256": "c1dd3d98a094f56c257b02fafbba5f083a6f6385a4f612d51d4d9591e5fb9c6a",
+        "bytes": 769,
+        "record_count": 1,
+        "count_unit": "file"
+      },
+      {
+        "alias": "legacy_service_observer_script",
+        "sha256": "5cc84fed6d7c5b17f29731e91f46ea379349e013aeb26cdce16a43593f072e71",
+        "bytes": 439,
+        "record_count": 1,
+        "count_unit": "file"
+      }
+    ]
+  },
+  "claim_boundaries": [
+    "Local observations are not independent validation, field validation, a medical diagnosis, or proof of prevented failures.",
+    "Legacy v1 custody is preserved as-is; its declared breaks and forks are not repaired by v2.",
+    "Only distinct UTC dates containing v2 observations count toward 30, 90, and 180-day readiness.",
+    "The collector may report state but may not remediate services, containers, updates, software, or accounts.",
+    "This protocol does not collect component temperatures, SMART attributes, fan speed, GPU telemetry, process attribution, network quality, or Windows event-error history."
+  ]
+}
