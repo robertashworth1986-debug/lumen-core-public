@@ -15,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import traceback
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -354,12 +355,15 @@ def execute_captured(
 ) -> tuple[dict[str, Any], float]:
     buffer = io.StringIO()
     started = time.perf_counter()
-    with contextlib.redirect_stdout(buffer), contextlib.redirect_stderr(buffer):
-        result = runner()
-    elapsed = time.perf_counter() - started
-    log = redact_text(buffer.getvalue())
-    write_text(log_path, log)
-    return result, elapsed
+    try:
+        with contextlib.redirect_stdout(buffer), contextlib.redirect_stderr(buffer):
+            result = runner()
+        return result, time.perf_counter() - started
+    except Exception:
+        traceback.print_exc(file=buffer)
+        raise
+    finally:
+        write_text(log_path, redact_text(buffer.getvalue()))
 
 
 def _run_module_benchmark(
@@ -610,9 +614,27 @@ def suite_result(
     }
 
 
+def failed_suite_result(suite: dict[str, Any], error: Exception) -> dict[str, Any]:
+    error_record = {
+        "type": type(error).__name__,
+        "message": redact_text(str(error)),
+    }
+    return {
+        "suite_id": suite["suite_id"],
+        "kind": suite["kind"],
+        "runner": suite["runner"],
+        "passed": False,
+        "elapsed_seconds": None,
+        "fact_projection": {},
+        "fact_projection_sha256": canonical_sha256({}),
+        "assertions": [],
+        "error": error_record,
+    }
+
+
 def load_frozen_panel(
     protocol: dict[str, Any],
-) -> tuple[dict[str, Any], dict[str, Any]]:
+) -> tuple[dict[str, Any], dict[str, Any], bytes]:
     frozen = protocol["frozen_inputs"][0]
     path = ROOT / frozen["path"]
     compressed = path.read_bytes()
@@ -632,12 +654,37 @@ def load_frozen_panel(
             "credential_serialized", panel["source"]["credential_serialized"], False
         ),
     ]
-    return panel, {
-        "input_id": frozen["input_id"],
-        "path": frozen["path"],
-        "passed": all(row["passed"] for row in checks),
-        "assertions": checks,
-    }
+    return (
+        panel,
+        {
+            "input_id": frozen["input_id"],
+            "path": frozen["path"],
+            "passed": all(row["passed"] for row in checks),
+            "assertions": checks,
+        },
+        raw,
+    )
+
+
+@contextlib.contextmanager
+def materialize_frozen_panel(protocol: dict[str, Any], raw: bytes):
+    frozen = protocol["frozen_inputs"][0]
+    target = (ROOT / frozen["materialized_path"]).resolve()
+    target.relative_to(ROOT.resolve())
+    existed = target.is_file()
+    if existed:
+        if file_sha256(target) != frozen["uncompressed_sha256"]:
+            raise ValueError(
+                "existing materialized EIA panel does not match the frozen input"
+            )
+    else:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(raw)
+    try:
+        yield target
+    finally:
+        if not existed and target.is_file():
+            target.unlink()
 
 
 def run_fixture_tests(protocol: dict[str, Any], run_dir: Path) -> dict[str, Any]:
@@ -727,18 +774,22 @@ def build_capsule(
     generated_utc = now_utc()
     artifacts = source_artifacts(protocol, protocol_path)
     dependencies = observed_dependencies(protocol)
-    panel, input_receipt = load_frozen_panel(protocol)
+    panel, input_receipt, panel_raw = load_frozen_panel(protocol)
     suites = []
-    for suite in protocol["suites"]:
-        runner = suite["runner"]
-        if runner == "eia_wave":
-            suites.append(run_eia_wave(panel, suite, run_dir))
-        elif runner == "eia_residual":
-            suites.append(run_eia_residual(panel, suite, run_dir))
-        elif runner == "mda_open_set":
-            suites.append(run_mda_open_set(suite, run_dir))
-        else:
-            raise ValueError(f"unsupported reviewer capsule runner: {runner}")
+    with materialize_frozen_panel(protocol, panel_raw):
+        for suite in protocol["suites"]:
+            runner = suite["runner"]
+            try:
+                if runner == "eia_wave":
+                    suites.append(run_eia_wave(panel, suite, run_dir))
+                elif runner == "eia_residual":
+                    suites.append(run_eia_residual(panel, suite, run_dir))
+                elif runner == "mda_open_set":
+                    suites.append(run_mda_open_set(suite, run_dir))
+                else:
+                    raise ValueError(f"unsupported reviewer capsule runner: {runner}")
+            except Exception as error:
+                suites.append(failed_suite_result(suite, error))
 
     fixture_tests = (
         run_fixture_tests(protocol, run_dir)

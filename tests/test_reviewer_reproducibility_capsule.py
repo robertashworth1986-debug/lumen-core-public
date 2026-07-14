@@ -83,6 +83,46 @@ def test_packaged_eia_panel_is_deterministic_secret_free_and_hash_valid():
     assert not module.scan_private(panel)
 
 
+def test_materialized_panel_is_scoped_verified_and_removed(tmp_path, monkeypatch):
+    module = load_module()
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    raw = b'{"schema":"fixture"}\n'
+    protocol = {
+        "frozen_inputs": [
+            {
+                "materialized_path": "data/panel.json",
+                "uncompressed_sha256": hashlib.sha256(raw).hexdigest(),
+            }
+        ]
+    }
+    target = tmp_path / "data" / "panel.json"
+
+    with module.materialize_frozen_panel(protocol, raw) as materialized:
+        assert materialized == target
+        assert target.read_bytes() == raw
+
+    assert not target.exists()
+
+
+def test_failed_suite_receipt_is_bounded_and_redacts_local_paths():
+    module = load_module()
+    suite = {
+        "suite_id": "fixture",
+        "kind": "fixture",
+        "runner": "fixture",
+    }
+
+    receipt = module.failed_suite_result(
+        suite,
+        FileNotFoundError(r"C:\Users\Example\private\missing.json"),
+    )
+
+    assert receipt["passed"] is False
+    assert receipt["error"]["type"] == "FileNotFoundError"
+    assert "C:\\Users" not in receipt["error"]["message"]
+    assert receipt["fact_projection_sha256"] == module.canonical_sha256({})
+
+
 def test_published_receipt_reconciles_hashes_assertions_and_public_projection():
     module = load_module()
     receipt = json.loads(PUBLISHED.read_text(encoding="utf-8"))

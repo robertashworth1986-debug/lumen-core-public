@@ -43,6 +43,7 @@
     {
       "input_id": "eia_grid_validation_panel_20260713",
       "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
+      "materialized_path": "data/live_measured/eia_grid_validation/eia_grid_validation_panel_latest.json",
       "media_type": "application/gzip",
       "compressed_sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9",
       "uncompressed_sha256": "8b480ec4923c17d3782eacd428ee5ea599525145ce2a0772ba934aba0a40da59",

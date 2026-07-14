@@ -13,15 +13,15 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 - Scoped SBOM components: `18`
 - Deterministic environment matched: `true`
 - Frozen input passed: `true`
-- Relevant source clean: `true`
-- Clean-runner replay: `true`
+- Relevant source clean: `false`
+- Clean-runner replay: `false`
 - Artifact hash lock complete: `false`
 - External validation complete: `false`
 - Agency certification complete: `false`
 - Fixture tests executed: `true`
 - Fixture tests passed: `true`
-- Source chain SHA-256: `69304523a499721bb7ad05e358bd15771bce18b9b13962e12f778ab775abaa7c`
-- Capsule SHA-256: `3e9004aebe3fdd0b4115dcdc3f29d467b3ae3c1d79fe33af31a3db779e4187d5`
+- Source chain SHA-256: `6a576ffda2d27d45bb0a4e930468b13f624929f0073f391325f0f938d51434c6`
+- Capsule SHA-256: `f5a005759494e71c7da7f45bbbd67e464902b843e44201fe2c7b20bb703352a6`
 
 ## Replayed Suites
 
@@ -29,7 +29,7 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - Kind: `measured_public_data_replay`
 - Passed: `true`
-- Elapsed seconds: `35.625`
+- Elapsed seconds: `35.201`
 - Fact projection SHA-256: `66f4fde9d3935fb2ea519fc639ec55fd582f0b2f454d33d973ea365e42c98bbf`
 - Facts:
   - `evaluation_rows`: `22530`
@@ -55,7 +55,7 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - Kind: `measured_public_data_replay`
 - Passed: `true`
-- Elapsed seconds: `11.273`
+- Elapsed seconds: `11.405`
 - Fact projection SHA-256: `c34a50a95474700e60cd1e162ac371f4bb0233c6a1b207d0f11603b3a2320405`
 - Facts:
   - `evaluation_rows`: `16975`
@@ -83,7 +83,7 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - Kind: `deterministic_synthetic_falsification_replay`
 - Passed: `true`
-- Elapsed seconds: `0.202`
+- Elapsed seconds: `0.205`
 - Fact projection SHA-256: `6cbbc86400aa77f0305dd13c3d08b9a46dce26e731b96aade2abf2933d7f56e4`
 - Facts:
   - `fixture_chain_sha256`: `25f32a2e03157f6f058f1022bec7d0f0ea151991fc4e1c68d0b91fe59b1e278e`
