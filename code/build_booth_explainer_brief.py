@@ -4,9 +4,15 @@ from __future__ import annotations
 import argparse
 import json
 import hashlib
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from booth_public_contract import (
+    public_booth_contains_forbidden_value,
+    public_booth_projection,
+)
 
 STACK_ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = STACK_ROOT / "out" / "execution" / "universe_map"
@@ -24,6 +30,20 @@ OUTPUT_JSON = OUT_DIR / "booth_explainer_brief.json"
 OUTPUT_MD = OUT_DIR / "booth_explainer_brief.md"
 OUTPUT_SHA = OUT_DIR / "booth_explainer_brief_sha256.json"
 OUTPUT_HISTORY = OUT_DIR / "booth_explainer_brief_history.jsonl"
+UPLOAD_READY_ROOT = STACK_ROOT / "out" / "ops" / "linkedin_master_pack" / "upload_ready"
+
+_COPY_JSON_NAME = re.compile(
+    r"^booth_explainer_brief(?P<variant>__\d+)?\.json$",
+    re.IGNORECASE,
+)
+_COPY_MD_NAME = re.compile(
+    r"^booth_explainer_brief(?P<variant>__\d+)?\.md$",
+    re.IGNORECASE,
+)
+_COPY_SHA_NAME = re.compile(
+    r"^booth_explainer_brief_sha256(?P<variant>__\d+)?\.json$",
+    re.IGNORECASE,
+)
 
 DEFAULT_FOUNDER_PROFILE = {
     "founder": "Robert BabyRay Ashworth",
@@ -268,9 +288,7 @@ def _render_markdown(payload: dict[str, Any]) -> str:
     catalog = payload.get("catalog", {}) if isinstance(payload, dict) else {}
     live = payload.get("live_execution", {}) if isinstance(payload, dict) else {}
     hb = live.get("heartbeat", {}) if isinstance(live, dict) else {}
-    trade = live.get("latest_trade", {}) if isinstance(live, dict) else {}
     mirror = payload.get("premium_mirror", {}) if isinstance(payload, dict) else {}
-    grant_win = payload.get("autonomous_grant_win", {}) if isinstance(payload, dict) else {}
 
     lines: list[str] = []
     lines.append("# Luma Booth Explainer Brief")
@@ -301,13 +319,14 @@ def _render_markdown(payload: dict[str, Any]) -> str:
     lines.append(f"- assets_source_rows: {catalog.get('assets_source_rows', 0)}")
     lines.append("")
 
-    lines.append("## Live Execution")
+    lines.append("## Execution Boundary")
     lines.append(f"- heartbeat_status: {hb.get('status', '')}")
-    lines.append(f"- heartbeat_reason: {hb.get('reason', '')}")
-    lines.append(f"- heartbeat_symbol: {hb.get('symbol', '')}")
-    lines.append(f"- latest_trade_txid: {trade.get('txid', '')}")
-    lines.append(f"- latest_trade_symbol: {trade.get('symbol', '')}")
-    lines.append(f"- latest_trade_status: {trade.get('status', '')}")
+    lines.append(f"- heartbeat_timestamp_utc: {hb.get('timestamp_utc', '')}")
+    lines.append(f"- universe_candidate_count: {hb.get('universe_candidate_count', 0)}")
+    lines.append(f"- recent_event_count: {live.get('recent_trade_count', 0)}")
+    lines.append(f"- details_redacted: {str(live.get('details_redacted', True)).lower()}")
+    lines.append(f"- public_claim_allowed: {str(live.get('public_claim_allowed', False)).lower()}")
+    lines.append(f"- live_execution_authority: {str(live.get('live_execution_authority', False)).lower()}")
     lines.append("")
 
     lines.append("## Premium Mirror")
@@ -315,30 +334,126 @@ def _render_markdown(payload: dict[str, Any]) -> str:
     lines.append(f"- total_files_seen: {mirror.get('total_files_seen', 0)}")
     lines.append(f"- total_files_copied: {mirror.get('total_files_copied', 0)}")
     lines.append("")
-    lines.append("## Autonomous Grant Win Lock")
-    lines.append(f"- valuation_increment_usd: {grant_win.get('valuation_increment_usd', 0)}")
-    lines.append(f"- master_valuation_proxy_usd: {grant_win.get('master_valuation_proxy_usd', 0)}")
-    lines.append(f"- ip_entry_sha256: {grant_win.get('ip_entry_sha256', '')}")
-    lines.append(f"- event_id: {grant_win.get('event_id', '')}")
-    lines.append(f"- explainer_generated_utc: {grant_win.get('explainer_generated_utc', '')}")
-    lines.append(f"- public_truth_status: {grant_win.get('public_truth_status', '')}")
-    lines.append(f"- public_truth_chain_entry_sha256: {grant_win.get('public_truth_chain_entry_sha256', '')}")
+    lines.append("## Claim Boundary")
+    lines.append(f"- supported_maturity_level: Level {payload.get('supported_maturity_level', 3)}")
+    lines.append(f"- profit_claim_allowed: {str(payload.get('profit_claim_allowed', False)).lower()}")
+    lines.append(f"- live_execution_authority: {str(payload.get('live_execution_authority', False)).lower()}")
+    lines.append("")
+    lines.append(str(payload.get("claim_boundary", "")))
 
     return "\n".join(lines).strip() + "\n"
 
 
-def _append_history(path: Path, payload: dict[str, Any]) -> None:
-    row = {
+def _safe_history_text(value: Any) -> str:
+    text = str(value or "")
+    return "" if public_booth_contains_forbidden_value(text) else text
+
+
+def _history_row_from_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    return {
         "generated_utc": payload.get("generated_utc"),
         "files_indexed": ((payload.get("indexing", {}) or {}).get("files_indexed", 0)),
         "engine_count": ((payload.get("catalog", {}) or {}).get("engine_count", 0)),
         "heartbeat_status": (((payload.get("live_execution", {}) or {}).get("heartbeat", {}) or {}).get("status", "")),
-        "latest_trade_txid": (((payload.get("live_execution", {}) or {}).get("latest_trade", {}) or {}).get("txid", "")),
+        "details_redacted": True,
+        "public_claim_allowed": False,
         "mirror_files_seen": ((payload.get("premium_mirror", {}) or {}).get("total_files_seen", 0)),
     }
+
+
+def _sanitize_history_row(row: dict[str, Any]) -> dict[str, Any]:
+    """Reduce a legacy history row to the bounded public-history contract."""
+
+    return {
+        "generated_utc": _safe_history_text(row.get("generated_utc")),
+        "files_indexed": max(0, _safe_int(row.get("files_indexed", 0), 0)),
+        "engine_count": max(0, _safe_int(row.get("engine_count", 0), 0)),
+        "heartbeat_status": _safe_history_text(row.get("heartbeat_status")),
+        "details_redacted": True,
+        "public_claim_allowed": False,
+        "mirror_files_seen": max(0, _safe_int(row.get("mirror_files_seen", 0), 0)),
+    }
+
+
+def _rewrite_history(path: Path, payload: dict[str, Any]) -> None:
+    rows: list[dict[str, Any]] = []
+    if path.exists():
+        try:
+            for raw in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+                try:
+                    row = json.loads(raw)
+                except Exception:
+                    continue
+                if isinstance(row, dict):
+                    rows.append(_sanitize_history_row(row))
+        except Exception:
+            rows = []
+
+    rows.append(_sanitize_history_row(_history_row_from_payload(payload)))
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+    path.write_text(
+        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+
+
+def _sha_manifest(files: list[Path], generated_utc: str) -> dict[str, Any]:
+    return {
+        "generated_utc": generated_utc,
+        "public_copy": True,
+        "details_redacted": True,
+        "files": {path.name: read_sha256(path) for path in files if path.is_file()},
+    }
+
+
+def _path_is_within_root(path: Path, root: Path) -> bool:
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, ValueError):
+        return False
+    return True
+
+
+def _rewrite_upload_ready_copies(
+    root: Path,
+    payload: dict[str, Any],
+    markdown: str,
+    manifest_generated_utc: str,
+) -> list[Path]:
+    """Rewrite only existing booth copies below the bounded upload-ready root."""
+
+    if not root.is_dir():
+        return []
+
+    candidates = sorted(root.rglob("booth_explainer_brief*"))
+    candidates = [
+        path
+        for path in candidates
+        if path.is_file() and not path.is_symlink() and _path_is_within_root(path, root)
+    ]
+    rewritten: list[Path] = []
+
+    for path in candidates:
+        if _COPY_JSON_NAME.fullmatch(path.name):
+            write_json(path, payload)
+            rewritten.append(path)
+        elif _COPY_MD_NAME.fullmatch(path.name):
+            path.write_text(markdown, encoding="utf-8")
+            rewritten.append(path)
+
+    for path in candidates:
+        match = _COPY_SHA_NAME.fullmatch(path.name)
+        if not match:
+            continue
+        variant = match.group("variant") or ""
+        related = [
+            path.parent / f"booth_explainer_brief{variant}.json",
+            path.parent / f"booth_explainer_brief{variant}.md",
+        ]
+        write_json(path, _sha_manifest(related, manifest_generated_utc))
+        rewritten.append(path)
+
+    return rewritten
 
 
 def main() -> None:
@@ -346,21 +461,27 @@ def main() -> None:
     parser.add_argument("--recent-trade-rows", type=int, default=80, help="How many ledger rows to inspect for recent trade context.")
     args = parser.parse_args()
 
-    payload = _build_payload(recent_trade_rows=max(1, int(args.recent_trade_rows)))
+    payload = public_booth_projection(
+        _build_payload(recent_trade_rows=max(1, int(args.recent_trade_rows)))
+    )
 
     write_json(OUTPUT_JSON, payload)
-    OUTPUT_MD.write_text(_render_markdown(payload), encoding="utf-8")
+    markdown = _render_markdown(payload)
+    OUTPUT_MD.write_text(markdown, encoding="utf-8")
 
-    sha_payload = {
-        "generated_utc": now_utc(),
-        "files": {
-            str(OUTPUT_JSON.as_posix()): read_sha256(OUTPUT_JSON),
-            str(OUTPUT_MD.as_posix()): read_sha256(OUTPUT_MD),
-        },
-    }
-    write_json(OUTPUT_SHA, sha_payload)
+    manifest_generated_utc = now_utc()
+    write_json(
+        OUTPUT_SHA,
+        _sha_manifest([OUTPUT_JSON, OUTPUT_MD], manifest_generated_utc),
+    )
 
-    _append_history(OUTPUT_HISTORY, payload)
+    _rewrite_history(OUTPUT_HISTORY, payload)
+    _rewrite_upload_ready_copies(
+        UPLOAD_READY_ROOT,
+        payload,
+        markdown,
+        manifest_generated_utc,
+    )
 
     print(str(OUTPUT_JSON.as_posix()))
     print(str(OUTPUT_MD.as_posix()))
