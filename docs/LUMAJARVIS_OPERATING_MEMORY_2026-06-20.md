@@ -421,9 +421,9 @@ Freeze one grid protocol and secure aligned utility, ISO/RTO, or laboratory data
 
 - Army AIDP RFI #4 market-research feedback was sent and read back with the `SENT` label at `2026-07-13T21:27:05Z`.
 - NASA Data Center Infrastructure RFI response was sent and read back with the `SENT` label at `2026-07-13T21:27:12Z`.
-- The USPTO Pro Se Assistance Center request for urgent procedural help on application `19/281,546` was sent at `2026-07-13T21:27:19Z`.
+- A USPTO Pro Se Assistance Center request for urgent procedural help on the private application reference was sent at `2026-07-13T21:27:19Z`.
 - Public machine receipt: `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json`.
-- Private patent send receipt remains under `C:\LumaTrader\PRIVATE_ESTATE\PATENT_19_281_546` and must not enter the public repository.
+- The private patent send receipt remains outside the public repository.
 
 Transmission is not agency acceptance, evaluation, validation, award, contract, patent relief, or deadline extension.
 
@@ -462,7 +462,7 @@ Transmission is not agency acceptance, evaluation, validation, award, contract, 
 
 ### Patent Triage
 
-- Application: `19/281,546`; title: `LumenCore: A Modular AI Node Framework for Conscious Systems Integration`.
+- The application reference is private; the working title is `LumenCore: A Modular AI Node Framework for Conscious Systems Integration`.
 - The saved payment receipt proves only fee code `3011`, basic filing fee, `$70.00`.
 - It does not prove that search, examination, oath/declaration, missing-parts, or later prosecution requirements were satisfied.
 - Do not infer a July 25, 2026 legal deadline from the filing anniversary.
@@ -470,11 +470,11 @@ Transmission is not agency acceptance, evaluation, validation, award, contract, 
 
 ### Custody and Verification
 
-- E-drive packet: `E:\LumaProofVault\LUMA_PROOF_VAULT_PACKET_20260713_SENT_ROUTING_MDA_V2`.
+- The private proof-vault packet is stored outside the public repository.
 - Artifact count: `120/120` ready and copied.
 - Destination hashes verified: `120/120`.
 - Manifest SHA-256: `DFCB65191959D4E7A7D2DD20A38396D468EFC6388A1C1AAFD5058B5A85B81597`.
-- Private patent custody is mirrored separately at `E:\LumaProofVault\PRIVATE_PATENT_19_281_546`.
+- Private patent custody is mirrored separately outside the public repository.
 
 ### Focused Verification
 

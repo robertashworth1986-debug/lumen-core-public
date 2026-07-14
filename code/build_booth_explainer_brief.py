@@ -30,9 +30,15 @@ DEFAULT_FOUNDER_PROFILE = {
     "company_system": "LumenCore / NovaCore / LumaCore",
     "uei": "SQY2XW71ZM51",
     "cage": "14TM8",
-    "ein": "39-3507463",
-    "uspto_non_provisional_application": "19/281,546",
     "patent_title": "LumenCore: A Modular AI Node Framework for Conscious Systems Integration",
+    "private_identifiers_embedded": False,
+}
+
+PRIVATE_FOUNDER_FIELDS = {
+    "ein",
+    "tin",
+    "uspto_non_provisional_application",
+    "patent_center_reference",
 }
 
 
@@ -117,6 +123,10 @@ def _build_payload(recent_trade_rows: int) -> dict[str, Any]:
         maybe_profile = universe_map.get("founder_profile")
         if isinstance(maybe_profile, dict) and maybe_profile:
             founder_profile = maybe_profile
+    founder_profile = {
+        key: value for key, value in founder_profile.items() if key not in PRIVATE_FOUNDER_FIELDS
+    }
+    founder_profile["private_identifiers_embedded"] = False
 
     scan = universe_map.get("scan", {}) if isinstance(universe_map, dict) else {}
     roots = universe_map.get("roots", []) if isinstance(universe_map, dict) else []
@@ -274,9 +284,8 @@ def _render_markdown(payload: dict[str, Any]) -> str:
         "company_system",
         "uei",
         "cage",
-        "ein",
-        "uspto_non_provisional_application",
         "patent_title",
+        "private_identifiers_embedded",
     ):
         lines.append(f"- {key}: {founder.get(key, '')}")
     lines.append("")

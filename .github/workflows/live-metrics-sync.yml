@@ -7,7 +7,7 @@ on:
   workflow_dispatch:   # allow manual trigger
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   sync-metrics:
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
       - name: Fetch live metrics from lumen-core.ai
         id: fetch
@@ -35,7 +35,9 @@ jobs:
           SNAPSHOT_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           SITE_UP=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" https://lumen-core.ai/ || echo "000")
 
-          cat > data/live_snapshot.json << EOF
+          mkdir -p out/ci/live-metrics
+
+          cat > out/ci/live-metrics/live_snapshot.json << EOF
           {
             "snapshot_utc": "${SNAPSHOT_TS}",
             "site_status": "${SITE_UP}",
@@ -59,7 +61,7 @@ jobs:
             STATUS_COLOR="red"
             STATUS_MSG="unreachable"
           fi
-          cat > data/site_health_badge.json << EOF
+          cat > out/ci/live-metrics/site_health_badge.json << EOF
           {
             "schemaVersion": 1,
             "label": "lumen-core.ai",
@@ -69,15 +71,21 @@ jobs:
           }
           EOF
 
-      - name: Commit metrics snapshot
+      - name: Publish workflow evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-metrics-${{ github.run_id }}
+          path: out/ci/live-metrics/
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Write run summary
         run: |
-          git config user.name  "lumencore-bot"
-          git config user.email "bot@lumen-core.ai"
-          git add data/live_snapshot.json data/site_health_badge.json
-          # Only commit if there are actual changes
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(metrics): live snapshot ${{ steps.fetch.outputs.snapshot_ts }}"
-            git push
-          else
-            echo "No changes — metrics unchanged since last run."
-          fi
+          {
+            echo "## Live metrics probe"
+            echo ""
+            echo "- Site HTTP status: ${{ steps.fetch.outputs.site_status }}"
+            echo "- Snapshot: ${{ steps.fetch.outputs.snapshot_ts }}"
+            echo ""
+            echo "The workflow is read-only. It does not commit generated state to the repository."
+          } >> "$GITHUB_STEP_SUMMARY"

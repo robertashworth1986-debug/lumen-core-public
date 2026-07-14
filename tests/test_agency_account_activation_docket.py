@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import re
 from pathlib import Path
 
 
@@ -128,10 +129,7 @@ def test_rendered_activation_docket_is_public_safe_and_human_gated():
     private_or_sensitive_markers = [
         "SQY2XW71ZM51",
         "14TM8",
-        "39-3507463",
         "2613 Paddle Wheel",
-        "615-438-2502",
-        "robertashworth4444@gmail.com",
         "zoom.us",
         "meeting id",
         "password",
@@ -145,3 +143,6 @@ def test_rendered_activation_docket_is_public_safe_and_human_gated():
     ]
     for marker in private_or_sensitive_markers:
         assert marker.lower() not in lowered
+    assert re.search(r"\b\d{2}-\d{7}\b", rendered) is None
+    assert re.search(r"\b\d{3}[-.]\d{3}[-.]\d{4}\b", rendered) is None
+    assert re.search(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", rendered, re.I) is None

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Proof To Pilot Control Room</title>
+  <style>
+    :root {
+      --paper: #f4f5f2;
+      --surface: #fff;
+      --ink: #171a18;
+      --muted: #626b65;
+      --line: #ccd2cd;
+      --green: #087f5b;
+      --amber: #a45b00;
+      --red: #b42318;
+      --blue: #2457a7;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.5 Inter, Segoe UI, sans-serif; }
+    header { background: var(--surface); border-bottom: 1px solid var(--line); }
+    .wrap { width: min(1220px, calc(100% - 32px)); margin: 0 auto; }
+    .head { min-height: 78px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+    h1 { margin: 0; font-size: 23px; letter-spacing: 0; }
+    h2 { margin: 0 0 12px; font-size: 17px; }
+    .label { color: var(--green); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .stamp { color: var(--muted); font-family: Consolas, monospace; }
+    main { padding: 26px 0 56px; }
+    .band { padding: 24px 0; border-bottom: 1px solid var(--line); }
+    .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); background: var(--surface); }
+    .metric { padding: 18px; border-right: 1px solid var(--line); min-width: 0; }
+    .metric:last-child { border-right: 0; }
+    .metric strong { display: block; font-size: 25px; overflow-wrap: anywhere; }
+    .metric span { color: var(--muted); }
+    .gates, .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .gate, .card { border: 1px solid var(--line); border-radius: 6px; background: var(--surface); padding: 15px; min-width: 0; }
+    .gate { display: flex; justify-content: space-between; gap: 16px; }
+    .pass { color: var(--green); font-weight: 700; }
+    .stop { color: var(--red); font-weight: 700; }
+    .card h3 { margin: 0 0 8px; font-size: 15px; }
+    .card p { margin: 6px 0; color: var(--muted); overflow-wrap: anywhere; }
+    .list { margin: 0; padding-left: 20px; columns: 2; column-gap: 40px; }
+    .list li { break-inside: avoid; margin-bottom: 8px; }
+    .boundary { padding: 16px; background: #eef4ff; border-left: 4px solid var(--blue); }
+    .error { color: var(--red); }
+    @media (max-width: 760px) {
+      .head { align-items: flex-start; flex-direction: column; padding: 16px 0; }
+      .summary, .gates, .cards { grid-template-columns: 1fr; }
+      .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+      .metric:last-child { border-bottom: 0; }
+      .list { columns: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header><div class="wrap head"><div><div class="label">Quant Hub evidence operations</div><h1>Proof To Pilot Control Room</h1></div><div id="stamp" class="stamp">Loading evidence feeds...</div></div></header>
+  <main class="wrap">
+    <section class="summary" id="summary" aria-label="Evidence summary"></section>
+    <section class="band"><h2>Claim gates</h2><div class="gates" id="gates"></div></section>
+    <section class="band"><h2>Reviewer proof cards</h2><div class="cards" id="cards"></div></section>
+    <section class="band"><h2>Evidence artifacts</h2><ul class="list" id="artifacts"></ul></section>
+    <section class="band"><h2>Manual reviewed outreach queue</h2><div class="cards" id="outreach"></div></section>
+    <section class="band"><h2>Field validation protocol</h2><div class="cards" id="field-validation"></div></section>
+    <section class="band"><h2>Field reviewer routing</h2><div class="cards" id="field-outreach"></div></section>
+    <p class="boundary">This control room does not authorize bulk email, field-validation claims, realized-savings claims, fixed-dollar frozen-delta claims, or external submission. It is not a send engine. Every external action remains manually reviewed.</p>
+  </main>
+  <script>
+    const feeds = {
+      control: 'data/proof_to_pilot_control_room.json',
+      outreach: 'data/paid_pilot_outreach_queue.json',
+      field: 'data/field_validation_control_room.json',
+      fieldOutreach: 'data/field_validation_outreach_board.json'
+    };
+    const gateLabels = [
+      ['manual_reviewed_outreach_allowed', 'Manual reviewed outreach allowed'],
+      ['paid_evaluation_offer_allowed', 'Paid evaluation offer allowed'],
+      ['buyer_authorized_pilot_scoping_ready', 'Buyer-authorized pilot scoping ready'],
+      ['field_validation_claim_allowed', 'Field-validation claim allowed'],
+      ['realized_savings_claim_allowed', 'Realized-savings claim allowed'],
+      ['fixed_dollar_delta_claim_allowed', 'Fixed-dollar delta claim allowed'],
+      ['bulk_email_allowed', 'Bulk email allowed'],
+      ['live_trading_or_autonomous_execution_allowed', 'Live trading/autonomous execution allowed'],
+      ['contact_scraping_allowed', 'Contact scraping allowed'],
+      ['send_without_user_review_allowed', 'Send without user review allowed']
+    ];
+    const array = (value) => Array.isArray(value) ? value : [];
+    const object = (value) => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    const pickArray = (payload, keys) => {
+      for (const key of keys) if (Array.isArray(payload?.[key])) return payload[key];
+      return [];
+    };
+    const escapeText = (value) => String(value ?? '');
+
+    function renderSummary(payload) {
+      const summary = object(payload.summary);
+      const values = [
+        ['Proof cards', summary.proof_card_count ?? pickArray(payload, ['proof_cards', 'cards']).length],
+        ['Evidence artifacts', summary.artifact_count ?? pickArray(payload, ['artifacts', 'evidence_artifacts']).length],
+        ['Ready lanes', summary.ready_lane_count ?? summary.lane_count ?? 0],
+        ['Human gate', 'Required']
+      ];
+      document.getElementById('summary').replaceChildren(...values.map(([label, value]) => {
+        const div = document.createElement('div'); div.className = 'metric';
+        const strong = document.createElement('strong'); strong.textContent = escapeText(value);
+        const span = document.createElement('span'); span.textContent = label;
+        div.append(strong, span); return div;
+      }));
+    }
+
+    function renderGates(payload) {
+      const source = { ...object(payload.summary), ...object(payload.claim_gates), ...object(payload.gates) };
+      document.getElementById('gates').replaceChildren(...gateLabels.map(([key, label]) => {
+        const row = document.createElement('div'); row.className = 'gate';
+        const name = document.createElement('span'); name.textContent = label;
+        const value = document.createElement('span'); value.textContent = source[key] === true ? 'YES' : 'NO'; value.className = source[key] === true ? 'pass' : 'stop';
+        row.append(name, value); return row;
+      }));
+    }
+
+    function cardNode(row) {
+      const card = document.createElement('article'); card.className = 'card';
+      const title = document.createElement('h3'); title.textContent = escapeText(row.title || row.lane || row.target || row.name || row.id || 'Evidence item');
+      const detail = document.createElement('p'); detail.textContent = escapeText(row.summary || row.status || row.next_gate || row.ask || row.claim_boundary || 'Review required');
+      card.append(title, detail); return card;
+    }
+    function renderCards(payload) { document.getElementById('cards').replaceChildren(...pickArray(payload, ['proof_cards', 'cards', 'pilot_cards']).map(cardNode)); }
+    function renderArtifacts(payload) {
+      document.getElementById('artifacts').replaceChildren(...pickArray(payload, ['artifacts', 'evidence_artifacts', 'reviewer_artifacts']).map((row) => {
+        const li = document.createElement('li'); li.textContent = escapeText(row.path || row.name || row.artifact || row); return li;
+      }));
+    }
+    function renderOutreachQueue(payload) { document.getElementById('outreach').replaceChildren(...pickArray(payload, ['queue', 'outreach_queue', 'targets']).map(cardNode)); }
+    function renderFieldValidation(payload) { document.getElementById('field-validation').replaceChildren(...pickArray(payload, ['protocols', 'cards', 'validation_cards', 'lanes']).map(cardNode)); }
+    function renderFieldOutreach(payload) { document.getElementById('field-outreach').replaceChildren(...pickArray(payload, ['queue', 'targets', 'reviewer_routes', 'cards']).map(cardNode)); }
+
+    async function loadFeed(url) {
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`${url} returned ${response.status}`);
+      return response.json();
+    }
+    async function boot() {
+      try {
+        const [control, outreach, field, fieldOutreach] = await Promise.all(Object.values(feeds).map(loadFeed));
+        renderSummary(control); renderGates(control); renderCards(control); renderArtifacts(control);
+        renderOutreachQueue(outreach); renderFieldValidation(field); renderFieldOutreach(fieldOutreach);
+        document.getElementById('stamp').textContent = `Evidence synchronized ${new Date().toLocaleTimeString()}`;
+      } catch (error) {
+        document.getElementById('stamp').textContent = `Evidence feed unavailable: ${escapeText(error.message)}`;
+        document.getElementById('stamp').classList.add('error');
+      }
+    }
+    boot();
+  </script>
+</body>
+</html>

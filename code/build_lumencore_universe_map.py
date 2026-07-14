@@ -14,15 +14,15 @@ from typing import Any, Dict, Iterable, List, Set, Tuple
 
 STACK_ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = STACK_ROOT / "out" / "execution" / "universe_map"
+USER_HOME_NORMALIZED = Path.home().as_posix().lower().rstrip("/")
 
 FOUNDER_PROFILE = {
     "founder": "Robert BabyRay Ashworth",
     "company_system": "LumenCore / NovaCore / LumaCore",
     "uei": "SQY2XW71ZM51",
     "cage": "14TM8",
-    "ein": "39-3507463",
-    "uspto_non_provisional_application": "19/281,546",
     "patent_title": "LumenCore: A Modular AI Node Framework for Conscious Systems Integration",
+    "private_identifiers_embedded": False,
     "positioning": [
         "contract-ready",
         "SAM.gov active",
@@ -188,12 +188,12 @@ ROOT_REQUESTED = [
     "C:/LumenCore_Energy_Lab",
     "C:/LumenCore_WorldModel_Lab",
     "C:/FLOWFORM_TOURNAMENT",
-    "C:/Users/Novac/iCloudDrive",
-    "C:/Users/Novac/OneDrive",
-    "C:/Users/Novac/Google Drive",
-    "C:/Users/Novac/GoogleDrive",
-    "C:/Users/Novac/My Drive",
-    "C:/Users/Novac",
+    str(Path.home() / "iCloudDrive"),
+    str(Path.home() / "OneDrive"),
+    str(Path.home() / "Google Drive"),
+    str(Path.home() / "GoogleDrive"),
+    str(Path.home() / "My Drive"),
+    str(Path.home()),
 ]
 
 SKIP_DIR_NAMES = {
@@ -344,10 +344,10 @@ def resolve_requested_roots(requested: Iterable[str]) -> List[Dict[str, Any]]:
         alias_from = None
         exists = candidate.exists()
 
-        # Fallback: if C:/Name missing, check C:/Users/Novac/Name
+        # Fallback: if C:/Name is missing, check the current user's home directory.
         parts = req.parts
         if not exists and len(parts) == 2 and parts[0].lower().startswith("c:\\"):
-            fallback = Path("C:/Users/Novac") / parts[1]
+            fallback = Path.home() / parts[1]
             if fallback.exists():
                 candidate = fallback
                 exists = True
@@ -370,8 +370,8 @@ def resolve_requested_roots(requested: Iterable[str]) -> List[Dict[str, Any]]:
 
 
 def _root_priority(path_str: str) -> Tuple[int, str]:
-    p = path_str.lower().replace("\\", "/")
-    if p == "c:/users/novac":
+    p = path_str.lower().replace("\\", "/").rstrip("/")
+    if p == USER_HOME_NORMALIZED:
         return (900, p)
     if "iclouddrive" in p or "onedrive" in p or "google drive" in p or "googledrive" in p:
         return (700, p)
@@ -390,7 +390,8 @@ def should_skip_dir(root_resolved: str, dir_name: str) -> bool:
         return True
     if any(name.startswith(prefix) for prefix in SKIP_DIR_PREFIXES):
         return True
-    if root_resolved.lower() == "c:/users/novac" and name in SKIP_HEAVY_UNDER_USER:
+    normalized_root = root_resolved.lower().replace("\\", "/").rstrip("/")
+    if normalized_root == USER_HOME_NORMALIZED and name in SKIP_HEAVY_UNDER_USER:
         return True
     return False
 

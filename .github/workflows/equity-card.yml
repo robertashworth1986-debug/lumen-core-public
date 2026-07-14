@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   generate-card:
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
       - name: Fetch live executor data
         id: data
@@ -66,9 +66,9 @@ jobs:
           elif [ "$STATUS" = "blocked" ]; then STATUS_COLOR="#ffa657"; STATUS_DOT="#ffa657"
           else STATUS_COLOR="#8b949e"; STATUS_DOT="#8b949e"; fi
 
-          mkdir -p assets
+          mkdir -p out/ci/equity-card
 
-          cat > assets/equity_card.svg << SVGEOF
+          cat > out/ci/equity-card/equity_card.svg << SVGEOF
           <svg width="600" height="200" viewBox="0 0 600 200" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -125,16 +125,26 @@ jobs:
           SVGEOF
 
           echo "SVG card generated successfully."
-          head -5 assets/equity_card.svg
+          head -5 out/ci/equity-card/equity_card.svg
 
-      - name: Commit equity card
+      - name: Publish workflow evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: equity-card-${{ github.run_id }}
+          path: out/ci/equity-card/equity_card.svg
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Write run summary
         run: |
-          git config user.name  "lumencore-bot"
-          git config user.email "bot@lumen-core.ai"
-          git add assets/equity_card.svg
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(card): equity ${{ steps.data.outputs.equity }} · ${{ steps.data.outputs.positions }} positions · ${{ steps.data.outputs.gen_ts }}"
-            git push
-          else
-            echo "Card unchanged — no commit needed."
-          fi
+          {
+            echo "## Equity card probe"
+            echo ""
+            echo "- Status: ${{ steps.data.outputs.status }}"
+            echo "- Open positions: ${{ steps.data.outputs.positions }}"
+            echo "- Portfolio heat: ${{ steps.data.outputs.heat }}"
+            echo "- Source timestamp: ${{ steps.data.outputs.hb_ts }}"
+            echo "- Generated: ${{ steps.data.outputs.gen_ts }}"
+            echo ""
+            echo "The workflow is read-only. It does not commit generated state to the repository."
+          } >> "$GITHUB_STEP_SUMMARY"

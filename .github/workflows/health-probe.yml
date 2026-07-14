@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   health-probe:
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
       - name: Probe all production endpoints
         id: probe
@@ -54,7 +54,9 @@ jobs:
             COLOR="red"
           fi
 
-          cat > data/site_health.json << EOF
+          mkdir -p out/ci/site-health
+
+          cat > out/ci/site-health/site_health.json << EOF
           {
             "checked_utc": "${TIMESTAMP}",
             "overall": "${OVERALL}",
@@ -72,7 +74,7 @@ jobs:
           EOF
 
           # Shields.io endpoint badge
-          cat > data/uptime_badge.json << EOF
+          cat > out/ci/site-health/uptime_badge.json << EOF
           {
             "schemaVersion": 1,
             "label": "status",
@@ -86,18 +88,28 @@ jobs:
           echo "healthy=${HEALTHY}" >> $GITHUB_OUTPUT
           echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
 
-      - name: Commit health report
+      - name: Publish workflow evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-health-${{ github.run_id }}
+          path: out/ci/site-health/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Write run summary
         run: |
-          git config user.name  "lumencore-bot"
-          git config user.email "bot@lumen-core.ai"
-          git add data/site_health.json data/uptime_badge.json
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(health): ${{ steps.probe.outputs.overall }} — ${{ steps.probe.outputs.healthy }}/6 endpoints up @ ${{ steps.probe.outputs.timestamp }}"
-            git push
-          fi
+          {
+            echo "## Production health probe"
+            echo ""
+            echo "- Overall: ${{ steps.probe.outputs.overall }}"
+            echo "- Healthy endpoints: ${{ steps.probe.outputs.healthy }}/6"
+            echo "- Checked: ${{ steps.probe.outputs.timestamp }}"
+            echo ""
+            echo "The workflow is read-only. It does not commit generated state to the repository."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Fail job on outage (optional alerting hook)
         if: steps.probe.outputs.overall == 'outage'
         run: |
           echo "::warning::lumen-core.ai is reporting an outage — ${{ steps.probe.outputs.healthy }}/6 endpoints healthy"
-          # Non-fatal: don't exit 1 so we still commit the status
+          # Non-fatal: keep the report available for incident review.

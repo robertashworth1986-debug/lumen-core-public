@@ -2,7 +2,7 @@
   "organization": {
     "legal_name": "LumenCore",
     "uei": "SQY2XW71ZM51",
-    "ein": "39-3507463",
+    "ein": "",
     "sam_registered": true,
     "entity_type": "for_profit_small_business",
     "address": {
@@ -18,14 +18,14 @@
     "authorized_rep": {
       "name": "Robert BabyRay Ashworth",
       "title": "Founder and Authorized Representative",
-      "email": "robertashworth4444@gmail.com",
-      "phone": "615-438-2502"
+      "email": "",
+      "phone": ""
     },
     "project_director": {
       "name": "Robert BabyRay Ashworth",
       "title": "Principal Investigator",
-      "email": "robertashworth4444@gmail.com",
-      "phone": "615-438-2502"
+      "email": "",
+      "phone": ""
     }
   },
   "qualification_profile": {

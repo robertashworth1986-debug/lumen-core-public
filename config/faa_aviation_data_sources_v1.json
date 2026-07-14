@@ -1,0 +1,80 @@
+{
+  "schema": "faa_aviation_data_sources_v1",
+  "as_of_utc": "2026-07-14T01:40:00Z",
+  "purpose": "Inventory official FAA data lanes that can support reproducible aviation reliability, airspace, airport, and delay studies.",
+  "claim_boundary": "Catalog inclusion does not imply FAA, operator, airport, or OEM approval. Human-gated sources require their own agreements and action-time approval before access.",
+  "sources": [
+    {
+      "source_id": "faa_sdr_yearly_csv",
+      "name": "FAA Service Difficulty Reports by year",
+      "official_page": "https://www.faa.gov/av-info/download_SDR",
+      "access_class": "public_direct_download",
+      "local_status": "pulled_2023_through_2026",
+      "data_value": "Reported aircraft malfunctions, failures, defects, maintenance findings, engine identifiers, parts, components, operating stage, and discrepancy narrative.",
+      "critical_limit": "Report-only observational data has no fleet exposure denominator and cannot establish component failure rates, causality, airworthiness, or predictive engine health by itself."
+    },
+    {
+      "source_id": "faa_nasr_28_day",
+      "name": "28 Day National Airspace System Resources subscription",
+      "official_page": "https://www.faa.gov/air_traffic/flight_info/aeronav/aero_data/NASR_Subscription/",
+      "access_class": "public_direct_download",
+      "local_status": "download_retry_required",
+      "data_value": "Airports, runways, air traffic facilities, airways, navigation aids, fixes, routes, procedures, weather locations, and controlled airspace in CSV, legacy, AIXM, and shapefile forms.",
+      "critical_limit": "Each cycle must be paired with FAA data-product notices, safety alerts, effective dates, and schema-drift tests."
+    },
+    {
+      "source_id": "faa_avinfo_accident_incident",
+      "name": "FAA Aviation Safety Accident/Incident Data",
+      "official_page": "https://www.faa.gov/av-info",
+      "access_class": "public_portal_or_download",
+      "local_status": "cataloged_not_pulled",
+      "data_value": "Accident and incident records for outcome linkage and rare-event analysis.",
+      "critical_limit": "Definitions, finality, revision status, and event linkage must be verified before combining with SDR or operational records."
+    },
+    {
+      "source_id": "faa_operations_performance",
+      "name": "FAA Operations and Performance Data",
+      "official_page": "https://www.aspm.faa.gov/",
+      "access_class": "public_aggregate_with_account_gated_detail",
+      "local_status": "human_access_gate",
+      "data_value": "Historical traffic counts, forecasts, delay statistics, airport performance, OPSNET, TFMSC, ASQP, and TAF products.",
+      "critical_limit": "Detailed preliminary or individual-flight reports require an account and may have use restrictions."
+    },
+    {
+      "source_id": "faa_adip",
+      "name": "Airport Data and Information Portal",
+      "official_page": "https://adip.faa.gov/agis/public/",
+      "access_class": "public_tools_with_account_gated_features",
+      "local_status": "human_access_gate",
+      "data_value": "Airport and heliport aeronautical information, historical records, master records, and authorized airport data management.",
+      "critical_limit": "Account creation, terms, and any data submission remain human actions."
+    },
+    {
+      "source_id": "faa_swim_swift",
+      "name": "System Wide Information Management / SWIFT",
+      "official_page": "https://www.faa.gov/air_traffic/technology/swim/products/get_connected",
+      "access_class": "agreement_gated",
+      "local_status": "human_access_gate",
+      "data_value": "Near-real-time aeronautical, flight, traffic-flow, and weather information services.",
+      "critical_limit": "Requires a Service Access Agreement; SWIFT data is not an authorization for operational or aviation-safety use."
+    },
+    {
+      "source_id": "faa_wildlife_strikes",
+      "name": "FAA Wildlife Strike Database",
+      "official_page": "https://www.faa.gov/airports/airport_safety/wildlife",
+      "access_class": "public_exploration_portal",
+      "local_status": "cataloged_not_pulled",
+      "data_value": "Wildlife strike reports for airport risk, damage, seasonality, and mitigation studies.",
+      "critical_limit": "Reporting is observational and can be incomplete; airport operations are needed for normalized rates."
+    },
+    {
+      "source_id": "faa_drs_certification",
+      "name": "FAA Dynamic Regulatory System certification records",
+      "official_page": "https://drs.faa.gov/",
+      "access_class": "public_search_portal",
+      "local_status": "cataloged_not_pulled",
+      "data_value": "Type Certificate Data Sheets, Supplemental Type Certificates, airworthiness directives, and regulatory material.",
+      "critical_limit": "Document retrieval and entity matching must preserve revision and effective-date provenance."
+    }
+  ]
+}

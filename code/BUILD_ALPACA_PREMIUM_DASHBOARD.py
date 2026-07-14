@@ -22,7 +22,7 @@ LEDGER_FILE = EXEC_OUT / "binanceus_paper_ledger.jsonl"
 TWIN_SEED_PATH = Path(
     os.environ.get(
         "LUMA_TWIN_SEED_PATH",
-        r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json",
+        str(Path.home() / "iCloudDrive" / "Downloads 2" / "Copy of twin_seed.json"),
     )
 )
 

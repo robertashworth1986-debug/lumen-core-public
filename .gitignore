@@ -39,6 +39,7 @@ dashboard/*.html
 !dashboard/quant_lab.html
 !dashboard/kraken_execution_dashboard.html
 !dashboard/agent_approval_hub.html
+!dashboard/proof_to_pilot.html
 !dashboard/grants.html
 !dashboard/forecast.html
 !dashboard/explain.html
@@ -90,6 +91,10 @@ desktop.ini
 __MACOSX/
 *.bak.*
 render_qa_*/
+/tmp/pdfs/
+
+# Counsel-only deliverables (mirrored to the private estate and E: vault)
+/output/pdf/LUMENCORE_PATENT_COUNSEL_BRIEF_*.pdf
 
 # Old / duplicate stack copies
 INSTITAL_STACK_V2/

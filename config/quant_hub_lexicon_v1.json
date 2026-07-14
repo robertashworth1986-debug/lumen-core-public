@@ -1,0 +1,146 @@
+{
+  "schema": "quant_hub_lexicon.v1",
+  "title": "Quant Hub Repo Public Vocabulary",
+  "purpose": "Define stable project terms, evidence maturity levels, and claim boundaries for public technical review.",
+  "identity": {
+    "repository_display_name": "Quant Hub Repo",
+    "technical_platform": "LumenCore",
+    "quantitative_evidence_lane": "LumaTrader",
+    "orchestration_context_layer": "NovaStack",
+    "proof_custody_layer": "ProofLock",
+    "external_validation_gate": "HumanUnlock",
+    "economic_translation_layer": "EconomicRichness"
+  },
+  "terms": [
+    {
+      "term": "LumenCore",
+      "status": "project name",
+      "allowed_meaning": "The technical platform and research program represented by this repository.",
+      "not_evidence_of": [
+        "patent validity or scope",
+        "production readiness",
+        "external validation"
+      ]
+    },
+    {
+      "term": "LumaTrader",
+      "status": "project name",
+      "allowed_meaning": "The quantitative-market experimentation and measurement lane within LumenCore.",
+      "not_evidence_of": [
+        "profitable live trading",
+        "fiduciary readiness",
+        "authorization to place orders"
+      ]
+    },
+    {
+      "term": "NovaStack",
+      "status": "coined project term",
+      "allowed_meaning": "The orchestration and context layer that connects protocols, evidence builders, dashboards, and human gates.",
+      "not_evidence_of": [
+        "artificial general intelligence",
+        "legal agency",
+        "autonomous authority"
+      ]
+    },
+    {
+      "term": "ProofLock",
+      "status": "coined project term",
+      "allowed_meaning": "The hash, manifest, provenance, negative-result, and reproducibility controls used to preserve an evidence record.",
+      "not_evidence_of": [
+        "independent replication",
+        "scientific acceptance",
+        "field validation"
+      ]
+    },
+    {
+      "term": "HumanUnlock",
+      "status": "coined project term",
+      "allowed_meaning": "The explicit human decision required before submissions, certifications, spending, account changes, external sends, legal actions, or live orders.",
+      "not_evidence_of": [
+        "delegated legal authority",
+        "blanket approval",
+        "automatic submission permission"
+      ]
+    },
+    {
+      "term": "EconomicRichness",
+      "status": "coined project term",
+      "allowed_meaning": "The controlled translation of externally accepted technical metrics into bounded economic scenarios with named assumptions and owners.",
+      "not_evidence_of": [
+        "realized savings",
+        "revenue",
+        "valuation",
+        "guaranteed return"
+      ]
+    },
+    {
+      "term": "geometry",
+      "status": "research vocabulary",
+      "allowed_meaning": "A registered candidate transform, routing rule, model family, or feature construction evaluated under a stated protocol.",
+      "not_evidence_of": [
+        "physical geometry",
+        "novelty",
+        "patentability",
+        "universal superiority"
+      ]
+    },
+    {
+      "term": "champion",
+      "status": "benchmark vocabulary",
+      "allowed_meaning": "The highest-ranked candidate inside a named dataset, split, metric, baseline set, and evaluation run.",
+      "not_evidence_of": [
+        "cross-domain superiority",
+        "production readiness",
+        "future performance"
+      ]
+    }
+  ],
+  "evidence_maturity": [
+    {
+      "level": 0,
+      "label": "concept registered",
+      "minimum_evidence": "A named concept, owner, scope, and prohibited claims."
+    },
+    {
+      "level": 1,
+      "label": "implemented and tested",
+      "minimum_evidence": "Runnable code, deterministic tests, and an identified input contract."
+    },
+    {
+      "level": 2,
+      "label": "frozen synthetic benchmark",
+      "minimum_evidence": "Preregistered synthetic protocol, frozen split, named baselines, metrics, and preserved failures."
+    },
+    {
+      "level": 3,
+      "label": "source-conditioned replay",
+      "minimum_evidence": "Hashed source artifacts, reproducible replay, named baselines, wins and non-wins, and explicit limitations."
+    },
+    {
+      "level": 4,
+      "label": "prospective public-data evaluation",
+      "minimum_evidence": "A frozen protocol evaluated only on observations arriving after the freeze, with complete settlements and preregistered gates."
+    },
+    {
+      "level": 5,
+      "label": "independent external validation",
+      "minimum_evidence": "A named independent organization evaluates held-out or field data, accepts the metric and protocol, and provides a dated validation receipt."
+    }
+  ],
+  "level_policy": {
+    "current_repository_wide_level": 3,
+    "level_5_attained": false,
+    "rule": "A component may claim only the highest level supported by its own evidence. Repository-wide language must use the lowest level needed for the stated claim.",
+    "level_5_gate": "No Level 5 claim is allowed without a named external validator, independent data or field setting, accepted metric, dated receipt, and preserved artifact hashes."
+  },
+  "human_authority_policy": {
+    "final_submission_allowed_without_human": false,
+    "legal_or_ip_action_allowed_without_human": false,
+    "spending_allowed_without_human": false,
+    "account_change_allowed_without_human": false,
+    "external_send_allowed_without_human": false,
+    "live_order_allowed_without_human": false
+  },
+  "patent_boundary": "This public vocabulary does not state what any filed patent claim covers. Counsel must compare the official filed claims and specification with dated evidence and later-developed concepts.",
+  "public_private_boundary": "Public builders may report metadata and public-safe evidence only. They must not read, copy, hash-list, or publish private patent-vault contents, credentials, personal identifiers, or privileged communications."
+}

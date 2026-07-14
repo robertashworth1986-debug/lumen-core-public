@@ -37,13 +37,13 @@ jobs:
             --exclude='*.ps1' \
             --exclude='.git/' \
             --exclude='node_modules/' \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "ssh -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts" \
             dashboard/ \
             opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/
 
           # Sync data snapshots
           rsync -avz \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "ssh -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts" \
             data/ \
             opc@${{ secrets.VPS_HOST }}:/opt/lumencore/data/
 

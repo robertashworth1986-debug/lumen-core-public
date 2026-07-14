@@ -1,6 +1,6 @@
 # LumaTrader Institutional Stack
 
-> **Superseded / Internal-Only Archive Notice (2026-07-03):** This May 2026 brief is retained for history and internal context only. It contains stale trading/live-allocation language, older live-breadth counts, and sensitive federal identifiers that should not be copied into public investor, grant, LinkedIn, or outreach materials. Use the current canonical investor artifact instead: `C:\Users\Novac\iCloudDrive\Business plan\LumenCore_Business_Plan_Investor_Ready_UPDATED_2026-07-03.pdf` and `docs/LUMENCORE_BUSINESS_PLAN_INVESTOR_READY_UPDATED_2026-07-03.md`.
+> **Superseded / Internal-Only Archive Notice (2026-07-03):** This May 2026 brief is retained for history and internal context only. It contains stale trading/live-allocation language, older live-breadth counts, and sensitive federal identifiers that should not be copied into public investor, grant, LinkedIn, or outreach materials. Use the private canonical investor-ready business plan stored outside the public repository and `docs/LUMENCORE_BUSINESS_PLAN_INVESTOR_READY_UPDATED_2026-07-03.md` instead.
 
 ## Executive Investment Brief
 
@@ -62,26 +62,19 @@ This addendum updates the brief for live investor and partner conversations ahea
 ### Federal and IP Readiness
 
 - SAM registration status: true
-- UEI/CAGE/EIN evidence present in dossier pack and audit materials
-- USPTO non-provisional reference: 19/281,546
-- Patent Center reference: 71551427
+- Public UEI/CAGE evidence is recorded; tax and private patent identifiers remain outside the public repository
+- Patent filing status and scope require verification from official Patent Center records and qualified counsel
 - Chain-of-custody and hash-locked proof materials present in premium proof packet artifacts
 
 ### Federal Codes and Patent Filing Snapshot
 
-- UEI: SQY2XW71ZM51
-- CAGE: 14TM8
-- EIN: 39-3507463
-- USPTO Application: 19/281,546
-- Filing confirmation number: 7076
-- Patent Center reference: 71551427
-- Filing receipt timestamp: 07/25/2025 11:06:37 PM ET
+- Public entity identifiers may be verified through SAM.gov
+- Tax identifiers, filing confirmation data, and private Patent Center references are intentionally omitted
+- No patent validity, scope, priority, or deadline conclusion is made in this public brief
 
-### Valuation Positioning Bands (Pre-Money)
+### Valuation Boundary
 
-- Conservative: $35M to $70M
-- Base case: $80M to $180M
-- Upside: $220M to $450M
+No defensible pre-money valuation band is established by the current repository. Valuation requires independent technical validation, verified commercial traction, a supportable market model, and appropriate financial and legal review.
 
 ### Why This Supports Premium Positioning
 

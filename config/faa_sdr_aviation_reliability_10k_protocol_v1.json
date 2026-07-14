@@ -1,0 +1,110 @@
+{
+  "schema": "faa_sdr_aviation_reliability_10k_protocol_v1",
+  "protocol_id": "faa-sdr-triage-10k-v1",
+  "status": "preregistered_not_executed",
+  "purpose": "Test whether a frozen hybrid router improves report-level aviation maintenance triage over named approved baselines on 10,000 independent FAA SDR records.",
+  "unit_of_analysis": "One unique FAA Service Difficulty Report identified by OperatorControlNumber.",
+  "development_window": {
+    "start": "2023-01-01",
+    "end": "2025-12-31",
+    "use": "Feature design, model fitting, fixed hyperparameter selection, and router training only.",
+    "internal_split": {
+      "base_model_fit": "2023-01-01 through 2024-12-31",
+      "router_selection": "2025-01-01 through 2025-12-31",
+      "refit_after_router_selection": false
+    }
+  },
+  "holdout_window": {
+    "start": "2026-01-01",
+    "end": "2026-07-13",
+    "selection": "Sort eligible unique OperatorControlNumber values by SHA-256(protocol_id + ':' + OperatorControlNumber) and take the first 10000.",
+    "target_independent_records": 10000,
+    "reuse_allowed": false,
+    "replacement_allowed": false
+  },
+  "task": {
+    "name": "JASC chapter triage",
+    "target": "First two characters of a valid four-character JASCCode; chapters with fewer than 200 base-model-fit rows map to OTHER.",
+    "allowed_features": [
+      "DifficultyDate calendar features",
+      "AircraftMake",
+      "AircraftModel",
+      "AircraftTotalTime",
+      "AircraftTotalCycles",
+      "EngineMake",
+      "EngineModel",
+      "EngineTotalTime",
+      "EngineTotalCycles",
+      "StageOfOperationCode"
+    ],
+    "forbidden_features": [
+      "JASCCode",
+      "PartName",
+      "PartCondition",
+      "ComponentName",
+      "NatureOfConditionA/B/C",
+      "PrecautionaryProcedureA/B/C/D",
+      "HowDiscoveredCode",
+      "Discrepancy",
+      "SubmissionDate",
+      "OperatorControlNumber except for deterministic split selection"
+    ],
+    "reason_for_forbidden_features": "They reveal or directly restate the maintenance outcome, create post-event leakage, or are identifiers rather than deployable predictors."
+  },
+  "approved_baselines": [
+    "training majority class",
+    "aircraft-make frequency table with global fallback",
+    "one-vs-rest linear logistic regression trained by SGD",
+    "random forest",
+    "histogram gradient boosting",
+    "direct LightGBM when the pinned implementation is available",
+    "direct XGBoost when the pinned implementation is available"
+  ],
+  "candidate": "Frozen hybrid router trained only on development data to select among approved baseline-family predictions; no holdout-trained routing.",
+  "router": {
+    "group_key": "AircraftMake",
+    "minimum_router_selection_rows": 500,
+    "selection_metric": "macro F1, then multiclass log loss, then stable model name",
+    "fallback": "globally strongest approved baseline on the 2025 router-selection window"
+  },
+  "implementation": {
+    "random_seed": 20260714,
+    "categorical_unknown_token": "UNKNOWN",
+    "numeric_invalid_handling": "development median imputation",
+    "logistic": "One-hot encoded SGD log-loss classifier, max_iter=200, early stopping enabled",
+    "random_forest": "160 trees, max_depth=24, min_samples_leaf=3",
+    "histogram_gradient_boosting": "max_iter=80, max_leaf_nodes=31, learning_rate=0.08",
+    "lightgbm": "250 trees, num_leaves=31, learning_rate=0.07",
+    "xgboost": "180 trees, max_depth=7, learning_rate=0.07, tree_method=hist"
+  },
+  "primary_metric": "macro F1 across mapped JASC chapters represented in the evaluated window",
+  "secondary_metrics": [
+    "multiclass log loss",
+    "top-3 accuracy",
+    "expected calibration error",
+    "coverage",
+    "worst supported aircraft-make subgroup macro F1"
+  ],
+  "statistics": {
+    "random_seed": 20260714,
+    "paired_resamples": 10000,
+    "confidence_interval": 0.95,
+    "method": "paired stratified bootstrap over unique report IDs",
+    "multiplicity": "Holm correction across candidate-versus-baseline confirmatory comparisons"
+  },
+  "promotion_gate": [
+    "Exactly 10000 unique holdout report IDs and zero development/holdout overlap.",
+    "All feature transforms fit on development data only.",
+    "Candidate primary-metric improvement over the strongest approved baseline has a multiplicity-adjusted 95% lower confidence bound greater than zero.",
+    "Candidate log loss is no worse than the strongest approved baseline by more than the preregistered noninferiority margin of 0.01.",
+    "No supported aircraft-make subgroup with at least 200 holdout rows loses more than 0.03 macro F1 versus the strongest approved baseline.",
+    "All predictions, failures, seeds, package versions, input hashes, and non-wins are preserved."
+  ],
+  "rolls_royce_subgroup": {
+    "status": "exploratory_only",
+    "rule": "EngineMake normalizes to RROYCE or ROLLS ROYCE, or EngineModel matches a declared Rolls-Royce family token.",
+    "confirmatory_claim_allowed": false,
+    "reason": "The current public holdout has too few Rolls-Royce-coded reports and no fleet exposure denominator."
+  },
+  "claim_boundary": "This is maintenance-report triage research. It is not an FAA or OEM evaluation, an airworthiness determination, an engine-health monitor, a failure-rate estimate, an operational decision aid, or evidence of a relationship with Rolls-Royce."
+}

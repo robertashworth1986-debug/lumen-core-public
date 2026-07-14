@@ -1,48 +1,67 @@
 # Luma Agent Continuity Rules
 
-This repository is a live worktrail for LumenCore, LumaTrader, NovaCore, HarborSentinel, and the grant factory. Do not treat a dirty worktree as disposable.
+This repository is an active evidence worktrail for LumenCore and related research lanes. A dirty worktree is not disposable. Read existing artifacts before creating replacements, preserve user changes, and keep private records out of public outputs.
 
 ## Start Every Serious Pass Here
 
-Before creating new dashboards, grant packets, benchmarks, trading changes, or proof claims, read these files in order:
+Read these files in order:
 
-1. `docs/LUMA_CONTEXT_DASHBOARD_PARITY_AUDIT_2026-06-22.md`
-2. `docs/LUMAJARVIS_OPERATING_MEMORY_2026-06-20.md`
-3. `grant_submissions/TOP5_LIVE_PROOF_SUBMISSION_BOARD_2026-06-22.md`
-4. `grant_submissions/GRANT_DEADLINE_TRIAGE_2026-06-22.md`
-5. `docs/GEOMETRY_PROOF_FRONTIER_BOARD_2026-06-22.md`
-6. `grant_submissions/LOCAL_ICLOUD_EVIDENCE_INTAKE_2026-06-21.md`
+1. `docs/REVIEWER_START_HERE.md`
+2. `README.md`
+3. `docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md`
+4. `docs/HYBRID_AGENT_OPERATING_MODEL_2026-07-13.md`
+5. `grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-13.md`
+6. `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md`
 
-## Current Operating Truth
+For the operations refresh lane, inspect `code/ops/RUN_BOOTH_WARROOM_REFRESH.ps1` and its current outputs before starting another loop.
 
-- Repo dirtiness is active evidence worktrail until classified.
-- Local grant packages can be file-ready while still portal/user/compliance blocked.
-- Do not mark a grant submitted unless an external portal action actually happened.
-- Do not submit, certify, sign, upload, withdraw, trade, move money, or publish to third-party accounts without fresh action-time approval.
-- Do not turn generated geometry wins into live, field, customer, safety, dollar, or trading claims.
-- Kraken/trading artifacts are not profit proof without a dedicated audited track record.
-- Live domain parity is separate from local freshness. Verify `https://lumen-core.ai` pages and JSON feeds before claiming reviewer-facing data is live.
-- HUD workspace `WS01676964` is locally marked `DISCARD_NO_SUBMIT`, but cloud deletion or withdrawal requires exact user confirmation.
+## Operating Truth
 
-## Grant Priority
+- Repository-wide supported evidence maturity is Level 3 unless a claim-specific artifact establishes less.
+- Level 5 is a target that requires a named independent evaluator and dated receipt; it is not a self-assigned platform grade.
+- Source-conditioned replay, synthetic benchmarks, paper execution, and live data intake are different evidence classes.
+- Preserve negative results, non-wins, exclusions, and test failures.
+- Do not turn a metric delta into a field, customer, safety, profit, savings, government, or patent claim.
+- A package can be locally complete while still blocked by portal state, certification, signature, eligibility, or action-time approval.
+- Do not mark an application submitted without the external portal receipt.
 
-Use the top-five board and triage board for ordering. As of the June 22 audit:
+## HumanUnlock
 
-- Active start package: DICE / DARPA BAAT / HR001126S0010.
-- Closest action gate: DSIP topic/form capture for HarborSentinel, MissionWeave, and NV065.
-- Live proof gate: 2/5 proposal-specific proof, with NSF Project Pitch, MissionWeave, and NV065 still proof-blocked.
+Fresh, action-time approval is required before any external message, submission, certification, publication, account change, credential change, spend, live order, money movement, NDA execution, patent filing, or other legal action.
 
-## Dashboard Priority
+General trust or an old approval does not replace a recipient-specific or portal-specific decision. Preparation and local staging may continue without that decision.
 
-Canonical surfaces are:
+Agent, grant, opportunity, outreach, trading, scanner, remediation, and other consequential mutation endpoints must remain disabled unless `LUMA_HUMAN_UNLOCK_TOKEN` is configured in the private deployment environment. Never place that token in repository files, browser JavaScript, logs, screenshots, or generated evidence.
+
+## Evidence And Data Custody
+
+- Hash source artifacts before transformation and record exact source identity, retrieval time, schema, row count, and exclusions.
+- Prefer frozen protocols and structured parsers over ad hoc extraction.
+- Store large or private raw data outside Git; publish only public-safe receipts and reproducible builders.
+- Do not follow symlinks into private vaults when building public manifests.
+- Do not expose credentials, tax identifiers, patent records, counsel communications, meeting credentials, or personal information.
+- Pause and classify background writers before large benchmark or repository-maintenance passes.
+- Check disk headroom before large data pulls or multi-thousand-run sweeps.
+
+## Code And Review
+
+- Use existing builders, schemas, and tests before adding a parallel abstraction.
+- Add targeted tests for changed behavior and broaden coverage when shared controls change.
+- Keep scheduled GitHub workflows read-only. Generated monitoring state belongs in workflow summaries or short-lived artifacts, not recurring commits to `main`.
+- Keep consequential API routes authenticated, bounded, idempotent where possible, and audit-chained.
+- Do not claim support for a programming language without a detected toolchain and a project-specific test receipt.
+
+## Canonical Surfaces
 
 - `dashboard/mission_control.html`
 - `dashboard/quant_lab.html`
 - `dashboard/grants.html`
 - `dashboard/kraken_execution_dashboard.html`
+- `dashboard/agent_approval_hub.html`
+- `dashboard/proof_to_pilot.html`
 
-Prefer wiring fresh proof feeds into these surfaces over creating new dashboard sprawl.
+Prefer wiring verified feeds into these surfaces over creating dashboard sprawl.
 
 ## Anti-Drift Rule
 
-If a future task feels like "start over," stop and read the context audit first. The job is to continue the evidence chain, not reinvent the universe every pass.
+If the next action feels like a restart, stop and rebuild the reviewer context first. Continue the evidence chain; do not reinvent the platform or inflate its claims.

@@ -26,7 +26,7 @@ PROOF_FILE = REPORTS / "artist_scout_run_proof.json"
 TWIN_SEED_PATH = Path(
     os.environ.get(
         "LUMA_TWIN_SEED_PATH",
-        r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json",
+        str(Path.home() / "iCloudDrive" / "Downloads 2" / "Copy of twin_seed.json"),
     )
 )
 

@@ -31,7 +31,7 @@ STRATEGIC_SUMMARY_PATH = ROOT / "code" / "📈 Strategic Summary & Next Steps.tx
 TWIN_SEED_PATH = Path(
     os.environ.get(
         "LUMA_TWIN_SEED_PATH",
-        r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json",
+        str(Path.home() / "iCloudDrive" / "Downloads 2" / "Copy of twin_seed.json"),
     )
 )
 

@@ -5,6 +5,7 @@ import atexit
 import asyncio
 import copy
 import csv
+import hmac
 import io
 import json
 import logging
@@ -20,7 +21,7 @@ from typing import Any
 
 from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -118,7 +119,7 @@ LAMASCOUT_REPORTS = ROOT / "LamaScout" / "reports"
 TWIN_SEED_PATH = Path(
     os.getenv(
         "LUMA_TWIN_SEED_PATH",
-        r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json",
+        str(Path.home() / "iCloudDrive" / "Downloads 2" / "Copy of twin_seed.json"),
     )
 )
 
@@ -1706,14 +1707,82 @@ class ConnectionManager:
             self.disconnect(ws)
 
 
+_DEFAULT_CORS_ORIGINS = (
+    "https://lumen-core.ai",
+    "https://www.lumen-core.ai",
+    "http://127.0.0.1:8787",
+    "http://localhost:8787",
+)
+_HUMAN_UNLOCK_MUTATION_PREFIXES = (
+    "/api/grants/",
+    "/api/master/",
+    "/api/opportunities/",
+    "/api/sells/",
+    "/api/buys/",
+    "/api/scanner/smart/",
+    "/api/kraken/sampler/",
+    "/api/spike-hunter/",
+)
+_HUMAN_UNLOCK_MUTATION_PATHS = {
+    "/api/ml/trigger",
+    "/api/nodered/ingest",
+}
+
+
+def _cors_origins() -> list[str]:
+    raw = os.getenv("LUMA_CORS_ORIGINS", "").strip()
+    configured = [item.strip().rstrip("/") for item in raw.split(",") if item.strip()]
+    safe = [item for item in configured if item != "*"]
+    return list(dict.fromkeys(safe or _DEFAULT_CORS_ORIGINS))
+
+
+def _human_unlock_bearer_authorized(configured_token: str, authorization: str | None) -> bool:
+    if not configured_token or not authorization:
+        return False
+    scheme, separator, presented = authorization.partition(" ")
+    if not separator or scheme.lower() != "bearer" or not presented:
+        return False
+    return hmac.compare_digest(configured_token, presented)
+
+
+def _requires_human_unlock(path: str, method: str) -> bool:
+    if method.upper() in {"GET", "HEAD", "OPTIONS"}:
+        return False
+    return path in _HUMAN_UNLOCK_MUTATION_PATHS or any(
+        path.startswith(prefix) for prefix in _HUMAN_UNLOCK_MUTATION_PREFIXES
+    )
+
+
 app = FastAPI(title="Luma Experience Gateway", version="2.0.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins(),
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
 )
+
+
+@app.middleware("http")
+async def human_unlock_mutation_boundary(request: Request, call_next):
+    """Fail closed before operator or capital-affecting routes can mutate state."""
+    if _requires_human_unlock(request.url.path, request.method):
+        configured_token = os.getenv("LUMA_HUMAN_UNLOCK_TOKEN", "").strip()
+        authorization = request.headers.get("authorization")
+        if not configured_token:
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "detail": "Operator mutations are disabled until LUMA_HUMAN_UNLOCK_TOKEN is configured."
+                },
+            )
+        if not _human_unlock_bearer_authorized(configured_token, authorization):
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "A valid HumanUnlock bearer token is required."},
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    return await call_next(request)
 
 if _PROMETHEUS_AVAILABLE:
     _PrometheusInstrumentator().instrument(app).expose(app, endpoint="/metrics")
@@ -2800,9 +2869,8 @@ def _build_booth_explainer_brief_payload() -> dict[str, Any]:
         "company_system": "LumenCore / NovaCore / LumaCore",
         "uei": "SQY2XW71ZM51",
         "cage": "14TM8",
-        "ein": "39-3507463",
-        "uspto_non_provisional_application": "19/281,546",
         "patent_title": "LumenCore: A Modular AI Node Framework for Conscious Systems Integration",
+        "private_identifiers_embedded": False,
     }
 
     founder_profile = default_founder_profile
@@ -2810,6 +2878,12 @@ def _build_booth_explainer_brief_payload() -> dict[str, Any]:
         candidate = universe_map.get("founder_profile")
         if isinstance(candidate, dict) and candidate:
             founder_profile = candidate
+    founder_profile = {
+        key: value
+        for key, value in founder_profile.items()
+        if key not in {"ein", "tin", "uspto_non_provisional_application", "patent_center_reference"}
+    }
+    founder_profile["private_identifiers_embedded"] = False
 
     scan = universe_map.get("scan", {}) if isinstance(universe_map, dict) else {}
     roots = universe_map.get("roots", []) if isinstance(universe_map, dict) else []

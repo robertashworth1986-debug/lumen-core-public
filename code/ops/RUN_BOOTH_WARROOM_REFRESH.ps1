@@ -5,6 +5,7 @@ param(
     [switch]$SkipCatalog,
     [switch]$SkipBoothBrief,
     [switch]$SkipAutopilot,
+    [switch]$ArmAutopilot,
     [switch]$NoBrowser
 )
 
@@ -32,6 +33,7 @@ foreach ($candidate in $pythonCandidates) {
 if (-not $python) {
     throw 'Python runtime not found for map/catalog generation.'
 }
+$userHome = [Environment]::GetFolderPath('UserProfile').Replace('\', '/')
 
 Write-Output "[WARROOM] stack_root=$stackRoot"
 Write-Output "[WARROOM] python=$python"
@@ -62,8 +64,8 @@ if (-not $SkipMap) {
         'C:/WhiteHoleLab',
         'C:/LumenCore',
         'C:/LumenLab',
-        'C:/Users/Novac/iCloudDrive',
-        'C:/Users/Novac/OneDrive'
+        "$userHome/iCloudDrive",
+        "$userHome/OneDrive"
     )
     & $python $mapScript @mapArgs
 }
@@ -84,12 +86,17 @@ if (-not $SkipBoothBrief) {
     & $python $boothBriefScript --recent-trade-rows 120
 }
 
-if (-not $SkipAutopilot) {
+if ($ArmAutopilot -and -not $SkipAutopilot) {
+    if ([string]::IsNullOrWhiteSpace($env:LUMA_HUMAN_UNLOCK_TOKEN)) {
+        throw 'LUMA_HUMAN_UNLOCK_TOKEN is required with -ArmAutopilot.'
+    }
     if (-not (Test-Path $autopilotScript)) {
         throw "Autopilot script not found: $autopilotScript"
     }
     Write-Output "[WARROOM] Step 5/5: Arm live autopilot"
     & $autopilotScript -StackGroup core -TabPreset investor -NoBrowser:$NoBrowser
+} else {
+    Write-Output '[WARROOM] Step 5/5: Autopilot skipped (safe default; requires -ArmAutopilot and HumanUnlock token)'
 }
 
 Write-Output '[WARROOM] refresh complete.'

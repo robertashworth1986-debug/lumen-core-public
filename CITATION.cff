@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this software or its evidence protocol, cite this repository and the dated artifact that supports the specific result."
+title: "LumenCore Quant Hub: Evidence, Benchmarking, and Human-Gated Decision Infrastructure"
+type: software
+authors:
+  - family-names: "Ashworth"
+    given-names: "Robert"
+repository-code: "https://github.com/robertashworth1986-debug/lumen-core-public"
+url: "https://lumen-core.ai"
+license: MIT
+keywords:
+  - reproducible benchmarking
+  - evidence provenance
+  - hybrid routing
+  - human-in-the-loop controls

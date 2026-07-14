@@ -28,7 +28,7 @@ CHAMPION_GAUNTLET = ROOT / "out" / "ops" / "champion_metric_gauntlet_latest.json
 TWIN_SEED_PATH = Path(
     os.environ.get(
         "LUMA_TWIN_SEED_PATH",
-        r"C:\Users\Novac\iCloudDrive\Downloads 2\Copy of twin_seed.json",
+        str(Path.home() / "iCloudDrive" / "Downloads 2" / "Copy of twin_seed.json"),
     )
 )
 

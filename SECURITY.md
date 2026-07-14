@@ -1,46 +1,46 @@
 # Security Policy
 
-## Supported Systems
+## Reporting A Vulnerability
 
-| System | Status |
-|--------|--------|
-| lumen-core.ai (production portal) | ✅ Active |
-| Kraken Execution Dashboard | ✅ Active |
-| Evidence Ledger API | ✅ Active |
-| Agent Approval Hub | ✅ Active |
+Do not open a public issue for a suspected vulnerability, leaked credential, private record, or unsafe consequential-action path.
 
-## Reporting a Vulnerability
+Use a [private GitHub security advisory](https://github.com/robertashworth1986-debug/lumen-core-public/security/advisories/new). Include the affected component, reproduction steps, likely impact, and whether any credential or personal record may have been exposed. Do not include active secrets in the report body.
 
-**Please do not open a public GitHub issue for security vulnerabilities.**
-
-If you discover a security issue — whether in the web frontend, the API endpoints, or anything that could impact the live trading system or user data — please report it privately.
-
-**Contact:** Open a [GitHub private security advisory](https://github.com/robertashworth1986-debug/lumen-core-public/security/advisories/new) or reach out via the contact on [lumen-core.ai](https://lumen-core.ai).
-
-### What to include
-
-- A description of the vulnerability and its potential impact
-- Steps to reproduce (or a proof-of-concept if you have one)
-- Which URL, endpoint, or component is affected
-
-### What to expect
-
-- Acknowledgement within **48 hours**
-- Resolution timeline communicated within **5 business days**
-- Credit in the changelog (if you'd like it) once the issue is resolved
+Reports are handled on a best-effort basis. No response or remediation service-level guarantee is represented by this public research repository.
 
 ## Scope
 
-This repository is a **public mirror** of the lumen-core.ai production stack. The full institutional trading engine (private keys, API credentials, order execution code) is maintained in a private deployment environment and is **not** in this repository.
+In scope:
 
-If you find something that looks like a leaked credential or key in this repo — please report it immediately so it can be rotated.
+- code and tracked configuration in this repository;
+- public pages and public API behavior served by `lumen-core.ai`;
+- evidence-integrity controls, manifests, and claim-boundary checks;
+- authentication and authorization for consequential-action routes.
 
-## Responsible Disclosure
+Out of scope without separate written authorization:
 
-We appreciate responsible disclosure. If you've found something real and you report it privately, we'll:
+- denial-of-service testing;
+- social engineering;
+- destructive testing of third-party accounts or infrastructure;
+- attempts to place orders, spend money, submit forms, or modify external records.
 
-1. Fix it as fast as we can
-2. Give you credit if you want it
-3. Thank you publicly
+## Security Boundaries
 
-The live system handles real money and real execution proofs. Security matters here.
+This repository is a public technical record, not an assurance that every represented component is production-ready. Private keys, API credentials, tax records, patent records, counsel communications, and privileged source material must remain outside Git.
+
+The `/api/agents/approve` and `/api/agents/log` routes require a server-configured `LUMA_HUMAN_UNLOCK_TOKEN`. The gateway applies the same requirement to grant and opportunity mutations, including outreach dispatch, and to operator mutations under the master, sell, buy, smart-scanner, Kraken sampler, and spike-hunter routes, plus ML-trigger and Node-RED ingest actions. If the token is absent, those mutations and private-log access are disabled. The token must be supplied only by a trusted operator client as a bearer token; it must never be embedded in public browser assets.
+
+Read-only queue responses remove raw source metadata because queued emails, applications, and tickets can contain private fields. Approval receipts are SHA-256 chained for tamper evidence, but a hash chain is not a substitute for access control, backup, or independent audit.
+
+## Repository Hygiene
+
+- Never commit `.env` files, credentials, tokens, private keys, or account exports.
+- Treat generated dashboards and logs as untrusted until scanned for secrets and personal information.
+- Pin or review third-party actions and dependencies before production use.
+- Keep scheduled monitoring workflows read-only; do not grant write access to jobs that only collect status.
+- Use strict SSH host verification for deployment.
+- Rotate any credential that may have entered Git history, logs, screenshots, or workflow artifacts.
+
+## Evidence Integrity
+
+Historical evidence artifacts should not be silently rewritten. Corrections must produce a new dated artifact or an explicit supersession record. Preserve failures and non-wins, and keep public claims no stronger than the underlying evidence maturity.

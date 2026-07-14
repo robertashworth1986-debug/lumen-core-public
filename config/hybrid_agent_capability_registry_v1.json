@@ -1,0 +1,205 @@
+{
+  "schema": "lumencore.hybrid_agent_capability_registry.v1",
+  "version": "1.0.0",
+  "as_of_date": "2026-07-13",
+  "claim_boundary": "This registry declares bounded workflows and controls. It does not establish general intelligence, universal programming-language expertise, neurological effects, or authority to act on external systems.",
+  "operating_lanes": {
+    "hypothesis_lane": {
+      "purpose": "Generate candidate routes, models, claims, and test plans.",
+      "prohibited": [
+        "promotion without a frozen protocol",
+        "rewriting failed results as wins"
+      ]
+    },
+    "falsification_lane": {
+      "purpose": "Challenge leakage, weak baselines, unstable metrics, and unsupported claims.",
+      "prohibited": [
+        "changing acceptance gates after observing results",
+        "discarding negative outcomes"
+      ]
+    },
+    "integration_lane": {
+      "purpose": "Reconcile both lanes into a reproducible artifact and an explicit decision gate.",
+      "prohibited": [
+        "external action without HumanUnlock",
+        "claim maturity inflation"
+      ]
+    }
+  },
+  "agents": [
+    {
+      "id": "evidence_ingest",
+      "role": "Evidence Ingest",
+      "lane": "integration_lane",
+      "inputs": ["named public or authorized private sources"],
+      "outputs": ["source receipt", "schema audit", "SHA-256 manifest"],
+      "autonomy": "local_read_and_stage",
+      "external_action": false
+    },
+    {
+      "id": "protocol_freezer",
+      "role": "Protocol Freezer",
+      "lane": "integration_lane",
+      "inputs": ["research question", "eligible population", "candidate metrics"],
+      "outputs": ["versioned protocol", "split policy", "acceptance gate"],
+      "autonomy": "local_write_with_review",
+      "external_action": false
+    },
+    {
+      "id": "baseline_runner",
+      "role": "Baseline Gauntlet Runner",
+      "lane": "falsification_lane",
+      "inputs": ["frozen protocol", "hashed dataset"],
+      "outputs": ["named baseline results", "candidate results", "failure ledger"],
+      "autonomy": "sandboxed_compute",
+      "external_action": false
+    },
+    {
+      "id": "hybrid_router",
+      "role": "Hybrid Route Evaluator",
+      "lane": "hypothesis_lane",
+      "inputs": ["eligible route families", "training-only evidence"],
+      "outputs": ["route policy", "ablation plan", "held-out predictions"],
+      "autonomy": "sandboxed_compute",
+      "external_action": false
+    },
+    {
+      "id": "falsification_critic",
+      "role": "Falsification Critic",
+      "lane": "falsification_lane",
+      "inputs": ["protocol", "results", "claims"],
+      "outputs": ["leakage checks", "counterexamples", "claim corrections"],
+      "autonomy": "local_read_and_report",
+      "external_action": false
+    },
+    {
+      "id": "reproducibility_auditor",
+      "role": "Reproducibility Auditor",
+      "lane": "integration_lane",
+      "inputs": ["code", "environment", "data receipts", "outputs"],
+      "outputs": ["test receipt", "rebuild instructions", "custody exceptions"],
+      "autonomy": "sandboxed_compute",
+      "external_action": false
+    },
+    {
+      "id": "reviewer_context",
+      "role": "Reviewer Context Builder",
+      "lane": "integration_lane",
+      "inputs": ["validated evidence ledger", "claim vocabulary"],
+      "outputs": ["bounded reviewer brief", "supported and unsupported claim table"],
+      "autonomy": "local_write_with_review",
+      "external_action": false
+    },
+    {
+      "id": "funding_package",
+      "role": "Funding Package Builder",
+      "lane": "integration_lane",
+      "inputs": ["official solicitation", "eligible evidence", "entity facts"],
+      "outputs": ["draft forms", "compliance matrix", "submission checklist"],
+      "autonomy": "local_draft_only",
+      "external_action": false
+    },
+    {
+      "id": "counsel_packet",
+      "role": "Counsel Packet Builder",
+      "lane": "integration_lane",
+      "inputs": ["official filing records", "dated private evidence", "counsel questions"],
+      "outputs": ["private source manifest", "issue list", "draft correspondence"],
+      "autonomy": "private_local_draft_only",
+      "external_action": false
+    },
+    {
+      "id": "external_action_operator",
+      "role": "External Action Operator",
+      "lane": "integration_lane",
+      "inputs": ["exact recipient or portal", "final artifact set", "action-time approval"],
+      "outputs": ["external receipt or explicit blocked status"],
+      "autonomy": "human_unlock_required",
+      "external_action": true
+    }
+  ],
+  "language_adapters": [
+    {
+      "language": "Python",
+      "status": "verified_in_repository",
+      "gate": "targeted tests plus repository claim checks"
+    },
+    {
+      "language": "PowerShell",
+      "status": "verified_in_repository",
+      "gate": "parser check plus dry-run or bounded invocation"
+    },
+    {
+      "language": "JavaScript",
+      "status": "verified_in_repository",
+      "gate": "syntax check plus browser-path verification"
+    },
+    {
+      "language": "HTML/CSS",
+      "status": "verified_in_repository",
+      "gate": "render, responsive, and accessibility smoke checks"
+    },
+    {
+      "language": "JSON/YAML",
+      "status": "verified_in_repository",
+      "gate": "structured parser plus schema or invariant checks"
+    },
+    {
+      "language": "C#",
+      "status": "present_not_repo_wide_certified",
+      "gate": "detected compiler and project-specific tests required"
+    },
+    {
+      "language": "POSIX shell",
+      "status": "present_not_repo_wide_certified",
+      "gate": "shell parser and platform-specific smoke test required"
+    },
+    {
+      "language": "Other",
+      "status": "on_demand_unverified",
+      "gate": "runtime or compiler detection, minimal reproducible test, and reviewer-visible receipt required"
+    }
+  ],
+  "coordination_cadences": [
+    {
+      "order": 1,
+      "id": "event_ingest",
+      "trigger": "new authorized source or changed source receipt",
+      "required_output": "source identity and freshness decision"
+    },
+    {
+      "order": 2,
+      "id": "artifact_seal",
+      "trigger": "every material artifact write",
+      "required_output": "hash and provenance entry"
+    },
+    {
+      "order": 3,
+      "id": "change_validation",
+      "trigger": "every code, protocol, or claim change",
+      "required_output": "tests, benchmark delta, and failure status"
+    },
+    {
+      "order": 4,
+      "id": "action_unlock",
+      "trigger": "immediately before any consequential external action",
+      "required_output": "recipient-specific or portal-specific human decision"
+    },
+    {
+      "order": 5,
+      "id": "release_promotion",
+      "trigger": "candidate reviewer release",
+      "required_output": "clean-tree scope, manifest, citation, and known-limitations receipt"
+    }
+  ],
+  "human_unlock_actions": [
+    "send_external_message",
+    "submit_or_certify_form",
+    "publish_to_third_party",
+    "place_live_order",
+    "move_or_spend_money",
+    "change_account_or_credentials",
+    "execute_legal_document",
+    "file_patent_or_other_legal_record"
+  ]
+}

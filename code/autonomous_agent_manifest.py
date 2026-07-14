@@ -13,14 +13,17 @@ The agent does all the prep; you approve right at ship.
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import logging
+import os
+import threading
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
-from fastapi import APIRouter
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, Header, HTTPException, status
+from pydantic import BaseModel, Field
 
 log = logging.getLogger(__name__)
 
@@ -30,6 +33,8 @@ log = logging.getLogger(__name__)
 _HERE = Path(__file__).parent
 _STACK_ROOT = _HERE.parent
 _OUT = _STACK_ROOT / "out"
+_AUDIT_LOCK = threading.Lock()
+_GENESIS_HASH = "0" * 64
 
 # ---------------------------------------------------------------------------
 # Agent Registry — canonical definition of every autonomous agent
@@ -37,9 +42,9 @@ _OUT = _STACK_ROOT / "out"
 AGENT_REGISTRY: dict[str, dict[str, Any]] = {
     "trade_ticket": {
         "id": "trade_ticket",
-        "name": "Live Trade Executor",
+        "name": "Trade Ticket Stager",
         "icon": "⚡",
-        "description": "Submits Kraken spot orders based on multi-timeframe alpha signals",
+        "description": "Stages Kraken spot-order tickets for a separate authenticated execution decision",
         "auto_fire": False,
         "requires_approval": True,
         "priority_rank": 0,
@@ -52,7 +57,7 @@ AGENT_REGISTRY: dict[str, dict[str, Any]] = {
         "id": "grant_submission",
         "name": "Grant Submission Agent",
         "icon": "🏛",
-        "description": "Packages federal grant applications — SF-424, technical briefs, cover letters",
+        "description": "Assembles local federal application drafts; portal certification and submission stay external",
         "auto_fire": False,
         "requires_approval": True,
         "priority_rank": 1,
@@ -65,7 +70,7 @@ AGENT_REGISTRY: dict[str, dict[str, Any]] = {
         "id": "job_application",
         "name": "Job Application Factory",
         "icon": "💼",
-        "description": "Builds targeted job packages: cover letter, resume, LinkedIn intro message",
+        "description": "Builds local job-package drafts; it does not submit them",
         "auto_fire": False,
         "requires_approval": True,
         "priority_rank": 2,
@@ -78,7 +83,7 @@ AGENT_REGISTRY: dict[str, dict[str, Any]] = {
         "id": "email_dispatch",
         "name": "Resume Email Dispatcher",
         "icon": "📧",
-        "description": "Dispatches tailored resume packages to scored email opportunities",
+        "description": "Stages tailored email-package decisions; sending requires a separate authenticated action",
         "auto_fire": False,
         "requires_approval": True,
         "priority_rank": 3,
@@ -91,7 +96,7 @@ AGENT_REGISTRY: dict[str, dict[str, Any]] = {
         "id": "linkedin_post",
         "name": "LinkedIn Profile Publisher",
         "icon": "🔗",
-        "description": "Posts profile summaries and achievement updates to LinkedIn",
+        "description": "Stages LinkedIn content decisions; publishing requires a separate authenticated action",
         "auto_fire": False,
         "requires_approval": True,
         "priority_rank": 4,
@@ -120,7 +125,77 @@ def _utc_now() -> str:
 
 
 def _short_id(raw: str) -> str:
-    return hashlib.md5(raw.encode()).hexdigest()[:8]
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:12]
+
+
+def _human_unlock_authorized(configured_token: str, authorization: str | None) -> bool:
+    """Constant-time bearer-token check kept separate for deterministic tests."""
+    if not configured_token or not authorization:
+        return False
+    scheme, separator, presented = authorization.partition(" ")
+    if not separator or scheme.lower() != "bearer" or not presented:
+        return False
+    return hmac.compare_digest(configured_token, presented)
+
+
+def _require_human_unlock(authorization: str | None = Header(default=None)) -> None:
+    """Require a server-held token before any approval state can change."""
+    configured_token = os.getenv("LUMA_HUMAN_UNLOCK_TOKEN", "").strip()
+    if not configured_token:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="HumanUnlock is disabled until LUMA_HUMAN_UNLOCK_TOKEN is configured.",
+        )
+    if not _human_unlock_authorized(configured_token, authorization):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="A valid HumanUnlock bearer token is required.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+def _public_queue_snapshot(payload: dict[str, Any]) -> dict[str, Any]:
+    """Remove source payloads that may contain addresses, tokens, or private notes."""
+    allowed = {
+        "id",
+        "agent_type",
+        "title",
+        "description",
+        "confidence",
+        "priority",
+        "state",
+        "value_usd",
+        "deadline",
+        "channel",
+        "keywords",
+    }
+    snapshot = dict(payload)
+    snapshot["items"] = [
+        {key: value for key, value in item.items() if key in allowed}
+        for item in payload.get("items", [])
+    ]
+    return snapshot
+
+
+def _append_audit_entry(entry: dict[str, Any]) -> dict[str, Any]:
+    """Append a process-serialized, SHA-256 chained approval receipt."""
+    log_path = _OUT / "ops" / "agent_approval_log.jsonl"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with _AUDIT_LOCK:
+        previous_hash = _GENESIS_HASH
+        if log_path.exists():
+            for line in reversed(log_path.read_text(encoding="utf-8-sig").splitlines()):
+                try:
+                    previous_hash = str(json.loads(line).get("entry_hash") or _GENESIS_HASH)
+                    break
+                except json.JSONDecodeError:
+                    continue
+        chained = {**entry, "previous_hash": previous_hash}
+        canonical = json.dumps(chained, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+        chained["entry_hash"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+        with log_path.open("a", encoding="utf-8", newline="\n") as handle:
+            handle.write(json.dumps(chained, sort_keys=True, ensure_ascii=True) + "\n")
+    return chained
 
 
 # ---------------------------------------------------------------------------
@@ -315,6 +390,12 @@ def _approve_job(item_id: str) -> dict[str, Any]:
     updated = False
     for pkg in items_raw:
         if str(pkg.get("job_id", pkg.get("id", ""))) == item_id:
+            if str(pkg.get("state", "")).lower() == "approved":
+                return {
+                    "success": True,
+                    "idempotent": True,
+                    "message": f"Job {item_id!r} was already approved",
+                }
             pkg["state"] = "approved"
             pkg["approved_utc"] = _utc_now()
             updated = True
@@ -346,6 +427,18 @@ def _approve_grant(item_id: str) -> dict[str, Any]:
         return {"success": False, "message": "Grant queue not found"}
     pending = data if isinstance(data, list) else data.get("pending", [])
     target = next((g for g in pending if str(g.get("id", g.get("opp_id", ""))) == item_id), None)
+    if isinstance(data, dict) and target is None:
+        approved = data.get("approved", [])
+        already = next(
+            (g for g in approved if str(g.get("id", g.get("opp_id", ""))) == item_id),
+            None,
+        )
+        if already is not None:
+            return {
+                "success": True,
+                "idempotent": True,
+                "message": f"Grant {item_id!r} was already approved",
+            }
     if target is None:
         return {"success": False, "message": f"Grant {item_id!r} not found"}
     target["approval_state"] = "APPROVED"
@@ -372,6 +465,12 @@ def _approve_linkedin(item_id: str) -> dict[str, Any]:
     publish_queue_path.parent.mkdir(parents=True, exist_ok=True)
     queue = list(_read_json(publish_queue_path) or [])
     post_id = item_id.replace("linkedin_", "")
+    if any(str(row.get("post_id", "")) == post_id for row in queue):
+        return {
+            "success": True,
+            "idempotent": True,
+            "message": f"LinkedIn post {post_id!r} was already staged",
+        }
     queue.append({"post_id": post_id, "approved_utc": _utc_now(), "status": "approved"})
     try:
         publish_queue_path.write_text(json.dumps(queue, indent=2), encoding="utf-8")
@@ -388,6 +487,12 @@ def _approve_email(item_id: str) -> dict[str, Any]:
     dispatch_queue_path = _OUT / "opportunities" / "email" / "email_dispatch_approved.json"
     dispatch_queue_path.parent.mkdir(parents=True, exist_ok=True)
     queue = list(_read_json(dispatch_queue_path) or [])
+    if any(str(row.get("item_id", "")) == item_id for row in queue):
+        return {
+            "success": True,
+            "idempotent": True,
+            "message": f"Email dispatch {item_id!r} was already staged",
+        }
     queue.append({"item_id": item_id, "approved_utc": _utc_now(), "status": "approved"})
     try:
         dispatch_queue_path.write_text(json.dumps(queue, indent=2), encoding="utf-8")
@@ -402,9 +507,19 @@ def _approve_email(item_id: str) -> dict[str, Any]:
 
 def _dispatch_approval(item_id: str, item_type: str, action: str) -> dict[str, Any]:
     if action == "skip":
-        return {"success": True, "message": f"Skipped {item_id}", "action": "skip"}
+        return {
+            "success": True,
+            "message": f"Recorded a skip decision for {item_id}; the source queue was not changed",
+            "action": "skip",
+            "source_queue_changed": False,
+        }
     if action == "delay":
-        return {"success": True, "message": f"Delayed {item_id} — will re-surface next cycle", "action": "delay"}
+        return {
+            "success": True,
+            "message": f"Recorded a delay decision for {item_id}; it will re-surface next cycle",
+            "action": "delay",
+            "source_queue_changed": False,
+        }
     # approve
     if item_type == "trade_ticket":
         return {
@@ -431,16 +546,22 @@ router = APIRouter(prefix="/api/agents", tags=["agents"])
 
 
 class ApproveRequest(BaseModel):
-    item_id: str
-    item_type: str
-    action: str = "approve"  # approve | skip | delay
-    notes: str = ""
+    item_id: str = Field(min_length=1, max_length=160, pattern=r"^[A-Za-z0-9_.:-]+$")
+    item_type: Literal[
+        "trade_ticket",
+        "grant_submission",
+        "job_application",
+        "email_dispatch",
+        "linkedin_post",
+    ]
+    action: Literal["approve", "skip", "delay"] = "approve"
+    notes: str = Field(default="", max_length=1000)
 
 
 @router.get("/queue")
 def get_agent_queue() -> dict[str, Any]:
-    """Unified approval queue across all autonomous agents."""
-    return build_unified_queue()
+    """Public-safe queue summary with private source payloads removed."""
+    return _public_queue_snapshot(build_unified_queue())
 
 
 @router.get("/registry")
@@ -450,7 +571,10 @@ def get_agent_registry() -> dict[str, Any]:
 
 
 @router.post("/approve")
-def approve_agent_action(req: ApproveRequest) -> dict[str, Any]:
+def approve_agent_action(
+    req: ApproveRequest,
+    _: None = Depends(_require_human_unlock),
+) -> dict[str, Any]:
     """
     Human-in-the-loop approval gate.
     Approve, skip, or delay a queued agent action.
@@ -458,9 +582,6 @@ def approve_agent_action(req: ApproveRequest) -> dict[str, Any]:
     """
     result = _dispatch_approval(req.item_id, req.item_type, req.action)
 
-    # Append to audit log
-    log_path = _OUT / "ops" / "agent_approval_log.jsonl"
-    log_path.parent.mkdir(parents=True, exist_ok=True)
     entry = {
         "timestamp_utc": _utc_now(),
         "item_id": req.item_id,
@@ -471,19 +592,23 @@ def approve_agent_action(req: ApproveRequest) -> dict[str, Any]:
         "message": result.get("message", ""),
     }
     try:
-        with open(log_path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(entry) + "\n")
+        entry = _append_audit_entry(entry)
     except Exception as exc:
         log.warning("Failed to write agent approval log: %s", exc)
+        entry["audit_write_error"] = type(exc).__name__
 
     return {**entry, **result}
 
 
 @router.get("/log")
-def get_approval_log(limit: int = 50) -> dict[str, Any]:
+def get_approval_log(
+    limit: int = 50,
+    _: None = Depends(_require_human_unlock),
+) -> dict[str, Any]:
     """Recent agent approval audit log."""
     log_path = _OUT / "ops" / "agent_approval_log.jsonl"
     entries: list[dict] = []
+    limit = max(1, min(limit, 250))
     if log_path.exists():
         lines = log_path.read_text(encoding="utf-8-sig").strip().splitlines()
         for line in lines[-limit:][::-1]:
