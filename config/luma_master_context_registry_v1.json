@@ -1,0 +1,110 @@
+{
+  "schema": "luma_master_context_registry_v1",
+  "purpose": "Define one canonical source for each continuity role without copying private source bodies into the public repository.",
+  "privacy_rule": "The generated master bundle is private metadata and summaries only. Source bodies, credentials, personal identifiers, and note text must not be serialized.",
+  "private_output": {
+    "vault_relative_dir": "PRIVATE_CONTEXT",
+    "latest_json": "LUMA_MASTER_CONTEXT_LATEST.json",
+    "latest_markdown": "LUMA_MASTER_CONTEXT_LATEST.md",
+    "latest_manifest": "LUMA_MASTER_CONTEXT_MANIFEST_LATEST.json",
+    "run_dir": "RUNS"
+  },
+  "startup_order": [
+    "reviewer_evidence",
+    "estate_inventory",
+    "operating_chronology",
+    "private_note_context",
+    "pass_continuity",
+    "compaction_overlap"
+  ],
+  "sources": [
+    {
+      "id": "estate_index",
+      "role": "estate_inventory",
+      "location": "repo",
+      "path": "out/ops/lumencore_estate_master_index_latest.json",
+      "builder": "code/ops/BUILD_LUMENCORE_ESTATE_MASTER_INDEX.py",
+      "status": "current",
+      "canonical": true,
+      "privacy": "public_safe_metadata",
+      "max_age_hours": 72
+    },
+    {
+      "id": "reviewer_context",
+      "role": "reviewer_evidence",
+      "location": "repo",
+      "path": "out/ops/quant_hub_reviewer_context_latest.json",
+      "builder": "code/ops/BUILD_QUANT_HUB_REVIEWER_CONTEXT.py",
+      "status": "current",
+      "canonical": true,
+      "privacy": "public_safe",
+      "max_age_hours": 72
+    },
+    {
+      "id": "operating_memory",
+      "role": "operating_chronology",
+      "location": "repo",
+      "path": "docs/LUMAJARVIS_OPERATING_MEMORY_2026-06-20.md",
+      "builder": null,
+      "status": "current",
+      "canonical": true,
+      "privacy": "internal_public_tree",
+      "max_age_hours": 168
+    },
+    {
+      "id": "private_note_capsule",
+      "role": "private_note_context",
+      "location": "vault",
+      "path": "PRIVATE_ICLOUD_NOTE_INDEX/private_context_capsule_latest.json",
+      "builder": "code/ops/BUILD_PRIVATE_ICLOUD_NOTE_INDEX.py",
+      "status": "current",
+      "canonical": true,
+      "privacy": "private_metadata",
+      "max_age_hours": 168
+    },
+    {
+      "id": "verified_pass_continuity",
+      "role": "pass_continuity",
+      "location": "vault",
+      "path": "PRIVATE_CONTEXT/LUMA_VERIFIED_CONTINUITY_2026-07-14.md",
+      "builder": null,
+      "status": "current",
+      "canonical": true,
+      "privacy": "private",
+      "max_age_hours": 168
+    },
+    {
+      "id": "compaction_overlap_audit",
+      "role": "compaction_overlap",
+      "location": "vault",
+      "path": "PRIVATE_CONTEXT/context_compaction_overlap_audit_latest.json",
+      "builder": null,
+      "status": "current",
+      "canonical": true,
+      "privacy": "private_metadata",
+      "max_age_hours": 720
+    },
+    {
+      "id": "legacy_master_context_snapshot",
+      "role": "legacy_context_snapshot",
+      "location": "repo",
+      "path": "out/execution/master_context_snapshot.json",
+      "builder": "code/build_master_context_snapshot.py",
+      "status": "superseded",
+      "canonical": false,
+      "privacy": "internal_public_tree",
+      "max_age_hours": null
+    },
+    {
+      "id": "legacy_continuity_handoff",
+      "role": "legacy_continuity_handoff",
+      "location": "repo",
+      "path": "docs/LUMA_CONTINUITY_OPERATING_CONTEXT_2026-07-11.md",
+      "builder": null,
+      "status": "superseded",
+      "canonical": false,
+      "privacy": "internal_public_tree",
+      "max_age_hours": null
+    }
+  ]
+}

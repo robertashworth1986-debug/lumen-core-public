@@ -6,12 +6,16 @@ This repository is an active evidence worktrail for LumenCore and related resear
 
 Read these files in order:
 
-1. `docs/REVIEWER_START_HERE.md`
-2. `README.md`
-3. `docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md`
-4. `docs/HYBRID_AGENT_OPERATING_MODEL_2026-07-13.md`
-5. `grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-13.md`
-6. `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md`
+1. Run `python code/ops/BUILD_LUMA_MASTER_CONTEXT_BUNDLE.py --check-only`.
+2. If available, read the private `E:/LumaProofVault/PRIVATE_CONTEXT/LUMA_MASTER_CONTEXT_LATEST.md` orientation map.
+3. Read `docs/REVIEWER_START_HERE.md`.
+4. Read `README.md`.
+5. Read `docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md`.
+6. Read `docs/HYBRID_AGENT_OPERATING_MODEL_2026-07-13.md`.
+7. Read `grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-13.md`.
+8. Read `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md`.
+
+The source registry is `config/luma_master_context_registry_v1.json`. Refresh a stale canonical source instead of creating a parallel master-context artifact.
 
 For the operations refresh lane, inspect `code/ops/RUN_BOOTH_WARROOM_REFRESH.ps1` and its current outputs before starting another loop.
 
@@ -64,4 +68,4 @@ Prefer wiring verified feeds into these surfaces over creating dashboard sprawl.
 
 ## Anti-Drift Rule
 
-If the next action feels like a restart, stop and rebuild the reviewer context first. Continue the evidence chain; do not reinvent the platform or inflate its claims.
+If the next action feels like a restart, stop and check the master-context registry first. Refresh only the stale canonical source, continue the evidence chain, and do not reinvent the platform or inflate its claims.

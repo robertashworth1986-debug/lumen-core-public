@@ -76,6 +76,7 @@ def sha256_file(path: Path) -> str:
 
 
 def should_skip(path: Path) -> bool:
+    """Return whether a path relative to the selected source root is excluded."""
     return bool({part.lower() for part in path.parts} & SKIP_PARTS)
 
 
@@ -122,13 +123,15 @@ def sensitive_flags(text: str) -> list[str]:
 def iter_note_paths(root: Path) -> Iterable[Path]:
     for dirpath, dirnames, filenames in os.walk(root):
         base = Path(dirpath)
-        dirnames[:] = [name for name in dirnames if not should_skip(base / name)]
-        if should_skip(base):
+        relative_base = base.relative_to(root)
+        dirnames[:] = [name for name in dirnames if not should_skip(relative_base / name)]
+        if should_skip(relative_base):
             dirnames[:] = []
             continue
         for name in filenames:
             path = base / name
-            if path.suffix.lower() in SUPPORTED_EXTENSIONS and not should_skip(path):
+            relative_path = path.relative_to(root)
+            if path.suffix.lower() in SUPPORTED_EXTENSIONS and not should_skip(relative_path):
                 yield path
 
 
