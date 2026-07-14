@@ -1,0 +1,539 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:pypi/iniconfig@2.3.0",
+      "name": "iniconfig",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "2.3.0"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "transitive"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "iniconfig",
+      "purl": "pkg:pypi/iniconfig@2.3.0",
+      "type": "library",
+      "version": "2.3.0"
+    },
+    {
+      "bom-ref": "pkg:pypi/joblib@1.5.3",
+      "name": "joblib",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "1.5.3"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "transitive"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "joblib",
+      "purl": "pkg:pypi/joblib@1.5.3",
+      "type": "library",
+      "version": "1.5.3"
+    },
+    {
+      "bom-ref": "pkg:pypi/lightgbm@4.6.0",
+      "name": "lightgbm",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "4.6.0"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "direct"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "lightgbm",
+      "purl": "pkg:pypi/lightgbm@4.6.0",
+      "type": "library",
+      "version": "4.6.0"
+    },
+    {
+      "bom-ref": "pkg:pypi/numpy@2.3.5",
+      "name": "numpy",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "2.3.5"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "direct"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "Travis E. Oliphant et al.",
+      "purl": "pkg:pypi/numpy@2.3.5",
+      "type": "library",
+      "version": "2.3.5"
+    },
+    {
+      "bom-ref": "pkg:pypi/nvidia-nccl-cu12@2.30.7",
+      "name": "nvidia-nccl-cu12",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "2.30.7"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "transitive"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "Nvidia CUDA Installer Team",
+      "purl": "pkg:pypi/nvidia-nccl-cu12@2.30.7",
+      "type": "library",
+      "version": "2.30.7"
+    },
+    {
+      "bom-ref": "pkg:pypi/packaging@25.0",
+      "name": "packaging",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "25.0"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "runner"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "packaging",
+      "purl": "pkg:pypi/packaging@25.0",
+      "type": "library",
+      "version": "25.0"
+    },
+    {
+      "bom-ref": "pkg:pypi/pandas@2.3.3",
+      "name": "pandas",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "2.3.3"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "direct"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "pandas",
+      "purl": "pkg:pypi/pandas@2.3.3",
+      "type": "library",
+      "version": "2.3.3"
+    },
+    {
+      "bom-ref": "pkg:pypi/pluggy@1.6.0",
+      "name": "pluggy",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "1.6.0"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "transitive"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "pluggy",
+      "purl": "pkg:pypi/pluggy@1.6.0",
+      "type": "library",
+      "version": "1.6.0"
+    },
+    {
+      "bom-ref": "pkg:pypi/pygments@2.20.0",
+      "name": "Pygments",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "2.20.0"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "transitive"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "Pygments",
+      "purl": "pkg:pypi/pygments@2.20.0",
+      "type": "library",
+      "version": "2.20.0"
+    },
+    {
+      "bom-ref": "pkg:pypi/pytest@9.1.0",
+      "name": "pytest",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "9.1.0"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "test"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "Brianna Laugher, Bruno Oliveira, Floris Bruynooghe, Freya Bruhin, Holger Krekel, Others (See AUTHORS), Ronny Pfannschmidt",
+      "purl": "pkg:pypi/pytest@9.1.0",
+      "type": "library",
+      "version": "9.1.0"
+    },
+    {
+      "bom-ref": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "name": "python-dateutil",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "2.9.0.post0"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "transitive"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "Gustavo Niemeyer",
+      "purl": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "type": "library",
+      "version": "2.9.0.post0"
+    },
+    {
+      "bom-ref": "pkg:pypi/pytz@2026.2",
+      "name": "pytz",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "2026.2"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "transitive"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "Stuart Bishop",
+      "purl": "pkg:pypi/pytz@2026.2",
+      "type": "library",
+      "version": "2026.2"
+    },
+    {
+      "bom-ref": "pkg:pypi/scikit-learn@1.8.0",
+      "name": "scikit-learn",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "1.8.0"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "direct"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "scikit-learn",
+      "purl": "pkg:pypi/scikit-learn@1.8.0",
+      "type": "library",
+      "version": "1.8.0"
+    },
+    {
+      "bom-ref": "pkg:pypi/scipy@1.16.3",
+      "name": "scipy",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "1.16.3"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "transitive_numeric_runtime"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "scipy",
+      "purl": "pkg:pypi/scipy@1.16.3",
+      "type": "library",
+      "version": "1.16.3"
+    },
+    {
+      "bom-ref": "pkg:pypi/six@1.17.0",
+      "name": "six",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "1.17.0"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "transitive"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "Benjamin Peterson",
+      "purl": "pkg:pypi/six@1.17.0",
+      "type": "library",
+      "version": "1.17.0"
+    },
+    {
+      "bom-ref": "pkg:pypi/threadpoolctl@3.6.0",
+      "name": "threadpoolctl",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "3.6.0"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "transitive"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "Thomas Moreau",
+      "purl": "pkg:pypi/threadpoolctl@3.6.0",
+      "type": "library",
+      "version": "3.6.0"
+    },
+    {
+      "bom-ref": "pkg:pypi/tzdata@2026.3",
+      "name": "tzdata",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "2026.3"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "transitive"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "Python Software Foundation",
+      "purl": "pkg:pypi/tzdata@2026.3",
+      "type": "library",
+      "version": "2026.3"
+    },
+    {
+      "bom-ref": "pkg:pypi/xgboost@3.2.0",
+      "name": "xgboost",
+      "properties": [
+        {
+          "name": "lumencore:expected-version",
+          "value": "3.2.0"
+        },
+        {
+          "name": "lumencore:relationship",
+          "value": "direct"
+        },
+        {
+          "name": "lumencore:version-match",
+          "value": "true"
+        }
+      ],
+      "publisher": "xgboost",
+      "purl": "pkg:pypi/xgboost@3.2.0",
+      "type": "library",
+      "version": "3.2.0"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependsOn": [
+        "pkg:pypi/lightgbm@4.6.0",
+        "pkg:pypi/numpy@2.3.5",
+        "pkg:pypi/packaging@25.0",
+        "pkg:pypi/pandas@2.3.3",
+        "pkg:pypi/pytest@9.1.0",
+        "pkg:pypi/scikit-learn@1.8.0",
+        "pkg:pypi/scipy@1.16.3",
+        "pkg:pypi/xgboost@3.2.0"
+      ],
+      "ref": "pkg:generic/lumencore/reviewer-reproducibility@LUMENCORE_REVIEWER_REPRODUCIBILITY_20260714"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:pypi/iniconfig@2.3.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:pypi/joblib@1.5.3"
+    },
+    {
+      "dependsOn": [
+        "pkg:pypi/numpy@2.3.5",
+        "pkg:pypi/scipy@1.16.3"
+      ],
+      "ref": "pkg:pypi/lightgbm@4.6.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:pypi/numpy@2.3.5"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:pypi/nvidia-nccl-cu12@2.30.7"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:pypi/packaging@25.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:pypi/numpy@2.3.5",
+        "pkg:pypi/python-dateutil@2.9.0.post0",
+        "pkg:pypi/pytz@2026.2",
+        "pkg:pypi/tzdata@2026.3"
+      ],
+      "ref": "pkg:pypi/pandas@2.3.3"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:pypi/pluggy@1.6.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:pypi/pygments@2.20.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:pypi/iniconfig@2.3.0",
+        "pkg:pypi/packaging@25.0",
+        "pkg:pypi/pluggy@1.6.0",
+        "pkg:pypi/pygments@2.20.0"
+      ],
+      "ref": "pkg:pypi/pytest@9.1.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:pypi/six@1.17.0"
+      ],
+      "ref": "pkg:pypi/python-dateutil@2.9.0.post0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:pypi/pytz@2026.2"
+    },
+    {
+      "dependsOn": [
+        "pkg:pypi/joblib@1.5.3",
+        "pkg:pypi/numpy@2.3.5",
+        "pkg:pypi/scipy@1.16.3",
+        "pkg:pypi/threadpoolctl@3.6.0"
+      ],
+      "ref": "pkg:pypi/scikit-learn@1.8.0"
+    },
+    {
+      "dependsOn": [
+        "pkg:pypi/numpy@2.3.5"
+      ],
+      "ref": "pkg:pypi/scipy@1.16.3"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:pypi/six@1.17.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:pypi/threadpoolctl@3.6.0"
+    },
+    {
+      "dependsOn": [],
+      "ref": "pkg:pypi/tzdata@2026.3"
+    },
+    {
+      "dependsOn": [
+        "pkg:pypi/numpy@2.3.5",
+        "pkg:pypi/nvidia-nccl-cu12@2.30.7",
+        "pkg:pypi/scipy@1.16.3"
+      ],
+      "ref": "pkg:pypi/xgboost@3.2.0"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:generic/lumencore/reviewer-reproducibility@LUMENCORE_REVIEWER_REPRODUCIBILITY_20260714",
+      "name": "LumenCore reviewer reproducibility capsule",
+      "supplier": {
+        "name": "LumenCore"
+      },
+      "type": "application",
+      "version": "LUMENCORE_REVIEWER_REPRODUCIBILITY_20260714"
+    },
+    "properties": [
+      {
+        "name": "lumencore:scope",
+        "value": "reviewer-suite-only"
+      },
+      {
+        "name": "lumencore:artifact-hash-lock-complete",
+        "value": "false"
+      }
+    ],
+    "timestamp": "2026-07-14T13:36:57.559697+00:00"
+  },
+  "serialNumber": "urn:uuid:17da83a6-6714-53db-9c31-eaff81721835",
+  "specVersion": "1.6",
+  "version": 1
+}

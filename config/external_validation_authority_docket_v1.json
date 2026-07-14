@@ -1,0 +1,144 @@
+{
+  "schema": "external_validation_authority_protocol.v1",
+  "protocol_id": "LUMENCORE_EIA_EXTERNAL_VALIDATION_AUTHORITY_20260714",
+  "version": 1,
+  "prepared_utc": "2026-07-14",
+  "purpose": "Give an independent technical evaluator a bounded, hash-verifiable way to supervise the preregistered EIA prospective router experiment and decide whether its evidence advances beyond repository Level 3.",
+  "current_repository_maturity_level": 3,
+  "evidence_lane": {
+    "lane_id": "eia_grid_prospective_hybrid_router",
+    "protocol_path": "config/eia_grid_prospective_hybrid_router_protocol_v1.json",
+    "runtime_status_path": "out/eia_grid_prospective_hybrid_router/prospective_status_latest.json",
+    "source_publisher": "U.S. Energy Information Administration",
+    "source_product": "Form EIA-930 daily demand and day-ahead demand forecast by balancing authority",
+    "source_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/",
+    "first_allowed_target_date": "2026-07-14",
+    "backfill_allowed": false,
+    "dynamic_route_override_allowed": false
+  },
+  "clean_runner_verification": {
+    "github_run_id": 29337177292,
+    "github_run_url": "https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/29337177292",
+    "commit": "9335d69ede11fecfe98ab866414c62cfb9e7469f",
+    "conclusion": "success",
+    "artifact_name": "reviewer-reproducibility-9335d69ede11fecfe98ab866414c62cfb9e7469f",
+    "artifact_api_digest": "sha256:f2cea96f37eea556aedace245ba636a0b8a2ccf4442a7e904136eb24760694e3",
+    "receipt_capsule_sha256": "c6355e124d5938505cc388093ec94f0732b8febac6e5305dc5b49e12a1a508cb",
+    "archive_path": "evidence/reproducibility/github_run_29337177292",
+    "artifact_retention_note": "The GitHub-hosted artifact has a finite retention window. The verified receipt, scoped SBOM, logs, and checksum manifest are preserved under archive_path."
+  },
+  "portable_input_paths": [
+    ".gitattributes",
+    ".github/workflows/external-validation-docket.yml",
+    "config/eia_grid_prospective_hybrid_router_protocol_v1.json",
+    "config/reviewer_reproducibility_protocol_v1.json",
+    "dashboard/data/reviewer_reproducibility_capsule.json",
+    "docs/EIA_GRID_PROSPECTIVE_HYBRID_ROUTER_2026-07-13.md",
+    "docs/EIA_GRID_PROSPECTIVE_ROUTER_OPERATIONS_2026-07-13.md",
+    "docs/FIELD_VALIDATION_BUYER_PILOT_PACKET_2026-06-25.md",
+    "docs/REVIEWER_REPRODUCIBILITY_CAPSULE_2026-07-14.md"
+  ],
+  "maturity_gates": {
+    "level_4": {
+      "label": "prospective_public_data_evaluation",
+      "minimum_common_settled_days_per_authority": 90,
+      "require_promotion_evaluation_complete": true,
+      "require_confirmatory_gate_passed": true,
+      "required_evidence": [
+        "predictions sealed before target-local midnight",
+        "no target actual present at seal",
+        "complete common-intersection settlements",
+        "router compared with every predeclared fixed specialist",
+        "all authority, month, route, fallback, and negative results reported"
+      ]
+    },
+    "level_5": {
+      "label": "independent_external_validation",
+      "minimum_common_settled_days_per_authority": 180,
+      "require_level_4": true,
+      "require_external_partner_replication": true,
+      "require_independent_evaluator_signoff": true,
+      "require_independent_hash_verification": true,
+      "require_conflict_disclosure": true
+    }
+  },
+  "evaluator_authority_contract": {
+    "required_identity_fields": [
+      "evaluator_name",
+      "organization",
+      "technical_role",
+      "authority_to_review",
+      "contact_channel",
+      "conflict_of_interest_disclosure",
+      "accepted_protocol_sha256",
+      "accepted_utc",
+      "signed_result_receipt_sha256"
+    ],
+    "decision_rights": [
+      "approve or reject the evaluation protocol before reviewing prospective outcomes",
+      "independently verify protocol, prediction-chain, settlement-chain, and receipt hashes",
+      "inspect all negative results, fallbacks, exclusions, and missing observations",
+      "reject any backfilled prediction or post-target route change",
+      "withhold Level 5 signoff when independence, coverage, or evidence custody is insufficient"
+    ],
+    "operator_prohibitions": [
+      "no result-dependent route or hyperparameter changes",
+      "no deletion or replacement of sealed predictions",
+      "no operational grid control or autonomous actuation",
+      "no realized-savings, reliability, certification, or universal-superiority claim",
+      "no evaluator identity or signature fabricated by the operator"
+    ]
+  },
+  "nist_ai_rmf_informative_crosswalk": [
+    {
+      "function": "GOVERN",
+      "implemented_control": "Named operator and evaluator roles, HumanUnlock boundaries, immutable protocol identity, claim prohibitions, and explicit decision authority.",
+      "remaining_gap": "No independent evaluator has accepted responsibility or signed the protocol."
+    },
+    {
+      "function": "MAP",
+      "implemented_control": "The intended forecast context, EIA source, eight balancing authorities, incumbent comparators, affected operational boundaries, and prohibited uses are documented.",
+      "remaining_gap": "An external domain owner has not yet reviewed context suitability or downstream impacts."
+    },
+    {
+      "function": "MEASURE",
+      "implemented_control": "Predeclared metrics, baselines, timing controls, holdout gates, uncertainty tests, append-only receipts, clean-runner replay, and negative-result reporting are defined.",
+      "remaining_gap": "Prospective samples and settlements have not reached the confirmatory or durability gates."
+    },
+    {
+      "function": "MANAGE",
+      "implemented_control": "Fail-closed eligibility rules, no-backfill controls, chain-tamper rejection, fallback tracking, stop conditions, and blocked deployment claims are documented.",
+      "remaining_gap": "No external organization has adopted an incident, escalation, or production-use decision process for this experiment."
+    }
+  ],
+  "standards_references": [
+    {
+      "name": "NIST AI Risk Management Framework 1.0",
+      "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10",
+      "use": "Informative mapping to the voluntary Govern, Map, Measure, and Manage functions. This docket is not a NIST certification or conformity assessment.",
+      "current_note": "NIST reports that AI RMF 1.0 is being revised; this docket must be reviewed when the revision is published."
+    },
+    {
+      "name": "NIST AI RMF Playbook",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-rmf-playbook",
+      "use": "Informative source for voluntary risk-management actions; the Playbook is not a checklist and this docket does not claim complete implementation."
+    },
+    {
+      "name": "EIA API Technical Documentation",
+      "url": "https://www.eia.gov/opendata/documentation.php",
+      "use": "Primary documentation for the public API that supplies the measured EIA-930 source observations."
+    },
+    {
+      "name": "EIA Form EIA-930 API Dashboard",
+      "url": "https://www.eia.gov/opendata/browser/electricity/rto/region-data",
+      "use": "Primary publisher description of hourly demand and demand-forecast data by balancing authority."
+    }
+  ],
+  "reviewer_decision_request": {
+    "decision": "Accept or decline the independent technical evaluator role for the frozen prospective experiment.",
+    "minimum_commitment": "Review the protocol and clean-runner receipt, verify hashes, observe the prospective ledger through the confirmatory gate, and sign only the result supported by the complete record.",
+    "fundable_scope": "A bounded independent evaluation and replication engagement may be funded without asserting that Level 4, Level 5, field performance, or economic savings already exist.",
+    "operator_may_not_answer_for_reviewer": true
+  },
+  "claim_boundary": "This docket proves only the identity and readiness of a bounded external-validation process. It does not prove Level 4 or Level 5 maturity, independent validation, agency approval, NIST certification, field performance, grid reliability improvement, realized savings, patent validity or scope, production readiness, trading performance, or universal model superiority."
+}

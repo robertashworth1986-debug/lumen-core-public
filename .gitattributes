@@ -3,3 +3,4 @@
 *.docx binary
 *.pptx binary
 *.xlsx binary
+evidence/reproducibility/github_run_*/** binary

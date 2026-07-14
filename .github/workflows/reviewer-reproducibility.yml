@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
+      - "README.md"
       - ".github/workflows/reviewer-reproducibility.yml"
       - "code/eia_grid_residual_moe_benchmark.py"
       - "code/eia_grid_wave_champion_benchmark.py"
@@ -22,6 +23,7 @@ on:
       - "tests/test_reviewer_reproducibility_capsule.py"
   push:
     paths:
+      - "README.md"
       - ".github/workflows/reviewer-reproducibility.yml"
       - "code/eia_grid_residual_moe_benchmark.py"
       - "code/eia_grid_wave_champion_benchmark.py"

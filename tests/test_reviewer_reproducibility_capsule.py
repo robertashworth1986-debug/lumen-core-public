@@ -75,6 +75,7 @@ def test_protocol_is_frozen_version_pinned_and_claim_bounded():
 def test_workflow_excludes_checksum_manifest_from_its_own_hash_set():
     workflow = WORKFLOW.read_text(encoding="utf-8")
 
+    assert workflow.count('- "README.md"') == 2
     assert "-type f ! -name SHA256SUMS -print0" in workflow
     assert "LC_ALL=C sort -z" in workflow
     assert (

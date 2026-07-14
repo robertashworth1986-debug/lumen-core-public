@@ -1,0 +1,57 @@
+name: External validation authority docket
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/external-validation-docket.yml"
+      - "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py"
+      - "config/external_validation_authority_docket_v1.json"
+      - "config/eia_grid_prospective_hybrid_router_protocol_v1.json"
+      - "docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md"
+      - "evidence/external_validation/**"
+      - "evidence/reproducibility/github_run_29337177292/**"
+      - "tests/test_external_validation_authority_docket.py"
+  push:
+    paths:
+      - ".github/workflows/external-validation-docket.yml"
+      - "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py"
+      - "config/external_validation_authority_docket_v1.json"
+      - "config/eia_grid_prospective_hybrid_router_protocol_v1.json"
+      - "docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md"
+      - "evidence/external_validation/**"
+      - "evidence/reproducibility/github_run_29337177292/**"
+      - "tests/test_external_validation_authority_docket.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: external-validation-docket-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-docket:
+    name: Verify archived receipt and authority gates
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      PYTHONHASHSEED: "0"
+      TZ: UTC
+
+    steps:
+      - name: Check out the reviewed source
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Install the pinned Python runtime
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11.9"
+
+      - name: Install the docket test runner
+        run: python -m pip install --disable-pip-version-check pytest==9.1.0
+
+      - name: Verify the archived clean-runner bundle and authority gates
+        run: |
+          python code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py --check-only
+          python -m pytest -q tests/test_external_validation_authority_docket.py
