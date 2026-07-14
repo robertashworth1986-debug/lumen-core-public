@@ -1,5 +1,5 @@
 {
-  "capsule_sha256": "865671b83dc0d2086a47508a79335d7b841426504c11d2439a4656da143ecdd1",
+  "capsule_sha256": "7a91dea2cf7fbaccca3421a6d99545f4eadc03f3ce51a877bd590579c5ad2d85",
   "claim_boundary": "A passing capsule proves that the named code reproduced the declared bounded facts from the packaged input under the recorded environment. It does not prove agency approval, cybersecurity certification, external validation, field performance, realized savings, patent scope, trading performance, or funding eligibility.",
   "dependencies": [
     {
@@ -148,10 +148,10 @@
       "-k",
       "not frozen_eia_panel_and_result_manifests_are_hash_valid_and_claim_safe and not published_receipt_reconciles_hashes_assertions_and_public_projection"
     ],
-    "elapsed_seconds": 6.686,
+    "elapsed_seconds": 11.662,
     "exit_code": 0,
     "log_path": "out/reproducibility/reviewer_capsule_latest/logs/fixture_tests.log",
-    "log_sha256": "ff75768d7ed7d427c55e7cdca1c4958b7dfe0712b279f5b7fa0da5a77ff98da2",
+    "log_sha256": "c27a984621dc843e60fd110d5bf6b0e799d934ee09f9205b07ea614dbefd1b3d",
     "passed": true
   },
   "frozen_input": {
@@ -191,10 +191,10 @@
     "passed": true,
     "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz"
   },
-  "generated_utc": "2026-07-14T13:54:10.473629+00:00",
+  "generated_utc": "2026-07-14T22:22:53.171966+00:00",
   "git": {
     "branch": "codex/live-domain-proof-feed-bundle",
-    "commit": "4c924ab498aef4ebcd2b314fb25fbc574ce96655",
+    "commit": "707af9b1228c011a5f7b597677012d686a14cd00",
     "relevant_change_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "relevant_change_line_count": 0,
     "relevant_source_clean": true
@@ -226,91 +226,108 @@
   "source_artifacts": [
     {
       "bytes": 3859,
+      "hash_mode": "utf8_lf",
       "path": ".github/workflows/reviewer-reproducibility.yml",
       "sha256": "b83bb4fb9da7ba13c3dc3440abad3880011e46352774665a54c1e1309d571002"
     },
     {
       "bytes": 12629,
+      "hash_mode": "utf8_lf",
       "path": "README.md",
       "sha256": "1cecf464bcd6fedbfe3386db698786173d10ef859a2bb9d88944faac8cab1f03"
     },
     {
       "bytes": 41017,
+      "hash_mode": "utf8_lf",
       "path": "code/eia_grid_residual_moe_benchmark.py",
       "sha256": "1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100"
     },
     {
       "bytes": 47012,
+      "hash_mode": "utf8_lf",
       "path": "code/eia_grid_wave_champion_benchmark.py",
       "sha256": "b3586ddc568f6bd4aa6ae48bbb289ab579eab773699dba5ac32234d393627791"
     },
     {
       "bytes": 37529,
+      "hash_mode": "utf8_lf",
       "path": "code/mda_control_mapping_open_set_benchmark.py",
       "sha256": "5346d8f4b66b7a19a6b0daf58bd4e983f4a2108346d6d51429ec0f387ab7ed8c"
     },
     {
-      "bytes": 39864,
+      "bytes": 40677,
+      "hash_mode": "utf8_lf",
       "path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
-      "sha256": "6ccbe78432b4675155e5c4f98e00ce3b57dced02688ff08556aa88c8828650b5"
+      "sha256": "dd660eeea9f2b199744f3754d44c5869cc797d45c0c465dafdb0a9eb6ec865d5"
     },
     {
       "bytes": 8422,
+      "hash_mode": "utf8_lf",
       "path": "config/eia_grid_residual_moe_protocol_v1.json",
       "sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8"
     },
     {
       "bytes": 7963,
+      "hash_mode": "utf8_lf",
       "path": "config/eia_grid_wave_champion_protocol_v1.json",
       "sha256": "273eb823b0be4b2d403d0aaa591673c2e470e3d7f30abb166a43fe6e311a1c3d"
     },
     {
       "bytes": 8387,
+      "hash_mode": "utf8_lf",
       "path": "config/mda_control_mapping_open_set_protocol_v2.json",
       "sha256": "9a694ed6f194137880c070e73355ef826a51d3fed438ccf65adf6d4726ca80f0"
     },
     {
       "bytes": 8223,
+      "hash_mode": "utf8_lf",
       "path": "config/reviewer_reproducibility_protocol_v1.json",
       "sha256": "f2f33ed885b2d26902a01b008882a1f9485e7afed91939d2a2bca5bea8bd8c5f"
     },
     {
       "bytes": 114366,
+      "hash_mode": "raw",
       "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
       "sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9"
     },
     {
       "bytes": 122,
+      "hash_mode": "utf8_lf",
       "path": "requirements-reviewer.txt",
       "sha256": "4b99049b4bc579f6d2a5a675e612f513e1a24db79775a2120e60334a0c72bbd4"
     },
     {
       "bytes": 4309,
+      "hash_mode": "utf8_lf",
       "path": "tests/test_eia_grid_residual_moe_benchmark.py",
       "sha256": "0aa6af3aa74ecb561c15a1b9560ed80014bc692679e61e6c6fa93bb75cc8ba68"
     },
     {
       "bytes": 8140,
+      "hash_mode": "utf8_lf",
       "path": "tests/test_eia_grid_wave_champion_benchmark.py",
       "sha256": "175010b5aa97951fe1770d4f67b1b9b4597baff113d55b34021a103ca04055bb"
     },
     {
       "bytes": 3342,
+      "hash_mode": "utf8_lf",
       "path": "tests/test_faa_sdr_10k_benchmark.py",
       "sha256": "c2bbaac93e10883f30424998fa676bd69d313e4815760b97e43f84d20a86c7d5"
     },
     {
       "bytes": 4217,
+      "hash_mode": "utf8_lf",
       "path": "tests/test_mda_control_mapping_open_set_benchmark.py",
       "sha256": "0798b6a130f48b012c75877fd56d9aeb36be033b5620b974e89fc46b76585db8"
     },
     {
-      "bytes": 10088,
+      "bytes": 10758,
+      "hash_mode": "utf8_lf",
       "path": "tests/test_reviewer_reproducibility_capsule.py",
-      "sha256": "66b5594e1c0067c2b63f147fd08b766edf966444c26628461f542b455c47d1f4"
+      "sha256": "1333f0db0ed75657cdf7029bfd4f2a975aa8ed51047be83b72d17b98f4cf6cf2"
     }
   ],
-  "source_chain_sha256": "196590870ff0c6a033b78eb739744087dca588da552cd2c844e8538bca6aa2de",
+  "source_chain_sha256": "e0875a07178e89faf83f9b0a2da63d7a87efd57021c572b6f8aa7b64db62e12e",
   "standards_references": [
     {
       "name": "NIST SP 800-218 Secure Software Development Framework 1.1",
@@ -388,7 +405,7 @@
           "passed": true
         }
       ],
-      "elapsed_seconds": 35.822,
+      "elapsed_seconds": 73.914,
       "fact_projection": {
         "baseline_comparison_count": 6,
         "best_mase": 0.47945937271811834,
@@ -471,7 +488,7 @@
           "passed": true
         }
       ],
-      "elapsed_seconds": 11.585,
+      "elapsed_seconds": 15.775,
       "fact_projection": {
         "baseline_comparison_count": 6,
         "best_mase": 0.21211186326437864,
@@ -543,7 +560,7 @@
           "passed": true
         }
       ],
-      "elapsed_seconds": 0.216,
+      "elapsed_seconds": 0.425,
       "fact_projection": {
         "candidate_micro_f1": 0.9433962264150945,
         "candidate_supported_coverage": 0.9583333333333334,
