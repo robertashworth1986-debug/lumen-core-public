@@ -13,6 +13,7 @@ PUBLISHED = ROOT / "out" / "ops" / "reviewer_reproducibility_capsule_latest.json
 DASHBOARD = ROOT / "dashboard" / "data" / "reviewer_reproducibility_capsule.json"
 SBOM = ROOT / "evidence" / "reproducibility" / "reviewer_suite_sbom_20260714.cdx.json"
 MARKDOWN = ROOT / "docs" / "REVIEWER_REPRODUCIBILITY_CAPSULE_2026-07-14.md"
+WORKFLOW = ROOT / ".github" / "workflows" / "reviewer-reproducibility.yml"
 
 
 def load_module():
@@ -67,6 +68,17 @@ def test_protocol_is_frozen_version_pinned_and_claim_bounded():
     assert pins == {
         row["distribution"]: row["version"] for row in protocol["dependencies"]
     }
+
+
+def test_workflow_excludes_checksum_manifest_from_its_own_hash_set():
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+
+    assert "-type f ! -name SHA256SUMS -print0" in workflow
+    assert "LC_ALL=C sort -z" in workflow
+    assert (
+        "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+        in workflow
+    )
 
 
 def test_packaged_eia_panel_is_deterministic_secret_free_and_hash_valid():

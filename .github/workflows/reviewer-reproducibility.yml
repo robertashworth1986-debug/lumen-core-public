@@ -86,15 +86,15 @@ jobs:
         shell: bash
         run: |
           if [ -d out/reproducibility/ci ]; then
-            find out/reproducibility/ci -type f -print0 \
-              | sort -z \
+            find out/reproducibility/ci -type f ! -name SHA256SUMS -print0 \
+              | LC_ALL=C sort -z \
               | xargs -0 sha256sum \
               > out/reproducibility/ci/SHA256SUMS
           fi
 
       - name: Publish the bounded replay receipt
         if: always()
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: reviewer-reproducibility-${{ github.sha }}
           path: out/reproducibility/ci/
