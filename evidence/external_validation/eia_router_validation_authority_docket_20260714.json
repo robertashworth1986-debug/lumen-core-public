@@ -78,7 +78,7 @@
     },
     "verified": true
   },
-  "docket_sha256": "576048462914d0a69155450068bd18a1658e3814850a4f07c9ae2908e386bcf5",
+  "docket_sha256": "d30b7fbb48688319a2ec0539f8836ff1f4b0451cbd30a5a7368a91999b2c404e",
   "evaluator_acceptance": {
     "accepted_protocol_sha256": null,
     "accepted_utc": null,
@@ -132,7 +132,7 @@
     "source_publisher": "U.S. Energy Information Administration",
     "source_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/"
   },
-  "generated_utc": "2026-07-14T13:55:26.696231+00:00",
+  "generated_utc": "2026-07-14T18:58:19.477212+00:00",
   "maturity": {
     "current_supported_level": 3,
     "external_validation_complete": false,
@@ -187,67 +187,79 @@
       "remaining_gap": "No external organization has adopted an incident, escalation, or production-use decision process for this experiment."
     }
   ],
-  "portable_input_chain_sha256": "a49bdd85aeeb1a0c5b65e89cb7bbff7401fe5813c33bcfaafd6b63c26a83a894",
+  "portable_input_chain_sha256": "6fa1cb21f551bdabb23caf2448f678ad8e2aaf875e5beefe474b51ff98eb4c0d",
   "portable_inputs": [
     {
       "bytes": 8330,
+      "hash_mode": "utf8_lf",
       "path": "config/external_validation_authority_docket_v1.json",
       "sha256": "ebf9110602dba121baf1a4ea58e1bc47f8e998141d8b517112612f51d1316cc5"
     },
     {
-      "bytes": 22517,
+      "bytes": 22959,
+      "hash_mode": "utf8_lf",
       "path": "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py",
-      "sha256": "816337367b87338b4d2771605f9e3f5b3e438ad8d0884609721fbfeb1966b301"
+      "sha256": "16462d7f5f8ab06027f64c8f1958f98fa259ede00fe5a20bcd9bc7942c8c6797"
     },
     {
-      "bytes": 7066,
+      "bytes": 7635,
+      "hash_mode": "utf8_lf",
       "path": "tests/test_external_validation_authority_docket.py",
-      "sha256": "622debd88be520b641da2df1bcb9836d715e31bf157a31f9ea7a750d53205764"
+      "sha256": "d910f77180897174c4e64f9419310491d4201d1ea34ceaa60a621050d4265573"
     },
     {
       "bytes": 120,
+      "hash_mode": "utf8_lf",
       "path": ".gitattributes",
       "sha256": "bc305d667254f6bc02227ef18dcb8acae9c1c5a0cf668b8bdd918c42e039e3d0"
     },
     {
       "bytes": 2079,
+      "hash_mode": "utf8_lf",
       "path": ".github/workflows/external-validation-docket.yml",
       "sha256": "adf3518bed984f3f5015b741d6ee72e190835be64fcc526e09f06b4245703038"
     },
     {
       "bytes": 8106,
+      "hash_mode": "utf8_lf",
       "path": "config/eia_grid_prospective_hybrid_router_protocol_v1.json",
       "sha256": "77a67f201884f70110c840d4d6b98b4194dca6f32a34c63c4a09c9dd786afb86"
     },
     {
       "bytes": 8223,
+      "hash_mode": "utf8_lf",
       "path": "config/reviewer_reproducibility_protocol_v1.json",
       "sha256": "f2f33ed885b2d26902a01b008882a1f9485e7afed91939d2a2bca5bea8bd8c5f"
     },
     {
-      "bytes": 20440,
+      "bytes": 19857,
+      "hash_mode": "utf8_lf",
       "path": "dashboard/data/reviewer_reproducibility_capsule.json",
-      "sha256": "93cd45d103e92e76cba2819e23f43bd10240a04d9b1da832b5890d35c961bb88"
+      "sha256": "f281fe07b6f87d8f1919ed2ccd77295e49691545afc48cfb3b1641fe83eb58c2"
     },
     {
       "bytes": 3481,
+      "hash_mode": "utf8_lf",
       "path": "docs/EIA_GRID_PROSPECTIVE_HYBRID_ROUTER_2026-07-13.md",
       "sha256": "c69d4112442ed738a8c5d11b5cf260fce15f60fb764b738a91f0a1826a3d068f"
     },
     {
       "bytes": 2691,
+      "hash_mode": "utf8_lf",
       "path": "docs/EIA_GRID_PROSPECTIVE_ROUTER_OPERATIONS_2026-07-13.md",
       "sha256": "b37f087da2a97860a57bd999d698e0e6790f6b8849713c12d294b59ef8fae944"
     },
     {
-      "bytes": 8028,
+      "bytes": 7860,
+      "hash_mode": "utf8_lf",
       "path": "docs/FIELD_VALIDATION_BUYER_PILOT_PACKET_2026-06-25.md",
-      "sha256": "160bec23ac31342459aa204cda0588207caf2d899cd7109c00a799f97c9e5290"
+      "sha256": "e95c3d7d88cdc732b86b28d93d7dba6db5216941c46edd2676822855e492243b"
     },
     {
-      "bytes": 7370,
+      "bytes": 7244,
+      "hash_mode": "utf8_lf",
       "path": "docs/REVIEWER_REPRODUCIBILITY_CAPSULE_2026-07-14.md",
-      "sha256": "7f9a0623c60f4277b6e5a6615f153ba69a3895bdba2ed87038a65a35ee890600"
+      "sha256": "9a4c54cf91e39eac6536ee9d1671b222d33793907527e294cf735c0eb7c39795"
     }
   ],
   "privacy_scan": {
@@ -258,9 +270,9 @@
     "available": true,
     "common_settled_day_count": 0,
     "first_common_settled_date": null,
-    "generated_utc": "2026-07-14T13:46:25.111566+00:00",
+    "generated_utc": "2026-07-14T18:57:57.695901+00:00",
     "latest_common_settled_date": null,
-    "operational_receipt_sha256": "4abd7bb8b03ef7aeeae494197b5e492d3db587d2940640ff1d6f8703f8f54ea8",
+    "operational_receipt_sha256": "7ffcdbc0ee44faf022ef5c29a210df659632affecb9f03fd6f209188ef187c6e",
     "prediction_count": 0,
     "prediction_count_by_authority": {
       "CISO": 0,
@@ -294,7 +306,7 @@
       "SWPP": 0,
       "TVA": 0
     },
-    "snapshot_sha256": "6990885c04cdc3020628cd960c18a6be7e2a42f0e151c6b6946f0f30f5abb4f8",
+    "snapshot_sha256": "c53b136e7d1f1f7c2118673e75d69b39b916551694a7c02b5bc9d16cefe42ed5",
     "state": "WAITING_FOR_FIRST_ELIGIBLE_FORECAST"
   },
   "protocol_id": "LUMENCORE_EIA_EXTERNAL_VALIDATION_AUTHORITY_20260714",
