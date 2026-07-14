@@ -28,4 +28,7 @@ def test_reviewer_entrypoint_and_citation_are_present() -> None:
     citation = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
     assert "Level 3" in reviewer
     assert "Level 5" in reviewer
+    assert "EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md" in reviewer
+    assert "VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py --expect-template" in reviewer
+    assert "Independent Review Roles" in reviewer
     assert "cff-version: 1.2.0" in citation

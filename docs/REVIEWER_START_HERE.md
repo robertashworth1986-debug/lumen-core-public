@@ -11,18 +11,32 @@ The repository supports an implemented, tested evidence and benchmarking platfor
 1. `README.md` for claim boundaries and the maturity scale.
 2. `docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md` for the machine-generated evidence snapshot.
 3. `docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md` for the evaluator decision, archived clean-runner receipt, and exact Level 4/5 gates.
-4. `docs/LOCKED_SOURCE_BASELINE_REPLAY_SWEEP_2026-06-30.md` for route-level wins and non-wins.
-5. `docs/FAA_SDR_SOURCE_AUDIT_2026-07-13.md` for the aviation source audit and its raw-data custody boundary.
-6. `docs/FAA_SDR_10K_BENCHMARK_2026-07-13.md` for the frozen holdout result and failed promotion gate.
-7. `docs/HYBRID_AGENT_OPERATING_MODEL_2026-07-13.md` for agent capabilities and HumanUnlock controls.
+4. `docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md` for the evaluator-owned receipt and fail-closed acceptance procedure.
+5. `docs/LOCKED_SOURCE_BASELINE_REPLAY_SWEEP_2026-06-30.md` for route-level wins and non-wins.
+6. `docs/FAA_SDR_SOURCE_AUDIT_2026-07-13.md` for the aviation source audit and its raw-data custody boundary.
+7. `docs/FAA_SDR_10K_BENCHMARK_2026-07-13.md` for the frozen holdout result and failed promotion gate.
+8. `docs/HYBRID_AGENT_OPERATING_MODEL_2026-07-13.md` for agent capabilities and HumanUnlock controls.
+
+## Independent Review Roles
+
+| Review role | Decision owned by reviewer | Evidence or receipt |
+|---|---|---|
+| Reproducibility reviewer | Can the bounded public result be replayed from pinned inputs on an independent runner? | Reviewer capsule receipt, logs, SBOM, and checksum manifest |
+| Domain and data owner | Are the source, eligible population, exclusions, baselines, and operational metric suitable for the stated use? | Dated protocol acceptance and authority artifact |
+| Security and privacy reviewer | Are custody, access, dependency, secret-scanning, privacy, and HumanUnlock controls adequate for the bounded evaluation? | Scoped findings, disposition record, and artifact hashes |
+| Independent technical evaluator | Did the frozen prospective experiment meet its predeclared gate without operator substitution or backfill? | Completed evaluator-owned acceptance and result receipts |
+
+Each role is independent of the operator. A reviewer may accept one bounded decision without endorsing the platform, a patent, an agency use, or a commercial claim.
 
 ## Fast Verification
 
 ```powershell
 python code/ops/BUILD_QUANT_HUB_REVIEWER_CONTEXT.py
 python code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py --check-only
+python code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py --expect-template
 python -m pytest -q tests/test_quant_hub_reviewer_context.py
 python -m pytest -q tests/test_external_validation_authority_docket.py
+python -m pytest -q tests/test_external_evaluator_acceptance.py
 python -m pytest -q tests/test_faa_sdr_source_audit.py tests/test_faa_sdr_10k_benchmark.py
 python -m pytest -q tests/test_external_proof_vault.py tests/test_funding_sprint_reviewer_gate.py
 ```
@@ -45,7 +59,7 @@ python -m pytest -q tests/test_locked_source_baseline_replay_sweep.py
 
 ## External Validation Target
 
-An acceptable Level 5 evaluation must name the evaluator, dataset owner, frozen eligible population, held-out period, baselines, metrics, acceptance threshold, exclusions, and receipt date before outcomes are observed. The authority record and remaining empty fields are in `docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md`. Commercial value should be estimated only after the external owner accepts both the technical metric and the economic assumptions.
+An acceptable Level 5 evaluation must name the evaluator, dataset owner, frozen eligible population, held-out period, baselines, metrics, acceptance threshold, exclusions, and receipt date before outcomes are observed. The authority record and remaining empty fields are in `docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md`; the evaluator procedure is in `docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md`. Commercial value should be estimated only after the external owner accepts both the technical metric and the economic assumptions.
 
 ## Citation
 
