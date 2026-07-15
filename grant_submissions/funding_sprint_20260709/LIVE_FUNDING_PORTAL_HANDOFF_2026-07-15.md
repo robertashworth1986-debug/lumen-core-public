@@ -4,7 +4,7 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 
 ## Control State
 
-- Posture: `LOCAL_PACKAGES_READY_PORTAL_AUTHENTICATION_REQUIRED`
+- Posture: `PORTALS_PARTIALLY_AUTHENTICATED_REGISTRATION_LINKAGE_IN_PROGRESS`
 - Final submission authority: Robert Ashworth
 - Agent boundary: draft, populate fact-supported fields, upload after narrow confirmation, and stop before certifications or final submission unless confirmed at action time.
 - Claim boundary: transmission receipts prove delivery and provenance only. They do not prove agency acceptance, technical validation, award, deployment, or field performance.
@@ -25,13 +25,13 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 | Portal | Open page | Gate requiring Robert |
 |---|---|---|
 | DSIP | `https://www.dodsbirsttr.mil/submissions/login` | Accept the government consent notice and complete Login.gov authentication. |
-| SBIR.gov/SBA | SBA single sign-on details page | Finish any account-detail prompt; then retrieve or create the SBC Control ID and registration proof. |
+| SBIR.gov/SBA | Signed in at `https://app.www.sbir.gov/company-registration` | Enter the verified 12-character UEI from the active SAM record, verify the returned legal entity, and continue to the SBC Control ID. The page is currently not responding to automated form inspection, so the UEI was staged on the Windows clipboard for Robert to paste. |
 | NSF Project Pitch | `https://nsfgov.my.site.com/mywork/s/login/` | Sign in and confirm whether a pitch, invitation, or proposal is already pending. |
-| Research.gov | `https://www.research.gov/research-web/` | Sign in and confirm organization/PI role only if an NSF invitation exists. |
-| ERDCWERX | Sovereign Defense Cloud Submittable form | Complete the Submittable sign-in/account prompt. |
+| Research.gov | Signed in; organization-role workflow open at `https://www.research.gov/accountmgmt/#/user/user-roles/affiliate?wizardType=manageOrg` | Exact SAM entity match found. Research.gov reports that the organization is not yet registered with NSF and requires the SAM POC to obtain the Administrator role. Continue factual contact fields and roles, then stop before review/certification submission. |
+| ERDCWERX | Signed in at the Sovereign Defense Cloud Submittable organization-search step | Verified UEI was entered. Search/result selection still needs confirmation before concept-form population. |
 | Grants.gov | Applicant login | Complete Login.gov authentication; use for workspace inspection, not NSF 26-511 submission. |
-| SAM.gov | Home and opportunity pages | Accept the site terms and sign in so entity status and workspaces can be re-verified live. |
-| DARPA BAAT | DoD consent banner | Accept the government consent notice and sign in to inspect DICE feedback/workspace state. |
+| SAM.gov | Signed-in workspace with one active All Awards registration | No SAM action required in this sprint. Source of truth: `grant_submissions/SAM_GOV_ENTITY_STATUS_CAPTURE_2026-06-20.md`. |
+| DARPA BAAT | Session-expired logout page | Reauthenticate later to inspect DICE feedback/workspace state. |
 | LinkedIn | Messaging login | Sign in before direct messages can be reviewed for real asks; networking notices are not treated as funding validation. |
 
 ## Inbox Audit
@@ -43,6 +43,15 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 - The CDC RFI response draft is staged with its two-page attachment but unsent.
 - Recent LinkedIn notices include direct messages and connection invitations, but their visible email excerpts do not establish a grant, contract, pilot, investment, or validation opportunity.
 
+## Live Registration Facts Verified On 2026-07-15
+
+- Research.gov sign-in completed for Robert Ashworth.
+- Research.gov returned one exact organization result matching the active SAM legal entity and UEI; the result was selected.
+- Research.gov reports `Registered with NSF: No` and requires the SAM point of contact to obtain the Administrator role during organization registration.
+- The Research.gov workflow advanced to `Add Information`, which requires work phone, work email, organization short name, organization type, time zone, organization phone, and organization email.
+- Repeated local dossier evidence confirms phone `615-438-2502` and email `robertashworth4444@gmail.com`. Legal organization name remains `ROBERT ASHWORTH`; SAM shows no DBA.
+- Do not guess organization type, make a foreign-talent certification, request legal authority roles, or perform the final role submission without reviewing the visible choices and certification text.
+
 ## Exclusions And Corrections
 
 - SBA FY26 FAST closes 2026-07-16, but the official notice limits eligible states and requires the governor-endorsed sole applicant. Tennessee is not listed; do not submit.
@@ -52,9 +61,10 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 
 ## Next Execution Order
 
-1. Robert completes DSIP and SBA account gates.
-2. Populate and preview MissionWeave in DSIP.
-3. Verify NSF Project Pitch/invitation status before any Research.gov work.
-4. Review and, after action-time approval, send the CDC RFI response.
-5. Populate ERDC Submittable fields from the bounded concept package.
-6. Build the FALCON compliance and evidence crosswalk.
+1. Robert pastes the staged UEI into the SBIR Company Registration page; verify the exact legal-entity match and retrieve/create the SBC Control ID.
+2. Complete Research.gov organization contact fields and role choices; stop before the review/certification submission.
+3. Complete DSIP authentication, then populate and preview MissionWeave.
+4. Verify NSF Project Pitch/invitation status before creating an NSF 26-511 proposal workspace.
+5. Review and, after action-time approval, send the CDC RFI response.
+6. Confirm the ERDC organization result, then populate the bounded concept form.
+7. Build the FALCON compliance and evidence crosswalk.
