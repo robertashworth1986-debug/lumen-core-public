@@ -1,0 +1,320 @@
+{
+  "authority_metrics": [
+    {
+      "candidate_metrics": {
+        "bias_corrected_official": {
+          "mean_absolute_error_mwh": 2790.45110626615,
+          "mean_scaled_absolute_error": 1.7460826349623566
+        },
+        "eia_official": {
+          "mean_absolute_error_mwh": 2800.9748062015506,
+          "mean_scaled_absolute_error": 1.7713393793005703
+        },
+        "lightgbm_residual": {
+          "mean_absolute_error_mwh": 691.8990726193771,
+          "mean_scaled_absolute_error": 0.4071663836459976
+        },
+        "ridge_residual": {
+          "mean_absolute_error_mwh": 1470.2120929072353,
+          "mean_scaled_absolute_error": 0.6960704036365882
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 2461.482558139535,
+          "mean_scaled_absolute_error": 1.415088026520135
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 1516.2470930232557,
+          "mean_scaled_absolute_error": 0.8732404258086895
+        },
+        "xgboost_residual": {
+          "mean_absolute_error_mwh": 678.9791617766598,
+          "mean_scaled_absolute_error": 0.40538843681995534
+        }
+      },
+      "respondent": "CISO",
+      "selected_candidate": "xgboost_residual",
+      "validation_row_count": 1032
+    },
+    {
+      "candidate_metrics": {
+        "bias_corrected_official": {
+          "mean_absolute_error_mwh": 1390.4657622739019,
+          "mean_scaled_absolute_error": 0.48128901955958026
+        },
+        "eia_official": {
+          "mean_absolute_error_mwh": 1122.296511627907,
+          "mean_scaled_absolute_error": 0.3818405578152957
+        },
+        "lightgbm_residual": {
+          "mean_absolute_error_mwh": 1121.907396928261,
+          "mean_scaled_absolute_error": 0.4008593110566017
+        },
+        "ridge_residual": {
+          "mean_absolute_error_mwh": 1625.2779602896107,
+          "mean_scaled_absolute_error": 0.5076502585317533
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 3913.1589147286822,
+          "mean_scaled_absolute_error": 1.196582821168723
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 2224.5591085271317,
+          "mean_scaled_absolute_error": 0.7089163705966065
+        },
+        "xgboost_residual": {
+          "mean_absolute_error_mwh": 1122.7301749509884,
+          "mean_scaled_absolute_error": 0.3966780347167755
+        }
+      },
+      "respondent": "ERCO",
+      "selected_candidate": "eia_official",
+      "validation_row_count": 1032
+    },
+    {
+      "candidate_metrics": {
+        "bias_corrected_official": {
+          "mean_absolute_error_mwh": 435.71580264857886,
+          "mean_scaled_absolute_error": 0.2730051448084092
+        },
+        "eia_official": {
+          "mean_absolute_error_mwh": 454.531007751938,
+          "mean_scaled_absolute_error": 0.29381010055010953
+        },
+        "lightgbm_residual": {
+          "mean_absolute_error_mwh": 302.2686867089478,
+          "mean_scaled_absolute_error": 0.18468859421886274
+        },
+        "ridge_residual": {
+          "mean_absolute_error_mwh": 960.5311922295485,
+          "mean_scaled_absolute_error": 0.4360152503655004
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 2524.8333333333335,
+          "mean_scaled_absolute_error": 1.4707097417002628
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 1377.1589147286822,
+          "mean_scaled_absolute_error": 0.7358249509723159
+        },
+        "xgboost_residual": {
+          "mean_absolute_error_mwh": 316.61511785008327,
+          "mean_scaled_absolute_error": 0.18982119225724162
+        }
+      },
+      "respondent": "ISNE",
+      "selected_candidate": "lightgbm_residual",
+      "validation_row_count": 1032
+    },
+    {
+      "candidate_metrics": {
+        "bias_corrected_official": {
+          "mean_absolute_error_mwh": 1746.5734819121449,
+          "mean_scaled_absolute_error": 0.25539235552741424
+        },
+        "eia_official": {
+          "mean_absolute_error_mwh": 2298.7771317829456,
+          "mean_scaled_absolute_error": 0.3497243908399809
+        },
+        "lightgbm_residual": {
+          "mean_absolute_error_mwh": 1229.7500639663429,
+          "mean_scaled_absolute_error": 0.18906020985638752
+        },
+        "ridge_residual": {
+          "mean_absolute_error_mwh": 2949.8359272604284,
+          "mean_scaled_absolute_error": 0.40008283908272285
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 8140.7761627906975,
+          "mean_scaled_absolute_error": 1.4203730461026614
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 3747.8023255813955,
+          "mean_scaled_absolute_error": 0.6379432678337358
+        },
+        "xgboost_residual": {
+          "mean_absolute_error_mwh": 1290.3062849277628,
+          "mean_scaled_absolute_error": 0.197692999500107
+        }
+      },
+      "respondent": "MISO",
+      "selected_candidate": "lightgbm_residual",
+      "validation_row_count": 1032
+    },
+    {
+      "candidate_metrics": {
+        "bias_corrected_official": {
+          "mean_absolute_error_mwh": 515.4192202928158,
+          "mean_scaled_absolute_error": 0.25953303116964643
+        },
+        "eia_official": {
+          "mean_absolute_error_mwh": 457.6976506639428,
+          "mean_scaled_absolute_error": 0.25474402430167853
+        },
+        "lightgbm_residual": {
+          "mean_absolute_error_mwh": 720.3949610744925,
+          "mean_scaled_absolute_error": 0.37531838264447
+        },
+        "ridge_residual": {
+          "mean_absolute_error_mwh": 1170.3213303162458,
+          "mean_scaled_absolute_error": 0.45392829136907387
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 3161.273748723187,
+          "mean_scaled_absolute_error": 1.7710108368535962
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 1547.1368743615935,
+          "mean_scaled_absolute_error": 0.7849657782482025
+        },
+        "xgboost_residual": {
+          "mean_absolute_error_mwh": 491.71906363062106,
+          "mean_scaled_absolute_error": 0.2474143155979872
+        }
+      },
+      "respondent": "NYIS",
+      "selected_candidate": "xgboost_residual",
+      "validation_row_count": 979
+    },
+    {
+      "candidate_metrics": {
+        "bias_corrected_official": {
+          "mean_absolute_error_mwh": 4171.841569767442,
+          "mean_scaled_absolute_error": 0.43307852251580087
+        },
+        "eia_official": {
+          "mean_absolute_error_mwh": 4247.156007751938,
+          "mean_scaled_absolute_error": 0.44710558890825364
+        },
+        "lightgbm_residual": {
+          "mean_absolute_error_mwh": 2296.6461140938864,
+          "mean_scaled_absolute_error": 0.23905318011718923
+        },
+        "ridge_residual": {
+          "mean_absolute_error_mwh": 5673.950314642991,
+          "mean_scaled_absolute_error": 0.45327370268825434
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 13937.15988372093,
+          "mean_scaled_absolute_error": 1.5158431671937505
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 5991.522286821705,
+          "mean_scaled_absolute_error": 0.6441177049323212
+        },
+        "xgboost_residual": {
+          "mean_absolute_error_mwh": 2344.136462646277,
+          "mean_scaled_absolute_error": 0.242485748020071
+        }
+      },
+      "respondent": "PJM",
+      "selected_candidate": "lightgbm_residual",
+      "validation_row_count": 1032
+    },
+    {
+      "candidate_metrics": {
+        "bias_corrected_official": {
+          "mean_absolute_error_mwh": 2654.8817515432097,
+          "mean_scaled_absolute_error": 0.7920076297551951
+        },
+        "eia_official": {
+          "mean_absolute_error_mwh": 2952.992283950617,
+          "mean_scaled_absolute_error": 0.9131898699081242
+        },
+        "lightgbm_residual": {
+          "mean_absolute_error_mwh": 1703.4300689997663,
+          "mean_scaled_absolute_error": 0.5167409969924998
+        },
+        "ridge_residual": {
+          "mean_absolute_error_mwh": 1625.2523819288992,
+          "mean_scaled_absolute_error": 0.46535100271514346
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 3803.246913580247,
+          "mean_scaled_absolute_error": 1.316075893389703
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 2201.175925925926,
+          "mean_scaled_absolute_error": 0.6653918455436644
+        },
+        "xgboost_residual": {
+          "mean_absolute_error_mwh": 1988.1520586163751,
+          "mean_scaled_absolute_error": 0.5906224865244191
+        }
+      },
+      "respondent": "SWPP",
+      "selected_candidate": "ridge_residual",
+      "validation_row_count": 648
+    },
+    {
+      "candidate_metrics": {
+        "bias_corrected_official": {
+          "mean_absolute_error_mwh": 665.5179352580927,
+          "mean_scaled_absolute_error": 0.33386506816290484
+        },
+        "eia_official": {
+          "mean_absolute_error_mwh": 632.6758530183727,
+          "mean_scaled_absolute_error": 0.3085755451635318
+        },
+        "lightgbm_residual": {
+          "mean_absolute_error_mwh": 597.0927915296933,
+          "mean_scaled_absolute_error": 0.29668568170167575
+        },
+        "ridge_residual": {
+          "mean_absolute_error_mwh": 961.9824903747988,
+          "mean_scaled_absolute_error": 0.4660028577664756
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 2390.97375328084,
+          "mean_scaled_absolute_error": 1.3001582769799493
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 1424.8097112860892,
+          "mean_scaled_absolute_error": 0.7525166824723295
+        },
+        "xgboost_residual": {
+          "mean_absolute_error_mwh": 591.0757019768794,
+          "mean_scaled_absolute_error": 0.2947726335966174
+        }
+      },
+      "respondent": "TVA",
+      "selected_candidate": "xgboost_residual",
+      "validation_row_count": 762
+    }
+  ],
+  "claim_boundary": "Historical design scores are exploratory and select the route map; they are not prospective confirmation evidence.",
+  "feature_diagnostics": {
+    "row_chain_sha256": "6de3c53e5d179c2aef8d8555d222d024d0df760f1b503cb3f9dd0ed6d541f1f9",
+    "row_count": 32700,
+    "skipped": {
+      "recent residual window is incomplete": 21,
+      "required actual lag is unavailable": 30,
+      "required official-forecast lag is unavailable": 2050,
+      "weekly residual window is incomplete": 1964
+    }
+  },
+  "fit_duration_ms": {
+    "lightgbm_residual": 680.497,
+    "ridge_residual": 11.257,
+    "xgboost_residual": 1877.892
+  },
+  "generated_utc": "2026-07-15T00:58:38.556088+00:00",
+  "protocol_path": "config/eia_grid_prospective_hourly_router_protocol_v1.json",
+  "protocol_sha256": "b6a0c236928c30cca358935da7f69734f9d21969511a4a1ad3db00a1f8aa1760",
+  "route_map_matches_protocol": false,
+  "schema": "eia_grid_hourly_router_design_benchmark.v1",
+  "selected_route_map": {
+    "CISO": "xgboost_residual",
+    "ERCO": "eia_official",
+    "ISNE": "lightgbm_residual",
+    "MISO": "lightgbm_residual",
+    "NYIS": "xgboost_residual",
+    "PJM": "lightgbm_residual",
+    "SWPP": "ridge_residual",
+    "TVA": "xgboost_residual"
+  },
+  "source_panel_row_chain_sha256": "7d5b484bf7238cdf71bb7b561646d10764c4f5bc83ffc195d39108105269035c",
+  "source_panel_row_count": 86244,
+  "source_receipt_sha256": "9c42c210fe7e24cb3a2e0cc6ec96b0ebe09a4f09ef52e737353f16d8c5d7997b",
+  "training_row_count": 25151,
+  "validation_row_count": 7549
+}

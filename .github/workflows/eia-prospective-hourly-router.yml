@@ -1,0 +1,71 @@
+name: EIA Prospective Hourly Router
+
+on:
+  push:
+    paths:
+      - ".github/workflows/eia-prospective-hourly-router.yml"
+      - "requirements-reviewer-ubuntu-py311.lock"
+      - "config/eia_grid_prospective_hourly_router_protocol_v1.json"
+      - "code/eia_grid_prospective_hourly_router.py"
+      - "code/ops/AUDIT_EIA_PROSPECTIVE_SOURCE_TIMING.py"
+      - "code/ops/FREEZE_EIA_HOURLY_ROUTER_DESIGN.py"
+      - "evidence/external_validation/eia_grid_hourly_router_design_benchmark_20260714.json"
+      - "evidence/external_validation/eia_grid_hourly_router_design_freeze_20260714.json"
+      - "evidence/external_validation/eia_prospective_source_timing_audit_20260714.json"
+      - "tests/test_eia_grid_prospective_hourly_router.py"
+      - "tests/test_eia_prospective_source_timing_audit.py"
+      - "tools/Run-EiaProspectiveHourlyRouterCycle.ps1"
+      - "tools/Register-EiaProspectiveHourlyRouterTask.ps1"
+  pull_request:
+    paths:
+      - ".github/workflows/eia-prospective-hourly-router.yml"
+      - "requirements-reviewer-ubuntu-py311.lock"
+      - "config/eia_grid_prospective_hourly_router_protocol_v1.json"
+      - "code/eia_grid_prospective_hourly_router.py"
+      - "code/ops/AUDIT_EIA_PROSPECTIVE_SOURCE_TIMING.py"
+      - "code/ops/FREEZE_EIA_HOURLY_ROUTER_DESIGN.py"
+      - "evidence/external_validation/eia_grid_hourly_router_design_benchmark_20260714.json"
+      - "evidence/external_validation/eia_grid_hourly_router_design_freeze_20260714.json"
+      - "evidence/external_validation/eia_prospective_source_timing_audit_20260714.json"
+      - "tests/test_eia_grid_prospective_hourly_router.py"
+      - "tests/test_eia_prospective_source_timing_audit.py"
+      - "tools/Run-EiaProspectiveHourlyRouterCycle.ps1"
+      - "tools/Register-EiaProspectiveHourlyRouterTask.ps1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-hourly-protocol:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up CPython 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.9"
+          cache: pip
+          cache-dependency-path: requirements-reviewer-ubuntu-py311.lock
+
+      - name: Install hash-locked reviewer environment
+        run: python -m pip install --require-hashes -r requirements-reviewer-ubuntu-py311.lock
+
+      - name: Verify frozen design receipt
+        run: python code/ops/FREEZE_EIA_HOURLY_ROUTER_DESIGN.py --check
+
+      - name: Run leakage and chain-integrity tests
+        run: >-
+          python -m pytest -q
+          tests/test_eia_grid_prospective_hourly_router.py
+          tests/test_eia_prospective_source_timing_audit.py
+
+      - name: Compile operational modules
+        run: >-
+          python -m py_compile
+          code/eia_grid_prospective_hourly_router.py
+          code/ops/AUDIT_EIA_PROSPECTIVE_SOURCE_TIMING.py
+          code/ops/FREEZE_EIA_HOURLY_ROUTER_DESIGN.py

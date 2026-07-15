@@ -1,0 +1,533 @@
+{
+  "authorities": [
+    {
+      "availability_at_observation": {
+        "complete_future_local_days": [],
+        "future_complete_daily_forecast_available": false,
+        "latest_actual_hour_ending_utc": "2026-07-14T19",
+        "latest_complete_forecast_hour_count": 24,
+        "latest_complete_forecast_local_day": "2026-07-14",
+        "latest_forecast_hour_ending_utc": "2026-07-15T07",
+        "local_observed_day": "2026-07-14"
+      },
+      "facet_timezone": "Pacific",
+      "iana_timezone": "America/Los_Angeles",
+      "receipts": {
+        "availability_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-17T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "CISO",
+          "response_body_sha256": "43180b30462e93123cd98e3bb88a7757756707fa1ac10164d658fa5cf64ec533",
+          "response_total": 100,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 100,
+          "start": "2026-07-13T00"
+        },
+        "historical_daily": {
+          "credential_serialized": false,
+          "end": "2026-07-10",
+          "frequency": "daily",
+          "http_status": 200,
+          "respondent": "CISO",
+          "response_body_sha256": "17b242d1957b89f2c7da88274b706f7d1627b4308b49c96250229cf215bfa11d",
+          "response_total": 20,
+          "route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/",
+          "row_count": 20,
+          "start": "2026-07-01"
+        },
+        "historical_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-12T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "CISO",
+          "response_body_sha256": "5220bbee79dd1bd182b64ffeb329975090a9a5dfb04a5f8f56ded11ccaeb49f5",
+          "response_total": 672,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 672,
+          "start": "2026-06-29T00"
+        }
+      },
+      "reconciliation": {
+        "all_exact": true,
+        "comparison_count": 20,
+        "comparison_sha256": "2e03f48e241e735850f9a5da01b3d79f4fe9813779fee236fe808b47840cf73a",
+        "exact_match_count": 20,
+        "maximum_absolute_delta_mwh": 0.0,
+        "window_end": "2026-07-10",
+        "window_start": "2026-07-01"
+      },
+      "respondent": "CISO"
+    },
+    {
+      "availability_at_observation": {
+        "complete_future_local_days": [],
+        "future_complete_daily_forecast_available": false,
+        "latest_actual_hour_ending_utc": "2026-07-14T19",
+        "latest_complete_forecast_hour_count": 24,
+        "latest_complete_forecast_local_day": "2026-07-14",
+        "latest_forecast_hour_ending_utc": "2026-07-15T05",
+        "local_observed_day": "2026-07-14"
+      },
+      "facet_timezone": "Central",
+      "iana_timezone": "America/Chicago",
+      "receipts": {
+        "availability_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-17T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "ERCO",
+          "response_body_sha256": "808f9cad4202ce353403a1e8e46fcf93f03a4587d91c0ff46b4ca007b4f69001",
+          "response_total": 98,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 98,
+          "start": "2026-07-13T00"
+        },
+        "historical_daily": {
+          "credential_serialized": false,
+          "end": "2026-07-10",
+          "frequency": "daily",
+          "http_status": 200,
+          "respondent": "ERCO",
+          "response_body_sha256": "d9e0a8734a189c029ba1c694b3d7ced9798ca51592c8c9edfb2ceacfe2d0eeee",
+          "response_total": 20,
+          "route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/",
+          "row_count": 20,
+          "start": "2026-07-01"
+        },
+        "historical_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-12T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "ERCO",
+          "response_body_sha256": "198d89f99d51b22b01d5aea9272803b2018b6bcfa4e85b50249ec6dd157c25ce",
+          "response_total": 672,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 672,
+          "start": "2026-06-29T00"
+        }
+      },
+      "reconciliation": {
+        "all_exact": true,
+        "comparison_count": 20,
+        "comparison_sha256": "92ec71c75e41da123394d67b0a7df88bd681a4b75e07296af15ee98ccd88809f",
+        "exact_match_count": 20,
+        "maximum_absolute_delta_mwh": 0.0,
+        "window_end": "2026-07-10",
+        "window_start": "2026-07-01"
+      },
+      "respondent": "ERCO"
+    },
+    {
+      "availability_at_observation": {
+        "complete_future_local_days": [],
+        "future_complete_daily_forecast_available": false,
+        "latest_actual_hour_ending_utc": "2026-07-14T19",
+        "latest_complete_forecast_hour_count": 24,
+        "latest_complete_forecast_local_day": "2026-07-14",
+        "latest_forecast_hour_ending_utc": "2026-07-15T04",
+        "local_observed_day": "2026-07-14"
+      },
+      "facet_timezone": "Eastern",
+      "iana_timezone": "America/New_York",
+      "receipts": {
+        "availability_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-17T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "ISNE",
+          "response_body_sha256": "aa9d2c712a1225875dd045cc869a94edb3777a87dfc183144d0e83bf52ab42a6",
+          "response_total": 97,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 97,
+          "start": "2026-07-13T00"
+        },
+        "historical_daily": {
+          "credential_serialized": false,
+          "end": "2026-07-10",
+          "frequency": "daily",
+          "http_status": 200,
+          "respondent": "ISNE",
+          "response_body_sha256": "a11805bd58d15c63c5f36788bb78c95c5c67c3179763d8c248acf3855012cbf4",
+          "response_total": 20,
+          "route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/",
+          "row_count": 20,
+          "start": "2026-07-01"
+        },
+        "historical_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-12T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "ISNE",
+          "response_body_sha256": "a9660a2c8a578bda2a092b26d562cb5471bbea0c10f496176aef062cbf99acc7",
+          "response_total": 672,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 672,
+          "start": "2026-06-29T00"
+        }
+      },
+      "reconciliation": {
+        "all_exact": true,
+        "comparison_count": 20,
+        "comparison_sha256": "105369b990dbfdf76e273f64cadfe78d2fcb840b25852a18bb45cc4bf0acea9a",
+        "exact_match_count": 20,
+        "maximum_absolute_delta_mwh": 0.0,
+        "window_end": "2026-07-10",
+        "window_start": "2026-07-01"
+      },
+      "respondent": "ISNE"
+    },
+    {
+      "availability_at_observation": {
+        "complete_future_local_days": [],
+        "future_complete_daily_forecast_available": false,
+        "latest_actual_hour_ending_utc": "2026-07-14T19",
+        "latest_complete_forecast_hour_count": 24,
+        "latest_complete_forecast_local_day": "2026-07-14",
+        "latest_forecast_hour_ending_utc": "2026-07-15T05",
+        "local_observed_day": "2026-07-14"
+      },
+      "facet_timezone": "Central",
+      "iana_timezone": "America/Chicago",
+      "receipts": {
+        "availability_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-17T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "MISO",
+          "response_body_sha256": "824c4fe62d33b2b3973c06698566570c620c944602f51e1174bae735999f2a26",
+          "response_total": 98,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 98,
+          "start": "2026-07-13T00"
+        },
+        "historical_daily": {
+          "credential_serialized": false,
+          "end": "2026-07-10",
+          "frequency": "daily",
+          "http_status": 200,
+          "respondent": "MISO",
+          "response_body_sha256": "cb133a7c4a6bd88e2f3b56bc79d84bc87a651d209443bfea84ea65add055e403",
+          "response_total": 20,
+          "route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/",
+          "row_count": 20,
+          "start": "2026-07-01"
+        },
+        "historical_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-12T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "MISO",
+          "response_body_sha256": "c3772cac432b330addd5798a9a61d112191007d56f6e5adca5d0562912c6ec9a",
+          "response_total": 672,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 672,
+          "start": "2026-06-29T00"
+        }
+      },
+      "reconciliation": {
+        "all_exact": true,
+        "comparison_count": 20,
+        "comparison_sha256": "47e2af26f965f8663f051b401fc356c0b34bfd754fc989e508c5bfba2b3e0b8c",
+        "exact_match_count": 20,
+        "maximum_absolute_delta_mwh": 0.0,
+        "window_end": "2026-07-10",
+        "window_start": "2026-07-01"
+      },
+      "respondent": "MISO"
+    },
+    {
+      "availability_at_observation": {
+        "complete_future_local_days": [],
+        "future_complete_daily_forecast_available": false,
+        "latest_actual_hour_ending_utc": "2026-07-14T19",
+        "latest_complete_forecast_hour_count": 24,
+        "latest_complete_forecast_local_day": "2026-07-14",
+        "latest_forecast_hour_ending_utc": "2026-07-15T04",
+        "local_observed_day": "2026-07-14"
+      },
+      "facet_timezone": "Eastern",
+      "iana_timezone": "America/New_York",
+      "receipts": {
+        "availability_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-17T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "NYIS",
+          "response_body_sha256": "66890a20540a6ecec8b18dae92eb76fe1a54c80dd26d1d87a72cff9cd38f6bcf",
+          "response_total": 97,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 97,
+          "start": "2026-07-13T00"
+        },
+        "historical_daily": {
+          "credential_serialized": false,
+          "end": "2026-07-10",
+          "frequency": "daily",
+          "http_status": 200,
+          "respondent": "NYIS",
+          "response_body_sha256": "742fd435e644d8690994d8f6b51ecc553c59bbd1eb82d7257f4d90b425b17318",
+          "response_total": 20,
+          "route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/",
+          "row_count": 20,
+          "start": "2026-07-01"
+        },
+        "historical_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-12T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "NYIS",
+          "response_body_sha256": "54789b5f5fb5dadae5e1bb8e660547b75ea1074321a3e10337863dba1313563a",
+          "response_total": 672,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 672,
+          "start": "2026-06-29T00"
+        }
+      },
+      "reconciliation": {
+        "all_exact": true,
+        "comparison_count": 20,
+        "comparison_sha256": "ecbf4bef69a1d064737dea2795f9977034afa8be92d0ba86455064b50150f866",
+        "exact_match_count": 20,
+        "maximum_absolute_delta_mwh": 0.0,
+        "window_end": "2026-07-10",
+        "window_start": "2026-07-01"
+      },
+      "respondent": "NYIS"
+    },
+    {
+      "availability_at_observation": {
+        "complete_future_local_days": [],
+        "future_complete_daily_forecast_available": false,
+        "latest_actual_hour_ending_utc": "2026-07-14T19",
+        "latest_complete_forecast_hour_count": 24,
+        "latest_complete_forecast_local_day": "2026-07-14",
+        "latest_forecast_hour_ending_utc": "2026-07-15T04",
+        "local_observed_day": "2026-07-14"
+      },
+      "facet_timezone": "Eastern",
+      "iana_timezone": "America/New_York",
+      "receipts": {
+        "availability_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-17T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "PJM",
+          "response_body_sha256": "26726ad54de44e5c54de12fe8c2266518e68eb4dc21a6dccbc477f388d21a596",
+          "response_total": 97,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 97,
+          "start": "2026-07-13T00"
+        },
+        "historical_daily": {
+          "credential_serialized": false,
+          "end": "2026-07-10",
+          "frequency": "daily",
+          "http_status": 200,
+          "respondent": "PJM",
+          "response_body_sha256": "f52ecdd688474ce9a9fb4b8fe1a6964c4ff0b87b4bb078fa758dc99196625f00",
+          "response_total": 20,
+          "route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/",
+          "row_count": 20,
+          "start": "2026-07-01"
+        },
+        "historical_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-12T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "PJM",
+          "response_body_sha256": "d08055cc24861908c7848ab3bc356267b3c7dbfdab92fbca6fc01419a78fe05a",
+          "response_total": 672,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 672,
+          "start": "2026-06-29T00"
+        }
+      },
+      "reconciliation": {
+        "all_exact": true,
+        "comparison_count": 20,
+        "comparison_sha256": "374ed6470acdc16c4cb49ca33bbfea8c5edba72b813b174b5a2070f07aec9574",
+        "exact_match_count": 20,
+        "maximum_absolute_delta_mwh": 0.0,
+        "window_end": "2026-07-10",
+        "window_start": "2026-07-01"
+      },
+      "respondent": "PJM"
+    },
+    {
+      "availability_at_observation": {
+        "complete_future_local_days": [],
+        "future_complete_daily_forecast_available": false,
+        "latest_actual_hour_ending_utc": "2026-07-14T19",
+        "latest_complete_forecast_hour_count": 24,
+        "latest_complete_forecast_local_day": "2026-07-13",
+        "latest_forecast_hour_ending_utc": "2026-07-14T05",
+        "local_observed_day": "2026-07-14"
+      },
+      "facet_timezone": "Central",
+      "iana_timezone": "America/Chicago",
+      "receipts": {
+        "availability_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-17T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "SWPP",
+          "response_body_sha256": "995517d5113a027feafe509f708ef8f2a35943b564199f5e01e9a49278fd9749",
+          "response_total": 74,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 74,
+          "start": "2026-07-13T00"
+        },
+        "historical_daily": {
+          "credential_serialized": false,
+          "end": "2026-07-10",
+          "frequency": "daily",
+          "http_status": 200,
+          "respondent": "SWPP",
+          "response_body_sha256": "4a9a8e5b7e02bf9b7f88923a378e70b9eeb29d1eed9b7e317ede4b23cbaaa3ed",
+          "response_total": 19,
+          "route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/",
+          "row_count": 19,
+          "start": "2026-07-01"
+        },
+        "historical_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-12T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "SWPP",
+          "response_body_sha256": "8689f1ee78fac5bc2982867a7bbfeb6069cea70ceb69beb7bcef8650973e4658",
+          "response_total": 648,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 648,
+          "start": "2026-06-29T00"
+        }
+      },
+      "reconciliation": {
+        "all_exact": true,
+        "comparison_count": 19,
+        "comparison_sha256": "8b73173fb1a1d335b189004d075ceda17b9c98c79bf0b44f7261d2f13e8edd2a",
+        "exact_match_count": 19,
+        "maximum_absolute_delta_mwh": 0.0,
+        "window_end": "2026-07-10",
+        "window_start": "2026-07-01"
+      },
+      "respondent": "SWPP"
+    },
+    {
+      "availability_at_observation": {
+        "complete_future_local_days": [],
+        "future_complete_daily_forecast_available": false,
+        "latest_actual_hour_ending_utc": "2026-07-14T19",
+        "latest_complete_forecast_hour_count": 24,
+        "latest_complete_forecast_local_day": "2026-07-14",
+        "latest_forecast_hour_ending_utc": "2026-07-15T05",
+        "local_observed_day": "2026-07-14"
+      },
+      "facet_timezone": "Central",
+      "iana_timezone": "America/Chicago",
+      "receipts": {
+        "availability_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-17T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "TVA",
+          "response_body_sha256": "282b73d6a9fe706ba97a0ca77dbd564c92ab92ddcdac361dbd4cb31170d355bb",
+          "response_total": 98,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 98,
+          "start": "2026-07-13T00"
+        },
+        "historical_daily": {
+          "credential_serialized": false,
+          "end": "2026-07-10",
+          "frequency": "daily",
+          "http_status": 200,
+          "respondent": "TVA",
+          "response_body_sha256": "7553179d68343d3813b92f7afcb340e8e06b451908ef059dd58818d9773167bb",
+          "response_total": 19,
+          "route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/",
+          "row_count": 19,
+          "start": "2026-07-01"
+        },
+        "historical_hourly": {
+          "credential_serialized": false,
+          "end": "2026-07-12T23",
+          "frequency": "hourly",
+          "http_status": 200,
+          "respondent": "TVA",
+          "response_body_sha256": "5c6116806f64699641125380b71b9b08ad4197726f64e672aaa4df635af270ba",
+          "response_total": 648,
+          "route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+          "row_count": 648,
+          "start": "2026-06-29T00"
+        }
+      },
+      "reconciliation": {
+        "all_exact": true,
+        "comparison_count": 19,
+        "comparison_sha256": "59b2207f616e65b4fc91ccaa13920382752e1260c9d8c3037e80906f95e3f523",
+        "exact_match_count": 19,
+        "maximum_absolute_delta_mwh": 0.0,
+        "window_end": "2026-07-10",
+        "window_start": "2026-07-01"
+      },
+      "respondent": "TVA"
+    }
+  ],
+  "claim_boundary": "This receipt establishes source equivalence and an observed publication-timing limitation. It does not establish prospective model skill, production readiness, savings, patentability, or external validation.",
+  "generated_utc": "2026-07-15T02:17:28.933853+00:00",
+  "protocol": {
+    "backfill_allowed": false,
+    "path": "config/eia_grid_prospective_hybrid_router_protocol_v1.json",
+    "protocol_id": "EIA_GRID_PROSPECTIVE_HYBRID_ROUTER_20260713",
+    "seal_rule": "Prediction must be sealed before target-local midnight.",
+    "sha256": "77a67f201884f70110c840d4d6b98b4194dca6f32a34c63c4a09c9dd786afb86"
+  },
+  "reconciliation": {
+    "all_authorities_exact": true,
+    "expected_authority_count": 8,
+    "observed_authority_count": 8,
+    "total_comparison_count": 158,
+    "total_exact_match_count": 158
+  },
+  "schema": "eia_prospective_source_timing_audit.v1",
+  "source_contract": {
+    "completeness_rule": "Accept an aggregate only when every expected UTC hour ending for the 23/24/25-hour local day is present exactly once.",
+    "credential_serialized": false,
+    "daily_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/",
+    "hourly_period_semantics": "UTC hour ending",
+    "hourly_route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+    "local_day_assignment": "Subtract one hour from the UTC hour-ending label, then convert the interval start to the authority IANA timezone.",
+    "product": "Form EIA-930 hourly demand and demand forecast",
+    "publisher": "U.S. Energy Information Administration"
+  },
+  "timing_finding": {
+    "complete_future_daily_forecast_observed": false,
+    "finding": "The hourly source exactly reconstructs settled daily D/DF values, but at observation time no authority exposed a complete future local-day DF aggregate before that target day's local-midnight gate. The v1 daily target therefore remains a valid zero-prediction negative result and must not be backfilled.",
+    "remediation": "Use a separately preregistered hourly target whose seal deadline is the target interval start; do not weaken or rewrite v1.",
+    "v1_daily_seal_feasible_on_observed_schedule": false
+  },
+  "v1_runtime": {
+    "negative_result_preserved": true,
+    "prediction_count": 0,
+    "prediction_terminal_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "settlement_count": 0,
+    "settlement_terminal_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "status_state": "WAITING_FOR_FIRST_ELIGIBLE_FORECAST"
+  }
+}

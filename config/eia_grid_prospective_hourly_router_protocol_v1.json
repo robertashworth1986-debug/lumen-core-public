@@ -1,0 +1,216 @@
+{
+  "schema": "eia_grid_prospective_hourly_router_protocol.v1",
+  "protocol_id": "EIA_GRID_PROSPECTIVE_HOURLY_ROUTER_20260715",
+  "version": 1,
+  "preregistered_date_utc": "2026-07-15",
+  "status": "design_frozen_before_prospective_hour_collection",
+  "purpose": "Prospectively test a frozen balancing-authority specialist router on EIA-930 hourly demand, sealing every prediction before the target interval begins and before target actual demand is present.",
+  "predecessor": {
+    "protocol_id": "EIA_GRID_PROSPECTIVE_HYBRID_ROUTER_20260713",
+    "protocol_path": "config/eia_grid_prospective_hybrid_router_protocol_v1.json",
+    "disposition": "preserved_zero_prediction_negative_result",
+    "reason_for_successor": "The official daily route did not expose a complete future local-day demand forecast before the predecessor's target-local-midnight seal. The seal is not weakened and no predecessor target is backfilled.",
+    "source_timing_receipt": "evidence/external_validation/eia_prospective_source_timing_audit_20260714.json"
+  },
+  "design_boundary": "Candidate definitions and hyperparameters are fixed before prospective collection. The authority route map may use only the frozen historical design window ending 2026-07-13T23 UTC. Prospective results may not change the route map, features, candidates, or gates.",
+  "source": {
+    "publisher": "U.S. Energy Information Administration",
+    "product": "Form EIA-930 hourly demand and demand forecast by balancing authority",
+    "api_route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+    "frequency": "hourly",
+    "period_semantics": "UTC hour ending",
+    "actual_type": "D",
+    "official_forecast_type": "DF",
+    "native_unit": "megawatthours",
+    "history_start_utc": "2025-12-01T00",
+    "cache_refresh_lookback_hours": 336,
+    "credential_policy": "Read EIA_API_KEY or EIA_API_KEY_PREMIUM from the process environment and never serialize the credential."
+  },
+  "historical_design": {
+    "training_start_period_end_utc": "2026-01-01T00",
+    "training_end_period_end_utc": "2026-05-31T23",
+    "validation_start_period_end_utc": "2026-06-01T00",
+    "validation_end_period_end_utc": "2026-07-13T23",
+    "route_selection_metric": "mean_scaled_absolute_error",
+    "selection_rule": "For each authority, choose the lexicographically tie-broken candidate with the lowest mean scaled absolute error on the frozen validation window.",
+    "result_path": "evidence/external_validation/eia_grid_hourly_router_design_benchmark_20260714.json",
+    "result_sha256": "6df6a391499c1567ba6bf34ec1a9c21b859e218207cdf4fc76e44acef5b69280",
+    "claim_rule": "Historical design scores are exploratory and select the route map; they are not prospective confirmation evidence."
+  },
+  "prospective_window": {
+    "first_allowed_period_end_utc": "2026-07-15T14",
+    "preliminary_gate_common_hours_per_authority": 168,
+    "confirmatory_gate_common_hours_per_authority": 720,
+    "durability_gate_common_hours_per_authority": 2160,
+    "target_end_period_end_utc": null,
+    "backfilled_predictions_allowed": false
+  },
+  "balancing_authorities": [
+    "CISO",
+    "ERCO",
+    "ISNE",
+    "MISO",
+    "NYIS",
+    "PJM",
+    "SWPP",
+    "TVA"
+  ],
+  "authority_timezones": {
+    "CISO": "America/Los_Angeles",
+    "ERCO": "America/Chicago",
+    "ISNE": "America/New_York",
+    "MISO": "America/Chicago",
+    "NYIS": "America/New_York",
+    "PJM": "America/New_York",
+    "SWPP": "America/Chicago",
+    "TVA": "America/Chicago"
+  },
+  "feature_contract": {
+    "actual_lag_hours": [
+      24,
+      48,
+      72,
+      168,
+      336
+    ],
+    "recent_residual_window_offsets": [
+      24,
+      47
+    ],
+    "weekly_residual_window_offsets": [
+      168,
+      335
+    ],
+    "scale_window_offsets": [
+      24,
+      191
+    ],
+    "authority_one_hot": true,
+    "calendar_features": [
+      "local_hour_sin_cos",
+      "local_day_of_week_sin_cos",
+      "local_day_of_year_sin_cos"
+    ],
+    "target_actual_may_be_used": false,
+    "future_observation_may_be_used": false
+  },
+  "candidates": [
+    {
+      "id": "eia_official",
+      "definition": "The EIA type DF value retrieved at seal for the target UTC hour ending."
+    },
+    {
+      "id": "seasonal_naive_24",
+      "definition": "Actual demand for the same authority 24 hours before the target."
+    },
+    {
+      "id": "seasonal_naive_168",
+      "definition": "Actual demand for the same authority 168 hours before the target."
+    },
+    {
+      "id": "bias_corrected_official",
+      "definition": "Target EIA DF plus the mean observed EIA forecast residual over frozen offsets 24 through 47 hours before the target."
+    },
+    {
+      "id": "ridge_residual",
+      "definition": "Deterministic ridge prediction of the target residual, added to EIA DF."
+    },
+    {
+      "id": "xgboost_residual",
+      "definition": "Deterministic XGBoost prediction of the target residual, added to EIA DF."
+    },
+    {
+      "id": "lightgbm_residual",
+      "definition": "Deterministic LightGBM prediction of the target residual, added to EIA DF."
+    }
+  ],
+  "model_contract": {
+    "target": "(actual_mwh - official_forecast_mwh) / leakage_safe_scale_mwh",
+    "fit_rule": "Fit the frozen candidate models on every complete feature row whose target actual is present in the source snapshot at seal and whose period ends before the prospective target interval starts.",
+    "ridge": {
+      "alpha": 10.0
+    },
+    "xgboost": {
+      "n_estimators": 160,
+      "max_depth": 4,
+      "learning_rate": 0.04,
+      "subsample": 0.9,
+      "colsample_bytree": 0.9,
+      "reg_lambda": 10.0,
+      "objective": "reg:squarederror",
+      "random_state": 20260714,
+      "n_jobs": 1
+    },
+    "lightgbm": {
+      "n_estimators": 160,
+      "num_leaves": 31,
+      "learning_rate": 0.04,
+      "subsample": 0.9,
+      "colsample_bytree": 0.9,
+      "reg_lambda": 10.0,
+      "random_state": 20260714,
+      "n_jobs": 1,
+      "verbosity": -1
+    },
+    "hyperparameter_change_allowed": false
+  },
+  "router": {
+    "id": "authority_hourly_specialist_router_v1",
+    "kind": "deterministic_frozen_authority_router",
+    "route_map": {
+      "CISO": "xgboost_residual",
+      "ERCO": "eia_official",
+      "ISNE": "lightgbm_residual",
+      "MISO": "lightgbm_residual",
+      "NYIS": "xgboost_residual",
+      "PJM": "lightgbm_residual",
+      "SWPP": "ridge_residual",
+      "TVA": "xgboost_residual"
+    },
+    "route_reason_code": "FROZEN_HISTORICAL_AUTHORITY_WINNER_V1",
+    "dynamic_override_allowed": false,
+    "post_target_override_allowed": false
+  },
+  "prediction_seal": {
+    "require_target_official_forecast": true,
+    "require_target_actual_absent_at_seal": true,
+    "require_sealed_before_target_interval_start": true,
+    "target_interval": "The one-hour UTC interval ending at target_period_end_utc.",
+    "late_or_backfilled_target_rule": "Skip the target and record the reason. Never create a prediction after the target interval begins.",
+    "append_only": true,
+    "replacement_allowed": false,
+    "settlement_rule": "Actual demand may be joined only after a sealed prediction exists."
+  },
+  "metrics": {
+    "primary": "scaled_absolute_error",
+    "secondary": [
+      "absolute_error_mwh",
+      "absolute_percentage_error",
+      "router_regret_to_oracle",
+      "route_hit_rate",
+      "specialist_usage_rate"
+    ],
+    "aggregation_unit": "balancing_authority_utc_day"
+  },
+  "promotion_gates": {
+    "preliminary": {
+      "minimum_common_hours_per_authority": 168,
+      "label": "prospective_preliminary_signal",
+      "external_generalization_allowed": false
+    },
+    "confirmatory": {
+      "minimum_common_hours_per_authority": 720,
+      "must_beat_best_fixed_specialist": true,
+      "minimum_authority_mean_wins": 6,
+      "minimum_utc_day_win_rate": 0.6,
+      "maximum_single_authority_scaled_error_regression": 0.05,
+      "require_positive_authority_cluster_bootstrap_lower_bound": true
+    },
+    "durability": {
+      "minimum_common_hours_per_authority": 2160,
+      "require_confirmatory_gate": true,
+      "external_partner_replication_required": true
+    }
+  },
+  "claim_boundary": "A passing result would support bounded prospective public-data evidence for a frozen hourly specialist router. It does not establish patent validity or scope, utility control, realized savings, grid reliability improvement, production readiness, trading edge, or universal model superiority."
+}
