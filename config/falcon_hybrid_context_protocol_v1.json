@@ -1,0 +1,87 @@
+{
+  "schema": "falcon_hybrid_context_protocol.v1",
+  "protocol_version": "1.0.0",
+  "frozen_date": "2026-07-15",
+  "topic": "DPA26BZ04-DV016",
+  "purpose": "Bounded two-domain feasibility test of validated LLM context routing for structured-data ML experts.",
+  "datasets": [
+    {
+      "id": "breast_cancer_diagnostic",
+      "loader": "load_breast_cancer",
+      "domain": "medical diagnostic measurements",
+      "evaluation_rows_per_context": 18
+    },
+    {
+      "id": "wine_chemistry",
+      "loader": "load_wine",
+      "domain": "food and beverage chemistry",
+      "evaluation_rows_per_context": 18
+    }
+  ],
+  "split": {
+    "random_state": 20260715,
+    "test_fraction": 0.25,
+    "validation_fraction_of_remaining": 0.25,
+    "stratified": true
+  },
+  "contexts": {
+    "nominal": {
+      "expected_route": "full",
+      "degraded_feature_fraction": 0.2,
+      "noise_sigma": 0.0
+    },
+    "declared_dropout": {
+      "expected_route": "dropout_robust",
+      "degraded_feature_fraction": 0.2,
+      "noise_sigma": 0.0
+    },
+    "declared_noise": {
+      "expected_route": "noise_robust",
+      "degraded_feature_fraction": 0.2,
+      "noise_sigma": 1.5
+    }
+  },
+  "routes": ["full", "dropout_robust", "noise_robust", "abstain"],
+  "model": {
+    "provider": "huggingface",
+    "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+    "license": "Apache-2.0",
+    "model_card": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct",
+    "revision_policy": "record_resolved_commit_at_run_time",
+    "trust_remote_code": false,
+    "device": "cpu",
+    "max_new_tokens_route": 48,
+    "max_new_tokens_label": 24,
+    "do_sample": false
+  },
+  "experts": {
+    "classifier": "logistic_regression",
+    "max_iter": 3000,
+    "regularization_c": 1.0,
+    "noise_augmentation_copies": 2,
+    "abstain_fallback": "fixed_ml_only"
+  },
+  "metrics": {
+    "primary": "macro_slice_balanced_accuracy",
+    "secondary": [
+      "macro_slice_f1",
+      "route_accuracy",
+      "unsupported_route_output_rate",
+      "unsupported_label_output_rate",
+      "latency_seconds",
+      "peak_rss_bytes"
+    ]
+  },
+  "promotion_gate": {
+    "minimum_hybrid_delta_over_fixed_ml": 0.005,
+    "minimum_hybrid_delta_over_llm_only": 0.05,
+    "maximum_per_domain_regression_vs_fixed_ml": 0.01,
+    "minimum_route_accuracy": 0.9,
+    "maximum_unsupported_route_output_rate": 0.05,
+    "require_real_model": true,
+    "require_two_completed_domains": true,
+    "require_trace_hash_verification": true,
+    "require_leakage_audit_pass": true
+  },
+  "claim_boundary": "A pass supports bounded internal feasibility only; it does not establish external validation, enterprise scale, agency acceptance, patent scope, operational performance, or universal superiority."
+}

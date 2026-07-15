@@ -1,0 +1,16 @@
+{
+  "boundary": "This receipt proves local byte identity for the pinned model artifact. It does not prove model quality, safety, external validation, or FALCON qualification.",
+  "byte_identity_verified": true,
+  "bytes": 3087467144,
+  "expected_bytes": 3087467144,
+  "expected_sha256": "dd924a11b4c220f385b51ffa522daea7c9f3d850e31b162bb5661df483c6d3ee",
+  "filename": "model.safetensors",
+  "license": "Apache-2.0",
+  "local_path_published": false,
+  "model_card": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct",
+  "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+  "receipt_sha256": "5d58c9b6d1251499acd7807f0cbb27ace8a12689c974833c23a7e8a577a0f5db",
+  "resolved_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "schema": "falcon_model_weights_receipt.v1",
+  "sha256": "dd924a11b4c220f385b51ffa522daea7c9f3d850e31b162bb5661df483c6d3ee"
+}

@@ -1,0 +1,68 @@
+{
+  "schema": "falcon_independent_reproduction_receipt.v1",
+  "template_version": 1,
+  "evidence_lane_id": "falcon_permutation_calibrated_router_v3",
+  "frozen_evidence": {
+    "protocol_sha256": "6384d5f9755e70e868052b0887c4a8d981068de85fbd89c968c874c1808521d9",
+    "runner_sha256": "aa4c37b20b5d732ede34ec25f33897b5dc059756455dc1176b3480ba5e74daa9",
+    "source_manifest_sha256": "2b6ad75db13396a26ab2600da73e764b33400f815945e3e9f057cf699bfb5bcb",
+    "trace_terminal_sha256": "a2b51eb22f287f939909028f06218e0f7077e65b414ac9b8af858b21a83015ec",
+    "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+    "model_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+    "model_weights_sha256": "dd924a11b4c220f385b51ffa522daea7c9f3d850e31b162bb5661df483c6d3ee",
+    "public_feed_file_sha256": "8527167a01635085fd67e6a093007679d0dac78b00e4979ef5169332417ce8a8",
+    "custody_packet_manifest_sha256": "b10f3ff0586e01fa859d5bf49f6466f39033c4022d3e1a1a99a4f1bbcca66598",
+    "expected_result": {
+      "status": "FROZEN_NULL_RESULT_PRESERVED",
+      "qualification_gate_passed": false,
+      "correct_decisions": 27,
+      "decision_count": 30,
+      "overall_accuracy": 0.9,
+      "unsupported_output_rate": 0.0,
+      "mean_permutation_agreement": 0.822222,
+      "minimum_permutation_agreement": 0.333333,
+      "failed_checks": [
+        "mean_permutation_agreement",
+        "minimum_permutation_agreement",
+        "per_context_accuracy"
+      ]
+    }
+  },
+  "reviewer": {
+    "name": null,
+    "organization": null,
+    "technical_role": null,
+    "contact_channel": null,
+    "conflict_of_interest_disclosure": null,
+    "independence_basis": null,
+    "independence_evidence_sha256": null
+  },
+  "reproduction": {
+    "executed_utc": null,
+    "decision": null,
+    "environment_summary": null,
+    "source_packet_rehashed": null,
+    "source_hashes_match": null,
+    "trace_chain_verified": null,
+    "model_weights_verified": null,
+    "result_recomputed_from_traces": null,
+    "correct_decisions": null,
+    "decision_count": null,
+    "overall_accuracy": null,
+    "unsupported_output_rate": null,
+    "mean_permutation_agreement": null,
+    "minimum_permutation_agreement": null,
+    "failed_checks": null,
+    "notes": null,
+    "operator_filled_reviewer_fields": null
+  },
+  "signature": {
+    "method": null,
+    "signed_payload_sha256": null,
+    "detached_signature_artifact_sha256": null
+  },
+  "operator_may_fill_reviewer_fields": false,
+  "performance_promotion_allowed": false,
+  "privacy_rule": "Keep reviewer identity and contact fields reviewer-controlled or in the private proof vault unless the reviewer explicitly authorizes publication. Publish only a redacted receipt or its hash by default.",
+  "claim_boundary": "A completed receipt can independently reproduce and bind the frozen v3 null result to named hashes. It does not convert the failed qualification into a performance pass, establish field validation, authenticate reviewer identity or independence by itself, prove signature semantics, authorize deployment, or support agency approval, safety, savings, patent, enterprise-scale, or universal-superiority claims."
+}

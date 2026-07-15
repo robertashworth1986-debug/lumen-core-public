@@ -67,6 +67,7 @@ def test_bundle_copies_each_required_feed_to_both_public_lanes(tmp_path):
 def test_bundle_contract_includes_expanded_bridge_and_domain_audit():
     module = load_module()
 
+    assert "falcon_permutation_calibrated_router" in module.OPTIONAL_FEEDS
     assert "locked_source_baseline_replay_sweep" in module.REQUIRED_FEEDS
     assert "champion_sample_expansion_and_economic_bridge" in module.REQUIRED_FEEDS
     assert "champion_source_ablation" in module.REQUIRED_FEEDS

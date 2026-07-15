@@ -1,0 +1,167 @@
+{
+  "schema": "falcon_permutation_calibrated_router_protocol.v3",
+  "protocol_version": "3.0.0",
+  "frozen_date": "2026-07-15",
+  "topic": "DPA26BZ04-DV016",
+  "purpose": "Prospective qualification of a constrained local-LLM classifier that maps unstructured data-quality notes to an allowlisted context class using all semantic-to-label permutations and a context-free label-prior calibration before any full hybrid-versus-baseline benchmark is run.",
+  "development_history": {
+    "prior_protocol": "config/falcon_constrained_context_router_protocol_v2.json",
+    "prior_protocol_sha256": "8302c6ad5b6220ed1b37e08751c46274c5aed4a4a64a33594cc2aa6d93d4ac3f",
+    "prior_output": "out/falcon_constrained_context_router_v2_real_20260715",
+    "prior_output_manifest_sha256": "b2ccc94072bb6fc39ea0c57b4b6b452832adf6fecbda3c6e1760ee36a6bc5e38",
+    "prior_gate_passed": false,
+    "prior_failure": "The v2 constrained candidate scorer achieved perfect nominal and dropout classification but only 0.5 noise accuracy. Five noise notes were routed to dropout, and the frozen 0.9 overall-accuracy gate failed.",
+    "design_rule": "Protocols v1 and v2 and both null results remain immutable. This protocol has a new identity, new evaluation-note wording, a stronger frozen model, single-token label scoring, all six label permutations, context-free prior subtraction, and a qualification-only claim boundary.",
+    "prospective_status": "frozen_before_first_real_model_run"
+  },
+  "datasets": [
+    {
+      "id": "breast_cancer_diagnostic",
+      "loader": "load_breast_cancer",
+      "domain": "medical diagnostic measurements"
+    },
+    {
+      "id": "wine_chemistry",
+      "loader": "load_wine",
+      "domain": "food and beverage chemistry"
+    }
+  ],
+  "development_split": {
+    "random_state": 20260715,
+    "test_fraction": 0.25,
+    "validation_fraction_of_remaining": 0.25,
+    "stratified": true,
+    "use": "Feature-name selection for note rendering only; no qualification outcome is fit on evaluation-note labels."
+  },
+  "future_full_benchmark_holdout": {
+    "random_state": 20260717,
+    "must_exclude_prior_v1_test_rows": true,
+    "status": "reserved_not_run",
+    "rule": "Any full comparative protocol must receive a separate frozen identity and must not reuse protocol-v1 test rows as its holdout."
+  },
+  "degraded_feature_fraction": 0.5,
+  "context_classes": {
+    "nominal": {
+      "definition": "All required channels are present and stable within calibration limits.",
+      "evaluation_note_templates": [
+        "Availability audit cleared: the full feature set is populated and repeat sampling remains inside stability thresholds.",
+        "Every expected signal is present; calibration residuals remain within band and no quality flag is active.",
+        "The complete channel set reports steady readings with no missingness alert.",
+        "All inputs passed both the completeness check and the variance check.",
+        "Telemetry has no gaps or volatility faults; every required field is online and stable."
+      ]
+    },
+    "dropout": {
+      "definition": "One or more required channels are unavailable or represented by missing values.",
+      "evaluation_note_templates": [
+        "{channels} never populated and remain explicit nulls; the other signals are usable.",
+        "Completeness failed because {channels} supplied no values during the interval.",
+        "An acquisition outage removed {channels}; those inputs are absent rather than erratic.",
+        "The expected {channels} entries remain null throughout the sample.",
+        "The packet arrived without {channels}; channel availability is the active fault."
+      ]
+    },
+    "noise": {
+      "definition": "Required channels are present, but one or more have unstable or noisy measurements.",
+      "evaluation_note_templates": [
+        "{channels} are online, but random oscillation exceeds the dispersion limit.",
+        "Values for {channels} appear at every timestamp yet remain inconsistent because of stochastic interference.",
+        "Completeness passed; {channels} failed stability because of high-frequency variation.",
+        "No input is absent, but {channels} wander unpredictably around calibration.",
+        "Continuous samples were received from {channels}, but excessive jitter makes them unreliable."
+      ]
+    }
+  },
+  "routing_prompt": {
+    "system": "Classify only the data-quality condition described in the evaluation note. Use the supplied label definitions and return exactly one allowed single-token label. Do not infer a scientific outcome, repeat the note, explain the choice, or add a class.",
+    "labels": [
+      "A",
+      "B",
+      "C"
+    ],
+    "few_shot_examples": [
+      {
+        "note": "The complete instrument panel reports steady values inside every tolerance band.",
+        "context_class": "nominal"
+      },
+      {
+        "note": "No required input is missing and no instability flag is active.",
+        "context_class": "nominal"
+      },
+      {
+        "note": "Two required fields contain nulls because their sensors did not report.",
+        "context_class": "dropout"
+      },
+      {
+        "note": "The packet lacks several expected channels while the remaining channels are usable.",
+        "context_class": "dropout"
+      },
+      {
+        "note": "Every field is populated, but repeated readings contain high-amplitude jitter.",
+        "context_class": "noise"
+      },
+      {
+        "note": "The channels are online while unstable variation makes part of the panel unreliable.",
+        "context_class": "noise"
+      }
+    ],
+    "calibration_prompt": "LABEL_PRIOR_CALIBRATION\nAvailable labels: A, B, C.\nNo data-quality evidence is supplied and no label is semantically favored.\nReturn exactly one label: A, B, or C.",
+    "calibration_rule": "For each label, subtract its next-token log probability under the context-free calibration prompt from its next-token log probability under the evaluation prompt."
+  },
+  "decision_method": {
+    "name": "permutation_averaged_context_free_calibrated_single_token_scoring",
+    "allowlisted_classes": [
+      "nominal",
+      "dropout",
+      "noise"
+    ],
+    "label_tokens": [
+      "A",
+      "B",
+      "C"
+    ],
+    "use_all_label_permutations": true,
+    "required_permutation_count": 6,
+    "inference_batching": "six evaluation prompts plus one context-free calibration prompt in one forward pass per decision",
+    "score_normalization": "evaluation_next_token_log_probability_minus_context_free_prior_log_probability",
+    "semantic_aggregation": "arithmetic_mean_of_calibrated_scores_across_all_six_label_permutations",
+    "permutation_agreement": "fraction_of_permutations_selecting_the_aggregate_semantic_class",
+    "tie_break": "lexicographic_context_class",
+    "output_schema": {
+      "required_only_key": "context_class"
+    }
+  },
+  "model": {
+    "provider": "huggingface",
+    "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+    "license": "Apache-2.0",
+    "model_card": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct",
+    "revision_policy": "record_resolved_commit_at_run_time",
+    "trust_remote_code": false,
+    "device": "cuda",
+    "dtype": "float16",
+    "do_sample": false,
+    "use_cache": false
+  },
+  "qualification_gate": {
+    "required_decision_count": 30,
+    "minimum_overall_accuracy": 0.9,
+    "minimum_per_domain_accuracy": 0.8,
+    "minimum_per_context_accuracy": 0.8,
+    "maximum_unsupported_output_rate": 0.0,
+    "confidence_margin_threshold": 0.01,
+    "minimum_confident_decision_rate": 0.8,
+    "minimum_mean_permutation_agreement": 0.8333333333333334,
+    "minimum_per_decision_permutation_agreement": 0.5,
+    "require_real_model": true,
+    "require_protocol_model_match": true,
+    "require_resolved_model_revision": true,
+    "require_cuda": true,
+    "require_single_token_labels": true,
+    "require_context_free_prior_calibration": true,
+    "require_all_label_permutations": true,
+    "require_two_completed_domains": true,
+    "require_trace_hash_verification": true
+  },
+  "claim_boundary": "A qualification pass would support only bounded internal evidence that the frozen local model and permutation-calibrated single-token scoring method classify these frozen note templates across two named domains. It would not establish hybrid performance lift, external validation, field readiness, agency acceptance, patent scope, safety, savings, enterprise scale, or universal superiority."
+}

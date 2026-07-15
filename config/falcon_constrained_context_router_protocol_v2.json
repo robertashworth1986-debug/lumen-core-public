@@ -1,0 +1,146 @@
+{
+  "schema": "falcon_constrained_context_router_protocol.v2",
+  "protocol_version": "2.0.0",
+  "frozen_date": "2026-07-15",
+  "topic": "DPA26BZ04-DV016",
+  "purpose": "Prospective qualification of a constrained local-LLM classifier that maps unstructured data-quality notes to an allowlisted context class before any full hybrid-versus-baseline benchmark is run.",
+  "development_history": {
+    "prior_protocol": "config/falcon_hybrid_context_protocol_v1.json",
+    "prior_protocol_sha256": "4442c63743a419eeb3d2c090e340f6d875c4096e711679171ebea48439abcd77",
+    "prior_output_manifest_sha256": "854dc5918c1e01345c60702c269798cef97da634ab50225a3cbdb80887d362c4",
+    "prior_gate_passed": false,
+    "prior_failure": "Free-form JSON generation copied the literal pipe-delimited option string in 15 of 18 route calls. Strict parsing converted those calls to abstentions.",
+    "design_rule": "Protocol v1 and its null result remain immutable. This protocol has a new identity, new evaluation-note wording, constrained candidate scoring, and a qualification-only claim boundary."
+  },
+  "datasets": [
+    {
+      "id": "breast_cancer_diagnostic",
+      "loader": "load_breast_cancer",
+      "domain": "medical diagnostic measurements"
+    },
+    {
+      "id": "wine_chemistry",
+      "loader": "load_wine",
+      "domain": "food and beverage chemistry"
+    }
+  ],
+  "development_split": {
+    "random_state": 20260715,
+    "test_fraction": 0.25,
+    "validation_fraction_of_remaining": 0.25,
+    "stratified": true,
+    "use": "Feature-name selection for note rendering only; no qualification outcome is fit on evaluation-note labels."
+  },
+  "future_full_benchmark_holdout": {
+    "random_state": 20260716,
+    "must_exclude_prior_v1_test_rows": true,
+    "status": "reserved_not_run",
+    "rule": "The full comparative protocol must receive a separate frozen identity and must not reuse protocol-v1 test rows as its v2 holdout."
+  },
+  "degraded_feature_fraction": 0.5,
+  "context_classes": {
+    "nominal": {
+      "definition": "All required channels are present and stable within calibration limits.",
+      "evaluation_note_templates": [
+        "Health summary: every measurement field arrived and all calibration checks are within tolerance.",
+        "The complete sensor panel is populated; no missing-value or instability warning is active.",
+        "All requested channels are available, synchronized, and operating without abnormal variance.",
+        "Quality control accepted every feature; neither dropout nor noisy telemetry was detected.",
+        "No channel outage or calibration drift is reported, and the full measurement set is usable."
+      ]
+    },
+    "dropout": {
+      "definition": "One or more required channels are unavailable or represented by missing values.",
+      "evaluation_note_templates": [
+        "{channels} produced no observations in this interval; those fields are unavailable.",
+        "The data packet omits {channels}; treat them as missing rather than corrupted.",
+        "A channel-availability alarm reports that {channels} are offline.",
+        "The record contains blank values for {channels}, while remaining measurements are present.",
+        "No readings were received from {channels}; the affected features cannot be used."
+      ]
+    },
+    "noise": {
+      "definition": "Required channels are present, but one or more have unstable or noisy measurements.",
+      "evaluation_note_templates": [
+        "{channels} are present, but repeated samples show high-variance random jitter.",
+        "Calibration drift makes {channels} unstable even though values are still arriving.",
+        "No fields are missing; however, {channels} contain elevated stochastic measurement noise.",
+        "The telemetry includes {channels}, but their variance exceeds the quality-control limit.",
+        "Readings from {channels} fluctuate unpredictably and are flagged as noisy, not absent."
+      ]
+    }
+  },
+  "routing_prompt": {
+    "system": "Classify only the data-quality condition described in the note. Distinguish complete and stable channels, unavailable or missing channels, and present but noisy channels. Do not infer a scientific outcome or add a fourth class.",
+    "few_shot_examples": [
+      {
+        "note": "Maintenance report: every signal is populated and within its calibration tolerance.",
+        "context_class": "nominal"
+      },
+      {
+        "note": "The complete feature panel passed its health check without an outage or variance alert.",
+        "context_class": "nominal"
+      },
+      {
+        "note": "Three required channels have no readings and appear as missing values.",
+        "context_class": "dropout"
+      },
+      {
+        "note": "An acquisition fault left part of the record blank even though the other fields arrived.",
+        "context_class": "dropout"
+      },
+      {
+        "note": "All readings arrived, but several channels show random high-amplitude jitter.",
+        "context_class": "noise"
+      },
+      {
+        "note": "The sensors remain online while calibration drift causes unstable measurements.",
+        "context_class": "noise"
+      }
+    ],
+    "candidate_completions": {
+      "nominal": "The note describes nominal data: all required channels are present and stable.",
+      "dropout": "The note describes dropout: one or more required channels are unavailable or missing.",
+      "noise": "The note describes noise: required channels are present but unstable or noisy."
+    }
+  },
+  "decision_method": {
+    "name": "candidate_completion_mean_log_probability",
+    "allowlisted_classes": [
+      "nominal",
+      "dropout",
+      "noise"
+    ],
+    "candidate_batching": true,
+    "score_normalization": "mean_log_probability_per_candidate_token",
+    "tie_break": "lexicographic_context_class",
+    "output_schema": {
+      "required_only_key": "context_class"
+    }
+  },
+  "model": {
+    "provider": "huggingface",
+    "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+    "license": "Apache-2.0",
+    "model_card": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct",
+    "revision_policy": "record_resolved_commit_at_run_time",
+    "trust_remote_code": false,
+    "device": "cpu",
+    "do_sample": false
+  },
+  "qualification_gate": {
+    "required_decision_count": 30,
+    "minimum_overall_accuracy": 0.9,
+    "minimum_per_domain_accuracy": 0.8,
+    "minimum_per_context_accuracy": 0.8,
+    "maximum_unsupported_output_rate": 0.0,
+    "confidence_margin_threshold": 0.01,
+    "minimum_confident_decision_rate": 0.8,
+    "require_real_model": true,
+    "require_protocol_model_match": true,
+    "require_resolved_model_revision": true,
+    "require_two_completed_domains": true,
+    "require_trace_hash_verification": true
+  },
+  "claim_boundary": "A qualification pass would support only bounded internal evidence that the frozen local model and candidate-scoring method classify these held-out note templates across two named domains. It would not establish hybrid performance lift, external validation, field readiness, agency acceptance, patent scope, safety, savings, enterprise scale, or universal superiority."
+}

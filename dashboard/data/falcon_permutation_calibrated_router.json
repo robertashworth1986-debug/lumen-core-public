@@ -1,0 +1,244 @@
+{
+  "claim_boundary": "A qualification pass would support only bounded internal evidence that the frozen local model and permutation-calibrated single-token scoring method classify these frozen note templates across two named domains. It would not establish hybrid performance lift, external validation, field readiness, agency acceptance, patent scope, safety, savings, enterprise scale, or universal superiority.",
+  "claim_gate": {
+    "agency_acceptance_complete": false,
+    "enterprise_scale_established": false,
+    "external_validation_complete": false,
+    "field_validation_complete": false,
+    "hybrid_performance_lift_established": false,
+    "medical_performance_claim_allowed": false,
+    "patent_scope_established": false,
+    "safety_claim_allowed": false,
+    "savings_claim_allowed": false,
+    "universal_superiority_established": false
+  },
+  "decision": {
+    "correct_decision_count": 27,
+    "decision_count": 30,
+    "failed_gate_checks": [
+      "mean_permutation_agreement",
+      "minimum_permutation_agreement",
+      "per_context_accuracy"
+    ],
+    "mean_permutation_agreement": 0.8222222222222223,
+    "minimum_permutation_agreement": 0.3333333333333333,
+    "overall_accuracy": 0.9,
+    "per_context_accuracy": {
+      "dropout": 1.0,
+      "noise": 1.0,
+      "nominal": 0.7
+    },
+    "per_domain_accuracy": {
+      "breast_cancer_diagnostic": 0.8666666666666667,
+      "wine_chemistry": 0.9333333333333333
+    },
+    "qualification_gate_passed": false,
+    "unsupported_output_rate": 0.0
+  },
+  "development_lineage": {
+    "cross_protocol_lift_claim_allowed": false,
+    "reason": "The model, note wording, and scoring protocol changed between v2 and v3; their class accuracies are diagnostic lineage, not an apples-to-apples lift estimate.",
+    "v2_failure": "The v2 constrained candidate scorer achieved perfect nominal and dropout classification but only 0.5 noise accuracy. Five noise notes were routed to dropout, and the frozen 0.9 overall-accuracy gate failed.",
+    "v2_gate_passed": false,
+    "v3_observation": "The v3 frozen run classified every noise and dropout note correctly, but nominal accuracy fell to 0.7 and permutation-stability gates failed."
+  },
+  "error_pattern": {
+    "error_count": 3,
+    "raw_model_outputs_published": false,
+    "raw_prompts_published": false,
+    "rows": [
+      {
+        "dataset_id": "breast_cancer_diagnostic",
+        "expected_context_class": "nominal",
+        "note_index": 0,
+        "permutation_agreement": 0.3333333333333333,
+        "score_margin": 0.29166676146996917,
+        "selected_context_class": "noise"
+      },
+      {
+        "dataset_id": "breast_cancer_diagnostic",
+        "expected_context_class": "nominal",
+        "note_index": 3,
+        "permutation_agreement": 0.5,
+        "score_margin": 0.6328124040919647,
+        "selected_context_class": "noise"
+      },
+      {
+        "dataset_id": "wine_chemistry",
+        "expected_context_class": "nominal",
+        "note_index": 3,
+        "permutation_agreement": 0.5,
+        "score_margin": 0.6848958098065243,
+        "selected_context_class": "noise"
+      }
+    ],
+    "summary": "All three observed errors mapped a nominal note to noise."
+  },
+  "evidence_class": "BOUNDED_INTERNAL_MODEL_QUALIFICATION_NULL_RESULT",
+  "feed_sha256": "8938e4e3ea0d1f62786f8bc4ab508aa7060dc8c66d80a3ca48a261743917f98e",
+  "gate_rows": [
+    {
+      "gate": "overall_accuracy",
+      "observed": 0.9,
+      "passed": true,
+      "threshold": 0.9
+    },
+    {
+      "gate": "per_domain_accuracy",
+      "observed": {
+        "breast_cancer_diagnostic": 0.8666666666666667,
+        "wine_chemistry": 0.9333333333333333
+      },
+      "passed": true,
+      "threshold": 0.8
+    },
+    {
+      "gate": "per_context_accuracy",
+      "observed": {
+        "dropout": 1.0,
+        "noise": 1.0,
+        "nominal": 0.7
+      },
+      "passed": false,
+      "threshold": 0.8
+    },
+    {
+      "comparison": "maximum",
+      "gate": "unsupported_output_rate",
+      "observed": 0.0,
+      "passed": true,
+      "threshold": 0.0
+    },
+    {
+      "gate": "mean_permutation_agreement",
+      "observed": 0.8222222222222223,
+      "passed": false,
+      "threshold": 0.8333333333333334
+    },
+    {
+      "gate": "minimum_permutation_agreement",
+      "observed": 0.3333333333333333,
+      "passed": false,
+      "threshold": 0.5
+    }
+  ],
+  "generated_utc": "2026-07-15T17:33:57.139986+00:00",
+  "integrity": {
+    "artifact_hashes_verified": true,
+    "input_receipts": [
+      {
+        "bytes": 1205,
+        "path": "out/falcon_permutation_calibrated_router_v3_real_20260715/manifest.sha256.json",
+        "sha256": "0e87e18da4971cfd01d221fa339eae5e4d544d1ff962c2aeba87f12af04f2b21"
+      },
+      {
+        "bytes": 2093,
+        "path": "out/falcon_permutation_calibrated_router_v3_real_20260715/ROUTER_QUALIFICATION_REPORT.md",
+        "sha256": "0c772b399eff90f7fab28edf07d9094e5a9d19ee3d3ee780f20b31cf74e20548"
+      },
+      {
+        "bytes": 23296,
+        "path": "out/falcon_permutation_calibrated_router_v3_real_20260715/router_qualification_result.json",
+        "sha256": "7c6980d2578b2d77b6447cf380469ebabb0ec931e976411d7f6bcef277c2f297"
+      },
+      {
+        "bytes": 424029,
+        "path": "out/falcon_permutation_calibrated_router_v3_real_20260715/traces.jsonl",
+        "sha256": "eeb06423236074b48b5c41e20cb28e25b9f1402875812c7b8959032712fc1334"
+      },
+      {
+        "bytes": 30602,
+        "path": "code/falcon_constrained_context_router.py",
+        "sha256": "c0adb0aa8890fa34a78d9d1473f79820f126346b8124d81bc6595f8963ef5021"
+      },
+      {
+        "bytes": 40765,
+        "path": "code/falcon_hybrid_context_benchmark.py",
+        "sha256": "8c70ab92c98e9ca917530667f3b30496bbe17b4fc393d45faded31158136d8e5"
+      },
+      {
+        "bytes": 41032,
+        "path": "code/falcon_permutation_calibrated_router.py",
+        "sha256": "aa4c37b20b5d732ede34ec25f33897b5dc059756455dc1176b3480ba5e74daa9"
+      },
+      {
+        "bytes": 8484,
+        "path": "config/falcon_permutation_calibrated_router_protocol_v3.json",
+        "sha256": "6384d5f9755e70e868052b0887c4a8d981068de85fbd89c968c874c1808521d9"
+      },
+      {
+        "bytes": 862,
+        "path": "evidence/falcon/qwen2_5_1_5b_instruct_weights_receipt_20260715.json",
+        "sha256": "42e7e7324900c90ce72755f2af229f90f468710971ce697d0fd54dfc032faa2f"
+      }
+    ],
+    "manifest_self_hash_verified": true,
+    "protocol_sha256": "6384d5f9755e70e868052b0887c4a8d981068de85fbd89c968c874c1808521d9",
+    "runner_sha256": "aa4c37b20b5d732ede34ec25f33897b5dc059756455dc1176b3480ba5e74daa9",
+    "source_file_hashes_verified": true,
+    "source_manifest_sha256": "2b6ad75db13396a26ab2600da73e764b33400f815945e3e9f057cf699bfb5bcb",
+    "source_packet_verified": true,
+    "trace_chain_verified": true,
+    "trace_record_count": 30,
+    "trace_terminal_sha256": "a2b51eb22f287f939909028f06218e0f7077e65b414ac9b8af858b21a83015ec"
+  },
+  "method": {
+    "allowlisted_classes": [
+      "nominal",
+      "dropout",
+      "noise"
+    ],
+    "inference_batching": "six evaluation prompts plus one context-free calibration prompt in one forward pass per decision",
+    "label_tokens": [
+      "A",
+      "B",
+      "C"
+    ],
+    "name": "permutation_averaged_context_free_calibrated_single_token_scoring",
+    "output_schema": {
+      "required_only_key": "context_class"
+    },
+    "permutation_agreement": "fraction_of_permutations_selecting_the_aggregate_semantic_class",
+    "required_permutation_count": 6,
+    "score_normalization": "evaluation_next_token_log_probability_minus_context_free_prior_log_probability",
+    "semantic_aggregation": "arithmetic_mean_of_calibrated_scores_across_all_six_label_permutations",
+    "tie_break": "lexicographic_context_class",
+    "use_all_label_permutations": true
+  },
+  "model": {
+    "cuda_device_name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+    "device": "cuda",
+    "license": "Apache-2.0",
+    "model_card": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct",
+    "model_class": "Qwen2ForCausalLM",
+    "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+    "parameter_count": 1543714304,
+    "parameter_dtype": "float16",
+    "resolved_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+    "weights_receipt": {
+      "byte_identity_verified": true,
+      "bytes": 3087467144,
+      "receipt_sha256": "5d58c9b6d1251499acd7807f0cbb27ace8a12689c974833c23a7e8a577a0f5db",
+      "sha256": "dd924a11b4c220f385b51ffa522daea7c9f3d850e31b162bb5661df483c6d3ee"
+    }
+  },
+  "next_allowed_experiment": {
+    "description": "Freeze a new same-row comparative protocol for ML-only, LLM-only, and hybrid systems on a reserved holdout. Preserve v1-v3 unchanged and test lift, calibration, abstention, latency, and failure modes against named baselines.",
+    "external_evaluator_required_for_external_validation": true,
+    "requires_new_protocol_identity": true
+  },
+  "runtime": {
+    "elapsed_seconds": 18.64804030000232,
+    "inference_prompt_count": 210,
+    "model_forward_pass_count": 30,
+    "model_scoring_seconds": 5.601824499972281,
+    "peak_rss_proxy_bytes": 1850126336,
+    "permutation_score_count": 180,
+    "route_decision_count": 30,
+    "rss_after_bytes": 1850126336,
+    "rss_before_bytes": 1177370624
+  },
+  "schema": "falcon_permutation_calibrated_router_reviewer_feed.v1",
+  "status": "FROZEN_NULL_RESULT_PRESERVED",
+  "topic": "DPA26BZ04-DV016"
+}

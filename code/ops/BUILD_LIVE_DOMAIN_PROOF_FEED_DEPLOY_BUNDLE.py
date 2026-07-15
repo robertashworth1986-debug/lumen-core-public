@@ -50,6 +50,7 @@ REQUIRED_FEEDS = [
 ]
 
 OPTIONAL_FEEDS = [
+    "falcon_permutation_calibrated_router",
     "top5_live_proof_submission_board",
     "deadline_evidence_bridge",
     "baseline_gauntlet_coverage",
