@@ -1,0 +1,16 @@
+{
+  "schema": "lumencore.external_drive_sync_receipt.v1",
+  "recorded_date": "2026-07-15",
+  "packet": "CDC_AI_ACQUISITION_RFI_75D301-26-RFI-73483",
+  "source_root": "C:/LumaTrader/INSTITUTIONAL_STACK_V2/grant_submissions/funding_sprint_20260709",
+  "mirror_root": "E:/INSTITUTIONAL_STACK_V2/grant_submissions/funding_sprint_20260709",
+  "proof_vault_root": "E:/LumaProofVault/LUMA_FUNDING_SPRINT_20260715_CDC_RFI_V1",
+  "manifest_sha256": "21F9C8FEFF56390DB2422DE3BA62BAFEF4BB3E4EC191790781F8A892309714FC",
+  "verification": {
+    "source_to_mirror_hash_match": true,
+    "source_to_proof_vault_hash_match": true,
+    "artifact_count": 4
+  },
+  "submission_state": "GMAIL_DRAFT_READY_NOT_SENT",
+  "boundary": "This is a storage and hash-verification receipt. It does not prove email transmission, CDC receipt, selection, validation, endorsement, award, or contract."
+}

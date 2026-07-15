@@ -1,0 +1,42 @@
+{
+  "schema": "lumencore.external_opportunity_artifact_manifest.v1",
+  "generated_date": "2026-07-15",
+  "opportunity": {
+    "agency": "Centers for Disease Control and Prevention",
+    "notice_id": "75D301-26-RFI-73483",
+    "title": "CDC Artificial Intelligence for Acquisition Support Reverse Industry Day",
+    "official_url": "https://sam.gov/opp/b8fc8fffe3524fba9bb79f16573ba2e5/view",
+    "questions_deadline": "2026-07-20T17:00:00-04:00",
+    "response_deadline": "2026-07-30T17:00:00-04:00"
+  },
+  "submission_state": "GMAIL_DRAFT_READY_NOT_SENT",
+  "submission_boundary": "This manifest records package preparation and draft verification only. It does not establish transmission, CDC receipt, selection, validation, endorsement, award, or contract.",
+  "artifacts": [
+    {
+      "path": "grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_75D301-26-RFI-73483_2026-07-15.md",
+      "role": "submission_control_note",
+      "sha256": "2FC40AF40A80BEE6FB643E48948582162EFCAB1BD943015BBA70F1AAECFEEBC3"
+    },
+    {
+      "path": "grant_submissions/funding_sprint_20260709/LumenCore_CDC_AI_Acquisition_RFI_75D301-26-RFI-73483_2026-07-15.docx",
+      "role": "editable_capability_statement",
+      "sha256": "052830FC72212CB1A738155DE1FA09C47676516384656CBE81E268F8A0E149E4"
+    },
+    {
+      "path": "grant_submissions/funding_sprint_20260709/LumenCore_CDC_AI_Acquisition_RFI_75D301-26-RFI-73483_2026-07-15.pdf",
+      "role": "send_ready_capability_statement",
+      "page_count": 2,
+      "sha256": "570F6A6C86DD03649B6F5EE7F731D5E3F0884712CD06DA588D2A4C92C903B2B1"
+    }
+  ],
+  "quality_gates": {
+    "docx_build": "PASS",
+    "pdf_render": "PASS",
+    "visual_page_review": "PASS",
+    "two_page_limit": "PASS",
+    "prototype_stage_disclosure": "PASS",
+    "claim_boundary_disclosure": "PASS",
+    "gmail_draft_recipient_subject_attachment_readback": "PASS"
+  }
+}
+
