@@ -94,6 +94,8 @@ def test_workflow_excludes_checksum_manifest_from_its_own_hash_set():
     assert workflow.count('- "requirements-reviewer-ubuntu-py311.lock"') == 2
     assert "--require-hashes --only-binary=:all:" in workflow
     assert "VERIFY_REVIEWER_DEPENDENCY_LOCK.py" in workflow
+    assert "--publish" in workflow
+    assert "Verify the generated reviewer publications" in workflow
     assert "-type f ! -name SHA256SUMS -print0" in workflow
     assert "LC_ALL=C sort -z" in workflow
     assert (
