@@ -34,7 +34,7 @@
     "route_selection_metric": "mean_scaled_absolute_error",
     "selection_rule": "For each authority, choose the lexicographically tie-broken candidate with the lowest mean scaled absolute error on the frozen validation window.",
     "result_path": "evidence/external_validation/eia_grid_hourly_router_design_benchmark_20260714.json",
-    "result_sha256": "6df6a391499c1567ba6bf34ec1a9c21b859e218207cdf4fc76e44acef5b69280",
+    "result_sha256": "19698f1923f3fea9d0f2c4c3fef1088ee131163ed246f8aaa69894af9ddb06c9",
     "claim_rule": "Historical design scores are exploratory and select the route map; they are not prospective confirmation evidence."
   },
   "prospective_window": {

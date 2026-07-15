@@ -134,3 +134,12 @@ def test_append_only_chain_detects_tampering(tmp_path):
         assert "record hash mismatch" in str(exc)
     else:
         raise AssertionError("tampered chain was accepted")
+
+
+def test_text_file_hash_is_stable_across_line_endings(tmp_path):
+    module = load_module()
+    lf = tmp_path / "lf.json"
+    crlf = tmp_path / "crlf.json"
+    lf.write_bytes(b'{"value":1}\n')
+    crlf.write_bytes(b'{"value":1}\r\n')
+    assert module.file_sha256(lf) == module.file_sha256(crlf)

@@ -34,11 +34,7 @@ def canonical_sha256(value: Any) -> str:
 
 
 def file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
 def build_receipt() -> tuple[dict[str, Any], bytes]:
@@ -50,7 +46,7 @@ def build_receipt() -> tuple[dict[str, Any], bytes]:
         result_path = SOURCE_RESULT_PATH
     else:
         raise FileNotFoundError("historical design benchmark is unavailable")
-    result_bytes = result_path.read_bytes()
+    result_bytes = result_path.read_bytes().replace(b"\r\n", b"\n")
     observed_result_hash = hashlib.sha256(result_bytes).hexdigest()
     if observed_result_hash != expected_result_hash:
         raise ValueError("historical design benchmark hash differs from the protocol")
@@ -185,9 +181,11 @@ def main() -> int:
     FROZEN_RESULT_PATH.parent.mkdir(parents=True, exist_ok=True)
     FROZEN_RESULT_PATH.write_bytes(result_bytes)
     RECEIPT_PATH.write_text(
-        json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
     )
-    DOC_PATH.write_text(render_markdown(receipt), encoding="utf-8")
+    DOC_PATH.write_text(render_markdown(receipt), encoding="utf-8", newline="\n")
     print(
         json.dumps(
             {

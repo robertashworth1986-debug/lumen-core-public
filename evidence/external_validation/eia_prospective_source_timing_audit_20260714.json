@@ -490,7 +490,7 @@
     }
   ],
   "claim_boundary": "This receipt establishes source equivalence and an observed publication-timing limitation. It does not establish prospective model skill, production readiness, savings, patentability, or external validation.",
-  "generated_utc": "2026-07-15T02:17:28.933853+00:00",
+  "generated_utc": "2026-07-15T02:23:15.348705+00:00",
   "protocol": {
     "backfill_allowed": false,
     "path": "config/eia_grid_prospective_hybrid_router_protocol_v1.json",

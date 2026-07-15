@@ -3,9 +3,9 @@
 ## Frozen Design
 
 - Protocol: `config/eia_grid_prospective_hourly_router_protocol_v1.json`
-- Protocol SHA256: `c6df71fdd3afa41cd09f823e24e4f2b544d6c12b3d326bf3bfec6fe90758ed1d`
+- Protocol SHA256: `5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5`
 - Historical design receipt: `evidence/external_validation/eia_grid_hourly_router_design_benchmark_20260714.json`
-- Historical design SHA256: `6df6a391499c1567ba6bf34ec1a9c21b859e218207cdf4fc76e44acef5b69280`
+- Historical design SHA256: `19698f1923f3fea9d0f2c4c3fef1088ee131163ed246f8aaa69894af9ddb06c9`
 - Source rows: `86244`
 - Training rows: `25151`
 - Validation rows: `7549`
