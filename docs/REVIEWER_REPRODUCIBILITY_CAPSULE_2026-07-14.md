@@ -12,16 +12,19 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 - Dependency versions matched: `8/8`
 - Scoped SBOM components: `18`
 - Deterministic environment matched: `true`
+- Authoritative runtime matched: `true`
+- Installed dependency closure matched lock: `true`
 - Frozen input passed: `true`
 - Relevant source clean: `true`
 - Clean-runner replay: `true`
-- Artifact hash lock complete: `false`
+- Artifact hash lock complete for authoritative runner: `true`
+- Cross-platform artifact hash lock complete: `false`
 - External validation complete: `false`
 - Agency certification complete: `false`
 - Fixture tests executed: `true`
 - Fixture tests passed: `true`
-- Source chain SHA-256: `e0875a07178e89faf83f9b0a2da63d7a87efd57021c572b6f8aa7b64db62e12e`
-- Capsule SHA-256: `7a91dea2cf7fbaccca3421a6d99545f4eadc03f3ce51a877bd590579c5ad2d85`
+- Source chain SHA-256: `8479076b62b9862dce53aa1f44ba231b769f90ef0bad9de48295f12ae42063f6`
+- Capsule SHA-256: `4d1a37fcb70bcb0bf7562c2867a97b0b14a919a13f8e7c2ece8b29360d93ba26`
 
 ## Protocol Amendment
 
@@ -35,24 +38,24 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - Kind: `measured_public_data_replay`
 - Passed: `true`
-- Elapsed seconds: `73.914`
-- Fact projection SHA-256: `66f4fde9d3935fb2ea519fc639ec55fd582f0b2f454d33d973ea365e42c98bbf`
+- Elapsed seconds: `29.917`
+- Fact projection SHA-256: `014fff0d31f18ba4c5dd764e9f1d2e966108e674d945e6eb45533e9f2df83f68`
 - Facts:
-  - `evaluation_rows`: `22530`
-  - `selected_candidate`: `lissajous_phase_paths`
-  - `best_strategy`: `autoregressive_ridge_p14`
-  - `best_mase`: `0.47945937271811834`
-  - `kuramoto_mase`: `1.253508683225091`
   - `baseline_comparison_count`: `6`
-  - `promotion_gate_passed`: `False`
+  - `best_mase`: `0.4794593727181181`
+  - `best_strategy`: `autoregressive_ridge_p14`
+  - `evaluation_rows`: `22530`
   - `field_validation_complete`: `False`
+  - `kuramoto_mase`: `1.253508683225091`
+  - `promotion_gate_passed`: `False`
+  - `selected_candidate`: `lissajous_phase_paths`
 - Assertions:
   - `panel_rows` passed=`true` actual=`14704` expected=`14704`
   - `holdout_rows` passed=`true` actual=`1525` expected=`1525`
   - `holdout_authorities` passed=`true` actual=`8` expected=`8`
   - `selected_candidate` passed=`true` actual=`lissajous_phase_paths` expected=`lissajous_phase_paths`
   - `best_strategy` passed=`true` actual=`autoregressive_ridge_p14` expected=`autoregressive_ridge_p14`
-  - `best_mase` passed=`true` actual=`0.47945937271811834` expected=`0.47945937271811834` absolute_tolerance=`1e-06` relative_difference=`0.0`
+  - `best_mase` passed=`true` actual=`0.4794593727181181` expected=`0.47945937271811834` absolute_tolerance=`1e-06` relative_difference=`4.631145359954717e-16`
   - `kuramoto_mase` passed=`true` actual=`1.253508683225091` expected=`1.253508683225091` absolute_tolerance=`1e-06` relative_difference=`0.0`
   - `promotion_gate_passed` passed=`true` actual=`False` expected=`False`
   - `field_validation_complete` passed=`true` actual=`False` expected=`False`
@@ -61,25 +64,25 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - Kind: `measured_public_data_replay`
 - Passed: `true`
-- Elapsed seconds: `15.775`
-- Fact projection SHA-256: `c34a50a95474700e60cd1e162ac371f4bb0233c6a1b207d0f11603b3a2320405`
+- Elapsed seconds: `9.997`
+- Fact projection SHA-256: `d2052b0fee6fd7b2ae89285084c4dd46fb3500fb3c998073a3b27976bb147eed`
 - Facts:
-  - `evaluation_rows`: `16975`
-  - `selected_candidate`: `xgboost_residual`
-  - `best_strategy`: `xgboost_residual`
-  - `best_mase`: `0.21211186326437864`
   - `baseline_comparison_count`: `6`
+  - `best_mase`: `0.2112062642583228`
+  - `best_strategy`: `xgboost_residual`
+  - `coverage_gate_passed`: `False`
+  - `evaluation_rows`: `16975`
+  - `field_validation_complete`: `False`
   - `holm_positive_point_improvement_count`: `6`
   - `promotion_gate_passed`: `False`
-  - `coverage_gate_passed`: `False`
-  - `field_validation_complete`: `False`
+  - `selected_candidate`: `xgboost_residual`
 - Assertions:
   - `panel_rows` passed=`true` actual=`14704` expected=`14704`
   - `holdout_rows` passed=`true` actual=`1176` expected=`1176`
   - `holdout_authorities` passed=`true` actual=`8` expected=`8`
   - `selected_candidate` passed=`true` actual=`xgboost_residual` expected=`xgboost_residual`
   - `best_strategy` passed=`true` actual=`xgboost_residual` expected=`xgboost_residual`
-  - `best_mase` passed=`true` actual=`0.21211186326437864` expected=`0.21211186326437864` relative_tolerance=`0.01` relative_difference=`0.0`
+  - `best_mase` passed=`true` actual=`0.2112062642583228` expected=`0.21211186326437864` relative_tolerance=`0.01` relative_difference=`0.004269440624954959`
   - `baseline_comparison_count` passed=`true` actual=`6` expected=`6`
   - `promotion_gate_passed` passed=`true` actual=`False` expected=`False`
   - `coverage_gate_passed` passed=`true` actual=`False` expected=`False`
@@ -89,17 +92,17 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - Kind: `deterministic_synthetic_falsification_replay`
 - Passed: `true`
-- Elapsed seconds: `0.425`
+- Elapsed seconds: `0.092`
 - Fact projection SHA-256: `6cbbc86400aa77f0305dd13c3d08b9a46dce26e731b96aade2abf2933d7f56e4`
 - Facts:
-  - `fixture_chain_sha256`: `25f32a2e03157f6f058f1022bec7d0f0ea151991fc4e1c68d0b91fe59b1e278e`
-  - `fixture_count`: `128`
-  - `holdout_count`: `36`
   - `candidate_micro_f1`: `0.9433962264150945`
   - `candidate_supported_coverage`: `0.9583333333333334`
   - `candidate_unsupported_mapping_rate`: `0.0`
-  - `promotion_gate_passed`: `False`
+  - `fixture_chain_sha256`: `25f32a2e03157f6f058f1022bec7d0f0ea151991fc4e1c68d0b91fe59b1e278e`
+  - `fixture_count`: `128`
+  - `holdout_count`: `36`
   - `operational_or_field_claim_allowed`: `False`
+  - `promotion_gate_passed`: `False`
 - Assertions:
   - `fixture_count` passed=`true` actual=`128` expected=`128`
   - `holdout_count` passed=`true` actual=`36` expected=`36`
@@ -111,7 +114,11 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 ## Supply-Chain Boundary
 
-- Package versions are exact-pinned, but transitive wheel and source-distribution hashes are not yet locked across supported operating systems.
+- Dependency lock verification: `AUTHORITATIVE_RUNNER_LOCK_VALID`
+- Authoritative target: `Complete for the authoritative Ubuntu 24.04 x86-64 CPython 3.11.9 reviewer runner only.`
+- Locked packages: `18`
+- Lock SHA-256: `e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18`
+- Other operating systems and architectures are not covered by this receipt until separately resolved, hash-locked, and replayed.
 - The CycloneDX inventory covers the reviewer suite, not every component in the wider repository or deployed service.
 
 ## Excluded Full Replays
@@ -124,3 +131,5 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - [NIST SP 800-218 Secure Software Development Framework 1.1](https://csrc.nist.gov/pubs/sp/800/218/final): Informative source for provenance, protected artifacts, and repeatable verification practices. This capsule is not a NIST certification or full SSDF attestation.
 - [CISA 2025 Minimum Elements for a Software Bill of Materials](https://www.cisa.gov/sites/default/files/2025-08/2025_CISA_SBOM_Minimum_Elements.pdf): Informative public-comment-draft reference for component identity and dependency relationships. The emitted inventory is scoped to the reviewer suite and is not a complete product SBOM.
+- [pip Secure Installs](https://pip.pypa.io/en/stable/topics/secure-installs/): Primary installer guidance for all-or-nothing hash checking, exact transitive pins, and binary-only installation.
+- [uv pip compile](https://docs.astral.sh/uv/pip/compile/): Primary resolver documentation for the target-specific, hash-emitting lock generation command recorded in the lock header.
