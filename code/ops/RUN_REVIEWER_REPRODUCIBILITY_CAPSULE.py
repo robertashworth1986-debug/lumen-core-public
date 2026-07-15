@@ -136,6 +136,23 @@ def load_module(module_id: str) -> Any:
     return module
 
 
+def verify_dependency_lock(
+    protocol: dict[str, Any], protocol_path: Path
+) -> dict[str, Any]:
+    verifier_path = ROOT / protocol["environment"]["requirements_lock_verifier_path"]
+    spec = importlib.util.spec_from_file_location(
+        "reviewer_capsule_dependency_lock", verifier_path
+    )
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load dependency-lock verifier: {verifier_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    receipt = module.verify_lock(root=ROOT, protocol_path=protocol_path)
+    if receipt.get("schema") != "reviewer_dependency_lock_verification.v1":
+        raise ValueError("unexpected dependency-lock receipt schema")
+    return receipt
+
+
 def safe_git(args: list[str]) -> str:
     result = subprocess.run(
         ["git", *args],
@@ -154,9 +171,14 @@ def source_artifacts(
 ) -> list[dict[str, Any]]:
     paths = {
         protocol_path.resolve(),
-        (ROOT / protocol["environment"]["requirements_path"]).resolve(),
         Path(__file__).resolve(),
     }
+    for environment_path in (
+        "requirements_path",
+        "requirements_lock_path",
+        "requirements_lock_verifier_path",
+    ):
+        paths.add((ROOT / protocol["environment"][environment_path]).resolve())
     for frozen in protocol["frozen_inputs"]:
         paths.add((ROOT / frozen["path"]).resolve())
     for suite in protocol["suites"]:
@@ -792,6 +814,59 @@ def runtime_environment_receipt(protocol: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def authoritative_runtime_receipt(protocol: dict[str, Any]) -> dict[str, Any]:
+    expected = protocol["environment"]["authoritative_runner"]
+    observed = {
+        "system": platform.system(),
+        "machine": platform.machine(),
+        "python": platform.python_version(),
+    }
+    normalized_machine = observed["machine"].casefold()
+    machine_matches = normalized_machine in {
+        expected["machine"].casefold(),
+        "amd64" if expected["machine"].casefold() == "x86_64" else "",
+    }
+    checks = {
+        "system": observed["system"].casefold() == expected["system"].casefold(),
+        "machine": machine_matches,
+        "python": observed["python"] == expected["python"],
+    }
+    return {
+        "expected": expected,
+        "observed": observed,
+        "checks": checks,
+        "matches": all(checks.values()),
+    }
+
+
+def dependency_closure_receipt(
+    dependency_lock: dict[str, Any], sbom: dict[str, Any]
+) -> dict[str, Any]:
+    expected = dependency_lock["locked_packages"]
+    observed = {
+        canonicalize_name(component["name"]): str(component["version"])
+        for component in sbom["components"]
+        if component.get("purl")
+    }
+    missing = sorted(set(expected) - set(observed))
+    unexpected = sorted(set(observed) - set(expected))
+    version_mismatches = {
+        name: {"expected": expected[name], "observed": observed[name]}
+        for name in sorted(set(expected) & set(observed))
+        if expected[name] != observed[name]
+    }
+    passed = not missing and not unexpected and not version_mismatches
+    return {
+        "passed": passed,
+        "expected_package_count": len(expected),
+        "observed_package_count": len(observed),
+        "missing_packages": missing,
+        "unexpected_packages": unexpected,
+        "version_mismatches": version_mismatches,
+        "observed_packages": observed,
+    }
+
+
 def git_state(artifacts: list[dict[str, Any]]) -> dict[str, Any]:
     paths = [row["path"] for row in artifacts]
     porcelain = safe_git(["status", "--porcelain", "--", *paths])
@@ -825,6 +900,7 @@ def build_capsule(
     run_dir.mkdir(parents=True, exist_ok=True)
     generated_utc = now_utc()
     artifacts = source_artifacts(protocol, protocol_path)
+    dependency_lock = verify_dependency_lock(protocol, protocol_path)
     dependencies = observed_dependencies(protocol)
     panel, input_receipt, panel_raw = load_frozen_panel(protocol)
     suites = []
@@ -853,7 +929,9 @@ def build_capsule(
     fixture_tests_pass = fixture_tests.get("passed") is not False
     source_state = git_state(artifacts)
     runtime_environment = runtime_environment_receipt(protocol)
+    authoritative_runtime = authoritative_runtime_receipt(protocol)
     sbom = build_sbom(protocol, dependencies, generated_utc)
+    dependency_closure = dependency_closure_receipt(dependency_lock, sbom)
     status = (
         "BOUNDED_REPRODUCIBILITY_PASS"
         if input_receipt["passed"]
@@ -861,6 +939,9 @@ def build_capsule(
         and suites_pass
         and fixture_tests_pass
         and runtime_environment["matches"]
+        and authoritative_runtime["matches"]
+        and dependency_lock["passed"]
+        and dependency_closure["passed"]
         else "BOUNDED_REPRODUCIBILITY_FAIL"
     )
     capsule = {
@@ -886,14 +967,29 @@ def build_capsule(
             "dependency_versions_exact_match": dependencies_match,
             "sbom_component_count": len(sbom["components"]),
             "deterministic_environment_match": runtime_environment["matches"],
-            "artifact_hash_lock_complete": protocol["environment"][
-                "artifact_hash_lock_complete"
+            "authoritative_runtime_match": authoritative_runtime["matches"],
+            "dependency_closure_exact_match": dependency_closure["passed"],
+            "artifact_hash_lock_complete": (
+                dependency_lock["passed"]
+                and protocol["environment"]["artifact_hash_lock_complete"]
+            ),
+            "cross_platform_artifact_hash_lock_complete": protocol["environment"][
+                "cross_platform_artifact_hash_lock_complete"
+            ],
+            "locked_package_count": dependency_lock["locked_package_count"],
+            "dependency_lock_sha256": dependency_lock[
+                "requirements_lock_sha256"
             ],
             "fixture_tests_executed": bool(with_fixture_tests),
             "fixture_tests_passed": fixture_tests.get("passed"),
             "relevant_source_clean": source_state["relevant_source_clean"],
-            "clean_runner_replay": source_state["relevant_source_clean"]
-            and with_fixture_tests,
+            "clean_runner_replay": (
+                source_state["relevant_source_clean"]
+                and with_fixture_tests
+                and authoritative_runtime["matches"]
+                and dependency_lock["passed"]
+                and dependency_closure["passed"]
+            ),
             "external_validation_complete": False,
             "agency_certification_complete": False,
         },
@@ -905,9 +1001,12 @@ def build_capsule(
             "timezone": protocol["environment"]["timezone"],
             "thread_limits": protocol["environment"]["thread_limits"],
             "runtime_control": runtime_environment,
+            "authoritative_runtime": authoritative_runtime,
         },
         "git": source_state,
         "frozen_input": input_receipt,
+        "dependency_lock": dependency_lock,
+        "dependency_closure": dependency_closure,
         "dependencies": dependencies,
         "source_artifacts": artifacts,
         "source_chain_sha256": canonical_sha256(artifacts),
@@ -947,10 +1046,13 @@ def render_markdown(capsule: dict[str, Any]) -> str:
         f"- Dependency versions matched: `{summary['dependency_version_match_count']}/{summary['dependency_count']}`",
         f"- Scoped SBOM components: `{summary['sbom_component_count']}`",
         f"- Deterministic environment matched: `{str(summary['deterministic_environment_match']).lower()}`",
+        f"- Authoritative runtime matched: `{str(summary['authoritative_runtime_match']).lower()}`",
+        f"- Installed dependency closure matched lock: `{str(summary['dependency_closure_exact_match']).lower()}`",
         f"- Frozen input passed: `{str(summary['frozen_input_passed']).lower()}`",
         f"- Relevant source clean: `{str(summary['relevant_source_clean']).lower()}`",
         f"- Clean-runner replay: `{str(summary['clean_runner_replay']).lower()}`",
-        f"- Artifact hash lock complete: `{str(summary['artifact_hash_lock_complete']).lower()}`",
+        f"- Artifact hash lock complete for authoritative runner: `{str(summary['artifact_hash_lock_complete']).lower()}`",
+        f"- Cross-platform artifact hash lock complete: `{str(summary['cross_platform_artifact_hash_lock_complete']).lower()}`",
         f"- External validation complete: `{str(summary['external_validation_complete']).lower()}`",
         f"- Agency certification complete: `{str(summary['agency_certification_complete']).lower()}`",
         f"- Fixture tests executed: `{str(summary['fixture_tests_executed']).lower()}`",
@@ -999,6 +1101,10 @@ def render_markdown(capsule: dict[str, Any]) -> str:
         [
             "## Supply-Chain Boundary",
             "",
+            f"- Dependency lock verification: `{capsule['dependency_lock']['status']}`",
+            f"- Authoritative target: `{capsule['dependency_lock']['scope_boundary']}`",
+            f"- Locked packages: `{capsule['dependency_lock']['locked_package_count']}`",
+            f"- Lock SHA-256: `{capsule['dependency_lock']['requirements_lock_sha256']}`",
             f"- {capsule['known_gap']}",
             "- The CycloneDX inventory covers the reviewer suite, not every component in the wider repository or deployed service.",
             "",

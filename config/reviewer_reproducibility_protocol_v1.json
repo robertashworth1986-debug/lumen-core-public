@@ -28,6 +28,16 @@
       "name": "CISA 2025 Minimum Elements for a Software Bill of Materials",
       "url": "https://www.cisa.gov/sites/default/files/2025-08/2025_CISA_SBOM_Minimum_Elements.pdf",
       "use": "Informative public-comment-draft reference for component identity and dependency relationships. The emitted inventory is scoped to the reviewer suite and is not a complete product SBOM."
+    },
+    {
+      "name": "pip Secure Installs",
+      "url": "https://pip.pypa.io/en/stable/topics/secure-installs/",
+      "use": "Primary installer guidance for all-or-nothing hash checking, exact transitive pins, and binary-only installation."
+    },
+    {
+      "name": "uv pip compile",
+      "url": "https://docs.astral.sh/uv/pip/compile/",
+      "use": "Primary resolver documentation for the target-specific, hash-emitting lock generation command recorded in the lock header."
     }
   ],
   "environment": {
@@ -40,8 +50,31 @@
       "MKL_NUM_THREADS": "1"
     },
     "requirements_path": "requirements-reviewer.txt",
-    "artifact_hash_lock_complete": false,
-    "artifact_hash_lock_gap": "Package versions are exact-pinned, but transitive wheel and source-distribution hashes are not yet locked across supported operating systems."
+    "requirements_lock_path": "requirements-reviewer-ubuntu-py311.lock",
+    "requirements_lock_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18",
+    "requirements_lock_hash_mode": "utf8_lf",
+    "requirements_lock_package_count": 18,
+    "requirements_lock_verifier_path": "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+    "authoritative_runner": {
+      "github_image": "ubuntu-24.04",
+      "system": "Linux",
+      "machine": "x86_64",
+      "python": "3.11.9"
+    },
+    "requirements_lock_resolver": {
+      "name": "uv",
+      "version": "0.11.28",
+      "python": "3.11.9",
+      "target_platform": "x86_64-unknown-linux-gnu",
+      "source_builds_allowed": false
+    },
+    "target_required_transitive": {
+      "nvidia-nccl-cu12": "2.30.7"
+    },
+    "artifact_hash_lock_complete": true,
+    "artifact_hash_lock_scope": "Complete for the authoritative Ubuntu 24.04 x86-64 CPython 3.11.9 reviewer runner only.",
+    "cross_platform_artifact_hash_lock_complete": false,
+    "artifact_hash_lock_gap": "Other operating systems and architectures are not covered by this receipt until separately resolved, hash-locked, and replayed."
   },
   "dependencies": [
     {"distribution": "lightgbm", "version": "4.6.0", "import_name": "lightgbm", "relationship": "direct"},
@@ -142,13 +175,18 @@
     "tests/test_eia_grid_residual_moe_benchmark.py",
     "tests/test_mda_control_mapping_open_set_benchmark.py",
     "tests/test_faa_sdr_10k_benchmark.py",
+    "tests/test_reviewer_dependency_lock.py",
     "tests/test_reviewer_reproducibility_capsule.py",
     "-k",
-    "not frozen_eia_panel_and_result_manifests_are_hash_valid_and_claim_safe and not published_receipt_reconciles_hashes_assertions_and_public_projection"
+    "not frozen_eia_panel_and_result_manifests_are_hash_valid_and_claim_safe and not published_receipt_reconciles_hashes_assertions_and_public_projection and not sbom_has_scoped_component_identity_and_dependency_relationships and not markdown_reports_failures_and_unmet_external_gates_plainly"
   ],
   "control_paths": [
+    ".gitignore",
     ".github/workflows/reviewer-reproducibility.yml",
     "README.md",
+    "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+    "requirements-reviewer-ubuntu-py311.lock",
+    "tests/test_reviewer_dependency_lock.py",
     "tests/test_reviewer_reproducibility_capsule.py"
   ],
   "excluded_full_replays": [

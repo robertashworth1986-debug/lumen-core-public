@@ -32,7 +32,20 @@ def test_protocol_is_frozen_version_pinned_and_claim_bounded():
     assert protocol["schema"] == "reviewer_reproducibility_protocol.v1"
     assert protocol["protocol_id"] == "LUMENCORE_REVIEWER_REPRODUCIBILITY_20260714"
     assert protocol["environment"]["python"] == "3.11.9"
-    assert protocol["environment"]["artifact_hash_lock_complete"] is False
+    environment = protocol["environment"]
+    assert environment["artifact_hash_lock_complete"] is True
+    assert environment["cross_platform_artifact_hash_lock_complete"] is False
+    assert environment["requirements_lock_package_count"] == 18
+    assert environment["requirements_lock_resolver"]["target_platform"] == (
+        "x86_64-unknown-linux-gnu"
+    )
+    assert environment["requirements_lock_resolver"]["source_builds_allowed"] is False
+    assert environment["authoritative_runner"] == {
+        "github_image": "ubuntu-24.04",
+        "system": "Linux",
+        "machine": "x86_64",
+        "python": "3.11.9",
+    }
     assert len(protocol["dependencies"]) == 8
     assert len(protocol["suites"]) == 3
     assert {row["runner"] for row in protocol["suites"]} == {
@@ -59,6 +72,8 @@ def test_protocol_is_frozen_version_pinned_and_claim_bounded():
     assert "tolerance" not in residual["expected"]
     fixture_filter = protocol["fixture_test_command"][-1]
     assert "not published_receipt_reconciles_hashes" in fixture_filter
+    assert "not sbom_has_scoped_component_identity" in fixture_filter
+    assert "not markdown_reports_failures" in fixture_filter
 
     pins = {
         line.split("==", 1)[0]: line.split("==", 1)[1]
@@ -76,6 +91,9 @@ def test_workflow_excludes_checksum_manifest_from_its_own_hash_set():
     workflow = WORKFLOW.read_text(encoding="utf-8")
 
     assert workflow.count('- "README.md"') == 2
+    assert workflow.count('- "requirements-reviewer-ubuntu-py311.lock"') == 2
+    assert "--require-hashes --only-binary=:all:" in workflow
+    assert "VERIFY_REVIEWER_DEPENDENCY_LOCK.py" in workflow
     assert "-type f ! -name SHA256SUMS -print0" in workflow
     assert "LC_ALL=C sort -z" in workflow
     assert (
@@ -127,6 +145,42 @@ def test_materialized_panel_is_scoped_verified_and_removed(tmp_path, monkeypatch
     assert not target.exists()
 
 
+def test_authoritative_runtime_gate_requires_linux_x86_64_python_3119(monkeypatch):
+    module = load_module()
+    protocol = module.load_protocol()
+    monkeypatch.setattr(module.platform, "system", lambda: "Linux")
+    monkeypatch.setattr(module.platform, "machine", lambda: "x86_64")
+    monkeypatch.setattr(module.platform, "python_version", lambda: "3.11.9")
+
+    receipt = module.authoritative_runtime_receipt(protocol)
+
+    assert receipt["matches"] is True
+    assert all(receipt["checks"].values())
+
+    monkeypatch.setattr(module.platform, "system", lambda: "Windows")
+    assert module.authoritative_runtime_receipt(protocol)["matches"] is False
+
+
+def test_dependency_closure_gate_rejects_missing_or_unexpected_packages():
+    module = load_module()
+    dependency_lock = {"locked_packages": {"alpha": "1.0", "beta": "2.0"}}
+    exact_sbom = {
+        "components": [
+            {"name": "Alpha", "version": "1.0", "purl": "pkg:pypi/alpha@1.0"},
+            {"name": "beta", "version": "2.0", "purl": "pkg:pypi/beta@2.0"},
+        ]
+    }
+
+    assert module.dependency_closure_receipt(dependency_lock, exact_sbom)["passed"]
+
+    exact_sbom["components"].append(
+        {"name": "gamma", "version": "3.0", "purl": "pkg:pypi/gamma@3.0"}
+    )
+    receipt = module.dependency_closure_receipt(dependency_lock, exact_sbom)
+    assert receipt["passed"] is False
+    assert receipt["unexpected_packages"] == ["gamma"]
+
+
 def test_failed_suite_receipt_is_bounded_and_redacts_local_paths():
     module = load_module()
     suite = {
@@ -173,7 +227,18 @@ def test_published_receipt_reconciles_hashes_assertions_and_public_projection():
     assert receipt["summary"]["dependency_versions_exact_match"] is True
     assert receipt["summary"]["sbom_component_count"] >= 8
     assert receipt["summary"]["deterministic_environment_match"] is True
-    assert receipt["summary"]["artifact_hash_lock_complete"] is False
+    assert receipt["summary"]["authoritative_runtime_match"] is True
+    assert receipt["summary"]["dependency_closure_exact_match"] is True
+    assert receipt["summary"]["artifact_hash_lock_complete"] is True
+    assert receipt["summary"]["cross_platform_artifact_hash_lock_complete"] is False
+    assert receipt["summary"]["locked_package_count"] == 18
+    assert receipt["dependency_lock"]["passed"] is True
+    assert receipt["dependency_lock"]["status"] == (
+        "AUTHORITATIVE_RUNNER_LOCK_VALID"
+    )
+    assert receipt["dependency_lock"]["requirements_lock_sha256"] == (
+        receipt["summary"]["dependency_lock_sha256"]
+    )
     assert receipt["summary"]["external_validation_complete"] is False
     assert receipt["summary"]["agency_certification_complete"] is False
     assert "post-observation" in receipt["protocol_amendment"][
@@ -264,6 +329,11 @@ def test_markdown_reports_failures_and_unmet_external_gates_plainly():
     assert "External validation complete: `false`" in rendered
     assert "Agency certification complete: `false`" in rendered
     assert "Deterministic environment matched: `true`" in rendered
+    assert "Authoritative runtime matched: `true`" in rendered
+    assert "Installed dependency closure matched lock: `true`" in rendered
+    assert "Artifact hash lock complete for authoritative runner: `true`" in rendered
+    assert "Cross-platform artifact hash lock complete: `false`" in rendered
+    assert "Dependency lock verification: `AUTHORITATIVE_RUNNER_LOCK_VALID`" in rendered
     assert "Fixture tests executed: `" in rendered
     assert "Fixture tests passed: `" in rendered
     assert "## Protocol Amendment" in rendered

@@ -116,15 +116,19 @@ python -m pytest -q tests/test_locked_source_baseline_replay_sweep.py
 The bounded reviewer capsule packages the frozen public EIA panel in deterministic gzip form, exact-pins the direct Python environment, emits a scoped CycloneDX dependency inventory, replays two measured EIA holdouts and one deterministic MDA falsification lane, and records every expected fact as a machine assertion.
 
 ```powershell
-python -m pip install --requirement requirements-reviewer.txt
+python code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py
+python -m pip install --require-hashes --only-binary=:all: --requirement requirements-reviewer-ubuntu-py311.lock
+python -m pip check
 python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests
 ```
+
+[`VERIFY_REVIEWER_DEPENDENCY_LOCK.py`](code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py) fails closed unless the authoritative target, resolver header, 18-package closure, lock digest, direct pins, required Linux transitive dependency, and CI enforcement flags all reconcile.
 
 The corresponding GitHub Actions workflow runs on a clean Ubuntu runner with read-only repository permissions and publishes the receipt, logs, SBOM, and SHA-256 checksum list as a workflow artifact. Start with [`REVIEWER_REPRODUCIBILITY_CAPSULE_2026-07-14.md`](docs/REVIEWER_REPRODUCIBILITY_CAPSULE_2026-07-14.md) and the frozen protocol in [`reviewer_reproducibility_protocol_v1.json`](config/reviewer_reproducibility_protocol_v1.json).
 
 The protocol preserves two failed clean-runner attempts. The second passed 30/31 assertions and exposed a 0.4269% XGBoost CPU-platform MASE drift while preserving champion identity, coverage, comparison count, and gate outcomes. A disclosed post-observation amendment now allows at most 1% relative drift for that metric only; all structural and decision assertions remain exact, and each receipt keeps the exact measured value.
 
-This capsule does not bundle the roughly 114 MB FAA SDR source corpus or the wider local/private source universe. Dependency versions are exact-pinned, but cross-platform wheel and source-distribution hashes are not yet fully locked. A green CI run is software reproducibility evidence, not independent scientific validation, security certification, agency approval, or field performance.
+This capsule does not bundle the roughly 114 MB FAA SDR source corpus or the wider local/private source universe. The authoritative Ubuntu 24.04 x86-64 CPython 3.11.9 runner has an exact, SHA-256-verified, binary-only lock for all 18 resolved packages. Other operating systems and architectures are not covered until separately resolved, hash-locked, and replayed. A green CI run is software reproducibility evidence, not independent scientific validation, security certification, agency approval, or field performance.
 
 ## External Validation Authority
 

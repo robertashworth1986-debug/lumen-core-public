@@ -15,6 +15,7 @@ OUTPUT = (
     / "eia_router_validation_authority_docket_20260714.json"
 )
 MARKDOWN = ROOT / "docs" / "EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md"
+WORKFLOW = ROOT / ".github" / "workflows" / "external-validation-docket.yml"
 
 
 def load_module():
@@ -49,6 +50,14 @@ def test_protocol_uses_official_sources_and_keeps_authority_external():
     assert "docs/REVIEWER_START_HERE.md" in portable_paths
     assert "tests/test_github_workflow_governance.py" in portable_paths
     assert config["evidence_lane"]["runtime_projection_path"] in portable_paths
+
+
+def test_every_portable_input_retriggers_docket_verification():
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+
+    for path in config["portable_input_paths"]:
+        assert workflow.count(f'- "{path}"') == 2, path
 
 
 def test_archived_clean_runner_bundle_is_complete_and_hash_verified():

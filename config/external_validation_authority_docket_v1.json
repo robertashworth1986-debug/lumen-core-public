@@ -30,7 +30,11 @@
   },
   "portable_input_paths": [
     ".gitattributes",
+    ".gitignore",
     ".github/workflows/external-validation-docket.yml",
+    ".github/workflows/reviewer-reproducibility.yml",
+    "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
+    "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
     "code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py",
     "config/eia_grid_prospective_hybrid_router_protocol_v1.json",
     "config/external_evaluator_acceptance_template_v1.json",
@@ -43,8 +47,12 @@
     "docs/FIELD_VALIDATION_BUYER_PILOT_PACKET_2026-06-25.md",
     "docs/REVIEWER_START_HERE.md",
     "docs/REVIEWER_REPRODUCIBILITY_CAPSULE_2026-07-14.md",
+    "requirements-reviewer.txt",
+    "requirements-reviewer-ubuntu-py311.lock",
     "tests/test_external_evaluator_acceptance.py",
-    "tests/test_github_workflow_governance.py"
+    "tests/test_github_workflow_governance.py",
+    "tests/test_reviewer_dependency_lock.py",
+    "tests/test_reviewer_reproducibility_capsule.py"
   ],
   "evaluator_acceptance_package": {
     "template_path": "config/external_evaluator_acceptance_template_v1.json",
