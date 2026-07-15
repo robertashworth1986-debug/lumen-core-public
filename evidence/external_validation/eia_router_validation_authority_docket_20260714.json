@@ -1,7 +1,7 @@
 {
   "claim_boundary": "This docket proves only the identity and readiness of a bounded external-validation process. It does not prove Level 4 or Level 5 maturity, independent validation, agency approval, NIST certification, field performance, grid reliability improvement, realized savings, patent validity or scope, production readiness, trading performance, or universal model superiority.",
   "clean_runner_bundle": {
-    "archive_path": "evidence/reproducibility/github_run_29378633693",
+    "archive_path": "evidence/reproducibility/github_run_29378952661",
     "archive_privacy_pattern_hit_count": 0,
     "available": true,
     "checksum_entry_count": 6,
@@ -23,11 +23,11 @@
         "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
-        "actual_sha256": "06b3ce40c7c8acf35892af8e3c4ef37467c24a2674e36bd19096afa1e4032f1e",
+        "actual_sha256": "847760757f232c77fceaacab9a14d2d27ed59da6602f6b9114d6869eb1fb0f0f",
         "bytes": 113,
         "passed": true,
         "path": "logs/fixture_tests.log",
-        "sha256": "06b3ce40c7c8acf35892af8e3c4ef37467c24a2674e36bd19096afa1e4032f1e"
+        "sha256": "847760757f232c77fceaacab9a14d2d27ed59da6602f6b9114d6869eb1fb0f0f"
       },
       {
         "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -37,18 +37,18 @@
         "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       {
-        "actual_sha256": "bfe793d0fdc732ceddecfb2131e2a526b8897a75bf37cb3299e0f1f844692a32",
-        "bytes": 26069,
+        "actual_sha256": "99554ce67f1d357aae9ddc74fe31d43087e2dfef35d1638cbf5571a1c8380048",
+        "bytes": 26070,
         "passed": true,
         "path": "reviewer_reproducibility_receipt.json",
-        "sha256": "bfe793d0fdc732ceddecfb2131e2a526b8897a75bf37cb3299e0f1f844692a32"
+        "sha256": "99554ce67f1d357aae9ddc74fe31d43087e2dfef35d1638cbf5571a1c8380048"
       },
       {
-        "actual_sha256": "b192efd7c187f511498633231fc80db08ee6fc77979545f9ea4de09b360c82db",
+        "actual_sha256": "c2600ca9f151e89920cf11a938a035620f00d4adf24d4e34f59f8f8c1740d7af",
         "bytes": 12883,
         "passed": true,
         "path": "reviewer_suite_sbom.cdx.json",
-        "sha256": "b192efd7c187f511498633231fc80db08ee6fc77979545f9ea4de09b360c82db"
+        "sha256": "c2600ca9f151e89920cf11a938a035620f00d4adf24d4e34f59f8f8c1740d7af"
       }
     ],
     "identity_checks": {
@@ -63,13 +63,13 @@
       "source_clean": true,
       "status_passed": true
     },
-    "manifest_sha256": "0091f8c3774e998fd0bef5af67f866979a6ea909206951f5065053c488f5abf0",
+    "manifest_sha256": "c6565abc9c8884d2eed189b3cc56342d2749458549a2419a33d433fe52437c53",
     "receipt_projection": {
       "agency_certification_complete": false,
       "assertion_count": 31,
       "assertion_pass_count": 31,
-      "capsule_sha256": "4d1a37fcb70bcb0bf7562c2867a97b0b14a919a13f8e7c2ece8b29360d93ba26",
-      "commit": "86670270ab243d894169f571e58687e4f9242f7c",
+      "capsule_sha256": "72f696fb8c9a330b207ab46f71760918fdf77e4a2cf1858fe4bc540ea61d32f2",
+      "commit": "f8a483c5fd5d78977b0d31619fae546358309d35",
       "external_validation_complete": false,
       "sbom_component_count": 18,
       "status": "BOUNDED_REPRODUCIBILITY_PASS",
@@ -78,7 +78,7 @@
     },
     "verified": true
   },
-  "docket_sha256": "0e91b28c839971727503980518da95c828274c77a1fa502425daf9db7cc3c4e8",
+  "docket_sha256": "9a1660c55ebfa341abe425ba048ee1b2ed831a7cf9c14f54d2737fd1a99fda9d",
   "evaluator_acceptance": {
     "accepted_protocol_sha256": null,
     "accepted_utc": null,
@@ -181,7 +181,7 @@
     "source_publisher": "U.S. Energy Information Administration",
     "source_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/"
   },
-  "generated_utc": "2026-07-15T00:21:41.927119+00:00",
+  "generated_utc": "2026-07-15T00:27:34.540682+00:00",
   "maturity": {
     "current_supported_level": 3,
     "external_validation_complete": false,
@@ -236,13 +236,13 @@
       "remaining_gap": "No external organization has adopted an incident, escalation, or production-use decision process for this experiment."
     }
   ],
-  "portable_input_chain_sha256": "098bce84d23333cdd29c68cd93d482ff12ca49152d240d32f2c3e72e66227d7e",
+  "portable_input_chain_sha256": "d5fa351f4c12c24e910e118d87b9844e9523b45f792ef7c039fbd5e7992bff74",
   "portable_inputs": [
     {
       "bytes": 9722,
       "hash_mode": "utf8_lf",
       "path": "config/external_validation_authority_docket_v1.json",
-      "sha256": "c837170a924ef031eda0e8a9c013b458661ef1709d2502c047d5c60a9d992143"
+      "sha256": "e8248fc3f703d57708a54c468d8cf30cffa5a657d4ffb04744fb087e09304217"
     },
     {
       "bytes": 31959,
@@ -272,7 +272,7 @@
       "bytes": 4678,
       "hash_mode": "utf8_lf",
       "path": ".github/workflows/external-validation-docket.yml",
-      "sha256": "e22f372ac0cac9b1a213c24fba2f8dce21e57ef40261feb7802fee1125f5e694"
+      "sha256": "974957d8e178b79a2ca180c3a1fdec27961b73992ecca940050f1d28489d9dff"
     },
     {
       "bytes": 4832,
@@ -317,10 +317,10 @@
       "sha256": "49582234ce107762f56a734b94d426e53fcec92e275b527a1a8f39a9822fc8d1"
     },
     {
-      "bytes": 26069,
+      "bytes": 26070,
       "hash_mode": "utf8_lf",
       "path": "dashboard/data/reviewer_reproducibility_capsule.json",
-      "sha256": "bfe793d0fdc732ceddecfb2131e2a526b8897a75bf37cb3299e0f1f844692a32"
+      "sha256": "99554ce67f1d357aae9ddc74fe31d43087e2dfef35d1638cbf5571a1c8380048"
     },
     {
       "bytes": 1469,
@@ -362,7 +362,7 @@
       "bytes": 8094,
       "hash_mode": "utf8_lf",
       "path": "docs/REVIEWER_REPRODUCIBILITY_CAPSULE_2026-07-14.md",
-      "sha256": "1b3d371acb3705fc387331b86f17bb103dfdc8c50ca4d74e8bbfc880fc35c0bb"
+      "sha256": "33171b24b3045cd0e4c558b16cd6d23af508c50946812ba6a8dc868ec19ef6ba"
     },
     {
       "bytes": 122,
