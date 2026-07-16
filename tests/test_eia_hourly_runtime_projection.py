@@ -148,6 +148,6 @@ def test_committed_projection_is_protocol_bound_and_public_safe() -> None:
         protocol_sha256=MODULE.sha256_file(protocol_path),
     )
     assert projection["sample_state"]["prediction_count"] == 95
-    assert projection["sample_state"]["settlement_count"] == 78
+    assert projection["sample_state"]["settlement_count"] == 84
     assert projection["sample_state"]["common_settled_hour_count"] == 0
     assert projection["descriptive_metrics"]["sample_gate_open"] is False

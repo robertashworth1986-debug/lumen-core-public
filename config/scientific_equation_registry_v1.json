@@ -20,7 +20,7 @@
     "docs/EIA_GRID_RESIDUAL_MOE_BENCHMARK_2026-07-13.md": {"role": "evidence_boundary", "sha256": "5aca894ad130d863b6431a46c47160105dee79fc027fa5c0b53dcff1b579e2f9"},
     "config/eia_grid_prospective_hourly_router_protocol_v1.json": {"role": "protocol", "sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5"},
     "evidence/external_validation/eia_grid_hourly_router_design_freeze_20260714.json": {"role": "evidence", "sha256": "44dc96407803b736893843a0edf86d736170ed459a215be98d4452ec900d7ea5"},
-    "evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json": {"role": "evidence", "sha256": "661f7437ba862880c69a54f3d0d1b3394ab885fcd6a705c558c381b4f7383778"},
+    "evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json": {"role": "evidence", "sha256": "751f5d07455d6feb48a07e7578333b3d0443dabfe1b6a401cad97aa05f29eb4e"},
     "docs/DICE_CONSTRAINT_CONTRACT_BENCHMARK_2026-06-18.md": {"role": "evidence_boundary", "sha256": "f662fb79946475053e3cbd30929acfb5a692f40772894e2e370fce4a3480aae8"},
     "docs/NV065_ADAPTIVE_SENSOR_TASKING_VALIDATION_2026-06-19.md": {"role": "evidence_boundary", "sha256": "cb75a70a13927b183a2c80a91ade36e2a083ee837f4c11d79f7f66d51a7247c2"},
     "docs/MISSIONWEAVE_GENERATED_WORKFLOW_VALIDATION_2026-06-13.md": {"role": "evidence_boundary", "sha256": "64f7006b19a8eed3ba3eab27fc513ab602b03daacd20849614e0690fb25f9ad0"},
