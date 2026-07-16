@@ -10,6 +10,8 @@ $RepoRoot = Split-Path -Parent $PSScriptRoot
 $Runner = Join-Path $RepoRoot "code\eia_grid_all_authority_direct_hourly_router.py"
 $OutputDir = Join-Path $RepoRoot "out\eia_grid_all_authority_direct_hourly_router"
 $SchedulerOutput = Join-Path $OutputDir "scheduler_cycle_latest.json"
+$SchedulerOutputTemp = Join-Path $OutputDir "scheduler_cycle_latest.json.tmp"
+$SchedulerStderrTemp = Join-Path $OutputDir "scheduler_stderr_latest.log.tmp"
 $SchedulerErrors = Join-Path $OutputDir "scheduler_errors.log"
 $Arguments = @($Runner, "--timeout", $TimeoutSeconds)
 
@@ -35,16 +37,25 @@ New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 Push-Location $RepoRoot
 try {
     if ($Quiet) {
-        $Output = & $PythonExe @Arguments 2>&1
+        Remove-Item -LiteralPath $SchedulerOutputTemp -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $SchedulerStderrTemp -Force -ErrorAction SilentlyContinue
+        & $PythonExe @Arguments 1> $SchedulerOutputTemp 2> $SchedulerStderrTemp
         $ExitCode = $LASTEXITCODE
-        $Output | Out-File -FilePath $SchedulerOutput -Encoding utf8
+        if ($ExitCode -eq 0) {
+            Move-Item -LiteralPath $SchedulerOutputTemp -Destination $SchedulerOutput -Force
+            Remove-Item -LiteralPath $SchedulerStderrTemp -Force -ErrorAction SilentlyContinue
+        }
     }
     else {
         & $PythonExe @Arguments
         $ExitCode = $LASTEXITCODE
     }
     if ($ExitCode -ne 0) {
-        throw "All-authority direct hourly router cycle failed with exit code $ExitCode"
+        $Stderr = ""
+        if (Test-Path -LiteralPath $SchedulerStderrTemp) {
+            $Stderr = (Get-Content -LiteralPath $SchedulerStderrTemp -Raw).Trim()
+        }
+        throw "All-authority direct hourly router cycle failed with exit code $ExitCode. $Stderr"
     }
 }
 catch {
