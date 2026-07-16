@@ -1,0 +1,86 @@
+{
+  "version": "2026-07-16.live-data-no-orders.v2",
+  "promotion_stage": "live_data_no_orders",
+  "patterns": {
+    "kraken_add_order": "\\bAddOrder\\b",
+    "alpaca_orders_endpoint": "/v2/orders",
+    "ccxt_create_order": "\\bcreate_order\\s*\\("
+  },
+  "rules": [
+    {
+      "path": "code/execution/execution_orchestrator.py",
+      "classification": "read_only_monitor",
+      "required": true
+    },
+    {
+      "path": "code/auto_ticket_producer.py",
+      "classification": "validate_only_ticket_facade",
+      "required": true
+    },
+    {
+      "path": "code/ops/LIQUIDATE_ALL_TO_USD.py",
+      "classification": "manual_emergency_facade",
+      "required": true
+    },
+    {
+      "path": "code/ops/LIQUIDATE_ALL_TO_USD_legacy.py",
+      "classification": "manual_emergency_implementation",
+      "expected_git_blob_sha": "3b474075ed5cf94c6aaae7331509fea57e9c025b"
+    },
+    {
+      "path": "code/kraken_execution_legacy.py",
+      "classification": "historical_preserved",
+      "expected_git_blob_sha": "99f5037501018b4aa8c48688b7354e6303d6c3d5"
+    },
+    {
+      "path": "code/execution/live_executor_legacy.py",
+      "classification": "historical_preserved",
+      "expected_git_blob_sha": "e590d6bfdf01f4fafa3a962a47a4e3d1aac60d7d"
+    },
+    {
+      "path": "code/luma_experience_gateway_legacy.py",
+      "classification": "historical_preserved",
+      "expected_git_blob_sha": "9f4c4c542afc1a0c9f214c485b869a8fe5d7f4d4"
+    },
+    {
+      "path": "code/auto_ticket_producer_legacy.py",
+      "classification": "historical_preserved",
+      "expected_git_blob_sha": "23817f7644c2a787396e8620e07cfde28d468bb0"
+    },
+    {
+      "path": "code/kraken_swing_hunter_legacy.py",
+      "classification": "historical_preserved",
+      "expected_git_blob_sha": "db90a705dad429cccdace114ffb6ab18ee950aed"
+    },
+    {
+      "path": "code/micro_position_kraken_bot_legacy.py",
+      "classification": "historical_preserved",
+      "expected_git_blob_sha": "9c39d50a6a5e30b925e4fe15ce0b7ae2a9da26c1"
+    },
+    {
+      "path": "code/execution/execution_orchestrator_legacy.py",
+      "classification": "historical_preserved",
+      "expected_git_blob_sha": "bc4996f03fe278ddcb65ccb5e35680c370f3fe98"
+    },
+    {
+      "path": "code/execution/alpaca_paper_executor_legacy.py",
+      "classification": "historical_preserved",
+      "expected_git_blob_sha": "a0e42d06cc1fb9e48653cabb18acea3c34278640"
+    },
+    {"path": "code/kraken_execution.py", "classification": "guarded_facade"},
+    {"path": "code/execution/live_executor.py", "classification": "guarded_facade"},
+    {"path": "code/luma_experience_gateway.py", "classification": "guarded_facade"},
+    {"path": "code/kraken_swing_hunter.py", "classification": "guarded_facade"},
+    {"path": "code/micro_position_kraken_bot.py", "classification": "guarded_facade"},
+    {"path": "code/execution/order_safety_gate.py", "classification": "guard_implementation"},
+    {"path": "code/execution/alpaca_paper_executor.py", "classification": "paper_sandbox", "required": true},
+    {"path": "code/multi_exchange_paper_ticker.py", "classification": "paper_sandbox"},
+    {"path": "code/alpaca_paper_loop_builder.py", "classification": "source_builder"},
+    {"path": "code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py", "classification": "source_builder"},
+    {"path": "code/HARD_TRUTH_LIVE_MEASUREMENT_AUDIT.py", "classification": "measurement_auditor"},
+    {"path": "code/ops/AUDIT_ORDER_SUBMISSION_PATHS.py", "classification": "policy_auditor"},
+    {"path": "tests/**", "classification": "test_fixture"},
+    {"path": "code/**/*_legacy.py", "classification": "historical_preserved"},
+    {"path": "code/**/*.py.bak", "classification": "historical_backup"}
+  ]
+}

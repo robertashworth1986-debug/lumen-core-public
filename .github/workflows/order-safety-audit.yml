@@ -1,0 +1,68 @@
+name: Order Safety Promotion Gate
+
+on:
+  pull_request:
+    paths:
+      - "code/**"
+      - "config/order_submission_path_policy.json"
+      - "tests/test_order_safety*.py"
+      - ".github/workflows/order-safety-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  order-safety-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime test dependency
+        run: python -m pip install --disable-pip-version-check requests
+
+      - name: Compile safety surfaces
+        run: |
+          python -m py_compile \
+            code/execution/order_safety_gate.py \
+            code/kraken_execution.py \
+            code/execution/live_executor.py \
+            code/luma_experience_gateway.py \
+            code/auto_ticket_producer.py \
+            code/kraken_swing_hunter.py \
+            code/micro_position_kraken_bot.py \
+            code/execution/execution_orchestrator.py \
+            code/execution/alpaca_paper_executor.py \
+            code/ops/LIQUIDATE_ALL_TO_USD.py \
+            code/ops/AUDIT_ORDER_SUBMISSION_PATHS.py
+
+      - name: Run focused fail-closed tests
+        run: |
+          python tests/test_order_safety_gate.py
+          python tests/test_order_safety_facades.py
+          python tests/test_standalone_no_orders_facades.py
+          python tests/test_order_safety_promotion_lane.py
+          python tests/test_order_safety_alpaca_paper_boundary.py
+
+      - name: Audit all direct submission paths
+        run: |
+          python code/ops/AUDIT_ORDER_SUBMISSION_PATHS.py \
+            --repo-root . \
+            --output out/ops/order_submission_path_audit_latest.json
+
+      - name: Upload immutable audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: order-safety-path-audit-${{ github.sha }}
+          path: out/ops/order_submission_path_audit_latest.json
+          if-no-files-found: warn
+          retention-days: 30
