@@ -78,7 +78,7 @@
     },
     "verified": true
   },
-  "docket_sha256": "9a1660c55ebfa341abe425ba048ee1b2ed831a7cf9c14f54d2737fd1a99fda9d",
+  "docket_sha256": "eaaf5bebac1e8ab5014cfe2d33dee3b0cab05fb047c694e9f00e9725b64d6700",
   "evaluator_acceptance": {
     "accepted_protocol_sha256": null,
     "accepted_utc": null,
@@ -181,7 +181,7 @@
     "source_publisher": "U.S. Energy Information Administration",
     "source_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/"
   },
-  "generated_utc": "2026-07-15T00:27:34.540682+00:00",
+  "generated_utc": "2026-07-16T02:35:13.489680+00:00",
   "maturity": {
     "current_supported_level": 3,
     "external_validation_complete": false,
@@ -236,7 +236,7 @@
       "remaining_gap": "No external organization has adopted an incident, escalation, or production-use decision process for this experiment."
     }
   ],
-  "portable_input_chain_sha256": "d5fa351f4c12c24e910e118d87b9844e9523b45f792ef7c039fbd5e7992bff74",
+  "portable_input_chain_sha256": "d3e9f85f32e9bd54a9fb8e3c7ff6ec589addf9ded887248e36fe1ac38291db04",
   "portable_inputs": [
     {
       "bytes": 9722,
@@ -326,7 +326,7 @@
       "bytes": 1469,
       "hash_mode": "utf8_lf",
       "path": "evidence/external_validation/eia_grid_prospective_runtime_projection_20260714.json",
-      "sha256": "21ad96f772fe49bf69fa5c65ef83b83e861ff4f28de8027b6768b7f0f60fefab"
+      "sha256": "6e6e63aefbd460ffdfe7b370d30cb1fa787f9c22ad3dac8b2aa690afb347244b"
     },
     {
       "bytes": 3481,
@@ -353,10 +353,10 @@
       "sha256": "e95c3d7d88cdc732b86b28d93d7dba6db5216941c46edd2676822855e492243b"
     },
     {
-      "bytes": 4511,
+      "bytes": 4864,
       "hash_mode": "utf8_lf",
       "path": "docs/REVIEWER_START_HERE.md",
-      "sha256": "a638f7e291ad8f7a6d110592e852a9a5c18868ac024691fba64561f5239d062b"
+      "sha256": "a257bde8c7757ef728384eb4fc763749b5494fd3947dfb69998209978dfc9ad6"
     },
     {
       "bytes": 8094,
@@ -409,9 +409,9 @@
     "available": true,
     "common_settled_day_count": 0,
     "first_common_settled_date": null,
-    "generated_utc": "2026-07-15T00:16:23.619357+00:00",
+    "generated_utc": "2026-07-15T03:38:29.456402+00:00",
     "latest_common_settled_date": null,
-    "operational_receipt_sha256": "243186648d2685895d3def0d13effe62f92380c7e7568f49478e630669c05863",
+    "operational_receipt_sha256": "84bfb37e17b66b10cfe393f44610c1879998510a63660a9d6e9610b64badc7fa",
     "prediction_count": 0,
     "prediction_count_by_authority": {
       "CISO": 0,
@@ -453,7 +453,7 @@
       "SWPP": 0,
       "TVA": 0
     },
-    "snapshot_sha256": "87579a76cf8d8a19faedd664995e6521ca5c19ac9bbc6333ef52072c0817bdb5",
+    "snapshot_sha256": "fe57fc67b6377cc71699d8cdf5ee5e19c5d6f5e88d947fc9a188dde20578121e",
     "state": "WAITING_FOR_FIRST_ELIGIBLE_FORECAST"
   },
   "protocol_id": "LUMENCORE_EIA_EXTERNAL_VALIDATION_AUTHORITY_20260714",

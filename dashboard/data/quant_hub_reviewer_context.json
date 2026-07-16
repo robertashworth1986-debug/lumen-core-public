@@ -1,6 +1,6 @@
 {
   "schema": "quant_hub_reviewer_context.v1",
-  "generated_utc": "2026-07-14T10:47:29.468797+00:00",
+  "generated_utc": "2026-07-16T02:35:13.536100+00:00",
   "identity": {
     "repository_display_name": "Quant Hub Repo",
     "technical_platform": "LumenCore",
@@ -15,7 +15,7 @@
     "highest_repository_wide_supported_level": 3,
     "level_5_attained": false,
     "level_5_gate": "No Level 5 claim is allowed without a named external validator, independent data or field setting, accepted metric, dated receipt, and preserved artifact hashes.",
-    "summary": "Level 3 source-conditioned replay and frozen EIA holdout evidence are supported. The EIA residual candidate has 6/6 Holm-positive internal comparisons, but its full protocol gate is CLOSED. Level 4 prospective evidence is still waiting for eligible EIA forecasts and settlements. Level 5 independent external validation has not been attained."
+    "summary": "Level 3 source-conditioned replay and frozen EIA holdout evidence are supported. The EIA residual candidate has 6/6 Holm-positive internal comparisons, but its full protocol gate is CLOSED. The frozen hourly successor has 95 sealed predictions and 72 settlements, but 0 common settled hours and no open sample gate. Level 4 and Level 5 have not been attained."
   },
   "proof_cards": [
     {
@@ -317,7 +317,7 @@
     },
     {
       "proof_id": "eia_prospective_router",
-      "title": "Frozen EIA prospective router",
+      "title": "Preserved predecessor daily EIA prospective router",
       "evidence_class": "prospective_protocol",
       "attained_maturity_level": 1,
       "target_maturity_level": 4,
@@ -332,6 +332,34 @@
         "durability_180_days_ready": false
       },
       "claim_boundary": "A passing result supports prospective public-data evidence for a frozen hybrid forecast router. It does not establish patent validity or scope, utility field control, realized savings, grid reliability improvement, production readiness, trading edge, or universal model superiority."
+    },
+    {
+      "proof_id": "eia_prospective_hourly_router",
+      "title": "Frozen EIA prospective hourly router",
+      "evidence_class": "prospective_collection_incomplete",
+      "attained_maturity_level": 1,
+      "target_maturity_level": 4,
+      "status": "PROSPECTIVE_COLLECTION_ACTIVE",
+      "facts": {
+        "prediction_count": 95,
+        "settlement_count": 72,
+        "common_settled_hour_count": 0,
+        "preliminary_ready": false,
+        "confirmatory_ready": false,
+        "durability_ready": false,
+        "promotion_evaluation_complete": false,
+        "preliminary_threshold_common_hours_per_authority": 168,
+        "confirmatory_threshold_common_hours_per_authority": 720,
+        "durability_threshold_common_hours_per_authority": 2160,
+        "current_best_fixed_candidate": "xgboost_residual",
+        "router_skill_vs_current_best_fixed": 0.005950193235611523,
+        "operational_receipt_sha256": "c316c4ba5fc8aa097a7ec062133a147c51b78cdac4320c89add69776ff4e3ad7",
+        "prediction_terminal_sha256": "daa839587b2dcd53b245ebef587f40f89518de457505c0e20f8e1a4480d7bbad",
+        "settlement_terminal_sha256": "f633e0d242ae07508afd4d77012e12e6cf5229d92631ab3404de8bbbb95a7b35",
+        "runtime_projection_source_sha256": "9c6f9938100c929c10c03d29f1d5bfe4673f2974e888d78223f18ce63e4a9670",
+        "protocol_source_sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5"
+      },
+      "claim_boundary": "A passing result would support bounded prospective public-data evidence for a frozen hourly specialist router. It does not establish patent validity or scope, utility control, realized savings, grid reliability improvement, production readiness, trading edge, or universal model superiority."
     },
     {
       "proof_id": "mda_synthetic_feasibility_v1",
@@ -413,7 +441,8 @@
       "The local system-health history audit preserves sparse one-second point observations and custody defects across 30/90/180-day windows; it is not hardware-degradation proof and names no independent evaluator.",
       "The optional private-universe receipt federates existing manifests and represents no fresh full universe scan, manifest-referenced file byte read, broad-root scan, archive extraction, or live reconciliation; only individually authorized explicit files may be read for SHA-256, and candidate lane counts remain metadata heuristics rather than content validation. The receipt names no independent evaluator.",
       "The development-selected EIA residual hybrid has 6/6 Holm-positive internal comparisons on its frozen internal holdout, but the full protocol gate is CLOSED.",
-      "The EIA prospective protocol is frozen and operational but has not produced an eligible prediction or settlement in this snapshot.",
+      "The predecessor daily EIA prospective protocol is preserved at zero predictions and zero settlements because its seal timing could not be weakened or backfilled.",
+      "The frozen hourly successor has 95 sealed predictions and 72 settlements, but only 0 common settled hours; its preliminary, confirmatory, durability, and promotion gates remain closed.",
       "A prior external proof packet reports all copied artifact hashes verified."
     ],
     "blocked_without_new_evidence": {
@@ -453,8 +482,8 @@
     },
     {
       "decision": "Assess prospective readiness",
-      "evidence": "Inspect the frozen EIA residual holdout, its Holm-adjusted internal comparisons, the closed composite gate, the prospective protocol, scheduler receipts, and zero-count waiting state.",
-      "remaining_gate": "Raise minimum common holdout coverage from 90 to 150 days without post-holdout tuning, satisfy the authority robustness gate, then complete the 30-, 90-, and 180-day prospective settlement gates."
+      "evidence": "Inspect the frozen EIA residual holdout, its Holm-adjusted internal comparisons, the closed composite gate, the preserved zero-count daily predecessor, the hourly successor protocol, and its prediction, settlement, and terminal-chain receipts.",
+      "remaining_gate": "Raise minimum common holdout coverage from 90 to 150 days without post-holdout tuning, satisfy the authority robustness gate, then reach the hourly successor's 168, 720, and 2160 common-hour gates per authority without route changes or backfill."
     },
     {
       "decision": "Assess economic relevance",
@@ -470,8 +499,8 @@
   "next_validation_actions": [
     {
       "priority": 1,
-      "action": "Keep the frozen EIA prospective router running without changing its promotion protocol.",
-      "success_receipt": "Hashed predictions, settlements, and preregistered 30/90/180-day gate outputs."
+      "action": "Keep the frozen EIA hourly successor running without changing routes, features, candidates, or promotion gates.",
+      "success_receipt": "Hashed predictions, settlements, common-hour coverage, terminal chains, and preregistered 168/720/2160-hour gate outputs."
     },
     {
       "priority": 2,
@@ -511,6 +540,8 @@
     "code/ops/BUILD_LOCKED_SOURCE_BASELINE_REPLAY_SWEEP.py",
     "code/eia_grid_residual_moe_benchmark.py",
     "code/eia_grid_prospective_router_ops.py",
+    "code/eia_grid_prospective_hourly_router.py",
+    "code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py",
     "code/mda_control_mapping_feasibility.py",
     "code/mda_control_mapping_open_set_benchmark.py",
     "code/ops/STAGE_EXTERNAL_PROOF_VAULT.py",
@@ -518,16 +549,30 @@
     "tests/test_locked_source_baseline_replay_sweep.py",
     "tests/test_eia_grid_residual_moe_benchmark.py",
     "tests/test_eia_grid_prospective_router_ops.py",
+    "tests/test_eia_grid_prospective_hourly_router.py",
+    "tests/test_eia_hourly_runtime_projection.py",
     "tests/test_mda_control_mapping_feasibility.py",
     "tests/test_mda_control_mapping_open_set_benchmark.py",
     "tests/test_external_proof_vault.py"
   ],
   "source_artifacts": [
     {
+      "source_id": "eia_hourly_protocol",
+      "path": "config/eia_grid_prospective_hourly_router_protocol_v1.json",
+      "bytes": 8463,
+      "sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5"
+    },
+    {
+      "source_id": "eia_hourly_runtime_projection",
+      "path": "evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json",
+      "bytes": 2824,
+      "sha256": "9c6f9938100c929c10c03d29f1d5bfe4673f2974e888d78223f18ce63e4a9670"
+    },
+    {
       "source_id": "eia_prospective_router",
       "path": "out/eia_grid_prospective_hybrid_router/prospective_status_latest.json",
       "bytes": 1989,
-      "sha256": "9dd01ede40c4006d7353cea680ab9ca2a85ee3b8f8fc5e6136cd34e75fd99d46"
+      "sha256": "fe57fc67b6377cc71699d8cdf5ee5e19c5d6f5e88d947fc9a188dde20578121e"
     },
     {
       "source_id": "eia_residual_benchmark",
@@ -614,7 +659,7 @@
       "sha256": "f87df88b282493cf511e441a6272cc60e2131a27ca93add662691aeb0d27f49a"
     }
   ],
-  "source_input_chain_sha256": "ba68902253b357cacb8be909ef3e5d5509785c9289dd92994d245b0d12f0ea19",
+  "source_input_chain_sha256": "631be15576b4c6a2e110288e56b695be7cd39d7041da9845aac12a611572f11b",
   "outputs": {
     "machine_readable": "out/ops/quant_hub_reviewer_context_latest.json",
     "dashboard_mirror": "dashboard/data/quant_hub_reviewer_context.json",

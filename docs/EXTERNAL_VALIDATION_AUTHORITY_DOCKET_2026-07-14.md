@@ -1,6 +1,6 @@
 # External Validation Authority Docket
 
-Generated UTC: `2026-07-15T00:27:34.540682+00:00`
+Generated UTC: `2026-07-16T02:35:13.489680+00:00`
 
 This docket proves only the identity and readiness of a bounded external-validation process. It does not prove Level 4 or Level 5 maturity, independent validation, agency approval, NIST certification, field performance, grid reliability improvement, realized savings, patent validity or scope, production readiness, trading performance, or universal model superiority.
 
@@ -9,7 +9,7 @@ This docket proves only the identity and readiness of a bounded external-validat
 - Status: `PROSPECTIVE_COLLECTION_ACTIVE_AWAITING_FIRST_ELIGIBLE_SEAL`
 - Requested decision: Accept or decline the independent technical evaluator role for the frozen prospective experiment.
 - Fundable scope: A bounded independent evaluation and replication engagement may be funded without asserting that Level 4, Level 5, field performance, or economic savings already exist.
-- Docket SHA-256: `9a1660c55ebfa341abe425ba048ee1b2ed831a7cf9c14f54d2737fd1a99fda9d`
+- Docket SHA-256: `eaaf5bebac1e8ab5014cfe2d33dee3b0cab05fb047c694e9f00e9725b64d6700`
 
 ## Current Evidence
 

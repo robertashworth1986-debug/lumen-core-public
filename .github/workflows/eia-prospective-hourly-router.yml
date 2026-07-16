@@ -8,10 +8,13 @@ on:
       - "config/eia_grid_prospective_hourly_router_protocol_v1.json"
       - "code/eia_grid_prospective_hourly_router.py"
       - "code/ops/AUDIT_EIA_PROSPECTIVE_SOURCE_TIMING.py"
+      - "code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py"
       - "code/ops/FREEZE_EIA_HOURLY_ROUTER_DESIGN.py"
       - "evidence/external_validation/eia_grid_hourly_router_design_benchmark_20260714.json"
       - "evidence/external_validation/eia_grid_hourly_router_design_freeze_20260714.json"
+      - "evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json"
       - "evidence/external_validation/eia_prospective_source_timing_audit_20260714.json"
+      - "tests/test_eia_hourly_runtime_projection.py"
       - "tests/test_eia_grid_prospective_hourly_router.py"
       - "tests/test_eia_prospective_source_timing_audit.py"
       - "tools/Run-EiaProspectiveHourlyRouterCycle.ps1"
@@ -23,10 +26,13 @@ on:
       - "config/eia_grid_prospective_hourly_router_protocol_v1.json"
       - "code/eia_grid_prospective_hourly_router.py"
       - "code/ops/AUDIT_EIA_PROSPECTIVE_SOURCE_TIMING.py"
+      - "code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py"
       - "code/ops/FREEZE_EIA_HOURLY_ROUTER_DESIGN.py"
       - "evidence/external_validation/eia_grid_hourly_router_design_benchmark_20260714.json"
       - "evidence/external_validation/eia_grid_hourly_router_design_freeze_20260714.json"
+      - "evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json"
       - "evidence/external_validation/eia_prospective_source_timing_audit_20260714.json"
+      - "tests/test_eia_hourly_runtime_projection.py"
       - "tests/test_eia_grid_prospective_hourly_router.py"
       - "tests/test_eia_prospective_source_timing_audit.py"
       - "tools/Run-EiaProspectiveHourlyRouterCycle.ps1"
@@ -42,10 +48,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
       - name: Set up CPython 3.11
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.11.9"
           cache: pip
@@ -60,6 +66,7 @@ jobs:
       - name: Run leakage and chain-integrity tests
         run: >-
           python -m pytest -q
+          tests/test_eia_hourly_runtime_projection.py
           tests/test_eia_grid_prospective_hourly_router.py
           tests/test_eia_prospective_source_timing_audit.py
 
@@ -68,4 +75,5 @@ jobs:
           python -m py_compile
           code/eia_grid_prospective_hourly_router.py
           code/ops/AUDIT_EIA_PROSPECTIVE_SOURCE_TIMING.py
+          code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py
           code/ops/FREEZE_EIA_HOURLY_ROUTER_DESIGN.py

@@ -282,6 +282,25 @@ def test_context_preserves_positive_negative_and_waiting_evidence():
     assert cards["eia_prospective_router"]["facts"]["prediction_count"] == 0
     assert cards["eia_prospective_router"]["facts"]["settlement_count"] == 0
     assert cards["eia_prospective_router"]["facts"]["promotion_evaluation_complete"] is False
+    hourly = cards["eia_prospective_hourly_router"]
+    assert hourly["attained_maturity_level"] == 1
+    assert hourly["target_maturity_level"] == 4
+    assert hourly["status"] == "PROSPECTIVE_COLLECTION_ACTIVE"
+    assert hourly["facts"]["prediction_count"] == 95
+    assert hourly["facts"]["settlement_count"] == 72
+    assert hourly["facts"]["common_settled_hour_count"] == 0
+    assert hourly["facts"]["preliminary_ready"] is False
+    assert hourly["facts"]["confirmatory_ready"] is False
+    assert hourly["facts"]["durability_ready"] is False
+    assert hourly["facts"]["promotion_evaluation_complete"] is False
+    assert hourly["facts"]["preliminary_threshold_common_hours_per_authority"] == 168
+    assert hourly["facts"]["confirmatory_threshold_common_hours_per_authority"] == 720
+    assert hourly["facts"]["durability_threshold_common_hours_per_authority"] == 2160
+    assert hourly["facts"]["protocol_source_sha256"] == next(
+        row["sha256"]
+        for row in context["source_artifacts"]
+        if row["source_id"] == "eia_hourly_protocol"
+    )
     assert cards["mda_synthetic_feasibility_v1"]["facts"]["gate_passed"] is False
     assert cards["mda_open_set_v2"]["facts"]["gate_passed"] is False
     assert cards["mda_open_set_v2"]["facts"]["unsupported_mapping_rate"] == 0.0
@@ -322,6 +341,9 @@ def test_context_outputs_are_identical_and_public_safe(tmp_path):
     assert "MDA mapping independent open-set v2" in markdown
     assert "FAA SDR frozen 10,000-report triage benchmark" in markdown
     assert "EIA residual hybrid frozen holdout" in markdown
+    assert "Frozen EIA prospective hourly router" in markdown
+    assert "prediction_count=95" in markdown
+    assert "common_settled_hour_count=0" in markdown
     assert "Hardware and 3D design-prior metadata custody" in markdown
     assert "Local system-health history custody audit" in markdown
     assert "holm_result=6/6 Holm-positive internal comparisons" in markdown
@@ -601,6 +623,25 @@ def test_context_fails_closed_when_required_source_is_missing(tmp_path, monkeypa
     monkeypatch.setitem(module.SOURCE_PATHS, "eia_residual_benchmark", missing)
     with pytest.raises(FileNotFoundError, match="required reviewer-context input is missing"):
         module.build_context()
+
+
+def test_hourly_projection_rejects_premature_readiness():
+    module = load_module()
+    projection = json.loads(
+        module.SOURCE_PATHS["eia_hourly_runtime_projection"].read_text(encoding="utf-8")
+    )
+    protocol = json.loads(
+        module.SOURCE_PATHS["eia_hourly_protocol"].read_text(encoding="utf-8")
+    )
+    projection["sample_state"]["preliminary_ready"] = True
+
+    with pytest.raises(ValueError, match="preliminary_ready does not reconcile"):
+        module.derive_eia_hourly_prospective_evidence(
+            projection,
+            protocol,
+            protocol_path=module.repo_path(module.SOURCE_PATHS["eia_hourly_protocol"]),
+            protocol_sha256=module.sha256_file(module.SOURCE_PATHS["eia_hourly_protocol"]),
+        )
 
 
 def test_eia_residual_card_is_derived_from_required_snapshots(tmp_path, monkeypatch):

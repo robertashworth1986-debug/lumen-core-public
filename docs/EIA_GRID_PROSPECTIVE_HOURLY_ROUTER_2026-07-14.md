@@ -32,6 +32,12 @@ The historical window selected the routes and is exploratory. Only targets seale
 
 A passing result would support bounded prospective public-data evidence for a frozen hourly specialist router. It does not establish patent validity or scope, utility control, realized savings, grid reliability improvement, production readiness, trading edge, or universal model superiority.
 
+## Dated Public Snapshot
+
+The public-safe runtime projection is [`eia_grid_prospective_hourly_runtime_projection_20260716.json`](../evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json). Its dated snapshot records 95 sealed predictions, 72 settlements, 0 common settled hours, and closed preliminary, confirmatory, durability, and promotion gates. The raw runtime ledgers remain outside the public repository; the projection preserves their hashes and terminal-chain receipts.
+
+These incomplete-sample descriptive values do not support Level 4, external generalization, field performance, reliability, savings, production, or trading claims.
+
 ## Operations
 
 - Core: `code/eia_grid_prospective_hourly_router.py`
@@ -53,6 +59,7 @@ The runtime source cache and ledgers are operational artifacts, not repository f
 
 ```powershell
 python code/ops/FREEZE_EIA_HOURLY_ROUTER_DESIGN.py --check
+python code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py --check
 python -m pytest -q tests/test_eia_grid_prospective_hourly_router.py tests/test_eia_prospective_source_timing_audit.py
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/Run-EiaProspectiveHourlyRouterCycle.ps1 -DryRun
 ```

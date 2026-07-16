@@ -26,6 +26,13 @@ SOURCE_PATHS = {
     / "out"
     / "eia_grid_prospective_hybrid_router"
     / "prospective_status_latest.json",
+    "eia_hourly_runtime_projection": ROOT
+    / "evidence"
+    / "external_validation"
+    / "eia_grid_prospective_hourly_runtime_projection_20260716.json",
+    "eia_hourly_protocol": ROOT
+    / "config"
+    / "eia_grid_prospective_hourly_router_protocol_v1.json",
     "eia_residual_benchmark": ROOT
     / "out"
     / "eia_grid_residual_moe"
@@ -1341,6 +1348,153 @@ def derive_eia_residual_evidence(
     }
 
 
+def derive_eia_hourly_prospective_evidence(
+    projection: dict[str, Any],
+    protocol: dict[str, Any],
+    *,
+    protocol_path: str,
+    protocol_sha256: str,
+) -> dict[str, Any]:
+    source = "eia_hourly_runtime_projection"
+    if projection.get("schema") != "eia_grid_prospective_hourly_runtime_projection.v1":
+        raise ValueError(f"{source}.schema is not supported")
+    if protocol.get("schema") != "eia_grid_prospective_hourly_router_protocol.v1":
+        raise ValueError("eia_hourly_protocol.schema is not supported")
+    integrity = require_dict(projection, "integrity", source)
+    if require_boolean(integrity, "gate_passed", f"{source}.integrity") is not True:
+        raise ValueError(f"{source}.integrity.gate_passed must be true")
+    checks = require_dict(integrity, "checks", f"{source}.integrity")
+    if not checks or any(value is not True for value in checks.values()):
+        raise ValueError(f"{source}.integrity checks must all pass")
+
+    projected_protocol = require_dict(projection, "protocol", source)
+    if require_nonempty_string(
+        projected_protocol,
+        "protocol_id",
+        f"{source}.protocol",
+    ) != require_nonempty_string(protocol, "protocol_id", "eia_hourly_protocol"):
+        raise ValueError(f"{source}.protocol_id does not match the frozen protocol")
+    if require_nonempty_string(
+        projected_protocol,
+        "path",
+        f"{source}.protocol",
+    ) != protocol_path:
+        raise ValueError(f"{source}.protocol.path does not match the source receipt")
+    if require_sha256(
+        projected_protocol,
+        "sha256",
+        f"{source}.protocol",
+    ) != protocol_sha256:
+        raise ValueError(f"{source}.protocol.sha256 does not match the frozen protocol")
+
+    sample = require_dict(projection, "sample_state", source)
+    prediction_count = require_nonnegative_integer(sample, "prediction_count", f"{source}.sample_state")
+    settlement_count = require_nonnegative_integer(sample, "settlement_count", f"{source}.sample_state")
+    common_hours = require_nonnegative_integer(
+        sample,
+        "common_settled_hour_count",
+        f"{source}.sample_state",
+    )
+    preliminary_ready = require_boolean(
+        sample,
+        "preliminary_ready",
+        f"{source}.sample_state",
+    )
+    confirmatory_ready = require_boolean(
+        sample,
+        "confirmatory_ready",
+        f"{source}.sample_state",
+    )
+    durability_ready = require_boolean(
+        sample,
+        "durability_ready",
+        f"{source}.sample_state",
+    )
+    promotion_complete = require_boolean(
+        sample,
+        "promotion_evaluation_complete",
+        f"{source}.sample_state",
+    )
+
+    window = require_dict(protocol, "prospective_window", "eia_hourly_protocol")
+    preliminary_threshold = require_nonnegative_integer(
+        window,
+        "preliminary_gate_common_hours_per_authority",
+        "eia_hourly_protocol.prospective_window",
+    )
+    confirmatory_threshold = require_nonnegative_integer(
+        window,
+        "confirmatory_gate_common_hours_per_authority",
+        "eia_hourly_protocol.prospective_window",
+    )
+    durability_threshold = require_nonnegative_integer(
+        window,
+        "durability_gate_common_hours_per_authority",
+        "eia_hourly_protocol.prospective_window",
+    )
+    readiness_checks = (
+        ("preliminary_ready", preliminary_ready, preliminary_threshold),
+        ("confirmatory_ready", confirmatory_ready, confirmatory_threshold),
+        ("durability_ready", durability_ready, durability_threshold),
+    )
+    for label, ready, threshold in readiness_checks:
+        if ready != (common_hours >= threshold):
+            raise ValueError(f"{source}.{label} does not reconcile to common settled hours")
+    if promotion_complete and not confirmatory_ready:
+        raise ValueError(f"{source}.promotion_evaluation_complete is premature")
+    if common_hours == 0 and (
+        sample.get("first_common_settled_period") is not None
+        or sample.get("latest_common_settled_period") is not None
+    ):
+        raise ValueError(f"{source} common-period bounds are inconsistent with zero common hours")
+
+    chains = require_dict(projection, "chain_receipts", source)
+    chain_fields = (
+        "operational_receipt_sha256",
+        "prediction_terminal_sha256",
+        "settlement_terminal_sha256",
+        "source_panel_row_chain_sha256",
+    )
+    normalized_chains = {
+        key: require_sha256(chains, key, f"{source}.chain_receipts")
+        for key in chain_fields
+    }
+    descriptive = require_dict(projection, "descriptive_metrics", source)
+    if require_boolean(descriptive, "sample_gate_open", f"{source}.descriptive_metrics"):
+        raise ValueError(f"{source}.descriptive_metrics.sample_gate_open must remain false")
+
+    return {
+        "state": require_nonempty_string(projection, "state", source),
+        "prediction_count": prediction_count,
+        "settlement_count": settlement_count,
+        "common_settled_hour_count": common_hours,
+        "preliminary_ready": preliminary_ready,
+        "confirmatory_ready": confirmatory_ready,
+        "durability_ready": durability_ready,
+        "promotion_evaluation_complete": promotion_complete,
+        "preliminary_threshold_common_hours_per_authority": preliminary_threshold,
+        "confirmatory_threshold_common_hours_per_authority": confirmatory_threshold,
+        "durability_threshold_common_hours_per_authority": durability_threshold,
+        "current_best_fixed_candidate": require_nonempty_string(
+            descriptive,
+            "current_best_fixed_candidate",
+            f"{source}.descriptive_metrics",
+        ),
+        "router_skill_vs_current_best_fixed": require_number(
+            descriptive,
+            "router_skill_vs_current_best_fixed",
+            f"{source}.descriptive_metrics",
+        ),
+        "protocol_commit": require_nonempty_string(
+            projected_protocol,
+            "commit",
+            f"{source}.protocol",
+        ),
+        **normalized_chains,
+        "claim_boundary": require_nonempty_string(projection, "claim_boundary", source),
+    }
+
+
 def build_context() -> dict[str, Any]:
     available_optional_sources = {
         source_id: path
@@ -1395,6 +1549,12 @@ def build_context() -> dict[str, Any]:
         raise ValueError("faa_sdr_10k leaderboard must identify the candidate and strongest baseline")
     eia = sources["eia_prospective_router"]
     eia_gates = require_dict(eia, "sample_gates", "eia_prospective_router")
+    eia_hourly = derive_eia_hourly_prospective_evidence(
+        sources["eia_hourly_runtime_projection"],
+        sources["eia_hourly_protocol"],
+        protocol_path=receipt_by_source["eia_hourly_protocol"]["path"],
+        protocol_sha256=receipt_by_source["eia_hourly_protocol"]["sha256"],
+    )
     eia_residual = derive_eia_residual_evidence(
         sources["eia_residual_benchmark"],
         sources["eia_residual_protocol"],
@@ -1611,7 +1771,7 @@ def build_context() -> dict[str, Any]:
         },
         {
             "proof_id": "eia_prospective_router",
-            "title": "Frozen EIA prospective router",
+            "title": "Preserved predecessor daily EIA prospective router",
             "evidence_class": "prospective_protocol",
             "attained_maturity_level": 1,
             "target_maturity_level": 4,
@@ -1646,6 +1806,48 @@ def build_context() -> dict[str, Any]:
                 ),
             },
             "claim_boundary": require_value(eia, "claim_boundary", "eia_prospective_router"),
+        },
+        {
+            "proof_id": "eia_prospective_hourly_router",
+            "title": "Frozen EIA prospective hourly router",
+            "evidence_class": "prospective_collection_incomplete",
+            "attained_maturity_level": 1,
+            "target_maturity_level": 4,
+            "status": eia_hourly["state"],
+            "facts": {
+                "prediction_count": eia_hourly["prediction_count"],
+                "settlement_count": eia_hourly["settlement_count"],
+                "common_settled_hour_count": eia_hourly["common_settled_hour_count"],
+                "preliminary_ready": eia_hourly["preliminary_ready"],
+                "confirmatory_ready": eia_hourly["confirmatory_ready"],
+                "durability_ready": eia_hourly["durability_ready"],
+                "promotion_evaluation_complete": eia_hourly[
+                    "promotion_evaluation_complete"
+                ],
+                "preliminary_threshold_common_hours_per_authority": eia_hourly[
+                    "preliminary_threshold_common_hours_per_authority"
+                ],
+                "confirmatory_threshold_common_hours_per_authority": eia_hourly[
+                    "confirmatory_threshold_common_hours_per_authority"
+                ],
+                "durability_threshold_common_hours_per_authority": eia_hourly[
+                    "durability_threshold_common_hours_per_authority"
+                ],
+                "current_best_fixed_candidate": eia_hourly["current_best_fixed_candidate"],
+                "router_skill_vs_current_best_fixed": eia_hourly[
+                    "router_skill_vs_current_best_fixed"
+                ],
+                "operational_receipt_sha256": eia_hourly["operational_receipt_sha256"],
+                "prediction_terminal_sha256": eia_hourly["prediction_terminal_sha256"],
+                "settlement_terminal_sha256": eia_hourly["settlement_terminal_sha256"],
+                "runtime_projection_source_sha256": receipt_by_source[
+                    "eia_hourly_runtime_projection"
+                ]["sha256"],
+                "protocol_source_sha256": receipt_by_source["eia_hourly_protocol"][
+                    "sha256"
+                ],
+            },
+            "claim_boundary": eia_hourly["claim_boundary"],
         },
         {
             "proof_id": "mda_synthetic_feasibility_v1",
@@ -1840,7 +2042,16 @@ def build_context() -> dict[str, Any]:
                 f"on its frozen internal holdout, but the full protocol gate is "
                 f"{eia_residual['full_protocol_gate']}."
             ),
-            "The EIA prospective protocol is frozen and operational but has not produced an eligible prediction or settlement in this snapshot.",
+            (
+                "The predecessor daily EIA prospective protocol is preserved at zero predictions "
+                "and zero settlements because its seal timing could not be weakened or backfilled."
+            ),
+            (
+                f"The frozen hourly successor has {eia_hourly['prediction_count']} sealed predictions "
+                f"and {eia_hourly['settlement_count']} settlements, but only "
+                f"{eia_hourly['common_settled_hour_count']} common settled hours; its preliminary, "
+                "confirmatory, durability, and promotion gates remain closed."
+            ),
             "A prior external proof packet reports all copied artifact hashes verified.",
         ],
         "blocked_without_new_evidence": {
@@ -1874,9 +2085,11 @@ def build_context() -> dict[str, Any]:
             "summary": (
                 "Level 3 source-conditioned replay and frozen EIA holdout evidence are supported. "
                 f"The EIA residual candidate has {eia_residual['holm_result']}, but its full "
-                f"protocol gate is {eia_residual['full_protocol_gate']}. Level 4 prospective "
-                "evidence is still waiting for eligible EIA forecasts and settlements. Level 5 "
-                "independent external validation has not been attained."
+                f"protocol gate is {eia_residual['full_protocol_gate']}. The frozen hourly "
+                f"successor has {eia_hourly['prediction_count']} sealed predictions and "
+                f"{eia_hourly['settlement_count']} settlements, but "
+                f"{eia_hourly['common_settled_hour_count']} common settled hours and no open "
+                "sample gate. Level 4 and Level 5 have not been attained."
             ),
         },
         "proof_cards": proof_cards,
@@ -1907,14 +2120,18 @@ def build_context() -> dict[str, Any]:
                 "decision": "Assess prospective readiness",
                 "evidence": (
                     "Inspect the frozen EIA residual holdout, its Holm-adjusted internal comparisons, "
-                    "the closed composite gate, the prospective protocol, scheduler receipts, and "
-                    "zero-count waiting state."
+                    "the closed composite gate, the preserved zero-count daily predecessor, the "
+                    "hourly successor protocol, and its prediction, settlement, and terminal-chain "
+                    "receipts."
                 ),
                 "remaining_gate": (
                     f"Raise minimum common holdout coverage from {eia_residual['minimum_coverage_days']} "
                     f"to {eia_residual['coverage_target_days']} days without post-holdout tuning, "
-                    "satisfy the authority robustness gate, then complete the 30-, 90-, and 180-day "
-                    "prospective settlement gates."
+                    "satisfy the authority robustness gate, then reach the hourly successor's "
+                    f"{eia_hourly['preliminary_threshold_common_hours_per_authority']}, "
+                    f"{eia_hourly['confirmatory_threshold_common_hours_per_authority']}, and "
+                    f"{eia_hourly['durability_threshold_common_hours_per_authority']} common-hour "
+                    "gates per authority without route changes or backfill."
                 ),
             },
             {
@@ -1931,8 +2148,8 @@ def build_context() -> dict[str, Any]:
         "next_validation_actions": [
             {
                 "priority": 1,
-                "action": "Keep the frozen EIA prospective router running without changing its promotion protocol.",
-                "success_receipt": "Hashed predictions, settlements, and preregistered 30/90/180-day gate outputs.",
+                "action": "Keep the frozen EIA hourly successor running without changing routes, features, candidates, or promotion gates.",
+                "success_receipt": "Hashed predictions, settlements, common-hour coverage, terminal chains, and preregistered 168/720/2160-hour gate outputs.",
             },
             {
                 "priority": 2,
@@ -1972,6 +2189,8 @@ def build_context() -> dict[str, Any]:
             "code/ops/BUILD_LOCKED_SOURCE_BASELINE_REPLAY_SWEEP.py",
             "code/eia_grid_residual_moe_benchmark.py",
             "code/eia_grid_prospective_router_ops.py",
+            "code/eia_grid_prospective_hourly_router.py",
+            "code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py",
             "code/mda_control_mapping_feasibility.py",
             "code/mda_control_mapping_open_set_benchmark.py",
             "code/ops/STAGE_EXTERNAL_PROOF_VAULT.py",
@@ -1979,6 +2198,8 @@ def build_context() -> dict[str, Any]:
             "tests/test_locked_source_baseline_replay_sweep.py",
             "tests/test_eia_grid_residual_moe_benchmark.py",
             "tests/test_eia_grid_prospective_router_ops.py",
+            "tests/test_eia_grid_prospective_hourly_router.py",
+            "tests/test_eia_hourly_runtime_projection.py",
             "tests/test_mda_control_mapping_feasibility.py",
             "tests/test_mda_control_mapping_open_set_benchmark.py",
             "tests/test_external_proof_vault.py",

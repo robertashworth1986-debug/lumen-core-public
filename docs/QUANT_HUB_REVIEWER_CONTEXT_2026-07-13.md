@@ -1,6 +1,6 @@
 # Quant Hub Reviewer Context
 
-Generated UTC: `2026-07-14T10:47:29.468797+00:00`
+Generated UTC: `2026-07-16T02:35:13.536100+00:00`
 
 ## Identity
 
@@ -15,7 +15,7 @@ Generated UTC: `2026-07-14T10:47:29.468797+00:00`
 
 - Highest repository-wide supported maturity: `Level 3`
 - Level 5 attained: `false`
-- Summary: Level 3 source-conditioned replay and frozen EIA holdout evidence are supported. The EIA residual candidate has 6/6 Holm-positive internal comparisons, but its full protocol gate is CLOSED. Level 4 prospective evidence is still waiting for eligible EIA forecasts and settlements. Level 5 independent external validation has not been attained.
+- Summary: Level 3 source-conditioned replay and frozen EIA holdout evidence are supported. The EIA residual candidate has 6/6 Holm-positive internal comparisons, but its full protocol gate is CLOSED. The frozen hourly successor has 95 sealed predictions and 72 settlements, but 0 common settled hours and no open sample gate. Level 4 and Level 5 have not been attained.
 
 Maturity is claim-specific. It is not a product-readiness, agency-approval, patent, security, or valuation grade.
 
@@ -31,7 +31,8 @@ Maturity is claim-specific. It is not a product-readiness, agency-approval, pate
 | Measured source breadth | `fresh_source_measurement` | 3 | `measured_with_thin_sources` | enabled_sources=29, measured_sources=25, failed_or_thin_sources=4, total_measured_rows=2580, coverage_pct=86.21 |
 | Locked source-conditioned baseline replay | `source_conditioned_replay` | 3 | `complete_with_wins_and_non_wins` | adapter_backed_routes=404, baseline_comparison_count=2861, candidate_win_count=1456, candidate_loss_or_tie_count=1405, estimated_rows_replayed=96223 |
 | EIA residual hybrid frozen holdout | `source_conditioned_frozen_holdout` | 3 | `all_internal_comparisons_holm_positive_full_protocol_gate_closed` | holm_result=6/6 Holm-positive internal comparisons, full_protocol_gate=CLOSED, coverage_result=90/150 minimum common days, selected_candidate=xgboost_residual, holdout_rows=1176 |
-| Frozen EIA prospective router | `prospective_protocol` | 1 | `WAITING_FOR_FIRST_ELIGIBLE_FORECAST` | first_allowed_target_date=2026-07-14, prediction_count=0, settlement_count=0, promotion_evaluation_complete=False, preliminary_30_days_ready=False |
+| Preserved predecessor daily EIA prospective router | `prospective_protocol` | 1 | `WAITING_FOR_FIRST_ELIGIBLE_FORECAST` | first_allowed_target_date=2026-07-14, prediction_count=0, settlement_count=0, promotion_evaluation_complete=False, preliminary_30_days_ready=False |
+| Frozen EIA prospective hourly router | `prospective_collection_incomplete` | 1 | `PROSPECTIVE_COLLECTION_ACTIVE` | prediction_count=95, settlement_count=72, common_settled_hour_count=0, preliminary_ready=False, confirmatory_ready=False |
 | MDA mapping synthetic feasibility v1 | `frozen_synthetic_benchmark` | 2 | `gate_failed_preserved` | fixture_count=96, candidate_micro_f1=0.9166666666666666, candidate_unsupported_mapping_rate=1.0, micro_f1_delta_over_best_baseline=0.023049645390070927, gate_passed=False |
 | MDA mapping independent open-set v2 | `frozen_synthetic_benchmark` | 2 | `safer_unsupported_behavior_but_gate_failed` | fixture_count=128, candidate_micro_f1=0.9433962264150945, supported_coverage=0.9583333333333334, unsupported_mapping_rate=0.0, micro_f1_delta_over_best_baseline=0.020319303338171446 |
 | FAA SDR frozen 10,000-report triage benchmark | `source_conditioned_frozen_holdout` | 3 | `completed_candidate_not_promoted` | holdout_rows=10000, holdout_unique_keys=10000, development_key_overlap=0, scenario_model_evaluations=80000, candidate_macro_f1=0.14217 |
@@ -47,7 +48,8 @@ Maturity is claim-specific. It is not a product-readiness, agency-approval, pate
 - The local system-health history audit preserves sparse one-second point observations and custody defects across 30/90/180-day windows; it is not hardware-degradation proof and names no independent evaluator.
 - The optional private-universe receipt federates existing manifests and represents no fresh full universe scan, manifest-referenced file byte read, broad-root scan, archive extraction, or live reconciliation; only individually authorized explicit files may be read for SHA-256, and candidate lane counts remain metadata heuristics rather than content validation. The receipt names no independent evaluator.
 - The development-selected EIA residual hybrid has 6/6 Holm-positive internal comparisons on its frozen internal holdout, but the full protocol gate is CLOSED.
-- The EIA prospective protocol is frozen and operational but has not produced an eligible prediction or settlement in this snapshot.
+- The predecessor daily EIA prospective protocol is preserved at zero predictions and zero settlements because its seal timing could not be weakened or backfilled.
+- The frozen hourly successor has 95 sealed predictions and 72 settlements, but only 0 common settled hours; its preliminary, confirmatory, durability, and promotion gates remain closed.
 - A prior external proof packet reports all copied artifact hashes verified.
 
 ## Blocked Claims
@@ -83,9 +85,9 @@ Remaining gate: An authoritative external corpus and independent evaluation owne
 
 ### Assess prospective readiness
 
-Evidence: Inspect the frozen EIA residual holdout, its Holm-adjusted internal comparisons, the closed composite gate, the prospective protocol, scheduler receipts, and zero-count waiting state.
+Evidence: Inspect the frozen EIA residual holdout, its Holm-adjusted internal comparisons, the closed composite gate, the preserved zero-count daily predecessor, the hourly successor protocol, and its prediction, settlement, and terminal-chain receipts.
 
-Remaining gate: Raise minimum common holdout coverage from 90 to 150 days without post-holdout tuning, satisfy the authority robustness gate, then complete the 30-, 90-, and 180-day prospective settlement gates.
+Remaining gate: Raise minimum common holdout coverage from 90 to 150 days without post-holdout tuning, satisfy the authority robustness gate, then reach the hourly successor's 168, 720, and 2160 common-hour gates per authority without route changes or backfill.
 
 ### Assess economic relevance
 
@@ -101,8 +103,8 @@ Remaining gate: Attorney-controlled claim chart; this public context contains no
 
 ## Next Validation Actions
 
-1. Keep the frozen EIA prospective router running without changing its promotion protocol.
-   Required receipt: Hashed predictions, settlements, and preregistered 30/90/180-day gate outputs.
+1. Keep the frozen EIA hourly successor running without changing routes, features, candidates, or promotion gates.
+   Required receipt: Hashed predictions, settlements, common-hour coverage, terminal chains, and preregistered 168/720/2160-hour gate outputs.
 2. Secure one independent evaluator with held-out operational data and a pre-agreed metric.
    Required receipt: Named evaluator, data boundary, protocol, acceptance metric, date, and signed or attributable result.
 3. Run MDA mapping only against an authoritative external corpus under a new preregistration.
@@ -129,9 +131,11 @@ Public builders may report metadata and public-safe evidence only. They must not
 
 ## Source Chain
 
-Input chain SHA-256: `ba68902253b357cacb8be909ef3e5d5509785c9289dd92994d245b0d12f0ea19`
+Input chain SHA-256: `631be15576b4c6a2e110288e56b695be7cd39d7041da9845aac12a611572f11b`
 
-- `out/eia_grid_prospective_hybrid_router/prospective_status_latest.json` | `9dd01ede40c4006d7353cea680ab9ca2a85ee3b8f8fc5e6136cd34e75fd99d46` | `1989` bytes
+- `config/eia_grid_prospective_hourly_router_protocol_v1.json` | `5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5` | `8463` bytes
+- `evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json` | `9c6f9938100c929c10c03d29f1d5bfe4673f2974e888d78223f18ce63e4a9670` | `2824` bytes
+- `out/eia_grid_prospective_hybrid_router/prospective_status_latest.json` | `fe57fc67b6377cc71699d8cdf5ee5e19c5d6f5e88d947fc9a188dde20578121e` | `1989` bytes
 - `out/eia_grid_residual_moe/eia_grid_residual_moe_benchmark_latest.json` | `e2e0bc779823e543784c24675e18c12bcb821e65911168c2d3339b6da67ea744` | `19279` bytes
 - `config/eia_grid_residual_moe_protocol_v1.json` | `79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8` | `8422` bytes
 - `out/ops/lumencore_estate_master_index_latest.json` | `e073a44231045764739b5d4e74c263f07f30b50b971566b0c812aa152f81a233` | `52897` bytes

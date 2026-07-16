@@ -2,9 +2,9 @@
   "available": true,
   "common_settled_day_count": 0,
   "first_common_settled_date": null,
-  "generated_utc": "2026-07-15T00:16:23.619357+00:00",
+  "generated_utc": "2026-07-15T03:38:29.456402+00:00",
   "latest_common_settled_date": null,
-  "operational_receipt_sha256": "243186648d2685895d3def0d13effe62f92380c7e7568f49478e630669c05863",
+  "operational_receipt_sha256": "84bfb37e17b66b10cfe393f44610c1879998510a63660a9d6e9610b64badc7fa",
   "prediction_count": 0,
   "prediction_count_by_authority": {
     "CISO": 0,
@@ -43,6 +43,6 @@
     "SWPP": 0,
     "TVA": 0
   },
-  "snapshot_sha256": "87579a76cf8d8a19faedd664995e6521ca5c19ac9bbc6333ef52072c0817bdb5",
+  "snapshot_sha256": "fe57fc67b6377cc71699d8cdf5ee5e19c5d6f5e88d947fc9a188dde20578121e",
   "state": "WAITING_FOR_FIRST_ELIGIBLE_FORECAST"
 }

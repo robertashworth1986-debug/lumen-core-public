@@ -10,12 +10,13 @@ The repository supports an implemented, tested evidence and benchmarking platfor
 
 1. `README.md` for claim boundaries and the maturity scale.
 2. `docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md` for the machine-generated evidence snapshot.
-3. `docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md` for the evaluator decision, archived clean-runner receipt, and exact Level 4/5 gates.
-4. `docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md` for the evaluator-owned receipt and fail-closed acceptance procedure.
-5. `docs/LOCKED_SOURCE_BASELINE_REPLAY_SWEEP_2026-06-30.md` for route-level wins and non-wins.
-6. `docs/FAA_SDR_SOURCE_AUDIT_2026-07-13.md` for the aviation source audit and its raw-data custody boundary.
-7. `docs/FAA_SDR_10K_BENCHMARK_2026-07-13.md` for the frozen holdout result and failed promotion gate.
-8. `docs/HYBRID_AGENT_OPERATING_MODEL_2026-07-13.md` for agent capabilities and HumanUnlock controls.
+3. `evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json` for the dated, public-safe successor snapshot and terminal-chain receipts.
+4. `docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md` for the predecessor-lane evaluator decision, archived clean-runner receipt, and exact Level 4/5 gates.
+5. `docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md` for the evaluator-owned receipt and fail-closed acceptance procedure; it must be explicitly amended before it governs the hourly successor.
+6. `docs/LOCKED_SOURCE_BASELINE_REPLAY_SWEEP_2026-06-30.md` for route-level wins and non-wins.
+7. `docs/FAA_SDR_SOURCE_AUDIT_2026-07-13.md` for the aviation source audit and its raw-data custody boundary.
+8. `docs/FAA_SDR_10K_BENCHMARK_2026-07-13.md` for the frozen holdout result and failed promotion gate.
+9. `docs/HYBRID_AGENT_OPERATING_MODEL_2026-07-13.md` for agent capabilities and HumanUnlock controls.
 
 ## Independent Review Roles
 
@@ -32,6 +33,7 @@ Each role is independent of the operator. A reviewer may accept one bounded deci
 
 ```powershell
 python code/ops/BUILD_QUANT_HUB_REVIEWER_CONTEXT.py
+python code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py --check
 python code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py --check-only
 python code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py --expect-template
 python -m pytest -q tests/test_quant_hub_reviewer_context.py
@@ -59,7 +61,7 @@ python -m pytest -q tests/test_locked_source_baseline_replay_sweep.py
 
 ## External Validation Target
 
-An acceptable Level 5 evaluation must name the evaluator, dataset owner, frozen eligible population, held-out period, baselines, metrics, acceptance threshold, exclusions, and receipt date before outcomes are observed. The authority record and remaining empty fields are in `docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md`; the evaluator procedure is in `docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md`. Commercial value should be estimated only after the external owner accepts both the technical metric and the economic assumptions.
+An acceptable Level 5 evaluation must name the evaluator, dataset owner, frozen eligible population, held-out period, baselines, metrics, acceptance threshold, exclusions, and receipt date before outcomes are observed. The current authority record and handoff are scoped to the preserved daily predecessor; they do not silently transfer to the hourly successor. The successor needs an explicit protocol-specific amendment or replacement acceptance record. Commercial value should be estimated only after the external owner accepts both the technical metric and the economic assumptions.
 
 ## Citation
 
