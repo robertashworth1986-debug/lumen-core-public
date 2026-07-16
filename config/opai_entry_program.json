@@ -12,7 +12,7 @@
     "status": "interest_submitted_not_yet_accepted",
     "last_contact_utc": "2026-07-16T05:30:03Z",
     "next_contact_not_before_utc": "2026-07-20T14:00:00Z",
-    "suppress_new_contact": true,
+    "suppress_standalone_contact": true,
     "contact_mode": "existing_thread_only",
     "next_action": "Wait for the onboarding team or Sarah Toews to respond. Do not send another standalone request before the cooldown expires."
   },
