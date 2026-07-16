@@ -30,7 +30,7 @@ PROGRAM = {
         "status": "interest_submitted_not_yet_accepted",
         "last_contact_utc": "2026-07-16T05:30:03Z",
         "next_contact_not_before_utc": "2026-07-20T14:00:00Z",
-        "suppress_new_contact": True,
+        "suppress_standalone_contact": True,
         "contact_mode": "existing_thread_only",
         "next_action": "Wait for the onboarding response.",
     },
@@ -67,15 +67,15 @@ class OPAIActionQueueTests(unittest.TestCase):
         self.assertIn("duplicate", action["reason"].lower())
         self.assertEqual(action["contact_mode"], "existing_thread_only")
 
-    def test_membership_follow_up_opens_after_cooldown_when_suppression_is_cleared(self) -> None:
-        membership = dict(PROGRAM["membership"])
-        membership["suppress_new_contact"] = False
+    def test_membership_follow_up_opens_after_cooldown_in_existing_thread(self) -> None:
         action = membership_action(
-            membership,
+            PROGRAM["membership"],
             now_utc=parse_utc("2026-07-20T14:00:01Z"),
         )
         self.assertEqual(action["state"], "ready")
         self.assertEqual(action["priority"], "high")
+        self.assertEqual(action["contact_mode"], "existing_thread_only")
+        self.assertTrue(action["standalone_contact_suppressed"])
 
     def test_invalid_program_fails_closed(self) -> None:
         invalid = dict(PROGRAM)
