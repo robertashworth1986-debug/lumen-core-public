@@ -1,0 +1,106 @@
+{
+  "schema": "opai_entry_program_v1",
+  "source_checked_utc": "2026-07-16T06:05:00Z",
+  "claim_boundary": "This file records public program facts and LumenCore's current preparation state. It does not prove accepted consortium membership, challenge eligibility, application acceptance, pilot selection, funding, utility participation, endorsement, or external validation.",
+  "sources": {
+    "opai_home": "https://openpowerai.org/",
+    "opai_membership": "https://openpowerai.org/consortium-membership",
+    "member_benefits": "https://restservice.epri.com/publicattachment/92892",
+    "ai_for_power_2026": "https://epri.brightidea.com/AIforPower2026"
+  },
+  "membership": {
+    "status": "interest_submitted_not_yet_accepted",
+    "last_contact_utc": "2026-07-16T05:30:03Z",
+    "next_contact_not_before_utc": "2026-07-20T14:00:00Z",
+    "suppress_new_contact": true,
+    "contact_mode": "existing_thread_only",
+    "next_action": "Wait for the onboarding team or Sarah Toews to respond. Do not send another standalone request before the cooldown expires."
+  },
+  "ai_for_power_2026": {
+    "application_state": "requires_program_confirmation",
+    "public_application_evaluation_window": "May / June 2026",
+    "page_still_displays_submit_application": true,
+    "pitch_day_date": "2026-08-05",
+    "demonstration_scoping_window": "Q4 2026 / Q1 2027",
+    "showcase_window": "2027",
+    "next_action": "Ask through the existing EPRI/OPAI thread whether technology-provider applications or late routing remain open before entering portal data."
+  },
+  "opportunities": [
+    {
+      "id": "ami_data_validation",
+      "title": "AMI Data Validation",
+      "category": "T&D Operations, Planning and Markets",
+      "public_source": "https://epri.brightidea.com/AIforPower2026",
+      "fit_score": 10,
+      "entry_claim": "LumenCore can propose a reviewer-controlled validation protocol that locks the source, baseline, metric, acceptance threshold, run window, and evidence manifest before scoring.",
+      "repo_evidence_paths": [
+        "docs/PROOF_CAPSULE_SCHEMA.md",
+        "docs/PILOT_REPORT_TEMPLATE.md",
+        "code/real_data_fair_benchmark.py"
+      ],
+      "external_gates": [
+        "utility-authorized AMI dataset or agreed public proxy",
+        "named incumbent validation method",
+        "locked error and data-quality metrics",
+        "written data-rights and privacy boundary"
+      ]
+    },
+    {
+      "id": "grid_constraint_forecasting",
+      "title": "Grid Constraint Forecasting",
+      "category": "T&D Operations, Planning and Markets",
+      "public_source": "https://epri.brightidea.com/AIforPower2026",
+      "fit_score": 9,
+      "entry_claim": "LumenCore can package walk-forward forecasting against naive, trend, harmonic, and machine-learning baselines with frozen inputs, negative results, and hash manifests.",
+      "repo_evidence_paths": [
+        "code/real_data_fair_benchmark.py",
+        "docs/PROOF_CAPSULE_SCHEMA.md",
+        "docs/CLAIM_BOUNDARY_REGISTER.md"
+      ],
+      "external_gates": [
+        "utility-selected constraint target",
+        "held-out evaluation window",
+        "incumbent forecast baseline",
+        "operationally meaningful acceptance threshold"
+      ]
+    },
+    {
+      "id": "post_storm_crew_routing",
+      "title": "Grid Post-Storm Field Crew Deployment Optimization",
+      "category": "Grid Regulation, Compliance and Workforce Management",
+      "public_source": "https://epri.brightidea.com/AIforPower2026",
+      "fit_score": 9,
+      "entry_claim": "FlowForm can be evaluated as a simulation-first routing candidate against a named dispatch baseline while LumenCore retains constraint violations, infeasible routes, and negative results.",
+      "repo_evidence_paths": [
+        "README.md",
+        "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+        "docs/PROOF_CAPSULE_SCHEMA.md"
+      ],
+      "external_gates": [
+        "utility-owned or synthetic storm scenario",
+        "crew, travel, safety, and priority constraints",
+        "named dispatch baseline",
+        "locked completion-time, coverage, and violation metrics"
+      ]
+    },
+    {
+      "id": "grid_model_digital_twin_validation",
+      "title": "Grid Model (Digital Twin) Validation",
+      "category": "Grid ICT and Data Management",
+      "public_source": "https://epri.brightidea.com/AIforPower2026",
+      "fit_score": 8,
+      "entry_claim": "LumenCore can package model-to-source consistency checks and reviewer-readable exception reports without claiming control authority or certified digital-twin performance.",
+      "repo_evidence_paths": [
+        "docs/PROOF_CAPSULE_SCHEMA.md",
+        "docs/PILOT_REPORT_TEMPLATE.md",
+        "docs/LUMA_UNIVERSE_MODULE_CATALOG.md"
+      ],
+      "external_gates": [
+        "authoritative model and source-of-truth records",
+        "field-level mismatch taxonomy",
+        "locked precision, coverage, and review-burden metrics",
+        "human adjudication protocol"
+      ]
+    }
+  ]
+}
