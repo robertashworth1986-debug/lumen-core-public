@@ -4,7 +4,10 @@ on:
   pull_request:
     paths:
       - 'code/ops/build_opai_consortium_intelligence.py'
+      - 'code/ops/build_opai_action_queue.py'
+      - 'config/opai_entry_program.json'
       - 'tests/test_opai_consortium_intelligence.py'
+      - 'tests/test_opai_action_queue.py'
       - '.github/workflows/opai-intelligence.yml'
   workflow_dispatch:
     inputs:
@@ -12,6 +15,8 @@ on:
         description: Maximum number of allowlisted public pages to fetch
         required: false
         default: '40'
+  schedule:
+    - cron: '17 11 * * 1-5'
 
 permissions:
   contents: read
@@ -29,14 +34,19 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Compile crawler
-        run: python -m py_compile code/ops/build_opai_consortium_intelligence.py tests/test_opai_consortium_intelligence.py
+      - name: Compile OPAI engines
+        run: |
+          python -m py_compile \
+            code/ops/build_opai_consortium_intelligence.py \
+            code/ops/build_opai_action_queue.py \
+            tests/test_opai_consortium_intelligence.py \
+            tests/test_opai_action_queue.py
 
-      - name: Run crawler safety tests
-        run: python -m unittest discover -s tests -p 'test_opai_consortium_intelligence.py' -v
+      - name: Run OPAI safety and action-queue tests
+        run: python -m unittest discover -s tests -p 'test_opai*.py' -v
 
   scrape:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
     needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -49,10 +59,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Validate dispatch input
+      - name: Validate crawl limit
         env:
-          MAX_PAGES: ${{ inputs.max_pages }}
+          DISPATCH_MAX_PAGES: ${{ github.event.inputs.max_pages }}
         run: |
+          MAX_PAGES="${DISPATCH_MAX_PAGES:-40}"
           case "$MAX_PAGES" in
             ''|*[!0-9]*)
               echo "::error::max_pages must be a positive integer"
@@ -63,12 +74,11 @@ jobs:
             echo "::error::max_pages must be between 1 and 100"
             exit 1
           fi
+          echo "MAX_PAGES=$MAX_PAGES" >> "$GITHUB_ENV"
 
       - name: Build live public intelligence artifact
         id: scrape
         continue-on-error: true
-        env:
-          MAX_PAGES: ${{ inputs.max_pages }}
         run: |
           mkdir -p artifacts
           python code/ops/build_opai_consortium_intelligence.py \
@@ -76,17 +86,27 @@ jobs:
             --out artifacts/opai_consortium_intelligence.json \
             --no-dashboard
 
-      - name: Upload bounded scrape result
+      - name: Build deadline-ranked action queue
+        id: queue
+        if: steps.scrape.outcome == 'success'
+        continue-on-error: true
+        run: |
+          python code/ops/build_opai_action_queue.py \
+            --intelligence artifacts/opai_consortium_intelligence.json \
+            --out artifacts/opai_action_queue.json \
+            --no-dashboard
+
+      - name: Upload bounded intelligence artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: opai-consortium-intelligence-${{ github.run_id }}
-          path: artifacts/opai_consortium_intelligence.json
+          path: artifacts/*.json
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Enforce successful live scrape
-        if: steps.scrape.outcome != 'success'
+      - name: Enforce successful live build
+        if: steps.scrape.outcome != 'success' || steps.queue.outcome != 'success'
         run: |
-          echo "::error::The crawler produced a bounded failure artifact; inspect it before retrying."
+          echo "::error::The live crawl or action queue failed; inspect the bounded artifacts before retrying."
           exit 1
