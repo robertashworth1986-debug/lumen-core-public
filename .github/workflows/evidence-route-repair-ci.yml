@@ -1,0 +1,62 @@
+name: Evidence route repair CI
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/evidence-route-repair-ci.yml'
+      - 'code/ops/repair_evidence_route.py'
+      - 'code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh'
+      - 'dashboard/evidence/index_bounded.html'
+      - 'docs/EVIDENCE_ROUTE_RECOVERY.md'
+      - 'tests/test_repair_evidence_route.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-route-repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Compile repair utility and tests
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            code/ops/repair_evidence_route.py \
+            tests/test_repair_evidence_route.py
+
+      - name: Validate shell wrapper syntax
+        run: |
+          set -euo pipefail
+          bash -n code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh
+
+      - name: Run focused unit tests
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover \
+            -s tests \
+            -p 'test_repair_evidence_route.py' \
+            -v
+
+      - name: Verify bounded public-page contract
+        run: |
+          set -euo pipefail
+          test -s dashboard/evidence/index_bounded.html
+          grep -Fq 'Hash' dashboard/evidence/index_bounded.html
+          grep -Fq 'do not by themselves establish' dashboard/evidence/index_bounded.html
+          grep -Fq 'not third-party validation' dashboard/evidence/index_bounded.html
+          ! grep -Fq 'Undeniable Evidence' dashboard/evidence/index_bounded.html
+          ! grep -Fq 'No cherry-picking' dashboard/evidence/index_bounded.html
+
+      - name: Confirm deployment remains human-authorized
+        run: |
+          set -euo pipefail
+          grep -Fq -- '--apply' code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh
+          grep -Fq 'nginx -t' code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh
+          grep -Fq 'index_bounded.html' code/ops/repair_evidence_route.py
+          ! grep -Eq 'ssh |scp |rsync ' code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh
