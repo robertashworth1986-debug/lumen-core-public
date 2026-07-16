@@ -137,7 +137,7 @@ def test_crawler_scope_rejects_external_login_and_form_urls():
     assert not module.is_public_crawl_url("mailto:OpenPowerAI@epri.com")
 
 
-def test_parser_never_creates_form_submission_records():
+def test_parser_ignores_form_controls_and_retains_only_public_page_metadata():
     module = load_module()
     doc = document(
         module,
@@ -149,6 +149,9 @@ def test_parser_never_creates_form_submission_records():
     )
     snapshot = module.build_snapshot_from_documents([doc])
     serialized = str(snapshot).lower()
+
     assert "input name" not in serialized
-    assert "submit" not in snapshot["source"]["boundary"].lower()
+    assert "action=\"/submit\"" not in serialized
+    assert snapshot["organizations"] == []
+    assert snapshot["documents"] == []
     assert "no authentication, form submission" in snapshot["source"]["boundary"].lower()
