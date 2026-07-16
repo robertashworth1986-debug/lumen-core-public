@@ -1,0 +1,69 @@
+{
+  "phase_sweep": {
+    "agent_counts": [
+      8,
+      16
+    ],
+    "coupling_gains": [
+      0.35,
+      0.7,
+      1.1,
+      1.6
+    ],
+    "phase_bins": [
+      4,
+      8,
+      16,
+      "continuous"
+    ],
+    "packet_losses": [
+      0.0,
+      0.2
+    ],
+    "sensor_noises": [
+      0.0,
+      0.08
+    ],
+    "latency_steps": [
+      0,
+      3
+    ],
+    "frequency_spread": 0.22,
+    "damping": 0.9,
+    "inertia": 1.0,
+    "seeds": [
+      11,
+      23,
+      47
+    ],
+    "duration_s": 30.0,
+    "dt_s": 0.03,
+    "disturbance_time_s": 15.0,
+    "disturbance_phase_rad": 1.5707963267948966
+  },
+  "formation_sweep": {
+    "enabled": true,
+    "agent_counts": [
+      8,
+      16
+    ],
+    "start_shapes": [
+      "line",
+      "ring",
+      "v"
+    ],
+    "end_shapes": [
+      "ring",
+      "v",
+      "echelon"
+    ],
+    "seeds": [
+      11,
+      23,
+      47
+    ],
+    "duration_s": 18.0,
+    "dt_s": 0.02,
+    "spacing": 1.0
+  }
+}
