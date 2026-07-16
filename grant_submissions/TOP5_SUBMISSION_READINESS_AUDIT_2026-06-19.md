@@ -1,6 +1,6 @@
 # Top-Five Grant Submission Readiness Audit
 
-Generated UTC: 2026-07-13T18:32:34.640737+00:00
+Generated UTC: 2026-07-16T19:33:43.494283+00:00
 
 Posture: LOCAL_READY_PORTAL_BLOCKED
 
@@ -8,7 +8,7 @@ Posture: LOCAL_READY_PORTAL_BLOCKED
 
 - Packages checked: 5
 - Local blockers: 0
-- Portal/user blockers: 23
+- Portal/user blockers: 24
 - Geometry registry manifest: 3/3 matched
 
 ## Verified Portal Facts
@@ -50,9 +50,9 @@ Live-measured rows and frozen live replay are the promoted evidence lanes. Synth
 
 - portal: DSIP
 - readiness: LOCAL_READY_PORTAL_BLOCKED_USER_GATES
-- required artifacts present: 17/17
+- required artifacts present: 28/28
 - evidence manifests matched: 8/8
-- render QA: pdfs=1, pngs=6, min_png_pages=6, ok=True
+- render QA: pdfs=1, pngs=5, min_png_pages=5, ok=True
 - verified portal facts:
   - SAM.gov active registration verified from signed-in workspace: SAM entity identifiers recorded, purpose All Awards, expiration 2026-08-30.
   - HarborSentinel public AIS controlled-injection benchmark ready: 20000 injected validation segments, motion-consistency recall 1.0, speed-only baseline recall 0.25835; best single-axis baseline recall 0.5068; boundary: controlled kinematic injections are not real threat labels, multi-source fusion, or field validation.
@@ -64,6 +64,7 @@ Live-measured rows and frozen live replay are the promoted evidence lanes. Synth
   - DSIP organization linkage and submitter authority are unverified.
   - DoD representations, FOCI, export, cybersecurity, and U.S. ownership/operation checks remain.
   - CMMC/SPRS/Affirming Official status is unverified.
+  - The seven-volume HarborSentinel assembly exists locally, but Volumes 1, 3, 4, 6, and 7 still require live DSIP facts or human action.
   - Navy reviewer proof matrix exists; final human/domain signoff is still required.
   - Final DSIP upload preview and fresh action-time approval are required.
 

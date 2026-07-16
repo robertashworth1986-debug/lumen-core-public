@@ -1,0 +1,100 @@
+{
+  "schema": "nv063_dsip_package_manifest_v1",
+  "generated_utc": "2026-07-16T19:36:51.8050037Z",
+  "topic": "DON26BZ03-NV063",
+  "official_close": "2026-07-22T12:00:00-04:00",
+  "status": "LOCAL_SEVEN_VOLUME_ASSEMBLY_PORTAL_AND_HUMAN_GATED",
+  "volume2_pages": 5,
+  "volume2_page_limit": 10,
+  "technical_abstract_characters": 2364,
+  "benefits_characters": 2471,
+  "portal_final_action_required": true,
+  "focused_tests": {
+    "command": "pytest -q tests/test_grant_submission_readiness_audit.py tests/test_grant_evidence_boundaries.py tests/test_harbor_sentinel_benchmark.py tests/test_harbor_sentinel_validation_suite.py tests/test_harbor_ais_injection_benchmark.py",
+    "passed": 21,
+    "failed": 0
+  },
+  "claim_boundary": "Local assembly and render QA only. This manifest does not certify eligibility, cost, CMMC/SPRS, export compliance, clearance status, data rights, portal authority, or submission.",
+  "artifacts": [
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/NV063_DSIP_ASSEMBLY_MAP_2026-07-16.md",
+      "bytes": 6992,
+      "sha256": "608989e2c390fd8fb4d03aafbc99d7c7be5d4feae478ca71df9a3cd7ab372e11"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/NV063_DSIP_VOLUME1_PUBLIC_TEXT_2026-07-16.md",
+      "bytes": 5960,
+      "sha256": "abdd30465cb8e842c8262d9a7ce4a9d66cc624fd86e2368cceba78563a764fac"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/NV063_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.md",
+      "bytes": 21124,
+      "sha256": "2d4609b8e614cbbf20c82a2d3e1a27e0487325542ee72956cb4bdafefdb65b02"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/NV063_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.docx",
+      "bytes": 35341,
+      "sha256": "b8065fd232120d4fabe19bae590eab876048f98dd708be92e4fdfb63208c9226"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/NV063_DSIP_VOLUME3_COST_INPUTS_2026-07-16.md",
+      "bytes": 3681,
+      "sha256": "7e310319f00c912791e18225f51b00b4bb84643a8b4ccaa3d8546aeb8db380ed"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/NV063_DSIP_VOLUME5_WORKSHEET_2026-07-16.md",
+      "bytes": 4557,
+      "sha256": "f899c58ea88d8bf10cb3555a13be71278c6f441c4bcb8862d61ee3386449dc35"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/build_nv063_dsip_volume2_candidate.py",
+      "bytes": 14869,
+      "sha256": "fb28e497e901377b15f76ba939406a7d24d1b8248421e1a4e341c9204a5f3846"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/source_attachments/DoW_2026_SBIR_BAA_RELEASE_3_PREFACE.pdf",
+      "bytes": 676002,
+      "sha256": "fb809186f3b43313a1877a5c36e2383a45b84f62566dda3f6bcdb93779ce08ae"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/source_attachments/DON_PHASE_I_CONVENTIONAL_VOLUME2_TEMPLATE_2026-03-04.docx",
+      "bytes": 49850,
+      "sha256": "676d05a566a023941a6c7bbe9719a1eece8f4ab6a99e0be8049af4793079f3f8"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/source_attachments/DON_PHASE_I_II_VOLUME5_SUPPORTING_DOCS_TEMPLATE_2025-02-12.docx",
+      "bytes": 37746,
+      "sha256": "589cfb26c2c6e4f63a3f61aee3a6ab3a84901c54f273a259a6f6df11bb9f36fb"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/render_qa_20260716_dsip_candidate_v1/NV063_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf",
+      "bytes": 124673,
+      "sha256": "692e86bf79a3c5e90913a1d5a611e3c2973ede55ed44736660e7e7267e10068a"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/render_qa_20260716_dsip_candidate_v1/page-1.png",
+      "bytes": 329570,
+      "sha256": "2ffbe05bb323eb91653c53fe4f295affb7259184045ef6a8e5d7f725dbcc5463"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/render_qa_20260716_dsip_candidate_v1/page-2.png",
+      "bytes": 323850,
+      "sha256": "f16ec4a081bb3cd14e800328b3a3ec691bb2e4a0f811a7dc013b74fb6d2a0661"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/render_qa_20260716_dsip_candidate_v1/page-3.png",
+      "bytes": 299985,
+      "sha256": "7d7edaa87ed8c770aec586fa3008578ba8a5914e2679d214237740c42c56d211"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/render_qa_20260716_dsip_candidate_v1/page-4.png",
+      "bytes": 304054,
+      "sha256": "5888778aae9667fdb5e226a3877f03034393b488b3364d61839bdd94ad851222"
+    },
+    {
+      "path": "grant_submissions/NV063_HarborSentinel/render_qa_20260716_dsip_candidate_v1/page-5.png",
+      "bytes": 291067,
+      "sha256": "cb947f91725c6a27e4c5b0b334c040933d0777b775dc0bd625e81506d465ddbf"
+    }
+  ]
+}

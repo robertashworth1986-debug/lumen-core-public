@@ -49,6 +49,18 @@ def test_top_five_have_no_local_readiness_blockers():
     assert "grant_submissions/DICE_HR001126S0010/DICE_LIVE_BREADTH_REPLAY_2026-06-20.md" in dice_required
     assert "grant_submissions/LIVE_BREADTH_PROVENANCE_ANNEX_2026-06-21.md" in dice_required
     assert "grant_submissions/LIVE_BREADTH_PROVENANCE_ANNEX_2026-06-21.md" in harbor_required
+    assert "grant_submissions/NV063_HarborSentinel/NV063_DSIP_ASSEMBLY_MAP_2026-07-16.md" in harbor_required
+    assert "grant_submissions/NV063_HarborSentinel/NV063_DSIP_VOLUME1_PUBLIC_TEXT_2026-07-16.md" in harbor_required
+    assert "grant_submissions/NV063_HarborSentinel/NV063_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.docx" in harbor_required
+    assert "grant_submissions/NV063_HarborSentinel/NV063_DSIP_VOLUME3_COST_INPUTS_2026-07-16.md" in harbor_required
+    assert "grant_submissions/NV063_HarborSentinel/NV063_DSIP_VOLUME5_WORKSHEET_2026-07-16.md" in harbor_required
+    assert "grant_submissions/NV063_HarborSentinel/NV063_DSIP_PACKAGE_MANIFEST_2026-07-16.json" in harbor_required
+    assert "grant_submissions/NV063_HarborSentinel/source_attachments/DoW_2026_SBIR_BAA_RELEASE_3_PREFACE.pdf" in harbor_required
+    assert (
+        by_name["HarborSentinel"]["render"]["render_dir"]
+        == "grant_submissions/NV063_HarborSentinel/render_qa_20260716_dsip_candidate_v1"
+    )
+    assert by_name["HarborSentinel"]["render"]["png_count"] == 5
     assert "grant_submissions/NV063_HarborSentinel/NV063_DATA_SOURCE_ACCESS_AUDIT_2026-06-20.md" in harbor_required
     assert "grant_submissions/NV063_HarborSentinel/NV063_AIS_PILOT_SOURCE_REGISTRY_2026-06-20.md" in harbor_required
     assert "grant_submissions/NV063_HarborSentinel/NV063_AIS_PILOT_ACQUISITION_2026-06-20.md" in harbor_required
