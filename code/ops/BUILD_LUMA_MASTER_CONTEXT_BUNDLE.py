@@ -130,6 +130,131 @@ def git_snapshot(repo_root: Path) -> dict[str, Any]:
         return {"available": False, "head": None, "branch": None, "dirty_path_count": None}
 
 
+def canonical_source_fingerprint(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    return sorted(
+        (
+            {
+                "id": row["id"],
+                "role": row["role"],
+                "location": row["location"],
+                "path": row["path"],
+                "exists": row["exists"],
+                "read_error": row["read_error"],
+                "stale": row["stale"],
+                "sha256": row["sha256"],
+            }
+            for row in payload.get("source_records", [])
+            if row.get("canonical") and row.get("status") == "current"
+        ),
+        key=lambda row: (str(row["role"]), str(row["id"])),
+    )
+
+
+def verify_published_bundle(
+    current_payload: dict[str, Any],
+    *,
+    vault_root: Path,
+    registry_path: Path,
+) -> dict[str, Any]:
+    registry = read_json(registry_path)
+    output = registry["private_output"]
+    output_dir = vault_root / output["vault_relative_dir"]
+    latest_json = output_dir / output["latest_json"]
+    latest_markdown = output_dir / output["latest_markdown"]
+    latest_manifest = output_dir / output["latest_manifest"]
+    reasons: list[str] = []
+    published_payload: dict[str, Any] | None = None
+    manifest: dict[str, Any] | None = None
+
+    for label, path in (
+        ("latest_json_missing", latest_json),
+        ("latest_markdown_missing", latest_markdown),
+        ("latest_manifest_missing", latest_manifest),
+    ):
+        if not path.is_file():
+            reasons.append(label)
+
+    if latest_json.is_file():
+        try:
+            published_payload = read_json(latest_json)
+        except (OSError, ValueError, json.JSONDecodeError):
+            reasons.append("latest_json_unreadable")
+    if latest_manifest.is_file():
+        try:
+            manifest = read_json(latest_manifest)
+        except (OSError, ValueError, json.JSONDecodeError):
+            reasons.append("latest_manifest_unreadable")
+
+    if published_payload is not None:
+        comparisons = (
+            (
+                "schema_mismatch",
+                current_payload.get("schema"),
+                published_payload.get("schema"),
+            ),
+            (
+                "startup_order_mismatch",
+                current_payload.get("startup_order"),
+                published_payload.get("startup_order"),
+            ),
+            (
+                "canonical_source_map_mismatch",
+                current_payload.get("canonical_source_by_role"),
+                published_payload.get("canonical_source_by_role"),
+            ),
+            (
+                "canonical_source_hash_mismatch",
+                canonical_source_fingerprint(current_payload),
+                canonical_source_fingerprint(published_payload),
+            ),
+            (
+                "git_availability_mismatch",
+                current_payload.get("git", {}).get("available"),
+                published_payload.get("git", {}).get("available"),
+            ),
+            (
+                "git_head_mismatch",
+                current_payload.get("git", {}).get("head"),
+                published_payload.get("git", {}).get("head"),
+            ),
+            (
+                "git_branch_mismatch",
+                current_payload.get("git", {}).get("branch"),
+                published_payload.get("git", {}).get("branch"),
+            ),
+            (
+                "git_dirty_path_count_mismatch",
+                current_payload.get("git", {}).get("dirty_path_count"),
+                published_payload.get("git", {}).get("dirty_path_count"),
+            ),
+        )
+        reasons.extend(label for label, current, published in comparisons if current != published)
+
+    if manifest is not None:
+        artifacts = manifest.get("artifacts")
+        if not isinstance(artifacts, dict):
+            reasons.append("manifest_artifacts_missing")
+        else:
+            for label, path in (
+                ("latest_json_hash_mismatch", latest_json),
+                ("latest_markdown_hash_mismatch", latest_markdown),
+            ):
+                expected = artifacts.get(path.name)
+                if path.is_file() and (not isinstance(expected, str) or sha256_file(path) != expected):
+                    reasons.append(label)
+        if published_payload is not None and manifest.get("generated_utc") != published_payload.get("generated_utc"):
+            reasons.append("manifest_generation_mismatch")
+
+    reasons = sorted(set(reasons))
+    return {
+        "gate_passed": not reasons,
+        "reasons": reasons,
+        "published_generated_utc": published_payload.get("generated_utc") if published_payload else None,
+        "current_git_head": current_payload.get("git", {}).get("head"),
+        "published_git_head": published_payload.get("git", {}).get("head") if published_payload else None,
+    }
+
+
 def build_payload(
     *,
     repo_root: Path,
@@ -354,12 +479,43 @@ def main() -> int:
         registry_path=args.registry.resolve(),
     )
     if args.check_only:
-        print(json.dumps(payload["integrity"], indent=2, sort_keys=True))
+        published_bundle = verify_published_bundle(
+            payload,
+            vault_root=args.vault_root.resolve(),
+            registry_path=args.registry.resolve(),
+        )
+        print(
+            json.dumps(
+                {"integrity": payload["integrity"], "published_bundle": published_bundle},
+                indent=2,
+                sort_keys=True,
+            )
+        )
     else:
         verification = write_bundle(payload, vault_root=args.vault_root.resolve(), registry_path=args.registry.resolve())
-        print(json.dumps({"integrity": payload["integrity"], "verification": verification}, indent=2, sort_keys=True))
+        published_bundle = verify_published_bundle(
+            payload,
+            vault_root=args.vault_root.resolve(),
+            registry_path=args.registry.resolve(),
+        )
+        print(
+            json.dumps(
+                {
+                    "integrity": payload["integrity"],
+                    "published_bundle": published_bundle,
+                    "verification": verification,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
     integrity = payload["integrity"]
-    return 0 if integrity["canonical_gate_passed"] and integrity["freshness_gate_passed"] else 1
+    gates_passed = (
+        integrity["canonical_gate_passed"]
+        and integrity["freshness_gate_passed"]
+        and published_bundle["gate_passed"]
+    )
+    return 0 if gates_passed else 1
 
 
 if __name__ == "__main__":

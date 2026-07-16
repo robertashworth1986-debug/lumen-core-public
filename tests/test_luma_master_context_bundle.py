@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -172,3 +173,42 @@ def test_write_bundle_creates_hash_verified_latest_and_run_receipts(tmp_path: Pa
     assert latest.is_file()
     assert verification["json_sha256"] == manifest["artifacts"][latest.name]
     assert Path(verification["run_dir"]).is_dir()
+
+
+def test_published_bundle_gate_detects_git_and_artifact_drift(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    vault = tmp_path / "vault"
+    repo.mkdir()
+    write_json(repo / "reviewer.json", {})
+    write_json(vault / "notes.json", {})
+    registry_path = repo / "registry.json"
+    write_json(registry_path, fixture_registry())
+    payload = MODULE.build_payload(
+        repo_root=repo,
+        vault_root=vault,
+        registry_path=registry_path,
+        generated_at=datetime(2026, 7, 14, 5, 30, tzinfo=timezone.utc),
+    )
+    payload["git"] = {
+        "available": True,
+        "head": "a" * 40,
+        "branch": "reviewer-branch",
+        "dirty_path_count": 0,
+    }
+    MODULE.write_bundle(payload, vault_root=vault, registry_path=registry_path)
+
+    clean = MODULE.verify_published_bundle(payload, vault_root=vault, registry_path=registry_path)
+    assert clean["gate_passed"] is True
+    assert clean["reasons"] == []
+
+    moved_head = deepcopy(payload)
+    moved_head["git"]["head"] = "b" * 40
+    stale = MODULE.verify_published_bundle(moved_head, vault_root=vault, registry_path=registry_path)
+    assert stale["gate_passed"] is False
+    assert stale["reasons"] == ["git_head_mismatch"]
+
+    latest_markdown = vault / "PRIVATE_CONTEXT" / "LUMA_MASTER_CONTEXT_LATEST.md"
+    latest_markdown.write_text("tampered\n", encoding="utf-8")
+    tampered = MODULE.verify_published_bundle(payload, vault_root=vault, registry_path=registry_path)
+    assert tampered["gate_passed"] is False
+    assert tampered["reasons"] == ["latest_markdown_hash_mismatch"]
