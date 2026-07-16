@@ -1,0 +1,240 @@
+{
+  "schema": "lumencore_story_value_policy_v1",
+  "purpose": "Rank media and evidence by reviewer-safe conversion value without treating attention, valuation, or wealth as guaranteed outcomes.",
+  "non_destructive_rule": "A freeze disposition changes only story eligibility. It never deletes, moves, renames, or rewrites a source asset.",
+  "profiles": {
+    "public_documentary": {
+      "purpose": "Select a compelling public story whose claims are receipt-bound and whose sources are cleared for public use.",
+      "weights": {
+        "proof_binding": 0.28,
+        "narrative_strength": 0.18,
+        "visual_strength": 0.12,
+        "conversion_alignment": 0.18,
+        "rights_confidence": 0.10,
+        "reusability": 0.09,
+        "freshness": 0.05
+      },
+      "penalties": {
+        "privacy_risk": 0.34,
+        "unsupported_claim_risk": 0.30,
+        "provenance_ambiguity": 0.16
+      },
+      "hard_gates": {
+        "allowed_rights_statuses": ["cleared", "user_owned"],
+        "privacy_risk_max": 0.20,
+        "unsupported_claim_risk_max": 0.25,
+        "proof_binding_min_for_proof_claim": 0.60
+      },
+      "thresholds": {
+        "feature_min": 68.0,
+        "support_min": 48.0,
+        "hold_min": 28.0
+      }
+    },
+    "reviewer_evidence": {
+      "purpose": "Retain positive, null, and adverse evidence when it improves reproducibility or decision integrity.",
+      "weights": {
+        "proof_binding": 0.42,
+        "narrative_strength": 0.08,
+        "visual_strength": 0.04,
+        "conversion_alignment": 0.16,
+        "rights_confidence": 0.08,
+        "reusability": 0.12,
+        "freshness": 0.10
+      },
+      "penalties": {
+        "privacy_risk": 0.28,
+        "unsupported_claim_risk": 0.38,
+        "provenance_ambiguity": 0.24
+      },
+      "hard_gates": {
+        "allowed_rights_statuses": ["cleared", "user_owned", "internal_review"],
+        "privacy_risk_max": 0.35,
+        "unsupported_claim_risk_max": 0.20,
+        "proof_binding_min_for_proof_claim": 0.70
+      },
+      "thresholds": {
+        "feature_min": 72.0,
+        "support_min": 50.0,
+        "hold_min": 30.0
+      }
+    },
+    "private_archive": {
+      "purpose": "Preserve custody and future optionality even when an asset is not suitable for reviewers or public storytelling.",
+      "weights": {
+        "proof_binding": 0.18,
+        "narrative_strength": 0.12,
+        "visual_strength": 0.08,
+        "conversion_alignment": 0.12,
+        "rights_confidence": 0.06,
+        "reusability": 0.24,
+        "freshness": 0.20
+      },
+      "penalties": {
+        "privacy_risk": 0.04,
+        "unsupported_claim_risk": 0.08,
+        "provenance_ambiguity": 0.08
+      },
+      "hard_gates": {
+        "allowed_rights_statuses": ["cleared", "user_owned", "internal_review", "unknown"],
+        "privacy_risk_max": 1.0,
+        "unsupported_claim_risk_max": 1.0,
+        "proof_binding_min_for_proof_claim": 0.0
+      },
+      "thresholds": {
+        "feature_min": 80.0,
+        "support_min": 52.0,
+        "hold_min": 0.0
+      }
+    }
+  },
+  "repo_assets": [
+    {
+      "asset_id": "frequency_reviewer_decision",
+      "path": "evidence/external_validation/frequency_cluster_reviewer_decision_20260716.json",
+      "content_role": "proof_claim",
+      "rights_status": "cleared",
+      "negative_or_null_result": true,
+      "metrics": {
+        "proof_binding": 1.0,
+        "narrative_strength": 0.90,
+        "visual_strength": 0.18,
+        "conversion_alignment": 0.82,
+        "rights_confidence": 1.0,
+        "reusability": 0.92,
+        "freshness": 1.0,
+        "privacy_risk": 0.0,
+        "unsupported_claim_risk": 0.0,
+        "provenance_ambiguity": 0.0
+      }
+    },
+    {
+      "asset_id": "truth_over_hype_short_film",
+      "path": "out/social/tiktok_truth_over_hype_v1_20260716/LumenCore_Truth_Over_Hype_TikTok_V1.mp4",
+      "content_role": "narrative",
+      "rights_status": "cleared",
+      "metrics": {
+        "proof_binding": 0.94,
+        "narrative_strength": 0.93,
+        "visual_strength": 0.88,
+        "conversion_alignment": 0.80,
+        "rights_confidence": 1.0,
+        "reusability": 0.88,
+        "freshness": 1.0,
+        "privacy_risk": 0.0,
+        "unsupported_claim_risk": 0.0,
+        "provenance_ambiguity": 0.0
+      }
+    },
+    {
+      "asset_id": "truth_over_hype_cover",
+      "path": "out/social/tiktok_truth_over_hype_v1_20260716/TIKTOK_COVER.png",
+      "content_role": "narrative",
+      "rights_status": "cleared",
+      "metrics": {
+        "proof_binding": 0.90,
+        "narrative_strength": 0.86,
+        "visual_strength": 0.84,
+        "conversion_alignment": 0.74,
+        "rights_confidence": 1.0,
+        "reusability": 0.90,
+        "freshness": 1.0,
+        "privacy_risk": 0.0,
+        "unsupported_claim_risk": 0.0,
+        "provenance_ambiguity": 0.0
+      }
+    },
+    {
+      "asset_id": "mission_control_reviewer_capture",
+      "path": "output/playwright/mission_control_reviewer_1440.png",
+      "content_role": "interface_context",
+      "rights_status": "cleared",
+      "metrics": {
+        "proof_binding": 0.62,
+        "narrative_strength": 0.72,
+        "visual_strength": 0.86,
+        "conversion_alignment": 0.70,
+        "rights_confidence": 1.0,
+        "reusability": 0.84,
+        "freshness": 0.72,
+        "privacy_risk": 0.0,
+        "unsupported_claim_risk": 0.08,
+        "provenance_ambiguity": 0.0
+      }
+    },
+    {
+      "asset_id": "grants_reviewer_capture",
+      "path": "output/playwright/grants-reviewer-desktop-final.png",
+      "content_role": "interface_context",
+      "rights_status": "cleared",
+      "metrics": {
+        "proof_binding": 0.58,
+        "narrative_strength": 0.54,
+        "visual_strength": 0.76,
+        "conversion_alignment": 0.78,
+        "rights_confidence": 1.0,
+        "reusability": 0.68,
+        "freshness": 0.66,
+        "privacy_risk": 0.0,
+        "unsupported_claim_risk": 0.12,
+        "provenance_ambiguity": 0.0
+      }
+    }
+  ],
+  "external_asset_rules_by_sha256": {
+    "fd92f4172ae6d1209602a93a749d10942137406f2b778637ba51a405f0be41a1": {
+      "asset_id": "physical_context_long_video",
+      "content_role": "historical_physical_context",
+      "rights_status": "user_owned",
+      "public_label": "Historical physical-context video; not performance evidence",
+      "metrics": {
+        "proof_binding": 0.0,
+        "narrative_strength": 0.28,
+        "visual_strength": 0.34,
+        "conversion_alignment": 0.10,
+        "rights_confidence": 0.74,
+        "reusability": 0.26,
+        "freshness": 0.62,
+        "privacy_risk": 0.55,
+        "unsupported_claim_risk": 0.68,
+        "provenance_ambiguity": 0.70
+      }
+    },
+    "675d3471ddaeca442500053d0238e2e36648165b1da1ee67fbbbd5efa8835869": {
+      "asset_id": "legacy_controller_live_photo_01",
+      "content_role": "historical_physical_context",
+      "rights_status": "user_owned",
+      "public_label": "Legacy controller hardware; provenance not linked to a LumenCore receipt",
+      "metrics": {
+        "proof_binding": 0.0,
+        "narrative_strength": 0.46,
+        "visual_strength": 0.74,
+        "conversion_alignment": 0.18,
+        "rights_confidence": 0.84,
+        "reusability": 0.52,
+        "freshness": 0.48,
+        "privacy_risk": 0.0,
+        "unsupported_claim_risk": 0.62,
+        "provenance_ambiguity": 0.72
+      }
+    },
+    "d7b84cb85f7888aec5dfdb3ac0959782f812f9ce3239a0289ec4a0dcf7c7c46b": {
+      "asset_id": "legacy_controller_live_photo_02",
+      "content_role": "historical_physical_context",
+      "rights_status": "user_owned",
+      "public_label": "Legacy controller hardware; provenance not linked to a LumenCore receipt",
+      "metrics": {
+        "proof_binding": 0.0,
+        "narrative_strength": 0.48,
+        "visual_strength": 0.78,
+        "conversion_alignment": 0.18,
+        "rights_confidence": 0.84,
+        "reusability": 0.54,
+        "freshness": 0.48,
+        "privacy_risk": 0.0,
+        "unsupported_claim_risk": 0.62,
+        "provenance_ambiguity": 0.72
+      }
+    }
+  }
+}
