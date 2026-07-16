@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-07-16T19:53:09Z",
+  "solicitation": "HR001126S0010",
+  "proposal_path": "TA1/TA2",
+  "abstract_id": "HR001126S0010-DICE-PA-052",
+  "purpose": "Receipt and requirements delta for DICE Amendment 01",
+  "mirror_path": "E:\\LumaProofVault\\SUBMISSIONS\\DICE_HR001126S0010_20260716",
+  "official_sources": [
+    "https://www.darpa.mil/work-with-us/opportunities/hr001126S0010",
+    "https://simpler.grants.gov/opportunity/56b71085-ed91-4468-b7eb-3a04bf840794"
+  ],
+  "artifacts": [
+    {
+      "path": "HR001126S0010_AMENDMENT_01_OFFICIAL.pdf",
+      "bytes": 1337620,
+      "sha256": "CEA5F2D6061B9EF6E52A52FEAA29E4FA3DE324552896CDB6AB82335D0D1EAF4C",
+      "role": "official_amendment"
+    },
+    {
+      "path": "DICE_AMENDMENT_01_DELTA_2026-07-16.md",
+      "bytes": 4085,
+      "sha256": "55A9670057FEE6F18E275E7E3B6A3A5DCA05F26523FA85198898D16FFD4E7619",
+      "role": "requirements_delta"
+    },
+    {
+      "path": "DICE_SUBMISSION_READINESS.md",
+      "bytes": 10520,
+      "sha256": "454BE23F7679FF8C5CC4142B8DFE3FB748B2CC3C70A75B404EB5ACC3ED59123E",
+      "role": "updated_readiness_record"
+    }
+  ],
+  "claim_boundary": "This manifest records local artifacts and hashes only. It does not establish CMMC status, SPRS status, BAAT authority, proposal submission, or award eligibility."
+}

@@ -1,6 +1,6 @@
 # DICE HR001126S0010 Submission Readiness
 
-Updated: June 19, 2026
+Updated: July 16, 2026
 
 ## Current Decision
 
@@ -8,6 +8,10 @@ Updated: June 19, 2026
 - Abstract due: June 30, 2026 at 2:00 p.m. Eastern Time.
 - Full proposal due: August 25, 2026 at 2:00 p.m. Eastern Time.
 - Submission system: DARPA Broad Agency Announcement Tool (BAAT).
+- Amendment 01 posted July 14, 2026 changes Section 3.3 CMMC requirements.
+- TA1/TA2 now has an explicit Final CMMC Level 1, CAGE-linked SPRS, and annual
+  affirmation award-eligibility gate. See
+  `DICE_AMENDMENT_01_DELTA_2026-07-16.md`.
 - Current artifact:
   `LumenCore_DICE_Abstract_WORKING_DRAFT.docx`
 - Status: working draft, not approved for submission.
@@ -15,6 +19,9 @@ Updated: June 19, 2026
 ## Completed
 
 - Official DICE BAA and abstract template downloaded.
+- Official Amendment 01 downloaded, hashed, and reconciled against the
+  original BAA on July 16, 2026. No technical-area, deadline, portal, or
+  proposal-attachment change was identified.
 - TA1/TA2 requirements mapped to a single technical concept.
 - Official-template working abstract generated.
 - Cover sheet, six required sections, cost-by-phase estimate, compute
@@ -108,8 +115,14 @@ Updated: June 19, 2026
      the final award instrument.
    - Confirm the proposed information boundary remains Unclassified and does
      not require CUI processing.
-   - If a procurement contract is pursued, verify CMMC Level 1 proposal
-     requirements and current SPRS/CMMC status.
+   - Amendment 01 states that TA1/TA2 requires Final CMMC Level 1, with the
+     proposal CAGE code linked to a valid, unexpired status in SPRS and a
+     current annual affirmation by an authorized Affirming Official.
+   - The amended language is broader than the original procurement-contract
+     lead-in. Treat the requirement as an award-eligibility gate unless DARPA
+     provides written clarification for the selected award instrument.
+   - Current PIEE access, SPRS role, CAGE linkage, CMMC status, and annual
+     affirmation remain unverified. Do not represent them as complete.
    - Use `../CMMC_LEVEL_2_READINESS_2026-06-13.md` to plan a separate federal
      enclave if future work requires CUI or a Level 2 status.
 
@@ -171,12 +184,14 @@ security certification.
 ## Current Action Order
 
 1. Human verifies BAAT access and submitter authority.
-2. Optionally re-open `LumenCore_DICE_Abstract_WORKING_DRAFT.docx` in Word,
+2. Human verifies PIEE/SPRS access, the proposal CAGE code, Final CMMC Level 1
+   status, and the current annual affirmation or records each item as absent.
+3. Optionally re-open `LumenCore_DICE_Abstract_WORKING_DRAFT.docx` in Word,
    LibreOffice, or BAAT preview and confirm the local 7-page layout.
-3. Replace the planning cost estimate with a reviewed cost basis if one
+4. Replace the planning cost estimate with a reviewed cost basis if one
    becomes available; otherwise preserve the abstract-stage ROM language.
-4. Review final reference relevance; link/source existence has been checked or
+5. Review final reference relevance; link/source existence has been checked or
    source-confirmed for all visible URLs, and citation style is normalized.
-5. Add any real collaborator commitments; otherwise keep the one-person-team
+6. Add any real collaborator commitments; otherwise keep the one-person-team
    risk explicit.
-6. Remove the working-draft warning only after all blockers clear.
+7. Remove the working-draft warning only after all blockers clear.
