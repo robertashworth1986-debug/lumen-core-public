@@ -36,7 +36,7 @@ STATIC = """server {
 
     location /evidence/ {
         root /opt/lumencore/dashboard;
-        index index.html;
+        index index_bounded.html;
         try_files $uri $uri/ =404;
         add_header Cache-Control "no-cache" always;
     }
@@ -54,6 +54,7 @@ class RepairEvidenceRouteTests(unittest.TestCase):
         self.assertTrue(result.changed)
         self.assertIn("location = /evidence", result.repaired)
         self.assertIn("root /opt/lumencore/dashboard;", result.repaired)
+        self.assertIn("index index_bounded.html;", result.repaired)
         self.assertNotIn("proxy_pass http://luma_gateway", result.repaired)
         self.assertIn("location / {", result.repaired)
         MODULE.validate_repaired_config(result.repaired)
@@ -77,7 +78,7 @@ class RepairEvidenceRouteTests(unittest.TestCase):
             root = Path(tmp)
             config = root / "lumatrader.conf"
             dashboard = root / "dashboard"
-            index = dashboard / "evidence" / "index.html"
+            index = dashboard / "evidence" / "index_bounded.html"
             index.parent.mkdir(parents=True)
             index.write_text("bounded evidence\n", encoding="utf-8")
             config.write_text(PROXIED, encoding="utf-8")
