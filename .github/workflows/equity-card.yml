@@ -2,7 +2,7 @@ name: 📊 Generate Live Equity Card
 
 on:
   schedule:
-    # Every 20 minutes — keep the equity card fresh
+    # Probe every 20 minutes; commit only on material card changes or once per UTC day.
     - cron: '*/20 * * * *'
   workflow_dispatch:
 
@@ -24,55 +24,133 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Fetch live executor data
+      - name: Fetch and compare equity state
         id: data
+        shell: bash
         run: |
-          # Try live heartbeat from VPS
-          HB=$(curl -sf --max-time 10 https://lumen-core.ai/api/executor_heartbeat.json 2>/dev/null || echo "{}")
-          BRIEF=$(curl -sf --max-time 10 https://lumen-core.ai/api/federal_brief.json 2>/dev/null || echo "{}")
+          set -euo pipefail
+          mkdir -p assets data
 
-          # Parse fields with jq, fall back gracefully
-          EQUITY=$(echo "$HB"   | jq -r '.total_equity_usd_hint // "—"')
-          STATUS=$(echo "$HB"   | jq -r '.status // "unknown"')
-          REASON=$(echo "$HB"   | jq -r '.reason // ""')
-          POSITIONS=$(echo "$HB" | jq -r '.risk_open_positions_live // "—"')
-          HEAT=$(echo "$HB"     | jq -r 'if .risk_portfolio_heat_live then (.risk_portfolio_heat_live * 100 | floor | tostring) + "%" else "—" end')
-          HB_TS=$(echo "$HB"    | jq -r '.timestamp_utc // "—"')
-          EXEC_COUNT=$(echo "$BRIEF" | jq -r '.total_executions // "—"')
+          fetch_object() {
+            local url=$1
+            local body
 
-          # Format equity as $X.XX
-          if [ "$EQUITY" != "—" ]; then
-            EQUITY=$(printf "$%.2f" "$EQUITY")
+            if body=$(curl --fail --silent --show-error --location --max-redirs 5 --max-time 10 "$url" 2>/dev/null); then
+              if jq -e 'type == "object"' >/dev/null 2>&1 <<<"$body"; then
+                jq -cS . <<<"$body"
+                return
+              fi
+            fi
+
+            echo '{}'
+          }
+
+          HB=$(fetch_object "https://lumen-core.ai/api/executor_heartbeat.json")
+          BRIEF=$(fetch_object "https://lumen-core.ai/api/federal_brief.json")
+
+          EQUITY_RAW=$(jq -r '.total_equity_usd_hint // empty | tostring' <<<"$HB")
+          if [[ "$EQUITY_RAW" =~ ^-?[0-9]+([.][0-9]+)?$ ]]; then
+            EQUITY=$(printf '$%.2f' "$EQUITY_RAW")
+          else
+            EQUITY="—"
           fi
 
-          echo "equity=${EQUITY}" >> $GITHUB_OUTPUT
-          echo "status=${STATUS}" >> $GITHUB_OUTPUT
-          echo "reason=${REASON}" >> $GITHUB_OUTPUT
-          echo "positions=${POSITIONS}" >> $GITHUB_OUTPUT
-          echo "heat=${HEAT}" >> $GITHUB_OUTPUT
-          echo "hb_ts=${HB_TS}" >> $GITHUB_OUTPUT
-          echo "exec_count=${EXEC_COUNT}" >> $GITHUB_OUTPUT
-          echo "gen_ts=$(date -u +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_OUTPUT
+          STATUS=$(jq -r 'if (.status | type) == "string" then ((.status | gsub("[\\r\\n\\t]"; " "))[0:40]) else "unknown" end' <<<"$HB")
+          REASON=$(jq -r 'if (.reason | type) == "string" then ((.reason | gsub("[\\r\\n\\t]"; " "))[0:100]) else "" end' <<<"$HB")
+          POSITIONS=$(jq -r 'if ((.risk_open_positions_live | type) == "number" or (.risk_open_positions_live | type) == "string") then (.risk_open_positions_live | tostring) else "—" end' <<<"$HB")
+          HEAT=$(jq -r 'if (.risk_portfolio_heat_live | type) == "number" then ((.risk_portfolio_heat_live * 100 | floor | tostring) + "%") else "—" end' <<<"$HB")
+          EXEC_COUNT=$(jq -r 'if ((.total_executions | type) == "number" or (.total_executions | type) == "string") then (.total_executions | tostring) else "—" end' <<<"$BRIEF")
 
-      - name: Render equity SVG card
+          GENERATED_UTC=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          TODAY=${GENERATED_UTC:0:10}
+          CANDIDATE="$RUNNER_TEMP/equity_card_candidate.json"
+
+          jq -n \
+            --arg generated_utc "$GENERATED_UTC" \
+            --arg equity "$EQUITY" \
+            --arg status "$STATUS" \
+            --arg reason "$REASON" \
+            --arg positions "$POSITIONS" \
+            --arg heat "$HEAT" \
+            --arg executions "$EXEC_COUNT" \
+            '{
+              generated_utc: $generated_utc,
+              state: {
+                equity: $equity,
+                status: $status,
+                reason: $reason,
+                positions: $positions,
+                portfolio_heat: $heat,
+                executions: $executions
+              }
+            }' > "$CANDIDATE"
+
+          jq empty "$CANDIDATE"
+
+          CURRENT_STATE=$(jq -cS '.state' "$CANDIDATE")
+          PREV_STATE=$(jq -cS '.state // {}' data/equity_card_state.json 2>/dev/null || echo '{}')
+          PREV_DATE=$(jq -r '.generated_utc // ""' data/equity_card_state.json 2>/dev/null | cut -c1-10 || true)
+
+          SHOULD_COMMIT="false"
+          REASON_CODE="no material card change"
+
+          if [[ "$CURRENT_STATE" != "$PREV_STATE" ]]; then
+            SHOULD_COMMIT="true"
+            REASON_CODE="material card state changed"
+          elif [[ "$PREV_DATE" != "$TODAY" ]]; then
+            SHOULD_COMMIT="true"
+            REASON_CODE="daily snapshot"
+          fi
+
+          echo "should_commit=${SHOULD_COMMIT}" >> "$GITHUB_OUTPUT"
+          echo "generated_utc=${GENERATED_UTC}" >> "$GITHUB_OUTPUT"
+          echo "commit_reason=${REASON_CODE}" >> "$GITHUB_OUTPUT"
+          echo "Equity card: ${REASON_CODE}."
+
+      - name: Render material equity SVG card
+        if: steps.data.outputs.should_commit == 'true'
+        shell: bash
         run: |
-          EQUITY="${{ steps.data.outputs.equity }}"
-          STATUS="${{ steps.data.outputs.status }}"
-          REASON="${{ steps.data.outputs.reason }}"
-          POSITIONS="${{ steps.data.outputs.positions }}"
-          HEAT="${{ steps.data.outputs.heat }}"
-          HB_TS="${{ steps.data.outputs.hb_ts }}"
-          EXEC_COUNT="${{ steps.data.outputs.exec_count }}"
-          GEN_TS="${{ steps.data.outputs.gen_ts }}"
+          set -euo pipefail
+          STATE_FILE="$RUNNER_TEMP/equity_card_candidate.json"
 
-          # Status color
-          if [ "$STATUS" = "running" ]; then STATUS_COLOR="#00ffe7"; STATUS_DOT="#00ffe7"
-          elif [ "$STATUS" = "blocked" ]; then STATUS_COLOR="#ffa657"; STATUS_DOT="#ffa657"
-          else STATUS_COLOR="#8b949e"; STATUS_DOT="#8b949e"; fi
+          EQUITY=$(jq -r '.state.equity' "$STATE_FILE")
+          STATUS=$(jq -r '.state.status' "$STATE_FILE")
+          REASON=$(jq -r '.state.reason' "$STATE_FILE")
+          POSITIONS=$(jq -r '.state.positions' "$STATE_FILE")
+          HEAT=$(jq -r '.state.portfolio_heat' "$STATE_FILE")
+          EXEC_COUNT=$(jq -r '.state.executions' "$STATE_FILE")
+          GENERATED_UTC=$(jq -r '.generated_utc' "$STATE_FILE")
+          GEN_TS=$(date -u -d "$GENERATED_UTC" +'%Y-%m-%d %H:%M UTC')
 
-          mkdir -p assets
+          if [[ "$STATUS" == "running" ]]; then
+            STATUS_COLOR="#00ffe7"
+            STATUS_DOT="#00ffe7"
+          elif [[ "$STATUS" == "blocked" ]]; then
+            STATUS_COLOR="#ffa657"
+            STATUS_DOT="#ffa657"
+          else
+            STATUS_COLOR="#8b949e"
+            STATUS_DOT="#8b949e"
+          fi
 
-          cat > assets/equity_card.svg << SVGEOF
+          STATUS_LINE="$STATUS"
+          if [[ -n "$REASON" ]]; then
+            STATUS_LINE+=" · $REASON"
+          fi
+
+          xml_escape() {
+            jq -nr --arg value "$1" '$value | @html'
+          }
+
+          EQUITY_XML=$(xml_escape "$EQUITY")
+          STATUS_LINE_XML=$(xml_escape "$STATUS_LINE")
+          POSITIONS_XML=$(xml_escape "$POSITIONS")
+          HEAT_XML=$(xml_escape "$HEAT")
+          EXEC_COUNT_XML=$(xml_escape "$EXEC_COUNT")
+          GEN_TS_XML=$(xml_escape "$GEN_TS")
+
+          cat > assets/equity_card.svg <<SVGEOF
           <svg width="600" height="200" viewBox="0 0 600 200" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -89,57 +167,52 @@ jobs:
               </filter>
             </defs>
 
-            <!-- Background -->
             <rect width="600" height="200" rx="12" fill="url(#bg)" />
             <rect width="600" height="3" rx="1.5" fill="url(#accent)" />
 
-            <!-- Status dot (animated) -->
             <circle cx="28" cy="32" r="6" fill="${STATUS_DOT}" filter="url(#glow)">
               <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
             </circle>
 
-            <!-- Title -->
             <text x="46" y="37" font-family="'Segoe UI', system-ui, sans-serif" font-size="15" font-weight="700" fill="#ffffff">LumaTrader™ — Live Execution</text>
-            <text x="46" y="55" font-family="'Segoe UI', system-ui, sans-serif" font-size="11" fill="${STATUS_COLOR}">${STATUS}${REASON:+ · $REASON}</text>
+            <text x="46" y="55" font-family="'Segoe UI', system-ui, sans-serif" font-size="11" fill="${STATUS_COLOR}">${STATUS_LINE_XML}</text>
 
-            <!-- Divider -->
             <line x1="20" y1="70" x2="580" y2="70" stroke="#21262d" stroke-width="1"/>
 
-            <!-- Equity (main metric) -->
             <text x="30" y="110" font-family="'Segoe UI', system-ui, sans-serif" font-size="11" fill="#8b949e">LIVE EQUITY</text>
-            <text x="30" y="142" font-family="'Segoe UI', system-ui, sans-serif" font-size="36" font-weight="800" fill="#00ffe7" filter="url(#glow)">${EQUITY}</text>
+            <text x="30" y="142" font-family="'Segoe UI', system-ui, sans-serif" font-size="36" font-weight="800" fill="#00ffe7" filter="url(#glow)">${EQUITY_XML}</text>
 
-            <!-- Stats grid -->
             <text x="300" y="95" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#8b949e">OPEN POSITIONS</text>
-            <text x="300" y="115" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#ffffff">${POSITIONS}</text>
+            <text x="300" y="115" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#ffffff">${POSITIONS_XML}</text>
 
             <text x="420" y="95" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#8b949e">PORTFOLIO HEAT</text>
-            <text x="420" y="115" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="${STATUS_COLOR}">${HEAT}</text>
+            <text x="420" y="115" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="${STATUS_COLOR}">${HEAT_XML}</text>
 
             <text x="300" y="148" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#8b949e">TOTAL EXECUTIONS</text>
-            <text x="300" y="168" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#7ee787">${EXEC_COUNT}</text>
+            <text x="300" y="168" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#7ee787">${EXEC_COUNT_XML}</text>
 
             <text x="420" y="148" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#8b949e">EXCHANGE</text>
             <text x="420" y="168" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#ffffff">Kraken</text>
 
-            <!-- Footer -->
             <line x1="20" y1="178" x2="580" y2="178" stroke="#21262d" stroke-width="1"/>
-            <text x="30" y="193" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#484f58">Updated: ${GEN_TS} · lumen-core.ai · Hash-chained proof at /evidence/</text>
+            <text x="30" y="193" font-family="'Segoe UI', system-ui, sans-serif" font-size="10" fill="#484f58">Updated: ${GEN_TS_XML} · lumen-core.ai · Hash-chained proof at /evidence/</text>
           </svg>
           SVGEOF
 
-          echo "SVG card generated successfully."
-          head -5 assets/equity_card.svg
+          jq -S . "$STATE_FILE" > data/equity_card_state.json
+          jq empty data/equity_card_state.json
 
-      - name: Commit equity card
+      - name: Commit material equity card
+        if: steps.data.outputs.should_commit == 'true'
+        shell: bash
         run: |
-          git config user.name  "lumencore-bot"
+          set -euo pipefail
+          git config user.name "lumencore-bot"
           git config user.email "bot@lumen-core.ai"
-          git add assets/equity_card.svg
+          git add assets/equity_card.svg data/equity_card_state.json
+
           if ! git diff --cached --quiet; then
-            git commit -m "chore(card): equity ${{ steps.data.outputs.equity }} · ${{ steps.data.outputs.positions }} positions · ${{ steps.data.outputs.gen_ts }}"
+            git commit -m "chore(card): ${{ steps.data.outputs.commit_reason }} @ ${{ steps.data.outputs.generated_utc }}"
             git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin "HEAD:${GITHUB_REF_NAME}"
-          else
-            echo "Card unchanged — no commit needed."
           fi
