@@ -1,0 +1,81 @@
+{
+  "schema": "opai_consortium_intelligence_seed_v1",
+  "captured_utc": "2026-07-16T00:00:00Z",
+  "membership_status": "interest_submitted_not_yet_accepted",
+  "claim_boundary": "This seed records public OPAI facts and a LumenCore expression of interest. It does not prove accepted membership, endorsement, pilot selection, private-data access, or external validation.",
+  "official_contacts": [
+    {
+      "channel": "membership_interest",
+      "value": "OpenPowerAI@epri.com",
+      "source": "https://restservice.epri.com/publicattachment/92892"
+    }
+  ],
+  "working_groups": [
+    "Member Representative Committee",
+    "Data Sharing",
+    "Domain-Specific Model",
+    "Implementation",
+    "Use Case"
+  ],
+  "public_signals": [
+    {
+      "name": "organizations_engaged_homepage",
+      "value": "250+",
+      "source": "https://openpowerai.org/"
+    },
+    {
+      "name": "technology_providers_homepage",
+      "value": "130+",
+      "source": "https://openpowerai.org/"
+    },
+    {
+      "name": "utilities_energy_companies_homepage",
+      "value": "120+",
+      "source": "https://openpowerai.org/"
+    },
+    {
+      "name": "free_to_use_datasets_homepage",
+      "value": "130+",
+      "source": "https://openpowerai.org/"
+    },
+    {
+      "name": "ai_models_homepage",
+      "value": "20+",
+      "source": "https://openpowerai.org/"
+    },
+    {
+      "name": "organizations_membership_page",
+      "value": "more than 300",
+      "source": "https://openpowerai.org/consortium-membership"
+    },
+    {
+      "name": "prioritized_use_cases_ai_for_power",
+      "value": "250+",
+      "source": "https://epri.brightidea.com/AIforPower2026"
+    },
+    {
+      "name": "paid_demonstration_duration",
+      "value": "typically within 16 weeks",
+      "source": "https://epri.brightidea.com/AIforPower2026"
+    }
+  ],
+  "engagement_expectations": {
+    "webcasts": "approximately 5 hours per year",
+    "workshops": "approximately 24 hours per year; participant travel expense",
+    "other_lanes": [
+      "data sharing",
+      "use case contribution",
+      "compute resources where available",
+      "model and tool development"
+    ],
+    "source": "https://restservice.epri.com/publicattachment/92892"
+  },
+  "lumen_core_fit": [
+    "benchmarking and controlled evaluation",
+    "buyer-authorized held-out replay",
+    "hash-verified evidence manifests",
+    "offline verification",
+    "failure and limitation retention",
+    "utility demonstration scoping"
+  ]
+}
