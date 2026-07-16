@@ -1,0 +1,1830 @@
+{
+  "builder": {
+    "path": "code/ops/BUILD_SCIENTIFIC_EQUATION_EVIDENCE_MAP.py",
+    "sha256": "100f6be0d0eb5b8fd2c67604d0e2ebde2fb9d10a6b8a0b54e99e36e42b67671e"
+  },
+  "chain": [
+    {
+      "chain_sha256": "23237ab394cfc6509fe3070c414e3b0b067b464c9935d7e5045b194918539699",
+      "entry_sha256": "2ce7dd9703a2a2c2a641100f12808d451ac83401cd985bd193427b4589a6a381",
+      "equation_id": "DICE-001"
+    },
+    {
+      "chain_sha256": "4d385b91f44f9ae57892331744939f1065b4899304cde57cddc7822cd3f3133e",
+      "entry_sha256": "8457b08985c40c4c233a6595ba5fd25325802039cb2a1af3be59b261e28ebcbb",
+      "equation_id": "DICE-002"
+    },
+    {
+      "chain_sha256": "ca2082db48e3a8b9ed94dd5ab6f1109180105c73ecf2da6fa89e8b8a5563d145",
+      "entry_sha256": "8d3108929974ab14a4639710a78cdcdc1958ffcc47a5a71585b9d5821f7ee1b0",
+      "equation_id": "EIA-D-001"
+    },
+    {
+      "chain_sha256": "dfaf740b3f3537f0d4fe71a094eefdd21ecfd030f6b7118abe55ddcd1e58f256",
+      "entry_sha256": "c49c5f1e737b22659e12990591b20a4518ffde406ba28cab7e17c9a283f58f86",
+      "equation_id": "EIA-D-002"
+    },
+    {
+      "chain_sha256": "1ea143c037740c66327aed65aa13021a2c65f149c5b8b6513ce4598cd9dd9bca",
+      "entry_sha256": "e13c6f51fe33b7d434c6a319abff9551266c7bebc01c4ca8ddd519948b6d2514",
+      "equation_id": "EIA-D-003"
+    },
+    {
+      "chain_sha256": "4535a1760354996a6cf09b4fcf2eadf5c7506897fa1d63c9b33009a0c2fa61d0",
+      "entry_sha256": "f86b2d967ba4a0857547432e8ba82a271df07c206df54b760368abeef134370b",
+      "equation_id": "EIA-D-004"
+    },
+    {
+      "chain_sha256": "acf2aa12b1731ea33f0daafb216092154ed15995862f0b74a839c16adf2aac12",
+      "entry_sha256": "236157963e5829e5e5a7aa146e88c22407c3bddd5a41f8c42faafb25eef1df84",
+      "equation_id": "EIA-D-005"
+    },
+    {
+      "chain_sha256": "7fbc2c2748c172e2404878e9b6edab0a6864ba8d1cddc49d99fd14892bb6366b",
+      "entry_sha256": "bd4e26daf026f7df40b4306f7bba5195c99926216538a5da3017b6423b767359",
+      "equation_id": "EIA-H-001"
+    },
+    {
+      "chain_sha256": "16c845bae2c48c001b91c8d40c7dbaa0f64962faf403bdf1d2a251418c43b773",
+      "entry_sha256": "157a30a405db0b0a3a637f6ba30d54523bd8216263bed0055750bff5eeac745e",
+      "equation_id": "EIA-H-002"
+    },
+    {
+      "chain_sha256": "903d5b53b8e0d47b633fc707f5e25798015e6d134469abc7ef782f7bfe566b26",
+      "entry_sha256": "f09b899ce4b9d22a027a50ef2636e894e7a35cc4e17aa8035ebf1d8c57c7ccab",
+      "equation_id": "EIA-H-003"
+    },
+    {
+      "chain_sha256": "a761636c4b5b208ca8668961e0fb8829b0bbb6b6f6e41086b736f90f799c370d",
+      "entry_sha256": "784215a5a05fce44c0832a8e223da5f463ae15c0ccd8316b12db4f4627256ccb",
+      "equation_id": "FREQ-001"
+    },
+    {
+      "chain_sha256": "18e3edbc155d0da8daa9cd3b264405fe218017272c947f64ab8b7aeb73d25deb",
+      "entry_sha256": "421fb94730172fca3228e2f3200616309daa08ca8cfa58e7081df8811026b45d",
+      "equation_id": "FREQ-002"
+    },
+    {
+      "chain_sha256": "8b18d7fa73febca71e6c0bea07f2005cad49673703782322b36ece725e64fdaf",
+      "entry_sha256": "0e74a9362bbe62d5ffe2c23d8a1511fc0e6b66163b01a5d191203fa70e25d692",
+      "equation_id": "FREQ-003"
+    },
+    {
+      "chain_sha256": "1069a024ffb797af13c340c5d48aa70bbb853c0acd810276c588c15cddee840b",
+      "entry_sha256": "8025f1d0289c2deccf7e20b6e2af895bb6ba15dbb54daabefb0c945486378be6",
+      "equation_id": "FREQ-004"
+    },
+    {
+      "chain_sha256": "09981948345e241aac0eff30d1e742576185b7d3dc87a552c0e9a2d9800856fc",
+      "entry_sha256": "ebeacb80b64258ed6d3830e8a9825de8ba88479e8488d644a209e4f5abcb97c1",
+      "equation_id": "FREQ-005"
+    },
+    {
+      "chain_sha256": "c0beedc89527ae7795185f8314d3e88a1412a634fc0f05cf8c42a888e81571f9",
+      "entry_sha256": "9f16a15ba6b2eddae7565ac348a5cd6c09945958a935a559967cce8fe204c5cc",
+      "equation_id": "FREQ-006"
+    },
+    {
+      "chain_sha256": "5098717af9814991d8e736de32c4dfaf4a90d33e02efc3b878f0470d7cabfb7c",
+      "entry_sha256": "0b0c2b2cf2bc06c3a4ad72cbd0564c06b87037400cd89f7b294ea575426353ce",
+      "equation_id": "GEO-CURVE-001"
+    },
+    {
+      "chain_sha256": "c8b065e620d166579db9a3e0e665c5b926982488aacac2b6a21c3cc6968509b9",
+      "entry_sha256": "c45eea41e4f4274f25c44da7359d9db4bd5dafa873dc0e70b4f51b6a38ee4ed7",
+      "equation_id": "GEO-GRAPH-001"
+    },
+    {
+      "chain_sha256": "6c6fdf8e01bf440bc4ac2ca3026748d7622f3ecf61e4e2380d13ca65fa148c81",
+      "entry_sha256": "77cafed611a32d48fdca49fcd7d4bf26e0bed9f607115d3afbbf08790ac603de",
+      "equation_id": "GEO-THERMAL-001"
+    },
+    {
+      "chain_sha256": "dd1f5837550d28550ecb6646fe36b7455e46d4a2b5886c7a5b4b2e3ca3b28102",
+      "entry_sha256": "c95ab2602b6b240407c4ded8ac18cad80371f425e557218f2d3b67b781ac256b",
+      "equation_id": "GEO-WAVE-001"
+    },
+    {
+      "chain_sha256": "f9271f4121e6a8445aac3febb54e0681f9e7ea537c8d786e976da49deef279ef",
+      "entry_sha256": "5ea268ae342e1f0dfc864c593e6403df80f0c8f855a9903a07b08d3ad01257f8",
+      "equation_id": "MW-001"
+    },
+    {
+      "chain_sha256": "0c05aa95b54b02f8829a48f4f4e7a4b1fef2353e88d17b56a92ea256c9dcafbc",
+      "entry_sha256": "2c11084c302ca0cddb83b82e41071c097160cbe69575292a22f613c01d0a4cbe",
+      "equation_id": "MW-002"
+    },
+    {
+      "chain_sha256": "9da8e7072357206f0bd7f5f1044e2aef82c00febfff3de7087ab72c2d2555d0a",
+      "entry_sha256": "850a9f86e1e7f28094dca08b2890039d0378d6c985bf989e6ecd6cdf9d6e8899",
+      "equation_id": "NV065-001"
+    },
+    {
+      "chain_sha256": "6607886577eb0722eadf08d76118926bea6303586dde166fa505e175327fb78b",
+      "entry_sha256": "3190f34834067d2cbddcfdf044cbbe46952b0cd35079cebddca4ba9ea5a8cd8a",
+      "equation_id": "UH-001"
+    },
+    {
+      "chain_sha256": "6628e38b71407898d2d83e87f0464813f8191c50b63f0c4f95b9fa581f2d502b",
+      "entry_sha256": "1bde35ba5e7604867af1d122d2f107e73d40c40062f5e45d8a5409ace8e6fed3",
+      "equation_id": "UH-002"
+    }
+  ],
+  "entries": [
+    {
+      "allowed_claim": "The frozen gauntlet implements a standard sine/cosine harmonic basis.",
+      "bindings": [
+        {
+          "path": "config/frequency_cluster_truth_gauntlet_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "8dece5112d08af58cb4910f0fc728859ca918db2b768813078bfa52e1be0beb9"
+        },
+        {
+          "path": "evidence/external_validation/frequency_cluster_reviewer_decision_20260716.json",
+          "role": "evidence",
+          "sha256": "6ff624feeb5fa5ae4d1e1aa9d8dd73b3a7de6985f8a1858c1e5dd0f5324d76a3"
+        }
+      ],
+      "blocked_claims": [
+        "novel harmonic mathematics",
+        "validated trading alpha",
+        "Kraken endorsement"
+      ],
+      "claim_boundary": "Standard basis implementation inside a source-authentic frozen gauntlet; no novelty, independent-validation, trading, or endorsement claim follows.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "cycle_angle",
+          "scope": "trigonometric basis",
+          "units": "radians",
+          "value": "2*pi"
+        }
+      ],
+      "equation_id": "FREQ-001",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INDEPENDENT_REPRODUCTION_PENDING"
+      },
+      "formal_expression": "X(t) = [1, sin(2*pi*t/p_k), cos(2*pi*t/p_k)] for each registered period p_k",
+      "implementation_class": "EXACT_STANDARD_METHOD",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "STANDARD_METHOD_NOT_NOVEL_ALONE"
+      },
+      "name": "Harmonic design matrix",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "dba7bd52f221980a87badec28e9c53e696590596e357dc854453fac58b8eaa67",
+        "line": 552,
+        "path": "code/frequency_cluster_truth_gauntlet.py",
+        "symbol": "harmonic_design"
+      },
+      "symbols": {
+        "X": "dimensionless design matrix",
+        "p_k": "registered period [days]",
+        "t": "day index [days]"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 29,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_frequency_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The frozen candidate uses ordinary least squares over registered harmonic features and clips negative outputs.",
+      "bindings": [
+        {
+          "path": "config/frequency_cluster_truth_gauntlet_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "8dece5112d08af58cb4910f0fc728859ca918db2b768813078bfa52e1be0beb9"
+        },
+        {
+          "path": "evidence/external_validation/frequency_cluster_reviewer_decision_20260716.json",
+          "role": "evidence",
+          "sha256": "6ff624feeb5fa5ae4d1e1aa9d8dd73b3a7de6985f8a1858c1e5dd0f5324d76a3"
+        }
+      ],
+      "blocked_claims": [
+        "novel least-squares method",
+        "promoted performance",
+        "permission to trade"
+      ],
+      "claim_boundary": "Standard least-squares implementation with a project-specific nonnegative output contract; the reviewer-grade gate failed and economic action remains disabled.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "prediction_floor",
+          "scope": "nonnegative target contract",
+          "units": "target units",
+          "value": 0.0
+        }
+      ],
+      "equation_id": "FREQ-002",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INDEPENDENT_REPRODUCTION_PENDING"
+      },
+      "formal_expression": "beta = argmin_b ||y-Xb||_2^2; y_hat = max(0, X_predict*beta)",
+      "implementation_class": "EXACT_STANDARD_METHOD",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "STANDARD_METHOD_NOT_NOVEL_ALONE"
+      },
+      "name": "Least-squares harmonic prediction with nonnegative clip",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "dba7bd52f221980a87badec28e9c53e696590596e357dc854453fac58b8eaa67",
+        "line": 562,
+        "path": "code/frequency_cluster_truth_gauntlet.py",
+        "symbol": "fit_harmonic_predict"
+      },
+      "symbols": {
+        "X": "harmonic design matrix",
+        "beta": "least-squares coefficients",
+        "y": "training target",
+        "y_hat": "prediction"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 29,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_frequency_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "Frequency discovery ranks registered periods using a transparent nonnegative R-squared diagnostic on the discovery split only.",
+      "bindings": [
+        {
+          "path": "config/frequency_cluster_truth_gauntlet_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "8dece5112d08af58cb4910f0fc728859ca918db2b768813078bfa52e1be0beb9"
+        }
+      ],
+      "blocked_claims": [
+        "causal frequency discovery",
+        "holdout-selected period",
+        "physical resonance"
+      ],
+      "claim_boundary": "This is a development-only ranking diagnostic and not evidence that a physical oscillator, causal frequency, or promoted economic edge exists.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "zero_variance_floor",
+          "scope": "degenerate discovery series",
+          "units": "squared target units",
+          "value": "1e-18"
+        }
+      ],
+      "equation_id": "FREQ-003",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INDEPENDENT_REPRODUCTION_PENDING"
+      },
+      "formal_expression": "partial_R2 = max(0, 1 - SSE_harmonic/SST_mean)",
+      "implementation_class": "OPERATIONAL_DEFINITION",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "Discovery partial R-squared",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "dba7bd52f221980a87badec28e9c53e696590596e357dc854453fac58b8eaa67",
+        "line": 574,
+        "path": "code/frequency_cluster_truth_gauntlet.py",
+        "symbol": "partial_r2"
+      },
+      "symbols": {
+        "SSE_harmonic": "harmonic residual sum of squares",
+        "SST_mean": "mean-baseline total sum of squares"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 29,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_frequency_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The benchmark includes a standard half-life-parameterized EWMA baseline component.",
+      "bindings": [
+        {
+          "path": "config/frequency_cluster_truth_gauntlet_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "8dece5112d08af58cb4910f0fc728859ca918db2b768813078bfa52e1be0beb9"
+        }
+      ],
+      "blocked_claims": [
+        "novel EWMA",
+        "universal optimal decay",
+        "live-profit claim"
+      ],
+      "claim_boundary": "This is a standard smoothing recursion used inside one frozen protocol; it does not establish an optimal decay constant or economic performance.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "half_decay",
+          "scope": "half-life parameterization",
+          "units": "ratio",
+          "value": 0.5
+        }
+      ],
+      "equation_id": "FREQ-004",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INDEPENDENT_REPRODUCTION_PENDING"
+      },
+      "formal_expression": "alpha = 1-exp(log(0.5)/h); m_t = alpha*y_t + (1-alpha)*m_(t-1)",
+      "implementation_class": "EXACT_STANDARD_METHOD",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "STANDARD_METHOD_NOT_NOVEL_ALONE"
+      },
+      "name": "EWMA half-life recursion",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "dba7bd52f221980a87badec28e9c53e696590596e357dc854453fac58b8eaa67",
+        "line": 644,
+        "path": "code/frequency_cluster_truth_gauntlet.py",
+        "symbol": "ewma_predictions"
+      },
+      "symbols": {
+        "alpha": "EWMA update weight",
+        "h": "half-life [samples]",
+        "m_t": "state",
+        "y_t": "observation"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 29,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_frequency_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The frozen inference layer preserves local dependence with a moving-block bootstrap.",
+      "bindings": [
+        {
+          "path": "config/frequency_cluster_truth_gauntlet_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "8dece5112d08af58cb4910f0fc728859ca918db2b768813078bfa52e1be0beb9"
+        },
+        {
+          "path": "evidence/external_validation/frequency_cluster_reviewer_decision_20260716.json",
+          "role": "evidence",
+          "sha256": "6ff624feeb5fa5ae4d1e1aa9d8dd73b3a7de6985f8a1858c1e5dd0f5324d76a3"
+        }
+      ],
+      "blocked_claims": [
+        "distribution-free guarantee",
+        "independent observations",
+        "external statistical certification"
+      ],
+      "claim_boundary": "Standard resampling machinery is implemented and tested, but its finite-sample adequacy remains specific to the frozen protocol and data-generating process.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [],
+      "equation_id": "FREQ-005",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INDEPENDENT_REPRODUCTION_PENDING"
+      },
+      "formal_expression": "Resample contiguous index blocks of length b with replacement until n indices are produced",
+      "implementation_class": "EXACT_STANDARD_METHOD",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "STANDARD_METHOD_NOT_NOVEL_ALONE"
+      },
+      "name": "Moving-block bootstrap sampler",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "dba7bd52f221980a87badec28e9c53e696590596e357dc854453fac58b8eaa67",
+        "line": 670,
+        "path": "code/frequency_cluster_truth_gauntlet.py",
+        "symbol": "moving_block_indices"
+      },
+      "symbols": {
+        "B": "bootstrap repetitions",
+        "b": "block size [samples]",
+        "n": "series length [samples]"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 29,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_frequency_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The gauntlet applies the standard monotone Holm adjustment across the registered test family.",
+      "bindings": [
+        {
+          "path": "config/frequency_cluster_truth_gauntlet_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "8dece5112d08af58cb4910f0fc728859ca918db2b768813078bfa52e1be0beb9"
+        },
+        {
+          "path": "evidence/external_validation/frequency_cluster_reviewer_decision_20260716.json",
+          "role": "evidence",
+          "sha256": "6ff624feeb5fa5ae4d1e1aa9d8dd73b3a7de6985f8a1858c1e5dd0f5324d76a3"
+        }
+      ],
+      "blocked_claims": [
+        "novel multiple-testing method",
+        "guaranteed discovery",
+        "independent validation"
+      ],
+      "claim_boundary": "Standard familywise-error control is correctly implemented, but it does not rescue a failed promotion gate or establish external validation.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "probability_ceiling",
+          "scope": "adjusted p-value",
+          "units": "probability",
+          "value": 1.0
+        }
+      ],
+      "equation_id": "FREQ-006",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INDEPENDENT_REPRODUCTION_PENDING"
+      },
+      "formal_expression": "p_adj(i) = max_(j<=i) min(1, (m-j+1)*p_(j)) for ordered p-values",
+      "implementation_class": "EXACT_STANDARD_METHOD",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "STANDARD_METHOD_NOT_NOVEL_ALONE"
+      },
+      "name": "Holm familywise p-value adjustment",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "dba7bd52f221980a87badec28e9c53e696590596e357dc854453fac58b8eaa67",
+        "line": 694,
+        "path": "code/frequency_cluster_truth_gauntlet.py",
+        "symbol": "holm_adjust"
+      },
+      "symbols": {
+        "m": "number of hypotheses",
+        "p_(j)": "ordered raw p-value",
+        "p_adj": "adjusted p-value"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 29,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_frequency_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The EIA benchmark uses a declared robust normalization contract.",
+      "bindings": [
+        {
+          "path": "config/eia_grid_residual_moe_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8"
+        },
+        {
+          "path": "docs/EIA_GRID_RESIDUAL_MOE_BENCHMARK_2026-07-13.md",
+          "role": "evidence_boundary",
+          "sha256": "5aca894ad130d863b6431a46c47160105dee79fc027fa5c0b53dcff1b579e2f9"
+        }
+      ],
+      "blocked_claims": [
+        "physical uncertainty calibration",
+        "universal robust optimum",
+        "field validation"
+      ],
+      "claim_boundary": "This project-specific scale protects numerical conditioning in a frozen source-authentic benchmark; it is not a calibrated physical uncertainty model.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "normal_consistency",
+          "scope": "MAD scaling",
+          "units": "ratio",
+          "value": 1.4826
+        },
+        {
+          "name": "scale_floor",
+          "scope": "numerical stability",
+          "units": "MWh",
+          "value": "1e-9"
+        }
+      ],
+      "equation_id": "EIA-D-001",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "SOURCE_AUTHENTIC_NOT_INDEPENDENTLY_VALIDATED"
+      },
+      "formal_expression": "center=median(x); scale=max(1.4826*MAD(x), std(x), |center|*1e-9, 1e-9)",
+      "implementation_class": "OPERATIONAL_DEFINITION",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "Robust center and scale contract",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100",
+        "line": 121,
+        "path": "code/eia_grid_residual_moe_benchmark.py",
+        "symbol": "stable_scale"
+      },
+      "symbols": {
+        "MAD": "median absolute deviation",
+        "scale": "normalization scale [MWh]",
+        "x": "historical demand [MWh]"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 50,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_daily_eia_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The daily EIA lane reports error relative to a seven-day seasonal-naive scale.",
+      "bindings": [
+        {
+          "path": "config/eia_grid_residual_moe_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8"
+        },
+        {
+          "path": "docs/EIA_GRID_RESIDUAL_MOE_BENCHMARK_2026-07-13.md",
+          "role": "evidence_boundary",
+          "sha256": "5aca894ad130d863b6431a46c47160105dee79fc027fa5c0b53dcff1b579e2f9"
+        }
+      ],
+      "blocked_claims": [
+        "novel MASE",
+        "all-season validity",
+        "independent benchmark acceptance"
+      ],
+      "claim_boundary": "Standard MASE-style scaling is used for one frozen daily-demand lane and does not establish universal seasonality or external acceptance.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "season",
+          "scope": "daily EIA benchmark",
+          "units": "days",
+          "value": 7
+        },
+        {
+          "name": "scale_floor",
+          "scope": "numerical stability",
+          "units": "MWh",
+          "value": "1e-9"
+        }
+      ],
+      "equation_id": "EIA-D-002",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "SOURCE_AUTHENTIC_NOT_INDEPENDENTLY_VALIDATED"
+      },
+      "formal_expression": "MASE_7 = |y-y_hat| / mean_t |y_t-y_(t-7)| with a declared numerical floor",
+      "implementation_class": "EXACT_STANDARD_METHOD",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "STANDARD_METHOD_NOT_NOVEL_ALONE"
+      },
+      "name": "Seven-day seasonal MASE scale",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100",
+        "line": 128,
+        "path": "code/eia_grid_residual_moe_benchmark.py",
+        "symbol": "seasonal_mase_scale"
+      },
+      "symbols": {
+        "MASE_7": "dimensionless scaled error",
+        "y": "actual demand [MWh]",
+        "y_hat": "forecast [MWh]"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 50,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_daily_eia_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The frozen EIA lane includes a transparent autoregressive ridge baseline.",
+      "bindings": [
+        {
+          "path": "config/eia_grid_residual_moe_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8"
+        },
+        {
+          "path": "docs/EIA_GRID_RESIDUAL_MOE_BENCHMARK_2026-07-13.md",
+          "role": "evidence_boundary",
+          "sha256": "5aca894ad130d863b6431a46c47160105dee79fc027fa5c0b53dcff1b579e2f9"
+        }
+      ],
+      "blocked_claims": [
+        "novel ridge regression",
+        "optimal grid forecast",
+        "operational deployment approval"
+      ],
+      "claim_boundary": "This is a standard regularized autoregression baseline and not a proprietary equation, grid-control system, or externally accepted forecast.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "default_lag",
+          "scope": "daily baseline",
+          "units": "days",
+          "value": 14
+        },
+        {
+          "name": "default_ridge",
+          "scope": "daily baseline",
+          "units": "penalty",
+          "value": 1.0
+        }
+      ],
+      "equation_id": "EIA-D-003",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "SOURCE_AUTHENTIC_NOT_INDEPENDENTLY_VALIDATED"
+      },
+      "formal_expression": "beta=(X^T X + lambda*P)^(-1) X^T y with P_00=0; y_hat=x_next^T beta",
+      "implementation_class": "EXACT_STANDARD_METHOD",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "STANDARD_METHOD_NOT_NOVEL_ALONE"
+      },
+      "name": "Autoregressive ridge baseline",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100",
+        "line": 138,
+        "path": "code/eia_grid_residual_moe_benchmark.py",
+        "symbol": "forecast_autoregressive_ridge"
+      },
+      "symbols": {
+        "P": "intercept-exempt penalty matrix",
+        "X": "lagged normalized design matrix",
+        "beta": "coefficients",
+        "lambda": "ridge penalty"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 50,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_daily_eia_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "Daily holdout rows expose declared error and direction metrics with units.",
+      "bindings": [
+        {
+          "path": "config/eia_grid_residual_moe_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8"
+        },
+        {
+          "path": "docs/EIA_GRID_RESIDUAL_MOE_BENCHMARK_2026-07-13.md",
+          "role": "evidence_boundary",
+          "sha256": "5aca894ad130d863b6431a46c47160105dee79fc027fa5c0b53dcff1b579e2f9"
+        }
+      ],
+      "blocked_claims": [
+        "economic savings",
+        "reliability improvement",
+        "causal impact"
+      ],
+      "claim_boundary": "These are transparent scoring definitions for source-authentic replay rows; they do not convert forecast error into realized savings, reliability, or causality.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "ape_floor",
+          "scope": "division guard",
+          "units": "MWh",
+          "value": "1e-9"
+        }
+      ],
+      "equation_id": "EIA-D-004",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "SOURCE_AUTHENTIC_NOT_INDEPENDENTLY_VALIDATED"
+      },
+      "formal_expression": "AE=|y-y_hat|; APE=AE/max(|y|,1e-9); MASE_7=AE/scale_7; DA=I[dir(y_hat-y_last)=dir(y-y_last)]",
+      "implementation_class": "OPERATIONAL_DEFINITION",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "Daily forecast metric row",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100",
+        "line": 463,
+        "path": "code/eia_grid_residual_moe_benchmark.py",
+        "symbol": "metric_row"
+      },
+      "symbols": {
+        "AE": "absolute error [MWh]",
+        "APE": "absolute percentage error",
+        "DA": "directional accuracy indicator"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 50,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_daily_eia_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The paired comparison layer includes an exact two-sided sign test.",
+      "bindings": [
+        {
+          "path": "config/eia_grid_residual_moe_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8"
+        },
+        {
+          "path": "docs/EIA_GRID_RESIDUAL_MOE_BENCHMARK_2026-07-13.md",
+          "role": "evidence_boundary",
+          "sha256": "5aca894ad130d863b6431a46c47160105dee79fc027fa5c0b53dcff1b579e2f9"
+        }
+      ],
+      "blocked_claims": [
+        "proof of superiority",
+        "causal significance",
+        "external statistical review"
+      ],
+      "claim_boundary": "A correct standard test can quantify registered paired signs but does not by itself prove superiority, causality, or independent review.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "zero_delta_tolerance",
+          "scope": "paired delta filtering",
+          "units": "metric units",
+          "value": "1e-12"
+        }
+      ],
+      "equation_id": "EIA-D-005",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "SOURCE_AUTHENTIC_NOT_INDEPENDENTLY_VALIDATED"
+      },
+      "formal_expression": "p=min(1, 2*sum_(k=0)^min(w,n-w) C(n,k)/2^n) after removing zero deltas",
+      "implementation_class": "EXACT_STANDARD_METHOD",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "STANDARD_METHOD_NOT_NOVEL_ALONE"
+      },
+      "name": "Exact two-sided sign test",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100",
+        "line": 591,
+        "path": "code/eia_grid_residual_moe_benchmark.py",
+        "symbol": "exact_two_sided_sign_test"
+      },
+      "symbols": {
+        "n": "nonzero paired comparisons",
+        "p": "two-sided p-value",
+        "w": "positive deltas"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 50,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_daily_eia_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The prospective hourly protocol uses a declared median weekly-difference normalization scale.",
+      "bindings": [
+        {
+          "path": "config/eia_grid_prospective_hourly_router_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5"
+        },
+        {
+          "path": "evidence/external_validation/eia_grid_hourly_router_design_freeze_20260714.json",
+          "role": "evidence",
+          "sha256": "44dc96407803b736893843a0edf86d736170ed459a215be98d4452ec900d7ea5"
+        },
+        {
+          "path": "evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json",
+          "role": "evidence",
+          "sha256": "661f7437ba862880c69a54f3d0d1b3394ab885fcd6a705c558c381b4f7383778"
+        }
+      ],
+      "blocked_claims": [
+        "settled forecast superiority",
+        "grid reliability",
+        "realized savings"
+      ],
+      "claim_boundary": "This scale is part of a frozen prospective implementation; the current projection has no common settled scoring window and supports no performance claim.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "weekly_lag",
+          "scope": "hourly demand seasonality",
+          "units": "hours",
+          "value": 168
+        },
+        {
+          "name": "scale_floor",
+          "scope": "numerical stability",
+          "units": "MWh",
+          "value": 1.0
+        }
+      ],
+      "equation_id": "EIA-H-001",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INDEPENDENT_REPRODUCTION_PENDING"
+      },
+      "formal_expression": "scale=max(median_positive{|D_(T-o)-D_(T-o-168)|: o=24..191}, 1 MWh)",
+      "implementation_class": "OPERATIONAL_DEFINITION",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "Hourly weekly-difference target scale",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "82f48921f5e3553fbb3b169ef1b1dc3e9c6677507735482e7d5cb820e12ccb41",
+        "line": 327,
+        "path": "code/eia_grid_prospective_hourly_router.py",
+        "symbol": "target_scale"
+      },
+      "symbols": {
+        "D": "actual hourly demand [MWh]",
+        "T": "target hour index",
+        "o": "historical offset [hours]"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 79,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_hourly_eia_equations_and_chain_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The sealed-forecast feature contract excludes the target actual and uses declared lags and cyclic bases.",
+      "bindings": [
+        {
+          "path": "config/eia_grid_prospective_hourly_router_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5"
+        },
+        {
+          "path": "evidence/external_validation/eia_grid_hourly_router_design_freeze_20260714.json",
+          "role": "evidence",
+          "sha256": "44dc96407803b736893843a0edf86d736170ed459a215be98d4452ec900d7ea5"
+        }
+      ],
+      "blocked_claims": [
+        "absence of all leakage classes",
+        "settled accuracy",
+        "agency acceptance"
+      ],
+      "claim_boundary": "The tested contract blocks target-actual leakage in this implementation; it is not a universal proof against every leakage mechanism or an accuracy claim.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "lag_set",
+          "scope": "hourly feature contract",
+          "units": "hours",
+          "value": [
+            24,
+            48,
+            72,
+            168,
+            336
+          ]
+        },
+        {
+          "name": "year_length",
+          "scope": "cyclic calendar basis",
+          "units": "days",
+          "value": 365.25
+        }
+      ],
+      "equation_id": "EIA-H-002",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INDEPENDENT_REPRODUCTION_PENDING"
+      },
+      "formal_expression": "x_T=[official-minus-lags, lag differences, historical residual moments, cyclic time bases, authority one-hot], excluding actual D_T",
+      "implementation_class": "OPERATIONAL_DEFINITION",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "Leakage-controlled hourly feature vector",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "82f48921f5e3553fbb3b169ef1b1dc3e9c6677507735482e7d5cb820e12ccb41",
+        "line": 338,
+        "path": "code/eia_grid_prospective_hourly_router.py",
+        "symbol": "build_feature_row"
+      },
+      "symbols": {
+        "D_T": "target actual demand [MWh]",
+        "official": "EIA official target forecast [MWh]",
+        "x_T": "27-element feature vector"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 79,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_hourly_eia_equations_and_chain_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "Prospective records are appended to a tamper-evident canonical SHA-256 chain.",
+      "bindings": [
+        {
+          "path": "config/eia_grid_prospective_hourly_router_protocol_v1.json",
+          "role": "protocol",
+          "sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5"
+        },
+        {
+          "path": "evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json",
+          "role": "evidence",
+          "sha256": "661f7437ba862880c69a54f3d0d1b3394ab885fcd6a705c558c381b4f7383778"
+        }
+      ],
+      "blocked_claims": [
+        "immutable third-party ledger",
+        "timestamp authority",
+        "independent custody"
+      ],
+      "claim_boundary": "This is a standard local tamper-evident hash chain, not a third-party timestamp, immutable public ledger, or independent custody service.",
+      "claim_level": "C2_FROZEN_INTERNAL_EVIDENCE",
+      "constants": [
+        {
+          "name": "genesis_hash",
+          "scope": "empty chain",
+          "units": "SHA-256",
+          "value": "64 zero hex characters"
+        }
+      ],
+      "equation_id": "EIA-H-003",
+      "evidence_class": "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INDEPENDENT_REPRODUCTION_PENDING"
+      },
+      "formal_expression": "record_i.prior=hash_(i-1); hash_i=SHA256(canonical_json(record_i without hash_i))",
+      "implementation_class": "EXACT_STANDARD_METHOD",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "STANDARD_METHOD_NOT_NOVEL_ALONE"
+      },
+      "name": "Append-only canonical SHA-256 chain",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "82f48921f5e3553fbb3b169ef1b1dc3e9c6677507735482e7d5cb820e12ccb41",
+        "line": 630,
+        "path": "code/eia_grid_prospective_hourly_router.py",
+        "symbol": "append_chain_record"
+      },
+      "symbols": {
+        "hash_i": "record chain SHA-256",
+        "record_i": "ordered prediction or settlement record"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 79,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_hourly_eia_equations_and_chain_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The generated benchmark reports normalized Shannon entropy across eight modeled strategies.",
+      "bindings": [
+        {
+          "path": "docs/DICE_CONSTRAINT_CONTRACT_BENCHMARK_2026-06-18.md",
+          "role": "evidence_boundary",
+          "sha256": "f662fb79946475053e3cbd30929acfb5a692f40772894e2e370fce4a3480aae8"
+        }
+      ],
+      "blocked_claims": [
+        "semantic diversity",
+        "agent intelligence",
+        "DARPA metric attainment"
+      ],
+      "claim_boundary": "Standard entropy is applied to generated strategy counts only and does not measure semantic correctness, language-model diversity, or DICE attainment.",
+      "claim_level": "C1_INTERNAL_IMPLEMENTATION",
+      "constants": [
+        {
+          "name": "strategy_cardinality",
+          "scope": "generated DICE benchmark",
+          "units": "strategies",
+          "value": 8
+        }
+      ],
+      "equation_id": "DICE-001",
+      "evidence_class": "E1_INTERNAL_IMPLEMENTATION",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INTERNAL_ONLY"
+      },
+      "formal_expression": "H_norm=-(sum_i p_i*log(p_i))/log(8)",
+      "implementation_class": "EXACT_STANDARD_METHOD",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "STANDARD_METHOD_NOT_NOVEL_ALONE"
+      },
+      "name": "Normalized strategy entropy",
+      "negative_result_retained": false,
+      "source": {
+        "file_sha256": "499fe6378b1add7de032ce853b8e52f5d03be78b97513773de399008883f32cb",
+        "line": 260,
+        "path": "code/dice_constraint_contract_benchmark.py",
+        "symbol": "_strategy_entropy"
+      },
+      "symbols": {
+        "H_norm": "normalized entropy",
+        "p_i": "share of safely completed tasks using strategy i"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 99,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_dice_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "A declared weighted objective selects contract margins on generated development conditions.",
+      "bindings": [
+        {
+          "path": "docs/DICE_CONSTRAINT_CONTRACT_BENCHMARK_2026-06-18.md",
+          "role": "evidence_boundary",
+          "sha256": "f662fb79946475053e3cbd30929acfb5a692f40772894e2e370fce4a3480aae8"
+        }
+      ],
+      "blocked_claims": [
+        "optimal mission utility",
+        "operational defense performance",
+        "DICE metric attainment"
+      ],
+      "claim_boundary": "The weights are a project-specific generated-benchmark utility definition, not a learned law, operational mission utility, or sponsor-approved objective.",
+      "claim_level": "C1_INTERNAL_IMPLEMENTATION",
+      "constants": [
+        {
+          "name": "violation_weight",
+          "scope": "development-only selection",
+          "units": "score/rate",
+          "value": -0.9
+        },
+        {
+          "name": "message_weight",
+          "scope": "development-only selection",
+          "units": "score/message",
+          "value": -0.002
+        }
+      ],
+      "equation_id": "DICE-002",
+      "evidence_class": "E1_INTERNAL_IMPLEMENTATION",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INTERNAL_ONLY"
+      },
+      "formal_expression": "J=safe_completion-0.90*violations-0.20*false_rejection+0.08*entropy-0.002*messages_per_safe_completion",
+      "implementation_class": "OPERATIONAL_DEFINITION",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "Constraint-contract development objective",
+      "negative_result_retained": false,
+      "source": {
+        "file_sha256": "499fe6378b1add7de032ce853b8e52f5d03be78b97513773de399008883f32cb",
+        "line": 399,
+        "path": "code/dice_constraint_contract_benchmark.py",
+        "symbol": "_objective"
+      },
+      "symbols": {
+        "J": "development objective",
+        "false_rejection": "false rejection rate",
+        "violations": "constraint violation rate"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 99,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_dice_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "A deterministic nonnegative heuristic ranks generated sensor-track assignments in the NV065 software benchmark.",
+      "bindings": [
+        {
+          "path": "docs/NV065_ADAPTIVE_SENSOR_TASKING_VALIDATION_2026-06-19.md",
+          "role": "evidence_boundary",
+          "sha256": "cb75a70a13927b183a2c80a91ade36e2a083ee837f4c11d79f7f66d51a7247c2"
+        }
+      ],
+      "blocked_claims": [
+        "radar physics",
+        "SSDS performance",
+        "fire-control quality",
+        "Navy-approved values"
+      ],
+      "claim_boundary": "This is an exploratory generated-resource tasking score and not radar physics, fire-control evidence, SSDS integration, or an operational sensor model.",
+      "claim_level": "C1_INTERNAL_IMPLEMENTATION",
+      "constants": [
+        {
+          "name": "FCQ_threshold",
+          "scope": "synthetic benchmark",
+          "units": "generated covariance units",
+          "value": 1.0
+        },
+        {
+          "name": "covariance_need_cap",
+          "scope": "synthetic tasking score",
+          "units": "ratio",
+          "value": 2.4
+        }
+      ],
+      "equation_id": "NV065-001",
+      "evidence_class": "E1_INTERNAL_IMPLEMENTATION",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INTERNAL_ONLY"
+      },
+      "formal_expression": "contribution=(precision*suitability*quality)*covariance_need/(1+0.38*surplus_margin), then bounded policy boosts and release penalties",
+      "implementation_class": "EXPLORATORY_HEURISTIC",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "Expected sensor contribution heuristic",
+      "negative_result_retained": false,
+      "source": {
+        "file_sha256": "bfbf3c005e97ec40012c7979c97920e0c11102bb12274d41d7bc4ae5776270fc",
+        "line": 281,
+        "path": "code/nv065_sensor_tasking_benchmark.py",
+        "symbol": "expected_contribution"
+      },
+      "symbols": {
+        "contribution": "tasking rank score",
+        "covariance_need": "generated track-uncertainty need",
+        "quality": "generated sensor-quality factor"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 113,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_nv065_expected_contribution_is_bounded_operational_heuristic"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "A declared weighted heuristic ranks eligible generated workflow cases.",
+      "bindings": [
+        {
+          "path": "docs/MISSIONWEAVE_GENERATED_WORKFLOW_VALIDATION_2026-06-13.md",
+          "role": "evidence_boundary",
+          "sha256": "64f7006b19a8eed3ba3eab27fc513ab602b03daacd20849614e0690fb25f9ad0"
+        }
+      ],
+      "blocked_claims": [
+        "workforce productivity",
+        "fairness",
+        "DLA readiness",
+        "causal impact"
+      ],
+      "claim_boundary": "The score is an exploratory generated-workflow routing heuristic and does not establish productivity, fairness, causal impact, personnel policy, or DLA readiness.",
+      "claim_level": "C1_INTERNAL_IMPLEMENTATION",
+      "constants": [
+        {
+          "name": "age_scale",
+          "scope": "generated workflow",
+          "units": "simulation steps",
+          "value": 25.0
+        }
+      ],
+      "equation_id": "MW-001",
+      "evidence_class": "E1_INTERNAL_IMPLEMENTATION",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INTERNAL_ONLY"
+      },
+      "formal_expression": "score=w_c*criticality+w_u*urgency+w_a*age/25+w_s*skill+w_b*log(1+stage_count)",
+      "implementation_class": "EXPLORATORY_HEURISTIC",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "MissionWeave priority score",
+      "negative_result_retained": false,
+      "source": {
+        "file_sha256": "8b40de3c402b7be092b5e50c1d1bc6adcd6c0d8f44806a54688d2fccde010865",
+        "line": 228,
+        "path": "code/missionweave_benchmark.py",
+        "symbol": "_priority"
+      },
+      "symbols": {
+        "skill": "generated worker-skill score",
+        "stage_count": "generated queue count",
+        "urgency": "slack-derived urgency"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 131,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_missionweave_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The generated workflow benchmark reports a standard Gini dispersion statistic.",
+      "bindings": [
+        {
+          "path": "docs/MISSIONWEAVE_GENERATED_WORKFLOW_VALIDATION_2026-06-13.md",
+          "role": "evidence_boundary",
+          "sha256": "64f7006b19a8eed3ba3eab27fc513ab602b03daacd20849614e0690fb25f9ad0"
+        }
+      ],
+      "blocked_claims": [
+        "validated fairness",
+        "absence of disparate impact",
+        "personnel-policy compliance"
+      ],
+      "claim_boundary": "A standard dispersion statistic over generated values is not a fairness audit, disparate-impact analysis, or personnel-policy validation.",
+      "claim_level": "C1_INTERNAL_IMPLEMENTATION",
+      "constants": [],
+      "equation_id": "MW-002",
+      "evidence_class": "E1_INTERNAL_IMPLEMENTATION",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INTERNAL_ONLY"
+      },
+      "formal_expression": "G=(2*sum_i i*x_(i))/(n*sum_i x_i)-(n+1)/n for sorted nonnegative x",
+      "implementation_class": "EXACT_STANDARD_METHOD",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "STANDARD_METHOD_NOT_NOVEL_ALONE"
+      },
+      "name": "Gini dispersion metric",
+      "negative_result_retained": false,
+      "source": {
+        "file_sha256": "8b40de3c402b7be092b5e50c1d1bc6adcd6c0d8f44806a54688d2fccde010865",
+        "line": 279,
+        "path": "code/missionweave_benchmark.py",
+        "symbol": "_gini"
+      },
+      "symbols": {
+        "G": "Gini coefficient",
+        "n": "number of values",
+        "x_(i)": "ordered nonnegative values"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 131,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_missionweave_equations_match_registered_semantics"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "A bounded Kuramoto-inspired analogue was evaluated in a generated wave-timing benchmark.",
+      "bindings": [
+        {
+          "path": "docs/GEOMETRY_CONFIRMATORY_PROMOTION_AUDIT_2026-07-16.md",
+          "role": "evidence",
+          "sha256": "c3f0d3389c3cc77b5e1f6083f8d62edb20b01f8e2e7afca2c16b3fa65bb274fb"
+        },
+        {
+          "path": "docs/FULL_GEOMETRY_PROTOCOL_FIELD_2026-07-16.md",
+          "role": "protocol_inventory",
+          "sha256": "6ec435a7577503b0ce755f0d1a0558bfab05bc3d0928a6932dd08495ca1cb837"
+        },
+        {
+          "path": "docs/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER_2026-07-13.md",
+          "role": "evidence_boundary",
+          "sha256": "b8af64d9a54ccf373b9e8e9c8a09f6188b77cf02388d9b1e6c0801cfa5360244"
+        }
+      ],
+      "blocked_claims": [
+        "Kuramoto ODE solution",
+        "critical coupling",
+        "grid synchronization",
+        "Kalman superiority in real systems"
+      ],
+      "claim_boundary": "This is not a governing-equation solver; it does not integrate Kuramoto oscillator dynamics and cannot support physical grid, PLL, RF, or critical-coupling claims.",
+      "claim_level": "C1_INTERNAL_IMPLEMENTATION",
+      "constants": [
+        {
+          "name": "phase_base",
+          "scope": "generated wave benchmark",
+          "units": "synthetic score",
+          "value": 0.055
+        },
+        {
+          "name": "stability_base",
+          "scope": "generated wave benchmark",
+          "units": "synthetic score",
+          "value": 0.94
+        }
+      ],
+      "equation_id": "GEO-WAVE-001",
+      "evidence_class": "E1_INTERNAL_IMPLEMENTATION",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INTERNAL_ONLY"
+      },
+      "formal_expression": "WavePlan metrics are affine functions of generated drift, shock, mode, noise, and dropout stress terms with fixed coefficients",
+      "implementation_class": "HEURISTIC_ANALOGUE",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "Kuramoto-labeled phase-coupling analogue",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "f5487583f16097ea9a52d145e5d1f49b3d74a6a9049d43ca3bdde29f3ccd60d3",
+        "line": 285,
+        "path": "code/geometry_wave_resonance_timing_benchmark.py",
+        "symbol": "strategy_kuramoto_phase_coupling"
+      },
+      "symbols": {
+        "noise_rejection": "synthetic proxy",
+        "phase_error": "synthetic proxy",
+        "stability_margin": "synthetic proxy"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 150,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_geometry_analogue_and_graph_implementations_are_bounded"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "A bounded brachistochrone-inspired analogue was evaluated and failed its internal confirmatory promotion gate.",
+      "bindings": [
+        {
+          "path": "docs/GEOMETRY_CONFIRMATORY_PROMOTION_AUDIT_2026-07-16.md",
+          "role": "evidence",
+          "sha256": "c3f0d3389c3cc77b5e1f6083f8d62edb20b01f8e2e7afca2c16b3fa65bb274fb"
+        },
+        {
+          "path": "docs/FULL_GEOMETRY_PROTOCOL_FIELD_2026-07-16.md",
+          "role": "protocol_inventory",
+          "sha256": "6ec435a7577503b0ce755f0d1a0558bfab05bc3d0928a6932dd08495ca1cb837"
+        }
+      ],
+      "blocked_claims": [
+        "exact cycloid solution",
+        "minimum-time proof",
+        "robotics validation",
+        "vehicle performance"
+      ],
+      "claim_boundary": "This is not a governing-equation solver; it does not compute the exact cycloid or prove minimum travel time in a physical system.",
+      "claim_level": "C1_INTERNAL_IMPLEMENTATION",
+      "constants": [
+        {
+          "name": "time_base",
+          "scope": "generated curve benchmark",
+          "units": "multiplier",
+          "value": 0.88
+        },
+        {
+          "name": "energy_factor",
+          "scope": "generated curve benchmark",
+          "units": "multiplier",
+          "value": 0.86
+        }
+      ],
+      "equation_id": "GEO-CURVE-001",
+      "evidence_class": "E1_INTERNAL_IMPLEMENTATION",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INTERNAL_ONLY"
+      },
+      "formal_expression": "PathPlan factors are heuristic functions of vertical-drop ratio, curvature pressure, drag, obstacle bias, and payload",
+      "implementation_class": "HEURISTIC_ANALOGUE",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "Brachistochrone-labeled descent analogue",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "06b5855225f3eda122b1bf21d5f621c6697ac7d3edf3edba4fa2f0f43432a86f",
+        "line": 217,
+        "path": "code/geometry_optimal_curve_transport_benchmark.py",
+        "symbol": "strategy_brachistochrone_descent"
+      },
+      "symbols": {
+        "PathPlan": "synthetic path metrics",
+        "drop_ratio": "vertical_drop/horizontal_distance",
+        "time_factor": "synthetic travel-time multiplier"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 150,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_geometry_analogue_and_graph_implementations_are_bounded"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "A bounded thermal-plume-inspired cooling proxy passed an internal generated confirmatory benchmark.",
+      "bindings": [
+        {
+          "path": "docs/GEOMETRY_CONFIRMATORY_PROMOTION_AUDIT_2026-07-16.md",
+          "role": "evidence",
+          "sha256": "c3f0d3389c3cc77b5e1f6083f8d62edb20b01f8e2e7afca2c16b3fa65bb274fb"
+        },
+        {
+          "path": "docs/FULL_GEOMETRY_PROTOCOL_FIELD_2026-07-16.md",
+          "role": "protocol_inventory",
+          "sha256": "6ec435a7577503b0ce755f0d1a0558bfab05bc3d0928a6932dd08495ca1cb837"
+        }
+      ],
+      "blocked_claims": [
+        "CFD solution",
+        "Navier-Stokes solution",
+        "datacenter validation",
+        "HVAC savings"
+      ],
+      "claim_boundary": "This is not a governing-equation solver; it is not CFD and does not solve Navier-Stokes, heat transfer, facility airflow, or equipment physics.",
+      "claim_level": "C1_INTERNAL_IMPLEMENTATION",
+      "constants": [
+        {
+          "name": "plume_cap",
+          "scope": "generated thermal benchmark",
+          "units": "synthetic proxy",
+          "value": 2.2
+        },
+        {
+          "name": "lateral_width",
+          "scope": "synthetic plume kernel",
+          "units": "grid-cell squared",
+          "value": 7.0
+        }
+      ],
+      "equation_id": "GEO-THERMAL-001",
+      "evidence_class": "E1_INTERNAL_IMPLEMENTATION",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INTERNAL_ONLY"
+      },
+      "formal_expression": "cooling(cell)=0.64+0.42*normalized_heat+0.62*clipped_vertical_lateral_plume, then obstruction attenuation",
+      "implementation_class": "HEURISTIC_ANALOGUE",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "Thermal-plume ventilation analogue",
+      "negative_result_retained": false,
+      "source": {
+        "file_sha256": "f05812f09e0cc133eb89c6ded2b23468b0578148481dd68627f9b98903b91a47",
+        "line": 279,
+        "path": "code/geometry_thermal_ventilation_benchmark.py",
+        "symbol": "strategy_thermal_plume_convection"
+      },
+      "symbols": {
+        "cooling": "synthetic cooling proxy",
+        "normalized_heat": "synthetic normalized cell heat",
+        "plume": "synthetic hotspot influence"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 150,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_geometry_analogue_and_graph_implementations_are_bounded"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "The generated branching benchmark includes a standard Dijkstra path baseline over its registered graph costs.",
+      "bindings": [
+        {
+          "path": "docs/GEOMETRY_CONFIRMATORY_PROMOTION_AUDIT_2026-07-16.md",
+          "role": "evidence",
+          "sha256": "c3f0d3389c3cc77b5e1f6083f8d62edb20b01f8e2e7afca2c16b3fa65bb274fb"
+        },
+        {
+          "path": "docs/FULL_GEOMETRY_PROTOCOL_FIELD_2026-07-16.md",
+          "role": "protocol_inventory",
+          "sha256": "6ec435a7577503b0ce755f0d1a0558bfab05bc3d0928a6932dd08495ca1cb837"
+        }
+      ],
+      "blocked_claims": [
+        "novel shortest-path algorithm",
+        "physical network optimum",
+        "infrastructure validation"
+      ],
+      "claim_boundary": "Dijkstra is standard prior art and the resulting path is optimal only under the benchmark's synthetic graph and cost definition, not a physical network.",
+      "claim_level": "C1_INTERNAL_IMPLEMENTATION",
+      "constants": [
+        {
+          "name": "base_edge_cost",
+          "scope": "generated branching benchmark",
+          "units": "synthetic cost",
+          "value": 1.0
+        }
+      ],
+      "equation_id": "GEO-GRAPH-001",
+      "evidence_class": "E1_INTERNAL_IMPLEMENTATION",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INTERNAL_ONLY"
+      },
+      "formal_expression": "dist(v)=min_path sum_e cost(e), updated by alt=dist(u)+cost(u,v) in a priority queue",
+      "implementation_class": "EXACT_STANDARD_METHOD",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "STANDARD_METHOD_NOT_NOVEL_ALONE"
+      },
+      "name": "Dijkstra shortest-path search",
+      "negative_result_retained": true,
+      "source": {
+        "file_sha256": "8e9ca6cc279c1fe90167ace5c131320832a8f8fcbd5e02d5fc2dd0520d6c1af6",
+        "line": 199,
+        "path": "code/geometry_branching_transport_benchmark.py",
+        "symbol": "dijkstra_path"
+      },
+      "symbols": {
+        "cost(e)": "registered synthetic edge cost",
+        "dist(v)": "best known path cost",
+        "path": "node sequence"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 150,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_geometry_analogue_and_graph_implementations_are_bounded"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "An implemented bounded phi-proximity bonus exists as exploratory scoring code.",
+      "bindings": [
+        {
+          "path": "docs/LUMAUNIVERSE_RESEARCH_EVIDENCE_AUDIT_2026-06-18.md",
+          "role": "evidence_boundary",
+          "sha256": "c91cef08a4d3dc449bb324827cc900185d87624b8dd466476cf3502e1bb046ad"
+        }
+      ],
+      "blocked_claims": [
+        "structural market dislocation",
+        "natural-law edge",
+        "predictive validity",
+        "trading alpha"
+      ],
+      "claim_boundary": "This is an unvalidated exploratory heuristic with no accepted empirical basis for structural dislocation, prediction, trading, or physical resonance claims.",
+      "claim_level": "C1_INTERNAL_IMPLEMENTATION",
+      "constants": [
+        {
+          "name": "PHI",
+          "scope": "exploratory score",
+          "units": "ratio",
+          "value": 1.6180339887
+        },
+        {
+          "name": "tolerance",
+          "scope": "exploratory score",
+          "units": "percentage points",
+          "value": 0.5
+        }
+      ],
+      "equation_id": "UH-001",
+      "evidence_class": "E1_INTERNAL_IMPLEMENTATION",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INTERNAL_ONLY"
+      },
+      "formal_expression": "bonus=max(0, 10*(1-min_l |edge_pct-10*phi_level_l|/0.5))",
+      "implementation_class": "EXPLORATORY_HEURISTIC",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "Phi-resonance additive bonus",
+      "negative_result_retained": false,
+      "source": {
+        "file_sha256": "cea9c661641aaf9fb28b036f53d83858af23811eeadeb565ed7c900dddd17b23",
+        "line": 157,
+        "path": "code/universal_harmonic_edge_core.py",
+        "symbol": "phi_resonance_bonus"
+      },
+      "symbols": {
+        "bonus": "0-to-10 heuristic points",
+        "edge_pct": "unvalidated input edge percentage",
+        "phi_level_l": "phi powers and reciprocals"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 178,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_universal_harmonic_score_is_exploratory_and_bounded"
+        }
+      ]
+    },
+    {
+      "allowed_claim": "A deterministic bounded cross-domain composite score is implemented for exploratory ranking.",
+      "bindings": [
+        {
+          "path": "docs/LUMAUNIVERSE_RESEARCH_EVIDENCE_AUDIT_2026-06-18.md",
+          "role": "evidence_boundary",
+          "sha256": "c91cef08a4d3dc449bb324827cc900185d87624b8dd466476cf3502e1bb046ad"
+        }
+      ],
+      "blocked_claims": [
+        "cross-domain comparability",
+        "expected return",
+        "signal validity",
+        "investment recommendation"
+      ],
+      "claim_boundary": "This composite is an exploratory ranking heuristic; scores are not probabilities, returns, calibrated utilities, validated cross-domain quantities, or investment recommendations.",
+      "claim_level": "C1_INTERNAL_IMPLEMENTATION",
+      "constants": [
+        {
+          "name": "score_floor",
+          "scope": "composite",
+          "units": "points",
+          "value": 0.0
+        },
+        {
+          "name": "score_ceiling",
+          "scope": "composite",
+          "units": "points",
+          "value": 100.0
+        }
+      ],
+      "equation_id": "UH-002",
+      "evidence_class": "E1_INTERNAL_IMPLEMENTATION",
+      "external_validation": {
+        "receipt_path": null,
+        "status": "INTERNAL_ONLY"
+      },
+      "formal_expression": "score=clamp(w_c*curvature+w_r*resonance+w_p*persistence+w_s*sharpity+phi_bonus,0,100)",
+      "implementation_class": "EXPLORATORY_HEURISTIC",
+      "ip_position": {
+        "novelty_claim_allowed": false,
+        "patent_counsel_review_required": true,
+        "prior_art_position": "SYSTEM_COMBINATION_REQUIRES_PRIOR_ART_REVIEW"
+      },
+      "name": "Universal harmonic composite score",
+      "negative_result_retained": false,
+      "source": {
+        "file_sha256": "cea9c661641aaf9fb28b036f53d83858af23811eeadeb565ed7c900dddd17b23",
+        "line": 204,
+        "path": "code/universal_harmonic_edge_core.py",
+        "symbol": "score_signal"
+      },
+      "symbols": {
+        "curvature": "log-price dispersion heuristic",
+        "score": "0-to-100 exploratory composite",
+        "w": "domain profile weights"
+      },
+      "tests": [
+        {
+          "file_sha256": "be875929aa61e6905fe962d03a3a493377537c9946c7111db2d0de19b6904611",
+          "line": 178,
+          "path": "tests/test_scientific_equation_evidence_map.py",
+          "symbol": "test_universal_harmonic_score_is_exploratory_and_bounded"
+        }
+      ]
+    }
+  ],
+  "generated_utc": "2026-07-16T04:23:19.301904+00:00",
+  "registry": {
+    "path": "config/scientific_equation_registry_v1.json",
+    "sha256": "4107c6ec86246c252cc93cf7e26fe12c8875ff529f0ad1ef8003ea649570847d"
+  },
+  "repository_head_at_generation": "5688a5b736775dd187b6c5193adf4b97451e5890",
+  "schema": "lumencore_scientific_equation_evidence_map_v1",
+  "summary": {
+    "claim_level_counts": {
+      "C1_INTERNAL_IMPLEMENTATION": 11,
+      "C2_FROZEN_INTERNAL_EVIDENCE": 14
+    },
+    "entry_count": 25,
+    "equation_ids": [
+      "DICE-001",
+      "DICE-002",
+      "EIA-D-001",
+      "EIA-D-002",
+      "EIA-D-003",
+      "EIA-D-004",
+      "EIA-D-005",
+      "EIA-H-001",
+      "EIA-H-002",
+      "EIA-H-003",
+      "FREQ-001",
+      "FREQ-002",
+      "FREQ-003",
+      "FREQ-004",
+      "FREQ-005",
+      "FREQ-006",
+      "GEO-CURVE-001",
+      "GEO-GRAPH-001",
+      "GEO-THERMAL-001",
+      "GEO-WAVE-001",
+      "MW-001",
+      "MW-002",
+      "NV065-001",
+      "UH-001",
+      "UH-002"
+    ],
+    "evidence_class_counts": {
+      "E1_INTERNAL_IMPLEMENTATION": 11,
+      "E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC": 14
+    },
+    "external_validation_claim_allowed": false,
+    "field_or_acceptance_validated_entry_count": 0,
+    "field_validation_claim_allowed": false,
+    "file_count": 26,
+    "implementation_class_counts": {
+      "EXACT_STANDARD_METHOD": 12,
+      "EXPLORATORY_HEURISTIC": 4,
+      "HEURISTIC_ANALOGUE": 3,
+      "OPERATIONAL_DEFINITION": 6
+    },
+    "independently_reproduced_entry_count": 0,
+    "patentability_determined": false
+  },
+  "terminal_chain_sha256": "6628e38b71407898d2d83e87f0464813f8191c50b63f0c4f95b9fa581f2d502b",
+  "truth_line": "This map distinguishes exact standard methods, operational definitions, heuristic analogues, and exploratory heuristics. It is an internal traceability artifact, not patentability, agency acceptance, independent validation, field validation, or performance certification."
+}
