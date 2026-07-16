@@ -41,8 +41,8 @@ if [[ ! -f "$CONFIG" ]]; then
   echo "ERROR: nginx config not found: $CONFIG" >&2
   exit 4
 fi
-if [[ ! -f "$DOCUMENT_ROOT/evidence/index.html" ]]; then
-  echo "ERROR: evidence page not found: $DOCUMENT_ROOT/evidence/index.html" >&2
+if [[ ! -f "$DOCUMENT_ROOT/evidence/index_bounded.html" ]]; then
+  echo "ERROR: bounded evidence page not found: $DOCUMENT_ROOT/evidence/index_bounded.html" >&2
   exit 5
 fi
 
@@ -119,4 +119,4 @@ if [[ "$PUBLIC_STATUS" != "200" ]]; then
   exit 12
 fi
 
-echo "OK: /evidence/ is serving the static evidence page locally and publicly."
+echo "OK: /evidence/ is serving the bounded static evidence index locally and publicly."
