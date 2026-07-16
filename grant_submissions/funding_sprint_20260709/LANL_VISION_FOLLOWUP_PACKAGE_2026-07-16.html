@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>LumenCore + LANL VISION - Licensing and Validation Fit</title>
+  <style>
+    @page {
+      size: Letter;
+      margin: 0.54in;
+    }
+
+    :root {
+      --ink: #15242d;
+      --muted: #52636d;
+      --line: #c9d4d9;
+      --paper: #ffffff;
+      --soft: #edf4f3;
+      --navy: #17384a;
+      --teal: #157f78;
+      --amber: #d89b2b;
+      --red: #a7443f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 10.1pt;
+      line-height: 1.38;
+      letter-spacing: 0;
+    }
+
+    .page {
+      min-height: 9.78in;
+      position: relative;
+      page-break-after: always;
+      padding-bottom: 0.34in;
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+    }
+
+    .compact {
+      font-size: 9.55pt;
+      line-height: 1.3;
+    }
+
+    .compact h2 {
+      font-size: 17pt;
+      margin-bottom: 0.11in;
+    }
+
+    .compact h3 {
+      font-size: 11pt;
+    }
+
+    .compact table {
+      font-size: 8.65pt;
+      margin-bottom: 0.13in;
+    }
+
+    .compact th,
+    .compact td {
+      padding: 6px 7px;
+    }
+
+    .compact .callout {
+      padding: 0.13in;
+    }
+
+    .compact .band {
+      margin-top: 0.12in;
+      padding-top: 0.12in;
+    }
+
+    .compact .metric-grid {
+      margin: 0.11in 0 0.14in;
+    }
+
+    .compact .metric {
+      min-height: 0.76in;
+      padding: 0.11in;
+    }
+
+    .compact .question-list li {
+      margin-bottom: 0.085in;
+    }
+
+    .top-rule {
+      width: 100%;
+      height: 7px;
+      background: var(--teal);
+      margin-bottom: 0.23in;
+    }
+
+    .eyebrow {
+      color: var(--teal);
+      font-size: 9pt;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      max-width: 7in;
+      color: var(--navy);
+      font-size: 28pt;
+      line-height: 1.08;
+      margin-top: 0.12in;
+    }
+
+    h2 {
+      color: var(--navy);
+      font-size: 18pt;
+      line-height: 1.15;
+      margin-bottom: 0.16in;
+    }
+
+    h3 {
+      color: var(--navy);
+      font-size: 11.5pt;
+      margin-bottom: 0.07in;
+    }
+
+    p {
+      margin: 0 0 0.12in;
+    }
+
+    ul,
+    ol {
+      margin: 0.04in 0 0.14in 0.22in;
+      padding: 0;
+    }
+
+    li {
+      margin: 0 0 0.055in;
+    }
+
+    .subtitle {
+      max-width: 6.9in;
+      color: var(--muted);
+      font-size: 13pt;
+      line-height: 1.35;
+      margin: 0.15in 0 0.28in;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 8.9pt;
+      margin-top: 0.2in;
+    }
+
+    .decision {
+      border-left: 5px solid var(--amber);
+      background: #fbf5e8;
+      padding: 0.16in 0.19in;
+      margin: 0.18in 0 0.24in;
+    }
+
+    .decision strong {
+      color: var(--navy);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.18in;
+    }
+
+    .band {
+      border-top: 1px solid var(--line);
+      padding-top: 0.16in;
+      margin-top: 0.17in;
+    }
+
+    .callout {
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 0.16in;
+      background: #f8fafb;
+    }
+
+    .callout.safe {
+      border-color: #9bc9c4;
+      background: var(--soft);
+    }
+
+    .callout.boundary {
+      border-color: #d7b2ad;
+      background: #fbf2f1;
+    }
+
+    .label {
+      display: inline-block;
+      color: #ffffff;
+      background: var(--navy);
+      padding: 2px 7px;
+      border-radius: 3px;
+      font-size: 8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 0.08in;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr 0.17in 1.2fr 0.17in 1fr;
+      align-items: stretch;
+      margin: 0.22in 0 0.25in;
+    }
+
+    .flow-box {
+      border: 1px solid var(--line);
+      border-top: 5px solid var(--teal);
+      border-radius: 5px;
+      padding: 0.15in;
+      background: #ffffff;
+      min-height: 2.25in;
+    }
+
+    .flow-box.center {
+      border-top-color: var(--amber);
+      background: #fffdf7;
+    }
+
+    .arrow {
+      align-self: center;
+      color: var(--teal);
+      font-size: 18pt;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.12in 0 0.2in;
+      font-size: 9.1pt;
+    }
+
+    th {
+      color: #ffffff;
+      background: var(--navy);
+      text-align: left;
+      padding: 7px 8px;
+      font-weight: 700;
+    }
+
+    td {
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+      padding: 7px 8px;
+    }
+
+    tr:nth-child(even) td {
+      background: #f7f9fa;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.11in;
+      margin: 0.16in 0 0.2in;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 0.13in;
+      min-height: 0.92in;
+    }
+
+    .metric strong {
+      display: block;
+      color: var(--teal);
+      font-size: 15pt;
+      line-height: 1;
+      margin-bottom: 0.07in;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 8.5pt;
+    }
+
+    .question-list {
+      counter-reset: q;
+      list-style: none;
+      margin-left: 0;
+    }
+
+    .question-list li {
+      position: relative;
+      padding-left: 0.39in;
+      margin-bottom: 0.13in;
+    }
+
+    .question-list li::before {
+      counter-increment: q;
+      content: counter(q);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 0.25in;
+      height: 0.25in;
+      border-radius: 50%;
+      color: #ffffff;
+      background: var(--teal);
+      font-size: 8.5pt;
+      font-weight: 700;
+      text-align: center;
+      line-height: 0.25in;
+    }
+
+    .footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      padding-top: 0.08in;
+      font-size: 7.8pt;
+    }
+
+    a {
+      color: var(--teal);
+      text-decoration: none;
+    }
+
+    code {
+      font-family: Consolas, monospace;
+      font-size: 8pt;
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+<body>
+  <section class="page">
+    <div class="top-rule"></div>
+    <div class="eyebrow">Technical follow-up package | July 16, 2026</div>
+    <h1>LumenCore + LANL VISION</h1>
+    <div class="subtitle">
+      A bounded licensing, validation, and commercialization fit for passive industrial
+      vibration intelligence with reproducible proof-to-pilot evidence.
+    </div>
+
+    <div class="decision">
+      <strong>Decision requested:</strong> Is there a credible path to a short technical
+      diligence session and an evaluation-stage relationship for VISION, with the
+      appropriate LANL licensing, NDA, data, and pilot boundaries established first?
+    </div>
+
+    <div class="grid-2">
+      <div class="callout safe">
+        <span class="label">The fit</span>
+        <h3>VISION supplies independent physical evidence</h3>
+        <p>
+          LANL publicly describes VISION as a passive, control-system-independent
+          vibration monitoring technology for pumps, compressors, fans, and related
+          industrial equipment.
+        </p>
+      </div>
+      <div class="callout">
+        <span class="label">The layer</span>
+        <h3>LumenCore supplies the audit and pilot spine</h3>
+        <p>
+          LumenCore can organize source identity, baseline definitions, locked metrics,
+          shadow-mode evaluations, adverse-result retention, hashes, and reviewer-facing
+          result packets around a jointly defined VISION evaluation.
+        </p>
+      </div>
+    </div>
+
+    <div class="band">
+      <h2>Why the combination is commercially useful</h2>
+      <div class="grid-2">
+        <div>
+          <ul>
+            <li>Physical vibration data can provide an independent check on networked control-system telemetry.</li>
+            <li>A proof spine can separate data provenance, model behavior, operational decisions, and claims.</li>
+            <li>Shadow-mode deployment supports evaluation before any control or maintenance action is authorized.</li>
+          </ul>
+        </div>
+        <div>
+          <ul>
+            <li>Locked baselines and holdouts make pilot acceptance criteria explicit before scoring.</li>
+            <li>Null, adverse, and error rows remain in the evidence record rather than being discarded.</li>
+            <li>The same evidence structure can support future licensee, pilot-customer, grant, or partner diligence.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout boundary">
+      <span class="label">Claim boundary</span>
+      <p>
+        LumenCore does not claim ownership of VISION, a LANL license, LANL endorsement,
+        field validation, cybersecurity certification, realized savings, or production
+        readiness. This package proposes a diligence and evaluation path only.
+      </p>
+    </div>
+
+    <div class="meta">
+      Prepared for Michael Erickson and Neil Loychik, Los Alamos National Laboratory<br>
+      Prepared by Robert Ashworth, Founder, LumenCore | robertashworth4444@gmail.com |
+      <a href="https://lumen-core.ai">lumen-core.ai</a>
+    </div>
+
+    <div class="footer">
+      <span>LumenCore reviewer-safe technical package</span>
+      <span>1 / 4</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="top-rule"></div>
+    <div class="eyebrow">Complementary system architecture</div>
+    <h2>Keep sensing, evidence, and action authority separate</h2>
+    <p>
+      The proposed architecture treats VISION as the physical-sensing and machine-state
+      signal layer. LumenCore does not replace VISION's sensing logic or the facility's
+      control system; it adds a governed evaluation and evidence path.
+    </p>
+
+    <div class="flow">
+      <div class="flow-box">
+        <h3>LANL VISION</h3>
+        <ul>
+          <li>Machine-mounted vibration sensing</li>
+          <li>Machine-specific signature learning</li>
+          <li>Performance deviation indicators</li>
+          <li>Independent physical feedback</li>
+          <li>Interfaces and data rights defined by LANL</li>
+        </ul>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="flow-box center">
+        <h3>LumenCore evidence layer</h3>
+        <ul>
+          <li>Source and schema registration</li>
+          <li>Timestamp and integrity checks</li>
+          <li>Named baseline and candidate registry</li>
+          <li>Predeclared metrics and holdout windows</li>
+          <li>Shadow-mode evaluation</li>
+          <li>Hash-sealed result and exception records</li>
+        </ul>
+      </div>
+      <div class="arrow">&rarr;</div>
+      <div class="flow-box">
+        <h3>Reviewer / operator</h3>
+        <ul>
+          <li>Inspectable pilot packet</li>
+          <li>Accepted or rejected gate outcome</li>
+          <li>Traceable deviations and limitations</li>
+          <li>Human maintenance authority</li>
+          <li>No automatic actuation by default</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="callout safe">
+        <h3>Default operating mode</h3>
+        <p>
+          Read-only observation and replay. Any maintenance recommendation, alert routing,
+          integration, or control action remains separately authorized by the responsible
+          owner.
+        </p>
+      </div>
+      <div class="callout">
+        <h3>Evidence object</h3>
+        <p>
+          Each result binds source identity, baseline, candidate, metric, time window,
+          protocol version, environment receipt, exceptions, and terminal hash.
+        </p>
+      </div>
+    </div>
+
+    <div class="band">
+      <h2>Example initial use cases</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Use case</th>
+            <th>Candidate evidence question</th>
+            <th>Safe first mode</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Pumps and cooling systems</td>
+            <td>Does VISION detect meaningful deviation earlier or more reliably than an accepted incumbent signal?</td>
+            <td>Historical replay, then shadow monitoring</td>
+          </tr>
+          <tr>
+            <td>Data-center mechanical infrastructure</td>
+            <td>Can the independent vibration channel improve confidence when network telemetry is incomplete or suspect?</td>
+            <td>Read-only parallel observation</td>
+          </tr>
+          <tr>
+            <td>Industrial cybersecurity</td>
+            <td>Can physical feedback identify inconsistencies under a jointly defined benign fault or spoofing test?</td>
+            <td>Controlled lab scenario only</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      <span>LumenCore reviewer-safe technical package</span>
+      <span>2 / 4</span>
+    </div>
+  </section>
+
+  <section class="page compact">
+    <div class="top-rule"></div>
+    <div class="eyebrow">Proposed evaluation structure</div>
+    <h2>A staged 90-day proof-to-pilot path</h2>
+    <p>
+      Timing is illustrative and would begin only after LANL identifies the appropriate
+      agreement route, disclosure boundary, and technical owner.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 15%;">Stage</th>
+          <th style="width: 22%;">Purpose</th>
+          <th>Work product</th>
+          <th style="width: 24%;">Exit gate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>0<br><span class="small">Weeks 0-2</span></td>
+          <td>Licensing and disclosure fit</td>
+          <td>Evaluation route, NDA/export review, field-of-use discussion, interface inventory, and named technical contacts.</td>
+          <td>Written authorization for the bounded evaluation scope.</td>
+        </tr>
+        <tr>
+          <td>1<br><span class="small">Weeks 2-4</span></td>
+          <td>Protocol lock</td>
+          <td>Accepted dataset or simulator, incumbent baseline, metric definitions, holdout window, exclusion rules, and failure criteria.</td>
+          <td>Protocol hash and written acceptance before scoring.</td>
+        </tr>
+        <tr>
+          <td>2<br><span class="small">Weeks 4-8</span></td>
+          <td>Retrospective or laboratory evaluation</td>
+          <td>Read-only adapter, quality report, baseline comparison, exception ledger, and complete null/adverse result retention.</td>
+          <td>Reproducible output package with no operational claim.</td>
+        </tr>
+        <tr>
+          <td>3<br><span class="small">Weeks 8-12</span></td>
+          <td>Independent review and next decision</td>
+          <td>Blind reproduction or reviewer replay, signed deviations, terminal hashes, and a pilot recommendation.</td>
+          <td>Stop, revise, or approve a separate shadow-site pilot.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Acceptance packet</h2>
+    <div class="metric-grid">
+      <div class="metric">
+        <strong>01</strong>
+        Protocol and source manifest
+      </div>
+      <div class="metric">
+        <strong>02</strong>
+        Baseline and metric register
+      </div>
+      <div class="metric">
+        <strong>03</strong>
+        Raw and exception-preserving outputs
+      </div>
+      <div class="metric">
+        <strong>04</strong>
+        Hashes and environment receipt
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="callout safe">
+        <h3>What would count as progress</h3>
+        <ul>
+          <li>LANL accepts the evaluation question and baseline.</li>
+          <li>The bounded test can be independently rerun.</li>
+          <li>The result and its limitations survive technical review.</li>
+          <li>A specific license or pilot next step becomes decision-ready.</li>
+        </ul>
+      </div>
+      <div class="callout boundary">
+        <h3>What would not count as progress</h3>
+        <ul>
+          <li>Internal reruns of the same evidence presented as independent validation.</li>
+          <li>Changing metrics or holdouts after seeing results.</li>
+          <li>Converting diagnostic outputs into savings or safety claims.</li>
+          <li>Using proprietary VISION information outside its authorized purpose.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>LumenCore reviewer-safe technical package</span>
+      <span>3 / 4</span>
+    </div>
+  </section>
+
+  <section class="page compact">
+    <div class="top-rule"></div>
+    <div class="eyebrow">Diligence agenda</div>
+    <h2>Questions for the next technical discussion</h2>
+
+    <ol class="question-list">
+      <li>
+        <strong>Licensing route:</strong> Is VISION available for evaluation, option,
+        field-of-use, or commercial licensing, and what information does LANL need from
+        a prospective small-business partner?
+      </li>
+      <li>
+        <strong>Technical boundary:</strong> Which sensing hardware, firmware, models,
+        calibration methods, interfaces, and documentation are included or excluded?
+      </li>
+      <li>
+        <strong>Data path:</strong> Is there a representative, releasable dataset or
+        controlled test environment suitable for a first baseline-locked evaluation?
+      </li>
+      <li>
+        <strong>Acceptance standard:</strong> Which incumbent sensor or operational
+        signal, metrics, operating conditions, and failure rules would LANL regard as a
+        credible comparison?
+      </li>
+      <li>
+        <strong>Protection and compliance:</strong> Should deeper discussion begin under
+        an NDA, and what export-control, cybersecurity, publication, or background-IP
+        constraints must be screened first?
+      </li>
+      <li>
+        <strong>Commercialization path:</strong> Would LANL prefer a licensing-only
+        discussion, an evaluation agreement, an SPP/CRADA route, a pilot customer, or a
+        commercialization-partner process?
+      </li>
+    </ol>
+
+    <div class="grid-2">
+      <div class="callout">
+        <span class="label">LumenCore can contribute</span>
+        <ul>
+          <li>Reviewer-safe pilot design</li>
+          <li>Data and schema adapters</li>
+          <li>Baseline and holdout locking</li>
+          <li>Shadow-mode evaluation</li>
+          <li>Manifest, hash, and exception records</li>
+          <li>Grant and partner diligence packaging</li>
+        </ul>
+      </div>
+      <div class="callout boundary">
+        <span class="label">Not represented</span>
+        <ul>
+          <li>Existing rights to VISION</li>
+          <li>Hardware manufacturing readiness</li>
+          <li>Field or customer validation</li>
+          <li>Cybersecurity or safety certification</li>
+          <li>Guaranteed performance or savings</li>
+          <li>Patent coverage or freedom to operate</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="band">
+      <h2>Requested next action</h2>
+      <p>
+        A 30-minute follow-up with the appropriate licensing and technical participants
+        to decide whether Stage 0 is warranted, followed by a bounded protocol in LANL's
+        preferred format.
+      </p>
+    </div>
+
+    <div class="band">
+      <h3>References and reviewer links</h3>
+      <p class="small">
+        LANL public VISION description:
+        <a href="https://cdn.lanl.gov/files/nss-2025-engineering-online_f0e10.pdf">
+          National Security Science, Summer 2025
+        </a><br>
+        LumenCore public proof gateway:
+        <a href="https://lumen-core.ai/proof_to_pilot.html">
+          https://lumen-core.ai/proof_to_pilot.html
+        </a><br>
+        LumenCore public repository:
+        <a href="https://github.com/robertashworth1986-debug/lumen-core-public">
+          https://github.com/robertashworth1986-debug/lumen-core-public
+        </a>
+      </p>
+    </div>
+
+    <div class="callout safe">
+      <h3>Contact</h3>
+      <p>
+        Robert Ashworth | Founder, LumenCore<br>
+        robertashworth4444@gmail.com |
+        <a href="https://lumen-core.ai">https://lumen-core.ai</a>
+      </p>
+    </div>
+
+    <div class="footer">
+      <span>LumenCore reviewer-safe technical package</span>
+      <span>4 / 4</span>
+    </div>
+  </section>
+</body>
+</html>

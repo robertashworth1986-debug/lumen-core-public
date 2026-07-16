@@ -1,0 +1,38 @@
+{
+  "schema": "lumencore_lanl_vision_followup_manifest_v1",
+  "generated_utc": "2026-07-16T18:38:00Z",
+  "purpose": "Reviewer-safe follow-up package for a bounded LANL VISION licensing, evaluation, and commercialization discussion.",
+  "intended_recipients": [
+    "Michael Erickson, Los Alamos National Laboratory",
+    "Neil Loychik, Los Alamos National Laboratory"
+  ],
+  "artifacts": [
+    {
+      "path": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_PACKAGE_2026-07-16.html",
+      "bytes": 20442,
+      "sha256": "8fc912ea80790d368e63ff25b4bbc8c4cde4ba32f62296b0ea614297eb1fa349",
+      "role": "Canonical reviewer-safe source"
+    },
+    {
+      "path": "grant_submissions/funding_sprint_20260709/LumenCore_LANL_VISION_Followup_Package_2026-07-16.pdf",
+      "bytes": 123160,
+      "sha256": "3788258083e5d58d3ff7c54d937ef6a73ae132c294021fb234e422a8903243e0",
+      "role": "Email attachment"
+    },
+    {
+      "path": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_EMAIL_2026-07-16.md",
+      "bytes": 1727,
+      "sha256": "c2e1b849ae7009891a2685431f7fc4f148c7ad4a4417d2aa6418695317a7d094",
+      "role": "Approved outbound email source"
+    }
+  ],
+  "quality_checks": {
+    "pdf_page_count": 4,
+    "visual_review_complete": true,
+    "orphan_pages": 0,
+    "clipped_or_overlapping_content": false,
+    "meeting_credentials_included": false,
+    "private_patent_material_included": false
+  },
+  "claim_boundary": "No LANL license, endorsement, field validation, cybersecurity certification, production deployment, realized savings, patent coverage, or freedom-to-operate conclusion is claimed."
+}
