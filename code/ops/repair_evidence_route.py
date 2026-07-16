@@ -29,7 +29,7 @@ STATIC_BLOCK = """    location = /evidence {
 
     location /evidence/ {
         root /opt/lumencore/dashboard;
-        index index.html;
+        index index_bounded.html;
         try_files $uri $uri/ =404;
         add_header Cache-Control \"no-cache\" always;
     }
@@ -126,6 +126,7 @@ def repair_config(text: str) -> RepairResult:
 
     already_static = (
         "root /opt/lumencore/dashboard;" in current_block
+        and "index index_bounded.html;" in current_block
         and "try_files $uri $uri/ =404;" in current_block
         and "proxy_pass" not in current_block
     )
@@ -160,7 +161,7 @@ def validate_repaired_config(text: str) -> None:
 
     required = (
         "root /opt/lumencore/dashboard;",
-        "index index.html;",
+        "index index_bounded.html;",
         "try_files $uri $uri/ =404;",
     )
     missing = [item for item in required if item not in block]
@@ -220,14 +221,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--document-root",
         type=Path,
         default=Path("/opt/lumencore/dashboard"),
-        help="dashboard root used to verify evidence/index.html",
+        help="dashboard root used to verify evidence/index_bounded.html",
     )
     parser.add_argument("--apply", action="store_true", help="write the repair after creating a timestamped backup")
     parser.add_argument("--show-diff", action="store_true", help="print the proposed unified diff")
     parser.add_argument(
         "--allow-missing-index",
         action="store_true",
-        help="allow repair when <document-root>/evidence/index.html is not present",
+        help="allow repair when <document-root>/evidence/index_bounded.html is not present",
     )
     return parser
 
@@ -240,9 +241,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: nginx config not found: {config}", file=sys.stderr)
         return 2
 
-    index_path = args.document_root / "evidence" / "index.html"
+    index_path = args.document_root / "evidence" / "index_bounded.html"
     if not index_path.is_file() and not args.allow_missing_index:
-        print(f"ERROR: static evidence page not found: {index_path}", file=sys.stderr)
+        print(f"ERROR: bounded static evidence page not found: {index_path}", file=sys.stderr)
         return 3
 
     original = config.read_text(encoding="utf-8")
