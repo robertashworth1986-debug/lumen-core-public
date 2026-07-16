@@ -503,6 +503,8 @@ def canonical_path_score(candidate: Candidate) -> int:
         score += 6
     if "equation_registry" in path_lower or "formula_registry" in path_lower:
         score += 6
+    if score == 0:
+        return 0
     if candidate.root_alias == "repo":
         score += 3
     if candidate.archive_or_backup:

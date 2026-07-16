@@ -156,3 +156,13 @@ def test_canonical_source_outranks_checksum_or_mirror_receipt(tmp_path):
     assert MODULE.canonical_path_score(source_candidate) > MODULE.canonical_path_score(
         receipt_candidate
     )
+    unrelated = tmp_path / "luma_router.py"
+    unrelated.write_text("def luma_router(): pass", encoding="utf-8")
+    unrelated_candidate = MODULE.score_candidate(
+        unrelated,
+        unrelated.read_text(encoding="utf-8"),
+        "content",
+        "repo",
+        tmp_path,
+    )
+    assert MODULE.canonical_path_score(unrelated_candidate) == 0
