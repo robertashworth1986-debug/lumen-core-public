@@ -1,0 +1,203 @@
+{
+  "schema": "lumajet_flight_assurance_protocol_v1",
+  "version": "1.0.0",
+  "frozen_utc": "2026-07-16T00:30:00Z",
+  "purpose": "Deterministic offline route-energy and safety-assurance simulation for LumaJet Phase I evidence development.",
+  "claim_boundary": "Generated software simulation only. This protocol does not produce actuator commands and is not flight control, aircraft design, propulsion evidence, airworthiness evidence, FAA or DoD approval, field validation, or authorization for operational use.",
+  "operational_outputs_allowed": false,
+  "actuator_commands_allowed": false,
+  "cross_domain_certification_claim_allowed": false,
+  "grid": {
+    "size": 24,
+    "connectivity": 8,
+    "diagonal_corner_cutting_allowed": false
+  },
+  "splits": {
+    "development": {
+      "seed_base": 24000,
+      "scenarios_per_condition": 24
+    },
+    "validation": {
+      "seed_base": 84000,
+      "scenarios_per_condition": 160
+    },
+    "holdout_used_for_selection": false
+  },
+  "conditions": [
+    {
+      "name": "nominal_clear",
+      "wind_scale": 0.18,
+      "turbulence_scale": 0.10,
+      "obstacle_count": 2,
+      "energy_budget_multiplier": 1.85,
+      "sensor_noise_scale": 0.02,
+      "corridor": false,
+      "broadband_transient": false
+    },
+    {
+      "name": "crosswind_shear",
+      "wind_scale": 0.75,
+      "turbulence_scale": 0.22,
+      "obstacle_count": 3,
+      "energy_budget_multiplier": 1.90,
+      "sensor_noise_scale": 0.04,
+      "corridor": false,
+      "broadband_transient": false
+    },
+    {
+      "name": "bounded_gust_front",
+      "wind_scale": 0.62,
+      "turbulence_scale": 0.62,
+      "obstacle_count": 3,
+      "energy_budget_multiplier": 1.95,
+      "sensor_noise_scale": 0.06,
+      "corridor": false,
+      "broadband_transient": false
+    },
+    {
+      "name": "thermal_cell_field",
+      "wind_scale": 0.46,
+      "turbulence_scale": 0.48,
+      "obstacle_count": 4,
+      "energy_budget_multiplier": 2.00,
+      "sensor_noise_scale": 0.05,
+      "corridor": false,
+      "broadband_transient": false
+    },
+    {
+      "name": "sensor_broadband_transient",
+      "wind_scale": 0.48,
+      "turbulence_scale": 0.34,
+      "obstacle_count": 3,
+      "energy_budget_multiplier": 2.00,
+      "sensor_noise_scale": 0.16,
+      "corridor": false,
+      "broadband_transient": true
+    },
+    {
+      "name": "degraded_energy_reserve",
+      "wind_scale": 0.52,
+      "turbulence_scale": 0.36,
+      "obstacle_count": 3,
+      "energy_budget_multiplier": 1.42,
+      "sensor_noise_scale": 0.07,
+      "corridor": false,
+      "broadband_transient": false
+    },
+    {
+      "name": "obstacle_corridor",
+      "wind_scale": 0.42,
+      "turbulence_scale": 0.30,
+      "obstacle_count": 1,
+      "energy_budget_multiplier": 2.05,
+      "sensor_noise_scale": 0.05,
+      "corridor": true,
+      "broadband_transient": false
+    }
+  ],
+  "spectral_stress": {
+    "name": "bounded_broadband_transient",
+    "legacy_metaphor_mapping": "The phrase white-hole burst is treated only as a bounded synthetic broadband sensor transient; it carries no consciousness, biological, propulsion, or exotic-physics claim.",
+    "sample_rate_hz": 20.0,
+    "sample_count": 128,
+    "component_frequencies_hz": [0.5, 1.5, 3.5, 7.0],
+    "nyquist_guard_fraction": 0.8,
+    "amplitude_limit": 0.22
+  },
+  "specialists": [
+    {
+      "name": "dijkstra_distance",
+      "kind": "baseline",
+      "heuristic": false,
+      "weights": {"distance": 1.0, "energy": 0.0, "risk": 0.0, "clearance": 0.0}
+    },
+    {
+      "name": "astar_distance",
+      "kind": "baseline",
+      "heuristic": true,
+      "weights": {"distance": 1.0, "energy": 0.0, "risk": 0.0, "clearance": 0.0}
+    },
+    {
+      "name": "astar_energy",
+      "kind": "baseline",
+      "heuristic": true,
+      "weights": {"distance": 0.30, "energy": 0.70, "risk": 0.0, "clearance": 0.0}
+    },
+    {
+      "name": "astar_risk",
+      "kind": "baseline",
+      "heuristic": true,
+      "weights": {"distance": 0.30, "energy": 0.0, "risk": 0.55, "clearance": 0.15}
+    },
+    {
+      "name": "astar_balanced",
+      "kind": "baseline",
+      "heuristic": true,
+      "weights": {"distance": 0.30, "energy": 0.32, "risk": 0.28, "clearance": 0.10}
+    }
+  ],
+  "hybrid_candidates": [
+    {
+      "name": "lumajet_efficiency_hybrid",
+      "kind": "hybrid_candidate",
+      "family_id": "lumajet_fixed_assurance_orchestrator",
+      "minimum_predicted_reserve_fraction": 0.10,
+      "selection_weights": {"distance": 0.25, "energy": 0.40, "risk": 0.12, "smoothness": 0.10, "clearance": 0.03, "reserve": 0.10}
+    },
+    {
+      "name": "lumajet_assurance_hybrid",
+      "kind": "hybrid_candidate",
+      "family_id": "lumajet_fixed_assurance_orchestrator",
+      "minimum_predicted_reserve_fraction": 0.15,
+      "selection_weights": {"distance": 0.12, "energy": 0.24, "risk": 0.28, "smoothness": 0.10, "clearance": 0.08, "reserve": 0.18}
+    },
+    {
+      "name": "lumajet_resilience_hybrid",
+      "kind": "hybrid_candidate",
+      "family_id": "lumajet_fixed_assurance_orchestrator",
+      "minimum_predicted_reserve_fraction": 0.18,
+      "selection_weights": {"distance": 0.10, "energy": 0.22, "risk": 0.27, "smoothness": 0.12, "clearance": 0.10, "reserve": 0.19}
+    }
+  ],
+  "truth_score_weights": {
+    "distance": 0.22,
+    "energy": 0.25,
+    "risk": 0.20,
+    "smoothness": 0.12,
+    "clearance": 0.08,
+    "reserve": 0.13
+  },
+  "hard_safety_constraints": {
+    "minimum_actual_reserve_fraction": 0.10,
+    "maximum_collision_rate": 0.0,
+    "maximum_endpoint_failure_rate": 0.0,
+    "maximum_candidate_reserve_breach_rate": 0.01
+  },
+  "confirmatory_gate": {
+    "pair_selection_source": "development_only",
+    "validation_pair_locked_before_scoring": true,
+    "paired_ci95_lower_bound_must_be_positive": true,
+    "condition_score_noninferiority_margin": 0.01,
+    "mean_energy_regression_margin_fraction": 0.01,
+    "mean_risk_regression_margin_fraction": 0.01,
+    "maximum_expansion_multiplier_vs_selected_baseline": 6.0,
+    "null_and_adverse_results_retained": true
+  },
+  "assurance_references": [
+    {
+      "name": "FAA AC 20-115D",
+      "relationship": "process-orientation reference only; this benchmark does not claim DO-178C compliance",
+      "url": "https://www.faa.gov/regulations_policies/advisory_circulars/index.cfm/go/document.information/documentID/1032046"
+    },
+    {
+      "name": "FAA Roadmap for Artificial Intelligence Safety Assurance",
+      "relationship": "safety-assurance planning reference only",
+      "url": "https://www.faa.gov/aircraft/air_cert/step/roadmap_for_AI_safety_assurance"
+    },
+    {
+      "name": "NASA Systems Engineering Handbook",
+      "relationship": "requirements and verification planning reference only",
+      "url": "https://www.nasa.gov/reference/2-0-fundamentals-of-systems-engineering/"
+    }
+  ]
+}

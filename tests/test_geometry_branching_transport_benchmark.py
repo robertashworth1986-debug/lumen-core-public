@@ -15,6 +15,7 @@ from geometry_branching_transport_benchmark import (  # noqa: E402
     CONDITIONS,
     EVIDENCE_BOUNDARY,
     STRATEGIES,
+    confirmatory_promotion_gate,
     evaluate_strategy,
     generate_scenario,
     run_suite,
@@ -74,13 +75,28 @@ class GeometryBranchingTransportBenchmarkTests(unittest.TestCase):
             )
             self.assertIn(
                 summary["promotion_gate"]["gate"],
-                {"candidate_geometry_beats_best_baseline", "baseline_still_leads"},
+                {
+                    "candidate_geometry_promoted_confirmatory",
+                    "candidate_geometry_not_promoted_confirmatory",
+                },
+            )
+            self.assertEqual(
+                summary["promotion_gate"]["selection"]["source"],
+                "development_only",
+            )
+            self.assertIn("paired_bootstrap", summary["promotion_gate"])
+            self.assertEqual(
+                len(summary["promotion_gate"]["condition_guardrails"]),
+                len(CONDITIONS),
             )
 
             manifest = json.loads((out / "manifest.sha256.json").read_text(encoding="utf-8"))
             self.assertEqual(
                 set(manifest["files"]),
                 {
+                    "execution_plan.json",
+                    "development_checkpoint.jsonl",
+                    "validation_checkpoint.jsonl",
                     "summary.json",
                     "SCORECARD.md",
                     "scenario_summary.csv",
@@ -92,8 +108,76 @@ class GeometryBranchingTransportBenchmarkTests(unittest.TestCase):
                 self.assertEqual(actual, metadata["sha256"])
 
             scorecard = (out / "SCORECARD.md").read_text(encoding="utf-8")
-            self.assertIn("Generated benchmark candidate only", scorecard)
+            self.assertIn("Generated benchmark evidence only", scorecard)
             self.assertNotIn("field validation", scorecard.lower().replace("not field validation", ""))
+
+    def test_resumable_runner_reuses_complete_scenarios(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            out = Path(temp_dir) / "run"
+            first = run_suite(out, development_scenarios=1, validation_scenarios=1, workers=1)
+            second = run_suite(out, development_scenarios=1, validation_scenarios=1, workers=1)
+
+            self.assertEqual(first["execution"]["plan_sha256"], second["execution"]["plan_sha256"])
+            self.assertEqual(second["execution"]["development"]["executed_scenario_count"], 0)
+            self.assertEqual(second["execution"]["validation"]["executed_scenario_count"], 0)
+            self.assertEqual(second["execution"]["development"]["resumed_scenario_count"], len(CONDITIONS))
+            self.assertEqual(second["execution"]["validation"]["resumed_scenario_count"], len(CONDITIONS))
+
+    def test_confirmatory_gate_vetoes_material_condition_regression(self) -> None:
+        development = [
+            {
+                "strategy": "candidate",
+                "kind": "geometry_family",
+                "mean_score": 0.8,
+            },
+            {
+                "strategy": "baseline",
+                "kind": "baseline",
+                "mean_score": 0.7,
+            },
+        ]
+        validation_rows = []
+        for condition, candidate_score, baseline_score in (
+            ("good", 0.9, 0.7),
+            ("bad", 0.5, 0.7),
+        ):
+            for seed in range(10):
+                shared = {
+                    "split": "validation",
+                    "condition": condition,
+                    "seed": seed,
+                    "delivered_flow": 0.8,
+                    "failure_tolerance": 0.8,
+                }
+                validation_rows.append({**shared, "strategy": "candidate", "score": candidate_score})
+                validation_rows.append({**shared, "strategy": "baseline", "score": baseline_score})
+        validation_ranked = [
+            {
+                "strategy": "candidate",
+                "kind": "geometry_family",
+                "mean_score": 0.7,
+                "mean_delivered_flow": 0.8,
+                "mean_failure_tolerance": 0.8,
+            },
+            {
+                "strategy": "baseline",
+                "kind": "baseline",
+                "mean_score": 0.7,
+                "mean_delivered_flow": 0.8,
+                "mean_failure_tolerance": 0.8,
+            },
+        ]
+
+        gate = confirmatory_promotion_gate(
+            development,
+            validation_rows,
+            validation_ranked,
+            bootstrap_resamples=100,
+        )
+
+        assert gate["promoted"] is False
+        assert gate["gate"] == "candidate_geometry_not_promoted_confirmatory"
+        assert gate["checks"]["all_condition_score_noninferiority"] is False
 
 
 if __name__ == "__main__":

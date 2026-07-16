@@ -1,0 +1,392 @@
+{
+  "evidence_boundary": "Internal generated software-simulation evidence only. The packet preserves both an adverse v1 result and a tiny-effect v2 internal gate pass. It is not flight control, airworthiness evidence, field validation, independent reproduction, FAA or DoD approval, economic proof, or authorization for operational use.",
+  "four_level_gate": [
+    {
+      "evidence": "unit tests, deterministic environments, source snapshots, manifests, and self-hashed summaries",
+      "external": false,
+      "level": 1,
+      "name": "implementation_integrity",
+      "status": "PASS"
+    },
+    {
+      "evidence": "identical generated scenarios across Dijkstra, A-star specialists, and fixed hybrid policies",
+      "external": false,
+      "level": 2,
+      "name": "named_baseline_internal_benchmark",
+      "status": "PASS"
+    },
+    {
+      "evidence": "1,400 v2 validation scenarios, paired CI95, seven conditions, and hard safety vetoes",
+      "external": false,
+      "level": 3,
+      "name": "frozen_fresh_seed_stress_confirmation",
+      "status": "PASS_TINY_EFFECT"
+    },
+    {
+      "evidence": "blind reproduction kit with no expected leaderboard",
+      "external": true,
+      "level": 4,
+      "name": "independent_blind_reproduction_and_representative_review",
+      "status": "KIT_READY_EXTERNAL_EXECUTION_REQUIRED"
+    }
+  ],
+  "generated_utc": "2026-07-16T00:58:25.017960+00:00",
+  "lineage_verification": {
+    "cross_run_seed_sets_disjoint": true,
+    "v1_adverse_result_retained": true,
+    "v1_validation_not_reused_for_v2_confirmation": true,
+    "v2_declared_v1_receipt_matches": true,
+    "v2_declared_v1_summary_hash_matches": true,
+    "v2_pair_preselected_before_current_validation": true
+  },
+  "next_evidence_gate": {
+    "name": "independent_offline_reproduction_then_representative_dynamics_review",
+    "required_actions": [
+      "Give an external runner the frozen v2 protocol, source snapshot, and verification command without the expected leaderboard.",
+      "Require the runner to publish raw checkpoints, environment package versions, terminal hashes, and all null or adverse rows.",
+      "Repeat on an accepted representative flight-dynamics environment or partner-approved historical data before any aerospace performance claim.",
+      "Obtain qualified aerospace software-assurance review before mapping any artifact toward certification objectives."
+    ]
+  },
+  "packet_sha256": "c2f9f24b874fbd271ed138dedb06123585b0baf22022d6ffd330cf3f3234af37",
+  "reviewer_interpretation": {
+    "allowed": [
+      "The v1 development-selected policy failed its frozen internal assurance gate and remains retained.",
+      "A guarded v2 policy passed the internal generated-software gate on fresh disjoint seeds.",
+      "The v2 effect is statistically positive inside this simulator but practically tiny.",
+      "The primary evidence contribution is bounded orchestration, hard safety vetoes, lineage, and reproducibility."
+    ],
+    "blocked": [
+      "airworthiness or flight-safety proof",
+      "FAA, DoD, Air Force, NASA, laboratory, or investor approval",
+      "field validation or independent reproduction",
+      "aircraft, propulsion, or actuator performance",
+      "economic savings or procurement readiness"
+    ]
+  },
+  "runs": {
+    "v1_adverse": {
+      "all_manifest_hashes_valid": true,
+      "baseline_validation_aggregate": {
+        "collision_rate": 0,
+        "endpoint_failure_rate": 0,
+        "family_id": "astar_balanced",
+        "kind": "baseline",
+        "mean_energy_used": 25.17007614,
+        "mean_path_length": 22.7007537,
+        "mean_planner_expansions": 264.375,
+        "mean_reserve_fraction": 0.36220396,
+        "mean_risk_exposure": 4.73164211,
+        "mean_score": 0.80996268,
+        "median_score": 0.81024127,
+        "mission_success_rate": 0.99821429,
+        "rank": 2,
+        "reserve_breach_rate": 0.00178571,
+        "scenario_count": 1120,
+        "selected_specialist_counts": {
+          "astar_balanced": 1120
+        },
+        "spectral_guard_pass_rate": 1,
+        "strategy": "astar_balanced"
+      },
+      "candidate_validation_aggregate": {
+        "collision_rate": 0,
+        "endpoint_failure_rate": 0,
+        "family_id": "lumajet_fixed_assurance_orchestrator",
+        "kind": "hybrid_candidate",
+        "mean_energy_used": 25.48159247,
+        "mean_path_length": 22.99436436,
+        "mean_planner_expansions": 1343.62232143,
+        "mean_reserve_fraction": 0.35448489,
+        "mean_risk_exposure": 4.61979256,
+        "mean_score": 0.80794963,
+        "median_score": 0.81210381,
+        "mission_success_rate": 0.99375,
+        "rank": 7,
+        "reserve_breach_rate": 0.00625,
+        "scenario_count": 1120,
+        "selected_specialist_counts": {
+          "astar_balanced": 522,
+          "astar_distance": 38,
+          "astar_energy": 90,
+          "astar_risk": 429,
+          "dijkstra_distance": 41
+        },
+        "spectral_guard_pass_rate": 1,
+        "strategy": "lumajet_resilience_hybrid"
+      },
+      "claim_gate": {
+        "airworthiness": false,
+        "economic_claim_allowed": false,
+        "external_reproduction": false,
+        "faa_or_dod_approval": false,
+        "field_validation": false,
+        "generated_simulation_evidence": true,
+        "internal_lumengrade": "LG2",
+        "operational_use_authorized": false
+      },
+      "condition_guardrails": [
+        {
+          "condition": "bounded_gust_front",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 160,
+          "passes_noninferiority": true,
+          "score_delta": 0.00250203
+        },
+        {
+          "condition": "crosswind_shear",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 160,
+          "passes_noninferiority": true,
+          "score_delta": 0.0014653
+        },
+        {
+          "condition": "degraded_energy_reserve",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 160,
+          "passes_noninferiority": false,
+          "score_delta": -0.02316825
+        },
+        {
+          "condition": "nominal_clear",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 160,
+          "passes_noninferiority": true,
+          "score_delta": 0.00064664
+        },
+        {
+          "condition": "obstacle_corridor",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 160,
+          "passes_noninferiority": true,
+          "score_delta": 0.00118652
+        },
+        {
+          "condition": "sensor_broadband_transient",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 160,
+          "passes_noninferiority": true,
+          "score_delta": 0.00167425
+        },
+        {
+          "condition": "thermal_cell_field",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 160,
+          "passes_noninferiority": true,
+          "score_delta": 0.00160217
+        }
+      ],
+      "development_scenario_count": 168,
+      "energy_regression_fraction": 0.01237646,
+      "evidence_receipt_sha256": "ab1602cde52573fdf735e0497c2ef3d0c33710f8507596bc1b636416f33f73e7",
+      "evidence_receipt_valid": true,
+      "execution_plan_sha256": "413feb5ccc50903acb105c5517f33833fb991290d1835d96bfbd1bd6852bc440",
+      "failed_checks": [
+        "overall_score_delta_positive",
+        "paired_ci95_lower_bound_positive",
+        "all_condition_score_noninferiority",
+        "candidate_reserve_breach_not_worse_than_baseline",
+        "mean_energy_noninferiority"
+      ],
+      "gate": "NOT_PROMOTED_ASSURANCE_GATE_FAILED",
+      "manifest_sha256": "fc1492a923e6867fb83ad294d1365999d7d1a026db46695571e293781f5806b3",
+      "paired_score_interval": {
+        "ci95": [
+          -0.0047998,
+          0.0007737
+        ],
+        "method": "paired_normal_approximation",
+        "observed_mean_delta": -0.00201305,
+        "paired_scenario_count": 1120,
+        "standard_error": 0.0014218355
+      },
+      "planner_expansion_multiplier": 5.08225937,
+      "promoted": false,
+      "protocol_sha256": "842c8b091b2b95bcccbdf05226956be25f6069fc553982d7475042abf54e3fb8",
+      "risk_regression_fraction": -0.02363863,
+      "run_dir": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\lumajet_flight_assurance\\v1_confirmatory_20260716",
+      "selection": {
+        "holdout_used_for_selection": false,
+        "selected_baseline": "astar_balanced",
+        "selected_candidate": "lumajet_resilience_hybrid",
+        "source": "development_only",
+        "validation_pair_locked_before_scoring": true
+      },
+      "summary_file_sha256": "d396561b329ceb357c27b234d2def3fa5096011f65988e9ffe0c5aa4b80cc146",
+      "validation_scenario_count": 1120
+    },
+    "v2_guarded": {
+      "all_manifest_hashes_valid": true,
+      "baseline_validation_aggregate": {
+        "collision_rate": 0,
+        "endpoint_failure_rate": 0,
+        "family_id": "astar_balanced",
+        "kind": "baseline",
+        "mean_energy_used": 25.15163247,
+        "mean_path_length": 22.67842702,
+        "mean_planner_expansions": 264.36285714,
+        "mean_reserve_fraction": 0.3622724,
+        "mean_risk_exposure": 4.74389266,
+        "mean_score": 0.81135576,
+        "median_score": 0.80969528,
+        "mission_success_rate": 1,
+        "rank": 2,
+        "reserve_breach_rate": 0,
+        "scenario_count": 1400,
+        "selected_specialist_counts": {
+          "astar_balanced": 1400
+        },
+        "spectral_guard_pass_rate": 1,
+        "strategy": "astar_balanced"
+      },
+      "candidate_validation_aggregate": {
+        "collision_rate": 0,
+        "endpoint_failure_rate": 0,
+        "family_id": "lumajet_fixed_assurance_orchestrator",
+        "kind": "hybrid_candidate",
+        "mean_energy_used": 25.14954522,
+        "mean_path_length": 22.67842702,
+        "mean_planner_expansions": 1343.84214286,
+        "mean_reserve_fraction": 0.362327,
+        "mean_risk_exposure": 4.74435272,
+        "mean_score": 0.81140346,
+        "median_score": 0.8096794,
+        "mission_success_rate": 1,
+        "rank": 1,
+        "reserve_breach_rate": 0,
+        "scenario_count": 1400,
+        "selected_specialist_counts": {
+          "astar_balanced": 1382,
+          "astar_distance": 1,
+          "astar_energy": 15,
+          "dijkstra_distance": 2
+        },
+        "spectral_guard_pass_rate": 1,
+        "strategy": "lumajet_guarded_efficiency_hybrid"
+      },
+      "claim_gate": {
+        "airworthiness": false,
+        "economic_claim_allowed": false,
+        "external_reproduction": false,
+        "faa_or_dod_approval": false,
+        "field_validation": false,
+        "generated_simulation_evidence": true,
+        "internal_lumengrade": "LG2",
+        "operational_use_authorized": false
+      },
+      "condition_guardrails": [
+        {
+          "condition": "bounded_gust_front",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 200,
+          "passes_noninferiority": true,
+          "score_delta": 6.794e-05
+        },
+        {
+          "condition": "crosswind_shear",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 200,
+          "passes_noninferiority": true,
+          "score_delta": 7.22e-05
+        },
+        {
+          "condition": "degraded_energy_reserve",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 200,
+          "passes_noninferiority": true,
+          "score_delta": 8.27e-05
+        },
+        {
+          "condition": "nominal_clear",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 200,
+          "passes_noninferiority": true,
+          "score_delta": 0.0
+        },
+        {
+          "condition": "obstacle_corridor",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 200,
+          "passes_noninferiority": true,
+          "score_delta": 0.0
+        },
+        {
+          "condition": "sensor_broadband_transient",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 200,
+          "passes_noninferiority": true,
+          "score_delta": 8.2e-06
+        },
+        {
+          "condition": "thermal_cell_field",
+          "noninferiority_margin": 0.01,
+          "paired_scenario_count": 200,
+          "passes_noninferiority": true,
+          "score_delta": 0.00010291
+        }
+      ],
+      "development_scenario_count": 112,
+      "energy_regression_fraction": -8.299e-05,
+      "evidence_receipt_sha256": "e00271405c0d6b70acf9d6d6e9a428df67bff59332f4fff416f26a1611dce602",
+      "evidence_receipt_valid": true,
+      "execution_plan_sha256": "86668b950a30ee33843f9017a3ecfe888918765be879a3508392118486b367c4",
+      "failed_checks": [],
+      "gate": "INTERNAL_GENERATED_ASSURANCE_PASS_NOT_AIRWORTHINESS",
+      "manifest_sha256": "91dcd07367989d5557efd8ac7f650030111b71f92c25f1374e63635f82f4d851",
+      "paired_score_interval": {
+        "ci95": [
+          1.361e-05,
+          8.181e-05
+        ],
+        "method": "paired_normal_approximation",
+        "observed_mean_delta": 4.771e-05,
+        "paired_scenario_count": 1400,
+        "standard_error": 1.73991e-05
+      },
+      "planner_expansion_multiplier": 5.08332433,
+      "promoted": true,
+      "protocol_sha256": "f91c154b177a902303b4a9c201562770721e56741806f6531f205da45396abb6",
+      "risk_regression_fraction": 9.698e-05,
+      "run_dir": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\out\\lumajet_flight_assurance\\v2_guarded_confirmatory_20260716",
+      "selection": {
+        "holdout_used_for_selection": false,
+        "preselected_before_current_validation": true,
+        "selected_baseline": "astar_balanced",
+        "selected_candidate": "lumajet_guarded_efficiency_hybrid",
+        "source": "frozen_v1_design_evidence",
+        "validation_pair_locked_before_scoring": true
+      },
+      "summary_file_sha256": "61d7ca5e0dc547f2a7c2cf431a8cf6dbbd91b42f5718f8df1471b5555d287764",
+      "validation_scenario_count": 1400
+    }
+  },
+  "schema": "lumajet_flight_assurance_evidence_packet_v1",
+  "summary": {
+    "airworthiness_claim_allowed": false,
+    "all_run_manifests_valid": true,
+    "all_seed_sets_disjoint": true,
+    "all_summary_receipts_valid": true,
+    "external_reproduction_complete": false,
+    "faa_or_dod_approval_claim_allowed": false,
+    "field_validation_complete": false,
+    "practical_effect_classification": "TINY_EFFECT_INTERNAL_GUARD_PASS",
+    "v1_adverse_result_retained": true,
+    "v1_decision": "NOT_PROMOTED_ASSURANCE_GATE_FAILED",
+    "v2_candidate_collision_rate": 0,
+    "v2_candidate_endpoint_failure_rate": 0,
+    "v2_candidate_reserve_breach_rate": 0,
+    "v2_decision": "INTERNAL_GENERATED_ASSURANCE_PASS_NOT_AIRWORTHINESS",
+    "v2_energy_regression_fraction": -8.299e-05,
+    "v2_guard_selection_count": 1382,
+    "v2_internal_generated_gate_pass": true,
+    "v2_non_guard_selection_count": 18,
+    "v2_planner_expansion_multiplier": 5.08332433,
+    "v2_risk_regression_fraction": 9.698e-05,
+    "v2_score_delta": 4.771e-05,
+    "v2_score_delta_ci95": [
+      1.361e-05,
+      8.181e-05
+    ],
+    "v2_validation_scenario_count": 1400
+  }
+}

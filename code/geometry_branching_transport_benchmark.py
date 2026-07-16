@@ -16,6 +16,11 @@ import csv
 import hashlib
 import heapq
 import json
+import os
+import random
+import time
+from collections import defaultdict
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -597,6 +602,167 @@ def score_against_baseline(ranked: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def percentile(values: list[float], quantile: float) -> float:
+    if not values:
+        raise ValueError("percentile requires at least one value")
+    ordered = sorted(values)
+    position = (len(ordered) - 1) * quantile
+    lower = int(position)
+    upper = min(lower + 1, len(ordered) - 1)
+    weight = position - lower
+    return ordered[lower] * (1.0 - weight) + ordered[upper] * weight
+
+
+def paired_bootstrap_mean_ci(
+    deltas: list[float],
+    *,
+    resamples: int = 2000,
+    seed: int = 20260715,
+) -> dict[str, Any]:
+    if not deltas:
+        raise ValueError("paired bootstrap requires at least one delta")
+    rng = random.Random(seed)
+    sample_count = len(deltas)
+    bootstrap_means = [
+        mean(rng.choices(deltas, k=sample_count))
+        for _ in range(resamples)
+    ]
+    return {
+        "observed_mean_delta": round(mean(deltas), 6),
+        "ci95": [
+            round(percentile(bootstrap_means, 0.025), 6),
+            round(percentile(bootstrap_means, 0.975), 6),
+        ],
+        "resamples": resamples,
+        "seed": seed,
+        "paired_scenario_count": sample_count,
+    }
+
+
+def confirmatory_promotion_gate(
+    development_ranked: list[dict[str, Any]],
+    validation_rows: list[dict[str, Any]],
+    validation_ranked: list[dict[str, Any]],
+    *,
+    condition_noninferiority_margin: float = 0.01,
+    bootstrap_resamples: int = 2000,
+) -> dict[str, Any]:
+    development_baselines = [row for row in development_ranked if row["kind"] == "baseline"]
+    development_geometries = [row for row in development_ranked if row["kind"] == "geometry_family"]
+    if not development_baselines or not development_geometries:
+        return {"gate": "missing_development_baseline_or_geometry", "promoted": False}
+
+    selected_geometry_name = str(development_geometries[0]["strategy"])
+    selected_baseline_name = str(development_baselines[0]["strategy"])
+    validation_by_strategy = {str(row["strategy"]): row for row in validation_ranked}
+    selected_geometry = validation_by_strategy.get(selected_geometry_name)
+    selected_baseline = validation_by_strategy.get(selected_baseline_name)
+    if not selected_geometry or not selected_baseline:
+        return {
+            "gate": "selected_pair_missing_from_validation",
+            "promoted": False,
+            "selected_geometry_name": selected_geometry_name,
+            "selected_baseline_name": selected_baseline_name,
+        }
+
+    paired: dict[tuple[str, int], dict[str, dict[str, Any]]] = defaultdict(dict)
+    for row in validation_rows:
+        strategy = str(row.get("strategy") or "")
+        if strategy not in {selected_geometry_name, selected_baseline_name}:
+            continue
+        key = (str(row["condition"]), int(row["seed"]))
+        paired[key][strategy] = row
+    complete_pairs = [
+        (key, rows[selected_geometry_name], rows[selected_baseline_name])
+        for key, rows in sorted(paired.items())
+        if selected_geometry_name in rows and selected_baseline_name in rows
+    ]
+    if not complete_pairs:
+        return {
+            "gate": "no_complete_validation_pairs",
+            "promoted": False,
+            "selected_geometry_name": selected_geometry_name,
+            "selected_baseline_name": selected_baseline_name,
+        }
+
+    score_deltas = [float(candidate["score"]) - float(baseline["score"]) for _, candidate, baseline in complete_pairs]
+    delivered_deltas = [
+        float(candidate["delivered_flow"]) - float(baseline["delivered_flow"])
+        for _, candidate, baseline in complete_pairs
+    ]
+    tolerance_deltas = [
+        float(candidate["failure_tolerance"]) - float(baseline["failure_tolerance"])
+        for _, candidate, baseline in complete_pairs
+    ]
+    bootstrap = paired_bootstrap_mean_ci(
+        score_deltas,
+        resamples=bootstrap_resamples,
+    )
+
+    by_condition: dict[str, list[tuple[dict[str, Any], dict[str, Any]]]] = defaultdict(list)
+    for (condition, _), candidate, baseline in complete_pairs:
+        by_condition[condition].append((candidate, baseline))
+    condition_guardrails: list[dict[str, Any]] = []
+    for condition, rows in sorted(by_condition.items()):
+        condition_deltas = [
+            float(candidate["score"]) - float(baseline["score"])
+            for candidate, baseline in rows
+        ]
+        score_delta = mean(condition_deltas)
+        condition_guardrails.append(
+            {
+                "condition": condition,
+                "paired_scenario_count": len(rows),
+                "score_delta": round(score_delta, 6),
+                "noninferiority_margin": condition_noninferiority_margin,
+                "passes_noninferiority": score_delta >= -condition_noninferiority_margin,
+            }
+        )
+
+    checks = {
+        "overall_score_delta_positive": mean(score_deltas) > 0.0,
+        "paired_ci95_lower_bound_positive": float(bootstrap["ci95"][0]) > 0.0,
+        "delivered_flow_no_regression": mean(delivered_deltas) >= 0.0,
+        "failure_tolerance_no_regression": mean(tolerance_deltas) >= 0.0,
+        "all_condition_score_noninferiority": all(
+            row["passes_noninferiority"] for row in condition_guardrails
+        ),
+    }
+    promoted = all(checks.values())
+    failed_checks = [name for name, passed in checks.items() if not passed]
+    return {
+        "gate": (
+            "candidate_geometry_promoted_confirmatory"
+            if promoted
+            else "candidate_geometry_not_promoted_confirmatory"
+        ),
+        "promoted": promoted,
+        "selection": {
+            "source": "development_only",
+            "selected_geometry": selected_geometry_name,
+            "selected_baseline": selected_baseline_name,
+            "validation_pair_locked_before_scoring": True,
+            "multiple_comparison_control": (
+                "one confirmatory pair selected on development; validation leaderboard is descriptive"
+            ),
+        },
+        "best_geometry": selected_geometry,
+        "best_baseline": selected_baseline,
+        "score_delta_vs_best_baseline": round(mean(score_deltas), 6),
+        "delivered_flow_delta_vs_best_baseline": round(mean(delivered_deltas), 6),
+        "failure_tolerance_delta_vs_best_baseline": round(mean(tolerance_deltas), 6),
+        "paired_bootstrap": bootstrap,
+        "condition_guardrails": condition_guardrails,
+        "checks": checks,
+        "failed_checks": failed_checks,
+        "claim_language": (
+            "Generated benchmark evidence only. Promotion requires a development-locked pair, "
+            "paired validation superiority, and no material condition regression. It is not field "
+            "validation, certification, or real-dollar performance."
+        ),
+    }
+
+
 def write_csv(path: Path, rows: list[dict[str, Any]], fieldnames: list[str]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as fh:
@@ -612,6 +778,152 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: fh.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def sha256_payload(payload: dict[str, Any]) -> str:
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def evaluate_scenario_all_strategies(scenario: Scenario) -> list[dict[str, Any]]:
+    return [evaluate_strategy(scenario, spec) for spec in STRATEGIES]
+
+
+def scenario_key(scenario: Scenario) -> tuple[str, str, int]:
+    return scenario.split, scenario.condition.name, scenario.seed
+
+
+def row_scenario_key(row: dict[str, Any]) -> tuple[str, str, int]:
+    return str(row["split"]), str(row["condition"]), int(row["seed"])
+
+
+def canonical_json_line(row: dict[str, Any]) -> str:
+    return json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n"
+
+
+def load_complete_checkpoint(
+    checkpoint_path: Path,
+    scenarios: list[Scenario],
+) -> tuple[dict[tuple[str, str, int], list[dict[str, Any]]], int]:
+    expected_keys = {scenario_key(scenario) for scenario in scenarios}
+    expected_strategies = {spec.name for spec in STRATEGIES}
+    grouped: dict[tuple[str, str, int], dict[str, dict[str, Any]]] = defaultdict(dict)
+    discarded_rows = 0
+    if checkpoint_path.exists():
+        for line_number, line in enumerate(checkpoint_path.read_text(encoding="utf-8").splitlines(), start=1):
+            if not line.strip():
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"invalid checkpoint JSON at {checkpoint_path}:{line_number}") from exc
+            if not isinstance(row, dict):
+                discarded_rows += 1
+                continue
+            try:
+                key = row_scenario_key(row)
+            except (KeyError, TypeError, ValueError):
+                discarded_rows += 1
+                continue
+            strategy = str(row.get("strategy") or "")
+            if key not in expected_keys or strategy not in expected_strategies:
+                discarded_rows += 1
+                continue
+            grouped[key][strategy] = row
+
+    complete: dict[tuple[str, str, int], list[dict[str, Any]]] = {}
+    for key, by_strategy in grouped.items():
+        if set(by_strategy) == expected_strategies:
+            complete[key] = [by_strategy[spec.name] for spec in STRATEGIES]
+        else:
+            discarded_rows += len(by_strategy)
+    return complete, discarded_rows
+
+
+def run_rows_resumable(
+    scenarios: list[Scenario],
+    checkpoint_path: Path,
+    *,
+    workers: int,
+    resume: bool,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    started = time.perf_counter()
+    checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+    complete, discarded_rows = (
+        load_complete_checkpoint(checkpoint_path, scenarios)
+        if resume
+        else ({}, 0)
+    )
+    ordered_keys = [scenario_key(scenario) for scenario in scenarios]
+    missing = [scenario for scenario in scenarios if scenario_key(scenario) not in complete]
+
+    with checkpoint_path.open("w", encoding="utf-8", newline="\n") as handle:
+        for key in ordered_keys:
+            for row in complete.get(key, []):
+                handle.write(canonical_json_line(row))
+
+    if missing:
+        executor: ProcessPoolExecutor | None = None
+        if workers <= 1:
+            iterator = map(evaluate_scenario_all_strategies, missing)
+        else:
+            executor = ProcessPoolExecutor(max_workers=workers)
+            iterator = executor.map(evaluate_scenario_all_strategies, missing, chunksize=1)
+        try:
+            with checkpoint_path.open("a", encoding="utf-8", newline="\n") as handle:
+                for scenario, scenario_rows in zip(missing, iterator):
+                    complete[scenario_key(scenario)] = scenario_rows
+                    for row in scenario_rows:
+                        handle.write(canonical_json_line(row))
+                    handle.flush()
+        finally:
+            if executor is not None:
+                executor.shutdown(wait=True, cancel_futures=False)
+
+    rows = [row for key in ordered_keys for row in complete[key]]
+    return rows, {
+        "scenario_count": len(scenarios),
+        "row_count": len(rows),
+        "resumed_scenario_count": len(scenarios) - len(missing),
+        "executed_scenario_count": len(missing),
+        "discarded_checkpoint_row_count": discarded_rows,
+        "checkpoint_path": str(checkpoint_path),
+        "checkpoint_sha256": sha256_file(checkpoint_path),
+        "workers": workers,
+        "wall_seconds": round(time.perf_counter() - started, 6),
+    }
+
+
+def write_or_validate_execution_plan(
+    out_dir: Path,
+    *,
+    development_scenarios: int,
+    validation_scenarios: int,
+) -> tuple[Path, dict[str, Any]]:
+    plan_path = out_dir / "execution_plan.json"
+    plan: dict[str, Any] = {
+        "schema": "geometry_branching_transport_execution_plan_v1",
+        "source_sha256": sha256_file(Path(__file__)),
+        "development_scenarios_per_condition": development_scenarios,
+        "validation_scenarios_per_condition": validation_scenarios,
+        "development_seed_base": 4100,
+        "validation_seed_base": 9100,
+        "condition_names": [condition.name for condition in CONDITIONS],
+        "strategy_names": [spec.name for spec in STRATEGIES],
+        "family_ids": [spec.family_id for spec in STRATEGIES],
+        "evidence_boundary": EVIDENCE_BOUNDARY,
+    }
+    plan["plan_sha256"] = sha256_payload(plan)
+    if plan_path.exists():
+        existing = json.loads(plan_path.read_text(encoding="utf-8"))
+        if existing != plan:
+            raise ValueError(
+                "execution plan mismatch; use a new run tag instead of mixing code, seeds, "
+                "scenario counts, or strategies in one checkpoint"
+            )
+    else:
+        plan_path.write_text(json.dumps(plan, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return plan_path, plan
 
 
 def render_scorecard(summary: dict[str, Any]) -> str:
@@ -636,12 +948,28 @@ def render_scorecard(summary: dict[str, Any]) -> str:
         f"- Score delta vs best baseline: {gate.get('score_delta_vs_best_baseline', 0)}",
         f"- Delivered-flow delta vs best baseline: {gate.get('delivered_flow_delta_vs_best_baseline', 0)}",
         f"- Failure-tolerance delta vs best baseline: {gate.get('failure_tolerance_delta_vs_best_baseline', 0)}",
+        f"- Paired score-delta CI95: {gate.get('paired_bootstrap', {}).get('ci95', 'n/a')}",
+        f"- Failed confirmatory checks: {', '.join(gate.get('failed_checks', [])) or 'none'}",
+        "",
+        "## Condition Guardrails",
+        "",
+        "| Condition | Paired Scenarios | Score Delta | Noninferiority Margin | Pass |",
+        "|---|---:|---:|---:|---|",
+    ]
+    for row in gate.get("condition_guardrails", []):
+        lines.append(
+            f"| {row['condition']} | {row['paired_scenario_count']} | {row['score_delta']} | "
+            f"{row['noninferiority_margin']} | {str(row['passes_noninferiority']).lower()} |"
+        )
+    lines.extend(
+        [
         "",
         "## Validation Leaderboard",
         "",
         "| Rank | Strategy | Kind | Score | Delivered Flow | Failure Tolerance | Material | Energy |",
         "|---:|---|---|---:|---:|---:|---:|---:|",
-    ]
+        ]
+    )
     for row in validation["leaderboard"]:
         lines.append(
             f"| {row['rank']} | {row['strategy']} | {row['kind']} | {row['mean_score']} | "
@@ -664,24 +992,40 @@ def run_suite(
     *,
     development_scenarios: int = 8,
     validation_scenarios: int = 10,
+    workers: int = 1,
+    resume: bool = True,
 ) -> dict[str, Any]:
+    if development_scenarios < 1 or validation_scenarios < 1:
+        raise ValueError("scenario counts must be positive")
+    if workers < 1:
+        raise ValueError("workers must be positive")
     generated_utc = now_utc()
     out_dir.mkdir(parents=True, exist_ok=True)
+    plan_path, execution_plan = write_or_validate_execution_plan(
+        out_dir,
+        development_scenarios=development_scenarios,
+        validation_scenarios=validation_scenarios,
+    )
     dev_scenarios = build_scenarios("development", scenario_count=development_scenarios, seed_base=4100)
     val_scenarios = build_scenarios("validation", scenario_count=validation_scenarios, seed_base=9100)
-
-    def run_rows(scenarios: list[Scenario]) -> list[dict[str, Any]]:
-        rows: list[dict[str, Any]] = []
-        for scenario in scenarios:
-            for spec in STRATEGIES:
-                rows.append(evaluate_strategy(scenario, spec))
-        return rows
-
-    development_rows = run_rows(dev_scenarios)
-    validation_rows = run_rows(val_scenarios)
+    development_checkpoint = out_dir / "development_checkpoint.jsonl"
+    validation_checkpoint = out_dir / "validation_checkpoint.jsonl"
+    development_rows, development_execution = run_rows_resumable(
+        dev_scenarios,
+        development_checkpoint,
+        workers=workers,
+        resume=resume,
+    )
+    validation_rows, validation_execution = run_rows_resumable(
+        val_scenarios,
+        validation_checkpoint,
+        workers=workers,
+        resume=resume,
+    )
     dev_leaderboard = ranked_aggregate(aggregate(development_rows))
     val_leaderboard = ranked_aggregate(aggregate(validation_rows))
-    gate = score_against_baseline(val_leaderboard)
+    descriptive_gate = score_against_baseline(val_leaderboard)
+    gate = confirmatory_promotion_gate(dev_leaderboard, validation_rows, val_leaderboard)
     summary = {
         "schema": "geometry_branching_transport_benchmark_v1",
         "generated_utc": generated_utc,
@@ -698,6 +1042,13 @@ def run_suite(
             for spec in STRATEGIES
         ],
         "conditions": [condition.__dict__ for condition in CONDITIONS],
+        "execution": {
+            "plan_sha256": execution_plan["plan_sha256"],
+            "workers": workers,
+            "resume_enabled": resume,
+            "development": development_execution,
+            "validation": validation_execution,
+        },
         "development": {
             "seed_base": 4100,
             "scenario_count": len(dev_scenarios),
@@ -708,6 +1059,7 @@ def run_suite(
             "scenario_count": len(val_scenarios),
             "leaderboard": val_leaderboard,
         },
+        "descriptive_validation_gate": descriptive_gate,
         "promotion_gate": gate,
         "claim_gate": {
             "performance_result_generated": True,
@@ -765,7 +1117,15 @@ def run_suite(
         "generated_utc": generated_utc,
         "files": {},
     }
-    for path in (summary_path, scorecard_path, out_dir / "scenario_summary.csv", out_dir / "leaderboard.csv"):
+    for path in (
+        plan_path,
+        development_checkpoint,
+        validation_checkpoint,
+        summary_path,
+        scorecard_path,
+        out_dir / "scenario_summary.csv",
+        out_dir / "leaderboard.csv",
+    ):
         manifest["files"][path.name] = {"sha256": sha256_file(path), "bytes": path.stat().st_size}
     (out_dir / "manifest.sha256.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return summary
@@ -777,6 +1137,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--run-tag", default="")
     parser.add_argument("--development-scenarios", type=int, default=8)
     parser.add_argument("--validation-scenarios", type=int, default=10)
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=max(1, min(8, (os.cpu_count() or 2) - 1)),
+    )
+    parser.add_argument("--no-resume", action="store_true")
     return parser.parse_args()
 
 
@@ -788,6 +1154,8 @@ def main() -> int:
         out_dir,
         development_scenarios=args.development_scenarios,
         validation_scenarios=args.validation_scenarios,
+        workers=args.workers,
+        resume=not args.no_resume,
     )
     latest = args.out_root / "latest.json"
     latest.parent.mkdir(parents=True, exist_ok=True)
