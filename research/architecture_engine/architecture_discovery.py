@@ -29,8 +29,11 @@ TEXT_EXTENSIONS = {
 IGNORE_DIRS = {
     ".git", ".github", ".venv", "venv", "env", "node_modules", "dist",
     "build", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache",
-    "artifacts", "outputs", "results", "coverage", ".next",
+    "artifacts", "out", "output", "outputs", "results", "coverage", ".next",
+    ".tox", "site-packages", "vendor", "third_party", "third-party", "_worktrees",
 }
+
+ENGINE_DIR = Path(__file__).resolve().parent
 
 ARCHITECTURE_TERMS = {
     "architecture", "engine", "orchestrator", "controller", "control",
@@ -368,6 +371,12 @@ def scan_root(
 ) -> List[Candidate]:
     candidates: List[Candidate] = []
     for path in iter_files(root, max_files=max_files):
+        if root_alias == "repo":
+            try:
+                path.resolve().relative_to(ENGINE_DIR)
+                continue
+            except ValueError:
+                pass
         text = read_text(path) if scan_mode == "content" else path.name
         lowered = f"{safe_relative(path, root).lower()} {text.lower()}"
         if not any(term in lowered for term in ARCHITECTURE_TERMS):
@@ -401,13 +410,14 @@ def write_backlog(path: Path, candidates: List[Candidate], top_n: int) -> None:
         "",
     ]
     for index, candidate in enumerate(candidates[:top_n], start=1):
+        source_hash = candidate.sha256 or "not computed (metadata-only)"
         lines.extend([
             f"## {index}. `{candidate.relative_path}`",
             "",
             f"- Root: `{candidate.root_alias}`",
             f"- Category: `{candidate.category}`",
             f"- Priority score: `{candidate.priority_score}`",
-            f"- Source SHA-256: `{candidate.sha256}`",
+            f"- Source SHA-256: `{source_hash}`",
             f"- Scores: executable `{candidate.executable_score}/5`, evidence `{candidate.evidence_score}/5`, reproducibility `{candidate.reproducibility_score}/5`, validation `{candidate.validation_score}/5`, disclosure risk `{candidate.disclosure_risk_score}/5`",
             f"- Baselines: {', '.join(candidate.recommended_baselines)}",
             f"- Locked metrics: {', '.join(candidate.locked_metrics)}",
@@ -444,6 +454,154 @@ def write_risk_register(path: Path, candidates: List[Candidate]) -> None:
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def canonical_path_score(candidate: Candidate) -> int:
+    path_lower = candidate.relative_path.lower()
+    name = Path(candidate.relative_path).name.lower()
+    score = 0
+    if "lexicon" in name:
+        score += 12
+    if "constant" in name:
+        score += 10
+    if "canonical" in name:
+        score += 8
+    if "master_context" in path_lower or "master context" in path_lower:
+        score += 6
+    if "equation_registry" in path_lower or "formula_registry" in path_lower:
+        score += 6
+    if candidate.root_alias == "repo":
+        score += 3
+    if candidate.archive_or_backup:
+        score -= 8
+    return score
+
+
+def write_canonical_path_candidates(path: Path, candidates: List[Candidate]) -> None:
+    ranked = [candidate for candidate in candidates if canonical_path_score(candidate) > 0]
+    ranked.sort(
+        key=lambda item: (
+            -canonical_path_score(item),
+            -item.priority_score,
+            item.root_alias,
+            item.relative_path.lower(),
+        )
+    )
+    lines = [
+        "# Canonical Lexicon and Constants Path Candidates",
+        "",
+        "Path metadata is a selection aid only. No external file content was read, and no canonical path is selected automatically.",
+        "",
+    ]
+    for index, candidate in enumerate(ranked[:50], start=1):
+        lines.extend(
+            [
+                f"## {index}. `{candidate.relative_path}`",
+                "",
+                f"- Root: `{candidate.root_alias}`",
+                f"- Scan mode: `{candidate.scan_mode}`",
+                f"- Canonical-path score: `{canonical_path_score(candidate)}`",
+                f"- Size bytes: `{candidate.size_bytes}`",
+                f"- Modified UTC: `{candidate.modified_utc}`",
+                f"- Archive/backup signal: `{candidate.archive_or_backup}`",
+                "- Required next step: Robert selects the canonical file before any content scan or binding hash.",
+                "",
+            ]
+        )
+    if not ranked:
+        lines.append("No path-name candidates were found.")
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def normalized_family_name(relative_path: str) -> str:
+    stem = Path(relative_path).stem.lower()
+    stem = re.sub(
+        r"(?:^|[_ .-])(copy|final|draft|newest|new|old|backup|archive|deprecated)(?:[_ .-]|$)",
+        "_",
+        stem,
+    )
+    stem = re.sub(r"(?:^|[_ .-])v(?:ersion)?\d+(?:[_ .-]|$)", "_", stem)
+    stem = re.sub(r"(?:^|[_ .-])\d{8}(?:t\d{6}z?)?(?:[_ .-]|$)", "_", stem)
+    stem = re.sub(r"\s*\(\d+\)$", "", stem)
+    return re.sub(r"[^a-z0-9]+", "", stem)
+
+
+def write_duplicate_conflict_register(path: Path, candidates: List[Candidate]) -> None:
+    exact: Dict[str, List[Candidate]] = {}
+    probable: Dict[Tuple[str, str, int], List[Candidate]] = {}
+    families: Dict[Tuple[str, str], List[Candidate]] = {}
+    for candidate in candidates:
+        if candidate.sha256:
+            exact.setdefault(candidate.sha256, []).append(candidate)
+        family = normalized_family_name(candidate.relative_path)
+        if family:
+            probable.setdefault((family, candidate.extension, candidate.size_bytes), []).append(candidate)
+            families.setdefault((family, candidate.extension), []).append(candidate)
+
+    exact_groups = [group for group in exact.values() if len(group) > 1]
+    probable_groups = [
+        group
+        for group in probable.values()
+        if len(group) > 1 and any(candidate.scan_mode == "metadata" for candidate in group)
+    ]
+    version_marker = re.compile(
+        r"(?i)(?:\bv\d+\b|copy|final|draft|newest|old|backup|archive|deprecated|\(\d+\)|\d{8})"
+    )
+    conflict_groups = [
+        group
+        for group in families.values()
+        if len(group) > 1
+        and len({candidate.relative_path.lower() for candidate in group}) > 1
+        and any(version_marker.search(candidate.relative_path) for candidate in group)
+    ]
+    for groups in (exact_groups, probable_groups, conflict_groups):
+        groups.sort(
+            key=lambda group: (
+                -max(candidate.priority_score for candidate in group),
+                -len(group),
+                group[0].relative_path.lower(),
+            )
+        )
+    archived = sorted(
+        (candidate for candidate in candidates if candidate.archive_or_backup),
+        key=lambda item: (-item.priority_score, item.root_alias, item.relative_path.lower()),
+    )
+
+    lines = [
+        "# Duplicate, Archive, and Conflict Register",
+        "",
+        "Exact duplicate means matching public content SHA-256. Probable duplicate means metadata-only normalized name, extension, and size match; it is not content proof. Conflict families require human canonical selection.",
+        "",
+        f"- Exact public duplicate groups: `{len(exact_groups)}`",
+        f"- Probable metadata duplicate groups: `{len(probable_groups)}`",
+        f"- Version/conflict families: `{len(conflict_groups)}`",
+        f"- Archive/backup candidates: `{len(archived)}`",
+        "",
+        "## Highest-Priority Exact Public Duplicates",
+        "",
+    ]
+    for group in exact_groups[:30]:
+        lines.append(f"- SHA-256 `{group[0].sha256}`")
+        for candidate in group[:12]:
+            lines.append(f"  - `{candidate.root_alias}:{candidate.relative_path}`")
+    lines.extend(["", "## Highest-Priority Probable Metadata Duplicates", ""])
+    for group in probable_groups[:30]:
+        lines.append(
+            f"- Probable family `{normalized_family_name(group[0].relative_path)}`; size `{group[0].size_bytes}` bytes"
+        )
+        for candidate in group[:12]:
+            lines.append(f"  - `{candidate.root_alias}:{candidate.relative_path}`")
+    lines.extend(["", "## Highest-Priority Version or Conflict Families", ""])
+    for group in conflict_groups[:30]:
+        lines.append(f"- Family `{normalized_family_name(group[0].relative_path)}`")
+        for candidate in group[:12]:
+            lines.append(f"  - `{candidate.root_alias}:{candidate.relative_path}`")
+    lines.extend(["", "## Highest-Priority Archive or Backup Candidates", ""])
+    for candidate in archived[:50]:
+        lines.append(
+            f"- `{candidate.root_alias}:{candidate.relative_path}`; priority `{candidate.priority_score}`"
+        )
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
 def write_proof_capsules(output: Path, candidates: List[Candidate], top_n: int) -> None:
     capsule_dir = output / "proof_capsule_stubs"
     capsule_dir.mkdir(parents=True, exist_ok=True)
@@ -455,6 +613,7 @@ def write_proof_capsules(output: Path, candidates: List[Candidate], top_n: int) 
                 "root_alias": candidate.root_alias,
                 "relative_path": candidate.relative_path,
                 "sha256": candidate.sha256,
+                "content_hash_status": candidate.content_hash_status,
             },
             "category": candidate.category,
             "hypothesis": "To be written as a bounded, falsifiable statement before execution.",
@@ -520,6 +679,8 @@ def main() -> int:
     write_csv(args.output / "architecture_inventory.csv", candidates)
     write_backlog(args.output / "validation_backlog.md", candidates, args.top_candidates)
     write_risk_register(args.output / "claim_risk_register.md", candidates)
+    write_canonical_path_candidates(args.output / "canonical_path_candidates.md", candidates)
+    write_duplicate_conflict_register(args.output / "duplicate_conflict_register.md", candidates)
     write_proof_capsules(args.output, candidates, min(args.top_candidates, 15))
 
     manifest = {

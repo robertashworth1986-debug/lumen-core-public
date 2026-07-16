@@ -77,3 +77,42 @@ def test_external_metadata_mode_never_hashes_private_file_contents(tmp_path):
     assert len(candidates) == 1
     assert candidates[0].relative_path == "LumaPrivateArchitecture.py"
     assert candidates[0].sha256 == ""
+
+
+def test_dependency_and_generated_trees_are_excluded(tmp_path):
+    private_dependency = tmp_path / "runtime" / "site-packages" / "luma_engine.py"
+    private_dependency.parent.mkdir(parents=True)
+    private_dependency.write_text("def dependency_engine(): pass", encoding="utf-8")
+    generated = tmp_path / "out" / "luma_engine.py"
+    generated.parent.mkdir(parents=True)
+    generated.write_text("def generated_engine(): pass", encoding="utf-8")
+    source = tmp_path / "src" / "luma_engine.py"
+    source.parent.mkdir(parents=True)
+    source.write_text("def source_engine(): pass", encoding="utf-8")
+
+    candidates = MODULE.scan_root(tmp_path, "authorized_external_1", "metadata", 100)
+    assert [candidate.relative_path for candidate in candidates] == ["src/luma_engine.py"]
+
+
+def test_duplicate_register_distinguishes_exact_and_probable_matches(tmp_path):
+    public_root = tmp_path / "public"
+    external_root = tmp_path / "external"
+    public_root.mkdir()
+    external_root.mkdir()
+    first = public_root / "luma_router_v1.py"
+    second = public_root / "luma_router_copy.py"
+    external = external_root / "luma_router_final.py"
+    for path in (first, second, external):
+        path.write_text("def luma_router():\n    return 1\n", encoding="utf-8")
+
+    candidates = [
+        MODULE.score_candidate(path, path.read_text(encoding="utf-8"), "content", "repo", public_root)
+        for path in (first, second)
+    ]
+    candidates.extend(MODULE.scan_root(external_root, "authorized_external_1", "metadata", 100))
+    report = tmp_path / "duplicates.md"
+    MODULE.write_duplicate_conflict_register(report, candidates)
+    text = report.read_text(encoding="utf-8")
+    assert "Exact public duplicate groups: `1`" in text
+    assert "Probable metadata duplicate groups: `1`" in text
+    assert "Version/conflict families: `1`" in text
