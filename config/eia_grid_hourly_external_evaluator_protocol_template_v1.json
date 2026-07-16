@@ -1,0 +1,87 @@
+{
+  "schema": "eia_grid_hourly_external_evaluator_protocol.v1",
+  "template_version": 1,
+  "evidence_lane_id": "eia_grid_prospective_hourly_router_external_evaluation",
+  "predecessor": {
+    "protocol_id": "EIA_GRID_PROSPECTIVE_HOURLY_ROUTER_20260715",
+    "protocol_sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5",
+    "disposition": "retained_incomplete_authority_panel",
+    "performance_promotion_allowed": false
+  },
+  "evaluator": {
+    "name": null,
+    "organization": null,
+    "technical_role": null,
+    "contact_channel": null,
+    "conflict_of_interest_disclosure": null,
+    "independence_basis": null,
+    "authority_to_accept_protocol": null,
+    "independence_evidence_sha256": null
+  },
+  "data_contract": {
+    "publisher_or_owner": null,
+    "dataset_description": null,
+    "dataset_or_query_manifest_sha256": null,
+    "custody_owner": null,
+    "access_authority": null,
+    "held_out_from_lumencore_before_freeze": null,
+    "observation_availability_rule": null,
+    "target_release_timing_rule": null,
+    "evaluation_start_utc": null,
+    "evaluation_end_utc": null,
+    "registered_authorities": null,
+    "authority_inclusion_rule": null,
+    "missing_data_rule": null,
+    "revision_policy": null,
+    "backfill_allowed": false
+  },
+  "test_plan": {
+    "candidate_definition": null,
+    "incumbent_baseline_id": null,
+    "incumbent_baseline_definition": null,
+    "primary_metric": null,
+    "metric_direction": null,
+    "aggregation_unit": "balancing_authority_utc_day",
+    "minimum_common_hours_per_authority": null,
+    "minimum_effect_size": null,
+    "confidence_level": 0.95,
+    "uncertainty_method": "paired_moving_block_bootstrap_clustered_by_authority_utc_day",
+    "bootstrap_replications": null,
+    "bootstrap_seed": null,
+    "multiple_comparison_correction": "holm",
+    "secondary_metrics": null,
+    "single_authority_regression_limit": null,
+    "minimum_authority_mean_wins": null,
+    "minimum_utc_day_win_rate": null,
+    "tie_rule": "lexicographic_candidate_id",
+    "route_or_hyperparameter_change_after_freeze_allowed": false,
+    "outcome_dependent_authority_exclusion_allowed": false,
+    "negative_result_retention_required": true
+  },
+  "acceptance_contract": {
+    "technical_gate_expression": null,
+    "all_required_checks_must_pass": true,
+    "partial_pass_allowed": false,
+    "economic_conversion_enabled": false,
+    "field_or_safety_claim_enabled": false,
+    "deployment_authorization_enabled": false
+  },
+  "scientific_floors": {
+    "minimum_common_hours_per_authority": 720,
+    "minimum_bootstrap_replications": 10000,
+    "required_confidence_level": 0.95,
+    "required_aggregation_unit": "balancing_authority_utc_day",
+    "required_uncertainty_method": "paired_moving_block_bootstrap_clustered_by_authority_utc_day",
+    "required_multiple_comparison_correction": "holm"
+  },
+  "freeze": {
+    "accepted_utc": null,
+    "accepted_protocol_payload_sha256": null,
+    "signature_method": null,
+    "signed_payload_sha256": null,
+    "detached_signature_artifact_sha256": null
+  },
+  "operator_may_fill_evaluator_fields": false,
+  "performance_promotion_before_completed_evaluation_allowed": false,
+  "claim_boundary": "A completed, evaluator-signed protocol freezes an outside evaluation design before scoring. It does not itself reproduce a result, establish field validation, authorize deployment, authenticate evaluator identity or signature semantics by itself, prove economic savings, determine patent validity, establish agency acceptance, or support universal-superiority claims."
+}
