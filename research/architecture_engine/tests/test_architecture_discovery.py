@@ -86,6 +86,12 @@ def test_dependency_and_generated_trees_are_excluded(tmp_path):
     generated = tmp_path / "out" / "luma_engine.py"
     generated.parent.mkdir(parents=True)
     generated.write_text("def generated_engine(): pass", encoding="utf-8")
+    worktree_copy = tmp_path / "stack.worktrees" / "luma_engine.py"
+    worktree_copy.parent.mkdir(parents=True)
+    worktree_copy.write_text("def copied_engine(): pass", encoding="utf-8")
+    flattened = tmp_path / "exports" / "luma_site-packages_engine.py"
+    flattened.parent.mkdir(parents=True)
+    flattened.write_text("def flattened_dependency(): pass", encoding="utf-8")
     source = tmp_path / "src" / "luma_engine.py"
     source.parent.mkdir(parents=True)
     source.write_text("def source_engine(): pass", encoding="utf-8")
@@ -133,3 +139,20 @@ def test_duplicate_register_distinguishes_exact_and_probable_matches(tmp_path):
     assert "Exact public duplicate groups: `1`" in text
     assert "Probable metadata duplicate groups: `1`" in text
     assert "Version/conflict families: `1`" in text
+
+
+def test_canonical_source_outranks_checksum_or_mirror_receipt(tmp_path):
+    source = tmp_path / "Luma_Lexicon.json"
+    source.write_text('{"luma": "architecture"}', encoding="utf-8")
+    receipt = tmp_path / "mirror" / "LEXICON.zip.sha256.txt"
+    receipt.parent.mkdir()
+    receipt.write_text("0" * 64, encoding="utf-8")
+    source_candidate = MODULE.score_candidate(
+        source, source.read_text(encoding="utf-8"), "content", "repo", tmp_path
+    )
+    receipt_candidate = MODULE.score_candidate(
+        receipt, receipt.name, "metadata", "authorized_external_1", tmp_path
+    )
+    assert MODULE.canonical_path_score(source_candidate) > MODULE.canonical_path_score(
+        receipt_candidate
+    )

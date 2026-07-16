@@ -32,6 +32,7 @@ IGNORE_DIRS = {
     "artifacts", "out", "output", "outputs", "results", "coverage", ".next",
     ".tox", "site-packages", "vendor", "third_party", "third-party", "_worktrees",
     "workspacestorage", "vscode_user_profile", "chat-session-resources",
+    "vscode_extensions", "clean_data",
 }
 
 ENGINE_DIR = Path(__file__).resolve().parent
@@ -140,6 +141,25 @@ def safe_stat(path: Path) -> Optional[os.stat_result]:
         return None
 
 
+def ignore_directory(name: str) -> bool:
+    lowered = name.lower()
+    return lowered in IGNORE_DIRS or lowered.endswith(".worktrees")
+
+
+def ignore_flattened_generated_file(path: Path) -> bool:
+    lowered = path.name.lower()
+    return any(
+        marker in lowered
+        for marker in (
+            "site-packages",
+            "node_modules",
+            "workspacestorage",
+            "chat-session-resources",
+            "vscode_extensions",
+        )
+    )
+
+
 def safe_relative(path: Path, root: Path) -> str:
     try:
         return path.resolve().relative_to(root.resolve()).as_posix()
@@ -150,9 +170,11 @@ def safe_relative(path: Path, root: Path) -> str:
 def iter_files(root: Path, max_files: int) -> Iterable[Path]:
     count = 0
     for directory, dirnames, filenames in os.walk(root):
-        dirnames[:] = [d for d in dirnames if d.lower() not in IGNORE_DIRS]
+        dirnames[:] = [d for d in dirnames if not ignore_directory(d)]
         for filename in filenames:
             path = Path(directory) / filename
+            if ignore_flattened_generated_file(path):
+                continue
             if path.suffix.lower() not in TEXT_EXTENSIONS:
                 continue
             stat_result = safe_stat(path)
@@ -477,8 +499,6 @@ def canonical_path_score(candidate: Candidate) -> int:
         score += 12
     if "constant" in name:
         score += 10
-    if "canonical" in name:
-        score += 8
     if "master_context" in path_lower or "master context" in path_lower:
         score += 6
     if "equation_registry" in path_lower or "formula_registry" in path_lower:
@@ -487,6 +507,18 @@ def canonical_path_score(candidate: Candidate) -> int:
         score += 3
     if candidate.archive_or_backup:
         score -= 8
+    if any(
+        marker in path_lower
+        for marker in (
+            ".sha256",
+            ".zip",
+            "mirror/",
+            "packet-clean/",
+            "runtime/",
+            "vscode",
+        )
+    ):
+        score -= 20
     return score
 
 
