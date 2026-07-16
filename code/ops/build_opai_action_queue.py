@@ -28,7 +28,10 @@ def parse_utc(value: str) -> datetime:
         raise ConfigurationError("expected a UTC timestamp")
     if text.endswith("Z"):
         text = text[:-1] + "+00:00"
-    parsed = datetime.fromisoformat(text)
+    try:
+        parsed = datetime.fromisoformat(text)
+    except ValueError as exc:
+        raise ConfigurationError(f"invalid ISO timestamp: {value!r}") from exc
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=timezone.utc)
     return parsed.astimezone(timezone.utc)
@@ -102,7 +105,9 @@ def membership_action(
 ) -> dict[str, Any]:
     status = str(membership.get("status", "unknown"))
     not_before = parse_utc(str(membership.get("next_contact_not_before_utc", "")))
-    suppress = bool(membership.get("suppress_new_contact", False))
+    suppress_standalone = bool(
+        membership.get("suppress_standalone_contact", False)
+    )
 
     if status in {"accepted", "declined", "withdrawn"}:
         return {
@@ -115,15 +120,16 @@ def membership_action(
             "contact_mode": str(membership.get("contact_mode", "existing_thread_only")),
         }
 
-    if suppress or now_utc < not_before:
+    if now_utc < not_before:
         return {
             "id": "membership_follow_up",
             "priority": "blocked",
             "state": "wait",
             "action": str(membership.get("next_action", "Wait for a response.")),
-            "reason": "A membership-interest request is already pending; duplicate standalone outreach is suppressed.",
+            "reason": "A membership-interest request is already pending; duplicate standalone outreach is suppressed during the cooldown.",
             "not_before_utc": not_before.isoformat(),
             "contact_mode": str(membership.get("contact_mode", "existing_thread_only")),
+            "standalone_contact_suppressed": suppress_standalone,
         }
 
     return {
@@ -131,9 +137,10 @@ def membership_action(
         "priority": "high",
         "state": "ready",
         "action": "Send one concise follow-up in the existing membership thread, then reset the cooldown.",
-        "reason": "The contact cooldown has expired and no accepted/declined state is recorded.",
+        "reason": "The contact cooldown has expired and no accepted/declined state is recorded. Follow up only in the existing thread.",
         "not_before_utc": not_before.isoformat(),
         "contact_mode": str(membership.get("contact_mode", "existing_thread_only")),
+        "standalone_contact_suppressed": suppress_standalone,
     }
 
 
@@ -150,10 +157,14 @@ def challenge_action(
         priority = "closed" if application_state in {"not_selected", "closed"} else "high"
         state = "closed" if priority == "closed" else "monitor"
     elif application_state == "requires_program_confirmation":
-        priority = "critical" if days_to_pitch <= 30 else "high"
-        state = "verify"
+        if days_to_pitch < 0:
+            priority = "high"
+            state = "route_next_cycle"
+        else:
+            priority = "critical" if days_to_pitch <= 30 else "high"
+            state = "verify"
     else:
-        priority = "high" if days_to_pitch <= 30 else "medium"
+        priority = "high" if 0 <= days_to_pitch <= 30 else "medium"
         state = "review"
 
     return {
@@ -298,6 +309,14 @@ def build_action_queue(
             }
         )
 
+    automation_boundary = {
+        "emails_sent": False,
+        "forms_submitted": False,
+        "applications_submitted": False,
+        "membership_claimed": False,
+        "purpose": "rank public-source opportunities and enforce outreach cooldowns",
+    }
+
     stable_core = {
         "schema": "opai_action_queue_v1",
         "program_source_checked_utc": str(program.get("source_checked_utc", "")),
@@ -308,19 +327,13 @@ def build_action_queue(
         "action_queue": action_queue,
         "sources": program.get("sources", {}),
         "claim_boundary": str(program.get("claim_boundary", "")),
+        "automation_boundary": automation_boundary,
     }
 
     return {
         **stable_core,
         "generated_utc": generated.isoformat(),
         "action_queue_hash_sha256": canonical_json_hash(stable_core),
-        "automation_boundary": {
-            "emails_sent": False,
-            "forms_submitted": False,
-            "applications_submitted": False,
-            "membership_claimed": False,
-            "purpose": "rank public-source opportunities and enforce outreach cooldowns",
-        },
     }
 
 
