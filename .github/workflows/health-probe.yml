@@ -2,7 +2,7 @@ name: 🔍 Site Health Probe
 
 on:
   schedule:
-    # Probe every 15 minutes, but only commit on a status change or once per UTC day.
+    # Probe every 15 minutes, but only commit on an endpoint-state change or once per UTC day.
     - cron: '*/15 * * * *'
   workflow_dispatch:
 
@@ -27,6 +27,8 @@ jobs:
       - name: Probe all production endpoints
         id: probe
         shell: bash
+        env:
+          CURL_TIMEOUT_SECONDS: '10'
         run: |
           set -euo pipefail
           mkdir -p data
@@ -37,6 +39,14 @@ jobs:
           PREV_OVERALL=$(jq -r '.overall // "unknown"' data/site_health.json 2>/dev/null || echo "unknown")
           PREV_HEALTHY=$(jq -r '.healthy_count // -1' data/site_health.json 2>/dev/null || echo "-1")
           PREV_DATE=$(jq -r '.checked_utc // ""' data/site_health.json 2>/dev/null | cut -c1-10 || true)
+          PREV_ENDPOINT_STATE=$(
+            jq -cS '
+              .endpoints // {}
+              | to_entries
+              | map({name: .key, status: .value.status, status_text: (.value.status_text // ""), ok: .value.ok})
+              | sort_by(.name)
+            ' data/site_health.json 2>/dev/null || echo '[]'
+          )
 
           check_endpoint() {
             local name=$1
@@ -45,15 +55,32 @@ jobs:
             local status
             local ok
 
-            # Do not use curl --fail here: HTTP errors such as 502 are valid probe
-            # results and must not be collapsed into a transport failure. A network
-            # failure is normalized to status 0, while status_text preserves 000.
-            code=$(curl -sS --max-time 10 -o /dev/null -w "%{http_code}" "$url" 2>/dev/null) || code="000"
+            # HTTP errors such as 502 are valid probe results, so do not use curl
+            # --fail. Normalize transport failures to numeric 0 while preserving
+            # the conventional three-character status text "000".
+            code=$(
+              curl \
+                --silent \
+                --show-error \
+                --location \
+                --max-redirs 5 \
+                --max-time "$CURL_TIMEOUT_SECONDS" \
+                --output /dev/null \
+                --write-out "%{http_code}" \
+                "$url" \
+                2>/dev/null
+            ) || code="000"
             [[ "$code" =~ ^[0-9]{3}$ ]] || code="000"
-            status=$((10#$code))
-            ok=$([ "$code" = "200" ] && echo "true" || echo "false")
 
-            echo "  \"$name\": { \"url\": \"$url\", \"status\": $status, \"status_text\": \"$code\", \"ok\": $ok }"
+            status=$((10#$code))
+            if [[ "$status" -ge 200 && "$status" -lt 300 ]]; then
+              ok="true"
+            else
+              ok="false"
+            fi
+
+            printf '  "%s": { "url": "%s", "status": %d, "status_text": "%s", "ok": %s }' \
+              "$name" "$url" "$status" "$code" "$ok"
           }
 
           PORTAL=$(check_endpoint "portal" "https://lumen-core.ai/")
@@ -66,10 +93,10 @@ jobs:
           ALL_UP=6
           HEALTHY=$(printf '%s\n' "$PORTAL" "$EVIDENCE" "$KRAKEN_DB" "$MISSION" "$APPROVAL" "$FORECAST" | grep -c '"ok": true' || true)
 
-          if [ "$HEALTHY" -eq "$ALL_UP" ]; then
+          if [[ "$HEALTHY" -eq "$ALL_UP" ]]; then
             OVERALL="operational"
             COLOR="brightgreen"
-          elif [ "$HEALTHY" -gt 3 ]; then
+          elif [[ "$HEALTHY" -gt 3 ]]; then
             OVERALL="degraded"
             COLOR="yellow"
           else
@@ -77,7 +104,7 @@ jobs:
             COLOR="red"
           fi
 
-          cat > data/site_health.json << EOF
+          cat > data/site_health.json <<EOF
           {
             "checked_utc": "${TIMESTAMP}",
             "overall": "${OVERALL}",
@@ -96,7 +123,16 @@ jobs:
 
           jq empty data/site_health.json
 
-          cat > data/uptime_badge.json << EOF
+          CURRENT_ENDPOINT_STATE=$(
+            jq -cS '
+              .endpoints
+              | to_entries
+              | map({name: .key, status: .value.status, status_text: (.value.status_text // ""), ok: .value.ok})
+              | sort_by(.name)
+            ' data/site_health.json
+          )
+
+          cat > data/uptime_badge.json <<EOF
           {
             "schemaVersion": 1,
             "label": "status",
@@ -111,10 +147,12 @@ jobs:
           SHOULD_COMMIT="false"
           REASON="no material status change"
 
-          if [ "$OVERALL" != "$PREV_OVERALL" ] || [ "$HEALTHY" != "$PREV_HEALTHY" ]; then
+          if [[ "$OVERALL" != "$PREV_OVERALL" ]] \
+            || [[ "$HEALTHY" != "$PREV_HEALTHY" ]] \
+            || [[ "$CURRENT_ENDPOINT_STATE" != "$PREV_ENDPOINT_STATE" ]]; then
             SHOULD_COMMIT="true"
-            REASON="status changed"
-          elif [ "$PREV_DATE" != "$TODAY" ]; then
+            REASON="endpoint state changed"
+          elif [[ "$PREV_DATE" != "$TODAY" ]]; then
             SHOULD_COMMIT="true"
             REASON="daily snapshot"
           fi
@@ -142,8 +180,9 @@ jobs:
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
 
-      - name: Fail job on outage (optional alerting hook)
+      - name: Warn on outage
         if: steps.probe.outputs.overall == 'outage'
+        shell: bash
         run: |
           echo "::warning::lumen-core.ai is reporting an outage — ${{ steps.probe.outputs.healthy }}/6 endpoints healthy"
-          # Non-fatal: do not exit 1 so the status report remains available.
+          # Non-fatal: preserve the status report for operator review.
