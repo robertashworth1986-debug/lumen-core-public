@@ -42,11 +42,18 @@ jobs:
             local name=$1
             local url=$2
             local code
+            local status
             local ok
 
-            code=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" "$url" 2>/dev/null || echo "000")
+            # Do not use curl --fail here: HTTP errors such as 502 are valid probe
+            # results and must not be collapsed into a transport failure. A network
+            # failure is normalized to status 0, while status_text preserves 000.
+            code=$(curl -sS --max-time 10 -o /dev/null -w "%{http_code}" "$url" 2>/dev/null) || code="000"
+            [[ "$code" =~ ^[0-9]{3}$ ]] || code="000"
+            status=$((10#$code))
             ok=$([ "$code" = "200" ] && echo "true" || echo "false")
-            echo "  \"$name\": { \"url\": \"$url\", \"status\": $code, \"ok\": $ok }"
+
+            echo "  \"$name\": { \"url\": \"$url\", \"status\": $status, \"status_text\": \"$code\", \"ok\": $ok }"
           }
 
           PORTAL=$(check_endpoint "portal" "https://lumen-core.ai/")
@@ -87,6 +94,8 @@ jobs:
           }
           EOF
 
+          jq empty data/site_health.json
+
           cat > data/uptime_badge.json << EOF
           {
             "schemaVersion": 1,
@@ -96,6 +105,8 @@ jobs:
             "cacheSeconds": 60
           }
           EOF
+
+          jq empty data/uptime_badge.json
 
           SHOULD_COMMIT="false"
           REASON="no material status change"
