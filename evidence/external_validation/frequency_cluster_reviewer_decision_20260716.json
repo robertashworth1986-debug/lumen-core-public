@@ -1,0 +1,83 @@
+{
+  "schema": "frequency_cluster_public_reviewer_decision_v1",
+  "generated_from_primary_run_utc": "2026-07-16T01:23:56Z",
+  "official_source": {
+    "provider": "Kraken",
+    "source_authentic": true,
+    "public_endpoints_only": true,
+    "authentication_used": false,
+    "meaning": "Normalized daily OHLC inputs were retrieved from Kraken public endpoints and hash-sealed.",
+    "does_not_mean": "Independent validation, Kraken endorsement, a trading recommendation, guaranteed alpha, or permission to trade."
+  },
+  "frozen_test": {
+    "protocol": "config/frequency_cluster_truth_gauntlet_protocol_v1.json",
+    "protocol_sha256": "8dece5112d08af58cb4910f0fc728859ca918db2b768813078bfa52e1be0beb9",
+    "current_locked_runner": "code/frequency_cluster_truth_gauntlet.py",
+    "current_locked_runner_sha256": "dba7bd52f221980a87badec28e9c53e696590596e357dc854453fac58b8eaa67",
+    "primary_scoring_runner_sha256": "41ac2dd109d7c890849e56c934f5a6fb8098b93e3111308321edf3afa28b78b8",
+    "current_runner_matches_primary_scoring_hash": false,
+    "primary_run_contains_scoring_source_snapshot": false,
+    "provenance_disclosure": "The primary manifest recorded the scoring-source hash but the run did not include that exact source snapshot. The supplied runner adds duplicate-input blocking and reviewer-report hardening. External output is an implementation-version reproduction, not a bit-for-bit executable replay.",
+    "timestamp_erratum": {
+      "path": "evidence/external_validation/frequency_cluster_protocol_timestamp_erratum_20260716.json",
+      "sha256": "a60dccac5534fa04a1899c28ebb53b6b6157d8f9edcee6542d40dd09beb93791",
+      "recorded_frozen_utc": "2026-07-16T02:15:00Z",
+      "intended_frozen_utc": "2026-07-16T01:15:00Z",
+      "scoring_rules_or_outputs_changed": false
+    },
+    "holdout_used_for_selection": false,
+    "eligible_pair_count": 20,
+    "selected_periods_days": [10.0, 120.0, 30.0]
+  },
+  "diagnostic_global_comparison": {
+    "improvement_pct_vs_one_global_strongest_named_baseline": 1.4469232844106072,
+    "pair_bootstrap_ci95_pct": [0.06971826871488182, 1.8259017783931208],
+    "promotion_metric": false
+  },
+  "reviewer_grade_gate": {
+    "metric": "Mean pair improvement against each pair's strongest named baseline, with block uncertainty, leave-one-pair-out, phase controls, and Holm family correction.",
+    "mean_pair_improvement_pct": -0.2871584421800558,
+    "mean_worst_baseline_effect": -0.001982820558211526,
+    "mean_worst_baseline_effect_pair_bootstrap_ci95": [-0.009688026971604041, 0.004328505893489018],
+    "positive_pairs": 11,
+    "total_pairs": 20,
+    "positive_pair_fraction": 0.55,
+    "required_positive_pair_fraction": 0.60,
+    "minimum_leave_one_pair_out_effect": -0.0033108014159957057,
+    "minimum_holm_adjusted_phase_p": 0.10471204188481675,
+    "individually_promoted_pairs": [],
+    "gate_checks": {
+      "aggregate_pair_effect_positive": false,
+      "aggregate_bootstrap_ci95_lower_positive": false,
+      "minimum_positive_pair_fraction": false,
+      "leave_one_pair_out_minimum_positive": false,
+      "minimum_individually_promoted_pairs": false
+    },
+    "gate_pass": false
+  },
+  "integrity": {
+    "primary_summary_sha256": "fcb43f743ff4d99f207885272723cd4aca512592915854816d90f620c8a34c04",
+    "primary_evidence_receipt_sha256": "3d565b290362588c5cc23cb1bf9c4b6f8f3ffa17944774b29848c9838c306f9b",
+    "run_identity_sha256": "d35d5d40937ea6b1e0f2d8794b729765ec89ec49c973131e734ba134882c8075",
+    "scored_computations_with_same_identity": 2,
+    "duplicate_scored_computations": 1,
+    "duplicate_evidence_receipts_match": true,
+    "duplicates_count_as_independent_confirmation": false,
+    "future_identical_protocol_and_input_hashes_blocked_before_scoring": true
+  },
+  "blind_reproduction": {
+    "kit_version": "1.2",
+    "expected_result_values_included": false,
+    "expected_result_commitment_included": true,
+    "kit_zip_sha256": "80bffac8b52c967354b9ffd604b48898df9e6b097a6fc80736cb655e4e536165",
+    "kit_zip_bytes": 538273,
+    "input_verification_passed": true,
+    "zip_integrity_passed": true,
+    "external_execution_status": "KIT_READY_EXTERNAL_REVIEWER_NOT_YET_RUN"
+  },
+  "decision": "NULL_OR_ADVERSE_NOT_PROMOTED_DO_NOT_RUN_ECONOMIC_ACTION",
+  "execution_authorized": false,
+  "capital_at_risk_allowed": false,
+  "independently_validated": false,
+  "safest_next_action": "One outside reviewer should run the blind kit and return its summary, terminal manifest hash, environment receipt, and signed attestation. Economic action remains disabled even if that reproduction matches, until a future prospectively sealed source window also passes."
+}

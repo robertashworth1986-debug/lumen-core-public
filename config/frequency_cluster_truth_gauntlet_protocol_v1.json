@@ -1,0 +1,123 @@
+{
+  "schema": "frequency_cluster_truth_gauntlet_protocol_v1",
+  "version": "1.0.0",
+  "frozen_utc": "2026-07-16T02:15:00Z",
+  "purpose": "Measure whether development-selected frequency clusters improve untouched daily volatility forecasts across a fixed major-asset Kraken cohort, and identify the first stress at which any measured effect fails.",
+  "claim_boundary": "Kraken is the official exchange data source for this internal benchmark. A source-authentic dataset and a hash-sealed run do not constitute independent validation, exchange endorsement, a trading recommendation, guaranteed alpha, realized savings, or authorization to place orders.",
+  "execution_authorized": false,
+  "capital_at_risk_allowed": false,
+  "holdout_used_for_selection": false,
+  "null_and_adverse_results_retained": true,
+  "data": {
+    "provider": "Kraken",
+    "api_family": "Kraken Spot REST public market data",
+    "asset_pairs_path": "/0/public/AssetPairs",
+    "ohlc_path": "/0/public/OHLC",
+    "interval_minutes": 1440,
+    "exclude_current_incomplete_candle": true,
+    "minimum_returns_per_pair": 650,
+    "minimum_eligible_pairs": 15,
+    "fixed_pair_universe": [
+      "XBT/USD",
+      "ETH/USD",
+      "SOL/USD",
+      "XRP/USD",
+      "ADA/USD",
+      "XDG/USD",
+      "LINK/USD",
+      "LTC/USD",
+      "BCH/USD",
+      "AVAX/USD",
+      "DOT/USD",
+      "XLM/USD",
+      "TRX/USD",
+      "UNI/USD",
+      "AAVE/USD",
+      "ATOM/USD",
+      "ETC/USD",
+      "FIL/USD",
+      "NEAR/USD",
+      "ICP/USD"
+    ],
+    "quality_gates": {
+      "maximum_missing_interval_fraction": 0.01,
+      "minimum_nonzero_volume_fraction": 0.70,
+      "minimum_nonzero_return_fraction": 0.70,
+      "maximum_single_return_bps": 10000.0
+    }
+  },
+  "splits": {
+    "discovery_fraction": 0.50,
+    "calibration_fraction": 0.20,
+    "holdout_fraction": 0.30,
+    "chronological": true,
+    "holdout_scored_once_per_frozen_protocol": true
+  },
+  "frequency_discovery": {
+    "target": "log1p_absolute_close_to_close_log_return_bps",
+    "candidate_periods_days": [2, 3, 4, 5, 7, 10, 14, 21, 30, 45, 60, 90, 120],
+    "maximum_selected_periods": 3,
+    "minimum_period_ratio_separation": 1.25,
+    "minimum_discovery_cycles": 2.5,
+    "pair_score": "single_period_harmonic_partial_r2",
+    "consensus_score": "median_pair_partial_r2",
+    "selection_uses_discovery_only": true
+  },
+  "models": {
+    "harmonic_fit": "ordinary_least_squares_with_intercept",
+    "ewma_half_life_days": 14.0,
+    "weekday_baseline": "development_weekday_median",
+    "candidate_variants": [
+      {"name": "harmonic_only", "harmonic": 1.0, "ewma": 0.0, "weekday": 0.0},
+      {"name": "harmonic_ewma_equal", "harmonic": 0.5, "ewma": 0.5, "weekday": 0.0},
+      {"name": "harmonic_weekday_equal", "harmonic": 0.5, "ewma": 0.0, "weekday": 0.5},
+      {"name": "harmonic_led_hybrid", "harmonic": 0.5, "ewma": 0.25, "weekday": 0.25},
+      {"name": "conservative_frequency_hybrid", "harmonic": 0.25, "ewma": 0.5, "weekday": 0.25}
+    ],
+    "variant_selection_metric": "calibration_mae",
+    "variant_selection_uses_calibration_only": true,
+    "named_baselines": ["development_median", "online_ewma", "development_weekday_median", "matched_no_frequency"],
+    "primary_metric": "mean_absolute_error_on_log_volatility_target",
+    "pair_effect": "minimum_mae_improvement_across_all_named_baselines"
+  },
+  "inference": {
+    "alpha": 0.05,
+    "pair_block_bootstrap_repetitions": 4000,
+    "aggregate_pair_bootstrap_repetitions": 10000,
+    "time_block_days": 7,
+    "phase_shift_minimum_days": 14,
+    "pair_family_correction": "holm",
+    "bootstrap_seed": 4172026
+  },
+  "promotion_gate": {
+    "aggregate_pair_effect_must_be_positive": true,
+    "aggregate_bootstrap_ci95_lower_bound_must_be_positive": true,
+    "minimum_positive_pair_fraction": 0.60,
+    "leave_one_pair_out_minimum_effect_must_be_positive": true,
+    "minimum_individually_promoted_pairs": 1,
+    "individual_pair_requires_positive_effect": true,
+    "individual_pair_ci95_lower_bound_must_be_positive": true,
+    "individual_pair_holm_phase_p_must_not_exceed": 0.05,
+    "external_reproduction_required_for_operational_claim": true
+  },
+  "stress_ladder": {
+    "harmonic_time_shifts_days": [0, 1, 2, 3, 5, 7, 14, 30],
+    "frequency_detuning_factors": [0.90, 0.95, 1.00, 1.05, 1.10],
+    "directional_roundtrip_cost_bps": [0, 10, 25, 52, 100],
+    "leave_one_pair_out": true,
+    "first_failure_is_retained": true
+  },
+  "directional_shadow_lane": {
+    "enabled": true,
+    "status": "diagnostic_only",
+    "position_rule": "sign_of_harmonic_return_forecast_when_magnitude_exceeds_roundtrip_cost",
+    "orders_allowed": false,
+    "live_execution_allowed": false,
+    "promotion_allowed": false
+  },
+  "decision_labels": {
+    "pass": "INTERNAL_SOURCE_AUTHENTIC_FREQUENCY_EFFECT_PASS_EXTERNAL_REPRODUCTION_REQUIRED",
+    "fail": "NULL_OR_ADVERSE_NOT_PROMOTED_DO_NOT_RUN_ECONOMIC_ACTION",
+    "insufficient": "INSUFFICIENT_SOURCE_COVERAGE_NOT_SCORED"
+  }
+}

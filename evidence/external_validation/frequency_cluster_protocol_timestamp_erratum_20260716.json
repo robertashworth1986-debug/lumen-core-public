@@ -1,0 +1,25 @@
+{
+  "schema": "frequency_cluster_protocol_timestamp_erratum_v1",
+  "affected_protocol": "config/frequency_cluster_truth_gauntlet_protocol_v1.json",
+  "affected_protocol_sha256": "8dece5112d08af58cb4910f0fc728859ca918db2b768813078bfa52e1be0beb9",
+  "field": "frozen_utc",
+  "recorded_value": "2026-07-16T02:15:00Z",
+  "intended_value": "2026-07-16T01:15:00Z",
+  "error_class": "one_hour_utc_transcription_error",
+  "local_filesystem_chronology": {
+    "protocol_creation_utc": "2026-07-16T01:12:45.5556419Z",
+    "protocol_last_write_utc": "2026-07-16T01:12:45.5566414Z",
+    "primary_summary_creation_utc": "2026-07-16T01:23:55.9023038Z",
+    "primary_summary_last_write_utc": "2026-07-16T01:23:55.9043115Z"
+  },
+  "primary_summary_sha256": "fcb43f743ff4d99f207885272723cd4aca512592915854816d90f620c8a34c04",
+  "primary_evidence_receipt_sha256": "3d565b290362588c5cc23cb1bf9c4b6f8f3ffa17944774b29848c9838c306f9b",
+  "protocol_existed_before_primary_scoring_on_local_filesystem": true,
+  "scoring_rules_changed": false,
+  "source_inputs_changed": false,
+  "numeric_outputs_changed": false,
+  "promotion_decision_changed": false,
+  "original_protocol_rewritten": false,
+  "reason_original_is_retained": "The original hash is already referenced by the primary run, input identity, blind commitment, and reviewer receipt. Retaining it plus this explicit erratum preserves the audit trail.",
+  "truth_boundary": "Filesystem timestamps are local chronology evidence, not an external timestamp authority. The protocol hash and primary receipt remain the durable linkage."
+}
