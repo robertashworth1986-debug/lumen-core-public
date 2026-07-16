@@ -1,0 +1,92 @@
+name: OPAI Public Intelligence
+
+on:
+  pull_request:
+    paths:
+      - 'code/ops/build_opai_consortium_intelligence.py'
+      - 'tests/test_opai_consortium_intelligence.py'
+      - '.github/workflows/opai-intelligence.yml'
+  workflow_dispatch:
+    inputs:
+      max_pages:
+        description: Maximum number of allowlisted public pages to fetch
+        required: false
+        default: '40'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Compile crawler
+        run: python -m py_compile code/ops/build_opai_consortium_intelligence.py tests/test_opai_consortium_intelligence.py
+
+      - name: Run crawler safety tests
+        run: python -m unittest discover -s tests -p 'test_opai_consortium_intelligence.py' -v
+
+  scrape:
+    if: github.event_name == 'workflow_dispatch'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Validate dispatch input
+        env:
+          MAX_PAGES: ${{ inputs.max_pages }}
+        run: |
+          case "$MAX_PAGES" in
+            ''|*[!0-9]*)
+              echo "::error::max_pages must be a positive integer"
+              exit 1
+              ;;
+          esac
+          if [ "$MAX_PAGES" -lt 1 ] || [ "$MAX_PAGES" -gt 100 ]; then
+            echo "::error::max_pages must be between 1 and 100"
+            exit 1
+          fi
+
+      - name: Build live public intelligence artifact
+        id: scrape
+        continue-on-error: true
+        env:
+          MAX_PAGES: ${{ inputs.max_pages }}
+        run: |
+          mkdir -p artifacts
+          python code/ops/build_opai_consortium_intelligence.py \
+            --max-pages "$MAX_PAGES" \
+            --out artifacts/opai_consortium_intelligence.json \
+            --no-dashboard
+
+      - name: Upload bounded scrape result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: opai-consortium-intelligence-${{ github.run_id }}
+          path: artifacts/opai_consortium_intelligence.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Enforce successful live scrape
+        if: steps.scrape.outcome != 'success'
+        run: |
+          echo "::error::The crawler produced a bounded failure artifact; inspect it before retrying."
+          exit 1
