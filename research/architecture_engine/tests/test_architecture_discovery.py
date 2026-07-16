@@ -94,6 +94,23 @@ def test_dependency_and_generated_trees_are_excluded(tmp_path):
     assert [candidate.relative_path for candidate in candidates] == ["src/luma_engine.py"]
 
 
+def test_vanishing_file_does_not_abort_inventory(tmp_path, monkeypatch):
+    stable = tmp_path / "stable_luma_engine.py"
+    vanishing = tmp_path / "vanishing_luma_engine.py"
+    stable.write_text("def stable(): pass", encoding="utf-8")
+    vanishing.write_text("def vanishing(): pass", encoding="utf-8")
+    original = MODULE.safe_stat
+
+    def simulated_stat(path):
+        if path == vanishing:
+            return None
+        return original(path)
+
+    monkeypatch.setattr(MODULE, "safe_stat", simulated_stat)
+    candidates = MODULE.scan_root(tmp_path, "authorized_external_1", "metadata", 100)
+    assert [candidate.relative_path for candidate in candidates] == ["stable_luma_engine.py"]
+
+
 def test_duplicate_register_distinguishes_exact_and_probable_matches(tmp_path):
     public_root = tmp_path / "public"
     external_root = tmp_path / "external"

@@ -31,6 +31,7 @@ IGNORE_DIRS = {
     "build", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache",
     "artifacts", "out", "output", "outputs", "results", "coverage", ".next",
     ".tox", "site-packages", "vendor", "third_party", "third-party", "_worktrees",
+    "workspacestorage", "vscode_user_profile", "chat-session-resources",
 }
 
 ENGINE_DIR = Path(__file__).resolve().parent
@@ -132,6 +133,13 @@ def utc_modified(path: Path) -> str:
     return datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat()
 
 
+def safe_stat(path: Path) -> Optional[os.stat_result]:
+    try:
+        return path.stat()
+    except OSError:
+        return None
+
+
 def safe_relative(path: Path, root: Path) -> str:
     try:
         return path.resolve().relative_to(root.resolve()).as_posix()
@@ -147,7 +155,8 @@ def iter_files(root: Path, max_files: int) -> Iterable[Path]:
             path = Path(directory) / filename
             if path.suffix.lower() not in TEXT_EXTENSIONS:
                 continue
-            if path.stat().st_size > 2_000_000:
+            stat_result = safe_stat(path)
+            if stat_result is None or stat_result.st_size > 2_000_000:
                 continue
             yield path
             count += 1
@@ -257,6 +266,9 @@ def score_candidate(
     root_alias: str,
     root: Path,
 ) -> Candidate:
+    stat_result = safe_stat(path)
+    if stat_result is None:
+        raise FileNotFoundError(path)
     lowered = text.lower()
     path_lower = safe_relative(path, root).lower()
     _, architecture_hits = count_hits(f"{path_lower} {lowered}", ARCHITECTURE_TERMS)
@@ -339,8 +351,8 @@ def score_candidate(
         content_hash_status=(
             "computed" if scan_mode == "content" else "not_computed_metadata_only"
         ),
-        size_bytes=path.stat().st_size,
-        modified_utc=utc_modified(path),
+        size_bytes=stat_result.st_size,
+        modified_utc=datetime.fromtimestamp(stat_result.st_mtime, timezone.utc).isoformat(),
         category=category,
         architecture_terms=architecture_hits[:30],
         symbols=symbols,
@@ -381,7 +393,10 @@ def scan_root(
         lowered = f"{safe_relative(path, root).lower()} {text.lower()}"
         if not any(term in lowered for term in ARCHITECTURE_TERMS):
             continue
-        candidates.append(score_candidate(path, text, scan_mode, root_alias, root))
+        try:
+            candidates.append(score_candidate(path, text, scan_mode, root_alias, root))
+        except OSError:
+            continue
     return candidates
 
 
