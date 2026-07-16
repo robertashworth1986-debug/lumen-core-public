@@ -26,6 +26,19 @@ Current official public signals captured on July 16, 2026 include:
 | Domain-Specific Model | Model-vs-baseline evaluation and evidence packaging | Benchmark method; no consortium endorsement |
 | AI for Power Challenge | Bounded utility demonstration scope with pre-registered acceptance rules | Candidate future path; no selection or award claim |
 
+## Recommended onboarding order
+
+1. **Use Case Work Group — Adrian Kelly.** This group catalogs and prioritizes opportunities by member value, feasibility, and risk, then evaluates existing solutions or new projects. Its sandbox mandate explicitly includes protection of data and IP. LumenCore should enter with the bounded EIA-930 replay-validation use case rather than a broad platform pitch.
+2. **Domain-Specific Model Work Group — Apurba Sakti.** This group curates governed power-sector data, develops domain models, and benchmarks performance over time. LumenCore's clean contribution is the model-vs-baseline evaluation contract, hash manifest, negative-result retention, and offline verifier.
+3. **Data Sharing Work Group — Jacqueline Rosati.** This group develops responsible-sharing practices, contractual templates, security mechanisms, transmittal and storage requirements, and anonymization, aggregation, or synthetic-data options. That is the correct home for a buyer-authorized held-out replay data agreement.
+4. **Implementation Work Group — Jason Hollern.** This group collects scaled-AI lessons, publishes case studies and guidance, and develops deployment playbooks. LumenCore belongs here after an independent replay result exists, not before.
+
+### Member Representative Committee seat
+
+The public MRC page names **Jeremy Renshaw** as lead and says each member organization designates one representative, typically its head of AI or equivalent. It coordinates participation across the consortium and meets publicly each month on the third Wednesday from 11:00 AM to 12:00 PM ET. Robert Ashworth should be listed as LumenCore's primary representative during onboarding unless OPAI requests a different role label.
+
+These names are public working-group leads, not an instruction for unsolicited direct outreach. The preferred path remains the official onboarding team and Sarah Toews's referral.
+
 ## Crawler behavior
 
 `code/ops/build_opai_consortium_intelligence.py` performs a read-only crawl of allowlisted public OPAI pages and creates a hash-addressed JSON asset.
