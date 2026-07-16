@@ -1,0 +1,31 @@
+{
+  "schema": "lumencore_the_stop_public_release_receipt_v1",
+  "generated_utc": "2026-07-16T04:03:10.022649+00:00",
+  "title": "The Stop: When the Stronger Test Says No",
+  "status": "RENDERED_NOT_PUBLISHED",
+  "video": {
+    "file_name": "LumenCore_The_Stop_Documentary_Trailer_V1.mp4",
+    "bytes": 4568464,
+    "sha256": "509064842ad4be249c66f252702b392710a12427da21a1ea2aac04e71a411ffc"
+  },
+  "manifest_sha256": "33dd51cab316cc66a80c1f62cb639d431791b7ef0a1cf72accda341cd8f22bef",
+  "validation_receipt_sha256": "63171cee6110998291f4319600e5ce2192e6706c27b25bb2ec7fe16d7a9bd5f0",
+  "source_receipt_sha256": "6ff624feeb5fa5ae4d1e1aa9d8dd73b3a7de6985f8a1858c1e5dd0f5324d76a3",
+  "selected_teaser_sha256": "241c9a69a7d30f539a99a161f5fc3618a54929746d836514afc4af3299e487ef",
+  "claim_boundary": {
+    "source_authentic": true,
+    "independently_validated": false,
+    "execution_authorized": false,
+    "capital_at_risk_allowed": false,
+    "decision": "NULL_OR_ADVERSE_NOT_PROMOTED_DO_NOT_RUN_ECONOMIC_ACTION"
+  },
+  "validation_status": "PASS",
+  "synthetic_narration_disclosed": true,
+  "frozen_asset_ids": [
+    "physical_context_long_video",
+    "legacy_controller_live_photo_01",
+    "legacy_controller_live_photo_02"
+  ],
+  "source_files_mutated": false,
+  "distribution_performed": false
+}
