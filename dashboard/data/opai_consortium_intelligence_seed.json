@@ -10,13 +10,6 @@
       "source": "https://restservice.epri.com/publicattachment/92892"
     }
   ],
-  "working_groups": [
-    "Member Representative Committee",
-    "Data Sharing",
-    "Domain-Specific Model",
-    "Implementation",
-    "Use Case"
-  ],
   "public_signals": [
     {
       "name": "organizations_engaged_homepage",
@@ -77,5 +70,46 @@
     "offline verification",
     "failure and limitation retention",
     "utility demonstration scoping"
-  ]
+  ],
+  "working_group_details": [
+    {
+      "name": "Use Case",
+      "lead": "Adrian Kelly",
+      "priority_for_lumencore": 1,
+      "public_mandate": "Catalog and prioritize use cases by member value, feasibility, and risk; identify existing solutions or projects; use sandboxes that protect data and IP.",
+      "lumen_core_entry": "Submit the EIA-930 replay-validation lane as a bounded use case with pre-registered acceptance rules.",
+      "source": "https://openpowerai.org/use-case-work-group"
+    },
+    {
+      "name": "Domain-Specific Model",
+      "lead": "Apurba Sakti",
+      "priority_for_lumencore": 2,
+      "public_mandate": "Develop power-sector models using governed high-signal data and benchmark performance over time.",
+      "lumen_core_entry": "Contribute model-vs-baseline evaluation, hash manifests, negative-result retention, and offline verification.",
+      "source": "https://openpowerai.org/domain-specific-model-work-group"
+    },
+    {
+      "name": "Data Sharing",
+      "lead": "Jacqueline Rosati",
+      "priority_for_lumencore": 3,
+      "public_mandate": "Enable responsible data sharing, develop contractual templates and security mechanisms, and define transmittal, storage, anonymization, aggregation, and synthetic-data practices.",
+      "lumen_core_entry": "Use the buyer-authorized held-out data contract and explicit rights labels before any utility replay.",
+      "source": "https://openpowerai.org/data-sharing"
+    },
+    {
+      "name": "Implementation",
+      "lead": "Jason Hollern",
+      "priority_for_lumencore": 4,
+      "public_mandate": "Share scaled-AI lessons, publish case studies and deployment guidance, streamline use-case deployment, and develop playbooks or roadmaps.",
+      "lumen_core_entry": "Translate an independently verified replay into a bounded pilot playbook without claiming deployment or savings.",
+      "source": "https://openpowerai.org/implementation-work-group"
+    }
+  ],
+  "member_representative_committee": {
+    "lead": "Jeremy Renshaw",
+    "role": "Coordinates consortium activity and member participation across work groups.",
+    "organization_seat": "Each member organization designates one representative, typically its head of AI or equivalent.",
+    "public_meeting_cadence": "Monthly on the third Wednesday from 11:00 AM to 12:00 PM ET.",
+    "source": "https://openpowerai.org/member-representative-committee"
+  }
 }
