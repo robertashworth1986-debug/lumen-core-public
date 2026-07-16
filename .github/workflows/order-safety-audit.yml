@@ -40,6 +40,7 @@ jobs:
             code/kraken_swing_hunter.py \
             code/micro_position_kraken_bot.py \
             code/execution/execution_orchestrator.py \
+            code/execution/alpaca_paper_executor.py \
             code/ops/LIQUIDATE_ALL_TO_USD.py \
             code/ops/AUDIT_ORDER_SUBMISSION_PATHS.py
 
@@ -49,6 +50,7 @@ jobs:
           python tests/test_order_safety_facades.py
           python tests/test_standalone_no_orders_facades.py
           python tests/test_order_safety_promotion_lane.py
+          python tests/test_order_safety_alpaca_paper_boundary.py
 
       - name: Audit all direct submission paths
         run: |

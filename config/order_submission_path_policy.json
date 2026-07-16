@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-16.live-data-no-orders.v1",
+  "version": "2026-07-16.live-data-no-orders.v2",
   "promotion_stage": "live_data_no_orders",
   "patterns": {
     "kraken_add_order": "\\bAddOrder\\b",
@@ -62,13 +62,18 @@
       "classification": "historical_preserved",
       "expected_git_blob_sha": "bc4996f03fe278ddcb65ccb5e35680c370f3fe98"
     },
+    {
+      "path": "code/execution/alpaca_paper_executor_legacy.py",
+      "classification": "historical_preserved",
+      "expected_git_blob_sha": "a0e42d06cc1fb9e48653cabb18acea3c34278640"
+    },
     {"path": "code/kraken_execution.py", "classification": "guarded_facade"},
     {"path": "code/execution/live_executor.py", "classification": "guarded_facade"},
     {"path": "code/luma_experience_gateway.py", "classification": "guarded_facade"},
     {"path": "code/kraken_swing_hunter.py", "classification": "guarded_facade"},
     {"path": "code/micro_position_kraken_bot.py", "classification": "guarded_facade"},
     {"path": "code/execution/order_safety_gate.py", "classification": "guard_implementation"},
-    {"path": "code/execution/alpaca_paper_executor.py", "classification": "paper_sandbox"},
+    {"path": "code/execution/alpaca_paper_executor.py", "classification": "paper_sandbox", "required": true},
     {"path": "code/multi_exchange_paper_ticker.py", "classification": "paper_sandbox"},
     {"path": "code/alpaca_paper_loop_builder.py", "classification": "source_builder"},
     {"path": "code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py", "classification": "source_builder"},
