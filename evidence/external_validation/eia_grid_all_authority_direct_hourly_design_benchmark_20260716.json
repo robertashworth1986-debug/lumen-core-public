@@ -1,0 +1,297 @@
+{
+  "authority_metrics": [
+    {
+      "candidate_metrics": {
+        "lightgbm_direct": {
+          "mean_absolute_error_mwh": 1356.810805622437,
+          "mean_scaled_absolute_error": 1.8106625668995069
+        },
+        "ridge_direct": {
+          "mean_absolute_error_mwh": 1481.7681542613668,
+          "mean_scaled_absolute_error": 1.9621412712428907
+        },
+        "seasonal_blend_24_168": {
+          "mean_absolute_error_mwh": 1534.5082364341085,
+          "mean_scaled_absolute_error": 2.0355421161535445
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 2461.482558139535,
+          "mean_scaled_absolute_error": 3.270206684047122
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 1516.2470930232557,
+          "mean_scaled_absolute_error": 2.0269391529145615
+        },
+        "xgboost_direct": {
+          "mean_absolute_error_mwh": 1299.4641842436652,
+          "mean_scaled_absolute_error": 1.7303805497765914
+        }
+      },
+      "respondent": "CISO",
+      "selected_candidate": "xgboost_direct",
+      "validation_row_count": 1032
+    },
+    {
+      "candidate_metrics": {
+        "lightgbm_direct": {
+          "mean_absolute_error_mwh": 2253.5279602094956,
+          "mean_scaled_absolute_error": 1.1503528238116343
+        },
+        "ridge_direct": {
+          "mean_absolute_error_mwh": 2901.297508700841,
+          "mean_scaled_absolute_error": 1.4458086522544862
+        },
+        "seasonal_blend_24_168": {
+          "mean_absolute_error_mwh": 2543.3871124031007,
+          "mean_scaled_absolute_error": 1.3409370880818303
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 3913.1589147286822,
+          "mean_scaled_absolute_error": 2.0539601047870844
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 2224.5591085271317,
+          "mean_scaled_absolute_error": 1.1659084211911899
+        },
+        "xgboost_direct": {
+          "mean_absolute_error_mwh": 2266.1634650466344,
+          "mean_scaled_absolute_error": 1.1583048607125275
+        }
+      },
+      "respondent": "ERCO",
+      "selected_candidate": "lightgbm_direct",
+      "validation_row_count": 1032
+    },
+    {
+      "candidate_metrics": {
+        "lightgbm_direct": {
+          "mean_absolute_error_mwh": 1502.9416497678662,
+          "mean_scaled_absolute_error": 3.874038830631478
+        },
+        "ridge_direct": {
+          "mean_absolute_error_mwh": 1318.1356877201163,
+          "mean_scaled_absolute_error": 3.3890625362034577
+        },
+        "seasonal_blend_24_168": {
+          "mean_absolute_error_mwh": 1515.0833333333333,
+          "mean_scaled_absolute_error": 4.008322295182599
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 2524.8333333333335,
+          "mean_scaled_absolute_error": 6.6038277778643675
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 1377.1589147286822,
+          "mean_scaled_absolute_error": 3.6024855985750963
+        },
+        "xgboost_direct": {
+          "mean_absolute_error_mwh": 1543.0183441371246,
+          "mean_scaled_absolute_error": 3.960546099669712
+        }
+      },
+      "respondent": "ISNE",
+      "selected_candidate": "ridge_direct",
+      "validation_row_count": 1032
+    },
+    {
+      "candidate_metrics": {
+        "lightgbm_direct": {
+          "mean_absolute_error_mwh": 3832.8433839717327,
+          "mean_scaled_absolute_error": 1.6623478821433813
+        },
+        "ridge_direct": {
+          "mean_absolute_error_mwh": 3792.63280617011,
+          "mean_scaled_absolute_error": 1.628366131612718
+        },
+        "seasonal_blend_24_168": {
+          "mean_absolute_error_mwh": 4764.981104651163,
+          "mean_scaled_absolute_error": 2.096628510777296
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 8140.7761627906975,
+          "mean_scaled_absolute_error": 3.5128897299616924
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 3747.8023255813955,
+          "mean_scaled_absolute_error": 1.603966226655453
+        },
+        "xgboost_direct": {
+          "mean_absolute_error_mwh": 3748.5189721445995,
+          "mean_scaled_absolute_error": 1.62059405651819
+        }
+      },
+      "respondent": "MISO",
+      "selected_candidate": "seasonal_naive_24",
+      "validation_row_count": 1032
+    },
+    {
+      "candidate_metrics": {
+        "lightgbm_direct": {
+          "mean_absolute_error_mwh": 1563.1762841320287,
+          "mean_scaled_absolute_error": 2.84977264430489
+        },
+        "ridge_direct": {
+          "mean_absolute_error_mwh": 1450.1657261506782,
+          "mean_scaled_absolute_error": 2.674423000154388
+        },
+        "seasonal_blend_24_168": {
+          "mean_absolute_error_mwh": 1769.2136627906978,
+          "mean_scaled_absolute_error": 3.3047888244151475
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 3030.1637596899227,
+          "mean_scaled_absolute_error": 5.544228288204383
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 1508.8875968992247,
+          "mean_scaled_absolute_error": 2.8206730873128922
+        },
+        "xgboost_direct": {
+          "mean_absolute_error_mwh": 1599.047732163163,
+          "mean_scaled_absolute_error": 2.9099719661607923
+        }
+      },
+      "respondent": "NYIS",
+      "selected_candidate": "ridge_direct",
+      "validation_row_count": 1032
+    },
+    {
+      "candidate_metrics": {
+        "lightgbm_direct": {
+          "mean_absolute_error_mwh": 6381.43966662831,
+          "mean_scaled_absolute_error": 2.230977954601189
+        },
+        "ridge_direct": {
+          "mean_absolute_error_mwh": 6354.594558957525,
+          "mean_scaled_absolute_error": 2.2082633786198596
+        },
+        "seasonal_blend_24_168": {
+          "mean_absolute_error_mwh": 8099.660852713178,
+          "mean_scaled_absolute_error": 2.8525470057542357
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 13937.15988372093,
+          "mean_scaled_absolute_error": 4.8190774320198795
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 5991.522286821705,
+          "mean_scaled_absolute_error": 2.1221644054559476
+        },
+        "xgboost_direct": {
+          "mean_absolute_error_mwh": 6542.314047962196,
+          "mean_scaled_absolute_error": 2.288733691057079
+        }
+      },
+      "respondent": "PJM",
+      "selected_candidate": "seasonal_naive_24",
+      "validation_row_count": 1032
+    },
+    {
+      "candidate_metrics": {
+        "lightgbm_direct": {
+          "mean_absolute_error_mwh": 1924.7858760326114,
+          "mean_scaled_absolute_error": 1.591875521755939
+        },
+        "ridge_direct": {
+          "mean_absolute_error_mwh": 1907.3831555312045,
+          "mean_scaled_absolute_error": 1.572035857547411
+        },
+        "seasonal_blend_24_168": {
+          "mean_absolute_error_mwh": 2089.296996124031,
+          "mean_scaled_absolute_error": 1.7692991152211983
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 3400.34496124031,
+          "mean_scaled_absolute_error": 2.874988135060936
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 2094.2936046511627,
+          "mean_scaled_absolute_error": 1.7278728135976043
+        },
+        "xgboost_direct": {
+          "mean_absolute_error_mwh": 1883.4326598784317,
+          "mean_scaled_absolute_error": 1.5567284140218367
+        }
+      },
+      "respondent": "SWPP",
+      "selected_candidate": "xgboost_direct",
+      "validation_row_count": 1032
+    },
+    {
+      "candidate_metrics": {
+        "lightgbm_direct": {
+          "mean_absolute_error_mwh": 1330.6608042888759,
+          "mean_scaled_absolute_error": 1.5387171533728543
+        },
+        "ridge_direct": {
+          "mean_absolute_error_mwh": 1417.0840367069734,
+          "mean_scaled_absolute_error": 1.6455569642133956
+        },
+        "seasonal_blend_24_168": {
+          "mean_absolute_error_mwh": 1450.9646317829458,
+          "mean_scaled_absolute_error": 1.7077293756620278
+        },
+        "seasonal_naive_168": {
+          "mean_absolute_error_mwh": 2245.4031007751937,
+          "mean_scaled_absolute_error": 2.629959033960091
+        },
+        "seasonal_naive_24": {
+          "mean_absolute_error_mwh": 1243.9951550387598,
+          "mean_scaled_absolute_error": 1.4486778664431923
+        },
+        "xgboost_direct": {
+          "mean_absolute_error_mwh": 1376.7558015048967,
+          "mean_scaled_absolute_error": 1.599018876768868
+        }
+      },
+      "respondent": "TVA",
+      "selected_candidate": "seasonal_naive_24",
+      "validation_row_count": 1032
+    }
+  ],
+  "candidate_ids": [
+    "seasonal_naive_24",
+    "seasonal_naive_168",
+    "seasonal_blend_24_168",
+    "ridge_direct",
+    "xgboost_direct",
+    "lightgbm_direct"
+  ],
+  "claim_boundary": "Historical design scores select the frozen route map and are exploratory, not prospective confirmation evidence.",
+  "design_input_protocol_path": "config/eia_grid_all_authority_direct_hourly_protocol_v2.json",
+  "design_input_protocol_sha256": "7e362f8f9de541adbf405127fc56e9524c0ef89b9ee123452691244a71376f31",
+  "feature_diagnostics": {
+    "row_chain_sha256": "3fee64a5e448c7c6e57563499aea55e00dbb2143311508e6802f4644dc358d80",
+    "row_count": 36924,
+    "skipped": {
+      "level-scale history is incomplete": 108,
+      "recent actual window is incomplete": 18,
+      "required actual lag is unavailable": 30,
+      "weekly actual window is incomplete": 162
+    }
+  },
+  "fit_duration_ms": {
+    "lightgbm_direct": 1135.264,
+    "ridge_direct": 22.87,
+    "xgboost_direct": 2804.365
+  },
+  "generated_utc": "2026-07-16T05:30:46.135097+00:00",
+  "schema": "eia_grid_all_authority_direct_hourly_design_benchmark.v2",
+  "selected_route_map": {
+    "CISO": "xgboost_direct",
+    "ERCO": "lightgbm_direct",
+    "ISNE": "ridge_direct",
+    "MISO": "seasonal_naive_24",
+    "NYIS": "ridge_direct",
+    "PJM": "seasonal_naive_24",
+    "SWPP": "xgboost_direct",
+    "TVA": "seasonal_naive_24"
+  },
+  "source_panel_row_chain_sha256": "ab4c81cd742e4bd2379ef6525dc2bee3cb1d1b285064d25d6e045e2358d7b05e",
+  "source_panel_row_count": 86724,
+  "source_receipt_sha256": "f2c386a6c5496b7b7d65a8172ec03aebcd3d2dbe502419816cca01451ae2ad57",
+  "training_row_count": 28668,
+  "v1_code_sha256": "82f48921f5e3553fbb3b169ef1b1dc3e9c6677507735482e7d5cb820e12ccb41",
+  "v1_protocol_sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5",
+  "validation_row_count": 8256
+}

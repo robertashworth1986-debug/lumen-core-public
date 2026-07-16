@@ -1,0 +1,238 @@
+{
+  "schema": "eia_grid_all_authority_direct_hourly_protocol.v2",
+  "protocol_id": "EIA_GRID_ALL_AUTHORITY_DIRECT_HOURLY_20260716",
+  "version": 2,
+  "preregistered_date_utc": "2026-07-16",
+  "status": "design_frozen_before_prospective_collection",
+  "purpose": "Prospectively test a frozen direct-demand specialist router on one common EIA-930 hour across eight balancing authorities, with every prediction sealed before the common target interval begins.",
+  "predecessor": {
+    "protocol_id": "EIA_GRID_PROSPECTIVE_HOURLY_ROUTER_20260715",
+    "protocol_path": "config/eia_grid_prospective_hourly_router_protocol_v1.json",
+    "disposition": "preserved_internal_incomplete_authority_coverage",
+    "reason_for_successor": "SWPP and TVA target-hour EIA demand forecasts arrive after the target interval begins under observed source timing. Version 2 removes target-hour official forecast dependence without weakening the pre-interval seal or backfilling version 1."
+  },
+  "design_boundary": "Candidate definitions, features, hyperparameters, training windows, route selection, sample gates, and release gates are frozen before prospective collection. Version 1 outcomes may not select or alter version 2 routes.",
+  "source": {
+    "publisher": "U.S. Energy Information Administration",
+    "product": "Form EIA-930 hourly demand by balancing authority",
+    "api_route": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+    "frequency": "hourly",
+    "period_semantics": "UTC hour ending",
+    "actual_type": "D",
+    "official_forecast_type": "DF",
+    "native_unit": "megawatthours",
+    "history_start_utc": "2025-12-01T00",
+    "cache_refresh_lookback_hours": 336,
+    "credential_policy": "Read EIA_API_KEY or EIA_API_KEY_PREMIUM from the process environment and never serialize the credential."
+  },
+  "historical_design": {
+    "training_start_period_end_utc": "2026-01-01T00",
+    "training_end_period_end_utc": "2026-05-31T23",
+    "validation_start_period_end_utc": "2026-06-01T00",
+    "validation_end_period_end_utc": "2026-07-13T23",
+    "prospective_refit_start_period_end_utc": "2026-01-01T00",
+    "prospective_refit_end_period_end_utc": "2026-07-13T23",
+    "route_selection_metric": "mean_scaled_absolute_error",
+    "selection_rule": "For each authority, select the lexicographically tie-broken candidate with the lowest mean scaled absolute error on the frozen validation window.",
+    "result_path": "evidence/external_validation/eia_grid_all_authority_direct_hourly_design_benchmark_20260716.json",
+    "result_sha256": "97f21742f1664af0fb7eacc50539e706919f5f731f7e8200f9eaade88e5a407f",
+    "claim_rule": "Historical design scores select the frozen route map and are exploratory, not prospective confirmation evidence."
+  },
+  "prospective_window": {
+    "first_allowed_period_end_utc": "2026-07-16T08",
+    "preliminary_gate_common_hours_per_authority": 168,
+    "confirmatory_gate_common_hours_per_authority": 720,
+    "durability_gate_common_hours_per_authority": 2160,
+    "target_end_period_end_utc": null,
+    "backfilled_predictions_allowed": false
+  },
+  "balancing_authorities": [
+    "CISO",
+    "ERCO",
+    "ISNE",
+    "MISO",
+    "NYIS",
+    "PJM",
+    "SWPP",
+    "TVA"
+  ],
+  "authority_timezones": {
+    "CISO": "America/Los_Angeles",
+    "ERCO": "America/Chicago",
+    "ISNE": "America/New_York",
+    "MISO": "America/Chicago",
+    "NYIS": "America/New_York",
+    "PJM": "America/New_York",
+    "SWPP": "America/Chicago",
+    "TVA": "America/Chicago"
+  },
+  "feature_contract": {
+    "actual_lag_hours": [
+      24,
+      48,
+      72,
+      168,
+      336
+    ],
+    "recent_actual_window_offsets": [
+      24,
+      47
+    ],
+    "weekly_actual_window_offsets": [
+      168,
+      335
+    ],
+    "level_scale_window_offsets": [
+      24,
+      191
+    ],
+    "error_scale_window_offsets": [
+      24,
+      191
+    ],
+    "level_scale_definition": "Median positive actual demand across offsets 24 through 191 before the target.",
+    "error_scale_definition": "Median positive absolute one-hour demand difference across offsets 24 through 191 before the target.",
+    "authority_one_hot": true,
+    "calendar_features": [
+      "local_hour_sin_cos",
+      "local_day_of_week_sin_cos",
+      "local_day_of_year_sin_cos"
+    ],
+    "target_official_forecast_may_be_used": false,
+    "target_actual_may_be_used": false,
+    "future_observation_may_be_used": false
+  },
+  "candidates": [
+    {
+      "id": "seasonal_naive_24",
+      "definition": "Actual demand for the same authority 24 hours before the target."
+    },
+    {
+      "id": "seasonal_naive_168",
+      "definition": "Actual demand for the same authority 168 hours before the target."
+    },
+    {
+      "id": "seasonal_blend_24_168",
+      "definition": "Equal-weight mean of the 24-hour and 168-hour seasonal-naive forecasts."
+    },
+    {
+      "id": "ridge_direct",
+      "definition": "Deterministic ridge forecast of target demand normalized by a lag-only local level scale."
+    },
+    {
+      "id": "xgboost_direct",
+      "definition": "Deterministic XGBoost forecast of target demand normalized by a lag-only local level scale."
+    },
+    {
+      "id": "lightgbm_direct",
+      "definition": "Deterministic LightGBM forecast of target demand normalized by a lag-only local level scale."
+    }
+  ],
+  "model_contract": {
+    "target": "actual_mwh / lag_only_level_scale_mwh",
+    "fit_rule": "Fit each model only on complete rows in the frozen historical window. Prospective outcomes do not update model weights.",
+    "ridge": {
+      "alpha": 10.0
+    },
+    "xgboost": {
+      "n_estimators": 160,
+      "max_depth": 4,
+      "learning_rate": 0.04,
+      "subsample": 0.9,
+      "colsample_bytree": 0.9,
+      "reg_lambda": 10.0,
+      "objective": "reg:squarederror",
+      "random_state": 20260716,
+      "n_jobs": 1
+    },
+    "lightgbm": {
+      "n_estimators": 160,
+      "num_leaves": 31,
+      "learning_rate": 0.04,
+      "subsample": 0.9,
+      "colsample_bytree": 0.9,
+      "reg_lambda": 10.0,
+      "random_state": 20260716,
+      "n_jobs": 1,
+      "verbosity": -1
+    },
+    "hyperparameter_change_allowed": false,
+    "prospective_weight_update_allowed": false
+  },
+  "router": {
+    "id": "all_authority_direct_specialist_router_v2",
+    "kind": "deterministic_frozen_authority_router",
+    "route_map": {
+      "CISO": "xgboost_direct",
+      "ERCO": "lightgbm_direct",
+      "ISNE": "ridge_direct",
+      "MISO": "seasonal_naive_24",
+      "NYIS": "ridge_direct",
+      "PJM": "seasonal_naive_24",
+      "SWPP": "xgboost_direct",
+      "TVA": "seasonal_naive_24"
+    },
+    "route_reason_code": "FROZEN_HISTORICAL_AUTHORITY_WINNER_V2",
+    "dynamic_override_allowed": false,
+    "post_target_override_allowed": false
+  },
+  "prediction_seal": {
+    "require_target_official_forecast": false,
+    "require_target_actual_absent_at_seal": true,
+    "require_sealed_before_target_interval_start": true,
+    "require_one_common_target_for_all_authorities": true,
+    "require_atomic_all_authority_panel_record": true,
+    "minimum_target_interval_lead_hours": 1,
+    "target_interval": "The one-hour UTC interval ending at target_period_end_utc.",
+    "incomplete_panel_rule": "Fail closed and seal no panel if any authority lacks a required lag or violates a seal condition.",
+    "late_or_backfilled_target_rule": "Skip the target and record the reason. Never create a prediction after the target interval begins.",
+    "append_only": true,
+    "replacement_allowed": false,
+    "settlement_rule": "Append one settlement panel only after all eight target actuals are available for an already sealed panel."
+  },
+  "metrics": {
+    "primary": "scaled_absolute_error",
+    "secondary": [
+      "absolute_error_mwh",
+      "absolute_percentage_error",
+      "router_regret_to_oracle",
+      "route_hit_rate",
+      "specialist_usage_rate"
+    ],
+    "aggregation_unit": "common_balancing_authority_utc_hour_panel"
+  },
+  "promotion_gates": {
+    "coverage": {
+      "minimum_authorities_per_panel": 8,
+      "require_common_target": true,
+      "require_pre_interval_seal": true
+    },
+    "preliminary": {
+      "minimum_common_hours_per_authority": 168,
+      "label": "prospective_preliminary_signal",
+      "external_generalization_allowed": false
+    },
+    "confirmatory": {
+      "minimum_common_hours_per_authority": 720,
+      "must_beat_best_fixed_specialist": true,
+      "minimum_authority_mean_wins": 6,
+      "minimum_utc_day_win_rate": 0.6,
+      "maximum_single_authority_scaled_error_regression": 0.05,
+      "require_positive_authority_cluster_bootstrap_lower_bound": true
+    },
+    "durability": {
+      "minimum_common_hours_per_authority": 2160,
+      "require_confirmatory_gate": true,
+      "external_partner_replication_required": true
+    }
+  },
+  "external_release_gate": {
+    "evidence_packet_minimum_common_hours": 168,
+    "performance_claim_minimum_common_hours": 720,
+    "require_all_eight_authorities": true,
+    "require_zero_chain_failures": true,
+    "require_explicit_action_time_user_approval": true,
+    "current_release_allowed": false
+  },
+  "claim_boundary": "A passing confirmatory result would support bounded prospective public-data evidence for a frozen direct-demand hourly specialist router across the declared eight-authority panel. It does not establish patent validity or scope, utility control, realized savings, grid reliability improvement, production readiness, trading edge, or universal model superiority."
+}
