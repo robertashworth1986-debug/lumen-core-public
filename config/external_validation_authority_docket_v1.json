@@ -18,14 +18,14 @@
     "dynamic_route_override_allowed": false
   },
   "clean_runner_verification": {
-    "github_run_id": 29378952661,
-    "github_run_url": "https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/29378952661",
-    "commit": "f8a483c5fd5d78977b0d31619fae546358309d35",
+    "github_run_id": 29467209018,
+    "github_run_url": "https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/29467209018",
+    "commit": "41cf31f65b9278289a3ed7791443f7aa637953ad",
     "conclusion": "success",
-    "artifact_name": "reviewer-reproducibility-f8a483c5fd5d78977b0d31619fae546358309d35",
-    "artifact_api_digest": "sha256:3bb1ee96436b5dbc678144409b27cca2c458920f2994fb5d14b67a3bcd1f848d",
-    "receipt_capsule_sha256": "72f696fb8c9a330b207ab46f71760918fdf77e4a2cf1858fe4bc540ea61d32f2",
-    "archive_path": "evidence/reproducibility/github_run_29378952661",
+    "artifact_name": "reviewer-reproducibility-41cf31f65b9278289a3ed7791443f7aa637953ad",
+    "artifact_api_digest": "sha256:ad706ba655923d0d86d21b01bbf7a9100d81a6f9174eaaefa9083dc960a1b6ce",
+    "receipt_capsule_sha256": "a87df4bc8fa930f3841b8802407820ce5ba256331bc75e3b8c3f810a5bbe8e0c",
+    "archive_path": "evidence/reproducibility/github_run_29467209018",
     "artifact_retention_note": "The GitHub-hosted artifact has a finite retention window. The verified receipt, scoped SBOM, logs, and checksum manifest are preserved under archive_path."
   },
   "portable_input_paths": [

@@ -287,7 +287,7 @@ def test_context_preserves_positive_negative_and_waiting_evidence():
     assert hourly["target_maturity_level"] == 4
     assert hourly["status"] == "PROSPECTIVE_COLLECTION_ACTIVE"
     assert hourly["facts"]["prediction_count"] == 95
-    assert hourly["facts"]["settlement_count"] == 72
+    assert hourly["facts"]["settlement_count"] == 78
     assert hourly["facts"]["common_settled_hour_count"] == 0
     assert hourly["facts"]["preliminary_ready"] is False
     assert hourly["facts"]["confirmatory_ready"] is False

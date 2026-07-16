@@ -34,7 +34,7 @@ A passing result would support bounded prospective public-data evidence for a fr
 
 ## Dated Public Snapshot
 
-The public-safe runtime projection is [`eia_grid_prospective_hourly_runtime_projection_20260716.json`](../evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json). Its dated snapshot records 95 sealed predictions, 72 settlements, 0 common settled hours, and closed preliminary, confirmatory, durability, and promotion gates. The raw runtime ledgers remain outside the public repository; the projection preserves their hashes and terminal-chain receipts.
+The public-safe runtime projection is [`eia_grid_prospective_hourly_runtime_projection_20260716.json`](../evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json). That dated, hash-bound file is authoritative for snapshot counts, descriptive incomplete-sample metrics, and gate state. The raw runtime ledgers remain outside the public repository; the projection preserves their hashes and terminal-chain receipts.
 
 These incomplete-sample descriptive values do not support Level 4, external generalization, field performance, reliability, savings, production, or trading claims.
 

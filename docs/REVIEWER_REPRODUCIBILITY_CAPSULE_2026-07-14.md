@@ -23,8 +23,8 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 - Agency certification complete: `false`
 - Fixture tests executed: `true`
 - Fixture tests passed: `true`
-- Source chain SHA-256: `192b9b6da31901742b7fb290e8bc75c17ecbad575a8d67065c1d78a0954e049d`
-- Capsule SHA-256: `72f696fb8c9a330b207ab46f71760918fdf77e4a2cf1858fe4bc540ea61d32f2`
+- Source chain SHA-256: `e0e2b64af3ee782119ad988a2117de24f8f39a611a38eeba01b1088515958da7`
+- Capsule SHA-256: `a87df4bc8fa930f3841b8802407820ce5ba256331bc75e3b8c3f810a5bbe8e0c`
 
 ## Protocol Amendment
 
@@ -38,15 +38,15 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - Kind: `measured_public_data_replay`
 - Passed: `true`
-- Elapsed seconds: `21.982`
-- Fact projection SHA-256: `014fff0d31f18ba4c5dd764e9f1d2e966108e674d945e6eb45533e9f2df83f68`
+- Elapsed seconds: `31.981`
+- Fact projection SHA-256: `11bcfa0fe7bf90634e9a960669181c55091342f46ce8b19655fdc7653a43f3a7`
 - Facts:
   - `baseline_comparison_count`: `6`
-  - `best_mase`: `0.4794593727181181`
+  - `best_mase`: `0.4794593727181179`
   - `best_strategy`: `autoregressive_ridge_p14`
   - `evaluation_rows`: `22530`
   - `field_validation_complete`: `False`
-  - `kuramoto_mase`: `1.253508683225091`
+  - `kuramoto_mase`: `1.2535086832250912`
   - `promotion_gate_passed`: `False`
   - `selected_candidate`: `lissajous_phase_paths`
 - Assertions:
@@ -55,8 +55,8 @@ A passing capsule proves that the named code reproduced the declared bounded fac
   - `holdout_authorities` passed=`true` actual=`8` expected=`8`
   - `selected_candidate` passed=`true` actual=`lissajous_phase_paths` expected=`lissajous_phase_paths`
   - `best_strategy` passed=`true` actual=`autoregressive_ridge_p14` expected=`autoregressive_ridge_p14`
-  - `best_mase` passed=`true` actual=`0.4794593727181181` expected=`0.47945937271811834` absolute_tolerance=`1e-06` relative_difference=`4.631145359954717e-16`
-  - `kuramoto_mase` passed=`true` actual=`1.253508683225091` expected=`1.253508683225091` absolute_tolerance=`1e-06` relative_difference=`0.0`
+  - `best_mase` passed=`true` actual=`0.4794593727181179` expected=`0.47945937271811834` absolute_tolerance=`1e-06` relative_difference=`9.262290719909434e-16`
+  - `kuramoto_mase` passed=`true` actual=`1.2535086832250912` expected=`1.253508683225091` absolute_tolerance=`1e-06` relative_difference=`1.7713846572944643e-16`
   - `promotion_gate_passed` passed=`true` actual=`False` expected=`False`
   - `field_validation_complete` passed=`true` actual=`False` expected=`False`
 
@@ -64,7 +64,7 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - Kind: `measured_public_data_replay`
 - Passed: `true`
-- Elapsed seconds: `7.563`
+- Elapsed seconds: `10.14`
 - Fact projection SHA-256: `d2052b0fee6fd7b2ae89285084c4dd46fb3500fb3c998073a3b27976bb147eed`
 - Facts:
   - `baseline_comparison_count`: `6`
@@ -92,7 +92,7 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 
 - Kind: `deterministic_synthetic_falsification_replay`
 - Passed: `true`
-- Elapsed seconds: `0.075`
+- Elapsed seconds: `0.108`
 - Fact projection SHA-256: `6cbbc86400aa77f0305dd13c3d08b9a46dce26e731b96aade2abf2933d7f56e4`
 - Facts:
   - `candidate_micro_f1`: `0.9433962264150945`
