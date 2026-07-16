@@ -1,0 +1,54 @@
+name: Architecture Discovery Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - research/qmpl-swarm-validation-sweep
+    paths:
+      - "research/architecture_engine/**"
+      - ".github/workflows/architecture-discovery-audit.yml"
+  pull_request:
+    paths:
+      - "research/architecture_engine/**"
+
+permissions:
+  contents: read
+
+jobs:
+  static-architecture-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependency
+        run: python -m pip install --disable-pip-version-check pytest
+
+      - name: Run architecture audit
+        run: |
+          python research/architecture_engine/architecture_discovery.py \
+            --repo-root . \
+            --output architecture-audit-output \
+            --top-candidates 40
+
+      - name: Run tests
+        run: python -m pytest research/architecture_engine/tests -q
+
+      - name: Verify manifest exists
+        run: test -s architecture-audit-output/run_manifest.json
+
+      - name: Upload audit artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: architecture-discovery-audit
+          path: architecture-audit-output
+          if-no-files-found: error
+          retention-days: 30
