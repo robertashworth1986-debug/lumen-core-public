@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
+    [string]$RepoRoot = "",
     [string[]]$AdditionalRoots = @(),
     [string]$ConstantsPath = "",
     [string]$LexiconPath = "",
@@ -11,6 +11,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+
+if (-not $RepoRoot) {
+    $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
+}
 
 if (-not $OutputRoot) {
     $stamp = Get-Date -Format "yyyyMMdd_HHmmss"

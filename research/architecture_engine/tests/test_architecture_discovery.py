@@ -54,3 +54,26 @@ def test_external_metadata_mode_does_not_parse_symbols(tmp_path):
     assert len(candidates) == 1
     assert candidates[0].symbols == []
     assert candidates[0].scan_mode == "metadata"
+    assert candidates[0].sha256 == ""
+    assert candidates[0].content_hash_status == "not_computed_metadata_only"
+
+
+def test_external_metadata_mode_never_hashes_private_file_contents(tmp_path):
+    source = tmp_path / "LumaPrivateArchitecture.py"
+    source.write_text("TOP SECRET CONTENT SENTINEL", encoding="utf-8")
+    original = MODULE.sha256_file
+
+    def guarded_sha256(path):
+        if path == source:
+            raise AssertionError("metadata-only scan attempted to read private contents")
+        return original(path)
+
+    MODULE.sha256_file = guarded_sha256
+    try:
+        candidates = MODULE.scan_root(tmp_path, "authorized_external_1", "metadata", 100)
+    finally:
+        MODULE.sha256_file = original
+
+    assert len(candidates) == 1
+    assert candidates[0].relative_path == "LumaPrivateArchitecture.py"
+    assert candidates[0].sha256 == ""

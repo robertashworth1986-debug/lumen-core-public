@@ -91,6 +91,7 @@ class Candidate:
     relative_path: str
     extension: str
     sha256: str
+    content_hash_status: str
     size_bytes: int
     modified_utc: str
     category: str
@@ -331,7 +332,10 @@ def score_candidate(
         root_alias=root_alias,
         relative_path=safe_relative(path, root),
         extension=path.suffix.lower(),
-        sha256=sha256_file(path) or "",
+        sha256=(sha256_file(path) or "") if scan_mode == "content" else "",
+        content_hash_status=(
+            "computed" if scan_mode == "content" else "not_computed_metadata_only"
+        ),
         size_bytes=path.stat().st_size,
         modified_utc=utc_modified(path),
         category=category,
