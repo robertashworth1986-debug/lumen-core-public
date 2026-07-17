@@ -15,12 +15,18 @@ The local record proves a payment acknowledgement only. It does not prove a Fili
 - Filing Receipt found: `false`
 - Official correspondence found: `false`
 - Official status record found: `false`
+- Submitted-document list found: `false`
+- Fee history found: `false`
+- Transaction history found: `false`
 - Claims verified in official file: `false`
+- Required docket categories captured: `0/6`
+- Complete docket capture: `false`
+- Missing docket categories: `fee_history, filing_receipt, official_correspondence, official_status_record, submitted_document_list, transaction_history`
 - Basic filing fee only observed in local receipt: `true`
 - Private paths published: `false`
 - Private hashes published: `false`
 - Application identifier published: `false`
-- Control SHA-256: `abe59e654751a493c36c2f28806912a164488b6500b6959e976166fc7ad7a03b`
+- Control SHA-256: `3ccc2257bc8627bb22940970002446ed46e5caeb1f83f5e0bf48475edaabd480`
 
 ## Deadline Posture
 
@@ -46,7 +52,7 @@ The local record proves a payment acknowledgement only. It does not prove a Fili
 - Fee payment without human: `false`
 - Signature without human: `false`
 - Browser navigation performed by this control: `false`
-- Next safe action: After the user confirms the signed-in Patent Center application page is ready, download the Filing Receipt, all outgoing correspondence, submitted-document list, fee history, transaction history, and current status without filing or paying.
+- Next safe action: After the user confirms the signed-in Patent Center application page is ready, download every missing docket category without filing, paying, or signing.
 
 ## Official Sources
 

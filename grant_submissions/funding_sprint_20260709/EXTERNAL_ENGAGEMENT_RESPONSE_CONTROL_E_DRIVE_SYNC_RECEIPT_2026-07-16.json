@@ -1,34 +1,34 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T06:33:11.5974717Z",
+  "created_utc": "2026-07-17T07:07:45.5534256Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_20260716",
-  "artifact_count": 43,
+  "artifact_count": 47,
   "all_sha256_matched_after_copy": true,
   "browser_navigation_performed": false,
   "private_founder_values_mirrored": false,
   "artifacts": [
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
-      "bytes": 22730,
-      "sha256": "1C4A17753C7EB015348A667BFC3DBCEA88FFD5632773E212424FE3C5B1FCBF4E",
+      "bytes": 24177,
+      "sha256": "17001768E12C98C8D5EB28BD8EE3ED5532253C147D3B8D7867477A69F0FE60D2",
       "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 66473,
-      "sha256": "CFEF0D456B98BB5435407084441841B890A533AFBC6746E4DF8D3DEF3E81A9C5",
+      "bytes": 67670,
+      "sha256": "44B8149A90657FF1833BAFE417ED62CE828ECF62CC386DC3E6FD22E015E2AD4F",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
-      "bytes": 8860,
-      "sha256": "4E80BDC4108C49075F992EDAD14DADFDF69F2A90DBB5AA9F8BCB8CA51E2FF2DC",
+      "bytes": 9967,
+      "sha256": "7FD755302E813AA8F52903B6E69049D0E92A9C7FF867986C1898DE159B5EE8E4",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 8816,
-      "sha256": "30927E373955711AED240D56EF420F5C46E88EC67D5BDBF15371E778241ABFF4",
+      "bytes": 9218,
+      "sha256": "8745FE10BC5656642311E76622D3000EB12BA16C536FA5A7291CED8E58443DB7",
       "copy_sha256_matched": true
     },
     {
@@ -39,8 +39,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-      "bytes": 12694,
-      "sha256": "B7FC23F88BE019575B57606C1AFE5F77FE592431BCEB9F43655C7C6E4401D169",
+      "bytes": 13550,
+      "sha256": "DF1D6505437EE1F1768DBC04037831B53F082EC251BE68ADC4EF91357926EAB5",
       "copy_sha256_matched": true
     },
     {
@@ -111,8 +111,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
-      "bytes": 17347,
-      "sha256": "8F83E87A0239C1200979B99F45A862533034788E98A9EAD081F519D82EB108C5",
+      "bytes": 18719,
+      "sha256": "18E96110EBBF94C04E12DA2A5C730281C40E5C8D34CC9EB4CA5D6A6165BEE0E4",
       "copy_sha256_matched": true
     },
     {
@@ -263,6 +263,30 @@
       "source": "tests/test_capture_nashville_ec_private_facts.py",
       "bytes": 8362,
       "sha256": "3D1C57A3EDA269FB8CC305FDA6F808DDCDBE0F3F19A274B271625341B1882085",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/PREPARE_PATENT_CENTER_PRIVATE_CAPTURE.py",
+      "bytes": 15478,
+      "sha256": "2F5089F84E9C58FB71C71F8B095FE01E4622F109787CC2E51965C35440C239CA",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_prepare_patent_center_private_capture.py",
+      "bytes": 13032,
+      "sha256": "39F8CE4471E70622BC8D8B60D535573259CB39F9E4ACE266062F3351682B3AF1",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md",
+      "bytes": 3090,
+      "sha256": "632D44E5640A6AF6E2BB63F157219799C834DD383E892CAC3247C2D4FB98734C",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md",
+      "bytes": 1815,
+      "sha256": "FAC3AA9FD88207FB881F33B38201325369E4820CDC34F6562079FEE7218D4792",
       "copy_sha256_matched": true
     }
   ],

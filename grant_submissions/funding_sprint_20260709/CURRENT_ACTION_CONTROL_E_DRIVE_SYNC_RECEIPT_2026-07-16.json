@@ -1,26 +1,26 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T06:07:53.0409588Z",
+  "created_utc": "2026-07-17T07:07:44.7302807Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/CURRENT_ACTION_CONTROL_20260716",
-  "artifact_count": 21,
+  "artifact_count": 25,
   "all_sha256_matched_after_copy": true,
   "artifacts": [
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 66473,
-      "sha256": "CFEF0D456B98BB5435407084441841B890A533AFBC6746E4DF8D3DEF3E81A9C5",
+      "bytes": 67670,
+      "sha256": "44B8149A90657FF1833BAFE417ED62CE828ECF62CC386DC3E6FD22E015E2AD4F",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 8816,
-      "sha256": "30927E373955711AED240D56EF420F5C46E88EC67D5BDBF15371E778241ABFF4",
+      "bytes": 9218,
+      "sha256": "8745FE10BC5656642311E76622D3000EB12BA16C536FA5A7291CED8E58443DB7",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_epri_open_power_ai_mou_response.py",
-      "bytes": 5411,
-      "sha256": "BE152FA470CA4E8D72AD82894D112974702B0B505347D709EBD879D84B6D53CB",
+      "bytes": 5766,
+      "sha256": "0DF4E541A5CE1D0B959B7986F944932F2945217F115C4F5B508A07C531AD8FE3",
       "copy_sha256_matched": true
     },
     {
@@ -61,26 +61,26 @@
     },
     {
       "source": "code/ops/BUILD_PATENT_DEADLINE_EVIDENCE_CONTROL.py",
-      "bytes": 21099,
-      "sha256": "BD70F2F1B311A45ED9269E1CF63338DB972552BE93267D87DC1B9D848C31502F",
+      "bytes": 29656,
+      "sha256": "6A6093C9E7F990129B023A377B1DF25E6C16753187764A248B232F474F48120F",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_patent_deadline_evidence_control.py",
-      "bytes": 5130,
-      "sha256": "EA5DA6E7C00CFCA530A0F3BD7333C3AEC2880CCED1D2FA760E0F1EEC41130E13",
+      "bytes": 12586,
+      "sha256": "1405D62FF3A2863E30890F909F5A8B2B351D4910F677ED07D3B6AD7C09F3A55B",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json",
-      "bytes": 6290,
-      "sha256": "E51EFBEEE2B102ED8C79CCB771BE51697EEDBD3BA4F9F352C3A7D6CD2A02EB5A",
+      "bytes": 6671,
+      "sha256": "096904E114457C56383E495CFAD6C6E3D0D31596D6B53E2920099608B2B7519B",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.md",
-      "bytes": 5201,
-      "sha256": "59626A5F2CC9129BF58DD903B655C91438B6336C1ABBE9EC0B7ED238C7261A6A",
+      "bytes": 5461,
+      "sha256": "B548330BDA92B8514CE25E8415B81740661C8A1E1620D9DD7FD5705E57AAAE0C",
       "copy_sha256_matched": true
     },
     {
@@ -127,8 +127,32 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
-      "bytes": 38319,
-      "sha256": "E40578A5F4D266732BD90AC2A6D7504437BFCFE4DE30AB68D153AC6B322DC3A4",
+      "bytes": 38689,
+      "sha256": "B3C4B9143628A1418E45420F04A67B7D312D96CE372148B695196DCB548921D0",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/PREPARE_PATENT_CENTER_PRIVATE_CAPTURE.py",
+      "bytes": 15478,
+      "sha256": "2F5089F84E9C58FB71C71F8B095FE01E4622F109787CC2E51965C35440C239CA",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_prepare_patent_center_private_capture.py",
+      "bytes": 13032,
+      "sha256": "39F8CE4471E70622BC8D8B60D535573259CB39F9E4ACE266062F3351682B3AF1",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md",
+      "bytes": 3090,
+      "sha256": "632D44E5640A6AF6E2BB63F157219799C834DD383E892CAC3247C2D4FB98734C",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md",
+      "bytes": 1815,
+      "sha256": "FAC3AA9FD88207FB881F33B38201325369E4820CDC34F6562079FEE7218D4792",
       "copy_sha256_matched": true
     }
   ],

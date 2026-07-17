@@ -93,7 +93,7 @@ def test_action_control_packet_has_a_bounded_e_drive_integrity_receipt():
     receipt = json.loads(SYNC_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 21
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 25
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["destination_root"].startswith("E:/LumaProofVault/")
     assert "does not prove email transmission" in receipt["claim_boundary"]
@@ -128,4 +128,8 @@ def test_action_control_packet_has_a_bounded_e_drive_integrity_receipt():
         "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
         "dashboard/data/ip_counsel_diligence_packet.json",
         "docs/DEADLINE_RECOVERY_CHECKLIST.md",
+        "code/ops/PREPARE_PATENT_CENTER_PRIVATE_CAPTURE.py",
+        "tests/test_prepare_patent_center_private_capture.py",
+        "grant_submissions/funding_sprint_20260709/PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md",
+        "grant_submissions/funding_sprint_20260709/PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md",
     }.issubset(mirrored_sources)

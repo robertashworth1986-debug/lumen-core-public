@@ -23,6 +23,15 @@ GEORGIA_PATENTS_TEMPLATE = (
 GEORGIA_PATENTS_RECEIPT = (
     SPRINT_DIR / "GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json"
 )
+PATENT_DEADLINE_CONTROL = (
+    SPRINT_DIR / "PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json"
+)
+PATENT_PRIVATE_CAPTURE_WORKFLOW = (
+    SPRINT_DIR / "PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md"
+)
+PATENT_PRACTITIONER_TEMPLATE = (
+    SPRINT_DIR / "PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md"
+)
 NASHVILLE_MANIFEST = (
     ROOT
     / "grant_submissions"
@@ -157,11 +166,14 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     lanl = read_json(LANL_RECEIPT)
     epri = read_json(EPRI_RECEIPT)
     georgia_patents = read_json(GEORGIA_PATENTS_RECEIPT)
+    patent_control = read_json(PATENT_DEADLINE_CONTROL)
     nashville = read_json(NASHVILLE_MANIFEST)
     nashville_resolution = read_json(NASHVILLE_FACT_RESOLUTION)
 
     if nashville_resolution.get("status") != "SIX_FOUNDER_CONFIRMATIONS_REQUIRED":
         raise ValueError("Nashville EC human-fact resolution is missing or stale")
+    if patent_control.get("schema") != "lumencore.patent_deadline_evidence_control.v1":
+        raise ValueError("Patent deadline evidence control is missing or stale")
 
     nasa = submission_by_notice(submissions, "80TECH26RFI0020")
     army = submission_by_notice(submissions, "ACCAPGAIDPRFI4")
@@ -220,8 +232,15 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "no_send_before": georgia_patents["acknowledgment"]["earliest_follow_up_date"],
             "action_gate": "Reply only if Georgia PATENTS requests intake facts or directs the founder to a reviewed application channel; do not disclose unpublished application materials by ordinary email.",
             "response_artifact": rel(GEORGIA_PATENTS_RECEIPT),
-            "supporting_artifacts": [rel(GEORGIA_PATENTS_TEMPLATE)],
-            "next_action": "Monitor through July 23 while separately capturing the official Patent Center docket and using USPTO Pro Se procedural support.",
+            "supporting_artifacts": [
+                rel(GEORGIA_PATENTS_TEMPLATE),
+                rel(PATENT_PRIVATE_CAPTURE_WORKFLOW),
+                rel(PATENT_PRACTITIONER_TEMPLATE),
+            ],
+            "required_docket_role_count": patent_control["public_evidence_summary"]["required_docket_role_count"],
+            "captured_required_docket_role_count": patent_control["public_evidence_summary"]["captured_required_docket_role_count"],
+            "docket_capture_complete": patent_control["public_evidence_summary"]["docket_capture_complete"],
+            "next_action": "Monitor through July 23 without a duplicate email. In parallel, populate the six ignored Patent Center role folders and use USPTO Pro Se procedural support; send the held practitioner request only after recipient and secure-channel confirmation.",
             "claim_boundary": georgia_patents["claim_boundary"],
         },
         {
@@ -362,6 +381,9 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "epri_engagement_receipt": artifact_status(EPRI_RECEIPT),
             "georgia_patents_response_template": artifact_status(GEORGIA_PATENTS_TEMPLATE),
             "georgia_patents_engagement_receipt": artifact_status(GEORGIA_PATENTS_RECEIPT),
+            "patent_deadline_control": artifact_status(PATENT_DEADLINE_CONTROL),
+            "patent_private_capture_workflow": artifact_status(PATENT_PRIVATE_CAPTURE_WORKFLOW),
+            "patent_practitioner_request_template": artifact_status(PATENT_PRACTITIONER_TEMPLATE),
             "nashville_application_manifest": artifact_status(NASHVILLE_MANIFEST),
             "nashville_human_fact_resolution": artifact_status(NASHVILLE_FACT_RESOLUTION),
             "nashville_private_collector": artifact_status(NASHVILLE_PRIVATE_COLLECTOR),

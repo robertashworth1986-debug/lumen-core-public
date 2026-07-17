@@ -96,6 +96,23 @@ REQUIRED_PATENT_CENTER_CAPTURE = [
     },
 ]
 
+REQUIRED_DOCKET_ROLES = (
+    "official_status_record",
+    "filing_receipt",
+    "official_correspondence",
+    "submitted_document_list",
+    "fee_history",
+    "transaction_history",
+)
+KNOWN_DOCKET_ROLES = frozenset(
+    REQUIRED_DOCKET_ROLES
+    + (
+        "claims_record",
+        "payment_acknowledgement",
+        "payment_receipt_screenshot",
+    )
+)
+
 CLAIM_BOUNDARY = (
     "This control classifies only the local evidence supplied to it. A payment acknowledgement "
     "proves receipt of the listed payment, not a granted filing date, complete application, "
@@ -168,6 +185,65 @@ def collect_evidence(role_paths: dict[str, list[Path]]) -> list[dict[str, Any]]:
     return records
 
 
+def derive_evidence_facts(records: Any) -> dict[str, Any]:
+    if not isinstance(records, list):
+        raise ValueError("Private patent docket evidence must be a list")
+
+    roles: set[str] = set()
+    unique_hashes: set[str] = set()
+    for row in records:
+        if not isinstance(row, dict):
+            raise ValueError("Private patent docket evidence row must be an object")
+        role = row.get("role")
+        if not isinstance(role, str) or role not in KNOWN_DOCKET_ROLES:
+            raise ValueError("Private patent docket evidence role is invalid")
+        source_hash = row.get("source_sha256")
+        if not isinstance(source_hash, str) or not re.fullmatch(
+            r"[0-9A-Fa-f]{64}", source_hash
+        ):
+            raise ValueError("Private patent docket evidence hash is invalid")
+        source_path = row.get("private_source_path")
+        source_name = row.get("source_name")
+        size = row.get("bytes")
+        canonical = row.get("canonical")
+        duplicate_of = row.get("duplicate_of_private_source_path")
+        if not isinstance(source_path, str) or not source_path:
+            raise ValueError("Private patent docket evidence path is invalid")
+        if not isinstance(source_name, str) or not source_name:
+            raise ValueError("Private patent docket evidence name is invalid")
+        if not isinstance(size, int) or isinstance(size, bool) or size < 0:
+            raise ValueError("Private patent docket evidence size is invalid")
+        if not isinstance(canonical, bool):
+            raise ValueError("Private patent docket canonical marker is invalid")
+        if duplicate_of is not None and not isinstance(duplicate_of, str):
+            raise ValueError("Private patent docket duplicate marker is invalid")
+        roles.add(role)
+        unique_hashes.add(source_hash.upper())
+
+    missing_required_roles = sorted(set(REQUIRED_DOCKET_ROLES) - roles)
+    return {
+        "source_count": len(records),
+        "unique_source_count": len(unique_hashes),
+        "duplicate_source_count": len(records) - len(unique_hashes),
+        "document_roles": sorted(roles),
+        "payment_acknowledgement_found": bool(
+            roles.intersection(
+                {"payment_acknowledgement", "payment_receipt_screenshot"}
+            )
+        ),
+        "filing_receipt_found": "filing_receipt" in roles,
+        "official_correspondence_found": "official_correspondence" in roles,
+        "official_status_record_found": "official_status_record" in roles,
+        "submitted_document_list_found": "submitted_document_list" in roles,
+        "fee_history_found": "fee_history" in roles,
+        "transaction_history_found": "transaction_history" in roles,
+        "claims_record_found": "claims_record" in roles,
+        "required_docket_roles": list(REQUIRED_DOCKET_ROLES),
+        "missing_required_docket_roles": missing_required_roles,
+        "docket_capture_complete": not missing_required_roles,
+    }
+
+
 def build_private_payload(
     *,
     records: list[dict[str, Any]],
@@ -177,15 +253,7 @@ def build_private_payload(
     basic_filing_fee_only_observed: bool,
     generated_utc: str | None = None,
 ) -> dict[str, Any]:
-    roles = {str(row["role"]) for row in records}
-    unique_hashes = {str(row["source_sha256"]) for row in records}
-    payment_acknowledgement_found = bool(
-        roles.intersection({"payment_acknowledgement", "payment_receipt_screenshot"})
-    )
-    filing_receipt_found = "filing_receipt" in roles
-    official_correspondence_found = "official_correspondence" in roles
-    official_status_record_found = "official_status_record" in roles
-    claims_record_found = "claims_record" in roles
+    evidence_facts = derive_evidence_facts(records)
 
     payload: dict[str, Any] = {
         "schema": "lumencore.patent_deadline_private_docket.v1",
@@ -196,15 +264,7 @@ def build_private_payload(
         "payment_received_date": payment_received_date,
         "evidence": records,
         "summary": {
-            "source_count": len(records),
-            "unique_source_count": len(unique_hashes),
-            "duplicate_source_count": len(records) - len(unique_hashes),
-            "document_roles": sorted(roles),
-            "payment_acknowledgement_found": payment_acknowledgement_found,
-            "filing_receipt_found": filing_receipt_found,
-            "official_correspondence_found": official_correspondence_found,
-            "official_status_record_found": official_status_record_found,
-            "claims_record_found": claims_record_found,
+            **evidence_facts,
             "basic_filing_fee_only_observed": basic_filing_fee_only_observed,
         },
         "deadline_posture": {
@@ -222,48 +282,84 @@ def build_private_payload(
 
 def build_public_payload(private_payload: dict[str, Any]) -> dict[str, Any]:
     private_summary = private_payload["summary"]
-    filing_receipt_found = bool(private_summary["filing_receipt_found"])
-    official_correspondence_found = bool(
-        private_summary["official_correspondence_found"]
-    )
-    official_status_record_found = bool(
-        private_summary["official_status_record_found"]
+    evidence_facts = derive_evidence_facts(private_payload.get("evidence"))
+    filing_receipt_found = evidence_facts["filing_receipt_found"]
+    official_correspondence_found = evidence_facts[
+        "official_correspondence_found"
+    ]
+    official_status_record_found = evidence_facts["official_status_record_found"]
+    submitted_document_list_found = evidence_facts[
+        "submitted_document_list_found"
+    ]
+    fee_history_found = evidence_facts["fee_history_found"]
+    transaction_history_found = evidence_facts["transaction_history_found"]
+    missing_required_roles = list(evidence_facts["missing_required_docket_roles"])
+    docket_capture_complete = not missing_required_roles
+    official_role_count = sum(
+        1
+        for found in (
+            filing_receipt_found,
+            official_correspondence_found,
+            official_status_record_found,
+            submitted_document_list_found,
+            fee_history_found,
+            transaction_history_found,
+        )
+        if found
     )
 
-    if (
-        filing_receipt_found
-        and official_correspondence_found
-        and official_status_record_found
-    ):
+    if docket_capture_complete:
         status = "OFFICIAL_DOCKET_CAPTURED_PRACTITIONER_REVIEW_REQUIRED"
-    elif private_summary["payment_acknowledgement_found"]:
+        direct_answer = (
+            "Files assigned to all six required Patent Center docket categories are locally "
+            "captured and hashed. This proves capture completeness only, not the legal effect or "
+            "content of any notice. The newest official correspondence still controls any U.S. "
+            "response deadline, and registered-practitioner review remains required."
+        )
+    elif official_role_count:
+        status = "PARTIAL_OFFICIAL_DOCKET_CAPTURE_REMAINING_DOWNLOADS_REQUIRED"
+        direct_answer = (
+            f"The local record contains {official_role_count} of six required Patent Center "
+            "docket categories. The remaining categories must be downloaded before any complete-"
+            "docket or U.S.-deadline claim. The newest official notice controls any response task."
+        )
+    elif evidence_facts["payment_acknowledgement_found"]:
         status = "PAYMENT_ACKNOWLEDGEMENT_ONLY_OFFICIAL_DOCKET_REQUIRED"
-    else:
-        status = "NO_OFFICIAL_DOCKET_EVIDENCE_CAPTURED"
-
-    payload: dict[str, Any] = {
-        "schema": "lumencore.patent_deadline_evidence_control.v1",
-        "generated_utc": private_payload["generated_utc"],
-        "status": status,
-        "direct_answer": (
+        direct_answer = (
             "The local record proves a payment acknowledgement only. It does not prove a "
             "Filing Receipt, complete application, current status, verified claims, or an "
             "outstanding response deadline. The official Patent Center docket must be captured "
             "before any U.S. deadline claim. Foreign or PCT priority strategy is a separate, "
             "potentially time-sensitive counsel question."
-        ),
+        )
+    else:
+        status = "NO_OFFICIAL_DOCKET_EVIDENCE_CAPTURED"
+        direct_answer = (
+            "No locally captured evidence is sufficient to establish the official Patent Center "
+            "docket or any U.S. response deadline. Capture all six required categories before "
+            "making a deadline claim."
+        )
+
+    payload: dict[str, Any] = {
+        "schema": "lumencore.patent_deadline_evidence_control.v1",
+        "generated_utc": private_payload["generated_utc"],
+        "status": status,
+        "direct_answer": direct_answer,
         "public_evidence_summary": {
-            "source_count": int(private_summary["source_count"]),
-            "unique_source_count": int(private_summary["unique_source_count"]),
-            "duplicate_source_count": int(private_summary["duplicate_source_count"]),
-            "document_roles": list(private_summary["document_roles"]),
-            "payment_acknowledgement_found": bool(
-                private_summary["payment_acknowledgement_found"]
-            ),
+            "source_count": evidence_facts["source_count"],
+            "unique_source_count": evidence_facts["unique_source_count"],
+            "duplicate_source_count": evidence_facts["duplicate_source_count"],
+            "document_roles": list(evidence_facts["document_roles"]),
+            "payment_acknowledgement_found": evidence_facts[
+                "payment_acknowledgement_found"
+            ],
             "filing_receipt_found": filing_receipt_found,
             "official_correspondence_found": official_correspondence_found,
             "official_status_record_found": official_status_record_found,
-            "claims_record_found": bool(private_summary["claims_record_found"]),
+            "submitted_document_list_found": submitted_document_list_found,
+            "fee_history_found": fee_history_found,
+            "transaction_history_found": transaction_history_found,
+            "claims_record_found": evidence_facts["claims_record_found"],
             "basic_filing_fee_only_observed": bool(
                 private_summary["basic_filing_fee_only_observed"]
             ),
@@ -271,22 +367,29 @@ def build_public_payload(private_payload: dict[str, Any]) -> dict[str, Any]:
             "private_hashes_published": False,
             "application_identifier_published": False,
             "payment_identifier_published": False,
+            "required_docket_role_count": len(REQUIRED_DOCKET_ROLES),
+            "captured_required_docket_role_count": len(REQUIRED_DOCKET_ROLES)
+            - len(missing_required_roles),
+            "missing_required_docket_roles": missing_required_roles,
+            "docket_capture_complete": docket_capture_complete,
         },
         "deadline_posture": private_payload["deadline_posture"],
         "required_patent_center_capture": REQUIRED_PATENT_CENTER_CAPTURE,
         "official_sources": OFFICIAL_SOURCES,
         "human_action_gate": {
             "browser_navigation_performed_by_control": False,
-            "patent_center_download_required": True,
+            "patent_center_download_required": not docket_capture_complete,
             "registered_practitioner_review_required": True,
             "legal_filing_allowed_without_human": False,
             "fee_payment_allowed_without_human": False,
             "signature_allowed_without_human": False,
             "public_claim_expansion_allowed": False,
             "next_safe_action": (
-                "After the user confirms the signed-in Patent Center application page is ready, "
-                "download the Filing Receipt, all outgoing correspondence, submitted-document "
-                "list, fee history, transaction history, and current status without filing or paying."
+                "Have a registered practitioner review the complete captured docket and newest "
+                "official correspondence before any legal filing, payment, signature, or deadline claim."
+                if docket_capture_complete
+                else "After the user confirms the signed-in Patent Center application page is ready, "
+                "download every missing docket category without filing, paying, or signing."
             ),
         },
         "claim_boundary": CLAIM_BOUNDARY,
@@ -350,7 +453,13 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Filing Receipt found: `{str(evidence['filing_receipt_found']).lower()}`",
         f"- Official correspondence found: `{str(evidence['official_correspondence_found']).lower()}`",
         f"- Official status record found: `{str(evidence['official_status_record_found']).lower()}`",
+        f"- Submitted-document list found: `{str(evidence['submitted_document_list_found']).lower()}`",
+        f"- Fee history found: `{str(evidence['fee_history_found']).lower()}`",
+        f"- Transaction history found: `{str(evidence['transaction_history_found']).lower()}`",
         f"- Claims verified in official file: `{str(evidence['claims_record_found']).lower()}`",
+        f"- Required docket categories captured: `{evidence['captured_required_docket_role_count']}/{evidence['required_docket_role_count']}`",
+        f"- Complete docket capture: `{str(evidence['docket_capture_complete']).lower()}`",
+        f"- Missing docket categories: `{', '.join(evidence['missing_required_docket_roles']) or 'none'}`",
         f"- Basic filing fee only observed in local receipt: `{str(evidence['basic_filing_fee_only_observed']).lower()}`",
         f"- Private paths published: `{str(evidence['private_paths_published']).lower()}`",
         f"- Private hashes published: `{str(evidence['private_hashes_published']).lower()}`",
@@ -421,6 +530,40 @@ def write_text(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
+def read_private_docket(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(payload, dict):
+        raise ValueError("Private patent docket must be a JSON object")
+    if payload.get("schema") != "lumencore.patent_deadline_private_docket.v1":
+        raise ValueError("Unexpected private patent docket schema")
+    if payload.get("private_only") is not True:
+        raise ValueError("Private patent docket must retain private_only=true")
+    summary = payload.get("summary")
+    evidence = payload.get("evidence")
+    if not isinstance(summary, dict) or not isinstance(evidence, list):
+        raise ValueError("Private patent docket is missing evidence or summary")
+    recorded_hash = payload.get("private_docket_sha256")
+    if not isinstance(recorded_hash, str) or not re.fullmatch(
+        r"[0-9A-Fa-f]{64}", recorded_hash
+    ):
+        raise ValueError("Private patent docket hash is missing or invalid")
+    unsigned_payload = dict(payload)
+    unsigned_payload.pop("private_docket_sha256", None)
+    if recorded_hash.lower() != stable_sha256(unsigned_payload):
+        raise ValueError("Private patent docket hash does not match its contents")
+
+    derived = derive_evidence_facts(evidence)
+    for key, expected in derived.items():
+        if key in summary and summary[key] != expected:
+            raise ValueError(
+                f"Private patent docket summary contradicts evidence: {key}"
+            )
+    basic_fee_observed = summary.get("basic_filing_fee_only_observed", False)
+    if not isinstance(basic_fee_observed, bool):
+        raise ValueError("Private patent docket fee observation must be boolean")
+    return payload
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Build private and public-safe patent deadline evidence controls."
@@ -430,11 +573,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--filing-receipt", action="append", type=Path, default=[])
     parser.add_argument("--official-correspondence", action="append", type=Path, default=[])
     parser.add_argument("--official-status-record", action="append", type=Path, default=[])
+    parser.add_argument("--submitted-document-list", action="append", type=Path, default=[])
+    parser.add_argument("--fee-history", action="append", type=Path, default=[])
+    parser.add_argument("--transaction-history", action="append", type=Path, default=[])
     parser.add_argument("--claims-record", action="append", type=Path, default=[])
     parser.add_argument("--application-number")
     parser.add_argument("--application-type")
     parser.add_argument("--payment-received-date")
     parser.add_argument("--basic-filing-fee-only-observed", action="store_true")
+    parser.add_argument(
+        "--private-docket-input",
+        type=Path,
+        help="Rebuild only the redacted public control from an existing ignored private docket",
+    )
     parser.add_argument("--private-output", type=Path, default=PRIVATE_OUT)
     parser.add_argument("--public-json", type=Path, default=OUT_JSON)
     parser.add_argument("--public-markdown", type=Path, default=OUT_MD)
@@ -449,15 +600,35 @@ def main() -> None:
         "filing_receipt": args.filing_receipt,
         "official_correspondence": args.official_correspondence,
         "official_status_record": args.official_status_record,
+        "submitted_document_list": args.submitted_document_list,
+        "fee_history": args.fee_history,
+        "transaction_history": args.transaction_history,
         "claims_record": args.claims_record,
     }
-    private_payload = build_private_payload(
-        records=collect_evidence(role_paths),
-        application_number=args.application_number,
-        application_type=args.application_type,
-        payment_received_date=args.payment_received_date,
-        basic_filing_fee_only_observed=args.basic_filing_fee_only_observed,
+    direct_private_values_used = bool(
+        args.application_number
+        or args.application_type
+        or args.payment_received_date
+        or args.basic_filing_fee_only_observed
     )
+    evidence_paths_used = any(role_paths.values())
+    if args.private_docket_input:
+        if direct_private_values_used or evidence_paths_used:
+            raise SystemExit(
+                "--private-docket-input cannot be combined with evidence paths or private metadata arguments"
+            )
+        private_payload = read_private_docket(args.private_docket_input)
+        private_output_written = False
+    else:
+        private_payload = build_private_payload(
+            records=collect_evidence(role_paths),
+            application_number=args.application_number,
+            application_type=args.application_type,
+            payment_received_date=args.payment_received_date,
+            basic_filing_fee_only_observed=args.basic_filing_fee_only_observed,
+        )
+        write_json(args.private_output, private_payload)
+        private_output_written = True
     public_payload = build_public_payload(private_payload)
     rendered = render_markdown(public_payload)
     validate_public_redaction(public_payload, private_payload)
@@ -465,7 +636,6 @@ def main() -> None:
         {"rendered_markdown": rendered, "control_sha256": public_payload["control_sha256"]},
         private_payload,
     )
-    write_json(args.private_output, private_payload)
     write_json(args.public_json, public_payload)
     write_text(args.public_markdown, rendered)
     print(
@@ -474,7 +644,8 @@ def main() -> None:
                 "status": public_payload["status"],
                 "source_count": private_payload["summary"]["source_count"],
                 "unique_source_count": private_payload["summary"]["unique_source_count"],
-                "private_output": str(args.private_output),
+                "existing_private_docket_input_used": args.private_docket_input is not None,
+                "private_output_written": private_output_written,
                 "public_json": str(args.public_json),
                 "public_markdown": str(args.public_markdown),
                 "private_values_printed": False,

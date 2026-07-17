@@ -13,7 +13,7 @@ Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPR
 - All attachment checks pass: `true`
 - Autonomous external send allowed: `false`
 - Autonomous final portal submit allowed: `false`
-- Register SHA-256: `8c9c9d70f4df4133686718144a96aea87354e85fa924ce8c30c5361482953f53`
+- Register SHA-256: `c0f4495233d1c9215e45235b586ed6a81cd16de0c85e1dd3cc1a9b76dd5db28a`
 
 ## Response Queue
 
@@ -64,10 +64,10 @@ Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPR
 - Response ready: `false`
 - Send now: `false`
 - Action gate: Reply only if Georgia PATENTS requests intake facts or directs the founder to a reviewed application channel; do not disclose unpublished application materials by ordinary email.
-- Next action: Monitor through July 23 while separately capturing the official Patent Center docket and using USPTO Pro Se procedural support.
+- Next action: Monitor through July 23 without a duplicate email. In parallel, populate the six ignored Patent Center role folders and use USPTO Pro Se procedural support; send the held practitioner request only after recipient and secure-channel confirmation.
 - Response artifact: `grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - Claim boundary: This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice.
-- Record SHA-256: `886fabc1d8b0f3c6cd0c9141235f3ec9deef3398dc58bb70afffff762215a275`
+- Record SHA-256: `155c39511691f2d5bc6005b40a3869a6e86e24611363d439f57662a38c6aae4f`
 
 ### Centers for Disease Control and Prevention
 
@@ -155,10 +155,13 @@ LumenCore
 - `epri_engagement_receipt`: present=`true` bytes=`1481` sha256=`EBAFA995EB6D0BBC3749315F1F41EAC1CB0A28E56AE2EC6439C2E69757752EE8` path=`grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - `georgia_patents_response_template`: present=`true` bytes=`2822` sha256=`1AFB40471C270B6DC7D69D2B07D7718D5D57DB8D16B1CB96F6B42FADE33D2A39` path=`grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_RESPONSE_2026-07-16.md`
 - `georgia_patents_engagement_receipt`: present=`true` bytes=`1595` sha256=`F7041E085AB62A100A41C35D8E056A0E7FE4F47FFC37D5C463FA68C5EF3C3F5F` path=`grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json`
+- `patent_deadline_control`: present=`true` bytes=`6671` sha256=`096904E114457C56383E495CFAD6C6E3D0D31596D6B53E2920099608B2B7519B` path=`grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json`
+- `patent_private_capture_workflow`: present=`true` bytes=`3091` sha256=`B41AB11E25D439AFF5B54B70B7E5B38B4DF46DC4DDFBA8B843D4FD5547295100` path=`grant_submissions/funding_sprint_20260709/PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md`
+- `patent_practitioner_request_template`: present=`true` bytes=`1818` sha256=`3E4128C5DA105DDCB59303D3887E69CB7E9D26DFF0FC81CB98D5B9F9485EE712` path=`grant_submissions/funding_sprint_20260709/PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md`
 - `nashville_application_manifest`: present=`true` bytes=`18360` sha256=`CD9501D1A61E248A62329595297592D00593BF0086C87DA58E120DF43DE2EF11` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json`
 - `nashville_human_fact_resolution`: present=`true` bytes=`8597` sha256=`998A267A08DF9E8923FAB1E57740F00F52270228A49417F40DA73AF4AA6D4D33` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
 - `nashville_private_collector`: present=`true` bytes=`11024` sha256=`379A150CC558D9A37ED53D8C48C291275C3A04241CB91F164377E309A5E9D165` path=`code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py`
-- `nashville_private_workflow`: present=`true` bytes=`2148` sha256=`47D928F922DB9E1CF70DAC3C70BD9BF26E243A9091F813273F3DB2C0A0DC971F` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md`
+- `nashville_private_workflow`: present=`true` bytes=`2256` sha256=`FAD93E7ED7C93A1406657D5D678A3673CFD73ED29FE4DE5205E223E948EA9D88` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md`
 - `nashville_private_fill_map`: present=`false` bytes=`0` sha256=`None` path=`grant_submissions/NASHVILLE_EC_FALL_2026/private/nashville_ec_portal_fill_map.private.json`
 
 ## Claim Boundary

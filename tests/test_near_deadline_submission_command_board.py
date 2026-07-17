@@ -54,6 +54,13 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert patent_control["filing_receipt_found"] is False
     assert patent_control["official_correspondence_found"] is False
     assert patent_control["official_status_record_found"] is False
+    assert patent_control["required_docket_role_count"] == 6
+    assert patent_control["captured_required_docket_role_count"] == 0
+    assert patent_control["docket_capture_complete"] is False
+    assert len(patent_control["missing_required_docket_roles"]) == 6
+    assert patent_control["private_capture_workflow"].endswith(
+        "PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md"
+    )
     assert patent_control["us_prosecution_deadline"] == (
         "UNVERIFIED_REQUIRES_NEWEST_OFFICIAL_NOTICE"
     )

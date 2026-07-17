@@ -58,6 +58,9 @@ SAM_KEY_ROTATION_CONTROL = (
 PATENT_DEADLINE_CONTROL = (
     SPRINT_DIR / "PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json"
 )
+PATENT_PRIVATE_CAPTURE_WORKFLOW = (
+    SPRINT_DIR / "PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md"
+)
 
 OUT_JSON = OUT_OPS / "near_deadline_submission_command_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "near_deadline_submission_command_board.json"
@@ -966,9 +969,14 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
                 "filing_receipt_found": patent_deadline_control["public_evidence_summary"]["filing_receipt_found"],
                 "official_correspondence_found": patent_deadline_control["public_evidence_summary"]["official_correspondence_found"],
                 "official_status_record_found": patent_deadline_control["public_evidence_summary"]["official_status_record_found"],
+                "required_docket_role_count": patent_deadline_control["public_evidence_summary"]["required_docket_role_count"],
+                "captured_required_docket_role_count": patent_deadline_control["public_evidence_summary"]["captured_required_docket_role_count"],
+                "docket_capture_complete": patent_deadline_control["public_evidence_summary"]["docket_capture_complete"],
+                "missing_required_docket_roles": patent_deadline_control["public_evidence_summary"]["missing_required_docket_roles"],
                 "us_prosecution_deadline": patent_deadline_control["deadline_posture"]["us_prosecution_deadline"],
                 "foreign_pct_priority": patent_deadline_control["deadline_posture"]["foreign_pct_priority"],
                 "control_artifact": rel(PATENT_DEADLINE_CONTROL),
+                "private_capture_workflow": rel(PATENT_PRIVATE_CAPTURE_WORKFLOW),
                 "human_action_required": True,
                 "browser_navigation_performed": False,
             },
@@ -1120,8 +1128,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
                     f"- Filing Receipt found: `{str(control['filing_receipt_found']).lower()}`",
                     f"- Official correspondence found: `{str(control['official_correspondence_found']).lower()}`",
                     f"- Official status record found: `{str(control['official_status_record_found']).lower()}`",
+                    f"- Required docket categories captured: `{control['captured_required_docket_role_count']}/{control['required_docket_role_count']}`",
+                    f"- Complete docket capture: `{str(control['docket_capture_complete']).lower()}`",
+                    f"- Missing docket categories: `{', '.join(control['missing_required_docket_roles']) or 'none'}`",
                     f"- U.S. prosecution deadline: `{control['us_prosecution_deadline']}`",
                     f"- Foreign or PCT priority: `{control['foreign_pct_priority']}`",
+                    f"- Private capture workflow: `{control['private_capture_workflow']}`",
                 ]
             )
         lines.extend(

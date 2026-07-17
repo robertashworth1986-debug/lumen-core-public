@@ -26,7 +26,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public A
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `789f28595a311058e5cb793724942a4f750ed0a2fcf314760117053fb82001ba`
+- Command board SHA-256: `68b56a1782fb45dc4d4bdf48d7b4281e9d35b2b4535347ba771d9a820f52b100`
 
 ## Operational Controls
 
@@ -51,8 +51,12 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public A
 - Filing Receipt found: `false`
 - Official correspondence found: `false`
 - Official status record found: `false`
+- Required docket categories captured: `0/6`
+- Complete docket capture: `false`
+- Missing docket categories: `fee_history, filing_receipt, official_correspondence, official_status_record, submitted_document_list, transaction_history`
 - U.S. prosecution deadline: `UNVERIFIED_REQUIRES_NEWEST_OFFICIAL_NOTICE`
 - Foreign or PCT priority: `TIME_SENSITIVE_PRACTITIONER_REVIEW_REQUIRED_IF_FOREIGN_RIGHTS_DESIRED`
+- Private capture workflow: `grant_submissions/funding_sprint_20260709/PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md`
 - Human action required: `true`
 - Browser navigation performed: `false`
 - Control artifact: `grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json`
@@ -637,6 +641,6 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public A
 - `nashville_ec_portal_field_map`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md` present=`true` sha256=`63bdfafebade22432a6d1ffc3509c8c5ee1685270144f12cc8124ae483bca017`
 - `nashville_ec_application_manifest`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json` present=`true` sha256=`cd9501d1a61e248a62329595297592d00593bf0086c87da58e120df43de2ef11`
 - `nashville_ec_human_fact_resolution`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json` present=`true` sha256=`998a267a08df9e8923fab1e57740f00f52270228a49417f40da73af4aa6d4d33`
-- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`0a0e2d63f3b1be5dc6033366a4fe3d641fdd0bad229b02254825ea3eb359a526`
+- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`77febed82dce0e4760301707b6d70d83e36a631ef19b80aee7b24fe6a1118e84`
 - `sam_public_key_rotation_control`: `grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json` present=`true` sha256=`6635a3fa854bd29c14547e6112cb66c51c5b8238908c438099a52610d140a563`
-- `patent_deadline_evidence_control`: `grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json` present=`true` sha256=`e51efbeee2b102ed8c79ccb771be51697eedbd3ba4f9f352c3a7d6cd2a02eb5a`
+- `patent_deadline_evidence_control`: `grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json` present=`true` sha256=`096904e114457c56383e495cfad6c6e3d0d31596d6b53e2920099608b2b7519b`

@@ -1,6 +1,6 @@
 {
   "claim_boundary": "This control classifies only the local evidence supplied to it. A payment acknowledgement proves receipt of the listed payment, not a granted filing date, complete application, verified claims, current pendency, patentability, freedom to operate, or absence of an outstanding notice. A filing anniversary is not, by itself, a U.S. prosecution response deadline. Foreign or PCT priority strategy can be separately time-sensitive and requires prompt review by a registered patent practitioner.",
-  "control_sha256": "abe59e654751a493c36c2f28806912a164488b6500b6959e976166fc7ad7a03b",
+  "control_sha256": "3ccc2257bc8627bb22940970002446ed46e5caeb1f83f5e0bf48475edaabd480",
   "deadline_posture": {
     "filing_anniversary": "NOT_A_US_PROSECUTION_RESPONSE_DEADLINE_BY_ITSELF",
     "foreign_pct_priority": "TIME_SENSITIVE_PRACTITIONER_REVIEW_REQUIRED_IF_FOREIGN_RIGHTS_DESIRED",
@@ -13,7 +13,7 @@
     "browser_navigation_performed_by_control": false,
     "fee_payment_allowed_without_human": false,
     "legal_filing_allowed_without_human": false,
-    "next_safe_action": "After the user confirms the signed-in Patent Center application page is ready, download the Filing Receipt, all outgoing correspondence, submitted-document list, fee history, transaction history, and current status without filing or paying.",
+    "next_safe_action": "After the user confirms the signed-in Patent Center application page is ready, download every missing docket category without filing, paying, or signing.",
     "patent_center_download_required": true,
     "public_claim_expansion_allowed": false,
     "registered_practitioner_review_required": true,
@@ -58,20 +58,34 @@
   "public_evidence_summary": {
     "application_identifier_published": false,
     "basic_filing_fee_only_observed": true,
+    "captured_required_docket_role_count": 0,
     "claims_record_found": false,
+    "docket_capture_complete": false,
     "document_roles": [
       "payment_acknowledgement",
       "payment_receipt_screenshot"
     ],
     "duplicate_source_count": 1,
+    "fee_history_found": false,
     "filing_receipt_found": false,
+    "missing_required_docket_roles": [
+      "fee_history",
+      "filing_receipt",
+      "official_correspondence",
+      "official_status_record",
+      "submitted_document_list",
+      "transaction_history"
+    ],
     "official_correspondence_found": false,
     "official_status_record_found": false,
     "payment_acknowledgement_found": true,
     "payment_identifier_published": false,
     "private_hashes_published": false,
     "private_paths_published": false,
+    "required_docket_role_count": 6,
     "source_count": 6,
+    "submitted_document_list_found": false,
+    "transaction_history_found": false,
     "unique_source_count": 5
   },
   "required_patent_center_capture": [

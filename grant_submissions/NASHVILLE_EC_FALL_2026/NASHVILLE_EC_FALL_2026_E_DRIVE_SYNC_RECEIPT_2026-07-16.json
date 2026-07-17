@@ -1,54 +1,63 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T01:39:20.8738371Z",
+  "created_utc": "2026-07-17T07:03:31.3817886Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FALL_2026_CONTROL_20260716",
   "artifact_count": 9,
   "all_sha256_matched_after_copy": true,
   "artifacts": [
     {
       "source": "code/ops/BUILD_NASHVILLE_EC_FALL_2026_APPLICATION.py",
-      "bytes": 17307,
-      "sha256": "B429FEC40D0F6B2F01EF3BE55F0395B91A3982C5B359BA1269A4A369DFFE1AA2"
+      "bytes": 18556,
+      "sha256": "7EBCCB415DC7340398870E20809497F3BCA919C4C4D308B5E60875DA908D10DE",
+      "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 59321,
-      "sha256": "8188FDF03C8682730147DB311746391AC614BDFCD38155E3A22D6A6250E35643"
+      "bytes": 67670,
+      "sha256": "44B8149A90657FF1833BAFE417ED62CE828ECF62CC386DC3E6FD22E015E2AD4F",
+      "copy_sha256_matched": true
     },
     {
       "source": "tests/test_nashville_ec_fall_2026_application.py",
-      "bytes": 4154,
-      "sha256": "2C15A62B0A17B7475F90CC63B4A611E2E061325A45E3FA12FEA46E3885F42ED8"
+      "bytes": 4761,
+      "sha256": "D4B53FDF4CE4F54BBF27CF83267B7432C379E7295634275E4434590EB3B4E231",
+      "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 6611,
-      "sha256": "F9935C8B85815B416D719A73BF6AF4DB6F6D21E9AFD27FB71BA009DC40E7838F"
+      "bytes": 9218,
+      "sha256": "8745FE10BC5656642311E76622D3000EB12BA16C536FA5A7291CED8E58443DB7",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json",
-      "bytes": 17728,
-      "sha256": "1BC772F56253112A346F3A6C3D02D9BF328C639407587386BF00803C14BA764E"
+      "bytes": 18360,
+      "sha256": "CD9501D1A61E248A62329595297592D00593BF0086C87DA58E120DF43DE2EF11",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md",
-      "bytes": 12631,
-      "sha256": "CAE7B41FB8B562EE693AC6F34409D9F1B514A885AAFADE6B796074873B67A8CC"
+      "bytes": 12886,
+      "sha256": "63BDFAFEBADE22432A6D1FFC3509C8C5EE1685270144F12CC8124AE483BCA017",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
-      "bytes": 35182,
-      "sha256": "27F8927377490B749FCC67B864DC378FB9EAC594A8F3531420FEAE72793223C3"
+      "bytes": 38019,
+      "sha256": "2DD6E5291A34A780CBBA3414B80187E9C2788C3878E98093A6EEEA79B7B9C0D7",
+      "copy_sha256_matched": true
     },
     {
       "source": "out/ops/near_deadline_submission_command_board_latest.json",
-      "bytes": 46733,
-      "sha256": "46601F72149536E861C9EF2A25FE5E5B54A3D9F45C199373568CABFC4FD874F2"
+      "bytes": 50808,
+      "sha256": "D10C428E27291BE10CFE733BAB7BBBB588CD8C4DB8BE806E996E33772E0DD6C7",
+      "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/near_deadline_submission_command_board.json",
-      "bytes": 46733,
-      "sha256": "46601F72149536E861C9EF2A25FE5E5B54A3D9F45C199373568CABFC4FD874F2"
+      "bytes": 50808,
+      "sha256": "D10C428E27291BE10CFE733BAB7BBBB588CD8C4DB8BE806E996E33772E0DD6C7",
+      "copy_sha256_matched": true
     }
   ],
   "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove application submission, program acceptance, customer validation, funding, fee payment, terms acceptance, revenue, technical validation, award, deployment, or field performance."

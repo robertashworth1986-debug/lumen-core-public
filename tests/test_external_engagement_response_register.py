@@ -65,7 +65,17 @@ def test_register_routes_current_actions_without_duplicate_sends():
     )
     assert records["georgia_patents_pro_bono_intake"]["no_send_before"] == "2026-07-24"
     assert records["georgia_patents_pro_bono_intake"]["do_not_duplicate_send"] is True
+    assert records["georgia_patents_pro_bono_intake"]["required_docket_role_count"] == 6
+    assert records["georgia_patents_pro_bono_intake"]["captured_required_docket_role_count"] == 0
+    assert records["georgia_patents_pro_bono_intake"]["docket_capture_complete"] is False
+    assert any(
+        path.endswith("PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md")
+        for path in records["georgia_patents_pro_bono_intake"]["supporting_artifacts"]
+    )
     assert payload["source_artifacts"]["georgia_patents_engagement_receipt"]["present"] is True
+    assert payload["source_artifacts"]["patent_deadline_control"]["present"] is True
+    assert payload["source_artifacts"]["patent_private_capture_workflow"]["present"] is True
+    assert payload["source_artifacts"]["patent_practitioner_request_template"]["present"] is True
     assert payload["source_artifacts"]["epri_engagement_receipt"]["present"] is True
     assert records["cdc_ai_acquisition_rfi"]["decision"] == "MONITOR_NO_REPLY_REQUIRED"
     assert records["lanl_vision_licensing_followup"]["no_send_before"] == "2026-07-23"
@@ -124,7 +134,7 @@ def test_mirror_receipt_matches_every_bounded_source():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 43
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 47
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["browser_navigation_performed"] is False
     assert receipt["private_founder_values_mirrored"] is False
@@ -164,6 +174,10 @@ def test_mirror_receipt_matches_every_bounded_source():
         "tests/test_nashville_ec_private_facts.py",
         "config/nashville_ec_private_facts_template_v1.json",
         "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md",
+        "code/ops/PREPARE_PATENT_CENTER_PRIVATE_CAPTURE.py",
+        "tests/test_prepare_patent_center_private_capture.py",
+        "grant_submissions/funding_sprint_20260709/PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md",
+        "grant_submissions/funding_sprint_20260709/PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md",
     }.issubset(mirrored_sources)
 
     assert "does not prove" in receipt["claim_boundary"]
