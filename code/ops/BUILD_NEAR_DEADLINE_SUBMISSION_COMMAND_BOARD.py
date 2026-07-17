@@ -335,6 +335,8 @@ def build_command_lanes(
     erdc = sam.get("W912HZ26SC005", {})
     bop = sam.get("15BCMS26Q70000005", {})
     nsf = grants.get("26-510", {})
+    nsf_routing = read_json(NSF_ROUTING_MANIFEST)
+    nsf_full_proposal = nsf_routing.get("full_proposal", {})
     hud = grants.get("PDR-2600-DC-029Q", {})
     hhs_child = grants.get("HHS-2026-ACF-ACYF-CA-0037", {})
 
@@ -513,16 +515,34 @@ def build_command_lanes(
             ),
             "agency": nsf.get("raw", {}).get("agency", "U.S. National Science Foundation"),
             "deadline_utc": None,
-            "deadline_date": "2026-11-04",
+            "deadline_date": nsf_full_proposal.get(
+                "next_planning_target", "2026-11-04"
+            ),
+            "deadline_date_semantics": (
+                "INVITATION_CONTINGENT_PLANNING_TARGET_NOT_PROJECT_PITCH_DUE_DATE"
+            ),
             "deadline_semantics": "PROJECT_PITCH_GATE_ROLLING_FULL_PROPOSAL_INVITATION_REQUIRED",
             "project_pitch_due_date": None,
-            "full_proposal_planning_deadline_date": "2026-11-04",
+            "listed_full_proposal_deadline_dates": nsf_full_proposal.get(
+                "listed_deadlines", []
+            ),
+            "nearest_listed_full_proposal_deadline_date": nsf_full_proposal.get(
+                "nearest_listed_deadline"
+            ),
+            "nearest_listed_deadline_reachable": nsf_full_proposal.get(
+                "july_27_2026_reachable", False
+            ),
+            "full_proposal_planning_deadline_date": nsf_full_proposal.get(
+                "next_planning_target", "2026-11-04"
+            ),
             "full_proposal_submission_allowed": False,
             "invitation_verified": False,
             "portal_state_verified": False,
             "official_deadline_text": (
-                "Project Pitch is the current rolling gate; November 4, 2026 is a "
-                "planning target for a full proposal only if NSF issues a valid invitation"
+                "NSF 26-510 lists July 27 and November 4, 2026, then March 4 and "
+                "July 7, 2027, as full-proposal deadlines. July 27 is not currently "
+                "reachable because no official Project Pitch invitation was verified; "
+                "November 4 is planning only."
             ),
             "command": "STAGE_PROJECT_PITCH",
             "eligibility_state": "PROJECT_PITCH_REQUIRED_INVITATION_NOT_VERIFIED",
@@ -542,7 +562,8 @@ def build_command_lanes(
             ],
             "why_now": (
                 "This is the strongest grants-side route, but the immediate action is the "
-                "rolling Project Pitch rather than a July 27 full proposal. NSF 26-510 is "
+                "rolling Project Pitch. July 27 is an official full-proposal deadline but "
+                "is currently inaccessible without a verified invitation. NSF 26-510 is "
                 "the cleaner general deep-technology fit; use 26-511 only if NSF confirms "
                 "the software-defined scientific-instrumentation framing."
             ),
@@ -997,7 +1018,7 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "critical_same_day_infrastructure_action": sam_critical_action,
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
-            "best_grants_lane": "NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. November 4, 2026 is planning only.",
+            "best_grants_lane": "NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. July 27, 2026 is officially listed but currently inaccessible; November 4, 2026 is planning only.",
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03.",
             "fastest_low_friction_lane": "The Nashville EC TakeOff application is the nearest low-friction reviewer route, but six founder confirmations and final portal submission remain human-gated.",
             "all_final_actions_blocked_without_human": True,
@@ -1303,6 +1324,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
         )
         if lane.get("secondary_url"):
             lines.append(f"- Secondary URL: {lane['secondary_url']}")
+        if lane.get("deadline_date_semantics"):
+            lines.append(
+                f"- Deadline date semantics: `{lane['deadline_date_semantics']}`"
+            )
         lines.extend(
             [
                 f"- Why now: {lane['why_now']}",

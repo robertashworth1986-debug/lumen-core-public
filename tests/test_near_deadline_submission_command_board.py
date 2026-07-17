@@ -91,15 +91,29 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert nsf["deadline_date"] == "2026-11-04"
     assert nsf["deadline_utc"] is None
     assert nsf["project_pitch_due_date"] is None
+    assert nsf["listed_full_proposal_deadline_dates"] == [
+        "2026-07-27",
+        "2026-11-04",
+        "2027-03-04",
+        "2027-07-07",
+    ]
+    assert nsf["nearest_listed_full_proposal_deadline_date"] == "2026-07-27"
+    assert nsf["nearest_listed_deadline_reachable"] is False
     assert nsf["full_proposal_planning_deadline_date"] == "2026-11-04"
     assert nsf["full_proposal_submission_allowed"] is False
     assert nsf["invitation_verified"] is False
     assert nsf["deadline_semantics"] == (
         "PROJECT_PITCH_GATE_ROLLING_FULL_PROPOSAL_INVITATION_REQUIRED"
     )
-    assert "planning target" in nsf["official_deadline_text"]
+    assert "July 27" in nsf["official_deadline_text"]
+    assert "not currently reachable" in nsf["official_deadline_text"]
     assert "26-510" in payload["summary"]["best_grants_lane"]
+    assert "officially listed but currently inaccessible" in payload["summary"][
+        "best_grants_lane"
+    ]
     assert "planning only" in payload["summary"]["best_grants_lane"]
+    rendered = module.render_markdown(payload)
+    assert "INVITATION_CONTINGENT_PLANNING_TARGET" in rendered
 
     ec = next(
         row

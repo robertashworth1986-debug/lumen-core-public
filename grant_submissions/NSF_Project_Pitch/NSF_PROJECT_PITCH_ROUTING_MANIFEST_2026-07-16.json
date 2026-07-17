@@ -1,8 +1,9 @@
 {
-  "as_of_date": "2026-07-16",
+  "as_of_date": "2026-07-17",
   "claim_boundary": [
     "No NSF invitation is claimed.",
     "No full-proposal authorization is claimed.",
+    "A listed full-proposal deadline is not represented as reachable without a verified Project Pitch invitation.",
     "No customer commitment, independent validation, award, or realized economic impact is claimed.",
     "Portal state and legal company facts require human confirmation."
   ],
@@ -13,18 +14,30 @@
     "Technology Innovation": 3500
   },
   "full_proposal": {
-    "current_official_schedule_checked_on": "2026-07-16",
-    "current_official_schedule_deadline": "2026-11-04",
+    "current_official_schedule_checked_on": "2026-07-17",
+    "deadline_time": "17:00",
+    "deadline_timezone_semantics": "SUBMITTING_ORGANIZATION_LOCAL_TIME",
     "invitation_required": true,
     "invitation_verified": false,
+    "july_27_2026_access_state": "BLOCKED_NO_VERIFIED_PROJECT_PITCH_INVITATION",
+    "july_27_2026_currently_listed": true,
     "july_27_2026_reachable": false,
-    "july_27_2026_currently_listed": false,
+    "listed_deadlines": [
+      "2026-07-27",
+      "2026-11-04",
+      "2027-03-04",
+      "2027-07-07"
+    ],
+    "nearest_listed_deadline": "2026-07-27",
     "next_planning_target": "2026-11-04",
+    "next_planning_target_semantics": "EARLIEST_REALISTIC_TARGET_NOT_AUTHORIZATION_OR_GUARANTEE",
     "submission_allowed": false
   },
   "gmail_evidence": {
+    "evidence_boundary": "Mailbox search is not portal state and does not prove that an invitation cannot exist elsewhere.",
     "inbound_invitation_found": false,
-    "search_as_of_date": "2026-07-16"
+    "search_as_of_date": "2026-07-17",
+    "search_scope": "Official NSF and Seed Fund Project Pitch invitation terms were searched in the connected mailbox."
   },
   "official_sources": {
     "project_pitch_details": "https://seedfund.nsf.gov/apply/project-pitch/",
@@ -39,11 +52,15 @@
     "pending_project_pitch_status_verified": false
   },
   "project_pitch": {
+    "company_pitch_limit_per_12_months": 2,
     "current_gate": true,
     "deadline": null,
-    "deadline_semantics": "ROLLING_NO_FIXED_DUE_DATE_LISTED",
+    "deadline_semantics": "ROLLING_PREREQUISITE_NO_FIXED_DUE_DATE",
     "final_submit_allowed_without_human": false,
-    "portal_url": "https://seedfund.nsf.gov/project-pitch/"
+    "invitation_valid_for_next_full_proposal_deadlines": 2,
+    "one_active_pitch_at_a_time": true,
+    "portal_url": "https://seedfund.nsf.gov/project-pitch/",
+    "typical_response_time": "1-2 months"
   },
   "routing": {
     "alternate_solicitation": "NSF 26-511 only if NSF confirms scientific-instrumentation fit",

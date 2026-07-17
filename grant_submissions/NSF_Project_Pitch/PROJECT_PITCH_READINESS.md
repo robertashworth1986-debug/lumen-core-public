@@ -1,6 +1,6 @@
 # NSF Project Pitch Readiness
 
-Updated: July 16, 2026
+Updated: July 17, 2026
 
 ## Status
 
@@ -9,7 +9,7 @@ Updated: July 16, 2026
   Pitch.
 - SAM.gov and Research.gov readiness are not required to send the short pitch,
   but they will block an invited full proposal.
-- Official NSF Project Pitch field limits were rechecked July 16, 2026:
+- Official NSF Project Pitch field limits were rechecked July 17, 2026:
   3,500 characters for Technology Innovation, 3,500 for Technical Objectives
   and Challenges, 1,750 for Market Opportunity, and 1,750 for Company and
   Team.
@@ -19,11 +19,14 @@ Updated: July 16, 2026
   `PROJECT_PITCH_PASTE_CHECK_2026-07-16.md`.
 - Routing and deadline semantics are frozen in
   `NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json`.
-- The official solicitation schedule was rechecked July 16, 2026. It lists
-  November 4, 2026 for eligible invited full proposals and does not currently
-  list July 27. No full-proposal date is reachable without a valid invitation.
-- November 4, 2026 is a full-proposal planning target only if NSF issues a
-  valid invitation in time.
+- NSF 26-510 was rechecked July 17, 2026. It lists full-proposal deadlines of
+  July 27, 2026; November 4, 2026; March 4, 2027; and July 7, 2027, each at
+  5:00 PM in the submitting organization's local time.
+- No official Project Pitch invitation was verified in the reviewed Gmail
+  results as of July 17, so July 27 is listed but not currently reachable.
+- NSF states that Project Pitch responses typically take one to two months.
+  November 4, 2026 is therefore the earliest realistic full-proposal planning
+  target, not an authorization or guarantee.
 - NSF 26-510 is the primary route. NSF 26-511 remains an alternate only if
   NSF confirms that the proposed software-defined validation platform fits
   the scientific-instrumentation pilot.
@@ -32,7 +35,7 @@ Updated: July 16, 2026
 
 - Four required narrative sections drafted.
 - Four portal-ready fields drafted and locally counted:
-  - Technology Innovation: 2,852 / 3,500 characters.
+  - Technology Innovation: 3,070 / 3,500 characters.
   - Technical Objectives and Challenges: 2,419 / 3,500 characters.
   - Market Opportunity: 1,517 / 1,750 characters.
   - Company and Team: 1,223 / 1,750 characters.

@@ -128,6 +128,7 @@ def test_nsf_pitch_fields_stay_under_portal_limits():
     for field, row in nsf["nsf_fields"].items():
         assert row["ok"], field
         assert row["characters"] <= row["limit"], field
+    assert nsf["nsf_fields"]["Technology Innovation"]["characters"] == 3070
 
     required = {row["path"] for row in nsf["required_artifacts"]}
     assert (
@@ -147,9 +148,15 @@ def test_nsf_pitch_fields_stay_under_portal_limits():
     assert routing["full_proposal"]["invitation_verified"] is False
     assert routing["full_proposal"]["submission_allowed"] is False
     assert routing["full_proposal"]["july_27_2026_reachable"] is False
-    assert routing["full_proposal"]["july_27_2026_currently_listed"] is False
-    assert routing["full_proposal"]["current_official_schedule_checked_on"] == "2026-07-16"
-    assert routing["full_proposal"]["current_official_schedule_deadline"] == "2026-11-04"
+    assert routing["full_proposal"]["july_27_2026_currently_listed"] is True
+    assert routing["full_proposal"]["current_official_schedule_checked_on"] == "2026-07-17"
+    assert routing["full_proposal"]["nearest_listed_deadline"] == "2026-07-27"
+    assert routing["full_proposal"]["listed_deadlines"] == [
+        "2026-07-27",
+        "2026-11-04",
+        "2027-03-04",
+        "2027-07-07",
+    ]
     assert routing["full_proposal"]["next_planning_target"] == "2026-11-04"
 
 
@@ -179,4 +186,6 @@ def test_nsf_pitch_is_claim_bounded_and_contains_required_reviewer_content():
 
     assert "does not claim an NSF invitation" in packet
     assert "does not claim" in lowered
-    assert "july 27 is not listed on the current schedule" in lowered
+    assert "july 27 is a full-proposal deadline" in lowered
+    assert "july 27 full-proposal deadline is not currently reachable" in lowered
+    assert "july 27 is not listed on the current schedule" not in lowered

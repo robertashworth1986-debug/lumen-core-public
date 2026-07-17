@@ -19,14 +19,14 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public A
 - Critical infrastructure action: SAM.gov public API-key rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action.
 - Closest deadline lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Closest stage-ready lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
-- Best grants lane: NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. November 4, 2026 is planning only.
+- Best grants lane: NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. July 27, 2026 is officially listed but currently inaccessible; November 4, 2026 is planning only.
 - Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03.
 - Fastest low-friction lane: The Nashville EC TakeOff application is the nearest low-friction reviewer route, but six founder confirmations and final portal submission remain human-gated.
 - Final submit without human: `false`
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `ce3f11cfd3a41f6e022fabc6825ae2236c0314ccb3f92bd092d06a83d4e861eb`
+- Command board SHA-256: `48b11d2c5dd30ddabdd30ad0ac7047ed0d46a68efb55bbce8d4e0baf5dca1c8d`
 
 ## Operational Controls
 
@@ -126,7 +126,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public A
 
 - Command: `STAGE_PROJECT_PITCH`
 - Deadline UTC: `None`
-- Official deadline: Project Pitch is the current rolling gate; November 4, 2026 is a planning target for a full proposal only if NSF issues a valid invitation
+- Official deadline: NSF 26-510 lists July 27 and November 4, 2026, then March 4 and July 7, 2027, as full-proposal deadlines. July 27 is not currently reachable because no official Project Pitch invitation was verified; November 4 is planning only.
 - Official URL: https://seedfund.nsf.gov/project-pitch/
 - Package files:
   - `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md`
@@ -378,7 +378,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public A
 - Source: `NSF Seed Fund Project Pitch`
 - Agency: `U.S. National Science Foundation`
 - Deadline UTC: `None`
-- Official deadline: Project Pitch is the current rolling gate; November 4, 2026 is a planning target for a full proposal only if NSF issues a valid invitation
+- Official deadline: NSF 26-510 lists July 27 and November 4, 2026, then March 4 and July 7, 2027, as full-proposal deadlines. July 27 is not currently reachable because no official Project Pitch invitation was verified; November 4 is planning only.
 - Days to close from scan date: `110`
 - Deadline bucket: `later`
 - Command: `STAGE_PROJECT_PITCH`
@@ -387,7 +387,8 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public A
 - Route: NSF Seed Fund Project Pitch now; Research.gov full proposal only after an official invitation
 - Official URL: https://seedfund.nsf.gov/project-pitch/
 - Secondary URL: https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology/nsf26-510/solicitation
-- Why now: This is the strongest grants-side route, but the immediate action is the rolling Project Pitch rather than a July 27 full proposal. NSF 26-510 is the cleaner general deep-technology fit; use 26-511 only if NSF confirms the software-defined scientific-instrumentation framing.
+- Deadline date semantics: `INVITATION_CONTINGENT_PLANNING_TARGET_NOT_PROJECT_PITCH_DUE_DATE`
+- Why now: This is the strongest grants-side route, but the immediate action is the rolling Project Pitch. July 27 is an official full-proposal deadline but is currently inaccessible without a verified invitation. NSF 26-510 is the cleaner general deep-technology fit; use 26-511 only if NSF confirms the software-defined scientific-instrumentation framing.
 - Today work:
   - Confirm in the Project Pitch portal that no pitch is pending and no invitation or full proposal is open.
   - Paste the four locally counted, claim-bounded fields from the canonical portal packet.
@@ -402,7 +403,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public A
   - `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_READINESS.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `5e73a46737b7acf6f2a655ade644e1209314322b6e449b0f6fe9f5e878a94c9b`
+- Lane SHA-256: `f2774d5e283b4c470e1eff3849be1007fda1f2b27bc55a8ee7c5aa69e00ef8fa`
 
 ### 8. W912HZ26SC005 - Sovereign Defense Cloud for High-Performance Computing Commercial Solutions Opening
 
@@ -679,8 +680,8 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public A
 - `cdc_engagement_receipt`: `grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json` present=`true` sha256=`292157621b722b1973a1aa55140f08586ab41d07fbe38672b348c73e8a865b78`
 - `doj_bop_go_no_go`: `grant_submissions/DOJ_BOP_15BCMS26Q70000005/DOJ_BOP_15BCMS26Q70000005_GO_NO_GO_2026-07-16.md` present=`true` sha256=`bd188bcb6a23f9786ed08dc0717d5e9c93fdd583e830b53983d9c5379850caa0`
 - `doj_bop_source_manifest`: `grant_submissions/DOJ_BOP_15BCMS26Q70000005/DOJ_BOP_15BCMS26Q70000005_SOURCE_MANIFEST_2026-07-16.json` present=`true` sha256=`0282a6778ecc0c31890b93c1f68ffdb011139086ee640595262b95600df6af46`
-- `nsf_project_pitch_portal_fields`: `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md` present=`true` sha256=`75ed8ece7ddbdf0bf3b5ef1a9c3e33c74fec53bcdded9334efc1cd62bfe99b8b`
-- `nsf_project_pitch_routing_manifest`: `grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json` present=`true` sha256=`6d0d9f8656c12cbb20c991523adc07064d1947249d6a10245fcc0c5ea9cac3ab`
+- `nsf_project_pitch_portal_fields`: `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md` present=`true` sha256=`d8d64a91508a4bc7eefcfa40afbc3057f03505756ef781fd505c382801274169`
+- `nsf_project_pitch_routing_manifest`: `grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json` present=`true` sha256=`ccad75e6650082a067bc37f514f54f489f9dd3f869a6b5c089822f93078acb01`
 - `nashville_ec_portal_field_map`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md` present=`true` sha256=`63bdfafebade22432a6d1ffc3509c8c5ee1685270144f12cc8124ae483bca017`
 - `nashville_ec_application_manifest`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json` present=`true` sha256=`cd9501d1a61e248a62329595297592d00593bf0086c87da58e120df43de2ef11`
 - `nashville_ec_human_fact_resolution`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json` present=`true` sha256=`998a267a08df9e8923fab1e57740f00f52270228a49417f40da73af4aa6d4d33`

@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.nsf_project_pitch_source_audit.v1",
-  "as_of_date": "2026-07-16",
+  "as_of_date": "2026-07-17",
   "official_facts": {
     "field_limits": {
       "Technology Innovation": 3500,
@@ -11,8 +11,17 @@
     "typical_response_time": "1-2 months",
     "only_one_pending_pitch": true,
     "full_proposal_requires_invitation": true,
-    "current_invited_full_proposal_deadline": "2026-11-04",
-    "july_27_2026_currently_listed": false
+    "listed_full_proposal_deadlines": [
+      "2026-07-27",
+      "2026-11-04",
+      "2027-03-04",
+      "2027-07-07"
+    ],
+    "nearest_listed_full_proposal_deadline": "2026-07-27",
+    "july_27_2026_currently_listed": true,
+    "july_27_2026_reachable": false,
+    "july_27_2026_access_state": "BLOCKED_NO_VERIFIED_PROJECT_PITCH_INVITATION",
+    "next_planning_target": "2026-11-04"
   },
   "local_field_counts": {
     "Technology Innovation": {
@@ -42,7 +51,7 @@
   },
   "official_sources": [
     "https://seedfund.nsf.gov/apply/project-pitch/",
-    "https://seedfund.nsf.gov/solicitations/"
+    "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology/nsf26-510/solicitation"
   ],
   "claim_boundary": "Official schedule and field controls do not prove portal eligibility, invitation, submission, review, or award."
 }

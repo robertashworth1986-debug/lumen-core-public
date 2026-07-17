@@ -1,6 +1,6 @@
 # NSF Project Pitch Portal Fields
 
-Updated: July 16, 2026
+Updated: July 17, 2026
 
 Working title: Evidence-Calibrated Model Routing and Abstention for High-Consequence Time-Series Systems
 
@@ -8,7 +8,7 @@ Primary route: NSF 26-510, general deep technology and trustworthy AI.
 
 Alternate route: NSF 26-511 only if NSF confirms that the software-defined validation platform fits the scientific-instrumentation pilot.
 
-Official Project Pitch field limits checked July 16, 2026:
+Official Project Pitch field limits rechecked July 17, 2026:
 
 - Technology Innovation: 3,500 characters
 - Technical Objectives and Challenges: 3,500 characters
@@ -17,7 +17,7 @@ Official Project Pitch field limits checked July 16, 2026:
 
 Character counts checked locally after drafting:
 
-- Technology Innovation: 2,852 / 3,500 characters (648 spare)
+- Technology Innovation: 3,070 / 3,500 characters (430 spare)
 - Technical Objectives and Challenges: 2,419 / 3,500 characters (1,081 spare)
 - Market Opportunity: 1,517 / 1,750 characters (233 spare)
 - Company and Team: 1,223 / 1,750 characters (527 spare)
@@ -64,10 +64,10 @@ The founder's advantage is speed of integration across data ingestion, evaluatio
 
 ## Routing Status
 
-- The Project Pitch is the current rolling gate; NSF does not list July 27 as a Project Pitch deadline.
-- The current official solicitation schedule, rechecked July 16, 2026, lists November 4, 2026 for eligible invited full proposals. July 27 is not listed on the current schedule.
-- No Project Pitch invitation was verified in the reviewed Gmail results as of July 16, 2026.
-- November 4, 2026 is a full-proposal planning target only if NSF issues a valid invitation in time.
+- The Project Pitch is the current rolling prerequisite; July 27 is a full-proposal deadline, not a Project Pitch deadline.
+- NSF 26-510 was rechecked July 17, 2026 and lists full-proposal deadlines of July 27, 2026; November 4, 2026; March 4, 2027; and July 7, 2027, each at 5:00 PM in the submitting organization's local time.
+- No official Project Pitch invitation was verified in the reviewed Gmail results as of July 17, 2026, so the July 27 full-proposal deadline is not currently reachable.
+- NSF states that Project Pitch responses typically take one to two months. November 4, 2026 is therefore the earliest realistic planning target, not an authorization or guarantee.
 - Before any portal action, verify that the company has no pending Project Pitch, open invitation, or Phase I proposal under review.
 
 ## Submission Boundary

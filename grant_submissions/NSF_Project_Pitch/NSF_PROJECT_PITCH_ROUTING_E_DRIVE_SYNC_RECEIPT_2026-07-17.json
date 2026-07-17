@@ -1,0 +1,96 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "created_utc": "2026-07-17T09:46:06.1423092Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/NSF_PROJECT_PITCH_ROUTING_20260717",
+  "artifact_count": 14,
+  "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "private_founder_values_mirrored": false,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_NSF_PROJECT_PITCH_ROUTING_CONTROL.py",
+      "bytes": 6388,
+      "sha256": "2D7A8FBFB67856B38F6863CF53893C228659AB6D776EF29A188F41D3CEB30C2C",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py",
+      "bytes": 34190,
+      "sha256": "02442394EA95E48C48A4AC9EA852CBF9C55EC6C6FDAEE407C4E2C0C75D9471A6",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_PACKAGE_DECISION_GATE.py",
+      "bytes": 16750,
+      "sha256": "2E29D9F6EFFB48C218F0BC45EDC467AB63B48B1529FEB80BEAA42D1C35B291AA",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "bytes": 72235,
+      "sha256": "B47407C0F3E18439C3300E2DD0DB69AA43E3B143BE37257D7D32C9F84521CD38",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_nsf_project_pitch_routing_control.py",
+      "bytes": 3005,
+      "sha256": "080D5089AE43C9067E078DB55C543E0C069C099679DF38EC50B2E922B9C71737",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_grant_submission_readiness_audit.py",
+      "bytes": 8664,
+      "sha256": "ECA7FD89361F217EDFA64B9234BC34EB3F6A48AF67D5AE0F8EA7C96BD5629401",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_package_decision_gate.py",
+      "bytes": 3506,
+      "sha256": "20AE0C56F4FE17E55794B9CF008E8F45388C7AB7B9219C421A196837F1302D5B",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_submission_command_board.py",
+      "bytes": 10794,
+      "sha256": "EEA01E87164A61615AEDAFA07C47FDE98783E293EFF92E9310FF6E9C2210F038",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json",
+      "bytes": 3321,
+      "sha256": "CCAD75E6650082A067BC37F514F54F489F9DD3F869A6B5C089822F93078ACB01",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_SOURCE_AUDIT_2026-07-16.json",
+      "bytes": 1777,
+      "sha256": "D4D81558474C81082B99C2F654AE7DB8767BAD0870F5C15F6D40BEA0658F4425",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PASTE_CHECK_2026-07-16.md",
+      "bytes": 1578,
+      "sha256": "D5B233230A400779F387F86CB592936EB676ED463CB53A60D6CD039AFD016E68",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md",
+      "bytes": 10944,
+      "sha256": "D8D64A91508A4BC7EEFCFA40AFBC3057F03505756EF781FD505C382801274169",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_READINESS.md",
+      "bytes": 4245,
+      "sha256": "EB0C7F23130A510F5EE1AB5E795B0E0AEEAA65AEFDA04AC6E8B7169BC4DE93A2",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "bytes": 42913,
+      "sha256": "F8CE94A079F53EEC9A59121C459A00521375CAD4586CBC93C2EBA66A66E2EC63",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves only that the bounded NSF routing, portal-control, audit, command-board, and test artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove NSF invitation, portal eligibility, submission, acceptance, award, external validation, or permission to disclose private account facts."
+}

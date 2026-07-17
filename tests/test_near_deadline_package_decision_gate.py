@@ -42,8 +42,18 @@ def test_nsf_fields_and_current_schedule_are_bounded():
     assert all(item["passes"] for item in nsf["field_counts"].values())
 
     source = module.nsf_source_audit(gate)
-    assert source["official_facts"]["current_invited_full_proposal_deadline"] == "2026-11-04"
-    assert source["official_facts"]["july_27_2026_currently_listed"] is False
+    assert source["official_facts"]["listed_full_proposal_deadlines"] == [
+        "2026-07-27",
+        "2026-11-04",
+        "2027-03-04",
+        "2027-07-07",
+    ]
+    assert source["official_facts"]["nearest_listed_full_proposal_deadline"] == (
+        "2026-07-27"
+    )
+    assert source["official_facts"]["july_27_2026_currently_listed"] is True
+    assert source["official_facts"]["july_27_2026_reachable"] is False
+    assert source["official_facts"]["next_planning_target"] == "2026-11-04"
     assert source["official_facts"]["full_proposal_requires_invitation"] is True
 
 

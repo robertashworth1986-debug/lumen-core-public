@@ -478,10 +478,19 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
             nsf_blockers.append("NSF full proposal is incorrectly marked submit-allowed")
         if full_proposal.get("july_27_2026_reachable") is not False:
             nsf_blockers.append("July 27 is incorrectly represented as reachable")
-        if full_proposal.get("july_27_2026_currently_listed") is not False:
-            nsf_blockers.append("July 27 is incorrectly represented as currently listed")
-        if full_proposal.get("current_official_schedule_deadline") != "2026-11-04":
-            nsf_blockers.append("NSF current invited full-proposal deadline is stale")
+        if full_proposal.get("july_27_2026_currently_listed") is not True:
+            nsf_blockers.append("July 27 is incorrectly represented as not listed")
+        if full_proposal.get("nearest_listed_deadline") != "2026-07-27":
+            nsf_blockers.append("NSF nearest listed full-proposal deadline is stale")
+        if full_proposal.get("listed_deadlines") != [
+            "2026-07-27",
+            "2026-11-04",
+            "2027-03-04",
+            "2027-07-07",
+        ]:
+            nsf_blockers.append("NSF listed full-proposal schedule is stale")
+        if full_proposal.get("next_planning_target") != "2026-11-04":
+            nsf_blockers.append("NSF invitation-contingent planning target is stale")
         if project_pitch.get("deadline") is not None:
             nsf_blockers.append("NSF Project Pitch incorrectly has a fixed due date")
         if project_pitch.get("final_submit_allowed_without_human") is not False:

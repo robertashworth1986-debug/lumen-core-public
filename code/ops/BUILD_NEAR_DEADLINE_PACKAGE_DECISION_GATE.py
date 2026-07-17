@@ -133,12 +133,18 @@ def safe_sam_status() -> dict[str, Any]:
 def build_gate() -> dict[str, Any]:
     fields = extract_nsf_fields()
     routing = read_json(NSF_ROUTING)
+    full_proposal = routing.get("full_proposal", {})
     erdc_sources = erdc_source_manifest()
     sam = safe_sam_status()
     nsf_local_ready = (
         set(fields) == set(NSF_LIMITS)
         and all(row["passes"] for row in fields.values())
         and routing.get("schema") == "lumencore.nsf_project_pitch_routing.v1"
+        and full_proposal.get("listed_deadlines")
+        == ["2026-07-27", "2026-11-04", "2027-03-04", "2027-07-07"]
+        and full_proposal.get("july_27_2026_currently_listed") is True
+        and full_proposal.get("july_27_2026_reachable") is False
+        and full_proposal.get("submission_allowed") is False
     )
     erdc_source_ready = erdc_sources["all_present"]
     sam_all_awards = (
@@ -166,9 +172,10 @@ def build_gate() -> dict[str, Any]:
                 "Human reviews the final portal preview and performs the final submit action.",
             ],
             "field_counts": fields,
+            "full_proposal_schedule": full_proposal,
             "official_sources": [
                 "https://seedfund.nsf.gov/apply/project-pitch/",
-                "https://seedfund.nsf.gov/solicitations/",
+                "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology/nsf26-510/solicitation",
             ],
         },
         {
@@ -232,7 +239,7 @@ def build_gate() -> dict[str, Any]:
     return {
         "schema": "lumencore.near_deadline_package_decision_gate.v1",
         "generated_utc": now_utc(),
-        "as_of_date": "2026-07-16",
+        "as_of_date": "2026-07-17",
         "decision": {
             "primary_lane": "NSF Project Pitch",
             "secondary_lane": "ERDC Sovereign Defense Cloud CSO",
@@ -255,6 +262,7 @@ def build_gate() -> dict[str, Any]:
 
 def nsf_source_audit(gate: dict[str, Any]) -> dict[str, Any]:
     nsf_lane = next(item for item in gate["lanes"] if item["lane"] == "NSF Project Pitch")
+    schedule = nsf_lane["full_proposal_schedule"]
     return {
         "schema": "lumencore.nsf_project_pitch_source_audit.v1",
         "as_of_date": gate["as_of_date"],
@@ -263,8 +271,16 @@ def nsf_source_audit(gate: dict[str, Any]) -> dict[str, Any]:
             "typical_response_time": "1-2 months",
             "only_one_pending_pitch": True,
             "full_proposal_requires_invitation": True,
-            "current_invited_full_proposal_deadline": "2026-11-04",
-            "july_27_2026_currently_listed": False,
+            "listed_full_proposal_deadlines": schedule["listed_deadlines"],
+            "nearest_listed_full_proposal_deadline": schedule[
+                "nearest_listed_deadline"
+            ],
+            "july_27_2026_currently_listed": schedule[
+                "july_27_2026_currently_listed"
+            ],
+            "july_27_2026_reachable": schedule["july_27_2026_reachable"],
+            "july_27_2026_access_state": schedule["july_27_2026_access_state"],
+            "next_planning_target": schedule["next_planning_target"],
         },
         "local_field_counts": nsf_lane["field_counts"],
         "official_sources": nsf_lane["official_sources"],
