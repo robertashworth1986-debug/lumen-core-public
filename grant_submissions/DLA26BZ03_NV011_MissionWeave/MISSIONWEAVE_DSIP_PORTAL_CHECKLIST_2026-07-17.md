@@ -17,6 +17,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - The candidate still contains the neutral proposal-number header: `false`.
 - Ignored assigned-number final PDF selected by the gate: `true`.
 - Do not upload the tracked neutral PDF after DSIP assigns a proposal number. Run `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`; the final PDF remains ignored and its path, number, and hash remain absent from public artifacts.
+- Private Volume 3 receipt integrity passes: `true`. This verifies the ignored workbook against its ignored receipt without publishing either path or hash; it does not replace corporate-official cost-basis review.
 
 ## Registration And Firm Controls
 

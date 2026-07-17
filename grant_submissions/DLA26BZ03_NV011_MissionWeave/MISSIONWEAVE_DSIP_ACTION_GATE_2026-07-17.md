@@ -15,7 +15,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Required private gates: `50`
 - Passed private gates: `13`
 - Open gates: `37`
-- Gate SHA-256: `fb86f26cb06843158187444a60795e2359bbef96a6e1488c3ec4bcff68f42784`
+- Gate SHA-256: `c7a5ec983de9b6657f4a54d2ec5e624c3ca1e36daeddc42543e615dcadbb0bce`
 
 ## Package Integrity
 
@@ -43,6 +43,21 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Portal preview receipt present: `false`
 - Corporate official reviewed: `false`
 - Action-time authorized: `false`
+
+## Private Volume 3 Artifact Integrity
+
+- Final workbook present: `true`
+- Private receipt present: `true`
+- Receipt header valid: `true`
+- Workbook size matches receipt: `true`
+- Workbook hash matches receipt: `true`
+- Formula scan clean: `true`
+- Export/reimport verified: `true`
+- Financial reconciliation passes: `true`
+- Corporate-review guardrails preserved: `true`
+- Receipt integrity passes: `true`
+- Private path exposed: `false`
+- Private hash exposed: `false`
 
 ## Open Gates
 

@@ -15,7 +15,7 @@
     "live_dsip_recheck_required": true,
     "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
   },
-  "gate_sha256": "fb86f26cb06843158187444a60795e2359bbef96a6e1488c3ec4bcff68f42784",
+  "gate_sha256": "c7a5ec983de9b6657f4a54d2ec5e624c3ca1e36daeddc42543e615dcadbb0bce",
   "gate_summary": {
     "open_gate_count": 37,
     "passed_private_gate_count": 13,
@@ -60,7 +60,7 @@
       "VOLUME7_FOREIGN_AFFILIATIONS_WEBFORM"
     ]
   },
-  "generated_utc": "2026-07-17T19:03:53.519457+00:00",
+  "generated_utc": "2026-07-17T23:14:52.711969+00:00",
   "official_instruction_facts": {
     "cmmc_amendment_note": "Amendment 2 says CMMC Phase II implementation was suspended on July 13, 2026 while Phase I self-assessment requirements remain in place; the current live requirement must be reviewed before submission.",
     "current_package_duration_months": 6,
@@ -112,6 +112,20 @@
     "sha256_present": true
   },
   "private_template": "config/missionweave_dsip_action_private_template_v1.json",
+  "private_volume3_artifact": {
+    "export_reimport_verified": true,
+    "financial_reconciliation_pass": true,
+    "formula_scan_clean": true,
+    "private_hash_exposed": false,
+    "private_path_exposed": false,
+    "receipt_header_valid": true,
+    "receipt_integrity_pass": true,
+    "receipt_present": true,
+    "review_guardrails_preserved": true,
+    "workbook_hash_matches_receipt": true,
+    "workbook_present": true,
+    "workbook_size_matches_receipt": true
+  },
   "schema": "lumencore.missionweave_dsip_action_gate.v1",
   "source_integrity": {
     "absolute_private_path_exposed": false,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 from copy import deepcopy
@@ -236,6 +237,54 @@ def test_private_target_must_be_bounded_and_git_ignored(tmp_path):
     with pytest.raises(module.MissionWeaveGateError) as exc:
         module.validate_private_target(outside)
     assert exc.value.code == "PRIVATE_INPUT_OUTSIDE_BOUNDED_DIRECTORY"
+
+
+def test_private_volume3_receipt_verifies_workbook_without_exposing_path_or_hash(
+    tmp_path: Path, monkeypatch
+):
+    module = load_module()
+    workbook = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_COST_FINAL.xlsx"
+    receipt = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_FINAL_RECEIPT.private.json"
+    workbook_bytes = b"synthetic-private-volume3-workbook"
+    workbook.write_bytes(workbook_bytes)
+    workbook_sha256 = hashlib.sha256(workbook_bytes).hexdigest().upper()
+    receipt.write_text(
+        json.dumps(
+            {
+                "schema": module.PRIVATE_VOLUME3_RECEIPT_SCHEMA,
+                "topic": module.TOPIC,
+                "file": workbook.name,
+                "bytes": len(workbook_bytes),
+                "sha256": workbook_sha256,
+                "total_usd": 100000,
+                "firm_cost_usd": 100000,
+                "subcontractor_cost_usd": 0,
+                "taba_requested": False,
+                "duration_months": 6,
+                "pi_hours": 640,
+                "formula_error_count": 0,
+                "export_reimport_verified": True,
+                "corporate_official_review_required": True,
+                "cost_basis_supported": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        module, "validate_private_target", lambda path: Path(path).resolve()
+    )
+
+    state = module.inspect_private_volume3_artifact(receipt, workbook)
+    serialized = json.dumps(state, sort_keys=True)
+
+    assert state["receipt_integrity_pass"] is True
+    assert state["workbook_hash_matches_receipt"] is True
+    assert state["financial_reconciliation_pass"] is True
+    assert state["review_guardrails_preserved"] is True
+    assert state["private_path_exposed"] is False
+    assert state["private_hash_exposed"] is False
+    assert str(workbook) not in serialized
+    assert workbook_sha256 not in serialized
 
 
 def test_written_public_outputs_and_checklist_are_current_and_safe():

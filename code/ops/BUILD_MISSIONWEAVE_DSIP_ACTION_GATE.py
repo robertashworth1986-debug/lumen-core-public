@@ -26,12 +26,21 @@ PRIVATE_CAPTURE_WORKFLOW = (
 MANIFEST = PACKAGE_DIR / "MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json"
 VOLUME2_PDF = PACKAGE_DIR / "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf"
 PRIVATE_FINAL_VOLUME2_PDF = PRIVATE_DIR / "MISSIONWEAVE_DSIP_VOLUME2_FINAL.private.pdf"
+PRIVATE_FINAL_VOLUME3_WORKBOOK = (
+    PRIVATE_DIR / "MISSIONWEAVE_DSIP_VOLUME3_COST_FINAL.xlsx"
+)
+PRIVATE_FINAL_VOLUME3_RECEIPT = (
+    PRIVATE_DIR / "MISSIONWEAVE_DSIP_VOLUME3_FINAL_RECEIPT.private.json"
+)
 OUT_JSON = PACKAGE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
 OUT_MD = PACKAGE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md"
 OUT_CHECKLIST = PACKAGE_DIR / "MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md"
 
 PRIVATE_SCHEMA = "lumencore.missionweave_dsip_action_private.v1"
 PUBLIC_SCHEMA = "lumencore.missionweave_dsip_action_gate.v1"
+PRIVATE_VOLUME3_RECEIPT_SCHEMA = (
+    "lumencore.missionweave_dsip_volume3_final_receipt_private.v1"
+)
 TOPIC = "DLA26BZ03-NV011"
 EXPECTED_DEADLINE = "2026-07-22T12:00:00-04:00"
 PHASE_I_CEILING = Decimal("100000")
@@ -230,6 +239,80 @@ def parse_phase_i_total(value: Any) -> Decimal | None:
     if not amount.is_finite():
         return None
     return amount
+
+
+def inspect_private_volume3_artifact(
+    receipt_path: Path = PRIVATE_FINAL_VOLUME3_RECEIPT,
+    workbook_path: Path = PRIVATE_FINAL_VOLUME3_WORKBOOK,
+) -> dict[str, bool]:
+    receipt_target = validate_private_target(receipt_path)
+    workbook_target = validate_private_target(workbook_path)
+    receipt_present = receipt_target.is_file()
+    workbook_present = workbook_target.is_file()
+    state = {
+        "receipt_present": receipt_present,
+        "workbook_present": workbook_present,
+        "receipt_header_valid": False,
+        "workbook_size_matches_receipt": False,
+        "workbook_hash_matches_receipt": False,
+        "formula_scan_clean": False,
+        "export_reimport_verified": False,
+        "financial_reconciliation_pass": False,
+        "review_guardrails_preserved": False,
+        "receipt_integrity_pass": False,
+        "private_path_exposed": False,
+        "private_hash_exposed": False,
+    }
+    if not receipt_present or not workbook_present:
+        return state
+
+    try:
+        receipt = json.loads(receipt_target.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return state
+    if not isinstance(receipt, dict):
+        return state
+
+    state["receipt_header_valid"] = bool(
+        receipt.get("schema") == PRIVATE_VOLUME3_RECEIPT_SCHEMA
+        and receipt.get("topic") == TOPIC
+        and receipt.get("file") == workbook_target.name
+    )
+    state["workbook_size_matches_receipt"] = bool(
+        isinstance(receipt.get("bytes"), int)
+        and receipt["bytes"] == workbook_target.stat().st_size
+    )
+    state["workbook_hash_matches_receipt"] = bool(
+        valid_sha256(receipt.get("sha256"))
+        and str(receipt["sha256"]).upper() == sha256_file(workbook_target)
+    )
+    state["formula_scan_clean"] = receipt.get("formula_error_count") == 0
+    state["export_reimport_verified"] = receipt.get("export_reimport_verified") is True
+    state["financial_reconciliation_pass"] = bool(
+        parse_phase_i_total(receipt.get("total_usd")) == PHASE_I_CEILING
+        and parse_phase_i_total(receipt.get("firm_cost_usd")) == PHASE_I_CEILING
+        and parse_phase_i_total(receipt.get("subcontractor_cost_usd")) == Decimal("0")
+        and receipt.get("taba_requested") is False
+        and receipt.get("duration_months") == 6
+        and receipt.get("pi_hours") == 640
+    )
+    state["review_guardrails_preserved"] = bool(
+        receipt.get("corporate_official_review_required") is True
+        and receipt.get("cost_basis_supported") is False
+    )
+    state["receipt_integrity_pass"] = all(
+        state[field]
+        for field in (
+            "receipt_header_valid",
+            "workbook_size_matches_receipt",
+            "workbook_hash_matches_receipt",
+            "formula_scan_clean",
+            "export_reimport_verified",
+            "financial_reconciliation_pass",
+            "review_guardrails_preserved",
+        )
+    )
+    return state
 
 
 def require_exact_keys(section: Any, expected: set[str], code: str) -> dict[str, Any]:
@@ -482,6 +565,7 @@ def build_payload(
     private_input_sha256: str | None = None,
     source_state: dict[str, Any] | None = None,
     volume2_text: str | None = None,
+    volume3_artifact_state: dict[str, bool] | None = None,
 ) -> dict[str, Any]:
     if source_state is None or volume2_text is None:
         use_private_final = bool(
@@ -527,6 +611,9 @@ def build_payload(
         public_source_state["volume2_path"] = "IGNORED_PRIVATE_FINAL_VOLUME2"
         public_source_state["private_final_volume2_sha256_exposed"] = False
         public_source_state["absolute_private_path_exposed"] = False
+
+    if volume3_artifact_state is None:
+        volume3_artifact_state = inspect_private_volume3_artifact()
 
     payload: dict[str, Any] = {
         "schema": PUBLIC_SCHEMA,
@@ -606,6 +693,7 @@ def build_payload(
                 evaluation and evaluation["approval_timestamp_present"]
             ),
         },
+        "private_volume3_artifact": deepcopy(volume3_artifact_state),
         "official_instruction_facts": {
             "dsip_volume_count": 7,
             "volume2_page_limit": VOLUME2_PAGE_LIMIT,
@@ -674,6 +762,7 @@ def ensure_public_safe(
 def render_markdown(payload: dict[str, Any]) -> str:
     source = payload["source_integrity"]
     facts = payload["private_fact_state"]
+    volume3 = payload["private_volume3_artifact"]
     lines = [
         "# MissionWeave DSIP Action Gate - 2026-07-17",
         "",
@@ -720,6 +809,21 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Portal preview receipt present: `{str(facts['portal_preview_receipt_present']).lower()}`",
         f"- Corporate official reviewed: `{str(facts['corporate_official_reviewed']).lower()}`",
         f"- Action-time authorized: `{str(facts['action_time_authorized']).lower()}`",
+        "",
+        "## Private Volume 3 Artifact Integrity",
+        "",
+        f"- Final workbook present: `{str(volume3['workbook_present']).lower()}`",
+        f"- Private receipt present: `{str(volume3['receipt_present']).lower()}`",
+        f"- Receipt header valid: `{str(volume3['receipt_header_valid']).lower()}`",
+        f"- Workbook size matches receipt: `{str(volume3['workbook_size_matches_receipt']).lower()}`",
+        f"- Workbook hash matches receipt: `{str(volume3['workbook_hash_matches_receipt']).lower()}`",
+        f"- Formula scan clean: `{str(volume3['formula_scan_clean']).lower()}`",
+        f"- Export/reimport verified: `{str(volume3['export_reimport_verified']).lower()}`",
+        f"- Financial reconciliation passes: `{str(volume3['financial_reconciliation_pass']).lower()}`",
+        f"- Corporate-review guardrails preserved: `{str(volume3['review_guardrails_preserved']).lower()}`",
+        f"- Receipt integrity passes: `{str(volume3['receipt_integrity_pass']).lower()}`",
+        f"- Private path exposed: `{str(volume3['private_path_exposed']).lower()}`",
+        f"- Private hash exposed: `{str(volume3['private_hash_exposed']).lower()}`",
         "",
         "## Open Gates",
         "",
@@ -775,6 +879,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - The candidate still contains the neutral proposal-number header: `{str(source['neutral_proposal_header_present']).lower()}`.
 - Ignored assigned-number final PDF selected by the gate: `{str(source['private_final_volume2_used']).lower()}`.
 - Do not upload the tracked neutral PDF after DSIP assigns a proposal number. Run `{rel(PRIVATE_FINALIZER)}`; the final PDF remains ignored and its path, number, and hash remain absent from public artifacts.
+- Private Volume 3 receipt integrity passes: `{str(payload['private_volume3_artifact']['receipt_integrity_pass']).lower()}`. This verifies the ignored workbook against its ignored receipt without publishing either path or hash; it does not replace corporate-official cost-basis review.
 
 ## Registration And Firm Controls
 
