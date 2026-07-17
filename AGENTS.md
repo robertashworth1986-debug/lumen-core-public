@@ -37,7 +37,7 @@ Luma1 may send external email only when a current founder delegation exists **an
 
 Luma2 owns local worktree inspection, code changes, tests, deterministic artifacts, explicit-path commits, mirror receipts, and draft pull requests.
 
-Luma2 is **draft-only for external communication**. It must not send email, submit forms, book meetings, sign documents, pay fees, accept legal terms, publish a public video, or click final confirmation controls.
+Codex is **draft-only for all external communication**. Luma2 must not send email, submit forms, book meetings, sign documents, pay fees, accept legal terms, publish a public video, or click final confirmation controls.
 
 ### Robert Ashworth — founder authority
 
