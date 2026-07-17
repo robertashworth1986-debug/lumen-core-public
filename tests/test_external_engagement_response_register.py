@@ -38,6 +38,11 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert payload["summary"]["autonomous_final_portal_submission_allowed"] is False
 
     assert records["nashville_ec_takeoff_fall_2026"]["deadline"] == "2026-07-17"
+    assert "six concise confirmation prompts" in records["nashville_ec_takeoff_fall_2026"]["action_gate"]
+    assert records["nashville_ec_takeoff_fall_2026"]["response_artifact"].endswith(
+        "NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json"
+    )
+    assert payload["source_artifacts"]["nashville_human_fact_resolution"]["present"] is True
     assert records["epri_open_power_ai_mou"]["decision"] == "SEND_EXISTING_GMAIL_DRAFT_AFTER_EXACT_GATE"
     assert "send EPRI" in records["epri_open_power_ai_mou"]["action_gate"]
     assert records["cdc_ai_acquisition_rfi"]["decision"] == "MONITOR_NO_REPLY_REQUIRED"
@@ -97,12 +102,20 @@ def test_mirror_receipt_matches_every_bounded_source():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 21
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 25
     assert receipt["all_sha256_matched_after_copy"] is True
     for artifact in receipt["artifacts"]:
         source = ROOT / artifact["source"]
         assert source.is_file(), artifact["source"]
         assert source.stat().st_size == artifact["bytes"], artifact["source"]
         assert hashlib.sha256(source.read_bytes()).hexdigest().upper() == artifact["sha256"]
+
+    mirrored_sources = {artifact["source"] for artifact in receipt["artifacts"]}
+    assert {
+        "code/ops/BUILD_NASHVILLE_EC_HUMAN_FACT_RESOLUTION.py",
+        "tests/test_nashville_ec_human_fact_resolution.py",
+        "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json",
+        "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md",
+    }.issubset(mirrored_sources)
 
     assert "does not prove" in receipt["claim_boundary"]

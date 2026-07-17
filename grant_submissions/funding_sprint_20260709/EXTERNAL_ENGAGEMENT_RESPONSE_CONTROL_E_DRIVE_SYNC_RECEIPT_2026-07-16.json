@@ -1,29 +1,29 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T01:54:58.2588422Z",
+  "created_utc": "2026-07-17T02:46:27.8817497Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_20260716",
-  "artifact_count": 21,
+  "artifact_count": 25,
   "all_sha256_matched_after_copy": true,
   "artifacts": [
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
-      "bytes": 18600,
-      "sha256": "999DBBB29B360E6D6487FACEFCAF28EA8B2164FEBB40EA1C4F40D5EA2A750E6D"
+      "bytes": 19334,
+      "sha256": "0659BFD802660FF03A5A2C7807EFC638DC36EEFA9153ED886EEDCFB02112E63E"
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 59508,
-      "sha256": "65FC64B943C599800B401BA96EBCD5C5678C8724D1296627A82E80A410A6DFE7"
+      "bytes": 59951,
+      "sha256": "25DB7647A50D78ABE9AD92A08EA70E0A99B660039C2B793A6C6C7EE5D962A724"
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
-      "bytes": 4521,
-      "sha256": "D3AF6D326C655C142BFF78B29AB0F2FF5029AD90846E7D97B76D782BF7775A2E"
+      "bytes": 5327,
+      "sha256": "40F3BA21110E4FC13150CCDEE06E35A718E19B7054BC5513E696FAA4A97E4B6D"
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 6660,
-      "sha256": "0A3E2580F90A4E7FFD10B385C9F8C5016A3C8A82D42FF88AF9C071DF867D3D46"
+      "bytes": 6931,
+      "sha256": "E66A30F9AFCC6AD91F784EAFC19933094258FF921571C0628AA3D6F1559A99F9"
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json",
@@ -32,18 +32,18 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-      "bytes": 9235,
-      "sha256": "6BD79563E7C69E94A2BACCDC7EFF7283AC935E46390D14D544A99AED5AA4F1A1"
+      "bytes": 9571,
+      "sha256": "40DFCC0C055AC4AEEC70023459BB4A050053CC7B437EF5E2EAB2D558D8939C56"
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-15.md",
-      "bytes": 8303,
-      "sha256": "BEB71317FD8922CD1B8D90398496678CC67B8A2E3957915BF0248B9AC11848C2"
+      "bytes": 8481,
+      "sha256": "79743F342A3AF0307CF971F6BC9583034A205C99B626F9800BC62289198C51BE"
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
-      "bytes": 35413,
-      "sha256": "76DC4438E0213F493054989A179C0D3D822452DD1B9949F888E709AF5E559A5C"
+      "bytes": 36053,
+      "sha256": "2B4E2C96F6C02508E27CEE9381A8B1FBAA2765693F48D746D1D0C5D0ED514942"
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json",
@@ -87,8 +87,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
-      "bytes": 12407,
-      "sha256": "33925D9C4932007B623EE7C948418EB36713CA62BA9D2A002F2267744DBA997C"
+      "bytes": 13053,
+      "sha256": "557D6BECD811AEFC9DF93679DF7F4D66AE01D4608E8162CA2831F5C41642B5B8"
     },
     {
       "source": "code/ops/BUILD_TRACTION_OPPORTUNITY_INTAKE_LEDGER.py",
@@ -102,13 +102,33 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
-      "bytes": 25360,
-      "sha256": "9EB98CE687ED8854A38E243D027B976863F21F53D50BEB1E2834E3019F4314A6"
+      "bytes": 25377,
+      "sha256": "4333999738C589B9ED7E7ECF0A3993C34CB98D60D21CB92D843C4C4C0BAED1E8"
     },
     {
       "source": "dashboard/data/traction_opportunity_intake_ledger.json",
-      "bytes": 41125,
-      "sha256": "F7340FED4ABFCB0ED2326E4085FDEEB4AA4C16C8EADD81FDDF9CB09077957448"
+      "bytes": 41489,
+      "sha256": "B6C21D007B45C94ACD8447AB99DA43B4DCA76679852D43FF12011A9797FFDA36"
+    },
+    {
+      "source": "code/ops/BUILD_NASHVILLE_EC_HUMAN_FACT_RESOLUTION.py",
+      "bytes": 15005,
+      "sha256": "38326016358F7ED365FD3F44962429274BA95073C1BF15BD8EEB2F5546EADE76"
+    },
+    {
+      "source": "tests/test_nashville_ec_human_fact_resolution.py",
+      "bytes": 3698,
+      "sha256": "F705211E69D04C3A0A375D47195BC4C303407021C40F40AB49DD61D9AF9151D3"
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json",
+      "bytes": 7579,
+      "sha256": "AB807930D19B28BB5A2A7AEF38B28C3E87B40B750D1EF891F61DBD6CE510EC9F"
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md",
+      "bytes": 3450,
+      "sha256": "A8CF1585475BB2B1DD48ABDAA8A8D409B20CDE91266D0F9C90B208746A719514"
     }
   ],
   "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove email delivery beyond recorded SENT/acknowledgment evidence, portal submission, evaluation, program acceptance, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance."

@@ -1,6 +1,6 @@
 # External Engagement Response Register - 2026-07-16
 
-Finish the Nashville EC human-fact gate before July 17 and send the existing EPRI administrative reply only after the exact `send EPRI` gate. CDC, LANL, NASA, and Army are monitor-only; duplicate sends would reduce credibility.
+Finish the six-confirmation Nashville EC human-fact gate before July 17 and send the existing EPRI administrative reply only after the exact `send EPRI` gate. CDC, LANL, NASA, and Army are monitor-only; duplicate sends would reduce credibility.
 
 ## Control Summary
 
@@ -13,7 +13,7 @@ Finish the Nashville EC human-fact gate before July 17 and send the existing EPR
 - All attachment checks pass: `true`
 - Autonomous external send allowed: `false`
 - Autonomous final portal submit allowed: `false`
-- Register SHA-256: `434c04153e6f3908845e83feda5f5d438382257e0f599263a408c53987d1861f`
+- Register SHA-256: `a7c29a031809d194d1378bef8c1fe26d01174b0162673a59da3ed09104d5bec5`
 
 ## Response Queue
 
@@ -34,11 +34,11 @@ Finish the Nashville EC human-fact gate before July 17 and send the existing EPR
 - Response channel: `PORTAL`
 - Response ready: `true`
 - Send now: `false`
-- Action gate: Founder confirms the nine grouped fact categories, reviews terms and any fee, and authorizes final portal submission at action time.
-- Next action: Finish the human-fact gate before the application closes; do not invent revenue, customers, demographics, or founder history.
-- Response artifact: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json`
+- Action gate: Founder answers all six concise confirmation prompts, reviews the complete live portal preview plus any terms or fee, and authorizes final submission at action time.
+- Next action: Collect the six founder confirmations in the resolution artifact before the application closes; do not invent revenue, customers, demographics, founder history, investment, or debt.
+- Response artifact: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
 - Claim boundary: This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms.
-- Record SHA-256: `d8b484ec69c253fd5ccc758ec85761dde01e26e24c0537b1a0c2d13482c56210`
+- Record SHA-256: `444a4ecac110bf017437b0be3351473d101958b101df4597f8b49ad17a043f95`
 
 ### EPRI Open Power AI Consortium
 
@@ -136,6 +136,7 @@ LumenCore
 - `lanl_engagement_receipt`: present=`true` bytes=`1414` sha256=`74303CFC65C85D9EF73FB80CC8177E5D08DF43D03264FFCE73251ACD2CD9E9D0` path=`grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - `epri_response_template`: present=`true` bytes=`2144` sha256=`B6F3FFB5049F5B6D64105E80403253688B1F6495CB1D94E92C309CE1C2D6CDE6` path=`grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md`
 - `nashville_application_manifest`: present=`true` bytes=`17728` sha256=`1BC772F56253112A346F3A6C3D02D9BF328C639407587386BF00803C14BA764E` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json`
+- `nashville_human_fact_resolution`: present=`true` bytes=`7579` sha256=`AB807930D19B28BB5A2A7AEF38B28C3E87B40B750D1EF891F61DBD6CE510EC9F` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
 
 ## Claim Boundary
 

@@ -43,6 +43,12 @@ NASHVILLE_EC_FIELD_MAP = (
 NASHVILLE_EC_MANIFEST = (
     NASHVILLE_EC_DIR / "NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json"
 )
+NASHVILLE_EC_FACT_RESOLUTION_JSON = (
+    NASHVILLE_EC_DIR / "NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json"
+)
+NASHVILLE_EC_FACT_RESOLUTION_MD = (
+    NASHVILLE_EC_DIR / "NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md"
+)
 EXTERNAL_ENGAGEMENT_REGISTER = (
     SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json"
 )
@@ -174,6 +180,7 @@ def base_sources() -> dict[str, Any]:
         "nsf_project_pitch_routing_manifest": NSF_ROUTING_MANIFEST,
         "nashville_ec_portal_field_map": NASHVILLE_EC_FIELD_MAP,
         "nashville_ec_application_manifest": NASHVILLE_EC_MANIFEST,
+        "nashville_ec_human_fact_resolution": NASHVILLE_EC_FACT_RESOLUTION_JSON,
         "external_engagement_response_register": EXTERNAL_ENGAGEMENT_REGISTER,
     }.items():
         if path.exists():
@@ -366,6 +373,8 @@ def build_command_lanes(
             "package_files": [
                 rel(NASHVILLE_EC_FIELD_MAP),
                 rel(NASHVILLE_EC_MANIFEST),
+                rel(NASHVILLE_EC_FACT_RESOLUTION_JSON),
+                rel(NASHVILLE_EC_FACT_RESOLUTION_MD),
             ],
             "why_now": (
                 "This is the nearest legitimate local reviewer and commercialization route. "
@@ -375,12 +384,12 @@ def build_command_lanes(
                 "request financial aid before accepting terms."
             ),
             "today_work": [
-                "Confirm the nine founder, work-status, conversation-count, and financial facts in the local field map.",
+                "Collect the six concise founder confirmations in the human-fact resolution artifact.",
                 "Paste the claim-bounded answers into the common application and select TakeOff.",
                 "Stop at final preview; do not accept a fee, terms, or cohort seat during application staging.",
             ],
             "human_gate": [
-                "Robert confirms founder status, weekly hours, conversation count, revenue, investment, funding, and business debt facts.",
+                "Robert answers all six prompts covering founder status, weekly hours, conversation count, revenue, founder investment, received funding, and business debt.",
                 "Robert reviews the final portal preview and approves submission before the July 17 close.",
                 "Any later program fee, financial-aid arrangement, terms, or cohort acceptance requires a separate decision.",
             ],
@@ -892,7 +901,7 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "closest_stage_ready_lane": describe_lane(closest_stage),
             "best_grants_lane": "NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. November 4, 2026 is planning only.",
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03.",
-            "fastest_low_friction_lane": "The Nashville EC TakeOff application is the nearest low-friction reviewer route, but nine founder facts and final portal submission remain human-gated.",
+            "fastest_low_friction_lane": "The Nashville EC TakeOff application is the nearest low-friction reviewer route, but six founder confirmations and final portal submission remain human-gated.",
             "all_final_actions_blocked_without_human": True,
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,

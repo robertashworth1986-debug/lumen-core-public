@@ -43,7 +43,7 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 - The bounded LANL VISION follow-up package was sent on 2026-07-16 at 2:50 PM ET. No substantive LANL response was present in the latest checked mailbox window; monitor without duplicate sending before 2026-07-23.
 - The CDC RFI response was sent on 2026-07-16 with its two-page attachment. Lauren Peel, CDC Contracting Officer and OAS Policy Section Lead, confirmed receipt and stated that CDC will follow up. This is an engagement receipt, not technical validation or an award.
 - EPRI requested the private legal and signatory details needed to prepare an Open Power AI Consortium MOU. A private Gmail reply draft is ready; send only after the exact `send EPRI` action-time gate. This is onboarding activity, not executed membership or endorsement.
-- The Nashville Entrepreneur Center TakeOff packet is staged for the July 17 close. Nine grouped founder-fact categories still require human confirmation before final portal preview and submission.
+- The Nashville Entrepreneur Center TakeOff packet is staged for the July 17 close. Eleven required portal fields have been reduced to six concise founder confirmations in `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md`; all six still require human confirmation before final portal preview and submission.
 - Recent LinkedIn notices include direct messages and connection invitations, but their visible email excerpts do not establish a grant, contract, pilot, investment, or validation opportunity.
 
 ## Live Registration Facts Verified On 2026-07-15
@@ -64,7 +64,7 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 
 ## Next Execution Order
 
-1. Complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close.
+1. Answer the six Nashville EC TakeOff founder-confirmation prompts and review the final portal preview before the July 17 close.
 2. Send the existing EPRI administrative reply only after the exact `send EPRI` action-time gate; attach no technical archive.
 3. Robert pastes the staged UEI into the SBIR Company Registration page; verify the exact legal-entity match and retrieve/create the SBC Control ID.
 4. Complete Research.gov organization contact fields and role choices; stop before the review/certification submission.

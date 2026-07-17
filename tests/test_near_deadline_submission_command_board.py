@@ -79,6 +79,11 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert ec["deadline_semantics"] == "DATE_ONLY_CLOSE_TIME_NOT_LISTED_SUBMIT_EARLY"
     assert "TAKEOFF" in ec["fit_state"]
     assert "does not list a closing time" in ec["official_deadline_text"]
+    assert any("six concise founder confirmations" in row for row in ec["today_work"])
+    assert any(
+        path.endswith("NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json")
+        for path in ec["package_files"]
+    )
     assert ec["external_send_allowed_without_human"] is False
     assert ec["final_submit_allowed_without_human"] is False
 
@@ -140,6 +145,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "nsf_project_pitch_routing_manifest",
         "nashville_ec_portal_field_map",
         "nashville_ec_application_manifest",
+        "nashville_ec_human_fact_resolution",
         "external_engagement_response_register",
     ):
         assert payload["source_ledgers"][source]["present"] is True

@@ -20,12 +20,12 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; finish the July 
 - Closest stage-ready lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Best grants lane: NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. November 4, 2026 is planning only.
 - Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03.
-- Fastest low-friction lane: The Nashville EC TakeOff application is the nearest low-friction reviewer route, but nine founder facts and final portal submission remain human-gated.
+- Fastest low-friction lane: The Nashville EC TakeOff application is the nearest low-friction reviewer route, but six founder confirmations and final portal submission remain human-gated.
 - Final submit without human: `false`
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `335198412683bf8cd4e812a307a572f7f3e8b0d26861a2c2cbf6697f82dc1189`
+- Command board SHA-256: `98c98c2a41fda16e643992f5314f5fa167ef7f8e107e1c09ac00ec89e2518ce5`
 
 ## Sent And Verified
 
@@ -61,6 +61,8 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; finish the July 
 - Package files:
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md`
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json`
+  - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
+  - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md`
 
 ### 5. 693JJ326R000012 - Transportation Systems Management and Operations Data Initiative
 
@@ -193,19 +195,21 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; finish the July 
 - Secondary URL: https://ec.co/accelerators/takeoff/
 - Why now: This is the nearest legitimate local reviewer and commercialization route. TakeOff fits a Nashville-based solo founder with a working MVP and no claimed customers. The listed $500 program fee and $125 start payment are not authorized; the application should answer no on fee readiness and request financial aid before accepting terms.
 - Today work:
-  - Confirm the nine founder, work-status, conversation-count, and financial facts in the local field map.
+  - Collect the six concise founder confirmations in the human-fact resolution artifact.
   - Paste the claim-bounded answers into the common application and select TakeOff.
   - Stop at final preview; do not accept a fee, terms, or cohort seat during application staging.
 - Human gate:
-  - Robert confirms founder status, weekly hours, conversation count, revenue, investment, funding, and business debt facts.
+  - Robert answers all six prompts covering founder status, weekly hours, conversation count, revenue, founder investment, received funding, and business debt.
   - Robert reviews the final portal preview and approves submission before the July 17 close.
   - Any later program fee, financial-aid arrangement, terms, or cohort acceptance requires a separate decision.
 - Package files:
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md`
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json`
+  - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
+  - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `cab140dc19a6f68afa46faeb5ceb8d244690c735393e5a51307b2a7bd890c1ef`
+- Lane SHA-256: `27a4d58d9f443161606105864ae2e592fb675ecf217d49fea4fb2a8dd0809202`
 
 ### 3. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
 
@@ -599,4 +603,5 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; finish the July 
 - `nsf_project_pitch_routing_manifest`: `grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json` present=`true` sha256=`84247c7c52a686f72ce5113354e665ac3f3827bf408db8ac15b11d918583c825`
 - `nashville_ec_portal_field_map`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md` present=`true` sha256=`cae7b41fb8b562ee693ac6f34409d9f1b514a885aafade6b796074873b67a8cc`
 - `nashville_ec_application_manifest`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json` present=`true` sha256=`1bc772f56253112a346f3a6c3d02d9bf328c639407587386bf00803c14ba764e`
-- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`33925d9c4932007b623ee7c948418eb36713ca62ba9d2a002f2267744dba997c`
+- `nashville_ec_human_fact_resolution`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json` present=`true` sha256=`ab807930d19b28bb5a2a7aef38b28c3e87b40b750d1ef891f61dbd6ce510ec9f`
+- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`557d6becd811aefc9df93679df7f4d66ae01d4608e8162ca2831f5c41642b5b8`

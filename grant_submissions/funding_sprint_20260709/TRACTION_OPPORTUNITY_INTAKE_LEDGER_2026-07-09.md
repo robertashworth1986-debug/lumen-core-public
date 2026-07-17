@@ -19,7 +19,7 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 - Human action required: `true`
 - External send without human: `false`
 - Final submission without human: `false`
-- Ledger SHA-256: `cdce8e5bcd4068300ab4480aeda2e3557a10f5f6293529349315398321af41c0`
+- Ledger SHA-256: `2fcb32afb31d7ce8f790e982383f0fcdbbd9ae74ffdf7fda05a656ee45ad509a`
 
 ## Source Coverage
 
@@ -32,13 +32,13 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 
 ## Current Response Overlay
 
-Finish the Nashville EC human-fact gate before July 17 and send the existing EPRI administrative reply only after the exact `send EPRI` gate. CDC, LANL, NASA, and Army are monitor-only; duplicate sends would reduce credibility.
+Finish the six-confirmation Nashville EC human-fact gate before July 17 and send the existing EPRI administrative reply only after the exact `send EPRI` gate. CDC, LANL, NASA, and Army are monitor-only; duplicate sends would reduce credibility.
 
 This overlay is authoritative through the stated as-of date and supersedes a legacy lane status where the two differ. Historical status remains visible below for provenance.
 
 - As of: `2026-07-16`
 - Source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json`
-- Register SHA-256: `434c04153e6f3908845e83feda5f5d438382257e0f599263a408c53987d1861f`
+- Register SHA-256: `a7c29a031809d194d1378bef8c1fe26d01174b0162673a59da3ed09104d5bec5`
 
 | Organization | Current state | Current decision | Duplicate send |
 |---|---|---|---:|

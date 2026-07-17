@@ -22,6 +22,12 @@ NASHVILLE_MANIFEST = (
     / "NASHVILLE_EC_FALL_2026"
     / "NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json"
 )
+NASHVILLE_FACT_RESOLUTION = (
+    ROOT
+    / "grant_submissions"
+    / "NASHVILLE_EC_FALL_2026"
+    / "NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json"
+)
 
 OUT_JSON = OUT_OPS / "external_engagement_response_register_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "external_engagement_response_register.json"
@@ -127,6 +133,10 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     cdc = read_json(CDC_RECEIPT)
     lanl = read_json(LANL_RECEIPT)
     nashville = read_json(NASHVILLE_MANIFEST)
+    nashville_resolution = read_json(NASHVILLE_FACT_RESOLUTION)
+
+    if nashville_resolution.get("status") != "SIX_FOUNDER_CONFIRMATIONS_REQUIRED":
+        raise ValueError("Nashville EC human-fact resolution is missing or stale")
 
     nasa = submission_by_notice(submissions, "80TECH26RFI0020")
     army = submission_by_notice(submissions, "ACCAPGAIDPRFI4")
@@ -142,9 +152,13 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "response_ready": True,
             "send_now": False,
             "do_not_duplicate_send": False,
-            "action_gate": "Founder confirms the nine grouped fact categories, reviews terms and any fee, and authorizes final portal submission at action time.",
-            "response_artifact": rel(NASHVILLE_MANIFEST),
-            "next_action": "Finish the human-fact gate before the application closes; do not invent revenue, customers, demographics, or founder history.",
+            "action_gate": "Founder answers all six concise confirmation prompts, reviews the complete live portal preview plus any terms or fee, and authorizes final submission at action time.",
+            "response_artifact": rel(NASHVILLE_FACT_RESOLUTION),
+            "supporting_artifacts": [
+                rel(NASHVILLE_MANIFEST),
+                rel(NASHVILLE_FACT_RESOLUTION),
+            ],
+            "next_action": "Collect the six founder confirmations in the resolution artifact before the application closes; do not invent revenue, customers, demographics, founder history, investment, or debt.",
             "claim_boundary": nashville.get("claim_boundary"),
         },
         {
@@ -257,7 +271,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "as_of_date": "2026-07-16",
         "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
         "direct_answer": (
-            "Finish the Nashville EC human-fact gate before July 17 and send the existing EPRI "
+            "Finish the six-confirmation Nashville EC human-fact gate before July 17 and send the existing EPRI "
             "administrative reply only after the exact `send EPRI` gate. CDC, LANL, NASA, and Army "
             "are monitor-only; duplicate sends would reduce credibility."
         ),
@@ -293,6 +307,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "lanl_engagement_receipt": artifact_status(LANL_RECEIPT),
             "epri_response_template": artifact_status(EPRI_TEMPLATE),
             "nashville_application_manifest": artifact_status(NASHVILLE_MANIFEST),
+            "nashville_human_fact_resolution": artifact_status(NASHVILLE_FACT_RESOLUTION),
         },
         "claim_boundary": REGISTER_BOUNDARY,
         "outputs": {

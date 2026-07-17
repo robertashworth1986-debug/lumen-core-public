@@ -1,0 +1,216 @@
+{
+  "as_of_date": "2026-07-16",
+  "candidate_answers": [
+    {
+      "candidate": "1 to 3 years",
+      "evidence_key": "business_age_floor",
+      "labels": [
+        "How long have you been working on this business?"
+      ],
+      "question_ids": [
+        31
+      ],
+      "status": "EVIDENCE_SUPPORTED_FOUNDER_CONFIRMATION"
+    },
+    {
+      "candidate": "11 to 25 if each bounded thread is a qualifying conversation; otherwise 6 to 10",
+      "evidence_key": "institutional_conversation_floor",
+      "labels": [
+        "Customer discovery or sales conversations completed"
+      ],
+      "question_ids": [
+        84
+      ],
+      "status": "EVIDENCE_SUPPORTED_CONDITIONAL"
+    },
+    {
+      "candidate": "$0 for each field",
+      "evidence_key": "financial_claim_ledger",
+      "labels": [
+        "Total revenue for previous year",
+        "Current annualized or most recent 12-month revenue",
+        "Total grant funding received",
+        "Total investor capital raised"
+      ],
+      "question_ids": [
+        66,
+        36,
+        63,
+        64
+      ],
+      "status": "CONSISTENT_WITH_CLAIM_LEDGER_FOUNDER_CONFIRMATION"
+    },
+    {
+      "candidate": null,
+      "evidence_key": null,
+      "labels": [
+        "Are you a first-time founder?"
+      ],
+      "question_ids": [
+        38
+      ],
+      "status": "FOUNDER_ATTESTATION_ONLY"
+    },
+    {
+      "candidate": null,
+      "evidence_key": null,
+      "labels": [
+        "Are you working on this business full-time?",
+        "Hours per week actively working on the business"
+      ],
+      "question_ids": [
+        28,
+        29
+      ],
+      "status": "FOUNDER_ATTESTATION_ONLY"
+    },
+    {
+      "candidate": null,
+      "evidence_key": null,
+      "labels": [
+        "Total founder cash invested to date"
+      ],
+      "question_ids": [
+        62
+      ],
+      "status": "PRIVATE_ACCOUNTING_TOTAL_REQUIRED"
+    },
+    {
+      "candidate": null,
+      "evidence_key": null,
+      "labels": [
+        "Total debt leveraged to date"
+      ],
+      "question_ids": [
+        65
+      ],
+      "status": "PRIVATE_ACCOUNTING_TOTAL_REQUIRED"
+    }
+  ],
+  "claim_boundary": "This artifact reduces a portal fact-check into evidence-supported candidates and explicit founder attestations. A dated file proves that a named project artifact existed, not continuous full-time work. Email-thread counts prove bounded communication activity, not customers, sales, validation, or revenue. No candidate becomes a submitted fact until Robert confirms it in the live portal preview.",
+  "confirmation_prompts": [
+    {
+      "covers_question_ids": [
+        38
+      ],
+      "prompt_id": "first_time_founder",
+      "reply_line": "First-time founder: YES or NO"
+    },
+    {
+      "covers_question_ids": [
+        28,
+        29
+      ],
+      "prompt_id": "full_time_and_hours",
+      "reply_line": "Full-time on LumenCore: YES or NO; weekly-hours bracket: [ENTER BRACKET]"
+    },
+    {
+      "covers_question_ids": [
+        84
+      ],
+      "prompt_id": "conversation_bracket",
+      "reply_line": "Discovery/sales conversation bracket: 11-25 or 6-10"
+    },
+    {
+      "covers_question_ids": [
+        66,
+        36,
+        63,
+        64
+      ],
+      "prompt_id": "zero_financials",
+      "reply_line": "Confirm previous-year revenue, trailing-12-month revenue, grants received, and investor capital are all $0: YES or NO"
+    },
+    {
+      "covers_question_ids": [
+        62
+      ],
+      "prompt_id": "founder_cash",
+      "reply_line": "Total founder cash invested in the business: $[ENTER VERIFIED TOTAL]"
+    },
+    {
+      "covers_question_ids": [
+        65
+      ],
+      "prompt_id": "business_debt",
+      "reply_line": "Business debt leveraged to date: $[ENTER BUSINESS DEBT ONLY]"
+    }
+  ],
+  "evidence_observations": {
+    "business_age_floor": {
+      "as_of_date": "2026-07-16",
+      "bounded_file_bytes": 1972,
+      "bounded_file_name": "LumenCore_Patent_Cover_Abstract.pdf",
+      "candidate": "1 to 3 years",
+      "limit": "File metadata does not prove the exact business start date or uninterrupted work.",
+      "observation": "The earliest LumenCore-named local file found in the bounded metadata scan is dated 2025-07-16.",
+      "strength": "EVIDENCE_SUPPORTED_FOUNDER_CONFIRMATION"
+    },
+    "financial_claim_ledger": {
+      "candidate_grant_funds_received": "$0",
+      "candidate_investor_capital_received": "$0",
+      "candidate_previous_year_revenue": "$0",
+      "candidate_trailing_twelve_month_revenue": "$0",
+      "limit": "The claim ledger is not an accounting system; Robert must confirm the amounts.",
+      "observation": "Current public-safe application, funding, and reviewer artifacts consistently describe LumenCore as pre-revenue and claim no received grant award or investor capital.",
+      "strength": "CONSISTENT_WITH_CLAIM_LEDGER_FOUNDER_CONFIRMATION"
+    },
+    "institutional_conversation_floor": {
+      "candidate": "11 to 25",
+      "conservative_fallback": "6 to 10",
+      "decision_rule": "Choose 11 to 25 only if the founder treats the 14 two-sided institutional threads as distinct qualifying discovery or sales conversations. Otherwise choose 6 to 10.",
+      "distinct_institutional_domains": 8,
+      "distinct_two_sided_human_threads": 14,
+      "domains": [
+        "cdc.gov",
+        "epri.com",
+        "evtit.com",
+        "lanl.gov",
+        "lvlup.vc",
+        "uspto.gov",
+        "vanderbilt.edu",
+        "vynetic.com"
+      ],
+      "exclusions": [
+        "automatic replies",
+        "password and account mail",
+        "newsletters and one-way marketing",
+        "threads without both inbound and outbound human messages"
+      ],
+      "inbound_messages_reviewed": 41,
+      "limit": "Institutional correspondence is not proof of a customer, sale, pilot, or validation.",
+      "outbound_messages_reviewed": 53,
+      "strength": "EVIDENCE_SUPPORTED_CONDITIONAL",
+      "window": "six months ending 2026-07-16"
+    }
+  },
+  "final_action_gate": {
+    "all_six_confirmation_prompts_answered": false,
+    "fee_and_terms_reviewed": false,
+    "final_submission_authorized_at_action_time": false,
+    "portal_preview_reviewed": false
+  },
+  "generated_utc": "2026-07-17T02:43:57.447133+00:00",
+  "optional_demographics": {
+    "do_not_infer": true,
+    "safe_default": "Leave blank or choose a prefer-not-to-answer option if the portal offers one.",
+    "status": "OPTIONAL_FOUNDER_CHOICE"
+  },
+  "outputs": {
+    "json": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json",
+    "markdown": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md"
+  },
+  "resolution_sha256": "75dc56e5750d1345ce9c626265746c15876981afdd6872b66175def714eda912",
+  "schema": "lumencore.nashville_ec_human_fact_resolution.v1",
+  "source_manifest": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json",
+  "status": "SIX_FOUNDER_CONFIRMATIONS_REQUIRED",
+  "summary": {
+    "concise_confirmation_prompts": 6,
+    "evidence_supported_candidate_fields": 6,
+    "final_submit_allowed_without_live_preview": false,
+    "founder_attestation_only_fields": 3,
+    "optional_demographics_may_be_skipped": true,
+    "private_accounting_fields": 2,
+    "required_human_portal_fields": 11
+  }
+}
