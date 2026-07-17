@@ -140,6 +140,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "nsf_project_pitch_routing_manifest",
         "nashville_ec_portal_field_map",
         "nashville_ec_application_manifest",
+        "external_engagement_response_register",
     ):
         assert payload["source_ledgers"][source]["present"] is True
 

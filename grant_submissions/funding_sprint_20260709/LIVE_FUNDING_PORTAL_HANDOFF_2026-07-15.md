@@ -38,9 +38,12 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 
 - New funding-related messages on 2026-07-15 were authentication messages for SBA and Submittable, not awards or agency validation.
 - USPTO Patent Center self-enrollment completed and the customer-number request was accepted on 2026-07-14.
-- No new DICE encouraged/discouraged feedback or LANL Teams invitation was found in the checked mail.
-- A LANL meeting-link follow-up draft is staged but unsent.
+- No new DICE encouraged/discouraged feedback was found in the checked mail.
+- A LANL Teams invitation was received and the July 16 meeting window occurred. Meeting credentials remain excluded from public artifacts.
+- The bounded LANL VISION follow-up package was sent on 2026-07-16 at 2:50 PM ET. No substantive LANL response was present in the latest checked mailbox window; monitor without duplicate sending before 2026-07-23.
 - The CDC RFI response was sent on 2026-07-16 with its two-page attachment. Lauren Peel, CDC Contracting Officer and OAS Policy Section Lead, confirmed receipt and stated that CDC will follow up. This is an engagement receipt, not technical validation or an award.
+- EPRI requested the private legal and signatory details needed to prepare an Open Power AI Consortium MOU. A private Gmail reply draft is ready; send only after the exact `send EPRI` action-time gate. This is onboarding activity, not executed membership or endorsement.
+- The Nashville Entrepreneur Center TakeOff packet is staged for the July 17 close. Nine grouped founder-fact categories still require human confirmation before final portal preview and submission.
 - Recent LinkedIn notices include direct messages and connection invitations, but their visible email excerpts do not establish a grant, contract, pilot, investment, or validation opportunity.
 
 ## Live Registration Facts Verified On 2026-07-15
@@ -61,10 +64,12 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 
 ## Next Execution Order
 
-1. Robert pastes the staged UEI into the SBIR Company Registration page; verify the exact legal-entity match and retrieve/create the SBC Control ID.
-2. Complete Research.gov organization contact fields and role choices; stop before the review/certification submission.
-3. Complete DSIP authentication, then populate and preview MissionWeave.
-4. Verify NSF Project Pitch/invitation status before creating an NSF 26-511 proposal workspace.
-5. Monitor the CDC RFI thread for a substantive follow-up; do not send a duplicate response.
-6. Confirm the ERDC organization result, then populate the bounded concept form.
-7. Build the FALCON compliance and evidence crosswalk.
+1. Complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close.
+2. Send the existing EPRI administrative reply only after the exact `send EPRI` action-time gate; attach no technical archive.
+3. Robert pastes the staged UEI into the SBIR Company Registration page; verify the exact legal-entity match and retrieve/create the SBC Control ID.
+4. Complete Research.gov organization contact fields and role choices; stop before the review/certification submission.
+5. Complete DSIP authentication, then populate and preview MissionWeave.
+6. Verify NSF Project Pitch/invitation status before creating an NSF proposal workspace.
+7. Monitor CDC, LANL, NASA, and Army; do not duplicate-send transmitted packages.
+8. Confirm the ERDC organization result, then populate the bounded concept form.
+9. Build the FALCON compliance and evidence crosswalk.

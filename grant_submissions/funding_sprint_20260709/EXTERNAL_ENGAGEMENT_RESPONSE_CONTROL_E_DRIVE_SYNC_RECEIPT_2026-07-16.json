@@ -1,0 +1,90 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "created_utc": "2026-07-17T01:54:58.2588422Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_20260716",
+  "artifact_count": 16,
+  "all_sha256_matched_after_copy": true,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
+      "bytes": 18423,
+      "sha256": "989FFC999890D1135D45CF663C865CF99E4C17D9BD42DA4BF327F5977276C404"
+    },
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "bytes": 59506,
+      "sha256": "37A6FB9DA31A5B4214367C91D64373F6CA21A4DD18A7B56982E4303AD92B83F1"
+    },
+    {
+      "source": "tests/test_external_engagement_response_register.py",
+      "bytes": 4521,
+      "sha256": "C7CD4630F1F4A5414A27FDE19576ACDCBE12DADFA2FF964A95007DAD9647BEEA"
+    },
+    {
+      "source": "tests/test_near_deadline_submission_command_board.py",
+      "bytes": 6660,
+      "sha256": "0A3E2580F90A4E7FFD10B385C9F8C5016A3C8A82D42FF88AF9C071DF867D3D46"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "bytes": 1414,
+      "sha256": "74303CFC65C85D9EF73FB80CC8177E5D08DF43D03264FFCE73251ACD2CD9E9D0"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+      "bytes": 9235,
+      "sha256": "85539342B1E83D692836378420C5D73E116D1709DEC0AA8E671B64BEEE55FD10"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-15.md",
+      "bytes": 8303,
+      "sha256": "BEB71317FD8922CD1B8D90398496678CC67B8A2E3957915BF0248B9AC11848C2"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
+      "bytes": 35411,
+      "sha256": "1631F534E8D890C198A02463059C3554CC98CC9F538317CEC4F2AD5956E6E24A"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json",
+      "bytes": 2036,
+      "sha256": "2DAC72C484BB39A6AB5891405C00AD68C66A2D99A5152D0E53CCBE8603FBAE01"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "bytes": 1527,
+      "sha256": "292157621B722B1973A1AA55140F08586AB41D07FBE38672B348C73E8A865B78"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
+      "bytes": 2144,
+      "sha256": "B6F3FFB5049F5B6D64105E80403253688B1F6495CB1D94E92C309CE1C2D6CDE6"
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json",
+      "bytes": 17728,
+      "sha256": "1BC772F56253112A346F3A6C3D02D9BF328C639407587386BF00803C14BA764E"
+    },
+    {
+      "source": "outputs/aidp-rfi4-20260713/AIDP - Questions and Feedback Submission Sheet - LumenCore Draft.xlsx",
+      "bytes": 5405,
+      "sha256": "D0528488B91C940E2A8401E3571BE72C59124F714883E25CF6D7D7716427B8BF"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.pdf",
+      "bytes": 15465,
+      "sha256": "88A606678ACC62C60C914C515605D5D590CEACDC1A82AA20B47028B3444EEB0D"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/LumenCore_CDC_AI_Acquisition_RFI_75D301-26-RFI-73483_2026-07-15.pdf",
+      "bytes": 77318,
+      "sha256": "570F6A6C86DD03649B6F5EE7F731D5E3F0884712CD06DA588D2A4C92C903B2B1"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/LumenCore_LANL_VISION_Followup_Package_2026-07-16.pdf",
+      "bytes": 123160,
+      "sha256": "3788258083E5D58D3FF7C54D937EF6A73AE132C294021FB234E422A8903243E0"
+    }
+  ],
+  "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove email delivery beyond recorded SENT/acknowledgment evidence, portal submission, evaluation, program acceptance, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance."
+}

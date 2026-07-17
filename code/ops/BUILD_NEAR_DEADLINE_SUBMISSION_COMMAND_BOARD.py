@@ -43,6 +43,9 @@ NASHVILLE_EC_FIELD_MAP = (
 NASHVILLE_EC_MANIFEST = (
     NASHVILLE_EC_DIR / "NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json"
 )
+EXTERNAL_ENGAGEMENT_REGISTER = (
+    SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md"
+)
 
 OUT_JSON = OUT_OPS / "near_deadline_submission_command_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "near_deadline_submission_command_board.json"
@@ -171,6 +174,7 @@ def base_sources() -> dict[str, Any]:
         "nsf_project_pitch_routing_manifest": NSF_ROUTING_MANIFEST,
         "nashville_ec_portal_field_map": NASHVILLE_EC_FIELD_MAP,
         "nashville_ec_application_manifest": NASHVILLE_EC_MANIFEST,
+        "external_engagement_response_register": EXTERNAL_ENGAGEMENT_REGISTER,
     }.items():
         if path.exists():
             data = path.read_bytes()

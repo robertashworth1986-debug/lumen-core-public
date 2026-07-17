@@ -1,0 +1,33 @@
+{
+  "schema": "lumencore.external_engagement_receipt.v1",
+  "recorded_date": "2026-07-16",
+  "engagement": {
+    "organization": "Los Alamos National Laboratory",
+    "lane_id": "lanl_vision_licensing_followup",
+    "title": "LumenCore VISION licensing and validation-fit follow-up"
+  },
+  "submission": {
+    "status": "SENT_WITH_ATTACHMENT",
+    "sent_utc": "2026-07-16T18:50:16Z",
+    "gmail_message_id": "19f6c43e50fbae1e",
+    "gmail_thread_id": "19f6be54d6ed3c2a",
+    "subject": "LumenCore",
+    "recipient_roles": [
+      "LANL VISION licensing contact",
+      "LANL technical contact"
+    ],
+    "attachment": {
+      "path": "grant_submissions/funding_sprint_20260709/LumenCore_LANL_VISION_Followup_Package_2026-07-16.pdf",
+      "bytes": 123160,
+      "sha256": "3788258083E5D58D3FF7C54D937EF6A73AE132C294021FB234E422A8903243E0"
+    }
+  },
+  "acknowledgment": {
+    "status": "OUTBOUND_SENT_RESPONSE_PENDING",
+    "received_utc": null,
+    "reply_required": false,
+    "earliest_follow_up_date": "2026-07-23",
+    "bounded_summary": "The bounded LANL VISION package was transmitted. No substantive LANL response was present in the checked mailbox window."
+  },
+  "claim_boundary": "The Gmail SENT record and attachment hash prove transmission only. They do not establish LANL receipt, evaluation, a license, endorsement, independent validation, a pilot, funding, deployment, or contract performance."
+}
