@@ -63,38 +63,92 @@ jobs:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
 
-      - name: Preflight VPS and prepare directories
+      - name: Verify SSH connectivity
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" \
+            'printf "SSH_OK\n"'
+
+      - name: Verify passwordless sudo
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" \
+            'sudo -n true && printf "SUDO_OK\n"'
+
+      - name: Ensure remote transfer dependencies
         shell: bash
         run: |
           set -euo pipefail
           ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
-            set -euo pipefail
-            command -v sudo
+            set -eu
+            missing=""
+            for command_name in rsync python3 curl; do
+              if ! command -v "$command_name" >/dev/null 2>&1; then
+                missing="$missing $command_name"
+              fi
+            done
+            if [ -n "$missing" ]; then
+              if command -v dnf >/dev/null 2>&1; then
+                sudo -n dnf install -y $missing
+              elif command -v yum >/dev/null 2>&1; then
+                sudo -n yum install -y $missing
+              elif command -v apt-get >/dev/null 2>&1; then
+                sudo -n apt-get update -qq
+                sudo -n apt-get install -y $missing
+              else
+                echo "ERROR: no supported package manager for:$missing" >&2
+                exit 1
+              fi
+            fi
             command -v rsync
             command -v python3
-            command -v nginx
-            command -v systemctl
-            sudo -n true
-            sudo journalctl --vacuum-size=100M >/dev/null 2>&1 || true
-            sudo dnf clean all >/dev/null 2>&1 || true
-            sudo yum clean all >/dev/null 2>&1 || true
-            sudo find /var/log -type f \( -name "*.gz" -o -name "*.old" -o -name "*.1" -o -name "*.log.*" \) -delete 2>/dev/null || true
-            sudo install -d -o opc -g opc -m 755 \
+            command -v curl
+          '
+
+      - name: Verify active Nginx edge
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -eu
+            sudo -n nginx -t
+            sudo -n systemctl is-active --quiet nginx
+            echo "Active nginx candidates:"
+            found=0
+            for candidate in \
+              /etc/nginx/sites-enabled/lumatrader \
+              /etc/nginx/sites-available/lumatrader \
+              /etc/nginx/conf.d/lumatrader.conf; do
+              if [ -e "$candidate" ] || [ -L "$candidate" ]; then
+                found=$((found + 1))
+                printf "  %s -> %s\n" "$candidate" "$(readlink -f "$candidate" 2>/dev/null || printf unknown)"
+              fi
+            done
+            if [ "$found" -eq 0 ]; then
+              echo "ERROR: no lumatrader nginx candidate was found" >&2
+              exit 1
+            fi
+          '
+
+      - name: Prepare bounded VPS directories
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -eu
+            sudo -n journalctl --vacuum-size=100M >/dev/null 2>&1 || true
+            sudo -n dnf clean all >/dev/null 2>&1 || true
+            sudo -n yum clean all >/dev/null 2>&1 || true
+            sudo -n find /var/log -type f \( -name "*.gz" -o -name "*.old" -o -name "*.1" -o -name "*.log.*" \) -delete 2>/dev/null || true
+            sudo -n install -d -o opc -g opc -m 755 \
               /opt/lumencore/dashboard \
               /opt/lumencore/dashboard/data \
               /opt/lumencore/data \
               /tmp/lumencore-evidence-route
             touch /tmp/lumencore-evidence-route/.write-test
             rm -f /tmp/lumencore-evidence-route/.write-test
-            echo "Active nginx candidates:"
-            for candidate in \
-              /etc/nginx/sites-enabled/lumatrader \
-              /etc/nginx/sites-available/lumatrader \
-              /etc/nginx/conf.d/lumatrader.conf; do
-              if [ -e "$candidate" ] || [ -L "$candidate" ]; then
-                printf "  %s -> %s\n" "$candidate" "$(readlink -f "$candidate" 2>/dev/null || printf unknown)"
-              fi
-            done
             df -h /opt/lumencore
           '
 
