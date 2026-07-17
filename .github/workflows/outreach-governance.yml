@@ -1,0 +1,43 @@
+name: Outreach Governance Gate
+
+on:
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "docs/CANONICAL_OPERATING_STATE.md"
+      - "config/outreach_registry_v1.json"
+      - "code/ops/outreach_gate.py"
+      - "tests/test_outreach_gate.py"
+      - ".github/workflows/outreach-governance.yml"
+  push:
+    branches: [main]
+    paths:
+      - "AGENTS.md"
+      - "docs/CANONICAL_OPERATING_STATE.md"
+      - "config/outreach_registry_v1.json"
+      - "code/ops/outreach_gate.py"
+      - "tests/test_outreach_gate.py"
+      - ".github/workflows/outreach-governance.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  outreach-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile the gate and tests
+        run: python -m py_compile code/ops/outreach_gate.py tests/test_outreach_gate.py
+      - name: Validate the shared registry
+        run: python code/ops/outreach_gate.py validate
+      - name: Run fail-closed tests
+        run: python -m unittest discover -s tests -p "test_outreach_gate.py" -v
+      - name: Enforce the canonical operating contract
+        run: |
+          grep -q "Codex is \*\*draft-only for all external communication\*\*" AGENTS.md
+          grep -q "Work-in-progress limit" docs/CANONICAL_OPERATING_STATE.md
+          grep -q "No other outbound message is currently authorized" docs/CANONICAL_OPERATING_STATE.md
