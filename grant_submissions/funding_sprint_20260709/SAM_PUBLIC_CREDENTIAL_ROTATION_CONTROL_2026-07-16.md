@@ -1,4 +1,4 @@
-# SAM.gov API-Key Rotation Control - 2026-07-16
+# SAM.gov Public Credential Rotation Control - 2026-07-16
 
 Status: `ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED`
 
@@ -12,23 +12,23 @@ Do not claim the SAM key is rotated yet. The current local aliases are consisten
 - Official reminder received UTC: `2026-07-16T08:07:36Z`
 - Rotation deadline, America/Chicago: `2026-07-16`
 - Local configured aliases: `3`
-- Distinct configured secret values: `1`
+- Distinct configured credential values: `1`
 - Aliases consistent: `true`
 - Private baseline present: `true`
 - Replacement installation detected: `false`
 - API probe: `HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE`
 - API HTTP status: `404`
 - Rotation verified: `false`
-- Control SHA-256: `ea4b3903a4bc0e316c8df1b35a702bd1e23f08db745cccce660ce7bec67cc51b`
+- Control SHA-256: `e6c78bfaa59dc7d7f73691703c4d185f044d1962b1cd14be50617dd18c93c4bc`
 
-No secret value, request URL, response body, or secret fingerprint is published.
+No credential value, request URL, response body, or credential fingerprint is published.
 The guarded local installer is `code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py`; it accepts the replacement only through a hidden prompt.
 
 ## Human Action Gate
 
 1. Keep the existing signed-in in-app browser tab on SAM.gov.
 2. Open Account Details and locate Public API Key.
-3. Use the SAM.gov one-time-password flow to reveal the already-generated replacement.
+3. Use the SAM.gov one-time verification flow to reveal the already-generated replacement.
 4. Run `python code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py` in a private terminal and paste the replacement only at its hidden prompt.
 5. Rerun this verifier and require a changed private fingerprint; require a live authenticated response when the upstream API is observable.
 
@@ -39,4 +39,4 @@ The guarded local installer is `code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py`; it a
 
 ## Claim Boundary
 
-This control proves only bounded local secret-discovery state, fingerprint comparison, and the recorded API probe result. It never stores or publishes an API key. A changed fingerprint proves that the configured secret changed, not that SAM.gov accepted it. Only a successful authenticated probe can establish live API acceptance, and no browser, account, submission, or opportunity state is changed by this control.
+This control proves only bounded local credential-discovery state, fingerprint comparison, and the recorded API probe result. It never stores or publishes a credential value. A changed fingerprint proves that the configured value changed, not that SAM.gov accepted it. Only a successful authenticated probe can establish live API acceptance, and no browser, account, submission, or opportunity state is changed by this control.

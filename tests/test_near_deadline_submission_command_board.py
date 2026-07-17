@@ -25,17 +25,17 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert payload["schema"] == "near_deadline_submission_command_board_v4"
     assert payload["status"] == "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS"
     assert payload["summary"]["lane_count"] == 17
-    assert payload["summary"]["stage_now_count"] == 5
+    assert payload["summary"]["stage_now_count"] == 4
     assert payload["summary"]["sent_verified_count"] == 3
     assert payload["summary"]["emergency_eligibility_gate_count"] == 0
-    assert payload["summary"]["no_bid_or_partner_only_count"] == 5
+    assert payload["summary"]["no_bid_or_partner_only_count"] == 6
     assert payload["summary"]["expired_without_verified_send_count"] == 1
     assert payload["summary"]["human_gated_count"] == 13
     assert payload["summary"]["final_submit_allowed_without_human"] is False
     assert payload["summary"]["external_send_allowed_without_human"] is False
     assert payload["summary"]["pricing_allowed_without_human"] is False
     assert payload["summary"]["legal_certification_allowed_without_human"] is False
-    assert "SAM.gov public API-key rotation" in payload["summary"]["critical_same_day_infrastructure_action"]
+    assert "SAM.gov public credential rotation" in payload["summary"]["critical_same_day_infrastructure_action"]
     sam_rotation = payload["operational_controls"]["sam_public_key_rotation"]
     assert sam_rotation["status"] == "ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED"
     assert sam_rotation["deadline_state"] == "PAST_DUE"
@@ -71,7 +71,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     stage_ids = {row["opportunity_number"] for row in payload["stage_now"]}
     assert "80TECH26RFI0020" not in stage_ids
     assert "ACCAPGAIDPRFI4" not in stage_ids
-    assert "693JJ326R000012" in stage_ids
+    assert "693JJ326R000012" not in stage_ids
     assert "26-510" in stage_ids
     assert "W912HZ26SC005" in stage_ids
     assert "NASHVILLE-EC-FALL-2026" in stage_ids
@@ -112,6 +112,21 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         "best_grants_lane"
     ]
     assert "planning only" in payload["summary"]["best_grants_lane"]
+    fhwa = next(
+        row
+        for row in payload["lanes"]
+        if row["opportunity_number"] == "693JJ326R000012"
+    )
+    assert fhwa["command"] == "NO_SOLO_SUBMIT_PARTNER_ONLY"
+    assert fhwa["eligibility_state"] == (
+        "QUALIFIED_TARGET_CONTACTED_PARTNER_CONFIRMATION_PENDING"
+    )
+    assert fhwa["partner_outreach_status"] == (
+        "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+    )
+    assert fhwa["qualified_partner_evidence_present"] is False
+    assert fhwa["no_follow_up_before"] == "2026-07-23"
+    assert "no solo bid" in payload["summary"]["best_contract_lane"].lower()
     rendered = module.render_markdown(payload)
     assert "INVITATION_CONTINGENT_PLANNING_TARGET" in rendered
 
@@ -197,7 +212,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "No-Bid Or Partner-Only" in rendered
     assert "Expired without verified send: `1`" in rendered
     assert "CDC are sent and receipt-backed" in rendered
-    assert "SAM.gov public API-key rotation became overdue" in rendered
+    assert "SAM.gov public credential rotation became overdue" in rendered
     assert "Guarded installer: `code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py`" in rendered
     assert "HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE" in rendered
     assert len(payload["command_board_sha256"]) == 64
@@ -216,6 +231,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "launchtn_3686_pitch_deck",
         "launchtn_3686_financial_model",
         "external_engagement_response_register",
+        "fhwa_partner_outreach_control",
         "sam_public_key_rotation_control",
         "patent_deadline_evidence_control",
     ):

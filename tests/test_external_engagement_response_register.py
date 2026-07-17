@@ -30,10 +30,10 @@ def test_register_routes_current_actions_without_duplicate_sends():
     records = {row["lane_id"]: row for row in payload["records"]}
 
     assert payload["schema"] == "lumencore.external_engagement_response_register.v1"
-    assert payload["summary"]["record_count"] == 11
+    assert payload["summary"]["record_count"] == 12
     assert payload["summary"]["immediate_human_action_count"] == 2
-    assert payload["summary"]["monitor_only_count"] == 7
-    assert payload["summary"]["do_not_duplicate_send_count"] == 9
+    assert payload["summary"]["monitor_only_count"] == 8
+    assert payload["summary"]["do_not_duplicate_send_count"] == 10
     assert payload["summary"]["email_action_reconciliation_status"] == (
         "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION"
     )
@@ -121,6 +121,15 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert "Send nothing further" in records["terry_vynetic_followup"][
         "next_action"
     ]
+    fhwa = records["fhwa_tsmo_qualified_partner_outreach"]
+    assert fhwa["state"] == "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+    assert fhwa["decision"] == "MONITOR_FOR_PARTNER_RESPONSE_NO_DUPLICATE"
+    assert fhwa["qualified_partner_evidence_present"] is False
+    assert fhwa["no_send_before"] == "2026-07-23"
+    assert fhwa["send_now"] is False
+    assert fhwa["do_not_duplicate_send"] is True
+    assert len(fhwa["message_id_sha256"]) == 64
+    assert payload["source_artifacts"]["fhwa_partner_outreach_control"]["present"] is True
     assert payload["source_artifacts"]["email_action_reconciliation"]["present"] is True
     assert records["nasa_data_center_rfi"]["do_not_duplicate_send"] is True
     assert records["army_aidp_draft_cfs_feedback"]["do_not_duplicate_send"] is True
@@ -183,7 +192,7 @@ def test_mirror_receipt_matches_every_bounded_source():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 52
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 63
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["browser_navigation_performed"] is False
     assert receipt["private_founder_values_mirrored"] is False
@@ -232,6 +241,17 @@ def test_mirror_receipt_matches_every_bounded_source():
         "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
         "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
         "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+        "code/ops/BUILD_FHWA_TSMO_PARTNER_OUTREACH_CONTROL.py",
+        "tests/test_fhwa_tsmo_partner_outreach_control.py",
+        "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json",
+        "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.md",
+        "code/ops/BUILD_NEAR_DEADLINE_PACKAGE_DECISION_GATE.py",
+        "tests/test_near_deadline_package_decision_gate.py",
+        "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-16.md",
+        "out/ops/near_deadline_package_decision_gate_latest.json",
+        "grant_submissions/funding_sprint_20260709/FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md",
+        "out/ops/external_engagement_response_register_latest.json",
+        "dashboard/data/external_engagement_response_register.json",
     }.issubset(mirrored_sources)
 
     assert "does not prove" in receipt["claim_boundary"]

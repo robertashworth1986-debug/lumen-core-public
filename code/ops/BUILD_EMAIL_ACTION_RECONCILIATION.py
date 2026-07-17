@@ -103,6 +103,20 @@ def build_payload() -> dict[str, Any]:
             ),
         },
         {
+            "lane_id": "fhwa_tsmo_qualified_partner_outreach",
+            "organization": "Cambridge Systematics",
+            "latest_event_type": "BOUNDED_PARTNER_FIT_OUTREACH_SENT",
+            "latest_event_utc": "2026-07-17T10:08:29Z",
+            "state": "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING",
+            "email_reply_required": False,
+            "send_now": False,
+            "no_send_before": "2026-07-23",
+            "next_action": (
+                "Monitor for a response; do not resend or claim a partner. Written role "
+                "and corporate-experience permission are required before proposal use."
+            ),
+        },
+        {
             "lane_id": "nsf_project_pitch",
             "organization": "U.S. National Science Foundation",
             "latest_event_type": "MAILBOX_INVITATION_SEARCH",
@@ -166,6 +180,7 @@ def build_payload() -> dict[str, Any]:
             "Patent routing and Georgia PATENTS",
             "LANL VISION and licensing follow-up",
             "EPRI Open Power AI Consortium onboarding",
+            "FHWA TSMO qualified-partner outreach",
             "CDC, NASA, Army, LvlUp, Terry Anderton, and Vynetic",
         ],
         "summary": {
@@ -174,7 +189,7 @@ def build_payload() -> dict[str, Any]:
                 1 for lane in lanes if lane["email_reply_required"]
             ),
             "send_now_count": sum(1 for lane in lanes if lane["send_now"]),
-            "duplicate_outbound_risk_count": 1,
+            "duplicate_outbound_risk_count": 2,
             "out_of_office_count": 1,
             "human_account_action_count": 1,
             "external_send_allowed_without_human": False,
@@ -182,7 +197,7 @@ def build_payload() -> dict[str, Any]:
         "lanes": lanes,
         "excluded_message_classes": [
             "Personal finance and payment notices",
-            "Account-security and password-reset notices",
+            "Account-access and recovery notices",
             "Newsletters, social notifications, and job-alert bulk mail",
         ],
         "claim_boundary": (

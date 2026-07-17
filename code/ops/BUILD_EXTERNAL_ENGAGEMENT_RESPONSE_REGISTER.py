@@ -85,6 +85,12 @@ SAM_ROTATION_CONTROL = (
 EMAIL_ACTION_RECONCILIATION = (
     SPRINT_DIR / "EMAIL_ACTION_RECONCILIATION_2026-07-17.json"
 )
+FHWA_TEAMING_TEMPLATE = (
+    SPRINT_DIR / "FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md"
+)
+FHWA_PARTNER_OUTREACH = (
+    SPRINT_DIR / "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json"
+)
 
 OUT_JSON = OUT_OPS / "external_engagement_response_register_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "external_engagement_response_register.json"
@@ -217,6 +223,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     launchtn = read_json(LAUNCHTN_MANIFEST)
     sam_rotation = read_json(SAM_ROTATION_CONTROL)
     email_reconciliation = read_json(EMAIL_ACTION_RECONCILIATION)
+    fhwa_outreach = read_json(FHWA_PARTNER_OUTREACH)
 
     if nashville_resolution.get("status") != "SIX_FOUNDER_CONFIRMATIONS_REQUIRED":
         raise ValueError("Nashville EC human-fact resolution is missing or stale")
@@ -228,6 +235,13 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         raise ValueError("SAM public credential rotation control is missing or stale")
     if email_reconciliation.get("schema") != "lumencore.email_action_reconciliation.v1":
         raise ValueError("Email action reconciliation is missing or stale")
+    if (
+        fhwa_outreach.get("schema")
+        != "lumencore.fhwa_tsmo_partner_outreach_control.v1"
+        or fhwa_outreach.get("status")
+        != "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+    ):
+        raise ValueError("FHWA partner outreach control is missing or stale")
     if email_reconciliation.get("status") != "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION":
         raise ValueError("Email action reconciliation requires a fresh action review")
     reconciliation_lanes = {
@@ -438,6 +452,34 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             ),
         },
         {
+            "lane_id": "fhwa_tsmo_qualified_partner_outreach",
+            "organization": fhwa_outreach["target"]["organization"],
+            "state": fhwa_outreach["status"],
+            "deadline": fhwa_outreach["opportunity"]["phase_i_deadline"],
+            "decision": "MONITOR_FOR_PARTNER_RESPONSE_NO_DUPLICATE",
+            "response_channel": "EMAIL",
+            "response_ready": False,
+            "send_now": False,
+            "do_not_duplicate_send": True,
+            "no_send_before": fhwa_outreach["response_control"][
+                "no_follow_up_before"
+            ],
+            "action_gate": (
+                "Do not claim a partner, cite corporate experience, or draft a joint "
+                "submission unless a reply supplies written role and evidence permission."
+            ),
+            "response_artifact": rel(FHWA_PARTNER_OUTREACH),
+            "supporting_artifacts": [rel(FHWA_TEAMING_TEMPLATE)],
+            "message_id_sha256": fhwa_outreach["outbound"][
+                "message_id_sha256"
+            ],
+            "qualified_partner_evidence_present": fhwa_outreach[
+                "response_control"
+            ]["qualified_partner_evidence_present"],
+            "next_action": fhwa_outreach["response_control"]["next_action"],
+            "claim_boundary": fhwa_outreach["claim_boundary"],
+        },
+        {
             "lane_id": "nasa_data_center_rfi",
             "organization": "NASA",
             "state": "SENT_VERIFIED_RESPONSE_PENDING",
@@ -500,9 +542,10 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "as_of_date": "2026-07-17",
         "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
         "direct_answer": (
-            "No new email should be sent. If the Nashville EC portal remains open, finish its founder-fact gate; "
+            "The bounded FHWA partner-fit email was sent to one verified TSMO target and must not be duplicated. "
+            "No additional email should be sent now. If the Nashville EC portal remains open, finish its founder-fact gate; "
             "complete the overdue SAM account-key action; and keep the QA-passed LaunchTN 3686 package staged for "
-            "founder facts, assumption approval, and final preview. EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army "
+            "founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army "
             "are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would "
             "reduce credibility."
         ),
@@ -576,6 +619,10 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             ),
             "email_action_reconciliation": artifact_status(
                 EMAIL_ACTION_RECONCILIATION
+            ),
+            "fhwa_teaming_template": artifact_status(FHWA_TEAMING_TEMPLATE),
+            "fhwa_partner_outreach_control": artifact_status(
+                FHWA_PARTNER_OUTREACH
             ),
         },
         "claim_boundary": REGISTER_BOUNDARY,

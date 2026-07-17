@@ -65,6 +65,9 @@ LAUNCHTN_3686_FINANCIAL_MODEL = (
 EXTERNAL_ENGAGEMENT_REGISTER = (
     SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json"
 )
+FHWA_PARTNER_OUTREACH_CONTROL = (
+    SPRINT_DIR / "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json"
+)
 SAM_KEY_ROTATION_CONTROL = (
     SPRINT_DIR / "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json"
 )
@@ -208,6 +211,7 @@ def base_sources() -> dict[str, Any]:
         "launchtn_3686_pitch_deck": LAUNCHTN_3686_DECK,
         "launchtn_3686_financial_model": LAUNCHTN_3686_FINANCIAL_MODEL,
         "external_engagement_response_register": EXTERNAL_ENGAGEMENT_REGISTER,
+        "fhwa_partner_outreach_control": FHWA_PARTNER_OUTREACH_CONTROL,
         "sam_public_key_rotation_control": SAM_KEY_ROTATION_CONTROL,
         "patent_deadline_evidence_control": PATENT_DEADLINE_CONTROL,
     }.items():
@@ -337,6 +341,17 @@ def build_command_lanes(
     nsf = grants.get("26-510", {})
     nsf_routing = read_json(NSF_ROUTING_MANIFEST)
     nsf_full_proposal = nsf_routing.get("full_proposal", {})
+    fhwa_outreach = read_json(FHWA_PARTNER_OUTREACH_CONTROL)
+    fhwa_target_contacted = (
+        fhwa_outreach.get("schema")
+        == "lumencore.fhwa_tsmo_partner_outreach_control.v1"
+        and fhwa_outreach.get("status")
+        == "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+        and fhwa_outreach.get("response_control", {}).get(
+            "qualified_partner_evidence_present"
+        )
+        is False
+    )
     hud = grants.get("PDR-2600-DC-029Q", {})
     hhs_child = grants.get("HHS-2026-ACF-ACYF-CA-0037", {})
 
@@ -475,9 +490,13 @@ def build_command_lanes(
             "agency": fhwa.get("agency", "Federal Highway Administration"),
             "deadline_utc": fhwa.get("deadline_utc", "2026-08-03T13:00:00Z"),
             "deadline_date": "2026-08-03",
-            "command": "BUILD_PRIMARY_VOLUME",
-            "eligibility_state": "SOLICITATION_REVIEW_REQUIRED",
-            "fit_state": "STRONG_MEASUREMENT_AND_TSMO_FIT",
+            "command": "NO_SOLO_SUBMIT_PARTNER_ONLY",
+            "eligibility_state": (
+                "QUALIFIED_TARGET_CONTACTED_PARTNER_CONFIRMATION_PENDING"
+                if fhwa_target_contacted
+                else "MANDATORY_CORPORATE_EXPERIENCE_PARTNER_REQUIRED"
+            ),
+            "fit_state": "STRONG_TECHNICAL_FIT_MANDATORY_CORPORATE_EXPERIENCE_MISSING",
             "submission_route": fhwa.get("submission_route", "SAM.gov / official solicitation instructions"),
             "official_url": fhwa.get("official_url", "https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view"),
             "package_files": fhwa.get(
@@ -490,17 +509,32 @@ def build_command_lanes(
             )
             + [
                 "FHWA_TSMO_COMPLIANCE_MATRIX_DRAFT_2026-07-11.md",
+                "FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md",
+                "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json",
             ],
-            "why_now": "Best fit for LumenCore's measured-source validation story: TSMO data barriers, prototype algorithms, use-case prioritization, and evidence-backed evaluation.",
+            "why_now": (
+                "LumenCore has a strong bounded technical fit, but the solicitation requires "
+                "documented corporate TSMO data-processing experience that LumenCore cannot "
+                "claim. One qualified target was contacted on July 17; contact is not a partner."
+            ),
             "today_work": [
-                "Download/review official attachments and amendments.",
-                "Add a compliance matrix to the Phase I outline.",
-                "Stage SAM.gov upload packet and hold at final preview.",
+                "Monitor the single qualified-target outreach for a response.",
+                "Do not send a duplicate follow-up before July 23 and do not claim a partner.",
+                "If a response arrives, verify role, references, conflicts, facilities, data rights, and permission to cite corporate experience.",
             ],
             "human_gate": [
-                "Robert approves Phase I volume, reps/certs, and any price/cost language.",
-                "Robert approves final SAM.gov submission preview.",
+                "A qualified organization confirms a role and documentable corporate experience in writing.",
+                "Robert approves any teaming terms, Phase I claims, and final submission preview.",
             ],
+            "partner_outreach_status": (
+                fhwa_outreach.get("status") if fhwa_target_contacted else "NOT_SENT"
+            ),
+            "qualified_partner_evidence_present": False,
+            "no_follow_up_before": (
+                fhwa_outreach.get("response_control", {}).get("no_follow_up_before")
+                if fhwa_target_contacted
+                else None
+            ),
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,
         },
@@ -947,24 +981,24 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
     sam_deadline_state = sam_rotation_control["deadline"]["state"]
     if sam_rotation_control["rotation_verified"]:
         sam_critical_action = (
-            "SAM.gov public API-key rotation is locally detected and live-API verified; preserve the "
+            "SAM.gov public credential rotation is locally detected and live-API verified; preserve the "
             "private key boundary and continue monitoring client health."
         )
     elif sam_deadline_state == "PAST_DUE":
         sam_critical_action = (
-            "SAM.gov public API-key rotation became overdue after 2026-07-16. Use the guarded hidden-input "
+            "SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input "
             "installer immediately, then require changed-fingerprint and live-API verification. Entity "
             "registration remains active; credential rotation is a separate account-maintenance action."
         )
     elif sam_deadline_state == "DUE_TODAY":
         sam_critical_action = (
-            "SAM.gov public API-key rotation is due 2026-07-16. Use the guarded hidden-input installer "
+            "SAM.gov public credential rotation is due 2026-07-16. Use the guarded hidden-input installer "
             "today; entity registration remains active and credential rotation is a separate "
             "account-maintenance action."
         )
     else:
         sam_critical_action = (
-            "SAM.gov public API-key rotation is upcoming. Use the guarded hidden-input installer before "
+            "SAM.gov public credential rotation is upcoming. Use the guarded hidden-input installer before "
             "the deadline and verify the replacement without exposing it."
         )
     patent_deadline_control = read_json(PATENT_DEADLINE_CONTROL)
@@ -1019,7 +1053,7 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
             "best_grants_lane": "NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. July 27, 2026 is officially listed but currently inaccessible; November 4, 2026 is planning only.",
-            "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03.",
+            "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: one qualified target was contacted July 17, but no solo bid and no partner claim unless written corporate-experience evidence arrives.",
             "fastest_low_friction_lane": "The Nashville EC TakeOff application is the nearest low-friction reviewer route, but six founder confirmations and final portal submission remain human-gated.",
             "all_final_actions_blocked_without_human": True,
             "external_send_allowed_without_human": False,
@@ -1156,7 +1190,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        f"Direct answer: NASA, Army, and CDC are sent and receipt-backed. {summary['critical_same_day_infrastructure_action']} Finish the July 17 Nashville EC TakeOff application, stage the rolling NSF Project Pitch, and re-verify FHWA while keeping DOJ/BOP partner-only.",
+        f"Direct answer: NASA, Army, and CDC are sent and receipt-backed. {summary['critical_same_day_infrastructure_action']} Finish the July 17 Nashville EC TakeOff application, stage the rolling NSF Project Pitch, and monitor the single FHWA qualified-target outreach without claiming a partner or sending a duplicate while keeping DOJ/BOP partner-only.",
         "",
         "## Control Line",
         "",

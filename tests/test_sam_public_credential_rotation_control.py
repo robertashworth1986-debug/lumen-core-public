@@ -239,7 +239,7 @@ def test_private_baseline_is_write_once_and_public_output_is_safe(tmp_path: Path
     module.ensure_public_safe(serialized, ["first-secret"])
     module.ensure_public_safe(rendered, ["first-secret"])
 
-    assert "No secret value" in rendered
+    assert "No credential value" in rendered
     assert "fingerprint" in rendered.lower()
     assert "first-secret" not in rendered
     assert first["fingerprint_sha256"] not in rendered

@@ -1,19 +1,19 @@
 # External Engagement Response Register - 2026-07-17
 
-No new email should be sent. If the Nashville EC portal remains open, finish its founder-fact gate; complete the overdue SAM account-key action; and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would reduce credibility.
+The bounded FHWA partner-fit email was sent to one verified TSMO target and must not be duplicated. No additional email should be sent now. If the Nashville EC portal remains open, finish its founder-fact gate; complete the overdue SAM account-key action; and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would reduce credibility.
 
 ## Control Summary
 
 - Status: `CURRENT_RESPONSE_CONTROL_HUMAN_GATED`
-- Engagement records: `11`
+- Engagement records: `12`
 - Immediate human actions: `2`
-- Monitor-only lanes: `7`
-- Do-not-duplicate lanes: `9`
+- Monitor-only lanes: `8`
+- Do-not-duplicate lanes: `10`
 - Verified attachments: `6`
 - All attachment checks pass: `true`
 - Autonomous external send allowed: `false`
 - Autonomous final portal submit allowed: `false`
-- Register SHA-256: `c5d041210c7a0a3278e1d00d516436c079baa61af7ae7185addd9397ccb26733`
+- Register SHA-256: `b7bf13cbd6b9f1810d7b0d724140095e170bc7e7443f5b86cd63e4d6b01e51d5`
 
 ## Response Queue
 
@@ -28,6 +28,7 @@ No new email should be sent. If the Nashville EC portal remains open, finish its
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `MONITOR_NO_REPLY_REQUIRED` | 2026-07-30T21:00:00Z | `true` |
 | Los Alamos National Laboratory | `OUTBOUND_SENT_RESPONSE_PENDING` | `MONITOR_THEN_ONE_BOUNDED_FOLLOW_UP` | 2026-07-23 | `true` |
 | Terry Anderton / Vynetic | `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY` | `MONITOR_NO_FURTHER_FOLLOWUP` | None | `true` |
+| Cambridge Systematics | `OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING` | `MONITOR_FOR_PARTNER_RESPONSE_NO_DUPLICATE` | 2026-08-03T09:00:00-04:00 | `true` |
 | NASA | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | 2026-07-17T21:00:00Z | `true` |
 | U.S. Army | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | None | `true` |
 
@@ -112,8 +113,8 @@ No new email should be sent. If the Nashville EC portal remains open, finish its
 - Action gate: Founder completes the official SAM.gov one-time-password flow, supplies the replacement key only through the hidden local installer prompt, and authorizes the final account confirmation. No secret may enter this register.
 - Next action: Rotate the public API key inside the authenticated SAM.gov account, run the guarded installer, and rerun the verifier until the private fingerprint changes and an authenticated probe is observable.
 - Response artifact: `grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json`
-- Claim boundary: This control proves only bounded local secret-discovery state, fingerprint comparison, and the recorded API probe result. It never stores or publishes an API key. A changed fingerprint proves that the configured secret changed, not that SAM.gov accepted it. Only a successful authenticated probe can establish live API acceptance, and no browser, account, submission, or opportunity state is changed by this control.
-- Record SHA-256: `665cb6e4c47692e8976201b71ddc3e166f57b2a6b3ce9b4ddfc9caee2a28dfdc`
+- Claim boundary: This control proves only bounded local credential-discovery state, fingerprint comparison, and the recorded API probe result. It never stores or publishes a credential value. A changed fingerprint proves that the configured value changed, not that SAM.gov accepted it. Only a successful authenticated probe can establish live API acceptance, and no browser, account, submission, or opportunity state is changed by this control.
+- Record SHA-256: `b33fac024a6456f54cb75d5aa0dc744a739c7b631c2dbab149635fa95202afca`
 
 ### Centers for Disease Control and Prevention
 
@@ -168,6 +169,20 @@ LumenCore
 - Response artifact: `grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json`
 - Claim boundary: The mailbox record proves only that two near-duplicate follow-ups were sent and no inbound reply was observed at reconciliation time. It does not prove interest, rejection, selection, funding, or validation.
 - Record SHA-256: `ae8344c154e7a7eb0d8fe2c6211f0cd8759b677cf093e7841606986f0f4fef67`
+
+### Cambridge Systematics
+
+- Lane: `fhwa_tsmo_qualified_partner_outreach`
+- State: `OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING`
+- Decision: `MONITOR_FOR_PARTNER_RESPONSE_NO_DUPLICATE`
+- Response channel: `EMAIL`
+- Response ready: `false`
+- Send now: `false`
+- Action gate: Do not claim a partner, cite corporate experience, or draft a joint submission unless a reply supplies written role and evidence permission.
+- Next action: Monitor for a reply. If Cambridge Systematics responds, verify role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule before any teaming or proposal claim.
+- Response artifact: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json`
+- Claim boundary: The official company pages support target selection, and the Gmail SENT label plus hashed message identifier support transmission. They do not establish receipt, interest, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.
+- Record SHA-256: `d496d2523798fb9b0dfe3462833a4462b1332b8e3ac29e465110eb900db9c551`
 
 ### NASA
 
@@ -227,8 +242,10 @@ LumenCore
 - `launchtn_pitch_deck`: present=`true` bytes=`353970` sha256=`C607E94D8E072EC9D9F93DA0D8C372FD5592B01D2CA3B4F71C0A079417C18A69` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx`
 - `launchtn_financial_model`: present=`true` bytes=`16166` sha256=`9DA46F8AD94FC53EF561EE33DCFA6DF907897CAEADF6AFBD08FB113FC6887D94` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx`
 - `lvlup_historical_application_draft`: present=`true` bytes=`12152` sha256=`F75EBF8FD60A40968484D6AE147FB6D02848CA109AB277337C5BAE5085CBA796` path=`docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md`
-- `sam_public_credential_rotation_control`: present=`true` bytes=`4529` sha256=`6635A3FA854BD29C14547E6112CB66C51C5B8238908C438099A52610D140A563` path=`grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json`
-- `email_action_reconciliation`: present=`true` bytes=`6510` sha256=`FFB2C77F4E2BAEF34A6AEC9628BCD963A9792F63AA22155ADEB309981BDC303A` path=`grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json`
+- `sam_public_credential_rotation_control`: present=`true` bytes=`4544` sha256=`AAC20E903A5055E731DA65E5E5A82F08D5C34A7288AA6BED4D0ED78C4F0BE159` path=`grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json`
+- `email_action_reconciliation`: present=`true` bytes=`7114` sha256=`6BA301EA39E4236338E0872A2BF8C36CDB1A1D4ED6925F622D3E200EDD387387` path=`grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json`
+- `fhwa_teaming_template`: present=`true` bytes=`2114` sha256=`6614F9D452565F9E5F54B3E70B45E93F112DD1293A8845E43489E339D34B0819` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md`
+- `fhwa_partner_outreach_control`: present=`true` bytes=`4494` sha256=`8A6D0B28CC7AFD33A376FE4908A99E5EE008795637C4BB995A5519660B5744E4` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json`
 
 ## Claim Boundary
 

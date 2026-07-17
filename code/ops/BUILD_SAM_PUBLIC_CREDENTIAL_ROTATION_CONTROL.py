@@ -47,9 +47,9 @@ EMAIL_EVIDENCE = {
 }
 
 CLAIM_BOUNDARY = (
-    "This control proves only bounded local secret-discovery state, fingerprint comparison, and the "
-    "recorded API probe result. It never stores or publishes an API key. A changed fingerprint proves "
-    "that the configured secret changed, not that SAM.gov accepted it. Only a successful authenticated "
+    "This control proves only bounded local credential-discovery state, fingerprint comparison, and the "
+    "recorded API probe result. It never stores or publishes a credential value. A changed fingerprint proves "
+    "that the configured value changed, not that SAM.gov accepted it. Only a successful authenticated "
     "probe can establish live API acceptance, and no browser, account, submission, or opportunity state "
     "is changed by this control."
 )
@@ -379,7 +379,7 @@ def build_payload(
             "steps": [
                 "Keep the existing signed-in in-app browser tab on SAM.gov.",
                 "Open Account Details and locate Public API Key.",
-                "Use the SAM.gov one-time-password flow to reveal the already-generated replacement.",
+                "Use the SAM.gov one-time verification flow to reveal the already-generated replacement.",
                 "Run `python code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py` in a private terminal and paste the replacement only at its hidden prompt.",
                 "Rerun this verifier and require a changed private fingerprint; require a live authenticated response when the upstream API is observable.",
             ],
@@ -397,7 +397,7 @@ def build_payload(
             "browser_navigation_performed": False,
         },
         "decision": (
-            "No configured SAM public API credential was found; install the replacement only in the ignored private secret store."
+            "No configured SAM public API credential was found; install the replacement only in the ignored private credential store."
             if not selected
             else (
                 "Capture a private write-once fingerprint baseline before installing the replacement."
@@ -406,7 +406,7 @@ def build_payload(
                     "Do not claim the SAM key is rotated yet. The current local aliases are consistent, but "
                     "the private fingerprint has not changed and the API probe is inconclusive."
                     if not fingerprint_changed
-                    else "A replacement secret is detected locally; API acceptance remains bounded by the probe result."
+                    else "A replacement credential is detected locally; API acceptance remains bounded by the probe result."
                 )
             )
         ),
@@ -421,7 +421,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     local = payload["local_configuration"]
     probe = payload["api_probe"]
     lines = [
-        "# SAM.gov API-Key Rotation Control - 2026-07-16",
+        "# SAM.gov Public Credential Rotation Control - 2026-07-16",
         "",
         f"Status: `{payload['status']}`",
         "",
@@ -435,7 +435,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Official reminder received UTC: `{payload['deadline']['source']['received_utc']}`",
         f"- Rotation deadline, America/Chicago: `{payload['deadline']['date_local']}`",
         f"- Local configured aliases: `{local['configured_entry_count']}`",
-        f"- Distinct configured secret values: `{local['distinct_secret_value_count']}`",
+        f"- Distinct configured credential values: `{local['distinct_secret_value_count']}`",
         f"- Aliases consistent: `{str(local['aliases_consistent']).lower()}`",
         f"- Private baseline present: `{str(local['private_baseline_present']).lower()}`",
         f"- Replacement installation detected: `{str(local['replacement_installation_detected']).lower()}`",
@@ -444,7 +444,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Rotation verified: `{str(payload['rotation_verified']).lower()}`",
         f"- Control SHA-256: `{payload['control_sha256']}`",
         "",
-        "No secret value, request URL, response body, or secret fingerprint is published.",
+        "No credential value, request URL, response body, or credential fingerprint is published.",
         f"The guarded local installer is `{payload['private_installer']['path']}`; it accepts the replacement only through a hidden prompt.",
         "",
         "## Human Action Gate",

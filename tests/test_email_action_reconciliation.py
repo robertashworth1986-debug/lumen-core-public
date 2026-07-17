@@ -29,7 +29,7 @@ def test_reconciliation_is_deterministic_and_no_send():
     module.validate_payload(actual)
     assert actual == expected
     assert actual["status"] == "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION"
-    assert actual["summary"]["lane_count"] == 10
+    assert actual["summary"]["lane_count"] == 11
     assert actual["summary"]["email_reply_required_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
     assert actual["summary"]["external_send_allowed_without_human"] is False
@@ -50,6 +50,12 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert epri["out_of_office_through"] == "2026-07-20"
     assert epri["no_send_before"] == "2026-07-23"
 
+    fhwa = lanes["fhwa_tsmo_qualified_partner_outreach"]
+    assert fhwa["latest_event_type"] == "BOUNDED_PARTNER_FIT_OUTREACH_SENT"
+    assert fhwa["state"] == "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+    assert fhwa["no_send_before"] == "2026-07-23"
+    assert fhwa["send_now"] is False
+
 
 def test_public_reconciliation_excludes_private_mailbox_data():
     module = load_module()
@@ -69,4 +75,4 @@ def test_public_reconciliation_excludes_private_mailbox_data():
         assert forbidden not in rendered
 
     assert "personal finance and payment notices" in rendered
-    assert "account-security and password-reset notices" in rendered
+    assert "account-access and recovery notices" in rendered

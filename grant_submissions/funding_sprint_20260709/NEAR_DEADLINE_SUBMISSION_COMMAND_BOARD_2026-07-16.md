@@ -16,7 +16,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; rotate the SAM.g
 - Expired without verified send: `1`
 - Human-gated lanes: `12`
 - Strongest today action: Retrieve and install the already-generated SAM.gov replacement public API key without exposing it, complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close, then capture the complete Patent Center docket for the separate U.S.-deadline and foreign/PCT-priority reviews; NASA, Army, and CDC are already sent and receipt-backed.
-- Critical same-day infrastructure action: SAM.gov public API-key rotation is due 2026-07-16. Entity registration remains active; credential rotation is a separate account-maintenance action.
+- Critical same-day infrastructure action: SAM.gov public credential rotation is due 2026-07-16. Entity registration remains active; credential rotation is a separate account-maintenance action.
 - Closest deadline lane: HHS-2026-ACL-NIDILRR-REGE-0212 RERC on AI-Driven Assistive and Rehabilitation Technologies, due July 16, 2026 at 11:59 PM Eastern Time; command TECHNICAL_CAPACITY_AND_DOMAIN_GATE; fit POTENTIAL_LUMA_SKIN_SUIT_FIT_NOT_YET_EVIDENCED_IN_REPOSITORY.
 - Closest stage-ready lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Best grants lane: NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. November 4, 2026 is planning only.

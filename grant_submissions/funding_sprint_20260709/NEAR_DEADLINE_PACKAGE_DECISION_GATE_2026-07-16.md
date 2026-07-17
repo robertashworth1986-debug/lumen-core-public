@@ -6,9 +6,9 @@ As of: July 16, 2026
 
 1. **NSF Project Pitch** - stage first after checking the duplicate-pitch/open-invitation gate in the portal.
 2. **ERDC Sovereign Defense Cloud** - build the compliant five-page solution brief as a validation and relationship lane; the notice says funding is not currently available.
-3. **FHWA TSMO** - do not submit as a solo prime unless a qualified partner supplies the mandatory corporate-experience evidence.
+3. **FHWA TSMO** - qualified-target outreach was sent July 17; do not submit as a solo prime unless written partner evidence supplies the mandatory corporate-experience requirement.
 
-NSF has the smallest truthful completion gap and no fixed Project Pitch deadline. ERDC is a credible five-page validation lane but currently has no available funding. FHWA is not compliant as a solo prime without qualifying TSMO corporate experience or a partner that supplies it.
+NSF has the smallest truthful completion gap and no fixed Project Pitch deadline. ERDC is a credible five-page validation lane but currently has no available funding. A qualified FHWA TSMO target was contacted on July 17, but FHWA remains noncompliant as a solo prime unless written partner evidence supplies the mandatory corporate experience.
 
 ## Package Gates
 
@@ -38,7 +38,7 @@ NSF has the smallest truthful completion gap and no fixed Project Pitch deadline
 ### 3. FHWA TSMO Data Initiative
 
 - Deadline: `2026-08-03T09:00:00-04:00`
-- Posture: `NO_GO_AS_SOLO_PRIME_UNLESS_QUALIFIED_PARTNER_JOINS`
+- Posture: `OUTREACH_SENT_NO_GO_UNTIL_PARTNER_CONFIRMATION`
 - Quick-funding fit: `PARTNER_DEPENDENT`
 - Hard gates:
   - Mandatory five or more years of successfully executed TSMO data-processing experience.

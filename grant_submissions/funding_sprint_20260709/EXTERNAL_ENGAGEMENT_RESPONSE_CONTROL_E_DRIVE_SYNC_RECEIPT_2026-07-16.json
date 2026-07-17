@@ -1,34 +1,34 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T09:58:47.0245122Z",
+  "created_utc": "2026-07-17T10:27:54.1324476Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_20260716",
-  "artifact_count": 52,
+  "artifact_count": 63,
   "all_sha256_matched_after_copy": true,
   "browser_navigation_performed": false,
   "private_founder_values_mirrored": false,
   "artifacts": [
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
-      "bytes": 33855,
-      "sha256": "A9472249B2BF98C78EAA4A21FB78CFC4E1B358EA238CC958601CB49A8682D1F1",
+      "bytes": 36078,
+      "sha256": "1B3998BF886E6E20CA169D6045C56A9C0DF182E41D4AF25D047A0E100C83C1B0",
       "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 72235,
-      "sha256": "B47407C0F3E18439C3300E2DD0DB69AA43E3B143BE37257D7D32C9F84521CD38",
+      "bytes": 74120,
+      "sha256": "39B9652E19A017D2EEDE41A67E439518C8DE1306614793DE669FEBFF20AC371D",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
-      "bytes": 12781,
-      "sha256": "2DA261F8F15469F60B2089B0CB0C7F925DC29B1C14BA6892BD320940F6F5AB41",
+      "bytes": 14194,
+      "sha256": "3B02608BDE9515D50C63EA0617F537EB402C4F867CA47471761472B231739A64",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 10794,
-      "sha256": "EEA01E87164A61615AEDAFA07C47FDE98783E293EFF92E9310FF6E9C2210F038",
+      "bytes": 11450,
+      "sha256": "5BFD66C14F1FB17D3D6CBD5434541DC5499B655725663D665C0B101001C6AD25",
       "copy_sha256_matched": true
     },
     {
@@ -39,8 +39,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-      "bytes": 20532,
-      "sha256": "A85FF21F6E5400247BAEDC1BA09AF0A5905F5E58F81358826B881DCE758F3BB4",
+      "bytes": 22464,
+      "sha256": "32FD152BDCA7A50564960C1774873EAF6B4E146C0805DF2B6A89FEAC010CA540",
       "copy_sha256_matched": true
     },
     {
@@ -51,8 +51,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
-      "bytes": 38019,
-      "sha256": "2DD6E5291A34A780CBBA3414B80187E9C2788C3878E98093A6EEEA79B7B9C0D7",
+      "bytes": 38021,
+      "sha256": "4BE304AEA326E10CC4B9A4C131A2FB0131E4F37FE572D0429817173B2E0CB873",
       "copy_sha256_matched": true
     },
     {
@@ -111,8 +111,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
-      "bytes": 27983,
-      "sha256": "CFF4D1C22A31815D65B8F6AF6EB0E5A26691ACCB558CAA55982088E9A61AB5F2",
+      "bytes": 30391,
+      "sha256": "8DD5F17D0241C5BD909A085029C87E07761FC13252B124E734FA551814D6A037",
       "copy_sha256_matched": true
     },
     {
@@ -165,26 +165,26 @@
     },
     {
       "source": "code/ops/BUILD_SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL.py",
-      "bytes": 21213,
-      "sha256": "D9D9507FF0970DAE7CDC25C9B79D41942CAED334E5F4936EB1E92EE409C23A31",
+      "bytes": 21258,
+      "sha256": "B4E0E2DF7632D53C1CDE9E96E771F4D0F76FB6CF5DFDA6D660862D4936C555B7",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_sam_public_credential_rotation_control.py",
-      "bytes": 8771,
-      "sha256": "565DEEEF1A6807E2CC811EF4D89B896A5738E82DBCF4A2815AA4C9ED08040768",
+      "bytes": 8775,
+      "sha256": "910184D55B729B9A8439CC855D473D01F16A8952602F2810D63550B52E4DD4C9",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
-      "bytes": 4529,
-      "sha256": "6635A3FA854BD29C14547E6112CB66C51C5B8238908C438099A52610D140A563",
+      "bytes": 4544,
+      "sha256": "AAC20E903A5055E731DA65E5E5A82F08D5C34A7288AA6BED4D0ED78C4F0BE159",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
-      "bytes": 2182,
-      "sha256": "B3A0D9A758844E526EA94F34AAF7EAD4AB0EB168C32C79B1C69615FC2ED516C7",
+      "bytes": 2219,
+      "sha256": "BE187A93A7553E692C7781EA56686769D3F539B7B27E1D944DC525B4E1623440",
       "copy_sha256_matched": true
     },
     {
@@ -291,34 +291,100 @@
     },
     {
       "source": "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
-      "bytes": 11332,
-      "sha256": "DC3895CB5E88E3C6D40710EC9EFC510820352FCFF2A3891F1A2ADD297E96659B",
+      "bytes": 12046,
+      "sha256": "AB0D0875C00AC0FCBBE8B7A7BA532144358034C406A26E01F070956A3C7488A9",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_email_action_reconciliation.py",
-      "bytes": 2349,
-      "sha256": "8296A17DE0405566F8F679C6474E97A015274117A76192B9FF7EE92A6CC0733A",
+      "bytes": 2635,
+      "sha256": "D0153AAF6587915D5F9DA6F05E21C6A4821F565581B8F3D35B6B6B274492A078",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
-      "bytes": 6510,
-      "sha256": "FFB2C77F4E2BAEF34A6AEC9628BCD963A9792F63AA22155ADEB309981BDC303A",
+      "bytes": 7114,
+      "sha256": "6BA301EA39E4236338E0872A2BF8C36CDB1A1D4ED6925F622D3E200EDD387387",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
-      "bytes": 2727,
-      "sha256": "CD8FD4C2DBE2DD34F8F07D37126B3B3CD1479F6123CEBA03AF83719CC4FF6873",
+      "bytes": 2946,
+      "sha256": "86BC8A9B322BAE9293FF469F738C6CCBE9F5A196DC3BFCD382717F2F811BAEBD",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
-      "bytes": 42913,
-      "sha256": "19673825A74A72ABA7F341EA858AD1C0EA35F7B3BAED498560AE7A59D0E81A7F",
+      "bytes": 43600,
+      "sha256": "A07816A1A3685FDA035F1231CB66BEF320564CA0E40C9CFAD9A21A568F275540",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_FHWA_TSMO_PARTNER_OUTREACH_CONTROL.py",
+      "bytes": 7657,
+      "sha256": "9C801E70303840AF9595A8A0E8A8B6739A26657F024231B5ABA93E00DE8742A5",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_fhwa_tsmo_partner_outreach_control.py",
+      "bytes": 2392,
+      "sha256": "87B2746EFA6AB14A80BDAD5988499279D576ADAF0DC832C50DCC59E68318F183",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json",
+      "bytes": 4494,
+      "sha256": "8A6D0B28CC7AFD33A376FE4908A99E5EE008795637C4BB995A5519660B5744E4",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.md",
+      "bytes": 3118,
+      "sha256": "BC838FF6DCD5D72A651B8920F7F514A4DE3F54C0D4F76DAAAECD67D2CB4C5720",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_PACKAGE_DECISION_GATE.py",
+      "bytes": 17775,
+      "sha256": "AE802E66E4732E5F0D688DA4095D565760B7F78EFAEE408EDE2ECB7636182299",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_package_decision_gate.py",
+      "bytes": 3737,
+      "sha256": "969C44B564F3B46BFBD6177FDAAD44A4723D451EBC44C7E6C6FA2DFD3CB36906",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-16.md",
+      "bytes": 2927,
+      "sha256": "B2CDA719028098C6CA11258345E4CB82405F4E80853E8921E8571AB075BAE61D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/near_deadline_package_decision_gate_latest.json",
+      "bytes": 7555,
+      "sha256": "2CC596C3DF889D27929DE49CC90A487F5489AA169DC3A2BA418213B5593D4B22",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md",
+      "bytes": 2114,
+      "sha256": "6614F9D452565F9E5F54B3E70B45E93F112DD1293A8845E43489E339D34B0819",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/external_engagement_response_register_latest.json",
+      "bytes": 30391,
+      "sha256": "8DD5F17D0241C5BD909A085029C87E07761FC13252B124E734FA551814D6A037",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/external_engagement_response_register.json",
+      "bytes": 30391,
+      "sha256": "8DD5F17D0241C5BD909A085029C87E07761FC13252B124E734FA551814D6A037",
       "copy_sha256_matched": true
     }
   ],
-  "claim_boundary": "This receipt proves only that 52 bounded engagement-response, deadline-control, attachment, reconciliation, private-workflow code, test, and public-safe artifact files were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove external transmission beyond the separately cited sent receipts, portal submission, acceptance, selection, award, validation, customer commitment, or permission to publish private founder, account, patent, or credential values."
+  "claim_boundary": "This receipt proves only that 63 bounded engagement-response, FHWA partner-outreach, deadline-control, attachment, reconciliation, private-workflow code, test, and public-safe artifact files were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove external receipt beyond the separately cited sent receipt, a teaming relationship, permission to cite corporate experience, portal submission, acceptance, selection, award, validation, customer commitment, or permission to publish private founder, account, patent, or credential values."
 }

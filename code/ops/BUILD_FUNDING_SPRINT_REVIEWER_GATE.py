@@ -79,6 +79,8 @@ BOUNDARY_SECTION_MARKERS = [
     "blocked:",
     "blocked language unless",
     "not allowed",
+    "blocked until",
+    "must_stop_before",
 ]
 
 ACTIVE_LANES = [
@@ -180,7 +182,9 @@ def markdown_files() -> list[Path]:
 
 def line_is_boundary(line: str) -> bool:
     lowered = line.lower()
-    return any(marker in lowered for marker in BOUNDARY_MARKERS)
+    structured_false = re.search(r":\s*`?false`?\s*$", lowered) is not None
+    structured_negative_true = re.search(r"_[a-z0-9]*not_[a-z0-9_]+:\s*`?true`?\s*$", lowered) is not None
+    return structured_false or structured_negative_true or any(marker in lowered for marker in BOUNDARY_MARKERS)
 
 
 def line_opens_boundary_section(line: str) -> bool:

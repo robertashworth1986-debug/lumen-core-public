@@ -6,10 +6,10 @@ Status: `NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION`
 
 ## Control Line
 
-- Reconciled lanes: `10`
+- Reconciled lanes: `11`
 - Reply required now: `0`
 - Send now: `0`
-- Duplicate-outbound risks: `1`
+- Duplicate-outbound risks: `2`
 - Human account actions: `1`
 - Browser navigation performed: `false`
 
@@ -23,6 +23,7 @@ Status: `NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION`
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `false` | Monitor for a CDC clarification, replacement request, or scheduling message; do not resend the response. |
 | LvlUp Ventures / Power of the Pitch Week | `OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND` | `false` | No reply or purchase; reconsider only if a relevant no-fee route or written non-pay-to-play selection terms arrive. |
 | Terry Anderton / Vynetic | `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY` | `false` | Send nothing further unless Terry replies with a specific ask; then answer only that ask in the existing thread. |
+| Cambridge Systematics | `OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING` | `false` | Monitor for a response; do not resend or claim a partner. Written role and corporate-experience permission are required before proposal use. |
 | U.S. National Science Foundation | `NO_OFFICIAL_PROJECT_PITCH_INVITATION_VERIFIED` | `false` | Use the rolling Project Pitch portal route; do not represent the July 27 full-proposal deadline as reachable without an invitation. |
 | NASA | `SENT_VERIFIED_RESPONSE_PENDING` | `false` | Monitor for an agency clarification or replacement request. |
 | U.S. Army | `SENT_VERIFIED_RESPONSE_PENDING` | `false` | Monitor for agency feedback; do not duplicate-send. |
@@ -31,7 +32,7 @@ Status: `NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION`
 ## Excluded Message Classes
 
 - Personal finance and payment notices
-- Account-security and password-reset notices
+- Account-access and recovery notices
 - Newsletters, social notifications, and job-alert bulk mail
 
 ## Claim Boundary

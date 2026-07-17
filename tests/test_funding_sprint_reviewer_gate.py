@@ -71,3 +71,22 @@ def test_rendered_markdown_preserves_no_autonomous_submission_rule():
     assert "Live trading allowed: `false`" in rendered
     assert "Final submission without human allowed: `false`" in rendered
     assert "No portal submission" in rendered
+
+
+def test_scanner_recognizes_structured_negative_claim_and_secret_metadata(tmp_path):
+    module = load_module()
+    artifact = tmp_path / "bounded.md"
+    artifact.write_text(
+        "# Review\n\n"
+        "- Secret content indexed: `false`\n"
+        "- secret_contents_not_published: `true`\n"
+        "- Realized savings claim allowed: `false`\n\n"
+        "## Blocked Until Human\n\n"
+        "- claim of agency validation, realized savings, or award certainty\n",
+        encoding="utf-8",
+    )
+
+    scan = module.scan_files([artifact])
+    assert scan["unsafe_secret_count"] == 0
+    assert scan["unsafe_claim_count"] == 0
+    assert scan["boundary_hit_count"] >= 4

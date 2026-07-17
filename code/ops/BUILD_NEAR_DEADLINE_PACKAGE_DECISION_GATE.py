@@ -22,6 +22,9 @@ ERDC_SOURCE_DIR = SPRINT / "source_attachments" / "W912HZ26SC005"
 ERDC_SOURCE_OUT = ERDC_SOURCE_DIR / "SOURCE_MANIFEST_2026-07-16.json"
 SAM_CAPTURE = OUT / "sam_gov_entity_status_capture_latest.json"
 FHWA_PARTNER_EVIDENCE = SPRINT / "FHWA_TSMO_QUALIFIED_PARTNER_EVIDENCE.json"
+FHWA_OUTREACH_CONTROL = (
+    SPRINT / "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json"
+)
 
 NSF_FIELDS = NSF / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md"
 NSF_ROUTING = NSF / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json"
@@ -152,6 +155,17 @@ def build_gate() -> dict[str, Any]:
         and sam["purpose_of_registration"] == "All Awards"
     )
     partner_verified = FHWA_PARTNER_EVIDENCE.exists()
+    fhwa_outreach = read_json(FHWA_OUTREACH_CONTROL)
+    qualified_target_contacted = (
+        fhwa_outreach.get("schema")
+        == "lumencore.fhwa_tsmo_partner_outreach_control.v1"
+        and fhwa_outreach.get("status")
+        == "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+        and fhwa_outreach.get("response_control", {}).get(
+            "qualified_partner_evidence_present"
+        )
+        is False
+    )
 
     lanes = [
         {
@@ -214,7 +228,11 @@ def build_gate() -> dict[str, Any]:
             "posture": (
                 "QUALIFIED_PARTNER_EVIDENCE_PRESENT_REVIEW_REQUIRED"
                 if partner_verified
-                else "NO_GO_AS_SOLO_PRIME_UNLESS_QUALIFIED_PARTNER_JOINS"
+                else (
+                    "OUTREACH_SENT_NO_GO_UNTIL_PARTNER_CONFIRMATION"
+                    if qualified_target_contacted
+                    else "NO_GO_AS_SOLO_PRIME_UNLESS_QUALIFIED_PARTNER_JOINS"
+                )
             ),
             "local_ready": False,
             "quick_funding_fit": "PARTNER_DEPENDENT",
@@ -227,6 +245,10 @@ def build_gate() -> dict[str, Any]:
                 "Recheck SAM.gov for amendments before submission.",
             ],
             "qualified_partner_evidence_present": partner_verified,
+            "qualified_target_contacted": qualified_target_contacted,
+            "partner_outreach_control": (
+                rel(FHWA_OUTREACH_CONTROL) if qualified_target_contacted else None
+            ),
             "official_notice": "https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view",
             "source_caveat": (
                 "The SAM public API returned 404 during this audit. Requirements were checked "
@@ -247,8 +269,9 @@ def build_gate() -> dict[str, Any]:
             "reason": (
                 "NSF has the smallest truthful completion gap and no fixed Project Pitch "
                 "deadline. ERDC is a credible five-page validation lane but currently has no "
-                "available funding. FHWA is not compliant as a solo prime without qualifying "
-                "TSMO corporate experience or a partner that supplies it."
+                "available funding. A qualified FHWA TSMO target was contacted on July 17, but "
+                "FHWA remains noncompliant as a solo prime unless written partner evidence "
+                "supplies the mandatory corporate experience."
             ),
         },
         "lanes": lanes,
@@ -301,7 +324,7 @@ def render_markdown(gate: dict[str, Any]) -> str:
         "",
         "1. **NSF Project Pitch** - stage first after checking the duplicate-pitch/open-invitation gate in the portal.",
         "2. **ERDC Sovereign Defense Cloud** - build the compliant five-page solution brief as a validation and relationship lane; the notice says funding is not currently available.",
-        "3. **FHWA TSMO** - do not submit as a solo prime unless a qualified partner supplies the mandatory corporate-experience evidence.",
+        "3. **FHWA TSMO** - qualified-target outreach was sent July 17; do not submit as a solo prime unless written partner evidence supplies the mandatory corporate-experience requirement.",
         "",
         gate["decision"]["reason"],
         "",

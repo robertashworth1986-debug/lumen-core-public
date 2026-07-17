@@ -25,8 +25,12 @@ def test_gate_ranks_truthful_direct_fit_before_partner_dependent_bid():
     assert gate["decision"]["partner_only_lane"] == "FHWA TSMO Data Initiative"
     assert lanes["NSF Project Pitch"]["local_ready"] is True
     assert lanes["FHWA TSMO Data Initiative"]["qualified_partner_evidence_present"] is False
+    assert lanes["FHWA TSMO Data Initiative"]["qualified_target_contacted"] is True
     assert lanes["FHWA TSMO Data Initiative"]["posture"] == (
-        "NO_GO_AS_SOLO_PRIME_UNLESS_QUALIFIED_PARTNER_JOINS"
+        "OUTREACH_SENT_NO_GO_UNTIL_PARTNER_CONFIRMATION"
+    )
+    assert lanes["FHWA TSMO Data Initiative"]["partner_outreach_control"].endswith(
+        "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json"
     )
     assert "five or more years" in " ".join(
         lanes["FHWA TSMO Data Initiative"]["hard_gates"]

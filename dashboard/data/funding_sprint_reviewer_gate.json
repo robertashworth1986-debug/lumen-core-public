@@ -26,8 +26,8 @@
       "patented"
     ]
   },
-  "gate_sha256": "cb725aa4e8c4257628dd6dc4631bb1406d35906553c36c9bf1b9b8be11ff80e1",
-  "generated_utc": "2026-07-09T22:54:08.299218+00:00",
+  "gate_sha256": "25a30d811afb800cd5890f48d3bd48a5985f09c25dfb6c29abe1f05a1360071d",
+  "generated_utc": "2026-07-17T10:27:33.849361+00:00",
   "manifest": [
     {
       "bytes": 12244,
@@ -58,6 +58,27 @@
       "sha256": "8d44ce2a3e555ec99a6c6d82a904933b1f09196fa6f8b516b6c05b4cab935aab"
     },
     {
+      "bytes": 1697,
+      "classification": "public_safe_markdown_review_required",
+      "name": "ARMY_AIDP_RFI4_EMAIL_DRAFT_2026-07-13.md",
+      "path": "grant_submissions/funding_sprint_20260709/ARMY_AIDP_RFI4_EMAIL_DRAFT_2026-07-13.md",
+      "sha256": "c6ae2ebafa9c8f014bc1a01f571d33ba62fa36c85a8e90ba41edd34b69bc9c6f"
+    },
+    {
+      "bytes": 1213,
+      "classification": "public_safe_markdown_review_required",
+      "name": "ARMY_AIDP_RFI4_PARTNER_NOTE_STUB_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/ARMY_AIDP_RFI4_PARTNER_NOTE_STUB_2026-07-10.md",
+      "sha256": "3bca95adbee97d6f7a6613e07348baae40d27320bf41c0c00da6e67781c1f4d7"
+    },
+    {
+      "bytes": 2886,
+      "classification": "public_safe_markdown_review_required",
+      "name": "ARMY_AIDP_RFI4_SOURCE_MANIFEST_2026-07-13.md",
+      "path": "grant_submissions/funding_sprint_20260709/ARMY_AIDP_RFI4_SOURCE_MANIFEST_2026-07-13.md",
+      "sha256": "301b54144ec25b853fd74038e46d2d541ea3d3d64f3545e782de2981ec6c1e41"
+    },
+    {
       "bytes": 6300,
       "classification": "public_safe_markdown_review_required",
       "name": "AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
@@ -70,6 +91,13 @@
       "name": "AUTONOMOUS_QUANT_INNOVATION_SAFETY_PROTOCOL_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_INNOVATION_SAFETY_PROTOCOL_2026-07-09.md",
       "sha256": "050f64e5c86a866a3fd125e00911e4f3caeb387625f7c4386c355727ab3ac30a"
+    },
+    {
+      "bytes": 2778,
+      "classification": "public_safe_markdown_review_required",
+      "name": "CDC_AI_ACQUISITION_RFI_75D301-26-RFI-73483_2026-07-15.md",
+      "path": "grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_75D301-26-RFI-73483_2026-07-15.md",
+      "sha256": "2fc40af40a80bee6fb643e48948582162efcab1bd943015bba70f1aaecfeebc3"
     },
     {
       "bytes": 12349,
@@ -93,11 +121,18 @@
       "sha256": "b1034846561675a25ff85134813c6e4bc0d71a5a48bad92f78610273c4499d28"
     },
     {
-      "bytes": 25708,
+      "bytes": 27683,
       "classification": "public_safe_markdown_review_required",
       "name": "DATA_ROOM_MANIFEST_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
-      "sha256": "5f75f6f5d698ae76c3794499b35efd43fa0c9be4258e08d8d0f3415fbca924f0"
+      "sha256": "f8d5e886dbea083bcb512748549e776d3a4c2e4b971ebb46c25b593001f16e7d"
+    },
+    {
+      "bytes": 1443,
+      "classification": "public_safe_markdown_review_required",
+      "name": "DOJ_BOP_MEDICAL_CLAIMS_ANALYSIS_QUOTE_STUB_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/DOJ_BOP_MEDICAL_CLAIMS_ANALYSIS_QUOTE_STUB_2026-07-10.md",
+      "sha256": "883b6164cd806d63add44194dd5ad9eaa2b798a553cfdf74e0ff076f9e397a19"
     },
     {
       "bytes": 5275,
@@ -121,6 +156,34 @@
       "sha256": "2ef421abdd3c777f95e4ade019b1e998d04b2f2cdfebccc27904a6ea3ead87af"
     },
     {
+      "bytes": 2946,
+      "classification": "public_safe_markdown_review_required",
+      "name": "EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
+      "sha256": "86bc8a9b322bae9293ff469f738c6ccbe9f5a196dc3bfcd382717f2f811baebd"
+    },
+    {
+      "bytes": 1840,
+      "classification": "public_safe_markdown_review_required",
+      "name": "EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
+      "path": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
+      "sha256": "efcf4fddced28472aa67f73b9b3d687f4dd317d42cf0162e57530b59a0114371"
+    },
+    {
+      "bytes": 5118,
+      "classification": "public_safe_markdown_review_required",
+      "name": "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.md",
+      "sha256": "d1cddeee4cd7d2ace79c1c165f50b4de6a7d3058c6b9470b88bedcb0fb959ee2"
+    },
+    {
+      "bytes": 1531,
+      "classification": "public_safe_markdown_review_required",
+      "name": "ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md",
+      "sha256": "da16f4de1cde669300680e230da53d57bc6072fc487b12bd78d77b0c67f99df9"
+    },
+    {
       "bytes": 8261,
       "classification": "public_safe_markdown_review_required",
       "name": "EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
@@ -135,11 +198,53 @@
       "sha256": "a9a309f607bd50ffe0b2ce773db08b135a932a42849f495730b61e160e42f5c9"
     },
     {
+      "bytes": 11657,
+      "classification": "public_safe_markdown_review_required",
+      "name": "EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+      "path": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+      "sha256": "f11482ff17c4417b2e8a67cb3c76d3139f78e2585b3939a6efadc93d9a65bfcb"
+    },
+    {
+      "bytes": 22464,
+      "classification": "public_safe_markdown_review_required",
+      "name": "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+      "path": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+      "sha256": "32fd152bdca7a50564960c1774873eaf6b4e146c0805df2b6a89feac010ca540"
+    },
+    {
+      "bytes": 1785,
+      "classification": "public_safe_markdown_review_required",
+      "name": "EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.md",
+      "path": "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.md",
+      "sha256": "c19902f8d654a4893f6b959e46459a51b76ba012b9f237b191c3754af99a098a"
+    },
+    {
       "bytes": 10709,
       "classification": "public_safe_markdown_review_required",
       "name": "FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
       "sha256": "ae8a41916c20207d4a2732d58c0e09a9a089809496696dfd822543751d27c13c"
+    },
+    {
+      "bytes": 2968,
+      "classification": "public_safe_markdown_review_required",
+      "name": "FHWA_TSMO_COMPLIANCE_MATRIX_DRAFT_2026-07-11.md",
+      "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_COMPLIANCE_MATRIX_DRAFT_2026-07-11.md",
+      "sha256": "20fad12aef8afa1ce4bad5155cf8d0e9cb8850fea3143b3c188b2c21776d7ea5"
+    },
+    {
+      "bytes": 3118,
+      "classification": "public_safe_markdown_review_required",
+      "name": "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.md",
+      "sha256": "bc838ff6dcd5d72a651b8920f7f514a4de3f54c0d4f76daaaecd67d2cb4c5720"
+    },
+    {
+      "bytes": 1388,
+      "classification": "public_safe_markdown_review_required",
+      "name": "FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md",
+      "sha256": "ef9644f44b66a979b743b0223efe7361e5e777dbed26c1838de13d991eb484d0"
     },
     {
       "bytes": 6109,
@@ -149,11 +254,39 @@
       "sha256": "f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046"
     },
     {
+      "bytes": 2114,
+      "classification": "public_safe_markdown_review_required",
+      "name": "FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md",
+      "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md",
+      "sha256": "6614f9d452565f9e5f54b3e70b45e93f112dd1293a8845e43489e339d34b0819"
+    },
+    {
       "bytes": 8338,
       "classification": "public_safe_markdown_review_required",
       "name": "FUNDING_ACTION_MATRIX_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md",
       "sha256": "684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9"
+    },
+    {
+      "bytes": 9956,
+      "classification": "public_safe_markdown_review_required",
+      "name": "FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
+      "sha256": "9d33dda1a48eea97860d60575c432f0c517085bbc9711fb75db839663deedbac"
+    },
+    {
+      "bytes": 2822,
+      "classification": "public_safe_markdown_review_required",
+      "name": "GEORGIA_PATENTS_PRO_BONO_INTAKE_RESPONSE_2026-07-16.md",
+      "path": "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_RESPONSE_2026-07-16.md",
+      "sha256": "1afb40471c270b6dc7d69d2b07d7718d5d57db8d16b1cb96f6b42fade33d2a39"
+    },
+    {
+      "bytes": 3419,
+      "classification": "public_safe_markdown_review_required",
+      "name": "HUD_ROBOTICS_AI_EMERGENCY_ELIGIBILITY_GATE_2026-07-11.md",
+      "path": "grant_submissions/funding_sprint_20260709/HUD_ROBOTICS_AI_EMERGENCY_ELIGIBILITY_GATE_2026-07-11.md",
+      "sha256": "25a62c9b6d81afe4d5eb731b4018fa73853b33cd75aefc0b37872022c4e42a8a"
     },
     {
       "bytes": 20001,
@@ -177,11 +310,11 @@
       "sha256": "43025b72c75f97cd24d09def3397606baa47afc471626f6a411b93988e3a6fce"
     },
     {
-      "bytes": 9907,
+      "bytes": 11129,
       "classification": "public_safe_markdown_review_required",
       "name": "IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
-      "sha256": "a3354fec70f9ae12a0bf42c24a2f1699f05ba0d05880afa16264080b1a1860ee"
+      "sha256": "e9efbb7e405cc0dc8d283f991e353df8ff78f69864bde2aab0159839f8ecd306"
     },
     {
       "bytes": 7643,
@@ -198,6 +331,13 @@
       "sha256": "af04f6cb53f8320292902aae23825970fe35785e263f7851122eb1506c159d52"
     },
     {
+      "bytes": 1727,
+      "classification": "public_safe_markdown_review_required",
+      "name": "LANL_VISION_FOLLOWUP_EMAIL_2026-07-16.md",
+      "path": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_EMAIL_2026-07-16.md",
+      "sha256": "c2e1b849ae7009891a2685431f7fc4f148c7ad4a4417d2aa6418695317a7d094"
+    },
+    {
       "bytes": 9037,
       "classification": "public_safe_markdown_review_required",
       "name": "LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
@@ -205,11 +345,46 @@
       "sha256": "95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762"
     },
     {
-      "bytes": 7867,
+      "bytes": 9130,
+      "classification": "public_safe_markdown_review_required",
+      "name": "LIVE_FUNDING_PORTAL_HANDOFF_2026-07-15.md",
+      "path": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-15.md",
+      "sha256": "35288fb81047332bc4ea12b794c69cf5d3945e6840264be36c24f90bfbfa22dd"
+    },
+    {
+      "bytes": 14508,
+      "classification": "public_safe_markdown_review_required",
+      "name": "LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md",
+      "sha256": "5b5e3694b74de858ec3577b29d30f169690dbb906ec4a7361ca6cffdd109abf8"
+    },
+    {
+      "bytes": 15011,
+      "classification": "public_safe_markdown_review_required",
+      "name": "LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md",
+      "path": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md",
+      "sha256": "fdbd657b52ba01d1967011f21ec24249de0ad13a6f32dd3aa2f2919eb02ffe53"
+    },
+    {
+      "bytes": 8029,
       "classification": "public_safe_markdown_review_required",
       "name": "MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
-      "sha256": "2aa3e2e80e5ebb68a085080b0466b3f40d42df8cfb67ab98dfbdcf5957fd7e7c"
+      "sha256": "b6257f98e9cad35a244aa02264dec019204c5ede27357cdadba76a1019a9fac6"
+    },
+    {
+      "bytes": 1949,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NASA_DATA_CENTER_RFI_EMAIL_DRAFT_2026-07-11.md",
+      "path": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_EMAIL_DRAFT_2026-07-11.md",
+      "sha256": "ad69ebbecb0303ec9cb073dfa92b6bd45958874a070a9e33ba4dab0f212e6f76"
+    },
+    {
+      "bytes": 13729,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.md",
+      "path": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.md",
+      "sha256": "5c5e5ca6a635092f2d7877c9b63cef8aab66d3b21880fa11f75526447ac223aa"
     },
     {
       "bytes": 5614,
@@ -219,11 +394,60 @@
       "sha256": "bcfdd40dfafc7ca0e7822679dba9d2504c2196b5701704d0ba3d46c5ce9448f6"
     },
     {
+      "bytes": 1395,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md",
+      "sha256": "3c446a7b28b3cb921b30269655f94714986317a90d92096c76a463e8c5d5957c"
+    },
+    {
+      "bytes": 2927,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-16.md",
+      "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-16.md",
+      "sha256": "b2cda719028098c6ca11258345e4cb82405f4e80853e8921e8571ab075bae61d"
+    },
+    {
+      "bytes": 14190,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-11.md",
+      "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-11.md",
+      "sha256": "c29ce9e3734f6ba3aacdd701dcbb79833ea75f2d7c3fdd6f2b60238a35fc3fc3"
+    },
+    {
+      "bytes": 27557,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-13.md",
+      "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-13.md",
+      "sha256": "eb9546f59cfe54da6f1216e31ef33a4d406a412256d64613922fda3007215d8d"
+    },
+    {
+      "bytes": 38021,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
+      "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
+      "sha256": "4be304aea326e10cc4b9a4c131a2fb0131e4f37fe572d0429817173b2e0cb873"
+    },
+    {
+      "bytes": 43600,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "sha256": "a07816a1a3685fda035f1231cb66bef320564ca0e40c9cfad9a21a568f275540"
+    },
+    {
       "bytes": 8895,
       "classification": "public_safe_markdown_review_required",
       "name": "NSF_PROJECT_PITCH_DRAFT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/NSF_PROJECT_PITCH_DRAFT_2026-07-09.md",
       "sha256": "baa66ab948fdc1bb57e898d8a6e4e0bf776c65ff4c6722ef658720c148f40e6f"
+    },
+    {
+      "bytes": 6432,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NSF_PROJECT_PITCH_PORTAL_FIELD_MAP_2026-07-11.md",
+      "path": "grant_submissions/funding_sprint_20260709/NSF_PROJECT_PITCH_PORTAL_FIELD_MAP_2026-07-11.md",
+      "sha256": "53073de64065b29dc18bf1de7e87e3c9b5f9a24d47eb5925bf41119c528b5652"
     },
     {
       "bytes": 5307,
@@ -245,6 +469,27 @@
       "name": "NUCLEAR_PARTNER_OUTREACH_DRAFTS_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/NUCLEAR_PARTNER_OUTREACH_DRAFTS_2026-07-09.md",
       "sha256": "48aee2b847dccfa3f748743fcf3778c0810d7b92f462368008c26496a7ab5439"
+    },
+    {
+      "bytes": 3090,
+      "classification": "public_safe_markdown_review_required",
+      "name": "PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md",
+      "sha256": "632d44e5640a6af6e2bb63f157219799c834dd383e892cac3247c2d4fb98734c"
+    },
+    {
+      "bytes": 5461,
+      "classification": "public_safe_markdown_review_required",
+      "name": "PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.md",
+      "path": "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.md",
+      "sha256": "b548330bda92b8514ce25e8415b81740661c8a1e1620d9dd7fd5705e57aaae0c"
+    },
+    {
+      "bytes": 1815,
+      "classification": "public_safe_markdown_review_required",
+      "name": "PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md",
+      "sha256": "fac3aa9fd88207fb881f33b38201325369e4820cdc34f6562079fee7218d4792"
     },
     {
       "bytes": 2407,
@@ -296,6 +541,20 @@
       "sha256": "0aa291778092b21187a00266a0eeb2ce033804162aa12345e0ed5f596966ed5a"
     },
     {
+      "bytes": 2219,
+      "classification": "public_safe_markdown_review_required",
+      "name": "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
+      "path": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
+      "sha256": "be187a93a7553e692c7781ea56686769d3f539b7b27e1d944dc525b4e1623440"
+    },
+    {
+      "bytes": 18526,
+      "classification": "public_safe_markdown_review_required",
+      "name": "SAM_RUSH_SUBMISSION_BOARD_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/SAM_RUSH_SUBMISSION_BOARD_2026-07-10.md",
+      "sha256": "a6cabe6659c6f468bed9fb87818d24c4b60003c13a85c986d57e1880b6dd3c6c"
+    },
+    {
       "bytes": 4583,
       "classification": "public_safe_markdown_review_required",
       "name": "SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md",
@@ -324,11 +583,18 @@
       "sha256": "2a99e42dd552ba573d55caf6fb7f14414fad25234966abf33debf4c5902e9dc5"
     },
     {
-      "bytes": 22779,
+      "bytes": 25377,
       "classification": "public_safe_markdown_review_required",
       "name": "TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
-      "sha256": "e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55"
+      "sha256": "4333999738c589b9ed7e7ecf0a3993c34cb98d60d21cb92d843c4c4c0baed1e8"
+    },
+    {
+      "bytes": 1324,
+      "classification": "public_safe_markdown_review_required",
+      "name": "USTDA_INDO_PACIFIC_DIGITAL_INFRA_SCOPING_STUB_2026-07-10.md",
+      "path": "grant_submissions/funding_sprint_20260709/USTDA_INDO_PACIFIC_DIGITAL_INFRA_SCOPING_STUB_2026-07-10.md",
+      "sha256": "c58d37b8ff6d50044599528adc5af801285bcdddf8397dd234ce07b06810f331"
     },
     {
       "bytes": 7293,
@@ -425,7 +691,7 @@
   ],
   "reviewer_gate_clear": true,
   "scan": {
-    "boundary_hit_count": 54,
+    "boundary_hit_count": 86,
     "boundary_hits": [
       {
         "classification": "boundary_language",
@@ -590,6 +856,83 @@
       },
       {
         "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.md",
+        "line": 45,
+        "phrase": "guaranteed award",
+        "text": "| `FUNDING_01` | `PASS` | Do not imply current funds or guaranteed award | Cover, compliance gate, and claim boundary state funding is not currently available and no award is guaranteed. |"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.md",
+        "line": 61,
+        "phrase": "realized savings",
+        "text": "This is a public-safe technical draft, not a submitted solution brief. It does not include the founder-approved Phase II price, private SAM-matched legal identity and address, a live SAM status verification, signature, certification, or portal confirmation. It does not claim ERDC selection, funding availability, a contract, Department of Defense deployment, an authorization to operate, classified-data handling, field validation, realized savings, or technical performance beyond the bounded repository evidence identified here."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+        "line": 53,
+        "phrase": "realized savings",
+        "text": "- Claim boundary: This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+        "line": 94,
+        "phrase": "realized savings",
+        "text": "- Claim boundary: This receipt records MOU-routing information only. The Gmail SENT record proves transmission of the administrative reply only. It does not establish an executed MOU, consortium membership, EPRI endorsement, independent validation, a pilot, funding, procurement, a contract, deployment, realized savings, or technical performance."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+        "line": 183,
+        "phrase": "realized savings",
+        "text": "This gate verifies recorded communication controls, source hashes, deadline precision, and follow-up holds. It does not prove receipt unless a source receipt says so, and it does not establish evaluation, selection, membership, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+        "line": 46,
+        "phrase": "realized savings",
+        "text": "- Claim boundary: This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+        "line": 60,
+        "phrase": "realized savings",
+        "text": "- Claim boundary: This is an application-preparation artifact. It does not claim a paying customer, booked revenue, signed pilot, external or field validation, partnership, endorsement, award, realized savings, product-market fit, investment, competition selection, or permission to submit without a founder-reviewed final preview."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+        "line": 74,
+        "phrase": "realized savings",
+        "text": "- Claim boundary: This receipt records MOU-routing information only. The Gmail SENT record proves transmission of the administrative reply only. It does not establish an executed MOU, consortium membership, EPRI endorsement, independent validation, a pilot, funding, procurement, a contract, deployment, realized savings, or technical performance."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+        "line": 113,
+        "pattern": "secret",
+        "text": "- Action gate: Founder completes the official SAM.gov one-time-password flow, supplies the replacement key only through the hidden local installer prompt, and authorizes the final account confirmation. No secret may enter this register."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+        "line": 113,
+        "pattern": "password",
+        "text": "- Action gate: Founder completes the official SAM.gov one-time-password flow, supplies the replacement key only through the hidden local installer prompt, and authorizes the final account confirmation. No secret may enter this register."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+        "line": 252,
+        "phrase": "realized savings",
+        "text": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md",
         "line": 69,
         "phrase": "medical efficacy",
@@ -611,6 +954,27 @@
       },
       {
         "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
+        "line": 30,
+        "phrase": "realized savings",
+        "text": "- Realized savings claim allowed: `false`"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
+        "line": 75,
+        "phrase": "realized savings",
+        "text": "- Boundary: No realized savings, guaranteed ROI, field validation, or bulk outreach is claimed."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
+        "line": 166,
+        "phrase": "realized savings",
+        "text": "- claim of agency validation, patent grant, realized savings, customer ROI, or award certainty"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/INSTITUTIONAL_TRUST_GATE_2026-07-09.md",
         "line": 110,
         "phrase": "certified assurance",
@@ -626,14 +990,14 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
-        "line": 140,
+        "line": 152,
         "phrase": "patented",
         "text": "- do not use 'patented' unless a granted patent is verified"
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
-        "line": 142,
+        "line": 154,
         "phrase": "freedom to operate",
         "text": "- do not use 'freedom to operate'"
       },
@@ -660,6 +1024,76 @@
       },
       {
         "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_EMAIL_2026-07-16.md",
+        "line": 12,
+        "phrase": "realized savings",
+        "text": "I am not claiming a license, LANL endorsement, field validation, production readiness, cybersecurity certification, or realized savings. The attached package proposes a bounded first step:"
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-15.md",
+        "line": 68,
+        "pattern": "secret",
+        "text": "1. In the existing signed-in SAM.gov tab, retrieve the already-generated replacement Public API Key and install it into the ignored local secret store; do not paste it into chat or Git."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md",
+        "line": 5,
+        "phrase": "realized savings",
+        "text": "This is an audit and custody artifact. It does not claim a valuation, patent grant, agency approval, realized savings, field validation, live trading authority, or final submission authority."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md",
+        "line": 22,
+        "pattern": "secret",
+        "text": "- Secret content indexed: `false`"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md",
+        "line": 215,
+        "phrase": "realized savings",
+        "text": "- Public boundary: No agency validation, field validation, realized savings, or patent grant claim without the relevant human gate."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md",
+        "line": 278,
+        "pattern": "secret",
+        "text": "- secret_contents_not_published: `True`"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md",
+        "line": 5,
+        "phrase": "realized savings",
+        "text": "This is an audit and custody artifact. It does not claim a valuation, patent grant, agency approval, realized savings, field validation, live trading authority, or final submission authority."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md",
+        "line": 26,
+        "pattern": "secret",
+        "text": "- Secret content indexed: `false`"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md",
+        "line": 221,
+        "phrase": "realized savings",
+        "text": "- Public boundary: No agency validation, field validation, realized savings, or patent grant claim without the relevant human gate."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md",
+        "line": 284,
+        "pattern": "secret",
+        "text": "- secret_contents_not_published: `True`"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
         "line": 5,
         "phrase": "realized savings",
@@ -668,16 +1102,30 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
-        "line": 47,
+        "line": 50,
         "phrase": "realized savings",
         "text": "- Do not claim realized savings."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
-        "line": 48,
+        "line": 51,
         "phrase": "guaranteed award",
         "text": "- Do not claim guaranteed award."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_EMAIL_DRAFT_2026-07-11.md",
+        "line": 32,
+        "phrase": "realized savings",
+        "text": "This response is submitted for market-research purposes only. LumenCore is not claiming NASA production access, NASA validation, FedRAMP authorization, realized savings, or deployment performance. The proposed first step is a limited, non-sensitive proof-to-pilot validation exercise that NASA or an authorized partner could scope, inspect, and accept or reject before any operational commitment."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.md",
+        "line": 117,
+        "phrase": "realized savings",
+        "text": "These are internal technical analogs, not NASA performance, field validation, realized savings, or agency endorsement. They demonstrate the intended review behavior: freeze the question, compare against strong baselines, report all outcomes, and stop unsupported promotion."
       },
       {
         "classification": "boundary_language",
@@ -688,10 +1136,52 @@
       },
       {
         "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md",
+        "line": 14,
+        "phrase": "realized savings",
+        "text": "- Boundary language: This response is market-research input only. LumenCore is not claiming NASA production access, NASA validation, FedRAMP authorization, or realized savings."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-11.md",
+        "line": 273,
+        "phrase": "realized savings",
+        "text": "- claim of agency validation, award, realized savings, or customer ROI"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-13.md",
+        "line": 507,
+        "phrase": "realized savings",
+        "text": "- claim of agency validation, award, realized savings, or customer ROI"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
+        "line": 619,
+        "phrase": "realized savings",
+        "text": "- claim of agency validation, award, realized savings, or customer ROI"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+        "line": 670,
+        "phrase": "realized savings",
+        "text": "- claim of agency validation, award, realized savings, or customer ROI"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/NSF_PROJECT_PITCH_DRAFT_2026-07-09.md",
         "line": 20,
         "phrase": "realized savings",
         "text": "Existing internal evidence supports feasibility but is intentionally bounded. LumenCore currently tracks a 29-source inventory with 25 measured providers and 2,580 measured rows in its latest live-source measurement artifact. Its internal replay stack has produced champion-vs-baseline results across source-conditioned scenarios, but those results are not being represented as field validation or realized savings. Phase I will replace ad hoc internal proof with a controlled, repeatable instrumentation workflow that can be tested on public benchmark-style infrastructure data and prepared for independent pilot review."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.md",
+        "line": 91,
+        "phrase": "freedom to operate",
+        "text": "This control classifies only the local evidence supplied to it. A payment acknowledgement proves receipt of the listed payment, not a granted filing date, complete application, verified claims, current pendency, patentability, freedom to operate, or absence of an outstanding notice. A filing anniversary is not, by itself, a U.S. prosecution response deadline. Foreign or PCT priority strategy can be separately time-sensitive and requires prompt review by a registered patent practitioner."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
@@ -817,10 +1307,10 @@
   "summary": {
     "all_cards_present": true,
     "autonomous_external_action_allowed": false,
-    "boundary_hit_count": 54,
+    "boundary_hit_count": 86,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 44,
+    "markdown_file_count": 82,
     "proof_card_count": 6,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0
