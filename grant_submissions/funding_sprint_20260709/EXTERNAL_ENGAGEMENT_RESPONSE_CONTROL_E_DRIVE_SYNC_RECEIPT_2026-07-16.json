@@ -1,159 +1,207 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T03:59:15.7707503Z",
+  "created_utc": "2026-07-17T04:20:15.5169412Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_20260716",
-  "artifact_count": 30,
+  "artifact_count": 33,
   "all_sha256_matched_after_copy": true,
   "artifacts": [
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
       "bytes": 19521,
-      "sha256": "F1EDA0FBD8027E268702839EC70FE1CC0B1758E5FCAE536574E8E95F6404131E"
+      "sha256": "F1EDA0FBD8027E268702839EC70FE1CC0B1758E5FCAE536574E8E95F6404131E",
+      "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
       "bytes": 65036,
-      "sha256": "DE6D8096D1257CDB9AB828F68D67E98E572F2BDEC0491BEA4BFC6D030CC50304"
+      "sha256": "DE6D8096D1257CDB9AB828F68D67E98E572F2BDEC0491BEA4BFC6D030CC50304",
+      "copy_sha256_matched": true
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
-      "bytes": 6022,
-      "sha256": "1FA0298C6A1608FDCC965C81E067E6B96573F9A03AAE2F9D5AA2C423613BA5F5"
+      "bytes": 6618,
+      "sha256": "EDCF1B6BAC1D81F80C10805F4667B80D62BC3B1FCE8E94AF8818C39359F3E616",
+      "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
       "bytes": 8480,
-      "sha256": "A4FCA00C0CD604339128F013C0194C72C86507180F08234A42C508A2EF7FB9B2"
+      "sha256": "A4FCA00C0CD604339128F013C0194C72C86507180F08234A42C508A2EF7FB9B2",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json",
       "bytes": 1414,
-      "sha256": "74303CFC65C85D9EF73FB80CC8177E5D08DF43D03264FFCE73251ACD2CD9E9D0"
+      "sha256": "74303CFC65C85D9EF73FB80CC8177E5D08DF43D03264FFCE73251ACD2CD9E9D0",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
       "bytes": 9985,
-      "sha256": "65362809CC716F7627D16DCEBAC4971836CB142A54B82210B0B120ABB5F68864"
+      "sha256": "058523AFE4C3D0A5E7D5AB7D6B2A79F7CD37F4B21B3C01597A6D467CDCDA1CC1",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-15.md",
       "bytes": 9130,
-      "sha256": "35288FB81047332BC4EA12B794C69CF5D3945E6840264BE36C24F90BFBFA22DD"
+      "sha256": "35288FB81047332BC4EA12B794C69CF5D3945E6840264BE36C24F90BFBFA22DD",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
       "bytes": 38019,
-      "sha256": "A2FEB8EC8B7A197E73054772180237C4B03D28A5076B05F863197BF6CE816AE2"
+      "sha256": "842A46F9B02C781F91860D0A1E967B0BA6C9BC0A61C12AA5BA3CBB914C8A84CA",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json",
       "bytes": 2036,
-      "sha256": "2DAC72C484BB39A6AB5891405C00AD68C66A2D99A5152D0E53CCBE8603FBAE01"
+      "sha256": "2DAC72C484BB39A6AB5891405C00AD68C66A2D99A5152D0E53CCBE8603FBAE01",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json",
       "bytes": 1527,
-      "sha256": "292157621B722B1973A1AA55140F08586AB41D07FBE38672B348C73E8A865B78"
+      "sha256": "292157621B722B1973A1AA55140F08586AB41D07FBE38672B348C73E8A865B78",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
       "bytes": 1840,
-      "sha256": "EFCF4FDDCED28472AA67F73B9B3D687F4DD317D42CF0162E57530B59A0114371"
+      "sha256": "EFCF4FDDCED28472AA67F73B9B3D687F4DD317D42CF0162E57530B59A0114371",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json",
       "bytes": 1481,
-      "sha256": "EBAFA995EB6D0BBC3749315F1F41EAC1CB0A28E56AE2EC6439C2E69757752EE8"
+      "sha256": "EBAFA995EB6D0BBC3749315F1F41EAC1CB0A28E56AE2EC6439C2E69757752EE8",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json",
-      "bytes": 17728,
-      "sha256": "1BC772F56253112A346F3A6C3D02D9BF328C639407587386BF00803C14BA764E"
+      "bytes": 18360,
+      "sha256": "CD9501D1A61E248A62329595297592D00593BF0086C87DA58E120DF43DE2EF11",
+      "copy_sha256_matched": true
     },
     {
       "source": "outputs/aidp-rfi4-20260713/AIDP - Questions and Feedback Submission Sheet - LumenCore Draft.xlsx",
       "bytes": 5405,
-      "sha256": "D0528488B91C940E2A8401E3571BE72C59124F714883E25CF6D7D7716427B8BF"
+      "sha256": "D0528488B91C940E2A8401E3571BE72C59124F714883E25CF6D7D7716427B8BF",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.pdf",
       "bytes": 15465,
-      "sha256": "88A606678ACC62C60C914C515605D5D590CEACDC1A82AA20B47028B3444EEB0D"
+      "sha256": "88A606678ACC62C60C914C515605D5D590CEACDC1A82AA20B47028B3444EEB0D",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/LumenCore_CDC_AI_Acquisition_RFI_75D301-26-RFI-73483_2026-07-15.pdf",
       "bytes": 77318,
-      "sha256": "570F6A6C86DD03649B6F5EE7F731D5E3F0884712CD06DA588D2A4C92C903B2B1"
+      "sha256": "570F6A6C86DD03649B6F5EE7F731D5E3F0884712CD06DA588D2A4C92C903B2B1",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/LumenCore_LANL_VISION_Followup_Package_2026-07-16.pdf",
       "bytes": 123160,
-      "sha256": "3788258083E5D58D3FF7C54D937EF6A73AE132C294021FB234E422A8903243E0"
+      "sha256": "3788258083E5D58D3FF7C54D937EF6A73AE132C294021FB234E422A8903243E0",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
       "bytes": 13724,
-      "sha256": "5D4FB0133D50529667B95843E83F9D9D7E96E6E32FC29AC5C3271F737B1890EF"
+      "sha256": "44C953502C58223C3E1FD3E62DDA479E19B718CB8B59BEB147E99A7BC8308B0B",
+      "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_TRACTION_OPPORTUNITY_INTAKE_LEDGER.py",
       "bytes": 38735,
-      "sha256": "1FB6C2191C69B37F6AEA5D305D50FC31165E9239BED78D6270FF6E29ADC57A89"
+      "sha256": "1FB6C2191C69B37F6AEA5D305D50FC31165E9239BED78D6270FF6E29ADC57A89",
+      "copy_sha256_matched": true
     },
     {
       "source": "tests/test_traction_opportunity_intake_ledger.py",
       "bytes": 5268,
-      "sha256": "AC30F58D85EE4CCE0520628B32AB024B6C3136A58BF252BF975E103DF6731607"
+      "sha256": "AC30F58D85EE4CCE0520628B32AB024B6C3136A58BF252BF975E103DF6731607",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
       "bytes": 25377,
-      "sha256": "4333999738C589B9ED7E7ECF0A3993C34CB98D60D21CB92D843C4C4C0BAED1E8"
+      "sha256": "4333999738C589B9ED7E7ECF0A3993C34CB98D60D21CB92D843C4C4C0BAED1E8",
+      "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/traction_opportunity_intake_ledger.json",
       "bytes": 41489,
-      "sha256": "B6C21D007B45C94ACD8447AB99DA43B4DCA76679852D43FF12011A9797FFDA36"
+      "sha256": "B6C21D007B45C94ACD8447AB99DA43B4DCA76679852D43FF12011A9797FFDA36",
+      "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_NASHVILLE_EC_HUMAN_FACT_RESOLUTION.py",
-      "bytes": 15005,
-      "sha256": "38326016358F7ED365FD3F44962429274BA95073C1BF15BD8EEB2F5546EADE76"
+      "bytes": 16802,
+      "sha256": "7CAF1216978113B4C8903D7C7FE62C2EF39642404C65FF4DABE5E11629246292",
+      "copy_sha256_matched": true
     },
     {
       "source": "tests/test_nashville_ec_human_fact_resolution.py",
-      "bytes": 3698,
-      "sha256": "F705211E69D04C3A0A375D47195BC4C303407021C40F40AB49DD61D9AF9151D3"
+      "bytes": 4466,
+      "sha256": "42C38B2D2887340795C4ED123B71DC3D504B5C51BB5026DE519BD65482E9AA55",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json",
-      "bytes": 7579,
-      "sha256": "AB807930D19B28BB5A2A7AEF38B28C3E87B40B750D1EF891F61DBD6CE510EC9F"
+      "bytes": 8597,
+      "sha256": "998A267A08DF9E8923FAB1E57740F00F52270228A49417F40DA73AF4AA6D4D33",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md",
-      "bytes": 3450,
-      "sha256": "A8CF1585475BB2B1DD48ABDAA8A8D409B20CDE91266D0F9C90B208746A719514"
+      "bytes": 3671,
+      "sha256": "C5905B7689A5643CA1CE6B793CBABD0D73166DAB0B94545E100B615CAE5BA16D",
+      "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL.py",
       "bytes": 19745,
-      "sha256": "FA899A6644C3D5541D23DE66DE19C9394CEF220BD241EC1C50249BE7003AB29D"
+      "sha256": "FA899A6644C3D5541D23DE66DE19C9394CEF220BD241EC1C50249BE7003AB29D",
+      "copy_sha256_matched": true
     },
     {
       "source": "tests/test_sam_public_credential_rotation_control.py",
       "bytes": 6428,
-      "sha256": "934A22620B889F65337439C8894610F1BABA15D4A00B20C04E3B42854DA4914F"
+      "sha256": "934A22620B889F65337439C8894610F1BABA15D4A00B20C04E3B42854DA4914F",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
       "bytes": 3980,
-      "sha256": "8636429835230980CF3EB1E56FC6AAE0517142EE09CB86DFAAA5F1E7445B7D4C"
+      "sha256": "8636429835230980CF3EB1E56FC6AAE0517142EE09CB86DFAAA5F1E7445B7D4C",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
       "bytes": 2007,
-      "sha256": "F42E4BEA2F08C9C910752B8B672ECEECADCFC40DF952999DF32589EA94A41671"
+      "sha256": "F42E4BEA2F08C9C910752B8B672ECEECADCFC40DF952999DF32589EA94A41671",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NASHVILLE_EC_FALL_2026_APPLICATION.py",
+      "bytes": 18556,
+      "sha256": "7EBCCB415DC7340398870E20809497F3BCA919C4C4D308B5E60875DA908D10DE",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_nashville_ec_fall_2026_application.py",
+      "bytes": 4761,
+      "sha256": "D4B53FDF4CE4F54BBF27CF83267B7432C379E7295634275E4434590EB3B4E231",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md",
+      "bytes": 12886,
+      "sha256": "63BDFAFEBADE22432A6D1FFC3509C8C5EE1685270144F12CC8124AE483BCA017",
+      "copy_sha256_matched": true
     }
   ],
   "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove email delivery beyond recorded SENT/acknowledgment evidence, portal submission, evaluation, program acceptance, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance."

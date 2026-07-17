@@ -12,16 +12,16 @@ Direct answer: eleven required portal fields now reduce to six concise founder c
 - Concise confirmation prompts: `6`
 - Optional demographics may be skipped: `true`
 - Final submit without live preview: `false`
-- Resolution SHA-256: `75dc56e5750d1345ce9c626265746c15876981afdd6872b66175def714eda912`
+- Resolution SHA-256: `3b8ccef31b1b181e6125c2741ccd98b9c0c8939cec54f25417a02155ea210e4f`
 
 ## Six-Line Founder Reply
 
 Reply using these six lines only:
 
 ```text
-First-time founder: YES or NO
-Full-time on LumenCore: YES or NO; weekly-hours bracket: [ENTER BRACKET]
-Discovery/sales conversation bracket: 11-25 or 6-10
+First-time founder: YES or NO; business age: Not yet started / Less than 6 months / 6 to 12 months / 1 to 3 years / 3+ years
+Full-time on LumenCore: YES or NO; weekly-hours bracket: Less than 10 / 10-20 / 20-30 / 30+
+Discovery/sales conversation bracket: 0 / 1 to 10 / 11 to 25 / 26 to 50 / 50+
 Confirm previous-year revenue, trailing-12-month revenue, grants received, and investor capital are all $0: YES or NO
 Total founder cash invested in the business: $[ENTER VERIFIED TOTAL]
 Business debt leveraged to date: $[ENTER BUSINESS DEBT ONLY]
@@ -39,9 +39,9 @@ Business debt leveraged to date: $[ENTER BUSINESS DEBT ONLY]
 
 - Two-sided human threads: `14`
 - Institutional domains: `8`
-- Candidate bracket: `11 to 25`
-- Conservative fallback: `6 to 10`
-- Decision rule: Choose 11 to 25 only if the founder treats the 14 two-sided institutional threads as distinct qualifying discovery or sales conversations. Otherwise choose 6 to 10.
+- Candidate bracket: `1 to 10 unless at least 11 genuine conversations are founder-confirmed`
+- Conservative fallback: `1 to 10`
+- Decision rule: Choose 11 to 25 only if at least 11 of the bounded interactions were genuine customer-discovery or sales conversations. Otherwise choose 1 to 10 if at least one qualifies, or 0 if none qualify.
 - Limit: Institutional correspondence is not proof of a customer, sale, pilot, or validation.
 
 ### Revenue And Received Capital
@@ -56,7 +56,7 @@ Business debt leveraged to date: $[ENTER BUSINESS DEBT ONLY]
 - Full-time status and truthful weekly-hours bracket.
 - Cumulative founder cash invested in the business.
 - Business debt leveraged, excluding personal debt unless the live form explicitly requires it.
-- Whether the 14 bounded threads qualify as 11-25 conversations or should use the conservative 6-10 bracket.
+- Whether genuine discovery or sales conversations fall in 0, 1 to 10, 11 to 25, 26 to 50, or 50+.
 - Final confirmation that all four proposed zero-dollar fields are accurate.
 
 ## Final Gate

@@ -105,18 +105,27 @@ def test_mirror_receipt_matches_every_bounded_source():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 30
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 33
     assert receipt["all_sha256_matched_after_copy"] is True
+    destination = Path(receipt["destination_root"])
     for artifact in receipt["artifacts"]:
         source = ROOT / artifact["source"]
+        mirror = destination / source.name
         assert source.is_file(), artifact["source"]
+        assert mirror.is_file(), str(mirror)
         assert source.stat().st_size == artifact["bytes"], artifact["source"]
+        assert mirror.stat().st_size == artifact["bytes"], artifact["source"]
         assert hashlib.sha256(source.read_bytes()).hexdigest().upper() == artifact["sha256"]
+        assert hashlib.sha256(mirror.read_bytes()).hexdigest().upper() == artifact["sha256"]
+        assert artifact["copy_sha256_matched"] is True
 
     mirrored_sources = {artifact["source"] for artifact in receipt["artifacts"]}
     assert {
         "code/ops/BUILD_NASHVILLE_EC_HUMAN_FACT_RESOLUTION.py",
+        "code/ops/BUILD_NASHVILLE_EC_FALL_2026_APPLICATION.py",
         "tests/test_nashville_ec_human_fact_resolution.py",
+        "tests/test_nashville_ec_fall_2026_application.py",
+        "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md",
         "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json",
         "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md",
         "code/ops/BUILD_SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL.py",

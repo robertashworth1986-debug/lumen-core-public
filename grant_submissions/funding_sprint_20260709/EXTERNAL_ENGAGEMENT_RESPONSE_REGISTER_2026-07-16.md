@@ -13,7 +13,7 @@ Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPR
 - All attachment checks pass: `true`
 - Autonomous external send allowed: `false`
 - Autonomous final portal submit allowed: `false`
-- Register SHA-256: `24905410a7ddff2554b7d67f2dfc06ca192899f68a7354cbafcffe46db37c8a8`
+- Register SHA-256: `0e9b3a290a9c59e2353ced5577a36e8c3c079c784266a75b324165f898a1edfe`
 
 ## Response Queue
 
@@ -136,8 +136,8 @@ LumenCore
 - `lanl_engagement_receipt`: present=`true` bytes=`1414` sha256=`74303CFC65C85D9EF73FB80CC8177E5D08DF43D03264FFCE73251ACD2CD9E9D0` path=`grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - `epri_response_template`: present=`true` bytes=`1840` sha256=`EFCF4FDDCED28472AA67F73B9B3D687F4DD317D42CF0162E57530B59A0114371` path=`grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md`
 - `epri_engagement_receipt`: present=`true` bytes=`1481` sha256=`EBAFA995EB6D0BBC3749315F1F41EAC1CB0A28E56AE2EC6439C2E69757752EE8` path=`grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json`
-- `nashville_application_manifest`: present=`true` bytes=`17728` sha256=`1BC772F56253112A346F3A6C3D02D9BF328C639407587386BF00803C14BA764E` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json`
-- `nashville_human_fact_resolution`: present=`true` bytes=`7579` sha256=`AB807930D19B28BB5A2A7AEF38B28C3E87B40B750D1EF891F61DBD6CE510EC9F` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
+- `nashville_application_manifest`: present=`true` bytes=`18360` sha256=`CD9501D1A61E248A62329595297592D00593BF0086C87DA58E120DF43DE2EF11` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json`
+- `nashville_human_fact_resolution`: present=`true` bytes=`8597` sha256=`998A267A08DF9E8923FAB1E57740F00F52270228A49417F40DA73AF4AA6D4D33` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
 
 ## Claim Boundary
 

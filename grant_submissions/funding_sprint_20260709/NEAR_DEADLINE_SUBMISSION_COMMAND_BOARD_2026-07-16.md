@@ -26,7 +26,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; rotate the SAM.g
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `d90a5e56c460ae3bbbbedb7c5bc696e9b5cf750eb759748c2045e69edd1c18ec`
+- Command board SHA-256: `a9c14628326126e20750f576725c3bba237322ad2ecde98b795c241b64a62299`
 
 ## Operational Controls
 
@@ -629,9 +629,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; rotate the SAM.g
 - `doj_bop_source_manifest`: `grant_submissions/DOJ_BOP_15BCMS26Q70000005/DOJ_BOP_15BCMS26Q70000005_SOURCE_MANIFEST_2026-07-16.json` present=`true` sha256=`0282a6778ecc0c31890b93c1f68ffdb011139086ee640595262b95600df6af46`
 - `nsf_project_pitch_portal_fields`: `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md` present=`true` sha256=`3f085b0007f7e8019a279faee8d00aa16a609b6d8acd715c4686b0e743260b39`
 - `nsf_project_pitch_routing_manifest`: `grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json` present=`true` sha256=`84247c7c52a686f72ce5113354e665ac3f3827bf408db8ac15b11d918583c825`
-- `nashville_ec_portal_field_map`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md` present=`true` sha256=`cae7b41fb8b562ee693ac6f34409d9f1b514a885aafade6b796074873b67a8cc`
-- `nashville_ec_application_manifest`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json` present=`true` sha256=`1bc772f56253112a346f3a6c3d02d9bf328c639407587386bf00803c14ba764e`
-- `nashville_ec_human_fact_resolution`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json` present=`true` sha256=`ab807930d19b28bb5a2a7aef38b28c3e87b40b750d1ef891f61dbd6ce510ec9f`
-- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`557d6becd811aefc9df93679df7f4d66ae01d4608e8162ca2831f5c41642b5b8`
+- `nashville_ec_portal_field_map`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md` present=`true` sha256=`63bdfafebade22432a6d1ffc3509c8c5ee1685270144f12cc8124ae483bca017`
+- `nashville_ec_application_manifest`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json` present=`true` sha256=`cd9501d1a61e248a62329595297592d00593bf0086c87da58e120df43de2ef11`
+- `nashville_ec_human_fact_resolution`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json` present=`true` sha256=`998a267a08df9e8923fab1e57740f00f52270228a49417f40da73af4aa6d4d33`
+- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`5d4fb0133d50529667b95843e83f9d9d7e96e6e32fc29ac5c3271f737b1890ef`
 - `sam_public_key_rotation_control`: `grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json` present=`true` sha256=`8636429835230980cf3eb1e56fc6aae0517142ee09cb86dfaaa5f1e7445b7d4c`
 - `patent_deadline_evidence_control`: `grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json` present=`true` sha256=`e51efbeee2b102ed8c79ccb771be51697eedbd3ba4f9f352c3a7d6cd2a02eb5a`

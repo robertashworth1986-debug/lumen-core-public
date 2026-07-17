@@ -73,6 +73,15 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             f"expected {sorted(REQUIRED_HUMAN_QUESTION_IDS)}, found {sorted(human_fields)}"
         )
 
+    conversation_options = human_fields[84].get("portal_options", [])
+    hours_options = human_fields[29].get("portal_options", [])
+    expected_conversation_options = ["0", "1 to 10", "11 to 25", "26 to 50", "50+"]
+    expected_hours_options = ["Less than 10", "10\u201320", "20\u201330", "30+"]
+    if conversation_options != expected_conversation_options:
+        raise ValueError(f"Conversation option schema drift: {conversation_options}")
+    if hours_options != expected_hours_options:
+        raise ValueError(f"Weekly-hours option schema drift: {hours_options}")
+
     evidence_observations = {
         "business_age_floor": {
             "observation": "The earliest LumenCore-named local file found in the bounded metadata scan is dated 2025-07-16.",
@@ -105,14 +114,25 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
                 "newsletters and one-way marketing",
                 "threads without both inbound and outbound human messages",
             ],
-            "candidate": "11 to 25",
-            "conservative_fallback": "6 to 10",
+            "candidate": "1 to 10 unless at least 11 genuine conversations are founder-confirmed",
+            "conservative_fallback": "1 to 10",
+            "portal_options": conversation_options,
             "strength": "EVIDENCE_SUPPORTED_CONDITIONAL",
             "decision_rule": (
-                "Choose 11 to 25 only if the founder treats the 14 two-sided institutional threads as "
-                "distinct qualifying discovery or sales conversations. Otherwise choose 6 to 10."
+                "Choose 11 to 25 only if at least 11 of the bounded interactions were genuine customer-"
+                "discovery or sales conversations. Otherwise choose 1 to 10 if at least one qualifies, "
+                "or 0 if none qualify."
             ),
             "limit": "Institutional correspondence is not proof of a customer, sale, pilot, or validation.",
+        },
+        "live_form_schema": {
+            "source_url": "https://form.jotform.com/261305765806056",
+            "observation_date": "2026-07-16",
+            "method": "Non-submitting independent browser inspection using synthetic audit data",
+            "saved_or_submitted": False,
+            "customer_conversation_options": conversation_options,
+            "weekly_hours_options": hours_options,
+            "limit": "Portal labels can change; recheck the live preview before final submission.",
         },
         "financial_claim_ledger": {
             "observation": (
@@ -139,7 +159,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         {
             "question_ids": [84],
             "labels": [human_fields[84]["label"]],
-            "candidate": "11 to 25 if each bounded thread is a qualifying conversation; otherwise 6 to 10",
+            "candidate": "1 to 10 unless at least 11 genuine conversations are founder-confirmed; 0 if none qualify",
             "status": "EVIDENCE_SUPPORTED_CONDITIONAL",
             "evidence_key": "institutional_conversation_floor",
         },
@@ -183,17 +203,17 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     confirmation_prompts = [
         {
             "prompt_id": "first_time_founder",
-            "reply_line": "First-time founder: YES or NO",
-            "covers_question_ids": [38],
+            "reply_line": "First-time founder: YES or NO; business age: Not yet started / Less than 6 months / 6 to 12 months / 1 to 3 years / 3+ years",
+            "covers_question_ids": [38, 31],
         },
         {
             "prompt_id": "full_time_and_hours",
-            "reply_line": "Full-time on LumenCore: YES or NO; weekly-hours bracket: [ENTER BRACKET]",
+            "reply_line": "Full-time on LumenCore: YES or NO; weekly-hours bracket: Less than 10 / 10-20 / 20-30 / 30+",
             "covers_question_ids": [28, 29],
         },
         {
             "prompt_id": "conversation_bracket",
-            "reply_line": "Discovery/sales conversation bracket: 11-25 or 6-10",
+            "reply_line": "Discovery/sales conversation bracket: 0 / 1 to 10 / 11 to 25 / 26 to 50 / 50+",
             "covers_question_ids": [84],
         },
         {
@@ -245,6 +265,16 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "claim_boundary": CLAIM_BOUNDARY,
         "outputs": {"json": rel(OUT_JSON), "markdown": rel(OUT_MD)},
     }
+    covered_question_ids = {
+        question_id
+        for prompt in confirmation_prompts
+        for question_id in prompt["covers_question_ids"]
+    }
+    if covered_question_ids != REQUIRED_HUMAN_QUESTION_IDS:
+        raise ValueError(
+            "Founder confirmation coverage drift: "
+            f"expected {sorted(REQUIRED_HUMAN_QUESTION_IDS)}, found {sorted(covered_question_ids)}"
+        )
     payload["resolution_sha256"] = stable_sha256(payload)
     return payload
 
@@ -317,7 +347,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "- Full-time status and truthful weekly-hours bracket.",
             "- Cumulative founder cash invested in the business.",
             "- Business debt leveraged, excluding personal debt unless the live form explicitly requires it.",
-            "- Whether the 14 bounded threads qualify as 11-25 conversations or should use the conservative 6-10 bracket.",
+            "- Whether genuine discovery or sales conversations fall in 0, 1 to 10, 11 to 25, 26 to 50, or 50+.",
             "- Final confirmation that all four proposed zero-dollar fields are accurate.",
             "",
             "## Final Gate",

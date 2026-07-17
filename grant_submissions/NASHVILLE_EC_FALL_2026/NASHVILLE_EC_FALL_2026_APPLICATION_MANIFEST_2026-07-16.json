@@ -1,15 +1,20 @@
 {
   "schema": "lumencore.nashville_ec_fall_2026_application.v1",
-  "generated_utc": "2026-07-17T01:37:54.099704+00:00",
+  "generated_utc": "2026-07-17T04:17:17.942211+00:00",
   "opportunity": {
     "name": "Nashville Entrepreneur Center Fall 2026 Accelerators",
     "deadline_date": "2026-07-17",
     "deadline_time": null,
+    "deadline_time_status": "NOT_LISTED_ON_OFFICIAL_PAGE",
     "official_deadline_text": "Applications close July 17, 2026; no time is listed on the official page.",
+    "operational_finish_target": "2026-07-17T12:00:00-05:00",
+    "operational_finish_target_status": "INTERNAL_TARGET_NOT_OFFICIAL_DEADLINE",
     "recommended_route": "TakeOff",
     "alternate_routes": [],
     "eligibility_fit": "Nashville-based solo pre-revenue technology founder with a working MVP",
-    "application_form_id": "261305765806056"
+    "application_form_id": "261305765806056",
+    "application_form_url": "https://form.jotform.com/261305765806056",
+    "portal_schema_status": "OBSERVED_WITHOUT_SAVE_OR_SUBMIT_2026-07-16"
   },
   "program_economics": {
     "application_fee": null,
@@ -123,9 +128,15 @@
       "section": "Founder Information",
       "label": "Hours per week actively working on the business",
       "required": true,
-      "proposed_answer": "30+ if accurate; otherwise select the truthful bracket",
+      "proposed_answer": "30+ only if accurate; otherwise select the truthful listed bracket",
       "status": "HUMAN_CONFIRM_REQUIRED",
-      "evidence": "Founder attestation required"
+      "evidence": "Founder attestation required",
+      "portal_options": [
+        "Less than 10",
+        "10\u201320",
+        "20\u201330",
+        "30+"
+      ]
     },
     {
       "question_id": 96,
@@ -213,9 +224,16 @@
       "section": "Validation",
       "label": "Customer discovery or sales conversations completed",
       "required": true,
-      "proposed_answer": "11 to 25 if the founder confirms qualifying conversations; otherwise select the lower truthful bracket",
+      "proposed_answer": "1 to 10 unless Robert confirms at least 11 genuine customer-discovery or sales conversations; select 0 if none qualify",
       "status": "HUMAN_CONFIRM_REQUIRED",
-      "evidence": "Gmail shows multiple institutional exchanges, but the form's conversation definition requires founder confirmation"
+      "evidence": "Gmail shows multiple institutional exchanges, but the form's conversation definition requires founder confirmation",
+      "portal_options": [
+        "0",
+        "1 to 10",
+        "11 to 25",
+        "26 to 50",
+        "50+"
+      ]
     },
     {
       "question_id": 85,
@@ -431,5 +449,5 @@
     "project_healthcare": "https://ec.co/accelerators/project-healthcare/"
   },
   "claim_boundary": "This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms.",
-  "application_packet_sha256": "be9ae476ccceb0fc26b98be663abc2ec1454d113e8ca34e02ee8a9922e4f97c7"
+  "application_packet_sha256": "ad8bb89c861e03afe5968d15274d2bfbace1d87dd81408cd76b6c79e62412e92"
 }

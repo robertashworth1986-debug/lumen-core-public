@@ -13,7 +13,7 @@
       "status": "EVIDENCE_SUPPORTED_FOUNDER_CONFIRMATION"
     },
     {
-      "candidate": "11 to 25 if each bounded thread is a qualifying conversation; otherwise 6 to 10",
+      "candidate": "1 to 10 unless at least 11 genuine conversations are founder-confirmed; 0 if none qualify",
       "evidence_key": "institutional_conversation_floor",
       "labels": [
         "Customer discovery or sales conversations completed"
@@ -91,10 +91,11 @@
   "confirmation_prompts": [
     {
       "covers_question_ids": [
-        38
+        38,
+        31
       ],
       "prompt_id": "first_time_founder",
-      "reply_line": "First-time founder: YES or NO"
+      "reply_line": "First-time founder: YES or NO; business age: Not yet started / Less than 6 months / 6 to 12 months / 1 to 3 years / 3+ years"
     },
     {
       "covers_question_ids": [
@@ -102,14 +103,14 @@
         29
       ],
       "prompt_id": "full_time_and_hours",
-      "reply_line": "Full-time on LumenCore: YES or NO; weekly-hours bracket: [ENTER BRACKET]"
+      "reply_line": "Full-time on LumenCore: YES or NO; weekly-hours bracket: Less than 10 / 10-20 / 20-30 / 30+"
     },
     {
       "covers_question_ids": [
         84
       ],
       "prompt_id": "conversation_bracket",
-      "reply_line": "Discovery/sales conversation bracket: 11-25 or 6-10"
+      "reply_line": "Discovery/sales conversation bracket: 0 / 1 to 10 / 11 to 25 / 26 to 50 / 50+"
     },
     {
       "covers_question_ids": [
@@ -156,9 +157,9 @@
       "strength": "CONSISTENT_WITH_CLAIM_LEDGER_FOUNDER_CONFIRMATION"
     },
     "institutional_conversation_floor": {
-      "candidate": "11 to 25",
-      "conservative_fallback": "6 to 10",
-      "decision_rule": "Choose 11 to 25 only if the founder treats the 14 two-sided institutional threads as distinct qualifying discovery or sales conversations. Otherwise choose 6 to 10.",
+      "candidate": "1 to 10 unless at least 11 genuine conversations are founder-confirmed",
+      "conservative_fallback": "1 to 10",
+      "decision_rule": "Choose 11 to 25 only if at least 11 of the bounded interactions were genuine customer-discovery or sales conversations. Otherwise choose 1 to 10 if at least one qualifies, or 0 if none qualify.",
       "distinct_institutional_domains": 8,
       "distinct_two_sided_human_threads": 14,
       "domains": [
@@ -180,8 +181,35 @@
       "inbound_messages_reviewed": 41,
       "limit": "Institutional correspondence is not proof of a customer, sale, pilot, or validation.",
       "outbound_messages_reviewed": 53,
+      "portal_options": [
+        "0",
+        "1 to 10",
+        "11 to 25",
+        "26 to 50",
+        "50+"
+      ],
       "strength": "EVIDENCE_SUPPORTED_CONDITIONAL",
       "window": "six months ending 2026-07-16"
+    },
+    "live_form_schema": {
+      "customer_conversation_options": [
+        "0",
+        "1 to 10",
+        "11 to 25",
+        "26 to 50",
+        "50+"
+      ],
+      "limit": "Portal labels can change; recheck the live preview before final submission.",
+      "method": "Non-submitting independent browser inspection using synthetic audit data",
+      "observation_date": "2026-07-16",
+      "saved_or_submitted": false,
+      "source_url": "https://form.jotform.com/261305765806056",
+      "weekly_hours_options": [
+        "Less than 10",
+        "10\u201320",
+        "20\u201330",
+        "30+"
+      ]
     }
   },
   "final_action_gate": {
@@ -190,7 +218,7 @@
     "final_submission_authorized_at_action_time": false,
     "portal_preview_reviewed": false
   },
-  "generated_utc": "2026-07-17T02:43:57.447133+00:00",
+  "generated_utc": "2026-07-17T04:17:21.671913+00:00",
   "optional_demographics": {
     "do_not_infer": true,
     "safe_default": "Leave blank or choose a prefer-not-to-answer option if the portal offers one.",
@@ -200,7 +228,7 @@
     "json": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json",
     "markdown": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md"
   },
-  "resolution_sha256": "75dc56e5750d1345ce9c626265746c15876981afdd6872b66175def714eda912",
+  "resolution_sha256": "3b8ccef31b1b181e6125c2741ccd98b9c0c8939cec54f25417a02155ea210e4f",
   "schema": "lumencore.nashville_ec_human_fact_resolution.v1",
   "source_manifest": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json",
   "status": "SIX_FOUNDER_CONFIRMATIONS_REQUIRED",

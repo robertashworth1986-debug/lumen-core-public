@@ -20,6 +20,21 @@ OFFICIAL_SOURCES = {
     "project_healthcare": "https://ec.co/accelerators/project-healthcare/",
 }
 
+PORTAL_FORM_URL = "https://form.jotform.com/261305765806056"
+HOURS_PER_WEEK_OPTIONS = (
+    "Less than 10",
+    "10\u201320",
+    "20\u201330",
+    "30+",
+)
+CUSTOMER_CONVERSATION_OPTIONS = (
+    "0",
+    "1 to 10",
+    "11 to 25",
+    "26 to 50",
+    "50+",
+)
+
 BUSINESS_DESCRIPTION = (
     "LumenCore is a proof-to-pilot AI validation platform for infrastructure, "
     "energy, and other high-consequence time-series systems. It helps technical "
@@ -69,8 +84,9 @@ def field(
     proposed_answer: str,
     status: str = "READY",
     evidence: str = "Public-safe local business record",
+    portal_options: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
-    return {
+    row: dict[str, Any] = {
         "question_id": question_id,
         "section": section,
         "label": label,
@@ -79,6 +95,9 @@ def field(
         "status": status,
         "evidence": evidence,
     }
+    if portal_options is not None:
+        row["portal_options"] = list(portal_options)
+    return row
 
 
 FIELDS = [
@@ -134,9 +153,10 @@ FIELDS = [
         "Founder Information",
         "Hours per week actively working on the business",
         True,
-        "30+ if accurate; otherwise select the truthful bracket",
+        "30+ only if accurate; otherwise select the truthful listed bracket",
         "HUMAN_CONFIRM_REQUIRED",
         "Founder attestation required",
+        HOURS_PER_WEEK_OPTIONS,
     ),
     field(96, "Business Stage", "Tell us about your business", True, BUSINESS_DESCRIPTION),
     field(
@@ -189,9 +209,10 @@ FIELDS = [
         "Validation",
         "Customer discovery or sales conversations completed",
         True,
-        "11 to 25 if the founder confirms qualifying conversations; otherwise select the lower truthful bracket",
+        "1 to 10 unless Robert confirms at least 11 genuine customer-discovery or sales conversations; select 0 if none qualify",
         "HUMAN_CONFIRM_REQUIRED",
         "Gmail shows multiple institutional exchanges, but the form's conversation definition requires founder confirmation",
+        CUSTOMER_CONVERSATION_OPTIONS,
     ),
     field(85, "Validation", "Clearest evidence the business solves a real problem", True, PROBLEM_EVIDENCE),
     field(
@@ -314,11 +335,16 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "name": "Nashville Entrepreneur Center Fall 2026 Accelerators",
             "deadline_date": "2026-07-17",
             "deadline_time": None,
+            "deadline_time_status": "NOT_LISTED_ON_OFFICIAL_PAGE",
             "official_deadline_text": "Applications close July 17, 2026; no time is listed on the official page.",
+            "operational_finish_target": "2026-07-17T12:00:00-05:00",
+            "operational_finish_target_status": "INTERNAL_TARGET_NOT_OFFICIAL_DEADLINE",
             "recommended_route": "TakeOff",
             "alternate_routes": [],
             "eligibility_fit": "Nashville-based solo pre-revenue technology founder with a working MVP",
             "application_form_id": "261305765806056",
+            "application_form_url": PORTAL_FORM_URL,
+            "portal_schema_status": "OBSERVED_WITHOUT_SAVE_OR_SUBMIT_2026-07-16",
         },
         "program_economics": {
             "application_fee": None,
@@ -379,6 +405,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- Recommended route: `{opportunity['recommended_route']}`",
         f"- Deadline: `{opportunity['official_deadline_text']}`",
+        f"- Internal finish target: `{opportunity['operational_finish_target']}` ({opportunity['operational_finish_target_status']})",
         f"- Eligibility fit: {opportunity['eligibility_fit']}",
         f"- TakeOff fee: `${economics['takeoff_program_fee']}`; `${economics['takeoff_required_to_start']}` required to start",
         "- Fee answer: `No`; request financial aid before accepting any fee",
@@ -404,6 +431,13 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 "",
             ]
         )
+        if row.get("portal_options"):
+            lines.extend(
+                [
+                    f"- Verified portal options: {'; '.join(row['portal_options'])}",
+                    "",
+                ]
+            )
 
     lines.extend(
         [

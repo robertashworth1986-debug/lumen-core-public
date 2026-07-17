@@ -1,16 +1,17 @@
 # Nashville Entrepreneur Center Fall 2026 Portal Field Map
 
-Generated UTC: `2026-07-17T01:37:54.099704+00:00`
+Generated UTC: `2026-07-17T04:17:17.942211+00:00`
 
 ## Decision
 
 - Recommended route: `TakeOff`
 - Deadline: `Applications close July 17, 2026; no time is listed on the official page.`
+- Internal finish target: `2026-07-17T12:00:00-05:00` (INTERNAL_TARGET_NOT_OFFICIAL_DEADLINE)
 - Eligibility fit: Nashville-based solo pre-revenue technology founder with a working MVP
 - TakeOff fee: `$500`; `$125` required to start
 - Fee answer: `No`; request financial aid before accepting any fee
 - Final submit without human: `false`
-- Packet SHA-256: `be9ae476ccceb0fc26b98be663abc2ec1454d113e8ca34e02ee8a9922e4f97c7`
+- Packet SHA-256: `ad8bb89c861e03afe5968d15274d2bfbace1d87dd81408cd76b6c79e62412e92`
 
 ## Portal Fields
 
@@ -83,8 +84,10 @@ Generated UTC: `2026-07-17T01:37:54.099704+00:00`
 
 - Required: `true`
 - Status: `HUMAN_CONFIRM_REQUIRED`
-- Proposed answer: 30+ if accurate; otherwise select the truthful bracket
+- Proposed answer: 30+ only if accurate; otherwise select the truthful listed bracket
 - Evidence basis: Founder attestation required
+
+- Verified portal options: Less than 10; 10–20; 20–30; 30+
 
 ### Business Stage
 
@@ -157,8 +160,10 @@ Generated UTC: `2026-07-17T01:37:54.099704+00:00`
 
 - Required: `true`
 - Status: `HUMAN_CONFIRM_REQUIRED`
-- Proposed answer: 11 to 25 if the founder confirms qualifying conversations; otherwise select the lower truthful bracket
+- Proposed answer: 1 to 10 unless Robert confirms at least 11 genuine customer-discovery or sales conversations; select 0 if none qualify
 - Evidence basis: Gmail shows multiple institutional exchanges, but the form's conversation definition requires founder confirmation
+
+- Verified portal options: 0; 1 to 10; 11 to 25; 26 to 50; 50+
 
 #### Q85 - Clearest evidence the business solves a real problem
 

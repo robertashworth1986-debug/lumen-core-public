@@ -43,6 +43,10 @@ def test_application_routes_to_takeoff_without_inventing_traction():
     assert payload["opportunity"]["recommended_route"] == "TakeOff"
     assert payload["opportunity"]["deadline_date"] == "2026-07-17"
     assert payload["opportunity"]["deadline_time"] is None
+    assert payload["opportunity"]["deadline_time_status"] == "NOT_LISTED_ON_OFFICIAL_PAGE"
+    assert payload["opportunity"]["operational_finish_target_status"] == (
+        "INTERNAL_TARGET_NOT_OFFICIAL_DEADLINE"
+    )
     assert payload["program_economics"]["application_fee"] is None
     assert payload["program_economics"]["application_fee_status"] == (
         "NOT_LISTED_ON_REVIEWED_OFFICIAL_PAGES"
@@ -55,6 +59,10 @@ def test_application_routes_to_takeoff_without_inventing_traction():
     assert by_id[34]["proposed_answer"] == "MVP built"
     assert by_id[35]["proposed_answer"] == "No"
     assert by_id[37]["proposed_answer"] == "1"
+    assert by_id[29]["portal_options"] == ["Less than 10", "10\u201320", "20\u201330", "30+"]
+    assert by_id[84]["portal_options"] == ["0", "1 to 10", "11 to 25", "26 to 50", "50+"]
+    assert "1 to 10 unless" in by_id[84]["proposed_answer"]
+    assert "6 to 10" not in by_id[84]["proposed_answer"]
     assert by_id[61]["proposed_answer"].startswith("No;")
     assert "not customer-result proof" in by_id[85]["proposed_answer"]
     assert "no paid customer or field validation is claimed" in by_id[89]["proposed_answer"]
@@ -90,3 +98,4 @@ def test_rendered_packet_preserves_sources_and_final_action_gate():
     assert "HUMAN_REVIEW_AND_SUBMIT_REQUIRED" in rendered
     assert "Do not accept program fees" in rendered
     assert "Final submit without human: `false`" in rendered
+    assert "Verified portal options: 0; 1 to 10; 11 to 25; 26 to 50; 50+" in rendered

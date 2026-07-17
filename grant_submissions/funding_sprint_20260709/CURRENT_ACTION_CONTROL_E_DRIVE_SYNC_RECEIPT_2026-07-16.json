@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T03:59:15.1935599Z",
+  "created_utc": "2026-07-17T04:19:55.1684472Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/CURRENT_ACTION_CONTROL_20260716",
   "artifact_count": 18,
   "all_sha256_matched_after_copy": true,
@@ -32,7 +32,7 @@
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
       "bytes": 38019,
-      "sha256": "A2FEB8EC8B7A197E73054772180237C4B03D28A5076B05F863197BF6CE816AE2",
+      "sha256": "842A46F9B02C781F91860D0A1E967B0BA6C9BC0A61C12AA5BA3CBB914C8A84CA",
       "copy_sha256_matched": true
     },
     {

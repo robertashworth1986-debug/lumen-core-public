@@ -44,7 +44,7 @@
   },
   "claim_boundary": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance.",
   "direct_answer": "Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPRI administrative reply was sent and is now monitor-only with CDC, LANL, NASA, and Army; duplicate sends would reduce credibility.",
-  "generated_utc": "2026-07-17T03:56:13.364706+00:00",
+  "generated_utc": "2026-07-17T04:17:52.599506+00:00",
   "inbox_risk_filters": [
     {
       "decision": "DO_NOT_TREAT_AS_OFFICIAL_SAM_NOTICE",
@@ -174,7 +174,7 @@
       "state": "SENT_VERIFIED_RESPONSE_PENDING"
     }
   ],
-  "register_sha256": "24905410a7ddff2554b7d67f2dfc06ca192899f68a7354cbafcffe46db37c8a8",
+  "register_sha256": "0e9b3a290a9c59e2353ced5577a36e8c3c079c784266a75b324165f898a1edfe",
   "schema": "lumencore.external_engagement_response_register.v1",
   "source_artifacts": {
     "cdc_engagement_receipt": {
@@ -208,16 +208,16 @@
       "sha256": "74303CFC65C85D9EF73FB80CC8177E5D08DF43D03264FFCE73251ACD2CD9E9D0"
     },
     "nashville_application_manifest": {
-      "bytes": 17728,
+      "bytes": 18360,
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json",
       "present": true,
-      "sha256": "1BC772F56253112A346F3A6C3D02D9BF328C639407587386BF00803C14BA764E"
+      "sha256": "CD9501D1A61E248A62329595297592D00593BF0086C87DA58E120DF43DE2EF11"
     },
     "nashville_human_fact_resolution": {
-      "bytes": 7579,
+      "bytes": 8597,
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json",
       "present": true,
-      "sha256": "AB807930D19B28BB5A2A7AEF38B28C3E87B40B750D1EF891F61DBD6CE510EC9F"
+      "sha256": "998A267A08DF9E8923FAB1E57740F00F52270228A49417F40DA73AF4AA6D4D33"
     }
   },
   "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",

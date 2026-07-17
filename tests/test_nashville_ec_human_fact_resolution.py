@@ -43,9 +43,14 @@ def test_age_and_conversation_candidates_are_bounded():
     conversations = evidence["institutional_conversation_floor"]
     assert conversations["distinct_two_sided_human_threads"] == 14
     assert conversations["distinct_institutional_domains"] == 8
-    assert conversations["candidate"] == "11 to 25"
-    assert conversations["conservative_fallback"] == "6 to 10"
+    assert conversations["candidate"].startswith("1 to 10 unless")
+    assert conversations["conservative_fallback"] == "1 to 10"
+    assert conversations["portal_options"] == ["0", "1 to 10", "11 to 25", "26 to 50", "50+"]
     assert "not proof of a customer" in conversations["limit"]
+
+    live_form = evidence["live_form_schema"]
+    assert live_form["saved_or_submitted"] is False
+    assert live_form["weekly_hours_options"] == ["Less than 10", "10\u201320", "20\u201330", "30+"]
 
 
 def test_financial_candidates_remain_founder_confirmed():
@@ -73,7 +78,9 @@ def test_rendered_resolution_is_concise_private_safe_and_send_gated():
 
     assert "Six-Line Founder Reply" in rendered
     assert "First-time founder: YES or NO" in rendered
-    assert "Discovery/sales conversation bracket: 11-25 or 6-10" in rendered
+    assert "business age:" in rendered
+    assert "Discovery/sales conversation bracket: 0 / 1 to 10 / 11 to 25 / 26 to 50 / 50+" in rendered
+    assert "6 to 10" not in rendered
     assert "Do not click final submit" in rendered
     assert "No candidate becomes a submitted fact" in rendered
     assert "full legal name:" not in lowered
@@ -83,3 +90,15 @@ def test_rendered_resolution_is_concise_private_safe_and_send_gated():
     assert "passcode" not in lowered
     assert "zoom.us" not in lowered
     assert "api_key" not in lowered
+
+
+def test_six_prompts_cover_every_human_required_question():
+    module = load_module()
+    payload = module.build_payload("2026-07-16T23:59:00Z")
+
+    covered = {
+        question_id
+        for prompt in payload["confirmation_prompts"]
+        for question_id in prompt["covers_question_ids"]
+    }
+    assert covered == module.REQUIRED_HUMAN_QUESTION_IDS
