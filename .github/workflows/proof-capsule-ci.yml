@@ -7,6 +7,7 @@ on:
       - "examples/proof_capsule/**"
       - "tests/test_proof_capsule_verifier.py"
       - "QUICKSTART.md"
+      - "dashboard/operator_home.html"
       - ".github/workflows/proof-capsule-ci.yml"
   push:
     branches: [main]
@@ -15,6 +16,7 @@ on:
       - "examples/proof_capsule/**"
       - "tests/test_proof_capsule_verifier.py"
       - "QUICKSTART.md"
+      - "dashboard/operator_home.html"
       - ".github/workflows/proof-capsule-ci.yml"
 
 permissions:
