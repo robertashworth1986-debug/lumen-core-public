@@ -50,6 +50,13 @@ class ProofCapsuleVerifierTests(unittest.TestCase):
         with self.assertRaises(MODULE.CapsuleError):
             MODULE.validate_capsule(mutated, ROOT)
 
+    def test_public_home_uses_proof_to_pilot_story(self) -> None:
+        home = (ROOT / "dashboard" / "operator_home.html").read_text(encoding="utf-8")
+        self.assertIn("One proof path. One bounded decision.", home)
+        self.assertIn("Internal replay evidence is not external validation.", home)
+        self.assertNotIn("One platform. Four products. One truth layer.", home)
+        self.assertNotIn("Finish and submit the current NSF Project Pitch.", home)
+
 
 if __name__ == "__main__":
     unittest.main()
