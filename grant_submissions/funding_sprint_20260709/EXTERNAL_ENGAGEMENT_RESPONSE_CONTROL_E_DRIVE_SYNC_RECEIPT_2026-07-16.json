@@ -1,34 +1,34 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T09:21:59.3340158Z",
+  "created_utc": "2026-07-17T09:58:47.0245122Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_20260716",
-  "artifact_count": 47,
+  "artifact_count": 52,
   "all_sha256_matched_after_copy": true,
   "browser_navigation_performed": false,
   "private_founder_values_mirrored": false,
   "artifacts": [
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
-      "bytes": 31079,
-      "sha256": "666D6494350CE15FD038827BF5CBBC818D42D48AFD0D01FEC676664E87C4C5DC",
+      "bytes": 33855,
+      "sha256": "A9472249B2BF98C78EAA4A21FB78CFC4E1B358EA238CC958601CB49A8682D1F1",
       "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 70979,
-      "sha256": "47589290533923721DA89DEB0BF7B31766AA9D33D676E1D9EFAB4EB3405E7DA1",
+      "bytes": 72235,
+      "sha256": "B47407C0F3E18439C3300E2DD0DB69AA43E3B143BE37257D7D32C9F84521CD38",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
-      "bytes": 11435,
-      "sha256": "1B2A9E6180C4FCE9AA2D66E4A164A2002B873D762BCE72BD254014FC4E867D02",
+      "bytes": 12781,
+      "sha256": "2DA261F8F15469F60B2089B0CB0C7F925DC29B1C14BA6892BD320940F6F5AB41",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 10217,
-      "sha256": "7658F471B3DBB8E47E7139FE5A391B62BE565C063235719BD2AB2C1BC5AC3DC9",
+      "bytes": 10794,
+      "sha256": "EEA01E87164A61615AEDAFA07C47FDE98783E293EFF92E9310FF6E9C2210F038",
       "copy_sha256_matched": true
     },
     {
@@ -39,8 +39,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-      "bytes": 19198,
-      "sha256": "29B03CC3A72E4B714047EC130745EA93F350549EBBAB8F1ACF5BC9C63A8CA445",
+      "bytes": 20532,
+      "sha256": "A85FF21F6E5400247BAEDC1BA09AF0A5905F5E58F81358826B881DCE758F3BB4",
       "copy_sha256_matched": true
     },
     {
@@ -111,8 +111,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
-      "bytes": 26282,
-      "sha256": "F132477A66A388931B3D0E8E08E2CFD43446AC0733A36A93DFB4BEF0A22F0D5D",
+      "bytes": 27983,
+      "sha256": "CFF4D1C22A31815D65B8F6AF6EB0E5A26691ACCB558CAA55982088E9A61AB5F2",
       "copy_sha256_matched": true
     },
     {
@@ -288,7 +288,37 @@
       "bytes": 1815,
       "sha256": "FAC3AA9FD88207FB881F33B38201325369E4820CDC34F6562079FEE7218D4792",
       "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
+      "bytes": 11332,
+      "sha256": "DC3895CB5E88E3C6D40710EC9EFC510820352FCFF2A3891F1A2ADD297E96659B",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_email_action_reconciliation.py",
+      "bytes": 2349,
+      "sha256": "8296A17DE0405566F8F679C6474E97A015274117A76192B9FF7EE92A6CC0733A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
+      "bytes": 6510,
+      "sha256": "FFB2C77F4E2BAEF34A6AEC9628BCD963A9792F63AA22155ADEB309981BDC303A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
+      "bytes": 2727,
+      "sha256": "CD8FD4C2DBE2DD34F8F07D37126B3B3CD1479F6123CEBA03AF83719CC4FF6873",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "bytes": 42913,
+      "sha256": "19673825A74A72ABA7F341EA858AD1C0EA35F7B3BAED498560AE7A59D0E81A7F",
+      "copy_sha256_matched": true
     }
   ],
-  "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove email delivery beyond recorded SENT/acknowledgment evidence, portal submission, evaluation, program acceptance, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance."
+  "claim_boundary": "This receipt proves only that 52 bounded engagement-response, deadline-control, attachment, reconciliation, private-workflow code, test, and public-safe artifact files were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove external transmission beyond the separately cited sent receipts, portal submission, acceptance, selection, award, validation, customer commitment, or permission to publish private founder, account, patent, or credential values."
 }

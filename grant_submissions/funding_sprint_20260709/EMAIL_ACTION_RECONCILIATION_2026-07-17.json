@@ -1,0 +1,143 @@
+{
+  "as_of_date": "2026-07-17",
+  "claim_boundary": "This dated mailbox reconciliation records only the messages observable at the check. It does not prove that no later message exists, portal state, eligibility, submission, acceptance, award, validation, or authorization to disclose private account or patent information.",
+  "evidence_method": "Connected Gmail metadata and relevant-thread reconciliation against sent receipts and the canonical response register.",
+  "excluded_message_classes": [
+    "Personal finance and payment notices",
+    "Account-security and password-reset notices",
+    "Newsletters, social notifications, and job-alert bulk mail"
+  ],
+  "lanes": [
+    {
+      "email_reply_required": false,
+      "lane_id": "epri_open_power_ai_mou",
+      "latest_event_type": "AUTOMATIC_OUT_OF_OFFICE",
+      "latest_event_utc": "2026-07-17T03:51:16Z",
+      "next_action": "Wait for the MOU, a correction request, or an onboarding question; do not resend identity details.",
+      "no_send_before": "2026-07-23",
+      "organization": "EPRI Open Power AI Consortium",
+      "out_of_office_through": "2026-07-20",
+      "send_now": false,
+      "state": "MOU_ROUTING_SENT_OUT_OF_OFFICE_RECEIVED"
+    },
+    {
+      "email_reply_required": false,
+      "lane_id": "georgia_patents_pro_bono_intake",
+      "latest_event_type": "OUTBOUND_INTAKE_SENT",
+      "latest_event_utc": "2026-07-17T04:27:26Z",
+      "next_action": "Wait for intake instructions; do not disclose unpublished patent materials through ordinary email.",
+      "no_send_before": "2026-07-24",
+      "organization": "Georgia PATENTS",
+      "send_now": false,
+      "state": "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING"
+    },
+    {
+      "email_reply_required": false,
+      "lane_id": "lanl_vision_licensing_followup",
+      "latest_event_type": "OUTBOUND_PACKAGE_SENT",
+      "latest_event_utc": "2026-07-16T18:50:16Z",
+      "next_action": "Wait for LANL; use the single bounded follow-up only on or after July 23 if no reply arrives.",
+      "no_send_before": "2026-07-23",
+      "organization": "Los Alamos National Laboratory",
+      "send_now": false,
+      "state": "PACKAGE_SENT_RESPONSE_PENDING"
+    },
+    {
+      "email_reply_required": false,
+      "lane_id": "cdc_ai_acquisition_rfi",
+      "latest_event_type": "AGENCY_RECEIPT_CONFIRMED",
+      "latest_event_utc": "2026-07-16T13:34:05Z",
+      "next_action": "Monitor for a CDC clarification, replacement request, or scheduling message; do not resend the response.",
+      "no_send_before": null,
+      "organization": "Centers for Disease Control and Prevention",
+      "send_now": false,
+      "state": "RECEIPT_CONFIRMED_FOLLOW_UP_PENDING"
+    },
+    {
+      "email_reply_required": false,
+      "lane_id": "lvlup_optional_paid_event",
+      "latest_event_type": "OPTIONAL_SPONSOR_TERMS_CLARIFIED",
+      "latest_event_utc": "2026-07-16T13:31:23Z",
+      "next_action": "No reply or purchase; reconsider only if a relevant no-fee route or written non-pay-to-play selection terms arrive.",
+      "no_send_before": null,
+      "organization": "LvlUp Ventures / Power of the Pitch Week",
+      "send_now": false,
+      "state": "OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND"
+    },
+    {
+      "email_reply_required": false,
+      "lane_id": "terry_vynetic_followup",
+      "latest_event_type": "TWO_NEAR_DUPLICATE_OUTBOUND_FOLLOWUPS",
+      "latest_event_utc": "2026-07-16T16:58:56Z",
+      "next_action": "Send nothing further unless Terry replies with a specific ask; then answer only that ask in the existing thread.",
+      "no_send_before": null,
+      "organization": "Terry Anderton / Vynetic",
+      "outbound_followup_count": 2,
+      "outbound_spacing_seconds": 10,
+      "send_now": false,
+      "state": "OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY"
+    },
+    {
+      "email_reply_required": false,
+      "lane_id": "nsf_project_pitch",
+      "latest_event_type": "MAILBOX_INVITATION_SEARCH",
+      "latest_event_utc": null,
+      "next_action": "Use the rolling Project Pitch portal route; do not represent the July 27 full-proposal deadline as reachable without an invitation.",
+      "no_send_before": null,
+      "organization": "U.S. National Science Foundation",
+      "send_now": false,
+      "state": "NO_OFFICIAL_PROJECT_PITCH_INVITATION_VERIFIED"
+    },
+    {
+      "email_reply_required": false,
+      "lane_id": "nasa_data_center_rfi",
+      "latest_event_type": "SENT_RECEIPT_RECONCILIATION",
+      "latest_event_utc": "2026-07-13T21:27:12Z",
+      "next_action": "Monitor for an agency clarification or replacement request.",
+      "no_send_before": null,
+      "organization": "NASA",
+      "send_now": false,
+      "state": "SENT_VERIFIED_RESPONSE_PENDING"
+    },
+    {
+      "email_reply_required": false,
+      "lane_id": "army_aidp_draft_cfs_feedback",
+      "latest_event_type": "SENT_RECEIPT_RECONCILIATION",
+      "latest_event_utc": "2026-07-13T21:27:05Z",
+      "next_action": "Monitor for agency feedback; do not duplicate-send.",
+      "no_send_before": null,
+      "organization": "U.S. Army",
+      "send_now": false,
+      "state": "SENT_VERIFIED_RESPONSE_PENDING"
+    },
+    {
+      "email_reply_required": false,
+      "lane_id": "sam_public_credential_rotation",
+      "latest_event_type": "OFFICIAL_ROTATION_REMINDER",
+      "latest_event_utc": "2026-07-16T08:07:36Z",
+      "next_action": "Complete the authenticated account rotation and hidden local install; do not reply to renewal solicitations or publish the credential.",
+      "no_send_before": null,
+      "organization": "SAM.gov account credential control",
+      "send_now": false,
+      "state": "ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY"
+    }
+  ],
+  "schema": "lumencore.email_action_reconciliation.v1",
+  "search_scope": [
+    "Funding, grant, contract, SBIR/STTR, DSIP, NSF, SAM.gov, and Research.gov",
+    "Patent routing and Georgia PATENTS",
+    "LANL VISION and licensing follow-up",
+    "EPRI Open Power AI Consortium onboarding",
+    "CDC, NASA, Army, LvlUp, Terry Anderton, and Vynetic"
+  ],
+  "status": "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION",
+  "summary": {
+    "duplicate_outbound_risk_count": 1,
+    "email_reply_required_count": 0,
+    "external_send_allowed_without_human": false,
+    "human_account_action_count": 1,
+    "lane_count": 10,
+    "out_of_office_count": 1,
+    "send_now_count": 0
+  }
+}

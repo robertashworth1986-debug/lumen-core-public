@@ -26,7 +26,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public A
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `48b11d2c5dd30ddabdd30ad0ac7047ed0d46a68efb55bbce8d4e0baf5dca1c8d`
+- Command board SHA-256: `d55fdf9dc55ca4253f1ebd832c7d69fd1525825cbca439f206d45fde4589f144`
 
 ## Operational Controls
 
@@ -689,6 +689,6 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public A
 - `launchtn_3686_application_manifest`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json` present=`true` sha256=`16fe4e214430055532f6fb7f57453e0f47daa648ee3e3b92b6050e17c98e3dc8`
 - `launchtn_3686_pitch_deck`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx` present=`true` sha256=`c607e94d8e072ec9d9f93da0d8c372fd5592b01d2ca3b4f71c0a079417c18a69`
 - `launchtn_3686_financial_model`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx` present=`true` sha256=`9da46f8ad94fc53ef561ee33dcfa6df907897caeadf6afbd08fb113fc6887d94`
-- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`f132477a66a388931b3d0e8e08e2cfd43446ac0733a36a93dfb4bef0a22f0d5d`
+- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`cff4d1c22a31815d65b8f6af6eb0e5a26691accb558caa55982088e9a61ab5f2`
 - `sam_public_key_rotation_control`: `grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json` present=`true` sha256=`6635a3fa854bd29c14547e6112cb66c51c5b8238908c438099a52610d140a563`
 - `patent_deadline_evidence_control`: `grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json` present=`true` sha256=`096904e114457c56383e495cfad6c6e3d0d31596d6b53e2920099608b2b7519b`

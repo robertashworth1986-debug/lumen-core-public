@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T09:46:06.1423092Z",
+  "created_utc": "2026-07-17T09:59:32.1280500Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/NSF_PROJECT_PITCH_ROUTING_20260717",
   "artifact_count": 14,
   "all_sha256_matched_after_copy": true,
@@ -88,7 +88,7 @@
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
       "bytes": 42913,
-      "sha256": "F8CE94A079F53EEC9A59121C459A00521375CAD4586CBC93C2EBA66A66E2EC63",
+      "sha256": "19673825A74A72ABA7F341EA858AD1C0EA35F7B3BAED498560AE7A59D0E81A7F",
       "copy_sha256_matched": true
     }
   ],

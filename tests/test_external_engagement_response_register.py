@@ -30,10 +30,13 @@ def test_register_routes_current_actions_without_duplicate_sends():
     records = {row["lane_id"]: row for row in payload["records"]}
 
     assert payload["schema"] == "lumencore.external_engagement_response_register.v1"
-    assert payload["summary"]["record_count"] == 10
+    assert payload["summary"]["record_count"] == 11
     assert payload["summary"]["immediate_human_action_count"] == 2
-    assert payload["summary"]["monitor_only_count"] == 6
-    assert payload["summary"]["do_not_duplicate_send_count"] == 8
+    assert payload["summary"]["monitor_only_count"] == 7
+    assert payload["summary"]["do_not_duplicate_send_count"] == 9
+    assert payload["summary"]["email_action_reconciliation_status"] == (
+        "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION"
+    )
     assert payload["summary"]["autonomous_external_send_allowed"] is False
     assert payload["summary"]["autonomous_final_portal_submission_allowed"] is False
 
@@ -72,6 +75,12 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert records["epri_open_power_ai_mou"]["state"] == "OUTBOUND_SENT_MOU_PENDING"
     assert records["epri_open_power_ai_mou"]["do_not_duplicate_send"] is True
     assert records["epri_open_power_ai_mou"]["no_send_before"] == "2026-07-23"
+    assert records["epri_open_power_ai_mou"]["latest_mailbox_event"] == (
+        "AUTOMATIC_OUT_OF_OFFICE"
+    )
+    assert records["epri_open_power_ai_mou"]["out_of_office_through"] == (
+        "2026-07-20"
+    )
     assert records["georgia_patents_pro_bono_intake"]["state"] == (
         "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING"
     )
@@ -102,6 +111,17 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert records["sam_public_credential_rotation"]["send_now"] is False
     assert records["cdc_ai_acquisition_rfi"]["decision"] == "MONITOR_NO_REPLY_REQUIRED"
     assert records["lanl_vision_licensing_followup"]["no_send_before"] == "2026-07-23"
+    assert records["terry_vynetic_followup"]["decision"] == (
+        "MONITOR_NO_FURTHER_FOLLOWUP"
+    )
+    assert records["terry_vynetic_followup"]["outbound_followup_count"] == 2
+    assert records["terry_vynetic_followup"]["outbound_spacing_seconds"] == 10
+    assert records["terry_vynetic_followup"]["send_now"] is False
+    assert records["terry_vynetic_followup"]["do_not_duplicate_send"] is True
+    assert "Send nothing further" in records["terry_vynetic_followup"][
+        "next_action"
+    ]
+    assert payload["source_artifacts"]["email_action_reconciliation"]["present"] is True
     assert records["nasa_data_center_rfi"]["do_not_duplicate_send"] is True
     assert records["army_aidp_draft_cfs_feedback"]["do_not_duplicate_send"] is True
 
@@ -163,7 +183,7 @@ def test_mirror_receipt_matches_every_bounded_source():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 47
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 52
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["browser_navigation_performed"] is False
     assert receipt["private_founder_values_mirrored"] is False
@@ -207,6 +227,11 @@ def test_mirror_receipt_matches_every_bounded_source():
         "tests/test_prepare_patent_center_private_capture.py",
         "grant_submissions/funding_sprint_20260709/PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md",
         "grant_submissions/funding_sprint_20260709/PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md",
+        "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
+        "tests/test_email_action_reconciliation.py",
+        "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
+        "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
+        "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
     }.issubset(mirrored_sources)
 
     assert "does not prove" in receipt["claim_boundary"]

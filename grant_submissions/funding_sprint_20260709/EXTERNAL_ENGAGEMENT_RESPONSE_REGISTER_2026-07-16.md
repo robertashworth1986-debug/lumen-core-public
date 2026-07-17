@@ -1,19 +1,19 @@
 # External Engagement Response Register - 2026-07-17
 
-No new email should be sent. If the Nashville EC portal remains open, finish its founder-fact gate; complete the overdue SAM account-key action; and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. EPRI, Georgia PATENTS, CDC, LANL, NASA, and Army are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would reduce credibility.
+No new email should be sent. If the Nashville EC portal remains open, finish its founder-fact gate; complete the overdue SAM account-key action; and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would reduce credibility.
 
 ## Control Summary
 
 - Status: `CURRENT_RESPONSE_CONTROL_HUMAN_GATED`
-- Engagement records: `10`
+- Engagement records: `11`
 - Immediate human actions: `2`
-- Monitor-only lanes: `6`
-- Do-not-duplicate lanes: `8`
+- Monitor-only lanes: `7`
+- Do-not-duplicate lanes: `9`
 - Verified attachments: `6`
 - All attachment checks pass: `true`
 - Autonomous external send allowed: `false`
 - Autonomous final portal submit allowed: `false`
-- Register SHA-256: `f39acdca88619c67133bb51930e3375d276bc7f5d570754bc47f1ae0918085de`
+- Register SHA-256: `c5d041210c7a0a3278e1d00d516436c079baa61af7ae7185addd9397ccb26733`
 
 ## Response Queue
 
@@ -27,6 +27,7 @@ No new email should be sent. If the Nashville EC portal remains open, finish its
 | SAM.gov account credential control | `ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED` | `HUMAN_ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY` | 2026-07-16 | `true` |
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `MONITOR_NO_REPLY_REQUIRED` | 2026-07-30T21:00:00Z | `true` |
 | Los Alamos National Laboratory | `OUTBOUND_SENT_RESPONSE_PENDING` | `MONITOR_THEN_ONE_BOUNDED_FOLLOW_UP` | 2026-07-23 | `true` |
+| Terry Anderton / Vynetic | `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY` | `MONITOR_NO_FURTHER_FOLLOWUP` | None | `true` |
 | NASA | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | 2026-07-17T21:00:00Z | `true` |
 | U.S. Army | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | None | `true` |
 
@@ -70,7 +71,7 @@ No new email should be sent. If the Nashville EC portal remains open, finish its
 - Next action: Monitor the existing thread for the DocuSign envelope or a clarification request; do not resend identity details.
 - Response artifact: `grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - Claim boundary: This receipt records MOU-routing information only. The Gmail SENT record proves transmission of the administrative reply only. It does not establish an executed MOU, consortium membership, EPRI endorsement, independent validation, a pilot, funding, procurement, a contract, deployment, realized savings, or technical performance.
-- Record SHA-256: `747973698c3d5ae36820470e6d043ab64c0e59be3cdffc43018e7a7d8b93483d`
+- Record SHA-256: `dc4d563f61332f4261e235bb738eac440d7b75f67af95a28206dc0ca5a020a7b`
 
 ### Georgia PATENTS
 
@@ -154,6 +155,20 @@ Robert Ashworth
 LumenCore
 ```
 
+### Terry Anderton / Vynetic
+
+- Lane: `terry_vynetic_followup`
+- State: `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY`
+- Decision: `MONITOR_NO_FURTHER_FOLLOWUP`
+- Response channel: `EMAIL_REPLY_ONLY_IF_INBOUND`
+- Response ready: `false`
+- Send now: `false`
+- Action gate: No additional outbound message. If Terry replies, read the complete thread and answer only the specific ask without sending another broad deck.
+- Next action: Send nothing further unless Terry replies with a specific ask; then answer only that ask in the existing thread.
+- Response artifact: `grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json`
+- Claim boundary: The mailbox record proves only that two near-duplicate follow-ups were sent and no inbound reply was observed at reconciliation time. It does not prove interest, rejection, selection, funding, or validation.
+- Record SHA-256: `ae8344c154e7a7eb0d8fe2c6211f0cd8759b677cf093e7841606986f0f4fef67`
+
 ### NASA
 
 - Lane: `nasa_data_center_rfi`
@@ -213,6 +228,7 @@ LumenCore
 - `launchtn_financial_model`: present=`true` bytes=`16166` sha256=`9DA46F8AD94FC53EF561EE33DCFA6DF907897CAEADF6AFBD08FB113FC6887D94` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx`
 - `lvlup_historical_application_draft`: present=`true` bytes=`12152` sha256=`F75EBF8FD60A40968484D6AE147FB6D02848CA109AB277337C5BAE5085CBA796` path=`docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md`
 - `sam_public_credential_rotation_control`: present=`true` bytes=`4529` sha256=`6635A3FA854BD29C14547E6112CB66C51C5B8238908C438099A52610D140A563` path=`grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json`
+- `email_action_reconciliation`: present=`true` bytes=`6510` sha256=`FFB2C77F4E2BAEF34A6AEC9628BCD963A9792F63AA22155ADEB309981BDC303A` path=`grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json`
 
 ## Claim Boundary
 

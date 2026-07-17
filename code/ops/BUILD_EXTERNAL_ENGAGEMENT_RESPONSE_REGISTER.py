@@ -82,6 +82,9 @@ LVLUP_DRAFT = ROOT / "docs" / "LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md"
 SAM_ROTATION_CONTROL = (
     SPRINT_DIR / "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json"
 )
+EMAIL_ACTION_RECONCILIATION = (
+    SPRINT_DIR / "EMAIL_ACTION_RECONCILIATION_2026-07-17.json"
+)
 
 OUT_JSON = OUT_OPS / "external_engagement_response_register_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "external_engagement_response_register.json"
@@ -213,6 +216,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     nashville_resolution = read_json(NASHVILLE_FACT_RESOLUTION)
     launchtn = read_json(LAUNCHTN_MANIFEST)
     sam_rotation = read_json(SAM_ROTATION_CONTROL)
+    email_reconciliation = read_json(EMAIL_ACTION_RECONCILIATION)
 
     if nashville_resolution.get("status") != "SIX_FOUNDER_CONFIRMATIONS_REQUIRED":
         raise ValueError("Nashville EC human-fact resolution is missing or stale")
@@ -222,6 +226,18 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         raise ValueError("LaunchTN 3686 application manifest is missing or stale")
     if sam_rotation.get("schema") != "lumencore.sam_public_credential_rotation_control.v1":
         raise ValueError("SAM public credential rotation control is missing or stale")
+    if email_reconciliation.get("schema") != "lumencore.email_action_reconciliation.v1":
+        raise ValueError("Email action reconciliation is missing or stale")
+    if email_reconciliation.get("status") != "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION":
+        raise ValueError("Email action reconciliation requires a fresh action review")
+    reconciliation_lanes = {
+        row["lane_id"]: row for row in email_reconciliation.get("lanes", [])
+    }
+    if {
+        "epri_open_power_ai_mou",
+        "terry_vynetic_followup",
+    } - reconciliation_lanes.keys():
+        raise ValueError("Email action reconciliation is missing required lane controls")
 
     nasa = submission_by_notice(submissions, "80TECH26RFI0020")
     army = submission_by_notice(submissions, "ACCAPGAIDPRFI4")
@@ -285,6 +301,12 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "action_gate": "Reply only when EPRI sends the MOU, requests a correction, or asks for additional onboarding information.",
             "response_artifact": rel(EPRI_RECEIPT),
             "supporting_artifacts": [rel(EPRI_TEMPLATE)],
+            "latest_mailbox_event": reconciliation_lanes[
+                "epri_open_power_ai_mou"
+            ]["latest_event_type"],
+            "out_of_office_through": reconciliation_lanes[
+                "epri_open_power_ai_mou"
+            ]["out_of_office_through"],
             "next_action": "Monitor the existing thread for the DocuSign envelope or a clarification request; do not resend identity details.",
             "claim_boundary": epri["claim_boundary"],
         },
@@ -386,6 +408,36 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "claim_boundary": lanl["claim_boundary"],
         },
         {
+            "lane_id": "terry_vynetic_followup",
+            "organization": "Terry Anderton / Vynetic",
+            "state": reconciliation_lanes["terry_vynetic_followup"]["state"],
+            "deadline": None,
+            "decision": "MONITOR_NO_FURTHER_FOLLOWUP",
+            "response_channel": "EMAIL_REPLY_ONLY_IF_INBOUND",
+            "response_ready": False,
+            "send_now": False,
+            "do_not_duplicate_send": True,
+            "action_gate": (
+                "No additional outbound message. If Terry replies, read the complete "
+                "thread and answer only the specific ask without sending another broad deck."
+            ),
+            "response_artifact": rel(EMAIL_ACTION_RECONCILIATION),
+            "outbound_followup_count": reconciliation_lanes[
+                "terry_vynetic_followup"
+            ]["outbound_followup_count"],
+            "outbound_spacing_seconds": reconciliation_lanes[
+                "terry_vynetic_followup"
+            ]["outbound_spacing_seconds"],
+            "next_action": reconciliation_lanes["terry_vynetic_followup"][
+                "next_action"
+            ],
+            "claim_boundary": (
+                "The mailbox record proves only that two near-duplicate follow-ups were "
+                "sent and no inbound reply was observed at reconciliation time. It does "
+                "not prove interest, rejection, selection, funding, or validation."
+            ),
+        },
+        {
             "lane_id": "nasa_data_center_rfi",
             "organization": "NASA",
             "state": "SENT_VERIFIED_RESPONSE_PENDING",
@@ -450,7 +502,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "direct_answer": (
             "No new email should be sent. If the Nashville EC portal remains open, finish its founder-fact gate; "
             "complete the overdue SAM account-key action; and keep the QA-passed LaunchTN 3686 package staged for "
-            "founder facts, assumption approval, and final preview. EPRI, Georgia PATENTS, CDC, LANL, NASA, and Army "
+            "founder facts, assumption approval, and final preview. EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army "
             "are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would "
             "reduce credibility."
         ),
@@ -471,6 +523,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "all_attachment_checks_pass": all_attachment_checks_pass,
             "autonomous_external_send_allowed": False,
             "autonomous_final_portal_submission_allowed": False,
+            "email_action_reconciliation_status": email_reconciliation["status"],
         },
         "records": records,
         "attachment_checks": attachment_checks,
@@ -520,6 +573,9 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "lvlup_historical_application_draft": artifact_status(LVLUP_DRAFT),
             "sam_public_credential_rotation_control": artifact_status(
                 SAM_ROTATION_CONTROL
+            ),
+            "email_action_reconciliation": artifact_status(
+                EMAIL_ACTION_RECONCILIATION
             ),
         },
         "claim_boundary": REGISTER_BOUNDARY,
