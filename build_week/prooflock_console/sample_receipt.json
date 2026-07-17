@@ -1,0 +1,93 @@
+{
+  "schema": "lumencore.prooflock_receipt.v1",
+  "receipt_id": "prooflock-flowform-v3-lineage-20260717",
+  "created_utc": "2026-07-17T21:30:00Z",
+  "subject": {
+    "name": "FLOWFORM Curved Motherboard and Honeycomb Battery V3 Concept",
+    "asset_id": "flowform_curved_motherboard_honeycomb_battery_v3",
+    "evidence_class": "AI_GENERATED_CONCEPT_RENDER"
+  },
+  "artifacts": [
+    {
+      "artifact_id": "flowform_v3_png",
+      "role": "current_concept_render",
+      "repo_relative_path": "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.png",
+      "expected_sha256": "10472c90db0837827e9c37d3bd781a87b690f084caf7ecb28988c02223ffecb7"
+    },
+    {
+      "artifact_id": "flowform_v3_manifest",
+      "role": "current_concept_manifest",
+      "repo_relative_path": "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.json",
+      "expected_sha256": "5146281af36e0dda090bd38d2699d847005e1dd02f41cf267104874d7d5eb98d"
+    },
+    {
+      "artifact_id": "flowform_v2_png",
+      "role": "predecessor_concept_render",
+      "repo_relative_path": "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.png",
+      "expected_sha256": "b4d90b400d3aa4e95d41b3fab259b27ce85db663d7f2ffb5f273a22e00824962"
+    },
+    {
+      "artifact_id": "flowform_v2_manifest",
+      "role": "predecessor_concept_manifest",
+      "repo_relative_path": "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.json",
+      "expected_sha256": "cc822aa047c9dbe6ab9044412f22f423c1d6cb772a2f4dc0753ad7f4e367c7a8"
+    }
+  ],
+  "lineage": {
+    "predecessor_asset_id": "flowform_curved_motherboard_honeycomb_battery_v2",
+    "current_asset_id": "flowform_curved_motherboard_honeycomb_battery_v3",
+    "relationship": "V3 is an AI-generated concept edit derived from the bounded V2 concept."
+  },
+  "gates": [
+    {
+      "gate_id": "artifact_hashes",
+      "label": "Artifact custody",
+      "status": "PASS",
+      "required_for_promotion": true,
+      "basis": "All four declared V2/V3 artifacts are present and hash-addressed."
+    },
+    {
+      "gate_id": "lineage_manifest",
+      "label": "Lineage declaration",
+      "status": "PASS",
+      "required_for_promotion": true,
+      "basis": "The V3 manifest names V2 as its predecessor and preserves the concept boundary."
+    },
+    {
+      "gate_id": "engineering_cad",
+      "label": "Engineering CAD",
+      "status": "OPEN",
+      "required_for_promotion": true,
+      "basis": "No controlled CAD, schematic, stack-up, or bill of materials is represented."
+    },
+    {
+      "gate_id": "prototype_test",
+      "label": "Prototype test",
+      "status": "OPEN",
+      "required_for_promotion": true,
+      "basis": "No fabricated prototype or electrical, thermal, vibration, or battery test is represented."
+    },
+    {
+      "gate_id": "qualified_safety_review",
+      "label": "Qualified safety review",
+      "status": "OPEN",
+      "required_for_promotion": true,
+      "basis": "Battery safety, venting, isolation, and service requirements require qualified review."
+    },
+    {
+      "gate_id": "human_release",
+      "label": "Human release",
+      "status": "OPEN",
+      "required_for_promotion": true,
+      "basis": "A human must approve any external engineering or commercialization claim."
+    }
+  ],
+  "limitations": [
+    "The render is an industrial-design concept, not a fabrication package.",
+    "Visual features indicate design intent only and do not establish performance.",
+    "No patentability, safety, manufacturability, certification, or commercial-readiness conclusion is supported."
+  ],
+  "decision": "HOLD",
+  "claim_boundary": "This receipt proves repository custody, SHA-256 identity, and declared V2-to-V3 concept lineage for the listed public artifacts. It does not prove CAD completeness, electrical or thermal performance, energy density, cycle life, crashworthiness, prototype status, safety certification, patentability, manufacturability, field validation, or commercial readiness.",
+  "receipt_sha256": "07f4d143210c5d0a175c480228273c6b3d4c5b01da5a12a5daeb38fcdfb0d961"
+}

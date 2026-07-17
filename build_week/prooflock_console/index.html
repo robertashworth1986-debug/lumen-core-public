@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>ProofLock Console</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="appbar">
+    <div class="brand-block">
+      <span class="brand-mark" aria-hidden="true">PL</span>
+      <div>
+        <p class="brand-name">ProofLock Console</p>
+        <p class="brand-meta">LumenCore / Developer Tools</p>
+      </div>
+    </div>
+    <div class="appbar-status">
+      <span class="status-dot" id="headerStatusDot" aria-hidden="true"></span>
+      <span id="headerStatus">Awaiting verification</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="command-band" aria-label="Receipt controls">
+      <div>
+        <h1>Artifact verification</h1>
+        <p id="receiptIdentity">No receipt loaded</p>
+      </div>
+      <div class="command-row">
+        <button type="button" id="loadSampleButton">Load sample</button>
+        <button type="button" id="verifyButton" class="primary">Verify receipt</button>
+        <button type="button" id="exportButton" disabled>Export report</button>
+      </div>
+    </section>
+
+    <section class="metric-strip" aria-label="Verification summary">
+      <div class="metric">
+        <span class="metric-label">Integrity</span>
+        <strong id="integrityMetric">Pending</strong>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Artifacts</span>
+        <strong id="artifactMetric">0 / 0</strong>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Required gates</span>
+        <strong id="gateMetric">0 open</strong>
+      </div>
+      <div class="metric decision-metric">
+        <span class="metric-label">Decision</span>
+        <strong id="decisionMetric">Pending</strong>
+      </div>
+    </section>
+
+    <section class="workspace-grid">
+      <div class="editor-pane">
+        <div class="section-heading">
+          <h2>Receipt JSON</h2>
+          <span id="receiptHashLabel">SHA-256 pending</span>
+        </div>
+        <label class="sr-only" for="receiptEditor">Receipt JSON</label>
+        <textarea id="receiptEditor" spellcheck="false" autocomplete="off"></textarea>
+      </div>
+
+      <aside class="preview-pane">
+        <div class="asset-frame">
+          <img
+            src="../../assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.png"
+            alt="FLOWFORM curved motherboard and honeycomb battery V3 concept render"
+          >
+        </div>
+        <div class="asset-caption">
+          <span>FLOWFORM V3</span>
+          <strong>Concept render</strong>
+        </div>
+        <div class="boundary-block">
+          <h2>Claim boundary</h2>
+          <p id="claimBoundary">Load and verify a receipt.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="results-section" aria-labelledby="artifactHeading">
+      <div class="section-heading">
+        <h2 id="artifactHeading">Artifact matrix</h2>
+        <span id="artifactSummary">No results</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Artifact</th>
+              <th>Role</th>
+              <th>Observed SHA-256</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="artifactRows">
+            <tr><td colspan="4" class="empty-cell">No receipt verified</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="results-section" aria-labelledby="gateHeading">
+      <div class="section-heading">
+        <h2 id="gateHeading">Authority gates</h2>
+        <span id="gateSummary">Fail closed</span>
+      </div>
+      <div class="gate-grid" id="gateGrid"></div>
+    </section>
+
+    <section class="event-log" aria-labelledby="eventHeading">
+      <div class="section-heading">
+        <h2 id="eventHeading">Verification log</h2>
+        <span id="verificationTime">Not run</span>
+      </div>
+      <pre id="eventLog">Ready.</pre>
+    </section>
+  </main>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
