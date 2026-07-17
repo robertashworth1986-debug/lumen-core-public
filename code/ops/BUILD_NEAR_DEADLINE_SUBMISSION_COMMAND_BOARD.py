@@ -68,6 +68,22 @@ EXTERNAL_ENGAGEMENT_REGISTER = (
 FHWA_PARTNER_OUTREACH_CONTROL = (
     SPRINT_DIR / "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json"
 )
+ERDC_SOLUTION_BRIEF_GATE = (
+    SPRINT_DIR / "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json"
+)
+ERDC_ROM_GATE = SPRINT_DIR / "ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json"
+ERDC_ROM_WORKFLOW = (
+    SPRINT_DIR / "ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-17.md"
+)
+ERDC_SOURCE_MANIFEST = (
+    SPRINT_DIR
+    / "source_attachments"
+    / "W912HZ26SC005"
+    / "SOURCE_MANIFEST_2026-07-16.json"
+)
+ERDC_PUBLIC_DRAFT_PDF = (
+    ROOT / "output" / "pdf" / "LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf"
+)
 SAM_KEY_ROTATION_CONTROL = (
     SPRINT_DIR / "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json"
 )
@@ -212,6 +228,11 @@ def base_sources() -> dict[str, Any]:
         "launchtn_3686_financial_model": LAUNCHTN_3686_FINANCIAL_MODEL,
         "external_engagement_response_register": EXTERNAL_ENGAGEMENT_REGISTER,
         "fhwa_partner_outreach_control": FHWA_PARTNER_OUTREACH_CONTROL,
+        "erdc_solution_brief_compliance_gate": ERDC_SOLUTION_BRIEF_GATE,
+        "erdc_phase2_rom_gate": ERDC_ROM_GATE,
+        "erdc_phase2_rom_workflow": ERDC_ROM_WORKFLOW,
+        "erdc_source_manifest": ERDC_SOURCE_MANIFEST,
+        "erdc_public_draft_pdf": ERDC_PUBLIC_DRAFT_PDF,
         "sam_public_key_rotation_control": SAM_KEY_ROTATION_CONTROL,
         "patent_deadline_evidence_control": PATENT_DEADLINE_CONTROL,
     }.items():
@@ -351,6 +372,27 @@ def build_command_lanes(
             "qualified_partner_evidence_present"
         )
         is False
+    )
+    erdc_solution_gate = read_json(ERDC_SOLUTION_BRIEF_GATE)
+    if erdc_solution_gate.get("schema") != (
+        "lumencore.erdc_sdc_solution_brief_compliance_gate.v1"
+    ):
+        raise ValueError("ERDC solution-brief compliance gate is missing or stale")
+    erdc_rom_gate = read_json(ERDC_ROM_GATE)
+    if erdc_rom_gate.get("schema") != "lumencore.erdc_sdc_phase2_rom_gate.v1":
+        raise ValueError("ERDC Phase II ROM gate is missing or stale")
+    erdc_technical_pass = (
+        erdc_solution_gate.get("technical_document_checks_pass") is True
+        and erdc_solution_gate.get("source_integrity", {}).get(
+            "all_source_checks_pass"
+        )
+        is True
+    )
+    erdc_rom_ready = (
+        erdc_rom_gate.get("approval", {}).get(
+            "rom_ready_for_private_pdf_insertion"
+        )
+        is True
     )
     hud = grants.get("PDR-2600-DC-029Q", {})
     hhs_child = grants.get("HHS-2026-ACF-ACYF-CA-0037", {})
@@ -660,20 +702,52 @@ def build_command_lanes(
             "deadline_date": "2026-08-07",
             "official_deadline_text": "August 7, 2026 at 4:00 PM Central Time",
             "command": "STAGE_CONCEPT_PAPER",
-            "eligibility_state": "OPEN_CSO_COMMERCIAL_SOLUTION",
-            "fit_state": "STRONG_MODULAR_PROOF_FABRIC_COMPONENT_FIT",
+            "eligibility_state": (
+                "OPEN_CSO_TECHNICAL_DRAFT_PASS_PRIVATE_ROM_SAM_AND_PORTAL_GATES_OPEN"
+                if erdc_technical_pass
+                else "OPEN_CSO_TECHNICAL_DOCUMENT_REVIEW_REQUIRED"
+            ),
+            "fit_state": (
+                "STRONG_MODULAR_EVIDENCE_CONTROL_PLANE_FIT_TECHNICAL_DOCUMENT_PASS"
+                if erdc_technical_pass
+                else "MODULAR_EVIDENCE_CONTROL_PLANE_FIT_NOT_YET_TECHNICALLY_CLEARED"
+            ),
             "submission_route": erdc.get("submission_route", "ERDCWERX Commercial Solutions Opening portal"),
             "official_url": erdc.get("official_url", "https://sam.gov/opp/8e32f0dfcdee42eeb3b2b03819a6ed25/view"),
             "secondary_url": erdc.get("secondary_url", "https://www.erdcwerx.org/sovereign-defense-cloud-for-high-performance-computing/"),
-            "package_files": erdc.get("package_files", ["ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md"]),
-            "why_now": "Good concept-paper lane if LumenCore is framed as a proof fabric module, not a full sovereign cloud prime.",
+            "package_files": [
+                rel(ERDC_PUBLIC_DRAFT_PDF),
+                rel(ERDC_SOLUTION_BRIEF_GATE),
+                rel(ERDC_ROM_GATE),
+                rel(ERDC_ROM_WORKFLOW),
+                rel(ERDC_SOURCE_MANIFEST),
+            ],
+            "solution_brief_status": erdc_solution_gate.get("status"),
+            "technical_document_checks_pass": erdc_technical_pass,
+            "rom_gate_status": erdc_rom_gate.get("status"),
+            "rom_private_input_present": erdc_rom_gate.get("private_input", {}).get(
+                "present"
+            )
+            is True,
+            "rom_ready_for_private_pdf_insertion": erdc_rom_ready,
+            "funding_currently_available": erdc_solution_gate.get(
+                "funding_currently_available"
+            )
+            is True,
+            "why_now": (
+                "A technically compliant public-safe five-page body now exists with verified official-source "
+                "hashes. The remaining work is private Phase II-only price approval, exact SAM contract-record "
+                "matching, and final portal review; the notice says funding is not currently available."
+            ),
             "today_work": [
-                "Open ERDCWERX and confirm form fields.",
-                "Stage concept title, problem, modular solution, and data-rights boundary.",
+                "Use the ignored private ROM workflow to support each cost input and approve one Phase II-only estimated price.",
+                "Insert the approved price and exact SAM-matched legal identity and address only into the private final copy.",
+                "Recheck the live ERDCWERX questions, amendments, terms, and complete preview before final confirmation.",
             ],
             "human_gate": [
-                "Robert approves title, commercial item framing, data rights, and any price.",
-                "Robert approves final portal submit.",
+                "Robert approves the supported Phase II-only candidate price and timestamp.",
+                "Robert verifies active SAM contract registration and exact legal entity and address match.",
+                "Robert reviews the private final PDF, portal answers, terms, and final confirmation.",
             ],
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,

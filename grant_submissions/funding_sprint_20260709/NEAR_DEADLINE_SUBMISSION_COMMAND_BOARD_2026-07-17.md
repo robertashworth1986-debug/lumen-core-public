@@ -26,7 +26,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `cbaa31953781f970c409bc9ca014fa07406b58d9c15b59248d00682a91fe97db`
+- Command board SHA-256: `e190d66bc445fe2b84490ee97e9a2abb57d36f2909e4965f3fd7576e3620f9f0`
 
 ## Operational Controls
 
@@ -129,7 +129,11 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Official deadline: August 7, 2026 at 4:00 PM Central Time
 - Official URL: https://sam.gov/opp/8e32f0dfcdee42eeb3b2b03819a6ed25/view
 - Package files:
-  - `ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md`
+  - `output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf`
+  - `grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json`
+  - `grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json`
+  - `grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-17.md`
+  - `grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-16.json`
 
 ## Emergency Gate
 
@@ -412,23 +416,29 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Days to close from scan date: `21`
 - Deadline bucket: `thirty_day_sprint`
 - Command: `STAGE_CONCEPT_PAPER`
-- Eligibility: `OPEN_CSO_COMMERCIAL_SOLUTION`
-- Fit: `STRONG_MODULAR_PROOF_FABRIC_COMPONENT_FIT`
+- Eligibility: `OPEN_CSO_TECHNICAL_DRAFT_PASS_PRIVATE_ROM_SAM_AND_PORTAL_GATES_OPEN`
+- Fit: `STRONG_MODULAR_EVIDENCE_CONTROL_PLANE_FIT_TECHNICAL_DOCUMENT_PASS`
 - Route: ERDCWERX Commercial Solutions Opening portal
 - Official URL: https://sam.gov/opp/8e32f0dfcdee42eeb3b2b03819a6ed25/view
 - Secondary URL: https://www.erdcwerx.org/sovereign-defense-cloud-for-high-performance-computing/
-- Why now: Good concept-paper lane if LumenCore is framed as a proof fabric module, not a full sovereign cloud prime.
+- Why now: A technically compliant public-safe five-page body now exists with verified official-source hashes. The remaining work is private Phase II-only price approval, exact SAM contract-record matching, and final portal review; the notice says funding is not currently available.
 - Today work:
-  - Open ERDCWERX and confirm form fields.
-  - Stage concept title, problem, modular solution, and data-rights boundary.
+  - Use the ignored private ROM workflow to support each cost input and approve one Phase II-only estimated price.
+  - Insert the approved price and exact SAM-matched legal identity and address only into the private final copy.
+  - Recheck the live ERDCWERX questions, amendments, terms, and complete preview before final confirmation.
 - Human gate:
-  - Robert approves title, commercial item framing, data rights, and any price.
-  - Robert approves final portal submit.
+  - Robert approves the supported Phase II-only candidate price and timestamp.
+  - Robert verifies active SAM contract registration and exact legal entity and address match.
+  - Robert reviews the private final PDF, portal answers, terms, and final confirmation.
 - Package files:
-  - `ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md`
+  - `output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf`
+  - `grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json`
+  - `grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json`
+  - `grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-17.md`
+  - `grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-16.json`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `996db15b113cf8782aea41259f4aacba9125ca51e02b8a2934008274bc1be922`
+- Lane SHA-256: `886f406001282f5de20bf77fe1e424e5a66e3da8300b07da507052e137e78045`
 
 ### 9. 15BCMS26Q70000005 - Historical Medical Claims Data Analysis
 
@@ -689,5 +699,10 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - `launchtn_3686_financial_model`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx` present=`true` sha256=`9da46f8ad94fc53ef561ee33dcfa6df907897caeadf6afbd08fb113fc6887d94`
 - `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`8dd5f17d0241c5bd909a085029c87e07761fc13252b124e734fa551814d6a037`
 - `fhwa_partner_outreach_control`: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json` present=`true` sha256=`8a6d0b28cc7afd33a376fe4908a99e5ee008795637c4bb995a5519660b5744e4`
+- `erdc_solution_brief_compliance_gate`: `grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json` present=`true` sha256=`dabaed4298b650855256e4054daf1be806f329846e1cd22cd01fd6f9d6f402cf`
+- `erdc_phase2_rom_gate`: `grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json` present=`true` sha256=`03f656866d63c1c74838ee36bef78eb5a8cf382fee2820d4afb2c324404b7574`
+- `erdc_phase2_rom_workflow`: `grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-17.md` present=`true` sha256=`002711f265d15b0e6435d401aac54c29ae831406279f339dbee165209ffd3888`
+- `erdc_source_manifest`: `grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-16.json` present=`true` sha256=`5a9e6cfc98e70c452e90f5a51dc16c64afdafd8fa4daf654cd2d5712bbf67894`
+- `erdc_public_draft_pdf`: `output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf` present=`true` sha256=`1278fe42aac97eb87b97b0a657f1986f47bb51562c153c093b9eeebb506259b2`
 - `sam_public_key_rotation_control`: `grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json` present=`true` sha256=`aac20e903a5055e731da65e5e5a82f08d5c34a7288aa6bed4d0ed78c4f0be159`
 - `patent_deadline_evidence_control`: `grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json` present=`true` sha256=`096904e114457c56383e495cfad6c6e3d0d31596d6b53e2920099608b2b7519b`

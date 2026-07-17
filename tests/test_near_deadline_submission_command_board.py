@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
+import json
 from datetime import date
 from pathlib import Path
 
@@ -8,6 +10,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py"
 SCAN_DATE = date(2026, 7, 16)
+MIRROR_RECEIPT = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "NEAR_DEADLINE_COMMAND_BOARD_ERDC_RECONCILIATION_E_DRIVE_SYNC_RECEIPT_2026-07-17.json"
+)
 
 
 def load_module():
@@ -16,6 +24,14 @@ def load_module():
     assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest().upper()
 
 
 def test_near_deadline_board_identifies_stage_now_and_human_gates():
@@ -164,6 +180,35 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert launchtn["external_send_allowed_without_human"] is False
     assert launchtn["final_submit_allowed_without_human"] is False
 
+    erdc = next(
+        row
+        for row in payload["lanes"]
+        if row["opportunity_number"] == "W912HZ26SC005"
+    )
+    assert erdc["command"] == "STAGE_CONCEPT_PAPER"
+    assert erdc["technical_document_checks_pass"] is True
+    assert erdc["solution_brief_status"] == (
+        "TECHNICAL_DRAFT_PASS_PRIVATE_ROM_AND_SAM_FINALIZATION_REQUIRED"
+    )
+    assert erdc["rom_gate_status"] == "PRIVATE_ROM_INPUT_NOT_CAPTURED"
+    assert erdc["rom_private_input_present"] is False
+    assert erdc["rom_ready_for_private_pdf_insertion"] is False
+    assert erdc["funding_currently_available"] is False
+    assert "TECHNICAL_DRAFT_PASS" in erdc["eligibility_state"]
+    assert "TECHNICAL_DOCUMENT_PASS" in erdc["fit_state"]
+    assert len(erdc["package_files"]) == 5
+    assert not any("CONCEPT_STUB" in path for path in erdc["package_files"])
+    assert any(
+        path.endswith("ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json")
+        for path in erdc["package_files"]
+    )
+    assert any(
+        path.endswith("LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf")
+        for path in erdc["package_files"]
+    )
+    assert erdc["external_send_allowed_without_human"] is False
+    assert erdc["final_submit_allowed_without_human"] is False
+
 
 def test_near_deadline_board_keeps_hud_and_bop_behind_correct_gates():
     module = load_module()
@@ -232,6 +277,11 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "launchtn_3686_financial_model",
         "external_engagement_response_register",
         "fhwa_partner_outreach_control",
+        "erdc_solution_brief_compliance_gate",
+        "erdc_phase2_rom_gate",
+        "erdc_phase2_rom_workflow",
+        "erdc_source_manifest",
+        "erdc_public_draft_pdf",
         "sam_public_key_rotation_control",
         "patent_deadline_evidence_control",
     ):
@@ -239,3 +289,21 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
 
     for marker in module.SENSITIVE_MARKERS:
         assert marker not in lowered
+
+
+def test_erdc_command_board_reconciliation_mirror_matches():
+    receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
+
+    assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 3
+    assert receipt["all_sha256_matched_after_copy"] is True
+    assert receipt["browser_navigation_performed"] is False
+    assert receipt["private_values_mirrored"] is False
+    assert receipt["destination_root"].startswith("E:/LumaProofVault/")
+    for artifact in receipt["artifacts"]:
+        source = ROOT / artifact["source"]
+        destination = Path(artifact["destination"])
+        assert source.is_file(), artifact["source"]
+        assert destination.is_file(), artifact["destination"]
+        assert source.stat().st_size == destination.stat().st_size == artifact["bytes"]
+        assert sha256_file(source) == sha256_file(destination) == artifact["sha256"]

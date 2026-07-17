@@ -1,0 +1,39 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "generated_utc": "2026-07-17T11:01:36.6233093Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_ERDC_RECONCILIATION_20260717",
+  "artifact_count": 3,
+  "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "private_values_mirrored": false,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_COMMAND_BOARD_ERDC_RECONCILIATION_20260717\\BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "bytes": 77447,
+      "sha256": "1F73051476CB524BE177492C8820EBC3903D574B9B5E9D8B75B5B041BF5EC0BD",
+      "copy_bytes": 77447,
+      "copy_sha256": "1F73051476CB524BE177492C8820EBC3903D574B9B5E9D8B75B5B041BF5EC0BD",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_submission_command_board.py",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_COMMAND_BOARD_ERDC_RECONCILIATION_20260717\\test_near_deadline_submission_command_board.py",
+      "bytes": 14281,
+      "sha256": "F14E17737FAC4CFF596B8FD08D30BB5870C7C8728E941B3BF4F0CFEA1FE1661E",
+      "copy_bytes": 14281,
+      "copy_sha256": "F14E17737FAC4CFF596B8FD08D30BB5870C7C8728E941B3BF4F0CFEA1FE1661E",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_COMMAND_BOARD_ERDC_RECONCILIATION_20260717\\NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "bytes": 46099,
+      "sha256": "A08BD432BEEB0994E9E7516E72F546A8F4F71C10357DE3B6B07504DE49EF98D4",
+      "copy_bytes": 46099,
+      "copy_sha256": "A08BD432BEEB0994E9E7516E72F546A8F4F71C10357DE3B6B07504DE49EF98D4",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves byte-for-byte mirroring of the bounded ERDC command-board reconciliation artifacts only. It does not disclose private pricing or SAM data, prove portal submission, accept terms, or establish an award."
+}
