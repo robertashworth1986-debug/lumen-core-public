@@ -1,16 +1,19 @@
 # External Engagement Clock Gate - 2026-07-16
 
-The Nashville EC application is the only immediate human-fact action. Its July 17 deadline is date-only, so no exact closing hour is claimed. EPRI, Georgia PATENTS, CDC, LANL, NASA, and Army remain monitor-only and duplicate-send blocked where recorded.
+The Nashville EC application is the only immediate human-fact action. A fresh, hash-verified official-page receipt confirms the application and TakeOff open signals with a July 17 date-only deadline, so no exact closing hour is claimed. EPRI, Georgia PATENTS, CDC, LANL, NASA, and Army remain monitor-only and duplicate-send blocked where recorded.
 
 ## Gate Summary
 
 - Status: `HUMAN_ACTION_DUE_NO_AUTONOMOUS_SEND`
-- As of UTC: `2026-07-17T05:01:58.050559+00:00`
-- As of local: `2026-07-17T00:01:58.050559-05:00`
+- As of UTC: `2026-07-17T05:13:33.201927+00:00`
+- As of local: `2026-07-17T00:13:33.201927-05:00`
 - Lanes: `7`
 - Verified record hashes: `7`
 - All record hashes valid: `true`
 - Source register hash valid: `true`
+- Nashville live receipt hash valid: `true`
+- Nashville official live source verified: `true`
+- Nashville live receipt age hours: `0.09`
 - Immediate human actions: `1`
 - Date-only deadlines: `1`
 - Active follow-up holds: `3`
@@ -18,7 +21,7 @@ The Nashville EC application is the only immediate human-fact action. Its July 1
 - Autonomous external send: `false`
 - Autonomous final submit: `false`
 - Session-browser navigation performed: `false`
-- Gate SHA-256: `718d5219100429846c574dffdb0e2bcb81c983f0bac52661521ce29bff205680`
+- Gate SHA-256: `1c517438d5fee38196400fc3d8641d25a4c42d26746c3aa644fbdd9834c3e8d5`
 
 ## Clocked Queue
 
@@ -48,7 +51,12 @@ The Nashville EC application is the only immediate human-fact action. Its July 1
 - Next action: Collect the six founder confirmations in the resolution artifact before the application closes; do not invent revenue, customers, demographics, founder history, investment, or debt.
 - Response artifact: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
 - Claim boundary: This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms.
-- Control SHA-256: `6702df0f9e09f75d5a7aae233d04415311def03bcc42b348cc0e39da02ca00b5`
+- Control SHA-256: `68cf33d689a6f1a39da75c62906a68418ea292f9a5b939d679b80c7b9a952bb2`
+- Official live source: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json`
+- Official live source gate: `VERIFIED_CURRENT`
+- Official open signals verified: `true`
+- Official live source fresh: `true`
+- Official live source age hours: `0.09`
 
 ### Centers for Disease Control and Prevention
 
@@ -66,7 +74,7 @@ The Nashville EC application is the only immediate human-fact action. Its July 1
 - Next action: Preserve the acknowledgment and monitor the existing thread; do not resend the response.
 - Response artifact: `grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - Claim boundary: The Gmail SENT record and CDC acknowledgment prove transmission and receipt only. They do not establish evaluation, selection, technical validation, endorsement, award, deployment, a pilot, or contract performance.
-- Control SHA-256: `0be4c04e3372362befc941c89222fc2d907580e48cfec1afba31ce88d82ed40f`
+- Control SHA-256: `fd9a0f28844ec4ea48636fdd7c67d2ebffcfa2942fd588a1d34436b2a763199a`
 
 ### EPRI Open Power AI Consortium
 
@@ -138,7 +146,7 @@ The Nashville EC application is the only immediate human-fact action. Its July 1
 - Next action: Retain the SENT receipt and attachment hash; do not resend before the deadline.
 - Response artifact: `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json`
 - Claim boundary: Transmission does not establish agency acceptance, evaluation, validation, an award, or a contract.
-- Control SHA-256: `fbad02b8fda31cebf4cb55aec9a03ae72df45cfebb0541a9e1d210c05e270a29`
+- Control SHA-256: `48a72574571c42c8e9fdf8d2fa5fb45fbf62cf62281808cbad38d90faef53509`
 
 ### U.S. Army
 
@@ -164,6 +172,11 @@ The Nashville EC application is the only immediate human-fact action. Its July 1
 - Bytes: `16160`
 - File SHA-256: `0a0e2d63f3b1be5dc6033366a4fe3d641fdd0bad229b02254825ea3eb359a526`
 - Embedded register SHA-256: `7621edbfff685349e5d700ed985711901b818a164052d2023f7f592b54558cd0`
+- Nashville live receipt path: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json`
+- Nashville live receipt bytes: `5108`
+- Nashville live receipt file SHA-256: `5f0768819c03565749724e8a66dd80ac712d317b241dc7d5f2eda65e5bc52da1`
+- Nashville live embedded receipt SHA-256: `64fa962a2de2eedb5756222c40494371efbc00b13aa49c724a1e109852c9d54c`
+- Nashville live receipt hash valid: `true`
 
 ## Claim Boundary
 

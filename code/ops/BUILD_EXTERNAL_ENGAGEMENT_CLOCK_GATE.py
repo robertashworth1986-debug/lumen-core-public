@@ -11,6 +11,12 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[2]
 SPRINT_DIR = ROOT / "grant_submissions" / "funding_sprint_20260709"
 REGISTER = SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json"
+NASHVILLE_LIVE_RECEIPT = (
+    ROOT
+    / "grant_submissions"
+    / "NASHVILLE_EC_FALL_2026"
+    / "NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json"
+)
 OUT_JSON = ROOT / "out" / "ops" / "external_engagement_clock_gate_latest.json"
 DASHBOARD_JSON = ROOT / "dashboard" / "data" / "external_engagement_clock_gate.json"
 CANONICAL_JSON = SPRINT_DIR / "EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.json"
@@ -78,6 +84,20 @@ def read_register() -> tuple[dict[str, Any], bytes]:
     return payload, raw
 
 
+def read_nashville_live_receipt(
+    override: dict[str, Any] | None = None,
+) -> tuple[dict[str, Any], bytes]:
+    if override is None:
+        raw = NASHVILLE_LIVE_RECEIPT.read_bytes()
+        payload = json.loads(raw.decode("utf-8"))
+    else:
+        payload = override
+        raw = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    if payload.get("schema") != "lumencore.nashville_ec_live_deadline_receipt.v1":
+        raise ValueError("Nashville EC live deadline receipt schema is missing or unsupported")
+    return payload, raw
+
+
 def verify_embedded_hash(payload: dict[str, Any], field: str) -> bool:
     expected = payload.get(field)
     if not isinstance(expected, str):
@@ -94,6 +114,48 @@ def verify_record_hash(row: dict[str, Any]) -> bool:
     unsigned = dict(row)
     unsigned.pop("record_sha256", None)
     return stable_hash(unsigned) == expected.lower()
+
+
+def evaluate_nashville_live_receipt(
+    receipt: dict[str, Any], as_of_utc: datetime
+) -> dict[str, Any]:
+    retrieved = parse_utc(receipt.get("retrieved_utc"))
+    age_hours = (as_of_utc - retrieved).total_seconds() / 3600
+    receipt_hash_valid = verify_embedded_hash(receipt, "receipt_sha256")
+    status_valid = receipt.get("status") == (
+        "OFFICIAL_OPEN_DATE_ONLY_DEADLINE_HUMAN_FACTS_REQUIRED"
+    )
+    deadline = receipt.get("deadline", {})
+    application = receipt.get("application", {})
+    integrity = receipt.get("integrity", {})
+    official_open_verified = all(
+        (
+            receipt_hash_valid,
+            status_valid,
+            deadline.get("date") == "2026-07-17",
+            deadline.get("date_status") == "CONFIRMED_ON_OFFICIAL_HOMEPAGE",
+            deadline.get("time") is None,
+            deadline.get("time_status")
+            == "NO_CLOSE_TIME_DETECTED_ON_FETCHED_OFFICIAL_PAGES",
+            application.get("open_signal_present") is True,
+            application.get("takeoff_open_signal_present") is True,
+            integrity.get("all_fetches_http_200_html") is True,
+            integrity.get("all_expected_markers_present") is True,
+            integrity.get("browser_navigation_performed") is False,
+        )
+    )
+    fresh = 0 <= age_hours <= 6
+    return {
+        "receipt_hash_valid": receipt_hash_valid,
+        "status_valid": status_valid,
+        "official_open_signals_verified": official_open_verified,
+        "fresh_within_six_hours": fresh,
+        "receipt_age_hours": round(age_hours, 2),
+        "operationally_verified": official_open_verified and fresh,
+        "source_status": receipt.get("status"),
+        "deadline_time_status": deadline.get("time_status"),
+        "browser_navigation_performed": integrity.get("browser_navigation_performed"),
+    }
 
 
 def deadline_control(value: str | None, as_of_utc: datetime) -> dict[str, Any]:
@@ -179,9 +241,12 @@ def priority_for(row: dict[str, Any], deadline: dict[str, Any]) -> str:
 def build_payload(
     as_of_utc: str | datetime | None = None,
     generated_utc: str | None = None,
+    nashville_live_receipt: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     as_of = parse_utc(as_of_utc)
     register, register_raw = read_register()
+    live_receipt, live_receipt_raw = read_nashville_live_receipt(nashville_live_receipt)
+    live_control = evaluate_nashville_live_receipt(live_receipt, as_of)
     controls: list[dict[str, Any]] = []
 
     for row in register["records"]:
@@ -217,6 +282,19 @@ def build_payload(
             **deadline,
             **hold,
         }
+        if row["lane_id"] == "nashville_ec_takeoff_fall_2026":
+            control["official_live_source"] = rel(NASHVILLE_LIVE_RECEIPT)
+            control["official_live_source_status"] = live_control["source_status"]
+            control["official_open_signals_verified"] = live_control[
+                "official_open_signals_verified"
+            ]
+            control["official_live_source_fresh"] = live_control["fresh_within_six_hours"]
+            control["official_live_source_age_hours"] = live_control["receipt_age_hours"]
+            control["official_live_source_gate"] = (
+                "VERIFIED_CURRENT"
+                if live_control["operationally_verified"]
+                else "REVERIFY_REQUIRED"
+            )
         control["control_sha256"] = stable_hash(control)
         controls.append(control)
 
@@ -235,6 +313,12 @@ def build_payload(
         if row["deadline_precision"] == "DATE_ONLY_CLOSE_TIME_NOT_RECORDED"
     ]
     holds = [row for row in controls if row["follow_up_hold_state"] == "FOLLOW_UP_HOLD_ACTIVE"]
+    live_source_statement = (
+        "A fresh, hash-verified official-page receipt confirms the application and TakeOff open "
+        "signals with a July 17 date-only deadline"
+        if live_control["operationally_verified"]
+        else "The official-page receipt is stale or failed an integrity/open-signal check and must be refreshed"
+    )
 
     payload: dict[str, Any] = {
         "schema": "lumencore.external_engagement_clock_gate.v1",
@@ -242,17 +326,28 @@ def build_payload(
         "as_of_utc": as_of.isoformat(),
         "as_of_local": as_of.astimezone(LOCAL_ZONE).isoformat(),
         "timezone": str(LOCAL_ZONE),
-        "status": "HUMAN_ACTION_DUE_NO_AUTONOMOUS_SEND" if human_now else "MONITOR_ONLY",
+        "status": (
+            "HUMAN_ACTION_DUE_NO_AUTONOMOUS_SEND"
+            if human_now and live_control["operationally_verified"]
+            else "HUMAN_ACTION_DUE_SOURCE_REVERIFY_REQUIRED"
+            if human_now
+            else "MONITOR_ONLY"
+        ),
         "direct_answer": (
-            "The Nashville EC application is the only immediate human-fact action. Its July 17 "
-            "deadline is date-only, so no exact closing hour is claimed. EPRI, Georgia PATENTS, "
-            "CDC, LANL, NASA, and Army remain monitor-only and duplicate-send blocked where recorded."
+            "The Nashville EC application is the only immediate human-fact action. "
+            f"{live_source_statement}, so no exact closing hour is claimed. EPRI, Georgia "
+            "PATENTS, CDC, LANL, NASA, and Army remain monitor-only and duplicate-send blocked where recorded."
         ),
         "summary": {
             "lane_count": len(controls),
             "verified_record_hash_count": record_hashes_valid,
             "all_record_hashes_valid": record_hashes_valid == len(controls),
             "source_register_hash_valid": verify_embedded_hash(register, "register_sha256"),
+            "nashville_live_receipt_hash_valid": live_control["receipt_hash_valid"],
+            "nashville_official_live_source_verified": live_control[
+                "operationally_verified"
+            ],
+            "nashville_live_receipt_age_hours": live_control["receipt_age_hours"],
             "immediate_human_action_count": len(human_now),
             "date_only_deadline_count": len(date_only),
             "active_follow_up_hold_count": len(holds),
@@ -269,6 +364,15 @@ def build_payload(
             "bytes": len(register_raw),
             "sha256": sha256_bytes(register_raw),
             "embedded_register_sha256": register.get("register_sha256"),
+            "nashville_live_deadline_receipt": {
+                "path": rel(NASHVILLE_LIVE_RECEIPT),
+                "bytes": len(live_receipt_raw),
+                "sha256": sha256_bytes(live_receipt_raw),
+                "embedded_receipt_sha256": live_receipt.get("receipt_sha256"),
+                "receipt_hash_valid": live_control["receipt_hash_valid"],
+                "fresh_within_six_hours": live_control["fresh_within_six_hours"],
+                "receipt_age_hours": live_control["receipt_age_hours"],
+            },
         },
         "claim_boundary": CLAIM_BOUNDARY,
         "outputs": {
@@ -298,6 +402,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Verified record hashes: `{summary['verified_record_hash_count']}`",
         f"- All record hashes valid: `{str(summary['all_record_hashes_valid']).lower()}`",
         f"- Source register hash valid: `{str(summary['source_register_hash_valid']).lower()}`",
+        f"- Nashville live receipt hash valid: `{str(summary['nashville_live_receipt_hash_valid']).lower()}`",
+        f"- Nashville official live source verified: `{str(summary['nashville_official_live_source_verified']).lower()}`",
+        f"- Nashville live receipt age hours: `{summary['nashville_live_receipt_age_hours']}`",
         f"- Immediate human actions: `{summary['immediate_human_action_count']}`",
         f"- Date-only deadlines: `{summary['date_only_deadline_count']}`",
         f"- Active follow-up holds: `{summary['active_follow_up_hold_count']}`",
@@ -341,6 +448,16 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Control SHA-256: `{row['control_sha256']}`",
             ]
         )
+        if row.get("official_live_source"):
+            lines.extend(
+                [
+                    f"- Official live source: `{row['official_live_source']}`",
+                    f"- Official live source gate: `{row['official_live_source_gate']}`",
+                    f"- Official open signals verified: `{str(row['official_open_signals_verified']).lower()}`",
+                    f"- Official live source fresh: `{str(row['official_live_source_fresh']).lower()}`",
+                    f"- Official live source age hours: `{row['official_live_source_age_hours']}`",
+                ]
+            )
 
     lines.extend(
         [
@@ -351,6 +468,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Bytes: `{payload['source']['bytes']}`",
             f"- File SHA-256: `{payload['source']['sha256']}`",
             f"- Embedded register SHA-256: `{payload['source']['embedded_register_sha256']}`",
+            f"- Nashville live receipt path: `{payload['source']['nashville_live_deadline_receipt']['path']}`",
+            f"- Nashville live receipt bytes: `{payload['source']['nashville_live_deadline_receipt']['bytes']}`",
+            f"- Nashville live receipt file SHA-256: `{payload['source']['nashville_live_deadline_receipt']['sha256']}`",
+            f"- Nashville live embedded receipt SHA-256: `{payload['source']['nashville_live_deadline_receipt']['embedded_receipt_sha256']}`",
+            f"- Nashville live receipt hash valid: `{str(payload['source']['nashville_live_deadline_receipt']['receipt_hash_valid']).lower()}`",
             "",
             "## Claim Boundary",
             "",

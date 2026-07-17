@@ -24,11 +24,21 @@ def load_module():
     return module
 
 
+def live_receipt_fixture(module, retrieved_utc: str = "2026-07-17T04:30:00Z"):
+    receipt = json.loads(module.NASHVILLE_LIVE_RECEIPT.read_text(encoding="utf-8"))
+    receipt["retrieved_utc"] = retrieved_utc
+    receipt["generated_utc"] = retrieved_utc
+    receipt.pop("receipt_sha256", None)
+    receipt["receipt_sha256"] = module.stable_hash(receipt)
+    return receipt
+
+
 def test_clock_gate_identifies_only_the_immediate_human_fact_lane():
     module = load_module()
     payload = module.build_payload(
         as_of_utc="2026-07-17T04:57:00Z",
         generated_utc="2026-07-17T04:57:00Z",
+        nashville_live_receipt=live_receipt_fixture(module),
     )
     controls = {row["lane_id"]: row for row in payload["controls"]}
 
@@ -42,6 +52,8 @@ def test_clock_gate_identifies_only_the_immediate_human_fact_lane():
     assert payload["summary"]["autonomous_external_send_allowed"] is False
     assert payload["summary"]["autonomous_final_submit_allowed"] is False
     assert payload["summary"]["browser_navigation_performed"] is False
+    assert payload["summary"]["nashville_live_receipt_hash_valid"] is True
+    assert payload["summary"]["nashville_official_live_source_verified"] is True
 
     nashville = controls["nashville_ec_takeoff_fall_2026"]
     assert nashville["priority"] == "P0_HUMAN_FACTS_NOW"
@@ -49,6 +61,9 @@ def test_clock_gate_identifies_only_the_immediate_human_fact_lane():
     assert nashville["deadline_precision"] == "DATE_ONLY_CLOSE_TIME_NOT_RECORDED"
     assert nashville["deadline_state"] == "DUE_NEXT_LOCAL_DAY_TIME_UNVERIFIED"
     assert nashville["hours_remaining"] is None
+    assert nashville["official_live_source_gate"] == "VERIFIED_CURRENT"
+    assert nashville["official_open_signals_verified"] is True
+    assert nashville["official_live_source_fresh"] is True
 
 
 def test_clock_gate_blocks_duplicate_outreach_and_preserves_holds():
@@ -56,6 +71,7 @@ def test_clock_gate_blocks_duplicate_outreach_and_preserves_holds():
     payload = module.build_payload(
         as_of_utc="2026-07-17T04:57:00Z",
         generated_utc="2026-07-17T04:57:00Z",
+        nashville_live_receipt=live_receipt_fixture(module),
     )
     controls = {row["lane_id"]: row for row in payload["controls"]}
 
@@ -88,12 +104,14 @@ def test_clock_gate_verifies_source_and_record_hashes():
     payload = module.build_payload(
         as_of_utc="2026-07-17T04:57:00Z",
         generated_utc="2026-07-17T04:57:00Z",
+        nashville_live_receipt=live_receipt_fixture(module),
     )
 
     assert payload["summary"]["source_register_hash_valid"] is True
     assert payload["summary"]["all_record_hashes_valid"] is True
     assert payload["summary"]["verified_record_hash_count"] == 7
     assert len(payload["source"]["sha256"]) == 64
+    assert payload["source"]["nashville_live_deadline_receipt"]["receipt_hash_valid"] is True
     assert len(payload["gate_sha256"]) == 64
     for row in payload["controls"]:
         assert row["record_hash_valid"] is True
@@ -105,6 +123,7 @@ def test_rendered_gate_is_public_safe_and_claim_bounded():
     payload = module.build_payload(
         as_of_utc="2026-07-17T04:57:00Z",
         generated_utc="2026-07-17T04:57:00Z",
+        nashville_live_receipt=live_receipt_fixture(module),
     )
     rendered = module.render_markdown(payload)
     lowered = rendered.lower()
@@ -112,10 +131,34 @@ def test_rendered_gate_is_public_safe_and_claim_bounded():
     module.ensure_public_safe(rendered)
     assert "only immediate human-fact action" in lowered
     assert "no exact closing hour is claimed" in lowered
+    assert "nashville official live source verified: `true`" in lowered
     assert "session-browser navigation performed: `false`" in lowered
     assert "does not establish" in lowered
     for marker in module.PRIVATE_MARKERS:
         assert marker not in lowered
+
+
+def test_stale_live_receipt_fails_closed_and_requires_reverification():
+    module = load_module()
+    payload = module.build_payload(
+        as_of_utc="2026-07-17T12:00:00Z",
+        generated_utc="2026-07-17T12:00:00Z",
+        nashville_live_receipt=live_receipt_fixture(
+            module, retrieved_utc="2026-07-17T04:30:00Z"
+        ),
+    )
+    nashville = next(
+        row
+        for row in payload["controls"]
+        if row["lane_id"] == "nashville_ec_takeoff_fall_2026"
+    )
+
+    assert payload["status"] == "HUMAN_ACTION_DUE_SOURCE_REVERIFY_REQUIRED"
+    assert payload["summary"]["nashville_official_live_source_verified"] is False
+    assert "must be refreshed" in payload["direct_answer"]
+    assert nashville["official_live_source_gate"] == "REVERIFY_REQUIRED"
+    assert nashville["official_live_source_fresh"] is False
+    assert nashville["official_live_source_age_hours"] == 7.5
 
 
 def test_bounded_e_drive_mirror_matches_every_clock_gate_artifact():
