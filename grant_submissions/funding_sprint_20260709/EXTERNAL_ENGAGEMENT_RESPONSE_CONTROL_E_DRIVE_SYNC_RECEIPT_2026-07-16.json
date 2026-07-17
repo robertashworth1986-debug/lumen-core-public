@@ -1,14 +1,16 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T06:07:54.7197386Z",
+  "created_utc": "2026-07-17T06:33:11.5974717Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_20260716",
-  "artifact_count": 36,
+  "artifact_count": 43,
   "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "private_founder_values_mirrored": false,
   "artifacts": [
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
-      "bytes": 21459,
-      "sha256": "3977AE0447530DA0058013D2CE4BFCA2F0F3A29E94BBD3B54A4FE44467FD43EF",
+      "bytes": 22730,
+      "sha256": "1C4A17753C7EB015348A667BFC3DBCEA88FFD5632773E212424FE3C5B1FCBF4E",
       "copy_sha256_matched": true
     },
     {
@@ -19,8 +21,8 @@
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
-      "bytes": 7296,
-      "sha256": "8E4B4E6D30ED20ABD2EE4EDAF8C47A9A10BC354997164EF8A285E111404135C4",
+      "bytes": 8860,
+      "sha256": "4E80BDC4108C49075F992EDAD14DADFDF69F2A90DBB5AA9F8BCB8CA51E2FF2DC",
       "copy_sha256_matched": true
     },
     {
@@ -37,8 +39,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-      "bytes": 12008,
-      "sha256": "9CF9BBE1B15D399354A6599D6E5B7AE3C82C42407FBE38A00367911C6826CD29",
+      "bytes": 12694,
+      "sha256": "B7FC23F88BE019575B57606C1AFE5F77FE592431BCEB9F43655C7C6E4401D169",
       "copy_sha256_matched": true
     },
     {
@@ -109,8 +111,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
-      "bytes": 16160,
-      "sha256": "0A0E2D63F3B1BE5DC6033366A4FE3D641FDD0BAD229B02254825EA3EB359A526",
+      "bytes": 17347,
+      "sha256": "8F83E87A0239C1200979B99F45A862533034788E98A9EAD081F519D82EB108C5",
       "copy_sha256_matched": true
     },
     {
@@ -219,6 +221,48 @@
       "source": "tests/test_georgia_patents_pro_bono_intake.py",
       "bytes": 2276,
       "sha256": "E41120FD8B45B4783AB5549DC02088FB5257FC1DA3950E93B925E09FDFC2F16B",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": ".gitignore",
+      "bytes": 2444,
+      "sha256": "5D4DAD6108338D9D14B2628F3F5DB095EFF3A9093FEC5285F2CEA124BCECBA09",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/VALIDATE_NASHVILLE_EC_PRIVATE_FACTS.py",
+      "bytes": 10016,
+      "sha256": "5974911C2892291F7CEBB67663977AF264D00E2BF1D1157476DD9CCFE0B08004",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_nashville_ec_private_facts.py",
+      "bytes": 6612,
+      "sha256": "616D0A3DC6739079A0DB16F6D577CD466B482373D8916ACBA165AFE2AC1ABFDB",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "config/nashville_ec_private_facts_template_v1.json",
+      "bytes": 354,
+      "sha256": "9287E018D3F8F2EE7DEB04D44A60C9062DF0400B67590F81CB48F0A751234530",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md",
+      "bytes": 2256,
+      "sha256": "FAD93E7ED7C93A1406657D5D678A3673CFD73ED29FE4DE5205E223E948EA9D88",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py",
+      "bytes": 11024,
+      "sha256": "379A150CC558D9A37ED53D8C48C291275C3A04241CB91F164377E309A5E9D165",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_capture_nashville_ec_private_facts.py",
+      "bytes": 8362,
+      "sha256": "3D1C57A3EDA269FB8CC305FDA6F808DDCDBE0F3F19A274B271625341B1882085",
       "copy_sha256_matched": true
     }
   ],

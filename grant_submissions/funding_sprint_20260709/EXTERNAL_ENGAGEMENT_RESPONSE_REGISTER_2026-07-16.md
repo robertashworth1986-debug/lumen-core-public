@@ -13,7 +13,7 @@ Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPR
 - All attachment checks pass: `true`
 - Autonomous external send allowed: `false`
 - Autonomous final portal submit allowed: `false`
-- Register SHA-256: `7621edbfff685349e5d700ed985711901b818a164052d2023f7f592b54558cd0`
+- Register SHA-256: `8c9c9d70f4df4133686718144a96aea87354e85fa924ce8c30c5361482953f53`
 
 ## Response Queue
 
@@ -36,10 +36,10 @@ Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPR
 - Response ready: `true`
 - Send now: `false`
 - Action gate: Founder answers all six concise confirmation prompts, reviews the complete live portal preview plus any terms or fee, and authorizes final submission at action time.
-- Next action: Collect the six founder confirmations in the resolution artifact before the application closes; do not invent revenue, customers, demographics, founder history, investment, or debt.
+- Next action: Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, then review the complete preview plus any terms or fee before action-time approval; do not invent revenue, customers, demographics, founder history, investment, or debt.
 - Response artifact: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
 - Claim boundary: This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms.
-- Record SHA-256: `444a4ecac110bf017437b0be3351473d101958b101df4597f8b49ad17a043f95`
+- Record SHA-256: `256fa0c62aca66f262deac596bb56a988d5e51be6cffa6f76253f80ddac5c030`
 
 ### EPRI Open Power AI Consortium
 
@@ -157,6 +157,9 @@ LumenCore
 - `georgia_patents_engagement_receipt`: present=`true` bytes=`1595` sha256=`F7041E085AB62A100A41C35D8E056A0E7FE4F47FFC37D5C463FA68C5EF3C3F5F` path=`grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - `nashville_application_manifest`: present=`true` bytes=`18360` sha256=`CD9501D1A61E248A62329595297592D00593BF0086C87DA58E120DF43DE2EF11` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json`
 - `nashville_human_fact_resolution`: present=`true` bytes=`8597` sha256=`998A267A08DF9E8923FAB1E57740F00F52270228A49417F40DA73AF4AA6D4D33` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
+- `nashville_private_collector`: present=`true` bytes=`11024` sha256=`379A150CC558D9A37ED53D8C48C291275C3A04241CB91F164377E309A5E9D165` path=`code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py`
+- `nashville_private_workflow`: present=`true` bytes=`2148` sha256=`47D928F922DB9E1CF70DAC3C70BD9BF26E243A9091F813273F3DB2C0A0DC971F` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md`
+- `nashville_private_fill_map`: present=`false` bytes=`0` sha256=`None` path=`grant_submissions/NASHVILLE_EC_FALL_2026/private/nashville_ec_portal_fill_map.private.json`
 
 ## Claim Boundary
 

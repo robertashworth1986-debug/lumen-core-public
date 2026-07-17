@@ -44,7 +44,7 @@
   },
   "claim_boundary": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance.",
   "direct_answer": "Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPRI administrative reply and Georgia PATENTS intake inquiry were sent and are now monitor-only with CDC, LANL, NASA, and Army; duplicate sends would reduce credibility.",
-  "generated_utc": "2026-07-17T04:29:04.066487+00:00",
+  "generated_utc": "2026-07-17T06:29:33.452665+00:00",
   "inbox_risk_filters": [
     {
       "decision": "DO_NOT_TREAT_AS_OFFICIAL_SAM_NOTICE",
@@ -76,9 +76,11 @@
       "decision": "COMPLETE_HUMAN_FACTS_AND_FINAL_PREVIEW",
       "do_not_duplicate_send": false,
       "lane_id": "nashville_ec_takeoff_fall_2026",
-      "next_action": "Collect the six founder confirmations in the resolution artifact before the application closes; do not invent revenue, customers, demographics, founder history, investment, or debt.",
+      "next_action": "Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, then review the complete preview plus any terms or fee before action-time approval; do not invent revenue, customers, demographics, founder history, investment, or debt.",
       "organization": "Nashville Entrepreneur Center",
-      "record_sha256": "444a4ecac110bf017437b0be3351473d101958b101df4597f8b49ad17a043f95",
+      "private_fact_values_read_or_published": false,
+      "private_fill_map_present": false,
+      "record_sha256": "256fa0c62aca66f262deac596bb56a988d5e51be6cffa6f76253f80ddac5c030",
       "response_artifact": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json",
       "response_channel": "PORTAL",
       "response_ready": true,
@@ -86,7 +88,9 @@
       "state": "PORTAL_PACKET_READY_HUMAN_FACTS_REQUIRED",
       "supporting_artifacts": [
         "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json",
-        "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json"
+        "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json",
+        "code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py",
+        "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md"
       ]
     },
     {
@@ -199,7 +203,7 @@
       "state": "SENT_VERIFIED_RESPONSE_PENDING"
     }
   ],
-  "register_sha256": "7621edbfff685349e5d700ed985711901b818a164052d2023f7f592b54558cd0",
+  "register_sha256": "8c9c9d70f4df4133686718144a96aea87354e85fa924ce8c30c5361482953f53",
   "schema": "lumencore.external_engagement_response_register.v1",
   "source_artifacts": {
     "cdc_engagement_receipt": {
@@ -255,6 +259,26 @@
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json",
       "present": true,
       "sha256": "998A267A08DF9E8923FAB1E57740F00F52270228A49417F40DA73AF4AA6D4D33"
+    },
+    "nashville_private_collector": {
+      "bytes": 11024,
+      "path": "code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py",
+      "present": true,
+      "sha256": "379A150CC558D9A37ED53D8C48C291275C3A04241CB91F164377E309A5E9D165"
+    },
+    "nashville_private_fill_map": {
+      "bytes": 0,
+      "path": "grant_submissions/NASHVILLE_EC_FALL_2026/private/nashville_ec_portal_fill_map.private.json",
+      "present": false,
+      "private_values_read_or_published": false,
+      "sha256": null,
+      "sha256_published": false
+    },
+    "nashville_private_workflow": {
+      "bytes": 2148,
+      "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md",
+      "present": true,
+      "sha256": "47D928F922DB9E1CF70DAC3C70BD9BF26E243A9091F813273F3DB2C0A0DC971F"
     }
   },
   "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",

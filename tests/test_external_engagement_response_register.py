@@ -42,7 +42,20 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert records["nashville_ec_takeoff_fall_2026"]["response_artifact"].endswith(
         "NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json"
     )
+    assert records["nashville_ec_takeoff_fall_2026"]["private_fill_map_present"] is False
+    assert records["nashville_ec_takeoff_fall_2026"]["private_fact_values_read_or_published"] is False
+    assert any(
+        path.endswith("CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py")
+        for path in records["nashville_ec_takeoff_fall_2026"]["supporting_artifacts"]
+    )
+    assert "hidden-prompt private collector" in records["nashville_ec_takeoff_fall_2026"]["next_action"]
     assert payload["source_artifacts"]["nashville_human_fact_resolution"]["present"] is True
+    assert payload["source_artifacts"]["nashville_private_collector"]["present"] is True
+    assert payload["source_artifacts"]["nashville_private_workflow"]["present"] is True
+    assert payload["source_artifacts"]["nashville_private_fill_map"]["present"] is False
+    assert payload["source_artifacts"]["nashville_private_fill_map"]["bytes"] == 0
+    assert payload["source_artifacts"]["nashville_private_fill_map"]["sha256"] is None
+    assert payload["source_artifacts"]["nashville_private_fill_map"]["private_values_read_or_published"] is False
     assert records["epri_open_power_ai_mou"]["decision"] == "MONITOR_FOR_MOU_NO_DUPLICATE"
     assert records["epri_open_power_ai_mou"]["state"] == "OUTBOUND_SENT_MOU_PENDING"
     assert records["epri_open_power_ai_mou"]["do_not_duplicate_send"] is True
@@ -111,8 +124,10 @@ def test_mirror_receipt_matches_every_bounded_source():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 36
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 43
     assert receipt["all_sha256_matched_after_copy"] is True
+    assert receipt["browser_navigation_performed"] is False
+    assert receipt["private_founder_values_mirrored"] is False
     destination = Path(receipt["destination_root"])
     for artifact in receipt["artifacts"]:
         source = ROOT / artifact["source"]
@@ -142,6 +157,13 @@ def test_mirror_receipt_matches_every_bounded_source():
         "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_RESPONSE_2026-07-16.md",
         "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json",
         "tests/test_georgia_patents_pro_bono_intake.py",
+        ".gitignore",
+        "code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py",
+        "code/ops/VALIDATE_NASHVILLE_EC_PRIVATE_FACTS.py",
+        "tests/test_capture_nashville_ec_private_facts.py",
+        "tests/test_nashville_ec_private_facts.py",
+        "config/nashville_ec_private_facts_template_v1.json",
+        "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md",
     }.issubset(mirrored_sources)
 
     assert "does not prove" in receipt["claim_boundary"]

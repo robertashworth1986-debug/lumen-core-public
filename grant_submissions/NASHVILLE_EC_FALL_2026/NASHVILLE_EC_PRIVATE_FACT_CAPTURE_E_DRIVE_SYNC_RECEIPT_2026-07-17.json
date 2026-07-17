@@ -1,15 +1,15 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "generated_utc": "2026-07-17T05:19:52.3959659Z",
+  "generated_utc": "2026-07-17T06:33:10.7513267Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717",
-  "artifact_count": 5,
+  "artifact_count": 7,
   "all_sha256_matched_after_copy": true,
   "browser_navigation_performed": false,
   "private_founder_values_mirrored": false,
   "artifacts": [
     {
       "source": ".gitignore",
-      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717/.gitignore",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717\\.gitignore",
       "bytes": 2444,
       "sha256": "5D4DAD6108338D9D14B2628F3F5DB095EFF3A9093FEC5285F2CEA124BCECBA09",
       "copy_bytes": 2444,
@@ -18,7 +18,7 @@
     },
     {
       "source": "code/ops/VALIDATE_NASHVILLE_EC_PRIVATE_FACTS.py",
-      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717/VALIDATE_NASHVILLE_EC_PRIVATE_FACTS.py",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717\\VALIDATE_NASHVILLE_EC_PRIVATE_FACTS.py",
       "bytes": 10016,
       "sha256": "5974911C2892291F7CEBB67663977AF264D00E2BF1D1157476DD9CCFE0B08004",
       "copy_bytes": 10016,
@@ -27,16 +27,16 @@
     },
     {
       "source": "tests/test_nashville_ec_private_facts.py",
-      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717/test_nashville_ec_private_facts.py",
-      "bytes": 6255,
-      "sha256": "48F6445D76973389AB03047CEEA40C43E2252210033113A821726EDA6C6CB0A3",
-      "copy_bytes": 6255,
-      "copy_sha256": "48F6445D76973389AB03047CEEA40C43E2252210033113A821726EDA6C6CB0A3",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717\\test_nashville_ec_private_facts.py",
+      "bytes": 6612,
+      "sha256": "616D0A3DC6739079A0DB16F6D577CD466B482373D8916ACBA165AFE2AC1ABFDB",
+      "copy_bytes": 6612,
+      "copy_sha256": "616D0A3DC6739079A0DB16F6D577CD466B482373D8916ACBA165AFE2AC1ABFDB",
       "copy_sha256_matched": true
     },
     {
       "source": "config/nashville_ec_private_facts_template_v1.json",
-      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717/nashville_ec_private_facts_template_v1.json",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717\\nashville_ec_private_facts_template_v1.json",
       "bytes": 354,
       "sha256": "9287E018D3F8F2EE7DEB04D44A60C9062DF0400B67590F81CB48F0A751234530",
       "copy_bytes": 354,
@@ -45,13 +45,31 @@
     },
     {
       "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md",
-      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md",
-      "bytes": 1182,
-      "sha256": "E8011475CE0732D0B7AAC967B948D316A27920C7CF67BF1810D82632FAA308C4",
-      "copy_bytes": 1182,
-      "copy_sha256": "E8011475CE0732D0B7AAC967B948D316A27920C7CF67BF1810D82632FAA308C4",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717\\NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md",
+      "bytes": 2256,
+      "sha256": "FAD93E7ED7C93A1406657D5D678A3673CFD73ED29FE4DE5205E223E948EA9D88",
+      "copy_bytes": 2256,
+      "copy_sha256": "FAD93E7ED7C93A1406657D5D678A3673CFD73ED29FE4DE5205E223E948EA9D88",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717\\CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py",
+      "bytes": 11024,
+      "sha256": "379A150CC558D9A37ED53D8C48C291275C3A04241CB91F164377E309A5E9D165",
+      "copy_bytes": 11024,
+      "copy_sha256": "379A150CC558D9A37ED53D8C48C291275C3A04241CB91F164377E309A5E9D165",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_capture_nashville_ec_private_facts.py",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717\\test_capture_nashville_ec_private_facts.py",
+      "bytes": 8362,
+      "sha256": "3D1C57A3EDA269FB8CC305FDA6F808DDCDBE0F3F19A274B271625341B1882085",
+      "copy_bytes": 8362,
+      "copy_sha256": "3D1C57A3EDA269FB8CC305FDA6F808DDCDBE0F3F19A274B271625341B1882085",
       "copy_sha256_matched": true
     }
   ],
-  "claim_boundary": "This receipt proves byte-for-byte mirroring of the public-safe validator, empty template, workflow, test, and ignore boundary only. It contains and mirrors no founder answer values and does not prove portal submission, acceptance, funding, validation, endorsement, or award."
+  "claim_boundary": "This receipt proves byte-for-byte mirroring of the public-safe hidden-input collector, validator, empty template, workflow, tests, and ignore boundary only. It contains and mirrors no founder answer values and does not prove portal submission, acceptance, funding, validation, endorsement, or award."
 }

@@ -132,6 +132,8 @@ def test_private_output_boundary_and_workflow_are_enforced(tmp_path):
 
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert "without placing the answers in public Git history" in workflow
+    assert "CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py" in workflow
+    assert "hidden terminal prompts" in workflow
     assert "refuses to write founder facts elsewhere inside the repository" in workflow
     assert "not authorized for publication" in workflow
 
@@ -140,7 +142,7 @@ def test_bounded_e_drive_mirror_contains_no_private_founder_values():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8-sig"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 5
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 7
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["browser_navigation_performed"] is False
     assert receipt["private_founder_values_mirrored"] is False
@@ -156,4 +158,9 @@ def test_bounded_e_drive_mirror_contains_no_private_founder_values():
         assert source_hash == mirror_hash == artifact["sha256"]
         assert artifact["copy_sha256_matched"] is True
 
+    mirrored_sources = {artifact["source"] for artifact in receipt["artifacts"]}
+    assert {
+        "code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py",
+        "tests/test_capture_nashville_ec_private_facts.py",
+    }.issubset(mirrored_sources)
     assert "mirrors no founder answer values" in receipt["claim_boundary"]

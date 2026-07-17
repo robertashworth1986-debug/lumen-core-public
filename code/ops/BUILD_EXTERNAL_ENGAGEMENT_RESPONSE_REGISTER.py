@@ -35,6 +35,22 @@ NASHVILLE_FACT_RESOLUTION = (
     / "NASHVILLE_EC_FALL_2026"
     / "NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json"
 )
+NASHVILLE_PRIVATE_COLLECTOR = (
+    ROOT / "code" / "ops" / "CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py"
+)
+NASHVILLE_PRIVATE_WORKFLOW = (
+    ROOT
+    / "grant_submissions"
+    / "NASHVILLE_EC_FALL_2026"
+    / "NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md"
+)
+NASHVILLE_PRIVATE_FILL_MAP = (
+    ROOT
+    / "grant_submissions"
+    / "NASHVILLE_EC_FALL_2026"
+    / "private"
+    / "nashville_ec_portal_fill_map.private.json"
+)
 
 OUT_JSON = OUT_OPS / "external_engagement_response_register_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "external_engagement_response_register.json"
@@ -166,8 +182,12 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "supporting_artifacts": [
                 rel(NASHVILLE_MANIFEST),
                 rel(NASHVILLE_FACT_RESOLUTION),
+                rel(NASHVILLE_PRIVATE_COLLECTOR),
+                rel(NASHVILLE_PRIVATE_WORKFLOW),
             ],
-            "next_action": "Collect the six founder confirmations in the resolution artifact before the application closes; do not invent revenue, customers, demographics, founder history, investment, or debt.",
+            "private_fill_map_present": NASHVILLE_PRIVATE_FILL_MAP.is_file(),
+            "private_fact_values_read_or_published": False,
+            "next_action": "Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, then review the complete preview plus any terms or fee before action-time approval; do not invent revenue, customers, demographics, founder history, investment, or debt.",
             "claim_boundary": nashville.get("claim_boundary"),
         },
         {
@@ -344,6 +364,16 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "georgia_patents_engagement_receipt": artifact_status(GEORGIA_PATENTS_RECEIPT),
             "nashville_application_manifest": artifact_status(NASHVILLE_MANIFEST),
             "nashville_human_fact_resolution": artifact_status(NASHVILLE_FACT_RESOLUTION),
+            "nashville_private_collector": artifact_status(NASHVILLE_PRIVATE_COLLECTOR),
+            "nashville_private_workflow": artifact_status(NASHVILLE_PRIVATE_WORKFLOW),
+            "nashville_private_fill_map": {
+                "path": rel(NASHVILLE_PRIVATE_FILL_MAP),
+                "present": NASHVILLE_PRIVATE_FILL_MAP.is_file(),
+                "bytes": 0,
+                "sha256": None,
+                "private_values_read_or_published": False,
+                "sha256_published": False,
+            },
         },
         "claim_boundary": REGISTER_BOUNDARY,
         "outputs": {
