@@ -5,7 +5,7 @@ The official Nashville Entrepreneur Center pages showed the Fall 2026 applicatio
 ## Decision
 
 - Status: `OFFICIAL_OPEN_DATE_ONLY_DEADLINE_HUMAN_FACTS_REQUIRED`
-- Retrieved UTC: `2026-07-17T05:08:12.752219+00:00`
+- Retrieved UTC: `2026-07-17T10:38:16.470442+00:00`
 - Deadline date: `2026-07-17`
 - Date status: `CONFIRMED_ON_OFFICIAL_HOMEPAGE`
 - Deadline time: `None`
@@ -17,15 +17,15 @@ The official Nashville Entrepreneur Center pages showed the Fall 2026 applicatio
 - Final submit without human: `false`
 - Fee or terms acceptance without human: `false`
 - Session-browser navigation performed: `false`
-- Receipt SHA-256: `64fa962a2de2eedb5756222c40494371efbc00b13aa49c724a1e109852c9d54c`
+- Receipt SHA-256: `2b868039a70e8495ab37cd15a0de832ee5e60295653cac147701120e3542fb5a`
 
 ## Official Source Receipts
 
 | Source | HTTP | Bytes | Markers | Content SHA-256 |
 |---|---:|---:|---:|---|
-| [homepage](https://ec.co/) | `200` | `296990` | `true` | `8e48822129b00afbbc2dbc0a1335ab64dd8cd07f5a842ba18e81c3e0d89e7c9c` |
-| [application](https://ec.co/apply/) | `200` | `268558` | `true` | `81837f58456486d1bfba2a8441a7756bc592df52e2fc264669952cd88f79e810` |
-| [takeoff](https://ec.co/accelerators/takeoff/) | `200` | `283345` | `true` | `d8bbf24197c85a1ca74dda4adbf4535803e9398b65753604ea2627aebb60a800` |
+| [homepage](https://ec.co/) | `200` | `289298` | `true` | `4d4163349011dc6b82cef46d6364c736d5d2599bddbe460aca6669aac53987bb` |
+| [application](https://ec.co/apply/) | `200` | `260855` | `true` | `6cdd11bfdb66b870ab6ae0b3c09900d5a94c86d234890418e2eac44a72f048a7` |
+| [takeoff](https://ec.co/accelerators/takeoff/) | `200` | `275637` | `true` | `646d2fe4ff3e85def25731627b6c7f1ae1866c863c0ca38caed8c9f57693e7c7` |
 
 ## Marker Detail
 
@@ -35,7 +35,7 @@ The official Nashville Entrepreneur Center pages showed the Fall 2026 applicatio
 - Final URL: https://ec.co/
 - Page title: Homepage - Entrepreneur Center
 - Raw HTML stored: `false`
-- Receipt SHA-256: `e428cc836847f015017bbaf882b0dbad334cbc5330a37520c3812183e8b77bd3`
+- Receipt SHA-256: `2c8072cc88b354b17e7c39621e98e4a457036ee0c0c0d77b57e8ad337c97c2b7`
 - Marker `Fall 2026 Accelerators`: `true`
 - Marker `July 17`: `true`
 - Marker `Apply Now`: `true`
@@ -46,7 +46,7 @@ The official Nashville Entrepreneur Center pages showed the Fall 2026 applicatio
 - Final URL: https://ec.co/apply/
 - Page title: Apply - Entrepreneur Center
 - Raw HTML stored: `false`
-- Receipt SHA-256: `3335694d3ac9979681b504a163fdf2eb7dfd32357f862d016ed1da5c23c87f36`
+- Receipt SHA-256: `e489cfdcb5e2daeabf2ef24c9cc213f75398dbbae958f124b56ff95f979e523f`
 - Marker `Start Your Application`: `true`
 - Marker `Save your progress`: `true`
 
@@ -56,7 +56,7 @@ The official Nashville Entrepreneur Center pages showed the Fall 2026 applicatio
 - Final URL: https://ec.co/accelerators/takeoff/
 - Page title: TakeOff - Entrepreneur Center
 - Raw HTML stored: `false`
-- Receipt SHA-256: `b352cc6795c055efef0876507c8f401ab08bdee3141994fa4a58769bf972f100`
+- Receipt SHA-256: `80d20f5f19a208150c44e5648fa29a82bc1163a6e6eeadaac705fc186b4acaab`
 - Marker `TakeOff Accelerator`: `true`
 - Marker `Applications for the Fall 2026 Cohort are open`: `true`
 - Marker `September`: `true`

@@ -17,7 +17,7 @@
     "time_status": "NO_CLOSE_TIME_DETECTED_ON_FETCHED_OFFICIAL_PAGES"
   },
   "direct_answer": "The official Nashville Entrepreneur Center pages showed the Fall 2026 application and TakeOff cohort open with a July 17 deadline at retrieval time. No exact closing hour was detected near the deadline date, so the safe operational instruction is to complete the founder-fact gate and submit early rather than assume midnight.",
-  "generated_utc": "2026-07-17T05:08:13.287536+00:00",
+  "generated_utc": "2026-07-17T10:38:18.024479+00:00",
   "integrity": {
     "all_expected_markers_present": true,
     "all_fetches_http_200_html": true,
@@ -30,15 +30,15 @@
     "json": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json",
     "markdown": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.md"
   },
-  "receipt_sha256": "64fa962a2de2eedb5756222c40494371efbc00b13aa49c724a1e109852c9d54c",
+  "receipt_sha256": "2b868039a70e8495ab37cd15a0de832ee5e60295653cac147701120e3542fb5a",
   "required_next_action": "Collect the six founder confirmations, review every populated portal field and any terms or fee, then obtain action-time approval before final submission.",
-  "retrieved_utc": "2026-07-17T05:08:12.752219+00:00",
+  "retrieved_utc": "2026-07-17T10:38:16.470442+00:00",
   "schema": "lumencore.nashville_ec_live_deadline_receipt.v1",
   "sources": [
     {
       "all_expected_markers_present": true,
-      "bytes": 296990,
-      "content_sha256": "8e48822129b00afbbc2dbc0a1335ab64dd8cd07f5a842ba18e81c3e0d89e7c9c",
+      "bytes": 289298,
+      "content_sha256": "4d4163349011dc6b82cef46d6364c736d5d2599bddbe460aca6669aac53987bb",
       "content_type": "text/html",
       "deadline_date_marker_present": true,
       "deadline_time_candidates_near_date": [],
@@ -53,15 +53,15 @@
       "last_modified": null,
       "page_title": "Homepage - Entrepreneur Center",
       "raw_html_stored": false,
-      "receipt_sha256": "e428cc836847f015017bbaf882b0dbad334cbc5330a37520c3812183e8b77bd3",
+      "receipt_sha256": "2c8072cc88b354b17e7c39621e98e4a457036ee0c0c0d77b57e8ad337c97c2b7",
       "requested_url": "https://ec.co/",
-      "retrieved_utc": "2026-07-17T05:08:12.752219+00:00",
+      "retrieved_utc": "2026-07-17T10:38:16.470442+00:00",
       "source_id": "homepage"
     },
     {
       "all_expected_markers_present": true,
-      "bytes": 268558,
-      "content_sha256": "81837f58456486d1bfba2a8441a7756bc592df52e2fc264669952cd88f79e810",
+      "bytes": 260855,
+      "content_sha256": "6cdd11bfdb66b870ab6ae0b3c09900d5a94c86d234890418e2eac44a72f048a7",
       "content_type": "text/html",
       "deadline_date_marker_present": false,
       "deadline_time_candidates_near_date": [],
@@ -75,15 +75,15 @@
       "last_modified": null,
       "page_title": "Apply - Entrepreneur Center",
       "raw_html_stored": false,
-      "receipt_sha256": "3335694d3ac9979681b504a163fdf2eb7dfd32357f862d016ed1da5c23c87f36",
+      "receipt_sha256": "e489cfdcb5e2daeabf2ef24c9cc213f75398dbbae958f124b56ff95f979e523f",
       "requested_url": "https://ec.co/apply/",
-      "retrieved_utc": "2026-07-17T05:08:12.752219+00:00",
+      "retrieved_utc": "2026-07-17T10:38:16.470442+00:00",
       "source_id": "application"
     },
     {
       "all_expected_markers_present": true,
-      "bytes": 283345,
-      "content_sha256": "d8bbf24197c85a1ca74dda4adbf4535803e9398b65753604ea2627aebb60a800",
+      "bytes": 275637,
+      "content_sha256": "646d2fe4ff3e85def25731627b6c7f1ae1866c863c0ca38caed8c9f57693e7c7",
       "content_type": "text/html",
       "deadline_date_marker_present": false,
       "deadline_time_candidates_near_date": [],
@@ -98,9 +98,9 @@
       "last_modified": null,
       "page_title": "TakeOff - Entrepreneur Center",
       "raw_html_stored": false,
-      "receipt_sha256": "b352cc6795c055efef0876507c8f401ab08bdee3141994fa4a58769bf972f100",
+      "receipt_sha256": "80d20f5f19a208150c44e5648fa29a82bc1163a6e6eeadaac705fc186b4acaab",
       "requested_url": "https://ec.co/accelerators/takeoff/",
-      "retrieved_utc": "2026-07-17T05:08:12.752219+00:00",
+      "retrieved_utc": "2026-07-17T10:38:16.470442+00:00",
       "source_id": "takeoff"
     }
   ],

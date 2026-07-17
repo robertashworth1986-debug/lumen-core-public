@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "generated_utc": "2026-07-17T06:33:10.7513267Z",
+  "generated_utc": "2026-07-17T10:40:22.7607447Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717",
   "artifact_count": 7,
   "all_sha256_matched_after_copy": true,
@@ -10,10 +10,10 @@
     {
       "source": ".gitignore",
       "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NASHVILLE_EC_PRIVATE_FACT_CAPTURE_20260717\\.gitignore",
-      "bytes": 2444,
-      "sha256": "5D4DAD6108338D9D14B2628F3F5DB095EFF3A9093FEC5285F2CEA124BCECBA09",
-      "copy_bytes": 2444,
-      "copy_sha256": "5D4DAD6108338D9D14B2628F3F5DB095EFF3A9093FEC5285F2CEA124BCECBA09",
+      "bytes": 2590,
+      "sha256": "2C2DB5AF3F9283C8B47151E15B087802D35369AFCAC43917A24FBCFDCF1D690B",
+      "copy_bytes": 2590,
+      "copy_sha256": "2C2DB5AF3F9283C8B47151E15B087802D35369AFCAC43917A24FBCFDCF1D690B",
       "copy_sha256_matched": true
     },
     {
