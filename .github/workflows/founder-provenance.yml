@@ -47,21 +47,34 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          forbidden = (
-              'raw private conversation archive',
-              'trademark registration established',
-              'patent priority established',
-              'externally validated by default',
+          positive_assertions = (
+              'raw private chats are public',
+              'raw private notebooks are public',
+              'trademark registration is established',
+              'patent priority is established',
+              'external validation is established by default',
           )
-          paths = [
-              Path('docs/FOUNDER_PROVENANCE_AND_BUILD_TIMELINE.md'),
-              Path('docs/PRIVATE_CONVERSATION_AND_NOTEBOOK_AUDIT_PROTOCOL.md'),
-              Path('docs/LUMA1_LUMA2_HANDOFF_PROTOCOL.md'),
-          ]
-          for path in paths:
+          required_boundaries = {
+              Path('docs/FOUNDER_PROVENANCE_AND_BUILD_TIMELINE.md'): (
+                  'full notebook and full conversation export audit not yet complete',
+                  'raw chats and notebooks may establish chronology',
+              ),
+              Path('docs/PRIVATE_CONVERSATION_AND_NOTEBOOK_AUDIT_PROTOCOL.md'): (
+                  'the raw source corpus remains private',
+                  'never commit the raw export to a public repository',
+              ),
+              Path('docs/LUMA1_LUMA2_HANDOFF_PROTOCOL.md'): (
+                  'repository state canonical',
+                  'raw conversations and notebook pages are private evidence inputs',
+              ),
+          }
+          for path, required in required_boundaries.items():
               text = path.read_text(encoding='utf-8').lower()
-              for phrase in forbidden:
+              for phrase in positive_assertions:
                   if phrase in text:
-                      raise SystemExit(f'{path}: forbidden phrase: {phrase}')
+                      raise SystemExit(f'{path}: unsafe positive assertion: {phrase}')
+              for phrase in required:
+                  if phrase not in text:
+                      raise SystemExit(f'{path}: required boundary missing: {phrase}')
           print('public provenance boundaries present')
           PY
