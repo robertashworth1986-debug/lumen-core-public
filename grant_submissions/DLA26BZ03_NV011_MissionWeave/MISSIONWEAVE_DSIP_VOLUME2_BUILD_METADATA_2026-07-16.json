@@ -1,0 +1,67 @@
+{
+  "schema": "missionweave_dsip_volume2_build_metadata.v1",
+  "source": "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.md",
+  "source_sha256": "791E05AC7373B7EB7AADD8E7C6FA41236D0F4D254A534B2A7E634B1EDDC44139",
+  "output": "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.docx",
+  "output_sha256": "22002112D2A3662E566728C853883DADE973A0DC192C4B20D5CC6B84B8D9689D",
+  "proposal_number_header": "Proposal No. assigned in DSIP",
+  "design_tokens": {
+    "preset": "grant_proposal",
+    "named_override": "DLA single-spaced technical volume",
+    "page": {
+      "size": "US Letter portrait",
+      "margins_inches": 1.0,
+      "header_footer_inches": 0.5,
+      "content_width_dxa": 9360
+    },
+    "body": {
+      "font": "Arial",
+      "size_pt": 10.5,
+      "line_spacing": "single",
+      "space_after_pt": 4.5
+    },
+    "headings": {
+      "title": {
+        "size_pt": 18,
+        "color": "000000",
+        "after_pt": 8
+      },
+      "h1": {
+        "size_pt": 12.5,
+        "color": "2E628A",
+        "before_pt": 10,
+        "after_pt": 4
+      },
+      "h2": {
+        "size_pt": 11.5,
+        "color": "1F4D78",
+        "before_pt": 7,
+        "after_pt": 3
+      },
+      "h3": {
+        "size_pt": 10.5,
+        "color": "1F4D78",
+        "before_pt": 5,
+        "after_pt": 2
+      }
+    },
+    "lists": {
+      "marker_aligned_dxa": 260,
+      "text_indent_dxa": 540,
+      "hanging_dxa": 280,
+      "space_after_pt": 2
+    },
+    "tables": {
+      "width_dxa": 9360,
+      "indent_dxa": 120,
+      "cell_margins_dxa": {
+        "top": 80,
+        "bottom": 80,
+        "start": 120,
+        "end": 120
+      },
+      "font_size_pt": 10,
+      "header_fill": "F2F4F7"
+    }
+  }
+}

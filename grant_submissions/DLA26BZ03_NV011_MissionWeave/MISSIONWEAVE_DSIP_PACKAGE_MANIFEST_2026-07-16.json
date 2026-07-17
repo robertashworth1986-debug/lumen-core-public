@@ -1,0 +1,87 @@
+{
+  "schema": "missionweave_dsip_submission_package_manifest.v1",
+  "generated_utc": "2026-07-17T00:00:57.980877+00:00",
+  "topic": "DLA26BZ03-NV011",
+  "deadline": "2026-07-22T12:00:00-04:00",
+  "applicant": "Robert Ashworth d/b/a LumenCore",
+  "package_state": "portal-ready candidate; certification and final submission gates remain",
+  "file_count": 15,
+  "files": [
+    {
+      "path": "MISSIONWEAVE_DSIP_ASSEMBLY_MAP_2026-07-16.md",
+      "bytes": 6752,
+      "sha256": "9F5F043D678BDCAB74C7B1E4993C75A807DA60BDB9A5BA05EEB5EB41487ED9ED"
+    },
+    {
+      "path": "MISSIONWEAVE_DSIP_VOLUME1_PUBLIC_TEXT_2026-07-16.md",
+      "bytes": 4368,
+      "sha256": "768AFD85CBFAF2B775A25E9161EE5B3007BD980E2519B544353B95D3DDFA854E"
+    },
+    {
+      "path": "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.md",
+      "bytes": 35281,
+      "sha256": "791E05AC7373B7EB7AADD8E7C6FA41236D0F4D254A534B2A7E634B1EDDC44139"
+    },
+    {
+      "path": "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.docx",
+      "bytes": 54797,
+      "sha256": "22002112D2A3662E566728C853883DADE973A0DC192C4B20D5CC6B84B8D9689D"
+    },
+    {
+      "path": "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf",
+      "bytes": 211345,
+      "sha256": "8BBDE3DB31285F3B671CBFCAF972E9EB8F2DE2F62D559463E519CA4F901C37E6"
+    },
+    {
+      "path": "MISSIONWEAVE_DSIP_VOLUME2_BUILD_METADATA_2026-07-16.json",
+      "bytes": 1776,
+      "sha256": "655E6562AEFF9FBD05758A8E8722EE2D39D145BAD8BF4DFDCC335C780447378B"
+    },
+    {
+      "path": "MISSIONWEAVE_DSIP_VOLUME3_COST_INPUTS_2026-07-16.md",
+      "bytes": 3653,
+      "sha256": "5A8330A73CF853EA47EF6034C275ED8D99CCC21BB1AE336540A186C1DD47FFE2"
+    },
+    {
+      "path": "MISSIONWEAVE_DSIP_VOLUME5_WORKSHEET_2026-07-16.md",
+      "bytes": 4702,
+      "sha256": "D273160FA445ACF93ED2B132FE284C5733D9ADA9E5369A3D7403B780B34B5314"
+    },
+    {
+      "path": "MISSIONWEAVE_CLAIM_EVIDENCE_MATRIX_2026-07-16.md",
+      "bytes": 4576,
+      "sha256": "4A2CD583989C742F82A3728097EE6FCBE6FB2B1A85C14211EE29A18D91DB33A2"
+    },
+    {
+      "path": "MISSIONWEAVE_BOUNDED_PROCESS_PLAN_2026-06-19.md",
+      "bytes": 5660,
+      "sha256": "F07085469BA889CEC7966E7651253F86161B40139E4172C01FF62D9B0D2593E1"
+    },
+    {
+      "path": "build_missionweave_dsip_volume2_candidate.py",
+      "bytes": 23792,
+      "sha256": "47FE24F04CE2FD3EE93FFA5BDF063FA0A92B44EB5B72C1F164107B930B855C81"
+    },
+    {
+      "path": "build_missionweave_package_manifest.py",
+      "bytes": 3982,
+      "sha256": "6915DB6F614EBAC0A6B5AD856F7B122C3C125999790BD0B51068A889DFB8E834"
+    },
+    {
+      "path": "source_attachments/DLA_26BZ_RELEASE_3_COMPONENT_INSTRUCTIONS.pdf",
+      "bytes": 374972,
+      "sha256": "17B06B6FE3DBE6F2035F8287A0DD01FDBFE180858F3C490F1E91D121819239A2"
+    },
+    {
+      "path": "source_attachments/DLA26BZ03_NV011_OFFICIAL_TOPIC_DETAILS.json",
+      "bytes": 5829,
+      "sha256": "4D01354A456BF91BAFF5AB638311BD5822176B49AD7911F6DEC1C379B3B217B7"
+    },
+    {
+      "path": "source_attachments/DoW_2026_SBIR_BAA_RELEASE_3_AMENDMENT_2.pdf",
+      "bytes": 676002,
+      "sha256": "FB809186F3B43313A1877A5C36E2383A45B84F62566DDA3F6BCDB93779CE08AE"
+    }
+  ],
+  "claim_boundary": "Generated-workflow feasibility evidence only. The package does not establish DLA operational performance, field validation, causal workforce impact, production readiness, realized savings, CMMC assessment, export-control certification, patent validity, independent reproduction, or a 10x improvement."
+}
