@@ -132,7 +132,7 @@ jobs:
             fi
           '
 
-      - name: Inspect VPS storage and identity
+      - name: Capture VPS storage and identity
         shell: bash
         run: |
           set -euo pipefail
@@ -144,9 +144,68 @@ jobs:
             df -hP / /opt
             printf "Filesystem inodes:\n"
             df -iP / /opt
+          ' | tee /tmp/lumencore-vps-preflight.txt
+
+      - name: Verify VPS disk capacity
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -eu
+            set -- $(df -Pk /opt | tail -n 1)
+            available_kb="$4"
+            if [ "$available_kb" -lt 131072 ]; then
+              sudo -n journalctl --vacuum-size=50M >/dev/null 2>&1 || true
+              sudo -n dnf clean all >/dev/null 2>&1 || true
+              sudo -n yum clean all >/dev/null 2>&1 || true
+              sudo -n apt-get clean >/dev/null 2>&1 || true
+              set -- $(df -Pk /opt | tail -n 1)
+              available_kb="$4"
+            fi
+            printf "AVAILABLE_KB=%s\n" "$available_kb"
+            if [ "$available_kb" -lt 131072 ]; then
+              echo "ERROR: fewer than 128 MiB remain on the VPS filesystem" >&2
+              exit 1
+            fi
           '
 
-      - name: Prepare bounded VPS directories
+      - name: Verify VPS inode capacity
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -eu
+            set -- $(df -Pi /opt | tail -n 1)
+            available_inodes="$4"
+            printf "AVAILABLE_INODES=%s\n" "$available_inodes"
+            if [ "$available_inodes" -lt 2048 ]; then
+              echo "ERROR: fewer than 2048 inodes remain on the VPS filesystem" >&2
+              exit 1
+            fi
+          '
+
+      - name: Prepare root-owned content directories
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -eu
+            sudo -n install -d -m 755 \
+              /opt/lumencore \
+              /opt/lumencore/dashboard \
+              /opt/lumencore/dashboard/data \
+              /opt/lumencore/data
+            for directory in \
+              /opt/lumencore \
+              /opt/lumencore/dashboard \
+              /opt/lumencore/dashboard/data \
+              /opt/lumencore/data; do
+              sudo -n test -d "$directory"
+            done
+            printf "CONTENT_DIRECTORIES_OK\n"
+          '
+
+      - name: Prepare writable repair staging directory
         shell: bash
         run: |
           set -euo pipefail
@@ -154,35 +213,24 @@ jobs:
             set -eu
             remote_uid="$(id -u)"
             remote_gid="$(id -g)"
-
-            sudo -n install -d -m 755 \
-              /opt/lumencore \
-              /opt/lumencore/dashboard \
-              /opt/lumencore/dashboard/data \
-              /opt/lumencore/data
-            sudo -n chown "$remote_uid:$remote_gid" \
-              /opt/lumencore \
-              /opt/lumencore/dashboard \
-              /opt/lumencore/dashboard/data \
-              /opt/lumencore/data
-
+            sudo -n rm -rf /tmp/lumencore-evidence-route
             sudo -n install -d -m 700 /tmp/lumencore-evidence-route
             sudo -n chown "$remote_uid:$remote_gid" /tmp/lumencore-evidence-route
-
-            for directory in \
-              /opt/lumencore \
-              /opt/lumencore/dashboard \
-              /opt/lumencore/dashboard/data \
-              /opt/lumencore/data \
-              /tmp/lumencore-evidence-route; do
-              test -d "$directory"
-              probe="$directory/.lumencore-write-test.$$"
-              : > "$probe"
-              rm -f "$probe"
-            done
-
-            printf "DIRECTORIES_OK uid=%s gid=%s\n" "$remote_uid" "$remote_gid"
+            test -w /tmp/lumencore-evidence-route
+            probe="/tmp/lumencore-evidence-route/.lumencore-write-test.$$"
+            : > "$probe"
+            rm -f "$probe"
+            printf "REPAIR_STAGING_OK uid=%s gid=%s\n" "$remote_uid" "$remote_gid"
           '
+
+      - name: Upload VPS preflight diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vps-preflight-${{ github.run_id }}
+          path: /tmp/lumencore-vps-preflight.txt
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Sync dashboard assets
         shell: bash
