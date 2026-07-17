@@ -67,6 +67,12 @@ NASHVILLE_DEADLINE_RECEIPT = (
 NASHVILLE_DEADLINE_RESPONSE_CONTROL = (
     SPRINT_DIR / "NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md"
 )
+NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION = (
+    ROOT
+    / "grant_submissions"
+    / "NASHVILLE_EC_FALL_2026"
+    / "NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json"
+)
 LAUNCHTN_MANIFEST = (
     ROOT
     / "grant_submissions"
@@ -86,6 +92,9 @@ LAUNCHTN_FINANCIAL_MODEL = (
     / "LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx"
 )
 LVLUP_DRAFT = ROOT / "docs" / "LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md"
+LVLUP_REVIEW_CONFIRMATION = (
+    SPRINT_DIR / "LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json"
+)
 SAM_ROTATION_CONTROL = (
     SPRINT_DIR / "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json"
 )
@@ -231,7 +240,9 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     nashville = read_json(NASHVILLE_MANIFEST)
     nashville_resolution = read_json(NASHVILLE_FACT_RESOLUTION)
     nashville_deadline = read_json(NASHVILLE_DEADLINE_RECEIPT)
+    nashville_official_deadline = read_json(NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION)
     launchtn = read_json(LAUNCHTN_MANIFEST)
+    lvlup_review = read_json(LVLUP_REVIEW_CONFIRMATION)
     sam_rotation = read_json(SAM_ROTATION_CONTROL)
     email_reconciliation = read_json(EMAIL_ACTION_RECONCILIATION)
     fhwa_outreach = read_json(FHWA_PARTNER_OUTREACH)
@@ -244,6 +255,20 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         != "DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING"
     ):
         raise ValueError("Nashville EC deadline-preservation receipt is missing or stale")
+    if (
+        nashville_official_deadline.get("schema")
+        != "lumencore.nashville_ec_official_deadline_confirmation.v1"
+        or nashville_official_deadline.get("status")
+        != "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
+    ):
+        raise ValueError("Nashville EC official deadline confirmation is missing or stale")
+    if (
+        lvlup_review.get("schema")
+        != "lumencore.lvlup_independent_review_confirmation.v1"
+        or lvlup_review.get("status")
+        != "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED"
+    ):
+        raise ValueError("LvlUp independent-review confirmation is missing or stale")
     if patent_control.get("schema") != "lumencore.patent_deadline_evidence_control.v1":
         raise ValueError("Patent deadline evidence control is missing or stale")
     if launchtn.get("schema") != "lumencore.launchtn_3686_pitch_application.v1":
@@ -299,28 +324,38 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         {
             "lane_id": "nashville_ec_takeoff_fall_2026",
             "organization": "Nashville Entrepreneur Center",
-            "state": nashville_deadline["acknowledgment"]["status"],
-            "deadline": "2026-07-17",
-            "decision": "CONTINUE_PORTAL_MONITOR_SUPPORT_REPLY_NO_DUPLICATE",
+            "state": nashville_official_deadline["status"],
+            "deadline": nashville_official_deadline["confirmation"][
+                "operational_local_deadline"
+            ],
+            "decision": "COMPLETE_PORTAL_BEFORE_CONFIRMED_CLOSE_NO_DUPLICATE_EMAIL",
             "response_channel": "PORTAL",
             "response_ready": True,
             "send_now": False,
             "do_not_duplicate_send": True,
             "action_gate": "Founder answers all six concise confirmation prompts, reviews the complete live portal preview plus any terms or fee, and authorizes final submission at action time.",
-            "response_artifact": rel(NASHVILLE_DEADLINE_RECEIPT),
+            "response_artifact": rel(NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION),
             "supporting_artifacts": [
                 rel(NASHVILLE_MANIFEST),
                 rel(NASHVILLE_FACT_RESOLUTION),
                 rel(NASHVILLE_PRIVATE_COLLECTOR),
                 rel(NASHVILLE_PRIVATE_WORKFLOW),
+                rel(NASHVILLE_DEADLINE_RECEIPT),
                 rel(NASHVILLE_DEADLINE_RESPONSE_CONTROL),
             ],
             "deadline_support_sent_utc": nashville_deadline["submission"]["sent_utc"],
             "deadline_support_email_is_application": False,
+            "official_close_time_confirmed": True,
+            "deadline_timezone_explicit_in_message": nashville_official_deadline[
+                "confirmation"
+            ]["timezone_explicit_in_message"],
+            "operational_timezone": nashville_official_deadline["confirmation"][
+                "operational_timezone"
+            ],
             "private_fill_map_present": NASHVILLE_PRIVATE_FILL_MAP.is_file(),
             "private_fact_values_read_or_published": False,
-            "next_action": "Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, and monitor the single support thread for the exact close time. Do not resend the deadline query or treat it as an application; review the complete preview plus any terms or fee before action-time approval.",
-            "claim_boundary": nashville.get("claim_boundary"),
+            "next_action": "Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, and complete the reviewed portal flow well before the confirmed close. Do not resend the deadline query or treat it as an application; review the complete preview plus any terms or fee before action-time approval.",
+            "claim_boundary": nashville_official_deadline["claim_boundary"],
         },
         {
             "lane_id": "launchtn_3686_pitch_2026",
@@ -393,18 +428,20 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         {
             "lane_id": "lvlup_optional_paid_event",
             "organization": "LvlUp Ventures / Power of the Pitch Week",
-            "state": "OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND",
+            "state": lvlup_review["status"],
             "deadline": None,
-            "decision": "DO_NOT_SPEND_OR_SEND_STALE_DRAFT",
-            "response_channel": "NONE",
+            "decision": "MONITOR_INDEPENDENT_REVIEW_NO_DUPLICATE",
+            "response_channel": "EMAIL",
             "response_ready": False,
             "send_now": False,
             "do_not_duplicate_send": True,
-            "action_gate": "No payment, sponsor purchase, application submission, valuation disclosure, or reuse of the July 3 draft without a fresh claim review and explicit founder approval.",
-            "response_artifact": rel(LVLUP_DRAFT),
-            "supporting_artifacts": [],
-            "next_action": "Take no action unless LvlUp provides written non-pay-to-play selection terms or a clearly relevant no-fee application route; the current LaunchTN package is the stronger reviewer-facing path.",
-            "claim_boundary": "The July 3 LvlUp draft is historical preparation only. It does not prove selection, investor interest, funding, validation, a required payment, or permission to submit its stale technical and valuation statements.",
+            "action_gate": "Reply only if LvlUp's Investment Committee requests additional information. No sponsor purchase, unsolicited duplicate packet, valuation disclosure, or reuse of the July 3 draft without a fresh claim review and explicit founder approval.",
+            "response_artifact": rel(LVLUP_REVIEW_CONFIRMATION),
+            "supporting_artifacts": [rel(LVLUP_DRAFT)],
+            "written_independent_review_confirmation": True,
+            "paid_sponsor_purchase_required_for_separate_review": False,
+            "next_action": lvlup_review["required_next_action"],
+            "claim_boundary": lvlup_review["claim_boundary"],
         },
         {
             "lane_id": "sam_public_credential_rotation",
@@ -600,13 +637,12 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "as_of_date": "2026-07-17",
         "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
         "direct_answer": (
-            "The bounded Nashville EC deadline-support query and FHWA response-lead acknowledgment were sent and must not be duplicated. The first FHWA route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response, but no fit check or partner is confirmed. "
-            "The Nashville message is not an application, so continue its founder-fact gate and final portal workflow while monitoring for the exact close time. "
+            "Nashville EC confirmed in writing that its application remains open until 11:59 PM on July 17; the timezone is operationally treated as America/Chicago because the message itself did not state one. The support reply is not an application, so complete the founder-fact gate and reviewed portal workflow well before the close. "
+            "The FHWA response-lead acknowledgment was sent and must not be duplicated. The first FHWA route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response, but no fit check or partner is confirmed. "
             "No additional email should be sent now. "
             "Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for "
             "founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army "
-            "are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would "
-            "reduce credibility."
+            "are monitor-only. LvlUp confirmed that declining its optional paid sponsor track does not affect the separate investment and accelerator review, so monitor that thread without spending or sending a duplicate packet; duplicate sends would reduce credibility."
         ),
         "summary": {
             "record_count": len(records),
@@ -667,6 +703,9 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "nashville_deadline_response_control": artifact_status(
                 NASHVILLE_DEADLINE_RESPONSE_CONTROL
             ),
+            "nashville_official_deadline_confirmation": artifact_status(
+                NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION
+            ),
             "nashville_private_fill_map": {
                 "path": rel(NASHVILLE_PRIVATE_FILL_MAP),
                 "present": NASHVILLE_PRIVATE_FILL_MAP.is_file(),
@@ -679,6 +718,9 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "launchtn_pitch_deck": artifact_status(LAUNCHTN_DECK),
             "launchtn_financial_model": artifact_status(LAUNCHTN_FINANCIAL_MODEL),
             "lvlup_historical_application_draft": artifact_status(LVLUP_DRAFT),
+            "lvlup_independent_review_confirmation": artifact_status(
+                LVLUP_REVIEW_CONFIRMATION
+            ),
             "sam_public_credential_rotation_control": artifact_status(
                 SAM_ROTATION_CONTROL
             ),

@@ -1,0 +1,31 @@
+{
+  "schema": "lumencore.lvlup_independent_review_confirmation.v1",
+  "generated_utc": "2026-07-17T20:09:50.638Z",
+  "status": "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED",
+  "source": {
+    "channel": "EMAIL_REPLY",
+    "organization": "LvlUp Ventures",
+    "sender_role": "Start-Up Review Team",
+    "gmail_message_id": "19f70cd41d76fbf7",
+    "gmail_thread_id": "19f32b72058b9656",
+    "received_utc": "2026-07-17T15:58:03Z",
+    "subject_ascii": "Re: Congratulations | Next Steps for the LvlUp Ventures Power of the Pitch Week",
+    "raw_email_body_stored": false
+  },
+  "confirmation": {
+    "bounded_exact_sentence": "Your application will continue to be reviewed independently through our standard investment process.",
+    "bounded_exact_sentence_sha256": "a32c461393804c5728bff7b2ca9fb3a98b5d3fe7b2346409d5be39cf6cb4c4d8",
+    "paid_sponsor_activation_declined": true,
+    "sender_stated_no_effect_on_separate_review": true,
+    "sender_stated_independent_review_continues": true,
+    "funding_or_selection_confirmed": false
+  },
+  "response_state": {
+    "reply_required": false,
+    "duplicate_reply_allowed": false,
+    "paid_sponsor_purchase_required_for_separate_review": false,
+    "monitor_for_diligence_request": true
+  },
+  "required_next_action": "Monitor the existing thread. Reply only if LvlUp's Investment Committee requests additional information; do not purchase the optional sponsor track or send an unsolicited duplicate packet.",
+  "claim_boundary": "This receipt proves only that LvlUp Ventures stated in writing that declining the sponsor-backed track would not affect the separate investment and accelerator review and that the application would continue through its standard investment process. It does not prove Investment Committee consideration, diligence, selection, investment interest, funding, accelerator admission, endorsement, validation, or an offer."
+}

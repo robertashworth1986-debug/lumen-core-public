@@ -8,11 +8,23 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py"
+LVLUP_REVIEW_CONFIRMATION = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json"
+)
 MIRROR_RECEIPT = (
     ROOT
     / "grant_submissions"
     / "funding_sprint_20260709"
     / "EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_E_DRIVE_SYNC_RECEIPT_2026-07-16.json"
+)
+CURRENT_STATE_MIRROR_RECEIPT = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "EXTERNAL_RESPONSE_STATE_E_DRIVE_SYNC_RECEIPT_2026-07-17.json"
 )
 
 
@@ -32,7 +44,7 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert payload["schema"] == "lumencore.external_engagement_response_register.v1"
     assert payload["summary"]["record_count"] == 12
     assert payload["summary"]["immediate_human_action_count"] == 2
-    assert payload["summary"]["monitor_only_count"] == 8
+    assert payload["summary"]["monitor_only_count"] == 9
     assert payload["summary"]["do_not_duplicate_send_count"] == 11
     assert payload["summary"]["email_action_reconciliation_status"] == (
         "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
@@ -40,17 +52,26 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert payload["summary"]["autonomous_external_send_allowed"] is False
     assert payload["summary"]["autonomous_final_portal_submission_allowed"] is False
 
-    assert records["nashville_ec_takeoff_fall_2026"]["deadline"] == "2026-07-17"
+    assert records["nashville_ec_takeoff_fall_2026"]["deadline"] == (
+        "2026-07-17T23:59:00-05:00"
+    )
     assert "six concise confirmation prompts" in records["nashville_ec_takeoff_fall_2026"]["action_gate"]
     nashville = records["nashville_ec_takeoff_fall_2026"]
-    assert nashville["state"] == "DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING"
-    assert nashville["decision"] == "CONTINUE_PORTAL_MONITOR_SUPPORT_REPLY_NO_DUPLICATE"
+    assert nashville["state"] == (
+        "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
+    )
+    assert nashville["decision"] == (
+        "COMPLETE_PORTAL_BEFORE_CONFIRMED_CLOSE_NO_DUPLICATE_EMAIL"
+    )
     assert nashville["do_not_duplicate_send"] is True
     assert nashville["deadline_support_sent_utc"] == "2026-07-17T12:05:34Z"
     assert nashville["deadline_support_email_is_application"] is False
     assert nashville["response_artifact"].endswith(
-        "NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json"
+        "NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json"
     )
+    assert nashville["official_close_time_confirmed"] is True
+    assert nashville["deadline_timezone_explicit_in_message"] is False
+    assert nashville["operational_timezone"] == "America/Chicago"
     assert nashville["private_fill_map_present"] is False
     assert nashville["private_fact_values_read_or_published"] is False
     assert any(
@@ -73,6 +94,7 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert payload["source_artifacts"]["nashville_private_fill_map"]["private_values_read_or_published"] is False
     assert payload["source_artifacts"]["nashville_deadline_preservation_receipt"]["present"] is True
     assert payload["source_artifacts"]["nashville_deadline_response_control"]["present"] is True
+    assert payload["source_artifacts"]["nashville_official_deadline_confirmation"]["present"] is True
     launchtn = records["launchtn_3686_pitch_2026"]
     assert launchtn["deadline"] == "2026-08-13T23:59:00-05:00"
     assert launchtn["state"] == (
@@ -112,10 +134,15 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert payload["source_artifacts"]["patent_private_capture_workflow"]["present"] is True
     assert payload["source_artifacts"]["patent_practitioner_request_template"]["present"] is True
     assert payload["source_artifacts"]["epri_engagement_receipt"]["present"] is True
-    assert records["lvlup_optional_paid_event"]["decision"] == (
-        "DO_NOT_SPEND_OR_SEND_STALE_DRAFT"
+    lvlup = records["lvlup_optional_paid_event"]
+    assert lvlup["state"] == (
+        "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED"
     )
-    assert records["lvlup_optional_paid_event"]["send_now"] is False
+    assert lvlup["decision"] == "MONITOR_INDEPENDENT_REVIEW_NO_DUPLICATE"
+    assert lvlup["written_independent_review_confirmation"] is True
+    assert lvlup["paid_sponsor_purchase_required_for_separate_review"] is False
+    assert lvlup["send_now"] is False
+    assert payload["source_artifacts"]["lvlup_independent_review_confirmation"]["present"] is True
     assert records["sam_public_credential_rotation"]["state"] == (
         "ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED"
     )
@@ -204,6 +231,49 @@ def test_register_preserves_claim_and_privacy_boundaries():
     assert "zoom.us" not in lowered
     assert "client_secret" not in lowered
     assert "api_key" not in lowered
+
+
+def test_lvlup_confirmation_sentence_is_hashed_and_bounded():
+    receipt = json.loads(LVLUP_REVIEW_CONFIRMATION.read_text(encoding="utf-8"))
+    confirmation = receipt["confirmation"]
+    sentence = confirmation["bounded_exact_sentence"]
+
+    assert receipt["schema"] == "lumencore.lvlup_independent_review_confirmation.v1"
+    assert receipt["status"] == (
+        "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED"
+    )
+    assert hashlib.sha256(sentence.encode("utf-8")).hexdigest() == confirmation[
+        "bounded_exact_sentence_sha256"
+    ]
+    assert confirmation["sender_stated_independent_review_continues"] is True
+    assert confirmation["funding_or_selection_confirmed"] is False
+    assert receipt["response_state"]["reply_required"] is False
+    assert receipt["response_state"]["duplicate_reply_allowed"] is False
+    assert "does not prove" in receipt["claim_boundary"].lower()
+
+
+def test_current_response_state_mirror_matches_sources_and_e_drive():
+    receipt = json.loads(CURRENT_STATE_MIRROR_RECEIPT.read_text(encoding="utf-8"))
+    destination = Path(receipt["destination_root"])
+
+    assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 10
+    assert receipt["all_sha256_matched_after_copy"] is True
+    assert receipt["private_founder_values_mirrored"] is False
+    for artifact in receipt["artifacts"]:
+        source = ROOT / artifact["source"]
+        mirror = destination / source.name
+        expected = artifact["sha256"]
+
+        assert source.is_file(), artifact["source"]
+        assert mirror.is_file(), str(mirror)
+        assert source.stat().st_size == artifact["bytes"]
+        assert mirror.stat().st_size == artifact["bytes"]
+        assert hashlib.sha256(source.read_bytes()).hexdigest().upper() == expected
+        assert hashlib.sha256(mirror.read_bytes()).hexdigest().upper() == expected
+        assert artifact["copy_sha256_matched"] is True
+
+    assert "does not prove" in receipt["claim_boundary"].lower()
 
 
 def test_lanl_followup_is_held_and_bounded():

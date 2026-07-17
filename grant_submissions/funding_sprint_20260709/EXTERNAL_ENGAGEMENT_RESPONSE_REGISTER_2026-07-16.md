@@ -1,29 +1,29 @@
 # External Engagement Response Register - 2026-07-17
 
-The bounded Nashville EC deadline-support query and FHWA response-lead acknowledgment were sent and must not be duplicated. The first FHWA route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response, but no fit check or partner is confirmed. The Nashville message is not an application, so continue its founder-fact gate and final portal workflow while monitoring for the exact close time. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would reduce credibility.
+Nashville EC confirmed in writing that its application remains open until 11:59 PM on July 17; the timezone is operationally treated as America/Chicago because the message itself did not state one. The support reply is not an application, so complete the founder-fact gate and reviewed portal workflow well before the close. The FHWA response-lead acknowledgment was sent and must not be duplicated. The first FHWA route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response, but no fit check or partner is confirmed. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army are monitor-only. LvlUp confirmed that declining its optional paid sponsor track does not affect the separate investment and accelerator review, so monitor that thread without spending or sending a duplicate packet; duplicate sends would reduce credibility.
 
 ## Control Summary
 
 - Status: `CURRENT_RESPONSE_CONTROL_HUMAN_GATED`
 - Engagement records: `12`
 - Immediate human actions: `2`
-- Monitor-only lanes: `8`
+- Monitor-only lanes: `9`
 - Do-not-duplicate lanes: `11`
 - Verified attachments: `6`
 - All attachment checks pass: `true`
 - Autonomous external send allowed: `false`
 - Autonomous final portal submit allowed: `false`
-- Register SHA-256: `58b6ef43f8c948b7eb49b3facd215bcbccae5f6074ad70fd32bf4a8d810edda2`
+- Register SHA-256: `d2fb2792141dff020ab0c66609763ace9f057cd80f3fe50ab176a0d102d40998`
 
 ## Response Queue
 
 | Organization | State | Decision | Deadline / Hold | Duplicate Send |
 |---|---|---|---|---:|
-| Nashville Entrepreneur Center | `DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING` | `CONTINUE_PORTAL_MONITOR_SUPPORT_REPLY_NO_DUPLICATE` | 2026-07-17 | `true` |
+| Nashville Entrepreneur Center | `OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED` | `COMPLETE_PORTAL_BEFORE_CONFIRMED_CLOSE_NO_DUPLICATE_EMAIL` | 2026-07-17T23:59:00-05:00 | `true` |
 | Launch Tennessee 3686 Pitch Competition | `PORTAL_PACKET_QA_PASSED_HUMAN_FACTS_AND_FOUNDER_APPROVAL_REQUIRED` | `STAGE_PORTAL_FINAL_PREVIEW_REQUIRED` | 2026-08-13T23:59:00-05:00 | `false` |
 | EPRI Open Power AI Consortium | `OUTBOUND_SENT_MOU_PENDING` | `MONITOR_FOR_MOU_NO_DUPLICATE` | 2026-07-23 | `true` |
 | Georgia PATENTS | `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | 2026-07-24 | `true` |
-| LvlUp Ventures / Power of the Pitch Week | `OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND` | `DO_NOT_SPEND_OR_SEND_STALE_DRAFT` | None | `true` |
+| LvlUp Ventures / Power of the Pitch Week | `WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED` | `MONITOR_INDEPENDENT_REVIEW_NO_DUPLICATE` | None | `true` |
 | SAM.gov account credential control | `ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED` | `HUMAN_ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY` | 2026-07-16 | `true` |
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `MONITOR_NO_REPLY_REQUIRED` | 2026-07-30T21:00:00Z | `true` |
 | Los Alamos National Laboratory | `OUTBOUND_SENT_RESPONSE_PENDING` | `MONITOR_THEN_ONE_BOUNDED_FOLLOW_UP` | 2026-07-23 | `true` |
@@ -35,16 +35,16 @@ The bounded Nashville EC deadline-support query and FHWA response-lead acknowled
 ### Nashville Entrepreneur Center
 
 - Lane: `nashville_ec_takeoff_fall_2026`
-- State: `DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING`
-- Decision: `CONTINUE_PORTAL_MONITOR_SUPPORT_REPLY_NO_DUPLICATE`
+- State: `OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED`
+- Decision: `COMPLETE_PORTAL_BEFORE_CONFIRMED_CLOSE_NO_DUPLICATE_EMAIL`
 - Response channel: `PORTAL`
 - Response ready: `true`
 - Send now: `false`
 - Action gate: Founder answers all six concise confirmation prompts, reviews the complete live portal preview plus any terms or fee, and authorizes final submission at action time.
-- Next action: Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, and monitor the single support thread for the exact close time. Do not resend the deadline query or treat it as an application; review the complete preview plus any terms or fee before action-time approval.
-- Response artifact: `grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json`
-- Claim boundary: This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms.
-- Record SHA-256: `ea1f73bc8327f2d9978f07b73d7d8b97b0b59edd51776ceba013a7c5a4d90e99`
+- Next action: Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, and complete the reviewed portal flow well before the confirmed close. Do not resend the deadline query or treat it as an application; review the complete preview plus any terms or fee before action-time approval.
+- Response artifact: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json`
+- Claim boundary: This receipt proves that the official Nashville Entrepreneur Center contact replied to the bounded deadline query with a July 17 close time. It does not prove a portal application was completed, submitted, accepted, reviewed, extended, funded, selected, validated, or awarded. The operational timezone is an explicit inference, not wording contained in the reply.
+- Record SHA-256: `a8b869c9c3347e79c7f3edf808feabbea7092a165be5db9bd1a6bf79ae7ff6af`
 
 ### Launch Tennessee 3686 Pitch Competition
 
@@ -91,16 +91,16 @@ The bounded Nashville EC deadline-support query and FHWA response-lead acknowled
 ### LvlUp Ventures / Power of the Pitch Week
 
 - Lane: `lvlup_optional_paid_event`
-- State: `OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND`
-- Decision: `DO_NOT_SPEND_OR_SEND_STALE_DRAFT`
-- Response channel: `NONE`
+- State: `WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED`
+- Decision: `MONITOR_INDEPENDENT_REVIEW_NO_DUPLICATE`
+- Response channel: `EMAIL`
 - Response ready: `false`
 - Send now: `false`
-- Action gate: No payment, sponsor purchase, application submission, valuation disclosure, or reuse of the July 3 draft without a fresh claim review and explicit founder approval.
-- Next action: Take no action unless LvlUp provides written non-pay-to-play selection terms or a clearly relevant no-fee application route; the current LaunchTN package is the stronger reviewer-facing path.
-- Response artifact: `docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md`
-- Claim boundary: The July 3 LvlUp draft is historical preparation only. It does not prove selection, investor interest, funding, validation, a required payment, or permission to submit its stale technical and valuation statements.
-- Record SHA-256: `6da7427ac8034e28ad5334f64bb33a0f8382fcf4fdca8a5c20fbf45148da165b`
+- Action gate: Reply only if LvlUp's Investment Committee requests additional information. No sponsor purchase, unsolicited duplicate packet, valuation disclosure, or reuse of the July 3 draft without a fresh claim review and explicit founder approval.
+- Next action: Monitor the existing thread. Reply only if LvlUp's Investment Committee requests additional information; do not purchase the optional sponsor track or send an unsolicited duplicate packet.
+- Response artifact: `grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json`
+- Claim boundary: This receipt proves only that LvlUp Ventures stated in writing that declining the sponsor-backed track would not affect the separate investment and accelerator review and that the application would continue through its standard investment process. It does not prove Investment Committee consideration, diligence, selection, investment interest, funding, accelerator admission, endorsement, validation, or an offer.
+- Record SHA-256: `39e225300492b8d807f8acdf76d68d675cacbcbaefd831f04d0ce0047bc9b4b1`
 
 ### SAM.gov account credential control
 
@@ -239,11 +239,13 @@ LumenCore
 - `nashville_private_workflow`: present=`true` bytes=`2256` sha256=`FAD93E7ED7C93A1406657D5D678A3673CFD73ED29FE4DE5205E223E948EA9D88` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md`
 - `nashville_deadline_preservation_receipt`: present=`true` bytes=`1801` sha256=`42FC996C7EBCDCE4027CCA5397347195D5B8FE74C90E75EFD114BD8265DC20B5` path=`grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json`
 - `nashville_deadline_response_control`: present=`true` bytes=`2610` sha256=`81225B12C7B8B7E614A0FD50D559BCE076E2142E0535E06EA15DEB01FE1A9C93` path=`grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md`
+- `nashville_official_deadline_confirmation`: present=`true` bytes=`2272` sha256=`DAC4B3120D9B4EC2A822198426939B89FE96BF7294C0CC251D1A299BB76B00E2` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json`
 - `nashville_private_fill_map`: present=`false` bytes=`0` sha256=`None` path=`grant_submissions/NASHVILLE_EC_FALL_2026/private/nashville_ec_portal_fill_map.private.json`
 - `launchtn_application_manifest`: present=`true` bytes=`22736` sha256=`16FE4E214430055532F6FB7F57453E0F47DAA648EE3E3B92B6050E17C98E3DC8` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json`
 - `launchtn_pitch_deck`: present=`true` bytes=`353970` sha256=`C607E94D8E072EC9D9F93DA0D8C372FD5592B01D2CA3B4F71C0A079417C18A69` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx`
 - `launchtn_financial_model`: present=`true` bytes=`16166` sha256=`9DA46F8AD94FC53EF561EE33DCFA6DF907897CAEADF6AFBD08FB113FC6887D94` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx`
 - `lvlup_historical_application_draft`: present=`true` bytes=`12152` sha256=`F75EBF8FD60A40968484D6AE147FB6D02848CA109AB277337C5BAE5085CBA796` path=`docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md`
+- `lvlup_independent_review_confirmation`: present=`true` bytes=`1908` sha256=`F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC` path=`grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json`
 - `sam_public_credential_rotation_control`: present=`true` bytes=`4544` sha256=`AAC20E903A5055E731DA65E5E5A82F08D5C34A7288AA6BED4D0ED78C4F0BE159` path=`grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json`
 - `email_action_reconciliation`: present=`true` bytes=`8249` sha256=`EB876ED9F82EA86927C0E6CE7E13EADF7762B20BC6E6FCB55F613B9B88203178` path=`grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json`
 - `fhwa_teaming_template`: present=`true` bytes=`2114` sha256=`6614F9D452565F9E5F54B3E70B45E93F112DD1293A8845E43489E339D34B0819` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md`

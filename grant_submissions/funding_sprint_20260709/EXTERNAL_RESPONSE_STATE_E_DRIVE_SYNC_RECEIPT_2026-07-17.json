@@ -1,0 +1,72 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "created_utc": "2026-07-17T20:15:32.840Z",
+  "destination_root": "E:/LumaProofVault/OUTREACH/EXTERNAL_RESPONSE_STATE_20260717",
+  "artifact_count": 10,
+  "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "private_founder_values_mirrored": false,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
+      "bytes": 41637,
+      "sha256": "14DF7E68FB8644F35FEDDA0EE8FC63C382BD72A18B80D39A55DBA35904AE991E",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_external_engagement_response_register.py",
+      "bytes": 18753,
+      "sha256": "DE88C55B61F07FCEF065686C842867A8A5C32E503717E12D11D457C0D8B8BBB1",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json",
+      "bytes": 1908,
+      "sha256": "F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.md",
+      "bytes": 1181,
+      "sha256": "EB8AEA087837B7F36A23D1694600BFADC932668C2AAA121D634BA8965ECA7E05",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
+      "bytes": 34615,
+      "sha256": "D2A7F11FA13560BD2E01F4F87A9D88FA929BD3ABF3E534CA27EEE0702FDD5E3F",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+      "bytes": 25225,
+      "sha256": "6C5768B13784DADC7B0AE1AFFC07E9E4AAAC2279E2522CD342A7A4FCD08062A3",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json",
+      "bytes": 2272,
+      "sha256": "DAC4B3120D9B4EC2A822198426939B89FE96BF7294C0CC251D1A299BB76B00E2",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.md",
+      "bytes": 1532,
+      "sha256": "70BEB109ADC54A01CF94DAED0CA1619D5DACD6415BAA37CE2A9EC3E046304D04",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/external_engagement_response_register_latest.json",
+      "bytes": 34615,
+      "sha256": "D2A7F11FA13560BD2E01F4F87A9D88FA929BD3ABF3E534CA27EEE0702FDD5E3F",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/external_engagement_response_register.json",
+      "bytes": 34615,
+      "sha256": "D2A7F11FA13560BD2E01F4F87A9D88FA929BD3ABF3E534CA27EEE0702FDD5E3F",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves only that ten bounded response-control, test, deadline-confirmation, and public-safe dashboard artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove portal submission, application acceptance, investor review activity beyond the cited sender statement, funding, selection, award, endorsement, external validation, or technical performance."
+}
