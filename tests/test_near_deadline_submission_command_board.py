@@ -143,26 +143,28 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     )
     assert fhwa["command"] == "NO_SOLO_SUBMIT_PARTNER_ONLY"
     assert fhwa["eligibility_state"] == (
-        "QUALIFIED_RESPONSE_LEAD_REFERRED_PARTNER_CONFIRMATION_PENDING"
+        "TEAM_SET_NO_ADDITIONAL_PARTNERS_ROUTE_CLOSED"
     )
     assert fhwa["partner_outreach_status"] == (
-        "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
+        "RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET"
     )
     assert fhwa["partner_outreach_delivery_failure_count"] == 1
     assert fhwa["partner_outreach_replacement_send_count"] == 1
     assert fhwa["partner_outreach_confirmed_delivery_count"] == 1
-    assert fhwa["partner_outreach_inbound_response_count"] == 1
+    assert fhwa["partner_outreach_inbound_response_count"] == 2
     assert fhwa["partner_outreach_referral_count"] == 1
     assert fhwa["partner_outreach_acknowledgment_send_count"] == 1
     assert fhwa["partner_outreach_fit_check_confirmed_count"] == 0
+    assert fhwa["partner_outreach_team_set_decline_count"] == 1
     assert fhwa["qualified_partner_evidence_present"] is False
-    assert fhwa["no_follow_up_before"] == "2026-07-21"
-    assert any("Do not reuse the rejected address" in row for row in fhwa["today_work"])
+    assert fhwa["no_follow_up_before"] is None
+    assert any("Close the Cambridge Systematics route" in row for row in fhwa["today_work"])
     assert any(
         path.endswith("FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md")
         for path in fhwa["package_files"]
     )
     assert "no solo bid" in payload["summary"]["best_contract_lane"].lower()
+    assert "route is closed" in payload["summary"]["best_contract_lane"].lower()
     rendered = module.render_markdown(payload)
     assert "INVITATION_CONTINGENT_PLANNING_TARGET" in rendered
 

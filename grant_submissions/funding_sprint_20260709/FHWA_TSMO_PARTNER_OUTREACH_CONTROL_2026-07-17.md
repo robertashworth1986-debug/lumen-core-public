@@ -1,6 +1,6 @@
 # FHWA TSMO Partner Outreach Control
 
-Status: `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING`
+Status: `RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET`
 Opportunity: `693JJ326R000012`
 Phase I deadline: `2026-08-03T09:00:00-04:00`
 
@@ -13,6 +13,7 @@ Active public professional role: Principal, VP Federal Market and Transportation
 - The official company biography for the rejected route documents deep FHWA TSMO and Office of Operations experience but its listed mailbox returned SMTP 550 Invalid Recipient.
 - The replacement message asks only for pursuit status, role fit, or routing and does not claim a partnership.
 - The active contact replied and referred the request to the subject matter expert leading this response; the referral does not itself confirm pursuit, teaming, or permission to cite experience.
+- The referred response lead later stated that the team was already set and would not add partners for this pursuit.
 
 ## Delivery Reconciliation
 
@@ -20,9 +21,10 @@ Active public professional role: Principal, VP Federal Market and Transportation
 - Delivery failures: `1`
 - Replacement sends: `1`
 - Confirmed deliveries: `1`
-- Responses: `1`
+- Responses: `2`
 - Qualified response-lead referrals: `1`
 - Fit checks confirmed: `0`
+- Team-set declines: `1`
 - Recipient domain: `camsys.com`
 
 ### Attempt 1
@@ -49,13 +51,23 @@ Active public professional role: Principal, VP Federal Market and Transportation
 - Message ID SHA-256: `4dc96cdefa25b4554bf730d002fd4e63f1420feb6fa50f3b9470f89adf1dbe25`
 - Attachments: `0`
 
-## Inbound Referral
+## Inbound Outcomes
+
+### Inbound 1
 
 - Status: `QUALIFIED_RESPONSE_LEAD_REFERRAL_RECEIVED`
 - Received UTC: `2026-07-17T14:15:28Z`
 - Sender role: Vice President, Federal Transportation Market and Policy
-- Referred lead role: Subject matter expert leading Cambridge Systematics' response
 - Message ID SHA-256: `747d1ddbd4c0d64994462b2d7183384eb17c8237c9ddaeca338fef9a6812eb09`
+- Partnership confirmed: `false`
+- Fit check confirmed: `false`
+
+### Inbound 2
+
+- Status: `TEAM_SET_NO_ADDITIONAL_PARTNERS`
+- Received UTC: `2026-07-17T16:28:25Z`
+- Sender role: Subject matter expert leading the response
+- Message ID SHA-256: `70cb86e922dd6af11bd790b9e4c22b1630f1634993ff3e5a4e11eccea5003d98`
 - Partnership confirmed: `false`
 - Fit check confirmed: `false`
 
@@ -81,11 +93,11 @@ Founder and Chief Scientist, LumenCore
 
 ## Response Gate
 
-- State: `QUALIFIED_RESPONSE_LEAD_REFERRED_ACKNOWLEDGMENT_SENT`
-- Bid posture: `NO_GO_AS_SOLO_PRIME_PARTNER_CONFIRMATION_REQUIRED`
-- No duplicate follow-up before: `2026-07-21`
-- Next action: Monitor the referred response lead for scheduling or a specific question and do not reuse the rejected address. If no response arrives by July 21, send at most one short scheduling follow-up. Before any teaming or proposal claim, verify written role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule.
+- State: `NO_GO_TEAM_SET_NO_ADDITIONAL_PARTNERS`
+- Bid posture: `NO_GO_NO_QUALIFIED_TEAMING_PARTNER`
+- No duplicate follow-up before: `None`
+- Next action: Close this Cambridge Systematics pursuit route without another reply or follow-up. Do not cite the firm, its experience, or a relationship. Reopen only if Cambridge Systematics initiates a future-opportunity conversation.
 
 ## Claim Boundary
 
-The Gmail records prove that the first route was rejected, the replacement message received a substantive reply, the request was referred to the subject matter expert leading this response, and one bounded acknowledgment was sent in that thread. The referral does not establish pursuit, a fit-check commitment, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.
+The Gmail records prove that the first route was rejected, the replacement message received a substantive reply, the request was referred to the subject matter expert leading this response, one bounded acknowledgment was sent, and the response lead then stated that its team was already set and would not add partners. This is a no-go for this teaming route; it does not establish a relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.

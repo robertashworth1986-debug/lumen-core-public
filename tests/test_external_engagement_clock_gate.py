@@ -55,7 +55,7 @@ def test_clock_gate_identifies_only_the_immediate_human_fact_lane():
     assert payload["summary"]["duplicate_send_block_count"] == sum(
         1 for row in register["records"] if row.get("do_not_duplicate_send")
     )
-    assert payload["summary"]["active_follow_up_hold_count"] == 4
+    assert payload["summary"]["active_follow_up_hold_count"] == 2
     assert payload["summary"]["autonomous_external_send_allowed"] is False
     assert payload["summary"]["autonomous_final_submit_allowed"] is False
     assert payload["summary"]["browser_navigation_performed"] is False
@@ -110,10 +110,16 @@ def test_clock_gate_blocks_duplicate_outreach_and_preserves_holds():
 
     for lane_id in (
         "epri_open_power_ai_mou",
-        "georgia_patents_pro_bono_intake",
         "lanl_vision_licensing_followup",
     ):
         assert controls[lane_id]["follow_up_hold_state"] == "FOLLOW_UP_HOLD_ACTIVE"
+
+    assert controls["georgia_patents_pro_bono_intake"]["follow_up_hold_state"] == (
+        "NO_HOLD_RECORDED"
+    )
+    assert controls["fhwa_tsmo_qualified_partner_outreach"]["follow_up_hold_state"] == (
+        "NO_HOLD_RECORDED"
+    )
 
     assert controls["nasa_data_center_rfi"]["deadline_state"] == "UNDER_24_HOURS"
     assert controls["nasa_data_center_rfi"]["priority"] == "P2_MONITOR_NO_DUPLICATE"

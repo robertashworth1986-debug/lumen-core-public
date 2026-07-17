@@ -1,46 +1,46 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T21:49:19.492358Z",
+  "created_utc": "2026-07-17T22:20:06.827134Z",
   "destination_root": "E:/LumaProofVault/OUTREACH/EXTERNAL_RESPONSE_STATE_20260717",
-  "artifact_count": 74,
+  "artifact_count": 78,
   "all_sha256_matched_after_copy": true,
   "browser_navigation_performed": false,
   "private_founder_values_mirrored": false,
   "artifacts": [
     {
       "source": "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
-      "bytes": 18132,
-      "sha256": "776DBBE17B506D4C02FD05B8267F068A13F15DA555DFF5F2D70003D368C21925",
+      "bytes": 23678,
+      "sha256": "407B09AB1E5DA26F7E9221B4F46904228B12D9F7753C50FEC8D97B863916A4CE",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_email_action_reconciliation.py",
-      "bytes": 5028,
-      "sha256": "4CF21B311A37A8D4822534211529B6952634BFD120D96FFA1B99960F22931744",
+      "bytes": 6194,
+      "sha256": "82DE9DA8769995CBBBD3B25F94897EB88C9E85BC8EEF4F4870A05A56374A5357",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
-      "bytes": 9681,
-      "sha256": "D7F7B1AEE07E3F689BB33AC0AC8ED4069C582CB16517242FE0528B8EAC322002",
+      "bytes": 12993,
+      "sha256": "A499DA75CD4C772AB21C4F0ADA79D78C9BBC06501CCF5DD7EB8B806258AA75B0",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
-      "bytes": 3415,
-      "sha256": "B39B5FCCB6779DD8ED891478011EE133154FBE17E3F73C160A07D6135146E16D",
+      "bytes": 4317,
+      "sha256": "2830C28CAACF5AA4CA83EFCC75AE5B5F6DBDBC9C52DDEBD187B8BAB82D06EB85",
       "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
-      "bytes": 41637,
-      "sha256": "14DF7E68FB8644F35FEDDA0EE8FC63C382BD72A18B80D39A55DBA35904AE991E",
+      "bytes": 43789,
+      "sha256": "A1C4001956731B472FE515DF5E479BA1A2B20CA9800B8905E0A3447DEE1FD12D",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
-      "bytes": 20235,
-      "sha256": "CDBC5CD85080715156C7837058FADE425E1F97CBCAAA9346FBB5B7C7EC3B39B9",
+      "bytes": 21228,
+      "sha256": "C0762B8385DC5AF5B3F679B61B59BA5BEE0402C9EFEE35A8833706936A50201F",
       "copy_sha256_matched": true
     },
     {
@@ -57,14 +57,14 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
-      "bytes": 34615,
-      "sha256": "63DF3DAD8AF80B433ED4DC3F6826C284BE39CA9DC4C40C2CDD571F4A788DC556",
+      "bytes": 36620,
+      "sha256": "265CEB9DE326BEE18AF64E54B4007B122B7EC7390B252630C92B2D5B78AF39C5",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-      "bytes": 25225,
-      "sha256": "DBCDE3CCBBCF1DAFA1B6800F6B78D98BA63A7F85ED1C6DA6C7F35B5D4009AB29",
+      "bytes": 26882,
+      "sha256": "1DD7BC333D3D1FC5A696E915256613ADEA02F0CE6AFF0AA2CC235AB6CE6E62CB",
       "copy_sha256_matched": true
     },
     {
@@ -81,44 +81,44 @@
     },
     {
       "source": "out/ops/external_engagement_response_register_latest.json",
-      "bytes": 34615,
-      "sha256": "63DF3DAD8AF80B433ED4DC3F6826C284BE39CA9DC4C40C2CDD571F4A788DC556",
+      "bytes": 36620,
+      "sha256": "265CEB9DE326BEE18AF64E54B4007B122B7EC7390B252630C92B2D5B78AF39C5",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/external_engagement_response_register.json",
-      "bytes": 34615,
-      "sha256": "63DF3DAD8AF80B433ED4DC3F6826C284BE39CA9DC4C40C2CDD571F4A788DC556",
+      "bytes": 36620,
+      "sha256": "265CEB9DE326BEE18AF64E54B4007B122B7EC7390B252630C92B2D5B78AF39C5",
       "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 105433,
-      "sha256": "AB9DACA0E9CD6BB55801C79C9E9450B205ABBAB580E430E71D2B83425A2289F1",
+      "bytes": 106113,
+      "sha256": "59E45F6C18DC996F2F4177BFE2EBAC70227A2AEE950BE1F0B7FD1B6D236E813D",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 23806,
-      "sha256": "0335279869DED678CEA405F27A7FE0A38F2E04FC63565C4BA62C4AF9A6E6A660",
+      "bytes": 23917,
+      "sha256": "62D0082001C953D45F4DBA8CB978CE02C7957EB8966DF8DECF17DAC41EB28A70",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
-      "bytes": 59781,
-      "sha256": "307C200BB79198A46833033FBC54A096C57D55EFD3D4D6FB7CC95DDD3FE5CCB5",
+      "bytes": 59776,
+      "sha256": "3E5A7F9E2A35961718B838A6BF5E126FB8A01ACD4D60BDF9E859E54D2DC873DC",
       "copy_sha256_matched": true
     },
     {
       "source": "out/ops/near_deadline_submission_command_board_latest.json",
-      "bytes": 79049,
-      "sha256": "393C671937B4445D806DF14E50F2BF7FF239E11D33581E8D17DEE6D3E0464554",
+      "bytes": 79115,
+      "sha256": "702669C6195E6D656BF7CA116C17717F8BA50D4198602F827028BF89462CD0F9",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/near_deadline_submission_command_board.json",
-      "bytes": 79049,
-      "sha256": "393C671937B4445D806DF14E50F2BF7FF239E11D33581E8D17DEE6D3E0464554",
+      "bytes": 79115,
+      "sha256": "702669C6195E6D656BF7CA116C17717F8BA50D4198602F827028BF89462CD0F9",
       "copy_sha256_matched": true
     },
     {
@@ -129,32 +129,32 @@
     },
     {
       "source": "tests/test_external_engagement_clock_gate.py",
-      "bytes": 9025,
-      "sha256": "1E743F7A48526FBDE383C68904B0DC2C39144ABE88A4780FD53203AEEADDE455",
+      "bytes": 9222,
+      "sha256": "A3332DFC7308AEB8C139F4C00969C6EDD386C6E51C8E12E894F405A4BD96EB0B",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.json",
-      "bytes": 25724,
-      "sha256": "4301740158137AD6221A2BCFFCE9BE77A21F52CF9D600DF44ECAF263BC6C5C48",
+      "bytes": 27468,
+      "sha256": "CD19B8F8EBF4F3F4800C9F39851FE66A5B1B856154491EF478B7834C219132DA",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
-      "bytes": 20979,
-      "sha256": "23A7C7E0EF9F77A4917652D4781696F387D502530CBB252807F1B52680B7B6FE",
+      "bytes": 22436,
+      "sha256": "8C110A429D210A817D212019FFF85332D014C570C5B9BAD70D50016245C0E100",
       "copy_sha256_matched": true
     },
     {
       "source": "out/ops/external_engagement_clock_gate_latest.json",
-      "bytes": 25724,
-      "sha256": "4301740158137AD6221A2BCFFCE9BE77A21F52CF9D600DF44ECAF263BC6C5C48",
+      "bytes": 27468,
+      "sha256": "CD19B8F8EBF4F3F4800C9F39851FE66A5B1B856154491EF478B7834C219132DA",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/external_engagement_clock_gate.json",
-      "bytes": 25724,
-      "sha256": "4301740158137AD6221A2BCFFCE9BE77A21F52CF9D600DF44ECAF263BC6C5C48",
+      "bytes": 27468,
+      "sha256": "CD19B8F8EBF4F3F4800C9F39851FE66A5B1B856154491EF478B7834C219132DA",
       "copy_sha256_matched": true
     },
     {
@@ -183,8 +183,8 @@
     },
     {
       "source": "code/ops/BUILD_EXTERNAL_RESPONSE_STATE_E_DRIVE_SYNC_RECEIPT.py",
-      "bytes": 8019,
-      "sha256": "FC75D60426D4DA4DE555CD90E219BB5CBA27D46959ABD517FAB11F9806B9394B",
+      "bytes": 8357,
+      "sha256": "BAC871725EAD7D0E0C83033F4704431A5ABE00A6F7D24F09F518BAE05BC176C5",
       "copy_sha256_matched": true
     },
     {
@@ -450,7 +450,31 @@
       "bytes": 13611,
       "sha256": "836D17D5A3CC8C695D9959C23C515C94E788A5411210CBD1AA13B83FBB08FF33",
       "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT.py",
+      "bytes": 7281,
+      "sha256": "2132F102B02D4DDE74D5491B1F42B72C930E3FF9B335B738E5397B6943176340",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_darpa_sn_26_97_public_submission_receipt.py",
+      "bytes": 1966,
+      "sha256": "EDBF4CE1DDAC6B0567AF5A0C84C8C52D783CF37ED7E0CEA1A7DDB42B42190A48",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json",
+      "bytes": 2834,
+      "sha256": "89B64A1A282AB72F0738E068952A14A82E38F5AEC4A78C1B7D2B4F4930410CB4",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.md",
+      "bytes": 1048,
+      "sha256": "D4EDECB7C79A33572AA66367EEF796F7E4E22D48A6D84CA3764C9693F0B52112",
+      "copy_sha256_matched": true
     }
   ],
-  "claim_boundary": "This receipt proves only that 74 bounded response-control, deadline, reviewer-pipeline, test, hardware-concept, MissionWeave action-gate, and public-safe dashboard artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove portal submission, application acceptance, investor activity beyond cited written evidence, funding, selection, award, endorsement, external validation, technical performance, hardware feasibility, safety certification, or commercial readiness."
+  "claim_boundary": "This receipt proves only that 78 bounded response-control, deadline, reviewer-pipeline, test, hardware-concept, MissionWeave action-gate, and public-safe dashboard artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove portal submission, application acceptance, investor activity beyond cited written evidence, funding, selection, award, endorsement, external validation, technical performance, hardware feasibility, safety certification, or commercial readiness."
 }

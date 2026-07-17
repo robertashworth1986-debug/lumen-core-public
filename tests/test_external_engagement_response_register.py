@@ -42,10 +42,10 @@ def test_register_routes_current_actions_without_duplicate_sends():
     records = {row["lane_id"]: row for row in payload["records"]}
 
     assert payload["schema"] == "lumencore.external_engagement_response_register.v1"
-    assert payload["summary"]["record_count"] == 12
+    assert payload["summary"]["record_count"] == 13
     assert payload["summary"]["immediate_human_action_count"] == 2
-    assert payload["summary"]["monitor_only_count"] == 9
-    assert payload["summary"]["do_not_duplicate_send_count"] == 11
+    assert payload["summary"]["monitor_only_count"] == 8
+    assert payload["summary"]["do_not_duplicate_send_count"] == 12
     assert payload["summary"]["email_action_reconciliation_status"] == (
         "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
     )
@@ -118,9 +118,12 @@ def test_register_routes_current_actions_without_duplicate_sends():
         "2026-07-20"
     )
     assert records["georgia_patents_pro_bono_intake"]["state"] == (
-        "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING"
+        "SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION"
     )
-    assert records["georgia_patents_pro_bono_intake"]["no_send_before"] == "2026-07-24"
+    assert records["georgia_patents_pro_bono_intake"]["decision"] == (
+        "CLOSE_SERVICE_SCOPE_NO_GO_NO_DUPLICATE"
+    )
+    assert records["georgia_patents_pro_bono_intake"]["no_send_before"] is None
     assert records["georgia_patents_pro_bono_intake"]["do_not_duplicate_send"] is True
     assert records["georgia_patents_pro_bono_intake"]["required_docket_role_count"] == 6
     assert records["georgia_patents_pro_bono_intake"]["captured_required_docket_role_count"] == 0
@@ -162,23 +165,34 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert "Send nothing further" in records["terry_vynetic_followup"][
         "next_action"
     ]
+    darpa = records["darpa_sn_26_97_low_resource_computing_rfi"]
+    assert darpa["state"] == "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+    assert darpa["decision"] == "MONITOR_FORMAL_PACKAGE_NO_DUPLICATE"
+    assert darpa["attachment_count"] == 2
+    assert darpa["timely_submission_claimed"] is False
+    assert darpa["do_not_duplicate_send"] is True
+    assert payload["source_artifacts"]["darpa_sn_26_97_public_submission_receipt"][
+        "present"
+    ] is True
     fhwa = records["fhwa_tsmo_qualified_partner_outreach"]
     assert fhwa["state"] == (
-        "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
+        "RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET"
     )
-    assert fhwa["decision"] == "MONITOR_REFERRED_RESPONSE_LEAD_NO_DUPLICATE"
+    assert fhwa["decision"] == "CLOSE_NO_GO_TEAM_SET_NO_DUPLICATE"
     assert fhwa["qualified_partner_evidence_present"] is False
     assert fhwa["delivery_failure_count"] == 1
     assert fhwa["replacement_send_count"] == 1
     assert fhwa["threaded_acknowledgment_send_count"] == 1
     assert fhwa["confirmed_delivery_count"] == 1
-    assert fhwa["inbound_response_count"] == 1
+    assert fhwa["inbound_response_count"] == 2
     assert fhwa["qualified_response_lead_referral_count"] == 1
     assert fhwa["fit_check_confirmed_count"] == 0
-    assert fhwa["active_route_status"] == (
+    assert fhwa["team_set_decline_count"] == 1
+    assert fhwa["last_outbound_status"] == (
         "THREADED_REFERRAL_ACKNOWLEDGMENT_SENT_FIT_CHECK_PENDING"
     )
-    assert fhwa["no_send_before"] == "2026-07-21"
+    assert fhwa["active_route_status"] == "NO_GO_TEAM_SET_NO_ADDITIONAL_PARTNERS"
+    assert fhwa["no_send_before"] is None
     assert fhwa["send_now"] is False
     assert fhwa["do_not_duplicate_send"] is True
     assert len(fhwa["message_id_sha256"]) == 64
@@ -277,6 +291,7 @@ def test_current_response_state_mirror_matches_sources_and_e_drive():
     mirrored_sources = {artifact["source"] for artifact in receipt["artifacts"]}
     assert {
         "code/ops/BUILD_EXTERNAL_RESPONSE_STATE_E_DRIVE_SYNC_RECEIPT.py",
+        "code/ops/BUILD_DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT.py",
         "code/ops/BUILD_TRACTION_OPPORTUNITY_INTAKE_LEDGER.py",
         "code/ops/BUILD_TRACTION_FOLLOWUP_PACKET.py",
         "code/ops/BUILD_EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET.py",
@@ -284,6 +299,8 @@ def test_current_response_state_mirror_matches_sources_and_e_drive():
         "code/ops/BUILD_AGENCY_SUBMISSION_ASSEMBLY_GATE.py",
         "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.json",
         "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.png",
+        "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json",
+        "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.md",
         "out/ops/traction_opportunity_intake_ledger_latest.json",
         "out/ops/traction_followup_packet_latest.json",
         "out/ops/evtit_technical_sprint_scope_packet_latest.json",

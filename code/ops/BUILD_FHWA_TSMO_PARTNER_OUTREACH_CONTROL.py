@@ -92,6 +92,10 @@ REFERRAL_ACK_MESSAGE_ID_SHA256 = (
 REFERRAL_ACK_BODY_SHA256 = (
     "9e704e831cb33f2013cad0b880a1c48539184bc6e1344ef48533b9c6b799ec84"
 )
+TEAM_SET_RESPONSE_RECEIVED_UTC = "2026-07-17T16:28:25Z"
+TEAM_SET_RESPONSE_MESSAGE_ID_SHA256 = (
+    "70cb86e922dd6af11bd790b9e4c22b1630f1634993ff3e5a4e11eccea5003d98"
+)
 
 
 def sha256_text(value: str) -> str:
@@ -100,9 +104,9 @@ def sha256_text(value: str) -> str:
 
 def build_payload() -> dict[str, Any]:
     return {
-        "schema": "lumencore.fhwa_tsmo_partner_outreach_control.v2",
+        "schema": "lumencore.fhwa_tsmo_partner_outreach_control.v3",
         "as_of_date": "2026-07-17",
-        "status": "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING",
+        "status": "RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET",
         "opportunity": {
             "notice_id": "693JJ326R000012",
             "title": "Transportation Systems Management and Operations Data Initiative",
@@ -131,6 +135,7 @@ def build_payload() -> dict[str, Any]:
                 "The official company biography for the rejected route documents deep FHWA TSMO and Office of Operations experience but its listed mailbox returned SMTP 550 Invalid Recipient.",
                 "The replacement message asks only for pursuit status, role fit, or routing and does not claim a partnership.",
                 "The active contact replied and referred the request to the subject matter expert leading this response; the referral does not itself confirm pursuit, teaming, or permission to cite experience.",
+                "The referred response lead later stated that the team was already set and would not add partners for this pursuit.",
             ],
             "official_company_sources": [
                 "https://camsys.com/trb",
@@ -219,7 +224,21 @@ def build_payload() -> dict[str, Any]:
                 "partnership_confirmed": False,
                 "permission_to_cite_experience_confirmed": False,
                 "fit_check_confirmed": False,
-            }
+            },
+            {
+                "event_index": 2,
+                "status": "TEAM_SET_NO_ADDITIONAL_PARTNERS",
+                "received_utc": TEAM_SET_RESPONSE_RECEIVED_UTC,
+                "message_id_sha256": TEAM_SET_RESPONSE_MESSAGE_ID_SHA256,
+                "sender_role": "Subject matter expert leading the response",
+                "attachment_count": 0,
+                "pursuit_confirmed": True,
+                "partnership_confirmed": False,
+                "permission_to_cite_experience_confirmed": False,
+                "fit_check_confirmed": False,
+                "additional_partner_slot_available": False,
+                "future_opportunity_recontact_invited": True,
+            },
         ],
         "delivery_reconciliation": {
             "attempt_count": 3,
@@ -227,41 +246,42 @@ def build_payload() -> dict[str, Any]:
             "replacement_send_count": 1,
             "threaded_acknowledgment_send_count": 1,
             "confirmed_delivery_count": 1,
-            "response_count": 1,
+            "response_count": 2,
             "qualified_response_lead_referral_count": 1,
             "fit_check_confirmed_count": 0,
+            "team_set_decline_count": 1,
             "active_attempt_index": 3,
             "stale_route_reuse_allowed": False,
         },
         "response_control": {
-            "state": "QUALIFIED_RESPONSE_LEAD_REFERRED_ACKNOWLEDGMENT_SENT",
+            "state": "NO_GO_TEAM_SET_NO_ADDITIONAL_PARTNERS",
             "qualified_partner_evidence_present": False,
             "qualified_response_lead_referral_present": True,
+            "response_lead_final_response_received": True,
             "fit_check_confirmed": False,
-            "bid_posture": "NO_GO_AS_SOLO_PRIME_PARTNER_CONFIRMATION_REQUIRED",
+            "bid_posture": "NO_GO_NO_QUALIFIED_TEAMING_PARTNER",
             "send_now": False,
             "do_not_duplicate_send": True,
-            "no_follow_up_before": "2026-07-21",
+            "no_follow_up_before": None,
             "next_action": (
-                "Monitor the referred response lead for scheduling or a specific question and "
-                "do not reuse the rejected address. If no response arrives by July 21, send at "
-                "most one short scheduling follow-up. Before any teaming or proposal claim, "
-                "verify written role, documentable corporate experience, conflicts, references, "
-                "facilities, data rights, and schedule."
+                "Close this Cambridge Systematics pursuit route without another reply or "
+                "follow-up. Do not cite the firm, its experience, or a relationship. Reopen only "
+                "if Cambridge Systematics initiates a future-opportunity conversation."
             ),
         },
         "response_templates": {
             "artifact": RESPONSE_OUT.resolve().relative_to(ROOT.resolve()).as_posix(),
-            "branch_count": 7,
+            "branch_count": 5,
             "autonomous_send_allowed": False,
         },
         "claim_boundary": (
             "The Gmail records prove that the first route was rejected, the replacement message "
             "received a substantive reply, the request was referred to the subject matter expert "
-            "leading this response, and one bounded acknowledgment was sent in that thread. The "
-            "referral does not establish pursuit, a fit-check commitment, a teaming relationship, "
-            "permission to cite corporate experience, independent validation, proposal compliance, "
-            "submission, award, or funding."
+            "leading this response, one bounded acknowledgment was sent, and the response lead "
+            "then stated that its team was already set and would not add partners. This is a no-go "
+            "for this teaming route; it does not establish a relationship, permission to cite "
+            "corporate experience, independent validation, proposal compliance, submission, award, "
+            "or funding."
         ),
     }
 
@@ -301,6 +321,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Responses: `{delivery['response_count']}`",
             f"- Qualified response-lead referrals: `{delivery['qualified_response_lead_referral_count']}`",
             f"- Fit checks confirmed: `{delivery['fit_check_confirmed_count']}`",
+            f"- Team-set declines: `{delivery['team_set_decline_count']}`",
             f"- Recipient domain: `{target['recipient_domain']}`",
             "",
         ]
@@ -318,18 +339,23 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 "",
             ]
         )
+    lines.extend(["## Inbound Outcomes", ""])
+    for inbound in payload["inbound_history"]:
+        lines.extend(
+            [
+                f"### Inbound {inbound['event_index']}",
+                "",
+                f"- Status: `{inbound['status']}`",
+                f"- Received UTC: `{inbound['received_utc']}`",
+                f"- Sender role: {inbound['sender_role']}",
+                f"- Message ID SHA-256: `{inbound['message_id_sha256']}`",
+                f"- Partnership confirmed: `{str(inbound['partnership_confirmed']).lower()}`",
+                f"- Fit check confirmed: `{str(inbound['fit_check_confirmed']).lower()}`",
+                "",
+            ]
+        )
     lines.extend(
         [
-            "## Inbound Referral",
-            "",
-            f"- Status: `{payload['inbound_history'][0]['status']}`",
-            f"- Received UTC: `{payload['inbound_history'][0]['received_utc']}`",
-            f"- Sender role: {payload['inbound_history'][0]['sender_role']}",
-            f"- Referred lead role: {payload['inbound_history'][0]['referred_lead_role']}",
-            f"- Message ID SHA-256: `{payload['inbound_history'][0]['message_id_sha256']}`",
-            f"- Partnership confirmed: `{str(payload['inbound_history'][0]['partnership_confirmed']).lower()}`",
-            f"- Fit check confirmed: `{str(payload['inbound_history'][0]['fit_check_confirmed']).lower()}`",
-            "",
             "## Active Threaded Message",
             "",
             f"Subject: {active['subject']}",
@@ -354,7 +380,6 @@ def render_markdown(payload: dict[str, Any]) -> str:
 
 def render_response_templates(payload: dict[str, Any]) -> str:
     deadline = payload["opportunity"]["phase_i_deadline"]
-    no_follow_up_before = payload["response_control"]["no_follow_up_before"]
     return f"""# FHWA TSMO Partner Response Control - 2026-07-17
 
 Opportunity: `693JJ326R000012`
@@ -373,10 +398,6 @@ Thank you for confirming the right lane. A 20-30 minute fit check would be helpf
 
 Thank you for the referral. Reply once in the existing thread, identify the referral accurately, and keep the request limited to pursuit, role fit, corporate-experience boundaries, conflicts, data rights, and schedule. Do not describe Cambridge Systematics as a partner without written agreement.
 
-## Referred Lead Fit Check Pending
-
-The referral acknowledgment was sent on `{REFERRAL_ACK_SENT_UTC}`. Monitor for a scheduling response or a specific question. Do not send a new capability deck, NDA, pricing, customer information, or patent-sensitive material unless the response lead asks for a bounded item and its disclosure gate passes.
-
 ## More Information Requested
 
 Thank you. I can provide a short, nonconfidential capability note limited to data-quality controls, chronological baseline-locked benchmarking, uncertainty and abstention, reproducible evidence manifests, and API-based prototype evaluation. Before sending an attachment, I will verify its current hash, public-safe status, and relevance to the specific question. It will not claim FHWA deployment, agency validation, customer savings, or a teaming relationship.
@@ -389,24 +410,10 @@ Thank you for the clear response. I will close this outreach route and will not 
 
 Thank you. I can first provide a public, nonconfidential overview. Any NDA, teaming agreement, proprietary exchange, data-rights term, or patent-sensitive disclosure must be reviewed and approved before signature or transmission. I will not send controlled or confidential material in this email thread.
 
-## One Follow-Up If No Response
-
-Do not send before: `{no_follow_up_before}`.
-
-Subject: `Follow-up: FHWA TSMO Data Initiative 693JJ326R000012`
-
-Hello,
-
-I am following up once on the FHWA TSMO Data Initiative fit-check request below. If Cambridge Systematics is pursuing the opportunity, I would appreciate a brief discussion with the response lead. If the team does not see a fit, a short decline is enough and I will close the route. I am not representing that a teaming relationship exists.
-
-Best regards,
-Robert Ashworth
-Founder and Chief Scientist, LumenCore
-
 ## Stop Conditions
 
 - Do not reuse the rejected address.
-- Do not send more than one scheduling follow-up after the referral acknowledgment without a new substantive inbound reply.
+- The current team-set response closes this route; do not send another acknowledgment or scheduling follow-up.
 - Do not attach confidential, controlled, patent-sensitive, customer, or unverified performance material.
 - Do not accept or sign an NDA, teaming agreement, data-rights term, pricing term, or exclusivity term through this template.
 - Do not claim delivery, receipt, pursuit, partnership, permission to cite experience, submission, award, or validation without written evidence.

@@ -5,38 +5,39 @@ The Nashville EC application is the only immediate human-fact action. An officia
 ## Gate Summary
 
 - Status: `HUMAN_ACTION_DUE_NO_AUTONOMOUS_SEND`
-- As of UTC: `2026-07-17T20:35:18.217756+00:00`
-- As of local: `2026-07-17T15:35:18.217756-05:00`
-- Lanes: `12`
-- Verified record hashes: `12`
+- As of UTC: `2026-07-17T22:17:44.734024+00:00`
+- As of local: `2026-07-17T17:17:44.734024-05:00`
+- Lanes: `13`
+- Verified record hashes: `13`
 - All record hashes valid: `true`
 - Source register hash valid: `true`
 - Nashville live receipt hash valid: `true`
 - Nashville official deadline confirmation verified: `true`
 - Nashville official deadline sentence hash valid: `true`
 - Nashville official live source verified: `false`
-- Nashville live receipt age hours: `9.95`
+- Nashville live receipt age hours: `11.66`
 - Immediate human actions: `1`
-- Date-only deadlines: `1`
-- Active follow-up holds: `4`
-- Duplicate-send blocks: `11`
+- Date-only deadlines: `2`
+- Active follow-up holds: `2`
+- Duplicate-send blocks: `12`
 - Autonomous external send: `false`
 - Autonomous final submit: `false`
 - Session-browser navigation performed: `false`
-- Gate SHA-256: `2e09ebf23a16f01431012f2162dafde42e72604d6a78538e44b823ae6ea9dbc4`
+- Gate SHA-256: `24b33c6af4fcabcd960f73b65d55254f52470d64257332f8eb3d9ac480944df3`
 
 ## Clocked Queue
 
 | Priority | Organization | Deadline state | Follow-up state | Send control |
 |---|---|---|---|---|
 | `P0_HUMAN_FACTS_NOW` | Nashville Entrepreneur Center | `UNDER_24_HOURS` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
-| `P2_MONITOR_NO_DUPLICATE` | Cambridge Systematics | `FUTURE_EXACT_DEADLINE` | `FOLLOW_UP_HOLD_ACTIVE` | `BLOCKED_DO_NOT_DUPLICATE` |
+| `P2_MONITOR_NO_DUPLICATE` | Cambridge Systematics | `FUTURE_EXACT_DEADLINE` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
 | `P2_MONITOR_NO_DUPLICATE` | Centers for Disease Control and Prevention | `FUTURE_EXACT_DEADLINE` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
+| `P2_MONITOR_NO_DUPLICATE` | DARPA Multi X Office | `DUE_TODAY_TIME_UNVERIFIED_SUBMIT_EARLY` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
 | `P2_MONITOR_NO_DUPLICATE` | EPRI Open Power AI Consortium | `NO_DEADLINE_RECORDED` | `FOLLOW_UP_HOLD_ACTIVE` | `BLOCKED_DO_NOT_DUPLICATE` |
-| `P2_MONITOR_NO_DUPLICATE` | Georgia PATENTS | `NO_DEADLINE_RECORDED` | `FOLLOW_UP_HOLD_ACTIVE` | `BLOCKED_DO_NOT_DUPLICATE` |
+| `P2_MONITOR_NO_DUPLICATE` | Georgia PATENTS | `NO_DEADLINE_RECORDED` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
 | `P2_MONITOR_NO_DUPLICATE` | Los Alamos National Laboratory | `NO_DEADLINE_RECORDED` | `FOLLOW_UP_HOLD_ACTIVE` | `BLOCKED_DO_NOT_DUPLICATE` |
 | `P2_MONITOR_NO_DUPLICATE` | LvlUp Ventures / Power of the Pitch Week | `NO_DEADLINE_RECORDED` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
-| `P2_MONITOR_NO_DUPLICATE` | NASA | `UNDER_24_HOURS` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
+| `P2_MONITOR_NO_DUPLICATE` | NASA | `PAST_EXACT_DEADLINE` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
 | `P2_MONITOR_NO_DUPLICATE` | SAM.gov account credential control | `PAST_DATE_TIME_UNVERIFIED` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
 | `P2_MONITOR_NO_DUPLICATE` | Terry Anderton / Vynetic | `NO_DEADLINE_RECORDED` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
 | `P2_MONITOR_NO_DUPLICATE` | U.S. Army | `NO_DEADLINE_RECORDED` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
@@ -59,31 +60,31 @@ The Nashville EC application is the only immediate human-fact action. An officia
 - Next action: Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, and complete the reviewed portal flow well before the confirmed close. Do not resend the deadline query or treat it as an application; review the complete preview plus any terms or fee before action-time approval.
 - Response artifact: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json`
 - Claim boundary: This receipt proves that the official Nashville Entrepreneur Center contact replied to the bounded deadline query with a July 17 close time. It does not prove a portal application was completed, submitted, accepted, reviewed, extended, funded, selected, validated, or awarded. The operational timezone is an explicit inference, not wording contained in the reply.
-- Control SHA-256: `e8ef9b5ce5285ae7465499e4d4a737b4a0137f2d304be188c4a08f0d8ab3c3d9`
+- Control SHA-256: `708cbb2dce720b04813d53ec7308e4d6df3a747776437e7311f3eb1259491351`
 - Official live source: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json`
 - Official live source gate: `REVERIFY_REQUIRED`
 - Official open signals verified: `true`
 - Official live source fresh: `false`
-- Official live source age hours: `9.95`
+- Official live source age hours: `11.66`
 
 ### Cambridge Systematics
 
 - Lane: `fhwa_tsmo_qualified_partner_outreach`
 - Priority: `P2_MONITOR_NO_DUPLICATE`
-- Source state: `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING`
-- Source decision: `MONITOR_REFERRED_RESPONSE_LEAD_NO_DUPLICATE`
+- Source state: `RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET`
+- Source decision: `CLOSE_NO_GO_TEAM_SET_NO_DUPLICATE`
 - Deadline precision: `TIMESTAMP_WITH_TIMEZONE`
 - Deadline state: `FUTURE_EXACT_DEADLINE`
-- Follow-up hold: `FOLLOW_UP_HOLD_ACTIVE`
+- Follow-up hold: `NO_HOLD_RECORDED`
 - Duplicate send: `BLOCKED_DO_NOT_DUPLICATE`
 - Record hash valid: `true`
 - Human fact gate open: `false`
 - Human action required now: `false`
-- Action gate: Do not claim a partner, cite corporate experience, or draft a joint submission unless a reply supplies written role and evidence permission.
-- Next action: Monitor the referred response lead for scheduling or a specific question and do not reuse the rejected address. If no response arrives by July 21, send at most one short scheduling follow-up. Before any teaming or proposal claim, verify written role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule.
+- Action gate: Close this route. Do not claim a partner, cite corporate experience, draft a joint submission, or send another follow-up.
+- Next action: Close this Cambridge Systematics pursuit route without another reply or follow-up. Do not cite the firm, its experience, or a relationship. Reopen only if Cambridge Systematics initiates a future-opportunity conversation.
 - Response artifact: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json`
-- Claim boundary: The Gmail records prove that the first route was rejected, the replacement message received a substantive reply, the request was referred to the subject matter expert leading this response, and one bounded acknowledgment was sent in that thread. The referral does not establish pursuit, a fit-check commitment, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.
-- Control SHA-256: `c4ec81cce6a1a137b5e754649d2cd3357e3564ba6ba97b11a1eaa5ede9daa562`
+- Claim boundary: The Gmail records prove that the first route was rejected, the replacement message received a substantive reply, the request was referred to the subject matter expert leading this response, one bounded acknowledgment was sent, and the response lead then stated that its team was already set and would not add partners. This is a no-go for this teaming route; it does not establish a relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.
+- Control SHA-256: `03bd39fc2b9e130e2b5817d357e84550672f6d61e4c794bd293aebd9777ba5c3`
 
 ### Centers for Disease Control and Prevention
 
@@ -102,7 +103,26 @@ The Nashville EC application is the only immediate human-fact action. An officia
 - Next action: Preserve the acknowledgment and monitor the existing thread; do not resend the response.
 - Response artifact: `grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - Claim boundary: The Gmail SENT record and CDC acknowledgment prove transmission and receipt only. They do not establish evaluation, selection, technical validation, endorsement, award, deployment, a pilot, or contract performance.
-- Control SHA-256: `e3ebb5bccc51a357519a8fdefd36475a8edb3955208ee2492516a62265a169fa`
+- Control SHA-256: `d7982d498f26db977522d0b48f5a7614ca1e694ac90affe6cb438123c17eba5e`
+
+### DARPA Multi X Office
+
+- Lane: `darpa_sn_26_97_low_resource_computing_rfi`
+- Priority: `P2_MONITOR_NO_DUPLICATE`
+- Source state: `FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING`
+- Source decision: `MONITOR_FORMAL_PACKAGE_NO_DUPLICATE`
+- Deadline precision: `DATE_ONLY_CLOSE_TIME_NOT_RECORDED`
+- Deadline state: `DUE_TODAY_TIME_UNVERIFIED_SUBMIT_EARLY`
+- Follow-up hold: `NO_HOLD_RECORDED`
+- Duplicate send: `BLOCKED_DO_NOT_DUPLICATE`
+- Record hash valid: `true`
+- Human fact gate open: `false`
+- Human action required now: `false`
+- Action gate: Reply only to a specific DARPA clarification, replacement request, or workshop invitation. Do not resend, expand claims, or disclose controlled information.
+- Next action: Monitor the existing agency thread for a receipt, clarification, or workshop invitation. Do not resend the package without a specific agency request.
+- Response artifact: `grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json`
+- Claim boundary: This receipt proves only that Gmail recorded a formal two-attachment package as sent after the agency's same-day guidance and preserves the attachment hashes. It does not prove delivery acceptance, deadline compliance, technical evaluation, independent validation, workshop selection, funding, award, or operational performance.
+- Control SHA-256: `2feb02cbc67de6b6029e81e1194eb3fb7c0c9125134d4a4f6b2e7d2a3cfce427`
 
 ### EPRI Open Power AI Consortium
 
@@ -127,20 +147,20 @@ The Nashville EC application is the only immediate human-fact action. An officia
 
 - Lane: `georgia_patents_pro_bono_intake`
 - Priority: `P2_MONITOR_NO_DUPLICATE`
-- Source state: `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING`
-- Source decision: `MONITOR_NO_DUPLICATE`
+- Source state: `SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION`
+- Source decision: `CLOSE_SERVICE_SCOPE_NO_GO_NO_DUPLICATE`
 - Deadline precision: `NONE`
 - Deadline state: `NO_DEADLINE_RECORDED`
-- Follow-up hold: `FOLLOW_UP_HOLD_ACTIVE`
+- Follow-up hold: `NO_HOLD_RECORDED`
 - Duplicate send: `BLOCKED_DO_NOT_DUPLICATE`
 - Record hash valid: `true`
 - Human fact gate open: `false`
 - Human action required now: `false`
-- Action gate: Reply only if Georgia PATENTS requests intake facts or directs the founder to a reviewed application channel; do not disclose unpublished application materials by ordinary email.
-- Next action: Monitor through July 23 without a duplicate email. In parallel, populate the six ignored Patent Center role folders and use USPTO Pro Se procedural support; send the held practitioner request only after recipient and secure-channel confirmation.
+- Action gate: Do not reply or submit the intake for this already-filed application. Continue only through USPTO Pro Se procedural support or a verified practitioner channel.
+- Next action: Close this pro bono route without a reply. Continue the private Patent Center docket capture, USPTO Pro Se procedural route, and a verified practitioner referral without emailing unpublished application material.
 - Response artifact: `grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - Claim boundary: This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice.
-- Control SHA-256: `f35b5ee9c310ec829e8e461f4ccc28629895e13e1f8df1bcb40fba2492ad8f9b`
+- Control SHA-256: `f4cb37d9dd1b525792aeaf66604068f3637a087757abda2e9259eccc8e92e5d7`
 
 ### Los Alamos National Laboratory
 
@@ -187,7 +207,7 @@ The Nashville EC application is the only immediate human-fact action. An officia
 - Source state: `SENT_VERIFIED_RESPONSE_PENDING`
 - Source decision: `MONITOR_NO_DUPLICATE`
 - Deadline precision: `TIMESTAMP_WITH_TIMEZONE`
-- Deadline state: `UNDER_24_HOURS`
+- Deadline state: `PAST_EXACT_DEADLINE`
 - Follow-up hold: `NO_HOLD_RECORDED`
 - Duplicate send: `BLOCKED_DO_NOT_DUPLICATE`
 - Record hash valid: `true`
@@ -197,7 +217,7 @@ The Nashville EC application is the only immediate human-fact action. An officia
 - Next action: Retain the SENT receipt and attachment hash; do not resend before the deadline.
 - Response artifact: `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json`
 - Claim boundary: Transmission does not establish agency acceptance, evaluation, validation, an award, or a contract.
-- Control SHA-256: `55c95bd0cca0ecbc98b5c528d19c676fe86605f3f3bbe2b5f1a4281ea0b244d3`
+- Control SHA-256: `b1cd6f61757e77c8786f3b609e360d1f80fa0a348699de949235f0a5a49e49e5`
 
 ### SAM.gov account credential control
 
@@ -273,14 +293,14 @@ The Nashville EC application is the only immediate human-fact action. An officia
 - Next action: Keep the portal staged. After founder facts and assumptions are confirmed, attach the hash-verified deck and financial model, inspect the final rendered application, and obtain action-time approval before submitting by August 13 at 11:59 PM CDT.
 - Response artifact: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json`
 - Claim boundary: This is an application-preparation artifact. It does not claim a paying customer, booked revenue, signed pilot, external or field validation, partnership, endorsement, award, realized savings, product-market fit, investment, competition selection, or permission to submit without a founder-reviewed final preview.
-- Control SHA-256: `490280cf2959472fb44321830a79b289ba8507133f09cf3e6b9da6833c5299d3`
+- Control SHA-256: `e2902521d3d050a6b7b6e51923516087d47eb6b26b81480b29cfcea106687d3a`
 
 ## Source Integrity
 
 - Path: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json`
-- Bytes: `34615`
-- File SHA-256: `63df3dad8af80b433ed4dc3f6826c284be39ca9dc4c40c2cdd571f4a788dc556`
-- Embedded register SHA-256: `4020be24c7df7cf0d5bdcc54111c98c0cdd0cd344be8e756babdffa63b3d529b`
+- Bytes: `36620`
+- File SHA-256: `265ceb9de326bee18af64e54b4007b122b7ec7390b252630c92b2d5b78af39c5`
+- Embedded register SHA-256: `bbce4544e0ba3a9c6873509213c2c1d93571994b59cc1613634ae74c30b72370`
 - Nashville live receipt path: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json`
 - Nashville live receipt bytes: `5108`
 - Nashville live receipt file SHA-256: `28436aafc9e0b8ea1149c81bb0ee57aa827e6a3bf321f2687bf0d124f298d8c9`

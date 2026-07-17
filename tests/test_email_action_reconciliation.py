@@ -29,10 +29,11 @@ def test_reconciliation_is_deterministic_and_no_send():
     module.validate_payload(actual)
     assert actual == expected
     assert actual["status"] == "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
-    assert actual["summary"]["lane_count"] == 12
+    assert actual["summary"]["lane_count"] == 15
     assert actual["summary"]["email_reply_required_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
-    assert actual["summary"]["duplicate_outbound_risk_count"] == 11
+    assert actual["summary"]["duplicate_outbound_risk_count"] == 14
+    assert actual["summary"]["human_account_action_count"] == 4
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert all(lane["send_now"] is False for lane in actual["lanes"])
 
@@ -52,24 +53,39 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert epri["no_send_before"] == "2026-07-23"
 
     fhwa = lanes["fhwa_tsmo_qualified_partner_outreach"]
-    assert fhwa["latest_event_type"] == (
-        "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED"
-    )
-    assert fhwa["latest_event_utc"] == "2026-07-17T14:41:54Z"
-    assert fhwa["state"] == (
-        "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
-    )
+    assert fhwa["latest_event_type"] == "RESPONSE_LEAD_TEAM_SET_DECLINE_RECEIVED"
+    assert fhwa["latest_event_utc"] == "2026-07-17T16:28:25Z"
+    assert fhwa["state"] == "RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET"
     assert fhwa["delivery_failure_count"] == 1
     assert fhwa["replacement_send_count"] == 1
     assert fhwa["confirmed_delivery_count"] == 1
-    assert fhwa["inbound_response_count"] == 1
+    assert fhwa["inbound_response_count"] == 2
     assert fhwa["qualified_response_lead_referral_count"] == 1
     assert fhwa["threaded_acknowledgment_send_count"] == 1
     assert fhwa["fit_check_confirmed_count"] == 0
+    assert fhwa["team_set_decline_count"] == 1
     assert fhwa["do_not_duplicate_send"] is True
-    assert fhwa["no_send_before"] == "2026-07-21"
+    assert fhwa["no_send_before"] is None
     assert fhwa["send_now"] is False
-    assert "Monitor the referred response lead" in fhwa["next_action"]
+    assert "Close this route" in fhwa["next_action"]
+
+    georgia = lanes["georgia_patents_pro_bono_intake"]
+    assert georgia["latest_event_type"] == "SERVICE_SCOPE_DECLINE_RECEIVED"
+    assert georgia["state"] == "SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION"
+    assert georgia["no_send_before"] is None
+
+    darpa = lanes["darpa_sn_26_97_low_resource_computing_rfi"]
+    assert darpa["state"] == "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+    assert darpa["attachment_count"] == 2
+    assert darpa["deadline_time_compliance_claimed"] is False
+
+    missionweave = lanes["missionweave_dsip_proposal"]
+    assert missionweave["deadline_utc"] == "2026-07-22T16:00:00Z"
+    assert missionweave["open_gate_count"] == 37
+
+    build_week = lanes["openai_build_week_prooflock"]
+    assert build_week["deadline_utc"] == "2026-07-22T00:00:00Z"
+    assert build_week["state"] == "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
 
     nashville = lanes["nashville_ec_takeoff_fall_2026"]
     assert nashville["latest_event_type"] == "OFFICIAL_DEADLINE_CONFIRMATION_RECEIVED"
@@ -100,6 +116,9 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     source_evidence = module.build_payload()["source_evidence"]
     assert source_evidence["nashville_official_deadline_confirmation"]["present"] is True
     assert source_evidence["lvlup_independent_review_confirmation"]["present"] is True
+    assert source_evidence["darpa_sn_26_97_public_submission_receipt"]["present"] is True
+    assert source_evidence["missionweave_dsip_action_gate"]["present"] is True
+    assert source_evidence["openai_build_week_readiness"]["present"] is True
     assert len(source_evidence["nashville_official_deadline_confirmation"]["sha256"]) == 64
     assert len(source_evidence["lvlup_independent_review_confirmation"]["sha256"]) == 64
 

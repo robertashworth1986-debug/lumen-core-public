@@ -2,7 +2,7 @@
 
 This is the action board for getting the closest credible grants and federal contract responses fully staged.
 
-Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action. Finish the July 17 Nashville EC TakeOff application, then stage the hash-verified MissionWeave DSIP package for its July 22 noon Eastern close. Keep NSF at the rolling Project Pitch gate, monitor the referred FHWA response lead after the bounded acknowledgment without claiming a fit check or partner, and keep DOJ/BOP partner-only.
+Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action. Finish the July 17 Nashville EC TakeOff application, then stage the hash-verified MissionWeave DSIP package for its July 22 noon Eastern close. Keep NSF at the rolling Project Pitch gate, close the declined Cambridge FHWA teaming route without another follow-up, and keep DOJ/BOP partner-only.
 
 ## Control Line
 
@@ -20,13 +20,13 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Closest deadline lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due The official Nashville Entrepreneur Center reply states that applications are open until 11:59 p.m. on July 17. The message does not name a timezone; America/Chicago is the explicit operational inference.; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Closest stage-ready lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due The official Nashville Entrepreneur Center reply states that applications are open until 11:59 p.m. on July 17. The message does not name a timezone; America/Chicago is the explicit operational inference.; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Best grants lane: DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. The hidden sectioned collector captures DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate. The current public action gate is 13/50, with unsupported portal and compliance facts still open. NSF 26-510 stays the next rolling Project Pitch route.
-- Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: the first listed contact route rejected delivery, the replacement route replied, and the request was referred to the subject matter expert leading this response. The fit check and partnership remain unconfirmed; no solo bid and no partner claim unless written role and corporate-experience evidence arrive.
+- Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative remains partner-only through 2026-08-03, but the Cambridge Systematics response lead confirmed its team is already set, so that outreach route is closed. No solo bid, no duplicate follow-up, and no partner claim; reopen only through a different qualified organization with written role and corporate-experience evidence.
 - Fastest low-friction lane: The Nashville EC TakeOff application is the nearest low-friction reviewer route. Its hidden-input gate is 0/15: six founder prompts produce 11 private portal answers, then preview, fee/terms, and action-time authorization remain human-gated. The verified support reply confirms the close time but does not replace portal submission.
 - Final submit without human: `false`
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `3b84a4c3ed7d4ab4d104ad269b88ff824cbc9bbee3b93df1858b25465a52208e`
+- Command board SHA-256: `a60db3c47de49a3bdc74e053a81d4c022cc9a9e1dbc99fc18b76c70766cf444c`
 
 ## Operational Controls
 
@@ -169,7 +169,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 
 - Command: `NO_SOLO_SUBMIT_PARTNER_ONLY`
 - Deadline date: `2026-08-03`
-- Eligibility: `QUALIFIED_RESPONSE_LEAD_REFERRED_PARTNER_CONFIRMATION_PENDING`
+- Eligibility: `TEAM_SET_NO_ADDITIONAL_PARTNERS_ROUTE_CLOSED`
 - Fit: `STRONG_TECHNICAL_FIT_MANDATORY_CORPORATE_EXPERIENCE_MISSING`
 - Official URL: https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view
 
@@ -441,15 +441,15 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Days to close from scan date: `17`
 - Deadline bucket: `thirty_day_sprint`
 - Command: `NO_SOLO_SUBMIT_PARTNER_ONLY`
-- Eligibility: `QUALIFIED_RESPONSE_LEAD_REFERRED_PARTNER_CONFIRMATION_PENDING`
+- Eligibility: `TEAM_SET_NO_ADDITIONAL_PARTNERS_ROUTE_CLOSED`
 - Fit: `STRONG_TECHNICAL_FIT_MANDATORY_CORPORATE_EXPERIENCE_MISSING`
 - Route: SAM.gov / official solicitation instructions
 - Official URL: https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view
-- Why now: LumenCore has a strong bounded technical fit, but the solicitation requires documented corporate TSMO data-processing experience that LumenCore cannot claim. The first official listed route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response. A referral is not a partner commitment.
+- Why now: LumenCore has a strong bounded technical fit, but the solicitation requires documented corporate TSMO data-processing experience that LumenCore cannot claim. The first official listed route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response. That response lead then confirmed that the team was already set and would not add partners, so this outreach route is closed.
 - Today work:
-  - Monitor the referred response lead for scheduling or a specific question.
-  - Do not reuse the rejected address or send a duplicate scheduling follow-up before July 21, and do not claim a partner.
-  - If a fit check is scheduled, verify role, references, conflicts, facilities, data rights, and permission to cite corporate experience.
+  - Close the Cambridge Systematics route without another reply or follow-up.
+  - Do not reuse the rejected address, claim a partner, or cite Cambridge Systematics experience.
+  - Reopen only if Cambridge Systematics initiates a future-opportunity discussion or a different qualified partner independently confirms interest.
 - Human gate:
   - A qualified organization confirms a role and documentable corporate experience in writing.
   - Robert approves any teaming terms, Phase I claims, and final submission preview.
@@ -463,7 +463,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `86ea6423326e553204f913bcad1708264f2d145d7b45bef390bafc99bd88ffcb`
+- Lane SHA-256: `36cc9eb3891a8f033e66e0daefab70151c9adb81f0332553cf8be4ab74f66275`
 
 ### 8. 26-510 - NSF Small Business Innovation Research / Small Business Technology Transfer Programs Phase I
 
@@ -804,9 +804,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - `launchtn_3686_application_manifest`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json` present=`true` sha256=`16fe4e214430055532f6fb7f57453e0f47daa648ee3e3b92b6050e17c98e3dc8`
 - `launchtn_3686_pitch_deck`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx` present=`true` sha256=`c607e94d8e072ec9d9f93da0d8c372fd5592b01d2ca3b4f71c0a079417c18a69`
 - `launchtn_3686_financial_model`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx` present=`true` sha256=`9da46f8ad94fc53ef561ee33dcfa6df907897caeadf6afbd08fb113fc6887d94`
-- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`63df3dad8af80b433ed4dc3f6826c284be39ca9dc4c40c2cdd571f4a788dc556`
-- `fhwa_partner_outreach_control`: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json` present=`true` sha256=`4437ebf6fc23025719911746c8c46bd929979d4678bb7c67eeff9644113b085e`
-- `fhwa_partner_response_control`: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md` present=`true` sha256=`b5650281c5a3a5eeb034d0927a3c4125fcb7fd9b163d82ecb4af5aa8e6b59c7c`
+- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`265ceb9de326bee18af64e54b4007b122b7ec7390b252630c92b2d5b78af39c5`
+- `fhwa_partner_outreach_control`: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json` present=`true` sha256=`39cbfe5f1c5db55c33d249adcfde1f04ae3983d69d1737f00a97403e168af364`
+- `fhwa_partner_response_control`: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md` present=`true` sha256=`a3de835ab830e37f6cf8cb3c8374f876150be8c48c185efe73344378558828cd`
 - `erdc_solution_brief_compliance_gate`: `grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json` present=`true` sha256=`dabaed4298b650855256e4054daf1be806f329846e1cd22cd01fd6f9d6f402cf`
 - `erdc_phase2_rom_gate`: `grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json` present=`true` sha256=`03f656866d63c1c74838ee36bef78eb5a8cf382fee2820d4afb2c324404b7574`
 - `erdc_phase2_rom_workflow`: `grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-17.md` present=`true` sha256=`002711f265d15b0e6435d401aac54c29ae831406279f339dbee165209ffd3888`

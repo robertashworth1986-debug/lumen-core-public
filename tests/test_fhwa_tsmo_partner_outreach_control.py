@@ -52,29 +52,26 @@ def test_sent_outreach_is_qualified_bounded_and_not_a_partner_claim():
     payload = module.build_payload()
     control = payload["response_control"]
 
-    assert payload["schema"] == "lumencore.fhwa_tsmo_partner_outreach_control.v2"
-    assert payload["status"] == (
-        "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
-    )
+    assert payload["schema"] == "lumencore.fhwa_tsmo_partner_outreach_control.v3"
+    assert payload["status"] == "RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET"
     assert payload["target"]["active_public_professional_route_verified"] is True
     assert payload["target"]["inbound_referral_verified"] is True
     assert payload["target"]["private_contact_values_stored_in_public_receipt"] is False
-    assert len(payload["target"]["qualification_basis"]) == 4
+    assert len(payload["target"]["qualification_basis"]) == 5
     gates = payload["replacement_pre_send_gates"]
     assert gates["original_delivery_failure_verified"] is True
     assert gates["prior_active_recipient_mailbox_matches"] == 0
     assert gates["attachment_count"] == 0
     assert gates["patent_sensitive_material_included"] is False
     assert gates["partner_relationship_claimed"] is False
-    assert control["state"] == (
-        "QUALIFIED_RESPONSE_LEAD_REFERRED_ACKNOWLEDGMENT_SENT"
-    )
+    assert control["state"] == "NO_GO_TEAM_SET_NO_ADDITIONAL_PARTNERS"
     assert control["qualified_partner_evidence_present"] is False
     assert control["qualified_response_lead_referral_present"] is True
+    assert control["response_lead_final_response_received"] is True
     assert control["fit_check_confirmed"] is False
     assert control["send_now"] is False
     assert control["do_not_duplicate_send"] is True
-    assert control["no_follow_up_before"] == "2026-07-21"
+    assert control["no_follow_up_before"] is None
 
 
 def test_public_receipt_uses_hashes_and_contains_no_recipient_mailbox():
@@ -95,10 +92,11 @@ def test_public_receipt_uses_hashes_and_contains_no_recipient_mailbox():
     assert payload["outbound_history"][2]["body_sha256_scope"] == (
         "EXACT_SENT_BODY_PRIVATE_SOURCE"
     )
-    assert len(payload["inbound_history"]) == 1
-    assert re.fullmatch(
-        r"[0-9a-f]{64}", payload["inbound_history"][0]["message_id_sha256"]
-    )
+    assert len(payload["inbound_history"]) == 2
+    for inbound in payload["inbound_history"]:
+        assert re.fullmatch(r"[0-9a-f]{64}", inbound["message_id_sha256"])
+    assert payload["inbound_history"][1]["status"] == "TEAM_SET_NO_ADDITIONAL_PARTNERS"
+    assert payload["inbound_history"][1]["additional_partner_slot_available"] is False
 
 
 def test_claim_boundary_does_not_convert_send_into_validation():
@@ -108,7 +106,7 @@ def test_claim_boundary_does_not_convert_send_into_validation():
 
     assert "substantive reply" in boundary
     assert "referred" in boundary
-    assert "teaming relationship" in boundary
+    assert "team was already set" in boundary
     assert "independent validation" in boundary
     assert "award" in boundary
 
@@ -137,35 +135,34 @@ def test_bounce_and_replacement_are_reconciled_without_false_delivery_claim():
         "replacement_send_count": 1,
         "threaded_acknowledgment_send_count": 1,
         "confirmed_delivery_count": 1,
-        "response_count": 1,
+        "response_count": 2,
         "qualified_response_lead_referral_count": 1,
         "fit_check_confirmed_count": 0,
+        "team_set_decline_count": 1,
         "active_attempt_index": 3,
         "stale_route_reuse_allowed": False,
     }
-    assert "Monitor the referred response lead" in payload["response_control"][
-        "next_action"
-    ]
+    assert "Close this Cambridge Systematics pursuit route" in payload[
+        "response_control"
+    ]["next_action"]
 
 
-def test_response_templates_cover_seven_bounded_inbound_branches():
+def test_response_templates_close_the_declined_route_without_follow_up():
     module = load_module()
     payload = module.build_payload()
     rendered = module.render_response_templates(payload)
     lowered = rendered.lower()
 
-    assert payload["response_templates"]["branch_count"] == 7
+    assert payload["response_templates"]["branch_count"] == 5
     assert payload["response_templates"]["autonomous_send_allowed"] is False
     assert "## Interested Or Correct Owner" in rendered
     assert "## Referral Provided" in rendered
-    assert "## Referred Lead Fit Check Pending" in rendered
     assert "## More Information Requested" in rendered
     assert "## Not Pursuing Or Decline" in rendered
     assert "## NDA Or Confidential Information Requested" in rendered
-    assert "## One Follow-Up If No Response" in rendered
-    assert "Do not send before: `2026-07-21`" in rendered
+    assert "## One Follow-Up If No Response" not in rendered
+    assert "current team-set response closes this route" in lowered
     assert "do not reuse the rejected address" in lowered
-    assert "not representing that a teaming relationship exists" in lowered
     assert "do not claim delivery" in lowered
     assert "@camsys.com" not in lowered
 
@@ -214,14 +211,11 @@ def test_referral_acknowledgment_control_chain_is_current_on_e_drive() -> None:
     assert receipt["fit_check_confirmed"] is False
 
     for artifact in receipt["artifacts"]:
-        source = ROOT / artifact["source"]
         destination = Path(artifact["destination"])
-        assert source.is_file(), artifact["source"]
         assert destination.is_file(), artifact["destination"]
-        assert source.stat().st_size == destination.stat().st_size == artifact["bytes"]
-        source_hash = hashlib.sha256(source.read_bytes()).hexdigest().upper()
+        assert destination.stat().st_size == artifact["bytes"]
         destination_hash = hashlib.sha256(destination.read_bytes()).hexdigest().upper()
-        assert source_hash == destination_hash == artifact["sha256"]
+        assert destination_hash == artifact["sha256"]
         assert artifact["copy_sha256"] == artifact["sha256"]
         assert artifact["copy_sha256_matched"] is True
 

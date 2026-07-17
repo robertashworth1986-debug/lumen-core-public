@@ -101,6 +101,9 @@ SAM_ROTATION_CONTROL = (
 EMAIL_ACTION_RECONCILIATION = (
     SPRINT_DIR / "EMAIL_ACTION_RECONCILIATION_2026-07-17.json"
 )
+DARPA_SN_26_97_RECEIPT = (
+    SPRINT_DIR / "DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json"
+)
 FHWA_TEAMING_TEMPLATE = (
     SPRINT_DIR / "FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md"
 )
@@ -245,6 +248,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     lvlup_review = read_json(LVLUP_REVIEW_CONFIRMATION)
     sam_rotation = read_json(SAM_ROTATION_CONTROL)
     email_reconciliation = read_json(EMAIL_ACTION_RECONCILIATION)
+    darpa_sn_26_97 = read_json(DARPA_SN_26_97_RECEIPT)
     fhwa_outreach = read_json(FHWA_PARTNER_OUTREACH)
 
     if nashville_resolution.get("status") != "SIX_FOUNDER_CONFIRMATIONS_REQUIRED":
@@ -278,10 +282,17 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     if email_reconciliation.get("schema") != "lumencore.email_action_reconciliation.v1":
         raise ValueError("Email action reconciliation is missing or stale")
     if (
+        darpa_sn_26_97.get("schema")
+        != "lumencore.darpa_sn_26_97_public_submission_receipt.v1"
+        or darpa_sn_26_97.get("status")
+        != "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+    ):
+        raise ValueError("DARPA-SN-26-97 public submission receipt is missing or stale")
+    if (
         fhwa_outreach.get("schema")
-        != "lumencore.fhwa_tsmo_partner_outreach_control.v2"
+        != "lumencore.fhwa_tsmo_partner_outreach_control.v3"
         or fhwa_outreach.get("status")
-        != "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
+        != "RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET"
     ):
         raise ValueError("FHWA partner outreach control is missing or stale")
     if email_reconciliation.get("status") != (
@@ -294,6 +305,8 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     if {
         "nashville_ec_takeoff_fall_2026",
         "epri_open_power_ai_mou",
+        "georgia_patents_pro_bono_intake",
+        "darpa_sn_26_97_low_resource_computing_rfi",
         "terry_vynetic_followup",
         "fhwa_tsmo_qualified_partner_outreach",
     } - reconciliation_lanes.keys():
@@ -309,9 +322,10 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         or fhwa_delivery["replacement_send_count"] != 1
         or fhwa_delivery["threaded_acknowledgment_send_count"] != 1
         or fhwa_delivery["confirmed_delivery_count"] != 1
-        or fhwa_delivery["response_count"] != 1
+        or fhwa_delivery["response_count"] != 2
         or fhwa_delivery["qualified_response_lead_referral_count"] != 1
         or fhwa_delivery["fit_check_confirmed_count"] != 0
+        or fhwa_delivery["team_set_decline_count"] != 1
         or fhwa_active_outbound["status"]
         != "THREADED_REFERRAL_ACKNOWLEDGMENT_SENT_FIT_CHECK_PENDING"
     ):
@@ -404,15 +418,17 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         {
             "lane_id": "georgia_patents_pro_bono_intake",
             "organization": "Georgia PATENTS",
-            "state": georgia_patents["acknowledgment"]["status"],
+            "state": reconciliation_lanes["georgia_patents_pro_bono_intake"][
+                "state"
+            ],
             "deadline": None,
-            "decision": "MONITOR_NO_DUPLICATE",
+            "decision": "CLOSE_SERVICE_SCOPE_NO_GO_NO_DUPLICATE",
             "response_channel": "EMAIL",
             "response_ready": False,
             "send_now": False,
             "do_not_duplicate_send": True,
-            "no_send_before": georgia_patents["acknowledgment"]["earliest_follow_up_date"],
-            "action_gate": "Reply only if Georgia PATENTS requests intake facts or directs the founder to a reviewed application channel; do not disclose unpublished application materials by ordinary email.",
+            "no_send_before": None,
+            "action_gate": "Do not reply or submit the intake for this already-filed application. Continue only through USPTO Pro Se procedural support or a verified practitioner channel.",
             "response_artifact": rel(GEORGIA_PATENTS_RECEIPT),
             "supporting_artifacts": [
                 rel(GEORGIA_PATENTS_TEMPLATE),
@@ -422,7 +438,9 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "required_docket_role_count": patent_control["public_evidence_summary"]["required_docket_role_count"],
             "captured_required_docket_role_count": patent_control["public_evidence_summary"]["captured_required_docket_role_count"],
             "docket_capture_complete": patent_control["public_evidence_summary"]["docket_capture_complete"],
-            "next_action": "Monitor through July 23 without a duplicate email. In parallel, populate the six ignored Patent Center role folders and use USPTO Pro Se procedural support; send the held practitioner request only after recipient and secure-channel confirmation.",
+            "next_action": reconciliation_lanes["georgia_patents_pro_bono_intake"][
+                "next_action"
+            ],
             "claim_boundary": georgia_patents["claim_boundary"],
         },
         {
@@ -531,11 +549,35 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             ),
         },
         {
+            "lane_id": "darpa_sn_26_97_low_resource_computing_rfi",
+            "organization": "DARPA Multi X Office",
+            "state": darpa_sn_26_97["status"],
+            "deadline": darpa_sn_26_97["opportunity"]["deadline_date"],
+            "decision": "MONITOR_FORMAL_PACKAGE_NO_DUPLICATE",
+            "response_channel": "EMAIL_REPLY_ONLY_IF_INBOUND",
+            "response_ready": False,
+            "send_now": False,
+            "do_not_duplicate_send": True,
+            "no_send_before": None,
+            "action_gate": (
+                "Reply only to a specific DARPA clarification, replacement request, or workshop "
+                "invitation. Do not resend, expand claims, or disclose controlled information."
+            ),
+            "response_artifact": rel(DARPA_SN_26_97_RECEIPT),
+            "attachment_count": len(darpa_sn_26_97["attachments"]),
+            "formal_package_sent_utc": darpa_sn_26_97[
+                "thread_reconciliation"
+            ]["formal_package_sent_utc"],
+            "timely_submission_claimed": False,
+            "next_action": darpa_sn_26_97["send_control"]["next_action"],
+            "claim_boundary": darpa_sn_26_97["claim_boundary"],
+        },
+        {
             "lane_id": "fhwa_tsmo_qualified_partner_outreach",
             "organization": fhwa_outreach["target"]["organization"],
             "state": fhwa_outreach["status"],
             "deadline": fhwa_outreach["opportunity"]["phase_i_deadline"],
-            "decision": "MONITOR_REFERRED_RESPONSE_LEAD_NO_DUPLICATE",
+            "decision": "CLOSE_NO_GO_TEAM_SET_NO_DUPLICATE",
             "response_channel": "EMAIL",
             "response_ready": False,
             "send_now": False,
@@ -544,8 +586,8 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
                 "no_follow_up_before"
             ],
             "action_gate": (
-                "Do not claim a partner, cite corporate experience, or draft a joint "
-                "submission unless a reply supplies written role and evidence permission."
+                "Close this route. Do not claim a partner, cite corporate experience, draft a "
+                "joint submission, or send another follow-up."
             ),
             "response_artifact": rel(FHWA_PARTNER_OUTREACH),
             "supporting_artifacts": [
@@ -567,7 +609,9 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "fit_check_confirmed_count": fhwa_delivery[
                 "fit_check_confirmed_count"
             ],
-            "active_route_status": fhwa_active_outbound["status"],
+            "team_set_decline_count": fhwa_delivery["team_set_decline_count"],
+            "last_outbound_status": fhwa_active_outbound["status"],
+            "active_route_status": fhwa_outreach["response_control"]["state"],
             "qualified_partner_evidence_present": fhwa_outreach[
                 "response_control"
             ]["qualified_partner_evidence_present"],
@@ -638,10 +682,11 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
         "direct_answer": (
             "Nashville EC confirmed in writing that its application remains open until 11:59 PM on July 17; the timezone is operationally treated as America/Chicago because the message itself did not state one. The support reply is not an application, so complete the founder-fact gate and reviewed portal workflow well before the close. "
-            "The FHWA response-lead acknowledgment was sent and must not be duplicated. The first FHWA route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response, but no fit check or partner is confirmed. "
+            "DARPA-SN-26-97 received the formal two-attachment RFI package after inviting an instructions-aligned submission; monitor the thread without claiming deadline compliance or receipt acceptance. "
+            "The Cambridge Systematics response lead then confirmed that its FHWA team is already set and will not add partners, so that route is closed with no follow-up. Georgia PATENTS also confirmed that it does not provide the requested already-filed prosecution support, so that route is closed. "
             "No additional email should be sent now. "
             "Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for "
-            "founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army "
+            "founder facts, assumption approval, and final preview. DARPA, EPRI, CDC, LANL, Terry, NASA, and Army "
             "are monitor-only. LvlUp confirmed that declining its optional paid sponsor track does not affect the separate investment and accelerator review, so monitor that thread without spending or sending a duplicate packet; duplicate sends would reduce credibility."
         ),
         "summary": {
@@ -726,6 +771,9 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             ),
             "email_action_reconciliation": artifact_status(
                 EMAIL_ACTION_RECONCILIATION
+            ),
+            "darpa_sn_26_97_public_submission_receipt": artifact_status(
+                DARPA_SN_26_97_RECEIPT
             ),
             "fhwa_teaming_template": artifact_status(FHWA_TEAMING_TEMPLATE),
             "fhwa_partner_outreach_control": artifact_status(

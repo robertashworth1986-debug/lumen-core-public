@@ -15,6 +15,7 @@ DESTINATION_ROOT = Path("E:/LumaProofVault/OUTREACH/EXTERNAL_RESPONSE_STATE_2026
 
 SCOPED_ADDITIONS = (
     "code/ops/BUILD_EXTERNAL_RESPONSE_STATE_E_DRIVE_SYNC_RECEIPT.py",
+    "code/ops/BUILD_DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT.py",
     "code/ops/BUILD_TRACTION_OPPORTUNITY_INTAKE_LEDGER.py",
     "code/ops/BUILD_TRACTION_FOLLOWUP_PACKET.py",
     "code/ops/BUILD_EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET.py",
@@ -25,6 +26,7 @@ SCOPED_ADDITIONS = (
     "tests/test_evtit_technical_sprint_scope_packet.py",
     "tests/test_reviewer_concierge_packet.py",
     "tests/test_agency_submission_assembly_gate.py",
+    "tests/test_darpa_sn_26_97_public_submission_receipt.py",
     "tests/test_flowform_hardware_concept_asset.py",
     "tests/test_missionweave_dsip_action_gate.py",
     "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.json",
@@ -59,6 +61,8 @@ SCOPED_ADDITIONS = (
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md",
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md",
+    "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json",
+    "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.md",
 )
 
 

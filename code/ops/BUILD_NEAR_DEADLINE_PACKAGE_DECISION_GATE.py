@@ -156,11 +156,14 @@ def build_gate() -> dict[str, Any]:
     )
     partner_verified = FHWA_PARTNER_EVIDENCE.exists()
     fhwa_outreach = read_json(FHWA_OUTREACH_CONTROL)
-    qualified_target_contacted = (
+    fhwa_control_current = (
         fhwa_outreach.get("schema")
-        == "lumencore.fhwa_tsmo_partner_outreach_control.v2"
+        == "lumencore.fhwa_tsmo_partner_outreach_control.v3"
         and fhwa_outreach.get("status")
-        == "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
+        == "RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET"
+    )
+    qualified_target_contacted = (
+        fhwa_control_current
         and fhwa_outreach.get("response_control", {}).get(
             "qualified_partner_evidence_present"
         )
@@ -169,6 +172,15 @@ def build_gate() -> dict[str, Any]:
             "qualified_response_lead_referral_present"
         )
         is True
+    )
+    fhwa_route_closed = (
+        fhwa_control_current
+        and fhwa_outreach.get("response_control", {}).get("state")
+        == "NO_GO_TEAM_SET_NO_ADDITIONAL_PARTNERS"
+        and fhwa_outreach.get("delivery_reconciliation", {}).get(
+            "team_set_decline_count"
+        )
+        == 1
     )
 
     lanes = [
@@ -233,7 +245,9 @@ def build_gate() -> dict[str, Any]:
                 "QUALIFIED_PARTNER_EVIDENCE_PRESENT_REVIEW_REQUIRED"
                 if partner_verified
                 else (
-                    "REFERRED_RESPONSE_LEAD_NO_GO_UNTIL_PARTNER_CONFIRMATION"
+                    "TEAM_SET_DECLINED_NO_GO_UNLESS_NEW_QUALIFIED_PARTNER_JOINS"
+                    if fhwa_route_closed
+                    else "REFERRED_RESPONSE_LEAD_NO_GO_UNTIL_PARTNER_CONFIRMATION"
                     if qualified_target_contacted
                     else "NO_GO_AS_SOLO_PRIME_UNLESS_QUALIFIED_PARTNER_JOINS"
                 )
@@ -268,8 +282,15 @@ def build_gate() -> dict[str, Any]:
             "fit_check_confirmed_count": fhwa_outreach.get(
                 "delivery_reconciliation", {}
             ).get("fit_check_confirmed_count", 0),
+            "inbound_response_count": fhwa_outreach.get(
+                "delivery_reconciliation", {}
+            ).get("response_count", 0),
+            "team_set_decline_count": fhwa_outreach.get(
+                "delivery_reconciliation", {}
+            ).get("team_set_decline_count", 0),
+            "outreach_route_closed": fhwa_route_closed,
             "partner_outreach_control": (
-                rel(FHWA_OUTREACH_CONTROL) if qualified_target_contacted else None
+                rel(FHWA_OUTREACH_CONTROL) if fhwa_control_current else None
             ),
             "official_notice": "https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view",
             "source_caveat": (
@@ -292,9 +313,10 @@ def build_gate() -> dict[str, Any]:
                 "NSF has the smallest truthful completion gap and no fixed Project Pitch "
                 "deadline. ERDC is a credible five-page validation lane but currently has no "
                 "available funding. The first FHWA TSMO contact route rejected delivery; the "
-                "replacement route replied and referred the request to its response lead, but "
-                "FHWA remains noncompliant as a solo prime unless written partner evidence "
-                "supplies the mandatory corporate experience."
+                "replacement route replied and referred the request to its response lead. That "
+                "lead confirmed the team was already set and would not add partners. This route "
+                "is closed, and FHWA remains noncompliant as a solo prime unless a different "
+                "qualified partner supplies written corporate-experience evidence."
             ),
         },
         "lanes": lanes,
@@ -347,7 +369,7 @@ def render_markdown(gate: dict[str, Any]) -> str:
         "",
         "1. **NSF Project Pitch** - stage first after checking the duplicate-pitch/open-invitation gate in the portal.",
         "2. **ERDC Sovereign Defense Cloud** - build the compliant five-page solution brief as a validation and relationship lane; the notice says funding is not currently available.",
-        "3. **FHWA TSMO** - the first listed contact route rejected delivery; the replacement route replied, referred the request to its response lead, and received a bounded acknowledgment. Do not submit as a solo prime unless written partner evidence supplies the mandatory corporate-experience requirement.",
+        "3. **FHWA TSMO** - Cambridge Systematics confirmed its team was already set after the replacement route reached its response lead. Close that route without another follow-up. Do not submit as a solo prime unless a different qualified partner supplies written corporate-experience evidence.",
         "",
         gate["decision"]["reason"],
         "",

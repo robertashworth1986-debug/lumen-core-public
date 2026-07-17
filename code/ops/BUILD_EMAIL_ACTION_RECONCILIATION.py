@@ -19,6 +19,21 @@ NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION = (
 LVLUP_REVIEW_CONFIRMATION = (
     SPRINT_DIR / "LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json"
 )
+DARPA_SN_26_97_RECEIPT = (
+    SPRINT_DIR / "DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json"
+)
+MISSIONWEAVE_ACTION_GATE = (
+    ROOT
+    / "grant_submissions"
+    / "DLA26BZ03_NV011_MissionWeave"
+    / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
+)
+OPENAI_BUILD_WEEK_READINESS = (
+    ROOT
+    / "grant_submissions"
+    / "OPENAI_BUILD_WEEK_20260721"
+    / "OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json"
+)
 
 AS_OF_DATE = "2026-07-17"
 
@@ -43,6 +58,9 @@ def artifact_status(path: Path) -> dict[str, Any]:
 def build_payload() -> dict[str, Any]:
     nashville = read_json(NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION)
     lvlup = read_json(LVLUP_REVIEW_CONFIRMATION)
+    darpa = read_json(DARPA_SN_26_97_RECEIPT)
+    missionweave = read_json(MISSIONWEAVE_ACTION_GATE)
+    build_week = read_json(OPENAI_BUILD_WEEK_READINESS)
     if (
         nashville.get("schema")
         != "lumencore.nashville_ec_official_deadline_confirmation.v1"
@@ -57,6 +75,25 @@ def build_payload() -> dict[str, Any]:
         != "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED"
     ):
         raise ValueError("LvlUp independent-review confirmation is missing or stale")
+    if (
+        darpa.get("schema")
+        != "lumencore.darpa_sn_26_97_public_submission_receipt.v1"
+        or darpa.get("status")
+        != "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+    ):
+        raise ValueError("DARPA-SN-26-97 public receipt is missing or stale")
+    if (
+        missionweave.get("schema") != "lumencore.missionweave_dsip_action_gate.v1"
+        or missionweave.get("status") != "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
+    ):
+        raise ValueError("MissionWeave DSIP action gate is missing or stale")
+    if (
+        build_week.get("schema")
+        != "lumencore.openai_build_week_submission_readiness.v1"
+        or build_week.get("status")
+        != "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
+    ):
+        raise ValueError("OpenAI Build Week readiness is missing or stale")
 
     lanes = [
         {
@@ -102,16 +139,17 @@ def build_payload() -> dict[str, Any]:
         {
             "lane_id": "georgia_patents_pro_bono_intake",
             "organization": "Georgia PATENTS",
-            "latest_event_type": "OUTBOUND_INTAKE_SENT",
-            "latest_event_utc": "2026-07-17T04:27:26Z",
-            "state": "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING",
+            "latest_event_type": "SERVICE_SCOPE_DECLINE_RECEIVED",
+            "latest_event_utc": "2026-07-17T16:14:15Z",
+            "state": "SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION",
             "email_reply_required": False,
             "send_now": False,
-            "no_send_before": "2026-07-24",
+            "no_send_before": None,
             "do_not_duplicate_send": True,
             "next_action": (
-                "Wait for intake instructions; do not disclose unpublished patent "
-                "materials through ordinary email."
+                "Close this pro bono route without a reply. Continue the private Patent Center "
+                "docket capture, USPTO Pro Se procedural route, and a verified practitioner "
+                "referral without emailing unpublished application material."
             ),
         },
         {
@@ -142,6 +180,58 @@ def build_payload() -> dict[str, Any]:
             "next_action": (
                 "Monitor for a CDC clarification, replacement request, or scheduling "
                 "message; do not resend the response."
+            ),
+        },
+        {
+            "lane_id": "darpa_sn_26_97_low_resource_computing_rfi",
+            "organization": "DARPA Multi X Office",
+            "latest_event_type": "FORMAL_TWO_ATTACHMENT_RFI_PACKAGE_SENT",
+            "latest_event_utc": darpa["thread_reconciliation"]["formal_package_sent_utc"],
+            "state": darpa["status"],
+            "deadline_date": darpa["opportunity"]["deadline_date"],
+            "deadline_time_compliance_claimed": False,
+            "email_reply_required": False,
+            "send_now": False,
+            "no_send_before": None,
+            "do_not_duplicate_send": True,
+            "attachment_count": len(darpa["attachments"]),
+            "next_action": darpa["send_control"]["next_action"],
+        },
+        {
+            "lane_id": "missionweave_dsip_proposal",
+            "organization": "Defense SBIR/STTR Innovation Portal",
+            "latest_event_type": "DSIP_PROPOSAL_CREATION_CONFIRMED",
+            "latest_event_utc": "2026-07-17T18:12:03Z",
+            "state": missionweave["status"],
+            "deadline_utc": missionweave["deadline"]["expected_utc"],
+            "open_gate_count": missionweave["gate_summary"]["open_gate_count"],
+            "email_reply_required": False,
+            "send_now": False,
+            "no_send_before": None,
+            "do_not_duplicate_send": True,
+            "next_action": (
+                "Complete and endorse all DSIP volumes, resolve the live legal/entity, CMMC, "
+                "ITAR, cost, support, and authority gates, review the portal preview, and obtain "
+                "action-time approval before final submission."
+            ),
+        },
+        {
+            "lane_id": "openai_build_week_prooflock",
+            "organization": "OpenAI Build Week / Devpost",
+            "latest_event_type": "PROJECT_CORE_VERIFIED_SUBMISSION_FIELDS_OPEN",
+            "latest_event_utc": build_week["generated_utc"],
+            "state": build_week["status"],
+            "deadline_utc": build_week["official_requirements"]["facts"][
+                "submission_period"
+            ]["deadline_utc"],
+            "email_reply_required": False,
+            "send_now": False,
+            "no_send_before": None,
+            "do_not_duplicate_send": True,
+            "next_action": (
+                "Confirm model provenance and the /feedback session ID, deploy the public demo, "
+                "record the required public video, complete Devpost registration, and obtain "
+                "action-time approval before final submission."
             ),
         },
         {
@@ -178,24 +268,25 @@ def build_payload() -> dict[str, Any]:
         {
             "lane_id": "fhwa_tsmo_qualified_partner_outreach",
             "organization": "Cambridge Systematics",
-            "latest_event_type": "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED",
-            "latest_event_utc": "2026-07-17T14:41:54Z",
-            "state": "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING",
+            "latest_event_type": "RESPONSE_LEAD_TEAM_SET_DECLINE_RECEIVED",
+            "latest_event_utc": "2026-07-17T16:28:25Z",
+            "state": "RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET",
             "delivery_failure_count": 1,
             "replacement_send_count": 1,
             "confirmed_delivery_count": 1,
-            "inbound_response_count": 1,
+            "inbound_response_count": 2,
             "qualified_response_lead_referral_count": 1,
             "threaded_acknowledgment_send_count": 1,
             "fit_check_confirmed_count": 0,
+            "team_set_decline_count": 1,
             "email_reply_required": False,
             "send_now": False,
-            "no_send_before": "2026-07-21",
+            "no_send_before": None,
             "do_not_duplicate_send": True,
             "next_action": (
-                "Monitor the referred response lead for scheduling or a specific question. "
-                "If no reply arrives by July 21, send at most one short scheduling follow-up. "
-                "Do not claim a partner or use corporate experience without written permission."
+                "Close this route without another reply or follow-up. Do not claim a partner or "
+                "use Cambridge Systematics' experience. Reopen only for a future opportunity "
+                "initiated by the firm."
             ),
         },
         {
@@ -268,6 +359,8 @@ def build_payload() -> dict[str, Any]:
             "EPRI Open Power AI Consortium onboarding",
             "FHWA TSMO qualified-partner outreach",
             "Nashville EC Fall 2026 TakeOff deadline-support query",
+            "DARPA-SN-26-97 formal RFI response and agency-thread state",
+            "MissionWeave DSIP and OpenAI Build Week portal deadlines",
             "CDC, NASA, Army, LvlUp, Terry Anderton, and Vynetic",
         ],
         "summary": {
@@ -280,7 +373,7 @@ def build_payload() -> dict[str, Any]:
                 1 for lane in lanes if lane["do_not_duplicate_send"]
             ),
             "out_of_office_count": 1,
-            "human_account_action_count": 1,
+            "human_account_action_count": 4,
             "external_send_allowed_without_human": False,
         },
         "lanes": lanes,
@@ -295,6 +388,15 @@ def build_payload() -> dict[str, Any]:
             ),
             "lvlup_independent_review_confirmation": artifact_status(
                 LVLUP_REVIEW_CONFIRMATION
+            ),
+            "darpa_sn_26_97_public_submission_receipt": artifact_status(
+                DARPA_SN_26_97_RECEIPT
+            ),
+            "missionweave_dsip_action_gate": artifact_status(
+                MISSIONWEAVE_ACTION_GATE
+            ),
+            "openai_build_week_readiness": artifact_status(
+                OPENAI_BUILD_WEEK_READINESS
             ),
         },
         "claim_boundary": (
@@ -329,17 +431,41 @@ def validate_payload(payload: dict[str, Any]) -> None:
     )
     if (
         fhwa["state"]
-        != "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
+        != "RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET"
         or fhwa["delivery_failure_count"] != 1
         or fhwa["replacement_send_count"] != 1
         or fhwa["confirmed_delivery_count"] != 1
-        or fhwa["inbound_response_count"] != 1
+        or fhwa["inbound_response_count"] != 2
         or fhwa["qualified_response_lead_referral_count"] != 1
         or fhwa["threaded_acknowledgment_send_count"] != 1
         or fhwa["fit_check_confirmed_count"] != 0
+        or fhwa["team_set_decline_count"] != 1
         or fhwa["do_not_duplicate_send"] is not True
     ):
         raise ValueError("FHWA bounce/replacement reconciliation is incomplete")
+    georgia = next(
+        lane
+        for lane in payload["lanes"]
+        if lane["lane_id"] == "georgia_patents_pro_bono_intake"
+    )
+    if (
+        georgia["state"] != "SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION"
+        or georgia["email_reply_required"] is not False
+        or georgia["do_not_duplicate_send"] is not True
+    ):
+        raise ValueError("Georgia PATENTS scope-decline control is incomplete")
+    darpa = next(
+        lane
+        for lane in payload["lanes"]
+        if lane["lane_id"] == "darpa_sn_26_97_low_resource_computing_rfi"
+    )
+    if (
+        darpa["state"] != "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+        or darpa["attachment_count"] != 2
+        or darpa["deadline_time_compliance_claimed"] is not False
+        or darpa["do_not_duplicate_send"] is not True
+    ):
+        raise ValueError("DARPA formal-package control is incomplete")
     nashville = next(
         lane
         for lane in payload["lanes"]

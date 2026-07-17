@@ -1,19 +1,19 @@
 # External Engagement Response Register - 2026-07-17
 
-Nashville EC confirmed in writing that its application remains open until 11:59 PM on July 17; the timezone is operationally treated as America/Chicago because the message itself did not state one. The support reply is not an application, so complete the founder-fact gate and reviewed portal workflow well before the close. The FHWA response-lead acknowledgment was sent and must not be duplicated. The first FHWA route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response, but no fit check or partner is confirmed. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army are monitor-only. LvlUp confirmed that declining its optional paid sponsor track does not affect the separate investment and accelerator review, so monitor that thread without spending or sending a duplicate packet; duplicate sends would reduce credibility.
+Nashville EC confirmed in writing that its application remains open until 11:59 PM on July 17; the timezone is operationally treated as America/Chicago because the message itself did not state one. The support reply is not an application, so complete the founder-fact gate and reviewed portal workflow well before the close. DARPA-SN-26-97 received the formal two-attachment RFI package after inviting an instructions-aligned submission; monitor the thread without claiming deadline compliance or receipt acceptance. The Cambridge Systematics response lead then confirmed that its FHWA team is already set and will not add partners, so that route is closed with no follow-up. Georgia PATENTS also confirmed that it does not provide the requested already-filed prosecution support, so that route is closed. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. DARPA, EPRI, CDC, LANL, Terry, NASA, and Army are monitor-only. LvlUp confirmed that declining its optional paid sponsor track does not affect the separate investment and accelerator review, so monitor that thread without spending or sending a duplicate packet; duplicate sends would reduce credibility.
 
 ## Control Summary
 
 - Status: `CURRENT_RESPONSE_CONTROL_HUMAN_GATED`
-- Engagement records: `12`
+- Engagement records: `13`
 - Immediate human actions: `2`
-- Monitor-only lanes: `9`
-- Do-not-duplicate lanes: `11`
+- Monitor-only lanes: `8`
+- Do-not-duplicate lanes: `12`
 - Verified attachments: `6`
 - All attachment checks pass: `true`
 - Autonomous external send allowed: `false`
 - Autonomous final portal submit allowed: `false`
-- Register SHA-256: `4020be24c7df7cf0d5bdcc54111c98c0cdd0cd344be8e756babdffa63b3d529b`
+- Register SHA-256: `bbce4544e0ba3a9c6873509213c2c1d93571994b59cc1613634ae74c30b72370`
 
 ## Response Queue
 
@@ -22,13 +22,14 @@ Nashville EC confirmed in writing that its application remains open until 11:59 
 | Nashville Entrepreneur Center | `OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED` | `COMPLETE_PORTAL_BEFORE_CONFIRMED_CLOSE_NO_DUPLICATE_EMAIL` | 2026-07-17T23:59:00-05:00 | `true` |
 | Launch Tennessee 3686 Pitch Competition | `PORTAL_PACKET_QA_PASSED_HUMAN_FACTS_AND_FOUNDER_APPROVAL_REQUIRED` | `STAGE_PORTAL_FINAL_PREVIEW_REQUIRED` | 2026-08-13T23:59:00-05:00 | `false` |
 | EPRI Open Power AI Consortium | `OUTBOUND_SENT_MOU_PENDING` | `MONITOR_FOR_MOU_NO_DUPLICATE` | 2026-07-23 | `true` |
-| Georgia PATENTS | `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | 2026-07-24 | `true` |
+| Georgia PATENTS | `SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION` | `CLOSE_SERVICE_SCOPE_NO_GO_NO_DUPLICATE` | None | `true` |
 | LvlUp Ventures / Power of the Pitch Week | `WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED` | `MONITOR_INDEPENDENT_REVIEW_NO_DUPLICATE` | None | `true` |
 | SAM.gov account credential control | `ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED` | `HUMAN_ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY` | 2026-07-16 | `true` |
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `MONITOR_NO_REPLY_REQUIRED` | 2026-07-30T21:00:00Z | `true` |
 | Los Alamos National Laboratory | `OUTBOUND_SENT_RESPONSE_PENDING` | `MONITOR_THEN_ONE_BOUNDED_FOLLOW_UP` | 2026-07-23 | `true` |
 | Terry Anderton / Vynetic | `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY` | `MONITOR_NO_FURTHER_FOLLOWUP` | None | `true` |
-| Cambridge Systematics | `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING` | `MONITOR_REFERRED_RESPONSE_LEAD_NO_DUPLICATE` | 2026-08-03T09:00:00-04:00 | `true` |
+| DARPA Multi X Office | `FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING` | `MONITOR_FORMAL_PACKAGE_NO_DUPLICATE` | 2026-07-17 | `true` |
+| Cambridge Systematics | `RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET` | `CLOSE_NO_GO_TEAM_SET_NO_DUPLICATE` | 2026-08-03T09:00:00-04:00 | `true` |
 | NASA | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | 2026-07-17T21:00:00Z | `true` |
 | U.S. Army | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | None | `true` |
 
@@ -77,16 +78,16 @@ Nashville EC confirmed in writing that its application remains open until 11:59 
 ### Georgia PATENTS
 
 - Lane: `georgia_patents_pro_bono_intake`
-- State: `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING`
-- Decision: `MONITOR_NO_DUPLICATE`
+- State: `SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION`
+- Decision: `CLOSE_SERVICE_SCOPE_NO_GO_NO_DUPLICATE`
 - Response channel: `EMAIL`
 - Response ready: `false`
 - Send now: `false`
-- Action gate: Reply only if Georgia PATENTS requests intake facts or directs the founder to a reviewed application channel; do not disclose unpublished application materials by ordinary email.
-- Next action: Monitor through July 23 without a duplicate email. In parallel, populate the six ignored Patent Center role folders and use USPTO Pro Se procedural support; send the held practitioner request only after recipient and secure-channel confirmation.
+- Action gate: Do not reply or submit the intake for this already-filed application. Continue only through USPTO Pro Se procedural support or a verified practitioner channel.
+- Next action: Close this pro bono route without a reply. Continue the private Patent Center docket capture, USPTO Pro Se procedural route, and a verified practitioner referral without emailing unpublished application material.
 - Response artifact: `grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - Claim boundary: This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice.
-- Record SHA-256: `155c39511691f2d5bc6005b40a3869a6e86e24611363d439f57662a38c6aae4f`
+- Record SHA-256: `ead98dab2ae493627d6b8dbf0abff3241a23cd22ce777dbf3325fef2738a2df5`
 
 ### LvlUp Ventures / Power of the Pitch Week
 
@@ -170,19 +171,33 @@ LumenCore
 - Claim boundary: The mailbox record proves only that two near-duplicate follow-ups were sent and no inbound reply was observed at reconciliation time. It does not prove interest, rejection, selection, funding, or validation.
 - Record SHA-256: `ae8344c154e7a7eb0d8fe2c6211f0cd8759b677cf093e7841606986f0f4fef67`
 
+### DARPA Multi X Office
+
+- Lane: `darpa_sn_26_97_low_resource_computing_rfi`
+- State: `FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING`
+- Decision: `MONITOR_FORMAL_PACKAGE_NO_DUPLICATE`
+- Response channel: `EMAIL_REPLY_ONLY_IF_INBOUND`
+- Response ready: `false`
+- Send now: `false`
+- Action gate: Reply only to a specific DARPA clarification, replacement request, or workshop invitation. Do not resend, expand claims, or disclose controlled information.
+- Next action: Monitor the existing agency thread for a receipt, clarification, or workshop invitation. Do not resend the package without a specific agency request.
+- Response artifact: `grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json`
+- Claim boundary: This receipt proves only that Gmail recorded a formal two-attachment package as sent after the agency's same-day guidance and preserves the attachment hashes. It does not prove delivery acceptance, deadline compliance, technical evaluation, independent validation, workshop selection, funding, award, or operational performance.
+- Record SHA-256: `0564a20aa95a2a495cafdf167aeab0ebeb6a80cd3dab80693b50f779b7e6c524`
+
 ### Cambridge Systematics
 
 - Lane: `fhwa_tsmo_qualified_partner_outreach`
-- State: `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING`
-- Decision: `MONITOR_REFERRED_RESPONSE_LEAD_NO_DUPLICATE`
+- State: `RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET`
+- Decision: `CLOSE_NO_GO_TEAM_SET_NO_DUPLICATE`
 - Response channel: `EMAIL`
 - Response ready: `false`
 - Send now: `false`
-- Action gate: Do not claim a partner, cite corporate experience, or draft a joint submission unless a reply supplies written role and evidence permission.
-- Next action: Monitor the referred response lead for scheduling or a specific question and do not reuse the rejected address. If no response arrives by July 21, send at most one short scheduling follow-up. Before any teaming or proposal claim, verify written role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule.
+- Action gate: Close this route. Do not claim a partner, cite corporate experience, draft a joint submission, or send another follow-up.
+- Next action: Close this Cambridge Systematics pursuit route without another reply or follow-up. Do not cite the firm, its experience, or a relationship. Reopen only if Cambridge Systematics initiates a future-opportunity conversation.
 - Response artifact: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json`
-- Claim boundary: The Gmail records prove that the first route was rejected, the replacement message received a substantive reply, the request was referred to the subject matter expert leading this response, and one bounded acknowledgment was sent in that thread. The referral does not establish pursuit, a fit-check commitment, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.
-- Record SHA-256: `37f7e769c47f17bf85f99b10752fefa0acdc9fcfcb610f05ab4f97ad85e6099c`
+- Claim boundary: The Gmail records prove that the first route was rejected, the replacement message received a substantive reply, the request was referred to the subject matter expert leading this response, one bounded acknowledgment was sent, and the response lead then stated that its team was already set and would not add partners. This is a no-go for this teaming route; it does not establish a relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.
+- Record SHA-256: `36429e93127f03cacb756d4eb658c718b31ca2b2b81037b4c9b55fd67581b735`
 
 ### NASA
 
@@ -247,10 +262,11 @@ LumenCore
 - `lvlup_historical_application_draft`: present=`true` bytes=`12152` sha256=`F75EBF8FD60A40968484D6AE147FB6D02848CA109AB277337C5BAE5085CBA796` path=`docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md`
 - `lvlup_independent_review_confirmation`: present=`true` bytes=`1908` sha256=`F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC` path=`grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json`
 - `sam_public_credential_rotation_control`: present=`true` bytes=`4544` sha256=`AAC20E903A5055E731DA65E5E5A82F08D5C34A7288AA6BED4D0ED78C4F0BE159` path=`grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json`
-- `email_action_reconciliation`: present=`true` bytes=`9681` sha256=`D7F7B1AEE07E3F689BB33AC0AC8ED4069C582CB16517242FE0528B8EAC322002` path=`grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json`
+- `email_action_reconciliation`: present=`true` bytes=`12993` sha256=`A499DA75CD4C772AB21C4F0ADA79D78C9BBC06501CCF5DD7EB8B806258AA75B0` path=`grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json`
+- `darpa_sn_26_97_public_submission_receipt`: present=`true` bytes=`2834` sha256=`89B64A1A282AB72F0738E068952A14A82E38F5AEC4A78C1B7D2B4F4930410CB4` path=`grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json`
 - `fhwa_teaming_template`: present=`true` bytes=`2114` sha256=`6614F9D452565F9E5F54B3E70B45E93F112DD1293A8845E43489E339D34B0819` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md`
-- `fhwa_partner_outreach_control`: present=`true` bytes=`11976` sha256=`4437EBF6FC23025719911746C8C46BD929979D4678BB7C67EEFF9644113B085E` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json`
-- `fhwa_partner_response_control`: present=`true` bytes=`4301` sha256=`B5650281C5A3A5EEB034D0927A3C4125FCB7FD9B163D82ECB4AF5AA8E6B59C7C` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md`
+- `fhwa_partner_outreach_control`: present=`true` bytes=`12675` sha256=`39CBFE5F1C5DB55C33D249ADCFDE1F04AE3983D69D1737F00A97403E168AF364` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json`
+- `fhwa_partner_response_control`: present=`true` bytes=`3426` sha256=`A3DE835AB830E37F6CF8CB3C8374F876150BE8C48C185EFE73344378558828CD` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md`
 
 ## Claim Boundary
 

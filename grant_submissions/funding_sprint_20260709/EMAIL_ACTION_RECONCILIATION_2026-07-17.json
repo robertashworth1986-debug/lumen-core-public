@@ -40,13 +40,13 @@
       "do_not_duplicate_send": true,
       "email_reply_required": false,
       "lane_id": "georgia_patents_pro_bono_intake",
-      "latest_event_type": "OUTBOUND_INTAKE_SENT",
-      "latest_event_utc": "2026-07-17T04:27:26Z",
-      "next_action": "Wait for intake instructions; do not disclose unpublished patent materials through ordinary email.",
-      "no_send_before": "2026-07-24",
+      "latest_event_type": "SERVICE_SCOPE_DECLINE_RECEIVED",
+      "latest_event_utc": "2026-07-17T16:14:15Z",
+      "next_action": "Close this pro bono route without a reply. Continue the private Patent Center docket capture, USPTO Pro Se procedural route, and a verified practitioner referral without emailing unpublished application material.",
+      "no_send_before": null,
       "organization": "Georgia PATENTS",
       "send_now": false,
-      "state": "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING"
+      "state": "SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION"
     },
     {
       "do_not_duplicate_send": true,
@@ -71,6 +71,48 @@
       "organization": "Centers for Disease Control and Prevention",
       "send_now": false,
       "state": "RECEIPT_CONFIRMED_FOLLOW_UP_PENDING"
+    },
+    {
+      "attachment_count": 2,
+      "deadline_date": "2026-07-17",
+      "deadline_time_compliance_claimed": false,
+      "do_not_duplicate_send": true,
+      "email_reply_required": false,
+      "lane_id": "darpa_sn_26_97_low_resource_computing_rfi",
+      "latest_event_type": "FORMAL_TWO_ATTACHMENT_RFI_PACKAGE_SENT",
+      "latest_event_utc": "2026-07-17T19:27:49Z",
+      "next_action": "Monitor the existing agency thread for a receipt, clarification, or workshop invitation. Do not resend the package without a specific agency request.",
+      "no_send_before": null,
+      "organization": "DARPA Multi X Office",
+      "send_now": false,
+      "state": "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+    },
+    {
+      "deadline_utc": "2026-07-22T16:00:00Z",
+      "do_not_duplicate_send": true,
+      "email_reply_required": false,
+      "lane_id": "missionweave_dsip_proposal",
+      "latest_event_type": "DSIP_PROPOSAL_CREATION_CONFIRMED",
+      "latest_event_utc": "2026-07-17T18:12:03Z",
+      "next_action": "Complete and endorse all DSIP volumes, resolve the live legal/entity, CMMC, ITAR, cost, support, and authority gates, review the portal preview, and obtain action-time approval before final submission.",
+      "no_send_before": null,
+      "open_gate_count": 37,
+      "organization": "Defense SBIR/STTR Innovation Portal",
+      "send_now": false,
+      "state": "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
+    },
+    {
+      "deadline_utc": "2026-07-22T00:00:00Z",
+      "do_not_duplicate_send": true,
+      "email_reply_required": false,
+      "lane_id": "openai_build_week_prooflock",
+      "latest_event_type": "PROJECT_CORE_VERIFIED_SUBMISSION_FIELDS_OPEN",
+      "latest_event_utc": "2026-07-17T21:49:11.231080+00:00",
+      "next_action": "Confirm model provenance and the /feedback session ID, deploy the public demo, record the required public video, complete Devpost registration, and obtain action-time approval before final submission.",
+      "no_send_before": null,
+      "organization": "OpenAI Build Week / Devpost",
+      "send_now": false,
+      "state": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
     },
     {
       "do_not_duplicate_send": true,
@@ -106,17 +148,18 @@
       "do_not_duplicate_send": true,
       "email_reply_required": false,
       "fit_check_confirmed_count": 0,
-      "inbound_response_count": 1,
+      "inbound_response_count": 2,
       "lane_id": "fhwa_tsmo_qualified_partner_outreach",
-      "latest_event_type": "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED",
-      "latest_event_utc": "2026-07-17T14:41:54Z",
-      "next_action": "Monitor the referred response lead for scheduling or a specific question. If no reply arrives by July 21, send at most one short scheduling follow-up. Do not claim a partner or use corporate experience without written permission.",
-      "no_send_before": "2026-07-21",
+      "latest_event_type": "RESPONSE_LEAD_TEAM_SET_DECLINE_RECEIVED",
+      "latest_event_utc": "2026-07-17T16:28:25Z",
+      "next_action": "Close this route without another reply or follow-up. Do not claim a partner or use Cambridge Systematics' experience. Reopen only for a future opportunity initiated by the firm.",
+      "no_send_before": null,
       "organization": "Cambridge Systematics",
       "qualified_response_lead_referral_count": 1,
       "replacement_send_count": 1,
       "send_now": false,
-      "state": "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING",
+      "state": "RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET",
+      "team_set_decline_count": 1,
       "threaded_acknowledgment_send_count": 1
     },
     {
@@ -176,29 +219,49 @@
     "EPRI Open Power AI Consortium onboarding",
     "FHWA TSMO qualified-partner outreach",
     "Nashville EC Fall 2026 TakeOff deadline-support query",
+    "DARPA-SN-26-97 formal RFI response and agency-thread state",
+    "MissionWeave DSIP and OpenAI Build Week portal deadlines",
     "CDC, NASA, Army, LvlUp, Terry Anderton, and Vynetic"
   ],
   "source_evidence": {
+    "darpa_sn_26_97_public_submission_receipt": {
+      "bytes": 2834,
+      "path": "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json",
+      "present": true,
+      "sha256": "89B64A1A282AB72F0738E068952A14A82E38F5AEC4A78C1B7D2B4F4930410CB4"
+    },
     "lvlup_independent_review_confirmation": {
       "bytes": 1908,
       "path": "grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json",
       "present": true,
       "sha256": "F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC"
     },
+    "missionweave_dsip_action_gate": {
+      "bytes": 9327,
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "present": true,
+      "sha256": "75DEC9CAE26FB9ABF879EC94EDDADA2A5DDA5FC8AEEEEC8D8A84E0BAAB5AA0BD"
+    },
     "nashville_official_deadline_confirmation": {
       "bytes": 2272,
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json",
       "present": true,
       "sha256": "DAC4B3120D9B4EC2A822198426939B89FE96BF7294C0CC251D1A299BB76B00E2"
+    },
+    "openai_build_week_readiness": {
+      "bytes": 9865,
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json",
+      "present": true,
+      "sha256": "05DAB3F0AE40D7EBB2D24DA1984DECAAF0B63E88E42BCBB055ED241E4F5880D1"
     }
   },
   "status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
   "summary": {
-    "duplicate_outbound_risk_count": 11,
+    "duplicate_outbound_risk_count": 14,
     "email_reply_required_count": 0,
     "external_send_allowed_without_human": false,
-    "human_account_action_count": 1,
-    "lane_count": 12,
+    "human_account_action_count": 4,
+    "lane_count": 15,
     "out_of_office_count": 1,
     "send_now_count": 0
   }

@@ -6,11 +6,11 @@ Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
 
 ## Control Line
 
-- Reconciled lanes: `12`
+- Reconciled lanes: `15`
 - Reply required now: `0`
 - Send now: `0`
-- Duplicate-outbound risks: `11`
-- Human account actions: `1`
+- Duplicate-outbound risks: `14`
+- Human account actions: `4`
 - Browser navigation performed: `false`
 
 ## Reconciled Lanes
@@ -19,12 +19,15 @@ Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
 |---|---|---:|---|
 | Nashville Entrepreneur Center | `OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED` | `false` | Complete the founder-fact and reviewed portal workflow well before the confirmed close; do not resend and do not treat the support reply as an application. |
 | EPRI Open Power AI Consortium | `MOU_ROUTING_SENT_OUT_OF_OFFICE_RECEIVED` | `false` | Wait for the MOU, a correction request, or an onboarding question; do not resend identity details. |
-| Georgia PATENTS | `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING` | `false` | Wait for intake instructions; do not disclose unpublished patent materials through ordinary email. |
+| Georgia PATENTS | `SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION` | `false` | Close this pro bono route without a reply. Continue the private Patent Center docket capture, USPTO Pro Se procedural route, and a verified practitioner referral without emailing unpublished application material. |
 | Los Alamos National Laboratory | `PACKAGE_SENT_RESPONSE_PENDING` | `false` | Wait for LANL; use the single bounded follow-up only on or after July 23 if no reply arrives. |
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `false` | Monitor for a CDC clarification, replacement request, or scheduling message; do not resend the response. |
+| DARPA Multi X Office | `FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING` | `false` | Monitor the existing agency thread for a receipt, clarification, or workshop invitation. Do not resend the package without a specific agency request. |
+| Defense SBIR/STTR Innovation Portal | `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN` | `false` | Complete and endorse all DSIP volumes, resolve the live legal/entity, CMMC, ITAR, cost, support, and authority gates, review the portal preview, and obtain action-time approval before final submission. |
+| OpenAI Build Week / Devpost | `PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN` | `false` | Confirm model provenance and the /feedback session ID, deploy the public demo, record the required public video, complete Devpost registration, and obtain action-time approval before final submission. |
 | LvlUp Ventures / Power of the Pitch Week | `WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED` | `false` | Monitor the existing thread. Reply only if LvlUp's Investment Committee requests additional information; do not purchase the optional sponsor track or send an unsolicited duplicate packet. |
 | Terry Anderton / Vynetic | `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY` | `false` | Send nothing further unless Terry replies with a specific ask; then answer only that ask in the existing thread. |
-| Cambridge Systematics | `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING` | `false` | Monitor the referred response lead for scheduling or a specific question. If no reply arrives by July 21, send at most one short scheduling follow-up. Do not claim a partner or use corporate experience without written permission. |
+| Cambridge Systematics | `RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET` | `false` | Close this route without another reply or follow-up. Do not claim a partner or use Cambridge Systematics' experience. Reopen only for a future opportunity initiated by the firm. |
 | U.S. National Science Foundation | `NO_OFFICIAL_PROJECT_PITCH_INVITATION_VERIFIED` | `false` | Use the rolling Project Pitch portal route; do not represent the July 27 full-proposal deadline as reachable without an invitation. |
 | NASA | `SENT_VERIFIED_RESPONSE_PENDING` | `false` | Monitor for an agency clarification or replacement request. |
 | U.S. Army | `SENT_VERIFIED_RESPONSE_PENDING` | `false` | Monitor for agency feedback; do not duplicate-send. |
