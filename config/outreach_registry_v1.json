@@ -1,0 +1,71 @@
+{
+  "schema": "lumencore_outreach_registry.v1",
+  "updated_utc": "2026-07-17T00:20:44Z",
+  "policy": {
+    "send_authority": "Robert Ashworth",
+    "codex_send_allowed": false,
+    "chatgpt_send_requires_explicit_action_time_approval": true,
+    "default_cooldown_hours": 72,
+    "existing_thread_required_after_first_outbound": true,
+    "gmail_sent_preflight_required": true,
+    "draft_only_by_default": true
+  },
+  "campaigns": [
+    {
+      "campaign_key": "epri-opai-membership-mou",
+      "organization": "EPRI / Open Power AI Consortium",
+      "status": "action_required_draft_ready",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "last_outbound_utc": "2026-07-16T05:29:58Z",
+      "duplicate_detected": true,
+      "duplicate_count": 1,
+      "inbound_since_last_outbound": true,
+      "next_allowed_action": "review_existing_draft_then_reply_once_after_explicit_approval",
+      "outreach_id": "LC-EPRI-OPAI-MOU-001",
+      "notes": "A second standalone membership request exists. Do not start another thread."
+    },
+    {
+      "campaign_key": "evtit-productization-review",
+      "organization": "EVTit / Vynetic",
+      "status": "waiting_for_reply",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 2,
+      "last_outbound_utc": "2026-07-16T16:58:56Z",
+      "duplicate_detected": true,
+      "duplicate_count": 1,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "wait_for_inbound_reply",
+      "outreach_id": "LC-EVTIT-REVIEW-002",
+      "notes": "Two differently worded follow-ups were sent ten seconds apart in the same thread."
+    },
+    {
+      "campaign_key": "lanl-vision-fit",
+      "organization": "Los Alamos National Laboratory / VISION",
+      "status": "waiting_for_reply",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "last_outbound_utc": "2026-07-16T18:50:16Z",
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "wait_for_reschedule_or_specific_information_request",
+      "outreach_id": "LC-LANL-VISION-001",
+      "notes": "The non-proprietary follow-up package was sent after the meeting connection was not completed."
+    },
+    {
+      "campaign_key": "cdc-rfi-75d301-26-rfi-73483",
+      "organization": "Centers for Disease Control and Prevention",
+      "status": "receipt_confirmed_waiting",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "last_outbound_utc": "2026-07-16T13:27:19Z",
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": true,
+      "next_allowed_action": "wait_for_substantive_cdc_follow_up",
+      "outreach_id": "LC-CDC-RFI-73483-001",
+      "notes": "Receipt was confirmed. A receipt is not selection, validation, award, or deployment."
+    }
+  ]
+}
