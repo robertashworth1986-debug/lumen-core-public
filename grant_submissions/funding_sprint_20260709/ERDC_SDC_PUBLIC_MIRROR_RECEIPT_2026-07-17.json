@@ -1,0 +1,73 @@
+{
+  "schema": "lumencore.erdc_sdc_public_mirror_receipt.v1",
+  "created_utc": "2026-07-17T05:41:01.1469226Z",
+  "opportunity_number": "W912HZ26SC005",
+  "c_root": "C:/LumaTrader/INSTITUTIONAL_STACK_V2",
+  "e_root": "E:/LumaProofVault/SUBMISSIONS/ERDC_SDC_SOLUTION_BRIEF_20260717",
+  "artifact_count": 6,
+  "all_copies_sha256_matched": true,
+  "submission_ready": false,
+  "browser_navigation_performed": false,
+  "artifacts": [
+    {
+      "name": "LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf",
+      "c_path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf",
+      "e_path": "LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf",
+      "bytes": 107655,
+      "sha256": "1278FE42AAC97EB87B97B0A657F1986F47BB51562C153C093B9EEEBB506259B2",
+      "c_copy_match": true,
+      "e_copy_match": true
+    },
+    {
+      "name": "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json",
+      "c_path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json",
+      "e_path": "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json",
+      "bytes": 10146,
+      "sha256": "DABAED4298B650855256E4054DAF1BE806F329846E1CD22CD01FD6F9D6F402CF",
+      "c_copy_match": true,
+      "e_copy_match": true
+    },
+    {
+      "name": "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.md",
+      "c_path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.md",
+      "e_path": "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.md",
+      "bytes": 5118,
+      "sha256": "D1CDDEEE4CD7D2ACE79C1C165F50B4DE6A7D3058C6B9470B88BEDCB0FB959EE2",
+      "c_copy_match": true,
+      "e_copy_match": true
+    },
+    {
+      "name": "SOURCE_MANIFEST_2026-07-16.json",
+      "c_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-16.json",
+      "e_path": "source/SOURCE_MANIFEST_2026-07-16.json",
+      "bytes": 1172,
+      "sha256": "5A9E6CFC98E70C452E90F5A51DC16C64AFDAFD8FA4DAF654CD2D5712BBF67894",
+      "c_copy_match": true,
+      "e_copy_match": true
+    },
+    {
+      "name": "CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "c_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "e_path": "source/CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "bytes": 162903,
+      "sha256": "EA456C2057DBE40128038FFFF3E1EB5C055D8CD36E8AF24ECD2EC5E8E5CDE209",
+      "c_copy_match": true,
+      "e_copy_match": true
+    },
+    {
+      "name": "HPCMP_SDC_FAQ_9June2026.pdf",
+      "c_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/HPCMP_SDC_FAQ_9June2026.pdf",
+      "e_path": "source/HPCMP_SDC_FAQ_9June2026.pdf",
+      "bytes": 81662,
+      "sha256": "6A650F8E22331EF97AB1837A1035527C8C778A0D5AFA9F27580A91977557D187",
+      "c_copy_match": true,
+      "e_copy_match": true
+    }
+  ],
+  "required_private_finalization": [
+    "Approve one Phase II-only firm-fixed-price Rough Order of Magnitude estimate.",
+    "Insert and verify the exact active SAM legal entity name and matching address in a private copy.",
+    "Review the live ERDCWERX form, amendments, representations, terms, and final confirmation."
+  ],
+  "claim_boundary": "This receipt proves bounded byte-for-byte mirroring at the recorded time. It does not prove submission, ERDC acceptance, available funding, award, active SAM status, price approval, technical performance, field validation, or Department of Defense deployment."
+}

@@ -1,0 +1,264 @@
+{
+  "claim_boundary": "This is a public-safe technical draft, not a submitted solution brief. It does not include the founder-approved Phase II price, private SAM-matched legal identity and address, a live SAM status verification, signature, certification, or portal confirmation. It does not claim ERDC selection, funding availability, a contract, Department of Defense deployment, an authorization to operate, classified-data handling, field validation, realized savings, or technical performance beyond the bounded repository evidence identified here.",
+  "deadline": {
+    "live_page_reviewed_date": "2026-07-17",
+    "official_live_page_text": "4:00 PM CT on August 7, 2026",
+    "official_project_url": "https://www.erdcwerx.org/sovereign-defense-cloud-for-high-performance-computing/"
+  },
+  "funding_currently_available": false,
+  "gate_sha256": "883690b7670e2b147506cff44def029ab686432f08855ce2d18916572a598573",
+  "generated_utc": "2026-07-17T05:39:14.639473+00:00",
+  "opportunity_number": "W912HZ26SC005",
+  "outputs": {
+    "json": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.md",
+    "pdf": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf"
+  },
+  "pdf": {
+    "acronym_pages": 1,
+    "all_detected_text_at_least_12_point": true,
+    "all_non_watermark_text_within_one_inch_margins": true,
+    "all_pages_letter_portrait": true,
+    "body_page_count": 5,
+    "body_page_labels_present": true,
+    "bytes": 107655,
+    "content_bounds_points_from_top_left": [
+      {
+        "bottom": 716.59,
+        "left": 72.0,
+        "right": 540.0,
+        "top": 204.75
+      },
+      {
+        "bottom": 716.59,
+        "left": 72.0,
+        "right": 499.2,
+        "top": 111.24
+      },
+      {
+        "bottom": 716.59,
+        "left": 72.0,
+        "right": 539.2,
+        "top": 78.59
+      },
+      {
+        "bottom": 716.59,
+        "left": 72.0,
+        "right": 540.0,
+        "top": 78.59
+      },
+      {
+        "bottom": 716.59,
+        "left": 72.0,
+        "right": 533.42,
+        "top": 78.59
+      },
+      {
+        "bottom": 716.59,
+        "left": 72.0,
+        "right": 540.0,
+        "top": 78.59
+      },
+      {
+        "bottom": 716.59,
+        "left": 72.0,
+        "right": 540.0,
+        "top": 78.59
+      }
+    ],
+    "cover_pages": 1,
+    "draft_watermark_present_every_page": true,
+    "embedded_font_names": [
+      "AAAAAA+TimesNewRomanPS-BoldMT",
+      "AAAAAA+TimesNewRomanPSMT"
+    ],
+    "exists": true,
+    "minimum_detected_font_size": 12.0,
+    "page_sizes_points": [
+      [
+        612.0,
+        792.0
+      ],
+      [
+        612.0,
+        792.0
+      ],
+      [
+        612.0,
+        792.0
+      ],
+      [
+        612.0,
+        792.0
+      ],
+      [
+        612.0,
+        792.0
+      ],
+      [
+        612.0,
+        792.0
+      ],
+      [
+        612.0,
+        792.0
+      ]
+    ],
+    "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf",
+    "physical_page_count": 7,
+    "required_content_markers_present": true,
+    "sha256": "1278fe42aac97eb87b97b0a657f1986f47bb51562c153c093b9eeebb506259b2",
+    "times_new_roman_detected": true
+  },
+  "required_private_finalization": [
+    "Approve one Phase II-only firm-fixed-price Rough Order of Magnitude estimate.",
+    "Insert the exact active SAM legal entity name and matching address in a private copy.",
+    "Reverify active SAM contract registration and review current ERDCWERX questions and answers.",
+    "Review the final private PDF, portal fields, representations, terms, and submission confirmation."
+  ],
+  "requirements": [
+    {
+      "evidence": "PDF has five numbered body pages plus excluded cover and acronym pages.",
+      "id": "FORMAT_01",
+      "requirement": "Five-page maximum proposal body",
+      "status": "PASS"
+    },
+    {
+      "evidence": "All seven physical pages are 612 by 792 points; body footers read 1 through 5 of 5 pages.",
+      "id": "FORMAT_02",
+      "requirement": "Letter, portrait, single-sided, page X of Y",
+      "status": "PASS"
+    },
+    {
+      "evidence": "PDF character-coordinate inspection verifies all non-watermark text remains within a 72-point boundary.",
+      "id": "FORMAT_03",
+      "requirement": "Minimum one-inch margins",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Embedded Windows Times New Roman files; PDF inspection rejects detected text below 12 points.",
+      "id": "FORMAT_04",
+      "requirement": "12-point Times New Roman; no smaller table or diagram text",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Generated PDF is English, Acrobat-readable, and size-checked.",
+      "id": "FORMAT_05",
+      "requirement": "English PDF under 20 MB",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Public-safe architecture and boundaries only; no private identity, patent claims, credentials, or classified data.",
+      "id": "DISCLOSURE_01",
+      "requirement": "No classified or proprietary information",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Body pages 1 and 2 define the evidence control plane, mission gap, components, and focus-area alignment.",
+      "id": "TECH_01",
+      "requirement": "Describe solution and mission effectiveness",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Body pages 1, 3, and 4 define the new application, prototype plan, acceptance checks, risks, and controls.",
+      "id": "TECH_02",
+      "requirement": "Explain innovation and feasibility",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Public website and repository are listed; evidence limitations explicitly reject field-validation claims.",
+      "id": "TECH_03",
+      "requirement": "Provide URL and convincing evidence",
+      "status": "PASS_BOUNDED"
+    },
+    {
+      "evidence": "Body page 5 preserves the required section but intentionally includes no unapproved amount.",
+      "id": "ROM_01",
+      "requirement": "One estimated price for Phase II prototype only",
+      "status": "PRIVATE_FINALIZATION_REQUIRED"
+    },
+    {
+      "evidence": "Public draft withholds identity and address; live SAM status and exact match must be verified before upload.",
+      "id": "SAM_01",
+      "requirement": "Active SAM contract registration and matching solution address",
+      "status": "PRIVATE_FINALIZATION_REQUIRED"
+    },
+    {
+      "evidence": "Official live page reviewed July 17; no portal submission is represented.",
+      "id": "PORTAL_01",
+      "requirement": "Submit through ERDCWERX form by 4:00 PM CT August 7, 2026",
+      "status": "HUMAN_FINAL_ACTION_REQUIRED"
+    },
+    {
+      "evidence": "Body page 3 and price gate scope Phase II only.",
+      "id": "FAQ_01",
+      "requirement": "ROM excludes Phase III and IV",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Per-enclave architecture and identity-context boundary are described without claiming accreditation or cross-domain transfer.",
+      "id": "FAQ_02",
+      "requirement": "Consider all classification levels without assuming CAC-only access",
+      "status": "PASS_BOUNDED"
+    },
+    {
+      "evidence": "Cover, compliance gate, and claim boundary state funding is not currently available and no award is guaranteed.",
+      "id": "FUNDING_01",
+      "requirement": "Do not imply current funds or guaranteed award",
+      "status": "PASS"
+    }
+  ],
+  "response_type": "RFI_STYLE_CSO_SOLUTION_BRIEF_EVALUATION_LANE",
+  "schema": "lumencore.erdc_sdc_solution_brief_compliance_gate.v1",
+  "source_integrity": {
+    "all_source_checks_pass": true,
+    "files": [
+      {
+        "actual_bytes": 162903,
+        "actual_pages": 7,
+        "actual_sha256": "ea456c2057dbe40128038ffff3e1eb5c055d8cd36e8af24ecd2ec5e8e5cde209",
+        "bytes_match": true,
+        "expected_bytes": 162903,
+        "expected_pages": 7,
+        "expected_sha256": "ea456c2057dbe40128038ffff3e1eb5c055d8cd36e8af24ecd2ec5e8e5cde209",
+        "official_url": "https://www.erdcwerx.org/wp-content/uploads/2026/05/CSO-HPCMP-SDC-30April2026-FINAL.pdf",
+        "page_count_match": true,
+        "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+        "sha256_match": true
+      },
+      {
+        "actual_bytes": 81662,
+        "actual_pages": 6,
+        "actual_sha256": "6a650f8e22331ef97ab1837a1035527c8c778a0d5afa9f27580a91977557d187",
+        "bytes_match": true,
+        "expected_bytes": 81662,
+        "expected_pages": 6,
+        "expected_sha256": "6a650f8e22331ef97ab1837a1035527c8c778a0d5afa9f27580a91977557d187",
+        "official_url": "https://www.erdcwerx.org/wp-content/uploads/2026/06/HPCMP-SDC-FAQ-Website-9June2026.pdf",
+        "page_count_match": true,
+        "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/HPCMP_SDC_FAQ_9June2026.pdf",
+        "sha256_match": true
+      }
+    ],
+    "manifest_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-16.json",
+    "manifest_sha256": "5a9e6cfc98e70c452e90f5a51dc16c64afdafd8fa4daf654cd2d5712bbf67894"
+  },
+  "status": "TECHNICAL_DRAFT_PASS_PRIVATE_ROM_AND_SAM_FINALIZATION_REQUIRED",
+  "submission_ready": false,
+  "summary": {
+    "browser_navigation_performed": false,
+    "external_send_allowed_without_human": false,
+    "final_portal_submit_allowed_without_human": false,
+    "finalization_blocker_count": 3,
+    "finalization_blocker_ids": [
+      "ROM_01",
+      "SAM_01",
+      "PORTAL_01"
+    ],
+    "legal_identity_publish_allowed": false,
+    "pass_or_bounded_pass_count": 12,
+    "pricing_allowed_without_founder_approval": false,
+    "requirement_count": 15
+  },
+  "technical_document_checks_pass": true
+}
