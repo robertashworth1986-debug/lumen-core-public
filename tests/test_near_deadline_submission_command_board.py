@@ -24,13 +24,13 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
 
     assert payload["schema"] == "near_deadline_submission_command_board_v4"
     assert payload["status"] == "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS"
-    assert payload["summary"]["lane_count"] == 15
-    assert payload["summary"]["stage_now_count"] == 3
+    assert payload["summary"]["lane_count"] == 16
+    assert payload["summary"]["stage_now_count"] == 4
     assert payload["summary"]["sent_verified_count"] == 3
     assert payload["summary"]["emergency_eligibility_gate_count"] == 0
     assert payload["summary"]["no_bid_or_partner_only_count"] == 5
     assert payload["summary"]["expired_without_verified_send_count"] == 1
-    assert payload["summary"]["human_gated_count"] == 11
+    assert payload["summary"]["human_gated_count"] == 12
     assert payload["summary"]["final_submit_allowed_without_human"] is False
     assert payload["summary"]["external_send_allowed_without_human"] is False
     assert payload["summary"]["pricing_allowed_without_human"] is False
@@ -42,6 +42,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "693JJ326R000012" in stage_ids
     assert "26-510" in stage_ids
     assert "W912HZ26SC005" in stage_ids
+    assert "NASHVILLE-EC-FALL-2026" in stage_ids
 
     sent_ids = {row["opportunity_number"] for row in payload["sent_verified"]}
     assert sent_ids == {
@@ -51,7 +52,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     }
 
     assert "HHS-2026-ACL-NIDILRR-REGE-0212" in payload["summary"]["closest_deadline_lane"]
-    assert "693JJ326R000012" in payload["summary"]["closest_stage_ready_lane"]
+    assert "NASHVILLE-EC-FALL-2026" in payload["summary"]["closest_stage_ready_lane"]
 
     nsf = next(row for row in payload["lanes"] if row["opportunity_number"] == "26-510")
     assert nsf["deadline_date"] == "2026-11-04"
@@ -66,6 +67,20 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "planning target" in nsf["official_deadline_text"]
     assert "26-510" in payload["summary"]["best_grants_lane"]
     assert "planning only" in payload["summary"]["best_grants_lane"]
+
+    ec = next(
+        row
+        for row in payload["lanes"]
+        if row["opportunity_number"] == "NASHVILLE-EC-FALL-2026"
+    )
+    assert ec["command"] == "STAGE_APPLICATION"
+    assert ec["deadline_date"] == "2026-07-17"
+    assert ec["deadline_utc"] is None
+    assert ec["deadline_semantics"] == "DATE_ONLY_CLOSE_TIME_NOT_LISTED_SUBMIT_EARLY"
+    assert "TAKEOFF" in ec["fit_state"]
+    assert "does not list a closing time" in ec["official_deadline_text"]
+    assert ec["external_send_allowed_without_human"] is False
+    assert ec["final_submit_allowed_without_human"] is False
 
 
 def test_near_deadline_board_keeps_hud_and_bop_behind_correct_gates():
@@ -109,6 +124,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "Near-Deadline Submission Command Board" in rendered
     assert "Final submit without human: `false`" in rendered
     assert "https://seedfund.nsf.gov/project-pitch/" in rendered
+    assert "https://ec.co/apply/" in rendered
     assert "https://www.grants.gov/search-results-detail/362360" in rendered
     assert "Sent And Verified" in rendered
     assert "No-Bid Or Partner-Only" in rendered
@@ -122,6 +138,8 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "doj_bop_source_manifest",
         "nsf_project_pitch_portal_fields",
         "nsf_project_pitch_routing_manifest",
+        "nashville_ec_portal_field_map",
+        "nashville_ec_application_manifest",
     ):
         assert payload["source_ledgers"][source]["present"] is True
 

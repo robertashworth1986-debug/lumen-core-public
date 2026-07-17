@@ -36,6 +36,13 @@ NSF_PORTAL_FIELDS = NSF_PITCH_DIR / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md"
 NSF_ROUTING_MANIFEST = (
     NSF_PITCH_DIR / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json"
 )
+NASHVILLE_EC_DIR = ROOT / "grant_submissions" / "NASHVILLE_EC_FALL_2026"
+NASHVILLE_EC_FIELD_MAP = (
+    NASHVILLE_EC_DIR / "NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md"
+)
+NASHVILLE_EC_MANIFEST = (
+    NASHVILLE_EC_DIR / "NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json"
+)
 
 OUT_JSON = OUT_OPS / "near_deadline_submission_command_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "near_deadline_submission_command_board.json"
@@ -48,6 +55,7 @@ STAGE_COMMANDS = {
     "BUILD_PRIMARY_VOLUME",
     "STAGE_PROJECT_PITCH",
     "STAGE_CONCEPT_PAPER",
+    "STAGE_APPLICATION",
 }
 NO_BID_COMMANDS = {
     "NO_BID_MISSED_PREREQUISITE",
@@ -161,6 +169,8 @@ def base_sources() -> dict[str, Any]:
         "doj_bop_source_manifest": DOJ_BOP_SOURCE_MANIFEST,
         "nsf_project_pitch_portal_fields": NSF_PORTAL_FIELDS,
         "nsf_project_pitch_routing_manifest": NSF_ROUTING_MANIFEST,
+        "nashville_ec_portal_field_map": NASHVILLE_EC_FIELD_MAP,
+        "nashville_ec_application_manifest": NASHVILLE_EC_MANIFEST,
     }.items():
         if path.exists():
             data = path.read_bytes()
@@ -325,6 +335,50 @@ def build_command_lanes(
             "human_gate": [
                 "Robert approves final capability language and any past-performance statement.",
                 "Robert approves the final email send.",
+            ],
+            "external_send_allowed_without_human": False,
+            "final_submit_allowed_without_human": False,
+        },
+        {
+            "rank": 1.5,
+            "lane_id": "nashville_ec_fall_2026_takeoff",
+            "source_system": "Nashville Entrepreneur Center official site / Gmail newsletter",
+            "opportunity_number": "NASHVILLE-EC-FALL-2026",
+            "title": "Nashville Entrepreneur Center Fall 2026 Accelerators",
+            "agency": "Nashville Entrepreneur Center",
+            "deadline_utc": None,
+            "deadline_date": "2026-07-17",
+            "official_deadline_text": (
+                "Applications close July 17, 2026; the official page does not list a "
+                "closing time"
+            ),
+            "deadline_semantics": "DATE_ONLY_CLOSE_TIME_NOT_LISTED_SUBMIT_EARLY",
+            "command": "STAGE_APPLICATION",
+            "eligibility_state": "MIDDLE_TENNESSEE_SOLO_FOUNDER_FIT_HUMAN_FACTS_UNVERIFIED",
+            "fit_state": "STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT",
+            "submission_route": "Nashville Entrepreneur Center common accelerator application",
+            "official_url": "https://ec.co/apply/",
+            "secondary_url": "https://ec.co/accelerators/takeoff/",
+            "package_files": [
+                rel(NASHVILLE_EC_FIELD_MAP),
+                rel(NASHVILLE_EC_MANIFEST),
+            ],
+            "why_now": (
+                "This is the nearest legitimate local reviewer and commercialization route. "
+                "TakeOff fits a Nashville-based solo founder with a working MVP and no "
+                "claimed customers. The listed $500 program fee and $125 start payment are "
+                "not authorized; the application should answer no on fee readiness and "
+                "request financial aid before accepting terms."
+            ),
+            "today_work": [
+                "Confirm the nine founder, work-status, conversation-count, and financial facts in the local field map.",
+                "Paste the claim-bounded answers into the common application and select TakeOff.",
+                "Stop at final preview; do not accept a fee, terms, or cohort seat during application staging.",
+            ],
+            "human_gate": [
+                "Robert confirms founder status, weekly hours, conversation count, revenue, investment, funding, and business debt facts.",
+                "Robert reviews the final portal preview and approves submission before the July 17 close.",
+                "Any later program fee, financial-aid arrangement, terms, or cohort acceptance requires a separate decision.",
             ],
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,
@@ -829,12 +883,12 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "no_bid_or_partner_only_count": len(no_bid),
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Stage the rolling NSF Project Pitch, verify that no pitch or invitation is already open, and re-verify the FHWA TSMO solicitation before portal work; NASA, Army, and CDC are already sent and receipt-backed.",
+            "strongest_today_action": "Complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close, then stage the rolling NSF Project Pitch and re-verify FHWA; NASA, Army, and CDC are already sent and receipt-backed.",
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
             "best_grants_lane": "NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. November 4, 2026 is planning only.",
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03.",
-            "fastest_low_friction_lane": "NASA RFI was sent on 2026-07-13; no remaining lane is both complete and low-friction.",
+            "fastest_low_friction_lane": "The Nashville EC TakeOff application is the nearest low-friction reviewer route, but nine founder facts and final portal submission remain human-gated.",
             "all_final_actions_blocked_without_human": True,
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,
@@ -938,7 +992,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        "Direct answer: NASA, Army, and CDC are sent and receipt-backed; stage the rolling NSF Project Pitch and re-verify FHWA next, keep DOJ/BOP partner-only, and expire missed lanes without implying a submission.",
+        "Direct answer: NASA, Army, and CDC are sent and receipt-backed; finish the July 17 Nashville EC TakeOff application first, then stage the rolling NSF Project Pitch and re-verify FHWA, while keeping DOJ/BOP partner-only.",
         "",
         "## Control Line",
         "",

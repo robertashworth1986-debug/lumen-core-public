@@ -1,0 +1,435 @@
+{
+  "schema": "lumencore.nashville_ec_fall_2026_application.v1",
+  "generated_utc": "2026-07-17T01:37:54.099704+00:00",
+  "opportunity": {
+    "name": "Nashville Entrepreneur Center Fall 2026 Accelerators",
+    "deadline_date": "2026-07-17",
+    "deadline_time": null,
+    "official_deadline_text": "Applications close July 17, 2026; no time is listed on the official page.",
+    "recommended_route": "TakeOff",
+    "alternate_routes": [],
+    "eligibility_fit": "Nashville-based solo pre-revenue technology founder with a working MVP",
+    "application_form_id": "261305765806056"
+  },
+  "program_economics": {
+    "application_fee": null,
+    "application_fee_status": "NOT_LISTED_ON_REVIEWED_OFFICIAL_PAGES",
+    "takeoff_program_fee": 500,
+    "takeoff_required_to_start": 125,
+    "equity_taken": 0,
+    "fee_commitment_authorized": false,
+    "financial_aid_request_recommended": true
+  },
+  "summary": {
+    "field_count": 41,
+    "required_field_count": 30,
+    "status_counts": {
+      "READY": 18,
+      "PRIVATE_PORTAL_ENTRY": 2,
+      "HUMAN_CONFIRM_REQUIRED": 11,
+      "CONDITIONAL_NOT_APPLICABLE": 2,
+      "READY_NO_FEE_COMMITMENT": 1,
+      "OPTIONAL_FOUNDER_CHOICE": 7
+    },
+    "portal_ready_except_human_facts": true,
+    "final_submit_allowed_without_human": false,
+    "accept_program_terms_allowed_without_human": false,
+    "fee_commitment_allowed_without_human": false
+  },
+  "fields": [
+    {
+      "question_id": 3,
+      "section": "Founder Information",
+      "label": "Founder Name",
+      "required": true,
+      "proposed_answer": "Robert Ashworth",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 4,
+      "section": "Founder Information",
+      "label": "Founder Email",
+      "required": true,
+      "proposed_answer": "[PRIVATE_PORTAL_ENTRY_FROM_GMAIL_ACCOUNT]",
+      "status": "PRIVATE_PORTAL_ENTRY",
+      "evidence": "Authenticated Gmail account"
+    },
+    {
+      "question_id": 75,
+      "section": "Founder Information",
+      "label": "Founder Phone Number",
+      "required": false,
+      "proposed_answer": "[PRIVATE_PORTAL_ENTRY]",
+      "status": "PRIVATE_PORTAL_ENTRY",
+      "evidence": "Private contact record"
+    },
+    {
+      "question_id": 26,
+      "section": "Founder Information",
+      "label": "LinkedIn Profile URL",
+      "required": false,
+      "proposed_answer": "https://www.linkedin.com/in/robert-ashworth-40a9b7376",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 6,
+      "section": "Founder Information",
+      "label": "Business Name",
+      "required": true,
+      "proposed_answer": "LumenCore",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 27,
+      "section": "Founder Information",
+      "label": "Business City and State",
+      "required": true,
+      "proposed_answer": "Nashville, TN",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 76,
+      "section": "Founder Information",
+      "label": "Business Website",
+      "required": false,
+      "proposed_answer": "https://lumen-core.ai",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 38,
+      "section": "Founder Information",
+      "label": "Are you a first-time founder?",
+      "required": true,
+      "proposed_answer": "[SELECT YES OR NO AFTER FOUNDER CONFIRMATION]",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "No authoritative local record found"
+    },
+    {
+      "question_id": 28,
+      "section": "Founder Information",
+      "label": "Are you working on this business full-time?",
+      "required": true,
+      "proposed_answer": "[SELECT YES OR NO AFTER FOUNDER CONFIRMATION]",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "No authoritative employment-status record found"
+    },
+    {
+      "question_id": 29,
+      "section": "Founder Information",
+      "label": "Hours per week actively working on the business",
+      "required": true,
+      "proposed_answer": "30+ if accurate; otherwise select the truthful bracket",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "Founder attestation required"
+    },
+    {
+      "question_id": 96,
+      "section": "Business Stage",
+      "label": "Tell us about your business",
+      "required": true,
+      "proposed_answer": "LumenCore is a proof-to-pilot AI validation platform for infrastructure, energy, and other high-consequence time-series systems. It helps technical buyers compare candidate models and workflows against locked baselines using past-only evaluation, calibrated uncertainty, explicit abstention, and hash-verifiable replay receipts. The problem is that teams can deploy confident AI outputs without a defensible record of which data, metric, or validation window justified the decision. LumenCore's first commercial product is a paid evidence-review and replay-scoping sprint that defines what a buyer-controlled pilot would need to prove.",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 30,
+      "section": "Business Stage",
+      "label": "Which best describes your business today?",
+      "required": true,
+      "proposed_answer": "I am building a prototype or MVP",
+      "status": "READY",
+      "evidence": "Repository describes a research prototype and working API/dashboard components"
+    },
+    {
+      "question_id": 31,
+      "section": "Business Stage",
+      "label": "How long have you been working on this business?",
+      "required": true,
+      "proposed_answer": "1 to 3 years if accurate",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "Founder attestation required"
+    },
+    {
+      "question_id": 33,
+      "section": "Business Stage",
+      "label": "Industry",
+      "required": true,
+      "proposed_answer": "Technology or SaaS",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 60,
+      "section": "Business Stage",
+      "label": "Healthcare focus",
+      "required": true,
+      "proposed_answer": "Not applicable unless the portal conditionally routes to Project Healthcare",
+      "status": "CONDITIONAL_NOT_APPLICABLE",
+      "evidence": "Recommended route is TakeOff"
+    },
+    {
+      "question_id": 32,
+      "section": "Business Stage",
+      "label": "Business model",
+      "required": true,
+      "proposed_answer": "B2B",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 34,
+      "section": "Business Stage",
+      "label": "Current product or service readiness",
+      "required": true,
+      "proposed_answer": "MVP built",
+      "status": "READY",
+      "evidence": "Working ingestion, benchmark, API, dashboard, and evidence-manifest components"
+    },
+    {
+      "question_id": 35,
+      "section": "Business Stage",
+      "label": "Do you currently have customers or users?",
+      "required": true,
+      "proposed_answer": "No",
+      "status": "READY",
+      "evidence": "No paying customer, pilot customer, or production user is currently claimed"
+    },
+    {
+      "question_id": 37,
+      "section": "Business Stage",
+      "label": "Team size including founder",
+      "required": true,
+      "proposed_answer": "1",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 84,
+      "section": "Validation",
+      "label": "Customer discovery or sales conversations completed",
+      "required": true,
+      "proposed_answer": "11 to 25 if the founder confirms qualifying conversations; otherwise select the lower truthful bracket",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "Gmail shows multiple institutional exchanges, but the form's conversation definition requires founder confirmation"
+    },
+    {
+      "question_id": 85,
+      "section": "Validation",
+      "label": "Clearest evidence the business solves a real problem",
+      "required": true,
+      "proposed_answer": "Current evidence is technical and engagement-stage, not customer-result proof. LumenCore has reproducible benchmark and replay infrastructure with preserved negative results, while EPRI initiated Open Power AI consortium onboarding and LANL received a bounded reviewer package. Those signals show that controlled benchmarking and reviewer-safe evidence matter to serious institutions; the next proof needed is a buyer-owned historical replay or paid pilot with locked acceptance metrics.",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 95,
+      "section": "Needs",
+      "label": "What are you most trying to figure out right now?",
+      "required": false,
+      "proposed_answer": "Find my first customers; Achieve product-market fit; Create a repeatable sales process; Raise capital",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 94,
+      "section": "Needs",
+      "label": "Areas needing the most support",
+      "required": true,
+      "proposed_answer": "Clarifying Vision, Strategy, and Priorities; Sales Process and Revenue Growth; Product Development and Product-Market Fit; Business Model and Financial Modeling; Raising Capital",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 88,
+      "section": "Goals",
+      "label": "Success over the next 6 to 12 months",
+      "required": true,
+      "proposed_answer": "Secure one paid buyer-controlled evaluation, complete one independent reproduction with a signed receipt, convert at least one institutional relationship into a scoped pilot, and establish a repeatable sales process for evidence-review and replay-scope packages. Success will be measured by signed scope, lawful data access, preregistered acceptance metrics, reviewer completion, and paid work rather than unsupported valuation or savings claims.",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 89,
+      "section": "Goals",
+      "label": "Why now?",
+      "required": true,
+      "proposed_answer": "The technical MVP and evidence controls exist; the bottleneck has moved from building to customer selection, positioning, pricing, and pilot conversion. EPRI has initiated consortium onboarding, LANL has received a bounded reviewer packet, and federal capability responses have produced transmission receipts, but no paid customer or field validation is claimed. The Fall cohort aligns with the need for local mentors, buyer introductions, and a disciplined go-to-market process.",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 66,
+      "section": "Financials",
+      "label": "Total revenue for previous year",
+      "required": true,
+      "proposed_answer": "$0 only after founder confirms no business revenue",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "Local materials describe LumenCore as pre-revenue but require founder confirmation"
+    },
+    {
+      "question_id": 36,
+      "section": "Financials",
+      "label": "Current annualized or most recent 12-month revenue",
+      "required": true,
+      "proposed_answer": "$0 only after founder confirms no business revenue",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "Local materials describe LumenCore as pre-revenue but require founder confirmation"
+    },
+    {
+      "question_id": 62,
+      "section": "Financials",
+      "label": "Total founder cash invested to date",
+      "required": true,
+      "proposed_answer": "[ENTER VERIFIED CUMULATIVE BUSINESS INVESTMENT]",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "No authoritative local total found"
+    },
+    {
+      "question_id": 63,
+      "section": "Financials",
+      "label": "Total grant funding received",
+      "required": true,
+      "proposed_answer": "$0 if no grant award funds have been received",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "No grant award is currently claimed"
+    },
+    {
+      "question_id": 64,
+      "section": "Financials",
+      "label": "Total investor capital raised",
+      "required": true,
+      "proposed_answer": "$0 if no investor capital has been received",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "No investment is currently claimed"
+    },
+    {
+      "question_id": 65,
+      "section": "Financials",
+      "label": "Total debt leveraged to date",
+      "required": true,
+      "proposed_answer": "[ENTER BUSINESS DEBT ONLY; DO NOT INCLUDE PERSONAL DEBT UNLESS THE FORM REQUIRES IT]",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "No authoritative business-debt total found"
+    },
+    {
+      "question_id": 61,
+      "section": "Financials",
+      "label": "Prepared to invest in a program fee at this time?",
+      "required": true,
+      "proposed_answer": "No; request financial aid before accepting any fee",
+      "status": "READY_NO_FEE_COMMITMENT",
+      "evidence": "TakeOff lists a $500 fee and $125 required to start; no spending is authorized"
+    },
+    {
+      "question_id": 83,
+      "section": "Optional Demographics",
+      "label": "Race and ethnicity",
+      "required": false,
+      "proposed_answer": "Founder choice",
+      "status": "OPTIONAL_FOUNDER_CHOICE",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 82,
+      "section": "Optional Demographics",
+      "label": "Gender",
+      "required": false,
+      "proposed_answer": "Founder choice",
+      "status": "OPTIONAL_FOUNDER_CHOICE",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 81,
+      "section": "Optional Demographics",
+      "label": "LGBTQIA+ identity",
+      "required": false,
+      "proposed_answer": "Founder choice",
+      "status": "OPTIONAL_FOUNDER_CHOICE",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 69,
+      "section": "Optional Demographics",
+      "label": "Pronouns",
+      "required": false,
+      "proposed_answer": "Founder choice",
+      "status": "OPTIONAL_FOUNDER_CHOICE",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 80,
+      "section": "Optional Demographics",
+      "label": "Military service",
+      "required": false,
+      "proposed_answer": "Founder choice",
+      "status": "OPTIONAL_FOUNDER_CHOICE",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 79,
+      "section": "Optional Demographics",
+      "label": "Disability or chronic condition",
+      "required": false,
+      "proposed_answer": "Founder choice",
+      "status": "OPTIONAL_FOUNDER_CHOICE",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 73,
+      "section": "Optional Demographics",
+      "label": "Access needs",
+      "required": false,
+      "proposed_answer": "Founder choice",
+      "status": "OPTIONAL_FOUNDER_CHOICE",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 24,
+      "section": "Source",
+      "label": "How did you hear about the accelerator?",
+      "required": true,
+      "proposed_answer": "EC Email Newsletter",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "question_id": 90,
+      "section": "Source",
+      "label": "Other source details",
+      "required": true,
+      "proposed_answer": "Not applicable because EC Email Newsletter is selected",
+      "status": "CONDITIONAL_NOT_APPLICABLE",
+      "evidence": "Public-safe local business record"
+    }
+  ],
+  "human_fact_gate": [
+    "First-time founder status",
+    "Full-time business status and weekly hours",
+    "Time working on the business",
+    "Qualifying customer-discovery conversation count",
+    "Previous-year and trailing-12-month business revenue",
+    "Cumulative founder cash investment",
+    "Grant funds received and investor capital received",
+    "Business debt leveraged",
+    "Optional demographic responses"
+  ],
+  "final_action_gate": {
+    "status": "HUMAN_REVIEW_AND_SUBMIT_REQUIRED",
+    "action": "Review the final portal preview and submit before the official July 17 close.",
+    "submit_allowed_without_human": false
+  },
+  "official_sources": {
+    "application": "https://ec.co/apply/",
+    "accelerators": "https://ec.co/accelerators/",
+    "takeoff": "https://ec.co/accelerators/takeoff/",
+    "inflight": "https://ec.co/accelerators/inflight/",
+    "project_healthcare": "https://ec.co/accelerators/project-healthcare/"
+  },
+  "claim_boundary": "This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms.",
+  "application_packet_sha256": "be9ae476ccceb0fc26b98be663abc2ec1454d113e8ca34e02ee8a9922e4f97c7"
+}
