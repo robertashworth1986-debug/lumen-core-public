@@ -1,26 +1,26 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T04:29:38.5349757Z",
+  "created_utc": "2026-07-17T06:07:53.0409588Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/CURRENT_ACTION_CONTROL_20260716",
-  "artifact_count": 18,
+  "artifact_count": 21,
   "all_sha256_matched_after_copy": true,
   "artifacts": [
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 65036,
-      "sha256": "DE6D8096D1257CDB9AB828F68D67E98E572F2BDEC0491BEA4BFC6D030CC50304",
+      "bytes": 66473,
+      "sha256": "CFEF0D456B98BB5435407084441841B890A533AFBC6746E4DF8D3DEF3E81A9C5",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 8480,
-      "sha256": "A4FCA00C0CD604339128F013C0194C72C86507180F08234A42C508A2EF7FB9B2",
+      "bytes": 8816,
+      "sha256": "30927E373955711AED240D56EF420F5C46E88EC67D5BDBF15371E778241ABFF4",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_epri_open_power_ai_mou_response.py",
-      "bytes": 5197,
-      "sha256": "5402BB797929C45EE78575F9FF4DA85A68E221B93F87396606F285D5036562CF",
+      "bytes": 5411,
+      "sha256": "BE152FA470CA4E8D72AD82894D112974702B0B505347D709EBD879D84B6D53CB",
       "copy_sha256_matched": true
     },
     {
@@ -37,26 +37,26 @@
     },
     {
       "source": "code/ops/BUILD_SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL.py",
-      "bytes": 19745,
-      "sha256": "FA899A6644C3D5541D23DE66DE19C9394CEF220BD241EC1C50249BE7003AB29D",
+      "bytes": 21213,
+      "sha256": "D9D9507FF0970DAE7CDC25C9B79D41942CAED334E5F4936EB1E92EE409C23A31",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_sam_public_credential_rotation_control.py",
-      "bytes": 6428,
-      "sha256": "934A22620B889F65337439C8894610F1BABA15D4A00B20C04E3B42854DA4914F",
+      "bytes": 8771,
+      "sha256": "565DEEEF1A6807E2CC811EF4D89B896A5738E82DBCF4A2815AA4C9ED08040768",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
-      "bytes": 3980,
-      "sha256": "8636429835230980CF3EB1E56FC6AAE0517142EE09CB86DFAAA5F1E7445B7D4C",
+      "bytes": 4529,
+      "sha256": "6635A3FA854BD29C14547E6112CB66C51C5B8238908C438099A52610D140A563",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
-      "bytes": 2007,
-      "sha256": "F42E4BEA2F08C9C910752B8B672ECEECADCFC40DF952999DF32589EA94A41671",
+      "bytes": 2182,
+      "sha256": "B3A0D9A758844E526EA94F34AAF7EAD4AB0EB168C32C79B1C69615FC2ED516C7",
       "copy_sha256_matched": true
     },
     {
@@ -111,6 +111,24 @@
       "source": "docs/DEADLINE_RECOVERY_CHECKLIST.md",
       "bytes": 4474,
       "sha256": "3C62A0110E0F7646C48CA6443EC47BA553769128582034C0064DDCA4A332F1DE",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py",
+      "bytes": 9815,
+      "sha256": "37D6EA8FFF2F0A14AE254AA1E6A090B558FB045E883E2371E658989611EFEA75",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_install_sam_public_credential.py",
+      "bytes": 5729,
+      "sha256": "CA3136F41CBFBAC3A0EB02CE358B25020526F0948BE69E6CFE3DDD87ABBB59A3",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "bytes": 38319,
+      "sha256": "E40578A5F4D266732BD90AC2A6D7504437BFCFE4DE30AB68D153AC6B322DC3A4",
       "copy_sha256_matched": true
     }
   ],

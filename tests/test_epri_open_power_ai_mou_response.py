@@ -93,7 +93,7 @@ def test_action_control_packet_has_a_bounded_e_drive_integrity_receipt():
     receipt = json.loads(SYNC_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 18
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 21
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["destination_root"].startswith("E:/LumaProofVault/")
     assert "does not prove email transmission" in receipt["claim_boundary"]
@@ -113,9 +113,12 @@ def test_action_control_packet_has_a_bounded_e_drive_integrity_receipt():
     mirrored_sources = {artifact["source"] for artifact in receipt["artifacts"]}
     assert {
         "code/ops/BUILD_SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL.py",
+        "code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py",
         "tests/test_sam_public_credential_rotation_control.py",
+        "tests/test_install_sam_public_credential.py",
         "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
         "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
+        "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
         "code/ops/BUILD_PATENT_DEADLINE_EVIDENCE_CONTROL.py",
         "tests/test_patent_deadline_evidence_control.py",
         "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json",

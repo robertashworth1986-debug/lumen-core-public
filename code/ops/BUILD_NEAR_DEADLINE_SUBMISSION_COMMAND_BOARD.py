@@ -863,6 +863,29 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
     sam_rotation_control = read_json(SAM_KEY_ROTATION_CONTROL)
     if sam_rotation_control.get("schema") != "lumencore.sam_public_credential_rotation_control.v1":
         raise ValueError("SAM.gov API-key rotation control is missing or stale")
+    sam_deadline_state = sam_rotation_control["deadline"]["state"]
+    if sam_rotation_control["rotation_verified"]:
+        sam_critical_action = (
+            "SAM.gov public API-key rotation is locally detected and live-API verified; preserve the "
+            "private key boundary and continue monitoring client health."
+        )
+    elif sam_deadline_state == "PAST_DUE":
+        sam_critical_action = (
+            "SAM.gov public API-key rotation became overdue after 2026-07-16. Use the guarded hidden-input "
+            "installer immediately, then require changed-fingerprint and live-API verification. Entity "
+            "registration remains active; credential rotation is a separate account-maintenance action."
+        )
+    elif sam_deadline_state == "DUE_TODAY":
+        sam_critical_action = (
+            "SAM.gov public API-key rotation is due 2026-07-16. Use the guarded hidden-input installer "
+            "today; entity registration remains active and credential rotation is a separate "
+            "account-maintenance action."
+        )
+    else:
+        sam_critical_action = (
+            "SAM.gov public API-key rotation is upcoming. Use the guarded hidden-input installer before "
+            "the deadline and verify the replacement without exposing it."
+        )
     patent_deadline_control = read_json(PATENT_DEADLINE_CONTROL)
     if patent_deadline_control.get("schema") != "lumencore.patent_deadline_evidence_control.v1":
         raise ValueError("Patent deadline evidence control is missing or stale")
@@ -911,7 +934,7 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
             "strongest_today_action": "Retrieve and install the already-generated SAM.gov replacement public API key without exposing it, complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close, then capture the complete Patent Center docket for the separate U.S.-deadline and foreign/PCT-priority reviews; NASA, Army, and CDC are already sent and receipt-backed.",
-            "critical_same_day_infrastructure_action": "SAM.gov public API-key rotation is due 2026-07-16. Entity registration remains active; credential rotation is a separate account-maintenance action.",
+            "critical_same_day_infrastructure_action": sam_critical_action,
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
             "best_grants_lane": "NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. November 4, 2026 is planning only.",
@@ -927,10 +950,12 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "sam_public_key_rotation": {
                 "status": sam_rotation_control["status"],
                 "deadline_local": sam_rotation_control["deadline"]["date_local"],
+                "deadline_state": sam_deadline_state,
                 "aliases_consistent": sam_rotation_control["local_configuration"]["aliases_consistent"],
                 "replacement_installation_detected": sam_rotation_control["local_configuration"]["replacement_installation_detected"],
                 "api_probe": sam_rotation_control["api_probe"]["classification"],
                 "rotation_verified": sam_rotation_control["rotation_verified"],
+                "private_installer": sam_rotation_control["private_installer"]["path"],
                 "control_artifact": rel(SAM_KEY_ROTATION_CONTROL),
                 "human_action_required": True,
                 "browser_navigation_performed": False,
@@ -1045,7 +1070,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        "Direct answer: NASA, Army, and CDC are sent and receipt-backed; rotate the SAM.gov public API key due today without exposing it, then finish the July 17 Nashville EC TakeOff application, stage the rolling NSF Project Pitch, and re-verify FHWA while keeping DOJ/BOP partner-only.",
+        f"Direct answer: NASA, Army, and CDC are sent and receipt-backed. {summary['critical_same_day_infrastructure_action']} Finish the July 17 Nashville EC TakeOff application, stage the rolling NSF Project Pitch, and re-verify FHWA while keeping DOJ/BOP partner-only.",
         "",
         "## Control Line",
         "",
@@ -1059,7 +1084,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Expired without verified send: `{summary['expired_without_verified_send_count']}`",
         f"- Human-gated lanes: `{summary['human_gated_count']}`",
         f"- Strongest today action: {summary['strongest_today_action']}",
-        f"- Critical same-day infrastructure action: {summary['critical_same_day_infrastructure_action']}",
+        f"- Critical infrastructure action: {summary['critical_same_day_infrastructure_action']}",
         f"- Closest deadline lane: {summary['closest_deadline_lane']}",
         f"- Closest stage-ready lane: {summary['closest_stage_ready_lane']}",
         f"- Best grants lane: {summary['best_grants_lane']}",
@@ -1080,10 +1105,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
             lines.extend(
                 [
                     f"- Deadline local: `{control['deadline_local']}`",
+                    f"- Deadline state: `{control['deadline_state']}`",
                     f"- Aliases consistent: `{str(control['aliases_consistent']).lower()}`",
                     f"- Replacement installation detected: `{str(control['replacement_installation_detected']).lower()}`",
                     f"- API probe: `{control['api_probe']}`",
                     f"- Rotation verified: `{str(control['rotation_verified']).lower()}`",
+                    f"- Guarded installer: `{control['private_installer']}`",
                 ]
             )
         elif key == "patent_deadline_evidence":

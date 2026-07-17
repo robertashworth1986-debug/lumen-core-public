@@ -1,6 +1,6 @@
 # SAM.gov API-Key Rotation Control - 2026-07-16
 
-Status: `ROTATION_DUE_REPLACEMENT_NOT_DETECTED`
+Status: `ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED`
 
 ## Direct Answer
 
@@ -19,22 +19,23 @@ Do not claim the SAM key is rotated yet. The current local aliases are consisten
 - API probe: `HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE`
 - API HTTP status: `404`
 - Rotation verified: `false`
-- Control SHA-256: `2f53c464fc559822d28f1b5fa0794a12e5e308589c7b7848efa1686415f0f78a`
+- Control SHA-256: `ea4b3903a4bc0e316c8df1b35a702bd1e23f08db745cccce660ce7bec67cc51b`
 
 No secret value, request URL, response body, or secret fingerprint is published.
+The guarded local installer is `code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py`; it accepts the replacement only through a hidden prompt.
 
 ## Human Action Gate
 
 1. Keep the existing signed-in in-app browser tab on SAM.gov.
 2. Open Account Details and locate Public API Key.
 3. Use the SAM.gov one-time-password flow to reveal the already-generated replacement.
-4. Install the replacement into all three ignored local aliases without pasting it into chat or Git.
+4. Run `python code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py` in a private terminal and paste the replacement only at its hidden prompt.
 5. Rerun this verifier and require a changed private fingerprint; require a live authenticated response when the upstream API is observable.
 
 ## Official References
 
 - SAM.gov Account Details: https://sam.gov/profile/details
-- GSA API documentation: https://open.gsa.gov/api/assistance-listings-api/
+- GSA API documentation: https://open.gsa.gov/api/get-opportunities-public-api/
 
 ## Claim Boundary
 

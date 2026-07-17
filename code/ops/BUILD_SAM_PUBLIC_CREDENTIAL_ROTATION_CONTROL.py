@@ -8,7 +8,7 @@ import re
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable
 from zoneinfo import ZoneInfo
@@ -25,14 +25,16 @@ ENV_PATHS = [
 BASELINE_PATH = PRIVATE_DIR / "sam_api_key_rotation_baseline.json"
 OUT_JSON = SPRINT_DIR / "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json"
 OUT_MD = SPRINT_DIR / "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md"
+INSTALLER_PATH = ROOT / "code" / "ops" / "INSTALL_SAM_PUBLIC_CREDENTIAL.py"
+INSTALLER_TARGET = ROOT / "code" / "execution" / "config" / "luma_live_keys.env"
 
 KEY_NAMES = ("SAM_API_KEY", "SAM_GOV_API_KEY", "DATA_GOV_API_KEY_PRIMARY")
 ROTATION_DEADLINE_LOCAL = date(2026, 7, 16)
 LOCAL_TIMEZONE = ZoneInfo("America/Chicago")
-ASSISTANCE_API = "https://api.sam.gov/assistance-listings/v1/search"
-ASSISTANCE_LISTING_PROBE_ID = "43.008"
+OPPORTUNITIES_API = "https://api.sam.gov/opportunities/v2/search"
+OPPORTUNITY_PROBE_SCOPE = "RECENT_30_DAY_FIRST_RECORD"
 OFFICIAL_ACCOUNT_URL = "https://sam.gov/profile/details"
-OFFICIAL_API_DOCUMENTATION = "https://open.gsa.gov/api/assistance-listings-api/"
+OFFICIAL_API_DOCUMENTATION = "https://open.gsa.gov/api/get-opportunities-public-api/"
 
 EMAIL_EVIDENCE = {
     "sender": "donotreply@sam.gov",
@@ -169,20 +171,25 @@ def public_source_summary(records: list[dict[str, str]]) -> dict[str, Any]:
 
 def classify_probe(status: int | None, body: bytes) -> dict[str, Any]:
     text = body.decode("utf-8", errors="replace") if body else ""
+    key_rejection_detected = bool(
+        re.search(r"(?i)(invalid|missing|no)\s+(?:api[_ -]?key|key)", text)
+    )
     shape_valid = False
     if status == 200 and text:
         try:
             payload = json.loads(text)
-            shape_valid = isinstance(payload, dict) and isinstance(
-                payload.get("assistanceListingsData"), list
-            ) and isinstance(payload.get("totalRecords"), int)
+            shape_valid = (
+                isinstance(payload, dict)
+                and isinstance(payload.get("opportunitiesData"), list)
+                and isinstance(payload.get("totalRecords"), int)
+            )
         except (TypeError, ValueError, json.JSONDecodeError):
             shape_valid = False
 
     if status == 200 and shape_valid:
         classification = "LIVE_AUTHENTICATED_RESPONSE"
         live = True
-    elif status == 401:
+    elif status in {401, 403} or key_rejection_detected:
         classification = "KEY_REJECTED_OR_MISSING"
         live = False
     elif status == 404 and not body:
@@ -207,14 +214,23 @@ def classify_probe(status: int | None, body: bytes) -> dict[str, Any]:
 def probe_sam_api_key(
     api_key: str,
     *,
+    as_of_date: date | None = None,
     timeout_seconds: float = 20.0,
     opener: Callable[..., Any] = urllib.request.urlopen,
 ) -> dict[str, Any]:
+    posted_to = as_of_date or datetime.now(LOCAL_TIMEZONE).date()
+    posted_from = posted_to - timedelta(days=30)
     query = urllib.parse.urlencode(
-        {"api_key": api_key, "assistanceListingId": ASSISTANCE_LISTING_PROBE_ID}
+        {
+            "api_key": api_key,
+            "limit": 1,
+            "offset": 0,
+            "postedFrom": posted_from.strftime("%m/%d/%Y"),
+            "postedTo": posted_to.strftime("%m/%d/%Y"),
+        }
     )
     request = urllib.request.Request(
-        f"{ASSISTANCE_API}?{query}",
+        f"{OPPORTUNITIES_API}?{query}",
         headers={
             "Accept": "application/json",
             "User-Agent": "LumenCore-SAM-Rotation-Verifier/1.0",
@@ -234,8 +250,11 @@ def probe_sam_api_key(
     result = classify_probe(status, body)
     result.update(
         {
-            "endpoint": "SAM_ASSISTANCE_LISTINGS_PUBLIC_API",
-            "probe_listing_id": ASSISTANCE_LISTING_PROBE_ID,
+            "endpoint": "SAM_GET_OPPORTUNITIES_PUBLIC_API",
+            "probe_scope": OPPORTUNITY_PROBE_SCOPE,
+            "probe_listing_id": None,
+            "posted_from": posted_from.isoformat(),
+            "posted_to": posted_to.isoformat(),
             "official_documentation": OFFICIAL_API_DOCUMENTATION,
             "request_url_published": False,
             "secret_value_published": False,
@@ -361,11 +380,21 @@ def build_payload(
                 "Keep the existing signed-in in-app browser tab on SAM.gov.",
                 "Open Account Details and locate Public API Key.",
                 "Use the SAM.gov one-time-password flow to reveal the already-generated replacement.",
-                "Install the replacement into all three ignored local aliases without pasting it into chat or Git.",
+                "Run `python code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py` in a private terminal and paste the replacement only at its hidden prompt.",
                 "Rerun this verifier and require a changed private fingerprint; require a live authenticated response when the upstream API is observable.",
             ],
             "official_account_url": OFFICIAL_ACCOUNT_URL,
             "final_confirmation_required": True,
+        },
+        "private_installer": {
+            "path": rel(INSTALLER_PATH),
+            "target": rel(INSTALLER_TARGET),
+            "hidden_prompt_input": True,
+            "command_line_secret_argument_supported": False,
+            "target_must_be_git_ignored": True,
+            "atomic_replace_required": True,
+            "plaintext_backup_created": False,
+            "browser_navigation_performed": False,
         },
         "decision": (
             "No configured SAM public API credential was found; install the replacement only in the ignored private secret store."
@@ -416,6 +445,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Control SHA-256: `{payload['control_sha256']}`",
         "",
         "No secret value, request URL, response body, or secret fingerprint is published.",
+        f"The guarded local installer is `{payload['private_installer']['path']}`; it accepts the replacement only through a hidden prompt.",
         "",
         "## Human Action Gate",
         "",
@@ -493,8 +523,11 @@ def main() -> None:
             "response_shape_valid": False,
             "live_authenticated_response": False,
             "response_body_published": False,
-            "endpoint": "SAM_ASSISTANCE_LISTINGS_PUBLIC_API",
-            "probe_listing_id": ASSISTANCE_LISTING_PROBE_ID,
+            "endpoint": "SAM_GET_OPPORTUNITIES_PUBLIC_API",
+            "probe_scope": OPPORTUNITY_PROBE_SCOPE,
+            "probe_listing_id": None,
+            "posted_from": None,
+            "posted_to": None,
             "official_documentation": OFFICIAL_API_DOCUMENTATION,
             "request_url_published": False,
             "secret_value_published": False,
