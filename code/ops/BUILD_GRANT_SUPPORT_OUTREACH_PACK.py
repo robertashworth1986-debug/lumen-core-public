@@ -335,6 +335,115 @@ def build_templates() -> dict[str, str]:
     }
 
 
+def build_response_templates() -> dict[str, dict[str, Any]]:
+    shared_checks = [
+        "Confirm the exact inbound thread and intended recipients.",
+        "Replace every [REPLACE: ...] token with a verified fact or remove the sentence.",
+        "Do not add partner, validation, award, customer, revenue, readiness, or performance claims that are not supported by the evidence ledger.",
+        "Do not attach private identifiers, credentials, portal screenshots, patent-sensitive material, or financial records unless the recipient and disclosure boundary were specifically approved.",
+    ]
+    return {
+        "receipt_acknowledgment": {
+            "use_when": "An official contact confirms receipt and asks for nothing else.",
+            "reply_required_by_default": False,
+            "required_checks": shared_checks,
+            "body": (
+                "Hello [REPLACE: NAME],\n\n"
+                "Thank you for confirming receipt. I appreciate the update and will "
+                "wait for the next instruction from your team.\n\n"
+                "Best regards,\nRobert Ashworth\nFounder / Systems Architect\nLumenCore"
+            ),
+        },
+        "verified_fact_request": {
+            "use_when": "A recipient requests legal-name, address, role, or other factual onboarding details.",
+            "reply_required_by_default": True,
+            "required_checks": shared_checks
+            + [
+                "Match legal names and identifiers to the authoritative registry or source document.",
+                "Ask the recipient to confirm the required entity format before an agreement or signature envelope is issued.",
+            ],
+            "body": (
+                "Hello [REPLACE: NAME],\n\n"
+                "Thank you. The requested verified information is below:\n\n"
+                "[REPLACE: FACT LABEL]: [REPLACE: VERIFIED FACT]\n"
+                "[REPLACE: FACT LABEL]: [REPLACE: VERIFIED FACT]\n\n"
+                "Please let me know if your system requires a different exact format "
+                "before any agreement or signature envelope is issued.\n\n"
+                "Best regards,\nRobert Ashworth\nFounder / Systems Architect\nLumenCore"
+            ),
+        },
+        "referral_or_routing": {
+            "use_when": "A contact routes the request to a more appropriate person or team.",
+            "reply_required_by_default": True,
+            "required_checks": shared_checks
+            + [
+                "Keep all already-included participants on the existing thread unless there is a clear privacy reason not to.",
+                "Do not start a duplicate thread if the referral already included the new recipient.",
+            ],
+            "body": (
+                "Hello [REPLACE: NAME],\n\n"
+                "Thank you for the introduction and for routing this to the appropriate "
+                "team. [REPLACE: NEW CONTACT OR TEAM], I can provide a concise, public-safe "
+                "summary and the specific evidence boundary your review requires. Please "
+                "let me know the preferred next step.\n\n"
+                "Best regards,\nRobert Ashworth\nFounder / Systems Architect\nLumenCore"
+            ),
+        },
+        "decline_or_no_fit": {
+            "use_when": "A recipient says the opportunity, service, or teaming lane is not a fit.",
+            "reply_required_by_default": False,
+            "required_checks": shared_checks
+            + [
+                "Do not argue with the decision or resend the same packet.",
+                "Request a referral only when the recipient's message or role makes that request reasonable.",
+            ],
+            "body": (
+                "Hello [REPLACE: NAME],\n\n"
+                "Thank you for the clear response and for considering the request. I "
+                "understand that this lane is not a fit and will close it on my side.\n\n"
+                "[REPLACE: OPTIONAL SINGLE-SENTENCE REFERRAL REQUEST OR REMOVE]\n\n"
+                "Best regards,\nRobert Ashworth\nFounder / Systems Architect\nLumenCore"
+            ),
+        },
+        "deadline_confirmation": {
+            "use_when": "Official support confirms a portal deadline or close time.",
+            "reply_required_by_default": False,
+            "required_checks": shared_checks
+            + [
+                "Record the stated date, time, and whether the source explicitly named a timezone.",
+                "Treat the portal confirmation page, not the support email, as evidence of submission.",
+            ],
+            "body": (
+                "Hello [REPLACE: NAME],\n\n"
+                "Thank you for confirming the deadline. I am continuing in the official "
+                "portal and understand that this email does not replace the required "
+                "application or submission confirmation.\n\n"
+                "Best regards,\nRobert Ashworth\nFounder / Systems Architect\nLumenCore"
+            ),
+        },
+        "packet_or_attachment_request": {
+            "use_when": "A qualified recipient requests a pitch deck, proposal, evidence packet, or technical attachment.",
+            "reply_required_by_default": True,
+            "required_checks": shared_checks
+            + [
+                "Verify the attachment path, file type, page count, hash, claim boundary, and intended disclosure level.",
+                "Confirm that the attachment contains no credentials, private identifiers, unapproved patent-sensitive material, or unsupported third-party names.",
+            ],
+            "body": (
+                "Hello [REPLACE: NAME],\n\n"
+                "Thank you for the request. Attached is [REPLACE: EXACT DOCUMENT TITLE], "
+                "prepared for [REPLACE: REVIEW PURPOSE]. Its claims are bounded to the "
+                "evidence identified inside the packet; it does not claim independent "
+                "validation, deployment, award, or realized savings unless expressly "
+                "supported there.\n\n"
+                "Please let me know which specific question or acceptance criterion you "
+                "would like the next version to address.\n\n"
+                "Best regards,\nRobert Ashworth\nFounder / Systems Architect\nLumenCore"
+            ),
+        },
+    }
+
+
 def build_pack(
     action_board: dict[str, Any] | None = None,
     freeze: dict[str, Any] | None = None,
@@ -359,6 +468,25 @@ def build_pack(
         "package_blocker_snapshot": cards,
         "outreach_queue": build_outreach_queue(cards),
         "templates": build_templates(),
+        "response_templates": build_response_templates(),
+        "response_send_gate": {
+            "unresolved_placeholder_token": "[REPLACE:",
+            "send_allowed_with_unresolved_placeholders": False,
+            "attachment_checks_required_when_present": [
+                "path_exists",
+                "sha256_recorded",
+                "page_count_or_file_shape_checked",
+                "claim_boundary_reviewed",
+                "recipient_and_disclosure_level_confirmed",
+            ],
+            "final_checks": [
+                "recipient_and_thread_verified",
+                "deadline_and_timezone_rechecked_when_relevant",
+                "no_secrets_or_unapproved_private_data",
+                "no_unsupported_claims",
+                "no_duplicate_send",
+            ],
+        },
         "live_breadth_policy": {
             "use_existing_first": True,
             "recommended_paid_data_now": False,
@@ -459,6 +587,38 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.extend(["## Message Templates", ""])
     for name, template in payload["templates"].items():
         lines.extend([f"### {name}", "", "```text", template.rstrip(), "```", ""])
+
+    lines.extend(["## Response Templates", ""])
+    for name, template in payload["response_templates"].items():
+        lines.extend(
+            [
+                f"### {name}",
+                "",
+                f"- Use when: {template['use_when']}",
+                f"- Reply required by default: {template['reply_required_by_default']}",
+                "- Required checks:",
+            ]
+        )
+        for check in template["required_checks"]:
+            lines.append(f"  - {check}")
+        lines.extend(["", "```text", template["body"].rstrip(), "```", ""])
+
+    gate = payload["response_send_gate"]
+    lines.extend(
+        [
+            "## Response Send Gate",
+            "",
+            f"- Unresolved placeholder token: `{gate['unresolved_placeholder_token']}`",
+            f"- Send allowed with unresolved placeholders: `{gate['send_allowed_with_unresolved_placeholders']}`",
+            "- Attachment checks when present:",
+        ]
+    )
+    for check in gate["attachment_checks_required_when_present"]:
+        lines.append(f"  - {check}")
+    lines.append("- Final checks:")
+    for check in gate["final_checks"]:
+        lines.append(f"  - {check}")
+    lines.append("")
     return "\n".join(lines)
 
 

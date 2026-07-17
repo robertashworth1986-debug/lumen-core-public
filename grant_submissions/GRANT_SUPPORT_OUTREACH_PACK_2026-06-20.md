@@ -1,6 +1,6 @@
 # Grant Support Outreach Pack
 
-Generated UTC: 2026-06-20T23:31:17.142524+00:00
+Generated UTC: 2026-07-17T19:59:10.153697+00:00
 
 ## Boundary
 
@@ -221,3 +221,167 @@ Hello,
 
 I am preparing early-stage R&D submissions for a control, evidence, and orchestration platform. I need help matching the proof package to the right SBIR/STTR agencies and improving reviewer-safe Phase I language without overstating partners, field validation, or revenue.
 ```
+
+## Response Templates
+
+### receipt_acknowledgment
+
+- Use when: An official contact confirms receipt and asks for nothing else.
+- Reply required by default: False
+- Required checks:
+  - Confirm the exact inbound thread and intended recipients.
+  - Replace every [REPLACE: ...] token with a verified fact or remove the sentence.
+  - Do not add partner, validation, award, customer, revenue, readiness, or performance claims that are not supported by the evidence ledger.
+  - Do not attach private identifiers, credentials, portal screenshots, patent-sensitive material, or financial records unless the recipient and disclosure boundary were specifically approved.
+
+```text
+Hello [REPLACE: NAME],
+
+Thank you for confirming receipt. I appreciate the update and will wait for the next instruction from your team.
+
+Best regards,
+Robert Ashworth
+Founder / Systems Architect
+LumenCore
+```
+
+### verified_fact_request
+
+- Use when: A recipient requests legal-name, address, role, or other factual onboarding details.
+- Reply required by default: True
+- Required checks:
+  - Confirm the exact inbound thread and intended recipients.
+  - Replace every [REPLACE: ...] token with a verified fact or remove the sentence.
+  - Do not add partner, validation, award, customer, revenue, readiness, or performance claims that are not supported by the evidence ledger.
+  - Do not attach private identifiers, credentials, portal screenshots, patent-sensitive material, or financial records unless the recipient and disclosure boundary were specifically approved.
+  - Match legal names and identifiers to the authoritative registry or source document.
+  - Ask the recipient to confirm the required entity format before an agreement or signature envelope is issued.
+
+```text
+Hello [REPLACE: NAME],
+
+Thank you. The requested verified information is below:
+
+[REPLACE: FACT LABEL]: [REPLACE: VERIFIED FACT]
+[REPLACE: FACT LABEL]: [REPLACE: VERIFIED FACT]
+
+Please let me know if your system requires a different exact format before any agreement or signature envelope is issued.
+
+Best regards,
+Robert Ashworth
+Founder / Systems Architect
+LumenCore
+```
+
+### referral_or_routing
+
+- Use when: A contact routes the request to a more appropriate person or team.
+- Reply required by default: True
+- Required checks:
+  - Confirm the exact inbound thread and intended recipients.
+  - Replace every [REPLACE: ...] token with a verified fact or remove the sentence.
+  - Do not add partner, validation, award, customer, revenue, readiness, or performance claims that are not supported by the evidence ledger.
+  - Do not attach private identifiers, credentials, portal screenshots, patent-sensitive material, or financial records unless the recipient and disclosure boundary were specifically approved.
+  - Keep all already-included participants on the existing thread unless there is a clear privacy reason not to.
+  - Do not start a duplicate thread if the referral already included the new recipient.
+
+```text
+Hello [REPLACE: NAME],
+
+Thank you for the introduction and for routing this to the appropriate team. [REPLACE: NEW CONTACT OR TEAM], I can provide a concise, public-safe summary and the specific evidence boundary your review requires. Please let me know the preferred next step.
+
+Best regards,
+Robert Ashworth
+Founder / Systems Architect
+LumenCore
+```
+
+### decline_or_no_fit
+
+- Use when: A recipient says the opportunity, service, or teaming lane is not a fit.
+- Reply required by default: False
+- Required checks:
+  - Confirm the exact inbound thread and intended recipients.
+  - Replace every [REPLACE: ...] token with a verified fact or remove the sentence.
+  - Do not add partner, validation, award, customer, revenue, readiness, or performance claims that are not supported by the evidence ledger.
+  - Do not attach private identifiers, credentials, portal screenshots, patent-sensitive material, or financial records unless the recipient and disclosure boundary were specifically approved.
+  - Do not argue with the decision or resend the same packet.
+  - Request a referral only when the recipient's message or role makes that request reasonable.
+
+```text
+Hello [REPLACE: NAME],
+
+Thank you for the clear response and for considering the request. I understand that this lane is not a fit and will close it on my side.
+
+[REPLACE: OPTIONAL SINGLE-SENTENCE REFERRAL REQUEST OR REMOVE]
+
+Best regards,
+Robert Ashworth
+Founder / Systems Architect
+LumenCore
+```
+
+### deadline_confirmation
+
+- Use when: Official support confirms a portal deadline or close time.
+- Reply required by default: False
+- Required checks:
+  - Confirm the exact inbound thread and intended recipients.
+  - Replace every [REPLACE: ...] token with a verified fact or remove the sentence.
+  - Do not add partner, validation, award, customer, revenue, readiness, or performance claims that are not supported by the evidence ledger.
+  - Do not attach private identifiers, credentials, portal screenshots, patent-sensitive material, or financial records unless the recipient and disclosure boundary were specifically approved.
+  - Record the stated date, time, and whether the source explicitly named a timezone.
+  - Treat the portal confirmation page, not the support email, as evidence of submission.
+
+```text
+Hello [REPLACE: NAME],
+
+Thank you for confirming the deadline. I am continuing in the official portal and understand that this email does not replace the required application or submission confirmation.
+
+Best regards,
+Robert Ashworth
+Founder / Systems Architect
+LumenCore
+```
+
+### packet_or_attachment_request
+
+- Use when: A qualified recipient requests a pitch deck, proposal, evidence packet, or technical attachment.
+- Reply required by default: True
+- Required checks:
+  - Confirm the exact inbound thread and intended recipients.
+  - Replace every [REPLACE: ...] token with a verified fact or remove the sentence.
+  - Do not add partner, validation, award, customer, revenue, readiness, or performance claims that are not supported by the evidence ledger.
+  - Do not attach private identifiers, credentials, portal screenshots, patent-sensitive material, or financial records unless the recipient and disclosure boundary were specifically approved.
+  - Verify the attachment path, file type, page count, hash, claim boundary, and intended disclosure level.
+  - Confirm that the attachment contains no credentials, private identifiers, unapproved patent-sensitive material, or unsupported third-party names.
+
+```text
+Hello [REPLACE: NAME],
+
+Thank you for the request. Attached is [REPLACE: EXACT DOCUMENT TITLE], prepared for [REPLACE: REVIEW PURPOSE]. Its claims are bounded to the evidence identified inside the packet; it does not claim independent validation, deployment, award, or realized savings unless expressly supported there.
+
+Please let me know which specific question or acceptance criterion you would like the next version to address.
+
+Best regards,
+Robert Ashworth
+Founder / Systems Architect
+LumenCore
+```
+
+## Response Send Gate
+
+- Unresolved placeholder token: `[REPLACE:`
+- Send allowed with unresolved placeholders: `False`
+- Attachment checks when present:
+  - path_exists
+  - sha256_recorded
+  - page_count_or_file_shape_checked
+  - claim_boundary_reviewed
+  - recipient_and_disclosure_level_confirmed
+- Final checks:
+  - recipient_and_thread_verified
+  - deadline_and_timezone_rechecked_when_relevant
+  - no_secrets_or_unapproved_private_data
+  - no_unsupported_claims
+  - no_duplicate_send

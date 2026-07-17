@@ -76,6 +76,50 @@ class GrantSupportOutreachPackTests(unittest.TestCase):
         self.assertNotIn("guaranteed funding", markdown.lower())
         self.assertNotIn("guaranteed award", markdown.lower())
 
+    def test_response_templates_are_bounded_and_block_unresolved_tokens(self) -> None:
+        payload = packer.build_pack(
+            self.fixture_action_board(),
+            {"freeze_signature_sha256": "abc123"},
+        )
+
+        responses = payload["response_templates"]
+        self.assertEqual(
+            set(responses),
+            {
+                "receipt_acknowledgment",
+                "verified_fact_request",
+                "referral_or_routing",
+                "decline_or_no_fit",
+                "deadline_confirmation",
+                "packet_or_attachment_request",
+            },
+        )
+        self.assertFalse(responses["receipt_acknowledgment"]["reply_required_by_default"])
+        self.assertTrue(responses["verified_fact_request"]["reply_required_by_default"])
+        self.assertFalse(responses["deadline_confirmation"]["reply_required_by_default"])
+
+        for template in responses.values():
+            body = template["body"].lower()
+            self.assertIn("best regards", body)
+            self.assertNotIn("guaranteed", body)
+            self.assertNotIn("world-class", body)
+            self.assertNotIn("proven savings", body)
+            self.assertTrue(template["required_checks"])
+
+        attachment = responses["packet_or_attachment_request"]
+        self.assertIn("claim boundary", " ".join(attachment["required_checks"]).lower())
+        self.assertIn("does not claim independent", attachment["body"].lower())
+
+        gate = payload["response_send_gate"]
+        self.assertEqual(gate["unresolved_placeholder_token"], "[REPLACE:")
+        self.assertFalse(gate["send_allowed_with_unresolved_placeholders"])
+        self.assertIn("no_duplicate_send", gate["final_checks"])
+
+        markdown = packer.render_markdown(payload)
+        self.assertIn("## Response Templates", markdown)
+        self.assertIn("## Response Send Gate", markdown)
+        self.assertIn("Send allowed with unresolved placeholders: `False`", markdown)
+
     def test_write_pack_outputs_json_and_markdown(self) -> None:
         payload = packer.build_pack(
             self.fixture_action_board(),
