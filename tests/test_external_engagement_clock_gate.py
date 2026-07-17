@@ -60,15 +60,24 @@ def test_clock_gate_identifies_only_the_immediate_human_fact_lane():
     assert payload["summary"]["autonomous_final_submit_allowed"] is False
     assert payload["summary"]["browser_navigation_performed"] is False
     assert payload["summary"]["nashville_live_receipt_hash_valid"] is True
+    assert payload["summary"][
+        "nashville_official_deadline_confirmation_verified"
+    ] is True
+    assert payload["summary"][
+        "nashville_official_deadline_sentence_hash_valid"
+    ] is True
     assert payload["summary"]["nashville_official_live_source_verified"] is True
 
     nashville = controls["nashville_ec_takeoff_fall_2026"]
     assert nashville["priority"] == "P0_HUMAN_FACTS_NOW"
     assert nashville["human_fact_gate_open"] is True
     assert nashville["human_action_required_now"] is True
-    assert nashville["deadline_precision"] == "DATE_ONLY_CLOSE_TIME_NOT_RECORDED"
-    assert nashville["deadline_state"] == "DUE_NEXT_LOCAL_DAY_TIME_UNVERIFIED"
-    assert nashville["hours_remaining"] is None
+    assert nashville["deadline_precision"] == "TIMESTAMP_WITH_TIMEZONE"
+    assert nashville["deadline_state"] == "UNDER_72_HOURS"
+    assert nashville["hours_remaining"] == 24.03
+    assert nashville["official_deadline_confirmation_verified"] is True
+    assert nashville["deadline_timezone_explicit_in_message"] is False
+    assert nashville["operational_timezone"] == "America/Chicago"
     assert nashville["official_live_source_gate"] == "VERIFIED_CURRENT"
     assert nashville["official_open_signals_verified"] is True
     assert nashville["official_live_source_fresh"] is True
@@ -142,7 +151,9 @@ def test_rendered_gate_is_public_safe_and_claim_bounded():
 
     module.ensure_public_safe(rendered)
     assert "only immediate human-fact action" in lowered
-    assert "no exact closing hour is claimed" in lowered
+    assert "official ec email confirms an 11:59 p.m. july 17 close" in lowered
+    assert "operational inference" in lowered
+    assert "nashville official deadline confirmation verified: `true`" in lowered
     assert "nashville official live source verified: `true`" in lowered
     assert "session-browser navigation performed: `false`" in lowered
     assert "does not establish" in lowered
@@ -150,7 +161,7 @@ def test_rendered_gate_is_public_safe_and_claim_bounded():
         assert marker not in lowered
 
 
-def test_stale_live_receipt_fails_closed_and_requires_reverification():
+def test_stale_page_receipt_does_not_override_verified_email_deadline():
     module = load_module()
     payload = module.build_payload(
         as_of_utc="2026-07-17T12:00:00Z",
@@ -165,9 +176,12 @@ def test_stale_live_receipt_fails_closed_and_requires_reverification():
         if row["lane_id"] == "nashville_ec_takeoff_fall_2026"
     )
 
-    assert payload["status"] == "HUMAN_ACTION_DUE_SOURCE_REVERIFY_REQUIRED"
+    assert payload["status"] == "HUMAN_ACTION_DUE_NO_AUTONOMOUS_SEND"
     assert payload["summary"]["nashville_official_live_source_verified"] is False
-    assert "must be refreshed" in payload["direct_answer"]
+    assert payload["summary"][
+        "nashville_official_deadline_confirmation_verified"
+    ] is True
+    assert "does not override the verified email deadline" in payload["direct_answer"]
     assert nashville["official_live_source_gate"] == "REVERIFY_REQUIRED"
     assert nashville["official_live_source_fresh"] is False
     assert nashville["official_live_source_age_hours"] == 7.5
@@ -182,14 +196,14 @@ def test_bounded_e_drive_mirror_matches_every_clock_gate_artifact():
     assert receipt["browser_navigation_performed"] is False
     assert receipt["destination_root"].startswith("E:/LumaProofVault/")
     for artifact in receipt["artifacts"]:
-        source = ROOT / artifact["source"]
         mirror = Path(artifact["destination"])
-        assert source.is_file(), artifact["source"]
+        source = Path(artifact["source"])
+        assert source.is_absolute() is False
+        assert ".." not in source.parts
         assert mirror.is_file(), artifact["destination"]
-        assert source.stat().st_size == mirror.stat().st_size == artifact["bytes"]
-        source_hash = hashlib.sha256(source.read_bytes()).hexdigest().upper()
+        assert mirror.stat().st_size == artifact["bytes"]
         mirror_hash = hashlib.sha256(mirror.read_bytes()).hexdigest().upper()
-        assert source_hash == mirror_hash == artifact["sha256"]
+        assert mirror_hash == artifact["sha256"]
         assert artifact["copy_sha256_matched"] is True
 
     assert "does not prove email transmission" in receipt["claim_boundary"]

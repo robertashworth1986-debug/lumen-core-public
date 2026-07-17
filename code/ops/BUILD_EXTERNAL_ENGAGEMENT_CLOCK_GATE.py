@@ -17,6 +17,12 @@ NASHVILLE_LIVE_RECEIPT = (
     / "NASHVILLE_EC_FALL_2026"
     / "NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json"
 )
+NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION = (
+    ROOT
+    / "grant_submissions"
+    / "NASHVILLE_EC_FALL_2026"
+    / "NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json"
+)
 OUT_JSON = ROOT / "out" / "ops" / "external_engagement_clock_gate_latest.json"
 DASHBOARD_JSON = ROOT / "dashboard" / "data" / "external_engagement_clock_gate.json"
 CANONICAL_JSON = SPRINT_DIR / "EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.json"
@@ -98,6 +104,18 @@ def read_nashville_live_receipt(
     return payload, raw
 
 
+def read_nashville_official_deadline_confirmation() -> tuple[dict[str, Any], bytes]:
+    raw = NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION.read_bytes()
+    payload = json.loads(raw.decode("utf-8"))
+    if payload.get("schema") != (
+        "lumencore.nashville_ec_official_deadline_confirmation.v1"
+    ):
+        raise ValueError(
+            "Nashville EC official deadline confirmation schema is missing or unsupported"
+        )
+    return payload, raw
+
+
 def verify_embedded_hash(payload: dict[str, Any], field: str) -> bool:
     expected = payload.get(field)
     if not isinstance(expected, str):
@@ -155,6 +173,50 @@ def evaluate_nashville_live_receipt(
         "source_status": receipt.get("status"),
         "deadline_time_status": deadline.get("time_status"),
         "browser_navigation_performed": integrity.get("browser_navigation_performed"),
+    }
+
+
+def evaluate_nashville_official_deadline_confirmation(
+    receipt: dict[str, Any],
+) -> dict[str, Any]:
+    confirmation = receipt.get("confirmation", {})
+    application_state = receipt.get("application_state", {})
+    sentence = confirmation.get("bounded_exact_sentence")
+    expected_sentence_hash = confirmation.get("bounded_exact_sentence_sha256")
+    sentence_hash_valid = (
+        isinstance(sentence, str)
+        and isinstance(expected_sentence_hash, str)
+        and sha256_bytes(sentence.encode("utf-8")) == expected_sentence_hash.lower()
+    )
+    status_valid = receipt.get("status") == (
+        "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
+    )
+    operational_deadline_valid = all(
+        (
+            confirmation.get("operational_local_deadline")
+            == "2026-07-17T23:59:00-05:00",
+            confirmation.get("operational_utc_deadline")
+            == "2026-07-18T04:59:00Z",
+            confirmation.get("timezone_explicit_in_message") is False,
+            confirmation.get("operational_timezone") == "America/Chicago",
+            application_state.get("portal_submission_verified") is False,
+            application_state.get("final_submit_clicked") is False,
+            application_state.get("reply_required") is False,
+            application_state.get("duplicate_deadline_query_allowed") is False,
+        )
+    )
+    return {
+        "status_valid": status_valid,
+        "sentence_hash_valid": sentence_hash_valid,
+        "operational_deadline_valid": operational_deadline_valid,
+        "verified": status_valid and sentence_hash_valid and operational_deadline_valid,
+        "source_status": receipt.get("status"),
+        "operational_local_deadline": confirmation.get("operational_local_deadline"),
+        "operational_utc_deadline": confirmation.get("operational_utc_deadline"),
+        "timezone_explicit_in_message": confirmation.get(
+            "timezone_explicit_in_message"
+        ),
+        "operational_timezone": confirmation.get("operational_timezone"),
     }
 
 
@@ -234,7 +296,9 @@ def human_fact_gate_open(row: dict[str, Any]) -> bool:
     decision = str(row.get("decision", ""))
     return "HUMAN_FACTS_REQUIRED" in state or (
         row.get("response_channel") == "PORTAL"
-        and decision.startswith(("CONTINUE_PORTAL", "STAGE_PORTAL"))
+        and decision.startswith(
+            ("CONTINUE_PORTAL", "STAGE_PORTAL", "COMPLETE_PORTAL")
+        )
     )
 
 
@@ -243,6 +307,8 @@ def priority_for(row: dict[str, Any], deadline: dict[str, Any]) -> str:
     if human_fact_gate_open(row) and deadline_state in {
         "DUE_TODAY_TIME_UNVERIFIED_SUBMIT_EARLY",
         "DUE_NEXT_LOCAL_DAY_TIME_UNVERIFIED",
+        "UNDER_24_HOURS",
+        "UNDER_72_HOURS",
     }:
         return "P0_HUMAN_FACTS_NOW"
     if row.get("do_not_duplicate_send"):
@@ -261,6 +327,14 @@ def build_payload(
     register, register_raw = read_register()
     live_receipt, live_receipt_raw = read_nashville_live_receipt(nashville_live_receipt)
     live_control = evaluate_nashville_live_receipt(live_receipt, as_of)
+    official_deadline, official_deadline_raw = (
+        read_nashville_official_deadline_confirmation()
+    )
+    official_deadline_control = evaluate_nashville_official_deadline_confirmation(
+        official_deadline
+    )
+    if not official_deadline_control["verified"]:
+        raise ValueError("Nashville EC official deadline confirmation failed verification")
     controls: list[dict[str, Any]] = []
 
     for row in register["records"]:
@@ -282,6 +356,8 @@ def build_payload(
                 in {
                     "DUE_TODAY_TIME_UNVERIFIED_SUBMIT_EARLY",
                     "DUE_NEXT_LOCAL_DAY_TIME_UNVERIFIED",
+                    "UNDER_24_HOURS",
+                    "UNDER_72_HOURS",
                 }
             ),
             "duplicate_send_control": (
@@ -299,6 +375,21 @@ def build_payload(
             **hold,
         }
         if row["lane_id"] == "nashville_ec_takeoff_fall_2026":
+            control["official_deadline_source"] = rel(
+                NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION
+            )
+            control["official_deadline_source_status"] = official_deadline_control[
+                "source_status"
+            ]
+            control["official_deadline_confirmation_verified"] = (
+                official_deadline_control["verified"]
+            )
+            control["deadline_timezone_explicit_in_message"] = (
+                official_deadline_control["timezone_explicit_in_message"]
+            )
+            control["operational_timezone"] = official_deadline_control[
+                "operational_timezone"
+            ]
             control["official_live_source"] = rel(NASHVILLE_LIVE_RECEIPT)
             control["official_live_source_status"] = live_control["source_status"]
             control["official_open_signals_verified"] = live_control[
@@ -329,11 +420,10 @@ def build_payload(
         if row["deadline_precision"] == "DATE_ONLY_CLOSE_TIME_NOT_RECORDED"
     ]
     holds = [row for row in controls if row["follow_up_hold_state"] == "FOLLOW_UP_HOLD_ACTIVE"]
-    live_source_statement = (
-        "A fresh, hash-verified official-page receipt confirms the application and TakeOff open "
-        "signals with a July 17 date-only deadline"
+    page_source_statement = (
+        "A fresh official-page receipt also corroborates that the application and TakeOff are open"
         if live_control["operationally_verified"]
-        else "The official-page receipt is stale or failed an integrity/open-signal check and must be refreshed"
+        else "The official-page snapshot needs refresh, but it does not override the verified email deadline"
     )
 
     payload: dict[str, Any] = {
@@ -344,14 +434,13 @@ def build_payload(
         "timezone": str(LOCAL_ZONE),
         "status": (
             "HUMAN_ACTION_DUE_NO_AUTONOMOUS_SEND"
-            if human_now and live_control["operationally_verified"]
-            else "HUMAN_ACTION_DUE_SOURCE_REVERIFY_REQUIRED"
-            if human_now
+            if human_now and official_deadline_control["verified"]
             else "MONITOR_ONLY"
         ),
         "direct_answer": (
             "The Nashville EC application is the only immediate human-fact action. "
-            f"{live_source_statement}, so no exact closing hour is claimed. EPRI, Georgia "
+            "An official EC email confirms an 11:59 p.m. July 17 close; America/Chicago is the documented operational inference because the message does not name a timezone. "
+            f"{page_source_statement}. EPRI, Georgia "
             "PATENTS, CDC, LANL, NASA, and Army remain monitor-only and duplicate-send blocked where recorded."
         ),
         "summary": {
@@ -360,6 +449,12 @@ def build_payload(
             "all_record_hashes_valid": record_hashes_valid == len(controls),
             "source_register_hash_valid": verify_embedded_hash(register, "register_sha256"),
             "nashville_live_receipt_hash_valid": live_control["receipt_hash_valid"],
+            "nashville_official_deadline_confirmation_verified": (
+                official_deadline_control["verified"]
+            ),
+            "nashville_official_deadline_sentence_hash_valid": (
+                official_deadline_control["sentence_hash_valid"]
+            ),
             "nashville_official_live_source_verified": live_control[
                 "operationally_verified"
             ],
@@ -388,6 +483,17 @@ def build_payload(
                 "receipt_hash_valid": live_control["receipt_hash_valid"],
                 "fresh_within_six_hours": live_control["fresh_within_six_hours"],
                 "receipt_age_hours": live_control["receipt_age_hours"],
+            },
+            "nashville_official_deadline_confirmation": {
+                "path": rel(NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION),
+                "bytes": len(official_deadline_raw),
+                "sha256": sha256_bytes(official_deadline_raw),
+                "sentence_hash_valid": official_deadline_control[
+                    "sentence_hash_valid"
+                ],
+                "operational_deadline_valid": official_deadline_control[
+                    "operational_deadline_valid"
+                ],
             },
         },
         "claim_boundary": CLAIM_BOUNDARY,
@@ -419,6 +525,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- All record hashes valid: `{str(summary['all_record_hashes_valid']).lower()}`",
         f"- Source register hash valid: `{str(summary['source_register_hash_valid']).lower()}`",
         f"- Nashville live receipt hash valid: `{str(summary['nashville_live_receipt_hash_valid']).lower()}`",
+        f"- Nashville official deadline confirmation verified: `{str(summary['nashville_official_deadline_confirmation_verified']).lower()}`",
+        f"- Nashville official deadline sentence hash valid: `{str(summary['nashville_official_deadline_sentence_hash_valid']).lower()}`",
         f"- Nashville official live source verified: `{str(summary['nashville_official_live_source_verified']).lower()}`",
         f"- Nashville live receipt age hours: `{summary['nashville_live_receipt_age_hours']}`",
         f"- Immediate human actions: `{summary['immediate_human_action_count']}`",

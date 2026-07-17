@@ -140,6 +140,11 @@ def queue_item(
                 "deadline_support_do_not_duplicate_send"
             ],
             "email_is_application": lane["deadline_support_email_is_application"],
+            "reply_required": lane.get("deadline_support_reply_required"),
+            "timezone_explicit_in_message": lane.get(
+                "deadline_timezone_explicit_in_message"
+            ),
+            "operational_timezone": lane.get("operational_timezone"),
         }
     return item
 
@@ -163,7 +168,7 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
                 "If this is the current signed-in page, inspect the visible application state before navigating anywhere.",
                 "Run `python code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py` and answer the six hidden prompts; require the ignored 11-answer fill map to validate without publishing values.",
                 "Populate only the supported answers from that private map and reach the complete preview.",
-                "Monitor the one deadline-support thread for the exact close time; do not resend it and do not treat it as an application.",
+                "Use the confirmed 11:59 p.m. July 17 close as the outside bound and submit early; do not resend the deadline query and do not treat the support reply as an application.",
             ],
             stop_conditions=[
                 "Any fee payment, financial-aid agreement, program terms, cohort acceptance, attestation, or final submission.",
@@ -178,7 +183,7 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
                 "Verify the live DSIP countdown, organization linkage, and generated proposal number.",
                 "Capture the proposal number only in the ignored record, run the guarded private Volume 2 finalizer, and require its assigned-header PDF QA receipt without changing the public 15-file manifest, which remains neutral.",
                 "Run the hidden sectioned MissionWeave collector for identity, proposal, and compliance; it accepts no Firm PIN or credential and keeps action-time approval separate.",
-                "Use the generated seven-volume checklist and require the public gate to move from 0/50 to 50/50 without exposing values.",
+                f"Use the generated seven-volume checklist and move the public gate beyond {missionweave['action_gate_passed_private_gate_count']}/{missionweave['action_gate_required_private_gate_count']} by resolving only supported portal facts without exposing values.",
                 "Populate Volumes 1-7 from the bounded package and reach the complete preview.",
             ],
             stop_conditions=[
@@ -369,6 +374,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
                     f"  - Sent UTC: `{support['sent_utc']}`",
                     f"  - Do not duplicate: `{str(support['do_not_duplicate_send']).lower()}`",
                     f"  - Email is application: `{str(support['email_is_application']).lower()}`",
+                    f"  - Reply required: `{str(support['reply_required']).lower()}`",
+                    f"  - Timezone explicit in message: `{str(support['timezone_explicit_in_message']).lower()}`",
+                    f"  - Operational timezone: `{support['operational_timezone']}`",
                 ]
             )
         lines.append("- Stop conditions:")

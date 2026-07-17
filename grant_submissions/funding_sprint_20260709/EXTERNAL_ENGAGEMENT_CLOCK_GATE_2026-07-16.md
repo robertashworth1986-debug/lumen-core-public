@@ -1,33 +1,35 @@
 # External Engagement Clock Gate - 2026-07-16
 
-The Nashville EC application is the only immediate human-fact action. A fresh, hash-verified official-page receipt confirms the application and TakeOff open signals with a July 17 date-only deadline, so no exact closing hour is claimed. EPRI, Georgia PATENTS, CDC, LANL, NASA, and Army remain monitor-only and duplicate-send blocked where recorded.
+The Nashville EC application is the only immediate human-fact action. An official EC email confirms an 11:59 p.m. July 17 close; America/Chicago is the documented operational inference because the message does not name a timezone. The official-page snapshot needs refresh, but it does not override the verified email deadline. EPRI, Georgia PATENTS, CDC, LANL, NASA, and Army remain monitor-only and duplicate-send blocked where recorded.
 
 ## Gate Summary
 
 - Status: `HUMAN_ACTION_DUE_NO_AUTONOMOUS_SEND`
-- As of UTC: `2026-07-17T14:53:02.241881+00:00`
-- As of local: `2026-07-17T09:53:02.241881-05:00`
+- As of UTC: `2026-07-17T20:35:18.217756+00:00`
+- As of local: `2026-07-17T15:35:18.217756-05:00`
 - Lanes: `12`
 - Verified record hashes: `12`
 - All record hashes valid: `true`
 - Source register hash valid: `true`
 - Nashville live receipt hash valid: `true`
-- Nashville official live source verified: `true`
-- Nashville live receipt age hours: `4.25`
+- Nashville official deadline confirmation verified: `true`
+- Nashville official deadline sentence hash valid: `true`
+- Nashville official live source verified: `false`
+- Nashville live receipt age hours: `9.95`
 - Immediate human actions: `1`
-- Date-only deadlines: `2`
+- Date-only deadlines: `1`
 - Active follow-up holds: `4`
 - Duplicate-send blocks: `11`
 - Autonomous external send: `false`
 - Autonomous final submit: `false`
 - Session-browser navigation performed: `false`
-- Gate SHA-256: `91617ae964c8b8b53c7b42c1a93696f1091c2247634a579771480af083bf73cb`
+- Gate SHA-256: `2e09ebf23a16f01431012f2162dafde42e72604d6a78538e44b823ae6ea9dbc4`
 
 ## Clocked Queue
 
 | Priority | Organization | Deadline state | Follow-up state | Send control |
 |---|---|---|---|---|
-| `P0_HUMAN_FACTS_NOW` | Nashville Entrepreneur Center | `DUE_TODAY_TIME_UNVERIFIED_SUBMIT_EARLY` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
+| `P0_HUMAN_FACTS_NOW` | Nashville Entrepreneur Center | `UNDER_24_HOURS` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
 | `P2_MONITOR_NO_DUPLICATE` | Cambridge Systematics | `FUTURE_EXACT_DEADLINE` | `FOLLOW_UP_HOLD_ACTIVE` | `BLOCKED_DO_NOT_DUPLICATE` |
 | `P2_MONITOR_NO_DUPLICATE` | Centers for Disease Control and Prevention | `FUTURE_EXACT_DEADLINE` | `NO_HOLD_RECORDED` | `BLOCKED_DO_NOT_DUPLICATE` |
 | `P2_MONITOR_NO_DUPLICATE` | EPRI Open Power AI Consortium | `NO_DEADLINE_RECORDED` | `FOLLOW_UP_HOLD_ACTIVE` | `BLOCKED_DO_NOT_DUPLICATE` |
@@ -44,25 +46,25 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 
 - Lane: `nashville_ec_takeoff_fall_2026`
 - Priority: `P0_HUMAN_FACTS_NOW`
-- Source state: `DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING`
-- Source decision: `CONTINUE_PORTAL_MONITOR_SUPPORT_REPLY_NO_DUPLICATE`
-- Deadline precision: `DATE_ONLY_CLOSE_TIME_NOT_RECORDED`
-- Deadline state: `DUE_TODAY_TIME_UNVERIFIED_SUBMIT_EARLY`
+- Source state: `OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED`
+- Source decision: `COMPLETE_PORTAL_BEFORE_CONFIRMED_CLOSE_NO_DUPLICATE_EMAIL`
+- Deadline precision: `TIMESTAMP_WITH_TIMEZONE`
+- Deadline state: `UNDER_24_HOURS`
 - Follow-up hold: `NO_HOLD_RECORDED`
 - Duplicate send: `BLOCKED_DO_NOT_DUPLICATE`
 - Record hash valid: `true`
 - Human fact gate open: `true`
 - Human action required now: `true`
 - Action gate: Founder answers all six concise confirmation prompts, reviews the complete live portal preview plus any terms or fee, and authorizes final submission at action time.
-- Next action: Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, and monitor the single support thread for the exact close time. Do not resend the deadline query or treat it as an application; review the complete preview plus any terms or fee before action-time approval.
-- Response artifact: `grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json`
-- Claim boundary: This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms.
-- Control SHA-256: `e8fec358ab703188dbe0ed5ee2aae6c79bbbabca620f34024bac4f8f684a1760`
+- Next action: Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, and complete the reviewed portal flow well before the confirmed close. Do not resend the deadline query or treat it as an application; review the complete preview plus any terms or fee before action-time approval.
+- Response artifact: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json`
+- Claim boundary: This receipt proves that the official Nashville Entrepreneur Center contact replied to the bounded deadline query with a July 17 close time. It does not prove a portal application was completed, submitted, accepted, reviewed, extended, funded, selected, validated, or awarded. The operational timezone is an explicit inference, not wording contained in the reply.
+- Control SHA-256: `e8ef9b5ce5285ae7465499e4d4a737b4a0137f2d304be188c4a08f0d8ab3c3d9`
 - Official live source: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json`
-- Official live source gate: `VERIFIED_CURRENT`
+- Official live source gate: `REVERIFY_REQUIRED`
 - Official open signals verified: `true`
-- Official live source fresh: `true`
-- Official live source age hours: `4.25`
+- Official live source fresh: `false`
+- Official live source age hours: `9.95`
 
 ### Cambridge Systematics
 
@@ -81,7 +83,7 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 - Next action: Monitor the referred response lead for scheduling or a specific question and do not reuse the rejected address. If no response arrives by July 21, send at most one short scheduling follow-up. Before any teaming or proposal claim, verify written role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule.
 - Response artifact: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json`
 - Claim boundary: The Gmail records prove that the first route was rejected, the replacement message received a substantive reply, the request was referred to the subject matter expert leading this response, and one bounded acknowledgment was sent in that thread. The referral does not establish pursuit, a fit-check commitment, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.
-- Control SHA-256: `9a873757361ca7926c83aa453e2a1daed60d560833db8102f605983f77d04240`
+- Control SHA-256: `c4ec81cce6a1a137b5e754649d2cd3357e3564ba6ba97b11a1eaa5ede9daa562`
 
 ### Centers for Disease Control and Prevention
 
@@ -100,7 +102,7 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 - Next action: Preserve the acknowledgment and monitor the existing thread; do not resend the response.
 - Response artifact: `grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - Claim boundary: The Gmail SENT record and CDC acknowledgment prove transmission and receipt only. They do not establish evaluation, selection, technical validation, endorsement, award, deployment, a pilot, or contract performance.
-- Control SHA-256: `8de93890acf8b52a7bf441135e353e50cf5861075bdf6380303d7859f356a00c`
+- Control SHA-256: `e3ebb5bccc51a357519a8fdefd36475a8edb3955208ee2492516a62265a169fa`
 
 ### EPRI Open Power AI Consortium
 
@@ -163,8 +165,8 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 
 - Lane: `lvlup_optional_paid_event`
 - Priority: `P2_MONITOR_NO_DUPLICATE`
-- Source state: `OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND`
-- Source decision: `DO_NOT_SPEND_OR_SEND_STALE_DRAFT`
+- Source state: `WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED`
+- Source decision: `MONITOR_INDEPENDENT_REVIEW_NO_DUPLICATE`
 - Deadline precision: `NONE`
 - Deadline state: `NO_DEADLINE_RECORDED`
 - Follow-up hold: `NO_HOLD_RECORDED`
@@ -172,11 +174,11 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 - Record hash valid: `true`
 - Human fact gate open: `false`
 - Human action required now: `false`
-- Action gate: No payment, sponsor purchase, application submission, valuation disclosure, or reuse of the July 3 draft without a fresh claim review and explicit founder approval.
-- Next action: Take no action unless LvlUp provides written non-pay-to-play selection terms or a clearly relevant no-fee application route; the current LaunchTN package is the stronger reviewer-facing path.
-- Response artifact: `docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md`
-- Claim boundary: The July 3 LvlUp draft is historical preparation only. It does not prove selection, investor interest, funding, validation, a required payment, or permission to submit its stale technical and valuation statements.
-- Control SHA-256: `8ad6833a363bb4f31d4a8bb5330f9cefaf9d6b8b5637b7351e0603f650ea6a67`
+- Action gate: Reply only if LvlUp's Investment Committee requests additional information. No sponsor purchase, unsolicited duplicate packet, valuation disclosure, or reuse of the July 3 draft without a fresh claim review and explicit founder approval.
+- Next action: Monitor the existing thread. Reply only if LvlUp's Investment Committee requests additional information; do not purchase the optional sponsor track or send an unsolicited duplicate packet.
+- Response artifact: `grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json`
+- Claim boundary: This receipt proves only that LvlUp Ventures stated in writing that declining the sponsor-backed track would not affect the separate investment and accelerator review and that the application would continue through its standard investment process. It does not prove Investment Committee consideration, diligence, selection, investment interest, funding, accelerator admission, endorsement, validation, or an offer.
+- Control SHA-256: `95f4d48f1f183b583b80b34a6f6198e88803c166abdf47cfb3e0150a37e8f3f6`
 
 ### NASA
 
@@ -195,7 +197,7 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 - Next action: Retain the SENT receipt and attachment hash; do not resend before the deadline.
 - Response artifact: `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json`
 - Claim boundary: Transmission does not establish agency acceptance, evaluation, validation, an award, or a contract.
-- Control SHA-256: `95cab1b27a76a6106fee6cf36dcd180fd3249a27e3b2e95500e6f9b1b83ebc83`
+- Control SHA-256: `55c95bd0cca0ecbc98b5c528d19c676fe86605f3f3bbe2b5f1a4281ea0b244d3`
 
 ### SAM.gov account credential control
 
@@ -271,14 +273,14 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 - Next action: Keep the portal staged. After founder facts and assumptions are confirmed, attach the hash-verified deck and financial model, inspect the final rendered application, and obtain action-time approval before submitting by August 13 at 11:59 PM CDT.
 - Response artifact: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json`
 - Claim boundary: This is an application-preparation artifact. It does not claim a paying customer, booked revenue, signed pilot, external or field validation, partnership, endorsement, award, realized savings, product-market fit, investment, competition selection, or permission to submit without a founder-reviewed final preview.
-- Control SHA-256: `05ecce9a42b64bb6029f40da6b7ae20513a9a5e2b75fe7677dfadc70481de377`
+- Control SHA-256: `490280cf2959472fb44321830a79b289ba8507133f09cf3e6b9da6833c5299d3`
 
 ## Source Integrity
 
 - Path: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json`
-- Bytes: `32797`
-- File SHA-256: `52912964fed3e4da5a0fe695fc3454f086657e5fc9499f5d0c785971ae936493`
-- Embedded register SHA-256: `58b6ef43f8c948b7eb49b3facd215bcbccae5f6074ad70fd32bf4a8d810edda2`
+- Bytes: `34615`
+- File SHA-256: `63df3dad8af80b433ed4dc3f6826c284be39ca9dc4c40c2cdd571f4a788dc556`
+- Embedded register SHA-256: `4020be24c7df7cf0d5bdcc54111c98c0cdd0cd344be8e756babdffa63b3d529b`
 - Nashville live receipt path: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json`
 - Nashville live receipt bytes: `5108`
 - Nashville live receipt file SHA-256: `28436aafc9e0b8ea1149c81bb0ee57aa827e6a3bf321f2687bf0d124f298d8c9`

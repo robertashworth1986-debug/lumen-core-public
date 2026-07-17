@@ -1,8 +1,8 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T20:30:35.589Z",
+  "created_utc": "2026-07-17T20:38:57.843Z",
   "destination_root": "E:/LumaProofVault/OUTREACH/EXTERNAL_RESPONSE_STATE_20260717",
-  "artifact_count": 19,
+  "artifact_count": 29,
   "all_sha256_matched_after_copy": true,
   "browser_navigation_performed": false,
   "private_founder_values_mirrored": false,
@@ -40,7 +40,7 @@
     {
       "source": "tests/test_external_engagement_response_register.py",
       "bytes": 18753,
-      "sha256": "F809E4E537A5B64271EA1185B2AA02D0E4E37602CE4B9294B40B48A7925E6DE6",
+      "sha256": "81DBC4F4F30D9A103583875D4169E97E41AD993990C3C94BD7824F3CE43906C9",
       "copy_sha256_matched": true
     },
     {
@@ -120,7 +120,67 @@
       "bytes": 79049,
       "sha256": "393C671937B4445D806DF14E50F2BF7FF239E11D33581E8D17DEE6D3E0464554",
       "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_CLOCK_GATE.py",
+      "bytes": 27505,
+      "sha256": "B20ED07D496D10023C9457EA33FEA976127B763A16DD8B5DE659C4C2B42638EA",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_external_engagement_clock_gate.py",
+      "bytes": 9025,
+      "sha256": "1E743F7A48526FBDE383C68904B0DC2C39144ABE88A4780FD53203AEEADDE455",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.json",
+      "bytes": 25724,
+      "sha256": "4301740158137AD6221A2BCFFCE9BE77A21F52CF9D600DF44ECAF263BC6C5C48",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+      "bytes": 20979,
+      "sha256": "23A7C7E0EF9F77A4917652D4781696F387D502530CBB252807F1B52680B7B6FE",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/external_engagement_clock_gate_latest.json",
+      "bytes": 25724,
+      "sha256": "4301740158137AD6221A2BCFFCE9BE77A21F52CF9D600DF44ECAF263BC6C5C48",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/external_engagement_clock_gate.json",
+      "bytes": 25724,
+      "sha256": "4301740158137AD6221A2BCFFCE9BE77A21F52CF9D600DF44ECAF263BC6C5C48",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py",
+      "bytes": 22512,
+      "sha256": "9058DA028738EBA12C85B476D0F37474263FFFD105B5FEA2EDB18C708DBF791E",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_live_funding_portal_handoff.py",
+      "bytes": 8488,
+      "sha256": "17DB82D6A1748626B4969B3D9E4FD2374BDE1B8682167E2E7A98F2B85B4439FA",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+      "bytes": 11665,
+      "sha256": "A41A9FF3DF3899BFD87739A01FFFF1F44A668DC70F74D094BAC31EC4F0120335",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/live_funding_portal_handoff_latest.json",
+      "bytes": 19223,
+      "sha256": "09625A9352CB6E27CF6591E08DE020016363D744F1BF63876CB70A5A683AD55E",
+      "copy_sha256_matched": true
     }
   ],
-  "claim_boundary": "This receipt proves only that nineteen bounded response-control, test, deadline-confirmation, reconciliation, command-board, and public-safe dashboard artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove portal submission, application acceptance, investor review activity beyond the cited sender statement, funding, selection, award, endorsement, external validation, or technical performance."
+  "claim_boundary": "This receipt proves only that twenty-nine bounded response-control, test, deadline-confirmation, reconciliation, clock-gate, portal-handoff, command-board, and public-safe dashboard artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove portal submission, application acceptance, investor review activity beyond the cited sender statement, funding, selection, award, endorsement, external validation, or technical performance."
 }

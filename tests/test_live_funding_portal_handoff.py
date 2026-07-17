@@ -69,10 +69,13 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
         "private_values_exposed": False,
     }
     assert nashville["deadline_support"] == {
-        "status": "DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING",
+        "status": "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED",
         "sent_utc": "2026-07-17T12:05:34Z",
         "do_not_duplicate_send": True,
         "email_is_application": False,
+        "reply_required": False,
+        "timezone_explicit_in_message": False,
+        "operational_timezone": "America/Chicago",
     }
     assert any(
         path.endswith("CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py")
@@ -87,14 +90,14 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
     assert missionweave["deadline_utc"] == "2026-07-22T16:00:00Z"
     assert "July 22, 2025" in missionweave["official_deadline_text"]
     assert any("15-file manifest" in action for action in missionweave["next_safe_action"])
-    assert any("0/50 to 50/50" in action for action in missionweave["next_safe_action"])
+    assert any("beyond 13/50" in action for action in missionweave["next_safe_action"])
     assert missionweave["action_gate"] == {
-        "status": "PRIVATE_DSIP_FACTS_NOT_CAPTURED",
+        "status": "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN",
         "submission_ready_for_human_click": False,
         "required_private_gate_count": 50,
-        "passed_private_gate_count": 0,
-        "open_gate_count": 50,
-        "private_input_present": False,
+        "passed_private_gate_count": 13,
+        "open_gate_count": 37,
+        "private_input_present": True,
         "private_values_exposed": False,
         "private_capture_tool": (
             "code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py"
@@ -107,7 +110,7 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
             "grant_submissions/DLA26BZ03_NV011_MissionWeave/"
             "MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md"
         ),
-        "private_final_volume2_present": False,
+        "private_final_volume2_present": True,
         "private_final_volume2_path_exposed": False,
         "private_final_volume2_sha256_exposed": False,
         "pre_submit_excludes_action_time_approval": True,
@@ -152,10 +155,13 @@ def test_rendered_handoff_is_public_safe_and_has_no_stale_send_state() -> None:
     assert "Navigation before resume signal: `false`" in rendered
     assert "DLA26BZ03-NV011" in rendered
     assert "Passed: `0/15`" in rendered
-    assert "Status: `DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING`" in rendered
+    assert "Status: `OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED`" in rendered
     assert "Do not duplicate: `true`" in rendered
     assert "Email is application: `false`" in rendered
-    assert "Passed: `0/50`" in rendered
+    assert "Reply required: `false`" in rendered
+    assert "Timezone explicit in message: `false`" in rendered
+    assert "Operational timezone: `America/Chicago`" in rendered
+    assert "Passed: `13/50`" in rendered
     assert "EPRI administrative onboarding was sent" in rendered
     assert "referred the request to the subject matter expert" in rendered
     assert "bounded acknowledgment is sent" in rendered

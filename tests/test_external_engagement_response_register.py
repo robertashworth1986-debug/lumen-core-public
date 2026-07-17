@@ -257,7 +257,7 @@ def test_current_response_state_mirror_matches_sources_and_e_drive():
     destination = Path(receipt["destination_root"])
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 19
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 29
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["private_founder_values_mirrored"] is False
     for artifact in receipt["artifacts"]:

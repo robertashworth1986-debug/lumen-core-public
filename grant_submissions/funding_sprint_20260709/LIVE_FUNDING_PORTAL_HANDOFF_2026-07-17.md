@@ -10,21 +10,21 @@ This handoff is generated from the authoritative near-deadline command board. It
 - Navigation before resume signal: `false`
 - Inspect current page before navigation: `true`
 - First action after resume: Inspect the current URL and visible page without navigating. Continue the current authenticated portal to its next safe preview before switching lanes.
-- Source command-board SHA-256: `73c51b288a3b91accd75a33cf6bfd2b77fc99d44a205bc666714191eef223699`
-- Handoff SHA-256: `6194ad607aedb22e051fc597d26dc60d1557942c8bed1bc2b65027e27701da9e`
+- Source command-board SHA-256: `698ed2de7ebac32c49418f97118d18f6ca43ac97c8f68fad7c98d1717f617fa1`
+- Handoff SHA-256: `393f511e953ac544a6e246973d5d8abbf82e9cc566ec4c39589b2ad0d7465213`
 
 ## Portal Queue
 
 ### 1. NASHVILLE-EC-FALL-2026 - Nashville Entrepreneur Center Fall 2026 Accelerators
 
 - Command: `STAGE_APPLICATION`
-- Deadline: Applications close July 17, 2026; the official page does not list a closing time
+- Deadline: The official Nashville Entrepreneur Center reply states that applications are open until 11:59 p.m. on July 17. The message does not name a timezone; America/Chicago is the explicit operational inference.
 - Portal: https://ec.co/apply/
 - Next safe action:
   - If this is the current signed-in page, inspect the visible application state before navigating anywhere.
   - Run `python code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py` and answer the six hidden prompts; require the ignored 11-answer fill map to validate without publishing values.
   - Populate only the supported answers from that private map and reach the complete preview.
-  - Monitor the one deadline-support thread for the exact close time; do not resend it and do not treat it as an application.
+  - Use the confirmed 11:59 p.m. July 17 close as the outside bound and submit early; do not resend the deadline query and do not treat the support reply as an application.
 - Action gate:
   - Status: `READY_FOR_HIDDEN_FOUNDER_INPUT`
   - Passed: `0/15`
@@ -33,10 +33,13 @@ This handoff is generated from the authoritative near-deadline command board. It
   - Private values exposed: `false`
   - Ready for human click: `false`
 - Deadline-support email:
-  - Status: `DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING`
+  - Status: `OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED`
   - Sent UTC: `2026-07-17T12:05:34Z`
   - Do not duplicate: `true`
   - Email is application: `false`
+  - Reply required: `false`
+  - Timezone explicit in message: `false`
+  - Operational timezone: `America/Chicago`
 - Stop conditions:
   - Any fee payment, financial-aid agreement, program terms, cohort acceptance, attestation, or final submission.
   - Any portal answer that conflicts with the founder-confirmation artifact.
@@ -46,7 +49,7 @@ This handoff is generated from the authoritative near-deadline command board. It
   - Any later program fee, financial-aid arrangement, terms, or cohort acceptance requires a separate decision.
 - External send without human: `false`
 - Final submit without human: `false`
-- Source lane SHA-256: `85c856fe6e0262c19ef672fec63fe79d087454e510f51d5b8e417c3cde925de0`
+- Source lane SHA-256: `876e11a28ab2f5244826dcf83b6c52b688b83e4d693a0f0fe030920a513d6b14`
 
 ### 2. DLA26BZ03-NV011 - Digital Twin of the Organization for Enhanced Mission Readiness
 
@@ -57,13 +60,13 @@ This handoff is generated from the authoritative near-deadline command board. It
   - Verify the live DSIP countdown, organization linkage, and generated proposal number.
   - Capture the proposal number only in the ignored record, run the guarded private Volume 2 finalizer, and require its assigned-header PDF QA receipt without changing the public 15-file manifest, which remains neutral.
   - Run the hidden sectioned MissionWeave collector for identity, proposal, and compliance; it accepts no Firm PIN or credential and keeps action-time approval separate.
-  - Use the generated seven-volume checklist and require the public gate to move from 0/50 to 50/50 without exposing values.
+  - Use the generated seven-volume checklist and move the public gate beyond 13/50 by resolving only supported portal facts without exposing values.
   - Populate Volumes 1-7 from the bounded package and reach the complete preview.
 - Action gate:
-  - Status: `PRIVATE_DSIP_FACTS_NOT_CAPTURED`
-  - Passed: `0/50`
-  - Open: `50`
-  - Private input present: `false`
+  - Status: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`
+  - Passed: `13/50`
+  - Open: `37`
+  - Private input present: `true`
   - Private values exposed: `false`
   - Ready for human click: `false`
 - Stop conditions:
@@ -78,7 +81,7 @@ This handoff is generated from the authoritative near-deadline command board. It
   - Robert completes required training and reviews every certification, attachment hash, total, and the final DSIP preview before submission.
 - External send without human: `false`
 - Final submit without human: `false`
-- Source lane SHA-256: `dbc7b4568691b2292300da891c9ad6e1cf916e0e3f32589939a2708cb604ef33`
+- Source lane SHA-256: `f7d1b5bd939920a6fa833ca6a5e43e0751a022d4bf518867787bb0c9ff4f37b2`
 
 ### 5. 26-510 - NSF Small Business Innovation Research / Small Business Technology Transfer Programs Phase I
 
