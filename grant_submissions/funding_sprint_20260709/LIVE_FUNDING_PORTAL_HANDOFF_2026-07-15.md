@@ -15,7 +15,7 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 |---|---|---:|---|
 | 1 | DLA26BZ03-NV011 - Digital Twin of the Organization for Enhanced Mission Readiness (MissionWeave) | 2026-07-22 | Finish DSIP identity, firm, organization, and topic-workspace gates; then populate from the bounded local package. |
 | 2 | NSF 26-511 - SBIR/STTR Scientific Instrumentation | 2026-07-27, 5:00 PM local | Inspect Project Pitch/invitation state. A full Phase I proposal requires an official invitation and must be submitted through Research.gov, not Grants.gov. |
-| 3 | 75D301-26-RFI-73483 - CDC AI Acquisition Support | Questions: 2026-07-20; response: 2026-07-30, 5:00 PM ET | Two-page response and Gmail draft are ready; transmission remains unsent pending review and action-time approval. |
+| 3 | 75D301-26-RFI-73483 - CDC AI Acquisition Support | Questions: 2026-07-20; response: 2026-07-30, 5:00 PM ET | Response sent July 16; CDC Contracting Officer confirmed receipt and said CDC will follow up. Monitor only; do not duplicate-send. |
 | 4 | W912HZ26SC005 - ERDC Sovereign Defense Cloud for HPC | 2026-08-07, 4:00 PM CT | Complete Submittable account and populate the concept-paper form as a modular proof-fabric component, not a full cloud-prime claim. |
 | 5 | DPA26BZ04-DV016 - FALCON | 2026-08-19 | New high-fit technical lane: hybrid LLM/ML methods, structured and unstructured data, cross-dataset metrics, hallucination mitigation, and reproducible analytic traces. Build only after MissionWeave is portal-staged. |
 | 6 | HR001126S0010 - DICE | 2026-08-25, 2:00 PM ET | Monitor for abstract feedback and stage a full proposal only from the bounded DICE package and verified BAAT account state. |
@@ -40,7 +40,7 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 - USPTO Patent Center self-enrollment completed and the customer-number request was accepted on 2026-07-14.
 - No new DICE encouraged/discouraged feedback or LANL Teams invitation was found in the checked mail.
 - A LANL meeting-link follow-up draft is staged but unsent.
-- The CDC RFI response draft is staged with its two-page attachment but unsent.
+- The CDC RFI response was sent on 2026-07-16 with its two-page attachment. Lauren Peel, CDC Contracting Officer and OAS Policy Section Lead, confirmed receipt and stated that CDC will follow up. This is an engagement receipt, not technical validation or an award.
 - Recent LinkedIn notices include direct messages and connection invitations, but their visible email excerpts do not establish a grant, contract, pilot, investment, or validation opportunity.
 
 ## Live Registration Facts Verified On 2026-07-15
@@ -65,6 +65,6 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 2. Complete Research.gov organization contact fields and role choices; stop before the review/certification submission.
 3. Complete DSIP authentication, then populate and preview MissionWeave.
 4. Verify NSF Project Pitch/invitation status before creating an NSF 26-511 proposal workspace.
-5. Review and, after action-time approval, send the CDC RFI response.
+5. Monitor the CDC RFI thread for a substantive follow-up; do not send a duplicate response.
 6. Confirm the ERDC organization result, then populate the bounded concept form.
 7. Build the FALCON compliance and evidence crosswalk.

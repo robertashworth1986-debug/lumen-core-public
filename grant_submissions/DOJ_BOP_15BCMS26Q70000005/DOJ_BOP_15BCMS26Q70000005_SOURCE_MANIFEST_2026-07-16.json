@@ -1,0 +1,70 @@
+{
+  "schema": "lumencore.solicitation_source_manifest.v1",
+  "generated_date_local": "2026-07-16",
+  "retrieved_utc": "2026-07-17T00:45:16.5801624Z",
+  "solicitation": {
+    "agency": "Federal Bureau of Prisons",
+    "department": "Department of Justice",
+    "notice_id": "15BCMS26Q70000005",
+    "parent_notice_uuid": "c897d53ee6ba4b419d09b76fe08edb02",
+    "latest_revision_uuid": "52680f2a89c241b3a055c35d816b7f20",
+    "official_parent_url": "https://sam.gov/opp/c897d53ee6ba4b419d09b76fe08edb02/view",
+    "official_latest_revision_url": "https://sam.gov/opp/52680f2a89c241b3a055c35d816b7f20/view",
+    "official_resource_metadata_url": "https://sam.gov/api/prod/opps/v3/opportunities/52680f2a89c241b3a055c35d816b7f20/resources?excludeDeleted=false&withScanResult=false",
+    "set_aside": "Total small business set-aside",
+    "naics": "541611",
+    "psc": "R405",
+    "offer_deadline_official_text": "07/23/2026 11:00 ET",
+    "offer_deadline_iso": "2026-07-23T11:00:00-04:00",
+    "question_deadline_official_text": "July 16, 2026, at 2:00pm EST",
+    "question_deadline_status": "PASSED",
+    "submission_route": "Email quotation to the Contracting Officer under the solicitation instructions",
+    "primary_contact": "Kristen Fisher",
+    "primary_contact_email": "kmfisher@bop.gov"
+  },
+  "source_bundle": {
+    "path": "grant_submissions/DOJ_BOP_15BCMS26Q70000005/Historical Medical Claims Data Analysis.zip",
+    "bytes": 1491677,
+    "sha256": "4CE1FBE58CE49107FB5C02E678C6F5C58A255F0E66A0B6596124EEEDA2683140"
+  },
+  "attachments": [
+    {
+      "name": "15BCMS26Q70000005 Historical Medical Claims Data Analysis.pdf",
+      "path": "grant_submissions/DOJ_BOP_15BCMS26Q70000005/source_attachments/15BCMS26Q70000005 Historical Medical Claims Data Analysis.pdf",
+      "resource_id": "ebe6e21fc3d5447d9105911d0b9e991d",
+      "posted_utc": "2026-07-10T14:32:12.512+00:00",
+      "bytes": 1531213,
+      "sha256": "BB47C8452C3BCBBE399C673D50A2801275547AB1BD447122007EC3D1CAEE102A",
+      "page_count": 58,
+      "access": "public"
+    },
+    {
+      "name": "15BCMS26Q70000005 Mod 001.pdf",
+      "path": "grant_submissions/DOJ_BOP_15BCMS26Q70000005/source_attachments/15BCMS26Q70000005 Mod 001.pdf",
+      "resource_id": "4c74c255fbd54d3987ab8b3874dc83cf",
+      "posted_utc": "2026-07-16T14:08:10.397+00:00",
+      "bytes": 45154,
+      "sha256": "69AD53D2E1A9632916998076B326CE8DFA5041DB4995FE6C602EFF48DC99CD1D",
+      "page_count": 3,
+      "access": "public"
+    },
+    {
+      "name": "Sample Data.xlsx",
+      "path": "grant_submissions/DOJ_BOP_15BCMS26Q70000005/source_attachments/Sample Data.xlsx",
+      "resource_id": "8a46f5da9051496199131078290efdd5",
+      "posted_utc": "2026-07-10T14:32:12.512+00:00",
+      "bytes": 23552,
+      "sha256": "A1EC02D0174D5FC227D781074CE43FE5E75205BBA43BA2112E4C267A559647CC",
+      "sheet_count": 1,
+      "row_count_including_header": 3,
+      "column_count": 70,
+      "access": "public"
+    }
+  ],
+  "custody": {
+    "download_method": "Anonymous official SAM.gov v3 resource metadata and ZIP endpoints",
+    "all_metadata_sizes_match_downloaded_files": true,
+    "source_files_modified": false
+  },
+  "claim_boundary": "This manifest proves source custody and file integrity only. It does not prove eligibility, responsibility, compliance, submission, agency acceptance, technical validation, award, or contract performance."
+}

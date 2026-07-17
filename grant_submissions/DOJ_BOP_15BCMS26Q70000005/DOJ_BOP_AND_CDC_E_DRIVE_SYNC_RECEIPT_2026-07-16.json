@@ -1,0 +1,27 @@
+{
+  "schema": "lumencore.e_drive_sync_receipt.v1",
+  "verified_utc": "2026-07-17T00:50:57.8591323Z",
+  "vault_root": "E:\\LumaProofVault\\SUBMISSIONS",
+  "packages": [
+    {
+      "name": "DOJ_BOP_15BCMS26Q70000005",
+      "source": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\grant_submissions\\DOJ_BOP_15BCMS26Q70000005",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\DOJ_BOP_15BCMS26Q70000005_20260716",
+      "artifact_count": 7,
+      "hash_matches": 7,
+      "source_manifest_sha256": "0282A6778ECC0C31890B93C1F68FFDB011139086EE640595262B95600DF6AF46",
+      "source_bundle_sha256": "4CE1FBE58CE49107FB5C02E678C6F5C58A255F0E66A0B6596124EEEDA2683140"
+    },
+    {
+      "name": "CDC_AI_ACQUISITION_RFI_75D301",
+      "source": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\grant_submissions\\funding_sprint_20260709",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\CDC_AI_ACQUISITION_RFI_75D301_20260716",
+      "artifact_count": 5,
+      "hash_matches": 5,
+      "artifact_manifest_sha256": "68ABA554D30F9CAEC5027705E4A3D8741E00447EEDEF74D5D089B54C600AF7A1",
+      "engagement_receipt_sha256": "292157621B722B1973A1AA55140F08586AB41D07FBE38672B348C73E8A865B78"
+    }
+  ],
+  "verification": "Every listed source artifact matched its E-drive copy byte for byte by SHA-256.",
+  "claim_boundary": "This receipt proves local mirror integrity only. It does not prove external submission, agency evaluation, technical validation, award, or contract performance."
+}

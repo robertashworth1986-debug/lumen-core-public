@@ -1,0 +1,34 @@
+{
+  "schema": "lumencore.external_engagement_receipt.v1",
+  "recorded_date": "2026-07-16",
+  "opportunity": {
+    "agency": "Centers for Disease Control and Prevention",
+    "notice_id": "75D301-26-RFI-73483",
+    "title": "CDC Artificial Intelligence for Acquisition Support Reverse Industry Day"
+  },
+  "submission": {
+    "status": "SENT_WITH_ATTACHMENT",
+    "sent_utc": "2026-07-16T13:27:19Z",
+    "gmail_message_id": "19f6b1c3b60be492",
+    "gmail_thread_id": "19f65c3aa0d84815",
+    "subject": "75D301-26-RFI-73483 LumenCore",
+    "recipient": "ijt9@cdc.gov",
+    "attachment": {
+      "path": "grant_submissions/funding_sprint_20260709/LumenCore_CDC_AI_Acquisition_RFI_75D301-26-RFI-73483_2026-07-15.pdf",
+      "bytes": 77318,
+      "sha256": "570F6A6C86DD03649B6F5EE7F731D5E3F0884712CD06DA588D2A4C92C903B2B1"
+    }
+  },
+  "acknowledgment": {
+    "status": "RECEIPT_CONFIRMED_FOLLOW_UP_PENDING",
+    "received_utc": "2026-07-16T13:34:05Z",
+    "gmail_message_id": "19f6b22814477428",
+    "sender_name": "Lauren Peel",
+    "sender_title": "Contracting Officer, OAS Policy Section Lead",
+    "envelope_from": "ijt9@cdc.gov",
+    "signature_email": "lpeel@cdc.gov",
+    "bounded_summary": "CDC confirmed receipt and stated that it will follow up.",
+    "reply_required": false
+  },
+  "claim_boundary": "The Gmail SENT record and CDC acknowledgment prove transmission and receipt only. They do not establish evaluation, selection, technical validation, endorsement, award, deployment, a pilot, or contract performance."
+}

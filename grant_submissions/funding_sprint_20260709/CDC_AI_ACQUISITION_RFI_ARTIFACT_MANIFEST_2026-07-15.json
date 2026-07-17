@@ -9,8 +9,8 @@
     "questions_deadline": "2026-07-20T17:00:00-04:00",
     "response_deadline": "2026-07-30T17:00:00-04:00"
   },
-  "submission_state": "GMAIL_DRAFT_READY_NOT_SENT",
-  "submission_boundary": "This manifest records package preparation and draft verification only. It does not establish transmission, CDC receipt, selection, validation, endorsement, award, or contract.",
+  "submission_state": "SENT_RECEIPT_CONFIRMED_FOLLOW_UP_PENDING",
+  "submission_boundary": "The Gmail SENT record and CDC acknowledgment establish transmission and receipt only. They do not establish evaluation, selection, technical validation, endorsement, award, deployment, a pilot, or contract performance.",
   "artifacts": [
     {
       "path": "grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_75D301-26-RFI-73483_2026-07-15.md",
@@ -27,6 +27,11 @@
       "role": "send_ready_capability_statement",
       "page_count": 2,
       "sha256": "570F6A6C86DD03649B6F5EE7F731D5E3F0884712CD06DA588D2A4C92C903B2B1"
+    },
+    {
+      "path": "grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "role": "external_engagement_receipt",
+      "sha256": "292157621B722B1973A1AA55140F08586AB41D07FBE38672B348C73E8A865B78"
     }
   ],
   "quality_gates": {
@@ -36,7 +41,8 @@
     "two_page_limit": "PASS",
     "prototype_stage_disclosure": "PASS",
     "claim_boundary_disclosure": "PASS",
-    "gmail_draft_recipient_subject_attachment_readback": "PASS"
+    "gmail_draft_recipient_subject_attachment_readback": "PASS",
+    "gmail_sent_message_readback": "PASS",
+    "cdc_receipt_confirmation_readback": "PASS"
   }
 }
-
