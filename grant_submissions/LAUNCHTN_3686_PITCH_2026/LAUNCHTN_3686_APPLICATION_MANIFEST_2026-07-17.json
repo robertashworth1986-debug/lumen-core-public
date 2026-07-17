@@ -1,0 +1,479 @@
+{
+  "schema": "lumencore.launchtn_3686_pitch_application.v1",
+  "generated_utc": "2026-07-17T09:10:23.619678+00:00",
+  "opportunity": {
+    "name": "3686 Pitch Competition 2026, presented by Amazon",
+    "organizer": "Launch Tennessee",
+    "application_deadline": "2026-08-13T23:59:00-05:00",
+    "application_deadline_timezone": "CDT",
+    "competition_date": "2026-09-15",
+    "competition_location": "Brooklyn Bowl, Nashville",
+    "cash_prize_usd": 10000,
+    "form_url": "https://airtable.com/app6GRZNbU72OmaK1/pagudvfO1hH7SmzBl/form",
+    "formal_investtn_application": false,
+    "investtn_url": "https://investtn.org/",
+    "portal_schema_status": "OBSERVED_WITHOUT_SAVE_OR_SUBMIT_2026-07-17",
+    "eligibility_fit": "POTENTIAL_TENNESSEE_STARTUP_FIT_REQUIRES_FOUNDER_ATTESTATION"
+  },
+  "summary": {
+    "field_count": 30,
+    "required_field_count": 25,
+    "status_counts": {
+      "READY": 15,
+      "PRIVATE_PORTAL_ENTRY": 4,
+      "HUMAN_CONFIRM_REQUIRED": 5,
+      "OPTIONAL_OMIT_UNLESS_TRUE": 1,
+      "HUMAN_ATTESTATION_REQUIRED": 1,
+      "FOUNDER_PRICING_APPROVAL_REQUIRED": 1,
+      "ATTACHMENT_QA_PASSED_FOUNDER_APPROVAL_REQUIRED": 2,
+      "OPTIONAL_OMIT_UNLESS_REVIEWED": 1
+    },
+    "narrative_fields_within_character_limits": true,
+    "human_or_private_fact_gates": 11,
+    "required_attachment_gates": 2,
+    "required_attachments_present": 2,
+    "required_attachments_qa_passed": 2,
+    "final_submit_allowed_without_human": false
+  },
+  "portal_options": {
+    "tennessee_counties": [
+      "Davidson",
+      "Other"
+    ],
+    "company_structure": [
+      "C Corporation",
+      "S Corporation",
+      "Limited Liability Corporation",
+      "Limited Liability Partnership",
+      "Partnership",
+      "Sole Proprietorship",
+      "Other",
+      "Not Determined Yet"
+    ],
+    "tennessee_eligibility": [
+      "51% of my company's employees are domiciled in Tennessee",
+      "My company is headquartered in TN",
+      "A majority of my company's senior management are domiciled in TN",
+      "None of the above"
+    ],
+    "prior_launchtn_capital": [
+      "None",
+      "Yes",
+      "No"
+    ],
+    "business_model": [
+      "B2B",
+      "B2C",
+      "D2C",
+      "B2B2C",
+      "Other"
+    ],
+    "primary_product": [
+      "Software / SaaS Platform",
+      "Mobile App",
+      "Physical Product / Device",
+      "Biotechnology / Life Sciences Solution",
+      "Medical Device",
+      "Consumer Packaged Good (CPG)",
+      "Marketplace Platform",
+      "AI / Machine Learning Tool",
+      "Fintech Solution",
+      "Healthtech Solution",
+      "Clean Energy / Sustainability Product",
+      "Manufacturing / Industrial Technology",
+      "Agricultural / Food Technology",
+      "Service-Based Offering",
+      "Other (please specify)"
+    ],
+    "product_status": [
+      "MVP not yet in development",
+      "MVP development in Progress",
+      "MVP development completed",
+      "Beta Testing Initial Users",
+      "Intial Product full developed and validated",
+      "Currently live in market"
+    ],
+    "industry_sectors": [
+      "Advanced Materials",
+      "AgTech",
+      "FinTech",
+      "Mobility & Transportation",
+      "Advanced Energy/Battery Solutions",
+      "AR/VR",
+      "Bio Tech/Life Sciences/Med Device",
+      "Blockchain/Crypto/Web 3.0",
+      "ClimateTech/CleanTech",
+      "Construction Tech/Manufacturing",
+      "Consumer/E-Commerce",
+      "Data/AI/ML",
+      "EdTech",
+      "Entertainment/Media/Gaming",
+      "FemTech",
+      "General",
+      "Health & Wellness",
+      "HR Tech",
+      "Robotics",
+      "Security/Cybersecurity",
+      "SaaS",
+      "InsurTech/Legal Tech",
+      "Other"
+    ]
+  },
+  "fields": [
+    {
+      "field_id": "company_name",
+      "label": "Company Name",
+      "required": true,
+      "proposed_answer": "LumenCore",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "field_id": "founder_names",
+      "label": "Founder(s) Name(s)",
+      "required": true,
+      "proposed_answer": "Robert Ashworth",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "field_id": "founder_phone",
+      "label": "Founder's Phone Number",
+      "required": false,
+      "proposed_answer": "[PRIVATE_PORTAL_ENTRY]",
+      "status": "PRIVATE_PORTAL_ENTRY",
+      "evidence": "Private contact record"
+    },
+    {
+      "field_id": "founder_linkedin",
+      "label": "Founder's LinkedIn",
+      "required": true,
+      "proposed_answer": "https://www.linkedin.com/in/robert-ashworth-40a9b7376",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "field_id": "founder_email",
+      "label": "Founder's Email",
+      "required": true,
+      "proposed_answer": "[PRIVATE_PORTAL_ENTRY_FROM_AUTHENTICATED_GMAIL]",
+      "status": "PRIVATE_PORTAL_ENTRY",
+      "evidence": "Authenticated Gmail account"
+    },
+    {
+      "field_id": "company_website",
+      "label": "Company Website (if applicable)",
+      "required": false,
+      "proposed_answer": "https://lumen-core.ai",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "field_id": "company_address",
+      "label": "Company Address",
+      "required": true,
+      "proposed_answer": "[PRIVATE_PORTAL_ENTRY]",
+      "status": "PRIVATE_PORTAL_ENTRY",
+      "evidence": "Founder-controlled legal or business address record"
+    },
+    {
+      "field_id": "company_city",
+      "label": "Company City",
+      "required": true,
+      "proposed_answer": "Nashville",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "field_id": "company_state",
+      "label": "Company State",
+      "required": true,
+      "proposed_answer": "TN",
+      "status": "READY",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "field_id": "company_zip",
+      "label": "Company Zip Code",
+      "required": true,
+      "proposed_answer": "[PRIVATE_PORTAL_ENTRY]",
+      "status": "PRIVATE_PORTAL_ENTRY",
+      "evidence": "Founder-controlled legal or business address record"
+    },
+    {
+      "field_id": "company_county",
+      "label": "Which county is your company HQ?",
+      "required": true,
+      "proposed_answer": "Davidson only if the submitted headquarters address is in Davidson County",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "Must match the private headquarters address entered in the portal",
+      "portal_option_group": "tennessee_counties"
+    },
+    {
+      "field_id": "additional_office",
+      "label": "Additional Office Location (Optional)",
+      "required": false,
+      "proposed_answer": "Leave blank unless another current office exists",
+      "status": "OPTIONAL_OMIT_UNLESS_TRUE",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "field_id": "formation_year",
+      "label": "Company Year of Formation",
+      "required": true,
+      "proposed_answer": "[ENTER VERIFIED LEGAL FORMATION YEAR]",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "Legal formation record required"
+    },
+    {
+      "field_id": "company_structure",
+      "label": "Company Structure",
+      "required": true,
+      "proposed_answer": "[SELECT VERIFIED LEGAL STRUCTURE]",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "Legal entity record required",
+      "portal_option_group": "company_structure"
+    },
+    {
+      "field_id": "tennessee_eligibility",
+      "label": "Which Statement best describes your company's eligibility?",
+      "required": true,
+      "proposed_answer": "My company is headquartered in TN only if the legal and operating facts support it",
+      "status": "HUMAN_ATTESTATION_REQUIRED",
+      "evidence": "Founder attestation against the portal's cited Tennessee statute",
+      "portal_option_group": "tennessee_eligibility"
+    },
+    {
+      "field_id": "full_time_employees",
+      "label": "Number of Full Time Employees",
+      "required": true,
+      "proposed_answer": "[ENTER VERIFIED INTEGER; INCLUDE FOUNDER ONLY IF THE PORTAL DEFINITION ALLOWS]",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "Current employment facts required"
+    },
+    {
+      "field_id": "prior_launchtn_capital",
+      "label": "Have you previously received capital from LaunchTN, such as from INCITE Fund, Impact Fund, SBIR/STTR matching funds or microgrants?",
+      "required": true,
+      "proposed_answer": "No only if no LaunchTN capital has ever been received",
+      "status": "HUMAN_CONFIRM_REQUIRED",
+      "evidence": "Founder funding-history attestation required",
+      "portal_option_group": "prior_launchtn_capital"
+    },
+    {
+      "field_id": "product_service",
+      "label": "Briefly describe your product/service",
+      "required": true,
+      "proposed_answer": "LumenCore is a proof-to-pilot AI validation platform for energy and infrastructure forecasting. It takes an approved time-series dataset, locks the baseline, candidate, metrics, and evaluation window, then runs past-only comparisons and issues hash-verifiable receipts showing wins, losses, and abstentions. Technical buyers use those receipts to decide whether a model deserves an independently reviewed pilot. The first product is a bounded evidence-review sprint followed by a buyer-controlled replay pilot; an annual platform license follows only after validation.",
+      "status": "READY",
+      "evidence": "Current product architecture and public claim boundary",
+      "character_limit": 1200,
+      "character_count": 568,
+      "within_character_limit": true
+    },
+    {
+      "field_id": "problem_customer",
+      "label": "What problem does your startup solve, and who is your target customer?",
+      "required": true,
+      "proposed_answer": "Utilities, laboratories, agencies, and industrial operators are being asked to trust AI outputs that can be difficult to reproduce, compare fairly, or defend after a decision. The initial customer is the technical or innovation leader responsible for forecasting, anomaly detection, timing, or operational-model assurance. Existing benchmark tools often stop at a score. LumenCore also locks the data window and metric, prevents future-data leakage, preserves negative results, supports abstention when the evidence is weak, and creates a hash-verifiable custody trail. The immediate customer outcome is a defensible go/no-go decision for a pilot, not an unsupported promise of savings or deployment readiness.",
+      "status": "READY",
+      "evidence": "Current commercialization packet and reviewer-safe product framing",
+      "character_limit": 1500,
+      "character_count": 710,
+      "within_character_limit": true
+    },
+    {
+      "field_id": "revenue_model",
+      "label": "How does your company generate or plan to generate revenue?",
+      "required": true,
+      "proposed_answer": "Planned, not yet realized: organizations would pay a one-time $5,000-$10,000 fee for a scoped evidence-review sprint, $20,000-$50,000 for a buyer-controlled historical replay pilot, and $60,000-$150,000 per year for software, evidence hosting, and validation support after independent validation. Exact scope and pricing remain founder-approval assumptions in the financial model. Grant-funded validation and government R&D contracts are complementary channels and are not counted as recurring software revenue. LumenCore currently claims no revenue or signed customer.",
+      "status": "FOUNDER_PRICING_APPROVAL_REQUIRED",
+      "evidence": "Planning assumptions only; no booked revenue or approved quote",
+      "character_limit": 1200,
+      "character_count": 569,
+      "within_character_limit": true
+    },
+    {
+      "field_id": "go_to_market",
+      "label": "What is your go-to-market or sales strategy? How will you reach your customers?",
+      "required": true,
+      "proposed_answer": "Start with a narrow energy and infrastructure wedge: utilities, grid analytics firms, national laboratories, agencies, and industrial operators that already own historical time-series data and an accepted baseline. Use founder-led targeted outreach, warm Tennessee ecosystem introductions, consortia, technical events, and the public proof portal to reach technical decision-makers. Qualify each account on data authority, baseline, metric, reviewer, and economic decision before proposing work. Convert the first engagement into a fixed-scope evidence review, then a buyer-controlled replay pilot, then an annual license only after the acceptance gate passes. SBIR/STTR and federal market-research channels support validation but do not replace customer discovery.",
+      "status": "READY",
+      "evidence": "Proof-to-pilot commercialization plan",
+      "character_limit": 1200,
+      "character_count": 765,
+      "within_character_limit": true
+    },
+    {
+      "field_id": "achievements",
+      "label": "Share any key achievements, traction, milestones, or validations so far",
+      "required": true,
+      "proposed_answer": "A working technical MVP and public reviewer surface exist, including locked baseline-versus-candidate protocols, past-only evaluation, explicit abstention, negative-result preservation, reproducible manifests, and hash-verifiable evidence receipts. Internal replay experiments cover public energy and other time-series sources with named baseline comparisons; these results remain internal evidence, not field or independent validation. EPRI initiated an Open Power AI onboarding information exchange, LANL received a bounded technical package, and federal capability responses have recorded transmission receipts. These are engagement milestones, not endorsements, partnerships, awards, or customer results. The next milestone is one independent reproduction and one buyer-owned replay pilot with preregistered acceptance metrics.",
+      "status": "READY",
+      "evidence": "Repository proof controls and bounded engagement receipts",
+      "character_limit": 1500,
+      "character_count": 831,
+      "within_character_limit": true
+    },
+    {
+      "field_id": "business_model",
+      "label": "What is your Business Model",
+      "required": true,
+      "proposed_answer": "B2B",
+      "status": "READY",
+      "evidence": "Public-safe local business record",
+      "portal_option_group": "business_model"
+    },
+    {
+      "field_id": "primary_product",
+      "label": "What is the primary product that your startup is providing?",
+      "required": true,
+      "proposed_answer": "AI / Machine Learning Tool",
+      "status": "READY",
+      "evidence": "Public-safe local business record",
+      "portal_option_group": "primary_product"
+    },
+    {
+      "field_id": "product_status",
+      "label": "Status of product",
+      "required": true,
+      "proposed_answer": "MVP development completed",
+      "status": "READY",
+      "evidence": "Working ingestion, benchmark, API, dashboard, and evidence-manifest components",
+      "portal_option_group": "product_status"
+    },
+    {
+      "field_id": "industry_sectors",
+      "label": "Indicate the Industry Sector(s) that best describe your company.",
+      "required": true,
+      "proposed_answer": "Data/AI/ML; Advanced Energy/Battery Solutions",
+      "status": "READY",
+      "evidence": "AI validation platform with an initial energy and infrastructure wedge",
+      "portal_option_group": "industry_sectors"
+    },
+    {
+      "field_id": "pitch_deck",
+      "label": "Pitch Deck",
+      "required": true,
+      "proposed_answer": "Attach grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx after founder review; SHA-256 c607e94d8e072ec9d9f93da0d8c372fd5592b01d2ca3b4f71c0a079417c18a69.",
+      "status": "ATTACHMENT_QA_PASSED_FOUNDER_APPROVAL_REQUIRED",
+      "evidence": "Application-specific deck passed content, visual, and overflow QA"
+    },
+    {
+      "field_id": "financials",
+      "label": "Upload attachments that contain information about your financials",
+      "required": true,
+      "proposed_answer": "Attach grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx after founder review; SHA-256 9da46f8ad94fc53ef561ee33dcfa6df907897caeadf6afbd08fb113fc6887d94.",
+      "status": "ATTACHMENT_QA_PASSED_FOUNDER_APPROVAL_REQUIRED",
+      "evidence": "Formula-driven model includes pricing, COGS, gross margin, and five-year projections"
+    },
+    {
+      "field_id": "other_attachment",
+      "label": "(Optional) Any other video/documents, and/or demo you want to share, please share it here!",
+      "required": false,
+      "proposed_answer": "Leave blank unless a public-safe reviewer artifact is separately approved",
+      "status": "OPTIONAL_OMIT_UNLESS_REVIEWED",
+      "evidence": "Public-safe local business record"
+    },
+    {
+      "field_id": "optional_note",
+      "label": "(Optional) Anything else you would like us to know?",
+      "required": false,
+      "proposed_answer": "LumenCore is applying as a Tennessee-based, pre-revenue technical startup. Performance results will remain labeled as internal until independently reproduced. The founder is seeking disciplined help with customer focus, pricing, and conversion from reproducible technical proof to the first paid buyer-controlled pilot.",
+      "status": "READY",
+      "evidence": "Current claim boundary and commercialization need"
+    }
+  ],
+  "required_attachments": [
+    {
+      "id": "launchtn_pitch_deck",
+      "portal_requirement": "Competitive landscape, business model, go-to-market, customer profiles, raise ask, and founding team",
+      "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx",
+      "present": true,
+      "bytes": 353970,
+      "sha256": "c607e94d8e072ec9d9f93da0d8c372fd5592b01d2ca3b4f71c0a079417c18a69",
+      "expected_sha256": "c607e94d8e072ec9d9f93da0d8c372fd5592b01d2ca3b4f71c0a079417c18a69",
+      "qa_hash_matches": true,
+      "qa_date": "2026-07-17",
+      "qa_checks": [
+        "11-slide application-specific narrative",
+        "Every slide visually inspected at original render resolution",
+        "slides_test.py passed with no overflow detected",
+        "Claims separated into current evidence and outside-validation gates"
+      ],
+      "status": "QA_PASSED_FOUNDER_APPROVAL_REQUIRED",
+      "founder_approval_required": true,
+      "source_candidate": "grant_submissions/funding_sprint_20260709/LUMENCORE_PITCH_DECK_SEND_READY_2026-07-09.pptx"
+    },
+    {
+      "id": "launchtn_financial_model",
+      "portal_requirement": "Pricing, COGS/cost of revenue, gross margin, and 2-5 year projections",
+      "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx",
+      "present": true,
+      "bytes": 16166,
+      "sha256": "9da46f8ad94fc53ef561ee33dcfa6df907897caeadf6afbd08fb113fc6887d94",
+      "expected_sha256": "9da46f8ad94fc53ef561ee33dcfa6df907897caeadf6afbd08fb113fc6887d94",
+      "qa_hash_matches": true,
+      "qa_date": "2026-07-17",
+      "qa_checks": [
+        "Six-sheet formula-driven model",
+        "Pricing, COGS, gross margin, and five-year projections present",
+        "All model check cells passed",
+        "Formula-error scan returned zero matches",
+        "Every sheet visually inspected after layout repair"
+      ],
+      "status": "QA_PASSED_FOUNDER_APPROVAL_REQUIRED",
+      "founder_approval_required": true,
+      "actuals_claimed": false
+    }
+  ],
+  "human_fact_gate": [
+    "Enter private founder email, optional phone, company street address, and ZIP only in the authenticated portal.",
+    "Verify headquarters county against the submitted private address.",
+    "Verify legal formation year and entity structure.",
+    "Attest which Tennessee statutory eligibility statement is true.",
+    "Verify the full-time employee count under the portal's definition.",
+    "Confirm whether any LaunchTN capital has ever been received.",
+    "Approve the planned pricing ranges, raise ask, and financial-model assumptions.",
+    "Review both required attachments and the final portal preview before submission."
+  ],
+  "source_artifacts": {
+    "business_plan": {
+      "path": "docs/LUMENCORE_BUSINESS_PLAN_INVESTOR_READY_UPDATED_2026-07-03.md",
+      "present": true,
+      "bytes": 3810,
+      "sha256": "74a27569f26c93a1a29424508a41146932dbd5c38f0e2edaa9c05e935995a4aa"
+    },
+    "current_proof_state": {
+      "path": "docs/CURRENT_LUMA_PROOF_STATE_2026-06-25.md",
+      "present": true,
+      "bytes": 3517,
+      "sha256": "fcbd75e46bad605d2509e74aa59bd78dec428ef4a6a95146c88229d4d980e64e"
+    },
+    "epri_receipt": {
+      "path": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "present": true,
+      "bytes": 1481,
+      "sha256": "ebafa995eb6d0bbc3749315f1f41eac1cb0a28e56ae2ec6439c2e69757752ee8"
+    },
+    "lanl_receipt": {
+      "path": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "present": true,
+      "bytes": 1414,
+      "sha256": "74303cfc65c85d9ef73fb80cc8177e5d08df43d03264ffce73251acd2cd9e9d0"
+    },
+    "existing_pitch_deck": {
+      "path": "grant_submissions/funding_sprint_20260709/LUMENCORE_PITCH_DECK_SEND_READY_2026-07-09.pptx",
+      "present": true,
+      "bytes": 48825,
+      "sha256": "365964241254ae5d559af1f379c05d4ae552ce4690883718353d58f902c371c2"
+    }
+  },
+  "claim_boundary": "This is an application-preparation artifact. It does not claim a paying customer, booked revenue, signed pilot, external or field validation, partnership, endorsement, award, realized savings, product-market fit, investment, competition selection, or permission to submit without a founder-reviewed final preview.",
+  "final_action_gate": {
+    "status": "HUMAN_FACTS_FOUNDER_APPROVAL_AND_FINAL_PREVIEW_REQUIRED",
+    "submit_allowed_without_human": false,
+    "action": "Resolve founder facts, approve pricing and funding assumptions, attach the hash-verified QA-passed files, review the live final preview, then submit before the verified deadline."
+  },
+  "application_packet_sha256": "0cfe79dad8922ff44ea69abb4fdb78d34543ecad2f2bc0b11bc98168fee2a9de"
+}

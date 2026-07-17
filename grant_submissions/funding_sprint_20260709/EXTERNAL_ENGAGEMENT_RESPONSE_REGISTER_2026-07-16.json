@@ -1,5 +1,5 @@
 {
-  "as_of_date": "2026-07-16",
+  "as_of_date": "2026-07-17",
   "attachment_checks": {
     "army": {
       "actual_bytes": 5405,
@@ -31,6 +31,30 @@
       "present": true,
       "sha256_match": true
     },
+    "launchtn_financial_model": {
+      "actual_bytes": 16166,
+      "actual_sha256": "9DA46F8AD94FC53EF561EE33DCFA6DF907897CAEADF6AFBD08FB113FC6887D94",
+      "bytes_match": true,
+      "expected_bytes": 16166,
+      "expected_sha256": "9DA46F8AD94FC53EF561EE33DCFA6DF907897CAEADF6AFBD08FB113FC6887D94",
+      "founder_approval_required": true,
+      "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx",
+      "present": true,
+      "qa_status": "QA_PASSED_FOUNDER_APPROVAL_REQUIRED",
+      "sha256_match": true
+    },
+    "launchtn_pitch_deck": {
+      "actual_bytes": 353970,
+      "actual_sha256": "C607E94D8E072EC9D9F93DA0D8C372FD5592B01D2CA3B4F71C0A079417C18A69",
+      "bytes_match": true,
+      "expected_bytes": 353970,
+      "expected_sha256": "C607E94D8E072EC9D9F93DA0D8C372FD5592B01D2CA3B4F71C0A079417C18A69",
+      "founder_approval_required": true,
+      "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx",
+      "present": true,
+      "qa_status": "QA_PASSED_FOUNDER_APPROVAL_REQUIRED",
+      "sha256_match": true
+    },
     "nasa": {
       "actual_bytes": 15465,
       "actual_sha256": "88A606678ACC62C60C914C515605D5D590CEACDC1A82AA20B47028B3444EEB0D",
@@ -43,8 +67,8 @@
     }
   },
   "claim_boundary": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance.",
-  "direct_answer": "Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPRI administrative reply and Georgia PATENTS intake inquiry were sent and are now monitor-only with CDC, LANL, NASA, and Army; duplicate sends would reduce credibility.",
-  "generated_utc": "2026-07-17T07:02:56.023749+00:00",
+  "direct_answer": "No new email should be sent. If the Nashville EC portal remains open, finish its founder-fact gate; complete the overdue SAM account-key action; and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. EPRI, Georgia PATENTS, CDC, LANL, NASA, and Army are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would reduce credibility.",
+  "generated_utc": "2026-07-17T09:19:16.153990+00:00",
   "inbox_risk_filters": [
     {
       "decision": "DO_NOT_TREAT_AS_OFFICIAL_SAM_NOTICE",
@@ -94,6 +118,28 @@
       ]
     },
     {
+      "action_gate": "Founder enters the 11 private, legal, employment, Tennessee-eligibility, funding-history, and pricing confirmations; approves the $250,000 illustrative raise and pricing assumptions; verifies both attachment hashes; then reviews the complete live preview before final submission.",
+      "attachment_qa_passed_count": 2,
+      "attachment_required_count": 2,
+      "claim_boundary": "This is an application-preparation artifact. It does not claim a paying customer, booked revenue, signed pilot, external or field validation, partnership, endorsement, award, realized savings, product-market fit, investment, competition selection, or permission to submit without a founder-reviewed final preview.",
+      "deadline": "2026-08-13T23:59:00-05:00",
+      "decision": "STAGE_PORTAL_FINAL_PREVIEW_REQUIRED",
+      "do_not_duplicate_send": false,
+      "lane_id": "launchtn_3686_pitch_2026",
+      "next_action": "Keep the portal staged. After founder facts and assumptions are confirmed, attach the hash-verified deck and financial model, inspect the final rendered application, and obtain action-time approval before submitting by August 13 at 11:59 PM CDT.",
+      "organization": "Launch Tennessee 3686 Pitch Competition",
+      "record_sha256": "c8bf0aadfd308ab93664a3c1d22d4b78182b4ad60cf4242f1b6520ceb155a2a8",
+      "response_artifact": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json",
+      "response_channel": "PORTAL",
+      "response_ready": true,
+      "send_now": false,
+      "state": "PORTAL_PACKET_QA_PASSED_HUMAN_FACTS_AND_FOUNDER_APPROVAL_REQUIRED",
+      "supporting_artifacts": [
+        "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx",
+        "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx"
+      ]
+    },
+    {
       "action_gate": "Reply only when EPRI sends the MOU, requests a correction, or asks for additional onboarding information.",
       "claim_boundary": "This receipt records MOU-routing information only. The Gmail SENT record proves transmission of the administrative reply only. It does not establish an executed MOU, consortium membership, EPRI endorsement, independent validation, a pilot, funding, procurement, a contract, deployment, realized savings, or technical performance.",
       "deadline": null,
@@ -136,6 +182,42 @@
         "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_RESPONSE_2026-07-16.md",
         "grant_submissions/funding_sprint_20260709/PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md",
         "grant_submissions/funding_sprint_20260709/PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md"
+      ]
+    },
+    {
+      "action_gate": "No payment, sponsor purchase, application submission, valuation disclosure, or reuse of the July 3 draft without a fresh claim review and explicit founder approval.",
+      "claim_boundary": "The July 3 LvlUp draft is historical preparation only. It does not prove selection, investor interest, funding, validation, a required payment, or permission to submit its stale technical and valuation statements.",
+      "deadline": null,
+      "decision": "DO_NOT_SPEND_OR_SEND_STALE_DRAFT",
+      "do_not_duplicate_send": true,
+      "lane_id": "lvlup_optional_paid_event",
+      "next_action": "Take no action unless LvlUp provides written non-pay-to-play selection terms or a clearly relevant no-fee application route; the current LaunchTN package is the stronger reviewer-facing path.",
+      "organization": "LvlUp Ventures / Power of the Pitch Week",
+      "record_sha256": "6da7427ac8034e28ad5334f64bb33a0f8382fcf4fdca8a5c20fbf45148da165b",
+      "response_artifact": "docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md",
+      "response_channel": "NONE",
+      "response_ready": false,
+      "send_now": false,
+      "state": "OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND",
+      "supporting_artifacts": []
+    },
+    {
+      "action_gate": "Founder completes the official SAM.gov one-time-password flow, supplies the replacement key only through the hidden local installer prompt, and authorizes the final account confirmation. No secret may enter this register.",
+      "claim_boundary": "This control proves only bounded local secret-discovery state, fingerprint comparison, and the recorded API probe result. It never stores or publishes an API key. A changed fingerprint proves that the configured secret changed, not that SAM.gov accepted it. Only a successful authenticated probe can establish live API acceptance, and no browser, account, submission, or opportunity state is changed by this control.",
+      "deadline": "2026-07-16",
+      "decision": "HUMAN_ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY",
+      "do_not_duplicate_send": true,
+      "lane_id": "sam_public_credential_rotation",
+      "next_action": "Rotate the public API key inside the authenticated SAM.gov account, run the guarded installer, and rerun the verifier until the private fingerprint changes and an authenticated probe is observable.",
+      "organization": "SAM.gov account credential control",
+      "record_sha256": "665cb6e4c47692e8976201b71ddc3e166f57b2a6b3ce9b4ddfc9caee2a28dfdc",
+      "response_artifact": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
+      "response_channel": "ACCOUNT_ACTION",
+      "response_ready": false,
+      "send_now": false,
+      "state": "ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED",
+      "supporting_artifacts": [
+        "code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py"
       ]
     },
     {
@@ -208,7 +290,7 @@
       "state": "SENT_VERIFIED_RESPONSE_PENDING"
     }
   ],
-  "register_sha256": "c0f4495233d1c9215e45235b586ed6a81cd16de0c85e1dd3cc1a9b76dd5db28a",
+  "register_sha256": "f39acdca88619c67133bb51930e3375d276bc7f5d570754bc47f1ae0918085de",
   "schema": "lumencore.external_engagement_response_register.v1",
   "source_artifacts": {
     "cdc_engagement_receipt": {
@@ -253,6 +335,30 @@
       "present": true,
       "sha256": "74303CFC65C85D9EF73FB80CC8177E5D08DF43D03264FFCE73251ACD2CD9E9D0"
     },
+    "launchtn_application_manifest": {
+      "bytes": 22736,
+      "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json",
+      "present": true,
+      "sha256": "16FE4E214430055532F6FB7F57453E0F47DAA648EE3E3B92B6050E17C98E3DC8"
+    },
+    "launchtn_financial_model": {
+      "bytes": 16166,
+      "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx",
+      "present": true,
+      "sha256": "9DA46F8AD94FC53EF561EE33DCFA6DF907897CAEADF6AFBD08FB113FC6887D94"
+    },
+    "launchtn_pitch_deck": {
+      "bytes": 353970,
+      "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx",
+      "present": true,
+      "sha256": "C607E94D8E072EC9D9F93DA0D8C372FD5592B01D2CA3B4F71C0A079417C18A69"
+    },
+    "lvlup_historical_application_draft": {
+      "bytes": 12152,
+      "path": "docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md",
+      "present": true,
+      "sha256": "F75EBF8FD60A40968484D6AE147FB6D02848CA109AB277337C5BAE5085CBA796"
+    },
     "nashville_application_manifest": {
       "bytes": 18360,
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json",
@@ -292,16 +398,22 @@
       "sha256": "096904E114457C56383E495CFAD6C6E3D0D31596D6B53E2920099608B2B7519B"
     },
     "patent_practitioner_request_template": {
-      "bytes": 1818,
+      "bytes": 1815,
       "path": "grant_submissions/funding_sprint_20260709/PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md",
       "present": true,
-      "sha256": "3E4128C5DA105DDCB59303D3887E69CB7E9D26DFF0FC81CB98D5B9F9485EE712"
+      "sha256": "FAC3AA9FD88207FB881F33B38201325369E4820CDC34F6562079FEE7218D4792"
     },
     "patent_private_capture_workflow": {
-      "bytes": 3091,
+      "bytes": 3090,
       "path": "grant_submissions/funding_sprint_20260709/PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md",
       "present": true,
-      "sha256": "B41AB11E25D439AFF5B54B70B7E5B38B4DF46DC4DDFBA8B843D4FD5547295100"
+      "sha256": "632D44E5640A6AF6E2BB63F157219799C834DD383E892CAC3247C2D4FB98734C"
+    },
+    "sam_public_credential_rotation_control": {
+      "bytes": 4529,
+      "path": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
+      "present": true,
+      "sha256": "6635A3FA854BD29C14547E6112CB66C51C5B8238908C438099A52610D140A563"
     }
   },
   "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
@@ -309,10 +421,10 @@
     "all_attachment_checks_pass": true,
     "autonomous_external_send_allowed": false,
     "autonomous_final_portal_submission_allowed": false,
-    "do_not_duplicate_send_count": 6,
-    "immediate_human_action_count": 1,
+    "do_not_duplicate_send_count": 8,
+    "immediate_human_action_count": 2,
     "monitor_only_count": 6,
-    "record_count": 7,
-    "verified_attachment_count": 4
+    "record_count": 10,
+    "verified_attachment_count": 6
   }
 }

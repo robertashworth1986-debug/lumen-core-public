@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T07:07:45.5534256Z",
+  "created_utc": "2026-07-17T09:21:59.3340158Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_20260716",
   "artifact_count": 47,
   "all_sha256_matched_after_copy": true,
@@ -9,26 +9,26 @@
   "artifacts": [
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
-      "bytes": 24177,
-      "sha256": "17001768E12C98C8D5EB28BD8EE3ED5532253C147D3B8D7867477A69F0FE60D2",
+      "bytes": 31079,
+      "sha256": "666D6494350CE15FD038827BF5CBBC818D42D48AFD0D01FEC676664E87C4C5DC",
       "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 67670,
-      "sha256": "44B8149A90657FF1833BAFE417ED62CE828ECF62CC386DC3E6FD22E015E2AD4F",
+      "bytes": 70979,
+      "sha256": "47589290533923721DA89DEB0BF7B31766AA9D33D676E1D9EFAB4EB3405E7DA1",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
-      "bytes": 9967,
-      "sha256": "7FD755302E813AA8F52903B6E69049D0E92A9C7FF867986C1898DE159B5EE8E4",
+      "bytes": 11435,
+      "sha256": "1B2A9E6180C4FCE9AA2D66E4A164A2002B873D762BCE72BD254014FC4E867D02",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 9218,
-      "sha256": "8745FE10BC5656642311E76622D3000EB12BA16C536FA5A7291CED8E58443DB7",
+      "bytes": 10217,
+      "sha256": "7658F471B3DBB8E47E7139FE5A391B62BE565C063235719BD2AB2C1BC5AC3DC9",
       "copy_sha256_matched": true
     },
     {
@@ -39,8 +39,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-      "bytes": 13550,
-      "sha256": "DF1D6505437EE1F1768DBC04037831B53F082EC251BE68ADC4EF91357926EAB5",
+      "bytes": 19198,
+      "sha256": "29B03CC3A72E4B714047EC130745EA93F350549EBBAB8F1ACF5BC9C63A8CA445",
       "copy_sha256_matched": true
     },
     {
@@ -111,8 +111,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
-      "bytes": 18719,
-      "sha256": "18E96110EBBF94C04E12DA2A5C730281C40E5C8D34CC9EB4CA5D6A6165BEE0E4",
+      "bytes": 26282,
+      "sha256": "F132477A66A388931B3D0E8E08E2CFD43446AC0733A36A93DFB4BEF0A22F0D5D",
       "copy_sha256_matched": true
     },
     {
@@ -225,8 +225,8 @@
     },
     {
       "source": ".gitignore",
-      "bytes": 2444,
-      "sha256": "5D4DAD6108338D9D14B2628F3F5DB095EFF3A9093FEC5285F2CEA124BCECBA09",
+      "bytes": 2590,
+      "sha256": "2C2DB5AF3F9283C8B47151E15B087802D35369AFCAC43917A24FBCFDCF1D690B",
       "copy_sha256_matched": true
     },
     {

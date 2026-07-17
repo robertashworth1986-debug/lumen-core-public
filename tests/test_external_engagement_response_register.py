@@ -30,10 +30,10 @@ def test_register_routes_current_actions_without_duplicate_sends():
     records = {row["lane_id"]: row for row in payload["records"]}
 
     assert payload["schema"] == "lumencore.external_engagement_response_register.v1"
-    assert payload["summary"]["record_count"] == 7
-    assert payload["summary"]["immediate_human_action_count"] == 1
+    assert payload["summary"]["record_count"] == 10
+    assert payload["summary"]["immediate_human_action_count"] == 2
     assert payload["summary"]["monitor_only_count"] == 6
-    assert payload["summary"]["do_not_duplicate_send_count"] == 6
+    assert payload["summary"]["do_not_duplicate_send_count"] == 8
     assert payload["summary"]["autonomous_external_send_allowed"] is False
     assert payload["summary"]["autonomous_final_portal_submission_allowed"] is False
 
@@ -56,6 +56,18 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert payload["source_artifacts"]["nashville_private_fill_map"]["bytes"] == 0
     assert payload["source_artifacts"]["nashville_private_fill_map"]["sha256"] is None
     assert payload["source_artifacts"]["nashville_private_fill_map"]["private_values_read_or_published"] is False
+    launchtn = records["launchtn_3686_pitch_2026"]
+    assert launchtn["deadline"] == "2026-08-13T23:59:00-05:00"
+    assert launchtn["state"] == (
+        "PORTAL_PACKET_QA_PASSED_HUMAN_FACTS_AND_FOUNDER_APPROVAL_REQUIRED"
+    )
+    assert launchtn["attachment_qa_passed_count"] == 2
+    assert launchtn["attachment_required_count"] == 2
+    assert launchtn["send_now"] is False
+    assert "final rendered application" in launchtn["next_action"]
+    assert payload["source_artifacts"]["launchtn_application_manifest"]["present"] is True
+    assert payload["source_artifacts"]["launchtn_pitch_deck"]["present"] is True
+    assert payload["source_artifacts"]["launchtn_financial_model"]["present"] is True
     assert records["epri_open_power_ai_mou"]["decision"] == "MONITOR_FOR_MOU_NO_DUPLICATE"
     assert records["epri_open_power_ai_mou"]["state"] == "OUTBOUND_SENT_MOU_PENDING"
     assert records["epri_open_power_ai_mou"]["do_not_duplicate_send"] is True
@@ -77,6 +89,17 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert payload["source_artifacts"]["patent_private_capture_workflow"]["present"] is True
     assert payload["source_artifacts"]["patent_practitioner_request_template"]["present"] is True
     assert payload["source_artifacts"]["epri_engagement_receipt"]["present"] is True
+    assert records["lvlup_optional_paid_event"]["decision"] == (
+        "DO_NOT_SPEND_OR_SEND_STALE_DRAFT"
+    )
+    assert records["lvlup_optional_paid_event"]["send_now"] is False
+    assert records["sam_public_credential_rotation"]["state"] == (
+        "ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED"
+    )
+    assert records["sam_public_credential_rotation"]["response_channel"] == (
+        "ACCOUNT_ACTION"
+    )
+    assert records["sam_public_credential_rotation"]["send_now"] is False
     assert records["cdc_ai_acquisition_rfi"]["decision"] == "MONITOR_NO_REPLY_REQUIRED"
     assert records["lanl_vision_licensing_followup"]["no_send_before"] == "2026-07-23"
     assert records["nasa_data_center_rfi"]["do_not_duplicate_send"] is True
@@ -87,12 +110,18 @@ def test_all_transmitted_attachments_match_receipts():
     module = load_module()
     payload = module.build_payload("2026-07-16T23:59:00Z")
 
-    assert payload["summary"]["verified_attachment_count"] == 4
+    assert payload["summary"]["verified_attachment_count"] == 6
     assert payload["summary"]["all_attachment_checks_pass"] is True
     for check in payload["attachment_checks"].values():
         assert check["present"] is True
         assert check["sha256_match"] is True
         assert check["bytes_match"] is True
+    assert payload["attachment_checks"]["launchtn_pitch_deck"]["qa_status"] == (
+        "QA_PASSED_FOUNDER_APPROVAL_REQUIRED"
+    )
+    assert payload["attachment_checks"]["launchtn_financial_model"]["qa_status"] == (
+        "QA_PASSED_FOUNDER_APPROVAL_REQUIRED"
+    )
 
 
 def test_register_preserves_claim_and_privacy_boundaries():

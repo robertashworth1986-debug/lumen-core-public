@@ -60,6 +60,28 @@ NASHVILLE_PRIVATE_FILL_MAP = (
     / "private"
     / "nashville_ec_portal_fill_map.private.json"
 )
+LAUNCHTN_MANIFEST = (
+    ROOT
+    / "grant_submissions"
+    / "LAUNCHTN_3686_PITCH_2026"
+    / "LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json"
+)
+LAUNCHTN_DECK = (
+    ROOT
+    / "grant_submissions"
+    / "LAUNCHTN_3686_PITCH_2026"
+    / "LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx"
+)
+LAUNCHTN_FINANCIAL_MODEL = (
+    ROOT
+    / "grant_submissions"
+    / "LAUNCHTN_3686_PITCH_2026"
+    / "LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx"
+)
+LVLUP_DRAFT = ROOT / "docs" / "LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md"
+SAM_ROTATION_CONTROL = (
+    SPRINT_DIR / "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json"
+)
 
 OUT_JSON = OUT_OPS / "external_engagement_response_register_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "external_engagement_response_register.json"
@@ -154,6 +176,26 @@ def verify_attachment(receipt_row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def verify_qa_attachment(attachment: dict[str, Any]) -> dict[str, Any]:
+    path = ROOT / str(attachment["path"])
+    expected_hash = str(attachment["expected_sha256"]).upper()
+    expected_bytes = int(attachment["bytes"])
+    actual_hash = sha256_file(path)
+    actual_bytes = path.stat().st_size
+    return {
+        "path": rel(path),
+        "present": True,
+        "expected_sha256": expected_hash,
+        "actual_sha256": actual_hash,
+        "sha256_match": actual_hash == expected_hash,
+        "expected_bytes": expected_bytes,
+        "actual_bytes": actual_bytes,
+        "bytes_match": actual_bytes == expected_bytes,
+        "qa_status": attachment["status"],
+        "founder_approval_required": attachment["founder_approval_required"],
+    }
+
+
 def lane_hash(row: dict[str, Any]) -> str:
     return hashlib.sha256(
         json.dumps(row, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -169,11 +211,17 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     patent_control = read_json(PATENT_DEADLINE_CONTROL)
     nashville = read_json(NASHVILLE_MANIFEST)
     nashville_resolution = read_json(NASHVILLE_FACT_RESOLUTION)
+    launchtn = read_json(LAUNCHTN_MANIFEST)
+    sam_rotation = read_json(SAM_ROTATION_CONTROL)
 
     if nashville_resolution.get("status") != "SIX_FOUNDER_CONFIRMATIONS_REQUIRED":
         raise ValueError("Nashville EC human-fact resolution is missing or stale")
     if patent_control.get("schema") != "lumencore.patent_deadline_evidence_control.v1":
         raise ValueError("Patent deadline evidence control is missing or stale")
+    if launchtn.get("schema") != "lumencore.launchtn_3686_pitch_application.v1":
+        raise ValueError("LaunchTN 3686 application manifest is missing or stale")
+    if sam_rotation.get("schema") != "lumencore.sam_public_credential_rotation_control.v1":
+        raise ValueError("SAM public credential rotation control is missing or stale")
 
     nasa = submission_by_notice(submissions, "80TECH26RFI0020")
     army = submission_by_notice(submissions, "ACCAPGAIDPRFI4")
@@ -201,6 +249,27 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "private_fact_values_read_or_published": False,
             "next_action": "Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, then review the complete preview plus any terms or fee before action-time approval; do not invent revenue, customers, demographics, founder history, investment, or debt.",
             "claim_boundary": nashville.get("claim_boundary"),
+        },
+        {
+            "lane_id": "launchtn_3686_pitch_2026",
+            "organization": "Launch Tennessee 3686 Pitch Competition",
+            "state": "PORTAL_PACKET_QA_PASSED_HUMAN_FACTS_AND_FOUNDER_APPROVAL_REQUIRED",
+            "deadline": launchtn["opportunity"]["application_deadline"],
+            "decision": "STAGE_PORTAL_FINAL_PREVIEW_REQUIRED",
+            "response_channel": "PORTAL",
+            "response_ready": True,
+            "send_now": False,
+            "do_not_duplicate_send": False,
+            "action_gate": "Founder enters the 11 private, legal, employment, Tennessee-eligibility, funding-history, and pricing confirmations; approves the $250,000 illustrative raise and pricing assumptions; verifies both attachment hashes; then reviews the complete live preview before final submission.",
+            "response_artifact": rel(LAUNCHTN_MANIFEST),
+            "supporting_artifacts": [
+                rel(LAUNCHTN_DECK),
+                rel(LAUNCHTN_FINANCIAL_MODEL),
+            ],
+            "attachment_qa_passed_count": launchtn["summary"]["required_attachments_qa_passed"],
+            "attachment_required_count": launchtn["summary"]["required_attachment_gates"],
+            "next_action": "Keep the portal staged. After founder facts and assumptions are confirmed, attach the hash-verified deck and financial model, inspect the final rendered application, and obtain action-time approval before submitting by August 13 at 11:59 PM CDT.",
+            "claim_boundary": launchtn["claim_boundary"],
         },
         {
             "lane_id": "epri_open_power_ai_mou",
@@ -242,6 +311,38 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "docket_capture_complete": patent_control["public_evidence_summary"]["docket_capture_complete"],
             "next_action": "Monitor through July 23 without a duplicate email. In parallel, populate the six ignored Patent Center role folders and use USPTO Pro Se procedural support; send the held practitioner request only after recipient and secure-channel confirmation.",
             "claim_boundary": georgia_patents["claim_boundary"],
+        },
+        {
+            "lane_id": "lvlup_optional_paid_event",
+            "organization": "LvlUp Ventures / Power of the Pitch Week",
+            "state": "OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND",
+            "deadline": None,
+            "decision": "DO_NOT_SPEND_OR_SEND_STALE_DRAFT",
+            "response_channel": "NONE",
+            "response_ready": False,
+            "send_now": False,
+            "do_not_duplicate_send": True,
+            "action_gate": "No payment, sponsor purchase, application submission, valuation disclosure, or reuse of the July 3 draft without a fresh claim review and explicit founder approval.",
+            "response_artifact": rel(LVLUP_DRAFT),
+            "supporting_artifacts": [],
+            "next_action": "Take no action unless LvlUp provides written non-pay-to-play selection terms or a clearly relevant no-fee application route; the current LaunchTN package is the stronger reviewer-facing path.",
+            "claim_boundary": "The July 3 LvlUp draft is historical preparation only. It does not prove selection, investor interest, funding, validation, a required payment, or permission to submit its stale technical and valuation statements.",
+        },
+        {
+            "lane_id": "sam_public_credential_rotation",
+            "organization": "SAM.gov account credential control",
+            "state": sam_rotation["status"],
+            "deadline": sam_rotation["deadline"]["date_local"],
+            "decision": "HUMAN_ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY",
+            "response_channel": "ACCOUNT_ACTION",
+            "response_ready": False,
+            "send_now": False,
+            "do_not_duplicate_send": True,
+            "action_gate": "Founder completes the official SAM.gov one-time-password flow, supplies the replacement key only through the hidden local installer prompt, and authorizes the final account confirmation. No secret may enter this register.",
+            "response_artifact": rel(SAM_ROTATION_CONTROL),
+            "supporting_artifacts": [sam_rotation["private_installer"]["path"]],
+            "next_action": "Rotate the public API key inside the authenticated SAM.gov account, run the guarded installer, and rerun the verifier until the private fingerprint changes and an authenticated probe is observable.",
+            "claim_boundary": sam_rotation["claim_boundary"],
         },
         {
             "lane_id": "cdc_ai_acquisition_rfi",
@@ -319,11 +420,20 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     for row in records:
         row["record_sha256"] = lane_hash(row)
 
+    launchtn_attachments = {
+        row["id"]: row for row in launchtn["required_attachments"]
+    }
     attachment_checks = {
         "army": verify_attachment(army),
         "nasa": verify_attachment(nasa),
         "cdc": verify_attachment(cdc["submission"]),
         "lanl": verify_attachment(lanl["submission"]),
+        "launchtn_pitch_deck": verify_qa_attachment(
+            launchtn_attachments["launchtn_pitch_deck"]
+        ),
+        "launchtn_financial_model": verify_qa_attachment(
+            launchtn_attachments["launchtn_financial_model"]
+        ),
     }
     all_attachment_checks_pass = all(
         check["sha256_match"] and check["bytes_match"]
@@ -335,17 +445,25 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "schema": "lumencore.external_engagement_response_register.v1",
         "generated_utc": generated_utc or now_utc(),
-        "as_of_date": "2026-07-16",
+        "as_of_date": "2026-07-17",
         "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
         "direct_answer": (
-            "Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPRI administrative "
-            "reply and Georgia PATENTS intake inquiry were sent and are now monitor-only with CDC, LANL, NASA, "
-            "and Army; duplicate sends would reduce credibility."
+            "No new email should be sent. If the Nashville EC portal remains open, finish its founder-fact gate; "
+            "complete the overdue SAM account-key action; and keep the QA-passed LaunchTN 3686 package staged for "
+            "founder facts, assumption approval, and final preview. EPRI, Georgia PATENTS, CDC, LANL, NASA, and Army "
+            "are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would "
+            "reduce credibility."
         ),
         "summary": {
             "record_count": len(records),
             "immediate_human_action_count": sum(
-                1 for row in records if row["lane_id"] == "nashville_ec_takeoff_fall_2026"
+                1
+                for row in records
+                if row["lane_id"]
+                in {
+                    "nashville_ec_takeoff_fall_2026",
+                    "sam_public_credential_rotation",
+                }
             ),
             "monitor_only_count": sum(1 for row in records if str(row["decision"]).startswith("MONITOR")),
             "do_not_duplicate_send_count": sum(1 for row in records if row["do_not_duplicate_send"]),
@@ -396,6 +514,13 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
                 "private_values_read_or_published": False,
                 "sha256_published": False,
             },
+            "launchtn_application_manifest": artifact_status(LAUNCHTN_MANIFEST),
+            "launchtn_pitch_deck": artifact_status(LAUNCHTN_DECK),
+            "launchtn_financial_model": artifact_status(LAUNCHTN_FINANCIAL_MODEL),
+            "lvlup_historical_application_draft": artifact_status(LVLUP_DRAFT),
+            "sam_public_credential_rotation_control": artifact_status(
+                SAM_ROTATION_CONTROL
+            ),
         },
         "claim_boundary": REGISTER_BOUNDARY,
         "outputs": {
@@ -414,7 +539,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     lines = [
-        "# External Engagement Response Register - 2026-07-16",
+        f"# External Engagement Response Register - {payload['as_of_date']}",
         "",
         payload["direct_answer"],
         "",

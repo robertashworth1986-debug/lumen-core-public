@@ -1,0 +1,114 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "created_utc": "2026-07-17T09:21:57.8285848Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/LAUNCHTN_3686_PITCH_20260717",
+  "artifact_count": 17,
+  "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "private_founder_values_mirrored": false,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_LAUNCHTN_3686_PITCH_APPLICATION.py",
+      "bytes": 29515,
+      "sha256": "FA402561F2073D14911AAD73D97F52BE74A6D8A285B33DC773FB83CB40B0FCDB",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_launchtn_3686_pitch_application.py",
+      "bytes": 9649,
+      "sha256": "B7C9E51F4517D8AEA85DE3034BFCD7A9A98ED00DC9B106F16B1A2F30C26A8C1D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json",
+      "bytes": 22736,
+      "sha256": "16FE4E214430055532F6FB7F57453E0F47DAA648EE3E3B92B6050E17C98E3DC8",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_PORTAL_FIELD_MAP_2026-07-17.md",
+      "bytes": 17643,
+      "sha256": "0FE19453F1595E4AF89109824CB6D3EF58BB8234A199C4DD9C88BF7AD629BAFD",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx",
+      "bytes": 16166,
+      "sha256": "9DA46F8AD94FC53EF561EE33DCFA6DF907897CAEADF6AFBD08FB113FC6887D94",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx",
+      "bytes": 353970,
+      "sha256": "C607E94D8E072EC9D9F93DA0D8C372FD5592B01D2CA3B4F71C0A079417C18A69",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
+      "bytes": 31079,
+      "sha256": "666D6494350CE15FD038827BF5CBBC818D42D48AFD0D01FEC676664E87C4C5DC",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_external_engagement_response_register.py",
+      "bytes": 11435,
+      "sha256": "1B2A9E6180C4FCE9AA2D66E4A164A2002B873D762BCE72BD254014FC4E867D02",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/external_engagement_response_register_latest.json",
+      "bytes": 26282,
+      "sha256": "F132477A66A388931B3D0E8E08E2CFD43446AC0733A36A93DFB4BEF0A22F0D5D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/external_engagement_response_register.json",
+      "bytes": 26282,
+      "sha256": "F132477A66A388931B3D0E8E08E2CFD43446AC0733A36A93DFB4BEF0A22F0D5D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
+      "bytes": 26282,
+      "sha256": "F132477A66A388931B3D0E8E08E2CFD43446AC0733A36A93DFB4BEF0A22F0D5D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+      "bytes": 19198,
+      "sha256": "29B03CC3A72E4B714047EC130745EA93F350549EBBAB8F1ACF5BC9C63A8CA445",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "bytes": 70979,
+      "sha256": "47589290533923721DA89DEB0BF7B31766AA9D33D676E1D9EFAB4EB3405E7DA1",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_submission_command_board.py",
+      "bytes": 10217,
+      "sha256": "7658F471B3DBB8E47E7139FE5A391B62BE565C063235719BD2AB2C1BC5AC3DC9",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/near_deadline_submission_command_board_latest.json",
+      "bytes": 55553,
+      "sha256": "1ED6431FD024705EF2B67AF1D658041001E6B442F0E38202E79CCF197F9B8E26",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/near_deadline_submission_command_board.json",
+      "bytes": 55553,
+      "sha256": "1ED6431FD024705EF2B67AF1D658041001E6B442F0E38202E79CCF197F9B8E26",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "bytes": 42504,
+      "sha256": "D16CF89C3CBCFE7C0F1F44C039A8C796E581A667098EF64BF31B08421EC51D5A",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves only that 17 bounded LaunchTN application, attachment, response-control, and deadline-board artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove submission, acceptance, selection, investment, award, external validation, customer traction, or permission to disclose private founder facts."
+}

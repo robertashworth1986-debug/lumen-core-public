@@ -49,6 +49,19 @@ NASHVILLE_EC_FACT_RESOLUTION_JSON = (
 NASHVILLE_EC_FACT_RESOLUTION_MD = (
     NASHVILLE_EC_DIR / "NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md"
 )
+LAUNCHTN_3686_DIR = ROOT / "grant_submissions" / "LAUNCHTN_3686_PITCH_2026"
+LAUNCHTN_3686_FIELD_MAP = (
+    LAUNCHTN_3686_DIR / "LAUNCHTN_3686_PORTAL_FIELD_MAP_2026-07-17.md"
+)
+LAUNCHTN_3686_MANIFEST = (
+    LAUNCHTN_3686_DIR / "LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json"
+)
+LAUNCHTN_3686_DECK = (
+    LAUNCHTN_3686_DIR / "LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx"
+)
+LAUNCHTN_3686_FINANCIAL_MODEL = (
+    LAUNCHTN_3686_DIR / "LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx"
+)
 EXTERNAL_ENGAGEMENT_REGISTER = (
     SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json"
 )
@@ -190,6 +203,10 @@ def base_sources() -> dict[str, Any]:
         "nashville_ec_portal_field_map": NASHVILLE_EC_FIELD_MAP,
         "nashville_ec_application_manifest": NASHVILLE_EC_MANIFEST,
         "nashville_ec_human_fact_resolution": NASHVILLE_EC_FACT_RESOLUTION_JSON,
+        "launchtn_3686_portal_field_map": LAUNCHTN_3686_FIELD_MAP,
+        "launchtn_3686_application_manifest": LAUNCHTN_3686_MANIFEST,
+        "launchtn_3686_pitch_deck": LAUNCHTN_3686_DECK,
+        "launchtn_3686_financial_model": LAUNCHTN_3686_FINANCIAL_MODEL,
         "external_engagement_response_register": EXTERNAL_ENGAGEMENT_REGISTER,
         "sam_public_key_rotation_control": SAM_KEY_ROTATION_CONTROL,
         "patent_deadline_evidence_control": PATENT_DEADLINE_CONTROL,
@@ -403,6 +420,46 @@ def build_command_lanes(
                 "Robert answers all six prompts covering founder status, weekly hours, conversation count, revenue, founder investment, received funding, and business debt.",
                 "Robert reviews the final portal preview and approves submission before the July 17 close.",
                 "Any later program fee, financial-aid arrangement, terms, or cohort acceptance requires a separate decision.",
+            ],
+            "external_send_allowed_without_human": False,
+            "final_submit_allowed_without_human": False,
+        },
+        {
+            "rank": 2,
+            "lane_id": "launchtn_3686_pitch_2026",
+            "source_system": "Launch Tennessee official 3686 Airtable application",
+            "opportunity_number": "LAUNCHTN-3686-2026",
+            "title": "3686 Pitch Competition 2026, presented by Amazon",
+            "agency": "Launch Tennessee",
+            "deadline_utc": "2026-08-14T04:59:00Z",
+            "deadline_date": "2026-08-13",
+            "official_deadline_text": "August 13, 2026 at 11:59 PM Central Daylight Time",
+            "deadline_semantics": "VERIFIED_CDT_TIMESTAMP",
+            "command": "STAGE_APPLICATION",
+            "eligibility_state": "TENNESSEE_STARTUP_FIT_HUMAN_ATTESTATION_REQUIRED",
+            "fit_state": "STRONG_WORKING_MVP_AND_COMMERCIALIZATION_FIT",
+            "submission_route": "Launch Tennessee 3686 Airtable application",
+            "official_url": "https://airtable.com/app6GRZNbU72OmaK1/pagudvfO1hH7SmzBl/form",
+            "package_files": [
+                rel(LAUNCHTN_3686_FIELD_MAP),
+                rel(LAUNCHTN_3686_MANIFEST),
+                rel(LAUNCHTN_3686_DECK),
+                rel(LAUNCHTN_3686_FINANCIAL_MODEL),
+            ],
+            "why_now": (
+                "The application-specific deck and formula-driven five-year model have passed visual, "
+                "content, formula, and attachment-hash QA. The remaining gates are founder-controlled facts, "
+                "Tennessee eligibility, pricing and raise approval, and the live final preview."
+            ),
+            "today_work": [
+                "Confirm the 11 private, legal, employment, Tennessee-eligibility, funding-history, and pricing facts in the application manifest.",
+                "Approve or revise the illustrative pricing ranges and $250,000 validation-bridge funding need.",
+                "Upload only the two hash-verified QA-passed attachments and stop at the complete final preview.",
+            ],
+            "human_gate": [
+                "Robert enters private contact and address facts only inside the authenticated portal.",
+                "Robert verifies the legal entity, formation year, employee count, Tennessee eligibility, and prior LaunchTN capital history.",
+                "Robert approves the pricing, funding assumptions, attachments, and final portal preview before submission.",
             ],
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,
@@ -936,7 +993,7 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "no_bid_or_partner_only_count": len(no_bid),
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Retrieve and install the already-generated SAM.gov replacement public API key without exposing it, complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close, then capture the complete Patent Center docket for the separate U.S.-deadline and foreign/PCT-priority reviews; NASA, Army, and CDC are already sent and receipt-backed.",
+            "strongest_today_action": "Retrieve and install the already-generated SAM.gov replacement public API key without exposing it, complete the Nashville EC TakeOff human-fact gate if its portal remains open, preserve the QA-passed LaunchTN 3686 package for founder facts and final preview, then capture the complete Patent Center docket for separate U.S.-deadline and foreign/PCT-priority review; NASA, Army, and CDC are already sent and receipt-backed.",
             "critical_same_day_infrastructure_action": sam_critical_action,
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),

@@ -24,13 +24,13 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
 
     assert payload["schema"] == "near_deadline_submission_command_board_v4"
     assert payload["status"] == "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS"
-    assert payload["summary"]["lane_count"] == 16
-    assert payload["summary"]["stage_now_count"] == 4
+    assert payload["summary"]["lane_count"] == 17
+    assert payload["summary"]["stage_now_count"] == 5
     assert payload["summary"]["sent_verified_count"] == 3
     assert payload["summary"]["emergency_eligibility_gate_count"] == 0
     assert payload["summary"]["no_bid_or_partner_only_count"] == 5
     assert payload["summary"]["expired_without_verified_send_count"] == 1
-    assert payload["summary"]["human_gated_count"] == 12
+    assert payload["summary"]["human_gated_count"] == 13
     assert payload["summary"]["final_submit_allowed_without_human"] is False
     assert payload["summary"]["external_send_allowed_without_human"] is False
     assert payload["summary"]["pricing_allowed_without_human"] is False
@@ -75,6 +75,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "26-510" in stage_ids
     assert "W912HZ26SC005" in stage_ids
     assert "NASHVILLE-EC-FALL-2026" in stage_ids
+    assert "LAUNCHTN-3686-2026" in stage_ids
 
     sent_ids = {row["opportunity_number"] for row in payload["sent_verified"]}
     assert sent_ids == {
@@ -118,6 +119,21 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     )
     assert ec["external_send_allowed_without_human"] is False
     assert ec["final_submit_allowed_without_human"] is False
+
+    launchtn = next(
+        row
+        for row in payload["lanes"]
+        if row["opportunity_number"] == "LAUNCHTN-3686-2026"
+    )
+    assert launchtn["command"] == "STAGE_APPLICATION"
+    assert launchtn["deadline_date"] == "2026-08-13"
+    assert launchtn["deadline_utc"] == "2026-08-14T04:59:00Z"
+    assert launchtn["deadline_semantics"] == "VERIFIED_CDT_TIMESTAMP"
+    assert len(launchtn["package_files"]) == 4
+    assert any(path.endswith("LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx") for path in launchtn["package_files"])
+    assert any(path.endswith("LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx") for path in launchtn["package_files"])
+    assert launchtn["external_send_allowed_without_human"] is False
+    assert launchtn["final_submit_allowed_without_human"] is False
 
 
 def test_near_deadline_board_keeps_hud_and_bop_behind_correct_gates():
@@ -181,6 +197,10 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "nashville_ec_portal_field_map",
         "nashville_ec_application_manifest",
         "nashville_ec_human_fact_resolution",
+        "launchtn_3686_portal_field_map",
+        "launchtn_3686_application_manifest",
+        "launchtn_3686_pitch_deck",
+        "launchtn_3686_financial_model",
         "external_engagement_response_register",
         "sam_public_key_rotation_control",
         "patent_deadline_evidence_control",
