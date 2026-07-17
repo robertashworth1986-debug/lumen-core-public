@@ -1,0 +1,35 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "created_utc": "2026-07-17T01:07:52.7027080Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/CURRENT_ACTION_CONTROL_20260716",
+  "artifact_count": 5,
+  "all_sha256_matched_after_copy": true,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "bytes": 54404,
+      "sha256": "15562F52FC7D702ADFDC03CEBC9458FC004F8CE6F46252616272F2C94981FFAC"
+    },
+    {
+      "source": "tests/test_near_deadline_submission_command_board.py",
+      "bytes": 5018,
+      "sha256": "1C1CB3720F20297E2A3C3C4B8E14D80620C4DF12D26E501DA5B0719C71946F72"
+    },
+    {
+      "source": "tests/test_epri_open_power_ai_mou_response.py",
+      "bytes": 2218,
+      "sha256": "D20DECABD90275B0B8E48DB471DB38F0E99E8899B3AAE00C63F7FAD338792DAB"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
+      "bytes": 2144,
+      "sha256": "B6F3FFB5049F5B6D64105E80403253688B1F6495CB1D94E92C309CE1C2D6CDE6"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
+      "bytes": 30822,
+      "sha256": "2C0EBFBDA46E3B7B13083A12BC30588E7B7D03F69BDBF0725EE580B5F1C0C346"
+    }
+  ],
+  "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove email transmission, portal submission, agency acceptance, technical validation, award, deployment, or field performance."
+}

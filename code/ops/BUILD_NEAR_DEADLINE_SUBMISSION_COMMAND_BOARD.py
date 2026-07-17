@@ -16,6 +16,21 @@ SAM_BOARD = OUT_OPS / "sam_rush_submission_board_latest.json"
 GRANTS_RANKED = ROOT / "out" / "grants" / "grants_ranked_v2.json"
 ZERO_FRICTION = OUT_OPS / "funding_reviewer_zero_friction_pack_latest.json"
 SUBMISSION_RECEIPT = SPRINT_DIR / "EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json"
+CDC_ENGAGEMENT_RECEIPT = (
+    SPRINT_DIR / "CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json"
+)
+DOJ_BOP_DECISION = (
+    ROOT
+    / "grant_submissions"
+    / "DOJ_BOP_15BCMS26Q70000005"
+    / "DOJ_BOP_15BCMS26Q70000005_GO_NO_GO_2026-07-16.md"
+)
+DOJ_BOP_SOURCE_MANIFEST = (
+    ROOT
+    / "grant_submissions"
+    / "DOJ_BOP_15BCMS26Q70000005"
+    / "DOJ_BOP_15BCMS26Q70000005_SOURCE_MANIFEST_2026-07-16.json"
+)
 
 OUT_JSON = OUT_OPS / "near_deadline_submission_command_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "near_deadline_submission_command_board.json"
@@ -34,6 +49,7 @@ NO_BID_COMMANDS = {
     "NO_SOLO_SUBMIT_PARTNER_ONLY",
     "PARTNER_OR_NO_BID",
 }
+EXPIRED_COMMAND = "EXPIRED_NO_SUBMISSION"
 
 SENSITIVE_MARKERS = [
     "password",
@@ -99,11 +115,13 @@ def days_to_close(deadline_date: str, scan_date: date = SCAN_DATE) -> int:
     return (date.fromisoformat(deadline_date) - scan_date).days
 
 
-def normalize_lane_deadlines(lanes: list[dict[str, Any]]) -> None:
+def normalize_lane_deadlines(
+    lanes: list[dict[str, Any]], scan_date: date = SCAN_DATE
+) -> None:
     for lane in lanes:
         deadline_date = str(lane.get("deadline_date") or lane.get("deadline_utc", "")[:10])
         lane["deadline_date"] = deadline_date
-        days = days_to_close(deadline_date)
+        days = days_to_close(deadline_date, scan_date)
         lane["days_to_close"] = days
         lane["days_to_close_from_scan_date"] = days
         lane["deadline_bucket"] = deadline_bucket(days)
@@ -133,6 +151,9 @@ def base_sources() -> dict[str, Any]:
         "grants_ranked": GRANTS_RANKED,
         "funding_reviewer_zero_friction_pack": ZERO_FRICTION,
         "external_submission_receipt": SUBMISSION_RECEIPT,
+        "cdc_engagement_receipt": CDC_ENGAGEMENT_RECEIPT,
+        "doj_bop_go_no_go": DOJ_BOP_DECISION,
+        "doj_bop_source_manifest": DOJ_BOP_SOURCE_MANIFEST,
     }.items():
         if path.exists():
             data = path.read_bytes()
@@ -170,10 +191,85 @@ def apply_submission_receipts(lanes: list[dict[str, Any]], receipt: dict[str, An
         lane["human_gate"] = []
 
 
+def build_cdc_receipt_lane(receipt: dict[str, Any]) -> dict[str, Any] | None:
+    opportunity = receipt.get("opportunity", {})
+    submission = receipt.get("submission", {})
+    acknowledgment = receipt.get("acknowledgment", {})
+    if (
+        receipt.get("schema") != "lumencore.external_engagement_receipt.v1"
+        or opportunity.get("notice_id") != "75D301-26-RFI-73483"
+        or acknowledgment.get("status") != "RECEIPT_CONFIRMED_FOLLOW_UP_PENDING"
+    ):
+        return None
+    attachment = submission.get("attachment", {})
+    return {
+        "rank": 2.5,
+        "lane_id": "cdc_ai_acquisition_rfi",
+        "source_system": "SAM.gov / Gmail receipt",
+        "opportunity_number": "75D301-26-RFI-73483",
+        "title": opportunity.get(
+            "title", "CDC Artificial Intelligence for Acquisition Support"
+        ),
+        "agency": opportunity.get(
+            "agency", "Centers for Disease Control and Prevention"
+        ),
+        "deadline_utc": "2026-07-30T21:00:00Z",
+        "deadline_date": "2026-07-30",
+        "official_deadline_text": "July 30, 2026 at 5:00 PM Eastern Time",
+        "command": "SENT_VERIFIED",
+        "eligibility_state": "RFI_MARKET_RESEARCH_RESPONSE_RECEIVED",
+        "fit_state": "BOUNDED_AI_ACQUISITION_EVIDENCE_RESPONSE_DELIVERED",
+        "submission_route": "Email response per the official RFI instructions",
+        "official_url": "https://sam.gov/opp/3b42d94270da435fa690c2fc5f26e157/view",
+        "package_files": [
+            "CDC_AI_ACQUISITION_RFI_75D301-26-RFI-73483_2026-07-15.md",
+            "LumenCore_CDC_AI_Acquisition_RFI_75D301-26-RFI-73483_2026-07-15.pdf",
+            CDC_ENGAGEMENT_RECEIPT.name,
+        ],
+        "why_now": (
+            "CDC confirmed receipt and said it will follow up. Preserve the receipt and "
+            "monitor; do not duplicate-send."
+        ),
+        "today_work": [
+            "Monitor the existing Gmail thread for a CDC clarification or follow-up.",
+            "Do not resend unless CDC asks for a replacement or additional material.",
+        ],
+        "human_gate": [],
+        "external_send_allowed_without_human": False,
+        "final_submit_allowed_without_human": False,
+        "submission_status": acknowledgment["status"],
+        "sent_utc": submission.get("sent_utc"),
+        "receipt_path": rel(CDC_ENGAGEMENT_RECEIPT),
+        "receipt_attachment_sha256": attachment.get("sha256"),
+        "claim_boundary": receipt.get("claim_boundary"),
+    }
+
+
+def expire_closed_lanes(lanes: list[dict[str, Any]]) -> None:
+    protected = {"SENT_VERIFIED", *NO_BID_COMMANDS, EXPIRED_COMMAND}
+    for lane in lanes:
+        if lane["days_to_close"] >= 0 or lane["command"] in protected:
+            continue
+        lane["pre_expiry_command"] = lane["command"]
+        lane["command"] = EXPIRED_COMMAND
+        lane["submission_status"] = "DEADLINE_PASSED_NO_VERIFIED_SEND"
+        lane["why_now"] = (
+            "The response deadline passed without a verified transmission receipt. "
+            "This lane is archival and must not be represented as submitted."
+        )
+        lane["today_work"] = [
+            "Archive the lane as missed; do not imply a submission occurred.",
+            "Retain reusable public-safe material only for a future verified opportunity.",
+        ]
+        lane["human_gate"] = []
+
+
 def build_command_lanes(
     sam_board: dict[str, Any],
     grants_ranked: dict[str, Any],
     submission_receipt: dict[str, Any] | None = None,
+    cdc_engagement_receipt: dict[str, Any] | None = None,
+    scan_date: date = SCAN_DATE,
 ) -> list[dict[str, Any]]:
     sam = sam_lookup(sam_board)
     grants = grant_lookup(grants_ranked)
@@ -375,21 +471,26 @@ def build_command_lanes(
             "agency": bop.get("agency", "Federal Bureau of Prisons"),
             "deadline_utc": bop.get("deadline_utc", "2026-07-23T15:00:00Z"),
             "deadline_date": "2026-07-23",
-            "command": "PRICE_AND_COMPLIANCE_GATE",
-            "eligibility_state": "SMALL_BUSINESS_SET_ASIDE_REQUIRES_SOLICITATION_CONFIRMATION",
-            "fit_state": "MODERATE_ANALYTICS_FIT_DATA_HANDLING_AND_PRICE_UNPROVEN",
+            "official_deadline_text": "July 23, 2026 at 11:00 AM Eastern Time",
+            "command": "NO_SOLO_SUBMIT_PARTNER_ONLY",
+            "eligibility_state": "SMALL_BUSINESS_SET_ASIDE_SOLO_DELIVERY_GATES_NOT_MET",
+            "fit_state": "ANALYTICS_COMPONENT_FIT_HIPAA_ATO_HSPD12_MEDICAL_CLAIMS_AND_FFP_GATES_OPEN",
             "submission_route": bop.get("submission_route", "Email quote per solicitation instructions"),
-            "official_url": bop.get("official_url") or "https://sam.gov/search/?index=opp&keywords=15BCMS26Q70000005&sort=-modifiedDate&sfm%5Bstatus%5D%5Bis_active%5D=true",
-            "package_files": bop.get("package_files", ["DOJ_BOP_MEDICAL_CLAIMS_ANALYSIS_QUOTE_STUB_2026-07-10.md"]),
-            "why_now": "Bounded analytics quote with small-business set-aside, but price, deliverable capacity, clauses, and data handling must be confirmed before any quote email.",
+            "official_url": "https://sam.gov/opp/52680f2a89c241b3a055c35d816b7f20/view",
+            "package_files": [
+                "grant_submissions/DOJ_BOP_15BCMS26Q70000005/DOJ_BOP_15BCMS26Q70000005_SOURCE_MANIFEST_2026-07-16.json",
+                "grant_submissions/DOJ_BOP_15BCMS26Q70000005/DOJ_BOP_15BCMS26Q70000005_GO_NO_GO_2026-07-16.md",
+                "grant_submissions/DOJ_BOP_15BCMS26Q70000005/DOJ_BOP_15BCMS26Q70000005_PARTNER_OUTREACH_TEMPLATE_2026-07-16.md",
+            ],
+            "why_now": "Official-source review supports only a conditional partner route. LumenCore does not currently evidence the HIPAA officer, ATO/ISSO delivery capacity, screened personnel, medical-claims expertise, or firm-fixed-price delivery posture required for a responsible solo quote.",
             "today_work": [
-                "Open official notice and download solicitation.",
-                "Draft technical quote and AI-use disclosure.",
-                "Hold until price and compliance are approved.",
+                "Do not send a solo quote.",
+                "Use the bounded partner template only if a qualified healthcare-claims and federal-security prime is identified.",
+                "Require the partner to own compliance, staffing, pricing, and protected-data delivery commitments.",
             ],
             "human_gate": [
-                "Robert approves price and responsibility/past-performance statements.",
-                "Robert approves final quote email.",
+                "A qualified prime confirms HIPAA, ATO/ISSO, HSPD-12, medical-claims, and delivery responsibility in writing.",
+                "Robert approves the partner outreach, role, price, representations, and any final quote.",
             ],
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,
@@ -628,30 +729,70 @@ def build_command_lanes(
         ]
     )
 
+    cdc_lane = build_cdc_receipt_lane(cdc_engagement_receipt or {})
+    if cdc_lane is not None:
+        lanes.append(cdc_lane)
+
     apply_submission_receipts(lanes, submission_receipt or {})
-    normalize_lane_deadlines(lanes)
-    lanes.sort(key=lambda row: row["rank"])
-    for lane in lanes:
+    normalize_lane_deadlines(lanes, scan_date)
+    expire_closed_lanes(lanes)
+    lanes.sort(key=lambda row: (float(row["rank"]), row["opportunity_number"]))
+    for rank, lane in enumerate(lanes, start=1):
+        lane["rank"] = rank
         lane["lane_sha256"] = stable_sha256(lane)
     return lanes
 
 
-def build_payload() -> dict[str, Any]:
+def describe_lane(row: dict[str, Any] | None) -> str:
+    if row is None:
+        return "No open lane is currently supported by the board."
+    deadline = row.get("official_deadline_text") or row.get("deadline_utc")
+    return (
+        f"{row['opportunity_number']} {row['title']}, due {deadline}; "
+        f"command {row['command']}; fit {row['fit_state']}."
+    )
+
+
+def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
     sam_board = read_json(SAM_BOARD)
     grants_ranked = read_json(GRANTS_RANKED)
     zero = read_json(ZERO_FRICTION)
     submission_receipt = read_json(SUBMISSION_RECEIPT)
-    lanes = build_command_lanes(sam_board, grants_ranked, submission_receipt)
+    cdc_engagement_receipt = read_json(CDC_ENGAGEMENT_RECEIPT)
+    lanes = build_command_lanes(
+        sam_board,
+        grants_ranked,
+        submission_receipt,
+        cdc_engagement_receipt,
+        scan_date,
+    )
     stage_now = [row for row in lanes if row["command"] in STAGE_COMMANDS]
     sent_verified = [row for row in lanes if row["command"] == "SENT_VERIFIED"]
     emergency_gate = [row for row in lanes if row["command"] == "ELIGIBILITY_AND_PARTNER_GATE"]
     no_bid = [row for row in lanes if row["command"] in NO_BID_COMMANDS]
+    expired = [row for row in lanes if row["command"] == EXPIRED_COMMAND]
     human_gated = [row for row in lanes if row["human_gate"]]
+    open_candidates = [
+        row
+        for row in lanes
+        if row["days_to_close"] >= 0
+        and row["command"] not in {"SENT_VERIFIED", EXPIRED_COMMAND, *NO_BID_COMMANDS}
+    ]
+    closest_open = min(
+        open_candidates,
+        key=lambda row: (row["days_to_close"], row["rank"]),
+        default=None,
+    )
+    closest_stage = min(
+        stage_now,
+        key=lambda row: (row["days_to_close"], row["rank"]),
+        default=None,
+    )
 
     payload: dict[str, Any] = {
-        "schema": "near_deadline_submission_command_board_v2",
+        "schema": "near_deadline_submission_command_board_v3",
         "generated_utc": now_utc(),
-        "scan_date": SCAN_DATE.isoformat(),
+        "scan_date": scan_date.isoformat(),
         "status": "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS",
         "source_ledgers": base_sources(),
         "summary": {
@@ -660,9 +801,11 @@ def build_payload() -> dict[str, Any]:
             "sent_verified_count": len(sent_verified),
             "emergency_eligibility_gate_count": len(emergency_gate),
             "no_bid_or_partner_only_count": len(no_bid),
+            "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Build the NSF scientific-instrumentation Project Pitch and FHWA TSMO primary volume next; NASA and Army are already sent and verified.",
-            "closest_deadline_lane": "PDR-2600-DC-029Q HUD robotics/AI home construction demonstration, due July 13 at 11:59:59 PM ET, but only after the construction-demonstration capacity gate passes.",
+            "strongest_today_action": "Build the NSF scientific-instrumentation Project Pitch and re-verify the FHWA TSMO solicitation before portal work; NASA, Army, and CDC are already sent and receipt-backed.",
+            "closest_deadline_lane": describe_lane(closest_open),
+            "closest_stage_ready_lane": describe_lane(closest_stage),
             "best_grants_lane": "26-511 NSF SBIR/STTR scientific instrumentation, due 2026-07-27.",
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03.",
             "fastest_low_friction_lane": "NASA RFI was sent on 2026-07-13; no remaining lane is both complete and low-friction.",
@@ -723,6 +866,18 @@ def build_payload() -> dict[str, Any]:
             }
             for row in no_bid
         ],
+        "expired_without_verified_send": [
+            {
+                "rank": row["rank"],
+                "opportunity_number": row["opportunity_number"],
+                "title": row["title"],
+                "deadline_date": row["deadline_date"],
+                "pre_expiry_command": row.get("pre_expiry_command"),
+                "submission_status": row.get("submission_status"),
+                "official_url": row["official_url"],
+            }
+            for row in expired
+        ],
         "zero_friction_pack_status": zero.get("status", "UNKNOWN"),
         "submission_boundary": {
             "can_open_pages": True,
@@ -757,7 +912,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        "Direct answer: NASA and Army are sent and verified; build NSF and FHWA next, and reject or partner-route opportunities whose prerequisites, delivery capacity, or team composition are not supported by evidence.",
+        "Direct answer: NASA, Army, and CDC are sent and receipt-backed; build NSF and re-verify FHWA next, keep DOJ/BOP partner-only, and expire missed lanes without implying a submission.",
         "",
         "## Control Line",
         "",
@@ -768,9 +923,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Sent and verified lanes: `{summary['sent_verified_count']}`",
         f"- Emergency eligibility gates: `{summary['emergency_eligibility_gate_count']}`",
         f"- No-bid or partner-only lanes: `{summary['no_bid_or_partner_only_count']}`",
+        f"- Expired without verified send: `{summary['expired_without_verified_send_count']}`",
         f"- Human-gated lanes: `{summary['human_gated_count']}`",
         f"- Strongest today action: {summary['strongest_today_action']}",
         f"- Closest deadline lane: {summary['closest_deadline_lane']}",
+        f"- Closest stage-ready lane: {summary['closest_stage_ready_lane']}",
         f"- Best grants lane: {summary['best_grants_lane']}",
         f"- Best contract lane: {summary['best_contract_lane']}",
         f"- Fastest low-friction lane: {summary['fastest_low_friction_lane']}",
@@ -844,6 +1001,20 @@ def render_markdown(payload: dict[str, Any]) -> str:
             ]
         )
 
+    lines.extend(["## Expired Without Verified Send", ""])
+    for row in payload["expired_without_verified_send"]:
+        lines.extend(
+            [
+                f"### {row['rank']}. {row['opportunity_number']} - {row['title']}",
+                "",
+                f"- Deadline date: `{row['deadline_date']}`",
+                f"- Prior command: `{row['pre_expiry_command']}`",
+                f"- Status: `{row['submission_status']}`",
+                f"- Official URL: {row['official_url']}",
+                "",
+            ]
+        )
+
     lines.extend(["## Full Lane Detail", ""])
     for lane in payload["lanes"]:
         lines.extend(
@@ -873,9 +1044,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
         )
         for item in lane["today_work"]:
             lines.append(f"  - {item}")
-        lines.append("- Human gate:")
-        for gate in lane["human_gate"]:
-            lines.append(f"  - {gate}")
+        if lane["human_gate"]:
+            lines.append("- Human gate:")
+            for gate in lane["human_gate"]:
+                lines.append(f"  - {gate}")
         if lane["package_files"]:
             lines.append("- Package files:")
             for file in lane["package_files"]:
