@@ -49,6 +49,45 @@ NASHVILLE_EC_FACT_RESOLUTION_JSON = (
 NASHVILLE_EC_FACT_RESOLUTION_MD = (
     NASHVILLE_EC_DIR / "NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md"
 )
+MISSIONWEAVE_DIR = (
+    ROOT / "grant_submissions" / "DLA26BZ03_NV011_MissionWeave"
+)
+MISSIONWEAVE_MANIFEST = (
+    MISSIONWEAVE_DIR / "MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json"
+)
+MISSIONWEAVE_ASSEMBLY_MAP = (
+    MISSIONWEAVE_DIR / "MISSIONWEAVE_DSIP_ASSEMBLY_MAP_2026-07-16.md"
+)
+MISSIONWEAVE_VOLUME1 = (
+    MISSIONWEAVE_DIR / "MISSIONWEAVE_DSIP_VOLUME1_PUBLIC_TEXT_2026-07-16.md"
+)
+MISSIONWEAVE_VOLUME2_PDF = (
+    MISSIONWEAVE_DIR / "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf"
+)
+MISSIONWEAVE_COST_INPUTS = (
+    MISSIONWEAVE_DIR / "MISSIONWEAVE_DSIP_VOLUME3_COST_INPUTS_2026-07-16.md"
+)
+MISSIONWEAVE_VOLUME5 = (
+    MISSIONWEAVE_DIR / "MISSIONWEAVE_DSIP_VOLUME5_WORKSHEET_2026-07-16.md"
+)
+MISSIONWEAVE_CLAIM_MATRIX = (
+    MISSIONWEAVE_DIR / "MISSIONWEAVE_CLAIM_EVIDENCE_MATRIX_2026-07-16.md"
+)
+MISSIONWEAVE_OFFICIAL_TOPIC = (
+    MISSIONWEAVE_DIR
+    / "source_attachments"
+    / "DLA26BZ03_NV011_OFFICIAL_TOPIC_DETAILS.json"
+)
+MISSIONWEAVE_BAA = (
+    MISSIONWEAVE_DIR
+    / "source_attachments"
+    / "DoW_2026_SBIR_BAA_RELEASE_3_AMENDMENT_2.pdf"
+)
+MISSIONWEAVE_COMPONENT_INSTRUCTIONS = (
+    MISSIONWEAVE_DIR
+    / "source_attachments"
+    / "DLA_26BZ_RELEASE_3_COMPONENT_INSTRUCTIONS.pdf"
+)
 LAUNCHTN_3686_DIR = ROOT / "grant_submissions" / "LAUNCHTN_3686_PITCH_2026"
 LAUNCHTN_3686_FIELD_MAP = (
     LAUNCHTN_3686_DIR / "LAUNCHTN_3686_PORTAL_FIELD_MAP_2026-07-17.md"
@@ -106,6 +145,7 @@ STAGE_COMMANDS = {
     "STAGE_PROJECT_PITCH",
     "STAGE_CONCEPT_PAPER",
     "STAGE_APPLICATION",
+    "STAGE_DSIP_PROPOSAL",
 }
 NO_BID_COMMANDS = {
     "NO_BID_MISSED_PREREQUISITE",
@@ -222,6 +262,12 @@ def base_sources() -> dict[str, Any]:
         "nashville_ec_portal_field_map": NASHVILLE_EC_FIELD_MAP,
         "nashville_ec_application_manifest": NASHVILLE_EC_MANIFEST,
         "nashville_ec_human_fact_resolution": NASHVILLE_EC_FACT_RESOLUTION_JSON,
+        "missionweave_dsip_package_manifest": MISSIONWEAVE_MANIFEST,
+        "missionweave_dsip_assembly_map": MISSIONWEAVE_ASSEMBLY_MAP,
+        "missionweave_volume2_pdf": MISSIONWEAVE_VOLUME2_PDF,
+        "missionweave_official_topic": MISSIONWEAVE_OFFICIAL_TOPIC,
+        "missionweave_baa_amendment_2": MISSIONWEAVE_BAA,
+        "missionweave_dla_component_instructions": MISSIONWEAVE_COMPONENT_INSTRUCTIONS,
         "launchtn_3686_portal_field_map": LAUNCHTN_3686_FIELD_MAP,
         "launchtn_3686_application_manifest": LAUNCHTN_3686_MANIFEST,
         "launchtn_3686_pitch_deck": LAUNCHTN_3686_DECK,
@@ -394,6 +440,33 @@ def build_command_lanes(
         )
         is True
     )
+    missionweave_manifest = read_json(MISSIONWEAVE_MANIFEST)
+    if missionweave_manifest.get("schema") != (
+        "missionweave_dsip_submission_package_manifest.v1"
+    ):
+        raise ValueError("MissionWeave DSIP package manifest is missing or stale")
+    if missionweave_manifest.get("topic") != "DLA26BZ03-NV011":
+        raise ValueError("MissionWeave DSIP package manifest has the wrong topic")
+    if missionweave_manifest.get("deadline") != "2026-07-22T12:00:00-04:00":
+        raise ValueError("MissionWeave DSIP package manifest has a stale deadline")
+    missionweave_files = missionweave_manifest.get("files", [])
+    if missionweave_manifest.get("file_count") != len(missionweave_files):
+        raise ValueError("MissionWeave DSIP package manifest file count does not reconcile")
+    missionweave_integrity_errors: list[str] = []
+    for item in missionweave_files:
+        package_path = MISSIONWEAVE_DIR / str(item.get("path", ""))
+        if not package_path.is_file():
+            missionweave_integrity_errors.append(f"missing:{item.get('path')}")
+            continue
+        data = package_path.read_bytes()
+        actual_sha256 = hashlib.sha256(data).hexdigest().upper()
+        if len(data) != item.get("bytes") or actual_sha256 != item.get("sha256"):
+            missionweave_integrity_errors.append(f"hash_or_size:{item.get('path')}")
+    if missionweave_integrity_errors:
+        raise ValueError(
+            "MissionWeave DSIP package manifest verification failed: "
+            + ", ".join(missionweave_integrity_errors)
+        )
     hud = grants.get("PDR-2600-DC-029Q", {})
     hhs_child = grants.get("HHS-2026-ACF-ACYF-CA-0037", {})
 
@@ -479,6 +552,81 @@ def build_command_lanes(
                 "Robert answers all six prompts covering founder status, weekly hours, conversation count, revenue, founder investment, received funding, and business debt.",
                 "Robert reviews the final portal preview and approves submission before the July 17 close.",
                 "Any later program fee, financial-aid arrangement, terms, or cohort acceptance requires a separate decision.",
+            ],
+            "external_send_allowed_without_human": False,
+            "final_submit_allowed_without_human": False,
+        },
+        {
+            "rank": 1.75,
+            "lane_id": "dla_missionweave_dsip_phase1",
+            "source_system": "DSIP / DLA / SBIR.gov",
+            "opportunity_number": "DLA26BZ03-NV011",
+            "title": "Digital Twin of the Organization for Enhanced Mission Readiness",
+            "agency": "Defense Logistics Agency",
+            "deadline_utc": "2026-07-22T16:00:00Z",
+            "deadline_date": "2026-07-22",
+            "official_deadline_text": (
+                "July 22, 2026 at 12:00 p.m. Eastern Time. The SBIR.gov topic record "
+                "and DLA Release 3 schedule agree on July 22, 2026; the downloaded "
+                "Amendment 2 BAA schedule line prints July 22, 2025, an apparent "
+                "internal year typo. Reconfirm the live DSIP countdown before submission."
+            ),
+            "deadline_semantics": (
+                "CROSS_SOURCE_2026_DATE_CONFIRMED_BAA_YEAR_TYPO_RECHECK_DSIP"
+            ),
+            "deadline_source_discrepancy_present": True,
+            "deadline_source_discrepancy": (
+                "The local Amendment 2 BAA schedule says July 22, 2025 while the "
+                "2026 topic record, DLA Release 3 schedule, and package sources say "
+                "July 22, 2026."
+            ),
+            "command": "STAGE_DSIP_PROPOSAL",
+            "eligibility_state": (
+                "OPEN_PHASE_I_SMALL_BUSINESS_IDENTITY_PI_AND_REPRESENTATIONS_UNVERIFIED"
+            ),
+            "fit_state": (
+                "STRONG_TOPIC_FIT_BOUNDED_SYNTHETIC_EVIDENCE_NO_DLA_VALIDATION_CLAIM"
+            ),
+            "submission_route": "Defense SBIR/STTR Innovation Portal (DSIP)",
+            "official_url": "https://www.sbir.gov/topics/12778",
+            "secondary_url": "https://www.dodsbirsttr.mil/",
+            "package_manifest_state": missionweave_manifest.get("package_state"),
+            "package_manifest_integrity_pass": True,
+            "package_manifest_file_count": len(missionweave_files),
+            "phase1_duration_months": 6,
+            "phase1_cost_ceiling_usd": 100000,
+            "topic_phase1_max_duration_months": 12,
+            "topic_phase1_max_cost_usd": 100000,
+            "itar_flag": True,
+            "projected_cmmc_level": "Level 2 (Self)",
+            "package_files": [
+                rel(MISSIONWEAVE_MANIFEST),
+                rel(MISSIONWEAVE_ASSEMBLY_MAP),
+                rel(MISSIONWEAVE_VOLUME1),
+                rel(MISSIONWEAVE_VOLUME2_PDF),
+                rel(MISSIONWEAVE_COST_INPUTS),
+                rel(MISSIONWEAVE_VOLUME5),
+                rel(MISSIONWEAVE_CLAIM_MATRIX),
+            ],
+            "why_now": (
+                "This is the nearest complete federal Phase I proposal package. The "
+                "15-file manifest verifies byte-for-byte, the technical candidate is "
+                "claim-bounded, and the official topic fit is strong. It is not "
+                "submission-ready until DSIP identity, cost, ITAR, CMMC, award-history, "
+                "foreign-affiliation, rights, and certification gates are answered."
+            ),
+            "today_work": [
+                "Open DLA26BZ03-NV011 in DSIP and verify the live countdown, organization linkage, and proposal number.",
+                "Replace the neutral proposal-number header through the builder, rerender the PDF, and regenerate the manifest.",
+                "Populate Volumes 1-7 from the hash-locked package and stop at the complete portal preview.",
+                "Resolve ITAR/JCP, projected CMMC Level 2 (Self), support-overlap, data-rights, and foreign-affiliation representations without claiming certifications that are not documented.",
+            ],
+            "human_gate": [
+                "Robert verifies the DSIP organization, submitter authority, legal entity, UEI, CAGE, SAM status, address, and proposal number.",
+                "Robert confirms PI primary-employment eligibility, 640 Phase I hours, six-month scope, and no conflicting support.",
+                "Robert approves direct labor, fringe, indirect treatment, ODCs, and the $100,000 total cost basis.",
+                "Robert answers prior SBIR/STTR award history, ITAR/JCP, CMMC, foreign-citizen, foreign-affiliation, and technical-data-rights fields from current facts.",
+                "Robert completes required training and reviews every certification, attachment hash, total, and the final DSIP preview before submission.",
             ],
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,
@@ -1122,11 +1270,11 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "no_bid_or_partner_only_count": len(no_bid),
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Retrieve and install the already-generated SAM.gov replacement public API key without exposing it, complete the Nashville EC TakeOff human-fact gate if its portal remains open, preserve the QA-passed LaunchTN 3686 package for founder facts and final preview, then capture the complete Patent Center docket for separate U.S.-deadline and foreign/PCT-priority review; NASA, Army, and CDC are already sent and receipt-backed.",
+            "strongest_today_action": "Keep the live browser on the founder-controlled Nashville EC sign-in and complete that July 17 application first; then open DLA26BZ03-NV011 in DSIP and assemble the hash-verified MissionWeave package before its July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.",
             "critical_same_day_infrastructure_action": sam_critical_action,
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
-            "best_grants_lane": "NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. July 27, 2026 is officially listed but currently inaccessible; November 4, 2026 is planning only.",
+            "best_grants_lane": "DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: a 15-file package is hash-verified, but DSIP identity, proposal-number, cost, ITAR/JCP, CMMC, award-history, foreign-affiliation, rights, certification, and final-preview gates remain. NSF 26-510 stays the next rolling Project Pitch route.",
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: one qualified target was contacted July 17, but no solo bid and no partner claim unless written corporate-experience evidence arrives.",
             "fastest_low_friction_lane": "The Nashville EC TakeOff application is the nearest low-friction reviewer route, but six founder confirmations and final portal submission remain human-gated.",
             "all_final_actions_blocked_without_human": True,
@@ -1264,7 +1412,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        f"Direct answer: NASA, Army, and CDC are sent and receipt-backed. {summary['critical_same_day_infrastructure_action']} Finish the July 17 Nashville EC TakeOff application, stage the rolling NSF Project Pitch, and monitor the single FHWA qualified-target outreach without claiming a partner or sending a duplicate while keeping DOJ/BOP partner-only.",
+        f"Direct answer: NASA, Army, and CDC are sent and receipt-backed. {summary['critical_same_day_infrastructure_action']} Finish the July 17 Nashville EC TakeOff application, then stage the hash-verified MissionWeave DSIP package for its July 22 noon Eastern close. Keep NSF at the rolling Project Pitch gate, monitor the single FHWA qualified-target outreach without claiming a partner or sending a duplicate, and keep DOJ/BOP partner-only.",
         "",
         "## Control Line",
         "",

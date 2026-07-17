@@ -2,31 +2,31 @@
 
 This is the action board for getting the closest credible grants and federal contract responses fully staged.
 
-Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action. Finish the July 17 Nashville EC TakeOff application, stage the rolling NSF Project Pitch, and monitor the single FHWA qualified-target outreach without claiming a partner or sending a duplicate while keeping DOJ/BOP partner-only.
+Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action. Finish the July 17 Nashville EC TakeOff application, then stage the hash-verified MissionWeave DSIP package for its July 22 noon Eastern close. Keep NSF at the rolling Project Pitch gate, monitor the single FHWA qualified-target outreach without claiming a partner or sending a duplicate, and keep DOJ/BOP partner-only.
 
 ## Control Line
 
 - Status: `NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS`
 - Scan date: `2026-07-17`
-- Lane count: `17`
-- Stage-now lanes: `4`
+- Lane count: `18`
+- Stage-now lanes: `5`
 - Sent and verified lanes: `3`
 - Emergency eligibility gates: `0`
 - No-bid or partner-only lanes: `6`
 - Expired without verified send: `2`
-- Human-gated lanes: `12`
-- Strongest today action: Retrieve and install the already-generated SAM.gov replacement public API key without exposing it, complete the Nashville EC TakeOff human-fact gate if its portal remains open, preserve the QA-passed LaunchTN 3686 package for founder facts and final preview, then capture the complete Patent Center docket for separate U.S.-deadline and foreign/PCT-priority review; NASA, Army, and CDC are already sent and receipt-backed.
+- Human-gated lanes: `13`
+- Strongest today action: Keep the live browser on the founder-controlled Nashville EC sign-in and complete that July 17 application first; then open DLA26BZ03-NV011 in DSIP and assemble the hash-verified MissionWeave package before its July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.
 - Critical infrastructure action: SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action.
 - Closest deadline lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Closest stage-ready lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
-- Best grants lane: NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. July 27, 2026 is officially listed but currently inaccessible; November 4, 2026 is planning only.
+- Best grants lane: DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: a 15-file package is hash-verified, but DSIP identity, proposal-number, cost, ITAR/JCP, CMMC, award-history, foreign-affiliation, rights, certification, and final-preview gates remain. NSF 26-510 stays the next rolling Project Pitch route.
 - Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: one qualified target was contacted July 17, but no solo bid and no partner claim unless written corporate-experience evidence arrives.
 - Fastest low-friction lane: The Nashville EC TakeOff application is the nearest low-friction reviewer route, but six founder confirmations and final portal submission remain human-gated.
 - Final submit without human: `false`
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `e190d66bc445fe2b84490ee97e9a2abb57d36f2909e4965f3fd7576e3620f9f0`
+- Command board SHA-256: `a9bfbf7131dd273cf02570c6675d57ad5bcddbe7faa517679e5002ae95d63912`
 
 ## Operational Controls
 
@@ -70,14 +70,14 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Receipt: `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json`
 - Attachment SHA-256: `88A606678ACC62C60C914C515605D5D590CEACDC1A82AA20B47028B3444EEB0D`
 
-### 3. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
+### 4. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
 
 - Status: `SENT_WITH_ATTACHMENT`
 - Sent UTC: `2026-07-13T21:27:05Z`
 - Receipt: `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json`
 - Attachment SHA-256: `D0528488B91C940E2A8401E3571BE72C59124F714883E25CF6D7D7716427B8BF`
 
-### 5. 75D301-26-RFI-73483 - CDC Artificial Intelligence for Acquisition Support Reverse Industry Day
+### 6. 75D301-26-RFI-73483 - CDC Artificial Intelligence for Acquisition Support Reverse Industry Day
 
 - Status: `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING`
 - Sent UTC: `2026-07-16T13:27:19Z`
@@ -98,7 +98,22 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md`
 
-### 4. LAUNCHTN-3686-2026 - 3686 Pitch Competition 2026, presented by Amazon
+### 3. DLA26BZ03-NV011 - Digital Twin of the Organization for Enhanced Mission Readiness
+
+- Command: `STAGE_DSIP_PROPOSAL`
+- Deadline UTC: `2026-07-22T16:00:00Z`
+- Official deadline: July 22, 2026 at 12:00 p.m. Eastern Time. The SBIR.gov topic record and DLA Release 3 schedule agree on July 22, 2026; the downloaded Amendment 2 BAA schedule line prints July 22, 2025, an apparent internal year typo. Reconfirm the live DSIP countdown before submission.
+- Official URL: https://www.sbir.gov/topics/12778
+- Package files:
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json`
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ASSEMBLY_MAP_2026-07-16.md`
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME1_PUBLIC_TEXT_2026-07-16.md`
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf`
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME3_COST_INPUTS_2026-07-16.md`
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME5_WORKSHEET_2026-07-16.md`
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_CLAIM_EVIDENCE_MATRIX_2026-07-16.md`
+
+### 5. LAUNCHTN-3686-2026 - 3686 Pitch Competition 2026, presented by Amazon
 
 - Command: `STAGE_APPLICATION`
 - Deadline UTC: `2026-08-14T04:59:00Z`
@@ -110,7 +125,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx`
   - `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx`
 
-### 7. 26-510 - NSF Small Business Innovation Research / Small Business Technology Transfer Programs Phase I
+### 8. 26-510 - NSF Small Business Innovation Research / Small Business Technology Transfer Programs Phase I
 
 - Command: `STAGE_PROJECT_PITCH`
 - Deadline UTC: `None`
@@ -122,7 +137,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json`
   - `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_READINESS.md`
 
-### 8. W912HZ26SC005 - Sovereign Defense Cloud for High-Performance Computing Commercial Solutions Opening
+### 9. W912HZ26SC005 - Sovereign Defense Cloud for High-Performance Computing Commercial Solutions Opening
 
 - Command: `STAGE_CONCEPT_PAPER`
 - Deadline UTC: `2026-08-07T21:00:00Z`
@@ -139,7 +154,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 
 ## No-Bid Or Partner-Only
 
-### 6. 693JJ326R000012 - Transportation Systems Management and Operations Data Initiative
+### 7. 693JJ326R000012 - Transportation Systems Management and Operations Data Initiative
 
 - Command: `NO_SOLO_SUBMIT_PARTNER_ONLY`
 - Deadline date: `2026-08-03`
@@ -147,7 +162,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Fit: `STRONG_TECHNICAL_FIT_MANDATORY_CORPORATE_EXPERIENCE_MISSING`
 - Official URL: https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view
 
-### 9. 15BCMS26Q70000005 - Historical Medical Claims Data Analysis
+### 10. 15BCMS26Q70000005 - Historical Medical Claims Data Analysis
 
 - Command: `NO_SOLO_SUBMIT_PARTNER_ONLY`
 - Deadline date: `2026-07-23`
@@ -155,7 +170,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Fit: `ANALYTICS_COMPONENT_FIT_HIPAA_ATO_HSPD12_MEDICAL_CLAIMS_AND_FFP_GATES_OPEN`
 - Official URL: https://sam.gov/opp/52680f2a89c241b3a055c35d816b7f20/view
 
-### 14. 693JJ3-26-BAA-0004 - Intersection Safety Systems Prototyping
+### 15. 693JJ3-26-BAA-0004 - Intersection Safety Systems Prototyping
 
 - Command: `NO_SOLO_SUBMIT_PARTNER_ONLY`
 - Deadline date: `2026-07-20`
@@ -163,7 +178,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Fit: `STRONG_MEASUREMENT_FIT_TESTBED_AND_PUBLIC_SECTOR_PARTNERS_MISSING`
 - Official URL: https://sam.gov/opp/a08fe6151b524fbd87e4c7ce8f6a4abb/view
 
-### 15. 7571TE26R00004 - HHS AI Power User Advanced Models and Features Pilot
+### 16. 7571TE26R00004 - HHS AI Power User Advanced Models and Features Pilot
 
 - Command: `PARTNER_OR_NO_BID`
 - Deadline date: `2026-07-14`
@@ -171,7 +186,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Fit: `THEMATIC_MEASUREMENT_FIT_PRIME_DELIVERY_REQUIREMENTS_NOT_MET`
 - Official URL: https://sam.gov/workspace/contract/opp/d60ae511937b410fa6f13473acbae762/view
 
-### 16. 26-508 - TechAccess: AI-Ready America - State/Territory Coordination Hubs
+### 17. 26-508 - TechAccess: AI-Ready America - State/Territory Coordination Hubs
 
 - Command: `NO_BID_MISSED_PREREQUISITE`
 - Deadline date: `2026-07-16`
@@ -179,7 +194,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Fit: `STRATEGIC_PARTNER_FIT_WATCH_ROUND_TWO`
 - Official URL: https://www.nsf.gov/funding/opportunities/techaccess-ai-ready-america/nsf26-508/solicitation
 
-### 17. HHS-2026-ACF-ACYF-CA-0037 - Predictive Analytics in Child Welfare Demonstration Grants
+### 18. HHS-2026-ACF-ACYF-CA-0037 - Predictive Analytics in Child Welfare Demonstration Grants
 
 - Command: `NO_SOLO_SUBMIT_PARTNER_ONLY`
 - Deadline date: `2026-07-13`
@@ -189,14 +204,14 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 
 ## Expired Without Verified Send
 
-### 11. HHS-2026-ACL-NIDILRR-REGE-0212 - RERC on AI-Driven Assistive and Rehabilitation Technologies
+### 12. HHS-2026-ACL-NIDILRR-REGE-0212 - RERC on AI-Driven Assistive and Rehabilitation Technologies
 
 - Deadline date: `2026-07-16`
 - Prior command: `TECHNICAL_CAPACITY_AND_DOMAIN_GATE`
 - Status: `DEADLINE_PASSED_NO_VERIFIED_SEND`
 - Official URL: https://simpler.grants.gov/opportunity/c08bbf7a-563b-4af4-a79b-b1cb7bdd71ad
 
-### 13. PDR-2600-DC-029Q - Mass Market Solutions for Leveraging Robotics and AI Technologies for Home Construction Demonstration
+### 14. PDR-2600-DC-029Q - Mass Market Solutions for Leveraging Robotics and AI Technologies for Home Construction Demonstration
 
 - Deadline date: `2026-07-13`
 - Prior command: `ELIGIBILITY_AND_PARTNER_GATE`
@@ -264,7 +279,45 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Final submit without human: `false`
 - Lane SHA-256: `2cbe84e796877173f726a8b056c18f3391fd0e502b66b8c8ee45d6e129571cac`
 
-### 3. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
+### 3. DLA26BZ03-NV011 - Digital Twin of the Organization for Enhanced Mission Readiness
+
+- Source: `DSIP / DLA / SBIR.gov`
+- Agency: `Defense Logistics Agency`
+- Deadline UTC: `2026-07-22T16:00:00Z`
+- Official deadline: July 22, 2026 at 12:00 p.m. Eastern Time. The SBIR.gov topic record and DLA Release 3 schedule agree on July 22, 2026; the downloaded Amendment 2 BAA schedule line prints July 22, 2025, an apparent internal year typo. Reconfirm the live DSIP countdown before submission.
+- Days to close from scan date: `5`
+- Deadline bucket: `seven_day_sprint`
+- Command: `STAGE_DSIP_PROPOSAL`
+- Eligibility: `OPEN_PHASE_I_SMALL_BUSINESS_IDENTITY_PI_AND_REPRESENTATIONS_UNVERIFIED`
+- Fit: `STRONG_TOPIC_FIT_BOUNDED_SYNTHETIC_EVIDENCE_NO_DLA_VALIDATION_CLAIM`
+- Route: Defense SBIR/STTR Innovation Portal (DSIP)
+- Official URL: https://www.sbir.gov/topics/12778
+- Secondary URL: https://www.dodsbirsttr.mil/
+- Why now: This is the nearest complete federal Phase I proposal package. The 15-file manifest verifies byte-for-byte, the technical candidate is claim-bounded, and the official topic fit is strong. It is not submission-ready until DSIP identity, cost, ITAR, CMMC, award-history, foreign-affiliation, rights, and certification gates are answered.
+- Today work:
+  - Open DLA26BZ03-NV011 in DSIP and verify the live countdown, organization linkage, and proposal number.
+  - Replace the neutral proposal-number header through the builder, rerender the PDF, and regenerate the manifest.
+  - Populate Volumes 1-7 from the hash-locked package and stop at the complete portal preview.
+  - Resolve ITAR/JCP, projected CMMC Level 2 (Self), support-overlap, data-rights, and foreign-affiliation representations without claiming certifications that are not documented.
+- Human gate:
+  - Robert verifies the DSIP organization, submitter authority, legal entity, UEI, CAGE, SAM status, address, and proposal number.
+  - Robert confirms PI primary-employment eligibility, 640 Phase I hours, six-month scope, and no conflicting support.
+  - Robert approves direct labor, fringe, indirect treatment, ODCs, and the $100,000 total cost basis.
+  - Robert answers prior SBIR/STTR award history, ITAR/JCP, CMMC, foreign-citizen, foreign-affiliation, and technical-data-rights fields from current facts.
+  - Robert completes required training and reviews every certification, attachment hash, total, and the final DSIP preview before submission.
+- Package files:
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json`
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ASSEMBLY_MAP_2026-07-16.md`
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME1_PUBLIC_TEXT_2026-07-16.md`
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf`
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME3_COST_INPUTS_2026-07-16.md`
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME5_WORKSHEET_2026-07-16.md`
+  - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_CLAIM_EVIDENCE_MATRIX_2026-07-16.md`
+- External send without human: `false`
+- Final submit without human: `false`
+- Lane SHA-256: `a4bd58b85395f0bc632578deb4cda62952928b717ed6cf346c33e012a2fe32fd`
+
+### 4. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
 
 - Source: `SAM.gov`
 - Agency: `U.S. Army Contracting Command - Aberdeen Proving Ground`
@@ -285,9 +338,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `ARMY_AIDP_RFI4_PARTNER_NOTE_STUB_2026-07-10.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `9bd27e40c2e04d0858ba4ef974a20e7870a3b0813f52bd76f03240fa93d3a8db`
+- Lane SHA-256: `01df9ce28f951e4b80c8c7f2a5eb96866f646db9c0183009219e40d9100364b6`
 
-### 4. LAUNCHTN-3686-2026 - 3686 Pitch Competition 2026, presented by Amazon
+### 5. LAUNCHTN-3686-2026 - 3686 Pitch Competition 2026, presented by Amazon
 
 - Source: `Launch Tennessee official 3686 Airtable application`
 - Agency: `Launch Tennessee`
@@ -316,9 +369,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `10d4c44a850e9047159fb7924f552c9e8579dad218063af7428b8cd1c99f8065`
+- Lane SHA-256: `76b5cc624247f272e469c46695bead2624dcca331b95cce013c5ee91964e6ad9`
 
-### 5. 75D301-26-RFI-73483 - CDC Artificial Intelligence for Acquisition Support Reverse Industry Day
+### 6. 75D301-26-RFI-73483 - CDC Artificial Intelligence for Acquisition Support Reverse Industry Day
 
 - Source: `SAM.gov / Gmail receipt`
 - Agency: `Centers for Disease Control and Prevention`
@@ -341,9 +394,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `bf728626b079d827c2e154282b1a67f4c17e5c53157a07e869351660cfb690c5`
+- Lane SHA-256: `f4689c91c3b24a4f0274e568a0c76f76e40987934fb8f88b06bfb2d0ac9b4893`
 
-### 6. 693JJ326R000012 - Transportation Systems Management and Operations Data Initiative
+### 7. 693JJ326R000012 - Transportation Systems Management and Operations Data Initiative
 
 - Source: `SAM.gov`
 - Agency: `Federal Highway Administration`
@@ -373,9 +426,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `0b0699fb78e670940be64b6c1104dbfe4ee003ddebcc6eaa8deabfe80140b099`
+- Lane SHA-256: `bcbe3e09c86803c0b4be005dfa5e1befae5efe82135bf06d6f400b8d1767b8a9`
 
-### 7. 26-510 - NSF Small Business Innovation Research / Small Business Technology Transfer Programs Phase I
+### 8. 26-510 - NSF Small Business Innovation Research / Small Business Technology Transfer Programs Phase I
 
 - Source: `NSF Seed Fund Project Pitch`
 - Agency: `U.S. National Science Foundation`
@@ -405,9 +458,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_READINESS.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `f2774d5e283b4c470e1eff3849be1007fda1f2b27bc55a8ee7c5aa69e00ef8fa`
+- Lane SHA-256: `2beaf7a1e23f964c1bec761a476894163c81fb65f37d03ff7c324d9f24dfd511`
 
-### 8. W912HZ26SC005 - Sovereign Defense Cloud for High-Performance Computing Commercial Solutions Opening
+### 9. W912HZ26SC005 - Sovereign Defense Cloud for High-Performance Computing Commercial Solutions Opening
 
 - Source: `SAM.gov / ERDCWERX`
 - Agency: `ERDC Information Technology Laboratory / HPCMP`
@@ -438,9 +491,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-16.json`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `886f406001282f5de20bf77fe1e424e5a66e3da8300b07da507052e137e78045`
+- Lane SHA-256: `83ac243de09311582c4dbdaafb5409c4da215b82cb7253689265052b3fec29c4`
 
-### 9. 15BCMS26Q70000005 - Historical Medical Claims Data Analysis
+### 10. 15BCMS26Q70000005 - Historical Medical Claims Data Analysis
 
 - Source: `SAM.gov`
 - Agency: `Federal Bureau of Prisons`
@@ -467,9 +520,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `grant_submissions/DOJ_BOP_15BCMS26Q70000005/DOJ_BOP_15BCMS26Q70000005_PARTNER_OUTREACH_TEMPLATE_2026-07-16.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `9c543bfd7bd43811b0775448be4bf127a73e9c7b8c989cb9b8daef9a8bb99100`
+- Lane SHA-256: `0353890a9d3dfb60157548b75c7563bf083e7a9f9cc9d2fb4b48e949851f8f51`
 
-### 10. 1131PL26R0049 - Indo-Pacific Digital Infrastructure Project Scoping Services
+### 11. 1131PL26R0049 - Indo-Pacific Digital Infrastructure Project Scoping Services
 
 - Source: `SAM.gov`
 - Agency: `U.S. Trade and Development Agency`
@@ -494,9 +547,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `USTDA_INDO_PACIFIC_DIGITAL_INFRA_SCOPING_STUB_2026-07-10.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `97b90181fb7c2fe5d95cb35063e3d117663d099d3533cb224fe0d583f97c201b`
+- Lane SHA-256: `580710e43765a3ca70ed44cd52df74764ce1782e7872e030a9e3d570ebf7f99e`
 
-### 11. HHS-2026-ACL-NIDILRR-REGE-0212 - RERC on AI-Driven Assistive and Rehabilitation Technologies
+### 12. HHS-2026-ACL-NIDILRR-REGE-0212 - RERC on AI-Driven Assistive and Rehabilitation Technologies
 
 - Source: `Grants.gov / Simpler.Grants.gov`
 - Agency: `Administration for Community Living`
@@ -515,9 +568,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - Retain reusable public-safe material only for a future verified opportunity.
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `4d886add66d033d924c14d134e837b8299a6dc158f28d72fd5ae714d8d63c725`
+- Lane SHA-256: `08b30ef69af56947a33b6683b4f2bf5e65bfe5e9b2f6bcd2943ede37fe4c1e69`
 
-### 12. USDA-NIFA-KFBMB-32830 - Farm Business Management and Benchmarking Competitive Grants Program
+### 13. USDA-NIFA-KFBMB-32830 - Farm Business Management and Benchmarking Competitive Grants Program
 
 - Source: `Grants.gov / NIFA`
 - Agency: `USDA National Institute of Food and Agriculture`
@@ -540,9 +593,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - Robert approves the budget, certifications, and final submission.
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `634b9e5a632a9076f882734c3e7f275a428c62ae45f197afd81ca9dab73e28be`
+- Lane SHA-256: `e43b71c252c8aa70c48cdd0a71c78b0fc0aeeee24e90fd7aee1c297b43c69418`
 
-### 13. PDR-2600-DC-029Q - Mass Market Solutions for Leveraging Robotics and AI Technologies for Home Construction Demonstration
+### 14. PDR-2600-DC-029Q - Mass Market Solutions for Leveraging Robotics and AI Technologies for Home Construction Demonstration
 
 - Source: `Grants.gov / HUD`
 - Agency: `Department of Housing and Urban Development`
@@ -565,9 +618,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `64d3ec0c4e1a8444321e2d1b32f7cf6923b466959f58acecd5dd3c99be120679`
+- Lane SHA-256: `8f1e6da89891751bbf935cf5c81c0bcbbb7efebb9ac0949c7aff16e9ac2cc3cf`
 
-### 14. 693JJ3-26-BAA-0004 - Intersection Safety Systems Prototyping
+### 15. 693JJ3-26-BAA-0004 - Intersection Safety Systems Prototyping
 
 - Source: `SAM.gov`
 - Agency: `Federal Highway Administration`
@@ -589,9 +642,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - Robert approves role, price, representations, and final proposal.
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `d29276d0c312541ad18fa827415e3bc2dd70f924219d2c6eab27e9770a86e27a`
+- Lane SHA-256: `dea11ab5f34ecabab4b5a85e6403d5335210c25566886382a3039b7231907cd8`
 
-### 15. 7571TE26R00004 - HHS AI Power User Advanced Models and Features Pilot
+### 16. 7571TE26R00004 - HHS AI Power User Advanced Models and Features Pilot
 
 - Source: `SAM.gov`
 - Agency: `Department of Health and Human Services`
@@ -613,9 +666,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - Robert approves any teaming terms, price, and external response.
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `dab0bec8e8779abe1b84a6598da554ac4c214b99300b5f3d2d0e46ad7aeead66`
+- Lane SHA-256: `e6e3cc3d164dbe0c3cf59741ac8bec5b2f9927ea9e60ecfea41b1f1b0324396c`
 
-### 16. 26-508 - TechAccess: AI-Ready America - State/Territory Coordination Hubs
+### 17. 26-508 - TechAccess: AI-Ready America - State/Territory Coordination Hubs
 
 - Source: `NSF / Research.gov`
 - Agency: `U.S. National Science Foundation`
@@ -637,9 +690,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - An eligible lead institution and statewide partner structure are confirmed.
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `9bc75b58a095626d6d92430406dffea781aef615dc879ec7b778bf834c6640b2`
+- Lane SHA-256: `3c4e9ca97c5d19d2fa4eeeeb8581c75db560fdb1757621e0f67992f38aac370d`
 
-### 17. HHS-2026-ACF-ACYF-CA-0037 - Predictive Analytics in Child Welfare Demonstration Grants
+### 18. HHS-2026-ACF-ACYF-CA-0037 - Predictive Analytics in Child Welfare Demonstration Grants
 
 - Source: `Grants.gov`
 - Agency: `Administration for Children and Families`
@@ -661,7 +714,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - Robert approves partner outreach or subrecipient role.
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `a5287577b8b11fcdce5ced16e5a84d6f4e9b91411498f35ced14a511ca55be5c`
+- Lane SHA-256: `e586c2a08d93c822676b37922a47ff93417f12f74ad13079253f59fa3a61c76c`
 
 ## Submission Boundary
 
@@ -693,6 +746,12 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - `nashville_ec_portal_field_map`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md` present=`true` sha256=`63bdfafebade22432a6d1ffc3509c8c5ee1685270144f12cc8124ae483bca017`
 - `nashville_ec_application_manifest`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json` present=`true` sha256=`cd9501d1a61e248a62329595297592d00593bf0086c87da58e120df43de2ef11`
 - `nashville_ec_human_fact_resolution`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json` present=`true` sha256=`998a267a08df9e8923fab1e57740f00f52270228a49417f40da73af4aa6d4d33`
+- `missionweave_dsip_package_manifest`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json` present=`true` sha256=`598317d0b4a971402e3446ff32c273209ae7f6dd347f02d5c663159ad4eb6069`
+- `missionweave_dsip_assembly_map`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ASSEMBLY_MAP_2026-07-16.md` present=`true` sha256=`9f5f043d678bdcab74c7b1e4993c75a807da60bdb9a5ba05eeb5eb41487ed9ed`
+- `missionweave_volume2_pdf`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf` present=`true` sha256=`8bbde3db31285f3b671cbfcaf972e9eb8f2de2f62d559463e519ca4f901c37e6`
+- `missionweave_official_topic`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/source_attachments/DLA26BZ03_NV011_OFFICIAL_TOPIC_DETAILS.json` present=`true` sha256=`4d01354a456bf91baff5ab638311bd5822176b49ad7911f6dec1c379b3b217b7`
+- `missionweave_baa_amendment_2`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/source_attachments/DoW_2026_SBIR_BAA_RELEASE_3_AMENDMENT_2.pdf` present=`true` sha256=`fb809186f3b43313a1877a5c36e2383a45b84f62566dda3f6bcdb93779ce08ae`
+- `missionweave_dla_component_instructions`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/source_attachments/DLA_26BZ_RELEASE_3_COMPONENT_INSTRUCTIONS.pdf` present=`true` sha256=`17b06b6fe3dbe6f2035f8287a0dd01fdbfe180858f3c490f1e91d121819239a2`
 - `launchtn_3686_portal_field_map`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_PORTAL_FIELD_MAP_2026-07-17.md` present=`true` sha256=`0fe19453f1595e4af89109824cb6d3ef58bb8234a199c4dd9c88bf7ad629bafd`
 - `launchtn_3686_application_manifest`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json` present=`true` sha256=`16fe4e214430055532f6fb7f57453e0f47daa648ee3e3b92b6050e17c98e3dc8`
 - `launchtn_3686_pitch_deck`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx` present=`true` sha256=`c607e94d8e072ec9d9f93da0d8c372fd5592b01d2ca3b4f71c0a079417c18a69`

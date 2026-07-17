@@ -14,7 +14,7 @@ MIRROR_RECEIPT = (
     ROOT
     / "grant_submissions"
     / "funding_sprint_20260709"
-    / "NEAR_DEADLINE_COMMAND_BOARD_ERDC_RECONCILIATION_E_DRIVE_SYNC_RECEIPT_2026-07-17.json"
+    / "NEAR_DEADLINE_COMMAND_BOARD_MISSIONWEAVE_RECONCILIATION_E_DRIVE_SYNC_RECEIPT_2026-07-17.json"
 )
 
 
@@ -40,13 +40,13 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
 
     assert payload["schema"] == "near_deadline_submission_command_board_v4"
     assert payload["status"] == "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS"
-    assert payload["summary"]["lane_count"] == 17
-    assert payload["summary"]["stage_now_count"] == 4
+    assert payload["summary"]["lane_count"] == 18
+    assert payload["summary"]["stage_now_count"] == 5
     assert payload["summary"]["sent_verified_count"] == 3
     assert payload["summary"]["emergency_eligibility_gate_count"] == 0
     assert payload["summary"]["no_bid_or_partner_only_count"] == 6
     assert payload["summary"]["expired_without_verified_send_count"] == 1
-    assert payload["summary"]["human_gated_count"] == 13
+    assert payload["summary"]["human_gated_count"] == 14
     assert payload["summary"]["final_submit_allowed_without_human"] is False
     assert payload["summary"]["external_send_allowed_without_human"] is False
     assert payload["summary"]["pricing_allowed_without_human"] is False
@@ -91,6 +91,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "26-510" in stage_ids
     assert "W912HZ26SC005" in stage_ids
     assert "NASHVILLE-EC-FALL-2026" in stage_ids
+    assert "DLA26BZ03-NV011" in stage_ids
     assert "LAUNCHTN-3686-2026" in stage_ids
 
     sent_ids = {row["opportunity_number"] for row in payload["sent_verified"]}
@@ -124,10 +125,9 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "July 27" in nsf["official_deadline_text"]
     assert "not currently reachable" in nsf["official_deadline_text"]
     assert "26-510" in payload["summary"]["best_grants_lane"]
-    assert "officially listed but currently inaccessible" in payload["summary"][
+    assert "next rolling Project Pitch route" in payload["summary"][
         "best_grants_lane"
     ]
-    assert "planning only" in payload["summary"]["best_grants_lane"]
     fhwa = next(
         row
         for row in payload["lanes"]
@@ -164,6 +164,40 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     )
     assert ec["external_send_allowed_without_human"] is False
     assert ec["final_submit_allowed_without_human"] is False
+
+    missionweave = next(
+        row
+        for row in payload["lanes"]
+        if row["opportunity_number"] == "DLA26BZ03-NV011"
+    )
+    assert missionweave["command"] == "STAGE_DSIP_PROPOSAL"
+    assert missionweave["deadline_date"] == "2026-07-22"
+    assert missionweave["deadline_utc"] == "2026-07-22T16:00:00Z"
+    assert missionweave["deadline_semantics"] == (
+        "CROSS_SOURCE_2026_DATE_CONFIRMED_BAA_YEAR_TYPO_RECHECK_DSIP"
+    )
+    assert missionweave["deadline_source_discrepancy_present"] is True
+    assert "July 22, 2025" in missionweave["official_deadline_text"]
+    assert missionweave["package_manifest_integrity_pass"] is True
+    assert missionweave["package_manifest_file_count"] == 15
+    assert missionweave["phase1_duration_months"] == 6
+    assert missionweave["phase1_cost_ceiling_usd"] == 100000
+    assert missionweave["topic_phase1_max_duration_months"] == 12
+    assert missionweave["topic_phase1_max_cost_usd"] == 100000
+    assert missionweave["itar_flag"] is True
+    assert missionweave["projected_cmmc_level"] == "Level 2 (Self)"
+    assert len(missionweave["package_files"]) == 7
+    assert any(
+        path.endswith("MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json")
+        for path in missionweave["package_files"]
+    )
+    assert any(
+        path.endswith("MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf")
+        for path in missionweave["package_files"]
+    )
+    assert missionweave["external_send_allowed_without_human"] is False
+    assert missionweave["final_submit_allowed_without_human"] is False
+    assert "DLA26BZ03-NV011" in payload["summary"]["best_grants_lane"]
 
     launchtn = next(
         row
@@ -271,6 +305,12 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "nashville_ec_portal_field_map",
         "nashville_ec_application_manifest",
         "nashville_ec_human_fact_resolution",
+        "missionweave_dsip_package_manifest",
+        "missionweave_dsip_assembly_map",
+        "missionweave_volume2_pdf",
+        "missionweave_official_topic",
+        "missionweave_baa_amendment_2",
+        "missionweave_dla_component_instructions",
         "launchtn_3686_portal_field_map",
         "launchtn_3686_application_manifest",
         "launchtn_3686_pitch_deck",
@@ -291,11 +331,11 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         assert marker not in lowered
 
 
-def test_erdc_command_board_reconciliation_mirror_matches():
+def test_missionweave_command_board_reconciliation_mirror_matches():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 3
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 9
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["browser_navigation_performed"] is False
     assert receipt["private_values_mirrored"] is False
