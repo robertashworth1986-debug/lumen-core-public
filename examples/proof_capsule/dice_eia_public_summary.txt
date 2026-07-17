@@ -1,0 +1,19 @@
+LumenCore public-safe DICE live-breadth replay summary
+Generated from the bounded public report dated 2026-06-21.
+
+Source families: Kraken market time-series and EIA power-grid time-series.
+Frozen source files: 6.
+Deterministic replay windows: 14.
+
+Reported mean deltas across the frozen replay windows:
+- Safe completion: +0.0437; favorable fraction 0.857.
+- Constraint violation: -0.1216; favorable fraction 0.929.
+- Messages per safe completion: -2.8157; favorable fraction 1.000.
+- False rejection: +0.0514; favorable fraction 0.000.
+
+Boundary:
+This is a public summary of internal replay evidence. The underlying source files and
+private run manifest are not published here. The stress signals are real pulled
+time-series windows, but the replay labels are deterministic derived labels. This does
+not prove DICE metric attainment, field validation, operational performance, trading
+profit, agency endorsement, or customer deployment.
