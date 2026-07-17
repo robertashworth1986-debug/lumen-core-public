@@ -1,0 +1,76 @@
+{
+  "capsule_id": "DICE-EIA-PUBLIC-SUMMARY-20260621",
+  "title": "DICE public live-breadth replay summary",
+  "module": "LumenCore",
+  "evidence_type": "replay",
+  "source": {
+    "name": "Public-safe summary of frozen Kraken and EIA time-series stress windows",
+    "type": "document",
+    "rights_status": "public",
+    "row_count_or_window": "6 source files; 14 deterministic replay windows"
+  },
+  "baseline": {
+    "name": "Frozen coordination comparator documented by the internal replay lane",
+    "baseline_type": "named_method",
+    "selection_time": "before_scoring"
+  },
+  "locked_metric": {
+    "name": "Safe completion delta with cost and rejection guardrails",
+    "definition": "Mean safe-completion change reported with constraint violation, messages per safe completion, and false rejection across 14 frozen windows.",
+    "locked_before_run": true
+  },
+  "run": {
+    "run_id": "DICE_PUBLIC_LIVE_BREADTH_REPLAY_20260621",
+    "run_type": "replay",
+    "timestamp_utc": "2026-06-21T00:15:00Z",
+    "code_commit": "unknown-public-summary",
+    "dependency_lock": "standard-library verifier only",
+    "seed_or_window": "14 deterministic replay windows"
+  },
+  "manifest": {
+    "input_hashes": [],
+    "output_hashes": [
+      {
+        "path": "examples/proof_capsule/dice_eia_public_summary.txt",
+        "sha256": "45f71b30fc1f7abab1d085f109cd3066e6281239c7323238911bad82fb73a371"
+      }
+    ],
+    "manifest_hash": "18949808da4b42246032a92cc169b2fbd327bd474389496a3bc552efea889132",
+    "public_safe": true
+  },
+  "result": {
+    "summary": "Across 14 deterministic replay windows built from frozen Kraken and EIA time-series stress signals, the public summary reports higher safe completion and lower constraint violations and messaging cost, alongside a higher false-rejection cost.",
+    "primary_delta": "Mean safe-completion delta +0.0437",
+    "secondary_metrics": [
+      "Constraint violation mean delta -0.1216",
+      "Messages per safe completion mean delta -2.8157"
+    ],
+    "negative_results": [
+      "False rejection mean delta +0.0514; favorable fraction 0.000"
+    ],
+    "failure_notes": [
+      "Underlying source files and the private run manifest are not published in this public capsule.",
+      "Stress-replay labels are deterministic derived labels, not native DICE task labels."
+    ]
+  },
+  "claim_boundary": {
+    "proves": [
+      "A bounded public summary exists with named source families, a frozen window count, metrics, a negative result, and limitations.",
+      "The public summary artifact can be SHA-256 verified."
+    ],
+    "does_not_prove": [
+      "DICE program metric attainment",
+      "field validation",
+      "operational DoD performance",
+      "trading profit",
+      "agency endorsement",
+      "customer deployment"
+    ],
+    "safe_public_sentence": "This public replay capsule summarizes frozen Kraken and EIA stress-window results and preserves the false-rejection cost; it supports review of the evidence method, not operational performance claims."
+  },
+  "pilot_decision": {
+    "status": "external_review",
+    "next_gate": "A qualified reviewer approves data rights, comparator, metric, threshold, and replay window before any external-validation claim.",
+    "owner": "Robert Ashworth / LumenCore"
+  }
+}

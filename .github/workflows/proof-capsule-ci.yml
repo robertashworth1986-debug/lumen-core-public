@@ -1,0 +1,38 @@
+name: Proof Capsule CI
+
+on:
+  pull_request:
+    paths:
+      - "code/proof_capsule_verifier.py"
+      - "examples/proof_capsule/**"
+      - "tests/test_proof_capsule_verifier.py"
+      - "QUICKSTART.md"
+      - "dashboard/operator_home.html"
+      - ".github/workflows/proof-capsule-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "code/proof_capsule_verifier.py"
+      - "examples/proof_capsule/**"
+      - "tests/test_proof_capsule_verifier.py"
+      - "QUICKSTART.md"
+      - "dashboard/operator_home.html"
+      - ".github/workflows/proof-capsule-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile verifier
+        run: python -m py_compile code/proof_capsule_verifier.py tests/test_proof_capsule_verifier.py
+      - name: Run focused tests
+        run: python -m unittest discover -s tests -p "test_proof_capsule_verifier.py" -v
+      - name: Verify public capsule
+        run: python code/proof_capsule_verifier.py examples/proof_capsule/dice_eia_public_capsule.json --root .
