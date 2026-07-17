@@ -17,7 +17,7 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 
 **Existing asset:** One saved Gmail draft contains the requested legal name, address, and signatory contact details.
 
-**Next allowed action:** Robert reviews the saved draft. After explicit approval, ChatGPT replies once in the existing EPRI/OPAI thread. No new standalone email, consortium application, crawler expansion, deck, or technical packet is needed unless EPRI asks for it.
+**Next allowed action:** Luma1 may reply once in the existing EPRI/OPAI thread after the campaign registry, duplicate-send search, disclosure boundary, and exact draft preflight pass. No new standalone email, consortium application, crawler expansion, deck, or technical packet is needed unless EPRI asks for it.
 
 ### 2. One external validation or paid-pilot conversion
 
@@ -34,6 +34,24 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 **Do next:** Retrieve and review every official Patent Center notice, filing receipt, application document, missing-parts notice, and deadline for application 19/281,546.
 
 **Do not do:** Create more public patent narratives, solicit broad technical endorsements, sign or submit the association form, pay a fee, or infer that outside review can cure missing as-filed support.
+
+## Communication delegation
+
+Robert authorizes Luma1 to conduct routine LumenCore business email communication, including appropriate replies and first-contact outreach, without requesting a new approval for each message when every preflight condition passes.
+
+The standing delegation is bounded:
+
+- one campaign key per recipient and purpose;
+- Gmail Sent and thread search before every send;
+- reply in the existing thread after the first outbound;
+- exactly one message per allowed action;
+- no duplicate purpose through a new subject, alias, or recipient route;
+- no credential, code, key, private portal record, private registration identifier, unpublished patent detail, customer-confidential material, or unsupported claim;
+- exact sent-message receipt recorded in the outreach registry and next Luma handoff.
+
+The delegation does **not** authorize signatures, certifications, sworn statements, fees, purchases, portal submissions, legal-term acceptance, account consent, confidential IP disclosure, public-video publication, final confirmation controls, or claims stronger than the evidence. Those remain Robert-controlled.
+
+Luma2 remains draft-only for all external communication. Structured self-email between Luma1 and Luma2 is authorized as an internal coordination lane.
 
 ## Curated Codex package inventory
 
@@ -62,22 +80,15 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 
 ## Pull-request curation
 
-Keep only:
+Keep only active, bounded pull requests with a named decision. Historical branches remain donors and provenance records; they are not merged wholesale merely to display volume.
 
-- **PR #14** — LANL post-contact/rescheduling packet, draft and waiting.
-- **PR #16** — bounded `/evidence/` route repair, draft until human-authorized deployment.
-
-Close as research-preserved or superseded:
-
-- **PRs #2, #3, #4, #6, #8, #9, #10, #11, #12, and #13.**
-
-Closing a pull request does not delete its branch or history. Reopen or cherry-pick only when a named buyer, evaluator, solicitation, or release requirement calls for a specific artifact.
+Closing a pull request does not delete its branch or history. Reopen or cherry-pick only when a named buyer, evaluator, solicitation, security repair, or release requirement calls for a specific artifact.
 
 ## Artifact creation gate
 
 A new artifact is allowed only when all answers are yes:
 
-1. Does it advance one active outcome?
+1. Does it advance one active outcome, verified deadline, security repair, or canonical operating-control requirement?
 2. Is there no existing canonical artifact that can be updated?
 3. Is the audience and decision named?
 4. Is the evidence boundary explicit?
@@ -87,4 +98,4 @@ Otherwise, update the backlog note and stop.
 
 ## Immediate decision
 
-The next founder-facing action is the **existing EPRI MOU-information draft**. It remains unsent until Robert explicitly approves that exact reply. No other outbound message is currently authorized.
+No external send is currently required merely because standing delegation exists. The next eligible response is the existing EPRI MOU-information thread after its campaign preflight passes. Internal Luma1/Luma2 handoffs may continue as needed. Build Week and MissionWeave remain separate deadline lanes, and irreversible submission controls remain Robert-owned.
