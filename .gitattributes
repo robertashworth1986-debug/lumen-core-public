@@ -1,6 +1,8 @@
+/.gitattributes text eol=lf
 *.sh text eol=lf
 *.pdf binary
 *.docx binary
 *.pptx binary
 *.xlsx binary
 evidence/reproducibility/github_run_*/** binary
+code/falcon_hybrid_context_benchmark.py text eol=lf
