@@ -31,6 +31,10 @@ Primary links:
 - Current proof status: docs/LUMENCORE_CURRENT_PROOF_STATUS_2026-07-09.md
 - Founder/IP boundary: docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md
 - Claim boundary register: docs/CLAIM_BOUNDARY_REGISTER.md
+- Founder provenance and build timeline: docs/FOUNDER_PROVENANCE_AND_BUILD_TIMELINE.md
+- Founder lexicon registry: config/founder_lexicon_v1.json
+- Luma1 / Luma2 handoff protocol: docs/LUMA1_LUMA2_HANDOFF_PROTOCOL.md
+- Public visual experience budget: docs/PUBLIC_VISUAL_EXPERIENCE_BUDGET.md
 - Luma Universe module catalog: docs/LUMA_UNIVERSE_MODULE_CATALOG.md
 - Proof Capsule schema: docs/PROOF_CAPSULE_SCHEMA.md
 - Pilot report template: docs/PILOT_REPORT_TEMPLATE.md
@@ -132,6 +136,9 @@ The missing proof-promotion pieces are now explicit repo docs rather than loose 
 - customer/mentor report format: `docs/PILOT_REPORT_TEMPLATE.md`,
 - LumaJet / LumaSuit safe promotion lane: `docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md`,
 - API and demo continuity lane: `docs/API_AND_DEMO_CONTINUITY_CHECKLIST.md`,
+- founder provenance and private-audit boundary: `docs/FOUNDER_PROVENANCE_AND_BUILD_TIMELINE.md`,
+- dual-agent coordination: `docs/LUMA1_LUMA2_HANDOFF_PROTOCOL.md`,
+- progressive visual budget: `docs/PUBLIC_VISUAL_EXPERIENCE_BUDGET.md`,
 - proof backlog: `docs/CURRENT_PROOF_PROMOTION_BACKLOG.md`.
 
 ---
@@ -199,7 +206,7 @@ Status language:
 - **Measured** means rows, files, commits, outputs, or runs exist.
 - **Replay** means controlled replay output exists but is not field validation.
 - **Synthetic** means generated or simulated benchmark evidence.
-- **Modeled** means simulation or internal modeling output.
+- **Modeled** means simulation or internal model output.
 - **Estimated** means economic translation or opportunity framing.
 - **Externally validated** means a qualified outside party or buyer has verified the result under agreed conditions.
 
