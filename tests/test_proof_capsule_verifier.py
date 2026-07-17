@@ -56,6 +56,7 @@ class ProofCapsuleVerifierTests(unittest.TestCase):
         self.assertIn("Internal replay evidence is not external validation.", home)
         self.assertNotIn("One platform. Four products. One truth layer.", home)
         self.assertNotIn("Finish and submit the current NSF Project Pitch.", home)
+        self.assertNotIn('href="/evidence/"', home)
 
 
 if __name__ == "__main__":
