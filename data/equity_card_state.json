@@ -1,11 +1,11 @@
 {
-  "generated_utc": "2026-07-16T12:53:00Z",
+  "generated_utc": "2026-07-17T01:46:27Z",
   "state": {
     "equity": "—",
-    "status": "unknown",
-    "reason": "",
-    "positions": "—",
+    "executions": "—",
     "portfolio_heat": "—",
-    "executions": "—"
+    "positions": "—",
+    "reason": "",
+    "status": "unknown"
   }
 }
