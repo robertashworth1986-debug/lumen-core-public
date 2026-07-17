@@ -1,4 +1,4 @@
-name: 🚀 Deploy Dashboard to VPS
+name: Deploy bounded LumenCore site to VPS
 
 on:
   push:
@@ -8,10 +8,18 @@ on:
       - 'assets/**'
       - 'data/*.json'
       - '*.html'
+      - 'code/ops/repair_evidence_route.py'
+      - 'code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh'
+      - 'code/deploy/nginx/lumatrader.conf'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: lumencore-production-site
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -29,9 +37,15 @@ jobs:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
 
-      - name: Sync dashboard assets to VPS
+      - name: Sync bounded public assets and repair evidence route
+        shell: bash
         run: |
-          ssh -o StrictHostKeyChecking=no opc@${{ secrets.VPS_HOST }} \
+          set -euo pipefail
+          REMOTE="opc@${{ secrets.VPS_HOST }}"
+          SSH=(ssh -o StrictHostKeyChecking=no "$REMOTE")
+          RSYNC_SSH="ssh -o StrictHostKeyChecking=no"
+
+          "${SSH[@]}" \
             "if command -v sudo >/dev/null 2>&1; then SUDO=sudo; else SUDO=; fi; \
              \$SUDO journalctl --vacuum-size=100M >/dev/null 2>&1 || true; \
              \$SUDO dnf clean all >/dev/null 2>&1 || true; \
@@ -46,15 +60,14 @@ jobs:
                \$SUDO find /opt/lumencore/dashboard -type d -name '__pycache__' -prune -exec rm -rf {} +; \
                \$SUDO find /opt/lumencore/dashboard -type f \( -name '*.pyc' -o -name '*.tmp' -o -name '*.bak' -o -name '*.log' \) -delete; \
              fi; \
-             \$SUDO install -d -o opc -g opc -m 755 /opt/lumencore/dashboard /opt/lumencore/dashboard/data /opt/lumencore/data; \
-             df -h /opt/lumencore; \
-             echo 'Largest remote directories:'; \
-             du -xhd1 /opt/lumencore /opt /var /home /tmp 2>/dev/null | sort -h | tail -50; \
-             touch /opt/lumencore/data/.deploy_write_test && rm -f /opt/lumencore/data/.deploy_write_test"
+             \$SUDO install -d -o opc -g opc -m 755 \
+               /opt/lumencore/dashboard \
+               /opt/lumencore/dashboard/data \
+               /opt/lumencore/data \
+               /tmp/lumencore-evidence-route; \
+             touch /opt/lumencore/data/.deploy_write_test && rm -f /opt/lumencore/data/.deploy_write_test; \
+             df -h /opt/lumencore"
 
-          # Sync HTML dashboards + data JSON to VPS web roots
-          # The VPS has limited free space, so avoid temp-copy rewrites of large
-          # preseeded vendor bundles while still shipping dashboard changes.
           rsync -rlvz --delete --inplace --size-only --no-perms --omit-dir-times \
             --exclude='*.py' \
             --exclude='*.ps1' \
@@ -62,33 +75,55 @@ jobs:
             --exclude='node_modules/' \
             --exclude='data/' \
             --exclude='assets/vendor/three.min.js' \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "$RSYNC_SSH" \
             dashboard/ \
-            opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/
+            "$REMOTE:/opt/lumencore/dashboard/"
 
-          # Sync data snapshots
           rsync -rlvz --inplace --size-only --no-perms --omit-dir-times \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "$RSYNC_SSH" \
             data/ \
-            opc@${{ secrets.VPS_HOST }}:/opt/lumencore/data/
+            "$REMOTE:/opt/lumencore/data/"
 
-          # Sync browser-visible data snapshots for dashboards that fetch /data/*.json
           rsync -rlvz --delete --inplace --size-only --no-perms --omit-dir-times \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "$RSYNC_SSH" \
             data/ \
-            opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/data/
+            "$REMOTE:/opt/lumencore/dashboard/data/"
 
-          echo "Dashboard deploy complete."
+          rsync -rlvz --inplace --no-perms --omit-dir-times \
+            -e "$RSYNC_SSH" \
+            code/ops/repair_evidence_route.py \
+            code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh \
+            "$REMOTE:/tmp/lumencore-evidence-route/"
 
-      - name: Smoke test production endpoints
+          "${SSH[@]}" \
+            "sudo bash /tmp/lumencore-evidence-route/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh --apply"
+
+      - name: Smoke test canonical production surfaces
+        shell: bash
         run: |
-          sleep 5  # let nginx settle
-          PORTAL=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" https://lumen-core.ai/ || echo "000")
-          DASH=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" https://lumen-core.ai/kraken_execution_dashboard.html || echo "000")
-          DATA=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" https://lumen-core.ai/data/site_health.json || echo "000")
-          echo "Portal: $PORTAL | Kraken Dashboard: $DASH | Site Health Data: $DATA"
-          if [ "$PORTAL" != "200" ] || [ "$DASH" != "200" ] || [ "$DATA" != "200" ]; then
-            echo "::error::Post-deploy smoke test failed — check VPS nginx"
-            exit 1
-          fi
-          echo "✅ All production endpoints responding after deploy."
+          set -euo pipefail
+          tmp_root="$(mktemp)"
+          tmp_evidence="$(mktemp)"
+          tmp_data="$(mktemp)"
+          trap 'rm -f "$tmp_root" "$tmp_evidence" "$tmp_data"' EXIT
+
+          status() {
+            local url="$1"
+            local output="$2"
+            curl -sS --max-time 15 -o "$output" -w '%{http_code}' "$url" || true
+          }
+
+          ROOT="$(status "https://lumen-core.ai/?deploy=${GITHUB_SHA}" "$tmp_root")"
+          EVIDENCE="$(status "https://lumen-core.ai/evidence/?deploy=${GITHUB_SHA}" "$tmp_evidence")"
+          DATA="$(status "https://lumen-core.ai/data/site_health.json?deploy=${GITHUB_SHA}" "$tmp_data")"
+
+          echo "Root: ${ROOT:-000} | Evidence: ${EVIDENCE:-000} | Site health data: ${DATA:-000}"
+
+          [[ "$ROOT" == "200" ]]
+          [[ "$EVIDENCE" == "200" ]]
+          [[ "$DATA" == "200" ]]
+          grep -Fq 'One proof path. One bounded decision.' "$tmp_root"
+          grep -Fq 'name="lumencore-surface" content="proof-to-pilot-evidence-v1"' "$tmp_evidence"
+          python3 -m json.tool "$tmp_data" >/dev/null
+
+          echo "Production root, bounded evidence page, and health JSON are live."
