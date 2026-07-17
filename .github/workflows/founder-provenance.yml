@@ -64,7 +64,7 @@ jobs:
                   'never commit the raw export to a public repository',
               ),
               Path('docs/LUMA1_LUMA2_HANDOFF_PROTOCOL.md'): (
-                  'repository state canonical',
+                  'repository state is canonical',
                   'raw conversations and notebook pages are private evidence inputs',
               ),
           }
