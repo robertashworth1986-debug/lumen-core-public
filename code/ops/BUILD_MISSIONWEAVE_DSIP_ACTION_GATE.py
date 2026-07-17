@@ -17,6 +17,10 @@ PACKAGE_DIR = ROOT / "grant_submissions" / "DLA26BZ03_NV011_MissionWeave"
 PRIVATE_DIR = PACKAGE_DIR / "private"
 DEFAULT_PRIVATE_INPUT = PRIVATE_DIR / "MISSIONWEAVE_DSIP_ACTION.private.json"
 TEMPLATE = ROOT / "config" / "missionweave_dsip_action_private_template_v1.json"
+PRIVATE_CAPTURE_TOOL = ROOT / "code" / "ops" / "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py"
+PRIVATE_CAPTURE_WORKFLOW = (
+    PACKAGE_DIR / "MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md"
+)
 MANIFEST = PACKAGE_DIR / "MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json"
 VOLUME2_PDF = PACKAGE_DIR / "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf"
 OUT_JSON = PACKAGE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
@@ -503,6 +507,11 @@ def build_payload(
             "present": private_payload is not None,
             "sha256": private_input_sha256,
             "private_values_exposed": False,
+            "capture_tool": rel(PRIVATE_CAPTURE_TOOL),
+            "capture_workflow": rel(PRIVATE_CAPTURE_WORKFLOW),
+            "pre_submit_excludes_action_time_approval": True,
+            "credential_values_accepted": False,
+            "firm_pin_value_accepted": False,
         },
         "gate_summary": {
             "required_private_gate_count": (
@@ -662,11 +671,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Private Workflow",
             "",
-            f"1. Copy `{payload['private_template']}` to `{payload['private_input']['expected_path']}`.",
-            "2. Set `template_only` to false and complete only supported facts. Never store the Firm PIN or any login credential in the file.",
-            "3. After DSIP assigns a proposal number, rebuild Volume 2 through the existing builder and regenerate the package manifest.",
-            "4. Save a local preview receipt hash only after all seven volumes are complete and visible.",
-            "5. Run this gate with `--private-input`; require every gate to pass before asking for the final human click.",
+            f"1. Run `{payload['private_input']['capture_tool']} --check-target`. This validates the ignored destination without reading private contents.",
+            "2. Run the hidden collector with `--section pre-submit`. It captures identity, proposal, and compliance sections but deliberately excludes action-time approval.",
+            "3. After DSIP assigns a proposal number, rebuild Volume 2 through the existing builder, regenerate the package manifest, and rerun only `--section proposal` with the current PDF and preview-receipt hash options.",
+            "4. Run `--section approval` only after the corporate official reviews the complete portal preview at action time. The collector never requests or accepts a Firm PIN or login credential.",
+            "5. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.",
             "",
             "## Controls",
             "",
@@ -714,6 +723,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 3. Verify active SAM status, current representations, legal-name match, UEI match, and CAGE match inside authenticated systems.
 4. Verify SBA Company Registry completion and the SBC Control ID. Store neither the Firm PIN nor login credentials in the private gate file.
 5. Confirm submitter and corporate-official authority.
+6. Record only the resulting yes/no completion state with `{rel(PRIVATE_CAPTURE_TOOL)} --section identity`; the collector has no Firm PIN or credential field.
 
 ## Seven Volumes
 
@@ -738,14 +748,20 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 
 1. Inspect every populated field, all seven volumes, every attachment filename and hash, the cost total, and the live deadline.
 2. Save a private local preview receipt and record only its SHA-256 in the ignored private gate file.
-3. Run:
+3. Capture the action-time approval section separately. This command never clicks submit:
+
+```powershell
+python code\ops\CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval
+```
+
+4. Run:
 
 ```powershell
 python code\ops\BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input grant_submissions\DLA26BZ03_NV011_MissionWeave\private\MISSIONWEAVE_DSIP_ACTION.private.json
 ```
 
-4. Require status `READY_FOR_HUMAN_FINAL_SUBMIT_CLICK` and zero open gates.
-5. Stop for the final human review. The builder does not click submit, certify facts, accept terms, or create a Government transmission receipt.
+5. Require status `READY_FOR_HUMAN_FINAL_SUBMIT_CLICK` and zero open gates.
+6. Stop for the final human review. The builder does not click submit, certify facts, accept terms, or create a Government transmission receipt.
 
 ## Public Claim Boundary
 

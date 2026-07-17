@@ -10,8 +10,8 @@ This handoff is generated from the authoritative near-deadline command board. It
 - Navigation before resume signal: `false`
 - Inspect current page before navigation: `true`
 - First action after resume: Inspect the current URL and visible page without navigating. Continue the current authenticated portal to its next safe preview before switching lanes.
-- Source command-board SHA-256: `df1a02e9f4e3685078bf25023da0faf2b53fdca338256c4a29afbdf433dc105b`
-- Handoff SHA-256: `0b0616a399f366f2f65c08081590ff6bb81cf9bd4c44d4b373fbae95ae2bd93a`
+- Source command-board SHA-256: `53d1bcfa6cee5477fc52fdb10355d890241b72811ea677352d0b6c3d9f58976f`
+- Handoff SHA-256: `e74af2dcb3ed89f8d7652f94cdd6ded599e59d7f4b13caf20abeaa4ea586e5a8`
 
 ## Portal Queue
 
@@ -56,7 +56,8 @@ This handoff is generated from the authoritative near-deadline command board. It
 - Next safe action:
   - Verify the live DSIP countdown, organization linkage, and generated proposal number.
   - Use the proposal number through the existing builder, rerender Volume 2, regenerate the 15-file manifest, and require all hashes to pass.
-  - Use the generated seven-volume checklist and ignored private action template; require the public gate to move from 0/50 to 50/50 without exposing values.
+  - Run the hidden sectioned MissionWeave collector for identity, proposal, and compliance; it accepts no Firm PIN or credential and keeps action-time approval separate.
+  - Use the generated seven-volume checklist and require the public gate to move from 0/50 to 50/50 without exposing values.
   - Populate Volumes 1-7 from the bounded package and reach the complete preview.
 - Action gate:
   - Status: `PRIVATE_DSIP_FACTS_NOT_CAPTURED`
@@ -77,7 +78,7 @@ This handoff is generated from the authoritative near-deadline command board. It
   - Robert completes required training and reviews every certification, attachment hash, total, and the final DSIP preview before submission.
 - External send without human: `false`
 - Final submit without human: `false`
-- Source lane SHA-256: `6fcaeb9e1efd6a7dc359f76feb5b93d1ee41661ffe75c150ce72c2792a28a5bc`
+- Source lane SHA-256: `9400ce8c52fd7cf953cf442b24ce339878b3bc51914962e14364bd01cce84431`
 
 ### 5. 26-510 - NSF Small Business Innovation Research / Small Business Technology Transfer Programs Phase I
 

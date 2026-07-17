@@ -15,7 +15,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Required private gates: `50`
 - Passed private gates: `0`
 - Open gates: `50`
-- Gate SHA-256: `047097e69d756810565db674784050654893b46aaf980dc7906b0697eb2c1f18`
+- Gate SHA-256: `c9283376a746b2bfbffd60cc45840098ddfc555fdea6eb3e0f96992104ad5c47`
 
 ## Package Integrity
 
@@ -96,11 +96,11 @@ This public-safe gate reports only package integrity and private-workflow comple
 
 ## Private Workflow
 
-1. Copy `config/missionweave_dsip_action_private_template_v1.json` to `grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_DSIP_ACTION.private.json`.
-2. Set `template_only` to false and complete only supported facts. Never store the Firm PIN or any login credential in the file.
-3. After DSIP assigns a proposal number, rebuild Volume 2 through the existing builder and regenerate the package manifest.
-4. Save a local preview receipt hash only after all seven volumes are complete and visible.
-5. Run this gate with `--private-input`; require every gate to pass before asking for the final human click.
+1. Run `code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --check-target`. This validates the ignored destination without reading private contents.
+2. Run the hidden collector with `--section pre-submit`. It captures identity, proposal, and compliance sections but deliberately excludes action-time approval.
+3. After DSIP assigns a proposal number, rebuild Volume 2 through the existing builder, regenerate the package manifest, and rerun only `--section proposal` with the current PDF and preview-receipt hash options.
+4. Run `--section approval` only after the corporate official reviews the complete portal preview at action time. The collector never requests or accepts a Firm PIN or login credential.
+5. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.
 
 ## Controls
 

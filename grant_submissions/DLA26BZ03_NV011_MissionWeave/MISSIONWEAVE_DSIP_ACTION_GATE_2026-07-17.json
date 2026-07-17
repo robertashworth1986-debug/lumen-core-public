@@ -15,7 +15,7 @@
     "live_dsip_recheck_required": true,
     "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
   },
-  "gate_sha256": "047097e69d756810565db674784050654893b46aaf980dc7906b0697eb2c1f18",
+  "gate_sha256": "c9283376a746b2bfbffd60cc45840098ddfc555fdea6eb3e0f96992104ad5c47",
   "gate_summary": {
     "open_gate_count": 50,
     "passed_private_gate_count": 0,
@@ -73,7 +73,7 @@
       "VOLUME7_FOREIGN_AFFILIATIONS_WEBFORM"
     ]
   },
-  "generated_utc": "2026-07-17T11:31:53.792717+00:00",
+  "generated_utc": "2026-07-17T13:12:16.007256+00:00",
   "official_instruction_facts": {
     "cmmc_amendment_note": "Amendment 2 says CMMC Phase II implementation was suspended on July 13, 2026 while Phase I self-assessment requirements remain in place; the current live requirement must be reviewed before submission.",
     "current_package_duration_months": 6,
@@ -107,8 +107,13 @@
     "volume3_total_matches_official_ceiling": false
   },
   "private_input": {
+    "capture_tool": "code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py",
+    "capture_workflow": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md",
+    "credential_values_accepted": false,
     "expected_path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_DSIP_ACTION.private.json",
+    "firm_pin_value_accepted": false,
     "git_ignored_target": true,
+    "pre_submit_excludes_action_time_approval": true,
     "present": false,
     "private_values_exposed": false,
     "sha256": null

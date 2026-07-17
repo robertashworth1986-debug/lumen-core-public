@@ -24,6 +24,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 3. Verify active SAM status, current representations, legal-name match, UEI match, and CAGE match inside authenticated systems.
 4. Verify SBA Company Registry completion and the SBC Control ID. Store neither the Firm PIN nor login credentials in the private gate file.
 5. Confirm submitter and corporate-official authority.
+6. Record only the resulting yes/no completion state with `code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section identity`; the collector has no Firm PIN or credential field.
 
 ## Seven Volumes
 
@@ -48,14 +49,20 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 
 1. Inspect every populated field, all seven volumes, every attachment filename and hash, the cost total, and the live deadline.
 2. Save a private local preview receipt and record only its SHA-256 in the ignored private gate file.
-3. Run:
+3. Capture the action-time approval section separately. This command never clicks submit:
+
+```powershell
+python code\ops\CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval
+```
+
+4. Run:
 
 ```powershell
 python code\ops\BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input grant_submissions\DLA26BZ03_NV011_MissionWeave\private\MISSIONWEAVE_DSIP_ACTION.private.json
 ```
 
-4. Require status `READY_FOR_HUMAN_FINAL_SUBMIT_CLICK` and zero open gates.
-5. Stop for the final human review. The builder does not click submit, certify facts, accept terms, or create a Government transmission receipt.
+5. Require status `READY_FOR_HUMAN_FINAL_SUBMIT_CLICK` and zero open gates.
+6. Stop for the final human review. The builder does not click submit, certify facts, accept terms, or create a Government transmission receipt.
 
 ## Public Claim Boundary
 

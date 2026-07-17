@@ -101,6 +101,12 @@ MISSIONWEAVE_ACTION_GATE_MD = (
 MISSIONWEAVE_PORTAL_CHECKLIST = (
     MISSIONWEAVE_DIR / "MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md"
 )
+MISSIONWEAVE_PRIVATE_CAPTURE_TOOL = (
+    ROOT / "code" / "ops" / "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py"
+)
+MISSIONWEAVE_PRIVATE_CAPTURE_WORKFLOW = (
+    MISSIONWEAVE_DIR / "MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md"
+)
 MISSIONWEAVE_OFFICIAL_TOPIC = (
     MISSIONWEAVE_DIR
     / "source_attachments"
@@ -378,6 +384,8 @@ def base_sources() -> dict[str, Any]:
         "missionweave_volume2_pdf": MISSIONWEAVE_VOLUME2_PDF,
         "missionweave_dsip_action_gate": MISSIONWEAVE_ACTION_GATE,
         "missionweave_dsip_portal_checklist": MISSIONWEAVE_PORTAL_CHECKLIST,
+        "missionweave_dsip_private_capture_tool": MISSIONWEAVE_PRIVATE_CAPTURE_TOOL,
+        "missionweave_dsip_private_capture_workflow": MISSIONWEAVE_PRIVATE_CAPTURE_WORKFLOW,
         "missionweave_official_topic": MISSIONWEAVE_OFFICIAL_TOPIC,
         "missionweave_baa_amendment_2": MISSIONWEAVE_BAA,
         "missionweave_dla_component_instructions": MISSIONWEAVE_COMPONENT_INSTRUCTIONS,
@@ -600,6 +608,22 @@ def build_command_lanes(
         "all_checks_pass"
     ) is not True:
         raise ValueError("MissionWeave DSIP action gate source integrity failed")
+    missionweave_private_input = missionweave_action_gate.get("private_input", {})
+    if missionweave_private_input.get("capture_tool") != rel(
+        MISSIONWEAVE_PRIVATE_CAPTURE_TOOL
+    ):
+        raise ValueError("MissionWeave private capture tool is missing or stale")
+    if missionweave_private_input.get("capture_workflow") != rel(
+        MISSIONWEAVE_PRIVATE_CAPTURE_WORKFLOW
+    ):
+        raise ValueError("MissionWeave private capture workflow is missing or stale")
+    if (
+        missionweave_private_input.get("pre_submit_excludes_action_time_approval")
+        is not True
+        or missionweave_private_input.get("credential_values_accepted") is not False
+        or missionweave_private_input.get("firm_pin_value_accepted") is not False
+    ):
+        raise ValueError("MissionWeave private capture safety controls failed")
     hud = grants.get("PDR-2600-DC-029Q", {})
     hhs_child = grants.get("HHS-2026-ACF-ACYF-CA-0037", {})
 
@@ -789,6 +813,21 @@ def build_command_lanes(
             "action_gate_private_values_exposed": missionweave_action_gate.get(
                 "private_input", {}
             ).get("private_values_exposed", False),
+            "action_gate_private_capture_tool": missionweave_private_input.get(
+                "capture_tool"
+            ),
+            "action_gate_private_capture_workflow": missionweave_private_input.get(
+                "capture_workflow"
+            ),
+            "action_gate_pre_submit_excludes_action_time_approval": missionweave_private_input.get(
+                "pre_submit_excludes_action_time_approval"
+            ),
+            "action_gate_credential_values_accepted": missionweave_private_input.get(
+                "credential_values_accepted"
+            ),
+            "action_gate_firm_pin_value_accepted": missionweave_private_input.get(
+                "firm_pin_value_accepted"
+            ),
             "phase1_duration_months": 6,
             "phase1_cost_ceiling_usd": 100000,
             "topic_phase1_max_duration_months": 12,
@@ -805,6 +844,8 @@ def build_command_lanes(
                 rel(MISSIONWEAVE_CLAIM_MATRIX),
                 rel(MISSIONWEAVE_ACTION_GATE),
                 rel(MISSIONWEAVE_PORTAL_CHECKLIST),
+                rel(MISSIONWEAVE_PRIVATE_CAPTURE_TOOL),
+                rel(MISSIONWEAVE_PRIVATE_CAPTURE_WORKFLOW),
             ],
             "why_now": (
                 "This is the nearest complete federal Phase I proposal package. The "
@@ -817,7 +858,7 @@ def build_command_lanes(
             "today_work": [
                 "Open DLA26BZ03-NV011 in DSIP and verify the live countdown, organization linkage, and proposal number.",
                 "Replace the neutral proposal-number header through the builder, rerender the PDF, and regenerate the manifest.",
-                "Use the generated seven-volume portal checklist and ignored private action template; rerun the public gate after each bounded block.",
+                "Use the hidden sectioned collector for identity, proposal, and compliance; keep action-time approval separate and rerun the public gate after each bounded block.",
                 "Populate Volumes 1-7 from the hash-locked package and stop at the complete portal preview.",
                 "Resolve ITAR/JCP, projected CMMC Level 2 (Self), support-overlap, data-rights, and foreign-affiliation representations without claiming certifications that are not documented.",
             ],
@@ -1481,11 +1522,11 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "no_bid_or_partner_only_count": len(no_bid),
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. If it is Nashville EC, move its private action gate from 0/15 by running the six-prompt hidden collector, then reach the complete preview before the date-only July 17 close. One deadline-support query is sent and must not be duplicated or treated as an application. Otherwise preserve the authenticated lane to its next safe preview. Next use the MissionWeave seven-volume checklist and private action gate, currently 0/50 with 15/15 package files verified, before the July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.",
+            "strongest_today_action": "Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. If it is Nashville EC, move its private action gate from 0/15 by running the six-prompt hidden collector, then reach the complete preview before the date-only July 17 close. One deadline-support query is sent and must not be duplicated or treated as an application. Otherwise preserve the authenticated lane to its next safe preview. Next use the MissionWeave seven-volume checklist and hidden sectioned collector to move its private action gate from 0/50 while keeping action-time approval separate; all 15 package files are verified for the July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.",
             "critical_same_day_infrastructure_action": sam_critical_action,
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
-            "best_grants_lane": "DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 package files are hash-verified and the 11-page PDF passes format checks, while the private action gate remains 0/50 until DSIP identity, proposal-number, cost, ITAR/JCP, current CMMC posture, award-history, foreign-affiliation, rights, preview, and certification facts are supported. NSF 26-510 stays the next rolling Project Pitch route.",
+            "best_grants_lane": "DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 package files are hash-verified and the 11-page PDF passes format checks. The hidden sectioned collector can now capture DSIP identity, proposal, and compliance facts without accepting credentials, while approval remains a separate action-time gate; the public action gate stays 0/50 until those facts are actually supported. NSF 26-510 stays the next rolling Project Pitch route.",
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: the first listed contact route rejected delivery and one current official replacement route was contacted July 17. Delivery and partnership remain unconfirmed; no solo bid and no partner claim unless written corporate-experience evidence arrives.",
             "fastest_low_friction_lane": "The Nashville EC TakeOff application is the nearest low-friction reviewer route. Its hidden-input gate is 0/15: six founder prompts produce 11 private portal answers, then preview, fee/terms, and action-time authorization remain human-gated. The verified support email only asks for the close time and does not replace portal submission.",
             "all_final_actions_blocked_without_human": True,

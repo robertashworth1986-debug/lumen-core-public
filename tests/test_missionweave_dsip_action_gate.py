@@ -75,6 +75,15 @@ def test_default_gate_verifies_package_and_fails_closed_without_private_input():
     assert payload["gate_summary"]["open_gate_count"] == 50
     assert payload["private_input"]["git_ignored_target"] is True
     assert payload["private_input"]["private_values_exposed"] is False
+    assert payload["private_input"]["capture_tool"].endswith(
+        "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py"
+    )
+    assert payload["private_input"]["capture_workflow"].endswith(
+        "MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md"
+    )
+    assert payload["private_input"]["pre_submit_excludes_action_time_approval"] is True
+    assert payload["private_input"]["credential_values_accepted"] is False
+    assert payload["private_input"]["firm_pin_value_accepted"] is False
     assert payload["controls"]["browser_navigation_performed"] is False
     assert payload["controls"]["portal_submit_performed"] is False
 
@@ -190,6 +199,10 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     assert "CMMC Phase II implementation was suspended" in checklist
     assert "Phase I self-assessment requirements remain" in checklist
     assert "READY_FOR_HUMAN_FINAL_SUBMIT_CLICK" in checklist
+    assert "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section identity" in checklist
+    assert "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval" in checklist
+    assert "--section pre-submit" in markdown
+    assert "never requests or accepts a Firm PIN or login credential" in markdown
     assert "robertashworth4444" not in combined.lower()
     assert "615-438-2502" not in combined
     assert module.PRIVATE_VALUE_MARKERS[0] not in combined.lower()

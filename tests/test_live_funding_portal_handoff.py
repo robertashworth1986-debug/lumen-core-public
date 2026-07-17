@@ -96,7 +96,21 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
         "open_gate_count": 50,
         "private_input_present": False,
         "private_values_exposed": False,
+        "private_capture_tool": (
+            "code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py"
+        ),
+        "private_capture_workflow": (
+            "grant_submissions/DLA26BZ03_NV011_MissionWeave/"
+            "MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md"
+        ),
+        "pre_submit_excludes_action_time_approval": True,
+        "credential_values_accepted": False,
+        "firm_pin_value_accepted": False,
     }
+    assert any(
+        "hidden sectioned MissionWeave collector" in action
+        for action in missionweave["next_safe_action"]
+    )
     assert any("ITAR/JCP" in stop for stop in missionweave["stop_conditions"])
     assert any("final DSIP submission" in stop for stop in missionweave["stop_conditions"])
     for item in queue:

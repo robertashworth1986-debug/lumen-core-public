@@ -99,6 +99,24 @@ def queue_item(
             "private_input_present": lane["action_gate_private_input_present"],
             "private_values_exposed": lane["action_gate_private_values_exposed"],
         }
+        if "action_gate_private_capture_tool" in lane:
+            item["action_gate"].update(
+                {
+                    "private_capture_tool": lane["action_gate_private_capture_tool"],
+                    "private_capture_workflow": lane[
+                        "action_gate_private_capture_workflow"
+                    ],
+                    "pre_submit_excludes_action_time_approval": lane[
+                        "action_gate_pre_submit_excludes_action_time_approval"
+                    ],
+                    "credential_values_accepted": lane[
+                        "action_gate_credential_values_accepted"
+                    ],
+                    "firm_pin_value_accepted": lane[
+                        "action_gate_firm_pin_value_accepted"
+                    ],
+                }
+            )
     if "deadline_support_status" in lane:
         item["deadline_support"] = {
             "status": lane["deadline_support_status"],
@@ -144,7 +162,8 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
             next_safe_action=[
                 "Verify the live DSIP countdown, organization linkage, and generated proposal number.",
                 "Use the proposal number through the existing builder, rerender Volume 2, regenerate the 15-file manifest, and require all hashes to pass.",
-                "Use the generated seven-volume checklist and ignored private action template; require the public gate to move from 0/50 to 50/50 without exposing values.",
+                "Run the hidden sectioned MissionWeave collector for identity, proposal, and compliance; it accepts no Firm PIN or credential and keeps action-time approval separate.",
+                "Use the generated seven-volume checklist and require the public gate to move from 0/50 to 50/50 without exposing values.",
                 "Populate Volumes 1-7 from the bounded package and reach the complete preview.",
             ],
             stop_conditions=[
