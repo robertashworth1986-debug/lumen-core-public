@@ -30,10 +30,10 @@ def test_register_routes_current_actions_without_duplicate_sends():
     records = {row["lane_id"]: row for row in payload["records"]}
 
     assert payload["schema"] == "lumencore.external_engagement_response_register.v1"
-    assert payload["summary"]["record_count"] == 6
+    assert payload["summary"]["record_count"] == 7
     assert payload["summary"]["immediate_human_action_count"] == 1
-    assert payload["summary"]["monitor_only_count"] == 5
-    assert payload["summary"]["do_not_duplicate_send_count"] == 5
+    assert payload["summary"]["monitor_only_count"] == 6
+    assert payload["summary"]["do_not_duplicate_send_count"] == 6
     assert payload["summary"]["autonomous_external_send_allowed"] is False
     assert payload["summary"]["autonomous_final_portal_submission_allowed"] is False
 
@@ -47,6 +47,12 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert records["epri_open_power_ai_mou"]["state"] == "OUTBOUND_SENT_MOU_PENDING"
     assert records["epri_open_power_ai_mou"]["do_not_duplicate_send"] is True
     assert records["epri_open_power_ai_mou"]["no_send_before"] == "2026-07-23"
+    assert records["georgia_patents_pro_bono_intake"]["state"] == (
+        "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING"
+    )
+    assert records["georgia_patents_pro_bono_intake"]["no_send_before"] == "2026-07-24"
+    assert records["georgia_patents_pro_bono_intake"]["do_not_duplicate_send"] is True
+    assert payload["source_artifacts"]["georgia_patents_engagement_receipt"]["present"] is True
     assert payload["source_artifacts"]["epri_engagement_receipt"]["present"] is True
     assert records["cdc_ai_acquisition_rfi"]["decision"] == "MONITOR_NO_REPLY_REQUIRED"
     assert records["lanl_vision_licensing_followup"]["no_send_before"] == "2026-07-23"
@@ -105,7 +111,7 @@ def test_mirror_receipt_matches_every_bounded_source():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 33
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 36
     assert receipt["all_sha256_matched_after_copy"] is True
     destination = Path(receipt["destination_root"])
     for artifact in receipt["artifacts"]:
@@ -133,6 +139,9 @@ def test_mirror_receipt_matches_every_bounded_source():
         "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
         "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
         "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json",
+        "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_RESPONSE_2026-07-16.md",
+        "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json",
+        "tests/test_georgia_patents_pro_bono_intake.py",
     }.issubset(mirrored_sources)
 
     assert "does not prove" in receipt["claim_boundary"]

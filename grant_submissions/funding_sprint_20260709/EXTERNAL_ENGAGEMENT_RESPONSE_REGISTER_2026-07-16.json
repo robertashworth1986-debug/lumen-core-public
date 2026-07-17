@@ -43,8 +43,8 @@
     }
   },
   "claim_boundary": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance.",
-  "direct_answer": "Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPRI administrative reply was sent and is now monitor-only with CDC, LANL, NASA, and Army; duplicate sends would reduce credibility.",
-  "generated_utc": "2026-07-17T04:17:52.599506+00:00",
+  "direct_answer": "Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPRI administrative reply and Georgia PATENTS intake inquiry were sent and are now monitor-only with CDC, LANL, NASA, and Army; duplicate sends would reduce credibility.",
+  "generated_utc": "2026-07-17T04:29:04.066487+00:00",
   "inbox_risk_filters": [
     {
       "decision": "DO_NOT_TREAT_AS_OFFICIAL_SAM_NOTICE",
@@ -55,6 +55,11 @@
       "decision": "DO_NOT_TREAT_AS_REQUIRED_FOR_FUND_REVIEW",
       "pattern": "Paid sponsor activation presented near a venture review",
       "safe_action": "Keep sponsor purchases separate from investment or accelerator evaluation unless written terms prove otherwise."
+    },
+    {
+      "decision": "PROCEDURAL_FACTS_ONLY",
+      "pattern": "Patent intake without a confidentiality relationship",
+      "safe_action": "Do not send unpublished specifications, claims, drawings, application identifiers, or private Patent Center records until a reviewed confidential channel exists."
     }
   ],
   "outputs": {
@@ -102,6 +107,26 @@
       "state": "OUTBOUND_SENT_MOU_PENDING",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md"
+      ]
+    },
+    {
+      "action_gate": "Reply only if Georgia PATENTS requests intake facts or directs the founder to a reviewed application channel; do not disclose unpublished application materials by ordinary email.",
+      "claim_boundary": "This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice.",
+      "deadline": null,
+      "decision": "MONITOR_NO_DUPLICATE",
+      "do_not_duplicate_send": true,
+      "lane_id": "georgia_patents_pro_bono_intake",
+      "next_action": "Monitor through July 23 while separately capturing the official Patent Center docket and using USPTO Pro Se procedural support.",
+      "no_send_before": "2026-07-24",
+      "organization": "Georgia PATENTS",
+      "record_sha256": "886fabc1d8b0f3c6cd0c9141235f3ec9deef3398dc58bb70afffff762215a275",
+      "response_artifact": "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "response_channel": "EMAIL",
+      "response_ready": false,
+      "send_now": false,
+      "state": "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING",
+      "supporting_artifacts": [
+        "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_RESPONSE_2026-07-16.md"
       ]
     },
     {
@@ -174,7 +199,7 @@
       "state": "SENT_VERIFIED_RESPONSE_PENDING"
     }
   ],
-  "register_sha256": "0e9b3a290a9c59e2353ced5577a36e8c3c079c784266a75b324165f898a1edfe",
+  "register_sha256": "7621edbfff685349e5d700ed985711901b818a164052d2023f7f592b54558cd0",
   "schema": "lumencore.external_engagement_response_register.v1",
   "source_artifacts": {
     "cdc_engagement_receipt": {
@@ -201,6 +226,18 @@
       "present": true,
       "sha256": "2DAC72C484BB39A6AB5891405C00AD68C66A2D99A5152D0E53CCBE8603FBAE01"
     },
+    "georgia_patents_engagement_receipt": {
+      "bytes": 1595,
+      "path": "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "present": true,
+      "sha256": "F7041E085AB62A100A41C35D8E056A0E7FE4F47FFC37D5C463FA68C5EF3C3F5F"
+    },
+    "georgia_patents_response_template": {
+      "bytes": 2822,
+      "path": "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_RESPONSE_2026-07-16.md",
+      "present": true,
+      "sha256": "1AFB40471C270B6DC7D69D2B07D7718D5D57DB8D16B1CB96F6B42FADE33D2A39"
+    },
     "lanl_engagement_receipt": {
       "bytes": 1414,
       "path": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json",
@@ -225,10 +262,10 @@
     "all_attachment_checks_pass": true,
     "autonomous_external_send_allowed": false,
     "autonomous_final_portal_submission_allowed": false,
-    "do_not_duplicate_send_count": 5,
+    "do_not_duplicate_send_count": 6,
     "immediate_human_action_count": 1,
-    "monitor_only_count": 5,
-    "record_count": 6,
+    "monitor_only_count": 6,
+    "record_count": 7,
     "verified_attachment_count": 4
   }
 }

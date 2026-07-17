@@ -1,0 +1,32 @@
+{
+  "schema": "lumencore.external_engagement_receipt.v1",
+  "recorded_date": "2026-07-16",
+  "engagement": {
+    "organization": "Georgia PATENTS",
+    "lane_id": "georgia_patents_pro_bono_intake",
+    "title": "Tennessee inventor pro bono prosecution-triage intake"
+  },
+  "submission": {
+    "status": "SENT_NO_ATTACHMENT",
+    "sent_at": "2026-07-17T00:27:26-04:00",
+    "subject": "Tennessee inventor - intake question for an already-filed utility application",
+    "recipient": "patents@gapatents.org",
+    "attachment": null,
+    "gmail_message_identifier_published": false,
+    "unpublished_application_material_sent": false
+  },
+  "acknowledgment": {
+    "status": "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING",
+    "received_at": null,
+    "reply_required": false,
+    "earliest_follow_up_date": "2026-07-24",
+    "bounded_summary": "A nonconfidential procedural inquiry asked whether Georgia PATENTS handles already-filed applications, which intake form applies, and whether urgent routing is available if an official notice reveals a near deadline."
+  },
+  "disclosure_boundary": {
+    "program_confidentiality_assumed": false,
+    "application_identifier_published": false,
+    "claims_or_drawings_sent": false,
+    "private_patent_center_records_sent": false
+  },
+  "claim_boundary": "This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice."
+}

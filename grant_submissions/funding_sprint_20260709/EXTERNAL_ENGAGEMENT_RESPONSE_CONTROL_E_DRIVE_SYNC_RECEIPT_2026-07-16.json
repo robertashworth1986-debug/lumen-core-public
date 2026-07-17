@@ -1,14 +1,14 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T04:20:15.5169412Z",
+  "created_utc": "2026-07-17T04:29:26.7472570Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_20260716",
-  "artifact_count": 33,
+  "artifact_count": 36,
   "all_sha256_matched_after_copy": true,
   "artifacts": [
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
-      "bytes": 19521,
-      "sha256": "F1EDA0FBD8027E268702839EC70FE1CC0B1758E5FCAE536574E8E95F6404131E",
+      "bytes": 21459,
+      "sha256": "3977AE0447530DA0058013D2CE4BFCA2F0F3A29E94BBD3B54A4FE44467FD43EF",
       "copy_sha256_matched": true
     },
     {
@@ -19,8 +19,8 @@
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
-      "bytes": 6618,
-      "sha256": "EDCF1B6BAC1D81F80C10805F4667B80D62BC3B1FCE8E94AF8818C39359F3E616",
+      "bytes": 7296,
+      "sha256": "8E4B4E6D30ED20ABD2EE4EDAF8C47A9A10BC354997164EF8A285E111404135C4",
       "copy_sha256_matched": true
     },
     {
@@ -37,8 +37,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-      "bytes": 9985,
-      "sha256": "058523AFE4C3D0A5E7D5AB7D6B2A79F7CD37F4B21B3C01597A6D467CDCDA1CC1",
+      "bytes": 12008,
+      "sha256": "9CF9BBE1B15D399354A6599D6E5B7AE3C82C42407FBE38A00367911C6826CD29",
       "copy_sha256_matched": true
     },
     {
@@ -50,7 +50,7 @@
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
       "bytes": 38019,
-      "sha256": "842A46F9B02C781F91860D0A1E967B0BA6C9BC0A61C12AA5BA3CBB914C8A84CA",
+      "sha256": "2DD6E5291A34A780CBBA3414B80187E9C2788C3878E98093A6EEEA79B7B9C0D7",
       "copy_sha256_matched": true
     },
     {
@@ -109,8 +109,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
-      "bytes": 13724,
-      "sha256": "44C953502C58223C3E1FD3E62DDA479E19B718CB8B59BEB147E99A7BC8308B0B",
+      "bytes": 16160,
+      "sha256": "0A0E2D63F3B1BE5DC6033366A4FE3D641FDD0BAD229B02254825EA3EB359A526",
       "copy_sha256_matched": true
     },
     {
@@ -201,6 +201,24 @@
       "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md",
       "bytes": 12886,
       "sha256": "63BDFAFEBADE22432A6D1FFC3509C8C5EE1685270144F12CC8124AE483BCA017",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_RESPONSE_2026-07-16.md",
+      "bytes": 2822,
+      "sha256": "1AFB40471C270B6DC7D69D2B07D7718D5D57DB8D16B1CB96F6B42FADE33D2A39",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "bytes": 1595,
+      "sha256": "F7041E085AB62A100A41C35D8E056A0E7FE4F47FFC37D5C463FA68C5EF3C3F5F",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_georgia_patents_pro_bono_intake.py",
+      "bytes": 2276,
+      "sha256": "E41120FD8B45B4783AB5549DC02088FB5257FC1DA3950E93B925E09FDFC2F16B",
       "copy_sha256_matched": true
     }
   ],

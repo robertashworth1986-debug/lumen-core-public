@@ -17,6 +17,12 @@ CDC_RECEIPT = SPRINT_DIR / "CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16
 LANL_RECEIPT = SPRINT_DIR / "LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json"
 EPRI_TEMPLATE = SPRINT_DIR / "EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md"
 EPRI_RECEIPT = SPRINT_DIR / "EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json"
+GEORGIA_PATENTS_TEMPLATE = (
+    SPRINT_DIR / "GEORGIA_PATENTS_PRO_BONO_INTAKE_RESPONSE_2026-07-16.md"
+)
+GEORGIA_PATENTS_RECEIPT = (
+    SPRINT_DIR / "GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json"
+)
 NASHVILLE_MANIFEST = (
     ROOT
     / "grant_submissions"
@@ -134,6 +140,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     cdc = read_json(CDC_RECEIPT)
     lanl = read_json(LANL_RECEIPT)
     epri = read_json(EPRI_RECEIPT)
+    georgia_patents = read_json(GEORGIA_PATENTS_RECEIPT)
     nashville = read_json(NASHVILLE_MANIFEST)
     nashville_resolution = read_json(NASHVILLE_FACT_RESOLUTION)
 
@@ -179,6 +186,23 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "supporting_artifacts": [rel(EPRI_TEMPLATE)],
             "next_action": "Monitor the existing thread for the DocuSign envelope or a clarification request; do not resend identity details.",
             "claim_boundary": epri["claim_boundary"],
+        },
+        {
+            "lane_id": "georgia_patents_pro_bono_intake",
+            "organization": "Georgia PATENTS",
+            "state": georgia_patents["acknowledgment"]["status"],
+            "deadline": None,
+            "decision": "MONITOR_NO_DUPLICATE",
+            "response_channel": "EMAIL",
+            "response_ready": False,
+            "send_now": False,
+            "do_not_duplicate_send": True,
+            "no_send_before": georgia_patents["acknowledgment"]["earliest_follow_up_date"],
+            "action_gate": "Reply only if Georgia PATENTS requests intake facts or directs the founder to a reviewed application channel; do not disclose unpublished application materials by ordinary email.",
+            "response_artifact": rel(GEORGIA_PATENTS_RECEIPT),
+            "supporting_artifacts": [rel(GEORGIA_PATENTS_TEMPLATE)],
+            "next_action": "Monitor through July 23 while separately capturing the official Patent Center docket and using USPTO Pro Se procedural support.",
+            "claim_boundary": georgia_patents["claim_boundary"],
         },
         {
             "lane_id": "cdc_ai_acquisition_rfi",
@@ -276,8 +300,8 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
         "direct_answer": (
             "Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPRI administrative "
-            "reply was sent and is now monitor-only with CDC, LANL, NASA, and Army; duplicate sends would "
-            "reduce credibility."
+            "reply and Georgia PATENTS intake inquiry were sent and are now monitor-only with CDC, LANL, NASA, "
+            "and Army; duplicate sends would reduce credibility."
         ),
         "summary": {
             "record_count": len(records),
@@ -304,6 +328,11 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
                 "decision": "DO_NOT_TREAT_AS_REQUIRED_FOR_FUND_REVIEW",
                 "safe_action": "Keep sponsor purchases separate from investment or accelerator evaluation unless written terms prove otherwise.",
             },
+            {
+                "pattern": "Patent intake without a confidentiality relationship",
+                "decision": "PROCEDURAL_FACTS_ONLY",
+                "safe_action": "Do not send unpublished specifications, claims, drawings, application identifiers, or private Patent Center records until a reviewed confidential channel exists.",
+            },
         ],
         "source_artifacts": {
             "external_submission_receipt": artifact_status(SUBMISSION_RECEIPT),
@@ -311,6 +340,8 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "lanl_engagement_receipt": artifact_status(LANL_RECEIPT),
             "epri_response_template": artifact_status(EPRI_TEMPLATE),
             "epri_engagement_receipt": artifact_status(EPRI_RECEIPT),
+            "georgia_patents_response_template": artifact_status(GEORGIA_PATENTS_TEMPLATE),
+            "georgia_patents_engagement_receipt": artifact_status(GEORGIA_PATENTS_RECEIPT),
             "nashville_application_manifest": artifact_status(NASHVILLE_MANIFEST),
             "nashville_human_fact_resolution": artifact_status(NASHVILLE_FACT_RESOLUTION),
         },
