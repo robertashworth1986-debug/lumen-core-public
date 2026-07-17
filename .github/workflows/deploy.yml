@@ -16,6 +16,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 concurrency:
   group: lumencore-production-site
@@ -28,6 +29,31 @@ jobs:
     environment: production
 
     steps:
+      - name: Mark production deployment pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+          TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' > /tmp/deploy-status.json
+          import json, os
+          print(json.dumps({
+              "state": "pending",
+              "target_url": os.environ["TARGET_URL"],
+              "description": "Bounded VPS deployment is running",
+              "context": "production/lumencore-vps",
+          }))
+          PY
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$REPOSITORY/statuses/$COMMIT_SHA" \
+            --data-binary @/tmp/deploy-status.json
+
       - name: Checkout
         uses: actions/checkout@v6
 
@@ -127,3 +153,45 @@ jobs:
           python3 -m json.tool "$tmp_data" >/dev/null
 
           echo "Production root, bounded evidence page, and health JSON are live."
+
+      - name: Publish production deployment receipt
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+          TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          case "$JOB_STATUS" in
+            success)
+              STATE=success
+              DESCRIPTION="Bounded VPS deployment passed all smoke tests"
+              ;;
+            cancelled)
+              STATE=error
+              DESCRIPTION="Bounded VPS deployment was cancelled"
+              ;;
+            *)
+              STATE=failure
+              DESCRIPTION="Bounded VPS deployment failed or rolled back"
+              ;;
+          esac
+          export STATE DESCRIPTION
+          python3 - <<'PY' > /tmp/deploy-status.json
+          import json, os
+          print(json.dumps({
+              "state": os.environ["STATE"],
+              "target_url": os.environ["TARGET_URL"],
+              "description": os.environ["DESCRIPTION"],
+              "context": "production/lumencore-vps",
+          }))
+          PY
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$REPOSITORY/statuses/$COMMIT_SHA" \
+            --data-binary @/tmp/deploy-status.json
