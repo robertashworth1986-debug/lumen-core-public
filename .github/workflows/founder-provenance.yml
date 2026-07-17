@@ -1,0 +1,67 @@
+name: Founder Provenance Gate
+
+on:
+  pull_request:
+    paths:
+      - 'AGENTS.md'
+      - 'config/founder_lexicon_v1.json'
+      - 'docs/FOUNDER_PROVENANCE_AND_BUILD_TIMELINE.md'
+      - 'docs/PRIVATE_CONVERSATION_AND_NOTEBOOK_AUDIT_PROTOCOL.md'
+      - 'docs/LUMA1_LUMA2_HANDOFF_PROTOCOL.md'
+      - 'docs/PUBLIC_VISUAL_EXPERIENCE_BUDGET.md'
+      - 'code/ops/founder_provenance_gate.py'
+      - 'tests/test_founder_provenance_gate.py'
+      - '.github/workflows/founder-provenance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Compile provenance gate
+        run: |
+          python -m py_compile \
+            code/ops/founder_provenance_gate.py \
+            tests/test_founder_provenance_gate.py
+
+      - name: Run focused tests
+        run: python -m unittest discover -s tests -p 'test_founder_provenance_gate.py' -v
+
+      - name: Validate founder lexicon and repo sources
+        run: python code/ops/founder_provenance_gate.py --root .
+
+      - name: Confirm public-source boundaries
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          forbidden = (
+              'raw private conversation archive',
+              'trademark registration established',
+              'patent priority established',
+              'externally validated by default',
+          )
+          paths = [
+              Path('docs/FOUNDER_PROVENANCE_AND_BUILD_TIMELINE.md'),
+              Path('docs/PRIVATE_CONVERSATION_AND_NOTEBOOK_AUDIT_PROTOCOL.md'),
+              Path('docs/LUMA1_LUMA2_HANDOFF_PROTOCOL.md'),
+          ]
+          for path in paths:
+              text = path.read_text(encoding='utf-8').lower()
+              for phrase in forbidden:
+                  if phrase in text:
+                      raise SystemExit(f'{path}: forbidden phrase: {phrase}')
+          print('public provenance boundaries present')
+          PY
