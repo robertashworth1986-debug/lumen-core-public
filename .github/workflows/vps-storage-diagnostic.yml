@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 concurrency:
   group: lumencore-vps-storage-diagnostic
@@ -21,6 +22,31 @@ jobs:
     environment: production
 
     steps:
+      - name: Mark storage diagnostic pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+          TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' > /tmp/storage-diagnostic-status.json
+          import json, os
+          print(json.dumps({
+              "state": "pending",
+              "target_url": os.environ["TARGET_URL"],
+              "description": "Read-only VPS storage diagnostic is running",
+              "context": "diagnostic/lumencore-vps-storage",
+          }))
+          PY
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$REPOSITORY/statuses/$COMMIT_SHA" \
+            --data-binary @/tmp/storage-diagnostic-status.json
+
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
@@ -66,3 +92,45 @@ jobs:
           path: /tmp/lumencore-vps-storage-diagnostic.txt
           if-no-files-found: error
           retention-days: 7
+
+      - name: Publish storage diagnostic receipt
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+          TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          case "$JOB_STATUS" in
+            success)
+              STATE=success
+              DESCRIPTION="Read-only VPS storage diagnostic completed"
+              ;;
+            cancelled)
+              STATE=error
+              DESCRIPTION="VPS storage diagnostic was cancelled"
+              ;;
+            *)
+              STATE=failure
+              DESCRIPTION="VPS storage diagnostic failed"
+              ;;
+          esac
+          export STATE DESCRIPTION
+          python3 - <<'PY' > /tmp/storage-diagnostic-status.json
+          import json, os
+          print(json.dumps({
+              "state": os.environ["STATE"],
+              "target_url": os.environ["TARGET_URL"],
+              "description": os.environ["DESCRIPTION"],
+              "context": "diagnostic/lumencore-vps-storage",
+          }))
+          PY
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$REPOSITORY/statuses/$COMMIT_SHA" \
+            --data-binary @/tmp/storage-diagnostic-status.json
