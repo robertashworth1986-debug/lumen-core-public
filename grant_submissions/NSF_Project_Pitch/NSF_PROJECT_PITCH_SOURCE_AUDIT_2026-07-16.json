@@ -1,0 +1,48 @@
+{
+  "schema": "lumencore.nsf_project_pitch_source_audit.v1",
+  "as_of_date": "2026-07-16",
+  "official_facts": {
+    "field_limits": {
+      "Technology Innovation": 3500,
+      "Technical Objectives and Challenges": 3500,
+      "Market Opportunity": 1750,
+      "Company and Team": 1750
+    },
+    "typical_response_time": "1-2 months",
+    "only_one_pending_pitch": true,
+    "full_proposal_requires_invitation": true,
+    "current_invited_full_proposal_deadline": "2026-11-04",
+    "july_27_2026_currently_listed": false
+  },
+  "local_field_counts": {
+    "Technology Innovation": {
+      "characters": 3070,
+      "limit": 3500,
+      "remaining": 430,
+      "passes": true
+    },
+    "Technical Objectives and Challenges": {
+      "characters": 2419,
+      "limit": 3500,
+      "remaining": 1081,
+      "passes": true
+    },
+    "Market Opportunity": {
+      "characters": 1517,
+      "limit": 1750,
+      "remaining": 233,
+      "passes": true
+    },
+    "Company and Team": {
+      "characters": 1223,
+      "limit": 1750,
+      "remaining": 527,
+      "passes": true
+    }
+  },
+  "official_sources": [
+    "https://seedfund.nsf.gov/apply/project-pitch/",
+    "https://seedfund.nsf.gov/solicitations/"
+  ],
+  "claim_boundary": "Official schedule and field controls do not prove portal eligibility, invitation, submission, review, or award."
+}

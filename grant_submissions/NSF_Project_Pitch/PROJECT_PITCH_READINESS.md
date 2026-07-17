@@ -19,9 +19,9 @@ Updated: July 16, 2026
   `PROJECT_PITCH_PASTE_CHECK_2026-07-16.md`.
 - Routing and deadline semantics are frozen in
   `NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json`.
-- July 27, 2026 is a Phase I full-proposal deadline, not a Project Pitch
-  deadline. No verified NSF invitation means that deadline is not currently
-  reachable.
+- The official solicitation schedule was rechecked July 16, 2026. It lists
+  November 4, 2026 for eligible invited full proposals and does not currently
+  list July 27. No full-proposal date is reachable without a valid invitation.
 - November 4, 2026 is a full-proposal planning target only if NSF issues a
   valid invitation in time.
 - NSF 26-510 is the primary route. NSF 26-511 remains an alternate only if
@@ -42,6 +42,9 @@ Updated: July 16, 2026
 - Team gaps and evidence boundaries are explicit.
 - Primary topic selected for portal entry: Artificial Intelligence, with
   emphasis on trustworthy AI.
+- The innovation-origin requirement is answered with the repeated benchmark
+  observation that model leadership changed by series, horizon, and regime
+  while aggregate scores concealed unsupported forecasts.
 - Official duplicate-pitch gate captured: only one Project Pitch can be
   pending at a time, and a business with a pending Project Pitch, open
   invitation, or full SBIR/STTR Phase I proposal under review must wait before

@@ -13,9 +13,12 @@
     "Technology Innovation": 3500
   },
   "full_proposal": {
+    "current_official_schedule_checked_on": "2026-07-16",
+    "current_official_schedule_deadline": "2026-11-04",
     "invitation_required": true,
     "invitation_verified": false,
     "july_27_2026_reachable": false,
+    "july_27_2026_currently_listed": false,
     "next_planning_target": "2026-11-04",
     "submission_allowed": false
   },

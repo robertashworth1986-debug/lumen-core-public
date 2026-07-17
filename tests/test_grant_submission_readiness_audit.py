@@ -147,6 +147,9 @@ def test_nsf_pitch_fields_stay_under_portal_limits():
     assert routing["full_proposal"]["invitation_verified"] is False
     assert routing["full_proposal"]["submission_allowed"] is False
     assert routing["full_proposal"]["july_27_2026_reachable"] is False
+    assert routing["full_proposal"]["july_27_2026_currently_listed"] is False
+    assert routing["full_proposal"]["current_official_schedule_checked_on"] == "2026-07-16"
+    assert routing["full_proposal"]["current_official_schedule_deadline"] == "2026-11-04"
     assert routing["full_proposal"]["next_planning_target"] == "2026-11-04"
 
 
@@ -167,6 +170,7 @@ def test_nsf_pitch_is_claim_bounded_and_contains_required_reviewer_content():
         "competitors include",
         "team plan",
         "negative result",
+        "originated in repeated internal benchmark work",
     ):
         assert required in lowered
 
@@ -175,3 +179,4 @@ def test_nsf_pitch_is_claim_bounded_and_contains_required_reviewer_content():
 
     assert "does not claim an NSF invitation" in packet
     assert "does not claim" in lowered
+    assert "july 27 is not listed on the current schedule" in lowered

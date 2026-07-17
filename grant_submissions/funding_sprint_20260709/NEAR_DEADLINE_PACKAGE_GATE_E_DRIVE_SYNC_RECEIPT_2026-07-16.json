@@ -1,0 +1,147 @@
+{
+  "schema": "lumencore.near_deadline_package_gate_e_drive_sync.v1",
+  "generated_utc": "2026-07-17T04:50:08.3172345Z",
+  "source_root": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2",
+  "destination_root": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716",
+  "artifact_count": 17,
+  "matched_count": 17,
+  "all_matched": true,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\code\\ops\\BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py",
+      "bytes": 33806,
+      "sha256": "227b8a3a905e7492d98e16ace187e0c84c1f573f99db1c98216fda2aabc2889f",
+      "mirror_sha256": "227b8a3a905e7492d98e16ace187e0c84c1f573f99db1c98216fda2aabc2889f",
+      "matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_PACKAGE_DECISION_GATE.py",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\code\\ops\\BUILD_NEAR_DEADLINE_PACKAGE_DECISION_GATE.py",
+      "bytes": 15775,
+      "sha256": "b207bc9007580a896d5ea74aa012f2104432fd02d1f1a07510bb5903144b4583",
+      "mirror_sha256": "b207bc9007580a896d5ea74aa012f2104432fd02d1f1a07510bb5903144b4583",
+      "matched": true
+    },
+    {
+      "source": "tests/test_grant_submission_readiness_audit.py",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\tests\\test_grant_submission_readiness_audit.py",
+      "bytes": 8299,
+      "sha256": "701ad13aeae7108f8825d049524ee92004a4f89c1b3830033feea20c78295f2c",
+      "mirror_sha256": "701ad13aeae7108f8825d049524ee92004a4f89c1b3830033feea20c78295f2c",
+      "matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_package_decision_gate.py",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\tests\\test_near_deadline_package_decision_gate.py",
+      "bytes": 3176,
+      "sha256": "6132b629da07d89a3a98e054af8e9508d83788e8323130aa20dadcee69256563",
+      "mirror_sha256": "6132b629da07d89a3a98e054af8e9508d83788e8323130aa20dadcee69256563",
+      "matched": true
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\grant_submissions\\NSF_Project_Pitch\\NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json",
+      "bytes": 2313,
+      "sha256": "6d0d9f8656c12cbb20c991523adc07064d1947249d6a10245fcc0c5ea9cac3ab",
+      "mirror_sha256": "6d0d9f8656c12cbb20c991523adc07064d1947249d6a10245fcc0c5ea9cac3ab",
+      "matched": true
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PASTE_CHECK_2026-07-16.md",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\grant_submissions\\NSF_Project_Pitch\\PROJECT_PITCH_PASTE_CHECK_2026-07-16.md",
+      "bytes": 1440,
+      "sha256": "41d1c8d8dce66c450f4ed5be5212ec687254a8a4e837f893e83c9a6b32575c36",
+      "mirror_sha256": "41d1c8d8dce66c450f4ed5be5212ec687254a8a4e837f893e83c9a6b32575c36",
+      "matched": true
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\grant_submissions\\NSF_Project_Pitch\\PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md",
+      "bytes": 10740,
+      "sha256": "75ed8ece7ddbdf0bf3b5ef1a9c3e33c74fec53bcdded9334efc1cd62bfe99b8b",
+      "mirror_sha256": "75ed8ece7ddbdf0bf3b5ef1a9c3e33c74fec53bcdded9334efc1cd62bfe99b8b",
+      "matched": true
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_READINESS.md",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\grant_submissions\\NSF_Project_Pitch\\PROJECT_PITCH_READINESS.md",
+      "bytes": 4023,
+      "sha256": "70bba9fe65c4ac4aadd72dc7f0e26d412a48669d7962e1cb6dddf87d1c27adf2",
+      "mirror_sha256": "70bba9fe65c4ac4aadd72dc7f0e26d412a48669d7962e1cb6dddf87d1c27adf2",
+      "matched": true
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_SOURCE_AUDIT_2026-07-16.json",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\grant_submissions\\NSF_Project_Pitch\\NSF_PROJECT_PITCH_SOURCE_AUDIT_2026-07-16.json",
+      "bytes": 1398,
+      "sha256": "aa035c1be649f896f687ffd55a39c3a974a4b5a3f375859a618fa82612f44968",
+      "mirror_sha256": "aa035c1be649f896f687ffd55a39c3a974a4b5a3f375859a618fa82612f44968",
+      "matched": true
+    },
+    {
+      "source": "grant_submissions/TOP5_SUBMISSION_READINESS_AUDIT_2026-06-19.md",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\grant_submissions\\TOP5_SUBMISSION_READINESS_AUDIT_2026-06-19.md",
+      "bytes": 7029,
+      "sha256": "c556dccb06225f5a08900a0700befb4e61a2466e4aef124beda034dc1371fb63",
+      "mirror_sha256": "c556dccb06225f5a08900a0700befb4e61a2466e4aef124beda034dc1371fb63",
+      "matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\grant_submissions\\funding_sprint_20260709\\FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md",
+      "bytes": 2114,
+      "sha256": "6614f9d452565f9e5f54b3e70b45e93f112dd1293a8845e43489e339d34b0819",
+      "mirror_sha256": "6614f9d452565f9e5f54b3e70b45e93f112dd1293a8845e43489e339d34b0819",
+      "matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-16.md",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\grant_submissions\\funding_sprint_20260709\\NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-16.md",
+      "bytes": 2815,
+      "sha256": "6015754dbe81d859f6d93ef1594306b60cb0e4524c6fbfd5cb27331bb0a01a47",
+      "mirror_sha256": "6015754dbe81d859f6d93ef1594306b60cb0e4524c6fbfd5cb27331bb0a01a47",
+      "matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-16.json",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\grant_submissions\\funding_sprint_20260709\\source_attachments\\W912HZ26SC005\\SOURCE_MANIFEST_2026-07-16.json",
+      "bytes": 1172,
+      "sha256": "5a9e6cfc98e70c452e90f5a51dc16c64afdafd8fa4daf654cd2d5712bbf67894",
+      "mirror_sha256": "5a9e6cfc98e70c452e90f5a51dc16c64afdafd8fa4daf654cd2d5712bbf67894",
+      "matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\grant_submissions\\funding_sprint_20260709\\source_attachments\\W912HZ26SC005\\CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "bytes": 162903,
+      "sha256": "ea456c2057dbe40128038ffff3e1eb5c055d8cd36e8af24ecd2ec5e8e5cde209",
+      "mirror_sha256": "ea456c2057dbe40128038ffff3e1eb5c055d8cd36e8af24ecd2ec5e8e5cde209",
+      "matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/HPCMP_SDC_FAQ_9June2026.pdf",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\grant_submissions\\funding_sprint_20260709\\source_attachments\\W912HZ26SC005\\HPCMP_SDC_FAQ_9June2026.pdf",
+      "bytes": 81662,
+      "sha256": "6a650f8e22331ef97ab1837a1035527c8c778a0d5afa9f27580a91977557d187",
+      "mirror_sha256": "6a650f8e22331ef97ab1837a1035527c8c778a0d5afa9f27580a91977557d187",
+      "matched": true
+    },
+    {
+      "source": "out/ops/near_deadline_package_decision_gate_latest.json",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\out\\ops\\near_deadline_package_decision_gate_latest.json",
+      "bytes": 6382,
+      "sha256": "6df4cd4886109757ff571a041e247b37b04719cf0d14044c17df24cc28a39fca",
+      "mirror_sha256": "6df4cd4886109757ff571a041e247b37b04719cf0d14044c17df24cc28a39fca",
+      "matched": true
+    },
+    {
+      "source": "out/ops/grant_submission_readiness_audit_latest.json",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\NEAR_DEADLINE_PACKAGE_GATE_20260716\\out\\ops\\grant_submission_readiness_audit_latest.json",
+      "bytes": 24863,
+      "sha256": "a6b4c64d159c5a2c33d8f61fc15af6f48abdb9260150f572b7b4fa7b6ca41fbb",
+      "mirror_sha256": "a6b4c64d159c5a2c33d8f61fc15af6f48abdb9260150f572b7b4fa7b6ca41fbb",
+      "matched": true
+    }
+  ]
+}

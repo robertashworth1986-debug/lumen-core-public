@@ -1,0 +1,25 @@
+{
+  "schema": "lumencore.erdc_sdc_source_manifest.v1",
+  "as_of_date": "2026-07-16",
+  "opportunity_number": "W912HZ26SC005",
+  "files": [
+    {
+      "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "exists": true,
+      "bytes": 162903,
+      "sha256": "ea456c2057dbe40128038ffff3e1eb5c055d8cd36e8af24ecd2ec5e8e5cde209",
+      "expected_pages": 7,
+      "official_url": "https://www.erdcwerx.org/wp-content/uploads/2026/05/CSO-HPCMP-SDC-30April2026-FINAL.pdf"
+    },
+    {
+      "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/HPCMP_SDC_FAQ_9June2026.pdf",
+      "exists": true,
+      "bytes": 81662,
+      "sha256": "6a650f8e22331ef97ab1837a1035527c8c778a0d5afa9f27580a91977557d187",
+      "expected_pages": 6,
+      "official_url": "https://www.erdcwerx.org/wp-content/uploads/2026/06/HPCMP-SDC-FAQ-Website-9June2026.pdf"
+    }
+  ],
+  "all_present": true,
+  "claim_boundary": "These files establish public solicitation requirements only; they do not establish selection, funding availability, award, or technical validation."
+}

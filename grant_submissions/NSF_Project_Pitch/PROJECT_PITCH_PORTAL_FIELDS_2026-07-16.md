@@ -30,7 +30,7 @@ LumenCore proposes a trustworthy AI architecture that treats model-family routin
 
 This differs from conventional forecasting APIs, AutoML systems, and monitoring dashboards because the product is not merely selecting the lowest recent error model. It is attempting to make model authority auditable: what data were allowed, what validation window justified the answer, what uncertainty was calibrated, what changed, and why the system answered or abstained. That is the technical basis for a durable product advantage in regulated or safety-sensitive operations where an unsupported confident answer can be worse than no answer.
 
-The high-risk technical innovation is an evidence-gated router that can learn when not to decide. The research question is not whether LumenCore can produce another point forecast; it is whether a system can combine leakage-resistant model selection, calibrated uncertainty, and auditable abstention in a way that generalizes across heterogeneous time-series sectors without hidden overfitting or silent subgroup failure.
+The high-risk technical innovation is an evidence-gated router that can learn when not to decide. The architecture originated in repeated internal benchmark work where a model family that led on one series, horizon, or operating regime often failed elsewhere, while aggregate scores concealed unsupported forecasts. The research question is not whether LumenCore can produce another point forecast; it is whether a system can combine leakage-resistant model selection, calibrated uncertainty, and auditable abstention in a way that generalizes across heterogeneous time-series sectors without hidden overfitting or silent subgroup failure.
 
 Existing work establishes engineering feasibility but also shows why the research is needed. LumenCore has run frozen multi-family benchmarks, streaming anomaly and regime-change components, deterministic manifests, and API prototypes. A leakage-resistant V7 validation rejected a universal forecasting-edge claim: median improvement was zero and no series passed every robustness gate. That negative result is central to the proposed innovation. Phase I will convert the current prototype into a validated trustworthy-AI product that knows when to route, when to abstain, and how to prove what evidence supported each response.
 
@@ -65,9 +65,9 @@ The founder's advantage is speed of integration across data ingestion, evaluatio
 ## Routing Status
 
 - The Project Pitch is the current rolling gate; NSF does not list July 27 as a Project Pitch deadline.
-- July 27, 2026 is a full-proposal deadline and is not reachable without an official NSF invitation.
+- The current official solicitation schedule, rechecked July 16, 2026, lists November 4, 2026 for eligible invited full proposals. July 27 is not listed on the current schedule.
 - No Project Pitch invitation was verified in the reviewed Gmail results as of July 16, 2026.
-- The next full-proposal planning target is November 4, 2026, only if NSF issues a valid invitation in time.
+- November 4, 2026 is a full-proposal planning target only if NSF issues a valid invitation in time.
 - Before any portal action, verify that the company has no pending Project Pitch, open invitation, or Phase I proposal under review.
 
 ## Submission Boundary

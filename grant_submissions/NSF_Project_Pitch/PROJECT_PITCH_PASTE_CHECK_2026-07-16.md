@@ -9,7 +9,8 @@ Canonical source: `PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md`
 - Confirm the exact legal company name and founder/PI title shown in the NSF account.
 - Confirm that no Project Pitch is pending.
 - Confirm that no invitation is open and no Phase I full proposal is under review.
-- Do not treat July 27 as a Project Pitch deadline.
+- The official schedule rechecked July 16 lists November 4, 2026 for eligible invited full proposals; it does not currently list July 27.
+- Do not treat any full-proposal date as a Project Pitch deadline or as reachable without an invitation.
 - Use NSF 26-510 as the primary fit unless NSF staff confirms 26-511 instrumentation eligibility.
 
 ## Field Controls
