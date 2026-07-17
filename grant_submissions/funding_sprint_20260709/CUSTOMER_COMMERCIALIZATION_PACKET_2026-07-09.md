@@ -14,7 +14,7 @@ LumenCore sells proof-to-pilot infrastructure for reviewers who need complex R&D
 - Customer segments: `5`
 - Productized offers: `5`
 - Buyer proof checks: `8`
-- Traction lanes: `19`
+- Traction lanes: `20`
 - Decision lanes: `19`
 - Data-room Markdown artifacts: `51`
 - Data-room machine controls: `52`
@@ -36,7 +36,7 @@ LumenCore sells proof-to-pilot infrastructure for reviewers who need complex R&D
 - Paying customer claimed: `false`
 - Customer result claimed: `false`
 - Production deployment claimed: `false`
-- Packet SHA-256: `27c637e885e0290b42d12b6387db02e4887d96bb7eead3a5374b177a6d7b2a2b`
+- Packet SHA-256: `790927905252b9d759f50dc3eff4a25213ec144c44b6a43c86991c5061cba029`
 
 ## Business Model
 
@@ -181,8 +181,8 @@ LumenCore sells proof-to-pilot infrastructure for reviewers who need complex R&D
 
 ## Evidence Artifacts
 
-- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md` sha256=`c935210e86e3cf4f217eec9edf04814067a829be7d93fe90093f3839b45490d9` bytes=`23864`
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f` bytes=`52071`
+- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md` sha256=`f08ff5e8314c58d9826f69ffdc6fcbf531808254402b3cdee9a3281fb1561e35` bytes=`23864`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262` bytes=`54115`
 - `present` `grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md` sha256=`b6257f98e9cad35a244aa02264dec019204c5ede27357cdadba76a1019a9fac6` bytes=`8029`
 - `present` `grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md` sha256=`f21c4af99226e6cd2554dc626df51e02f1dd909bb6fdf7095fdbda1dacb1df78` bytes=`8625`
 - `present` `grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md` sha256=`ae8a41916c20207d4a2732d58c0e09a9a089809496696dfd822543751d27c13c` bytes=`10709`

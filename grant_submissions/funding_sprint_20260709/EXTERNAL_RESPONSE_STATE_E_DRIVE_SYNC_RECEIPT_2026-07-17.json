@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T21:18:25.494161Z",
+  "created_utc": "2026-07-17T21:49:19.492358Z",
   "destination_root": "E:/LumaProofVault/OUTREACH/EXTERNAL_RESPONSE_STATE_20260717",
   "artifact_count": 74,
   "all_sha256_matched_after_copy": true,
@@ -189,8 +189,8 @@
     },
     {
       "source": "code/ops/BUILD_TRACTION_OPPORTUNITY_INTAKE_LEDGER.py",
-      "bytes": 53657,
-      "sha256": "5D819D642FE964799997423AF6F88748F9F1764DD5C31F20529CC8F13C4C886A",
+      "bytes": 55623,
+      "sha256": "08951D378EBD104921EE32BE017DDD717A4076FD5D41FC449CB810FE2A8DC41C",
       "copy_sha256_matched": true
     },
     {
@@ -207,8 +207,8 @@
     },
     {
       "source": "code/ops/BUILD_REVIEWER_CONCIERGE_PACKET.py",
-      "bytes": 21605,
-      "sha256": "A0D2BB944FDB42762FA9A4A95F7ECECFE03A899A3FABCDC3F6DCF0C8F8230198",
+      "bytes": 22439,
+      "sha256": "26A46F4E4CA32295989C21E2B9636639CB618B9C71A20DEAC193D43EE9762B3C",
       "copy_sha256_matched": true
     },
     {
@@ -219,8 +219,8 @@
     },
     {
       "source": "tests/test_traction_opportunity_intake_ledger.py",
-      "bytes": 8906,
-      "sha256": "F3152DDB78877A00C3BD219E7448F693D2544ED3D2EF0D304542CEE4EA53C16F",
+      "bytes": 9416,
+      "sha256": "9C68AA4E6BF890B3E6014C1027B1FE3C0EF3502CEA540F76FA367DADB3177E53",
       "copy_sha256_matched": true
     },
     {
@@ -237,8 +237,8 @@
     },
     {
       "source": "tests/test_reviewer_concierge_packet.py",
-      "bytes": 3895,
-      "sha256": "20AE15EAEFC613808449CD127A6BB9CDE47C8B197B983C86BEDBC07F4E85B76B",
+      "bytes": 4138,
+      "sha256": "BFF4BCF770FD7E86398957F74C21B41C19009A61380778F26AD19E6893B52DE3",
       "copy_sha256_matched": true
     },
     {
@@ -267,20 +267,20 @@
     },
     {
       "source": "out/ops/traction_opportunity_intake_ledger_latest.json",
-      "bytes": 85341,
-      "sha256": "FB88AC9D2B61D3C07EF04EEAA33756DAE839B64271C9D5DFD1893E8AD061F7B8",
+      "bytes": 88416,
+      "sha256": "D06A06B44C4DB3F802544101B71A9275FE8181AC6F40E39193828554B327AF78",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/traction_opportunity_intake_ledger.json",
-      "bytes": 85341,
-      "sha256": "FB88AC9D2B61D3C07EF04EEAA33756DAE839B64271C9D5DFD1893E8AD061F7B8",
+      "bytes": 88416,
+      "sha256": "D06A06B44C4DB3F802544101B71A9275FE8181AC6F40E39193828554B327AF78",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
-      "bytes": 52071,
-      "sha256": "9CDCAD79BB7BF3041CE817F832D8CBFAF58F6076D30211F8D5D4E6D192D9DE9F",
+      "bytes": 54115,
+      "sha256": "4F7520B12DA081B0395F4EA821FE2BE7BB8C6DCEC6F6926908D112FE9B16B262",
       "copy_sha256_matched": true
     },
     {
@@ -321,110 +321,110 @@
     },
     {
       "source": "out/ops/reviewer_concierge_packet_latest.json",
-      "bytes": 49973,
-      "sha256": "F908B067A209E28CA9532B28A4C44DF42171A5E3D172F63A70402198A102C421",
+      "bytes": 53457,
+      "sha256": "33EC1093B3A00B546B66AE9DBB4704C0BE5B4A8BA623C1458A09A702D56B6DF1",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/reviewer_concierge_packet.json",
-      "bytes": 49973,
-      "sha256": "F908B067A209E28CA9532B28A4C44DF42171A5E3D172F63A70402198A102C421",
+      "bytes": 53457,
+      "sha256": "33EC1093B3A00B546B66AE9DBB4704C0BE5B4A8BA623C1458A09A702D56B6DF1",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
-      "bytes": 36127,
-      "sha256": "44DDF0C67FF6291892AD18809C6381B33329A54F5502CBFE93A19508C05E6168",
+      "bytes": 38632,
+      "sha256": "C3B908BB414D378365507F562143DA48AA08245603C3E77441E96A5911C8C33D",
       "copy_sha256_matched": true
     },
     {
       "source": "out/ops/human_action_docket_latest.json",
-      "bytes": 30936,
-      "sha256": "23E20DA5AD34EA6477C487B5C6D7F9045A5E4BEC471AF7599045275646B6A7A6",
+      "bytes": 32727,
+      "sha256": "97D0FE37206FF4E13A8F09A3904848D847529352C381C91B7AF87FC262C862B6",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/human_action_docket.json",
-      "bytes": 30936,
-      "sha256": "23E20DA5AD34EA6477C487B5C6D7F9045A5E4BEC471AF7599045275646B6A7A6",
+      "bytes": 32727,
+      "sha256": "97D0FE37206FF4E13A8F09A3904848D847529352C381C91B7AF87FC262C862B6",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
-      "bytes": 22454,
-      "sha256": "CD2DD829F5F383D69EA7D55934E3C15B6F5ED86852463E1D373481189F8F155A",
+      "bytes": 23545,
+      "sha256": "421850FA2215FBC5733137CC4BDB1EB354F1E9CCB24C12A26AF91EBCA34741AD",
       "copy_sha256_matched": true
     },
     {
       "source": "out/ops/reviewer_decision_brief_latest.json",
       "bytes": 29965,
-      "sha256": "3930B7C561E1F8D3BA31C0F201FD861B8C3975B2D8CC98987EAE3BF0218AC50A",
+      "sha256": "7ADFC419C8B8EC7AF50DDBF47406C6781D77CC5EE191F014132EB09ED23A3FE8",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/reviewer_decision_brief.json",
       "bytes": 29965,
-      "sha256": "3930B7C561E1F8D3BA31C0F201FD861B8C3975B2D8CC98987EAE3BF0218AC50A",
+      "sha256": "7ADFC419C8B8EC7AF50DDBF47406C6781D77CC5EE191F014132EB09ED23A3FE8",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
       "bytes": 23864,
-      "sha256": "C935210E86E3CF4F217EEC9EDF04814067A829BE7D93FE90093F3839B45490D9",
+      "sha256": "F08FF5E8314C58D9826F69FFDC6FCBF531808254402B3CDEE9A3281FB1561E35",
       "copy_sha256_matched": true
     },
     {
       "source": "out/ops/customer_commercialization_packet_latest.json",
       "bytes": 14800,
-      "sha256": "E4448BF9F99ACC50D29AB0216AFE587FB66DAB4F9D39157DECC6CDC554CC283A",
+      "sha256": "94F16C53934FD93A3AF947063E0E8BE8CBE4DEE1DE19E01DD932C241AC8BC5DD",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/customer_commercialization_packet.json",
       "bytes": 14800,
-      "sha256": "E4448BF9F99ACC50D29AB0216AFE587FB66DAB4F9D39157DECC6CDC554CC283A",
+      "sha256": "94F16C53934FD93A3AF947063E0E8BE8CBE4DEE1DE19E01DD932C241AC8BC5DD",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
       "bytes": 11451,
-      "sha256": "9C4CF95F1D749CDE316F02EB4FB9AB0938290089D312EBB121572C7B304E31CC",
+      "sha256": "AF3FF3067F35B59571B5C40D98DA295F70671752D427C9D5F980955FC831930D",
       "copy_sha256_matched": true
     },
     {
       "source": "out/ops/reviewer_investor_fast_lane_router_latest.json",
       "bytes": 23856,
-      "sha256": "930F8EB67EC4C1CB60988AB58FB8B04B3597721DB47D653ED699ED114737AB0E",
+      "sha256": "1B8EFBD0992C1EC94976DB6EEE57CA6C4EDC25E5741E4AB3F324478F94A515D9",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/reviewer_investor_fast_lane_router.json",
       "bytes": 23856,
-      "sha256": "930F8EB67EC4C1CB60988AB58FB8B04B3597721DB47D653ED699ED114737AB0E",
+      "sha256": "1B8EFBD0992C1EC94976DB6EEE57CA6C4EDC25E5741E4AB3F324478F94A515D9",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md",
       "bytes": 15628,
-      "sha256": "58546A323724B656D85D355D9E7C36C4A0B56B619FC2BDE6433CE30BE4F6B541",
+      "sha256": "8DED436AE8B126F2EDA45B492C738B97CEF2968686088C22BB62B90DCC99779C",
       "copy_sha256_matched": true
     },
     {
       "source": "out/ops/agency_submission_assembly_gate_latest.json",
       "bytes": 72601,
-      "sha256": "5AD01B9E63D7EDBDFEA82D415656636AFEAF495F5388083EA7029BD08DFC7733",
+      "sha256": "8CB8A615C902781677FD3A18683392C52849CBD748605F08D5392423CD89812D",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/agency_submission_assembly_gate.json",
       "bytes": 72601,
-      "sha256": "5AD01B9E63D7EDBDFEA82D415656636AFEAF495F5388083EA7029BD08DFC7733",
+      "sha256": "8CB8A615C902781677FD3A18683392C52849CBD748605F08D5392423CD89812D",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
       "bytes": 35113,
-      "sha256": "172B5511A3FC25C9F3C0CDF6FBDC401F1390F37E982D5F1DE0BA7AC8FEDE3360",
+      "sha256": "3E8AD5470415D5694F3AD221487B2EFC56F79C78497CDEBF4039662A00A3BCFD",
       "copy_sha256_matched": true
     },
     {

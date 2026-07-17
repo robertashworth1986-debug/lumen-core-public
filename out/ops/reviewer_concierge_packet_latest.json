@@ -24,17 +24,17 @@
           "sha256": "ae8a41916c20207d4a2732d58c0e09a9a089809496696dfd822543751d27c13c"
         },
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         }
       ],
       "audience": "federal registration or contracting-readiness reviewer",
       "best_first_read": "SAM submission receipt, account activation docket, and federal protocol packet.",
       "channel": "federal_registration",
       "claim_boundary": "Submitted is not Active; no award eligibility, active registration, or CAGE validation is claimed until SAM confirms it.",
-      "concierge_card_sha256": "c7ff28a48e34a25fc0bc563e0d198f4f585168e01b838cd3791c3e1727b90323",
+      "concierge_card_sha256": "5fab6deb4fb1aef6d68bb77950d5df970906147306a46a0be4478085c3dfbc1b",
       "deadline_or_gate": "SAM confirmation says the entity registration remains Submitted until IRS TIN validation and DLA CAGE validation complete; DLA may contact the Government Business POC.",
       "decision_question": "What external validation or entity-administrator action is needed before active-registration claims are safe?",
       "fit_score": 100,
@@ -63,10 +63,10 @@
           "sha256": "a99cb47050718693df37e5903c762c425c6797add294b614209773e7f6d16686"
         },
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         },
         {
           "bytes": 4065,
@@ -91,7 +91,7 @@
       "best_first_read": "Live proof stack, build scope, validation workflow, and productization gaps.",
       "channel": "venture_engineering",
       "claim_boundary": "The mailbox record proves only that two near-duplicate follow-ups were sent and no inbound reply was observed at reconciliation time. It does not prove interest, rejection, selection, funding, or validation.",
-      "concierge_card_sha256": "726e1a18d36273db7adf32c8f8aea35975e44243dbb8dc23fac4d01fbd142867",
+      "concierge_card_sha256": "7a4f3703369a992feabbe2e70198400dbbee2bcbfc48f485af44c232466ac5d1",
       "deadline_or_gate": "No additional outbound message. If Terry replies, read the complete thread and answer only the specific ask without sending another broad deck.",
       "decision_question": "Can an in-kind engineering team accelerate proof portal, replay runner, manifest, and pilot onboarding?",
       "fit_score": 92,
@@ -121,10 +121,10 @@
       "artifact_present_count": 4,
       "artifacts": [
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         },
         {
           "bytes": 11129,
@@ -149,7 +149,7 @@
       "best_first_read": "Licensing-fit note, IP boundary packet, proof-stack edge index, and commercialization map.",
       "channel": "federal_lab_tech_transfer",
       "claim_boundary": "The Gmail SENT record and attachment hash prove transmission only. They do not establish LANL receipt, evaluation, a license, endorsement, independent validation, a pilot, funding, deployment, or contract performance.",
-      "concierge_card_sha256": "c0b54830196403024af645ca062e92cb7b72180c06892463b19cc1f99931c489",
+      "concierge_card_sha256": "044a4fd1d022c8dc7c9e78e55a01994fa67d077e8af722387c8a12cadb2a90d6",
       "deadline_or_gate": "No follow-up before 2026-07-23 unless LANL replies first; any NDA, licensing term, export-control question, or disclosure remains human-reviewed.",
       "decision_question": "Is there a bounded licensing or validation conversation worth pursuing with the named lab POC?",
       "fit_score": 88,
@@ -172,10 +172,10 @@
       "artifact_present_count": 3,
       "artifacts": [
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         },
         {
           "bytes": 2960,
@@ -194,7 +194,7 @@
       "best_first_read": "Traction ledger, proof-to-revenue engine, and clean proof-to-pilot public link.",
       "channel": "venture_cash",
       "claim_boundary": "This receipt proves only that LvlUp Ventures stated in writing that declining the sponsor-backed track would not affect the separate investment and accelerator review and that the application would continue through its standard investment process. It does not prove Investment Committee consideration, diligence, selection, investment interest, funding, accelerator admission, endorsement, validation, or an offer.",
-      "concierge_card_sha256": "ac779439b74ba69a6338c4f4751a9e011daf8db65bab5e9e5a5606faa721283c",
+      "concierge_card_sha256": "35078373c757d822f7370700e518e4f8b664e8fa6d06b7ae9e8abfd948c6da54",
       "deadline_or_gate": "Reply only if LvlUp's Investment Committee requests additional information. No sponsor purchase, unsolicited duplicate packet, valuation disclosure, or reuse of the July 3 draft without a fresh claim review and explicit founder approval.",
       "decision_question": "Is a small first check useful enough to preserve execution velocity and unlock pilots?",
       "fit_score": 86,
@@ -211,6 +211,66 @@
       ],
       "state_source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json#related:lvlup_optional_paid_event",
       "status": "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED"
+    },
+    {
+      "artifact_count": 5,
+      "artifact_missing_count": 0,
+      "artifact_present_count": 5,
+      "artifacts": [
+        {
+          "bytes": 3124,
+          "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.md",
+          "present": true,
+          "sha256": "a836fde6bdb24a36360a5d562cc6dda4b6d5346fc74e2f4e0ba60ed65c85e1d2"
+        },
+        {
+          "bytes": 3036,
+          "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PROJECT_DESCRIPTION_DRAFT_2026-07-17.md",
+          "present": true,
+          "sha256": "e74b6a47247994f6f81422cecfbc5f520cc2eb458bb4232c7b7228f7471261eb"
+        },
+        {
+          "bytes": 2648,
+          "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEMO_SCRIPT_2026-07-17.md",
+          "present": true,
+          "sha256": "1bafb973a6d1e9cf6b0ad5717655038c940264ca14e21c29493102d61f011498"
+        },
+        {
+          "bytes": 2719,
+          "path": "build_week/prooflock_console/README.md",
+          "present": true,
+          "sha256": "26615a4750a4b87a910194fa14609a4787e872b35802dbd3448eb9acf3a3dfb2"
+        },
+        {
+          "bytes": 4221,
+          "path": "build_week/prooflock_console/sample_receipt.json",
+          "present": true,
+          "sha256": "dee8c4779a74e4e34f5b5ee8ae127c49eb88d3cbc6693d1d419f103b39636c63"
+        }
+      ],
+      "audience": "developer-challenge judge",
+      "best_first_read": "Working demo, post-start commit, setup instructions, bounded receipt, and under-three-minute demo script.",
+      "channel": "developer_challenge",
+      "claim_boundary": "This is a verified project-readiness lane, not proof of Devpost registration, model identity, final submission, eligibility acceptance, judging outcome, OpenAI endorsement, prize entitlement, external validation, or commercial value.",
+      "concierge_card_sha256": "3ec64372374738bb8a484c68c7d2a456fa0d22db96e83d1cf44d0b9b6890df7d",
+      "deadline_or_gate": "Final submission deadline is 2026-07-21 17:00 Pacific / 19:00 Central / 2026-07-22 00:00 UTC per the official Devpost overview and rules.",
+      "decision_question": "Does the post-start ProofLock extension provide a coherent, non-trivial, judge-testable developer tool?",
+      "fit_score": 93,
+      "human_gate": "Human logs in or registers with Devpost, reviews publicity/IP terms and every populated field, and approves the final submission action.",
+      "lane_id": "openai_build_week_prooflock",
+      "legacy_intake_deadline_or_gate": "Final submission deadline is 2026-07-21 17:00 Pacific / 19:00 Central / 2026-07-22 00:00 UTC per the official Devpost overview and rules.",
+      "legacy_intake_status": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN",
+      "name": "OpenAI Build Week - ProofLock Console",
+      "priority": 2,
+      "reviewer_action": "Confirm GPT-5.6 provenance and the /feedback Session ID, deploy the public demo, record the public under-three-minute YouTube demo, then populate and review the Devpost draft.",
+      "source_refs": [
+        "gmail:19f71ed715ce0c9f",
+        "public:https://openai.devpost.com/",
+        "public:https://openai.devpost.com/rules",
+        "github:1578504204c429d7f05779897dc3d5430038f681"
+      ],
+      "state_source": "legacy_intake_baseline",
+      "status": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
     },
     {
       "artifact_count": 3,
@@ -230,17 +290,17 @@
           "sha256": "274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb"
         },
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         }
       ],
       "audience": "patent counsel or IP reviewer",
       "best_first_read": "Claim-boundary register and legal rescue packet.",
       "channel": "ip_readiness",
       "claim_boundary": "This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice.",
-      "concierge_card_sha256": "dddaee15c2966f0c853cfe0d22e43171540227ae24a09d5069d5e8fcfb1a0b1f",
+      "concierge_card_sha256": "a520ed69f351342f4b202f374a7d05647e953990944a613d99e50ffeb24e6b30",
       "deadline_or_gate": "Reply only if Georgia PATENTS requests intake facts or directs the founder to a reviewed application channel; do not disclose unpublished application materials by ordinary email.",
       "decision_question": "What filing or claim action must licensed counsel verify before public expansion?",
       "fit_score": 100,
@@ -265,10 +325,10 @@
       "artifact_present_count": 5,
       "artifacts": [
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         },
         {
           "bytes": 10520,
@@ -299,7 +359,7 @@
       "best_first_read": "Heilmeier matrix, evidence synthesis, compliance matrix, and human-gated submission controls.",
       "channel": "federal_baa",
       "claim_boundary": "Abstract receipt is not award selection and not permission to skip BAA instructions.",
-      "concierge_card_sha256": "e8af495c82e8c398b6e440d0524d81c5de8589458f38d808ea4888407535e907",
+      "concierge_card_sha256": "862f4272cf8d9136d01afcca4c213a5db9c75ae85e58f47bc7199cc2ea59f6be",
       "deadline_or_gate": "Abstract ID HR001126S0010-DICE-PA-052 recorded; full proposal instructions must be confirmed against the controlling BAA before upload.",
       "decision_question": "Does the proposal map a credible research objective to a bounded validation method?",
       "fit_score": 90,
@@ -511,7 +571,7 @@
           "bytes": 11451,
           "path": "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
           "present": true,
-          "sha256": "6adceb9476c4c557c316fce368db813f25fe585285258de389b265c33a2fe413"
+          "sha256": "3c954a3873edd9f897832c44cecf763d0790ac138be5bbadb17f781e061c2d3f"
         },
         {
           "bytes": 6109,
@@ -520,17 +580,17 @@
           "sha256": "f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046"
         },
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         }
       ],
       "audience": "infrastructure buyer-discovery reviewer",
       "best_first_read": "Customer commercialization packet, FHWA/TSMO capability outline, and traction ledger.",
       "channel": "infrastructure_market_signal",
       "claim_boundary": "This is not a customer commitment, contract, employment acceptance, or pilot demand signal.",
-      "concierge_card_sha256": "357601c478885352e7a89ded2cbf6c5dcc382929cdabf3cd6b6fe24ebb9a66fb",
+      "concierge_card_sha256": "ec9089038b185474402f160132b2bc14450b21e7ace3dd147150142aa1153522",
       "deadline_or_gate": "Recruiter asked Robert to apply for an ITS Engineer role on a Georgia highway infrastructure project if interested.",
       "decision_question": "Does the ITS signal sharpen customer-discovery language without claiming a customer or pilot?",
       "fit_score": 66,
@@ -554,10 +614,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         },
         {
           "bytes": 8338,
@@ -570,7 +630,7 @@
       "best_first_read": "Boundary-safe routing note and partner-only decision record.",
       "channel": "federal_market_research",
       "claim_boundary": "No instrument supply, OEM, reseller, or lab-services qualification claim.",
-      "concierge_card_sha256": "086215387576f719c7b46e48a26e80ce50403cf407817fe7ae5d6bd0b3a9c0bc",
+      "concierge_card_sha256": "908f6b28229e2a848116b6d6b05929b454c61b7cba7350fe416e07ce488d45cc",
       "deadline_or_gate": "Active until 2026-07-21 21:30 UTC per Sweetspot search; official notice ID 68HE0726Q0027 located.",
       "decision_question": "Should LumenCore be routed to a data QA or validation need instead of a hardware buy?",
       "fit_score": 42,
@@ -595,10 +655,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         },
         {
           "bytes": 8338,
@@ -611,7 +671,7 @@
       "best_first_read": "Partner-only filter and qualification boundary.",
       "channel": "federal_sources_sought",
       "claim_boundary": "No testing lab, contaminant monitoring, or regulated lab-services claim.",
-      "concierge_card_sha256": "2cea7ad1ca990f5cb3e99d202a2f0ed6cb4b8ddd2e0f6159fab2ac7e306ac26e",
+      "concierge_card_sha256": "f600cfb9eb1954567eb4ec0fc0edbf061e73ec3dfd8f418a261f705a13eb3421",
       "deadline_or_gate": "Active until 2026-07-21 20:00 UTC per Sweetspot search.",
       "decision_question": "Is there a qualified prime or lab partner before any response is drafted?",
       "fit_score": 46,
@@ -634,10 +694,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         },
         {
           "bytes": 6109,
@@ -650,7 +710,7 @@
       "best_first_read": "Heilmeier matrix, evidence synthesis, compliance matrix, and human-gated submission controls.",
       "channel": "federal_baa",
       "claim_boundary": "No claim that LumenCore fits all BAA topics.",
-      "concierge_card_sha256": "1bba2998d81c3935692fc3902a08ad5e842d5edac0d3071dfb0c924b730688c7",
+      "concierge_card_sha256": "4420eea48d6d323bfea0290bf208a8bfe2748ae653138a475d777af4a9d2db86",
       "deadline_or_gate": "Active until 2026-07-24 17:00 UTC per Sweetspot search; official SAM call located.",
       "decision_question": "Does the proposal map a credible research objective to a bounded validation method?",
       "fit_score": 64,
@@ -674,10 +734,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         },
         {
           "bytes": 8929,
@@ -690,7 +750,7 @@
       "best_first_read": "Capability outline, source provenance, risk boundaries, and agency protocol controls.",
       "channel": "federal_contract",
       "claim_boundary": "No FedRAMP, ATO, HHS pilot, or government production-access claim.",
-      "concierge_card_sha256": "cfd9a2af97d5d15f02b2528b13906f1e316244671564253c03a7cc65a844fc41",
+      "concierge_card_sha256": "b66774925e06a13e5c7d07bef03ecccae304e4e3677eea72253316742dc66ae0",
       "deadline_or_gate": "Active until 2026-07-14 21:00 UTC per Sweetspot search.",
       "decision_question": "Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?",
       "fit_score": 38,
@@ -713,10 +773,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         },
         {
           "bytes": 8929,
@@ -729,7 +789,7 @@
       "best_first_read": "Capability outline, source provenance, risk boundaries, and agency protocol controls.",
       "channel": "federal_contract",
       "claim_boundary": "No public-safety deployment, law-enforcement feed integration, or FedRAMP authorization claim.",
-      "concierge_card_sha256": "417333b416ed2b5b523f1b891c42437a47d3a774a27c828440aa946092668bb3",
+      "concierge_card_sha256": "30afac461367e12cc5ff6eee9fd04831c3a67fe5c507d21ae93217ebbdd01881",
       "deadline_or_gate": "Active until 2026-07-14 16:00 UTC per Sweetspot search.",
       "decision_question": "Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?",
       "fit_score": 35,
@@ -752,10 +812,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         },
         {
           "bytes": 3470,
@@ -768,7 +828,7 @@
       "best_first_read": "Capability outline, source provenance, risk boundaries, and agency protocol controls.",
       "channel": "federal_contract",
       "claim_boundary": "No consortium management, energy project financing, or installation-performance claim.",
-      "concierge_card_sha256": "8cbb6eb4bb2c8476217050e8a679c4bb4cb99dea315ca42322ae182f81e736e0",
+      "concierge_card_sha256": "644ec7bb5acb49d73a56989ce117d738cee13cf31e62861f02c9956a9d350b20",
       "deadline_or_gate": "Active until 2026-07-30 19:00 UTC per Sweetspot search.",
       "decision_question": "Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?",
       "fit_score": 58,
@@ -791,10 +851,10 @@
       "artifact_present_count": 2,
       "artifacts": [
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         },
         {
           "bytes": 6532,
@@ -807,7 +867,7 @@
       "best_first_read": "Proof-stack continuity case and API continuity request.",
       "channel": "vendor_credit_or_partner_route",
       "claim_boundary": "No credit, free account, or vendor approval is represented.",
-      "concierge_card_sha256": "1325b2605ebb64305e9b53417cf37efc39951bb0650fe6f09f4c8e27d6f44c92",
+      "concierge_card_sha256": "e4a7525650d866f9edbe896d13e827ce16be972bde435cab56b4aab2df7aca3b",
       "deadline_or_gate": "No deadline found; request should be submitted through official contact-sales path if still needed.",
       "decision_question": "Can a temporary credit or startup route preserve grant/proof-factory continuity?",
       "fit_score": 80,
@@ -870,8 +930,8 @@
       "status": "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING"
     }
   ],
-  "concierge_sha256": "e238f2645617483ae0de549d12e0d1efe1d6ea26e54ec41ca000a1691d068d04",
-  "generated_utc": "2026-07-17T21:09:59.777347+00:00",
+  "concierge_sha256": "8416a6636abbe3d64d9cb2b163b9844da243c005ec13106109059d89557a1a30",
+  "generated_utc": "2026-07-17T21:49:12.890051+00:00",
   "missing_artifacts": [],
   "outputs": {
     "dashboard_json": "dashboard/data/reviewer_concierge_packet.json",
@@ -900,11 +960,11 @@
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "human_action_required": true,
-    "lane_count": 19,
+    "lane_count": 20,
     "missing_artifact_count": 0,
     "reviewer_gate_clear": true,
     "top_priority_artifacts_complete": true,
-    "top_priority_count": 10,
+    "top_priority_count": 11,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0
   }

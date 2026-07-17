@@ -26,7 +26,7 @@ def test_fast_lane_router_builds_human_gated_routes():
     assert summary["route_count"] == 8
     assert summary["missing_artifact_count"] == 0
     assert summary["decision_lane_count"] == 19
-    assert summary["traction_lane_count"] == 19
+    assert summary["traction_lane_count"] == 20
     assert summary["qa_count"] >= 13
     assert summary["ip_invention_family_count"] == 6
     assert summary["reviewer_gate_clear"] is True

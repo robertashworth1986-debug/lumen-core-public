@@ -157,6 +157,28 @@
     },
     {
       "action_due": "2026-07-21",
+      "action_type": "developer_challenge_build",
+      "artifact_missing_count": 0,
+      "artifact_present_count": 5,
+      "channel": "developer_challenge",
+      "claim_boundary": "This is a verified project-readiness lane, not proof of Devpost registration, model identity, final submission, eligibility acceptance, judging outcome, OpenAI endorsement, prize entitlement, external validation, or commercial value.",
+      "days_until_action_due": 12,
+      "decision_question": "Does the post-start ProofLock extension provide a coherent, non-trivial, judge-testable developer tool?",
+      "docket_action": "Confirm model/session provenance, deploy the public demo, record the public video, and populate the Devpost draft without final submission.",
+      "docket_item_sha256": "3a428edafdcac49b63516134c78cd04b827775ab7796a63242c7bf31a36da080",
+      "first_artifact": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.md",
+      "fit_score": 93,
+      "human_gate": "Human logs in or registers with Devpost, reviews publicity/IP terms and every populated field, and approves the final submission action.",
+      "lane_id": "openai_build_week_prooflock",
+      "name": "OpenAI Build Week - ProofLock Console",
+      "no_final_action_rule": "Human approval is required before any send, upload, filing, certification, pricing, term acceptance, calendar edit, trading, or capital movement.",
+      "priority": 2,
+      "status": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN",
+      "time_basis": "Official final submission deadline is July 21, 2026 at 5:00 p.m. Pacific / 7:00 p.m. Central.",
+      "urgency": "ACTIVE_14D"
+    },
+    {
+      "action_due": "2026-07-21",
       "action_type": "agency_routing_watch",
       "artifact_missing_count": 0,
       "artifact_present_count": 2,
@@ -420,8 +442,8 @@
       "urgency": "PARKED_UNLESS_PARTNER"
     }
   ],
-  "docket_sha256": "61c949e3d36d9af159d3cb32a76d195ebe66e784efc0751356e3be9b6f8b7dc3",
-  "generated_utc": "2026-07-17T21:09:59.949306+00:00",
+  "docket_sha256": "695b7e30c1f30ff463b608ccd882462b7c7dc1be02d35c729ad1bbf802231fe3",
+  "generated_utc": "2026-07-17T21:49:13.705998+00:00",
   "human_stop_rule": "Human approval is required before any send, upload, filing, certification, pricing, term acceptance, calendar edit, trading, or capital movement.",
   "outputs": {
     "dashboard_json": "dashboard/data/human_action_docket.json",
@@ -439,6 +461,7 @@
     "action_type_counts": {
       "agency_routing_watch": 1,
       "customer_discovery_watch": 1,
+      "developer_challenge_build": 1,
       "federal_baa_build": 1,
       "federal_registration_watch": 1,
       "human_review": 3,
@@ -454,7 +477,7 @@
       "vendor_route": 1
     },
     "all_artifacts_present": true,
-    "concierge_lane_count": 19,
+    "concierge_lane_count": 20,
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
     "human_action_required": true,
@@ -467,14 +490,14 @@
       "darpa_dice_full_submission",
       "openai_api_continuity"
     ],
-    "lane_count": 19,
+    "lane_count": 20,
     "live_trading_allowed": false,
     "reviewer_gate_clear": true,
-    "traction_lane_count": 19,
+    "traction_lane_count": 20,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0,
     "urgency_counts": {
-      "ACTIVE_14D": 2,
+      "ACTIVE_14D": 3,
       "IMMEDIATE_24H": 3,
       "PARKED_UNLESS_PARTNER": 4,
       "ROLLING_OR_EVENT_GATED": 5,

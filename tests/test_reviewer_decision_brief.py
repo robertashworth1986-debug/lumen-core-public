@@ -27,9 +27,9 @@ def test_reviewer_decision_brief_summarizes_full_control_stack():
     assert payload["summary"]["urgent_lane_count"] == 6
     assert payload["summary"]["partner_blocked_lane_count"] == 4
     assert payload["summary"]["authority_lane_count"] == 19
-    assert payload["summary"]["docket_lane_count"] == 19
-    assert payload["summary"]["concierge_lane_count"] == 19
-    assert payload["summary"]["traction_lane_count"] == 19
+    assert payload["summary"]["docket_lane_count"] == 20
+    assert payload["summary"]["concierge_lane_count"] == 20
+    assert payload["summary"]["traction_lane_count"] == 20
     assert payload["summary"]["reviewer_gate_clear"] is True
     assert payload["summary"]["all_final_actions_blocked_without_human"] is True
     assert payload["summary"]["unsafe_secret_count"] == 0

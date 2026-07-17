@@ -1,0 +1,46 @@
+{
+  "schema": "lumencore.openai_build_week_requirements_receipt.v1",
+  "captured_date": "2026-07-17",
+  "capture_method": "VISIBLE_OFFICIAL_PAGE_REVIEW_NORMALIZED_FACT_RECORD",
+  "raw_html_archived": false,
+  "official_sources": {
+    "overview": "https://openai.devpost.com/",
+    "rules": "https://openai.devpost.com/rules",
+    "submission_manager": "https://devpost.com/submit-to/30223-openai-build-week/manage/submissions"
+  },
+  "facts": {
+    "submission_period": {
+      "start_utc": "2026-07-13T16:00:00Z",
+      "deadline_pacific": "2026-07-21T17:00:00-07:00",
+      "deadline_central": "2026-07-21T19:00:00-05:00",
+      "deadline_utc": "2026-07-22T00:00:00Z"
+    },
+    "category": "Developer Tools",
+    "required_project": "A working project built with Codex and GPT-5.6.",
+    "required_submission_materials": [
+      "category",
+      "project description",
+      "public YouTube demonstration shorter than three minutes with audio",
+      "code repository URL with relevant licensing and setup instructions",
+      "working demo or test access available free through judging",
+      "README explaining Codex collaboration and key decisions",
+      "/feedback Codex Session ID for the thread containing most core functionality"
+    ],
+    "existing_project_rule": "Pre-existing projects must be meaningfully extended after the submission period begins, and the entrant must distinguish prior work from new work with dated evidence.",
+    "judging": {
+      "stage_one": "Pass/fail theme fit and use of the required tools.",
+      "stage_two_equal_weight_criteria": [
+        "Technological Implementation",
+        "Design",
+        "Potential Impact",
+        "Quality of the Idea"
+      ]
+    },
+    "project_testing_rule": "Judges must receive free access to a working website, demo, test build, sandbox, or test account.",
+    "plugin_required": false,
+    "free_credit_request_deadline_pacific": "2026-07-17T12:00:00-07:00"
+  },
+  "facts_sha256": "4275d15cc89f75e83691677b331a8652a4b6828175f393c2a96c1e68f04fa4b3",
+  "claim_boundary": "This is a normalized fact record from the visible official overview and rules pages, not a raw-page archive or legal interpretation. The official rules and current Devpost submission interface remain authoritative.",
+  "receipt_sha256": "6f20c120cc46d693fc9bebbaee6f8dc4dc232b42450432f615ad2999c99b6adc"
+}

@@ -121,6 +121,13 @@ ARTIFACT_MAP: dict[str, list[str]] = {
         "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
         "docs/CURRENT_PROOF_POSTURE_AND_NEXT_TESTS_2026-07-03.md",
     ],
+    "openai_build_week_prooflock": [
+        "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.md",
+        "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PROJECT_DESCRIPTION_DRAFT_2026-07-17.md",
+        "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEMO_SCRIPT_2026-07-17.md",
+        "build_week/prooflock_console/README.md",
+        "build_week/prooflock_console/sample_receipt.json",
+    ],
     "patent_deadline_counsel": [
         "grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md",
         "grant_submissions/PATENT_LEGAL_RESCUE_PACKET_2026-06-20.md",
@@ -192,6 +199,11 @@ REVIEWER_PACKS = {
         "audience": "vendor credit or partner-program reviewer",
         "best_first_read": "Proof-stack continuity case and API continuity request.",
         "decision_question": "Can a temporary credit or startup route preserve grant/proof-factory continuity?",
+    },
+    "developer_challenge": {
+        "audience": "developer-challenge judge",
+        "best_first_read": "Working demo, post-start commit, setup instructions, bounded receipt, and under-three-minute demo script.",
+        "decision_question": "Does the post-start ProofLock extension provide a coherent, non-trivial, judge-testable developer tool?",
     },
 }
 

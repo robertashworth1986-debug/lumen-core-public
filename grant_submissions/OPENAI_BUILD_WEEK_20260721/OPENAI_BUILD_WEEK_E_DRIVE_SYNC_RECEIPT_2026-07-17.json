@@ -1,0 +1,148 @@
+{
+  "schema": "lumencore.openai_build_week_e_drive_sync_receipt.v1",
+  "created_utc": "2026-07-17T21:49:20.592937Z",
+  "destination_root": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721",
+  "artifact_count": 19,
+  "all_sha256_matched_after_copy": true,
+  "relative_paths_preserved": true,
+  "private_files_mirrored": false,
+  "browser_navigation_performed": false,
+  "artifacts": [
+    {
+      "source": "build_week/prooflock_console/README.md",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/build_week/prooflock_console/README.md",
+      "bytes": 2719,
+      "sha256": "26615A4750A4B87A910194FA14609A4787E872B35802DBD3448EB9ACF3A3DFB2",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "build_week/prooflock_console/app.js",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/build_week/prooflock_console/app.js",
+      "bytes": 10846,
+      "sha256": "3A8AEF62513533960C5F6FC891145016EF35A1B5EB759F0B1A3A7DDE9259CAD2",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "build_week/prooflock_console/index.html",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/build_week/prooflock_console/index.html",
+      "bytes": 4178,
+      "sha256": "DD313667755130E3F6542DF91E2F3A376090CEDBC06370CB0185E888D22D1AE7",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "build_week/prooflock_console/sample_receipt.json",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/build_week/prooflock_console/sample_receipt.json",
+      "bytes": 4221,
+      "sha256": "DEE8C4779A74E4E34F5B5EE8AE127C49EB88D3CBC6693D1D419F103B39636C63",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "build_week/prooflock_console/styles.css",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/build_week/prooflock_console/styles.css",
+      "bytes": 8725,
+      "sha256": "E3B27FA4AAAC362630F5DA701F2EA7B4EA6A431E5EFC9DF0FC1A51F5D412705D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "build_week/prooflock_console/verify_receipt.py",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/build_week/prooflock_console/verify_receipt.py",
+      "bytes": 6701,
+      "sha256": "358299D05A1658BACB4705D76FC9FE1FA28D94265120A3D22012887FD905CF84",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_OPENAI_BUILD_WEEK_READINESS_PACKET.py",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/code/ops/BUILD_OPENAI_BUILD_WEEK_READINESS_PACKET.py",
+      "bytes": 20539,
+      "sha256": "B5070E2E75D5FEE0B79345F3100095EED55ED35AD09379ED9DA84B0A7E78F08B",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_OPENAI_BUILD_WEEK_E_DRIVE_SYNC_RECEIPT.py",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/code/ops/BUILD_OPENAI_BUILD_WEEK_E_DRIVE_SYNC_RECEIPT.py",
+      "bytes": 6483,
+      "sha256": "9D24D7C80DB5115445B967F4382A05E0F02D621A36B6E584C20332A0CA7E67F4",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_openai_build_week_readiness_packet.py",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/tests/test_openai_build_week_readiness_packet.py",
+      "bytes": 4592,
+      "sha256": "0008CA8A02D3A5A50DE89DFEB7AEA92FD82A74E3F5CD18CC99D547521D73D8F1",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_prooflock_console.py",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/tests/test_prooflock_console.py",
+      "bytes": 3257,
+      "sha256": "5808D6CC784FDB35031EC3E72DB7084536305107E9B66E49D398B59206299F33",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json",
+      "bytes": 9865,
+      "sha256": "05DAB3F0AE40D7EBB2D24DA1984DECAAF0B63E88E42BCBB055ED241E4F5880D1",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.md",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.md",
+      "bytes": 3124,
+      "sha256": "A836FDE6BDB24A36360A5D562CC6DDA4B6D5346FC74E2F4E0BA60ED65C85E1D2",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PROJECT_DESCRIPTION_DRAFT_2026-07-17.md",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PROJECT_DESCRIPTION_DRAFT_2026-07-17.md",
+      "bytes": 3036,
+      "sha256": "E74B6A47247994F6F81422CECFBC5F520CC2EB458BB4232C7B7228F7471261EB",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEMO_SCRIPT_2026-07-17.md",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEMO_SCRIPT_2026-07-17.md",
+      "bytes": 2648,
+      "sha256": "1BAFB973A6D1E9CF6B0AD5717655038C940264CA14E21C29493102D61F011498",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json",
+      "bytes": 2409,
+      "sha256": "7E27FFDCDBE0B51EA2FEAB13034535737F7219FE22CB375A64238F6FB6793529",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.json",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.json",
+      "bytes": 2411,
+      "sha256": "CC822AA047C9DBE6AB9044412F22F423C1D6CB772A2F4DC0753AD7F4E367C7A8",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.png",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.png",
+      "bytes": 2852054,
+      "sha256": "B4D90B400D3AA4E95D41B3FAB259B27CE85DB663D7F2FFB5F273A22E00824962",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.json",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.json",
+      "bytes": 3363,
+      "sha256": "5146281AF36E0DDA090BD38D2699D847005E1DD02F41CF267104874D7D5EB98D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.png",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.png",
+      "bytes": 2943666,
+      "sha256": "10472C90DB0837827E9C37D3BD781A87B690F084CAF7ECB28988C02223FFECB7",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves only that the listed public Build Week app, readiness, test, and hardware-concept artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove public deployment, Devpost registration, model identity, video publication, final submission, eligibility, judging outcome, endorsement, award, external validation, engineering performance, safety, patent rights, funding, or value.",
+  "receipt_copy_destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_E_DRIVE_SYNC_RECEIPT_2026-07-17.json",
+  "receipt_payload_sha256": "947CDB7139951F2B5470A2BF1CD3CC1534428266FAA017D43C2DF2F38C9CE53D"
+}

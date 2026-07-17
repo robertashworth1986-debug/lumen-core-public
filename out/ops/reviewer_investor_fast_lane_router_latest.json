@@ -1,6 +1,6 @@
 {
-  "fast_lane_router_sha256": "9de9bbafcc544c24ba63375bad8d1ba510de037ec4920c27dd4d2c30dabd83a7",
-  "generated_utc": "2026-07-17T21:10:00.658671+00:00",
+  "fast_lane_router_sha256": "e170ee5ec13662dd8792d95f7ea51ad6be8f37a26d93016e3d61a4710aaf0a6e",
+  "generated_utc": "2026-07-17T21:49:16.234825+00:00",
   "outputs": {
     "dashboard_json": "dashboard/data/reviewer_investor_fast_lane_router.json",
     "json": "out/ops/reviewer_investor_fast_lane_router_latest.json",
@@ -15,7 +15,7 @@
           "bytes": 23864,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
           "present": true,
-          "sha256": "c935210e86e3cf4f217eec9edf04814067a829be7d93fe90093f3839b45490d9"
+          "sha256": "f08ff5e8314c58d9826f69ffdc6fcbf531808254402b3cdee9a3281fb1561e35"
         },
         {
           "bytes": 16206,
@@ -47,7 +47,7 @@
       "missing_artifact_count": 0,
       "question": "Where should a busy reviewer start?",
       "route_id": "five_minute_reviewer_start",
-      "route_sha256": "7da3642faa4ea93e142e243cbceceb433559e14d517905ec2fdce33a58d0008f",
+      "route_sha256": "59889dafd634691eebf0521c4f040016254c9752ce6c7449e6a9abaf81e2968b",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
@@ -64,10 +64,10 @@
           "sha256": "ae8a41916c20207d4a2732d58c0e09a9a089809496696dfd822543751d27c13c"
         },
         {
-          "bytes": 32810,
+          "bytes": 35113,
           "path": "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
           "present": true,
-          "sha256": "9a06bf73fab59081f2cc0ee95c718b5a3f19254c171fa5506335d45a8c8943b8"
+          "sha256": "b5919ac1a4123bd2c8349fdb3446e9cb1b7ec0fb051f7dfad3390816a412e5c0"
         },
         {
           "bytes": 12244,
@@ -82,10 +82,10 @@
           "sha256": "fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82"
         },
         {
-          "bytes": 22454,
+          "bytes": 23545,
           "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
           "present": true,
-          "sha256": "cd2dd829f5f383d69ea7d55934e3c15b6f5ed86852463e1d373481189f8f155a"
+          "sha256": "421850fa2215fbc5733137cc4bdb1eb354f1e9ccb24c12a26af91ebca34741ad"
         }
       ],
       "audience": "agency_reviewer_or_contracting_contact",
@@ -99,7 +99,7 @@
       "missing_artifact_count": 0,
       "question": "Is LumenCore disciplined enough for agency protocol?",
       "route_id": "agency_submission_protocol",
-      "route_sha256": "0daf0c4b8deac516eda431e7ed6ab7e8eef08ce6cf7d99f2ce448b7e6586dc53",
+      "route_sha256": "0e1ddf39761007a8e3a1436435cdae7323be73201c88084aef87a397fc8a5b1d",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
@@ -203,16 +203,16 @@
       "answer": "Use the traction ledger and human docket to see the 19-lane opportunity map, urgent dates, response status, and required next human action.",
       "artifact_status": [
         {
-          "bytes": 52071,
+          "bytes": 54115,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+          "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
         },
         {
-          "bytes": 22454,
+          "bytes": 23545,
           "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
           "present": true,
-          "sha256": "cd2dd829f5f383d69ea7d55934e3c15b6f5ed86852463e1d373481189f8f155a"
+          "sha256": "421850fa2215fbc5733137cc4bdb1eb354f1e9ccb24c12a26af91ebca34741ad"
         },
         {
           "bytes": 12349,
@@ -221,10 +221,10 @@
           "sha256": "d675cc756efcc84ccd219cce06560493ac2f7ea2c4cf3338aca45a1e5e52e567"
         },
         {
-          "bytes": 36127,
+          "bytes": 38632,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
           "present": true,
-          "sha256": "44ddf0c67ff6291892ad18809c6381b33329a54f5502cbfe93a19508c05e6168"
+          "sha256": "c3b908bb414d378365507f562143da48aa08245603c3e77441e96a5911c8c33d"
         }
       ],
       "audience": "operator_or_non_dilutive_funding_reviewer",
@@ -238,7 +238,7 @@
       "missing_artifact_count": 0,
       "question": "Which lanes deserve action first?",
       "route_id": "traction_deadline_action",
-      "route_sha256": "e9119683b608af6f166f0fc2a0edd85eda6fc9475185a1d77786d356ed1053d8",
+      "route_sha256": "595e1a9c9a8485df0477ad76f056b38f54efcef40c1c5999d2f53e616d7b0222",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/CLOSEST_QUALIFIED_GRANTS_AND_CONTRACTS_2026-07-09.md",
@@ -298,7 +298,7 @@
           "bytes": 11451,
           "path": "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
           "present": true,
-          "sha256": "9c4cf95f1d749cde316f02eb4fb9ab0938290089d312ebb121572c7b304e31cc"
+          "sha256": "af3ff3067f35b59571b5c40d98da295f70671752d427c9d5f980955fc831930d"
         },
         {
           "bytes": 8029,
@@ -330,7 +330,7 @@
       "missing_artifact_count": 0,
       "question": "How does this become customer value without overclaiming savings?",
       "route_id": "commercialization_customer_roi",
-      "route_sha256": "3d800eefc81b9ca15ff667ba53e6070e9a660b8103ca8765cf13ed40b6ed52d5",
+      "route_sha256": "b981086219d0d0f10b293cfbbb094309764dcf91a12cb33ccd0d65a6117dc43d",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/PROOF_STACK_EDGE_INDEX_2026-07-09.md",
@@ -362,7 +362,7 @@
           "bytes": 23864,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
           "present": true,
-          "sha256": "c935210e86e3cf4f217eec9edf04814067a829be7d93fe90093f3839b45490d9"
+          "sha256": "f08ff5e8314c58d9826f69ffdc6fcbf531808254402b3cdee9a3281fb1561e35"
         }
       ],
       "audience": "investor_or_profile_reviewer",
@@ -376,7 +376,7 @@
       "missing_artifact_count": 0,
       "question": "What should an investor see before a deeper call?",
       "route_id": "investor_profile_and_terms",
-      "route_sha256": "ff061825ab174776871153d7b1c2c045aeebe588d68761a40d05c58ab1059a50",
+      "route_sha256": "8f3c7a41f4fb0a6c7dacaeabbc3f2a26df8ee91f87d3ae11af97a5f2caa66550",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/VENTURE_STUDIO_TERMS_GUARDRAIL_PACKET_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/PITCH_DECK_SEND_RECEIPT_2026-07-09.md",
@@ -428,7 +428,7 @@
     "route_count": 8,
     "social_posting_allowed_without_human": false,
     "top_ready_lane_count": 10,
-    "traction_lane_count": 19,
+    "traction_lane_count": 20,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0,
     "urgent_lane_count": 6

@@ -83,6 +83,9 @@ def test_priority_lanes_keep_expected_statuses_and_claim_boundaries():
     assert lanes["darpa_dice_full_submission"]["status"] == "FULL_PROPOSAL_SPRINT"
     assert lanes["fhwa_tsmo_data_initiative"]["status"] == "PHASE_I_TECH_VOLUME"
     assert lanes["nasa_data_center_rfi"]["status"] == "RFI_RESPONSE_PREP"
+    assert lanes["openai_build_week_prooflock"]["status"] == (
+        "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
+    )
     assert lanes["patent_deadline_counsel"]["status"] == "PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED"
 
     for lane in payload["lanes"]:
@@ -115,6 +118,13 @@ def test_latest_response_lanes_are_claim_bounded_and_actionable():
     protecnium = lanes["protecnium_its_infrastructure_signal"]
     assert "not a customer commitment" in protecnium["claim_boundary"]
     assert "customer-discovery" in protecnium["reviewer_action"]
+
+    build_week = lanes["openai_build_week_prooflock"]
+    assert build_week["priority"] == 2
+    assert "2026-07-21 17:00 Pacific" in build_week["deadline_or_gate"]
+    assert "/feedback Session ID" in build_week["reviewer_action"]
+    assert "not proof of Devpost registration" in build_week["claim_boundary"]
+    assert "gmail:19f71ed715ce0c9f" in build_week["source_refs"]
 
 
 def test_current_queue_and_effective_states_prevent_stale_or_duplicate_actions():

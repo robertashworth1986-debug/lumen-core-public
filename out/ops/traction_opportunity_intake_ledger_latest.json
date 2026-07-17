@@ -281,7 +281,7 @@
     "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
     "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED"
   },
-  "generated_utc": "2026-07-17T21:01:50.261035+00:00",
+  "generated_utc": "2026-07-17T21:49:12.109021+00:00",
   "lanes": [
     {
       "channel": "federal_registration",
@@ -501,6 +501,39 @@
         "LumenCore application submitted with proof-to-pilot public proof link.",
         "Jackson Hellmann replied positively to the submitted-update email.",
         "Public program describes first-check funding and startup perks for early founders."
+      ]
+    },
+    {
+      "channel": "developer_challenge",
+      "claim_boundary": "This is a verified project-readiness lane, not proof of Devpost registration, model identity, final submission, eligibility acceptance, judging outcome, OpenAI endorsement, prize entitlement, external validation, or commercial value.",
+      "deadline_or_gate": "Final submission deadline is 2026-07-21 17:00 Pacific / 19:00 Central / 2026-07-22 00:00 UTC per the official Devpost overview and rules.",
+      "effective_claim_boundary": "This is a verified project-readiness lane, not proof of Devpost registration, model identity, final submission, eligibility acceptance, judging outcome, OpenAI endorsement, prize entitlement, external validation, or commercial value.",
+      "effective_deadline_or_gate": "Final submission deadline is 2026-07-21 17:00 Pacific / 19:00 Central / 2026-07-22 00:00 UTC per the official Devpost overview and rules.",
+      "effective_reviewer_action": "Confirm GPT-5.6 provenance and the /feedback Session ID, deploy the public demo, record the public under-three-minute YouTube demo, then populate and review the Devpost draft.",
+      "effective_source": "legacy_intake_baseline",
+      "effective_status": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN",
+      "evidence_date": "2026-07-17",
+      "fit_score": 93,
+      "human_gate": "Human logs in or registers with Devpost, reviews publicity/IP terms and every populated field, and approves the final submission action.",
+      "human_gate_required": true,
+      "lane_id": "openai_build_week_prooflock",
+      "lane_sha256": "8368acb990254c03e8f5b8cf311dd9e12584de9867764ae6c4552b13a8529b0f",
+      "name": "OpenAI Build Week - ProofLock Console",
+      "priority": 2,
+      "reviewer_action": "Confirm GPT-5.6 provenance and the /feedback Session ID, deploy the public demo, record the public under-three-minute YouTube demo, then populate and review the Devpost draft.",
+      "source_kind": "gmail_plus_official_rules_plus_git_commit",
+      "source_refs": [
+        "gmail:19f71ed715ce0c9f",
+        "public:https://openai.devpost.com/",
+        "public:https://openai.devpost.com/rules",
+        "github:1578504204c429d7f05779897dc3d5430038f681"
+      ],
+      "status": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN",
+      "traction_evidence": [
+        "Official OpenAI email announced the challenge, deadline, and $100,000 total prize pool.",
+        "Official rules allow a meaningfully extended pre-existing project when post-start work is clearly documented.",
+        "ProofLock Console was added after the submission period opened in commit 1578504204c429d7f05779897dc3d5430038f681.",
+        "The browser and Python verifiers both match 4/4 public V2/V3 artifacts and keep four engineering/release gates open."
       ]
     },
     {
@@ -1061,7 +1094,7 @@
       ]
     }
   ],
-  "ledger_sha256": "a157a984945fbeedf432b1f64692107fedd25c2044674a5979bfe558fe84d3bf",
+  "ledger_sha256": "54d2522de6a7690f1d4df164b1d30a236a82d36d55bb7086279d328e8680d26a",
   "missionweave_action_gate": {
     "claim_boundary": "This public gate proves package integrity, document-format checks, and the completion state of a bounded private DSIP fact workflow. It does not expose legal identifiers, a Firm PIN, the assigned proposal number, private portal evidence, or unsupported compliance facts. It does not establish DLA validation, CMMC status, ITAR compliance, award eligibility, proposal acceptance, submission, selection, contract, award, deployment, or realized performance.",
     "deadline": {
@@ -1161,6 +1194,7 @@
   "status": "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED",
   "summary": {
     "channel_counts": {
+      "developer_challenge": 1,
       "federal_baa": 2,
       "federal_contract": 4,
       "federal_lab_tech_transfer": 1,
@@ -1194,6 +1228,7 @@
       "PARTNER_ONLY": 1,
       "PITCH_READY_HUMAN_CHECK": 1,
       "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN": 1,
+      "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN": 1,
       "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING": 1,
       "ROUTE_ONLY_LOW_FIT": 1,
       "SCOUT_TOPIC_MATCH": 1,
@@ -1203,19 +1238,20 @@
     },
     "external_send_allowed_without_human": false,
     "final_submission_allowed_without_human": false,
-    "gmail_reference_count": 16,
+    "gmail_reference_count": 17,
     "human_action_required": true,
-    "lane_count": 19,
+    "lane_count": 20,
     "missionweave_open_gate_count": 37,
     "missionweave_passed_gate_count": 13,
     "missionweave_required_gate_count": 50,
     "missionweave_submission_ready_for_human_click": false,
-    "public_reference_count": 19,
+    "public_reference_count": 21,
     "source_kind_counts": {
       "existing_sprint_plus_public_sbir": 1,
       "gmail_lab_response": 1,
       "gmail_plus_official_page": 1,
       "gmail_plus_official_program": 1,
+      "gmail_plus_official_rules_plus_git_commit": 1,
       "gmail_plus_public_program": 2,
       "gmail_plus_sweetspot_plus_sam": 1,
       "gmail_plus_uspto_public_guidance": 1,
@@ -1236,6 +1272,7 @@
       "PARTNER_ONLY": 1,
       "PHASE_I_TECH_VOLUME": 1,
       "PITCH_READY_HUMAN_CHECK": 1,
+      "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN": 1,
       "PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED": 2,
       "RESET_NOTE_SENT_TECH_REVIEW_PENDING": 1,
       "RFI_RESPONSE_PREP": 1,
@@ -1246,6 +1283,6 @@
       "WAITING_REVIEW": 1
     },
     "sweetspot_reference_count": 8,
-    "top_priority_count": 10
+    "top_priority_count": 11
   }
 }

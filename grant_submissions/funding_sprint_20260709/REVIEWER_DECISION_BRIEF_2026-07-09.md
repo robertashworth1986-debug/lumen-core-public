@@ -18,7 +18,7 @@ This brief is a decision-support front page. It does not authorize any final ext
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Decision brief SHA-256: `cf8573d7550ba66fb73e0cbfb0fe62d118697851f2d040ccd314eec4224a0894`
+- Decision brief SHA-256: `6b330d87da69bfabb9291d87023f6e2bc4f4d8926f2027ab1aed3b4f2baa00f6`
 
 ## Reviewer Answer
 

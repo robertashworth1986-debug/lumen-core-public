@@ -103,19 +103,19 @@
       "segment_id": "ip_or_compliance_reviewer"
     }
   ],
-  "customer_commercialization_sha256": "27c637e885e0290b42d12b6387db02e4887d96bb7eead3a5374b177a6d7b2a2b",
+  "customer_commercialization_sha256": "790927905252b9d759f50dc3eff4a25213ec144c44b6a43c86991c5061cba029",
   "evidence_artifacts": [
     {
       "bytes": 23864,
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
       "present": true,
-      "sha256": "c935210e86e3cf4f217eec9edf04814067a829be7d93fe90093f3839b45490d9"
+      "sha256": "f08ff5e8314c58d9826f69ffdc6fcbf531808254402b3cdee9a3281fb1561e35"
     },
     {
-      "bytes": 52071,
+      "bytes": 54115,
       "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
       "present": true,
-      "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
+      "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
     },
     {
       "bytes": 8029,
@@ -150,7 +150,7 @@
     "Route investors and venture builders to the 30-day technical and commercialization sprint.",
     "Route pilot partners to a data-boundary and acceptance-standard discussion before any private data exchange."
   ],
-  "generated_utc": "2026-07-17T21:10:00.385108+00:00",
+  "generated_utc": "2026-07-17T21:49:15.257862+00:00",
   "human_gate": {
     "accept_terms_allowed_without_human": false,
     "quote_price_allowed_without_human": false,
@@ -252,7 +252,7 @@
     "registry_measured_sources": 25,
     "reviewer_gate_clear": true,
     "schedule_allowed_without_human": false,
-    "traction_lane_count": 19,
+    "traction_lane_count": 20,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0
   }

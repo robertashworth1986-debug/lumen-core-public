@@ -91,6 +91,12 @@ ACTION_OVERRIDES: dict[str, dict[str, Any]] = {
         "time_basis": "Operational continuity support action; no public program deadline found.",
         "action_type": "vendor_route",
     },
+    "openai_build_week_prooflock": {
+        "docket_action": "Confirm model/session provenance, deploy the public demo, record the public video, and populate the Devpost draft without final submission.",
+        "action_due": "2026-07-21",
+        "time_basis": "Official final submission deadline is July 21, 2026 at 5:00 p.m. Pacific / 7:00 p.m. Central.",
+        "action_type": "developer_challenge_build",
+    },
     "patent_deadline_counsel": {
         "docket_action": "Monitor counsel replies and prepare filed-materials packet for licensed review.",
         "action_due": "2026-07-25",
@@ -112,6 +118,7 @@ STATUS_ACTION_TYPES: dict[str, str] = {
     "PITCH_READY_HUMAN_CHECK": "rolling_human_check",
     "HUMAN_FORM_READY": "vendor_route",
     "PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED": "licensed_counsel_review",
+    "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN": "developer_challenge_build",
     "URGENT_COUNSEL_WATCH": "licensed_counsel_review",
     "SUBMITTED_EXTERNAL_VALIDATION_PENDING": "federal_registration_watch",
     "WAITING_POC_RETURN": "lab_poc_followup",
@@ -138,6 +145,7 @@ DOCKET_ACTIONS_BY_TYPE: dict[str, str] = {
     "partner_intro_only": "Use as strategic-intro material, not a solo proposal.",
     "park_partner_only": "Park as non-solo lane unless a qualified platform or prime partner leads.",
     "topic_fit_check": "Review official attachments and score topic fit before drafting.",
+    "developer_challenge_build": "Complete public demo, video, model/session provenance, registration, and draft fields before human final review.",
 }
 
 

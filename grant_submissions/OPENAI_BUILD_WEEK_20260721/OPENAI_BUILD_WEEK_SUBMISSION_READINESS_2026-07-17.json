@@ -1,0 +1,218 @@
+{
+  "schema": "lumencore.openai_build_week_submission_readiness.v1",
+  "generated_utc": "2026-07-17T21:49:11.231080+00:00",
+  "status": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN",
+  "project": {
+    "name": "ProofLock Console",
+    "tagline": "Hash what exists. Hold what is not proven.",
+    "category": "Developer Tools",
+    "public_repo": "https://github.com/robertashworth1986-debug/lumen-core-public",
+    "scoped_tree": "https://github.com/robertashworth1986-debug/lumen-core-public/tree/1578504204c429d7f05779897dc3d5430038f681/build_week/prooflock_console",
+    "app_path": "build_week/prooflock_console",
+    "local_demo_url": "http://127.0.0.1:8088/build_week/prooflock_console/",
+    "public_demo_url": null,
+    "youtube_demo_url": null,
+    "feedback_session_id": null,
+    "confirmed_model": null
+  },
+  "official_requirements": {
+    "schema": "lumencore.openai_build_week_requirements_receipt.v1",
+    "captured_date": "2026-07-17",
+    "capture_method": "VISIBLE_OFFICIAL_PAGE_REVIEW_NORMALIZED_FACT_RECORD",
+    "raw_html_archived": false,
+    "official_sources": {
+      "overview": "https://openai.devpost.com/",
+      "rules": "https://openai.devpost.com/rules",
+      "submission_manager": "https://devpost.com/submit-to/30223-openai-build-week/manage/submissions"
+    },
+    "facts": {
+      "submission_period": {
+        "start_utc": "2026-07-13T16:00:00Z",
+        "deadline_pacific": "2026-07-21T17:00:00-07:00",
+        "deadline_central": "2026-07-21T19:00:00-05:00",
+        "deadline_utc": "2026-07-22T00:00:00Z"
+      },
+      "category": "Developer Tools",
+      "required_project": "A working project built with Codex and GPT-5.6.",
+      "required_submission_materials": [
+        "category",
+        "project description",
+        "public YouTube demonstration shorter than three minutes with audio",
+        "code repository URL with relevant licensing and setup instructions",
+        "working demo or test access available free through judging",
+        "README explaining Codex collaboration and key decisions",
+        "/feedback Codex Session ID for the thread containing most core functionality"
+      ],
+      "existing_project_rule": "Pre-existing projects must be meaningfully extended after the submission period begins, and the entrant must distinguish prior work from new work with dated evidence.",
+      "judging": {
+        "stage_one": "Pass/fail theme fit and use of the required tools.",
+        "stage_two_equal_weight_criteria": [
+          "Technological Implementation",
+          "Design",
+          "Potential Impact",
+          "Quality of the Idea"
+        ]
+      },
+      "project_testing_rule": "Judges must receive free access to a working website, demo, test build, sandbox, or test account.",
+      "plugin_required": false,
+      "free_credit_request_deadline_pacific": "2026-07-17T12:00:00-07:00"
+    },
+    "facts_sha256": "4275d15cc89f75e83691677b331a8652a4b6828175f393c2a96c1e68f04fa4b3",
+    "claim_boundary": "This is a normalized fact record from the visible official overview and rules pages, not a raw-page archive or legal interpretation. The official rules and current Devpost submission interface remain authoritative.",
+    "receipt_sha256": "6f20c120cc46d693fc9bebbaee6f8dc4dc232b42450432f615ad2999c99b6adc"
+  },
+  "new_work_evidence": {
+    "commit": "1578504204c429d7f05779897dc3d5430038f681",
+    "committed_at": "2026-07-17T16:37:51-05:00",
+    "subject": "Add Build Week ProofLock Console",
+    "after_submission_start": true,
+    "github_tree_url": "https://github.com/robertashworth1986-debug/lumen-core-public/tree/1578504204c429d7f05779897dc3d5430038f681/build_week/prooflock_console"
+  },
+  "app_artifacts": [
+    {
+      "path": "build_week/prooflock_console/README.md",
+      "present": true,
+      "bytes": 2719,
+      "sha256": "26615a4750a4b87a910194fa14609a4787e872b35802dbd3448eb9acf3a3dfb2"
+    },
+    {
+      "path": "build_week/prooflock_console/app.js",
+      "present": true,
+      "bytes": 10846,
+      "sha256": "3a8aef62513533960c5f6fc891145016ef35a1b5eb759f0b1a3a7dde9259cad2"
+    },
+    {
+      "path": "build_week/prooflock_console/index.html",
+      "present": true,
+      "bytes": 4178,
+      "sha256": "dd313667755130e3f6542df91e2f3a376090cedbc06370cb0185e888d22d1ae7"
+    },
+    {
+      "path": "build_week/prooflock_console/sample_receipt.json",
+      "present": true,
+      "bytes": 4221,
+      "sha256": "dee8c4779a74e4e34f5b5ee8ae127c49eb88d3cbc6693d1d419f103b39636c63"
+    },
+    {
+      "path": "build_week/prooflock_console/styles.css",
+      "present": true,
+      "bytes": 8725,
+      "sha256": "e3b27fa4aaac362630f5da701f2ea7b4ea6a431e5efc9df0fc1a51f5d412705d"
+    },
+    {
+      "path": "build_week/prooflock_console/verify_receipt.py",
+      "present": true,
+      "bytes": 6701,
+      "sha256": "358299d05a1658bacb4705d76fc9fe1fa28d94265120a3d22012887fd905cf84"
+    }
+  ],
+  "sample_verification": {
+    "integrity_valid": true,
+    "promotion_allowed": false,
+    "recorded_decision": "HOLD",
+    "artifact_count": 4,
+    "artifact_hash_match_count": 4,
+    "required_open_or_failed_gates": [
+      "engineering_cad",
+      "prototype_test",
+      "qualified_safety_review",
+      "human_release"
+    ],
+    "receipt_sha256": "07f4d143210c5d0a175c480228273c6b3d4c5b01da5a12a5daeb38fcdfb0d961"
+  },
+  "gates": [
+    {
+      "gate_id": "working_project",
+      "label": "Working project",
+      "status": "PASS",
+      "owner": "Codex",
+      "basis": "The static console, browser verifier, Python verifier, sample receipt, and README are present; the bundled sample verifies 4/4 declared artifacts."
+    },
+    {
+      "gate_id": "post_start_new_work",
+      "label": "Post-start new work",
+      "status": "PASS",
+      "owner": "Git",
+      "basis": "First scoped evidence commit: 1578504204c429d7f05779897dc3d5430038f681 at 2026-07-17T16:37:51-05:00."
+    },
+    {
+      "gate_id": "public_repository",
+      "label": "Public repository",
+      "status": "PASS",
+      "owner": "GitHub",
+      "basis": "https://github.com/robertashworth1986-debug/lumen-core-public.git"
+    },
+    {
+      "gate_id": "relevant_license",
+      "label": "Relevant license",
+      "status": "PASS",
+      "owner": "Repository",
+      "basis": "The root MIT license is present and applies to the public repository unless a path states otherwise."
+    },
+    {
+      "gate_id": "model_provenance",
+      "label": "GPT-5.6 provenance",
+      "status": "OPEN",
+      "owner": "Robert",
+      "basis": "Confirm the model label from the project-building Codex session; do not infer it from prose or local filenames."
+    },
+    {
+      "gate_id": "feedback_session",
+      "label": "/feedback session ID",
+      "status": "OPEN",
+      "owner": "Robert",
+      "basis": "Generate and paste the Codex /feedback Session ID for the task containing most of the console implementation."
+    },
+    {
+      "gate_id": "public_demo",
+      "label": "Public working demo",
+      "status": "OPEN",
+      "owner": "Codex and Robert",
+      "basis": "Deploy the self-contained console to a stable public URL and verify all four artifact fetches from that URL."
+    },
+    {
+      "gate_id": "youtube_demo",
+      "label": "Public demo video",
+      "status": "OPEN",
+      "owner": "Robert",
+      "basis": "Record the bounded script with voice, keep it under three minutes, upload it publicly to YouTube, and review privacy before publishing."
+    },
+    {
+      "gate_id": "devpost_registration",
+      "label": "Devpost registration",
+      "status": "OPEN",
+      "owner": "Robert",
+      "basis": "Log in or create the Devpost account, review the rules, and join the hackathon."
+    },
+    {
+      "gate_id": "final_submission",
+      "label": "Final submission",
+      "status": "OPEN",
+      "owner": "Robert",
+      "basis": "Review every populated field, publicity/IP terms, repository visibility, demo video, and final certification before the final submit action."
+    }
+  ],
+  "counts": {
+    "gate_total": 10,
+    "pass": 4,
+    "open": 6,
+    "fail": 0
+  },
+  "core_ready": true,
+  "ready_for_final_submission": false,
+  "next_actions": [
+    "Confirm GPT-5.6 model provenance and obtain the /feedback Session ID.",
+    "Deploy and verify the public demo URL.",
+    "Record and publish the under-three-minute YouTube demo after privacy review.",
+    "Join the Devpost challenge, populate the draft, and obtain action-time approval before final submission."
+  ],
+  "claim_boundary": "This packet records a bounded Build Week readiness audit for the public ProofLock Console. It does not prove Devpost registration, GPT-5.6 model identity, a valid /feedback session ID, a public demo deployment, a YouTube upload, eligibility acceptance, final submission, judging outcome, OpenAI endorsement, prize entitlement, external validation, patent rights, safety, engineering performance, funding, or commercial value.",
+  "outputs": {
+    "json": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json",
+    "markdown": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.md",
+    "description_draft": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PROJECT_DESCRIPTION_DRAFT_2026-07-17.md",
+    "demo_script": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEMO_SCRIPT_2026-07-17.md",
+    "requirements_receipt": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json"
+  },
+  "packet_sha256": "a25ca7e45f81cfc67b8b08c7d69c5e1bbacd3cdc2b92c2bb8d53e3b31b75c58d"
+}

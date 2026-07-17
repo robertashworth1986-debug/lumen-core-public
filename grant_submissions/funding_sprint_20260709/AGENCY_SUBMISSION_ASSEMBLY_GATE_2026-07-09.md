@@ -23,7 +23,7 @@ No federal, SBIR, RFI, lab, IP, certification, legal, pricing, portal, trading, 
 - Capital movement allowed: `false`
 - Unsafe sensitive hits: `0`
 - Unsafe claim hits: `0`
-- Assembly gate SHA-256: `9f96aa63f3abe5a2e8af671103a41a3ddb094ec35ed210e269577b57f45e7809`
+- Assembly gate SHA-256: `b60f0ccabb02e45aee8da639a98bf7694d8217cc10e35ba3a7a0e3ce489ae083`
 
 ## Package Status Counts
 
@@ -84,7 +84,7 @@ Assembly blockers:
 - Package status: `FOLLOWUP_PACKET_READY_HUMAN_SEND_REQUIRED`
 - Urgency: `URGENT_5D`
 - Action due: `2026-07-13`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -93,7 +93,7 @@ Assembly blockers:
 - Required authority: Robert approves any lab POC reply, NDA, licensing discussion, export-control response, or disclosure packet.
 - Next human action: Prepare concise licensing-fit note and technical questions for the named LANL POC return window.
 - Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
-- Row SHA-256: `3561eab433065d460f224f67fee910e4e05b3f532b8134a18159fae6c7552a4d`
+- Row SHA-256: `91ccaa1534d2a58a28ad9ab310c217d8d337e0228ea5cf017cc4f1e12ace7a4b`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -155,7 +155,7 @@ Assembly blockers:
 - Package status: `ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED`
 - Urgency: `URGENT_5D`
 - Action due: `2026-07-12`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -164,7 +164,7 @@ Assembly blockers:
 - Required authority: Robert verifies the controlling BAA instructions, submission account authority, budget, representations, and final package.
 - Next human action: Build full-proposal compliance matrix and confirm controlling BAA instructions.
 - Claim boundary: Abstract receipt is not award selection and not permission to skip BAA instructions.
-- Row SHA-256: `9e68964cfc341021abd7e8d4863342b0a078eb2da44df356babf76cc27d16b8d`
+- Row SHA-256: `587ff5b535f8d47c9b9e1b16fcbbb02e2378dd0cbfb9f870d9136ba252eb506e`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -335,7 +335,7 @@ Assembly blockers:
 - Package status: `WAIT_FOR_RESPONSE`
 - Urgency: `ACTIVE_14D`
 - Action due: `2026-07-21`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -344,7 +344,7 @@ Assembly blockers:
 - Required authority: Robert approves any further agency contact after a routing response.
 - Next human action: Wait for routing response; do not prepare a prime bid.
 - Claim boundary: No instrument supply, OEM, reseller, or lab-services qualification claim.
-- Row SHA-256: `cb73a1937206d27b02b6a6301d04e457c6d903df3106f0de4324d3bd0221c3c0`
+- Row SHA-256: `a8abaa1ad8feab278699fe6bff810b64f8108f4a9a5b35e2b9e09ca90341ae25`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -370,7 +370,7 @@ Assembly blockers:
 - Package status: `PARTNER_OR_NO_SOLO_BLOCKED`
 - Urgency: `PARKED_UNLESS_PARTNER`
 - Action due: `2026-07-21`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -379,7 +379,7 @@ Assembly blockers:
 - Required authority: Qualified partner and Robert approve any partner-led response.
 - Next human action: Find qualified partner before any response draft.
 - Claim boundary: No testing lab, contaminant monitoring, or regulated lab-services claim.
-- Row SHA-256: `ea7ba288a1bbeb4e9df12ee16558b80a2886985df27b147254dadf2c2e8e1444`
+- Row SHA-256: `523dfe2b4e8e3a9194e91a7b67ea01337ddbb141b0c1fc11d29571bb51e8ae03`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -405,7 +405,7 @@ Assembly blockers:
 - Package status: `SCOUT_READY_NOT_ASSEMBLED`
 - Urgency: `WATCHLIST`
 - Action due: `2026-07-24`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -414,7 +414,7 @@ Assembly blockers:
 - Required authority: Robert approves topic selection after official attachments and topic fit are reviewed.
 - Next human action: Review official attachments and score topic fit before drafting.
 - Claim boundary: No claim that LumenCore fits all BAA topics.
-- Row SHA-256: `1f37abab9d40dab00641a252fc89407ed9edf8cbf8b74e149ef0e8a6a0a99989`
+- Row SHA-256: `5b4c5bfb79dacc99a6c96948bbaae48ee8198fb760d0e52fa8be5a4e1442c0bb`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -440,7 +440,7 @@ Assembly blockers:
 - Package status: `PARTNER_OR_NO_SOLO_BLOCKED`
 - Urgency: `PARKED_UNLESS_PARTNER`
 - Action due: `2026-07-14`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262`
 - Review-ready components: `8/8`
 - Can prepare internally: `false`
 - External send without human: `false`
@@ -449,7 +449,7 @@ Assembly blockers:
 - Required authority: Qualified compliant platform or prime partner must lead before this lane is reopened.
 - Next human action: Park as non-solo lane unless a qualified platform or prime partner leads.
 - Claim boundary: No FedRAMP, ATO, HHS pilot, or government production-access claim.
-- Row SHA-256: `db5460b5fee41a7715d923003ee77bcd9a0b57ee29e556480e173c65210721aa`
+- Row SHA-256: `30f48e97830457eb9e00d7783af26aad35b66d648b6ba08d6b7ab309f9706c17`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -475,7 +475,7 @@ Assembly blockers:
 - Package status: `PARTNER_OR_NO_SOLO_BLOCKED`
 - Urgency: `PARKED_UNLESS_PARTNER`
 - Action due: `2026-07-14`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262`
 - Review-ready components: `8/8`
 - Can prepare internally: `false`
 - External send without human: `false`
@@ -484,7 +484,7 @@ Assembly blockers:
 - Required authority: Qualified compliant platform or prime partner must lead before this lane is reopened.
 - Next human action: Park as non-solo lane unless a qualified platform or prime partner leads.
 - Claim boundary: No public-safety deployment, law-enforcement feed integration, or FedRAMP authorization claim.
-- Row SHA-256: `5473a65c33ffe803d8735495db782308c78e8b60f24b6ad6f46e341bc5dabd8c`
+- Row SHA-256: `1128355d7cdbfe711e95866b1e766a91499f5637e9ab841286507d0767c1364b`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -510,7 +510,7 @@ Assembly blockers:
 - Package status: `PARTNER_OR_NO_SOLO_BLOCKED`
 - Urgency: `PARKED_UNLESS_PARTNER`
 - Action due: `2026-07-30`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -519,7 +519,7 @@ Assembly blockers:
 - Required authority: Robert approves any strategic partner or investor introduction before outreach.
 - Next human action: Use as strategic-intro material, not a solo proposal.
 - Claim boundary: No consortium management, energy project financing, or installation-performance claim.
-- Row SHA-256: `f4da07a8857f45213263642a39dafd1e4c18b749f0bae8e475fad47e1135715d`
+- Row SHA-256: `02ca78251983dbe594df04c044d7f64f60b105e1dcb3e000c68db220768d1aa0`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`

@@ -23,9 +23,9 @@ def test_human_action_docket_builds_date_aware_lane_board():
     assert payload["schema"] == "human_action_docket_v1"
     assert payload["current_date"] == "2026-07-09"
     assert payload["status"] == "HUMAN_ACTION_DOCKET_READY"
-    assert payload["summary"]["lane_count"] == 19
-    assert payload["summary"]["traction_lane_count"] == 19
-    assert payload["summary"]["concierge_lane_count"] == 19
+    assert payload["summary"]["lane_count"] == 20
+    assert payload["summary"]["traction_lane_count"] == 20
+    assert payload["summary"]["concierge_lane_count"] == 20
     assert payload["summary"]["all_artifacts_present"] is True
     assert payload["summary"]["reviewer_gate_clear"] is True
     assert payload["summary"]["unsafe_secret_count"] == 0
@@ -59,6 +59,8 @@ def test_immediate_and_urgent_lanes_are_explicit_and_human_gated():
     assert items["darpa_dice_full_submission"]["action_due"] == "2026-07-12"
     assert items["openai_api_continuity"]["action_due"] == "2026-07-10"
     assert items["patent_deadline_counsel"]["action_due"] == "2026-07-25"
+    assert items["openai_build_week_prooflock"]["action_due"] == "2026-07-21"
+    assert items["openai_build_week_prooflock"]["action_type"] == "developer_challenge_build"
     assert items["protecnium_its_infrastructure_signal"]["action_type"] == "customer_discovery_watch"
     assert items["hhs_ai_power_user_pilot"]["urgency"] == "PARKED_UNLESS_PARTNER"
     assert items["csosa_public_safety_analytics"]["urgency"] == "PARKED_UNLESS_PARTNER"

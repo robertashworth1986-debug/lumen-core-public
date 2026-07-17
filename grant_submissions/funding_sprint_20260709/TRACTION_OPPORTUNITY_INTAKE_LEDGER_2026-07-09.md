@@ -7,11 +7,11 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 ## Summary
 
 - Status: `TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED`
-- Lanes tracked: `19`
-- Top priority lanes: `10`
-- Gmail references: `16`
+- Lanes tracked: `20`
+- Top priority lanes: `11`
+- Gmail references: `17`
 - Sweetspot references: `8`
-- Public references: `19`
+- Public references: `21`
 - Current response records: `12`
 - Current immediate human actions: `2`
 - Current do-not-duplicate sends: `11`
@@ -24,7 +24,7 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 - Human action required: `true`
 - External send without human: `false`
 - Final submission without human: `false`
-- Ledger SHA-256: `a157a984945fbeedf432b1f64692107fedd25c2044674a5979bfe558fe84d3bf`
+- Ledger SHA-256: `54d2522de6a7690f1d4df164b1d30a236a82d36d55bb7086279d328e8680d26a`
 
 ## Source Coverage
 
@@ -328,6 +328,31 @@ This overlay is authoritative through the stated as-of date and supersedes a leg
 - Sources:
   - `gmail:19f44c59a4189d31`
   - `public:lvlup_first_check`
+
+### 2. OpenAI Build Week - ProofLock Console
+
+- Lane ID: `openai_build_week_prooflock`
+- Channel: `developer_challenge`
+- Legacy intake status: `PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN`
+- Effective current status: `PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN`
+- Fit score: `93`
+- Legacy intake gate: Final submission deadline is 2026-07-21 17:00 Pacific / 19:00 Central / 2026-07-22 00:00 UTC per the official Devpost overview and rules.
+- Effective current gate: Final submission deadline is 2026-07-21 17:00 Pacific / 19:00 Central / 2026-07-22 00:00 UTC per the official Devpost overview and rules.
+- Effective reviewer action: Confirm GPT-5.6 provenance and the /feedback Session ID, deploy the public demo, record the public under-three-minute YouTube demo, then populate and review the Devpost draft.
+- Effective state source: `legacy_intake_baseline`
+- Human gate: Human logs in or registers with Devpost, reviews publicity/IP terms and every populated field, and approves the final submission action.
+- Effective claim boundary: This is a verified project-readiness lane, not proof of Devpost registration, model identity, final submission, eligibility acceptance, judging outcome, OpenAI endorsement, prize entitlement, external validation, or commercial value.
+- Evidence hash: `8368acb990254c03e8f5b8cf311dd9e12584de9867764ae6c4552b13a8529b0f`
+- Evidence:
+  - Official OpenAI email announced the challenge, deadline, and $100,000 total prize pool.
+  - Official rules allow a meaningfully extended pre-existing project when post-start work is clearly documented.
+  - ProofLock Console was added after the submission period opened in commit 1578504204c429d7f05779897dc3d5430038f681.
+  - The browser and Python verifiers both match 4/4 public V2/V3 artifacts and keep four engineering/release gates open.
+- Sources:
+  - `gmail:19f71ed715ce0c9f`
+  - `public:https://openai.devpost.com/`
+  - `public:https://openai.devpost.com/rules`
+  - `github:1578504204c429d7f05779897dc3d5430038f681`
 
 ### 3. USPTO / Georgia PATENTS pro bono routing
 
