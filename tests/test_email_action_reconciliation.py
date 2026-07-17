@@ -32,7 +32,7 @@ def test_reconciliation_is_deterministic_and_no_send():
     assert actual["summary"]["lane_count"] == 12
     assert actual["summary"]["email_reply_required_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
-    assert actual["summary"]["duplicate_outbound_risk_count"] == 3
+    assert actual["summary"]["duplicate_outbound_risk_count"] == 11
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert all(lane["send_now"] is False for lane in actual["lanes"])
 
@@ -72,12 +72,36 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert "Monitor the referred response lead" in fhwa["next_action"]
 
     nashville = lanes["nashville_ec_takeoff_fall_2026"]
-    assert nashville["latest_event_type"] == "DEADLINE_PRESERVATION_QUERY_SENT"
-    assert nashville["latest_event_utc"] == "2026-07-17T12:05:34Z"
-    assert nashville["state"] == "DEADLINE_QUERY_SENT_PORTAL_SUBMISSION_STILL_REQUIRED"
+    assert nashville["latest_event_type"] == "OFFICIAL_DEADLINE_CONFIRMATION_RECEIVED"
+    assert nashville["latest_event_utc"] == "2026-07-17T16:11:48Z"
+    assert nashville["state"] == (
+        "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
+    )
+    assert nashville["operational_local_deadline"] == "2026-07-17T23:59:00-05:00"
+    assert nashville["operational_utc_deadline"] == "2026-07-18T04:59:00Z"
+    assert nashville["deadline_timezone_explicit_in_message"] is False
     assert nashville["do_not_duplicate_send"] is True
     assert nashville["send_now"] is False
-    assert "not treat the email as an application" in nashville["next_action"]
+    assert "not treat the support reply as an application" in nashville["next_action"]
+
+    lvlup = lanes["lvlup_optional_paid_event"]
+    assert lvlup["latest_event_type"] == (
+        "INDEPENDENT_REVIEW_CONTINUATION_CONFIRMED"
+    )
+    assert lvlup["latest_event_utc"] == "2026-07-17T15:58:03Z"
+    assert lvlup["state"] == (
+        "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED"
+    )
+    assert lvlup["written_independent_review_confirmation"] is True
+    assert lvlup["paid_sponsor_purchase_required_for_separate_review"] is False
+    assert lvlup["do_not_duplicate_send"] is True
+    assert lvlup["send_now"] is False
+
+    source_evidence = module.build_payload()["source_evidence"]
+    assert source_evidence["nashville_official_deadline_confirmation"]["present"] is True
+    assert source_evidence["lvlup_independent_review_confirmation"]["present"] is True
+    assert len(source_evidence["nashville_official_deadline_confirmation"]["sha256"]) == 64
+    assert len(source_evidence["lvlup_independent_review_confirmation"]["sha256"]) == 64
 
 
 def test_public_reconciliation_excludes_private_mailbox_data():

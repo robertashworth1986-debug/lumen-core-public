@@ -68,6 +68,9 @@ NASHVILLE_EC_DEADLINE_RECEIPT = (
 NASHVILLE_EC_DEADLINE_RESPONSE_CONTROL = (
     SPRINT_DIR / "NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md"
 )
+NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION = (
+    NASHVILLE_EC_DIR / "NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json"
+)
 MISSIONWEAVE_DIR = (
     ROOT / "grant_submissions" / "DLA26BZ03_NV011_MissionWeave"
 )
@@ -382,6 +385,7 @@ def base_sources() -> dict[str, Any]:
         "nashville_ec_private_workflow": NASHVILLE_EC_PRIVATE_WORKFLOW,
         "nashville_ec_deadline_preservation_receipt": NASHVILLE_EC_DEADLINE_RECEIPT,
         "nashville_ec_deadline_response_control": NASHVILLE_EC_DEADLINE_RESPONSE_CONTROL,
+        "nashville_ec_official_deadline_confirmation": NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION,
         "missionweave_dsip_package_manifest": MISSIONWEAVE_MANIFEST,
         "missionweave_dsip_assembly_map": MISSIONWEAVE_ASSEMBLY_MAP,
         "missionweave_volume2_pdf": MISSIONWEAVE_VOLUME2_PDF,
@@ -526,12 +530,20 @@ def build_command_lanes(
 ) -> list[dict[str, Any]]:
     nashville_gate = nashville_private_action_gate()
     nashville_deadline = read_json(NASHVILLE_EC_DEADLINE_RECEIPT)
+    nashville_official_deadline = read_json(NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION)
     if (
         nashville_deadline.get("schema") != "lumencore.external_engagement_receipt.v1"
         or nashville_deadline.get("acknowledgment", {}).get("status")
         != "DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING"
     ):
         raise ValueError("Nashville EC deadline-preservation receipt is missing or stale")
+    if (
+        nashville_official_deadline.get("schema")
+        != "lumencore.nashville_ec_official_deadline_confirmation.v1"
+        or nashville_official_deadline.get("status")
+        != "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
+    ):
+        raise ValueError("Nashville EC official deadline confirmation is missing or stale")
     sam = sam_lookup(sam_board)
     grants = grant_lookup(grants_ranked)
 
@@ -691,13 +703,16 @@ def build_command_lanes(
             "opportunity_number": "NASHVILLE-EC-FALL-2026",
             "title": "Nashville Entrepreneur Center Fall 2026 Accelerators",
             "agency": "Nashville Entrepreneur Center",
-            "deadline_utc": None,
+            "deadline_utc": nashville_official_deadline["confirmation"][
+                "operational_utc_deadline"
+            ],
             "deadline_date": "2026-07-17",
             "official_deadline_text": (
-                "Applications close July 17, 2026; the official page does not list a "
-                "closing time"
+                "The official Nashville Entrepreneur Center reply states that applications "
+                "are open until 11:59 p.m. on July 17. The message does not name a timezone; "
+                "America/Chicago is the explicit operational inference."
             ),
-            "deadline_semantics": "DATE_ONLY_CLOSE_TIME_NOT_LISTED_SUBMIT_EARLY",
+            "deadline_semantics": "OFFICIAL_REPLY_CONFIRMED_TIME_TIMEZONE_INFERRED_SUBMIT_EARLY",
             "command": "STAGE_APPLICATION",
             "eligibility_state": "MIDDLE_TENNESSEE_SOLO_FOUNDER_FIT_HUMAN_FACTS_UNVERIFIED",
             "fit_state": "STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT",
@@ -714,17 +729,25 @@ def build_command_lanes(
                 rel(NASHVILLE_EC_PRIVATE_WORKFLOW),
                 rel(NASHVILLE_EC_DEADLINE_RECEIPT),
                 rel(NASHVILLE_EC_DEADLINE_RESPONSE_CONTROL),
+                rel(NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION),
             ],
-            "deadline_support_status": nashville_deadline["acknowledgment"][
-                "status"
-            ],
+            "deadline_support_status": nashville_official_deadline["status"],
             "deadline_support_sent_utc": nashville_deadline["submission"][
                 "sent_utc"
             ],
-            "deadline_support_do_not_duplicate_send": nashville_deadline[
-                "acknowledgment"
-            ]["do_not_duplicate_send"],
+            "deadline_support_do_not_duplicate_send": not nashville_official_deadline[
+                "application_state"
+            ]["duplicate_deadline_query_allowed"],
             "deadline_support_email_is_application": False,
+            "deadline_support_reply_required": nashville_official_deadline[
+                "application_state"
+            ]["reply_required"],
+            "deadline_timezone_explicit_in_message": nashville_official_deadline[
+                "confirmation"
+            ]["timezone_explicit_in_message"],
+            "operational_timezone": nashville_official_deadline["confirmation"][
+                "operational_timezone"
+            ],
             "action_gate_status": nashville_gate["status"],
             "action_gate_submission_ready_for_human_click": nashville_gate[
                 "submission_ready_for_human_click"
@@ -763,7 +786,7 @@ def build_command_lanes(
             "today_work": [
                 "Run the hidden-prompt founder-fact collector and require its ignored 11-answer fill map to validate.",
                 "Paste the claim-bounded answers into the common application and select TakeOff.",
-                "Monitor the single deadline-support thread for the exact close time; do not resend and do not treat it as an application.",
+                "Use the confirmed 11:59 p.m. close as the outside bound and submit early; do not resend and do not treat the support reply as an application.",
                 "Stop at final preview; do not accept a fee, terms, or cohort seat during application staging.",
             ],
             "human_gate": [
@@ -884,7 +907,7 @@ def build_command_lanes(
                 "This is the nearest complete federal Phase I proposal package. The "
                 "15-file manifest verifies byte-for-byte, the technical candidate is "
                 "claim-bounded, and the official topic fit is strong. It is not "
-                "submission-ready until the public action gate moves from 0/50 to 50/50 "
+                f"submission-ready: the current public action gate is {missionweave_action_gate['gate_summary']['passed_private_gate_count']}/{missionweave_action_gate['gate_summary']['required_private_gate_count']}, and every remaining gate must be resolved "
                 "without exposing identity, cost, ITAR, CMMC, award-history, foreign-"
                 "affiliation, rights, preview, or certification values."
             ),
@@ -1553,6 +1576,20 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
         key=lambda row: (row["days_to_close"], row["rank"]),
         default=None,
     )
+    nashville_lane = next(
+        row for row in lanes if row["lane_id"] == "nashville_ec_fall_2026_takeoff"
+    )
+    missionweave_lane = next(
+        row for row in lanes if row["lane_id"] == "dla_missionweave_dsip_phase1"
+    )
+    nashville_gate_progress = (
+        f"{nashville_lane['action_gate_passed_private_gate_count']}/"
+        f"{nashville_lane['action_gate_required_private_gate_count']}"
+    )
+    missionweave_gate_progress = (
+        f"{missionweave_lane['action_gate_passed_private_gate_count']}/"
+        f"{missionweave_lane['action_gate_required_private_gate_count']}"
+    )
 
     payload: dict[str, Any] = {
         "schema": "near_deadline_submission_command_board_v4",
@@ -1568,13 +1605,27 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "no_bid_or_partner_only_count": len(no_bid),
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. If it is Nashville EC, move its private action gate from 0/15 by running the six-prompt hidden collector, then reach the complete preview before the date-only July 17 close. One deadline-support query is sent and must not be duplicated or treated as an application. Otherwise preserve the authenticated lane to its next safe preview. Next use the MissionWeave seven-volume checklist, hidden sectioned collector, and guarded private Volume 2 finalizer to move its private action gate from 0/50 while keeping the proposal number, final PDF identity, and action-time approval private; all 15 public package files are verified for the July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.",
+            "strongest_today_action": (
+                "Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. "
+                f"If it is Nashville EC, move its private action gate from {nashville_gate_progress} by running the six-prompt hidden collector, then reach the complete preview well before the confirmed 11:59 p.m. July 17 close. "
+                "The deadline-support reply must not be duplicated or treated as an application. Otherwise preserve the authenticated lane to its next safe preview. "
+                f"Next use the MissionWeave seven-volume checklist to move its current private action gate beyond {missionweave_gate_progress} while keeping the proposal number, final PDF identity, and action-time approval private; all 15 public package files are verified for the July 22 noon Eastern close. "
+                "Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed."
+            ),
             "critical_same_day_infrastructure_action": sam_critical_action,
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
-            "best_grants_lane": "DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. The hidden sectioned collector can capture DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate, and the public action gate stays 0/50 until actual portal facts are supported. NSF 26-510 stays the next rolling Project Pitch route.",
+            "best_grants_lane": (
+                "DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. "
+                "The hidden sectioned collector captures DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate. "
+                f"The current public action gate is {missionweave_gate_progress}, with unsupported portal and compliance facts still open. NSF 26-510 stays the next rolling Project Pitch route."
+            ),
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: the first listed contact route rejected delivery, the replacement route replied, and the request was referred to the subject matter expert leading this response. The fit check and partnership remain unconfirmed; no solo bid and no partner claim unless written role and corporate-experience evidence arrive.",
-            "fastest_low_friction_lane": "The Nashville EC TakeOff application is the nearest low-friction reviewer route. Its hidden-input gate is 0/15: six founder prompts produce 11 private portal answers, then preview, fee/terms, and action-time authorization remain human-gated. The verified support email only asks for the close time and does not replace portal submission.",
+            "fastest_low_friction_lane": (
+                "The Nashville EC TakeOff application is the nearest low-friction reviewer route. "
+                f"Its hidden-input gate is {nashville_gate_progress}: six founder prompts produce 11 private portal answers, then preview, fee/terms, and action-time authorization remain human-gated. "
+                "The verified support reply confirms the close time but does not replace portal submission."
+            ),
             "all_final_actions_blocked_without_human": True,
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,

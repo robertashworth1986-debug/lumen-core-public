@@ -9,7 +9,7 @@ Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
 - Reconciled lanes: `12`
 - Reply required now: `0`
 - Send now: `0`
-- Duplicate-outbound risks: `3`
+- Duplicate-outbound risks: `11`
 - Human account actions: `1`
 - Browser navigation performed: `false`
 
@@ -17,12 +17,12 @@ Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
 
 | Lane | State | Reply now | Next action |
 |---|---|---:|---|
-| Nashville Entrepreneur Center | `DEADLINE_QUERY_SENT_PORTAL_SUBMISSION_STILL_REQUIRED` | `false` | Continue the portal application and monitor for the exact close time or support instructions; do not resend and do not treat the email as an application. |
+| Nashville Entrepreneur Center | `OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED` | `false` | Complete the founder-fact and reviewed portal workflow well before the confirmed close; do not resend and do not treat the support reply as an application. |
 | EPRI Open Power AI Consortium | `MOU_ROUTING_SENT_OUT_OF_OFFICE_RECEIVED` | `false` | Wait for the MOU, a correction request, or an onboarding question; do not resend identity details. |
 | Georgia PATENTS | `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING` | `false` | Wait for intake instructions; do not disclose unpublished patent materials through ordinary email. |
 | Los Alamos National Laboratory | `PACKAGE_SENT_RESPONSE_PENDING` | `false` | Wait for LANL; use the single bounded follow-up only on or after July 23 if no reply arrives. |
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `false` | Monitor for a CDC clarification, replacement request, or scheduling message; do not resend the response. |
-| LvlUp Ventures / Power of the Pitch Week | `OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND` | `false` | No reply or purchase; reconsider only if a relevant no-fee route or written non-pay-to-play selection terms arrive. |
+| LvlUp Ventures / Power of the Pitch Week | `WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED` | `false` | Monitor the existing thread. Reply only if LvlUp's Investment Committee requests additional information; do not purchase the optional sponsor track or send an unsolicited duplicate packet. |
 | Terry Anderton / Vynetic | `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY` | `false` | Send nothing further unless Terry replies with a specific ask; then answer only that ask in the existing thread. |
 | Cambridge Systematics | `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING` | `false` | Monitor the referred response lead for scheduling or a specific question. If no reply arrives by July 21, send at most one short scheduling follow-up. Do not claim a partner or use corporate experience without written permission. |
 | U.S. National Science Foundation | `NO_OFFICIAL_PROJECT_PITCH_INVITATION_VERIFIED` | `false` | Use the rolling Project Pitch portal route; do not represent the July 27 full-proposal deadline as reachable without an invitation. |

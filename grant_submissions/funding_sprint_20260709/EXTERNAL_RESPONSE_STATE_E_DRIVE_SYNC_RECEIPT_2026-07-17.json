@@ -1,12 +1,36 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T20:15:32.840Z",
+  "created_utc": "2026-07-17T20:30:35.589Z",
   "destination_root": "E:/LumaProofVault/OUTREACH/EXTERNAL_RESPONSE_STATE_20260717",
-  "artifact_count": 10,
+  "artifact_count": 19,
   "all_sha256_matched_after_copy": true,
   "browser_navigation_performed": false,
   "private_founder_values_mirrored": false,
   "artifacts": [
+    {
+      "source": "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
+      "bytes": 18132,
+      "sha256": "776DBBE17B506D4C02FD05B8267F068A13F15DA555DFF5F2D70003D368C21925",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_email_action_reconciliation.py",
+      "bytes": 5028,
+      "sha256": "4CF21B311A37A8D4822534211529B6952634BFD120D96FFA1B99960F22931744",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
+      "bytes": 9681,
+      "sha256": "D7F7B1AEE07E3F689BB33AC0AC8ED4069C582CB16517242FE0528B8EAC322002",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
+      "bytes": 3415,
+      "sha256": "B39B5FCCB6779DD8ED891478011EE133154FBE17E3F73C160A07D6135146E16D",
+      "copy_sha256_matched": true
+    },
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
       "bytes": 41637,
@@ -16,7 +40,7 @@
     {
       "source": "tests/test_external_engagement_response_register.py",
       "bytes": 18753,
-      "sha256": "DE88C55B61F07FCEF065686C842867A8A5C32E503717E12D11D457C0D8B8BBB1",
+      "sha256": "F809E4E537A5B64271EA1185B2AA02D0E4E37602CE4B9294B40B48A7925E6DE6",
       "copy_sha256_matched": true
     },
     {
@@ -34,13 +58,13 @@
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
       "bytes": 34615,
-      "sha256": "D2A7F11FA13560BD2E01F4F87A9D88FA929BD3ABF3E534CA27EEE0702FDD5E3F",
+      "sha256": "63DF3DAD8AF80B433ED4DC3F6826C284BE39CA9DC4C40C2CDD571F4A788DC556",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
       "bytes": 25225,
-      "sha256": "6C5768B13784DADC7B0AE1AFFC07E9E4AAAC2279E2522CD342A7A4FCD08062A3",
+      "sha256": "DBCDE3CCBBCF1DAFA1B6800F6B78D98BA63A7F85ED1C6DA6C7F35B5D4009AB29",
       "copy_sha256_matched": true
     },
     {
@@ -58,15 +82,45 @@
     {
       "source": "out/ops/external_engagement_response_register_latest.json",
       "bytes": 34615,
-      "sha256": "D2A7F11FA13560BD2E01F4F87A9D88FA929BD3ABF3E534CA27EEE0702FDD5E3F",
+      "sha256": "63DF3DAD8AF80B433ED4DC3F6826C284BE39CA9DC4C40C2CDD571F4A788DC556",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/external_engagement_response_register.json",
       "bytes": 34615,
-      "sha256": "D2A7F11FA13560BD2E01F4F87A9D88FA929BD3ABF3E534CA27EEE0702FDD5E3F",
+      "sha256": "63DF3DAD8AF80B433ED4DC3F6826C284BE39CA9DC4C40C2CDD571F4A788DC556",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "bytes": 105433,
+      "sha256": "AB9DACA0E9CD6BB55801C79C9E9450B205ABBAB580E430E71D2B83425A2289F1",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_submission_command_board.py",
+      "bytes": 23806,
+      "sha256": "0335279869DED678CEA405F27A7FE0A38F2E04FC63565C4BA62C4AF9A6E6A660",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "bytes": 59781,
+      "sha256": "307C200BB79198A46833033FBC54A096C57D55EFD3D4D6FB7CC95DDD3FE5CCB5",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/near_deadline_submission_command_board_latest.json",
+      "bytes": 79049,
+      "sha256": "393C671937B4445D806DF14E50F2BF7FF239E11D33581E8D17DEE6D3E0464554",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/near_deadline_submission_command_board.json",
+      "bytes": 79049,
+      "sha256": "393C671937B4445D806DF14E50F2BF7FF239E11D33581E8D17DEE6D3E0464554",
       "copy_sha256_matched": true
     }
   ],
-  "claim_boundary": "This receipt proves only that ten bounded response-control, test, deadline-confirmation, and public-safe dashboard artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove portal submission, application acceptance, investor review activity beyond the cited sender statement, funding, selection, award, endorsement, external validation, or technical performance."
+  "claim_boundary": "This receipt proves only that nineteen bounded response-control, test, deadline-confirmation, reconciliation, command-board, and public-safe dashboard artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove portal submission, application acceptance, investor review activity beyond the cited sender statement, funding, selection, award, endorsement, external validation, or technical performance."
 }

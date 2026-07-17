@@ -173,10 +173,13 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     )
     assert ec["command"] == "STAGE_APPLICATION"
     assert ec["deadline_date"] == "2026-07-17"
-    assert ec["deadline_utc"] is None
-    assert ec["deadline_semantics"] == "DATE_ONLY_CLOSE_TIME_NOT_LISTED_SUBMIT_EARLY"
+    assert ec["deadline_utc"] == "2026-07-18T04:59:00Z"
+    assert ec["deadline_semantics"] == (
+        "OFFICIAL_REPLY_CONFIRMED_TIME_TIMEZONE_INFERRED_SUBMIT_EARLY"
+    )
     assert "TAKEOFF" in ec["fit_state"]
-    assert "does not list a closing time" in ec["official_deadline_text"]
+    assert "11:59 p.m. on July 17" in ec["official_deadline_text"]
+    assert "America/Chicago" in ec["official_deadline_text"]
     assert any("hidden-prompt founder-fact collector" in row for row in ec["today_work"])
     assert any(
         path.endswith("NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json")
@@ -190,13 +193,20 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         path.endswith("NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md")
         for path in ec["package_files"]
     )
-    assert len(ec["package_files"]) == 9
+    assert any(
+        path.endswith("NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json")
+        for path in ec["package_files"]
+    )
+    assert len(ec["package_files"]) == 10
     assert ec["deadline_support_status"] == (
-        "DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING"
+        "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
     )
     assert ec["deadline_support_sent_utc"] == "2026-07-17T12:05:34Z"
     assert ec["deadline_support_do_not_duplicate_send"] is True
     assert ec["deadline_support_email_is_application"] is False
+    assert ec["deadline_support_reply_required"] is False
+    assert ec["deadline_timezone_explicit_in_message"] is False
+    assert ec["operational_timezone"] == "America/Chicago"
     assert any("do not resend" in row for row in ec["today_work"])
     assert ec["action_gate_status"] == "READY_FOR_HIDDEN_FOUNDER_INPUT"
     assert ec["action_gate_submission_ready_for_human_click"] is False
@@ -232,12 +242,14 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "July 22, 2025" in missionweave["official_deadline_text"]
     assert missionweave["package_manifest_integrity_pass"] is True
     assert missionweave["package_manifest_file_count"] == 15
-    assert missionweave["action_gate_status"] == "PRIVATE_DSIP_FACTS_NOT_CAPTURED"
+    assert missionweave["action_gate_status"] == (
+        "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
+    )
     assert missionweave["action_gate_submission_ready_for_human_click"] is False
     assert missionweave["action_gate_required_private_gate_count"] == 50
-    assert missionweave["action_gate_passed_private_gate_count"] == 0
-    assert missionweave["action_gate_open_gate_count"] == 50
-    assert missionweave["action_gate_private_input_present"] is False
+    assert missionweave["action_gate_passed_private_gate_count"] == 13
+    assert missionweave["action_gate_open_gate_count"] == 37
+    assert missionweave["action_gate_private_input_present"] is True
     assert missionweave["action_gate_private_values_exposed"] is False
     assert missionweave["action_gate_private_input_sha256_exposed"] is False
     assert missionweave["action_gate_private_capture_tool"].endswith(
@@ -249,7 +261,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert missionweave["action_gate_private_capture_workflow"].endswith(
         "MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md"
     )
-    assert missionweave["action_gate_private_final_volume2_present"] is False
+    assert missionweave["action_gate_private_final_volume2_present"] is True
     assert missionweave["action_gate_private_final_volume2_path_exposed"] is False
     assert missionweave["action_gate_private_final_volume2_sha256_exposed"] is False
     assert missionweave["action_gate_pre_submit_excludes_action_time_approval"] is True
@@ -391,8 +403,8 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE" in rendered
     assert "Action gate: `READY_FOR_HIDDEN_FOUNDER_INPUT`" in rendered
     assert "Action gates passed: `0/15`" in rendered
-    assert "Action gate: `PRIVATE_DSIP_FACTS_NOT_CAPTURED`" in rendered
-    assert "Action gates passed: `0/50`" in rendered
+    assert "Action gate: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`" in rendered
+    assert "Action gates passed: `13/50`" in rendered
     assert len(payload["command_board_sha256"]) == 64
 
     for source in (
@@ -409,6 +421,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "nashville_ec_private_workflow",
         "nashville_ec_deadline_preservation_receipt",
         "nashville_ec_deadline_response_control",
+        "nashville_ec_official_deadline_confirmation",
         "missionweave_dsip_package_manifest",
         "missionweave_dsip_assembly_map",
         "missionweave_volume2_pdf",

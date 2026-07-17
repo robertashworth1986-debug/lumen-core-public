@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -9,25 +10,77 @@ ROOT = Path(__file__).resolve().parents[2]
 SPRINT_DIR = ROOT / "grant_submissions" / "funding_sprint_20260709"
 JSON_OUT = SPRINT_DIR / "EMAIL_ACTION_RECONCILIATION_2026-07-17.json"
 MD_OUT = SPRINT_DIR / "EMAIL_ACTION_RECONCILIATION_2026-07-17.md"
+NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION = (
+    ROOT
+    / "grant_submissions"
+    / "NASHVILLE_EC_FALL_2026"
+    / "NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json"
+)
+LVLUP_REVIEW_CONFIRMATION = (
+    SPRINT_DIR / "LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json"
+)
 
 AS_OF_DATE = "2026-07-17"
 
 
+def read_json(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected JSON object: {path}")
+    return payload
+
+
+def artifact_status(path: Path) -> dict[str, Any]:
+    data = path.read_bytes()
+    return {
+        "path": path.relative_to(ROOT).as_posix(),
+        "present": True,
+        "bytes": len(data),
+        "sha256": hashlib.sha256(data).hexdigest().upper(),
+    }
+
+
 def build_payload() -> dict[str, Any]:
+    nashville = read_json(NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION)
+    lvlup = read_json(LVLUP_REVIEW_CONFIRMATION)
+    if (
+        nashville.get("schema")
+        != "lumencore.nashville_ec_official_deadline_confirmation.v1"
+        or nashville.get("status")
+        != "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
+    ):
+        raise ValueError("Nashville official deadline confirmation is missing or stale")
+    if (
+        lvlup.get("schema")
+        != "lumencore.lvlup_independent_review_confirmation.v1"
+        or lvlup.get("status")
+        != "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED"
+    ):
+        raise ValueError("LvlUp independent-review confirmation is missing or stale")
+
     lanes = [
         {
             "lane_id": "nashville_ec_takeoff_fall_2026",
             "organization": "Nashville Entrepreneur Center",
-            "latest_event_type": "DEADLINE_PRESERVATION_QUERY_SENT",
-            "latest_event_utc": "2026-07-17T12:05:34Z",
-            "state": "DEADLINE_QUERY_SENT_PORTAL_SUBMISSION_STILL_REQUIRED",
+            "latest_event_type": "OFFICIAL_DEADLINE_CONFIRMATION_RECEIVED",
+            "latest_event_utc": nashville["source"]["received_utc"],
+            "state": nashville["status"],
+            "operational_local_deadline": nashville["confirmation"][
+                "operational_local_deadline"
+            ],
+            "operational_utc_deadline": nashville["confirmation"][
+                "operational_utc_deadline"
+            ],
+            "deadline_timezone_explicit_in_message": nashville["confirmation"][
+                "timezone_explicit_in_message"
+            ],
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": None,
             "do_not_duplicate_send": True,
             "next_action": (
-                "Continue the portal application and monitor for the exact close time or "
-                "support instructions; do not resend and do not treat the email as an application."
+                "Complete the founder-fact and reviewed portal workflow well before the "
+                "confirmed close; do not resend and do not treat the support reply as an application."
             ),
         },
         {
@@ -40,6 +93,7 @@ def build_payload() -> dict[str, Any]:
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": "2026-07-23",
+            "do_not_duplicate_send": True,
             "next_action": (
                 "Wait for the MOU, a correction request, or an onboarding question; "
                 "do not resend identity details."
@@ -54,6 +108,7 @@ def build_payload() -> dict[str, Any]:
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": "2026-07-24",
+            "do_not_duplicate_send": True,
             "next_action": (
                 "Wait for intake instructions; do not disclose unpublished patent "
                 "materials through ordinary email."
@@ -68,6 +123,7 @@ def build_payload() -> dict[str, Any]:
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": "2026-07-23",
+            "do_not_duplicate_send": True,
             "next_action": (
                 "Wait for LANL; use the single bounded follow-up only on or after "
                 "July 23 if no reply arrives."
@@ -82,6 +138,7 @@ def build_payload() -> dict[str, Any]:
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": None,
+            "do_not_duplicate_send": True,
             "next_action": (
                 "Monitor for a CDC clarification, replacement request, or scheduling "
                 "message; do not resend the response."
@@ -90,16 +147,16 @@ def build_payload() -> dict[str, Any]:
         {
             "lane_id": "lvlup_optional_paid_event",
             "organization": "LvlUp Ventures / Power of the Pitch Week",
-            "latest_event_type": "OPTIONAL_SPONSOR_TERMS_CLARIFIED",
-            "latest_event_utc": "2026-07-16T13:31:23Z",
-            "state": "OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND",
+            "latest_event_type": "INDEPENDENT_REVIEW_CONTINUATION_CONFIRMED",
+            "latest_event_utc": lvlup["source"]["received_utc"],
+            "state": lvlup["status"],
+            "written_independent_review_confirmation": True,
+            "paid_sponsor_purchase_required_for_separate_review": False,
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": None,
-            "next_action": (
-                "No reply or purchase; reconsider only if a relevant no-fee route or "
-                "written non-pay-to-play selection terms arrive."
-            ),
+            "do_not_duplicate_send": True,
+            "next_action": lvlup["required_next_action"],
         },
         {
             "lane_id": "terry_vynetic_followup",
@@ -112,6 +169,7 @@ def build_payload() -> dict[str, Any]:
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": None,
+            "do_not_duplicate_send": True,
             "next_action": (
                 "Send nothing further unless Terry replies with a specific ask; then "
                 "answer only that ask in the existing thread."
@@ -149,6 +207,7 @@ def build_payload() -> dict[str, Any]:
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": None,
+            "do_not_duplicate_send": False,
             "next_action": (
                 "Use the rolling Project Pitch portal route; do not represent the July "
                 "27 full-proposal deadline as reachable without an invitation."
@@ -163,6 +222,7 @@ def build_payload() -> dict[str, Any]:
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": None,
+            "do_not_duplicate_send": True,
             "next_action": "Monitor for an agency clarification or replacement request.",
         },
         {
@@ -174,6 +234,7 @@ def build_payload() -> dict[str, Any]:
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": None,
+            "do_not_duplicate_send": True,
             "next_action": "Monitor for agency feedback; do not duplicate-send.",
         },
         {
@@ -185,6 +246,7 @@ def build_payload() -> dict[str, Any]:
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": None,
+            "do_not_duplicate_send": True,
             "next_action": (
                 "Complete the authenticated account rotation and hidden local install; "
                 "do not reply to renewal solicitations or publish the credential."
@@ -214,7 +276,9 @@ def build_payload() -> dict[str, Any]:
                 1 for lane in lanes if lane["email_reply_required"]
             ),
             "send_now_count": sum(1 for lane in lanes if lane["send_now"]),
-            "duplicate_outbound_risk_count": 3,
+            "duplicate_outbound_risk_count": sum(
+                1 for lane in lanes if lane["do_not_duplicate_send"]
+            ),
             "out_of_office_count": 1,
             "human_account_action_count": 1,
             "external_send_allowed_without_human": False,
@@ -225,6 +289,14 @@ def build_payload() -> dict[str, Any]:
             "Account-access and recovery notices",
             "Newsletters, social notifications, and job-alert bulk mail",
         ],
+        "source_evidence": {
+            "nashville_official_deadline_confirmation": artifact_status(
+                NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION
+            ),
+            "lvlup_independent_review_confirmation": artifact_status(
+                LVLUP_REVIEW_CONFIRMATION
+            ),
+        },
         "claim_boundary": (
             "This dated mailbox reconciliation records only the messages observable at "
             "the check. It does not prove that no later message exists, portal state, "
@@ -243,6 +315,8 @@ def validate_payload(payload: dict[str, Any]) -> None:
         raise ValueError("A send-now lane needs separate action review")
     if any(lane["send_now"] for lane in payload["lanes"]):
         raise ValueError("The no-send reconciliation contains a send-now lane")
+    if any(not isinstance(lane.get("do_not_duplicate_send"), bool) for lane in payload["lanes"]):
+        raise ValueError("Every lane must declare a duplicate-send decision")
     terry = next(
         lane for lane in payload["lanes"] if lane["lane_id"] == "terry_vynetic_followup"
     )
@@ -272,10 +346,25 @@ def validate_payload(payload: dict[str, Any]) -> None:
         if lane["lane_id"] == "nashville_ec_takeoff_fall_2026"
     )
     if (
-        nashville["state"] != "DEADLINE_QUERY_SENT_PORTAL_SUBMISSION_STILL_REQUIRED"
+        nashville["state"]
+        != "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
+        or nashville["operational_local_deadline"] != "2026-07-17T23:59:00-05:00"
+        or nashville["operational_utc_deadline"] != "2026-07-18T04:59:00Z"
+        or nashville["deadline_timezone_explicit_in_message"] is not False
         or nashville["do_not_duplicate_send"] is not True
     ):
-        raise ValueError("Nashville EC deadline-preservation control is incomplete")
+        raise ValueError("Nashville EC confirmed-deadline control is incomplete")
+    lvlup = next(
+        lane for lane in payload["lanes"] if lane["lane_id"] == "lvlup_optional_paid_event"
+    )
+    if (
+        lvlup["state"]
+        != "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED"
+        or lvlup["written_independent_review_confirmation"] is not True
+        or lvlup["paid_sponsor_purchase_required_for_separate_review"] is not False
+        or lvlup["do_not_duplicate_send"] is not True
+    ):
+        raise ValueError("LvlUp independent-review control is incomplete")
 
 
 def render_markdown(payload: dict[str, Any]) -> str:

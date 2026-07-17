@@ -68,7 +68,7 @@
   },
   "claim_boundary": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance.",
   "direct_answer": "Nashville EC confirmed in writing that its application remains open until 11:59 PM on July 17; the timezone is operationally treated as America/Chicago because the message itself did not state one. The support reply is not an application, so complete the founder-fact gate and reviewed portal workflow well before the close. The FHWA response-lead acknowledgment was sent and must not be duplicated. The first FHWA route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response, but no fit check or partner is confirmed. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army are monitor-only. LvlUp confirmed that declining its optional paid sponsor track does not affect the separate investment and accelerator review, so monitor that thread without spending or sending a duplicate packet; duplicate sends would reduce credibility.",
-  "generated_utc": "2026-07-17T20:12:52.896342+00:00",
+  "generated_utc": "2026-07-17T20:22:55.891546+00:00",
   "inbox_risk_filters": [
     {
       "decision": "DO_NOT_TREAT_AS_OFFICIAL_SAM_NOTICE",
@@ -353,7 +353,7 @@
       "state": "SENT_VERIFIED_RESPONSE_PENDING"
     }
   ],
-  "register_sha256": "d2fb2792141dff020ab0c66609763ace9f057cd80f3fe50ab176a0d102d40998",
+  "register_sha256": "4020be24c7df7cf0d5bdcc54111c98c0cdd0cd344be8e756babdffa63b3d529b",
   "schema": "lumencore.external_engagement_response_register.v1",
   "source_artifacts": {
     "cdc_engagement_receipt": {
@@ -363,10 +363,10 @@
       "sha256": "292157621B722B1973A1AA55140F08586AB41D07FBE38672B348C73E8A865B78"
     },
     "email_action_reconciliation": {
-      "bytes": 8249,
+      "bytes": 9681,
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
       "present": true,
-      "sha256": "EB876ED9F82EA86927C0E6CE7E13EADF7762B20BC6E6FCB55F613B9B88203178"
+      "sha256": "D7F7B1AEE07E3F689BB33AC0AC8ED4069C582CB16517242FE0528B8EAC322002"
     },
     "epri_engagement_receipt": {
       "bytes": 1481,

@@ -9,18 +9,22 @@
   ],
   "lanes": [
     {
+      "deadline_timezone_explicit_in_message": false,
       "do_not_duplicate_send": true,
       "email_reply_required": false,
       "lane_id": "nashville_ec_takeoff_fall_2026",
-      "latest_event_type": "DEADLINE_PRESERVATION_QUERY_SENT",
-      "latest_event_utc": "2026-07-17T12:05:34Z",
-      "next_action": "Continue the portal application and monitor for the exact close time or support instructions; do not resend and do not treat the email as an application.",
+      "latest_event_type": "OFFICIAL_DEADLINE_CONFIRMATION_RECEIVED",
+      "latest_event_utc": "2026-07-17T16:11:48Z",
+      "next_action": "Complete the founder-fact and reviewed portal workflow well before the confirmed close; do not resend and do not treat the support reply as an application.",
       "no_send_before": null,
+      "operational_local_deadline": "2026-07-17T23:59:00-05:00",
+      "operational_utc_deadline": "2026-07-18T04:59:00Z",
       "organization": "Nashville Entrepreneur Center",
       "send_now": false,
-      "state": "DEADLINE_QUERY_SENT_PORTAL_SUBMISSION_STILL_REQUIRED"
+      "state": "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
     },
     {
+      "do_not_duplicate_send": true,
       "email_reply_required": false,
       "lane_id": "epri_open_power_ai_mou",
       "latest_event_type": "AUTOMATIC_OUT_OF_OFFICE",
@@ -33,6 +37,7 @@
       "state": "MOU_ROUTING_SENT_OUT_OF_OFFICE_RECEIVED"
     },
     {
+      "do_not_duplicate_send": true,
       "email_reply_required": false,
       "lane_id": "georgia_patents_pro_bono_intake",
       "latest_event_type": "OUTBOUND_INTAKE_SENT",
@@ -44,6 +49,7 @@
       "state": "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING"
     },
     {
+      "do_not_duplicate_send": true,
       "email_reply_required": false,
       "lane_id": "lanl_vision_licensing_followup",
       "latest_event_type": "OUTBOUND_PACKAGE_SENT",
@@ -55,6 +61,7 @@
       "state": "PACKAGE_SENT_RESPONSE_PENDING"
     },
     {
+      "do_not_duplicate_send": true,
       "email_reply_required": false,
       "lane_id": "cdc_ai_acquisition_rfi",
       "latest_event_type": "AGENCY_RECEIPT_CONFIRMED",
@@ -66,17 +73,21 @@
       "state": "RECEIPT_CONFIRMED_FOLLOW_UP_PENDING"
     },
     {
+      "do_not_duplicate_send": true,
       "email_reply_required": false,
       "lane_id": "lvlup_optional_paid_event",
-      "latest_event_type": "OPTIONAL_SPONSOR_TERMS_CLARIFIED",
-      "latest_event_utc": "2026-07-16T13:31:23Z",
-      "next_action": "No reply or purchase; reconsider only if a relevant no-fee route or written non-pay-to-play selection terms arrive.",
+      "latest_event_type": "INDEPENDENT_REVIEW_CONTINUATION_CONFIRMED",
+      "latest_event_utc": "2026-07-17T15:58:03Z",
+      "next_action": "Monitor the existing thread. Reply only if LvlUp's Investment Committee requests additional information; do not purchase the optional sponsor track or send an unsolicited duplicate packet.",
       "no_send_before": null,
       "organization": "LvlUp Ventures / Power of the Pitch Week",
+      "paid_sponsor_purchase_required_for_separate_review": false,
       "send_now": false,
-      "state": "OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND"
+      "state": "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED",
+      "written_independent_review_confirmation": true
     },
     {
+      "do_not_duplicate_send": true,
       "email_reply_required": false,
       "lane_id": "terry_vynetic_followup",
       "latest_event_type": "TWO_NEAR_DUPLICATE_OUTBOUND_FOLLOWUPS",
@@ -109,6 +120,7 @@
       "threaded_acknowledgment_send_count": 1
     },
     {
+      "do_not_duplicate_send": false,
       "email_reply_required": false,
       "lane_id": "nsf_project_pitch",
       "latest_event_type": "MAILBOX_INVITATION_SEARCH",
@@ -120,6 +132,7 @@
       "state": "NO_OFFICIAL_PROJECT_PITCH_INVITATION_VERIFIED"
     },
     {
+      "do_not_duplicate_send": true,
       "email_reply_required": false,
       "lane_id": "nasa_data_center_rfi",
       "latest_event_type": "SENT_RECEIPT_RECONCILIATION",
@@ -131,6 +144,7 @@
       "state": "SENT_VERIFIED_RESPONSE_PENDING"
     },
     {
+      "do_not_duplicate_send": true,
       "email_reply_required": false,
       "lane_id": "army_aidp_draft_cfs_feedback",
       "latest_event_type": "SENT_RECEIPT_RECONCILIATION",
@@ -142,6 +156,7 @@
       "state": "SENT_VERIFIED_RESPONSE_PENDING"
     },
     {
+      "do_not_duplicate_send": true,
       "email_reply_required": false,
       "lane_id": "sam_public_credential_rotation",
       "latest_event_type": "OFFICIAL_ROTATION_REMINDER",
@@ -163,9 +178,23 @@
     "Nashville EC Fall 2026 TakeOff deadline-support query",
     "CDC, NASA, Army, LvlUp, Terry Anderton, and Vynetic"
   ],
+  "source_evidence": {
+    "lvlup_independent_review_confirmation": {
+      "bytes": 1908,
+      "path": "grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json",
+      "present": true,
+      "sha256": "F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC"
+    },
+    "nashville_official_deadline_confirmation": {
+      "bytes": 2272,
+      "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json",
+      "present": true,
+      "sha256": "DAC4B3120D9B4EC2A822198426939B89FE96BF7294C0CC251D1A299BB76B00E2"
+    }
+  },
   "status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
   "summary": {
-    "duplicate_outbound_risk_count": 3,
+    "duplicate_outbound_risk_count": 11,
     "email_reply_required_count": 0,
     "external_send_allowed_without_human": false,
     "human_account_action_count": 1,
