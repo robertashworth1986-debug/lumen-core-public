@@ -1,0 +1,38 @@
+name: Outreach Governance
+
+on:
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "docs/CANONICAL_OPERATING_STATE.md"
+      - "config/outreach_registry_v1.json"
+      - "code/ops/outreach_gate.py"
+      - "tests/test_outreach_gate.py"
+      - ".github/workflows/outreach-governance.yml"
+  push:
+    branches: [main]
+    paths:
+      - "AGENTS.md"
+      - "docs/CANONICAL_OPERATING_STATE.md"
+      - "config/outreach_registry_v1.json"
+      - "code/ops/outreach_gate.py"
+      - "tests/test_outreach_gate.py"
+      - ".github/workflows/outreach-governance.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile governance surfaces
+        run: python -m py_compile code/ops/outreach_gate.py tests/test_outreach_gate.py
+      - name: Run focused tests
+        run: python -m unittest discover -s tests -p "test_outreach_gate.py" -v
+      - name: Validate shared registry
+        run: python code/ops/outreach_gate.py validate
