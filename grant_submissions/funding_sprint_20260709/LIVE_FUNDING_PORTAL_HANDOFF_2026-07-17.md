@@ -10,8 +10,8 @@ This handoff is generated from the authoritative near-deadline command board. It
 - Navigation before resume signal: `false`
 - Inspect current page before navigation: `true`
 - First action after resume: Inspect the current URL and visible page without navigating. Continue the current authenticated portal to its next safe preview before switching lanes.
-- Source command-board SHA-256: `e37da1876e98299d4d3b1c193330b16018b5b103a7f38fb9b8112aca74c84808`
-- Handoff SHA-256: `badc50be53cc2f23cfa36f3c25c0d014086ac25b7e6db02b55c027c35c599c4a`
+- Source command-board SHA-256: `2a9fcfc783535218f0e917e21eb14c6ebcd472f096905556f8f7be1b558c393f`
+- Handoff SHA-256: `929b5451531228b3f9bc140c26d9021bb75600392c0a8aac8b6d2a9325a3610f`
 
 ## Portal Queue
 
@@ -22,7 +22,15 @@ This handoff is generated from the authoritative near-deadline command board. It
 - Portal: https://ec.co/apply/
 - Next safe action:
   - If this is the current signed-in page, inspect the visible application state before navigating anywhere.
-  - Resolve only the six founder-controlled facts, populate supported answers, and reach the complete preview.
+  - Run `python code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py` and answer the six hidden prompts; require the ignored 11-answer fill map to validate without publishing values.
+  - Populate only the supported answers from that private map and reach the complete preview.
+- Action gate:
+  - Status: `READY_FOR_HIDDEN_FOUNDER_INPUT`
+  - Passed: `0/15`
+  - Open: `15`
+  - Private input present: `false`
+  - Private values exposed: `false`
+  - Ready for human click: `false`
 - Stop conditions:
   - Any fee payment, financial-aid agreement, program terms, cohort acceptance, attestation, or final submission.
   - Any portal answer that conflicts with the founder-confirmation artifact.
@@ -32,7 +40,7 @@ This handoff is generated from the authoritative near-deadline command board. It
   - Any later program fee, financial-aid arrangement, terms, or cohort acceptance requires a separate decision.
 - External send without human: `false`
 - Final submit without human: `false`
-- Source lane SHA-256: `2cbe84e796877173f726a8b056c18f3391fd0e502b66b8c8ee45d6e129571cac`
+- Source lane SHA-256: `562a48aab55e09095408945cf422d3716110f9b9b36d5afeb048c06e7d7d0413`
 
 ### 2. DLA26BZ03-NV011 - Digital Twin of the Organization for Enhanced Mission Readiness
 

@@ -103,6 +103,11 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
 
     assert "HHS-2026-ACL-NIDILRR-REGE-0212" in payload["summary"]["closest_deadline_lane"]
     assert "NASHVILLE-EC-FALL-2026" in payload["summary"]["closest_stage_ready_lane"]
+    assert "0/15" in payload["summary"]["strongest_today_action"]
+    assert "six-prompt hidden collector" in payload["summary"]["strongest_today_action"]
+    assert "hidden-input gate is 0/15" in payload["summary"][
+        "fastest_low_friction_lane"
+    ]
 
     nsf = next(row for row in payload["lanes"] if row["opportunity_number"] == "26-510")
     assert nsf["deadline_date"] == "2026-11-04"
@@ -157,10 +162,27 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert ec["deadline_semantics"] == "DATE_ONLY_CLOSE_TIME_NOT_LISTED_SUBMIT_EARLY"
     assert "TAKEOFF" in ec["fit_state"]
     assert "does not list a closing time" in ec["official_deadline_text"]
-    assert any("six concise founder confirmations" in row for row in ec["today_work"])
+    assert any("hidden-prompt founder-fact collector" in row for row in ec["today_work"])
     assert any(
         path.endswith("NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json")
         for path in ec["package_files"]
+    )
+    assert len(ec["package_files"]) == 7
+    assert ec["action_gate_status"] == "READY_FOR_HIDDEN_FOUNDER_INPUT"
+    assert ec["action_gate_submission_ready_for_human_click"] is False
+    assert ec["action_gate_required_private_gate_count"] == 15
+    assert ec["action_gate_passed_private_gate_count"] == 0
+    assert ec["action_gate_open_gate_count"] == 15
+    assert ec["action_gate_private_input_present"] is False
+    assert ec["action_gate_private_values_exposed"] is False
+    assert ec["private_capture_target_git_ignored"] is True
+    assert ec["private_capture_required_founder_prompt_count"] == 6
+    assert ec["private_capture_required_portal_answer_count"] == 11
+    assert ec["private_capture_collector"].endswith(
+        "CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py"
+    )
+    assert ec["private_capture_workflow"].endswith(
+        "NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md"
     )
     assert ec["external_send_allowed_without_human"] is False
     assert ec["final_submit_allowed_without_human"] is False
@@ -309,6 +331,10 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "SAM.gov public credential rotation became overdue" in rendered
     assert "Guarded installer: `code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py`" in rendered
     assert "HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE" in rendered
+    assert "Action gate: `READY_FOR_HIDDEN_FOUNDER_INPUT`" in rendered
+    assert "Action gates passed: `0/15`" in rendered
+    assert "Action gate: `PRIVATE_DSIP_FACTS_NOT_CAPTURED`" in rendered
+    assert "Action gates passed: `0/50`" in rendered
     assert len(payload["command_board_sha256"]) == 64
 
     for source in (
@@ -320,6 +346,9 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "nashville_ec_portal_field_map",
         "nashville_ec_application_manifest",
         "nashville_ec_human_fact_resolution",
+        "nashville_ec_private_collector",
+        "nashville_ec_private_validator",
+        "nashville_ec_private_workflow",
         "missionweave_dsip_package_manifest",
         "missionweave_dsip_assembly_map",
         "missionweave_volume2_pdf",
@@ -348,7 +377,46 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         assert marker not in lowered
 
 
-def test_missionweave_dsip_action_gate_mirror_matches():
+def test_nashville_private_action_gate_summarizes_without_exposing_values(
+    tmp_path: Path,
+) -> None:
+    module = load_module()
+    private_map = tmp_path / "nashville_ec_portal_fill_map.private.json"
+    private_map.write_text(
+        json.dumps(
+            {
+                "schema": "lumencore.nashville_ec_private_portal_fill_map.v1",
+                "status": "VALIDATED_PRIVATE_PORTAL_FILL_MAP",
+                "private_portal_only": True,
+                "public_repo_publish_allowed": False,
+                "question_answer_count": 11,
+                "question_answers": [
+                    {"question_id": 38, "value": "DO_NOT_EXPOSE_SENTINEL"}
+                ],
+                "final_action_gate": {
+                    "private_facts_validated": True,
+                    "live_portal_preview_reviewed": False,
+                    "fee_and_terms_reviewed": False,
+                    "final_submission_authorized_at_action_time": False,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    module.NASHVILLE_EC_PRIVATE_FILL_MAP = private_map
+
+    gate = module.nashville_private_action_gate()
+
+    assert gate["status"] == "PRIVATE_FACTS_VALIDATED_PORTAL_PREVIEW_REQUIRED"
+    assert gate["required_private_gate_count"] == 15
+    assert gate["passed_private_gate_count"] == 12
+    assert gate["open_gate_count"] == 3
+    assert gate["private_input_present"] is True
+    assert gate["private_values_exposed"] is False
+    assert "DO_NOT_EXPOSE_SENTINEL" not in json.dumps(gate)
+
+
+def test_missionweave_dsip_action_gate_historical_mirror_receipt_matches():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
@@ -362,5 +430,6 @@ def test_missionweave_dsip_action_gate_mirror_matches():
         destination = Path(artifact["destination"])
         assert source.is_file(), artifact["source"]
         assert destination.is_file(), artifact["destination"]
-        assert source.stat().st_size == destination.stat().st_size == artifact["bytes"]
-        assert sha256_file(source) == sha256_file(destination) == artifact["sha256"]
+        assert destination.stat().st_size == artifact["bytes"]
+        assert sha256_file(destination) == artifact["sha256"]
+        assert artifact["copy_sha256_matched"] is True

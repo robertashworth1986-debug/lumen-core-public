@@ -15,18 +15,18 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - No-bid or partner-only lanes: `6`
 - Expired without verified send: `2`
 - Human-gated lanes: `13`
-- Strongest today action: Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. Complete the July 17 Nashville EC application if that is the active portal; otherwise preserve the authenticated lane to its next safe preview. Then use the MissionWeave seven-volume checklist and private action gate, currently 0/50 with 15/15 package files verified, before the July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.
+- Strongest today action: Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. If it is Nashville EC, move its private action gate from 0/15 by running the six-prompt hidden collector, then reach the complete preview before the date-only July 17 close. Otherwise preserve the authenticated lane to its next safe preview. Next use the MissionWeave seven-volume checklist and private action gate, currently 0/50 with 15/15 package files verified, before the July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.
 - Critical infrastructure action: SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action.
 - Closest deadline lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Closest stage-ready lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Best grants lane: DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 package files are hash-verified and the 11-page PDF passes format checks, while the private action gate remains 0/50 until DSIP identity, proposal-number, cost, ITAR/JCP, current CMMC posture, award-history, foreign-affiliation, rights, preview, and certification facts are supported. NSF 26-510 stays the next rolling Project Pitch route.
 - Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: one qualified target was contacted July 17, but no solo bid and no partner claim unless written corporate-experience evidence arrives.
-- Fastest low-friction lane: The Nashville EC TakeOff application is the nearest low-friction reviewer route, but six founder confirmations and final portal submission remain human-gated.
+- Fastest low-friction lane: The Nashville EC TakeOff application is the nearest low-friction reviewer route. Its hidden-input gate is 0/15: six founder prompts produce 11 private portal answers, then preview, fee/terms, and action-time authorization remain human-gated.
 - Final submit without human: `false`
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `230a25047e75f139fe03c8cfc4af8433efea8f2fcedaa9a12f954ef8384ead41`
+- Command board SHA-256: `f235eadb9e1220d69824027378987d6e466d3bf3a33a1e19175b5a40a79b51f9`
 
 ## Operational Controls
 
@@ -97,6 +97,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json`
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md`
+  - `code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py`
+  - `code/ops/VALIDATE_NASHVILLE_EC_PRIVATE_FACTS.py`
+  - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md`
 
 ### 3. DLA26BZ03-NV011 - Digital Twin of the Organization for Enhanced Mission Readiness
 
@@ -265,7 +268,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Secondary URL: https://ec.co/accelerators/takeoff/
 - Why now: This is the nearest legitimate local reviewer and commercialization route. TakeOff fits a Nashville-based solo founder with a working MVP and no claimed customers. The listed $500 program fee and $125 start payment are not authorized; the application should answer no on fee readiness and request financial aid before accepting terms.
 - Today work:
-  - Collect the six concise founder confirmations in the human-fact resolution artifact.
+  - Run the hidden-prompt founder-fact collector and require its ignored 11-answer fill map to validate.
   - Paste the claim-bounded answers into the common application and select TakeOff.
   - Stop at final preview; do not accept a fee, terms, or cohort seat during application staging.
 - Human gate:
@@ -277,9 +280,18 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json`
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md`
+  - `code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py`
+  - `code/ops/VALIDATE_NASHVILLE_EC_PRIVATE_FACTS.py`
+  - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md`
+- Action gate: `READY_FOR_HIDDEN_FOUNDER_INPUT`
+- Action gates passed: `0/15`
+- Action gates open: `15`
+- Private input present: `false`
+- Private values exposed: `false`
+- Ready for human final click: `false`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `2cbe84e796877173f726a8b056c18f3391fd0e502b66b8c8ee45d6e129571cac`
+- Lane SHA-256: `562a48aab55e09095408945cf422d3716110f9b9b36d5afeb048c06e7d7d0413`
 
 ### 3. DLA26BZ03-NV011 - Digital Twin of the Organization for Enhanced Mission Readiness
 
@@ -318,6 +330,12 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_CLAIM_EVIDENCE_MATRIX_2026-07-16.md`
   - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json`
   - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md`
+- Action gate: `PRIVATE_DSIP_FACTS_NOT_CAPTURED`
+- Action gates passed: `0/50`
+- Action gates open: `50`
+- Private input present: `false`
+- Private values exposed: `false`
+- Ready for human final click: `false`
 - External send without human: `false`
 - Final submit without human: `false`
 - Lane SHA-256: `6fcaeb9e1efd6a7dc359f76feb5b93d1ee41661ffe75c150ce72c2792a28a5bc`
@@ -751,6 +769,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - `nashville_ec_portal_field_map`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md` present=`true` sha256=`63bdfafebade22432a6d1ffc3509c8c5ee1685270144f12cc8124ae483bca017`
 - `nashville_ec_application_manifest`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json` present=`true` sha256=`cd9501d1a61e248a62329595297592d00593bf0086c87da58e120df43de2ef11`
 - `nashville_ec_human_fact_resolution`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json` present=`true` sha256=`998a267a08df9e8923fab1e57740f00f52270228a49417f40da73af4aa6d4d33`
+- `nashville_ec_private_collector`: `code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py` present=`true` sha256=`379a150cc558d9a37ed53d8c48c291275c3a04241cb91f164377e309a5e9d165`
+- `nashville_ec_private_validator`: `code/ops/VALIDATE_NASHVILLE_EC_PRIVATE_FACTS.py` present=`true` sha256=`5974911c2892291f7cebb67663977af264d00e2bf1d1157476dd9ccfe0b08004`
+- `nashville_ec_private_workflow`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md` present=`true` sha256=`fad93e7ed7c93a1406657d5d678a3673cfd73ed29fe4de5205e223e948ea9d88`
 - `missionweave_dsip_package_manifest`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json` present=`true` sha256=`598317d0b4a971402e3446ff32c273209ae7f6dd347f02d5c663159ad4eb6069`
 - `missionweave_dsip_assembly_map`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ASSEMBLY_MAP_2026-07-16.md` present=`true` sha256=`9f5f043d678bdcab74c7b1e4993c75a807da60bdb9a5ba05eeb5eb41487ed9ed`
 - `missionweave_volume2_pdf`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf` present=`true` sha256=`8bbde3db31285f3b671cbfcaf972e9eb8f2de2f62d559463e519ca4f901c37e6`

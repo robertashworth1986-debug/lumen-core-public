@@ -49,6 +49,18 @@ NASHVILLE_EC_FACT_RESOLUTION_JSON = (
 NASHVILLE_EC_FACT_RESOLUTION_MD = (
     NASHVILLE_EC_DIR / "NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md"
 )
+NASHVILLE_EC_PRIVATE_COLLECTOR = (
+    ROOT / "code" / "ops" / "CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py"
+)
+NASHVILLE_EC_PRIVATE_VALIDATOR = (
+    ROOT / "code" / "ops" / "VALIDATE_NASHVILLE_EC_PRIVATE_FACTS.py"
+)
+NASHVILLE_EC_PRIVATE_WORKFLOW = (
+    NASHVILLE_EC_DIR / "NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md"
+)
+NASHVILLE_EC_PRIVATE_FILL_MAP = (
+    NASHVILLE_EC_DIR / "private" / "nashville_ec_portal_fill_map.private.json"
+)
 MISSIONWEAVE_DIR = (
     ROOT / "grant_submissions" / "DLA26BZ03_NV011_MissionWeave"
 )
@@ -197,6 +209,81 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def nashville_private_action_gate() -> dict[str, Any]:
+    required_gate_count = 15
+    ignore_rule = "grant_submissions/NASHVILLE_EC_FALL_2026/private/"
+    ignored = ignore_rule in {
+        line.strip()
+        for line in (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+    }
+    if not ignored:
+        raise ValueError("Nashville EC private capture target is not git-ignored")
+
+    if not NASHVILLE_EC_PRIVATE_FILL_MAP.is_file():
+        return {
+            "status": "READY_FOR_HIDDEN_FOUNDER_INPUT",
+            "submission_ready_for_human_click": False,
+            "required_private_gate_count": required_gate_count,
+            "passed_private_gate_count": 0,
+            "open_gate_count": required_gate_count,
+            "private_input_present": False,
+            "private_values_exposed": False,
+            "private_target_git_ignored": True,
+            "required_founder_prompt_count": 6,
+            "required_portal_answer_count": 11,
+            "collector": rel(NASHVILLE_EC_PRIVATE_COLLECTOR),
+            "workflow": rel(NASHVILLE_EC_PRIVATE_WORKFLOW),
+        }
+
+    try:
+        private_map = read_json(NASHVILLE_EC_PRIVATE_FILL_MAP)
+        final_gate = private_map.get("final_action_gate", {})
+        valid = (
+            private_map.get("schema")
+            == "lumencore.nashville_ec_private_portal_fill_map.v1"
+            and private_map.get("status") == "VALIDATED_PRIVATE_PORTAL_FILL_MAP"
+            and private_map.get("private_portal_only") is True
+            and private_map.get("public_repo_publish_allowed") is False
+            and private_map.get("question_answer_count") == 11
+            and final_gate.get("private_facts_validated") is True
+        )
+        if not valid:
+            raise ValueError("invalid private fill map")
+        passed_gate_count = 12 + sum(
+            final_gate.get(key) is True
+            for key in (
+                "live_portal_preview_reviewed",
+                "fee_and_terms_reviewed",
+                "final_submission_authorized_at_action_time",
+            )
+        )
+        ready = passed_gate_count == required_gate_count
+        status = (
+            "READY_FOR_HUMAN_FINAL_SUBMIT_CLICK"
+            if ready
+            else "PRIVATE_FACTS_VALIDATED_PORTAL_PREVIEW_REQUIRED"
+        )
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        passed_gate_count = 0
+        ready = False
+        status = "PRIVATE_FILL_MAP_INVALID_RECAPTURE_REQUIRED"
+
+    return {
+        "status": status,
+        "submission_ready_for_human_click": ready,
+        "required_private_gate_count": required_gate_count,
+        "passed_private_gate_count": passed_gate_count,
+        "open_gate_count": required_gate_count - passed_gate_count,
+        "private_input_present": True,
+        "private_values_exposed": False,
+        "private_target_git_ignored": True,
+        "required_founder_prompt_count": 6,
+        "required_portal_answer_count": 11,
+        "collector": rel(NASHVILLE_EC_PRIVATE_COLLECTOR),
+        "workflow": rel(NASHVILLE_EC_PRIVATE_WORKFLOW),
+    }
+
+
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
@@ -271,6 +358,9 @@ def base_sources() -> dict[str, Any]:
         "nashville_ec_portal_field_map": NASHVILLE_EC_FIELD_MAP,
         "nashville_ec_application_manifest": NASHVILLE_EC_MANIFEST,
         "nashville_ec_human_fact_resolution": NASHVILLE_EC_FACT_RESOLUTION_JSON,
+        "nashville_ec_private_collector": NASHVILLE_EC_PRIVATE_COLLECTOR,
+        "nashville_ec_private_validator": NASHVILLE_EC_PRIVATE_VALIDATOR,
+        "nashville_ec_private_workflow": NASHVILLE_EC_PRIVATE_WORKFLOW,
         "missionweave_dsip_package_manifest": MISSIONWEAVE_MANIFEST,
         "missionweave_dsip_assembly_map": MISSIONWEAVE_ASSEMBLY_MAP,
         "missionweave_volume2_pdf": MISSIONWEAVE_VOLUME2_PDF,
@@ -409,6 +499,7 @@ def build_command_lanes(
     cdc_engagement_receipt: dict[str, Any] | None = None,
     scan_date: date = SCAN_DATE,
 ) -> list[dict[str, Any]]:
+    nashville_gate = nashville_private_action_gate()
     sam = sam_lookup(sam_board)
     grants = grant_lookup(grants_ranked)
 
@@ -557,7 +648,38 @@ def build_command_lanes(
                 rel(NASHVILLE_EC_MANIFEST),
                 rel(NASHVILLE_EC_FACT_RESOLUTION_JSON),
                 rel(NASHVILLE_EC_FACT_RESOLUTION_MD),
+                rel(NASHVILLE_EC_PRIVATE_COLLECTOR),
+                rel(NASHVILLE_EC_PRIVATE_VALIDATOR),
+                rel(NASHVILLE_EC_PRIVATE_WORKFLOW),
             ],
+            "action_gate_status": nashville_gate["status"],
+            "action_gate_submission_ready_for_human_click": nashville_gate[
+                "submission_ready_for_human_click"
+            ],
+            "action_gate_required_private_gate_count": nashville_gate[
+                "required_private_gate_count"
+            ],
+            "action_gate_passed_private_gate_count": nashville_gate[
+                "passed_private_gate_count"
+            ],
+            "action_gate_open_gate_count": nashville_gate["open_gate_count"],
+            "action_gate_private_input_present": nashville_gate[
+                "private_input_present"
+            ],
+            "action_gate_private_values_exposed": nashville_gate[
+                "private_values_exposed"
+            ],
+            "private_capture_target_git_ignored": nashville_gate[
+                "private_target_git_ignored"
+            ],
+            "private_capture_required_founder_prompt_count": nashville_gate[
+                "required_founder_prompt_count"
+            ],
+            "private_capture_required_portal_answer_count": nashville_gate[
+                "required_portal_answer_count"
+            ],
+            "private_capture_collector": nashville_gate["collector"],
+            "private_capture_workflow": nashville_gate["workflow"],
             "why_now": (
                 "This is the nearest legitimate local reviewer and commercialization route. "
                 "TakeOff fits a Nashville-based solo founder with a working MVP and no "
@@ -566,7 +688,7 @@ def build_command_lanes(
                 "request financial aid before accepting terms."
             ),
             "today_work": [
-                "Collect the six concise founder confirmations in the human-fact resolution artifact.",
+                "Run the hidden-prompt founder-fact collector and require its ignored 11-answer fill map to validate.",
                 "Paste the claim-bounded answers into the common application and select TakeOff.",
                 "Stop at final preview; do not accept a fee, terms, or cohort seat during application staging.",
             ],
@@ -1315,13 +1437,13 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "no_bid_or_partner_only_count": len(no_bid),
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. Complete the July 17 Nashville EC application if that is the active portal; otherwise preserve the authenticated lane to its next safe preview. Then use the MissionWeave seven-volume checklist and private action gate, currently 0/50 with 15/15 package files verified, before the July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.",
+            "strongest_today_action": "Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. If it is Nashville EC, move its private action gate from 0/15 by running the six-prompt hidden collector, then reach the complete preview before the date-only July 17 close. Otherwise preserve the authenticated lane to its next safe preview. Next use the MissionWeave seven-volume checklist and private action gate, currently 0/50 with 15/15 package files verified, before the July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.",
             "critical_same_day_infrastructure_action": sam_critical_action,
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
             "best_grants_lane": "DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 package files are hash-verified and the 11-page PDF passes format checks, while the private action gate remains 0/50 until DSIP identity, proposal-number, cost, ITAR/JCP, current CMMC posture, award-history, foreign-affiliation, rights, preview, and certification facts are supported. NSF 26-510 stays the next rolling Project Pitch route.",
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: one qualified target was contacted July 17, but no solo bid and no partner claim unless written corporate-experience evidence arrives.",
-            "fastest_low_friction_lane": "The Nashville EC TakeOff application is the nearest low-friction reviewer route, but six founder confirmations and final portal submission remain human-gated.",
+            "fastest_low_friction_lane": "The Nashville EC TakeOff application is the nearest low-friction reviewer route. Its hidden-input gate is 0/15: six founder prompts produce 11 private portal answers, then preview, fee/terms, and action-time authorization remain human-gated.",
             "all_final_actions_blocked_without_human": True,
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,
@@ -1557,6 +1679,16 @@ def render_markdown(payload: dict[str, Any]) -> str:
         )
         for file in row["package_files"]:
             lines.append(f"  - `{file}`")
+        if row.get("action_gate_status"):
+            lines.extend(
+                [
+                    f"- Action gate: `{row['action_gate_status']}`",
+                    f"- Action gates passed: `{row['action_gate_passed_private_gate_count']}/{row['action_gate_required_private_gate_count']}`",
+                    f"- Private input present: `{str(row['action_gate_private_input_present']).lower()}`",
+                    f"- Private values exposed: `{str(row['action_gate_private_values_exposed']).lower()}`",
+                    f"- Ready for human final click: `{str(row['action_gate_submission_ready_for_human_click']).lower()}`",
+                ]
+            )
         lines.append("")
 
     lines.extend(["## Emergency Gate", ""])
@@ -1645,6 +1777,17 @@ def render_markdown(payload: dict[str, Any]) -> str:
             lines.append("- Package files:")
             for file in lane["package_files"]:
                 lines.append(f"  - `{file}`")
+        if lane.get("action_gate_status"):
+            lines.extend(
+                [
+                    f"- Action gate: `{lane['action_gate_status']}`",
+                    f"- Action gates passed: `{lane['action_gate_passed_private_gate_count']}/{lane['action_gate_required_private_gate_count']}`",
+                    f"- Action gates open: `{lane['action_gate_open_gate_count']}`",
+                    f"- Private input present: `{str(lane['action_gate_private_input_present']).lower()}`",
+                    f"- Private values exposed: `{str(lane['action_gate_private_values_exposed']).lower()}`",
+                    f"- Ready for human final click: `{str(lane['action_gate_submission_ready_for_human_click']).lower()}`",
+                ]
+            )
         lines.extend(
             [
                 f"- External send without human: `{str(lane['external_send_allowed_without_human']).lower()}`",

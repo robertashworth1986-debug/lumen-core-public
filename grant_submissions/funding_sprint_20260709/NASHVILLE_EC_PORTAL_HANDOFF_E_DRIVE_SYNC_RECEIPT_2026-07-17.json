@@ -1,0 +1,82 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "generated_utc": "2026-07-17T12:00:46.6701306Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PORTAL_HANDOFF_20260717",
+  "artifact_count": 10,
+  "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "private_founder_values_mirrored": false,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PORTAL_HANDOFF_20260717/code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "bytes": 95096,
+      "sha256": "5C4BAFC6ECDE5BAC1A6298385B7C7ED0CFECB6955BD73D65310AEDC55A4FACF4",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PORTAL_HANDOFF_20260717/code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py",
+      "bytes": 18706,
+      "sha256": "33E81087C413F4E3ADF50159584A4BDF774D324AEC66C0705A417BD7AD15B755",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_submission_command_board.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PORTAL_HANDOFF_20260717/tests/test_near_deadline_submission_command_board.py",
+      "bytes": 20101,
+      "sha256": "EEEC351C573A84B236D7B3AF5885F48136F4D224C4C8690D5C117DA5EA738322",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_live_funding_portal_handoff.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PORTAL_HANDOFF_20260717/tests/test_live_funding_portal_handoff.py",
+      "bytes": 6695,
+      "sha256": "957B7D84E0119E9950F42514924023BF772EAF79AD5A4C876DB0BD720ABC7A0D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_nashville_ec_private_facts.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PORTAL_HANDOFF_20260717/tests/test_nashville_ec_private_facts.py",
+      "bytes": 6505,
+      "sha256": "5C93008DE423CFAC4BCADAAD90CF06C7988DD8CF391B4BC23B2CF469ED51677C",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PORTAL_HANDOFF_20260717/grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "bytes": 55294,
+      "sha256": "5A0C37952C81056D469AD556F30AB14791B999CFE37925D67EC325C79E62478D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PORTAL_HANDOFF_20260717/grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+      "bytes": 10615,
+      "sha256": "808034323B888F4B54DF2D783346B33CDBC6BDFD72A4164E177B5FECA77AED21",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/near_deadline_submission_command_board_latest.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PORTAL_HANDOFF_20260717/out/ops/near_deadline_submission_command_board_latest.json",
+      "bytes": 72398,
+      "sha256": "56455D8E8C4FB340C8286197536E2E9F442E0667BE1797860B3305787FA6D8FA",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/live_funding_portal_handoff_latest.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PORTAL_HANDOFF_20260717/out/ops/live_funding_portal_handoff_latest.json",
+      "bytes": 16798,
+      "sha256": "CD1B3FEC2D082B2F4D2A79D4DD46CC21A45722EE578BC2F858AE70FFA359987A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/near_deadline_submission_command_board.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_PORTAL_HANDOFF_20260717/dashboard/data/near_deadline_submission_command_board.json",
+      "bytes": 72398,
+      "sha256": "56455D8E8C4FB340C8286197536E2E9F442E0667BE1797860B3305787FA6D8FA",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves byte-for-byte copying of the listed public-safe Nashville EC portal-handoff artifacts at the recorded time. It mirrors no private founder answer values and proves no portal save, submission, fee acceptance, program acceptance, funding, customer traction, validation, or award."
+}

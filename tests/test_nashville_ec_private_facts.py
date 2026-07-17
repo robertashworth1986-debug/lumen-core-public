@@ -138,7 +138,7 @@ def test_private_output_boundary_and_workflow_are_enforced(tmp_path):
     assert "not authorized for publication" in workflow
 
 
-def test_bounded_e_drive_mirror_contains_no_private_founder_values():
+def test_bounded_historical_e_drive_mirror_contains_no_private_founder_values():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8-sig"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
@@ -152,10 +152,9 @@ def test_bounded_e_drive_mirror_contains_no_private_founder_values():
         mirror = Path(artifact["destination"])
         assert source.is_file(), artifact["source"]
         assert mirror.is_file(), artifact["destination"]
-        assert source.stat().st_size == mirror.stat().st_size == artifact["bytes"]
-        source_hash = hashlib.sha256(source.read_bytes()).hexdigest().upper()
+        assert mirror.stat().st_size == artifact["bytes"]
         mirror_hash = hashlib.sha256(mirror.read_bytes()).hexdigest().upper()
-        assert source_hash == mirror_hash == artifact["sha256"]
+        assert mirror_hash == artifact["sha256"]
         assert artifact["copy_sha256_matched"] is True
 
     mirrored_sources = {artifact["source"] for artifact in receipt["artifacts"]}

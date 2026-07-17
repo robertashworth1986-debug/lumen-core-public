@@ -1,12 +1,20 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
+import json
 from datetime import date
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py"
+MIRROR_RECEIPT = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "NASHVILLE_EC_PORTAL_HANDOFF_E_DRIVE_SYNC_RECEIPT_2026-07-17.json"
+)
 
 
 def load_module():
@@ -49,7 +57,25 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
         "W912HZ26SC005",
         "LAUNCHTN-3686-2026",
     ]
-    assert queue[0]["deadline_date"] == "2026-07-17"
+    nashville = queue[0]
+    assert nashville["deadline_date"] == "2026-07-17"
+    assert nashville["action_gate"] == {
+        "status": "READY_FOR_HIDDEN_FOUNDER_INPUT",
+        "submission_ready_for_human_click": False,
+        "required_private_gate_count": 15,
+        "passed_private_gate_count": 0,
+        "open_gate_count": 15,
+        "private_input_present": False,
+        "private_values_exposed": False,
+    }
+    assert any(
+        path.endswith("CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py")
+        for path in nashville["package_files"]
+    )
+    assert any(
+        "CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py" in action
+        for action in nashville["next_safe_action"]
+    )
     missionweave = queue[1]
     assert missionweave["deadline_date"] == "2026-07-22"
     assert missionweave["deadline_utc"] == "2026-07-22T16:00:00Z"
@@ -98,6 +124,7 @@ def test_rendered_handoff_is_public_safe_and_has_no_stale_send_state() -> None:
     assert "Live Funding Portal Handoff" in rendered
     assert "Navigation before resume signal: `false`" in rendered
     assert "DLA26BZ03-NV011" in rendered
+    assert "Passed: `0/15`" in rendered
     assert "Passed: `0/50`" in rendered
     assert "EPRI administrative onboarding was sent" in rendered
     assert "EPRI draft" not in rendered
@@ -105,3 +132,23 @@ def test_rendered_handoff_is_public_safe_and_has_no_stale_send_state() -> None:
     assert "Final submit without human: `false`" in rendered
     assert module.public_safety_hits(rendered) == []
     assert len(payload["handoff_sha256"]) == 64
+
+
+def test_current_nashville_portal_handoff_mirror_matches_sources() -> None:
+    receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
+
+    assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 10
+    assert receipt["all_sha256_matched_after_copy"] is True
+    assert receipt["browser_navigation_performed"] is False
+    assert receipt["private_founder_values_mirrored"] is False
+    for artifact in receipt["artifacts"]:
+        source = ROOT / artifact["source"]
+        destination = Path(artifact["destination"])
+        assert source.is_file(), artifact["source"]
+        assert destination.is_file(), artifact["destination"]
+        assert source.stat().st_size == destination.stat().st_size == artifact["bytes"]
+        source_hash = hashlib.sha256(source.read_bytes()).hexdigest().upper()
+        destination_hash = hashlib.sha256(destination.read_bytes()).hexdigest().upper()
+        assert source_hash == destination_hash == artifact["sha256"]
+        assert artifact["copy_sha256_matched"] is True

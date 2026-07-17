@@ -119,7 +119,8 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
             portal_url=nashville["official_url"],
             next_safe_action=[
                 "If this is the current signed-in page, inspect the visible application state before navigating anywhere.",
-                "Resolve only the six founder-controlled facts, populate supported answers, and reach the complete preview.",
+                "Run `python code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py` and answer the six hidden prompts; require the ignored 11-answer fill map to validate without publishing values.",
+                "Populate only the supported answers from that private map and reach the complete preview.",
             ],
             stop_conditions=[
                 "Any fee payment, financial-aid agreement, program terms, cohort acceptance, attestation, or final submission.",
