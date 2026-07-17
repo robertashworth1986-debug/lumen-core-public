@@ -63,66 +63,89 @@ jobs:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
 
-      - name: Sync bounded public assets and repair evidence route
+      - name: Preflight VPS and prepare directories
         shell: bash
         run: |
           set -euo pipefail
-          REMOTE="opc@${{ secrets.VPS_HOST }}"
-          SSH=(ssh -o StrictHostKeyChecking=no "$REMOTE")
-          RSYNC_SSH="ssh -o StrictHostKeyChecking=no"
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -euo pipefail
+            command -v sudo
+            command -v rsync
+            command -v python3
+            command -v nginx
+            command -v systemctl
+            sudo -n true
+            sudo journalctl --vacuum-size=100M >/dev/null 2>&1 || true
+            sudo dnf clean all >/dev/null 2>&1 || true
+            sudo yum clean all >/dev/null 2>&1 || true
+            sudo find /var/log -type f \( -name "*.gz" -o -name "*.old" -o -name "*.1" -o -name "*.log.*" \) -delete 2>/dev/null || true
+            sudo install -d -o opc -g opc -m 755 \
+              /opt/lumencore/dashboard \
+              /opt/lumencore/dashboard/data \
+              /opt/lumencore/data \
+              /tmp/lumencore-evidence-route
+            touch /tmp/lumencore-evidence-route/.write-test
+            rm -f /tmp/lumencore-evidence-route/.write-test
+            echo "Active nginx candidates:"
+            for candidate in \
+              /etc/nginx/sites-enabled/lumatrader \
+              /etc/nginx/sites-available/lumatrader \
+              /etc/nginx/conf.d/lumatrader.conf; do
+              if [ -e "$candidate" ] || [ -L "$candidate" ]; then
+                printf "  %s -> %s\n" "$candidate" "$(readlink -f "$candidate" 2>/dev/null || printf unknown)"
+              fi
+            done
+            df -h /opt/lumencore
+          '
 
-          "${SSH[@]}" \
-            "if command -v sudo >/dev/null 2>&1; then SUDO=sudo; else SUDO=; fi; \
-             \$SUDO journalctl --vacuum-size=100M >/dev/null 2>&1 || true; \
-             \$SUDO dnf clean all >/dev/null 2>&1 || true; \
-             \$SUDO yum clean all >/dev/null 2>&1 || true; \
-             \$SUDO find /var/log -type f \( -name '*.gz' -o -name '*.old' -o -name '*.1' -o -name '*.log.*' \) -delete 2>/dev/null || true; \
-             if [ -d /opt/lumencore/dashboard ]; then \
-               \$SUDO rm -rf /opt/lumencore/dashboard/node_modules \
-                      /opt/lumencore/dashboard/.git \
-                      /opt/lumencore/dashboard/.pytest_cache \
-                      /opt/lumencore/dashboard/.mypy_cache \
-                      /opt/lumencore/dashboard/.ruff_cache; \
-               \$SUDO find /opt/lumencore/dashboard -type d -name '__pycache__' -prune -exec rm -rf {} +; \
-               \$SUDO find /opt/lumencore/dashboard -type f \( -name '*.pyc' -o -name '*.tmp' -o -name '*.bak' -o -name '*.log' \) -delete; \
-             fi; \
-             \$SUDO install -d -o opc -g opc -m 755 \
-               /opt/lumencore/dashboard \
-               /opt/lumencore/dashboard/data \
-               /opt/lumencore/data \
-               /tmp/lumencore-evidence-route; \
-             touch /opt/lumencore/data/.deploy_write_test && rm -f /opt/lumencore/data/.deploy_write_test; \
-             df -h /opt/lumencore"
-
+      - name: Sync dashboard assets
+        shell: bash
+        run: |
+          set -euo pipefail
           rsync -rlvz --delete --inplace --size-only --no-perms --omit-dir-times \
+            --rsync-path="sudo -n rsync" \
             --exclude='*.py' \
             --exclude='*.ps1' \
             --exclude='.git/' \
             --exclude='node_modules/' \
             --exclude='data/' \
             --exclude='assets/vendor/three.min.js' \
-            -e "$RSYNC_SSH" \
+            -e "ssh -o StrictHostKeyChecking=no" \
             dashboard/ \
-            "$REMOTE:/opt/lumencore/dashboard/"
+            "opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/"
 
+      - name: Sync data snapshots
+        shell: bash
+        run: |
+          set -euo pipefail
           rsync -rlvz --inplace --size-only --no-perms --omit-dir-times \
-            -e "$RSYNC_SSH" \
+            --rsync-path="sudo -n rsync" \
+            -e "ssh -o StrictHostKeyChecking=no" \
             data/ \
-            "$REMOTE:/opt/lumencore/data/"
+            "opc@${{ secrets.VPS_HOST }}:/opt/lumencore/data/"
 
           rsync -rlvz --delete --inplace --size-only --no-perms --omit-dir-times \
-            -e "$RSYNC_SSH" \
+            --rsync-path="sudo -n rsync" \
+            -e "ssh -o StrictHostKeyChecking=no" \
             data/ \
-            "$REMOTE:/opt/lumencore/dashboard/data/"
+            "opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/data/"
 
+      - name: Upload bounded repair tools
+        shell: bash
+        run: |
+          set -euo pipefail
           rsync -rlvz --inplace --no-perms --omit-dir-times \
-            -e "$RSYNC_SSH" \
+            -e "ssh -o StrictHostKeyChecking=no" \
             code/ops/repair_evidence_route.py \
             code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh \
-            "$REMOTE:/tmp/lumencore-evidence-route/"
+            "opc@${{ secrets.VPS_HOST }}:/tmp/lumencore-evidence-route/"
 
-          "${SSH[@]}" \
-            "sudo bash /tmp/lumencore-evidence-route/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh --apply"
+      - name: Apply bounded evidence route repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" \
+            "sudo -n bash /tmp/lumencore-evidence-route/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh --apply"
 
       - name: Smoke test canonical production surfaces
         shell: bash
