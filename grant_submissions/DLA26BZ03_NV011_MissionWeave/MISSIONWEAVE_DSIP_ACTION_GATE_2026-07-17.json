@@ -1,0 +1,231 @@
+{
+  "claim_boundary": "This public gate proves package integrity, document-format checks, and the completion state of a bounded private DSIP fact workflow. It does not expose legal identifiers, a Firm PIN, the assigned proposal number, private portal evidence, or unsupported compliance facts. It does not establish DLA validation, CMMC status, ITAR compliance, award eligibility, proposal acceptance, submission, selection, contract, award, deployment, or realized performance.",
+  "controls": {
+    "action_time_human_required": true,
+    "browser_navigation_performed": false,
+    "builder_can_click_final_submit": false,
+    "credentials_allowed_in_public_output": false,
+    "external_send_performed": false,
+    "portal_submit_performed": false,
+    "private_identifiers_allowed_in_public_output": false
+  },
+  "deadline": {
+    "expected_local": "July 22, 2026 at 12:00 p.m. Eastern Time",
+    "expected_utc": "2026-07-22T16:00:00Z",
+    "live_dsip_recheck_required": true,
+    "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
+  },
+  "gate_sha256": "047097e69d756810565db674784050654893b46aaf980dc7906b0697eb2c1f18",
+  "gate_summary": {
+    "open_gate_count": 50,
+    "passed_private_gate_count": 0,
+    "required_private_gate_count": 50,
+    "unresolved_gates": [
+      "ACTION_TIME_APPROVAL_TIMESTAMP",
+      "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+      "ASSIGNED_PROPOSAL_NUMBER_CAPTURE",
+      "CAGE_MATCH",
+      "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+      "COMPLETE_PORTAL_PREVIEW_REVIEW",
+      "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+      "CONTROLLED_DATA_EXCLUDED",
+      "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+      "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+      "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+      "DSIP_AUTHENTICATION",
+      "DSIP_FIRM_ADMIN",
+      "DSIP_FIRM_LEVEL_FORMS",
+      "DSIP_FIRM_PIN_AVAILABILITY",
+      "DSIP_ORGANIZATION_LINKAGE",
+      "FOREIGN_AFFILIATIONS_CURRENT_FACTS",
+      "FOREIGN_CITIZEN_ANSWER",
+      "ITAR_SCOPE_CONFIRMED",
+      "LIVE_DSIP_DEADLINE_CONFIRMATION",
+      "NO_CMMC_STATUS_OVERCLAIM",
+      "NO_DUPLICATE_COST_OR_DELIVERABLE",
+      "OWNERSHIP_AND_AFFILIATES",
+      "PI_640_HOURS",
+      "PI_PRIMARY_EMPLOYMENT",
+      "PORTAL_PREVIEW_RECEIPT_HASH",
+      "PRIOR_CURRENT_PENDING_SUPPORT",
+      "PRIVATE_INPUT_TIMESTAMP",
+      "SAM_ACTIVE_STATUS",
+      "SAM_LEGAL_NAME_MATCH",
+      "SAM_REPRESENTATIONS_CURRENT",
+      "SBA_COMPANY_REGISTRY",
+      "SBC_CONTROL_ID",
+      "SBIR_PERCENTAGE_OF_WORK",
+      "SUBMITTER_AUTHORITY",
+      "TECHNICAL_DATA_RIGHTS_ASSERTION",
+      "TECHNOLOGY_CONTROL_PLAN_DECISION",
+      "UEI_MATCH",
+      "US_SMALL_BUSINESS_ELIGIBILITY",
+      "VOLUME1_PUBLIC_RELEASE_TEXT_REVIEW",
+      "VOLUME2_ASSIGNED_PROPOSAL_NUMBER_EMBEDDED",
+      "VOLUME2_PDF_HASH_MATCH",
+      "VOLUME2_REBUILD",
+      "VOLUME2_VIRUS_SCAN",
+      "VOLUME3_COST_BASIS",
+      "VOLUME3_TOTAL_MATCHES_PHASE_I_CEILING",
+      "VOLUME4_CCR",
+      "VOLUME5_UPLOAD_SET",
+      "VOLUME6_FWA_TRAINING",
+      "VOLUME7_FOREIGN_AFFILIATIONS_WEBFORM"
+    ]
+  },
+  "generated_utc": "2026-07-17T11:31:53.792717+00:00",
+  "official_instruction_facts": {
+    "cmmc_amendment_note": "Amendment 2 says CMMC Phase II implementation was suspended on July 13, 2026 while Phase I self-assessment requirements remain in place; the current live requirement must be reviewed before submission.",
+    "current_package_duration_months": 6,
+    "dd2345_or_jcp_application_evidence_required_if_effort_subject_to_itar": true,
+    "dsip_volume_count": 7,
+    "phase_i_base_ceiling_usd": 100000,
+    "phase_i_max_duration_months": 12,
+    "projected_cmmc_level": "Level 2 (Self)",
+    "taba_requested": false,
+    "topic_itar_flag": true,
+    "volume2_page_limit": 20,
+    "volume6_fwa_training_required_annually": true,
+    "volume7_is_webform_not_volume5_pdf": true
+  },
+  "outputs": {
+    "json": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+    "markdown": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md"
+  },
+  "portal_checklist": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md",
+  "private_fact_state": {
+    "action_time_authorized": false,
+    "approval_timestamp_present": false,
+    "assigned_proposal_number_embedded_in_volume2": false,
+    "assigned_proposal_number_present": false,
+    "assigned_proposal_number_value_exposed": false,
+    "corporate_official_reviewed": false,
+    "portal_preview_receipt_present": false,
+    "portal_preview_receipt_value_exposed": false,
+    "volume2_pdf_hash_matches_private_record": false,
+    "volume3_private_amount_exposed": false,
+    "volume3_total_matches_official_ceiling": false
+  },
+  "private_input": {
+    "expected_path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_DSIP_ACTION.private.json",
+    "git_ignored_target": true,
+    "present": false,
+    "private_values_exposed": false,
+    "sha256": null
+  },
+  "private_template": "config/missionweave_dsip_action_private_template_v1.json",
+  "schema": "lumencore.missionweave_dsip_action_gate.v1",
+  "source_integrity": {
+    "all_checks_pass": true,
+    "all_manifest_files_match": true,
+    "candidate_format_pass": true,
+    "files": [
+      {
+        "bytes_match": true,
+        "path": "MISSIONWEAVE_DSIP_ASSEMBLY_MAP_2026-07-16.md",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "MISSIONWEAVE_DSIP_VOLUME1_PUBLIC_TEXT_2026-07-16.md",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.md",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.docx",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "MISSIONWEAVE_DSIP_VOLUME2_BUILD_METADATA_2026-07-16.json",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "MISSIONWEAVE_DSIP_VOLUME3_COST_INPUTS_2026-07-16.md",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "MISSIONWEAVE_DSIP_VOLUME5_WORKSHEET_2026-07-16.md",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "MISSIONWEAVE_CLAIM_EVIDENCE_MATRIX_2026-07-16.md",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "MISSIONWEAVE_BOUNDED_PROCESS_PLAN_2026-06-19.md",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "build_missionweave_dsip_volume2_candidate.py",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "build_missionweave_package_manifest.py",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "source_attachments/DLA_26BZ_RELEASE_3_COMPONENT_INSTRUCTIONS.pdf",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "source_attachments/DLA26BZ03_NV011_OFFICIAL_TOPIC_DETAILS.json",
+        "present": true,
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "source_attachments/DoW_2026_SBIR_BAA_RELEASE_3_AMENDMENT_2.pdf",
+        "present": true,
+        "sha256_match": true
+      }
+    ],
+    "manifest_file_count": 15,
+    "manifest_header_pass": true,
+    "manifest_path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json",
+    "manifest_sha256": "598317D0B4A971402E3446FF32C273209AE7F6DD347F02D5C663159AD4EB6069",
+    "neutral_proposal_header_present": true,
+    "volume2_encrypted": false,
+    "volume2_letter_size": true,
+    "volume2_page_limit": 20,
+    "volume2_pages": 11,
+    "volume2_path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf",
+    "volume2_required_sections_present": true,
+    "volume2_searchable": true,
+    "volume2_sha256": "8BBDE3DB31285F3B671CBFCAF972E9EB8F2DE2F62D559463E519CA4F901C37E6"
+  },
+  "status": "PRIVATE_DSIP_FACTS_NOT_CAPTURED",
+  "submission_ready_for_human_click": false,
+  "topic": "DLA26BZ03-NV011"
+}

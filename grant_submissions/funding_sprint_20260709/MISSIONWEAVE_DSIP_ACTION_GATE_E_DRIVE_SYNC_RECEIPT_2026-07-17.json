@@ -1,0 +1,157 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "generated_utc": "2026-07-17T11:36:55.4760562Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717",
+  "artifact_count": 16,
+  "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "private_input_mirrored": false,
+  "private_values_mirrored": false,
+  "artifacts": [
+    {
+      "source": ".gitignore",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/.gitignore",
+      "bytes": 2711,
+      "sha256": "1210B71FE5D86DBDF8A48FDBA9165F61D3257E0F0795A081C5CFEC3FA5DB3A2E",
+      "copy_bytes": 2711,
+      "copy_sha256": "1210B71FE5D86DBDF8A48FDBA9165F61D3257E0F0795A081C5CFEC3FA5DB3A2E",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "config/missionweave_dsip_action_private_template_v1.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/config/missionweave_dsip_action_private_template_v1.json",
+      "bytes": 2342,
+      "sha256": "3156759330B543A2BE00A40A1E1B4C98D18AC000469D1322F52E8ABEFD46212F",
+      "copy_bytes": 2342,
+      "copy_sha256": "3156759330B543A2BE00A40A1E1B4C98D18AC000469D1322F52E8ABEFD46212F",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py",
+      "bytes": 36610,
+      "sha256": "AD824F061DB9483E802AAEDA9C8F6987AACE234A30C927F834EDA32E92F3D279",
+      "copy_bytes": 36610,
+      "copy_sha256": "AD824F061DB9483E802AAEDA9C8F6987AACE234A30C927F834EDA32E92F3D279",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_missionweave_dsip_action_gate.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/tests/test_missionweave_dsip_action_gate.py",
+      "bytes": 9013,
+      "sha256": "416A04A8FDCDCF53B8EA4844F79A2A452627E007B9E77B31F91C23AF1CFFBD65",
+      "copy_bytes": 9013,
+      "copy_sha256": "416A04A8FDCDCF53B8EA4844F79A2A452627E007B9E77B31F91C23AF1CFFBD65",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "bytes": 9093,
+      "sha256": "A647445FC0287975232B045762FD2B62C1C9FD8D5124F09AF6D0AB1576ABBAA3",
+      "copy_bytes": 9093,
+      "copy_sha256": "A647445FC0287975232B045762FD2B62C1C9FD8D5124F09AF6D0AB1576ABBAA3",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md",
+      "bytes": 4603,
+      "sha256": "125CCB9C4DB652D02EF042FD9803F0F66C3179DE4E28650987985828803DCD0D",
+      "copy_bytes": 4603,
+      "copy_sha256": "125CCB9C4DB652D02EF042FD9803F0F66C3179DE4E28650987985828803DCD0D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md",
+      "bytes": 5262,
+      "sha256": "F594E4FB7A67B2C1E206802B0411A813550C7E96A1DFCF27D9FC037F3B709524",
+      "copy_bytes": 5262,
+      "copy_sha256": "F594E4FB7A67B2C1E206802B0411A813550C7E96A1DFCF27D9FC037F3B709524",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "bytes": 88175,
+      "sha256": "3DAC6BCA8D0B83909D4602C64C3336FBCA7C65416D7DB384643F9F20C33906CF",
+      "copy_bytes": 88175,
+      "copy_sha256": "3DAC6BCA8D0B83909D4602C64C3336FBCA7C65416D7DB384643F9F20C33906CF",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_submission_command_board.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/tests/test_near_deadline_submission_command_board.py",
+      "bytes": 17001,
+      "sha256": "563FF8012E05BB7505C662AB8BF61DAE81ADB7D0E23A4537E6521A7F023116CC",
+      "copy_bytes": 17001,
+      "copy_sha256": "563FF8012E05BB7505C662AB8BF61DAE81ADB7D0E23A4537E6521A7F023116CC",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "bytes": 53660,
+      "sha256": "94814A874AA0D995E9E09E86B10396D1B68AF1B879AEC74D8069D2F6DD0A04AB",
+      "copy_bytes": 53660,
+      "copy_sha256": "94814A874AA0D995E9E09E86B10396D1B68AF1B879AEC74D8069D2F6DD0A04AB",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py",
+      "bytes": 18531,
+      "sha256": "D9C0CC9CCFC7A23F67A395F532F7CF08FFB65B0AA9DE16FBB4CC286A1B458D95",
+      "copy_bytes": 18531,
+      "copy_sha256": "D9C0CC9CCFC7A23F67A395F532F7CF08FFB65B0AA9DE16FBB4CC286A1B458D95",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_live_funding_portal_handoff.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/tests/test_live_funding_portal_handoff.py",
+      "bytes": 4730,
+      "sha256": "9B73FE81ED878C52D2539444C7568C6487DD9D73FB041EDBED28020D5E34B1EA",
+      "copy_bytes": 4730,
+      "copy_sha256": "9B73FE81ED878C52D2539444C7568C6487DD9D73FB041EDBED28020D5E34B1EA",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+      "bytes": 10247,
+      "sha256": "8E9595009C58D4F4749D9F5199EC96C685FE29FFD31D599258D60289A3EF1B71",
+      "copy_bytes": 10247,
+      "copy_sha256": "8E9595009C58D4F4749D9F5199EC96C685FE29FFD31D599258D60289A3EF1B71",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/near_deadline_submission_command_board_latest.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/out/ops/near_deadline_submission_command_board_latest.json",
+      "bytes": 70192,
+      "sha256": "91481522A95BF4A5654E65B741701ED5654DF22CB1617EA0C5F8FE7573764EC8",
+      "copy_bytes": 70192,
+      "copy_sha256": "91481522A95BF4A5654E65B741701ED5654DF22CB1617EA0C5F8FE7573764EC8",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/live_funding_portal_handoff_latest.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/out/ops/live_funding_portal_handoff_latest.json",
+      "bytes": 16063,
+      "sha256": "59F766FF5BDE7CCBFE4EE50E894F81781656DFFF79AD1E91CE2062ADBAD45DD6",
+      "copy_bytes": 16063,
+      "copy_sha256": "59F766FF5BDE7CCBFE4EE50E894F81781656DFFF79AD1E91CE2062ADBAD45DD6",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/near_deadline_submission_command_board.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_DSIP_ACTION_GATE_20260717/dashboard/data/near_deadline_submission_command_board.json",
+      "bytes": 70192,
+      "sha256": "91481522A95BF4A5654E65B741701ED5654DF22CB1617EA0C5F8FE7573764EC8",
+      "copy_bytes": 70192,
+      "copy_sha256": "91481522A95BF4A5654E65B741701ED5654DF22CB1617EA0C5F8FE7573764EC8",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves byte-for-byte mirroring of the bounded public MissionWeave DSIP action gate, portal checklist, command-board integration, and current-session handoff only. No private input, Firm PIN, assigned proposal number, legal identifier, private portal evidence, or credential was mirrored. It does not prove portal submission, certification, acceptance, validation, selection, contract, award, or funding."
+}

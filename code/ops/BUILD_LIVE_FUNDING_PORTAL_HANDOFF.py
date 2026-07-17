@@ -66,7 +66,7 @@ def queue_item(
     next_safe_action: list[str],
     stop_conditions: list[str],
 ) -> dict[str, Any]:
-    return {
+    item = {
         "priority": priority,
         "opportunity_number": lane["opportunity_number"],
         "title": lane["title"],
@@ -83,6 +83,23 @@ def queue_item(
         "final_submit_allowed_without_human": False,
         "source_lane_sha256": lane["lane_sha256"],
     }
+    if "action_gate_status" in lane:
+        item["action_gate"] = {
+            "status": lane["action_gate_status"],
+            "submission_ready_for_human_click": lane[
+                "action_gate_submission_ready_for_human_click"
+            ],
+            "required_private_gate_count": lane[
+                "action_gate_required_private_gate_count"
+            ],
+            "passed_private_gate_count": lane[
+                "action_gate_passed_private_gate_count"
+            ],
+            "open_gate_count": lane["action_gate_open_gate_count"],
+            "private_input_present": lane["action_gate_private_input_present"],
+            "private_values_exposed": lane["action_gate_private_values_exposed"],
+        }
+    return item
 
 
 def build_payload(operational_date: date | None = None) -> dict[str, Any]:
@@ -116,6 +133,7 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
             next_safe_action=[
                 "Verify the live DSIP countdown, organization linkage, and generated proposal number.",
                 "Use the proposal number through the existing builder, rerender Volume 2, regenerate the 15-file manifest, and require all hashes to pass.",
+                "Use the generated seven-volume checklist and ignored private action template; require the public gate to move from 0/50 to 50/50 without exposing values.",
                 "Populate Volumes 1-7 from the bounded package and reach the complete preview.",
             ],
             stop_conditions=[
@@ -284,6 +302,19 @@ def render_markdown(payload: dict[str, Any]) -> str:
         )
         for action in item["next_safe_action"]:
             lines.append(f"  - {action}")
+        if item.get("action_gate"):
+            gate = item["action_gate"]
+            lines.extend(
+                [
+                    "- Action gate:",
+                    f"  - Status: `{gate['status']}`",
+                    f"  - Passed: `{gate['passed_private_gate_count']}/{gate['required_private_gate_count']}`",
+                    f"  - Open: `{gate['open_gate_count']}`",
+                    f"  - Private input present: `{str(gate['private_input_present']).lower()}`",
+                    f"  - Private values exposed: `{str(gate['private_values_exposed']).lower()}`",
+                    f"  - Ready for human click: `{str(gate['submission_ready_for_human_click']).lower()}`",
+                ]
+            )
         lines.append("- Stop conditions:")
         for stop in item["stop_conditions"]:
             lines.append(f"  - {stop}")

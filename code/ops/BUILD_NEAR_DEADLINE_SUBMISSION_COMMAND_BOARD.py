@@ -73,6 +73,15 @@ MISSIONWEAVE_VOLUME5 = (
 MISSIONWEAVE_CLAIM_MATRIX = (
     MISSIONWEAVE_DIR / "MISSIONWEAVE_CLAIM_EVIDENCE_MATRIX_2026-07-16.md"
 )
+MISSIONWEAVE_ACTION_GATE = (
+    MISSIONWEAVE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
+)
+MISSIONWEAVE_ACTION_GATE_MD = (
+    MISSIONWEAVE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md"
+)
+MISSIONWEAVE_PORTAL_CHECKLIST = (
+    MISSIONWEAVE_DIR / "MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md"
+)
 MISSIONWEAVE_OFFICIAL_TOPIC = (
     MISSIONWEAVE_DIR
     / "source_attachments"
@@ -265,6 +274,8 @@ def base_sources() -> dict[str, Any]:
         "missionweave_dsip_package_manifest": MISSIONWEAVE_MANIFEST,
         "missionweave_dsip_assembly_map": MISSIONWEAVE_ASSEMBLY_MAP,
         "missionweave_volume2_pdf": MISSIONWEAVE_VOLUME2_PDF,
+        "missionweave_dsip_action_gate": MISSIONWEAVE_ACTION_GATE,
+        "missionweave_dsip_portal_checklist": MISSIONWEAVE_PORTAL_CHECKLIST,
         "missionweave_official_topic": MISSIONWEAVE_OFFICIAL_TOPIC,
         "missionweave_baa_amendment_2": MISSIONWEAVE_BAA,
         "missionweave_dla_component_instructions": MISSIONWEAVE_COMPONENT_INSTRUCTIONS,
@@ -467,6 +478,17 @@ def build_command_lanes(
             "MissionWeave DSIP package manifest verification failed: "
             + ", ".join(missionweave_integrity_errors)
         )
+    missionweave_action_gate = read_json(MISSIONWEAVE_ACTION_GATE)
+    if missionweave_action_gate.get("schema") != (
+        "lumencore.missionweave_dsip_action_gate.v1"
+    ):
+        raise ValueError("MissionWeave DSIP action gate is missing or stale")
+    if missionweave_action_gate.get("topic") != "DLA26BZ03-NV011":
+        raise ValueError("MissionWeave DSIP action gate has the wrong topic")
+    if missionweave_action_gate.get("source_integrity", {}).get(
+        "all_checks_pass"
+    ) is not True:
+        raise ValueError("MissionWeave DSIP action gate source integrity failed")
     hud = grants.get("PDR-2600-DC-029Q", {})
     hhs_child = grants.get("HHS-2026-ACF-ACYF-CA-0037", {})
 
@@ -593,6 +615,25 @@ def build_command_lanes(
             "package_manifest_state": missionweave_manifest.get("package_state"),
             "package_manifest_integrity_pass": True,
             "package_manifest_file_count": len(missionweave_files),
+            "action_gate_status": missionweave_action_gate.get("status"),
+            "action_gate_submission_ready_for_human_click": missionweave_action_gate.get(
+                "submission_ready_for_human_click", False
+            ),
+            "action_gate_required_private_gate_count": missionweave_action_gate.get(
+                "gate_summary", {}
+            ).get("required_private_gate_count"),
+            "action_gate_passed_private_gate_count": missionweave_action_gate.get(
+                "gate_summary", {}
+            ).get("passed_private_gate_count"),
+            "action_gate_open_gate_count": missionweave_action_gate.get(
+                "gate_summary", {}
+            ).get("open_gate_count"),
+            "action_gate_private_input_present": missionweave_action_gate.get(
+                "private_input", {}
+            ).get("present", False),
+            "action_gate_private_values_exposed": missionweave_action_gate.get(
+                "private_input", {}
+            ).get("private_values_exposed", False),
             "phase1_duration_months": 6,
             "phase1_cost_ceiling_usd": 100000,
             "topic_phase1_max_duration_months": 12,
@@ -607,17 +648,21 @@ def build_command_lanes(
                 rel(MISSIONWEAVE_COST_INPUTS),
                 rel(MISSIONWEAVE_VOLUME5),
                 rel(MISSIONWEAVE_CLAIM_MATRIX),
+                rel(MISSIONWEAVE_ACTION_GATE),
+                rel(MISSIONWEAVE_PORTAL_CHECKLIST),
             ],
             "why_now": (
                 "This is the nearest complete federal Phase I proposal package. The "
                 "15-file manifest verifies byte-for-byte, the technical candidate is "
                 "claim-bounded, and the official topic fit is strong. It is not "
-                "submission-ready until DSIP identity, cost, ITAR, CMMC, award-history, "
-                "foreign-affiliation, rights, and certification gates are answered."
+                "submission-ready until the public action gate moves from 0/50 to 50/50 "
+                "without exposing identity, cost, ITAR, CMMC, award-history, foreign-"
+                "affiliation, rights, preview, or certification values."
             ),
             "today_work": [
                 "Open DLA26BZ03-NV011 in DSIP and verify the live countdown, organization linkage, and proposal number.",
                 "Replace the neutral proposal-number header through the builder, rerender the PDF, and regenerate the manifest.",
+                "Use the generated seven-volume portal checklist and ignored private action template; rerun the public gate after each bounded block.",
                 "Populate Volumes 1-7 from the hash-locked package and stop at the complete portal preview.",
                 "Resolve ITAR/JCP, projected CMMC Level 2 (Self), support-overlap, data-rights, and foreign-affiliation representations without claiming certifications that are not documented.",
             ],
@@ -1270,11 +1315,11 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "no_bid_or_partner_only_count": len(no_bid),
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Keep the live browser on the founder-controlled Nashville EC sign-in and complete that July 17 application first; then open DLA26BZ03-NV011 in DSIP and assemble the hash-verified MissionWeave package before its July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.",
+            "strongest_today_action": "Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. Complete the July 17 Nashville EC application if that is the active portal; otherwise preserve the authenticated lane to its next safe preview. Then use the MissionWeave seven-volume checklist and private action gate, currently 0/50 with 15/15 package files verified, before the July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.",
             "critical_same_day_infrastructure_action": sam_critical_action,
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
-            "best_grants_lane": "DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: a 15-file package is hash-verified, but DSIP identity, proposal-number, cost, ITAR/JCP, CMMC, award-history, foreign-affiliation, rights, certification, and final-preview gates remain. NSF 26-510 stays the next rolling Project Pitch route.",
+            "best_grants_lane": "DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 package files are hash-verified and the 11-page PDF passes format checks, while the private action gate remains 0/50 until DSIP identity, proposal-number, cost, ITAR/JCP, current CMMC posture, award-history, foreign-affiliation, rights, preview, and certification facts are supported. NSF 26-510 stays the next rolling Project Pitch route.",
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: one qualified target was contacted July 17, but no solo bid and no partner claim unless written corporate-experience evidence arrives.",
             "fastest_low_friction_lane": "The Nashville EC TakeOff application is the nearest low-friction reviewer route, but six founder confirmations and final portal submission remain human-gated.",
             "all_final_actions_blocked_without_human": True,

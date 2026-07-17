@@ -14,7 +14,7 @@ MIRROR_RECEIPT = (
     ROOT
     / "grant_submissions"
     / "funding_sprint_20260709"
-    / "NEAR_DEADLINE_COMMAND_BOARD_MISSIONWEAVE_RECONCILIATION_E_DRIVE_SYNC_RECEIPT_2026-07-17.json"
+    / "MISSIONWEAVE_DSIP_ACTION_GATE_E_DRIVE_SYNC_RECEIPT_2026-07-17.json"
 )
 
 
@@ -180,19 +180,34 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "July 22, 2025" in missionweave["official_deadline_text"]
     assert missionweave["package_manifest_integrity_pass"] is True
     assert missionweave["package_manifest_file_count"] == 15
+    assert missionweave["action_gate_status"] == "PRIVATE_DSIP_FACTS_NOT_CAPTURED"
+    assert missionweave["action_gate_submission_ready_for_human_click"] is False
+    assert missionweave["action_gate_required_private_gate_count"] == 50
+    assert missionweave["action_gate_passed_private_gate_count"] == 0
+    assert missionweave["action_gate_open_gate_count"] == 50
+    assert missionweave["action_gate_private_input_present"] is False
+    assert missionweave["action_gate_private_values_exposed"] is False
     assert missionweave["phase1_duration_months"] == 6
     assert missionweave["phase1_cost_ceiling_usd"] == 100000
     assert missionweave["topic_phase1_max_duration_months"] == 12
     assert missionweave["topic_phase1_max_cost_usd"] == 100000
     assert missionweave["itar_flag"] is True
     assert missionweave["projected_cmmc_level"] == "Level 2 (Self)"
-    assert len(missionweave["package_files"]) == 7
+    assert len(missionweave["package_files"]) == 9
     assert any(
         path.endswith("MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json")
         for path in missionweave["package_files"]
     )
     assert any(
         path.endswith("MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf")
+        for path in missionweave["package_files"]
+    )
+    assert any(
+        path.endswith("MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json")
+        for path in missionweave["package_files"]
+    )
+    assert any(
+        path.endswith("MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md")
         for path in missionweave["package_files"]
     )
     assert missionweave["external_send_allowed_without_human"] is False
@@ -308,6 +323,8 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "missionweave_dsip_package_manifest",
         "missionweave_dsip_assembly_map",
         "missionweave_volume2_pdf",
+        "missionweave_dsip_action_gate",
+        "missionweave_dsip_portal_checklist",
         "missionweave_official_topic",
         "missionweave_baa_amendment_2",
         "missionweave_dla_component_instructions",
@@ -331,11 +348,11 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         assert marker not in lowered
 
 
-def test_missionweave_command_board_reconciliation_mirror_matches():
+def test_missionweave_dsip_action_gate_mirror_matches():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 9
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 16
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["browser_navigation_performed"] is False
     assert receipt["private_values_mirrored"] is False

@@ -55,6 +55,16 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
     assert missionweave["deadline_utc"] == "2026-07-22T16:00:00Z"
     assert "July 22, 2025" in missionweave["official_deadline_text"]
     assert any("15-file manifest" in action for action in missionweave["next_safe_action"])
+    assert any("0/50 to 50/50" in action for action in missionweave["next_safe_action"])
+    assert missionweave["action_gate"] == {
+        "status": "PRIVATE_DSIP_FACTS_NOT_CAPTURED",
+        "submission_ready_for_human_click": False,
+        "required_private_gate_count": 50,
+        "passed_private_gate_count": 0,
+        "open_gate_count": 50,
+        "private_input_present": False,
+        "private_values_exposed": False,
+    }
     assert any("ITAR/JCP" in stop for stop in missionweave["stop_conditions"])
     assert any("final DSIP submission" in stop for stop in missionweave["stop_conditions"])
     for item in queue:
@@ -88,6 +98,7 @@ def test_rendered_handoff_is_public_safe_and_has_no_stale_send_state() -> None:
     assert "Live Funding Portal Handoff" in rendered
     assert "Navigation before resume signal: `false`" in rendered
     assert "DLA26BZ03-NV011" in rendered
+    assert "Passed: `0/50`" in rendered
     assert "EPRI administrative onboarding was sent" in rendered
     assert "EPRI draft" not in rendered
     assert "Private contact data included: `false`" in rendered

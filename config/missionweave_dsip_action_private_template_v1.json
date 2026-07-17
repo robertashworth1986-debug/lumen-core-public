@@ -1,0 +1,62 @@
+{
+  "approval": {
+    "approval_utc": null,
+    "corporate_official_reviewed_all_volumes": false,
+    "final_submission_authorized_at_action_time": false
+  },
+  "captured_utc": null,
+  "eligibility_and_compliance": {
+    "cmmc_phase_i_self_assessment_position_supported": false,
+    "conflicts_and_joint_venture_status_reviewed": false,
+    "controlled_data_excluded_from_submission": true,
+    "current_cmmc_requirements_reviewed": false,
+    "dd2345_or_jcp_application_evidence_ready": false,
+    "foreign_affiliations_webform_answered_from_current_facts": false,
+    "foreign_citizen_answer_verified": false,
+    "itar_scope_determination": null,
+    "no_cmmc_status_overclaim": true,
+    "no_duplicate_cost_or_deliverable": false,
+    "ownership_and_affiliates_reviewed": false,
+    "pi_640_hours_confirmed": false,
+    "pi_primary_employment_confirmed": false,
+    "prior_current_pending_support_reviewed": false,
+    "sbir_work_share_confirmed": false,
+    "technical_data_rights_assertion_supported": false,
+    "technology_control_plan_decision_documented": false,
+    "us_small_business_eligibility_confirmed": false
+  },
+  "identity": {
+    "cage_match_verified": false,
+    "dsip_authenticated": false,
+    "firm_admin_confirmed": false,
+    "firm_level_forms_complete": false,
+    "firm_pin_available_in_dsip": false,
+    "organization_linked": false,
+    "sam_active_verified": false,
+    "sam_legal_name_match": false,
+    "sam_representations_current": false,
+    "sba_company_registry_verified": false,
+    "sbc_control_id_verified": false,
+    "submitter_authority_confirmed": false,
+    "uei_match_verified": false
+  },
+  "proposal": {
+    "live_deadline_confirmed": false,
+    "portal_preview_reviewed": false,
+    "portal_preview_sha256": null,
+    "proposal_number": null,
+    "volume1_public_release_text_reviewed": false,
+    "volume2_pdf_rebuilt_with_assigned_proposal_number": false,
+    "volume2_pdf_sha256": null,
+    "volume2_virus_scan_passed": false,
+    "volume3_cost_basis_supported": false,
+    "volume3_total_usd": null,
+    "volume4_ccr_answer_verified": false,
+    "volume5_upload_set_reviewed": false,
+    "volume6_fwa_training_current": false,
+    "volume7_webform_complete": false
+  },
+  "schema": "lumencore.missionweave_dsip_action_private.v1",
+  "template_only": true,
+  "topic": "DLA26BZ03-NV011"
+}
