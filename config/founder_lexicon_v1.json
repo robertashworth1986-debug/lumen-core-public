@@ -1,0 +1,260 @@
+{
+  "schema": "lumencore_founder_lexicon_v1",
+  "generated_utc": "2026-07-17T23:30:00Z",
+  "owner": "Robert Ashworth",
+  "boundary": "This registry records founder-used names, phrases, and architecture labels together with public-safe provenance. It does not establish trademark registration, patent priority, legal ownership against third parties, scientific validity, product certification, customer adoption, or external validation.",
+  "publication_rules": {
+    "raw_private_chats_public": false,
+    "raw_private_notebooks_public": false,
+    "credentials_or_private_portal_records_public": false,
+    "founder_origin_assertion_requires_source": true,
+    "pending_terms_may_be_promoted": false
+  },
+  "terms": [
+    {
+      "key": "lumencore",
+      "term": "LumenCore",
+      "family": "company_and_platform",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2025",
+      "evidence_state": "verified_current_repo",
+      "public_state": "public_safe",
+      "public_definition": "Founder-built proof-to-pilot AI infrastructure validation architecture.",
+      "sources": [
+        {"type": "repo_path", "locator": "README.md"},
+        {"type": "repo_path", "locator": "docs/CANONICAL_OPERATING_STATE.md"}
+      ]
+    },
+    {
+      "key": "bounded_light_speed",
+      "term": "Bounded Light Speed",
+      "family": "founder_operating_principle",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2026-07-15",
+      "evidence_state": "verified_current_repo",
+      "public_state": "public_safe",
+      "public_definition": "Move at the fastest rate that preserves evidence custody, claim boundaries, reversibility, and founder control.",
+      "sources": [
+        {"type": "repo_path", "locator": "dashboard/evidence/index_bounded.html"},
+        {"type": "repo_path", "locator": "docs/LUMA1_LUMA2_HANDOFF_PROTOCOL.md"}
+      ]
+    },
+    {
+      "key": "bounded_infinity",
+      "term": "Bounded Infinity",
+      "family": "research_and_runtime_language",
+      "founder_origin_asserted": true,
+      "first_documented_date": "unknown",
+      "evidence_state": "verified_current_repo",
+      "public_state": "research_only",
+      "public_definition": "A founder-used label for open-ended search or scale constrained by explicit safety, evidence, and control bounds.",
+      "sources": [
+        {"type": "repo_path", "locator": "code/bounded_infinity.py"}
+      ]
+    },
+    {
+      "key": "alpha_echo",
+      "term": "Alpha Echo",
+      "family": "research_lineage",
+      "founder_origin_asserted": true,
+      "first_documented_date": "unknown",
+      "evidence_state": "verified_current_repo",
+      "public_state": "research_only",
+      "public_definition": "Founder-used lineage language for an early echo/coherence research family; not a validated product claim.",
+      "sources": [
+        {"type": "repo_path", "locator": "code/build_lumencore_universe_map.py"},
+        {"type": "repo_path", "locator": "docs/CANONICAL_OPERATING_STATE.md"}
+      ]
+    },
+    {
+      "key": "hybrid_echo_routing",
+      "term": "Hybrid Echo Routing",
+      "family": "routing_research",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2026-07-15",
+      "evidence_state": "verified_pr_history",
+      "public_state": "research_only",
+      "public_definition": "A deterministic simulation lineage combining geometry profiles with adaptive phase, damping, reroute, and thermal controls.",
+      "sources": [
+        {"type": "pull_request", "locator": "#9"},
+        {"type": "branch", "locator": "feature/hybrid-echo-routing-lineage"}
+      ]
+    },
+    {
+      "key": "flowform",
+      "term": "FlowForm",
+      "family": "geometry_and_routing",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2025",
+      "evidence_state": "verified_current_repo",
+      "public_state": "public_safe",
+      "public_definition": "Geometry and routing layer for biomimetic, curved, and stability-aware pathway modeling.",
+      "sources": [
+        {"type": "repo_path", "locator": "README.md"},
+        {"type": "repo_path", "locator": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md"}
+      ]
+    },
+    {
+      "key": "echoform",
+      "term": "EchoForm",
+      "family": "identity_architecture",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2025",
+      "evidence_state": "verified_current_repo",
+      "public_state": "concept_or_prototype",
+      "public_definition": "Identity-consistent digital-twin and bio-digital signature architecture; no medical or biometric certification is asserted.",
+      "sources": [
+        {"type": "repo_path", "locator": "README.md"},
+        {"type": "repo_path", "locator": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md"}
+      ]
+    },
+    {
+      "key": "etherframe",
+      "term": "EtherFrame",
+      "family": "system_logic_and_routing",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2025",
+      "evidence_state": "verified_current_repo",
+      "public_state": "concept_or_prototype",
+      "public_definition": "Logic and routing layer for system-state organization, proof coordination, and stability controls.",
+      "sources": [
+        {"type": "repo_path", "locator": "README.md"},
+        {"type": "repo_path", "locator": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md"}
+      ]
+    },
+    {
+      "key": "aetherreach",
+      "term": "AetherReach",
+      "family": "human_interface",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2025",
+      "evidence_state": "verified_current_repo",
+      "public_state": "concept_or_prototype",
+      "public_definition": "Human-interface layer for gesture, biometric, symbolic, and operator-facing input concepts.",
+      "sources": [
+        {"type": "repo_path", "locator": "README.md"},
+        {"type": "repo_path", "locator": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md"}
+      ]
+    },
+    {
+      "key": "lumenshell",
+      "term": "LumenShell",
+      "family": "embodiment_and_boundary",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2025",
+      "evidence_state": "verified_current_repo",
+      "public_state": "concept_or_prototype",
+      "public_definition": "Embodiment and smart-skin boundary layer for robotics, haptics, thermal balance, and resonant-system design concepts.",
+      "sources": [
+        {"type": "repo_path", "locator": "README.md"},
+        {"type": "repo_path", "locator": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md"}
+      ]
+    },
+    {
+      "key": "luma_spiral",
+      "term": "LumaSpiral / LumenSpiral",
+      "family": "geometry_and_harmonic_routing",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2025",
+      "evidence_state": "verified_current_repo",
+      "public_state": "research_only",
+      "public_definition": "Spiral geometry layer for compact pathing, phase organization, and harmonic-routing experiments.",
+      "sources": [
+        {"type": "repo_path", "locator": "README.md"},
+        {"type": "repo_path", "locator": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md"}
+      ]
+    },
+    {
+      "key": "luma_trader",
+      "term": "LumaTrader",
+      "family": "market_data_research",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2025",
+      "evidence_state": "verified_current_repo",
+      "public_state": "research_only",
+      "public_definition": "Market-data, runtime-control, scoring, dashboard, and evidence-discipline branch; no audited profit or guaranteed performance is asserted.",
+      "sources": [
+        {"type": "repo_path", "locator": "README.md"},
+        {"type": "repo_path", "locator": "docs/CANONICAL_OPERATING_STATE.md"}
+      ]
+    },
+    {
+      "key": "luma_scout",
+      "term": "LumaScout",
+      "family": "discovery_and_scouting",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2025",
+      "evidence_state": "verified_current_repo",
+      "public_state": "research_only",
+      "public_definition": "Discovery and scouting intelligence branch whose live dependency and billing state must be verified before demonstration.",
+      "sources": [
+        {"type": "repo_path", "locator": "README.md"},
+        {"type": "repo_path", "locator": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md"}
+      ]
+    },
+    {
+      "key": "luma_jet",
+      "term": "LumaJet",
+      "family": "simulation_first_hardware_research",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2025",
+      "evidence_state": "verified_current_repo",
+      "public_state": "simulation_only",
+      "public_definition": "Simulation-first geometry, routing, thermal, resilience, and e-drive research branch; not flight capability or certification.",
+      "sources": [
+        {"type": "repo_path", "locator": "README.md"},
+        {"type": "repo_path", "locator": "docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md"}
+      ]
+    },
+    {
+      "key": "luma_suit_skin",
+      "term": "LumaSuit / LumaSkin",
+      "family": "human_performance_and_smart_skin",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2025",
+      "evidence_state": "verified_current_repo",
+      "public_state": "simulation_only",
+      "public_definition": "Non-actuating smart-skin and human-performance digital-twin research branch; not powered armor, medical diagnosis, or certified safety.",
+      "sources": [
+        {"type": "repo_path", "locator": "README.md"},
+        {"type": "repo_path", "locator": "docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md"}
+      ]
+    },
+    {
+      "key": "proof_capsule",
+      "term": "Proof Capsule",
+      "family": "evidence_method",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2026",
+      "evidence_state": "verified_current_repo",
+      "public_state": "public_safe",
+      "public_definition": "A bounded evidence unit that identifies source, baseline, locked metric, run type, manifest, result, limitations, and next validation gate.",
+      "sources": [
+        {"type": "repo_path", "locator": "docs/PROOF_CAPSULE_SCHEMA.md"},
+        {"type": "repo_path", "locator": "QUICKSTART.md"}
+      ]
+    },
+    {
+      "key": "iseed",
+      "term": "iSeed",
+      "family": "founder_lineage_pending",
+      "founder_origin_asserted": true,
+      "first_documented_date": "unknown",
+      "evidence_state": "pending_private_source",
+      "public_state": "hold",
+      "public_definition": "Definition intentionally held until a dated source artifact is verified.",
+      "sources": []
+    },
+    {
+      "key": "we_come_we_test_checksum",
+      "term": "We come. We test. Checksum.",
+      "family": "founder_expression_pending",
+      "founder_origin_asserted": true,
+      "first_documented_date": "2026-07-16",
+      "evidence_state": "pending_private_source",
+      "public_state": "hold",
+      "public_definition": "Founder expression for test-first, evidence-locked external validation; publication held until its dated source is preserved.",
+      "sources": []
+    }
+  ]
+}
