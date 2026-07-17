@@ -1016,7 +1016,23 @@ function reviewerSourceStatus(value, source) {
   const raw = String(value || 'unknown');
   if (raw === 'ZERO_RECORDS_CAUSE_UNVERIFIED') return `${source} zero records; cause unverified`;
   if (raw === 'HARVESTED_RECORDS_PRESENT') return `${source} records present in bounded harvest`;
+  if (raw === 'LIVE_RESPONSES_RECORDS_PRESENT' || raw === 'LIVE_RESPONSE_RECORDS_PRESENT' || raw === 'LIVE_AUTHENTICATED_RECORDS_PRESENT') return `${source} live response; records present`;
+  if (raw === 'LIVE_RESPONSES_ZERO_RECORDS' || raw === 'LIVE_RESPONSE_ZERO_RECORDS' || raw === 'LIVE_AUTHENTICATED_ZERO_MATCHES') return `${source} live response; zero bounded matches`;
+  if (raw === 'RATE_LIMITED_INCONCLUSIVE') return `${source} rate limited; inconclusive`;
+  if (raw === 'HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE') return `${source} empty HTTP 404; inconclusive`;
+  if (raw === 'CREDENTIAL_REJECTED_OR_UNAUTHORIZED') return `${source} credential rejected or unauthorized`;
+  if (raw === 'CREDENTIAL_NOT_CONFIGURED') return `${source} credential not configured`;
+  if (raw === 'INVALID_RESPONSE_SHAPE_INCONCLUSIVE') return `${source} response shape invalid; inconclusive`;
   return `${source} ${raw.replace(/_/g, ' ').toLowerCase()}`;
+}
+
+function reviewerRotationStatus(rotation) {
+  if (!rotation || typeof rotation !== 'object') return 'SAM key rotation state unavailable';
+  if (rotation.rotation_verified) return 'SAM key rotation verified by changed fingerprint and live probe';
+  const raw = String(rotation.status || 'UNVERIFIED').toUpperCase();
+  if (raw === 'ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED') return 'SAM key rotation overdue; replacement not detected';
+  if (raw === 'ROTATION_CHANGE_DETECTED_API_PROBE_INCONCLUSIVE') return 'SAM replacement detected; API probe inconclusive';
+  return `SAM key rotation ${raw.replace(/_/g, ' ').toLowerCase()}`;
 }
 function drapersFrame(payload) {
   const rows = Array.isArray(payload?.scenario_projection)
@@ -1313,6 +1329,7 @@ function renderTop5LiveProofBoard() {
           <div class="live-proof-k">Discovery sources</div>
           <div class="live-proof-v">${Number(sourceHealth.grants_gov?.records || 0).toLocaleString()} Grants.gov</div>
           <div class="live-proof-sub">${escHTML(reviewerSourceStatus(sourceHealth.sam_gov?.status, 'SAM'))} · ${escHTML(reviewerSourceStatus(sourceHealth.sbir_gov?.status, 'SBIR'))}</div>
+          <div class="live-proof-sub">${escHTML(reviewerRotationStatus(sourceHealth.sam_gov?.credential_rotation))}</div>
         </div>
       </div>
       <ul class="reviewer-boundaries">${boundaries.map((item) => `<li>${escHTML(String(item))}</li>`).join('')}</ul>

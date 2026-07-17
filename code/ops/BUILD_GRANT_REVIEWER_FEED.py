@@ -335,22 +335,60 @@ def _source_health(harvest: dict[str, Any], now: datetime, ttl_hours: float) -> 
     harvested_utc = _source_timestamp(harvest)
     freshness, age = _freshness_status(harvested_utc, now, ttl_hours)
     totals = harvest.get("totals") if isinstance(harvest.get("totals"), dict) else {}
+    measured = (
+        harvest.get("source_health")
+        if isinstance(harvest.get("source_health"), dict)
+        else {}
+    )
     result: dict[str, Any] = {}
     for key in ("grants_gov", "sam_gov", "sbir_gov"):
         count = int(totals.get(key) or 0)
-        result[key] = {
+        upstream = measured.get(key) if isinstance(measured.get(key), dict) else None
+        row: dict[str, Any] = {
             "records": count,
-            "status": RECORDS_PRESENT_STATUS if count > 0 else ZERO_RECORD_STATUS,
+            "status": (
+                str(upstream.get("status"))
+                if upstream and upstream.get("status")
+                else RECORDS_PRESENT_STATUS if count > 0 else ZERO_RECORD_STATUS
+            ),
             "harvested_utc": harvested_utc,
             "source_age_hours": age,
             "source_freshness_status": freshness,
             "boundary": (
-                "A zero-record result proves only that this snapshot contains zero records; "
-                "it does not establish outage, maintenance, rate limiting, or absence of opportunities."
-                if count == 0
-                else "Record count describes this bounded harvest snapshot, not all current opportunities."
+                "This status is preserved from a bounded measured request diagnostic. It does not "
+                "prove opportunity absence, credential validity, credential rejection, outage, or maintenance."
+                if upstream
+                else (
+                    "A zero-record result proves only that this snapshot contains zero records; "
+                    "it does not establish outage, maintenance, rate limiting, or absence of opportunities."
+                    if count == 0
+                    else "Record count describes this bounded harvest snapshot, not all current opportunities."
+                )
             ),
         }
+        if upstream:
+            for field in (
+                "endpoint",
+                "request_attempts",
+                "successful_requests",
+                "failed_requests",
+                "live_response_observed",
+                "response_shape_valid",
+                "credential_required",
+                "credential_configured",
+                "http_status",
+            ):
+                if field in upstream:
+                    row[field] = upstream[field]
+            rotation = upstream.get("credential_rotation_control")
+            if isinstance(rotation, dict):
+                row["credential_rotation"] = {
+                    "status": rotation.get("status"),
+                    "generated_utc": rotation.get("generated_utc"),
+                    "rotation_verified": bool(rotation.get("rotation_verified")),
+                    "deadline_state": rotation.get("deadline_state"),
+                }
+        result[key] = row
     return result
 
 

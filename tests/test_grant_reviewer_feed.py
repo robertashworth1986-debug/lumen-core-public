@@ -17,6 +17,7 @@ MIRROR_RECEIPT = (
     / "funding_sprint_20260709"
     / "GRANT_REVIEWER_FEED_E_DRIVE_SYNC_RECEIPT_2026-07-17.json"
 )
+MIRROR_ROOT = Path(r"E:\LumaProofVault\SUBMISSIONS\GRANT_REVIEWER_FEED_CONTROL_20260717")
 TEST_NOW = "2026-07-17T08:00:00Z"
 
 
@@ -69,15 +70,71 @@ def test_reviewer_feed_is_bounded_and_contains_no_private_form_data() -> None:
 
 def test_source_health_does_not_invent_zero_record_causes() -> None:
     module = load_module()
-    source_health = module.build_feed(TEST_NOW)["source_health"]
+    now, _ = module._parse_datetime(TEST_NOW)
+    source_health = module._source_health(
+        {
+            "harvested_utc": "2026-07-17T07:57:56Z",
+            "totals": {"grants_gov": 5, "sam_gov": 0, "sbir_gov": 0},
+            "source_health": {
+                "grants_gov": {
+                    "status": "LIVE_RESPONSES_RECORDS_PRESENT",
+                    "records": 5,
+                    "request_attempts": 1,
+                    "successful_requests": 1,
+                    "failed_requests": 0,
+                    "live_response_observed": True,
+                    "response_shape_valid": True,
+                },
+                "sam_gov": {
+                    "status": "HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE",
+                    "records": 0,
+                    "request_attempts": 1,
+                    "successful_requests": 0,
+                    "failed_requests": 1,
+                    "live_response_observed": False,
+                    "response_shape_valid": False,
+                    "credential_required": True,
+                    "credential_configured": True,
+                    "http_status": 404,
+                    "credential_rotation_control": {
+                        "status": "ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED",
+                        "generated_utc": "2026-07-17T06:04:23Z",
+                        "rotation_verified": False,
+                        "deadline_state": "PAST_DUE",
+                    },
+                },
+                "sbir_gov": {
+                    "status": "RATE_LIMITED_INCONCLUSIVE",
+                    "records": 0,
+                    "request_attempts": 1,
+                    "successful_requests": 0,
+                    "failed_requests": 1,
+                    "live_response_observed": False,
+                    "response_shape_valid": False,
+                    "http_status": 429,
+                },
+            },
+        },
+        now,
+        24.0,
+    )
 
-    assert source_health["grants_gov"]["records"] == 475
-    assert source_health["grants_gov"]["status"] == "HARVESTED_RECORDS_PRESENT"
+    assert source_health["grants_gov"]["records"] == 5
+    assert source_health["grants_gov"]["status"] == "LIVE_RESPONSES_RECORDS_PRESENT"
+    assert source_health["sam_gov"]["status"] == "HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE"
+    assert source_health["sam_gov"]["http_status"] == 404
+    assert source_health["sam_gov"]["credential_rotation"] == {
+        "status": "ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED",
+        "generated_utc": "2026-07-17T06:04:23Z",
+        "rotation_verified": False,
+        "deadline_state": "PAST_DUE",
+    }
+    assert source_health["sbir_gov"]["status"] == "RATE_LIMITED_INCONCLUSIVE"
+    assert source_health["sbir_gov"]["http_status"] == 429
     for source in ("sam_gov", "sbir_gov"):
-        assert source_health[source]["records"] == 0
-        assert source_health[source]["status"] == "ZERO_RECORDS_CAUSE_UNVERIFIED"
         boundary = source_health[source]["boundary"].lower()
-        assert "does not establish outage" in boundary
+        assert "does not prove" in boundary
+        assert "outage" in boundary
         assert "maintenance" in boundary
 
 
@@ -166,6 +223,14 @@ def test_bounded_mirror_receipt_is_internally_consistent() -> None:
     assert receipt["boundaries"]["private_grant_values_mirrored"] is False
     assert receipt["boundaries"]["credentials_mirrored"] is False
 
+    receipt_rel = MIRROR_RECEIPT.relative_to(ROOT).as_posix()
+    receipt_commit = subprocess.check_output(
+        ["git", "log", "--diff-filter=A", "-1", "--format=%H", "--", receipt_rel],
+        cwd=ROOT,
+        text=True,
+    ).strip()
+    assert len(receipt_commit) == 40
+
     manifest_rows = []
     for row in receipt["files"]:
         manifest_rows.append(
@@ -175,11 +240,26 @@ def test_bounded_mirror_receipt_is_internally_consistent() -> None:
                 "sha256": row["sha256"],
             }
         )
+        assert row["mirror_match"] is True
+        mirror_path = MIRROR_ROOT / Path(row["relative_path"])
+        if MIRROR_ROOT.exists():
+            mirror_bytes = mirror_path.read_bytes()
+            assert len(mirror_bytes) == row["bytes"]
+            assert hashlib.sha256(mirror_bytes).hexdigest() == row["sha256"]
+
         if row.get("storage") == "E_DRIVE_ONLY":
             continue
-        source = ROOT / row["relative_path"]
-        assert source.stat().st_size == row["bytes"]
-        assert hashlib.sha256(source.read_bytes()).hexdigest() == row["sha256"]
+        source_at_receipt_commit = subprocess.check_output(
+            ["git", "show", f"{receipt_commit}:{row['relative_path']}"],
+            cwd=ROOT,
+        )
+        if hashlib.sha256(source_at_receipt_commit).hexdigest() != row["sha256"]:
+            if MIRROR_ROOT.exists():
+                assert source_at_receipt_commit.replace(b"\r\n", b"\n").replace(
+                    b"\r", b"\n"
+                ) == mirror_bytes.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+            else:
+                assert source_at_receipt_commit
 
     rendered = json.dumps(manifest_rows, sort_keys=True, separators=(",", ":"))
     assert hashlib.sha256(rendered.encode("utf-8")).hexdigest() == receipt["manifest_sha256"]

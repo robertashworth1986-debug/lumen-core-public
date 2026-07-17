@@ -1,0 +1,240 @@
+{
+  "schema": "lumencore.opportunity_source_health_mirror_receipt.v2",
+  "generated_utc": "2026-07-17T08:17:04.199403Z",
+  "scope": "OPPORTUNITY_SOURCE_HEALTH_CONTROL_20260717",
+  "source_copy": "C_WORKTREE_AND_GIT_INDEX_TO_BE_COMMITTED_WITH_THIS_RECEIPT",
+  "mirror_copy": "E_DRIVE/LumaProofVault/SUBMISSIONS/OPPORTUNITY_SOURCE_HEALTH_CONTROL_20260717",
+  "git_branch": "codex/live-domain-proof-feed-bundle",
+  "manifest_sha256": "0be117da98e6106656b7d7dc7c78471b5659ce8af94e4310f78bacf88cfc59f2",
+  "git_index_manifest_sha256": "b4a312a219128e380a1dc3502ababff9e528b71ba44f8d3529f7ddfd6557c57d",
+  "worktree_mirror_manifest_sha256": "c420c9c278e32a325cc485a91544110d6d923f28eb9670e5388d41d9b47e43ff",
+  "controls": {
+    "source_health_schema": "lumencore.opportunity_source_health.v1",
+    "source_health_control_sha256": "51e0b34b4953ec21e2b2efc2a7e945d55faa1c98c542903e17d05698b2f229b5",
+    "reviewer_feed_schema": "grant_reviewer_feed_v2",
+    "reviewer_feed_control_sha256": "7d52222c92dbe556484de01cfbe5fd85d8e361371c19538a908f95d8279bba61",
+    "source_status": {
+      "grants_gov": {
+        "status": "LIVE_RESPONSES_RECORDS_PRESENT",
+        "records": 474,
+        "http_status": null,
+        "request_attempts": 8,
+        "successful_requests": 8,
+        "failed_requests": 0
+      },
+      "sbir_gov": {
+        "status": "RATE_LIMITED_INCONCLUSIVE",
+        "records": 0,
+        "http_status": 429,
+        "request_attempts": 1,
+        "successful_requests": 0,
+        "failed_requests": 1
+      },
+      "sam_gov": {
+        "status": "HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE",
+        "records": 0,
+        "http_status": 404,
+        "request_attempts": 1,
+        "successful_requests": 0,
+        "failed_requests": 1
+      },
+      "local_skip_feed": {
+        "status": "LOCAL_RECORDS_PRESENT",
+        "records": 4,
+        "http_status": null,
+        "request_attempts": 0,
+        "successful_requests": 0,
+        "failed_requests": 0
+      }
+    },
+    "sam_credential_rotation": {
+      "deadline_state": "PAST_DUE",
+      "generated_utc": "2026-07-17T06:04:23.391506+00:00",
+      "rotation_verified": false,
+      "status": "ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED"
+    }
+  },
+  "files": [
+    {
+      "relative_path": "code/opportunity_harvester.py",
+      "storage": "C_WORKTREE_GIT_INDEX_AND_E_MIRROR",
+      "worktree_bytes": 35959,
+      "worktree_sha256": "8b7ca5253e7e6076d34654da1c6d0c1fdde7358c6fa7a7c48969b88acec39ef7",
+      "mirror_bytes": 35959,
+      "mirror_sha256": "8b7ca5253e7e6076d34654da1c6d0c1fdde7358c6fa7a7c48969b88acec39ef7",
+      "mirror_match": true,
+      "git_index_object_id_sha1": "a3c122c9a1dcbbdae049d2da04cf32a54500e7d9",
+      "git_blob_bytes": 35475,
+      "git_blob_sha256": "6c923b0baabe60e05a6de1b09d86c40f016aeaec8985a6b66e0f05853980cefe",
+      "git_worktree_equivalence": "UTF8_TEXT_NEWLINE_NORMALIZED",
+      "normalized_content_sha256": "6c923b0baabe60e05a6de1b09d86c40f016aeaec8985a6b66e0f05853980cefe"
+    },
+    {
+      "relative_path": "code/ops/BUILD_GRANT_REVIEWER_FEED.py",
+      "storage": "C_WORKTREE_GIT_INDEX_AND_E_MIRROR",
+      "worktree_bytes": 28317,
+      "worktree_sha256": "c056b62445432caff564880eb85722c24011e7d1ea2dfde03de69882eeb5352d",
+      "mirror_bytes": 28317,
+      "mirror_sha256": "c056b62445432caff564880eb85722c24011e7d1ea2dfde03de69882eeb5352d",
+      "mirror_match": true,
+      "git_index_object_id_sha1": "21992c792736737defae49d08f12a8ca34c34e7a",
+      "git_blob_bytes": 28317,
+      "git_blob_sha256": "c056b62445432caff564880eb85722c24011e7d1ea2dfde03de69882eeb5352d",
+      "git_worktree_equivalence": "EXACT_BYTES",
+      "normalized_content_sha256": "c056b62445432caff564880eb85722c24011e7d1ea2dfde03de69882eeb5352d"
+    },
+    {
+      "relative_path": "dashboard/data/grant_reviewer_feed.json",
+      "storage": "C_WORKTREE_GIT_INDEX_AND_E_MIRROR",
+      "worktree_bytes": 29795,
+      "worktree_sha256": "5757cf8d0ca3e96b8aea1892ed54f0758bf4e7c25ccee82a4a9fd2b5c6969282",
+      "mirror_bytes": 29795,
+      "mirror_sha256": "5757cf8d0ca3e96b8aea1892ed54f0758bf4e7c25ccee82a4a9fd2b5c6969282",
+      "mirror_match": true,
+      "git_index_object_id_sha1": "24a7dd01cb6703639d07b92c0f8fa6a7f3ef9ced",
+      "git_blob_bytes": 29795,
+      "git_blob_sha256": "5757cf8d0ca3e96b8aea1892ed54f0758bf4e7c25ccee82a4a9fd2b5c6969282",
+      "git_worktree_equivalence": "EXACT_BYTES",
+      "normalized_content_sha256": "5757cf8d0ca3e96b8aea1892ed54f0758bf4e7c25ccee82a4a9fd2b5c6969282"
+    },
+    {
+      "relative_path": "dashboard/grants.html",
+      "storage": "C_WORKTREE_GIT_INDEX_AND_E_MIRROR",
+      "worktree_bytes": 127272,
+      "worktree_sha256": "40df082ed63384fc39b2ee764a30e62375df67955ce4f59ee733118fd549a438",
+      "mirror_bytes": 127272,
+      "mirror_sha256": "40df082ed63384fc39b2ee764a30e62375df67955ce4f59ee733118fd549a438",
+      "mirror_match": true,
+      "git_index_object_id_sha1": "d6227b12a7c29b8181d28d8a5cde2a2aa3131518",
+      "git_blob_bytes": 125483,
+      "git_blob_sha256": "54ec37ec1fdd0d767123b1a5eaaf5ba0d83463a5fef1b3e32c7b11dbe9f86879",
+      "git_worktree_equivalence": "UTF8_TEXT_NEWLINE_NORMALIZED",
+      "normalized_content_sha256": "54ec37ec1fdd0d767123b1a5eaaf5ba0d83463a5fef1b3e32c7b11dbe9f86879"
+    },
+    {
+      "relative_path": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
+      "storage": "C_WORKTREE_GIT_INDEX_AND_E_MIRROR",
+      "worktree_bytes": 4529,
+      "worktree_sha256": "6635a3fa854bd29c14547e6112cb66c51c5b8238908c438099a52610d140a563",
+      "mirror_bytes": 4529,
+      "mirror_sha256": "6635a3fa854bd29c14547e6112cb66c51c5b8238908c438099a52610d140a563",
+      "mirror_match": true,
+      "git_index_object_id_sha1": "1620d8925d438a5864cd7c0ba47d0a274fffec9b",
+      "git_blob_bytes": 4434,
+      "git_blob_sha256": "21458130663c9884e172da555d32743d3d504d6cf8dd3f51f7e24b762e1838a6",
+      "git_worktree_equivalence": "UTF8_TEXT_NEWLINE_NORMALIZED",
+      "normalized_content_sha256": "21458130663c9884e172da555d32743d3d504d6cf8dd3f51f7e24b762e1838a6"
+    },
+    {
+      "relative_path": "out/opportunities/source_health_latest.json",
+      "storage": "C_RUNTIME_AND_E_MIRROR_NOT_GIT",
+      "worktree_bytes": 2913,
+      "worktree_sha256": "e318be84d16593da60e09756364955362ed6fcd707e051b4e01a087e5d12351c",
+      "mirror_bytes": 2913,
+      "mirror_sha256": "e318be84d16593da60e09756364955362ed6fcd707e051b4e01a087e5d12351c",
+      "mirror_match": true
+    },
+    {
+      "relative_path": "out/opportunity_source_health_control_20260717/playwright/grants-source-health-desktop.png",
+      "storage": "C_RUNTIME_AND_E_MIRROR_NOT_GIT",
+      "worktree_bytes": 339780,
+      "worktree_sha256": "15fcbed375842cfa180ba7a6aee32a75cf8be86593227aefd689b57a9fdea3b2",
+      "mirror_bytes": 339780,
+      "mirror_sha256": "15fcbed375842cfa180ba7a6aee32a75cf8be86593227aefd689b57a9fdea3b2",
+      "mirror_match": true
+    },
+    {
+      "relative_path": "out/opportunity_source_health_control_20260717/playwright/grants-source-health-mobile.png",
+      "storage": "C_RUNTIME_AND_E_MIRROR_NOT_GIT",
+      "worktree_bytes": 310099,
+      "worktree_sha256": "e3dec0647ce552207f4c07b82851f0e2092ce09948df3e47fdc35b29d567d9db",
+      "mirror_bytes": 310099,
+      "mirror_sha256": "e3dec0647ce552207f4c07b82851f0e2092ce09948df3e47fdc35b29d567d9db",
+      "mirror_match": true
+    },
+    {
+      "relative_path": "tests/test_grant_reviewer_feed.py",
+      "storage": "C_WORKTREE_GIT_INDEX_AND_E_MIRROR",
+      "worktree_bytes": 11251,
+      "worktree_sha256": "08e025c7598641b577a9831ce68542fbf62988999536b651d9a28c12c68e7e95",
+      "mirror_bytes": 11251,
+      "mirror_sha256": "08e025c7598641b577a9831ce68542fbf62988999536b651d9a28c12c68e7e95",
+      "mirror_match": true,
+      "git_index_object_id_sha1": "db7947ccefad9317f2978f9d030969a85e528399",
+      "git_blob_bytes": 11251,
+      "git_blob_sha256": "08e025c7598641b577a9831ce68542fbf62988999536b651d9a28c12c68e7e95",
+      "git_worktree_equivalence": "EXACT_BYTES",
+      "normalized_content_sha256": "08e025c7598641b577a9831ce68542fbf62988999536b651d9a28c12c68e7e95"
+    },
+    {
+      "relative_path": "tests/test_grants_dashboard_reviewer_mode.py",
+      "storage": "C_WORKTREE_GIT_INDEX_AND_E_MIRROR",
+      "worktree_bytes": 2672,
+      "worktree_sha256": "93aa491409c246d13e78d654f0c4401b3b65caf01ed857b69ed7609539adc66c",
+      "mirror_bytes": 2672,
+      "mirror_sha256": "93aa491409c246d13e78d654f0c4401b3b65caf01ed857b69ed7609539adc66c",
+      "mirror_match": true,
+      "git_index_object_id_sha1": "b399960cb4b170eeab40847f493c23ce74be125b",
+      "git_blob_bytes": 2672,
+      "git_blob_sha256": "93aa491409c246d13e78d654f0c4401b3b65caf01ed857b69ed7609539adc66c",
+      "git_worktree_equivalence": "EXACT_BYTES",
+      "normalized_content_sha256": "93aa491409c246d13e78d654f0c4401b3b65caf01ed857b69ed7609539adc66c"
+    },
+    {
+      "relative_path": "tests/test_opportunity_harvester.py",
+      "storage": "C_WORKTREE_GIT_INDEX_AND_E_MIRROR",
+      "worktree_bytes": 8974,
+      "worktree_sha256": "6d5cd602208ba5a9eb24cc5483635190119f4f407f9fe8b12de9eccb80248c36",
+      "mirror_bytes": 8974,
+      "mirror_sha256": "6d5cd602208ba5a9eb24cc5483635190119f4f407f9fe8b12de9eccb80248c36",
+      "mirror_match": true,
+      "git_index_object_id_sha1": "6dc2cced9b8c092972dd4bfc018fdcc4f34a0fc2",
+      "git_blob_bytes": 8974,
+      "git_blob_sha256": "6d5cd602208ba5a9eb24cc5483635190119f4f407f9fe8b12de9eccb80248c36",
+      "git_worktree_equivalence": "EXACT_BYTES",
+      "normalized_content_sha256": "6d5cd602208ba5a9eb24cc5483635190119f4f407f9fe8b12de9eccb80248c36"
+    },
+    {
+      "relative_path": "tests/test_opportunity_source_health_receipt.py",
+      "storage": "C_WORKTREE_GIT_INDEX_AND_E_MIRROR",
+      "worktree_bytes": 4811,
+      "worktree_sha256": "c73a8f7b4832653e291348d619779061d253614f1119079e58bfda847bef74d9",
+      "mirror_bytes": 4811,
+      "mirror_sha256": "c73a8f7b4832653e291348d619779061d253614f1119079e58bfda847bef74d9",
+      "mirror_match": true,
+      "git_index_object_id_sha1": "e0f7d342325cf1c89e8f4037ebdee428fb52c374",
+      "git_blob_bytes": 4811,
+      "git_blob_sha256": "c73a8f7b4832653e291348d619779061d253614f1119079e58bfda847bef74d9",
+      "git_worktree_equivalence": "EXACT_BYTES",
+      "normalized_content_sha256": "c73a8f7b4832653e291348d619779061d253614f1119079e58bfda847bef74d9"
+    }
+  ],
+  "verification": {
+    "python_compile": "PASS",
+    "focused_tests": "37 passed",
+    "desktop_viewport": "1440x1000",
+    "mobile_viewport": "390x844",
+    "desktop_horizontal_overflow": false,
+    "mobile_horizontal_overflow": false,
+    "visible_text_overflow_findings": 0,
+    "undersized_mobile_controls": 0,
+    "browser_console_errors": 0,
+    "reviewer_private_api_requests": 0,
+    "reviewer_websocket_requests": 0,
+    "source_labels_visible": true,
+    "sam_rotation_warning_visible": true,
+    "known_local_secret_values_checked": 43,
+    "known_local_secret_value_matches": 0,
+    "generic_credential_pattern_matches": 0
+  },
+  "boundaries": {
+    "in_app_dsip_browser_touched": false,
+    "private_application_values_mirrored": false,
+    "credentials_mirrored": false,
+    "upstream_response_bodies_mirrored": false,
+    "screenshots_contain_public_reviewer_data_only": true,
+    "source_failures_preserved_as_inconclusive": true,
+    "receipt_is_not_eligibility_submission_award_or_external_validation": true
+  },
+  "claim_boundary": "This receipt proves byte-for-byte C-to-E mirroring, Git-index binding for tracked artifacts, bounded local tests, and reviewer rendering checks. It does not prove opportunity eligibility, portal state, credential validity, submission, selection, award, agency endorsement, outage, maintenance, or independent technical validation."
+}

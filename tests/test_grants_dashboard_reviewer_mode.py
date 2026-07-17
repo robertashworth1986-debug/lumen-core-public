@@ -31,6 +31,11 @@ def test_reviewer_mode_exposes_freshness_authority_and_exact_receipt_semantics()
     assert "Unofficial topic mirror - DSIP recheck required" in html
     assert "ZERO_RECORDS_CAUSE_UNVERIFIED" in html
     assert "zero records; cause unverified" in html
+    assert "RATE_LIMITED_INCONCLUSIVE" in html
+    assert "rate limited; inconclusive" in html
+    assert "HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE" in html
+    assert "empty HTTP 404; inconclusive" in html
+    assert "SAM key rotation overdue; replacement not detected" in html
     assert "successful_submission_or_received" in html
     assert "agency_tracking_assigned" in html
     assert "agency_received" in html
