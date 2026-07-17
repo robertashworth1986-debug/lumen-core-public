@@ -353,6 +353,25 @@ def test_preview_receipt_hashes_locally_without_returning_path(tmp_path: Path):
     assert str(receipt_file) not in digest
 
 
+def test_current_volume2_hash_uses_only_guarded_private_final(
+    tmp_path: Path, monkeypatch
+) -> None:
+    module = load_module()
+    private_pdf = tmp_path / "MISSIONWEAVE_DSIP_VOLUME2_FINAL.private.pdf"
+    private_pdf.write_bytes(b"assigned-number-private-final")
+    monkeypatch.setattr(module.GATE, "PRIVATE_FINAL_VOLUME2_PDF", private_pdf)
+    monkeypatch.setattr(module.GATE, "validate_private_target", lambda path: path)
+
+    digest = module.hash_private_final_volume2()
+
+    assert digest == hashlib.sha256(private_pdf.read_bytes()).hexdigest().upper()
+
+    private_pdf.unlink()
+    with pytest.raises(module.CaptureError) as error:
+        module.hash_private_final_volume2()
+    assert error.value.code == "PRIVATE_FINAL_VOLUME2_NOT_FOUND"
+
+
 def test_private_collector_snapshot_remains_immutable_on_e_drive() -> None:
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 

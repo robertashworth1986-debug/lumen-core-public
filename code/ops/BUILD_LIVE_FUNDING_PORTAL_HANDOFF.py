@@ -103,8 +103,23 @@ def queue_item(
             item["action_gate"].update(
                 {
                     "private_capture_tool": lane["action_gate_private_capture_tool"],
+                    "private_input_sha256_exposed": lane[
+                        "action_gate_private_input_sha256_exposed"
+                    ],
+                    "private_volume2_finalizer": lane[
+                        "action_gate_private_volume2_finalizer"
+                    ],
                     "private_capture_workflow": lane[
                         "action_gate_private_capture_workflow"
+                    ],
+                    "private_final_volume2_present": lane[
+                        "action_gate_private_final_volume2_present"
+                    ],
+                    "private_final_volume2_path_exposed": lane[
+                        "action_gate_private_final_volume2_path_exposed"
+                    ],
+                    "private_final_volume2_sha256_exposed": lane[
+                        "action_gate_private_final_volume2_sha256_exposed"
                     ],
                     "pre_submit_excludes_action_time_approval": lane[
                         "action_gate_pre_submit_excludes_action_time_approval"
@@ -161,7 +176,7 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
             portal_url=missionweave["secondary_url"],
             next_safe_action=[
                 "Verify the live DSIP countdown, organization linkage, and generated proposal number.",
-                "Use the proposal number through the existing builder, rerender Volume 2, regenerate the 15-file manifest, and require all hashes to pass.",
+                "Capture the proposal number only in the ignored record, run the guarded private Volume 2 finalizer, and require its assigned-header PDF QA receipt without changing the public 15-file manifest, which remains neutral.",
                 "Run the hidden sectioned MissionWeave collector for identity, proposal, and compliance; it accepts no Firm PIN or credential and keeps action-time approval separate.",
                 "Use the generated seven-volume checklist and require the public gate to move from 0/50 to 50/50 without exposing values.",
                 "Populate Volumes 1-7 from the bounded package and reach the complete preview.",
@@ -285,7 +300,7 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
         ],
         "global_stop_conditions": [
             "Any final submit, external send, signature, legal certification, pricing approval, fee payment, terms acceptance, or irreversible confirmation.",
-            "Any unsupported claim of agency validation, award, customer deployment, realized savings, patent validity, field performance, CMMC status, or ITAR compliance.",
+            "Do not make unsupported claims of agency validation, award, customer deployment, realized savings, patent validity, field performance, CMMC status, or ITAR compliance.",
             "Any request to expose credentials, private identifiers, unpublished patent material, controlled technical data, or private cost rates in a public artifact.",
         ],
         "private_contact_data_included": False,

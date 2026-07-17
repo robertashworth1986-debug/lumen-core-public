@@ -14,6 +14,7 @@ PACKAGE = ROOT / "grant_submissions" / "DLA26BZ03_NV011_MissionWeave"
 VOLUME1 = PACKAGE / "MISSIONWEAVE_DSIP_VOLUME1_PUBLIC_TEXT_2026-07-16.md"
 VOLUME2_MD = PACKAGE / "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.md"
 VOLUME2_DOCX = PACKAGE / "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.docx"
+VOLUME2_METADATA = PACKAGE / "MISSIONWEAVE_DSIP_VOLUME2_BUILD_METADATA_2026-07-16.json"
 COST = PACKAGE / "MISSIONWEAVE_DSIP_VOLUME3_COST_INPUTS_2026-07-16.md"
 MANIFEST = PACKAGE / "MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json"
 
@@ -167,6 +168,16 @@ def test_docx_page_geometry_header_fonts_and_table_geometry() -> None:
         for row in table.rows:
             cell_widths = [int(cell._tc.get_or_add_tcPr().find(qn("w:tcW")).get(qn("w:w"))) for cell in row.cells]
             assert cell_widths == grid_widths
+
+
+def test_public_build_metadata_is_neutral_and_contains_no_assigned_value() -> None:
+    metadata = json.loads(VOLUME2_METADATA.read_text(encoding="utf-8"))
+
+    assert metadata["schema"] == "missionweave_dsip_volume2_build_metadata.v2"
+    assert metadata["proposal_number_header_state"] == "NEUTRAL_PLACEHOLDER"
+    assert metadata["proposal_number_value_exposed"] is False
+    assert metadata["proposal_number_sha256"] is None
+    assert "proposal_number_header" not in metadata
 
 
 def test_package_manifest_verifies_when_present() -> None:

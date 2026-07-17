@@ -99,10 +99,17 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
         "private_capture_tool": (
             "code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py"
         ),
+        "private_input_sha256_exposed": False,
+        "private_volume2_finalizer": (
+            "code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py"
+        ),
         "private_capture_workflow": (
             "grant_submissions/DLA26BZ03_NV011_MissionWeave/"
             "MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md"
         ),
+        "private_final_volume2_present": False,
+        "private_final_volume2_path_exposed": False,
+        "private_final_volume2_sha256_exposed": False,
         "pre_submit_excludes_action_time_approval": True,
         "credential_values_accepted": False,
         "firm_pin_value_accepted": False,

@@ -15,7 +15,7 @@
     "live_dsip_recheck_required": true,
     "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
   },
-  "gate_sha256": "c9283376a746b2bfbffd60cc45840098ddfc555fdea6eb3e0f96992104ad5c47",
+  "gate_sha256": "a22bd709c9e4d67d7aeafe826868d841293c69d2371783a1a08645014b3a2de4",
   "gate_summary": {
     "open_gate_count": 50,
     "passed_private_gate_count": 0,
@@ -73,7 +73,7 @@
       "VOLUME7_FOREIGN_AFFILIATIONS_WEBFORM"
     ]
   },
-  "generated_utc": "2026-07-17T13:12:16.007256+00:00",
+  "generated_utc": "2026-07-17T14:05:37.008864+00:00",
   "official_instruction_facts": {
     "cmmc_amendment_note": "Amendment 2 says CMMC Phase II implementation was suspended on July 13, 2026 while Phase I self-assessment requirements remain in place; the current live requirement must be reviewed before submission.",
     "current_package_duration_months": 6,
@@ -115,12 +115,19 @@
     "git_ignored_target": true,
     "pre_submit_excludes_action_time_approval": true,
     "present": false,
+    "private_final_volume2_path_exposed": false,
+    "private_final_volume2_present": false,
+    "private_final_volume2_sha256_exposed": false,
     "private_values_exposed": false,
-    "sha256": null
+    "private_volume2_finalizer": "code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py",
+    "sha256": null,
+    "sha256_exposed": false,
+    "sha256_present": false
   },
   "private_template": "config/missionweave_dsip_action_private_template_v1.json",
   "schema": "lumencore.missionweave_dsip_action_gate.v1",
   "source_integrity": {
+    "absolute_private_path_exposed": false,
     "all_checks_pass": true,
     "all_manifest_files_match": true,
     "candidate_format_pass": true,
@@ -219,8 +226,10 @@
     "manifest_file_count": 15,
     "manifest_header_pass": true,
     "manifest_path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json",
-    "manifest_sha256": "598317D0B4A971402E3446FF32C273209AE7F6DD347F02D5C663159AD4EB6069",
+    "manifest_sha256": "6CA200CCD8B3450700662F2628C61FA882DDD52850F691448882F9D44BB10E0E",
     "neutral_proposal_header_present": true,
+    "private_final_volume2_sha256_exposed": false,
+    "private_final_volume2_used": false,
     "volume2_encrypted": false,
     "volume2_letter_size": true,
     "volume2_page_limit": 20,
@@ -228,7 +237,9 @@
     "volume2_path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf",
     "volume2_required_sections_present": true,
     "volume2_searchable": true,
-    "volume2_sha256": "8BBDE3DB31285F3B671CBFCAF972E9EB8F2DE2F62D559463E519CA4F901C37E6"
+    "volume2_sha256": "C07401B2552CB754E71785C42D1CEF00E13F36212C2F2BF4AD9D1F980475D0C9",
+    "volume2_sha256_exposed": true,
+    "volume2_sha256_present": true
   },
   "status": "PRIVATE_DSIP_FACTS_NOT_CAPTURED",
   "submission_ready_for_human_click": false,

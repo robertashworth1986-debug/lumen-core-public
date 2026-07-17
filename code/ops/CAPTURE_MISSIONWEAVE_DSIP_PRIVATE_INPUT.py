@@ -415,6 +415,16 @@ def hash_receipt_file(path: Path) -> str:
     return GATE.sha256_file(path)
 
 
+def hash_private_final_volume2() -> str:
+    try:
+        target = GATE.validate_private_target(GATE.PRIVATE_FINAL_VOLUME2_PDF)
+    except GATE.MissionWeaveGateError as exc:
+        raise CaptureError(exc.code) from exc
+    if not target.is_file():
+        raise CaptureError("PRIVATE_FINAL_VOLUME2_NOT_FOUND")
+    return GATE.sha256_file(target)
+
+
 def collect_proposal(
     payload: dict[str, Any],
     *,
@@ -431,7 +441,7 @@ def collect_proposal(
             PROPOSAL_LABELS[field], section[field], prompt=prompt
         )
     if use_current_volume2_hash:
-        section["volume2_pdf_sha256"] = GATE.sha256_file(GATE.VOLUME2_PDF)
+        section["volume2_pdf_sha256"] = hash_private_final_volume2()
     else:
         section["volume2_pdf_sha256"] = choose_sha256(
             "Rebuilt Volume 2 PDF",
@@ -592,7 +602,11 @@ def capture_private_sections(
     ensure_private_record_has_no_credential_material(payload)
 
     if source_state is None or volume2_text is None:
-        source_state, volume2_text = GATE.inspect_source_package()
+        use_private_final = GATE.PRIVATE_FINAL_VOLUME2_PDF.is_file()
+        source_state, volume2_text = GATE.inspect_source_package(
+            GATE.PRIVATE_FINAL_VOLUME2_PDF if use_private_final else GATE.VOLUME2_PDF,
+            private_final=use_private_final,
+        )
     try:
         evaluation = GATE.evaluate_private_payload(
             payload, source_state=source_state, volume2_text=volume2_text
@@ -694,7 +708,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--use-current-volume2-hash",
         action="store_true",
-        help="Hash the current bounded Volume 2 PDF instead of requesting a hash",
+        help=(
+            "Hash the ignored assigned-number final Volume 2 PDF instead of requesting "
+            "a hash; fails closed when the guarded finalizer has not produced it"
+        ),
     )
     parser.add_argument(
         "--preview-receipt-file",

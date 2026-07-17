@@ -50,6 +50,18 @@ def synthetic_private_payload(module, source_state: dict) -> tuple[dict, str]:
     return payload, private_proposal_number
 
 
+def private_final_source_state(source_state: dict) -> dict:
+    private_state = deepcopy(source_state)
+    private_state["volume2_path"] = "IGNORED_PRIVATE_FINAL_VOLUME2"
+    private_state["volume2_sha256_present"] = True
+    private_state["volume2_sha256_exposed"] = False
+    private_state["private_final_volume2_used"] = True
+    private_state["private_final_volume2_sha256_exposed"] = False
+    private_state["absolute_private_path_exposed"] = False
+    private_state["neutral_proposal_header_present"] = False
+    return private_state
+
+
 def test_default_gate_verifies_package_and_fails_closed_without_private_input():
     module = load_module()
     payload = module.build_payload()
@@ -69,18 +81,27 @@ def test_default_gate_verifies_package_and_fails_closed_without_private_input():
     assert source["volume2_searchable"] is True
     assert source["volume2_required_sections_present"] is True
     assert source["neutral_proposal_header_present"] is True
+    assert source["private_final_volume2_sha256_exposed"] is False
     assert source["all_checks_pass"] is True
     assert payload["gate_summary"]["required_private_gate_count"] == 50
     assert payload["gate_summary"]["passed_private_gate_count"] == 0
     assert payload["gate_summary"]["open_gate_count"] == 50
     assert payload["private_input"]["git_ignored_target"] is True
     assert payload["private_input"]["private_values_exposed"] is False
+    assert payload["private_input"]["sha256"] is None
+    assert payload["private_input"]["sha256_present"] is False
+    assert payload["private_input"]["sha256_exposed"] is False
     assert payload["private_input"]["capture_tool"].endswith(
         "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py"
     )
     assert payload["private_input"]["capture_workflow"].endswith(
         "MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md"
     )
+    assert payload["private_input"]["private_volume2_finalizer"].endswith(
+        "FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py"
+    )
+    assert payload["private_input"]["private_final_volume2_path_exposed"] is False
+    assert payload["private_input"]["private_final_volume2_sha256_exposed"] is False
     assert payload["private_input"]["pre_submit_excludes_action_time_approval"] is True
     assert payload["private_input"]["credential_values_accepted"] is False
     assert payload["private_input"]["firm_pin_value_accepted"] is False
@@ -91,6 +112,7 @@ def test_default_gate_verifies_package_and_fails_closed_without_private_input():
 def test_complete_private_record_can_pass_without_exposing_private_values():
     module = load_module()
     source_state, _ = module.inspect_source_package()
+    source_state = private_final_source_state(source_state)
     private, proposal_number = synthetic_private_payload(module, source_state)
     synthetic_volume2_text = f"{proposal_number}\nFinal assigned proposal header"
 
@@ -118,16 +140,25 @@ def test_complete_private_record_can_pass_without_exposing_private_values():
     assert facts["action_time_authorized"] is True
     assert facts["approval_timestamp_present"] is True
     assert proposal_number not in serialized
+    assert "B" * 64 not in serialized
     assert "A" * 64 not in serialized
     assert "100000.00" not in serialized
     assert facts["assigned_proposal_number_value_exposed"] is False
     assert facts["portal_preview_receipt_value_exposed"] is False
     assert payload["controls"]["builder_can_click_final_submit"] is False
+    public_source = payload["source_integrity"]
+    assert public_source["volume2_path"] == "IGNORED_PRIVATE_FINAL_VOLUME2"
+    assert public_source["volume2_sha256"] is None
+    assert public_source["volume2_sha256_present"] is True
+    assert public_source["volume2_sha256_exposed"] is False
+    assert public_source["absolute_private_path_exposed"] is False
+    assert source_state["volume2_sha256"] not in serialized
 
 
 def test_private_record_stays_open_when_pdf_header_or_action_gate_is_missing():
     module = load_module()
     source_state, actual_text = module.inspect_source_package()
+    source_state = private_final_source_state(source_state)
     private, _ = synthetic_private_payload(module, source_state)
     private["approval"]["final_submission_authorized_at_action_time"] = False
 
@@ -146,6 +177,33 @@ def test_private_record_stays_open_when_pdf_header_or_action_gate_is_missing():
     assert "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION" in payload[
         "gate_summary"
     ]["unresolved_gates"]
+
+
+def test_private_record_auto_selects_guarded_private_final_pdf(
+    tmp_path: Path, monkeypatch
+):
+    module = load_module()
+    base_state, _ = module.inspect_source_package()
+    private_state = private_final_source_state(base_state)
+    private, proposal_number = synthetic_private_payload(module, private_state)
+    private_pdf = tmp_path / "MISSIONWEAVE_DSIP_VOLUME2_FINAL.private.pdf"
+    private_pdf.write_bytes(b"private-final-marker")
+    calls: list[tuple[Path, bool]] = []
+
+    def fake_inspect(path: Path, *, private_final: bool = False):
+        calls.append((path, private_final))
+        return private_state, f"{proposal_number}\nassigned final header"
+
+    monkeypatch.setattr(module, "PRIVATE_FINAL_VOLUME2_PDF", private_pdf)
+    monkeypatch.setattr(module, "inspect_source_package", fake_inspect)
+
+    payload = module.build_payload(private, private_input_sha256="D" * 64)
+
+    assert calls == [(private_pdf, True)]
+    assert payload["status"] == "READY_FOR_HUMAN_FINAL_SUBMIT_CLICK"
+    assert payload["source_integrity"]["private_final_volume2_used"] is True
+    assert payload["source_integrity"]["volume2_sha256"] is None
+    assert payload["source_integrity"]["volume2_sha256_exposed"] is False
 
 
 def test_template_and_schema_drift_fail_closed():
@@ -201,6 +259,10 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     assert "READY_FOR_HUMAN_FINAL_SUBMIT_CLICK" in checklist
     assert "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section identity" in checklist
     assert "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval" in checklist
+    assert "FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py" in checklist
+    assert "FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py" in markdown
+    assert payload["private_input"]["private_final_volume2_path_exposed"] is False
+    assert payload["private_input"]["private_final_volume2_sha256_exposed"] is False
     assert "--section pre-submit" in markdown
     assert "never requests or accepts a Firm PIN or login credential" in markdown
     assert "robertashworth4444" not in combined.lower()
@@ -217,6 +279,12 @@ def test_public_safety_rejects_injected_private_contact_or_proposal_number():
     with pytest.raises(module.MissionWeaveGateError) as exc:
         module.ensure_public_safe({"unsafe": proposal_number}, private)
     assert exc.value.code == "PRIVATE_PROPOSAL_NUMBER_EXPOSED"
+
+    with pytest.raises(module.MissionWeaveGateError) as exc:
+        module.ensure_public_safe(
+            {"unsafe": private["proposal"]["volume2_pdf_sha256"]}, private
+        )
+    assert exc.value.code == "PRIVATE_VOLUME2_PDF_SHA256_EXPOSED"
 
     with pytest.raises(module.MissionWeaveGateError) as exc:
         module.ensure_public_safe({"unsafe": "person@example.com"})

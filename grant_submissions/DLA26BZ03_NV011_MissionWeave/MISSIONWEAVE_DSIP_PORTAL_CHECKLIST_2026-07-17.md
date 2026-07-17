@@ -15,7 +15,8 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - All manifest hashes and sizes match: `true`
 - Volume 2 candidate: `11` pages of `20` allowed, letter size, searchable, and unencrypted.
 - The candidate still contains the neutral proposal-number header: `true`.
-- Do not upload the current PDF after DSIP assigns a proposal number. Rebuild the PDF and regenerate the manifest first.
+- Ignored assigned-number final PDF selected by the gate: `false`.
+- Do not upload the tracked neutral PDF after DSIP assigns a proposal number. Run `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`; the final PDF remains ignored and its path, number, and hash remain absent from public artifacts.
 
 ## Registration And Firm Controls
 
@@ -29,7 +30,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 ## Seven Volumes
 
 1. Volume 1 - Proposal Cover Sheet: paste only the bounded public abstract and anticipated-benefits text. Each field must remain within 3,000 characters and contain no proprietary or classified material.
-2. Volume 2 - Technical Volume: capture the assigned DSIP proposal number, rebuild the existing DOCX/PDF through the package builder, require no neutral header, rerun the manifest, run a local malware scan, and upload one PDF no longer than 20 pages.
+2. Volume 2 - Technical Volume: capture the assigned DSIP proposal number in the ignored record, run the guarded private finalizer, require its PDF QA to pass with no neutral header, run a local malware scan, and upload one PDF no longer than 20 pages. Keep the public 15-file neutral manifest unchanged.
 3. Volume 3 - Cost Volume: use the DSIP spreadsheet/form, keep the Phase I base at or below the official $100,000 ceiling, support the direct labor and indirect treatment, and reconcile every task, ODC, and percentage-of-work entry.
 4. Volume 4 - Company Commercialization Report: answer from actual SBIR/STTR award history and ensure the current company report is complete.
 5. Volume 5 - Supporting Documents: upload only applicable and current evidence. Because the topic is ITAR-marked, include a certified DD Form 2345 or acceptable JCP application evidence when required. Do not upload the old foreign-affiliations PDF form.
@@ -47,22 +48,23 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 
 ## Final Preview Gate
 
-1. Inspect every populated field, all seven volumes, every attachment filename and hash, the cost total, and the live deadline.
-2. Save a private local preview receipt and record only its SHA-256 in the ignored private gate file.
-3. Capture the action-time approval section separately. This command never clicks submit:
+1. Run `python code\ops\FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py` after the assigned proposal number is captured. Require `PRIVATE_VOLUME2_REBUILT_AND_QA_PASSED`.
+2. Inspect every populated field, all seven volumes, every attachment filename and hash, the cost total, and the live deadline.
+3. Save a private local preview receipt and record only its SHA-256 in the ignored private gate file.
+4. Capture the action-time approval section separately. This command never clicks submit:
 
 ```powershell
 python code\ops\CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval
 ```
 
-4. Run:
+5. Run:
 
 ```powershell
 python code\ops\BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input grant_submissions\DLA26BZ03_NV011_MissionWeave\private\MISSIONWEAVE_DSIP_ACTION.private.json
 ```
 
-5. Require status `READY_FOR_HUMAN_FINAL_SUBMIT_CLICK` and zero open gates.
-6. Stop for the final human review. The builder does not click submit, certify facts, accept terms, or create a Government transmission receipt.
+6. Require status `READY_FOR_HUMAN_FINAL_SUBMIT_CLICK` and zero open gates.
+7. Stop for the final human review. The builder does not click submit, certify facts, accept terms, or create a Government transmission receipt.
 
 ## Public Claim Boundary
 

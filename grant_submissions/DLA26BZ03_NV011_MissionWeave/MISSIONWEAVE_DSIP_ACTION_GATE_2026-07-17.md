@@ -15,7 +15,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Required private gates: `50`
 - Passed private gates: `0`
 - Open gates: `50`
-- Gate SHA-256: `c9283376a746b2bfbffd60cc45840098ddfc555fdea6eb3e0f96992104ad5c47`
+- Gate SHA-256: `a22bd709c9e4d67d7aeafe826868d841293c69d2371783a1a08645014b3a2de4`
 
 ## Package Integrity
 
@@ -26,6 +26,9 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Encrypted: `false`
 - Searchable: `true`
 - Required sections present: `true`
+- Ignored private final Volume 2 used: `false`
+- Private final Volume 2 path exposed: `false`
+- Private final Volume 2 hash exposed: `false`
 - Neutral proposal header still present: `true`
 - All source and format checks pass: `true`
 
@@ -98,7 +101,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 
 1. Run `code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --check-target`. This validates the ignored destination without reading private contents.
 2. Run the hidden collector with `--section pre-submit`. It captures identity, proposal, and compliance sections but deliberately excludes action-time approval.
-3. After DSIP assigns a proposal number, rebuild Volume 2 through the existing builder, regenerate the package manifest, and rerun only `--section proposal` with the current PDF and preview-receipt hash options.
+3. After DSIP assigns a proposal number, run `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`. It reads the number only from the ignored private record, writes the assigned-number DOCX/PDF only to the ignored private area, performs PDF QA, and updates the private PDF hash without exposing either value publicly.
 4. Run `--section approval` only after the corporate official reviews the complete portal preview at action time. The collector never requests or accepts a Firm PIN or login credential.
 5. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.
 

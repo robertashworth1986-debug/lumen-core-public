@@ -23,6 +23,7 @@ HERE = Path(__file__).resolve().parent
 DEFAULT_SOURCE = HERE / "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.md"
 DEFAULT_OUTPUT = HERE / "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.docx"
 DEFAULT_METADATA = HERE / "MISSIONWEAVE_DSIP_VOLUME2_BUILD_METADATA_2026-07-16.json"
+NEUTRAL_PROPOSAL_HEADER = "Proposal No. assigned in DSIP"
 
 PAGE_WIDTH_DXA = 12240
 PAGE_HEIGHT_DXA = 15840
@@ -608,16 +609,31 @@ def build_document(source: Path, output: Path, metadata_output: Path, proposal_n
     output.parent.mkdir(parents=True, exist_ok=True)
     doc.save(output)
 
+    proposal_number_is_neutral = proposal_number == NEUTRAL_PROPOSAL_HEADER
     metadata = {
-        "schema": "missionweave_dsip_volume2_build_metadata.v1",
+        "schema": "missionweave_dsip_volume2_build_metadata.v2",
         "source": source.name,
         "source_sha256": sha256(source),
         "output": output.name,
         "output_sha256": sha256(output),
-        "proposal_number_header": proposal_number,
+        "proposal_number_header_state": (
+            "NEUTRAL_PLACEHOLDER" if proposal_number_is_neutral else "ASSIGNED_PRIVATE_VALUE"
+        ),
+        "proposal_number_value_exposed": False,
+        "proposal_number_sha256": (
+            None
+            if proposal_number_is_neutral
+            else hashlib.sha256(proposal_number.encode("utf-8")).hexdigest().upper()
+        ),
         "design_tokens": PRESET,
     }
     metadata_output.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+
+
+def validate_cli_proposal_number(value: str) -> str:
+    if value != NEUTRAL_PROPOSAL_HEADER:
+        raise ValueError("ASSIGNED_PROPOSAL_NUMBER_REQUIRES_PRIVATE_FINALIZER")
+    return value
 
 
 def main() -> int:
@@ -625,9 +641,20 @@ def main() -> int:
     parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--metadata-output", type=Path, default=DEFAULT_METADATA)
-    parser.add_argument("--proposal-number", default="Proposal No. assigned in DSIP")
+    parser.add_argument(
+        "--proposal-number",
+        default=NEUTRAL_PROPOSAL_HEADER,
+        help=(
+            "Neutral placeholder only. Assigned proposal numbers must be read from the "
+            "ignored private record by the guarded finalizer."
+        ),
+    )
     args = parser.parse_args()
-    build_document(args.source, args.output, args.metadata_output, args.proposal_number)
+    try:
+        proposal_number = validate_cli_proposal_number(args.proposal_number)
+    except ValueError as exc:
+        parser.error(str(exc))
+    build_document(args.source, args.output, args.metadata_output, proposal_number)
     print(args.output)
     return 0
 

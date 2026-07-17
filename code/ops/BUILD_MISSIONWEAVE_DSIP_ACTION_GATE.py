@@ -6,6 +6,7 @@ import json
 import re
 import shutil
 import subprocess
+from copy import deepcopy
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -18,11 +19,13 @@ PRIVATE_DIR = PACKAGE_DIR / "private"
 DEFAULT_PRIVATE_INPUT = PRIVATE_DIR / "MISSIONWEAVE_DSIP_ACTION.private.json"
 TEMPLATE = ROOT / "config" / "missionweave_dsip_action_private_template_v1.json"
 PRIVATE_CAPTURE_TOOL = ROOT / "code" / "ops" / "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py"
+PRIVATE_FINALIZER = ROOT / "code" / "ops" / "FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py"
 PRIVATE_CAPTURE_WORKFLOW = (
     PACKAGE_DIR / "MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md"
 )
 MANIFEST = PACKAGE_DIR / "MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json"
 VOLUME2_PDF = PACKAGE_DIR / "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf"
+PRIVATE_FINAL_VOLUME2_PDF = PRIVATE_DIR / "MISSIONWEAVE_DSIP_VOLUME2_FINAL.private.pdf"
 OUT_JSON = PACKAGE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
 OUT_MD = PACKAGE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md"
 OUT_CHECKLIST = PACKAGE_DIR / "MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md"
@@ -253,7 +256,11 @@ def run_pdf_tool(executable: str, arguments: list[str]) -> str:
     return result.stdout
 
 
-def inspect_source_package() -> tuple[dict[str, Any], str]:
+def inspect_source_package(
+    volume2_pdf: Path = VOLUME2_PDF,
+    *,
+    private_final: bool = False,
+) -> tuple[dict[str, Any], str]:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     manifest_header_ok = (
         manifest.get("schema") == "missionweave_dsip_submission_package_manifest.v1"
@@ -280,7 +287,22 @@ def inspect_source_package() -> tuple[dict[str, Any], str]:
         for row in file_checks
     )
 
-    info_text = run_pdf_tool("pdfinfo.exe", [str(VOLUME2_PDF)])
+    if private_final:
+        selected_volume2 = validate_private_target(volume2_pdf)
+        if not selected_volume2.is_file():
+            raise MissionWeaveGateError("PRIVATE_FINAL_VOLUME2_NOT_FOUND")
+        volume2_path_label = "IGNORED_PRIVATE_FINAL_VOLUME2"
+    else:
+        if volume2_pdf.is_symlink():
+            raise MissionWeaveGateError("PUBLIC_VOLUME2_SYMLINK_REJECTED")
+        selected_volume2 = volume2_pdf.resolve()
+        if not path_is_within(selected_volume2, PACKAGE_DIR):
+            raise MissionWeaveGateError("PUBLIC_VOLUME2_OUTSIDE_PACKAGE")
+        if not selected_volume2.is_file():
+            raise MissionWeaveGateError("PUBLIC_VOLUME2_NOT_FOUND")
+        volume2_path_label = rel(selected_volume2)
+
+    info_text = run_pdf_tool("pdfinfo.exe", [str(selected_volume2)])
     pages_match = re.search(r"^Pages:\s+(\d+)\s*$", info_text, re.MULTILINE)
     encrypted_match = re.search(r"^Encrypted:\s+(\S+)\s*$", info_text, re.MULTILINE)
     size_match = re.search(r"^Page size:\s+([\d.]+) x ([\d.]+) pts", info_text, re.MULTILINE)
@@ -291,7 +313,7 @@ def inspect_source_package() -> tuple[dict[str, Any], str]:
         and abs(float(size_match.group(1)) - 612.0) < 0.5
         and abs(float(size_match.group(2)) - 792.0) < 0.5
     )
-    volume2_text = run_pdf_tool("pdftotext", [str(VOLUME2_PDF), "-"])
+    volume2_text = run_pdf_tool("pdftotext", [str(selected_volume2), "-"])
     required_sections_present = all(
         heading in volume2_text for heading in REQUIRED_VOLUME2_SECTIONS
     )
@@ -310,8 +332,13 @@ def inspect_source_package() -> tuple[dict[str, Any], str]:
         "manifest_header_pass": manifest_header_ok,
         "manifest_file_count": len(file_checks),
         "all_manifest_files_match": all_manifest_files_match,
-        "volume2_path": rel(VOLUME2_PDF),
-        "volume2_sha256": sha256_file(VOLUME2_PDF),
+        "volume2_path": volume2_path_label,
+        "volume2_sha256": sha256_file(selected_volume2),
+        "volume2_sha256_present": True,
+        "volume2_sha256_exposed": not private_final,
+        "private_final_volume2_used": private_final,
+        "private_final_volume2_sha256_exposed": False,
+        "absolute_private_path_exposed": False,
         "volume2_pages": pages,
         "volume2_page_limit": VOLUME2_PAGE_LIMIT,
         "volume2_letter_size": letter_size,
@@ -457,7 +484,13 @@ def build_payload(
     volume2_text: str | None = None,
 ) -> dict[str, Any]:
     if source_state is None or volume2_text is None:
-        source_state, volume2_text = inspect_source_package()
+        use_private_final = bool(
+            private_payload is not None and PRIVATE_FINAL_VOLUME2_PDF.is_file()
+        )
+        source_state, volume2_text = inspect_source_package(
+            PRIVATE_FINAL_VOLUME2_PDF if use_private_final else VOLUME2_PDF,
+            private_final=use_private_final,
+        )
     evaluation = (
         evaluate_private_payload(
             private_payload, source_state=source_state, volume2_text=volume2_text
@@ -484,6 +517,17 @@ def build_payload(
         and evaluation is not None
         and evaluation["all_private_gates_pass"]
     )
+    public_source_state = deepcopy(source_state)
+    if public_source_state.get("private_final_volume2_used") is True:
+        public_source_state["volume2_sha256"] = None
+        public_source_state["volume2_sha256_present"] = valid_sha256(
+            source_state.get("volume2_sha256")
+        )
+        public_source_state["volume2_sha256_exposed"] = False
+        public_source_state["volume2_path"] = "IGNORED_PRIVATE_FINAL_VOLUME2"
+        public_source_state["private_final_volume2_sha256_exposed"] = False
+        public_source_state["absolute_private_path_exposed"] = False
+
     payload: dict[str, Any] = {
         "schema": PUBLIC_SCHEMA,
         "generated_utc": now_utc(),
@@ -500,14 +544,22 @@ def build_payload(
         },
         "status": status,
         "submission_ready_for_human_click": ready,
-        "source_integrity": source_state,
+        "source_integrity": public_source_state,
         "private_input": {
             "expected_path": rel(DEFAULT_PRIVATE_INPUT),
             "git_ignored_target": git_ignored(DEFAULT_PRIVATE_INPUT),
             "present": private_payload is not None,
-            "sha256": private_input_sha256,
+            "sha256": None,
+            "sha256_present": valid_sha256(private_input_sha256),
+            "sha256_exposed": False,
             "private_values_exposed": False,
             "capture_tool": rel(PRIVATE_CAPTURE_TOOL),
+            "private_volume2_finalizer": rel(PRIVATE_FINALIZER),
+            "private_final_volume2_present": bool(
+                private_payload is not None and PRIVATE_FINAL_VOLUME2_PDF.is_file()
+            ),
+            "private_final_volume2_path_exposed": False,
+            "private_final_volume2_sha256_exposed": False,
             "capture_workflow": rel(PRIVATE_CAPTURE_WORKFLOW),
             "pre_submit_excludes_action_time_approval": True,
             "credential_values_accepted": False,
@@ -609,7 +661,11 @@ def ensure_public_safe(
     if private_payload is None:
         return
     proposal = private_payload.get("proposal", {})
-    for field in ("proposal_number", "portal_preview_sha256"):
+    for field in (
+        "proposal_number",
+        "volume2_pdf_sha256",
+        "portal_preview_sha256",
+    ):
         value = proposal.get(field) if isinstance(proposal, dict) else None
         if isinstance(value, str) and value and value in serialized:
             raise MissionWeaveGateError(f"PRIVATE_{field.upper()}_EXPOSED")
@@ -647,6 +703,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Encrypted: `{str(source['volume2_encrypted']).lower()}`",
         f"- Searchable: `{str(source['volume2_searchable']).lower()}`",
         f"- Required sections present: `{str(source['volume2_required_sections_present']).lower()}`",
+        f"- Ignored private final Volume 2 used: `{str(source['private_final_volume2_used']).lower()}`",
+        f"- Private final Volume 2 path exposed: `{str(source['absolute_private_path_exposed']).lower()}`",
+        f"- Private final Volume 2 hash exposed: `{str(source['private_final_volume2_sha256_exposed']).lower()}`",
         f"- Neutral proposal header still present: `{str(source['neutral_proposal_header_present']).lower()}`",
         f"- All source and format checks pass: `{str(source['all_checks_pass']).lower()}`",
         "",
@@ -673,7 +732,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             f"1. Run `{payload['private_input']['capture_tool']} --check-target`. This validates the ignored destination without reading private contents.",
             "2. Run the hidden collector with `--section pre-submit`. It captures identity, proposal, and compliance sections but deliberately excludes action-time approval.",
-            "3. After DSIP assigns a proposal number, rebuild Volume 2 through the existing builder, regenerate the package manifest, and rerun only `--section proposal` with the current PDF and preview-receipt hash options.",
+            f"3. After DSIP assigns a proposal number, run `{payload['private_input']['private_volume2_finalizer']}`. It reads the number only from the ignored private record, writes the assigned-number DOCX/PDF only to the ignored private area, performs PDF QA, and updates the private PDF hash without exposing either value publicly.",
             "4. Run `--section approval` only after the corporate official reviews the complete portal preview at action time. The collector never requests or accepts a Firm PIN or login credential.",
             "5. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.",
             "",
@@ -697,7 +756,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
 def render_portal_checklist(payload: dict[str, Any]) -> str:
     source = payload["source_integrity"]
     instruction = payload["official_instruction_facts"]
-    return f"""# MissionWeave DSIP Portal Checklist - 2026-07-17
+    return rf"""# MissionWeave DSIP Portal Checklist - 2026-07-17
 
 Use this sequence only after the user says `I'm in`. Inspect the current in-session browser page before navigating. Preserve any authentication already in progress.
 
@@ -714,7 +773,8 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - All manifest hashes and sizes match: `{str(source['all_manifest_files_match']).lower()}`
 - Volume 2 candidate: `{source['volume2_pages']}` pages of `{source['volume2_page_limit']}` allowed, letter size, searchable, and unencrypted.
 - The candidate still contains the neutral proposal-number header: `{str(source['neutral_proposal_header_present']).lower()}`.
-- Do not upload the current PDF after DSIP assigns a proposal number. Rebuild the PDF and regenerate the manifest first.
+- Ignored assigned-number final PDF selected by the gate: `{str(source['private_final_volume2_used']).lower()}`.
+- Do not upload the tracked neutral PDF after DSIP assigns a proposal number. Run `{rel(PRIVATE_FINALIZER)}`; the final PDF remains ignored and its path, number, and hash remain absent from public artifacts.
 
 ## Registration And Firm Controls
 
@@ -728,7 +788,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 ## Seven Volumes
 
 1. Volume 1 - Proposal Cover Sheet: paste only the bounded public abstract and anticipated-benefits text. Each field must remain within 3,000 characters and contain no proprietary or classified material.
-2. Volume 2 - Technical Volume: capture the assigned DSIP proposal number, rebuild the existing DOCX/PDF through the package builder, require no neutral header, rerun the manifest, run a local malware scan, and upload one PDF no longer than {instruction['volume2_page_limit']} pages.
+2. Volume 2 - Technical Volume: capture the assigned DSIP proposal number in the ignored record, run the guarded private finalizer, require its PDF QA to pass with no neutral header, run a local malware scan, and upload one PDF no longer than {instruction['volume2_page_limit']} pages. Keep the public 15-file neutral manifest unchanged.
 3. Volume 3 - Cost Volume: use the DSIP spreadsheet/form, keep the Phase I base at or below the official $100,000 ceiling, support the direct labor and indirect treatment, and reconcile every task, ODC, and percentage-of-work entry.
 4. Volume 4 - Company Commercialization Report: answer from actual SBIR/STTR award history and ensure the current company report is complete.
 5. Volume 5 - Supporting Documents: upload only applicable and current evidence. Because the topic is ITAR-marked, include a certified DD Form 2345 or acceptable JCP application evidence when required. Do not upload the old foreign-affiliations PDF form.
@@ -746,22 +806,23 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 
 ## Final Preview Gate
 
-1. Inspect every populated field, all seven volumes, every attachment filename and hash, the cost total, and the live deadline.
-2. Save a private local preview receipt and record only its SHA-256 in the ignored private gate file.
-3. Capture the action-time approval section separately. This command never clicks submit:
+1. Run `python code\ops\FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py` after the assigned proposal number is captured. Require `PRIVATE_VOLUME2_REBUILT_AND_QA_PASSED`.
+2. Inspect every populated field, all seven volumes, every attachment filename and hash, the cost total, and the live deadline.
+3. Save a private local preview receipt and record only its SHA-256 in the ignored private gate file.
+4. Capture the action-time approval section separately. This command never clicks submit:
 
 ```powershell
 python code\ops\CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval
 ```
 
-4. Run:
+5. Run:
 
 ```powershell
 python code\ops\BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input grant_submissions\DLA26BZ03_NV011_MissionWeave\private\MISSIONWEAVE_DSIP_ACTION.private.json
 ```
 
-5. Require status `READY_FOR_HUMAN_FINAL_SUBMIT_CLICK` and zero open gates.
-6. Stop for the final human review. The builder does not click submit, certify facts, accept terms, or create a Government transmission receipt.
+6. Require status `READY_FOR_HUMAN_FINAL_SUBMIT_CLICK` and zero open gates.
+7. Stop for the final human review. The builder does not click submit, certify facts, accept terms, or create a Government transmission receipt.
 
 ## Public Claim Boundary
 

@@ -235,12 +235,19 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert missionweave["action_gate_open_gate_count"] == 50
     assert missionweave["action_gate_private_input_present"] is False
     assert missionweave["action_gate_private_values_exposed"] is False
+    assert missionweave["action_gate_private_input_sha256_exposed"] is False
     assert missionweave["action_gate_private_capture_tool"].endswith(
         "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py"
+    )
+    assert missionweave["action_gate_private_volume2_finalizer"].endswith(
+        "FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py"
     )
     assert missionweave["action_gate_private_capture_workflow"].endswith(
         "MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md"
     )
+    assert missionweave["action_gate_private_final_volume2_present"] is False
+    assert missionweave["action_gate_private_final_volume2_path_exposed"] is False
+    assert missionweave["action_gate_private_final_volume2_sha256_exposed"] is False
     assert missionweave["action_gate_pre_submit_excludes_action_time_approval"] is True
     assert missionweave["action_gate_credential_values_accepted"] is False
     assert missionweave["action_gate_firm_pin_value_accepted"] is False
@@ -250,7 +257,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert missionweave["topic_phase1_max_cost_usd"] == 100000
     assert missionweave["itar_flag"] is True
     assert missionweave["projected_cmmc_level"] == "Level 2 (Self)"
-    assert len(missionweave["package_files"]) == 11
+    assert len(missionweave["package_files"]) == 12
     assert any(
         path.endswith("MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json")
         for path in missionweave["package_files"]
@@ -269,6 +276,10 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     )
     assert any(
         path.endswith("CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py")
+        for path in missionweave["package_files"]
+    )
+    assert any(
+        path.endswith("FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py")
         for path in missionweave["package_files"]
     )
     assert any(

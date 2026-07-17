@@ -10,6 +10,7 @@ This workflow replaces manual editing of the ignored MissionWeave DSIP action fi
 - Private target: `grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_DSIP_ACTION.private.json`
 - Target must remain inside the bounded private directory and must be Git-ignored.
 - Private answers are never printed, returned in the metadata receipt, mirrored, committed, or written to a public artifact.
+- The assigned-number DOCX, PDF, build metadata, and final manifest remain in the ignored private directory. Their path, proposal number, and PDF hash are redacted from public gate outputs.
 - The collector does not navigate a browser, upload a file, certify an answer, accept terms, send an email, or click final submit.
 - A yes/no answer that a Firm PIN is available is permitted. The Firm PIN value itself is never permitted.
 
@@ -37,13 +38,27 @@ This section records 13 booleans. It does not record the UEI, CAGE, SBC Control 
 
 ### 2. Proposal
 
-Run after DSIP assigns the proposal number and the bounded package has been rebuilt:
+After DSIP assigns the proposal number, capture the proposal section first. Keep the rebuilt-PDF hash unset until the guarded finalizer runs:
+
+```powershell
+python code\ops\CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section proposal
+```
+
+Rebuild the assigned-number document only inside the ignored private area:
+
+```powershell
+python code\ops\FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py
+```
+
+Require status `PRIVATE_VOLUME2_REBUILT_AND_QA_PASSED`. The finalizer reads the assigned number from the ignored record rather than a command-line argument, verifies the PDF page count, letter geometry, encryption state, searchable text, required sections, assigned header, and absence of the neutral header, then writes the final PDF hash back into the ignored record.
+
+Rerun the proposal section to confirm the remaining proposal facts and hash the fixed ignored final PDF:
 
 ```powershell
 python code\ops\CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section proposal --use-current-volume2-hash
 ```
 
-The collector validates the proposal-number format, computes the current bounded Volume 2 PDF hash when requested, enforces the official Phase I ceiling, and accepts only a 64-character SHA-256 for the private portal-preview receipt.
+The collector validates the proposal-number format, computes only the guarded ignored final Volume 2 PDF hash when requested, enforces the official Phase I ceiling, and accepts only a 64-character SHA-256 for the private portal-preview receipt. It fails closed if the private final PDF does not exist.
 
 When a local preview-receipt file exists, hash it without storing or printing its path:
 

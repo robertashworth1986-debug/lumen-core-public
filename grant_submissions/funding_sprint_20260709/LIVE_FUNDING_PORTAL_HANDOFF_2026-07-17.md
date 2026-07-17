@@ -10,8 +10,8 @@ This handoff is generated from the authoritative near-deadline command board. It
 - Navigation before resume signal: `false`
 - Inspect current page before navigation: `true`
 - First action after resume: Inspect the current URL and visible page without navigating. Continue the current authenticated portal to its next safe preview before switching lanes.
-- Source command-board SHA-256: `53d1bcfa6cee5477fc52fdb10355d890241b72811ea677352d0b6c3d9f58976f`
-- Handoff SHA-256: `e74af2dcb3ed89f8d7652f94cdd6ded599e59d7f4b13caf20abeaa4ea586e5a8`
+- Source command-board SHA-256: `a00258d7e8f4772ffafed2439c3a7c78a5ffa6214da3b9ce2ac2bb12fbb0d636`
+- Handoff SHA-256: `1f60c5a542d116898fc68a357312a78e591f128aadc5f89d337daec522d5a8e6`
 
 ## Portal Queue
 
@@ -55,7 +55,7 @@ This handoff is generated from the authoritative near-deadline command board. It
 - Portal: https://www.dodsbirsttr.mil/
 - Next safe action:
   - Verify the live DSIP countdown, organization linkage, and generated proposal number.
-  - Use the proposal number through the existing builder, rerender Volume 2, regenerate the 15-file manifest, and require all hashes to pass.
+  - Capture the proposal number only in the ignored record, run the guarded private Volume 2 finalizer, and require its assigned-header PDF QA receipt without changing the public 15-file manifest, which remains neutral.
   - Run the hidden sectioned MissionWeave collector for identity, proposal, and compliance; it accepts no Firm PIN or credential and keeps action-time approval separate.
   - Use the generated seven-volume checklist and require the public gate to move from 0/50 to 50/50 without exposing values.
   - Populate Volumes 1-7 from the bounded package and reach the complete preview.
@@ -78,7 +78,7 @@ This handoff is generated from the authoritative near-deadline command board. It
   - Robert completes required training and reviews every certification, attachment hash, total, and the final DSIP preview before submission.
 - External send without human: `false`
 - Final submit without human: `false`
-- Source lane SHA-256: `9400ce8c52fd7cf953cf442b24ce339878b3bc51914962e14364bd01cce84431`
+- Source lane SHA-256: `dbc7b4568691b2292300da891c9ad6e1cf916e0e3f32589939a2708cb604ef33`
 
 ### 5. 26-510 - NSF Small Business Innovation Research / Small Business Technology Transfer Programs Phase I
 
@@ -167,7 +167,7 @@ This handoff is generated from the authoritative near-deadline command board. It
 ## Global Stops
 
 - Any final submit, external send, signature, legal certification, pricing approval, fee payment, terms acceptance, or irreversible confirmation.
-- Any unsupported claim of agency validation, award, customer deployment, realized savings, patent validity, field performance, CMMC status, or ITAR compliance.
+- Do not make unsupported claims of agency validation, award, customer deployment, realized savings, patent validity, field performance, CMMC status, or ITAR compliance.
 - Any request to expose credentials, private identifiers, unpublished patent material, controlled technical data, or private cost rates in a public artifact.
 
 - Private contact data included: `false`

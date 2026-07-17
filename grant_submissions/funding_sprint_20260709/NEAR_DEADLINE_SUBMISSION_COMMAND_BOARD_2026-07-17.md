@@ -15,18 +15,18 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - No-bid or partner-only lanes: `6`
 - Expired without verified send: `2`
 - Human-gated lanes: `13`
-- Strongest today action: Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. If it is Nashville EC, move its private action gate from 0/15 by running the six-prompt hidden collector, then reach the complete preview before the date-only July 17 close. One deadline-support query is sent and must not be duplicated or treated as an application. Otherwise preserve the authenticated lane to its next safe preview. Next use the MissionWeave seven-volume checklist and hidden sectioned collector to move its private action gate from 0/50 while keeping action-time approval separate; all 15 package files are verified for the July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.
+- Strongest today action: Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. If it is Nashville EC, move its private action gate from 0/15 by running the six-prompt hidden collector, then reach the complete preview before the date-only July 17 close. One deadline-support query is sent and must not be duplicated or treated as an application. Otherwise preserve the authenticated lane to its next safe preview. Next use the MissionWeave seven-volume checklist, hidden sectioned collector, and guarded private Volume 2 finalizer to move its private action gate from 0/50 while keeping the proposal number, final PDF identity, and action-time approval private; all 15 public package files are verified for the July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.
 - Critical infrastructure action: SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action.
 - Closest deadline lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Closest stage-ready lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
-- Best grants lane: DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 package files are hash-verified and the 11-page PDF passes format checks. The hidden sectioned collector can now capture DSIP identity, proposal, and compliance facts without accepting credentials, while approval remains a separate action-time gate; the public action gate stays 0/50 until those facts are actually supported. NSF 26-510 stays the next rolling Project Pitch route.
+- Best grants lane: DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. The hidden sectioned collector can capture DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate, and the public action gate stays 0/50 until actual portal facts are supported. NSF 26-510 stays the next rolling Project Pitch route.
 - Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: the first listed contact route rejected delivery and one current official replacement route was contacted July 17. Delivery and partnership remain unconfirmed; no solo bid and no partner claim unless written corporate-experience evidence arrives.
 - Fastest low-friction lane: The Nashville EC TakeOff application is the nearest low-friction reviewer route. Its hidden-input gate is 0/15: six founder prompts produce 11 private portal answers, then preview, fee/terms, and action-time authorization remain human-gated. The verified support email only asks for the close time and does not replace portal submission.
 - Final submit without human: `false`
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `208468921b9a36adc4366de9106166178fcf72198a94d4ab0eb6df3513d55e18`
+- Command board SHA-256: `923b215a6e002bb07e634ae9fa01515ee2ac9b751ac7c55b275c893ad704eb16`
 
 ## Operational Controls
 
@@ -120,6 +120,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json`
   - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md`
   - `code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py`
+  - `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`
   - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md`
 
 ### 5. LAUNCHTN-3686-2026 - 3686 Pitch Competition 2026, presented by Amazon
@@ -317,7 +318,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Why now: This is the nearest complete federal Phase I proposal package. The 15-file manifest verifies byte-for-byte, the technical candidate is claim-bounded, and the official topic fit is strong. It is not submission-ready until the public action gate moves from 0/50 to 50/50 without exposing identity, cost, ITAR, CMMC, award-history, foreign-affiliation, rights, preview, or certification values.
 - Today work:
   - Open DLA26BZ03-NV011 in DSIP and verify the live countdown, organization linkage, and proposal number.
-  - Replace the neutral proposal-number header through the builder, rerender the PDF, and regenerate the manifest.
+  - Capture the assigned proposal number in the ignored record, run the guarded private finalizer, and require its PDF QA receipt; never place the number, private PDF path, or final PDF hash in public artifacts.
   - Use the hidden sectioned collector for identity, proposal, and compliance; keep action-time approval separate and rerun the public gate after each bounded block.
   - Populate Volumes 1-7 from the hash-locked package and stop at the complete portal preview.
   - Resolve ITAR/JCP, projected CMMC Level 2 (Self), support-overlap, data-rights, and foreign-affiliation representations without claiming certifications that are not documented.
@@ -338,6 +339,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json`
   - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md`
   - `code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py`
+  - `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`
   - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md`
 - Action gate: `PRIVATE_DSIP_FACTS_NOT_CAPTURED`
 - Action gates passed: `0/50`
@@ -347,7 +349,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Ready for human final click: `false`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `9400ce8c52fd7cf953cf442b24ce339878b3bc51914962e14364bd01cce84431`
+- Lane SHA-256: `dbc7b4568691b2292300da891c9ad6e1cf916e0e3f32589939a2708cb604ef33`
 
 ### 4. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
 
@@ -784,13 +786,14 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - `nashville_ec_private_workflow`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md` present=`true` sha256=`fad93e7ed7c93a1406657d5d678a3673cfd73ed29fe4de5205e223e948ea9d88`
 - `nashville_ec_deadline_preservation_receipt`: `grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json` present=`true` sha256=`42fc996c7ebcdce4027cca5397347195d5b8fe74c90e75efd114bd8265dc20b5`
 - `nashville_ec_deadline_response_control`: `grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md` present=`true` sha256=`81225b12c7b8b7e614a0fd50d559bce076e2142e0535e06ea15deb01fe1a9c93`
-- `missionweave_dsip_package_manifest`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json` present=`true` sha256=`598317d0b4a971402e3446ff32c273209ae7f6dd347f02d5c663159ad4eb6069`
+- `missionweave_dsip_package_manifest`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json` present=`true` sha256=`6ca200ccd8b3450700662f2628c61fa882ddd52850f691448882f9d44bb10e0e`
 - `missionweave_dsip_assembly_map`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ASSEMBLY_MAP_2026-07-16.md` present=`true` sha256=`9f5f043d678bdcab74c7b1e4993c75a807da60bdb9a5ba05eeb5eb41487ed9ed`
-- `missionweave_volume2_pdf`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf` present=`true` sha256=`8bbde3db31285f3b671cbfcaf972e9eb8f2de2f62d559463e519ca4f901c37e6`
-- `missionweave_dsip_action_gate`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json` present=`true` sha256=`52eef9c499b15a8fd2afd1e99b7a8cc7cc319b19a979d2bee3988731441a78f4`
-- `missionweave_dsip_portal_checklist`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md` present=`true` sha256=`424c363087c07f7cd7743832cba682c0f05859b69cd93282a1ed9845aa941076`
-- `missionweave_dsip_private_capture_tool`: `code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py` present=`true` sha256=`543cbaf14acabb5d4ab8e0a39e2baf05625d2925b0576efd1ddbe154baa7726f`
-- `missionweave_dsip_private_capture_workflow`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md` present=`true` sha256=`a4806d688ea6c3e263447f5b2e316ff13da89e3f9c8f7d602dd91face16b457b`
+- `missionweave_volume2_pdf`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf` present=`true` sha256=`c07401b2552cb754e71785c42d1cef00e13f36212c2f2bf4ad9d1f980475d0c9`
+- `missionweave_dsip_action_gate`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json` present=`true` sha256=`b5bb6dd102cd22fd817e10f29fc22536159375a44ae3187767ccf1d67e5b91b5`
+- `missionweave_dsip_portal_checklist`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md` present=`true` sha256=`5749d3865ea98e5153c914cae9f544918f5e83f6d27d0a0c265197c03008599a`
+- `missionweave_dsip_private_capture_tool`: `code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py` present=`true` sha256=`30ae90eadcff7ae97d118f10c6a9767583410514b5e2e9c0c137f1e772ae87dc`
+- `missionweave_dsip_private_volume2_finalizer`: `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py` present=`true` sha256=`11cc2c3ab11882295a7cfd31f8a09ce428d786540c456018fe503d016da0219c`
+- `missionweave_dsip_private_capture_workflow`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md` present=`true` sha256=`b70a8345d7d7021ea146abfc728199086bb3da8b3dfa6c5fb88c82251b38704d`
 - `missionweave_official_topic`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/source_attachments/DLA26BZ03_NV011_OFFICIAL_TOPIC_DETAILS.json` present=`true` sha256=`4d01354a456bf91baff5ab638311bd5822176b49ad7911f6dec1c379b3b217b7`
 - `missionweave_baa_amendment_2`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/source_attachments/DoW_2026_SBIR_BAA_RELEASE_3_AMENDMENT_2.pdf` present=`true` sha256=`fb809186f3b43313a1877a5c36e2383a45b84f62566dda3f6bcdb93779ce08ae`
 - `missionweave_dla_component_instructions`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/source_attachments/DLA_26BZ_RELEASE_3_COMPONENT_INSTRUCTIONS.pdf` present=`true` sha256=`17b06b6fe3dbe6f2035f8287a0dd01fdbfe180858f3c490f1e91d121819239a2`
