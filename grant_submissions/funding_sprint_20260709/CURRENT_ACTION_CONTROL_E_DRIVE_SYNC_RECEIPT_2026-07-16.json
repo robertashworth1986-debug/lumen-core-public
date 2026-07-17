@@ -1,55 +1,118 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T03:09:56.4556840Z",
+  "created_utc": "2026-07-17T03:43:17.3224090Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/CURRENT_ACTION_CONTROL_20260716",
-  "artifact_count": 9,
+  "artifact_count": 18,
   "all_sha256_matched_after_copy": true,
   "artifacts": [
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 62524,
-      "sha256": "DD29D3BD16F7E2EA9210A7FA5C587F6A536F498444E3AD61E20352CBF3CD51BA"
+      "bytes": 65036,
+      "sha256": "DE6D8096D1257CDB9AB828F68D67E98E572F2BDEC0491BEA4BFC6D030CC50304",
+      "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 7670,
-      "sha256": "8E61FFD1C3DDDD39D93658E3018EAA41F56333D08CF5D37107CB54F5623FBDCC"
+      "bytes": 8480,
+      "sha256": "A4FCA00C0CD604339128F013C0194C72C86507180F08234A42C508A2EF7FB9B2",
+      "copy_sha256_matched": true
     },
     {
       "source": "tests/test_epri_open_power_ai_mou_response.py",
-      "bytes": 3244,
-      "sha256": "A9B0EB7303AEE1A3F2C8734CE2811B83FB9C5F42B8A4CED3377677C48C0FFD7A"
+      "bytes": 3878,
+      "sha256": "7831B34CF950C847D8E26FBEDA7BB0A3E002377565C0D2F6AB8D5E473762D385",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
       "bytes": 2144,
-      "sha256": "B6F3FFB5049F5B6D64105E80403253688B1F6495CB1D94E92C309CE1C2D6CDE6"
+      "sha256": "B6F3FFB5049F5B6D64105E80403253688B1F6495CB1D94E92C309CE1C2D6CDE6",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
-      "bytes": 37029,
-      "sha256": "FA4C8525AB7B65814E1F106007AD97DD37A8C8A35EA0CE3EE0466623644A5674"
+      "bytes": 38019,
+      "sha256": "A2FEB8EC8B7A197E73054772180237C4B03D28A5076B05F863197BF6CE816AE2",
+      "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL.py",
       "bytes": 19745,
-      "sha256": "FA899A6644C3D5541D23DE66DE19C9394CEF220BD241EC1C50249BE7003AB29D"
+      "sha256": "FA899A6644C3D5541D23DE66DE19C9394CEF220BD241EC1C50249BE7003AB29D",
+      "copy_sha256_matched": true
     },
     {
       "source": "tests/test_sam_public_credential_rotation_control.py",
       "bytes": 6428,
-      "sha256": "934A22620B889F65337439C8894610F1BABA15D4A00B20C04E3B42854DA4914F"
+      "sha256": "934A22620B889F65337439C8894610F1BABA15D4A00B20C04E3B42854DA4914F",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
       "bytes": 3980,
-      "sha256": "8636429835230980CF3EB1E56FC6AAE0517142EE09CB86DFAAA5F1E7445B7D4C"
+      "sha256": "8636429835230980CF3EB1E56FC6AAE0517142EE09CB86DFAAA5F1E7445B7D4C",
+      "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
       "bytes": 2007,
-      "sha256": "F42E4BEA2F08C9C910752B8B672ECEECADCFC40DF952999DF32589EA94A41671"
+      "sha256": "F42E4BEA2F08C9C910752B8B672ECEECADCFC40DF952999DF32589EA94A41671",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_PATENT_DEADLINE_EVIDENCE_CONTROL.py",
+      "bytes": 21099,
+      "sha256": "BD70F2F1B311A45ED9269E1CF63338DB972552BE93267D87DC1B9D848C31502F",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_patent_deadline_evidence_control.py",
+      "bytes": 5130,
+      "sha256": "EA5DA6E7C00CFCA530A0F3BD7333C3AEC2880CCED1D2FA760E0F1EEC41130E13",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json",
+      "bytes": 6290,
+      "sha256": "E51EFBEEE2B102ED8C79CCB771BE51697EEDBD3BA4F9F352C3A7D6CD2A02EB5A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.md",
+      "bytes": 5201,
+      "sha256": "59626A5F2CC9129BF58DD903B655C91438B6336C1ABBE9EC0B7ED238C7261A6A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_IP_COUNSEL_DILIGENCE_PACKET.py",
+      "bytes": 22058,
+      "sha256": "064CB284853BBADEC66BE7FC539A6D37EF3744AEB634DC6D0B02E32C57ABC749",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_ip_counsel_diligence_packet.py",
+      "bytes": 4176,
+      "sha256": "1643BD3B42A04EF8FE2D90467CCF6B31C89A4DAC4CB5D3D64FC61A1992AE759A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+      "bytes": 11129,
+      "sha256": "E9EFBB7E405CC0DC8D283F991E353DF8FF78F69864BDE2AAB0159839F8ECD306",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/ip_counsel_diligence_packet.json",
+      "bytes": 13031,
+      "sha256": "1C1E7133BD44E3BB568972C018B37406CB43AE4CA37D19278B8B5F191AE7B846",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "docs/DEADLINE_RECOVERY_CHECKLIST.md",
+      "bytes": 4474,
+      "sha256": "3C62A0110E0F7646C48CA6443EC47BA553769128582034C0064DDCA4A332F1DE",
+      "copy_sha256_matched": true
     }
   ],
-  "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove email transmission, portal submission, agency acceptance, technical validation, award, deployment, or field performance."
+  "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove email transmission, portal submission, agency acceptance, technical validation, award, deployment, patent status, legal deadline, or field performance."
 }

@@ -43,6 +43,20 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert sam_rotation["rotation_verified"] is False
     assert sam_rotation["human_action_required"] is True
     assert sam_rotation["browser_navigation_performed"] is False
+    patent_control = payload["operational_controls"]["patent_deadline_evidence"]
+    assert patent_control["status"] == (
+        "PAYMENT_ACKNOWLEDGEMENT_ONLY_OFFICIAL_DOCKET_REQUIRED"
+    )
+    assert patent_control["payment_acknowledgement_found"] is True
+    assert patent_control["filing_receipt_found"] is False
+    assert patent_control["official_correspondence_found"] is False
+    assert patent_control["official_status_record_found"] is False
+    assert patent_control["us_prosecution_deadline"] == (
+        "UNVERIFIED_REQUIRES_NEWEST_OFFICIAL_NOTICE"
+    )
+    assert "TIME_SENSITIVE" in patent_control["foreign_pct_priority"]
+    assert patent_control["human_action_required"] is True
+    assert patent_control["browser_navigation_performed"] is False
 
     stage_ids = {row["opportunity_number"] for row in payload["stage_now"]}
     assert "80TECH26RFI0020" not in stage_ids
@@ -158,6 +172,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "nashville_ec_human_fact_resolution",
         "external_engagement_response_register",
         "sam_public_key_rotation_control",
+        "patent_deadline_evidence_control",
     ):
         assert payload["source_ledgers"][source]["present"] is True
 

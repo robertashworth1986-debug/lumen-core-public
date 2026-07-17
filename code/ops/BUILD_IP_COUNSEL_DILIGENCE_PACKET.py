@@ -19,6 +19,9 @@ DOCKET_JSON = OUT_OPS / "human_action_docket_latest.json"
 MANIFEST_JSON = OUT_OPS / "data_room_manifest_latest.json"
 QA_JSON = OUT_OPS / "reviewer_diligence_qa_matrix_latest.json"
 LINKEDIN_JSON = OUT_OPS / "linkedin_universe_profile_packet_latest.json"
+PATENT_DEADLINE_CONTROL_JSON = (
+    SPRINT_DIR / "PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json"
+)
 
 OUT_JSON = OUT_OPS / "ip_counsel_diligence_packet_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "ip_counsel_diligence_packet.json"
@@ -26,10 +29,10 @@ OUT_MD = SPRINT_DIR / "IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md"
 
 OFFICIAL_SOURCES = [
     {
-        "label": "USPTO provisional application guidance",
-        "url": "https://www.uspto.gov/patents/basics/apply/provisional-application",
-        "packet_use": "Confirm provisional pendency, nonprovisional timing, and provisional limits.",
-        "verified_fact": "USPTO guidance says a provisional application cannot become a U.S. patent unless a nonprovisional filing or conversion occurs within the required 12-month period.",
+        "label": "USPTO incomplete or missing application information",
+        "url": "https://www.uspto.gov/patents/apply/when-patent-applications-are-incomplete-or-missing-information",
+        "packet_use": "Identify the role of OPAP notices and the response period stated in the controlling notice.",
+        "verified_fact": "USPTO guidance says an OPAP notice identifies missing or deficient application items, the reply period, and any additional fees.",
     },
     {
         "label": "USPTO nonprovisional utility filing guide",
@@ -50,10 +53,10 @@ OFFICIAL_SOURCES = [
         "verified_fact": "USPTO describes a nationwide network matching volunteer patent attorneys and agents with financially under-resourced inventors and small businesses.",
     },
     {
-        "label": "USPTO restoration of provisional benefit",
-        "url": "https://www.uspto.gov/patents/apply/petitions/restoration-benefit-provisional-application-or-priority-foreign-application",
-        "packet_use": "Counsel-only review if a deadline has passed or may be near.",
-        "verified_fact": "USPTO describes petition-based restoration only in limited circumstances, including timing and unintentional-delay requirements.",
+        "label": "WIPO PCT restoration of priority",
+        "url": "https://www.wipo.int/en/web/pct-system/texts/restoration",
+        "packet_use": "Counsel-only review of any time-sensitive foreign or PCT priority strategy.",
+        "verified_fact": "WIPO describes restoration of priority as limited, jurisdiction-dependent, and time-sensitive; availability must not be assumed.",
     },
 ]
 
@@ -233,6 +236,7 @@ def build_payload() -> dict[str, Any]:
     manifest = read_json(MANIFEST_JSON)
     qa = read_json(QA_JSON)
     linkedin = read_json(LINKEDIN_JSON)
+    patent_deadline_control = read_json(PATENT_DEADLINE_CONTROL_JSON)
 
     evidence_paths = [
         "grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md",
@@ -243,6 +247,8 @@ def build_payload() -> dict[str, Any]:
         "grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
+        "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json",
+        "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.md",
     ]
     evidence_status = [artifact_status(path) for path in evidence_paths]
 
@@ -279,6 +285,16 @@ def build_payload() -> dict[str, Any]:
             "public_disclosure_review_required": True,
             "licensed_counsel_required": True,
             "human_patent_center_check_required": True,
+            "patent_deadline_control_status": patent_deadline_control.get("status", "MISSING"),
+            "us_prosecution_deadline_verified": False,
+            "foreign_pct_priority_review_time_sensitive": (
+                "TIME_SENSITIVE"
+                in str(
+                    (patent_deadline_control.get("deadline_posture") or {}).get(
+                        "foreign_pct_priority", ""
+                    )
+                )
+            ),
             "qa_count": int((qa.get("summary") or {}).get("qa_count") or 0),
             "data_room_markdown_count": int((manifest.get("summary") or {}).get("manifested_markdown_count") or 0),
             "linkedin_packet_ready": str(linkedin.get("status") or "").endswith("HUMAN_POST_REQUIRED"),
@@ -287,6 +303,22 @@ def build_payload() -> dict[str, Any]:
         "counsel_questions": COUNSEL_QUESTIONS,
         "counsel_intake_items": COUNSEL_INTAKE_ITEMS,
         "public_rules": PUBLIC_RULES,
+        "deadline_posture": patent_deadline_control.get("deadline_posture", {}),
+        "patent_deadline_control": {
+            "status": patent_deadline_control.get("status", "MISSING"),
+            "control_artifact": rel(PATENT_DEADLINE_CONTROL_JSON),
+            "direct_answer": patent_deadline_control.get("direct_answer", ""),
+            "private_paths_published": bool(
+                (patent_deadline_control.get("public_evidence_summary") or {}).get(
+                    "private_paths_published", True
+                )
+            ),
+            "application_identifier_published": bool(
+                (patent_deadline_control.get("public_evidence_summary") or {}).get(
+                    "application_identifier_published", True
+                )
+            ),
+        },
         "evidence_status": evidence_status,
         "human_gate": {
             "patent_center_access_allowed_without_human": False,
@@ -335,7 +367,19 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Public disclosure review required: `{str(summary['public_disclosure_review_required']).lower()}`",
         f"- Licensed counsel required: `{str(summary['licensed_counsel_required']).lower()}`",
         f"- Human Patent Center check required: `{str(summary['human_patent_center_check_required']).lower()}`",
+        f"- Patent deadline control: `{summary['patent_deadline_control_status']}`",
+        f"- U.S. prosecution deadline verified: `{str(summary['us_prosecution_deadline_verified']).lower()}`",
+        f"- Foreign or PCT priority review time-sensitive: `{str(summary['foreign_pct_priority_review_time_sensitive']).lower()}`",
         f"- Packet SHA-256: `{payload['ip_counsel_diligence_packet_sha256']}`",
+        "",
+        "## Deadline Evidence Control",
+        "",
+        payload["patent_deadline_control"]["direct_answer"],
+        "",
+        f"- Status: `{payload['patent_deadline_control']['status']}`",
+        f"- Control artifact: `{payload['patent_deadline_control']['control_artifact']}`",
+        f"- Private paths published: `{str(payload['patent_deadline_control']['private_paths_published']).lower()}`",
+        f"- Application identifier published: `{str(payload['patent_deadline_control']['application_identifier_published']).lower()}`",
         "",
         "## Official Sources",
         "",

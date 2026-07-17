@@ -32,6 +32,13 @@ def test_ip_packet_is_ready_and_not_legal_advice():
     assert payload["summary"]["clearance_to_operate_claimed"] is False
     assert payload["summary"]["licensed_counsel_required"] is True
     assert payload["summary"]["human_patent_center_check_required"] is True
+    assert payload["summary"]["patent_deadline_control_status"] == (
+        "PAYMENT_ACKNOWLEDGEMENT_ONLY_OFFICIAL_DOCKET_REQUIRED"
+    )
+    assert payload["summary"]["us_prosecution_deadline_verified"] is False
+    assert payload["summary"]["foreign_pct_priority_review_time_sensitive"] is True
+    assert payload["patent_deadline_control"]["private_paths_published"] is False
+    assert payload["patent_deadline_control"]["application_identifier_published"] is False
 
 
 def test_ip_packet_cites_official_uspto_routes():
@@ -39,11 +46,16 @@ def test_ip_packet_cites_official_uspto_routes():
     payload = module.build_payload()
     urls = {row["url"] for row in payload["official_sources"]}
 
-    assert any("provisional-application" in url for url in urls)
+    assert any("incomplete-or-missing-information" in url for url in urls)
     assert any("utility-patent" in url for url in urls)
     assert any("checking-application-status" in url for url in urls)
     assert any("patent-pro-bono-program" in url for url in urls)
-    assert all(url.startswith("https://www.uspto.gov/") for url in urls)
+    assert any(url.startswith("https://www.wipo.int/") for url in urls)
+    assert all(
+        url.startswith("https://www.uspto.gov/")
+        or url.startswith("https://www.wipo.int/")
+        for url in urls
+    )
 
 
 def test_ip_packet_evidence_sources_are_present_and_hashed():
@@ -60,6 +72,8 @@ def test_ip_packet_evidence_sources_are_present_and_hashed():
         "LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
         "DATA_ROOM_MANIFEST_2026-07-09.md",
         "FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
+        "PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json",
+        "PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.md",
     ]:
         assert evidence_by_name[name]["present"] is True
         assert evidence_by_name[name]["bytes"] > 0

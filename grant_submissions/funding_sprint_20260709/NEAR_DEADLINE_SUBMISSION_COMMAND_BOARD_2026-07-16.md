@@ -15,7 +15,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; rotate the SAM.g
 - No-bid or partner-only lanes: `5`
 - Expired without verified send: `1`
 - Human-gated lanes: `12`
-- Strongest today action: Retrieve and install the already-generated SAM.gov replacement public API key without exposing it, then complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close; NASA, Army, and CDC are already sent and receipt-backed.
+- Strongest today action: Retrieve and install the already-generated SAM.gov replacement public API key without exposing it, complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close, then capture the complete Patent Center docket for the separate U.S.-deadline and foreign/PCT-priority reviews; NASA, Army, and CDC are already sent and receipt-backed.
 - Critical same-day infrastructure action: SAM.gov public API-key rotation is due 2026-07-16. Entity registration remains active; credential rotation is a separate account-maintenance action.
 - Closest deadline lane: HHS-2026-ACL-NIDILRR-REGE-0212 RERC on AI-Driven Assistive and Rehabilitation Technologies, due July 16, 2026 at 11:59 PM Eastern Time; command TECHNICAL_CAPACITY_AND_DOMAIN_GATE; fit POTENTIAL_LUMA_SKIN_SUIT_FIT_NOT_YET_EVIDENCED_IN_REPOSITORY.
 - Closest stage-ready lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
@@ -26,7 +26,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; rotate the SAM.g
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `9bb604523a6fda2d5d7eb382d2c4d7e81ae42d11d8035eedeb046f5b903452ff`
+- Command board SHA-256: `d90a5e56c460ae3bbbbedb7c5bc696e9b5cf750eb759748c2045e69edd1c18ec`
 
 ## Operational Controls
 
@@ -39,7 +39,21 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; rotate the SAM.g
 - API probe: `HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE`
 - Rotation verified: `false`
 - Human action required: `true`
+- Browser navigation performed: `false`
 - Control artifact: `grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json`
+
+### patent_deadline_evidence
+
+- Status: `PAYMENT_ACKNOWLEDGEMENT_ONLY_OFFICIAL_DOCKET_REQUIRED`
+- Payment acknowledgement found: `true`
+- Filing Receipt found: `false`
+- Official correspondence found: `false`
+- Official status record found: `false`
+- U.S. prosecution deadline: `UNVERIFIED_REQUIRES_NEWEST_OFFICIAL_NOTICE`
+- Foreign or PCT priority: `TIME_SENSITIVE_PRACTITIONER_REVIEW_REQUIRED_IF_FOREIGN_RIGHTS_DESIRED`
+- Human action required: `true`
+- Browser navigation performed: `false`
+- Control artifact: `grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json`
 
 ## Sent And Verified
 
@@ -620,3 +634,4 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; rotate the SAM.g
 - `nashville_ec_human_fact_resolution`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json` present=`true` sha256=`ab807930d19b28bb5a2a7aef38b28c3e87b40b750d1ef891f61dbd6ce510ec9f`
 - `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`557d6becd811aefc9df93679df7f4d66ae01d4608e8162ca2831f5c41642b5b8`
 - `sam_public_key_rotation_control`: `grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json` present=`true` sha256=`8636429835230980cf3eb1e56fc6aae0517142ee09cb86dfaaa5f1e7445b7d4c`
+- `patent_deadline_evidence_control`: `grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json` present=`true` sha256=`e51efbeee2b102ed8c79ccb771be51697eedbd3ba4f9f352c3a7d6cd2a02eb5a`

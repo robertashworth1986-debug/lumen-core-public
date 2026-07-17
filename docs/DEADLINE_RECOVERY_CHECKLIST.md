@@ -1,6 +1,6 @@
 # Deadline Recovery Checklist
 
-Updated: June 11, 2026 (America/Chicago)
+Updated: July 16, 2026 (America/Chicago)
 
 ## Immediate Priority
 
@@ -8,23 +8,37 @@ Updated: June 11, 2026 (America/Chicago)
 
 Verified evidence:
 
-- A utility nonprovisional application was filed and paid on July 25, 2025.
-- The local screenshots are payment/application receipts, not deadline notices.
-- No local Office Action, notice of missing parts, or response deadline was
-  found.
+- The local official record set contains six source files and five unique
+  hashes. Every item is a view or copy of the same payment acknowledgement.
+- The acknowledgement identifies a utility nonprovisional submission and a
+  basic filing-fee payment. It is not a Filing Receipt, Office Action, OPAP
+  notice, or current-status record.
+- The acknowledgement does not verify a granted filing date, claims in the
+  official file, completeness, current pendency, or absence of an outstanding
+  notice.
+- No local Filing Receipt, Office Action, notice of missing parts, abandonment
+  notice, or response deadline was found. A bounded Gmail search also found no
+  official USPTO correspondence for the application.
 
 Required action:
 
 1. Sign in to Patent Center.
-2. Open the application and download the complete correspondence history.
+2. Open the application and download the Filing Receipt, application data and
+   current status, all outgoing correspondence, submitted-document list, fee
+   payment history, and transaction history.
 3. Identify the newest USPTO notice and its mailing date.
-4. Record the statutory response period and whether extensions are permitted.
-5. Have a registered patent practitioner review any substantive response.
+4. Record the response period and extension language stated in that notice.
+5. Verify whether the official file contains the specification, claims,
+   abstract, drawings, ADS, oath or declaration, and all required fees.
+6. Have a registered patent practitioner review any substantive response and
+   any foreign or PCT priority strategy.
 
-Do not calculate an extension from July 25, 2025. The controlling date, if a
-response is due, will be in the relevant USPTO notice.
+Do not calculate a U.S. prosecution response deadline from a filing
+anniversary. The controlling date, if a response is due, will be in the
+relevant USPTO notice. Foreign or PCT priority is a separate, potentially
+time-sensitive question; do not assume either preservation or restoration.
 
-Status: `BLOCKED_ON_AUTHENTICATED_CORRESPONDENCE`
+Status: `PAYMENT_ACKNOWLEDGEMENT_ONLY_OFFICIAL_DOCKET_REQUIRED`
 
 ### 2. SAM.gov, UEI, And CAGE
 

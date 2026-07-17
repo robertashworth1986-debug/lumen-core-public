@@ -11,7 +11,7 @@ This packet is not legal advice. It does not claim patent grant, patentability, 
 - Invention families: `6`
 - Counsel questions: `6`
 - Intake items: `5`
-- Evidence artifacts: `8`
+- Evidence artifacts: `10`
 - Missing evidence: `0`
 - Reviewer gate clear: `true`
 - Unsafe sensitive hits: `0`
@@ -23,15 +23,27 @@ This packet is not legal advice. It does not claim patent grant, patentability, 
 - Public disclosure review required: `true`
 - Licensed counsel required: `true`
 - Human Patent Center check required: `true`
-- Packet SHA-256: `8141d3b37e71ff15d0228f6102d7bc87bd53ae3c719cd150fcceac0b3dceaaa4`
+- Patent deadline control: `PAYMENT_ACKNOWLEDGEMENT_ONLY_OFFICIAL_DOCKET_REQUIRED`
+- U.S. prosecution deadline verified: `false`
+- Foreign or PCT priority review time-sensitive: `true`
+- Packet SHA-256: `0a3a25e93a0468fa7c799c7379356f9df737eaa3d3c073a06d8754215443b925`
+
+## Deadline Evidence Control
+
+The local record proves a payment acknowledgement only. It does not prove a Filing Receipt, complete application, current status, verified claims, or an outstanding response deadline. The official Patent Center docket must be captured before any U.S. deadline claim. Foreign or PCT priority strategy is a separate, potentially time-sensitive counsel question.
+
+- Status: `PAYMENT_ACKNOWLEDGEMENT_ONLY_OFFICIAL_DOCKET_REQUIRED`
+- Control artifact: `grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json`
+- Private paths published: `false`
+- Application identifier published: `false`
 
 ## Official Sources
 
-### USPTO provisional application guidance
+### USPTO incomplete or missing application information
 
-- URL: https://www.uspto.gov/patents/basics/apply/provisional-application
-- Packet use: Confirm provisional pendency, nonprovisional timing, and provisional limits.
-- Verified fact: USPTO guidance says a provisional application cannot become a U.S. patent unless a nonprovisional filing or conversion occurs within the required 12-month period.
+- URL: https://www.uspto.gov/patents/apply/when-patent-applications-are-incomplete-or-missing-information
+- Packet use: Identify the role of OPAP notices and the response period stated in the controlling notice.
+- Verified fact: USPTO guidance says an OPAP notice identifies missing or deficient application items, the reply period, and any additional fees.
 
 ### USPTO nonprovisional utility filing guide
 
@@ -51,11 +63,11 @@ This packet is not legal advice. It does not claim patent grant, patentability, 
 - Packet use: Counsel-access route for under-resourced inventors or small businesses.
 - Verified fact: USPTO describes a nationwide network matching volunteer patent attorneys and agents with financially under-resourced inventors and small businesses.
 
-### USPTO restoration of provisional benefit
+### WIPO PCT restoration of priority
 
-- URL: https://www.uspto.gov/patents/apply/petitions/restoration-benefit-provisional-application-or-priority-foreign-application
-- Packet use: Counsel-only review if a deadline has passed or may be near.
-- Verified fact: USPTO describes petition-based restoration only in limited circumstances, including timing and unintentional-delay requirements.
+- URL: https://www.wipo.int/en/web/pct-system/texts/restoration
+- Packet use: Counsel-only review of any time-sensitive foreign or PCT priority strategy.
+- Verified fact: WIPO describes restoration of priority as limited, jurisdiction-dependent, and time-sensitive; availability must not be assumed.
 
 ## Invention Family Map
 
@@ -155,9 +167,11 @@ This packet is not legal advice. It does not claim patent grant, patentability, 
 
 - `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md` | present=`true` | bytes=`7643` | sha256=`274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb`
 - `grant_submissions/PATENT_LEGAL_RESCUE_PACKET_2026-06-20.md` | present=`true` | bytes=`6455` | sha256=`78f1356655372083a0906010cbfd669a409077c26bd1e46998fb1aaf6da7fcf8`
-- `grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md` | present=`true` | bytes=`16206` | sha256=`4e8e5f65d25c69cb38af1ddc5ede9560a7cd32aaf3277cafd0caeec820b438b3`
+- `grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md` | present=`true` | bytes=`16206` | sha256=`b670cb506ec97a24910515a39a8987a2a6d1659bece6817912d1ed39f5ba1a18`
 - `grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md` | present=`true` | bytes=`24099` | sha256=`cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390`
 - `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` | present=`true` | bytes=`20001` | sha256=`81a4f42d51f72e9c51e7cd645b804c3a47e64dbe65cf6ca02faa99d7b45419b6`
 - `grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md` | present=`true` | bytes=`9037` | sha256=`95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762`
-- `grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md` | present=`true` | bytes=`25708` | sha256=`5f75f6f5d698ae76c3794499b35efd43fa0c9be4258e08d8d0f3415fbca924f0`
-- `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` | present=`true` | bytes=`6279` | sha256=`c56fed102e513a1373d9d23317b7ff20c51adc77faa1cc1c5e1dd88e255cdd95`
+- `grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md` | present=`true` | bytes=`27683` | sha256=`f8d5e886dbea083bcb512748549e776d3a4c2e4b971ebb46c25b593001f16e7d`
+- `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` | present=`true` | bytes=`6279` | sha256=`c650985a63fe5c450dda5f4bb98729648cbc233ddb55aa0878d46df0e6efa786`
+- `grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json` | present=`true` | bytes=`6290` | sha256=`e51efbeee2b102ed8c79ccb771be51697eedbd3ba4f9f352c3a7d6cd2a02eb5a`
+- `grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.md` | present=`true` | bytes=`5201` | sha256=`59626a5f2cc9129bf58dd903b655c91438b6336c1abbe9ec0b7ed238c7261a6a`

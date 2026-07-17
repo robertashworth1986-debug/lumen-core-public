@@ -66,7 +66,7 @@ def test_action_control_packet_has_a_bounded_e_drive_integrity_receipt():
     receipt = json.loads(SYNC_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 9
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 18
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["destination_root"].startswith("E:/LumaProofVault/")
     assert "does not prove email transmission" in receipt["claim_boundary"]
@@ -89,4 +89,13 @@ def test_action_control_packet_has_a_bounded_e_drive_integrity_receipt():
         "tests/test_sam_public_credential_rotation_control.py",
         "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
         "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
+        "code/ops/BUILD_PATENT_DEADLINE_EVIDENCE_CONTROL.py",
+        "tests/test_patent_deadline_evidence_control.py",
+        "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json",
+        "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.md",
+        "code/ops/BUILD_IP_COUNSEL_DILIGENCE_PACKET.py",
+        "tests/test_ip_counsel_diligence_packet.py",
+        "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+        "dashboard/data/ip_counsel_diligence_packet.json",
+        "docs/DEADLINE_RECOVERY_CHECKLIST.md",
     }.issubset(mirrored_sources)

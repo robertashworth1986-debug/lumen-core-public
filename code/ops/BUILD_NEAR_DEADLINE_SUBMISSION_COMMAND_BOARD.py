@@ -55,6 +55,9 @@ EXTERNAL_ENGAGEMENT_REGISTER = (
 SAM_KEY_ROTATION_CONTROL = (
     SPRINT_DIR / "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json"
 )
+PATENT_DEADLINE_CONTROL = (
+    SPRINT_DIR / "PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json"
+)
 
 OUT_JSON = OUT_OPS / "near_deadline_submission_command_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "near_deadline_submission_command_board.json"
@@ -186,6 +189,7 @@ def base_sources() -> dict[str, Any]:
         "nashville_ec_human_fact_resolution": NASHVILLE_EC_FACT_RESOLUTION_JSON,
         "external_engagement_response_register": EXTERNAL_ENGAGEMENT_REGISTER,
         "sam_public_key_rotation_control": SAM_KEY_ROTATION_CONTROL,
+        "patent_deadline_evidence_control": PATENT_DEADLINE_CONTROL,
     }.items():
         if path.exists():
             data = path.read_bytes()
@@ -859,6 +863,9 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
     sam_rotation_control = read_json(SAM_KEY_ROTATION_CONTROL)
     if sam_rotation_control.get("schema") != "lumencore.sam_public_credential_rotation_control.v1":
         raise ValueError("SAM.gov API-key rotation control is missing or stale")
+    patent_deadline_control = read_json(PATENT_DEADLINE_CONTROL)
+    if patent_deadline_control.get("schema") != "lumencore.patent_deadline_evidence_control.v1":
+        raise ValueError("Patent deadline evidence control is missing or stale")
     lanes = build_command_lanes(
         sam_board,
         grants_ranked,
@@ -903,7 +910,7 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "no_bid_or_partner_only_count": len(no_bid),
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Retrieve and install the already-generated SAM.gov replacement public API key without exposing it, then complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close; NASA, Army, and CDC are already sent and receipt-backed.",
+            "strongest_today_action": "Retrieve and install the already-generated SAM.gov replacement public API key without exposing it, complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close, then capture the complete Patent Center docket for the separate U.S.-deadline and foreign/PCT-priority reviews; NASA, Army, and CDC are already sent and receipt-backed.",
             "critical_same_day_infrastructure_action": "SAM.gov public API-key rotation is due 2026-07-16. Entity registration remains active; credential rotation is a separate account-maintenance action.",
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
@@ -927,7 +934,19 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
                 "control_artifact": rel(SAM_KEY_ROTATION_CONTROL),
                 "human_action_required": True,
                 "browser_navigation_performed": False,
-            }
+            },
+            "patent_deadline_evidence": {
+                "status": patent_deadline_control["status"],
+                "payment_acknowledgement_found": patent_deadline_control["public_evidence_summary"]["payment_acknowledgement_found"],
+                "filing_receipt_found": patent_deadline_control["public_evidence_summary"]["filing_receipt_found"],
+                "official_correspondence_found": patent_deadline_control["public_evidence_summary"]["official_correspondence_found"],
+                "official_status_record_found": patent_deadline_control["public_evidence_summary"]["official_status_record_found"],
+                "us_prosecution_deadline": patent_deadline_control["deadline_posture"]["us_prosecution_deadline"],
+                "foreign_pct_priority": patent_deadline_control["deadline_posture"]["foreign_pct_priority"],
+                "control_artifact": rel(PATENT_DEADLINE_CONTROL),
+                "human_action_required": True,
+                "browser_navigation_performed": False,
+            },
         },
         "lanes": lanes,
         "sent_verified": [
@@ -1056,17 +1075,32 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
     ]
     for key, control in payload["operational_controls"].items():
+        lines.extend([f"### {key}", "", f"- Status: `{control['status']}`"])
+        if key == "sam_public_key_rotation":
+            lines.extend(
+                [
+                    f"- Deadline local: `{control['deadline_local']}`",
+                    f"- Aliases consistent: `{str(control['aliases_consistent']).lower()}`",
+                    f"- Replacement installation detected: `{str(control['replacement_installation_detected']).lower()}`",
+                    f"- API probe: `{control['api_probe']}`",
+                    f"- Rotation verified: `{str(control['rotation_verified']).lower()}`",
+                ]
+            )
+        elif key == "patent_deadline_evidence":
+            lines.extend(
+                [
+                    f"- Payment acknowledgement found: `{str(control['payment_acknowledgement_found']).lower()}`",
+                    f"- Filing Receipt found: `{str(control['filing_receipt_found']).lower()}`",
+                    f"- Official correspondence found: `{str(control['official_correspondence_found']).lower()}`",
+                    f"- Official status record found: `{str(control['official_status_record_found']).lower()}`",
+                    f"- U.S. prosecution deadline: `{control['us_prosecution_deadline']}`",
+                    f"- Foreign or PCT priority: `{control['foreign_pct_priority']}`",
+                ]
+            )
         lines.extend(
             [
-                f"### {key}",
-                "",
-                f"- Status: `{control['status']}`",
-                f"- Deadline local: `{control['deadline_local']}`",
-                f"- Aliases consistent: `{str(control['aliases_consistent']).lower()}`",
-                f"- Replacement installation detected: `{str(control['replacement_installation_detected']).lower()}`",
-                f"- API probe: `{control['api_probe']}`",
-                f"- Rotation verified: `{str(control['rotation_verified']).lower()}`",
                 f"- Human action required: `{str(control['human_action_required']).lower()}`",
+                f"- Browser navigation performed: `{str(control['browser_navigation_performed']).lower()}`",
                 f"- Control artifact: `{control['control_artifact']}`",
                 "",
             ]
