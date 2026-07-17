@@ -1,0 +1,58 @@
+{
+  "as_of_utc": "2026-07-17T22:32:09Z",
+  "available_authoritative_rules": [
+    "Do not merge or rebase the historical ProofLock donor branch wholesale.",
+    "Do not use git add -A or git add .",
+    "Snapshot and classify the complete current worktree before changing anything.",
+    "Create the clean judge branch from current origin/main.",
+    "Port only the focused Build Week files from donor commit 1578504204c429d7f05779897dc3d5430038f681 and the intentionally classified later local work.",
+    "Build the Evidence Lattice visual upgrade described in the handoff.",
+    "Run the focused tests and bounded repository shards.",
+    "Stage explicit paths, commit, push, and open a draft PR.",
+    "Do not submit Devpost, accept legal terms, publish a video, send email, or click a final confirmation.",
+    "Return the exact branch, commit, file list, test results, PR URL, exclusions, and remaining gates to Robert and Luma."
+  ],
+  "claim_boundary": "This public-safe receipt records the observable attachment state of one self-sent instruction message and a bounded exact-filename search. It does not preserve private message identifiers, addresses, raw MIME, credentials, or an unpublished handoff body. It does not prove that the file never existed or cannot arrive later.",
+  "control_boundary": "Only the ten rules present in the message body are available. The missing handoff's Evidence Lattice design, later-work classification, bounded test shards, and exact judge-branch execution details must not be invented, approximated, or represented as read.",
+  "execution_control": {
+    "may_accept_legal_terms": false,
+    "may_claim_full_handoff_read": false,
+    "may_click_final_confirmation": false,
+    "may_execute_embedded_rules": true,
+    "may_infer_missing_instructions": false,
+    "may_merge_or_rebase_donor_branch_wholesale": false,
+    "may_publish_video": false,
+    "may_send_email": false,
+    "may_stage_all_paths": false,
+    "may_submit_devpost": false
+  },
+  "integrity_findings": {
+    "bounded_local_exact_filename_found": false,
+    "bounded_local_exact_filename_match_count": 0,
+    "embedded_rule_count": 10,
+    "full_handoff_body_available": false,
+    "gmail_attachment_count": 0,
+    "gmail_attachment_present": false,
+    "message_stated_attachment": true,
+    "raw_mime_attachment_part_present": false
+  },
+  "recovery": {
+    "required_action": "Resend the named Markdown file as an actual attachment or place the exact file in an explicitly identified private handoff location, then refresh this receipt.",
+    "safe_continuation": "Continue bounded repository work under the embedded rules and existing AGENTS.md controls, but hold the handoff-specific Evidence Lattice implementation."
+  },
+  "referenced_filename": "LUMA_TO_CODEX_BUILD_WEEK_MASTER_HANDOFF_2026-07-17.md",
+  "schema": "lumencore.build_week_handoff_integrity_control.v1",
+  "source_receipt": {
+    "bytes": 2227,
+    "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/BUILD_WEEK_HANDOFF_SOURCE_RECEIPT_2026-07-17.json",
+    "present": true,
+    "sha256": "6CFF3DD3176EA42442FF92EE9CE4AAE09831E94C1F97E65DF6AE792959EC1681"
+  },
+  "status": "REFERENCED_HANDOFF_UNAVAILABLE_EXECUTION_SCOPE_BOUNDED",
+  "unavailable_instruction_scope": [
+    "Evidence Lattice visual design and acceptance criteria",
+    "Identity of intentionally classified later local work",
+    "Exact bounded repository shard list",
+    "Any handoff-specific exclusions, file map, or completion criteria not quoted in the message body"
+  ]
+}

@@ -26,7 +26,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `a60db3c47de49a3bdc74e053a81d4c022cc9a9e1dbc99fc18b76c70766cf444c`
+- Command board SHA-256: `abe73b4c84e1b76a395097f2be5b8e01c14eae09585faadae20afd4f6186f4bd`
 
 ## Operational Controls
 
@@ -804,7 +804,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - `launchtn_3686_application_manifest`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json` present=`true` sha256=`16fe4e214430055532f6fb7f57453e0f47daa648ee3e3b92b6050e17c98e3dc8`
 - `launchtn_3686_pitch_deck`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx` present=`true` sha256=`c607e94d8e072ec9d9f93da0d8c372fd5592b01d2ca3b4f71c0a079417c18a69`
 - `launchtn_3686_financial_model`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx` present=`true` sha256=`9da46f8ad94fc53ef561ee33dcfa6df907897caeadf6afbd08fb113fc6887d94`
-- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`265ceb9de326bee18af64e54b4007b122b7ec7390b252630c92b2d5b78af39c5`
+- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`f046d35a8e20bbc2944dd54dc42722bb1a496265f1dce411211125b770314c6d`
 - `fhwa_partner_outreach_control`: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json` present=`true` sha256=`39cbfe5f1c5db55c33d249adcfde1f04ae3983d69d1737f00a97403e168af364`
 - `fhwa_partner_response_control`: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md` present=`true` sha256=`a3de835ab830e37f6cf8cb3c8374f876150be8c48c185efe73344378558828cd`
 - `erdc_solution_brief_compliance_gate`: `grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json` present=`true` sha256=`dabaed4298b650855256e4054daf1be806f329846e1cd22cd01fd6f9d6f402cf`

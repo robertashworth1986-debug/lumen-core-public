@@ -1,0 +1,48 @@
+{
+  "schema": "lumencore.build_week_handoff_source_receipt.v1",
+  "observed_utc": "2026-07-17T22:32:09Z",
+  "source": {
+    "channel": "CONNECTED_GMAIL_FULL_MESSAGE_AND_RAW_MIME",
+    "mailbox_relationship": "SELF_SENT",
+    "sent_local": "2026-07-17T17:24:12-05:00",
+    "subject_present": false,
+    "message_count": 1,
+    "mime_top_level": "multipart/alternative",
+    "mime_leaf_types": [
+      "text/plain",
+      "text/html"
+    ]
+  },
+  "referenced_handoff": {
+    "filename": "LUMA_TO_CODEX_BUILD_WEEK_MASTER_HANDOFF_2026-07-17.md",
+    "stated_as_attached": true,
+    "gmail_has_attachment": false,
+    "gmail_attachment_count": 0,
+    "gmail_attachment_metadata": [],
+    "raw_mime_attachment_part_present": false
+  },
+  "bounded_local_search": {
+    "performed": true,
+    "root_aliases": [
+      "USER_DOWNLOADS",
+      "USER_ICLOUD_DRIVE",
+      "CODEX_ATTACHMENTS",
+      "LUMATRADER_WORKSPACE"
+    ],
+    "exact_filename_match_count": 0,
+    "exact_filename_found": false
+  },
+  "embedded_rules": [
+    "Do not merge or rebase the historical ProofLock donor branch wholesale.",
+    "Do not use git add -A or git add .",
+    "Snapshot and classify the complete current worktree before changing anything.",
+    "Create the clean judge branch from current origin/main.",
+    "Port only the focused Build Week files from donor commit 1578504204c429d7f05779897dc3d5430038f681 and the intentionally classified later local work.",
+    "Build the Evidence Lattice visual upgrade described in the handoff.",
+    "Run the focused tests and bounded repository shards.",
+    "Stage explicit paths, commit, push, and open a draft PR.",
+    "Do not submit Devpost, accept legal terms, publish a video, send email, or click a final confirmation.",
+    "Return the exact branch, commit, file list, test results, PR URL, exclusions, and remaining gates to Robert and Luma."
+  ],
+  "claim_boundary": "This public-safe receipt records the observable attachment state of one self-sent instruction message and a bounded exact-filename search. It does not preserve private message identifiers, addresses, raw MIME, credentials, or an unpublished handoff body. It does not prove that the file never existed or cannot arrive later."
+}

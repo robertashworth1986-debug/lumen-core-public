@@ -6,10 +6,10 @@ Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
 
 ## Control Line
 
-- Reconciled lanes: `15`
+- Reconciled lanes: `16`
 - Reply required now: `0`
 - Send now: `0`
-- Duplicate-outbound risks: `14`
+- Duplicate-outbound risks: `15`
 - Human account actions: `4`
 - Browser navigation performed: `false`
 
@@ -25,6 +25,7 @@ Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
 | DARPA Multi X Office | `FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING` | `false` | Monitor the existing agency thread for a receipt, clarification, or workshop invitation. Do not resend the package without a specific agency request. |
 | Defense SBIR/STTR Innovation Portal | `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN` | `false` | Complete and endorse all DSIP volumes, resolve the live legal/entity, CMMC, ITAR, cost, support, and authority gates, review the portal preview, and obtain action-time approval before final submission. |
 | OpenAI Build Week / Devpost | `PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN` | `false` | Confirm model provenance and the /feedback session ID, deploy the public demo, record the required public video, complete Devpost registration, and obtain action-time approval before final submission. |
+| OpenAI Build Week internal handoff | `REFERENCED_HANDOFF_UNAVAILABLE_EXECUTION_SCOPE_BOUNDED` | `false` | Resend or privately place the exact named handoff, then refresh its integrity receipt. Until then, preserve the ten embedded rules and do not invent the missing Evidence Lattice design or completion criteria. |
 | LvlUp Ventures / Power of the Pitch Week | `WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED` | `false` | Monitor the existing thread. Reply only if LvlUp's Investment Committee requests additional information; do not purchase the optional sponsor track or send an unsolicited duplicate packet. |
 | Terry Anderton / Vynetic | `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY` | `false` | Send nothing further unless Terry replies with a specific ask; then answer only that ask in the existing thread. |
 | Cambridge Systematics | `RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET` | `false` | Close this route without another reply or follow-up. Do not claim a partner or use Cambridge Systematics' experience. Reopen only for a future opportunity initiated by the firm. |

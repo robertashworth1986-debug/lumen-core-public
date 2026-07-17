@@ -68,7 +68,7 @@
   },
   "claim_boundary": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance.",
   "direct_answer": "Nashville EC confirmed in writing that its application remains open until 11:59 PM on July 17; the timezone is operationally treated as America/Chicago because the message itself did not state one. The support reply is not an application, so complete the founder-fact gate and reviewed portal workflow well before the close. DARPA-SN-26-97 received the formal two-attachment RFI package after inviting an instructions-aligned submission; monitor the thread without claiming deadline compliance or receipt acceptance. The Cambridge Systematics response lead then confirmed that its FHWA team is already set and will not add partners, so that route is closed with no follow-up. Georgia PATENTS also confirmed that it does not provide the requested already-filed prosecution support, so that route is closed. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. DARPA, EPRI, CDC, LANL, Terry, NASA, and Army are monitor-only. LvlUp confirmed that declining its optional paid sponsor track does not affect the separate investment and accelerator review, so monitor that thread without spending or sending a duplicate packet; duplicate sends would reduce credibility.",
-  "generated_utc": "2026-07-17T22:15:20.811250+00:00",
+  "generated_utc": "2026-07-17T22:35:06.176714+00:00",
   "inbox_risk_filters": [
     {
       "decision": "DO_NOT_TREAT_AS_OFFICIAL_SAM_NOTICE",
@@ -375,7 +375,7 @@
       "state": "SENT_VERIFIED_RESPONSE_PENDING"
     }
   ],
-  "register_sha256": "bbce4544e0ba3a9c6873509213c2c1d93571994b59cc1613634ae74c30b72370",
+  "register_sha256": "37b5497e1043190a3470697674efcd0f1595aadf11ff7510aee09a7464cc8a8a",
   "schema": "lumencore.external_engagement_response_register.v1",
   "source_artifacts": {
     "cdc_engagement_receipt": {
@@ -391,10 +391,10 @@
       "sha256": "89B64A1A282AB72F0738E068952A14A82E38F5AEC4A78C1B7D2B4F4930410CB4"
     },
     "email_action_reconciliation": {
-      "bytes": 12993,
+      "bytes": 14146,
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
       "present": true,
-      "sha256": "A499DA75CD4C772AB21C4F0ADA79D78C9BBC06501CCF5DD7EB8B806258AA75B0"
+      "sha256": "A724BB701FFD788EF9539CBC300F4B41E3232B30DD7ECAA62521A4101BACDEE8"
     },
     "epri_engagement_receipt": {
       "bytes": 1481,

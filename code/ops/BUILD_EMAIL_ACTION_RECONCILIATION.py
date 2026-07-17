@@ -34,6 +34,12 @@ OPENAI_BUILD_WEEK_READINESS = (
     / "OPENAI_BUILD_WEEK_20260721"
     / "OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json"
 )
+OPENAI_BUILD_WEEK_HANDOFF_CONTROL = (
+    ROOT
+    / "grant_submissions"
+    / "OPENAI_BUILD_WEEK_20260721"
+    / "BUILD_WEEK_HANDOFF_INTEGRITY_CONTROL_2026-07-17.json"
+)
 
 AS_OF_DATE = "2026-07-17"
 
@@ -61,6 +67,7 @@ def build_payload() -> dict[str, Any]:
     darpa = read_json(DARPA_SN_26_97_RECEIPT)
     missionweave = read_json(MISSIONWEAVE_ACTION_GATE)
     build_week = read_json(OPENAI_BUILD_WEEK_READINESS)
+    build_week_handoff = read_json(OPENAI_BUILD_WEEK_HANDOFF_CONTROL)
     if (
         nashville.get("schema")
         != "lumencore.nashville_ec_official_deadline_confirmation.v1"
@@ -94,6 +101,17 @@ def build_payload() -> dict[str, Any]:
         != "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
     ):
         raise ValueError("OpenAI Build Week readiness is missing or stale")
+    if (
+        build_week_handoff.get("schema")
+        != "lumencore.build_week_handoff_integrity_control.v1"
+        or build_week_handoff.get("status")
+        != "REFERENCED_HANDOFF_UNAVAILABLE_EXECUTION_SCOPE_BOUNDED"
+        or build_week_handoff.get("integrity_findings", {}).get(
+            "full_handoff_body_available"
+        )
+        is not False
+    ):
+        raise ValueError("OpenAI Build Week handoff integrity control is missing or stale")
 
     lanes = [
         {
@@ -235,6 +253,28 @@ def build_payload() -> dict[str, Any]:
             ),
         },
         {
+            "lane_id": "openai_build_week_internal_handoff",
+            "organization": "OpenAI Build Week internal handoff",
+            "latest_event_type": "SELF_SENT_HANDOFF_REFERENCE_WITHOUT_ATTACHMENT",
+            "latest_event_utc": build_week_handoff["as_of_utc"],
+            "state": build_week_handoff["status"],
+            "email_reply_required": False,
+            "send_now": False,
+            "no_send_before": None,
+            "do_not_duplicate_send": True,
+            "embedded_rule_count": build_week_handoff["integrity_findings"][
+                "embedded_rule_count"
+            ],
+            "full_handoff_body_available": build_week_handoff["integrity_findings"][
+                "full_handoff_body_available"
+            ],
+            "next_action": (
+                "Resend or privately place the exact named handoff, then refresh its integrity "
+                "receipt. Until then, preserve the ten embedded rules and do not invent the "
+                "missing Evidence Lattice design or completion criteria."
+            ),
+        },
+        {
             "lane_id": "lvlup_optional_paid_event",
             "organization": "LvlUp Ventures / Power of the Pitch Week",
             "latest_event_type": "INDEPENDENT_REVIEW_CONTINUATION_CONFIRMED",
@@ -361,6 +401,7 @@ def build_payload() -> dict[str, Any]:
             "Nashville EC Fall 2026 TakeOff deadline-support query",
             "DARPA-SN-26-97 formal RFI response and agency-thread state",
             "MissionWeave DSIP and OpenAI Build Week portal deadlines",
+            "OpenAI Build Week self-sent handoff attachment integrity",
             "CDC, NASA, Army, LvlUp, Terry Anderton, and Vynetic",
         ],
         "summary": {
@@ -397,6 +438,9 @@ def build_payload() -> dict[str, Any]:
             ),
             "openai_build_week_readiness": artifact_status(
                 OPENAI_BUILD_WEEK_READINESS
+            ),
+            "openai_build_week_handoff_integrity_control": artifact_status(
+                OPENAI_BUILD_WEEK_HANDOFF_CONTROL
             ),
         },
         "claim_boundary": (

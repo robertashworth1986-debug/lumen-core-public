@@ -117,6 +117,20 @@
     {
       "do_not_duplicate_send": true,
       "email_reply_required": false,
+      "embedded_rule_count": 10,
+      "full_handoff_body_available": false,
+      "lane_id": "openai_build_week_internal_handoff",
+      "latest_event_type": "SELF_SENT_HANDOFF_REFERENCE_WITHOUT_ATTACHMENT",
+      "latest_event_utc": "2026-07-17T22:32:09Z",
+      "next_action": "Resend or privately place the exact named handoff, then refresh its integrity receipt. Until then, preserve the ten embedded rules and do not invent the missing Evidence Lattice design or completion criteria.",
+      "no_send_before": null,
+      "organization": "OpenAI Build Week internal handoff",
+      "send_now": false,
+      "state": "REFERENCED_HANDOFF_UNAVAILABLE_EXECUTION_SCOPE_BOUNDED"
+    },
+    {
+      "do_not_duplicate_send": true,
+      "email_reply_required": false,
       "lane_id": "lvlup_optional_paid_event",
       "latest_event_type": "INDEPENDENT_REVIEW_CONTINUATION_CONFIRMED",
       "latest_event_utc": "2026-07-17T15:58:03Z",
@@ -221,6 +235,7 @@
     "Nashville EC Fall 2026 TakeOff deadline-support query",
     "DARPA-SN-26-97 formal RFI response and agency-thread state",
     "MissionWeave DSIP and OpenAI Build Week portal deadlines",
+    "OpenAI Build Week self-sent handoff attachment integrity",
     "CDC, NASA, Army, LvlUp, Terry Anderton, and Vynetic"
   ],
   "source_evidence": {
@@ -248,6 +263,12 @@
       "present": true,
       "sha256": "DAC4B3120D9B4EC2A822198426939B89FE96BF7294C0CC251D1A299BB76B00E2"
     },
+    "openai_build_week_handoff_integrity_control": {
+      "bytes": 3587,
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/BUILD_WEEK_HANDOFF_INTEGRITY_CONTROL_2026-07-17.json",
+      "present": true,
+      "sha256": "26907C567B22D6AE1B34EE83B2C39E588BAE01CB1E21E19D7E187714993E8EF6"
+    },
     "openai_build_week_readiness": {
       "bytes": 9865,
       "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json",
@@ -257,11 +278,11 @@
   },
   "status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
   "summary": {
-    "duplicate_outbound_risk_count": 14,
+    "duplicate_outbound_risk_count": 15,
     "email_reply_required_count": 0,
     "external_send_allowed_without_human": false,
     "human_account_action_count": 4,
-    "lane_count": 15,
+    "lane_count": 16,
     "out_of_office_count": 1,
     "send_now_count": 0
   }

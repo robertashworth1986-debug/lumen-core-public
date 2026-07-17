@@ -29,10 +29,10 @@ def test_reconciliation_is_deterministic_and_no_send():
     module.validate_payload(actual)
     assert actual == expected
     assert actual["status"] == "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
-    assert actual["summary"]["lane_count"] == 15
+    assert actual["summary"]["lane_count"] == 16
     assert actual["summary"]["email_reply_required_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
-    assert actual["summary"]["duplicate_outbound_risk_count"] == 14
+    assert actual["summary"]["duplicate_outbound_risk_count"] == 15
     assert actual["summary"]["human_account_action_count"] == 4
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert all(lane["send_now"] is False for lane in actual["lanes"])
@@ -87,6 +87,18 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert build_week["deadline_utc"] == "2026-07-22T00:00:00Z"
     assert build_week["state"] == "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
 
+    build_week_handoff = lanes["openai_build_week_internal_handoff"]
+    assert build_week_handoff["state"] == (
+        "REFERENCED_HANDOFF_UNAVAILABLE_EXECUTION_SCOPE_BOUNDED"
+    )
+    assert build_week_handoff["latest_event_type"] == (
+        "SELF_SENT_HANDOFF_REFERENCE_WITHOUT_ATTACHMENT"
+    )
+    assert build_week_handoff["embedded_rule_count"] == 10
+    assert build_week_handoff["full_handoff_body_available"] is False
+    assert build_week_handoff["do_not_duplicate_send"] is True
+    assert "do not invent" in build_week_handoff["next_action"]
+
     nashville = lanes["nashville_ec_takeoff_fall_2026"]
     assert nashville["latest_event_type"] == "OFFICIAL_DEADLINE_CONFIRMATION_RECEIVED"
     assert nashville["latest_event_utc"] == "2026-07-17T16:11:48Z"
@@ -119,6 +131,9 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert source_evidence["darpa_sn_26_97_public_submission_receipt"]["present"] is True
     assert source_evidence["missionweave_dsip_action_gate"]["present"] is True
     assert source_evidence["openai_build_week_readiness"]["present"] is True
+    assert source_evidence["openai_build_week_handoff_integrity_control"][
+        "present"
+    ] is True
     assert len(source_evidence["nashville_official_deadline_confirmation"]["sha256"]) == 64
     assert len(source_evidence["lvlup_independent_review_confirmation"]["sha256"]) == 64
 
