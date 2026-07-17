@@ -1,0 +1,77 @@
+name: Evidence route repair CI
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/evidence-route-repair-ci.yml'
+      - '.github/workflows/deploy.yml'
+      - 'code/ops/repair_evidence_route.py'
+      - 'code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh'
+      - 'dashboard/evidence/index_bounded.html'
+      - 'docs/EVIDENCE_ROUTE_RECOVERY.md'
+      - 'tests/test_repair_evidence_route.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/evidence-route-repair-ci.yml'
+      - '.github/workflows/deploy.yml'
+      - 'code/ops/repair_evidence_route.py'
+      - 'code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh'
+      - 'dashboard/evidence/index_bounded.html'
+      - 'docs/EVIDENCE_ROUTE_RECOVERY.md'
+      - 'tests/test_repair_evidence_route.py'
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-route-repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Compile repair utility and tests
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            code/ops/repair_evidence_route.py \
+            tests/test_repair_evidence_route.py
+
+      - name: Validate wrapper syntax
+        run: |
+          set -euo pipefail
+          bash -n code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh
+
+      - name: Run focused unit tests
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover \
+            -s tests \
+            -p 'test_repair_evidence_route.py' \
+            -v
+
+      - name: Verify canonical public-page contract
+        run: |
+          set -euo pipefail
+          PAGE=dashboard/evidence/index_bounded.html
+          test -s "$PAGE"
+          grep -Fq 'name="lumencore-surface" content="proof-to-pilot-evidence-v1"' "$PAGE"
+          grep -Fq 'One proof path. One bounded decision.' "$PAGE"
+          grep -Fq 'internal simulation, replay, benchmark, and hash records are not external validation' "$PAGE"
+          ! grep -Fq 'Open Quant Lab' "$PAGE"
+          ! grep -Fq 'Open Approval Hub' "$PAGE"
+          ! grep -Fq 'Undeniable Evidence' "$PAGE"
+
+      - name: Verify production deployment remains fail closed
+        run: |
+          set -euo pipefail
+          grep -Fq -- '--apply' code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh
+          grep -Fq 'nginx -t' code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh
+          grep -Fq 'Rolling back nginx configuration' code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh
+          grep -Fq 'proof-to-pilot-evidence-v1' code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh
+          grep -Fq 'concurrency:' .github/workflows/deploy.yml
+          grep -Fq 'Smoke test canonical production surfaces' .github/workflows/deploy.yml
+          grep -Fq 'REPAIR_EVIDENCE_ROUTE_ON_VPS.sh --apply' .github/workflows/deploy.yml
