@@ -1,0 +1,53 @@
+{
+  "approval_utc": null,
+  "candidate_price_usd": null,
+  "certifications": {
+    "direct_labor_rate_supported": false,
+    "founder_approved_candidate_price": false,
+    "indirect_treatment_supported": false,
+    "no_uncommitted_subcontractor_costs": false,
+    "other_direct_costs_itemized": false,
+    "phase_iii_and_iv_costs_excluded": true
+  },
+  "direct_labor": [
+    {
+      "hours": null,
+      "rate_basis": null,
+      "rate_usd": null,
+      "role": "Principal Investigator / Lead Engineer"
+    }
+  ],
+  "ffp_risk_reserve_pct": null,
+  "fringe": {
+    "base": "DIRECT_LABOR",
+    "rate_pct": null
+  },
+  "indirect": {
+    "base": "DIRECT_LABOR_PLUS_FRINGE",
+    "rate_pct": null
+  },
+  "opportunity_number": "W912HZ26SC005",
+  "other_direct_costs": [
+    {
+      "amount_usd": null,
+      "basis": null,
+      "name": "Cloud, data, storage, and reproducibility services"
+    },
+    {
+      "amount_usd": null,
+      "basis": null,
+      "name": "Authorized travel"
+    },
+    {
+      "amount_usd": null,
+      "basis": null,
+      "name": "Software, storage media, and small equipment"
+    }
+  ],
+  "period_weeks": 16,
+  "profit_pct": null,
+  "rounding_increment_usd": "1000.00",
+  "schema": "lumencore.erdc_sdc_phase2_rom_private.v1",
+  "scope": "PHASE_II_PROTOTYPE_DEVELOPMENT_ONLY",
+  "template_only": true
+}

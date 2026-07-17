@@ -1,0 +1,74 @@
+{
+  "approval": {
+    "approval_timestamp_present": false,
+    "founder_approved": false,
+    "rom_ready_for_private_pdf_insertion": false
+  },
+  "arithmetic": {
+    "candidate_matches_formula": false,
+    "candidate_price_present": false,
+    "candidate_price_value_exposed": false,
+    "checked": false,
+    "labor_role_count": 0,
+    "other_direct_cost_count": 0
+  },
+  "claim_boundary": "This public gate proves only that the private Phase II pricing workflow is structurally available and, when explicitly invoked, can verify arithmetic and approval flags without publishing private rates or dollar amounts. It is not a quote, certified accounting record, proposal submission, contract, award, Government price determination, SAM verification, or authorization to accept terms. Phase III and Phase IV costs are excluded.",
+  "controls": {
+    "browser_navigation_performed": false,
+    "external_send_allowed": false,
+    "final_portal_submit_allowed": false,
+    "phase_iii_or_iv_costs_allowed": false,
+    "sam_private_values_allowed_in_public_output": false
+  },
+  "deadline": "4:00 PM CT on August 7, 2026",
+  "formula": "candidate price = round_to_increment(((direct labor + fringe + indirect + other direct costs) * (1 + FFP risk reserve rate)) * (1 + profit rate))",
+  "funding_currently_available": false,
+  "gate_sha256": "8af8adae1ada5e60ac297f6e423a57857d045930a1f622b01389d2dba9f4fb71",
+  "generated_utc": "2026-07-17T10:50:43.341507+00:00",
+  "opportunity_number": "W912HZ26SC005",
+  "outputs": {
+    "json": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.md"
+  },
+  "period_weeks": 16,
+  "phase_scope": "PHASE_II_PROTOTYPE_DEVELOPMENT_ONLY",
+  "private_input": {
+    "expected_path": "grant_submissions/funding_sprint_20260709/private/W912HZ26SC005/ERDC_SDC_PHASE2_ROM.private.json",
+    "git_ignored_target": true,
+    "present": false,
+    "private_values_exposed": false,
+    "sha256": null
+  },
+  "private_template": "config/erdc_sdc_phase2_rom_private_template_v1.json",
+  "schema": "lumencore.erdc_sdc_phase2_rom_gate.v1",
+  "source_integrity": {
+    "all_checks_pass": true,
+    "files": [
+      {
+        "bytes_match": true,
+        "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+        "sha256_match": true
+      },
+      {
+        "bytes_match": true,
+        "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/HPCMP_SDC_FAQ_9June2026.pdf",
+        "sha256_match": true
+      }
+    ],
+    "manifest_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-16.json",
+    "manifest_sha256": "5a9e6cfc98e70c452e90f5a51dc16c64afdafd8fa4daf654cd2d5712bbf67894"
+  },
+  "status": "PRIVATE_ROM_INPUT_NOT_CAPTURED",
+  "submission_ready": false,
+  "unresolved_gates": [
+    "PRIVATE_INPUT_CAPTURE",
+    "DIRECT_RATE_SUPPORT",
+    "INDIRECT_TREATMENT",
+    "OTHER_DIRECT_COST_ITEMIZATION",
+    "NO_UNCOMMITTED_SUBCONTRACTOR_COSTS",
+    "FOUNDER_CANDIDATE_PRICE_APPROVAL",
+    "PRIVATE_PDF_INSERTION",
+    "SAM_IDENTITY_ADDRESS_AND_CONTRACT_STATUS_MATCH",
+    "PORTAL_PREVIEW_TERMS_AND_FINAL_CONFIRMATION"
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "generated_utc": "2026-07-17T10:51:54.9444543Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/ERDC_SDC_PHASE2_ROM_GATE_20260717",
+  "artifact_count": 7,
+  "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "private_input_mirrored": false,
+  "private_amounts_present_in_public_artifacts": false,
+  "artifacts": [
+    {
+      "source": ".gitignore",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\ERDC_SDC_PHASE2_ROM_GATE_20260717\\.gitignore",
+      "bytes": 2655,
+      "sha256": "C75EC0F208756D4E3482BB1047047B24C7F788B4CE597013A4D7F414C81D3267",
+      "copy_bytes": 2655,
+      "copy_sha256": "C75EC0F208756D4E3482BB1047047B24C7F788B4CE597013A4D7F414C81D3267",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "config/erdc_sdc_phase2_rom_private_template_v1.json",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\ERDC_SDC_PHASE2_ROM_GATE_20260717\\erdc_sdc_phase2_rom_private_template_v1.json",
+      "bytes": 1324,
+      "sha256": "3989259FED1E722D71FA9DD52A13B03A3497AA7B3DFC816FF6F61FF4B735096C",
+      "copy_bytes": 1324,
+      "copy_sha256": "3989259FED1E722D71FA9DD52A13B03A3497AA7B3DFC816FF6F61FF4B735096C",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_ERDC_SDC_PHASE2_ROM_GATE.py",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\ERDC_SDC_PHASE2_ROM_GATE_20260717\\BUILD_ERDC_SDC_PHASE2_ROM_GATE.py",
+      "bytes": 22863,
+      "sha256": "86F9DA59C0876AC83CDA1742BEB45FE3DB2EF7CD46DAA0F2EAAEDC2FEDB06109",
+      "copy_bytes": 22863,
+      "copy_sha256": "86F9DA59C0876AC83CDA1742BEB45FE3DB2EF7CD46DAA0F2EAAEDC2FEDB06109",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_erdc_sdc_phase2_rom_gate.py",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\ERDC_SDC_PHASE2_ROM_GATE_20260717\\test_erdc_sdc_phase2_rom_gate.py",
+      "bytes": 8444,
+      "sha256": "D40D6D83AA3E99ABCADABB88B4CB0D975AA744AA257782A648E5ED5851AE21FE",
+      "copy_bytes": 8444,
+      "copy_sha256": "D40D6D83AA3E99ABCADABB88B4CB0D975AA744AA257782A648E5ED5851AE21FE",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-17.md",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\ERDC_SDC_PHASE2_ROM_GATE_20260717\\ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-17.md",
+      "bytes": 2421,
+      "sha256": "002711F265D15B0E6435D401AAC54C29AE831406279F339DBEE165209FFD3888",
+      "copy_bytes": 2421,
+      "copy_sha256": "002711F265D15B0E6435D401AAC54C29AE831406279F339DBEE165209FFD3888",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\ERDC_SDC_PHASE2_ROM_GATE_20260717\\ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json",
+      "bytes": 3397,
+      "sha256": "03F656866D63C1C74838EE36BEF78EB5A8CF382FEE2820D4AFB2C324404B7574",
+      "copy_bytes": 3397,
+      "copy_sha256": "03F656866D63C1C74838EE36BEF78EB5A8CF382FEE2820D4AFB2C324404B7574",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.md",
+      "destination": "E:\\LumaProofVault\\SUBMISSIONS\\ERDC_SDC_PHASE2_ROM_GATE_20260717\\ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.md",
+      "bytes": 2723,
+      "sha256": "E0F0DEAB1411418E37BDDE2AFEE5D307742B8D9884D07D504ADA250A03299204",
+      "copy_bytes": 2723,
+      "copy_sha256": "E0F0DEAB1411418E37BDDE2AFEE5D307742B8D9884D07D504ADA250A03299204",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves byte-for-byte mirroring of the listed public-safe ERDC ROM workflow artifacts only. It does not mirror a private ROM input, disclose a price, prove submission, verify SAM, accept portal terms, or establish an award."
+}
