@@ -2,7 +2,7 @@
 
 This is the action board for getting the closest credible grants and federal contract responses fully staged.
 
-Direct answer: NASA, Army, and CDC are sent and receipt-backed; finish the July 17 Nashville EC TakeOff application first, then stage the rolling NSF Project Pitch and re-verify FHWA, while keeping DOJ/BOP partner-only.
+Direct answer: NASA, Army, and CDC are sent and receipt-backed; rotate the SAM.gov public API key due today without exposing it, then finish the July 17 Nashville EC TakeOff application, stage the rolling NSF Project Pitch, and re-verify FHWA while keeping DOJ/BOP partner-only.
 
 ## Control Line
 
@@ -15,7 +15,8 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; finish the July 
 - No-bid or partner-only lanes: `5`
 - Expired without verified send: `1`
 - Human-gated lanes: `12`
-- Strongest today action: Complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close, then stage the rolling NSF Project Pitch and re-verify FHWA; NASA, Army, and CDC are already sent and receipt-backed.
+- Strongest today action: Retrieve and install the already-generated SAM.gov replacement public API key without exposing it, then complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close; NASA, Army, and CDC are already sent and receipt-backed.
+- Critical same-day infrastructure action: SAM.gov public API-key rotation is due 2026-07-16. Entity registration remains active; credential rotation is a separate account-maintenance action.
 - Closest deadline lane: HHS-2026-ACL-NIDILRR-REGE-0212 RERC on AI-Driven Assistive and Rehabilitation Technologies, due July 16, 2026 at 11:59 PM Eastern Time; command TECHNICAL_CAPACITY_AND_DOMAIN_GATE; fit POTENTIAL_LUMA_SKIN_SUIT_FIT_NOT_YET_EVIDENCED_IN_REPOSITORY.
 - Closest stage-ready lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Best grants lane: NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. November 4, 2026 is planning only.
@@ -25,7 +26,20 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; finish the July 
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `98c98c2a41fda16e643992f5314f5fa167ef7f8e107e1c09ac00ec89e2518ce5`
+- Command board SHA-256: `9bb604523a6fda2d5d7eb382d2c4d7e81ae42d11d8035eedeb046f5b903452ff`
+
+## Operational Controls
+
+### sam_public_key_rotation
+
+- Status: `ROTATION_DUE_REPLACEMENT_NOT_DETECTED`
+- Deadline local: `2026-07-16`
+- Aliases consistent: `true`
+- Replacement installation detected: `false`
+- API probe: `HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE`
+- Rotation verified: `false`
+- Human action required: `true`
+- Control artifact: `grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json`
 
 ## Sent And Verified
 
@@ -605,3 +619,4 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; finish the July 
 - `nashville_ec_application_manifest`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json` present=`true` sha256=`1bc772f56253112a346f3a6c3d02d9bf328c639407587386bf00803c14ba764e`
 - `nashville_ec_human_fact_resolution`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json` present=`true` sha256=`ab807930d19b28bb5a2a7aef38b28c3e87b40b750d1ef891f61dbd6ce510ec9f`
 - `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`557d6becd811aefc9df93679df7f4d66ae01d4608e8162ca2831f5c41642b5b8`
+- `sam_public_key_rotation_control`: `grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json` present=`true` sha256=`8636429835230980cf3eb1e56fc6aae0517142ee09cb86dfaaa5f1e7445b7d4c`

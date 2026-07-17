@@ -35,6 +35,14 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert payload["summary"]["external_send_allowed_without_human"] is False
     assert payload["summary"]["pricing_allowed_without_human"] is False
     assert payload["summary"]["legal_certification_allowed_without_human"] is False
+    assert "SAM.gov public API-key rotation" in payload["summary"]["critical_same_day_infrastructure_action"]
+    sam_rotation = payload["operational_controls"]["sam_public_key_rotation"]
+    assert sam_rotation["status"] == "ROTATION_DUE_REPLACEMENT_NOT_DETECTED"
+    assert sam_rotation["aliases_consistent"] is True
+    assert sam_rotation["replacement_installation_detected"] is False
+    assert sam_rotation["rotation_verified"] is False
+    assert sam_rotation["human_action_required"] is True
+    assert sam_rotation["browser_navigation_performed"] is False
 
     stage_ids = {row["opportunity_number"] for row in payload["stage_now"]}
     assert "80TECH26RFI0020" not in stage_ids
@@ -135,6 +143,8 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "No-Bid Or Partner-Only" in rendered
     assert "Expired without verified send: `1`" in rendered
     assert "CDC are sent and receipt-backed" in rendered
+    assert "rotate the SAM.gov public API key due today" in rendered
+    assert "HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE" in rendered
     assert len(payload["command_board_sha256"]) == 64
 
     for source in (
@@ -147,6 +157,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "nashville_ec_application_manifest",
         "nashville_ec_human_fact_resolution",
         "external_engagement_response_register",
+        "sam_public_key_rotation_control",
     ):
         assert payload["source_ledgers"][source]["present"] is True
 

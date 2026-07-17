@@ -1,24 +1,24 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T01:07:52.7027080Z",
+  "created_utc": "2026-07-17T03:09:56.4556840Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/CURRENT_ACTION_CONTROL_20260716",
-  "artifact_count": 5,
+  "artifact_count": 9,
   "all_sha256_matched_after_copy": true,
   "artifacts": [
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 54404,
-      "sha256": "15562F52FC7D702ADFDC03CEBC9458FC004F8CE6F46252616272F2C94981FFAC"
+      "bytes": 62524,
+      "sha256": "DD29D3BD16F7E2EA9210A7FA5C587F6A536F498444E3AD61E20352CBF3CD51BA"
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 5018,
-      "sha256": "1C1CB3720F20297E2A3C3C4B8E14D80620C4DF12D26E501DA5B0719C71946F72"
+      "bytes": 7670,
+      "sha256": "8E61FFD1C3DDDD39D93658E3018EAA41F56333D08CF5D37107CB54F5623FBDCC"
     },
     {
       "source": "tests/test_epri_open_power_ai_mou_response.py",
-      "bytes": 2218,
-      "sha256": "D20DECABD90275B0B8E48DB471DB38F0E99E8899B3AAE00C63F7FAD338792DAB"
+      "bytes": 3244,
+      "sha256": "A9B0EB7303AEE1A3F2C8734CE2811B83FB9C5F42B8A4CED3377677C48C0FFD7A"
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
@@ -27,8 +27,28 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
-      "bytes": 30822,
-      "sha256": "2C0EBFBDA46E3B7B13083A12BC30588E7B7D03F69BDBF0725EE580B5F1C0C346"
+      "bytes": 37029,
+      "sha256": "FA4C8525AB7B65814E1F106007AD97DD37A8C8A35EA0CE3EE0466623644A5674"
+    },
+    {
+      "source": "code/ops/BUILD_SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL.py",
+      "bytes": 19745,
+      "sha256": "FA899A6644C3D5541D23DE66DE19C9394CEF220BD241EC1C50249BE7003AB29D"
+    },
+    {
+      "source": "tests/test_sam_public_credential_rotation_control.py",
+      "bytes": 6428,
+      "sha256": "934A22620B889F65337439C8894610F1BABA15D4A00B20C04E3B42854DA4914F"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
+      "bytes": 3980,
+      "sha256": "8636429835230980CF3EB1E56FC6AAE0517142EE09CB86DFAAA5F1E7445B7D4C"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
+      "bytes": 2007,
+      "sha256": "F42E4BEA2F08C9C910752B8B672ECEECADCFC40DF952999DF32589EA94A41671"
     }
   ],
   "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove email transmission, portal submission, agency acceptance, technical validation, award, deployment, or field performance."

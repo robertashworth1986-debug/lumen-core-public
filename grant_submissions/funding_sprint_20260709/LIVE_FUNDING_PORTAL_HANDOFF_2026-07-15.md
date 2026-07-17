@@ -30,7 +30,7 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 | Research.gov | Signed in; organization-role workflow open at `https://www.research.gov/accountmgmt/#/user/user-roles/affiliate?wizardType=manageOrg` | Exact SAM entity match found. Research.gov reports that the organization is not yet registered with NSF and requires the SAM POC to obtain the Administrator role. Continue factual contact fields and roles, then stop before review/certification submission. |
 | ERDCWERX | Signed in at the Sovereign Defense Cloud Submittable organization-search step | Verified UEI was entered. Search/result selection still needs confirmation before concept-form population. |
 | Grants.gov | Applicant login | Complete Login.gov authentication; use for workspace inspection, not NSF 26-511 submission. |
-| SAM.gov | Signed-in workspace with one active All Awards registration | No SAM action required in this sprint. Source of truth: `grant_submissions/SAM_GOV_ENTITY_STATUS_CAPTURE_2026-06-20.md`. |
+| SAM.gov | Signed-in workspace with one active All Awards registration | Entity registration is active. Separately, rotate the individual Public API Key by the July 16 reminder deadline using Account Details; never place the key in chat, Git, or a public artifact. Control: `grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md`. |
 | DARPA BAAT | Session-expired logout page | Reauthenticate later to inspect DICE feedback/workspace state. |
 | LinkedIn | Messaging login | Sign in before direct messages can be reviewed for real asks; networking notices are not treated as funding validation. |
 
@@ -43,6 +43,7 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 - The bounded LANL VISION follow-up package was sent on 2026-07-16 at 2:50 PM ET. No substantive LANL response was present in the latest checked mailbox window; monitor without duplicate sending before 2026-07-23.
 - The CDC RFI response was sent on 2026-07-16 with its two-page attachment. Lauren Peel, CDC Contracting Officer and OAS Policy Section Lead, confirmed receipt and stated that CDC will follow up. This is an engagement receipt, not technical validation or an award.
 - EPRI requested the private legal and signatory details needed to prepare an Open Power AI Consortium MOU. A private Gmail reply draft is ready; send only after the exact `send EPRI` action-time gate. This is onboarding activity, not executed membership or endorsement.
+- SAM.gov sent an official final reminder to rotate the individual-account Public API Key on July 16. The three local aliases are consistent, but the private fingerprint has not changed; rotation is not yet verified. This is credential maintenance, not an entity-registration defect.
 - The Nashville Entrepreneur Center TakeOff packet is staged for the July 17 close. Eleven required portal fields have been reduced to six concise founder confirmations in `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md`; all six still require human confirmation before final portal preview and submission.
 - Recent LinkedIn notices include direct messages and connection invitations, but their visible email excerpts do not establish a grant, contract, pilot, investment, or validation opportunity.
 
@@ -64,12 +65,13 @@ Generated for the LumenCore funding sprint. This record distinguishes official-s
 
 ## Next Execution Order
 
-1. Answer the six Nashville EC TakeOff founder-confirmation prompts and review the final portal preview before the July 17 close.
-2. Send the existing EPRI administrative reply only after the exact `send EPRI` action-time gate; attach no technical archive.
-3. Robert pastes the staged UEI into the SBIR Company Registration page; verify the exact legal-entity match and retrieve/create the SBC Control ID.
-4. Complete Research.gov organization contact fields and role choices; stop before the review/certification submission.
-5. Complete DSIP authentication, then populate and preview MissionWeave.
-6. Verify NSF Project Pitch/invitation status before creating an NSF proposal workspace.
-7. Monitor CDC, LANL, NASA, and Army; do not duplicate-send transmitted packages.
-8. Confirm the ERDC organization result, then populate the bounded concept form.
-9. Build the FALCON compliance and evidence crosswalk.
+1. In the existing signed-in SAM.gov tab, retrieve the already-generated replacement Public API Key and install it into the ignored local secret store; do not paste it into chat or Git.
+2. Answer the six Nashville EC TakeOff founder-confirmation prompts and review the final portal preview before the July 17 close.
+3. Send the existing EPRI administrative reply only after the exact `send EPRI` action-time gate; attach no technical archive.
+4. Robert pastes the staged UEI into the SBIR Company Registration page; verify the exact legal-entity match and retrieve/create the SBC Control ID.
+5. Complete Research.gov organization contact fields and role choices; stop before the review/certification submission.
+6. Complete DSIP authentication, then populate and preview MissionWeave.
+7. Verify NSF Project Pitch/invitation status before creating an NSF proposal workspace.
+8. Monitor CDC, LANL, NASA, and Army; do not duplicate-send transmitted packages.
+9. Confirm the ERDC organization result, then populate the bounded concept form.
+10. Build the FALCON compliance and evidence crosswalk.

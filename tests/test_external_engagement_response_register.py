@@ -102,7 +102,7 @@ def test_mirror_receipt_matches_every_bounded_source():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 25
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 29
     assert receipt["all_sha256_matched_after_copy"] is True
     for artifact in receipt["artifacts"]:
         source = ROOT / artifact["source"]
@@ -116,6 +116,10 @@ def test_mirror_receipt_matches_every_bounded_source():
         "tests/test_nashville_ec_human_fact_resolution.py",
         "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json",
         "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.md",
+        "code/ops/BUILD_SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL.py",
+        "tests/test_sam_public_credential_rotation_control.py",
+        "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
+        "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
     }.issubset(mirrored_sources)
 
     assert "does not prove" in receipt["claim_boundary"]

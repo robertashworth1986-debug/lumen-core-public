@@ -52,6 +52,9 @@ NASHVILLE_EC_FACT_RESOLUTION_MD = (
 EXTERNAL_ENGAGEMENT_REGISTER = (
     SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json"
 )
+SAM_KEY_ROTATION_CONTROL = (
+    SPRINT_DIR / "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json"
+)
 
 OUT_JSON = OUT_OPS / "near_deadline_submission_command_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "near_deadline_submission_command_board.json"
@@ -80,7 +83,7 @@ SENSITIVE_MARKERS = [
     "private key",
     "refresh_token",
     "client_secret",
-    "api_key",
+    "api_key=",
     "sk-",
     "xox",
 ]
@@ -182,6 +185,7 @@ def base_sources() -> dict[str, Any]:
         "nashville_ec_application_manifest": NASHVILLE_EC_MANIFEST,
         "nashville_ec_human_fact_resolution": NASHVILLE_EC_FACT_RESOLUTION_JSON,
         "external_engagement_response_register": EXTERNAL_ENGAGEMENT_REGISTER,
+        "sam_public_key_rotation_control": SAM_KEY_ROTATION_CONTROL,
     }.items():
         if path.exists():
             data = path.read_bytes()
@@ -852,6 +856,9 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
     zero = read_json(ZERO_FRICTION)
     submission_receipt = read_json(SUBMISSION_RECEIPT)
     cdc_engagement_receipt = read_json(CDC_ENGAGEMENT_RECEIPT)
+    sam_rotation_control = read_json(SAM_KEY_ROTATION_CONTROL)
+    if sam_rotation_control.get("schema") != "lumencore.sam_public_credential_rotation_control.v1":
+        raise ValueError("SAM.gov API-key rotation control is missing or stale")
     lanes = build_command_lanes(
         sam_board,
         grants_ranked,
@@ -896,7 +903,8 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "no_bid_or_partner_only_count": len(no_bid),
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close, then stage the rolling NSF Project Pitch and re-verify FHWA; NASA, Army, and CDC are already sent and receipt-backed.",
+            "strongest_today_action": "Retrieve and install the already-generated SAM.gov replacement public API key without exposing it, then complete the Nashville EC TakeOff human-fact gate and final portal preview before the July 17 close; NASA, Army, and CDC are already sent and receipt-backed.",
+            "critical_same_day_infrastructure_action": "SAM.gov public API-key rotation is due 2026-07-16. Entity registration remains active; credential rotation is a separate account-maintenance action.",
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
             "best_grants_lane": "NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. November 4, 2026 is planning only.",
@@ -907,6 +915,19 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "final_submit_allowed_without_human": False,
             "pricing_allowed_without_human": False,
             "legal_certification_allowed_without_human": False,
+        },
+        "operational_controls": {
+            "sam_public_key_rotation": {
+                "status": sam_rotation_control["status"],
+                "deadline_local": sam_rotation_control["deadline"]["date_local"],
+                "aliases_consistent": sam_rotation_control["local_configuration"]["aliases_consistent"],
+                "replacement_installation_detected": sam_rotation_control["local_configuration"]["replacement_installation_detected"],
+                "api_probe": sam_rotation_control["api_probe"]["classification"],
+                "rotation_verified": sam_rotation_control["rotation_verified"],
+                "control_artifact": rel(SAM_KEY_ROTATION_CONTROL),
+                "human_action_required": True,
+                "browser_navigation_performed": False,
+            }
         },
         "lanes": lanes,
         "sent_verified": [
@@ -1005,7 +1026,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        "Direct answer: NASA, Army, and CDC are sent and receipt-backed; finish the July 17 Nashville EC TakeOff application first, then stage the rolling NSF Project Pitch and re-verify FHWA, while keeping DOJ/BOP partner-only.",
+        "Direct answer: NASA, Army, and CDC are sent and receipt-backed; rotate the SAM.gov public API key due today without exposing it, then finish the July 17 Nashville EC TakeOff application, stage the rolling NSF Project Pitch, and re-verify FHWA while keeping DOJ/BOP partner-only.",
         "",
         "## Control Line",
         "",
@@ -1019,6 +1040,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Expired without verified send: `{summary['expired_without_verified_send_count']}`",
         f"- Human-gated lanes: `{summary['human_gated_count']}`",
         f"- Strongest today action: {summary['strongest_today_action']}",
+        f"- Critical same-day infrastructure action: {summary['critical_same_day_infrastructure_action']}",
         f"- Closest deadline lane: {summary['closest_deadline_lane']}",
         f"- Closest stage-ready lane: {summary['closest_stage_ready_lane']}",
         f"- Best grants lane: {summary['best_grants_lane']}",
@@ -1030,9 +1052,31 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Legal certification without human: `{str(summary['legal_certification_allowed_without_human']).lower()}`",
         f"- Command board SHA-256: `{payload['command_board_sha256']}`",
         "",
-        "## Sent And Verified",
+        "## Operational Controls",
         "",
     ]
+    for key, control in payload["operational_controls"].items():
+        lines.extend(
+            [
+                f"### {key}",
+                "",
+                f"- Status: `{control['status']}`",
+                f"- Deadline local: `{control['deadline_local']}`",
+                f"- Aliases consistent: `{str(control['aliases_consistent']).lower()}`",
+                f"- Replacement installation detected: `{str(control['replacement_installation_detected']).lower()}`",
+                f"- API probe: `{control['api_probe']}`",
+                f"- Rotation verified: `{str(control['rotation_verified']).lower()}`",
+                f"- Human action required: `{str(control['human_action_required']).lower()}`",
+                f"- Control artifact: `{control['control_artifact']}`",
+                "",
+            ]
+        )
+    lines.extend(
+        [
+        "## Sent And Verified",
+        "",
+        ]
+    )
     for row in payload["sent_verified"]:
         lines.extend(
             [
