@@ -128,3 +128,50 @@ def test_nsf_pitch_fields_stay_under_portal_limits():
     for field, row in nsf["nsf_fields"].items():
         assert row["ok"], field
         assert row["characters"] <= row["limit"], field
+
+    required = {row["path"] for row in nsf["required_artifacts"]}
+    assert (
+        "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md"
+        in required
+    )
+    assert (
+        "grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json"
+        in required
+    )
+
+    routing = nsf["nsf_routing"]
+    assert routing["schema"] == "lumencore.nsf_project_pitch_routing.v1"
+    assert routing["project_pitch"]["deadline"] is None
+    assert routing["project_pitch"]["final_submit_allowed_without_human"] is False
+    assert routing["full_proposal"]["invitation_required"] is True
+    assert routing["full_proposal"]["invitation_verified"] is False
+    assert routing["full_proposal"]["submission_allowed"] is False
+    assert routing["full_proposal"]["july_27_2026_reachable"] is False
+    assert routing["full_proposal"]["next_planning_target"] == "2026-11-04"
+
+
+def test_nsf_pitch_is_claim_bounded_and_contains_required_reviewer_content():
+    packet = (
+        ROOT
+        / "grant_submissions"
+        / "NSF_Project_Pitch"
+        / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md"
+    ).read_text(encoding="utf-8")
+    lowered = packet.lower()
+
+    for required in (
+        "high-risk technical innovation",
+        "leakage-resistant",
+        "abstention",
+        "initial customer",
+        "competitors include",
+        "team plan",
+        "negative result",
+    ):
+        assert required in lowered
+
+    for stale_metric in ("29-source", "25 measured", "2,580"):
+        assert stale_metric not in packet
+
+    assert "does not claim an NSF invitation" in packet
+    assert "does not claim" in lowered

@@ -1,6 +1,6 @@
 # NSF Project Pitch Readiness
 
-Updated: June 19, 2026
+Updated: July 16, 2026
 
 ## Status
 
@@ -9,14 +9,24 @@ Updated: June 19, 2026
   Pitch.
 - SAM.gov and Research.gov readiness are not required to send the short pitch,
   but they will block an invited full proposal.
-- Official NSF Project Pitch field limits were checked June 19, 2026:
+- Official NSF Project Pitch field limits were rechecked July 16, 2026:
   3,500 characters for Technology Innovation, 3,500 for Technical Objectives
   and Challenges, 1,750 for Market Opportunity, and 1,750 for Company and
   Team.
 - Portal-ready fields are drafted in
-  `PROJECT_PITCH_PORTAL_FIELDS_2026-06-19.md`.
+  `PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md`.
 - Paste-check controls are drafted in
-  `PROJECT_PITCH_PASTE_CHECK_2026-06-19.md`.
+  `PROJECT_PITCH_PASTE_CHECK_2026-07-16.md`.
+- Routing and deadline semantics are frozen in
+  `NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json`.
+- July 27, 2026 is a Phase I full-proposal deadline, not a Project Pitch
+  deadline. No verified NSF invitation means that deadline is not currently
+  reachable.
+- November 4, 2026 is a full-proposal planning target only if NSF issues a
+  valid invitation in time.
+- NSF 26-510 is the primary route. NSF 26-511 remains an alternate only if
+  NSF confirms that the proposed software-defined validation platform fits
+  the scientific-instrumentation pilot.
 
 ## Completed
 
@@ -32,16 +42,16 @@ Updated: June 19, 2026
 - Team gaps and evidence boundaries are explicit.
 - Primary topic selected for portal entry: Artificial Intelligence, with
   emphasis on trustworthy AI.
-- Official duplicate-pitch gate captured: only one Project Pitch per
-  submission deadline, and a business with a pending Project Pitch, open
-  invitation, or full SBIR/STTR Phase I proposal under review must wait for a
-  response before submitting another Project Pitch.
+- Official duplicate-pitch gate captured: only one Project Pitch can be
+  pending at a time, and a business with a pending Project Pitch, open
+  invitation, or full SBIR/STTR Phase I proposal under review must wait before
+  submitting another Project Pitch.
 
 ## Before Portal Entry
 
 1. Confirm the exact legal business name used for the NSF account.
 2. Confirm the founder/PI name and title to use consistently.
-3. Confirm that no substantially equivalent pitch is already under NSF review.
+3. Confirm that no Project Pitch is already pending.
 4. Confirm there is no open NSF invitation or full SBIR/STTR Phase I proposal
    under review for the same small business.
 5. Recount the four portal text fields after pasting because portal handling
@@ -60,5 +70,13 @@ Updated: June 19, 2026
 
 ## Official Source
 
-- NSF Project Pitch:
+- NSF Project Pitch overview:
+  https://seedfund.nsf.gov/project-pitch/
+- NSF Project Pitch details:
   https://seedfund.nsf.gov/apply/project-pitch/
+- NSF 26-510:
+  https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology/nsf26-510/solicitation
+- NSF 26-511:
+  https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology-0/nsf26-511/solicitation
+- Solicitation schedule:
+  https://seedfund.nsf.gov/solicitations/

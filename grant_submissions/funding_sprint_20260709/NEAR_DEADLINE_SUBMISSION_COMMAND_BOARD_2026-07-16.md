@@ -2,7 +2,7 @@
 
 This is the action board for getting the closest credible grants and federal contract responses fully staged.
 
-Direct answer: NASA, Army, and CDC are sent and receipt-backed; build NSF and re-verify FHWA next, keep DOJ/BOP partner-only, and expire missed lanes without implying a submission.
+Direct answer: NASA, Army, and CDC are sent and receipt-backed; stage the rolling NSF Project Pitch and re-verify FHWA next, keep DOJ/BOP partner-only, and expire missed lanes without implying a submission.
 
 ## Control Line
 
@@ -15,17 +15,17 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; build NSF and re
 - No-bid or partner-only lanes: `5`
 - Expired without verified send: `1`
 - Human-gated lanes: `11`
-- Strongest today action: Build the NSF scientific-instrumentation Project Pitch and re-verify the FHWA TSMO solicitation before portal work; NASA, Army, and CDC are already sent and receipt-backed.
+- Strongest today action: Stage the rolling NSF Project Pitch, verify that no pitch or invitation is already open, and re-verify the FHWA TSMO solicitation before portal work; NASA, Army, and CDC are already sent and receipt-backed.
 - Closest deadline lane: HHS-2026-ACL-NIDILRR-REGE-0212 RERC on AI-Driven Assistive and Rehabilitation Technologies, due July 16, 2026 at 11:59 PM Eastern Time; command TECHNICAL_CAPACITY_AND_DOMAIN_GATE; fit POTENTIAL_LUMA_SKIN_SUIT_FIT_NOT_YET_EVIDENCED_IN_REPOSITORY.
-- Closest stage-ready lane: 26-511 Small Business Innovation Research / Small Business Technology Transfer Phase I, Phase II, Fast-Track Programs (SBIR/STTR): A Pilot Emphasis on Scientific Instrumentation., due July 27, 2026 at 5:00 PM submitting organization's local time; command STAGE_PROJECT_PITCH; fit STRONG_SCIENTIFIC_INSTRUMENTATION_FIT.
-- Best grants lane: 26-511 NSF SBIR/STTR scientific instrumentation, due 2026-07-27.
+- Closest stage-ready lane: 693JJ326R000012 Transportation Systems Management and Operations Data Initiative, due 2026-08-03T13:00:00Z; command BUILD_PRIMARY_VOLUME; fit STRONG_MEASUREMENT_AND_TSMO_FIT.
+- Best grants lane: NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. November 4, 2026 is planning only.
 - Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03.
 - Fastest low-friction lane: NASA RFI was sent on 2026-07-13; no remaining lane is both complete and low-friction.
 - Final submit without human: `false`
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `d7ce1051dbb66a4b92b8e0f47dc331a6da48c02ddd80219a8e72e63ea74ef6e7`
+- Command board SHA-256: `13a90f110a0348e121053bfd289aedaafcff18d682734d2c4aa8912828d32c57`
 
 ## Sent And Verified
 
@@ -64,16 +64,17 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; build NSF and re
   - `FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md`
   - `FHWA_TSMO_COMPLIANCE_MATRIX_DRAFT_2026-07-11.md`
 
-### 5. 26-511 - Small Business Innovation Research / Small Business Technology Transfer Phase I, Phase II, Fast-Track Programs (SBIR/STTR): A Pilot Emphasis on Scientific Instrumentation.
+### 5. 26-510 - NSF Small Business Innovation Research / Small Business Technology Transfer Programs Phase I
 
 - Command: `STAGE_PROJECT_PITCH`
 - Deadline UTC: `None`
-- Official deadline: July 27, 2026 at 5:00 PM submitting organization's local time
-- Official URL: https://www.grants.gov/search-results-detail/362551
+- Official deadline: Project Pitch is the current rolling gate; November 4, 2026 is a planning target for a full proposal only if NSF issues a valid invitation
+- Official URL: https://seedfund.nsf.gov/project-pitch/
 - Package files:
-  - `NSF_PROJECT_PITCH_DRAFT_2026-07-09.md`
-  - `NSF_PROJECT_PITCH_PORTAL_FIELD_MAP_2026-07-11.md`
-  - `FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md`
+  - `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md`
+  - `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PASTE_CHECK_2026-07-16.md`
+  - `grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json`
+  - `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_READINESS.md`
 
 ### 6. W912HZ26SC005 - Sovereign Defense Cloud for High-Performance Computing Commercial Solutions Opening
 
@@ -244,35 +245,36 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; build NSF and re
 - Final submit without human: `false`
 - Lane SHA-256: `6d3f35cc94b26f07eb79b60974fad01dadb7e481ff02a4c137fb2d3d15ae0409`
 
-### 5. 26-511 - Small Business Innovation Research / Small Business Technology Transfer Phase I, Phase II, Fast-Track Programs (SBIR/STTR): A Pilot Emphasis on Scientific Instrumentation.
+### 5. 26-510 - NSF Small Business Innovation Research / Small Business Technology Transfer Programs Phase I
 
-- Source: `Grants.gov / NSF Seed Fund`
+- Source: `NSF Seed Fund Project Pitch`
 - Agency: `U.S. National Science Foundation`
 - Deadline UTC: `None`
-- Official deadline: July 27, 2026 at 5:00 PM submitting organization's local time
-- Days to close from scan date: `11`
-- Deadline bucket: `two_week_sprint`
+- Official deadline: Project Pitch is the current rolling gate; November 4, 2026 is a planning target for a full proposal only if NSF issues a valid invitation
+- Days to close from scan date: `111`
+- Deadline bucket: `later`
 - Command: `STAGE_PROJECT_PITCH`
-- Eligibility: `SMALL_BUSINESS_ELIGIBLE_INVITATION_AND_PORTAL_STATE_UNVERIFIED`
-- Fit: `STRONG_SCIENTIFIC_INSTRUMENTATION_FIT`
-- Route: NSF Seed Fund Project Pitch / Grants.gov full proposal if invited
-- Official URL: https://www.grants.gov/search-results-detail/362551
-- Secondary URL: https://seedfund.nsf.gov/project-pitch/
-- Why now: Strongest grants-side fit: small business, SBIR/STTR, Phase I, instrumentation emphasis. This is a better match than most broad human-services grants.
+- Eligibility: `PROJECT_PITCH_REQUIRED_INVITATION_NOT_VERIFIED`
+- Fit: `STRONG_TRUSTWORTHY_AI_FIT_26_510_26_511_STAFF_CONFIRMATION_REQUIRED`
+- Route: NSF Seed Fund Project Pitch now; Research.gov full proposal only after an official invitation
+- Official URL: https://seedfund.nsf.gov/project-pitch/
+- Secondary URL: https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology/nsf26-510/solicitation
+- Why now: This is the strongest grants-side route, but the immediate action is the rolling Project Pitch rather than a July 27 full proposal. NSF 26-510 is the cleaner general deep-technology fit; use 26-511 only if NSF confirms the software-defined scientific-instrumentation framing.
 - Today work:
-  - Open NSF Seed Fund Project Pitch and confirm account state.
-  - Use the existing NSF draft as the base pitch.
-  - Frame LumenCore as a scientific instrumentation and validation platform for measured-source AI/data systems.
+  - Confirm in the Project Pitch portal that no pitch is pending and no invitation or full proposal is open.
+  - Paste the four locally counted, claim-bounded fields from the canonical portal packet.
+  - Stop at final review so the legal company facts and submission certification can be checked.
 - Human gate:
-  - Robert confirms company profile, PI/ownership eligibility, and any budget facts.
-  - Robert approves final pitch submit.
+  - Robert confirms the legal company profile, PI eligibility, and portal status.
+  - Robert reviews the final portal preview and approves the Project Pitch submission.
 - Package files:
-  - `NSF_PROJECT_PITCH_DRAFT_2026-07-09.md`
-  - `NSF_PROJECT_PITCH_PORTAL_FIELD_MAP_2026-07-11.md`
-  - `FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md`
+  - `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md`
+  - `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PASTE_CHECK_2026-07-16.md`
+  - `grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json`
+  - `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_READINESS.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `7d20a13d8c6c6fcd99b9da266d900318d7081992f7066ad57ebff976fd09ee5e`
+- Lane SHA-256: `5b581d67136b790ecf1757e840618755e59b400fda93271f9152b15c19edb88e`
 
 ### 6. W912HZ26SC005 - Sovereign Defense Cloud for High-Performance Computing Commercial Solutions Opening
 
@@ -553,3 +555,5 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; build NSF and re
 - `cdc_engagement_receipt`: `grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json` present=`true` sha256=`292157621b722b1973a1aa55140f08586ab41d07fbe38672b348c73e8a865b78`
 - `doj_bop_go_no_go`: `grant_submissions/DOJ_BOP_15BCMS26Q70000005/DOJ_BOP_15BCMS26Q70000005_GO_NO_GO_2026-07-16.md` present=`true` sha256=`bd188bcb6a23f9786ed08dc0717d5e9c93fdd583e830b53983d9c5379850caa0`
 - `doj_bop_source_manifest`: `grant_submissions/DOJ_BOP_15BCMS26Q70000005/DOJ_BOP_15BCMS26Q70000005_SOURCE_MANIFEST_2026-07-16.json` present=`true` sha256=`0282a6778ecc0c31890b93c1f68ffdb011139086ee640595262b95600df6af46`
+- `nsf_project_pitch_portal_fields`: `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md` present=`true` sha256=`3f085b0007f7e8019a279faee8d00aa16a609b6d8acd715c4686b0e743260b39`
+- `nsf_project_pitch_routing_manifest`: `grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json` present=`true` sha256=`84247c7c52a686f72ce5113354e665ac3f3827bf408db8ac15b11d918583c825`

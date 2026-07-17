@@ -22,7 +22,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     module = load_module()
     payload = module.build_payload(scan_date=SCAN_DATE)
 
-    assert payload["schema"] == "near_deadline_submission_command_board_v3"
+    assert payload["schema"] == "near_deadline_submission_command_board_v4"
     assert payload["status"] == "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS"
     assert payload["summary"]["lane_count"] == 15
     assert payload["summary"]["stage_now_count"] == 3
@@ -40,7 +40,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "80TECH26RFI0020" not in stage_ids
     assert "ACCAPGAIDPRFI4" not in stage_ids
     assert "693JJ326R000012" in stage_ids
-    assert "26-511" in stage_ids
+    assert "26-510" in stage_ids
     assert "W912HZ26SC005" in stage_ids
 
     sent_ids = {row["opportunity_number"] for row in payload["sent_verified"]}
@@ -51,7 +51,21 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     }
 
     assert "HHS-2026-ACL-NIDILRR-REGE-0212" in payload["summary"]["closest_deadline_lane"]
-    assert "26-511" in payload["summary"]["closest_stage_ready_lane"]
+    assert "693JJ326R000012" in payload["summary"]["closest_stage_ready_lane"]
+
+    nsf = next(row for row in payload["lanes"] if row["opportunity_number"] == "26-510")
+    assert nsf["deadline_date"] == "2026-11-04"
+    assert nsf["deadline_utc"] is None
+    assert nsf["project_pitch_due_date"] is None
+    assert nsf["full_proposal_planning_deadline_date"] == "2026-11-04"
+    assert nsf["full_proposal_submission_allowed"] is False
+    assert nsf["invitation_verified"] is False
+    assert nsf["deadline_semantics"] == (
+        "PROJECT_PITCH_GATE_ROLLING_FULL_PROPOSAL_INVITATION_REQUIRED"
+    )
+    assert "planning target" in nsf["official_deadline_text"]
+    assert "26-510" in payload["summary"]["best_grants_lane"]
+    assert "planning only" in payload["summary"]["best_grants_lane"]
 
 
 def test_near_deadline_board_keeps_hud_and_bop_behind_correct_gates():
@@ -106,6 +120,8 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "cdc_engagement_receipt",
         "doj_bop_go_no_go",
         "doj_bop_source_manifest",
+        "nsf_project_pitch_portal_fields",
+        "nsf_project_pitch_routing_manifest",
     ):
         assert payload["source_ledgers"][source]["present"] is True
 

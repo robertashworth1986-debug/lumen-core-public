@@ -1,6 +1,6 @@
 # Top-Five Grant Submission Readiness Audit
 
-Generated UTC: 2026-07-16T19:33:43.494283+00:00
+Generated UTC: 2026-07-17T01:21:47.178459+00:00
 
 Posture: LOCAL_READY_PORTAL_BLOCKED
 
@@ -8,7 +8,7 @@ Posture: LOCAL_READY_PORTAL_BLOCKED
 
 - Packages checked: 5
 - Local blockers: 0
-- Portal/user blockers: 24
+- Portal/user blockers: 25
 - Geometry registry manifest: 3/3 matched
 
 ## Verified Portal Facts
@@ -72,7 +72,7 @@ Live-measured rows and frozen live replay are the promoted evidence lanes. Synth
 
 - portal: NSF Seed Fund Project Pitch portal
 - readiness: LOCAL_READY_PORTAL_BLOCKED_USER_GATES
-- required artifacts present: 3/3
+- required artifacts present: 4/4
 - evidence manifests matched: 0/0
 - NSF field counts:
   - Technology Innovation: 2852/3500 (648 remaining)
@@ -87,6 +87,7 @@ Live-measured rows and frozen live replay are the promoted evidence lanes. Synth
   - Legal business name and PI/founder title must be confirmed.
   - Duplicate-pitch/open-invitation/full-proposal status must be checked in the portal.
   - Portal paste counts must be confirmed after the user logs in.
+  - An official NSF invitation is required before any Phase I full proposal.
   - Fresh action-time approval is required before final save/submit actions.
 
 ### MissionWeave

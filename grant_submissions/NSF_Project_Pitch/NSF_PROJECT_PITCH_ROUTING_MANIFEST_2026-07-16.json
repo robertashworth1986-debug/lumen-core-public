@@ -1,0 +1,51 @@
+{
+  "as_of_date": "2026-07-16",
+  "claim_boundary": [
+    "No NSF invitation is claimed.",
+    "No full-proposal authorization is claimed.",
+    "No customer commitment, independent validation, award, or realized economic impact is claimed.",
+    "Portal state and legal company facts require human confirmation."
+  ],
+  "field_limits": {
+    "Company and Team": 1750,
+    "Market Opportunity": 1750,
+    "Technical Objectives and Challenges": 3500,
+    "Technology Innovation": 3500
+  },
+  "full_proposal": {
+    "invitation_required": true,
+    "invitation_verified": false,
+    "july_27_2026_reachable": false,
+    "next_planning_target": "2026-11-04",
+    "submission_allowed": false
+  },
+  "gmail_evidence": {
+    "inbound_invitation_found": false,
+    "search_as_of_date": "2026-07-16"
+  },
+  "official_sources": {
+    "project_pitch_details": "https://seedfund.nsf.gov/apply/project-pitch/",
+    "project_pitch_overview": "https://seedfund.nsf.gov/project-pitch/",
+    "solicitation_26_510": "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology/nsf26-510/solicitation",
+    "solicitation_26_511": "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology-0/nsf26-511/solicitation",
+    "solicitation_schedule": "https://seedfund.nsf.gov/solicitations/"
+  },
+  "portal_state": {
+    "full_proposal_under_review_verified": false,
+    "open_invitation_status_verified": false,
+    "pending_project_pitch_status_verified": false
+  },
+  "project_pitch": {
+    "current_gate": true,
+    "deadline": null,
+    "deadline_semantics": "ROLLING_NO_FIXED_DUE_DATE_LISTED",
+    "final_submit_allowed_without_human": false,
+    "portal_url": "https://seedfund.nsf.gov/project-pitch/"
+  },
+  "routing": {
+    "alternate_solicitation": "NSF 26-511 only if NSF confirms scientific-instrumentation fit",
+    "primary_solicitation": "NSF 26-510",
+    "reason": "The current proposal is a trustworthy-AI software and validation platform; the general deep-technology solicitation is the cleaner documented fit."
+  },
+  "schema": "lumencore.nsf_project_pitch_routing.v1"
+}

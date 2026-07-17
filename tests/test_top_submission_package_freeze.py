@@ -57,5 +57,6 @@ def test_freeze_markdown_preserves_submission_boundary_and_current_harbor_render
     assert "LumenCore_DICE_Abstract_WORKING_DRAFT.docx" in rendered
     assert "NV063_VOLUME2_TECHNICAL_DRAFT_2026-06-19.docx" in rendered
     assert "LIVE_BREADTH_PROVENANCE_ANNEX_2026-06-21.md" in rendered
-    assert "render_qa_20260620_baselines_v1" in rendered
+    assert "render_qa_20260716_dsip_candidate_v1" in rendered
+    assert "render_qa_20260620_baselines_v1" not in rendered
     assert "render_qa_20260620_injection_v2" not in rendered

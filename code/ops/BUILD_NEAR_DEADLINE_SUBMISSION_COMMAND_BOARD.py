@@ -31,6 +31,11 @@ DOJ_BOP_SOURCE_MANIFEST = (
     / "DOJ_BOP_15BCMS26Q70000005"
     / "DOJ_BOP_15BCMS26Q70000005_SOURCE_MANIFEST_2026-07-16.json"
 )
+NSF_PITCH_DIR = ROOT / "grant_submissions" / "NSF_Project_Pitch"
+NSF_PORTAL_FIELDS = NSF_PITCH_DIR / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md"
+NSF_ROUTING_MANIFEST = (
+    NSF_PITCH_DIR / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json"
+)
 
 OUT_JSON = OUT_OPS / "near_deadline_submission_command_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "near_deadline_submission_command_board.json"
@@ -154,6 +159,8 @@ def base_sources() -> dict[str, Any]:
         "cdc_engagement_receipt": CDC_ENGAGEMENT_RECEIPT,
         "doj_bop_go_no_go": DOJ_BOP_DECISION,
         "doj_bop_source_manifest": DOJ_BOP_SOURCE_MANIFEST,
+        "nsf_project_pitch_portal_fields": NSF_PORTAL_FIELDS,
+        "nsf_project_pitch_routing_manifest": NSF_ROUTING_MANIFEST,
     }.items():
         if path.exists():
             data = path.read_bytes()
@@ -278,7 +285,7 @@ def build_command_lanes(
     fhwa = sam.get("693JJ326R000012", {})
     erdc = sam.get("W912HZ26SC005", {})
     bop = sam.get("15BCMS26Q70000005", {})
-    nsf = grants.get("26-511", {})
+    nsf = grants.get("26-510", {})
     hud = grants.get("PDR-2600-DC-029Q", {})
     hhs_child = grants.get("HHS-2026-ACF-ACYF-CA-0037", {})
 
@@ -362,37 +369,56 @@ def build_command_lanes(
         },
         {
             "rank": 4,
-            "lane_id": "nsf_sbir_scientific_instrumentation",
-            "source_system": "Grants.gov / NSF Seed Fund",
-            "opportunity_number": "26-511",
+            "lane_id": "nsf_sbir_project_pitch",
+            "source_system": "NSF Seed Fund Project Pitch",
+            "opportunity_number": "26-510",
             "title": nsf.get(
                 "title",
-                "SBIR/STTR Pilot Emphasis on Scientific Instrumentation",
+                "NSF Small Business Innovation Research / Small Business Technology Transfer Programs Phase I",
             ),
             "agency": nsf.get("raw", {}).get("agency", "U.S. National Science Foundation"),
             "deadline_utc": None,
-            "deadline_date": "2026-07-27",
-            "official_deadline_text": "July 27, 2026 at 5:00 PM submitting organization's local time",
+            "deadline_date": "2026-11-04",
+            "deadline_semantics": "PROJECT_PITCH_GATE_ROLLING_FULL_PROPOSAL_INVITATION_REQUIRED",
+            "project_pitch_due_date": None,
+            "full_proposal_planning_deadline_date": "2026-11-04",
+            "full_proposal_submission_allowed": False,
+            "invitation_verified": False,
+            "portal_state_verified": False,
+            "official_deadline_text": (
+                "Project Pitch is the current rolling gate; November 4, 2026 is a "
+                "planning target for a full proposal only if NSF issues a valid invitation"
+            ),
             "command": "STAGE_PROJECT_PITCH",
-            "eligibility_state": "SMALL_BUSINESS_ELIGIBLE_INVITATION_AND_PORTAL_STATE_UNVERIFIED",
-            "fit_state": "STRONG_SCIENTIFIC_INSTRUMENTATION_FIT",
-            "submission_route": "NSF Seed Fund Project Pitch / Grants.gov full proposal if invited",
-            "official_url": "https://www.grants.gov/search-results-detail/362551",
-            "secondary_url": "https://seedfund.nsf.gov/project-pitch/",
+            "eligibility_state": "PROJECT_PITCH_REQUIRED_INVITATION_NOT_VERIFIED",
+            "fit_state": "STRONG_TRUSTWORTHY_AI_FIT_26_510_26_511_STAFF_CONFIRMATION_REQUIRED",
+            "submission_route": (
+                "NSF Seed Fund Project Pitch now; Research.gov full proposal only after "
+                "an official invitation"
+            ),
+            "official_url": "https://seedfund.nsf.gov/project-pitch/",
+            "secondary_url": "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology/nsf26-510/solicitation",
+            "alternate_url": "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology-0/nsf26-511/solicitation",
             "package_files": [
-                "NSF_PROJECT_PITCH_DRAFT_2026-07-09.md",
-                "NSF_PROJECT_PITCH_PORTAL_FIELD_MAP_2026-07-11.md",
-                "FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
+                rel(NSF_PORTAL_FIELDS),
+                rel(NSF_PITCH_DIR / "PROJECT_PITCH_PASTE_CHECK_2026-07-16.md"),
+                rel(NSF_ROUTING_MANIFEST),
+                rel(NSF_PITCH_DIR / "PROJECT_PITCH_READINESS.md"),
             ],
-            "why_now": "Strongest grants-side fit: small business, SBIR/STTR, Phase I, instrumentation emphasis. This is a better match than most broad human-services grants.",
+            "why_now": (
+                "This is the strongest grants-side route, but the immediate action is the "
+                "rolling Project Pitch rather than a July 27 full proposal. NSF 26-510 is "
+                "the cleaner general deep-technology fit; use 26-511 only if NSF confirms "
+                "the software-defined scientific-instrumentation framing."
+            ),
             "today_work": [
-                "Open NSF Seed Fund Project Pitch and confirm account state.",
-                "Use the existing NSF draft as the base pitch.",
-                "Frame LumenCore as a scientific instrumentation and validation platform for measured-source AI/data systems.",
+                "Confirm in the Project Pitch portal that no pitch is pending and no invitation or full proposal is open.",
+                "Paste the four locally counted, claim-bounded fields from the canonical portal packet.",
+                "Stop at final review so the legal company facts and submission certification can be checked.",
             ],
             "human_gate": [
-                "Robert confirms company profile, PI/ownership eligibility, and any budget facts.",
-                "Robert approves final pitch submit.",
+                "Robert confirms the legal company profile, PI eligibility, and portal status.",
+                "Robert reviews the final portal preview and approves the Project Pitch submission.",
             ],
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,
@@ -790,7 +816,7 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
     )
 
     payload: dict[str, Any] = {
-        "schema": "near_deadline_submission_command_board_v3",
+        "schema": "near_deadline_submission_command_board_v4",
         "generated_utc": now_utc(),
         "scan_date": scan_date.isoformat(),
         "status": "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS",
@@ -803,10 +829,10 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "no_bid_or_partner_only_count": len(no_bid),
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
-            "strongest_today_action": "Build the NSF scientific-instrumentation Project Pitch and re-verify the FHWA TSMO solicitation before portal work; NASA, Army, and CDC are already sent and receipt-backed.",
+            "strongest_today_action": "Stage the rolling NSF Project Pitch, verify that no pitch or invitation is already open, and re-verify the FHWA TSMO solicitation before portal work; NASA, Army, and CDC are already sent and receipt-backed.",
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
-            "best_grants_lane": "26-511 NSF SBIR/STTR scientific instrumentation, due 2026-07-27.",
+            "best_grants_lane": "NSF 26-510 Project Pitch gate; no fixed pitch due date is listed, and a full proposal requires an invitation. November 4, 2026 is planning only.",
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03.",
             "fastest_low_friction_lane": "NASA RFI was sent on 2026-07-13; no remaining lane is both complete and low-friction.",
             "all_final_actions_blocked_without_human": True,
@@ -912,7 +938,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        "Direct answer: NASA, Army, and CDC are sent and receipt-backed; build NSF and re-verify FHWA next, keep DOJ/BOP partner-only, and expire missed lanes without implying a submission.",
+        "Direct answer: NASA, Army, and CDC are sent and receipt-backed; stage the rolling NSF Project Pitch and re-verify FHWA next, keep DOJ/BOP partner-only, and expire missed lanes without implying a submission.",
         "",
         "## Control Line",
         "",

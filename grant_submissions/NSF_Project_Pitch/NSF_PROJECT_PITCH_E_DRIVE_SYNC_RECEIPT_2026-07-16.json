@@ -1,0 +1,75 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "created_utc": "2026-07-17T01:24:32.7755217Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/NSF_PROJECT_PITCH_CONTROL_20260716",
+  "artifact_count": 13,
+  "all_sha256_matched_after_copy": true,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "bytes": 56113,
+      "sha256": "12145E80946F3AE5AB1CEBBE3E2031E7DB1ECDDAF50EADF35BA33459112B5BD3"
+    },
+    {
+      "source": "code/ops/BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py",
+      "bytes": 33469,
+      "sha256": "6AFCD729CA2D7D6747165F115B17779FE9A0BFF50B96E5029ADD09439C6A4D4B"
+    },
+    {
+      "source": "tests/test_near_deadline_submission_command_board.py",
+      "bytes": 5832,
+      "sha256": "0974302788EA4ED3CC0DFE0C12512A1815D82ABF4F18817D79C9ED03EFEED8B5"
+    },
+    {
+      "source": "tests/test_grant_submission_readiness_audit.py",
+      "bytes": 7911,
+      "sha256": "7B3917B5F4015EC7218E0F5C84B1FC92AE4B56165FB6BDCD5E904A02DC83F417"
+    },
+    {
+      "source": "tests/test_top_submission_package_freeze.py",
+      "bytes": 2635,
+      "sha256": "B738CB9ABF91F646E388592BBB966783145B6C47382920B9E540270F074701BA"
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md",
+      "bytes": 10453,
+      "sha256": "3F085B0007F7E8019A279FAEE8D00AA16A609B6D8ACD715C4686B0E743260B39"
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PASTE_CHECK_2026-07-16.md",
+      "bytes": 1249,
+      "sha256": "12E9A37BA9FB45F2062B33A49827088E8C47B65CCF737DABF38A5ECC523CB0CF"
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json",
+      "bytes": 2155,
+      "sha256": "84247C7C52A686F72CE5113354E665AC3F3827BF408DB8AC15B11D918583C825"
+    },
+    {
+      "source": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_READINESS.md",
+      "bytes": 3744,
+      "sha256": "DED5AC56594FBEAE7C5B6FFAE7DF50DFCFA2296B98ADDA622BA73C441886FF53"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
+      "bytes": 31923,
+      "sha256": "4FE373200EEE84743ED40CFA48D2B00336311EDDBC6CE47F7F964ABC89878AD2"
+    },
+    {
+      "source": "grant_submissions/TOP5_SUBMISSION_READINESS_AUDIT_2026-06-19.md",
+      "bytes": 7029,
+      "sha256": "3F4EA558D29455BAAD351AFA010FD34370097BD91BF8D36C11110D1E8D1DE715"
+    },
+    {
+      "source": "out/ops/near_deadline_submission_command_board_latest.json",
+      "bytes": 42686,
+      "sha256": "A0F7B6B7AD878C58408983532988BF606CDAF3977363665DDEBF7E90AAAE728E"
+    },
+    {
+      "source": "out/ops/grant_submission_readiness_audit_latest.json",
+      "bytes": 24684,
+      "sha256": "D3A8297803CD9281DDDD89581783999289D4E2BA33DB7DD89768E718B8E2689C"
+    }
+  ],
+  "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove portal submission, NSF invitation, full-proposal authorization, agency acceptance, technical validation, award, deployment, or field performance."
+}

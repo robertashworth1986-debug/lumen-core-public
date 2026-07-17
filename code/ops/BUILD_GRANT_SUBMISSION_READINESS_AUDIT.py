@@ -110,8 +110,9 @@ TOP5 = {
         "portal": "NSF Seed Fund Project Pitch portal",
         "package": GRANTS / "NSF_Project_Pitch",
         "required_files": [
-            GRANTS / "NSF_Project_Pitch" / "PROJECT_PITCH_PORTAL_FIELDS_2026-06-19.md",
-            GRANTS / "NSF_Project_Pitch" / "PROJECT_PITCH_PASTE_CHECK_2026-06-19.md",
+            GRANTS / "NSF_Project_Pitch" / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md",
+            GRANTS / "NSF_Project_Pitch" / "PROJECT_PITCH_PASTE_CHECK_2026-07-16.md",
+            GRANTS / "NSF_Project_Pitch" / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json",
             GRANTS / "NSF_Project_Pitch" / "PROJECT_PITCH_READINESS.md",
         ],
         "evidence_dirs": [],
@@ -119,6 +120,7 @@ TOP5 = {
             "Legal business name and PI/founder title must be confirmed.",
             "Duplicate-pitch/open-invitation/full-proposal status must be checked in the portal.",
             "Portal paste counts must be confirmed after the user logs in.",
+            "An official NSF invitation is required before any Phase I full proposal.",
             "Fresh action-time approval is required before final save/submit actions.",
         ],
     },
@@ -450,9 +452,12 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
     claim_blockers = [f"risky claim phrase found in markdown: {hit}" for hit in claim_hits]
 
     nsf_fields = {}
+    nsf_routing = {}
     nsf_blockers = []
     if name == "NSF Project Pitch":
-        nsf_fields = extract_nsf_fields(cfg["package"] / "PROJECT_PITCH_PORTAL_FIELDS_2026-06-19.md")
+        nsf_fields = extract_nsf_fields(
+            cfg["package"] / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md"
+        )
         missing_fields = [field for field in NSF_LIMITS if field not in nsf_fields]
         nsf_blockers.extend(f"missing NSF field: {field}" for field in missing_fields)
         nsf_blockers.extend(
@@ -460,6 +465,23 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
             for field, row in nsf_fields.items()
             if not row["ok"]
         )
+        nsf_routing = read_json(
+            cfg["package"] / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json"
+        )
+        if nsf_routing.get("schema") != "lumencore.nsf_project_pitch_routing.v1":
+            nsf_blockers.append("NSF routing manifest schema is missing or invalid")
+        full_proposal = nsf_routing.get("full_proposal", {})
+        project_pitch = nsf_routing.get("project_pitch", {})
+        if full_proposal.get("invitation_required") is not True:
+            nsf_blockers.append("NSF full-proposal invitation gate is not enforced")
+        if full_proposal.get("submission_allowed") is not False:
+            nsf_blockers.append("NSF full proposal is incorrectly marked submit-allowed")
+        if full_proposal.get("july_27_2026_reachable") is not False:
+            nsf_blockers.append("July 27 is incorrectly represented as reachable")
+        if project_pitch.get("deadline") is not None:
+            nsf_blockers.append("NSF Project Pitch incorrectly has a fixed due date")
+        if project_pitch.get("final_submit_allowed_without_human") is not False:
+            nsf_blockers.append("NSF Project Pitch final submit lacks a human gate")
 
     local_blockers = []
     local_blockers.extend(f"missing required artifact: {path}" for path in missing)
@@ -561,6 +583,7 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
         "evidence_manifests": manifests,
         "render": render,
         "nsf_fields": nsf_fields,
+        "nsf_routing": nsf_routing,
         "local_blockers": local_blockers,
         "portal_user_blockers": portal_blockers,
         "verified_portal_facts": verified_portal_facts,
