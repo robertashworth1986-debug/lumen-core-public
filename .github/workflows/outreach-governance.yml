@@ -40,4 +40,5 @@ jobs:
         run: |
           grep -q "Codex is \*\*draft-only for all external communication\*\*" AGENTS.md
           grep -q "Work-in-progress limit" docs/CANONICAL_OPERATING_STATE.md
-          grep -q "No other outbound message is currently authorized" docs/CANONICAL_OPERATING_STATE.md
+          grep -q "standing delegation is bounded" docs/CANONICAL_OPERATING_STATE.md
+          grep -q "No external send is currently required merely because standing delegation exists" docs/CANONICAL_OPERATING_STATE.md
