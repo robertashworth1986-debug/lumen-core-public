@@ -172,7 +172,7 @@
       "first_documented_date": "2025",
       "evidence_state": "verified_current_repo",
       "public_state": "research_only",
-      "public_definition": "Market-data, runtime-control, scoring, dashboard, and evidence-discipline branch; no audited profit or guaranteed performance is asserted.",
+      "public_definition": "Market-data, runtime-control, scoring, dashboard, and evidence-discipline branch; no audited profit or performance assurance is asserted.",
       "sources": [
         {"type": "repo_path", "locator": "README.md"},
         {"type": "repo_path", "locator": "docs/CANONICAL_OPERATING_STATE.md"}
