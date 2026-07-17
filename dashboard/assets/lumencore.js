@@ -14,6 +14,7 @@
   })();
 
   const IS_FILE_PROTOCOL = location.protocol === 'file:';
+  const STATIC_REVIEWER = Boolean(window.LUMA_REVIEWER_MODE);
   const USER_API_BASE = (typeof window.LUMA_API_BASE === 'string' && window.LUMA_API_BASE.trim())
     ? window.LUMA_API_BASE.trim().replace(/\/$/, '')
     : '';
@@ -195,8 +196,8 @@
       ['/mission_control.html', 'Mission'],
       ['/grants.html', 'Grants'],
       ['/forecast.html', 'Forecast'],
-      ['/agent_approval_hub.html', 'Agents ⚡'],
-      ['/draftkings_parlay_lab.html', 'Parlay Lab 🎯'],
+      ['/agent_approval_hub.html', 'Agents'],
+      ['/draftkings_parlay_lab.html', 'Parlay Lab'],
       ['/anomalies.html', 'Anomalies'],
       ['/explain.html', 'Explain'],
       ['/lab.html', 'Lab'],
@@ -536,9 +537,9 @@
     tryNext();
   }
 
-  if (window.THREE) {
+  if (!STATIC_REVIEWER && window.THREE) {
     if (!IN_IFRAME) startWebGL();
-  } else if (!IN_IFRAME) {
+  } else if (!STATIC_REVIEWER && !IN_IFRAME) {
     if (!IS_FILE_PROTOCOL) {
       loadThreeWithFallback([
         './assets/vendor/three.min.js',
@@ -553,7 +554,7 @@
 
   // 4. WebSocket bridge: surface grants events as a toast (Mission Control feel)
   try {
-    const wsUrl = resolveWsUrl('/ws/live');
+    const wsUrl = STATIC_REVIEWER ? '' : resolveWsUrl('/ws/live');
     if (wsUrl) {
       const ws = new WebSocket(wsUrl);
       ws.onmessage = (e) => {

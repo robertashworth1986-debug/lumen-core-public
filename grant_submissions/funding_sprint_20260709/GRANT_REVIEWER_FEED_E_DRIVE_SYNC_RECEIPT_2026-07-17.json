@@ -1,0 +1,97 @@
+{
+  "schema": "lumencore.bounded_public_mirror_receipt.v1",
+  "generated_utc": "2026-07-17T07:39:25.635804Z",
+  "scope": "GRANT_REVIEWER_FEED_CONTROL_20260717",
+  "source_copy": "C_WORKTREE_AND_GITHUB_COMMIT_CONTAINING_THIS_RECEIPT",
+  "mirror_copy": "E_DRIVE/LumaProofVault/SUBMISSIONS/GRANT_REVIEWER_FEED_CONTROL_20260717",
+  "manifest_sha256": "1f557a86d7f0c8fff6f8d8cb5cabc80f636aa8e6d1de8c693b239c6a199ff44c",
+  "files": [
+    {
+      "relative_path": ".gitignore",
+      "bytes": 2590,
+      "sha256": "2c2db5af3f9283c8b47151e15b087802d35369afcac43917a24fbcfdcf1d690b",
+      "mirror_match": true
+    },
+    {
+      "relative_path": "code/ops/BUILD_GRANT_REVIEWER_FEED.py",
+      "bytes": 26700,
+      "sha256": "576aeeeb63b98ada552130e7f546829c4655cbb122d37444503731e3d93db632",
+      "mirror_match": true
+    },
+    {
+      "relative_path": "config/grant_reviewer_curation_v1.json",
+      "bytes": 6354,
+      "sha256": "8a59d654b799539a38be7b3b2eaf7fd549a1f62da25a909b1d176d951bfea049",
+      "mirror_match": true
+    },
+    {
+      "relative_path": "dashboard/grants.html",
+      "bytes": 125642,
+      "sha256": "6582e037a2624d38423a8d688b8ae8809ec242a33bd497c13e212a1753ccc56d",
+      "mirror_match": true
+    },
+    {
+      "relative_path": "dashboard/assets/lumencore.js",
+      "bytes": 24800,
+      "sha256": "947b739356f6534173348c3176d797bda0e7e96ae883a6e0bb4f9fc5052ec0eb",
+      "mirror_match": true
+    },
+    {
+      "relative_path": "dashboard/data/grant_reviewer_feed.json",
+      "bytes": 28558,
+      "sha256": "5dec41bbda96560fb6af5be351e8834c941c1cc3dab142725632d08cc3eddcf7",
+      "mirror_match": true
+    },
+    {
+      "relative_path": "tests/test_grant_reviewer_feed.py",
+      "bytes": 7862,
+      "sha256": "05096ec264551fc74fa8d04649ba6c9698dca172033eaf3c0247c181d19815e7",
+      "mirror_match": true
+    },
+    {
+      "relative_path": "tests/test_grants_dashboard_reviewer_mode.py",
+      "bytes": 2397,
+      "sha256": "3b016343f5f06a4f7fd3b84547ea2bc1058d86117805d199921652bb532af7bb",
+      "mirror_match": true
+    },
+    {
+      "relative_path": "output/playwright/grants-reviewer-desktop.png",
+      "bytes": 337578,
+      "sha256": "dd862697d1150781095f3a3c46fceb65bcb3267500f4634af0553e1e2f917339",
+      "mirror_match": true,
+      "storage": "E_DRIVE_ONLY"
+    },
+    {
+      "relative_path": "output/playwright/grants-reviewer-mobile.png",
+      "bytes": 307658,
+      "sha256": "3b63dd505422c12905939c6206024ec42a4fe72c573c932f607ba555be15335e",
+      "mirror_match": true,
+      "storage": "E_DRIVE_ONLY"
+    }
+  ],
+  "verification": {
+    "focused_tests": "11 passed",
+    "desktop_viewport": "1440x1000",
+    "mobile_viewport": "390x844",
+    "desktop_horizontal_overflow": false,
+    "mobile_horizontal_overflow": false,
+    "visible_text_overflow_findings": 0,
+    "undersized_mobile_controls": 0,
+    "browser_console_errors": 0,
+    "reviewer_private_api_requests": 0,
+    "reviewer_websocket_requests": 0,
+    "forced_stale_banner_verified": true,
+    "forced_stale_candidate_downgrade_verified": true,
+    "fresh_snapshot_restore_verified": true
+  },
+  "boundaries": {
+    "browser_navigation_performed": false,
+    "in_app_dsip_browser_touched": false,
+    "private_grant_values_mirrored": false,
+    "operator_packets_mirrored": false,
+    "credentials_mirrored": false,
+    "screenshots_contain_public_reviewer_data_only": true,
+    "receipt_is_not_an_award_or_external_validation": true
+  },
+  "claim_boundary": "This receipt proves byte-for-byte mirroring and bounded local verification of the public reviewer feed. It does not prove eligibility, responsiveness, submission, selection, award, technical validation, endorsement, or current portal state."
+}

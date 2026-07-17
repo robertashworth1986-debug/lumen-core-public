@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <title>LumenCore — Grants Console</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -170,27 +171,173 @@
   table th, table td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
   table th { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--ink-dim);
               text-transform: uppercase; letter-spacing: 1.5px; text-align: left; }
+
+  /* Public reviewer mode is deliberately quiet, claim-bounded, and non-operational. */
+  html.reviewer-mode {
+    --bg-0: #f4f7f9;
+    --bg-1: #ffffff;
+    --ink: #17212b;
+    --ink-dim: #5c6975;
+    --neon-c: #087f8c;
+    --neon-p: #315b75;
+    --neon-g: #16794a;
+    --neon-a: #9a6700;
+    --neon-r: #b42318;
+    --glass: #ffffff;
+    --glass-2: #f7f9fb;
+    --border: #d6dde3;
+    --border-2: #9cabb6;
+  }
+  html.reviewer-mode body { background: #f4f7f9; color: var(--ink); }
+  html.reviewer-mode #bg-canvas,
+  html.reviewer-mode #lc-ambient,
+  html.reviewer-mode #grid-overlay,
+  html.reviewer-mode #scanlines,
+  html.reviewer-mode #grants-cinematic-host,
+  html.reviewer-mode #lc-boot,
+  html.reviewer-mode .lcf-rail,
+  html.reviewer-mode .lcf-palette { display: none !important; }
+  html.reviewer-mode * { letter-spacing: 0 !important; text-shadow: none !important; }
+  html.reviewer-mode .lc-stage { max-width: 1480px; padding: 20px 24px 48px; }
+  html.reviewer-mode .lc-topbar { margin-bottom: 20px; border-bottom-color: var(--border); }
+  html.reviewer-mode .lc-brand .lc-logo {
+    width: 38px; height: 38px; animation: none; box-shadow: none;
+    background: #087f8c;
+  }
+  html.reviewer-mode .lc-brand .lc-logo::after { background: #ffffff; }
+  html.reviewer-mode .lc-brand h1 {
+    color: #16384a; background: none; -webkit-text-fill-color: currentColor;
+    font-family: Inter, sans-serif; font-size: 20px;
+  }
+  html.reviewer-mode .lc-brand .lc-sub { font-family: Inter, sans-serif; font-size: 11px; text-transform: none; }
+  html.reviewer-mode .lc-nav a {
+    color: #52616d; font-family: Inter, sans-serif; font-size: 12px;
+    text-transform: none; border-radius: 4px;
+  }
+  html.reviewer-mode .lc-nav a[href*="draftkings"],
+  html.reviewer-mode .lc-nav a[href*="anomalies"],
+  html.reviewer-mode .lc-nav a[href*="explain"] { display: none; }
+  html.reviewer-mode .lc-nav a.active { color: #075f68; border-color: #87b8bd; background: #e9f4f5; box-shadow: none; }
+  html.reviewer-mode .lc-live { border-radius: 4px; background: #fff8e5; border-color: #e6c56f; color: #7a5200; }
+  html.reviewer-mode .lc-live::before { background: #9a6700; box-shadow: none; animation: none; }
+  html.reviewer-mode .reviewer-overview { padding: 0; border: 0; background: transparent; box-shadow: none; overflow: visible; }
+  html.reviewer-mode .reviewer-overview::before,
+  html.reviewer-mode .reviewer-overview::after { display: none; }
+  html.reviewer-mode .lc-panel {
+    background: #ffffff; border: 1px solid var(--border); border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(23, 33, 43, 0.05); backdrop-filter: none;
+  }
+  html.reviewer-mode .lc-panel:hover { border-color: var(--border); }
+  html.reviewer-mode .lc-panel::before,
+  html.reviewer-mode .lc-panel::after { display: none; }
+  html.reviewer-mode .lc-panel h2,
+  html.reviewer-mode .lc-panel h3 {
+    font-family: Inter, sans-serif; color: #32414c; font-size: 13px; text-transform: none;
+  }
+  html.reviewer-mode .lc-panel h2::before,
+  html.reviewer-mode .lc-panel h3::before { display: none; }
+  html.reviewer-mode .grants-grid { grid-template-columns: minmax(360px, 430px) minmax(0, 1fr); gap: 16px; align-items: start; }
+  html.reviewer-mode .mission-pulse-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  html.reviewer-mode .mission-card,
+  html.reviewer-mode .live-proof-board,
+  html.reviewer-mode .mission-drapers,
+  html.reviewer-mode .submission-card,
+  html.reviewer-mode .grant-item,
+  html.reviewer-mode .markdown {
+    background: #ffffff; border: 1px solid var(--border); border-radius: 6px;
+    box-shadow: none; backdrop-filter: none;
+  }
+  html.reviewer-mode .mission-card { min-height: 104px; }
+  html.reviewer-mode .mission-k,
+  html.reviewer-mode .mission-v,
+  html.reviewer-mode .mission-sub,
+  html.reviewer-mode .live-proof-k,
+  html.reviewer-mode .live-proof-v,
+  html.reviewer-mode .live-proof-sub,
+  html.reviewer-mode .topline { font-family: Inter, sans-serif !important; }
+  html.reviewer-mode .mission-v { font-size: 20px; }
+  html.reviewer-mode .mission-meter { display: none; }
+  html.reviewer-mode .mission-drapers { border-left: 4px solid #087f8c; }
+  html.reviewer-mode .mission-drapers .headline { color: #16384a; font-family: Inter, sans-serif; font-size: 16px; }
+  html.reviewer-mode .live-proof-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  html.reviewer-mode .live-proof-tile { background: #f8fafb; border: 1px solid var(--border); border-radius: 5px; }
+  html.reviewer-mode .live-proof-sub { overflow-wrap: anywhere; }
+  html.reviewer-mode .grant-list { max-height: 920px; }
+  html.reviewer-mode .grant-item { background: #ffffff; }
+  html.reviewer-mode .grant-item:hover { border-color: #7ca8ad; transform: none; box-shadow: none; }
+  html.reviewer-mode .grant-item.active { border-color: #087f8c; background: #f0f8f8; box-shadow: inset 3px 0 0 #087f8c; }
+  html.reviewer-mode .grant-item .row { align-items: flex-start; }
+  html.reviewer-mode .grant-item .agency { font-family: Inter, sans-serif; font-size: 12px; }
+  html.reviewer-mode .grant-item .program { color: #35444f; font-size: 13px; line-height: 1.35; margin-top: 4px; }
+  html.reviewer-mode .grant-item .score-bar { display: none; }
+  html.reviewer-mode .pill,
+  html.reviewer-mode .submission-badge {
+    border-radius: 4px; font-family: Inter, sans-serif; text-transform: none;
+    background: #ffffff; color: #52616d; border-color: #c7d0d7;
+  }
+  html.reviewer-mode .pill.approved,
+  html.reviewer-mode .pill.submitted { background: #edf7f1; color: #11663d; border-color: #8fc6a8; box-shadow: none; }
+  html.reviewer-mode .pill.draft { background: #f4f6f8; color: #52616d; border-color: #c7d0d7; box-shadow: none; }
+  html.reviewer-mode .pill.gated { background: #fff8e5; color: #7a5200; border-color: #e6c56f; box-shadow: none; }
+  html.reviewer-mode .btn-link,
+  html.reviewer-mode button {
+    font-family: Inter, sans-serif; text-transform: none; border-radius: 4px;
+    background: #ffffff; color: #075f68; border: 1px solid #8fb7bb;
+    box-shadow: none;
+  }
+  html.reviewer-mode button:hover,
+  html.reviewer-mode .btn-link:hover { transform: none; box-shadow: none; background: #edf6f6; }
+  html.reviewer-mode .operator-actions { display: none; }
+  html.reviewer-mode .markdown { max-height: none; }
+  html.reviewer-mode .reviewer-boundaries { margin: 10px 0 0; padding-left: 18px; color: var(--ink-dim); font-size: 12px; line-height: 1.55; }
+  html.reviewer-mode .reviewer-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+  html.reviewer-mode .reviewer-detail-row { padding: 12px 0; border-top: 1px solid var(--border); }
+  html.reviewer-mode .reviewer-detail-row:first-child { border-top: 0; }
+  html.reviewer-mode .reviewer-label { color: var(--ink-dim); font-size: 11px; text-transform: uppercase; }
+  html.reviewer-mode .reviewer-value { margin-top: 4px; font-size: 13px; line-height: 1.45; }
+  @media (max-width: 900px) {
+    html.reviewer-mode .grants-grid { grid-template-columns: 1fr; }
+    html.reviewer-mode .mission-pulse-grid,
+    html.reviewer-mode .live-proof-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    html.reviewer-mode .lc-stage { padding: 14px 12px 32px; }
+    html.reviewer-mode .mission-pulse-grid,
+    html.reviewer-mode .live-proof-grid,
+    html.reviewer-mode .reviewer-detail-grid { grid-template-columns: 1fr; }
+    html.reviewer-mode .grant-item .row { display: block; }
+    html.reviewer-mode .grant-item .row > .pill { display: inline-block; max-width: 100%; margin-top: 8px; }
+  }
 </style>
+<script>
+  (() => {
+    const params = new URLSearchParams(window.location.search || '');
+    const localHost = ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname);
+    window.LUMA_REVIEWER_MODE = !(localHost && params.get('operator') === '1');
+    document.documentElement.classList.toggle('reviewer-mode', window.LUMA_REVIEWER_MODE);
+  })();
+</script>
 </head>
 <body>
-<script>window.LC_CONFIG = { title: 'GRANTS', subtitle: 'Submission console · draft to submit-ready · $3.53M addressable',
-  bootLines: ['> handshake: grants api','> drafting submit-ready packages',
-              '> scanning contracts + loans + sbir + pilot ops','> preflight blockers + SF-424 map','> ready'] };</script>
+<script>window.LC_CONFIG = window.LUMA_REVIEWER_MODE
+  ? { title: 'GRANTS', subtitle: 'Reviewer-safe funding evidence and submission status', reviewer: true, bootLines: [] }
+  : { title: 'GRANTS', subtitle: 'Local operator submission console',
+      bootLines: ['> handshake: grants api','> loading operator artifacts','> preflight blockers','> ready'] };</script>
 
 <div id="grants-cinematic-host" aria-hidden="true"></div>
 
 <div class="lc-stage">
-  <div class="lc-panel" style="margin-bottom:14px">
-    <h2>Mission Pulse</h2>
+  <div class="lc-panel reviewer-overview" style="margin-bottom:14px">
+    <h2>Reviewer Readiness</h2>
     <div id="mission-drapers" class="mission-drapers"></div>
     <div id="mission-pulse" class="mission-pulse-grid"></div>
     <div id="top5-live-proof-board" class="live-proof-board"></div>
   </div>
   <div class="grants-grid">
     <div class="lc-panel">
-      <h2>Pipeline</h2>
+      <h2>Opportunity Docket</h2>
       <div class="summary" id="summary"></div>
-      <div class="toolbar">
+      <div class="toolbar operator-actions">
         <button class="lc-btn" id="draft-all">Draft to submit-ready</button>
         <button class="lc-btn secondary" id="opps-autopilot">Scan all opportunities</button>
         <button class="lc-btn secondary" id="regenerate">Regenerate all drafts</button>
@@ -250,6 +397,12 @@ function resolveApiBase() {
 const API_BASE = resolveApiBase();
 const CAN_TRY_LIVE_API = !(location.protocol === 'file:' && !API_BASE);
 const FILE_MODE = location.protocol === 'file:';
+const REVIEWER_MODE = Boolean(window.LUMA_REVIEWER_MODE);
+
+if (REVIEWER_MODE) {
+  const liveLabel = document.querySelector('.lc-live');
+  if (liveLabel) liveLabel.textContent = 'REVIEW';
+}
 
 function prioritizeFileCandidates(values, mirrorNeedle) {
   const src = Array.isArray(values) ? values : [];
@@ -296,6 +449,7 @@ const GRANT_READINESS_STATUS_REL = 'grant_dashboard_status_feed_latest.json';
 const TOP5_LIVE_PROOF_REL = 'top5_live_proof_submission_board_latest.json';
 const LIVE_PROOF_VALUE_METER_REL = 'live_proof_value_meter_latest.json';
 const GEOMETRY_ASSET_WIRING_REL = 'geometry_asset_wiring_board_latest.json';
+const GRANT_REVIEWER_FEED_REL = 'data/grant_reviewer_feed.json';
 
 let queue = null;
 let activeId = null;
@@ -311,6 +465,7 @@ let grantReadinessStatus = null;
 let top5LiveProofBoard = null;
 let liveProofValueMeter = null;
 let geometryAssetWiringBoard = null;
+let grantReviewerFeed = null;
 let meetDrapersSourcePath = null;
 let cinematicLayer = null;
 let urlBootstrapApplied = false;
@@ -329,6 +484,7 @@ const localCache = {
   top5LiveProofBoard: undefined,
   liveProofValueMeter: undefined,
   geometryAssetWiringBoard: undefined,
+  grantReviewerFeed: undefined,
 };
 
 function uniquePaths(values) {
@@ -570,7 +726,10 @@ function externalSubmissionSummary(ledger) {
   const records = Array.isArray(ledger?.records) ? ledger.records.filter(Boolean) : [];
   const validated = records.filter((row) => normalizeSubmissionStatus(row?.status).includes('validated')).length;
   const rejected = records.filter((row) => normalizeSubmissionStatus(row?.status).includes('rejected')).length;
-  const submitted = records.length;
+  const submitted = records.filter((row) => {
+    const status = normalizeSubmissionStatus(row?.status);
+    return !status.includes('rejected') && (status.includes('submitted') || status.includes('received_by_agency'));
+  }).length;
   return { records, submitted, validated, rejected };
 }
 
@@ -740,6 +899,125 @@ async function loadGeometryAssetWiringBoard() {
   localCache.geometryAssetWiringBoard = null;
   return null;
 }
+
+async function loadGrantReviewerFeed() {
+  if (localCache.grantReviewerFeed !== undefined) {
+    return localCache.grantReviewerFeed;
+  }
+  const candidates = uniquePaths([
+    `./${GRANT_REVIEWER_FEED_REL}`,
+    GRANT_REVIEWER_FEED_REL,
+    '/data/grant_reviewer_feed.json',
+    '/dashboard/data/grant_reviewer_feed.json',
+  ]);
+  for (const candidate of candidates) {
+    const payload = await fetchJsonLoose(candidate);
+    if (payload?.schema === 'grant_reviewer_feed_v2') {
+      localCache.grantReviewerFeed = payload;
+      return payload;
+    }
+  }
+  localCache.grantReviewerFeed = null;
+  return null;
+}
+
+function reviewerQueue(feed) {
+  const rows = Array.isArray(feed?.discovered_opportunities) ? feed.discovered_opportunities : [];
+  const items = rows.map((row, index) => ({
+    program_id: safeSeg(String(row.candidate_id || `candidate-${index + 1}`).replace(/:/g, '-')),
+    agency: row.agency || row.source || 'Official source',
+    program: row.title || row.opportunity_number || 'Untitled opportunity',
+    opp_num: row.opportunity_number || '',
+    score: Number(row.discovery_match_score || 0),
+    ceiling_usd: Number(row.notice_award_ceiling_usd || 0),
+    deadline_typical: row.close_date || 'Verify in official notice',
+    url: row.source_url || row.official_url || '#',
+    state: row.published_window_actionable === false ? 'date-gated' : 'candidate',
+    effective_state: row.eligibility_status || 'UNVERIFIED',
+    reviewer_record: row,
+  }));
+  return {
+    source: 'reviewer-feed',
+    generated_utc: feed?.generated_utc || null,
+    n_total: items.length,
+    n_draft: 0,
+    n_approved: 0,
+    n_submitted: Number(feed?.summary?.successful_submission_or_received || 0),
+    items,
+  };
+}
+
+function reviewerStatusLabel(value) {
+  const status = String(value || 'UNVERIFIED').toUpperCase();
+  const labels = {
+    BENCHMARK_AND_COMPLIANCE_GATED: 'Benchmark gated',
+    REPRESENTATIVE_DATA_AND_COMPLIANCE_GATED: 'Representative data gated',
+    SYNTHETIC_ONLY_AND_COMPLIANCE_GATED: 'Synthetic-only evidence',
+    CONDITIONAL_DP2_CANDIDATE: 'Conditional DP2',
+    UNVERIFIED: 'Unverified',
+  };
+  return labels[status] || status.replace(/_/g, ' ').toLowerCase();
+}
+
+function reviewerFeedFreshness(feed) {
+  const generatedRaw = feed?.freshness?.generated_utc || feed?.generated_utc || '';
+  const generatedMs = Date.parse(generatedRaw);
+  const ttlHours = Number(feed?.freshness?.ttl_hours || 24);
+  const ageHours = Number.isFinite(generatedMs)
+    ? Math.max((Date.now() - generatedMs) / 3600000, 0)
+    : null;
+  const stale = ageHours === null || !Number.isFinite(ttlHours) || ttlHours <= 0 || ageHours > ttlHours;
+  return {
+    stale,
+    ageHours,
+    ttlHours,
+    label: stale ? 'Stale snapshot - reverify deadlines' : 'Snapshot within freshness window',
+  };
+}
+
+function reviewerDeadlineLabel(value) {
+  const labels = {
+    OPEN_BY_PUBLISHED_DATES: 'Open by published dates',
+    DATE_ONLY_TIME_REVERIFY: 'Date published - time recheck',
+    NOT_OPEN_BY_PUBLISHED_DATES: 'Not open by published dates',
+    PUBLISHED_DEADLINE_PASSED_REVERIFY: 'Published deadline passed - recheck',
+    DEADLINE_UNVERIFIED: 'Deadline unverified',
+  };
+  const raw = String(value || 'DEADLINE_UNVERIFIED').toUpperCase();
+  return labels[raw] || raw.replace(/_/g, ' ').toLowerCase();
+}
+
+function reviewerAuthorityLabel(row) {
+  const raw = String(row?.source_authority_status || 'SOURCE_UNVERIFIED').toUpperCase();
+  if (raw === 'TOPIC_MIRROR_VERIFIED_DSIP_RECHECK_REQUIRED') return 'Unofficial topic mirror - DSIP recheck required';
+  if (raw === 'OFFICIAL_PAGE_VERIFIED') return 'Official opportunity page verified';
+  if (raw === 'OFFICIAL_DISCOVERY_SNAPSHOT_NOTICE_RECHECK_REQUIRED') return 'Official discovery snapshot - complete notice recheck required';
+  return raw.replace(/_/g, ' ').toLowerCase();
+}
+
+function reviewerSourceLinkLabel(row) {
+  const raw = String(row?.source_authority_status || '').toUpperCase();
+  return raw.includes('TOPIC_MIRROR') ? 'Open topic mirror' : 'Open official source';
+}
+
+function reviewerDate(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return 'Verify in official notice';
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return raw;
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(raw) || /^\d{2}\/\d{2}\/\d{4}$/.test(raw);
+  const options = dateOnly
+    ? { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }
+    : { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York', timeZoneName: 'short' };
+  return new Intl.DateTimeFormat('en-US', options).format(parsed);
+}
+
+function reviewerSourceStatus(value, source) {
+  const raw = String(value || 'unknown');
+  if (raw === 'ZERO_RECORDS_CAUSE_UNVERIFIED') return `${source} zero records; cause unverified`;
+  if (raw === 'HARVESTED_RECORDS_PRESENT') return `${source} records present in bounded harvest`;
+  return `${source} ${raw.replace(/_/g, ' ').toLowerCase()}`;
+}
 function drapersFrame(payload) {
   const rows = Array.isArray(payload?.scenario_projection)
     ? payload.scenario_projection
@@ -817,6 +1095,7 @@ function missionSnapshot() {
 }
 
 function ensureCinematicLayer() {
+  if (REVIEWER_MODE) return;
   if (cinematicLayer || !window.LumaCinematic) return;
   const host = $('grants-cinematic-host');
   if (!host) return;
@@ -828,6 +1107,7 @@ function ensureCinematicLayer() {
 }
 
 function updateCinematicLayer(snapshot) {
+  if (REVIEWER_MODE) return;
   ensureCinematicLayer();
   if (!cinematicLayer || !snapshot) return;
   cinematicLayer.setMetrics({
@@ -849,6 +1129,51 @@ function renderMissionPulse() {
   const pulseRoot = $('mission-pulse');
   const drapersRoot = $('mission-drapers');
   if (!pulseRoot || !drapersRoot) return;
+
+  if (REVIEWER_MODE) {
+    const summary = grantReviewerFeed?.summary || {};
+    const reproduction = grantReviewerFeed?.independent_reproduction || {};
+    const freshness = reviewerFeedFreshness(grantReviewerFeed);
+    const cards = [
+      {
+        key: 'Submission / receipt records',
+        value: String(Number(summary.successful_submission_or_received || 0)),
+        sub: `${Number(summary.agency_received || 0)} agency received · ${Number(summary.agency_tracking_assigned || 0)} tracking assigned · ${Number(summary.rejected_with_errors || 0)} rejected`,
+        cls: Number(summary.successful_submission_or_received || 0) > 0 ? 'good' : 'warn',
+      },
+      {
+        key: 'Portal / user gate snapshot',
+        value: String(Number(summary.portal_user_gates_snapshot || 0)),
+        sub: `${Number(summary.local_blockers_snapshot || 0)} local blockers · ${String(summary.readiness_snapshot_freshness || 'undated').replace(/_/g, ' ').toLowerCase()}`,
+        cls: Number(summary.portal_user_gates_snapshot || 0) > 0 ? 'warn' : 'good',
+      },
+      {
+        key: 'Independent reproduction',
+        value: reproduction.status === 'AWAITING_INDEPENDENT_RUNNER' ? 'Pending' : 'Recorded',
+        sub: `${escHTML(reproduction.expected_score || 'n/a')} frozen null result · qualification pass ${reproduction.qualification_gate_passed ? 'yes' : 'no'}`,
+        cls: reproduction.reviewer_identity_filled ? 'good' : 'warn',
+      },
+      {
+        key: 'Snapshot freshness',
+        value: freshness.stale ? 'Reverify' : 'Current',
+        sub: freshness.label,
+        cls: freshness.stale ? 'alert' : 'good',
+      },
+    ];
+    pulseRoot.innerHTML = cards.map((card) => `
+      <div class="mission-card">
+        <div class="mission-k">${escHTML(card.key)}</div>
+        <div class="mission-v ${card.cls}">${escHTML(card.value)}</div>
+        <div class="mission-sub">${escHTML(card.sub)}</div>
+      </div>
+    `).join('');
+    drapersRoot.innerHTML = `
+      <div class="topline">Reviewer boundary</div>
+      <div class="headline">Discovery, artifact, receipt, and evidence-gate status only</div>
+      <div class="detail">Approved local artifacts are drafts. Keyword matches are not eligibility decisions. Independent reproduction of a null result does not promote performance.</div>
+    `;
+    return;
+  }
 
   const snap = missionSnapshot();
   const feed = grantReadinessStatus && typeof grantReadinessStatus === 'object'
@@ -960,6 +1285,40 @@ function renderMissionPulse() {
 function renderTop5LiveProofBoard() {
   const root = $('top5-live-proof-board');
   if (!root) return;
+
+  if (REVIEWER_MODE) {
+    const feed = grantReviewerFeed || {};
+    const priority = feed.priority_candidate || {};
+    const reproduction = feed.independent_reproduction || {};
+    const sourceHealth = feed.source_health || {};
+    const boundaries = Array.isArray(feed.claim_boundaries) ? feed.claim_boundaries : [];
+    const freshness = reviewerFeedFreshness(feed);
+    const shortHash = String(reproduction.protocol_sha256 || '').slice(0, 16) || 'not published';
+    root.innerHTML = `
+      <div class="topline">Evidence gates · ${escHTML(freshness.label)} · generated ${escHTML(reviewerDate(feed.generated_utc))}</div>
+      <div class="live-proof-grid">
+        <div class="live-proof-tile">
+          <div class="live-proof-k">Priority candidate</div>
+          <div class="live-proof-v warn">${escHTML(String(priority.opportunity_number || 'FALCON'))}</div>
+          <div class="live-proof-sub">${escHTML(reviewerStatusLabel(priority.eligibility_status))}</div>
+          <div class="live-proof-sub">${escHTML(reviewerAuthorityLabel(priority))}</div>
+          ${isHttpUrl(priority.source_url) ? `<div style="margin-top:8px"><a class="btn-link" href="${escAttr(priority.source_url)}" target="_blank" rel="noopener">${escHTML(reviewerSourceLinkLabel(priority))}</a></div>` : ''}
+        </div>
+        <div class="live-proof-tile">
+          <div class="live-proof-k">Independent reproduction</div>
+          <div class="live-proof-v warn">${reproduction.reviewer_identity_filled ? 'Receipt recorded' : 'Runner pending'}</div>
+          <div class="live-proof-sub">Expected ${escHTML(String(reproduction.expected_score || 'n/a'))} null result · protocol ${escHTML(shortHash)}</div>
+        </div>
+        <div class="live-proof-tile">
+          <div class="live-proof-k">Discovery sources</div>
+          <div class="live-proof-v">${Number(sourceHealth.grants_gov?.records || 0).toLocaleString()} Grants.gov</div>
+          <div class="live-proof-sub">${escHTML(reviewerSourceStatus(sourceHealth.sam_gov?.status, 'SAM'))} · ${escHTML(reviewerSourceStatus(sourceHealth.sbir_gov?.status, 'SBIR'))}</div>
+        </div>
+      </div>
+      <ul class="reviewer-boundaries">${boundaries.map((item) => `<li>${escHTML(String(item))}</li>`).join('')}</ul>
+    `;
+    return;
+  }
 
   const board = top5LiveProofBoard && typeof top5LiveProofBoard === 'object'
     ? top5LiveProofBoard
@@ -1373,6 +1732,19 @@ async function api(path, opts = {}) {
 
 async function loadQueue() {
   try {
+    if (REVIEWER_MODE) {
+      grantReviewerFeed = await loadGrantReviewerFeed();
+      if (!grantReviewerFeed) throw new Error('Reviewer feed unavailable. No private grant artifacts were loaded.');
+      runtimeMode = 'reviewer';
+      queue = reviewerQueue(grantReviewerFeed);
+      renderQueue();
+      renderMissionPulse();
+      renderTop5LiveProofBoard();
+      const requested = resolveBootstrapGrantId();
+      const preferred = (queue.items || []).find((item) => item.program_id === requested) || (queue.items || [])[0];
+      if (preferred?.program_id) await loadDetail(preferred.program_id);
+      return;
+    }
     await loadGrantSubmitFitPack();
     externalSubmissionLedger = await loadExternalSubmissionLedger();
     waitingActions = await loadWaitingActions();
@@ -1410,8 +1782,62 @@ async function loadQueue() {
   }
 }
 
+function renderReviewerQueue() {
+  const summary = grantReviewerFeed?.summary || {};
+  const generated = grantReviewerFeed?.generated_utc || 'unavailable';
+  const freshness = reviewerFeedFreshness(grantReviewerFeed);
+  $('summary').innerHTML = [
+    `<span class="pill"><b>${Number(queue?.n_total || 0)}</b> curated opportunities</span>`,
+    `<span class="pill"><b>${Number(summary.local_dossiers_indexed || 0)}</b> local dossiers indexed</span>`,
+    `<span class="pill submitted"><b>${Number(summary.successful_submission_or_received || 0)}</b> submission / received records</span>`,
+    `<span class="pill"><b>${Number(summary.agency_received || 0)}</b> agency received</span>`,
+    `<span class="pill"><b>${Number(summary.award_receipts || 0)}</b> award receipts</span>`,
+    `<span class="pill ${freshness.stale ? 'gated' : 'approved'}">${escHTML(freshness.label)}</span>`,
+    `<span class="pill">generated ${escHTML(reviewerDate(generated))}</span>`,
+  ].join('');
+
+  const operatorToolbar = document.querySelector('.operator-actions');
+  if (operatorToolbar) operatorToolbar.setAttribute('aria-hidden', 'true');
+
+  const items = queue?.items || [];
+  $('grant-list').innerHTML = items.map((item) => {
+    const row = item.reviewer_record || {};
+    const ceiling = Number(item.ceiling_usd || 0);
+    const isUnverified = String(row.eligibility_status || '').toUpperCase() === 'UNVERIFIED';
+    const sourceRecheck = Boolean(row.source_recheck_required) || freshness.stale;
+    const status = freshness.stale
+      ? 'Snapshot stale - reverify'
+      : (sourceRecheck ? reviewerDeadlineLabel(row.deadline_state) : reviewerStatusLabel(row.eligibility_status));
+    return `
+      <li class="grant-item ${item.program_id === activeId ? 'active' : ''}" data-id="${escAttr(item.program_id)}">
+        <div class="row">
+          <div>
+            <div class="agency">${escHTML(item.agency || 'Official source')}</div>
+            <div class="program">${escHTML(item.program || '')}</div>
+          </div>
+          <span class="pill ${isUnverified ? 'draft' : 'gated'}">${escHTML(status)}</span>
+        </div>
+        <div class="meta">
+          ${ceiling > 0 ? `<span>notice ceiling ${moneyCompact(ceiling)}</span>` : ''}
+          <span>closes ${escHTML(reviewerDate(item.deadline_typical))}</span>
+          <span>${escHTML(reviewerDeadlineLabel(row.deadline_state))}</span>
+        </div>
+      </li>
+    `;
+  }).join('') || '<li class="empty">No sanitized reviewer candidates are available.</li>';
+
+  document.querySelectorAll('.grant-item').forEach((element) => {
+    element.addEventListener('click', () => loadDetail(element.dataset.id));
+  });
+}
+
 function renderQueue() {
   if (!queue) return;
+  if (REVIEWER_MODE) {
+    renderReviewerQueue();
+    renderMissionPulse();
+    return;
+  }
   const readOnly = runtimeMode === 'artifact';
   const readyCount = Number(submissionDashboard?.totals?.n_ready_to_submit || 0);
   const submittedFromPackets = Number(submissionDashboard?.totals?.n_submitted || 0);
@@ -1628,6 +2054,8 @@ async function applyUrlBootstrap() {
   activeTab = 'submission';
   await loadDetail(grantId);
 
+  if (REVIEWER_MODE) return;
+
   if (!parseBootstrapFlag(params.get('auto_fill'))) {
     return;
   }
@@ -1671,6 +2099,15 @@ async function loadDetail(id) {
   document.querySelectorAll('.grant-item').forEach(el => {
     el.classList.toggle('active', el.dataset.id === id);
   });
+  if (REVIEWER_MODE) {
+    const item = (queue?.items || []).find((row) => row.program_id === id);
+    if (!item) {
+      $('detail').innerHTML = '<div class="err">Sanitized reviewer record not found.</div>';
+      return;
+    }
+    renderReviewerDetail(item);
+    return;
+  }
   try {
     const d = await api(`/api/grants/${encodeURIComponent(id)}`);
     activeDetail = d;
@@ -1685,6 +2122,62 @@ async function loadDetail(id) {
   } catch (e) {
     $('detail').innerHTML = `<div class="err">${e.message}</div>`;
   }
+}
+
+function renderReviewerDetail(item) {
+  const row = item.reviewer_record || {};
+  const reproduction = grantReviewerFeed?.independent_reproduction || {};
+  const freshness = reviewerFeedFreshness(grantReviewerFeed);
+  const isFalcon = row.opportunity_number === 'DPA26BZ04-DV016';
+  const ceiling = Number(row.notice_award_ceiling_usd || 0);
+  const floor = Number(row.notice_award_floor_usd || 0);
+  const keywords = Array.isArray(row.keyword_matches) ? row.keyword_matches : [];
+  const protocolHash = String(reproduction.protocol_sha256 || 'not published');
+  $('detail').innerHTML = `
+    <h2 style="margin:0 0 6px;font-size:20px">${escHTML(String(row.title || item.program || 'Opportunity'))}</h2>
+    <p style="color:var(--ink-dim);margin:0 0 14px">${escHTML(String(row.agency || item.agency || 'Official source'))} · ${escHTML(String(row.opportunity_number || 'number unavailable'))}</p>
+    <div class="submission-badges">
+      <span class="submission-badge warn">eligibility ${escHTML(reviewerStatusLabel(row.eligibility_status))}</span>
+      <span class="submission-badge">status ${escHTML(String(row.submission_status || 'DISCOVERY ONLY').replace(/_/g, ' '))}</span>
+    </div>
+    <div class="reviewer-detail-grid">
+      <div class="reviewer-detail-row"><div class="reviewer-label">Open date</div><div class="reviewer-value">${escHTML(reviewerDate(row.open_date))}</div></div>
+      <div class="reviewer-detail-row"><div class="reviewer-label">Close date</div><div class="reviewer-value">${escHTML(reviewerDate(row.close_date))}</div></div>
+      <div class="reviewer-detail-row"><div class="reviewer-label">Notice funding range</div><div class="reviewer-value">${floor > 0 || ceiling > 0 ? `${floor > 0 ? moneyCompact(floor) : 'not stated'} to ${ceiling > 0 ? moneyCompact(ceiling) : 'not stated'}` : 'Not normalized in the reviewer feed'}</div></div>
+      <div class="reviewer-detail-row"><div class="reviewer-label">Submission route</div><div class="reviewer-value">${escHTML(String(row.submission_route || row.source || 'official notice'))}</div></div>
+      <div class="reviewer-detail-row"><div class="reviewer-label">Deadline state</div><div class="reviewer-value">${escHTML(reviewerDeadlineLabel(row.deadline_state))}</div></div>
+      <div class="reviewer-detail-row"><div class="reviewer-label">Source authority</div><div class="reviewer-value">${escHTML(reviewerAuthorityLabel(row))}</div></div>
+      <div class="reviewer-detail-row"><div class="reviewer-label">Snapshot freshness</div><div class="reviewer-value">${escHTML(freshness.label)}</div></div>
+      <div class="reviewer-detail-row"><div class="reviewer-label">Source verification</div><div class="reviewer-value">${escHTML(String(row.source_freshness_status || 'undated').replace(/_/g, ' ').toLowerCase())}</div></div>
+    </div>
+    <div class="reviewer-detail-row">
+      <div class="reviewer-label">Next evidence gate</div>
+      <div class="reviewer-value">${escHTML(String(row.next_gate || 'Complete official eligibility review.'))}</div>
+    </div>
+    <div class="reviewer-detail-row">
+      <div class="reviewer-label">Claim boundary</div>
+      <div class="reviewer-value">${escHTML(String(row.claim_boundary || 'Discovery does not establish qualification or award likelihood.'))}</div>
+    </div>
+    <div class="reviewer-detail-row">
+      <div class="reviewer-label">Source boundary</div>
+      <div class="reviewer-value">${escHTML(String(row.source_authority_boundary || 'The complete current controlling notice governs.'))}</div>
+    </div>
+    ${keywords.length ? `<div class="reviewer-detail-row"><div class="reviewer-label">Discovery terms</div><div class="reviewer-value">${keywords.map((value) => escHTML(String(value))).join(' · ')}</div></div>` : ''}
+    ${isFalcon ? `
+      <div class="reviewer-detail-row">
+        <div class="reviewer-label">Independent reproduction gate</div>
+        <div class="reviewer-value">
+          ${escHTML(String(reproduction.status || 'AWAITING INDEPENDENT RUNNER').replace(/_/g, ' '))}. Expected frozen result ${escHTML(String(reproduction.expected_score || 'n/a'))}; qualification pass ${reproduction.qualification_gate_passed ? 'yes' : 'no'}; performance promotion ${reproduction.performance_promotion_allowed ? 'allowed' : 'not allowed'}.
+          <div style="margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:11px;overflow-wrap:anywhere">protocol SHA-256 ${escHTML(protocolHash)}</div>
+        </div>
+      </div>
+    ` : ''}
+    <div class="toolbar" style="margin-top:16px">
+      ${isHttpUrl(row.source_url) ? `<a class="btn-link" href="${escAttr(row.source_url)}" target="_blank" rel="noopener">${escHTML(reviewerSourceLinkLabel(row))}</a>` : ''}
+      ${isHttpUrl(row.official_update_url) && row.official_update_url !== row.source_url ? `<a class="btn-link" href="${escAttr(row.official_update_url)}" target="_blank" rel="noopener">Open controlling update route</a>` : ''}
+    </div>
+    <div class="gaps" style="margin-top:14px"><b>Reviewer-safe view:</b> private application packets, contact fields, tax identifiers, signatures, and credentials are not published.</div>
+  `;
 }
 
 function renderDetail(d) {
@@ -2245,6 +2738,12 @@ renderMissionPulse();
 renderTop5LiveProofBoard();
 loadQueue();
 </script>
-<script src="./assets/luma_command_fabric.js"></script>
+<script>
+  if (!window.LUMA_REVIEWER_MODE) {
+    const commandFabric = document.createElement('script');
+    commandFabric.src = './assets/luma_command_fabric.js';
+    document.body.appendChild(commandFabric);
+  }
+</script>
 </body>
 </html>

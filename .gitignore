@@ -115,6 +115,10 @@ dashboard/node_modules/
 dashboard/archive/
 dashboard/evidence/runs/
 dashboard/proof_live*.json
+# Publish only the public-safe grant reviewer snapshot from dashboard/data.
+!dashboard/data/
+dashboard/data/*
+!dashboard/data/grant_reviewer_feed.json
 
 # High-churn runtime backup snapshots
 config/runtime_control.backup_*.json

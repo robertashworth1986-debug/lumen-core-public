@@ -1,0 +1,106 @@
+{
+  "schema": "lumencore.grant_reviewer_curation.v1",
+  "verified_utc": "2026-07-17T07:21:42Z",
+  "reviewer_feed_ttl_hours": 24,
+  "curated_grants_gov_ids": [
+    "24-569",
+    "DE-FOA-0003612",
+    "W911NF-20-S-0008",
+    "W911NF-23-S-0001",
+    "25-531",
+    "DE-FOA-0003467",
+    "PD-18-7607"
+  ],
+  "candidates": [
+    {
+      "candidate_id": "navy:DON26BZ03-NV061",
+      "source": "navysbir.com",
+      "opportunity_number": "DON26BZ03-NV061",
+      "title": "Predictive Movement for Object Oriented Tracking",
+      "agency": "Department of the Navy",
+      "open_date": "2026-06-24",
+      "close_date": "2026-07-22T12:00:00-04:00",
+      "source_url": "https://www.navysbir.com/n26_3/DON26BZ03-NV061.htm",
+      "submission_route": "DSIP",
+      "eligibility_status": "BENCHMARK_AND_COMPLIANCE_GATED",
+      "submission_status": "DRAFT_EVIDENCE_GATED",
+      "next_gate": "Freeze a trajectory benchmark against kinematic, interacting-multiple-model, and historical-pattern baselines on representative AIS/ADS-B data; then close cost, clearance, compliance, portal, and domain-review gates.",
+      "claim_boundary": "A topic-specific concept exists, but no qualifying trajectory benchmark or operational, classified, or Navy-data performance result is complete.",
+      "source_verification": {
+        "status": "TOPIC_MIRROR_VERIFIED_DSIP_RECHECK_REQUIRED",
+        "verified_utc": "2026-07-17T07:21:42Z",
+        "deadline_text": "Closes July 22, 2026 at 12:00 PM ET",
+        "authority_boundary": "The Navy topic page labels itself an unofficial copy. DSIP controls updates and submission requirements.",
+        "official_update_url": "https://www.dodsbirsttr.mil/submissions/solicitation-documents/active-solicitations"
+      }
+    },
+    {
+      "candidate_id": "navy:DON26BZ03-NV063",
+      "source": "navysbir.com",
+      "opportunity_number": "DON26BZ03-NV063",
+      "title": "Anomalous Behavior Detection and Alerting for Congested Maritime Environments",
+      "agency": "Department of the Navy",
+      "open_date": "2026-06-24",
+      "close_date": "2026-07-22T12:00:00-04:00",
+      "source_url": "https://www.navysbir.com/n26_3/DON26BZ03-NV063.htm",
+      "submission_route": "DSIP",
+      "eligibility_status": "REPRESENTATIVE_DATA_AND_COMPLIANCE_GATED",
+      "submission_status": "DRAFT_EVIDENCE_GATED",
+      "next_gate": "Close DSIP authority, ownership, foreign-influence, export, cybersecurity, cost, clearance-transition, portal-preview, and domain-review gates; extend the public AIS controlled-injection lane with stronger labels and calibration.",
+      "claim_boundary": "The frozen packet supports a public-AIS controlled-injection comparison only. It does not establish real adversary labels, ADS-B or radar validation, SSDS integration, classified performance, or field readiness.",
+      "source_verification": {
+        "status": "TOPIC_MIRROR_VERIFIED_DSIP_RECHECK_REQUIRED",
+        "verified_utc": "2026-07-17T07:21:42Z",
+        "deadline_text": "Closes July 22, 2026 at 12:00 PM ET",
+        "authority_boundary": "The Navy topic page labels itself an unofficial copy. DSIP controls updates and submission requirements.",
+        "official_update_url": "https://www.dodsbirsttr.mil/submissions/solicitation-documents/active-solicitations"
+      }
+    },
+    {
+      "candidate_id": "navy:DON26BZ03-NV065",
+      "source": "navysbir.com",
+      "opportunity_number": "DON26BZ03-NV065",
+      "title": "Adaptive Sensor Management",
+      "agency": "Department of the Navy",
+      "open_date": "2026-06-24",
+      "close_date": "2026-07-22T12:00:00-04:00",
+      "source_url": "https://www.navysbir.com/n26_3/DON26BZ03-NV065.htm",
+      "submission_route": "DSIP",
+      "eligibility_status": "SYNTHETIC_ONLY_AND_COMPLIANCE_GATED",
+      "submission_status": "DRAFT_EVIDENCE_GATED",
+      "next_gate": "Replace generated sensor archetypes with approved representative assumptions or models; add covariance, latency, and measurement-cost accounting; then close cost, clearance, compliance, portal, and domain-review gates.",
+      "claim_boundary": "The current benchmark is synthetic. It does not establish real sensor physics, SSDS integration, fire-control performance, classified performance, or field readiness.",
+      "source_verification": {
+        "status": "TOPIC_MIRROR_VERIFIED_DSIP_RECHECK_REQUIRED",
+        "verified_utc": "2026-07-17T07:21:42Z",
+        "deadline_text": "Closes July 22, 2026 at 12:00 PM ET",
+        "authority_boundary": "The Navy topic page labels itself an unofficial copy. DSIP controls updates and submission requirements.",
+        "official_update_url": "https://www.dodsbirsttr.mil/submissions/solicitation-documents/active-solicitations"
+      }
+    },
+    {
+      "candidate_id": "darpa:DPA26BZ04-DV016",
+      "source": "darpa.mil",
+      "opportunity_number": "DPA26BZ04-DV016",
+      "title": "FALCON: Fusing Advanced Language and Correlation-Oriented Networks",
+      "agency": "DARPA",
+      "published_date": "2026-07-01",
+      "open_date": null,
+      "close_date": "2026-08-19T12:00:00-04:00",
+      "source_url": "https://www.darpa.mil/work-with-us/opportunities/dpa26bz04-dv016",
+      "submission_route": "DSIP",
+      "eligibility_status": "CONDITIONAL_DP2_CANDIDATE",
+      "submission_status": "EVIDENCE_GATED",
+      "next_gate": "Document qualifying prior non-SBIR research and complete the official DP2 compliance matrix before portal assembly.",
+      "claim_boundary": "The current v3 result is a reproducible null result and does not satisfy the performance qualification gate.",
+      "source_verification": {
+        "status": "OFFICIAL_PAGE_VERIFIED",
+        "verified_utc": "2026-07-17T07:21:42Z",
+        "deadline_text": "Deadline August 19, 2026 at 12:00 PM ET",
+        "authority_boundary": "The DARPA opportunity page is authoritative for the published opportunity summary; DSIP controls the submitted proposal record.",
+        "official_update_url": "https://www.darpa.mil/work-with-us/opportunities/dpa26bz04-dv016"
+      }
+    }
+  ],
+  "claim_boundary": "This curation control records source checks and bounded local evidence gates. It does not prove eligibility, responsiveness, submission, selection, endorsement, technical validation, award, or performance. DSIP and the complete controlling notice govern DoD submissions."
+}
