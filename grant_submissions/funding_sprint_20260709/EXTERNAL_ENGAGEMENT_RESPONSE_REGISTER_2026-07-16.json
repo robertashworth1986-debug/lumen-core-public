@@ -43,8 +43,8 @@
     }
   },
   "claim_boundary": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance.",
-  "direct_answer": "Finish the six-confirmation Nashville EC human-fact gate before July 17 and send the existing EPRI administrative reply only after the exact `send EPRI` gate. CDC, LANL, NASA, and Army are monitor-only; duplicate sends would reduce credibility.",
-  "generated_utc": "2026-07-17T02:44:01.445321+00:00",
+  "direct_answer": "Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPRI administrative reply was sent and is now monitor-only with CDC, LANL, NASA, and Army; duplicate sends would reduce credibility.",
+  "generated_utc": "2026-07-17T03:56:13.364706+00:00",
   "inbox_risk_filters": [
     {
       "decision": "DO_NOT_TREAT_AS_OFFICIAL_SAM_NOTICE",
@@ -85,20 +85,24 @@
       ]
     },
     {
-      "action_gate": "Robert says `send EPRI` at action time.",
-      "claim_boundary": "MOU-routing information only; no executed membership, EPRI endorsement, validation, pilot, funding, procurement, or contract is claimed.",
+      "action_gate": "Reply only when EPRI sends the MOU, requests a correction, or asks for additional onboarding information.",
+      "claim_boundary": "This receipt records MOU-routing information only. The Gmail SENT record proves transmission of the administrative reply only. It does not establish an executed MOU, consortium membership, EPRI endorsement, independent validation, a pilot, funding, procurement, a contract, deployment, realized savings, or technical performance.",
       "deadline": null,
-      "decision": "SEND_EXISTING_GMAIL_DRAFT_AFTER_EXACT_GATE",
-      "do_not_duplicate_send": false,
+      "decision": "MONITOR_FOR_MOU_NO_DUPLICATE",
+      "do_not_duplicate_send": true,
       "lane_id": "epri_open_power_ai_mou",
-      "next_action": "Send the existing private Gmail draft in the current thread; attach no technical archive and publish no private identity fields.",
+      "next_action": "Monitor the existing thread for the DocuSign envelope or a clarification request; do not resend identity details.",
+      "no_send_before": "2026-07-23",
       "organization": "EPRI Open Power AI Consortium",
-      "record_sha256": "2ac60b1bd706f020b5c45ff0648ed5e1fbc0a7b221fae6414a469722bcb1101b",
-      "response_artifact": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
+      "record_sha256": "747973698c3d5ae36820470e6d043ab64c0e59be3cdffc43018e7a7d8b93483d",
+      "response_artifact": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json",
       "response_channel": "EMAIL_REPLY",
-      "response_ready": true,
-      "send_now": true,
-      "state": "INBOUND_ADMIN_REQUEST_DRAFT_READY"
+      "response_ready": false,
+      "send_now": false,
+      "state": "OUTBOUND_SENT_MOU_PENDING",
+      "supporting_artifacts": [
+        "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md"
+      ]
     },
     {
       "action_gate": "Reply only if CDC asks for clarification, replacement material, or scheduling.",
@@ -170,7 +174,7 @@
       "state": "SENT_VERIFIED_RESPONSE_PENDING"
     }
   ],
-  "register_sha256": "a7c29a031809d194d1378bef8c1fe26d01174b0162673a59da3ed09104d5bec5",
+  "register_sha256": "24905410a7ddff2554b7d67f2dfc06ca192899f68a7354cbafcffe46db37c8a8",
   "schema": "lumencore.external_engagement_response_register.v1",
   "source_artifacts": {
     "cdc_engagement_receipt": {
@@ -179,11 +183,17 @@
       "present": true,
       "sha256": "292157621B722B1973A1AA55140F08586AB41D07FBE38672B348C73E8A865B78"
     },
+    "epri_engagement_receipt": {
+      "bytes": 1481,
+      "path": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "present": true,
+      "sha256": "EBAFA995EB6D0BBC3749315F1F41EAC1CB0A28E56AE2EC6439C2E69757752EE8"
+    },
     "epri_response_template": {
-      "bytes": 2144,
+      "bytes": 1840,
       "path": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
       "present": true,
-      "sha256": "B6F3FFB5049F5B6D64105E80403253688B1F6495CB1D94E92C309CE1C2D6CDE6"
+      "sha256": "EFCF4FDDCED28472AA67F73B9B3D687F4DD317D42CF0162E57530B59A0114371"
     },
     "external_submission_receipt": {
       "bytes": 2036,
@@ -215,9 +225,9 @@
     "all_attachment_checks_pass": true,
     "autonomous_external_send_allowed": false,
     "autonomous_final_portal_submission_allowed": false,
-    "do_not_duplicate_send_count": 4,
-    "immediate_human_action_count": 2,
-    "monitor_only_count": 4,
+    "do_not_duplicate_send_count": 5,
+    "immediate_human_action_count": 1,
+    "monitor_only_count": 5,
     "record_count": 6,
     "verified_attachment_count": 4
   }

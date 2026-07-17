@@ -19,14 +19,24 @@ SYNC_RECEIPT = (
     / "funding_sprint_20260709"
     / "CURRENT_ACTION_CONTROL_E_DRIVE_SYNC_RECEIPT_2026-07-16.json"
 )
+ENGAGEMENT_RECEIPT = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json"
+)
+PRIVATE_STREET_PATTERN = re.compile(
+    r"\b\d{1,6}\s+[A-Za-z0-9 .'-]+\s(?:st|street|rd|road|dr|drive|ave|avenue|ln|lane|blvd|way|ct|court)\b",
+    re.IGNORECASE,
+)
 
 
-def test_epri_response_is_routed_and_explicitly_send_gated():
+def test_epri_response_is_routed_and_duplicate_send_gated():
     text = TEMPLATE.read_text(encoding="utf-8")
 
-    assert "DRAFT_NOT_SENT" in text
-    assert "READY_AWAITING_EXPLICIT_SEND" in text
-    assert "send EPRI" in text
+    assert "SENT_VERIFIED_RESPONSE_PENDING" in text
+    assert "SENT_VERIFIED" in text
+    assert "Duplicate-send gate: `CLOSED`" in text
     for address in (
         "MDahl@epri.com",
         "SToews@epri.com",
@@ -41,9 +51,10 @@ def test_epri_response_keeps_private_identity_values_out_of_repo():
     text = TEMPLATE.read_text(encoding="utf-8")
     lowered = text.lower()
 
-    assert text.count("[ENTER IN PRIVATE GMAIL DRAFT ONLY]") == 5
-    assert "2613" not in text
-    assert "paddle" not in lowered
+    assert "private Gmail thread only" in text
+    assert PRIVATE_STREET_PATTERN.search(text) is None
+    assert re.search(r"\b\d{5}(?:-\d{4})?\b", text) is None
+    assert "full legal party name:" not in lowered
     assert "api key" not in lowered
     assert "password" not in lowered
     assert "private key" not in lowered
@@ -60,6 +71,22 @@ def test_epri_response_preserves_claim_boundaries():
         "patent-sensitive material",
     ):
         assert phrase in text
+
+
+def test_epri_engagement_receipt_is_redacted_and_monitor_only():
+    receipt = json.loads(ENGAGEMENT_RECEIPT.read_text(encoding="utf-8"))
+    rendered = json.dumps(receipt).lower()
+
+    assert receipt["schema"] == "lumencore.external_engagement_receipt.v1"
+    assert receipt["submission"]["status"] == "SENT_NO_ATTACHMENT"
+    assert receipt["submission"]["attachment"] is None
+    assert receipt["submission"]["private_identity_values_stored_in_public_receipt"] is False
+    assert receipt["acknowledgment"]["status"] == "OUTBOUND_SENT_MOU_PENDING"
+    assert receipt["acknowledgment"]["earliest_follow_up_date"] == "2026-07-23"
+    assert PRIVATE_STREET_PATTERN.search(rendered) is None
+    assert re.search(r"\b\d{5}(?:-\d{4})?\b", rendered) is None
+    assert "full legal party name:" not in rendered
+    assert "does not establish an executed mou" in receipt["claim_boundary"].lower()
 
 
 def test_action_control_packet_has_a_bounded_e_drive_integrity_receipt():

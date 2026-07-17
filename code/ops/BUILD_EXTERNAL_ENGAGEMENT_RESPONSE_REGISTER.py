@@ -16,6 +16,7 @@ SUBMISSION_RECEIPT = SPRINT_DIR / "EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json"
 CDC_RECEIPT = SPRINT_DIR / "CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json"
 LANL_RECEIPT = SPRINT_DIR / "LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json"
 EPRI_TEMPLATE = SPRINT_DIR / "EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md"
+EPRI_RECEIPT = SPRINT_DIR / "EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json"
 NASHVILLE_MANIFEST = (
     ROOT
     / "grant_submissions"
@@ -132,6 +133,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     submissions = read_json(SUBMISSION_RECEIPT)
     cdc = read_json(CDC_RECEIPT)
     lanl = read_json(LANL_RECEIPT)
+    epri = read_json(EPRI_RECEIPT)
     nashville = read_json(NASHVILLE_MANIFEST)
     nashville_resolution = read_json(NASHVILLE_FACT_RESOLUTION)
 
@@ -164,17 +166,19 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         {
             "lane_id": "epri_open_power_ai_mou",
             "organization": "EPRI Open Power AI Consortium",
-            "state": "INBOUND_ADMIN_REQUEST_DRAFT_READY",
+            "state": epri["acknowledgment"]["status"],
             "deadline": None,
-            "decision": "SEND_EXISTING_GMAIL_DRAFT_AFTER_EXACT_GATE",
+            "decision": "MONITOR_FOR_MOU_NO_DUPLICATE",
             "response_channel": "EMAIL_REPLY",
-            "response_ready": True,
-            "send_now": True,
-            "do_not_duplicate_send": False,
-            "action_gate": "Robert says `send EPRI` at action time.",
-            "response_artifact": rel(EPRI_TEMPLATE),
-            "next_action": "Send the existing private Gmail draft in the current thread; attach no technical archive and publish no private identity fields.",
-            "claim_boundary": "MOU-routing information only; no executed membership, EPRI endorsement, validation, pilot, funding, procurement, or contract is claimed.",
+            "response_ready": False,
+            "send_now": False,
+            "do_not_duplicate_send": True,
+            "no_send_before": epri["acknowledgment"]["earliest_follow_up_date"],
+            "action_gate": "Reply only when EPRI sends the MOU, requests a correction, or asks for additional onboarding information.",
+            "response_artifact": rel(EPRI_RECEIPT),
+            "supporting_artifacts": [rel(EPRI_TEMPLATE)],
+            "next_action": "Monitor the existing thread for the DocuSign envelope or a clarification request; do not resend identity details.",
+            "claim_boundary": epri["claim_boundary"],
         },
         {
             "lane_id": "cdc_ai_acquisition_rfi",
@@ -271,14 +275,14 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "as_of_date": "2026-07-16",
         "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
         "direct_answer": (
-            "Finish the six-confirmation Nashville EC human-fact gate before July 17 and send the existing EPRI "
-            "administrative reply only after the exact `send EPRI` gate. CDC, LANL, NASA, and Army "
-            "are monitor-only; duplicate sends would reduce credibility."
+            "Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPRI administrative "
+            "reply was sent and is now monitor-only with CDC, LANL, NASA, and Army; duplicate sends would "
+            "reduce credibility."
         ),
         "summary": {
             "record_count": len(records),
             "immediate_human_action_count": sum(
-                1 for row in records if row["lane_id"] in {"nashville_ec_takeoff_fall_2026", "epri_open_power_ai_mou"}
+                1 for row in records if row["lane_id"] == "nashville_ec_takeoff_fall_2026"
             ),
             "monitor_only_count": sum(1 for row in records if str(row["decision"]).startswith("MONITOR")),
             "do_not_duplicate_send_count": sum(1 for row in records if row["do_not_duplicate_send"]),
@@ -306,6 +310,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "cdc_engagement_receipt": artifact_status(CDC_RECEIPT),
             "lanl_engagement_receipt": artifact_status(LANL_RECEIPT),
             "epri_response_template": artifact_status(EPRI_TEMPLATE),
+            "epri_engagement_receipt": artifact_status(EPRI_RECEIPT),
             "nashville_application_manifest": artifact_status(NASHVILLE_MANIFEST),
             "nashville_human_fact_resolution": artifact_status(NASHVILLE_FACT_RESOLUTION),
         },

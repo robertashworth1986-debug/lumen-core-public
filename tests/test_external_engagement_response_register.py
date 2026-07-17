@@ -31,9 +31,9 @@ def test_register_routes_current_actions_without_duplicate_sends():
 
     assert payload["schema"] == "lumencore.external_engagement_response_register.v1"
     assert payload["summary"]["record_count"] == 6
-    assert payload["summary"]["immediate_human_action_count"] == 2
-    assert payload["summary"]["monitor_only_count"] == 4
-    assert payload["summary"]["do_not_duplicate_send_count"] == 4
+    assert payload["summary"]["immediate_human_action_count"] == 1
+    assert payload["summary"]["monitor_only_count"] == 5
+    assert payload["summary"]["do_not_duplicate_send_count"] == 5
     assert payload["summary"]["autonomous_external_send_allowed"] is False
     assert payload["summary"]["autonomous_final_portal_submission_allowed"] is False
 
@@ -43,8 +43,11 @@ def test_register_routes_current_actions_without_duplicate_sends():
         "NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json"
     )
     assert payload["source_artifacts"]["nashville_human_fact_resolution"]["present"] is True
-    assert records["epri_open_power_ai_mou"]["decision"] == "SEND_EXISTING_GMAIL_DRAFT_AFTER_EXACT_GATE"
-    assert "send EPRI" in records["epri_open_power_ai_mou"]["action_gate"]
+    assert records["epri_open_power_ai_mou"]["decision"] == "MONITOR_FOR_MOU_NO_DUPLICATE"
+    assert records["epri_open_power_ai_mou"]["state"] == "OUTBOUND_SENT_MOU_PENDING"
+    assert records["epri_open_power_ai_mou"]["do_not_duplicate_send"] is True
+    assert records["epri_open_power_ai_mou"]["no_send_before"] == "2026-07-23"
+    assert payload["source_artifacts"]["epri_engagement_receipt"]["present"] is True
     assert records["cdc_ai_acquisition_rfi"]["decision"] == "MONITOR_NO_REPLY_REQUIRED"
     assert records["lanl_vision_licensing_followup"]["no_send_before"] == "2026-07-23"
     assert records["nasa_data_center_rfi"]["do_not_duplicate_send"] is True
@@ -102,7 +105,7 @@ def test_mirror_receipt_matches_every_bounded_source():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 29
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 30
     assert receipt["all_sha256_matched_after_copy"] is True
     for artifact in receipt["artifacts"]:
         source = ROOT / artifact["source"]
@@ -120,6 +123,7 @@ def test_mirror_receipt_matches_every_bounded_source():
         "tests/test_sam_public_credential_rotation_control.py",
         "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
         "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
+        "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json",
     }.issubset(mirrored_sources)
 
     assert "does not prove" in receipt["claim_boundary"]

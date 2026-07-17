@@ -1,0 +1,31 @@
+{
+  "schema": "lumencore.external_engagement_receipt.v1",
+  "recorded_date": "2026-07-16",
+  "engagement": {
+    "organization": "EPRI Open Power AI Consortium",
+    "lane_id": "epri_open_power_ai_mou",
+    "title": "Open Power AI Consortium MOU onboarding"
+  },
+  "submission": {
+    "status": "SENT_NO_ATTACHMENT",
+    "sent_utc": "2026-07-17T03:51:07Z",
+    "gmail_message_id": "19f6e330d4105a6a",
+    "gmail_thread_id": "19f696731d1f185c",
+    "subject": "RE: [EXTERNAL] Open Power AI Consortium membership request - LumenCore",
+    "recipient_roles": [
+      "EPRI legal onboarding contact",
+      "EPRI technology-innovation contact",
+      "Open Power AI Consortium shared mailbox"
+    ],
+    "attachment": null,
+    "private_identity_values_stored_in_public_receipt": false
+  },
+  "acknowledgment": {
+    "status": "OUTBOUND_SENT_MOU_PENDING",
+    "received_utc": null,
+    "reply_required": false,
+    "earliest_follow_up_date": "2026-07-23",
+    "bounded_summary": "The requested legal-party and signatory routing information was sent in the existing EPRI thread. The public receipt omits those private values."
+  },
+  "claim_boundary": "This receipt records MOU-routing information only. The Gmail SENT record proves transmission of the administrative reply only. It does not establish an executed MOU, consortium membership, EPRI endorsement, independent validation, a pilot, funding, procurement, a contract, deployment, realized savings, or technical performance."
+}

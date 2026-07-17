@@ -1,26 +1,26 @@
 # External Engagement Response Register - 2026-07-16
 
-Finish the six-confirmation Nashville EC human-fact gate before July 17 and send the existing EPRI administrative reply only after the exact `send EPRI` gate. CDC, LANL, NASA, and Army are monitor-only; duplicate sends would reduce credibility.
+Finish the six-confirmation Nashville EC human-fact gate before July 17. The EPRI administrative reply was sent and is now monitor-only with CDC, LANL, NASA, and Army; duplicate sends would reduce credibility.
 
 ## Control Summary
 
 - Status: `CURRENT_RESPONSE_CONTROL_HUMAN_GATED`
 - Engagement records: `6`
-- Immediate human actions: `2`
-- Monitor-only lanes: `4`
-- Do-not-duplicate lanes: `4`
+- Immediate human actions: `1`
+- Monitor-only lanes: `5`
+- Do-not-duplicate lanes: `5`
 - Verified attachments: `4`
 - All attachment checks pass: `true`
 - Autonomous external send allowed: `false`
 - Autonomous final portal submit allowed: `false`
-- Register SHA-256: `a7c29a031809d194d1378bef8c1fe26d01174b0162673a59da3ed09104d5bec5`
+- Register SHA-256: `24905410a7ddff2554b7d67f2dfc06ca192899f68a7354cbafcffe46db37c8a8`
 
 ## Response Queue
 
 | Organization | State | Decision | Deadline / Hold | Duplicate Send |
 |---|---|---|---|---:|
 | Nashville Entrepreneur Center | `PORTAL_PACKET_READY_HUMAN_FACTS_REQUIRED` | `COMPLETE_HUMAN_FACTS_AND_FINAL_PREVIEW` | 2026-07-17 | `false` |
-| EPRI Open Power AI Consortium | `INBOUND_ADMIN_REQUEST_DRAFT_READY` | `SEND_EXISTING_GMAIL_DRAFT_AFTER_EXACT_GATE` | None | `false` |
+| EPRI Open Power AI Consortium | `OUTBOUND_SENT_MOU_PENDING` | `MONITOR_FOR_MOU_NO_DUPLICATE` | 2026-07-23 | `true` |
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `MONITOR_NO_REPLY_REQUIRED` | 2026-07-30T21:00:00Z | `true` |
 | Los Alamos National Laboratory | `OUTBOUND_SENT_RESPONSE_PENDING` | `MONITOR_THEN_ONE_BOUNDED_FOLLOW_UP` | 2026-07-23 | `true` |
 | NASA | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | 2026-07-17T21:00:00Z | `true` |
@@ -43,16 +43,16 @@ Finish the six-confirmation Nashville EC human-fact gate before July 17 and send
 ### EPRI Open Power AI Consortium
 
 - Lane: `epri_open_power_ai_mou`
-- State: `INBOUND_ADMIN_REQUEST_DRAFT_READY`
-- Decision: `SEND_EXISTING_GMAIL_DRAFT_AFTER_EXACT_GATE`
+- State: `OUTBOUND_SENT_MOU_PENDING`
+- Decision: `MONITOR_FOR_MOU_NO_DUPLICATE`
 - Response channel: `EMAIL_REPLY`
-- Response ready: `true`
-- Send now: `true`
-- Action gate: Robert says `send EPRI` at action time.
-- Next action: Send the existing private Gmail draft in the current thread; attach no technical archive and publish no private identity fields.
-- Response artifact: `grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md`
-- Claim boundary: MOU-routing information only; no executed membership, EPRI endorsement, validation, pilot, funding, procurement, or contract is claimed.
-- Record SHA-256: `2ac60b1bd706f020b5c45ff0648ed5e1fbc0a7b221fae6414a469722bcb1101b`
+- Response ready: `false`
+- Send now: `false`
+- Action gate: Reply only when EPRI sends the MOU, requests a correction, or asks for additional onboarding information.
+- Next action: Monitor the existing thread for the DocuSign envelope or a clarification request; do not resend identity details.
+- Response artifact: `grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json`
+- Claim boundary: This receipt records MOU-routing information only. The Gmail SENT record proves transmission of the administrative reply only. It does not establish an executed MOU, consortium membership, EPRI endorsement, independent validation, a pilot, funding, procurement, a contract, deployment, realized savings, or technical performance.
+- Record SHA-256: `747973698c3d5ae36820470e6d043ab64c0e59be3cdffc43018e7a7d8b93483d`
 
 ### Centers for Disease Control and Prevention
 
@@ -134,7 +134,8 @@ LumenCore
 - `external_submission_receipt`: present=`true` bytes=`2036` sha256=`2DAC72C484BB39A6AB5891405C00AD68C66A2D99A5152D0E53CCBE8603FBAE01` path=`grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json`
 - `cdc_engagement_receipt`: present=`true` bytes=`1527` sha256=`292157621B722B1973A1AA55140F08586AB41D07FBE38672B348C73E8A865B78` path=`grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - `lanl_engagement_receipt`: present=`true` bytes=`1414` sha256=`74303CFC65C85D9EF73FB80CC8177E5D08DF43D03264FFCE73251ACD2CD9E9D0` path=`grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json`
-- `epri_response_template`: present=`true` bytes=`2144` sha256=`B6F3FFB5049F5B6D64105E80403253688B1F6495CB1D94E92C309CE1C2D6CDE6` path=`grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md`
+- `epri_response_template`: present=`true` bytes=`1840` sha256=`EFCF4FDDCED28472AA67F73B9B3D687F4DD317D42CF0162E57530B59A0114371` path=`grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md`
+- `epri_engagement_receipt`: present=`true` bytes=`1481` sha256=`EBAFA995EB6D0BBC3749315F1F41EAC1CB0A28E56AE2EC6439C2E69757752EE8` path=`grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - `nashville_application_manifest`: present=`true` bytes=`17728` sha256=`1BC772F56253112A346F3A6C3D02D9BF328C639407587386BF00803C14BA764E` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json`
 - `nashville_human_fact_resolution`: present=`true` bytes=`7579` sha256=`AB807930D19B28BB5A2A7AEF38B28C3E87B40B750D1EF891F61DBD6CE510EC9F` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
 

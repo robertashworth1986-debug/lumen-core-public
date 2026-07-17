@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T03:43:17.3224090Z",
+  "created_utc": "2026-07-17T03:59:15.1935599Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/CURRENT_ACTION_CONTROL_20260716",
   "artifact_count": 18,
   "all_sha256_matched_after_copy": true,
@@ -19,14 +19,14 @@
     },
     {
       "source": "tests/test_epri_open_power_ai_mou_response.py",
-      "bytes": 3878,
-      "sha256": "7831B34CF950C847D8E26FBEDA7BB0A3E002377565C0D2F6AB8D5E473762D385",
+      "bytes": 5197,
+      "sha256": "5402BB797929C45EE78575F9FF4DA85A68E221B93F87396606F285D5036562CF",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
-      "bytes": 2144,
-      "sha256": "B6F3FFB5049F5B6D64105E80403253688B1F6495CB1D94E92C309CE1C2D6CDE6",
+      "bytes": 1840,
+      "sha256": "EFCF4FDDCED28472AA67F73B9B3D687F4DD317D42CF0162E57530B59A0114371",
       "copy_sha256_matched": true
     },
     {

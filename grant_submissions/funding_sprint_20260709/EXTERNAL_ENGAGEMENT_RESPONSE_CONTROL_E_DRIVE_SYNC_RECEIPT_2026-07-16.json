@@ -1,29 +1,29 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T03:10:13.3142812Z",
+  "created_utc": "2026-07-17T03:59:15.7707503Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_20260716",
-  "artifact_count": 29,
+  "artifact_count": 30,
   "all_sha256_matched_after_copy": true,
   "artifacts": [
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
-      "bytes": 19334,
-      "sha256": "0659BFD802660FF03A5A2C7807EFC638DC36EEFA9153ED886EEDCFB02112E63E"
+      "bytes": 19521,
+      "sha256": "F1EDA0FBD8027E268702839EC70FE1CC0B1758E5FCAE536574E8E95F6404131E"
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 62524,
-      "sha256": "DD29D3BD16F7E2EA9210A7FA5C587F6A536F498444E3AD61E20352CBF3CD51BA"
+      "bytes": 65036,
+      "sha256": "DE6D8096D1257CDB9AB828F68D67E98E572F2BDEC0491BEA4BFC6D030CC50304"
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
-      "bytes": 5673,
-      "sha256": "6EFAF568817BDCF7A7622CC2F684DA083C3653CE7896535FE6F9A58812B4D9F0"
+      "bytes": 6022,
+      "sha256": "1FA0298C6A1608FDCC965C81E067E6B96573F9A03AAE2F9D5AA2C423613BA5F5"
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 7670,
-      "sha256": "8E61FFD1C3DDDD39D93658E3018EAA41F56333D08CF5D37107CB54F5623FBDCC"
+      "bytes": 8480,
+      "sha256": "A4FCA00C0CD604339128F013C0194C72C86507180F08234A42C508A2EF7FB9B2"
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json",
@@ -32,8 +32,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-      "bytes": 9571,
-      "sha256": "40DFCC0C055AC4AEEC70023459BB4A050053CC7B437EF5E2EAB2D558D8939C56"
+      "bytes": 9985,
+      "sha256": "65362809CC716F7627D16DCEBAC4971836CB142A54B82210B0B120ABB5F68864"
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-15.md",
@@ -42,8 +42,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
-      "bytes": 37029,
-      "sha256": "FA4C8525AB7B65814E1F106007AD97DD37A8C8A35EA0CE3EE0466623644A5674"
+      "bytes": 38019,
+      "sha256": "A2FEB8EC8B7A197E73054772180237C4B03D28A5076B05F863197BF6CE816AE2"
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json",
@@ -57,8 +57,13 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
-      "bytes": 2144,
-      "sha256": "B6F3FFB5049F5B6D64105E80403253688B1F6495CB1D94E92C309CE1C2D6CDE6"
+      "bytes": 1840,
+      "sha256": "EFCF4FDDCED28472AA67F73B9B3D687F4DD317D42CF0162E57530B59A0114371"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "bytes": 1481,
+      "sha256": "EBAFA995EB6D0BBC3749315F1F41EAC1CB0A28E56AE2EC6439C2E69757752EE8"
     },
     {
       "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json",
@@ -87,8 +92,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
-      "bytes": 13053,
-      "sha256": "557D6BECD811AEFC9DF93679DF7F4D66AE01D4608E8162CA2831F5C41642B5B8"
+      "bytes": 13724,
+      "sha256": "5D4FB0133D50529667B95843E83F9D9D7E96E6E32FC29AC5C3271F737B1890EF"
     },
     {
       "source": "code/ops/BUILD_TRACTION_OPPORTUNITY_INTAKE_LEDGER.py",
