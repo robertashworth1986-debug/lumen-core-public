@@ -34,7 +34,7 @@ This router is a navigation layer. It does not authorize external sends, portal 
 - Capital movement allowed: `false`
 - Unsafe sensitive hits: `0`
 - Unsafe claim hits: `0`
-- Router SHA-256: `eb5573972426bc99d8e9566555941b6e62bd353744f2668a5040e0444f221b50`
+- Router SHA-256: `9de9bbafcc544c24ba63375bad8d1ba510de037ec4920c27dd4d2c30dabd83a7`
 
 ## Routes
 
@@ -50,13 +50,13 @@ This router is a navigation layer. It does not authorize external sends, portal 
 - External send without human: `false`
 - Final action without human: `false`
 - Missing artifacts: `0`
-- Route SHA-256: `5e40155ae1e58b1d28d0b3c571db40f8b45e1552567c824398d4b5dc49493680`
+- Route SHA-256: `7da3642faa4ea93e142e243cbceceb433559e14d517905ec2fdce33a58d0008f`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md` sha256=`b9fcb9149ab06d23149883e94437dc9cfaabb23648c25eab0377755eaa8708f1`
+- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md` sha256=`c935210e86e3cf4f217eec9edf04814067a829be7d93fe90093f3839b45490d9`
 - `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md` sha256=`b670cb506ec97a24910515a39a8987a2a6d1659bece6817912d1ed39f5ba1a18`
 - `present` `grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md` sha256=`cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390`
-- `present` `grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md` sha256=`5f75f6f5d698ae76c3794499b35efd43fa0c9be4258e08d8d0f3415fbca924f0`
+- `present` `grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md` sha256=`f8d5e886dbea083bcb512748549e776d3a4c2e4b971ebb46c25b593001f16e7d`
 
 ### 2. agency_submission_protocol
 
@@ -70,14 +70,14 @@ Artifacts:
 - External send without human: `false`
 - Final action without human: `false`
 - Missing artifacts: `0`
-- Route SHA-256: `b072d65c1ed20abb656a20dfb214ca3803539c248f99c0986e6f07761e79337e`
+- Route SHA-256: `0daf0c4b8deac516eda431e7ed6ab7e8eef08ce6cf7d99f2ce448b7e6586dc53`
 
 Artifacts:
 - `present` `grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md` sha256=`ae8a41916c20207d4a2732d58c0e09a9a089809496696dfd822543751d27c13c`
-- `present` `grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md` sha256=`df352e21244a5719742c84146e69112489ff582384a916f097811e036fd76f91`
+- `present` `grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md` sha256=`9a06bf73fab59081f2cc0ee95c718b5a3f19254c171fa5506335d45a8c8943b8`
 - `present` `grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md` sha256=`77be584815223c7940817ba6355603ff6f93f8475a6ec1fdcabdbad0d43479e5`
 - `present` `grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md` sha256=`fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82`
-- `present` `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` sha256=`81a4f42d51f72e9c51e7cd645b804c3a47e64dbe65cf6ca02faa99d7b45419b6`
+- `present` `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` sha256=`cd2dd829f5f383d69ea7d55934e3c15b6f5ed86852463e1d373481189f8f155a`
 
 ### 3. ip_patent_claim_boundary
 
@@ -91,10 +91,10 @@ Artifacts:
 - External send without human: `false`
 - Final action without human: `false`
 - Missing artifacts: `0`
-- Route SHA-256: `21a83dce2a1aa88ec305803a957fc428e5f58c8190849d7e7451cd06dccc9dbe`
+- Route SHA-256: `cb2de7cd2eae386a3da2b341737b19dab92109b9510948d3851689f7c61955c6`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`a3354fec70f9ae12a0bf42c24a2f1699f05ba0d05880afa16264080b1a1860ee`
+- `present` `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`e9efbb7e405cc0dc8d283f991e353df8ff78f69864bde2aab0159839f8ecd306`
 - `present` `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md` sha256=`274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb`
 - `present` `grant_submissions/PATENT_LEGAL_RESCUE_PACKET_2026-06-20.md` sha256=`78f1356655372083a0906010cbfd669a409077c26bd1e46998fb1aaf6da7fcf8`
 - `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md` sha256=`b670cb506ec97a24910515a39a8987a2a6d1659bece6817912d1ed39f5ba1a18`
@@ -111,13 +111,13 @@ Artifacts:
 - External send without human: `false`
 - Final action without human: `false`
 - Missing artifacts: `0`
-- Route SHA-256: `a8cf8a6ac14815963cab53c058e0adf226968e5ac82f473bbd0cb2f0e488a046`
+- Route SHA-256: `5cf957dfba1a6de977c22b5f1674bc4f87f2b217e77c9f891f5704f46cf008fb`
 
 Artifacts:
 - `present` `grant_submissions/funding_sprint_20260709/KEY_GOVERNANCE_FIREWALL_2026-07-09.md` sha256=`af04f6cb53f8320292902aae23825970fe35785e263f7851122eb1506c159d52`
-- `present` `grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md` sha256=`2aa3e2e80e5ebb68a085080b0466b3f40d42df8cfb67ab98dfbdcf5957fd7e7c`
+- `present` `grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md` sha256=`b6257f98e9cad35a244aa02264dec019204c5ede27357cdadba76a1019a9fac6`
 - `present` `grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md` sha256=`f04cfca6d7b388c97303e354aaf9229ba3d46d57f54c6f56110d4ade89dd82b3`
-- `present` `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` sha256=`c56fed102e513a1373d9d23317b7ff20c51adc77faa1cc1c5e1dd88e255cdd95`
+- `present` `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` sha256=`937b51af324d049b09ee2519554e6c40071d2c341c0c0715c2c24d7199d7e443`
 
 ### 5. traction_deadline_action
 
@@ -131,13 +131,13 @@ Artifacts:
 - External send without human: `false`
 - Final action without human: `false`
 - Missing artifacts: `0`
-- Route SHA-256: `8084553fda436cd9902f73da676506aa36189e86a8d8cbfdee0d55939fda7f38`
+- Route SHA-256: `e9119683b608af6f166f0fc2a0edd85eda6fc9475185a1d77786d356ed1053d8`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
-- `present` `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` sha256=`81a4f42d51f72e9c51e7cd645b804c3a47e64dbe65cf6ca02faa99d7b45419b6`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
+- `present` `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` sha256=`cd2dd829f5f383d69ea7d55934e3c15b6f5ed86852463e1d373481189f8f155a`
 - `present` `grant_submissions/funding_sprint_20260709/CLOSEST_QUALIFIED_GRANTS_AND_CONTRACTS_2026-07-09.md` sha256=`d675cc756efcc84ccd219cce06560493ac2f7ea2c4cf3338aca45a1e5e52e567`
-- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md` sha256=`04fae167c7755ac30ea8db7e7b8e9eccb48c16bbd8a456b7288602ef674c1e47`
+- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md` sha256=`44ddf0c67ff6291892ad18809c6381b33329a54f5502cbfe93a19508c05e6168`
 
 ### 6. autonomous_quant_safety
 
@@ -171,11 +171,11 @@ Artifacts:
 - External send without human: `false`
 - Final action without human: `false`
 - Missing artifacts: `0`
-- Route SHA-256: `b3ab804403a962af73fc5c9b280aaa3a86512105baf2e545d715c2e0edccd919`
+- Route SHA-256: `3d800eefc81b9ca15ff667ba53e6070e9a660b8103ca8765cf13ed40b6ed52d5`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md` sha256=`b1034846561675a25ff85134813c6e4bc0d71a5a48bad92f78610273c4499d28`
-- `present` `grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md` sha256=`2aa3e2e80e5ebb68a085080b0466b3f40d42df8cfb67ab98dfbdcf5957fd7e7c`
+- `present` `grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md` sha256=`9c4cf95f1d749cde316f02eb4fb9ab0938290089d312ebb121572c7b304e31cc`
+- `present` `grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md` sha256=`b6257f98e9cad35a244aa02264dec019204c5ede27357cdadba76a1019a9fac6`
 - `present` `grant_submissions/funding_sprint_20260709/PROOF_STACK_EDGE_INDEX_2026-07-09.md` sha256=`3a814a6751a89939d540381a20acd7eaa0ccec1b970d045191dc64d7a5b49596`
 - `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md` sha256=`b670cb506ec97a24910515a39a8987a2a6d1659bece6817912d1ed39f5ba1a18`
 
@@ -191,13 +191,13 @@ Artifacts:
 - External send without human: `false`
 - Final action without human: `false`
 - Missing artifacts: `0`
-- Route SHA-256: `552278d96f36413b94fadf00480e1f8c83d27468be7d5a222bc0f9864e371a51`
+- Route SHA-256: `ff061825ab174776871153d7b1c2c045aeebe588d68761a40d05c58ab1059a50`
 
 Artifacts:
 - `present` `grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md` sha256=`95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762`
 - `present` `grant_submissions/funding_sprint_20260709/VENTURE_STUDIO_TERMS_GUARDRAIL_PACKET_2026-07-09.md` sha256=`6c29546acb06e2ae3527d957a1f906beef42153b099ac6c04ef96a943d5399bb`
 - `present` `grant_submissions/funding_sprint_20260709/PITCH_DECK_SEND_RECEIPT_2026-07-09.md` sha256=`ae6f04ec0837e51833e36164b8671812db1a3547cb1c64790ca20d2435a0bef8`
-- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md` sha256=`b9fcb9149ab06d23149883e94437dc9cfaabb23648c25eab0377755eaa8708f1`
+- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md` sha256=`c935210e86e3cf4f217eec9edf04814067a829be7d93fe90093f3839b45490d9`
 
 ## Share Rules
 

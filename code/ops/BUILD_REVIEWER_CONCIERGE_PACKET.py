@@ -262,15 +262,24 @@ def build_payload() -> dict[str, Any]:
             "name": lane.get("name", ""),
             "priority": int(lane.get("priority", 999)),
             "channel": channel,
-            "status": lane.get("status", ""),
+            "status": lane.get("effective_status", lane.get("status", "")),
+            "legacy_intake_status": lane.get("status", ""),
+            "state_source": lane.get("effective_source", "legacy_intake_baseline"),
             "fit_score": lane.get("fit_score", 0),
             "audience": pack.get("audience", "reviewer"),
             "best_first_read": pack.get("best_first_read", "Review the traction ledger and source artifacts."),
             "decision_question": pack.get("decision_question", "Decide whether to continue this lane."),
-            "deadline_or_gate": lane.get("deadline_or_gate", ""),
-            "reviewer_action": lane.get("reviewer_action", ""),
+            "deadline_or_gate": lane.get(
+                "effective_deadline_or_gate", lane.get("deadline_or_gate", "")
+            ),
+            "legacy_intake_deadline_or_gate": lane.get("deadline_or_gate", ""),
+            "reviewer_action": lane.get(
+                "effective_reviewer_action", lane.get("reviewer_action", "")
+            ),
             "human_gate": lane.get("human_gate", ""),
-            "claim_boundary": lane.get("claim_boundary", ""),
+            "claim_boundary": lane.get(
+                "effective_claim_boundary", lane.get("claim_boundary", "")
+            ),
             "artifact_count": len(artifacts),
             "artifact_present_count": present_count,
             "artifact_missing_count": len(artifacts) - present_count,
@@ -379,6 +388,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Audience: {card['audience']}",
                 f"- Channel: `{card['channel']}`",
                 f"- Status: `{card['status']}`",
+                f"- Legacy intake status: `{card['legacy_intake_status']}`",
+                f"- State source: `{card['state_source']}`",
                 f"- Fit score: `{card['fit_score']}`",
                 f"- Gate: {card['deadline_or_gate']}",
                 f"- Best first read: {card['best_first_read']}",

@@ -16,7 +16,7 @@ This index is a navigation and decision-support artifact. It does not authorize 
 - Unsafe claim hits: `0`
 - External send without human: `false`
 - Final submission without human: `false`
-- Concierge SHA-256: `f2568854e0de6f3c63e10e46cda10ca0d87d0ea419d906364bd7cf04f6f28cba`
+- Concierge SHA-256: `e238f2645617483ae0de549d12e0d1efe1d6ea26e54ec41ca000a1691d068d04`
 
 ## Reviewer Route
 
@@ -33,6 +33,8 @@ This index is a navigation and decision-support artifact. It does not authorize 
 - Audience: federal registration or contracting-readiness reviewer
 - Channel: `federal_registration`
 - Status: `SUBMITTED_EXTERNAL_VALIDATION_PENDING`
+- Legacy intake status: `SUBMITTED_EXTERNAL_VALIDATION_PENDING`
+- State source: `legacy_intake_baseline`
 - Fit score: `100`
 - Gate: SAM confirmation says the entity registration remains Submitted until IRS TIN validation and DLA CAGE validation complete; DLA may contact the Government Business POC.
 - Best first read: SAM submission receipt, account activation docket, and federal protocol packet.
@@ -41,13 +43,13 @@ This index is a navigation and decision-support artifact. It does not authorize 
 - Human gate: Human handles any DLA response, notarized letter, registration correction, or federal certification.
 - Claim boundary: Submitted is not Active; no award eligibility, active registration, or CAGE validation is claimed until SAM confirms it.
 - Artifacts present: `4/4`
-- Card SHA-256: `115e625c2efc163692bd215083392123e344fa1b078d08dfa329f71c57db9974`
+- Card SHA-256: `c7ff28a48e34a25fc0bc563e0d198f4f585168e01b838cd3791c3e1727b90323`
 
 Artifacts:
 - `present` `grant_submissions/funding_sprint_20260709/SAM_SUBMISSION_AND_TODAY_OPPORTUNITY_PUSH_2026-07-09.md` sha256=`7f4f1a90c08f3c4df1b6f2b6d32b5b863a008a300f304feb807823846cdbf528`
-- `present` `grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md` sha256=`6903e94da0afb1aa1c915e12b76528a70c538aebcd7728600c623558282fbebe`
-- `present` `grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md` sha256=`2f3859baa8f84ef704ab0934c431a2b97d6210cc617303e35a9b626a861a06e7`
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- `present` `grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md` sha256=`77be584815223c7940817ba6355603ff6f93f8475a6ec1fdcabdbad0d43479e5`
+- `present` `grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md` sha256=`ae8a41916c20207d4a2732d58c0e09a9a089809496696dfd822543751d27c13c`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 
 Source refs:
 - `gmail:19f48d20c59295b2`
@@ -57,23 +59,25 @@ Source refs:
 - Lane ID: `evtit_blackdog_inkind`
 - Audience: engineering-for-equity reviewer
 - Channel: `venture_engineering`
-- Status: `RESET_NOTE_SENT_TECH_REVIEW_PENDING`
+- Status: `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY`
+- Legacy intake status: `RESET_NOTE_SENT_TECH_REVIEW_PENDING`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json#related:terry_vynetic_followup`
 - Fit score: `92`
-- Gate: Discovery call window occurred July 9, 2026; reset note sent after the timing mix-up; public launch event July 22, 2026.
+- Gate: No additional outbound message. If Terry replies, read the complete thread and answer only the specific ask without sending another broad deck.
 - Best first read: Live proof stack, build scope, validation workflow, and productization gaps.
 - Decision question: Can an in-kind engineering team accelerate proof portal, replay runner, manifest, and pilot onboarding?
-- Reviewer action: Prepare a concise follow-up packet, technical walkthrough, build-scope menu, and proof-card appendix.
+- Reviewer action: Send nothing further unless Terry replies with a specific ask; then answer only that ask in the existing thread.
 - Human gate: Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.
-- Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
+- Claim boundary: The mailbox record proves only that two near-duplicate follow-ups were sent and no inbound reply was observed at reconciliation time. It does not prove interest, rejection, selection, funding, or validation.
 - Artifacts present: `5/5`
-- Card SHA-256: `c58af7826af5623308f0e38ef4a489338d700a5c3a490f052b15d8e4e2ef29e1`
+- Card SHA-256: `726e1a18d36273db7adf32c8f8aea35975e44243dbb8dc23fac4d01fbd142867`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md` sha256=`774e179a6273e9967d006de0169b09455b9d6f874ac8737aa8516a3e6bf05385`
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- `present` `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md` sha256=`a99cb47050718693df37e5903c762c425c6797add294b614209773e7f6d16686`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - `present` `docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md` sha256=`a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957`
-- `present` `docs/PROOF_TO_PILOT_CONTROL_ROOM_2026-06-25.md` sha256=`2aaa3ade058e88eef43d9ec54a0d63271de034596abd8fdb8570c6aa9eee7de3`
-- `present` `docs/LIVE_DOMAIN_PROOF_FEED_DEPLOY_BUNDLE_2026-06-27.md` sha256=`b01d392e1e003b5e0c1d910bda52901cea0ad8e04c724cd3c88babf5f26ebfaf`
+- `present` `docs/PROOF_TO_PILOT_CONTROL_ROOM_2026-06-25.md` sha256=`b0878fe3377f820083343662e893bb7d7a4feed747eb8a38c8c278e736bc93f8`
+- `present` `docs/LIVE_DOMAIN_PROOF_FEED_DEPLOY_BUNDLE_2026-06-27.md` sha256=`3d13d92fc22ecd8abc8a82341e8f048a9264e7eaa7fc312f596e9578fe13bd5e`
 
 Source refs:
 - `gmail:19f43c8a4ba9346e`
@@ -90,20 +94,22 @@ Source refs:
 - Lane ID: `lanl_vision_licensing_followup`
 - Audience: federal lab technology-transfer reviewer
 - Channel: `federal_lab_tech_transfer`
-- Status: `WAITING_POC_RETURN`
+- Status: `OUTBOUND_SENT_RESPONSE_PENDING`
+- Legacy intake status: `WAITING_POC_RETURN`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json`
 - Fit score: `88`
-- Gate: LANL reply says Mike Erickson is the main point of contact and is out until next week.
+- Gate: No follow-up before 2026-07-23 unless LANL replies first; any NDA, licensing term, export-control question, or disclosure remains human-reviewed.
 - Best first read: Licensing-fit note, IP boundary packet, proof-stack edge index, and commercialization map.
 - Decision question: Is there a bounded licensing or validation conversation worth pursuing with the named lab POC?
-- Reviewer action: Prepare a short licensing-fit note, evidence-replay boundary, and technical questions for Mike Erickson.
+- Reviewer action: Wait for LANL. If no reply by July 23, use the single bounded follow-up template in this register.
 - Human gate: Human approves any LANL reply, NDA, licensing discussion, export-control response, or disclosure package.
-- Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
+- Claim boundary: The Gmail SENT record and attachment hash prove transmission only. They do not establish LANL receipt, evaluation, a license, endorsement, independent validation, a pilot, funding, deployment, or contract performance.
 - Artifacts present: `4/4`
-- Card SHA-256: `c98887031f311b7619797626dc5102df671bf16536ead1420d5f5b0803e635d5`
+- Card SHA-256: `c0b54830196403024af645ca062e92cb7b72180c06892463b19cc1f99931c489`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
-- `present` `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`0e5cf6b23334fed68895f117a61a47238e0ea27ba9bed7103739fc19f9ba8d59`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
+- `present` `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`e9efbb7e405cc0dc8d283f991e353df8ff78f69864bde2aab0159839f8ecd306`
 - `present` `grant_submissions/funding_sprint_20260709/PROOF_STACK_EDGE_INDEX_2026-07-09.md` sha256=`3a814a6751a89939d540381a20acd7eaa0ccec1b970d045191dc64d7a5b49596`
 - `present` `docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md` sha256=`a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957`
 
@@ -115,19 +121,21 @@ Source refs:
 - Lane ID: `lvlup_first_check`
 - Audience: early-check investor
 - Channel: `venture_cash`
-- Status: `WAITING_REVIEW`
+- Status: `WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED`
+- Legacy intake status: `WAITING_REVIEW`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json#related:lvlup_optional_paid_event`
 - Fit score: `86`
-- Gate: Submitted July 9, 2026; Gmail reply acknowledged the update.
+- Gate: Reply only if LvlUp's Investment Committee requests additional information. No sponsor purchase, unsolicited duplicate packet, valuation disclosure, or reuse of the July 3 draft without a fresh claim review and explicit founder approval.
 - Best first read: Traction ledger, proof-to-revenue engine, and clean proof-to-pilot public link.
 - Decision question: Is a small first check useful enough to preserve execution velocity and unlock pilots?
-- Reviewer action: Keep investor brief and short walkthrough ready for under-one-week review.
+- Reviewer action: Monitor the existing thread. Reply only if LvlUp's Investment Committee requests additional information; do not purchase the optional sponsor track or send an unsolicited duplicate packet.
 - Human gate: Human approves any diligence reply or investor terms.
-- Claim boundary: Submission and acknowledgement only; no funding decision is represented.
+- Claim boundary: This receipt proves only that LvlUp Ventures stated in writing that declining the sponsor-backed track would not affect the separate investment and accelerator review and that the application would continue through its standard investment process. It does not prove Investment Committee consideration, diligence, selection, investment interest, funding, accelerator admission, endorsement, validation, or an offer.
 - Artifacts present: `3/3`
-- Card SHA-256: `6a081c5f6deac960564ebfce338aa0ebfc45f7f5ca045ea1658553cc20cbd7bf`
+- Card SHA-256: `ac779439b74ba69a6338c4f4751a9e011daf8db65bab5e9e5a5606faa721283c`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - `present` `docs/PROOF_TO_REVENUE_ENGINE_2026-06-27.md` sha256=`7c3a46f3a679a6f1c345c1028b6877630d3c3c09f65295e1b1bbb091cd38b992`
 - `present` `docs/BUSINESS_PLAN_AND_LIVE_BREADTH_SEND_PACKET_2026-07-05.md` sha256=`150b3b3f519f545230f5640f154f4f1fcc0850eafa869169a22c77cea9539769`
 
@@ -140,21 +148,23 @@ Source refs:
 - Lane ID: `uspto_georgia_patents_route`
 - Audience: patent counsel or IP reviewer
 - Channel: `ip_readiness`
-- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- Status: `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING`
+- Legacy intake status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json#related:georgia_patents_pro_bono_intake`
 - Fit score: `100`
-- Gate: USPTO Pro Bono response says Georgia PATENTS serves Tennessee inventors; counsel must verify actual patent deadlines and filing posture.
+- Gate: Reply only if Georgia PATENTS requests intake facts or directs the founder to a reviewed application channel; do not disclose unpublished application materials by ordinary email.
 - Best first read: Claim-boundary register and legal rescue packet.
 - Decision question: What filing or claim action must licensed counsel verify before public expansion?
-- Reviewer action: Prepare Georgia PATENTS intake packet: filed materials, invention timeline, public disclosure map, claim boundary, and counsel questions.
+- Reviewer action: Monitor through July 23 without a duplicate email. In parallel, populate the six ignored Patent Center role folders and use USPTO Pro Se procedural support; send the held practitioner request only after recipient and secure-channel confirmation.
 - Human gate: Human and licensed counsel decide any filing, claim, continuation, PCT, disclosure, or legal strategy.
-- Claim boundary: This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.
+- Claim boundary: This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice.
 - Artifacts present: `3/3`
-- Card SHA-256: `328fce40957a3a79b7adc6395771dadbdd73877e38cd77e18ef83355623681a8`
+- Card SHA-256: `dddaee15c2966f0c853cfe0d22e43171540227ae24a09d5069d5e8fcfb1a0b1f`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`0e5cf6b23334fed68895f117a61a47238e0ea27ba9bed7103739fc19f9ba8d59`
+- `present` `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`e9efbb7e405cc0dc8d283f991e353df8ff78f69864bde2aab0159839f8ecd306`
 - `present` `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md` sha256=`274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb`
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 
 Source refs:
 - `gmail:19f47bc2564305ae`
@@ -167,6 +177,8 @@ Source refs:
 - Audience: BAA technical evaluator
 - Channel: `federal_baa`
 - Status: `FULL_PROPOSAL_SPRINT`
+- Legacy intake status: `FULL_PROPOSAL_SPRINT`
+- State source: `legacy_intake_baseline`
 - Fit score: `90`
 - Gate: Abstract ID HR001126S0010-DICE-PA-052 recorded; full proposal instructions must be confirmed against the controlling BAA before upload.
 - Best first read: Heilmeier matrix, evidence synthesis, compliance matrix, and human-gated submission controls.
@@ -175,11 +187,11 @@ Source refs:
 - Human gate: Human confirms BAA requirements, reps, budgets, and submission package before any portal action.
 - Claim boundary: Abstract receipt is not award selection and not permission to skip BAA instructions.
 - Artifacts present: `5/5`
-- Card SHA-256: `862884c51273043a34b6305a0c284de05634caadc3e6d5feedd3a9dab1cf4fb5`
+- Card SHA-256: `e8af495c82e8c398b6e440d0524d81c5de8589458f38d808ea4888407535e907`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
-- `present` `grant_submissions/DICE_HR001126S0010/DICE_SUBMISSION_READINESS.md` sha256=`783af4c8d658be2b90c1a2419fb7728455e91652b00dda740b5c39d9502359ad`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
+- `present` `grant_submissions/DICE_HR001126S0010/DICE_SUBMISSION_READINESS.md` sha256=`454be23f7679ff8c5cc4142b8dfe3fb748b2cc3c70a75b404eb5acc3ed59123e`
 - `present` `grant_submissions/DICE_HR001126S0010/DICE_HEILMEIER_REVIEWER_MATRIX_2026-06-20.md` sha256=`a42695523227bb7e2270187722a2ac2e2359dd3d0493eb4e0f014538927d0be8`
 - `present` `grant_submissions/DICE_HR001126S0010/DICE_EVIDENCE_SYNTHESIS_2026-06-20.md` sha256=`291047ec5573f3461b050cc870ff19bacfb2035a513f6ba166b4f649c836c300`
 - `present` `grant_submissions/DICE_HR001126S0010/DICE_REFERENCE_RELEVANCE_MATRIX_2026-06-20.md` sha256=`e83685b7603c05aa28228765ee0c4c4c6a8b466ec75dc1f11cdffb8e53eeea4c`
@@ -193,16 +205,18 @@ Source refs:
 - Lane ID: `fhwa_tsmo_data_initiative`
 - Audience: contracting or technical capability reviewer
 - Channel: `federal_contract`
-- Status: `PHASE_I_TECH_VOLUME`
+- Status: `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING`
+- Legacy intake status: `PHASE_I_TECH_VOLUME`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json#related:fhwa_tsmo_qualified_partner_outreach`
 - Fit score: `95`
-- Gate: Active until 2026-08-03 13:00 UTC per Sweetspot search; official SAM notice ID 693JJ326R000012 located.
+- Gate: 2026-08-03T09:00:00-04:00
 - Best first read: Capability outline, source provenance, risk boundaries, and agency protocol controls.
 - Decision question: Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?
-- Reviewer action: Convert the existing outline into a compliance matrix, capability volume, and teaming decision.
+- Reviewer action: Monitor the referred response lead for scheduling or a specific question and do not reuse the rejected address. If no response arrives by July 21, send at most one short scheduling follow-up. Before any teaming or proposal claim, verify written role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule.
 - Human gate: Human verifies SAM attachments, terms, pricing, reps/certs, and final submission authority.
-- Claim boundary: Prepared capability material only; no FHWA field result, safety benefit, or deployment claim.
+- Claim boundary: The Gmail records prove that the first route was rejected, the replacement message received a substantive reply, the request was referred to the subject matter expert leading this response, and one bounded acknowledgment was sent in that thread. The referral does not establish pursuit, a fit-check commitment, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.
 - Artifacts present: `3/3`
-- Card SHA-256: `1328e8f4d489da72e8e3fd87fe9f0a3cdea8a82b97b852c61098473a6b7b6f71`
+- Card SHA-256: `d152edc4a30c6bf67c6840f821e9f832a804b399c9c2c5a9e652c2cf8d04ad8d`
 
 Artifacts:
 - `present` `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md` sha256=`f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046`
@@ -218,16 +232,18 @@ Source refs:
 - Lane ID: `nasa_data_center_rfi`
 - Audience: market research reviewer
 - Channel: `federal_rfi`
-- Status: `RFI_RESPONSE_PREP`
+- Status: `SENT_VERIFIED_RESPONSE_PENDING`
+- Legacy intake status: `RFI_RESPONSE_PREP`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json`
 - Fit score: `89`
-- Gate: Active until 2026-07-17 21:00 UTC per Sweetspot search; official RFI number 80TECH26RFI0020 located.
+- Gate: 2026-07-17T21:00:00Z
 - Best first read: RFI response outline and source-backed concept map.
 - Decision question: Does the response provide useful market intelligence without claiming award readiness?
-- Reviewer action: Package the RFI response as architecture, evidence manifest, and operations-risk framing.
+- Reviewer action: Retain the SENT receipt and attachment hash; do not resend before the deadline.
 - Human gate: Human verifies official response instructions, page limits, contacts, and final send.
-- Claim boundary: RFI response only; no NASA partnership, contract, or infrastructure result is represented.
+- Claim boundary: Transmission does not establish agency acceptance, evaluation, validation, an award, or a contract.
 - Artifacts present: `3/3`
-- Card SHA-256: `5cf3ef5242a4b758bfea94dfe4aac3c46529a67d01b3ba226247a3f18124ebfc`
+- Card SHA-256: `1c350f31ae2ae7614a27aa0a3024799113b72a9c941dbd45008326a4ba498124`
 
 Artifacts:
 - `present` `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md` sha256=`bcfdd40dfafc7ca0e7822679dba9d2504c2196b5701704d0ba3d46c5ce9448f6`
@@ -243,16 +259,18 @@ Source refs:
 - Lane ID: `dla_missionweave_sbir`
 - Audience: SBIR reviewer
 - Channel: `federal_sbir`
-- Status: `DSIP_PACKAGE_PREP`
+- Status: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`
+- Legacy intake status: `DSIP_PACKAGE_PREP`
+- State source: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json`
 - Fit score: `87`
-- Gate: Current sprint records July 22, 2026 as the active DSIP gate; verify DSIP before final action.
+- Gate: July 22, 2026 at 12:00 p.m. Eastern Time (2026-07-22T16:00:00Z); live DSIP recheck required
 - Best first read: Phase I technical plan, innovation boundary, commercialization path, and proof-to-pilot evidence.
 - Decision question: Is the Phase I work scoped to produce independently reviewable technical evidence?
-- Reviewer action: Prepare DSIP technical volume, cost notes, and Firm PIN handoff checklist.
+- Reviewer action: Resolve the 37 open gates out of 50, review the complete portal preview, and retain the human-only final-submit boundary.
 - Human gate: Human-only Firm PIN, certifications, cost approval, and final submit.
-- Claim boundary: No DLA integration, procurement, or certified readiness claim.
+- Claim boundary: This public gate proves package integrity, document-format checks, and the completion state of a bounded private DSIP fact workflow. It does not expose legal identifiers, a Firm PIN, the assigned proposal number, private portal evidence, or unsupported compliance facts. It does not establish DLA validation, CMMC status, ITAR compliance, award eligibility, proposal acceptance, submission, selection, contract, award, deployment, or realized performance.
 - Artifacts present: `3/3`
-- Card SHA-256: `34c7baccce03f5ee0f417a1d84f15db7718b09a929ca8067980fd4b027e21bfd`
+- Card SHA-256: `7fc787fa32dc5adc0e3086639c57c84d14dd630f4dc7965e6c8edc82e8c79a37`
 
 Artifacts:
 - `present` `grant_submissions/funding_sprint_20260709/DSIP_MISSIONWEAVE_FAST_SUBMISSION_PLAN_2026-07-09.md` sha256=`cf0d3fd466ecfd8396d17f1c4787a7fa2898f49ee5f81ed377df05aa161029c4`
@@ -269,6 +287,8 @@ Source refs:
 - Audience: SBIR reviewer
 - Channel: `federal_sbir`
 - Status: `PITCH_READY_HUMAN_CHECK`
+- Legacy intake status: `PITCH_READY_HUMAN_CHECK`
+- State source: `legacy_intake_baseline`
 - Fit score: `78`
 - Gate: Rolling pitch gate; NSF requires waiting if a Project Pitch, open invitation, or full proposal is already pending.
 - Best first read: Phase I technical plan, innovation boundary, commercialization path, and proof-to-pilot evidence.
@@ -277,11 +297,11 @@ Source refs:
 - Human gate: Human approves pitch content and submission.
 - Claim boundary: No NSF invitation or full-proposal eligibility is represented unless NSF issues it.
 - Artifacts present: `3/3`
-- Card SHA-256: `d5839df683b593e54ed9ed74dfef2e6967d170c95df1cbaa90b2f3915cb178e2`
+- Card SHA-256: `410861af6adf43aef3cb10de28949fcd750bf04879049c630d5e680c284f1a6c`
 
 Artifacts:
 - `present` `grant_submissions/funding_sprint_20260709/NSF_PROJECT_PITCH_DRAFT_2026-07-09.md` sha256=`baa66ab948fdc1bb57e898d8a6e4e0bf776c65ff4c6722ef658720c148f40e6f`
-- `present` `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_READINESS.md` sha256=`7ba4f6c8a371dca2c0b6472424b5f7c5866063df014f1d8691855f4e81d3dacb`
+- `present` `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_READINESS.md` sha256=`eb0c7f23130a510f5ee1ab5e795b0e0aeeaa65aefda04ac6e8b7169bc4de93a2`
 - `present` `grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-06-19.md` sha256=`f4b07fcdd718b53a854f6e96451276392487c725ca25c7e3e3c792e189848602`
 
 Source refs:
@@ -295,6 +315,8 @@ Source refs:
 - Audience: infrastructure buyer-discovery reviewer
 - Channel: `infrastructure_market_signal`
 - Status: `CUSTOMER_DISCOVERY_SIGNAL_ONLY`
+- Legacy intake status: `CUSTOMER_DISCOVERY_SIGNAL_ONLY`
+- State source: `legacy_intake_baseline`
 - Fit score: `66`
 - Gate: Recruiter asked Robert to apply for an ITS Engineer role on a Georgia highway infrastructure project if interested.
 - Best first read: Customer commercialization packet, FHWA/TSMO capability outline, and traction ledger.
@@ -303,12 +325,12 @@ Source refs:
 - Human gate: Human decides whether to reply, apply, or use it only as a customer-discovery clue.
 - Claim boundary: This is not a customer commitment, contract, employment acceptance, or pilot demand signal.
 - Artifacts present: `3/3`
-- Card SHA-256: `e585cc687bac0821298d8dd42ad25f19d36cd00c11c1e10f5b1bb75e67bd195f`
+- Card SHA-256: `357601c478885352e7a89ded2cbf6c5dcc382929cdabf3cd6b6fe24ebb9a66fb`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md` sha256=`b1034846561675a25ff85134813c6e4bc0d71a5a48bad92f78610273c4499d28`
+- `present` `grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md` sha256=`6adceb9476c4c557c316fce368db813f25fe585285258de389b265c33a2fe413`
 - `present` `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md` sha256=`f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046`
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 
 Source refs:
 - `gmail:19f485d99c69a63a`
@@ -320,6 +342,8 @@ Source refs:
 - Audience: agency routing contact
 - Channel: `federal_market_research`
 - Status: `ROUTE_ONLY_LOW_FIT`
+- Legacy intake status: `ROUTE_ONLY_LOW_FIT`
+- State source: `legacy_intake_baseline`
 - Fit score: `42`
 - Gate: Active until 2026-07-21 21:30 UTC per Sweetspot search; official notice ID 68HE0726Q0027 located.
 - Best first read: Boundary-safe routing note and partner-only decision record.
@@ -328,10 +352,10 @@ Source refs:
 - Human gate: Human approves any further agency contact.
 - Claim boundary: No instrument supply, OEM, reseller, or lab-services qualification claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `6176133d0bacf627aaad6eee9a0ecfe3ca021bb9056d805b56ec2414287be1a4`
+- Card SHA-256: `086215387576f719c7b46e48a26e80ce50403cf407817fe7ae5d6bd0b3a9c0bc`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - `present` `grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md` sha256=`684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9`
 
 Source refs:
@@ -345,6 +369,8 @@ Source refs:
 - Audience: sources-sought reviewer
 - Channel: `federal_sources_sought`
 - Status: `PARTNER_ONLY`
+- Legacy intake status: `PARTNER_ONLY`
+- State source: `legacy_intake_baseline`
 - Fit score: `46`
 - Gate: Active until 2026-07-21 20:00 UTC per Sweetspot search.
 - Best first read: Partner-only filter and qualification boundary.
@@ -353,10 +379,10 @@ Source refs:
 - Human gate: Human approves partner outreach.
 - Claim boundary: No testing lab, contaminant monitoring, or regulated lab-services claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `fd786f9139d4aa291074157fcabe669ed45132fb914cf537b30ae25c614ad68e`
+- Card SHA-256: `2cea7ad1ca990f5cb3e99d202a2f0ed6cb4b8ddd2e0f6159fab2ac7e306ac26e`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - `present` `grant_submissions/funding_sprint_20260709/FUNDING_ACTION_MATRIX_2026-07-09.md` sha256=`684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9`
 
 Source refs:
@@ -368,6 +394,8 @@ Source refs:
 - Audience: BAA technical evaluator
 - Channel: `federal_baa`
 - Status: `SCOUT_TOPIC_MATCH`
+- Legacy intake status: `SCOUT_TOPIC_MATCH`
+- State source: `legacy_intake_baseline`
 - Fit score: `64`
 - Gate: Active until 2026-07-24 17:00 UTC per Sweetspot search; official SAM call located.
 - Best first read: Heilmeier matrix, evidence synthesis, compliance matrix, and human-gated submission controls.
@@ -376,10 +404,10 @@ Source refs:
 - Human gate: Human approves topic selection and submission.
 - Claim boundary: No claim that LumenCore fits all BAA topics.
 - Artifacts present: `2/2`
-- Card SHA-256: `f5e4d3f01340e4a562e8aed901f97f88ed995ec9afe2579810e864a90ec0dd86`
+- Card SHA-256: `1bba2998d81c3935692fc3902a08ad5e842d5edac0d3071dfb0c924b730688c7`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - `present` `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md` sha256=`f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046`
 
 Source refs:
@@ -392,6 +420,8 @@ Source refs:
 - Audience: contracting or technical capability reviewer
 - Channel: `federal_contract`
 - Status: `DO_NOT_PRIME_SOLO`
+- Legacy intake status: `DO_NOT_PRIME_SOLO`
+- State source: `legacy_intake_baseline`
 - Fit score: `38`
 - Gate: Active until 2026-07-14 21:00 UTC per Sweetspot search.
 - Best first read: Capability outline, source provenance, risk boundaries, and agency protocol controls.
@@ -400,10 +430,10 @@ Source refs:
 - Human gate: Human approves any partner route.
 - Claim boundary: No FedRAMP, ATO, HHS pilot, or government production-access claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `aae83fe4e83943be7d4838517f0bdec202cba40a0745bd04724173c6d7070241`
+- Card SHA-256: `cfd9a2af97d5d15f02b2528b13906f1e316244671564253c03a7cc65a844fc41`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - `present` `grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md` sha256=`fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82`
 
 Source refs:
@@ -415,6 +445,8 @@ Source refs:
 - Audience: contracting or technical capability reviewer
 - Channel: `federal_contract`
 - Status: `DO_NOT_PRIME_SOLO`
+- Legacy intake status: `DO_NOT_PRIME_SOLO`
+- State source: `legacy_intake_baseline`
 - Fit score: `35`
 - Gate: Active until 2026-07-14 16:00 UTC per Sweetspot search.
 - Best first read: Capability outline, source provenance, risk boundaries, and agency protocol controls.
@@ -423,10 +455,10 @@ Source refs:
 - Human gate: Human approves any partner route.
 - Claim boundary: No public-safety deployment, law-enforcement feed integration, or FedRAMP authorization claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `c1f8294701a8b98da2311e4372a40b2849f16f2e817e940a41df1d291096c260`
+- Card SHA-256: `417333b416ed2b5b523f1b891c42437a47d3a774a27c828440aa946092668bb3`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - `present` `grant_submissions/funding_sprint_20260709/AGENCY_GOV_PROTOCOL_READINESS_CONTROL_ROOM_2026-07-09.md` sha256=`fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82`
 
 Source refs:
@@ -438,6 +470,8 @@ Source refs:
 - Audience: contracting or technical capability reviewer
 - Channel: `federal_contract`
 - Status: `PARTNER_INTRO_ONLY`
+- Legacy intake status: `PARTNER_INTRO_ONLY`
+- State source: `legacy_intake_baseline`
 - Fit score: `58`
 - Gate: Active until 2026-07-30 19:00 UTC per Sweetspot search.
 - Best first read: Capability outline, source provenance, risk boundaries, and agency protocol controls.
@@ -446,11 +480,11 @@ Source refs:
 - Human gate: Human approves any partner or investor intro.
 - Claim boundary: No consortium management, energy project financing, or installation-performance claim.
 - Artifacts present: `2/2`
-- Card SHA-256: `9863021e6750ef64e5881d40a1be19d664728170958892465cf3a935d1a0a0d0`
+- Card SHA-256: `8cbb6eb4bb2c8476217050e8a679c4bb4cb99dea315ca42322ae182f81e736e0`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
-- `present` `docs/PROOF_TO_PILOT_CONTROL_ROOM_2026-06-25.md` sha256=`2aaa3ade058e88eef43d9ec54a0d63271de034596abd8fdb8570c6aa9eee7de3`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
+- `present` `docs/PROOF_TO_PILOT_CONTROL_ROOM_2026-06-25.md` sha256=`b0878fe3377f820083343662e893bb7d7a4feed747eb8a38c8c278e736bc93f8`
 
 Source refs:
 - `sweetspot:FA8003-26-R-0023`
@@ -461,6 +495,8 @@ Source refs:
 - Audience: vendor credit or partner-program reviewer
 - Channel: `vendor_credit_or_partner_route`
 - Status: `HUMAN_FORM_READY`
+- Legacy intake status: `HUMAN_FORM_READY`
+- State source: `legacy_intake_baseline`
 - Fit score: `80`
 - Gate: No deadline found; request should be submitted through official contact-sales path if still needed.
 - Best first read: Proof-stack continuity case and API continuity request.
@@ -469,10 +505,10 @@ Source refs:
 - Human gate: Human submits the vendor form and approves any billing or credit terms.
 - Claim boundary: No credit, free account, or vendor approval is represented.
 - Artifacts present: `2/2`
-- Card SHA-256: `3cbe7230d28817a07f9a625a4d8b511bf585f0a08a3b9a7fe78eb763bd46b8f5`
+- Card SHA-256: `1325b2605ebb64305e9b53417cf37efc39951bb0650fe6f09f4c8e27d6f44c92`
 
 Artifacts:
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - `present` `docs/CURRENT_PROOF_POSTURE_AND_NEXT_TESTS_2026-07-03.md` sha256=`d96de76ff8b4f4a7df247ca9143ca62621765a2ed90f89558b88cde70a29a022`
 
 Source refs:
@@ -484,16 +520,18 @@ Source refs:
 - Lane ID: `patent_deadline_counsel`
 - Audience: patent counsel or IP reviewer
 - Channel: `ip_readiness`
-- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- Status: `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING`
+- Legacy intake status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json#related:georgia_patents_pro_bono_intake`
 - Fit score: `100`
-- Gate: Dossier email states a July 25, 2025 filing date; USPTO Pro Bono routed Tennessee inventors to Georgia PATENTS; counsel must verify all actual patent deadlines before action.
+- Gate: Reply only if Georgia PATENTS requests intake facts or directs the founder to a reviewed application channel; do not disclose unpublished application materials by ordinary email.
 - Best first read: Claim-boundary register and legal rescue packet.
 - Decision question: What filing or claim action must licensed counsel verify before public expansion?
-- Reviewer action: Prepare Georgia PATENTS intake packet, monitor counsel replies, and avoid public claim expansion until counsel reviews.
+- Reviewer action: Monitor through July 23 without a duplicate email. In parallel, populate the six ignored Patent Center role folders and use USPTO Pro Se procedural support; send the held practitioner request only after recipient and secure-channel confirmation.
 - Human gate: Human and licensed counsel decide any filing, claim, continuation, PCT, or disclosure action.
-- Claim boundary: This ledger is not legal advice and does not assert patentability, ownership, or filing sufficiency.
+- Claim boundary: This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice.
 - Artifacts present: `2/2`
-- Card SHA-256: `aaa69bbe8840dedb1e2c7f9d1bea97d3cd5e5469e15d55a6ced6671810eea675`
+- Card SHA-256: `3f5c644856b3a3cf0baed7d59fca1d4487722455871e0b22d60b8f9b045488f3`
 
 Artifacts:
 - `present` `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md` sha256=`274d6212cdbd25c2a624375cf845ba9f3339c7ca9b111adfefe5034bf9f74cfb`

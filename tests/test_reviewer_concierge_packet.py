@@ -54,6 +54,10 @@ def test_concierge_cards_keep_decision_questions_hashes_and_human_gates():
         "patent_deadline_counsel",
     }
     assert expected.issubset(cards)
+    assert cards["dla_missionweave_sbir"]["status"] == "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
+    assert cards["lvlup_first_check"]["status"] == "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED"
+    assert cards["evtit_blackdog_inkind"]["status"] == "OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY"
+    assert "2026-07-22T16:00:00Z" in cards["dla_missionweave_sbir"]["deadline_or_gate"]
 
     for card in payload["concierge_cards"]:
         assert card["artifact_count"] > 0
@@ -61,6 +65,8 @@ def test_concierge_cards_keep_decision_questions_hashes_and_human_gates():
         assert card["artifact_present_count"] == card["artifact_count"]
         assert card["decision_question"]
         assert card["best_first_read"]
+        assert card["legacy_intake_status"]
+        assert card["state_source"]
         assert "Human" in card["human_gate"]
         assert len(card["concierge_card_sha256"]) == 64
         for artifact in card["artifacts"]:

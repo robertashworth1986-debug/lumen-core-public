@@ -1,8 +1,8 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T20:38:57.843Z",
+  "created_utc": "2026-07-17T21:18:25.494161Z",
   "destination_root": "E:/LumaProofVault/OUTREACH/EXTERNAL_RESPONSE_STATE_20260717",
-  "artifact_count": 29,
+  "artifact_count": 74,
   "all_sha256_matched_after_copy": true,
   "browser_navigation_performed": false,
   "private_founder_values_mirrored": false,
@@ -39,8 +39,8 @@
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
-      "bytes": 18753,
-      "sha256": "81DBC4F4F30D9A103583875D4169E97E41AD993990C3C94BD7824F3CE43906C9",
+      "bytes": 20235,
+      "sha256": "CDBC5CD85080715156C7837058FADE425E1F97CBCAAA9346FBB5B7C7EC3B39B9",
       "copy_sha256_matched": true
     },
     {
@@ -180,7 +180,277 @@
       "bytes": 19223,
       "sha256": "09625A9352CB6E27CF6591E08DE020016363D744F1BF63876CB70A5A683AD55E",
       "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_EXTERNAL_RESPONSE_STATE_E_DRIVE_SYNC_RECEIPT.py",
+      "bytes": 8019,
+      "sha256": "FC75D60426D4DA4DE555CD90E219BB5CBA27D46959ABD517FAB11F9806B9394B",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_TRACTION_OPPORTUNITY_INTAKE_LEDGER.py",
+      "bytes": 53657,
+      "sha256": "5D819D642FE964799997423AF6F88748F9F1764DD5C31F20529CC8F13C4C886A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_TRACTION_FOLLOWUP_PACKET.py",
+      "bytes": 19873,
+      "sha256": "DF39B7E830832A676DA211D0FDC9585F4192FC3537B71EF509247A51CAC20FFB",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET.py",
+      "bytes": 20790,
+      "sha256": "4AC6FFDA1F06CAB70175EBC7B8F649932F1E10C3A6598F94980C817412470BA9",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_REVIEWER_CONCIERGE_PACKET.py",
+      "bytes": 21605,
+      "sha256": "A0D2BB944FDB42762FA9A4A95F7ECECFE03A899A3FABCDC3F6DCF0C8F8230198",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_AGENCY_SUBMISSION_ASSEMBLY_GATE.py",
+      "bytes": 23328,
+      "sha256": "9F9A96645E4BF14E5FEE5C889ACA15B15695EDA50635E394EB45EB46DE576B32",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_traction_opportunity_intake_ledger.py",
+      "bytes": 8906,
+      "sha256": "F3152DDB78877A00C3BD219E7448F693D2544ED3D2EF0D304542CEE4EA53C16F",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_traction_followup_packet.py",
+      "bytes": 5526,
+      "sha256": "5DE3866E6322C595FD10CD7AAD2E6D79F7403D7831B0508281206361CBBD9776",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_evtit_technical_sprint_scope_packet.py",
+      "bytes": 3516,
+      "sha256": "A1FB2F31055E08DD18A3C1624D908BAD1F31F5E3B00A9F5909DEE6BE4B4863DC",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_reviewer_concierge_packet.py",
+      "bytes": 3895,
+      "sha256": "20AE15EAEFC613808449CD127A6BB9CDE47C8B197B983C86BEDBC07F4E85B76B",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_agency_submission_assembly_gate.py",
+      "bytes": 4856,
+      "sha256": "0BB750FFC60809AB4E789777B01D39AEDA23DF545B7EE028D1D9BF479EA300B9",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_flowform_hardware_concept_asset.py",
+      "bytes": 2215,
+      "sha256": "18C1232F92D49AF4B6A552F5EEDC58C4B524526BE72CE22A331C383D76DC9B28",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.json",
+      "bytes": 3363,
+      "sha256": "5146281AF36E0DDA090BD38D2699D847005E1DD02F41CF267104874D7D5EB98D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.png",
+      "bytes": 2943666,
+      "sha256": "10472C90DB0837827E9C37D3BD781A87B690F084CAF7ECB28988C02223FFECB7",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/traction_opportunity_intake_ledger_latest.json",
+      "bytes": 85341,
+      "sha256": "FB88AC9D2B61D3C07EF04EEAA33756DAE839B64271C9D5DFD1893E8AD061F7B8",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/traction_opportunity_intake_ledger.json",
+      "bytes": 85341,
+      "sha256": "FB88AC9D2B61D3C07EF04EEAA33756DAE839B64271C9D5DFD1893E8AD061F7B8",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+      "bytes": 52071,
+      "sha256": "9CDCAD79BB7BF3041CE817F832D8CBFAF58F6076D30211F8D5D4E6D192D9DE9F",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/traction_followup_packet_latest.json",
+      "bytes": 12366,
+      "sha256": "BF8F2F49C3B8662980A22C8935EC6EF3C9F5401B5A9080744EA4E7F53155D1C5",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/traction_followup_packet.json",
+      "bytes": 12366,
+      "sha256": "BF8F2F49C3B8662980A22C8935EC6EF3C9F5401B5A9080744EA4E7F53155D1C5",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
+      "bytes": 8935,
+      "sha256": "A99CB47050718693DF37E5903C762C425C6797ADD294B614209773E7F6D16686",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/evtit_technical_sprint_scope_packet_latest.json",
+      "bytes": 11837,
+      "sha256": "ACC478857BA260FC0C14040FD72E05D6B6D20CB00125D5191F45FD6C9567AC29",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/evtit_technical_sprint_scope_packet.json",
+      "bytes": 11837,
+      "sha256": "ACC478857BA260FC0C14040FD72E05D6B6D20CB00125D5191F45FD6C9567AC29",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
+      "bytes": 8625,
+      "sha256": "F21C4AF99226E6CD2554DC626DF51E02F1DD909BB6FDF7095FDBDA1DACB1DF78",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/reviewer_concierge_packet_latest.json",
+      "bytes": 49973,
+      "sha256": "F908B067A209E28CA9532B28A4C44DF42171A5E3D172F63A70402198A102C421",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/reviewer_concierge_packet.json",
+      "bytes": 49973,
+      "sha256": "F908B067A209E28CA9532B28A4C44DF42171A5E3D172F63A70402198A102C421",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
+      "bytes": 36127,
+      "sha256": "44DDF0C67FF6291892AD18809C6381B33329A54F5502CBFE93A19508C05E6168",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/human_action_docket_latest.json",
+      "bytes": 30936,
+      "sha256": "23E20DA5AD34EA6477C487B5C6D7F9045A5E4BEC471AF7599045275646B6A7A6",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/human_action_docket.json",
+      "bytes": 30936,
+      "sha256": "23E20DA5AD34EA6477C487B5C6D7F9045A5E4BEC471AF7599045275646B6A7A6",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
+      "bytes": 22454,
+      "sha256": "CD2DD829F5F383D69EA7D55934E3C15B6F5ED86852463E1D373481189F8F155A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/reviewer_decision_brief_latest.json",
+      "bytes": 29965,
+      "sha256": "3930B7C561E1F8D3BA31C0F201FD861B8C3975B2D8CC98987EAE3BF0218AC50A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/reviewer_decision_brief.json",
+      "bytes": 29965,
+      "sha256": "3930B7C561E1F8D3BA31C0F201FD861B8C3975B2D8CC98987EAE3BF0218AC50A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
+      "bytes": 23864,
+      "sha256": "C935210E86E3CF4F217EEC9EDF04814067A829BE7D93FE90093F3839B45490D9",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/customer_commercialization_packet_latest.json",
+      "bytes": 14800,
+      "sha256": "E4448BF9F99ACC50D29AB0216AFE587FB66DAB4F9D39157DECC6CDC554CC283A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/customer_commercialization_packet.json",
+      "bytes": 14800,
+      "sha256": "E4448BF9F99ACC50D29AB0216AFE587FB66DAB4F9D39157DECC6CDC554CC283A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
+      "bytes": 11451,
+      "sha256": "9C4CF95F1D749CDE316F02EB4FB9AB0938290089D312EBB121572C7B304E31CC",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/reviewer_investor_fast_lane_router_latest.json",
+      "bytes": 23856,
+      "sha256": "930F8EB67EC4C1CB60988AB58FB8B04B3597721DB47D653ED699ED114737AB0E",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/reviewer_investor_fast_lane_router.json",
+      "bytes": 23856,
+      "sha256": "930F8EB67EC4C1CB60988AB58FB8B04B3597721DB47D653ED699ED114737AB0E",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md",
+      "bytes": 15628,
+      "sha256": "58546A323724B656D85D355D9E7C36C4A0B56B619FC2BDE6433CE30BE4F6B541",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/agency_submission_assembly_gate_latest.json",
+      "bytes": 72601,
+      "sha256": "5AD01B9E63D7EDBDFEA82D415656636AFEAF495F5388083EA7029BD08DFC7733",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/agency_submission_assembly_gate.json",
+      "bytes": 72601,
+      "sha256": "5AD01B9E63D7EDBDFEA82D415656636AFEAF495F5388083EA7029BD08DFC7733",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
+      "bytes": 35113,
+      "sha256": "172B5511A3FC25C9F3C0CDF6FBDC401F1390F37E982D5F1DE0BA7AC8FEDE3360",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "bytes": 9327,
+      "sha256": "75DEC9CAE26FB9ABF879EC94EDDADA2A5DDA5FC8AEEEEC8D8A84E0BAAB5AA0BD",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md",
+      "bytes": 4641,
+      "sha256": "DABF2BFAC691D64907975A4139DF30125153D1D555BF8C92578DFB7B02BDD323",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md",
+      "bytes": 6048,
+      "sha256": "250BE54937EAAFD0C77849D4E950440DDCA93224C15DA5B5B00F5AB611047D2A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_missionweave_dsip_action_gate.py",
+      "bytes": 13611,
+      "sha256": "836D17D5A3CC8C695D9959C23C515C94E788A5411210CBD1AA13B83FBB08FF33",
+      "copy_sha256_matched": true
     }
   ],
-  "claim_boundary": "This receipt proves only that twenty-nine bounded response-control, test, deadline-confirmation, reconciliation, clock-gate, portal-handoff, command-board, and public-safe dashboard artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove portal submission, application acceptance, investor review activity beyond the cited sender statement, funding, selection, award, endorsement, external validation, or technical performance."
+  "claim_boundary": "This receipt proves only that 74 bounded response-control, deadline, reviewer-pipeline, test, hardware-concept, MissionWeave action-gate, and public-safe dashboard artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove portal submission, application acceptance, investor activity beyond cited written evidence, funding, selection, award, endorsement, external validation, technical performance, hardware feasibility, safety certification, or commercial readiness."
 }

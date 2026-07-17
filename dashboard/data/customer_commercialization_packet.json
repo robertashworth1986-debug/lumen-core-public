@@ -103,43 +103,43 @@
       "segment_id": "ip_or_compliance_reviewer"
     }
   ],
-  "customer_commercialization_sha256": "2ac468847ad9a0b7b77db7412cf7e89217f96521a29fb82a930fb9413a9841db",
+  "customer_commercialization_sha256": "27c637e885e0290b42d12b6387db02e4887d96bb7eead3a5374b177a6d7b2a2b",
   "evidence_artifacts": [
     {
-      "bytes": 18715,
+      "bytes": 23864,
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
       "present": true,
-      "sha256": "767720b50d1012b95e6716377b315b74181236ede4412d616171b87b1e73cd48"
+      "sha256": "c935210e86e3cf4f217eec9edf04814067a829be7d93fe90093f3839b45490d9"
     },
     {
-      "bytes": 17167,
+      "bytes": 52071,
       "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
       "present": true,
-      "sha256": "d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b"
+      "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
     },
     {
-      "bytes": 7867,
+      "bytes": 8029,
       "path": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
       "present": true,
-      "sha256": "2aa3e2e80e5ebb68a085080b0466b3f40d42df8cfb67ab98dfbdcf5957fd7e7c"
+      "sha256": "b6257f98e9cad35a244aa02264dec019204c5ede27357cdadba76a1019a9fac6"
     },
     {
-      "bytes": 8261,
+      "bytes": 8625,
       "path": "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
       "present": true,
-      "sha256": "fa8fd779a9cce41f8169d77611417249ada18263e420da0271c44bd3d0bf6df8"
+      "sha256": "f21c4af99226e6cd2554dc626df51e02f1dd909bb6fdf7095fdbda1dacb1df78"
     },
     {
       "bytes": 10709,
       "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
       "present": true,
-      "sha256": "2f3859baa8f84ef704ab0934c431a2b97d6210cc617303e35a9b626a861a06e7"
+      "sha256": "ae8a41916c20207d4a2732d58c0e09a9a089809496696dfd822543751d27c13c"
     },
     {
-      "bytes": 18779,
+      "bytes": 24099,
       "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
       "present": true,
-      "sha256": "1271ddbcfe306c67b25eebddf3c5cce71eb1e9db1fa70ec8d928e40d43d86eb2"
+      "sha256": "cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390"
     }
   ],
   "executive_summary": "LumenCore sells proof-to-pilot infrastructure for reviewers who need complex R&D translated into inspectable, source-backed, human-gated decision material. The first money motion is a paid proof or replay-scope sprint; the expansion path is pilot support, agency submission preparation, partner diligence rooms, and eventually recurring proof portal access.",
@@ -150,7 +150,7 @@
     "Route investors and venture builders to the 30-day technical and commercialization sprint.",
     "Route pilot partners to a data-boundary and acceptance-standard discussion before any private data exchange."
   ],
-  "generated_utc": "2026-07-09T20:24:18.710649+00:00",
+  "generated_utc": "2026-07-17T21:10:00.385108+00:00",
   "human_gate": {
     "accept_terms_allowed_without_human": false,
     "quote_price_allowed_without_human": false,
@@ -232,9 +232,9 @@
     "current_probe_measured_sources": 23,
     "customer_result_claimed": false,
     "customer_segment_count": 5,
-    "data_room_control_artifact_count": 34,
-    "data_room_markdown_count": 35,
-    "decision_lane_count": 15,
+    "data_room_control_artifact_count": 52,
+    "data_room_markdown_count": 51,
+    "decision_lane_count": 19,
     "evidence_artifacts_present": true,
     "evtit_workstream_count": 6,
     "external_send_allowed_without_human": false,
@@ -252,7 +252,7 @@
     "registry_measured_sources": 25,
     "reviewer_gate_clear": true,
     "schedule_allowed_without_human": false,
-    "traction_lane_count": 15,
+    "traction_lane_count": 19,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0
   }

@@ -63,7 +63,9 @@ def test_assembly_rows_have_components_blockers_and_hashes():
     assert rows["sam_registration_external_validation_watch"]["package_status"] == "VALIDATION_WATCH_NOT_SUBMISSION"
     assert rows["darpa_dice_full_submission"]["package_status"] == "ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED"
     assert rows["dla_missionweave_sbir"]["package_status"] == "ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED"
+    assert rows["dla_missionweave_sbir"]["status"] == "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
     assert rows["uspto_georgia_patents_route"]["package_status"] == "COUNSEL_PACKET_READY_LEGAL_ACTION_BLOCKED"
+    assert rows["uspto_georgia_patents_route"]["status"] == "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING"
 
     for row in payload["assembly_rows"]:
         assert row["component_count"] == 8
@@ -72,6 +74,8 @@ def test_assembly_rows_have_components_blockers_and_hashes():
         assert row["first_artifact"]["bytes"] > 0
         assert len(row["first_artifact"]["sha256"]) == 64
         assert row["assembly_blockers"]
+        assert row["legacy_intake_status"]
+        assert row["state_source"]
         assert row["claim_boundary"]
         assert row["external_send_allowed_without_human"] is False
         assert row["final_submission_allowed_without_human"] is False

@@ -202,6 +202,10 @@ def build_payload() -> dict[str, Any]:
     gate_clear = bool(gate.get("reviewer_gate_clear")) and int(gate_summary.get("unsafe_secret_count") or 0) == 0 and int(gate_summary.get("unsafe_claim_count") or 0) == 0
     final_actions_blocked = bool(authority_summary.get("all_final_actions_blocked_without_human"))
     lane = find_evtit_lane(traction)
+    current_control = followup.get("lane", {}).get("current_control", {})
+    if not isinstance(current_control, dict):
+        current_control = {}
+    monitor_only = current_control.get("decision") == "MONITOR_NO_FURTHER_FOLLOWUP"
     evidence_paths = [
         OUT_JSON,
         TRACTION_JSON,
@@ -218,18 +222,33 @@ def build_payload() -> dict[str, Any]:
     payload = {
         "generated_utc": now_utc(),
         "schema": "evtit_technical_sprint_scope_packet_v1",
-        "status": "EVTIT_TECHNICAL_SPRINT_SCOPE_READY_HUMAN_TERMS_REQUIRED"
-        if gate_clear and final_actions_blocked
-        else "EVTIT_TECHNICAL_SPRINT_SCOPE_BLOCKED",
+        "status": (
+            "EVTIT_TECHNICAL_SPRINT_SCOPE_INTERNAL_ONLY_MONITOR_NO_SEND"
+            if gate_clear and final_actions_blocked and monitor_only
+            else "EVTIT_TECHNICAL_SPRINT_SCOPE_READY_HUMAN_TERMS_REQUIRED"
+            if gate_clear and final_actions_blocked
+            else "EVTIT_TECHNICAL_SPRINT_SCOPE_BLOCKED"
+        ),
         "lane": {
             "lane_id": "evtit_blackdog_inkind",
             "name": lane.get("name", "EVTit / Black Dog in-kind engineering fund"),
-            "status": lane.get("status", "MEETING_OR_TECH_REVIEW_PENDING"),
+            "status": lane.get(
+                "effective_status",
+                lane.get("status", "MEETING_OR_TECH_REVIEW_PENDING"),
+            ),
+            "legacy_intake_status": lane.get("status", ""),
+            "state_source": lane.get(
+                "effective_source", "legacy_intake_baseline"
+            ),
             "fit_score": int(lane.get("fit_score") or 92),
             "claim_boundary": lane.get(
-                "claim_boundary",
-                "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
+                "effective_claim_boundary",
+                lane.get(
+                    "claim_boundary",
+                    "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
+                ),
             ),
+            "current_control": current_control,
         },
         "summary": {
             "workstream_count": len(WORKSTREAMS),
@@ -249,6 +268,10 @@ def build_payload() -> dict[str, Any]:
             "ip_packet_status": ip.get("status", ""),
             "autonomy_packet_status": autonomy.get("status", ""),
             "human_terms_required": True,
+            "monitor_only": monitor_only,
+            "do_not_duplicate_send": bool(
+                current_control.get("do_not_duplicate_send", False)
+            ),
             "external_send_allowed_without_human": False,
             "schedule_allowed_without_human": False,
             "share_private_files_allowed_without_human": False,
@@ -264,8 +287,16 @@ def build_payload() -> dict[str, Any]:
                 "A 30-day technical sprint to convert LumenCore's proof-to-pilot stack into a cleaner reviewer portal, "
                 "repeatable evidence receipts, measured-source visibility, and pilot-ready intake gates."
             ),
-            "decision_question": "Can EVTit help productize the evidence system so serious reviewers can inspect it faster?",
-            "best_next_meeting": "30-minute technical fit call with named engineering owners and a workstream selection decision.",
+            "decision_question": (
+                "What internal sprint scope should remain ready if Terry sends a specific technical ask?"
+                if monitor_only
+                else "Can EVTit help productize the evidence system so serious reviewers can inspect it faster?"
+            ),
+            "best_next_meeting": (
+                "None scheduled; consider a technical fit call only after a specific inbound request."
+                if monitor_only
+                else "30-minute technical fit call with named engineering owners and a workstream selection decision."
+            ),
         },
         "workstreams": WORKSTREAMS,
         "milestones": MILESTONES,
@@ -275,7 +306,11 @@ def build_payload() -> dict[str, Any]:
             "meeting_schedule_allowed_without_human": False,
             "terms_acceptance_allowed_without_human": False,
             "private_file_share_allowed_without_human": False,
-            "rule": "This packet is a scope-preparation artifact only. Robert approves any external send, meeting schedule, access grant, economics, equity/service terms, or file sharing.",
+            "rule": (
+                "Current control is monitor-only. Keep this scope internal and send nothing unless Terry replies with a specific ask; any later action still requires Robert's review."
+                if monitor_only
+                else "This packet is a scope-preparation artifact only. Robert approves any external send, meeting schedule, access grant, economics, equity/service terms, or file sharing."
+            ),
         },
         "evidence_status": [artifact_status(path) for path in evidence_paths if path != OUT_JSON or path.exists()],
         "outputs": {
@@ -303,6 +338,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Status: `{payload['status']}`",
         f"- Lane ID: `{lane['lane_id']}`",
         f"- Lane status: `{lane['status']}`",
+        f"- Legacy intake status: `{lane['legacy_intake_status']}`",
+        f"- State source: `{lane['state_source']}`",
         f"- Fit score: `{lane['fit_score']}`",
         f"- Workstreams: `{summary['workstream_count']}`",
         f"- Milestones: `{summary['milestone_count']}`",
@@ -314,6 +351,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Current probe measured sources: `{summary['current_probe_measured_sources']}`",
         f"- Measured-source reconciliation required: `{str(summary['measured_source_reconciliation_required']).lower()}`",
         f"- Human terms required: `{str(summary['human_terms_required']).lower()}`",
+        f"- Monitor only: `{str(summary['monitor_only']).lower()}`",
+        f"- Do not duplicate send: `{str(summary['do_not_duplicate_send']).lower()}`",
         f"- External send without human: `{str(summary['external_send_allowed_without_human']).lower()}`",
         f"- Schedule without human: `{str(summary['schedule_allowed_without_human']).lower()}`",
         f"- Share private files without human: `{str(summary['share_private_files_allowed_without_human']).lower()}`",
@@ -402,7 +441,15 @@ def main() -> int:
             indent=2,
         )
     )
-    return 0 if payload["status"].endswith("HUMAN_TERMS_REQUIRED") else 1
+    return (
+        0
+        if payload["status"]
+        in {
+            "EVTIT_TECHNICAL_SPRINT_SCOPE_READY_HUMAN_TERMS_REQUIRED",
+            "EVTIT_TECHNICAL_SPRINT_SCOPE_INTERNAL_ONLY_MONITOR_NO_SEND",
+        }
+        else 1
+    )
 
 
 if __name__ == "__main__":

@@ -22,7 +22,7 @@ def test_evtit_sprint_scope_is_ready_but_human_terms_gated():
     summary = payload["summary"]
 
     assert payload["schema"] == "evtit_technical_sprint_scope_packet_v1"
-    assert payload["status"] == "EVTIT_TECHNICAL_SPRINT_SCOPE_READY_HUMAN_TERMS_REQUIRED"
+    assert payload["status"] == "EVTIT_TECHNICAL_SPRINT_SCOPE_INTERNAL_ONLY_MONITOR_NO_SEND"
     assert summary["workstream_count"] == 6
     assert summary["milestone_count"] == 5
     assert summary["reviewer_gate_clear"] is True
@@ -32,6 +32,9 @@ def test_evtit_sprint_scope_is_ready_but_human_terms_gated():
     assert summary["registry_measured_sources"] == 25
     assert summary["current_probe_measured_sources"] == 23
     assert summary["human_terms_required"] is True
+    assert summary["monitor_only"] is True
+    assert summary["do_not_duplicate_send"] is True
+    assert payload["lane"]["status"] == "OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY"
     assert len(payload["evtit_sprint_scope_sha256"]) == 64
 
 
@@ -51,7 +54,8 @@ def test_evtit_sprint_scope_contains_expected_workstreams_and_outputs():
     assert set(workstreams) == expected
     assert "source-register" in workstreams["measured_source_register_ui"]["evidence_output"]
     assert "run manifest" in workstreams["replay_runner_manifest"]["evidence_output"]
-    assert payload["positioning"]["decision_question"].startswith("Can EVTit help")
+    assert payload["positioning"]["decision_question"].startswith("What internal sprint scope")
+    assert payload["positioning"]["best_next_meeting"].startswith("None scheduled")
 
 
 def test_evtit_sprint_scope_blocks_terms_sends_and_claims():
@@ -72,6 +76,8 @@ def test_evtit_sprint_scope_blocks_terms_sends_and_claims():
     assert summary["production_deployment_claimed"] is False
     assert "EVTit Technical Sprint Scope Packet" in rendered
     assert "Production deployment claimed: `false`" in rendered
+    assert "Monitor only: `true`" in rendered
+    assert "Do not duplicate send: `true`" in rendered
     assert "api_key" not in lowered
     assert "client_secret" not in lowered
     assert "refresh_token" not in lowered

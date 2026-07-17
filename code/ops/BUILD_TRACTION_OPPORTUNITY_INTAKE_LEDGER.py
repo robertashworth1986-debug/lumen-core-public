@@ -16,6 +16,33 @@ OUT_JSON = OUT_OPS / "traction_opportunity_intake_ledger_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "traction_opportunity_intake_ledger.json"
 OUT_MD = SPRINT_DIR / "TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md"
 CURRENT_RESPONSE_JSON = SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json"
+MISSIONWEAVE_ACTION_GATE_JSON = (
+    ROOT
+    / "grant_submissions"
+    / "DLA26BZ03_NV011_MissionWeave"
+    / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
+)
+
+RELATED_CURRENT_RESPONSE_LANES: dict[str, tuple[str, ...]] = {
+    "fhwa_tsmo_qualified_partner_outreach": ("fhwa_tsmo_data_initiative",),
+    "georgia_patents_pro_bono_intake": (
+        "uspto_georgia_patents_route",
+        "patent_deadline_counsel",
+    ),
+    "lvlup_optional_paid_event": ("lvlup_first_check",),
+    "sam_public_credential_rotation": ("sam_registration_external_validation_watch",),
+    "terry_vynetic_followup": ("evtit_blackdog_inkind",),
+}
+
+RELATED_EFFECTIVE_OVERLAY_LANES: dict[str, tuple[str, ...]] = {
+    "fhwa_tsmo_qualified_partner_outreach": ("fhwa_tsmo_data_initiative",),
+    "georgia_patents_pro_bono_intake": (
+        "uspto_georgia_patents_route",
+        "patent_deadline_counsel",
+    ),
+    "lvlup_optional_paid_event": ("lvlup_first_check",),
+    "terry_vynetic_followup": ("evtit_blackdog_inkind",),
+}
 
 SENSITIVE_MARKERS = [
     "password",
@@ -481,52 +508,219 @@ def lane_hash(lane: dict[str, Any]) -> str:
     return hashlib.sha256(json.dumps(lane, sort_keys=True).encode("utf-8")).hexdigest()
 
 
+def canonical_hash(payload: Any) -> str:
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode(
+            "utf-8"
+        )
+    ).hexdigest()
+
+
 def scan_sensitive_text(text: str) -> list[str]:
     lowered = text.lower()
     return sorted({marker for marker in SENSITIVE_MARKERS if marker in lowered})
+
+
+def public_safe_text(value: Any) -> Any:
+    if not isinstance(value, str):
+        return value
+    return value.replace("one-time-password", "one-time verification code").replace(
+        "password", "credential secret"
+    )
 
 
 def current_response_overlay() -> dict[str, Any]:
     payload = read_json(CURRENT_RESPONSE_JSON)
     if payload.get("schema") != "lumencore.external_engagement_response_register.v1":
         raise ValueError("Current external-engagement register is missing or has the wrong schema")
+    records = payload.get("records")
+    if not isinstance(records, list) or not all(isinstance(row, dict) for row in records):
+        raise ValueError("Current external-engagement register records are malformed")
+    lane_ids = [str(row.get("lane_id", "")) for row in records]
+    if any(not lane_id for lane_id in lane_ids) or len(set(lane_ids)) != len(lane_ids):
+        raise ValueError("Current external-engagement register lane IDs are missing or duplicated")
+    if payload.get("summary", {}).get("record_count") != len(records):
+        raise ValueError("Current external-engagement register record count is inconsistent")
+    for row in records:
+        recorded_hash = row.get("record_sha256")
+        unhashed = dict(row)
+        unhashed.pop("record_sha256", None)
+        if not isinstance(recorded_hash, str) or canonical_hash(unhashed) != recorded_hash:
+            raise ValueError(
+                f"Current response record hash mismatch: {row.get('lane_id', 'UNKNOWN')}"
+            )
+    recorded_register_hash = payload.get("register_sha256")
+    unhashed_register = dict(payload)
+    unhashed_register.pop("register_sha256", None)
+    if (
+        not isinstance(recorded_register_hash, str)
+        or canonical_hash(unhashed_register) != recorded_register_hash
+    ):
+        raise ValueError("Current external-engagement register hash mismatch")
     return payload
+
+
+def missionweave_action_gate_overlay() -> dict[str, Any]:
+    payload = read_json(MISSIONWEAVE_ACTION_GATE_JSON)
+    if payload.get("schema") != "lumencore.missionweave_dsip_action_gate.v1":
+        raise ValueError("MissionWeave action gate is missing or has the wrong schema")
+    recorded_hash = payload.get("gate_sha256")
+    unhashed = dict(payload)
+    unhashed.pop("gate_sha256", None)
+    if not isinstance(recorded_hash, str) or canonical_hash(unhashed) != recorded_hash:
+        raise ValueError("MissionWeave action-gate hash mismatch")
+    gate_summary = payload.get("gate_summary", {})
+    required = gate_summary.get("required_private_gate_count")
+    passed = gate_summary.get("passed_private_gate_count")
+    open_count = gate_summary.get("open_gate_count")
+    if not all(isinstance(value, int) for value in (required, passed, open_count)):
+        raise ValueError("MissionWeave action-gate counts are malformed")
+    if passed + open_count != required:
+        raise ValueError("MissionWeave action-gate counts are inconsistent")
+    return payload
+
+
+def compact_current_response(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "lane_id": row.get("lane_id"),
+        "organization": row.get("organization"),
+        "state": row.get("state"),
+        "decision": row.get("decision"),
+        "deadline": row.get("deadline"),
+        "no_send_before": row.get("no_send_before"),
+        "send_now": row.get("send_now"),
+        "do_not_duplicate_send": row.get("do_not_duplicate_send"),
+        "response_channel": row.get("response_channel"),
+        "response_ready": row.get("response_ready"),
+        "action_gate": public_safe_text(row.get("action_gate")),
+        "next_action": public_safe_text(row.get("next_action")),
+        "claim_boundary": public_safe_text(row.get("claim_boundary")),
+        "response_artifact": row.get("response_artifact"),
+        "supporting_artifacts": row.get("supporting_artifacts", []),
+        "related_legacy_lane_ids": list(
+            RELATED_CURRENT_RESPONSE_LANES.get(str(row.get("lane_id")), ())
+        ),
+        "record_sha256": row.get("record_sha256"),
+    }
 
 
 def build_payload() -> dict[str, Any]:
     response_control = current_response_overlay()
+    missionweave_gate = missionweave_action_gate_overlay()
     response_records = {
         str(row.get("lane_id")): row
         for row in response_control.get("records", [])
         if isinstance(row, dict) and row.get("lane_id")
     }
+    current_response_queue = [
+        compact_current_response(row) for row in response_control["records"]
+    ]
+    legacy_lane_ids = {str(lane["lane_id"]) for lane in LANES}
+    related_response_records: dict[str, list[dict[str, Any]]] = {}
+    for current in current_response_queue:
+        for related_lane_id in current["related_legacy_lane_ids"]:
+            related_response_records.setdefault(related_lane_id, []).append(current)
+
+    mission_summary = missionweave_gate["gate_summary"]
+    mission_deadline = missionweave_gate["deadline"]
     lanes = []
     for lane in LANES:
         row = dict(lane)
         current = response_records.get(str(row.get("lane_id")))
+        effective_status = row["status"]
+        effective_deadline_or_gate = row["deadline_or_gate"]
+        effective_reviewer_action = row["reviewer_action"]
+        effective_claim_boundary = row["claim_boundary"]
+        effective_source = "legacy_intake_baseline"
         if current:
             row["current_response_control"] = {
                 "as_of_date": response_control.get("as_of_date"),
-                "state": current.get("state"),
-                "decision": current.get("decision"),
-                "deadline": current.get("deadline"),
-                "no_send_before": current.get("no_send_before"),
-                "send_now": current.get("send_now"),
-                "do_not_duplicate_send": current.get("do_not_duplicate_send"),
-                "action_gate": current.get("action_gate"),
-                "next_action": current.get("next_action"),
-                "claim_boundary": current.get("claim_boundary"),
-                "record_sha256": current.get("record_sha256"),
+                **compact_current_response(current),
             }
+            effective_status = str(current.get("state"))
+            effective_deadline_or_gate = str(
+                current.get("deadline") or current.get("action_gate") or "No current deadline recorded"
+            )
+            effective_reviewer_action = str(current.get("next_action"))
+            effective_claim_boundary = str(current.get("claim_boundary"))
+            effective_source = rel(CURRENT_RESPONSE_JSON)
+        related = related_response_records.get(str(row.get("lane_id")), [])
+        if related:
+            row["related_current_response_controls"] = related
+        effective_related = next(
+            (
+                related_row
+                for related_row in related
+                if row.get("lane_id")
+                in RELATED_EFFECTIVE_OVERLAY_LANES.get(
+                    str(related_row.get("lane_id")), ()
+                )
+            ),
+            None,
+        )
+        if current is None and effective_related is not None:
+            effective_status = str(effective_related["state"])
+            effective_deadline_or_gate = str(
+                effective_related.get("deadline")
+                or effective_related.get("action_gate")
+                or "No current deadline recorded"
+            )
+            effective_reviewer_action = str(effective_related["next_action"])
+            effective_claim_boundary = str(effective_related["claim_boundary"])
+            effective_source = (
+                f"{rel(CURRENT_RESPONSE_JSON)}#related:{effective_related['lane_id']}"
+            )
+        if row.get("lane_id") == "dla_missionweave_sbir":
+            row["current_action_gate"] = {
+                "status": missionweave_gate["status"],
+                "deadline_expected_local": mission_deadline["expected_local"],
+                "deadline_expected_utc": mission_deadline["expected_utc"],
+                "live_dsip_recheck_required": mission_deadline[
+                    "live_dsip_recheck_required"
+                ],
+                "passed_gate_count": mission_summary["passed_private_gate_count"],
+                "open_gate_count": mission_summary["open_gate_count"],
+                "required_gate_count": mission_summary[
+                    "required_private_gate_count"
+                ],
+                "submission_ready_for_human_click": missionweave_gate[
+                    "submission_ready_for_human_click"
+                ],
+                "claim_boundary": missionweave_gate["claim_boundary"],
+                "source": rel(MISSIONWEAVE_ACTION_GATE_JSON),
+                "gate_sha256": missionweave_gate["gate_sha256"],
+            }
+            effective_status = str(missionweave_gate["status"])
+            effective_deadline_or_gate = (
+                f"{mission_deadline['expected_local']} "
+                f"({mission_deadline['expected_utc']}); live DSIP recheck required"
+            )
+            effective_reviewer_action = (
+                f"Resolve the {mission_summary['open_gate_count']} open gates out of "
+                f"{mission_summary['required_private_gate_count']}, review the complete portal "
+                "preview, and retain the human-only final-submit boundary."
+            )
+            effective_claim_boundary = str(missionweave_gate["claim_boundary"])
+            effective_source = rel(MISSIONWEAVE_ACTION_GATE_JSON)
+        row["effective_status"] = effective_status
+        row["effective_deadline_or_gate"] = effective_deadline_or_gate
+        row["effective_reviewer_action"] = effective_reviewer_action
+        row["effective_claim_boundary"] = effective_claim_boundary
+        row["effective_source"] = effective_source
         row["lane_sha256"] = lane_hash(row)
         row["human_gate_required"] = True
         lanes.append(row)
 
     status_counts: dict[str, int] = {}
+    effective_status_counts: dict[str, int] = {}
     channel_counts: dict[str, int] = {}
     source_kind_counts: dict[str, int] = {}
     for lane in lanes:
         status_counts[lane["status"]] = status_counts.get(lane["status"], 0) + 1
+        effective_status = str(lane["effective_status"])
+        effective_status_counts[effective_status] = (
+            effective_status_counts.get(effective_status, 0) + 1
+        )
         channel_counts[lane["channel"]] = channel_counts.get(lane["channel"], 0) + 1
         source_kind_counts[lane["source_kind"]] = source_kind_counts.get(lane["source_kind"], 0) + 1
 
@@ -560,6 +754,7 @@ def build_payload() -> dict[str, Any]:
             "sweetspot_reference_count": sweetspot_ref_count,
             "public_reference_count": public_ref_count,
             "status_counts": dict(sorted(status_counts.items())),
+            "effective_status_counts": dict(sorted(effective_status_counts.items())),
             "channel_counts": dict(sorted(channel_counts.items())),
             "source_kind_counts": dict(sorted(source_kind_counts.items())),
             "human_action_required": True,
@@ -569,12 +764,34 @@ def build_payload() -> dict[str, Any]:
             "current_immediate_human_action_count": response_control["summary"]["immediate_human_action_count"],
             "current_do_not_duplicate_send_count": response_control["summary"]["do_not_duplicate_send_count"],
             "current_state_supersedes_legacy_when_present": True,
+            "current_response_queue_count": len(current_response_queue),
+            "current_response_exact_overlay_count": sum(
+                1 for row in current_response_queue if row["lane_id"] in legacy_lane_ids
+            ),
+            "current_response_related_control_count": sum(
+                1 for row in current_response_queue if row["related_legacy_lane_ids"]
+            ),
+            "missionweave_passed_gate_count": mission_summary[
+                "passed_private_gate_count"
+            ],
+            "missionweave_open_gate_count": mission_summary["open_gate_count"],
+            "missionweave_required_gate_count": mission_summary[
+                "required_private_gate_count"
+            ],
+            "missionweave_submission_ready_for_human_click": missionweave_gate[
+                "submission_ready_for_human_click"
+            ],
         },
         "connected_evidence": {
             **CONNECTED_EVIDENCE,
             "external_engagement_response_register": (
-                "Tracked current-state register reconciled through 2026-07-16; its state and response decision "
+                f"Tracked current-state register reconciled through {response_control['as_of_date']}; its state and response decision "
                 "supersede legacy July 9 lane status where both are present."
+            ),
+            "missionweave_dsip_action_gate": (
+                f"Integrity-checked action gate reports {mission_summary['passed_private_gate_count']}/"
+                f"{mission_summary['required_private_gate_count']} gates passed and "
+                f"{mission_summary['open_gate_count']} open; final submission remains human-only."
             ),
         },
         "current_response_control": {
@@ -583,16 +800,27 @@ def build_payload() -> dict[str, Any]:
             "direct_answer": response_control["direct_answer"],
             "source": rel(CURRENT_RESPONSE_JSON),
             "register_sha256": response_control["register_sha256"],
-            "records": response_control["records"],
+            "records": current_response_queue,
             "claim_boundary": response_control["claim_boundary"],
+        },
+        "missionweave_action_gate": {
+            "status": missionweave_gate["status"],
+            "deadline": mission_deadline,
+            "gate_summary": mission_summary,
+            "submission_ready_for_human_click": missionweave_gate[
+                "submission_ready_for_human_click"
+            ],
+            "source": rel(MISSIONWEAVE_ACTION_GATE_JSON),
+            "gate_sha256": missionweave_gate["gate_sha256"],
+            "claim_boundary": missionweave_gate["claim_boundary"],
         },
         "public_sources": PUBLIC_SOURCES,
         "lanes": sorted(lanes, key=lambda item: int(item["priority"])),
         "next_actions": [
-            "Review the EVTit follow-up packet and send only after human approval.",
-            "Do not duplicate-send NASA, Army, CDC, or LANL packages already recorded by the current response control.",
-            "Complete the Nashville EC human-fact gate before July 17 and use the exact EPRI action-time send gate.",
-            "Advance FHWA TSMO into a final human-review package after official re-verification.",
+            "Complete the Nashville EC founder-fact gate and reviewed portal workflow well before 2026-07-17T23:59:00-05:00; do not duplicate the deadline-support email.",
+            "Do not duplicate-send NASA, Army, CDC, LANL, EPRI, Georgia PATENTS, FHWA, Terry/Vynetic, or LvlUp packets already controlled by the current register.",
+            f"Resolve MissionWeave's {mission_summary['open_gate_count']} open gates and recheck the live DSIP deadline before the expected July 22, 2026 noon Eastern close.",
+            "Monitor the existing FHWA referral thread; no fit check, partner commitment, or additional send is currently supported.",
             "Build DICE full-proposal compliance matrix after confirming controlling BAA instructions.",
             "Submit or refresh OpenAI API continuity request through official contact route if still needed.",
             "Monitor patent counsel replies and prepare filed-materials packet for licensed review.",
@@ -614,8 +842,12 @@ def build_payload() -> dict[str, Any]:
 
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
+    current = payload["current_response_control"]
     lines = [
-        "# Traction Opportunity Intake Ledger - 2026-07-09",
+        (
+            "# Traction Opportunity Intake Ledger - Current Control "
+            f"{current['as_of_date']} (Legacy Intake 2026-07-09)"
+        ),
         "",
         "Purpose: turn connected Gmail evidence, federal contract search, and official public sources into a reviewer-safe action queue.",
         "",
@@ -632,6 +864,19 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Current response records: `{summary['current_response_record_count']}`",
         f"- Current immediate human actions: `{summary['current_immediate_human_action_count']}`",
         f"- Current do-not-duplicate sends: `{summary['current_do_not_duplicate_send_count']}`",
+        f"- Current response queue records: `{summary['current_response_queue_count']}`",
+        f"- Exact legacy-lane overlays: `{summary['current_response_exact_overlay_count']}`",
+        f"- Related current controls: `{summary['current_response_related_control_count']}`",
+        (
+            "- MissionWeave gates: "
+            f"`{summary['missionweave_passed_gate_count']}/"
+            f"{summary['missionweave_required_gate_count']}` passed; "
+            f"`{summary['missionweave_open_gate_count']}` open"
+        ),
+        (
+            "- MissionWeave ready for human final click: "
+            f"`{str(summary['missionweave_submission_ready_for_human_click']).lower()}`"
+        ),
         f"- Current state supersedes legacy when present: `{str(summary['current_state_supersedes_legacy_when_present']).lower()}`",
         f"- Human action required: `{str(summary['human_action_required']).lower()}`",
         f"- External send without human: `{str(summary['external_send_allowed_without_human']).lower()}`",
@@ -643,7 +888,6 @@ def render_markdown(payload: dict[str, Any]) -> str:
     ]
     for key, value in payload["connected_evidence"].items():
         lines.append(f"- {key}: {value}")
-    current = payload["current_response_control"]
     lines.extend(
         [
             "",
@@ -657,16 +901,37 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Source: `{current['source']}`",
             f"- Register SHA-256: `{current['register_sha256']}`",
             "",
-            "| Organization | Current state | Current decision | Duplicate send |",
-            "|---|---|---|---:|",
+            "| Organization | Current state | Current decision | Deadline | Send now | Duplicate send |",
+            "|---|---|---|---|---:|---:|",
         ]
     )
     for row in current["records"]:
         lines.append(
             f"| {row['organization']} | `{row['state']}` | `{row['decision']}` | "
+            f"{row['deadline'] or 'None recorded'} | "
+            f"`{str(row['send_now']).lower()}` | "
             f"`{str(row['do_not_duplicate_send']).lower()}` |"
         )
-    lines.extend(["", "## Priority Queue", ""])
+    lines.extend(["", "## Current Response Queue", ""])
+    for row in current["records"]:
+        lines.extend(
+            [
+                f"### {row['organization']}",
+                "",
+                f"- Lane ID: `{row['lane_id']}`",
+                f"- State: `{row['state']}`",
+                f"- Decision: `{row['decision']}`",
+                f"- Deadline: {row['deadline'] or 'None recorded'}",
+                f"- Send now: `{str(row['send_now']).lower()}`",
+                f"- Do not duplicate: `{str(row['do_not_duplicate_send']).lower()}`",
+                f"- Next action: {row['next_action']}",
+                f"- Action gate: {row['action_gate']}",
+                f"- Claim boundary: {row['claim_boundary']}",
+                f"- Record SHA-256: `{row['record_sha256']}`",
+                "",
+            ]
+        )
+    lines.extend(["## Legacy Intake Queue With Effective-State Controls", ""])
     for lane in payload["lanes"]:
         lines.extend(
             [
@@ -674,12 +939,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 "",
                 f"- Lane ID: `{lane['lane_id']}`",
                 f"- Channel: `{lane['channel']}`",
-                f"- Status: `{lane['status']}`",
+                f"- Legacy intake status: `{lane['status']}`",
+                f"- Effective current status: `{lane['effective_status']}`",
                 f"- Fit score: `{lane['fit_score']}`",
-                f"- Gate: {lane['deadline_or_gate']}",
-                f"- Reviewer action: {lane['reviewer_action']}",
+                f"- Legacy intake gate: {lane['deadline_or_gate']}",
+                f"- Effective current gate: {lane['effective_deadline_or_gate']}",
+                f"- Effective reviewer action: {lane['effective_reviewer_action']}",
+                f"- Effective state source: `{lane['effective_source']}`",
                 f"- Human gate: {lane['human_gate']}",
-                f"- Claim boundary: {lane['claim_boundary']}",
+                f"- Effective claim boundary: {lane['effective_claim_boundary']}",
                 f"- Evidence hash: `{lane['lane_sha256']}`",
             ]
         )
@@ -691,6 +959,39 @@ def render_markdown(payload: dict[str, Any]) -> str:
                     f"- Current response decision: `{current_lane['decision']}`",
                     f"- Current do-not-duplicate send: `{str(current_lane['do_not_duplicate_send']).lower()}`",
                     f"- Current next action: {current_lane['next_action']}",
+                ]
+            )
+        current_gate = lane.get("current_action_gate")
+        if isinstance(current_gate, dict):
+            lines.extend(
+                [
+                    (
+                        "- Current action-gate progress: "
+                        f"`{current_gate['passed_gate_count']}/"
+                        f"{current_gate['required_gate_count']}` passed; "
+                        f"`{current_gate['open_gate_count']}` open"
+                    ),
+                    (
+                        "- Ready for human final click: "
+                        f"`{str(current_gate['submission_ready_for_human_click']).lower()}`"
+                    ),
+                    f"- Current action-gate source: `{current_gate['source']}`",
+                    f"- Current action-gate SHA-256: `{current_gate['gate_sha256']}`",
+                ]
+            )
+        related_controls = lane.get("related_current_response_controls", [])
+        for related in related_controls:
+            lines.extend(
+                [
+                    (
+                        f"- Related current control `{related['lane_id']}`: "
+                        f"`{related['state']}` / `{related['decision']}`"
+                    ),
+                    f"- Related current next action: {related['next_action']}",
+                    (
+                        "- Related current do-not-duplicate send: "
+                        f"`{str(related['do_not_duplicate_send']).lower()}`"
+                    ),
                 ]
             )
         lines.append("- Evidence:")
@@ -720,7 +1021,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
 def main() -> None:
     payload = build_payload()
     markdown = render_markdown(payload)
-    sensitive_hits = scan_sensitive_text(markdown)
+    sensitive_hits = scan_sensitive_text(
+        markdown + "\n" + json.dumps(payload, sort_keys=True)
+    )
     if sensitive_hits:
         raise SystemExit(f"Refusing to write sensitive public ledger markers: {sensitive_hits}")
     write_json(OUT_JSON, payload)

@@ -16,15 +16,17 @@ def load_module():
     return module
 
 
-def test_traction_followup_packet_is_ready_and_human_gated():
+def test_traction_followup_packet_is_current_monitor_only_and_human_gated():
     module = load_module()
     payload = module.build_payload()
     summary = payload["summary"]
 
     assert payload["schema"] == "traction_followup_packet_v1"
-    assert payload["status"] == "TRACTION_FOLLOWUP_READY_HUMAN_SEND_REQUIRED"
+    assert payload["status"] == "TRACTION_FOLLOWUP_MONITOR_ONLY_NO_SEND"
     assert payload["lane"]["lane_id"] == "evtit_blackdog_inkind"
-    assert payload["lane"]["status"] == "RESET_NOTE_SENT_TECH_REVIEW_PENDING"
+    assert payload["lane"]["status"] == "OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY"
+    assert payload["lane"]["legacy_intake_status"] == "RESET_NOTE_SENT_TECH_REVIEW_PENDING"
+    assert payload["lane"]["current_control"]["decision"] == "MONITOR_NO_FURTHER_FOLLOWUP"
     assert summary["thread_signal_count"] == 7
     assert summary["build_scope_count"] == 6
     assert summary["draft_count"] == 2
@@ -32,7 +34,9 @@ def test_traction_followup_packet_is_ready_and_human_gated():
     assert summary["reviewer_gate_clear"] is True
     assert summary["unsafe_secret_count"] == 0
     assert summary["unsafe_claim_count"] == 0
-    assert summary["human_send_required"] is True
+    assert summary["human_send_required"] is False
+    assert summary["monitor_only"] is True
+    assert summary["do_not_duplicate_send"] is True
     assert summary["external_send_allowed_without_human"] is False
     assert summary["equity_terms_allowed_without_human"] is False
     assert summary["partnership_claimed"] is False
@@ -59,13 +63,15 @@ def test_thread_signals_include_latest_reset_message_without_credentials():
         assert "password" not in combined
 
 
-def test_followup_drafts_are_ready_but_not_send_authority():
+def test_followup_drafts_are_retained_but_held_by_current_control():
     module = load_module()
     payload = module.build_payload()
     drafts = {draft["draft_id"]: draft for draft in payload["followup_drafts"]}
 
     assert set(drafts) == {"same_day_reset_next_step", "technical_team_packet_note"}
     assert all(draft["human_send_required"] is True for draft in drafts.values())
+    assert all(draft["held_by_current_control"] is True for draft in drafts.values())
+    assert all(draft["send_allowed_by_current_control"] is False for draft in drafts.values())
     reset_body = "\n".join(drafts["same_day_reset_next_step"]["body"])
     assert "30-minute technical fit call" in reset_body
     assert "no partnership" in reset_body.lower()
@@ -100,6 +106,8 @@ def test_rendered_followup_packet_is_public_safe_and_action_gated():
 
     assert "EVTit Traction Follow-Up Packet" in rendered
     assert "External send without human: `false`" in rendered
+    assert "Monitor only: `true`" in rendered
+    assert "Do not duplicate send: `true`" in rendered
     assert "Equity terms without human: `false`" in rendered
     assert "Partnership claimed: `false`" in rendered
     assert "Investment claimed: `false`" in rendered

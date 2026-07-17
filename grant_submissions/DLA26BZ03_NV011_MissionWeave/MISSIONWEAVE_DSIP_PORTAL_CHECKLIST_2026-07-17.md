@@ -14,8 +14,8 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - Manifest files verified: `15`
 - All manifest hashes and sizes match: `true`
 - Volume 2 candidate: `11` pages of `20` allowed, letter size, searchable, and unencrypted.
-- The candidate still contains the neutral proposal-number header: `true`.
-- Ignored assigned-number final PDF selected by the gate: `false`.
+- The candidate still contains the neutral proposal-number header: `false`.
+- Ignored assigned-number final PDF selected by the gate: `true`.
 - Do not upload the tracked neutral PDF after DSIP assigns a proposal number. Run `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`; the final PDF remains ignored and its path, number, and hash remain absent from public artifacts.
 
 ## Registration And Firm Controls

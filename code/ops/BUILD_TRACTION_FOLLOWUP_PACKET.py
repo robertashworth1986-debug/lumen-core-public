@@ -217,33 +217,67 @@ def find_evtit_lane(traction: dict[str, Any]) -> dict[str, Any]:
     return {}
 
 
+def find_current_control(lane: dict[str, Any], lane_id: str) -> dict[str, Any]:
+    controls = lane.get("related_current_response_controls", [])
+    if isinstance(controls, list):
+        for control in controls:
+            if isinstance(control, dict) and control.get("lane_id") == lane_id:
+                return control
+    return {}
+
+
 def build_payload() -> dict[str, Any]:
     traction = read_json(TRACTION_JSON)
     gate = read_json(REVIEWER_GATE_JSON)
     data_room = read_json(DATA_ROOM_JSON)
     evtit_lane = find_evtit_lane(traction)
+    current_control = find_current_control(evtit_lane, "terry_vynetic_followup")
     artifact_rows = [artifact_status(path) for path in DILIGENCE_ARTIFACTS]
     gate_summary = gate.get("summary", {}) if isinstance(gate.get("summary"), dict) else {}
     data_summary = data_room.get("summary", {}) if isinstance(data_room.get("summary"), dict) else {}
     artifacts_present = all(row["present"] for row in artifact_rows)
     gate_clear = bool(gate.get("reviewer_gate_clear")) and int(gate_summary.get("unsafe_secret_count") or 0) == 0 and int(gate_summary.get("unsafe_claim_count") or 0) == 0
+    monitor_only = current_control.get("decision") == "MONITOR_NO_FURTHER_FOLLOWUP"
+    followup_drafts = [
+        {
+            **draft,
+            "held_by_current_control": monitor_only,
+            "send_allowed_by_current_control": not monitor_only,
+        }
+        for draft in FOLLOWUP_DRAFTS
+    ]
 
     payload = {
         "generated_utc": now_utc(),
         "schema": "traction_followup_packet_v1",
-        "status": "TRACTION_FOLLOWUP_READY_HUMAN_SEND_REQUIRED"
-        if gate_clear and artifacts_present
-        else "TRACTION_FOLLOWUP_BLOCKED",
+        "status": (
+            "TRACTION_FOLLOWUP_MONITOR_ONLY_NO_SEND"
+            if gate_clear and artifacts_present and monitor_only
+            else "TRACTION_FOLLOWUP_READY_HUMAN_SEND_REQUIRED"
+            if gate_clear and artifacts_present
+            else "TRACTION_FOLLOWUP_BLOCKED"
+        ),
         "lane": {
             "lane_id": "evtit_blackdog_inkind",
             "name": evtit_lane.get("name", "EVTit / Black Dog in-kind engineering fund"),
-            "status": evtit_lane.get("status", "RESET_NOTE_SENT_TECH_REVIEW_PENDING"),
+            "status": evtit_lane.get(
+                "effective_status",
+                evtit_lane.get("status", "RESET_NOTE_SENT_TECH_REVIEW_PENDING"),
+            ),
+            "legacy_intake_status": evtit_lane.get("status", ""),
+            "state_source": evtit_lane.get(
+                "effective_source", "legacy_intake_baseline"
+            ),
             "fit_score": evtit_lane.get("fit_score", 92),
             "priority": evtit_lane.get("priority", 1),
             "claim_boundary": evtit_lane.get(
-                "claim_boundary",
+                "effective_claim_boundary",
+                evtit_lane.get(
+                    "claim_boundary",
                 "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
+                ),
             ),
+            "current_control": current_control,
         },
         "summary": {
             "thread_signal_count": len(THREAD_SIGNALS),
@@ -256,7 +290,11 @@ def build_payload() -> dict[str, Any]:
             "unsafe_claim_count": int(gate_summary.get("unsafe_claim_count") or 0),
             "data_room_status": data_room.get("status", ""),
             "data_room_markdown_count": int(data_summary.get("manifested_markdown_count") or 0),
-            "human_send_required": True,
+            "human_send_required": not monitor_only,
+            "monitor_only": monitor_only,
+            "do_not_duplicate_send": bool(
+                current_control.get("do_not_duplicate_send", False)
+            ),
             "external_send_allowed_without_human": False,
             "equity_terms_allowed_without_human": False,
             "partnership_claimed": False,
@@ -266,14 +304,19 @@ def build_payload() -> dict[str, Any]:
         },
         "thread_signals": THREAD_SIGNALS,
         "build_scope_menu": BUILD_SCOPE_MENU,
-        "followup_drafts": FOLLOWUP_DRAFTS,
+        "followup_drafts": followup_drafts,
         "diligence_artifacts": artifact_rows,
         "human_gate": {
             "send_email_allowed_without_human": False,
             "schedule_followup_allowed_without_human": False,
             "accept_equity_or_services_terms_without_human": False,
             "share_private_files_without_human": False,
-            "rule": "This packet prepares follow-up language and review scope only. Robert approves any send, schedule, terms, or file sharing.",
+            "rule": (
+                "Current control is monitor-only: send nothing further unless Terry replies with a specific ask. "
+                "Any later response, schedule, terms, or file sharing still requires Robert's action-time review."
+                if monitor_only
+                else "This packet prepares follow-up language and review scope only. Robert approves any send, schedule, terms, or file sharing."
+            ),
         },
         "outputs": {
             "json": rel(OUT_JSON),
@@ -302,6 +345,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Status: `{payload['status']}`",
         f"- Lane ID: `{lane['lane_id']}`",
         f"- Lane status: `{lane['status']}`",
+        f"- Legacy intake status: `{lane['legacy_intake_status']}`",
+        f"- State source: `{lane['state_source']}`",
         f"- Fit score: `{lane['fit_score']}`",
         f"- Thread signals: `{summary['thread_signal_count']}`",
         f"- Build scopes: `{summary['build_scope_count']}`",
@@ -311,6 +356,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Unsafe sensitive hits: `{summary['unsafe_secret_count']}`",
         f"- Unsafe claim hits: `{summary['unsafe_claim_count']}`",
         f"- Human send required: `{str(summary['human_send_required']).lower()}`",
+        f"- Monitor only: `{str(summary['monitor_only']).lower()}`",
+        f"- Do not duplicate send: `{str(summary['do_not_duplicate_send']).lower()}`",
         f"- External send without human: `{str(summary['external_send_allowed_without_human']).lower()}`",
         f"- Equity terms without human: `{str(summary['equity_terms_allowed_without_human']).lower()}`",
         f"- Partnership claimed: `{str(summary['partnership_claimed']).lower()}`",
@@ -402,7 +449,15 @@ def main() -> int:
             indent=2,
         )
     )
-    return 0 if payload["status"].endswith("HUMAN_SEND_REQUIRED") else 1
+    return (
+        0
+        if payload["status"]
+        in {
+            "TRACTION_FOLLOWUP_READY_HUMAN_SEND_REQUIRED",
+            "TRACTION_FOLLOWUP_MONITOR_ONLY_NO_SEND",
+        }
+        else 1
+    )
 
 
 if __name__ == "__main__":

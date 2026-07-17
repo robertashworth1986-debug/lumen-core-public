@@ -4,18 +4,18 @@ This public-safe gate reports only package integrity and private-workflow comple
 
 ## Decision
 
-- Status: `PRIVATE_DSIP_FACTS_NOT_CAPTURED`
+- Status: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`
 - Submission ready for human click: `false`
 - Expected deadline: July 22, 2026 at 12:00 p.m. Eastern Time
 - Live DSIP recheck required: `true`
 - Deadline discrepancy: The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026.
-- Private input present: `false`
+- Private input present: `true`
 - Private target git-ignored: `true`
 - Private values exposed: `false`
 - Required private gates: `50`
-- Passed private gates: `0`
-- Open gates: `50`
-- Gate SHA-256: `a22bd709c9e4d67d7aeafe826868d841293c69d2371783a1a08645014b3a2de4`
+- Passed private gates: `13`
+- Open gates: `37`
+- Gate SHA-256: `fb86f26cb06843158187444a60795e2359bbef96a6e1488c3ec4bcff68f42784`
 
 ## Package Integrity
 
@@ -26,19 +26,19 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Encrypted: `false`
 - Searchable: `true`
 - Required sections present: `true`
-- Ignored private final Volume 2 used: `false`
+- Ignored private final Volume 2 used: `true`
 - Private final Volume 2 path exposed: `false`
 - Private final Volume 2 hash exposed: `false`
-- Neutral proposal header still present: `true`
+- Neutral proposal header still present: `false`
 - All source and format checks pass: `true`
 
 ## Private Fact State
 
-- Assigned proposal number present: `false`
-- Assigned proposal number embedded in Volume 2: `false`
+- Assigned proposal number present: `true`
+- Assigned proposal number embedded in Volume 2: `true`
 - Assigned proposal number value exposed: `false`
-- Volume 2 PDF hash matches private record: `false`
-- Volume 3 total matches official ceiling: `false`
+- Volume 2 PDF hash matches private record: `true`
+- Volume 3 total matches official ceiling: `true`
 - Volume 3 private amount exposed: `false`
 - Portal preview receipt present: `false`
 - Corporate official reviewed: `false`
@@ -48,32 +48,25 @@ This public-safe gate reports only package integrity and private-workflow comple
 
 - `ACTION_TIME_APPROVAL_TIMESTAMP`
 - `ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION`
-- `ASSIGNED_PROPOSAL_NUMBER_CAPTURE`
 - `CAGE_MATCH`
 - `CMMC_PHASE_I_SELF_ASSESSMENT_POSITION`
 - `COMPLETE_PORTAL_PREVIEW_REVIEW`
 - `CONFLICTS_AND_JOINT_VENTURE_STATUS`
-- `CONTROLLED_DATA_EXCLUDED`
 - `CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW`
 - `CURRENT_CMMC_REQUIREMENTS_REVIEW`
 - `DD2345_OR_JCP_APPLICATION_EVIDENCE`
-- `DSIP_AUTHENTICATION`
 - `DSIP_FIRM_ADMIN`
 - `DSIP_FIRM_LEVEL_FORMS`
 - `DSIP_FIRM_PIN_AVAILABILITY`
-- `DSIP_ORGANIZATION_LINKAGE`
 - `FOREIGN_AFFILIATIONS_CURRENT_FACTS`
 - `FOREIGN_CITIZEN_ANSWER`
 - `ITAR_SCOPE_CONFIRMED`
-- `LIVE_DSIP_DEADLINE_CONFIRMATION`
-- `NO_CMMC_STATUS_OVERCLAIM`
 - `NO_DUPLICATE_COST_OR_DELIVERABLE`
 - `OWNERSHIP_AND_AFFILIATES`
 - `PI_640_HOURS`
 - `PI_PRIMARY_EMPLOYMENT`
 - `PORTAL_PREVIEW_RECEIPT_HASH`
 - `PRIOR_CURRENT_PENDING_SUPPORT`
-- `PRIVATE_INPUT_TIMESTAMP`
 - `SAM_ACTIVE_STATUS`
 - `SAM_LEGAL_NAME_MATCH`
 - `SAM_REPRESENTATIONS_CURRENT`
@@ -85,13 +78,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 - `TECHNOLOGY_CONTROL_PLAN_DECISION`
 - `UEI_MATCH`
 - `US_SMALL_BUSINESS_ELIGIBILITY`
-- `VOLUME1_PUBLIC_RELEASE_TEXT_REVIEW`
-- `VOLUME2_ASSIGNED_PROPOSAL_NUMBER_EMBEDDED`
-- `VOLUME2_PDF_HASH_MATCH`
-- `VOLUME2_REBUILD`
-- `VOLUME2_VIRUS_SCAN`
 - `VOLUME3_COST_BASIS`
-- `VOLUME3_TOTAL_MATCHES_PHASE_I_CEILING`
 - `VOLUME4_CCR`
 - `VOLUME5_UPLOAD_SET`
 - `VOLUME6_FWA_TRAINING`

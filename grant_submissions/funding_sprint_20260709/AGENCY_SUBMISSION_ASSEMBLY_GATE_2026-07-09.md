@@ -23,7 +23,7 @@ No federal, SBIR, RFI, lab, IP, certification, legal, pricing, portal, trading, 
 - Capital movement allowed: `false`
 - Unsafe sensitive hits: `0`
 - Unsafe claim hits: `0`
-- Assembly gate SHA-256: `70a60614ffbd17ba49b9143dc481099367c91f93cfa51bc633d924c7227ea338`
+- Assembly gate SHA-256: `9f96aa63f3abe5a2e8af671103a41a3ddb094ec35ed210e269577b57f45e7809`
 
 ## Package Status Counts
 
@@ -42,6 +42,8 @@ No federal, SBIR, RFI, lab, IP, certification, legal, pricing, portal, trading, 
 - Name: SAM.gov registration external validation watch
 - Channel: `federal_registration`
 - Status: `SUBMITTED_EXTERNAL_VALIDATION_PENDING`
+- Legacy intake status: `SUBMITTED_EXTERNAL_VALIDATION_PENDING`
+- State source: `legacy_intake_baseline`
 - Readiness mode: `FEDERAL_REGISTRATION_SUBMITTED_VALIDATION_PENDING`
 - Package status: `VALIDATION_WATCH_NOT_SUBMISSION`
 - Urgency: `URGENT_5D`
@@ -55,7 +57,7 @@ No federal, SBIR, RFI, lab, IP, certification, legal, pricing, portal, trading, 
 - Required authority: Robert verifies SAM status, responds to any official DLA or SAM request, and approves any notarized Entity Administrator letter or correction.
 - Next human action: Check SAM status and watch for any DLA email; prepare Entity Administrator letter packet if required.
 - Claim boundary: Submitted is not Active; no award eligibility, active registration, or CAGE validation is claimed until SAM confirms it.
-- Row SHA-256: `fff8f2b49219b6072bd225cae4ef3c7c4cd150d7848ec9395096e5757e4761d9`
+- Row SHA-256: `b92e17451dbe8770685986d606819aa2090f18335efbf791b4da870be84d541b`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -75,12 +77,14 @@ Assembly blockers:
 
 - Name: LANL VISION licensing opportunity follow-up
 - Channel: `federal_lab_tech_transfer`
-- Status: `WAITING_POC_RETURN`
+- Status: `OUTBOUND_SENT_RESPONSE_PENDING`
+- Legacy intake status: `WAITING_POC_RETURN`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json`
 - Readiness mode: `LAB_POC_FOLLOWUP_READY_HUMAN_SEND_REQUIRED`
 - Package status: `FOLLOWUP_PACKET_READY_HUMAN_SEND_REQUIRED`
 - Urgency: `URGENT_5D`
 - Action due: `2026-07-13`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -89,7 +93,7 @@ Assembly blockers:
 - Required authority: Robert approves any lab POC reply, NDA, licensing discussion, export-control response, or disclosure packet.
 - Next human action: Prepare concise licensing-fit note and technical questions for the named LANL POC return window.
 - Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
-- Row SHA-256: `dad3c03d4f2dbb0437232991813706152db271627545b9cd54b76c253aff5774`
+- Row SHA-256: `3561eab433065d460f224f67fee910e4e05b3f532b8134a18159fae6c7552a4d`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -109,12 +113,14 @@ Assembly blockers:
 
 - Name: USPTO / Georgia PATENTS pro bono routing
 - Channel: `ip_readiness`
-- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- Status: `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING`
+- Legacy intake status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json#related:georgia_patents_pro_bono_intake`
 - Readiness mode: `IP_PACKET_READY_COUNSEL_REQUIRED`
 - Package status: `COUNSEL_PACKET_READY_LEGAL_ACTION_BLOCKED`
 - Urgency: `IMMEDIATE_24H`
 - Action due: `2026-07-10`
-- First artifact: `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`a3354fec70f9ae12a0bf42c24a2f1699f05ba0d05880afa16264080b1a1860ee`
+- First artifact: `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md` sha256=`e9efbb7e405cc0dc8d283f991e353df8ff78f69864bde2aab0159839f8ecd306`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -123,7 +129,7 @@ Assembly blockers:
 - Required authority: Licensed patent counsel and Robert decide any filing, continuation, PCT, disclosure, or claim strategy action.
 - Next human action: Prepare Georgia PATENTS intake packet and counsel questions.
 - Claim boundary: This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.
-- Row SHA-256: `8ce0abfa57e004025e2f821057a5bf2c5a88db9c8580d9d55b4b25b8e1f8b6db`
+- Row SHA-256: `dfa4ffd398a9427e9bf99df2961db62096f901284b6219d4511c5dfae5ff9fe7`
 
 Components:
 - `official_source_and_instructions` state=`counsel_or_official_record_required` review_ready=`true`
@@ -143,11 +149,13 @@ Assembly blockers:
 - Name: DARPA DICE full proposal sprint
 - Channel: `federal_baa`
 - Status: `FULL_PROPOSAL_SPRINT`
+- Legacy intake status: `FULL_PROPOSAL_SPRINT`
+- State source: `legacy_intake_baseline`
 - Readiness mode: `FEDERAL_DRAFT_READY_SUBMISSION_BLOCKED`
 - Package status: `ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED`
 - Urgency: `URGENT_5D`
 - Action due: `2026-07-12`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -156,7 +164,7 @@ Assembly blockers:
 - Required authority: Robert verifies the controlling BAA instructions, submission account authority, budget, representations, and final package.
 - Next human action: Build full-proposal compliance matrix and confirm controlling BAA instructions.
 - Claim boundary: Abstract receipt is not award selection and not permission to skip BAA instructions.
-- Row SHA-256: `0e35771a739505864d533c21ecf9508674ec48c149df72679dab8d752b30793b`
+- Row SHA-256: `9e68964cfc341021abd7e8d4863342b0a078eb2da44df356babf76cc27d16b8d`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -176,11 +184,13 @@ Assembly blockers:
 
 - Name: FHWA TSMO Data Initiative
 - Channel: `federal_contract`
-- Status: `PHASE_I_TECH_VOLUME`
+- Status: `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING`
+- Legacy intake status: `PHASE_I_TECH_VOLUME`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json#related:fhwa_tsmo_qualified_partner_outreach`
 - Readiness mode: `FEDERAL_DRAFT_READY_SUBMISSION_BLOCKED`
 - Package status: `ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED`
-- Urgency: `WATCHLIST`
-- Action due: `2026-08-03`
+- Urgency: `ROLLING_OR_EVENT_GATED`
+- Action due: `None`
 - First artifact: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md` sha256=`f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
@@ -188,9 +198,9 @@ Assembly blockers:
 - Final submission without human: `false`
 - Legal/certification action without human: `false`
 - Required authority: Robert verifies SAM access, solicitation attachments, pricing, reps/certs, and authorized representative status before submission.
-- Next human action: Convert the current outline into a human-review package with compliance checklist, pricing stop, and source attachment check.
+- Next human action: Monitor the referred response lead for scheduling or a specific question and do not reuse the rejected address. If no response arrives by July 21, send at most one short scheduling follow-up. Before any teaming or proposal claim, verify written role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule.
 - Claim boundary: Prepared capability material only; no FHWA field result, safety benefit, or deployment claim.
-- Row SHA-256: `aa4199c6af91836b4cccbdc40451dc60ca3522cd1abe8102faf45cd5b7cd9073`
+- Row SHA-256: `8e6d50d96d3e4c7d1ea19e2ea06451a89432ee46fef4451f8fe79c0d03b435e7`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -210,11 +220,13 @@ Assembly blockers:
 
 - Name: NASA Data Center Infrastructure RFI
 - Channel: `federal_rfi`
-- Status: `RFI_RESPONSE_PREP`
+- Status: `SENT_VERIFIED_RESPONSE_PENDING`
+- Legacy intake status: `RFI_RESPONSE_PREP`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json`
 - Readiness mode: `RFI_DRAFT_READY_SEND_BLOCKED`
 - Package status: `ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED`
-- Urgency: `ACTIVE_14D`
-- Action due: `2026-07-17`
+- Urgency: `ROLLING_OR_EVENT_GATED`
+- Action due: `None`
 - First artifact: `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md` sha256=`bcfdd40dfafc7ca0e7822679dba9d2504c2196b5701704d0ba3d46c5ce9448f6`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
@@ -222,9 +234,9 @@ Assembly blockers:
 - Final submission without human: `false`
 - Legal/certification action without human: `false`
 - Required authority: Robert verifies official RFI instructions, contact address, page limits, and final send approval.
-- Next human action: Prepare a bounded response draft and verify official response instructions before send.
+- Next human action: Retain the SENT receipt and attachment hash; do not resend before the deadline.
 - Claim boundary: RFI response only; no NASA partnership, contract, or infrastructure result is represented.
-- Row SHA-256: `ff354396c87764aca4ae3f0968cc2f3215bd5dcadb1d823666427cc12e910231`
+- Row SHA-256: `31e8ff7079f8c3ada3e6c8d1cc1cc49cee257ff983626d2ee72318666b2c5f5e`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -244,7 +256,9 @@ Assembly blockers:
 
 - Name: DLA MissionWeave DSIP SBIR
 - Channel: `federal_sbir`
-- Status: `DSIP_PACKAGE_PREP`
+- Status: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`
+- Legacy intake status: `DSIP_PACKAGE_PREP`
+- State source: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json`
 - Readiness mode: `SBIR_DRAFT_READY_PORTAL_BLOCKED`
 - Package status: `ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED`
 - Urgency: `ROLLING_OR_EVENT_GATED`
@@ -256,9 +270,9 @@ Assembly blockers:
 - Final submission without human: `false`
 - Legal/certification action without human: `false`
 - Required authority: Robert controls DSIP or SBIR portal login, Firm PIN, cost approval, certifications, and final submit.
-- Next human action: Prepare technical volume, cost notes, and Firm PIN handoff checklist.
+- Next human action: Resolve the 37 open gates out of 50, review the complete portal preview, and retain the human-only final-submit boundary.
 - Claim boundary: No DLA integration, procurement, or certified readiness claim.
-- Row SHA-256: `80e6c84f4928f283f8d7a23177d60f964531ddfbe70418e89823c4e21631270b`
+- Row SHA-256: `3ee0614a94cfa9413821deba52c5248f8bc451bcdf07668f87efeb4c6e478a30`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -279,6 +293,8 @@ Assembly blockers:
 - Name: NSF SBIR/STTR Project Pitch
 - Channel: `federal_sbir`
 - Status: `PITCH_READY_HUMAN_CHECK`
+- Legacy intake status: `PITCH_READY_HUMAN_CHECK`
+- State source: `legacy_intake_baseline`
 - Readiness mode: `ROLLING_GATE_READY_RULE_CHECK_REQUIRED`
 - Package status: `ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED`
 - Urgency: `ROLLING_OR_EVENT_GATED`
@@ -292,7 +308,7 @@ Assembly blockers:
 - Required authority: Robert verifies account status, platform-specific rules, one-pending-pitch limits, and final content before submit.
 - Next human action: Check the one-pending-pitch rule before any Project Pitch submit.
 - Claim boundary: No NSF invitation or full-proposal eligibility is represented unless NSF issues it.
-- Row SHA-256: `e21bd5a7a4e9095ba712b74084984f35ad60bdd232720823d279a76f2369430c`
+- Row SHA-256: `9e682652ee706ae53f99910ef119c877a500942d07cd9635bc69986b316f8624`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -313,11 +329,13 @@ Assembly blockers:
 - Name: EPA Region 10 ICP-OES RFI route
 - Channel: `federal_market_research`
 - Status: `ROUTE_ONLY_LOW_FIT`
+- Legacy intake status: `ROUTE_ONLY_LOW_FIT`
+- State source: `legacy_intake_baseline`
 - Readiness mode: `ROUTING_SENT_WAIT_FOR_RESPONSE`
 - Package status: `WAIT_FOR_RESPONSE`
 - Urgency: `ACTIVE_14D`
 - Action due: `2026-07-21`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -326,7 +344,7 @@ Assembly blockers:
 - Required authority: Robert approves any further agency contact after a routing response.
 - Next human action: Wait for routing response; do not prepare a prime bid.
 - Claim boundary: No instrument supply, OEM, reseller, or lab-services qualification claim.
-- Row SHA-256: `33cc48f5664d89455678fe10589460221358862d0b06d372f0610ce348b5762a`
+- Row SHA-256: `cb73a1937206d27b02b6a6301d04e457c6d903df3106f0de4324d3bd0221c3c0`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -346,11 +364,13 @@ Assembly blockers:
 - Name: EPA UCMR 6 analytical chemistry lab services
 - Channel: `federal_sources_sought`
 - Status: `PARTNER_ONLY`
+- Legacy intake status: `PARTNER_ONLY`
+- State source: `legacy_intake_baseline`
 - Readiness mode: `PARTNER_REQUIRED_NO_SOLO_SUBMISSION`
 - Package status: `PARTNER_OR_NO_SOLO_BLOCKED`
 - Urgency: `PARKED_UNLESS_PARTNER`
 - Action due: `2026-07-21`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -359,7 +379,7 @@ Assembly blockers:
 - Required authority: Qualified partner and Robert approve any partner-led response.
 - Next human action: Find qualified partner before any response draft.
 - Claim boundary: No testing lab, contaminant monitoring, or regulated lab-services claim.
-- Row SHA-256: `8cb6190184f78cc75db67b667c668eab645cef1d3290ce58cb1d5f56a799aafd`
+- Row SHA-256: `ea7ba288a1bbeb4e9df12ee16558b80a2886985df27b147254dadf2c2e8e1444`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -379,11 +399,13 @@ Assembly blockers:
 - Name: FHWA Infrastructure R&D BAA Call 3.0
 - Channel: `federal_baa`
 - Status: `SCOUT_TOPIC_MATCH`
+- Legacy intake status: `SCOUT_TOPIC_MATCH`
+- State source: `legacy_intake_baseline`
 - Readiness mode: `TOPIC_SCOUT_READY_SELECTION_REQUIRED`
 - Package status: `SCOUT_READY_NOT_ASSEMBLED`
 - Urgency: `WATCHLIST`
 - Action due: `2026-07-24`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -392,7 +414,7 @@ Assembly blockers:
 - Required authority: Robert approves topic selection after official attachments and topic fit are reviewed.
 - Next human action: Review official attachments and score topic fit before drafting.
 - Claim boundary: No claim that LumenCore fits all BAA topics.
-- Row SHA-256: `9de3e0ae8ad03f06d62f25f8b827df9cc6f729c40ab3ad713606181a66d3787f`
+- Row SHA-256: `1f37abab9d40dab00641a252fc89407ed9edf8cbf8b74e149ef0e8a6a0a99989`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -412,11 +434,13 @@ Assembly blockers:
 - Name: HHS AI Power User Advanced Models and Features Pilot
 - Channel: `federal_contract`
 - Status: `DO_NOT_PRIME_SOLO`
+- Legacy intake status: `DO_NOT_PRIME_SOLO`
+- State source: `legacy_intake_baseline`
 - Readiness mode: `PARKED_NO_SOLO_ACTION`
 - Package status: `PARTNER_OR_NO_SOLO_BLOCKED`
 - Urgency: `PARKED_UNLESS_PARTNER`
 - Action due: `2026-07-14`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - Review-ready components: `8/8`
 - Can prepare internally: `false`
 - External send without human: `false`
@@ -425,7 +449,7 @@ Assembly blockers:
 - Required authority: Qualified compliant platform or prime partner must lead before this lane is reopened.
 - Next human action: Park as non-solo lane unless a qualified platform or prime partner leads.
 - Claim boundary: No FedRAMP, ATO, HHS pilot, or government production-access claim.
-- Row SHA-256: `e750b5b627a51fd2bfaa88e2bf704514c20af45f2ed05ae16a61de2fe369cae5`
+- Row SHA-256: `db5460b5fee41a7715d923003ee77bcd9a0b57ee29e556480e173c65210721aa`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -445,11 +469,13 @@ Assembly blockers:
 - Name: CSOSA Public Safety Data Analytics Platform
 - Channel: `federal_contract`
 - Status: `DO_NOT_PRIME_SOLO`
+- Legacy intake status: `DO_NOT_PRIME_SOLO`
+- State source: `legacy_intake_baseline`
 - Readiness mode: `PARKED_NO_SOLO_ACTION`
 - Package status: `PARTNER_OR_NO_SOLO_BLOCKED`
 - Urgency: `PARKED_UNLESS_PARTNER`
 - Action due: `2026-07-14`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - Review-ready components: `8/8`
 - Can prepare internally: `false`
 - External send without human: `false`
@@ -458,7 +484,7 @@ Assembly blockers:
 - Required authority: Qualified compliant platform or prime partner must lead before this lane is reopened.
 - Next human action: Park as non-solo lane unless a qualified platform or prime partner leads.
 - Claim boundary: No public-safety deployment, law-enforcement feed integration, or FedRAMP authorization claim.
-- Row SHA-256: `3a7b0d825d28da6d0cbe625d4bac20e629ffea703c6ce642720a720192818a95`
+- Row SHA-256: `5473a65c33ffe803d8735495db782308c78e8b60f24b6ad6f46e341bc5dabd8c`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -478,11 +504,13 @@ Assembly blockers:
 - Name: Defense Energy Consortium CMO
 - Channel: `federal_contract`
 - Status: `PARTNER_INTRO_ONLY`
+- Legacy intake status: `PARTNER_INTRO_ONLY`
+- State source: `legacy_intake_baseline`
 - Readiness mode: `INTRO_MATERIAL_READY_NO_SOLO_PROPOSAL`
 - Package status: `PARTNER_OR_NO_SOLO_BLOCKED`
 - Urgency: `PARKED_UNLESS_PARTNER`
 - Action due: `2026-07-30`
-- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55`
+- First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f`
 - Review-ready components: `8/8`
 - Can prepare internally: `true`
 - External send without human: `false`
@@ -491,7 +519,7 @@ Assembly blockers:
 - Required authority: Robert approves any strategic partner or investor introduction before outreach.
 - Next human action: Use as strategic-intro material, not a solo proposal.
 - Claim boundary: No consortium management, energy project financing, or installation-performance claim.
-- Row SHA-256: `91eed77a9c6537a1e6d766a57cb3c87bb6717b0252b55b90da3fe49548365419`
+- Row SHA-256: `f4da07a8857f45213263642a39dafd1e4c18b749f0bae8e475fad47e1135715d`
 
 Components:
 - `official_source_and_instructions` state=`source_identified_human_recheck_required` review_ready=`true`
@@ -510,7 +538,9 @@ Assembly blockers:
 
 - Name: Patent counsel / IP deadline defense
 - Channel: `ip_readiness`
-- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- Status: `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING`
+- Legacy intake status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json#related:georgia_patents_pro_bono_intake`
 - Readiness mode: `IP_PACKET_READY_COUNSEL_REQUIRED`
 - Package status: `COUNSEL_PACKET_READY_LEGAL_ACTION_BLOCKED`
 - Urgency: `WATCHLIST`
@@ -524,7 +554,7 @@ Assembly blockers:
 - Required authority: Licensed patent counsel and Robert decide any filing, continuation, PCT, disclosure, or claim strategy action.
 - Next human action: Monitor counsel replies and prepare filed-materials packet for licensed review.
 - Claim boundary: This ledger is not legal advice and does not assert patentability, ownership, or filing sufficiency.
-- Row SHA-256: `8c68c7932bab9a32e707a5fb16aa102c9afad9cdc437d45cc3e196c75558b4dc`
+- Row SHA-256: `04a28a9f819158631f035c33352c439c79592af225de681e1ead9d2d83ddfed7`
 
 Components:
 - `official_source_and_instructions` state=`counsel_or_official_record_required` review_ready=`true`

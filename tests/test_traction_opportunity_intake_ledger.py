@@ -13,6 +13,12 @@ CURRENT_RESPONSE_JSON = (
     / "funding_sprint_20260709"
     / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json"
 )
+MISSIONWEAVE_GATE_JSON = (
+    ROOT
+    / "grant_submissions"
+    / "DLA26BZ03_NV011_MissionWeave"
+    / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
+)
 
 
 def load_module():
@@ -29,6 +35,7 @@ def test_traction_ledger_builds_connected_and_federal_lane_queue():
     response_summary = json.loads(
         CURRENT_RESPONSE_JSON.read_text(encoding="utf-8")
     )["summary"]
+    missionweave = json.loads(MISSIONWEAVE_GATE_JSON.read_text(encoding="utf-8"))
 
     assert payload["schema"] == "traction_opportunity_intake_ledger_v1"
     assert payload["status"] == "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED"
@@ -53,6 +60,12 @@ def test_traction_ledger_builds_connected_and_federal_lane_queue():
         == response_summary["do_not_duplicate_send_count"]
     )
     assert payload["summary"]["current_state_supersedes_legacy_when_present"] is True
+    assert payload["summary"]["current_response_queue_count"] == response_summary["record_count"]
+    assert payload["summary"]["missionweave_passed_gate_count"] == 13
+    assert payload["summary"]["missionweave_open_gate_count"] == 37
+    assert payload["summary"]["missionweave_required_gate_count"] == 50
+    assert payload["summary"]["missionweave_submission_ready_for_human_click"] is False
+    assert payload["missionweave_action_gate"]["gate_sha256"] == missionweave["gate_sha256"]
     assert len(payload["ledger_sha256"]) == 64
 
 
@@ -104,6 +117,44 @@ def test_latest_response_lanes_are_claim_bounded_and_actionable():
     assert "customer-discovery" in protecnium["reviewer_action"]
 
 
+def test_current_queue_and_effective_states_prevent_stale_or_duplicate_actions():
+    module = load_module()
+    payload = module.build_payload()
+    current = {
+        row["lane_id"]: row
+        for row in payload["current_response_control"]["records"]
+    }
+    lanes = {lane["lane_id"]: lane for lane in payload["lanes"]}
+
+    nashville = current["nashville_ec_takeoff_fall_2026"]
+    assert nashville["deadline"] == "2026-07-17T23:59:00-05:00"
+    assert nashville["send_now"] is False
+    assert nashville["do_not_duplicate_send"] is True
+    assert nashville["decision"] == "COMPLETE_PORTAL_BEFORE_CONFIRMED_CLOSE_NO_DUPLICATE_EMAIL"
+
+    lvlup = current["lvlup_optional_paid_event"]
+    assert lvlup["state"] == "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED"
+    assert lvlup["send_now"] is False
+    assert lvlup["related_legacy_lane_ids"] == ["lvlup_first_check"]
+    assert lanes["lvlup_first_check"]["related_current_response_controls"][0]["lane_id"] == lvlup["lane_id"]
+    assert lanes["lvlup_first_check"]["effective_status"] == lvlup["state"]
+    assert lanes["lvlup_first_check"]["effective_source"].endswith(
+        "#related:lvlup_optional_paid_event"
+    )
+
+    missionweave = lanes["dla_missionweave_sbir"]
+    assert missionweave["effective_status"] == "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
+    assert missionweave["current_action_gate"]["passed_gate_count"] == 13
+    assert missionweave["current_action_gate"]["open_gate_count"] == 37
+    assert missionweave["current_action_gate"]["submission_ready_for_human_click"] is False
+    assert "July 22, 2026 at 12:00 p.m. Eastern Time" in missionweave["effective_deadline_or_gate"]
+
+    serialized = json.dumps(payload).lower()
+    assert "one-time-password" not in serialized
+    assert "password" not in serialized
+    assert all(len(row["record_sha256"]) == 64 for row in current.values())
+
+
 def test_rendered_markdown_excludes_meeting_credentials_and_live_action_authority():
     module = load_module()
     payload = module.build_payload()
@@ -118,6 +169,8 @@ def test_rendered_markdown_excludes_meeting_credentials_and_live_action_authorit
 
     assert "Traction Opportunity Intake Ledger" in rendered
     assert "Current Response Overlay" in rendered
+    assert "Current Response Queue" in rendered
+    assert "Legacy Intake Queue With Effective-State Controls" in rendered
     assert "supersedes a legacy lane status" in rendered
     assert current_decisions
     assert all(decision in rendered for decision in current_decisions)
@@ -126,6 +179,8 @@ def test_rendered_markdown_excludes_meeting_credentials_and_live_action_authorit
     assert lanl_section.index("Current response state") < lanl_section.index("- Evidence:")
     assert "External send without human: `false`" in rendered
     assert "Final submission without human: `false`" in rendered
+    assert "MissionWeave gates: `13/50` passed; `37` open" in rendered
+    assert "2026-07-17T23:59:00-05:00" in rendered
     assert "No final portal action" in rendered
     assert "zoom.us" not in lowered
     assert "password" not in lowered

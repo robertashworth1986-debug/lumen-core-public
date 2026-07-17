@@ -14,10 +14,10 @@ LumenCore sells proof-to-pilot infrastructure for reviewers who need complex R&D
 - Customer segments: `5`
 - Productized offers: `5`
 - Buyer proof checks: `8`
-- Traction lanes: `15`
-- Decision lanes: `15`
-- Data-room Markdown artifacts: `35`
-- Data-room machine controls: `34`
+- Traction lanes: `19`
+- Decision lanes: `19`
+- Data-room Markdown artifacts: `51`
+- Data-room machine controls: `52`
 - EVTit workstreams: `6`
 - Registry enabled sources: `29`
 - Registry measured sources: `25`
@@ -36,7 +36,7 @@ LumenCore sells proof-to-pilot infrastructure for reviewers who need complex R&D
 - Paying customer claimed: `false`
 - Customer result claimed: `false`
 - Production deployment claimed: `false`
-- Packet SHA-256: `2ac468847ad9a0b7b77db7412cf7e89217f96521a29fb82a930fb9413a9841db`
+- Packet SHA-256: `27c637e885e0290b42d12b6387db02e4887d96bb7eead3a5374b177a6d7b2a2b`
 
 ## Business Model
 
@@ -181,12 +181,12 @@ LumenCore sells proof-to-pilot infrastructure for reviewers who need complex R&D
 
 ## Evidence Artifacts
 
-- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md` sha256=`767720b50d1012b95e6716377b315b74181236ede4412d616171b87b1e73cd48` bytes=`18715`
-- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`d116b0679357b38737be8f61c8960118647d4d830d72c0df73fce65c79d6ab5b` bytes=`17167`
-- `present` `grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md` sha256=`2aa3e2e80e5ebb68a085080b0466b3f40d42df8cfb67ab98dfbdcf5957fd7e7c` bytes=`7867`
-- `present` `grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md` sha256=`fa8fd779a9cce41f8169d77611417249ada18263e420da0271c44bd3d0bf6df8` bytes=`8261`
-- `present` `grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md` sha256=`2f3859baa8f84ef704ab0934c431a2b97d6210cc617303e35a9b626a861a06e7` bytes=`10709`
-- `present` `grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md` sha256=`1271ddbcfe306c67b25eebddf3c5cce71eb1e9db1fa70ec8d928e40d43d86eb2` bytes=`18779`
+- `present` `grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md` sha256=`c935210e86e3cf4f217eec9edf04814067a829be7d93fe90093f3839b45490d9` bytes=`23864`
+- `present` `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md` sha256=`9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f` bytes=`52071`
+- `present` `grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md` sha256=`b6257f98e9cad35a244aa02264dec019204c5ede27357cdadba76a1019a9fac6` bytes=`8029`
+- `present` `grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md` sha256=`f21c4af99226e6cd2554dc626df51e02f1dd909bb6fdf7095fdbda1dacb1df78` bytes=`8625`
+- `present` `grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md` sha256=`ae8a41916c20207d4a2732d58c0e09a9a089809496696dfd822543751d27c13c` bytes=`10709`
+- `present` `grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md` sha256=`cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390` bytes=`24099`
 
 ## Human Gate
 

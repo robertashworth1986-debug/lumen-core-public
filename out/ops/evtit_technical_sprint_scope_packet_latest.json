@@ -4,55 +4,55 @@
       "bytes": 10148,
       "path": "out/ops/evtit_technical_sprint_scope_packet_latest.json",
       "present": true,
-      "sha256": "f16e60392e1258fe44dc1e6e029f3a03c2a1561c295ecb983b3a00c6ee8e9416"
+      "sha256": "c92cc4b3007f2ad0333c5629dffddd47d3d3def061e0bfa60a74827f6e5bed18"
     },
     {
-      "bytes": 23378,
+      "bytes": 85341,
       "path": "out/ops/traction_opportunity_intake_ledger_latest.json",
       "present": true,
-      "sha256": "6d8b07f3454aa843f0095e51f578d110355c5f0a0b7899e7d70a8c85724e6278"
+      "sha256": "fb88ac9d2b61d3c07ef04eeaa33756dae839b64271c9d5dfd1893e8ad061f7b8"
     },
     {
-      "bytes": 10154,
+      "bytes": 12366,
       "path": "out/ops/traction_followup_packet_latest.json",
       "present": true,
-      "sha256": "e82ac1ef626d962395244228f0506b1cb7a914594a87a58f0d71c1232ff53178"
+      "sha256": "bf8f2f49c3b8662980a22c8935ec6ef3c9f5401b5a9080744ea4e7f53155d1c5"
     },
     {
-      "bytes": 37344,
+      "bytes": 73041,
       "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
       "present": true,
-      "sha256": "e6f4f78ab0625f3e4f1a4c6c13c93943afd537df2fd9fcb300ffd3abfa7ea345"
+      "sha256": "355a17d60db1ac7ca05e5442698eb34491ecdd4b97d30e2857b628c167e6c9ab"
     },
     {
-      "bytes": 33617,
+      "bytes": 49467,
       "path": "out/ops/data_room_manifest_latest.json",
       "present": true,
-      "sha256": "5db8855fd7e825ed6fd64d1d261a47aa33e18989518777877d8d92cb2eeba633"
+      "sha256": "c92dd8bd0be7dbc8f7ab222a3a9590389b5dffa39b744460f90daf2abb8d84af"
     },
     {
-      "bytes": 42569,
+      "bytes": 42951,
       "path": "out/ops/measured_source_evidence_register_latest.json",
       "present": true,
-      "sha256": "7fbadbbcc2304df545bc99b089115aee1bb72ede154743aab8eb4af910539646"
+      "sha256": "e12e23d62f60d2b677fa288a09c023e4a688cd6f395105030b9fc6544dcc3669"
     },
     {
       "bytes": 12389,
       "path": "out/ops/federal_submission_protocol_packet_latest.json",
       "present": true,
-      "sha256": "67e0c97d97eaad6b2d3d97e212214ca089c025057fb3b117a87c042591085adb"
+      "sha256": "dbf19b6dcb218b1beba9824e1da8178c59c41856b2c542839b5e6362e9fb1d88"
     },
     {
-      "bytes": 26227,
+      "bytes": 33418,
       "path": "out/ops/submission_authority_matrix_latest.json",
       "present": true,
-      "sha256": "157a95c4f9607beba3fa7aa9894c586a80cec2ace86632b60b2bc567baf7239c"
+      "sha256": "616519280f524711e6e11c43e059a90cb5490efbcd3f29f4e22530dd3f6fa1ca"
     },
     {
-      "bytes": 11291,
+      "bytes": 13031,
       "path": "out/ops/ip_counsel_diligence_packet_latest.json",
       "present": true,
-      "sha256": "51fed2d69e85dc589429af22f19590f4db11ce1e0e593257ceaea512cc423ba1"
+      "sha256": "1c1e7133bd44e3bb568972c018b37406cb43ae4ca37d19278b8b5f191ae7b846"
     },
     {
       "bytes": 10038,
@@ -61,22 +61,45 @@
       "sha256": "fb2fa17cfc4da39ec4c95659e679462fba202af881d2ebad4307419261a77c81"
     }
   ],
-  "evtit_sprint_scope_sha256": "4fb2236f561cc8555d5f97390163ab685f6c1b1ad4a35b1fb6367c0af8b1a7b6",
-  "generated_utc": "2026-07-09T20:24:18.013255+00:00",
+  "evtit_sprint_scope_sha256": "c4bb5cad52a5eed0e0cf4b30ef6b9366f55086cd194d46a0217acd4bf35877b3",
+  "generated_utc": "2026-07-17T21:09:59.525417+00:00",
   "human_gate": {
     "email_send_allowed_without_human": false,
     "meeting_schedule_allowed_without_human": false,
     "private_file_share_allowed_without_human": false,
-    "rule": "This packet is a scope-preparation artifact only. Robert approves any external send, meeting schedule, access grant, economics, equity/service terms, or file sharing.",
+    "rule": "Current control is monitor-only. Keep this scope internal and send nothing unless Terry replies with a specific ask; any later action still requires Robert's review.",
     "scope_share_allowed_without_human": false,
     "terms_acceptance_allowed_without_human": false
   },
   "lane": {
-    "claim_boundary": "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
+    "claim_boundary": "The mailbox record proves only that two near-duplicate follow-ups were sent and no inbound reply was observed at reconciliation time. It does not prove interest, rejection, selection, funding, or validation.",
+    "current_control": {
+      "action_gate": "No additional outbound message. If Terry replies, read the complete thread and answer only the specific ask without sending another broad deck.",
+      "claim_boundary": "The mailbox record proves only that two near-duplicate follow-ups were sent and no inbound reply was observed at reconciliation time. It does not prove interest, rejection, selection, funding, or validation.",
+      "deadline": null,
+      "decision": "MONITOR_NO_FURTHER_FOLLOWUP",
+      "do_not_duplicate_send": true,
+      "lane_id": "terry_vynetic_followup",
+      "next_action": "Send nothing further unless Terry replies with a specific ask; then answer only that ask in the existing thread.",
+      "no_send_before": null,
+      "organization": "Terry Anderton / Vynetic",
+      "record_sha256": "ae8344c154e7a7eb0d8fe2c6211f0cd8759b677cf093e7841606986f0f4fef67",
+      "related_legacy_lane_ids": [
+        "evtit_blackdog_inkind"
+      ],
+      "response_artifact": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
+      "response_channel": "EMAIL_REPLY_ONLY_IF_INBOUND",
+      "response_ready": false,
+      "send_now": false,
+      "state": "OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY",
+      "supporting_artifacts": []
+    },
     "fit_score": 92,
     "lane_id": "evtit_blackdog_inkind",
+    "legacy_intake_status": "RESET_NOTE_SENT_TECH_REVIEW_PENDING",
     "name": "EVTit / Black Dog in-kind engineering fund",
-    "status": "RESET_NOTE_SENT_TECH_REVIEW_PENDING"
+    "state_source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json#related:terry_vynetic_followup",
+    "status": "OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY"
   },
   "milestones": [
     {
@@ -116,28 +139,30 @@
     "markdown": "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md"
   },
   "positioning": {
-    "best_next_meeting": "30-minute technical fit call with named engineering owners and a workstream selection decision.",
-    "decision_question": "Can EVTit help productize the evidence system so serious reviewers can inspect it faster?",
+    "best_next_meeting": "None scheduled; consider a technical fit call only after a specific inbound request.",
+    "decision_question": "What internal sprint scope should remain ready if Terry sends a specific technical ask?",
     "one_sentence": "A 30-day technical sprint to convert LumenCore's proof-to-pilot stack into a cleaner reviewer portal, repeatable evidence receipts, measured-source visibility, and pilot-ready intake gates."
   },
   "schema": "evtit_technical_sprint_scope_packet_v1",
-  "status": "EVTIT_TECHNICAL_SPRINT_SCOPE_READY_HUMAN_TERMS_REQUIRED",
+  "status": "EVTIT_TECHNICAL_SPRINT_SCOPE_INTERNAL_ONLY_MONITOR_NO_SEND",
   "summary": {
     "autonomy_packet_status": "AUTONOMOUS_QUANT_GOVERNANCE_READY_HUMAN_RUNTIME_REQUIRED",
     "current_probe_measured_sources": 23,
     "customer_outcome_value_claimed": false,
-    "data_room_control_count": 34,
-    "data_room_markdown_count": 35,
+    "data_room_control_count": 52,
+    "data_room_markdown_count": 51,
     "data_room_status": "DATA_ROOM_MANIFEST_READY",
+    "do_not_duplicate_send": true,
     "equity_or_services_terms_allowed_without_human": false,
     "external_send_allowed_without_human": false,
     "federal_protocol_status": "FEDERAL_SUBMISSION_PROTOCOL_READY_HUMAN_PORTAL_REQUIRED",
-    "followup_status": "TRACTION_FOLLOWUP_READY_HUMAN_SEND_REQUIRED",
+    "followup_status": "TRACTION_FOLLOWUP_MONITOR_ONLY_NO_SEND",
     "human_terms_required": true,
     "investment_claimed": false,
     "ip_packet_status": "IP_COUNSEL_DILIGENCE_READY_HUMAN_COUNSEL_REQUIRED",
     "measured_source_reconciliation_required": true,
     "milestone_count": 5,
+    "monitor_only": true,
     "partnership_claimed": false,
     "production_deployment_claimed": false,
     "registry_enabled_sources": 29,

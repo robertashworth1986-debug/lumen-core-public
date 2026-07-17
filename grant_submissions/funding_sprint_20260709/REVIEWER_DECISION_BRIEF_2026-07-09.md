@@ -18,7 +18,7 @@ This brief is a decision-support front page. It does not authorize any final ext
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Decision brief SHA-256: `8172f556577086ea46441a46df196785b6528fb2c53597fb2a6d8cc6965eded6`
+- Decision brief SHA-256: `cf8573d7550ba66fb73e0cbfb0fe62d118697851f2d040ccd314eec4224a0894`
 
 ## Reviewer Answer
 
@@ -176,14 +176,14 @@ This brief is a decision-support front page. It does not authorize any final ext
 - Readiness mode: `FEDERAL_DRAFT_READY_SUBMISSION_BLOCKED`
 - Decision stance: Advance draft package; human verifies official instructions and authority.
 - Reviewer decision: Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?
-- Next human action: Convert the current outline into a human-review package with compliance checklist, pricing stop, and source attachment check.
+- Next human action: Monitor the referred response lead for scheduling or a specific question and do not reuse the rejected address. If no response arrives by July 21, send at most one short scheduling follow-up. Before any teaming or proposal claim, verify written role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule.
 - Required authority: Robert verifies SAM access, solicitation attachments, pricing, reps/certs, and authorized representative status before submission.
 - First artifact: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md`
 - Claim boundary: Prepared capability material only; no FHWA field result, safety benefit, or deployment claim.
 - Can send externally without human: `false`
 - Can submit without human: `false`
 - Can accept terms without human: `false`
-- Card SHA-256: `fb1fd20c6f81a2782e165ca72efbabd24d3dee8d8a2564115d22a3b148507a7e`
+- Card SHA-256: `9e1c99ef7c509791c3a780a149392c65382ee932193870db8cf8f0058c6bbed9`
 
 ### 5. NASA Data Center Infrastructure RFI
 
@@ -195,14 +195,14 @@ This brief is a decision-support front page. It does not authorize any final ext
 - Readiness mode: `RFI_DRAFT_READY_SEND_BLOCKED`
 - Decision stance: Prepare response; human verifies official send route.
 - Reviewer decision: Does the response provide useful market intelligence without claiming award readiness?
-- Next human action: Prepare a bounded response draft and verify official response instructions before send.
+- Next human action: Retain the SENT receipt and attachment hash; do not resend before the deadline.
 - Required authority: Robert verifies official RFI instructions, contact address, page limits, and final send approval.
 - First artifact: `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md`
 - Claim boundary: RFI response only; no NASA partnership, contract, or infrastructure result is represented.
 - Can send externally without human: `false`
 - Can submit without human: `false`
 - Can accept terms without human: `false`
-- Card SHA-256: `b462f10b9def80239485075ae90dc2a285afcdc11353f95a5c4a2f0b2367cd63`
+- Card SHA-256: `2a3e3549c6320de12ddcec5f4b549dcef7e4609f96ae317f57e77376de04ad99`
 
 ### 6. DLA MissionWeave DSIP SBIR
 
@@ -214,14 +214,14 @@ This brief is a decision-support front page. It does not authorize any final ext
 - Readiness mode: `SBIR_DRAFT_READY_PORTAL_BLOCKED`
 - Decision stance: Prepare portal package; human controls Firm PIN and certifications.
 - Reviewer decision: Is the Phase I work scoped to produce independently reviewable technical evidence?
-- Next human action: Prepare technical volume, cost notes, and Firm PIN handoff checklist.
+- Next human action: Resolve the 37 open gates out of 50, review the complete portal preview, and retain the human-only final-submit boundary.
 - Required authority: Robert controls DSIP or SBIR portal login, Firm PIN, cost approval, certifications, and final submit.
 - First artifact: `grant_submissions/funding_sprint_20260709/DSIP_MISSIONWEAVE_FAST_SUBMISSION_PLAN_2026-07-09.md`
 - Claim boundary: No DLA integration, procurement, or certified readiness claim.
 - Can send externally without human: `false`
 - Can submit without human: `false`
 - Can accept terms without human: `false`
-- Card SHA-256: `cf3521f660adfb310f08f6f16ebdc6ee3869ccb6279dd10de6ae6e86420cb3e4`
+- Card SHA-256: `b7dc93b707b1d29678082396cd4ab2dcb58a4714581babcdb28e0af7265365a7`
 
 ### 7. NSF SBIR/STTR Project Pitch
 

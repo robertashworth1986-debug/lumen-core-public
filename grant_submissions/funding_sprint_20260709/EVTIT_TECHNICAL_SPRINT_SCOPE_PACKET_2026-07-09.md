@@ -6,9 +6,11 @@ This packet is preparation-only. It does not send email, schedule a meeting, acc
 
 ## Status
 
-- Status: `EVTIT_TECHNICAL_SPRINT_SCOPE_READY_HUMAN_TERMS_REQUIRED`
+- Status: `EVTIT_TECHNICAL_SPRINT_SCOPE_INTERNAL_ONLY_MONITOR_NO_SEND`
 - Lane ID: `evtit_blackdog_inkind`
-- Lane status: `RESET_NOTE_SENT_TECH_REVIEW_PENDING`
+- Lane status: `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY`
+- Legacy intake status: `RESET_NOTE_SENT_TECH_REVIEW_PENDING`
+- State source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json#related:terry_vynetic_followup`
 - Fit score: `92`
 - Workstreams: `6`
 - Milestones: `5`
@@ -20,6 +22,8 @@ This packet is preparation-only. It does not send email, schedule a meeting, acc
 - Current probe measured sources: `23`
 - Measured-source reconciliation required: `true`
 - Human terms required: `true`
+- Monitor only: `true`
+- Do not duplicate send: `true`
 - External send without human: `false`
 - Schedule without human: `false`
 - Share private files without human: `false`
@@ -29,17 +33,17 @@ This packet is preparation-only. It does not send email, schedule a meeting, acc
 - Services award claimed: `false`
 - Customer outcome value claimed: `false`
 - Production deployment claimed: `false`
-- Packet SHA-256: `4fb2236f561cc8555d5f97390163ab685f6c1b1ad4a35b1fb6367c0af8b1a7b6`
+- Packet SHA-256: `c4bb5cad52a5eed0e0cf4b30ef6b9366f55086cd194d46a0217acd4bf35877b3`
 
 ## Positioning
 
 - One sentence: A 30-day technical sprint to convert LumenCore's proof-to-pilot stack into a cleaner reviewer portal, repeatable evidence receipts, measured-source visibility, and pilot-ready intake gates.
-- Decision question: Can EVTit help productize the evidence system so serious reviewers can inspect it faster?
-- Best next meeting: 30-minute technical fit call with named engineering owners and a workstream selection decision.
+- Decision question: What internal sprint scope should remain ready if Terry sends a specific technical ask?
+- Best next meeting: None scheduled; consider a technical fit call only after a specific inbound request.
 
 ## Claim Boundary
 
-Meeting and application evidence only; no investment, services award, or partnership has been accepted.
+The mailbox record proves only that two near-duplicate follow-ups were sent and no inbound reply was observed at reconciliation time. It does not prove interest, rejection, selection, funding, or validation.
 
 ## Workstreams
 
@@ -125,17 +129,17 @@ Meeting and application evidence only; no investment, services award, or partner
 - meeting_schedule_allowed_without_human: `False`
 - terms_acceptance_allowed_without_human: `False`
 - private_file_share_allowed_without_human: `False`
-- rule: `This packet is a scope-preparation artifact only. Robert approves any external send, meeting schedule, access grant, economics, equity/service terms, or file sharing.`
+- rule: `Current control is monitor-only. Keep this scope internal and send nothing unless Terry replies with a specific ask; any later action still requires Robert's review.`
 
 ## Evidence Sources
 
-- `out/ops/evtit_technical_sprint_scope_packet_latest.json` | present=`true` | bytes=`10148` | sha256=`f16e60392e1258fe44dc1e6e029f3a03c2a1561c295ecb983b3a00c6ee8e9416`
-- `out/ops/traction_opportunity_intake_ledger_latest.json` | present=`true` | bytes=`23378` | sha256=`6d8b07f3454aa843f0095e51f578d110355c5f0a0b7899e7d70a8c85724e6278`
-- `out/ops/traction_followup_packet_latest.json` | present=`true` | bytes=`10154` | sha256=`e82ac1ef626d962395244228f0506b1cb7a914594a87a58f0d71c1232ff53178`
-- `out/ops/funding_sprint_reviewer_gate_latest.json` | present=`true` | bytes=`37344` | sha256=`e6f4f78ab0625f3e4f1a4c6c13c93943afd537df2fd9fcb300ffd3abfa7ea345`
-- `out/ops/data_room_manifest_latest.json` | present=`true` | bytes=`33617` | sha256=`5db8855fd7e825ed6fd64d1d261a47aa33e18989518777877d8d92cb2eeba633`
-- `out/ops/measured_source_evidence_register_latest.json` | present=`true` | bytes=`42569` | sha256=`7fbadbbcc2304df545bc99b089115aee1bb72ede154743aab8eb4af910539646`
-- `out/ops/federal_submission_protocol_packet_latest.json` | present=`true` | bytes=`12389` | sha256=`67e0c97d97eaad6b2d3d97e212214ca089c025057fb3b117a87c042591085adb`
-- `out/ops/submission_authority_matrix_latest.json` | present=`true` | bytes=`26227` | sha256=`157a95c4f9607beba3fa7aa9894c586a80cec2ace86632b60b2bc567baf7239c`
-- `out/ops/ip_counsel_diligence_packet_latest.json` | present=`true` | bytes=`11291` | sha256=`51fed2d69e85dc589429af22f19590f4db11ce1e0e593257ceaea512cc423ba1`
+- `out/ops/evtit_technical_sprint_scope_packet_latest.json` | present=`true` | bytes=`10148` | sha256=`c92cc4b3007f2ad0333c5629dffddd47d3d3def061e0bfa60a74827f6e5bed18`
+- `out/ops/traction_opportunity_intake_ledger_latest.json` | present=`true` | bytes=`85341` | sha256=`fb88ac9d2b61d3c07ef04eeaa33756dae839b64271c9d5dfd1893e8ad061f7b8`
+- `out/ops/traction_followup_packet_latest.json` | present=`true` | bytes=`12366` | sha256=`bf8f2f49c3b8662980a22c8935ec6ef3c9f5401b5a9080744ea4e7f53155d1c5`
+- `out/ops/funding_sprint_reviewer_gate_latest.json` | present=`true` | bytes=`73041` | sha256=`355a17d60db1ac7ca05e5442698eb34491ecdd4b97d30e2857b628c167e6c9ab`
+- `out/ops/data_room_manifest_latest.json` | present=`true` | bytes=`49467` | sha256=`c92dd8bd0be7dbc8f7ab222a3a9590389b5dffa39b744460f90daf2abb8d84af`
+- `out/ops/measured_source_evidence_register_latest.json` | present=`true` | bytes=`42951` | sha256=`e12e23d62f60d2b677fa288a09c023e4a688cd6f395105030b9fc6544dcc3669`
+- `out/ops/federal_submission_protocol_packet_latest.json` | present=`true` | bytes=`12389` | sha256=`dbf19b6dcb218b1beba9824e1da8178c59c41856b2c542839b5e6362e9fb1d88`
+- `out/ops/submission_authority_matrix_latest.json` | present=`true` | bytes=`33418` | sha256=`616519280f524711e6e11c43e059a90cb5490efbcd3f29f4e22530dd3f6fa1ca`
+- `out/ops/ip_counsel_diligence_packet_latest.json` | present=`true` | bytes=`13031` | sha256=`1c1e7133bd44e3bb568972c018b37406cb43ae4ca37d19278b8b5f191ae7b846`
 - `out/ops/autonomous_quant_governance_packet_latest.json` | present=`true` | bytes=`10038` | sha256=`fb2fa17cfc4da39ec4c95659e679462fba202af881d2ebad4307419261a77c81`

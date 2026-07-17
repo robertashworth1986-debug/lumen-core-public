@@ -16,7 +16,7 @@ Current date for this docket: `2026-07-09`.
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Docket SHA-256: `018d18656838ba7cc7100a1e953318f0cef6e3b4bfb25242e8edfeb85532f600`
+- Docket SHA-256: `61c949e3d36d9af159d3cb32a76d195ebe66e784efc0751356e3be9b6f8b7dc3`
 
 ## Immediate And Urgent Lanes
 
@@ -30,8 +30,8 @@ Current date for this docket: `2026-07-09`.
 - Time basis: Gmail invite received; exact event time is intentionally excluded from the public docket.
 - First artifact: `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md`
 - Human gate: Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.
-- Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
-- Item SHA-256: `1c654f2696837d96d1b1fcfa1ffe8229f7f49f91a4e35cdc75eda4b75aec1b4a`
+- Claim boundary: The mailbox record proves only that two near-duplicate follow-ups were sent and no inbound reply was observed at reconciliation time. It does not prove interest, rejection, selection, funding, or validation.
+- Item SHA-256: `b9363575e3d9ec82597c425aec6af333909681cd423e387446492639057b39ca`
 
 ### USPTO / Georgia PATENTS pro bono routing
 
@@ -43,8 +43,8 @@ Current date for this docket: `2026-07-09`.
 - Time basis: USPTO Pro Bono routed Tennessee inventors to Georgia PATENTS; patent timing must be verified by counsel.
 - First artifact: `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md`
 - Human gate: Human and licensed counsel decide any filing, claim, continuation, PCT, disclosure, or legal strategy.
-- Claim boundary: This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.
-- Item SHA-256: `3e87b1ce8ce788f218587ad8df5b7ab6d79425c19ea14a49d6f27cda5534739c`
+- Claim boundary: This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice.
+- Item SHA-256: `9998f211630188721a24f10bccd3c69da58b1b5153c02e2462a8538b9c353f4f`
 
 ### OpenAI API continuity request
 
@@ -95,8 +95,8 @@ Current date for this docket: `2026-07-09`.
 - Time basis: LANL response says the main POC is out until next week.
 - First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
 - Human gate: Human approves any LANL reply, NDA, licensing discussion, export-control response, or disclosure package.
-- Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
-- Item SHA-256: `8c8ce8aa3ef07b3484285b75b99c855427b907eca3141a0cc188a0edc31ba7b3`
+- Claim boundary: The Gmail SENT record and attachment hash prove transmission only. They do not establish LANL receipt, evaluation, a license, endorsement, independent validation, a pilot, funding, deployment, or contract performance.
+- Item SHA-256: `4159a3d99b3cb1b62a2679307ba09fb8ad27ea0d02df5c102c30f236649898ce`
 
 ## Full Docket
 
@@ -104,7 +104,7 @@ Current date for this docket: `2026-07-09`.
 
 - Lane ID: `evtit_blackdog_inkind`
 - Channel: `venture_engineering`
-- Status: `RESET_NOTE_SENT_TECH_REVIEW_PENDING`
+- Status: `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY`
 - Action type: `meeting_prep`
 - Urgency: `IMMEDIATE_24H`
 - Action due: `2026-07-09`
@@ -112,13 +112,13 @@ Current date for this docket: `2026-07-09`.
 - First artifact: `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md`
 - Decision question: Can an in-kind engineering team accelerate proof portal, replay runner, manifest, and pilot onboarding?
 - Human gate: Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.
-- Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
+- Claim boundary: The mailbox record proves only that two near-duplicate follow-ups were sent and no inbound reply was observed at reconciliation time. It does not prove interest, rejection, selection, funding, or validation.
 
 ### 3. USPTO / Georgia PATENTS pro bono routing
 
 - Lane ID: `uspto_georgia_patents_route`
 - Channel: `ip_readiness`
-- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- Status: `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING`
 - Action type: `licensed_counsel_review`
 - Urgency: `IMMEDIATE_24H`
 - Action due: `2026-07-10`
@@ -126,7 +126,7 @@ Current date for this docket: `2026-07-09`.
 - First artifact: `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md`
 - Decision question: What filing or claim action must licensed counsel verify before public expansion?
 - Human gate: Human and licensed counsel decide any filing, claim, continuation, PCT, disclosure, or legal strategy.
-- Claim boundary: This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.
+- Claim boundary: This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice.
 
 ### 14. OpenAI API continuity request
 
@@ -174,7 +174,7 @@ Current date for this docket: `2026-07-09`.
 
 - Lane ID: `lanl_vision_licensing_followup`
 - Channel: `federal_lab_tech_transfer`
-- Status: `WAITING_POC_RETURN`
+- Status: `OUTBOUND_SENT_RESPONSE_PENDING`
 - Action type: `lab_poc_followup`
 - Urgency: `URGENT_5D`
 - Action due: `2026-07-13`
@@ -182,13 +182,13 @@ Current date for this docket: `2026-07-09`.
 - First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
 - Decision question: Is there a bounded licensing or validation conversation worth pursuing with the named lab POC?
 - Human gate: Human approves any LANL reply, NDA, licensing discussion, export-control response, or disclosure package.
-- Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
+- Claim boundary: The Gmail SENT record and attachment hash prove transmission only. They do not establish LANL receipt, evaluation, a license, endorsement, independent validation, a pilot, funding, deployment, or contract performance.
 
 ### 2. LvlUp Ventures First Check Fund
 
 - Lane ID: `lvlup_first_check`
 - Channel: `venture_cash`
-- Status: `WAITING_REVIEW`
+- Status: `WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED`
 - Action type: `investor_watch`
 - Urgency: `ACTIVE_14D`
 - Action due: `2026-07-16`
@@ -196,21 +196,7 @@ Current date for this docket: `2026-07-09`.
 - First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
 - Decision question: Is a small first check useful enough to preserve execution velocity and unlock pilots?
 - Human gate: Human approves any diligence reply or investor terms.
-- Claim boundary: Submission and acknowledgement only; no funding decision is represented.
-
-### 5. NASA Data Center Infrastructure RFI
-
-- Lane ID: `nasa_data_center_rfi`
-- Channel: `federal_rfi`
-- Status: `RFI_RESPONSE_PREP`
-- Action type: `federal_rfi_build`
-- Urgency: `ACTIVE_14D`
-- Action due: `2026-07-17`
-- Action: Prepare a bounded response draft and verify official response instructions before send.
-- First artifact: `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md`
-- Decision question: Does the response provide useful market intelligence without claiming award readiness?
-- Human gate: Human verifies official response instructions, page limits, contacts, and final send.
-- Claim boundary: RFI response only; no NASA partnership, contract, or infrastructure result is represented.
+- Claim boundary: This receipt proves only that LvlUp Ventures stated in writing that declining the sponsor-backed track would not affect the separate investment and accelerator review and that the application would continue through its standard investment process. It does not prove Investment Committee consideration, diligence, selection, investment interest, funding, accelerator admission, endorsement, validation, or an offer.
 
 ### 8. EPA Region 10 ICP-OES RFI route
 
@@ -244,7 +230,7 @@ Current date for this docket: `2026-07-09`.
 
 - Lane ID: `patent_deadline_counsel`
 - Channel: `ip_readiness`
-- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- Status: `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING`
 - Action type: `licensed_counsel_review`
 - Urgency: `WATCHLIST`
 - Action due: `2026-07-25`
@@ -252,35 +238,49 @@ Current date for this docket: `2026-07-09`.
 - First artifact: `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md`
 - Decision question: What filing or claim action must licensed counsel verify before public expansion?
 - Human gate: Human and licensed counsel decide any filing, claim, continuation, PCT, or disclosure action.
-- Claim boundary: This ledger is not legal advice and does not assert patentability, ownership, or filing sufficiency.
+- Claim boundary: This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice.
 
 ### 4. FHWA TSMO Data Initiative
 
 - Lane ID: `fhwa_tsmo_data_initiative`
 - Channel: `federal_contract`
-- Status: `PHASE_I_TECH_VOLUME`
-- Action type: `federal_contract_build`
-- Urgency: `WATCHLIST`
-- Action due: `2026-08-03`
-- Action: Convert the current outline into a human-review package with compliance checklist, pricing stop, and source attachment check.
+- Status: `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING`
+- Action type: `human_review`
+- Urgency: `ROLLING_OR_EVENT_GATED`
+- Action due: `None`
+- Action: Monitor the referred response lead for scheduling or a specific question and do not reuse the rejected address. If no response arrives by July 21, send at most one short scheduling follow-up. Before any teaming or proposal claim, verify written role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule.
 - First artifact: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md`
 - Decision question: Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?
 - Human gate: Human verifies SAM attachments, terms, pricing, reps/certs, and final submission authority.
-- Claim boundary: Prepared capability material only; no FHWA field result, safety benefit, or deployment claim.
+- Claim boundary: The Gmail records prove that the first route was rejected, the replacement message received a substantive reply, the request was referred to the subject matter expert leading this response, and one bounded acknowledgment was sent in that thread. The referral does not establish pursuit, a fit-check commitment, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.
+
+### 5. NASA Data Center Infrastructure RFI
+
+- Lane ID: `nasa_data_center_rfi`
+- Channel: `federal_rfi`
+- Status: `SENT_VERIFIED_RESPONSE_PENDING`
+- Action type: `human_review`
+- Urgency: `ROLLING_OR_EVENT_GATED`
+- Action due: `None`
+- Action: Retain the SENT receipt and attachment hash; do not resend before the deadline.
+- First artifact: `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md`
+- Decision question: Does the response provide useful market intelligence without claiming award readiness?
+- Human gate: Human verifies official response instructions, page limits, contacts, and final send.
+- Claim boundary: Transmission does not establish agency acceptance, evaluation, validation, an award, or a contract.
 
 ### 6. DLA MissionWeave DSIP SBIR
 
 - Lane ID: `dla_missionweave_sbir`
 - Channel: `federal_sbir`
-- Status: `DSIP_PACKAGE_PREP`
-- Action type: `federal_sbir_build`
+- Status: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`
+- Action type: `human_review`
 - Urgency: `ROLLING_OR_EVENT_GATED`
 - Action due: `None`
-- Action: Prepare technical volume, cost notes, and Firm PIN handoff checklist.
+- Action: Resolve the 37 open gates out of 50, review the complete portal preview, and retain the human-only final-submit boundary.
 - First artifact: `grant_submissions/funding_sprint_20260709/DSIP_MISSIONWEAVE_FAST_SUBMISSION_PLAN_2026-07-09.md`
 - Decision question: Is the Phase I work scoped to produce independently reviewable technical evidence?
 - Human gate: Human-only Firm PIN, certifications, cost approval, and final submit.
-- Claim boundary: No DLA integration, procurement, or certified readiness claim.
+- Claim boundary: This public gate proves package integrity, document-format checks, and the completion state of a bounded private DSIP fact workflow. It does not expose legal identifiers, a Firm PIN, the assigned proposal number, private portal evidence, or unsupported compliance facts. It does not establish DLA validation, CMMC status, ITAR compliance, award eligibility, proposal acceptance, submission, selection, contract, award, deployment, or realized performance.
 
 ### 7. NSF SBIR/STTR Project Pitch
 

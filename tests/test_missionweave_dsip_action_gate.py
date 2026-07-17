@@ -245,7 +245,12 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     checklist = module.OUT_CHECKLIST.read_text(encoding="utf-8")
     combined = markdown + checklist + json.dumps(payload, sort_keys=True)
 
-    assert payload["status"] == "PRIVATE_DSIP_FACTS_NOT_CAPTURED"
+    assert payload["status"] == "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
+    assert payload["gate_summary"]["passed_private_gate_count"] == 13
+    assert payload["gate_summary"]["open_gate_count"] == 37
+    assert payload["gate_summary"]["required_private_gate_count"] == 50
+    assert payload["submission_ready_for_human_click"] is False
+    assert payload["private_input"]["private_values_exposed"] is False
     assert payload["source_integrity"]["all_checks_pass"] is True
     assert "Seven Volumes" in checklist
     for volume in range(1, 8):

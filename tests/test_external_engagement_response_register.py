@@ -257,7 +257,8 @@ def test_current_response_state_mirror_matches_sources_and_e_drive():
     destination = Path(receipt["destination_root"])
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 29
+    assert receipt["artifact_count"] == len(receipt["artifacts"])
+    assert receipt["artifact_count"] >= 29
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["private_founder_values_mirrored"] is False
     for artifact in receipt["artifacts"]:
@@ -272,6 +273,31 @@ def test_current_response_state_mirror_matches_sources_and_e_drive():
         assert hashlib.sha256(source.read_bytes()).hexdigest().upper() == expected
         assert hashlib.sha256(mirror.read_bytes()).hexdigest().upper() == expected
         assert artifact["copy_sha256_matched"] is True
+
+    mirrored_sources = {artifact["source"] for artifact in receipt["artifacts"]}
+    assert {
+        "code/ops/BUILD_EXTERNAL_RESPONSE_STATE_E_DRIVE_SYNC_RECEIPT.py",
+        "code/ops/BUILD_TRACTION_OPPORTUNITY_INTAKE_LEDGER.py",
+        "code/ops/BUILD_TRACTION_FOLLOWUP_PACKET.py",
+        "code/ops/BUILD_EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET.py",
+        "code/ops/BUILD_REVIEWER_CONCIERGE_PACKET.py",
+        "code/ops/BUILD_AGENCY_SUBMISSION_ASSEMBLY_GATE.py",
+        "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.json",
+        "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.png",
+        "out/ops/traction_opportunity_intake_ledger_latest.json",
+        "out/ops/traction_followup_packet_latest.json",
+        "out/ops/evtit_technical_sprint_scope_packet_latest.json",
+        "out/ops/reviewer_concierge_packet_latest.json",
+        "out/ops/human_action_docket_latest.json",
+        "out/ops/reviewer_decision_brief_latest.json",
+        "out/ops/customer_commercialization_packet_latest.json",
+        "out/ops/reviewer_investor_fast_lane_router_latest.json",
+        "out/ops/agency_submission_assembly_gate_latest.json",
+        "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+    }.issubset(mirrored_sources)
+    assert len({Path(source).name.casefold() for source in mirrored_sources}) == len(
+        mirrored_sources
+    )
 
     assert "does not prove" in receipt["claim_boundary"].lower()
 

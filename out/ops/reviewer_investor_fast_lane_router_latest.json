@@ -1,6 +1,6 @@
 {
-  "fast_lane_router_sha256": "eb5573972426bc99d8e9566555941b6e62bd353744f2668a5040e0444f221b50",
-  "generated_utc": "2026-07-09T22:54:07.746466+00:00",
+  "fast_lane_router_sha256": "9de9bbafcc544c24ba63375bad8d1ba510de037ec4920c27dd4d2c30dabd83a7",
+  "generated_utc": "2026-07-17T21:10:00.658671+00:00",
   "outputs": {
     "dashboard_json": "dashboard/data/reviewer_investor_fast_lane_router.json",
     "json": "out/ops/reviewer_investor_fast_lane_router_latest.json",
@@ -12,10 +12,10 @@
       "answer": "Open the decision brief, then the diligence Q&A, then the authority matrix. This gives the lane count, evidence posture, final-action gates, and the first artifact for each opportunity.",
       "artifact_status": [
         {
-          "bytes": 23598,
+          "bytes": 23864,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
           "present": true,
-          "sha256": "b9fcb9149ab06d23149883e94437dc9cfaabb23648c25eab0377755eaa8708f1"
+          "sha256": "c935210e86e3cf4f217eec9edf04814067a829be7d93fe90093f3839b45490d9"
         },
         {
           "bytes": 16206,
@@ -30,10 +30,10 @@
           "sha256": "cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390"
         },
         {
-          "bytes": 25708,
+          "bytes": 27683,
           "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
           "present": true,
-          "sha256": "5f75f6f5d698ae76c3794499b35efd43fa0c9be4258e08d8d0f3415fbca924f0"
+          "sha256": "f8d5e886dbea083bcb512748549e776d3a4c2e4b971ebb46c25b593001f16e7d"
         }
       ],
       "audience": "reviewer_or_investor",
@@ -47,7 +47,7 @@
       "missing_artifact_count": 0,
       "question": "Where should a busy reviewer start?",
       "route_id": "five_minute_reviewer_start",
-      "route_sha256": "5e40155ae1e58b1d28d0b3c571db40f8b45e1552567c824398d4b5dc49493680",
+      "route_sha256": "7da3642faa4ea93e142e243cbceceb433559e14d517905ec2fdce33a58d0008f",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
@@ -67,7 +67,7 @@
           "bytes": 32810,
           "path": "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
           "present": true,
-          "sha256": "df352e21244a5719742c84146e69112489ff582384a916f097811e036fd76f91"
+          "sha256": "9a06bf73fab59081f2cc0ee95c718b5a3f19254c171fa5506335d45a8c8943b8"
         },
         {
           "bytes": 12244,
@@ -82,10 +82,10 @@
           "sha256": "fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82"
         },
         {
-          "bytes": 20001,
+          "bytes": 22454,
           "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
           "present": true,
-          "sha256": "81a4f42d51f72e9c51e7cd645b804c3a47e64dbe65cf6ca02faa99d7b45419b6"
+          "sha256": "cd2dd829f5f383d69ea7d55934e3c15b6f5ed86852463e1d373481189f8f155a"
         }
       ],
       "audience": "agency_reviewer_or_contracting_contact",
@@ -99,7 +99,7 @@
       "missing_artifact_count": 0,
       "question": "Is LumenCore disciplined enough for agency protocol?",
       "route_id": "agency_submission_protocol",
-      "route_sha256": "b072d65c1ed20abb656a20dfb214ca3803539c248f99c0986e6f07761e79337e",
+      "route_sha256": "0daf0c4b8deac516eda431e7ed6ab7e8eef08ce6cf7d99f2ce448b7e6586dc53",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
@@ -111,10 +111,10 @@
       "answer": "Use the IP counsel packet and boundary register to separate invention-family summaries from legal claims, claim charts, filing decisions, and freedom-to-operate language.",
       "artifact_status": [
         {
-          "bytes": 9907,
+          "bytes": 11129,
           "path": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
           "present": true,
-          "sha256": "a3354fec70f9ae12a0bf42c24a2f1699f05ba0d05880afa16264080b1a1860ee"
+          "sha256": "e9efbb7e405cc0dc8d283f991e353df8ff78f69864bde2aab0159839f8ecd306"
         },
         {
           "bytes": 7643,
@@ -146,7 +146,7 @@
       "missing_artifact_count": 0,
       "question": "What can be said about IP without overclaiming?",
       "route_id": "ip_patent_claim_boundary",
-      "route_sha256": "21a83dce2a1aa88ec305803a957fc428e5f58c8190849d7e7451cd06dccc9dbe",
+      "route_sha256": "cb2de7cd2eae386a3da2b341737b19dab92109b9510948d3851689f7c61955c6",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md",
         "grant_submissions/PATENT_LEGAL_RESCUE_PACKET_2026-06-20.md",
@@ -163,10 +163,10 @@
           "sha256": "af04f6cb53f8320292902aae23825970fe35785e263f7851122eb1506c159d52"
         },
         {
-          "bytes": 7867,
+          "bytes": 8029,
           "path": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
           "present": true,
-          "sha256": "2aa3e2e80e5ebb68a085080b0466b3f40d42df8cfb67ab98dfbdcf5957fd7e7c"
+          "sha256": "b6257f98e9cad35a244aa02264dec019204c5ede27357cdadba76a1019a9fac6"
         },
         {
           "bytes": 6300,
@@ -178,7 +178,7 @@
           "bytes": 6279,
           "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
           "present": true,
-          "sha256": "c56fed102e513a1373d9d23317b7ff20c51adc77faa1cc1c5e1dd88e255cdd95"
+          "sha256": "937b51af324d049b09ee2519554e6c40071d2c341c0c0715c2c24d7199d7e443"
         }
       ],
       "audience": "technical_diligence_or_security_reviewer",
@@ -192,7 +192,7 @@
       "missing_artifact_count": 0,
       "question": "Can live sources be used without turning credentials into risk?",
       "route_id": "live_source_and_key_governance",
-      "route_sha256": "a8cf8a6ac14815963cab53c058e0adf226968e5ac82f473bbd0cb2f0e488a046",
+      "route_sha256": "5cf957dfba1a6de977c22b5f1674bc4f87f2b217e77c9f891f5704f46cf008fb",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
@@ -203,16 +203,16 @@
       "answer": "Use the traction ledger and human docket to see the 19-lane opportunity map, urgent dates, response status, and required next human action.",
       "artifact_status": [
         {
-          "bytes": 22779,
+          "bytes": 52071,
           "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
           "present": true,
-          "sha256": "e6bcabe153e9bccee645a489dd32e69550c078ce6e07c0e600d8e37fc75f6e55"
+          "sha256": "9cdcad79bb7bf3041ce817f832d8cbfaf58f6076d30211f8d5d4e6d192d9de9f"
         },
         {
-          "bytes": 20001,
+          "bytes": 22454,
           "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
           "present": true,
-          "sha256": "81a4f42d51f72e9c51e7cd645b804c3a47e64dbe65cf6ca02faa99d7b45419b6"
+          "sha256": "cd2dd829f5f383d69ea7d55934e3c15b6f5ed86852463e1d373481189f8f155a"
         },
         {
           "bytes": 12349,
@@ -221,10 +221,10 @@
           "sha256": "d675cc756efcc84ccd219cce06560493ac2f7ea2c4cf3338aca45a1e5e52e567"
         },
         {
-          "bytes": 30996,
+          "bytes": 36127,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
           "present": true,
-          "sha256": "04fae167c7755ac30ea8db7e7b8e9eccb48c16bbd8a456b7288602ef674c1e47"
+          "sha256": "44ddf0c67ff6291892ad18809c6381b33329a54f5502cbfe93a19508c05e6168"
         }
       ],
       "audience": "operator_or_non_dilutive_funding_reviewer",
@@ -238,7 +238,7 @@
       "missing_artifact_count": 0,
       "question": "Which lanes deserve action first?",
       "route_id": "traction_deadline_action",
-      "route_sha256": "8084553fda436cd9902f73da676506aa36189e86a8d8cbfdee0d55939fda7f38",
+      "route_sha256": "e9119683b608af6f166f0fc2a0edd85eda6fc9475185a1d77786d356ed1053d8",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/CLOSEST_QUALIFIED_GRANTS_AND_CONTRACTS_2026-07-09.md",
@@ -298,13 +298,13 @@
           "bytes": 11451,
           "path": "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
           "present": true,
-          "sha256": "b1034846561675a25ff85134813c6e4bc0d71a5a48bad92f78610273c4499d28"
+          "sha256": "9c4cf95f1d749cde316f02eb4fb9ab0938290089d312ebb121572c7b304e31cc"
         },
         {
-          "bytes": 7867,
+          "bytes": 8029,
           "path": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
           "present": true,
-          "sha256": "2aa3e2e80e5ebb68a085080b0466b3f40d42df8cfb67ab98dfbdcf5957fd7e7c"
+          "sha256": "b6257f98e9cad35a244aa02264dec019204c5ede27357cdadba76a1019a9fac6"
         },
         {
           "bytes": 6754,
@@ -330,7 +330,7 @@
       "missing_artifact_count": 0,
       "question": "How does this become customer value without overclaiming savings?",
       "route_id": "commercialization_customer_roi",
-      "route_sha256": "b3ab804403a962af73fc5c9b280aaa3a86512105baf2e545d715c2e0edccd919",
+      "route_sha256": "3d800eefc81b9ca15ff667ba53e6070e9a660b8103ca8765cf13ed40b6ed52d5",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/PROOF_STACK_EDGE_INDEX_2026-07-09.md",
@@ -359,10 +359,10 @@
           "sha256": "ae6f04ec0837e51833e36164b8671812db1a3547cb1c64790ca20d2435a0bef8"
         },
         {
-          "bytes": 23598,
+          "bytes": 23864,
           "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
           "present": true,
-          "sha256": "b9fcb9149ab06d23149883e94437dc9cfaabb23648c25eab0377755eaa8708f1"
+          "sha256": "c935210e86e3cf4f217eec9edf04814067a829be7d93fe90093f3839b45490d9"
         }
       ],
       "audience": "investor_or_profile_reviewer",
@@ -376,7 +376,7 @@
       "missing_artifact_count": 0,
       "question": "What should an investor see before a deeper call?",
       "route_id": "investor_profile_and_terms",
-      "route_sha256": "552278d96f36413b94fadf00480e1f8c83d27468be7d5a222bc0f9864e371a51",
+      "route_sha256": "ff061825ab174776871153d7b1c2c045aeebe588d68761a40d05c58ab1059a50",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/VENTURE_STUDIO_TERMS_GUARDRAIL_PACKET_2026-07-09.md",
         "grant_submissions/funding_sprint_20260709/PITCH_DECK_SEND_RECEIPT_2026-07-09.md",
