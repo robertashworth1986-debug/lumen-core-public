@@ -1,0 +1,65 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "generated_utc": "2026-07-17T05:02:17.4809301Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_CLOCK_GATE_20260716",
+  "artifact_count": 6,
+  "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_CLOCK_GATE.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_CLOCK_GATE_20260716/BUILD_EXTERNAL_ENGAGEMENT_CLOCK_GATE.py",
+      "bytes": 15450,
+      "sha256": "A2B01B7DC02D02280ECE97917926B91027C2574E732CC7511656CAAA27585230",
+      "copy_bytes": 15450,
+      "copy_sha256": "A2B01B7DC02D02280ECE97917926B91027C2574E732CC7511656CAAA27585230",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_external_engagement_clock_gate.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_CLOCK_GATE_20260716/test_external_engagement_clock_gate.py",
+      "bytes": 5629,
+      "sha256": "F2083191AAA7D9254D8D673E5F847F06719E215AC59CC5C5AC45C26DF3747FD7",
+      "copy_bytes": 5629,
+      "copy_sha256": "F2083191AAA7D9254D8D673E5F847F06719E215AC59CC5C5AC45C26DF3747FD7",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_CLOCK_GATE_20260716/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.json",
+      "bytes": 13074,
+      "sha256": "D26A00A3BD19876E7660F08DE0417212C1AF4E9AF0A0375B52F3B2B7FDF59A44",
+      "copy_bytes": 13074,
+      "copy_sha256": "D26A00A3BD19876E7660F08DE0417212C1AF4E9AF0A0375B52F3B2B7FDF59A44",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_CLOCK_GATE_20260716/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+      "bytes": 10703,
+      "sha256": "FFAD2760F91C8CD062C6C7DB50544A7DA1311E02B14B3D66C86D6708C2BC3F57",
+      "copy_bytes": 10703,
+      "copy_sha256": "FFAD2760F91C8CD062C6C7DB50544A7DA1311E02B14B3D66C86D6708C2BC3F57",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/external_engagement_clock_gate_latest.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_CLOCK_GATE_20260716/external_engagement_clock_gate_latest.json",
+      "bytes": 13074,
+      "sha256": "D26A00A3BD19876E7660F08DE0417212C1AF4E9AF0A0375B52F3B2B7FDF59A44",
+      "copy_bytes": 13074,
+      "copy_sha256": "D26A00A3BD19876E7660F08DE0417212C1AF4E9AF0A0375B52F3B2B7FDF59A44",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/external_engagement_clock_gate.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_CLOCK_GATE_20260716/external_engagement_clock_gate.json",
+      "bytes": 13074,
+      "sha256": "D26A00A3BD19876E7660F08DE0417212C1AF4E9AF0A0375B52F3B2B7FDF59A44",
+      "copy_bytes": 13074,
+      "copy_sha256": "D26A00A3BD19876E7660F08DE0417212C1AF4E9AF0A0375B52F3B2B7FDF59A44",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves byte-for-byte mirroring of the listed public-safe clock-gate artifacts only. It does not prove email transmission, portal submission, acceptance, evaluation, validation, funding, award, contract, deployment, or technical performance."
+}
