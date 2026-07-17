@@ -1,0 +1,68 @@
+name: Diagnose LumenCore VPS storage pressure
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/vps-storage-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lumencore-vps-storage-diagnostic
+  cancel-in-progress: false
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+
+    steps:
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+
+      - name: Capture storage and inode hotspots
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -u
+            echo "=== identity ==="
+            id
+            echo "=== filesystem capacity ==="
+            df -hP / /opt /var /home /tmp 2>&1 || true
+            echo "=== filesystem inodes ==="
+            df -iP / /opt /var /home /tmp 2>&1 || true
+            echo "=== journal usage ==="
+            sudo -n journalctl --disk-usage 2>&1 || true
+            echo "=== largest subtrees by KiB ==="
+            sudo -n du -x -k -d2 /var /opt /home/opc /tmp 2>/dev/null \
+              | sort -n \
+              | tail -n 160 \
+              || true
+            echo "=== densest subtrees by inode count ==="
+            sudo -n du -x --inodes -d2 /var /opt /home/opc /tmp 2>/dev/null \
+              | sort -n \
+              | tail -n 160 \
+              || true
+            echo "=== largest regular files under mutable roots ==="
+            sudo -n find /var /opt /home/opc /tmp -xdev -type f -printf "%s %p\n" 2>/dev/null \
+              | sort -n \
+              | tail -n 100 \
+              || true
+          ' | tee /tmp/lumencore-vps-storage-diagnostic.txt
+
+      - name: Upload storage diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lumencore-vps-storage-${{ github.run_id }}
+          path: /tmp/lumencore-vps-storage-diagnostic.txt
+          if-no-files-found: error
+          retention-days: 7
