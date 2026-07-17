@@ -1,0 +1,47 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "generated_utc": "2026-07-17T05:09:41.7417273Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_20260717",
+  "artifact_count": 4,
+  "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_NASHVILLE_EC_LIVE_DEADLINE_RECEIPT.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_20260717/BUILD_NASHVILLE_EC_LIVE_DEADLINE_RECEIPT.py",
+      "bytes": 14703,
+      "sha256": "41FCE21439504AEFE5A711EE9589C3D662477743D7C3836627240F3E979668B8",
+      "copy_bytes": 14703,
+      "copy_sha256": "41FCE21439504AEFE5A711EE9589C3D662477743D7C3836627240F3E979668B8",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_nashville_ec_live_deadline_receipt.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_20260717/test_nashville_ec_live_deadline_receipt.py",
+      "bytes": 6397,
+      "sha256": "72EC53A2573F8000D2B413AE73C9E5A6BE5722D247AF7FBF9621F6C41B78135D",
+      "copy_bytes": 6397,
+      "copy_sha256": "72EC53A2573F8000D2B413AE73C9E5A6BE5722D247AF7FBF9621F6C41B78135D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_20260717/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json",
+      "bytes": 5108,
+      "sha256": "5F0768819C03565749724E8A66DD80AC712D317B241DC7D5F2EDA65E5BC52DA1",
+      "copy_bytes": 5108,
+      "copy_sha256": "5F0768819C03565749724E8A66DD80AC712D317B241DC7D5F2EDA65E5BC52DA1",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_20260717/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.md",
+      "bytes": 3339,
+      "sha256": "24E49F24FEC9D9332579EB1CDBA8434E75AFA728F94F25B19F57519C78FA1621",
+      "copy_bytes": 3339,
+      "copy_sha256": "24E49F24FEC9D9332579EB1CDBA8434E75AFA728F94F25B19F57519C78FA1621",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves byte-for-byte mirroring of the listed public-safe Nashville EC deadline artifacts only. It does not prove portal submission, acceptance, selection, funding, validation, endorsement, or award."
+}
