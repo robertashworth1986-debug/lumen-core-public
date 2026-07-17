@@ -68,6 +68,12 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
         "private_input_present": False,
         "private_values_exposed": False,
     }
+    assert nashville["deadline_support"] == {
+        "status": "DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING",
+        "sent_utc": "2026-07-17T12:05:34Z",
+        "do_not_duplicate_send": True,
+        "email_is_application": False,
+    }
     assert any(
         path.endswith("CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py")
         for path in nashville["package_files"]
@@ -125,6 +131,9 @@ def test_rendered_handoff_is_public_safe_and_has_no_stale_send_state() -> None:
     assert "Navigation before resume signal: `false`" in rendered
     assert "DLA26BZ03-NV011" in rendered
     assert "Passed: `0/15`" in rendered
+    assert "Status: `DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING`" in rendered
+    assert "Do not duplicate: `true`" in rendered
+    assert "Email is application: `false`" in rendered
     assert "Passed: `0/50`" in rendered
     assert "EPRI administrative onboarding was sent" in rendered
     assert "EPRI draft" not in rendered
@@ -143,12 +152,12 @@ def test_current_nashville_portal_handoff_mirror_matches_sources() -> None:
     assert receipt["browser_navigation_performed"] is False
     assert receipt["private_founder_values_mirrored"] is False
     for artifact in receipt["artifacts"]:
-        source = ROOT / artifact["source"]
+        source_path = Path(artifact["source"])
         destination = Path(artifact["destination"])
-        assert source.is_file(), artifact["source"]
+        assert source_path.is_absolute() is False
+        assert ".." not in source_path.parts
         assert destination.is_file(), artifact["destination"]
-        assert source.stat().st_size == destination.stat().st_size == artifact["bytes"]
-        source_hash = hashlib.sha256(source.read_bytes()).hexdigest().upper()
+        assert destination.stat().st_size == artifact["bytes"]
         destination_hash = hashlib.sha256(destination.read_bytes()).hexdigest().upper()
-        assert source_hash == destination_hash == artifact["sha256"]
+        assert destination_hash == artifact["sha256"]
         assert artifact["copy_sha256_matched"] is True

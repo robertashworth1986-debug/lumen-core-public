@@ -1,6 +1,6 @@
 # External Engagement Response Register - 2026-07-17
 
-The bounded FHWA partner-fit email was sent to one verified TSMO target and must not be duplicated. No additional email should be sent now. If the Nashville EC portal remains open, finish its founder-fact gate; complete the overdue SAM account-key action; and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would reduce credibility.
+The bounded Nashville EC deadline-support query and FHWA partner-fit email were sent and must not be duplicated. The Nashville message is not an application, so continue its founder-fact gate and final portal workflow while monitoring for the exact close time. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would reduce credibility.
 
 ## Control Summary
 
@@ -8,18 +8,18 @@ The bounded FHWA partner-fit email was sent to one verified TSMO target and must
 - Engagement records: `12`
 - Immediate human actions: `2`
 - Monitor-only lanes: `8`
-- Do-not-duplicate lanes: `10`
+- Do-not-duplicate lanes: `11`
 - Verified attachments: `6`
 - All attachment checks pass: `true`
 - Autonomous external send allowed: `false`
 - Autonomous final portal submit allowed: `false`
-- Register SHA-256: `b7bf13cbd6b9f1810d7b0d724140095e170bc7e7443f5b86cd63e4d6b01e51d5`
+- Register SHA-256: `93846183cd39cdc91aa55dcd2358086424ac0483baba614aec86c20c6e679e5b`
 
 ## Response Queue
 
 | Organization | State | Decision | Deadline / Hold | Duplicate Send |
 |---|---|---|---|---:|
-| Nashville Entrepreneur Center | `PORTAL_PACKET_READY_HUMAN_FACTS_REQUIRED` | `COMPLETE_HUMAN_FACTS_AND_FINAL_PREVIEW` | 2026-07-17 | `false` |
+| Nashville Entrepreneur Center | `DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING` | `CONTINUE_PORTAL_MONITOR_SUPPORT_REPLY_NO_DUPLICATE` | 2026-07-17 | `true` |
 | Launch Tennessee 3686 Pitch Competition | `PORTAL_PACKET_QA_PASSED_HUMAN_FACTS_AND_FOUNDER_APPROVAL_REQUIRED` | `STAGE_PORTAL_FINAL_PREVIEW_REQUIRED` | 2026-08-13T23:59:00-05:00 | `false` |
 | EPRI Open Power AI Consortium | `OUTBOUND_SENT_MOU_PENDING` | `MONITOR_FOR_MOU_NO_DUPLICATE` | 2026-07-23 | `true` |
 | Georgia PATENTS | `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | 2026-07-24 | `true` |
@@ -35,16 +35,16 @@ The bounded FHWA partner-fit email was sent to one verified TSMO target and must
 ### Nashville Entrepreneur Center
 
 - Lane: `nashville_ec_takeoff_fall_2026`
-- State: `PORTAL_PACKET_READY_HUMAN_FACTS_REQUIRED`
-- Decision: `COMPLETE_HUMAN_FACTS_AND_FINAL_PREVIEW`
+- State: `DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING`
+- Decision: `CONTINUE_PORTAL_MONITOR_SUPPORT_REPLY_NO_DUPLICATE`
 - Response channel: `PORTAL`
 - Response ready: `true`
 - Send now: `false`
 - Action gate: Founder answers all six concise confirmation prompts, reviews the complete live portal preview plus any terms or fee, and authorizes final submission at action time.
-- Next action: Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, then review the complete preview plus any terms or fee before action-time approval; do not invent revenue, customers, demographics, founder history, investment, or debt.
-- Response artifact: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
+- Next action: Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, and monitor the single support thread for the exact close time. Do not resend the deadline query or treat it as an application; review the complete preview plus any terms or fee before action-time approval.
+- Response artifact: `grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json`
 - Claim boundary: This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms.
-- Record SHA-256: `256fa0c62aca66f262deac596bb56a988d5e51be6cffa6f76253f80ddac5c030`
+- Record SHA-256: `ea1f73bc8327f2d9978f07b73d7d8b97b0b59edd51776ceba013a7c5a4d90e99`
 
 ### Launch Tennessee 3686 Pitch Competition
 
@@ -237,13 +237,15 @@ LumenCore
 - `nashville_human_fact_resolution`: present=`true` bytes=`8597` sha256=`998A267A08DF9E8923FAB1E57740F00F52270228A49417F40DA73AF4AA6D4D33` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json`
 - `nashville_private_collector`: present=`true` bytes=`11024` sha256=`379A150CC558D9A37ED53D8C48C291275C3A04241CB91F164377E309A5E9D165` path=`code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py`
 - `nashville_private_workflow`: present=`true` bytes=`2256` sha256=`FAD93E7ED7C93A1406657D5D678A3673CFD73ED29FE4DE5205E223E948EA9D88` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md`
+- `nashville_deadline_preservation_receipt`: present=`true` bytes=`1801` sha256=`42FC996C7EBCDCE4027CCA5397347195D5B8FE74C90E75EFD114BD8265DC20B5` path=`grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json`
+- `nashville_deadline_response_control`: present=`true` bytes=`2610` sha256=`81225B12C7B8B7E614A0FD50D559BCE076E2142E0535E06EA15DEB01FE1A9C93` path=`grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md`
 - `nashville_private_fill_map`: present=`false` bytes=`0` sha256=`None` path=`grant_submissions/NASHVILLE_EC_FALL_2026/private/nashville_ec_portal_fill_map.private.json`
 - `launchtn_application_manifest`: present=`true` bytes=`22736` sha256=`16FE4E214430055532F6FB7F57453E0F47DAA648EE3E3B92B6050E17C98E3DC8` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json`
 - `launchtn_pitch_deck`: present=`true` bytes=`353970` sha256=`C607E94D8E072EC9D9F93DA0D8C372FD5592B01D2CA3B4F71C0A079417C18A69` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx`
 - `launchtn_financial_model`: present=`true` bytes=`16166` sha256=`9DA46F8AD94FC53EF561EE33DCFA6DF907897CAEADF6AFBD08FB113FC6887D94` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx`
 - `lvlup_historical_application_draft`: present=`true` bytes=`12152` sha256=`F75EBF8FD60A40968484D6AE147FB6D02848CA109AB277337C5BAE5085CBA796` path=`docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md`
 - `sam_public_credential_rotation_control`: present=`true` bytes=`4544` sha256=`AAC20E903A5055E731DA65E5E5A82F08D5C34A7288AA6BED4D0ED78C4F0BE159` path=`grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json`
-- `email_action_reconciliation`: present=`true` bytes=`7114` sha256=`6BA301EA39E4236338E0872A2BF8C36CDB1A1D4ED6925F622D3E200EDD387387` path=`grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json`
+- `email_action_reconciliation`: present=`true` bytes=`7797` sha256=`23720EB0463CB8CBAC0D5B454D52691DEA5C0AD8DD4E94D2AC43D9C8400911FB` path=`grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json`
 - `fhwa_teaming_template`: present=`true` bytes=`2114` sha256=`6614F9D452565F9E5F54B3E70B45E93F112DD1293A8845E43489E339D34B0819` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md`
 - `fhwa_partner_outreach_control`: present=`true` bytes=`4494` sha256=`8A6D0B28CC7AFD33A376FE4908A99E5EE008795637C4BB995A5519660B5744E4` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json`
 

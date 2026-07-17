@@ -16,6 +16,21 @@ AS_OF_DATE = "2026-07-17"
 def build_payload() -> dict[str, Any]:
     lanes = [
         {
+            "lane_id": "nashville_ec_takeoff_fall_2026",
+            "organization": "Nashville Entrepreneur Center",
+            "latest_event_type": "DEADLINE_PRESERVATION_QUERY_SENT",
+            "latest_event_utc": "2026-07-17T12:05:34Z",
+            "state": "DEADLINE_QUERY_SENT_PORTAL_SUBMISSION_STILL_REQUIRED",
+            "email_reply_required": False,
+            "send_now": False,
+            "no_send_before": None,
+            "do_not_duplicate_send": True,
+            "next_action": (
+                "Continue the portal application and monitor for the exact close time or "
+                "support instructions; do not resend and do not treat the email as an application."
+            ),
+        },
+        {
             "lane_id": "epri_open_power_ai_mou",
             "organization": "EPRI Open Power AI Consortium",
             "latest_event_type": "AUTOMATIC_OUT_OF_OFFICE",
@@ -181,6 +196,7 @@ def build_payload() -> dict[str, Any]:
             "LANL VISION and licensing follow-up",
             "EPRI Open Power AI Consortium onboarding",
             "FHWA TSMO qualified-partner outreach",
+            "Nashville EC Fall 2026 TakeOff deadline-support query",
             "CDC, NASA, Army, LvlUp, Terry Anderton, and Vynetic",
         ],
         "summary": {
@@ -189,7 +205,7 @@ def build_payload() -> dict[str, Any]:
                 1 for lane in lanes if lane["email_reply_required"]
             ),
             "send_now_count": sum(1 for lane in lanes if lane["send_now"]),
-            "duplicate_outbound_risk_count": 2,
+            "duplicate_outbound_risk_count": 3,
             "out_of_office_count": 1,
             "human_account_action_count": 1,
             "external_send_allowed_without_human": False,
@@ -223,6 +239,16 @@ def validate_payload(payload: dict[str, Any]) -> None:
     )
     if terry["outbound_followup_count"] != 2:
         raise ValueError("Terry duplicate-send guard is incomplete")
+    nashville = next(
+        lane
+        for lane in payload["lanes"]
+        if lane["lane_id"] == "nashville_ec_takeoff_fall_2026"
+    )
+    if (
+        nashville["state"] != "DEADLINE_QUERY_SENT_PORTAL_SUBMISSION_STILL_REQUIRED"
+        or nashville["do_not_duplicate_send"] is not True
+    ):
+        raise ValueError("Nashville EC deadline-preservation control is incomplete")
 
 
 def render_markdown(payload: dict[str, Any]) -> str:

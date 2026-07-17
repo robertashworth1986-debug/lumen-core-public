@@ -6,10 +6,10 @@ Status: `NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION`
 
 ## Control Line
 
-- Reconciled lanes: `11`
+- Reconciled lanes: `12`
 - Reply required now: `0`
 - Send now: `0`
-- Duplicate-outbound risks: `2`
+- Duplicate-outbound risks: `3`
 - Human account actions: `1`
 - Browser navigation performed: `false`
 
@@ -17,6 +17,7 @@ Status: `NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION`
 
 | Lane | State | Reply now | Next action |
 |---|---|---:|---|
+| Nashville Entrepreneur Center | `DEADLINE_QUERY_SENT_PORTAL_SUBMISSION_STILL_REQUIRED` | `false` | Continue the portal application and monitor for the exact close time or support instructions; do not resend and do not treat the email as an application. |
 | EPRI Open Power AI Consortium | `MOU_ROUTING_SENT_OUT_OF_OFFICE_RECEIVED` | `false` | Wait for the MOU, a correction request, or an onboarding question; do not resend identity details. |
 | Georgia PATENTS | `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING` | `false` | Wait for intake instructions; do not disclose unpublished patent materials through ordinary email. |
 | Los Alamos National Laboratory | `PACKAGE_SENT_RESPONSE_PENDING` | `false` | Wait for LANL; use the single bounded follow-up only on or after July 23 if no reply arrives. |

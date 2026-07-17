@@ -9,6 +9,18 @@
   ],
   "lanes": [
     {
+      "do_not_duplicate_send": true,
+      "email_reply_required": false,
+      "lane_id": "nashville_ec_takeoff_fall_2026",
+      "latest_event_type": "DEADLINE_PRESERVATION_QUERY_SENT",
+      "latest_event_utc": "2026-07-17T12:05:34Z",
+      "next_action": "Continue the portal application and monitor for the exact close time or support instructions; do not resend and do not treat the email as an application.",
+      "no_send_before": null,
+      "organization": "Nashville Entrepreneur Center",
+      "send_now": false,
+      "state": "DEADLINE_QUERY_SENT_PORTAL_SUBMISSION_STILL_REQUIRED"
+    },
+    {
       "email_reply_required": false,
       "lane_id": "epri_open_power_ai_mou",
       "latest_event_type": "AUTOMATIC_OUT_OF_OFFICE",
@@ -140,15 +152,16 @@
     "LANL VISION and licensing follow-up",
     "EPRI Open Power AI Consortium onboarding",
     "FHWA TSMO qualified-partner outreach",
+    "Nashville EC Fall 2026 TakeOff deadline-support query",
     "CDC, NASA, Army, LvlUp, Terry Anderton, and Vynetic"
   ],
   "status": "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION",
   "summary": {
-    "duplicate_outbound_risk_count": 2,
+    "duplicate_outbound_risk_count": 3,
     "email_reply_required_count": 0,
     "external_send_allowed_without_human": false,
     "human_account_action_count": 1,
-    "lane_count": 11,
+    "lane_count": 12,
     "out_of_office_count": 1,
     "send_now_count": 0
   }

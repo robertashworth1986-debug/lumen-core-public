@@ -60,6 +60,13 @@ NASHVILLE_PRIVATE_FILL_MAP = (
     / "private"
     / "nashville_ec_portal_fill_map.private.json"
 )
+NASHVILLE_DEADLINE_RECEIPT = (
+    SPRINT_DIR
+    / "NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json"
+)
+NASHVILLE_DEADLINE_RESPONSE_CONTROL = (
+    SPRINT_DIR / "NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md"
+)
 LAUNCHTN_MANIFEST = (
     ROOT
     / "grant_submissions"
@@ -220,6 +227,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     patent_control = read_json(PATENT_DEADLINE_CONTROL)
     nashville = read_json(NASHVILLE_MANIFEST)
     nashville_resolution = read_json(NASHVILLE_FACT_RESOLUTION)
+    nashville_deadline = read_json(NASHVILLE_DEADLINE_RECEIPT)
     launchtn = read_json(LAUNCHTN_MANIFEST)
     sam_rotation = read_json(SAM_ROTATION_CONTROL)
     email_reconciliation = read_json(EMAIL_ACTION_RECONCILIATION)
@@ -227,6 +235,12 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
 
     if nashville_resolution.get("status") != "SIX_FOUNDER_CONFIRMATIONS_REQUIRED":
         raise ValueError("Nashville EC human-fact resolution is missing or stale")
+    if (
+        nashville_deadline.get("schema") != "lumencore.external_engagement_receipt.v1"
+        or nashville_deadline.get("acknowledgment", {}).get("status")
+        != "DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING"
+    ):
+        raise ValueError("Nashville EC deadline-preservation receipt is missing or stale")
     if patent_control.get("schema") != "lumencore.patent_deadline_evidence_control.v1":
         raise ValueError("Patent deadline evidence control is missing or stale")
     if launchtn.get("schema") != "lumencore.launchtn_3686_pitch_application.v1":
@@ -248,6 +262,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         row["lane_id"]: row for row in email_reconciliation.get("lanes", [])
     }
     if {
+        "nashville_ec_takeoff_fall_2026",
         "epri_open_power_ai_mou",
         "terry_vynetic_followup",
     } - reconciliation_lanes.keys():
@@ -260,24 +275,27 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         {
             "lane_id": "nashville_ec_takeoff_fall_2026",
             "organization": "Nashville Entrepreneur Center",
-            "state": "PORTAL_PACKET_READY_HUMAN_FACTS_REQUIRED",
+            "state": nashville_deadline["acknowledgment"]["status"],
             "deadline": "2026-07-17",
-            "decision": "COMPLETE_HUMAN_FACTS_AND_FINAL_PREVIEW",
+            "decision": "CONTINUE_PORTAL_MONITOR_SUPPORT_REPLY_NO_DUPLICATE",
             "response_channel": "PORTAL",
             "response_ready": True,
             "send_now": False,
-            "do_not_duplicate_send": False,
+            "do_not_duplicate_send": True,
             "action_gate": "Founder answers all six concise confirmation prompts, reviews the complete live portal preview plus any terms or fee, and authorizes final submission at action time.",
-            "response_artifact": rel(NASHVILLE_FACT_RESOLUTION),
+            "response_artifact": rel(NASHVILLE_DEADLINE_RECEIPT),
             "supporting_artifacts": [
                 rel(NASHVILLE_MANIFEST),
                 rel(NASHVILLE_FACT_RESOLUTION),
                 rel(NASHVILLE_PRIVATE_COLLECTOR),
                 rel(NASHVILLE_PRIVATE_WORKFLOW),
+                rel(NASHVILLE_DEADLINE_RESPONSE_CONTROL),
             ],
+            "deadline_support_sent_utc": nashville_deadline["submission"]["sent_utc"],
+            "deadline_support_email_is_application": False,
             "private_fill_map_present": NASHVILLE_PRIVATE_FILL_MAP.is_file(),
             "private_fact_values_read_or_published": False,
-            "next_action": "Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, then review the complete preview plus any terms or fee before action-time approval; do not invent revenue, customers, demographics, founder history, investment, or debt.",
+            "next_action": "Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, and monitor the single support thread for the exact close time. Do not resend the deadline query or treat it as an application; review the complete preview plus any terms or fee before action-time approval.",
             "claim_boundary": nashville.get("claim_boundary"),
         },
         {
@@ -542,9 +560,10 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "as_of_date": "2026-07-17",
         "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
         "direct_answer": (
-            "The bounded FHWA partner-fit email was sent to one verified TSMO target and must not be duplicated. "
-            "No additional email should be sent now. If the Nashville EC portal remains open, finish its founder-fact gate; "
-            "complete the overdue SAM account-key action; and keep the QA-passed LaunchTN 3686 package staged for "
+            "The bounded Nashville EC deadline-support query and FHWA partner-fit email were sent and must not be duplicated. "
+            "The Nashville message is not an application, so continue its founder-fact gate and final portal workflow while monitoring for the exact close time. "
+            "No additional email should be sent now. "
+            "Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for "
             "founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army "
             "are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would "
             "reduce credibility."
@@ -602,6 +621,12 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "nashville_human_fact_resolution": artifact_status(NASHVILLE_FACT_RESOLUTION),
             "nashville_private_collector": artifact_status(NASHVILLE_PRIVATE_COLLECTOR),
             "nashville_private_workflow": artifact_status(NASHVILLE_PRIVATE_WORKFLOW),
+            "nashville_deadline_preservation_receipt": artifact_status(
+                NASHVILLE_DEADLINE_RECEIPT
+            ),
+            "nashville_deadline_response_control": artifact_status(
+                NASHVILLE_DEADLINE_RESPONSE_CONTROL
+            ),
             "nashville_private_fill_map": {
                 "path": rel(NASHVILLE_PRIVATE_FILL_MAP),
                 "present": NASHVILLE_PRIVATE_FILL_MAP.is_file(),

@@ -10,8 +10,8 @@ This handoff is generated from the authoritative near-deadline command board. It
 - Navigation before resume signal: `false`
 - Inspect current page before navigation: `true`
 - First action after resume: Inspect the current URL and visible page without navigating. Continue the current authenticated portal to its next safe preview before switching lanes.
-- Source command-board SHA-256: `2a9fcfc783535218f0e917e21eb14c6ebcd472f096905556f8f7be1b558c393f`
-- Handoff SHA-256: `929b5451531228b3f9bc140c26d9021bb75600392c0a8aac8b6d2a9325a3610f`
+- Source command-board SHA-256: `497e2a7cf3856665af7174e8e6c9587e2e54475f174aad726c44ce60444dc6a1`
+- Handoff SHA-256: `7fdf76d12addbdac194ba37db01db1761e3409a0805e96cf5f91376bc506e0f2`
 
 ## Portal Queue
 
@@ -24,6 +24,7 @@ This handoff is generated from the authoritative near-deadline command board. It
   - If this is the current signed-in page, inspect the visible application state before navigating anywhere.
   - Run `python code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py` and answer the six hidden prompts; require the ignored 11-answer fill map to validate without publishing values.
   - Populate only the supported answers from that private map and reach the complete preview.
+  - Monitor the one deadline-support thread for the exact close time; do not resend it and do not treat it as an application.
 - Action gate:
   - Status: `READY_FOR_HIDDEN_FOUNDER_INPUT`
   - Passed: `0/15`
@@ -31,6 +32,11 @@ This handoff is generated from the authoritative near-deadline command board. It
   - Private input present: `false`
   - Private values exposed: `false`
   - Ready for human click: `false`
+- Deadline-support email:
+  - Status: `DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING`
+  - Sent UTC: `2026-07-17T12:05:34Z`
+  - Do not duplicate: `true`
+  - Email is application: `false`
 - Stop conditions:
   - Any fee payment, financial-aid agreement, program terms, cohort acceptance, attestation, or final submission.
   - Any portal answer that conflicts with the founder-confirmation artifact.
@@ -40,7 +46,7 @@ This handoff is generated from the authoritative near-deadline command board. It
   - Any later program fee, financial-aid arrangement, terms, or cohort acceptance requires a separate decision.
 - External send without human: `false`
 - Final submit without human: `false`
-- Source lane SHA-256: `562a48aab55e09095408945cf422d3716110f9b9b36d5afeb048c06e7d7d0413`
+- Source lane SHA-256: `85c856fe6e0262c19ef672fec63fe79d087454e510f51d5b8e417c3cde925de0`
 
 ### 2. DLA26BZ03-NV011 - Digital Twin of the Organization for Enhanced Mission Readiness
 

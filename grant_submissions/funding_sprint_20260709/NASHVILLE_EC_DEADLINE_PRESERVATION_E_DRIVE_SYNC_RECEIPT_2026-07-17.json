@@ -1,0 +1,166 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "generated_utc": "2026-07-17T12:30:39.0629790Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717",
+  "artifact_count": 22,
+  "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "private_founder_values_mirrored": false,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
+      "bytes": 13229,
+      "sha256": "00DA3B15BF4CEE18062C06DDE80F3F3A71377DA3164663630B37684C5BAE6038",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_email_action_reconciliation.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/tests/test_email_action_reconciliation.py",
+      "bytes": 3169,
+      "sha256": "9865CDE5F977371F8208F806DEBE278AD87EAC36AB58279DAB940D6B9386A5EF",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
+      "bytes": 7797,
+      "sha256": "23720EB0463CB8CBAC0D5B454D52691DEA5C0AD8DD4E94D2AC43D9C8400911FB",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
+      "bytes": 3204,
+      "sha256": "BB854AFCC7A653DD11B9C5D5C8A4DB4699B8A5399D7B8144494ADE23FAA44926",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
+      "bytes": 37390,
+      "sha256": "596F2C07970CCEBC0C93B9ED8FC38527E9C0DA04B2C4E3C50A421175127DF9AF",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_external_engagement_response_register.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/tests/test_external_engagement_response_register.py",
+      "bytes": 14915,
+      "sha256": "288F339F5DA0F0BF4AA053F80F915D768205217BD4187A08D9657B5AF6E1C5FF",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
+      "bytes": 31420,
+      "sha256": "4596BE6187E59AB385A0D471B8F107638394DE7199C5CFA3047F91877CD96827",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+      "bytes": 23177,
+      "sha256": "78F182D2CB7F43B84F682F557A1B4CBD008BC2CF841B3BDC73C1C3279FD3C2C8",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/external_engagement_response_register_latest.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/out/ops/external_engagement_response_register_latest.json",
+      "bytes": 31420,
+      "sha256": "4596BE6187E59AB385A0D471B8F107638394DE7199C5CFA3047F91877CD96827",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/external_engagement_response_register.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/dashboard/data/external_engagement_response_register.json",
+      "bytes": 31420,
+      "sha256": "4596BE6187E59AB385A0D471B8F107638394DE7199C5CFA3047F91877CD96827",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "bytes": 96806,
+      "sha256": "49CD4922E20C2C25BD9F2887E13C000F348F7661713C767569A82FDEDA35D173",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_submission_command_board.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/tests/test_near_deadline_submission_command_board.py",
+      "bytes": 21018,
+      "sha256": "8AB64FCD0DA4693B0184877FB473327F11DBBD5C4B20BA44B06B02759516E199",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "bytes": 56573,
+      "sha256": "8F7D5B36F460BACBC27297B16580FFC56FAF8D4BCD568C671FE2181D476E4811",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/near_deadline_submission_command_board_latest.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/out/ops/near_deadline_submission_command_board_latest.json",
+      "bytes": 74099,
+      "sha256": "4926F05E049E88B01A253DD600C18BC6AAD03C57474326AB569D0F852DBCC25E",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/near_deadline_submission_command_board.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/dashboard/data/near_deadline_submission_command_board.json",
+      "bytes": 74099,
+      "sha256": "4926F05E049E88B01A253DD600C18BC6AAD03C57474326AB569D0F852DBCC25E",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py",
+      "bytes": 19776,
+      "sha256": "553107F81106929A6FC05674BA0603ABB5124179CAC2D35B43FEE3A96F1F00A3",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_live_funding_portal_handoff.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/tests/test_live_funding_portal_handoff.py",
+      "bytes": 7059,
+      "sha256": "A73F08953705A4883E15390A8FE030C017511E823A69F39F2C2A809749D547C3",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+      "bytes": 10937,
+      "sha256": "0CE1E33845F9EABF45DDB3298401F083E67769EEBCE02B4DD00F29314CA31C99",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/live_funding_portal_handoff_latest.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/out/ops/live_funding_portal_handoff_latest.json",
+      "bytes": 17411,
+      "sha256": "B2B60CE5C691FA1B9BA727B18C4D3611837D2C82A514992894C89FD0080DBA08",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json",
+      "bytes": 1801,
+      "sha256": "42FC996C7EBCDCE4027CCA5397347195D5B8FE74C90E75EFD114BD8265DC20B5",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md",
+      "bytes": 2610,
+      "sha256": "81225B12C7B8B7E614A0FD50D559BCE076E2142E0535E06EA15DEB01FE1A9C93",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_nashville_ec_deadline_preservation.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_DEADLINE_PRESERVATION_20260717/tests/test_nashville_ec_deadline_preservation.py",
+      "bytes": 5325,
+      "sha256": "BC4183461FABFE032948CA9119351770E8EA05E82CF54A17CBB21245101E7EDE",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves byte-for-byte copying of the 22 listed public-safe deadline-preservation and portal-control artifacts at the recorded time. It mirrors no private founder answer values. It does not prove a portal save, application submission, deadline extension, acceptance, funding, technical validation, customer traction, endorsement, contract, or award."
+}

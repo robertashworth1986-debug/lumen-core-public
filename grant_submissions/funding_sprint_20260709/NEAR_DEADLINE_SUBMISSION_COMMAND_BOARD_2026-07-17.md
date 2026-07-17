@@ -15,18 +15,18 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - No-bid or partner-only lanes: `6`
 - Expired without verified send: `2`
 - Human-gated lanes: `13`
-- Strongest today action: Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. If it is Nashville EC, move its private action gate from 0/15 by running the six-prompt hidden collector, then reach the complete preview before the date-only July 17 close. Otherwise preserve the authenticated lane to its next safe preview. Next use the MissionWeave seven-volume checklist and private action gate, currently 0/50 with 15/15 package files verified, before the July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.
+- Strongest today action: Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. If it is Nashville EC, move its private action gate from 0/15 by running the six-prompt hidden collector, then reach the complete preview before the date-only July 17 close. One deadline-support query is sent and must not be duplicated or treated as an application. Otherwise preserve the authenticated lane to its next safe preview. Next use the MissionWeave seven-volume checklist and private action gate, currently 0/50 with 15/15 package files verified, before the July 22 noon Eastern close. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed.
 - Critical infrastructure action: SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action.
 - Closest deadline lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Closest stage-ready lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Best grants lane: DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 package files are hash-verified and the 11-page PDF passes format checks, while the private action gate remains 0/50 until DSIP identity, proposal-number, cost, ITAR/JCP, current CMMC posture, award-history, foreign-affiliation, rights, preview, and certification facts are supported. NSF 26-510 stays the next rolling Project Pitch route.
 - Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: one qualified target was contacted July 17, but no solo bid and no partner claim unless written corporate-experience evidence arrives.
-- Fastest low-friction lane: The Nashville EC TakeOff application is the nearest low-friction reviewer route. Its hidden-input gate is 0/15: six founder prompts produce 11 private portal answers, then preview, fee/terms, and action-time authorization remain human-gated.
+- Fastest low-friction lane: The Nashville EC TakeOff application is the nearest low-friction reviewer route. Its hidden-input gate is 0/15: six founder prompts produce 11 private portal answers, then preview, fee/terms, and action-time authorization remain human-gated. The verified support email only asks for the close time and does not replace portal submission.
 - Final submit without human: `false`
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `f235eadb9e1220d69824027378987d6e466d3bf3a33a1e19175b5a40a79b51f9`
+- Command board SHA-256: `97b8858f45fc25ecfcb36b311de9c759183769c683e0c505f274e040db77c929`
 
 ## Operational Controls
 
@@ -100,6 +100,8 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py`
   - `code/ops/VALIDATE_NASHVILLE_EC_PRIVATE_FACTS.py`
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md`
+  - `grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json`
+  - `grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md`
 
 ### 3. DLA26BZ03-NV011 - Digital Twin of the Organization for Enhanced Mission Readiness
 
@@ -270,6 +272,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Today work:
   - Run the hidden-prompt founder-fact collector and require its ignored 11-answer fill map to validate.
   - Paste the claim-bounded answers into the common application and select TakeOff.
+  - Monitor the single deadline-support thread for the exact close time; do not resend and do not treat it as an application.
   - Stop at final preview; do not accept a fee, terms, or cohort seat during application staging.
 - Human gate:
   - Robert answers all six prompts covering founder status, weekly hours, conversation count, revenue, founder investment, received funding, and business debt.
@@ -283,6 +286,8 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py`
   - `code/ops/VALIDATE_NASHVILLE_EC_PRIVATE_FACTS.py`
   - `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md`
+  - `grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json`
+  - `grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md`
 - Action gate: `READY_FOR_HIDDEN_FOUNDER_INPUT`
 - Action gates passed: `0/15`
 - Action gates open: `15`
@@ -291,7 +296,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Ready for human final click: `false`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `562a48aab55e09095408945cf422d3716110f9b9b36d5afeb048c06e7d7d0413`
+- Lane SHA-256: `85c856fe6e0262c19ef672fec63fe79d087454e510f51d5b8e417c3cde925de0`
 
 ### 3. DLA26BZ03-NV011 - Digital Twin of the Organization for Enhanced Mission Readiness
 
@@ -772,6 +777,8 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - `nashville_ec_private_collector`: `code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py` present=`true` sha256=`379a150cc558d9a37ed53d8c48c291275c3a04241cb91f164377e309a5e9d165`
 - `nashville_ec_private_validator`: `code/ops/VALIDATE_NASHVILLE_EC_PRIVATE_FACTS.py` present=`true` sha256=`5974911c2892291f7cebb67663977af264d00e2bf1d1157476dd9ccfe0b08004`
 - `nashville_ec_private_workflow`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md` present=`true` sha256=`fad93e7ed7c93a1406657d5d678a3673cfd73ed29fe4de5205e223e948ea9d88`
+- `nashville_ec_deadline_preservation_receipt`: `grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json` present=`true` sha256=`42fc996c7ebcdce4027cca5397347195d5b8fe74c90e75efd114bd8265dc20b5`
+- `nashville_ec_deadline_response_control`: `grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md` present=`true` sha256=`81225b12c7b8b7e614a0fd50d559bce076e2142e0535e06ea15deb01fe1a9c93`
 - `missionweave_dsip_package_manifest`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json` present=`true` sha256=`598317d0b4a971402e3446ff32c273209ae7f6dd347f02d5c663159ad4eb6069`
 - `missionweave_dsip_assembly_map`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ASSEMBLY_MAP_2026-07-16.md` present=`true` sha256=`9f5f043d678bdcab74c7b1e4993c75a807da60bdb9a5ba05eeb5eb41487ed9ed`
 - `missionweave_volume2_pdf`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf` present=`true` sha256=`8bbde3db31285f3b671cbfcaf972e9eb8f2de2f62d559463e519ca4f901c37e6`
@@ -784,7 +791,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - `launchtn_3686_application_manifest`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json` present=`true` sha256=`16fe4e214430055532f6fb7f57453e0f47daa648ee3e3b92b6050e17c98e3dc8`
 - `launchtn_3686_pitch_deck`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx` present=`true` sha256=`c607e94d8e072ec9d9f93da0d8c372fd5592b01d2ca3b4f71c0a079417c18a69`
 - `launchtn_3686_financial_model`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx` present=`true` sha256=`9da46f8ad94fc53ef561ee33dcfa6df907897caeadf6afbd08fb113fc6887d94`
-- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`8dd5f17d0241c5bd909a085029c87e07761fc13252b124e734fa551814d6a037`
+- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`4596be6187e59ab385a0d471b8f107638394de7199c5cfa3047f91877cd96827`
 - `fhwa_partner_outreach_control`: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json` present=`true` sha256=`8a6d0b28cc7afd33a376fe4908a99e5ee008795637c4bb995a5519660b5744e4`
 - `erdc_solution_brief_compliance_gate`: `grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json` present=`true` sha256=`dabaed4298b650855256e4054daf1be806f329846e1cd22cd01fd6f9d6f402cf`
 - `erdc_phase2_rom_gate`: `grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json` present=`true` sha256=`03f656866d63c1c74838ee36bef78eb5a8cf382fee2820d4afb2c324404b7574`

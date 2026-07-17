@@ -29,9 +29,10 @@ def test_reconciliation_is_deterministic_and_no_send():
     module.validate_payload(actual)
     assert actual == expected
     assert actual["status"] == "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION"
-    assert actual["summary"]["lane_count"] == 11
+    assert actual["summary"]["lane_count"] == 12
     assert actual["summary"]["email_reply_required_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
+    assert actual["summary"]["duplicate_outbound_risk_count"] == 3
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert all(lane["send_now"] is False for lane in actual["lanes"])
 
@@ -55,6 +56,14 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert fhwa["state"] == "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
     assert fhwa["no_send_before"] == "2026-07-23"
     assert fhwa["send_now"] is False
+
+    nashville = lanes["nashville_ec_takeoff_fall_2026"]
+    assert nashville["latest_event_type"] == "DEADLINE_PRESERVATION_QUERY_SENT"
+    assert nashville["latest_event_utc"] == "2026-07-17T12:05:34Z"
+    assert nashville["state"] == "DEADLINE_QUERY_SENT_PORTAL_SUBMISSION_STILL_REQUIRED"
+    assert nashville["do_not_duplicate_send"] is True
+    assert nashville["send_now"] is False
+    assert "not treat the email as an application" in nashville["next_action"]
 
 
 def test_public_reconciliation_excludes_private_mailbox_data():

@@ -105,6 +105,9 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "NASHVILLE-EC-FALL-2026" in payload["summary"]["closest_stage_ready_lane"]
     assert "0/15" in payload["summary"]["strongest_today_action"]
     assert "six-prompt hidden collector" in payload["summary"]["strongest_today_action"]
+    assert "must not be duplicated or treated as an application" in payload["summary"][
+        "strongest_today_action"
+    ]
     assert "hidden-input gate is 0/15" in payload["summary"][
         "fastest_low_friction_lane"
     ]
@@ -167,7 +170,22 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         path.endswith("NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json")
         for path in ec["package_files"]
     )
-    assert len(ec["package_files"]) == 7
+    assert any(
+        path.endswith("NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json")
+        for path in ec["package_files"]
+    )
+    assert any(
+        path.endswith("NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md")
+        for path in ec["package_files"]
+    )
+    assert len(ec["package_files"]) == 9
+    assert ec["deadline_support_status"] == (
+        "DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING"
+    )
+    assert ec["deadline_support_sent_utc"] == "2026-07-17T12:05:34Z"
+    assert ec["deadline_support_do_not_duplicate_send"] is True
+    assert ec["deadline_support_email_is_application"] is False
+    assert any("do not resend" in row for row in ec["today_work"])
     assert ec["action_gate_status"] == "READY_FOR_HIDDEN_FOUNDER_INPUT"
     assert ec["action_gate_submission_ready_for_human_click"] is False
     assert ec["action_gate_required_private_gate_count"] == 15
@@ -349,6 +367,8 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "nashville_ec_private_collector",
         "nashville_ec_private_validator",
         "nashville_ec_private_workflow",
+        "nashville_ec_deadline_preservation_receipt",
+        "nashville_ec_deadline_response_control",
         "missionweave_dsip_package_manifest",
         "missionweave_dsip_assembly_map",
         "missionweave_volume2_pdf",

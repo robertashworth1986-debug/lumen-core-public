@@ -1,0 +1,38 @@
+{
+  "schema": "lumencore.external_engagement_receipt.v1",
+  "recorded_date": "2026-07-17",
+  "engagement": {
+    "organization": "Nashville Entrepreneur Center",
+    "lane_id": "nashville_ec_takeoff_fall_2026",
+    "title": "Fall 2026 TakeOff application deadline-support query"
+  },
+  "submission": {
+    "status": "SENT_NO_ATTACHMENT",
+    "sent_utc": "2026-07-17T12:05:34Z",
+    "gmail_message_id": "19f6ff7bcd146628",
+    "gmail_thread_id": "19f6ff7bcd146628",
+    "subject": "Fall 2026 TakeOff application \u2014 July 17 close time",
+    "subject_sha256_utf8": "e37f7384846eae544db40a7f722b67b80fcf41acf73a73618caabde2ed10724c",
+    "recipient_roles": [
+      "official Nashville Entrepreneur Center general contact"
+    ],
+    "attachment": null,
+    "private_founder_values_stored_in_public_receipt": false
+  },
+  "official_basis": {
+    "deadline_date": "2026-07-17",
+    "deadline_time_published": false,
+    "application_url": "https://ec.co/apply/",
+    "contact_source_url": "https://members.ec.co/contact",
+    "recipient": "info@ec.co"
+  },
+  "acknowledgment": {
+    "status": "DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING",
+    "received_utc": null,
+    "reply_required": false,
+    "do_not_duplicate_send": true,
+    "earliest_follow_up_date": null,
+    "bounded_summary": "A single support query asked for the missing July 17 close time and the correct technical-support route. The message expressly states that it is not an application and does not replace final portal submission."
+  },
+  "claim_boundary": "This receipt records transmission of one deadline-support query. It does not prove an application was started, saved, completed, submitted, accepted, reviewed, extended, funded, selected, validated, or awarded, and it creates no substitute filing or deadline right."
+}

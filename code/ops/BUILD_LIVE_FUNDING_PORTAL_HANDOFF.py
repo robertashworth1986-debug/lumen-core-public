@@ -99,6 +99,15 @@ def queue_item(
             "private_input_present": lane["action_gate_private_input_present"],
             "private_values_exposed": lane["action_gate_private_values_exposed"],
         }
+    if "deadline_support_status" in lane:
+        item["deadline_support"] = {
+            "status": lane["deadline_support_status"],
+            "sent_utc": lane["deadline_support_sent_utc"],
+            "do_not_duplicate_send": lane[
+                "deadline_support_do_not_duplicate_send"
+            ],
+            "email_is_application": lane["deadline_support_email_is_application"],
+        }
     return item
 
 
@@ -121,6 +130,7 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
                 "If this is the current signed-in page, inspect the visible application state before navigating anywhere.",
                 "Run `python code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py` and answer the six hidden prompts; require the ignored 11-answer fill map to validate without publishing values.",
                 "Populate only the supported answers from that private map and reach the complete preview.",
+                "Monitor the one deadline-support thread for the exact close time; do not resend it and do not treat it as an application.",
             ],
             stop_conditions=[
                 "Any fee payment, financial-aid agreement, program terms, cohort acceptance, attestation, or final submission.",
@@ -314,6 +324,17 @@ def render_markdown(payload: dict[str, Any]) -> str:
                     f"  - Private input present: `{str(gate['private_input_present']).lower()}`",
                     f"  - Private values exposed: `{str(gate['private_values_exposed']).lower()}`",
                     f"  - Ready for human click: `{str(gate['submission_ready_for_human_click']).lower()}`",
+                ]
+            )
+        if item.get("deadline_support"):
+            support = item["deadline_support"]
+            lines.extend(
+                [
+                    "- Deadline-support email:",
+                    f"  - Status: `{support['status']}`",
+                    f"  - Sent UTC: `{support['sent_utc']}`",
+                    f"  - Do not duplicate: `{str(support['do_not_duplicate_send']).lower()}`",
+                    f"  - Email is application: `{str(support['email_is_application']).lower()}`",
                 ]
             )
         lines.append("- Stop conditions:")
