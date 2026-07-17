@@ -132,24 +132,56 @@ jobs:
             fi
           '
 
+      - name: Inspect VPS storage and identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -eu
+            printf "Remote identity: "
+            id
+            printf "Filesystem capacity:\n"
+            df -hP / /opt
+            printf "Filesystem inodes:\n"
+            df -iP / /opt
+          '
+
       - name: Prepare bounded VPS directories
         shell: bash
         run: |
           set -euo pipefail
           ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
             set -eu
-            sudo -n journalctl --vacuum-size=100M >/dev/null 2>&1 || true
-            sudo -n dnf clean all >/dev/null 2>&1 || true
-            sudo -n yum clean all >/dev/null 2>&1 || true
-            sudo -n find /var/log -type f \( -name "*.gz" -o -name "*.old" -o -name "*.1" -o -name "*.log.*" \) -delete 2>/dev/null || true
-            sudo -n install -d -o opc -g opc -m 755 \
+            remote_uid="$(id -u)"
+            remote_gid="$(id -g)"
+
+            sudo -n install -d -m 755 \
+              /opt/lumencore \
+              /opt/lumencore/dashboard \
+              /opt/lumencore/dashboard/data \
+              /opt/lumencore/data
+            sudo -n chown "$remote_uid:$remote_gid" \
+              /opt/lumencore \
+              /opt/lumencore/dashboard \
+              /opt/lumencore/dashboard/data \
+              /opt/lumencore/data
+
+            sudo -n install -d -m 700 /tmp/lumencore-evidence-route
+            sudo -n chown "$remote_uid:$remote_gid" /tmp/lumencore-evidence-route
+
+            for directory in \
+              /opt/lumencore \
               /opt/lumencore/dashboard \
               /opt/lumencore/dashboard/data \
               /opt/lumencore/data \
-              /tmp/lumencore-evidence-route
-            touch /tmp/lumencore-evidence-route/.write-test
-            rm -f /tmp/lumencore-evidence-route/.write-test
-            df -h /opt/lumencore
+              /tmp/lumencore-evidence-route; do
+              test -d "$directory"
+              probe="$directory/.lumencore-write-test.$$"
+              : > "$probe"
+              rm -f "$probe"
+            done
+
+            printf "DIRECTORIES_OK uid=%s gid=%s\n" "$remote_uid" "$remote_gid"
           '
 
       - name: Sync dashboard assets
