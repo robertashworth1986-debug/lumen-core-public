@@ -1,0 +1,187 @@
+name: Recover LumenCore VPS capacity from disposable caches
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/vps-safe-cache-recovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: lumencore-vps-capacity-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+
+    steps:
+      - name: Mark capacity recovery pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+          TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' > /tmp/capacity-recovery-status.json
+          import json, os
+          print(json.dumps({
+              "state": "pending",
+              "target_url": os.environ["TARGET_URL"],
+              "description": "Bounded VPS cache recovery is running",
+              "context": "recovery/lumencore-vps-capacity",
+          }))
+          PY
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$REPOSITORY/statuses/$COMMIT_SHA" \
+            --data-binary @/tmp/capacity-recovery-status.json
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+
+      - name: Verify recovery authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" \
+            'sudo -n true && printf "RECOVERY_AUTHORITY_OK\n"'
+
+      - name: Capture capacity before recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -eu
+            echo "=== before filesystem capacity ==="
+            df -hP /
+            echo "=== before filesystem inodes ==="
+            df -iP /
+            echo "=== approved disposable targets ==="
+            sudo -n du -sh \
+              /var/cache/dnf \
+              /home/opc/.cache/pip \
+              /tmp/luma_proof_feeds \
+              /tmp/lumencore-evidence-route \
+              2>/dev/null || true
+          ' | tee /tmp/lumencore-vps-capacity-recovery.txt
+
+      - name: Remove only disposable caches and bytecode
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -eu
+
+            # Package and Python download caches are disposable and reconstructible.
+            sudo -n rm -rf /var/cache/dnf/*
+            sudo -n rm -rf /home/opc/.cache/pip
+
+            # These are explicitly temporary deployment/feed staging directories.
+            sudo -n rm -rf /tmp/luma_proof_feeds
+            sudo -n rm -rf /tmp/lumencore-evidence-route
+
+            # Python bytecode caches are reconstructible. Source, data, manifests,
+            # frozen evidence, environments, and /opt/lumencore/out are untouched.
+            sudo -n find /opt/lumencore /home/opc/LumaTrader -xdev \
+              -type f \( -name "*.pyc" -o -name "*.pyo" \) -delete 2>/dev/null || true
+            sudo -n find /opt/lumencore /home/opc/LumaTrader -xdev \
+              -depth -type d -name "__pycache__" -empty -delete 2>/dev/null || true
+
+            # Bound systemd journal storage without deleting active service logs.
+            sudo -n journalctl --vacuum-size=32M >/dev/null 2>&1 || true
+            sync
+          '
+
+      - name: Verify recovered capacity
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -eu
+            echo "=== after filesystem capacity ==="
+            df -hP /
+            echo "=== after filesystem inodes ==="
+            df -iP /
+
+            set -- $(df -Pk / | tail -n 1)
+            available_kb="$4"
+            set -- $(df -Pi / | tail -n 1)
+            available_inodes="$4"
+
+            printf "AVAILABLE_KB=%s\n" "$available_kb"
+            printf "AVAILABLE_INODES=%s\n" "$available_inodes"
+
+            if [ "$available_kb" -lt 262144 ]; then
+              echo "ERROR: safe-cache recovery did not produce 256 MiB free" >&2
+              exit 1
+            fi
+            if [ "$available_inodes" -lt 2048 ]; then
+              echo "ERROR: safe-cache recovery did not produce 2048 free inodes" >&2
+              exit 1
+            fi
+          ' | tee -a /tmp/lumencore-vps-capacity-recovery.txt
+
+      - name: Upload capacity recovery receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lumencore-vps-capacity-recovery-${{ github.run_id }}
+          path: /tmp/lumencore-vps-capacity-recovery.txt
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Publish capacity recovery receipt
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+          TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          case "$JOB_STATUS" in
+            success)
+              STATE=success
+              DESCRIPTION="Disposable-cache recovery passed capacity gates"
+              ;;
+            cancelled)
+              STATE=error
+              DESCRIPTION="VPS capacity recovery was cancelled"
+              ;;
+            *)
+              STATE=failure
+              DESCRIPTION="VPS capacity recovery failed safely"
+              ;;
+          esac
+          export STATE DESCRIPTION
+          python3 - <<'PY' > /tmp/capacity-recovery-status.json
+          import json, os
+          print(json.dumps({
+              "state": os.environ["STATE"],
+              "target_url": os.environ["TARGET_URL"],
+              "description": os.environ["DESCRIPTION"],
+              "context": "recovery/lumencore-vps-capacity",
+          }))
+          PY
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$REPOSITORY/statuses/$COMMIT_SHA" \
+            --data-binary @/tmp/capacity-recovery-status.json
