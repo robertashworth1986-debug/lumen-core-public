@@ -25,6 +25,7 @@ NASHVILLE_MANIFEST = (
 
 OUT_JSON = OUT_OPS / "external_engagement_response_register_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "external_engagement_response_register.json"
+CANONICAL_JSON = SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json"
 OUT_MD = SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md"
 
 PRIVATE_MARKERS = (
@@ -297,6 +298,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "outputs": {
             "json": rel(OUT_JSON),
             "dashboard_json": rel(DASHBOARD_JSON),
+            "canonical_json": rel(CANONICAL_JSON),
             "markdown": rel(OUT_MD),
         },
     }
@@ -412,6 +414,7 @@ def main() -> None:
     ensure_public_safe(markdown)
     write_json(OUT_JSON, payload)
     write_json(DASHBOARD_JSON, payload)
+    write_json(CANONICAL_JSON, payload)
     write_text(OUT_MD, markdown)
     print(
         json.dumps(

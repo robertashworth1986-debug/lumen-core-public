@@ -2,23 +2,23 @@
   "schema": "lumencore.bounded_mirror_receipt.v1",
   "created_utc": "2026-07-17T01:54:58.2588422Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_20260716",
-  "artifact_count": 16,
+  "artifact_count": 21,
   "all_sha256_matched_after_copy": true,
   "artifacts": [
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
-      "bytes": 18423,
-      "sha256": "989FFC999890D1135D45CF663C865CF99E4C17D9BD42DA4BF327F5977276C404"
+      "bytes": 18600,
+      "sha256": "999DBBB29B360E6D6487FACEFCAF28EA8B2164FEBB40EA1C4F40D5EA2A750E6D"
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 59506,
-      "sha256": "37A6FB9DA31A5B4214367C91D64373F6CA21A4DD18A7B56982E4303AD92B83F1"
+      "bytes": 59508,
+      "sha256": "65FC64B943C599800B401BA96EBCD5C5678C8724D1296627A82E80A410A6DFE7"
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
       "bytes": 4521,
-      "sha256": "C7CD4630F1F4A5414A27FDE19576ACDCBE12DADFA2FF964A95007DAD9647BEEA"
+      "sha256": "D3AF6D326C655C142BFF78B29AB0F2FF5029AD90846E7D97B76D782BF7775A2E"
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
@@ -33,7 +33,7 @@
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
       "bytes": 9235,
-      "sha256": "85539342B1E83D692836378420C5D73E116D1709DEC0AA8E671B64BEEE55FD10"
+      "sha256": "6BD79563E7C69E94A2BACCDC7EFF7283AC935E46390D14D544A99AED5AA4F1A1"
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-15.md",
@@ -42,8 +42,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
-      "bytes": 35411,
-      "sha256": "1631F534E8D890C198A02463059C3554CC98CC9F538317CEC4F2AD5956E6E24A"
+      "bytes": 35413,
+      "sha256": "76DC4438E0213F493054989A179C0D3D822452DD1B9949F888E709AF5E559A5C"
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json",
@@ -84,6 +84,31 @@
       "source": "grant_submissions/funding_sprint_20260709/LumenCore_LANL_VISION_Followup_Package_2026-07-16.pdf",
       "bytes": 123160,
       "sha256": "3788258083E5D58D3FF7C54D937EF6A73AE132C294021FB234E422A8903243E0"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
+      "bytes": 12407,
+      "sha256": "33925D9C4932007B623EE7C948418EB36713CA62BA9D2A002F2267744DBA997C"
+    },
+    {
+      "source": "code/ops/BUILD_TRACTION_OPPORTUNITY_INTAKE_LEDGER.py",
+      "bytes": 38735,
+      "sha256": "1FB6C2191C69B37F6AEA5D305D50FC31165E9239BED78D6270FF6E29ADC57A89"
+    },
+    {
+      "source": "tests/test_traction_opportunity_intake_ledger.py",
+      "bytes": 5268,
+      "sha256": "AC30F58D85EE4CCE0520628B32AB024B6C3136A58BF252BF975E103DF6731607"
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+      "bytes": 25360,
+      "sha256": "9EB98CE687ED8854A38E243D027B976863F21F53D50BEB1E2834E3019F4314A6"
+    },
+    {
+      "source": "dashboard/data/traction_opportunity_intake_ledger.json",
+      "bytes": 41125,
+      "sha256": "F7340FED4ABFCB0ED2326E4085FDEEB4AA4C16C8EADD81FDDF9CB09077957448"
     }
   ],
   "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove email delivery beyond recorded SENT/acknowledgment evidence, portal submission, evaluation, program acceptance, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance."

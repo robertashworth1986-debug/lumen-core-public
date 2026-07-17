@@ -25,7 +25,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; finish the July 
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `d3052ae2f7f57afb88504e42542ebb70a674b0c83faae554eeb56d7773958fad`
+- Command board SHA-256: `335198412683bf8cd4e812a307a572f7f3e8b0d26861a2c2cbf6697f82dc1189`
 
 ## Sent And Verified
 
@@ -599,4 +599,4 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed; finish the July 
 - `nsf_project_pitch_routing_manifest`: `grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json` present=`true` sha256=`84247c7c52a686f72ce5113354e665ac3f3827bf408db8ac15b11d918583c825`
 - `nashville_ec_portal_field_map`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_PORTAL_FIELD_MAP_2026-07-16.md` present=`true` sha256=`cae7b41fb8b562ee693ac6f34409d9f1b514a885aafade6b796074873b67a8cc`
 - `nashville_ec_application_manifest`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json` present=`true` sha256=`1bc772f56253112a346f3a6c3d02d9bf328c639407587386bf00803c14ba764e`
-- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md` present=`true` sha256=`85539342b1e83d692836378420c5d73e116d1709dec0aa8e671b64beee55fd10`
+- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`33925d9c4932007b623ee7c948418eb36713ca62ba9d2a002f2267744dba997c`

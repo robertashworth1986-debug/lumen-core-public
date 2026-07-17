@@ -1,0 +1,214 @@
+{
+  "as_of_date": "2026-07-16",
+  "attachment_checks": {
+    "army": {
+      "actual_bytes": 5405,
+      "actual_sha256": "D0528488B91C940E2A8401E3571BE72C59124F714883E25CF6D7D7716427B8BF",
+      "bytes_match": true,
+      "expected_bytes": 5405,
+      "expected_sha256": "D0528488B91C940E2A8401E3571BE72C59124F714883E25CF6D7D7716427B8BF",
+      "path": "outputs/aidp-rfi4-20260713/AIDP - Questions and Feedback Submission Sheet - LumenCore Draft.xlsx",
+      "present": true,
+      "sha256_match": true
+    },
+    "cdc": {
+      "actual_bytes": 77318,
+      "actual_sha256": "570F6A6C86DD03649B6F5EE7F731D5E3F0884712CD06DA588D2A4C92C903B2B1",
+      "bytes_match": true,
+      "expected_bytes": 77318,
+      "expected_sha256": "570F6A6C86DD03649B6F5EE7F731D5E3F0884712CD06DA588D2A4C92C903B2B1",
+      "path": "grant_submissions/funding_sprint_20260709/LumenCore_CDC_AI_Acquisition_RFI_75D301-26-RFI-73483_2026-07-15.pdf",
+      "present": true,
+      "sha256_match": true
+    },
+    "lanl": {
+      "actual_bytes": 123160,
+      "actual_sha256": "3788258083E5D58D3FF7C54D937EF6A73AE132C294021FB234E422A8903243E0",
+      "bytes_match": true,
+      "expected_bytes": 123160,
+      "expected_sha256": "3788258083E5D58D3FF7C54D937EF6A73AE132C294021FB234E422A8903243E0",
+      "path": "grant_submissions/funding_sprint_20260709/LumenCore_LANL_VISION_Followup_Package_2026-07-16.pdf",
+      "present": true,
+      "sha256_match": true
+    },
+    "nasa": {
+      "actual_bytes": 15465,
+      "actual_sha256": "88A606678ACC62C60C914C515605D5D590CEACDC1A82AA20B47028B3444EEB0D",
+      "bytes_match": true,
+      "expected_bytes": 15465,
+      "expected_sha256": "88A606678ACC62C60C914C515605D5D590CEACDC1A82AA20B47028B3444EEB0D",
+      "path": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_READY_RESPONSE_2026-07-11.pdf",
+      "present": true,
+      "sha256_match": true
+    }
+  },
+  "claim_boundary": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance.",
+  "direct_answer": "Finish the Nashville EC human-fact gate before July 17 and send the existing EPRI administrative reply only after the exact `send EPRI` gate. CDC, LANL, NASA, and Army are monitor-only; duplicate sends would reduce credibility.",
+  "generated_utc": "2026-07-17T02:27:20.150541+00:00",
+  "inbox_risk_filters": [
+    {
+      "decision": "DO_NOT_TREAT_AS_OFFICIAL_SAM_NOTICE",
+      "pattern": "Paid third-party SAM renewal solicitation",
+      "safe_action": "Verify registration status and renewal tasks only inside SAM.gov or through an official .gov notice."
+    },
+    {
+      "decision": "DO_NOT_TREAT_AS_REQUIRED_FOR_FUND_REVIEW",
+      "pattern": "Paid sponsor activation presented near a venture review",
+      "safe_action": "Keep sponsor purchases separate from investment or accelerator evaluation unless written terms prove otherwise."
+    }
+  ],
+  "outputs": {
+    "canonical_json": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
+    "dashboard_json": "dashboard/data/external_engagement_response_register.json",
+    "json": "out/ops/external_engagement_response_register_latest.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md"
+  },
+  "records": [
+    {
+      "action_gate": "Founder confirms the nine grouped fact categories, reviews terms and any fee, and authorizes final portal submission at action time.",
+      "claim_boundary": "This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms.",
+      "deadline": "2026-07-17",
+      "decision": "COMPLETE_HUMAN_FACTS_AND_FINAL_PREVIEW",
+      "do_not_duplicate_send": false,
+      "lane_id": "nashville_ec_takeoff_fall_2026",
+      "next_action": "Finish the human-fact gate before the application closes; do not invent revenue, customers, demographics, or founder history.",
+      "organization": "Nashville Entrepreneur Center",
+      "record_sha256": "d8b484ec69c253fd5ccc758ec85761dde01e26e24c0537b1a0c2d13482c56210",
+      "response_artifact": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json",
+      "response_channel": "PORTAL",
+      "response_ready": true,
+      "send_now": false,
+      "state": "PORTAL_PACKET_READY_HUMAN_FACTS_REQUIRED"
+    },
+    {
+      "action_gate": "Robert says `send EPRI` at action time.",
+      "claim_boundary": "MOU-routing information only; no executed membership, EPRI endorsement, validation, pilot, funding, procurement, or contract is claimed.",
+      "deadline": null,
+      "decision": "SEND_EXISTING_GMAIL_DRAFT_AFTER_EXACT_GATE",
+      "do_not_duplicate_send": false,
+      "lane_id": "epri_open_power_ai_mou",
+      "next_action": "Send the existing private Gmail draft in the current thread; attach no technical archive and publish no private identity fields.",
+      "organization": "EPRI Open Power AI Consortium",
+      "record_sha256": "2ac60b1bd706f020b5c45ff0648ed5e1fbc0a7b221fae6414a469722bcb1101b",
+      "response_artifact": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
+      "response_channel": "EMAIL_REPLY",
+      "response_ready": true,
+      "send_now": true,
+      "state": "INBOUND_ADMIN_REQUEST_DRAFT_READY"
+    },
+    {
+      "action_gate": "Reply only if CDC asks for clarification, replacement material, or scheduling.",
+      "claim_boundary": "The Gmail SENT record and CDC acknowledgment prove transmission and receipt only. They do not establish evaluation, selection, technical validation, endorsement, award, deployment, a pilot, or contract performance.",
+      "deadline": "2026-07-30T21:00:00Z",
+      "decision": "MONITOR_NO_REPLY_REQUIRED",
+      "do_not_duplicate_send": true,
+      "lane_id": "cdc_ai_acquisition_rfi",
+      "next_action": "Preserve the acknowledgment and monitor the existing thread; do not resend the response.",
+      "organization": "Centers for Disease Control and Prevention",
+      "record_sha256": "e461af1a6d92e3892663518d6a4fb8f7c16efc710e5bede386e03fa282911df0",
+      "response_artifact": "grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "response_channel": "EMAIL",
+      "response_ready": false,
+      "send_now": false,
+      "state": "RECEIPT_CONFIRMED_FOLLOW_UP_PENDING"
+    },
+    {
+      "action_gate": "No follow-up before 2026-07-23 unless LANL replies first; any NDA, licensing term, export-control question, or disclosure remains human-reviewed.",
+      "claim_boundary": "The Gmail SENT record and attachment hash prove transmission only. They do not establish LANL receipt, evaluation, a license, endorsement, independent validation, a pilot, funding, deployment, or contract performance.",
+      "deadline": null,
+      "decision": "MONITOR_THEN_ONE_BOUNDED_FOLLOW_UP",
+      "do_not_duplicate_send": true,
+      "follow_up_template": {
+        "body": "Michael and Neil,\n\nI am following up on the bounded LumenCore package sent July 16. Would a short Stage 0 diligence session be useful to decide whether a VISION evaluation or licensing discussion is warranted? I am not asserting a license, LANL endorsement, field validation, or production readiness. I would welcome your preferred next step and any confidentiality or data-boundary requirements.\n\nBest regards,\nRobert Ashworth\nLumenCore",
+        "subject": "Follow-up: LumenCore package for LANL VISION licensing discussion"
+      },
+      "lane_id": "lanl_vision_licensing_followup",
+      "next_action": "Wait for LANL. If no reply by July 23, use the single bounded follow-up template in this register.",
+      "no_send_before": "2026-07-23",
+      "organization": "Los Alamos National Laboratory",
+      "record_sha256": "b58d53ebda9f491c1411d2e6a883d9a1b12d793b7df656956b57333707ad454b",
+      "response_artifact": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "response_channel": "EMAIL",
+      "response_ready": true,
+      "send_now": false,
+      "state": "OUTBOUND_SENT_RESPONSE_PENDING"
+    },
+    {
+      "action_gate": "Respond only to an agency clarification or replacement request.",
+      "claim_boundary": "Transmission does not establish agency acceptance, evaluation, validation, an award, or a contract.",
+      "deadline": "2026-07-17T21:00:00Z",
+      "decision": "MONITOR_NO_DUPLICATE",
+      "do_not_duplicate_send": true,
+      "lane_id": "nasa_data_center_rfi",
+      "next_action": "Retain the SENT receipt and attachment hash; do not resend before the deadline.",
+      "organization": "NASA",
+      "record_sha256": "955029063d2e7f8901c9f8a00bf8a3390b50394152321ec770b7c1e067fced24",
+      "response_artifact": "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json",
+      "response_channel": "EMAIL",
+      "response_ready": false,
+      "send_now": false,
+      "state": "SENT_VERIFIED_RESPONSE_PENDING"
+    },
+    {
+      "action_gate": "Respond only to an agency clarification or replacement request.",
+      "claim_boundary": "Transmission does not establish agency acceptance, evaluation, validation, an award, or a contract.",
+      "deadline": null,
+      "decision": "MONITOR_NO_DUPLICATE",
+      "do_not_duplicate_send": true,
+      "lane_id": "army_aidp_draft_cfs_feedback",
+      "next_action": "Retain the SENT receipt and attachment hash; monitor for agency feedback.",
+      "organization": "U.S. Army",
+      "record_sha256": "65d68edb83d30739376fc5ae1c5248f075531bac684f06417b9d09e1fb6ce277",
+      "response_artifact": "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json",
+      "response_channel": "EMAIL",
+      "response_ready": false,
+      "send_now": false,
+      "state": "SENT_VERIFIED_RESPONSE_PENDING"
+    }
+  ],
+  "register_sha256": "434c04153e6f3908845e83feda5f5d438382257e0f599263a408c53987d1861f",
+  "schema": "lumencore.external_engagement_response_register.v1",
+  "source_artifacts": {
+    "cdc_engagement_receipt": {
+      "bytes": 1527,
+      "path": "grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "present": true,
+      "sha256": "292157621B722B1973A1AA55140F08586AB41D07FBE38672B348C73E8A865B78"
+    },
+    "epri_response_template": {
+      "bytes": 2144,
+      "path": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
+      "present": true,
+      "sha256": "B6F3FFB5049F5B6D64105E80403253688B1F6495CB1D94E92C309CE1C2D6CDE6"
+    },
+    "external_submission_receipt": {
+      "bytes": 2036,
+      "path": "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json",
+      "present": true,
+      "sha256": "2DAC72C484BB39A6AB5891405C00AD68C66A2D99A5152D0E53CCBE8603FBAE01"
+    },
+    "lanl_engagement_receipt": {
+      "bytes": 1414,
+      "path": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json",
+      "present": true,
+      "sha256": "74303CFC65C85D9EF73FB80CC8177E5D08DF43D03264FFCE73251ACD2CD9E9D0"
+    },
+    "nashville_application_manifest": {
+      "bytes": 17728,
+      "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FALL_2026_APPLICATION_MANIFEST_2026-07-16.json",
+      "present": true,
+      "sha256": "1BC772F56253112A346F3A6C3D02D9BF328C639407587386BF00803C14BA764E"
+    }
+  },
+  "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
+  "summary": {
+    "all_attachment_checks_pass": true,
+    "autonomous_external_send_allowed": false,
+    "autonomous_final_portal_submission_allowed": false,
+    "do_not_duplicate_send_count": 4,
+    "immediate_human_action_count": 2,
+    "monitor_only_count": 4,
+    "record_count": 6,
+    "verified_attachment_count": 4
+  }
+}

@@ -15,6 +15,7 @@ DASHBOARD_DATA = ROOT / "dashboard" / "data"
 OUT_JSON = OUT_OPS / "traction_opportunity_intake_ledger_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "traction_opportunity_intake_ledger.json"
 OUT_MD = SPRINT_DIR / "TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md"
+CURRENT_RESPONSE_JSON = SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json"
 
 SENSITIVE_MARKERS = [
     "password",
@@ -52,7 +53,7 @@ PUBLIC_SOURCES = {
 CONNECTED_EVIDENCE = {
     "gmail_profile": "Robert Ashworth mailbox confirmed through Gmail connector.",
     "gmail_window": "Gmail searched in:anywhere after 2026-04-09 for funding, SBIR, RFI/RFP, deadline, calendar, and application terms.",
-    "gmail_latest_response_window": "Gmail searched the July 9, 2026 inbox/new-response window for SAM, Terry/EVTit, LANL, USPTO, LinkedIn, venture, and account-notice updates.",
+    "gmail_latest_response_window": "Gmail reconciled the July 16, 2026 response window for EPRI, CDC, LANL, NASA, Army, SAM, Terry/EVTit, USPTO, LinkedIn, venture, and account-notice updates.",
     "calendar_window": "Google Calendar located the July 9 EVTit discovery meeting; public artifacts intentionally exclude meeting access details.",
     "sweetspot_window": "Sweetspot federal contracts searched for active opportunities after 2026-07-09 and before 2026-08-31 across AI validation, lab data QA, data center, and transportation operations lanes.",
 }
@@ -464,6 +465,13 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def read_json(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected JSON object: {path}")
+    return payload
+
+
 def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
@@ -478,10 +486,38 @@ def scan_sensitive_text(text: str) -> list[str]:
     return sorted({marker for marker in SENSITIVE_MARKERS if marker in lowered})
 
 
+def current_response_overlay() -> dict[str, Any]:
+    payload = read_json(CURRENT_RESPONSE_JSON)
+    if payload.get("schema") != "lumencore.external_engagement_response_register.v1":
+        raise ValueError("Current external-engagement register is missing or has the wrong schema")
+    return payload
+
+
 def build_payload() -> dict[str, Any]:
+    response_control = current_response_overlay()
+    response_records = {
+        str(row.get("lane_id")): row
+        for row in response_control.get("records", [])
+        if isinstance(row, dict) and row.get("lane_id")
+    }
     lanes = []
     for lane in LANES:
         row = dict(lane)
+        current = response_records.get(str(row.get("lane_id")))
+        if current:
+            row["current_response_control"] = {
+                "as_of_date": response_control.get("as_of_date"),
+                "state": current.get("state"),
+                "decision": current.get("decision"),
+                "deadline": current.get("deadline"),
+                "no_send_before": current.get("no_send_before"),
+                "send_now": current.get("send_now"),
+                "do_not_duplicate_send": current.get("do_not_duplicate_send"),
+                "action_gate": current.get("action_gate"),
+                "next_action": current.get("next_action"),
+                "claim_boundary": current.get("claim_boundary"),
+                "record_sha256": current.get("record_sha256"),
+            }
         row["lane_sha256"] = lane_hash(row)
         row["human_gate_required"] = True
         lanes.append(row)
@@ -529,13 +565,34 @@ def build_payload() -> dict[str, Any]:
             "human_action_required": True,
             "final_submission_allowed_without_human": False,
             "external_send_allowed_without_human": False,
+            "current_response_record_count": response_control["summary"]["record_count"],
+            "current_immediate_human_action_count": response_control["summary"]["immediate_human_action_count"],
+            "current_do_not_duplicate_send_count": response_control["summary"]["do_not_duplicate_send_count"],
+            "current_state_supersedes_legacy_when_present": True,
         },
-        "connected_evidence": CONNECTED_EVIDENCE,
+        "connected_evidence": {
+            **CONNECTED_EVIDENCE,
+            "external_engagement_response_register": (
+                "Tracked current-state register reconciled through 2026-07-16; its state and response decision "
+                "supersede legacy July 9 lane status where both are present."
+            ),
+        },
+        "current_response_control": {
+            "as_of_date": response_control["as_of_date"],
+            "status": response_control["status"],
+            "direct_answer": response_control["direct_answer"],
+            "source": rel(CURRENT_RESPONSE_JSON),
+            "register_sha256": response_control["register_sha256"],
+            "records": response_control["records"],
+            "claim_boundary": response_control["claim_boundary"],
+        },
         "public_sources": PUBLIC_SOURCES,
         "lanes": sorted(lanes, key=lambda item: int(item["priority"])),
         "next_actions": [
             "Review the EVTit follow-up packet and send only after human approval.",
-            "Advance NASA RFI and FHWA TSMO drafts into final human-review packages.",
+            "Do not duplicate-send NASA, Army, CDC, or LANL packages already recorded by the current response control.",
+            "Complete the Nashville EC human-fact gate before July 17 and use the exact EPRI action-time send gate.",
+            "Advance FHWA TSMO into a final human-review package after official re-verification.",
             "Build DICE full-proposal compliance matrix after confirming controlling BAA instructions.",
             "Submit or refresh OpenAI API continuity request through official contact route if still needed.",
             "Monitor patent counsel replies and prepare filed-materials packet for licensed review.",
@@ -572,6 +629,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Gmail references: `{summary['gmail_reference_count']}`",
         f"- Sweetspot references: `{summary['sweetspot_reference_count']}`",
         f"- Public references: `{summary['public_reference_count']}`",
+        f"- Current response records: `{summary['current_response_record_count']}`",
+        f"- Current immediate human actions: `{summary['current_immediate_human_action_count']}`",
+        f"- Current do-not-duplicate sends: `{summary['current_do_not_duplicate_send_count']}`",
+        f"- Current state supersedes legacy when present: `{str(summary['current_state_supersedes_legacy_when_present']).lower()}`",
         f"- Human action required: `{str(summary['human_action_required']).lower()}`",
         f"- External send without human: `{str(summary['external_send_allowed_without_human']).lower()}`",
         f"- Final submission without human: `{str(summary['final_submission_allowed_without_human']).lower()}`",
@@ -582,6 +643,29 @@ def render_markdown(payload: dict[str, Any]) -> str:
     ]
     for key, value in payload["connected_evidence"].items():
         lines.append(f"- {key}: {value}")
+    current = payload["current_response_control"]
+    lines.extend(
+        [
+            "",
+            "## Current Response Overlay",
+            "",
+            current["direct_answer"],
+            "",
+            "This overlay is authoritative through the stated as-of date and supersedes a legacy lane status where the two differ. Historical status remains visible below for provenance.",
+            "",
+            f"- As of: `{current['as_of_date']}`",
+            f"- Source: `{current['source']}`",
+            f"- Register SHA-256: `{current['register_sha256']}`",
+            "",
+            "| Organization | Current state | Current decision | Duplicate send |",
+            "|---|---|---|---:|",
+        ]
+    )
+    for row in current["records"]:
+        lines.append(
+            f"| {row['organization']} | `{row['state']}` | `{row['decision']}` | "
+            f"`{str(row['do_not_duplicate_send']).lower()}` |"
+        )
     lines.extend(["", "## Priority Queue", ""])
     for lane in payload["lanes"]:
         lines.extend(
@@ -597,9 +681,19 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Human gate: {lane['human_gate']}",
                 f"- Claim boundary: {lane['claim_boundary']}",
                 f"- Evidence hash: `{lane['lane_sha256']}`",
-                "- Evidence:",
             ]
         )
+        current_lane = lane.get("current_response_control")
+        if isinstance(current_lane, dict):
+            lines.extend(
+                [
+                    f"- Current response state: `{current_lane['state']}`",
+                    f"- Current response decision: `{current_lane['decision']}`",
+                    f"- Current do-not-duplicate send: `{str(current_lane['do_not_duplicate_send']).lower()}`",
+                    f"- Current next action: {current_lane['next_action']}",
+                ]
+            )
+        lines.append("- Evidence:")
         for item in lane["traction_evidence"]:
             lines.append(f"  - {item}")
         lines.append("- Sources:")

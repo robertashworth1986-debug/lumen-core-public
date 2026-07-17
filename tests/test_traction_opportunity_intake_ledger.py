@@ -30,6 +30,10 @@ def test_traction_ledger_builds_connected_and_federal_lane_queue():
     assert payload["summary"]["human_action_required"] is True
     assert payload["summary"]["external_send_allowed_without_human"] is False
     assert payload["summary"]["final_submission_allowed_without_human"] is False
+    assert payload["summary"]["current_response_record_count"] == 6
+    assert payload["summary"]["current_immediate_human_action_count"] == 2
+    assert payload["summary"]["current_do_not_duplicate_send_count"] == 4
+    assert payload["summary"]["current_state_supersedes_legacy_when_present"] is True
     assert len(payload["ledger_sha256"]) == 64
 
 
@@ -69,6 +73,8 @@ def test_latest_response_lanes_are_claim_bounded_and_actionable():
     lanl = lanes["lanl_vision_licensing_followup"]
     assert "no LANL license" in lanl["claim_boundary"]
     assert "Mike Erickson" in " ".join(lanl["traction_evidence"])
+    assert lanl["current_response_control"]["state"] == "OUTBOUND_SENT_RESPONSE_PENDING"
+    assert lanl["current_response_control"]["do_not_duplicate_send"] is True
 
     uspto = lanes["uspto_georgia_patents_route"]
     assert "not legal advice" in uspto["claim_boundary"]
@@ -86,6 +92,12 @@ def test_rendered_markdown_excludes_meeting_credentials_and_live_action_authorit
     lowered = rendered.lower()
 
     assert "Traction Opportunity Intake Ledger" in rendered
+    assert "Current Response Overlay" in rendered
+    assert "supersedes a legacy lane status" in rendered
+    assert "SEND_EXISTING_GMAIL_DRAFT_AFTER_EXACT_GATE" in rendered
+    assert "MONITOR_NO_DUPLICATE" in rendered
+    lanl_section = rendered.split("### 2. LANL VISION licensing opportunity follow-up", 1)[1].split("### 2.", 1)[0]
+    assert lanl_section.index("Current response state") < lanl_section.index("- Evidence:")
     assert "External send without human: `false`" in rendered
     assert "Final submission without human: `false`" in rendered
     assert "No final portal action" in rendered

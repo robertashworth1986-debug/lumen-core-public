@@ -12,18 +12,42 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 - Gmail references: `16`
 - Sweetspot references: `8`
 - Public references: `19`
+- Current response records: `6`
+- Current immediate human actions: `2`
+- Current do-not-duplicate sends: `4`
+- Current state supersedes legacy when present: `true`
 - Human action required: `true`
 - External send without human: `false`
 - Final submission without human: `false`
-- Ledger SHA-256: `c8960e0cbd99faf8d4f3aa01ebadd16c39e8d90eb2e4df07275881ec66e3a6c0`
+- Ledger SHA-256: `cdce8e5bcd4068300ab4480aeda2e3557a10f5f6293529349315398321af41c0`
 
 ## Source Coverage
 
 - gmail_profile: Robert Ashworth mailbox confirmed through Gmail connector.
 - gmail_window: Gmail searched in:anywhere after 2026-04-09 for funding, SBIR, RFI/RFP, deadline, calendar, and application terms.
-- gmail_latest_response_window: Gmail searched the July 9, 2026 inbox/new-response window for SAM, Terry/EVTit, LANL, USPTO, LinkedIn, venture, and account-notice updates.
+- gmail_latest_response_window: Gmail reconciled the July 16, 2026 response window for EPRI, CDC, LANL, NASA, Army, SAM, Terry/EVTit, USPTO, LinkedIn, venture, and account-notice updates.
 - calendar_window: Google Calendar located the July 9 EVTit discovery meeting; public artifacts intentionally exclude meeting access details.
 - sweetspot_window: Sweetspot federal contracts searched for active opportunities after 2026-07-09 and before 2026-08-31 across AI validation, lab data QA, data center, and transportation operations lanes.
+- external_engagement_response_register: Tracked current-state register reconciled through 2026-07-16; its state and response decision supersede legacy July 9 lane status where both are present.
+
+## Current Response Overlay
+
+Finish the Nashville EC human-fact gate before July 17 and send the existing EPRI administrative reply only after the exact `send EPRI` gate. CDC, LANL, NASA, and Army are monitor-only; duplicate sends would reduce credibility.
+
+This overlay is authoritative through the stated as-of date and supersedes a legacy lane status where the two differ. Historical status remains visible below for provenance.
+
+- As of: `2026-07-16`
+- Source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json`
+- Register SHA-256: `434c04153e6f3908845e83feda5f5d438382257e0f599263a408c53987d1861f`
+
+| Organization | Current state | Current decision | Duplicate send |
+|---|---|---|---:|
+| Nashville Entrepreneur Center | `PORTAL_PACKET_READY_HUMAN_FACTS_REQUIRED` | `COMPLETE_HUMAN_FACTS_AND_FINAL_PREVIEW` | `false` |
+| EPRI Open Power AI Consortium | `INBOUND_ADMIN_REQUEST_DRAFT_READY` | `SEND_EXISTING_GMAIL_DRAFT_AFTER_EXACT_GATE` | `false` |
+| Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `MONITOR_NO_REPLY_REQUIRED` | `true` |
+| Los Alamos National Laboratory | `OUTBOUND_SENT_RESPONSE_PENDING` | `MONITOR_THEN_ONE_BOUNDED_FOLLOW_UP` | `true` |
+| NASA | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | `true` |
+| U.S. Army | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | `true` |
 
 ## Priority Queue
 
@@ -83,7 +107,11 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 - Reviewer action: Prepare a short licensing-fit note, evidence-replay boundary, and technical questions for Mike Erickson.
 - Human gate: Human approves any LANL reply, NDA, licensing discussion, export-control response, or disclosure package.
 - Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
-- Evidence hash: `f497bc4dd5b01b6841839db9f35b91dd1253b9638ef5a9ce69143ab3843c35af`
+- Evidence hash: `6ca0a46d29df2eb40f8468e3f1ae64a5a9e9384d2653673a9ccb616fa6599894`
+- Current response state: `OUTBOUND_SENT_RESPONSE_PENDING`
+- Current response decision: `MONITOR_THEN_ONE_BOUNDED_FOLLOW_UP`
+- Current do-not-duplicate send: `true`
+- Current next action: Wait for LANL. If no reply by July 23, use the single bounded follow-up template in this register.
 - Evidence:
   - LANL replied to the VISION licensing opportunity outreach.
   - The reply identified Mike Erickson as the main point of contact.
@@ -176,7 +204,11 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 - Reviewer action: Package the RFI response as architecture, evidence manifest, and operations-risk framing.
 - Human gate: Human verifies official response instructions, page limits, contacts, and final send.
 - Claim boundary: RFI response only; no NASA partnership, contract, or infrastructure result is represented.
-- Evidence hash: `e8b8ab21a5287458ce75165ec8de74cdf0059211392090bf8132b191f8a09f92`
+- Evidence hash: `5aa640eab40ca1540aa6fcddabc4f14673bf845114787810ead220818c15b602`
+- Current response state: `SENT_VERIFIED_RESPONSE_PENDING`
+- Current response decision: `MONITOR_NO_DUPLICATE`
+- Current do-not-duplicate send: `true`
+- Current next action: Retain the SENT receipt and attachment hash; do not resend before the deadline.
 - Evidence:
   - Sweetspot describes NASA interest in modernization, AI-driven operations, resilience, efficiency, and mission continuity.
   - Existing LumenCore sprint already contains a response outline.
@@ -409,7 +441,9 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 ## Immediate Next Actions
 
 - Review the EVTit follow-up packet and send only after human approval.
-- Advance NASA RFI and FHWA TSMO drafts into final human-review packages.
+- Do not duplicate-send NASA, Army, CDC, or LANL packages already recorded by the current response control.
+- Complete the Nashville EC human-fact gate before July 17 and use the exact EPRI action-time send gate.
+- Advance FHWA TSMO into a final human-review package after official re-verification.
 - Build DICE full-proposal compliance matrix after confirming controlling BAA instructions.
 - Submit or refresh OpenAI API continuity request through official contact route if still needed.
 - Monitor patent counsel replies and prepare filed-materials packet for licensed review.

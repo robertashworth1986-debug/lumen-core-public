@@ -97,7 +97,7 @@ def test_mirror_receipt_matches_every_bounded_source():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
-    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 16
+    assert receipt["artifact_count"] == len(receipt["artifacts"]) == 21
     assert receipt["all_sha256_matched_after_copy"] is True
     for artifact in receipt["artifacts"]:
         source = ROOT / artifact["source"]
