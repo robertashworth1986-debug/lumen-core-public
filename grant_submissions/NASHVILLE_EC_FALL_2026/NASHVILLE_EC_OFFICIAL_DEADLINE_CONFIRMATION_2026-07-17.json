@@ -1,0 +1,38 @@
+{
+  "schema": "lumencore.nashville_ec_official_deadline_confirmation.v1",
+  "generated_utc": "2026-07-17T19:37:50.972Z",
+  "status": "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED",
+  "source": {
+    "channel": "EMAIL_REPLY_TO_DEADLINE_SUPPORT_QUERY",
+    "organization": "Nashville Entrepreneur Center",
+    "sender_role": "official general contact",
+    "recipient_address_matches_prior_official_contact": true,
+    "gmail_message_id": "19f70d960e974df7",
+    "gmail_thread_id": "19f6ff7bcd146628",
+    "received_utc": "2026-07-17T16:11:48Z",
+    "subject_ascii": "Re: Fall 2026 TakeOff application - July 17 close time",
+    "raw_email_body_stored": false
+  },
+  "confirmation": {
+    "bounded_exact_sentence": "Applications are open until 11:59pm tonight on July 17.",
+    "bounded_exact_sentence_sha256": "f68f3ea186775e3b5cd08de8bdec425e92a8f09dc07fbb9275b05f416af0e18c",
+    "deadline_date": "2026-07-17",
+    "close_time_as_stated": "11:59pm tonight",
+    "timezone_explicit_in_message": false,
+    "operational_timezone": "America/Chicago",
+    "operational_local_deadline": "2026-07-17T23:59:00-05:00",
+    "operational_utc_deadline": "2026-07-18T04:59:00Z",
+    "timezone_basis": "The organization is in Nashville and the inbound message timestamp used UTC-05:00. The message itself did not spell out a timezone.",
+    "operational_rule": "SUBMIT_EARLY_DO_NOT_WAIT_FOR_THE_STATED_CUTOFF"
+  },
+  "application_state": {
+    "portal_submission_verified": false,
+    "human_founder_facts_resolved": false,
+    "fee_or_terms_accepted": false,
+    "final_submit_clicked": false,
+    "reply_required": false,
+    "duplicate_deadline_query_allowed": false
+  },
+  "required_next_action": "Collect the six founder confirmations, populate and review the complete portal preview, and obtain action-time approval for any terms, fee, signature, and final submission.",
+  "claim_boundary": "This receipt proves that the official Nashville Entrepreneur Center contact replied to the bounded deadline query with a July 17 close time. It does not prove a portal application was completed, submitted, accepted, reviewed, extended, funded, selected, validated, or awarded. The operational timezone is an explicit inference, not wording contained in the reply."
+}

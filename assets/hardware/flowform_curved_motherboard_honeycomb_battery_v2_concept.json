@@ -1,0 +1,46 @@
+{
+  "schema": "lumencore.hardware_concept_asset.v1",
+  "asset_id": "flowform_curved_motherboard_honeycomb_battery_v2",
+  "asset_name": "FLOWFORM Curved Motherboard and Honeycomb Battery V2 Concept",
+  "asset_path": "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.png",
+  "media_type": "image/png",
+  "bytes": 2852054,
+  "width_pixels": 1536,
+  "height_pixels": 1024,
+  "sha256": "b4d90b400d3aa4e95d41b3fab259b27ce85db663d7f2ffb5f273a22e00824962",
+  "created_date": "2026-07-17",
+  "status": "GENERATED_CONCEPT_RENDER_NOT_ENGINEERING_VALIDATION",
+  "source_concept_references": [
+    "out/ops/grant_docs_ingest_latest.md",
+    "code/ops/BUILD_GOV_BLUEPRINT_VAULT.py"
+  ],
+  "visible_design_intent": {
+    "curved_motherboard": [
+      "conformal multilayer board geometry",
+      "controlled-radius signal routing",
+      "segmented copper and aluminum thermal spreaders",
+      "distributed compute and health-sensing modules",
+      "serviceable edge connectors"
+    ],
+    "honeycomb_battery": [
+      "replaceable hexagonal cell cassettes",
+      "segmented fire-resistant isolation walls",
+      "directed cooling and vent channels",
+      "protected bus bars and per-segment electrical protection",
+      "battery-management telemetry and a perimeter crush frame"
+    ],
+    "combined_system": [
+      "serviceable power-and-data spine",
+      "physical separation between compute and energy-storage modules",
+      "fault-containment and thermal-management emphasis"
+    ]
+  },
+  "required_engineering_next_steps": [
+    "translate the concept into electrical schematics and a stack-up specification",
+    "run signal-integrity, power-integrity, thermal, vibration, and manufacturability analyses",
+    "define cell chemistry, voltage, capacity, protection, venting, and cooling requirements",
+    "build coupon-level and subpack prototypes before any system-level performance claim",
+    "obtain qualified electrical, battery-safety, and manufacturing review"
+  ],
+  "claim_boundary": "This image is an AI-generated industrial-design concept derived from existing FLOWFORM notes. It is not CAD, not a schematic, not a bill of materials, not a fabricated prototype, not test evidence, not a safety certification, not patentability evidence, and not proof of improved signal integrity, thermal performance, energy density, cycle life, crashworthiness, or commercial readiness."
+}
