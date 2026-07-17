@@ -223,10 +223,24 @@ def hold_control(value: str | None, as_of_utc: datetime) -> dict[str, Any]:
     }
 
 
-def priority_for(row: dict[str, Any], deadline: dict[str, Any]) -> str:
+def human_fact_gate_open(row: dict[str, Any]) -> bool:
+    explicit = row.get("human_fact_gate_open")
+    if explicit is not None:
+        if not isinstance(explicit, bool):
+            raise ValueError("human_fact_gate_open must be a boolean when provided")
+        return explicit
+
     state = str(row.get("state", ""))
+    decision = str(row.get("decision", ""))
+    return "HUMAN_FACTS_REQUIRED" in state or (
+        row.get("response_channel") == "PORTAL"
+        and decision.startswith(("CONTINUE_PORTAL", "STAGE_PORTAL"))
+    )
+
+
+def priority_for(row: dict[str, Any], deadline: dict[str, Any]) -> str:
     deadline_state = deadline["deadline_state"]
-    if "HUMAN_FACTS_REQUIRED" in state and deadline_state in {
+    if human_fact_gate_open(row) and deadline_state in {
         "DUE_TODAY_TIME_UNVERIFIED_SUBMIT_EARLY",
         "DUE_NEXT_LOCAL_DAY_TIME_UNVERIFIED",
     }:
@@ -252,6 +266,7 @@ def build_payload(
     for row in register["records"]:
         deadline = deadline_control(row.get("deadline"), as_of)
         hold = hold_control(row.get("no_send_before"), as_of)
+        fact_gate_open = human_fact_gate_open(row)
         control = {
             "lane_id": row["lane_id"],
             "organization": row["organization"],
@@ -260,8 +275,9 @@ def build_payload(
             "source_decision": row["decision"],
             "priority": priority_for(row, deadline),
             "response_channel": row["response_channel"],
+            "human_fact_gate_open": fact_gate_open,
             "human_action_required_now": (
-                "HUMAN_FACTS_REQUIRED" in str(row.get("state", ""))
+                fact_gate_open
                 and deadline["deadline_state"]
                 in {
                     "DUE_TODAY_TIME_UNVERIFIED_SUBMIT_EARLY",
@@ -440,6 +456,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Follow-up hold: `{row['follow_up_hold_state']}`",
                 f"- Duplicate send: `{row['duplicate_send_control']}`",
                 f"- Record hash valid: `{str(row['record_hash_valid']).lower()}`",
+                f"- Human fact gate open: `{str(row['human_fact_gate_open']).lower()}`",
                 f"- Human action required now: `{str(row['human_action_required_now']).lower()}`",
                 f"- Action gate: {row['action_gate']}",
                 f"- Next action: {row['next_action']}",

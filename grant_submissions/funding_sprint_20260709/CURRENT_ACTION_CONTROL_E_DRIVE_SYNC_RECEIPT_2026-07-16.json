@@ -7,14 +7,14 @@
   "artifacts": [
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 67670,
-      "sha256": "44B8149A90657FF1833BAFE417ED62CE828ECF62CC386DC3E6FD22E015E2AD4F",
+      "bytes": 101903,
+      "sha256": "4E49B92D98E1F3CC46593F5EB7B6AD91E387061A8787447BEA50366B3E7EB48A",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 9218,
-      "sha256": "8745FE10BC5656642311E76622D3000EB12BA16C536FA5A7291CED8E58443DB7",
+      "bytes": 23004,
+      "sha256": "06A9E942014A0DD7B3C00D91240D3B986A0B319340A56D188588024E13651DF8",
       "copy_sha256_matched": true
     },
     {
@@ -31,32 +31,32 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-16.md",
-      "bytes": 38019,
-      "sha256": "2DD6E5291A34A780CBBA3414B80187E9C2788C3878E98093A6EEEA79B7B9C0D7",
+      "bytes": 38021,
+      "sha256": "4BE304AEA326E10CC4B9A4C131A2FB0131E4F37FE572D0429817173B2E0CB873",
       "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL.py",
-      "bytes": 21213,
-      "sha256": "D9D9507FF0970DAE7CDC25C9B79D41942CAED334E5F4936EB1E92EE409C23A31",
+      "bytes": 21258,
+      "sha256": "B4E0E2DF7632D53C1CDE9E96E771F4D0F76FB6CF5DFDA6D660862D4936C555B7",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_sam_public_credential_rotation_control.py",
-      "bytes": 8771,
-      "sha256": "565DEEEF1A6807E2CC811EF4D89B896A5738E82DBCF4A2815AA4C9ED08040768",
+      "bytes": 8775,
+      "sha256": "910184D55B729B9A8439CC855D473D01F16A8952602F2810D63550B52E4DD4C9",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
-      "bytes": 4529,
-      "sha256": "6635A3FA854BD29C14547E6112CB66C51C5B8238908C438099A52610D140A563",
+      "bytes": 4544,
+      "sha256": "AAC20E903A5055E731DA65E5E5A82F08D5C34A7288AA6BED4D0ED78C4F0BE159",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
-      "bytes": 2182,
-      "sha256": "B3A0D9A758844E526EA94F34AAF7EAD4AB0EB168C32C79B1C69615FC2ED516C7",
+      "bytes": 2219,
+      "sha256": "BE187A93A7553E692C7781EA56686769D3F539B7B27E1D944DC525B4E1623440",
       "copy_sha256_matched": true
     },
     {
@@ -127,8 +127,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
-      "bytes": 38689,
-      "sha256": "B3C4B9143628A1418E45420F04A67B7D312D96CE372148B695196DCB548921D0",
+      "bytes": 58631,
+      "sha256": "D2D49CE2E3400E90DD9A061CCC0489A65E5B8C5AAD82AF0393886D44263F3369",
       "copy_sha256_matched": true
     },
     {
@@ -156,5 +156,6 @@
       "copy_sha256_matched": true
     }
   ],
-  "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove email transmission, portal submission, agency acceptance, technical validation, award, deployment, patent status, legal deadline, or field performance."
+  "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove email transmission, portal submission, agency acceptance, technical validation, award, deployment, patent status, legal deadline, or field performance.",
+  "generated_utc": "2026-07-17T14:26:50.1292619Z"
 }

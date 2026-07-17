@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "generated_utc": "2026-07-17T10:51:54.9444543Z",
+  "generated_utc": "2026-07-17T14:25:07.4382788Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/ERDC_SDC_PHASE2_ROM_GATE_20260717",
   "artifact_count": 7,
   "all_sha256_matched_after_copy": true,
@@ -11,10 +11,10 @@
     {
       "source": ".gitignore",
       "destination": "E:\\LumaProofVault\\SUBMISSIONS\\ERDC_SDC_PHASE2_ROM_GATE_20260717\\.gitignore",
-      "bytes": 2655,
-      "sha256": "C75EC0F208756D4E3482BB1047047B24C7F788B4CE597013A4D7F414C81D3267",
-      "copy_bytes": 2655,
-      "copy_sha256": "C75EC0F208756D4E3482BB1047047B24C7F788B4CE597013A4D7F414C81D3267",
+      "bytes": 2711,
+      "sha256": "1210B71FE5D86DBDF8A48FDBA9165F61D3257E0F0795A081C5CFEC3FA5DB3A2E",
+      "copy_bytes": 2711,
+      "copy_sha256": "1210B71FE5D86DBDF8A48FDBA9165F61D3257E0F0795A081C5CFEC3FA5DB3A2E",
       "copy_sha256_matched": true
     },
     {
