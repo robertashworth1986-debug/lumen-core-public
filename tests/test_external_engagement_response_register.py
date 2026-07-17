@@ -136,14 +136,27 @@ def test_register_routes_current_actions_without_duplicate_sends():
         "next_action"
     ]
     fhwa = records["fhwa_tsmo_qualified_partner_outreach"]
-    assert fhwa["state"] == "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+    assert fhwa["state"] == (
+        "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING"
+    )
     assert fhwa["decision"] == "MONITOR_FOR_PARTNER_RESPONSE_NO_DUPLICATE"
     assert fhwa["qualified_partner_evidence_present"] is False
+    assert fhwa["delivery_failure_count"] == 1
+    assert fhwa["replacement_send_count"] == 1
+    assert fhwa["confirmed_delivery_count"] == 0
+    assert fhwa["active_route_status"] == (
+        "SENT_NO_IMMEDIATE_REJECTION_RESPONSE_PENDING"
+    )
     assert fhwa["no_send_before"] == "2026-07-23"
     assert fhwa["send_now"] is False
     assert fhwa["do_not_duplicate_send"] is True
     assert len(fhwa["message_id_sha256"]) == 64
     assert payload["source_artifacts"]["fhwa_partner_outreach_control"]["present"] is True
+    assert payload["source_artifacts"]["fhwa_partner_response_control"]["present"] is True
+    assert any(
+        path.endswith("FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md")
+        for path in fhwa["supporting_artifacts"]
+    )
     assert payload["source_artifacts"]["email_action_reconciliation"]["present"] is True
     assert records["nasa_data_center_rfi"]["do_not_duplicate_send"] is True
     assert records["army_aidp_draft_cfs_feedback"]["do_not_duplicate_send"] is True

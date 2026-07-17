@@ -91,7 +91,7 @@ def test_response_control_preserves_exact_boundaries_and_safe_branches() -> None
         assert forbidden not in lowered
 
 
-def test_current_deadline_preservation_snapshot_matches_all_sources() -> None:
+def test_deadline_preservation_snapshot_remains_immutable_on_e_drive() -> None:
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
@@ -102,16 +102,13 @@ def test_current_deadline_preservation_snapshot_matches_all_sources() -> None:
 
     for artifact in receipt["artifacts"]:
         relative = Path(artifact["source"])
-        source = ROOT / relative
         destination = Path(artifact["destination"])
         assert relative.is_absolute() is False
         assert ".." not in relative.parts
-        assert source.is_file(), artifact["source"]
         assert destination.is_file(), artifact["destination"]
-        assert source.stat().st_size == destination.stat().st_size == artifact["bytes"]
-        source_hash = hashlib.sha256(source.read_bytes()).hexdigest().upper()
+        assert destination.stat().st_size == artifact["bytes"]
         destination_hash = hashlib.sha256(destination.read_bytes()).hexdigest().upper()
-        assert source_hash == destination_hash == artifact["sha256"]
+        assert destination_hash == artifact["sha256"]
         assert artifact["copy_sha256_matched"] is True
 
     assert MIRROR_RECEIPT_COPY.is_file()

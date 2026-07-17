@@ -143,13 +143,21 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     )
     assert fhwa["command"] == "NO_SOLO_SUBMIT_PARTNER_ONLY"
     assert fhwa["eligibility_state"] == (
-        "QUALIFIED_TARGET_CONTACTED_PARTNER_CONFIRMATION_PENDING"
+        "REPLACEMENT_TARGET_CONTACTED_PARTNER_CONFIRMATION_PENDING"
     )
     assert fhwa["partner_outreach_status"] == (
-        "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+        "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING"
     )
+    assert fhwa["partner_outreach_delivery_failure_count"] == 1
+    assert fhwa["partner_outreach_replacement_send_count"] == 1
+    assert fhwa["partner_outreach_confirmed_delivery_count"] == 0
     assert fhwa["qualified_partner_evidence_present"] is False
     assert fhwa["no_follow_up_before"] == "2026-07-23"
+    assert any("Do not reuse the rejected address" in row for row in fhwa["today_work"])
+    assert any(
+        path.endswith("FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md")
+        for path in fhwa["package_files"]
+    )
     assert "no solo bid" in payload["summary"]["best_contract_lane"].lower()
     rendered = module.render_markdown(payload)
     assert "INVITATION_CONTINGENT_PLANNING_TARGET" in rendered
@@ -383,6 +391,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "launchtn_3686_financial_model",
         "external_engagement_response_register",
         "fhwa_partner_outreach_control",
+        "fhwa_partner_response_control",
         "erdc_solution_brief_compliance_gate",
         "erdc_phase2_rom_gate",
         "erdc_phase2_rom_workflow",

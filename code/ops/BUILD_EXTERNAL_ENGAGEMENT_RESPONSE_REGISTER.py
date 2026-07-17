@@ -98,6 +98,9 @@ FHWA_TEAMING_TEMPLATE = (
 FHWA_PARTNER_OUTREACH = (
     SPRINT_DIR / "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json"
 )
+FHWA_PARTNER_RESPONSE_CONTROL = (
+    SPRINT_DIR / "FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md"
+)
 
 OUT_JSON = OUT_OPS / "external_engagement_response_register_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "external_engagement_response_register.json"
@@ -251,9 +254,9 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         raise ValueError("Email action reconciliation is missing or stale")
     if (
         fhwa_outreach.get("schema")
-        != "lumencore.fhwa_tsmo_partner_outreach_control.v1"
+        != "lumencore.fhwa_tsmo_partner_outreach_control.v2"
         or fhwa_outreach.get("status")
-        != "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+        != "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING"
     ):
         raise ValueError("FHWA partner outreach control is missing or stale")
     if email_reconciliation.get("status") != "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION":
@@ -267,6 +270,19 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "terry_vynetic_followup",
     } - reconciliation_lanes.keys():
         raise ValueError("Email action reconciliation is missing required lane controls")
+    fhwa_delivery = fhwa_outreach["delivery_reconciliation"]
+    fhwa_active_outbound = next(
+        row
+        for row in fhwa_outreach["outbound_history"]
+        if row["attempt_index"] == fhwa_delivery["active_attempt_index"]
+    )
+    if (
+        fhwa_delivery["delivery_failure_count"] != 1
+        or fhwa_delivery["replacement_send_count"] != 1
+        or fhwa_active_outbound["status"]
+        != "SENT_NO_IMMEDIATE_REJECTION_RESPONSE_PENDING"
+    ):
+        raise ValueError("FHWA delivery reconciliation is incomplete")
 
     nasa = submission_by_notice(submissions, "80TECH26RFI0020")
     army = submission_by_notice(submissions, "ACCAPGAIDPRFI4")
@@ -487,10 +503,16 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
                 "submission unless a reply supplies written role and evidence permission."
             ),
             "response_artifact": rel(FHWA_PARTNER_OUTREACH),
-            "supporting_artifacts": [rel(FHWA_TEAMING_TEMPLATE)],
-            "message_id_sha256": fhwa_outreach["outbound"][
-                "message_id_sha256"
+            "supporting_artifacts": [
+                rel(FHWA_TEAMING_TEMPLATE),
+                rel(FHWA_PARTNER_RESPONSE_CONTROL),
+                rel(EMAIL_ACTION_RECONCILIATION),
             ],
+            "message_id_sha256": fhwa_active_outbound["message_id_sha256"],
+            "delivery_failure_count": fhwa_delivery["delivery_failure_count"],
+            "replacement_send_count": fhwa_delivery["replacement_send_count"],
+            "confirmed_delivery_count": fhwa_delivery["confirmed_delivery_count"],
+            "active_route_status": fhwa_active_outbound["status"],
             "qualified_partner_evidence_present": fhwa_outreach[
                 "response_control"
             ]["qualified_partner_evidence_present"],
@@ -560,7 +582,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "as_of_date": "2026-07-17",
         "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
         "direct_answer": (
-            "The bounded Nashville EC deadline-support query and FHWA partner-fit email were sent and must not be duplicated. "
+            "The bounded Nashville EC deadline-support query and corrected FHWA partner-fit routing request were sent and must not be duplicated. The first FHWA route rejected delivery; one current official replacement route is now pending without a delivery or partner claim. "
             "The Nashville message is not an application, so continue its founder-fact gate and final portal workflow while monitoring for the exact close time. "
             "No additional email should be sent now. "
             "Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for "
@@ -648,6 +670,9 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "fhwa_teaming_template": artifact_status(FHWA_TEAMING_TEMPLATE),
             "fhwa_partner_outreach_control": artifact_status(
                 FHWA_PARTNER_OUTREACH
+            ),
+            "fhwa_partner_response_control": artifact_status(
+                FHWA_PARTNER_RESPONSE_CONTROL
             ),
         },
         "claim_boundary": REGISTER_BOUNDARY,

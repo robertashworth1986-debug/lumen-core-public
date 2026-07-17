@@ -120,15 +120,20 @@ def build_payload() -> dict[str, Any]:
         {
             "lane_id": "fhwa_tsmo_qualified_partner_outreach",
             "organization": "Cambridge Systematics",
-            "latest_event_type": "BOUNDED_PARTNER_FIT_OUTREACH_SENT",
-            "latest_event_utc": "2026-07-17T10:08:29Z",
-            "state": "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING",
+            "latest_event_type": "BOUNCE_RECONCILED_REPLACEMENT_OUTREACH_SENT",
+            "latest_event_utc": "2026-07-17T12:35:16Z",
+            "state": "REPLACEMENT_OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING",
+            "delivery_failure_count": 1,
+            "replacement_send_count": 1,
+            "confirmed_delivery_count": 0,
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": "2026-07-23",
+            "do_not_duplicate_send": True,
             "next_action": (
-                "Monitor for a response; do not resend or claim a partner. Written role "
-                "and corporate-experience permission are required before proposal use."
+                "Monitor the replacement route; do not reuse the rejected address, resend, "
+                "or claim a partner. Written role and corporate-experience permission are "
+                "required before proposal use."
             ),
         },
         {
@@ -239,6 +244,19 @@ def validate_payload(payload: dict[str, Any]) -> None:
     )
     if terry["outbound_followup_count"] != 2:
         raise ValueError("Terry duplicate-send guard is incomplete")
+    fhwa = next(
+        lane
+        for lane in payload["lanes"]
+        if lane["lane_id"] == "fhwa_tsmo_qualified_partner_outreach"
+    )
+    if (
+        fhwa["state"]
+        != "REPLACEMENT_OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+        or fhwa["delivery_failure_count"] != 1
+        or fhwa["replacement_send_count"] != 1
+        or fhwa["do_not_duplicate_send"] is not True
+    ):
+        raise ValueError("FHWA bounce/replacement reconciliation is incomplete")
     nashville = next(
         lane
         for lane in payload["lanes"]

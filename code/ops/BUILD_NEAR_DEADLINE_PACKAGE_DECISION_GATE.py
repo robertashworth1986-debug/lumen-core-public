@@ -158,9 +158,9 @@ def build_gate() -> dict[str, Any]:
     fhwa_outreach = read_json(FHWA_OUTREACH_CONTROL)
     qualified_target_contacted = (
         fhwa_outreach.get("schema")
-        == "lumencore.fhwa_tsmo_partner_outreach_control.v1"
+        == "lumencore.fhwa_tsmo_partner_outreach_control.v2"
         and fhwa_outreach.get("status")
-        == "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+        == "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING"
         and fhwa_outreach.get("response_control", {}).get(
             "qualified_partner_evidence_present"
         )
@@ -246,6 +246,12 @@ def build_gate() -> dict[str, Any]:
             ],
             "qualified_partner_evidence_present": partner_verified,
             "qualified_target_contacted": qualified_target_contacted,
+            "delivery_failure_count": fhwa_outreach.get(
+                "delivery_reconciliation", {}
+            ).get("delivery_failure_count", 0),
+            "replacement_send_count": fhwa_outreach.get(
+                "delivery_reconciliation", {}
+            ).get("replacement_send_count", 0),
             "partner_outreach_control": (
                 rel(FHWA_OUTREACH_CONTROL) if qualified_target_contacted else None
             ),
@@ -269,7 +275,8 @@ def build_gate() -> dict[str, Any]:
             "reason": (
                 "NSF has the smallest truthful completion gap and no fixed Project Pitch "
                 "deadline. ERDC is a credible five-page validation lane but currently has no "
-                "available funding. A qualified FHWA TSMO target was contacted on July 17, but "
+                "available funding. The first FHWA TSMO contact route rejected delivery; one "
+                "current official replacement route was contacted on July 17, but "
                 "FHWA remains noncompliant as a solo prime unless written partner evidence "
                 "supplies the mandatory corporate experience."
             ),
@@ -324,7 +331,7 @@ def render_markdown(gate: dict[str, Any]) -> str:
         "",
         "1. **NSF Project Pitch** - stage first after checking the duplicate-pitch/open-invitation gate in the portal.",
         "2. **ERDC Sovereign Defense Cloud** - build the compliant five-page solution brief as a validation and relationship lane; the notice says funding is not currently available.",
-        "3. **FHWA TSMO** - qualified-target outreach was sent July 17; do not submit as a solo prime unless written partner evidence supplies the mandatory corporate-experience requirement.",
+        "3. **FHWA TSMO** - the first listed contact route rejected delivery and one current official replacement outreach was sent July 17; do not submit as a solo prime unless written partner evidence supplies the mandatory corporate-experience requirement.",
         "",
         gate["decision"]["reason"],
         "",

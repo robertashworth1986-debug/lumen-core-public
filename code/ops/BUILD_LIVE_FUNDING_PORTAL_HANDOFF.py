@@ -259,7 +259,7 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
         ],
         "monitor_only": [
             "NASA, Army, and CDC responses are sent and receipt-backed; do not duplicate-send.",
-            "FHWA has one qualified-target outreach pending; do not follow up before the recorded control date and do not claim a partner.",
+            "FHWA has one active replacement outreach pending after the first listed route rejected delivery; do not reuse the rejected address, follow up before the recorded control date, or claim delivery or a partner.",
             "DOJ/BOP remains partner-only; do not send a solo quote.",
             "EPRI administrative onboarding was sent; monitor for a substantive response without claiming membership or endorsement.",
             "LANL follow-up was sent; monitor without duplicate transmission.",

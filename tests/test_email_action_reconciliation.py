@@ -52,10 +52,20 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert epri["no_send_before"] == "2026-07-23"
 
     fhwa = lanes["fhwa_tsmo_qualified_partner_outreach"]
-    assert fhwa["latest_event_type"] == "BOUNDED_PARTNER_FIT_OUTREACH_SENT"
-    assert fhwa["state"] == "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+    assert fhwa["latest_event_type"] == (
+        "BOUNCE_RECONCILED_REPLACEMENT_OUTREACH_SENT"
+    )
+    assert fhwa["latest_event_utc"] == "2026-07-17T12:35:16Z"
+    assert fhwa["state"] == (
+        "REPLACEMENT_OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+    )
+    assert fhwa["delivery_failure_count"] == 1
+    assert fhwa["replacement_send_count"] == 1
+    assert fhwa["confirmed_delivery_count"] == 0
+    assert fhwa["do_not_duplicate_send"] is True
     assert fhwa["no_send_before"] == "2026-07-23"
     assert fhwa["send_now"] is False
+    assert "do not reuse the rejected address" in fhwa["next_action"]
 
     nashville = lanes["nashville_ec_takeoff_fall_2026"]
     assert nashville["latest_event_type"] == "DEADLINE_PRESERVATION_QUERY_SENT"

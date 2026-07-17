@@ -90,15 +90,19 @@
       "state": "OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY"
     },
     {
+      "confirmed_delivery_count": 0,
+      "delivery_failure_count": 1,
+      "do_not_duplicate_send": true,
       "email_reply_required": false,
       "lane_id": "fhwa_tsmo_qualified_partner_outreach",
-      "latest_event_type": "BOUNDED_PARTNER_FIT_OUTREACH_SENT",
-      "latest_event_utc": "2026-07-17T10:08:29Z",
-      "next_action": "Monitor for a response; do not resend or claim a partner. Written role and corporate-experience permission are required before proposal use.",
+      "latest_event_type": "BOUNCE_RECONCILED_REPLACEMENT_OUTREACH_SENT",
+      "latest_event_utc": "2026-07-17T12:35:16Z",
+      "next_action": "Monitor the replacement route; do not reuse the rejected address, resend, or claim a partner. Written role and corporate-experience permission are required before proposal use.",
       "no_send_before": "2026-07-23",
       "organization": "Cambridge Systematics",
+      "replacement_send_count": 1,
       "send_now": false,
-      "state": "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+      "state": "REPLACEMENT_OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
     },
     {
       "email_reply_required": false,

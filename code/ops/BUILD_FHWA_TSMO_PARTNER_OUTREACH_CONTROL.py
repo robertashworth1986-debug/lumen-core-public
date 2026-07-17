@@ -10,9 +10,10 @@ ROOT = Path(__file__).resolve().parents[2]
 SPRINT = ROOT / "grant_submissions" / "funding_sprint_20260709"
 JSON_OUT = SPRINT / "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json"
 MD_OUT = SPRINT / "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.md"
+RESPONSE_OUT = SPRINT / "FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md"
 
-SUBJECT = "FHWA TSMO Data Initiative (693JJ326R000012) - bounded teaming fit"
-BODY = """Hello Ms. Flanigan,
+ORIGINAL_SUBJECT = "FHWA TSMO Data Initiative (693JJ326R000012) - bounded teaming fit"
+ORIGINAL_BODY = """Hello Ms. Flanigan,
 
 I am reaching out because Cambridge Systematics' published work shows deep FHWA and Transportation Systems Management and Operations program experience. LumenCore is evaluating whether to participate in FHWA solicitation 693JJ326R000012, due August 3, 2026 at 9:00 a.m. ET, only through a qualified prime or team member that can truthfully document the Phase I corporate-experience requirement.
 
@@ -28,8 +29,39 @@ Best regards,
 Robert Ashworth
 Founder and Chief Scientist, LumenCore"""
 
-SENT_UTC = "2026-07-17T10:08:29Z"
-MESSAGE_ID_SHA256 = "d27b64996ab87149931992cd81dd1562b996504f0c4dd72e8384564ad0a44752"
+REPLACEMENT_SUBJECT = (
+    "FHWA TSMO Data Initiative (693JJ326R000012) - teaming fit / routing request"
+)
+REPLACEMENT_BODY = """Hello Ms. Binder,
+
+I am contacting you because Cambridge Systematics' current 2026 materials identify you as Principal, VP Federal Market and Transportation Policy, and the firm's published work reflects substantial FHWA and Transportation Systems Management and Operations experience. A message sent earlier today to a TSMO contact address listed on the company site was returned as an invalid recipient, so I am using this current official route and will not resend to that address.
+
+LumenCore is evaluating whether to participate in FHWA solicitation 693JJ326R000012, due August 3, 2026 at 9:00 a.m. ET, only through a qualified prime or team member that can truthfully document the Phase I corporate-experience requirement.
+
+Our proposed contribution is narrow: data-quality controls; chronological, baseline-locked model benchmarking; uncertainty and abstention gates; reproducible evidence manifests; and API-based prototype evaluation. We would not represent Cambridge Systematics as a partner, cite its experience, or use customer information without written agreement and verification.
+
+Is Cambridge Systematics pursuing this opportunity, and if so, would you or the appropriate colleague be open to a 20-30 minute fit check by July 23? The initial call would cover only role fit, corporate-experience eligibility, conflicts, data rights, and schedule. No confidential or patent-sensitive information is needed.
+
+Official opportunity: https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view
+
+If another colleague owns this lane, a referral would be appreciated.
+
+Best regards,
+Robert Ashworth
+Founder and Chief Scientist, LumenCore"""
+
+ORIGINAL_SENT_UTC = "2026-07-17T10:08:29Z"
+ORIGINAL_FAILURE_UTC = "2026-07-17T10:08:31Z"
+ORIGINAL_MESSAGE_ID_SHA256 = (
+    "d27b64996ab87149931992cd81dd1562b996504f0c4dd72e8384564ad0a44752"
+)
+ORIGINAL_DSN_MESSAGE_ID_SHA256 = (
+    "dc22b523b0e618dd7e461b631b877473bb4f323ace2797a6fe0a3bce34ac40e5"
+)
+REPLACEMENT_SENT_UTC = "2026-07-17T12:35:16Z"
+REPLACEMENT_MESSAGE_ID_SHA256 = (
+    "e39959cf09ccba85deccd2ce2c36a0bf8526e337f5ff6ea2abe1c8c989fe406f"
+)
 
 
 def sha256_text(value: str) -> str:
@@ -38,9 +70,9 @@ def sha256_text(value: str) -> str:
 
 def build_payload() -> dict[str, Any]:
     return {
-        "schema": "lumencore.fhwa_tsmo_partner_outreach_control.v1",
+        "schema": "lumencore.fhwa_tsmo_partner_outreach_control.v2",
         "as_of_date": "2026-07-17",
-        "status": "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING",
+        "status": "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING",
         "opportunity": {
             "notice_id": "693JJ326R000012",
             "title": "Transportation Systems Management and Operations Data Initiative",
@@ -51,22 +83,28 @@ def build_payload() -> dict[str, Any]:
         },
         "target": {
             "organization": "Cambridge Systematics",
-            "contact_role": "Vice President and FHWA Office of Operations program manager",
+            "active_contact_role": (
+                "Principal, VP Federal Market and Transportation Policy"
+            ),
+            "rejected_contact_role": (
+                "Vice President and FHWA Office of Operations program manager"
+            ),
             "recipient_domain": "camsys.com",
-            "public_professional_route_verified": True,
+            "active_public_professional_route_verified": True,
             "qualification_basis": [
-                "Official company biography describes more than 17 years focused on TSMO.",
-                "Official company biography describes leadership of FHWA TSMO work and program management for FHWA Office of Operations contracts.",
-                "Official company materials describe transportation data integration, analytics, governance, and ground-truthed findings.",
+                "The current official TRB 2026 company page identifies the active contact as Principal, VP Federal Market and Transportation Policy.",
+                "The official company biography for the rejected route documents deep FHWA TSMO and Office of Operations experience but its listed mailbox returned SMTP 550 Invalid Recipient.",
+                "The replacement message asks only for pursuit status, role fit, or routing and does not claim a partnership.",
             ],
             "official_company_sources": [
+                "https://camsys.com/trb",
                 "https://camsys.com/blog/people/erin-flanigan",
-                "https://camsys.com/services-and-products/data-and-analytics",
             ],
         },
-        "pre_send_gates": {
-            "official_target_evidence_verified": True,
-            "prior_recipient_or_organization_mailbox_matches": 0,
+        "replacement_pre_send_gates": {
+            "active_official_target_evidence_verified": True,
+            "original_delivery_failure_verified": True,
+            "prior_active_recipient_mailbox_matches": 0,
             "mailbox_search_method": "Connected Gmail exact-recipient and organization search before send.",
             "attachment_count": 0,
             "patent_sensitive_material_included": False,
@@ -74,32 +112,75 @@ def build_payload() -> dict[str, Any]:
             "customer_information_requested": False,
             "send_gate_passed": True,
         },
-        "outbound": {
-            "sent_utc": SENT_UTC,
-            "gmail_label_observed": "SENT",
-            "message_id_sha256": MESSAGE_ID_SHA256,
-            "subject": SUBJECT,
-            "subject_sha256": sha256_text(SUBJECT),
-            "body_sha256": sha256_text(BODY),
-            "body": BODY,
+        "outbound_history": [
+            {
+                "attempt_index": 1,
+                "route_role": "official TSMO profile contact",
+                "status": "DELIVERY_REJECTED_550_INVALID_RECIPIENT",
+                "sent_utc": ORIGINAL_SENT_UTC,
+                "failure_utc": ORIGINAL_FAILURE_UTC,
+                "smtp_status_code": 550,
+                "gmail_label_observed": "SENT",
+                "message_id_sha256": ORIGINAL_MESSAGE_ID_SHA256,
+                "dsn_message_id_sha256": ORIGINAL_DSN_MESSAGE_ID_SHA256,
+                "subject": ORIGINAL_SUBJECT,
+                "subject_sha256": sha256_text(ORIGINAL_SUBJECT),
+                "body_sha256": sha256_text(ORIGINAL_BODY),
+                "body": ORIGINAL_BODY,
+                "attachment_count": 0,
+                "delivery_confirmed": False,
+            },
+            {
+                "attempt_index": 2,
+                "route_role": "current official federal-market contact",
+                "status": "SENT_NO_IMMEDIATE_REJECTION_RESPONSE_PENDING",
+                "sent_utc": REPLACEMENT_SENT_UTC,
+                "failure_utc": None,
+                "smtp_status_code": None,
+                "gmail_label_observed": "SENT",
+                "message_id_sha256": REPLACEMENT_MESSAGE_ID_SHA256,
+                "subject": REPLACEMENT_SUBJECT,
+                "subject_sha256": sha256_text(REPLACEMENT_SUBJECT),
+                "body_sha256": sha256_text(REPLACEMENT_BODY),
+                "body": REPLACEMENT_BODY,
+                "attachment_count": 0,
+                "immediate_delivery_rejection_observed": False,
+                "delivery_confirmed": False,
+            },
+        ],
+        "delivery_reconciliation": {
+            "attempt_count": 2,
+            "delivery_failure_count": 1,
+            "replacement_send_count": 1,
+            "confirmed_delivery_count": 0,
+            "response_count": 0,
+            "active_attempt_index": 2,
+            "stale_route_reuse_allowed": False,
         },
         "response_control": {
-            "state": "CONTACTED_NOT_CONFIRMED",
+            "state": "REPLACEMENT_ROUTE_CONTACTED_NOT_CONFIRMED",
             "qualified_partner_evidence_present": False,
             "bid_posture": "NO_GO_AS_SOLO_PRIME_PARTNER_CONFIRMATION_REQUIRED",
             "send_now": False,
             "do_not_duplicate_send": True,
             "no_follow_up_before": "2026-07-23",
             "next_action": (
-                "Monitor for a reply. If Cambridge Systematics responds, verify role, "
+                "Monitor the replacement route for a reply and do not reuse the rejected "
+                "address. If Cambridge Systematics responds, verify role, "
                 "documentable corporate experience, conflicts, references, facilities, "
                 "data rights, and schedule before any teaming or proposal claim."
             ),
         },
+        "response_templates": {
+            "artifact": RESPONSE_OUT.resolve().relative_to(ROOT.resolve()).as_posix(),
+            "branch_count": 6,
+            "autonomous_send_allowed": False,
+        },
         "claim_boundary": (
-            "The official company pages support target selection, and the Gmail SENT label plus "
-            "hashed message identifier support transmission. They do not establish receipt, "
-            "interest, a teaming relationship, permission to cite corporate experience, "
+            "The Gmail records prove that the first route was rejected and that one replacement "
+            "message was transmitted to a current official company route. A SENT label and the "
+            "absence of an immediate rejection do not establish delivery or receipt. Nothing here "
+            "establishes interest, a teaming relationship, permission to cite corporate experience, "
             "independent validation, proposal compliance, submission, award, or funding."
         ),
     }
@@ -108,7 +189,12 @@ def build_payload() -> dict[str, Any]:
 def render_markdown(payload: dict[str, Any]) -> str:
     target = payload["target"]
     response = payload["response_control"]
-    outbound = payload["outbound"]
+    delivery = payload["delivery_reconciliation"]
+    active = next(
+        row
+        for row in payload["outbound_history"]
+        if row["attempt_index"] == delivery["active_attempt_index"]
+    )
     lines = [
         "# FHWA TSMO Partner Outreach Control",
         "",
@@ -119,26 +205,44 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "## Verified Target Basis",
         "",
         f"Organization: {target['organization']}",
-        f"Public professional role: {target['contact_role']}",
+        f"Active public professional role: {target['active_contact_role']}",
         "",
     ]
     lines.extend(f"- {item}" for item in target["qualification_basis"])
     lines.extend(
         [
             "",
-            "## Transmission Receipt",
+            "## Delivery Reconciliation",
             "",
-            f"- Sent UTC: `{outbound['sent_utc']}`",
+            f"- Attempts: `{delivery['attempt_count']}`",
+            f"- Delivery failures: `{delivery['delivery_failure_count']}`",
+            f"- Replacement sends: `{delivery['replacement_send_count']}`",
+            f"- Confirmed deliveries: `{delivery['confirmed_delivery_count']}`",
+            f"- Responses: `{delivery['response_count']}`",
             f"- Recipient domain: `{target['recipient_domain']}`",
-            f"- Gmail label observed: `{outbound['gmail_label_observed']}`",
-            f"- Message ID SHA-256: `{outbound['message_id_sha256']}`",
-            "- Attachments: `0`",
             "",
-            "## Message",
+        ]
+    )
+    for attempt in payload["outbound_history"]:
+        lines.extend(
+            [
+                f"### Attempt {attempt['attempt_index']}",
+                "",
+                f"- Route role: {attempt['route_role']}",
+                f"- Status: `{attempt['status']}`",
+                f"- Sent UTC: `{attempt['sent_utc']}`",
+                f"- Message ID SHA-256: `{attempt['message_id_sha256']}`",
+                f"- Attachments: `{attempt['attachment_count']}`",
+                "",
+            ]
+        )
+    lines.extend(
+        [
+            "## Active Replacement Message",
             "",
-            f"Subject: {outbound['subject']}",
+            f"Subject: {active['subject']}",
             "",
-            outbound["body"],
+            active["body"],
             "",
             "## Response Gate",
             "",
@@ -156,15 +260,89 @@ def render_markdown(payload: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def render_response_templates(payload: dict[str, Any]) -> str:
+    deadline = payload["opportunity"]["phase_i_deadline"]
+    no_follow_up_before = payload["response_control"]["no_follow_up_before"]
+    return f"""# FHWA TSMO Partner Response Control - 2026-07-17
+
+Opportunity: `693JJ326R000012`
+
+Phase I deadline: `{deadline}`
+
+Status: `{payload['status']}`
+
+These branches are bounded drafts. Use only the branch supported by a new inbound message. Do not state that delivery, interest, a partnership, permission to cite experience, proposal compliance, or selection exists unless the written record establishes it.
+
+## Interested Or Correct Owner
+
+Thank you for confirming the right lane. A 20-30 minute fit check would be helpful. The initial discussion can stay limited to pursuit status, LumenCore's possible role, the mandatory corporate-experience requirement, conflicts, schedule, data rights, and what evidence could be cited only with written permission. Please send two suitable windows and the preferred meeting method. No confidential or patent-sensitive information is needed for this first check.
+
+## Referral Provided
+
+Thank you for the referral. I will contact the named colleague once, identify your referral accurately, and keep the request limited to pursuit and role fit. I will not describe Cambridge Systematics or the referred organization as a partner without written agreement.
+
+## More Information Requested
+
+Thank you. I can provide a short, nonconfidential capability note limited to data-quality controls, chronological baseline-locked benchmarking, uncertainty and abstention, reproducible evidence manifests, and API-based prototype evaluation. Before sending an attachment, I will verify its current hash, public-safe status, and relevance to the specific question. It will not claim FHWA deployment, agency validation, customer savings, or a teaming relationship.
+
+## Not Pursuing Or Decline
+
+Thank you for the clear response. I will close this outreach route and will not represent any relationship or use Cambridge Systematics' experience in the proposal.
+
+## NDA Or Confidential Information Requested
+
+Thank you. I can first provide a public, nonconfidential overview. Any NDA, teaming agreement, proprietary exchange, data-rights term, or patent-sensitive disclosure must be reviewed and approved before signature or transmission. I will not send controlled or confidential material in this email thread.
+
+## One Follow-Up If No Response
+
+Do not send before: `{no_follow_up_before}`.
+
+Subject: `Follow-up: FHWA TSMO Data Initiative 693JJ326R000012`
+
+Hello Ms. Binder,
+
+I am following up once on the FHWA TSMO Data Initiative routing request below. If Cambridge Systematics is pursuing the opportunity, I would appreciate either a brief fit check or a referral to the appropriate proposal lead. If it is not pursuing, a short decline is enough and I will close the route. I am not representing that a teaming relationship exists.
+
+Best regards,
+Robert Ashworth
+Founder and Chief Scientist, LumenCore
+
+## Stop Conditions
+
+- Do not reuse the rejected address.
+- Do not send more than one follow-up without a substantive inbound reply.
+- Do not attach confidential, controlled, patent-sensitive, customer, or unverified performance material.
+- Do not accept or sign an NDA, teaming agreement, data-rights term, pricing term, or exclusivity term through this template.
+- Do not claim delivery, receipt, pursuit, partnership, permission to cite experience, submission, award, or validation without written evidence.
+
+## Claim Boundary
+
+{payload['claim_boundary']}
+"""
+
+
 def write_outputs(payload: dict[str, Any]) -> None:
     JSON_OUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     MD_OUT.write_text(render_markdown(payload), encoding="utf-8")
+    RESPONSE_OUT.write_text(render_response_templates(payload), encoding="utf-8")
 
 
 def main() -> int:
     payload = build_payload()
     write_outputs(payload)
-    print(json.dumps({"status": payload["status"], "sent_utc": SENT_UTC}, indent=2))
+    print(
+        json.dumps(
+            {
+                "status": payload["status"],
+                "active_sent_utc": REPLACEMENT_SENT_UTC,
+                "delivery_failure_count": payload["delivery_reconciliation"][
+                    "delivery_failure_count"
+                ],
+                "response_templates": payload["response_templates"]["artifact"],
+            },
+            indent=2,
+        )
+    )
     return 0
 
 

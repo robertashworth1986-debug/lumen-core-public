@@ -1,7 +1,7 @@
 {
-  "schema": "lumencore.fhwa_tsmo_partner_outreach_control.v1",
+  "schema": "lumencore.fhwa_tsmo_partner_outreach_control.v2",
   "as_of_date": "2026-07-17",
-  "status": "OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING",
+  "status": "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING",
   "opportunity": {
     "notice_id": "693JJ326R000012",
     "title": "Transportation Systems Management and Operations Data Initiative",
@@ -12,22 +12,24 @@
   },
   "target": {
     "organization": "Cambridge Systematics",
-    "contact_role": "Vice President and FHWA Office of Operations program manager",
+    "active_contact_role": "Principal, VP Federal Market and Transportation Policy",
+    "rejected_contact_role": "Vice President and FHWA Office of Operations program manager",
     "recipient_domain": "camsys.com",
-    "public_professional_route_verified": true,
+    "active_public_professional_route_verified": true,
     "qualification_basis": [
-      "Official company biography describes more than 17 years focused on TSMO.",
-      "Official company biography describes leadership of FHWA TSMO work and program management for FHWA Office of Operations contracts.",
-      "Official company materials describe transportation data integration, analytics, governance, and ground-truthed findings."
+      "The current official TRB 2026 company page identifies the active contact as Principal, VP Federal Market and Transportation Policy.",
+      "The official company biography for the rejected route documents deep FHWA TSMO and Office of Operations experience but its listed mailbox returned SMTP 550 Invalid Recipient.",
+      "The replacement message asks only for pursuit status, role fit, or routing and does not claim a partnership."
     ],
     "official_company_sources": [
-      "https://camsys.com/blog/people/erin-flanigan",
-      "https://camsys.com/services-and-products/data-and-analytics"
+      "https://camsys.com/trb",
+      "https://camsys.com/blog/people/erin-flanigan"
     ]
   },
-  "pre_send_gates": {
-    "official_target_evidence_verified": true,
-    "prior_recipient_or_organization_mailbox_matches": 0,
+  "replacement_pre_send_gates": {
+    "active_official_target_evidence_verified": true,
+    "original_delivery_failure_verified": true,
+    "prior_active_recipient_mailbox_matches": 0,
     "mailbox_search_method": "Connected Gmail exact-recipient and organization search before send.",
     "attachment_count": 0,
     "patent_sensitive_material_included": false,
@@ -35,23 +37,64 @@
     "customer_information_requested": false,
     "send_gate_passed": true
   },
-  "outbound": {
-    "sent_utc": "2026-07-17T10:08:29Z",
-    "gmail_label_observed": "SENT",
-    "message_id_sha256": "d27b64996ab87149931992cd81dd1562b996504f0c4dd72e8384564ad0a44752",
-    "subject": "FHWA TSMO Data Initiative (693JJ326R000012) - bounded teaming fit",
-    "subject_sha256": "c14557b73e357a653ae349a66353dd48c3ee5dceab421d43f32fd19807ad973f",
-    "body_sha256": "ccedffbc602d64eb288f4bf8320d5bcb6c3ed10bc5ed216565b19dd37fc47d3a",
-    "body": "Hello Ms. Flanigan,\n\nI am reaching out because Cambridge Systematics' published work shows deep FHWA and Transportation Systems Management and Operations program experience. LumenCore is evaluating whether to participate in FHWA solicitation 693JJ326R000012, due August 3, 2026 at 9:00 a.m. ET, only through a qualified prime or team member that can truthfully document the Phase I corporate-experience requirement.\n\nOur proposed contribution is narrow: data-quality controls; chronological, baseline-locked model benchmarking; uncertainty and abstention gates; reproducible evidence manifests; and API-based prototype evaluation. We would not represent Cambridge Systematics as a partner, cite its experience, or use customer information without written agreement and verification.\n\nIs Cambridge Systematics pursuing this opportunity, and if so, would you or the appropriate colleague be open to a 20-30 minute fit check by July 23? The initial call would cover only role fit, corporate-experience eligibility, conflicts, data rights, and schedule. No confidential or patent-sensitive information is needed.\n\nOfficial opportunity: https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view\n\nIf this is not in your lane, a referral to the appropriate federal programs or proposal lead would be appreciated.\n\nBest regards,\nRobert Ashworth\nFounder and Chief Scientist, LumenCore"
+  "outbound_history": [
+    {
+      "attempt_index": 1,
+      "route_role": "official TSMO profile contact",
+      "status": "DELIVERY_REJECTED_550_INVALID_RECIPIENT",
+      "sent_utc": "2026-07-17T10:08:29Z",
+      "failure_utc": "2026-07-17T10:08:31Z",
+      "smtp_status_code": 550,
+      "gmail_label_observed": "SENT",
+      "message_id_sha256": "d27b64996ab87149931992cd81dd1562b996504f0c4dd72e8384564ad0a44752",
+      "dsn_message_id_sha256": "dc22b523b0e618dd7e461b631b877473bb4f323ace2797a6fe0a3bce34ac40e5",
+      "subject": "FHWA TSMO Data Initiative (693JJ326R000012) - bounded teaming fit",
+      "subject_sha256": "c14557b73e357a653ae349a66353dd48c3ee5dceab421d43f32fd19807ad973f",
+      "body_sha256": "ccedffbc602d64eb288f4bf8320d5bcb6c3ed10bc5ed216565b19dd37fc47d3a",
+      "body": "Hello Ms. Flanigan,\n\nI am reaching out because Cambridge Systematics' published work shows deep FHWA and Transportation Systems Management and Operations program experience. LumenCore is evaluating whether to participate in FHWA solicitation 693JJ326R000012, due August 3, 2026 at 9:00 a.m. ET, only through a qualified prime or team member that can truthfully document the Phase I corporate-experience requirement.\n\nOur proposed contribution is narrow: data-quality controls; chronological, baseline-locked model benchmarking; uncertainty and abstention gates; reproducible evidence manifests; and API-based prototype evaluation. We would not represent Cambridge Systematics as a partner, cite its experience, or use customer information without written agreement and verification.\n\nIs Cambridge Systematics pursuing this opportunity, and if so, would you or the appropriate colleague be open to a 20-30 minute fit check by July 23? The initial call would cover only role fit, corporate-experience eligibility, conflicts, data rights, and schedule. No confidential or patent-sensitive information is needed.\n\nOfficial opportunity: https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view\n\nIf this is not in your lane, a referral to the appropriate federal programs or proposal lead would be appreciated.\n\nBest regards,\nRobert Ashworth\nFounder and Chief Scientist, LumenCore",
+      "attachment_count": 0,
+      "delivery_confirmed": false
+    },
+    {
+      "attempt_index": 2,
+      "route_role": "current official federal-market contact",
+      "status": "SENT_NO_IMMEDIATE_REJECTION_RESPONSE_PENDING",
+      "sent_utc": "2026-07-17T12:35:16Z",
+      "failure_utc": null,
+      "smtp_status_code": null,
+      "gmail_label_observed": "SENT",
+      "message_id_sha256": "e39959cf09ccba85deccd2ce2c36a0bf8526e337f5ff6ea2abe1c8c989fe406f",
+      "subject": "FHWA TSMO Data Initiative (693JJ326R000012) - teaming fit / routing request",
+      "subject_sha256": "c1e73ab7150e08a66146ed16d0118aba6fe2ea604bafdf533f1bc6e8b5835a19",
+      "body_sha256": "b71444ad52e673fd2b7a45edbc8c97b26944b45debfc801676d729fe191c88fa",
+      "body": "Hello Ms. Binder,\n\nI am contacting you because Cambridge Systematics' current 2026 materials identify you as Principal, VP Federal Market and Transportation Policy, and the firm's published work reflects substantial FHWA and Transportation Systems Management and Operations experience. A message sent earlier today to a TSMO contact address listed on the company site was returned as an invalid recipient, so I am using this current official route and will not resend to that address.\n\nLumenCore is evaluating whether to participate in FHWA solicitation 693JJ326R000012, due August 3, 2026 at 9:00 a.m. ET, only through a qualified prime or team member that can truthfully document the Phase I corporate-experience requirement.\n\nOur proposed contribution is narrow: data-quality controls; chronological, baseline-locked model benchmarking; uncertainty and abstention gates; reproducible evidence manifests; and API-based prototype evaluation. We would not represent Cambridge Systematics as a partner, cite its experience, or use customer information without written agreement and verification.\n\nIs Cambridge Systematics pursuing this opportunity, and if so, would you or the appropriate colleague be open to a 20-30 minute fit check by July 23? The initial call would cover only role fit, corporate-experience eligibility, conflicts, data rights, and schedule. No confidential or patent-sensitive information is needed.\n\nOfficial opportunity: https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view\n\nIf another colleague owns this lane, a referral would be appreciated.\n\nBest regards,\nRobert Ashworth\nFounder and Chief Scientist, LumenCore",
+      "attachment_count": 0,
+      "immediate_delivery_rejection_observed": false,
+      "delivery_confirmed": false
+    }
+  ],
+  "delivery_reconciliation": {
+    "attempt_count": 2,
+    "delivery_failure_count": 1,
+    "replacement_send_count": 1,
+    "confirmed_delivery_count": 0,
+    "response_count": 0,
+    "active_attempt_index": 2,
+    "stale_route_reuse_allowed": false
   },
   "response_control": {
-    "state": "CONTACTED_NOT_CONFIRMED",
+    "state": "REPLACEMENT_ROUTE_CONTACTED_NOT_CONFIRMED",
     "qualified_partner_evidence_present": false,
     "bid_posture": "NO_GO_AS_SOLO_PRIME_PARTNER_CONFIRMATION_REQUIRED",
     "send_now": false,
     "do_not_duplicate_send": true,
     "no_follow_up_before": "2026-07-23",
-    "next_action": "Monitor for a reply. If Cambridge Systematics responds, verify role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule before any teaming or proposal claim."
+    "next_action": "Monitor the replacement route for a reply and do not reuse the rejected address. If Cambridge Systematics responds, verify role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule before any teaming or proposal claim."
   },
-  "claim_boundary": "The official company pages support target selection, and the Gmail SENT label plus hashed message identifier support transmission. They do not establish receipt, interest, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding."
+  "response_templates": {
+    "artifact": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md",
+    "branch_count": 6,
+    "autonomous_send_allowed": false
+  },
+  "claim_boundary": "The Gmail records prove that the first route was rejected and that one replacement message was transmitted to a current official company route. A SENT label and the absence of an immediate rejection do not establish delivery or receipt. Nothing here establishes interest, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding."
 }
