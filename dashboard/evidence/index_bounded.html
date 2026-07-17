@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="lumencore-surface" content="proof-to-pilot-evidence-v1" />
+  <title>LumenCore Proof-to-Pilot Evidence</title>
+  <meta name="description" content="A bounded public review path for LumenCore Proof Capsules, claim boundaries, reproducibility controls, and external-validation gates." />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07101f;
+      --panel: #101b31;
+      --panel2: #152440;
+      --text: #eef4ff;
+      --muted: #a7b5cc;
+      --line: #2a3a59;
+      --accent: #a99cff;
+      --good: #62e0a4;
+      --warn: #ffd479;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 14% 0%, rgba(95, 79, 205, .28), transparent 38rem),
+        linear-gradient(180deg, #091427 0%, var(--bg) 72%);
+    }
+    a { color: #d0c8ff; }
+    .wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    header { padding: 54px 0 30px; border-bottom: 1px solid var(--line); }
+    .eyebrow { color: var(--good); font-size: 12px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    h1 { margin: 10px 0 14px; font-size: clamp(36px, 6vw, 68px); line-height: .98; letter-spacing: -.04em; }
+    .lead { max-width: 850px; margin: 0; color: var(--muted); font-size: 18px; line-height: 1.65; }
+    main { padding: 30px 0 68px; }
+    .notice {
+      border: 1px solid #6d5bc2;
+      background: rgba(79, 62, 151, .22);
+      border-radius: 16px;
+      padding: 18px 20px;
+      line-height: 1.65;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 22px 0; }
+    .card { background: linear-gradient(180deg, var(--panel2), var(--panel)); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+    .card h2 { margin: 0 0 10px; font-size: 18px; }
+    .card p, .card li { color: var(--muted); line-height: 1.6; }
+    .card ul, .card ol { margin: 10px 0 0; padding-left: 20px; }
+    .state { margin-top: 14px; color: var(--warn); font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .button { display: inline-block; padding: 10px 14px; border: 1px solid #6357aa; border-radius: 10px; background: rgba(99, 87, 170, .18); text-decoration: none; font-weight: 700; }
+    .button:hover { background: rgba(99, 87, 170, .32); }
+    .small { color: var(--muted); font-size: 13px; line-height: 1.6; }
+    footer { border-top: 1px solid var(--line); padding: 26px 0 40px; color: var(--muted); }
+    code { color: #ddd7ff; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="eyebrow">LumenCore public evidence surface</div>
+      <h1>One proof path. One bounded decision.</h1>
+      <p class="lead">
+        LumenCore turns an AI or infrastructure claim into a reviewer-readable Proof Capsule:
+        named source, incumbent baseline, metric locked before scoring, labeled run type,
+        hashes, result, negative findings, claim boundary, and next pilot decision.
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="notice">
+      <strong>Evidence boundary:</strong> internal simulation, replay, benchmark, and hash records are not external validation.
+      No membership, endorsement, field savings, deployment, certification, patent outcome, or universal model superiority is implied.
+    </section>
+
+    <section class="grid" aria-label="Reviewer path">
+      <article class="card">
+        <h2>1. Inspect the canonical capsule</h2>
+        <p>See what was tested, the baseline, the prelocked metric, the preserved negative result, and the exact limitation.</p>
+        <div class="links">
+          <a class="button" href="https://github.com/robertashworth1986-debug/lumen-core-public/tree/main/examples/proof_capsule">Open public capsule</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>2. Verify the artifact</h2>
+        <p>Run the standard-library verifier and focused tests from a clean checkout. The verifier checks structure and hashes; it does not independently reproduce the private replay.</p>
+        <div class="links">
+          <a class="button" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/QUICKSTART.md">Run the five-minute quick start</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>3. Make one decision</h2>
+        <p>A qualified reviewer can reject, request information, rerun under agreed conditions, authorize an external validation, or scope a paid pilot.</p>
+        <div class="state">Current gate: external review, not field validation</div>
+      </article>
+    </section>
+
+    <section class="card">
+      <h2>Controlled external-validation gate</h2>
+      <ol>
+        <li>Confirm data rights and the authoritative source.</li>
+        <li>Name the incumbent comparator.</li>
+        <li>Lock the metric, threshold, window, exclusions, and failure rules before scoring.</li>
+        <li>Retain positive, neutral, incomplete, and adverse findings.</li>
+        <li>Issue a hash-verified report with one bounded go/no-go decision.</li>
+      </ol>
+      <div class="links">
+        <a class="button" href="/">Return to LumenCore</a>
+        <a class="button" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/CLAIM_BOUNDARY_REGISTER.md">Read the claim boundary</a>
+        <a class="button" href="mailto:robertashworth4444@gmail.com?subject=LumenCore%20bounded%20technical%20review">Request a bounded review</a>
+      </div>
+    </section>
+
+    <p class="small">
+      This page is intentionally static so the public review path remains available even when an application gateway is unavailable.
+    </p>
+  </main>
+
+  <footer>
+    <div class="wrap">LumenCore™ · bounded light speed · evidence before claims.</div>
+  </footer>
+</body>
+</html>
