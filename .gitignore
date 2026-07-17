@@ -126,3 +126,6 @@ config/runtime_control.__pre_drift_retest__.json
 
 # High-volume generated odds cache
 sports_data/
+
+# Private founder attestations and portal-only financial facts
+grant_submissions/NASHVILLE_EC_FALL_2026/private/
