@@ -5,15 +5,15 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 ## Gate Summary
 
 - Status: `HUMAN_ACTION_DUE_NO_AUTONOMOUS_SEND`
-- As of UTC: `2026-07-17T14:24:15.111743+00:00`
-- As of local: `2026-07-17T09:24:15.111743-05:00`
+- As of UTC: `2026-07-17T14:53:02.241881+00:00`
+- As of local: `2026-07-17T09:53:02.241881-05:00`
 - Lanes: `12`
 - Verified record hashes: `12`
 - All record hashes valid: `true`
 - Source register hash valid: `true`
 - Nashville live receipt hash valid: `true`
 - Nashville official live source verified: `true`
-- Nashville live receipt age hours: `3.77`
+- Nashville live receipt age hours: `4.25`
 - Immediate human actions: `1`
 - Date-only deadlines: `2`
 - Active follow-up holds: `4`
@@ -21,7 +21,7 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 - Autonomous external send: `false`
 - Autonomous final submit: `false`
 - Session-browser navigation performed: `false`
-- Gate SHA-256: `ef1e77c98a3d21f770fac9cf2883b734e834a4ec820a9d5341dda215a15419cd`
+- Gate SHA-256: `91617ae964c8b8b53c7b42c1a93696f1091c2247634a579771480af083bf73cb`
 
 ## Clocked Queue
 
@@ -57,19 +57,19 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 - Next action: Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, and monitor the single support thread for the exact close time. Do not resend the deadline query or treat it as an application; review the complete preview plus any terms or fee before action-time approval.
 - Response artifact: `grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json`
 - Claim boundary: This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms.
-- Control SHA-256: `daf2876ad77c3e4a5137680c0bd1bcd95c579ddf58826e61511a3afe5332f28d`
+- Control SHA-256: `e8fec358ab703188dbe0ed5ee2aae6c79bbbabca620f34024bac4f8f684a1760`
 - Official live source: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json`
 - Official live source gate: `VERIFIED_CURRENT`
 - Official open signals verified: `true`
 - Official live source fresh: `true`
-- Official live source age hours: `3.77`
+- Official live source age hours: `4.25`
 
 ### Cambridge Systematics
 
 - Lane: `fhwa_tsmo_qualified_partner_outreach`
 - Priority: `P2_MONITOR_NO_DUPLICATE`
-- Source state: `BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING`
-- Source decision: `MONITOR_FOR_PARTNER_RESPONSE_NO_DUPLICATE`
+- Source state: `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING`
+- Source decision: `MONITOR_REFERRED_RESPONSE_LEAD_NO_DUPLICATE`
 - Deadline precision: `TIMESTAMP_WITH_TIMEZONE`
 - Deadline state: `FUTURE_EXACT_DEADLINE`
 - Follow-up hold: `FOLLOW_UP_HOLD_ACTIVE`
@@ -78,10 +78,10 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 - Human fact gate open: `false`
 - Human action required now: `false`
 - Action gate: Do not claim a partner, cite corporate experience, or draft a joint submission unless a reply supplies written role and evidence permission.
-- Next action: Monitor the replacement route for a reply and do not reuse the rejected address. If Cambridge Systematics responds, verify role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule before any teaming or proposal claim.
+- Next action: Monitor the referred response lead for scheduling or a specific question and do not reuse the rejected address. If no response arrives by July 21, send at most one short scheduling follow-up. Before any teaming or proposal claim, verify written role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule.
 - Response artifact: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json`
-- Claim boundary: The Gmail records prove that the first route was rejected and that one replacement message was transmitted to a current official company route. A SENT label and the absence of an immediate rejection do not establish delivery or receipt. Nothing here establishes interest, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.
-- Control SHA-256: `8158961f084628e2560ffd86f12b7fdac07044b89c28f35bfcbaf4497d5b62cc`
+- Claim boundary: The Gmail records prove that the first route was rejected, the replacement message received a substantive reply, the request was referred to the subject matter expert leading this response, and one bounded acknowledgment was sent in that thread. The referral does not establish pursuit, a fit-check commitment, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.
+- Control SHA-256: `9a873757361ca7926c83aa453e2a1daed60d560833db8102f605983f77d04240`
 
 ### Centers for Disease Control and Prevention
 
@@ -100,7 +100,7 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 - Next action: Preserve the acknowledgment and monitor the existing thread; do not resend the response.
 - Response artifact: `grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - Claim boundary: The Gmail SENT record and CDC acknowledgment prove transmission and receipt only. They do not establish evaluation, selection, technical validation, endorsement, award, deployment, a pilot, or contract performance.
-- Control SHA-256: `b5dd5d1bbf6bd9c30e4174efcf72940fd3f5c91bf6cd238eb0e52b12da375d86`
+- Control SHA-256: `8de93890acf8b52a7bf441135e353e50cf5861075bdf6380303d7859f356a00c`
 
 ### EPRI Open Power AI Consortium
 
@@ -195,7 +195,7 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 - Next action: Retain the SENT receipt and attachment hash; do not resend before the deadline.
 - Response artifact: `grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json`
 - Claim boundary: Transmission does not establish agency acceptance, evaluation, validation, an award, or a contract.
-- Control SHA-256: `3e75453b447560d9043d5932e7ae6fd39047bedd70203a4b4206c578c8863d20`
+- Control SHA-256: `95cab1b27a76a6106fee6cf36dcd180fd3249a27e3b2e95500e6f9b1b83ebc83`
 
 ### SAM.gov account credential control
 
@@ -271,14 +271,14 @@ The Nashville EC application is the only immediate human-fact action. A fresh, h
 - Next action: Keep the portal staged. After founder facts and assumptions are confirmed, attach the hash-verified deck and financial model, inspect the final rendered application, and obtain action-time approval before submitting by August 13 at 11:59 PM CDT.
 - Response artifact: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json`
 - Claim boundary: This is an application-preparation artifact. It does not claim a paying customer, booked revenue, signed pilot, external or field validation, partnership, endorsement, award, realized savings, product-market fit, investment, competition selection, or permission to submit without a founder-reviewed final preview.
-- Control SHA-256: `f2cf44c04d0cd07e61410ed265bcab6fc43dc2caa0bb199da3193504e6ab9633`
+- Control SHA-256: `05ecce9a42b64bb6029f40da6b7ae20513a9a5e2b75fe7677dfadc70481de377`
 
 ## Source Integrity
 
 - Path: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json`
-- Bytes: `32416`
-- File SHA-256: `0fe02c3485cf8244ceb72dc609628e5de3c5ebbff4b94b22faa3aed3e14a7d46`
-- Embedded register SHA-256: `57e7c370aa82a7dee2bb9295ff2b38f08068328810e8fdbc20d954aa746c7b8a`
+- Bytes: `32797`
+- File SHA-256: `52912964fed3e4da5a0fe695fc3454f086657e5fc9499f5d0c785971ae936493`
+- Embedded register SHA-256: `58b6ef43f8c948b7eb49b3facd215bcbccae5f6074ad70fd32bf4a8d810edda2`
 - Nashville live receipt path: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_LIVE_DEADLINE_RECEIPT_2026-07-17.json`
 - Nashville live receipt bytes: `5108`
 - Nashville live receipt file SHA-256: `28436aafc9e0b8ea1149c81bb0ee57aa827e6a3bf321f2687bf0d124f298d8c9`

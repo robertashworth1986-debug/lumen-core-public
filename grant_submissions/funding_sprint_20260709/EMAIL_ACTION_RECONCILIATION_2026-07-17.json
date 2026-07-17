@@ -90,19 +90,23 @@
       "state": "OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY"
     },
     {
-      "confirmed_delivery_count": 0,
+      "confirmed_delivery_count": 1,
       "delivery_failure_count": 1,
       "do_not_duplicate_send": true,
       "email_reply_required": false,
+      "fit_check_confirmed_count": 0,
+      "inbound_response_count": 1,
       "lane_id": "fhwa_tsmo_qualified_partner_outreach",
-      "latest_event_type": "BOUNCE_RECONCILED_REPLACEMENT_OUTREACH_SENT",
-      "latest_event_utc": "2026-07-17T12:35:16Z",
-      "next_action": "Monitor the replacement route; do not reuse the rejected address, resend, or claim a partner. Written role and corporate-experience permission are required before proposal use.",
-      "no_send_before": "2026-07-23",
+      "latest_event_type": "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED",
+      "latest_event_utc": "2026-07-17T14:41:54Z",
+      "next_action": "Monitor the referred response lead for scheduling or a specific question. If no reply arrives by July 21, send at most one short scheduling follow-up. Do not claim a partner or use corporate experience without written permission.",
+      "no_send_before": "2026-07-21",
       "organization": "Cambridge Systematics",
+      "qualified_response_lead_referral_count": 1,
       "replacement_send_count": 1,
       "send_now": false,
-      "state": "REPLACEMENT_OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+      "state": "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING",
+      "threaded_acknowledgment_send_count": 1
     },
     {
       "email_reply_required": false,
@@ -159,7 +163,7 @@
     "Nashville EC Fall 2026 TakeOff deadline-support query",
     "CDC, NASA, Army, LvlUp, Terry Anderton, and Vynetic"
   ],
-  "status": "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION",
+  "status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
   "summary": {
     "duplicate_outbound_risk_count": 3,
     "email_reply_required_count": 0,

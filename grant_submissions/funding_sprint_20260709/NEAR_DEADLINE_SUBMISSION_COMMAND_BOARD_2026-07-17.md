@@ -2,7 +2,7 @@
 
 This is the action board for getting the closest credible grants and federal contract responses fully staged.
 
-Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action. Finish the July 17 Nashville EC TakeOff application, then stage the hash-verified MissionWeave DSIP package for its July 22 noon Eastern close. Keep NSF at the rolling Project Pitch gate, monitor the single active FHWA replacement outreach after one rejected route without claiming delivery or a partner, and keep DOJ/BOP partner-only.
+Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action. Finish the July 17 Nashville EC TakeOff application, then stage the hash-verified MissionWeave DSIP package for its July 22 noon Eastern close. Keep NSF at the rolling Project Pitch gate, monitor the referred FHWA response lead after the bounded acknowledgment without claiming a fit check or partner, and keep DOJ/BOP partner-only.
 
 ## Control Line
 
@@ -20,13 +20,13 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Closest deadline lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Closest stage-ready lane: NASHVILLE-EC-FALL-2026 Nashville Entrepreneur Center Fall 2026 Accelerators, due Applications close July 17, 2026; the official page does not list a closing time; command STAGE_APPLICATION; fit STRONG_TAKEOFF_MVP_AND_CUSTOMER_VALIDATION_FIT.
 - Best grants lane: DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. The hidden sectioned collector can capture DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate, and the public action gate stays 0/50 until actual portal facts are supported. NSF 26-510 stays the next rolling Project Pitch route.
-- Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: the first listed contact route rejected delivery and one current official replacement route was contacted July 17. Delivery and partnership remain unconfirmed; no solo bid and no partner claim unless written corporate-experience evidence arrives.
+- Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: the first listed contact route rejected delivery, the replacement route replied, and the request was referred to the subject matter expert leading this response. The fit check and partnership remain unconfirmed; no solo bid and no partner claim unless written role and corporate-experience evidence arrive.
 - Fastest low-friction lane: The Nashville EC TakeOff application is the nearest low-friction reviewer route. Its hidden-input gate is 0/15: six founder prompts produce 11 private portal answers, then preview, fee/terms, and action-time authorization remain human-gated. The verified support email only asks for the close time and does not replace portal submission.
 - Final submit without human: `false`
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `923b215a6e002bb07e634ae9fa01515ee2ac9b751ac7c55b275c893ad704eb16`
+- Command board SHA-256: `a16b3011e4dc7f2924a2232412a153fb9bb2c6e005d796db8818e526a0d4ac44`
 
 ## Operational Controls
 
@@ -168,7 +168,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 
 - Command: `NO_SOLO_SUBMIT_PARTNER_ONLY`
 - Deadline date: `2026-08-03`
-- Eligibility: `REPLACEMENT_TARGET_CONTACTED_PARTNER_CONFIRMATION_PENDING`
+- Eligibility: `QUALIFIED_RESPONSE_LEAD_REFERRED_PARTNER_CONFIRMATION_PENDING`
 - Fit: `STRONG_TECHNICAL_FIT_MANDATORY_CORPORATE_EXPERIENCE_MISSING`
 - Official URL: https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view
 
@@ -439,15 +439,15 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - Days to close from scan date: `17`
 - Deadline bucket: `thirty_day_sprint`
 - Command: `NO_SOLO_SUBMIT_PARTNER_ONLY`
-- Eligibility: `REPLACEMENT_TARGET_CONTACTED_PARTNER_CONFIRMATION_PENDING`
+- Eligibility: `QUALIFIED_RESPONSE_LEAD_REFERRED_PARTNER_CONFIRMATION_PENDING`
 - Fit: `STRONG_TECHNICAL_FIT_MANDATORY_CORPORATE_EXPERIENCE_MISSING`
 - Route: SAM.gov / official solicitation instructions
 - Official URL: https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view
-- Why now: LumenCore has a strong bounded technical fit, but the solicitation requires documented corporate TSMO data-processing experience that LumenCore cannot claim. The first official listed route rejected delivery; one current official replacement route was contacted on July 17. Contact is not a partner.
+- Why now: LumenCore has a strong bounded technical fit, but the solicitation requires documented corporate TSMO data-processing experience that LumenCore cannot claim. The first official listed route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response. A referral is not a partner commitment.
 - Today work:
-  - Monitor the single active replacement outreach for a response.
-  - Do not reuse the rejected address or send a duplicate follow-up before July 23, and do not claim a partner.
-  - If a response arrives, verify role, references, conflicts, facilities, data rights, and permission to cite corporate experience.
+  - Monitor the referred response lead for scheduling or a specific question.
+  - Do not reuse the rejected address or send a duplicate scheduling follow-up before July 21, and do not claim a partner.
+  - If a fit check is scheduled, verify role, references, conflicts, facilities, data rights, and permission to cite corporate experience.
 - Human gate:
   - A qualified organization confirms a role and documentable corporate experience in writing.
   - Robert approves any teaming terms, Phase I claims, and final submission preview.
@@ -461,7 +461,7 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
   - `FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `c4ec19533764277dbd6d61d598d7c4b1e65aba424a36604e521f07f3996c05d8`
+- Lane SHA-256: `86ea6423326e553204f913bcad1708264f2d145d7b45bef390bafc99bd88ffcb`
 
 ### 8. 26-510 - NSF Small Business Innovation Research / Small Business Technology Transfer Programs Phase I
 
@@ -801,9 +801,9 @@ Direct answer: NASA, Army, and CDC are sent and receipt-backed. SAM.gov public c
 - `launchtn_3686_application_manifest`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json` present=`true` sha256=`16fe4e214430055532f6fb7f57453e0f47daa648ee3e3b92b6050e17c98e3dc8`
 - `launchtn_3686_pitch_deck`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx` present=`true` sha256=`c607e94d8e072ec9d9f93da0d8c372fd5592b01d2ca3b4f71c0a079417c18a69`
 - `launchtn_3686_financial_model`: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx` present=`true` sha256=`9da46f8ad94fc53ef561ee33dcfa6df907897caeadf6afbd08fb113fc6887d94`
-- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`0fe02c3485cf8244ceb72dc609628e5de3c5ebbff4b94b22faa3aed3e14a7d46`
-- `fhwa_partner_outreach_control`: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json` present=`true` sha256=`48ff057e779c31004b9958cdd4b95f0ed3d84a01009c57b06207989d610ed1a3`
-- `fhwa_partner_response_control`: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md` present=`true` sha256=`75768f91d3288dbb59b8198deb485453946354297c8f7c4eaac4d1092ceaf96a`
+- `external_engagement_response_register`: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json` present=`true` sha256=`52912964fed3e4da5a0fe695fc3454f086657e5fc9499f5d0c785971ae936493`
+- `fhwa_partner_outreach_control`: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json` present=`true` sha256=`4437ebf6fc23025719911746c8c46bd929979d4678bb7c67eeff9644113b085e`
+- `fhwa_partner_response_control`: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md` present=`true` sha256=`b5650281c5a3a5eeb034d0927a3c4125fcb7fd9b163d82ecb4af5aa8e6b59c7c`
 - `erdc_solution_brief_compliance_gate`: `grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json` present=`true` sha256=`dabaed4298b650855256e4054daf1be806f329846e1cd22cd01fd6f9d6f402cf`
 - `erdc_phase2_rom_gate`: `grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json` present=`true` sha256=`03f656866d63c1c74838ee36bef78eb5a8cf382fee2820d4afb2c324404b7574`
 - `erdc_phase2_rom_workflow`: `grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-17.md` present=`true` sha256=`002711f265d15b0e6435d401aac54c29ae831406279f339dbee165209ffd3888`

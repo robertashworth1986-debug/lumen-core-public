@@ -120,20 +120,24 @@ def build_payload() -> dict[str, Any]:
         {
             "lane_id": "fhwa_tsmo_qualified_partner_outreach",
             "organization": "Cambridge Systematics",
-            "latest_event_type": "BOUNCE_RECONCILED_REPLACEMENT_OUTREACH_SENT",
-            "latest_event_utc": "2026-07-17T12:35:16Z",
-            "state": "REPLACEMENT_OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING",
+            "latest_event_type": "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED",
+            "latest_event_utc": "2026-07-17T14:41:54Z",
+            "state": "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING",
             "delivery_failure_count": 1,
             "replacement_send_count": 1,
-            "confirmed_delivery_count": 0,
+            "confirmed_delivery_count": 1,
+            "inbound_response_count": 1,
+            "qualified_response_lead_referral_count": 1,
+            "threaded_acknowledgment_send_count": 1,
+            "fit_check_confirmed_count": 0,
             "email_reply_required": False,
             "send_now": False,
-            "no_send_before": "2026-07-23",
+            "no_send_before": "2026-07-21",
             "do_not_duplicate_send": True,
             "next_action": (
-                "Monitor the replacement route; do not reuse the rejected address, resend, "
-                "or claim a partner. Written role and corporate-experience permission are "
-                "required before proposal use."
+                "Monitor the referred response lead for scheduling or a specific question. "
+                "If no reply arrives by July 21, send at most one short scheduling follow-up. "
+                "Do not claim a partner or use corporate experience without written permission."
             ),
         },
         {
@@ -190,7 +194,7 @@ def build_payload() -> dict[str, Any]:
     return {
         "schema": "lumencore.email_action_reconciliation.v1",
         "as_of_date": AS_OF_DATE,
-        "status": "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION",
+        "status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
         "evidence_method": (
             "Connected Gmail metadata and relevant-thread reconciliation against sent "
             "receipts and the canonical response register."
@@ -251,9 +255,14 @@ def validate_payload(payload: dict[str, Any]) -> None:
     )
     if (
         fhwa["state"]
-        != "REPLACEMENT_OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+        != "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
         or fhwa["delivery_failure_count"] != 1
         or fhwa["replacement_send_count"] != 1
+        or fhwa["confirmed_delivery_count"] != 1
+        or fhwa["inbound_response_count"] != 1
+        or fhwa["qualified_response_lead_referral_count"] != 1
+        or fhwa["threaded_acknowledgment_send_count"] != 1
+        or fhwa["fit_check_confirmed_count"] != 0
         or fhwa["do_not_duplicate_send"] is not True
     ):
         raise ValueError("FHWA bounce/replacement reconciliation is incomplete")

@@ -160,11 +160,15 @@ def build_gate() -> dict[str, Any]:
         fhwa_outreach.get("schema")
         == "lumencore.fhwa_tsmo_partner_outreach_control.v2"
         and fhwa_outreach.get("status")
-        == "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING"
+        == "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
         and fhwa_outreach.get("response_control", {}).get(
             "qualified_partner_evidence_present"
         )
         is False
+        and fhwa_outreach.get("response_control", {}).get(
+            "qualified_response_lead_referral_present"
+        )
+        is True
     )
 
     lanes = [
@@ -229,7 +233,7 @@ def build_gate() -> dict[str, Any]:
                 "QUALIFIED_PARTNER_EVIDENCE_PRESENT_REVIEW_REQUIRED"
                 if partner_verified
                 else (
-                    "OUTREACH_SENT_NO_GO_UNTIL_PARTNER_CONFIRMATION"
+                    "REFERRED_RESPONSE_LEAD_NO_GO_UNTIL_PARTNER_CONFIRMATION"
                     if qualified_target_contacted
                     else "NO_GO_AS_SOLO_PRIME_UNLESS_QUALIFIED_PARTNER_JOINS"
                 )
@@ -252,6 +256,18 @@ def build_gate() -> dict[str, Any]:
             "replacement_send_count": fhwa_outreach.get(
                 "delivery_reconciliation", {}
             ).get("replacement_send_count", 0),
+            "confirmed_delivery_count": fhwa_outreach.get(
+                "delivery_reconciliation", {}
+            ).get("confirmed_delivery_count", 0),
+            "qualified_response_lead_referral_count": fhwa_outreach.get(
+                "delivery_reconciliation", {}
+            ).get("qualified_response_lead_referral_count", 0),
+            "threaded_acknowledgment_send_count": fhwa_outreach.get(
+                "delivery_reconciliation", {}
+            ).get("threaded_acknowledgment_send_count", 0),
+            "fit_check_confirmed_count": fhwa_outreach.get(
+                "delivery_reconciliation", {}
+            ).get("fit_check_confirmed_count", 0),
             "partner_outreach_control": (
                 rel(FHWA_OUTREACH_CONTROL) if qualified_target_contacted else None
             ),
@@ -275,8 +291,8 @@ def build_gate() -> dict[str, Any]:
             "reason": (
                 "NSF has the smallest truthful completion gap and no fixed Project Pitch "
                 "deadline. ERDC is a credible five-page validation lane but currently has no "
-                "available funding. The first FHWA TSMO contact route rejected delivery; one "
-                "current official replacement route was contacted on July 17, but "
+                "available funding. The first FHWA TSMO contact route rejected delivery; the "
+                "replacement route replied and referred the request to its response lead, but "
                 "FHWA remains noncompliant as a solo prime unless written partner evidence "
                 "supplies the mandatory corporate experience."
             ),
@@ -331,7 +347,7 @@ def render_markdown(gate: dict[str, Any]) -> str:
         "",
         "1. **NSF Project Pitch** - stage first after checking the duplicate-pitch/open-invitation gate in the portal.",
         "2. **ERDC Sovereign Defense Cloud** - build the compliant five-page solution brief as a validation and relationship lane; the notice says funding is not currently available.",
-        "3. **FHWA TSMO** - the first listed contact route rejected delivery and one current official replacement outreach was sent July 17; do not submit as a solo prime unless written partner evidence supplies the mandatory corporate-experience requirement.",
+        "3. **FHWA TSMO** - the first listed contact route rejected delivery; the replacement route replied, referred the request to its response lead, and received a bounded acknowledgment. Do not submit as a solo prime unless written partner evidence supplies the mandatory corporate-experience requirement.",
         "",
         gate["decision"]["reason"],
         "",

@@ -28,8 +28,16 @@ def test_gate_ranks_truthful_direct_fit_before_partner_dependent_bid():
     assert lanes["FHWA TSMO Data Initiative"]["qualified_target_contacted"] is True
     assert lanes["FHWA TSMO Data Initiative"]["delivery_failure_count"] == 1
     assert lanes["FHWA TSMO Data Initiative"]["replacement_send_count"] == 1
+    assert lanes["FHWA TSMO Data Initiative"]["confirmed_delivery_count"] == 1
+    assert lanes["FHWA TSMO Data Initiative"][
+        "qualified_response_lead_referral_count"
+    ] == 1
+    assert lanes["FHWA TSMO Data Initiative"][
+        "threaded_acknowledgment_send_count"
+    ] == 1
+    assert lanes["FHWA TSMO Data Initiative"]["fit_check_confirmed_count"] == 0
     assert lanes["FHWA TSMO Data Initiative"]["posture"] == (
-        "OUTREACH_SENT_NO_GO_UNTIL_PARTNER_CONFIRMATION"
+        "REFERRED_RESPONSE_LEAD_NO_GO_UNTIL_PARTNER_CONFIRMATION"
     )
     assert lanes["FHWA TSMO Data Initiative"]["partner_outreach_control"].endswith(
         "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json"

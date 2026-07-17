@@ -35,7 +35,7 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert payload["summary"]["monitor_only_count"] == 8
     assert payload["summary"]["do_not_duplicate_send_count"] == 11
     assert payload["summary"]["email_action_reconciliation_status"] == (
-        "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION"
+        "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
     )
     assert payload["summary"]["autonomous_external_send_allowed"] is False
     assert payload["summary"]["autonomous_final_portal_submission_allowed"] is False
@@ -137,17 +137,21 @@ def test_register_routes_current_actions_without_duplicate_sends():
     ]
     fhwa = records["fhwa_tsmo_qualified_partner_outreach"]
     assert fhwa["state"] == (
-        "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING"
+        "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
     )
-    assert fhwa["decision"] == "MONITOR_FOR_PARTNER_RESPONSE_NO_DUPLICATE"
+    assert fhwa["decision"] == "MONITOR_REFERRED_RESPONSE_LEAD_NO_DUPLICATE"
     assert fhwa["qualified_partner_evidence_present"] is False
     assert fhwa["delivery_failure_count"] == 1
     assert fhwa["replacement_send_count"] == 1
-    assert fhwa["confirmed_delivery_count"] == 0
+    assert fhwa["threaded_acknowledgment_send_count"] == 1
+    assert fhwa["confirmed_delivery_count"] == 1
+    assert fhwa["inbound_response_count"] == 1
+    assert fhwa["qualified_response_lead_referral_count"] == 1
+    assert fhwa["fit_check_confirmed_count"] == 0
     assert fhwa["active_route_status"] == (
-        "SENT_NO_IMMEDIATE_REJECTION_RESPONSE_PENDING"
+        "THREADED_REFERRAL_ACKNOWLEDGMENT_SENT_FIT_CHECK_PENDING"
     )
-    assert fhwa["no_send_before"] == "2026-07-23"
+    assert fhwa["no_send_before"] == "2026-07-21"
     assert fhwa["send_now"] is False
     assert fhwa["do_not_duplicate_send"] is True
     assert len(fhwa["message_id_sha256"]) == 64

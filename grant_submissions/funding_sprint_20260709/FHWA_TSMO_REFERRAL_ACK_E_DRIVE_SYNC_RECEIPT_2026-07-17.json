@@ -1,0 +1,249 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "generated_utc": "2026-07-17T15:01:15.8835060Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717",
+  "artifact_count": 26,
+  "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "private_contact_values_mirrored": false,
+  "message_identifiers_stored_only_as_sha256": true,
+  "partnership_claimed": false,
+  "fit_check_confirmed": false,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_FHWA_TSMO_PARTNER_OUTREACH_CONTROL.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/code/ops/BUILD_FHWA_TSMO_PARTNER_OUTREACH_CONTROL.py",
+      "bytes": 22967,
+      "sha256": "57114142C5AE1A6CEA95ABD6A968863B55C823A12268B50E5F9670BD62082E20",
+      "copy_bytes": 22967,
+      "copy_sha256": "57114142C5AE1A6CEA95ABD6A968863B55C823A12268B50E5F9670BD62082E20",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_fhwa_tsmo_partner_outreach_control.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/tests/test_fhwa_tsmo_partner_outreach_control.py",
+      "bytes": 10583,
+      "sha256": "BF4D95FA55F9454B4C5457DC395978A1E389C84BFD85BFFB031FCC4494B6EB0E",
+      "copy_bytes": 10583,
+      "copy_sha256": "BF4D95FA55F9454B4C5457DC395978A1E389C84BFD85BFFB031FCC4494B6EB0E",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json",
+      "bytes": 11976,
+      "sha256": "4437EBF6FC23025719911746C8C46BD929979D4678BB7C67EEFF9644113B085E",
+      "copy_bytes": 11976,
+      "copy_sha256": "4437EBF6FC23025719911746C8C46BD929979D4678BB7C67EEFF9644113B085E",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.md",
+      "bytes": 4933,
+      "sha256": "66C79E68F67B7D8A60F4087C06AF2847625AC947D70517A87C94446EB1014635",
+      "copy_bytes": 4933,
+      "copy_sha256": "66C79E68F67B7D8A60F4087C06AF2847625AC947D70517A87C94446EB1014635",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md",
+      "bytes": 4301,
+      "sha256": "B5650281C5A3A5EEB034D0927A3C4125FCB7FD9B163D82ECB4AF5AA8E6B59C7C",
+      "copy_bytes": 4301,
+      "copy_sha256": "B5650281C5A3A5EEB034D0927A3C4125FCB7FD9B163D82ECB4AF5AA8E6B59C7C",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
+      "bytes": 14493,
+      "sha256": "C638946FDF2BDD1822976A8A03A434D05BBE861922656CE86C862B18660D4158",
+      "copy_bytes": 14493,
+      "copy_sha256": "C638946FDF2BDD1822976A8A03A434D05BBE861922656CE86C862B18660D4158",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_email_action_reconciliation.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/tests/test_email_action_reconciliation.py",
+      "bytes": 3785,
+      "sha256": "65085CB57FB9710EAEF5EE08B6EFBC10BD7919FEC51B3D103C91F328AA1A77D4",
+      "copy_bytes": 3785,
+      "copy_sha256": "65085CB57FB9710EAEF5EE08B6EFBC10BD7919FEC51B3D103C91F328AA1A77D4",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
+      "bytes": 8249,
+      "sha256": "EB876ED9F82EA86927C0E6CE7E13EADF7762B20BC6E6FCB55F613B9B88203178",
+      "copy_bytes": 8249,
+      "copy_sha256": "EB876ED9F82EA86927C0E6CE7E13EADF7762B20BC6E6FCB55F613B9B88203178",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
+      "bytes": 3321,
+      "sha256": "D12563063C62DCA54668B9C39BB841D98F5D13D9E5A28EC4CDA965E4239F24C6",
+      "copy_bytes": 3321,
+      "copy_sha256": "D12563063C62DCA54668B9C39BB841D98F5D13D9E5A28EC4CDA965E4239F24C6",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
+      "bytes": 39627,
+      "sha256": "CDDBCD4DD734EB2D272C8AE1E33D2E32C4672CD2700408B5E4589322C35E780F",
+      "copy_bytes": 39627,
+      "copy_sha256": "CDDBCD4DD734EB2D272C8AE1E33D2E32C4672CD2700408B5E4589322C35E780F",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_external_engagement_response_register.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/tests/test_external_engagement_response_register.py",
+      "bytes": 15675,
+      "sha256": "3125394A04D9F8EDCE9F54840A2137AEC2C19BB28CC72A3592A0BFDFE806AA82",
+      "copy_bytes": 15675,
+      "copy_sha256": "3125394A04D9F8EDCE9F54840A2137AEC2C19BB28CC72A3592A0BFDFE806AA82",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
+      "bytes": 32797,
+      "sha256": "52912964FED3E4DA5A0FE695FC3454F086657E5FC9499F5D0C785971AE936493",
+      "copy_bytes": 32797,
+      "copy_sha256": "52912964FED3E4DA5A0FE695FC3454F086657E5FC9499F5D0C785971AE936493",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
+      "bytes": 23944,
+      "sha256": "52099A405BED80BCA98371A66939EF2C93D94F829EC78D009E49DBE40D53F8C8",
+      "copy_bytes": 23944,
+      "copy_sha256": "52099A405BED80BCA98371A66939EF2C93D94F829EC78D009E49DBE40D53F8C8",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_CLOCK_GATE.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/code/ops/BUILD_EXTERNAL_ENGAGEMENT_CLOCK_GATE.py",
+      "bytes": 22525,
+      "sha256": "3A776BFD54F2C0AC3614BEBB6C31672250F3ED90886B30380D4057F71764ED77",
+      "copy_bytes": 22525,
+      "copy_sha256": "3A776BFD54F2C0AC3614BEBB6C31672250F3ED90886B30380D4057F71764ED77",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_external_engagement_clock_gate.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/tests/test_external_engagement_clock_gate.py",
+      "bytes": 8445,
+      "sha256": "AEA3D4FC5E09CB8C48D46AF0BDBA748683B2C32B75417E6D219C5A58186B7EF9",
+      "copy_bytes": 8445,
+      "copy_sha256": "AEA3D4FC5E09CB8C48D46AF0BDBA748683B2C32B75417E6D219C5A58186B7EF9",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.json",
+      "bytes": 24302,
+      "sha256": "E46F2DCB1159A6E516A2E118B8117C2E3CE2B2620E613136CC68DE0B3F88015C",
+      "copy_bytes": 24302,
+      "copy_sha256": "E46F2DCB1159A6E516A2E118B8117C2E3CE2B2620E613136CC68DE0B3F88015C",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+      "bytes": 20365,
+      "sha256": "7CE86E66029ECAA29FEF5B138840B189A67009C32155D077C1CB32AE22DF4165",
+      "copy_bytes": 20365,
+      "copy_sha256": "7CE86E66029ECAA29FEF5B138840B189A67009C32155D077C1CB32AE22DF4165",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "bytes": 102912,
+      "sha256": "5BFBBB8E94CB84465A0334A08A8A082D7381D8133161E3E30C5718BBC58702A6",
+      "copy_bytes": 102912,
+      "copy_sha256": "5BFBBB8E94CB84465A0334A08A8A082D7381D8133161E3E30C5718BBC58702A6",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_submission_command_board.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/tests/test_near_deadline_submission_command_board.py",
+      "bytes": 23274,
+      "sha256": "4B03D5139AD548DB437C72EF422074AAE0167F2DA8D82FE7CCEE7F62CB91A8BB",
+      "copy_bytes": 23274,
+      "copy_sha256": "4B03D5139AD548DB437C72EF422074AAE0167F2DA8D82FE7CCEE7F62CB91A8BB",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
+      "bytes": 58780,
+      "sha256": "5B0BE3A072C13DE40C051D16A3BBD9AED198DEBE3AE29C2CF8B0939A5099E5DF",
+      "copy_bytes": 58780,
+      "copy_sha256": "5B0BE3A072C13DE40C051D16A3BBD9AED198DEBE3AE29C2CF8B0939A5099E5DF",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py",
+      "bytes": 21774,
+      "sha256": "0CBED518BB51370C33705C7BB5AB75A6B44B96731065909FE5A6A21DC09630F1",
+      "copy_bytes": 21774,
+      "copy_sha256": "0CBED518BB51370C33705C7BB5AB75A6B44B96731065909FE5A6A21DC09630F1",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_live_funding_portal_handoff.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/tests/test_live_funding_portal_handoff.py",
+      "bytes": 8146,
+      "sha256": "21CEACBDD80E7204B341EDC63699025751DB197E924974985581329350F183F3",
+      "copy_bytes": 8146,
+      "copy_sha256": "21CEACBDD80E7204B341EDC63699025751DB197E924974985581329350F183F3",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+      "bytes": 11332,
+      "sha256": "81E3DC8499A5614E59346D6308F9A92CACCBF3CECBD64771D9C441C6340D5971",
+      "copy_bytes": 11332,
+      "copy_sha256": "81E3DC8499A5614E59346D6308F9A92CACCBF3CECBD64771D9C441C6340D5971",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_PACKAGE_DECISION_GATE.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/code/ops/BUILD_NEAR_DEADLINE_PACKAGE_DECISION_GATE.py",
+      "bytes": 19130,
+      "sha256": "F4611DB042332FB066379AF3D70F09F542AEA078D4812CB0971162D48B2CC008",
+      "copy_bytes": 19130,
+      "copy_sha256": "F4611DB042332FB066379AF3D70F09F542AEA078D4812CB0971162D48B2CC008",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_package_decision_gate.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/tests/test_near_deadline_package_decision_gate.py",
+      "bytes": 4269,
+      "sha256": "9DC3530FC40B0E22B7B3A65775EC3C7E31905D4075A7238E3C550E5C4DC639B8",
+      "copy_bytes": 4269,
+      "copy_sha256": "9DC3530FC40B0E22B7B3A65775EC3C7E31905D4075A7238E3C550E5C4DC639B8",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-16.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/FHWA_TSMO_REFERRAL_ACK_20260717/grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-16.md",
+      "bytes": 3130,
+      "sha256": "B47C57F6AA2847307D4EDCA96938B993B601EAD4296E94509F03459539D8375D",
+      "copy_bytes": 3130,
+      "copy_sha256": "B47C57F6AA2847307D4EDCA96938B993B601EAD4296E94509F03459539D8375D",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves byte-for-byte mirroring of the listed public-safe FHWA referral, acknowledgment, deadline-control, and reviewer-handoff artifacts only. It proves that the recorded Gmail thread was reconciled into bounded public controls; it does not independently prove the underlying email contents, a scheduled fit check, pursuit, a teaming relationship, permission to cite corporate experience, proposal compliance, submission, award, funding, deployment, validation, or technical performance."
+}

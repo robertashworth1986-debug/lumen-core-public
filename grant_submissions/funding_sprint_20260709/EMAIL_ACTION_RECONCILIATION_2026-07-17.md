@@ -2,7 +2,7 @@
 
 As of: 2026-07-17
 
-Status: `NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION`
+Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
 
 ## Control Line
 
@@ -24,7 +24,7 @@ Status: `NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION`
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `false` | Monitor for a CDC clarification, replacement request, or scheduling message; do not resend the response. |
 | LvlUp Ventures / Power of the Pitch Week | `OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND` | `false` | No reply or purchase; reconsider only if a relevant no-fee route or written non-pay-to-play selection terms arrive. |
 | Terry Anderton / Vynetic | `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY` | `false` | Send nothing further unless Terry replies with a specific ask; then answer only that ask in the existing thread. |
-| Cambridge Systematics | `REPLACEMENT_OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING` | `false` | Monitor the replacement route; do not reuse the rejected address, resend, or claim a partner. Written role and corporate-experience permission are required before proposal use. |
+| Cambridge Systematics | `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING` | `false` | Monitor the referred response lead for scheduling or a specific question. If no reply arrives by July 21, send at most one short scheduling follow-up. Do not claim a partner or use corporate experience without written permission. |
 | U.S. National Science Foundation | `NO_OFFICIAL_PROJECT_PITCH_INVITATION_VERIFIED` | `false` | Use the rolling Project Pitch portal route; do not represent the July 27 full-proposal deadline as reachable without an invitation. |
 | NASA | `SENT_VERIFIED_RESPONSE_PENDING` | `false` | Monitor for an agency clarification or replacement request. |
 | U.S. Army | `SENT_VERIFIED_RESPONSE_PENDING` | `false` | Monitor for agency feedback; do not duplicate-send. |

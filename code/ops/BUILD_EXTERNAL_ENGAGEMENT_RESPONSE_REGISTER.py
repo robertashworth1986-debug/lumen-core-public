@@ -256,10 +256,12 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         fhwa_outreach.get("schema")
         != "lumencore.fhwa_tsmo_partner_outreach_control.v2"
         or fhwa_outreach.get("status")
-        != "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING"
+        != "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
     ):
         raise ValueError("FHWA partner outreach control is missing or stale")
-    if email_reconciliation.get("status") != "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION":
+    if email_reconciliation.get("status") != (
+        "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
+    ):
         raise ValueError("Email action reconciliation requires a fresh action review")
     reconciliation_lanes = {
         row["lane_id"]: row for row in email_reconciliation.get("lanes", [])
@@ -268,6 +270,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "nashville_ec_takeoff_fall_2026",
         "epri_open_power_ai_mou",
         "terry_vynetic_followup",
+        "fhwa_tsmo_qualified_partner_outreach",
     } - reconciliation_lanes.keys():
         raise ValueError("Email action reconciliation is missing required lane controls")
     fhwa_delivery = fhwa_outreach["delivery_reconciliation"]
@@ -279,8 +282,13 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     if (
         fhwa_delivery["delivery_failure_count"] != 1
         or fhwa_delivery["replacement_send_count"] != 1
+        or fhwa_delivery["threaded_acknowledgment_send_count"] != 1
+        or fhwa_delivery["confirmed_delivery_count"] != 1
+        or fhwa_delivery["response_count"] != 1
+        or fhwa_delivery["qualified_response_lead_referral_count"] != 1
+        or fhwa_delivery["fit_check_confirmed_count"] != 0
         or fhwa_active_outbound["status"]
-        != "SENT_NO_IMMEDIATE_REJECTION_RESPONSE_PENDING"
+        != "THREADED_REFERRAL_ACKNOWLEDGMENT_SENT_FIT_CHECK_PENDING"
     ):
         raise ValueError("FHWA delivery reconciliation is incomplete")
 
@@ -490,7 +498,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "organization": fhwa_outreach["target"]["organization"],
             "state": fhwa_outreach["status"],
             "deadline": fhwa_outreach["opportunity"]["phase_i_deadline"],
-            "decision": "MONITOR_FOR_PARTNER_RESPONSE_NO_DUPLICATE",
+            "decision": "MONITOR_REFERRED_RESPONSE_LEAD_NO_DUPLICATE",
             "response_channel": "EMAIL",
             "response_ready": False,
             "send_now": False,
@@ -511,7 +519,17 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "message_id_sha256": fhwa_active_outbound["message_id_sha256"],
             "delivery_failure_count": fhwa_delivery["delivery_failure_count"],
             "replacement_send_count": fhwa_delivery["replacement_send_count"],
+            "threaded_acknowledgment_send_count": fhwa_delivery[
+                "threaded_acknowledgment_send_count"
+            ],
             "confirmed_delivery_count": fhwa_delivery["confirmed_delivery_count"],
+            "inbound_response_count": fhwa_delivery["response_count"],
+            "qualified_response_lead_referral_count": fhwa_delivery[
+                "qualified_response_lead_referral_count"
+            ],
+            "fit_check_confirmed_count": fhwa_delivery[
+                "fit_check_confirmed_count"
+            ],
             "active_route_status": fhwa_active_outbound["status"],
             "qualified_partner_evidence_present": fhwa_outreach[
                 "response_control"
@@ -582,7 +600,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "as_of_date": "2026-07-17",
         "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
         "direct_answer": (
-            "The bounded Nashville EC deadline-support query and corrected FHWA partner-fit routing request were sent and must not be duplicated. The first FHWA route rejected delivery; one current official replacement route is now pending without a delivery or partner claim. "
+            "The bounded Nashville EC deadline-support query and FHWA response-lead acknowledgment were sent and must not be duplicated. The first FHWA route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response, but no fit check or partner is confirmed. "
             "The Nashville message is not an application, so continue its founder-fact gate and final portal workflow while monitoring for the exact close time. "
             "No additional email should be sent now. "
             "Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for "

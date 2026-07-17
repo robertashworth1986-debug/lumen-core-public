@@ -547,11 +547,15 @@ def build_command_lanes(
         fhwa_outreach.get("schema")
         == "lumencore.fhwa_tsmo_partner_outreach_control.v2"
         and fhwa_outreach.get("status")
-        == "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING"
+        == "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
         and fhwa_outreach.get("response_control", {}).get(
             "qualified_partner_evidence_present"
         )
         is False
+        and fhwa_outreach.get("response_control", {}).get(
+            "qualified_response_lead_referral_present"
+        )
+        is True
     )
     erdc_solution_gate = read_json(ERDC_SOLUTION_BRIEF_GATE)
     if erdc_solution_gate.get("schema") != (
@@ -952,7 +956,7 @@ def build_command_lanes(
             "deadline_date": "2026-08-03",
             "command": "NO_SOLO_SUBMIT_PARTNER_ONLY",
             "eligibility_state": (
-                "REPLACEMENT_TARGET_CONTACTED_PARTNER_CONFIRMATION_PENDING"
+                "QUALIFIED_RESPONSE_LEAD_REFERRED_PARTNER_CONFIRMATION_PENDING"
                 if fhwa_target_contacted
                 else "MANDATORY_CORPORATE_EXPERIENCE_PARTNER_REQUIRED"
             ),
@@ -976,13 +980,14 @@ def build_command_lanes(
             "why_now": (
                 "LumenCore has a strong bounded technical fit, but the solicitation requires "
                 "documented corporate TSMO data-processing experience that LumenCore cannot "
-                "claim. The first official listed route rejected delivery; one current official "
-                "replacement route was contacted on July 17. Contact is not a partner."
+                "claim. The first official listed route rejected delivery; the replacement route "
+                "replied and referred the request to the subject matter expert leading this "
+                "response. A referral is not a partner commitment."
             ),
             "today_work": [
-                "Monitor the single active replacement outreach for a response.",
-                "Do not reuse the rejected address or send a duplicate follow-up before July 23, and do not claim a partner.",
-                "If a response arrives, verify role, references, conflicts, facilities, data rights, and permission to cite corporate experience.",
+                "Monitor the referred response lead for scheduling or a specific question.",
+                "Do not reuse the rejected address or send a duplicate scheduling follow-up before July 21, and do not claim a partner.",
+                "If a fit check is scheduled, verify role, references, conflicts, facilities, data rights, and permission to cite corporate experience.",
             ],
             "human_gate": [
                 "A qualified organization confirms a role and documentable corporate experience in writing.",
@@ -1000,6 +1005,18 @@ def build_command_lanes(
             "partner_outreach_confirmed_delivery_count": fhwa_outreach.get(
                 "delivery_reconciliation", {}
             ).get("confirmed_delivery_count", 0),
+            "partner_outreach_inbound_response_count": fhwa_outreach.get(
+                "delivery_reconciliation", {}
+            ).get("response_count", 0),
+            "partner_outreach_referral_count": fhwa_outreach.get(
+                "delivery_reconciliation", {}
+            ).get("qualified_response_lead_referral_count", 0),
+            "partner_outreach_acknowledgment_send_count": fhwa_outreach.get(
+                "delivery_reconciliation", {}
+            ).get("threaded_acknowledgment_send_count", 0),
+            "partner_outreach_fit_check_confirmed_count": fhwa_outreach.get(
+                "delivery_reconciliation", {}
+            ).get("fit_check_confirmed_count", 0),
             "qualified_partner_evidence_present": False,
             "no_follow_up_before": (
                 fhwa_outreach.get("response_control", {}).get("no_follow_up_before")
@@ -1556,7 +1573,7 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
             "best_grants_lane": "DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. The hidden sectioned collector can capture DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate, and the public action gate stays 0/50 until actual portal facts are supported. NSF 26-510 stays the next rolling Project Pitch route.",
-            "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: the first listed contact route rejected delivery and one current official replacement route was contacted July 17. Delivery and partnership remain unconfirmed; no solo bid and no partner claim unless written corporate-experience evidence arrives.",
+            "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative, due 2026-08-03: the first listed contact route rejected delivery, the replacement route replied, and the request was referred to the subject matter expert leading this response. The fit check and partnership remain unconfirmed; no solo bid and no partner claim unless written role and corporate-experience evidence arrive.",
             "fastest_low_friction_lane": "The Nashville EC TakeOff application is the nearest low-friction reviewer route. Its hidden-input gate is 0/15: six founder prompts produce 11 private portal answers, then preview, fee/terms, and action-time authorization remain human-gated. The verified support email only asks for the close time and does not replace portal submission.",
             "all_final_actions_blocked_without_human": True,
             "external_send_allowed_without_human": False,
@@ -1693,7 +1710,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        f"Direct answer: NASA, Army, and CDC are sent and receipt-backed. {summary['critical_same_day_infrastructure_action']} Finish the July 17 Nashville EC TakeOff application, then stage the hash-verified MissionWeave DSIP package for its July 22 noon Eastern close. Keep NSF at the rolling Project Pitch gate, monitor the single active FHWA replacement outreach after one rejected route without claiming delivery or a partner, and keep DOJ/BOP partner-only.",
+        f"Direct answer: NASA, Army, and CDC are sent and receipt-backed. {summary['critical_same_day_infrastructure_action']} Finish the July 17 Nashville EC TakeOff application, then stage the hash-verified MissionWeave DSIP package for its July 22 noon Eastern close. Keep NSF at the rolling Project Pitch gate, monitor the referred FHWA response lead after the bounded acknowledgment without claiming a fit check or partner, and keep DOJ/BOP partner-only.",
         "",
         "## Control Line",
         "",

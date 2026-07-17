@@ -10,8 +10,8 @@ This handoff is generated from the authoritative near-deadline command board. It
 - Navigation before resume signal: `false`
 - Inspect current page before navigation: `true`
 - First action after resume: Inspect the current URL and visible page without navigating. Continue the current authenticated portal to its next safe preview before switching lanes.
-- Source command-board SHA-256: `a00258d7e8f4772ffafed2439c3a7c78a5ffa6214da3b9ce2ac2bb12fbb0d636`
-- Handoff SHA-256: `1f60c5a542d116898fc68a357312a78e591f128aadc5f89d337daec522d5a8e6`
+- Source command-board SHA-256: `73c51b288a3b91accd75a33cf6bfd2b77fc99d44a205bc666714191eef223699`
+- Handoff SHA-256: `6194ad607aedb22e051fc597d26dc60d1557942c8bed1bc2b65027e27701da9e`
 
 ## Portal Queue
 
@@ -159,7 +159,7 @@ This handoff is generated from the authoritative near-deadline command board. It
 ## Monitor Only
 
 - NASA, Army, and CDC responses are sent and receipt-backed; do not duplicate-send.
-- FHWA has one active replacement outreach pending after the first listed route rejected delivery; do not reuse the rejected address, follow up before the recorded control date, or claim delivery or a partner.
+- FHWA replied to the replacement route and referred the request to the subject matter expert leading its response; the bounded acknowledgment is sent. Monitor for scheduling, do not reuse the rejected address or follow up before the recorded control date, and do not claim a fit check or partner.
 - DOJ/BOP remains partner-only; do not send a solo quote.
 - EPRI administrative onboarding was sent; monitor for a substantive response without claiming membership or endorsement.
 - LANL follow-up was sent; monitor without duplicate transmission.

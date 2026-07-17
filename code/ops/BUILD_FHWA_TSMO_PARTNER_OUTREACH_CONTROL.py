@@ -50,6 +50,25 @@ Best regards,
 Robert Ashworth
 Founder and Chief Scientist, LumenCore"""
 
+REFERRAL_ACK_SUBJECT = (
+    "Re: FHWA TSMO Data Initiative (693JJ326R000012) - teaming fit / routing request"
+)
+REFERRAL_ACK_BODY_PUBLIC = """Susan,
+
+Thank you for the quick routing. The original message was sent to the rejected official-profile route, which Gmail returned as: "the address couldn't be found, or is unable to receive mail." I can provide the delivery-status notice if it would help investigate.
+
+Sogand,
+
+Thank you for considering a brief fit check. LumenCore is interested only in a bounded supporting role if Cambridge Systematics is pursuing FHWA solicitation 693JJ326R000012 and our capabilities fit your response plan.
+
+A 20-30 minute discussion on or before July 23 would be enough to cover role scope, the Phase I corporate-experience boundary, conflicts, data rights, and schedule. Our candidate contribution is limited to data-quality controls, chronological and baseline-locked model benchmarking, uncertainty and abstention gates, reproducible evidence manifests, and API-based prototype evaluation. No confidential or patent-sensitive information is needed for the initial discussion.
+
+Please suggest a time that works for your team and I will do my best to accommodate it. I will not represent Cambridge Systematics as a partner or cite its experience without written agreement and verification.
+
+Best regards,
+Robert Ashworth
+Founder and Chief Scientist, LumenCore"""
+
 ORIGINAL_SENT_UTC = "2026-07-17T10:08:29Z"
 ORIGINAL_FAILURE_UTC = "2026-07-17T10:08:31Z"
 ORIGINAL_MESSAGE_ID_SHA256 = (
@@ -62,6 +81,17 @@ REPLACEMENT_SENT_UTC = "2026-07-17T12:35:16Z"
 REPLACEMENT_MESSAGE_ID_SHA256 = (
     "e39959cf09ccba85deccd2ce2c36a0bf8526e337f5ff6ea2abe1c8c989fe406f"
 )
+REFERRAL_RECEIVED_UTC = "2026-07-17T14:15:28Z"
+REFERRAL_MESSAGE_ID_SHA256 = (
+    "747d1ddbd4c0d64994462b2d7183384eb17c8237c9ddaeca338fef9a6812eb09"
+)
+REFERRAL_ACK_SENT_UTC = "2026-07-17T14:41:54Z"
+REFERRAL_ACK_MESSAGE_ID_SHA256 = (
+    "4dc96cdefa25b4554bf730d002fd4e63f1420feb6fa50f3b9470f89adf1dbe25"
+)
+REFERRAL_ACK_BODY_SHA256 = (
+    "9e704e831cb33f2013cad0b880a1c48539184bc6e1344ef48533b9c6b799ec84"
+)
 
 
 def sha256_text(value: str) -> str:
@@ -72,7 +102,7 @@ def build_payload() -> dict[str, Any]:
     return {
         "schema": "lumencore.fhwa_tsmo_partner_outreach_control.v2",
         "as_of_date": "2026-07-17",
-        "status": "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING",
+        "status": "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING",
         "opportunity": {
             "notice_id": "693JJ326R000012",
             "title": "Transportation Systems Management and Operations Data Initiative",
@@ -86,15 +116,21 @@ def build_payload() -> dict[str, Any]:
             "active_contact_role": (
                 "Principal, VP Federal Market and Transportation Policy"
             ),
+            "response_lead_role": (
+                "Subject matter expert leading Cambridge Systematics' response"
+            ),
             "rejected_contact_role": (
                 "Vice President and FHWA Office of Operations program manager"
             ),
             "recipient_domain": "camsys.com",
             "active_public_professional_route_verified": True,
+            "inbound_referral_verified": True,
+            "private_contact_values_stored_in_public_receipt": False,
             "qualification_basis": [
                 "The current official TRB 2026 company page identifies the active contact as Principal, VP Federal Market and Transportation Policy.",
                 "The official company biography for the rejected route documents deep FHWA TSMO and Office of Operations experience but its listed mailbox returned SMTP 550 Invalid Recipient.",
                 "The replacement message asks only for pursuit status, role fit, or routing and does not claim a partnership.",
+                "The active contact replied and referred the request to the subject matter expert leading this response; the referral does not itself confirm pursuit, teaming, or permission to cite experience.",
             ],
             "official_company_sources": [
                 "https://camsys.com/trb",
@@ -133,7 +169,7 @@ def build_payload() -> dict[str, Any]:
             {
                 "attempt_index": 2,
                 "route_role": "current official federal-market contact",
-                "status": "SENT_NO_IMMEDIATE_REJECTION_RESPONSE_PENDING",
+                "status": "DELIVERED_BY_SUBSTANTIVE_REPLY_REFERRAL_RECEIVED",
                 "sent_utc": REPLACEMENT_SENT_UTC,
                 "failure_utc": None,
                 "smtp_status_code": None,
@@ -145,43 +181,87 @@ def build_payload() -> dict[str, Any]:
                 "body": REPLACEMENT_BODY,
                 "attachment_count": 0,
                 "immediate_delivery_rejection_observed": False,
+                "delivery_confirmed": True,
+            },
+            {
+                "attempt_index": 3,
+                "route_role": "referred response lead and routing contacts",
+                "status": "THREADED_REFERRAL_ACKNOWLEDGMENT_SENT_FIT_CHECK_PENDING",
+                "sent_utc": REFERRAL_ACK_SENT_UTC,
+                "failure_utc": None,
+                "smtp_status_code": None,
+                "gmail_label_observed": "SENT",
+                "message_id_sha256": REFERRAL_ACK_MESSAGE_ID_SHA256,
+                "subject": REFERRAL_ACK_SUBJECT,
+                "subject_sha256": sha256_text(REFERRAL_ACK_SUBJECT),
+                "body_sha256": REFERRAL_ACK_BODY_SHA256,
+                "body_sha256_scope": "EXACT_SENT_BODY_PRIVATE_SOURCE",
+                "body": REFERRAL_ACK_BODY_PUBLIC,
+                "body_public_redaction_applied": True,
+                "attachment_count": 0,
+                "immediate_delivery_rejection_observed": False,
                 "delivery_confirmed": False,
             },
         ],
+        "inbound_history": [
+            {
+                "event_index": 1,
+                "status": "QUALIFIED_RESPONSE_LEAD_REFERRAL_RECEIVED",
+                "received_utc": REFERRAL_RECEIVED_UTC,
+                "message_id_sha256": REFERRAL_MESSAGE_ID_SHA256,
+                "sender_role": "Vice President, Federal Transportation Market and Policy",
+                "referred_lead_role": (
+                    "Subject matter expert leading Cambridge Systematics' response"
+                ),
+                "attachment_count": 0,
+                "original_route_failure_question_received": True,
+                "pursuit_confirmed": False,
+                "partnership_confirmed": False,
+                "permission_to_cite_experience_confirmed": False,
+                "fit_check_confirmed": False,
+            }
+        ],
         "delivery_reconciliation": {
-            "attempt_count": 2,
+            "attempt_count": 3,
             "delivery_failure_count": 1,
             "replacement_send_count": 1,
-            "confirmed_delivery_count": 0,
-            "response_count": 0,
-            "active_attempt_index": 2,
+            "threaded_acknowledgment_send_count": 1,
+            "confirmed_delivery_count": 1,
+            "response_count": 1,
+            "qualified_response_lead_referral_count": 1,
+            "fit_check_confirmed_count": 0,
+            "active_attempt_index": 3,
             "stale_route_reuse_allowed": False,
         },
         "response_control": {
-            "state": "REPLACEMENT_ROUTE_CONTACTED_NOT_CONFIRMED",
+            "state": "QUALIFIED_RESPONSE_LEAD_REFERRED_ACKNOWLEDGMENT_SENT",
             "qualified_partner_evidence_present": False,
+            "qualified_response_lead_referral_present": True,
+            "fit_check_confirmed": False,
             "bid_posture": "NO_GO_AS_SOLO_PRIME_PARTNER_CONFIRMATION_REQUIRED",
             "send_now": False,
             "do_not_duplicate_send": True,
-            "no_follow_up_before": "2026-07-23",
+            "no_follow_up_before": "2026-07-21",
             "next_action": (
-                "Monitor the replacement route for a reply and do not reuse the rejected "
-                "address. If Cambridge Systematics responds, verify role, "
-                "documentable corporate experience, conflicts, references, facilities, "
-                "data rights, and schedule before any teaming or proposal claim."
+                "Monitor the referred response lead for scheduling or a specific question and "
+                "do not reuse the rejected address. If no response arrives by July 21, send at "
+                "most one short scheduling follow-up. Before any teaming or proposal claim, "
+                "verify written role, documentable corporate experience, conflicts, references, "
+                "facilities, data rights, and schedule."
             ),
         },
         "response_templates": {
             "artifact": RESPONSE_OUT.resolve().relative_to(ROOT.resolve()).as_posix(),
-            "branch_count": 6,
+            "branch_count": 7,
             "autonomous_send_allowed": False,
         },
         "claim_boundary": (
-            "The Gmail records prove that the first route was rejected and that one replacement "
-            "message was transmitted to a current official company route. A SENT label and the "
-            "absence of an immediate rejection do not establish delivery or receipt. Nothing here "
-            "establishes interest, a teaming relationship, permission to cite corporate experience, "
-            "independent validation, proposal compliance, submission, award, or funding."
+            "The Gmail records prove that the first route was rejected, the replacement message "
+            "received a substantive reply, the request was referred to the subject matter expert "
+            "leading this response, and one bounded acknowledgment was sent in that thread. The "
+            "referral does not establish pursuit, a fit-check commitment, a teaming relationship, "
+            "permission to cite corporate experience, independent validation, proposal compliance, "
+            "submission, award, or funding."
         ),
     }
 
@@ -219,6 +299,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Replacement sends: `{delivery['replacement_send_count']}`",
             f"- Confirmed deliveries: `{delivery['confirmed_delivery_count']}`",
             f"- Responses: `{delivery['response_count']}`",
+            f"- Qualified response-lead referrals: `{delivery['qualified_response_lead_referral_count']}`",
+            f"- Fit checks confirmed: `{delivery['fit_check_confirmed_count']}`",
             f"- Recipient domain: `{target['recipient_domain']}`",
             "",
         ]
@@ -238,7 +320,17 @@ def render_markdown(payload: dict[str, Any]) -> str:
         )
     lines.extend(
         [
-            "## Active Replacement Message",
+            "## Inbound Referral",
+            "",
+            f"- Status: `{payload['inbound_history'][0]['status']}`",
+            f"- Received UTC: `{payload['inbound_history'][0]['received_utc']}`",
+            f"- Sender role: {payload['inbound_history'][0]['sender_role']}",
+            f"- Referred lead role: {payload['inbound_history'][0]['referred_lead_role']}",
+            f"- Message ID SHA-256: `{payload['inbound_history'][0]['message_id_sha256']}`",
+            f"- Partnership confirmed: `{str(payload['inbound_history'][0]['partnership_confirmed']).lower()}`",
+            f"- Fit check confirmed: `{str(payload['inbound_history'][0]['fit_check_confirmed']).lower()}`",
+            "",
+            "## Active Threaded Message",
             "",
             f"Subject: {active['subject']}",
             "",
@@ -279,7 +371,11 @@ Thank you for confirming the right lane. A 20-30 minute fit check would be helpf
 
 ## Referral Provided
 
-Thank you for the referral. I will contact the named colleague once, identify your referral accurately, and keep the request limited to pursuit and role fit. I will not describe Cambridge Systematics or the referred organization as a partner without written agreement.
+Thank you for the referral. Reply once in the existing thread, identify the referral accurately, and keep the request limited to pursuit, role fit, corporate-experience boundaries, conflicts, data rights, and schedule. Do not describe Cambridge Systematics as a partner without written agreement.
+
+## Referred Lead Fit Check Pending
+
+The referral acknowledgment was sent on `{REFERRAL_ACK_SENT_UTC}`. Monitor for a scheduling response or a specific question. Do not send a new capability deck, NDA, pricing, customer information, or patent-sensitive material unless the response lead asks for a bounded item and its disclosure gate passes.
 
 ## More Information Requested
 
@@ -299,9 +395,9 @@ Do not send before: `{no_follow_up_before}`.
 
 Subject: `Follow-up: FHWA TSMO Data Initiative 693JJ326R000012`
 
-Hello Ms. Binder,
+Hello,
 
-I am following up once on the FHWA TSMO Data Initiative routing request below. If Cambridge Systematics is pursuing the opportunity, I would appreciate either a brief fit check or a referral to the appropriate proposal lead. If it is not pursuing, a short decline is enough and I will close the route. I am not representing that a teaming relationship exists.
+I am following up once on the FHWA TSMO Data Initiative fit-check request below. If Cambridge Systematics is pursuing the opportunity, I would appreciate a brief discussion with the response lead. If the team does not see a fit, a short decline is enough and I will close the route. I am not representing that a teaming relationship exists.
 
 Best regards,
 Robert Ashworth
@@ -310,7 +406,7 @@ Founder and Chief Scientist, LumenCore
 ## Stop Conditions
 
 - Do not reuse the rejected address.
-- Do not send more than one follow-up without a substantive inbound reply.
+- Do not send more than one scheduling follow-up after the referral acknowledgment without a new substantive inbound reply.
 - Do not attach confidential, controlled, patent-sensitive, customer, or unverified performance material.
 - Do not accept or sign an NDA, teaming agreement, data-rights term, pricing term, or exclusivity term through this template.
 - Do not claim delivery, receipt, pursuit, partnership, permission to cite experience, submission, award, or validation without written evidence.
@@ -334,7 +430,7 @@ def main() -> int:
         json.dumps(
             {
                 "status": payload["status"],
-                "active_sent_utc": REPLACEMENT_SENT_UTC,
+                "active_sent_utc": REFERRAL_ACK_SENT_UTC,
                 "delivery_failure_count": payload["delivery_reconciliation"][
                     "delivery_failure_count"
                 ],

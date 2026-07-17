@@ -28,7 +28,7 @@ def test_reconciliation_is_deterministic_and_no_send():
 
     module.validate_payload(actual)
     assert actual == expected
-    assert actual["status"] == "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION"
+    assert actual["status"] == "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
     assert actual["summary"]["lane_count"] == 12
     assert actual["summary"]["email_reply_required_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
@@ -53,19 +53,23 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
 
     fhwa = lanes["fhwa_tsmo_qualified_partner_outreach"]
     assert fhwa["latest_event_type"] == (
-        "BOUNCE_RECONCILED_REPLACEMENT_OUTREACH_SENT"
+        "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED"
     )
-    assert fhwa["latest_event_utc"] == "2026-07-17T12:35:16Z"
+    assert fhwa["latest_event_utc"] == "2026-07-17T14:41:54Z"
     assert fhwa["state"] == (
-        "REPLACEMENT_OUTBOUND_SENT_PARTNER_CONFIRMATION_PENDING"
+        "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
     )
     assert fhwa["delivery_failure_count"] == 1
     assert fhwa["replacement_send_count"] == 1
-    assert fhwa["confirmed_delivery_count"] == 0
+    assert fhwa["confirmed_delivery_count"] == 1
+    assert fhwa["inbound_response_count"] == 1
+    assert fhwa["qualified_response_lead_referral_count"] == 1
+    assert fhwa["threaded_acknowledgment_send_count"] == 1
+    assert fhwa["fit_check_confirmed_count"] == 0
     assert fhwa["do_not_duplicate_send"] is True
-    assert fhwa["no_send_before"] == "2026-07-23"
+    assert fhwa["no_send_before"] == "2026-07-21"
     assert fhwa["send_now"] is False
-    assert "do not reuse the rejected address" in fhwa["next_action"]
+    assert "Monitor the referred response lead" in fhwa["next_action"]
 
     nashville = lanes["nashville_ec_takeoff_fall_2026"]
     assert nashville["latest_event_type"] == "DEADLINE_PRESERVATION_QUERY_SENT"

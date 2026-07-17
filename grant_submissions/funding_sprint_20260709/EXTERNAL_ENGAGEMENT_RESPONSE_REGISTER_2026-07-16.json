@@ -67,8 +67,8 @@
     }
   },
   "claim_boundary": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance.",
-  "direct_answer": "The bounded Nashville EC deadline-support query and corrected FHWA partner-fit routing request were sent and must not be duplicated. The first FHWA route rejected delivery; one current official replacement route is now pending without a delivery or partner claim. The Nashville message is not an application, so continue its founder-fact gate and final portal workflow while monitoring for the exact close time. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would reduce credibility.",
-  "generated_utc": "2026-07-17T12:51:36.638002+00:00",
+  "direct_answer": "The bounded Nashville EC deadline-support query and FHWA response-lead acknowledgment were sent and must not be duplicated. The first FHWA route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response, but no fit check or partner is confirmed. The Nashville message is not an application, so continue its founder-fact gate and final portal workflow while monitoring for the exact close time. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would reduce credibility.",
+  "generated_utc": "2026-07-17T14:52:56.043886+00:00",
   "inbox_risk_filters": [
     {
       "decision": "DO_NOT_TREAT_AS_OFFICIAL_SAM_NOTICE",
@@ -282,31 +282,35 @@
     },
     {
       "action_gate": "Do not claim a partner, cite corporate experience, or draft a joint submission unless a reply supplies written role and evidence permission.",
-      "active_route_status": "SENT_NO_IMMEDIATE_REJECTION_RESPONSE_PENDING",
-      "claim_boundary": "The Gmail records prove that the first route was rejected and that one replacement message was transmitted to a current official company route. A SENT label and the absence of an immediate rejection do not establish delivery or receipt. Nothing here establishes interest, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.",
-      "confirmed_delivery_count": 0,
+      "active_route_status": "THREADED_REFERRAL_ACKNOWLEDGMENT_SENT_FIT_CHECK_PENDING",
+      "claim_boundary": "The Gmail records prove that the first route was rejected, the replacement message received a substantive reply, the request was referred to the subject matter expert leading this response, and one bounded acknowledgment was sent in that thread. The referral does not establish pursuit, a fit-check commitment, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.",
+      "confirmed_delivery_count": 1,
       "deadline": "2026-08-03T09:00:00-04:00",
-      "decision": "MONITOR_FOR_PARTNER_RESPONSE_NO_DUPLICATE",
+      "decision": "MONITOR_REFERRED_RESPONSE_LEAD_NO_DUPLICATE",
       "delivery_failure_count": 1,
       "do_not_duplicate_send": true,
+      "fit_check_confirmed_count": 0,
+      "inbound_response_count": 1,
       "lane_id": "fhwa_tsmo_qualified_partner_outreach",
-      "message_id_sha256": "e39959cf09ccba85deccd2ce2c36a0bf8526e337f5ff6ea2abe1c8c989fe406f",
-      "next_action": "Monitor the replacement route for a reply and do not reuse the rejected address. If Cambridge Systematics responds, verify role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule before any teaming or proposal claim.",
-      "no_send_before": "2026-07-23",
+      "message_id_sha256": "4dc96cdefa25b4554bf730d002fd4e63f1420feb6fa50f3b9470f89adf1dbe25",
+      "next_action": "Monitor the referred response lead for scheduling or a specific question and do not reuse the rejected address. If no response arrives by July 21, send at most one short scheduling follow-up. Before any teaming or proposal claim, verify written role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule.",
+      "no_send_before": "2026-07-21",
       "organization": "Cambridge Systematics",
       "qualified_partner_evidence_present": false,
-      "record_sha256": "bd4aeff2db4eb91a0803b289107fa06aab3b9834fbc96e518806347d9481c07c",
+      "qualified_response_lead_referral_count": 1,
+      "record_sha256": "37f7e769c47f17bf85f99b10752fefa0acdc9fcfcb610f05ab4f97ad85e6099c",
       "replacement_send_count": 1,
       "response_artifact": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json",
       "response_channel": "EMAIL",
       "response_ready": false,
       "send_now": false,
-      "state": "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING",
+      "state": "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING",
       "supporting_artifacts": [
         "grant_submissions/funding_sprint_20260709/FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md",
         "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md",
         "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json"
-      ]
+      ],
+      "threaded_acknowledgment_send_count": 1
     },
     {
       "action_gate": "Respond only to an agency clarification or replacement request.",
@@ -341,7 +345,7 @@
       "state": "SENT_VERIFIED_RESPONSE_PENDING"
     }
   ],
-  "register_sha256": "57e7c370aa82a7dee2bb9295ff2b38f08068328810e8fdbc20d954aa746c7b8a",
+  "register_sha256": "58b6ef43f8c948b7eb49b3facd215bcbccae5f6074ad70fd32bf4a8d810edda2",
   "schema": "lumencore.external_engagement_response_register.v1",
   "source_artifacts": {
     "cdc_engagement_receipt": {
@@ -351,10 +355,10 @@
       "sha256": "292157621B722B1973A1AA55140F08586AB41D07FBE38672B348C73E8A865B78"
     },
     "email_action_reconciliation": {
-      "bytes": 8003,
+      "bytes": 8249,
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.json",
       "present": true,
-      "sha256": "840FA64087C4B59610E18802D565322E95468C7502C15C5FB696A298C6E6E907"
+      "sha256": "EB876ED9F82EA86927C0E6CE7E13EADF7762B20BC6E6FCB55F613B9B88203178"
     },
     "epri_engagement_receipt": {
       "bytes": 1481,
@@ -375,16 +379,16 @@
       "sha256": "2DAC72C484BB39A6AB5891405C00AD68C66A2D99A5152D0E53CCBE8603FBAE01"
     },
     "fhwa_partner_outreach_control": {
-      "bytes": 8276,
+      "bytes": 11976,
       "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json",
       "present": true,
-      "sha256": "48FF057E779C31004B9958CDD4B95F0ED3D84A01009C57B06207989D610ED1A3"
+      "sha256": "4437EBF6FC23025719911746C8C46BD929979D4678BB7C67EEFF9644113B085E"
     },
     "fhwa_partner_response_control": {
-      "bytes": 3859,
+      "bytes": 4301,
       "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md",
       "present": true,
-      "sha256": "75768F91D3288DBB59B8198DEB485453946354297C8F7C4EAAC4D1092CEAF96A"
+      "sha256": "B5650281C5A3A5EEB034D0927A3C4125FCB7FD9B163D82ECB4AF5AA8E6B59C7C"
     },
     "fhwa_teaming_template": {
       "bytes": 2114,
@@ -509,7 +513,7 @@
     "autonomous_external_send_allowed": false,
     "autonomous_final_portal_submission_allowed": false,
     "do_not_duplicate_send_count": 11,
-    "email_action_reconciliation_status": "NO_NEW_DEADLINE_CRITICAL_EMAIL_ACTION",
+    "email_action_reconciliation_status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
     "immediate_human_action_count": 2,
     "monitor_only_count": 8,
     "record_count": 12,

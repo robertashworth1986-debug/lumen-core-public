@@ -6,9 +6,9 @@ As of: July 16, 2026
 
 1. **NSF Project Pitch** - stage first after checking the duplicate-pitch/open-invitation gate in the portal.
 2. **ERDC Sovereign Defense Cloud** - build the compliant five-page solution brief as a validation and relationship lane; the notice says funding is not currently available.
-3. **FHWA TSMO** - the first listed contact route rejected delivery and one current official replacement outreach was sent July 17; do not submit as a solo prime unless written partner evidence supplies the mandatory corporate-experience requirement.
+3. **FHWA TSMO** - the first listed contact route rejected delivery; the replacement route replied, referred the request to its response lead, and received a bounded acknowledgment. Do not submit as a solo prime unless written partner evidence supplies the mandatory corporate-experience requirement.
 
-NSF has the smallest truthful completion gap and no fixed Project Pitch deadline. ERDC is a credible five-page validation lane but currently has no available funding. The first FHWA TSMO contact route rejected delivery; one current official replacement route was contacted on July 17, but FHWA remains noncompliant as a solo prime unless written partner evidence supplies the mandatory corporate experience.
+NSF has the smallest truthful completion gap and no fixed Project Pitch deadline. ERDC is a credible five-page validation lane but currently has no available funding. The first FHWA TSMO contact route rejected delivery; the replacement route replied and referred the request to its response lead, but FHWA remains noncompliant as a solo prime unless written partner evidence supplies the mandatory corporate experience.
 
 ## Package Gates
 
@@ -38,7 +38,7 @@ NSF has the smallest truthful completion gap and no fixed Project Pitch deadline
 ### 3. FHWA TSMO Data Initiative
 
 - Deadline: `2026-08-03T09:00:00-04:00`
-- Posture: `OUTREACH_SENT_NO_GO_UNTIL_PARTNER_CONFIRMATION`
+- Posture: `REFERRED_RESPONSE_LEAD_NO_GO_UNTIL_PARTNER_CONFIRMATION`
 - Quick-funding fit: `PARTNER_DEPENDENT`
 - Hard gates:
   - Mandatory five or more years of successfully executed TSMO data-processing experience.

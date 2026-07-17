@@ -157,7 +157,8 @@ def test_rendered_handoff_is_public_safe_and_has_no_stale_send_state() -> None:
     assert "Email is application: `false`" in rendered
     assert "Passed: `0/50`" in rendered
     assert "EPRI administrative onboarding was sent" in rendered
-    assert "one active replacement outreach pending" in rendered
+    assert "referred the request to the subject matter expert" in rendered
+    assert "bounded acknowledgment is sent" in rendered
     assert "do not reuse the rejected address" in rendered
     assert "EPRI draft" not in rendered
     assert "Private contact data included: `false`" in rendered

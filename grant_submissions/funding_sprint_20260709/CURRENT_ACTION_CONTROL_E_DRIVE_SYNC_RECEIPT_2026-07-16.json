@@ -7,14 +7,14 @@
   "artifacts": [
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 101903,
-      "sha256": "4E49B92D98E1F3CC46593F5EB7B6AD91E387061A8787447BEA50366B3E7EB48A",
+      "bytes": 102912,
+      "sha256": "5BFBBB8E94CB84465A0334A08A8A082D7381D8133161E3E30C5718BBC58702A6",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 23004,
-      "sha256": "06A9E942014A0DD7B3C00D91240D3B986A0B319340A56D188588024E13651DF8",
+      "bytes": 23274,
+      "sha256": "4B03D5139AD548DB437C72EF422074AAE0167F2DA8D82FE7CCEE7F62CB91A8BB",
       "copy_sha256_matched": true
     },
     {
@@ -127,8 +127,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
-      "bytes": 58631,
-      "sha256": "D2D49CE2E3400E90DD9A061CCC0489A65E5B8C5AAD82AF0393886D44263F3369",
+      "bytes": 58780,
+      "sha256": "5B0BE3A072C13DE40C051D16A3BBD9AED198DEBE3AE29C2CF8B0939A5099E5DF",
       "copy_sha256_matched": true
     },
     {
@@ -157,5 +157,5 @@
     }
   ],
   "claim_boundary": "This receipt proves bounded file-copy integrity at the recorded time only. It does not prove email transmission, portal submission, agency acceptance, technical validation, award, deployment, patent status, legal deadline, or field performance.",
-  "generated_utc": "2026-07-17T14:26:50.1292619Z"
+  "generated_utc": "2026-07-17T14:56:34.3583168Z"
 }

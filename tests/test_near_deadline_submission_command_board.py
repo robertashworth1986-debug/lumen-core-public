@@ -143,16 +143,20 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     )
     assert fhwa["command"] == "NO_SOLO_SUBMIT_PARTNER_ONLY"
     assert fhwa["eligibility_state"] == (
-        "REPLACEMENT_TARGET_CONTACTED_PARTNER_CONFIRMATION_PENDING"
+        "QUALIFIED_RESPONSE_LEAD_REFERRED_PARTNER_CONFIRMATION_PENDING"
     )
     assert fhwa["partner_outreach_status"] == (
-        "BOUNCE_RECONCILED_REPLACEMENT_SENT_RESPONSE_PENDING"
+        "QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING"
     )
     assert fhwa["partner_outreach_delivery_failure_count"] == 1
     assert fhwa["partner_outreach_replacement_send_count"] == 1
-    assert fhwa["partner_outreach_confirmed_delivery_count"] == 0
+    assert fhwa["partner_outreach_confirmed_delivery_count"] == 1
+    assert fhwa["partner_outreach_inbound_response_count"] == 1
+    assert fhwa["partner_outreach_referral_count"] == 1
+    assert fhwa["partner_outreach_acknowledgment_send_count"] == 1
+    assert fhwa["partner_outreach_fit_check_confirmed_count"] == 0
     assert fhwa["qualified_partner_evidence_present"] is False
-    assert fhwa["no_follow_up_before"] == "2026-07-23"
+    assert fhwa["no_follow_up_before"] == "2026-07-21"
     assert any("Do not reuse the rejected address" in row for row in fhwa["today_work"])
     assert any(
         path.endswith("FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md")
