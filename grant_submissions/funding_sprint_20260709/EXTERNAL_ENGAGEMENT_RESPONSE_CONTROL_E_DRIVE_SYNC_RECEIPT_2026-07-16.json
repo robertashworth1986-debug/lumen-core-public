@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T10:27:54.1324476Z",
+  "created_utc": "2026-07-17T16:06:40.1330610Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/EXTERNAL_ENGAGEMENT_RESPONSE_CONTROL_20260716",
   "artifact_count": 63,
   "all_sha256_matched_after_copy": true,
@@ -123,20 +123,20 @@
     },
     {
       "source": "tests/test_traction_opportunity_intake_ledger.py",
-      "bytes": 5268,
-      "sha256": "AC30F58D85EE4CCE0520628B32AB024B6C3136A58BF252BF975E103DF6731607",
+      "bytes": 6057,
+      "sha256": "4C33D1BD0FF7E6E69D75F41CF49C287B15406FC79527D75042FB8B600DB089AD",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
-      "bytes": 25377,
-      "sha256": "4333999738C589B9ED7E7ECF0A3993C34CB98D60D21CB92D843C4C4C0BAED1E8",
+      "bytes": 26787,
+      "sha256": "105ED17EF19E8C5BA6337FF17236A4C7FB231EDA050DE86D886731F4F8F00CC1",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/traction_opportunity_intake_ledger.json",
-      "bytes": 41489,
-      "sha256": "B6C21D007B45C94ACD8447AB99DA43B4DCA76679852D43FF12011A9797FFDA36",
+      "bytes": 54171,
+      "sha256": "BAFA3C308DFC36DB1C32D48ABAE1433AD42FC8FB1D0CD8E2E470E15E5B83FD00",
       "copy_sha256_matched": true
     },
     {
@@ -386,6 +386,5 @@
       "copy_sha256_matched": true
     }
   ],
-  "claim_boundary": "This receipt proves only that 63 bounded engagement-response, FHWA partner-outreach, deadline-control, attachment, reconciliation, private-workflow code, test, and public-safe artifact files were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove external receipt beyond the separately cited sent receipt, a teaming relationship, permission to cite corporate experience, portal submission, acceptance, selection, award, validation, customer commitment, or permission to publish private founder, account, patent, or credential values.",
-  "generated_utc": "2026-07-17T15:01:39.0812410Z"
+  "claim_boundary": "This receipt proves only that 63 bounded engagement-response, FHWA partner-outreach, deadline-control, attachment, reconciliation, private-workflow code, test, and public-safe artifact files were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove external receipt beyond the separately cited sent receipt, a teaming relationship, permission to cite corporate experience, portal submission, acceptance, selection, award, validation, customer commitment, or permission to publish private founder, account, patent, or credential values."
 }

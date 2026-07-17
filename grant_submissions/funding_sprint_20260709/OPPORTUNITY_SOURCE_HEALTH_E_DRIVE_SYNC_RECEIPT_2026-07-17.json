@@ -1,13 +1,13 @@
 {
   "schema": "lumencore.opportunity_source_health_mirror_receipt.v2",
-  "generated_utc": "2026-07-17T08:17:04.199403Z",
+  "generated_utc": "2026-07-17T15:59:15.239466Z",
   "scope": "OPPORTUNITY_SOURCE_HEALTH_CONTROL_20260717",
   "source_copy": "C_WORKTREE_AND_GIT_INDEX_TO_BE_COMMITTED_WITH_THIS_RECEIPT",
   "mirror_copy": "E_DRIVE/LumaProofVault/SUBMISSIONS/OPPORTUNITY_SOURCE_HEALTH_CONTROL_20260717",
   "git_branch": "codex/live-domain-proof-feed-bundle",
-  "manifest_sha256": "0be117da98e6106656b7d7dc7c78471b5659ce8af94e4310f78bacf88cfc59f2",
-  "git_index_manifest_sha256": "b4a312a219128e380a1dc3502ababff9e528b71ba44f8d3529f7ddfd6557c57d",
-  "worktree_mirror_manifest_sha256": "c420c9c278e32a325cc485a91544110d6d923f28eb9670e5388d41d9b47e43ff",
+  "manifest_sha256": "731662fca3935fd14619360663a45a1d5938f639b3bf002705158b5bfd0f44e5",
+  "git_index_manifest_sha256": "102f038cd0301ac4276e9f1fb7c6a7e46010ed10f5457f536f02ef8cd8998021",
+  "worktree_mirror_manifest_sha256": "25e1bff4cc9713d87135fd4764df6a8389edc1f9793a6fc7cea72688f98c6fdb",
   "controls": {
     "source_health_schema": "lumencore.opportunity_source_health.v1",
     "source_health_control_sha256": "51e0b34b4953ec21e2b2efc2a7e945d55faa1c98c542903e17d05698b2f229b5",
@@ -114,16 +114,16 @@
     {
       "relative_path": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json",
       "storage": "C_WORKTREE_GIT_INDEX_AND_E_MIRROR",
-      "worktree_bytes": 4529,
-      "worktree_sha256": "6635a3fa854bd29c14547e6112cb66c51c5b8238908c438099a52610d140a563",
-      "mirror_bytes": 4529,
-      "mirror_sha256": "6635a3fa854bd29c14547e6112cb66c51c5b8238908c438099a52610d140a563",
+      "worktree_bytes": 4544,
+      "worktree_sha256": "aac20e903a5055e731da65e5e5a82f08d5c34a7288aa6bed4d0ed78c4f0be159",
+      "mirror_bytes": 4544,
+      "mirror_sha256": "aac20e903a5055e731da65e5e5a82f08d5c34a7288aa6bed4d0ed78c4f0be159",
       "mirror_match": true,
-      "git_index_object_id_sha1": "1620d8925d438a5864cd7c0ba47d0a274fffec9b",
-      "git_blob_bytes": 4434,
-      "git_blob_sha256": "21458130663c9884e172da555d32743d3d504d6cf8dd3f51f7e24b762e1838a6",
+      "git_index_object_id_sha1": "81f64591be2d525d334f78fa3ddf92984d6a1d2e",
+      "git_blob_bytes": 4449,
+      "git_blob_sha256": "3df00d92bcede576e761c662d8cf8e8e98a4076ca12430fa243c5eac91c031a2",
       "git_worktree_equivalence": "UTF8_TEXT_NEWLINE_NORMALIZED",
-      "normalized_content_sha256": "21458130663c9884e172da555d32743d3d504d6cf8dd3f51f7e24b762e1838a6"
+      "normalized_content_sha256": "3df00d92bcede576e761c662d8cf8e8e98a4076ca12430fa243c5eac91c031a2"
     },
     {
       "relative_path": "out/opportunities/source_health_latest.json",

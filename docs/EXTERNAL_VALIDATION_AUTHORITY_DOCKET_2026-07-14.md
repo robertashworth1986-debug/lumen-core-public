@@ -9,7 +9,7 @@ This docket proves only the identity and readiness of a bounded external-validat
 - Status: `PROSPECTIVE_COLLECTION_ACTIVE_AWAITING_FIRST_ELIGIBLE_SEAL`
 - Requested decision: Accept or decline the independent technical evaluator role for the frozen prospective experiment.
 - Fundable scope: A bounded independent evaluation and replication engagement may be funded without asserting that Level 4, Level 5, field performance, or economic savings already exist.
-- Docket SHA-256: `56e2c2e2aaad9c0d6fbdb5e0197ac4833b471695e1e08f611fce269141894401`
+- Docket SHA-256: `d549640da08f8fee3f3239d6276de4b146a0eec14778c1e083387e06ec0bb52f`
 
 ## Current Evidence
 

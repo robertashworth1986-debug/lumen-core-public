@@ -23,8 +23,8 @@ A passing capsule proves that the named code reproduced the declared bounded fac
 - Agency certification complete: `false`
 - Fixture tests executed: `true`
 - Fixture tests passed: `true`
-- Source chain SHA-256: `d9bbf10fed4065e0d17072f7fe8f76bf95745259e3c7ac83be905b1d69c80b1f`
-- Capsule SHA-256: `7dd1fb16006e5fd102e671c09e08c6280418620768c7e7f87552b0e63e8249b2`
+- Source chain SHA-256: `b3e9af659d12ba0150754e1ec3e38c9dc04d62575fbafe4e93679f055d7c336f`
+- Capsule SHA-256: `8cd4144854da6448c45883a1b46970cdea00a61c5266e8102a789f299d7253b8`
 
 ## Protocol Amendment
 

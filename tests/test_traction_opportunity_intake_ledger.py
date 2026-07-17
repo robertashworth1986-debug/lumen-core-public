@@ -1,11 +1,18 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "BUILD_TRACTION_OPPORTUNITY_INTAKE_LEDGER.py"
+CURRENT_RESPONSE_JSON = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json"
+)
 
 
 def load_module():
@@ -19,6 +26,9 @@ def load_module():
 def test_traction_ledger_builds_connected_and_federal_lane_queue():
     module = load_module()
     payload = module.build_payload()
+    response_summary = json.loads(
+        CURRENT_RESPONSE_JSON.read_text(encoding="utf-8")
+    )["summary"]
 
     assert payload["schema"] == "traction_opportunity_intake_ledger_v1"
     assert payload["status"] == "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED"
@@ -30,9 +40,18 @@ def test_traction_ledger_builds_connected_and_federal_lane_queue():
     assert payload["summary"]["human_action_required"] is True
     assert payload["summary"]["external_send_allowed_without_human"] is False
     assert payload["summary"]["final_submission_allowed_without_human"] is False
-    assert payload["summary"]["current_response_record_count"] == 6
-    assert payload["summary"]["current_immediate_human_action_count"] == 2
-    assert payload["summary"]["current_do_not_duplicate_send_count"] == 4
+    assert (
+        payload["summary"]["current_response_record_count"]
+        == response_summary["record_count"]
+    )
+    assert (
+        payload["summary"]["current_immediate_human_action_count"]
+        == response_summary["immediate_human_action_count"]
+    )
+    assert (
+        payload["summary"]["current_do_not_duplicate_send_count"]
+        == response_summary["do_not_duplicate_send_count"]
+    )
     assert payload["summary"]["current_state_supersedes_legacy_when_present"] is True
     assert len(payload["ledger_sha256"]) == 64
 
@@ -90,12 +109,19 @@ def test_rendered_markdown_excludes_meeting_credentials_and_live_action_authorit
     payload = module.build_payload()
     rendered = module.render_markdown(payload)
     lowered = rendered.lower()
+    response_control = json.loads(CURRENT_RESPONSE_JSON.read_text(encoding="utf-8"))
+    current_decisions = {
+        row["decision"]
+        for row in response_control["records"]
+        if isinstance(row.get("decision"), str) and row["decision"]
+    }
 
     assert "Traction Opportunity Intake Ledger" in rendered
     assert "Current Response Overlay" in rendered
     assert "supersedes a legacy lane status" in rendered
-    assert "SEND_EXISTING_GMAIL_DRAFT_AFTER_EXACT_GATE" in rendered
-    assert "MONITOR_NO_DUPLICATE" in rendered
+    assert current_decisions
+    assert all(decision in rendered for decision in current_decisions)
+    assert "SEND_EXISTING_GMAIL_DRAFT_AFTER_EXACT_GATE" not in rendered
     lanl_section = rendered.split("### 2. LANL VISION licensing opportunity follow-up", 1)[1].split("### 2.", 1)[0]
     assert lanl_section.index("Current response state") < lanl_section.index("- Evidence:")
     assert "External send without human: `false`" in rendered

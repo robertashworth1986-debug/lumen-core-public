@@ -11,6 +11,12 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "BUILD_QUANT_HUB_REVIEWER_CONTEXT.py"
 LEXICON = ROOT / "config" / "quant_hub_lexicon_v1.json"
+HOURLY_RUNTIME_PROJECTION = (
+    ROOT
+    / "evidence"
+    / "external_validation"
+    / "eia_grid_prospective_hourly_runtime_projection_20260716.json"
+)
 
 
 def load_module():
@@ -173,6 +179,10 @@ def test_lexicon_defines_level_five_as_external_validation():
 def test_context_preserves_positive_negative_and_waiting_evidence():
     module = load_module()
     context = module.build_context()
+    hourly_projection = json.loads(
+        HOURLY_RUNTIME_PROJECTION.read_text(encoding="utf-8")
+    )
+    hourly_sample = hourly_projection["sample_state"]
 
     assert context["schema"] == "quant_hub_reviewer_context.v1"
     assert context["current_evidence_posture"]["highest_repository_wide_supported_level"] == 3
@@ -285,14 +295,20 @@ def test_context_preserves_positive_negative_and_waiting_evidence():
     hourly = cards["eia_prospective_hourly_router"]
     assert hourly["attained_maturity_level"] == 1
     assert hourly["target_maturity_level"] == 4
-    assert hourly["status"] == "PROSPECTIVE_COLLECTION_ACTIVE"
-    assert hourly["facts"]["prediction_count"] == 95
-    assert hourly["facts"]["settlement_count"] == 78
-    assert hourly["facts"]["common_settled_hour_count"] == 0
-    assert hourly["facts"]["preliminary_ready"] is False
-    assert hourly["facts"]["confirmatory_ready"] is False
-    assert hourly["facts"]["durability_ready"] is False
-    assert hourly["facts"]["promotion_evaluation_complete"] is False
+    assert hourly["status"] == hourly_projection["state"]
+    assert hourly["facts"]["prediction_count"] == hourly_sample["prediction_count"]
+    assert hourly["facts"]["settlement_count"] == hourly_sample["settlement_count"]
+    assert (
+        hourly["facts"]["common_settled_hour_count"]
+        == hourly_sample["common_settled_hour_count"]
+    )
+    assert hourly["facts"]["preliminary_ready"] is hourly_sample["preliminary_ready"]
+    assert hourly["facts"]["confirmatory_ready"] is hourly_sample["confirmatory_ready"]
+    assert hourly["facts"]["durability_ready"] is hourly_sample["durability_ready"]
+    assert (
+        hourly["facts"]["promotion_evaluation_complete"]
+        is hourly_sample["promotion_evaluation_complete"]
+    )
     assert hourly["facts"]["preliminary_threshold_common_hours_per_authority"] == 168
     assert hourly["facts"]["confirmatory_threshold_common_hours_per_authority"] == 720
     assert hourly["facts"]["durability_threshold_common_hours_per_authority"] == 2160

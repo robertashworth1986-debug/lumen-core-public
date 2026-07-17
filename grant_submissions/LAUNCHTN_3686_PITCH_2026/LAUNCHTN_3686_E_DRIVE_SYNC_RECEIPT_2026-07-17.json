@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T09:21:57.8285848Z",
+  "created_utc": "2026-07-17T15:27:22.4383221Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/LAUNCHTN_3686_PITCH_20260717",
   "artifact_count": 17,
   "all_sha256_matched_after_copy": true,
@@ -45,68 +45,68 @@
     },
     {
       "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
-      "bytes": 31079,
-      "sha256": "666D6494350CE15FD038827BF5CBBC818D42D48AFD0D01FEC676664E87C4C5DC",
+      "bytes": 39627,
+      "sha256": "CDDBCD4DD734EB2D272C8AE1E33D2E32C4672CD2700408B5E4589322C35E780F",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_external_engagement_response_register.py",
-      "bytes": 11435,
-      "sha256": "1B2A9E6180C4FCE9AA2D66E4A164A2002B873D762BCE72BD254014FC4E867D02",
+      "bytes": 15675,
+      "sha256": "3125394A04D9F8EDCE9F54840A2137AEC2C19BB28CC72A3592A0BFDFE806AA82",
       "copy_sha256_matched": true
     },
     {
       "source": "out/ops/external_engagement_response_register_latest.json",
-      "bytes": 26282,
-      "sha256": "F132477A66A388931B3D0E8E08E2CFD43446AC0733A36A93DFB4BEF0A22F0D5D",
+      "bytes": 32797,
+      "sha256": "52912964FED3E4DA5A0FE695FC3454F086657E5FC9499F5D0C785971AE936493",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/external_engagement_response_register.json",
-      "bytes": 26282,
-      "sha256": "F132477A66A388931B3D0E8E08E2CFD43446AC0733A36A93DFB4BEF0A22F0D5D",
+      "bytes": 32797,
+      "sha256": "52912964FED3E4DA5A0FE695FC3454F086657E5FC9499F5D0C785971AE936493",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json",
-      "bytes": 26282,
-      "sha256": "F132477A66A388931B3D0E8E08E2CFD43446AC0733A36A93DFB4BEF0A22F0D5D",
+      "bytes": 32797,
+      "sha256": "52912964FED3E4DA5A0FE695FC3454F086657E5FC9499F5D0C785971AE936493",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-      "bytes": 19198,
-      "sha256": "29B03CC3A72E4B714047EC130745EA93F350549EBBAB8F1ACF5BC9C63A8CA445",
+      "bytes": 23944,
+      "sha256": "52099A405BED80BCA98371A66939EF2C93D94F829EC78D009E49DBE40D53F8C8",
       "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 70979,
-      "sha256": "47589290533923721DA89DEB0BF7B31766AA9D33D676E1D9EFAB4EB3405E7DA1",
+      "bytes": 102912,
+      "sha256": "5BFBBB8E94CB84465A0334A08A8A082D7381D8133161E3E30C5718BBC58702A6",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 10217,
-      "sha256": "7658F471B3DBB8E47E7139FE5A391B62BE565C063235719BD2AB2C1BC5AC3DC9",
+      "bytes": 23274,
+      "sha256": "4B03D5139AD548DB437C72EF422074AAE0167F2DA8D82FE7CCEE7F62CB91A8BB",
       "copy_sha256_matched": true
     },
     {
       "source": "out/ops/near_deadline_submission_command_board_latest.json",
-      "bytes": 55553,
-      "sha256": "1ED6431FD024705EF2B67AF1D658041001E6B442F0E38202E79CCF197F9B8E26",
+      "bytes": 77782,
+      "sha256": "98D30CCBF35DCA824AA6B262E68DED194676631CCC010F052EC51FA0EA01148C",
       "copy_sha256_matched": true
     },
     {
       "source": "dashboard/data/near_deadline_submission_command_board.json",
-      "bytes": 55553,
-      "sha256": "1ED6431FD024705EF2B67AF1D658041001E6B442F0E38202E79CCF197F9B8E26",
+      "bytes": 77782,
+      "sha256": "98D30CCBF35DCA824AA6B262E68DED194676631CCC010F052EC51FA0EA01148C",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
-      "bytes": 42504,
-      "sha256": "D16CF89C3CBCFE7C0F1F44C039A8C796E581A667098EF64BF31B08421EC51D5A",
+      "bytes": 58780,
+      "sha256": "5B0BE3A072C13DE40C051D16A3BBD9AED198DEBE3AE29C2CF8B0939A5099E5DF",
       "copy_sha256_matched": true
     }
   ],

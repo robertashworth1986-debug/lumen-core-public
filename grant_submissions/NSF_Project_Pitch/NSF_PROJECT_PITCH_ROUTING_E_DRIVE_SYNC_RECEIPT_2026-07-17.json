@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "created_utc": "2026-07-17T09:59:32.1280500Z",
+  "created_utc": "2026-07-17T15:57:36.5611739Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/NSF_PROJECT_PITCH_ROUTING_20260717",
   "artifact_count": 14,
   "all_sha256_matched_after_copy": true,
@@ -21,14 +21,14 @@
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_PACKAGE_DECISION_GATE.py",
-      "bytes": 16750,
-      "sha256": "2E29D9F6EFFB48C218F0BC45EDC467AB63B48B1529FEB80BEAA42D1C35B291AA",
+      "bytes": 19130,
+      "sha256": "F4611DB042332FB066379AF3D70F09F542AEA078D4812CB0971162D48B2CC008",
       "copy_sha256_matched": true
     },
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 72235,
-      "sha256": "B47407C0F3E18439C3300E2DD0DB69AA43E3B143BE37257D7D32C9F84521CD38",
+      "bytes": 102912,
+      "sha256": "5BFBBB8E94CB84465A0334A08A8A082D7381D8133161E3E30C5718BBC58702A6",
       "copy_sha256_matched": true
     },
     {
@@ -45,14 +45,14 @@
     },
     {
       "source": "tests/test_near_deadline_package_decision_gate.py",
-      "bytes": 3506,
-      "sha256": "20AE0C56F4FE17E55794B9CF008E8F45388C7AB7B9219C421A196837F1302D5B",
+      "bytes": 4269,
+      "sha256": "9DC3530FC40B0E22B7B3A65775EC3C7E31905D4075A7238E3C550E5C4DC639B8",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
-      "bytes": 10794,
-      "sha256": "EEA01E87164A61615AEDAFA07C47FDE98783E293EFF92E9310FF6E9C2210F038",
+      "bytes": 23274,
+      "sha256": "4B03D5139AD548DB437C72EF422074AAE0167F2DA8D82FE7CCEE7F62CB91A8BB",
       "copy_sha256_matched": true
     },
     {
@@ -87,8 +87,8 @@
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
-      "bytes": 42913,
-      "sha256": "19673825A74A72ABA7F341EA858AD1C0EA35F7B3BAED498560AE7A59D0E81A7F",
+      "bytes": 58780,
+      "sha256": "5B0BE3A072C13DE40C051D16A3BBD9AED198DEBE3AE29C2CF8B0939A5099E5DF",
       "copy_sha256_matched": true
     }
   ],

@@ -1,5 +1,5 @@
 {
-  "capsule_sha256": "7dd1fb16006e5fd102e671c09e08c6280418620768c7e7f87552b0e63e8249b2",
+  "capsule_sha256": "8cd4144854da6448c45883a1b46970cdea00a61c5266e8102a789f299d7253b8",
   "claim_boundary": "A passing capsule proves that the named code reproduced the declared bounded facts from the packaged input under the recorded environment. It does not prove agency approval, cybersecurity certification, external validation, field performance, realized savings, patent scope, trading performance, or funding eligibility.",
   "dependencies": [
     {
@@ -356,10 +356,10 @@
       "sha256": "2fa8feb63735603960688161a252d2efa68077a51b27dc48bcdfe0d99d0ae14e"
     },
     {
-      "bytes": 2232,
+      "bytes": 2618,
       "hash_mode": "utf8_lf",
       "path": ".gitignore",
-      "sha256": "6532ecde9a663bcef41aceda6c01cfa9649808f2fb2a8b6d256de182f39f8b75"
+      "sha256": "c25c01afa309ecee57a768b3d4e5ca98cc0bcfb6d7afaaf861da113b2421adbb"
     },
     {
       "bytes": 13623,
@@ -476,7 +476,7 @@
       "sha256": "4995d85976b862e16041e7e42ef005c0cb9b1543944cbed11ea254a37923948b"
     }
   ],
-  "source_chain_sha256": "d9bbf10fed4065e0d17072f7fe8f76bf95745259e3c7ac83be905b1d69c80b1f",
+  "source_chain_sha256": "b3e9af659d12ba0150754e1ec3e38c9dc04d62575fbafe4e93679f055d7c336f",
   "standards_references": [
     {
       "name": "NIST SP 800-218 Secure Software Development Framework 1.1",

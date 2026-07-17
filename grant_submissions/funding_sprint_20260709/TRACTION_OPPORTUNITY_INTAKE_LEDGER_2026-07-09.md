@@ -12,14 +12,14 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 - Gmail references: `16`
 - Sweetspot references: `8`
 - Public references: `19`
-- Current response records: `6`
+- Current response records: `12`
 - Current immediate human actions: `2`
-- Current do-not-duplicate sends: `4`
+- Current do-not-duplicate sends: `11`
 - Current state supersedes legacy when present: `true`
 - Human action required: `true`
 - External send without human: `false`
 - Final submission without human: `false`
-- Ledger SHA-256: `2fcb32afb31d7ce8f790e982383f0fcdbbd9ae74ffdf7fda05a656ee45ad509a`
+- Ledger SHA-256: `eb8ed5474f189a9e96488abf125b136f7062ee1395cc17c342a520785b4f1a4f`
 
 ## Source Coverage
 
@@ -32,20 +32,26 @@ This ledger does not authorize portal submissions, email sends, certifications, 
 
 ## Current Response Overlay
 
-Finish the six-confirmation Nashville EC human-fact gate before July 17 and send the existing EPRI administrative reply only after the exact `send EPRI` gate. CDC, LANL, NASA, and Army are monitor-only; duplicate sends would reduce credibility.
+The bounded Nashville EC deadline-support query and FHWA response-lead acknowledgment were sent and must not be duplicated. The first FHWA route rejected delivery; the replacement route replied and referred the request to the subject matter expert leading this response, but no fit check or partner is confirmed. The Nashville message is not an application, so continue its founder-fact gate and final portal workflow while monitoring for the exact close time. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. FHWA, EPRI, Georgia PATENTS, CDC, LANL, Terry, NASA, and Army are monitor-only, while the optional LvlUp paid event needs no reply or spend; duplicate sends would reduce credibility.
 
 This overlay is authoritative through the stated as-of date and supersedes a legacy lane status where the two differ. Historical status remains visible below for provenance.
 
-- As of: `2026-07-16`
+- As of: `2026-07-17`
 - Source: `grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json`
-- Register SHA-256: `a7c29a031809d194d1378bef8c1fe26d01174b0162673a59da3ed09104d5bec5`
+- Register SHA-256: `58b6ef43f8c948b7eb49b3facd215bcbccae5f6074ad70fd32bf4a8d810edda2`
 
 | Organization | Current state | Current decision | Duplicate send |
 |---|---|---|---:|
-| Nashville Entrepreneur Center | `PORTAL_PACKET_READY_HUMAN_FACTS_REQUIRED` | `COMPLETE_HUMAN_FACTS_AND_FINAL_PREVIEW` | `false` |
-| EPRI Open Power AI Consortium | `INBOUND_ADMIN_REQUEST_DRAFT_READY` | `SEND_EXISTING_GMAIL_DRAFT_AFTER_EXACT_GATE` | `false` |
+| Nashville Entrepreneur Center | `DEADLINE_PRESERVATION_QUERY_SENT_RESPONSE_PENDING` | `CONTINUE_PORTAL_MONITOR_SUPPORT_REPLY_NO_DUPLICATE` | `true` |
+| Launch Tennessee 3686 Pitch Competition | `PORTAL_PACKET_QA_PASSED_HUMAN_FACTS_AND_FOUNDER_APPROVAL_REQUIRED` | `STAGE_PORTAL_FINAL_PREVIEW_REQUIRED` | `false` |
+| EPRI Open Power AI Consortium | `OUTBOUND_SENT_MOU_PENDING` | `MONITOR_FOR_MOU_NO_DUPLICATE` | `true` |
+| Georgia PATENTS | `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | `true` |
+| LvlUp Ventures / Power of the Pitch Week | `OPTIONAL_PAID_EVENT_NO_REQUIRED_REPLY_OR_SPEND` | `DO_NOT_SPEND_OR_SEND_STALE_DRAFT` | `true` |
+| SAM.gov account credential control | `ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED` | `HUMAN_ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY` | `true` |
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `MONITOR_NO_REPLY_REQUIRED` | `true` |
 | Los Alamos National Laboratory | `OUTBOUND_SENT_RESPONSE_PENDING` | `MONITOR_THEN_ONE_BOUNDED_FOLLOW_UP` | `true` |
+| Terry Anderton / Vynetic | `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY` | `MONITOR_NO_FURTHER_FOLLOWUP` | `true` |
+| Cambridge Systematics | `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING` | `MONITOR_REFERRED_RESPONSE_LEAD_NO_DUPLICATE` | `true` |
 | NASA | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | `true` |
 | U.S. Army | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | `true` |
 
@@ -107,7 +113,7 @@ This overlay is authoritative through the stated as-of date and supersedes a leg
 - Reviewer action: Prepare a short licensing-fit note, evidence-replay boundary, and technical questions for Mike Erickson.
 - Human gate: Human approves any LANL reply, NDA, licensing discussion, export-control response, or disclosure package.
 - Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
-- Evidence hash: `6ca0a46d29df2eb40f8468e3f1ae64a5a9e9384d2653673a9ccb616fa6599894`
+- Evidence hash: `765e5fd5a99268cbbda44ca739d339eb5954ec1d186e6415bcdfe0a6519a879f`
 - Current response state: `OUTBOUND_SENT_RESPONSE_PENDING`
 - Current response decision: `MONITOR_THEN_ONE_BOUNDED_FOLLOW_UP`
 - Current do-not-duplicate send: `true`
@@ -204,7 +210,7 @@ This overlay is authoritative through the stated as-of date and supersedes a leg
 - Reviewer action: Package the RFI response as architecture, evidence manifest, and operations-risk framing.
 - Human gate: Human verifies official response instructions, page limits, contacts, and final send.
 - Claim boundary: RFI response only; no NASA partnership, contract, or infrastructure result is represented.
-- Evidence hash: `5aa640eab40ca1540aa6fcddabc4f14673bf845114787810ead220818c15b602`
+- Evidence hash: `43ff69dc8c5ac98ed0a83c0a9dc171afeb05fd374fc3d2df3858185b7bc0c502`
 - Current response state: `SENT_VERIFIED_RESPONSE_PENDING`
 - Current response decision: `MONITOR_NO_DUPLICATE`
 - Current do-not-duplicate send: `true`
