@@ -1,0 +1,60 @@
+name: ProofLock Build Week CI
+
+on:
+  pull_request:
+    paths:
+      - "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.*"
+      - "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.*"
+      - "build_week/prooflock_console/**"
+      - "dashboard/assets/vendor/THREE_LICENSE.txt"
+      - "dashboard/assets/vendor/three.core.min.js"
+      - "dashboard/assets/vendor/three.module.min.js"
+      - "tests/test_prooflock_console.py"
+      - "tests/test_prooflock_visual.py"
+      - ".github/workflows/prooflock-build-week-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.*"
+      - "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.*"
+      - "build_week/prooflock_console/**"
+      - "dashboard/assets/vendor/THREE_LICENSE.txt"
+      - "dashboard/assets/vendor/three.core.min.js"
+      - "dashboard/assets/vendor/three.module.min.js"
+      - "tests/test_prooflock_console.py"
+      - "tests/test_prooflock_visual.py"
+      - ".github/workflows/prooflock-build-week-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install focused test dependency
+        run: python -m pip install --disable-pip-version-check pytest
+      - name: Compile Python verifier and tests
+        run: >-
+          python -m py_compile
+          build_week/prooflock_console/verify_receipt.py
+          tests/test_prooflock_console.py
+          tests/test_prooflock_visual.py
+      - name: Check JavaScript syntax
+        run: |
+          node --check build_week/prooflock_console/app.js
+          node --check build_week/prooflock_console/bootstrap.js
+          node --check build_week/prooflock_console/prooflock_core.js
+          node --check build_week/prooflock_console/prooflock_lattice.js
+      - name: Run focused functional and visual tests
+        run: python -m pytest -q tests/test_prooflock_console.py tests/test_prooflock_visual.py
+      - name: Verify bundled ProofLock receipt
+        run: python build_week/prooflock_console/verify_receipt.py
