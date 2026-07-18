@@ -1,0 +1,344 @@
+.trust-bar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  margin: 0 0 28px;
+  border: 1px solid var(--public-line);
+  border-radius: 18px;
+  background: var(--public-line);
+}
+
+.trust-item {
+  min-height: 106px;
+  padding: 19px;
+  background: rgba(7, 14, 32, 0.96);
+}
+
+.trust-item strong {
+  display: block;
+  color: var(--public-text);
+  font: 800 0.78rem/1.35 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 0.45px;
+}
+
+.trust-item span {
+  display: block;
+  margin-top: 8px;
+  color: var(--public-muted);
+  font-size: 0.83rem;
+  line-height: 1.55;
+}
+
+.section {
+  padding: 72px 0 0;
+}
+
+.section.compact {
+  padding-top: 44px;
+}
+
+.section-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(280px, 0.5fr);
+  gap: 34px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+
+.section-heading h2,
+.page-section h2 {
+  margin: 10px 0 0;
+  font: 900 clamp(1.9rem, 4vw, 3.35rem) / 1.08 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.section-heading p,
+.page-section > p,
+.section-intro {
+  margin: 0;
+  color: var(--public-muted);
+  line-height: 1.7;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.offer-card,
+.sector-card,
+.process-card,
+.surface-card {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  min-height: 100%;
+}
+
+.offer-card:hover,
+.sector-card:hover,
+.surface-card:hover {
+  border-color: rgba(94, 234, 212, 0.38);
+  transform: translateY(-2px);
+  transition: transform 170ms ease, border-color 170ms ease;
+}
+
+.card-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(94, 234, 212, 0.34);
+  border-radius: 11px;
+  color: var(--public-cyan);
+  background: rgba(94, 234, 212, 0.06);
+  font: 800 10px/1 "JetBrains Mono", ui-monospace, monospace;
+}
+
+.offer-card h3,
+.sector-card h3,
+.process-card h3,
+.surface-card h3 {
+  font-size: 1.08rem;
+}
+
+.offer-card p,
+.sector-card p,
+.process-card p,
+.surface-card p,
+.boundary-card p,
+.proof-panel p,
+.delivery-card p,
+.founder-card p {
+  margin: 0;
+  color: var(--public-muted);
+  line-height: 1.65;
+}
+
+.clean-list,
+.check-list,
+.cross-list,
+.data-list {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.clean-list li,
+.check-list li,
+.cross-list li,
+.data-list li {
+  position: relative;
+  padding: 8px 0 8px 24px;
+  color: var(--public-muted);
+  line-height: 1.55;
+}
+
+.clean-list li::before,
+.check-list li::before,
+.cross-list li::before,
+.data-list li::before {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  color: var(--public-cyan);
+  font: 800 0.9rem/1 "JetBrains Mono", monospace;
+}
+
+.clean-list li::before {
+  content: "→";
+}
+
+.check-list li::before {
+  content: "✓";
+  color: var(--public-green);
+}
+
+.cross-list li::before {
+  content: "×";
+  color: var(--public-red);
+}
+
+.data-list li::before {
+  content: "◆";
+  color: var(--public-violet);
+  font-size: 0.65rem;
+  top: 12px;
+}
+
+.card-actions {
+  margin-top: auto;
+  padding-top: 22px;
+}
+
+.sector-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sector-card {
+  min-height: 220px;
+}
+
+.sector-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(192, 132, 252, 0.3);
+  border-radius: 13px;
+  color: var(--public-violet);
+  background: rgba(192, 132, 252, 0.07);
+  font: 900 0.72rem/1 "Orbitron", sans-serif;
+}
+
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  counter-reset: process;
+}
+
+.process-card {
+  min-height: 238px;
+  counter-increment: process;
+}
+
+.process-card::after {
+  content: counter(process, decimal-leading-zero);
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  color: rgba(94, 234, 212, 0.2);
+  font: 900 2.2rem/1 "Orbitron", sans-serif;
+}
+
+.proof-layout,
+.boundary-layout,
+.delivery-layout,
+.founder-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.proof-panel,
+.delivery-card,
+.founder-card {
+  padding: 28px;
+}
+
+.proof-panel h2,
+.delivery-card h2,
+.founder-card h2 {
+  font-size: 1.28rem;
+}
+
+.proof-stack {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.proof-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--public-line);
+  border-radius: 13px;
+  color: var(--public-text);
+  background: rgba(3, 9, 23, 0.46);
+  text-decoration: none;
+  transition: border-color 160ms ease, transform 160ms ease, background 160ms ease;
+}
+
+.proof-link:hover,
+.proof-link:focus-visible {
+  border-color: var(--public-cyan);
+  background: rgba(94, 234, 212, 0.055);
+  transform: translateX(2px);
+}
+
+.proof-link strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.proof-link span {
+  display: block;
+  margin-top: 4px;
+  color: var(--public-muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.proof-link code {
+  color: var(--public-cyan);
+  font: 700 0.72rem/1 "JetBrains Mono", monospace;
+}
+
+.boundary-card {
+  padding: 26px;
+}
+
+.boundary-card.good {
+  border-color: rgba(85, 230, 165, 0.27);
+}
+
+.boundary-card.warn {
+  border-color: rgba(247, 200, 92, 0.28);
+}
+
+.boundary-card.good .card-kicker {
+  color: var(--public-green);
+}
+
+.boundary-card.warn .card-kicker {
+  color: var(--public-amber);
+}
+
+.callout {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border: 1px solid rgba(247, 200, 92, 0.29);
+  border-radius: 14px;
+  color: #fbe7b0;
+  background: rgba(247, 200, 92, 0.07);
+  font-size: 0.87rem;
+  line-height: 1.6;
+}
+
+.cta-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 34px;
+  align-items: center;
+  margin-top: 72px;
+  padding: clamp(28px, 5vw, 52px);
+  border-color: rgba(94, 234, 212, 0.3);
+  background:
+    radial-gradient(circle at 94% 10%, rgba(94, 234, 212, 0.16), transparent 24rem),
+    radial-gradient(circle at 6% 90%, rgba(192, 132, 252, 0.13), transparent 25rem),
+    var(--public-panel-strong);
+}
+
+.cta-panel h2 {
+  max-width: 760px;
+  margin: 9px 0 12px;
+  font: 900 clamp(1.75rem, 4vw, 3rem) / 1.1 "Orbitron", sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.cta-panel p {
+  max-width: 750px;
+  margin: 0;
+  color: var(--public-muted);
+  line-height: 1.7;
+}
