@@ -130,6 +130,24 @@ def test_volume2_has_no_submission_placeholders_or_unsupported_escalation() -> N
         assert phrase not in text
 
 
+def test_volume2_contains_structured_related_effort_and_rights_assertions() -> None:
+    text = VOLUME2_MD.read_text(encoding="utf-8")
+    required_fragments = [
+        "Effort and authoritative identifiers",
+        "HR001126S0010",
+        "DON26BZ03-NV063",
+        "DPA26BZ04-DV016",
+        "No prior, current, or pending award was identified as providing financial support",
+        "Technical data or computer software to be furnished with restrictions",
+        "Developed exclusively at private expense before any resulting award",
+        "R-DFARS 252.227-7992",
+        "Robert Ashworth d/b/a LumenCore",
+        "Completion of this table constitutes the proposal assertion under the BAA",
+    ]
+    for fragment in required_fragments:
+        assert fragment in text
+
+
 def test_cost_model_reconciles_to_ceiling_and_all_prime_work_share() -> None:
     text = COST.read_text(encoding="utf-8")
     amounts = [60800, 12160, 18240, 4000, 2000, 2800, 0, 0]

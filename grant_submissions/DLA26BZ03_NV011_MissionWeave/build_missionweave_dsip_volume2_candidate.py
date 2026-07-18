@@ -317,6 +317,19 @@ def table_widths(headers: list[str]) -> list[int]:
         return [2450, 6910]
     if key == ("milestone", "evidence required for advancement"):
         return [2600, 6760]
+    if key == (
+        "effort and authoritative identifiers",
+        "submission, award, and pi facts",
+        "relationship to missionweave and cost separation",
+    ):
+        return [3300, 2500, 3560]
+    if key == (
+        "technical data or computer software to be furnished with restrictions",
+        "basis for assertion",
+        "asserted rights category",
+        "person or organization asserting restrictions",
+    ):
+        return [3200, 2300, 1850, 2010]
     if len(headers) == 2:
         return [2800, 6560]
     if len(headers) == 3:

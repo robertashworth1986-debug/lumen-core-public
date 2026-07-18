@@ -75,7 +75,7 @@ def test_default_gate_verifies_package_and_fails_closed_without_private_input():
     assert source["manifest_header_pass"] is True
     assert source["manifest_file_count"] == 15
     assert source["all_manifest_files_match"] is True
-    assert source["volume2_pages"] == 11
+    assert source["volume2_pages"] == 12
     assert source["volume2_page_limit"] == 20
     assert source["volume2_letter_size"] is True
     assert source["volume2_encrypted"] is False
