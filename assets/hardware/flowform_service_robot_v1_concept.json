@@ -1,0 +1,54 @@
+{
+  "schema": "lumencore.hardware_concept_asset.v1",
+  "asset_id": "flowform_service_robot_v1",
+  "asset_name": "FLOWFORM Service Robot V1 Concept",
+  "asset_path": "assets/hardware/flowform_service_robot_v1_concept.png",
+  "media_type": "image/png",
+  "bytes": 2362013,
+  "width_pixels": 1536,
+  "height_pixels": 1024,
+  "sha256": "fa1748db0dd68422e9f7398a6d7bcecb708e767c54cac42acf1dbf17fb8425bc",
+  "created_date": "2026-07-17",
+  "status": "GENERATED_CONCEPT_RENDER_NOT_ENGINEERING_VALIDATION",
+  "source_concept_references": [
+    "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.json",
+    "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.png",
+    "data/Appendix- EchoForm Identity Architecture Terminology 2.pdf"
+  ],
+  "generation_provenance": {
+    "method": "OpenAI built-in image generation using a project-local reference image",
+    "reference_asset_id": "flowform_curved_motherboard_honeycomb_battery_v3",
+    "reference_role": "compute, battery, thermal, cable-routing, and serviceability design language",
+    "intended_use": "reviewer-facing industrial robotics concept render"
+  },
+  "visible_design_intent": {
+    "robot_platform": [
+      "stable wheeled mobile base for indoor service and inspection concepts",
+      "two articulated manipulation arms with compact serviceable joints",
+      "sensor mast with visible lidar and camera apertures",
+      "removable torso, base, and cooling access panels"
+    ],
+    "compute_architecture": [
+      "conformal curved rigid-flex compute board mounted inside the torso",
+      "segmented copper thermal-spreader regions",
+      "separated compute, power-distribution, and cooling service zones",
+      "visible fasteners and connector access for module replacement"
+    ],
+    "energy_architecture": [
+      "low-mounted modular honeycomb battery cassettes for a lower visual center of mass",
+      "segmented cell enclosures with protected orange power routes and blue cooling lines",
+      "removable auxiliary battery module shown outside the base",
+      "service disconnect and fault-isolation design intent"
+    ]
+  },
+  "required_engineering_next_steps": [
+    "define a bounded mission, operating environment, payload, duty cycle, and human-safety envelope",
+    "translate the visible concept into controlled electrical schematics, mechanical CAD, software architecture, and interface specifications",
+    "select motors, drives, brakes, gear reductions, sensors, compute modules, cell chemistry, pack voltage, and protection components",
+    "run mass-property, tip-over, manipulator-load, thermal, power, runtime, vibration, ingress, and maintainability analyses",
+    "perform hazard analysis, failure-mode review, cybersecurity threat modeling, and applicable functional-safety assessment",
+    "prototype compute, battery, cooling, drive, and emergency-stop subsystems separately before integrated motion testing",
+    "use independent engineering review and controlled test receipts before any safety, reliability, runtime, or performance claim"
+  ],
+  "claim_boundary": "This image is an AI-generated industrial-design concept derived from the bounded FLOWFORM V3 curved-motherboard and honeycomb-battery concept. It is not CAD, not a schematic, not a bill of materials, not executable robot software, not a fabricated prototype, not test evidence, not a safety assessment or certification, and not proof of autonomy, payload, runtime, stability, thermal performance, reliability, manufacturability, commercial readiness, or patentability."
+}
