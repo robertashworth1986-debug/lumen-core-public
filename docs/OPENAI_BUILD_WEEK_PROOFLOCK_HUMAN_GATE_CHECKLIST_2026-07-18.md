@@ -13,7 +13,7 @@
 - Live demonstration: `https://lumen-core.ai/build_week/prooflock_console/?release=20260718.1&commit=e9a1aba`
 - Deployed source commit: `e9a1aba6fdfb368c64887af7e9caeee8aac21abb`
 - Latest verified live-QA commit: `a7731fa`
-- Current focused test result: `28 passed`
+- Current focused test result: rerun the focused suite immediately before recording and use the exact current-head CI result in the demo and submission.
 - Live-file identity: `14/14` HTTP 200 responses and exact SHA-256 matches
 - Authoritative model evidence: `gpt-5.6-sol` with `ultra` reasoning; a private task-metadata Session ID candidate is retained and its digest match is directly confirmed
 - Private Session ID SHA-256: `CEDEC32157F2516DF88505802805761AE3535F093FB9B1B06CA6DEFF4A344FD9`
@@ -45,7 +45,7 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 2. Run `/feedback` in the primary Codex build task and retain the exact Session ID requested by the form.
 3. Compare the private `/feedback` Session ID with the saved task-metadata candidate. The candidate's digest already matches the published hash and the model is confirmed as `gpt-5.6-sol`; do not expose the private identifier in the repository or video.
 4. Record the live demonstration using the timed narration. Keep the final cut under three minutes with intelligible audio.
-5. Upload the video to YouTube as public or unlisted, according to the live rules, and verify playback while signed out.
+5. Upload the video to YouTube as **public** and verify playback while signed out. Deviate only if the live Devpost form explicitly supersedes that requirement, and preserve a dated source receipt before doing so.
 6. Enter the repository, live-demo, and YouTube URLs into Devpost. Paste only the verified Session ID and model identity.
 7. Confirm that pre-existing work and new Build Week work are separated exactly as stated above.
 8. Preview the complete entry and test every link in a signed-out window.

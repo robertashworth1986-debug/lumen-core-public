@@ -140,6 +140,15 @@ def test_console_is_self_contained_and_documents_build_week_gates():
     core = (APP_DIR / "prooflock_core.js").read_text(encoding="utf-8")
     lattice = (APP_DIR / "prooflock_lattice.js").read_text(encoding="utf-8")
     readme = (APP_DIR / "README.md").read_text(encoding="utf-8")
+    narration = (
+        ROOT / "docs" / "OPENAI_BUILD_WEEK_PROOFLOCK_DEMO_NARRATION_2026-07-18.md"
+    ).read_text(encoding="utf-8")
+    checklist = (
+        ROOT / "docs" / "OPENAI_BUILD_WEEK_PROOFLOCK_HUMAN_GATE_CHECKLIST_2026-07-18.md"
+    ).read_text(encoding="utf-8")
+    readiness = (
+        ROOT / "docs" / "OPENAI_BUILD_WEEK_PROOFLOCK_SUBMISSION_READINESS_2026-07-17.md"
+    ).read_text(encoding="utf-8")
 
     assert "ProofLock Console" in html
     assert "Artifact matrix" in html
@@ -151,6 +160,12 @@ def test_console_is_self_contained_and_documents_build_week_gates():
     assert "/feedback" in readme
     assert "does not infer or invent the model identity" in readme
     assert "external service is required" in readme
+    assert "twenty-seven passing tests" not in narration
+    assert "current-head CI receipt" in narration
+    assert "`28 passed`" not in checklist
+    assert "public or unlisted" not in checklist
+    assert "YouTube as **public**" in checklist
+    assert "`32 passed`" not in readiness
 
 
 def test_hashed_json_artifacts_are_checkout_byte_stable():

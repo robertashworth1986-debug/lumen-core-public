@@ -54,7 +54,7 @@ The complete current-main test collection produced `114 passed, 25 subtests pass
 - `test_public_capsule_verifies` hashes a CRLF checkout of `dice_eia_public_summary.txt` while the manifest records the LF Git blob.
 - `test_cli_requires_explicit_apply_and_creates_backup` passes a valid Windows temporary absolute path to a helper that accepts only Unix-style `/...` document roots.
 
-These are cross-platform baseline defects outside the focused Build Week lane. They are not hidden or weakened here, and should be repaired in a separate bounded PR. The current ProofLock-focused suite is `32 passed`; the live-release receipt preserves its historical `27 passed` run. The separate live-release gate adds seven offline regression checks.
+These are cross-platform baseline defects outside the focused Build Week lane. They are not hidden or weakened here, and should be repaired in a separate bounded PR. The current ProofLock-focused suite is green at the current PR head; the exact count belongs to the current-head CI receipt rather than this durable narrative. The live-release receipt preserves its historical `27 passed` run. The separate live-release gate adds seven offline regression checks.
 
 ## Judge Test Path
 

@@ -32,7 +32,7 @@ On screen: select **Run guided proof** and let the sequence complete.
 
 On screen: show the repository or briefly scroll the verification log.
 
-> The same rules run in the browser and in a Python command-line verifier. The focused suite has twenty-seven passing tests covering canonical hashes, path boundaries, browser and Python parity, deterministic visuals, reduced motion, exact restoration, accessibility hooks, and local-only dependencies.
+> The same rules run in the browser and in a Python command-line verifier. The focused suite covers canonical hashes, path boundaries, browser and Python parity, deterministic visuals, reduced motion, exact restoration, accessibility hooks, and local-only dependencies. The exact current result comes from the current-head CI receipt shown with the demo.
 
 ## 2:02-2:20 - Codex And Boundary
 
