@@ -33,15 +33,15 @@ A Proof Capsule is a bounded evidence unit. It is not a sales claim, revenue cla
   "run": {
     "run_id": "string",
     "run_type": "measured | replay | synthetic | bench | modeled",
-    "timestamp_utc": "ISO-8601 string",
-    "code_commit": "git SHA or unknown",
+    "timestamp_utc": "ISO-8601 UTC string",
+    "code_commit": "git SHA or explicit unknown value",
     "dependency_lock": "path or unknown",
     "seed_or_window": "string"
   },
   "manifest": {
     "input_hashes": [],
     "output_hashes": [],
-    "manifest_hash": "string or pending",
+    "manifest_hash": "64-character SHA-256 digest",
     "public_safe": true
   },
   "result": {
@@ -85,18 +85,44 @@ A Proof Capsule is a bounded evidence unit. It is not a sales claim, revenue cla
 A capsule may be public only when:
 
 - source/dataset is named,
-- data rights are labeled,
-- baseline/comparator is named,
+- data rights are resolved and labeled,
+- baseline/comparator is named and selected before scoring,
 - metric is locked before scoring,
-- run type is labeled,
-- manifest or hash plan exists,
+- evidence type and run type are compatible,
+- the run timestamp is explicit UTC,
+- manifest paths are canonical repository-relative POSIX paths,
+- at least one artifact hash is verified,
+- manifest and artifact hashes are valid SHA-256 digests,
+- negative or neutral findings and failure notes are retained,
 - limitations are explicit,
+- non-external evidence explicitly states that external, field, or operational validation is not established,
 - forbidden claims are absent,
 - founder approval is recorded.
 
+`source.rights_status: unknown` is valid as an internal drafting state, but it does not pass the public verifier. Resolve it before promotion.
+
 ---
 
-## 4. Forbidden promotion language
+## 4. Verifier v2 integrity and resource gates
+
+The standard-library verifier additionally fails closed when:
+
+- the capsule contains duplicate JSON keys or invalid UTF-8,
+- a path is absolute, uses backslashes, escapes the repository root, or is non-canonical,
+- duplicate manifest paths or aliases resolve to the same artifact,
+- a referenced artifact is missing, not a regular file, too large, or changes while being hashed,
+- a SHA-256 or manifest digest is malformed or mismatched,
+- enumerated source, baseline, evidence, run, or pilot values are unsupported,
+- the timestamp is invalid or not UTC,
+- list fields contain blank, non-string, or duplicate entries,
+- a capsule or artifact exceeds the configured resource budget,
+- public summary language contains a prohibited performance, endorsement, certification, revenue, or deployment claim.
+
+Default resource budgets are 1 MiB for the capsule JSON and 512 MiB per referenced artifact. They may be raised explicitly by a reviewer; they are resource-safety limits, not evidence-quality thresholds.
+
+---
+
+## 5. Forbidden promotion language
 
 Do not promote a Proof Capsule using language that implies:
 
@@ -114,6 +140,6 @@ Do not promote a Proof Capsule using language that implies:
 
 ---
 
-## 5. Safe capsule sentence
+## 6. Safe capsule sentence
 
 > This Proof Capsule is a bounded evidence unit. It identifies source, baseline, locked metric, run type, manifest status, result, and limitations so reviewers can decide the next validation gate without treating internal evidence as field certification.
