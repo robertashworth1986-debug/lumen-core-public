@@ -29,6 +29,7 @@
 - [x] Public live release verified at `https://lumen-core.ai/build_week/prooflock_console/?release=20260718.1&commit=e9a1aba`.
 - [x] All 14 deployed files returned HTTP 200 and matched the exact commit archive by SHA-256.
 - [x] Live release QA, visual evidence, and hashes are recorded in `docs/OPENAI_BUILD_WEEK_PROOFLOCK_LIVE_RELEASE_RECEIPT_2026-07-18.md`.
+- [x] A timed under-three-minute narration and one-pass human submission checklist are recorded in `docs/OPENAI_BUILD_WEEK_PROOFLOCK_DEMO_NARRATION_2026-07-18.md` and `docs/OPENAI_BUILD_WEEK_PROOFLOCK_HUMAN_GATE_CHECKLIST_2026-07-18.md`.
 
 ## External And Human Gates
 
@@ -40,7 +41,7 @@
 - [ ] Primary build task `/feedback` Session ID captured.
 - [ ] Actual GPT-5.6 model/session evidence captured from authoritative UI or session metadata.
 - [ ] Founder review of judge-facing copy completed.
-- [x] Draft pull request CI completed successfully on head commit `e9a1aba6fdfb368c64887af7e9caeee8aac21abb`.
+- [x] Draft pull request CI completed successfully on live-QA commit `a7731fa`.
 - [ ] Final Devpost form reviewed by Robert.
 - [ ] Final Devpost submit clicked by Robert.
 
