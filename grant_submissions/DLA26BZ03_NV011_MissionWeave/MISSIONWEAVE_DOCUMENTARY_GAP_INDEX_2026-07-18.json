@@ -1,0 +1,135 @@
+{
+  "schema": "lumencore.missionweave_documentary_gap_index.v1",
+  "generated_utc": "2026-07-18T12:56:06.293799+00:00",
+  "status": "NO_QUALIFYING_DOCUMENTARY_CANDIDATES_LOCATED",
+  "scan_mode": "FILENAME_AND_FILESYSTEM_METADATA_ONLY",
+  "controls": {
+    "file_contents_read": false,
+    "candidate_paths_published": false,
+    "symlinks_followed": false,
+    "credentials_or_private_values_collected": false,
+    "gate_changes_automatic": false,
+    "maximum_files_per_root": 1000000
+  },
+  "search_policy": {
+    "document_classes": [
+      "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+      "MISSIONWEAVE_FWA_TRAINING_EVIDENCE",
+      "SAM_REPRESENTATIONS_EVIDENCE",
+      "MISSIONWEAVE_PORTAL_PREVIEW_RECEIPT"
+    ],
+    "evidence_extensions": [
+      ".csv",
+      ".doc",
+      ".docx",
+      ".jpeg",
+      ".jpg",
+      ".json",
+      ".pdf",
+      ".png",
+      ".rtf",
+      ".txt",
+      ".xlsx"
+    ],
+    "skipped_directory_names": [
+      ".git",
+      ".mypy_cache",
+      ".pytest_cache",
+      ".ruff_cache",
+      ".tox",
+      ".venv",
+      "__pycache__",
+      "node_modules",
+      "temp",
+      "venv"
+    ],
+    "skipped_path_fragments": [
+      "out/execution",
+      "output/clean-checkout",
+      "proof_vault/temp"
+    ]
+  },
+  "roots": [
+    {
+      "root_id": "repository",
+      "present": true,
+      "scan_complete": true,
+      "scanned_file_count": 118256,
+      "skipped_directory_count": 170,
+      "metadata_error_count": 0,
+      "candidate_counts": {
+        "DD2345_OR_JCP_APPLICATION_EVIDENCE": 0,
+        "MISSIONWEAVE_FWA_TRAINING_EVIDENCE": 0,
+        "SAM_REPRESENTATIONS_EVIDENCE": 0,
+        "MISSIONWEAVE_PORTAL_PREVIEW_RECEIPT": 0
+      },
+      "candidate_details_published": false,
+      "status": "COMPLETE"
+    },
+    {
+      "root_id": "icloud_drive",
+      "present": true,
+      "scan_complete": true,
+      "scanned_file_count": 46627,
+      "skipped_directory_count": 712,
+      "metadata_error_count": 0,
+      "candidate_counts": {
+        "DD2345_OR_JCP_APPLICATION_EVIDENCE": 0,
+        "MISSIONWEAVE_FWA_TRAINING_EVIDENCE": 0,
+        "SAM_REPRESENTATIONS_EVIDENCE": 0,
+        "MISSIONWEAVE_PORTAL_PREVIEW_RECEIPT": 0
+      },
+      "candidate_details_published": false,
+      "status": "COMPLETE"
+    },
+    {
+      "root_id": "proof_vault",
+      "present": true,
+      "scan_complete": true,
+      "scanned_file_count": 29865,
+      "skipped_directory_count": 180,
+      "metadata_error_count": 0,
+      "candidate_counts": {
+        "DD2345_OR_JCP_APPLICATION_EVIDENCE": 0,
+        "MISSIONWEAVE_FWA_TRAINING_EVIDENCE": 0,
+        "SAM_REPRESENTATIONS_EVIDENCE": 0,
+        "MISSIONWEAVE_PORTAL_PREVIEW_RECEIPT": 0
+      },
+      "candidate_details_published": false,
+      "status": "COMPLETE"
+    }
+  ],
+  "summary": {
+    "root_count": 3,
+    "present_root_count": 3,
+    "complete_root_count": 3,
+    "scanned_file_count": 194748,
+    "skipped_directory_count": 1062,
+    "metadata_error_count": 0,
+    "candidate_total": 0,
+    "candidate_counts": {
+      "DD2345_OR_JCP_APPLICATION_EVIDENCE": 0,
+      "MISSIONWEAVE_FWA_TRAINING_EVIDENCE": 0,
+      "SAM_REPRESENTATIONS_EVIDENCE": 0,
+      "MISSIONWEAVE_PORTAL_PREVIEW_RECEIPT": 0
+    }
+  },
+  "gate_decisions": {
+    "DD2345_OR_JCP_APPLICATION_EVIDENCE": "NO_CHANGE_KEEP_GATE_OPEN",
+    "MISSIONWEAVE_FWA_TRAINING_EVIDENCE": "NO_CHANGE_KEEP_GATE_OPEN",
+    "SAM_REPRESENTATIONS_EVIDENCE": "NO_CHANGE_KEEP_GATE_OPEN",
+    "MISSIONWEAVE_PORTAL_PREVIEW_RECEIPT": "NO_CHANGE_KEEP_GATE_OPEN",
+    "DSIP_FIRM_PIN_AVAILABILITY": "PORTAL_ONLY_NO_FILE_INFERENCE"
+  },
+  "next_actions": [
+    "Keep the named documentary gates open unless a current record is reviewed privately.",
+    "Complete FWA training, Firm PIN verification, and the final preview inside authenticated DSIP.",
+    "Treat DD Form 2345/JCP, SAM representations, and portal-preview facts as current only after documentary or portal review."
+  ],
+  "claim_boundary": "This index records filename and filesystem metadata only. It does not read document contents, expose candidate paths, verify authenticity or currency, establish eligibility or compliance, certify training, confirm a Firm PIN, complete a portal gate, or authorize submission. Zero filename candidates means no qualifying candidate was located under this bounded search policy; it does not prove that no document exists elsewhere.",
+  "outputs": {
+    "json": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DOCUMENTARY_GAP_INDEX_2026-07-18.json",
+    "markdown": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DOCUMENTARY_GAP_INDEX_2026-07-18.md"
+  },
+  "index_sha256": "601f6f30dfe96cb84b39ac9e5e6245b174182e308cf3a558b65fcc36929ac165"
+}
