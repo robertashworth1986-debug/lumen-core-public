@@ -1,0 +1,55 @@
+{
+  "schema": "lumencore.hardware_concept_asset.v1",
+  "asset_id": "flowform_lumenshell_dualmode_vtol_v3",
+  "asset_name": "FLOWFORM LumenShell Dual-Mode VTOL V3 Concept",
+  "asset_path": "assets/hardware/flowform_lumenshell_dualmode_vtol_v3_concept.png",
+  "media_type": "image/png",
+  "bytes": 2288307,
+  "width_pixels": 1536,
+  "height_pixels": 1024,
+  "sha256": "4e6a1bf50073cb3f6258436d93a194fe0030e3a6441bd3c33002908f52ea9e81",
+  "created_date": "2026-07-17",
+  "status": "GENERATED_CONCEPT_RENDER_NOT_ENGINEERING_VALIDATION",
+  "supersedes_asset_id": "flowform_lumenshell_robot_ev_v2",
+  "source_concept_references": [
+    "assets/hardware/flowform_lumenshell_robot_ev_v2_concept.json",
+    "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.json",
+    "docs/hardware/lumenshell_dualmode_vtol/system_requirements.json",
+    "code/hardware/lumenshell_safety_state_machine.py"
+  ],
+  "generation_provenance": {
+    "method": "OpenAI built-in image generation using the V2 project-local architecture as a reference",
+    "reference_asset_id": "flowform_lumenshell_robot_ev_v2",
+    "intended_use": "bounded reviewer-facing dual-mode wearable and autonomous research concept"
+  },
+  "bounded_design_translation": {
+    "dual_mode": "The same serviceable outer architecture is shown in occupied wearable-ground and unoccupied autonomous configurations. The modes require separate controllers and independent interlocks.",
+    "jet_pack": "The shrouded fan pack is a detachable propulsion research module. The image provides no thrust, mass, power, thermal, containment, control, endurance, or safety evidence.",
+    "sound_and_frequency": "Distributed acoustic and vibration sensing, modal identification, active vibration or noise control, ranging, and health monitoring. These functions are not presented as primary lift or free energy.",
+    "cymatic_channels": "Candidate wave-channel shell structures for blinded comparison with flat, straight-rib, and constrained-layer damping baselines.",
+    "whitehole_blackhole_logic": "A bounded source/sink routing metaphor for intake, distribution, telemetry, heat rejection, and fault isolation. It is not literal astrophysics or energy creation.",
+    "battery_separation": "The suit uses a compact protected service-energy domain. The electric-vehicle honeycomb battery remains a separate research lane."
+  },
+  "visible_design_intent": [
+    "occupied wearable ground configuration with explicit harness and quick-release intent",
+    "unoccupied autonomous configuration on an internal support frame",
+    "detachable guarded fan modules rather than integrated fantasy propulsion",
+    "separate fan-module ground test stand",
+    "curved conformal compute enclosure and source/sink service routing",
+    "wave-channel structural panels and distributed sensing",
+    "serviceable joints, guarded mechanisms, and conservative industrial materials"
+  ],
+  "current_program_boundary": "No occupied flight state exists in the executable reference monitor. Current work is limited to requirements, passive fit, coupon tests, ground actuation, unoccupied autonomy, detached propulsion stands, and later unoccupied tethered research under qualified independent supervision.",
+  "required_engineering_next_steps": [
+    "complete independent system safety analysis, FMEA, human-factors review, threat model, and verification cross-reference matrix",
+    "build an adjustable unpowered fit, alignment, load-path, quick-release, and egress rig before powered wearable testing",
+    "preregister wave-channel coupon tests against flat, straight-rib, and conventional constrained-layer damping baselines",
+    "measure modal response, transmissibility, impact attenuation, fatigue, thermal behavior, control energy, and mass penalty with uncertainty",
+    "develop guarded single-joint and unoccupied ground rigs with hardwired energy isolation and fault injection",
+    "select a qualified contained propulsion-test facility and independent aerospace test lead",
+    "measure detached-module thrust, power, thermal, noise, vibration, containment, asymmetric-fault, and shutdown behavior",
+    "obtain written FAA or applicable authority pathway guidance before any free-flight activity",
+    "obtain qualified independent aerospace, exoskeleton, controls, electrical, battery, medical, ergonomics, cybersecurity, and manufacturing review"
+  ],
+  "claim_boundary": "This image is an AI-generated industrial-design concept. It is not CAD, not a schematic, not a bill of materials, not a fabricated prototype, not flight software, not an aircraft, not test evidence, not a safety assessment, not certification, not patentability evidence, and not authorization for construction or operation. It does not prove human flight, acoustic lift, thrust, stability, damping, impact attenuation, autonomy, payload, runtime, reliability, thermal performance, containment, egress, human safety, manufacturability, commercial readiness, or regulatory compliance. Sound, frequency, cymatic, and source/sink terms describe bounded hypotheses, sensing functions, and routing metaphors only."
+}

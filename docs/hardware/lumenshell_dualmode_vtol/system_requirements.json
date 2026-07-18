@@ -1,0 +1,216 @@
+{
+  "schema": "lumencore.system_requirements.v1",
+  "system_id": "LUMENSHELL-DUALMODE-VTOL",
+  "revision": "0.1.0",
+  "date": "2026-07-17",
+  "status": "PRELIMINARY_RESEARCH_ARCHITECTURE_NOT_APPROVED_FOR_HUMAN_FLIGHT",
+  "mission": "Evaluate a shared LumenShell architecture that can support a person during ground tasks or operate unoccupied as an autonomous robotic platform, with a physically detachable experimental propulsion module.",
+  "current_program_boundary": "Ground and unoccupied test research only. Human flight is outside the authorized prototype program until independent aerospace, medical, safety, and regulatory authorities approve a later program.",
+  "mode_definitions": {
+    "WEARABLE_GROUND": "Verified occupant is primary authority; bounded assist only; propulsion remains deenergized.",
+    "AUTONOMOUS_GROUND": "No occupant; autonomous controller may command bounded ground motion inside a controlled exclusion zone.",
+    "PROPULSION_TEST_STAND": "Detached propulsion module is physically locked to an instrumented stand with no occupant.",
+    "AUTONOMOUS_TETHERED_TEST": "No occupant; integrated system is physically tethered and operated under independent test authorization.",
+    "FAULT_LOCKOUT": "Energy and motion are removed; only a deliberate service reset can return the system to SAFE_GROUND."
+  },
+  "architectural_separation": [
+    "wearable-assist controller",
+    "unoccupied autonomous controller",
+    "independent safety controller and hardwired energy isolation",
+    "detachable propulsion module",
+    "compact protected suit service battery",
+    "separate electric-vehicle honeycomb battery research lane"
+  ],
+  "requirements": [
+    {
+      "id": "SYS-001",
+      "shall": "The system shall implement mutually exclusive wearable, autonomous, propulsion-test, safe-ground, powered-off, and fault-lockout states.",
+      "verification": "inspection_and_state_machine_test"
+    },
+    {
+      "id": "SYS-002",
+      "shall": "The propulsion module shall be mechanically, electrically, and logically detachable from the ground exosuit.",
+      "verification": "interface_review_and_physical_inspection"
+    },
+    {
+      "id": "SAFE-001",
+      "shall": "An independent safety controller shall retain authority to remove actuator and propulsion energy regardless of mission-controller state.",
+      "verification": "fault_injection_and_energy_isolation_test"
+    },
+    {
+      "id": "SAFE-002",
+      "shall": "Autonomous and propulsion-test states shall be rejected whenever any independent occupancy sensor reports a person in the suit.",
+      "verification": "state_machine_test_and_sensor_fault_injection"
+    },
+    {
+      "id": "SAFE-003",
+      "shall": "Every active-mode transition shall begin from SAFE_GROUND with actuators and propulsion deenergized.",
+      "verification": "state_machine_test"
+    },
+    {
+      "id": "SAFE-004",
+      "shall": "Emergency stop, watchdog loss, sensor-health loss, or isolation fault shall make FAULT_LOCKOUT reachable without software permission from a mission controller.",
+      "verification": "hardware_in_loop_fault_injection"
+    },
+    {
+      "id": "SAFE-005",
+      "shall": "Wearable operation shall require verified harness closure, joint alignment, quick release, egress, and ground support.",
+      "verification": "human_factors_inspection_and_ground_test"
+    },
+    {
+      "id": "SAFE-006",
+      "shall": "No current software state shall authorize occupied flight.",
+      "verification": "source_inspection_and_exhaustive_state_test"
+    },
+    {
+      "id": "SAFE-007",
+      "shall": "Propulsion testing shall require a locked stand or independent physical tether, a clear exclusion zone, and written independent safety authorization.",
+      "verification": "test_readiness_review_and_state_machine_test"
+    },
+    {
+      "id": "SAFE-008",
+      "shall": "Stored-energy domains shall provide independent isolation, current limiting, thermal monitoring, containment intent, and service disconnects.",
+      "verification": "electrical_review_and_abuse_test_plan"
+    },
+    {
+      "id": "CTRL-001",
+      "shall": "Wearable intent assistance and autonomous behavior shall use separate bounded controllers and shall not share unrestricted command authority.",
+      "verification": "software_architecture_review_and_interface_test"
+    },
+    {
+      "id": "CTRL-002",
+      "shall": "All safety-relevant commands, interlock observations, clock sources, configuration versions, and state transitions shall be time-stamped and hash-receipted.",
+      "verification": "deterministic_replay_and_receipt_verification"
+    },
+    {
+      "id": "PROP-001",
+      "shall": "Lift and control authority shall be supported only by measured thrust, mass, power, thermal, and failure-envelope evidence from instrumented tests.",
+      "verification": "independent_test_report"
+    },
+    {
+      "id": "PROP-002",
+      "shall": "Propulsion hazards shall be assessed for ingestion, hot surfaces, debris, rotor containment, asymmetric thrust, loss of power, fire, noise, and uncontrolled motion.",
+      "verification": "hazard_analysis_and_test_plan_review"
+    },
+    {
+      "id": "ACOU-001",
+      "shall": "Sound and frequency functions shall be limited to measurable sensing, ranging, communication, modal identification, vibration control, noise control, and health monitoring unless a new claim passes independent testing.",
+      "verification": "claim_review_and_bench_test"
+    },
+    {
+      "id": "ACOU-002",
+      "shall": "The program shall not claim that acoustic or cymatic effects provide human-scale primary lift without independent reproducible evidence.",
+      "verification": "claim_register_audit"
+    },
+    {
+      "id": "ACOU-003",
+      "shall": "Wave-channel structures shall be compared against flat-panel, straight-rib, and conventional constrained-layer damping baselines under identical blinded protocols.",
+      "verification": "preregistered_coupon_test"
+    },
+    {
+      "id": "HUM-001",
+      "shall": "Human-factors evaluation shall cover fit range, pressure, pinch and crush zones, joint alignment, center-of-mass shift, balance, fatigue, thermal exposure, noise, and emergency egress.",
+      "verification": "qualified_ergonomics_and_medical_review"
+    },
+    {
+      "id": "CYBER-001",
+      "shall": "Remote and autonomous functions shall fail closed under authentication loss, command replay, stale telemetry, clock drift, network loss, or software integrity failure.",
+      "verification": "threat_model_and_adversarial_test"
+    },
+    {
+      "id": "REG-001",
+      "shall": "The program shall obtain written regulatory-pathway guidance before any free-flight activity or public operation.",
+      "verification": "authority_correspondence"
+    }
+  ],
+  "authority_gates": [
+    {
+      "id": "AG-01",
+      "name": "Source and claim boundary",
+      "pass_evidence": "Dated concept lineage, public/private boundary, prior-art review plan, and claim-risk register approved."
+    },
+    {
+      "id": "AG-02",
+      "name": "Requirements and hazards",
+      "pass_evidence": "Independent review of requirements, hazard analysis, FMEA, system safety assessment, and verification matrix."
+    },
+    {
+      "id": "AG-03",
+      "name": "Passive fit and egress",
+      "pass_evidence": "Unpowered fit rig demonstrates joint alignment, load paths, quick release, egress, and no unacceptable pinch or pressure hazards."
+    },
+    {
+      "id": "AG-04",
+      "name": "Frequency and structure evidence",
+      "pass_evidence": "Preregistered coupon tests report damping, transmissibility, fatigue, thermal, mass, and uncertainty results against named baselines."
+    },
+    {
+      "id": "AG-05",
+      "name": "Ground actuation and autonomy",
+      "pass_evidence": "Tethered joint rigs and unoccupied ground platform pass interlock, balance, stop-distance, watchdog, and fault-injection tests."
+    },
+    {
+      "id": "AG-06",
+      "name": "Detached propulsion stand",
+      "pass_evidence": "Qualified facility independently witnesses contained static tests and reports thrust, power, thermal, noise, vibration, containment, and failure data."
+    },
+    {
+      "id": "AG-07",
+      "name": "Unoccupied integrated tether",
+      "pass_evidence": "No-occupant integrated system passes tethered tests, asymmetric-fault tests, deterministic replay, and independent test-readiness review."
+    },
+    {
+      "id": "AG-08",
+      "name": "Authority hold point",
+      "pass_evidence": "Independent aerospace, medical, safety, and regulatory authorities approve the next test basis in writing. Passing this gate is not itself certification or permission for unrestricted operation."
+    }
+  ],
+  "acoustic_frequency_test_matrix": [
+    {
+      "hypothesis": "Wave-channel panels improve structural damping without unacceptable mass or thermal penalties.",
+      "baselines": [
+        "flat panel",
+        "straight rib panel",
+        "conventional constrained-layer damping panel"
+      ],
+      "metrics": [
+        "modal damping ratio",
+        "frequency response function",
+        "transmissibility",
+        "impact attenuation",
+        "fatigue life",
+        "thermal rise",
+        "mass penalty"
+      ]
+    },
+    {
+      "hypothesis": "Active vibration control reduces selected structural modes under bounded operating conditions.",
+      "baselines": [
+        "controller disabled",
+        "fixed notch controller",
+        "standard adaptive controller"
+      ],
+      "metrics": [
+        "RMS acceleration",
+        "peak response",
+        "control energy",
+        "stability margin",
+        "fault response"
+      ]
+    },
+    {
+      "hypothesis": "Acoustic and vibration telemetry improves propulsion health-event detection.",
+      "baselines": [
+        "RPM and current only",
+        "standard vibration threshold"
+      ],
+      "metrics": [
+        "detection sensitivity",
+        "false alarm rate",
+        "detection latency",
+        "calibration drift",
+        "cross-condition generalization"
+      ]
+    }
+  ]
+}
