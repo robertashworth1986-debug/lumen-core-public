@@ -321,6 +321,9 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
         assert f"Volume {volume}" in checklist
     assert "July 22, 2025" in checklist
     assert "July 22, 2026" in checklist
+    assert "July 22, 2026 at 11:00 a.m. Central Time" in checklist
+    assert "July 21 at 3:00 p.m. Central" in checklist
+    assert "every volume must be completed and endorsed before close" in checklist
     assert "Volume 2 candidate: `12` pages of `20` allowed" in checklist
     assert "Foreign Risk Evaluation (FRE)" in checklist
     assert "Do not upload a foreign-affiliations PDF in Volume 5" in checklist
