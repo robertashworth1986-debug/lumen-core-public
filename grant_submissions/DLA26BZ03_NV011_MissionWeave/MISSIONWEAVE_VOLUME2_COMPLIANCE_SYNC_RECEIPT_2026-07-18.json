@@ -1,0 +1,70 @@
+{
+  "schema": "lumencore.missionweave_volume2_compliance_sync_receipt.v1",
+  "created_utc": "2026-07-18T10:59:17Z",
+  "topic": "DLA26BZ03-NV011",
+  "protocol_commit": "3d62fc8",
+  "source_branch": "codex/mindwise-product-lane-20260718",
+  "mirror_root": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_VOLUME2_COMPLIANCE_20260718_3D62FC8",
+  "mirror_overwrite_performed": false,
+  "artifact_counts": {
+    "total": 29,
+    "public": 16,
+    "private": 10,
+    "official_sources": 3
+  },
+  "all_source_hashes_match_mirror": true,
+  "private_mirror_receipt_sha256": "A9DBBD6756A42A2F801FF0FF637EB10D5E4ADF0CB42079F48A5957375FF71247",
+  "key_public_artifacts": [
+    {
+      "path": "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.md",
+      "sha256": "3A1569F945CAC2DAB4A699FC5543E043C55A32CE6CAAF882581AA22279BE528A"
+    },
+    {
+      "path": "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf",
+      "sha256": "88F92DE4A22FF56F49D5C9C8D5BAE8D3973DB88F37634B648263958E3625EADB"
+    },
+    {
+      "path": "MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json",
+      "sha256": "91F28BB0080E4FAA87F7970FC35C136C06846894ACBF2552F48030F940C9F4D4"
+    },
+    {
+      "path": "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "sha256": "AB2833ED46B88E599DC034093E1E487344CB00AF57C7EC1BD9B1D69424AC02E9"
+    },
+    {
+      "path": "MISSIONWEAVE_DSIP_VOLUME5_WORKSHEET_2026-07-16.md",
+      "sha256": "7F77792874DB59BAAE7AC41E99F4B9E0D8D7002442207F860BC5E58AF4551C4A"
+    },
+    {
+      "path": "source_attachments/DoW_2026_SBIR_BAA_RELEASE_3_AMENDMENT_2.pdf",
+      "sha256": "FB809186F3B43313A1877A5C36E2383A45B84F62566DDA3F6BCDB93779CE08AE"
+    }
+  ],
+  "qa": {
+    "focused_tests": 31,
+    "focused_tests_passed": 31,
+    "pdf_pages": 12,
+    "pdf_page_limit": 20,
+    "pdf_letter_size": true,
+    "pdf_searchable": true,
+    "pdf_encrypted": false,
+    "all_pages_visually_reviewed": true,
+    "package_manifest_file_count": 15,
+    "package_manifest_verified": true,
+    "action_gate_status": "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN",
+    "action_gate_passed": 20,
+    "action_gate_open": 30
+  },
+  "private_boundary": {
+    "assigned_proposal_number_exposed": false,
+    "private_artifact_hashes_exposed": false,
+    "private_artifact_contents_committed": false,
+    "private_artifacts_git_ignored": true
+  },
+  "external_actions": {
+    "portal_upload_performed": false,
+    "portal_submission_performed": false,
+    "final_certification_performed": false,
+    "external_send_performed": false
+  }
+}
