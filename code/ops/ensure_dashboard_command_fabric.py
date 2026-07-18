@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ensure canonical dashboard pages load the shared Luma command fabric."""
+"""Ensure canonical dashboard pages load the shared command fabric and truthful indexing policy."""
 
 from __future__ import annotations
 
@@ -9,6 +9,8 @@ from pathlib import Path
 
 CANONICAL_PAGES = (
     "operator_home.html",
+    "proof_to_pilot.html",
+    "review_sprint.html",
     "mission_control.html",
     "quant_lab.html",
     "kraken_execution_dashboard.html",
@@ -16,23 +18,40 @@ CANONICAL_PAGES = (
     "forecast.html",
     "explain.html",
 )
+INDEXABLE_PAGES = {
+    "operator_home.html",
+    "proof_to_pilot.html",
+    "review_sprint.html",
+}
 CSS_REF = '<link rel="stylesheet" href="./assets/luma_command_fabric.css">'
 JS_REF = '<script src="./assets/luma_command_fabric.js"></script>'
+ROBOTS_NOINDEX_REF = '<meta name="robots" content="noindex,nofollow,noarchive">'
 
 
 def ensure_fabric(path: Path) -> bool:
+    """Inject shared assets and fail-closed search indexing for operator-only surfaces."""
+
     text = path.read_text(encoding="utf-8")
     updated = text
+
+    if path.name not in INDEXABLE_PAGES and 'name="robots"' not in updated.lower():
+        if "</head>" not in updated:
+            raise ValueError(f"{path} has no closing head tag")
+        updated = updated.replace("</head>", f"{ROBOTS_NOINDEX_REF}\n</head>", 1)
+
     if "luma_command_fabric.css" not in updated:
         if "</head>" not in updated:
             raise ValueError(f"{path} has no closing head tag")
         updated = updated.replace("</head>", f"{CSS_REF}\n</head>", 1)
+
     if "luma_command_fabric.js" not in updated:
         if "</body>" not in updated:
             raise ValueError(f"{path} has no closing body tag")
         updated = updated.replace("</body>", f"{JS_REF}\n</body>", 1)
+
     if updated == text:
         return False
+
     path.write_text(updated, encoding="utf-8")
     return True
 
@@ -50,6 +69,7 @@ def main() -> int:
     root = args.dashboard_root.expanduser().resolve()
     missing: list[str] = []
     changed: list[str] = []
+
     for name in CANONICAL_PAGES:
         path = root / name
         if not path.exists():
