@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LumenCore Proof-to-Pilot | Public evidence review</title>
+  <meta name="description" content="Inspect LumenCore's public Proof Capsule, verifier, source summary, claim boundary, and controlled external-validation gate.">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+  <link rel="canonical" href="https://lumen-core.ai/proof_to_pilot.html">
+  <meta name="theme-color" content="#04060f">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LumenCore">
+  <meta property="og:title" content="LumenCore Proof-to-Pilot | Public evidence review">
+  <meta property="og:description" content="Read the capsule, verify the artifacts, inspect the claim boundary, and choose one bounded next decision.">
+  <meta property="og:url" content="https://lumen-core.ai/proof_to_pilot.html">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="./assets/lumencore-mark.svg" type="image/svg+xml">
+  <link rel="manifest" href="./site.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&family=Orbitron:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/lumencore.css">
+  <link rel="stylesheet" href="./assets/public_site.css">
+  <link rel="stylesheet" href="./assets/luma_command_fabric.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "LumenCore Proof-to-Pilot Public Evidence Review",
+    "description": "A bounded public review path for Proof Capsules, reproducibility controls, claim boundaries, and external-validation gates.",
+    "author": {
+      "@type": "Person",
+      "name": "Robert Ashworth"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "LumenCore",
+      "url": "https://lumen-core.ai/"
+    },
+    "mainEntityOfPage": "https://lumen-core.ai/proof_to_pilot.html"
+  }
+  </script>
+</head>
+<body class="public-site">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-shell site-header-inner">
+      <a class="site-brand" href="/" aria-label="LumenCore home">
+        <img src="./assets/lumencore-mark.svg" width="38" height="38" alt="">
+        <span class="site-brand-copy">
+          <span class="site-brand-name">LumenCore</span>
+          <span class="site-brand-sub">Public evidence review</span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="/">Home</a>
+        <a href="/proof_to_pilot.html" aria-current="page">Proof</a>
+        <a href="#review-path">Review path</a>
+        <a href="#boundary">Boundary</a>
+        <a class="nav-cta" href="/review_sprint.html">Scope a review</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <div class="site-shell">
+      <section class="page-hero" aria-labelledby="page-title">
+        <div class="page-hero-inner">
+          <div class="eyebrow">LumenCore public evidence surface</div>
+          <h1 id="page-title">Read the evidence. <span class="accent">Then decide what it permits.</span></h1>
+          <p class="page-lead">
+            A Proof Capsule separates three questions that are often blurred together:
+            <strong>Did the declared files remain intact? Do those files support the stated claim?
+            Has the responsible human authorized the next action?</strong>
+            Internal simulation, replay, benchmark, and hash records are not external validation.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="https://github.com/robertashworth1986-debug/lumen-core-public/tree/main/examples/proof_capsule" rel="noopener noreferrer">Open public capsule</a>
+            <a class="button" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/QUICKSTART.md" rel="noopener noreferrer">Run five-minute verification</a>
+            <a class="button quiet" href="/review_sprint.html">Scope external review</a>
+          </div>
+          <div class="metric-band" aria-label="Current public proof state">
+            <div class="metric-cell">
+              <span>Capsule</span>
+              <strong>Public fixture available</strong>
+            </div>
+            <div class="metric-cell">
+              <span>Verifier</span>
+              <strong>Standard-library path</strong>
+            </div>
+            <div class="metric-cell">
+              <span>Decision</span>
+              <strong>External review</strong>
+            </div>
+            <div class="metric-cell">
+              <span>Field validation</span>
+              <strong>Not yet established</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-section" id="review-path" aria-labelledby="review-title">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">Reviewer path</div>
+            <h2 id="review-title">One capsule. Three checks. One next gate.</h2>
+          </div>
+          <p>
+            The public path is intentionally short. A qualified reviewer should be able to identify the source,
+            comparator, metric, configuration, result, adverse finding, limitation, and decision without reconstructing the entire platform.
+          </p>
+        </div>
+
+        <div class="card-grid">
+          <article class="surface-card">
+            <span class="card-number">01</span>
+            <h3>Inspect the canonical capsule</h3>
+            <p>Read what was tested, the authoritative source, the incumbent baseline, the metric locked before scoring, and the exact limitation.</p>
+            <ul class="clean-list">
+              <li>Declared run type and decision owner</li>
+              <li>Source and output hash records</li>
+              <li>Positive and negative findings</li>
+              <li>Claim boundary and next gate</li>
+            </ul>
+            <div class="card-actions">
+              <a class="button quiet" href="https://github.com/robertashworth1986-debug/lumen-core-public/tree/main/examples/proof_capsule" rel="noopener noreferrer">Inspect capsule</a>
+            </div>
+          </article>
+
+          <article class="surface-card">
+            <span class="card-number">02</span>
+            <h3>Verify the declared artifacts</h3>
+            <p>Run the repository verifier and focused tests from a clean checkout. Verification checks declared structure and hashes; it does not independently reproduce a private experiment.</p>
+            <ul class="clean-list">
+              <li>Schema and required fields</li>
+              <li>Path and hash integrity</li>
+              <li>Metric-lock and negative-result controls</li>
+              <li>Fail-closed handling of tampering</li>
+            </ul>
+            <div class="card-actions">
+              <a class="button quiet" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/QUICKSTART.md" rel="noopener noreferrer">Run quick start</a>
+            </div>
+          </article>
+
+          <article class="surface-card">
+            <span class="card-number">03</span>
+            <h3>Make a bounded decision</h3>
+            <p>A valid evidence packet does not force promotion. The reviewer selects the next authorized state based on the substantive evidence and open authority gates.</p>
+            <ul class="clean-list">
+              <li>Reject the claim</li>
+              <li>Request information or correct the design</li>
+              <li>Rerun under predeclared conditions</li>
+              <li>Authorize external review or a scoped pilot</li>
+            </ul>
+            <div class="card-actions">
+              <a class="button quiet" href="/review_sprint.html">Review sprint scope</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="page-section" aria-labelledby="fixture-title">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">Current public fixture</div>
+            <h2 id="fixture-title">A bounded EIA/Kraken replay summary with the failure cost retained.</h2>
+          </div>
+          <p>
+            The public example demonstrates the evidence method on frozen time-series stress windows.
+            It is not represented as a field-deployed utility system, a trading performance record,
+            or an independently reproduced scientific result.
+          </p>
+        </div>
+
+        <div class="proof-layout">
+          <article class="proof-panel">
+            <div class="card-kicker">What is declared</div>
+            <h2>Reviewer-readable inputs and outputs</h2>
+            <ul class="check-list">
+              <li>Named public-source context and a frozen source summary</li>
+              <li>A predeclared metric and incumbent comparison</li>
+              <li>Hash records for the declared public artifact</li>
+              <li>Positive and negative metrics, including false-rejection cost</li>
+              <li>A pilot decision of <span class="mono">external_review</span></li>
+            </ul>
+          </article>
+
+          <article class="proof-panel">
+            <div class="card-kicker">What remains open</div>
+            <h2>Substantive reproduction and field relevance</h2>
+            <ul class="cross-list">
+              <li>The underlying private replay has not been independently reproduced</li>
+              <li>No utility, laboratory, agency, or buyer has endorsed the result</li>
+              <li>No field savings, live deployment, or production performance is claimed</li>
+              <li>No hash proves the scientific truth of an arbitrary claim</li>
+              <li>No result authorizes live trading or operational control</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="callout">
+          Integrity is necessary but not sufficient. A file can be authentic and still be incomplete, irrelevant,
+          poorly designed, or unauthorized for promotion. LumenCore preserves that distinction.
+        </div>
+      </section>
+
+      <section class="page-section" aria-labelledby="materials-title">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">Public materials</div>
+            <h2 id="materials-title">Follow the evidence chain directly.</h2>
+          </div>
+          <p>Each link opens a source-controlled public artifact. No account or API key is required for the review path.</p>
+        </div>
+
+        <div class="proof-layout">
+          <article class="proof-panel">
+            <div class="proof-stack">
+              <a class="proof-link" href="https://github.com/robertashworth1986-debug/lumen-core-public/tree/main/examples/proof_capsule" rel="noopener noreferrer">
+                <span><strong>Canonical public capsule</strong><span>Fixture, manifest, hash record, result, and decision.</span></span>
+                <code>OPEN</code>
+              </a>
+              <a class="proof-link" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/proof_capsule_verifier.py" rel="noopener noreferrer">
+                <span><strong>Verifier source</strong><span>Standard-library structure, path, and hash validation.</span></span>
+                <code>PY</code>
+              </a>
+              <a class="proof-link" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/tests/test_proof_capsule_verifier.py" rel="noopener noreferrer">
+                <span><strong>Focused tests</strong><span>Tampering, metric lock, negative result, and path-escape checks.</span></span>
+                <code>TEST</code>
+              </a>
+            </div>
+          </article>
+
+          <article class="proof-panel">
+            <div class="proof-stack">
+              <a class="proof-link" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PROOF_CAPSULE_SCHEMA.md" rel="noopener noreferrer">
+                <span><strong>Proof Capsule schema</strong><span>Required fields and bounded decision vocabulary.</span></span>
+                <code>SCHEMA</code>
+              </a>
+              <a class="proof-link" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md" rel="noopener noreferrer">
+                <span><strong>Source summary</strong><span>Public-safe replay context, metrics, and limitations.</span></span>
+                <code>SUMMARY</code>
+              </a>
+              <a class="proof-link" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/CLAIM_BOUNDARY_REGISTER.md" rel="noopener noreferrer">
+                <span><strong>Claim boundary register</strong><span>Measured, modeled, simulated, credential-only, and open states.</span></span>
+                <code>BOUNDARY</code>
+              </a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="page-section" id="boundary" aria-labelledby="boundary-title">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">Controlled external-validation gate</div>
+            <h2 id="boundary-title">The next serious test belongs to the reviewer who controls the data and decision.</h2>
+          </div>
+          <p>
+            External validation should not be simulated through stronger language. It requires an authorized environment,
+            agreed comparator, locked acceptance criteria, preserved failures, and a human-approved release decision.
+          </p>
+        </div>
+
+        <div class="timeline" aria-label="External validation sequence">
+          <article class="timeline-row">
+            <div class="timeline-label">Gate 01</div>
+            <div>
+              <h3>Confirm authority and data rights</h3>
+              <p>Name the authoritative source, permitted use, responsible reviewer, disclosure boundary, and any controlled-data restrictions.</p>
+            </div>
+          </article>
+          <article class="timeline-row">
+            <div class="timeline-label">Gate 02</div>
+            <div>
+              <h3>Lock the incumbent and acceptance rule</h3>
+              <p>Freeze the comparator, metric, threshold, window, exclusions, uncertainty treatment, and failure conditions before scoring.</p>
+            </div>
+          </article>
+          <article class="timeline-row">
+            <div class="timeline-label">Gate 03</div>
+            <div>
+              <h3>Run and preserve every outcome</h3>
+              <p>Retain positive, neutral, incomplete, and adverse findings with configuration, version, source identity, and hashes.</p>
+            </div>
+          </article>
+          <article class="timeline-row">
+            <div class="timeline-label">Gate 04</div>
+            <div>
+              <h3>Issue one bounded decision</h3>
+              <p>Reject, rerun, request information, authorize the next external review, or scope a pilot with written acceptance and stop conditions.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="cta-panel" aria-labelledby="cta-title">
+        <div>
+          <div class="eyebrow">Move from review to controlled test</div>
+          <h2 id="cta-title">Use the public method on one buyer-owned claim.</h2>
+          <p>
+            A commercial engagement begins with a fit check and written scope. No performance, savings,
+            certification, funding, procurement, or deployment outcome is guaranteed.
+          </p>
+        </div>
+        <div class="inline-actions">
+          <a class="button primary" href="/review_sprint.html">Read the sprint</a>
+          <a class="button" href="mailto:robertashworth4444@gmail.com?subject=LumenCore%20proof-to-pilot%20review">Request review</a>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <div class="site-footer-grid">
+          <div>
+            <strong>LumenCore™ · bounded light speed · evidence before claims.</strong>
+            <p>
+              Public artifact integrity does not independently establish scientific truth, safety, patentability,
+              field performance, or release authority. © <span data-current-year>2026</span> LumenCore.
+            </p>
+          </div>
+          <nav class="site-footer-links" aria-label="Footer navigation">
+            <a href="/">Home</a>
+            <a href="/review_sprint.html">Review sprint</a>
+            <a href="https://github.com/robertashworth1986-debug/lumen-core-public" rel="noopener noreferrer">GitHub</a>
+            <a href="mailto:robertashworth4444@gmail.com">Email</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <script src="./assets/luma_command_fabric.js"></script>
+  <script src="./assets/public_site.js"></script>
+</body>
+</html>
