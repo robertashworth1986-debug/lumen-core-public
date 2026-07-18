@@ -13,10 +13,11 @@
 - Live demonstration: `https://lumen-core.ai/build_week/prooflock_console/?release=20260718.1&commit=e9a1aba`
 - Deployed source commit: `e9a1aba6fdfb368c64887af7e9caeee8aac21abb`
 - Latest verified live-QA commit: `a7731fa`
-- Focused test result: `27 passed`
+- Current focused test result: `28 passed`
 - Live-file identity: `14/14` HTTP 200 responses and exact SHA-256 matches
-- Authoritative model evidence: `gpt-5.6-sol` with `ultra` reasoning; exact Session ID retained privately
+- Authoritative model evidence: `gpt-5.6-sol` with `ultra` reasoning; a private task-metadata Session ID candidate is retained and its digest match is directly confirmed
 - Private Session ID SHA-256: `CEDEC32157F2516DF88505802805761AE3535F093FB9B1B06CA6DEFF4A344FD9`
+- Session hash reconciliation: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_SESSION_HASH_RECONCILIATION_2026-07-18.md`
 - Release receipt: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_LIVE_RELEASE_RECEIPT_2026-07-18.md`
 - Timed narration: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_DEMO_NARRATION_2026-07-18.md`
 
@@ -42,7 +43,7 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 
 1. Sign in to Devpost and verify the correct challenge, category, rules, deadline, and required fields.
 2. Run `/feedback` in the primary Codex build task and retain the exact Session ID requested by the form.
-3. Reconcile the private `/feedback` Session ID with the saved authoritative task metadata. The model is already confirmed as `gpt-5.6-sol`; do not expose the private identifier in the repository or video.
+3. Compare the private `/feedback` Session ID with the saved task-metadata candidate. The candidate's digest already matches the published hash and the model is confirmed as `gpt-5.6-sol`; do not expose the private identifier in the repository or video.
 4. Record the live demonstration using the timed narration. Keep the final cut under three minutes with intelligible audio.
 5. Upload the video to YouTube as public or unlisted, according to the live rules, and verify playback while signed out.
 6. Enter the repository, live-demo, and YouTube URLs into Devpost. Paste only the verified Session ID and model identity.
@@ -59,6 +60,7 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 - [ ] Repository link opens without authentication
 - [ ] Live demonstration opens without authentication
 - [ ] YouTube video is under three minutes and plays with audio while signed out
+- [x] Private task-metadata Session ID candidate matches the published SHA-256
 - [ ] `/feedback` Session ID comes from the primary build task
 - [x] Model name comes from authoritative session evidence
 - [ ] No patent-sensitive or private material is exposed
@@ -70,4 +72,4 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 
 ## Stop Conditions
 
-Do not submit if the video link is private, the Session ID or model identity is inferred, the live demo fails, the repository is inaccessible, or the entry implies that receipt integrity proves the underlying engineering claim.
+Do not submit if the video link is private, the Session ID has not been confirmed through `/feedback`, the model identity is inferred, the live demo fails, the repository is inaccessible, or the entry implies that receipt integrity proves the underlying engineering claim.

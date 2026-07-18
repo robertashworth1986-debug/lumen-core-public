@@ -39,7 +39,7 @@
 - [ ] Public YouTube demonstration is under three minutes and includes audio.
 - [ ] Narration accurately covers the product, Codex contribution, and confirmed GPT-5.6 use.
 - [ ] Primary build task `/feedback` Session ID captured.
-- [x] Actual model evidence captured from authoritative session metadata as `gpt-5.6-sol`; the private Session ID is represented publicly only by SHA-256 `CEDEC32157F2516DF88505802805761AE3535F093FB9B1B06CA6DEFF4A344FD9`.
+- [x] Actual model evidence captured from authoritative session metadata as `gpt-5.6-sol`; the private task-metadata Session ID candidate exactly matches public SHA-256 `CEDEC32157F2516DF88505802805761AE3535F093FB9B1B06CA6DEFF4A344FD9`, with `/feedback` confirmation still open.
 - [ ] Founder review of judge-facing copy completed.
 - [x] Draft pull request CI completed successfully on live-QA commit `a7731fa`.
 - [ ] Final Devpost form reviewed by Robert.
@@ -52,7 +52,7 @@ The complete current-main test collection produced `114 passed, 25 subtests pass
 - `test_public_capsule_verifies` hashes a CRLF checkout of `dice_eia_public_summary.txt` while the manifest records the LF Git blob.
 - `test_cli_requires_explicit_apply_and_creates_backup` passes a valid Windows temporary absolute path to a helper that accepts only Unix-style `/...` document roots.
 
-These are cross-platform baseline defects outside the focused Build Week lane. They are not hidden or weakened here, and should be repaired in a separate bounded PR. The complete ProofLock-focused suite remains `27 passed`.
+These are cross-platform baseline defects outside the focused Build Week lane. They are not hidden or weakened here, and should be repaired in a separate bounded PR. The current ProofLock-focused suite is `28 passed`; the live-release receipt preserves its historical `27 passed` run.
 
 ## Judge Test Path
 

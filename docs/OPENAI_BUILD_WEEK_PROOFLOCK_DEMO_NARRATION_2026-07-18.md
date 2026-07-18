@@ -42,7 +42,7 @@ On screen: return to the final `HOLD` state.
 
 ## Model Provenance Line
 
-The authoritative Codex task metadata records model `gpt-5.6-sol`. The exact Session ID remains private and must be reconciled with the `/feedback` value before Devpost submission.
+The authoritative Codex task metadata records model `gpt-5.6-sol`. A private Session ID candidate now matches the packet's published digest exactly, but it still must be confirmed against the `/feedback` value before Devpost submission.
 
 ## Recording Checks
 

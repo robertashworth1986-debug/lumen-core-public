@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -133,3 +134,19 @@ def test_hashed_json_artifacts_are_checkout_byte_stable():
     attributes = (ROOT / ".gitattributes").read_text(encoding="utf-8")
     assert "flowform_curved_motherboard_honeycomb_battery_v2_concept.json -text" in attributes
     assert "flowform_curved_motherboard_honeycomb_battery_v3_concept.json -text" in attributes
+
+
+def test_public_session_reconciliation_is_bounded_and_identifier_free():
+    receipt = (
+        ROOT
+        / "docs"
+        / "OPENAI_BUILD_WEEK_PROOFLOCK_SESSION_HASH_RECONCILIATION_2026-07-18.md"
+    ).read_text(encoding="utf-8")
+
+    assert "CANDIDATE_HASH_MATCH_CONFIRMED" in receipt
+    assert "CEDEC32157F2516DF88505802805761AE3535F093FB9B1B06CA6DEFF4A344FD9" in receipt
+    assert "does **not** establish that `/feedback` returns that candidate" in receipt
+    assert not re.search(
+        r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b",
+        receipt,
+    )
