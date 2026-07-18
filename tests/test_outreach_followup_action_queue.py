@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -82,6 +83,17 @@ def test_current_queue_is_deterministic_and_never_sends():
         if row["action_state"] == "RECHECK_MAILBOX_BEFORE_DRAFT"
     )
     assert len(actual["queue_sha256"]) == 64
+
+
+def test_default_build_uses_current_utc_instead_of_frozen_reference():
+    module = load_module()
+    before = datetime.now(timezone.utc)
+    payload = module.build_payload()
+    after = datetime.now(timezone.utc)
+    observed = module.parse_aware_utc(payload["as_of_utc"])
+
+    assert before <= observed <= after
+    assert payload["as_of_utc"] != module.REFERENCE_AS_OF_UTC
 
 
 def test_lanl_hold_expiration_requires_recheck_and_still_does_not_authorize_send():
@@ -181,7 +193,7 @@ def test_modes_route_closed_inbound_portal_private_and_account_work_separately()
     module = load_module()
     rows = {
         row["lane_id"]: row
-        for row in module.build_payload(module.DEFAULT_AS_OF_UTC)["actions"]
+        for row in module.build_payload(module.REFERENCE_AS_OF_UTC)["actions"]
     }
 
     assert rows["fhwa_tsmo_qualified_partner_outreach"]["action_state"] == (
@@ -217,10 +229,16 @@ def test_missing_or_drifted_lane_policy_fails_closed():
     with pytest.raises(ValueError, match="policy drift"):
         module.validate_sources(drifted, registry, policies)
 
+    stale_evidence = copy.deepcopy(reconciliation)
+    source_id = next(iter(stale_evidence["source_evidence"]))
+    stale_evidence["source_evidence"][source_id]["sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="Source evidence hash drift"):
+        module.validate_sources(stale_evidence, registry, policies)
+
 
 def test_public_outputs_exclude_mailbox_and_secret_material():
     module = load_module()
-    payload = module.build_payload(module.DEFAULT_AS_OF_UTC)
+    payload = module.build_payload(module.REFERENCE_AS_OF_UTC)
     rendered = json.dumps(payload, sort_keys=True) + "\n" + MD_OUT.read_text(
         encoding="utf-8"
     )

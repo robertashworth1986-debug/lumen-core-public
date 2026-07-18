@@ -30,7 +30,7 @@ CANONICAL_MD = SPRINT_DIR / "OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md"
 LATEST_JSON = OUT_OPS / "outreach_followup_action_queue_latest.json"
 
 SCHEMA = "lumencore.outreach_followup_action_queue.v1"
-DEFAULT_AS_OF_UTC = "2026-07-18T12:20:24Z"
+REFERENCE_AS_OF_UTC = "2026-07-18T12:20:24Z"
 
 MODE_STATES = {
     "ACCOUNT_ACTION": "HUMAN_ACCOUNT_ACTION_OPEN",
@@ -77,6 +77,32 @@ def source_status(path: Path) -> dict[str, Any]:
     }
 
 
+def validate_embedded_source_evidence(reconciliation: dict[str, Any]) -> None:
+    evidence = reconciliation.get("source_evidence")
+    if not isinstance(evidence, dict) or not evidence:
+        raise ValueError("Email reconciliation source evidence is missing")
+
+    root = ROOT.resolve()
+    for source_id, recorded in evidence.items():
+        if not isinstance(recorded, dict) or not recorded.get("path"):
+            raise ValueError(f"Invalid source evidence row: {source_id}")
+        candidate = (ROOT / str(recorded["path"])).resolve()
+        try:
+            candidate.relative_to(root)
+        except ValueError as exc:
+            raise ValueError(f"Source evidence path escapes repository: {source_id}") from exc
+
+        present = candidate.is_file()
+        if present != (recorded.get("present") is True):
+            raise ValueError(f"Source evidence presence drift: {source_id}")
+        if not present:
+            continue
+        if candidate.stat().st_size != recorded.get("bytes"):
+            raise ValueError(f"Source evidence byte-count drift: {source_id}")
+        if sha256_file(candidate) != recorded.get("sha256"):
+            raise ValueError(f"Source evidence hash drift: {source_id}")
+
+
 def validate_sources(
     reconciliation: dict[str, Any],
     registry: dict[str, Any],
@@ -90,6 +116,7 @@ def validate_sources(
         or reconciliation.get("summary", {}).get("send_now_count") != 0
     ):
         raise ValueError("Email reconciliation is missing, stale, or send-active")
+    validate_embedded_source_evidence(reconciliation)
     if (
         registry.get("schema")
         != "lumencore.outreach_response_template_registry.v1"
@@ -238,8 +265,12 @@ def render_due_followup(
     return rendered
 
 
-def build_payload(as_of_utc: str = DEFAULT_AS_OF_UTC) -> dict[str, Any]:
-    as_of = parse_aware_utc(as_of_utc)
+def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
+    as_of = (
+        datetime.now(timezone.utc)
+        if as_of_utc is None
+        else parse_aware_utc(as_of_utc)
+    )
     reconciliation = read_json(EMAIL_RECONCILIATION)
     registry = read_json(RESPONSE_TEMPLATE_REGISTRY)
     policy_config = read_json(FOLLOWUP_POLICY_CONFIG)
@@ -357,7 +388,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Build the fail-closed outreach follow-up action queue."
     )
-    parser.add_argument("--as-of-utc", default=DEFAULT_AS_OF_UTC)
+    parser.add_argument(
+        "--as-of-utc",
+        help="Aware timestamp to evaluate; defaults to the current UTC time.",
+    )
     args = parser.parse_args()
 
     payload = build_payload(args.as_of_utc)
