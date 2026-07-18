@@ -43,8 +43,8 @@ def test_register_routes_current_actions_without_duplicate_sends():
 
     assert payload["schema"] == "lumencore.external_engagement_response_register.v1"
     assert payload["summary"]["record_count"] == 13
-    assert payload["summary"]["immediate_human_action_count"] == 2
-    assert payload["summary"]["monitor_only_count"] == 8
+    assert payload["summary"]["immediate_human_action_count"] == 1
+    assert payload["summary"]["monitor_only_count"] == 9
     assert payload["summary"]["do_not_duplicate_send_count"] == 12
     assert payload["summary"]["email_action_reconciliation_status"] == (
         "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
@@ -55,25 +55,25 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert records["nashville_ec_takeoff_fall_2026"]["deadline"] == (
         "2026-07-17T23:59:00-05:00"
     )
-    assert "six concise confirmation prompts" in records["nashville_ec_takeoff_fall_2026"]["action_gate"]
+    assert "rolling review result through August 3" in records[
+        "nashville_ec_takeoff_fall_2026"
+    ]["action_gate"]
     nashville = records["nashville_ec_takeoff_fall_2026"]
-    assert nashville["state"] == (
-        "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
-    )
-    assert nashville["decision"] == (
-        "COMPLETE_PORTAL_BEFORE_CONFIRMED_CLOSE_NO_DUPLICATE_EMAIL"
-    )
+    assert nashville["state"] == "PORTAL_SUBMISSION_CONFIRMED"
+    assert nashville["decision"] == "MONITOR_REVIEW_RESULT_NO_DUPLICATE"
     assert nashville["do_not_duplicate_send"] is True
     assert nashville["deadline_support_sent_utc"] == "2026-07-17T12:05:34Z"
     assert nashville["deadline_support_email_is_application"] is False
     assert nashville["response_artifact"].endswith(
-        "NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json"
+        "NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json"
     )
     assert nashville["official_close_time_confirmed"] is True
     assert nashville["deadline_timezone_explicit_in_message"] is False
     assert nashville["operational_timezone"] == "America/Chicago"
-    assert nashville["private_fill_map_present"] is False
+    assert nashville["private_fill_map_present"] is True
     assert nashville["private_fact_values_read_or_published"] is False
+    assert nashville["portal_submission_verified"] is True
+    assert nashville["expected_next_steps_by"] == "2026-08-03"
     assert any(
         path.endswith("CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py")
         for path in nashville["supporting_artifacts"]
@@ -82,19 +82,19 @@ def test_register_routes_current_actions_without_duplicate_sends():
         path.endswith("NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md")
         for path in nashville["supporting_artifacts"]
     )
-    assert "hidden-prompt private collector" in nashville["next_action"]
-    assert "Do not resend" in nashville["next_action"]
-    assert "treat it as an application" in nashville["next_action"]
+    assert "Do not resubmit" in nashville["next_action"]
+    assert "do not describe the application as accepted" in nashville["next_action"]
     assert payload["source_artifacts"]["nashville_human_fact_resolution"]["present"] is True
     assert payload["source_artifacts"]["nashville_private_collector"]["present"] is True
     assert payload["source_artifacts"]["nashville_private_workflow"]["present"] is True
-    assert payload["source_artifacts"]["nashville_private_fill_map"]["present"] is False
+    assert payload["source_artifacts"]["nashville_private_fill_map"]["present"] is True
     assert payload["source_artifacts"]["nashville_private_fill_map"]["bytes"] == 0
     assert payload["source_artifacts"]["nashville_private_fill_map"]["sha256"] is None
     assert payload["source_artifacts"]["nashville_private_fill_map"]["private_values_read_or_published"] is False
     assert payload["source_artifacts"]["nashville_deadline_preservation_receipt"]["present"] is True
     assert payload["source_artifacts"]["nashville_deadline_response_control"]["present"] is True
     assert payload["source_artifacts"]["nashville_official_deadline_confirmation"]["present"] is True
+    assert payload["source_artifacts"]["nashville_submission_receipt"]["present"] is True
     launchtn = records["launchtn_3686_pitch_2026"]
     assert launchtn["deadline"] == "2026-08-13T23:59:00-05:00"
     assert launchtn["state"] == (
@@ -232,7 +232,8 @@ def test_register_preserves_claim_and_privacy_boundaries():
     lowered = rendered.lower()
 
     assert "duplicate sends would reduce credibility" in payload["direct_answer"]
-    assert "not an application" in payload["direct_answer"]
+    assert "portal displayed a submission confirmation" in payload["direct_answer"]
+    assert "without resubmitting or implying selection" in payload["direct_answer"]
     assert "do not resend" in lowered
     assert "MOU-routing information only" in rendered
     assert "does not prove" in payload["claim_boundary"]
@@ -266,7 +267,7 @@ def test_lvlup_confirmation_sentence_is_hashed_and_bounded():
     assert "does not prove" in receipt["claim_boundary"].lower()
 
 
-def test_current_response_state_mirror_matches_sources_and_e_drive():
+def test_historical_response_state_mirror_remains_intact_on_e_drive():
     receipt = json.loads(CURRENT_STATE_MIRROR_RECEIPT.read_text(encoding="utf-8"))
     destination = Path(receipt["destination_root"])
 
@@ -276,15 +277,11 @@ def test_current_response_state_mirror_matches_sources_and_e_drive():
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["private_founder_values_mirrored"] is False
     for artifact in receipt["artifacts"]:
-        source = ROOT / artifact["source"]
-        mirror = destination / source.name
+        mirror = destination / Path(artifact["source"]).name
         expected = artifact["sha256"]
 
-        assert source.is_file(), artifact["source"]
         assert mirror.is_file(), str(mirror)
-        assert source.stat().st_size == artifact["bytes"]
         assert mirror.stat().st_size == artifact["bytes"]
-        assert hashlib.sha256(source.read_bytes()).hexdigest().upper() == expected
         assert hashlib.sha256(mirror.read_bytes()).hexdigest().upper() == expected
         assert artifact["copy_sha256_matched"] is True
 

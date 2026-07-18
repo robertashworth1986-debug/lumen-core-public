@@ -298,8 +298,8 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     )
     assert missionweave["action_gate_submission_ready_for_human_click"] is False
     assert missionweave["action_gate_required_private_gate_count"] == 50
-    assert missionweave["action_gate_passed_private_gate_count"] == 19
-    assert missionweave["action_gate_open_gate_count"] == 31
+    assert missionweave["action_gate_passed_private_gate_count"] == 20
+    assert missionweave["action_gate_open_gate_count"] == 30
     assert missionweave["action_gate_private_input_present"] is True
     assert missionweave["action_gate_private_values_exposed"] is False
     assert missionweave["action_gate_private_input_sha256_exposed"] is False
@@ -458,7 +458,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "OPENAI-BUILD-WEEK-2026" in rendered
     assert "5/10 gates pass" in rendered
     assert "Action gate: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`" in rendered
-    assert "Action gates passed: `19/50`" in rendered
+    assert "Action gates passed: `20/50`" in rendered
     assert len(payload["command_board_sha256"]) == 64
 
     for source in (

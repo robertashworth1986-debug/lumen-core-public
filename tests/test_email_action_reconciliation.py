@@ -9,7 +9,7 @@ JSON_OUT = (
     ROOT
     / "grant_submissions"
     / "funding_sprint_20260709"
-    / "EMAIL_ACTION_RECONCILIATION_2026-07-17.json"
+    / "EMAIL_ACTION_RECONCILIATION_2026-07-18.json"
 )
 
 
@@ -33,6 +33,7 @@ def test_reconciliation_is_deterministic_and_no_send():
     assert actual["summary"]["email_reply_required_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
     assert actual["summary"]["duplicate_outbound_risk_count"] == 15
+    assert actual["summary"]["monitor_no_send_template_count"] == 15
     assert actual["summary"]["human_account_action_count"] == 4
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert all(lane["send_now"] is False for lane in actual["lanes"])
@@ -81,7 +82,7 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
 
     missionweave = lanes["missionweave_dsip_proposal"]
     assert missionweave["deadline_utc"] == "2026-07-22T16:00:00Z"
-    assert missionweave["open_gate_count"] == 37
+    assert missionweave["open_gate_count"] == 30
 
     build_week = lanes["openai_build_week_prooflock"]
     assert build_week["deadline_utc"] == "2026-07-22T00:00:00Z"
@@ -100,17 +101,17 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert "do not invent" in build_week_handoff["next_action"]
 
     nashville = lanes["nashville_ec_takeoff_fall_2026"]
-    assert nashville["latest_event_type"] == "OFFICIAL_DEADLINE_CONFIRMATION_RECEIVED"
-    assert nashville["latest_event_utc"] == "2026-07-17T16:11:48Z"
-    assert nashville["state"] == (
-        "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
-    )
+    assert nashville["latest_event_type"] == "PORTAL_SUBMISSION_CONFIRMED"
+    assert nashville["latest_event_utc"] == "2026-07-18T04:54:52.709214Z"
+    assert nashville["state"] == "PORTAL_SUBMISSION_CONFIRMED"
     assert nashville["operational_local_deadline"] == "2026-07-17T23:59:00-05:00"
     assert nashville["operational_utc_deadline"] == "2026-07-18T04:59:00Z"
     assert nashville["deadline_timezone_explicit_in_message"] is False
+    assert nashville["portal_submission_verified"] is True
+    assert nashville["expected_next_steps_by"] == "2026-08-03"
     assert nashville["do_not_duplicate_send"] is True
     assert nashville["send_now"] is False
-    assert "not treat the support reply as an application" in nashville["next_action"]
+    assert "do not resubmit" in nashville["next_action"]
 
     lvlup = lanes["lvlup_optional_paid_event"]
     assert lvlup["latest_event_type"] == (
@@ -127,6 +128,7 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
 
     source_evidence = module.build_payload()["source_evidence"]
     assert source_evidence["nashville_official_deadline_confirmation"]["present"] is True
+    assert source_evidence["nashville_submission_receipt"]["present"] is True
     assert source_evidence["lvlup_independent_review_confirmation"]["present"] is True
     assert source_evidence["darpa_sn_26_97_public_submission_receipt"]["present"] is True
     assert source_evidence["missionweave_dsip_action_gate"]["present"] is True
@@ -134,8 +136,15 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert source_evidence["openai_build_week_handoff_integrity_control"][
         "present"
     ] is True
+    assert source_evidence["outreach_response_template_registry"]["present"] is True
     assert len(source_evidence["nashville_official_deadline_confirmation"]["sha256"]) == 64
     assert len(source_evidence["lvlup_independent_review_confirmation"]["sha256"]) == 64
+
+    assert all(
+        lane["response_template_id"] == "NO_DUPLICATE_MONITOR"
+        for lane in lanes.values()
+        if lane["do_not_duplicate_send"]
+    )
 
 
 def test_public_reconciliation_excludes_private_mailbox_data():

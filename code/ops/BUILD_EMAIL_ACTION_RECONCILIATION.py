@@ -8,13 +8,19 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 SPRINT_DIR = ROOT / "grant_submissions" / "funding_sprint_20260709"
-JSON_OUT = SPRINT_DIR / "EMAIL_ACTION_RECONCILIATION_2026-07-17.json"
-MD_OUT = SPRINT_DIR / "EMAIL_ACTION_RECONCILIATION_2026-07-17.md"
+JSON_OUT = SPRINT_DIR / "EMAIL_ACTION_RECONCILIATION_2026-07-18.json"
+MD_OUT = SPRINT_DIR / "EMAIL_ACTION_RECONCILIATION_2026-07-18.md"
 NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION = (
     ROOT
     / "grant_submissions"
     / "NASHVILLE_EC_FALL_2026"
     / "NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json"
+)
+NASHVILLE_SUBMISSION_RECEIPT = (
+    ROOT
+    / "grant_submissions"
+    / "NASHVILLE_EC_FALL_2026"
+    / "NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json"
 )
 LVLUP_REVIEW_CONFIRMATION = (
     SPRINT_DIR / "LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json"
@@ -40,8 +46,11 @@ OPENAI_BUILD_WEEK_HANDOFF_CONTROL = (
     / "OPENAI_BUILD_WEEK_20260721"
     / "BUILD_WEEK_HANDOFF_INTEGRITY_CONTROL_2026-07-17.json"
 )
+OUTREACH_RESPONSE_TEMPLATE_REGISTRY = (
+    SPRINT_DIR / "OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
+)
 
-AS_OF_DATE = "2026-07-17"
+AS_OF_DATE = "2026-07-18"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -63,11 +72,13 @@ def artifact_status(path: Path) -> dict[str, Any]:
 
 def build_payload() -> dict[str, Any]:
     nashville = read_json(NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION)
+    nashville_submission = read_json(NASHVILLE_SUBMISSION_RECEIPT)
     lvlup = read_json(LVLUP_REVIEW_CONFIRMATION)
     darpa = read_json(DARPA_SN_26_97_RECEIPT)
     missionweave = read_json(MISSIONWEAVE_ACTION_GATE)
     build_week = read_json(OPENAI_BUILD_WEEK_READINESS)
     build_week_handoff = read_json(OPENAI_BUILD_WEEK_HANDOFF_CONTROL)
+    response_registry = read_json(OUTREACH_RESPONSE_TEMPLATE_REGISTRY)
     if (
         nashville.get("schema")
         != "lumencore.nashville_ec_official_deadline_confirmation.v1"
@@ -75,6 +86,12 @@ def build_payload() -> dict[str, Any]:
         != "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
     ):
         raise ValueError("Nashville official deadline confirmation is missing or stale")
+    if (
+        nashville_submission.get("schema")
+        != "lumencore.nashville_ec_submission_receipt.v1"
+        or nashville_submission.get("status") != "PORTAL_SUBMISSION_CONFIRMED"
+    ):
+        raise ValueError("Nashville application submission receipt is missing or stale")
     if (
         lvlup.get("schema")
         != "lumencore.lvlup_independent_review_confirmation.v1"
@@ -112,14 +129,26 @@ def build_payload() -> dict[str, Any]:
         is not False
     ):
         raise ValueError("OpenAI Build Week handoff integrity control is missing or stale")
+    if (
+        response_registry.get("schema")
+        != "lumencore.outreach_response_template_registry.v1"
+        or response_registry.get("controls", {}).get("builder_can_send_email") is not False
+        or response_registry.get("controls", {}).get("duplicate_send_fail_closed") is not True
+    ):
+        raise ValueError("Outreach response template registry is missing or unsafe")
+    response_template_ids = {
+        row.get("template_id") for row in response_registry.get("templates", [])
+    }
+    if "NO_DUPLICATE_MONITOR" not in response_template_ids:
+        raise ValueError("No-duplicate response template is unavailable")
 
     lanes = [
         {
             "lane_id": "nashville_ec_takeoff_fall_2026",
             "organization": "Nashville Entrepreneur Center",
-            "latest_event_type": "OFFICIAL_DEADLINE_CONFIRMATION_RECEIVED",
-            "latest_event_utc": nashville["source"]["received_utc"],
-            "state": nashville["status"],
+            "latest_event_type": "PORTAL_SUBMISSION_CONFIRMED",
+            "latest_event_utc": "2026-07-18T04:54:52.709214Z",
+            "state": nashville_submission["status"],
             "operational_local_deadline": nashville["confirmation"][
                 "operational_local_deadline"
             ],
@@ -129,13 +158,17 @@ def build_payload() -> dict[str, Any]:
             "deadline_timezone_explicit_in_message": nashville["confirmation"][
                 "timezone_explicit_in_message"
             ],
+            "portal_submission_verified": True,
+            "expected_next_steps_by": nashville_submission["confirmation_page"][
+                "expected_next_steps_by"
+            ],
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": None,
             "do_not_duplicate_send": True,
             "next_action": (
-                "Complete the founder-fact and reviewed portal workflow well before the "
-                "confirmed close; do not resend and do not treat the support reply as an application."
+                "Monitor for the rolling review result through August 3; do not resubmit, "
+                "reply to the automated confirmation, or describe the application as selected."
             ),
         },
         {
@@ -384,6 +417,10 @@ def build_payload() -> dict[str, Any]:
             ),
         },
     ]
+    for lane in lanes:
+        lane["response_template_id"] = (
+            "NO_DUPLICATE_MONITOR" if lane["do_not_duplicate_send"] else None
+        )
     return {
         "schema": "lumencore.email_action_reconciliation.v1",
         "as_of_date": AS_OF_DATE,
@@ -399,6 +436,7 @@ def build_payload() -> dict[str, Any]:
             "EPRI Open Power AI Consortium onboarding",
             "FHWA TSMO qualified-partner outreach",
             "Nashville EC Fall 2026 TakeOff deadline-support query",
+            "Nashville EC Fall 2026 TakeOff portal-submission confirmation",
             "DARPA-SN-26-97 formal RFI response and agency-thread state",
             "MissionWeave DSIP and OpenAI Build Week portal deadlines",
             "OpenAI Build Week self-sent handoff attachment integrity",
@@ -412,6 +450,11 @@ def build_payload() -> dict[str, Any]:
             "send_now_count": sum(1 for lane in lanes if lane["send_now"]),
             "duplicate_outbound_risk_count": sum(
                 1 for lane in lanes if lane["do_not_duplicate_send"]
+            ),
+            "monitor_no_send_template_count": sum(
+                1
+                for lane in lanes
+                if lane["response_template_id"] == "NO_DUPLICATE_MONITOR"
             ),
             "out_of_office_count": 1,
             "human_account_action_count": 4,
@@ -427,6 +470,9 @@ def build_payload() -> dict[str, Any]:
             "nashville_official_deadline_confirmation": artifact_status(
                 NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION
             ),
+            "nashville_submission_receipt": artifact_status(
+                NASHVILLE_SUBMISSION_RECEIPT
+            ),
             "lvlup_independent_review_confirmation": artifact_status(
                 LVLUP_REVIEW_CONFIRMATION
             ),
@@ -441,6 +487,9 @@ def build_payload() -> dict[str, Any]:
             ),
             "openai_build_week_handoff_integrity_control": artifact_status(
                 OPENAI_BUILD_WEEK_HANDOFF_CONTROL
+            ),
+            "outreach_response_template_registry": artifact_status(
+                OUTREACH_RESPONSE_TEMPLATE_REGISTRY
             ),
         },
         "claim_boundary": (
@@ -463,6 +512,16 @@ def validate_payload(payload: dict[str, Any]) -> None:
         raise ValueError("The no-send reconciliation contains a send-now lane")
     if any(not isinstance(lane.get("do_not_duplicate_send"), bool) for lane in payload["lanes"]):
         raise ValueError("Every lane must declare a duplicate-send decision")
+    if any(
+        lane.get("response_template_id") != "NO_DUPLICATE_MONITOR"
+        for lane in payload["lanes"]
+        if lane["do_not_duplicate_send"]
+    ):
+        raise ValueError("A duplicate-send lane is not routed to the no-send template")
+    if payload["summary"]["monitor_no_send_template_count"] != payload["summary"][
+        "duplicate_outbound_risk_count"
+    ]:
+        raise ValueError("No-send template coverage is incomplete")
     terry = next(
         lane for lane in payload["lanes"] if lane["lane_id"] == "terry_vynetic_followup"
     )
@@ -516,14 +575,15 @@ def validate_payload(payload: dict[str, Any]) -> None:
         if lane["lane_id"] == "nashville_ec_takeoff_fall_2026"
     )
     if (
-        nashville["state"]
-        != "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
+        nashville["state"] != "PORTAL_SUBMISSION_CONFIRMED"
         or nashville["operational_local_deadline"] != "2026-07-17T23:59:00-05:00"
         or nashville["operational_utc_deadline"] != "2026-07-18T04:59:00Z"
         or nashville["deadline_timezone_explicit_in_message"] is not False
+        or nashville["portal_submission_verified"] is not True
+        or nashville["expected_next_steps_by"] != "2026-08-03"
         or nashville["do_not_duplicate_send"] is not True
     ):
-        raise ValueError("Nashville EC confirmed-deadline control is incomplete")
+        raise ValueError("Nashville EC submission control is incomplete")
     lvlup = next(
         lane for lane in payload["lanes"] if lane["lane_id"] == "lvlup_optional_paid_event"
     )
@@ -552,6 +612,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Reply required now: `{summary['email_reply_required_count']}`",
         f"- Send now: `{summary['send_now_count']}`",
         f"- Duplicate-outbound risks: `{summary['duplicate_outbound_risk_count']}`",
+        f"- No-send template coverage: `{summary['monitor_no_send_template_count']}`",
         f"- Human account actions: `{summary['human_account_action_count']}`",
         "- Browser navigation performed: `false`",
         "",

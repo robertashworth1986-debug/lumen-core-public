@@ -73,6 +73,12 @@ NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION = (
     / "NASHVILLE_EC_FALL_2026"
     / "NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json"
 )
+NASHVILLE_SUBMISSION_RECEIPT = (
+    ROOT
+    / "grant_submissions"
+    / "NASHVILLE_EC_FALL_2026"
+    / "NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json"
+)
 LAUNCHTN_MANIFEST = (
     ROOT
     / "grant_submissions"
@@ -99,7 +105,7 @@ SAM_ROTATION_CONTROL = (
     SPRINT_DIR / "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json"
 )
 EMAIL_ACTION_RECONCILIATION = (
-    SPRINT_DIR / "EMAIL_ACTION_RECONCILIATION_2026-07-17.json"
+    SPRINT_DIR / "EMAIL_ACTION_RECONCILIATION_2026-07-18.json"
 )
 DARPA_SN_26_97_RECEIPT = (
     SPRINT_DIR / "DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json"
@@ -116,8 +122,8 @@ FHWA_PARTNER_RESPONSE_CONTROL = (
 
 OUT_JSON = OUT_OPS / "external_engagement_response_register_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "external_engagement_response_register.json"
-CANONICAL_JSON = SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json"
-OUT_MD = SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md"
+CANONICAL_JSON = SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.json"
+OUT_MD = SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.md"
 
 PRIVATE_MARKERS = (
     "full legal name:",
@@ -244,6 +250,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     nashville_resolution = read_json(NASHVILLE_FACT_RESOLUTION)
     nashville_deadline = read_json(NASHVILLE_DEADLINE_RECEIPT)
     nashville_official_deadline = read_json(NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION)
+    nashville_submission = read_json(NASHVILLE_SUBMISSION_RECEIPT)
     launchtn = read_json(LAUNCHTN_MANIFEST)
     lvlup_review = read_json(LVLUP_REVIEW_CONFIRMATION)
     sam_rotation = read_json(SAM_ROTATION_CONTROL)
@@ -266,6 +273,12 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         != "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
     ):
         raise ValueError("Nashville EC official deadline confirmation is missing or stale")
+    if (
+        nashville_submission.get("schema")
+        != "lumencore.nashville_ec_submission_receipt.v1"
+        or nashville_submission.get("status") != "PORTAL_SUBMISSION_CONFIRMED"
+    ):
+        raise ValueError("Nashville EC submission receipt is missing or stale")
     if (
         lvlup_review.get("schema")
         != "lumencore.lvlup_independent_review_confirmation.v1"
@@ -338,17 +351,17 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         {
             "lane_id": "nashville_ec_takeoff_fall_2026",
             "organization": "Nashville Entrepreneur Center",
-            "state": nashville_official_deadline["status"],
+            "state": nashville_submission["status"],
             "deadline": nashville_official_deadline["confirmation"][
                 "operational_local_deadline"
             ],
-            "decision": "COMPLETE_PORTAL_BEFORE_CONFIRMED_CLOSE_NO_DUPLICATE_EMAIL",
-            "response_channel": "PORTAL",
-            "response_ready": True,
+            "decision": "MONITOR_REVIEW_RESULT_NO_DUPLICATE",
+            "response_channel": "EMAIL_MONITOR_ONLY",
+            "response_ready": False,
             "send_now": False,
             "do_not_duplicate_send": True,
-            "action_gate": "Founder answers all six concise confirmation prompts, reviews the complete live portal preview plus any terms or fee, and authorizes final submission at action time.",
-            "response_artifact": rel(NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION),
+            "action_gate": "Wait for the rolling review result through August 3. Reply only if NEC asks a specific question or requests a correction.",
+            "response_artifact": rel(NASHVILLE_SUBMISSION_RECEIPT),
             "supporting_artifacts": [
                 rel(NASHVILLE_MANIFEST),
                 rel(NASHVILLE_FACT_RESOLUTION),
@@ -356,6 +369,8 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
                 rel(NASHVILLE_PRIVATE_WORKFLOW),
                 rel(NASHVILLE_DEADLINE_RECEIPT),
                 rel(NASHVILLE_DEADLINE_RESPONSE_CONTROL),
+                rel(NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION),
+                rel(NASHVILLE_SUBMISSION_RECEIPT),
             ],
             "deadline_support_sent_utc": nashville_deadline["submission"]["sent_utc"],
             "deadline_support_email_is_application": False,
@@ -368,8 +383,12 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             ],
             "private_fill_map_present": NASHVILLE_PRIVATE_FILL_MAP.is_file(),
             "private_fact_values_read_or_published": False,
-            "next_action": "Run the hidden-prompt private collector, use its ignored 11-answer fill map in the live portal, and complete the reviewed portal flow well before the confirmed close. Do not resend the deadline query or treat it as an application; review the complete preview plus any terms or fee before action-time approval.",
-            "claim_boundary": nashville_official_deadline["claim_boundary"],
+            "portal_submission_verified": True,
+            "expected_next_steps_by": nashville_submission["confirmation_page"][
+                "expected_next_steps_by"
+            ],
+            "next_action": "Monitor the existing account through August 3. Do not resubmit or reply to the automated confirmation, and do not describe the application as accepted, selected, or funded.",
+            "claim_boundary": nashville_submission["claim_boundary"],
         },
         {
             "lane_id": "launchtn_3686_pitch_2026",
@@ -678,10 +697,10 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "schema": "lumencore.external_engagement_response_register.v1",
         "generated_utc": generated_utc or now_utc(),
-        "as_of_date": "2026-07-17",
+        "as_of_date": "2026-07-18",
         "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
         "direct_answer": (
-            "Nashville EC confirmed in writing that its application remains open until 11:59 PM on July 17; the timezone is operationally treated as America/Chicago because the message itself did not state one. The support reply is not an application, so complete the founder-fact gate and reviewed portal workflow well before the close. "
+            "Nashville EC's portal displayed a submission confirmation before the operational July 17 close, and the follow-up email says rolling-review next steps are expected by August 3. Monitor without resubmitting or implying selection. "
             "DARPA-SN-26-97 received the formal two-attachment RFI package after inviting an instructions-aligned submission; monitor the thread without claiming deadline compliance or receipt acceptance. "
             "The Cambridge Systematics response lead then confirmed that its FHWA team is already set and will not add partners, so that route is closed with no follow-up. Georgia PATENTS also confirmed that it does not provide the requested already-filed prosecution support, so that route is closed. "
             "No additional email should be sent now. "
@@ -694,11 +713,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "immediate_human_action_count": sum(
                 1
                 for row in records
-                if row["lane_id"]
-                in {
-                    "nashville_ec_takeoff_fall_2026",
-                    "sam_public_credential_rotation",
-                }
+                if row["lane_id"] == "sam_public_credential_rotation"
             ),
             "monitor_only_count": sum(1 for row in records if str(row["decision"]).startswith("MONITOR")),
             "do_not_duplicate_send_count": sum(1 for row in records if row["do_not_duplicate_send"]),
@@ -750,6 +765,9 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             ),
             "nashville_official_deadline_confirmation": artifact_status(
                 NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION
+            ),
+            "nashville_submission_receipt": artifact_status(
+                NASHVILLE_SUBMISSION_RECEIPT
             ),
             "nashville_private_fill_map": {
                 "path": rel(NASHVILLE_PRIVATE_FILL_MAP),
