@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>LumaSkin Protocol Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body
+  data-program-status="BENCH_PROTOCOL_READY_HUMAN_TESTS_BLOCKED"
+  data-asset-status="CONCEPT_DIAGRAM_NOT_ENGINEERING_VALIDATION"
+>
+  <header class="appbar">
+    <div>
+      <p class="eyebrow">LumenCore / Research Control</p>
+      <h1>LumaSkin Protocol Lab</h1>
+    </div>
+    <div class="header-status" aria-label="Current platform status">
+      <span>Concept diagram / simulation only</span>
+      <strong id="canonicalStatus">Human tests locked</strong>
+    </div>
+  </header>
+
+  <main>
+    <section class="control-band" aria-labelledby="mode-title">
+      <div class="section-heading">
+        <p class="sequence">01 / STATE</p>
+        <h2 id="mode-title">Authority mode</h2>
+      </div>
+      <div class="mode-control" role="group" aria-label="Requested test mode">
+        <button class="mode active" type="button" data-state="BENCH_SAFE">Bench</button>
+        <button class="mode" type="button" data-state="MANNEQUIN_FIXTURE">Mannequin</button>
+        <button class="mode" type="button" data-state="PASSIVE_FIT">Passive fit</button>
+        <button class="mode" type="button" data-state="SINGLE_ZONE_HAPTIC">Single zone</button>
+        <button class="mode" type="button" data-state="XR_MULTIMODAL">XR multimodal</button>
+      </div>
+      <div id="decision" class="decision neutral" role="status" aria-live="polite">
+        Loading the canonical status packet. Human modes remain locked if it is unavailable.
+      </div>
+    </section>
+
+    <section class="workspace" aria-label="LumaSkin synthetic protocol controls">
+      <div class="zone-panel">
+        <div class="section-heading compact">
+          <p class="sequence">02 / BODY MAP</p>
+          <h2>Cue zone</h2>
+        </div>
+        <div class="body-map" aria-label="Selectable LumaSkin actuator zones">
+          <svg viewBox="0 0 360 620" aria-hidden="true">
+            <circle cx="180" cy="62" r="46" class="head"/>
+            <path d="M105 132Q180 102 255 132L282 342 234 570H190L181 374H179L170 570H126L78 342Z" class="body"/>
+            <path d="M108 144L36 292 67 307 130 191ZM252 144l72 148-31 15-63-116Z" class="body"/>
+            <path d="M114 145Q180 119 246 145L256 326 216 360h-72l-40-34Z" class="fabric"/>
+            <path d="M114 358h60l-13 203h-45ZM186 358h60l-2 203h-45Z" class="fabric"/>
+          </svg>
+          <button class="zone selected" type="button" data-zone="left_shoulder" style="--x:31%;--y:25%" title="Left shoulder"><span>L shoulder</span></button>
+          <button class="zone" type="button" data-zone="right_shoulder" style="--x:69%;--y:25%" title="Right shoulder"><span>R shoulder</span></button>
+          <button class="zone" type="button" data-zone="left_forearm" style="--x:16%;--y:45%" title="Left forearm"><span>L forearm</span></button>
+          <button class="zone" type="button" data-zone="right_forearm" style="--x:84%;--y:45%" title="Right forearm"><span>R forearm</span></button>
+          <button class="zone" type="button" data-zone="upper_back" style="--x:50%;--y:29%" title="Upper back"><span>Upper back</span></button>
+          <button class="zone" type="button" data-zone="lower_back" style="--x:50%;--y:44%" title="Lower back"><span>Lower back</span></button>
+          <button class="zone" type="button" data-zone="left_hip" style="--x:37%;--y:55%" title="Left hip"><span>L hip</span></button>
+          <button class="zone" type="button" data-zone="right_hip" style="--x:63%;--y:55%" title="Right hip"><span>R hip</span></button>
+          <button class="zone" type="button" data-zone="left_thigh" style="--x:40%;--y:68%" title="Left thigh"><span>L thigh</span></button>
+          <button class="zone" type="button" data-zone="right_thigh" style="--x:60%;--y:68%" title="Right thigh"><span>R thigh</span></button>
+          <button class="zone" type="button" data-zone="left_calf" style="--x:42%;--y:84%" title="Left calf"><span>L calf</span></button>
+          <button class="zone" type="button" data-zone="right_calf" style="--x:58%;--y:84%" title="Right calf"><span>R calf</span></button>
+        </div>
+      </div>
+
+      <div class="stimulus-panel">
+        <div class="section-heading compact">
+          <p class="sequence">03 / CUE</p>
+          <h2>Stimulus envelope</h2>
+        </div>
+        <label class="range-row" for="intensity">
+          <span>Normalized intensity</span>
+          <output id="intensityValue">0.15</output>
+        </label>
+        <input id="intensity" type="range" min="0.01" max="0.50" value="0.15" step="0.01">
+
+        <label class="range-row" for="duration">
+          <span>Duration</span>
+          <output id="durationValue">120 ms</output>
+        </label>
+        <input id="duration" type="range" min="20" max="500" value="120" step="10">
+
+        <label class="range-row" for="frequency">
+          <span>Frequency</span>
+          <output id="frequencyValue">90 Hz</output>
+        </label>
+        <input id="frequency" type="range" min="10" max="300" value="90" step="5">
+
+        <div class="limit-table" aria-label="Preliminary command caps">
+          <span>Intensity cap</span><strong>0.25</strong>
+          <span>Duration cap</span><strong>250 ms</strong>
+          <span>Frequency band</span><strong>20-180 Hz</strong>
+          <span>Selected zone</span><strong id="selectedZone">left_shoulder</strong>
+        </div>
+
+        <div class="command-row">
+          <button id="evaluate" class="primary" type="button">Evaluate synthetic cue</button>
+          <button id="fault" class="danger" type="button">Fault lockout</button>
+        </div>
+      </div>
+
+      <div class="interlock-panel">
+        <div class="section-heading compact">
+          <p class="sequence">04 / INTERLOCKS</p>
+          <h2>Authority evidence</h2>
+        </div>
+        <div id="interlocks" class="interlock-list"></div>
+      </div>
+    </section>
+
+    <section class="test-band" aria-labelledby="tests-title">
+      <div class="section-heading">
+        <p class="sequence">05 / PROTOCOL</p>
+        <h2 id="tests-title">Eight-family gauntlet</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Test family</th><th>Stage</th><th>Evidence</th></tr></thead>
+          <tbody id="testRows"><tr><td colspan="4">Loading protocol...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Protocol simulation only. No garment, actuator, headset, medical device, or human-test authority is connected.
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

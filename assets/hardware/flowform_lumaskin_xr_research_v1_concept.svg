@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">FLOWFORM LumaSkin XR research architecture</title>
+  <desc id="desc">Front and rear technical garment views with twelve vibrotactile zones, removable sensing modules, a hardwired stop control, and a gated validation ladder.</desc>
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8faf9"/>
+      <stop offset="1" stop-color="#e6ece9"/>
+    </linearGradient>
+    <pattern id="weave" width="16" height="16" patternUnits="userSpaceOnUse">
+      <path d="M0 8h16M8 0v16" stroke="#c7d2cd" stroke-width="1" opacity=".45"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#17211d" flood-opacity=".16"/>
+    </filter>
+    <style>
+      .label{font:700 22px Arial,sans-serif;fill:#17211d;letter-spacing:0}
+      .small{font:600 17px Arial,sans-serif;fill:#4f5d56;letter-spacing:0}
+      .micro{font:700 14px Arial,sans-serif;fill:#6b7771;letter-spacing:0}
+      .line{fill:none;stroke:#2b6f60;stroke-width:3}
+      .zone{fill:#d17a43;stroke:#fff;stroke-width:5}
+      .sensor{fill:#2b6f60;stroke:#fff;stroke-width:4}
+      .body{fill:#26342e;stroke:#0f1713;stroke-width:5}
+      .fabric{fill:url(#weave);stroke:#98a9a0;stroke-width:3}
+    </style>
+  </defs>
+  <rect width="1600" height="1000" fill="#f4f6f5"/>
+  <rect x="38" y="38" width="1524" height="924" rx="8" fill="url(#panel)" stroke="#b8c3bd" stroke-width="2"/>
+  <path d="M38 166h1524" stroke="#b7683b" stroke-width="4"/>
+  <text x="82" y="102" font-family="Arial,sans-serif" font-weight="800" font-size="48" fill="#17211d" letter-spacing="0">FLOWFORM LUMASKIN</text>
+  <text x="84" y="140" class="small">XR COMFORT + CUE-INTEGRITY RESEARCH PLATFORM</text>
+  <g transform="translate(92 214)" filter="url(#shadow)">
+    <rect width="960" height="690" rx="8" fill="#fff" stroke="#c8d0cc" stroke-width="2"/>
+    <text x="52" y="54" class="micro">FRONT</text>
+    <text x="514" y="54" class="micro">REAR</text>
+    <g transform="translate(150 70)">
+      <circle cx="150" cy="68" r="58" fill="#d8dfdc" stroke="#26342e" stroke-width="5"/>
+      <path class="body" d="M70 145Q150 112 230 145L260 330 225 548 178 548 158 350 142 350 122 548 75 548 40 330Z"/>
+      <path class="fabric" d="M78 154Q150 126 222 154L235 314 191 350H109L65 314Z"/>
+      <path class="body" d="M72 160L18 285 42 303 101 210ZM228 160l54 125-24 18-59-93Z"/>
+      <path class="fabric" d="M76 171L31 281 53 290 103 198ZM224 171l45 110-22 9-50-92Z"/>
+      <path class="fabric" d="M82 335h59l-20 201H79ZM159 335h59l3 201h-42Z"/>
+      <rect x="126" y="245" width="48" height="52" rx="8" fill="#171f1b" stroke="#d17a43" stroke-width="4"/>
+      <circle class="zone" cx="77" cy="177" r="14"/><circle class="zone" cx="223" cy="177" r="14"/>
+      <circle class="zone" cx="45" cy="281" r="14"/><circle class="zone" cx="255" cy="281" r="14"/>
+      <circle class="zone" cx="107" cy="391" r="14"/><circle class="zone" cx="193" cy="391" r="14"/>
+      <circle class="zone" cx="101" cy="506" r="14"/><circle class="zone" cx="199" cy="506" r="14"/>
+      <circle class="sensor" cx="150" cy="181" r="11"/>
+      <path d="M136 257h28M150 243v28" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+      <text x="112" y="578" class="small">QUICK RELEASE</text>
+    </g>
+    <g transform="translate(610 70)">
+      <circle cx="150" cy="68" r="58" fill="#d8dfdc" stroke="#26342e" stroke-width="5"/>
+      <path class="body" d="M70 145Q150 112 230 145L260 330 225 548 178 548 158 350 142 350 122 548 75 548 40 330Z"/>
+      <path class="fabric" d="M78 154Q150 126 222 154L235 314 191 350H109L65 314Z"/>
+      <path class="body" d="M72 160L18 285 42 303 101 210ZM228 160l54 125-24 18-59-93Z"/>
+      <path class="fabric" d="M76 171L31 281 53 290 103 198ZM224 171l45 110-22 9-50-92Z"/>
+      <path class="fabric" d="M82 335h59l-20 201H79ZM159 335h59l3 201h-42Z"/>
+      <rect x="105" y="190" width="90" height="86" rx="12" fill="#18231f" stroke="#2b6f60" stroke-width="5"/>
+      <path d="M118 219h64M118 237h64M118 255h40" stroke="#a6d4c8" stroke-width="5"/>
+      <circle class="zone" cx="150" cy="173" r="14"/><circle class="zone" cx="150" cy="300" r="14"/>
+      <circle class="zone" cx="105" cy="361" r="14"/><circle class="zone" cx="195" cy="361" r="14"/>
+      <circle class="zone" cx="101" cy="506" r="14"/><circle class="zone" cx="199" cy="506" r="14"/>
+      <circle class="sensor" cx="117" cy="205" r="10"/><circle class="sensor" cx="183" cy="205" r="10"/>
+      <text x="89" y="578" class="small">REMOVABLE MODULES</text>
+    </g>
+    <g>
+      <path class="line" d="M180 285H74V188"/><circle cx="74" cy="188" r="6" fill="#2b6f60"/>
+      <text x="42" y="171" class="small">12 ZONES</text>
+      <path class="line" d="M480 465h66V382"/><circle cx="546" cy="382" r="6" fill="#2b6f60"/>
+      <text x="487" y="493" class="small">PRESSURE + TEMP</text>
+      <path class="line" d="M806 288h96V190"/><circle cx="902" cy="190" r="6" fill="#2b6f60"/>
+      <text x="756" y="171" class="small">IMU + CURRENT</text>
+    </g>
+  </g>
+  <g transform="translate(1092 214)">
+    <text x="0" y="32" class="micro">AUTHORITY LADDER</text>
+    <g transform="translate(0 58)">
+      <rect width="410" height="72" rx="6" fill="#26342e"/><text x="24" y="44" font-family="Arial,sans-serif" font-weight="700" font-size="20" fill="#fff">01 SOFTWARE + FAULT SWEEP</text>
+      <rect y="86" width="410" height="72" rx="6" fill="#2b6f60"/><text x="24" y="130" font-family="Arial,sans-serif" font-weight="700" font-size="20" fill="#fff">02 UN-OCCUPIED BENCH</text>
+      <rect y="172" width="410" height="72" rx="6" fill="#497a6e"/><text x="24" y="216" font-family="Arial,sans-serif" font-weight="700" font-size="20" fill="#fff">03 MANNEQUIN FIXTURE</text>
+      <rect y="258" width="410" height="72" rx="6" fill="#d17a43"/><text x="24" y="302" font-family="Arial,sans-serif" font-weight="700" font-size="20" fill="#fff">04 MATERIAL + FIT REVIEW</text>
+      <rect y="344" width="410" height="72" rx="6" fill="#a5afaa"/><text x="24" y="388" font-family="Arial,sans-serif" font-weight="700" font-size="20" fill="#26342e">05 HUMAN AUTHORITY HOLD</text>
+      <rect y="430" width="410" height="72" rx="6" fill="#d9dedb" stroke="#a8b0ac" stroke-width="2"/><text x="24" y="474" font-family="Arial,sans-serif" font-weight="700" font-size="20" fill="#26342e">06 RANDOMIZED XR STUDY</text>
+      <rect y="516" width="410" height="72" rx="6" fill="#d9dedb" stroke="#a8b0ac" stroke-width="2"/><text x="24" y="560" font-family="Arial,sans-serif" font-weight="700" font-size="20" fill="#26342e">07 INDEPENDENT REPLAY</text>
+    </g>
+    <rect x="0" y="690" width="410" height="92" rx="6" fill="#fff5ee" stroke="#d17a43" stroke-width="3"/>
+    <text x="22" y="725" class="micro" fill="#8e4f2a">CURRENT BOUNDARY</text>
+    <text x="22" y="755" class="label" font-size="19">BENCH PROTOCOL ONLY</text>
+  </g>
+  <text x="86" y="942" class="micro">CONCEPT ARCHITECTURE - NOT A FABRICATED PRODUCT, MEDICAL DEVICE, PROTECTIVE SYSTEM, OR HUMAN-TEST AUTHORIZATION</text>
+</svg>

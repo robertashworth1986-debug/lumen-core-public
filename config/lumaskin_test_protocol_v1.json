@@ -1,0 +1,330 @@
+{
+  "schema": "lumencore.lumaskin_test_protocol.v1",
+  "protocol_id": "lumaskin_xr_research_v1",
+  "program_name": "LumaSkin XR Comfort and Cue-Integrity Research Platform",
+  "status": "PROTOCOL_DESIGN_BENCH_ONLY_HUMAN_TESTS_BLOCKED",
+  "version": "1.0.0",
+  "effective_date": "2026-07-18",
+  "purpose": "Measure whether a soft, instrumented garment can deliver spatial vibrotactile cues with bounded latency and improve XR cue recognition or task performance without unacceptable comfort, workload, or cybersickness outcomes.",
+  "claim_boundary": "LumaSkin V1 is a non-medical research architecture and simulation/bench protocol. It is not a fabricated product. It is not protective equipment. It is not an exoskeleton. It is not a medical device. It is not a safety certification. It is not an injury-prevention system and is not proof that haptics prevent motion sickness. No strength amplification is in scope. No electrical muscle stimulation, autonomous force, pain stimulus, or impact-protection claim is in scope. No unsupervised human use is in scope.",
+  "canonical_paths": {
+    "controller": "code/hardware/lumaskin_safety_controller.py",
+    "concept_visual": "assets/hardware/flowform_lumaskin_xr_research_v1_concept.svg",
+    "asset_manifest": "assets/hardware/flowform_lumaskin_xr_research_v1_concept.json",
+    "program_readme": "docs/hardware/lumaskin_xr_research_platform/README.md",
+    "status_packet": "docs/hardware/lumaskin_xr_research_platform/PROTOCOL_STATUS.md",
+    "lab_console": "build_week/lumaskin_lab/index.html"
+  },
+  "v1_scope": {
+    "garment": "Adjustable soft oversuit with removable low-energy vibrotactile modules and a hardwired wearer stop control.",
+    "actuation": "ERM or LRA vibrotactile modules only; no powered joint actuation or electrical stimulation.",
+    "sensing": [
+      "garment IMU",
+      "contact pressure",
+      "surface temperature",
+      "actuator current",
+      "garment strain",
+      "cue command and acknowledgement timestamps"
+    ],
+    "optional_external_measurements": [
+      "validated heart-rate device when the protocol permits",
+      "headset motion and frame timing",
+      "task accuracy and response time"
+    ],
+    "zones": [
+      "left_shoulder",
+      "right_shoulder",
+      "left_forearm",
+      "right_forearm",
+      "upper_back",
+      "lower_back",
+      "left_hip",
+      "right_hip",
+      "left_thigh",
+      "right_thigh",
+      "left_calf",
+      "right_calf"
+    ]
+  },
+  "preliminary_command_envelope": {
+    "max_normalized_intensity": 0.25,
+    "max_duration_ms": 250,
+    "min_frequency_hz": 20.0,
+    "max_frequency_hz": 180.0,
+    "max_active_zones": 2,
+    "boundary": "These are conservative software command caps for early bench development, not biological safety limits. Hardware-specific limits require qualified independent electrical, thermal, materials, and human-factors review before human use."
+  },
+  "research_states": [
+    "POWERED_OFF",
+    "BENCH_SAFE",
+    "MANNEQUIN_FIXTURE",
+    "PASSIVE_FIT",
+    "SINGLE_ZONE_HAPTIC",
+    "XR_MULTIMODAL",
+    "FAULT_LOCKOUT"
+  ],
+  "test_families": [
+    {
+      "id": "TF-01",
+      "name": "Cue integrity and fail-silent behavior",
+      "stage": "software_and_bench",
+      "comparator": "command log versus actuator acknowledgement and independent sensor trace",
+      "primary_endpoints": [
+        "end-to-end cue latency",
+        "latency jitter",
+        "wrong-zone rate",
+        "dropout rate",
+        "time to zero output after fault"
+      ],
+      "required_faults": [
+        "packet loss",
+        "stale calibration",
+        "sensor dropout",
+        "thermal fault",
+        "battery fault",
+        "wearer stop",
+        "controller restart"
+      ],
+      "acceptance_rule": "All preregistered hard-stop and wrong-zone limits pass with immutable raw traces; any unsafe output is a protocol failure."
+    },
+    {
+      "id": "TF-02",
+      "name": "Cross-modal timing",
+      "stage": "bench_then_human",
+      "comparator": "visual-only, audio-only, haptic-only, and synchronized multimodal conditions",
+      "primary_endpoints": [
+        "visual-to-haptic offset",
+        "audio-to-haptic offset",
+        "frame-time stability",
+        "cue recognition accuracy"
+      ],
+      "acceptance_rule": "Timing limits are frozen before testing and verified on independent clocks before any comfort or performance claim."
+    },
+    {
+      "id": "TF-03",
+      "name": "Garment fit, contact, and thermal envelope",
+      "stage": "mannequin_then_passive_fit",
+      "comparator": "unpowered garment and no-garment task baselines",
+      "primary_endpoints": [
+        "contact pressure distribution",
+        "surface temperature",
+        "range of motion",
+        "don and doff time",
+        "quick-release time",
+        "skin observation and adverse-event count"
+      ],
+      "acceptance_rule": "No energized human testing until materials, fit, quick release, cleaning, and stopping rules pass qualified review."
+    },
+    {
+      "id": "TF-04",
+      "name": "Spatial cue localization",
+      "stage": "single_zone_human",
+      "comparator": "randomized sham, single-zone cue, and repeated-session conditions",
+      "primary_endpoints": [
+        "zone identification accuracy",
+        "response time",
+        "false-positive rate",
+        "confidence calibration"
+      ],
+      "acceptance_rule": "Report blinded participant-level intervals and abstain from a localization claim if the preregistered effect or sample gate fails."
+    },
+    {
+      "id": "TF-05",
+      "name": "XR comfort and cybersickness",
+      "stage": "xr_multimodal_human",
+      "comparator": "counterbalanced headset baseline versus bounded adaptive haptics",
+      "primary_endpoints": [
+        "Simulator Sickness Questionnaire change",
+        "exposure completion",
+        "early-stop rate",
+        "task accuracy",
+        "response time"
+      ],
+      "secondary_endpoints": [
+        "NASA Task Load Index",
+        "presence rating",
+        "user preference"
+      ],
+      "acceptance_rule": "Comfort is co-primary with task fidelity; no benefit claim if task performance degrades, stopping rules differ adversely, or uncertainty crosses the preregistered null."
+    },
+    {
+      "id": "TF-06",
+      "name": "Fatigue and movement burden",
+      "stage": "passive_fit_then_human",
+      "comparator": "no garment, unpowered garment, and bounded haptic garment",
+      "primary_endpoints": [
+        "NASA Task Load Index physical demand",
+        "range-of-motion change",
+        "task completion time",
+        "balance and gait observation",
+        "participant stop rate"
+      ],
+      "acceptance_rule": "Evaluate load transfer, balance, pressure, and fatigue as possible harms; do not infer injury prevention from short laboratory sessions."
+    },
+    {
+      "id": "TF-07",
+      "name": "Adaptive cue governor",
+      "stage": "offline_then_prospective",
+      "comparator": "best fixed cue policy, no-haptic policy, and declared oracle upper bound",
+      "primary_endpoints": [
+        "prospective comfort-task utility",
+        "abstention rate",
+        "policy switching rate",
+        "calibration error",
+        "worst-participant outcome"
+      ],
+      "acceptance_rule": "Train only on development participants; lock the policy before held-out use; fail closed when uncertainty, sensor health, or command limits fail."
+    },
+    {
+      "id": "TF-08",
+      "name": "Privacy, provenance, and independent reproduction",
+      "stage": "all_stages",
+      "comparator": "manifested raw inputs and a clean-room replay environment",
+      "primary_endpoints": [
+        "consent-to-field mapping",
+        "data minimization coverage",
+        "hash-chain verification",
+        "environment reproduction",
+        "independent result agreement"
+      ],
+      "acceptance_rule": "No public participant-level data; publish only bounded aggregates and a reproduction receipt approved by the reviewing organization."
+    }
+  ],
+  "authority_gates": [
+    {
+      "id": "AG-01",
+      "name": "Claim and requirements freeze",
+      "required_evidence": [
+        "versioned protocol",
+        "hazard register",
+        "claim-risk register",
+        "configuration manifest"
+      ]
+    },
+    {
+      "id": "AG-02",
+      "name": "Executable controller and synthetic fault sweep",
+      "required_evidence": [
+        "controller tests",
+        "state-transition coverage",
+        "cue-envelope rejection tests",
+        "fault-lockout trace"
+      ]
+    },
+    {
+      "id": "AG-03",
+      "name": "Unoccupied electrical and thermal bench",
+      "required_evidence": [
+        "qualified test plan",
+        "calibrated instrumentation",
+        "energy-source review",
+        "hardwired stop verification",
+        "raw traces"
+      ]
+    },
+    {
+      "id": "AG-04",
+      "name": "Mannequin fit and contact fixture",
+      "required_evidence": [
+        "pressure map",
+        "thermal map",
+        "range-of-motion fixture results",
+        "quick-release demonstration"
+      ]
+    },
+    {
+      "id": "AG-05",
+      "name": "Materials, hygiene, and wearable risk review",
+      "required_evidence": [
+        "skin-contact material inventory",
+        "cleaning protocol",
+        "battery containment review",
+        "wearable hazard analysis"
+      ]
+    },
+    {
+      "id": "AG-06",
+      "name": "Human-research authority",
+      "required_evidence": [
+        "institutional ethics or IRB determination",
+        "approved consent",
+        "eligibility and exclusion rules",
+        "adverse-event and stopping rules",
+        "trained supervisor record"
+      ]
+    },
+    {
+      "id": "AG-07",
+      "name": "Preregistered randomized human-factors study",
+      "required_evidence": [
+        "frozen analysis plan",
+        "counterbalanced assignment",
+        "SSQ and task-fidelity results",
+        "attrition and adverse-event accounting"
+      ]
+    },
+    {
+      "id": "AG-08",
+      "name": "Independent reproduction and claim review",
+      "required_evidence": [
+        "external protocol acceptance",
+        "independent dataset or supervised rerun",
+        "signed result receipt",
+        "bounded publication claim matrix"
+      ]
+    }
+  ],
+  "human_test_hold": {
+    "blocked_until_gates_pass": [
+      "AG-01",
+      "AG-02",
+      "AG-03",
+      "AG-04",
+      "AG-05",
+      "AG-06"
+    ],
+    "prohibited_shortcuts": [
+      "founder self-authorization",
+      "consent without an ethics or IRB determination",
+      "software simulation treated as hardware safety evidence",
+      "internal testing described as independent validation"
+    ]
+  },
+  "external_reference_basis": [
+    {
+      "title": "ISO 9241-920:2024 - Tactile and haptic interactions",
+      "url": "https://www.iso.org/standard/80751.html",
+      "use": "haptic interaction design reference; not proof of conformity"
+    },
+    {
+      "title": "IEC 62368-1:2023 - AV/ICT equipment safety requirements",
+      "url": "https://webstore.iec.ch/en/publication/69308",
+      "use": "energy-source and safeguard planning reference; independent applicability review required"
+    },
+    {
+      "title": "ISO 10993-1:2025 - Biological evaluation within risk management",
+      "url": "https://www.iso.org/standard/10993-1",
+      "use": "skin-contact material risk planning if medical or protective claims are pursued"
+    },
+    {
+      "title": "HHS OHRP Human Subject Regulations Decision Charts",
+      "url": "https://www.hhs.gov/ohrp/regulations-and-policy/decision-charts/index.html",
+      "use": "institutional human-research determination planning; not a self-issued exemption"
+    },
+    {
+      "title": "NASA Task Load Index",
+      "url": "https://www.nasa.gov/human-systems-integration-division/nasa-task-load-index-tlx/",
+      "use": "subjective workload measurement"
+    },
+    {
+      "title": "NASA motion-sickness measurement technical memorandum",
+      "url": "https://human-factors.arc.nasa.gov/publications/NASA_TM_20205009977.pdf",
+      "use": "SSQ measurement context and limitations"
+    },
+    {
+      "title": "NIOSH Industrial Exoskeletons",
+      "url": "https://www.cdc.gov/niosh/bulletin/2020/industrial-exoskeletons.html",
+      "use": "wearable load-transfer, fit, balance, skin, and battery hazard framing"
+    }
+  ]
+}

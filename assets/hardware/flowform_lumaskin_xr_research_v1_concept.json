@@ -1,0 +1,40 @@
+{
+  "schema": "lumencore.hardware_concept_asset.v1",
+  "asset_id": "flowform_lumaskin_xr_research_v1",
+  "asset_name": "FLOWFORM LumaSkin XR Research V1 Concept",
+  "asset_path": "assets/hardware/flowform_lumaskin_xr_research_v1_concept.svg",
+  "media_type": "image/svg+xml",
+  "bytes": 7256,
+  "width_pixels": 1600,
+  "height_pixels": 1000,
+  "sha256": "cfad68416796a18f319d524699db0df2e5135d57128499b48ef4f09869cc01cf",
+  "created_date": "2026-07-18",
+  "status": "CONCEPT_DIAGRAM_NOT_ENGINEERING_VALIDATION",
+  "source_concept_references": [
+    "config/lumaskin_test_protocol_v1.json",
+    "code/hardware/lumaskin_safety_controller.py",
+    "docs/hardware/lumaskin_xr_research_platform/README.md",
+    "build_week/lumaskin_lab/index.html",
+    "tests/test_lumaskin_xr_research_platform.py"
+  ],
+  "visible_design_intent": [
+    "adjustable soft garment rather than a powered exoskeleton",
+    "twelve removable low-energy vibrotactile zones",
+    "hardwired quick-release and wearer-stop intent",
+    "removable IMU, contact, temperature, current, and timing modules",
+    "bench-to-manikin-to-human authority ladder",
+    "explicit human-research hold before energized participant testing"
+  ],
+  "current_program_boundary": "Software simulation, protocol design, and unoccupied bench preparation only. No garment has been fabricated or energized on a person, and no human test is authorized.",
+  "required_engineering_next_steps": [
+    "complete the executable synthetic state-transition and fault sweep",
+    "obtain qualified electrical, thermal, battery, and energy-source review",
+    "build and instrument an unoccupied actuator and communication bench",
+    "build a mannequin fit, pressure, temperature, and quick-release fixture",
+    "complete skin-contact material, hygiene, and wearable hazard review",
+    "obtain an institutional ethics or IRB determination before recruiting participants",
+    "preregister the randomized crossover analysis and stopping rules",
+    "obtain independent protocol acceptance and a signed reproduction receipt before public benefit claims"
+  ],
+  "claim_boundary": "This is a deterministic SVG concept diagram, not CAD, not a schematic, not a fabricated prototype, not protective equipment, not an exoskeleton, not a medical device, not a safety certification, not human-test authorization, and not test evidence. It does not prove cue accuracy, comfort improvement, reduced motion sickness, task improvement, fatigue reduction, injury prevention, skin safety, electrical safety, thermal safety, manufacturability, commercial readiness, or regulatory compliance."
+}
