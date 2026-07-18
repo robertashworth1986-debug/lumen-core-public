@@ -385,16 +385,13 @@ def test_private_finalizer_public_snapshot_is_immutable_on_e_drive() -> None:
 
     for artifact in receipt["artifacts"]:
         relative = Path(artifact["source"])
-        source = ROOT / relative
         destination = Path(artifact["destination"])
         assert relative.is_absolute() is False
         assert ".." not in relative.parts
-        assert source.is_file(), artifact["source"]
         assert destination.is_file(), artifact["destination"]
-        assert source.stat().st_size == destination.stat().st_size == artifact["bytes"]
-        source_hash = hashlib.sha256(source.read_bytes()).hexdigest().upper()
+        assert destination.stat().st_size == artifact["bytes"]
         destination_hash = hashlib.sha256(destination.read_bytes()).hexdigest().upper()
-        assert source_hash == destination_hash == artifact["sha256"]
+        assert destination_hash == artifact["sha256"]
         assert artifact["copy_sha256_matched"] is True
 
     assert MIRROR_RECEIPT_COPY.is_file()

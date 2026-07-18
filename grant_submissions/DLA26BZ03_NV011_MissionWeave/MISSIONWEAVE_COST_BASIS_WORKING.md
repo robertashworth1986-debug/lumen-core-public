@@ -2,6 +2,14 @@
 
 Updated: June 19, 2026
 
+> **SUPERSEDED FOR CURRENT DSIP ASSEMBLY.** This historical 500-hour planning
+> basis is retained for provenance only. It must not be uploaded, cited as the
+> current budget, or used to populate DSIP. The controlling current inputs are
+> `MISSIONWEAVE_DSIP_VOLUME3_COST_INPUTS_2026-07-16.md` and the private
+> `MISSIONWEAVE_DSIP_VOLUME3_COST_FINAL.xlsx`: 640 PI hours, no subcontractors
+> or consultants, six months, and a $100,000 proposed total. The current cost
+> basis remains unsupported and requires corporate-official review.
+
 Status: planning basis only; not a certified cost proposal, accounting
 determination, vendor quote, indirect-rate support, or commitment by any
 proposed teammate.
