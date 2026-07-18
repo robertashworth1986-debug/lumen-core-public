@@ -187,7 +187,8 @@
       verified_utc: verifiedUtc,
       receipt_id: String(safeReceipt.receipt_id || ""),
       integrity_valid: errors.length === 0,
-      promotion_allowed: errors.length === 0 && requiredOpenOrFailed.length === 0,
+      promotion_allowed:
+        errors.length === 0 && requiredOpenOrFailed.length === 0 && decision === "PROMOTE",
       recorded_decision: decision,
       receipt_hash: {
         expected: expectedReceiptHash,

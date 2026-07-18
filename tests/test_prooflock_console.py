@@ -74,6 +74,29 @@ def test_promotion_cannot_clear_required_open_gates():
 
 
 @pytest.mark.parametrize(
+    ("decision", "expected_promotion_allowed"),
+    [("HOLD", False), ("REJECT", False), ("PROMOTE", True)],
+)
+def test_all_required_gates_pass_still_requires_explicit_promote_decision(
+    decision, expected_promotion_allowed
+):
+    module = load_module()
+    receipt = sample_receipt()
+    for gate in receipt["gates"]:
+        if gate.get("required_for_promotion"):
+            gate["status"] = "PASS"
+    receipt["decision"] = decision
+    receipt["receipt_sha256"] = module.stable_hash(module.receipt_payload(receipt))
+
+    report = module.verify_receipt(receipt)
+
+    assert report["integrity_valid"] is True
+    assert report["required_open_or_failed_gates"] == []
+    assert report["recorded_decision"] == decision
+    assert report["promotion_allowed"] is expected_promotion_allowed
+
+
+@pytest.mark.parametrize(
     "unsafe_path",
     [
         "../private.txt",

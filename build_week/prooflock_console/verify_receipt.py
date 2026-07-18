@@ -177,7 +177,9 @@ def verify_receipt(receipt: dict[str, Any], root: Path = ROOT) -> dict[str, Any]
         "verified_utc": datetime.now(timezone.utc).isoformat(),
         "receipt_id": receipt.get("receipt_id"),
         "integrity_valid": not errors,
-        "promotion_allowed": not required_open_or_failed and not errors,
+        "promotion_allowed": (
+            decision == "PROMOTE" and not required_open_or_failed and not errors
+        ),
         "recorded_decision": decision,
         "receipt_hash": {
             "expected": expected_receipt_hash,

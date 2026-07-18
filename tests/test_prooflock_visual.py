@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import importlib.util
 import json
 import re
@@ -172,6 +173,66 @@ def test_python_and_browser_reports_match_on_canonical_fixture():
         "receipt_hash",
     ):
         assert browser_report[key] == python_report[key]
+
+
+def test_python_and_browser_promotion_decision_parity_with_all_required_gates_passed():
+    verifier = load_python_verifier()
+    receipts = []
+    python_reports = []
+    for decision in ("HOLD", "REJECT", "PROMOTE"):
+        receipt = copy.deepcopy(json.loads(SAMPLE.read_text(encoding="utf-8")))
+        for gate in receipt["gates"]:
+            if gate.get("required_for_promotion"):
+                gate["status"] = "PASS"
+        receipt["decision"] = decision
+        receipt["receipt_sha256"] = verifier.stable_hash(
+            verifier.receipt_payload(receipt)
+        )
+        receipts.append(receipt)
+        report = verifier.verify_receipt(receipt)
+        python_reports.append(
+            {
+                "integrity_valid": report["integrity_valid"],
+                "promotion_allowed": report["promotion_allowed"],
+                "recorded_decision": report["recorded_decision"],
+                "required_open_or_failed_gates": report[
+                    "required_open_or_failed_gates"
+                ],
+            }
+        )
+
+    output = run_node(
+        f"""
+        const fs = require("node:fs");
+        const path = require("node:path");
+        const core = require({json.dumps(js_path(CORE))});
+        const root = {json.dumps(js_path(ROOT))};
+        const receipts = {json.dumps(receipts)};
+        (async () => {{
+          const reports = [];
+          for (const receipt of receipts) {{
+            const report = await core.verifyReceipt(receipt, {{
+              loadArtifact: async (relative) => fs.readFileSync(path.join(root, relative))
+            }});
+            reports.push({{
+              integrity_valid: report.integrity_valid,
+              promotion_allowed: report.promotion_allowed,
+              recorded_decision: report.recorded_decision,
+              required_open_or_failed_gates: report.required_open_or_failed_gates
+            }});
+          }}
+          console.log(JSON.stringify(reports));
+        }})().catch((error) => {{ console.error(error); process.exitCode = 1; }});
+        """
+    )
+    browser_reports = json.loads(output)
+
+    assert browser_reports == python_reports
+    assert [row["promotion_allowed"] for row in browser_reports] == [
+        False,
+        False,
+        True,
+    ]
 
 
 def test_browser_path_allowlist_rejects_escape_forms():
