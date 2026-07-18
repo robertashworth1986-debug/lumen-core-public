@@ -321,8 +321,9 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
         assert f"Volume {volume}" in checklist
     assert "July 22, 2025" in checklist
     assert "July 22, 2026" in checklist
-    assert "11" in checklist
-    assert "20" in checklist
+    assert "Volume 2 candidate: `12` pages of `20` allowed" in checklist
+    assert "Foreign Risk Evaluation (FRE)" in checklist
+    assert "Do not upload a foreign-affiliations PDF in Volume 5" in checklist
     assert "CMMC Phase II implementation was suspended" in checklist
     assert "Phase I self-assessment requirements remain" in checklist
     assert "READY_FOR_HUMAN_FINAL_SUBMIT_CLICK" in checklist

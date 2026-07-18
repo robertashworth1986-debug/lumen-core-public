@@ -982,6 +982,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - Expected close: `{payload['deadline']['expected_local']}`
 - Recheck the live DSIP countdown before entry and again before final submission.
 - Source discrepancy: {payload['deadline']['source_discrepancy']}
+- Amendment control: use `MISSIONWEAVE_AMENDMENT_2_PORTAL_CONTROL_2026-07-18.md`. Amendment 2 renames the due-diligence program as Foreign Risk Evaluation (FRE), but the required Volume 7 webform and its eight disclosure questions remain. Do not upload a foreign-affiliations PDF in Volume 5.
 
 ## Package Lock
 

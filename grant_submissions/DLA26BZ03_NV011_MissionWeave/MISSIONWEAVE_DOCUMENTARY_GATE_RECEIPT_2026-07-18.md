@@ -7,15 +7,17 @@ This receipt records one evidence-backed change to the MissionWeave DSIP action 
 ## Evidence
 
 - The active SBIR.gov firm profile was reviewed and saved on July 18, 2026 with CAGE `14TM8`.
+- The official SBIR.gov Proof of Registration PDF was located on July 18, 2026 and verified privately against the expected registrant, UEI, and SBC registry record. The document and its hash remain in the ignored private package and private proof-vault receipt.
 - The saved SAM registration and renewal records identify the same CAGE for the same UEI and legal registrant.
 - Supporting repository receipt: `grant_submissions/funding_sprint_20260709/SBIR_GOV_FIRM_PROFILE_UPDATE_RECEIPT_2026-07-18.md`.
 
 ## Gate Change
 
 - Cleared: `CAGE_MATCH`
+- Previously cleared and now document-backed: `SBA_COMPANY_REGISTRY`, `SBC_CONTROL_ID`
 - Passed gates: `20/50`
 - Open gates: `30`
-- Resulting gate SHA-256: `bbac74b06c58f768a14bcb8606374df9133822532ce82a94989400089ec92990`
+- Current gate and its SHA-256 are authoritative only in `MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json`; this receipt does not duplicate the rolling gate hash.
 
 All founder-factual, legal-certification, export-control, portal-preview, cost-basis, and final-submit gates remain open unless independently supported and reviewed.
 
