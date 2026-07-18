@@ -1,0 +1,83 @@
+name: Bounded Validation Sprint Gate
+
+on:
+  pull_request:
+    paths:
+      - "config/bounded_validation_sprint_v1.json"
+      - "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md"
+      - "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md"
+      - "code/ops/validate_bounded_validation_sprint.py"
+      - "tests/test_bounded_validation_sprint.py"
+      - ".github/workflows/bounded-validation-sprint.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bounded-validation-sprint-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Compile offer gate and tests
+        run: |
+          python -m py_compile \
+            code/ops/validate_bounded_validation_sprint.py \
+            tests/test_bounded_validation_sprint.py
+
+      - name: Run focused commercial-boundary tests
+        run: |
+          python -m unittest discover \
+            -s tests \
+            -p "test_bounded_validation_sprint.py" \
+            -v
+
+      - name: Validate offer, pricing, scope, IP, and claim boundaries
+        run: |
+          python code/ops/validate_bounded_validation_sprint.py \
+            --root . \
+            > bounded_validation_sprint_receipt.json
+
+      - name: Validate machine-readable receipt
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(
+              Path("bounded_validation_sprint_receipt.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          assert receipt["valid"] is True
+          assert receipt["schema"] == "lumencore_bounded_validation_sprint_v1"
+          assert receipt["status"] == "proposed_founder_review"
+          assert receipt["tier_count"] == 3
+          assert receipt["proposed_prices_usd"] == [7500, 15000, 25000]
+          assert receipt["duration_calendar_days_max"] == 30
+          assert receipt["founder_approved_for_external_use"] is False
+          assert receipt["legal_review_complete"] is False
+          print(json.dumps(receipt, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload commercial-boundary receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: bounded-validation-sprint-receipt-${{ github.run_id }}
+          path: bounded_validation_sprint_receipt.json
+          if-no-files-found: error
+          retention-days: 30
