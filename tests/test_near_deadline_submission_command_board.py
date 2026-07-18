@@ -249,8 +249,8 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     )
     assert missionweave["action_gate_submission_ready_for_human_click"] is False
     assert missionweave["action_gate_required_private_gate_count"] == 50
-    assert missionweave["action_gate_passed_private_gate_count"] == 13
-    assert missionweave["action_gate_open_gate_count"] == 37
+    assert missionweave["action_gate_passed_private_gate_count"] == 15
+    assert missionweave["action_gate_open_gate_count"] == 35
     assert missionweave["action_gate_private_input_present"] is True
     assert missionweave["action_gate_private_values_exposed"] is False
     assert missionweave["action_gate_private_input_sha256_exposed"] is False
@@ -406,7 +406,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "Action gate: `READY_FOR_HIDDEN_FOUNDER_INPUT`" in rendered
     assert "Action gates passed: `0/15`" in rendered
     assert "Action gate: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`" in rendered
-    assert "Action gates passed: `13/50`" in rendered
+    assert "Action gates passed: `15/50`" in rendered
     assert len(payload["command_board_sha256"]) == 64
 
     for source in (
