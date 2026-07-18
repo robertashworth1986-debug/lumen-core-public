@@ -13,9 +13,9 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Private target git-ignored: `true`
 - Private values exposed: `false`
 - Required private gates: `50`
-- Passed private gates: `35`
-- Open gates: `15`
-- Gate SHA-256: `8f42d2d93ee80165c3d82328ff555f53c07c54ffea8862cf4cefa46c25de7ed6`
+- Passed private gates: `36`
+- Open gates: `14`
+- Gate SHA-256: `2488d0f93a96ae21234227b487fe1648e99ceca526f3b6addb5a7be148fddf3c`
 
 ## Package Integrity
 
@@ -64,9 +64,9 @@ This public-safe gate reports only package integrity and private-workflow comple
 - `A_DOCUMENTARY_RETRIEVAL`: `4` gates (`OPEN`)
 - `B_FOUNDER_FACTUAL_ANSWER`: `1` gates (`OPEN`)
 - `C_LEGAL_CERTIFICATION_DECISION`: `6` gates (`OPEN`)
-- `D_PORTAL_MECHANICS`: `2` gates (`OPEN`)
+- `D_PORTAL_MECHANICS`: `1` gates (`OPEN`)
 - `E_TECHNICAL_VOLUME_CONSISTENCY`: `2` gates (`OPEN`)
-- `F_CLEARED_BY_EVIDENCE`: `35` gates (`CLEARED`)
+- `F_CLEARED_BY_EVIDENCE`: `36` gates (`CLEARED`)
 
 ## Open Gates
 
@@ -78,7 +78,6 @@ This public-safe gate reports only package integrity and private-workflow comple
 - `CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW`
 - `CURRENT_CMMC_REQUIREMENTS_REVIEW`
 - `DD2345_OR_JCP_APPLICATION_EVIDENCE`
-- `DSIP_FIRM_LEVEL_FORMS`
 - `DSIP_FIRM_PIN_AVAILABILITY`
 - `PORTAL_PREVIEW_RECEIPT_HASH`
 - `SAM_REPRESENTATIONS_CURRENT`

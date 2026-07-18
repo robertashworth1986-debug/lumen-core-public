@@ -15,10 +15,10 @@
     "live_dsip_recheck_required": true,
     "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
   },
-  "gate_sha256": "8f42d2d93ee80165c3d82328ff555f53c07c54ffea8862cf4cefa46c25de7ed6",
+  "gate_sha256": "2488d0f93a96ae21234227b487fe1648e99ceca526f3b6addb5a7be148fddf3c",
   "gate_summary": {
-    "open_gate_count": 15,
-    "passed_private_gate_count": 35,
+    "open_gate_count": 14,
+    "passed_private_gate_count": 36,
     "reconciliation_groups": {
       "A_DOCUMENTARY_RETRIEVAL": {
         "count": 4,
@@ -50,10 +50,9 @@
         "status": "OPEN"
       },
       "D_PORTAL_MECHANICS": {
-        "count": 2,
+        "count": 1,
         "gates": [
-          "COMPLETE_PORTAL_PREVIEW_REVIEW",
-          "DSIP_FIRM_LEVEL_FORMS"
+          "COMPLETE_PORTAL_PREVIEW_REVIEW"
         ],
         "status": "OPEN"
       },
@@ -66,13 +65,14 @@
         "status": "OPEN"
       },
       "F_CLEARED_BY_EVIDENCE": {
-        "count": 35,
+        "count": 36,
         "gates": [
           "ASSIGNED_PROPOSAL_NUMBER_CAPTURE",
           "CAGE_MATCH",
           "CONTROLLED_DATA_EXCLUDED",
           "DSIP_AUTHENTICATION",
           "DSIP_FIRM_ADMIN",
+          "DSIP_FIRM_LEVEL_FORMS",
           "DSIP_ORGANIZATION_LINKAGE",
           "FOREIGN_AFFILIATIONS_CURRENT_FACTS",
           "FOREIGN_CITIZEN_ANSWER",
@@ -117,7 +117,6 @@
       "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
       "CURRENT_CMMC_REQUIREMENTS_REVIEW",
       "DD2345_OR_JCP_APPLICATION_EVIDENCE",
-      "DSIP_FIRM_LEVEL_FORMS",
       "DSIP_FIRM_PIN_AVAILABILITY",
       "PORTAL_PREVIEW_RECEIPT_HASH",
       "SAM_REPRESENTATIONS_CURRENT",
@@ -126,7 +125,7 @@
       "VOLUME5_UPLOAD_SET"
     ]
   },
-  "generated_utc": "2026-07-18T14:53:53.971425+00:00",
+  "generated_utc": "2026-07-18T15:08:23.845174+00:00",
   "official_instruction_facts": {
     "cmmc_amendment_note": "Amendment 2 says CMMC Phase II implementation was suspended on July 13, 2026 while Phase I self-assessment requirements remain in place; the current live requirement must be reviewed before submission.",
     "current_package_duration_months": 6,
