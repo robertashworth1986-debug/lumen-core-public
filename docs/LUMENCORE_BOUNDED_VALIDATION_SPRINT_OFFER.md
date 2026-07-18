@@ -107,7 +107,7 @@ The standard public offer does not accept classified information, CUI, PHI, paym
 
 ## What this sprint does not promise
 
-The sprint does not promise a favorable result. It does not establish guaranteed ROI, realized savings, certification, agency endorsement, award likelihood, production readiness, field validation, customer deployment, safety approval, or autonomous operating authority.
+A favorable result is not promised. The sprint does not establish guaranteed ROI, realized savings, certification, agency endorsement, award likelihood, production readiness, field validation, customer deployment, safety approval, or autonomous operating authority.
 
 A failed or neutral result may still be valuable because it can stop an unsafe or uneconomic pilot before the buyer spends more money.
 
