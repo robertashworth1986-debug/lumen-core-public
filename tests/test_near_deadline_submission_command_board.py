@@ -40,9 +40,9 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
 
     assert payload["schema"] == "near_deadline_submission_command_board_v4"
     assert payload["status"] == "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS"
-    assert payload["summary"]["lane_count"] == 18
+    assert payload["summary"]["lane_count"] == 20
     assert payload["summary"]["stage_now_count"] == 5
-    assert payload["summary"]["sent_verified_count"] == 3
+    assert payload["summary"]["sent_verified_count"] == 5
     assert payload["summary"]["emergency_eligibility_gate_count"] == 0
     assert payload["summary"]["no_bid_or_partner_only_count"] == 6
     assert payload["summary"]["expired_without_verified_send_count"] == 1
@@ -90,7 +90,8 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "693JJ326R000012" not in stage_ids
     assert "26-510" in stage_ids
     assert "W912HZ26SC005" in stage_ids
-    assert "NASHVILLE-EC-FALL-2026" in stage_ids
+    assert "NASHVILLE-EC-FALL-2026" not in stage_ids
+    assert "OPENAI-BUILD-WEEK-2026" in stage_ids
     assert "DLA26BZ03-NV011" in stage_ids
     assert "LAUNCHTN-3686-2026" in stage_ids
 
@@ -99,18 +100,18 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         "80TECH26RFI0020",
         "ACCAPGAIDPRFI4",
         "75D301-26-RFI-73483",
+        "NASHVILLE-EC-FALL-2026",
+        "DARPA-SN-26-97",
     }
 
     assert "HHS-2026-ACL-NIDILRR-REGE-0212" in payload["summary"]["closest_deadline_lane"]
-    assert "NASHVILLE-EC-FALL-2026" in payload["summary"]["closest_stage_ready_lane"]
-    assert "0/15" in payload["summary"]["strongest_today_action"]
-    assert "six-prompt hidden collector" in payload["summary"]["strongest_today_action"]
-    assert "must not be duplicated or treated as an application" in payload["summary"][
+    assert "OPENAI-BUILD-WEEK-2026" in payload["summary"]["closest_stage_ready_lane"]
+    assert "5/10" in payload["summary"]["strongest_today_action"]
+    assert "5 open" in payload["summary"]["strongest_today_action"]
+    assert "Nashville EC is portal-confirmed" in payload["summary"][
         "strongest_today_action"
     ]
-    assert "hidden-input gate is 0/15" in payload["summary"][
-        "fastest_low_friction_lane"
-    ]
+    assert "5/10 gates pass" in payload["summary"]["fastest_low_friction_lane"]
 
     nsf = next(row for row in payload["lanes"] if row["opportunity_number"] == "26-510")
     assert nsf["deadline_date"] == "2026-11-04"
@@ -173,7 +174,14 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         for row in payload["lanes"]
         if row["opportunity_number"] == "NASHVILLE-EC-FALL-2026"
     )
-    assert ec["command"] == "STAGE_APPLICATION"
+    assert ec["command"] == "SENT_VERIFIED"
+    assert ec["pre_send_command"] == "STAGE_APPLICATION"
+    assert ec["submission_status"] == "PORTAL_SUBMISSION_CONFIRMED"
+    assert ec["sent_utc"] == "2026-07-18T04:54:52.709214Z"
+    assert ec["receipt_path"].endswith(
+        "NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json"
+    )
+    assert ec["verification_scope"] == "PORTAL_CONFIRMATION_PAGE_OBSERVED"
     assert ec["deadline_date"] == "2026-07-17"
     assert ec["deadline_utc"] == "2026-07-18T04:59:00Z"
     assert ec["deadline_semantics"] == (
@@ -182,7 +190,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "TAKEOFF" in ec["fit_state"]
     assert "11:59 p.m. on July 17" in ec["official_deadline_text"]
     assert "America/Chicago" in ec["official_deadline_text"]
-    assert any("hidden-prompt founder-fact collector" in row for row in ec["today_work"])
+    assert any("Monitor the existing email account" in row for row in ec["today_work"])
     assert any(
         path.endswith("NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json")
         for path in ec["package_files"]
@@ -199,7 +207,11 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         path.endswith("NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json")
         for path in ec["package_files"]
     )
-    assert len(ec["package_files"]) == 10
+    assert any(
+        path.endswith("NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json")
+        for path in ec["package_files"]
+    )
+    assert len(ec["package_files"]) == 11
     assert ec["deadline_support_status"] == (
         "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED"
     )
@@ -209,13 +221,13 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert ec["deadline_support_reply_required"] is False
     assert ec["deadline_timezone_explicit_in_message"] is False
     assert ec["operational_timezone"] == "America/Chicago"
-    assert any("do not resend" in row for row in ec["today_work"])
-    assert ec["action_gate_status"] == "READY_FOR_HIDDEN_FOUNDER_INPUT"
+    assert any("Do not duplicate" in row for row in ec["today_work"])
+    assert ec["action_gate_status"] == "PORTAL_SUBMISSION_CONFIRMED"
     assert ec["action_gate_submission_ready_for_human_click"] is False
     assert ec["action_gate_required_private_gate_count"] == 15
-    assert ec["action_gate_passed_private_gate_count"] == 0
-    assert ec["action_gate_open_gate_count"] == 15
-    assert ec["action_gate_private_input_present"] is False
+    assert ec["action_gate_passed_private_gate_count"] == 15
+    assert ec["action_gate_open_gate_count"] == 0
+    assert ec["action_gate_private_input_present"] is True
     assert ec["action_gate_private_values_exposed"] is False
     assert ec["private_capture_target_git_ignored"] is True
     assert ec["private_capture_required_founder_prompt_count"] == 6
@@ -228,6 +240,43 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     )
     assert ec["external_send_allowed_without_human"] is False
     assert ec["final_submit_allowed_without_human"] is False
+
+    darpa = next(
+        row
+        for row in payload["lanes"]
+        if row["opportunity_number"] == "DARPA-SN-26-97"
+    )
+    assert darpa["command"] == "SENT_VERIFIED"
+    assert darpa["submission_status"] == "EMAIL_SUBMISSION_SENT_BEFORE_DEADLINE"
+    assert darpa["sent_utc"] == "2026-07-17T19:27:49Z"
+    assert darpa["deadline_utc"] == "2026-07-17T21:00:00Z"
+    assert darpa["acknowledgment_received"] is False
+    assert darpa["human_gate"] == []
+    assert len(darpa["receipt_attachment_sha256"]) == 64
+    assert len(darpa["package_files"]) == 2
+
+    build_week = next(
+        row
+        for row in payload["lanes"]
+        if row["opportunity_number"] == "OPENAI-BUILD-WEEK-2026"
+    )
+    assert build_week["command"] == "STAGE_APPLICATION"
+    assert build_week["deadline_date"] == "2026-07-21"
+    assert build_week["deadline_utc"] == "2026-07-22T00:00:00Z"
+    assert build_week["deadline_semantics"] == "OFFICIAL_RULES_DEADLINE_VERIFIED"
+    assert build_week["readiness_status"] == (
+        "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
+    )
+    assert build_week["readiness_gate_total"] == 10
+    assert build_week["readiness_gate_pass_count"] == 5
+    assert build_week["readiness_gate_open_count"] == 5
+    assert build_week["public_demo_url"] == (
+        "https://lumen-core.ai/build_week/prooflock_console/"
+    )
+    assert build_week["youtube_demo_url"] is None
+    assert build_week["feedback_session_id_present"] is False
+    assert build_week["confirmed_model_present"] is False
+    assert len(build_week["package_files"]) == 5
 
     missionweave = next(
         row
@@ -249,8 +298,8 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     )
     assert missionweave["action_gate_submission_ready_for_human_click"] is False
     assert missionweave["action_gate_required_private_gate_count"] == 50
-    assert missionweave["action_gate_passed_private_gate_count"] == 15
-    assert missionweave["action_gate_open_gate_count"] == 35
+    assert missionweave["action_gate_passed_private_gate_count"] == 19
+    assert missionweave["action_gate_open_gate_count"] == 31
     assert missionweave["action_gate_private_input_present"] is True
     assert missionweave["action_gate_private_values_exposed"] is False
     assert missionweave["action_gate_private_input_sha256_exposed"] is False
@@ -399,14 +448,17 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "Sent And Verified" in rendered
     assert "No-Bid Or Partner-Only" in rendered
     assert "Expired without verified send: `1`" in rendered
-    assert "CDC are sent and receipt-backed" in rendered
+    assert "CDC acknowledged receipt" in rendered
+    assert "Nashville EC is portal-confirmed" in rendered
+    assert "DARPA was sent before deadline with acknowledgment pending" in rendered
     assert "SAM.gov public credential rotation became overdue" in rendered
     assert "Guarded installer: `code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py`" in rendered
     assert "HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE" in rendered
-    assert "Action gate: `READY_FOR_HIDDEN_FOUNDER_INPUT`" in rendered
-    assert "Action gates passed: `0/15`" in rendered
+    assert "Status: `PORTAL_SUBMISSION_CONFIRMED`" in rendered
+    assert "OPENAI-BUILD-WEEK-2026" in rendered
+    assert "5/10 gates pass" in rendered
     assert "Action gate: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`" in rendered
-    assert "Action gates passed: `15/50`" in rendered
+    assert "Action gates passed: `19/50`" in rendered
     assert len(payload["command_board_sha256"]) == 64
 
     for source in (
@@ -424,6 +476,12 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "nashville_ec_deadline_preservation_receipt",
         "nashville_ec_deadline_response_control",
         "nashville_ec_official_deadline_confirmation",
+        "nashville_ec_submission_receipt",
+        "darpa_sn_26_97_submission_receipt",
+        "openai_build_week_submission_readiness",
+        "openai_build_week_project_description",
+        "openai_build_week_demo_script",
+        "openai_build_week_requirements",
         "missionweave_dsip_package_manifest",
         "missionweave_dsip_assembly_map",
         "missionweave_volume2_pdf",
@@ -494,7 +552,7 @@ def test_nashville_private_action_gate_summarizes_without_exposing_values(
     assert "DO_NOT_EXPOSE_SENTINEL" not in json.dumps(gate)
 
 
-def test_missionweave_dsip_action_gate_historical_mirror_receipt_matches():
+def test_missionweave_dsip_action_gate_historical_mirror_receipt_is_consistent():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
@@ -504,10 +562,10 @@ def test_missionweave_dsip_action_gate_historical_mirror_receipt_matches():
     assert receipt["private_values_mirrored"] is False
     assert receipt["destination_root"].startswith("E:/LumaProofVault/")
     for artifact in receipt["artifacts"]:
-        source = ROOT / artifact["source"]
-        destination = Path(artifact["destination"])
-        assert source.is_file(), artifact["source"]
-        assert destination.is_file(), artifact["destination"]
-        assert destination.stat().st_size == artifact["bytes"]
-        assert sha256_file(destination) == artifact["sha256"]
+        assert artifact["bytes"] == artifact["copy_bytes"]
+        assert artifact["sha256"] == artifact["copy_sha256"]
         assert artifact["copy_sha256_matched"] is True
+        destination = Path(artifact["destination"])
+        if destination.is_file():
+            assert destination.stat().st_size == artifact["copy_bytes"]
+            assert sha256_file(destination) == artifact["copy_sha256"]

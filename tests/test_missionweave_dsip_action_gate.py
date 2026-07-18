@@ -87,6 +87,9 @@ def test_default_gate_verifies_package_and_fails_closed_without_private_input():
     assert payload["gate_summary"]["required_private_gate_count"] == 50
     assert payload["gate_summary"]["passed_private_gate_count"] == 0
     assert payload["gate_summary"]["open_gate_count"] == 50
+    groups = payload["gate_summary"]["reconciliation_groups"]
+    assert sum(group["count"] for group in groups.values()) == 50
+    assert groups["F_CLEARED_BY_EVIDENCE"]["count"] == 0
     assert payload["private_input"]["git_ignored_target"] is True
     assert payload["private_input"]["private_values_exposed"] is False
     assert payload["private_input"]["sha256"] is None
@@ -131,6 +134,13 @@ def test_complete_private_record_can_pass_without_exposing_private_values():
     assert payload["gate_summary"]["passed_private_gate_count"] == 50
     assert payload["gate_summary"]["open_gate_count"] == 0
     assert payload["gate_summary"]["unresolved_gates"] == []
+    groups = payload["gate_summary"]["reconciliation_groups"]
+    assert sum(group["count"] for group in groups.values()) == 50
+    assert groups["F_CLEARED_BY_EVIDENCE"] == {
+        "status": "CLEARED",
+        "count": 50,
+        "gates": module.required_private_gates(),
+    }
     facts = payload["private_fact_state"]
     assert facts["assigned_proposal_number_present"] is True
     assert facts["assigned_proposal_number_embedded_in_volume2"] is True
@@ -295,9 +305,14 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     combined = markdown + checklist + json.dumps(payload, sort_keys=True)
 
     assert payload["status"] == "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
-    assert payload["gate_summary"]["passed_private_gate_count"] == 15
-    assert payload["gate_summary"]["open_gate_count"] == 35
+    assert payload["gate_summary"]["passed_private_gate_count"] == 19
+    assert payload["gate_summary"]["open_gate_count"] == 31
     assert payload["gate_summary"]["required_private_gate_count"] == 50
+    groups = payload["gate_summary"]["reconciliation_groups"]
+    assert sum(group["count"] for group in groups.values()) == 50
+    assert sum(group["count"] for key, group in groups.items() if key != "F_CLEARED_BY_EVIDENCE") == 31
+    assert groups["F_CLEARED_BY_EVIDENCE"]["count"] == 19
+    assert "## Reconciliation Groups" in markdown
     assert payload["submission_ready_for_human_click"] is False
     assert payload["private_input"]["private_values_exposed"] is False
     assert payload["source_integrity"]["all_checks_pass"] is True

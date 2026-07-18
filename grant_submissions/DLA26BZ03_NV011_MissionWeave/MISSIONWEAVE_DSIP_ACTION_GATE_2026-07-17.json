@@ -15,10 +15,98 @@
     "live_dsip_recheck_required": true,
     "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
   },
-  "gate_sha256": "aca80eba7c6f85a67e8ed7fe3e8f524b54a0590125890524eda4772ea523045e",
+  "gate_sha256": "44e820a2085cd91f5b21ecd1208d63cb71e4127169a16d4b22df25b0b0010290",
   "gate_summary": {
-    "open_gate_count": 35,
-    "passed_private_gate_count": 15,
+    "open_gate_count": 31,
+    "passed_private_gate_count": 19,
+    "reconciliation_groups": {
+      "A_DOCUMENTARY_RETRIEVAL": {
+        "count": 6,
+        "gates": [
+          "CAGE_MATCH",
+          "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+          "DSIP_FIRM_PIN_AVAILABILITY",
+          "PORTAL_PREVIEW_RECEIPT_HASH",
+          "SAM_REPRESENTATIONS_CURRENT",
+          "VOLUME6_FWA_TRAINING"
+        ],
+        "status": "OPEN"
+      },
+      "B_FOUNDER_FACTUAL_ANSWER": {
+        "count": 9,
+        "gates": [
+          "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+          "FOREIGN_CITIZEN_ANSWER",
+          "NO_DUPLICATE_COST_OR_DELIVERABLE",
+          "OWNERSHIP_AND_AFFILIATES",
+          "PI_640_HOURS",
+          "PI_PRIMARY_EMPLOYMENT",
+          "SBIR_PERCENTAGE_OF_WORK",
+          "SUBMITTER_AUTHORITY",
+          "US_SMALL_BUSINESS_ELIGIBILITY"
+        ],
+        "status": "OPEN"
+      },
+      "C_LEGAL_CERTIFICATION_DECISION": {
+        "count": 9,
+        "gates": [
+          "ACTION_TIME_APPROVAL_TIMESTAMP",
+          "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+          "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+          "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+          "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+          "FOREIGN_AFFILIATIONS_CURRENT_FACTS",
+          "ITAR_SCOPE_CONFIRMED",
+          "TECHNICAL_DATA_RIGHTS_ASSERTION",
+          "TECHNOLOGY_CONTROL_PLAN_DECISION"
+        ],
+        "status": "OPEN"
+      },
+      "D_PORTAL_MECHANICS": {
+        "count": 5,
+        "gates": [
+          "COMPLETE_PORTAL_PREVIEW_REVIEW",
+          "DSIP_AUTHENTICATION",
+          "DSIP_FIRM_ADMIN",
+          "DSIP_FIRM_LEVEL_FORMS",
+          "VOLUME7_FOREIGN_AFFILIATIONS_WEBFORM"
+        ],
+        "status": "OPEN"
+      },
+      "E_TECHNICAL_VOLUME_CONSISTENCY": {
+        "count": 2,
+        "gates": [
+          "VOLUME3_COST_BASIS",
+          "VOLUME5_UPLOAD_SET"
+        ],
+        "status": "OPEN"
+      },
+      "F_CLEARED_BY_EVIDENCE": {
+        "count": 19,
+        "gates": [
+          "ASSIGNED_PROPOSAL_NUMBER_CAPTURE",
+          "CONTROLLED_DATA_EXCLUDED",
+          "DSIP_ORGANIZATION_LINKAGE",
+          "LIVE_DSIP_DEADLINE_CONFIRMATION",
+          "NO_CMMC_STATUS_OVERCLAIM",
+          "PRIOR_CURRENT_PENDING_SUPPORT",
+          "PRIVATE_INPUT_TIMESTAMP",
+          "SAM_ACTIVE_STATUS",
+          "SAM_LEGAL_NAME_MATCH",
+          "SBA_COMPANY_REGISTRY",
+          "SBC_CONTROL_ID",
+          "UEI_MATCH",
+          "VOLUME1_PUBLIC_RELEASE_TEXT_REVIEW",
+          "VOLUME2_ASSIGNED_PROPOSAL_NUMBER_EMBEDDED",
+          "VOLUME2_PDF_HASH_MATCH",
+          "VOLUME2_REBUILD",
+          "VOLUME2_VIRUS_SCAN",
+          "VOLUME3_TOTAL_MATCHES_PHASE_I_CEILING",
+          "VOLUME4_CCR"
+        ],
+        "status": "CLEARED"
+      }
+    },
     "required_private_gate_count": 50,
     "unresolved_gates": [
       "ACTION_TIME_APPROVAL_TIMESTAMP",
@@ -30,6 +118,7 @@
       "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
       "CURRENT_CMMC_REQUIREMENTS_REVIEW",
       "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+      "DSIP_AUTHENTICATION",
       "DSIP_FIRM_ADMIN",
       "DSIP_FIRM_LEVEL_FORMS",
       "DSIP_FIRM_PIN_AVAILABILITY",
@@ -41,24 +130,19 @@
       "PI_640_HOURS",
       "PI_PRIMARY_EMPLOYMENT",
       "PORTAL_PREVIEW_RECEIPT_HASH",
-      "PRIOR_CURRENT_PENDING_SUPPORT",
       "SAM_REPRESENTATIONS_CURRENT",
-      "SBA_COMPANY_REGISTRY",
-      "SBC_CONTROL_ID",
       "SBIR_PERCENTAGE_OF_WORK",
       "SUBMITTER_AUTHORITY",
       "TECHNICAL_DATA_RIGHTS_ASSERTION",
       "TECHNOLOGY_CONTROL_PLAN_DECISION",
-      "UEI_MATCH",
       "US_SMALL_BUSINESS_ELIGIBILITY",
       "VOLUME3_COST_BASIS",
-      "VOLUME4_CCR",
       "VOLUME5_UPLOAD_SET",
       "VOLUME6_FWA_TRAINING",
       "VOLUME7_FOREIGN_AFFILIATIONS_WEBFORM"
     ]
   },
-  "generated_utc": "2026-07-18T00:45:55.094269+00:00",
+  "generated_utc": "2026-07-18T08:05:44.180997+00:00",
   "official_instruction_facts": {
     "cmmc_amendment_note": "Amendment 2 says CMMC Phase II implementation was suspended on July 13, 2026 while Phase I self-assessment requirements remain in place; the current live requirement must be reviewed before submission.",
     "current_package_duration_months": 6,

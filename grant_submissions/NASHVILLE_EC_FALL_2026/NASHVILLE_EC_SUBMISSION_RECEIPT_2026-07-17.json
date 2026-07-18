@@ -1,0 +1,27 @@
+{
+  "schema": "lumencore.nashville_ec_submission_receipt.v1",
+  "status": "PORTAL_SUBMISSION_CONFIRMED",
+  "opportunity": "Nashville Entrepreneur Center Fall 2026 Accelerator Application",
+  "selected_program": "TakeOff",
+  "form_id": "261305765806056",
+  "deadline_local": "2026-07-17T23:59:00-05:00",
+  "confirmation_observed_local": "2026-07-17T23:54:52.7092145-05:00",
+  "confirmation_page": {
+    "title": "Thank You",
+    "url": "https://submit.jotform.com/261305765806056",
+    "bounded_confirmation": "We have received your application.",
+    "expected_next_steps_by": "2026-08-03"
+  },
+  "submission_controls": {
+    "required_answers_ready_before_entry": "30/30",
+    "founder_attestations_incorporated": 11,
+    "program_fee_commitment": false,
+    "optional_demographic_fields_omitted": true,
+    "final_submission_authority": "User standing authorization for deadline-ready submissions in this task"
+  },
+  "private_evidence": {
+    "path": "out/private/nashville_ec_submission_20260717/NASHVILLE_EC_SUBMISSION_SUCCESS_2026-07-17.png",
+    "sha256": "d2c82aa6a9d91785b72a09fda2753bdae070b100b7efd048e16a952f214c5619"
+  },
+  "claim_boundary": "This receipt records the portal confirmation page observed after submission. It does not prove acceptance into a cohort, selection, funding, endorsement, validation, revenue, or an award."
+}

@@ -112,6 +112,79 @@ SPECIAL_GATES = (
     "ACTION_TIME_APPROVAL_TIMESTAMP",
 )
 
+GATE_RECONCILIATION_GROUPS = {
+    "A_DOCUMENTARY_RETRIEVAL": frozenset(
+        {
+            "ASSIGNED_PROPOSAL_NUMBER_CAPTURE",
+            "CAGE_MATCH",
+            "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+            "DSIP_FIRM_PIN_AVAILABILITY",
+            "PORTAL_PREVIEW_RECEIPT_HASH",
+            "PRIVATE_INPUT_TIMESTAMP",
+            "SAM_ACTIVE_STATUS",
+            "SAM_LEGAL_NAME_MATCH",
+            "SAM_REPRESENTATIONS_CURRENT",
+            "SBA_COMPANY_REGISTRY",
+            "SBC_CONTROL_ID",
+            "UEI_MATCH",
+            "VOLUME6_FWA_TRAINING",
+        }
+    ),
+    "B_FOUNDER_FACTUAL_ANSWER": frozenset(
+        {
+            "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+            "FOREIGN_CITIZEN_ANSWER",
+            "NO_DUPLICATE_COST_OR_DELIVERABLE",
+            "OWNERSHIP_AND_AFFILIATES",
+            "PI_640_HOURS",
+            "PI_PRIMARY_EMPLOYMENT",
+            "PRIOR_CURRENT_PENDING_SUPPORT",
+            "SBIR_PERCENTAGE_OF_WORK",
+            "SUBMITTER_AUTHORITY",
+            "US_SMALL_BUSINESS_ELIGIBILITY",
+        }
+    ),
+    "C_LEGAL_CERTIFICATION_DECISION": frozenset(
+        {
+            "ACTION_TIME_APPROVAL_TIMESTAMP",
+            "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+            "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+            "CONTROLLED_DATA_EXCLUDED",
+            "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+            "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+            "FOREIGN_AFFILIATIONS_CURRENT_FACTS",
+            "ITAR_SCOPE_CONFIRMED",
+            "NO_CMMC_STATUS_OVERCLAIM",
+            "TECHNICAL_DATA_RIGHTS_ASSERTION",
+            "TECHNOLOGY_CONTROL_PLAN_DECISION",
+            "VOLUME4_CCR",
+        }
+    ),
+    "D_PORTAL_MECHANICS": frozenset(
+        {
+            "COMPLETE_PORTAL_PREVIEW_REVIEW",
+            "DSIP_AUTHENTICATION",
+            "DSIP_FIRM_ADMIN",
+            "DSIP_FIRM_LEVEL_FORMS",
+            "DSIP_ORGANIZATION_LINKAGE",
+            "LIVE_DSIP_DEADLINE_CONFIRMATION",
+            "VOLUME7_FOREIGN_AFFILIATIONS_WEBFORM",
+        }
+    ),
+    "E_TECHNICAL_VOLUME_CONSISTENCY": frozenset(
+        {
+            "VOLUME1_PUBLIC_RELEASE_TEXT_REVIEW",
+            "VOLUME2_ASSIGNED_PROPOSAL_NUMBER_EMBEDDED",
+            "VOLUME2_PDF_HASH_MATCH",
+            "VOLUME2_REBUILD",
+            "VOLUME2_VIRUS_SCAN",
+            "VOLUME3_COST_BASIS",
+            "VOLUME3_TOTAL_MATCHES_PHASE_I_CEILING",
+            "VOLUME5_UPLOAD_SET",
+        }
+    ),
+}
+
 REQUIRED_VOLUME2_SECTIONS = (
     "1. Identification and Significance of the Problem or Opportunity",
     "2. Phase I Technical Objectives",
@@ -448,6 +521,38 @@ def required_private_gates() -> list[str]:
     )
 
 
+def gate_reconciliation_groups(unresolved_gates: list[str]) -> dict[str, Any]:
+    required = set(required_private_gates())
+    classified: set[str] = set()
+    for members in GATE_RECONCILIATION_GROUPS.values():
+        if classified.intersection(members):
+            raise MissionWeaveGateError("GATE_RECONCILIATION_GROUP_OVERLAP")
+        classified.update(members)
+    if classified != required:
+        raise MissionWeaveGateError("GATE_RECONCILIATION_CLASSIFICATION_DRIFT")
+
+    unresolved = set(unresolved_gates)
+    unresolved_required = required.intersection(unresolved)
+    groups: dict[str, Any] = {}
+    for group_id, members in GATE_RECONCILIATION_GROUPS.items():
+        gates = sorted(unresolved_required.intersection(members))
+        if group_id == "A_DOCUMENTARY_RETRIEVAL" and "OFFICIAL_SOURCE_INTEGRITY" in unresolved:
+            gates = ["OFFICIAL_SOURCE_INTEGRITY", *gates]
+        groups[group_id] = {
+            "status": "OPEN" if gates else "CLEAR",
+            "count": len(gates),
+            "gates": gates,
+        }
+
+    cleared = sorted(required.difference(unresolved_required))
+    groups["F_CLEARED_BY_EVIDENCE"] = {
+        "status": "CLEARED",
+        "count": len(cleared),
+        "gates": cleared,
+    }
+    return groups
+
+
 def evaluate_private_payload(
     payload: dict[str, Any],
     *,
@@ -614,6 +719,7 @@ def build_payload(
 
     if volume3_artifact_state is None:
         volume3_artifact_state = inspect_private_volume3_artifact()
+    reconciliation_groups = gate_reconciliation_groups(unresolved)
 
     payload: dict[str, Any] = {
         "schema": PUBLIC_SCHEMA,
@@ -663,6 +769,7 @@ def build_payload(
             ),
             "open_gate_count": len(unresolved),
             "unresolved_gates": unresolved,
+            "reconciliation_groups": reconciliation_groups,
         },
         "private_fact_state": {
             "assigned_proposal_number_present": bool(
@@ -825,9 +932,14 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Private path exposed: `{str(volume3['private_path_exposed']).lower()}`",
         f"- Private hash exposed: `{str(volume3['private_hash_exposed']).lower()}`",
         "",
-        "## Open Gates",
+        "## Reconciliation Groups",
         "",
     ]
+    for group_id, group in payload["gate_summary"]["reconciliation_groups"].items():
+        lines.append(
+            f"- `{group_id}`: `{group['count']}` gates (`{group['status']}`)"
+        )
+    lines.extend(["", "## Open Gates", ""])
     lines.extend(f"- `{gate}`" for gate in payload["gate_summary"]["unresolved_gates"])
     lines.extend(
         [

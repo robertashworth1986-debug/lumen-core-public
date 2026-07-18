@@ -13,9 +13,9 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Private target git-ignored: `true`
 - Private values exposed: `false`
 - Required private gates: `50`
-- Passed private gates: `15`
-- Open gates: `35`
-- Gate SHA-256: `aca80eba7c6f85a67e8ed7fe3e8f524b54a0590125890524eda4772ea523045e`
+- Passed private gates: `19`
+- Open gates: `31`
+- Gate SHA-256: `44e820a2085cd91f5b21ecd1208d63cb71e4127169a16d4b22df25b0b0010290`
 
 ## Package Integrity
 
@@ -59,6 +59,15 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Private path exposed: `false`
 - Private hash exposed: `false`
 
+## Reconciliation Groups
+
+- `A_DOCUMENTARY_RETRIEVAL`: `6` gates (`OPEN`)
+- `B_FOUNDER_FACTUAL_ANSWER`: `9` gates (`OPEN`)
+- `C_LEGAL_CERTIFICATION_DECISION`: `9` gates (`OPEN`)
+- `D_PORTAL_MECHANICS`: `5` gates (`OPEN`)
+- `E_TECHNICAL_VOLUME_CONSISTENCY`: `2` gates (`OPEN`)
+- `F_CLEARED_BY_EVIDENCE`: `19` gates (`CLEARED`)
+
 ## Open Gates
 
 - `ACTION_TIME_APPROVAL_TIMESTAMP`
@@ -70,6 +79,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 - `CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW`
 - `CURRENT_CMMC_REQUIREMENTS_REVIEW`
 - `DD2345_OR_JCP_APPLICATION_EVIDENCE`
+- `DSIP_AUTHENTICATION`
 - `DSIP_FIRM_ADMIN`
 - `DSIP_FIRM_LEVEL_FORMS`
 - `DSIP_FIRM_PIN_AVAILABILITY`
@@ -81,18 +91,13 @@ This public-safe gate reports only package integrity and private-workflow comple
 - `PI_640_HOURS`
 - `PI_PRIMARY_EMPLOYMENT`
 - `PORTAL_PREVIEW_RECEIPT_HASH`
-- `PRIOR_CURRENT_PENDING_SUPPORT`
 - `SAM_REPRESENTATIONS_CURRENT`
-- `SBA_COMPANY_REGISTRY`
-- `SBC_CONTROL_ID`
 - `SBIR_PERCENTAGE_OF_WORK`
 - `SUBMITTER_AUTHORITY`
 - `TECHNICAL_DATA_RIGHTS_ASSERTION`
 - `TECHNOLOGY_CONTROL_PLAN_DECISION`
-- `UEI_MATCH`
 - `US_SMALL_BUSINESS_ELIGIBILITY`
 - `VOLUME3_COST_BASIS`
-- `VOLUME4_CCR`
 - `VOLUME5_UPLOAD_SET`
 - `VOLUME6_FWA_TRAINING`
 - `VOLUME7_FOREIGN_AFFILIATIONS_WEBFORM`
