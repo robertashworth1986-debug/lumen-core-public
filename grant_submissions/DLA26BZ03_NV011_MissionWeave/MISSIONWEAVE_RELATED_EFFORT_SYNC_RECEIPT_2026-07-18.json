@@ -1,0 +1,35 @@
+{
+  "schema": "lumencore.missionweave_related_effort_sync_receipt.v1",
+  "captured_utc": "2026-07-18T10:23:02.8358579Z",
+  "protocol_commit": "ba715009510aa5aa6d39e829d328b2b2ee46eb93",
+  "source_root": "C:/LumaTrader/INSTITUTIONAL_STACK_V2",
+  "mirror_root": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_RELATED_EFFORT_20260718",
+  "artifact_count": 3,
+  "all_sha256_matched_after_copy": true,
+  "artifacts": [
+    {
+      "source": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_COST_BASIS_WORKING.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_RELATED_EFFORT_20260718/MISSIONWEAVE_COST_BASIS_WORKING.md",
+      "sha256": "FD97A76BB5F1B55DBFBE607431FF907CBF4FDB996D2A713689535AADB0137C80",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_RELATED_EFFORT_OVERLAP_MATRIX_2026-07-18.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_RELATED_EFFORT_20260718/MISSIONWEAVE_RELATED_EFFORT_OVERLAP_MATRIX_2026-07-18.md",
+      "sha256": "15AD5EE5C5FE9CCEF52CF893ED6158A2E0A77D0881CEC499DA0185CE9DC0445D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_finalize_missionweave_dsip_volume2_private.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/MISSIONWEAVE_RELATED_EFFORT_20260718/test_finalize_missionweave_dsip_volume2_private.py",
+      "sha256": "4E51E3CAD8866B6C9362F3CC36CC301CEB507F9A8E6D4DC717E65310DFA944AE",
+      "copy_sha256_matched": true
+    }
+  ],
+  "tests": {
+    "command": "python -m pytest -q tests/test_missionweave_dsip_action_gate.py tests/test_missionweave_dsip_package.py tests/test_finalize_missionweave_dsip_volume2_private.py tests/test_capture_missionweave_dsip_private_input.py",
+    "passed": 42,
+    "failed": 0
+  },
+  "claim_boundary": "This receipt proves byte-for-byte identity of the listed C-drive and E-drive artifacts at capture time and records their Git commit. It does not prove proposal eligibility, accounting support, cost allowability, absence of all related efforts, corporate-official certification, agency acceptance, award status, or final submission."
+}
