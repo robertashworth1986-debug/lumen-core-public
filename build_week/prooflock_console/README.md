@@ -24,7 +24,7 @@ Open `http://127.0.0.1:8088/build_week/prooflock_console/`.
 
 Supported platforms: current desktop and mobile browsers with Web Crypto and Fetch support. No account, API key, build step, or external service is required for the bundled demonstration.
 
-The console loads only files shipped inside `build_week/prooflock_console/`. Its vendored Three.js module and `THREE_LICENSE.txt` travel with the deployable directory, so copying that directory cannot create a hidden repository-layout dependency. A deterministic Canvas 2D renderer remains available when WebGL is unavailable.
+The console loads only files shipped inside `build_week/prooflock_console/`. Its vendored Three.js modules and `THREE_LICENSE.txt` travel with the deployable directory, so copying that directory cannot create a hidden repository-layout dependency. A deterministic Canvas 2D renderer remains available when WebGL is unavailable.
 
 ## Verify From The CLI
 

@@ -222,7 +222,7 @@ def test_console_has_no_remote_runtime_dependency():
 
 
 def test_deployable_module_graph_is_self_contained():
-    import_pattern = re.compile(r"(?:from\s+|import\s*\()\s*[\"']([^\"']+)[\"']")
+    import_pattern = re.compile(r"(?:from|import\s*\()\s*[\"']([^\"']+)[\"']")
     pending = [APP_DIR / "bootstrap.js"]
     visited: set[Path] = set()
 
@@ -242,9 +242,13 @@ def test_deployable_module_graph_is_self_contained():
                 pending.append(dependency)
 
     assert APP_DIR / "three.module.min.js" in visited
+    assert APP_DIR / "three.core.min.js" in visited
     assert (APP_DIR / "THREE_LICENSE.txt").is_file()
     assert (APP_DIR / "three.module.min.js").read_bytes() == (
         ROOT / "dashboard" / "assets" / "vendor" / "three.module.min.js"
+    ).read_bytes()
+    assert (APP_DIR / "three.core.min.js").read_bytes() == (
+        ROOT / "dashboard" / "assets" / "vendor" / "three.core.min.js"
     ).read_bytes()
 
 
