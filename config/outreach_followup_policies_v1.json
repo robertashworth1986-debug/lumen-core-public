@@ -1,0 +1,141 @@
+{
+  "schema": "lumencore.outreach_followup_policies.v1",
+  "version": 1,
+  "controls": {
+    "action_time_human_review_required": true,
+    "builder_can_send_email": false,
+    "inbox_recheck_required_before_any_followup": true,
+    "missing_lane_policy_fail_closed": true,
+    "past_hold_does_not_authorize_send": true
+  },
+  "lane_policies": [
+    {
+      "lane_id": "nashville_ec_takeoff_fall_2026",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "Portal submission is confirmed; monitor through the stated review date and answer only a specific inbound request."
+    },
+    {
+      "lane_id": "epri_open_power_ai_mou",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "Identity and routing facts were already supplied; wait for an MOU, correction request, or onboarding question."
+    },
+    {
+      "lane_id": "georgia_patents_pro_bono_intake",
+      "mode": "CLOSED",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "The organization stated that it does not provide the requested service for an already-filed application."
+    },
+    {
+      "lane_id": "lanl_vision_licensing_followup",
+      "mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
+      "eligible_template_id": "SUBMISSION_RECEIPT_FOLLOWUP",
+      "not_before_utc": "2026-07-23T14:00:00Z",
+      "max_proactive_sends": 1,
+      "rationale": "One bounded receipt-status follow-up may be drafted after the hold only if a fresh mailbox check confirms no reply."
+    },
+    {
+      "lane_id": "cdc_ai_acquisition_rfi",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "Agency receipt is confirmed; respond only to a clarification, replacement request, or scheduling message."
+    },
+    {
+      "lane_id": "darpa_sn_26_97_low_resource_computing_rfi",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "The formal package was sent; do not duplicate it and respond only to a specific agency request."
+    },
+    {
+      "lane_id": "missionweave_dsip_proposal",
+      "mode": "PORTAL_ACTION",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "The open work is inside DSIP and requires founder facts, legal review, certification, and action-time final authority."
+    },
+    {
+      "lane_id": "openai_build_week_prooflock",
+      "mode": "PORTAL_ACTION",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "The remaining work is external submission-field, feedback-session, deployment, and video completion rather than an email reply."
+    },
+    {
+      "lane_id": "openai_build_week_internal_handoff",
+      "mode": "PRIVATE_RECONCILIATION",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "The exact handoff must be recovered privately; no external email should invent or publish missing content."
+    },
+    {
+      "lane_id": "lvlup_optional_paid_event",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "Independent review continuation is confirmed; reply only if the investment committee requests information."
+    },
+    {
+      "lane_id": "terry_vynetic_followup",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "Two near-duplicate outbound follow-ups already exist; send nothing unless a specific inbound ask arrives."
+    },
+    {
+      "lane_id": "fhwa_tsmo_qualified_partner_outreach",
+      "mode": "CLOSED",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "The response lead stated that the team is set and will not add partners for this pursuit."
+    },
+    {
+      "lane_id": "nsf_project_pitch",
+      "mode": "PORTAL_ACTION",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "Use the rolling Project Pitch portal; no official invitation supports a full-proposal email route."
+    },
+    {
+      "lane_id": "nasa_data_center_rfi",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "A sent receipt exists; monitor for an agency clarification or replacement request."
+    },
+    {
+      "lane_id": "army_aidp_draft_cfs_feedback",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "A sent receipt exists; monitor for agency feedback and do not duplicate the package."
+    },
+    {
+      "lane_id": "sam_public_credential_rotation",
+      "mode": "ACCOUNT_ACTION",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "The work is authenticated account maintenance through the guarded local installer, not an email reply."
+    }
+  ]
+}

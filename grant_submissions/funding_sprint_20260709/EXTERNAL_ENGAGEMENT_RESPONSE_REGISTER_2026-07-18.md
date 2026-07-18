@@ -13,7 +13,7 @@ Nashville EC's portal displayed a submission confirmation before the operational
 - All attachment checks pass: `true`
 - Autonomous external send allowed: `false`
 - Autonomous final portal submit allowed: `false`
-- Register SHA-256: `2d81372014d5786f6c4e4c5c189d4ff6e365c7b90b8f64d661c27bd44f0f65f1`
+- Register SHA-256: `480c85d3ab453a2591b09992e66d6721b9a833fbaf05d71dd3e31bc484d8881f`
 
 ## Response Queue
 
@@ -263,7 +263,7 @@ LumenCore
 - `lvlup_historical_application_draft`: present=`true` bytes=`12152` sha256=`F75EBF8FD60A40968484D6AE147FB6D02848CA109AB277337C5BAE5085CBA796` path=`docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md`
 - `lvlup_independent_review_confirmation`: present=`true` bytes=`1908` sha256=`F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC` path=`grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json`
 - `sam_public_credential_rotation_control`: present=`true` bytes=`4544` sha256=`AAC20E903A5055E731DA65E5E5A82F08D5C34A7288AA6BED4D0ED78C4F0BE159` path=`grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json`
-- `email_action_reconciliation`: present=`true` bytes=`15748` sha256=`1896A2EBC33C2541DEE020890D6057A09AFB9BB9606E7AE3EFE48A0218342F1C` path=`grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json`
+- `email_action_reconciliation`: present=`true` bytes=`22025` sha256=`2C3CE20CBD6681EB2198F61E546F12B03EFCA645C5D8BA85EAD610CFD814FD54` path=`grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json`
 - `darpa_sn_26_97_public_submission_receipt`: present=`true` bytes=`2834` sha256=`89B64A1A282AB72F0738E068952A14A82E38F5AEC4A78C1B7D2B4F4930410CB4` path=`grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json`
 - `fhwa_teaming_template`: present=`true` bytes=`2114` sha256=`6614F9D452565F9E5F54B3E70B45E93F112DD1293A8845E43489E339D34B0819` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md`
 - `fhwa_partner_outreach_control`: present=`true` bytes=`12675` sha256=`39CBFE5F1C5DB55C33D249ADCFDE1F04AE3983D69D1737F00A97403E168AF364` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json`

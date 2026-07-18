@@ -34,6 +34,14 @@ def test_reconciliation_is_deterministic_and_no_send():
     assert actual["summary"]["send_now_count"] == 0
     assert actual["summary"]["duplicate_outbound_risk_count"] == 15
     assert actual["summary"]["monitor_no_send_template_count"] == 15
+    assert actual["summary"]["follow_up_mode_counts"] == {
+        "ACCOUNT_ACTION": 1,
+        "CLOSED": 2,
+        "INBOUND_ONLY": 8,
+        "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD": 1,
+        "PORTAL_ACTION": 3,
+        "PRIVATE_RECONCILIATION": 1,
+    }
     assert actual["summary"]["human_account_action_count"] == 4
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert all(lane["send_now"] is False for lane in actual["lanes"])
@@ -99,6 +107,9 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert build_week_handoff["full_handoff_body_available"] is False
     assert build_week_handoff["do_not_duplicate_send"] is True
     assert "do not invent" in build_week_handoff["next_action"]
+    assert build_week_handoff["follow_up_policy"]["mode"] == (
+        "PRIVATE_RECONCILIATION"
+    )
 
     nashville = lanes["nashville_ec_takeoff_fall_2026"]
     assert nashville["latest_event_type"] == "PORTAL_SUBMISSION_CONFIRMED"
@@ -112,6 +123,20 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert nashville["do_not_duplicate_send"] is True
     assert nashville["send_now"] is False
     assert "do not resubmit" in nashville["next_action"]
+    assert nashville["follow_up_policy"]["mode"] == "INBOUND_ONLY"
+
+    lanl = lanes["lanl_vision_licensing_followup"]
+    assert lanl["follow_up_policy"] == {
+        "lane_id": "lanl_vision_licensing_followup",
+        "mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
+        "eligible_template_id": "SUBMISSION_RECEIPT_FOLLOWUP",
+        "not_before_utc": "2026-07-23T14:00:00Z",
+        "max_proactive_sends": 1,
+        "rationale": (
+            "One bounded receipt-status follow-up may be drafted after the hold only "
+            "if a fresh mailbox check confirms no reply."
+        ),
+    }
 
     lvlup = lanes["lvlup_optional_paid_event"]
     assert lvlup["latest_event_type"] == (
@@ -137,6 +162,7 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
         "present"
     ] is True
     assert source_evidence["outreach_response_template_registry"]["present"] is True
+    assert source_evidence["outreach_followup_policy_config"]["present"] is True
     assert len(source_evidence["nashville_official_deadline_confirmation"]["sha256"]) == 64
     assert len(source_evidence["lvlup_independent_review_confirmation"]["sha256"]) == 64
 

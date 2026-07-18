@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -49,6 +50,18 @@ OPENAI_BUILD_WEEK_HANDOFF_CONTROL = (
 OUTREACH_RESPONSE_TEMPLATE_REGISTRY = (
     SPRINT_DIR / "OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
 )
+OUTREACH_FOLLOWUP_POLICY_CONFIG = (
+    ROOT / "config" / "outreach_followup_policies_v1.json"
+)
+
+VALID_FOLLOWUP_MODES = {
+    "ACCOUNT_ACTION",
+    "CLOSED",
+    "INBOUND_ONLY",
+    "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
+    "PORTAL_ACTION",
+    "PRIVATE_RECONCILIATION",
+}
 
 AS_OF_DATE = "2026-07-18"
 
@@ -79,6 +92,7 @@ def build_payload() -> dict[str, Any]:
     build_week = read_json(OPENAI_BUILD_WEEK_READINESS)
     build_week_handoff = read_json(OPENAI_BUILD_WEEK_HANDOFF_CONTROL)
     response_registry = read_json(OUTREACH_RESPONSE_TEMPLATE_REGISTRY)
+    followup_config = read_json(OUTREACH_FOLLOWUP_POLICY_CONFIG)
     if (
         nashville.get("schema")
         != "lumencore.nashville_ec_official_deadline_confirmation.v1"
@@ -141,6 +155,25 @@ def build_payload() -> dict[str, Any]:
     }
     if "NO_DUPLICATE_MONITOR" not in response_template_ids:
         raise ValueError("No-duplicate response template is unavailable")
+    if (
+        followup_config.get("schema")
+        != "lumencore.outreach_followup_policies.v1"
+        or followup_config.get("version") != 1
+        or followup_config.get("controls", {}).get("builder_can_send_email") is not False
+        or followup_config.get("controls", {}).get("missing_lane_policy_fail_closed")
+        is not True
+    ):
+        raise ValueError("Outreach follow-up policy config is missing or unsafe")
+    followup_policies = {
+        row.get("lane_id"): row for row in followup_config.get("lane_policies", [])
+    }
+    if len(followup_policies) != len(followup_config.get("lane_policies", [])):
+        raise ValueError("Outreach follow-up policy lane IDs are duplicated")
+    if any(
+        row.get("mode") not in VALID_FOLLOWUP_MODES
+        for row in followup_policies.values()
+    ):
+        raise ValueError("Outreach follow-up policy mode is invalid")
 
     lanes = [
         {
@@ -417,7 +450,34 @@ def build_payload() -> dict[str, Any]:
             ),
         },
     ]
+    lane_ids = {lane["lane_id"] for lane in lanes}
+    if lane_ids != set(followup_policies):
+        missing = sorted(lane_ids - set(followup_policies))
+        stale = sorted(set(followup_policies) - lane_ids)
+        raise ValueError(
+            f"Outreach follow-up policy coverage mismatch: missing={missing}, stale={stale}"
+        )
     for lane in lanes:
+        followup_policy = dict(followup_policies[lane["lane_id"]])
+        eligible_template_id = followup_policy.get("eligible_template_id")
+        if eligible_template_id and eligible_template_id not in response_template_ids:
+            raise ValueError(
+                f"Unknown eligible response template: {eligible_template_id}"
+            )
+        if followup_policy["mode"] == "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD":
+            if (
+                not followup_policy.get("not_before_utc")
+                or followup_policy.get("max_proactive_sends") != 1
+                or not eligible_template_id
+            ):
+                raise ValueError("Bounded follow-up policy is incomplete")
+        elif (
+            followup_policy.get("not_before_utc") is not None
+            or followup_policy.get("max_proactive_sends") != 0
+            or eligible_template_id is not None
+        ):
+            raise ValueError("Non-proactive follow-up policy contains send authority")
+        lane["follow_up_policy"] = followup_policy
         lane["response_template_id"] = (
             "NO_DUPLICATE_MONITOR" if lane["do_not_duplicate_send"] else None
         )
@@ -456,6 +516,13 @@ def build_payload() -> dict[str, Any]:
                 for lane in lanes
                 if lane["response_template_id"] == "NO_DUPLICATE_MONITOR"
             ),
+            "follow_up_mode_counts": dict(
+                sorted(
+                    Counter(
+                        lane["follow_up_policy"]["mode"] for lane in lanes
+                    ).items()
+                )
+            ),
             "out_of_office_count": 1,
             "human_account_action_count": 4,
             "external_send_allowed_without_human": False,
@@ -491,6 +558,9 @@ def build_payload() -> dict[str, Any]:
             "outreach_response_template_registry": artifact_status(
                 OUTREACH_RESPONSE_TEMPLATE_REGISTRY
             ),
+            "outreach_followup_policy_config": artifact_status(
+                OUTREACH_FOLLOWUP_POLICY_CONFIG
+            ),
         },
         "claim_boundary": (
             "This dated mailbox reconciliation records only the messages observable at "
@@ -522,6 +592,10 @@ def validate_payload(payload: dict[str, Any]) -> None:
         "duplicate_outbound_risk_count"
     ]:
         raise ValueError("No-send template coverage is incomplete")
+    if sum(payload["summary"]["follow_up_mode_counts"].values()) != payload["summary"][
+        "lane_count"
+    ]:
+        raise ValueError("Follow-up mode coverage is incomplete")
     terry = next(
         lane for lane in payload["lanes"] if lane["lane_id"] == "terry_vynetic_followup"
     )
@@ -618,12 +692,13 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Reconciled Lanes",
         "",
-        "| Lane | State | Reply now | Next action |",
-        "|---|---|---:|---|",
+        "| Lane | State | Follow-up mode | Reply now | Next action |",
+        "|---|---|---|---:|---|",
     ]
     for lane in payload["lanes"]:
         lines.append(
             f"| {lane['organization']} | `{lane['state']}` | "
+            f"`{lane['follow_up_policy']['mode']}` | "
             f"`{str(lane['email_reply_required']).lower()}` | {lane['next_action']} |"
         )
     lines.extend(
