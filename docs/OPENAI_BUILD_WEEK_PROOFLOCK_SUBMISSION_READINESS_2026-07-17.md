@@ -39,7 +39,7 @@
 - [ ] Public YouTube demonstration is under three minutes and includes audio.
 - [ ] Narration accurately covers the product, Codex contribution, and confirmed GPT-5.6 use.
 - [ ] Primary build task `/feedback` Session ID captured.
-- [ ] Actual GPT-5.6 model/session evidence captured from authoritative UI or session metadata.
+- [x] Actual model evidence captured from authoritative session metadata as `gpt-5.6-sol`; the private Session ID is represented publicly only by SHA-256 `CEDEC32157F2516DF88505802805761AE3535F093FB9B1B06CA6DEFF4A344FD9`.
 - [ ] Founder review of judge-facing copy completed.
 - [x] Draft pull request CI completed successfully on live-QA commit `a7731fa`.
 - [ ] Final Devpost form reviewed by Robert.

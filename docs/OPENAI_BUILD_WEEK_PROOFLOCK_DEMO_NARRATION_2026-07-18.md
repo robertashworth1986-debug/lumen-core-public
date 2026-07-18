@@ -38,11 +38,11 @@ On screen: show the repository or briefly scroll the verification log.
 
 On screen: return to the final `HOLD` state.
 
-> Codex helped isolate, implement, test, and deploy this bounded release while preserving provenance and keeping unsupported claims behind explicit gates. ProofLock proves receipt integrity and artifact identity. It does not pretend that a hash proves safety, patentability, field performance, or commercial readiness.
+> OpenAI Codex with the GPT-5.6 SOL model helped isolate, implement, test, and deploy this bounded release while preserving provenance and keeping unsupported claims behind explicit gates. ProofLock proves receipt integrity and artifact identity. It does not pretend that a hash proves safety, patentability, field performance, or commercial readiness.
 
 ## Model Provenance Line
 
-Do not add a spoken model-version claim until the authoritative Codex session record is captured. If the record verifies the exact model required by the challenge, add one short factual sentence and keep the final video under three minutes.
+The authoritative Codex task metadata records model `gpt-5.6-sol`. The exact Session ID remains private and must be reconciled with the `/feedback` value before Devpost submission.
 
 ## Recording Checks
 

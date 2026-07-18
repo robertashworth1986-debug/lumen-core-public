@@ -15,6 +15,8 @@
 - Latest verified live-QA commit: `a7731fa`
 - Focused test result: `27 passed`
 - Live-file identity: `14/14` HTTP 200 responses and exact SHA-256 matches
+- Authoritative model evidence: `gpt-5.6-sol` with `ultra` reasoning; exact Session ID retained privately
+- Private Session ID SHA-256: `CEDEC32157F2516DF88505802805761AE3535F093FB9B1B06CA6DEFF4A344FD9`
 - Release receipt: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_LIVE_RELEASE_RECEIPT_2026-07-18.md`
 - Timed narration: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_DEMO_NARRATION_2026-07-18.md`
 
@@ -40,7 +42,7 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 
 1. Sign in to Devpost and verify the correct challenge, category, rules, deadline, and required fields.
 2. Run `/feedback` in the primary Codex build task and retain the exact Session ID requested by the form.
-3. Capture the actual model name from authoritative Codex UI or session metadata. Do not infer it from conversation text or memory.
+3. Reconcile the private `/feedback` Session ID with the saved authoritative task metadata. The model is already confirmed as `gpt-5.6-sol`; do not expose the private identifier in the repository or video.
 4. Record the live demonstration using the timed narration. Keep the final cut under three minutes with intelligible audio.
 5. Upload the video to YouTube as public or unlisted, according to the live rules, and verify playback while signed out.
 6. Enter the repository, live-demo, and YouTube URLs into Devpost. Paste only the verified Session ID and model identity.
@@ -58,7 +60,7 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 - [ ] Live demonstration opens without authentication
 - [ ] YouTube video is under three minutes and plays with audio while signed out
 - [ ] `/feedback` Session ID comes from the primary build task
-- [ ] Model name comes from authoritative session evidence
+- [x] Model name comes from authoritative session evidence
 - [ ] No patent-sensitive or private material is exposed
 - [ ] No safety, field-validation, revenue, certification, or patent claim is implied
 - [ ] Pre-existing and Build Week contributions are clearly separated
