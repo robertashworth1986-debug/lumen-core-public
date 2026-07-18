@@ -295,8 +295,8 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     combined = markdown + checklist + json.dumps(payload, sort_keys=True)
 
     assert payload["status"] == "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
-    assert payload["gate_summary"]["passed_private_gate_count"] == 13
-    assert payload["gate_summary"]["open_gate_count"] == 37
+    assert payload["gate_summary"]["passed_private_gate_count"] == 15
+    assert payload["gate_summary"]["open_gate_count"] == 35
     assert payload["gate_summary"]["required_private_gate_count"] == 50
     assert payload["submission_ready_for_human_click"] is False
     assert payload["private_input"]["private_values_exposed"] is False
