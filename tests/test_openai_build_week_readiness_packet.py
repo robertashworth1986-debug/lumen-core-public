@@ -56,6 +56,10 @@ def test_project_core_is_verified_from_post_start_commit_and_sample_receipt():
     assert payload["sample_verification"]["recorded_decision"] == "HOLD"
     assert len(payload["app_artifacts"]) == 6
     assert all(row["present"] and len(row["sha256"]) == 64 for row in payload["app_artifacts"])
+    assert payload["public_demo_verification"]["verified"] is True
+    assert payload["project"]["public_demo_url"] == (
+        "https://lumen-core.ai/build_week/prooflock_console/"
+    )
 
 
 def test_external_and_final_actions_remain_open_and_human_owned():
@@ -67,17 +71,17 @@ def test_external_and_final_actions_remain_open_and_human_owned():
     assert gates["post_start_new_work"]["status"] == "PASS"
     assert gates["public_repository"]["status"] == "PASS"
     assert gates["relevant_license"]["status"] == "PASS"
+    assert gates["public_demo"]["status"] == "PASS"
     for gate_id in (
         "model_provenance",
         "feedback_session",
-        "public_demo",
         "youtube_demo",
         "devpost_registration",
         "final_submission",
     ):
         assert gates[gate_id]["status"] == "OPEN"
     assert gates["final_submission"]["owner"] == "Robert"
-    assert payload["counts"] == {"gate_total": 10, "pass": 4, "open": 6, "fail": 0}
+    assert payload["counts"] == {"gate_total": 10, "pass": 5, "open": 5, "fail": 0}
 
 
 def test_generated_packet_is_hashed_and_claim_bounded():
@@ -92,7 +96,9 @@ def test_generated_packet_is_hashed_and_claim_bounded():
     assert "OpenAI endorsement" in payload["claim_boundary"]
     assert payload["project"]["confirmed_model"] is None
     assert payload["project"]["feedback_session_id"] is None
-    assert payload["project"]["public_demo_url"] is None
+    assert payload["project"]["public_demo_url"] == (
+        "https://lumen-core.ai/build_week/prooflock_console/"
+    )
     assert payload["project"]["youtube_demo_url"] is None
 
 

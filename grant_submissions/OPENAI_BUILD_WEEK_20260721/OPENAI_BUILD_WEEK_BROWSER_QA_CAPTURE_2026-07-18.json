@@ -1,0 +1,30 @@
+{
+  "schema": "lumencore.openai_build_week_browser_qa_capture.v1",
+  "captured_utc": "2026-07-18T07:27:16Z",
+  "capture_method": "IN_APP_BROWSER_DESKTOP_AND_PLAYWRIGHT_CLI_MOBILE",
+  "demo_url": "https://lumen-core.ai/build_week/prooflock_console/",
+  "desktop": {
+    "observed_utc": "2026-07-18T07:16:32Z",
+    "viewport_width": 1280,
+    "viewport_height": 720,
+    "status": "Verified, promotion held",
+    "integrity": "Verified",
+    "artifact_state": "4 / 4",
+    "decision": "HOLD",
+    "horizontal_overflow_px": 0
+  },
+  "mobile": {
+    "observed_utc": "2026-07-18T07:27:16Z",
+    "viewport_width": 390,
+    "viewport_height": 844,
+    "status": "Verified, promotion held",
+    "integrity": "Verified",
+    "artifact_state": "4 / 4",
+    "decision": "HOLD",
+    "horizontal_overflow_px": 0,
+    "console_errors": 0,
+    "console_warnings": 0
+  },
+  "claim_boundary": "This receipt records the browser states observed at the stated times. It does not prove continuous availability, future browser behavior, engineering validation, Devpost submission, judging outcome, endorsement, funding, or value.",
+  "capture_sha256": "a986daf28f56d33ce135edcc965bc512f326cddaf8f51fcb5391b1a556fe4183"
+}

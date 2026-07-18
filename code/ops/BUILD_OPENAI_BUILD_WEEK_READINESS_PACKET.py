@@ -17,6 +17,7 @@ OUT_MD = OUT_DIR / "OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.md"
 OUT_DESCRIPTION = OUT_DIR / "OPENAI_BUILD_WEEK_PROJECT_DESCRIPTION_DRAFT_2026-07-17.md"
 OUT_DEMO = OUT_DIR / "OPENAI_BUILD_WEEK_DEMO_SCRIPT_2026-07-17.md"
 OUT_REQUIREMENTS = OUT_DIR / "OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json"
+PUBLIC_DEMO_RECEIPT = OUT_DIR / "OPENAI_BUILD_WEEK_PUBLIC_DEMO_RECEIPT_2026-07-18.json"
 
 SUBMISSION_START_UTC = "2026-07-13T16:00:00Z"
 DEADLINE_UTC = "2026-07-22T00:00:00Z"
@@ -36,9 +37,9 @@ APP_FILES = (
 CLAIM_BOUNDARY = (
     "This packet records a bounded Build Week readiness audit for the public ProofLock Console. "
     "It does not prove Devpost registration, GPT-5.6 model identity, a valid /feedback session ID, "
-    "a public demo deployment, a YouTube upload, eligibility acceptance, final submission, judging "
-    "outcome, OpenAI endorsement, prize entitlement, external validation, patent rights, safety, "
-    "engineering performance, funding, or commercial value."
+    "continuous public-demo availability, a YouTube upload, eligibility acceptance, final submission, "
+    "judging outcome, OpenAI endorsement, prize entitlement, external validation, patent rights, "
+    "safety, engineering performance, funding, or commercial value."
 )
 
 
@@ -129,6 +130,55 @@ def verify_sample() -> dict[str, Any]:
     }
 
 
+def public_demo_state() -> dict[str, Any]:
+    default = {
+        "verified": False,
+        "status": "PUBLIC_DEMO_RECEIPT_MISSING",
+        "demo_url": "",
+        "required_file_count": 0,
+        "hash_match_count": 0,
+        "receipt_sha256": "",
+        "receipt_path": PUBLIC_DEMO_RECEIPT.relative_to(ROOT).as_posix(),
+    }
+    if not PUBLIC_DEMO_RECEIPT.is_file():
+        return default
+    try:
+        payload = json.loads(PUBLIC_DEMO_RECEIPT.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {**default, "status": "PUBLIC_DEMO_RECEIPT_UNREADABLE"}
+
+    unhashed = dict(payload)
+    recorded_hash = unhashed.pop("receipt_sha256", "")
+    receipt_hash_valid = bool(recorded_hash) and recorded_hash == stable_hash(unhashed)
+    expected_url = "https://lumen-core.ai/build_week/prooflock_console/"
+    verified = all(
+        (
+            payload.get("schema") == "lumencore.openai_build_week_public_demo_receipt.v1",
+            payload.get("status") == "PUBLIC_DEMO_HASH_VERIFIED",
+            payload.get("public_demo_verified") is True,
+            payload.get("demo_url") == expected_url,
+            payload.get("all_http_200") is True,
+            payload.get("all_hashes_match") is True,
+            payload.get("required_file_count") == 10,
+            payload.get("http_200_count") == 10,
+            payload.get("hash_match_count") == 10,
+            payload.get("browser_qa_verified") is True,
+            receipt_hash_valid,
+        )
+    )
+    return {
+        "verified": verified,
+        "status": payload.get("status", "PUBLIC_DEMO_RECEIPT_INVALID"),
+        "demo_url": payload.get("demo_url", ""),
+        "required_file_count": payload.get("required_file_count", 0),
+        "hash_match_count": payload.get("hash_match_count", 0),
+        "receipt_sha256": recorded_hash,
+        "receipt_hash_valid": receipt_hash_valid,
+        "receipt_path": PUBLIC_DEMO_RECEIPT.relative_to(ROOT).as_posix(),
+        "observed_utc": payload.get("generated_utc", ""),
+    }
+
+
 def requirements_receipt() -> dict[str, Any]:
     facts: dict[str, Any] = {
         "submission_period": {
@@ -193,6 +243,7 @@ def build_payload() -> dict[str, Any]:
     artifacts = app_artifacts()
     commit = app_commit()
     sample = verify_sample()
+    public_demo = public_demo_state()
     remote = run_git("remote", "get-url", "origin")
     license_path = ROOT / "LICENSE"
 
@@ -242,9 +293,15 @@ def build_payload() -> dict[str, Any]:
         gate(
             "public_demo",
             "Public working demo",
-            "OPEN",
-            "Codex and Robert",
-            "Deploy the self-contained console to a stable public URL and verify all four artifact fetches from that URL.",
+            "PASS" if public_demo["verified"] else "OPEN",
+            "Codex",
+            (
+                f"{public_demo['demo_url']} returned the exact {public_demo['hash_match_count']}/"
+                f"{public_demo['required_file_count']} recorded file hashes at "
+                f"{public_demo.get('observed_utc') or 'an unverified observation time'}."
+                if public_demo["verified"]
+                else "Deploy the self-contained console to a stable public URL and verify all four artifact fetches from that URL."
+            ),
         ),
         gate(
             "youtube_demo",
@@ -284,7 +341,7 @@ def build_payload() -> dict[str, Any]:
             "scoped_tree": commit.get("github_tree_url", ""),
             "app_path": APP_DIR.relative_to(ROOT).as_posix(),
             "local_demo_url": "http://127.0.0.1:8088/build_week/prooflock_console/",
-            "public_demo_url": None,
+            "public_demo_url": public_demo["demo_url"] if public_demo["verified"] else None,
             "youtube_demo_url": None,
             "feedback_session_id": None,
             "confirmed_model": None,
@@ -293,6 +350,7 @@ def build_payload() -> dict[str, Any]:
         "new_work_evidence": commit,
         "app_artifacts": artifacts,
         "sample_verification": sample,
+        "public_demo_verification": public_demo,
         "gates": gates,
         "counts": {
             "gate_total": len(gates),
@@ -304,7 +362,7 @@ def build_payload() -> dict[str, Any]:
         "ready_for_final_submission": final_ready,
         "next_actions": [
             "Confirm GPT-5.6 model provenance and obtain the /feedback Session ID.",
-            "Deploy and verify the public demo URL.",
+            "Recheck the public demo from the final Devpost preview and preserve the observed URL.",
             "Record and publish the under-three-minute YouTube demo after privacy review.",
             "Join the Devpost challenge, populate the draft, and obtain action-time approval before final submission.",
         ],
@@ -315,6 +373,7 @@ def build_payload() -> dict[str, Any]:
             "description_draft": OUT_DESCRIPTION.relative_to(ROOT).as_posix(),
             "demo_script": OUT_DEMO.relative_to(ROOT).as_posix(),
             "requirements_receipt": OUT_REQUIREMENTS.relative_to(ROOT).as_posix(),
+            "public_demo_receipt": PUBLIC_DEMO_RECEIPT.relative_to(ROOT).as_posix(),
         },
     }
     payload["packet_sha256"] = stable_hash(payload)
@@ -338,6 +397,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Repository: {project['public_repo']}",
         f"- Scoped tree: {project['scoped_tree']}",
         f"- Local demo: {project['local_demo_url']}",
+        f"- Public demo: {project['public_demo_url'] or 'not verified'}",
         f"- Core ready: `{str(payload['core_ready']).lower()}`",
         f"- Final-submission ready: `{str(payload['ready_for_final_submission']).lower()}`",
         f"- Gates: `{counts['pass']}` pass / `{counts['open']}` open / `{counts['fail']}` fail",
@@ -384,6 +444,8 @@ Codex reviewed the official rules, narrowed the product to one judge-testable wo
 Repository: {project['public_repo']}
 
 Scoped source: {project['scoped_tree']}
+
+Public demo: {project['public_demo_url'] or 'not yet verified'}
 
 Run `python -m http.server 8088` from the repository root and open `/build_week/prooflock_console/`, or run `python build_week/prooflock_console/verify_receipt.py` for the CLI verification report.
 

@@ -20,6 +20,15 @@ python -m http.server 8088
 
 Open `http://127.0.0.1:8088/build_week/prooflock_console/`.
 
+Public judge-testable deployment:
+
+`https://lumen-core.ai/build_week/prooflock_console/`
+
+The public deployment is verified byte-for-byte against the six console files and four declared
+hardware artifacts by `code/ops/BUILD_OPENAI_BUILD_WEEK_PUBLIC_DEMO_RECEIPT.py`. A successful
+deployment receipt proves availability and artifact identity at the recorded observation time; it
+does not prove continuous uptime, engineering validation, or any Build Week judging outcome.
+
 Supported platforms: current desktop and mobile browsers with Web Crypto and Fetch support. No account, API key, build step, or external service is required for the bundled demonstration.
 
 ## Verify From The CLI

@@ -26,8 +26,10 @@ Repository: https://github.com/robertashworth1986-debug/lumen-core-public
 
 Scoped source: https://github.com/robertashworth1986-debug/lumen-core-public/tree/1578504204c429d7f05779897dc3d5430038f681/build_week/prooflock_console
 
+Public demo: https://lumen-core.ai/build_week/prooflock_console/
+
 Run `python -m http.server 8088` from the repository root and open `/build_week/prooflock_console/`, or run `python build_week/prooflock_console/verify_receipt.py` for the CLI verification report.
 
 ## Boundary
 
-This packet records a bounded Build Week readiness audit for the public ProofLock Console. It does not prove Devpost registration, GPT-5.6 model identity, a valid /feedback session ID, a public demo deployment, a YouTube upload, eligibility acceptance, final submission, judging outcome, OpenAI endorsement, prize entitlement, external validation, patent rights, safety, engineering performance, funding, or commercial value.
+This packet records a bounded Build Week readiness audit for the public ProofLock Console. It does not prove Devpost registration, GPT-5.6 model identity, a valid /feedback session ID, continuous public-demo availability, a YouTube upload, eligibility acceptance, final submission, judging outcome, OpenAI endorsement, prize entitlement, external validation, patent rights, safety, engineering performance, funding, or commercial value.

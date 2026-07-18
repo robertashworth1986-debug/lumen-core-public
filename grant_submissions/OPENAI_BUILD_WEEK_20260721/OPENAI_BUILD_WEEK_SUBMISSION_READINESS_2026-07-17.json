@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.openai_build_week_submission_readiness.v1",
-  "generated_utc": "2026-07-17T21:49:11.231080+00:00",
+  "generated_utc": "2026-07-18T07:43:23.212373+00:00",
   "status": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN",
   "project": {
     "name": "ProofLock Console",
@@ -10,7 +10,7 @@
     "scoped_tree": "https://github.com/robertashworth1986-debug/lumen-core-public/tree/1578504204c429d7f05779897dc3d5430038f681/build_week/prooflock_console",
     "app_path": "build_week/prooflock_console",
     "local_demo_url": "http://127.0.0.1:8088/build_week/prooflock_console/",
-    "public_demo_url": null,
+    "public_demo_url": "https://lumen-core.ai/build_week/prooflock_console/",
     "youtube_demo_url": null,
     "feedback_session_id": null,
     "confirmed_model": null
@@ -72,8 +72,8 @@
     {
       "path": "build_week/prooflock_console/README.md",
       "present": true,
-      "bytes": 2719,
-      "sha256": "26615a4750a4b87a910194fa14609a4787e872b35802dbd3448eb9acf3a3dfb2"
+      "bytes": 3191,
+      "sha256": "766ba2b64d477b21d443a673a60f83fb4a5ad0e5d46a3e215180c7f924bd3ede"
     },
     {
       "path": "build_week/prooflock_console/app.js",
@@ -84,8 +84,8 @@
     {
       "path": "build_week/prooflock_console/index.html",
       "present": true,
-      "bytes": 4178,
-      "sha256": "dd313667755130e3f6542df91e2f3a376090cedbc06370cb0185e888d22d1ae7"
+      "bytes": 4478,
+      "sha256": "f55733cb136b933b402b588e5e54222879d90f0a78d7a89e596437e69cec6e20"
     },
     {
       "path": "build_week/prooflock_console/sample_receipt.json",
@@ -119,6 +119,17 @@
       "human_release"
     ],
     "receipt_sha256": "07f4d143210c5d0a175c480228273c6b3d4c5b01da5a12a5daeb38fcdfb0d961"
+  },
+  "public_demo_verification": {
+    "verified": true,
+    "status": "PUBLIC_DEMO_HASH_VERIFIED",
+    "demo_url": "https://lumen-core.ai/build_week/prooflock_console/",
+    "required_file_count": 10,
+    "hash_match_count": 10,
+    "receipt_sha256": "f61e2cf81e569ebe20f99678cea424d9e91de2b67c428a269b2dd9e2c6321f3f",
+    "receipt_hash_valid": true,
+    "receipt_path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PUBLIC_DEMO_RECEIPT_2026-07-18.json",
+    "observed_utc": "2026-07-18T07:43:17.647535Z"
   },
   "gates": [
     {
@@ -166,9 +177,9 @@
     {
       "gate_id": "public_demo",
       "label": "Public working demo",
-      "status": "OPEN",
-      "owner": "Codex and Robert",
-      "basis": "Deploy the self-contained console to a stable public URL and verify all four artifact fetches from that URL."
+      "status": "PASS",
+      "owner": "Codex",
+      "basis": "https://lumen-core.ai/build_week/prooflock_console/ returned the exact 10/10 recorded file hashes at 2026-07-18T07:43:17.647535Z."
     },
     {
       "gate_id": "youtube_demo",
@@ -194,25 +205,26 @@
   ],
   "counts": {
     "gate_total": 10,
-    "pass": 4,
-    "open": 6,
+    "pass": 5,
+    "open": 5,
     "fail": 0
   },
   "core_ready": true,
   "ready_for_final_submission": false,
   "next_actions": [
     "Confirm GPT-5.6 model provenance and obtain the /feedback Session ID.",
-    "Deploy and verify the public demo URL.",
+    "Recheck the public demo from the final Devpost preview and preserve the observed URL.",
     "Record and publish the under-three-minute YouTube demo after privacy review.",
     "Join the Devpost challenge, populate the draft, and obtain action-time approval before final submission."
   ],
-  "claim_boundary": "This packet records a bounded Build Week readiness audit for the public ProofLock Console. It does not prove Devpost registration, GPT-5.6 model identity, a valid /feedback session ID, a public demo deployment, a YouTube upload, eligibility acceptance, final submission, judging outcome, OpenAI endorsement, prize entitlement, external validation, patent rights, safety, engineering performance, funding, or commercial value.",
+  "claim_boundary": "This packet records a bounded Build Week readiness audit for the public ProofLock Console. It does not prove Devpost registration, GPT-5.6 model identity, a valid /feedback session ID, continuous public-demo availability, a YouTube upload, eligibility acceptance, final submission, judging outcome, OpenAI endorsement, prize entitlement, external validation, patent rights, safety, engineering performance, funding, or commercial value.",
   "outputs": {
     "json": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json",
     "markdown": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.md",
     "description_draft": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PROJECT_DESCRIPTION_DRAFT_2026-07-17.md",
     "demo_script": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEMO_SCRIPT_2026-07-17.md",
-    "requirements_receipt": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json"
+    "requirements_receipt": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json",
+    "public_demo_receipt": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PUBLIC_DEMO_RECEIPT_2026-07-18.json"
   },
-  "packet_sha256": "a25ca7e45f81cfc67b8b08c7d69c5e1bbacd3cdc2b92c2bb8d53e3b31b75c58d"
+  "packet_sha256": "d3d7917d70c1a4f81b5dae14fee5bbf73b44429400af46f0e32213b22b8c861b"
 }
