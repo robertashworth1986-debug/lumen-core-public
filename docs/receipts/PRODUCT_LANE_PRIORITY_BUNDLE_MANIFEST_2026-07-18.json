@@ -1,0 +1,83 @@
+{
+  "all_artifacts_present": true,
+  "artifact_count": 12,
+  "artifacts": [
+    {
+      "bytes": 7620,
+      "exists": true,
+      "path": "config/product_lane_priority_v1.json",
+      "sha256": "0111b96c809926c76dde9632bf913c564eccd9ba66c5eccde02791cb9bc11d4e"
+    },
+    {
+      "bytes": 25688,
+      "exists": true,
+      "path": "code/ops/BUILD_PRODUCT_LANE_PRIORITY_ENGINE.py",
+      "sha256": "2bc5b0b4b646a1f149f35675b6aa3e27f2b9d488da492da88841185f3dfed8cb"
+    },
+    {
+      "bytes": 22211,
+      "exists": true,
+      "path": "dashboard/data/product_lane_priority_engine_20260718.json",
+      "sha256": "46eefb7dba19fd2e456196f7eb4b03a15c09715cb8b8cd8c7cbfecd69d126732"
+    },
+    {
+      "bytes": 5098,
+      "exists": true,
+      "path": "docs/PRODUCT_LANE_PRIORITY_ENGINE_2026-07-18.md",
+      "sha256": "1f31d1fd4c99fd3cc0e492ebac53455b46c14550df4991795d121f16d47ce0f1"
+    },
+    {
+      "bytes": 2219,
+      "exists": true,
+      "path": "docs/MINDWISE_PAID_DESIGN_PARTNER_PILOT_2026-07-18.md",
+      "sha256": "a97ea27d66a9d7daec43fa3956754b0d53d6227b473a7b0644ad80c157457fdf"
+    },
+    {
+      "bytes": 1237,
+      "exists": true,
+      "path": "docs/MINDWISE_DESIGN_PARTNER_FOLLOWUP_EMAIL_2026-07-18.txt",
+      "sha256": "4d482e7b0e28ac54a01c01401d4b42f51ab66d69ee1354fa0fbbccf4f6c7be40"
+    },
+    {
+      "bytes": 20526,
+      "exists": true,
+      "path": "dashboard/js/luma_healthcare_grants_embed.js",
+      "sha256": "06bae338860291aa13cff7a4617811a50797c3404ac875753068ce97796add2e"
+    },
+    {
+      "bytes": 2855,
+      "exists": true,
+      "path": "dashboard/embed/healthcare_grants_widget_example.html",
+      "sha256": "fae97466488571cdcf1ad688a3c8fa125cbe22e94cc4d3f4568c772ca690f84d"
+    },
+    {
+      "bytes": 8286,
+      "exists": true,
+      "path": "dashboard/embed/mindwise_premium_flow_demo.html",
+      "sha256": "80f82503ae5122ecf59819e1ca6847104eca47395fc4a67b08edf25c15ddf88c"
+    },
+    {
+      "bytes": 3609,
+      "exists": true,
+      "path": "code/ops/HEALTHCARE_WEBSITE_EMBED_PLAYBOOK.md",
+      "sha256": "3dba1326959c23bd14e99aeb236c61fd677dff98dd2bab226a094691e1ab4283"
+    },
+    {
+      "bytes": 5566,
+      "exists": true,
+      "path": "tests/test_product_lane_priority_engine.py",
+      "sha256": "96712c6d702e963468b3b2c4c6645187a748b3a2969cedeca0a017de682b9d2c"
+    },
+    {
+      "bytes": 7682,
+      "exists": true,
+      "path": "dashboard/data/mindwise_healthcare_candidate_feed_20260718.json",
+      "sha256": "b210ccba41c4cea3cd56e4fac61e4d44a11d52e59aa0b5867ae6d92ff9008e3f"
+    }
+  ],
+  "boundary": "File receipts prove byte identity and presence only. They do not prove eligibility, correctness, independent validation, customer acceptance, award probability, or commercial value.",
+  "generated_utc": "2026-07-18T06:48:29.081740+00:00",
+  "manifest_payload_sha256": "7050d2003a1b57c90cf18ed53b30ab871b0eadacc69816ccd469286d086aa250",
+  "product_lane_priority_sha256": "380b3330e48562dd7d0bf2cc8fedc9afe6616e2a4a72dfa17a768b082bfb8b71",
+  "schema": "product_lane_priority_bundle_manifest_v1"
+}

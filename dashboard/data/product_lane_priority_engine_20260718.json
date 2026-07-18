@@ -1,0 +1,538 @@
+{
+  "boundary": "Product-lane priority engine. Scores are a transparent founder strategy heuristic, not market valuation, patentability, customer acceptance, award probability, field validation, or guaranteed revenue.",
+  "claim_controls": {
+    "allowed_now": [
+      "working grant-ranking, draft-assembly, preflight, and receipt components exist",
+      "five historical benchmark runs and raw source directories exist",
+      "the 673-dataset run is a bounded exploratory single-holdout reference",
+      "a paid design-partner pilot can measure workflow improvement",
+      "the healthcare candidate feed was refreshed within its 24-hour SLA; freshness does not establish eligibility"
+    ],
+    "blocked_now": [
+      "organizational eligibility from relevance scores alone",
+      "urgent or priority labels as authorization to apply or submit",
+      "prospective router superiority until train-only features pass",
+      "field validation or realized savings",
+      "guaranteed awards or autonomous final submission",
+      "patentability"
+    ]
+  },
+  "evidence_audit": {
+    "best_bounded_exploratory_dataset_count": 673,
+    "best_bounded_exploratory_run": "20260505T121657Z",
+    "healthcare_feed": {
+      "age_hours": 0.4,
+      "boundary": "Freshness applies only to the candidate source feed. Relevance scores do not establish applicant eligibility, current requirements, submission readiness, or award probability.",
+      "eligibility_label_allowed": false,
+      "freshness_label_allowed": true,
+      "freshness_sla_hours": 24,
+      "generated_utc": "2026-07-18T06:24:37.230552+00:00",
+      "path": "out/ops/healthcare_grants_engine/healthcare_website_feed_latest.json",
+      "record_count": 12,
+      "status": "fresh",
+      "submission_ready_label_allowed": false
+    },
+    "latest_run_blocker": "Run 20260526T050639Z is blocked from comparative headline use because i_sarima has no valid RMSE on all 1,118 datasets while the scorecard still describes a classical comparison.",
+    "router_risk": "The historical meta-router extracts features from each full series, including the benchmark test window. Cross-dataset CV does not remove that within-series look-ahead. Rebuild features from each training window as train-only inputs before making prospective routing claims.",
+    "runs": [
+      {
+        "all_models_complete": true,
+        "attempted_datasets": 104,
+        "dashboard_manifest_note": "Dashboard copy hashes six summary artifacts; raw CSVs remain in the canonical out/master_universe_v2 run.",
+        "datasets_succeeded": 96,
+        "evaluation_design": "single_chronological_80_20_holdout",
+        "method_language_status": "stale_overstatement",
+        "model_count": 9,
+        "model_failures": {},
+        "models_reported": [
+          "a_naive",
+          "b_linear_trend",
+          "c_harmonic_fixed12",
+          "d_harmonic_search",
+          "e_mlp_untuned",
+          "f_mlp_tuned",
+          "g_xgboost_lag",
+          "h_lightgbm_lag",
+          "i_sarima"
+        ],
+        "raw_csv_count": 96,
+        "reviewer_use": "bounded_exploratory_reference",
+        "run_id": "20260505T082948Z",
+        "scorecard_calls_method_walk_forward": true
+      },
+      {
+        "all_models_complete": true,
+        "attempted_datasets": 699,
+        "dashboard_manifest_note": "Dashboard copy hashes six summary artifacts; raw CSVs remain in the canonical out/master_universe_v2 run.",
+        "datasets_succeeded": 662,
+        "evaluation_design": "single_chronological_80_20_holdout",
+        "method_language_status": "stale_overstatement",
+        "model_count": 9,
+        "model_failures": {},
+        "models_reported": [
+          "a_naive",
+          "b_linear_trend",
+          "c_harmonic_fixed12",
+          "d_harmonic_search",
+          "e_mlp_untuned",
+          "f_mlp_tuned",
+          "g_xgboost_lag",
+          "h_lightgbm_lag",
+          "i_sarima"
+        ],
+        "raw_csv_count": 662,
+        "reviewer_use": "bounded_exploratory_reference",
+        "run_id": "20260505T104706Z",
+        "scorecard_calls_method_walk_forward": true
+      },
+      {
+        "all_models_complete": true,
+        "attempted_datasets": 739,
+        "dashboard_manifest_note": "Dashboard copy hashes six summary artifacts; raw CSVs remain in the canonical out/master_universe_v2 run.",
+        "datasets_succeeded": 673,
+        "evaluation_design": "single_chronological_80_20_holdout",
+        "method_language_status": "stale_overstatement",
+        "model_count": 9,
+        "model_failures": {},
+        "models_reported": [
+          "a_naive",
+          "b_linear_trend",
+          "c_harmonic_fixed12",
+          "d_harmonic_search",
+          "e_mlp_untuned",
+          "f_mlp_tuned",
+          "g_xgboost_lag",
+          "h_lightgbm_lag",
+          "i_sarima"
+        ],
+        "raw_csv_count": 673,
+        "reviewer_use": "bounded_exploratory_reference",
+        "run_id": "20260505T121657Z",
+        "scorecard_calls_method_walk_forward": true
+      },
+      {
+        "all_models_complete": true,
+        "attempted_datasets": 104,
+        "dashboard_manifest_note": "Dashboard copy hashes six summary artifacts; raw CSVs remain in the canonical out/master_universe_v2 run.",
+        "datasets_succeeded": 79,
+        "evaluation_design": "single_chronological_80_20_holdout",
+        "method_language_status": "stale_overstatement",
+        "model_count": 9,
+        "model_failures": {},
+        "models_reported": [
+          "a_naive",
+          "b_linear_trend",
+          "c_harmonic_fixed12",
+          "d_harmonic_search",
+          "e_mlp_untuned",
+          "f_mlp_tuned",
+          "g_xgboost_lag",
+          "h_lightgbm_lag",
+          "i_sarima"
+        ],
+        "raw_csv_count": 79,
+        "reviewer_use": "bounded_exploratory_reference",
+        "run_id": "20260511T175644Z",
+        "scorecard_calls_method_walk_forward": true
+      },
+      {
+        "all_models_complete": false,
+        "attempted_datasets": 1212,
+        "dashboard_manifest_note": "Dashboard copy hashes six summary artifacts; raw CSVs remain in the canonical out/master_universe_v2 run.",
+        "datasets_succeeded": 1118,
+        "evaluation_design": "single_chronological_80_20_holdout",
+        "method_language_status": "stale_overstatement",
+        "model_count": 11,
+        "model_failures": {
+          "f_mlp_tuned": {
+            "invalid_rows": 1,
+            "total_rows": 1118
+          },
+          "i_sarima": {
+            "invalid_rows": 1118,
+            "total_rows": 1118
+          }
+        },
+        "models_reported": [
+          "a_naive",
+          "b_linear_trend",
+          "c_harmonic_fixed12",
+          "d_harmonic_search",
+          "e_mlp_untuned",
+          "f_mlp_tuned",
+          "g_xgboost_lag",
+          "h_lightgbm_lag",
+          "i_sarima",
+          "j_random_forest_lag",
+          "k_extra_trees_lag"
+        ],
+        "raw_csv_count": 1118,
+        "reviewer_use": "blocked_from_comparative_headline",
+        "run_id": "20260526T050639Z",
+        "scorecard_calls_method_walk_forward": true
+      }
+    ]
+  },
+  "generated_utc": "2026-07-18T06:48:29.081740+00:00",
+  "market_boundary": {
+    "crowded_features": [
+      "grant matching and tracking",
+      "AI-assisted proposal drafting",
+      "grant database search and APIs",
+      "grantmaker workflow and review management"
+    ],
+    "inference": "Generic grant finding/filling is not a defensible category claim. Lead with evidence-bound eligibility, deterministic abstention, deadline controls, and replayable submission receipts.",
+    "official_product_sources_checked_2026_07_18": [
+      "https://www.instrumentl.com/product-overview",
+      "https://grantable.co/",
+      "https://ops.opengrants.io/api-docs",
+      "https://www.submittable.com/solutions/grants"
+    ]
+  },
+  "mindwise_pilot": {
+    "acceptance_metrics": [
+      {
+        "definition": "buyer-approved qualified matches / reviewed matches",
+        "metric": "qualified opportunity precision"
+      },
+      {
+        "definition": "median elapsed time from discovery to documented decision",
+        "metric": "time to pursue decision"
+      },
+      {
+        "definition": "median elapsed time from pursue decision to internal review state",
+        "metric": "time to reviewer-ready draft"
+      },
+      {
+        "definition": "missing or contradictory required items per package at review",
+        "metric": "preflight defect rate"
+      },
+      {
+        "definition": "packages reaching internal review by the buyer-set cutoff / pursued packages",
+        "metric": "deadline reliability"
+      },
+      {
+        "definition": "material claims with a traceable source / material claims reviewed",
+        "metric": "provenance completeness"
+      }
+    ],
+    "buyer": "Kishore Tummala, CEO and Founder, MindWise Health",
+    "commercial_posture": "Paid design-partner pilot; credit the agreed pilot fee toward an annual subscription if acceptance gates pass.",
+    "go_no_go": "Convert only if the buyer confirms a measured workflow improvement and the evidence/eligibility error rate remains within the agreed threshold.",
+    "human_gates": [
+      "buyer confirms organizational eligibility",
+      "buyer approves claims and representations",
+      "authorized official certifies and submits",
+      "no system action bypasses portal attestations or signatures"
+    ],
+    "name": "MindWise x ProofLock Opportunity Operations - 30-day design-partner pilot",
+    "scope_boundary": "Phase 1 uses opportunity, workflow, and synthetic/sample organization data only; no PHI.",
+    "week_1_baseline": [
+      "Measure current time from opportunity discovery to pursue/no-pursue decision.",
+      "Measure current time from pursue decision to reviewer-ready draft.",
+      "Count eligibility reversals, missing attachments, and missed internal review dates.",
+      "Lock the source portals, eligibility rubric, roles, and final human approval gate."
+    ],
+    "weeks_2_to_4": [
+      "Refresh permitted opportunity sources and rank candidates with evidence links.",
+      "Generate source-grounded draft structures and an attachment/blocker ledger.",
+      "Route unresolved facts to named owners; abstain instead of guessing.",
+      "Emit a replayable receipt for every shortlist, draft, and preflight decision."
+    ]
+  },
+  "product_lane_priority_sha256": "380b3330e48562dd7d0bf2cc8fedc9afe6616e2a4a72dfa17a768b082bfb8b71",
+  "ranking": [
+    {
+      "blocked_claims": [
+        "guaranteed awards",
+        "automatic eligibility without source review",
+        "autonomous final certification or submission",
+        "realized savings before a buyer baseline is measured"
+      ],
+      "evidence_checks": [
+        {
+          "exists": true,
+          "path": "code/ops/run_healthcare_grants_engine.py"
+        },
+        {
+          "exists": true,
+          "path": "code/ops/build_healthcare_website_feed.py"
+        },
+        {
+          "exists": true,
+          "path": "code/ops/BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py"
+        },
+        {
+          "exists": true,
+          "path": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py"
+        },
+        {
+          "exists": true,
+          "path": "dashboard/embed/mindwise_premium_flow_demo.html"
+        }
+      ],
+      "evidence_coverage": 1.0,
+      "evidence_paths": [
+        "code/ops/run_healthcare_grants_engine.py",
+        "code/ops/build_healthcare_website_feed.py",
+        "code/ops/BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py",
+        "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+        "dashboard/embed/mindwise_premium_flow_demo.html"
+      ],
+      "first_validation": "Run a paid 30-day design-partner pilot against the buyer's current grant workflow and lock the baseline before automation begins.",
+      "id": "prooflock_opportunity_ops",
+      "name": "ProofLock Opportunity Operations",
+      "offer": "Continuously find, qualify, assemble, preflight, and receipt funding opportunities while keeping final certifications and submissions human-controlled.",
+      "rank": 1,
+      "recurring_model": "Per-organization subscription with controlled seats, opportunity monitoring, evidence storage, and an optional managed preflight tier.",
+      "scores": {
+        "buyer_pain": 92,
+        "capital_efficiency": 96,
+        "compliance_ease": 78,
+        "data_access": 88,
+        "evidence_on_disk": 94,
+        "recurring_revenue_fit": 90,
+        "technical_defensibility": 82,
+        "time_to_paid_pilot": 92
+      },
+      "strategy_score": 89.6
+    },
+    {
+      "blocked_claims": [
+        "patentability",
+        "leakage-free performance until the train-only rerun passes",
+        "universal model superiority",
+        "oracle-equivalent prospective performance"
+      ],
+      "evidence_checks": [
+        {
+          "exists": true,
+          "path": "code/meta_router.py"
+        },
+        {
+          "exists": true,
+          "path": "code/ops/BUILD_PROOF_TO_REVENUE_ENGINE.py"
+        },
+        {
+          "exists": true,
+          "path": "dashboard/evidence/runs/20260505T121657Z/router/eval.json"
+        },
+        {
+          "exists": true,
+          "path": "dashboard/evidence/runs/20260505T121657Z/stacker/eval.json"
+        }
+      ],
+      "evidence_coverage": 1.0,
+      "evidence_paths": [
+        "code/meta_router.py",
+        "code/ops/BUILD_PROOF_TO_REVENUE_ENGINE.py",
+        "dashboard/evidence/runs/20260505T121657Z/router/eval.json",
+        "dashboard/evidence/runs/20260505T121657Z/stacker/eval.json"
+      ],
+      "first_validation": "Rebuild router features from training windows only, add deterministic abstention, and evaluate prospectively against the best fixed family and a declared oracle boundary.",
+      "id": "prooflock_evidence_router_api",
+      "name": "ProofLock Evidence Router API",
+      "offer": "Select a bounded model or workflow route, abstain when gates fail, and emit a replayable decision receipt with source and policy provenance.",
+      "rank": 2,
+      "recurring_model": "Usage-priced API plus enterprise policy packs and retained evidence storage.",
+      "scores": {
+        "buyer_pain": 80,
+        "capital_efficiency": 94,
+        "compliance_ease": 82,
+        "data_access": 82,
+        "evidence_on_disk": 72,
+        "recurring_revenue_fit": 94,
+        "technical_defensibility": 94,
+        "time_to_paid_pilot": 75
+      },
+      "strategy_score": 83.25
+    },
+    {
+      "blocked_claims": [
+        "field validation without an operator receipt",
+        "realized outage savings",
+        "universal harmonic superiority"
+      ],
+      "evidence_checks": [
+        {
+          "exists": true,
+          "path": "code/ops/BUILD_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py"
+        },
+        {
+          "exists": true,
+          "path": "code/ops/BUILD_OUTAGE_SECOND_ECONOMIC_VALUE_PACKET.py"
+        },
+        {
+          "exists": true,
+          "path": "dashboard/evidence/runs/20260505T121657Z/summary.json"
+        }
+      ],
+      "evidence_coverage": 1.0,
+      "evidence_paths": [
+        "code/ops/BUILD_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py",
+        "code/ops/BUILD_OUTAGE_SECOND_ECONOMIC_VALUE_PACKET.py",
+        "dashboard/evidence/runs/20260505T121657Z/summary.json"
+      ],
+      "first_validation": "Secure one operator-approved dataset, baseline, holdout policy, and economic conversion factor before discussing dollar value.",
+      "id": "energy_forecast_validation",
+      "name": "Energy Forecast Validation Service",
+      "offer": "Buyer-authorized forecast replay and evidence receipts for grid, facility, and energy-planning decisions.",
+      "rank": 3,
+      "recurring_model": "Monitoring and model-governance subscription after a scoped validation engagement.",
+      "scores": {
+        "buyer_pain": 88,
+        "capital_efficiency": 76,
+        "compliance_ease": 64,
+        "data_access": 66,
+        "evidence_on_disk": 78,
+        "recurring_revenue_fit": 86,
+        "technical_defensibility": 84,
+        "time_to_paid_pilot": 48
+      },
+      "strategy_score": 75.6
+    },
+    {
+      "blocked_claims": [
+        "hit prediction",
+        "label adoption",
+        "cross-platform data rights not documented in source terms"
+      ],
+      "evidence_checks": [
+        {
+          "exists": true,
+          "path": "dashboard/lumascout_dashboard.html"
+        },
+        {
+          "exists": true,
+          "path": "out/lumascout_summary.json"
+        },
+        {
+          "exists": true,
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+        }
+      ],
+      "evidence_coverage": 1.0,
+      "evidence_paths": [
+        "dashboard/lumascout_dashboard.html",
+        "out/lumascout_summary.json",
+        "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+      ],
+      "first_validation": "Pre-register a shortlist and measure forward artist outcomes against a transparent popularity baseline using licensed or permitted data.",
+      "id": "lumascout_ar_intelligence",
+      "name": "LumaScout A&R Intelligence",
+      "offer": "Cross-platform artist discovery shortlists with source receipts and forward outcome tracking.",
+      "rank": 4,
+      "recurring_model": "A&R team subscription with watchlists, alerts, and portfolio outcome tracking.",
+      "scores": {
+        "buyer_pain": 68,
+        "capital_efficiency": 88,
+        "compliance_ease": 68,
+        "data_access": 54,
+        "evidence_on_disk": 58,
+        "recurring_revenue_fit": 88,
+        "technical_defensibility": 68,
+        "time_to_paid_pilot": 54
+      },
+      "strategy_score": 67.0
+    },
+    {
+      "blocked_claims": [
+        "alpha",
+        "profitability",
+        "institutional readiness",
+        "live trading authorization"
+      ],
+      "evidence_checks": [
+        {
+          "exists": true,
+          "path": "dashboard/kraken_execution_dashboard.html"
+        },
+        {
+          "exists": true,
+          "path": "code/master_universe_benchmark_v2.py"
+        },
+        {
+          "exists": true,
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+        }
+      ],
+      "evidence_coverage": 1.0,
+      "evidence_paths": [
+        "dashboard/kraken_execution_dashboard.html",
+        "code/master_universe_benchmark_v2.py",
+        "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+      ],
+      "first_validation": "Pass a prospective after-fee paper protocol with reconciliation and risk gates before any live-capital discussion.",
+      "id": "guarded_market_research",
+      "name": "Guarded Market Research",
+      "offer": "Paper-only signal research, model comparison, and evidence receipts for quantitative teams.",
+      "rank": 5,
+      "recurring_model": "Research subscription only after prospective evidence passes.",
+      "scores": {
+        "buyer_pain": 86,
+        "capital_efficiency": 46,
+        "compliance_ease": 28,
+        "data_access": 48,
+        "evidence_on_disk": 64,
+        "recurring_revenue_fit": 90,
+        "technical_defensibility": 70,
+        "time_to_paid_pilot": 28
+      },
+      "strategy_score": 63.5
+    },
+    {
+      "blocked_claims": [
+        "prevention of motion sickness",
+        "medical efficacy",
+        "safety certification",
+        "patentability"
+      ],
+      "evidence_checks": [
+        {
+          "exists": true,
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+        }
+      ],
+      "evidence_coverage": 1.0,
+      "evidence_paths": [
+        "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+      ],
+      "first_validation": "Build a non-medical software-only prototype and run an ethics-reviewed human-factors study with established cybersickness and task-performance measures.",
+      "id": "xr_comfort_governor",
+      "name": "XR Comfort and Cue-Integrity Governor",
+      "offer": "Adapt visual, vestibular, and haptic cue intensity to reduce discomfort while preserving training-task fidelity.",
+      "rank": 6,
+      "recurring_model": "SDK licensing after human-factors validation.",
+      "scores": {
+        "buyer_pain": 76,
+        "capital_efficiency": 24,
+        "compliance_ease": 30,
+        "data_access": 34,
+        "evidence_on_disk": 28,
+        "recurring_revenue_fit": 82,
+        "technical_defensibility": 90,
+        "time_to_paid_pilot": 18
+      },
+      "strategy_score": 54.0
+    }
+  ],
+  "recommendation": {
+    "commercial_lane": "prooflock_opportunity_ops",
+    "commercial_offer": "Continuously find, qualify, assemble, preflight, and receipt funding opportunities while keeping final certifications and submissions human-controlled.",
+    "first_design_partner": "MindWise Health",
+    "technical_wedge": "prooflock_evidence_router_api",
+    "technical_wedge_boundary": "The defensible target is not generic grant search or AI writing. It is a constrained router that uses train-only or source-available features, abstains when eligibility or evidence gates fail, and emits replayable policy/source receipts. Patentability still requires a dedicated search.",
+    "why_now": "A warm founder relationship, a working vertical demo, and a current candidate feed exist. The feed still requires buyer-specific eligibility review and measured pilot acceptance gates."
+  },
+  "schema": "product_lane_priority_engine_v1",
+  "weights": {
+    "buyer_pain": 20,
+    "capital_efficiency": 5,
+    "compliance_ease": 5,
+    "data_access": 10,
+    "evidence_on_disk": 15,
+    "recurring_revenue_fit": 15,
+    "technical_defensibility": 15,
+    "time_to_paid_pilot": 15
+  }
+}

@@ -15,9 +15,9 @@
     grants_search: 'Grants Search',
   };
   const ACTION_LABELS = {
-    IMMEDIATE_SUBMIT: 'Immediate Submit',
-    FAST_TRACK: 'Fast Track',
-    ACTIVE_PIPELINE: 'Active Pipeline',
+    IMMEDIATE_SUBMIT: 'Urgent Review',
+    FAST_TRACK: 'Priority Review',
+    ACTIVE_PIPELINE: 'Review Queue',
     WATCHLIST: 'Watchlist',
     MANUAL_REVIEW: 'Manual Review',
   };
@@ -79,10 +79,10 @@
 
   function scoreBand(score) {
     const n = toNum(score, 0);
-    if (n >= 80) return 'Elite Fit';
-    if (n >= 65) return 'Strong Fit';
-    if (n >= 50) return 'Viable Fit';
-    return 'Early Fit';
+    if (n >= 80) return 'High Relevance';
+    if (n >= 65) return 'Moderate Relevance';
+    if (n >= 50) return 'Review Relevance';
+    return 'Low Relevance';
   }
 
   function formatGeneratedAt(value) {
@@ -141,13 +141,10 @@
         position: relative;
         overflow: hidden;
         border: 1px solid var(--lh-border);
-        border-radius: 18px;
+        border-radius: 8px;
         color: var(--lh-text);
         font-family: var(--lh-font);
-        background:
-          radial-gradient(130% 110% at 100% 0%, rgba(15, 118, 110, 0.12) 0%, rgba(15, 118, 110, 0) 46%),
-          radial-gradient(130% 110% at 0% 100%, rgba(14, 116, 144, 0.08) 0%, rgba(14, 116, 144, 0) 54%),
-          var(--lh-surface);
+        background: var(--lh-surface);
         box-shadow: 0 16px 42px rgba(2, 6, 23, 0.09);
       }
       .luma-hc-theme-host {
@@ -220,27 +217,14 @@
         padding: 10px;
       }
       .luma-hc-head {
-        position: relative;
-        isolation: isolate;
-        background: linear-gradient(124deg, var(--lh-head-from), var(--lh-head-to));
+        background: var(--lh-head-from);
         color: var(--lh-head-text);
-      }
-      .luma-hc-head::after {
-        content: "";
-        position: absolute;
-        width: 180px;
-        height: 180px;
-        right: -48px;
-        top: -64px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.16);
-        z-index: -1;
       }
       .luma-hc-head h3 {
         margin: 0;
         font-size: 16px;
         line-height: 1.25;
-        letter-spacing: 0.01em;
+        letter-spacing: 0;
         font-weight: 800;
       }
       .luma-hc-sub {
@@ -254,7 +238,7 @@
       }
       .luma-hc-item {
         border: 1px solid var(--lh-card-border);
-        border-radius: 14px;
+        border-radius: 8px;
         padding: 11px;
         background: var(--lh-card-bg);
         transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
@@ -337,7 +321,7 @@
         text-decoration: none;
         font-size: 12px;
         line-height: 1.2;
-        border-radius: 9px;
+        border-radius: 6px;
         padding: 6px 10px;
         border: 1px solid var(--lh-button-border);
         color: var(--lh-button-text);
@@ -374,6 +358,13 @@
         border-top: 1px solid var(--lh-border);
         background: rgba(248, 250, 252, 0.82);
       }
+      .luma-hc-boundary {
+        margin: 0;
+        padding: 10px 14px 0;
+        font-size: 11px;
+        line-height: 1.4;
+        color: #475569;
+      }
       .luma-hc-empty {
         padding: 12px;
         color: #64748b;
@@ -384,7 +375,7 @@
       }
       .luma-hc-skeleton-line {
         height: 10px;
-        border-radius: 8px;
+        border-radius: 4px;
         background: linear-gradient(90deg, #e2e8f0 0%, #f8fafc 50%, #e2e8f0 100%);
         background-size: 220px 100%;
         animation: lumaHcShimmer 1.3s linear infinite;
@@ -455,8 +446,8 @@
     el.innerHTML = `
       <section class="luma-hc-wrap luma-hc-theme-${esc(opts.theme)} luma-hc-density-${esc(opts.density)}">
         <header class="luma-hc-head">
-          <h3>${esc(opts.title || 'Healthcare Grants Live')}</h3>
-          <div class="luma-hc-sub">Loading live healthcare opportunities...</div>
+          <h3>${esc(opts.title || 'Healthcare Opportunity Radar')}</h3>
+          <div class="luma-hc-sub">Loading candidate opportunities...</div>
         </header>
         <div class="luma-hc-list">${rows}</div>
       </section>
@@ -472,7 +463,7 @@
     const close7 = toNum(summary.close_7_days, 0);
     const close14 = toNum(summary.close_14_days, 0);
     const immediate = toNum(summary.immediate_or_fast, 0);
-    const headlineMetrics = `${close7} close <=7d | ${close14} close <=14d | ${immediate} immediate/fast`;
+    const headlineMetrics = `${close7} close <=7d | ${close14} close <=14d | ${immediate} urgent/priority review`;
     const linkTarget = opts.newTab ? '_blank' : '_self';
     const linkRel = opts.newTab ? 'noopener noreferrer' : '';
 
@@ -502,31 +493,32 @@
               <div class="luma-hc-badges">
                 <span class="luma-hc-badge">${esc(action || 'Manual Review')}</span>
                 <span class="luma-hc-badge luma-hc-badge--${esc(close.tone)}">${esc(close.label)}</span>
-                <span class="luma-hc-badge">score ${score}</span>
+                <span class="luma-hc-badge">relevance ${score}</span>
                 <span class="luma-hc-badge">${esc(scoreBand(score))}</span>
                 <span class="luma-hc-badge">${esc(route)}</span>
               </div>
               <div class="luma-hc-actions">
-                <a class="luma-hc-btn luma-hc-btn--primary${submitDisabledClass}" href="${esc(submitHref)}" target="${esc(linkTarget)}" rel="${esc(linkRel)}" aria-disabled="${submitUrl ? 'false' : 'true'}">Open Submit Route</a>
-                <a class="luma-hc-btn luma-hc-btn--ai" href="${esc(aiUrl)}" target="${esc(linkTarget)}" rel="${esc(linkRel)}">AI Fill</a>
-                <a class="luma-hc-btn" href="${esc(consoleUrl)}" target="${esc(linkTarget)}" rel="${esc(linkRel)}">Grant Console</a>
+                <a class="luma-hc-btn luma-hc-btn--primary${submitDisabledClass}" href="${esc(submitHref)}" target="${esc(linkTarget)}" rel="${esc(linkRel)}" aria-disabled="${submitUrl ? 'false' : 'true'}">Review Official Source</a>
+                <a class="luma-hc-btn luma-hc-btn--ai" href="${esc(aiUrl)}" target="${esc(linkTarget)}" rel="${esc(linkRel)}">Draft Workspace</a>
+                <a class="luma-hc-btn" href="${esc(consoleUrl)}" target="${esc(linkTarget)}" rel="${esc(linkRel)}">Opportunity Console</a>
               </div>
             </article>
           `;
         }).join('')
-      : '<div class="luma-hc-empty">No healthcare opportunities available in this feed yet.</div>';
+      : '<div class="luma-hc-empty">No candidate healthcare opportunities are available in this feed yet.</div>';
 
     const selected = toNum((payload.source || {}).healthcare_engine_metrics?.n_selected, 0);
     const generatedAt = formatGeneratedAt(payload.generated_utc);
     el.innerHTML = `
       <section class="luma-hc-wrap luma-hc-theme-${esc(opts.theme)} luma-hc-density-${esc(opts.density)}">
         <header class="luma-hc-head">
-          <h3>${esc(opts.title || 'Healthcare Grants Live')}</h3>
+          <h3>${esc(opts.title || 'Healthcare Opportunity Radar')}</h3>
           <div class="luma-hc-sub">${esc(headlineMetrics)}</div>
         </header>
+        <p class="luma-hc-boundary">Discovery candidates only. Verify organizational eligibility, current requirements, and the official deadline before deciding to pursue.</p>
         <div class="luma-hc-list">${itemsHtml}</div>
         <footer class="luma-hc-foot">
-          feed refreshed: ${esc(generatedAt)} · selected opportunities: ${esc(selected)}
+          source feed refreshed: ${esc(generatedAt)} · candidates selected: ${esc(selected)}
         </footer>
       </section>
     `;
@@ -546,7 +538,7 @@
     }
 
     const opts = {
-      title: el.getAttribute('data-luma-title') || 'Healthcare Grants Live',
+      title: el.getAttribute('data-luma-title') || 'Healthcare Opportunity Radar',
       max: el.getAttribute('data-luma-max') || '8',
       consoleBase: el.getAttribute('data-luma-grants-console') || '',
       theme: pick(el.getAttribute('data-luma-theme'), THEMES, 'host'),

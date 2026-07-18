@@ -29,7 +29,7 @@ Include this container where the grants widget should appear:
 ```html
 <div
   data-luma-healthcare-feed="https://YOUR-HOST/out/ops/healthcare_grants_engine/healthcare_website_feed_latest.json"
-  data-luma-title="MindWise Healthcare Grant Radar"
+  data-luma-title="MindWise Healthcare Opportunity Radar"
   data-luma-max="8"
   data-luma-grants-console="https://YOUR-HOST/dashboard/grants.html"
   data-luma-theme="host"
@@ -77,11 +77,11 @@ window.LumaHealthcareEmbed.refresh();
 
 Use this after replacing the feed file during a live page session if you want to refresh without page reload.
 
-## Click behavior
+## Review behavior
 
-- `Open Submit Route`: opens the best-known route for that grant (Grants.gov detail, Simpler listing, Hello Skip, or source portal).
-- `AI Fill`: opens `grants.html` with `auto_fill=1` for AI draft + blocker generation.
-- `Grant Console`: opens the same grant in full console mode without auto-fill.
+- `Review Official Source`: opens the best-known authoritative or source-linked listing for requirements review.
+- `Draft Workspace`: opens `grants.html` with `auto_fill=1` for a source-grounded draft structure and blocker ledger. It does not establish eligibility or submit anything.
+- `Opportunity Console`: opens the same candidate in full console mode without draft initialization.
 
 ## Frontend parity
 
@@ -94,4 +94,5 @@ For internal parity with mission control and grants console:
 ## Notes
 
 - Some portals require authenticated workspace creation before final submission.
-- The widget routes users to the exact listing/submit entry point when known from feed metadata.
+- Feed scores measure configured relevance and urgency signals, not organizational eligibility or award probability.
+- The widget routes users to the best-known listing entry point from feed metadata. Users must verify the official source, current requirements, deadline, eligibility, and submission route.
