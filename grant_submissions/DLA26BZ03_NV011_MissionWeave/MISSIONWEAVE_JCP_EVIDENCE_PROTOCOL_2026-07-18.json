@@ -1,0 +1,78 @@
+{
+  "accepted_private_evidence_kinds": [
+    "CERTIFIED_DD2345",
+    "JCP_APPLICATION_SUBMISSION_RECEIPT"
+  ],
+  "claim_boundary": "This protocol defines the evidence required to clear one private MissionWeave submission gate. It does not establish JCP or DD Form 2345 approval, ITAR compliance, CMMC status, DLA acceptance, proposal submission, award eligibility, or an award.",
+  "controls": {
+    "bare_boolean_can_clear_gate": false,
+    "builder_can_accept_prerequisites_in_progress": false,
+    "builder_can_submit_jcp_application": false,
+    "builder_can_submit_proposal": false,
+    "entity_match_required": true,
+    "evidence_file_must_be_pdf": true,
+    "evidence_file_sha256_match_required": true,
+    "official_jcp_portal_source_required": true,
+    "private_path_or_hash_may_be_published": false
+  },
+  "deadline": {
+    "missionweave_expected_close_utc": "2026-07-22T16:00:00Z",
+    "live_dsip_recheck_required": true
+  },
+  "official_sources": [
+    {
+      "fact": "The ITAR-marked proposal must include a certified DD Form 2345 or evidence of JCP application submission when the proposed effort is subject to ITAR.",
+      "path": "source_attachments/DoW_2026_SBIR_BAA_RELEASE_3_AMENDMENT_2.pdf",
+      "section": "3.2 and Volume V supporting-document instructions",
+      "source_type": "LOCAL_OFFICIAL_PDF"
+    },
+    {
+      "fact": "Questions about DLA proposal-preparation instructions route to the DLA SBIR component office.",
+      "path": "source_attachments/DLA_26BZ_RELEASE_3_COMPONENT_INSTRUCTIONS.pdf",
+      "section": "DLA component contact and Phase I proposal guidelines",
+      "source_type": "LOCAL_OFFICIAL_PDF"
+    },
+    {
+      "fact": "The topic record marks DLA26BZ03-NV011 as ITAR and projects CMMC Level 2 (Self).",
+      "path": "source_attachments/DLA26BZ03_NV011_OFFICIAL_TOPIC_DETAILS.json",
+      "section": "itar and cmmcLevel fields",
+      "source_type": "LOCAL_OFFICIAL_JSON"
+    },
+    {
+      "fact": "JCP applications and supporting documents are completed through the official JCP portal rather than email.",
+      "source_type": "OFFICIAL_WEB",
+      "url": "https://www.dla.mil/logistics-operations/services/joint-certification-program/"
+    },
+    {
+      "fact": "Official JCP portal entry point.",
+      "source_type": "OFFICIAL_WEB",
+      "url": "https://www.public.dacs.dla.mil/jcp/ext/"
+    }
+  ],
+  "private_receipt_contract": {
+    "evidence_file": "A non-empty official portal PDF inside the ignored MissionWeave private directory",
+    "receipt_file": "MISSIONWEAVE_JCP_EVIDENCE_RECEIPT.private.json",
+    "receipt_schema": "lumencore.missionweave_jcp_evidence_private.v1",
+    "template": "config/missionweave_jcp_evidence_private_template_v1.json"
+  },
+  "rejected_substitutes": [
+    "JCP account registration without application submission",
+    "prerequisites-in-progress",
+    "a self-authored status memo",
+    "a checked private boolean without a matching evidence file",
+    "a receipt whose file hash does not match",
+    "an emailed DD Form 2345 application"
+  ],
+  "schema": "lumencore.missionweave_jcp_evidence_protocol.v1",
+  "topic": "DLA26BZ03-NV011",
+  "workflow": [
+    "Enter the official JCP portal and complete the current application using verified entity facts.",
+    "Submit the JCP application through the portal; portal registration alone is not sufficient.",
+    "Download or print the official application-submission receipt to a private PDF.",
+    "Confirm that the receipt belongs to the submitting entity and record the source-issued timestamp.",
+    "Hash the private PDF and complete the ignored receipt JSON from the tracked template.",
+    "Run the MissionWeave action-gate builder and require evidence_integrity_pass=true.",
+    "Upload only the official evidence accepted by the governing instructions and verify it in the complete DSIP preview.",
+    "Preserve action-time corporate review and final submission authority as separate gates."
+  ]
+}

@@ -59,11 +59,11 @@
     },
     {
       "lane_id": "missionweave_dsip_proposal",
-      "mode": "PORTAL_ACTION",
-      "eligible_template_id": null,
-      "not_before_utc": null,
-      "max_proactive_sends": 0,
-      "rationale": "The open work is inside DSIP and requires founder facts, legal review, certification, and action-time final authority."
+      "mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
+      "eligible_template_id": "COMPONENT_INSTRUCTION_ESCALATION",
+      "not_before_utc": "2026-07-20T17:00:00Z",
+      "max_proactive_sends": 1,
+      "rationale": "DSIP Support redirected the Volume V DD Form 2345/JCP instruction question to the DLA component POC already included on the original message. Draft at most one component follow-up after the Monday hold and only after a fresh full-thread check confirms no component reply."
     },
     {
       "lane_id": "openai_build_week_prooflock",

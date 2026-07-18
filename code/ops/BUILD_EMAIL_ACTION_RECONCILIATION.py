@@ -284,19 +284,22 @@ def build_payload() -> dict[str, Any]:
         {
             "lane_id": "missionweave_dsip_proposal",
             "organization": "Defense SBIR/STTR Innovation Portal",
-            "latest_event_type": "DSIP_PROPOSAL_CREATION_CONFIRMED",
-            "latest_event_utc": "2026-07-17T18:12:03Z",
+            "latest_event_type": "DSIP_SUPPORT_REDIRECTED_TO_DLA_COMPONENT_POC",
+            "latest_event_utc": "2026-07-18T15:35:55Z",
             "state": missionweave["status"],
             "deadline_utc": missionweave["deadline"]["expected_utc"],
             "open_gate_count": missionweave["gate_summary"]["open_gate_count"],
+            "component_poc_included_on_original_message": True,
+            "component_reply_observed": False,
+            "support_redirect_received": True,
             "email_reply_required": False,
             "send_now": False,
-            "no_send_before": None,
+            "no_send_before": "2026-07-20T17:00:00Z",
             "do_not_duplicate_send": True,
             "next_action": (
-                "Complete and endorse all DSIP volumes, resolve the live legal/entity, CMMC, "
-                "ITAR, cost, support, and authority gates, review the portal preview, and obtain "
-                "action-time approval before final submission."
+                "Continue the JCP portal and DSIP evidence work. Recheck the complete component "
+                "thread after the Monday hold; only if no component reply exists may one bounded "
+                "instruction follow-up be drafted. Do not resend the proposal package."
             ),
         },
         {

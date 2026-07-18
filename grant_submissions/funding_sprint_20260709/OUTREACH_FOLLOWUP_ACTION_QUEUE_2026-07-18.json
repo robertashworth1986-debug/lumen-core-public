@@ -58,7 +58,7 @@
       "draft_rendered": false,
       "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 427184,
+      "hold_seconds_remaining": 413913,
       "inbox_recheck_required": false,
       "lane_id": "lanl_vision_licensing_followup",
       "max_proactive_sends": 1,
@@ -104,19 +104,20 @@
       "source_state": "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
     },
     {
-      "action_state": "HUMAN_PORTAL_ACTION_OPEN",
+      "action_state": "HELD_NO_SEND",
       "action_time_human_review_required": true,
       "current_response_template_id": "NO_DUPLICATE_MONITOR",
       "draft_rendered": false,
-      "eligible_template_id": null,
-      "follow_up_mode": "PORTAL_ACTION",
+      "eligible_template_id": "COMPONENT_INSTRUCTION_ESCALATION",
+      "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
+      "hold_seconds_remaining": 165513,
       "inbox_recheck_required": false,
       "lane_id": "missionweave_dsip_proposal",
-      "max_proactive_sends": 0,
-      "next_action": "Complete and endorse all DSIP volumes, resolve the live legal/entity, CMMC, ITAR, cost, support, and authority gates, review the portal preview, and obtain action-time approval before final submission.",
-      "not_before_utc": null,
+      "max_proactive_sends": 1,
+      "next_action": "Continue the JCP portal and DSIP evidence work. Recheck the complete component thread after the Monday hold; only if no component reply exists may one bounded instruction follow-up be drafted. Do not resend the proposal package.",
+      "not_before_utc": "2026-07-20T17:00:00Z",
       "organization": "Defense SBIR/STTR Innovation Portal",
-      "rationale": "The open work is inside DSIP and requires founder facts, legal review, certification, and action-time final authority.",
+      "rationale": "DSIP Support redirected the Volume V DD Form 2345/JCP instruction question to the DLA component POC already included on the original message. Draft at most one component follow-up after the Monday hold and only after a fresh full-thread check confirms no component reply.",
       "send_now": false,
       "source_state": "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
     },
@@ -274,7 +275,7 @@
       "source_state": "ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY"
     }
   ],
-  "as_of_utc": "2026-07-18T15:20:15.428007Z",
+  "as_of_utc": "2026-07-18T19:01:26.924863Z",
   "claim_boundary": "This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check and does not authorize a draft or send. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.",
   "controls": {
     "action_time_human_review_required": true,
@@ -283,18 +284,18 @@
     "inbox_recheck_required_before_draft": true,
     "past_hold_authorizes_send": false
   },
-  "queue_sha256": "B7BFCE7F0E7CE12A060FC005A8C39745FAC8A90A5688B85420314339A5C845AB",
+  "queue_sha256": "C9C351627F01A84DE9390FB091AF5B22AAC13F4952CCA8B94E9540EF46F30697",
   "schema": "lumencore.outreach_followup_action_queue.v1",
   "source_evidence": {
     "email_reconciliation": {
-      "bytes": 22013,
+      "bytes": 22433,
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
-      "sha256": "E6FAA7B6053503827892943DA4CA48DB99CDB094531D1FEEDEDE56B899EF9550"
+      "sha256": "74268285A847785237A1E31A2CE3D07BBFE69297CF8C35C4C23F009C29556914"
     },
     "followup_policy_config": {
-      "bytes": 5450,
+      "bytes": 5670,
       "path": "config/outreach_followup_policies_v1.json",
-      "sha256": "AE7F5FD61516F9448CEBE3CA478341F8F6A8089B409F4E59D4075FEC1A334CF4"
+      "sha256": "34F758D02549726463FCC1A3BFAE36542FBEB8D393991BD66037B870DBD1444C"
     },
     "response_registry_builder": {
       "bytes": 19040,
@@ -302,25 +303,25 @@
       "sha256": "B49F5A5EE37006E356E2C8F8EAA661BFE8F7B1A23AA176640568798C49CD2553"
     },
     "response_template_registry": {
-      "bytes": 16241,
+      "bytes": 18192,
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
-      "sha256": "A8E4594E4FBC0ADB9E6712AF7C1B24CBB240E72AE74D5E1F6B2DA6BEB0AA694D"
+      "sha256": "1295795F0531DEE996F9FBCE91C0F68135EEF55EDB6D45086F6F69CB05C0BB87"
     }
   },
   "status": "NO_EXTERNAL_FOLLOWUP_DUE",
   "summary": {
     "action_state_counts": {
       "CLOSED_NO_ACTION": 2,
-      "HELD_NO_SEND": 1,
+      "HELD_NO_SEND": 2,
       "HUMAN_ACCOUNT_ACTION_OPEN": 1,
-      "HUMAN_PORTAL_ACTION_OPEN": 3,
+      "HUMAN_PORTAL_ACTION_OPEN": 2,
       "MONITOR_INBOUND_ONLY": 8,
       "PRIVATE_RECONCILIATION_OPEN": 1
     },
     "draft_rendered_count": 0,
     "due_for_mailbox_recheck_count": 0,
     "external_send_allowed_without_human": false,
-    "held_no_send_count": 1,
+    "held_no_send_count": 2,
     "lane_count": 16,
     "send_now_count": 0
   }

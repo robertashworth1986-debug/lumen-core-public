@@ -12,6 +12,12 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py"
 TEMPLATE = ROOT / "config" / "missionweave_dsip_action_private_template_v1.json"
+JCP_PROTOCOL = (
+    ROOT
+    / "grant_submissions"
+    / "DLA26BZ03_NV011_MissionWeave"
+    / "MISSIONWEAVE_JCP_EVIDENCE_PROTOCOL_2026-07-18.json"
+)
 
 
 def load_module():
@@ -63,6 +69,24 @@ def private_final_source_state(source_state: dict) -> dict:
     return private_state
 
 
+def valid_jcp_evidence_state(module) -> dict:
+    return {
+        "receipt_present": True,
+        "receipt_header_valid": True,
+        "evidence_file_present": True,
+        "evidence_pdf": True,
+        "evidence_hash_matches_receipt": True,
+        "source_metadata_valid": True,
+        "entity_match_confirmed": True,
+        "corporate_official_reviewed": True,
+        "evidence_integrity_pass": True,
+        "evidence_kind": "JCP_APPLICATION_SUBMISSION_RECEIPT",
+        "failure_code": None,
+        "private_path_exposed": False,
+        "private_hash_exposed": False,
+    }
+
+
 def test_default_gate_verifies_package_and_fails_closed_without_private_input():
     module = load_module()
     payload = module.build_payload()
@@ -109,8 +133,32 @@ def test_default_gate_verifies_package_and_fails_closed_without_private_input():
     assert payload["private_input"]["pre_submit_excludes_action_time_approval"] is True
     assert payload["private_input"]["credential_values_accepted"] is False
     assert payload["private_input"]["firm_pin_value_accepted"] is False
+    assert payload["private_jcp_evidence"]["receipt_present"] is False
+    assert payload["private_jcp_evidence"]["evidence_integrity_pass"] is False
+    assert payload["controls"]["bare_jcp_checkbox_can_clear_gate"] is False
+    assert payload["jcp_evidence_protocol"]["bare_boolean_can_clear_gate"] is False
+    assert len(payload["jcp_evidence_protocol"]["sha256"]) == 64
     assert payload["controls"]["browser_navigation_performed"] is False
     assert payload["controls"]["portal_submit_performed"] is False
+
+
+def test_jcp_protocol_accepts_only_official_hash_matched_private_evidence():
+    protocol = json.loads(JCP_PROTOCOL.read_text(encoding="utf-8"))
+
+    assert protocol["schema"] == "lumencore.missionweave_jcp_evidence_protocol.v1"
+    assert protocol["topic"] == "DLA26BZ03-NV011"
+    assert set(protocol["accepted_private_evidence_kinds"]) == {
+        "CERTIFIED_DD2345",
+        "JCP_APPLICATION_SUBMISSION_RECEIPT",
+    }
+    assert protocol["controls"]["bare_boolean_can_clear_gate"] is False
+    assert protocol["controls"]["evidence_file_sha256_match_required"] is True
+    assert protocol["controls"]["builder_can_accept_prerequisites_in_progress"] is False
+    assert "prerequisites-in-progress" in protocol["rejected_substitutes"]
+    assert any(
+        row.get("url") == "https://www.public.dacs.dla.mil/jcp/ext/"
+        for row in protocol["official_sources"]
+    )
 
 
 def test_complete_private_record_can_pass_without_exposing_private_values():
@@ -125,6 +173,7 @@ def test_complete_private_record_can_pass_without_exposing_private_values():
         private_input_sha256="B" * 64,
         source_state=source_state,
         volume2_text=synthetic_volume2_text,
+        jcp_evidence_state=valid_jcp_evidence_state(module),
     )
     serialized = json.dumps(payload, sort_keys=True)
 
@@ -150,6 +199,7 @@ def test_complete_private_record_can_pass_without_exposing_private_values():
     assert facts["corporate_official_reviewed"] is True
     assert facts["action_time_authorized"] is True
     assert facts["approval_timestamp_present"] is True
+    assert facts["dd2345_or_jcp_evidence_verified"] is True
     assert proposal_number not in serialized
     assert "B" * 64 not in serialized
     assert "A" * 64 not in serialized
@@ -208,7 +258,11 @@ def test_private_record_auto_selects_guarded_private_final_pdf(
     monkeypatch.setattr(module, "PRIVATE_FINAL_VOLUME2_PDF", private_pdf)
     monkeypatch.setattr(module, "inspect_source_package", fake_inspect)
 
-    payload = module.build_payload(private, private_input_sha256="D" * 64)
+    payload = module.build_payload(
+        private,
+        private_input_sha256="D" * 64,
+        jcp_evidence_state=valid_jcp_evidence_state(module),
+    )
 
     assert calls == [(private_pdf, True)]
     assert payload["status"] == "READY_FOR_HUMAN_FINAL_SUBMIT_CLICK"
@@ -297,6 +351,80 @@ def test_private_volume3_receipt_verifies_workbook_without_exposing_path_or_hash
     assert workbook_sha256 not in serialized
 
 
+def test_private_jcp_evidence_requires_hash_matched_portal_pdf(
+    tmp_path: Path, monkeypatch
+):
+    module = load_module()
+    evidence = tmp_path / "MISSIONWEAVE_JCP_APPLICATION_SUBMISSION_RECEIPT.private.pdf"
+    receipt = tmp_path / "MISSIONWEAVE_JCP_EVIDENCE_RECEIPT.private.json"
+    evidence_bytes = b"synthetic-official-jcp-portal-submission-receipt"
+    evidence.write_bytes(evidence_bytes)
+    evidence_sha256 = hashlib.sha256(evidence_bytes).hexdigest().upper()
+    receipt.write_text(
+        json.dumps(
+            {
+                "schema": module.PRIVATE_JCP_EVIDENCE_SCHEMA,
+                "topic": module.TOPIC,
+                "captured_utc": "2026-07-18T12:00:00-05:00",
+                "evidence_kind": "JCP_APPLICATION_SUBMISSION_RECEIPT",
+                "evidence_file": evidence.name,
+                "evidence_file_sha256": evidence_sha256,
+                "source_issued_utc": "2026-07-18T11:58:00-05:00",
+                "source_channel": "JCP_PORTAL",
+                "entity_match_confirmed": True,
+                "corporate_official_reviewed": True,
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        module, "validate_private_target", lambda path: Path(path).resolve()
+    )
+
+    state = module.inspect_private_jcp_evidence(receipt)
+    serialized = json.dumps(state, sort_keys=True)
+
+    assert state["receipt_header_valid"] is True
+    assert state["evidence_file_present"] is True
+    assert state["evidence_hash_matches_receipt"] is True
+    assert state["source_metadata_valid"] is True
+    assert state["evidence_integrity_pass"] is True
+    assert state["private_path_exposed"] is False
+    assert state["private_hash_exposed"] is False
+    assert str(evidence) not in serialized
+    assert evidence_sha256 not in serialized
+
+    receipt_payload = json.loads(receipt.read_text(encoding="utf-8"))
+    receipt_payload["evidence_file_sha256"] = "0" * 64
+    receipt.write_text(json.dumps(receipt_payload), encoding="utf-8")
+    mismatched = module.inspect_private_jcp_evidence(receipt)
+    assert mismatched["evidence_integrity_pass"] is False
+    assert mismatched["evidence_hash_matches_receipt"] is False
+
+
+def test_checked_jcp_flag_cannot_clear_gate_without_private_receipt():
+    module = load_module()
+    source_state, _ = module.inspect_source_package()
+    source_state = private_final_source_state(source_state)
+    private, proposal_number = synthetic_private_payload(module, source_state)
+
+    payload = module.build_payload(
+        private,
+        private_input_sha256="E" * 64,
+        source_state=source_state,
+        volume2_text=f"{proposal_number}\nassigned final header",
+        jcp_evidence_state={"evidence_integrity_pass": False},
+    )
+
+    assert payload["submission_ready_for_human_click"] is False
+    assert "DD2345_OR_JCP_APPLICATION_EVIDENCE" in payload["gate_summary"][
+        "unresolved_gates"
+    ]
+    assert payload["private_fact_state"][
+        "dd2345_or_jcp_evidence_verified"
+    ] is False
+
+
 def test_written_public_outputs_and_checklist_are_current_and_safe():
     module = load_module()
     payload = json.loads(module.OUT_JSON.read_text(encoding="utf-8"))
@@ -344,6 +472,10 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     assert "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval" in checklist
     assert "FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py" in checklist
     assert "FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py" in markdown
+    assert "Private DD Form 2345/JCP Evidence Integrity" in markdown
+    assert "A boolean answer cannot clear this gate" in markdown
+    assert "https://www.public.dacs.dla.mil/jcp/ext/" in checklist
+    assert "prerequisites-in-progress" in checklist
     assert payload["private_input"]["private_final_volume2_path_exposed"] is False
     assert payload["private_input"]["private_final_volume2_sha256_exposed"] is False
     assert "--section pre-submit" in markdown

@@ -1,7 +1,7 @@
 # Outreach Response Template Registry - 2026-07-18
 
-- Templates: `10`
-- Private-render templates: `6`
+- Templates: `11`
+- Private-render templates: `7`
 - Builder can send email: `false`
 - Duplicate-send gate: `FAIL_CLOSED`
 - Missing-fact gate: `FAIL_CLOSED`
@@ -31,6 +31,7 @@ This response is a communication or routing artifact. It does not establish sele
 | `PORTAL_SUPPORT_DEADLINE_RESCUE` | `HUMAN_ACTION_DUE` | `EXPLICIT_REQUEST_ONLY` | `true` |
 | `REQUESTED_INFORMATION_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `true` |
 | `SUBMISSION_RECEIPT_FOLLOWUP` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `true` |
+| `COMPONENT_INSTRUCTION_ESCALATION` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
 | `BOUNDED_REVIEW_FOLLOWUP` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
 | `VALIDATION_PILOT_REQUEST` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `false` |
 | `DECLINE_CLOSEOUT` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `false` |
@@ -136,6 +137,31 @@ Hello {recipient_name},
 On {submitted_at_local}, I sent {submission_name} under {notice_or_topic}. The transmitted files were: {artifact_names}.
 
 Could you confirm receipt and whether anything is missing or unreadable? This is a receipt check only, not a duplicate submission.
+
+Thank you,
+{sender_name}
+{sender_title}
+{organization_name}
+```
+
+## COMPONENT_INSTRUCTION_ESCALATION
+
+Follow up once with the authoritative component POC after portal support redirects a deadline-critical instruction question and the original component message remains unanswered.
+
+- Inbound states: `SUPPORT_REDIRECTED_TO_COMPONENT, DEADLINE_BLOCKER_UNANSWERED`
+- Reply triggers: `COMPONENT_POC_FOLLOWUP_AFTER_NO_REPLY`
+- Required fields: `recipient_name, source_subject, topic_or_notice, deadline_local, original_sent_local, support_redirect_summary, exact_instruction_question, requested_reply_by_local, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+
+```text
+Subject: Re: {source_subject}
+
+Hello {recipient_name},
+
+I am following up once on the instruction question below for {topic_or_notice}, which closes {deadline_local}. The original component message was sent {original_sent_local}. {support_redirect_summary}
+
+Question requiring component guidance: {exact_instruction_question}
+
+I will not treat prerequisites-in-progress as completed evidence or represent an uncompleted certification. A response by {requested_reply_by_local} would leave time to follow the official instruction before close. No attachment is included, and I will not duplicate the proposal package by email.
 
 Thank you,
 {sender_name}

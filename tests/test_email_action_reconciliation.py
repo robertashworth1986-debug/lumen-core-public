@@ -44,8 +44,8 @@ def test_reconciliation_is_deterministic_and_no_send():
         "ACCOUNT_ACTION": 1,
         "CLOSED": 2,
         "INBOUND_ONLY": 8,
-        "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD": 1,
-        "PORTAL_ACTION": 3,
+        "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD": 2,
+        "PORTAL_ACTION": 2,
         "PRIVATE_RECONCILIATION": 1,
     }
     assert actual["summary"]["human_account_action_count"] == 4
@@ -100,6 +100,18 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert missionweave["open_gate_count"] == missionweave_gate["gate_summary"][
         "open_gate_count"
     ]
+    assert missionweave["latest_event_type"] == (
+        "DSIP_SUPPORT_REDIRECTED_TO_DLA_COMPONENT_POC"
+    )
+    assert missionweave["latest_event_utc"] == "2026-07-18T15:35:55Z"
+    assert missionweave["component_poc_included_on_original_message"] is True
+    assert missionweave["component_reply_observed"] is False
+    assert missionweave["support_redirect_received"] is True
+    assert missionweave["no_send_before"] == "2026-07-20T17:00:00Z"
+    assert missionweave["follow_up_policy"]["eligible_template_id"] == (
+        "COMPONENT_INSTRUCTION_ESCALATION"
+    )
+    assert missionweave["follow_up_policy"]["max_proactive_sends"] == 1
 
     build_week = lanes["openai_build_week_prooflock"]
     assert build_week["deadline_utc"] == "2026-07-22T00:00:00Z"

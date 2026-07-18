@@ -183,6 +183,45 @@
       "body": "Hello {recipient_name},\n\nOn {submitted_at_local}, I sent {submission_name} under {notice_or_topic}. The transmitted files were: {artifact_names}.\n\nCould you confirm receipt and whether anything is missing or unreadable? This is a receipt check only, not a duplicate submission.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
     },
     {
+      "template_id": "COMPONENT_INSTRUCTION_ESCALATION",
+      "description": "Follow up once with the authoritative component POC after portal support redirects a deadline-critical instruction question and the original component message remains unanswered.",
+      "inbound_states": [
+        "SUPPORT_REDIRECTED_TO_COMPONENT",
+        "DEADLINE_BLOCKER_UNANSWERED"
+      ],
+      "reply_triggers": [
+        "COMPONENT_POC_FOLLOWUP_AFTER_NO_REPLY"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "attachment_policy": "NONE",
+      "private_render_only": true,
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "topic_or_notice",
+        "deadline_local",
+        "original_sent_local",
+        "support_redirect_summary",
+        "exact_instruction_question",
+        "requested_reply_by_local",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id",
+        "support_redirect_summary"
+      ],
+      "optional_defaults": {},
+      "subject": "Re: {source_subject}",
+      "body": "Hello {recipient_name},\n\nI am following up once on the instruction question below for {topic_or_notice}, which closes {deadline_local}. The original component message was sent {original_sent_local}. {support_redirect_summary}\n\nQuestion requiring component guidance: {exact_instruction_question}\n\nI will not treat prerequisites-in-progress as completed evidence or represent an uncompleted certification. A response by {requested_reply_by_local} would leave time to follow the official instruction before close. No attachment is included, and I will not duplicate the proposal package by email.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
+    },
+    {
       "template_id": "BOUNDED_REVIEW_FOLLOWUP",
       "description": "Send one claim-bounded follow-up after a reviewed package and a defined hold, asking whether a short diligence or evaluation-fit discussion is useful.",
       "inbound_states": [

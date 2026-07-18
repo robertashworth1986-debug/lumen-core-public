@@ -32,6 +32,15 @@ PRIVATE_FINAL_VOLUME3_WORKBOOK = (
 PRIVATE_FINAL_VOLUME3_RECEIPT = (
     PRIVATE_DIR / "MISSIONWEAVE_DSIP_VOLUME3_FINAL_RECEIPT.private.json"
 )
+PRIVATE_JCP_EVIDENCE_RECEIPT = (
+    PRIVATE_DIR / "MISSIONWEAVE_JCP_EVIDENCE_RECEIPT.private.json"
+)
+PRIVATE_JCP_EVIDENCE_TEMPLATE = (
+    ROOT / "config" / "missionweave_jcp_evidence_private_template_v1.json"
+)
+JCP_EVIDENCE_PROTOCOL = (
+    PACKAGE_DIR / "MISSIONWEAVE_JCP_EVIDENCE_PROTOCOL_2026-07-18.json"
+)
 OUT_JSON = PACKAGE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
 OUT_MD = PACKAGE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md"
 OUT_CHECKLIST = PACKAGE_DIR / "MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md"
@@ -40,6 +49,10 @@ PRIVATE_SCHEMA = "lumencore.missionweave_dsip_action_private.v1"
 PUBLIC_SCHEMA = "lumencore.missionweave_dsip_action_gate.v1"
 PRIVATE_VOLUME3_RECEIPT_SCHEMA = (
     "lumencore.missionweave_dsip_volume3_final_receipt_private.v1"
+)
+PRIVATE_JCP_EVIDENCE_SCHEMA = "lumencore.missionweave_jcp_evidence_private.v1"
+JCP_EVIDENCE_KINDS = frozenset(
+    {"CERTIFIED_DD2345", "JCP_APPLICATION_SUBMISSION_RECEIPT"}
 )
 TOPIC = "DLA26BZ03-NV011"
 EXPECTED_DEADLINE = "2026-07-22T12:00:00-04:00"
@@ -388,6 +401,120 @@ def inspect_private_volume3_artifact(
     return state
 
 
+def inspect_private_jcp_evidence(
+    receipt_path: Path = PRIVATE_JCP_EVIDENCE_RECEIPT,
+) -> dict[str, Any]:
+    state: dict[str, Any] = {
+        "receipt_present": receipt_path.is_file(),
+        "receipt_header_valid": False,
+        "evidence_file_present": False,
+        "evidence_pdf": False,
+        "evidence_hash_matches_receipt": False,
+        "source_metadata_valid": False,
+        "entity_match_confirmed": False,
+        "corporate_official_reviewed": False,
+        "evidence_integrity_pass": False,
+        "evidence_kind": None,
+        "failure_code": "PRIVATE_JCP_RECEIPT_NOT_FOUND",
+        "private_path_exposed": False,
+        "private_hash_exposed": False,
+    }
+    if not receipt_path.is_file():
+        return state
+
+    try:
+        receipt = json.loads(
+            validate_private_target(receipt_path).read_text(encoding="utf-8")
+        )
+    except (MissionWeaveGateError, OSError, UnicodeDecodeError, json.JSONDecodeError):
+        state["failure_code"] = "PRIVATE_JCP_RECEIPT_INVALID"
+        return state
+    if not isinstance(receipt, dict):
+        state["failure_code"] = "PRIVATE_JCP_RECEIPT_NOT_OBJECT"
+        return state
+
+    required_keys = {
+        "schema",
+        "topic",
+        "captured_utc",
+        "evidence_kind",
+        "evidence_file",
+        "evidence_file_sha256",
+        "source_issued_utc",
+        "source_channel",
+        "entity_match_confirmed",
+        "corporate_official_reviewed",
+    }
+    if set(receipt) != required_keys:
+        state["failure_code"] = "PRIVATE_JCP_RECEIPT_SCHEMA_DRIFT"
+        return state
+
+    evidence_name = receipt.get("evidence_file")
+    evidence_kind = receipt.get("evidence_kind")
+    state["evidence_kind"] = (
+        evidence_kind if evidence_kind in JCP_EVIDENCE_KINDS else None
+    )
+    header_valid = bool(
+        receipt.get("schema") == PRIVATE_JCP_EVIDENCE_SCHEMA
+        and receipt.get("topic") == TOPIC
+        and evidence_kind in JCP_EVIDENCE_KINDS
+        and valid_timestamp(receipt.get("captured_utc"))
+        and isinstance(evidence_name, str)
+        and evidence_name == Path(evidence_name).name
+        and Path(evidence_name).suffix.casefold() == ".pdf"
+        and valid_sha256(receipt.get("evidence_file_sha256"))
+    )
+    state["receipt_header_valid"] = header_valid
+    if not header_valid:
+        state["failure_code"] = "PRIVATE_JCP_RECEIPT_HEADER_INVALID"
+        return state
+
+    evidence_path = receipt_path.parent / str(evidence_name)
+    try:
+        evidence_path = validate_private_target(evidence_path)
+    except MissionWeaveGateError:
+        state["failure_code"] = "PRIVATE_JCP_EVIDENCE_PATH_INVALID"
+        return state
+
+    evidence_present = evidence_path.is_file() and evidence_path.stat().st_size > 0
+    evidence_hash_match = bool(
+        evidence_present
+        and sha256_file(evidence_path)
+        == str(receipt["evidence_file_sha256"]).upper()
+    )
+    source_metadata_valid = bool(
+        receipt.get("source_channel") == "JCP_PORTAL"
+        and valid_timestamp(receipt.get("source_issued_utc"))
+    )
+    entity_match = receipt.get("entity_match_confirmed") is True
+    corporate_review = receipt.get("corporate_official_reviewed") is True
+    evidence_integrity_pass = bool(
+        header_valid
+        and evidence_present
+        and evidence_hash_match
+        and source_metadata_valid
+        and entity_match
+        and corporate_review
+    )
+    state.update(
+        {
+            "evidence_file_present": evidence_present,
+            "evidence_pdf": evidence_present,
+            "evidence_hash_matches_receipt": evidence_hash_match,
+            "source_metadata_valid": source_metadata_valid,
+            "entity_match_confirmed": entity_match,
+            "corporate_official_reviewed": corporate_review,
+            "evidence_integrity_pass": evidence_integrity_pass,
+            "failure_code": (
+                None
+                if evidence_integrity_pass
+                else "PRIVATE_JCP_EVIDENCE_INCOMPLETE"
+            ),
+        }
+    )
+    return state
+
+
 def require_exact_keys(section: Any, expected: set[str], code: str) -> dict[str, Any]:
     if not isinstance(section, dict) or set(section) != expected:
         raise MissionWeaveGateError(code)
@@ -558,6 +685,7 @@ def evaluate_private_payload(
     *,
     source_state: dict[str, Any],
     volume2_text: str,
+    jcp_evidence_state: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     if payload.get("schema") != PRIVATE_SCHEMA:
         raise MissionWeaveGateError("PRIVATE_SCHEMA_MISMATCH")
@@ -613,6 +741,13 @@ def evaluate_private_payload(
     for field, gate in APPROVAL_FLAG_GATES.items():
         gate_state[gate] = approval.get(field) is True
 
+    if jcp_evidence_state is None:
+        jcp_evidence_state = inspect_private_jcp_evidence()
+    gate_state["DD2345_OR_JCP_APPLICATION_EVIDENCE"] = bool(
+        compliance.get("dd2345_or_jcp_application_evidence_ready") is True
+        and jcp_evidence_state.get("evidence_integrity_pass") is True
+    )
+
     proposal_number = proposal.get("proposal_number")
     proposal_number_present = valid_proposal_number(proposal_number)
     proposal_number_embedded = bool(
@@ -661,6 +796,9 @@ def evaluate_private_payload(
             "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION"
         ],
         "approval_timestamp_present": gate_state["ACTION_TIME_APPROVAL_TIMESTAMP"],
+        "dd2345_or_jcp_evidence_verified": gate_state[
+            "DD2345_OR_JCP_APPLICATION_EVIDENCE"
+        ],
     }
 
 
@@ -671,6 +809,7 @@ def build_payload(
     source_state: dict[str, Any] | None = None,
     volume2_text: str | None = None,
     volume3_artifact_state: dict[str, bool] | None = None,
+    jcp_evidence_state: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     if source_state is None or volume2_text is None:
         use_private_final = bool(
@@ -680,9 +819,14 @@ def build_payload(
             PRIVATE_FINAL_VOLUME2_PDF if use_private_final else VOLUME2_PDF,
             private_final=use_private_final,
         )
+    if jcp_evidence_state is None:
+        jcp_evidence_state = inspect_private_jcp_evidence()
     evaluation = (
         evaluate_private_payload(
-            private_payload, source_state=source_state, volume2_text=volume2_text
+            private_payload,
+            source_state=source_state,
+            volume2_text=volume2_text,
+            jcp_evidence_state=jcp_evidence_state,
         )
         if private_payload is not None
         else None
@@ -720,6 +864,24 @@ def build_payload(
     if volume3_artifact_state is None:
         volume3_artifact_state = inspect_private_volume3_artifact()
     reconciliation_groups = gate_reconciliation_groups(unresolved)
+    public_jcp_evidence_state = {
+        key: jcp_evidence_state.get(key)
+        for key in (
+            "receipt_present",
+            "receipt_header_valid",
+            "evidence_file_present",
+            "evidence_pdf",
+            "evidence_hash_matches_receipt",
+            "source_metadata_valid",
+            "entity_match_confirmed",
+            "corporate_official_reviewed",
+            "evidence_integrity_pass",
+            "evidence_kind",
+            "failure_code",
+            "private_path_exposed",
+            "private_hash_exposed",
+        )
+    }
 
     payload: dict[str, Any] = {
         "schema": PUBLIC_SCHEMA,
@@ -754,6 +916,10 @@ def build_payload(
             "private_final_volume2_path_exposed": False,
             "private_final_volume2_sha256_exposed": False,
             "capture_workflow": rel(PRIVATE_CAPTURE_WORKFLOW),
+            "jcp_evidence_receipt_expected_path": rel(
+                PRIVATE_JCP_EVIDENCE_RECEIPT
+            ),
+            "jcp_evidence_template": rel(PRIVATE_JCP_EVIDENCE_TEMPLATE),
             "pre_submit_excludes_action_time_approval": True,
             "credential_values_accepted": False,
             "firm_pin_value_accepted": False,
@@ -799,8 +965,18 @@ def build_payload(
             "approval_timestamp_present": bool(
                 evaluation and evaluation["approval_timestamp_present"]
             ),
+            "dd2345_or_jcp_evidence_verified": bool(
+                evaluation and evaluation["dd2345_or_jcp_evidence_verified"]
+            ),
         },
         "private_volume3_artifact": deepcopy(volume3_artifact_state),
+        "private_jcp_evidence": public_jcp_evidence_state,
+        "jcp_evidence_protocol": {
+            "path": rel(JCP_EVIDENCE_PROTOCOL),
+            "bytes": JCP_EVIDENCE_PROTOCOL.stat().st_size,
+            "sha256": sha256_file(JCP_EVIDENCE_PROTOCOL),
+            "bare_boolean_can_clear_gate": False,
+        },
         "official_instruction_facts": {
             "dsip_volume_count": 7,
             "volume2_page_limit": VOLUME2_PAGE_LIMIT,
@@ -809,6 +985,7 @@ def build_payload(
             "current_package_duration_months": 6,
             "topic_itar_flag": True,
             "dd2345_or_jcp_application_evidence_required_if_effort_subject_to_itar": True,
+            "dd2345_or_jcp_gate_requires_hash_matched_private_portal_evidence": True,
             "projected_cmmc_level": "Level 2 (Self)",
             "cmmc_amendment_note": (
                 "Amendment 2 says CMMC Phase II implementation was suspended on July "
@@ -827,6 +1004,7 @@ def build_payload(
             "action_time_human_required": True,
             "credentials_allowed_in_public_output": False,
             "private_identifiers_allowed_in_public_output": False,
+            "bare_jcp_checkbox_can_clear_gate": False,
         },
         "private_template": rel(TEMPLATE),
         "portal_checklist": rel(OUT_CHECKLIST),
@@ -870,6 +1048,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     source = payload["source_integrity"]
     facts = payload["private_fact_state"]
     volume3 = payload["private_volume3_artifact"]
+    jcp = payload["private_jcp_evidence"]
     lines = [
         "# MissionWeave DSIP Action Gate - 2026-07-17",
         "",
@@ -916,6 +1095,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Portal preview receipt present: `{str(facts['portal_preview_receipt_present']).lower()}`",
         f"- Corporate official reviewed: `{str(facts['corporate_official_reviewed']).lower()}`",
         f"- Action-time authorized: `{str(facts['action_time_authorized']).lower()}`",
+        f"- DD Form 2345/JCP evidence verified: `{str(facts['dd2345_or_jcp_evidence_verified']).lower()}`",
         "",
         "## Private Volume 3 Artifact Integrity",
         "",
@@ -931,6 +1111,21 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Receipt integrity passes: `{str(volume3['receipt_integrity_pass']).lower()}`",
         f"- Private path exposed: `{str(volume3['private_path_exposed']).lower()}`",
         f"- Private hash exposed: `{str(volume3['private_hash_exposed']).lower()}`",
+        "",
+        "## Private DD Form 2345/JCP Evidence Integrity",
+        "",
+        f"- Private receipt present: `{str(jcp['receipt_present']).lower()}`",
+        f"- Receipt header valid: `{str(jcp['receipt_header_valid']).lower()}`",
+        f"- Evidence PDF present: `{str(jcp['evidence_file_present']).lower()}`",
+        f"- Evidence hash matches receipt: `{str(jcp['evidence_hash_matches_receipt']).lower()}`",
+        f"- Portal source metadata valid: `{str(jcp['source_metadata_valid']).lower()}`",
+        f"- Entity match confirmed: `{str(jcp['entity_match_confirmed']).lower()}`",
+        f"- Corporate-official review confirmed: `{str(jcp['corporate_official_reviewed']).lower()}`",
+        f"- Evidence integrity passes: `{str(jcp['evidence_integrity_pass']).lower()}`",
+        f"- Private path exposed: `{str(jcp['private_path_exposed']).lower()}`",
+        f"- Private hash exposed: `{str(jcp['private_hash_exposed']).lower()}`",
+        f"- Protocol: `{payload['jcp_evidence_protocol']['path']}`",
+        f"- Protocol SHA-256: `{payload['jcp_evidence_protocol']['sha256']}`",
         "",
         "## Reconciliation Groups",
         "",
@@ -949,8 +1144,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"1. Run `{payload['private_input']['capture_tool']} --check-target`. This validates the ignored destination without reading private contents.",
             "2. Run the hidden collector with `--section pre-submit`. It captures identity, proposal, and compliance sections but deliberately excludes action-time approval.",
             f"3. After DSIP assigns a proposal number, run `{payload['private_input']['private_volume2_finalizer']}`. It reads the number only from the ignored private record, writes the assigned-number DOCX/PDF only to the ignored private area, performs PDF QA, and updates the private PDF hash without exposing either value publicly.",
-            "4. Run `--section approval` only after the corporate official reviews the complete portal preview at action time. The collector never requests or accepts a Firm PIN or login credential.",
-            "5. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.",
+            f"4. For the ITAR-marked topic, save only an official JCP portal submission receipt or certified DD Form 2345 as a private PDF and complete `{payload['private_input']['jcp_evidence_template']}` beside it. A boolean answer cannot clear this gate without a matching file hash.",
+            "5. Run `--section approval` only after the corporate official reviews the complete portal preview at action time. The collector never requests or accepts a Firm PIN or login credential.",
+            "6. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.",
             "",
             "## Controls",
             "",
@@ -996,6 +1192,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - Ignored assigned-number final PDF selected by the gate: `{str(source['private_final_volume2_used']).lower()}`.
 - Do not upload the tracked neutral PDF after DSIP assigns a proposal number. Run `{rel(PRIVATE_FINALIZER)}`; the final PDF remains ignored and its path, number, and hash remain absent from public artifacts.
 - Private Volume 3 receipt integrity passes: `{str(payload['private_volume3_artifact']['receipt_integrity_pass']).lower()}`. This verifies the ignored workbook against its ignored receipt without publishing either path or hash; it does not replace corporate-official cost-basis review.
+- Private DD Form 2345/JCP evidence integrity passes: `{str(payload['private_jcp_evidence']['evidence_integrity_pass']).lower()}`. A checked private flag cannot clear this gate unless an official portal PDF exists, its SHA-256 matches the ignored receipt, and entity/corporate review are confirmed.
 
 ## Registration And Firm Controls
 
@@ -1012,7 +1209,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 2. Volume 2 - Technical Volume: capture the assigned DSIP proposal number in the ignored record, run the guarded private finalizer, require its PDF QA to pass with no neutral header, run a local malware scan, and upload one PDF no longer than {instruction['volume2_page_limit']} pages. Keep the public 15-file neutral manifest unchanged.
 3. Volume 3 - Cost Volume: use the DSIP spreadsheet/form, keep the Phase I base at or below the official $100,000 ceiling, support the direct labor and indirect treatment, and reconcile every task, ODC, and percentage-of-work entry.
 4. Volume 4 - Company Commercialization Report: answer from actual SBIR/STTR award history and ensure the current company report is complete.
-5. Volume 5 - Supporting Documents: upload only applicable and current evidence. Because the topic is ITAR-marked, include a certified DD Form 2345 or acceptable JCP application evidence when required. Do not upload the old foreign-affiliations PDF form.
+5. Volume 5 - Supporting Documents: upload only applicable and current evidence. Because the topic is ITAR-marked, include a certified DD Form 2345 or acceptable JCP application-submission receipt when required. Use the official JCP portal at `https://www.public.dacs.dla.mil/jcp/ext/`; keep the downloaded evidence and its receipt private, require the file hash to match, and do not treat portal registration or prerequisites-in-progress as submission evidence. Do not upload the old foreign-affiliations PDF form.
 6. Volume 6 - Fraud, Waste, and Abuse Training: complete the current annual DSIP training review.
 7. Volume 7 - Foreign Affiliations: complete the current DSIP webform from current facts. The corporate official cannot certify the proposal until this webform is complete.
 

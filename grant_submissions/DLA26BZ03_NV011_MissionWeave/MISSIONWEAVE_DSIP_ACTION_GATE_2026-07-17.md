@@ -15,7 +15,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Required private gates: `50`
 - Passed private gates: `36`
 - Open gates: `14`
-- Gate SHA-256: `2488d0f93a96ae21234227b487fe1648e99ceca526f3b6addb5a7be148fddf3c`
+- Gate SHA-256: `0a64c071fa262c8ae55c2e17ec6f57a8ef1d13d9583135669639fad2ce777c94`
 
 ## Package Integrity
 
@@ -43,6 +43,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Portal preview receipt present: `false`
 - Corporate official reviewed: `false`
 - Action-time authorized: `false`
+- DD Form 2345/JCP evidence verified: `false`
 
 ## Private Volume 3 Artifact Integrity
 
@@ -58,6 +59,21 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Receipt integrity passes: `true`
 - Private path exposed: `false`
 - Private hash exposed: `false`
+
+## Private DD Form 2345/JCP Evidence Integrity
+
+- Private receipt present: `false`
+- Receipt header valid: `false`
+- Evidence PDF present: `false`
+- Evidence hash matches receipt: `false`
+- Portal source metadata valid: `false`
+- Entity match confirmed: `false`
+- Corporate-official review confirmed: `false`
+- Evidence integrity passes: `false`
+- Private path exposed: `false`
+- Private hash exposed: `false`
+- Protocol: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_JCP_EVIDENCE_PROTOCOL_2026-07-18.json`
+- Protocol SHA-256: `04EB5334A96D672BF02FD00F5C80482D1BFD779F190D70DFCB411F2E6695CE06`
 
 ## Reconciliation Groups
 
@@ -90,8 +106,9 @@ This public-safe gate reports only package integrity and private-workflow comple
 1. Run `code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --check-target`. This validates the ignored destination without reading private contents.
 2. Run the hidden collector with `--section pre-submit`. It captures identity, proposal, and compliance sections but deliberately excludes action-time approval.
 3. After DSIP assigns a proposal number, run `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`. It reads the number only from the ignored private record, writes the assigned-number DOCX/PDF only to the ignored private area, performs PDF QA, and updates the private PDF hash without exposing either value publicly.
-4. Run `--section approval` only after the corporate official reviews the complete portal preview at action time. The collector never requests or accepts a Firm PIN or login credential.
-5. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.
+4. For the ITAR-marked topic, save only an official JCP portal submission receipt or certified DD Form 2345 as a private PDF and complete `config/missionweave_jcp_evidence_private_template_v1.json` beside it. A boolean answer cannot clear this gate without a matching file hash.
+5. Run `--section approval` only after the corporate official reviews the complete portal preview at action time. The collector never requests or accepts a Firm PIN or login credential.
+6. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.
 
 ## Controls
 

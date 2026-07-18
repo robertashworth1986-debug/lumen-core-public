@@ -8,7 +8,7 @@
     "missing_fact_fail_closed": true,
     "past_deadline_fail_closed": true
   },
-  "generated_utc": "2026-07-18T12:33:00.855690+00:00",
+  "generated_utc": "2026-07-18T19:00:48.445450+00:00",
   "global_rules": [
     "Ground every reply in the latest inbound message and preserve its thread identifier.",
     "Answer only the question asked; do not append an unrelated pitch or attachment.",
@@ -19,17 +19,17 @@
     "Escalate deadlines with the exact date, time, timezone, portal, and observed blocker.",
     "Require action-time human review for every outbound response."
   ],
-  "private_render_template_count": 6,
+  "private_render_template_count": 7,
   "schema": "lumencore.outreach_response_template_registry.v1",
   "send_policy_counts": {
-    "HUMAN_ACTION_DUE": 4,
+    "HUMAN_ACTION_DUE": 5,
     "MONITOR_NO_SEND": 1,
     "REPLY_AFTER_FACT_REVIEW": 5
   },
   "source_config": "config/outreach_response_templates_v1.json",
-  "source_config_sha256": "6F26548069BDB1F9B4B7CB339ED4027CD11D81C4EAF1A679D38D6BF3883278C9",
+  "source_config_sha256": "0DF3A8568E5ACDEC8E2EBB4B0703CC86C12A7AD4261C08EA75B5F11E5BA486D0",
   "source_schema": "lumencore.outreach_response_templates.v1",
-  "template_count": 10,
+  "template_count": 11,
   "templates": [
     {
       "attachment_policy": "NONE",
@@ -199,6 +199,45 @@
       ],
       "subject": "Re: {source_subject}",
       "template_id": "SUBMISSION_RECEIPT_FOLLOWUP"
+    },
+    {
+      "attachment_policy": "NONE",
+      "body": "Hello {recipient_name},\n\nI am following up once on the instruction question below for {topic_or_notice}, which closes {deadline_local}. The original component message was sent {original_sent_local}. {support_redirect_summary}\n\nQuestion requiring component guidance: {exact_instruction_question}\n\nI will not treat prerequisites-in-progress as completed evidence or represent an uncompleted certification. A response by {requested_reply_by_local} would leave time to follow the official instruction before close. No attachment is included, and I will not duplicate the proposal package by email.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}",
+      "description": "Follow up once with the authoritative component POC after portal support redirects a deadline-critical instruction question and the original component message remains unanswered.",
+      "inbound_states": [
+        "SUPPORT_REDIRECTED_TO_COMPONENT",
+        "DEADLINE_BLOCKER_UNANSWERED"
+      ],
+      "optional_defaults": {},
+      "private_render_only": true,
+      "reply_triggers": [
+        "COMPONENT_POC_FOLLOWUP_AFTER_NO_REPLY"
+      ],
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "topic_or_notice",
+        "deadline_local",
+        "original_sent_local",
+        "support_redirect_summary",
+        "exact_instruction_question",
+        "requested_reply_by_local",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id",
+        "support_redirect_summary"
+      ],
+      "subject": "Re: {source_subject}",
+      "template_id": "COMPONENT_INSTRUCTION_ESCALATION"
     },
     {
       "attachment_policy": "NONE",

@@ -22,6 +22,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - Ignored assigned-number final PDF selected by the gate: `true`.
 - Do not upload the tracked neutral PDF after DSIP assigns a proposal number. Run `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`; the final PDF remains ignored and its path, number, and hash remain absent from public artifacts.
 - Private Volume 3 receipt integrity passes: `true`. This verifies the ignored workbook against its ignored receipt without publishing either path or hash; it does not replace corporate-official cost-basis review.
+- Private DD Form 2345/JCP evidence integrity passes: `false`. A checked private flag cannot clear this gate unless an official portal PDF exists, its SHA-256 matches the ignored receipt, and entity/corporate review are confirmed.
 
 ## Registration And Firm Controls
 
@@ -38,7 +39,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 2. Volume 2 - Technical Volume: capture the assigned DSIP proposal number in the ignored record, run the guarded private finalizer, require its PDF QA to pass with no neutral header, run a local malware scan, and upload one PDF no longer than 20 pages. Keep the public 15-file neutral manifest unchanged.
 3. Volume 3 - Cost Volume: use the DSIP spreadsheet/form, keep the Phase I base at or below the official $100,000 ceiling, support the direct labor and indirect treatment, and reconcile every task, ODC, and percentage-of-work entry.
 4. Volume 4 - Company Commercialization Report: answer from actual SBIR/STTR award history and ensure the current company report is complete.
-5. Volume 5 - Supporting Documents: upload only applicable and current evidence. Because the topic is ITAR-marked, include a certified DD Form 2345 or acceptable JCP application evidence when required. Do not upload the old foreign-affiliations PDF form.
+5. Volume 5 - Supporting Documents: upload only applicable and current evidence. Because the topic is ITAR-marked, include a certified DD Form 2345 or acceptable JCP application-submission receipt when required. Use the official JCP portal at `https://www.public.dacs.dla.mil/jcp/ext/`; keep the downloaded evidence and its receipt private, require the file hash to match, and do not treat portal registration or prerequisites-in-progress as submission evidence. Do not upload the old foreign-affiliations PDF form.
 6. Volume 6 - Fraud, Waste, and Abuse Training: complete the current annual DSIP training review.
 7. Volume 7 - Foreign Affiliations: complete the current DSIP webform from current facts. The corporate official cannot certify the proposal until this webform is complete.
 

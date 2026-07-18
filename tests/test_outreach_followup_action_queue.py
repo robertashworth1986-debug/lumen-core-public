@@ -51,11 +51,22 @@ def test_followup_policy_config_is_complete_and_fail_closed():
     }
 
     proactive = [row for row in rows if row["max_proactive_sends"]]
-    assert len(proactive) == 1
-    assert proactive[0]["lane_id"] == "lanl_vision_licensing_followup"
-    assert proactive[0]["max_proactive_sends"] == 1
-    assert proactive[0]["eligible_template_id"] == "BOUNDED_REVIEW_FOLLOWUP"
-    assert proactive[0]["not_before_utc"] == "2026-07-23T14:00:00Z"
+    assert len(proactive) == 2
+    by_lane = {row["lane_id"]: row for row in proactive}
+    assert by_lane["lanl_vision_licensing_followup"]["max_proactive_sends"] == 1
+    assert by_lane["lanl_vision_licensing_followup"]["eligible_template_id"] == (
+        "BOUNDED_REVIEW_FOLLOWUP"
+    )
+    assert by_lane["lanl_vision_licensing_followup"]["not_before_utc"] == (
+        "2026-07-23T14:00:00Z"
+    )
+    assert by_lane["missionweave_dsip_proposal"]["max_proactive_sends"] == 1
+    assert by_lane["missionweave_dsip_proposal"]["eligible_template_id"] == (
+        "COMPONENT_INSTRUCTION_ESCALATION"
+    )
+    assert by_lane["missionweave_dsip_proposal"]["not_before_utc"] == (
+        "2026-07-20T17:00:00Z"
+    )
 
 
 def test_current_queue_is_deterministic_and_never_sends():
@@ -115,7 +126,7 @@ def test_lanl_hold_expiration_requires_recheck_and_still_does_not_authorize_send
     assert due_lanl["draft_rendered"] is False
     assert due_lanl["send_now"] is False
     assert at_gate["status"] == "FOLLOWUP_RECHECK_DUE_HUMAN_REVIEW"
-    assert at_gate["summary"]["due_for_mailbox_recheck_count"] == 1
+    assert at_gate["summary"]["due_for_mailbox_recheck_count"] == 2
     assert at_gate["summary"]["send_now_count"] == 0
 
 
@@ -189,6 +200,25 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
     assert "will not send another follow-up" in rendered["body"]
 
 
+def test_missionweave_component_followup_waits_for_monday_and_full_thread_recheck():
+    module = load_module()
+    before = module.build_payload("2026-07-20T16:59:59Z")
+    due = module.build_payload("2026-07-20T17:00:00Z")
+    before_row = {row["lane_id"]: row for row in before["actions"]}[
+        "missionweave_dsip_proposal"
+    ]
+    due_row = {row["lane_id"]: row for row in due["actions"]}[
+        "missionweave_dsip_proposal"
+    ]
+
+    assert before_row["action_state"] == "HELD_NO_SEND"
+    assert before_row["hold_seconds_remaining"] == 1
+    assert due_row["action_state"] == "RECHECK_MAILBOX_BEFORE_DRAFT"
+    assert due_row["eligible_template_id"] == "COMPONENT_INSTRUCTION_ESCALATION"
+    assert due_row["inbox_recheck_required"] is True
+    assert due_row["send_now"] is False
+
+
 def test_modes_route_closed_inbound_portal_private_and_account_work_separately():
     module = load_module()
     rows = {
@@ -202,9 +232,7 @@ def test_modes_route_closed_inbound_portal_private_and_account_work_separately()
     assert rows["epri_open_power_ai_mou"]["action_state"] == (
         "MONITOR_INBOUND_ONLY"
     )
-    assert rows["missionweave_dsip_proposal"]["action_state"] == (
-        "HUMAN_PORTAL_ACTION_OPEN"
-    )
+    assert rows["missionweave_dsip_proposal"]["action_state"] == "HELD_NO_SEND"
     assert rows["openai_build_week_internal_handoff"]["action_state"] == (
         "PRIVATE_RECONCILIATION_OPEN"
     )

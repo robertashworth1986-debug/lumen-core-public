@@ -1,0 +1,12 @@
+{
+  "captured_utc": null,
+  "corporate_official_reviewed": false,
+  "entity_match_confirmed": false,
+  "evidence_file": "MISSIONWEAVE_JCP_APPLICATION_SUBMISSION_RECEIPT.private.pdf",
+  "evidence_file_sha256": null,
+  "evidence_kind": "JCP_APPLICATION_SUBMISSION_RECEIPT",
+  "schema": "lumencore.missionweave_jcp_evidence_private.v1",
+  "source_channel": "JCP_PORTAL",
+  "source_issued_utc": null,
+  "topic": "DLA26BZ03-NV011"
+}

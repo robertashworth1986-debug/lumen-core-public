@@ -1,14 +1,14 @@
 # Outreach Follow-up Action Queue - 2026-07-18
 
 - Status: `NO_EXTERNAL_FOLLOWUP_DUE`
-- As of UTC: `2026-07-18T15:20:15.428007Z`
+- As of UTC: `2026-07-18T19:01:26.924863Z`
 - Lanes: `16`
 - Due for mailbox recheck: `0`
-- Held no-send: `1`
+- Held no-send: `2`
 - Drafts rendered: `0`
 - Send now: `0`
 - Autonomous external send allowed: `false`
-- Queue SHA-256: `B7BFCE7F0E7CE12A060FC005A8C39745FAC8A90A5688B85420314339A5C845AB`
+- Queue SHA-256: `C9C351627F01A84DE9390FB091AF5B22AAC13F4952CCA8B94E9540EF46F30697`
 
 ## Action Queue
 
@@ -20,7 +20,7 @@
 | Los Alamos National Laboratory | `ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD` | `HELD_NO_SEND` | `2026-07-23T14:00:00Z` | `BOUNDED_REVIEW_FOLLOWUP` |
 | Centers for Disease Control and Prevention | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
 | DARPA Multi X Office | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
-| Defense SBIR/STTR Innovation Portal | `PORTAL_ACTION` | `HUMAN_PORTAL_ACTION_OPEN` | `none` | `none` |
+| Defense SBIR/STTR Innovation Portal | `ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD` | `HELD_NO_SEND` | `2026-07-20T17:00:00Z` | `COMPONENT_INSTRUCTION_ESCALATION` |
 | OpenAI Build Week / Devpost | `PORTAL_ACTION` | `HUMAN_PORTAL_ACTION_OPEN` | `none` | `none` |
 | OpenAI Build Week internal handoff | `PRIVATE_RECONCILIATION` | `PRIVATE_RECONCILIATION_OPEN` | `none` | `none` |
 | LvlUp Ventures / Power of the Pitch Week | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |

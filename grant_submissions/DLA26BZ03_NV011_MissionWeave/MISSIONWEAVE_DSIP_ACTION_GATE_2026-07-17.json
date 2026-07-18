@@ -2,6 +2,7 @@
   "claim_boundary": "This public gate proves package integrity, document-format checks, and the completion state of a bounded private DSIP fact workflow. It does not expose legal identifiers, a Firm PIN, the assigned proposal number, private portal evidence, or unsupported compliance facts. It does not establish DLA validation, CMMC status, ITAR compliance, award eligibility, proposal acceptance, submission, selection, contract, award, deployment, or realized performance.",
   "controls": {
     "action_time_human_required": true,
+    "bare_jcp_checkbox_can_clear_gate": false,
     "browser_navigation_performed": false,
     "builder_can_click_final_submit": false,
     "credentials_allowed_in_public_output": false,
@@ -15,7 +16,7 @@
     "live_dsip_recheck_required": true,
     "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
   },
-  "gate_sha256": "2488d0f93a96ae21234227b487fe1648e99ceca526f3b6addb5a7be148fddf3c",
+  "gate_sha256": "0a64c071fa262c8ae55c2e17ec6f57a8ef1d13d9583135669639fad2ce777c94",
   "gate_summary": {
     "open_gate_count": 14,
     "passed_private_gate_count": 36,
@@ -125,11 +126,18 @@
       "VOLUME5_UPLOAD_SET"
     ]
   },
-  "generated_utc": "2026-07-18T15:08:23.845174+00:00",
+  "generated_utc": "2026-07-18T19:01:00.501867+00:00",
+  "jcp_evidence_protocol": {
+    "bare_boolean_can_clear_gate": false,
+    "bytes": 3956,
+    "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_JCP_EVIDENCE_PROTOCOL_2026-07-18.json",
+    "sha256": "04EB5334A96D672BF02FD00F5C80482D1BFD779F190D70DFCB411F2E6695CE06"
+  },
   "official_instruction_facts": {
     "cmmc_amendment_note": "Amendment 2 says CMMC Phase II implementation was suspended on July 13, 2026 while Phase I self-assessment requirements remain in place; the current live requirement must be reviewed before submission.",
     "current_package_duration_months": 6,
     "dd2345_or_jcp_application_evidence_required_if_effort_subject_to_itar": true,
+    "dd2345_or_jcp_gate_requires_hash_matched_private_portal_evidence": true,
     "dsip_volume_count": 7,
     "phase_i_base_ceiling_usd": 100000,
     "phase_i_max_duration_months": 12,
@@ -152,6 +160,7 @@
     "assigned_proposal_number_present": true,
     "assigned_proposal_number_value_exposed": false,
     "corporate_official_reviewed": false,
+    "dd2345_or_jcp_evidence_verified": false,
     "portal_preview_receipt_present": false,
     "portal_preview_receipt_value_exposed": false,
     "volume2_pdf_hash_matches_private_record": true,
@@ -165,6 +174,8 @@
     "expected_path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_DSIP_ACTION.private.json",
     "firm_pin_value_accepted": false,
     "git_ignored_target": true,
+    "jcp_evidence_receipt_expected_path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_JCP_EVIDENCE_RECEIPT.private.json",
+    "jcp_evidence_template": "config/missionweave_jcp_evidence_private_template_v1.json",
     "pre_submit_excludes_action_time_approval": true,
     "present": true,
     "private_final_volume2_path_exposed": false,
@@ -175,6 +186,21 @@
     "sha256": null,
     "sha256_exposed": false,
     "sha256_present": true
+  },
+  "private_jcp_evidence": {
+    "corporate_official_reviewed": false,
+    "entity_match_confirmed": false,
+    "evidence_file_present": false,
+    "evidence_hash_matches_receipt": false,
+    "evidence_integrity_pass": false,
+    "evidence_kind": null,
+    "evidence_pdf": false,
+    "failure_code": "PRIVATE_JCP_RECEIPT_NOT_FOUND",
+    "private_hash_exposed": false,
+    "private_path_exposed": false,
+    "receipt_header_valid": false,
+    "receipt_present": false,
+    "source_metadata_valid": false
   },
   "private_template": "config/missionweave_dsip_action_private_template_v1.json",
   "private_volume3_artifact": {
