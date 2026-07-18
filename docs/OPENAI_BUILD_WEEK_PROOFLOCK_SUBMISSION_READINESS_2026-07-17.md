@@ -26,8 +26,9 @@
 - [x] Fresh browser network log contains 16 repository-local HTTP 200 requests and no external request.
 - [x] Repository `LICENSE` is present.
 - [x] Vendored Three.js files retain copyright headers and `dashboard/assets/vendor/THREE_LICENSE.txt` contains the MIT license.
-- [x] Public live release verified at `https://lumen-core.ai/build_week/prooflock_console/?release=20260718.1&commit=e9a1aba`.
-- [x] All 14 deployed files returned HTTP 200 and matched the exact commit archive by SHA-256.
+- [x] Historical public release `20260718.1` verified against source commit `e9a1aba`; all 14 deployed files returned HTTP 200 and matched that exact commit archive by SHA-256.
+- [ ] Corrected deployable source commit `8c235f5` is live and reverified. The canonical Git-blob audit matches 10 of 14 files; both verifier files are stale, so submission remains on HOLD.
+- [x] Current-head deployment state is recorded in `docs/OPENAI_BUILD_WEEK_PROOFLOCK_PREDEPLOYMENT_GATE_2026-07-18.md` and its machine-readable JSON companion.
 - [x] Live release QA, visual evidence, and hashes are recorded in `docs/OPENAI_BUILD_WEEK_PROOFLOCK_LIVE_RELEASE_RECEIPT_2026-07-18.md`.
 - [x] A timed under-three-minute narration and one-pass human submission checklist are recorded in `docs/OPENAI_BUILD_WEEK_PROOFLOCK_DEMO_NARRATION_2026-07-18.md` and `docs/OPENAI_BUILD_WEEK_PROOFLOCK_HUMAN_GATE_CHECKLIST_2026-07-18.md`.
 
@@ -41,7 +42,8 @@
 - [ ] Primary build task `/feedback` Session ID captured.
 - [x] Actual model evidence captured from authoritative session metadata as `gpt-5.6-sol`; the private task-metadata Session ID candidate exactly matches public SHA-256 `CEDEC32157F2516DF88505802805761AE3535F093FB9B1B06CA6DEFF4A344FD9`, with `/feedback` confirmation still open.
 - [ ] Founder review of judge-facing copy completed.
-- [x] Draft pull request CI completed successfully on live-QA commit `a7731fa`.
+- [x] Draft pull request CI completed successfully on authority-fix commit `8c235f5`.
+- [ ] Corrected source released and reverified at 14 of 14 exact byte matches.
 - [ ] Final Devpost form reviewed by Robert.
 - [ ] Final Devpost submit clicked by Robert.
 
@@ -52,7 +54,7 @@ The complete current-main test collection produced `114 passed, 25 subtests pass
 - `test_public_capsule_verifies` hashes a CRLF checkout of `dice_eia_public_summary.txt` while the manifest records the LF Git blob.
 - `test_cli_requires_explicit_apply_and_creates_backup` passes a valid Windows temporary absolute path to a helper that accepts only Unix-style `/...` document roots.
 
-These are cross-platform baseline defects outside the focused Build Week lane. They are not hidden or weakened here, and should be repaired in a separate bounded PR. The current ProofLock-focused suite is `28 passed`; the live-release receipt preserves its historical `27 passed` run.
+These are cross-platform baseline defects outside the focused Build Week lane. They are not hidden or weakened here, and should be repaired in a separate bounded PR. The current ProofLock-focused suite is `32 passed`; the live-release receipt preserves its historical `27 passed` run. The separate live-release gate adds seven offline regression checks.
 
 ## Judge Test Path
 

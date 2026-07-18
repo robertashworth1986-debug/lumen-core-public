@@ -1,0 +1,213 @@
+{
+  "schema": "lumencore.prooflock_live_release_gate.v1",
+  "generated_utc": "2026-07-18T13:45:52.697945+00:00",
+  "status": "STALE_OR_INCOMPLETE_DEPLOYMENT_HOLD",
+  "source_commit": "8c235f587fa748745b67903cda17817c7a344c7d",
+  "base_url": "https://lumen-core.ai/build_week/prooflock_console/",
+  "controls": {
+    "byte_preserving_fetch": true,
+    "cache_bust_key": "8c235f587fa7",
+    "redirect_must_preserve_origin_and_path": true,
+    "symlinks_followed": false,
+    "credentials_collected": false,
+    "source_commit_bytes_verified": true,
+    "deployment_performed": false,
+    "submission_performed": false
+  },
+  "source_provenance": {
+    "checked": true,
+    "verified": true,
+    "resolved_commit": "8c235f587fa748745b67903cda17817c7a344c7d",
+    "tracked_file_count": 14,
+    "worktree_file_count": 14,
+    "worktree_match_count": 9,
+    "worktree_matches_commit": false,
+    "mismatched_files": [
+      "README.md",
+      "index.html",
+      "sample_receipt.json",
+      "styles.css",
+      "verify_receipt.py"
+    ],
+    "commit_symlinks_rejected": [],
+    "worktree_symlinks_rejected": []
+  },
+  "summary": {
+    "file_count": 14,
+    "http_200_count": 14,
+    "redirect_valid_count": 14,
+    "byte_match_count": 10,
+    "mismatch_count": 4
+  },
+  "submission_gate": "HOLD",
+  "deployment_required": true,
+  "mismatched_files": [
+    "prooflock_core.js",
+    "prooflock_favicon.svg",
+    "THREE_LICENSE.txt",
+    "verify_receipt.py"
+  ],
+  "files": [
+    {
+      "file": "app.js",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": true,
+      "local_bytes": 10931,
+      "live_bytes": 10931,
+      "local_sha256": "5405917de7f99548dce48c8c3212e36c6e5ae98157ab33a96a77b2edf6438d87",
+      "live_sha256": "5405917de7f99548dce48c8c3212e36c6e5ae98157ab33a96a77b2edf6438d87",
+      "state": "MATCH"
+    },
+    {
+      "file": "bootstrap.js",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": true,
+      "local_bytes": 230,
+      "live_bytes": 230,
+      "local_sha256": "5116d0db7ff60e48ed4018356ed15e8a7d8fdc902bb29fa3ec7a5ae5f9ca6baa",
+      "live_sha256": "5116d0db7ff60e48ed4018356ed15e8a7d8fdc902bb29fa3ec7a5ae5f9ca6baa",
+      "state": "MATCH"
+    },
+    {
+      "file": "index.html",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": true,
+      "local_bytes": 5062,
+      "live_bytes": 5062,
+      "local_sha256": "6071b366b4030e3301326c499e586134f6bc303b7a4be7529c0e659fcb873952",
+      "live_sha256": "6071b366b4030e3301326c499e586134f6bc303b7a4be7529c0e659fcb873952",
+      "state": "MATCH"
+    },
+    {
+      "file": "prooflock_core.js",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": false,
+      "local_bytes": 10199,
+      "live_bytes": 10165,
+      "local_sha256": "d90c7afc16215e3d4cffbefbeee809787c6f456206b361b94e3a73de859bf08b",
+      "live_sha256": "55e1c09cdc8bbb9a0259b401eea2b35f4aab1875bf01beb289de5e4b40fa88d8",
+      "state": "CONTENT_MISMATCH"
+    },
+    {
+      "file": "prooflock_favicon.svg",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": false,
+      "local_bytes": 313,
+      "live_bytes": 318,
+      "local_sha256": "fccfaa85618a824cd186613006113add6bef64cce33122fee4167ab897765f82",
+      "live_sha256": "d92ad4d3af3e778b3d1d05d657bc542be3af34119d920dc115204c44128f65b9",
+      "state": "CONTENT_MISMATCH"
+    },
+    {
+      "file": "prooflock_lattice.css",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": true,
+      "local_bytes": 1821,
+      "live_bytes": 1821,
+      "local_sha256": "c6a0f40a856d8dc0530df6b8c1f0e8a138335f88bf09fc9fcd65fed7208b150a",
+      "live_sha256": "c6a0f40a856d8dc0530df6b8c1f0e8a138335f88bf09fc9fcd65fed7208b150a",
+      "state": "MATCH"
+    },
+    {
+      "file": "prooflock_lattice.js",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": true,
+      "local_bytes": 21835,
+      "live_bytes": 21835,
+      "local_sha256": "1d637cca788b1b7f9f8982cd62657770175a58adf7a9e1b52554afd2b7167f26",
+      "live_sha256": "1d637cca788b1b7f9f8982cd62657770175a58adf7a9e1b52554afd2b7167f26",
+      "state": "MATCH"
+    },
+    {
+      "file": "README.md",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": true,
+      "local_bytes": 4385,
+      "live_bytes": 4385,
+      "local_sha256": "8f98bb1fedbc60237f8a90a1a992419a4e799a1bec130edafd8397a49866af78",
+      "live_sha256": "8f98bb1fedbc60237f8a90a1a992419a4e799a1bec130edafd8397a49866af78",
+      "state": "MATCH"
+    },
+    {
+      "file": "sample_receipt.json",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": true,
+      "local_bytes": 4128,
+      "live_bytes": 4128,
+      "local_sha256": "559bfc14d122d4b77f402660c3a0909ea3100385ac188e0809ebfb9621c74773",
+      "live_sha256": "559bfc14d122d4b77f402660c3a0909ea3100385ac188e0809ebfb9621c74773",
+      "state": "MATCH"
+    },
+    {
+      "file": "styles.css",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": true,
+      "local_bytes": 8745,
+      "live_bytes": 8745,
+      "local_sha256": "4132481bc75f267b9f5ce01d3ab6e8a624fc5d42d21322e22b526b08a8a57684",
+      "live_sha256": "4132481bc75f267b9f5ce01d3ab6e8a624fc5d42d21322e22b526b08a8a57684",
+      "state": "MATCH"
+    },
+    {
+      "file": "three.core.min.js",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": true,
+      "local_bytes": 384222,
+      "live_bytes": 384222,
+      "local_sha256": "6486aa0d719cfa87ec88dc47223b59b1fb8417a1a407fc0e52467c943e2f8cc9",
+      "live_sha256": "6486aa0d719cfa87ec88dc47223b59b1fb8417a1a407fc0e52467c943e2f8cc9",
+      "state": "MATCH"
+    },
+    {
+      "file": "three.module.min.js",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": true,
+      "local_bytes": 365024,
+      "live_bytes": 365024,
+      "local_sha256": "a38c21912ea8c9fd2c92b8dfb2064297d073ec19ac815faf75a686c179202f33",
+      "live_sha256": "a38c21912ea8c9fd2c92b8dfb2064297d073ec19ac815faf75a686c179202f33",
+      "state": "MATCH"
+    },
+    {
+      "file": "THREE_LICENSE.txt",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": false,
+      "local_bytes": 1081,
+      "live_bytes": 1102,
+      "local_sha256": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc",
+      "live_sha256": "5d5dad8147523d59bc15cca838ae0bdaae7075230ec49132c551a1d18e7b3412",
+      "state": "CONTENT_MISMATCH"
+    },
+    {
+      "file": "verify_receipt.py",
+      "http_status": 200,
+      "redirect_valid": true,
+      "byte_match": false,
+      "local_bytes": 8952,
+      "live_bytes": 8902,
+      "local_sha256": "547efc3b601318879069b877a70e417c56d85e4469585cd31b5fe98f61aef7d4",
+      "live_sha256": "c9e7a170ccca072286f7629e04c07ea4d7baadc0eb63e136f61d04d12372b406",
+      "state": "CONTENT_MISMATCH"
+    }
+  ],
+  "next_actions": [
+    "Do not present the live route as current-head evidence.",
+    "After explicit release approval, deploy the exact bounded console directory from the named source commit.",
+    "Rerun this gate and require every listed file to return HTTP 200 with an exact byte match before final Devpost review."
+  ],
+  "claim_boundary": "This gate compares public HTTP response bytes with deployable source blobs loaded from the named Git commit at one observation time. A full match establishes only observed byte identity for the listed files. It does not prove uninterrupted availability, correct server configuration, security, engineering performance, external validation, Build Week eligibility, selection, or authority to submit.",
+  "gate_sha256": "fffb459781b72b49e4dc0fbd1a0b6d086e2f2b5af616b6a5d7d770360ad8ad28"
+}
