@@ -15,18 +15,18 @@ Direct answer: Nashville EC is portal-confirmed; DARPA was sent before deadline 
 - No-bid or partner-only lanes: `6`
 - Expired without verified send: `2`
 - Human-gated lanes: `13`
-- Strongest today action: Finish the OpenAI Build Week external gates first: deploy and verify the public demo, capture the exact model label and /feedback Session ID, record the privacy-reviewed sub-three-minute video, and stage the Devpost preview before the July 21 7:00 p.m. Central close. Its current readiness control has 5/10 gates passed and 5 open. Then use the MissionWeave checklist to move its private action gate beyond 19/50 while keeping the proposal number, final PDF identity, credentials, and action-time approval private for the July 22 noon Eastern close. Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket.
+- Strongest today action: Finish the OpenAI Build Week external gates first: deploy and verify the public demo, capture the exact model label and /feedback Session ID, record the privacy-reviewed sub-three-minute video, and stage the Devpost preview before the July 21 7:00 p.m. Central close. Its current readiness control has 5/10 gates passed and 5 open. Then use the MissionWeave checklist to move its private action gate beyond 35/50 while keeping the proposal number, final PDF identity, credentials, and action-time approval private for the July 22 noon Eastern close. Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket.
 - Critical infrastructure action: SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action.
 - Closest deadline lane: USDA-NIFA-KFBMB-32830 Farm Business Management and Benchmarking Competitive Grants Program, due July 20, 2026 at 5:00 PM Eastern Time; command AGRICULTURE_PARTNER_AND_DATA_GATE; fit BENCHMARKING_METHOD_FIT_FARM_NETWORK_AND_FINBIN_DELIVERY_UNPROVEN.
 - Closest stage-ready lane: OPENAI-BUILD-WEEK-2026 OpenAI Build Week - ProofLock Console, due July 21, 2026 at 5:00 PM Pacific / 7:00 PM Central; command STAGE_APPLICATION; fit DEVELOPER_TOOLS_WORKING_PROJECT_STRONG_FIT.
-- Best grants lane: DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. The hidden sectioned collector captures DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate. The current public action gate is 19/50, with unsupported portal and compliance facts still open. NSF 26-510 stays the next rolling Project Pitch route.
+- Best grants lane: DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. The hidden sectioned collector captures DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate. The current public action gate is 35/50, with unsupported portal and compliance facts still open. NSF 26-510 stays the next rolling Project Pitch route.
 - Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative remains partner-only through 2026-08-03, but the Cambridge Systematics response lead confirmed its team is already set, so that outreach route is closed. No solo bid, no duplicate follow-up, and no partner claim; reopen only through a different qualified organization with written role and corporate-experience evidence.
 - Fastest low-friction lane: OpenAI Build Week is the nearest unresolved low-friction reviewer route. The working core is verified and 5/10 gates pass; the public demo, exact model label, /feedback Session ID, video, Devpost registration, and final review remain open. Nashville EC is no longer an open lane because its portal confirmation is receipt-backed.
 - Final submit without human: `false`
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `a23596ce3edf1f6d2ae64f58abecb611a7bb50ba9fe3fd4ae7a7bb11c40f28b4`
+- Command board SHA-256: `f7081e749daedfabc59666f99dd27c8a290d3293546da92d6a85b1d78fd2bb9e`
 
 ## Operational Controls
 
@@ -388,7 +388,7 @@ Direct answer: Nashville EC is portal-confirmed; DARPA was sent before deadline 
 - Route: Defense SBIR/STTR Innovation Portal (DSIP)
 - Official URL: https://www.sbir.gov/topics/12778
 - Secondary URL: https://www.dodsbirsttr.mil/
-- Why now: This is the nearest complete federal Phase I proposal package. The 15-file manifest verifies byte-for-byte, the technical candidate is claim-bounded, and the official topic fit is strong. It is not submission-ready: the current public action gate is 19/50, and every remaining gate must be resolved without exposing identity, cost, ITAR, CMMC, award-history, foreign-affiliation, rights, preview, or certification values.
+- Why now: This is the nearest complete federal Phase I proposal package. The 15-file manifest verifies byte-for-byte, the technical candidate is claim-bounded, and the official topic fit is strong. It is not submission-ready: the current public action gate is 35/50, and every remaining gate must be resolved without exposing identity, cost, ITAR, CMMC, award-history, foreign-affiliation, rights, preview, or certification values.
 - Today work:
   - Open DLA26BZ03-NV011 in DSIP and verify the live countdown, organization linkage, and proposal number.
   - Capture the assigned proposal number in the ignored record, run the guarded private finalizer, and require its PDF QA receipt; never place the number, private PDF path, or final PDF hash in public artifacts.
@@ -415,14 +415,14 @@ Direct answer: Nashville EC is portal-confirmed; DARPA was sent before deadline 
   - `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`
   - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md`
 - Action gate: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`
-- Action gates passed: `19/50`
-- Action gates open: `31`
+- Action gates passed: `35/50`
+- Action gates open: `15`
 - Private input present: `true`
 - Private values exposed: `false`
 - Ready for human final click: `false`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `ed46a7dcab7b4d87206f5b8cd469d23069b110838c55d5c3016d2d3bf07afb50`
+- Lane SHA-256: `9e148c27ba118f0e81aa806b8aeb94ad4aa291e41d596ef8acc236dad2eadc49`
 
 ### 6. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
 
@@ -866,11 +866,11 @@ Direct answer: Nashville EC is portal-confirmed; DARPA was sent before deadline 
 - `openai_build_week_project_description`: `grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PROJECT_DESCRIPTION_DRAFT_2026-07-17.md` present=`true` sha256=`c121a7e714920e9535ff522eb4b30e559bea52a470e05a2348211f4622f1bc14`
 - `openai_build_week_demo_script`: `grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEMO_SCRIPT_2026-07-17.md` present=`true` sha256=`72d1297e5f6793749645c73fa39ffb6b4f621b4be98e78d83948cc0e5e0e002c`
 - `openai_build_week_requirements`: `grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json` present=`true` sha256=`7e27ffdcdbe0b51ea2feab13034535737f7219fe22cb375a64238f6fb6793529`
-- `missionweave_dsip_package_manifest`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json` present=`true` sha256=`6ca200ccd8b3450700662f2628c61fa882ddd52850f691448882f9d44bb10e0e`
+- `missionweave_dsip_package_manifest`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json` present=`true` sha256=`e5ab4138476246685fd365f16b3be0d00679007765550d96844e2fa794b480c1`
 - `missionweave_dsip_assembly_map`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ASSEMBLY_MAP_2026-07-16.md` present=`true` sha256=`9f5f043d678bdcab74c7b1e4993c75a807da60bdb9a5ba05eeb5eb41487ed9ed`
-- `missionweave_volume2_pdf`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf` present=`true` sha256=`c07401b2552cb754e71785c42d1cef00e13f36212c2f2bf4ad9d1f980475d0c9`
-- `missionweave_dsip_action_gate`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json` present=`true` sha256=`ee796a0d6dc5483111121dea967a4b1af76633497311f1a6aa67e5d98bbe19be`
-- `missionweave_dsip_portal_checklist`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md` present=`true` sha256=`07b9ceaf3be5235e5d0b11c67fb29d9e7285dba3778db898f2b0288f9bf7d5d7`
+- `missionweave_volume2_pdf`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf` present=`true` sha256=`88f92de4a22ff56f49d5c9c8d5bae8d3973db88f37634b648263958e3625eadb`
+- `missionweave_dsip_action_gate`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json` present=`true` sha256=`3daa034128445c1d9d7f17bdf37a81f4aa9f6223d9d8a97fc336c9eb2bcb4e20`
+- `missionweave_dsip_portal_checklist`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md` present=`true` sha256=`40dba8bc102454549caed1ad48b40dcc94a50de2b22f290fa6bb25fe2176af63`
 - `missionweave_dsip_private_capture_tool`: `code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py` present=`true` sha256=`30ae90eadcff7ae97d118f10c6a9767583410514b5e2e9c0c137f1e772ae87dc`
 - `missionweave_dsip_private_volume2_finalizer`: `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py` present=`true` sha256=`11cc2c3ab11882295a7cfd31f8a09ce428d786540c456018fe503d016da0219c`
 - `missionweave_dsip_private_capture_workflow`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md` present=`true` sha256=`b70a8345d7d7021ea146abfc728199086bb3da8b3dfa6c5fb88c82251b38704d`

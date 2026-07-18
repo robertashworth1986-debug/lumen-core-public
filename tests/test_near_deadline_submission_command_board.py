@@ -16,6 +16,12 @@ MIRROR_RECEIPT = (
     / "funding_sprint_20260709"
     / "MISSIONWEAVE_DSIP_ACTION_GATE_E_DRIVE_SYNC_RECEIPT_2026-07-17.json"
 )
+MISSIONWEAVE_ACTION_GATE = (
+    ROOT
+    / "grant_submissions"
+    / "DLA26BZ03_NV011_MissionWeave"
+    / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
+)
 
 
 def load_module():
@@ -283,6 +289,10 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         for row in payload["lanes"]
         if row["opportunity_number"] == "DLA26BZ03-NV011"
     )
+    missionweave_gate = json.loads(
+        MISSIONWEAVE_ACTION_GATE.read_text(encoding="utf-8")
+    )
+    missionweave_gate_summary = missionweave_gate["gate_summary"]
     assert missionweave["command"] == "STAGE_DSIP_PROPOSAL"
     assert missionweave["deadline_date"] == "2026-07-22"
     assert missionweave["deadline_utc"] == "2026-07-22T16:00:00Z"
@@ -297,9 +307,15 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
     )
     assert missionweave["action_gate_submission_ready_for_human_click"] is False
-    assert missionweave["action_gate_required_private_gate_count"] == 50
-    assert missionweave["action_gate_passed_private_gate_count"] == 20
-    assert missionweave["action_gate_open_gate_count"] == 30
+    assert missionweave["action_gate_required_private_gate_count"] == (
+        missionweave_gate_summary["required_private_gate_count"]
+    )
+    assert missionweave["action_gate_passed_private_gate_count"] == (
+        missionweave_gate_summary["passed_private_gate_count"]
+    )
+    assert missionweave["action_gate_open_gate_count"] == (
+        missionweave_gate_summary["open_gate_count"]
+    )
     assert missionweave["action_gate_private_input_present"] is True
     assert missionweave["action_gate_private_values_exposed"] is False
     assert missionweave["action_gate_private_input_sha256_exposed"] is False
@@ -458,7 +474,16 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "OPENAI-BUILD-WEEK-2026" in rendered
     assert "5/10 gates pass" in rendered
     assert "Action gate: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`" in rendered
-    assert "Action gates passed: `20/50`" in rendered
+    missionweave_gate = json.loads(
+        MISSIONWEAVE_ACTION_GATE.read_text(encoding="utf-8")
+    )
+    missionweave_gate_summary = missionweave_gate["gate_summary"]
+    assert (
+        "Action gates passed: "
+        f"`{missionweave_gate_summary['passed_private_gate_count']}/"
+        f"{missionweave_gate_summary['required_private_gate_count']}`"
+        in rendered
+    )
     assert len(payload["command_board_sha256"]) == 64
 
     for source in (

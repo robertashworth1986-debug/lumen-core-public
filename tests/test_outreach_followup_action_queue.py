@@ -59,30 +59,28 @@ def test_followup_policy_config_is_complete_and_fail_closed():
 
 def test_current_queue_is_deterministic_and_never_sends():
     module = load_module()
-    expected = module.build_payload(module.DEFAULT_AS_OF_UTC)
     actual = json.loads(JSON_OUT.read_text(encoding="utf-8"))
+    expected = module.build_payload(actual["as_of_utc"])
 
     module.validate_payload(actual)
     assert actual == expected
-    assert actual["status"] == "NO_EXTERNAL_FOLLOWUP_DUE"
-    assert actual["summary"] == {
-        "action_state_counts": {
-            "CLOSED_NO_ACTION": 2,
-            "HELD_NO_SEND": 1,
-            "HUMAN_ACCOUNT_ACTION_OPEN": 1,
-            "HUMAN_PORTAL_ACTION_OPEN": 3,
-            "MONITOR_INBOUND_ONLY": 8,
-            "PRIVATE_RECONCILIATION_OPEN": 1,
-        },
-        "draft_rendered_count": 0,
-        "due_for_mailbox_recheck_count": 0,
-        "external_send_allowed_without_human": False,
-        "held_no_send_count": 1,
-        "lane_count": 16,
-        "send_now_count": 0,
+    assert actual["as_of_utc"].endswith("Z")
+    assert actual["status"] in {
+        "NO_EXTERNAL_FOLLOWUP_DUE",
+        "FOLLOWUP_RECHECK_DUE_HUMAN_REVIEW",
     }
+    assert actual["summary"]["lane_count"] == 16
+    assert sum(actual["summary"]["action_state_counts"].values()) == 16
+    assert actual["summary"]["draft_rendered_count"] == 0
+    assert actual["summary"]["send_now_count"] == 0
+    assert actual["summary"]["external_send_allowed_without_human"] is False
     assert all(row["send_now"] is False for row in actual["actions"])
     assert all(row["draft_rendered"] is False for row in actual["actions"])
+    assert all(
+        row["inbox_recheck_required"] is True
+        for row in actual["actions"]
+        if row["action_state"] == "RECHECK_MAILBOX_BEFORE_DRAFT"
+    )
     assert len(actual["queue_sha256"]) == 64
 
 

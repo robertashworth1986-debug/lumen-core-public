@@ -13,9 +13,9 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Private target git-ignored: `true`
 - Private values exposed: `false`
 - Required private gates: `50`
-- Passed private gates: `20`
-- Open gates: `30`
-- Gate SHA-256: `2fa51f19cbce93dbd93b16b71793c39d000039f127cf16eea1553d4bfac71f72`
+- Passed private gates: `35`
+- Open gates: `15`
+- Gate SHA-256: `8f42d2d93ee80165c3d82328ff555f53c07c54ffea8862cf4cefa46c25de7ed6`
 
 ## Package Integrity
 
@@ -61,12 +61,12 @@ This public-safe gate reports only package integrity and private-workflow comple
 
 ## Reconciliation Groups
 
-- `A_DOCUMENTARY_RETRIEVAL`: `5` gates (`OPEN`)
-- `B_FOUNDER_FACTUAL_ANSWER`: `9` gates (`OPEN`)
-- `C_LEGAL_CERTIFICATION_DECISION`: `9` gates (`OPEN`)
-- `D_PORTAL_MECHANICS`: `5` gates (`OPEN`)
+- `A_DOCUMENTARY_RETRIEVAL`: `4` gates (`OPEN`)
+- `B_FOUNDER_FACTUAL_ANSWER`: `1` gates (`OPEN`)
+- `C_LEGAL_CERTIFICATION_DECISION`: `6` gates (`OPEN`)
+- `D_PORTAL_MECHANICS`: `2` gates (`OPEN`)
 - `E_TECHNICAL_VOLUME_CONSISTENCY`: `2` gates (`OPEN`)
-- `F_CLEARED_BY_EVIDENCE`: `20` gates (`CLEARED`)
+- `F_CLEARED_BY_EVIDENCE`: `35` gates (`CLEARED`)
 
 ## Open Gates
 
@@ -78,28 +78,13 @@ This public-safe gate reports only package integrity and private-workflow comple
 - `CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW`
 - `CURRENT_CMMC_REQUIREMENTS_REVIEW`
 - `DD2345_OR_JCP_APPLICATION_EVIDENCE`
-- `DSIP_AUTHENTICATION`
-- `DSIP_FIRM_ADMIN`
 - `DSIP_FIRM_LEVEL_FORMS`
 - `DSIP_FIRM_PIN_AVAILABILITY`
-- `FOREIGN_AFFILIATIONS_CURRENT_FACTS`
-- `FOREIGN_CITIZEN_ANSWER`
-- `ITAR_SCOPE_CONFIRMED`
-- `NO_DUPLICATE_COST_OR_DELIVERABLE`
-- `OWNERSHIP_AND_AFFILIATES`
-- `PI_640_HOURS`
-- `PI_PRIMARY_EMPLOYMENT`
 - `PORTAL_PREVIEW_RECEIPT_HASH`
 - `SAM_REPRESENTATIONS_CURRENT`
-- `SBIR_PERCENTAGE_OF_WORK`
-- `SUBMITTER_AUTHORITY`
-- `TECHNICAL_DATA_RIGHTS_ASSERTION`
 - `TECHNOLOGY_CONTROL_PLAN_DECISION`
-- `US_SMALL_BUSINESS_ELIGIBILITY`
 - `VOLUME3_COST_BASIS`
 - `VOLUME5_UPLOAD_SET`
-- `VOLUME6_FWA_TRAINING`
-- `VOLUME7_FOREIGN_AFFILIATIONS_WEBFORM`
 
 ## Private Workflow
 

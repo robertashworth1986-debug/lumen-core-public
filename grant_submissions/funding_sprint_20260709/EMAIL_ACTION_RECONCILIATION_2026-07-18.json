@@ -160,7 +160,7 @@
       "latest_event_utc": "2026-07-17T18:12:03Z",
       "next_action": "Complete and endorse all DSIP volumes, resolve the live legal/entity, CMMC, ITAR, cost, support, and authority gates, review the portal preview, and obtain action-time approval before final submission.",
       "no_send_before": null,
-      "open_gate_count": 30,
+      "open_gate_count": 15,
       "organization": "Defense SBIR/STTR Innovation Portal",
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
@@ -399,10 +399,10 @@
       "sha256": "F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC"
     },
     "missionweave_dsip_action_gate": {
-      "bytes": 12430,
+      "bytes": 11908,
       "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
       "present": true,
-      "sha256": "41E53D1AD1BDA1E20606E112EAF19AFB3FDD2B022785943E1F3E1F4C4D28B55A"
+      "sha256": "3DAA034128445C1D9D7F17BDF37A81F4AA9F6223D9D8A97FC336C9EB2BCB4E20"
     },
     "nashville_official_deadline_confirmation": {
       "bytes": 2272,

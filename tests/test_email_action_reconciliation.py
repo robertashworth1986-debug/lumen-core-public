@@ -11,6 +11,12 @@ JSON_OUT = (
     / "funding_sprint_20260709"
     / "EMAIL_ACTION_RECONCILIATION_2026-07-18.json"
 )
+MISSIONWEAVE_GATE = (
+    ROOT
+    / "grant_submissions"
+    / "DLA26BZ03_NV011_MissionWeave"
+    / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
+)
 
 
 def load_module():
@@ -89,8 +95,11 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert darpa["deadline_time_compliance_claimed"] is False
 
     missionweave = lanes["missionweave_dsip_proposal"]
+    missionweave_gate = json.loads(MISSIONWEAVE_GATE.read_text(encoding="utf-8"))
     assert missionweave["deadline_utc"] == "2026-07-22T16:00:00Z"
-    assert missionweave["open_gate_count"] == 30
+    assert missionweave["open_gate_count"] == missionweave_gate["gate_summary"][
+        "open_gate_count"
+    ]
 
     build_week = lanes["openai_build_week_prooflock"]
     assert build_week["deadline_utc"] == "2026-07-22T00:00:00Z"
