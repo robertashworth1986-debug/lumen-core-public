@@ -1,30 +1,39 @@
 # Dashboard Architecture
 
-Updated: June 12, 2026
+Updated: July 18, 2026
 
-## Canonical Surfaces
+## Canonical Public Surfaces
 
-The public product has a plain-English home plus six primary operator surfaces:
+The public product now separates the indexable company and evidence experience from
+operator-only control surfaces.
 
-| Surface | Route | Responsibility |
-| --- | --- | --- |
-| Operator Home | `/` or `/operator_home.html` | Product map, proof boundaries, commercialization, and live readiness |
-| Mission Control | `/mission_control.html` | System health, evidence, approvals, and operating posture |
-| Quant Lab | `/quant_lab.html` | Unified research cockpit and navigation host |
-| Kraken Execution | `/kraken_execution_dashboard.html` | Paper execution, order evidence, positions, and market awareness |
-| Grants | `/grants.html` | Opportunity qualification, application readiness, and submission workflow |
-| Forecast | `/forecast.html` | Forecast scenarios and model comparison |
-| Explainer | `/explain.html` | Per-series router rationale and evidence interpretation |
+| Surface | Route | Responsibility | Search policy |
+| --- | --- | --- | --- |
+| Public Home | `/` or `/operator_home.html` | Plain-English product, commercial offer, proof boundaries, sectors, and contact path | Index |
+| Proof-to-Pilot | `/proof_to_pilot.html` | Public capsule, verifier, source summary, claim boundary, and external-validation gate | Index |
+| Bounded Validation Sprint | `/review_sprint.html` | Commercial fit criteria, phases, deliverables, stop conditions, and inquiry path | Index |
+| Mission Control | `/mission_control.html` | System health, evidence, approvals, and operating posture | Noindex |
+| Quant Lab | `/quant_lab.html` | Unified research cockpit and navigation host | Noindex |
+| Kraken Execution | `/kraken_execution_dashboard.html` | Paper execution, order evidence, positions, and market awareness | Noindex |
+| Grants | `/grants.html` | Opportunity qualification, application readiness, and submission workflow | Noindex |
+| Forecast | `/forecast.html` | Forecast scenarios and model comparison | Noindex |
+| Explainer | `/explain.html` | Per-series router rationale and evidence interpretation | Noindex |
 
-These surfaces share `assets/luma_command_fabric.css` and
-`assets/luma_command_fabric.js`. The command fabric provides canonical
-navigation, Ctrl+K routing, public API health, artifact freshness, and truthful
-execution mode.
+The public pages share `assets/public_site.css`, `assets/public_site.js`,
+`assets/luma_command_fabric.css`, and `assets/luma_command_fabric.js`.
+The command fabric provides canonical navigation, Ctrl+K routing, public API
+health, artifact freshness, and truthful execution mode. Public pages remain
+useful when the runtime gateway is unavailable.
+
+`robots.txt` and `sitemap.xml` expose only the public company, proof, and
+commercial-review paths. `code/ops/ensure_dashboard_command_fabric.py` injects
+`noindex,nofollow,noarchive` into canonical operator-only pages when they do not
+already declare a robots policy.
 
 The canonical HTML files are explicit Git exceptions even though other
 generated dashboard HTML remains ignored. Deployment runs
 `code/ops/ensure_dashboard_command_fabric.py` before publishing so regenerated
-pages cannot silently lose the shared layer.
+pages cannot silently lose the shared layer or indexing boundary.
 
 ## Truth Rules
 
@@ -36,7 +45,13 @@ pages cannot silently lose the shared layer.
 - Unreachable health data is labeled `OFFLINE`.
 - Paper equity and paper PnL must not be described as realized profit.
 - Dashboard claims must identify whether they are measured, modeled, simulated,
-  or credential-only.
+  credential-only, independently validated, or still open.
+- Public artifact integrity is never presented as proof of scientific truth,
+  safety, patentability, commercial performance, or release authority.
+- External validation is claimed only after an independent or buyer-controlled
+  reviewer performs and documents the agreed test.
+- Commercial review timing, fees, handling requirements, deliverables, and
+  acceptance criteria are controlled by a written scope.
 
 ## Supporting Surfaces
 
@@ -47,10 +62,11 @@ top-level product.
 
 ## Generated Pages
 
-Generated dashboards must retain the shared command-fabric references. Builders
-that overwrite a canonical page are responsible for emitting those references.
-The deployment copies the dashboard directory to the public web root, so a
-generated page that omits the shared layer can create visual and truth drift.
+Generated dashboards must retain the shared command-fabric references.
+Builders that overwrite a canonical page are responsible for emitting those
+references. The deployment copies the dashboard directory to the public web
+root, so a generated page that omits the shared layer can create visual, truth,
+or indexing drift.
 
 ## Storage
 
