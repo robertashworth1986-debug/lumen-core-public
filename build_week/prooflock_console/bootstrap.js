@@ -1,4 +1,4 @@
-import * as THREE from "../../dashboard/assets/vendor/three.module.min.js";
+import * as THREE from "./three.module.min.js";
 
 globalThis.THREE = THREE;
 await import("./prooflock_core.js");

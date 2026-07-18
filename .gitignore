@@ -65,6 +65,7 @@ profit_lock_peaks.json
 logs/
 *.log
 *.txt
+!build_week/prooflock_console/THREE_LICENSE.txt
 
 # VS Code
 .vscode/

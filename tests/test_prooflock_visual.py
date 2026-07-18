@@ -221,6 +221,33 @@ def test_console_has_no_remote_runtime_dependency():
         assert not remote_pattern.search(path.read_text(encoding="utf-8")), path
 
 
+def test_deployable_module_graph_is_self_contained():
+    import_pattern = re.compile(r"(?:from\s+|import\s*\()\s*[\"']([^\"']+)[\"']")
+    pending = [APP_DIR / "bootstrap.js"]
+    visited: set[Path] = set()
+
+    while pending:
+        source = pending.pop()
+        assert source.is_file(), source
+        if source in visited:
+            continue
+        visited.add(source)
+
+        for specifier in import_pattern.findall(source.read_text(encoding="utf-8")):
+            assert specifier.startswith("./"), (source, specifier)
+            dependency = (source.parent / specifier).resolve()
+            assert dependency.is_relative_to(APP_DIR.resolve()), (source, specifier)
+            assert dependency.is_file(), (source, specifier)
+            if dependency.suffix == ".js":
+                pending.append(dependency)
+
+    assert APP_DIR / "three.module.min.js" in visited
+    assert (APP_DIR / "THREE_LICENSE.txt").is_file()
+    assert (APP_DIR / "three.module.min.js").read_bytes() == (
+        ROOT / "dashboard" / "assets" / "vendor" / "three.module.min.js"
+    ).read_bytes()
+
+
 def test_accessibility_and_mobile_contract_is_present():
     html = (APP_DIR / "index.html").read_text(encoding="utf-8")
     styles = (APP_DIR / "styles.css").read_text(encoding="utf-8")
