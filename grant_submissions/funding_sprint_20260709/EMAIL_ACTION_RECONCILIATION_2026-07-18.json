@@ -81,12 +81,12 @@
       "do_not_duplicate_send": true,
       "email_reply_required": false,
       "follow_up_policy": {
-        "eligible_template_id": "SUBMISSION_RECEIPT_FOLLOWUP",
+        "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
         "lane_id": "lanl_vision_licensing_followup",
         "max_proactive_sends": 1,
         "mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
         "not_before_utc": "2026-07-23T14:00:00Z",
-        "rationale": "One bounded receipt-status follow-up may be drafted after the hold only if a fresh mailbox check confirms no reply."
+        "rationale": "One bounded review follow-up may be drafted after the hold only if a fresh mailbox check confirms no reply."
       },
       "lane_id": "lanl_vision_licensing_followup",
       "latest_event_type": "OUTBOUND_PACKAGE_SENT",
@@ -429,16 +429,16 @@
       "sha256": "DAE0EF8377E3EFD60942CE9A61859C4E42CC2404917A06704A6B15B18F280E2A"
     },
     "outreach_followup_policy_config": {
-      "bytes": 5462,
+      "bytes": 5450,
       "path": "config/outreach_followup_policies_v1.json",
       "present": true,
-      "sha256": "14354DEFFE330DF7480780ADF20F6D6EF9F1372D8BA06E8E5853CCDFB6F95FC5"
+      "sha256": "AE7F5FD61516F9448CEBE3CA478341F8F6A8089B409F4E59D4075FEC1A334CF4"
     },
     "outreach_response_template_registry": {
-      "bytes": 14575,
+      "bytes": 16241,
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
       "present": true,
-      "sha256": "C4FFC56FAE583804D9A35027CAEF0DF2C9C7B33FBCB4A65FAC0AF1AF414B63F4"
+      "sha256": "A8E4594E4FBC0ADB9E6712AF7C1B24CBB240E72AE74D5E1F6B2DA6BEB0AA694D"
     }
   },
   "status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",

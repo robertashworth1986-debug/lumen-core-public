@@ -53,7 +53,7 @@ def test_followup_policy_config_is_complete_and_fail_closed():
     assert len(proactive) == 1
     assert proactive[0]["lane_id"] == "lanl_vision_licensing_followup"
     assert proactive[0]["max_proactive_sends"] == 1
-    assert proactive[0]["eligible_template_id"] == "SUBMISSION_RECEIPT_FOLLOWUP"
+    assert proactive[0]["eligible_template_id"] == "BOUNDED_REVIEW_FOLLOWUP"
     assert proactive[0]["not_before_utc"] == "2026-07-23T14:00:00Z"
 
 
@@ -101,12 +101,82 @@ def test_lanl_hold_expiration_requires_recheck_and_still_does_not_authorize_send
     assert before_lanl["send_now"] is False
     assert due_lanl["action_state"] == "RECHECK_MAILBOX_BEFORE_DRAFT"
     assert due_lanl["inbox_recheck_required"] is True
-    assert due_lanl["eligible_template_id"] == "SUBMISSION_RECEIPT_FOLLOWUP"
+    assert due_lanl["eligible_template_id"] == "BOUNDED_REVIEW_FOLLOWUP"
     assert due_lanl["draft_rendered"] is False
     assert due_lanl["send_now"] is False
     assert at_gate["status"] == "FOLLOWUP_RECHECK_DUE_HUMAN_REVIEW"
     assert at_gate["summary"]["due_for_mailbox_recheck_count"] == 1
     assert at_gate["summary"]["send_now_count"] == 0
+
+
+def test_lanl_followup_render_requires_every_gate_and_never_sends():
+    module = load_module()
+    facts = {
+        "recipient_name": "Reviewer",
+        "recipient_email": "reviewer@example.org",
+        "source_message_id": "synthetic-message-id",
+        "source_subject": "Bounded technical package",
+        "sent_date_local": "July 16, 2026",
+        "package_name": "a bounded technical package",
+        "review_scope": "a short Stage 0 diligence and evaluation-fit discussion",
+        "requested_next_step": "a 20-minute technical fit check",
+        "sender_name": "Founder",
+        "sender_title": "Founder / Systems Architect",
+        "organization_name": "LumenCore",
+    }
+
+    with pytest.raises(ValueError, match="not due"):
+        module.render_due_followup(
+            "lanl_vision_licensing_followup",
+            facts,
+            as_of_utc="2026-07-23T13:59:59Z",
+            mailbox_rechecked=True,
+            no_reply_confirmed=True,
+            prior_followup_count=0,
+        )
+
+    for mailbox_rechecked, no_reply_confirmed in ((False, True), (True, False)):
+        with pytest.raises(ValueError, match="Fresh mailbox recheck"):
+            module.render_due_followup(
+                "lanl_vision_licensing_followup",
+                facts,
+                as_of_utc="2026-07-23T14:00:00Z",
+                mailbox_rechecked=mailbox_rechecked,
+                no_reply_confirmed=no_reply_confirmed,
+                prior_followup_count=0,
+            )
+
+    with pytest.raises(ValueError, match="Maximum proactive follow-up"):
+        module.render_due_followup(
+            "lanl_vision_licensing_followup",
+            facts,
+            as_of_utc="2026-07-23T14:00:00Z",
+            mailbox_rechecked=True,
+            no_reply_confirmed=True,
+            prior_followup_count=1,
+        )
+
+    rendered = module.render_due_followup(
+        "lanl_vision_licensing_followup",
+        facts,
+        as_of_utc="2026-07-23T14:00:00Z",
+        mailbox_rechecked=True,
+        no_reply_confirmed=True,
+        prior_followup_count=0,
+    )
+    assert rendered["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
+    assert rendered["template_id"] == "BOUNDED_REVIEW_FOLLOWUP"
+    assert rendered["queue_action_state"] == "RECHECK_MAILBOX_BEFORE_DRAFT"
+    assert rendered["attachment_policy"] == "NONE"
+    assert rendered["send_allowed_by_builder"] is False
+    assert rendered["send_performed"] is False
+    assert rendered["mailbox_rechecked"] is True
+    assert rendered["no_reply_confirmed"] is True
+    assert "following up once" in rendered["body"]
+    assert "does not assert receipt, endorsement, independent validation" in (
+        rendered["body"]
+    )
+    assert "will not send another follow-up" in rendered["body"]
 
 
 def test_modes_route_closed_inbound_portal_private_and_account_work_separately():

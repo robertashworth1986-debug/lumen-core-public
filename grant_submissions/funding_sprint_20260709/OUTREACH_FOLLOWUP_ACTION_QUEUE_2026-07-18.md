@@ -8,7 +8,7 @@
 - Drafts rendered: `0`
 - Send now: `0`
 - Autonomous external send allowed: `false`
-- Queue SHA-256: `FA49BECCE0356A53B52839C05D8DAC2751F96313F239BBA080A97FD53D8BB8B3`
+- Queue SHA-256: `46DD7B8E523F673A4DC37A155A0EA99C3C4016528AC0DDA62990168C34F7BA9F`
 
 ## Action Queue
 
@@ -17,7 +17,7 @@
 | Nashville Entrepreneur Center | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
 | EPRI Open Power AI Consortium | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
 | Georgia PATENTS | `CLOSED` | `CLOSED_NO_ACTION` | `none` | `none` |
-| Los Alamos National Laboratory | `ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD` | `HELD_NO_SEND` | `2026-07-23T14:00:00Z` | `SUBMISSION_RECEIPT_FOLLOWUP` |
+| Los Alamos National Laboratory | `ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD` | `HELD_NO_SEND` | `2026-07-23T14:00:00Z` | `BOUNDED_REVIEW_FOLLOWUP` |
 | Centers for Disease Control and Prevention | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
 | DARPA Multi X Office | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
 | Defense SBIR/STTR Innovation Portal | `PORTAL_ACTION` | `HUMAN_PORTAL_ACTION_OPEN` | `none` | `none` |

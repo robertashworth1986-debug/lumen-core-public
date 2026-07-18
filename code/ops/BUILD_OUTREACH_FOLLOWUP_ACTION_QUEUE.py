@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 from collections import Counter
 from datetime import datetime, timezone
@@ -18,6 +19,9 @@ EMAIL_RECONCILIATION = (
 )
 RESPONSE_TEMPLATE_REGISTRY = (
     SPRINT_DIR / "OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
+)
+RESPONSE_REGISTRY_BUILDER = (
+    ROOT / "code" / "ops" / "BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py"
 )
 FOLLOWUP_POLICY_CONFIG = ROOT / "config" / "outreach_followup_policies_v1.json"
 
@@ -175,6 +179,65 @@ def evaluate_lane(lane: dict[str, Any], as_of: datetime) -> dict[str, Any]:
     return row
 
 
+def load_response_registry_module():
+    spec = importlib.util.spec_from_file_location(
+        "outreach_response_template_registry", RESPONSE_REGISTRY_BUILDER
+    )
+    if spec is None or spec.loader is None:
+        raise ValueError("Response registry builder cannot be loaded")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def render_due_followup(
+    lane_id: str,
+    facts: dict[str, Any],
+    *,
+    as_of_utc: str,
+    mailbox_rechecked: bool,
+    no_reply_confirmed: bool,
+    prior_followup_count: int,
+) -> dict[str, Any]:
+    queue = build_payload(as_of_utc)
+    action = next(
+        (row for row in queue["actions"] if row["lane_id"] == lane_id), None
+    )
+    if action is None:
+        raise ValueError(f"Unknown follow-up lane: {lane_id}")
+    if action["action_state"] != "RECHECK_MAILBOX_BEFORE_DRAFT":
+        raise ValueError("Follow-up is not due for mailbox recheck")
+    if not mailbox_rechecked or not no_reply_confirmed:
+        raise ValueError("Fresh mailbox recheck and no-reply confirmation are required")
+    if prior_followup_count < 0:
+        raise ValueError("Prior follow-up count cannot be negative")
+    if prior_followup_count >= int(action["max_proactive_sends"]):
+        raise ValueError("Maximum proactive follow-up count has been reached")
+    template_id = action.get("eligible_template_id")
+    if not template_id:
+        raise ValueError("No eligible follow-up template is configured")
+
+    registry_module = load_response_registry_module()
+    rendered = registry_module.render_response(
+        template_id,
+        facts,
+        already_sent=False,
+        inbound_requires_response=True,
+        explicit_attachment_request=False,
+        current_utc=as_of_utc,
+    )
+    if not str(rendered.get("status", "")).startswith("READY_FOR_"):
+        raise ValueError(f"Follow-up render blocked: {rendered.get('status')}")
+    if rendered.get("send_allowed_by_builder") is not False:
+        raise ValueError("Follow-up renderer exposed send authority")
+    rendered["queue_action_state"] = action["action_state"]
+    rendered["mailbox_rechecked"] = True
+    rendered["no_reply_confirmed"] = True
+    rendered["prior_followup_count"] = prior_followup_count
+    rendered["max_proactive_sends"] = action["max_proactive_sends"]
+    return rendered
+
+
 def build_payload(as_of_utc: str = DEFAULT_AS_OF_UTC) -> dict[str, Any]:
     as_of = parse_aware_utc(as_of_utc)
     reconciliation = read_json(EMAIL_RECONCILIATION)
@@ -213,6 +276,7 @@ def build_payload(as_of_utc: str = DEFAULT_AS_OF_UTC) -> dict[str, Any]:
         "source_evidence": {
             "email_reconciliation": source_status(EMAIL_RECONCILIATION),
             "response_template_registry": source_status(RESPONSE_TEMPLATE_REGISTRY),
+            "response_registry_builder": source_status(RESPONSE_REGISTRY_BUILDER),
             "followup_policy_config": source_status(FOLLOWUP_POLICY_CONFIG),
         },
         "claim_boundary": (

@@ -129,11 +129,11 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert lanl["follow_up_policy"] == {
         "lane_id": "lanl_vision_licensing_followup",
         "mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-        "eligible_template_id": "SUBMISSION_RECEIPT_FOLLOWUP",
+        "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
         "not_before_utc": "2026-07-23T14:00:00Z",
         "max_proactive_sends": 1,
         "rationale": (
-            "One bounded receipt-status follow-up may be drafted after the hold only "
+            "One bounded review follow-up may be drafted after the hold only "
             "if a fresh mailbox check confirms no reply."
         ),
     }

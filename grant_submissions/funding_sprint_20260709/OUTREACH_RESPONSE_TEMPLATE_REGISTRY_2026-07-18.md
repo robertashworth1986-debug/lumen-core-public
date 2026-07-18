@@ -1,7 +1,7 @@
 # Outreach Response Template Registry - 2026-07-18
 
-- Templates: `9`
-- Private-render templates: `5`
+- Templates: `10`
+- Private-render templates: `6`
 - Builder can send email: `false`
 - Duplicate-send gate: `FAIL_CLOSED`
 - Missing-fact gate: `FAIL_CLOSED`
@@ -31,6 +31,7 @@ This response is a communication or routing artifact. It does not establish sele
 | `PORTAL_SUPPORT_DEADLINE_RESCUE` | `HUMAN_ACTION_DUE` | `EXPLICIT_REQUEST_ONLY` | `true` |
 | `REQUESTED_INFORMATION_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `true` |
 | `SUBMISSION_RECEIPT_FOLLOWUP` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `true` |
+| `BOUNDED_REVIEW_FOLLOWUP` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
 | `VALIDATION_PILOT_REQUEST` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `false` |
 | `DECLINE_CLOSEOUT` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `false` |
 | `MOU_ONBOARDING_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `true` |
@@ -137,6 +138,31 @@ On {submitted_at_local}, I sent {submission_name} under {notice_or_topic}. The t
 Could you confirm receipt and whether anything is missing or unreadable? This is a receipt check only, not a duplicate submission.
 
 Thank you,
+{sender_name}
+{sender_title}
+{organization_name}
+```
+
+## BOUNDED_REVIEW_FOLLOWUP
+
+Send one claim-bounded follow-up after a reviewed package and a defined hold, asking whether a short diligence or evaluation-fit discussion is useful.
+
+- Inbound states: `PACKAGE_SENT_RESPONSE_PENDING`
+- Reply triggers: `HOLD_EXPIRED_NO_REPLY_AFTER_RECHECK`
+- Required fields: `recipient_name, source_subject, sent_date_local, package_name, review_scope, requested_next_step, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+
+```text
+Subject: Re: {source_subject}
+
+Hello {recipient_name},
+
+I am following up once on {package_name}, sent {sent_date_local}. Would {requested_next_step} be useful to decide whether a bounded review is warranted?
+
+Proposed scope: {review_scope}
+
+This note does not assert receipt, endorsement, independent validation, licensing, funding, deployment, or production readiness. No additional attachment is included. If this is not a fit, no response is required and I will not send another follow-up.
+
+Best regards,
 {sender_name}
 {sender_title}
 {organization_name}

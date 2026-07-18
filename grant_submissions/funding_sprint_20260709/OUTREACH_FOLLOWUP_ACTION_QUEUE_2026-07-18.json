@@ -56,7 +56,7 @@
       "action_time_human_review_required": true,
       "current_response_template_id": "NO_DUPLICATE_MONITOR",
       "draft_rendered": false,
-      "eligible_template_id": "SUBMISSION_RECEIPT_FOLLOWUP",
+      "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
       "hold_seconds_remaining": 437976,
       "inbox_recheck_required": false,
@@ -65,7 +65,7 @@
       "next_action": "Wait for LANL; use the single bounded follow-up only on or after July 23 if no reply arrives.",
       "not_before_utc": "2026-07-23T14:00:00Z",
       "organization": "Los Alamos National Laboratory",
-      "rationale": "One bounded receipt-status follow-up may be drafted after the hold only if a fresh mailbox check confirms no reply.",
+      "rationale": "One bounded review follow-up may be drafted after the hold only if a fresh mailbox check confirms no reply.",
       "send_now": false,
       "source_state": "PACKAGE_SENT_RESPONSE_PENDING"
     },
@@ -283,23 +283,28 @@
     "inbox_recheck_required_before_draft": true,
     "past_hold_authorizes_send": false
   },
-  "queue_sha256": "FA49BECCE0356A53B52839C05D8DAC2751F96313F239BBA080A97FD53D8BB8B3",
+  "queue_sha256": "46DD7B8E523F673A4DC37A155A0EA99C3C4016528AC0DDA62990168C34F7BA9F",
   "schema": "lumencore.outreach_followup_action_queue.v1",
   "source_evidence": {
     "email_reconciliation": {
-      "bytes": 22025,
+      "bytes": 22013,
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
-      "sha256": "2C3CE20CBD6681EB2198F61E546F12B03EFCA645C5D8BA85EAD610CFD814FD54"
+      "sha256": "03A37247ADC69552E7B02E39E0A96A716B29E422D3AC2B62B133B11D920B06F1"
     },
     "followup_policy_config": {
-      "bytes": 5462,
+      "bytes": 5450,
       "path": "config/outreach_followup_policies_v1.json",
-      "sha256": "14354DEFFE330DF7480780ADF20F6D6EF9F1372D8BA06E8E5853CCDFB6F95FC5"
+      "sha256": "AE7F5FD61516F9448CEBE3CA478341F8F6A8089B409F4E59D4075FEC1A334CF4"
+    },
+    "response_registry_builder": {
+      "bytes": 19040,
+      "path": "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py",
+      "sha256": "B49F5A5EE37006E356E2C8F8EAA661BFE8F7B1A23AA176640568798C49CD2553"
     },
     "response_template_registry": {
-      "bytes": 14575,
+      "bytes": 16241,
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
-      "sha256": "C4FFC56FAE583804D9A35027CAEF0DF2C9C7B33FBCB4A65FAC0AF1AF414B63F4"
+      "sha256": "A8E4594E4FBC0ADB9E6712AF7C1B24CBB240E72AE74D5E1F6B2DA6BEB0AA694D"
     }
   },
   "status": "NO_EXTERNAL_FOLLOWUP_DUE",

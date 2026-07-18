@@ -183,6 +183,43 @@
       "body": "Hello {recipient_name},\n\nOn {submitted_at_local}, I sent {submission_name} under {notice_or_topic}. The transmitted files were: {artifact_names}.\n\nCould you confirm receipt and whether anything is missing or unreadable? This is a receipt check only, not a duplicate submission.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
     },
     {
+      "template_id": "BOUNDED_REVIEW_FOLLOWUP",
+      "description": "Send one claim-bounded follow-up after a reviewed package and a defined hold, asking whether a short diligence or evaluation-fit discussion is useful.",
+      "inbound_states": [
+        "PACKAGE_SENT_RESPONSE_PENDING"
+      ],
+      "reply_triggers": [
+        "HOLD_EXPIRED_NO_REPLY_AFTER_RECHECK"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "attachment_policy": "NONE",
+      "private_render_only": true,
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "sent_date_local",
+        "package_name",
+        "review_scope",
+        "requested_next_step",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id",
+        "package_name",
+        "review_scope"
+      ],
+      "optional_defaults": {},
+      "subject": "Re: {source_subject}",
+      "body": "Hello {recipient_name},\n\nI am following up once on {package_name}, sent {sent_date_local}. Would {requested_next_step} be useful to decide whether a bounded review is warranted?\n\nProposed scope: {review_scope}\n\nThis note does not assert receipt, endorsement, independent validation, licensing, funding, deployment, or production readiness. No additional attachment is included. If this is not a fit, no response is required and I will not send another follow-up.\n\nBest regards,\n{sender_name}\n{sender_title}\n{organization_name}"
+    },
+    {
       "template_id": "VALIDATION_PILOT_REQUEST",
       "description": "Invite a qualified reviewer to define a bounded, independently reproducible evaluation rather than endorse a broad platform claim.",
       "inbound_states": [

@@ -44,13 +44,14 @@ def test_registry_validates_and_covers_high_value_response_states():
     ids = {row["template_id"] for row in registry["templates"]}
 
     assert registry["schema"] == module.SCHEMA
-    assert len(ids) == 9
+    assert len(ids) == 10
     assert {
         "NO_DUPLICATE_MONITOR",
         "DEADLINE_CLARIFICATION",
         "PORTAL_SUPPORT_DEADLINE_RESCUE",
         "REQUESTED_INFORMATION_REPLY",
         "SUBMISSION_RECEIPT_FOLLOWUP",
+        "BOUNDED_REVIEW_FOLLOWUP",
         "VALIDATION_PILOT_REQUEST",
         "DECLINE_CLOSEOUT",
         "MOU_ONBOARDING_REPLY",
@@ -173,6 +174,27 @@ def test_mou_and_validation_templates_preserve_private_and_claim_boundaries():
     assert "retain negative results" in rendered_validation["body"]
     assert rendered_validation["send_performed"] is False
 
+    followup = common_facts()
+    followup.update(
+        {
+            "sent_date_local": "July 16, 2026",
+            "package_name": "a bounded technical package",
+            "review_scope": "a short Stage 0 diligence and evaluation-fit discussion",
+            "requested_next_step": "a 20-minute technical fit check",
+        }
+    )
+    rendered_followup = module.render_response("BOUNDED_REVIEW_FOLLOWUP", followup)
+    assert rendered_followup["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
+    assert rendered_followup["private_render"] is True
+    assert rendered_followup["attachment_policy"] == "NONE"
+    assert "following up once" in rendered_followup["body"]
+    assert "does not assert receipt, endorsement, independent validation" in (
+        rendered_followup["body"]
+    )
+    assert "no response is required" in rendered_followup["body"]
+    assert "will not send another follow-up" in rendered_followup["body"]
+    assert rendered_followup["send_allowed_by_builder"] is False
+
 
 def test_written_public_registry_is_current_and_contains_no_contact_values():
     module = load_module()
@@ -181,7 +203,7 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     combined = OUT_JSON.read_text(encoding="utf-8") + markdown
 
     assert payload["schema"] == module.PUBLIC_SCHEMA
-    assert payload["template_count"] == 9
+    assert payload["template_count"] == 10
     assert payload["controls"]["builder_can_send_email"] is False
     assert payload["controls"]["duplicate_send_fail_closed"] is True
     assert "Duplicate-send gate: `FAIL_CLOSED`" in markdown
@@ -202,7 +224,7 @@ def test_source_config_hash_and_builder_payload_agree():
 
     assert payload["source_config_sha256"] == module.sha256_bytes(CONFIG.read_bytes())
     assert payload["send_policy_counts"] == {
-        "HUMAN_ACTION_DUE": 3,
+        "HUMAN_ACTION_DUE": 4,
         "MONITOR_NO_SEND": 1,
         "REPLY_AFTER_FACT_REVIEW": 5,
     }
