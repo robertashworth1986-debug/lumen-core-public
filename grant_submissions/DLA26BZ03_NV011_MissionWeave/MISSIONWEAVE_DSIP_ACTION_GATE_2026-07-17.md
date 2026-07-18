@@ -15,7 +15,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Required private gates: `50`
 - Passed private gates: `20`
 - Open gates: `30`
-- Gate SHA-256: `eb91ccc4c23f82f41cbc1800430043944840b98ee23a77d8172c9ce2b3fbe9a9`
+- Gate SHA-256: `a25b2ecc9c8c9cd256f1a2acfc35878b8c8963bcae1c19ee3ce9bbc41c82d21b`
 
 ## Package Integrity
 
