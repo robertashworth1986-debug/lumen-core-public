@@ -6,6 +6,7 @@ import re
 import subprocess
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urlsplit
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,6 +15,7 @@ SAMPLE = APP_DIR / "sample_receipt.json"
 CORE = APP_DIR / "prooflock_core.js"
 LATTICE = APP_DIR / "prooflock_lattice.js"
 PYTHON_VERIFIER = APP_DIR / "verify_receipt.py"
+RELEASE_VERSION = "20260718.1"
 
 
 def run_node(source: str) -> str:
@@ -235,7 +237,10 @@ def test_deployable_module_graph_is_self_contained():
 
         for specifier in import_pattern.findall(source.read_text(encoding="utf-8")):
             assert specifier.startswith("./"), (source, specifier)
-            dependency = (source.parent / specifier).resolve()
+            parsed = urlsplit(specifier)
+            assert not parsed.scheme and not parsed.netloc and not parsed.fragment, (source, specifier)
+            assert parsed.query == f"v={RELEASE_VERSION}", (source, specifier)
+            dependency = (source.parent / parsed.path).resolve()
             assert dependency.is_relative_to(APP_DIR.resolve()), (source, specifier)
             assert dependency.is_file(), (source, specifier)
             if dependency.suffix == ".js":
@@ -244,9 +249,13 @@ def test_deployable_module_graph_is_self_contained():
     assert APP_DIR / "three.module.min.js" in visited
     assert APP_DIR / "three.core.min.js" in visited
     assert (APP_DIR / "THREE_LICENSE.txt").is_file()
-    assert (APP_DIR / "three.module.min.js").read_bytes() == (
-        ROOT / "dashboard" / "assets" / "vendor" / "three.module.min.js"
-    ).read_bytes()
+    canonical_three_module = (ROOT / "dashboard" / "assets" / "vendor" / "three.module.min.js").read_bytes()
+    expected_three_module = canonical_three_module.replace(
+        b'./three.core.min.js',
+        f'./three.core.min.js?v={RELEASE_VERSION}'.encode("ascii"),
+    )
+    assert expected_three_module != canonical_three_module
+    assert (APP_DIR / "three.module.min.js").read_bytes() == expected_three_module
     assert (APP_DIR / "three.core.min.js").read_bytes() == (
         ROOT / "dashboard" / "assets" / "vendor" / "three.core.min.js"
     ).read_bytes()
@@ -258,7 +267,7 @@ def test_accessibility_and_mobile_contract_is_present():
     lattice_styles = (APP_DIR / "prooflock_lattice.css").read_text(encoding="utf-8")
     assert 'aria-live="polite"' in html
     assert 'aria-hidden="true"' in html
-    assert 'src="bootstrap.js" type="module"' in html
+    assert f'src="bootstrap.js?v={RELEASE_VERSION}" type="module"' in html
     assert ":focus-visible" in styles
     assert "overflow-x: clip" in styles
     assert "@media (max-width: 420px)" in lattice_styles
@@ -293,4 +302,6 @@ def test_html_script_style_and_image_paths_resolve_from_http_server_root():
     assert parser.paths
     for relative in parser.paths:
         assert not relative.startswith(("http://", "https://", "//"))
-        assert (APP_DIR / relative).resolve().is_file(), relative
+        parsed = urlsplit(relative)
+        assert not parsed.scheme and not parsed.netloc and not parsed.fragment, relative
+        assert (APP_DIR / parsed.path).resolve().is_file(), relative
