@@ -11,6 +11,14 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 
 ## Active outcomes
 
+### Time-boxed release: OpenAI Build Week / ProofLock Console
+
+**State:** A focused Developer Tools release is being prepared on `build-week/prooflock-judge-ready` for the July 21, 2026 at 7:00 PM Central deadline.
+
+**Boundary:** This is a release of the existing proof-to-pilot product, not a new company, research lane, or replacement operating system. It may contain only the ProofLock console, its declared V2/V3 public demonstration artifacts, tests, provenance, and one readiness record. MissionWeave proposal files, outreach packets, trading systems, and unrelated generated outputs remain outside the branch.
+
+**Release rule:** The console may prove receipt integrity, repository custody, declared lineage, and fail-closed authority logic. It may not claim CAD completeness, prototype status, performance, safety, certification, patentability, manufacturability, field validation, commercial readiness, or model provenance without direct evidence.
+
 ### 1. EPRI / Open Power AI Consortium onboarding
 
 **State:** Onboarding information requested; MOU not yet issued or executed.

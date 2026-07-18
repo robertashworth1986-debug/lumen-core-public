@@ -1,1 +1,13 @@
 *.sh text eol=lf
+
+# ProofLock is a static cross-platform demo. Keep source and fixture line endings deterministic.
+build_week/prooflock_console/*.css text eol=lf
+build_week/prooflock_console/*.html text eol=lf
+build_week/prooflock_console/*.js text eol=lf
+build_week/prooflock_console/*.json text eol=lf
+build_week/prooflock_console/*.md text eol=lf
+build_week/prooflock_console/*.py text eol=lf
+
+# ProofLock hashes these evidence artifacts byte-for-byte. Keep checkout bytes stable.
+assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.json -text
+assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.json -text

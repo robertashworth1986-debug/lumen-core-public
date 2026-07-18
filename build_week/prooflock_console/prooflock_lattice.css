@@ -1,0 +1,95 @@
+.lattice-band {
+  position: relative;
+  min-height: 390px;
+  margin: 18px calc(-1 * clamp(16px, 3vw, 36px)) 0;
+  overflow: hidden;
+  isolation: isolate;
+  color: #effcff;
+  background: #07131b;
+  border-top: 1px solid #21424b;
+  border-bottom: 1px solid #21424b;
+}
+
+#evidenceLattice {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.lattice-copy {
+  position: relative;
+  z-index: 1;
+  width: min(360px, calc(100% - 32px));
+  padding: 28px clamp(16px, 3vw, 36px);
+  pointer-events: none;
+}
+
+.lattice-kicker {
+  margin: 0 0 7px;
+  color: #73dce4;
+  font: 700 11px/1.3 ui-monospace, SFMono-Regular, Consolas, monospace;
+  text-transform: uppercase;
+}
+
+.lattice-copy h2 {
+  margin: 0 0 9px;
+  color: #ffffff;
+  font-size: 25px;
+}
+
+.lattice-copy p:last-child {
+  margin: 0;
+  color: #b8cdd3;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.lattice-boundary {
+  position: absolute;
+  z-index: 1;
+  right: clamp(16px, 3vw, 36px);
+  bottom: 18px;
+  width: min(520px, calc(100% - 32px));
+  margin: 0;
+  padding-left: 14px;
+  color: #c5d7da;
+  border-left: 3px solid #f3b84b;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: right;
+  pointer-events: none;
+}
+
+button.guided {
+  color: #07353b;
+  border-color: #4acbd3;
+  background: #a8edf0;
+}
+
+button.guided:hover:not(:disabled) {
+  color: #041f23;
+  border-color: #2db2bc;
+  background: #c7f6f8;
+}
+
+@media (max-width: 700px) {
+  .lattice-band { min-height: 430px; }
+  .lattice-copy { width: 100%; }
+  .lattice-boundary {
+    right: 16px;
+    bottom: 16px;
+    text-align: left;
+  }
+}
+
+@media (max-width: 420px) {
+  .lattice-band { min-height: 450px; }
+  .lattice-copy h2 { font-size: 21px; }
+  .lattice-boundary { width: calc(100% - 32px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #evidenceLattice { transform: none !important; }
+}
