@@ -8,6 +8,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - Expected close: `July 22, 2026 at 12:00 p.m. Eastern Time`
 - Recheck the live DSIP countdown before entry and again before final submission.
 - Source discrepancy: The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026.
+- Amendment control: use `MISSIONWEAVE_AMENDMENT_2_PORTAL_CONTROL_2026-07-18.md`. Amendment 2 renames the due-diligence program as Foreign Risk Evaluation (FRE), but the required Volume 7 webform and its eight disclosure questions remain. Do not upload a foreign-affiliations PDF in Volume 5.
 
 ## Package Lock
 
