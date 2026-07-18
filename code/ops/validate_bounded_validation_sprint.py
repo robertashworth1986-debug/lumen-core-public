@@ -8,7 +8,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Iterator
 
 SCHEMA = "lumencore_bounded_validation_sprint_v1"
 ALLOWED_STATUSES = {"proposed_founder_review", "approved_for_use", "retired"}
@@ -73,7 +73,7 @@ REQUIRED_DOC_PHRASES = {
         "do not sign this template",
     ),
 }
-POSITIVE_UNSAFE_ASSERTIONS = (
+UNSAFE_CLAIM_PHRASES = (
     "guaranteed return on investment",
     "guaranteed savings",
     "field validation is established",
@@ -83,7 +83,22 @@ POSITIVE_UNSAFE_ASSERTIONS = (
     "award is guaranteed",
     "production authorization is granted",
 )
+NEGATION_MARKERS = (
+    "no ",
+    "not ",
+    "does not ",
+    "do not ",
+    "did not ",
+    "is not ",
+    "are not ",
+    "cannot ",
+    "can't ",
+    "without ",
+    "never ",
+    "neither ",
+)
 TIER_ID_RE = re.compile(r"^[a-z][a-z0-9_]{2,63}$")
+SENTENCE_BOUNDARY_RE = re.compile(r"[.!?;\n]")
 
 
 class OfferValidationError(ValueError):
@@ -160,15 +175,58 @@ def _integer(
 
 def _normalized_string_set(values: Iterable[Any], *, context: str) -> set[str]:
     result: set[str] = set()
+    seen: set[str] = set()
     for index, value in enumerate(values):
         if not isinstance(value, str) or not value.strip():
             raise OfferValidationError(f"{context}[{index}] must be a non-empty string")
         normalized = value.strip()
         key = normalized.casefold()
-        if key in {item.casefold() for item in result}:
+        if key in seen:
             raise OfferValidationError(f"{context} contains duplicate entry: {normalized}")
+        seen.add(key)
         result.add(normalized)
     return result
+
+
+def _iter_strings(value: Any) -> Iterator[str]:
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for item in value.values():
+            yield from _iter_strings(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _iter_strings(item)
+
+
+def _unsafe_positive_hits(text: str) -> set[str]:
+    """Detect positive unsafe assertions while allowing explicit negated boundaries."""
+    lowered = text.casefold()
+    hits: set[str] = set()
+    for phrase in UNSAFE_CLAIM_PHRASES:
+        start = 0
+        while True:
+            index = lowered.find(phrase, start)
+            if index < 0:
+                break
+            prefix = lowered[:index]
+            boundaries = list(SENTENCE_BOUNDARY_RE.finditer(prefix))
+            sentence_start = boundaries[-1].end() if boundaries else 0
+            local_prefix = prefix[sentence_start:index][-120:]
+            if not any(marker in local_prefix for marker in NEGATION_MARKERS):
+                hits.add(phrase)
+            start = index + len(phrase)
+    return hits
+
+
+def _validate_no_unsafe_positive_claims(value: Any, *, context: str) -> None:
+    hits: set[str] = set()
+    for text in _iter_strings(value):
+        hits.update(_unsafe_positive_hits(text))
+    if hits:
+        raise OfferValidationError(
+            f"{context}: unsafe positive assertion(s): " + ", ".join(sorted(hits))
+        )
 
 
 def validate_offer(payload: dict[str, Any]) -> dict[str, Any]:
@@ -192,21 +250,27 @@ def validate_offer(payload: dict[str, Any]) -> dict[str, Any]:
         minimum=1,
         maximum=30,
     ) != 30:
-        raise OfferValidationError("the canonical sprint duration must remain 30 calendar days")
+        raise OfferValidationError(
+            "the canonical sprint duration must remain 30 calendar days"
+        )
 
     decisions = {
         item.strip()
         for item in _string(offer, "buyer_decision", context="offer").split("|")
     }
     if decisions != ALLOWED_DECISIONS:
-        raise OfferValidationError("offer.buyer_decision must enumerate the five bounded decisions")
+        raise OfferValidationError(
+            "offer.buyer_decision must enumerate the five bounded decisions"
+        )
 
     rights = _normalized_string_set(
         _list(offer, "accepted_source_rights"),
         context="offer.accepted_source_rights",
     )
     if rights != ALLOWED_RIGHTS:
-        raise OfferValidationError("accepted_source_rights must be public, synthetic, and buyer_authorized")
+        raise OfferValidationError(
+            "accepted_source_rights must be public, synthetic, and buyer_authorized"
+        )
 
     exclusions = _normalized_string_set(
         _list(offer, "excluded_without_separate_written_controls"),
@@ -295,14 +359,24 @@ def validate_offer(payload: dict[str, Any]) -> dict[str, Any]:
                 f"{context}.scope_limits mismatch; missing={missing}, extra={extra}"
             )
         for key in REQUIRED_SCOPE_KEYS:
-            _integer(limits, key, context=f"{context}.scope_limits", minimum=0, maximum=100)
+            _integer(
+                limits,
+                key,
+                context=f"{context}.scope_limits",
+                minimum=0,
+                maximum=100,
+            )
         if limits["primary_metrics_max"] != 1:
             raise OfferValidationError(f"{context} must keep one primary metric")
         if limits["authorized_sources_max"] < 1 or limits["baselines_max"] < 1:
-            raise OfferValidationError(f"{context} requires at least one source and one baseline")
+            raise OfferValidationError(
+                f"{context} requires at least one source and one baseline"
+            )
 
     if prices != sorted(prices) or len(set(prices)) != len(prices):
-        raise OfferValidationError("tier prices must be unique and strictly increasing")
+        raise OfferValidationError(
+            "tier prices must be unique and strictly increasing"
+        )
 
     payment = _mapping(payload, "payment")
     for key in ("commercial_default", "government_boundary", "out_of_scope_work"):
@@ -314,24 +388,25 @@ def validate_offer(payload: dict[str, Any]) -> dict[str, Any]:
 
     approval = _mapping(payload, "approval")
     if set(approval) != REQUIRED_APPROVAL_KEYS:
-        raise OfferValidationError("approval keys do not match the canonical approval gate")
+        raise OfferValidationError(
+            "approval keys do not match the canonical approval gate"
+        )
     for key, value in approval.items():
         if not isinstance(value, bool):
             raise OfferValidationError(f"approval.{key} must be boolean")
-    if status == "proposed_founder_review" and approval["founder_approved_for_external_use"]:
-        raise OfferValidationError("proposed offer cannot claim founder approval for external use")
-    if status == "approved_for_use" and not approval["founder_approved_for_external_use"]:
+    if (
+        status == "proposed_founder_review"
+        and approval["founder_approved_for_external_use"]
+    ):
+        raise OfferValidationError(
+            "proposed offer cannot claim founder approval for external use"
+        )
+    if status == "approved_for_use" and not approval[
+        "founder_approved_for_external_use"
+    ]:
         raise OfferValidationError("approved offer requires founder approval")
 
-    serialized = json.dumps(payload, sort_keys=True).casefold()
-    unsafe_hits = sorted(
-        phrase for phrase in POSITIVE_UNSAFE_ASSERTIONS if phrase in serialized
-    )
-    if unsafe_hits:
-        raise OfferValidationError(
-            "unsafe positive assertion(s): " + ", ".join(unsafe_hits)
-        )
-
+    _validate_no_unsafe_positive_claims(payload, context="offer")
     return {
         "valid": True,
         "schema": SCHEMA,
@@ -351,7 +426,9 @@ def validate_offer(payload: dict[str, Any]) -> dict[str, Any]:
 def validate_documents(root: Path) -> dict[str, Any]:
     paths = {
         "offer": root / "docs" / "LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md",
-        "sow": root / "docs" / "LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md",
+        "sow": root
+        / "docs"
+        / "LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md",
     }
     result: dict[str, Any] = {}
     for label, path in paths.items():
@@ -362,13 +439,14 @@ def validate_documents(root: Path) -> dict[str, Any]:
         lowered = text.casefold()
         for phrase in REQUIRED_DOC_PHRASES[label]:
             if phrase.casefold() not in lowered:
-                raise OfferValidationError(f"{path}: required phrase missing: {phrase}")
-        unsafe_hits = sorted(
-            phrase for phrase in POSITIVE_UNSAFE_ASSERTIONS if phrase in lowered
-        )
-        if unsafe_hits:
+                raise OfferValidationError(
+                    f"{path}: required phrase missing: {phrase}"
+                )
+        hits = _unsafe_positive_hits(text)
+        if hits:
             raise OfferValidationError(
-                f"{path}: unsafe positive assertion(s): {', '.join(unsafe_hits)}"
+                f"{path}: unsafe positive assertion(s): "
+                + ", ".join(sorted(hits))
             )
         result[label] = {
             "path": path.relative_to(root).as_posix(),
@@ -392,7 +470,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         result = validate_repository(args.root.resolve())
     except OfferValidationError as exc:
-        print(json.dumps({"valid": False, "error": str(exc)}, indent=2), file=sys.stderr)
+        print(
+            json.dumps({"valid": False, "error": str(exc)}, indent=2),
+            file=sys.stderr,
+        )
         return 1
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0
