@@ -1,0 +1,517 @@
+:root {
+  color-scheme: dark;
+  --public-bg: #04060f;
+  --public-bg-soft: #081126;
+  --public-panel: rgba(9, 17, 39, 0.86);
+  --public-panel-strong: rgba(11, 22, 48, 0.96);
+  --public-text: #edf6ff;
+  --public-muted: #9aabc7;
+  --public-faint: #657593;
+  --public-cyan: #5eead4;
+  --public-blue: #67b7ff;
+  --public-violet: #c084fc;
+  --public-green: #55e6a5;
+  --public-amber: #f7c85c;
+  --public-red: #fb7185;
+  --public-line: rgba(130, 157, 201, 0.2);
+  --public-line-strong: rgba(94, 234, 212, 0.34);
+  --public-shadow: 0 28px 90px rgba(0, 0, 0, 0.4);
+  --public-radius: 22px;
+  --public-max: 1180px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+body.public-site {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0 0 116px;
+  color: var(--public-text);
+  background:
+    radial-gradient(circle at 12% 2%, rgba(103, 183, 255, 0.17), transparent 34rem),
+    radial-gradient(circle at 88% 10%, rgba(192, 132, 252, 0.15), transparent 31rem),
+    radial-gradient(circle at 55% 72%, rgba(94, 234, 212, 0.08), transparent 42rem),
+    linear-gradient(180deg, #050817 0%, var(--public-bg) 68%);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  overflow-x: hidden;
+}
+
+body.public-site::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(94, 234, 212, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(94, 234, 212, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at 50% 25%, #000 0%, transparent 74%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 25%, #000 0%, transparent 74%);
+}
+
+body.public-site::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.45;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 3px,
+    rgba(255, 255, 255, 0.012) 3px,
+    rgba(255, 255, 255, 0.012) 4px
+  );
+}
+
+.public-site a {
+  color: inherit;
+}
+
+.public-site img,
+.public-site svg {
+  display: block;
+  max-width: 100%;
+}
+
+.public-site button,
+.public-site input,
+.public-site select,
+.public-site textarea {
+  font: inherit;
+}
+
+.public-site ::selection {
+  color: #021014;
+  background: var(--public-cyan);
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 2000;
+  top: 8px;
+  left: 8px;
+  transform: translateY(-160%);
+  padding: 10px 14px;
+  border: 1px solid var(--public-cyan);
+  border-radius: 10px;
+  color: #041013;
+  background: var(--public-cyan);
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 160ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.site-shell {
+  width: min(var(--public-max), calc(100% - 36px));
+  margin: 0 auto;
+}
+
+.site-header {
+  position: sticky;
+  z-index: 800;
+  top: 0;
+  border-bottom: 1px solid rgba(130, 157, 201, 0.14);
+  background: rgba(4, 6, 15, 0.78);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+}
+
+.site-header-inner {
+  min-height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--public-text);
+  text-decoration: none;
+}
+
+.site-brand img {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 0 16px rgba(94, 234, 212, 0.28));
+}
+
+.site-brand-copy {
+  min-width: 0;
+}
+
+.site-brand-name {
+  display: block;
+  font: 900 15px/1 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 2.7px;
+  text-transform: uppercase;
+}
+
+.site-brand-sub {
+  display: block;
+  margin-top: 5px;
+  color: var(--public-muted);
+  font: 700 8px/1.15 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 1.65px;
+  text-transform: uppercase;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.site-nav a {
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--public-muted);
+  font: 700 9px/1 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 1.25px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: 160ms ease;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.site-nav a[aria-current="page"] {
+  color: var(--public-cyan);
+  border-color: rgba(94, 234, 212, 0.25);
+  background: rgba(94, 234, 212, 0.06);
+}
+
+.site-nav .nav-cta {
+  margin-left: 5px;
+  color: #031113;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--public-cyan), var(--public-blue));
+  box-shadow: 0 10px 35px rgba(94, 234, 212, 0.16);
+}
+
+.site-nav .nav-cta:hover,
+.site-nav .nav-cta:focus-visible {
+  color: #031113;
+  border-color: transparent;
+  background: linear-gradient(135deg, #78f8e4, #80c4ff);
+  transform: translateY(-1px);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.72fr);
+  gap: 22px;
+  padding: 72px 0 28px;
+  align-items: stretch;
+}
+
+.hero-copy,
+.status-card,
+.surface-card,
+.offer-card,
+.sector-card,
+.process-card,
+.boundary-card,
+.cta-panel,
+.founder-card,
+.proof-panel,
+.delivery-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--public-line);
+  border-radius: var(--public-radius);
+  background:
+    linear-gradient(145deg, rgba(103, 183, 255, 0.045), transparent 38%),
+    linear-gradient(320deg, rgba(192, 132, 252, 0.045), transparent 42%),
+    var(--public-panel);
+  box-shadow: var(--public-shadow);
+}
+
+.hero-copy::before,
+.status-card::before,
+.surface-card::before,
+.offer-card::before,
+.sector-card::before,
+.process-card::before,
+.boundary-card::before,
+.cta-panel::before,
+.founder-card::before,
+.proof-panel::before,
+.delivery-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(94, 234, 212, 0.34), transparent) top / 100% 1px no-repeat;
+}
+
+.hero-copy {
+  padding: clamp(28px, 5vw, 56px);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--public-cyan);
+  font: 800 10px/1.35 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 13px currentColor;
+}
+
+.hero h1,
+.page-hero h1 {
+  max-width: 890px;
+  margin: 18px 0 16px;
+  font: 900 clamp(2.55rem, 6.4vw, 5.55rem) / 0.98 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+
+.hero h1 .accent,
+.page-hero h1 .accent {
+  color: var(--public-cyan);
+  background: linear-gradient(120deg, var(--public-cyan), var(--public-blue), var(--public-violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-lead,
+.page-lead {
+  max-width: 850px;
+  margin: 0;
+  color: var(--public-muted);
+  font-size: clamp(1rem, 1.7vw, 1.17rem);
+  line-height: 1.72;
+}
+
+.hero-lead strong,
+.page-lead strong {
+  color: var(--public-text);
+  font-weight: 700;
+}
+
+.hero-actions,
+.card-actions,
+.inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-actions {
+  margin-top: 27px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 12px 16px;
+  border: 1px solid var(--public-line-strong);
+  border-radius: 12px;
+  color: var(--public-text);
+  background: rgba(13, 24, 50, 0.68);
+  font: 800 10px/1.15 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 1.1px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.button:hover,
+.button:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--public-cyan);
+  background: rgba(94, 234, 212, 0.08);
+  box-shadow: 0 14px 34px rgba(94, 234, 212, 0.11);
+}
+
+.button.primary {
+  color: #031113;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--public-cyan), var(--public-blue));
+  box-shadow: 0 15px 40px rgba(94, 234, 212, 0.15);
+}
+
+.button.primary:hover,
+.button.primary:focus-visible {
+  color: #031113;
+  border-color: transparent;
+  background: linear-gradient(135deg, #79f7e4, #84c7ff);
+}
+
+.button.quiet {
+  min-height: 40px;
+  padding: 10px 13px;
+  font-size: 9px;
+}
+
+.proof-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.proof-chip,
+.status-chip,
+.signal-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 7px 10px;
+  border: 1px solid rgba(130, 157, 201, 0.22);
+  border-radius: 999px;
+  color: var(--public-muted);
+  background: rgba(2, 8, 22, 0.48);
+  font: 700 9px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.65px;
+  text-transform: uppercase;
+}
+
+.proof-chip::before,
+.status-chip::before,
+.signal-chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: var(--public-cyan);
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.proof-chip.good::before,
+.status-chip.good::before,
+.signal-chip.good::before {
+  color: var(--public-green);
+}
+
+.proof-chip.warn::before,
+.status-chip.warn::before,
+.signal-chip.warn::before {
+  color: var(--public-amber);
+}
+
+.proof-chip.bad::before,
+.status-chip.bad::before,
+.signal-chip.bad::before {
+  color: var(--public-red);
+}
+
+.status-card {
+  padding: 26px;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(94, 234, 212, 0.13), transparent 24rem),
+    var(--public-panel-strong);
+}
+
+.card-kicker {
+  color: var(--public-cyan);
+  font: 800 9px/1.3 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.status-card h2,
+.surface-card h3,
+.offer-card h3,
+.sector-card h3,
+.process-card h3,
+.boundary-card h3,
+.proof-panel h2,
+.delivery-card h2,
+.founder-card h2 {
+  margin: 10px 0 12px;
+  color: var(--public-text);
+  font-family: "Orbitron", "Segoe UI", sans-serif;
+  font-weight: 800;
+  line-height: 1.22;
+}
+
+.status-card h2 {
+  font-size: 1.35rem;
+}
+
+.status-list {
+  display: grid;
+  gap: 0;
+  margin-top: 18px;
+  border-top: 1px solid var(--public-line);
+}
+
+.status-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--public-line);
+}
+
+.status-row span:first-child {
+  color: var(--public-muted);
+  font-size: 0.92rem;
+}
+
+.status-value {
+  color: var(--public-text);
+  font: 800 9px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.7px;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.status-value.good {
+  color: var(--public-green);
+}
+
+.status-value.warn {
+  color: var(--public-amber);
+}
+
+.status-value.bad {
+  color: var(--public-red);
+}
+
+.status-note {
+  margin: 16px 0 0;
+  color: var(--public-faint);
+  font-size: 0.79rem;
+  line-height: 1.58;
+}
