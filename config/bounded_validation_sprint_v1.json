@@ -1,0 +1,121 @@
+{
+  "schema": "lumencore_bounded_validation_sprint_v1",
+  "version": "1.0.0",
+  "status": "proposed_founder_review",
+  "currency": "USD",
+  "commercial_position": "LumenCore sells one controlled technical decision, not a promise of performance.",
+  "offer": {
+    "name": "LumenCore 30-Day Bounded Validation Sprint",
+    "duration_calendar_days_max": 30,
+    "buyer_decision": "promote | rerun | external_review | hold | reject",
+    "accepted_source_rights": [
+      "public",
+      "synthetic",
+      "buyer_authorized"
+    ],
+    "excluded_without_separate_written_controls": [
+      "classified information",
+      "controlled unclassified information",
+      "protected health information",
+      "payment card data",
+      "export-controlled technical data",
+      "production credentials",
+      "live autonomous physical-control access"
+    ],
+    "pre_registered_fields": [
+      "source and rights owner",
+      "incumbent baseline",
+      "primary metric",
+      "acceptance threshold",
+      "held-out window or frozen seeds",
+      "failure and incomplete-run rules",
+      "allowed public claims",
+      "decision owner"
+    ],
+    "required_deliverables": [
+      "signed evaluation contract or authorized purchase instrument",
+      "source and rights label",
+      "frozen baseline and metric contract",
+      "input and dependency manifest",
+      "baseline-versus-candidate replay or benchmark",
+      "failure and negative-result register",
+      "SHA-256 input/output manifest",
+      "offline verification instructions",
+      "buyer-readable Proof Capsule",
+      "one bounded go/no-go decision briefing"
+    ],
+    "claim_boundary": [
+      "No guaranteed outcome, savings, ROI, certification, deployment, agency endorsement, award, or production authorization.",
+      "Internal or buyer-authorized replay is not field validation unless the qualified data owner approves the protocol and the resulting claim in writing.",
+      "Visualizations and dashboards project verifier state; they cannot strengthen the evidence result."
+    ]
+  },
+  "tiers": [
+    {
+      "tier_id": "launch_replay",
+      "name": "Launch Replay",
+      "proposed_price_usd": 7500,
+      "deposit_percent": 50,
+      "duration_calendar_days_max": 30,
+      "scope_limits": {
+        "authorized_sources_max": 1,
+        "baselines_max": 1,
+        "primary_metrics_max": 1,
+        "held_out_windows_max": 1,
+        "reviewer_reruns_included": 0,
+        "briefings_included": 1
+      },
+      "best_for": "A startup, lab, or operator needing one credible baseline-versus-candidate decision."
+    },
+    {
+      "tier_id": "standard_sprint",
+      "name": "Standard Sprint",
+      "proposed_price_usd": 15000,
+      "deposit_percent": 50,
+      "duration_calendar_days_max": 30,
+      "scope_limits": {
+        "authorized_sources_max": 1,
+        "baselines_max": 1,
+        "primary_metrics_max": 1,
+        "held_out_windows_max": 3,
+        "reviewer_reruns_included": 1,
+        "briefings_included": 2
+      },
+      "best_for": "A buyer or technical reviewer who needs repeatability, one controlled rerun, and an executive decision packet."
+    },
+    {
+      "tier_id": "institutional_sprint",
+      "name": "Institutional Sprint",
+      "proposed_price_usd": 25000,
+      "price_basis": "starting_at",
+      "deposit_percent": 50,
+      "duration_calendar_days_max": 30,
+      "scope_limits": {
+        "authorized_sources_max": 2,
+        "baselines_max": 2,
+        "primary_metrics_max": 1,
+        "held_out_windows_max": 5,
+        "reviewer_reruns_included": 2,
+        "briefings_included": 3
+      },
+      "best_for": "An enterprise, utility, prime contractor, or regulated team needing a buyer-owned holdout, integration workshop, and procurement-ready handoff."
+    }
+  ],
+  "payment": {
+    "commercial_default": "50 percent at signed scope; 50 percent at delivery of the agreed evidence packet.",
+    "government_boundary": "Government payment, invoicing, and acceptance follow the controlling procurement instrument rather than this commercial default.",
+    "out_of_scope_work": "Requires written change order before execution."
+  },
+  "ip_boundary": {
+    "background_ip": "Each party retains its pre-existing intellectual property, data, code, models, methods, names, and documentation.",
+    "buyer_data": "Buyer-authorized data remains controlled by the buyer or its named rights owner.",
+    "sprint_outputs": "Ownership and license rights for buyer-specific outputs must be stated in the signed scope. No transfer is implied by this proposed offer.",
+    "publicity": "No customer, partner, validation, result, or logo may be named publicly without written permission."
+  },
+  "approval": {
+    "founder_approved_for_external_use": false,
+    "legal_review_complete": false,
+    "pricing_tested_with_buyers": false,
+    "first_paid_scope_signed": false
+  }
+}
