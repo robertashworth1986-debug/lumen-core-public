@@ -1,0 +1,61 @@
+name: Public Website CI
+
+on:
+  pull_request:
+    paths:
+      - "dashboard/operator_home.html"
+      - "dashboard/proof_to_pilot.html"
+      - "dashboard/review_sprint.html"
+      - "dashboard/index.html"
+      - "dashboard/robots.txt"
+      - "dashboard/sitemap.xml"
+      - "dashboard/site.webmanifest"
+      - "dashboard/assets/public_site*.css"
+      - "dashboard/assets/public_site.js"
+      - "dashboard/assets/lumencore-mark.svg"
+      - "code/ops/ensure_dashboard_command_fabric.py"
+      - "docs/DASHBOARD_ARCHITECTURE.md"
+      - "tests/test_public_website.py"
+      - ".github/workflows/public-website-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "dashboard/operator_home.html"
+      - "dashboard/proof_to_pilot.html"
+      - "dashboard/review_sprint.html"
+      - "dashboard/index.html"
+      - "dashboard/robots.txt"
+      - "dashboard/sitemap.xml"
+      - "dashboard/site.webmanifest"
+      - "dashboard/assets/public_site*.css"
+      - "dashboard/assets/public_site.js"
+      - "dashboard/assets/lumencore-mark.svg"
+      - "code/ops/ensure_dashboard_command_fabric.py"
+      - "docs/DASHBOARD_ARCHITECTURE.md"
+      - "tests/test_public_website.py"
+      - ".github/workflows/public-website-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Compile website safeguards
+        run: >-
+          python -m py_compile
+          code/ops/ensure_dashboard_command_fabric.py
+          tests/test_public_website.py
+      - name: Validate public website
+        run: python tests/test_public_website.py
+      - name: Check public JavaScript syntax
+        run: node --check dashboard/assets/public_site.js
