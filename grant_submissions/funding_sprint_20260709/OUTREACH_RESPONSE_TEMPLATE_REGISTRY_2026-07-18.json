@@ -1,0 +1,351 @@
+{
+  "claim_boundary": "This response is a communication or routing artifact. It does not establish selection, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance.",
+  "controls": {
+    "action_time_human_review_required": true,
+    "attachment_requires_explicit_request": true,
+    "builder_can_send_email": false,
+    "duplicate_send_fail_closed": true,
+    "missing_fact_fail_closed": true,
+    "past_deadline_fail_closed": true
+  },
+  "generated_utc": "2026-07-18T11:59:33.866458+00:00",
+  "global_rules": [
+    "Ground every reply in the latest inbound message and preserve its thread identifier.",
+    "Answer only the question asked; do not append an unrelated pitch or attachment.",
+    "Do not send a duplicate when the requested information or packet is already in the thread.",
+    "Never imply independent validation, field performance, selection, funding, or savings without direct evidence.",
+    "Keep legal, signatory, address, account, and portal identifiers in private renderings only.",
+    "Attach files only when the recipient or governing instructions explicitly require them.",
+    "Escalate deadlines with the exact date, time, timezone, portal, and observed blocker.",
+    "Require action-time human review for every outbound response."
+  ],
+  "private_render_template_count": 5,
+  "schema": "lumencore.outreach_response_template_registry.v1",
+  "send_policy_counts": {
+    "HUMAN_ACTION_DUE": 3,
+    "MONITOR_NO_SEND": 1,
+    "REPLY_AFTER_FACT_REVIEW": 5
+  },
+  "source_config": "config/outreach_response_templates_v1.json",
+  "source_config_sha256": "5D095277CB39A19957170B0BCDB2972D29E4C819A3DCB32DF19E99BC78BAF844",
+  "source_schema": "lumencore.outreach_response_templates.v1",
+  "template_count": 9,
+  "templates": [
+    {
+      "attachment_policy": "NONE",
+      "body": "",
+      "description": "Use after a receipt, out-of-office notice, completed answer, or final decline when no new question requires a reply.",
+      "inbound_states": [
+        "RECEIPT_CONFIRMED",
+        "OUT_OF_OFFICE",
+        "ALREADY_ANSWERED",
+        "DECLINE_FINAL"
+      ],
+      "optional_defaults": {},
+      "private_render_only": false,
+      "reply_triggers": [
+        "NEW_FACT_REQUEST",
+        "CORRECTION_REQUEST",
+        "MOU_RECEIVED",
+        "PORTAL_INSTRUCTION"
+      ],
+      "required_fields": [],
+      "routing_fields": [],
+      "send_policy": "MONITOR_NO_SEND",
+      "sensitive_fields": [],
+      "subject": "",
+      "template_id": "NO_DUPLICATE_MONITOR"
+    },
+    {
+      "attachment_policy": "NONE",
+      "body": "Hello {recipient_name},\n\nI am finalizing {opportunity_name}. Please confirm the official submission deadline, including timezone, and whether {eligibility_question}.\n\nIf a portal-specific instruction controls, please send the authoritative link or section.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}",
+      "description": "Ask an authoritative contact to confirm the exact deadline or eligibility rule before a package is finalized.",
+      "inbound_states": [
+        "DEADLINE_AMBIGUOUS",
+        "ELIGIBILITY_AMBIGUOUS"
+      ],
+      "optional_defaults": {},
+      "private_render_only": false,
+      "reply_triggers": [
+        "AUTHORITATIVE_CLARIFICATION_NEEDED"
+      ],
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "opportunity_name",
+        "eligibility_question",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "subject": "Re: {source_subject}",
+      "template_id": "DEADLINE_CLARIFICATION"
+    },
+    {
+      "attachment_policy": "EXPLICIT_REQUEST_ONLY",
+      "body": "Hello {recipient_name},\n\nI am attempting to complete {submission_name} in {portal_name} before {deadline_local}. The current blocker is: {portal_blocker}\n\nSteps already tried: {steps_already_tried}\n\nPlease confirm the safest supported path to preserve a timely submission. I am not asking for requirements to be waived; I need the official instructions for resolving this blocker before close.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}",
+      "description": "Request official support instructions for a concrete portal blocker before a known close time.",
+      "inbound_states": [
+        "PORTAL_BLOCKER",
+        "SUBMISSION_AT_RISK"
+      ],
+      "optional_defaults": {},
+      "private_render_only": true,
+      "reply_triggers": [
+        "SUPPORT_ACTION_REQUIRED"
+      ],
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "submission_name",
+        "portal_name",
+        "deadline_local",
+        "portal_blocker",
+        "steps_already_tried",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id",
+        "portal_blocker",
+        "steps_already_tried"
+      ],
+      "subject": "Time-sensitive portal support: {submission_name}",
+      "template_id": "PORTAL_SUPPORT_DEADLINE_RESCUE"
+    },
+    {
+      "attachment_policy": "EXPLICIT_REQUEST_ONLY",
+      "body": "Hello {recipient_name},\n\nThank you. Below is the requested information, limited to your question:\n\n{requested_information}\n\nPlease let me know if any item needs correction before it is placed into an agreement, portal record, or formal submission.\n\nBest regards,\n{sender_name}\n{sender_title}\n{organization_name}",
+      "description": "Answer a specific inbound fact request without adding unrelated claims or attachments.",
+      "inbound_states": [
+        "INFORMATION_REQUESTED",
+        "CORRECTION_REQUESTED"
+      ],
+      "optional_defaults": {},
+      "private_render_only": true,
+      "reply_triggers": [
+        "FACTUAL_RESPONSE_REQUIRED"
+      ],
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "requested_information",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "send_policy": "REPLY_AFTER_FACT_REVIEW",
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id",
+        "requested_information"
+      ],
+      "subject": "Re: {source_subject}",
+      "template_id": "REQUESTED_INFORMATION_REPLY"
+    },
+    {
+      "attachment_policy": "NONE",
+      "body": "Hello {recipient_name},\n\nOn {submitted_at_local}, I sent {submission_name} under {notice_or_topic}. The transmitted files were: {artifact_names}.\n\nCould you confirm receipt and whether anything is missing or unreadable? This is a receipt check only, not a duplicate submission.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}",
+      "description": "Confirm delivery and readability after a required package was sent; this is not a duplicate submission.",
+      "inbound_states": [
+        "SUBMISSION_SENT_NO_RECEIPT",
+        "RECEIPT_UNCERTAIN"
+      ],
+      "optional_defaults": {},
+      "private_render_only": true,
+      "reply_triggers": [
+        "RECEIPT_CONFIRMATION_REQUIRED"
+      ],
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "submitted_at_local",
+        "submission_name",
+        "notice_or_topic",
+        "artifact_names",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "send_policy": "REPLY_AFTER_FACT_REVIEW",
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id",
+        "artifact_names"
+      ],
+      "subject": "Re: {source_subject}",
+      "template_id": "SUBMISSION_RECEIPT_FOLLOWUP"
+    },
+    {
+      "attachment_policy": "EXPLICIT_REQUEST_ONLY",
+      "body": "Hello {recipient_name},\n\nThank you for considering {problem_lane}. We are requesting a bounded review, not an endorsement. The current evidence is internal and has not been independently reproduced.\n\nProposed evaluation scope: {validation_scope}\nProtocol: {protocol_summary}\n\nThe evaluation should lock the incumbent baseline and acceptance metrics before scoring, use reviewer-controlled or authorized data, retain negative results, and separate receipt integrity from substantive performance.\n\nRequested next step: {requested_next_step}\n\nBest regards,\n{sender_name}\n{sender_title}\n{organization_name}",
+      "description": "Invite a qualified reviewer to define a bounded, independently reproducible evaluation rather than endorse a broad platform claim.",
+      "inbound_states": [
+        "VALIDATION_ROUTE_OPEN",
+        "PILOT_SCOPE_REQUESTED"
+      ],
+      "optional_defaults": {},
+      "private_render_only": false,
+      "reply_triggers": [
+        "BOUNDED_REVIEW_PROPOSAL"
+      ],
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "problem_lane",
+        "validation_scope",
+        "protocol_summary",
+        "requested_next_step",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "send_policy": "REPLY_AFTER_FACT_REVIEW",
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "subject": "Re: {source_subject} - bounded validation scope",
+      "template_id": "VALIDATION_PILOT_REQUEST"
+    },
+    {
+      "attachment_policy": "NONE",
+      "body": "Hello {recipient_name},\n\nThank you for the clear answer. I appreciate your time and will not send a duplicate packet on this lane.\n\nIf a future opportunity specifically matches {future_fit}, I would welcome a fresh invitation.\n\nBest regards,\n{sender_name}\n{sender_title}\n{organization_name}",
+      "description": "Acknowledge a final decline professionally and stop the current outreach lane without repitching.",
+      "inbound_states": [
+        "DECLINE_FINAL",
+        "TEAM_ALREADY_SET",
+        "SERVICE_NOT_OFFERED"
+      ],
+      "optional_defaults": {},
+      "private_render_only": false,
+      "reply_triggers": [
+        "COURTESY_CLOSEOUT_DUE"
+      ],
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "future_fit",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "send_policy": "REPLY_AFTER_FACT_REVIEW",
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "subject": "Re: {source_subject}",
+      "template_id": "DECLINE_CLOSEOUT"
+    },
+    {
+      "attachment_policy": "NONE",
+      "body": "Hello {recipient_name},\n\nThank you. Please use the following information for the MOU:\n\nFull legal party name: {legal_party_name}\nOrganization or project name: {organization_name}\nBusiness address: {business_address}\n\nSignatory name: {signatory_name}\nSignatory email: {signatory_email}\nSignatory title: {signatory_title}\n\nPlease confirm the exact entity format before issuing the agreement or DocuSign envelope if your records require a different legal-party convention.\n\nBest regards,\n{sender_name}\n{sender_title}\n{organization_name}",
+      "description": "Provide exactly the legal-party and signatory facts requested for an MOU while requiring private handling and pre-issuance confirmation.",
+      "inbound_states": [
+        "MOU_INFORMATION_REQUESTED"
+      ],
+      "optional_defaults": {},
+      "private_render_only": true,
+      "reply_triggers": [
+        "LEGAL_PARTY_FACTS_REQUIRED"
+      ],
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "legal_party_name",
+        "organization_name",
+        "business_address",
+        "signatory_name",
+        "signatory_email",
+        "signatory_title",
+        "sender_name",
+        "sender_title"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "send_policy": "REPLY_AFTER_FACT_REVIEW",
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id",
+        "legal_party_name",
+        "business_address",
+        "signatory_name",
+        "signatory_email"
+      ],
+      "subject": "Re: {source_subject}",
+      "template_id": "MOU_ONBOARDING_REPLY"
+    },
+    {
+      "attachment_policy": "NONE",
+      "body": "Hello {recipient_name},\n\nI apologize for the scheduling mistake regarding {meeting_context}. {scheduling_correction}\n\nI remain interested and can meet during: {availability_windows}. Please use whichever available slot is easiest, or send the correct rebooking link.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}",
+      "description": "Correct a scheduling mistake, confirm continued interest, and request a specific rebooking path without oversharing.",
+      "inbound_states": [
+        "MEETING_MISSED",
+        "TIMEZONE_ERROR",
+        "REBOOK_REQUIRED"
+      ],
+      "optional_defaults": {},
+      "private_render_only": true,
+      "reply_triggers": [
+        "SCHEDULING_RESPONSE_REQUIRED"
+      ],
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "meeting_context",
+        "scheduling_correction",
+        "availability_windows",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id",
+        "availability_windows"
+      ],
+      "subject": "Re: {source_subject}",
+      "template_id": "MEETING_REBOOK_REQUEST"
+    }
+  ]
+}
