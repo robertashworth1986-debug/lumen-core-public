@@ -1,72 +1,108 @@
 # Contributing to LumenCore™
 
-First — thank you for caring enough to look at this.
+Thank you for reviewing LumenCore and considering a contribution.
 
-LumenCore is a solo-built, production-grade institutional intelligence platform. Most of the core trading engine and AI architecture lives in a private deployment environment, but this public repo contains the live dashboards, evidence ledger, and site infrastructure that power [lumen-core.ai](https://lumen-core.ai).
+LumenCore is a founder-built proof-to-pilot architecture. This public repository is a bounded review surface containing reviewer-safe code, documentation, dashboards, manifests, tests, and evidence artifacts. It is not a representation that every module is production-deployed, independently validated, certified, revenue-generating, or available for unrestricted external modification.
 
----
+## Before contributing
 
-## What You Can Contribute
+Please read:
 
-### 1. Bug Reports & Issues
-Found something broken on the live site? Please [file an issue](https://github.com/robertashworth1986-debug/lumen-core-public/issues/new/choose). The templates are set up to make it fast.
+- `README.md`
+- `SECURITY.md`
+- `docs/CLAIM_BOUNDARY_REGISTER.md`
+- `docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md`
+- any path-specific README or evidence receipt relevant to the proposed change.
 
-### 2. Dashboard Improvements
-The HTML dashboards are in the `dashboard/` folder. If you have frontend chops and want to improve UX, performance, or accessibility — PRs are welcome.
+Security vulnerabilities must be reported privately through the process in `SECURITY.md`, not through a public issue.
 
-- Use vanilla JS or Three.js (no new build toolchains please — this deploys to a bare nginx VPS)
-- Preserve all existing data bindings (don't break the JSON feed connections)
-- Test in Chrome and Firefox before submitting
+## Useful contribution types
 
-### 3. Documentation
-Better docs = more people understanding what this system does. If you can write clearly about:
-- How the evidence ledger works
-- How the alpha map is generated
-- What the harmonic architecture actually does
+Contributions are most useful when they improve one bounded concern:
 
-...a PR to improve the docs is extremely welcome.
+- reproducibility and deterministic verification;
+- tests and negative-result coverage;
+- accessibility, responsive behavior, or browser compatibility;
+- documentation and reviewer quickstarts;
+- evidence manifests, schemas, and source mapping;
+- fail-closed release controls;
+- dependency, workflow, or supply-chain hardening;
+- public-safe service and product clarity;
+- correction of stale or unsupported claims.
 
-### 4. Collaboration Proposals
-If you're working in quant finance, energy grid optimization, defense, or hardware R&D — and you think there's alignment with what's being built here — open a Feature Request issue or reach out directly.
+Do not combine unrelated platform expansion, outreach, deployment, compliance certification, and evidence changes in one pull request.
 
----
+## Claim discipline
 
-## Ground Rules
+Every contribution must preserve the distinction between:
 
-1. **No credentials in PRs.** Ever. Not even test ones.
-2. **Don't break the evidence chain.** The hash-chained proof ledger is the most important artifact in this repo. Don't modify historical entries.
-3. **Keep it production-quality.** This is a live system. Broken HTML reaches real users.
-4. **One concern per PR.** Smaller PRs get reviewed faster.
+- measured;
+- replayed;
+- synthetic;
+- modeled;
+- estimated;
+- externally validated.
 
----
+Do not introduce claims of customer status, partnership, agency endorsement, independent validation, field performance, savings, revenue, safety, certification, patentability, award status, or superiority without directly cited documentary evidence and an explicit authorization boundary.
 
-## Development Setup
+A hash proves identity or custody within its declared scope. It does not prove substantive truth, safety, legal rights, or release authority.
 
-The site is static HTML + JSON. No build step needed for most changes.
+## Intellectual-property boundary
 
-```bash
-git clone https://github.com/robertashworth1986-debug/lumen-core-public.git
-cd lumen-core-public
-# Edit HTML files directly
-# Open dashboard/mission_control.html in your browser to test
-```
+Reviewing or contributing to this repository does not transfer ownership of pre-existing LumenCore architecture, module names, lexicon, designs, private artifacts, or patent-sensitive material.
 
-For changes that depend on live API data, the JSON feed endpoints are:
-- `https://lumen-core.ai/api/live_status.json`
-- `https://lumen-core.ai/api/executor_heartbeat.json`
-- `https://lumen-core.ai/evidence/`
+Do not submit confidential employer information, third-party proprietary material, controlled technical data, personal records, credentials, or content you do not have authority to contribute.
 
----
+Contributions accepted into the repository are licensed under the repository license. Pre-existing founder-owned material remains subject to the boundaries documented in the repository.
 
-## Code Style
+## Development workflow
 
-- **HTML**: 2-space indent, no inline `style=""` (use the existing CSS classes)
-- **JavaScript**: Vanilla ES6+, no frameworks
-- **JSON**: Pretty-printed, UTF-8
-- **Filenames**: `snake_case` for data files, `kebab-case` for HTML pages
+1. Start from the current default branch.
+2. Create a narrowly named branch.
+3. Change one concern.
+4. Add or update tests.
+5. Run the focused tests and any affected baseline tests.
+6. Record exact results, including failures and known limitations.
+7. Open a draft pull request.
+8. Keep deployment, submission, certification, outreach, and legal actions outside the code change unless explicitly authorized.
 
----
+## Pull-request requirements
 
-## License
+A pull request should state:
 
-By contributing, you agree that your contributions will be licensed under the same [MIT License](LICENSE) that covers this project.
+- purpose and scope;
+- exact paths changed;
+- evidence or issue being addressed;
+- test commands and exact results;
+- claim-boundary impact;
+- security impact;
+- backward-compatibility or deployment impact;
+- open blockers;
+- what was not deployed, submitted, certified, or externally claimed.
+
+Historical evidence packets and receipts should not be rewritten to look current. Create a new dated artifact when the underlying state changes.
+
+## Style and safety
+
+- Never commit credentials or private keys.
+- Prefer deterministic local behavior and repository-pinned dependencies.
+- Keep workflow permissions least-privileged.
+- Preserve immutable evidence and historical receipts.
+- Keep browser and Python/CLI verification rules in parity where both exist.
+- Add regression tests for any corrected security or authority invariant.
+- Prefer accessible semantic HTML and reduced-motion support.
+- Avoid unnecessary build systems or external runtime dependencies for static reviewer surfaces.
+
+## Review standard
+
+The review standard is not “does it sound impressive?” It is:
+
+- Can another person reproduce it?
+- Is the source identified?
+- Is the comparator fair and frozen?
+- Was the metric chosen before scoring?
+- Are negative results retained?
+- Are limitations explicit?
+- Does the system fail closed when authority or evidence is missing?
+
+Evidence before claims.
