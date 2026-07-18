@@ -13,9 +13,9 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Private target git-ignored: `true`
 - Private values exposed: `false`
 - Required private gates: `50`
-- Passed private gates: `19`
-- Open gates: `31`
-- Gate SHA-256: `44e820a2085cd91f5b21ecd1208d63cb71e4127169a16d4b22df25b0b0010290`
+- Passed private gates: `20`
+- Open gates: `30`
+- Gate SHA-256: `bbac74b06c58f768a14bcb8606374df9133822532ce82a94989400089ec92990`
 
 ## Package Integrity
 
@@ -61,18 +61,17 @@ This public-safe gate reports only package integrity and private-workflow comple
 
 ## Reconciliation Groups
 
-- `A_DOCUMENTARY_RETRIEVAL`: `6` gates (`OPEN`)
+- `A_DOCUMENTARY_RETRIEVAL`: `5` gates (`OPEN`)
 - `B_FOUNDER_FACTUAL_ANSWER`: `9` gates (`OPEN`)
 - `C_LEGAL_CERTIFICATION_DECISION`: `9` gates (`OPEN`)
 - `D_PORTAL_MECHANICS`: `5` gates (`OPEN`)
 - `E_TECHNICAL_VOLUME_CONSISTENCY`: `2` gates (`OPEN`)
-- `F_CLEARED_BY_EVIDENCE`: `19` gates (`CLEARED`)
+- `F_CLEARED_BY_EVIDENCE`: `20` gates (`CLEARED`)
 
 ## Open Gates
 
 - `ACTION_TIME_APPROVAL_TIMESTAMP`
 - `ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION`
-- `CAGE_MATCH`
 - `CMMC_PHASE_I_SELF_ASSESSMENT_POSITION`
 - `COMPLETE_PORTAL_PREVIEW_REVIEW`
 - `CONFLICTS_AND_JOINT_VENTURE_STATUS`

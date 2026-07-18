@@ -15,15 +15,14 @@
     "live_dsip_recheck_required": true,
     "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
   },
-  "gate_sha256": "44e820a2085cd91f5b21ecd1208d63cb71e4127169a16d4b22df25b0b0010290",
+  "gate_sha256": "bbac74b06c58f768a14bcb8606374df9133822532ce82a94989400089ec92990",
   "gate_summary": {
-    "open_gate_count": 31,
-    "passed_private_gate_count": 19,
+    "open_gate_count": 30,
+    "passed_private_gate_count": 20,
     "reconciliation_groups": {
       "A_DOCUMENTARY_RETRIEVAL": {
-        "count": 6,
+        "count": 5,
         "gates": [
-          "CAGE_MATCH",
           "DD2345_OR_JCP_APPLICATION_EVIDENCE",
           "DSIP_FIRM_PIN_AVAILABILITY",
           "PORTAL_PREVIEW_RECEIPT_HASH",
@@ -82,9 +81,10 @@
         "status": "OPEN"
       },
       "F_CLEARED_BY_EVIDENCE": {
-        "count": 19,
+        "count": 20,
         "gates": [
           "ASSIGNED_PROPOSAL_NUMBER_CAPTURE",
+          "CAGE_MATCH",
           "CONTROLLED_DATA_EXCLUDED",
           "DSIP_ORGANIZATION_LINKAGE",
           "LIVE_DSIP_DEADLINE_CONFIRMATION",
@@ -111,7 +111,6 @@
     "unresolved_gates": [
       "ACTION_TIME_APPROVAL_TIMESTAMP",
       "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
-      "CAGE_MATCH",
       "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
       "COMPLETE_PORTAL_PREVIEW_REVIEW",
       "CONFLICTS_AND_JOINT_VENTURE_STATUS",
@@ -142,7 +141,7 @@
       "VOLUME7_FOREIGN_AFFILIATIONS_WEBFORM"
     ]
   },
-  "generated_utc": "2026-07-18T08:05:44.180997+00:00",
+  "generated_utc": "2026-07-18T09:47:25.245049+00:00",
   "official_instruction_facts": {
     "cmmc_amendment_note": "Amendment 2 says CMMC Phase II implementation was suspended on July 13, 2026 while Phase I self-assessment requirements remain in place; the current live requirement must be reviewed before submission.",
     "current_package_duration_months": 6,
