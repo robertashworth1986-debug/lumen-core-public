@@ -71,6 +71,28 @@ NASHVILLE_EC_DEADLINE_RESPONSE_CONTROL = (
 NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION = (
     NASHVILLE_EC_DIR / "NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json"
 )
+NASHVILLE_EC_SUBMISSION_RECEIPT = (
+    NASHVILLE_EC_DIR / "NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json"
+)
+DARPA_SN_26_97_DIR = ROOT / "grant_submissions" / "DARPA_SN_26_97"
+DARPA_SN_26_97_SUBMISSION_RECEIPT = (
+    DARPA_SN_26_97_DIR / "DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.json"
+)
+OPENAI_BUILD_WEEK_DIR = (
+    ROOT / "grant_submissions" / "OPENAI_BUILD_WEEK_20260721"
+)
+OPENAI_BUILD_WEEK_READINESS = (
+    OPENAI_BUILD_WEEK_DIR / "OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json"
+)
+OPENAI_BUILD_WEEK_DESCRIPTION = (
+    OPENAI_BUILD_WEEK_DIR / "OPENAI_BUILD_WEEK_PROJECT_DESCRIPTION_DRAFT_2026-07-17.md"
+)
+OPENAI_BUILD_WEEK_DEMO_SCRIPT = (
+    OPENAI_BUILD_WEEK_DIR / "OPENAI_BUILD_WEEK_DEMO_SCRIPT_2026-07-17.md"
+)
+OPENAI_BUILD_WEEK_REQUIREMENTS = (
+    OPENAI_BUILD_WEEK_DIR / "OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json"
+)
 MISSIONWEAVE_DIR = (
     ROOT / "grant_submissions" / "DLA26BZ03_NV011_MissionWeave"
 )
@@ -231,6 +253,25 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def parse_aware_datetime(value: str, *, field: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"{field} must be an ISO-8601 timestamp") from exc
+    if parsed.tzinfo is None:
+        raise ValueError(f"{field} must include a timezone")
+    return parsed
+
+
+def utc_iso(value: str, *, field: str) -> str:
+    return (
+        parse_aware_datetime(value, field=field)
+        .astimezone(timezone.utc)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
+
+
 def nashville_private_action_gate() -> dict[str, Any]:
     required_gate_count = 15
     ignore_rule = "grant_submissions/NASHVILLE_EC_FALL_2026/private/"
@@ -386,6 +427,12 @@ def base_sources() -> dict[str, Any]:
         "nashville_ec_deadline_preservation_receipt": NASHVILLE_EC_DEADLINE_RECEIPT,
         "nashville_ec_deadline_response_control": NASHVILLE_EC_DEADLINE_RESPONSE_CONTROL,
         "nashville_ec_official_deadline_confirmation": NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION,
+        "nashville_ec_submission_receipt": NASHVILLE_EC_SUBMISSION_RECEIPT,
+        "darpa_sn_26_97_submission_receipt": DARPA_SN_26_97_SUBMISSION_RECEIPT,
+        "openai_build_week_submission_readiness": OPENAI_BUILD_WEEK_READINESS,
+        "openai_build_week_project_description": OPENAI_BUILD_WEEK_DESCRIPTION,
+        "openai_build_week_demo_script": OPENAI_BUILD_WEEK_DEMO_SCRIPT,
+        "openai_build_week_requirements": OPENAI_BUILD_WEEK_REQUIREMENTS,
         "missionweave_dsip_package_manifest": MISSIONWEAVE_MANIFEST,
         "missionweave_dsip_assembly_map": MISSIONWEAVE_ASSEMBLY_MAP,
         "missionweave_volume2_pdf": MISSIONWEAVE_VOLUME2_PDF,
@@ -446,6 +493,262 @@ def apply_submission_receipts(lanes: list[dict[str, Any]], receipt: dict[str, An
             "Do not resend unless the agency requests a replacement or the receipt fails verification.",
         ]
         lane["human_gate"] = []
+
+
+def apply_nashville_submission_receipt(
+    lanes: list[dict[str, Any]], receipt: dict[str, Any]
+) -> None:
+    confirmation = receipt.get("confirmation_page", {})
+    controls = receipt.get("submission_controls", {})
+    evidence = receipt.get("private_evidence", {})
+    deadline = parse_aware_datetime(
+        str(receipt.get("deadline_local", "")), field="Nashville deadline_local"
+    )
+    observed = parse_aware_datetime(
+        str(receipt.get("confirmation_observed_local", "")),
+        field="Nashville confirmation_observed_local",
+    )
+    evidence_sha256 = str(evidence.get("sha256", ""))
+    valid = (
+        receipt.get("schema") == "lumencore.nashville_ec_submission_receipt.v1"
+        and receipt.get("status") == "PORTAL_SUBMISSION_CONFIRMED"
+        and receipt.get("form_id") == "261305765806056"
+        and receipt.get("selected_program") == "TakeOff"
+        and confirmation.get("title") == "Thank You"
+        and confirmation.get("bounded_confirmation")
+        == "We have received your application."
+        and confirmation.get("expected_next_steps_by") == "2026-08-03"
+        and observed <= deadline
+        and controls.get("required_answers_ready_before_entry") == "30/30"
+        and controls.get("founder_attestations_incorporated") == 11
+        and controls.get("program_fee_commitment") is False
+        and len(evidence_sha256) == 64
+        and all(character in "0123456789abcdefABCDEF" for character in evidence_sha256)
+    )
+    if not valid:
+        raise ValueError("Nashville EC portal-submission receipt is missing or stale")
+
+    lane = next(
+        (
+            row
+            for row in lanes
+            if row.get("opportunity_number") == "NASHVILLE-EC-FALL-2026"
+        ),
+        None,
+    )
+    if lane is None:
+        raise ValueError("Nashville EC command lane is missing")
+
+    lane["pre_send_command"] = lane["command"]
+    lane["command"] = "SENT_VERIFIED"
+    lane["submission_status"] = receipt["status"]
+    lane["sent_utc"] = utc_iso(
+        receipt["confirmation_observed_local"],
+        field="Nashville confirmation_observed_local",
+    )
+    lane["receipt_path"] = rel(NASHVILLE_EC_SUBMISSION_RECEIPT)
+    lane["receipt_attachment_sha256"] = evidence_sha256
+    lane["verification_scope"] = "PORTAL_CONFIRMATION_PAGE_OBSERVED"
+    lane["eligibility_state"] = "APPLICATION_SUBMITTED_PORTAL_CONFIRMATION_OBSERVED"
+    lane["action_gate_status"] = "PORTAL_SUBMISSION_CONFIRMED"
+    lane["action_gate_submission_ready_for_human_click"] = False
+    lane["action_gate_passed_private_gate_count"] = lane[
+        "action_gate_required_private_gate_count"
+    ]
+    lane["action_gate_open_gate_count"] = 0
+    lane["action_gate_private_input_present"] = True
+    lane["package_files"] = [
+        *lane["package_files"],
+        rel(NASHVILLE_EC_SUBMISSION_RECEIPT),
+    ]
+    lane["why_now"] = (
+        "The portal displayed the bounded confirmation that the application was received. "
+        "Preserve the receipt and monitor for the stated next-step window; do not describe "
+        "the application as selected, funded, endorsed, or accepted into a cohort."
+    )
+    lane["today_work"] = [
+        "Monitor the existing email account for Nashville EC next steps through August 3, 2026.",
+        "Do not duplicate the application or accept a fee, terms, or cohort seat without a separate decision.",
+    ]
+    lane["human_gate"] = []
+    lane["claim_boundary"] = receipt.get("claim_boundary")
+
+
+def build_darpa_submission_lane(receipt: dict[str, Any]) -> dict[str, Any]:
+    if (
+        receipt.get("schema") != "lumencore.darpa_rfi_submission_receipt.v1"
+        or receipt.get("status") != "EMAIL_SUBMISSION_SENT_BEFORE_DEADLINE"
+        or receipt.get("notice_id") != "DARPA-SN-26-97"
+    ):
+        raise ValueError("DARPA-SN-26-97 submission receipt is missing or stale")
+
+    sent = parse_aware_datetime(str(receipt.get("sent", "")), field="DARPA sent")
+    deadline = parse_aware_datetime(
+        str(receipt.get("deadline", "")), field="DARPA deadline"
+    )
+    margin_seconds = int((deadline - sent).total_seconds())
+    attachments = receipt.get("attachments", [])
+    expected_names = {
+        "LumenCore_DARPA_SN_26_97_One_Slide.private.pdf",
+        "LumenCore_DARPA_SN_26_97_RFI_Response.private.pdf",
+    }
+    attachment_names = {str(item.get("name", "")) for item in attachments}
+    attachment_records_valid = all(
+        int(item.get("bytes", 0)) > 0
+        and len(str(item.get("sha256", ""))) == 64
+        and all(
+            character in "0123456789abcdefABCDEF"
+            for character in str(item.get("sha256", ""))
+        )
+        for item in attachments
+    )
+    if (
+        margin_seconds <= 0
+        or receipt.get("sent_before_deadline_seconds") != margin_seconds
+        or len(attachments) != 2
+        or attachment_names != expected_names
+        or not attachment_records_valid
+        or receipt.get("acknowledgment", {}).get("received") is not False
+    ):
+        raise ValueError("DARPA-SN-26-97 submission receipt failed reconciliation")
+
+    return {
+        "rank": 1.6,
+        "lane_id": "darpa_sn_26_97_anticipatory_research_rfi",
+        "source_system": "SAM.gov / Gmail sent-folder receipt",
+        "opportunity_number": "DARPA-SN-26-97",
+        "title": receipt.get("title", "Anticipatory Research Program RFI"),
+        "agency": "Defense Advanced Research Projects Agency",
+        "deadline_utc": utc_iso(receipt["deadline"], field="DARPA deadline"),
+        "deadline_date": "2026-07-17",
+        "official_deadline_text": "July 17, 2026 at 5:00 PM Eastern Time",
+        "command": "SENT_VERIFIED",
+        "eligibility_state": "NON_PROPRIETARY_RFI_RESPONSE_SENT_BEFORE_DEADLINE",
+        "fit_state": "BOUNDED_RESEARCH_AND_MEASUREMENT_RESPONSE_DELIVERED",
+        "submission_route": receipt.get("submission_channel"),
+        "official_url": receipt.get("official_notice_url"),
+        "package_files": [
+            rel(DARPA_SN_26_97_SUBMISSION_RECEIPT),
+            rel(
+                DARPA_SN_26_97_DIR
+                / "DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.md"
+            ),
+        ],
+        "why_now": (
+            "The sent-folder record is before the stated deadline and both attachment hashes "
+            "reconcile. No agency acknowledgment has been captured, so the verified scope is "
+            "send timing and attachment identity only."
+        ),
+        "today_work": [
+            "Monitor the existing thread for an acknowledgment, workshop invitation, or clarification request.",
+            "Do not resend unless DARPA requests a replacement or additional material.",
+        ],
+        "human_gate": [],
+        "external_send_allowed_without_human": False,
+        "final_submit_allowed_without_human": False,
+        "submission_status": receipt["status"],
+        "sent_utc": utc_iso(receipt["sent"], field="DARPA sent"),
+        "receipt_path": rel(DARPA_SN_26_97_SUBMISSION_RECEIPT),
+        "receipt_attachment_sha256": stable_sha256(attachments),
+        "verification_scope": receipt.get("evidence_state"),
+        "acknowledgment_received": False,
+        "claim_boundary": receipt.get("claim_boundary"),
+    }
+
+
+def build_openai_build_week_lane(readiness: dict[str, Any]) -> dict[str, Any]:
+    requirements = readiness.get("official_requirements", {})
+    facts = requirements.get("facts", {})
+    submission_period = facts.get("submission_period", {})
+    counts = readiness.get("counts", {})
+    project = readiness.get("project", {})
+    if (
+        readiness.get("schema")
+        != "lumencore.openai_build_week_submission_readiness.v1"
+        or readiness.get("status")
+        != "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
+        or readiness.get("core_ready") is not True
+        or readiness.get("ready_for_final_submission") is not False
+        or submission_period.get("deadline_central")
+        != "2026-07-21T19:00:00-05:00"
+        or counts.get("gate_total") != counts.get("pass", 0) + counts.get("open", 0)
+        or counts.get("fail") != 0
+    ):
+        raise ValueError("OpenAI Build Week readiness control is missing or stale")
+
+    integrity_errors: list[str] = []
+    for item in readiness.get("app_artifacts", []):
+        artifact = ROOT / str(item.get("path", ""))
+        if not artifact.is_file():
+            integrity_errors.append(f"missing:{item.get('path')}")
+            continue
+        data = artifact.read_bytes()
+        if (
+            len(data) != item.get("bytes")
+            or hashlib.sha256(data).hexdigest() != item.get("sha256")
+        ):
+            integrity_errors.append(f"hash_or_size:{item.get('path')}")
+    if integrity_errors:
+        raise ValueError(
+            "OpenAI Build Week app artifact verification failed: "
+            + ", ".join(integrity_errors)
+        )
+
+    outputs = readiness.get("outputs", {})
+    return {
+        "rank": 1.65,
+        "lane_id": "openai_build_week_prooflock_console",
+        "source_system": "OpenAI Build Week / Devpost",
+        "opportunity_number": "OPENAI-BUILD-WEEK-2026",
+        "title": "OpenAI Build Week - ProofLock Console",
+        "agency": "OpenAI / Devpost",
+        "deadline_utc": submission_period.get("deadline_utc"),
+        "deadline_date": "2026-07-21",
+        "official_deadline_text": "July 21, 2026 at 5:00 PM Pacific / 7:00 PM Central",
+        "deadline_semantics": "OFFICIAL_RULES_DEADLINE_VERIFIED",
+        "command": "STAGE_APPLICATION",
+        "eligibility_state": "CORE_PROJECT_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN",
+        "fit_state": "DEVELOPER_TOOLS_WORKING_PROJECT_STRONG_FIT",
+        "submission_route": "Devpost submission manager",
+        "official_url": requirements.get("official_sources", {}).get("overview"),
+        "secondary_url": requirements.get("official_sources", {}).get(
+            "submission_manager"
+        ),
+        "package_files": [
+            str(outputs.get("json")),
+            str(outputs.get("markdown")),
+            str(outputs.get("description_draft")),
+            str(outputs.get("demo_script")),
+            str(outputs.get("requirements_receipt")),
+        ],
+        "readiness_status": readiness.get("status"),
+        "readiness_gate_total": counts.get("gate_total"),
+        "readiness_gate_pass_count": counts.get("pass"),
+        "readiness_gate_open_count": counts.get("open"),
+        "public_demo_url": project.get("public_demo_url"),
+        "youtube_demo_url": project.get("youtube_demo_url"),
+        "feedback_session_id_present": bool(project.get("feedback_session_id")),
+        "confirmed_model_present": bool(project.get("confirmed_model")),
+        "scoped_tree": project.get("scoped_tree"),
+        "why_now": (
+            "This is the nearest unresolved submission deadline. The working core, public "
+            "repository, license, and post-start evidence pass; the public demo, model label, "
+            "/feedback Session ID, video, Devpost registration, and final review remain open."
+        ),
+        "today_work": [
+            "Deploy the self-contained console to a stable public URL and verify every sample artifact fetch.",
+            "Capture the exact project-building model label and the /feedback Session ID without guessing.",
+            "Record and privacy-review the bounded demonstration, keep it under three minutes with audio, and publish it to YouTube.",
+            "Populate the Devpost draft and stop for publicity, IP, certification, and final-submit review.",
+        ],
+        "human_gate": [
+            "Robert provides the exact model label and /feedback Session ID from the qualifying task.",
+            "Robert reviews the public demo video, Devpost publicity/IP terms, certifications, and final submission.",
+        ],
+        "external_send_allowed_without_human": False,
+        "final_submit_allowed_without_human": False,
+        "claim_boundary": readiness.get("claim_boundary"),
+    }
 
 
 def build_cdc_receipt_lane(receipt: dict[str, Any]) -> dict[str, Any] | None:
@@ -526,6 +829,9 @@ def build_command_lanes(
     grants_ranked: dict[str, Any],
     submission_receipt: dict[str, Any] | None = None,
     cdc_engagement_receipt: dict[str, Any] | None = None,
+    nashville_submission_receipt: dict[str, Any] | None = None,
+    darpa_submission_receipt: dict[str, Any] | None = None,
+    openai_build_week_readiness: dict[str, Any] | None = None,
     scan_date: date = SCAN_DATE,
 ) -> list[dict[str, Any]]:
     nashville_gate = nashville_private_action_gate()
@@ -1510,7 +1816,13 @@ def build_command_lanes(
     if cdc_lane is not None:
         lanes.append(cdc_lane)
 
+    lanes.append(build_darpa_submission_lane(darpa_submission_receipt or {}))
+    lanes.append(build_openai_build_week_lane(openai_build_week_readiness or {}))
+
     apply_submission_receipts(lanes, submission_receipt or {})
+    apply_nashville_submission_receipt(
+        lanes, nashville_submission_receipt or {}
+    )
     normalize_lane_deadlines(lanes, scan_date)
     expire_closed_lanes(lanes)
     lanes.sort(key=lambda row: (float(row["rank"]), row["opportunity_number"]))
@@ -1536,6 +1848,9 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
     zero = read_json(ZERO_FRICTION)
     submission_receipt = read_json(SUBMISSION_RECEIPT)
     cdc_engagement_receipt = read_json(CDC_ENGAGEMENT_RECEIPT)
+    nashville_submission_receipt = read_json(NASHVILLE_EC_SUBMISSION_RECEIPT)
+    darpa_submission_receipt = read_json(DARPA_SN_26_97_SUBMISSION_RECEIPT)
+    openai_build_week_readiness = read_json(OPENAI_BUILD_WEEK_READINESS)
     sam_rotation_control = read_json(SAM_KEY_ROTATION_CONTROL)
     if sam_rotation_control.get("schema") != "lumencore.sam_public_credential_rotation_control.v1":
         raise ValueError("SAM.gov API-key rotation control is missing or stale")
@@ -1570,6 +1885,9 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
         grants_ranked,
         submission_receipt,
         cdc_engagement_receipt,
+        nashville_submission_receipt,
+        darpa_submission_receipt,
+        openai_build_week_readiness,
         scan_date,
     )
     stage_now = [row for row in lanes if row["command"] in STAGE_COMMANDS]
@@ -1594,15 +1912,11 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
         key=lambda row: (row["days_to_close"], row["rank"]),
         default=None,
     )
-    nashville_lane = next(
-        row for row in lanes if row["lane_id"] == "nashville_ec_fall_2026_takeoff"
-    )
     missionweave_lane = next(
         row for row in lanes if row["lane_id"] == "dla_missionweave_dsip_phase1"
     )
-    nashville_gate_progress = (
-        f"{nashville_lane['action_gate_passed_private_gate_count']}/"
-        f"{nashville_lane['action_gate_required_private_gate_count']}"
+    build_week_lane = next(
+        row for row in lanes if row["lane_id"] == "openai_build_week_prooflock_console"
     )
     missionweave_gate_progress = (
         f"{missionweave_lane['action_gate_passed_private_gate_count']}/"
@@ -1624,11 +1938,10 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
             "strongest_today_action": (
-                "Keep the live browser on its current user-controlled sign-in and inspect that page before navigating. "
-                f"If it is Nashville EC, move its private action gate from {nashville_gate_progress} by running the six-prompt hidden collector, then reach the complete preview well before the confirmed 11:59 p.m. July 17 close. "
-                "The deadline-support reply must not be duplicated or treated as an application. Otherwise preserve the authenticated lane to its next safe preview. "
-                f"Next use the MissionWeave seven-volume checklist to move its current private action gate beyond {missionweave_gate_progress} while keeping the proposal number, final PDF identity, and action-time approval private; all 15 public package files are verified for the July 22 noon Eastern close. "
-                "Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket; NASA, Army, and CDC are already sent and receipt-backed."
+                "Finish the OpenAI Build Week external gates first: deploy and verify the public demo, capture the exact model label and /feedback Session ID, record the privacy-reviewed sub-three-minute video, and stage the Devpost preview before the July 21 7:00 p.m. Central close. "
+                f"Its current readiness control has {build_week_lane['readiness_gate_pass_count']}/{build_week_lane['readiness_gate_total']} gates passed and {build_week_lane['readiness_gate_open_count']} open. "
+                f"Then use the MissionWeave checklist to move its private action gate beyond {missionweave_gate_progress} while keeping the proposal number, final PDF identity, credentials, and action-time approval private for the July 22 noon Eastern close. "
+                "Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket."
             ),
             "critical_same_day_infrastructure_action": sam_critical_action,
             "closest_deadline_lane": describe_lane(closest_open),
@@ -1640,9 +1953,9 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             ),
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative remains partner-only through 2026-08-03, but the Cambridge Systematics response lead confirmed its team is already set, so that outreach route is closed. No solo bid, no duplicate follow-up, and no partner claim; reopen only through a different qualified organization with written role and corporate-experience evidence.",
             "fastest_low_friction_lane": (
-                "The Nashville EC TakeOff application is the nearest low-friction reviewer route. "
-                f"Its hidden-input gate is {nashville_gate_progress}: six founder prompts produce 11 private portal answers, then preview, fee/terms, and action-time authorization remain human-gated. "
-                "The verified support reply confirms the close time but does not replace portal submission."
+                "OpenAI Build Week is the nearest unresolved low-friction reviewer route. "
+                f"The working core is verified and {build_week_lane['readiness_gate_pass_count']}/{build_week_lane['readiness_gate_total']} gates pass; the public demo, exact model label, /feedback Session ID, video, Devpost registration, and final review remain open. "
+                "Nashville EC is no longer an open lane because its portal confirmation is receipt-backed."
             ),
             "all_final_actions_blocked_without_human": True,
             "external_send_allowed_without_human": False,
@@ -1692,6 +2005,8 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
                 "sent_utc": row["sent_utc"],
                 "receipt_path": row["receipt_path"],
                 "receipt_attachment_sha256": row["receipt_attachment_sha256"],
+                "verification_scope": row.get("verification_scope"),
+                "claim_boundary": row.get("claim_boundary"),
             }
             for row in sent_verified
         ],
@@ -1779,7 +2094,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        f"Direct answer: NASA, Army, and CDC are sent and receipt-backed. {summary['critical_same_day_infrastructure_action']} Finish the July 17 Nashville EC TakeOff application, then stage the hash-verified MissionWeave DSIP package for its July 22 noon Eastern close. Keep NSF at the rolling Project Pitch gate, close the declined Cambridge FHWA teaming route without another follow-up, and keep DOJ/BOP partner-only.",
+        f"Direct answer: Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. {summary['critical_same_day_infrastructure_action']} Finish the OpenAI Build Week public-demo, provenance, video, and Devpost preview gates before its July 21 close, then stage the hash-verified MissionWeave DSIP package for July 22 noon Eastern. Keep NSF at the rolling Project Pitch gate, close the declined Cambridge FHWA teaming route without another follow-up, and keep DOJ/BOP partner-only.",
         "",
         "## Control Line",
         "",
@@ -1859,7 +2174,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Status: `{row['submission_status']}`",
                 f"- Sent UTC: `{row['sent_utc']}`",
                 f"- Receipt: `{row['receipt_path']}`",
-                f"- Attachment SHA-256: `{row['receipt_attachment_sha256']}`",
+                f"- Receipt evidence SHA-256: `{row['receipt_attachment_sha256']}`",
+                f"- Verification scope: `{row.get('verification_scope') or 'RECEIPT_RECORD_ONLY'}`",
+                f"- Claim boundary: {row.get('claim_boundary') or 'The receipt proves only the recorded transmission state.'}",
                 "",
             ]
         )

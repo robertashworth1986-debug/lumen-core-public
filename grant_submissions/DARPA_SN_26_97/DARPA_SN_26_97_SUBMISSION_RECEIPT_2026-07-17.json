@@ -1,0 +1,30 @@
+{
+  "schema": "lumencore.darpa_rfi_submission_receipt.v1",
+  "status": "EMAIL_SUBMISSION_SENT_BEFORE_DEADLINE",
+  "notice_id": "DARPA-SN-26-97",
+  "title": "Anticipatory Research Program RFI",
+  "official_notice_url": "https://sam.gov/opp/e7e66724a10f4bdc9e327c101347f71e/view",
+  "deadline": "2026-07-17T17:00:00-04:00",
+  "sent": "2026-07-17T15:27:49-04:00",
+  "sent_before_deadline_seconds": 5531,
+  "submission_channel": "Official notice email route",
+  "subject": "RE: DARPA-SN-26-97 - Non-Proprietary RFI Response - LumenCore",
+  "evidence_state": "SENT_FOLDER_AND_LOCAL_ATTACHMENT_MANIFEST_OBSERVED",
+  "attachments": [
+    {
+      "name": "LumenCore_DARPA_SN_26_97_One_Slide.private.pdf",
+      "bytes": 3588,
+      "sha256": "29a154e28899b2062859ec7d9ebcef438fe430a352d4d57e889be04f276a0964"
+    },
+    {
+      "name": "LumenCore_DARPA_SN_26_97_RFI_Response.private.pdf",
+      "bytes": 19202,
+      "sha256": "afd15408da826d6b92cb8561ee049c975104bc975998a068cb1c1ee6aaf196da"
+    }
+  ],
+  "acknowledgment": {
+    "received": false,
+    "follow_up_required": false
+  },
+  "claim_boundary": "This receipt verifies a sent-folder record before the stated deadline and reconciles the two local attachment hashes. It does not prove agency receipt, acceptance, workshop selection, endorsement, validation, funding, or award."
+}

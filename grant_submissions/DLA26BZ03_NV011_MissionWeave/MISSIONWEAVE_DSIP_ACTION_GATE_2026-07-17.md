@@ -13,9 +13,9 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Private target git-ignored: `true`
 - Private values exposed: `false`
 - Required private gates: `50`
-- Passed private gates: `13`
-- Open gates: `37`
-- Gate SHA-256: `c7a5ec983de9b6657f4a54d2ec5e624c3ca1e36daeddc42543e615dcadbb0bce`
+- Passed private gates: `15`
+- Open gates: `35`
+- Gate SHA-256: `aca80eba7c6f85a67e8ed7fe3e8f524b54a0590125890524eda4772ea523045e`
 
 ## Package Integrity
 
@@ -82,8 +82,6 @@ This public-safe gate reports only package integrity and private-workflow comple
 - `PI_PRIMARY_EMPLOYMENT`
 - `PORTAL_PREVIEW_RECEIPT_HASH`
 - `PRIOR_CURRENT_PENDING_SUPPORT`
-- `SAM_ACTIVE_STATUS`
-- `SAM_LEGAL_NAME_MATCH`
 - `SAM_REPRESENTATIONS_CURRENT`
 - `SBA_COMPANY_REGISTRY`
 - `SBC_CONTROL_ID`

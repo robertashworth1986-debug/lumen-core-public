@@ -1,0 +1,138 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "generated_utc": "2026-07-18T05:25:49.0768854Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718",
+  "artifact_count": 14,
+  "all_sha256_matched_after_copy": true,
+  "browser_navigation_performed": false,
+  "private_input_mirrored": false,
+  "private_values_mirrored": false,
+  "artifacts": [
+    {
+      "source": ".gitattributes",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/.gitattributes",
+      "bytes": 742,
+      "sha256": "6B902ABABFE5A745608BCCDB84C1C6B69BEC86AC190823691B17EBFBFF199440",
+      "copy_bytes": 742,
+      "copy_sha256": "6B902ABABFE5A745608BCCDB84C1C6B69BEC86AC190823691B17EBFBFF199440",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": ".gitignore",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/.gitignore",
+      "bytes": 2753,
+      "sha256": "5C501C55A798CE9DDBAB78A9687B9D67D08004F17DFC4D06A726867BC5334C83",
+      "copy_bytes": 2753,
+      "copy_sha256": "5C501C55A798CE9DDBAB78A9687B9D67D08004F17DFC4D06A726867BC5334C83",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+      "bytes": 121170,
+      "sha256": "BEE307BCC75017E4C1E917F260E9303A7EE8256551917A12FAD5F73181CEE6D4",
+      "copy_bytes": 121170,
+      "copy_sha256": "BEE307BCC75017E4C1E917F260E9303A7EE8256551917A12FAD5F73181CEE6D4",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_near_deadline_submission_command_board.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/tests/test_near_deadline_submission_command_board.py",
+      "bytes": 26423,
+      "sha256": "C81E63013EA65C462EEF9C37B6884EA4FDC4A61719519A02DBE0E867404F8774",
+      "copy_bytes": 26423,
+      "copy_sha256": "C81E63013EA65C462EEF9C37B6884EA4FDC4A61719519A02DBE0E867404F8774",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "bytes": 9757,
+      "sha256": "6D78478CB89B44DC2B20433F3BB7229752612235A609C9C8AE8AE3C81D79EF1E",
+      "copy_bytes": 9757,
+      "copy_sha256": "6D78478CB89B44DC2B20433F3BB7229752612235A609C9C8AE8AE3C81D79EF1E",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md",
+      "bytes": 5079,
+      "sha256": "93FC9E8AE9E1BB379DEA55E7F814D3D374236D617FD138E305F432DEA3652772",
+      "copy_bytes": 5079,
+      "copy_sha256": "93FC9E8AE9E1BB379DEA55E7F814D3D374236D617FD138E305F432DEA3652772",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_missionweave_dsip_action_gate.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/tests/test_missionweave_dsip_action_gate.py",
+      "bytes": 15519,
+      "sha256": "8DC772194FA4F007B626419DAF132046178F9F5B80701F234F4312421B5F0D89",
+      "copy_bytes": 15519,
+      "copy_sha256": "8DC772194FA4F007B626419DAF132046178F9F5B80701F234F4312421B5F0D89",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json",
+      "bytes": 1347,
+      "sha256": "E606530B0CCBAB06347BEF60DE527B4A76E5EE35BD7A15E71C3A0B49647BE505",
+      "copy_bytes": 1347,
+      "copy_sha256": "E606530B0CCBAB06347BEF60DE527B4A76E5EE35BD7A15E71C3A0B49647BE505",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.md",
+      "bytes": 950,
+      "sha256": "35A89096FDCB6DC47E2E1B11840479414EE78F3D8629D308BB73061C9171D403",
+      "copy_bytes": 950,
+      "copy_sha256": "35A89096FDCB6DC47E2E1B11840479414EE78F3D8629D308BB73061C9171D403",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/DARPA_SN_26_97/DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/grant_submissions/DARPA_SN_26_97/DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.json",
+      "bytes": 1331,
+      "sha256": "7D5D3E744A02AEF665E1B8ACB93B3579ABC4A978414958E59E742E7CDE8A4EC0",
+      "copy_bytes": 1331,
+      "copy_sha256": "7D5D3E744A02AEF665E1B8ACB93B3579ABC4A978414958E59E742E7CDE8A4EC0",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/DARPA_SN_26_97/DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/grant_submissions/DARPA_SN_26_97/DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.md",
+      "bytes": 836,
+      "sha256": "5D1A6CDA979E14B6C9FA7A41275D7B2B0513B8FD6601B45E3AAC1550D395C07A",
+      "copy_bytes": 836,
+      "copy_sha256": "5D1A6CDA979E14B6C9FA7A41275D7B2B0513B8FD6601B45E3AAC1550D395C07A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-18.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-18.md",
+      "bytes": 65043,
+      "sha256": "E51B6BC14264C6E369EB055895DC56C515083B178B3A6AE3B5B5B869CBBFC48F",
+      "copy_bytes": 65043,
+      "copy_sha256": "E51B6BC14264C6E369EB055895DC56C515083B178B3A6AE3B5B5B869CBBFC48F",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "out/ops/near_deadline_submission_command_board_latest.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/out/ops/near_deadline_submission_command_board_latest.json",
+      "bytes": 87892,
+      "sha256": "A23DF8C008B67D7C76C27561E92ADCA1E90039E03CCD11DD143C70D34DCC8DA1",
+      "copy_bytes": 87892,
+      "copy_sha256": "A23DF8C008B67D7C76C27561E92ADCA1E90039E03CCD11DD143C70D34DCC8DA1",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "dashboard/data/near_deadline_submission_command_board.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NEAR_DEADLINE_COMMAND_BOARD_20260718/dashboard/data/near_deadline_submission_command_board.json",
+      "bytes": 87892,
+      "sha256": "A23DF8C008B67D7C76C27561E92ADCA1E90039E03CCD11DD143C70D34DCC8DA1",
+      "copy_bytes": 87892,
+      "copy_sha256": "A23DF8C008B67D7C76C27561E92ADCA1E90039E03CCD11DD143C70D34DCC8DA1",
+      "copy_sha256_matched": true
+    }
+  ]
+}
