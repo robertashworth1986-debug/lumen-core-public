@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,8 @@ DASHBOARD_DATA = ROOT / "dashboard" / "data"
 SAM_BOARD = OUT_OPS / "sam_rush_submission_board_latest.json"
 GRANTS_RANKED = ROOT / "out" / "grants" / "grants_ranked_v2.json"
 ZERO_FRICTION = OUT_OPS / "funding_reviewer_zero_friction_pack_latest.json"
+GRANT_REVIEWER_CURATION = ROOT / "config" / "grant_reviewer_curation_v1.json"
+GRANT_REVIEWER_FEED = DASHBOARD_DATA / "grant_reviewer_feed.json"
 SUBMISSION_RECEIPT = SPRINT_DIR / "EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json"
 CDC_ENGAGEMENT_RECEIPT = (
     SPRINT_DIR / "CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json"
@@ -198,6 +201,23 @@ PATENT_PRIVATE_CAPTURE_WORKFLOW = (
     SPRINT_DIR / "PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md"
 )
 
+NV061_DIR = ROOT / "grant_submissions" / "NV061_TrackCast"
+NV061_CONCEPT = NV061_DIR / "NV061_CONCEPT_DRAFT.md"
+NV061_READINESS = NV061_DIR / "NV061_READINESS.md"
+NV063_DIR = ROOT / "grant_submissions" / "NV063_HarborSentinel"
+NV063_PACKAGE_MANIFEST = NV063_DIR / "NV063_DSIP_PACKAGE_MANIFEST_2026-07-16.json"
+NV063_READINESS = NV063_DIR / "NV063_READINESS.md"
+NV065_DIR = ROOT / "grant_submissions" / "NV065_AdaptiveSensorManagement"
+NV065_CONCEPT = NV065_DIR / "NV065_CONCEPT_DRAFT.md"
+NV065_READINESS = NV065_DIR / "NV065_READINESS.md"
+
+CURATED_NAVY_OPPORTUNITY_NUMBERS = (
+    "DON26BZ03-NV061",
+    "DON26BZ03-NV063",
+    "DON26BZ03-NV065",
+)
+DEFAULT_SOURCE_TTL_HOURS = 24.0
+
 OUT_JSON = OUT_OPS / "near_deadline_submission_command_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "near_deadline_submission_command_board.json"
 SCAN_DATE = date.today()
@@ -218,6 +238,13 @@ NO_BID_COMMANDS = {
     "PARTNER_OR_NO_BID",
 }
 EXPIRED_COMMAND = "EXPIRED_NO_SUBMISSION"
+FRESHNESS_BLOCKED_COMMAND = "REVERIFY_SOURCE_BEFORE_STAGE"
+
+PORTAL_ONLY_LANES = {
+    "nashville_ec_fall_2026_takeoff",
+    "openai_build_week_prooflock_console",
+    "launchtn_3686_pitch_2026",
+}
 
 SENSITIVE_MARKERS = [
     "password",
@@ -270,6 +297,244 @@ def utc_iso(value: str, *, field: str) -> str:
         .isoformat()
         .replace("+00:00", "Z")
     )
+
+
+def optional_aware_datetime(value: Any) -> datetime | None:
+    if value in (None, ""):
+        return None
+    try:
+        return parse_aware_datetime(str(value), field="source timestamp")
+    except (TypeError, ValueError):
+        return None
+
+
+def source_timestamp(payload: dict[str, Any]) -> str | None:
+    for key in (
+        "generated_utc",
+        "harvested_utc",
+        "updated_utc",
+        "timestamp_utc",
+        "verified_utc",
+    ):
+        parsed = optional_aware_datetime(payload.get(key))
+        if parsed is not None:
+            return parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    return None
+
+
+def freshness_descriptor(
+    *,
+    source: str,
+    source_utc: Any,
+    as_of: datetime,
+    ttl_hours: float,
+    explicit_fresh_until_utc: Any = None,
+) -> dict[str, Any]:
+    parsed = optional_aware_datetime(source_utc)
+    explicit_fresh_until = optional_aware_datetime(explicit_fresh_until_utc)
+    if parsed is None:
+        return {
+            "source": source,
+            "source_utc": None,
+            "age_hours": None,
+            "ttl_hours": ttl_hours,
+            "fresh_until_utc": None,
+            "freshness_status": "UNDATED_REVERIFY_REQUIRED",
+            "status": "UNDATED_REVERIFY_REQUIRED",
+            "blocking": True,
+            "reason": "The source has no valid timezone-aware timestamp.",
+        }
+
+    parsed = parsed.astimezone(timezone.utc)
+    age_hours = round((as_of - parsed).total_seconds() / 3600.0, 3)
+    fresh_until = explicit_fresh_until or (parsed + timedelta(hours=ttl_hours))
+    if age_hours < -0.084:
+        status = "FUTURE_TIMESTAMP_REVERIFY_REQUIRED"
+        reason = "The source timestamp is later than the board as-of time."
+        blocking = True
+    elif as_of > fresh_until:
+        status = "STALE_REVERIFY_REQUIRED"
+        reason = "The source exceeded its TTL before the board as-of time."
+        blocking = True
+    else:
+        status = "CURRENT_WITHIN_TTL"
+        reason = "The source timestamp is within its TTL at the board as-of time."
+        blocking = False
+
+    return {
+        "source": source,
+        "source_utc": parsed.isoformat().replace("+00:00", "Z"),
+        "age_hours": age_hours,
+        "ttl_hours": ttl_hours,
+        "fresh_until_utc": fresh_until.astimezone(timezone.utc)
+        .isoformat()
+        .replace("+00:00", "Z"),
+        "freshness_status": status,
+        "status": status,
+        "blocking": blocking,
+        "reason": reason,
+    }
+
+
+def build_source_freshness(
+    *,
+    curation: dict[str, Any],
+    reviewer_feed: dict[str, Any],
+    sam_board: dict[str, Any],
+    grants_ranked: dict[str, Any],
+    zero_friction: dict[str, Any],
+    as_of_utc: str,
+) -> dict[str, Any]:
+    as_of = parse_aware_datetime(as_of_utc, field="board as_of_utc").astimezone(
+        timezone.utc
+    )
+    ttl_raw = curation.get("reviewer_feed_ttl_hours")
+    ttl_valid = (
+        isinstance(ttl_raw, (int, float))
+        and not isinstance(ttl_raw, bool)
+        and ttl_raw > 0
+    )
+    ttl_hours = float(ttl_raw) if ttl_valid else DEFAULT_SOURCE_TTL_HOURS
+
+    feed_freshness = reviewer_feed.get("freshness", {})
+    if not isinstance(feed_freshness, dict):
+        feed_freshness = {}
+    feed_ttl_raw = feed_freshness.get("ttl_hours")
+    feed_ttl_valid = (
+        isinstance(feed_ttl_raw, (int, float))
+        and not isinstance(feed_ttl_raw, bool)
+        and feed_ttl_raw > 0
+    )
+    feed_ttl_hours = float(feed_ttl_raw) if feed_ttl_valid else ttl_hours
+    descriptors = {
+        "grant_reviewer_curation": freshness_descriptor(
+            source="grant_reviewer_curation",
+            source_utc=curation.get("verified_utc"),
+            as_of=as_of,
+            ttl_hours=ttl_hours,
+        ),
+        "grant_reviewer_feed": freshness_descriptor(
+            source="grant_reviewer_feed",
+            source_utc=reviewer_feed.get("generated_utc"),
+            as_of=as_of,
+            ttl_hours=feed_ttl_hours,
+            explicit_fresh_until_utc=feed_freshness.get("fresh_until_utc"),
+        ),
+        "sam_rush_board": freshness_descriptor(
+            source="sam_rush_board",
+            source_utc=source_timestamp(sam_board),
+            as_of=as_of,
+            ttl_hours=ttl_hours,
+        ),
+        "grants_ranked": freshness_descriptor(
+            source="grants_ranked",
+            source_utc=source_timestamp(grants_ranked),
+            as_of=as_of,
+            ttl_hours=ttl_hours,
+        ),
+        "zero_friction_pack": freshness_descriptor(
+            source="zero_friction_pack",
+            source_utc=source_timestamp(zero_friction),
+            as_of=as_of,
+            ttl_hours=ttl_hours,
+        ),
+    }
+    if not feed_ttl_valid:
+        descriptors["grant_reviewer_feed"].update(
+            {
+                "freshness_status": "INVALID_TTL_REVERIFY_REQUIRED",
+                "status": "INVALID_TTL_REVERIFY_REQUIRED",
+                "blocking": True,
+                "reason": "The reviewer feed TTL is missing or invalid.",
+            }
+        )
+
+    sam_health = reviewer_feed.get("source_health", {}).get("sam_gov", {})
+    if not isinstance(sam_health, dict):
+        sam_health = {}
+    sam_live = freshness_descriptor(
+        source="sam_live_discovery",
+        source_utc=sam_health.get("harvested_utc"),
+        as_of=as_of,
+        ttl_hours=ttl_hours,
+    )
+    records = sam_health.get("records")
+    zero_rows = not isinstance(records, int) or isinstance(records, bool) or records <= 0
+    inconclusive = (
+        zero_rows
+        or sam_health.get("live_response_observed") is not True
+        or sam_health.get("response_shape_valid") is not True
+    )
+    sam_live.update(
+        {
+            "records": (
+                records
+                if isinstance(records, int) and not isinstance(records, bool)
+                else None
+            ),
+            "reported_status": sam_health.get("status") or "MISSING_SOURCE_HEALTH",
+            "reported_http_status": sam_health.get("http_status"),
+            "reported_freshness_status_at_feed_build": sam_health.get(
+                "source_freshness_status"
+            ),
+            "zero_rows": zero_rows,
+        }
+    )
+    if inconclusive:
+        sam_live.update(
+            {
+                "status": "ZERO_ROW_SAM_RESPONSE_INCONCLUSIVE_BLOCKER"
+                if zero_rows
+                else "SAM_RESPONSE_INCONCLUSIVE_BLOCKER",
+                "blocking": True,
+                "reason": (
+                    "The bounded SAM diagnostic returned zero usable rows; this does not prove "
+                    "that no opportunities exist and cannot refresh a deadline or eligibility state."
+                ),
+            }
+        )
+    descriptors["sam_live_discovery"] = sam_live
+
+    if not ttl_valid:
+        descriptors["ttl_control"] = {
+            "source": "ttl_control",
+            "source_utc": None,
+            "age_hours": None,
+            "ttl_hours": ttl_hours,
+            "fresh_until_utc": None,
+            "freshness_status": "INVALID_TTL_REVERIFY_REQUIRED",
+            "status": "INVALID_TTL_REVERIFY_REQUIRED",
+            "blocking": True,
+            "reason": "The curation TTL is missing or invalid; the default is display-only.",
+        }
+
+    blockers = [
+        {
+            "source": key,
+            "status": row["status"],
+            "freshness_status": row["freshness_status"],
+            "reason": row["reason"],
+        }
+        for key, row in descriptors.items()
+        if row["blocking"]
+    ]
+    return {
+        "as_of_utc": as_of.isoformat().replace("+00:00", "Z"),
+        "ttl_hours": ttl_hours,
+        "ttl_control_valid": ttl_valid,
+        "overall_status": (
+            "BLOCKED_REVERIFY_REQUIRED" if blockers else "CURRENT_WITHIN_TTL"
+        ),
+        "submission_decisions_fail_closed": True,
+        "blocker_count": len(blockers),
+        "blockers": blockers,
+        "sources": descriptors,
+        "claim_boundary": (
+            "Freshness describes local snapshots only. A current timestamp does not prove "
+            "eligibility, an unchanged deadline, portal state, or submission readiness; zero-row "
+            "or inconclusive discovery responses never prove opportunity absence."
+        ),
+    }
 
 
 def nashville_private_action_gate() -> dict[str, Any]:
@@ -381,9 +646,15 @@ def normalize_lane_deadlines(
     lanes: list[dict[str, Any]], scan_date: date = SCAN_DATE
 ) -> None:
     for lane in lanes:
-        deadline_date = str(lane.get("deadline_date") or lane.get("deadline_utc", "")[:10])
-        lane["deadline_date"] = deadline_date
-        days = days_to_close(deadline_date, scan_date)
+        deadline_date = str(
+            lane.get("deadline_date") or str(lane.get("deadline_utc") or "")[:10]
+        )
+        try:
+            days = days_to_close(deadline_date, scan_date)
+        except ValueError:
+            deadline_date = ""
+            days = None
+        lane["deadline_date"] = deadline_date or None
         lane["days_to_close"] = days
         lane["days_to_close_from_scan_date"] = days
         lane["deadline_bucket"] = deadline_bucket(days)
@@ -406,12 +677,367 @@ def grant_lookup(grants: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return rows
 
 
+def inspect_nv063_package() -> dict[str, Any]:
+    manifest = read_json(NV063_PACKAGE_MANIFEST)
+    errors: list[str] = []
+    artifacts = manifest.get("artifacts")
+    if manifest.get("schema") != "nv063_dsip_package_manifest_v1":
+        errors.append("manifest_schema")
+    if manifest.get("topic") != "DON26BZ03-NV063":
+        errors.append("manifest_topic")
+    if not isinstance(artifacts, list) or not artifacts:
+        artifacts = []
+        errors.append("manifest_artifacts")
+
+    package_files = [rel(NV063_PACKAGE_MANIFEST), rel(NV063_READINESS)]
+    root_resolved = ROOT.resolve()
+    for item in artifacts:
+        if not isinstance(item, dict):
+            errors.append("invalid_artifact_record")
+            continue
+        declared = str(item.get("path") or "")
+        if not declared:
+            errors.append("missing_artifact_path")
+            continue
+        package_files.append(declared.replace("\\", "/"))
+        candidate = (ROOT / declared).resolve()
+        try:
+            candidate.relative_to(root_resolved)
+        except ValueError:
+            errors.append(f"outside_root:{declared}")
+            continue
+        if not candidate.is_file():
+            errors.append(f"missing:{declared}")
+            continue
+        data = candidate.read_bytes()
+        expected_sha = str(item.get("sha256") or "").lower()
+        if len(data) != item.get("bytes") or hashlib.sha256(data).hexdigest() != expected_sha:
+            errors.append(f"hash_or_size:{declared}")
+
+    return {
+        "manifest_status": manifest.get("status") or "MISSING_OR_INVALID_MANIFEST",
+        "package_integrity_pass": not errors,
+        "package_integrity_status": (
+            "MANIFEST_HASHES_VERIFIED" if not errors else "MANIFEST_REVERIFY_REQUIRED"
+        ),
+        "manifest_integrity_errors": errors,
+        "package_files": list(dict.fromkeys(package_files)),
+    }
+
+
+def build_curated_navy_lanes(
+    curation: dict[str, Any],
+    source_freshness: dict[str, Any],
+    scan_date: date,
+) -> list[dict[str, Any]]:
+    if curation.get("schema") != "lumencore.grant_reviewer_curation.v1":
+        raise ValueError("Grant reviewer curation control is missing or has the wrong schema")
+    candidates = curation.get("candidates")
+    if not isinstance(candidates, list):
+        raise ValueError("Grant reviewer curation candidates are missing")
+
+    by_number: dict[str, dict[str, Any]] = {}
+    for row in candidates:
+        if not isinstance(row, dict):
+            continue
+        number = str(row.get("opportunity_number") or "")
+        if number in CURATED_NAVY_OPPORTUNITY_NUMBERS:
+            if number in by_number:
+                raise ValueError(f"Duplicate curated Navy lane: {number}")
+            by_number[number] = row
+    missing = sorted(set(CURATED_NAVY_OPPORTUNITY_NUMBERS) - set(by_number))
+    if missing:
+        raise ValueError(f"Required curated Navy lanes are absent: {', '.join(missing)}")
+
+    nv063_package = inspect_nv063_package()
+    local_material = {
+        "DON26BZ03-NV061": {
+            "package_status": "CONCEPT",
+            "package_files": [rel(NV061_CONCEPT), rel(NV061_READINESS)],
+            "package_integrity_status": "CONCEPT_FILES_PRESENT"
+            if NV061_CONCEPT.is_file() and NV061_READINESS.is_file()
+            else "CONCEPT_FILES_MISSING",
+            "package_integrity_pass": NV061_CONCEPT.is_file()
+            and NV061_READINESS.is_file(),
+        },
+        "DON26BZ03-NV063": {
+            "package_status": "DEDICATED_PACKAGE",
+            **nv063_package,
+        },
+        "DON26BZ03-NV065": {
+            "package_status": "CONCEPT",
+            "package_files": [rel(NV065_CONCEPT), rel(NV065_READINESS)],
+            "package_integrity_status": "CONCEPT_FILES_PRESENT"
+            if NV065_CONCEPT.is_file() and NV065_READINESS.is_file()
+            else "CONCEPT_FILES_MISSING",
+            "package_integrity_pass": NV065_CONCEPT.is_file()
+            and NV065_READINESS.is_file(),
+        },
+    }
+    rank_by_number = {
+        "DON26BZ03-NV063": 1.76,
+        "DON26BZ03-NV065": 1.77,
+        "DON26BZ03-NV061": 1.78,
+    }
+    curation_freshness = source_freshness["sources"][
+        "grant_reviewer_curation"
+    ]
+    lanes: list[dict[str, Any]] = []
+    for number in sorted(rank_by_number, key=rank_by_number.get):
+        candidate = by_number[number]
+        verification = candidate.get("source_verification")
+        if not isinstance(verification, dict):
+            raise ValueError(f"Curated Navy lane {number} has no source verification")
+        close_raw = candidate.get("close_date")
+        close = optional_aware_datetime(close_raw)
+        deadline_utc = (
+            close.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+            if close is not None
+            else None
+        )
+        deadline_date: str | None = None
+        if close_raw:
+            try:
+                deadline_date = date.fromisoformat(str(close_raw)[:10]).isoformat()
+            except ValueError:
+                deadline_date = None
+        published_open = (
+            deadline_date is not None
+            and date.fromisoformat(deadline_date) >= scan_date
+        )
+
+        material = local_material[number]
+        authority_status = str(verification.get("status") or "")
+        authority_recheck = (
+            "RECHECK_REQUIRED" in authority_status
+            or "unofficial" in str(verification.get("authority_boundary") or "").lower()
+        )
+        blockers: list[str] = []
+        if curation_freshness["blocking"]:
+            blockers.append(
+                "grant_reviewer_curation:"
+                + str(curation_freshness["freshness_status"])
+            )
+        if authority_recheck:
+            blockers.append("DSIP_CONTROLLING_NOTICE_RECHECK_REQUIRED")
+        if not material["package_integrity_pass"]:
+            blockers.append(str(material["package_integrity_status"]))
+
+        harbor = number == "DON26BZ03-NV063"
+        why_now = (
+            "HarborSentinel remains urgent because the curation control publishes a near close and a "
+            "dedicated local package exists. It is not ready: the controlling DSIP notice, eligibility, "
+            "portal state, compliance facts, cost approval, and any manifest drift must be resolved before staging."
+            if harbor
+            else (
+                "This curated Navy topic remains visible because its published window is near, but the "
+                "local material is a concept rather than a dedicated submission package. The controlling "
+                "DSIP notice and every eligibility, evidence, compliance, cost, and portal gate remain open."
+            )
+        )
+        next_gate = str(candidate.get("next_gate") or "").strip()
+        lanes.append(
+            {
+                "rank": rank_by_number[number],
+                "lane_id": str(candidate.get("candidate_id") or number),
+                "source_system": "Curated Navy topic mirror / DSIP controlling portal",
+                "source_dependency_keys": ["grant_reviewer_curation"],
+                "opportunity_number": number,
+                "title": candidate.get("title"),
+                "agency": candidate.get("agency"),
+                "deadline_utc": deadline_utc,
+                "deadline_date": deadline_date,
+                "published_close_date": close_raw,
+                "official_deadline_text": verification.get("deadline_text"),
+                "deadline_semantics": (
+                    "PUBLISHED_TOPIC_MIRROR_DATE_STALE_DSIP_REVERIFY_REQUIRED"
+                    if curation_freshness["blocking"]
+                    else "PUBLISHED_TOPIC_MIRROR_DATE_DSIP_REVERIFY_REQUIRED"
+                ),
+                "deadline_source": rel(GRANT_REVIEWER_CURATION),
+                "deadline_currently_verified": False,
+                "deadline_actionable": False,
+                "published_window_open_by_recorded_dates": published_open,
+                "published_window_actionable": False,
+                "command": FRESHNESS_BLOCKED_COMMAND,
+                "pre_freshness_command": "ASSEMBLE_DSIP_PROPOSAL"
+                if harbor
+                else "DEVELOP_CONCEPT",
+                "eligibility_state": candidate.get("eligibility_status"),
+                "eligibility_verified": False,
+                "fit_state": candidate.get("submission_status"),
+                "submission_status": candidate.get("submission_status"),
+                "submission_route": candidate.get("submission_route") or "DSIP",
+                "official_url": verification.get("official_update_url"),
+                "secondary_url": candidate.get("source_url"),
+                "source_authority_status": authority_status,
+                "source_verified_utc": verification.get("verified_utc"),
+                "source_age_hours": curation_freshness.get("age_hours"),
+                "source_freshness_status": curation_freshness[
+                    "freshness_status"
+                ],
+                "source_recheck_required": True,
+                "source_data_current": False,
+                "source_authority_boundary": verification.get(
+                    "authority_boundary"
+                ),
+                "freshness_blockers": blockers,
+                "package_status": material["package_status"],
+                "package_integrity_status": material[
+                    "package_integrity_status"
+                ],
+                "package_integrity_pass": material["package_integrity_pass"],
+                "package_manifest_status": material.get("manifest_status"),
+                "package_integrity_errors": material.get(
+                    "manifest_integrity_errors", []
+                ),
+                "package_files": material["package_files"],
+                "portal_status": "PORTAL_ONLY_UNVERIFIED",
+                "portal_status_verified": False,
+                "urgency_status": (
+                    "URGENT_PUBLISHED_DEADLINE_REVERIFY_REQUIRED"
+                    if published_open
+                    else "PUBLISHED_WINDOW_NOT_ACTIONABLE_REVERIFY_REQUIRED"
+                ),
+                "readiness_status": "URGENT_NOT_READY" if harbor else "NOT_READY",
+                "submission_ready": False,
+                "submission_ready_for_human_action": False,
+                "why_now": why_now,
+                "today_work": [
+                    "Recheck the complete active solicitation and live DSIP topic before relying on the published close.",
+                    next_gate,
+                ],
+                "human_gate": [
+                    "Robert verifies current DSIP organization and submitter authority from the live portal.",
+                    "Robert verifies eligibility, representations, cost, attachments, and the final portal preview from current controlling instructions.",
+                ],
+                "claim_boundary": candidate.get("claim_boundary"),
+                "external_send_allowed_without_human": False,
+                "final_submit_allowed_without_human": False,
+            }
+        )
+    return lanes
+
+
+def classify_lane_status(lane: dict[str, Any]) -> None:
+    command = str(lane.get("command") or "")
+    material_command = str(lane.get("pre_freshness_command") or command)
+    if not lane.get("package_status"):
+        if command in NO_BID_COMMANDS:
+            lane["package_status"] = "NO_BID"
+        elif command == EXPIRED_COMMAND:
+            lane["package_status"] = "EXPIRED"
+        elif lane.get("lane_id") in PORTAL_ONLY_LANES:
+            lane["package_status"] = "PORTAL_ONLY"
+        elif material_command in {"STAGE_CONCEPT_PAPER", "STAGE_PROJECT_PITCH"}:
+            lane["package_status"] = "CONCEPT"
+        elif lane.get("package_files"):
+            lane["package_status"] = "DEDICATED_PACKAGE"
+        else:
+            lane["package_status"] = "SOURCE_ONLY_NOTICE"
+
+    if not lane.get("portal_status"):
+        submission_status = str(lane.get("submission_status") or "")
+        route = str(lane.get("submission_route") or "").lower()
+        if submission_status == "PORTAL_SUBMISSION_CONFIRMED":
+            lane["portal_status"] = "PORTAL_CONFIRMED_RECEIPT_BACKED"
+            lane["portal_status_verified"] = True
+        elif command in NO_BID_COMMANDS:
+            lane["portal_status"] = "NO_PORTAL_ACTION_AUTHORIZED"
+            lane["portal_status_verified"] = False
+        elif any(
+            marker in route
+            for marker in ("portal", "dsip", "airtable", "devpost", "research.gov", "grants.gov", "sam.gov")
+        ):
+            lane["portal_status"] = "PORTAL_ONLY_UNVERIFIED"
+            lane["portal_status_verified"] = False
+        else:
+            lane["portal_status"] = "NOT_APPLICABLE_OR_NOT_OBSERVED"
+            lane["portal_status_verified"] = False
+
+    lane.setdefault("submission_ready", False)
+    lane.setdefault("submission_ready_for_human_action", False)
+    if not lane.get("readiness_status"):
+        if command == "SENT_VERIFIED":
+            lane["readiness_status"] = "RECEIPT_BACKED_HISTORICAL_SEND"
+        elif command in NO_BID_COMMANDS:
+            lane["readiness_status"] = "NO_BID"
+        elif command == EXPIRED_COMMAND:
+            lane["readiness_status"] = "EXPIRED_NOT_READY"
+        elif lane.get("freshness_blockers"):
+            lane["readiness_status"] = "NOT_READY_FRESHNESS_BLOCKED"
+        else:
+            lane["readiness_status"] = "NOT_READY_HUMAN_GATED"
+
+
+def apply_lane_freshness_controls(
+    lanes: list[dict[str, Any]],
+    source_freshness: dict[str, Any],
+    sam_numbers: set[str],
+    grant_numbers: set[str],
+) -> None:
+    descriptors = source_freshness["sources"]
+    for lane in lanes:
+        number = str(lane.get("opportunity_number") or "")
+        source_system = str(lane.get("source_system") or "").lower()
+        dependencies = list(lane.get("source_dependency_keys") or [])
+        if number in sam_numbers or "sam.gov" in source_system:
+            dependencies.extend(["sam_rush_board", "sam_live_discovery"])
+        if number in grant_numbers:
+            dependencies.append("grants_ranked")
+        dependencies = list(dict.fromkeys(dependencies))
+        lane["source_dependency_keys"] = dependencies
+
+        existing_blockers = list(lane.get("freshness_blockers") or [])
+        dependency_blockers = [
+            f"{key}:{descriptors[key]['status']}"
+            for key in dependencies
+            if key in descriptors and descriptors[key]["blocking"]
+        ]
+        lane["freshness_blockers"] = list(
+            dict.fromkeys([*existing_blockers, *dependency_blockers])
+        )
+        if dependencies:
+            blocking = bool(lane["freshness_blockers"])
+            lane["source_freshness_status"] = (
+                "BLOCKED_REVERIFY_REQUIRED"
+                if blocking
+                else "CURRENT_WITHIN_TTL"
+            )
+            lane["source_data_current"] = not blocking
+            if blocking:
+                lane["deadline_currently_verified"] = False
+                lane["deadline_actionable"] = False
+                lane["eligibility_currently_verified"] = False
+                if lane["command"] in STAGE_COMMANDS:
+                    lane["pre_freshness_command"] = lane["command"]
+                    lane["command"] = FRESHNESS_BLOCKED_COMMAND
+                    lane["today_work"] = [
+                        "Reverify the complete controlling notice and deadline before resuming package staging.",
+                        *lane["today_work"],
+                    ]
+        else:
+            lane.setdefault("source_freshness_status", "NO_TTL_FEED_DEPENDENCY")
+            lane.setdefault("source_data_current", None)
+            lane.setdefault("deadline_actionable", False)
+            lane.setdefault("deadline_currently_verified", False)
+        classify_lane_status(lane)
+
+
 def base_sources() -> dict[str, Any]:
     sources = {}
     for key, path in {
         "sam_rush_board": SAM_BOARD,
         "grants_ranked": GRANTS_RANKED,
         "funding_reviewer_zero_friction_pack": ZERO_FRICTION,
+        "grant_reviewer_curation": GRANT_REVIEWER_CURATION,
+        "grant_reviewer_feed": GRANT_REVIEWER_FEED,
+        "nv061_concept": NV061_CONCEPT,
+        "nv061_readiness": NV061_READINESS,
+        "nv063_package_manifest": NV063_PACKAGE_MANIFEST,
+        "nv063_readiness": NV063_READINESS,
+        "nv065_concept": NV065_CONCEPT,
+        "nv065_readiness": NV065_READINESS,
         "external_submission_receipt": SUBMISSION_RECEIPT,
         "cdc_engagement_receipt": CDC_ENGAGEMENT_RECEIPT,
         "doj_bop_go_no_go": DOJ_BOP_DECISION,
@@ -808,7 +1434,11 @@ def build_cdc_receipt_lane(receipt: dict[str, Any]) -> dict[str, Any] | None:
 def expire_closed_lanes(lanes: list[dict[str, Any]]) -> None:
     protected = {"SENT_VERIFIED", *NO_BID_COMMANDS, EXPIRED_COMMAND}
     for lane in lanes:
-        if lane["days_to_close"] >= 0 or lane["command"] in protected:
+        if (
+            lane["days_to_close"] is None
+            or lane["days_to_close"] >= 0
+            or lane["command"] in protected
+        ):
             continue
         lane["pre_expiry_command"] = lane["command"]
         lane["command"] = EXPIRED_COMMAND
@@ -833,7 +1463,19 @@ def build_command_lanes(
     darpa_submission_receipt: dict[str, Any] | None = None,
     openai_build_week_readiness: dict[str, Any] | None = None,
     scan_date: date = SCAN_DATE,
+    curation_control: dict[str, Any] | None = None,
+    source_freshness: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
+    curation_control = curation_control or read_json(GRANT_REVIEWER_CURATION)
+    if source_freshness is None:
+        source_freshness = build_source_freshness(
+            curation=curation_control,
+            reviewer_feed=read_json(GRANT_REVIEWER_FEED),
+            sam_board=sam_board,
+            grants_ranked=grants_ranked,
+            zero_friction=read_json(ZERO_FRICTION),
+            as_of_utc=now_utc(),
+        )
     nashville_gate = nashville_private_action_gate()
     nashville_deadline = read_json(NASHVILLE_EC_DEADLINE_RECEIPT)
     nashville_official_deadline = read_json(NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION)
@@ -1812,6 +2454,10 @@ def build_command_lanes(
         ]
     )
 
+    lanes.extend(
+        build_curated_navy_lanes(curation_control, source_freshness, scan_date)
+    )
+
     cdc_lane = build_cdc_receipt_lane(cdc_engagement_receipt or {})
     if cdc_lane is not None:
         lanes.append(cdc_lane)
@@ -1825,6 +2471,12 @@ def build_command_lanes(
     )
     normalize_lane_deadlines(lanes, scan_date)
     expire_closed_lanes(lanes)
+    apply_lane_freshness_controls(
+        lanes,
+        source_freshness,
+        set(sam),
+        set(grants),
+    )
     lanes.sort(key=lambda row: (float(row["rank"]), row["opportunity_number"]))
     for rank, lane in enumerate(lanes, start=1):
         lane["rank"] = rank
@@ -1842,10 +2494,27 @@ def describe_lane(row: dict[str, Any] | None) -> str:
     )
 
 
-def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
+def build_payload(
+    scan_date: date = SCAN_DATE,
+    *,
+    generated_utc: str | None = None,
+    as_of_utc: str | None = None,
+) -> dict[str, Any]:
+    generated = utc_iso(generated_utc or now_utc(), field="generated_utc")
+    board_as_of = utc_iso(as_of_utc or generated, field="as_of_utc")
     sam_board = read_json(SAM_BOARD)
     grants_ranked = read_json(GRANTS_RANKED)
     zero = read_json(ZERO_FRICTION)
+    curation_control = read_json(GRANT_REVIEWER_CURATION)
+    reviewer_feed = read_json(GRANT_REVIEWER_FEED)
+    source_freshness = build_source_freshness(
+        curation=curation_control,
+        reviewer_feed=reviewer_feed,
+        sam_board=sam_board,
+        grants_ranked=grants_ranked,
+        zero_friction=zero,
+        as_of_utc=board_as_of,
+    )
     submission_receipt = read_json(SUBMISSION_RECEIPT)
     cdc_engagement_receipt = read_json(CDC_ENGAGEMENT_RECEIPT)
     nashville_submission_receipt = read_json(NASHVILLE_EC_SUBMISSION_RECEIPT)
@@ -1889,6 +2558,8 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
         darpa_submission_receipt,
         openai_build_week_readiness,
         scan_date,
+        curation_control,
+        source_freshness,
     )
     stage_now = [row for row in lanes if row["command"] in STAGE_COMMANDS]
     sent_verified = [row for row in lanes if row["command"] == "SENT_VERIFIED"]
@@ -1899,7 +2570,8 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
     open_candidates = [
         row
         for row in lanes
-        if row["days_to_close"] >= 0
+        if row["days_to_close"] is not None
+        and row["days_to_close"] >= 0
         and row["command"] not in {"SENT_VERIFIED", EXPIRED_COMMAND, *NO_BID_COMMANDS}
     ]
     closest_open = min(
@@ -1918,29 +2590,83 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
     build_week_lane = next(
         row for row in lanes if row["lane_id"] == "openai_build_week_prooflock_console"
     )
+    harbor_lane = next(
+        row
+        for row in lanes
+        if row["opportunity_number"] == "DON26BZ03-NV063"
+    )
     missionweave_gate_progress = (
         f"{missionweave_lane['action_gate_passed_private_gate_count']}/"
         f"{missionweave_lane['action_gate_required_private_gate_count']}"
     )
+    package_status_counts = {
+        status: sum(row["package_status"] == status for row in lanes)
+        for status in sorted({str(row["package_status"]) for row in lanes})
+    }
+    lane_status_groups = {
+        "dedicated_package": [
+            row["opportunity_number"]
+            for row in lanes
+            if row["package_status"] == "DEDICATED_PACKAGE"
+        ],
+        "source_only_notice": [
+            row["opportunity_number"]
+            for row in lanes
+            if row["package_status"] == "SOURCE_ONLY_NOTICE"
+        ],
+        "concept": [
+            row["opportunity_number"]
+            for row in lanes
+            if row["package_status"] == "CONCEPT"
+        ],
+        "no_bid": [
+            row["opportunity_number"]
+            for row in lanes
+            if row["package_status"] == "NO_BID"
+        ],
+        "portal_only": [
+            row["opportunity_number"]
+            for row in lanes
+            if row["package_status"] == "PORTAL_ONLY"
+            or row["portal_status"] == "PORTAL_ONLY_UNVERIFIED"
+        ],
+    }
+    freshness_blocked = [row for row in lanes if row["freshness_blockers"]]
+    sam_live_source = source_freshness["sources"]["sam_live_discovery"]
 
     payload: dict[str, Any] = {
-        "schema": "near_deadline_submission_command_board_v4",
-        "generated_utc": now_utc(),
+        "schema": "near_deadline_submission_command_board_v5",
+        "generated_utc": generated,
+        "as_of_utc": board_as_of,
         "scan_date": scan_date.isoformat(),
-        "status": "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS",
+        "status": "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_FAIL_CLOSED_FRESHNESS_BLOCKERS",
         "source_ledgers": base_sources(),
+        "source_freshness": source_freshness,
         "summary": {
             "lane_count": len(lanes),
+            "curated_navy_lane_count": sum(
+                row["opportunity_number"] in CURATED_NAVY_OPPORTUNITY_NUMBERS
+                for row in lanes
+            ),
             "stage_now_count": len(stage_now),
             "sent_verified_count": len(sent_verified),
             "emergency_eligibility_gate_count": len(emergency_gate),
             "no_bid_or_partner_only_count": len(no_bid),
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
+            "freshness_blocked_lane_count": len(freshness_blocked),
+            "freshness_blocker_count": source_freshness["blocker_count"],
+            "sam_zero_row_inconclusive_blocker": sam_live_source["zero_rows"],
+            "package_status_counts": package_status_counts,
+            "harbor_status": (
+                f"{harbor_lane['urgency_status']}; {harbor_lane['readiness_status']}; "
+                f"{harbor_lane['package_status']}; {harbor_lane['portal_status']}"
+            ),
             "strongest_today_action": (
                 "Finish the OpenAI Build Week external gates first: deploy and verify the public demo, capture the exact model label and /feedback Session ID, record the privacy-reviewed sub-three-minute video, and stage the Devpost preview before the July 21 7:00 p.m. Central close. "
                 f"Its current readiness control has {build_week_lane['readiness_gate_pass_count']}/{build_week_lane['readiness_gate_total']} gates passed and {build_week_lane['readiness_gate_open_count']} open. "
                 f"Then use the MissionWeave checklist to move its private action gate beyond {missionweave_gate_progress} while keeping the proposal number, final PDF identity, credentials, and action-time approval private for the July 22 noon Eastern close. "
+                "HarborSentinel is urgent but not ready: retain its dedicated package while rechecking DSIP, freshness, package integrity, eligibility, compliance, cost, and portal gates. "
                 "Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket."
             ),
             "critical_same_day_infrastructure_action": sam_critical_action,
@@ -1949,7 +2675,8 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             "best_grants_lane": (
                 "DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. "
                 "The hidden sectioned collector captures DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate. "
-                f"The current public action gate is {missionweave_gate_progress}, with unsupported portal and compliance facts still open. NSF 26-510 stays the next rolling Project Pitch route."
+                f"The current public action gate is {missionweave_gate_progress}, with unsupported portal and compliance facts still open. "
+                "DON26BZ03-NV063 HarborSentinel remains an urgent dedicated-package lane, but it is explicitly not ready and its stale topic mirror cannot refresh the controlling deadline or eligibility. NSF 26-510 stays the next rolling Project Pitch route after its source is refreshed."
             ),
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative remains partner-only through 2026-08-03, but the Cambridge Systematics response lead confirmed its team is already set, so that outreach route is closed. No solo bid, no duplicate follow-up, and no partner claim; reopen only through a different qualified organization with written role and corporate-experience evidence.",
             "fastest_low_friction_lane": (
@@ -1996,6 +2723,7 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             },
         },
         "lanes": lanes,
+        "lane_status_groups": lane_status_groups,
         "sent_verified": [
             {
                 "rank": row["rank"],
@@ -2044,6 +2772,8 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
                 "deadline_date": row["deadline_date"],
                 "eligibility_state": row["eligibility_state"],
                 "fit_state": row["fit_state"],
+                "package_status": row["package_status"],
+                "portal_status": row["portal_status"],
                 "official_url": row["official_url"],
             }
             for row in no_bid
@@ -2060,7 +2790,26 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
             }
             for row in expired
         ],
-        "zero_friction_pack_status": zero.get("status", "UNKNOWN"),
+        "freshness_blocked": [
+            {
+                "rank": row["rank"],
+                "opportunity_number": row["opportunity_number"],
+                "title": row["title"],
+                "pre_freshness_command": row.get("pre_freshness_command"),
+                "command": row["command"],
+                "source_freshness_status": row["source_freshness_status"],
+                "freshness_blockers": row["freshness_blockers"],
+                "deadline_actionable": row["deadline_actionable"],
+                "submission_ready": row["submission_ready"],
+            }
+            for row in freshness_blocked
+        ],
+        "zero_friction_pack_status": (
+            "STALE_REVERIFY_REQUIRED"
+            if source_freshness["sources"]["zero_friction_pack"]["blocking"]
+            else zero.get("status", "UNKNOWN")
+        ),
+        "zero_friction_pack_reported_status": zero.get("status", "UNKNOWN"),
         "submission_boundary": {
             "can_open_pages": True,
             "can_stage_drafts": True,
@@ -2080,7 +2829,10 @@ def build_payload(scan_date: date = SCAN_DATE) -> dict[str, Any]:
         "outputs": {
             "json": rel(OUT_JSON),
             "dashboard_json": rel(DASHBOARD_JSON),
-            "markdown": rel(OUT_MD),
+            "markdown": rel(
+                SPRINT_DIR
+                / f"NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_{scan_date.isoformat()}.md"
+            ),
         },
     }
     payload["command_board_sha256"] = stable_sha256(payload)
@@ -2094,19 +2846,26 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        f"Direct answer: Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. {summary['critical_same_day_infrastructure_action']} Finish the OpenAI Build Week public-demo, provenance, video, and Devpost preview gates before its July 21 close, then stage the hash-verified MissionWeave DSIP package for July 22 noon Eastern. Keep NSF at the rolling Project Pitch gate, close the declined Cambridge FHWA teaming route without another follow-up, and keep DOJ/BOP partner-only.",
+        f"Direct answer: HarborSentinel remains urgent but is not ready; its dedicated package stays visible while stale source, DSIP, package-integrity, eligibility, compliance, cost, and portal gates remain closed. Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. {summary['critical_same_day_infrastructure_action']} Finish the OpenAI Build Week public-demo, provenance, video, and Devpost preview gates before its July 21 close, then stage the hash-verified MissionWeave DSIP package for July 22 noon Eastern. Refresh NSF before resuming its rolling Project Pitch staging, close the declined Cambridge FHWA teaming route without another follow-up, and keep DOJ/BOP partner-only.",
         "",
         "## Control Line",
         "",
         f"- Status: `{payload['status']}`",
+        f"- Generated UTC: `{payload['generated_utc']}`",
+        f"- Freshness as-of UTC: `{payload['as_of_utc']}`",
         f"- Scan date: `{payload['scan_date']}`",
         f"- Lane count: `{summary['lane_count']}`",
+        f"- Curated Navy lanes: `{summary['curated_navy_lane_count']}`",
         f"- Stage-now lanes: `{summary['stage_now_count']}`",
         f"- Sent and verified lanes: `{summary['sent_verified_count']}`",
         f"- Emergency eligibility gates: `{summary['emergency_eligibility_gate_count']}`",
         f"- No-bid or partner-only lanes: `{summary['no_bid_or_partner_only_count']}`",
         f"- Expired without verified send: `{summary['expired_without_verified_send_count']}`",
         f"- Human-gated lanes: `{summary['human_gated_count']}`",
+        f"- Freshness-blocked lanes: `{summary['freshness_blocked_lane_count']}`",
+        f"- SAM zero-row response is an inconclusive blocker: `{str(summary['sam_zero_row_inconclusive_blocker']).lower()}`",
+        f"- Harbor status: `{summary['harbor_status']}`",
+        f"- Package status counts: `{json.dumps(summary['package_status_counts'], sort_keys=True)}`",
         f"- Strongest today action: {summary['strongest_today_action']}",
         f"- Critical infrastructure action: {summary['critical_same_day_infrastructure_action']}",
         f"- Closest deadline lane: {summary['closest_deadline_lane']}",
@@ -2120,9 +2879,33 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Legal certification without human: `{str(summary['legal_certification_allowed_without_human']).lower()}`",
         f"- Command board SHA-256: `{payload['command_board_sha256']}`",
         "",
-        "## Operational Controls",
+        "## Source Freshness",
+        "",
+        f"- Overall status: `{payload['source_freshness']['overall_status']}`",
+        f"- TTL hours: `{payload['source_freshness']['ttl_hours']}`",
+        f"- Fail closed: `{str(payload['source_freshness']['submission_decisions_fail_closed']).lower()}`",
+        f"- Blockers: `{payload['source_freshness']['blocker_count']}`",
+        f"- Boundary: {payload['source_freshness']['claim_boundary']}",
         "",
     ]
+    for key, source in payload["source_freshness"]["sources"].items():
+        lines.append(
+            f"- `{key}`: status=`{source['status']}` freshness=`{source['freshness_status']}` "
+            f"source_utc=`{source['source_utc']}` age_hours=`{source['age_hours']}` "
+            f"blocking=`{str(source['blocking']).lower()}`"
+        )
+        if key == "sam_live_discovery":
+            lines.append(
+                f"  - SAM records: `{source['records']}`; reported diagnostic: "
+                f"`{source['reported_status']}`; zero rows: `{str(source['zero_rows']).lower()}`"
+            )
+    lines.extend(
+        [
+        "",
+        "## Operational Controls",
+        "",
+        ]
+    )
     for key, control in payload["operational_controls"].items():
         lines.extend([f"### {key}", "", f"- Status: `{control['status']}`"])
         if key == "sam_public_key_rotation":
@@ -2208,6 +2991,24 @@ def render_markdown(payload: dict[str, Any]) -> str:
             )
         lines.append("")
 
+    lines.extend(["## Freshness Blocked", ""])
+    for row in payload["freshness_blocked"]:
+        lines.extend(
+            [
+                f"### {row['rank']}. {row['opportunity_number']} - {row['title']}",
+                "",
+                f"- Command: `{row['command']}`",
+                f"- Prior command: `{row.get('pre_freshness_command')}`",
+                f"- Source freshness: `{row['source_freshness_status']}`",
+                f"- Deadline actionable: `{str(row['deadline_actionable']).lower()}`",
+                f"- Submission ready: `{str(row['submission_ready']).lower()}`",
+                "- Blockers:",
+            ]
+        )
+        for blocker in row["freshness_blockers"]:
+            lines.append(f"  - `{blocker}`")
+        lines.append("")
+
     lines.extend(["## Emergency Gate", ""])
     for row in payload["emergency_gate"]:
         lines.extend(
@@ -2234,6 +3035,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Deadline date: `{row['deadline_date']}`",
                 f"- Eligibility: `{row['eligibility_state']}`",
                 f"- Fit: `{row['fit_state']}`",
+                f"- Package status: `{row['package_status']}`",
+                f"- Portal status: `{row['portal_status']}`",
                 f"- Official URL: {row['official_url']}",
                 "",
             ]
@@ -2268,6 +3071,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Command: `{lane['command']}`",
                 f"- Eligibility: `{lane['eligibility_state']}`",
                 f"- Fit: `{lane['fit_state']}`",
+                f"- Package status: `{lane['package_status']}`",
+                f"- Portal status: `{lane['portal_status']}`",
+                f"- Readiness: `{lane['readiness_status']}`",
+                f"- Submission ready: `{str(lane['submission_ready']).lower()}`",
+                f"- Source freshness: `{lane['source_freshness_status']}`",
+                f"- Deadline actionable: `{str(lane['deadline_actionable']).lower()}`",
                 f"- Route: {lane['submission_route']}",
                 f"- Official URL: {lane['official_url']}",
             ]
@@ -2278,6 +3087,16 @@ def render_markdown(payload: dict[str, Any]) -> str:
             lines.append(
                 f"- Deadline date semantics: `{lane['deadline_date_semantics']}`"
             )
+        if lane.get("freshness_blockers"):
+            lines.append("- Freshness blockers:")
+            for blocker in lane["freshness_blockers"]:
+                lines.append(f"  - `{blocker}`")
+        if lane.get("source_authority_boundary"):
+            lines.append(
+                f"- Source authority boundary: {lane['source_authority_boundary']}"
+            )
+        if lane.get("claim_boundary"):
+            lines.append(f"- Claim boundary: {lane['claim_boundary']}")
         lines.extend(
             [
                 f"- Why now: {lane['why_now']}",
@@ -2334,15 +3153,82 @@ def scan_sensitive_text(text: str) -> list[str]:
     return sorted({marker for marker in SENSITIVE_MARKERS if marker in lowered})
 
 
-def main() -> None:
-    payload = build_payload()
+def output_paths(payload: dict[str, Any]) -> tuple[Path, Path, Path]:
+    outputs = payload["outputs"]
+    return (
+        ROOT / str(outputs["json"]),
+        ROOT / str(outputs["dashboard_json"]),
+        ROOT / str(outputs["markdown"]),
+    )
+
+
+def serialized_payload(payload: dict[str, Any]) -> str:
+    return json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n"
+
+
+def write_outputs(payload: dict[str, Any], rendered: str) -> None:
+    json_path, dashboard_path, markdown_path = output_paths(payload)
+    write_text(json_path, serialized_payload(payload))
+    write_text(dashboard_path, serialized_payload(payload))
+    write_text(markdown_path, rendered)
+
+
+def output_differences(payload: dict[str, Any], rendered: str) -> list[str]:
+    expected_json = serialized_payload(payload)
+    differences: list[str] = []
+    json_path, dashboard_path, markdown_path = output_paths(payload)
+    for path, expected in (
+        (json_path, expected_json),
+        (dashboard_path, expected_json),
+        (markdown_path, rendered),
+    ):
+        if not path.is_file() or path.read_text(encoding="utf-8") != expected:
+            differences.append(f"stale:{rel(path)}")
+    return differences
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Build the fail-closed near-deadline submission command board."
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Fail when the published outputs do not match a stable rebuild.",
+    )
+    parser.add_argument("--scan-date", help="Override scan date (YYYY-MM-DD).")
+    parser.add_argument("--generated-utc", help="Use a fixed generated timestamp.")
+    parser.add_argument("--as-of-utc", help="Use a fixed source-freshness timestamp.")
+    args = parser.parse_args()
+
+    if args.check:
+        if not OUT_JSON.is_file():
+            raise FileNotFoundError(OUT_JSON)
+        published = read_json(OUT_JSON)
+        payload = build_payload(
+            scan_date=date.fromisoformat(str(published["scan_date"])),
+            generated_utc=str(published["generated_utc"]),
+            as_of_utc=str(published.get("as_of_utc") or published["generated_utc"]),
+        )
+    else:
+        payload = build_payload(
+            scan_date=date.fromisoformat(args.scan_date) if args.scan_date else SCAN_DATE,
+            generated_utc=args.generated_utc,
+            as_of_utc=args.as_of_utc,
+        )
     rendered = render_markdown(payload)
     hits = scan_sensitive_text(rendered)
     if hits:
         raise SystemExit(f"Refusing to write sensitive markers: {hits}")
-    write_json(OUT_JSON, payload)
-    write_json(DASHBOARD_JSON, payload)
-    write_text(OUT_MD, rendered)
+
+    if args.check:
+        differences = output_differences(payload, rendered)
+        if differences:
+            raise RuntimeError(", ".join(differences))
+        print("near-deadline submission command board outputs are current")
+        return 0
+
+    write_outputs(payload, rendered)
     print(
         json.dumps(
             {
@@ -2350,12 +3236,14 @@ def main() -> None:
                 "lanes": payload["summary"]["lane_count"],
                 "stage_now": payload["summary"]["stage_now_count"],
                 "emergency_gates": payload["summary"]["emergency_eligibility_gate_count"],
-                "markdown": rel(OUT_MD),
+                "freshness_blockers": payload["summary"]["freshness_blocker_count"],
+                "markdown": payload["outputs"]["markdown"],
             },
             indent=2,
         )
     )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

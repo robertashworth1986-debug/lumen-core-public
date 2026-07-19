@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py"
 SCAN_DATE = date(2026, 7, 16)
+BOARD_AS_OF = "2026-07-18T16:00:00Z"
 MIRROR_RECEIPT = (
     ROOT
     / "grant_submissions"
@@ -40,19 +41,32 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest().upper()
 
 
+def build_test_payload(module, scan_date: date = SCAN_DATE):
+    return module.build_payload(
+        scan_date=scan_date,
+        generated_utc=BOARD_AS_OF,
+        as_of_utc=BOARD_AS_OF,
+    )
+
+
 def test_near_deadline_board_identifies_stage_now_and_human_gates():
     module = load_module()
-    payload = module.build_payload(scan_date=SCAN_DATE)
+    payload = build_test_payload(module)
 
-    assert payload["schema"] == "near_deadline_submission_command_board_v4"
-    assert payload["status"] == "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_WITH_VERIFIED_SENDS"
-    assert payload["summary"]["lane_count"] == 20
-    assert payload["summary"]["stage_now_count"] == 5
+    assert payload["schema"] == "near_deadline_submission_command_board_v5"
+    assert payload["status"] == (
+        "NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_FAIL_CLOSED_FRESHNESS_BLOCKERS"
+    )
+    assert payload["summary"]["lane_count"] == 23
+    assert payload["summary"]["curated_navy_lane_count"] == 3
+    assert payload["summary"]["stage_now_count"] == 4
     assert payload["summary"]["sent_verified_count"] == 5
     assert payload["summary"]["emergency_eligibility_gate_count"] == 0
     assert payload["summary"]["no_bid_or_partner_only_count"] == 6
     assert payload["summary"]["expired_without_verified_send_count"] == 1
-    assert payload["summary"]["human_gated_count"] == 14
+    assert payload["summary"]["human_gated_count"] == 17
+    assert payload["summary"]["freshness_blocked_lane_count"] == 13
+    assert payload["summary"]["sam_zero_row_inconclusive_blocker"] is True
     assert payload["summary"]["final_submit_allowed_without_human"] is False
     assert payload["summary"]["external_send_allowed_without_human"] is False
     assert payload["summary"]["pricing_allowed_without_human"] is False
@@ -95,7 +109,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "ACCAPGAIDPRFI4" not in stage_ids
     assert "693JJ326R000012" not in stage_ids
     assert "26-510" in stage_ids
-    assert "W912HZ26SC005" in stage_ids
+    assert "W912HZ26SC005" not in stage_ids
     assert "NASHVILLE-EC-FALL-2026" not in stage_ids
     assert "OPENAI-BUILD-WEEK-2026" in stage_ids
     assert "DLA26BZ03-NV011" in stage_ids
@@ -393,7 +407,10 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         for row in payload["lanes"]
         if row["opportunity_number"] == "W912HZ26SC005"
     )
-    assert erdc["command"] == "STAGE_CONCEPT_PAPER"
+    assert erdc["command"] == "REVERIFY_SOURCE_BEFORE_STAGE"
+    assert erdc["pre_freshness_command"] == "STAGE_CONCEPT_PAPER"
+    assert erdc["source_data_current"] is False
+    assert erdc["deadline_actionable"] is False
     assert erdc["technical_document_checks_pass"] is True
     assert erdc["solution_brief_status"] == (
         "TECHNICAL_DRAFT_PASS_PRIVATE_ROM_AND_SAM_FINALIZATION_REQUIRED"
@@ -420,7 +437,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
 
 def test_near_deadline_board_keeps_hud_and_bop_behind_correct_gates():
     module = load_module()
-    payload = module.build_payload(scan_date=SCAN_DATE)
+    payload = build_test_payload(module)
 
     lanes = {row["opportunity_number"]: row for row in payload["lanes"]}
     assert lanes["PDR-2600-DC-029Q"]["command"] == "EXPIRED_NO_SUBMISSION"
@@ -452,7 +469,7 @@ def test_near_deadline_board_keeps_hud_and_bop_behind_correct_gates():
 
 def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     module = load_module()
-    payload = module.build_payload(scan_date=SCAN_DATE)
+    payload = build_test_payload(module)
     rendered = module.render_markdown(payload)
     lowered = rendered.lower()
 
@@ -536,6 +553,122 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
 
     for marker in module.SENSITIVE_MARKERS:
         assert marker not in lowered
+
+
+def test_curated_open_navy_lanes_are_complete_and_status_distinct() -> None:
+    module = load_module()
+    payload = build_test_payload(module, date(2026, 7, 18))
+    lanes = {row["opportunity_number"]: row for row in payload["lanes"]}
+
+    curated_numbers = {
+        "DON26BZ03-NV061",
+        "DON26BZ03-NV063",
+        "DON26BZ03-NV065",
+    }
+    assert curated_numbers <= lanes.keys()
+    assert payload["summary"]["curated_navy_lane_count"] == 3
+    assert curated_numbers <= set(payload["lane_status_groups"]["portal_only"])
+
+    for number in curated_numbers:
+        lane = lanes[number]
+        assert lane["deadline_date"] == "2026-07-22"
+        assert lane["deadline_utc"] == "2026-07-22T16:00:00Z"
+        assert lane["official_deadline_text"] == (
+            "Closes July 22, 2026 at 12:00 PM ET"
+        )
+        assert lane["deadline_source"].endswith(
+            "config/grant_reviewer_curation_v1.json"
+        )
+        assert lane["deadline_currently_verified"] is False
+        assert lane["deadline_actionable"] is False
+        assert lane["published_window_open_by_recorded_dates"] is True
+        assert lane["published_window_actionable"] is False
+        assert lane["eligibility_verified"] is False
+        assert lane["source_data_current"] is False
+        assert lane["source_recheck_required"] is True
+        assert lane["portal_status"] == "PORTAL_ONLY_UNVERIFIED"
+        assert lane["portal_status_verified"] is False
+        assert lane["command"] == "REVERIFY_SOURCE_BEFORE_STAGE"
+        assert lane["submission_ready"] is False
+        assert lane["final_submit_allowed_without_human"] is False
+        assert "DSIP_CONTROLLING_NOTICE_RECHECK_REQUIRED" in lane[
+            "freshness_blockers"
+        ]
+        assert "unofficial" in lane["source_authority_boundary"].lower()
+
+    harbor = lanes["DON26BZ03-NV063"]
+    assert harbor["package_status"] == "DEDICATED_PACKAGE"
+    assert harbor["urgency_status"] == (
+        "URGENT_PUBLISHED_DEADLINE_REVERIFY_REQUIRED"
+    )
+    assert harbor["readiness_status"] == "URGENT_NOT_READY"
+    assert harbor["package_manifest_status"] == (
+        "LOCAL_SEVEN_VOLUME_ASSEMBLY_PORTAL_AND_HUMAN_GATED"
+    )
+    assert any(
+        path.endswith("NV063_DSIP_PACKAGE_MANIFEST_2026-07-16.json")
+        for path in harbor["package_files"]
+    )
+    assert "real adversary labels" in harbor["claim_boundary"]
+
+    assert lanes["DON26BZ03-NV061"]["package_status"] == "CONCEPT"
+    assert lanes["DON26BZ03-NV065"]["package_status"] == "CONCEPT"
+    assert {
+        "DON26BZ03-NV061",
+        "DON26BZ03-NV065",
+    } <= set(payload["lane_status_groups"]["concept"])
+
+
+def test_stale_sources_and_zero_row_sam_fail_closed() -> None:
+    module = load_module()
+    payload = build_test_payload(module, date(2026, 7, 18))
+    freshness = payload["source_freshness"]
+
+    assert freshness["as_of_utc"] == BOARD_AS_OF
+    assert freshness["overall_status"] == "BLOCKED_REVERIFY_REQUIRED"
+    assert freshness["submission_decisions_fail_closed"] is True
+    for source in (
+        "grant_reviewer_curation",
+        "grant_reviewer_feed",
+        "sam_rush_board",
+        "grants_ranked",
+        "zero_friction_pack",
+    ):
+        descriptor = freshness["sources"][source]
+        assert descriptor["freshness_status"] == "STALE_REVERIFY_REQUIRED"
+        assert descriptor["blocking"] is True
+
+    sam = freshness["sources"]["sam_live_discovery"]
+    assert sam["records"] == 0
+    assert sam["zero_rows"] is True
+    assert sam["status"] == "ZERO_ROW_SAM_RESPONSE_INCONCLUSIVE_BLOCKER"
+    assert sam["freshness_status"] == "STALE_REVERIFY_REQUIRED"
+    assert sam["reported_freshness_status_at_feed_build"] == (
+        "CURRENT_WITHIN_TTL"
+    )
+    assert sam["blocking"] is True
+    assert payload["zero_friction_pack_status"] == "STALE_REVERIFY_REQUIRED"
+    assert payload["zero_friction_pack_reported_status"].endswith(
+        "HUMAN_ACTION_REQUIRED"
+    )
+
+    lanes = {row["opportunity_number"]: row for row in payload["lanes"]}
+    erdc = lanes["W912HZ26SC005"]
+    assert erdc["pre_freshness_command"] == "STAGE_CONCEPT_PAPER"
+    assert erdc["command"] == "REVERIFY_SOURCE_BEFORE_STAGE"
+    assert erdc["package_status"] == "CONCEPT"
+    assert erdc["source_data_current"] is False
+    assert erdc["deadline_actionable"] is False
+    assert erdc["submission_ready"] is False
+    assert any("ZERO_ROW_SAM" in blocker for blocker in erdc["freshness_blockers"])
+    assert "W912HZ26SC005" not in {
+        row["opportunity_number"] for row in payload["stage_now"]
+    }
+    assert lanes["80TECH26RFI0020"]["command"] == "SENT_VERIFIED"
+
+    rebuilt = build_test_payload(module, date(2026, 7, 18))
+    assert rebuilt == payload
+    assert rebuilt["command_board_sha256"] == payload["command_board_sha256"]
 
 
 def test_nashville_private_action_gate_summarizes_without_exposing_values(
