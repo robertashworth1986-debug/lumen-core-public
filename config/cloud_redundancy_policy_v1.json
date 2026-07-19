@@ -1,0 +1,98 @@
+{
+  "schema": "lumencore.cloud_redundancy_policy.v1",
+  "policy_id": "cloud_redundancy_public_receipts_20260718",
+  "status": "frozen",
+  "mode": "LOCAL_MANIFEST_ONLY",
+  "purpose": "Build a deterministic local manifest for an exact allowlist of public-safe receipt JSON without copying, syncing, uploading, publishing, probing cloud state, or reading credential sources.",
+  "max_source_bytes": 1048576,
+  "allowed_source_roots": [
+    "build_week/prooflock_console",
+    "evidence/falcon"
+  ],
+  "denied_path_terms": [
+    ".env",
+    ".git",
+    "api-key",
+    "api_key",
+    "api_keys",
+    "apikey",
+    "client_secret",
+    "credential",
+    "credentials",
+    "email",
+    "grant_submissions",
+    "inbox",
+    "mail",
+    "mailbox",
+    "oauth",
+    "password",
+    "patent",
+    "portal",
+    "private",
+    "raw",
+    "raw_evidence",
+    "registry",
+    "secret",
+    "secrets",
+    "source_attachments",
+    "token"
+  ],
+  "action_boundary": {
+    "api_key_reads": "PROHIBITED",
+    "credential_store_reads": "PROHIBITED",
+    "file_copies": "PROHIBITED_IN_THIS_LANE",
+    "network_actions": "PROHIBITED",
+    "publication": "PROHIBITED",
+    "registry_reads": "PROHIBITED",
+    "uploads": "PROHIBITED_IN_THIS_LANE"
+  },
+  "storage_topology": {
+    "c_drive": {
+      "label": "C:",
+      "role": "REPOSITORY_SOURCE_VOLUME",
+      "physical_disk_id": "LOCAL_PHYSICAL_DISK_0",
+      "off_device": false
+    },
+    "e_drive": {
+      "label": "E:",
+      "role": "LOCAL_VAULT_VOLUME",
+      "physical_disk_id": "LOCAL_PHYSICAL_DISK_0",
+      "relationship_to_c": "C_AND_E_ARE_VOLUMES_ON_THE_SAME_PHYSICAL_DISK",
+      "counts_as_independent_redundancy": false
+    },
+    "icloud": {
+      "label": "iCloud Drive local folder",
+      "local_folder": "USERPROFILE/iCloudDrive/LumaTrader/PublicSafeReceipts",
+      "role": "LOCAL_SYNC_CANDIDATE_ONLY",
+      "remote_completion": "NOT_PROVEN",
+      "readback_verification": "NOT_PERFORMED",
+      "counts_as_verified_off_device_redundancy": false
+    },
+    "google_drive": {
+      "label": "Google Drive",
+      "role": "OFF_DEVICE_TARGET",
+      "connector_action": "SEPARATE_UPLOAD_AND_READBACK_REQUIRED",
+      "upload": "NOT_PERFORMED",
+      "readback_verification": "NOT_PERFORMED",
+      "counts_as_verified_off_device_redundancy": false
+    }
+  },
+  "allowlist": [
+    {
+      "id": "flowform_concept_lineage_receipt",
+      "source_path": "build_week/prooflock_console/sample_receipt.json",
+      "expected_sha256": "dee8c4779a74e4e34f5b5ee8ae127c49eb88d3cbc6693d1d419f103b39636c63",
+      "receipt_schema": "lumencore.prooflock_receipt.v1",
+      "classification": "PUBLIC_SAFE_NON_SECRET_RECEIPT",
+      "public_safety_basis": "Public concept-lineage receipt with bounded claims and no credential or private-source dependency."
+    },
+    {
+      "id": "falcon_model_weights_identity_receipt",
+      "source_path": "evidence/falcon/qwen2_5_1_5b_instruct_weights_receipt_20260715.json",
+      "expected_sha256": "42e7e7324900c90ce72755f2af229f90f468710971ce697d0fd54dfc032faa2f",
+      "receipt_schema": "falcon_model_weights_receipt.v1",
+      "classification": "PUBLIC_SAFE_NON_SECRET_RECEIPT",
+      "public_safety_basis": "Public model byte-identity receipt with an explicit limitation boundary and no local model path publication."
+    }
+  ]
+}
