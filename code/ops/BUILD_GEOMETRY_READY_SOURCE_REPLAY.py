@@ -207,7 +207,10 @@ def read_numeric_samples(path: Path, sample_limit: int) -> list[float]:
         return values
 
     try:
-        text = path.read_text(encoding="utf-8", errors="ignore")[:2_000_000]
+        # Read only the bounded evidence window. Slicing read_text() after the
+        # call still loads multi-gigabyte archives and text feeds in full.
+        with path.open("rb") as handle:
+            text = handle.read(2_000_000).decode("utf-8", errors="ignore")
     except OSError:
         return values
     for token in re.findall(r"[-+]?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?", text):

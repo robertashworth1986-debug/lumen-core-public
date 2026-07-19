@@ -81,3 +81,15 @@ def test_ready_source_replay_has_candidate_baseline_deltas_and_safe_markdown():
     assert "guaranteed" not in dumped
     assert "live_order_placement" not in dumped
     assert "heroin-like" not in dumped
+
+
+def test_numeric_reader_uses_a_bounded_binary_window_for_non_tabular_files(tmp_path, monkeypatch):
+    module = load_module(SCRIPT, "geometry_ready_source_replay_bounded_reader")
+    source = tmp_path / "large-input.bin"
+    source.write_bytes(b"1 2 3\n" + (b"x" * 2_100_000))
+
+    def fail_read_text(*args, **kwargs):
+        raise AssertionError("non-tabular evidence must not use an unbounded read_text call")
+
+    monkeypatch.setattr(Path, "read_text", fail_read_text)
+    assert module.read_numeric_samples(source, 3) == [1.0, 2.0, 3.0]
