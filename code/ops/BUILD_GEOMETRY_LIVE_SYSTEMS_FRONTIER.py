@@ -287,6 +287,32 @@ def local_live_file_inventory() -> list[dict[str, Any]]:
     return rows
 
 
+def representative_file_sample(rows: list[dict[str, Any]], *, limit: int = 120) -> list[dict[str, Any]]:
+    """Keep the highest-volume rows while guaranteeing system coverage."""
+    if len(rows) <= limit:
+        return list(rows)
+    selected: list[dict[str, Any]] = []
+    seen_paths: set[str] = set()
+    seen_systems: set[str] = set()
+    for row in rows:
+        system = str(row.get("system", "unclassified_measured_file"))
+        path = str(row.get("path", ""))
+        if system in seen_systems or not path:
+            continue
+        selected.append(row)
+        seen_paths.add(path)
+        seen_systems.add(system)
+    for row in rows:
+        if len(selected) >= limit:
+            break
+        path = str(row.get("path", ""))
+        if not path or path in seen_paths:
+            continue
+        selected.append(row)
+        seen_paths.add(path)
+    return selected
+
+
 def provider_file_inventory(live_source: dict[str, Any]) -> list[dict[str, Any]]:
     rows = []
     for provider in as_list(live_source.get("provider_rows")):
@@ -555,7 +581,7 @@ def build_payload() -> dict[str, Any]:
     ledger = read_json(ACTION_LEDGER_JSON)
     field_money = read_json(FIELD_MONEY_JSON)
     live_source = read_json(LIVE_SOURCE_MAX_JSON)
-    live_bridge = read_json(LIVE_BREADTH_BRIDGE_JSON)
+    _live_bridge = read_json(LIVE_BREADTH_BRIDGE_JSON)
     top_replay = read_json(TOP_REPLAY_JSON)
     rolling = read_json(ROLLING_JSON)
 
@@ -618,7 +644,7 @@ def build_payload() -> dict[str, Any]:
         "top_live_systems": system_rows[:20],
         "top_ranked_families": ranked[:40],
         "all_family_rankings": ranked,
-        "local_live_file_inventory_sample": local_files[:120],
+        "local_live_file_inventory_sample": representative_file_sample(local_files, limit=120),
         "provider_snapshot_files": provider_files,
         "claim_gates": {
             "field_validation_claim_allowed": False,

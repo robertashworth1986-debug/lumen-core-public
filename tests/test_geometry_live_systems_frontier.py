@@ -57,6 +57,17 @@ def test_frontier_keeps_top_geometries_and_actions_visible():
     assert all("field validation" in action["claim_boundary"] for action in actions)
 
 
+def test_representative_sample_preserves_each_detected_system():
+    module = load_module()
+    payload = module.build_payload()
+    all_systems = {row["system"] for row in payload["top_live_systems"]}
+    sampled_systems = {row["system"] for row in payload["local_live_file_inventory_sample"]}
+
+    assert sampled_systems.issubset(all_systems)
+    assert "maritime_ais" in sampled_systems
+    assert len(payload["local_live_file_inventory_sample"]) <= 120
+
+
 def test_frontier_claim_gates_close_unsafe_claims():
     module = load_module()
     payload = module.build_payload()
