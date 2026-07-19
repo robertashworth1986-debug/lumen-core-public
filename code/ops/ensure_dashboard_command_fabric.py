@@ -39,7 +39,7 @@ def ensure_fabric(path: Path) -> bool:
             raise ValueError(f"{path} has no closing head tag")
         updated = updated.replace("</head>", f"{ROBOTS_NOINDEX_REF}\n</head>", 1)
 
-    if "luma_command_fabric.css" not in updated:
+    if path.name not in INDEXABLE_PAGES and "luma_command_fabric.css" not in updated:
         if "</head>" not in updated:
             raise ValueError(f"{path} has no closing head tag")
         updated = updated.replace("</head>", f"{CSS_REF}\n</head>", 1)

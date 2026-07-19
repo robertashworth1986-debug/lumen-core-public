@@ -124,6 +124,17 @@
     syncLegacyModeBadges();
   }
 
+  function dispatchStatus() {
+    window.dispatchEvent(new CustomEvent("luma:fabric-status", {
+      detail: {
+        mode: state.mode,
+        freshness: state.freshness,
+        health: state.health,
+        snapshot: state.snapshot,
+      },
+    }));
+  }
+
   function updateStatus() {
     return Promise.allSettled([
       fetchJson("/health"),
@@ -142,14 +153,7 @@
       state.freshnessTone = freshness.tone;
       renderStatus();
 
-      window.dispatchEvent(new CustomEvent("luma:fabric-status", {
-        detail: {
-          mode: state.mode,
-          freshness: state.freshness,
-          health: state.health,
-          snapshot: state.snapshot,
-        },
-      }));
+      dispatchStatus();
     });
   }
 
@@ -280,10 +284,18 @@
   }
 
   function start() {
-    if (!isPublicPage) {
-      buildRail();
-      buildPalette();
+    if (isPublicPage) {
+      state.mode = "OFFLINE";
+      state.modeTone = "bad";
+      state.freshness = "OFFLINE";
+      state.freshnessTone = "bad";
+      renderStatus();
+      dispatchStatus();
+      return;
     }
+
+    buildRail();
+    buildPalette();
     renderStatus();
     updateStatus();
     setInterval(updateStatus, 15000);

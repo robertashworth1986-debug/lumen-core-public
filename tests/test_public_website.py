@@ -99,9 +99,16 @@ class PublicWebsiteTests(unittest.TestCase):
                 canonical = page.first("link", rel="canonical")
                 self.assertIsNotNone(canonical)
                 self.assertTrue(canonical["href"].startswith("https://lumen-core.ai/"))
-                self.assertIsNotNone(
-                    page.first("link", rel="stylesheet", href="./assets/public_site.css")
-                )
+                for asset in (
+                    "public_site_core.css",
+                    "public_site_components.css",
+                    "public_site_pages.css",
+                    "public_site_responsive.css",
+                ):
+                    self.assertIsNotNone(
+                        page.first("link", rel="stylesheet", href=f"./assets/{asset}")
+                    )
+                self.assertNotIn("fonts.googleapis.com", text)
                 self.assertIsNotNone(
                     page.first("script", src="./assets/public_site.js")
                 )
@@ -154,6 +161,30 @@ class PublicWebsiteTests(unittest.TestCase):
         self.assertIn("Disallow: /grants.html", robots)
         self.assertIn("Allow: /review_sprint.html", robots)
 
+        font_dir = DASHBOARD / "assets" / "fonts"
+        for filename in (
+            "inter-latin-variable.woff2",
+            "orbitron-latin-variable.woff2",
+            "jetbrains-mono-latin-variable.woff2",
+        ):
+            self.assertGreater((font_dir / filename).stat().st_size, 10_000)
+        for filename in (
+            "OFL-Inter.txt",
+            "OFL-Orbitron.txt",
+            "OFL-JetBrains-Mono.txt",
+        ):
+            license_text = (font_dir / filename).read_text(encoding="utf-8")
+            self.assertIn("SIL OPEN FONT LICENSE", license_text)
+
+    def test_public_styles_preserve_reduced_motion_controls(self) -> None:
+        responsive = (DASHBOARD / "assets" / "public_site_responsive.css").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("@media (prefers-reduced-motion: reduce)", responsive)
+        self.assertIn("scroll-behavior: auto", responsive)
+        self.assertIn("animation-duration: 0.01ms !important", responsive)
+        self.assertIn("transition-duration: 0.01ms !important", responsive)
+
     def test_public_pages_do_not_mount_operator_command_chrome(self) -> None:
         fabric = (DASHBOARD / "assets" / "luma_command_fabric.js").read_text(
             encoding="utf-8"
@@ -161,7 +192,9 @@ class PublicWebsiteTests(unittest.TestCase):
         for name in self.PUBLIC_PAGES:
             self.assertIn(f'"{name}": true', fabric)
         self.assertIn("var isPublicPage = Boolean(PUBLIC_PAGES[currentFile]);", fabric)
-        self.assertIn("if (!isPublicPage) {", fabric)
+        self.assertIn("if (isPublicPage) {", fabric)
+        self.assertIn('state.mode = "OFFLINE";', fabric)
+        self.assertIn("dispatchStatus();", fabric)
         self.assertIn("buildRail();", fabric)
         self.assertIn("buildPalette();", fabric)
 
@@ -204,6 +237,8 @@ class PublicWebsiteTests(unittest.TestCase):
             public_text = public.read_text(encoding="utf-8")
             self.assertIn('content="index,follow"', public_text)
             self.assertNotIn("noindex,nofollow,noarchive", public_text)
+            self.assertNotIn("luma_command_fabric.css", public_text)
+            self.assertIn("luma_command_fabric.js", public_text)
 
 
 if __name__ == "__main__":

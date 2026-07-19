@@ -1,3 +1,27 @@
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("./fonts/inter-latin-variable.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Orbitron";
+  font-style: normal;
+  font-weight: 600 900;
+  font-display: swap;
+  src: url("./fonts/orbitron-latin-variable.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 500 700;
+  font-display: swap;
+  src: url("./fonts/jetbrains-mono-latin-variable.woff2") format("woff2");
+}
+
 :root {
   color-scheme: dark;
   --public-bg: #04060f;
@@ -32,7 +56,7 @@ html {
 body.public-site {
   min-height: 100vh;
   margin: 0;
-  padding: 0 0 116px;
+  padding: 0;
   color: var(--public-text);
   background:
     radial-gradient(circle at 12% 2%, rgba(103, 183, 255, 0.17), transparent 34rem),
