@@ -6,9 +6,10 @@
     "builder_can_send_email": false,
     "duplicate_send_fail_closed": true,
     "missing_fact_fail_closed": true,
-    "past_deadline_fail_closed": true
+    "past_deadline_fail_closed": true,
+    "unchanged_rebuild_byte_stable": true
   },
-  "generated_utc": "2026-07-19T01:31:29.456852+00:00",
+  "generated_utc": "2026-07-19T02:06:25Z",
   "global_rules": [
     "Ground every reply in the latest inbound message and preserve its thread identifier.",
     "Answer only the question asked; do not append an unrelated pitch or attachment.",
@@ -27,7 +28,8 @@
     "REPLY_AFTER_FACT_REVIEW": 5
   },
   "source_config": "config/outreach_response_templates_v1.json",
-  "source_config_sha256": "0DF3A8568E5ACDEC8E2EBB4B0703CC86C12A7AD4261C08EA75B5F11E5BA486D0",
+  "source_config_sha256": "E40607547C9E975CFAE05400A3E2DD1F28125C0A2278A88F408D41E933AC52F2",
+  "source_effective_utc": "2026-07-19T02:06:25Z",
   "source_schema": "lumencore.outreach_response_templates.v1",
   "template_count": 11,
   "templates": [

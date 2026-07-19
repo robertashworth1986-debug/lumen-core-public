@@ -254,3 +254,23 @@ def test_source_config_hash_and_builder_payload_agree():
         "MONITOR_NO_SEND": 1,
         "REPLY_AFTER_FACT_REVIEW": 5,
     }
+
+
+def test_unchanged_registry_rebuild_is_byte_stable(tmp_path):
+    module = load_module()
+    registry = module.validate_registry(module.read_registry(CONFIG))
+
+    first = module.build_public_payload(registry)
+    second = module.build_public_payload(registry)
+    first_path = tmp_path / "first.json"
+    second_path = tmp_path / "second.json"
+    module.write_json(first_path, first)
+    module.write_json(second_path, second)
+
+    assert first == second
+    assert first_path.read_bytes() == second_path.read_bytes()
+    assert first["generated_utc"] == first["source_effective_utc"]
+    assert first["source_effective_utc"] == module.canonical_utc(
+        registry["source_effective_utc"]
+    )
+    assert first["controls"]["unchanged_rebuild_byte_stable"] is True

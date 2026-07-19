@@ -61,7 +61,7 @@
       "draft_rendered": false,
       "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 389295,
+      "hold_seconds_remaining": 388293,
       "inbox_recheck_required": false,
       "lane_id": "lanl_vision_licensing_followup",
       "max_proactive_sends": 1,
@@ -116,7 +116,7 @@
       "draft_rendered": false,
       "eligible_template_id": "COMPONENT_INSTRUCTION_ESCALATION",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 140895,
+      "hold_seconds_remaining": 139893,
       "inbox_recheck_required": false,
       "lane_id": "missionweave_dsip_proposal",
       "max_proactive_sends": 1,
@@ -291,7 +291,7 @@
       "source_state": "ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY"
     }
   ],
-  "as_of_utc": "2026-07-19T01:51:44.356127Z",
+  "as_of_utc": "2026-07-19T02:08:26.508814Z",
   "claim_boundary": "This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, and neither condition authorizes a draft or send. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.",
   "controls": {
     "action_time_human_review_required": true,
@@ -304,13 +304,13 @@
     "proactive_send_count_derived_from_sealed_ledger": true
   },
   "followup_send_receipt_digests": {},
-  "queue_sha256": "C6A5A49A4EB5CE058974AA565B8131F6FCFFC36DFD74E5058BC15BA01DD58A7C",
+  "queue_sha256": "DD921B12440E8DE81367D49C776D9F8572FBB19C9C0DBD2F260127E88756E9B5",
   "schema": "lumencore.outreach_followup_action_queue.v1",
   "source_evidence": {
     "email_reconciliation": {
       "bytes": 22433,
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
-      "sha256": "D67F86BF2693F1BACB9E6EE41674C7501449AC3E848FE3769C12143841C31C67"
+      "sha256": "DCA3E90621B7AB8A5A17F5C4CD0621E0EAE53A662F892ED71665EE1D3426029D"
     },
     "followup_policy_config": {
       "bytes": 5670,
@@ -323,14 +323,14 @@
       "sha256": "3F5670E2B3268010FBF22A86CEEF0EA46ACB3651054025E972FF7F60DACFDE80"
     },
     "response_registry_builder": {
-      "bytes": 19040,
+      "bytes": 19601,
       "path": "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py",
-      "sha256": "B49F5A5EE37006E356E2C8F8EAA661BFE8F7B1A23AA176640568798C49CD2553"
+      "sha256": "E3410ED6848C38AA3E0F385D95E8F1C02C59840117179A5F716EA923C319DAC8"
     },
     "response_template_registry": {
-      "bytes": 18192,
+      "bytes": 18275,
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
-      "sha256": "BB091A36D0E8C87D071FB97E8774E4C691A66F6D9ECFD4C70C3ABF80E875D6BA"
+      "sha256": "A72FA6DF0B4F6626D43062FC96957647CFEECC0EE5E6270333E47DA16FB61789"
     }
   },
   "status": "NO_EXTERNAL_FOLLOWUP_DUE",

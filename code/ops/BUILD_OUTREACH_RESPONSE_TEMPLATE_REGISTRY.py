@@ -51,10 +51,6 @@ class OutreachRegistryError(ValueError):
     pass
 
 
-def now_utc() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
-
 def read_registry(path: Path = CONFIG) -> dict[str, Any]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
@@ -91,6 +87,10 @@ def validate_registry(payload: dict[str, Any]) -> dict[str, Any]:
         raise OutreachRegistryError("SCHEMA_MISMATCH")
     if payload.get("version") != 1:
         raise OutreachRegistryError("VERSION_MISMATCH")
+    source_effective_utc = payload.get("source_effective_utc")
+    if not isinstance(source_effective_utc, str) or not source_effective_utc.strip():
+        raise OutreachRegistryError("SOURCE_EFFECTIVE_UTC_MISSING")
+    parse_aware_datetime(source_effective_utc)
     if not isinstance(payload.get("claim_boundary"), str) or not payload[
         "claim_boundary"
     ].strip():
@@ -189,6 +189,10 @@ def parse_aware_datetime(value: str) -> datetime:
     if parsed.tzinfo is None:
         raise OutreachRegistryError("DEADLINE_TIMEZONE_REQUIRED")
     return parsed.astimezone(timezone.utc)
+
+
+def canonical_utc(value: str) -> str:
+    return parse_aware_datetime(value).isoformat().replace("+00:00", "Z")
 
 
 def deadline_state(deadline_iso: str | None, current_utc: str | None = None) -> dict[str, Any]:
@@ -389,9 +393,11 @@ def build_public_payload(
     payload = validate_registry(registry or read_registry())
     policy_counts = Counter(row["send_policy"] for row in payload["templates"])
     private_count = sum(bool(row["private_render_only"]) for row in payload["templates"])
+    source_effective_utc = canonical_utc(payload["source_effective_utc"])
     result = {
         "schema": PUBLIC_SCHEMA,
-        "generated_utc": generated_utc or now_utc(),
+        "generated_utc": canonical_utc(generated_utc or source_effective_utc),
+        "source_effective_utc": source_effective_utc,
         "source_schema": payload["schema"],
         "source_config": CONFIG.relative_to(ROOT).as_posix(),
         "source_config_sha256": sha256_bytes(CONFIG.read_bytes()),
@@ -408,6 +414,7 @@ def build_public_payload(
             "attachment_requires_explicit_request": True,
             "builder_can_send_email": False,
             "action_time_human_review_required": True,
+            "unchanged_rebuild_byte_stable": True,
         },
     }
     serialized = json.dumps(result, sort_keys=True)
@@ -426,6 +433,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Duplicate-send gate: `FAIL_CLOSED`",
         "- Missing-fact gate: `FAIL_CLOSED`",
         "- Past-deadline gate: `FAIL_CLOSED`",
+        "- Unchanged rebuilds byte-stable: `true`",
         "",
         "## Claim Boundary",
         "",

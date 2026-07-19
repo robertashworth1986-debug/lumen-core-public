@@ -6,6 +6,7 @@
 - Duplicate-send gate: `FAIL_CLOSED`
 - Missing-fact gate: `FAIL_CLOSED`
 - Past-deadline gate: `FAIL_CLOSED`
+- Unchanged rebuilds byte-stable: `true`
 
 ## Claim Boundary
 
