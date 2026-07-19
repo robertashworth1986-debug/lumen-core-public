@@ -4,18 +4,19 @@
 
 **Internal target:** complete the human gates by July 20 at 6:00 PM Central so the final day is recovery time.
 
-## Ready Assets
+## Prepared Assets And Current Holds
 
 - Project title: `ProofLock Console`
 - Category: `Developer Tools`
 - Public repository: `https://github.com/robertashworth1986-debug/lumen-core-public`
 - Draft pull request: `https://github.com/robertashworth1986-debug/lumen-core-public/pull/36`
-- Live demonstration: `https://lumen-core.ai/build_week/prooflock_console/?release=20260718.1&commit=e9a1aba`
-- Deployed source commit: `e9a1aba6fdfb368c64887af7e9caeee8aac21abb`
-- Latest verified live-QA commit: `a7731fa`
-- Current focused test result: rerun the focused suite immediately before recording and use the exact current-head CI result in the demo and submission.
-- Live-file identity: `14/14` HTTP 200 responses and exact SHA-256 matches
-- Authoritative model evidence: `gpt-5.6-sol` with `ultra` reasoning; a private task-metadata Session ID candidate is retained and its digest match is directly confirmed
+- Historical live demonstration only: `https://lumen-core.ai/build_week/prooflock_console/?release=20260718.1&commit=e9a1aba`
+- Historical deployed source commit: `e9a1aba6fdfb368c64887af7e9caeee8aac21abb`; this release predates the corrected `decision == "PROMOTE"` invariant and must not be used for the final recording.
+- Current deployment candidate: `08659335e6ed7f838a276b6203526deff5dddd3b`
+- Current focused test result: `40 passed`; rerun immediately before recording and use the exact current-head CI result.
+- Current-head GitHub Actions: Proof Capsule CI, ProofLock Build Week CI, Outreach Governance Gate, and Order Safety Promotion Gate all passed.
+- Current live-file identity: `10/14`; `prooflock_core.js`, `prooflock_favicon.svg`, `THREE_LICENSE.txt`, and `verify_receipt.py` are stale. The live-release and submission gates remain `HOLD`.
+- Model evidence: retain the private task-metadata candidate, but do not state a final model identity until the primary task's `/feedback` value is directly confirmed.
 - Private Session ID SHA-256: `CEDEC32157F2516DF88505802805761AE3535F093FB9B1B06CA6DEFF4A344FD9`
 - Session hash reconciliation: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_SESSION_HASH_RECONCILIATION_2026-07-18.md`
 - Release receipt: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_LIVE_RELEASE_RECEIPT_2026-07-18.md`
@@ -44,13 +45,15 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 1. Sign in to Devpost and verify the correct challenge, category, rules, deadline, and required fields.
 2. Run `/feedback` in the primary Codex build task and retain the exact Session ID requested by the form.
 3. Compare the private `/feedback` Session ID with the saved task-metadata candidate. The candidate's digest already matches the published hash and the model is confirmed as `gpt-5.6-sol`; do not expose the private identifier in the repository or video.
-4. Record the live demonstration using the timed narration. Keep the final cut under three minutes with intelligible audio.
-5. Upload the video to YouTube as **public** and verify playback while signed out. Deviate only if the live Devpost form explicitly supersedes that requirement, and preserve a dated source receipt before doing so.
-6. Enter the repository, live-demo, and YouTube URLs into Devpost. Paste only the verified Session ID and model identity.
-7. Confirm that pre-existing work and new Build Week work are separated exactly as stated above.
-8. Preview the complete entry and test every link in a signed-out window.
-9. Robert performs the final review and clicks Submit.
-10. Save the Devpost confirmation page or email as a private submission receipt and hash it locally.
+4. Deploy only the four stale files through the controlled release path, rerun the current-commit live verifier to `14/14`, and refresh the immutable custody pin.
+5. Replace the historical recording URL in the narration with the newly verified release URL.
+6. Record the live demonstration using the timed narration. Keep the final cut under three minutes with intelligible audio.
+7. Upload the video to YouTube as **public** and verify playback while signed out. Deviate only if the live Devpost form explicitly supersedes that requirement, and preserve a dated source receipt before doing so.
+8. Enter the repository, live-demo, and YouTube URLs into Devpost. Paste only the verified Session ID and model identity.
+9. Confirm that pre-existing work and new Build Week work are separated exactly as stated above.
+10. Preview the complete entry and test every link in a signed-out window.
+11. Robert performs the final review and clicks Submit.
+12. Save the Devpost confirmation page or email as a private submission receipt and hash it locally.
 
 ## Final Review
 
@@ -62,7 +65,7 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 - [ ] YouTube video is under three minutes and plays with audio while signed out
 - [x] Private task-metadata Session ID candidate matches the published SHA-256
 - [ ] `/feedback` Session ID comes from the primary build task
-- [x] Model name comes from authoritative session evidence
+- [ ] Model name is directly confirmed from the primary task rather than inferred
 - [ ] No patent-sensitive or private material is exposed
 - [ ] No safety, field-validation, revenue, certification, or patent claim is implied
 - [ ] Pre-existing and Build Week contributions are clearly separated
@@ -72,4 +75,4 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 
 ## Stop Conditions
 
-Do not submit if the video link is private, the Session ID has not been confirmed through `/feedback`, the model identity is inferred, the live demo fails, the repository is inaccessible, or the entry implies that receipt integrity proves the underlying engineering claim.
+Do not record the final video or submit while the current live release is below `14/14`. Do not submit if the video link is private, the Session ID has not been confirmed through `/feedback`, the model identity is inferred, the live demo fails, the repository is inaccessible, or the entry implies that receipt integrity proves the underlying engineering claim.

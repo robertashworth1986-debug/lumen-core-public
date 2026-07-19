@@ -2,7 +2,7 @@
 
 **Target runtime:** 2 minutes 20 seconds
 
-**Recording surface:** the public live demonstration at `https://lumen-core.ai/build_week/prooflock_console/?release=20260718.1&commit=e9a1aba`
+**Recording surface:** `HOLD`. Do not record the final video from the historical `e9a1aba` release. Replace this line with the newly verified public URL only after the current deployment candidate reaches `14/14` live byte identity.
 
 ## 0:00-0:18 - Open
 
@@ -38,11 +38,11 @@ On screen: show the repository or briefly scroll the verification log.
 
 On screen: return to the final `HOLD` state.
 
-> OpenAI Codex with the GPT-5.6 SOL model helped isolate, implement, test, and deploy this bounded release while preserving provenance and keeping unsupported claims behind explicit gates. ProofLock proves receipt integrity and artifact identity. It does not pretend that a hash proves safety, patentability, field performance, or commercial readiness.
+> OpenAI Codex helped isolate, implement, and test this bounded release while preserving provenance and keeping unsupported claims behind explicit gates. ProofLock proves receipt integrity and artifact identity. It does not pretend that a hash proves safety, patentability, field performance, or commercial readiness.
 
 ## Model Provenance Line
 
-The authoritative Codex task metadata records model `gpt-5.6-sol`. A private Session ID candidate now matches the packet's published digest exactly, but it still must be confirmed against the `/feedback` value before Devpost submission.
+Do not record a model name or Session ID until the primary Codex task's `/feedback` value is directly confirmed. Keep the private candidate and its digest out of the video and public repository.
 
 ## Recording Checks
 

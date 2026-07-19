@@ -1,5 +1,7 @@
 # ProofLock Live Release Receipt
 
+> **Historical release only.** This receipt applies only to release `20260718.1` at source commit `e9a1aba...`. It predates the corrected requirement that promotion also needs recorded decision `PROMOTE`. It must not be used as current release evidence or as the final recording surface. The current deployment candidate is `08659335e6ed7f838a276b6203526deff5dddd3b`, whose live gate remains `HOLD` at `10/14` byte matches until the four stale files are deployed and independently rechecked.
+
 - Release: `20260718.1`
 - Source commit: `e9a1aba6fdfb368c64887af7e9caeee8aac21abb`
 - Live route: `https://lumen-core.ai/build_week/prooflock_console/?release=20260718.1&commit=e9a1aba`
@@ -11,7 +13,7 @@
 
 The deployment archive was built from the source commit above. All 14 live release files returned HTTP 200 and matched the archive's file bytes by SHA-256. The deployed console uses only its versioned, local runtime graph; it does not require a CDN, account, API key, or external service for the bundled verification demonstration.
 
-## Verification State
+## Historical Verification State
 
 | Check | Result |
 |---|---|
@@ -25,7 +27,7 @@ The deployment archive was built from the source commit above. All 14 live relea
 | GitHub `verify` check | Success |
 | GitHub `outreach-lock` check | Success |
 
-The guided live-browser proof verified custody, applied an in-memory claim mutation, rejected the mutation, restored the exact canonical editor text, and returned to `HOLD` without browser-console errors.
+For this historical release, the guided live-browser proof verified custody, applied an in-memory claim mutation, rejected the mutation, restored the exact canonical editor text, and returned to `HOLD` without browser-console errors. This result does not establish the later corrected decision invariant.
 
 ## Browser QA
 
@@ -59,4 +61,4 @@ The guided live-browser proof verified custody, applied an in-memory claim mutat
 
 ## Claim Boundary
 
-This receipt establishes source/deployment byte identity, deterministic receipt verification, bounded artifact custody, fail-closed promotion logic, and successful browser rendering at the tested viewports. It does not establish engineering performance, safety, patentability, external scientific validation, commercial readiness, legal acceptance, or authority to promote the underlying hardware concept.
+For release `20260718.1` only, this receipt establishes source/deployment byte identity, deterministic receipt verification as it existed at that commit, bounded artifact custody, and successful browser rendering at the tested viewports. It does not establish the later corrected decision invariant, current deployment status, engineering performance, safety, patentability, external scientific validation, commercial readiness, legal acceptance, or authority to promote the underlying hardware concept.

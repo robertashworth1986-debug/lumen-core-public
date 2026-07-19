@@ -146,6 +146,9 @@ def test_console_is_self_contained_and_documents_build_week_gates():
     checklist = (
         ROOT / "docs" / "OPENAI_BUILD_WEEK_PROOFLOCK_HUMAN_GATE_CHECKLIST_2026-07-18.md"
     ).read_text(encoding="utf-8")
+    release_receipt = (
+        ROOT / "docs" / "OPENAI_BUILD_WEEK_PROOFLOCK_LIVE_RELEASE_RECEIPT_2026-07-18.md"
+    ).read_text(encoding="utf-8")
     readiness = (
         ROOT / "docs" / "OPENAI_BUILD_WEEK_PROOFLOCK_SUBMISSION_READINESS_2026-07-17.md"
     ).read_text(encoding="utf-8")
@@ -162,9 +165,13 @@ def test_console_is_self_contained_and_documents_build_week_gates():
     assert "external service is required" in readme
     assert "twenty-seven passing tests" not in narration
     assert "current-head CI receipt" in narration
+    assert "Do not record the final video from the historical" in narration
     assert "`28 passed`" not in checklist
     assert "public or unlisted" not in checklist
     assert "YouTube as **public**" in checklist
+    assert "Current live-file identity: `10/14`" in checklist
+    assert "Historical release only" in release_receipt
+    assert "must not be used as current release evidence" in release_receipt
     assert "`32 passed`" not in readiness
 
 
