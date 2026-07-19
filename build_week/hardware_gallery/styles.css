@@ -82,6 +82,10 @@ main {
   background: #e7ece9;
 }
 
+.skin-band {
+  background: #f8faf9;
+}
+
 .archive-band {
   background: #ffffff;
 }
@@ -152,6 +156,23 @@ dd {
   background: #244a3a;
   outline: 3px solid #d59a72;
   outline-offset: 2px;
+}
+
+.link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.secondary-link {
+  color: #2f5d49;
+  background: transparent;
+  border: 1px solid #2f5d49;
+}
+
+.secondary-link:hover,
+.secondary-link:focus-visible {
+  color: #ffffff;
 }
 
 figure {
