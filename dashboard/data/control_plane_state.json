@@ -2,7 +2,8 @@
   "schema": "lumencore.control_plane_state.v1",
   "state_id": "control-plane-20260719T025600Z",
   "generated_utc": "2026-07-19T02:56:00Z",
-  "owner": "Robert Ashworth",
+  "owner_role": "CONTROL_PLANE_STEWARD",
+  "hash_scope": "EMBEDDED_SHA256_SELF_CONSISTENCY_ONLY_GIT_COMMIT_IS_CUSTODY_ANCHOR",
   "authority": "PUBLIC_SAFE_RECONCILIATION_NOT_ACTION_AUTHORITY",
   "failure_mode": "FAIL_CLOSED",
   "operating_principle": "Bounded light speed: move quickly without outrunning evidence, rights, reversibility, or founder control.",
@@ -15,9 +16,13 @@
     "external_email_sent_by_this_state": false,
     "portal_submission_performed": false,
     "signature_or_certification_performed": false,
+    "final_confirmation_performed": false,
     "merge_performed": false,
     "deployment_performed": false,
-    "payment_or_legal_acceptance_performed": false
+    "payment_or_legal_acceptance_performed": false,
+    "public_video_publication_performed": false,
+    "devpost_submission_performed": false,
+    "claim_expansion_performed": false
   },
   "lanes": [
     {
@@ -363,5 +368,5 @@
     }
   ],
   "claim_boundary": "Public-safe sequencing and conflict register only; not a live portal, solicitation, agreement, legal/accounting review, deployment receipt, external validation, or founder action approval.",
-  "state_sha256": "6dcd309c0da75b14a1024b590f4160b8e7169f7ad0cd9583bccc4faae0e45304"
+  "state_sha256": "fe5d6ec6d53d79fc4a4ddc28c2f2d9f0c81d4f6af8ba5e69b756d0178f2d3740"
 }

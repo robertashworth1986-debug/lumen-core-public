@@ -4,6 +4,8 @@ import argparse
 import copy
 import hashlib
 import json
+import math
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -11,6 +13,11 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_STATE = ROOT / "dashboard" / "data" / "control_plane_state.json"
 SCHEMA = "lumencore.control_plane_state.v1"
+HASH_SCOPE = (
+    "EMBEDDED_SHA256_SELF_CONSISTENCY_ONLY_GIT_COMMIT_IS_CUSTODY_ANCHOR"
+)
+OWNER_ROLE = "CONTROL_PLANE_STEWARD"
+DEFAULT_MAX_FUTURE_SKEW_MINUTES = 5.0
 ALLOWED_STATES = {
     "BLOCKED",
     "HOLD",
@@ -31,14 +38,64 @@ REQUIRED_LANES = {
     "outreach_governance",
     "epri_opai",
     "patent_center",
+    "eia_prospective",
 }
-WRITE_CONTROL_KEYS = {
+NO_ACTION_CONTROL_KEYS = {
     "external_email_sent_by_this_state",
     "portal_submission_performed",
     "signature_or_certification_performed",
+    "final_confirmation_performed",
     "merge_performed",
     "deployment_performed",
     "payment_or_legal_acceptance_performed",
+    "public_video_publication_performed",
+    "devpost_submission_performed",
+    "claim_expansion_performed",
+}
+PUBLIC_SAFETY_PATTERNS = {
+    "email address": (
+        re.compile(
+            r"(?i)(?<![a-z0-9._%+-])[a-z0-9._%+-]+@"
+            r"[a-z0-9.-]+\.[a-z]{2,}(?![a-z0-9.-])"
+        ),
+    ),
+    "phone number": (
+        re.compile(
+            r"(?<![a-zA-Z0-9])(?:\+?1[\s.-]?)?"
+            r"(?:\([2-9]\d{2}\)|[2-9]\d{2})[\s.-]"
+            r"[2-9]\d{2}[\s.-]\d{4}(?![a-zA-Z0-9])"
+        ),
+        re.compile(
+            r"(?<![a-zA-Z0-9])(?:\(?\d{2,4}\)?[\s.-]){2,4}"
+            r"\d{3,4}(?![a-zA-Z0-9])"
+        ),
+        re.compile(
+            r"(?<![a-zA-Z0-9])\+\d{1,3}(?:[\s.-]?\d){7,14}"
+            r"(?![a-zA-Z0-9])"
+        ),
+        re.compile(r"(?<![a-zA-Z0-9])\d{10,15}(?![a-zA-Z0-9])"),
+    ),
+    "local filesystem path": (
+        re.compile(r"(?i)(?:^|[\s\"'(=])[a-z]:[\\/]"),
+        re.compile(r"(?:^|[\s\"'(=])\\\\[^\\/\s]+[\\/][^\s\"']+"),
+        re.compile(
+            r"(?i)(?:^|[\s\"'(=])/(?:home|users|private|tmp|var/tmp|mnt|volumes)/"
+        ),
+        re.compile(r"(?i)\bfile://(?:localhost/)?[^\s\"']+"),
+        re.compile(r"(?:^|[\s\"'(=])\.\.?[\\/][^\s\"']+"),
+    ),
+    "credential or token": (
+        re.compile(
+            r"(?i)\b(?:sk-(?:proj-)?|gh[pousr]_|github_pat_|xox[baprs]-)"
+            r"[a-z0-9_-]{8,}"
+        ),
+        re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
+        re.compile(r"\bAIza[0-9A-Za-z_-]{20,}\b"),
+        re.compile(
+            r"(?i)\b(?:api[_-]?(?:key|token)|access[_-]?token|auth[_-]?token|bearer|secret)"
+            r"\s*[:=]\s*[\"']?[a-z0-9._~+/=-]{12,}"
+        ),
+    ),
 }
 
 
@@ -72,11 +129,46 @@ def state_payload(state: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
+def iter_text(value: Any):
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield str(key)
+            yield from iter_text(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from iter_text(item)
+    elif isinstance(value, str):
+        yield value
+
+
+def finite_limit(
+    value: Any,
+    *,
+    field: str,
+    errors: list[str],
+    allow_zero: bool,
+) -> float | None:
+    if isinstance(value, bool):
+        errors.append(f"{field} must be a finite number")
+        return None
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError):
+        errors.append(f"{field} must be a finite number")
+        return None
+    if not math.isfinite(parsed) or parsed < 0 or (parsed == 0 and not allow_zero):
+        qualifier = "non-negative" if allow_zero else "positive"
+        errors.append(f"{field} must be a finite {qualifier} number")
+        return None
+    return parsed
+
+
 def verify_state(
     state: Any,
     *,
     now: datetime | None = None,
     max_age_hours: float | None = None,
+    max_future_skew_minutes: float = DEFAULT_MAX_FUTURE_SKEW_MINUTES,
 ) -> dict[str, Any]:
     errors: list[str] = []
     warnings: list[str] = []
@@ -88,15 +180,50 @@ def verify_state(
         errors.append("authority must remain non-action-authorizing")
     if safe_state.get("failure_mode") != "FAIL_CLOSED":
         errors.append("failure_mode must be FAIL_CLOSED")
+    if safe_state.get("hash_scope") != HASH_SCOPE:
+        errors.append(
+            "hash_scope must limit the embedded SHA-256 to self-consistency and "
+            "identify the Git commit as the custody anchor"
+        )
+    if safe_state.get("owner_role") != OWNER_ROLE:
+        errors.append(f"owner_role must be {OWNER_ROLE}")
+    if "owner" in safe_state:
+        errors.append("owner must not publish a named person; use owner_role")
 
     generated = parse_utc(safe_state.get("generated_utc"), "generated_utc", errors)
     observed_now = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    validated_max_age = None
+    if max_age_hours is not None:
+        validated_max_age = finite_limit(
+            max_age_hours,
+            field="max_age_hours",
+            errors=errors,
+            allow_zero=False,
+        )
+    validated_future_skew = finite_limit(
+        max_future_skew_minutes,
+        field="max_future_skew_minutes",
+        errors=errors,
+        allow_zero=True,
+    )
     age_hours = None
+    future_skew_minutes = None
     if generated is not None:
-        age_hours = max((observed_now - generated).total_seconds() / 3600.0, 0.0)
-        if max_age_hours is not None and age_hours > max_age_hours:
+        signed_age_hours = (observed_now - generated).total_seconds() / 3600.0
+        age_hours = max(signed_age_hours, 0.0)
+        future_skew_minutes = max(-signed_age_hours * 60.0, 0.0)
+        if validated_max_age is not None and age_hours > validated_max_age:
             errors.append(
-                f"control-plane state is stale: {age_hours:.2f}h > {max_age_hours:.2f}h"
+                f"control-plane state is stale: "
+                f"{age_hours:.2f}h > {validated_max_age:.2f}h"
+            )
+        if (
+            validated_future_skew is not None
+            and future_skew_minutes > validated_future_skew
+        ):
+            errors.append(
+                f"control-plane state is too far in the future: "
+                f"{future_skew_minutes:.2f}m > {validated_future_skew:.2f}m"
             )
 
     expected_hash = str(safe_state.get("state_sha256") or "").lower()
@@ -108,7 +235,14 @@ def verify_state(
     if not isinstance(controls, dict):
         errors.append("controls must be an object")
         controls = {}
-    for key in sorted(WRITE_CONTROL_KEYS):
+    control_keys = set(controls)
+    missing_controls = sorted(NO_ACTION_CONTROL_KEYS - control_keys)
+    unknown_controls = sorted(control_keys - NO_ACTION_CONTROL_KEYS)
+    if missing_controls:
+        errors.append(f"controls missing required keys: {', '.join(missing_controls)}")
+    if unknown_controls:
+        errors.append(f"controls contain unknown keys: {', '.join(unknown_controls)}")
+    for key in sorted(NO_ACTION_CONTROL_KEYS):
         if controls.get(key) is not False:
             errors.append(f"{key} must be explicitly false")
 
@@ -221,12 +355,10 @@ def verify_state(
         if required_path not in stale_paths:
             errors.append(f"stale source register must include {required_path}")
 
-    serialized = canonical_json(safe_state).lower()
-    for private_marker in ("@gmail.com", "c:\\users\\", "e:\\", "sk-proj-", "ghp_"):
-        if private_marker in serialized:
-            errors.append(
-                f"public state contains prohibited private marker: {private_marker}"
-            )
+    public_text = tuple(iter_text(safe_state))
+    for label, patterns in PUBLIC_SAFETY_PATTERNS.items():
+        if any(pattern.search(text) for pattern in patterns for text in public_text):
+            errors.append(f"public state contains prohibited {label} pattern")
 
     return {
         "schema": "lumencore.control_plane_verification_report.v1",
@@ -236,16 +368,25 @@ def verify_state(
         "lane_count": len(lanes),
         "required_lane_count": len(REQUIRED_LANES),
         "generated_age_hours": round(age_hours, 3) if age_hours is not None else None,
+        "generated_future_skew_minutes": (
+            round(future_skew_minutes, 3)
+            if future_skew_minutes is not None
+            else None
+        ),
         "state_hash": {
             "expected": expected_hash,
             "computed": computed_hash,
             "matches": expected_hash == computed_hash,
+            "scope": "EMBEDDED_SELF_CONSISTENCY_ONLY",
+            "custody_anchor": "GIT_COMMIT",
         },
         "errors": errors,
         "warnings": warnings,
         "claim_boundary": (
-            "This verifier checks the structure, custody hash, deadline locks, and "
-            "fail-closed action boundaries of one public-safe coordination snapshot. "
+            "This verifier checks structure, embedded-hash self-consistency, deadline "
+            "locks, and fail-closed action boundaries of one public-safe coordination "
+            "snapshot. The Git commit, not the recomputable embedded hash, is the "
+            "custody and history anchor. "
             "It does not prove portal readiness, proposal compliance, deployment, "
             "external validation, funding, legal status, or authority to send, sign, "
             "merge, deploy, pay, certify, or submit."
@@ -259,10 +400,19 @@ def main() -> int:
     )
     parser.add_argument("state", nargs="?", type=Path, default=DEFAULT_STATE)
     parser.add_argument("--max-age-hours", type=float, default=None)
+    parser.add_argument(
+        "--max-future-skew-minutes",
+        type=float,
+        default=DEFAULT_MAX_FUTURE_SKEW_MINUTES,
+    )
     args = parser.parse_args()
 
     state = json.loads(args.state.read_text(encoding="utf-8"))
-    report = verify_state(state, max_age_hours=args.max_age_hours)
+    report = verify_state(
+        state,
+        max_age_hours=args.max_age_hours,
+        max_future_skew_minutes=args.max_future_skew_minutes,
+    )
     print(json.dumps(report, indent=2, ensure_ascii=True))
     return 0 if report["integrity_valid"] else 1
 

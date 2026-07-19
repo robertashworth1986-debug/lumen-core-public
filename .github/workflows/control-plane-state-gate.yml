@@ -39,6 +39,9 @@ jobs:
           code/ops/VERIFY_CONTROL_PLANE_STATE.py
           tests/test_control_plane_state.py
       - name: Verify checked-in control-plane state
-        run: python code/ops/VERIFY_CONTROL_PLANE_STATE.py
+        run: >-
+          python code/ops/VERIFY_CONTROL_PLANE_STATE.py
+          --max-age-hours 24
+          --max-future-skew-minutes 5
       - name: Run focused tests
         run: python -m pytest -q tests/test_control_plane_state.py

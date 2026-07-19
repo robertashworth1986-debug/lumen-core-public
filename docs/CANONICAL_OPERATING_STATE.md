@@ -1,27 +1,37 @@
 # LumenCore Canonical Operating State
 
-> **Historical-snapshot notice — 2026-07-19 UTC:** The operational statements below were captured on 2026-07-17 and include superseded outreach and pull-request state. Until a full canonical rewrite is merged, use [`CONTROL_PLANE_RECONCILIATION_2026-07-19.md`](CONTROL_PLANE_RECONCILIATION_2026-07-19.md) and `dashboard/data/control_plane_state.json` for current sequencing. This file is preserved as historical context and is not submission, deployment, certification, legal, or outreach authority.
+> **Time-scope notice — 2026-07-19 UTC:** The `Current ProofLock status` section is current only to its stated observation time. Content under `Historical operating snapshot` was captured on 2026-07-17 and includes superseded outreach and pull-request state. Use [`CONTROL_PLANE_RECONCILIATION_2026-07-19.md`](CONTROL_PLANE_RECONCILIATION_2026-07-19.md) and `dashboard/data/control_plane_state.json` for current cross-lane sequencing. No section in this file is submission, deployment, certification, legal, outreach, final-confirmation, video-publication, Devpost-submission, or claim-expansion authority.
+
+## Current ProofLock status — observed 2026-07-19 02:55 UTC
+
+**State:** `HOLD`\
+**Reviewed head:** PR #36 at `4584a41dbedd2f856bba5fa8202e7dcc8e4a448f` with current-head workflows green.\
+**Release gate:** The live release remains 10/14; four files are stale. Green CI is not deployment evidence.\
+**Open human gates:** Refresh the release receipt after 14/14, confirm the `/feedback` Session ID, publish the final sub-three-minute video, and obtain founder approval before Devpost submission.\
+**Authority boundary:** This status does not authorize deployment, merge, final confirmation, public video publication, Devpost submission, or claim expansion. The Git commit is the custody/history anchor for this statement.
+
+## Historical operating snapshot — 2026-07-17 UTC
 
 **Snapshot date:** 2026-07-17 UTC  
-**Owner:** Robert Ashworth  
+**Owner role:** Founder/operator\
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
 
-## One commercial sentence
+### One commercial sentence
 
 LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routing, or infrastructure candidate against an accepted baseline under predeclared rules, then packages the result, failures, provenance, and claim boundary into a hash-verifiable decision record.
 
-## Active outcomes
+### Active outcomes
 
-### 1. EPRI / Open Power AI Consortium onboarding
+#### 1. EPRI / Open Power AI Consortium onboarding
 
 **State:** Onboarding information requested; MOU not yet issued or executed.
 
 **Existing asset:** One saved Gmail draft contains the requested legal name, address, and signatory contact details.
 
-**Next allowed action:** Robert reviews the saved draft. After explicit approval, ChatGPT replies once in the existing EPRI/OPAI thread. No new standalone email, consortium application, crawler expansion, deck, or technical packet is needed unless EPRI asks for it.
+**Next allowed action:** The authorized human reviewer checks the saved draft. After explicit approval, ChatGPT replies once in the existing EPRI/OPAI thread. No new standalone email, consortium application, crawler expansion, deck, or technical packet is needed unless EPRI asks for it.
 
-### 2. One external validation or paid-pilot conversion
+#### 2. One external validation or paid-pilot conversion
 
 **LANL VISION:** A bounded non-proprietary follow-up package was sent after the July 16 meeting connection was not completed. Wait for a reschedule, a specific information request, an agreement-path owner, or a no-fit decision.
 
@@ -29,7 +39,7 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 
 **Selection rule:** The first qualified party that agrees to a controlled dataset, incumbent baseline, prelocked metric and threshold, reporting format, failure rules, and one go/no-go decision becomes the single active external-validation lane. All other pilot outreach pauses.
 
-### 3. Patent official-record protection
+#### 3. Patent official-record protection
 
 **Keep:** The Patent Examination Review Matrix, customer-number association draft, reviewer handoff, hash-verified patent vault, and official-record retrieval checklist.
 
@@ -37,9 +47,9 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 
 **Do not do:** Create more public patent narratives, solicit broad technical endorsements, sign or submit the association form, pay a fee, or infer that outside review can cure missing as-filed support.
 
-## Curated Codex package inventory
+### Curated Codex package inventory
 
-### Canonical and active
+#### Canonical and active
 
 | Package | Decision |
 |---|---|
@@ -50,7 +60,7 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 | LANL VISION follow-up package | **Sent; freeze and wait.** |
 | Live Funding Portal Handoff | **Use only as a deadline queue. Update existing rows; do not create parallel trackers.** |
 
-### Preserved research, not active product scope
+#### Preserved research, not active product scope
 
 | Package or PR | Decision |
 |---|---|
@@ -62,7 +72,7 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 | Geometry publication packet, DICE/geometry audit, HarborSentinel, NV065 sensor tasking | Preserve as bounded research evidence; keep outside v1.0. |
 | Trading engines and live execution surfaces | Safety-maintenance only; no product promotion and no live orders. |
 
-## Pull-request curation
+### Pull-request curation
 
 Keep only:
 
@@ -75,7 +85,7 @@ Close as research-preserved or superseded:
 
 Closing a pull request does not delete its branch or history. Reopen or cherry-pick only when a named buyer, evaluator, solicitation, or release requirement calls for a specific artifact.
 
-## Artifact creation gate
+### Artifact creation gate
 
 A new artifact is allowed only when all answers are yes:
 
@@ -87,6 +97,6 @@ A new artifact is allowed only when all answers are yes:
 
 Otherwise, update the backlog note and stop.
 
-## Immediate decision
+### Immediate decision
 
-The next founder-facing action is the **existing EPRI MOU-information draft**. It remains unsent until Robert explicitly approves that exact reply. No other outbound message is currently authorized.
+The next founder-facing action in this historical snapshot was the **existing EPRI MOU-information draft**. It remained unsent until the authorized founder explicitly approved that exact reply. This historical statement does not authorize outbound action now.

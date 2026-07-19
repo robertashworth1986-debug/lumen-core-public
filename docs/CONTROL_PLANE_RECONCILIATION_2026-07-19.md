@@ -1,9 +1,10 @@
 # LumenCore Control-Plane Reconciliation — 2026-07-19 UTC
 
-**Owner:** Robert Ashworth  
+**Owner role:** `CONTROL_PLANE_STEWARD`\
 **State ID:** `control-plane-20260719T025600Z`  
 **Machine-readable state:** `dashboard/data/control_plane_state.json`  
-**State SHA-256:** `6dcd309c0da75b14a1024b590f4160b8e7169f7ad0cd9583bccc4faae0e45304`  
+**Embedded state SHA-256 (self-consistency only):** `fe5d6ec6d53d79fc4a4ddc28c2f2d9f0c81d4f6af8ba5e69b756d0178f2d3740`\
+**Custody/history anchor:** The Git commit containing this document and the machine-readable state.\
 **Authority:** Public-safe reconciliation only; not action authority.  
 **Failure mode:** `FAIL_CLOSED`
 
@@ -19,7 +20,7 @@ It exists to prevent five recurring control failures:
 4. green CI being treated as deployment or submission evidence;
 5. duplicate outreach being triggered by stale coordination text.
 
-The state does not send email, access a portal, sign, certify, merge, deploy, pay, accept legal terms, or submit anything.
+The state does not send email, access a portal, sign, certify, issue final confirmation, merge, deploy, pay, accept legal terms, publish a public video, submit to Devpost, expand a claim, or submit anything else.
 
 ## Current execution order
 
@@ -66,9 +67,9 @@ The branch is current-head green and has a later browser-QA receipt than the ini
 
 ## What this control-plane PR changes
 
-- adds the machine-readable, hash-locked control-plane state;
-- adds a standard-library verifier for schema, state hash, deadline locks, unique priorities, evidence rows, required open gates, stale-source registration, public/private boundary, and explicit non-action controls;
-- adds focused tests for valid custody, deadline locks, duplicated lanes, missing gates, unauthorized actions, payload mutation, and private-identifier exclusion;
+- adds the machine-readable control-plane state with an embedded self-consistency hash and Git-commit custody anchor;
+- adds a standard-library verifier for schema, embedded-hash self-consistency, deadline locks, unique priorities, evidence rows, required open gates, stale-source registration, generic public-safety patterns, and an exact non-action control schema;
+- adds focused adversarial tests for freshness and future skew, every required lane and control, unknown controls, hash-scope wording, payload mutation, and private-identifier patterns;
 - adds path-scoped GitHub Actions CI;
 - marks the older canonical operating-state file as a historical snapshot pending full reconciliation.
 
