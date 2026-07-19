@@ -6,12 +6,19 @@ import hashlib
 import json
 import os
 import re
+import socket
+import subprocess
+import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Iterable
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -34,6 +41,59 @@ SOURCE_TRUTH_JSON = OUT / "source_truth_table.json"
 OUT_JSON = OUT_OPS / "live_source_measurement_maximizer_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "live_source_measurement_maximizer.json"
 OUT_MD = DOCS / "LIVE_SOURCE_MEASUREMENT_MAXIMIZER_2026-06-22.md"
+ORCHESTRATOR_POLICY_JSON = CONFIG / "live_source_orchestrator_policy_v1.json"
+
+MAX_HTTP_RESPONSE_BYTES = 2_000_000
+POLICY_SCHEMA = "live_source_orchestrator_policy.v1"
+RECEIPT_SCHEMA = "live_source_provider_receipt.v1"
+ORCHESTRATOR_SCHEMA = "live_source_orchestrator_run.v1"
+ORCHESTRATOR_STATE_SCHEMA = "live_source_orchestrator_state.v1"
+REGISTRY_ROWS_SCHEMA = "live_source_registry.rows.v1"
+REGISTRY_CANONICAL_SCHEMA = "live_source_registry.canonical.v1"
+REGISTRY_LEGACY_ROWS_SCHEMA = "live_source_registry.legacy_rows.v0"
+REGISTRY_LEGACY_SOURCES_SCHEMA = "live_source_registry.legacy_sources.v0"
+REGISTRY_LEGACY_MIRRORED_SCHEMA = "live_source_registry.legacy_mirrored.v0"
+SAFE_PROVIDER_ID = re.compile(r"^[A-Z][A-Z0-9_]{1,63}$")
+SAFE_RUN_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$")
+SAFE_NAMESPACE = re.compile(r"^live-source/[A-Za-z0-9_.-]+/[a-z0-9_-]+/(cpu|gpu)$")
+SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
+QC_STATES = {
+    "PASS",
+    "DRY_RUN",
+    "EMPTY",
+    "UNCONFIGURED",
+    "HTTP_REJECTED",
+    "RETRYABLE_HTTP",
+    "TIMEOUT",
+    "MALFORMED_JSON",
+    "OVERSIZED_JSON",
+    "ADAPTER_ERROR",
+    "TRANSPORT_ERROR",
+    "CHILD_EXIT",
+    "INVALID_RECEIPT",
+    "RATE_LIMITED",
+}
+CIRCUIT_STATES = {"CLOSED", "OPEN", "HALF_OPEN"}
+
+
+class MalformedJSONError(ValueError):
+    pass
+
+
+class OversizedJSONError(ValueError):
+    pass
+
+
+class ReceiptValidationError(ValueError):
+    pass
+
+
+class PolicyValidationError(ValueError):
+    pass
+
+
+class RegistrySchemaError(ValueError):
+    pass
 
 
 SECTOR_WEIGHT = {
@@ -64,17 +124,26 @@ def now_tag() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
-def read_json(path: Path) -> dict[str, Any]:
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-    return payload if isinstance(payload, dict) else {}
-
-
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        with temporary.open("x", encoding="utf-8", newline="\n") as handle:
+            json.dump(payload, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        try:
+            temporary.unlink(missing_ok=True)
+        except OSError:
+            pass
 
 
 def write_text(path: Path, text: str) -> None:
@@ -117,14 +186,17 @@ def load_env_file(path: Path) -> dict[str, str]:
     return env
 
 
-def hydrate_env() -> dict[str, str]:
-    loaded: dict[str, str] = {}
+def hydrate_selected_env(env_names: Iterable[str]) -> list[str]:
+    selected = {str(name) for name in env_names if str(name)}
+    loaded_names: list[str] = []
     for path in ENV_FILES:
-        loaded.update(load_env_file(path))
-    for key, value in loaded.items():
-        if value and not os.environ.get(key):
-            os.environ[key] = value
-    return loaded
+        values = load_env_file(path)
+        for name in sorted(selected):
+            value = values.get(name, "")
+            if value and not os.environ.get(name):
+                os.environ[name] = value
+                loaded_names.append(name)
+    return loaded_names
 
 
 def env_first(*names: str) -> str:
@@ -141,14 +213,12 @@ def present_env_names(names: list[str]) -> list[str]:
 
 def known_secret_values(env_names: list[str] | None = None) -> list[str]:
     names = set(env_names or [])
-    for path in ENV_FILES:
-        names.update(load_env_file(path).keys())
-    values = []
+    values: list[str] = []
     for name in names:
         value = os.environ.get(name, "")
         if value and len(value) >= 4:
             values.append(value)
-    return values
+    return sorted(set(values), key=lambda value: (-len(value), value))
 
 
 def sanitize_text(value: Any, env_names: list[str] | None = None) -> str:
@@ -186,6 +256,54 @@ def sha256_payload(payload: Any) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
+def seal_receipt(payload: dict[str, Any]) -> dict[str, Any]:
+    if "receipt_sha256" in payload:
+        raise ReceiptValidationError("receipt payload already contains receipt_sha256")
+    sealed = dict(payload)
+    sealed["receipt_sha256"] = sha256_payload(payload)
+    return sealed
+
+
+def verify_receipt_hash(receipt: dict[str, Any]) -> bool:
+    observed = receipt.get("receipt_sha256")
+    if not isinstance(observed, str) or not SHA256_HEX.fullmatch(observed):
+        return False
+    unsigned = {key: value for key, value in receipt.items() if key != "receipt_sha256"}
+    return observed == sha256_payload(unsigned)
+
+
+def parse_utc(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return None
+    return parsed.astimezone(timezone.utc)
+
+
+def parse_retry_after(value: Any, *, reference_utc: datetime | None = None) -> int | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    try:
+        return max(0, int(text))
+    except ValueError:
+        pass
+    try:
+        retry_at = parsedate_to_datetime(text)
+        if retry_at.tzinfo is None:
+            retry_at = retry_at.replace(tzinfo=timezone.utc)
+        reference = reference_utc or datetime.now(timezone.utc)
+        return max(0, int((retry_at.astimezone(timezone.utc) - reference).total_seconds()))
+    except (TypeError, ValueError, OverflowError):
+        return None
+
+
 def request_json(
     url: str,
     *,
@@ -193,6 +311,7 @@ def request_json(
     headers: dict[str, str] | None = None,
     body: dict[str, Any] | None = None,
     timeout: int = 20,
+    max_response_bytes: int = MAX_HTTP_RESPONSE_BYTES,
 ) -> tuple[int | None, Any, str]:
     data = None
     req_headers = dict(headers or {})
@@ -202,11 +321,14 @@ def request_json(
 
     req = urllib.request.Request(url, data=data, headers=req_headers, method=method)
     with urllib.request.urlopen(req, timeout=timeout) as response:
-        text = response.read().decode("utf-8", errors="ignore")
+        raw = response.read(max_response_bytes + 1)
+        if len(raw) > max_response_bytes:
+            raise OversizedJSONError("response exceeded the configured byte limit")
+        text = raw.decode("utf-8", errors="strict")
         try:
             payload = json.loads(text)
-        except Exception:
-            payload = None
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise MalformedJSONError("response was not valid UTF-8 JSON") from exc
         return response.getcode(), payload, text
 
 
@@ -223,18 +345,62 @@ def safe_request(
             "rows": rows,
             "probe_ok": bool(rows),
             "probe_note": sanitize_text(note, env_names),
+            "error_kind": None,
+            "retry_after_seconds": None,
         }
     except urllib.error.HTTPError as exc:
-        try:
-            body = exc.read().decode("utf-8", errors="ignore")
-        except Exception:
-            body = str(exc)
+        headers = getattr(exc, "headers", None)
+        retry_after = headers.get("Retry-After") if headers is not None else None
         return {
             "source": source,
             "http_status": getattr(exc, "code", None),
             "rows": [],
             "probe_ok": False,
-            "probe_note": sanitize_text(f"http_error:{body}", env_names),
+            "probe_note": f"http_error:{getattr(exc, 'code', 'unknown')}",
+            "error_kind": "http_error",
+            "retry_after_seconds": parse_retry_after(retry_after),
+        }
+    except OversizedJSONError:
+        return {
+            "source": source,
+            "http_status": None,
+            "rows": [],
+            "probe_ok": False,
+            "probe_note": "exception:OversizedJSONError",
+            "error_kind": "oversized_json",
+            "retry_after_seconds": None,
+        }
+    except (MalformedJSONError, UnicodeDecodeError, json.JSONDecodeError):
+        return {
+            "source": source,
+            "http_status": None,
+            "rows": [],
+            "probe_ok": False,
+            "probe_note": "exception:MalformedJSONError",
+            "error_kind": "malformed_json",
+            "retry_after_seconds": None,
+        }
+    except (TimeoutError, socket.timeout):
+        return {
+            "source": source,
+            "http_status": None,
+            "rows": [],
+            "probe_ok": False,
+            "probe_note": "exception:TimeoutError",
+            "error_kind": "timeout",
+            "retry_after_seconds": None,
+        }
+    except urllib.error.URLError as exc:
+        is_timeout = isinstance(getattr(exc, "reason", None), (TimeoutError, socket.timeout))
+        kind = "timeout" if is_timeout else "transport_error"
+        return {
+            "source": source,
+            "http_status": None,
+            "rows": [],
+            "probe_ok": False,
+            "probe_note": f"exception:{'TimeoutError' if is_timeout else 'URLError'}",
+            "error_kind": kind,
+            "retry_after_seconds": None,
         }
     except Exception as exc:
         return {
@@ -242,7 +408,9 @@ def safe_request(
             "http_status": None,
             "rows": [],
             "probe_ok": False,
-            "probe_note": sanitize_text(f"exception:{type(exc).__name__}:{exc}", env_names),
+            "probe_note": sanitize_text(f"exception:{type(exc).__name__}", env_names),
+            "error_kind": "adapter_error",
+            "retry_after_seconds": None,
         }
 
 
@@ -917,6 +1085,370 @@ PROVIDERS: list[dict[str, Any]] = [
 ]
 
 
+def build_provider_catalog() -> dict[str, dict[str, Any]]:
+    catalog: dict[str, dict[str, Any]] = {}
+    for provider in PROVIDERS:
+        provider_id = str(provider.get("source") or "")
+        if not SAFE_PROVIDER_ID.fullmatch(provider_id):
+            raise RuntimeError("provider catalog contains an invalid provider id")
+        if provider_id in catalog:
+            raise RuntimeError("provider catalog contains a duplicate provider id")
+        if not callable(provider.get("collector")):
+            raise RuntimeError("provider catalog contains a non-callable collector")
+        catalog[provider_id] = provider
+    return catalog
+
+
+PROVIDER_BY_ID = build_provider_catalog()
+
+POLICY_LIMITS = {
+    "max_concurrency": (1, 16),
+    "child_timeout_seconds": (1, 300),
+    "request_timeout_seconds": (1, 120),
+    "max_retries": (0, 5),
+    "retry_base_seconds": (0, 60),
+    "max_retry_delay_seconds": (0, 300),
+    "default_rate_limit_seconds": (1, 86_400),
+    "circuit_breaker_failures": (1, 20),
+    "max_rows": (1, 1_000),
+    "max_child_output_bytes": (512, 1_000_000),
+}
+
+
+def _strict_int(value: Any, *, name: str, low: int, high: int) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or not low <= value <= high:
+        raise PolicyValidationError(f"{name} must be an integer in [{low}, {high}]")
+    return value
+
+
+def _safe_runtime_state_path(value: Any) -> Path:
+    if not isinstance(value, str) or not value or "\\" in value:
+        raise PolicyValidationError("state_path must be a forward-slash relative path")
+    relative = Path(value)
+    if relative.is_absolute() or ".." in relative.parts or not relative.parts or relative.parts[0] != "run":
+        raise PolicyValidationError("state_path must remain under run/")
+    resolved = (ROOT / relative).resolve()
+    run_root = (ROOT / "run").resolve()
+    if resolved != run_root and run_root not in resolved.parents:
+        raise PolicyValidationError("state_path escaped run/")
+    return resolved
+
+
+def load_orchestrator_policy(path: Path = ORCHESTRATOR_POLICY_JSON) -> dict[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise PolicyValidationError("orchestrator policy could not be read") from exc
+    if not isinstance(payload, dict):
+        raise PolicyValidationError("orchestrator policy must be an object")
+
+    expected_keys = {
+        "schema",
+        "provider_allowlist",
+        "limits",
+        "state_path",
+        "execution_default",
+        "network_default",
+        "publish_outputs_default",
+    }
+    if set(payload) != expected_keys:
+        raise PolicyValidationError("orchestrator policy fields do not match the v1 schema")
+    if payload.get("schema") != POLICY_SCHEMA:
+        raise PolicyValidationError("orchestrator policy schema is unsupported")
+    if payload.get("execution_default") != "dry_run":
+        raise PolicyValidationError("orchestrator policy must default to dry_run")
+    if payload.get("network_default") is not False or payload.get("publish_outputs_default") is not False:
+        raise PolicyValidationError("network and output publication must default to false")
+
+    raw_allowlist = payload.get("provider_allowlist")
+    if not isinstance(raw_allowlist, list) or not raw_allowlist:
+        raise PolicyValidationError("provider_allowlist must be a non-empty list")
+    allowlist: list[str] = []
+    for value in raw_allowlist:
+        if not isinstance(value, str) or not SAFE_PROVIDER_ID.fullmatch(value):
+            raise PolicyValidationError("provider_allowlist contains an invalid provider id")
+        if value not in PROVIDER_BY_ID:
+            raise PolicyValidationError("provider_allowlist contains an unknown provider id")
+        if value in allowlist:
+            raise PolicyValidationError("provider_allowlist contains a duplicate provider id")
+        allowlist.append(value)
+
+    raw_limits = payload.get("limits")
+    if not isinstance(raw_limits, dict) or set(raw_limits) != set(POLICY_LIMITS):
+        raise PolicyValidationError("policy limits do not match the v1 schema")
+    limits = {
+        name: _strict_int(raw_limits.get(name), name=name, low=bounds[0], high=bounds[1])
+        for name, bounds in POLICY_LIMITS.items()
+    }
+    if limits["request_timeout_seconds"] >= limits["child_timeout_seconds"]:
+        raise PolicyValidationError("request timeout must be lower than child timeout")
+
+    state_path = _safe_runtime_state_path(payload.get("state_path"))
+    normalized = dict(payload)
+    normalized["provider_allowlist"] = sorted(allowlist)
+    normalized["limits"] = limits
+    normalized["resolved_state_path"] = state_path
+    normalized["policy_sha256"] = sha256_payload(payload)
+    return normalized
+
+
+def normalize_provider_ids(provider_ids: Iterable[str] | None, allowlist: Iterable[str]) -> list[str]:
+    allowed = set(allowlist)
+    requested = list(allowlist) if provider_ids is None else list(provider_ids)
+    if not requested:
+        raise ValueError("at least one provider id is required")
+    normalized: list[str] = []
+    for provider_id in requested:
+        if not isinstance(provider_id, str) or not SAFE_PROVIDER_ID.fullmatch(provider_id):
+            raise ValueError("provider id is invalid")
+        if provider_id not in allowed or provider_id not in PROVIDER_BY_ID:
+            raise ValueError("provider id is not allowlisted")
+        if provider_id in normalized:
+            raise ValueError("provider ids must be unique")
+        normalized.append(provider_id)
+    return sorted(normalized)
+
+
+def _registry_rows_by_id(values: Any, *, field: str) -> dict[str, dict[str, Any]]:
+    if not isinstance(values, list):
+        raise RegistrySchemaError(f"registry {field} must be a list")
+    rows: dict[str, dict[str, Any]] = {}
+    for value in values:
+        if not isinstance(value, dict):
+            raise RegistrySchemaError(f"registry {field} contains a non-object row")
+        provider_id = str(value.get("source") or "").upper()
+        if not SAFE_PROVIDER_ID.fullmatch(provider_id):
+            raise RegistrySchemaError(f"registry {field} contains an invalid source id")
+        if provider_id in rows:
+            raise RegistrySchemaError(f"registry {field} contains a duplicate source id")
+        row = dict(value)
+        row["source"] = provider_id
+        rows[provider_id] = row
+    return rows
+
+
+def migrate_live_source_registry(payload: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(payload, dict):
+        raise RegistrySchemaError("live source registry must be an object")
+    declared_schema = payload.get("schema")
+    rows_present = "rows" in payload
+    sources_present = "sources" in payload
+
+    if declared_schema in {REGISTRY_ROWS_SCHEMA, REGISTRY_CANONICAL_SCHEMA}:
+        if not rows_present or sources_present:
+            raise RegistrySchemaError("versioned rows registry has an ambiguous payload shape")
+        rows_by_id = _registry_rows_by_id(payload.get("rows"), field="rows")
+        source_schema = str(declared_schema)
+        migration_required = declared_schema != REGISTRY_CANONICAL_SCHEMA
+    elif declared_schema in {
+        REGISTRY_LEGACY_ROWS_SCHEMA,
+        REGISTRY_LEGACY_SOURCES_SCHEMA,
+        REGISTRY_LEGACY_MIRRORED_SCHEMA,
+    }:
+        if declared_schema == REGISTRY_LEGACY_MIRRORED_SCHEMA:
+            rows_by_id = _registry_rows_by_id(payload.get("rows"), field="rows")
+            sources_by_id = _registry_rows_by_id(payload.get("sources"), field="sources")
+            if sha256_payload(rows_by_id) != sha256_payload(sources_by_id):
+                raise RegistrySchemaError("versioned legacy registry rows and sources conflict")
+        else:
+            field = "sources" if declared_schema == REGISTRY_LEGACY_SOURCES_SCHEMA else "rows"
+            rows_by_id = _registry_rows_by_id(payload.get(field), field=field)
+        source_schema = str(declared_schema)
+        migration_required = True
+    elif declared_schema is not None:
+        raise RegistrySchemaError("live source registry schema is unsupported")
+    elif rows_present and sources_present:
+        rows_by_id = _registry_rows_by_id(payload.get("rows"), field="rows")
+        sources_by_id = _registry_rows_by_id(payload.get("sources"), field="sources")
+        if sha256_payload(rows_by_id) != sha256_payload(sources_by_id):
+            raise RegistrySchemaError("unversioned registry rows and sources conflict")
+        source_schema = REGISTRY_LEGACY_MIRRORED_SCHEMA
+        migration_required = True
+    elif rows_present:
+        rows_by_id = _registry_rows_by_id(payload.get("rows"), field="rows")
+        source_schema = REGISTRY_LEGACY_ROWS_SCHEMA
+        migration_required = True
+    elif sources_present:
+        rows_by_id = _registry_rows_by_id(payload.get("sources"), field="sources")
+        source_schema = REGISTRY_LEGACY_SOURCES_SCHEMA
+        migration_required = True
+    else:
+        raise RegistrySchemaError("unversioned registry has no recognized row field")
+
+    return {
+        "schema": REGISTRY_CANONICAL_SCHEMA,
+        "source_schema": source_schema,
+        "source_payload_sha256": sha256_payload(payload),
+        "migration_required": migration_required,
+        "generated_utc": payload.get("generated_utc"),
+        "paper_live_linked": bool(payload.get("paper_live_linked", False)),
+        "rows": [rows_by_id[key] for key in sorted(rows_by_id)],
+    }
+
+
+def read_live_source_registry(path: Path = REGISTRY_JSON) -> dict[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise RegistrySchemaError("live source registry could not be read") from exc
+    return migrate_live_source_registry(payload)
+
+
+def registry_boundary_receipt(registry: dict[str, Any], allowlist: Iterable[str]) -> dict[str, Any]:
+    known = set(allowlist)
+    provider_ids = [str(row["source"]) for row in registry["rows"]]
+    return {
+        "input_schema": registry["source_schema"],
+        "canonical_schema": registry["schema"],
+        "migration_required": bool(registry["migration_required"]),
+        "source_payload_sha256": registry["source_payload_sha256"],
+        "provider_count": len(provider_ids),
+        "stale_provider_ids": sorted(provider_id for provider_id in provider_ids if provider_id not in known),
+    }
+
+
+def build_namespace_assignments(provider_ids: Iterable[str], run_id: str) -> dict[str, dict[str, str]]:
+    if not SAFE_RUN_ID.fullmatch(run_id):
+        raise ValueError("run id is invalid")
+    assignments = {
+        provider_id: {
+            "cpu": f"live-source/{run_id}/{provider_id.lower()}/cpu",
+            "gpu": f"live-source/{run_id}/{provider_id.lower()}/gpu",
+        }
+        for provider_id in provider_ids
+    }
+    validate_namespace_assignments(assignments)
+    return assignments
+
+
+def validate_namespace_assignments(assignments: dict[str, dict[str, str]]) -> None:
+    if not isinstance(assignments, dict) or not assignments:
+        raise ValueError("namespace assignments must be a non-empty object")
+    seen: set[str] = set()
+    for provider_id, namespace in assignments.items():
+        if not SAFE_PROVIDER_ID.fullmatch(provider_id):
+            raise ValueError("namespace assignment has an invalid provider id")
+        if not isinstance(namespace, dict) or set(namespace) != {"cpu", "gpu"}:
+            raise ValueError("namespace assignment fields are invalid")
+        for kind in ("cpu", "gpu"):
+            value = namespace[kind]
+            if not isinstance(value, str) or not SAFE_NAMESPACE.fullmatch(value) or not value.endswith(f"/{kind}"):
+                raise ValueError("namespace value is invalid")
+            if value in seen:
+                raise ValueError("CPU/GPU namespaces must be disjoint")
+            seen.add(value)
+
+
+def _validate_artifact(artifact: Any) -> dict[str, str]:
+    if not isinstance(artifact, dict):
+        raise ReceiptValidationError("published child receipt requires an artifact")
+    expected = {"snapshot_json", "snapshot_latest_json", "snapshot_csv", "sha256"}
+    if set(artifact) != expected:
+        raise ReceiptValidationError("artifact fields do not match the v1 schema")
+    validated: dict[str, str] = {}
+    for key in ("snapshot_json", "snapshot_latest_json", "snapshot_csv"):
+        value = artifact.get(key)
+        if not isinstance(value, str) or not value or "\\" in value:
+            raise ReceiptValidationError("artifact path is invalid")
+        path = Path(value)
+        if path.is_absolute() or ".." in path.parts:
+            raise ReceiptValidationError("artifact path escaped the workspace")
+        validated[key] = value
+    digest = artifact.get("sha256")
+    if not isinstance(digest, str) or not SHA256_HEX.fullmatch(digest):
+        raise ReceiptValidationError("artifact hash is invalid")
+    validated["sha256"] = digest
+    return validated
+
+
+def validate_child_receipt(
+    receipt: Any,
+    *,
+    allowlist: Iterable[str],
+    expected_provider_id: str | None = None,
+    expected_run_id: str | None = None,
+    expected_attempt: int | None = None,
+    expected_namespace: dict[str, str] | None = None,
+    expected_network_allowed: bool | None = None,
+    expected_published_outputs: bool | None = None,
+    max_rows: int = 1_000,
+) -> dict[str, Any]:
+    if not isinstance(receipt, dict):
+        raise ReceiptValidationError("child receipt must be an object")
+    expected_fields = {
+        "schema",
+        "run_id",
+        "provider_id",
+        "attempt",
+        "namespace",
+        "network_allowed",
+        "published_outputs",
+        "credential_state",
+        "qc_state",
+        "row_count",
+        "http_status",
+        "retry_after_seconds",
+        "artifact",
+        "receipt_sha256",
+    }
+    if set(receipt) != expected_fields:
+        raise ReceiptValidationError("child receipt fields do not match the v1 schema")
+    if receipt.get("schema") != RECEIPT_SCHEMA or not verify_receipt_hash(receipt):
+        raise ReceiptValidationError("child receipt schema or hash is invalid")
+
+    provider_id = receipt.get("provider_id")
+    if not isinstance(provider_id, str) or provider_id not in set(allowlist) or provider_id not in PROVIDER_BY_ID:
+        raise ReceiptValidationError("child receipt provider is not allowlisted")
+    if expected_provider_id is not None and provider_id != expected_provider_id:
+        raise ReceiptValidationError("child receipt provider does not match the launched provider")
+    run_id = receipt.get("run_id")
+    if not isinstance(run_id, str) or not SAFE_RUN_ID.fullmatch(run_id):
+        raise ReceiptValidationError("child receipt run id is invalid")
+    if expected_run_id is not None and run_id != expected_run_id:
+        raise ReceiptValidationError("child receipt run id does not match")
+    attempt = receipt.get("attempt")
+    if isinstance(attempt, bool) or not isinstance(attempt, int) or attempt < 1:
+        raise ReceiptValidationError("child receipt attempt is invalid")
+    if expected_attempt is not None and attempt != expected_attempt:
+        raise ReceiptValidationError("child receipt attempt does not match")
+
+    namespace = receipt.get("namespace")
+    validate_namespace_assignments({provider_id: namespace})
+    if expected_namespace is not None and namespace != expected_namespace:
+        raise ReceiptValidationError("child receipt namespace does not match")
+    if not isinstance(receipt.get("network_allowed"), bool) or not isinstance(receipt.get("published_outputs"), bool):
+        raise ReceiptValidationError("child receipt boolean fields are invalid")
+    if receipt["published_outputs"] and not receipt["network_allowed"]:
+        raise ReceiptValidationError("child cannot publish without network authorization")
+    if expected_network_allowed is not None and receipt["network_allowed"] is not expected_network_allowed:
+        raise ReceiptValidationError("child receipt network authorization does not match")
+    if expected_published_outputs is not None and receipt["published_outputs"] is not expected_published_outputs:
+        raise ReceiptValidationError("child receipt publication state does not match")
+    if receipt.get("credential_state") not in {"UNKNOWN", "NOT_REQUIRED", "PRESENT", "MISSING"}:
+        raise ReceiptValidationError("child receipt credential state is invalid")
+    qc_state = receipt.get("qc_state")
+    if not isinstance(qc_state, str) or qc_state not in QC_STATES - {"RATE_LIMITED"}:
+        raise ReceiptValidationError("child receipt QC state is invalid")
+    row_count = receipt.get("row_count")
+    if isinstance(row_count, bool) or not isinstance(row_count, int) or not 0 <= row_count <= max_rows:
+        raise ReceiptValidationError("child receipt row count is invalid")
+    http_status = receipt.get("http_status")
+    if http_status is not None and (
+        isinstance(http_status, bool) or not isinstance(http_status, int) or not 100 <= http_status <= 599
+    ):
+        raise ReceiptValidationError("child receipt HTTP status is invalid")
+    retry_after = receipt.get("retry_after_seconds")
+    if retry_after is not None and (
+        isinstance(retry_after, bool) or not isinstance(retry_after, int) or not 0 <= retry_after <= 86_400
+    ):
+        raise ReceiptValidationError("child receipt retry delay is invalid")
+    if receipt["published_outputs"]:
+        _validate_artifact(receipt.get("artifact"))
+    elif receipt.get("artifact") is not None:
+        raise ReceiptValidationError("unpublished child receipt cannot declare an artifact")
+    return dict(receipt)
+
+
 def estimate_value(sector: str, rows: int) -> dict[str, float]:
     if rows <= 0:
         return {"hour": 0.0, "day": 0.0, "week": 0.0, "month": 0.0, "year": 0.0}
@@ -978,7 +1510,8 @@ def registry_row(provider: dict[str, Any], result: dict[str, Any], artifact: dic
     source = str(provider["source"])
     sector = str(provider["sector"])
     env_names = list(provider.get("env_names", []))
-    row_count = len(result.get("rows", []) or [])
+    raw_row_count = result.get("row_count")
+    row_count = int(raw_row_count) if isinstance(raw_row_count, int) else len(result.get("rows", []) or [])
     enabled = (not env_names) or bool(present_env_names(env_names))
     measured = bool(result.get("probe_ok")) and row_count > 0
     translated = estimate_value(sector, row_count) if measured else estimate_value(sector, 0)
@@ -1010,18 +1543,39 @@ def registry_row(provider: dict[str, Any], result: dict[str, Any], artifact: dic
 
 
 def merge_registry(existing: dict[str, Any], rows: list[dict[str, Any]]) -> dict[str, Any]:
-    old_rows = existing.get("rows", []) if isinstance(existing.get("rows"), list) else []
+    if existing.get("schema") == REGISTRY_CANONICAL_SCHEMA:
+        old_rows_by_id = _registry_rows_by_id(existing.get("rows"), field="rows")
+        canonical = dict(existing)
+        canonical["rows"] = [old_rows_by_id[key] for key in sorted(old_rows_by_id)]
+    else:
+        canonical = migrate_live_source_registry(existing)
+    old_rows = canonical["rows"]
     merged: dict[str, dict[str, Any]] = {}
     for row in old_rows:
         if isinstance(row, dict) and row.get("source"):
             merged[str(row["source"]).upper()] = dict(row)
     for row in rows:
-        merged[str(row["source"]).upper()] = dict(row)
+        if not isinstance(row, dict):
+            raise RegistrySchemaError("new registry rows must be objects")
+        provider_id = str(row.get("source") or "").upper()
+        if not SAFE_PROVIDER_ID.fullmatch(provider_id):
+            raise RegistrySchemaError("new registry row has an invalid source id")
+        copied = dict(row)
+        copied["source"] = provider_id
+        merged[provider_id] = copied
     ordered = sorted(merged.values(), key=lambda item: str(item.get("source", "")))
+    stale_provider_ids = sorted(provider_id for provider_id in merged if provider_id not in PROVIDER_BY_ID)
     return {
+        "schema": REGISTRY_ROWS_SCHEMA,
         "generated_utc": now_utc(),
         "paper_live_linked": True,
         "rows": ordered,
+        "stale_provider_ids": stale_provider_ids,
+        "migration_boundary": {
+            "input_schema": canonical.get("source_schema", canonical.get("schema")),
+            "canonical_schema": REGISTRY_CANONICAL_SCHEMA,
+            "source_payload_sha256": canonical.get("source_payload_sha256", sha256_payload(existing)),
+        },
     }
 
 
@@ -1149,30 +1703,450 @@ def render_markdown(payload: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def run_measurement(max_rows: int, timeout: int) -> dict[str, Any]:
-    hydrate_env()
-    tag = now_tag()
-    provider_rows = []
+def classify_provider_result(result: dict[str, Any], *, network_allowed: bool) -> str:
+    if not network_allowed:
+        return "DRY_RUN"
+    rows = result.get("rows") if isinstance(result.get("rows"), list) else []
+    if result.get("probe_ok") and rows:
+        return "PASS"
+    note = str(result.get("probe_note") or "")
+    error_kind = str(result.get("error_kind") or "")
+    http_status = result.get("http_status")
+    if note == "missing_env":
+        return "UNCONFIGURED"
+    if http_status == 429 or (isinstance(http_status, int) and 500 <= http_status <= 599):
+        return "RETRYABLE_HTTP"
+    if isinstance(http_status, int) and 400 <= http_status <= 499:
+        return "HTTP_REJECTED"
+    if error_kind == "timeout":
+        return "TIMEOUT"
+    if error_kind == "malformed_json":
+        return "MALFORMED_JSON"
+    if error_kind == "oversized_json":
+        return "OVERSIZED_JSON"
+    if error_kind == "transport_error":
+        return "TRANSPORT_ERROR"
+    if error_kind:
+        return "ADAPTER_ERROR"
+    return "EMPTY"
 
-    for provider in PROVIDERS:
-        env_names = list(provider.get("env_names", []))
+
+def build_provider_child_receipt(
+    provider_id: str,
+    *,
+    policy: dict[str, Any],
+    run_id: str,
+    attempt: int,
+    namespace: dict[str, str],
+    max_rows: int,
+    request_timeout_seconds: int,
+    allow_network: bool = False,
+    publish_outputs: bool = False,
+) -> dict[str, Any]:
+    normalize_provider_ids([provider_id], policy["provider_allowlist"])
+    validate_namespace_assignments({provider_id: namespace})
+    if not SAFE_RUN_ID.fullmatch(run_id):
+        raise ValueError("run id is invalid")
+    if isinstance(attempt, bool) or not isinstance(attempt, int) or attempt < 1:
+        raise ValueError("attempt must be a positive integer")
+    if publish_outputs and not allow_network:
+        raise ValueError("output publication requires network authorization")
+    limits = policy["limits"]
+    if not 1 <= max_rows <= limits["max_rows"]:
+        raise ValueError("max_rows exceeds policy")
+    if not 1 <= request_timeout_seconds <= limits["request_timeout_seconds"]:
+        raise ValueError("request timeout exceeds policy")
+
+    provider = PROVIDER_BY_ID[provider_id]
+    env_names = list(provider.get("env_names", []))
+    os.environ["LUMA_CPU_NAMESPACE"] = namespace["cpu"]
+    os.environ["LUMA_GPU_NAMESPACE"] = namespace["gpu"]
+    os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
+    credential_state = "UNKNOWN"
+    if not env_names:
+        credential_state = "NOT_REQUIRED"
+    if allow_network:
+        hydrate_selected_env(env_names)
+        credential_state = "PRESENT" if (not env_names or present_env_names(env_names)) else "MISSING"
         collector = provider["collector"]
         result = safe_request(
-            str(provider["source"]),
+            provider_id,
             env_names,
-            lambda provider=provider, collector=collector: collector(max_rows, timeout),
+            lambda: collector(max_rows, request_timeout_seconds),
         )
-        artifact = snapshot_provider(provider, result, tag=tag)
-        provider_rows.append(registry_row(provider, result, artifact))
+        rows = result.get("rows") if isinstance(result.get("rows"), list) else []
+        result["rows"] = [row for row in rows if isinstance(row, dict)][:max_rows]
+    else:
+        result = {
+            "source": provider_id,
+            "http_status": None,
+            "rows": [],
+            "probe_ok": False,
+            "probe_note": "dry_run",
+            "error_kind": None,
+            "retry_after_seconds": None,
+        }
 
-    registry = merge_registry(read_json(REGISTRY_JSON), provider_rows)
+    qc_state = classify_provider_result(result, network_allowed=allow_network)
+    artifact = None
+    if publish_outputs:
+        artifact = snapshot_provider(provider, result, tag=f"{run_id}_{attempt}")
+    retry_after = result.get("retry_after_seconds")
+    if isinstance(retry_after, int) and not isinstance(retry_after, bool):
+        retry_after = min(max(0, retry_after), 86_400)
+    else:
+        retry_after = None
+    http_status = result.get("http_status")
+    if isinstance(http_status, bool) or not isinstance(http_status, int) or not 100 <= http_status <= 599:
+        http_status = None
+    rows = result.get("rows") if isinstance(result.get("rows"), list) else []
+    receipt = seal_receipt(
+        {
+            "schema": RECEIPT_SCHEMA,
+            "run_id": run_id,
+            "provider_id": provider_id,
+            "attempt": attempt,
+            "namespace": dict(namespace),
+            "network_allowed": bool(allow_network),
+            "published_outputs": bool(publish_outputs),
+            "credential_state": credential_state,
+            "qc_state": qc_state,
+            "row_count": len(rows),
+            "http_status": http_status,
+            "retry_after_seconds": retry_after,
+            "artifact": artifact,
+        }
+    )
+    return validate_child_receipt(
+        receipt,
+        allowlist=policy["provider_allowlist"],
+        expected_provider_id=provider_id,
+        expected_run_id=run_id,
+        expected_attempt=attempt,
+        expected_namespace=namespace,
+        expected_network_allowed=allow_network,
+        expected_published_outputs=publish_outputs,
+        max_rows=max_rows,
+    )
+
+
+def empty_rate_limit_state() -> dict[str, Any]:
+    return {"schema": ORCHESTRATOR_STATE_SCHEMA, "providers": {}}
+
+
+def validate_rate_limit_state(payload: Any) -> dict[str, Any]:
+    if not isinstance(payload, dict) or set(payload) != {"schema", "providers"}:
+        raise ValueError("rate-limit state fields are invalid")
+    if payload.get("schema") != ORCHESTRATOR_STATE_SCHEMA or not isinstance(payload.get("providers"), dict):
+        raise ValueError("rate-limit state schema is invalid")
+    for provider_id, entry in payload["providers"].items():
+        if not isinstance(provider_id, str) or not SAFE_PROVIDER_ID.fullmatch(provider_id):
+            raise ValueError("rate-limit state provider id is invalid")
+        if not isinstance(entry, dict) or set(entry) != {
+            "circuit_state",
+            "consecutive_failures",
+            "not_before_utc",
+            "last_qc_state",
+            "last_http_status",
+        }:
+            raise ValueError("rate-limit provider state fields are invalid")
+        if entry.get("circuit_state") not in CIRCUIT_STATES:
+            raise ValueError("rate-limit circuit state is invalid")
+        failures = entry.get("consecutive_failures")
+        if isinstance(failures, bool) or not isinstance(failures, int) or failures < 0:
+            raise ValueError("rate-limit failure count is invalid")
+        not_before = entry.get("not_before_utc")
+        if not_before is not None and parse_utc(not_before) is None:
+            raise ValueError("rate-limit not-before timestamp is invalid")
+        if entry.get("last_qc_state") not in QC_STATES:
+            raise ValueError("rate-limit last QC state is invalid")
+        status = entry.get("last_http_status")
+        if status is not None and (
+            isinstance(status, bool) or not isinstance(status, int) or not 100 <= status <= 599
+        ):
+            raise ValueError("rate-limit HTTP status is invalid")
+    return payload
+
+
+def load_rate_limit_state(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return empty_rate_limit_state()
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("rate-limit state could not be read") from exc
+    return validate_rate_limit_state(payload)
+
+
+def provider_is_rate_limited(entry: Any, *, reference_utc: datetime) -> bool:
+    if not isinstance(entry, dict):
+        return False
+    not_before = parse_utc(entry.get("not_before_utc"))
+    return bool(not_before and not_before > reference_utc.astimezone(timezone.utc))
+
+
+def update_rate_limit_state(
+    state: dict[str, Any],
+    provider_results: Iterable[dict[str, Any]],
+    *,
+    limits: dict[str, int],
+    reference_utc: datetime,
+) -> dict[str, Any]:
+    updated = {
+        "schema": ORCHESTRATOR_STATE_SCHEMA,
+        "providers": {key: dict(value) for key, value in state.get("providers", {}).items()},
+    }
+    for result in provider_results:
+        provider_id = result["provider_id"]
+        qc_state = result["qc_state"]
+        prior = updated["providers"].get(provider_id, {})
+        failures = int(prior.get("consecutive_failures", 0) or 0)
+        not_before_utc = None
+        circuit_state = "CLOSED"
+
+        if qc_state in {"RETRYABLE_HTTP", "TIMEOUT", "TRANSPORT_ERROR", "CHILD_EXIT"}:
+            failures += 1
+            retry_after = result.get("retry_after_seconds")
+            if qc_state == "RETRYABLE_HTTP":
+                delay = retry_after if isinstance(retry_after, int) else limits["default_rate_limit_seconds"]
+                not_before_utc = (reference_utc + timedelta(seconds=delay)).astimezone(timezone.utc).isoformat()
+            if failures >= limits["circuit_breaker_failures"]:
+                circuit_state = "OPEN"
+                if not_before_utc is None:
+                    not_before_utc = (
+                        reference_utc + timedelta(seconds=limits["default_rate_limit_seconds"])
+                    ).astimezone(timezone.utc).isoformat()
+        elif qc_state == "RATE_LIMITED":
+            continue
+        else:
+            failures = 0
+
+        updated["providers"][provider_id] = {
+            "circuit_state": circuit_state,
+            "consecutive_failures": failures,
+            "not_before_utc": not_before_utc,
+            "last_qc_state": qc_state,
+            "last_http_status": result.get("http_status"),
+        }
+    return updated
+
+
+def write_rate_limit_state(path: Path, state: dict[str, Any]) -> None:
+    validate_rate_limit_state(state)
+    atomic_write_json(path, state)
+
+
+def build_child_command(
+    *,
+    provider_id: str,
+    policy_path: Path,
+    run_id: str,
+    attempt: int,
+    namespace: dict[str, str],
+    max_rows: int,
+    request_timeout_seconds: int,
+    allow_network: bool,
+    publish_outputs: bool,
+) -> list[str]:
+    command = [
+        sys.executable,
+        str(Path(__file__).resolve()),
+        "--policy",
+        str(policy_path.resolve()),
+        "--child-provider",
+        provider_id,
+        "--run-id",
+        run_id,
+        "--attempt",
+        str(attempt),
+        "--cpu-namespace",
+        namespace["cpu"],
+        "--gpu-namespace",
+        namespace["gpu"],
+        "--max-rows",
+        str(max_rows),
+        "--timeout",
+        str(request_timeout_seconds),
+    ]
+    if allow_network:
+        command.append("--allow-network")
+    if publish_outputs:
+        command.append("--publish-outputs")
+    if command.count("--child-provider") != 1:
+        raise RuntimeError("child command must contain exactly one provider selector")
+    return command
+
+
+def _provider_process_failure(
+    provider_id: str,
+    namespace: dict[str, str],
+    *,
+    qc_state: str,
+    attempts: int,
+) -> dict[str, Any]:
+    return {
+        "provider_id": provider_id,
+        "namespace": dict(namespace),
+        "qc_state": qc_state,
+        "attempts": attempts,
+        "child_receipt_sha256": None,
+        "credential_state": "UNKNOWN",
+        "row_count": 0,
+        "http_status": None,
+        "retry_after_seconds": None,
+        "artifact": None,
+    }
+
+
+def run_provider_subprocess(
+    provider_id: str,
+    *,
+    policy: dict[str, Any],
+    policy_path: Path,
+    run_id: str,
+    namespace: dict[str, str],
+    allow_network: bool,
+    publish_outputs: bool,
+    runner: Callable[..., Any] | None = None,
+    sleep_fn: Callable[[float], None] = time.sleep,
+) -> dict[str, Any]:
+    limits = policy["limits"]
+    process_runner = runner or subprocess.run
+    for attempt in range(1, limits["max_retries"] + 2):
+        command = build_child_command(
+            provider_id=provider_id,
+            policy_path=policy_path,
+            run_id=run_id,
+            attempt=attempt,
+            namespace=namespace,
+            max_rows=limits["max_rows"],
+            request_timeout_seconds=limits["request_timeout_seconds"],
+            allow_network=allow_network,
+            publish_outputs=publish_outputs,
+        )
+        try:
+            completed = process_runner(
+                command,
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=limits["child_timeout_seconds"],
+            )
+        except subprocess.TimeoutExpired:
+            result = _provider_process_failure(provider_id, namespace, qc_state="TIMEOUT", attempts=attempt)
+        except (OSError, subprocess.SubprocessError):
+            result = _provider_process_failure(provider_id, namespace, qc_state="CHILD_EXIT", attempts=attempt)
+        else:
+            if completed.returncode != 0:
+                result = _provider_process_failure(provider_id, namespace, qc_state="CHILD_EXIT", attempts=attempt)
+            else:
+                stdout = completed.stdout if isinstance(completed.stdout, str) else ""
+                if len(stdout.encode("utf-8")) > limits["max_child_output_bytes"]:
+                    result = _provider_process_failure(
+                        provider_id, namespace, qc_state="INVALID_RECEIPT", attempts=attempt
+                    )
+                else:
+                    try:
+                        raw_receipt = json.loads(stdout)
+                        receipt = validate_child_receipt(
+                            raw_receipt,
+                            allowlist=policy["provider_allowlist"],
+                            expected_provider_id=provider_id,
+                            expected_run_id=run_id,
+                            expected_attempt=attempt,
+                            expected_namespace=namespace,
+                            expected_network_allowed=allow_network,
+                            expected_published_outputs=publish_outputs,
+                            max_rows=limits["max_rows"],
+                        )
+                    except (json.JSONDecodeError, UnicodeError, ReceiptValidationError, ValueError):
+                        result = _provider_process_failure(
+                            provider_id, namespace, qc_state="INVALID_RECEIPT", attempts=attempt
+                        )
+                    else:
+                        result = {
+                            "provider_id": provider_id,
+                            "namespace": dict(namespace),
+                            "qc_state": receipt["qc_state"],
+                            "attempts": attempt,
+                            "child_receipt_sha256": receipt["receipt_sha256"],
+                            "credential_state": receipt["credential_state"],
+                            "row_count": receipt["row_count"],
+                            "http_status": receipt["http_status"],
+                            "retry_after_seconds": receipt["retry_after_seconds"],
+                            "artifact": receipt["artifact"],
+                        }
+
+        retryable = result["qc_state"] in {"RETRYABLE_HTTP", "TIMEOUT", "TRANSPORT_ERROR", "CHILD_EXIT"}
+        if retryable and attempt <= limits["max_retries"]:
+            requested_delay = result.get("retry_after_seconds")
+            if not isinstance(requested_delay, int):
+                requested_delay = limits["retry_base_seconds"] * (2 ** (attempt - 1))
+            delay = min(requested_delay, limits["max_retry_delay_seconds"])
+            if delay > 0:
+                sleep_fn(float(delay))
+            continue
+        return result
+    raise RuntimeError("provider retry loop exhausted unexpectedly")
+
+
+def registry_row_from_provider_result(provider_result: dict[str, Any]) -> dict[str, Any]:
+    provider = PROVIDER_BY_ID[provider_result["provider_id"]]
+    sector = str(provider["sector"])
+    row_count = int(provider_result.get("row_count", 0) or 0)
+    qc_state = str(provider_result["qc_state"])
+    measured = qc_state == "PASS" and row_count > 0
+    credential_state = str(provider_result.get("credential_state") or "UNKNOWN")
+    enabled = not provider.get("env_names") or credential_state == "PRESENT"
+    artifact = _validate_artifact(provider_result.get("artifact"))
+    return {
+        "source": provider_result["provider_id"],
+        "sector": sector,
+        "status": "MEASURED" if measured else ("PROBE_FAILED_OR_THIN" if enabled else "UNCONFIGURED"),
+        "rows": row_count,
+        "probe_ok": measured,
+        "http_status": provider_result.get("http_status"),
+        "evidence_basis": "LIVE_HTTP_SNAPSHOT" if measured else ("KEY_PRESENT_BUT_NO_USABLE_ROWS" if enabled else "NONE"),
+        "dollar_basis": "MEASURED" if measured else "UNMEASURED",
+        "constraint_type": provider.get("constraint_type", ""),
+        "money_drain_mode": provider.get("money_drain_mode", ""),
+        "formula_basis": "bounded_log_translation_if_measured_else_zero",
+        "translated_value": estimate_value(sector, row_count if measured else 0),
+        "env_names": list(provider.get("env_names", [])),
+        "present_env_names": [],
+        "credential_state": credential_state,
+        "last_probe_utc": now_utc(),
+        "probe_note": f"child_qc:{qc_state}",
+        "enabled": enabled,
+        "measured": measured,
+        "snapshot_json": artifact["snapshot_json"],
+        "snapshot_latest_json": artifact["snapshot_latest_json"],
+        "snapshot_csv": artifact["snapshot_csv"],
+        "snapshot_sha256": artifact["sha256"],
+        "child_receipt_sha256": provider_result["child_receipt_sha256"],
+    }
+
+
+def publish_measurement_outputs(
+    registry_input: dict[str, Any],
+    provider_results: list[dict[str, Any]],
+    *,
+    run_id: str,
+) -> dict[str, Any]:
+    provider_rows = [
+        registry_row_from_provider_result(result)
+        for result in provider_results
+        if result.get("child_receipt_sha256") and result.get("artifact") is not None
+    ]
+    registry = merge_registry(registry_input, provider_rows)
     live_sources = live_sources_from_registry(registry)
     source_truth = source_truth_from_registry(registry)
     summary = build_summary(registry["rows"])
-
     payload = {
         "generated_utc": now_utc(),
         "schema": "live_source_measurement_maximizer_v1",
+        "orchestrator_run_id": run_id,
         "summary": summary,
         "provider_rows": provider_rows,
         "outputs": {
@@ -1183,38 +2157,299 @@ def run_measurement(max_rows: int, timeout: int) -> dict[str, Any]:
             "markdown": str(OUT_MD.relative_to(ROOT)).replace("\\", "/"),
         },
     }
-
-    write_json(REGISTRY_JSON, registry)
-    write_json(LIVE_SOURCES_JSON, live_sources)
-    write_json(SOURCE_TRUTH_JSON, source_truth)
-    write_json(OUT_JSON, payload)
-    write_json(DASHBOARD_JSON, payload)
+    atomic_write_json(REGISTRY_JSON, registry)
+    atomic_write_json(LIVE_SOURCES_JSON, live_sources)
+    atomic_write_json(SOURCE_TRUTH_JSON, source_truth)
+    atomic_write_json(OUT_JSON, payload)
+    atomic_write_json(DASHBOARD_JSON, payload)
     write_text(OUT_MD, render_markdown(payload))
     return payload
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Pull bounded live snapshots from every configured source.")
-    parser.add_argument("--max-rows", type=int, default=25)
-    parser.add_argument("--timeout", type=int, default=20)
-    args = parser.parse_args()
+def _bounded_policy_overrides(
+    policy: dict[str, Any],
+    *,
+    max_rows: int | None,
+    request_timeout_seconds: int | None,
+    max_concurrency: int | None,
+    max_retries: int | None,
+) -> dict[str, Any]:
+    normalized = dict(policy)
+    limits = dict(policy["limits"])
+    overrides = {
+        "max_rows": max_rows,
+        "request_timeout_seconds": request_timeout_seconds,
+        "max_concurrency": max_concurrency,
+        "max_retries": max_retries,
+    }
+    for name, value in overrides.items():
+        if value is None:
+            continue
+        low, _ = POLICY_LIMITS[name]
+        if isinstance(value, bool) or not isinstance(value, int) or not low <= value <= limits[name]:
+            raise PolicyValidationError(f"{name} override exceeds the configured policy bound")
+        limits[name] = value
+    if limits["request_timeout_seconds"] >= limits["child_timeout_seconds"]:
+        raise PolicyValidationError("request timeout must remain lower than child timeout")
+    normalized["limits"] = limits
+    return normalized
 
-    payload = run_measurement(max(1, args.max_rows), max(3, args.timeout))
-    print(
-        json.dumps(
-            {
-                "schema": payload["schema"],
-                "enabled_sources": payload["summary"]["enabled_sources"],
-                "measured_sources": payload["summary"]["measured_sources"],
-                "failed_or_thin_sources": payload["summary"]["failed_or_thin_sources"],
-                "total_measured_rows": payload["summary"]["total_measured_rows"],
-                "output": str(OUT_JSON.relative_to(ROOT)).replace("\\", "/"),
-                "markdown": str(OUT_MD.relative_to(ROOT)).replace("\\", "/"),
-            },
-            indent=2,
-        )
+
+def orchestrate_providers(
+    provider_ids: Iterable[str] | None = None,
+    *,
+    policy_path: Path = ORCHESTRATOR_POLICY_JSON,
+    registry_path: Path = REGISTRY_JSON,
+    state_path: Path | None = None,
+    receipt_path: Path | None = None,
+    execute: bool = False,
+    allow_network: bool = False,
+    publish_outputs: bool = False,
+    run_id: str | None = None,
+    max_rows: int | None = None,
+    request_timeout_seconds: int | None = None,
+    max_concurrency: int | None = None,
+    max_retries: int | None = None,
+    runner: Callable[..., Any] | None = None,
+    sleep_fn: Callable[[float], None] = time.sleep,
+    now_fn: Callable[[], datetime] | None = None,
+) -> dict[str, Any]:
+    if allow_network and not execute:
+        raise ValueError("network authorization requires --execute")
+    if publish_outputs and (not execute or not allow_network):
+        raise ValueError("output publication requires --execute and --allow-network")
+    policy = _bounded_policy_overrides(
+        load_orchestrator_policy(policy_path),
+        max_rows=max_rows,
+        request_timeout_seconds=request_timeout_seconds,
+        max_concurrency=max_concurrency,
+        max_retries=max_retries,
     )
-    return 0
+    selected = normalize_provider_ids(provider_ids, policy["provider_allowlist"])
+    registry = read_live_source_registry(registry_path)
+    boundary = registry_boundary_receipt(registry, policy["provider_allowlist"])
+    if run_id is None:
+        if execute:
+            run_id = f"run-{now_tag()}-{uuid.uuid4().hex[:8]}"
+        else:
+            dry_seed = {
+                "policy_sha256": policy["policy_sha256"],
+                "registry_sha256": boundary["source_payload_sha256"],
+                "provider_ids": selected,
+            }
+            run_id = f"dry-{sha256_payload(dry_seed)[:24]}"
+    if not SAFE_RUN_ID.fullmatch(run_id):
+        raise ValueError("run id is invalid")
+    namespaces = build_namespace_assignments(selected, run_id)
+    reference_utc = (now_fn or (lambda: datetime.now(timezone.utc)))()
+    if reference_utc.tzinfo is None:
+        raise ValueError("now_fn must return a timezone-aware datetime")
+    reference_utc = reference_utc.astimezone(timezone.utc)
+
+    effective_state_path = state_path or policy["resolved_state_path"]
+    state = load_rate_limit_state(effective_state_path) if execute and allow_network else empty_rate_limit_state()
+    provider_results: dict[str, dict[str, Any]] = {}
+    eligible: list[str] = []
+    if not execute:
+        for provider_id in selected:
+            provider_results[provider_id] = _provider_process_failure(
+                provider_id, namespaces[provider_id], qc_state="DRY_RUN", attempts=0
+            )
+    else:
+        for provider_id in selected:
+            prior = state["providers"].get(provider_id)
+            if allow_network and provider_is_rate_limited(prior, reference_utc=reference_utc):
+                skipped = _provider_process_failure(
+                    provider_id, namespaces[provider_id], qc_state="RATE_LIMITED", attempts=0
+                )
+                if isinstance(prior, dict):
+                    skipped["http_status"] = prior.get("last_http_status")
+                provider_results[provider_id] = skipped
+            else:
+                eligible.append(provider_id)
+
+        if eligible:
+            workers = min(policy["limits"]["max_concurrency"], len(eligible))
+            with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="live-source-parent") as executor:
+                futures = {
+                    executor.submit(
+                        run_provider_subprocess,
+                        provider_id,
+                        policy=policy,
+                        policy_path=policy_path,
+                        run_id=run_id,
+                        namespace=namespaces[provider_id],
+                        allow_network=allow_network,
+                        publish_outputs=publish_outputs,
+                        runner=runner,
+                        sleep_fn=sleep_fn,
+                    ): provider_id
+                    for provider_id in eligible
+                }
+                for future in as_completed(futures):
+                    provider_id = futures[future]
+                    try:
+                        provider_results[provider_id] = future.result()
+                    except Exception:
+                        provider_results[provider_id] = _provider_process_failure(
+                            provider_id, namespaces[provider_id], qc_state="CHILD_EXIT", attempts=1
+                        )
+
+    ordered_results = [provider_results[provider_id] for provider_id in selected]
+    state_persisted = False
+    if execute and allow_network:
+        updated_state = update_rate_limit_state(
+            state,
+            ordered_results,
+            limits=policy["limits"],
+            reference_utc=reference_utc,
+        )
+        write_rate_limit_state(effective_state_path, updated_state)
+        state_persisted = True
+
+    fail_closed_states = {"TIMEOUT", "CHILD_EXIT", "INVALID_RECEIPT"}
+    has_fail_closed_result = any(result["qc_state"] in fail_closed_states for result in ordered_results)
+    published = False
+    if publish_outputs and not has_fail_closed_result:
+        publish_measurement_outputs(registry, ordered_results, run_id=run_id)
+        published = True
+
+    if not execute:
+        status = "DRY_RUN"
+    elif has_fail_closed_result:
+        status = "FAILED_CLOSED"
+    elif any(result["qc_state"] not in {"PASS", "DRY_RUN", "RATE_LIMITED"} for result in ordered_results):
+        status = "COMPLETED_WITH_PROVIDER_FAILURES"
+    else:
+        status = "COMPLETE"
+    receipt = seal_receipt(
+        {
+            "schema": ORCHESTRATOR_SCHEMA,
+            "run_id": run_id,
+            "status": status,
+            "mode": "DRY_RUN" if not execute else ("LIVE" if allow_network else "EXECUTE_NO_NETWORK"),
+            "network_allowed": bool(allow_network),
+            "publish_outputs_requested": bool(publish_outputs),
+            "published_outputs": published,
+            "state_persisted": state_persisted,
+            "policy": {
+                "schema": policy["schema"],
+                "sha256": policy["policy_sha256"],
+                "limits": dict(policy["limits"]),
+            },
+            "registry_boundary": boundary,
+            "providers": ordered_results,
+            "summary": {
+                "provider_count": len(ordered_results),
+                "launched_child_processes": sum(int(result["attempts"]) for result in ordered_results),
+                "valid_child_receipts": sum(bool(result["child_receipt_sha256"]) for result in ordered_results),
+                "rate_limited_providers": sum(result["qc_state"] == "RATE_LIMITED" for result in ordered_results),
+                "failed_closed_providers": sum(
+                    result["qc_state"] in fail_closed_states for result in ordered_results
+                ),
+            },
+        }
+    )
+    if receipt_path is not None:
+        atomic_write_json(receipt_path, receipt)
+    return receipt
+
+
+def run_measurement(
+    max_rows: int = 25,
+    timeout: int = 20,
+    *,
+    allow_network: bool = False,
+    publish_outputs: bool = False,
+) -> dict[str, Any]:
+    return orchestrate_providers(
+        execute=allow_network,
+        allow_network=allow_network,
+        publish_outputs=publish_outputs,
+        max_rows=max_rows,
+        request_timeout_seconds=timeout,
+    )
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Run isolated, bounded live-source provider children.")
+    parser.add_argument("--policy", type=Path, default=ORCHESTRATOR_POLICY_JSON)
+    parser.add_argument("--registry", type=Path, default=REGISTRY_JSON)
+    parser.add_argument("--state-file", type=Path)
+    parser.add_argument("--receipt-file", type=Path)
+    parser.add_argument("--provider", action="append", dest="providers")
+    parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--allow-network", action="store_true")
+    parser.add_argument("--publish-outputs", action="store_true")
+    parser.add_argument("--max-rows", type=int)
+    parser.add_argument("--timeout", type=int)
+    parser.add_argument("--max-concurrency", type=int)
+    parser.add_argument("--max-retries", type=int)
+    parser.add_argument("--run-id")
+    parser.add_argument("--child-provider", help=argparse.SUPPRESS)
+    parser.add_argument("--attempt", type=int, help=argparse.SUPPRESS)
+    parser.add_argument("--cpu-namespace", help=argparse.SUPPRESS)
+    parser.add_argument("--gpu-namespace", help=argparse.SUPPRESS)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    try:
+        if args.child_provider:
+            if (
+                args.providers
+                or args.execute
+                or args.registry != REGISTRY_JSON
+                or args.state_file
+                or args.receipt_file
+                or args.max_concurrency is not None
+                or args.max_retries is not None
+            ):
+                raise ValueError("child mode received parent-only arguments")
+            policy = _bounded_policy_overrides(
+                load_orchestrator_policy(args.policy),
+                max_rows=args.max_rows,
+                request_timeout_seconds=args.timeout,
+                max_concurrency=None,
+                max_retries=None,
+            )
+            if not args.run_id or not args.attempt or not args.cpu_namespace or not args.gpu_namespace:
+                raise ValueError("child mode is missing its execution envelope")
+            receipt = build_provider_child_receipt(
+                args.child_provider,
+                policy=policy,
+                run_id=args.run_id,
+                attempt=args.attempt,
+                namespace={"cpu": args.cpu_namespace, "gpu": args.gpu_namespace},
+                max_rows=policy["limits"]["max_rows"],
+                request_timeout_seconds=policy["limits"]["request_timeout_seconds"],
+                allow_network=args.allow_network,
+                publish_outputs=args.publish_outputs,
+            )
+            print(json.dumps(receipt, sort_keys=True, separators=(",", ":")))
+            return 0
+
+        receipt = orchestrate_providers(
+            args.providers,
+            policy_path=args.policy,
+            registry_path=args.registry,
+            state_path=args.state_file,
+            receipt_path=args.receipt_file,
+            execute=args.execute,
+            allow_network=args.allow_network,
+            publish_outputs=args.publish_outputs,
+            run_id=args.run_id,
+            max_rows=args.max_rows,
+            request_timeout_seconds=args.timeout,
+            max_concurrency=args.max_concurrency,
+            max_retries=args.max_retries,
+        )
+        print(json.dumps(receipt, indent=2, sort_keys=True))
+        return 1 if receipt["status"] == "FAILED_CLOSED" else 0
+    except (PolicyValidationError, RegistrySchemaError, ReceiptValidationError, ValueError, OSError):
+        print("live source orchestrator rejected the request", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

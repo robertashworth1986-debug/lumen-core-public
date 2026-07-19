@@ -2,7 +2,13 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
+import threading
+import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,6 +21,81 @@ def load_module():
     assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
+
+
+def write_policy(module, tmp_path: Path, provider_ids: list[str], **limit_overrides: int) -> Path:
+    limits = {
+        "max_concurrency": 2,
+        "child_timeout_seconds": 5,
+        "request_timeout_seconds": 2,
+        "max_retries": 1,
+        "retry_base_seconds": 0,
+        "max_retry_delay_seconds": 1,
+        "default_rate_limit_seconds": 60,
+        "circuit_breaker_failures": 2,
+        "max_rows": 5,
+        "max_child_output_bytes": 4096,
+    }
+    limits.update(limit_overrides)
+    payload = {
+        "schema": module.POLICY_SCHEMA,
+        "provider_allowlist": provider_ids,
+        "limits": limits,
+        "state_path": "run/live_source_orchestrator/test_state_v1.json",
+        "execution_default": "dry_run",
+        "network_default": False,
+        "publish_outputs_default": False,
+    }
+    path = tmp_path / "policy.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
+def write_registry(module, tmp_path: Path, rows: list[dict] | None = None) -> Path:
+    path = tmp_path / "registry.json"
+    path.write_text(
+        json.dumps({"schema": module.REGISTRY_ROWS_SCHEMA, "rows": rows or []}),
+        encoding="utf-8",
+    )
+    return path
+
+
+def command_value(command: list[str], flag: str) -> str:
+    return command[command.index(flag) + 1]
+
+
+def completed_child(
+    module,
+    command: list[str],
+    *,
+    qc_state: str = "PASS",
+    http_status: int | None = 200,
+    retry_after_seconds: int | None = None,
+    stderr: str = "",
+) -> subprocess.CompletedProcess[str]:
+    provider_id = command_value(command, "--child-provider")
+    network_allowed = "--allow-network" in command
+    receipt = module.seal_receipt(
+        {
+            "schema": module.RECEIPT_SCHEMA,
+            "run_id": command_value(command, "--run-id"),
+            "provider_id": provider_id,
+            "attempt": int(command_value(command, "--attempt")),
+            "namespace": {
+                "cpu": command_value(command, "--cpu-namespace"),
+                "gpu": command_value(command, "--gpu-namespace"),
+            },
+            "network_allowed": network_allowed,
+            "published_outputs": False,
+            "credential_state": "PRESENT" if network_allowed else "UNKNOWN",
+            "qc_state": qc_state,
+            "row_count": 1 if qc_state == "PASS" else 0,
+            "http_status": http_status,
+            "retry_after_seconds": retry_after_seconds,
+            "artifact": None,
+        }
+    )
+    return subprocess.CompletedProcess(command, 0, json.dumps(receipt), stderr)
 
 
 def test_sanitize_redacts_secret_values(monkeypatch) -> None:
@@ -135,3 +216,335 @@ def test_nasa_collector_has_open_power_fallback(monkeypatch) -> None:
     monkeypatch.delenv("NASA_API_KEY", raising=False)
 
     assert module.rows_from_nasa.__name__ == "rows_from_nasa"
+
+
+def test_parent_defaults_to_dry_run_without_children_network_or_state(tmp_path) -> None:
+    module = load_module()
+    policy = write_policy(module, tmp_path, ["FRED"])
+    registry = write_registry(module, tmp_path)
+    state = tmp_path / "state.json"
+
+    def forbidden_runner(*args, **kwargs):
+        raise AssertionError("dry-run parent launched a child")
+
+    receipt = module.orchestrate_providers(
+        ["FRED"],
+        policy_path=policy,
+        registry_path=registry,
+        state_path=state,
+        runner=forbidden_runner,
+    )
+    repeated = module.orchestrate_providers(
+        ["FRED"],
+        policy_path=policy,
+        registry_path=registry,
+        state_path=state,
+        runner=forbidden_runner,
+    )
+
+    assert receipt["status"] == "DRY_RUN"
+    assert receipt["mode"] == "DRY_RUN"
+    assert receipt["network_allowed"] is False
+    assert receipt["summary"]["launched_child_processes"] == 0
+    assert receipt["providers"][0]["qc_state"] == "DRY_RUN"
+    assert not state.exists()
+    assert module.verify_receipt_hash(receipt)
+    assert repeated == receipt
+
+
+def test_checked_in_policy_is_public_safe_fail_closed_and_covers_catalog() -> None:
+    module = load_module()
+    policy = module.load_orchestrator_policy()
+
+    assert policy["execution_default"] == "dry_run"
+    assert policy["network_default"] is False
+    assert policy["publish_outputs_default"] is False
+    assert set(policy["provider_allowlist"]) == set(module.PROVIDER_BY_ID)
+    assert policy["resolved_state_path"].is_relative_to(module.ROOT / "run")
+
+
+def test_parent_never_places_key_values_in_argv_logs_receipts_or_state(tmp_path, monkeypatch) -> None:
+    module = load_module()
+    secret = "key-value-that-must-never-cross-parent-boundary"
+    monkeypatch.setenv("FRED_API_KEY", secret)
+    policy = write_policy(module, tmp_path, ["FRED"], max_retries=0)
+    registry = write_registry(module, tmp_path)
+    state = tmp_path / "state.json"
+    observed: list[tuple[list[str], dict]] = []
+
+    def runner(command, **kwargs):
+        observed.append((list(command), dict(kwargs)))
+        return completed_child(module, command, stderr=f"provider said {secret}")
+
+    receipt = module.orchestrate_providers(
+        ["FRED"],
+        policy_path=policy,
+        registry_path=registry,
+        state_path=state,
+        execute=True,
+        allow_network=True,
+        run_id="secret-boundary-test",
+        runner=runner,
+        sleep_fn=lambda _: None,
+    )
+
+    rendered = json.dumps({"receipt": receipt, "calls": observed})
+    assert secret not in rendered
+    assert secret not in state.read_text(encoding="utf-8")
+    assert observed[0][0].count("--child-provider") == 1
+    assert "env" not in observed[0][1]
+    assert receipt["providers"][0]["child_receipt_sha256"]
+
+
+def test_invalid_provider_is_rejected_before_any_child_launch(tmp_path) -> None:
+    module = load_module()
+    policy = write_policy(module, tmp_path, ["FRED"])
+    registry = write_registry(module, tmp_path)
+    launched = False
+
+    def runner(*args, **kwargs):
+        nonlocal launched
+        launched = True
+        raise AssertionError("invalid provider reached the subprocess runner")
+
+    with pytest.raises(ValueError, match="not allowlisted"):
+        module.orchestrate_providers(
+            ["NOT_ALLOWLISTED"],
+            policy_path=policy,
+            registry_path=registry,
+            execute=True,
+            runner=runner,
+        )
+
+    assert launched is False
+
+
+def test_child_timeout_is_bounded_retried_and_failed_closed(tmp_path) -> None:
+    module = load_module()
+    policy = write_policy(module, tmp_path, ["FRED"], max_retries=1)
+    registry = write_registry(module, tmp_path)
+    state = tmp_path / "state.json"
+    calls = 0
+
+    def runner(command, **kwargs):
+        nonlocal calls
+        calls += 1
+        raise subprocess.TimeoutExpired(command, kwargs["timeout"])
+
+    receipt = module.orchestrate_providers(
+        ["FRED"],
+        policy_path=policy,
+        registry_path=registry,
+        state_path=state,
+        execute=True,
+        allow_network=True,
+        run_id="timeout-test",
+        runner=runner,
+        sleep_fn=lambda _: None,
+    )
+
+    assert calls == 2
+    assert receipt["status"] == "FAILED_CLOSED"
+    assert receipt["providers"][0]["qc_state"] == "TIMEOUT"
+    assert receipt["providers"][0]["attempts"] == 2
+    assert receipt["summary"]["launched_child_processes"] == 2
+
+
+def test_malformed_child_output_is_not_echoed_or_published(tmp_path, monkeypatch) -> None:
+    module = load_module()
+    secret = "secret-in-malformed-child-output"
+    policy = write_policy(module, tmp_path, ["FRED"], max_retries=0)
+    registry = write_registry(module, tmp_path)
+    state = tmp_path / "state.json"
+
+    def runner(command, **kwargs):
+        return subprocess.CompletedProcess(command, 0, json.dumps({"unexpected_secret": secret}), secret)
+
+    def forbidden_publish(*args, **kwargs):
+        raise AssertionError("malformed child output reached publication")
+
+    monkeypatch.setattr(module, "publish_measurement_outputs", forbidden_publish)
+    receipt = module.orchestrate_providers(
+        ["FRED"],
+        policy_path=policy,
+        registry_path=registry,
+        state_path=state,
+        execute=True,
+        allow_network=True,
+        publish_outputs=True,
+        run_id="malformed-output-test",
+        runner=runner,
+    )
+
+    assert receipt["status"] == "FAILED_CLOSED"
+    assert receipt["published_outputs"] is False
+    assert receipt["providers"][0]["qc_state"] == "INVALID_RECEIPT"
+    assert secret not in json.dumps(receipt)
+
+
+def test_duplicate_cpu_or_gpu_namespaces_are_rejected() -> None:
+    module = load_module()
+    duplicate = "live-source/duplicate-test/fred/cpu"
+    assignments = {
+        "FRED": {"cpu": duplicate, "gpu": "live-source/duplicate-test/fred/gpu"},
+        "EIA": {"cpu": duplicate, "gpu": "live-source/duplicate-test/eia/gpu"},
+    }
+
+    with pytest.raises(ValueError, match="disjoint"):
+        module.validate_namespace_assignments(assignments)
+
+
+def test_registry_schema_conflict_fails_before_children_launch(tmp_path) -> None:
+    module = load_module()
+    policy = write_policy(module, tmp_path, ["FRED"])
+    registry = tmp_path / "registry.json"
+    registry.write_text(
+        json.dumps(
+            {
+                "rows": [{"source": "FRED", "enabled": True}],
+                "sources": [{"source": "FRED", "enabled": False}],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    def forbidden_runner(*args, **kwargs):
+        raise AssertionError("conflicted registry reached child launch")
+
+    with pytest.raises(module.RegistrySchemaError, match="conflict"):
+        module.orchestrate_providers(
+            ["FRED"],
+            policy_path=policy,
+            registry_path=registry,
+            execute=True,
+            runner=forbidden_runner,
+        )
+
+
+def test_registry_migration_preserves_and_marks_stale_providers() -> None:
+    module = load_module()
+    existing = {
+        "sources": [
+            {"source": "OLD_PROVIDER", "enabled": True, "measured": True, "rows": 9},
+        ]
+    }
+    merged = module.merge_registry(
+        existing,
+        [{"source": "FRED", "enabled": True, "measured": False, "rows": 0}],
+    )
+
+    rows = {row["source"]: row for row in merged["rows"]}
+    assert merged["schema"] == module.REGISTRY_ROWS_SCHEMA
+    assert rows["OLD_PROVIDER"]["rows"] == 9
+    assert rows["FRED"]["rows"] == 0
+    assert merged["stale_provider_ids"] == ["OLD_PROVIDER"]
+    assert merged["migration_boundary"]["input_schema"] == module.REGISTRY_LEGACY_SOURCES_SCHEMA
+
+
+def test_receipt_hash_is_canonical_and_deterministic() -> None:
+    module = load_module()
+    first = module.seal_receipt({"schema": "test.v1", "b": [2, 1], "a": {"z": 3}})
+    second = module.seal_receipt({"a": {"z": 3}, "b": [2, 1], "schema": "test.v1"})
+
+    assert first["receipt_sha256"] == second["receipt_sha256"]
+    assert module.verify_receipt_hash(first)
+    assert module.verify_receipt_hash(second)
+
+
+def test_rate_limit_state_persists_and_skips_provider_until_not_before(tmp_path) -> None:
+    module = load_module()
+    policy = write_policy(module, tmp_path, ["FRED"], max_retries=0)
+    registry = write_registry(module, tmp_path)
+    state = tmp_path / "state.json"
+    reference = datetime(2026, 7, 18, 12, 0, tzinfo=timezone.utc)
+    calls = 0
+
+    def rate_limited_runner(command, **kwargs):
+        nonlocal calls
+        calls += 1
+        return completed_child(
+            module,
+            command,
+            qc_state="RETRYABLE_HTTP",
+            http_status=429,
+            retry_after_seconds=120,
+        )
+
+    first = module.orchestrate_providers(
+        ["FRED"],
+        policy_path=policy,
+        registry_path=registry,
+        state_path=state,
+        execute=True,
+        allow_network=True,
+        run_id="rate-limit-first",
+        runner=rate_limited_runner,
+        now_fn=lambda: reference,
+    )
+
+    def forbidden_runner(*args, **kwargs):
+        raise AssertionError("persistently rate-limited provider was relaunched")
+
+    second = module.orchestrate_providers(
+        ["FRED"],
+        policy_path=policy,
+        registry_path=registry,
+        state_path=state,
+        execute=True,
+        allow_network=True,
+        run_id="rate-limit-second",
+        runner=forbidden_runner,
+        now_fn=lambda: reference + timedelta(seconds=30),
+    )
+
+    persisted = json.loads(state.read_text(encoding="utf-8"))
+    assert calls == 1
+    assert first["providers"][0]["qc_state"] == "RETRYABLE_HTTP"
+    assert persisted["providers"]["FRED"]["not_before_utc"] == "2026-07-18T12:02:00+00:00"
+    assert second["providers"][0]["qc_state"] == "RATE_LIMITED"
+    assert second["summary"]["launched_child_processes"] == 0
+
+
+def test_each_child_command_has_one_provider_and_concurrency_is_bounded(tmp_path) -> None:
+    module = load_module()
+    providers = ["BLS", "EIA", "FRED"]
+    policy = write_policy(module, tmp_path, providers, max_concurrency=2, max_retries=0)
+    registry = write_registry(module, tmp_path)
+    lock = threading.Lock()
+    active = 0
+    maximum_active = 0
+    commands: list[list[str]] = []
+
+    def runner(command, **kwargs):
+        nonlocal active, maximum_active
+        with lock:
+            active += 1
+            maximum_active = max(maximum_active, active)
+            commands.append(list(command))
+        time.sleep(0.03)
+        try:
+            return completed_child(module, command, qc_state="DRY_RUN", http_status=None)
+        finally:
+            with lock:
+                active -= 1
+
+    receipt = module.orchestrate_providers(
+        providers,
+        policy_path=policy,
+        registry_path=registry,
+        execute=True,
+        allow_network=False,
+        run_id="bounded-concurrency-test",
+        runner=runner,
+    )
+
+    namespaces = {
+        value
+        for provider in receipt["providers"]
+        for value in provider["namespace"].values()
+    }
+    assert len(commands) == len(providers)
+    assert all(command.count("--child-provider") == 1 for command in commands)
+    assert {command_value(command, "--child-provider") for command in commands} == set(providers)
+    assert maximum_active <= 2
+    assert len(namespaces) == len(providers) * 2
