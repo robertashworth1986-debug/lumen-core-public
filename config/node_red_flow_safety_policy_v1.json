@@ -1,0 +1,21 @@
+{
+  "policy_id": "node_red_flow_safety_v1",
+  "version": 1,
+  "fail_closed": true,
+  "targets": {
+    "flow_glob": "code/node_red/*.json",
+    "ensure_script": "code/ENSURE_NODERED_LUMA_FLOWS.py"
+  },
+  "blocking_controls": {
+    "no_auto_fire_inject": true,
+    "no_debug_payload_exposure": true,
+    "http_timeout_positive": true,
+    "http_error_path": true,
+    "require_loopback_http_endpoints": true,
+    "no_replace_all_flows_post": true,
+    "no_secret_like_literals": true
+  },
+  "secret_patterns": [
+    "api[_-]?key", "secret", "token", "password", "bearer", "private[_-]?key"
+  ]
+}
