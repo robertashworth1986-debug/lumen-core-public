@@ -11,3 +11,6 @@ build_week/prooflock_console/*.py text eol=lf
 # ProofLock hashes these evidence artifacts byte-for-byte. Keep checkout bytes stable.
 assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.json -text
 assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.json -text
+
+# Proof Capsule fixtures are reviewed and hashed across platforms.
+examples/proof_capsule/** text eol=lf
