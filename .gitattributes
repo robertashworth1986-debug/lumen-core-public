@@ -6,3 +6,12 @@
 *.xlsx binary
 evidence/reproducibility/github_run_*/** binary
 code/falcon_hybrid_context_benchmark.py text eol=lf
+grant_submissions/DLA26BZ03_NV011_MissionWeave/*.md text eol=lf
+grant_submissions/DLA26BZ03_NV011_MissionWeave/*.py text eol=lf
+grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_BUILD_METADATA_2026-07-16.json text eol=crlf
+build_week/prooflock_console/*.md text eol=lf
+build_week/prooflock_console/*.js text eol=lf
+build_week/prooflock_console/*.html text eol=lf
+build_week/prooflock_console/*.css text eol=lf
+build_week/prooflock_console/*.py text eol=lf
+build_week/prooflock_console/sample_receipt.json text eol=crlf
