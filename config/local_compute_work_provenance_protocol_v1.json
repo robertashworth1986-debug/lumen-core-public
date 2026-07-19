@@ -1,0 +1,84 @@
+{
+  "schema": "local_compute_work_provenance_protocol.v1",
+  "status": "frozen",
+  "receipt_schema": "local_compute_work_provenance_receipt.v1",
+  "work_schema": "local_compute_work_provenance_work_measurement.v1",
+  "packet_manifest_schema": "local_compute_work_provenance_packet_manifest.v1",
+  "purpose": "Measure local Codex task elapsed time, ambiguity-safe runtime model attribution, available compute, and aggregate asset presence without publishing message content, source identities, source paths, or input-file content hashes.",
+  "measurement_quality_levels": [
+    "VALID",
+    "DEGRADED",
+    "INVALID"
+  ],
+  "work_measurement": {
+    "selected_records": "Top-level JSON objects are parsed without depending on byte layout or whitespace. Only turn_context and selected event_msg payload fields affect measurement.",
+    "authoritative_interval": "Each accepted task_complete defines exactly one half-open interval [completed_utc - normalized_duration, completed_utc). task_started timestamps do not alter that interval.",
+    "completion_endpoint": "Use payload.completed_at when present; otherwise use the top-level event timestamp. A present but invalid completed_at is rejected rather than replaced by a fallback.",
+    "interval_endpoint_timezone": "UTC",
+    "additive_task_elapsed": "Sum the integer-microsecond lengths of unique, non-conflicting accepted completion intervals.",
+    "calendar_union_elapsed": "Union the same accepted half-open intervals in integer microseconds. The union must be less than or equal to additive elapsed time.",
+    "duration_validation": {
+      "minimum_ms": 0,
+      "maximum_ms": 604800000,
+      "boolean_allowed": false,
+      "non_finite_allowed": false,
+      "rule": "Reject missing, Boolean, negative, non-finite, NaN, and greater-than-seven-day duration_ms values."
+    },
+    "rounding": {
+      "duration_ms_normalization": "ROUND_HALF_UP to nearest integer microsecond",
+      "elapsed_seconds": "ROUND_HALF_UP to 0.001 seconds",
+      "duration_labels": "ROUND_HALF_UP to nearest whole second"
+    },
+    "model_identity": "Attribute a completion only from non-reserved exact model strings in matching turn_context records observed before that completion. No context is __UNATTRIBUTED__; conflicting contexts or duplicate evidence are __AMBIGUOUS__; late contexts never backfill an earlier completion.",
+    "duplicate_completions": "Identical completion intervals for one turn are counted once and reported as duplicates. Conflicting duplicate intervals are excluded from elapsed totals.",
+    "in_progress_tasks": "A unique valid task_started turn with no observed valid completion or matching abort is pending. Pending tasks are reported separately and excluded from completed-task totals.",
+    "goal_snapshot": "Optional caller-supplied numeric metadata. Objective text is prohibited and goal runtime is not added to completion totals."
+  },
+  "source_validation": {
+    "root": "A missing, non-directory, unresolved, or symbolic-link session root is INVALID.",
+    "source_files": "Symbolic links and sources outside the resolved root are never read. Read, discovery, mutation, and parse failures are counted without source identity.",
+    "mutation": "A source must retain device, inode, size, and nanosecond modification time from pre-open through end-of-read and post-close validation. Mutated source measurements are discarded.",
+    "quality": "A fully readable and well-formed corpus is VALID. Partial or ambiguous evidence is DEGRADED. An invalid root or a discovered corpus with no usable source is INVALID.",
+    "verified_status": false
+  },
+  "privacy": {
+    "message_content_read_for_measurement": false,
+    "message_content_written_to_receipt": false,
+    "prompt_content_written_to_receipt": false,
+    "tool_output_content_written_to_receipt": false,
+    "credentials_or_environment_values_written_to_receipt": false,
+    "session_paths_written_to_receipt": false,
+    "session_ids_written_to_receipt": false,
+    "input_file_content_hashes_written_to_receipt": false,
+    "stable_source_aliases_written_to_receipt": false,
+    "session_identity_mode": "none",
+    "noninterference": "Changing ignored message, prompt, or tool-output payload content without changing selected provenance events does not change work measurement output."
+  },
+  "compute_measurement": {
+    "mode": "one_time_local_capability_snapshot",
+    "gpu_source": "nvidia-smi plus the active Python runtime when available",
+    "cuda_smoke_test": "Optional bounded FP16 matrix multiplication. Throughput is a local engineering measurement, not a vendor benchmark.",
+    "continuous_health_monitor": false,
+    "serial_numbers_collected": false,
+    "host_or_user_identity_collected": false
+  },
+  "asset_measurement": {
+    "quant_lab": "Count files and bytes both including and excluding dependency/cache directories. File count is not a simulation count.",
+    "premium_mirror": "Read only aggregate fields and byte size from the existing mirror summary.",
+    "canonical_evidence": "Report presence and byte size under protocol-defined artifact IDs; do not publish local paths, input-file hashes, or reinterpret scientific results."
+  },
+  "packet_publication": {
+    "archive": "A complete ZIP packet containing receipt JSON, Markdown, and manifest is fsynced and atomically hard-linked into an immutable collision-protected archive name.",
+    "latest": "Convenience latest files are atomically replaced only after archive publication; the latest-packet pointer is written last and is authoritative.",
+    "output_hash_boundary": "Receipt and manifest hashes protect generated output packets. They are not hashes of session or other input files."
+  },
+  "claim_boundaries": [
+    "Elapsed agent-task time is engineering provenance, not scientific validation.",
+    "Token counts are workload metadata, not a valuation, bill, or measure of correctness.",
+    "Model attribution is exact only when event ordering is unambiguous; no model alias is inferred.",
+    "Model use does not transfer ownership of the underlying model or establish independent review.",
+    "Compute throughput does not establish production readiness, field validation, safety, profitability, or government approval.",
+    "File, row, exposure, model-call, trial, and independent-run counts are distinct and must not be merged.",
+    "Existing QuantLab and premium assets remain governed by their original protocols, receipts, and claim boundaries."
+  ]
+}
