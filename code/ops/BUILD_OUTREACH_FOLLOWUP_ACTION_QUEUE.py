@@ -31,6 +31,7 @@ LATEST_JSON = OUT_OPS / "outreach_followup_action_queue_latest.json"
 
 SCHEMA = "lumencore.outreach_followup_action_queue.v1"
 REFERENCE_AS_OF_UTC = "2026-07-18T12:20:24Z"
+MAILBOX_RECHECK_MAX_AGE_SECONDS = 15 * 60
 
 MODE_STATES = {
     "ACCOUNT_ACTION": "HUMAN_ACCOUNT_ACTION_OPEN",
@@ -223,6 +224,8 @@ def render_due_followup(
     *,
     as_of_utc: str,
     mailbox_rechecked: bool,
+    mailbox_rechecked_utc: str,
+    mailbox_check_receipt_sha256: str,
     no_reply_confirmed: bool,
     prior_followup_count: int,
 ) -> dict[str, Any]:
@@ -236,6 +239,16 @@ def render_due_followup(
         raise ValueError("Follow-up is not due for mailbox recheck")
     if not mailbox_rechecked or not no_reply_confirmed:
         raise ValueError("Fresh mailbox recheck and no-reply confirmation are required")
+    as_of = parse_aware_utc(as_of_utc)
+    mailbox_checked_at = parse_aware_utc(mailbox_rechecked_utc)
+    mailbox_check_age_seconds = int((as_of - mailbox_checked_at).total_seconds())
+    if mailbox_check_age_seconds < 0:
+        raise ValueError("Mailbox recheck timestamp cannot be in the future")
+    if mailbox_check_age_seconds > MAILBOX_RECHECK_MAX_AGE_SECONDS:
+        raise ValueError("Mailbox recheck is stale")
+    receipt = mailbox_check_receipt_sha256.strip().upper()
+    if len(receipt) != 64 or any(char not in "0123456789ABCDEF" for char in receipt):
+        raise ValueError("Mailbox recheck receipt SHA-256 is invalid")
     if prior_followup_count < 0:
         raise ValueError("Prior follow-up count cannot be negative")
     if prior_followup_count >= int(action["max_proactive_sends"]):
@@ -259,6 +272,9 @@ def render_due_followup(
         raise ValueError("Follow-up renderer exposed send authority")
     rendered["queue_action_state"] = action["action_state"]
     rendered["mailbox_rechecked"] = True
+    rendered["mailbox_rechecked_utc"] = utc_iso(mailbox_checked_at)
+    rendered["mailbox_recheck_age_seconds"] = mailbox_check_age_seconds
+    rendered["mailbox_check_receipt_sha256"] = receipt
     rendered["no_reply_confirmed"] = True
     rendered["prior_followup_count"] = prior_followup_count
     rendered["max_proactive_sends"] = action["max_proactive_sends"]
@@ -301,6 +317,8 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
             "builder_can_send_email": False,
             "past_hold_authorizes_send": False,
             "inbox_recheck_required_before_draft": True,
+            "mailbox_recheck_max_age_seconds": MAILBOX_RECHECK_MAX_AGE_SECONDS,
+            "mailbox_recheck_receipt_required": True,
             "action_time_human_review_required": True,
             "final_send_performed": False,
         },
@@ -312,7 +330,8 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
         },
         "claim_boundary": (
             "This queue evaluates communication timing and routing controls only. A hold "
-            "expiration requires a fresh mailbox check and does not authorize a draft or send. "
+            "expiration requires a fresh mailbox check that is recent, timestamped, and "
+            "receipted; it does not authorize a draft or send. "
             "The queue does not establish submission, receipt, selection, funding, endorsement, "
             "validation, technical performance, or authority to disclose private information."
         ),

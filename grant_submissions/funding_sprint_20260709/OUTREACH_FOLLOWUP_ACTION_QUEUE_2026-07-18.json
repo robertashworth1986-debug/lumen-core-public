@@ -58,7 +58,7 @@
       "draft_rendered": false,
       "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 413913,
+      "hold_seconds_remaining": 390169,
       "inbox_recheck_required": false,
       "lane_id": "lanl_vision_licensing_followup",
       "max_proactive_sends": 1,
@@ -110,7 +110,7 @@
       "draft_rendered": false,
       "eligible_template_id": "COMPONENT_INSTRUCTION_ESCALATION",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 165513,
+      "hold_seconds_remaining": 141769,
       "inbox_recheck_required": false,
       "lane_id": "missionweave_dsip_proposal",
       "max_proactive_sends": 1,
@@ -275,22 +275,24 @@
       "source_state": "ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY"
     }
   ],
-  "as_of_utc": "2026-07-18T19:01:26.924863Z",
-  "claim_boundary": "This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check and does not authorize a draft or send. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.",
+  "as_of_utc": "2026-07-19T01:37:10.533550Z",
+  "claim_boundary": "This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; it does not authorize a draft or send. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.",
   "controls": {
     "action_time_human_review_required": true,
     "builder_can_send_email": false,
     "final_send_performed": false,
     "inbox_recheck_required_before_draft": true,
+    "mailbox_recheck_max_age_seconds": 900,
+    "mailbox_recheck_receipt_required": true,
     "past_hold_authorizes_send": false
   },
-  "queue_sha256": "C9C351627F01A84DE9390FB091AF5B22AAC13F4952CCA8B94E9540EF46F30697",
+  "queue_sha256": "21CFD5A2E281CA5DEE43351A4CB069CD1D08DA92B9565FB84E1E1EA8EC01BF97",
   "schema": "lumencore.outreach_followup_action_queue.v1",
   "source_evidence": {
     "email_reconciliation": {
       "bytes": 22433,
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
-      "sha256": "74268285A847785237A1E31A2CE3D07BBFE69297CF8C35C4C23F009C29556914"
+      "sha256": "D67F86BF2693F1BACB9E6EE41674C7501449AC3E848FE3769C12143841C31C67"
     },
     "followup_policy_config": {
       "bytes": 5670,
@@ -305,7 +307,7 @@
     "response_template_registry": {
       "bytes": 18192,
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
-      "sha256": "1295795F0531DEE996F9FBCE91C0F68135EEF55EDB6D45086F6F69CB05C0BB87"
+      "sha256": "BB091A36D0E8C87D071FB97E8774E4C691A66F6D9ECFD4C70C3ABF80E875D6BA"
     }
   },
   "status": "NO_EXTERNAL_FOLLOWUP_DUE",

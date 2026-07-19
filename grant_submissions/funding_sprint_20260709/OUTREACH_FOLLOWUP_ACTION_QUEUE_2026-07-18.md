@@ -1,14 +1,14 @@
 # Outreach Follow-up Action Queue - 2026-07-18
 
 - Status: `NO_EXTERNAL_FOLLOWUP_DUE`
-- As of UTC: `2026-07-18T19:01:26.924863Z`
+- As of UTC: `2026-07-19T01:37:10.533550Z`
 - Lanes: `16`
 - Due for mailbox recheck: `0`
 - Held no-send: `2`
 - Drafts rendered: `0`
 - Send now: `0`
 - Autonomous external send allowed: `false`
-- Queue SHA-256: `C9C351627F01A84DE9390FB091AF5B22AAC13F4952CCA8B94E9540EF46F30697`
+- Queue SHA-256: `21CFD5A2E281CA5DEE43351A4CB069CD1D08DA92B9565FB84E1E1EA8EC01BF97`
 
 ## Action Queue
 
@@ -33,4 +33,4 @@
 
 ## Claim Boundary
 
-This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check and does not authorize a draft or send. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.
+This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; it does not authorize a draft or send. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.

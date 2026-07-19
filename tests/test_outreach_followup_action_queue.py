@@ -86,6 +86,8 @@ def test_current_queue_is_deterministic_and_never_sends():
     assert actual["summary"]["draft_rendered_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
     assert actual["summary"]["external_send_allowed_without_human"] is False
+    assert actual["controls"]["mailbox_recheck_max_age_seconds"] == 900
+    assert actual["controls"]["mailbox_recheck_receipt_required"] is True
     assert all(row["send_now"] is False for row in actual["actions"])
     assert all(row["draft_rendered"] is False for row in actual["actions"])
     assert all(
@@ -132,6 +134,7 @@ def test_lanl_hold_expiration_requires_recheck_and_still_does_not_authorize_send
 
 def test_lanl_followup_render_requires_every_gate_and_never_sends():
     module = load_module()
+    mailbox_receipt = "0123456789ABCDEF" * 4
     facts = {
         "recipient_name": "Reviewer",
         "recipient_email": "reviewer@example.org",
@@ -152,6 +155,8 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
             facts,
             as_of_utc="2026-07-23T13:59:59Z",
             mailbox_rechecked=True,
+            mailbox_rechecked_utc="2026-07-23T13:59:30Z",
+            mailbox_check_receipt_sha256=mailbox_receipt,
             no_reply_confirmed=True,
             prior_followup_count=0,
         )
@@ -163,6 +168,8 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
                 facts,
                 as_of_utc="2026-07-23T14:00:00Z",
                 mailbox_rechecked=mailbox_rechecked,
+                mailbox_rechecked_utc="2026-07-23T13:59:30Z",
+                mailbox_check_receipt_sha256=mailbox_receipt,
                 no_reply_confirmed=no_reply_confirmed,
                 prior_followup_count=0,
             )
@@ -173,6 +180,8 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
             facts,
             as_of_utc="2026-07-23T14:00:00Z",
             mailbox_rechecked=True,
+            mailbox_rechecked_utc="2026-07-23T13:59:30Z",
+            mailbox_check_receipt_sha256=mailbox_receipt,
             no_reply_confirmed=True,
             prior_followup_count=1,
         )
@@ -182,6 +191,8 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
         facts,
         as_of_utc="2026-07-23T14:00:00Z",
         mailbox_rechecked=True,
+        mailbox_rechecked_utc="2026-07-23T13:59:30Z",
+        mailbox_check_receipt_sha256=mailbox_receipt,
         no_reply_confirmed=True,
         prior_followup_count=0,
     )
@@ -192,12 +203,54 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
     assert rendered["send_allowed_by_builder"] is False
     assert rendered["send_performed"] is False
     assert rendered["mailbox_rechecked"] is True
+    assert rendered["mailbox_rechecked_utc"] == "2026-07-23T13:59:30Z"
+    assert rendered["mailbox_recheck_age_seconds"] == 30
+    assert rendered["mailbox_check_receipt_sha256"] == mailbox_receipt
     assert rendered["no_reply_confirmed"] is True
     assert "following up once" in rendered["body"]
     assert "does not assert receipt, endorsement, independent validation" in (
         rendered["body"]
     )
     assert "will not send another follow-up" in rendered["body"]
+
+
+@pytest.mark.parametrize(
+    ("mailbox_rechecked_utc", "receipt", "error"),
+    (
+        ("2026-07-23T13:44:59Z", "0123456789ABCDEF" * 4, "stale"),
+        ("2026-07-23T14:00:01Z", "0123456789ABCDEF" * 4, "future"),
+        ("2026-07-23T13:59:30Z", "not-a-hash", "receipt SHA-256"),
+    ),
+)
+def test_followup_render_rejects_unreceipted_or_nonfresh_mailbox_checks(
+    mailbox_rechecked_utc, receipt, error
+):
+    module = load_module()
+    facts = {
+        "recipient_name": "Reviewer",
+        "recipient_email": "reviewer@example.org",
+        "source_message_id": "synthetic-message-id",
+        "source_subject": "Bounded technical package",
+        "sent_date_local": "July 16, 2026",
+        "package_name": "a bounded technical package",
+        "review_scope": "a short Stage 0 diligence and evaluation-fit discussion",
+        "requested_next_step": "a 20-minute technical fit check",
+        "sender_name": "Founder",
+        "sender_title": "Founder / Systems Architect",
+        "organization_name": "LumenCore",
+    }
+
+    with pytest.raises(ValueError, match=error):
+        module.render_due_followup(
+            "lanl_vision_licensing_followup",
+            facts,
+            as_of_utc="2026-07-23T14:00:00Z",
+            mailbox_rechecked=True,
+            mailbox_rechecked_utc=mailbox_rechecked_utc,
+            mailbox_check_receipt_sha256=receipt,
+            no_reply_confirmed=True,
+            prior_followup_count=0,
+        )
 
 
 def test_missionweave_component_followup_waits_for_monday_and_full_thread_recheck():

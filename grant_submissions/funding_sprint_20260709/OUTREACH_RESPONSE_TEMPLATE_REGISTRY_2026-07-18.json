@@ -8,7 +8,7 @@
     "missing_fact_fail_closed": true,
     "past_deadline_fail_closed": true
   },
-  "generated_utc": "2026-07-18T19:00:48.445450+00:00",
+  "generated_utc": "2026-07-19T01:31:29.456852+00:00",
   "global_rules": [
     "Ground every reply in the latest inbound message and preserve its thread identifier.",
     "Answer only the question asked; do not append an unrelated pitch or attachment.",
