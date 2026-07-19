@@ -47,8 +47,11 @@ def test_project_core_is_verified_from_post_start_commit_and_sample_receipt():
     assert payload["core_ready"] is True
     assert payload["ready_for_final_submission"] is False
     assert payload["new_work_evidence"]["after_submission_start"] is True
-    assert len(payload["new_work_evidence"]["commit"]) == 40
-    assert payload["new_work_evidence"]["subject"] == "Add Build Week ProofLock Console"
+    commit = payload["new_work_evidence"]["commit"]
+    assert len(commit) == 40
+    assert payload["new_work_evidence"]["subject"] == module.run_git(
+        "show", "-s", "--format=%s", commit
+    )
     assert payload["sample_verification"]["integrity_valid"] is True
     assert payload["sample_verification"]["artifact_count"] == 4
     assert payload["sample_verification"]["artifact_hash_match_count"] == 4

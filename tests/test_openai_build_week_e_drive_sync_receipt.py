@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import subprocess
+import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,18 +21,31 @@ def sha256(path: Path) -> str:
 
 
 def test_build_week_e_drive_mirror_preserves_paths_and_hashes():
+    subprocess.run(
+        [sys.executable, str(ROOT / "code" / "ops" / "BUILD_OPENAI_BUILD_WEEK_E_DRIVE_SYNC_RECEIPT.py")],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
     payload = json.loads(RECEIPT.read_text(encoding="utf-8"))
     destination_root = Path(payload["destination_root"])
 
     assert payload["schema"] == "lumencore.openai_build_week_e_drive_sync_receipt.v1"
-    assert payload["artifact_count"] == len(payload["artifacts"]) == 23
+    assert payload["artifact_count"] == len(payload["artifacts"]) == 29
     assert payload["all_sha256_matched_after_copy"] is True
     assert payload["relative_paths_preserved"] is True
     assert payload["private_files_mirrored"] is False
     assert payload["browser_navigation_performed"] is False
+    assert payload["independent_physical_media_proven"] is False
+    assert payload["storage_scope"] == "logical_partition_mirror_only"
     assert destination_root == Path("E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721")
     assert any(
         row["source"].endswith("OPENAI_BUILD_WEEK_PUBLIC_DEMO_RECEIPT_2026-07-18.json")
+        for row in payload["artifacts"]
+    )
+    assert any(
+        row["source"].endswith("OPENAI_BUILD_WEEK_DEVPOST_FIELD_REGISTRY_2026-07-18.json")
         for row in payload["artifacts"]
     )
 

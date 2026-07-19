@@ -1,12 +1,14 @@
 {
   "schema": "lumencore.openai_build_week_e_drive_sync_receipt.v1",
-  "created_utc": "2026-07-18T07:43:33.711188Z",
+  "created_utc": "2026-07-19T03:27:48.578116Z",
   "destination_root": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721",
-  "artifact_count": 23,
+  "artifact_count": 29,
   "all_sha256_matched_after_copy": true,
   "relative_paths_preserved": true,
   "private_files_mirrored": false,
   "browser_navigation_performed": false,
+  "independent_physical_media_proven": false,
+  "storage_scope": "logical_partition_mirror_only",
   "artifacts": [
     {
       "source": "build_week/prooflock_console/README.md",
@@ -67,15 +69,22 @@
     {
       "source": "code/ops/BUILD_OPENAI_BUILD_WEEK_E_DRIVE_SYNC_RECEIPT.py",
       "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/code/ops/BUILD_OPENAI_BUILD_WEEK_E_DRIVE_SYNC_RECEIPT.py",
-      "bytes": 6849,
-      "sha256": "A8DEEDC7F0DB8B282BEA87AA7AACC4DFDF39E073D0E9D81ED0B3300F952F2F76",
+      "bytes": 7660,
+      "sha256": "7538FABDC315F0BF84566ACE36E0B9325106718C882493BF7C97170AD58CB634",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_OPENAI_BUILD_WEEK_DEVPOST_COMPLETION_KIT.py",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/code/ops/BUILD_OPENAI_BUILD_WEEK_DEVPOST_COMPLETION_KIT.py",
+      "bytes": 36331,
+      "sha256": "8D9E7171809BEDFC8BC5712F44BD92B34EF5E9A35CE0798AD0352C1AA38EB565",
       "copy_sha256_matched": true
     },
     {
       "source": "tests/test_openai_build_week_readiness_packet.py",
       "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/tests/test_openai_build_week_readiness_packet.py",
-      "bytes": 4875,
-      "sha256": "923F2C4728FE10909A399936463A51EA31BCB8ED99F5DBD21F5946612C17A619",
+      "bytes": 4926,
+      "sha256": "13F9FDA1CEE328384B82AEE2A5EBD3B31F3D0B61B58E299C32BA7A6F1CB089E1",
       "copy_sha256_matched": true
     },
     {
@@ -83,6 +92,13 @@
       "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/tests/test_openai_build_week_public_demo_receipt.py",
       "bytes": 2677,
       "sha256": "9C3766D4E8B90337D5F056086250E0676917B564804F028A521BEC9502873447",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_openai_build_week_devpost_completion_kit.py",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/tests/test_openai_build_week_devpost_completion_kit.py",
+      "bytes": 6309,
+      "sha256": "3B2AB2F8B2D657BD3DE8383ADD37451BF5F78473669115EFAB4B2D2803E85412",
       "copy_sha256_matched": true
     },
     {
@@ -142,6 +158,34 @@
       "copy_sha256_matched": true
     },
     {
+      "source": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_COMPLETION_KIT_2026-07-18.md",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_COMPLETION_KIT_2026-07-18.md",
+      "bytes": 6465,
+      "sha256": "1A991776967ABB4FA2A5B42531C022DBFBA91152C0917A6AE49080F7E16BC165",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_FIELD_REGISTRY_2026-07-18.json",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_FIELD_REGISTRY_2026-07-18.json",
+      "bytes": 31104,
+      "sha256": "462701D411CC7A328DFD35BD88526C24DC62F3BBDF37E2A52DCDD3E74D73852F",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_PROJECT_COPY_2026-07-18.md",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_PROJECT_COPY_2026-07-18.md",
+      "bytes": 4668,
+      "sha256": "540DA965ADE5934CF4B863355C5EA004B4BD605BE155C6488A89166E935B9489",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_READINESS_RECEIPT_2026-07-18.json",
+      "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_READINESS_RECEIPT_2026-07-18.json",
+      "bytes": 3937,
+      "sha256": "CAA35A1FC995995438A97BADA2DCA79AD68725FC9CF88E6E1ACE6D71E0A3B7C9",
+      "copy_sha256_matched": true
+    },
+    {
       "source": "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.json",
       "destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.json",
       "bytes": 2411,
@@ -170,7 +214,7 @@
       "copy_sha256_matched": true
     }
   ],
-  "claim_boundary": "This receipt proves only that the listed public Build Week app, readiness, test, and hardware-concept artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove continuous public-demo availability, Devpost registration, model identity, video publication, final submission, eligibility, judging outcome, endorsement, award, external validation, engineering performance, safety, patent rights, funding, or value.",
+  "claim_boundary": "This receipt proves only that the listed public Build Week app, readiness, test, and hardware-concept artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove continuous public-demo availability, Devpost registration, model identity, video publication, final submission, eligibility, judging outcome, endorsement, award, external validation, engineering performance, safety, patent rights, funding, or value. The destination is a logical-partition mirror and this receipt does not prove an independent physical backup.",
   "receipt_copy_destination": "E:/LumaProofVault/OPPORTUNITIES/OPENAI_BUILD_WEEK_20260721/grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_E_DRIVE_SYNC_RECEIPT_2026-07-17.json",
-  "receipt_payload_sha256": "FFDBC1021A1F5F0F88EF6405B213DC05FAD280A08D20433341BEED3CB7FEB33F"
+  "receipt_payload_sha256": "89292844BCC571C44DC2021726A313F4CE67A42AB8F8B41FF6DFB3E0E04173DD"
 }

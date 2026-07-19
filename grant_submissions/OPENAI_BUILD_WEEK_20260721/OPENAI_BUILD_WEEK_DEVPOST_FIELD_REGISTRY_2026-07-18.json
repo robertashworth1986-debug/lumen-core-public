@@ -1,0 +1,650 @@
+{
+  "schema": "lumencore.openai_build_week_devpost_field_registry.v1",
+  "generated_utc": "2026-07-19T03:05:09Z",
+  "deadline": {
+    "central": "2026-07-21T19:00:00-05:00",
+    "utc": "2026-07-22T00:00:00Z",
+    "timezone_label": "CDT"
+  },
+  "portal_observation": {
+    "observed_utc": "2026-07-19T03:05:09Z",
+    "authentication_state": "SIGNED_OUT",
+    "hackathon_join_state": "NOT_JOINED",
+    "project_state": "NO_PROJECT_OBSERVED",
+    "submission_confirmation_state": "NONE_OBSERVED",
+    "observation_basis": "Current task state and the unsigned public submission-manager page displayed Log in, Sign up, Join hackathon, and Register for this hackathon.",
+    "limitations": "No account, project, registration, or confirmation endpoint was opened or changed by this builder."
+  },
+  "official_sources": {
+    "overview": "https://openai.devpost.com/",
+    "rules": "https://openai.devpost.com/rules",
+    "submission_manager": "https://devpost.com/submit-to/30223-openai-build-week/manage/submissions",
+    "devpost_submission_steps": "https://help.devpost.com/article/126-know-your-submission-steps"
+  },
+  "field_registry_policy": {
+    "standard_labels": "Labels marked exact come from Devpost's current standard submission-step documentation.",
+    "custom_labels": "Contest-specific semantics come from the official Build Week overview and rules, but their exact portal labels remain null until the joined form is observed.",
+    "no_inference": "Model identity, session IDs, entrant type, residence, representative authority, and legal acceptance must never be inferred from repository prose or filenames."
+  },
+  "source_registry": {
+    "readiness_snapshot": {
+      "source_id": "readiness_snapshot",
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json",
+      "bytes": 10649,
+      "sha256": "dae0ef8377e3efd60942ce9a61859c4e42cc2404917a06704a6b15b18f280e2a",
+      "embedded_integrity": {
+        "hash_key": "packet_sha256",
+        "recorded": "d3d7917d70c1a4f81b5dae14fee5bbf73b44429400af46f0e32213b22b8c861b",
+        "computed": "d3d7917d70c1a4f81b5dae14fee5bbf73b44429400af46f0e32213b22b8c861b",
+        "valid": true
+      }
+    },
+    "requirements_receipt": {
+      "source_id": "requirements_receipt",
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json",
+      "bytes": 2409,
+      "sha256": "7e27ffdcdbe0b51ea2feab13034535737f7219fe22cb375a64238f6fb6793529",
+      "embedded_integrity": {
+        "hash_key": "receipt_sha256",
+        "recorded": "6f20c120cc46d693fc9bebbaee6f8dc4dc232b42450432f615ad2999c99b6adc",
+        "computed": "6f20c120cc46d693fc9bebbaee6f8dc4dc232b42450432f615ad2999c99b6adc",
+        "valid": true
+      }
+    },
+    "public_demo_receipt": {
+      "source_id": "public_demo_receipt",
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PUBLIC_DEMO_RECEIPT_2026-07-18.json",
+      "bytes": 8726,
+      "sha256": "064e2fcbc59509f0aac445665a52c3e895c635307fe3da692a9c7d973708c505",
+      "embedded_integrity": {
+        "hash_key": "receipt_sha256",
+        "recorded": "f61e2cf81e569ebe20f99678cea424d9e91de2b67c428a269b2dd9e2c6321f3f",
+        "computed": "f61e2cf81e569ebe20f99678cea424d9e91de2b67c428a269b2dd9e2c6321f3f",
+        "valid": true
+      }
+    },
+    "browser_qa_receipt": {
+      "source_id": "browser_qa_receipt",
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_BROWSER_QA_CAPTURE_2026-07-18.json",
+      "bytes": 1199,
+      "sha256": "a5ac9636b003d1e6e8a568d7e3ad590f8a6584e8f2f694f3b5c47fcb28dfc20e",
+      "embedded_integrity": {
+        "hash_key": "capture_sha256",
+        "recorded": "a986daf28f56d33ce135edcc965bc512f326cddaf8f51fcb5391b1a556fe4183",
+        "computed": "a986daf28f56d33ce135edcc965bc512f326cddaf8f51fcb5391b1a556fe4183",
+        "valid": true
+      }
+    },
+    "description_draft": {
+      "source_id": "description_draft",
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PROJECT_DESCRIPTION_DRAFT_2026-07-17.md",
+      "bytes": 3115,
+      "sha256": "c121a7e714920e9535ff522eb4b30e559bea52a470e05a2348211f4622f1bc14"
+    },
+    "demo_script": {
+      "source_id": "demo_script",
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEMO_SCRIPT_2026-07-17.md",
+      "bytes": 2659,
+      "sha256": "72d1297e5f6793749645c73fa39ffb6b4f621b4be98e78d83948cc0e5e0e002c"
+    },
+    "prooflock_readme": {
+      "source_id": "prooflock_readme",
+      "path": "build_week/prooflock_console/README.md",
+      "bytes": 3191,
+      "sha256": "766ba2b64d477b21d443a673a60f83fb4a5ad0e5d46a3e215180c7f924bd3ede"
+    },
+    "sample_receipt": {
+      "source_id": "sample_receipt",
+      "path": "build_week/prooflock_console/sample_receipt.json",
+      "bytes": 4221,
+      "sha256": "dee8c4779a74e4e34f5b5ee8ae127c49eb88d3cbc6693d1d419f103b39636c63"
+    },
+    "repository_license": {
+      "source_id": "repository_license",
+      "path": "LICENSE",
+      "bytes": 1093,
+      "sha256": "a2c01dae8f86b9d0bc5a1ec3d2baaa6818dfd67d6e89e1fd506eaf77d0c02a8b"
+    }
+  },
+  "project_copy": {
+    "project_name": "ProofLock Console",
+    "tagline": "Hash what exists. Hold what is not proven.",
+    "category": "Developer Tools",
+    "repository_url": "https://github.com/robertashworth1986-debug/lumen-core-public",
+    "try_it_out_url": "https://lumen-core.ai/build_week/prooflock_console/",
+    "video_demo_url": null,
+    "thumbnail_asset": null,
+    "built_with_confirmed": [
+      "Codex",
+      "JavaScript",
+      "Web Crypto API",
+      "Python",
+      "pytest",
+      "HTML",
+      "CSS"
+    ],
+    "built_with_blocked_pending_model_provenance": [
+      "[[CONFIRMED_MODEL_LABEL]]"
+    ],
+    "project_story_markdown": "## Inspiration\n\nAI-assisted development can move faster than the evidence behind a claim. ProofLock Console was built to make that boundary visible and testable for developers, reviewers, and automated workflows.\n\n## What it does\n\nProofLock Console loads a canonical JSON receipt, recomputes its SHA-256 identity, resolves only repository-bounded artifact paths, rehashes the declared files, and evaluates required promotion gates separately from receipt integrity. The bundled example verifies four declared V2/V3 concept artifacts, then correctly keeps the decision at HOLD because engineering, prototype, safety, and human-release gates remain open.\n\n## How we built it\n\nThe project pairs a static browser experience using Web Crypto with a matching Python verifier for local automation and CI. Deterministic tests cover receipt tampering, path traversal, artifact custody, duplicate or invalid gates, and attempts to promote while required gates remain open. Codex helped narrow the scope, implement both verification paths, review the evidence boundary, and build the test suite. [[SOURCE_BACKED_MODEL_USAGE_SENTENCE_REQUIRED]]\n\n## Challenges we ran into\n\nThe hardest design problem was keeping integrity and truth distinct. A receipt can be internally intact without proving the underlying engineering claim, so the interface and verifier report `integrity_valid` and `promotion_allowed` as separate decisions and fail closed when evidence is missing.\n\n## Accomplishments that we're proud of\n\nThe public demo was observed with all ten required files returning HTTP 200 and matching their local SHA-256 identities. Desktop and mobile checks recorded zero horizontal overflow, and the bundled sample verified all four declared artifacts while preserving the HOLD decision.\n\n## What we learned\n\nAuditability improves when every important assertion names its evidence class, every artifact has a stable identity, and a missing human or technical gate cannot be converted into approval by polished prose.\n\n## What's next for ProofLock Console\n\nNext steps are an independent reproduction run, signed receipt adapters, CI integration, and additional schemas for evidence workflows. These are planned directions, not completed capabilities.",
+    "installation_and_testing": "Open the public demo URL for the no-build browser path. For local CLI verification, clone the repository and run `python build_week/prooflock_console/verify_receipt.py`. Run the focused test with `python -m pytest -q tests/test_prooflock_console.py`.",
+    "supported_platforms": "Current desktop and mobile browsers with Web Crypto and Fetch support, plus Python 3 for the CLI.",
+    "testing_access": "The public demo requires no account, API key, paid service, rebuild, or test credentials for the bundled verification path. Availability is proven only at the recorded observation time.",
+    "preexisting_project_boundary": "The larger repository and source concept assets predate the submission period. The focused console, receipt contract, browser and Python verification paths, responsive interface, and tests are the scoped Build Week extension identified by the dated commit record.",
+    "model_provenance_placeholder": "[[CONFIRMED_MODEL_LABEL]]",
+    "model_usage_placeholder": "[[SOURCE_BACKED_MODEL_USAGE_SENTENCE_REQUIRED]]",
+    "feedback_session_placeholder": "[[FEEDBACK_SESSION_ID]]",
+    "video_url_placeholder": "[[PUBLIC_YOUTUBE_URL]]",
+    "copy_state": "NOT_PASTE_READY_MODEL_AND_VIDEO_PROVENANCE_OPEN",
+    "source_refs": [
+      "readiness_snapshot",
+      "requirements_receipt",
+      "public_demo_receipt",
+      "browser_qa_receipt",
+      "description_draft",
+      "demo_script",
+      "prooflock_readme",
+      "sample_receipt",
+      "repository_license"
+    ]
+  },
+  "model_and_session_placeholders": {
+    "confirmed_model_label": null,
+    "model_usage_sentence": null,
+    "feedback_session_id": null,
+    "public_youtube_url": null,
+    "thumbnail_asset": null,
+    "submitter_type": null,
+    "country_of_residence": null,
+    "representative_authorization": null
+  },
+  "fields": [
+    {
+      "field_id": "team_members",
+      "step": "1_manage_team",
+      "portal_label": "Teammates",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": false,
+      "proposed_value": null,
+      "completion_state": "OPTIONAL_NOT_SELECTED",
+      "source_refs": [],
+      "human_gate": "Human confirms whether the entry is individual, team, or organization.",
+      "format_rule": null
+    },
+    {
+      "field_id": "project_name",
+      "step": "2_project_overview",
+      "portal_label": "Project name",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": true,
+      "proposed_value": "ProofLock Console",
+      "completion_state": "SOURCE_BACKED_READY",
+      "source_refs": [
+        "readiness_snapshot",
+        "prooflock_readme"
+      ],
+      "human_gate": null,
+      "format_rule": null
+    },
+    {
+      "field_id": "project_tagline",
+      "step": "2_project_overview",
+      "portal_label": "Project tagline",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": true,
+      "proposed_value": "Hash what exists. Hold what is not proven.",
+      "completion_state": "SOURCE_BACKED_READY",
+      "source_refs": [
+        "readiness_snapshot"
+      ],
+      "human_gate": null,
+      "format_rule": "Maximum 140 characters per Devpost standard field documentation."
+    },
+    {
+      "field_id": "thumbnail_image",
+      "step": "2_project_overview",
+      "portal_label": "Thumbnail image for the Project Gallery",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": true,
+      "proposed_value": null,
+      "completion_state": "MISSING_PUBLIC_ASSET",
+      "source_refs": [],
+      "human_gate": "Human privacy/IP review and visual approval before upload.",
+      "format_rule": "JPG, PNG, or GIF; 5 MB maximum; 3:2 recommended."
+    },
+    {
+      "field_id": "project_story",
+      "step": "3_project_details",
+      "portal_label": "Project story",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": true,
+      "proposed_value": "## Inspiration\n\nAI-assisted development can move faster than the evidence behind a claim. ProofLock Console was built to make that boundary visible and testable for developers, reviewers, and automated workflows.\n\n## What it does\n\nProofLock Console loads a canonical JSON receipt, recomputes its SHA-256 identity, resolves only repository-bounded artifact paths, rehashes the declared files, and evaluates required promotion gates separately from receipt integrity. The bundled example verifies four declared V2/V3 concept artifacts, then correctly keeps the decision at HOLD because engineering, prototype, safety, and human-release gates remain open.\n\n## How we built it\n\nThe project pairs a static browser experience using Web Crypto with a matching Python verifier for local automation and CI. Deterministic tests cover receipt tampering, path traversal, artifact custody, duplicate or invalid gates, and attempts to promote while required gates remain open. Codex helped narrow the scope, implement both verification paths, review the evidence boundary, and build the test suite. [[SOURCE_BACKED_MODEL_USAGE_SENTENCE_REQUIRED]]\n\n## Challenges we ran into\n\nThe hardest design problem was keeping integrity and truth distinct. A receipt can be internally intact without proving the underlying engineering claim, so the interface and verifier report `integrity_valid` and `promotion_allowed` as separate decisions and fail closed when evidence is missing.\n\n## Accomplishments that we're proud of\n\nThe public demo was observed with all ten required files returning HTTP 200 and matching their local SHA-256 identities. Desktop and mobile checks recorded zero horizontal overflow, and the bundled sample verified all four declared artifacts while preserving the HOLD decision.\n\n## What we learned\n\nAuditability improves when every important assertion names its evidence class, every artifact has a stable identity, and a missing human or technical gate cannot be converted into approval by polished prose.\n\n## What's next for ProofLock Console\n\nNext steps are an independent reproduction run, signed receipt adapters, CI integration, and additional schemas for evidence workflows. These are planned directions, not completed capabilities.",
+      "completion_state": "PARTIAL_MODEL_PROVENANCE_OPEN",
+      "source_refs": [
+        "description_draft",
+        "prooflock_readme",
+        "public_demo_receipt",
+        "browser_qa_receipt"
+      ],
+      "human_gate": "Replace the model-usage placeholder only from direct session evidence.",
+      "format_rule": "Markdown accepted by Devpost."
+    },
+    {
+      "field_id": "built_with_tags",
+      "step": "3_project_details",
+      "portal_label": "Built with tags",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": true,
+      "proposed_value": [
+        "Codex",
+        "JavaScript",
+        "Web Crypto API",
+        "Python",
+        "pytest",
+        "HTML",
+        "CSS"
+      ],
+      "completion_state": "PARTIAL_MODEL_PROVENANCE_OPEN",
+      "source_refs": [
+        "prooflock_readme",
+        "readiness_snapshot"
+      ],
+      "human_gate": "Add the required model tag only after the exact model label is directly confirmed.",
+      "format_rule": null
+    },
+    {
+      "field_id": "try_it_out_link",
+      "step": "3_project_details",
+      "portal_label": "Try it Out links",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": true,
+      "proposed_value": "https://lumen-core.ai/build_week/prooflock_console/",
+      "completion_state": "SOURCE_BACKED_READY_FINAL_PREVIEW_RECHECK_REQUIRED",
+      "source_refs": [
+        "public_demo_receipt",
+        "browser_qa_receipt"
+      ],
+      "human_gate": "Recheck from the final Devpost preview and preserve a new observation receipt.",
+      "format_rule": null
+    },
+    {
+      "field_id": "image_gallery",
+      "step": "3_project_details",
+      "portal_label": "Image Gallery",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": false,
+      "proposed_value": null,
+      "completion_state": "OPTIONAL_PRIVACY_REVIEW_OPEN",
+      "source_refs": [],
+      "human_gate": "Use only public, owned, privacy-reviewed screenshots if selected.",
+      "format_rule": null
+    },
+    {
+      "field_id": "video_demo_link",
+      "step": "3_project_details",
+      "portal_label": "Video demo link",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": true,
+      "proposed_value": null,
+      "completion_state": "MISSING_PUBLIC_YOUTUBE_VIDEO",
+      "source_refs": [
+        "demo_script",
+        "requirements_receipt"
+      ],
+      "human_gate": "Human records, reviews, uploads, and makes the video public; this builder does none of those actions.",
+      "format_rule": "Public YouTube URL; video shorter than three minutes; audio covers the project and required tools."
+    },
+    {
+      "field_id": "submitter_type",
+      "step": "4_additional_details",
+      "portal_label": "Submitter Type",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": true,
+      "proposed_value": null,
+      "completion_state": "MISSING_HUMAN_LEGAL_INPUT",
+      "source_refs": [],
+      "human_gate": "Human chooses Individual, Team, or Organization and confirms authority.",
+      "format_rule": null
+    },
+    {
+      "field_id": "country_of_residence",
+      "step": "4_additional_details",
+      "portal_label": "Countries of Residence",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": true,
+      "proposed_value": null,
+      "completion_state": "MISSING_PRIVATE_HUMAN_INPUT",
+      "source_refs": [],
+      "human_gate": "Enter directly in Devpost; do not persist the private answer in this public kit.",
+      "format_rule": null
+    },
+    {
+      "field_id": "category",
+      "step": "4_additional_details",
+      "portal_label": null,
+      "portal_label_exact": false,
+      "label_authority": "OPENAI_BUILD_WEEK_RULES_SEMANTIC_REQUIREMENT_PORTAL_LABEL_UNOBSERVED",
+      "required": true,
+      "proposed_value": "Developer Tools",
+      "completion_state": "SOURCE_BACKED_READY_PORTAL_LABEL_UNOBSERVED",
+      "source_refs": [
+        "requirements_receipt",
+        "readiness_snapshot"
+      ],
+      "human_gate": "Verify the exact custom field label and option spelling after joining.",
+      "format_rule": null
+    },
+    {
+      "field_id": "repository_url",
+      "step": "4_additional_details",
+      "portal_label": null,
+      "portal_label_exact": false,
+      "label_authority": "OPENAI_BUILD_WEEK_RULES_SEMANTIC_REQUIREMENT_PORTAL_LABEL_UNOBSERVED",
+      "required": true,
+      "proposed_value": "https://github.com/robertashworth1986-debug/lumen-core-public",
+      "completion_state": "SOURCE_BACKED_READY_EXTERNAL_ACCESS_RECHECK_REQUIRED",
+      "source_refs": [
+        "readiness_snapshot",
+        "prooflock_readme",
+        "repository_license"
+      ],
+      "human_gate": "Verify anonymous repository access from the final preview.",
+      "format_rule": null
+    },
+    {
+      "field_id": "repository_license",
+      "step": "4_additional_details",
+      "portal_label": null,
+      "portal_label_exact": false,
+      "label_authority": "OPENAI_BUILD_WEEK_RULES_SEMANTIC_REQUIREMENT_PORTAL_LABEL_UNOBSERVED",
+      "required": true,
+      "proposed_value": "MIT License at repository root",
+      "completion_state": "SOURCE_BACKED_READY_HUMAN_REPRESENTATION_REQUIRED",
+      "source_refs": [
+        "repository_license",
+        "readiness_snapshot"
+      ],
+      "human_gate": "Human confirms license scope and any third-party obligations.",
+      "format_rule": null
+    },
+    {
+      "field_id": "new_or_existing_project",
+      "step": "4_additional_details",
+      "portal_label": null,
+      "portal_label_exact": false,
+      "label_authority": "OPENAI_BUILD_WEEK_RULES_SEMANTIC_REQUIREMENT_PORTAL_LABEL_UNOBSERVED",
+      "required": true,
+      "proposed_value": "Pre-existing project meaningfully extended during the submission period",
+      "completion_state": "SOURCE_BACKED_READY_PORTAL_LABEL_UNOBSERVED",
+      "source_refs": [
+        "readiness_snapshot",
+        "description_draft",
+        "prooflock_readme"
+      ],
+      "human_gate": "Verify the exact custom field label and available choices after joining.",
+      "format_rule": null
+    },
+    {
+      "field_id": "hackathon_improvement_explanation",
+      "step": "4_additional_details",
+      "portal_label": null,
+      "portal_label_exact": false,
+      "label_authority": "OPENAI_BUILD_WEEK_RULES_SEMANTIC_REQUIREMENT_PORTAL_LABEL_UNOBSERVED",
+      "required": true,
+      "proposed_value": "The larger repository and source concept assets predate the submission period. The focused console, receipt contract, browser and Python verification paths, responsive interface, and tests are the scoped Build Week extension identified by the dated commit record.",
+      "completion_state": "SOURCE_BACKED_READY_PORTAL_LABEL_UNOBSERVED",
+      "source_refs": [
+        "readiness_snapshot",
+        "description_draft",
+        "prooflock_readme"
+      ],
+      "human_gate": null,
+      "format_rule": null
+    },
+    {
+      "field_id": "confirmed_model_identity",
+      "step": "4_additional_details",
+      "portal_label": null,
+      "portal_label_exact": false,
+      "label_authority": "OPENAI_BUILD_WEEK_RULES_SEMANTIC_REQUIREMENT_PORTAL_LABEL_UNOBSERVED",
+      "required": true,
+      "proposed_value": null,
+      "completion_state": "MISSING_DIRECT_MODEL_PROVENANCE",
+      "source_refs": [],
+      "human_gate": "Human reads and records the exact model label from the qualifying core-build session; never infer it.",
+      "format_rule": null
+    },
+    {
+      "field_id": "feedback_session_id",
+      "step": "4_additional_details",
+      "portal_label": null,
+      "portal_label_exact": false,
+      "label_authority": "OPENAI_BUILD_WEEK_RULES_SEMANTIC_REQUIREMENT_PORTAL_LABEL_UNOBSERVED",
+      "required": true,
+      "proposed_value": null,
+      "completion_state": "MISSING_FEEDBACK_SESSION_ID",
+      "source_refs": [],
+      "human_gate": "Human obtains the /feedback Session ID from the task containing most core functionality; never invent it.",
+      "format_rule": null
+    },
+    {
+      "field_id": "representative_authorization",
+      "step": "4_additional_details",
+      "portal_label": null,
+      "portal_label_exact": false,
+      "label_authority": "OPENAI_BUILD_WEEK_RULES_SEMANTIC_REQUIREMENT_PORTAL_LABEL_UNOBSERVED",
+      "required": true,
+      "proposed_value": null,
+      "completion_state": "MISSING_CONDITIONAL_LEGAL_ATTESTATION",
+      "source_refs": [],
+      "human_gate": "Required if entering as a team or organization; human confirms the entrant and authority.",
+      "format_rule": null
+    },
+    {
+      "field_id": "official_rules_and_terms",
+      "step": "5_submit",
+      "portal_label": "Agree to the hackathon terms and conditions",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": true,
+      "proposed_value": null,
+      "completion_state": "HUMAN_LEGAL_ACCEPTANCE_REQUIRED",
+      "source_refs": [
+        "requirements_receipt"
+      ],
+      "human_gate": "Only the entrant may review and accept the official rules, publicity/IP terms, and Devpost terms.",
+      "format_rule": null
+    },
+    {
+      "field_id": "final_submit_action",
+      "step": "5_submit",
+      "portal_label": "Submit project",
+      "portal_label_exact": true,
+      "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
+      "required": true,
+      "proposed_value": null,
+      "completion_state": "FINAL_HUMAN_ACTION_BLOCKED",
+      "source_refs": [],
+      "human_gate": "Requires action-time human review and approval after every required field and legal gate is complete.",
+      "format_rule": null
+    }
+  ],
+  "checklists": {
+    "public_demo": [
+      {
+        "item_id": "demo_hashes",
+        "text": "All ten required public files returned HTTP 200 and matched local SHA-256 identities at the recorded observation.",
+        "status": "PASS_OBSERVED",
+        "source_refs": [
+          "public_demo_receipt"
+        ],
+        "human_gate": false
+      },
+      {
+        "item_id": "desktop_mobile_qa",
+        "text": "Desktop and mobile browser QA records are integrity-valid and recorded no horizontal overflow.",
+        "status": "PASS_OBSERVED",
+        "source_refs": [
+          "public_demo_receipt",
+          "browser_qa_receipt"
+        ],
+        "human_gate": false
+      },
+      {
+        "item_id": "anonymous_access",
+        "text": "Load the demo and repository from a signed-out browser without credentials or private identifiers.",
+        "status": "OPEN_FINAL_PREVIEW_RECHECK",
+        "source_refs": [
+          "public_demo_receipt",
+          "prooflock_readme"
+        ],
+        "human_gate": true
+      },
+      {
+        "item_id": "judging_period_availability",
+        "text": "Confirm the free demo will remain available without restriction through the judging period.",
+        "status": "OPEN_FUTURE_AVAILABILITY_NOT_PROVABLE",
+        "source_refs": [
+          "requirements_receipt"
+        ],
+        "human_gate": true
+      },
+      {
+        "item_id": "behavior_matches_copy",
+        "text": "Verify the public behavior matches the submitted story and video, including the HOLD decision.",
+        "status": "OPEN_FINAL_PREVIEW_RECHECK",
+        "source_refs": [
+          "sample_receipt",
+          "public_demo_receipt"
+        ],
+        "human_gate": true
+      }
+    ],
+    "video": [
+      {
+        "item_id": "script",
+        "text": "Use the bounded demo script and keep the final cut shorter than 180 seconds.",
+        "status": "DRAFT_PRESENT_RECORDING_OPEN",
+        "source_refs": [
+          "demo_script",
+          "requirements_receipt"
+        ],
+        "human_gate": true
+      },
+      {
+        "item_id": "working_demo",
+        "text": "Show the live receipt load, 4/4 artifact verification, HOLD decision, tamper failure, and blocked promotion.",
+        "status": "OPEN_RECORDING_REQUIRED",
+        "source_refs": [
+          "demo_script",
+          "sample_receipt",
+          "public_demo_receipt"
+        ],
+        "human_gate": true
+      },
+      {
+        "item_id": "required_tool_audio",
+        "text": "Audio must accurately explain how Codex and the directly confirmed required model were used.",
+        "status": "BLOCKED_MODEL_PROVENANCE_MISSING",
+        "source_refs": [
+          "requirements_receipt"
+        ],
+        "human_gate": true
+      },
+      {
+        "item_id": "rights_review",
+        "text": "Exclude unlicensed music, third-party trademarks, private screens, credentials, and patent-sensitive material.",
+        "status": "OPEN_PRIVACY_IP_REVIEW",
+        "source_refs": [
+          "requirements_receipt"
+        ],
+        "human_gate": true
+      },
+      {
+        "item_id": "public_youtube",
+        "text": "Upload to YouTube, make it public and embeddable, then verify playback while signed out.",
+        "status": "OPEN_PUBLICATION_REQUIRED",
+        "source_refs": [
+          "requirements_receipt"
+        ],
+        "human_gate": true
+      }
+    ],
+    "privacy_ip": [
+      {
+        "item_id": "credentials",
+        "text": "No passwords, API keys, OTPs, cookies, private portal identifiers, or meeting credentials appear in any artifact.",
+        "status": "HUMAN_REVIEW_REQUIRED",
+        "source_refs": [],
+        "human_gate": true
+      },
+      {
+        "item_id": "personal_data",
+        "text": "No private addresses, phone numbers, tax identifiers, signatures, or unrelated personal data are published.",
+        "status": "HUMAN_REVIEW_REQUIRED",
+        "source_refs": [],
+        "human_gate": true
+      },
+      {
+        "item_id": "patent_boundary",
+        "text": "No unpublished claim language, private patent drafts, CUI/export-controlled material, or grant-portal screenshots are disclosed.",
+        "status": "HUMAN_REVIEW_REQUIRED",
+        "source_refs": [],
+        "human_gate": true
+      },
+      {
+        "item_id": "ownership",
+        "text": "Entrant confirms original ownership, third-party permissions, and open-source license compliance.",
+        "status": "HUMAN_LEGAL_REVIEW_REQUIRED",
+        "source_refs": [
+          "repository_license",
+          "requirements_receipt"
+        ],
+        "human_gate": true
+      },
+      {
+        "item_id": "publicity_terms",
+        "text": "Entrant reviews the non-exclusive judging license and the publicity use of name, likeness, voice, and image before acceptance.",
+        "status": "HUMAN_LEGAL_REVIEW_REQUIRED",
+        "source_refs": [
+          "requirements_receipt"
+        ],
+        "human_gate": true
+      },
+      {
+        "item_id": "claim_accuracy",
+        "text": "Every performance statement is traceable to the recorded receipt and preserves time-bounded observation language.",
+        "status": "HUMAN_REVIEW_REQUIRED",
+        "source_refs": [
+          "public_demo_receipt",
+          "readiness_snapshot"
+        ],
+        "human_gate": true
+      }
+    ]
+  },
+  "actions_prohibited_for_this_kit": [
+    "authenticate",
+    "join_or_register",
+    "create_or_import_project",
+    "upload_file_or_video",
+    "publish",
+    "accept_terms",
+    "certify",
+    "submit",
+    "contact_anyone"
+  ],
+  "claim_boundary": "This kit prepares source-backed draft content and a field-by-field completion contract. It does not prove model identity, a /feedback Session ID, eligibility, ownership, legal acceptance, Devpost authentication or registration, project creation, video publication, final submission, judging outcome, endorsement, award, external validation, patent rights, safety, funding, or value.",
+  "registry_sha256": "6ce73050675b492a42ac222bdf42b9196f569e5fc30410e2c3bee9d54defd865"
+}

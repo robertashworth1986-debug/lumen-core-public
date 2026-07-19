@@ -24,8 +24,10 @@ SOURCES = (
     "code/ops/BUILD_OPENAI_BUILD_WEEK_READINESS_PACKET.py",
     "code/ops/BUILD_OPENAI_BUILD_WEEK_PUBLIC_DEMO_RECEIPT.py",
     "code/ops/BUILD_OPENAI_BUILD_WEEK_E_DRIVE_SYNC_RECEIPT.py",
+    "code/ops/BUILD_OPENAI_BUILD_WEEK_DEVPOST_COMPLETION_KIT.py",
     "tests/test_openai_build_week_readiness_packet.py",
     "tests/test_openai_build_week_public_demo_receipt.py",
+    "tests/test_openai_build_week_devpost_completion_kit.py",
     "tests/test_prooflock_console.py",
     "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json",
     "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.md",
@@ -34,6 +36,10 @@ SOURCES = (
     "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json",
     "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PUBLIC_DEMO_RECEIPT_2026-07-18.json",
     "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_BROWSER_QA_CAPTURE_2026-07-18.json",
+    "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_COMPLETION_KIT_2026-07-18.md",
+    "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_FIELD_REGISTRY_2026-07-18.json",
+    "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_PROJECT_COPY_2026-07-18.md",
+    "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_READINESS_RECEIPT_2026-07-18.json",
     "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.json",
     "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.png",
     "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.json",
@@ -110,6 +116,8 @@ def build_receipt(created_utc: str | None = None) -> dict[str, Any]:
         "relative_paths_preserved": True,
         "private_files_mirrored": False,
         "browser_navigation_performed": False,
+        "independent_physical_media_proven": False,
+        "storage_scope": "logical_partition_mirror_only",
         "artifacts": artifacts,
         "claim_boundary": (
             "This receipt proves only that the listed public Build Week app, readiness, test, and "
@@ -118,6 +126,8 @@ def build_receipt(created_utc: str | None = None) -> dict[str, Any]:
             "model identity, video publication, final submission, eligibility, judging outcome, "
             "endorsement, award, external validation, engineering performance, safety, patent rights, "
             "funding, or value."
+            " The destination is a logical-partition mirror and this receipt does not prove an "
+            "independent physical backup."
         ),
         "receipt_copy_destination": (
             DESTINATION_ROOT

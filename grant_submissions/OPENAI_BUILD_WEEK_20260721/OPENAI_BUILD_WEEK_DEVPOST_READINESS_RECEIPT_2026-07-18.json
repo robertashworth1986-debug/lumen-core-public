@@ -1,0 +1,100 @@
+{
+  "schema": "lumencore.openai_build_week_devpost_readiness_receipt.v1",
+  "generated_utc": "2026-07-19T03:05:09Z",
+  "status": "NOT_READY_FOR_SUBMISSION",
+  "deadline": {
+    "central": "2026-07-21T19:00:00-05:00",
+    "utc": "2026-07-22T00:00:00Z",
+    "timezone_label": "CDT"
+  },
+  "portal_observation": {
+    "observed_utc": "2026-07-19T03:05:09Z",
+    "authentication_state": "SIGNED_OUT",
+    "hackathon_join_state": "NOT_JOINED",
+    "project_state": "NO_PROJECT_OBSERVED",
+    "submission_confirmation_state": "NONE_OBSERVED",
+    "observation_basis": "Current task state and the unsigned public submission-manager page displayed Log in, Sign up, Join hackathon, and Register for this hackathon.",
+    "limitations": "No account, project, registration, or confirmation endpoint was opened or changed by this builder."
+  },
+  "existing_readiness_snapshot": {
+    "status": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN",
+    "counts": {
+      "gate_total": 10,
+      "pass": 5,
+      "open": 5,
+      "fail": 0
+    },
+    "core_ready": true,
+    "ready_for_final_submission": false,
+    "open_gate_ids": [
+      "devpost_registration",
+      "feedback_session",
+      "final_submission",
+      "model_provenance",
+      "youtube_demo"
+    ],
+    "packet_sha256": "d3d7917d70c1a4f81b5dae14fee5bbf73b44429400af46f0e32213b22b8c861b",
+    "source_path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json"
+  },
+  "field_counts": {
+    "total": 21,
+    "required": 19,
+    "exact_standard_labels": 13,
+    "custom_labels_unobserved": 8,
+    "source_backed_ready_or_conditionally_ready": 8
+  },
+  "model_and_session_provenance": {
+    "confirmed_model_label": null,
+    "model_usage_evidence": null,
+    "feedback_session_id": null,
+    "state": "MISSING_DIRECT_EVIDENCE",
+    "inference_prohibited": true
+  },
+  "submission_artifacts": [
+    {
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_FIELD_REGISTRY_2026-07-18.json",
+      "bytes": 31104,
+      "sha256": "462701d411cc7a328dfd35bd88526c24dc62f3bbdf37e2a52dcdd3e74d73852f"
+    },
+    {
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_PROJECT_COPY_2026-07-18.md",
+      "bytes": 4668,
+      "sha256": "540da965ade5934cf4b863355c5ea004b4bd605be155c6488a89166e935b9489"
+    },
+    {
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_COMPLETION_KIT_2026-07-18.md",
+      "bytes": 6465,
+      "sha256": "1a991776967abb4fa2a5b42531c022dbfba91152c0917a6ae49080f7e16bc165"
+    }
+  ],
+  "hard_blockers": [
+    "DEVPOST_SIGNED_OUT",
+    "HACKATHON_NOT_JOINED",
+    "NO_DEVPOST_PROJECT",
+    "NO_SUBMISSION_CONFIRMATION",
+    "MODEL_IDENTITY_UNCONFIRMED",
+    "FEEDBACK_SESSION_ID_MISSING",
+    "PUBLIC_YOUTUBE_VIDEO_MISSING",
+    "THUMBNAIL_MISSING",
+    "CUSTOM_PORTAL_LABELS_UNOBSERVED",
+    "PRIVACY_IP_REVIEW_OPEN",
+    "LEGAL_ACCEPTANCE_OPEN",
+    "FINAL_HUMAN_SUBMIT_ACTION_OPEN"
+  ],
+  "ready_for_portal_population": false,
+  "ready_for_final_submission": false,
+  "actions_performed": [],
+  "actions_not_performed": [
+    "authenticate",
+    "join_or_register",
+    "create_or_import_project",
+    "upload_file_or_video",
+    "publish",
+    "accept_terms",
+    "certify",
+    "submit",
+    "contact_anyone"
+  ],
+  "claim_boundary": "This kit prepares source-backed draft content and a field-by-field completion contract. It does not prove model identity, a /feedback Session ID, eligibility, ownership, legal acceptance, Devpost authentication or registration, project creation, video publication, final submission, judging outcome, endorsement, award, external validation, patent rights, safety, funding, or value.",
+  "receipt_sha256": "94d061df31330d5230387cb32e7993fda067ac14f354d015aa8f637ee5415860"
+}
