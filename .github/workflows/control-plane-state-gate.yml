@@ -1,0 +1,44 @@
+name: Control Plane State Gate
+
+on:
+  pull_request:
+    paths:
+      - "dashboard/data/control_plane_state.json"
+      - "docs/CONTROL_PLANE_RECONCILIATION_2026-07-19.md"
+      - "docs/CANONICAL_OPERATING_STATE.md"
+      - "code/ops/VERIFY_CONTROL_PLANE_STATE.py"
+      - "tests/test_control_plane_state.py"
+      - ".github/workflows/control-plane-state-gate.yml"
+  push:
+    branches: [main]
+    paths:
+      - "dashboard/data/control_plane_state.json"
+      - "docs/CONTROL_PLANE_RECONCILIATION_2026-07-19.md"
+      - "docs/CANONICAL_OPERATING_STATE.md"
+      - "code/ops/VERIFY_CONTROL_PLANE_STATE.py"
+      - "tests/test_control_plane_state.py"
+      - ".github/workflows/control-plane-state-gate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install focused test dependency
+        run: python -m pip install --disable-pip-version-check pytest
+      - name: Compile verifier and tests
+        run: >-
+          python -m py_compile
+          code/ops/VERIFY_CONTROL_PLANE_STATE.py
+          tests/test_control_plane_state.py
+      - name: Verify checked-in control-plane state
+        run: python code/ops/VERIFY_CONTROL_PLANE_STATE.py
+      - name: Run focused tests
+        run: python -m pytest -q tests/test_control_plane_state.py
