@@ -1,0 +1,129 @@
+{
+  "schema": "lumencore.public_release_sync_policy.v1",
+  "status": "frozen",
+  "mode": "DRY_RUN_ONLY",
+  "purpose": "Allowlist reviewer-safe artifacts for a deterministic local sync preflight while prohibiting credentials, private material, unsupported claims, overwrites, and all autonomous network actions.",
+  "allowed_source_roots": [
+    "dashboard/data",
+    "docs"
+  ],
+  "allowed_target_roots": [
+    "dashboard/data",
+    "dashboard/evidence"
+  ],
+  "allowed_extension_mime": {
+    ".html": "text/html",
+    ".json": "application/json",
+    ".md": "text/markdown",
+    ".svg": "image/svg+xml"
+  },
+  "allowed_claim_states": [
+    "BOUNDED_INTERNAL_EVIDENCE",
+    "NO_PERFORMANCE_CLAIM",
+    "PROCESS_RECEIPT",
+    "PROVENANCE_AND_REPRODUCIBILITY"
+  ],
+  "denied_path_tokens": [
+    ".env",
+    ".git",
+    "api_key",
+    "apikey",
+    "credential",
+    "gmail",
+    "grant_submissions",
+    "inbox",
+    "mailbox",
+    "oauth",
+    "otp",
+    "patent",
+    "personally_identifiable",
+    "pii",
+    "portal",
+    "private",
+    "raw_email",
+    "registry",
+    "secret",
+    "session",
+    "token"
+  ],
+  "allowed_public_hosts": [
+    "lumen-core.ai",
+    "www.lumen-core.ai"
+  ],
+  "allowed_public_url_prefixes": [
+    "/data/",
+    "/evidence/"
+  ],
+  "max_source_bytes": 5000000,
+  "max_source_age_hours": 720,
+  "network_actions": {
+    "deploy": "HUMAN_UNLOCK_REQUIRED",
+    "email": "HUMAN_UNLOCK_REQUIRED",
+    "post": "HUMAN_UNLOCK_REQUIRED",
+    "publish": "HUMAN_UNLOCK_REQUIRED",
+    "push": "HUMAN_UNLOCK_REQUIRED"
+  },
+  "allowlist": [
+    {
+      "id": "model_geometry_evidence_ledger",
+      "source_path": "docs/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER_2026-07-13.md",
+      "expected_source_sha256": "b8af64d9a54ccf373b9e8e9c8a09f6188b77cf02388d9b1e6c0801cfa5360244",
+      "target_path": "dashboard/evidence/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER.md",
+      "public_url": "https://lumen-core.ai/evidence/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER.md",
+      "mime_type": "text/markdown",
+      "claim_state": "PROVENANCE_AND_REPRODUCIBILITY",
+      "claim_boundary": "The ledger inventories bounded internal evidence and reproducibility state; it does not establish external validation, government approval, field performance, or commercial value.",
+      "source_commit": "27c84ae9467c513300a114664518aaf7e01ea048",
+      "last_validated_utc": "2026-07-13T21:41:39Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "tests/test_quant_hub_reviewer_context.py",
+          "expected_sha256": "b1af9b3a07603e7bd9a8d4b3a75d84658d7ad3fedcda5495f464798271d819ca"
+        },
+        {
+          "path": "out/reproducibility/reviewer_capsule_latest/reviewer_reproducibility_receipt.json",
+          "expected_sha256": "2a55297c369fac57062ba8bce975348e588d6589a882f6fb554a9ced5c0e3acb"
+        }
+      ]
+    },
+    {
+      "id": "quant_hub_reviewer_context_json",
+      "source_path": "dashboard/data/quant_hub_reviewer_context.json",
+      "expected_source_sha256": "c684833237a76569b39500b4e38d6c6922f450ef7b9923da0774a0f0f58b61d6",
+      "target_path": "dashboard/data/quant_hub_reviewer_context.json",
+      "public_url": "https://lumen-core.ai/data/quant_hub_reviewer_context.json",
+      "mime_type": "application/json",
+      "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
+      "claim_boundary": "The feed reports bounded internal measurement and provenance state with explicit limitations; it does not establish external validation, government approval, or realized economic outcomes.",
+      "source_commit": "e96f15021f6ab37d37dbcdbd53c8f14ce76ea2fd",
+      "last_validated_utc": "2026-07-16T02:55:08Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "tests/test_quant_hub_reviewer_context.py",
+          "expected_sha256": "b1af9b3a07603e7bd9a8d4b3a75d84658d7ad3fedcda5495f464798271d819ca"
+        }
+      ]
+    },
+    {
+      "id": "quant_hub_reviewer_context_markdown",
+      "source_path": "docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md",
+      "expected_source_sha256": "8b777c293ab5371b5bc8220fc715a961efb10eba3e441bf9a025b6d5ea65225d",
+      "target_path": "dashboard/evidence/QUANT_HUB_REVIEWER_CONTEXT.md",
+      "public_url": "https://lumen-core.ai/evidence/QUANT_HUB_REVIEWER_CONTEXT.md",
+      "mime_type": "text/markdown",
+      "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
+      "claim_boundary": "The reviewer context summarizes bounded internal evidence and its limitations; it does not establish external validation, government approval, or realized economic outcomes.",
+      "source_commit": "e96f15021f6ab37d37dbcdbd53c8f14ce76ea2fd",
+      "last_validated_utc": "2026-07-16T02:55:08Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "tests/test_quant_hub_reviewer_context.py",
+          "expected_sha256": "b1af9b3a07603e7bd9a8d4b3a75d84658d7ad3fedcda5495f464798271d819ca"
+        }
+      ]
+    }
+  ]
+}
