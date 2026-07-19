@@ -109,6 +109,7 @@ def summarize_whitehole(proofs_dir: Path = WHITEHOLE_PROOFS, chain_path: Path = 
         )
     chain_text = read_text_safe(chain_path, 200_000)
     chain_lines = [line for line in chain_text.splitlines() if line.strip()]
+    usable = [row for row in recent if row["usable_as"] == "custody_and_reproducibility_evidence"]
     return {
         "root": str(proofs_dir.parent),
         "proof_dir": str(proofs_dir),
@@ -116,7 +117,13 @@ def summarize_whitehole(proofs_dir: Path = WHITEHOLE_PROOFS, chain_path: Path = 
         "weekly_fed_packet_count": len(weekly),
         "zero_byte_freeze_count": sum(1 for path in zips if path.stat().st_size == 0),
         "recent_freezes": recent,
-        "latest_freeze": recent[0] if recent else {},
+        "latest_observed_freeze": recent[0] if recent else {},
+        "latest_freeze": usable[0] if usable else (recent[0] if recent else {}),
+        "latest_freeze_selection": (
+            "newest_complete_freeze_with_sha256_sidecar"
+            if usable
+            else "newest_observed_freeze_no_complete_freeze_available"
+        ),
         "chain_of_custody": {
             "path": str(chain_path),
             "exists": chain_path.exists(),

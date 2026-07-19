@@ -40,6 +40,8 @@ def test_whitehole_is_custody_evidence_not_performance_evidence():
 
     assert whitehole["freeze_zip_count"] >= 1
     assert whitehole["latest_freeze"]["usable_as"] == "custody_and_reproducibility_evidence"
+    assert whitehole["latest_freeze_selection"] == "newest_complete_freeze_with_sha256_sidecar"
+    assert whitehole["latest_observed_freeze"]
     assert "not field validation" in whitehole["grant_limit"]
     assert "SHA256" in module.read_text_safe(Path(whitehole["latest_freeze"]["manifest"]), 1000)
 
