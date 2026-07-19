@@ -74,34 +74,43 @@ def resolve_repo_path(relative_path: str, root: Path = ROOT) -> Path:
     return candidate
 
 
-def verify_receipt(receipt: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
+def verify_receipt(receipt: Any, root: Path = ROOT) -> dict[str, Any]:
     errors: list[str] = []
     warnings: list[str] = []
+    receipt_is_object = isinstance(receipt, dict)
+    safe_receipt: dict[str, Any] = receipt if receipt_is_object else {}
 
-    if receipt.get("schema") != "lumencore.prooflock_receipt.v1":
+    if not receipt_is_object:
+        errors.append("receipt must be an object")
+
+    if safe_receipt.get("schema") != "lumencore.prooflock_receipt.v1":
         errors.append("unsupported or missing receipt schema")
-    if not str(receipt.get("claim_boundary") or "").strip():
+    if not str(safe_receipt.get("claim_boundary") or "").strip():
         errors.append("claim_boundary is required")
 
-    expected_receipt_hash = str(receipt.get("receipt_sha256") or "").lower()
-    computed_receipt_hash = stable_hash(receipt_payload(receipt))
+    expected_receipt_hash = str(safe_receipt.get("receipt_sha256") or "").lower()
+    computed_receipt_hash = stable_hash(receipt_payload(safe_receipt))
     receipt_hash_matches = expected_receipt_hash == computed_receipt_hash
     if not receipt_hash_matches:
         errors.append("receipt_sha256 does not match the canonical receipt payload")
 
-    artifact_rows = receipt.get("artifacts", [])
+    artifact_rows = safe_receipt.get("artifacts")
     if not isinstance(artifact_rows, list):
         errors.append("artifacts must be an array")
         artifact_rows = []
     artifacts: list[dict[str, Any]] = []
     seen_artifact_ids: set[str] = set()
-    for row in artifact_rows:
-        relative_path = str(row.get("repo_relative_path") or "")
-        expected_hash = str(row.get("expected_sha256") or "").lower()
-        artifact_id = str(row.get("artifact_id") or "")
+    for index, row in enumerate(artifact_rows):
+        row_is_object = isinstance(row, dict)
+        safe_row: dict[str, Any] = row if row_is_object else {}
+        if not row_is_object:
+            errors.append(f"artifact row {index} must be an object")
+        relative_path = str(safe_row.get("repo_relative_path") or "")
+        expected_hash = str(safe_row.get("expected_sha256") or "").lower()
+        artifact_id = str(safe_row.get("artifact_id") or "")
         result = {
             "artifact_id": artifact_id,
-            "role": str(row.get("role") or ""),
+            "role": str(safe_row.get("role") or ""),
             "repo_relative_path": relative_path,
             "expected_sha256": expected_hash,
             "observed_sha256": "",
@@ -140,18 +149,20 @@ def verify_receipt(receipt: dict[str, Any], root: Path = ROOT) -> dict[str, Any]
     gate_counts = {status: 0 for status in ALLOWED_GATE_STATUSES}
     required_open_or_failed: list[str] = []
     seen_gate_ids: set[str] = set()
-    gates = receipt.get("gates", [])
+    gates = safe_receipt.get("gates")
     if not isinstance(gates, list):
         errors.append("gates must be an array")
         gates = []
-    for gate in gates:
-        gate_id = str(gate.get("gate_id") or "")
-        status = str(gate.get("status") or "")
-        required = bool(gate.get("required_for_promotion"))
-        if not gate_id:
-            errors.append("every gate requires gate_id")
-        elif gate_id in seen_gate_ids:
-            errors.append(f"duplicate gate_id: {gate_id}")
+    for index, gate in enumerate(gates):
+        gate_is_object = isinstance(gate, dict)
+        safe_gate: dict[str, Any] = gate if gate_is_object else {}
+        if not gate_is_object:
+            errors.append(f"gate row {index} must be an object")
+        gate_id = str(safe_gate.get("gate_id") or "")
+        status = str(safe_gate.get("status") or "")
+        required = bool(safe_gate.get("required_for_promotion"))
+        if not gate_id or gate_id in seen_gate_ids:
+            errors.append(f"missing or duplicate gate_id: {gate_id or '<missing>'}")
         seen_gate_ids.add(gate_id)
         if status not in ALLOWED_GATE_STATUSES:
             errors.append(f"invalid gate status for {gate_id or '<missing>'}: {status}")
@@ -163,19 +174,20 @@ def verify_receipt(receipt: dict[str, Any], root: Path = ROOT) -> dict[str, Any]
     if not gates:
         errors.append("at least one gate is required")
 
-    decision = str(receipt.get("decision") or "").upper()
+    decision = str(safe_receipt.get("decision") or "").upper()
     if decision == "PROMOTE" and required_open_or_failed:
         errors.append("PROMOTE is prohibited while required gates are not PASS")
     if decision not in ALLOWED_DECISIONS:
         errors.append("decision must be HOLD, PROMOTE, or REJECT")
 
-    if not receipt.get("limitations"):
+    limitations = safe_receipt.get("limitations")
+    if not isinstance(limitations, list) or not limitations:
         warnings.append("no limitations were recorded")
 
     return {
         "schema": "lumencore.prooflock_verification_report.v1",
         "verified_utc": datetime.now(timezone.utc).isoformat(),
-        "receipt_id": receipt.get("receipt_id"),
+        "receipt_id": safe_receipt.get("receipt_id"),
         "integrity_valid": not errors,
         "promotion_allowed": (
             decision == "PROMOTE" and not required_open_or_failed and not errors
@@ -193,7 +205,7 @@ def verify_receipt(receipt: dict[str, Any], root: Path = ROOT) -> dict[str, Any]
         "required_open_or_failed_gates": required_open_or_failed,
         "errors": errors,
         "warnings": warnings,
-        "claim_boundary": receipt.get("claim_boundary", ""),
+        "claim_boundary": safe_receipt.get("claim_boundary", ""),
     }
 
 

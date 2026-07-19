@@ -175,6 +175,65 @@ def test_python_and_browser_reports_match_on_canonical_fixture():
         assert browser_report[key] == python_report[key]
 
 
+def test_python_and_browser_fail_closed_parity_for_non_object_receipts_and_rows():
+    verifier = load_python_verifier()
+    sample = json.loads(SAMPLE.read_text(encoding="utf-8"))
+    malformed_artifacts = copy.deepcopy(sample)
+    malformed_artifacts["artifacts"] = [None, "invalid", []]
+    malformed_artifacts["receipt_sha256"] = verifier.stable_hash(
+        verifier.receipt_payload(malformed_artifacts)
+    )
+    malformed_gates = copy.deepcopy(sample)
+    malformed_gates["gates"] = [None, "invalid", []]
+    malformed_gates["receipt_sha256"] = verifier.stable_hash(
+        verifier.receipt_payload(malformed_gates)
+    )
+    receipts = [None, "invalid", [], malformed_artifacts, malformed_gates]
+
+    comparable_keys = (
+        "integrity_valid",
+        "promotion_allowed",
+        "artifact_count",
+        "artifact_hash_match_count",
+        "gate_counts",
+        "required_open_or_failed_gates",
+        "errors",
+    )
+    python_reports = [
+        {key: verifier.verify_receipt(receipt)[key] for key in comparable_keys}
+        for receipt in receipts
+    ]
+
+    output = run_node(
+        f"""
+        const fs = require("node:fs");
+        const path = require("node:path");
+        const core = require({json.dumps(js_path(CORE))});
+        const root = {json.dumps(js_path(ROOT))};
+        const receipts = {json.dumps(receipts)};
+        const keys = {json.dumps(comparable_keys)};
+        (async () => {{
+          const reports = [];
+          for (const receipt of receipts) {{
+            const report = await core.verifyReceipt(receipt, {{
+              loadArtifact: async (relative) => fs.readFileSync(path.join(root, relative))
+            }});
+            reports.push(Object.fromEntries(keys.map((key) => [key, report[key]])));
+          }}
+          console.log(JSON.stringify(reports));
+        }})().catch((error) => {{ console.error(error); process.exitCode = 1; }});
+        """
+    )
+    browser_reports = json.loads(output)
+
+    assert browser_reports == python_reports
+    assert all(report["integrity_valid"] is False for report in browser_reports)
+    assert all(report["promotion_allowed"] is False for report in browser_reports)
+    assert "receipt must be an object" in browser_reports[0]["errors"]
+    assert "artifact row 0 must be an object" in browser_reports[3]["errors"]
+    assert "gate row 0 must be an object" in browser_reports[4]["errors"]
+
+
 def test_python_and_browser_promotion_decision_parity_with_all_required_gates_passed():
     verifier = load_python_verifier()
     receipts = []

@@ -113,7 +113,9 @@
   async function verifyReceipt(receipt, options = {}) {
     const errors = [];
     const warnings = [];
-    const safeReceipt = receipt && typeof receipt === "object" && !Array.isArray(receipt) ? receipt : {};
+    const receiptIsObject = Boolean(receipt && typeof receipt === "object" && !Array.isArray(receipt));
+    const safeReceipt = receiptIsObject ? receipt : {};
+    if (!receiptIsObject) errors.push("receipt must be an object");
     if (safeReceipt.schema !== RECEIPT_SCHEMA) errors.push("unsupported or missing receipt schema");
     if (!String(safeReceipt.claim_boundary || "").trim()) errors.push("claim_boundary is required");
 
@@ -127,8 +129,11 @@
     if (!artifactRows.length) errors.push("at least one artifact is required");
     const artifacts = [];
     const seenArtifactIds = new Set();
-    for (const row of artifactRows) {
-      const result = makeArtifactResult(row);
+    for (const [index, row] of artifactRows.entries()) {
+      const rowIsObject = Boolean(row && typeof row === "object" && !Array.isArray(row));
+      const safeRow = rowIsObject ? row : {};
+      if (!rowIsObject) errors.push(`artifact row ${index} must be an object`);
+      const result = makeArtifactResult(safeRow);
       if (!result.artifact_id || seenArtifactIds.has(result.artifact_id)) {
         errors.push(`missing or duplicate artifact_id: ${result.artifact_id || "<missing>"}`);
       }
@@ -161,16 +166,19 @@
     const gateCounts = Object.fromEntries(Array.from(ALLOWED_GATE_STATUSES, (status) => [status, 0]));
     const requiredOpenOrFailed = [];
     const seenGateIds = new Set();
-    for (const gate of gates) {
-      const gateId = String(gate?.gate_id || "");
-      const status = String(gate?.status || "");
+    for (const [index, gate] of gates.entries()) {
+      const gateIsObject = Boolean(gate && typeof gate === "object" && !Array.isArray(gate));
+      const safeGate = gateIsObject ? gate : {};
+      if (!gateIsObject) errors.push(`gate row ${index} must be an object`);
+      const gateId = String(safeGate.gate_id || "");
+      const status = String(safeGate.status || "");
       if (!gateId || seenGateIds.has(gateId)) errors.push(`missing or duplicate gate_id: ${gateId || "<missing>"}`);
       seenGateIds.add(gateId);
       if (!ALLOWED_GATE_STATUSES.has(status)) {
         errors.push(`invalid gate status for ${gateId || "<missing>"}: ${status}`);
       } else {
         gateCounts[status] += 1;
-        if (gate?.required_for_promotion && status !== "PASS") requiredOpenOrFailed.push(gateId);
+        if (safeGate.required_for_promotion && status !== "PASS") requiredOpenOrFailed.push(gateId);
       }
     }
 
