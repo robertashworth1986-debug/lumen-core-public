@@ -1,0 +1,367 @@
+{
+  "schema": "lumencore.control_plane_state.v1",
+  "state_id": "control-plane-20260719T025600Z",
+  "generated_utc": "2026-07-19T02:56:00Z",
+  "owner": "Robert Ashworth",
+  "authority": "PUBLIC_SAFE_RECONCILIATION_NOT_ACTION_AUTHORITY",
+  "failure_mode": "FAIL_CLOSED",
+  "operating_principle": "Bounded light speed: move quickly without outrunning evidence, rights, reversibility, or founder control.",
+  "source_cutoff": {
+    "gmail_handoff_observed_utc": "2026-07-19T01:54:28Z",
+    "github_observed_utc": "2026-07-19T02:55:00Z",
+    "official_deadlines_observed_utc": "2026-07-19T02:55:00Z"
+  },
+  "controls": {
+    "external_email_sent_by_this_state": false,
+    "portal_submission_performed": false,
+    "signature_or_certification_performed": false,
+    "merge_performed": false,
+    "deployment_performed": false,
+    "payment_or_legal_acceptance_performed": false
+  },
+  "lanes": [
+    {
+      "lane_id": "missionweave",
+      "priority": 1,
+      "category": "deadline_submission",
+      "deadline_utc": "2026-07-22T16:00:00Z",
+      "state": "BLOCKED",
+      "summary": "Latest bounded handoff: 36/50 gates cleared, 14 open; JCP/DD Form 2345 and final certification remain fail-closed.",
+      "evidence": [
+        {
+          "source_type": "gmail_handoff",
+          "reference": "MissionWeave checkpoint and outreach-hardening receipt",
+          "observed_utc": "2026-07-19T01:54:28Z"
+        },
+        {
+          "source_type": "component_support_reply",
+          "reference": "DSIP Support routed interpretation to the component POC",
+          "observed_utc": "2026-07-18T15:35:55Z"
+        }
+      ],
+      "open_gates": [
+        "Official component/JCP evidence",
+        "Official registration and portal receipts",
+        "Founder/legal facts",
+        "Action-time package review"
+      ],
+      "next_actions": [
+        "Recheck the existing DLA thread without duplicate outreach",
+        "Retrieve only official evidence",
+        "Keep the 14 open gates visible"
+      ],
+      "prohibited_actions": [
+        "No inferred JCP/CMMC/SPRS status",
+        "No certification or submission from this state"
+      ],
+      "claim_boundary": "Coordination checkpoint only; not proposal compliance, portal acceptance, legal sufficiency, award eligibility, or submission authority."
+    },
+    {
+      "lane_id": "harbor_sentinel",
+      "priority": 2,
+      "category": "deadline_submission",
+      "deadline_utc": "2026-07-22T16:00:00Z",
+      "state": "RECONCILIATION_REQUIRED",
+      "summary": "Bounded public AIS evidence exists, but the readiness feed is June-dated and PR #3 closed unmerged; current topic-specific portal readiness is not established.",
+      "evidence": [
+        {
+          "source_type": "repository_snapshot",
+          "reference": "June grant-readiness feed",
+          "observed_utc": "2026-06-20T22:56:29Z"
+        },
+        {
+          "source_type": "pull_request",
+          "reference": "PR #3 closed unmerged",
+          "observed_utc": "2026-07-17T00:25:03Z"
+        },
+        {
+          "source_type": "official_topic_record",
+          "reference": "DON26BZ03-NV063 deadline lock",
+          "observed_utc": "2026-07-19T02:55:00Z"
+        }
+      ],
+      "open_gates": [
+        "Fresh solicitation/attachment audit",
+        "Fresh DSIP/file reconciliation",
+        "Topic-specific founder/legal facts",
+        "Operational-claim separation"
+      ],
+      "next_actions": [
+        "Run a read-only current topic audit",
+        "Reuse valid frozen artifacts selectively",
+        "Return a fresh gate count and exact questions"
+      ],
+      "prohibited_actions": [
+        "No June snapshot as current authority",
+        "No Navy/radar/field-validation claim",
+        "No submission without fresh reconciliation"
+      ],
+      "claim_boundary": "Public-data feasibility only; not operational harbor performance, Navy integration, cybersecurity, field validation, endorsement, or deployment."
+    },
+    {
+      "lane_id": "prooflock",
+      "priority": 3,
+      "category": "time_boxed_release",
+      "deadline_utc": "2026-07-22T00:00:00Z",
+      "state": "HOLD",
+      "summary": "PR #36 is draft/mergeable at 4584a41dbedd2f856bba5fa8202e7dcc8e4a448f with green workflows; live release remains 10/14 with four stale files.",
+      "evidence": [
+        {
+          "source_type": "pull_request",
+          "reference": "PR #36 current head",
+          "observed_utc": "2026-07-19T02:32:54Z"
+        },
+        {
+          "source_type": "github_actions",
+          "reference": "Four current-head workflows succeeded",
+          "observed_utc": "2026-07-19T02:55:00Z"
+        },
+        {
+          "source_type": "live_release_gate",
+          "reference": "10/14; core JS, favicon, license, and Python verifier stale",
+          "observed_utc": "2026-07-19T01:22:50Z"
+        }
+      ],
+      "open_gates": [
+        "Deploy four stale files and require 14/14",
+        "Refresh release/custody receipts",
+        "Confirm /feedback Session ID",
+        "Public sub-three-minute video",
+        "Devpost founder approval"
+      ],
+      "next_actions": [
+        "Keep implementation fixes on PR #36",
+        "Refresh PR metadata from final receipts",
+        "Keep e9a1aba historical only"
+      ],
+      "prohibited_actions": [
+        "No green-CI-equals-deployed claim",
+        "No historical-build final video",
+        "No merge or submission from this state"
+      ],
+      "claim_boundary": "Receipt integrity and human-gated promotion logic only; not arbitrary claim validation, performance/safety certification, patent rights, or competition outcome."
+    },
+    {
+      "lane_id": "public_site",
+      "priority": 4,
+      "category": "public_release",
+      "deadline_utc": null,
+      "state": "READY_FOR_REVIEW",
+      "summary": "PR #38 is draft/mergeable at e67e5074d908e0b57d2d8e4f59e8ef5745299ba8 with current-head website, proof, and safety workflows green.",
+      "evidence": [
+        {
+          "source_type": "pull_request",
+          "reference": "PR #38 current head",
+          "observed_utc": "2026-07-19T01:22:01Z"
+        },
+        {
+          "source_type": "github_actions",
+          "reference": "Three current-head workflows succeeded",
+          "observed_utc": "2026-07-19T02:55:00Z"
+        }
+      ],
+      "open_gates": [],
+      "next_actions": [
+        "Reconcile PR description with current QA",
+        "Final signed-out review after deadline lanes",
+        "Preserve bounded claims"
+      ],
+      "prohibited_actions": [
+        "No deploy/DNS/claim expansion",
+        "No private or unrelated lane import"
+      ],
+      "claim_boundary": "Reviewer navigation and commercial clarity only; not validation, customers, savings, deployment, funding, certification, or endorsement."
+    },
+    {
+      "lane_id": "dice",
+      "priority": 5,
+      "category": "proposal_preparation",
+      "deadline_utc": "2026-08-25T18:00:00Z",
+      "state": "PREPARATION",
+      "summary": "PR #37 is a one-file Amendment 01/template audit at 69d48c09b7dbed80a8043952becbf76642c7eb98; no fabricated invitation gate is assumed.",
+      "evidence": [
+        {
+          "source_type": "pull_request",
+          "reference": "PR #37 audit",
+          "observed_utc": "2026-07-18T15:19:51Z"
+        },
+        {
+          "source_type": "official_opportunity_record",
+          "reference": "HR001126S0010 active opportunity/deadline",
+          "observed_utc": "2026-07-19T02:55:00Z"
+        }
+      ],
+      "open_gates": [
+        "Amendment 01 redline",
+        "Official attachment hashes",
+        "P1 Technical Volume v0.2",
+        "Team/cost/cyber/legal facts",
+        "BAAT preview and founder approval"
+      ],
+      "next_actions": [
+        "Redline the amendment first",
+        "Use the official template",
+        "Keep cybersecurity facts unresolved until evidenced"
+      ],
+      "prohibited_actions": [
+        "No unsupported CMMC/SPRS/CUI/classified/partner claim",
+        "No portal acceptance or submission"
+      ],
+      "claim_boundary": "Controlled preparation only; not invitation, award, compliance determination, certification, or submission authority."
+    },
+    {
+      "lane_id": "outreach_governance",
+      "priority": 6,
+      "category": "coordination_control",
+      "deadline_utc": null,
+      "state": "NO_ACTION_DUE",
+      "summary": "Latest handoff: branch codex/mindwise-product-lane-20260718 at 85a1c5c178af38c841a25e423b057790a4177c8e; 24 tests; zero send-now lanes.",
+      "evidence": [
+        {
+          "source_type": "gmail_handoff",
+          "reference": "Outreach ledger receipt",
+          "observed_utc": "2026-07-19T01:54:28Z"
+        }
+      ],
+      "open_gates": [],
+      "next_actions": [
+        "Recheck Gmail immediately before any decision",
+        "Preserve receipt-ledger and follow-up limits",
+        "No parallel tracker"
+      ],
+      "prohibited_actions": [
+        "No send while zero lanes qualify",
+        "No caller-supplied count bypass"
+      ],
+      "claim_boundary": "Eligibility control only; it does not create a reason or authority to contact anyone."
+    },
+    {
+      "lane_id": "epri_opai",
+      "priority": 7,
+      "category": "onboarding_wait",
+      "deadline_utc": null,
+      "state": "WAITING",
+      "summary": "The requested onboarding information was already sent once; wait for DocuSign or an exact entity-format correction.",
+      "evidence": [
+        {
+          "source_type": "gmail_sent_receipt",
+          "reference": "Existing OPAI thread contains the reply",
+          "observed_utc": "2026-07-17T03:51:00Z"
+        }
+      ],
+      "open_gates": [],
+      "next_actions": [
+        "Wait for new inbound information",
+        "Reply once in the existing thread when requested"
+      ],
+      "prohibited_actions": [
+        "No duplicate reply, standalone message, or unsolicited packet"
+      ],
+      "claim_boundary": "Onboarding information does not establish membership, executed MOU, validation, endorsement, procurement, or funding."
+    },
+    {
+      "lane_id": "patent_center",
+      "priority": 8,
+      "category": "official_record_protection",
+      "deadline_utc": null,
+      "state": "READ_ONLY",
+      "summary": "The repository does not prove a current patent deadline; retrieve missing official records while signed in and escalate legal interpretation.",
+      "evidence": [
+        {
+          "source_type": "repository_and_portal_audit",
+          "reference": "Patent record-category gap handoff",
+          "observed_utc": "2026-07-19T02:55:00Z"
+        }
+      ],
+      "open_gates": [],
+      "next_actions": [
+        "Retrieve/hash official records",
+        "Preserve protected custody",
+        "Escalate actual deadlines to counsel"
+      ],
+      "prohibited_actions": [
+        "No anniversary-date inference",
+        "No filing, signature, fee, legal acceptance, or enabling publication"
+      ],
+      "claim_boundary": "Official-record custody only; not legal advice, patent validity/scope, cure, or filing authority."
+    },
+    {
+      "lane_id": "eia_prospective",
+      "priority": 9,
+      "category": "research_hold",
+      "deadline_utc": null,
+      "state": "PRELIMINARY",
+      "summary": "Latest handoff: 351 predictions, 322 settlements, zero common settled hours; promotion gates remain false.",
+      "evidence": [
+        {
+          "source_type": "gmail_handoff",
+          "reference": "EIA prospective receipt",
+          "observed_utc": "2026-07-19T01:54:28Z"
+        }
+      ],
+      "open_gates": [
+        "Common settled-hour set",
+        "Predeclared promotion thresholds",
+        "Independent replay/current receipt"
+      ],
+      "next_actions": [
+        "Continue non-promotional collection",
+        "Preserve preliminary status"
+      ],
+      "prohibited_actions": [
+        "No accuracy, outage, savings, operational-value, or validation promotion"
+      ],
+      "claim_boundary": "Process counts only; not accuracy, savings, avoided outages, or external validation."
+    }
+  ],
+  "stale_or_conflicting_sources": [
+    {
+      "path": "docs/CANONICAL_OPERATING_STATE.md",
+      "state": "HISTORICAL_SNAPSHOT",
+      "finding": "July 17 outreach and PR statements are superseded.",
+      "required_control": "Show a historical banner and route current sequencing here."
+    },
+    {
+      "path": "dashboard/data/grant_readiness_status.json",
+      "state": "HISTORICAL_SNAPSHOT",
+      "finding": "June 20 feed is not current portal authority.",
+      "required_control": "Regenerate from fresh receipts or hold as historical."
+    },
+    {
+      "path": "pull/36 description",
+      "state": "DESCRIPTION_DRIFT",
+      "finding": "Metadata trails the current head and receipts.",
+      "required_control": "Refresh after final deployment verification."
+    },
+    {
+      "path": "pull/38 description",
+      "state": "DESCRIPTION_DRIFT",
+      "finding": "Initial test summary trails current QA.",
+      "required_control": "Reconcile before final review."
+    },
+    {
+      "path": "ProofLock historical release e9a1aba",
+      "state": "HISTORICAL_RELEASE_ONLY",
+      "finding": "Its 14/14 receipt does not prove the corrected current predicate is deployed.",
+      "required_control": "Do not use as final recording surface."
+    }
+  ],
+  "independent_findings": [
+    {
+      "finding_id": "prooflock_malformed_json_parity",
+      "severity": "MEDIUM",
+      "scope": "PR #36",
+      "finding": "Python may raise on non-object JSON rows while browser code returns structured failures.",
+      "bounded_fix": "Type-guard receipt/artifact/gate rows and add parity tests on PR #36."
+    },
+    {
+      "finding_id": "historical_feed_freshness",
+      "severity": "HIGH",
+      "scope": "grant dashboard",
+      "finding": "Old generated time must not be replaced so stale readiness appears fresh.",
+      "bounded_fix": "Preserve source_generated_utc, add observed_utc, and force HISTORICAL_SNAPSHOT_HOLD without fresh receipts."
+    }
+  ],
+  "claim_boundary": "Public-safe sequencing and conflict register only; not a live portal, solicitation, agreement, legal/accounting review, deployment receipt, external validation, or founder action approval.",
+  "state_sha256": "6dcd309c0da75b14a1024b590f4160b8e7169f7ad0cd9583bccc4faae0e45304"
+}
