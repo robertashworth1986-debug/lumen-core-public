@@ -292,6 +292,64 @@ def test_missing_and_unknown_no_action_controls_fail_closed():
 
 
 @pytest.mark.parametrize(
+    ("mutate", "expected_error"),
+    [
+        (
+            lambda state: state.__setitem__("portal_submission_authorized", True),
+            "control-plane state contains unknown keys",
+        ),
+        (
+            lambda state: state["lanes"][0].__setitem__(
+                "portal_submission_authorized", True
+            ),
+            "lanes[0] contains unknown keys",
+        ),
+        (
+            lambda state: state["lanes"][0]["evidence"][0].__setitem__(
+                "action_authority", "submit"
+            ),
+            "lanes[0].evidence[0] contains unknown keys",
+        ),
+        (
+            lambda state: state["stale_or_conflicting_sources"][0].__setitem__(
+                "action_authority", "submit"
+            ),
+            "stale_or_conflicting_sources[0] contains unknown keys",
+        ),
+    ],
+)
+def test_unknown_fields_cannot_create_action_authority_after_rehash(
+    mutate, expected_error
+):
+    module = load_module()
+    mutated = copy.deepcopy(load_state())
+    mutate(mutated)
+    refresh_self_hash(module, mutated)
+
+    report = verify(module, mutated)
+
+    assert report["integrity_valid"] is False
+    assert report["state_hash"]["matches"] is True
+    assert expected_error in report["errors"]
+
+
+@pytest.mark.parametrize("bad_value", [float("nan"), float("inf"), float("-inf")])
+def test_non_finite_values_fail_closed_after_rehash(bad_value):
+    module = load_module()
+    mutated = copy.deepcopy(load_state())
+    mutated["lanes"][0]["summary"] = bad_value
+    refresh_self_hash(module, mutated)
+
+    report = verify(module, mutated)
+
+    assert report["integrity_valid"] is False
+    assert report["state_hash"]["matches"] is True
+    assert "control-plane state value item value contains a non-finite number" in report[
+        "errors"
+    ]
+
+
+@pytest.mark.parametrize(
     ("field", "value", "expected_error"),
     [
         (

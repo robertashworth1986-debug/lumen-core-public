@@ -61,6 +61,51 @@ NO_ACTION_CONTROL_KEYS = {
     "devpost_submission_performed",
     "claim_expansion_performed",
 }
+TOP_LEVEL_KEYS = {
+    "authority",
+    "claim_boundary",
+    "controls",
+    "custody_anchor",
+    "failure_mode",
+    "generated_utc",
+    "hash_scope",
+    "independent_findings",
+    "lanes",
+    "operating_principle",
+    "owner_role",
+    "schema",
+    "source_cutoff",
+    "stale_or_conflicting_sources",
+    "state_id",
+    "state_sha256",
+}
+SOURCE_CUTOFF_KEYS = {
+    "gmail_handoff_observed_utc",
+    "github_observed_utc",
+    "official_deadlines_observed_utc",
+}
+INDEPENDENT_FINDING_KEYS = {
+    "bounded_fix",
+    "finding",
+    "finding_id",
+    "scope",
+    "severity",
+}
+LANE_KEYS = {
+    "category",
+    "claim_boundary",
+    "deadline_utc",
+    "evidence",
+    "lane_id",
+    "next_actions",
+    "open_gates",
+    "priority",
+    "prohibited_actions",
+    "state",
+    "summary",
+}
+EVIDENCE_KEYS = {"observed_utc", "reference", "source_type"}
+STALE_SOURCE_KEYS = {"finding", "path", "required_control", "state"}
 DIRECT_IDENTIFIER_FIELDS = {
     "owner",
     "owner_name",
@@ -298,6 +343,46 @@ def finite_limit(
     return parsed
 
 
+def validate_json_domain(value: Any, *, field: str, errors: list[str]) -> None:
+    """Reject values Python's permissive JSON codec accepts outside strict JSON."""
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if not isinstance(key, str):
+                errors.append(f"{field} contains a non-string object key")
+                continue
+            validate_json_domain(child, field=f"{field} value", errors=errors)
+        return
+    if isinstance(value, list):
+        for child in value:
+            validate_json_domain(child, field=f"{field} item", errors=errors)
+        return
+    if isinstance(value, float) and not math.isfinite(value):
+        errors.append(f"{field} contains a non-finite number")
+        return
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return
+    errors.append(f"{field} contains a value outside the JSON data model")
+
+
+def validate_exact_keys(
+    value: Any,
+    *,
+    allowed: set[str],
+    field: str,
+    errors: list[str],
+) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        errors.append(f"{field} must be an object")
+        return {}
+    keys = set(value)
+    missing = sorted(allowed - keys)
+    if missing:
+        errors.append(f"{field} missing required keys: {', '.join(missing)}")
+    if keys - allowed:
+        errors.append(f"{field} contains unknown keys")
+    return value
+
+
 def verify_state(
     state: Any,
     *,
@@ -308,6 +393,13 @@ def verify_state(
     errors: list[str] = []
     warnings: list[str] = []
     safe_state = state if isinstance(state, dict) else {}
+    validate_json_domain(state, field="control-plane state", errors=errors)
+    validate_exact_keys(
+        state,
+        allowed=TOP_LEVEL_KEYS,
+        field="control-plane state",
+        errors=errors,
+    )
     privacy_findings = public_safety_findings(safe_state)
     for label in sorted(privacy_findings):
         errors.append(f"public state contains prohibited {label}")
@@ -335,6 +427,31 @@ def verify_state(
         errors.append(f"owner_role must be {OWNER_ROLE}")
     if "owner" in safe_state:
         errors.append("owner must not publish a named person; use owner_role")
+
+    source_cutoff = validate_exact_keys(
+        safe_state.get("source_cutoff"),
+        allowed=SOURCE_CUTOFF_KEYS,
+        field="source_cutoff",
+        errors=errors,
+    )
+    for key in sorted(SOURCE_CUTOFF_KEYS):
+        parse_utc(source_cutoff.get(key), f"source_cutoff.{key}", errors)
+
+    independent_findings = safe_state.get("independent_findings")
+    if not isinstance(independent_findings, list) or not independent_findings:
+        errors.append("independent_findings must be a non-empty array")
+        independent_findings = []
+    for index, finding in enumerate(independent_findings):
+        prefix = f"independent_findings[{index}]"
+        checked = validate_exact_keys(
+            finding,
+            allowed=INDEPENDENT_FINDING_KEYS,
+            field=prefix,
+            errors=errors,
+        )
+        for key in sorted(INDEPENDENT_FINDING_KEYS):
+            if not str(checked.get(key) or "").strip():
+                errors.append(f"{prefix}.{key} is required")
 
     generated = parse_utc(safe_state.get("generated_utc"), "generated_utc", errors)
     observed_now = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
@@ -405,6 +522,7 @@ def verify_state(
         if not isinstance(row, dict):
             errors.append(f"{prefix} must be an object")
             continue
+        validate_exact_keys(row, allowed=LANE_KEYS, field=prefix, errors=errors)
         lane_id = str(row.get("lane_id") or "").strip()
         if not lane_id:
             errors.append(f"{prefix}.lane_id is required")
@@ -442,6 +560,12 @@ def verify_state(
                 if not isinstance(item, dict):
                     errors.append(f"{eprefix} must be an object")
                     continue
+                validate_exact_keys(
+                    item,
+                    allowed=EVIDENCE_KEYS,
+                    field=eprefix,
+                    errors=errors,
+                )
                 if not str(item.get("source_type") or "").strip():
                     errors.append(f"{eprefix}.source_type is required")
                 if not str(item.get("reference") or "").strip():
@@ -494,6 +618,13 @@ def verify_state(
         for item in stale_sources
         if isinstance(item, dict)
     }
+    for index, item in enumerate(stale_sources):
+        validate_exact_keys(
+            item,
+            allowed=STALE_SOURCE_KEYS,
+            field=f"stale_or_conflicting_sources[{index}]",
+            errors=errors,
+        )
     for required_path in {
         "docs/CANONICAL_OPERATING_STATE.md",
         "dashboard/data/grant_readiness_status.json",
