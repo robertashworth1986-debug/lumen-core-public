@@ -332,6 +332,11 @@ def test_published_receipt_rejects_artifact_outside_provider_directory() -> None
                 "snapshot_latest_json": "docs/not-a-provider-latest.json",
                 "snapshot_csv": "docs/not-a-provider-snapshot.csv",
                 "sha256": "0" * 64,
+                "file_sha256": {
+                    "snapshot_json": "0" * 64,
+                    "snapshot_latest_json": "0" * 64,
+                    "snapshot_csv": "0" * 64,
+                },
             },
         }
     )
@@ -347,6 +352,42 @@ def test_published_receipt_rejects_artifact_outside_provider_directory() -> None
             expected_network_allowed=True,
             expected_published_outputs=True,
             max_rows=5,
+        )
+
+
+def test_snapshot_artifact_receipt_verifies_files_and_detects_tampering(tmp_path, monkeypatch) -> None:
+    module = load_module()
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    monkeypatch.setattr(module, "DATA_ROOT", tmp_path / "data" / "live_measured")
+    provider = module.PROVIDER_BY_ID["FRED"]
+    artifact = module.snapshot_provider(
+        provider,
+        {
+            "rows": [{"series_id": "TEST", "value": 1.0}],
+            "http_status": 200,
+            "probe_ok": True,
+            "probe_note": "ok",
+        },
+        tag="artifact-verification-test",
+    )
+
+    validated = module.verify_artifact_files(
+        artifact,
+        expected_provider_id="FRED",
+    )
+    assert validated["sha256"] == artifact["sha256"]
+    assert set(validated["file_sha256"]) == {
+        "snapshot_json",
+        "snapshot_latest_json",
+        "snapshot_csv",
+    }
+
+    snapshot_path = tmp_path / artifact["snapshot_json"]
+    snapshot_path.write_text("{}", encoding="utf-8")
+    with pytest.raises(module.ReceiptValidationError, match="hash-mismatched"):
+        module.verify_artifact_files(
+            artifact,
+            expected_provider_id="FRED",
         )
 
 

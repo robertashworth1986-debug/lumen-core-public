@@ -48,6 +48,7 @@ POLICY_SCHEMA = "live_source_orchestrator_policy.v1"
 RECEIPT_SCHEMA = "live_source_provider_receipt.v1"
 ORCHESTRATOR_SCHEMA = "live_source_orchestrator_run.v1"
 ORCHESTRATOR_STATE_SCHEMA = "live_source_orchestrator_state.v1"
+SNAPSHOT_SCHEMA = "live_source_snapshot.v1"
 REGISTRY_ROWS_SCHEMA = "live_source_registry.rows.v1"
 REGISTRY_CANONICAL_SCHEMA = "live_source_registry.canonical.v1"
 REGISTRY_LEGACY_ROWS_SCHEMA = "live_source_registry.legacy_rows.v0"
@@ -192,6 +193,30 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
+def atomic_write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        fields: list[str] = []
+        for row in rows:
+            for key in row:
+                if key not in fields:
+                    fields.append(key)
+        with temporary.open("x", encoding="utf-8", newline="") as handle:
+            if fields:
+                writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
+                writer.writeheader()
+                writer.writerows(rows)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        try:
+            temporary.unlink(missing_ok=True)
+        except OSError:
+            pass
+
+
 def load_env_file(path: Path) -> dict[str, str]:
     env: dict[str, str] = {}
     if not path.exists():
@@ -292,6 +317,14 @@ def scrub(obj: Any, env_names: list[str] | None = None) -> Any:
 def sha256_payload(payload: Any) -> str:
     raw = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
     return hashlib.sha256(raw).hexdigest()
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def seal_receipt(payload: dict[str, Any]) -> dict[str, Any]:
@@ -1381,13 +1414,19 @@ def _validate_artifact(
     artifact: Any,
     *,
     expected_provider_id: str | None = None,
-) -> dict[str, str]:
+) -> dict[str, Any]:
     if not isinstance(artifact, dict):
         raise ReceiptValidationError("published child receipt requires an artifact")
-    expected = {"snapshot_json", "snapshot_latest_json", "snapshot_csv", "sha256"}
+    expected = {
+        "snapshot_json",
+        "snapshot_latest_json",
+        "snapshot_csv",
+        "sha256",
+        "file_sha256",
+    }
     if set(artifact) != expected:
         raise ReceiptValidationError("artifact fields do not match the v1 schema")
-    validated: dict[str, str] = {}
+    validated: dict[str, Any] = {}
     expected_root = None
     if expected_provider_id is not None:
         if expected_provider_id not in PROVIDER_BY_ID:
@@ -1408,6 +1447,48 @@ def _validate_artifact(
     if not isinstance(digest, str) or not SHA256_HEX.fullmatch(digest):
         raise ReceiptValidationError("artifact hash is invalid")
     validated["sha256"] = digest
+    file_hashes = artifact.get("file_sha256")
+    expected_hash_keys = {"snapshot_json", "snapshot_latest_json", "snapshot_csv"}
+    if not isinstance(file_hashes, dict) or set(file_hashes) != expected_hash_keys:
+        raise ReceiptValidationError("artifact file hashes are invalid")
+    for key, value in file_hashes.items():
+        if not isinstance(value, str) or not SHA256_HEX.fullmatch(value):
+            raise ReceiptValidationError("artifact file hash is invalid")
+    validated["file_sha256"] = dict(file_hashes)
+    return validated
+
+
+def verify_artifact_files(
+    artifact: Any,
+    *,
+    expected_provider_id: str,
+) -> dict[str, Any]:
+    validated = _validate_artifact(
+        artifact,
+        expected_provider_id=expected_provider_id,
+    )
+    paths = {
+        key: (ROOT / validated[key]).resolve()
+        for key in ("snapshot_json", "snapshot_latest_json", "snapshot_csv")
+    }
+    for key, path in paths.items():
+        if not path.is_file() or sha256_file(path) != validated["file_sha256"][key]:
+            raise ReceiptValidationError("artifact file is missing or hash-mismatched")
+    try:
+        snapshot = json.loads(paths["snapshot_json"].read_text(encoding="utf-8"))
+        latest = json.loads(paths["snapshot_latest_json"].read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ReceiptValidationError("artifact snapshot JSON is unreadable") from exc
+    if not isinstance(snapshot, dict) or snapshot != latest:
+        raise ReceiptValidationError("artifact snapshot and latest JSON differ")
+    unsigned = {key: value for key, value in snapshot.items() if key != "sha256"}
+    if (
+        snapshot.get("schema") != SNAPSHOT_SCHEMA
+        or snapshot.get("source") != expected_provider_id
+        or snapshot.get("sha256") != validated["sha256"]
+        or sha256_payload(unsigned) != validated["sha256"]
+    ):
+        raise ReceiptValidationError("artifact snapshot payload hash is invalid")
     return validated
 
 
@@ -1493,7 +1574,7 @@ def validate_child_receipt(
     ):
         raise ReceiptValidationError("child receipt retry delay is invalid")
     if receipt["published_outputs"]:
-        _validate_artifact(
+        verify_artifact_files(
             receipt.get("artifact"),
             expected_provider_id=provider_id,
         )
@@ -1529,6 +1610,7 @@ def snapshot_provider(
     env_names = list(provider.get("env_names", []))
     rows = scrub(result.get("rows", []), env_names)
     snapshot = {
+        "schema": SNAPSHOT_SCHEMA,
         "generated_utc": now_utc(),
         "source": source,
         "sector": provider["sector"],
@@ -1547,15 +1629,20 @@ def snapshot_provider(
     json_path = source_dir / f"{source.lower()}_{tag}.json"
     latest_path = source_dir / f"{source.lower()}_latest.json"
     csv_path = source_dir / f"{source.lower()}_{tag}.csv"
-    write_json(json_path, snapshot)
-    write_json(latest_path, snapshot)
-    write_csv(csv_path, rows if isinstance(rows, list) else [])
+    atomic_write_json(json_path, snapshot)
+    atomic_write_json(latest_path, snapshot)
+    atomic_write_csv(csv_path, rows if isinstance(rows, list) else [])
 
     return {
         "snapshot_json": str(json_path.relative_to(ROOT)).replace("\\", "/"),
         "snapshot_latest_json": str(latest_path.relative_to(ROOT)).replace("\\", "/"),
         "snapshot_csv": str(csv_path.relative_to(ROOT)).replace("\\", "/"),
         "sha256": digest,
+        "file_sha256": {
+            "snapshot_json": sha256_file(json_path),
+            "snapshot_latest_json": sha256_file(latest_path),
+            "snapshot_csv": sha256_file(csv_path),
+        },
     }
 
 
@@ -2166,7 +2253,7 @@ def registry_row_from_provider_result(provider_result: dict[str, Any]) -> dict[s
     measured = qc_state == "PASS" and row_count > 0
     credential_state = str(provider_result.get("credential_state") or "UNKNOWN")
     enabled = not provider.get("env_names") or credential_state == "PRESENT"
-    artifact = _validate_artifact(
+    artifact = verify_artifact_files(
         provider_result.get("artifact"),
         expected_provider_id=provider_result["provider_id"],
     )
