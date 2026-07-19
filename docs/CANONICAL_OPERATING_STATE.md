@@ -1,6 +1,8 @@
 # LumenCore Canonical Operating State
 
-**State date:** 2026-07-17 UTC  
+> **Historical-snapshot notice — 2026-07-19 UTC:** The operational statements below were captured on 2026-07-17 and include superseded outreach and pull-request state. Until a full canonical rewrite is merged, use [`CONTROL_PLANE_RECONCILIATION_2026-07-19.md`](CONTROL_PLANE_RECONCILIATION_2026-07-19.md) and `dashboard/data/control_plane_state.json` for current sequencing. This file is preserved as historical context and is not submission, deployment, certification, legal, or outreach authority.
+
+**Snapshot date:** 2026-07-17 UTC  
 **Owner:** Robert Ashworth  
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
