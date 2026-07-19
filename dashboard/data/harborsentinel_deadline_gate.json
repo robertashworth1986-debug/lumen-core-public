@@ -1,0 +1,239 @@
+{
+  "schema": "harborsentinel_deadline_gate_v1",
+  "as_of_utc": "2026-07-19T05:02:49Z",
+  "public_safe": true,
+  "posture": "BLOCKED_UNKNOWN_NOT_VERIFIED",
+  "deadline_conclusion": "VERIFIED_REAL_DEADLINE",
+  "requirements_conclusion": "VERIFIED_REQUIREMENTS",
+  "proposal_conclusion": "LOCAL_DRAFT_EXISTS_DSIP_UNKNOWN_NOT_VERIFIED",
+  "notice": {
+    "notice_id": "DOD_SBIR_2026_P1_CBZ",
+    "solicitation": "DoW 2026 SBIR Broad Agency Announcement",
+    "release": 3,
+    "amendment": 2,
+    "amendment_date": "2026-07-15",
+    "component": "Department of the Navy",
+    "phase": "Phase I",
+    "topic_id": "DON26BZ03-NV063",
+    "topic_title": "Anomalous Behavior Detection and Alerting for Congested Maritime Environments",
+    "deadline_source_text": "July 22, 2026 at 12:00 p.m. ET",
+    "deadline_local_iso": "2026-07-22T12:00:00-04:00",
+    "deadline_utc_iso": "2026-07-22T16:00:00Z",
+    "timezone_source": "ET",
+    "timezone_iana": "America/New_York",
+    "portal_name": "Defense SBIR/STTR Innovation Portal (DSIP)",
+    "portal_url": "https://www.dodsbirsttr.mil/submissions/"
+  },
+  "official_sources": [
+    {
+      "role": "release_preface",
+      "url": "https://www.dodsbirsttr.mil/submissions/api/public/download/solicitationDocuments?documentType=RELEASE_PREFACE&release=3&solicitation=DOD_SBIR_2026_P1_CBZ",
+      "verification": "VERIFIED_CURRENT",
+      "http_status": 200,
+      "bytes": 676002,
+      "sha256": "FB809186F3B43313A1877A5C36E2383A45B84F62566DDA3F6BCDB93779CE08AE",
+      "local_authoritative_copy_hash_match": true
+    },
+    {
+      "role": "navy_component_instructions_and_topics",
+      "url": "https://www.dodsbirsttr.mil/submissions/api/public/download/solicitationDocuments?component=NAVY&documentType=INSTRUCTIONS&release=3&solicitation=DOD_SBIR_2026_P1_CBZ",
+      "verification": "VERIFIED_CURRENT",
+      "http_status": 200,
+      "bytes": 469496,
+      "sha256": "0741854B1BDBA001D34C7362D954627020FBD4258B1E46554329509030DB3185",
+      "local_authoritative_copy_hash_match": true
+    },
+    {
+      "role": "dsip_current_solicitation_page",
+      "url": "https://www.dodsbirsttr.mil/submissions/login",
+      "verification": "VERIFIED_CURRENT",
+      "observed_facts": [
+        "DoW SBIR 2026 BAA is listed under Active Solicitations",
+        "Release 3 schedule shows June 3, 2026 pre-release, June 24, 2026 open, and July 22, 2026 close",
+        "The July 15, 2026 Amendment 2 announcement is present"
+      ]
+    },
+    {
+      "role": "navy_current_baa_index",
+      "url": "https://www.navysbir.com/topics26_3.htm",
+      "verification": "VERIFIED_CURRENT",
+      "observed_facts": [
+        "DON26BZ03-NV063 is listed in Navy FY-26 Release 3",
+        "The page states a July 22, 2026 close at 12:00 p.m. ET"
+      ]
+    }
+  ],
+  "source_checks": {
+    "dsip_current_solicitation_page": true,
+    "navy_component_instructions_and_topics": true,
+    "navy_current_baa_index": true,
+    "release_preface": true
+  },
+  "official_fact_checks": {
+    "authoritative_sources_current": true,
+    "deadline_exact_and_timezone_consistent": true,
+    "official_notice_exact": true,
+    "official_topic_exact": true,
+    "official_portal_exact": true,
+    "seven_volume_structure_verified": true
+  },
+  "requirements": {
+    "all_seven_volumes_required": true,
+    "required_volumes": [
+      {
+        "volume": 1,
+        "name": "Proposal Cover Sheet",
+        "delivery": "DSIP form",
+        "controls": "Public-safe abstract and benefits fields; firm and proposal certifications apply."
+      },
+      {
+        "volume": 2,
+        "name": "Technical Proposal",
+        "delivery": "Single unlocked PDF upload",
+        "controls": "Maximum 10 pages; 10-point minimum body text; one-inch margins; six-month Base and six-month Option."
+      },
+      {
+        "volume": 3,
+        "name": "Cost Volume",
+        "delivery": "DSIP cost form",
+        "controls": "Base must not exceed $200,000; Option must not exceed $115,000; Base and Option separated; proposing SBC performs at least two-thirds of each; no cost sharing."
+      },
+      {
+        "volume": 4,
+        "name": "Company Commercialization Report",
+        "delivery": "DSIP Volume 4 and Firm Forms",
+        "controls": "A current SBIR.gov CCR PDF is conditionally required for firms with prior Phase I or Phase II SBIR/STTR awards."
+      },
+      {
+        "volume": 5,
+        "name": "Supporting Documents",
+        "delivery": "DSIP administrative-document uploads",
+        "controls": "Applicability review is required for DD Form 2345 or application evidence, majority-owned investment certification, joint-venture eligibility, TABA detail, data-rights assertions, and a fundamental-research disclosure. Technical-merit overflow is not allowed."
+      },
+      {
+        "volume": 6,
+        "name": "Fraud, Waste, and Abuse Training",
+        "delivery": "DSIP annual training step",
+        "controls": "The Proposal Owner must complete the required annual review in DSIP."
+      },
+      {
+        "volume": 7,
+        "name": "Disclosures of Foreign Affiliations or Relationships to Foreign Countries",
+        "delivery": "DSIP webform",
+        "controls": "The webform must be completed and submitted; a PDF upload is not accepted as a substitute."
+      }
+    ],
+    "firm_level_forms_required": true,
+    "corporate_official_electronic_certification_required": true,
+    "non_submitted_portal_states": [
+      "In Progress",
+      "Ready to Certify"
+    ],
+    "topic_controls": [
+      "Projected CMMC Level 2 (Self) requirement must be met before award",
+      "The topic is restricted under ITAR or EAR and requires a controlled foreign-national and export review",
+      "A current NIST SP 800-171 assessment in SPRS is required to be considered for award",
+      "Advanced phases carry U.S.-ownership, foreign-influence mitigation, facility-clearance, and personnel-clearance conditions"
+    ]
+  },
+  "eligibility": [
+    {
+      "id": "sbc_ownership_and_control",
+      "requirement": "The proposing entity qualifies as an eligible small business concern under 13 CFR 121.702.",
+      "applicant_status": "UNKNOWN_NOT_VERIFIED"
+    },
+    {
+      "id": "sba_company_registry",
+      "requirement": "A valid SBA Company Registry SBC Control ID and proof of registration are available for DSIP.",
+      "applicant_status": "UNKNOWN_NOT_VERIFIED"
+    },
+    {
+      "id": "sam_registration",
+      "requirement": "SAM registration and representations are current; an active registration is required at award.",
+      "applicant_status": "UNKNOWN_NOT_VERIFIED"
+    },
+    {
+      "id": "dsip_registration_and_authority",
+      "requirement": "The firm, Firm Admin, Proposal Owner, and Corporate Official have current DSIP access and authority.",
+      "applicant_status": "UNKNOWN_NOT_VERIFIED"
+    },
+    {
+      "id": "principal_investigator_employment",
+      "requirement": "The principal investigator's primary employment is with the proposing SBC at award and during performance.",
+      "applicant_status": "UNKNOWN_NOT_VERIFIED"
+    },
+    {
+      "id": "phase_i_workshare",
+      "requirement": "The proposing SBC performs at least two-thirds of Phase I work in both the Base and Option.",
+      "applicant_status": "UNKNOWN_NOT_VERIFIED"
+    },
+    {
+      "id": "us_performance",
+      "requirement": "The SBC and subcontractors perform all research and development work in the United States.",
+      "applicant_status": "UNKNOWN_NOT_VERIFIED"
+    },
+    {
+      "id": "cmmc_and_sprs",
+      "requirement": "The projected CMMC Level 2 (Self), NIST SP 800-171, and SPRS conditions can be met before award.",
+      "applicant_status": "UNKNOWN_NOT_VERIFIED"
+    },
+    {
+      "id": "export_and_foreign_national_review",
+      "requirement": "ITAR or EAR handling, foreign-national disclosure, and applicable DD Form 2345 evidence are complete and accurate.",
+      "applicant_status": "UNKNOWN_NOT_VERIFIED"
+    },
+    {
+      "id": "advanced_phase_security_path",
+      "requirement": "The later-phase U.S.-ownership, foreign-influence mitigation, facility-clearance, and personnel-clearance path is supportable.",
+      "applicant_status": "UNKNOWN_NOT_VERIFIED"
+    }
+  ],
+  "proposal_state": {
+    "local_candidate": {
+      "status": "EXISTS_LOCAL_DRAFT",
+      "evidence_kind": "redacted_private_manifest_digest",
+      "manifest_sha256": "6AAD562AABB6AD58E6A9AD6C98775735A1F3FF1E431CDC597B7258D2B127EED1",
+      "independent_vault_copy_hash_match": true,
+      "boundary": "This proves only that a local draft assembly existed. Proposal text and private identifiers are intentionally excluded."
+    },
+    "dsip_proposal_record": "UNKNOWN_NOT_VERIFIED",
+    "proposal_number": "UNKNOWN_NOT_VERIFIED",
+    "portal_status": "UNKNOWN_NOT_VERIFIED",
+    "all_required_volumes_complete": "UNKNOWN_NOT_VERIFIED",
+    "required_attachments_complete": "UNKNOWN_NOT_VERIFIED",
+    "eligibility_complete": "UNKNOWN_NOT_VERIFIED",
+    "corporate_official_certification": "UNKNOWN_NOT_VERIFIED",
+    "submission_status": "UNKNOWN_NOT_VERIFIED",
+    "submission_receipt": "UNKNOWN_NOT_VERIFIED",
+    "receipt_search_result": "NO_AUTHORITATIVE_HARBORSENTINEL_PORTAL_RECEIPT_FOUND"
+  },
+  "action_readiness_checks": {
+    "all_required_volumes_complete": false,
+    "corporate_official_certification_verified": false,
+    "dsip_proposal_record_verified": false,
+    "eligibility_verified": false,
+    "portal_status_verified": false,
+    "required_attachments_complete": false,
+    "submission_receipt_verified": false,
+    "submission_status_verified": false
+  },
+  "blockers": [
+    "all_required_volumes_complete: UNKNOWN / NOT VERIFIED",
+    "corporate_official_certification_verified: UNKNOWN / NOT VERIFIED",
+    "dsip_proposal_record_verified: UNKNOWN / NOT VERIFIED",
+    "eligibility_verified: UNKNOWN / NOT VERIFIED",
+    "portal_status_verified: UNKNOWN / NOT VERIFIED",
+    "required_attachments_complete: UNKNOWN / NOT VERIFIED",
+    "submission_receipt_verified: UNKNOWN / NOT VERIFIED",
+    "submission_status_verified: UNKNOWN / NOT VERIFIED"
+  ],
+  "authority_boundary": {
+    "upload_authorized": false,
+    "certification_authorized": false,
+    "submission_authorized": false,
+    "signature_authorized": false,
+    "external_contact_authorized": false,
+    "claim": "This public-safe gate verifies solicitation facts only. It does not certify the applicant, prove a DSIP proposal exists, establish portal status, or authorize any external action."
+  },
+  "safest_next_action": "An authorized human should sign in to DSIP and capture a redacted, read-only receipt showing whether a DON26BZ03-NV063 proposal record exists and its current portal state. During that capture, do not certify, upload, submit, accept new terms on another person's behalf, or expose private identifiers. Then verify each eligibility and conditional-attachment blocker against authoritative records."
+}
