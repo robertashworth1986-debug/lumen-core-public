@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import os
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -21,6 +23,23 @@ MIRROR_RECEIPT_COPY = Path(
     "grant_submissions/funding_sprint_20260709/"
     "MISSIONWEAVE_DSIP_PRIVATE_COLLECTOR_E_DRIVE_SYNC_RECEIPT_2026-07-17.json"
 )
+REFERENCE_UTC = datetime(2026, 7, 19, 3, 20, tzinfo=timezone.utc)
+AUTHORITATIVE_OPEN_GATES = {
+    "ACTION_TIME_APPROVAL_TIMESTAMP",
+    "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+    "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+    "COMPLETE_PORTAL_PREVIEW_REVIEW",
+    "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+    "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+    "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+    "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+    "DSIP_FIRM_PIN_AVAILABILITY",
+    "PORTAL_PREVIEW_RECEIPT_HASH",
+    "SAM_REPRESENTATIONS_CURRENT",
+    "TECHNOLOGY_CONTROL_PLAN_DECISION",
+    "VOLUME3_COST_BASIS",
+    "VOLUME5_UPLOAD_SET",
+}
 
 
 def load_module():
@@ -51,26 +70,97 @@ def synthetic_source_state() -> dict[str, str]:
     return {"volume2_sha256": "A" * 64}
 
 
-def pre_submit_answers(proposal_number: str) -> list[str]:
+def unresolved_evidence_kwargs(module) -> dict:
+    return {
+        "volume3_artifact_state": {"receipt_integrity_pass": False},
+        "jcp_evidence_state": {"evidence_integrity_pass": False},
+        "cmmc_packet_state": {
+            "packet_present": True,
+            "packet_regular_file": True,
+            "schema_valid": True,
+            "integrity_valid": True,
+            "generated_timestamp_valid": True,
+            "missionweave_program_unique": True,
+            "cmmc_requirement_unique": True,
+            "requirement_source_policy_valid": True,
+            "packet_consumed": True,
+            "packet_state": "EVIDENCE_INCOMPLETE",
+            "requirement_evidence_state": "APPLICABILITY_UNRESOLVED",
+            "requirements_review_basis_present": True,
+            "phase_i_position_supported": False,
+            "overclaim_boundary_present": True,
+            "packet_binding_sha256": "C" * 64,
+            "failure_code": None,
+        },
+    }
+
+
+def authoritative_private_payload(module, proposal_number: str) -> dict:
+    payload = module.load_template()
+    payload["template_only"] = False
+    payload["captured_utc"] = (REFERENCE_UTC - timedelta(minutes=5)).isoformat()
+    for field in module.GATE.IDENTITY_GATES:
+        payload["identity"][field] = True
+    for field in module.GATE.PROPOSAL_FLAG_GATES:
+        payload["proposal"][field] = True
+    for field in module.GATE.COMPLIANCE_GATES:
+        payload["eligibility_and_compliance"][field] = True
+
+    payload["identity"]["firm_pin_available_in_dsip"] = False
+    payload["identity"]["sam_representations_current"] = False
+    payload["proposal"].update(
+        {
+            "proposal_number": proposal_number,
+            "volume2_pdf_sha256": "A" * 64,
+            "volume3_total_usd": "100000.00",
+            "portal_preview_sha256": None,
+            "portal_preview_captured_utc": None,
+            "portal_preview_binding_sha256": None,
+            "volume3_cost_basis_supported": False,
+            "volume5_upload_set_reviewed": False,
+            "portal_preview_reviewed": False,
+        }
+    )
+    compliance = payload["eligibility_and_compliance"]
+    for field in (
+        "cmmc_phase_i_self_assessment_position_supported",
+        "conflicts_and_joint_venture_status_reviewed",
+        "current_cmmc_requirements_reviewed",
+        "dd2345_or_jcp_application_evidence_ready",
+        "technology_control_plan_decision_documented",
+    ):
+        compliance[field] = False
+    compliance["itar_scope_determination"] = "SUBJECT_TO_ITAR"
+    return payload
+
+
+def keep_pre_submit_answers() -> list[str]:
     return [
-        *(["y"] * 13),
-        proposal_number,
-        *(["y"] * 10),
-        "A" * 64,
-        "100000",
-        "B" * 64,
-        *(["y"] * 17),
-        "1",
+        *(["k"] * 13),
+        "",
+        *(["k"] * 10),
+        "",
+        "",
+        "",
+        *(["k"] * 17),
+        "k",
     ]
 
 
-def test_pre_submit_capture_completes_47_gates_and_excludes_approval(tmp_path: Path):
+def test_pre_submit_preserves_authoritative_36_of_50_and_excludes_approval(
+    tmp_path: Path,
+):
     module = load_module()
     root = tmp_path / "repo"
     private_dir = root / "private"
     target = private_dir / "MISSIONWEAVE_DSIP_ACTION.private.json"
     proposal_number = "DLA26BZ03-NV011-TEST0001"
-    prompt = prompt_from(pre_submit_answers(proposal_number))
+    private_dir.mkdir(parents=True)
+    target.write_text(
+        json.dumps(authoritative_private_payload(module, proposal_number)),
+        encoding="utf-8",
+    )
+    prompt = prompt_from(keep_pre_submit_answers())
 
     receipt = module.capture_private_sections(
         ["pre-submit"],
@@ -81,6 +171,8 @@ def test_pre_submit_capture_completes_47_gates_and_excludes_approval(tmp_path: P
         ignored_checker=lambda _path: True,
         source_state=synthetic_source_state(),
         volume2_text=f"{proposal_number}\nfinal assigned proposal header",
+        reference_utc=REFERENCE_UTC,
+        **unresolved_evidence_kwargs(module),
     )
 
     private = json.loads(target.read_text(encoding="utf-8"))
@@ -97,13 +189,11 @@ def test_pre_submit_capture_completes_47_gates_and_excludes_approval(tmp_path: P
     assert receipt["sections_updated"] == list(module.PRE_SUBMIT_SECTIONS)
     assert receipt["approval_section_explicitly_requested"] is False
     assert receipt["gate_summary"]["required_gate_count"] == 50
-    assert receipt["gate_summary"]["passed_gate_count"] == 47
-    assert receipt["gate_summary"]["open_gate_count"] == 3
-    assert set(receipt["gate_summary"]["unresolved_gates"]) == {
-        "ACTION_TIME_APPROVAL_TIMESTAMP",
-        "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
-        "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
-    }
+    assert receipt["gate_summary"]["passed_gate_count"] == 36
+    assert receipt["gate_summary"]["open_gate_count"] == 14
+    assert set(receipt["gate_summary"]["unresolved_gates"]) == (
+        AUTHORITATIVE_OPEN_GATES
+    )
     assert receipt["credential_values_requested"] is False
     assert receipt["firm_pin_value_requested"] is False
     assert receipt["browser_navigation_performed"] is False
@@ -114,7 +204,7 @@ def test_pre_submit_capture_completes_47_gates_and_excludes_approval(tmp_path: P
     assert "100000.00" not in public_receipt
 
 
-def test_explicit_approval_resumes_record_and_can_close_only_remaining_gates(
+def test_explicit_approval_cannot_turn_authoritative_open_state_into_50_of_50(
     tmp_path: Path,
 ):
     module = load_module()
@@ -125,17 +215,80 @@ def test_explicit_approval_resumes_record_and_can_close_only_remaining_gates(
     source_state = synthetic_source_state()
     volume2_text = f"{proposal_number}\nfinal assigned proposal header"
 
-    module.capture_private_sections(
-        ["pre-submit"],
-        prompt=prompt_from(pre_submit_answers(proposal_number)),
+    private_dir.mkdir(parents=True)
+    target.write_text(
+        json.dumps(authoritative_private_payload(module, proposal_number)),
+        encoding="utf-8",
+    )
+    before = target.read_bytes()
+
+    with pytest.raises(module.CaptureError) as error:
+        module.capture_private_sections(
+            ["approval"],
+            prompt=prompt_from(["y", "y"]),
+            target=target,
+            root=root,
+            private_dir=private_dir,
+            ignored_checker=lambda _path: True,
+            source_state=source_state,
+            volume2_text=volume2_text,
+            reference_utc=REFERENCE_UTC,
+            **unresolved_evidence_kwargs(module),
+        )
+
+    assert error.value.code == "APPROVAL_REQUIRES_FRESH_CURRENT_PREVIEW"
+    assert target.read_bytes() == before
+
+
+def test_fresh_preview_and_approval_bind_current_upload_then_upstream_change_clears_them(
+    tmp_path: Path,
+):
+    module = load_module()
+    root = tmp_path / "repo"
+    private_dir = root / "private"
+    target = private_dir / "MISSIONWEAVE_DSIP_ACTION.private.json"
+    proposal_number = "DLA26BZ03-NV011-TEST0003"
+    source_state = synthetic_source_state()
+    volume2_text = f"{proposal_number}\nfinal assigned proposal header"
+    private_dir.mkdir(parents=True)
+    target.write_text(
+        json.dumps(authoritative_private_payload(module, proposal_number)),
+        encoding="utf-8",
+    )
+    preview_file = tmp_path / "current-private-preview.txt"
+    preview_file.write_text("current portal preview and upload set", encoding="utf-8")
+    preview_timestamp = REFERENCE_UTC.timestamp()
+    os.utime(preview_file, (preview_timestamp, preview_timestamp))
+    proposal_answers = [
+        "",
+        "k",
+        "k",
+        "k",
+        "k",
+        "k",
+        "k",
+        "y",
+        "k",
+        "k",
+        "y",
+        "",
+        "",
+    ]
+
+    preview_receipt = module.capture_private_sections(
+        ["proposal"],
+        prompt=prompt_from(proposal_answers),
         target=target,
         root=root,
         private_dir=private_dir,
         ignored_checker=lambda _path: True,
+        preview_receipt_file=preview_file,
         source_state=source_state,
         volume2_text=volume2_text,
+        reference_utc=REFERENCE_UTC,
+        **unresolved_evidence_kwargs(module),
     )
-    receipt = module.capture_private_sections(
+    approval_receipt = module.capture_private_sections(
         ["approval"],
         prompt=prompt_from(["y", "y"]),
         target=target,
@@ -144,18 +297,97 @@ def test_explicit_approval_resumes_record_and_can_close_only_remaining_gates(
         ignored_checker=lambda _path: True,
         source_state=source_state,
         volume2_text=volume2_text,
+        reference_utc=REFERENCE_UTC + timedelta(minutes=1),
+        **unresolved_evidence_kwargs(module),
     )
-
     private = json.loads(target.read_text(encoding="utf-8"))
-    assert receipt["status"] == "PRIVATE_INPUT_COMPLETE_READY_FOR_PUBLIC_GATE"
-    assert receipt["existing_private_input_resumed"] is True
-    assert receipt["approval_section_explicitly_requested"] is True
-    assert receipt["action_time_authorization_gate_passed"] is True
-    assert receipt["gate_summary"]["passed_gate_count"] == 50
-    assert receipt["gate_summary"]["open_gate_count"] == 0
-    assert private["approval"]["corporate_official_reviewed_all_volumes"] is True
-    assert private["approval"]["final_submission_authorized_at_action_time"] is True
-    assert module.GATE.valid_timestamp(private["approval"]["approval_utc"])
+
+    assert preview_receipt["action_time_authorization_gate_passed"] is False
+    assert approval_receipt["status"] == "PRIVATE_INPUT_SECTION_CAPTURED_GATES_OPEN"
+    assert approval_receipt["action_time_authorization_gate_passed"] is True
+    assert approval_receipt["gate_summary"]["passed_gate_count"] == 42
+    assert approval_receipt["gate_summary"]["open_gate_count"] == 8
+    assert "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION" in approval_receipt[
+        "gate_summary"
+    ]["unresolved_gates"]
+    assert module.GATE.valid_sha256(
+        private["proposal"]["portal_preview_binding_sha256"]
+    )
+    assert module.GATE.valid_sha256(private["approval"]["approval_binding_sha256"])
+
+    module.capture_private_sections(
+        ["identity"],
+        prompt=prompt_from(["n", *(["k"] * 12)]),
+        target=target,
+        root=root,
+        private_dir=private_dir,
+        ignored_checker=lambda _path: True,
+        source_state=source_state,
+        volume2_text=volume2_text,
+        reference_utc=REFERENCE_UTC + timedelta(minutes=2),
+        **unresolved_evidence_kwargs(module),
+    )
+    invalidated = json.loads(target.read_text(encoding="utf-8"))
+    assert invalidated["proposal"]["portal_preview_reviewed"] is False
+    assert invalidated["proposal"]["portal_preview_captured_utc"] is None
+    assert invalidated["proposal"]["portal_preview_binding_sha256"] is None
+    assert invalidated["approval"]["corporate_official_reviewed_all_volumes"] is False
+    assert invalidated["approval"]["final_submission_authorized_at_action_time"] is False
+    assert invalidated["approval"]["approval_utc"] is None
+    assert invalidated["approval"]["approval_binding_sha256"] is None
+
+
+def test_template_placeholders_cannot_clear_legal_founder_or_portal_gates(
+    tmp_path: Path,
+):
+    module = load_module()
+    template = json.loads(module.TEMPLATE.read_text(encoding="utf-8"))
+    template["captured_utc"] = REFERENCE_UTC.isoformat()
+    for section_name in (
+        "identity",
+        "proposal",
+        "eligibility_and_compliance",
+        "approval",
+    ):
+        for field, value in template[section_name].items():
+            if isinstance(value, bool):
+                template[section_name][field] = True
+    template["proposal"].update(
+        {
+            "proposal_number": "DLA26BZ03-NV011-PLACEHOLDER",
+            "volume2_pdf_sha256": "A" * 64,
+            "volume3_total_usd": "100000.00",
+            "portal_preview_sha256": "B" * 64,
+        }
+    )
+    template["eligibility_and_compliance"]["itar_scope_determination"] = (
+        "SUBJECT_TO_ITAR"
+    )
+    template["approval"]["approval_utc"] = REFERENCE_UTC.isoformat()
+    placeholder_path = tmp_path / "placeholder-template.json"
+    placeholder_path.write_text(json.dumps(template), encoding="utf-8")
+
+    clean = module.load_template(placeholder_path)
+
+    assert clean["captured_utc"] is None
+    assert all(value is False for value in clean["identity"].values())
+    assert all(clean["proposal"][field] is False for field in module.GATE.PROPOSAL_FLAG_GATES)
+    assert all(
+        clean["proposal"][field] is None
+        for field in module.GATE.PROPOSAL_VALUE_KEYS
+        | module.GATE.PROPOSAL_CONSISTENCY_KEYS
+    )
+    assert all(
+        clean["eligibility_and_compliance"][field] is False
+        for field in module.GATE.COMPLIANCE_GATES
+    )
+    assert clean["eligibility_and_compliance"]["itar_scope_determination"] is None
+    assert all(clean["approval"][field] is False for field in module.GATE.APPROVAL_FLAG_GATES)
+    assert all(
+        clean["approval"][field] is None
+        for field in module.GATE.APPROVAL_VALUE_KEYS
+        | module.GATE.APPROVAL_CONSISTENCY_KEYS
+    )
 
 
 def test_approval_cannot_authorize_before_all_volume_review(tmp_path: Path):
@@ -174,6 +406,8 @@ def test_approval_cannot_authorize_before_all_volume_review(tmp_path: Path):
             ignored_checker=lambda _path: True,
             source_state=synthetic_source_state(),
             volume2_text="neutral candidate",
+            reference_utc=REFERENCE_UTC,
+            **unresolved_evidence_kwargs(module),
         )
 
     assert error.value.code == "APPROVAL_REQUIRES_ALL_VOLUME_REVIEW"
@@ -236,6 +470,8 @@ def test_schema_drift_or_public_target_fails_before_hidden_prompts(tmp_path: Pat
             ignored_checker=lambda _path: True,
             source_state=synthetic_source_state(),
             volume2_text="neutral candidate",
+            reference_utc=REFERENCE_UTC,
+            **unresolved_evidence_kwargs(module),
         )
 
     with pytest.raises(module.CaptureError) as public_error:
@@ -284,6 +520,8 @@ def test_existing_credential_like_value_fails_before_prompting(tmp_path: Path):
             ignored_checker=lambda _path: True,
             source_state=synthetic_source_state(),
             volume2_text="neutral candidate",
+            reference_utc=REFERENCE_UTC,
+            **unresolved_evidence_kwargs(module),
         )
 
     assert error.value.code == "CREDENTIAL_LIKE_VALUE_REJECTED"
@@ -351,6 +589,38 @@ def test_preview_receipt_hashes_locally_without_returning_path(tmp_path: Path):
 
     assert module.GATE.valid_sha256(digest)
     assert str(receipt_file) not in digest
+
+
+def test_preview_receipt_rejects_stale_file_and_manual_digest_has_no_binding(
+    tmp_path: Path,
+):
+    module = load_module()
+    receipt_file = tmp_path / "stale-private-preview.txt"
+    receipt_file.write_text("stale portal preview", encoding="utf-8")
+    stale_timestamp = (REFERENCE_UTC - timedelta(minutes=31)).timestamp()
+    os.utime(receipt_file, (stale_timestamp, stale_timestamp))
+
+    with pytest.raises(module.CaptureError) as stale_error:
+        module.capture_preview_receipt(receipt_file, reference_utc=REFERENCE_UTC)
+    assert stale_error.value.code == "PREVIEW_RECEIPT_NOT_FRESH"
+
+    payload = authoritative_private_payload(
+        module, "DLA26BZ03-NV011-MANUALHASH"
+    )
+    module.collect_proposal(
+        payload,
+        prompt=prompt_from(
+            ["", *(["k"] * 10), "", "", "B" * 64]
+        ),
+        use_current_volume2_hash=False,
+        preview_receipt_file=None,
+        reference_utc=REFERENCE_UTC,
+        **unresolved_evidence_kwargs(module),
+    )
+
+    assert payload["proposal"]["portal_preview_sha256"] == "B" * 64
+    assert payload["proposal"]["portal_preview_captured_utc"] is None
+    assert payload["proposal"]["portal_preview_binding_sha256"] is None
 
 
 def test_current_volume2_hash_uses_only_guarded_private_final(

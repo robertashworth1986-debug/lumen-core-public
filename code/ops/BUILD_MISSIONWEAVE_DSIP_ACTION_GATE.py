@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import hmac
 import json
 import re
 import shutil
 import subprocess
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
@@ -41,6 +42,12 @@ PRIVATE_JCP_EVIDENCE_TEMPLATE = (
 JCP_EVIDENCE_PROTOCOL = (
     PACKAGE_DIR / "MISSIONWEAVE_JCP_EVIDENCE_PROTOCOL_2026-07-18.json"
 )
+CMMC_EVIDENCE_PACKET = (
+    ROOT
+    / "grant_submissions"
+    / "compliance_evidence"
+    / "CMMC_EXPORT_EVIDENCE_PACKET_2026-07-18.json"
+)
 OUT_JSON = PACKAGE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
 OUT_MD = PACKAGE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md"
 OUT_CHECKLIST = PACKAGE_DIR / "MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md"
@@ -51,6 +58,19 @@ PRIVATE_VOLUME3_RECEIPT_SCHEMA = (
     "lumencore.missionweave_dsip_volume3_final_receipt_private.v1"
 )
 PRIVATE_JCP_EVIDENCE_SCHEMA = "lumencore.missionweave_jcp_evidence_private.v1"
+CMMC_PACKET_SCHEMA = "lumencore.cmmc_export_evidence_packet.v1"
+CMMC_PROGRAM_ID = "MissionWeave"
+CMMC_FACT_ID = "missionweave.cmmc_l2_self_status"
+CMMC_CONTROL = "CMMC_L2_SELF_STATUS"
+CMMC_READY_EVIDENCE_STATES = frozenset(
+    {"AUTHORITATIVE_PROOF_INVENTORIED", "NOT_APPLICABLE_REVIEW_INVENTORIED"}
+)
+CMMC_PROHIBITED_CONCLUSIONS = frozenset(
+    {"compliant", "certified", "award_eligible"}
+)
+CMMC_NON_AUTHORITATIVE_SOURCE_CLASSES = frozenset(
+    {"FOUNDER_ATTESTATION", "PORTAL_OBSERVED"}
+)
 JCP_EVIDENCE_KINDS = frozenset(
     {"CERTIFIED_DD2345", "JCP_APPLICATION_SUBMISSION_RECEIPT"}
 )
@@ -59,6 +79,16 @@ EXPECTED_DEADLINE = "2026-07-22T12:00:00-04:00"
 PHASE_I_CEILING = Decimal("100000")
 VOLUME2_PAGE_LIMIT = 20
 NEUTRAL_PROPOSAL_HEADER = "Proposal No. assigned in DSIP"
+PREVIEW_RECEIPT_MAX_AGE = timedelta(minutes=30)
+ACTION_TIME_APPROVAL_MAX_AGE = timedelta(minutes=15)
+FUTURE_TIMESTAMP_TOLERANCE = timedelta(minutes=2)
+ACTION_CONTEXT_SCHEMA = "lumencore.missionweave_dsip_action_context.v1"
+PREVIEW_EVIDENCE_BINDING_SCHEMA = (
+    "lumencore.missionweave_dsip_preview_evidence_binding.v1"
+)
+ACTION_APPROVAL_BINDING_SCHEMA = (
+    "lumencore.missionweave_dsip_action_approval_binding.v1"
+)
 
 IDENTITY_GATES = {
     "dsip_authenticated": "DSIP_AUTHENTICATION",
@@ -113,6 +143,19 @@ APPROVAL_FLAG_GATES = {
     "corporate_official_reviewed_all_volumes": "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
     "final_submission_authorized_at_action_time": "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
 }
+
+PROPOSAL_VALUE_KEYS = {
+    "proposal_number",
+    "volume2_pdf_sha256",
+    "volume3_total_usd",
+    "portal_preview_sha256",
+}
+PROPOSAL_CONSISTENCY_KEYS = {
+    "portal_preview_binding_sha256",
+    "portal_preview_captured_utc",
+}
+APPROVAL_VALUE_KEYS = {"approval_utc"}
+APPROVAL_CONSISTENCY_KEYS = {"approval_binding_sha256"}
 
 SPECIAL_GATES = (
     "PRIVATE_INPUT_TIMESTAMP",
@@ -300,6 +343,39 @@ def valid_timestamp(value: Any) -> bool:
     return parsed.tzinfo is not None
 
 
+def parse_timestamp(value: Any) -> datetime | None:
+    if not valid_timestamp(value):
+        return None
+    parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    return parsed.astimezone(timezone.utc)
+
+
+def normalize_reference_time(value: datetime | str | None = None) -> datetime:
+    if value is None:
+        return datetime.now(timezone.utc)
+    if isinstance(value, str):
+        parsed = parse_timestamp(value)
+        if parsed is None:
+            raise MissionWeaveGateError("EVALUATION_TIMESTAMP_INVALID")
+        return parsed
+    if isinstance(value, datetime) and value.tzinfo is not None:
+        return value.astimezone(timezone.utc)
+    raise MissionWeaveGateError("EVALUATION_TIMESTAMP_INVALID")
+
+
+def timestamp_is_fresh(
+    value: Any,
+    *,
+    reference_utc: datetime,
+    max_age: timedelta,
+) -> bool:
+    parsed = parse_timestamp(value)
+    if parsed is None:
+        return False
+    age = reference_utc - parsed
+    return -FUTURE_TIMESTAMP_TOLERANCE <= age <= max_age
+
+
 def valid_sha256(value: Any) -> bool:
     return isinstance(value, str) and re.fullmatch(r"[A-Fa-f0-9]{64}", value) is not None
 
@@ -330,7 +406,7 @@ def parse_phase_i_total(value: Any) -> Decimal | None:
 def inspect_private_volume3_artifact(
     receipt_path: Path = PRIVATE_FINAL_VOLUME3_RECEIPT,
     workbook_path: Path = PRIVATE_FINAL_VOLUME3_WORKBOOK,
-) -> dict[str, bool]:
+) -> dict[str, Any]:
     receipt_target = validate_private_target(receipt_path)
     workbook_target = validate_private_target(workbook_path)
     receipt_present = receipt_target.is_file()
@@ -346,6 +422,7 @@ def inspect_private_volume3_artifact(
         "financial_reconciliation_pass": False,
         "review_guardrails_preserved": False,
         "receipt_integrity_pass": False,
+        "artifact_binding_sha256": None,
         "private_path_exposed": False,
         "private_hash_exposed": False,
     }
@@ -398,7 +475,28 @@ def inspect_private_volume3_artifact(
             "review_guardrails_preserved",
         )
     )
+    state["artifact_binding_sha256"] = (
+        stable_sha256(receipt).upper() if state["receipt_integrity_pass"] else None
+    )
     return state
+
+
+def volume3_artifact_is_verified(state: Any) -> bool:
+    if not isinstance(state, dict):
+        return False
+    return bool(
+        state.get("receipt_present") is True
+        and state.get("workbook_present") is True
+        and state.get("receipt_header_valid") is True
+        and state.get("workbook_size_matches_receipt") is True
+        and state.get("workbook_hash_matches_receipt") is True
+        and state.get("formula_scan_clean") is True
+        and state.get("export_reimport_verified") is True
+        and state.get("financial_reconciliation_pass") is True
+        and state.get("review_guardrails_preserved") is True
+        and state.get("receipt_integrity_pass") is True
+        and valid_sha256(state.get("artifact_binding_sha256"))
+    )
 
 
 def inspect_private_jcp_evidence(
@@ -416,6 +514,7 @@ def inspect_private_jcp_evidence(
         "evidence_integrity_pass": False,
         "evidence_kind": None,
         "failure_code": "PRIVATE_JCP_RECEIPT_NOT_FOUND",
+        "evidence_binding_sha256": None,
         "private_path_exposed": False,
         "private_hash_exposed": False,
     }
@@ -505,6 +604,9 @@ def inspect_private_jcp_evidence(
             "entity_match_confirmed": entity_match,
             "corporate_official_reviewed": corporate_review,
             "evidence_integrity_pass": evidence_integrity_pass,
+            "evidence_binding_sha256": (
+                stable_sha256(receipt).upper() if evidence_integrity_pass else None
+            ),
             "failure_code": (
                 None
                 if evidence_integrity_pass
@@ -515,8 +617,249 @@ def inspect_private_jcp_evidence(
     return state
 
 
+def jcp_evidence_is_verified(state: Any) -> bool:
+    if not isinstance(state, dict):
+        return False
+    return bool(
+        state.get("receipt_present") is True
+        and state.get("receipt_header_valid") is True
+        and state.get("evidence_file_present") is True
+        and state.get("evidence_pdf") is True
+        and state.get("evidence_hash_matches_receipt") is True
+        and state.get("source_metadata_valid") is True
+        and state.get("entity_match_confirmed") is True
+        and state.get("corporate_official_reviewed") is True
+        and state.get("evidence_integrity_pass") is True
+        and state.get("evidence_kind") in JCP_EVIDENCE_KINDS
+        and state.get("failure_code") is None
+        and valid_sha256(state.get("evidence_binding_sha256"))
+    )
+
+
+def inspect_cmmc_evidence_packet(
+    packet_path: Path = CMMC_EVIDENCE_PACKET,
+) -> dict[str, Any]:
+    state: dict[str, Any] = {
+        "packet_present": packet_path.is_file(),
+        "packet_regular_file": False,
+        "schema_valid": False,
+        "integrity_valid": False,
+        "generated_timestamp_valid": False,
+        "missionweave_program_unique": False,
+        "cmmc_requirement_unique": False,
+        "requirement_source_policy_valid": False,
+        "packet_consumed": False,
+        "packet_state": None,
+        "requirement_evidence_state": None,
+        "requirements_review_basis_present": False,
+        "phase_i_position_supported": False,
+        "overclaim_boundary_present": False,
+        "packet_binding_sha256": None,
+        "failure_code": "CMMC_EVIDENCE_PACKET_NOT_FOUND",
+    }
+    if packet_path.is_symlink() or not packet_path.is_file():
+        if packet_path.is_symlink():
+            state["failure_code"] = "CMMC_EVIDENCE_PACKET_SYMLINK_REJECTED"
+        return state
+    state["packet_regular_file"] = True
+
+    try:
+        packet = json.loads(packet_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        state["failure_code"] = "CMMC_EVIDENCE_PACKET_INVALID"
+        return state
+    if not isinstance(packet, dict):
+        state["failure_code"] = "CMMC_EVIDENCE_PACKET_NOT_OBJECT"
+        return state
+
+    integrity = packet.get("integrity")
+    expected_hash = integrity.get("packet_sha256") if isinstance(integrity, dict) else None
+    candidate = deepcopy(packet)
+    candidate_integrity = candidate.get("integrity")
+    if isinstance(candidate_integrity, dict):
+        candidate_integrity["packet_sha256"] = ""
+    integrity_valid = bool(
+        isinstance(integrity, dict)
+        and integrity.get("hash_algorithm") == "SHA-256"
+        and valid_sha256(expected_hash)
+        and hmac.compare_digest(
+            str(expected_hash).casefold(), stable_sha256(candidate).casefold()
+        )
+    )
+    state["schema_valid"] = packet.get("schema") == CMMC_PACKET_SCHEMA
+    state["integrity_valid"] = integrity_valid
+    state["generated_timestamp_valid"] = valid_timestamp(packet.get("generated_utc"))
+    state["packet_state"] = (
+        packet.get("packet_state")
+        if isinstance(packet.get("packet_state"), str)
+        else None
+    )
+
+    programs = packet.get("programs")
+    missionweave_programs = (
+        [
+            program
+            for program in programs
+            if isinstance(program, dict)
+            and program.get("program_id") == CMMC_PROGRAM_ID
+        ]
+        if isinstance(programs, list)
+        else []
+    )
+    state["missionweave_program_unique"] = len(missionweave_programs) == 1
+    requirements = (
+        missionweave_programs[0].get("requirements", [])
+        if state["missionweave_program_unique"]
+        else []
+    )
+    cmmc_requirements = (
+        [
+            requirement
+            for requirement in requirements
+            if isinstance(requirement, dict)
+            and requirement.get("fact_id") == CMMC_FACT_ID
+            and requirement.get("control") == CMMC_CONTROL
+        ]
+        if isinstance(requirements, list)
+        else []
+    )
+    state["cmmc_requirement_unique"] = len(cmmc_requirements) == 1
+    requirement = cmmc_requirements[0] if len(cmmc_requirements) == 1 else {}
+    accepted_source_classes = requirement.get("accepted_source_classes")
+    accepted_source_class_set = (
+        {
+            item
+            for item in accepted_source_classes
+            if isinstance(item, str) and item
+        }
+        if isinstance(accepted_source_classes, list)
+        else set()
+    )
+    state["requirement_source_policy_valid"] = bool(
+        accepted_source_class_set
+        and not CMMC_NON_AUTHORITATIVE_SOURCE_CLASSES.intersection(
+            accepted_source_class_set
+        )
+    )
+    evidence_state = requirement.get("evidence_state")
+    state["requirement_evidence_state"] = (
+        evidence_state if isinstance(evidence_state, str) else None
+    )
+
+    packet_consumed = bool(
+        state["packet_regular_file"]
+        and state["schema_valid"]
+        and state["integrity_valid"]
+        and state["generated_timestamp_valid"]
+        and state["missionweave_program_unique"]
+        and state["cmmc_requirement_unique"]
+        and state["requirement_source_policy_valid"]
+    )
+    packet_prohibited = packet.get("prohibited_conclusions")
+    requirement_prohibited = requirement.get("prohibited_conclusions")
+    packet_prohibited_set = (
+        {item for item in packet_prohibited if isinstance(item, str)}
+        if isinstance(packet_prohibited, list)
+        else set()
+    )
+    requirement_prohibited_set = (
+        {item for item in requirement_prohibited if isinstance(item, str)}
+        if isinstance(requirement_prohibited, list)
+        else set()
+    )
+    evidence_rows = requirement.get("evidence")
+    accepted_evidence_count = (
+        sum(
+            isinstance(row, dict)
+            and row.get("evaluation") == "ACCEPTED_PROOF_METADATA"
+            for row in evidence_rows
+        )
+        if isinstance(evidence_rows, list)
+        else 0
+    )
+    authoritative_count = requirement.get("authoritative_proof_count")
+    authoritative_position_supported = bool(
+        evidence_state == "AUTHORITATIVE_PROOF_INVENTORIED"
+        and isinstance(authoritative_count, int)
+        and not isinstance(authoritative_count, bool)
+        and authoritative_count > 0
+        and accepted_evidence_count == authoritative_count
+        and requirement.get("issues") == []
+    )
+    applicability = requirement.get("applicability")
+    not_applicable_position_supported = bool(
+        evidence_state == "NOT_APPLICABLE_REVIEW_INVENTORIED"
+        and isinstance(applicability, dict)
+        and applicability.get("state") == "NOT_APPLICABLE"
+        and applicability.get("decided_by_source_class")
+        in {"LEGAL_REVIEW", "AGENCY_DETERMINATION"}
+        and applicability.get("named_reviewer_present") is True
+        and isinstance(applicability.get("reviewer_role"), str)
+        and bool(applicability.get("reviewer_role"))
+        and isinstance(applicability.get("decision_ref"), str)
+        and str(applicability.get("decision_ref")).startswith(
+            ("private-ref:", "official-source:")
+        )
+        and valid_sha256(applicability.get("decision_sha256"))
+        and requirement.get("issues") == []
+    )
+    state["packet_consumed"] = packet_consumed
+    state["requirements_review_basis_present"] = packet_consumed
+    state["phase_i_position_supported"] = bool(
+        packet_consumed
+        and evidence_state in CMMC_READY_EVIDENCE_STATES
+        and (
+            authoritative_position_supported
+            or not_applicable_position_supported
+        )
+    )
+    state["overclaim_boundary_present"] = bool(
+        packet_consumed
+        and CMMC_PROHIBITED_CONCLUSIONS.issubset(packet_prohibited_set)
+        and CMMC_PROHIBITED_CONCLUSIONS.issubset(requirement_prohibited_set)
+    )
+    state["packet_binding_sha256"] = (
+        str(expected_hash).upper() if packet_consumed else None
+    )
+    state["failure_code"] = None if packet_consumed else "CMMC_EVIDENCE_PACKET_REJECTED"
+    return state
+
+
+def cmmc_packet_is_consumed(state: Any) -> bool:
+    if not isinstance(state, dict):
+        return False
+    return bool(
+        state.get("packet_present") is True
+        and state.get("packet_regular_file") is True
+        and state.get("schema_valid") is True
+        and state.get("integrity_valid") is True
+        and state.get("generated_timestamp_valid") is True
+        and state.get("missionweave_program_unique") is True
+        and state.get("cmmc_requirement_unique") is True
+        and state.get("requirement_source_policy_valid") is True
+        and state.get("packet_consumed") is True
+        and state.get("requirements_review_basis_present") is True
+        and state.get("failure_code") is None
+        and valid_sha256(state.get("packet_binding_sha256"))
+    )
+
+
 def require_exact_keys(section: Any, expected: set[str], code: str) -> dict[str, Any]:
     if not isinstance(section, dict) or set(section) != expected:
+        raise MissionWeaveGateError(code)
+    return section
+
+
+def require_compatible_keys(
+    section: Any,
+    required: set[str],
+    optional: set[str],
+    code: str,
+) -> dict[str, Any]:
+    if not isinstance(section, dict):
+        raise MissionWeaveGateError(code)
+    keys = set(section)
+    if not required.issubset(keys) or keys.difference(required | optional):
         raise MissionWeaveGateError(code)
     return section
 
@@ -680,12 +1023,128 @@ def gate_reconciliation_groups(unresolved_gates: list[str]) -> dict[str, Any]:
     return groups
 
 
+def current_upload_set_identity_sha256(
+    payload: dict[str, Any],
+    *,
+    jcp_evidence_state: dict[str, Any],
+    volume3_artifact_state: dict[str, Any],
+    cmmc_packet_state: dict[str, Any],
+) -> str:
+    identity = payload.get("identity")
+    proposal = payload.get("proposal")
+    compliance = payload.get("eligibility_and_compliance")
+    identity = identity if isinstance(identity, dict) else {}
+    proposal = proposal if isinstance(proposal, dict) else {}
+    compliance = compliance if isinstance(compliance, dict) else {}
+    context = {
+        "schema": ACTION_CONTEXT_SCHEMA,
+        "topic": payload.get("topic"),
+        "identity_gate_state": {
+            field: identity.get(field) for field in sorted(IDENTITY_GATES)
+        },
+        "proposal_upload_state": {
+            field: proposal.get(field)
+            for field in sorted(
+                (set(PROPOSAL_FLAG_GATES) - {"portal_preview_reviewed"})
+                | (PROPOSAL_VALUE_KEYS - {"portal_preview_sha256"})
+            )
+        },
+        "compliance_gate_state": {
+            field: compliance.get(field)
+            for field in sorted(set(COMPLIANCE_GATES) | {"itar_scope_determination"})
+        },
+        "jcp_evidence_binding_sha256": (
+            jcp_evidence_state.get("evidence_binding_sha256")
+            if jcp_evidence_is_verified(jcp_evidence_state)
+            else None
+        ),
+        "volume3_artifact_binding_sha256": (
+            volume3_artifact_state.get("artifact_binding_sha256")
+            if volume3_artifact_is_verified(volume3_artifact_state)
+            else None
+        ),
+        "cmmc_packet_binding_sha256": (
+            cmmc_packet_state.get("packet_binding_sha256")
+            if cmmc_packet_is_consumed(cmmc_packet_state)
+            else None
+        ),
+    }
+    return stable_sha256(context).upper()
+
+
+def preview_evidence_binding_sha256(
+    payload: dict[str, Any],
+    *,
+    jcp_evidence_state: dict[str, Any],
+    volume3_artifact_state: dict[str, Any],
+    cmmc_packet_state: dict[str, Any],
+) -> str | None:
+    proposal = payload.get("proposal")
+    if not isinstance(proposal, dict):
+        return None
+    preview_sha256 = proposal.get("portal_preview_sha256")
+    captured_utc = proposal.get("portal_preview_captured_utc")
+    if not valid_sha256(preview_sha256) or not valid_timestamp(captured_utc):
+        return None
+    binding = {
+        "schema": PREVIEW_EVIDENCE_BINDING_SCHEMA,
+        "topic": payload.get("topic"),
+        "portal_preview_sha256": str(preview_sha256).upper(),
+        "portal_preview_captured_utc": captured_utc,
+        "upload_set_identity_sha256": current_upload_set_identity_sha256(
+            payload,
+            jcp_evidence_state=jcp_evidence_state,
+            volume3_artifact_state=volume3_artifact_state,
+            cmmc_packet_state=cmmc_packet_state,
+        ),
+    }
+    return stable_sha256(binding).upper()
+
+
+def action_time_approval_binding_sha256(
+    payload: dict[str, Any],
+    *,
+    approval_utc: Any,
+    jcp_evidence_state: dict[str, Any],
+    volume3_artifact_state: dict[str, Any],
+    cmmc_packet_state: dict[str, Any],
+) -> str | None:
+    if not valid_timestamp(approval_utc):
+        return None
+    approval = payload.get("approval")
+    approval = approval if isinstance(approval, dict) else {}
+    binding = {
+        "schema": ACTION_APPROVAL_BINDING_SCHEMA,
+        "topic": payload.get("topic"),
+        "approval_utc": approval_utc,
+        "approval_gate_state": {
+            field: approval.get(field) for field in sorted(APPROVAL_FLAG_GATES)
+        },
+        "preview_evidence_binding_sha256": preview_evidence_binding_sha256(
+            payload,
+            jcp_evidence_state=jcp_evidence_state,
+            volume3_artifact_state=volume3_artifact_state,
+            cmmc_packet_state=cmmc_packet_state,
+        ),
+        "upload_set_identity_sha256": current_upload_set_identity_sha256(
+            payload,
+            jcp_evidence_state=jcp_evidence_state,
+            volume3_artifact_state=volume3_artifact_state,
+            cmmc_packet_state=cmmc_packet_state,
+        ),
+    }
+    return stable_sha256(binding).upper()
+
+
 def evaluate_private_payload(
     payload: dict[str, Any],
     *,
     source_state: dict[str, Any],
     volume2_text: str,
+    volume3_artifact_state: dict[str, Any] | None = None,
     jcp_evidence_state: dict[str, Any] | None = None,
+    cmmc_packet_state: dict[str, Any] | None = None,
+    evaluated_utc: datetime | str | None = None,
 ) -> dict[str, Any]:
     if payload.get("schema") != PRIVATE_SCHEMA:
         raise MissionWeaveGateError("PRIVATE_SCHEMA_MISMATCH")
@@ -709,15 +1168,10 @@ def evaluate_private_payload(
     identity = require_exact_keys(
         payload.get("identity"), set(IDENTITY_GATES), "IDENTITY_SCHEMA_DRIFT"
     )
-    proposal_value_keys = {
-        "proposal_number",
-        "volume2_pdf_sha256",
-        "volume3_total_usd",
-        "portal_preview_sha256",
-    }
-    proposal = require_exact_keys(
+    proposal = require_compatible_keys(
         payload.get("proposal"),
-        set(PROPOSAL_FLAG_GATES) | proposal_value_keys,
+        set(PROPOSAL_FLAG_GATES) | PROPOSAL_VALUE_KEYS,
+        PROPOSAL_CONSISTENCY_KEYS,
         "PROPOSAL_SCHEMA_DRIFT",
     )
     compliance = require_exact_keys(
@@ -725,12 +1179,14 @@ def evaluate_private_payload(
         set(COMPLIANCE_GATES) | {"itar_scope_determination"},
         "COMPLIANCE_SCHEMA_DRIFT",
     )
-    approval = require_exact_keys(
+    approval = require_compatible_keys(
         payload.get("approval"),
-        set(APPROVAL_FLAG_GATES) | {"approval_utc"},
+        set(APPROVAL_FLAG_GATES) | APPROVAL_VALUE_KEYS,
+        APPROVAL_CONSISTENCY_KEYS,
         "APPROVAL_SCHEMA_DRIFT",
     )
 
+    reference_utc = normalize_reference_time(evaluated_utc)
     gate_state: dict[str, bool] = {}
     for field, gate in IDENTITY_GATES.items():
         gate_state[gate] = identity.get(field) is True
@@ -741,11 +1197,32 @@ def evaluate_private_payload(
     for field, gate in APPROVAL_FLAG_GATES.items():
         gate_state[gate] = approval.get(field) is True
 
+    if volume3_artifact_state is None:
+        volume3_artifact_state = inspect_private_volume3_artifact()
     if jcp_evidence_state is None:
         jcp_evidence_state = inspect_private_jcp_evidence()
+    if cmmc_packet_state is None:
+        cmmc_packet_state = inspect_cmmc_evidence_packet()
+    jcp_evidence_verified = jcp_evidence_is_verified(jcp_evidence_state)
     gate_state["DD2345_OR_JCP_APPLICATION_EVIDENCE"] = bool(
         compliance.get("dd2345_or_jcp_application_evidence_ready") is True
-        and jcp_evidence_state.get("evidence_integrity_pass") is True
+        and jcp_evidence_verified
+    )
+    cmmc_packet_consumed = cmmc_packet_is_consumed(cmmc_packet_state)
+    gate_state["CURRENT_CMMC_REQUIREMENTS_REVIEW"] = bool(
+        compliance.get("current_cmmc_requirements_reviewed") is True
+        and cmmc_packet_consumed
+        and cmmc_packet_state.get("requirements_review_basis_present") is True
+    )
+    gate_state["CMMC_PHASE_I_SELF_ASSESSMENT_POSITION"] = bool(
+        compliance.get("cmmc_phase_i_self_assessment_position_supported") is True
+        and cmmc_packet_consumed
+        and cmmc_packet_state.get("phase_i_position_supported") is True
+    )
+    gate_state["NO_CMMC_STATUS_OVERCLAIM"] = bool(
+        compliance.get("no_cmmc_status_overclaim") is True
+        and cmmc_packet_consumed
+        and cmmc_packet_state.get("overclaim_boundary_present") is True
     )
 
     proposal_number = proposal.get("proposal_number")
@@ -763,6 +1240,80 @@ def evaluate_private_payload(
     cost_total = parse_phase_i_total(proposal.get("volume3_total_usd"))
     cost_total_matches = cost_total == PHASE_I_CEILING
     preview_receipt_present = valid_sha256(proposal.get("portal_preview_sha256"))
+    preview_receipt_timestamp_present = valid_timestamp(
+        proposal.get("portal_preview_captured_utc")
+    )
+    preview_receipt_fresh = bool(
+        preview_receipt_present
+        and timestamp_is_fresh(
+            proposal.get("portal_preview_captured_utc"),
+            reference_utc=reference_utc,
+            max_age=PREVIEW_RECEIPT_MAX_AGE,
+        )
+    )
+    recorded_preview_binding = proposal.get("portal_preview_binding_sha256")
+    preview_binding_present = valid_sha256(recorded_preview_binding)
+    expected_preview_binding = preview_evidence_binding_sha256(
+        payload,
+        jcp_evidence_state=jcp_evidence_state,
+        volume3_artifact_state=volume3_artifact_state,
+        cmmc_packet_state=cmmc_packet_state,
+    )
+    preview_binding_matches = bool(
+        expected_preview_binding is not None
+        and preview_binding_present
+        and hmac.compare_digest(
+            str(recorded_preview_binding).upper(), expected_preview_binding
+        )
+    )
+    preview_evidence_current = bool(
+        preview_receipt_fresh and preview_binding_matches
+    )
+    approval_timestamp_present = valid_timestamp(approval.get("approval_utc"))
+    approval_timestamp_fresh = timestamp_is_fresh(
+        approval.get("approval_utc"),
+        reference_utc=reference_utc,
+        max_age=ACTION_TIME_APPROVAL_MAX_AGE,
+    )
+    preview_timestamp = parse_timestamp(proposal.get("portal_preview_captured_utc"))
+    approval_timestamp = parse_timestamp(approval.get("approval_utc"))
+    approval_not_before_preview = bool(
+        preview_timestamp is not None
+        and approval_timestamp is not None
+        and approval_timestamp >= preview_timestamp
+    )
+    expected_approval_binding = action_time_approval_binding_sha256(
+        payload,
+        approval_utc=approval.get("approval_utc"),
+        jcp_evidence_state=jcp_evidence_state,
+        volume3_artifact_state=volume3_artifact_state,
+        cmmc_packet_state=cmmc_packet_state,
+    )
+    recorded_approval_binding = approval.get("approval_binding_sha256")
+    approval_binding_matches = bool(
+        expected_approval_binding is not None
+        and valid_sha256(recorded_approval_binding)
+        and hmac.compare_digest(
+            str(recorded_approval_binding).upper(), expected_approval_binding
+        )
+    )
+    approval_context_current = bool(
+        preview_evidence_current
+        and approval_timestamp_fresh
+        and approval_not_before_preview
+        and approval_binding_matches
+    )
+    gate_state["COMPLETE_PORTAL_PREVIEW_REVIEW"] = bool(
+        proposal.get("portal_preview_reviewed") is True and preview_evidence_current
+    )
+    gate_state["CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW"] = bool(
+        approval.get("corporate_official_reviewed_all_volumes") is True
+        and approval_context_current
+    )
+    gate_state["ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION"] = bool(
+        approval.get("final_submission_authorized_at_action_time") is True
+        and approval_context_current
+    )
     itar_scope_confirmed = compliance.get("itar_scope_determination") == "SUBJECT_TO_ITAR"
 
     gate_state.update(
@@ -772,9 +1323,9 @@ def evaluate_private_payload(
             "VOLUME2_PDF_HASH_MATCH": pdf_hash_match,
             "VOLUME2_ASSIGNED_PROPOSAL_NUMBER_EMBEDDED": proposal_number_embedded,
             "VOLUME3_TOTAL_MATCHES_PHASE_I_CEILING": cost_total_matches,
-            "PORTAL_PREVIEW_RECEIPT_HASH": preview_receipt_present,
+            "PORTAL_PREVIEW_RECEIPT_HASH": preview_evidence_current,
             "ITAR_SCOPE_CONFIRMED": itar_scope_confirmed,
-            "ACTION_TIME_APPROVAL_TIMESTAMP": valid_timestamp(approval.get("approval_utc")),
+            "ACTION_TIME_APPROVAL_TIMESTAMP": approval_context_current,
         }
     )
     unresolved = sorted(gate for gate, passed in gate_state.items() if not passed)
@@ -789,16 +1340,29 @@ def evaluate_private_payload(
         "volume2_pdf_hash_match": pdf_hash_match,
         "volume3_total_matches_official_ceiling": cost_total_matches,
         "portal_preview_receipt_present": preview_receipt_present,
+        "portal_preview_receipt_timestamp_present": preview_receipt_timestamp_present,
+        "portal_preview_receipt_fresh": preview_receipt_fresh,
+        "portal_preview_binding_present": preview_binding_present,
+        "portal_preview_binding_matches_current_upload_set": preview_binding_matches,
+        "portal_preview_evidence_current": preview_evidence_current,
         "corporate_official_reviewed": gate_state[
             "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW"
         ],
         "action_time_authorized": gate_state[
             "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION"
         ],
-        "approval_timestamp_present": gate_state["ACTION_TIME_APPROVAL_TIMESTAMP"],
+        "approval_timestamp_present": approval_timestamp_present,
+        "approval_timestamp_fresh": approval_timestamp_fresh,
+        "approval_not_before_preview": approval_not_before_preview,
+        "approval_binding_matches_current_upload_set": approval_binding_matches,
         "dd2345_or_jcp_evidence_verified": gate_state[
             "DD2345_OR_JCP_APPLICATION_EVIDENCE"
         ],
+        "cmmc_packet_consumed": cmmc_packet_consumed,
+        "cmmc_phase_i_position_supported": bool(
+            cmmc_packet_consumed
+            and cmmc_packet_state.get("phase_i_position_supported") is True
+        ),
     }
 
 
@@ -808,9 +1372,12 @@ def build_payload(
     private_input_sha256: str | None = None,
     source_state: dict[str, Any] | None = None,
     volume2_text: str | None = None,
-    volume3_artifact_state: dict[str, bool] | None = None,
+    volume3_artifact_state: dict[str, Any] | None = None,
     jcp_evidence_state: dict[str, Any] | None = None,
+    cmmc_packet_state: dict[str, Any] | None = None,
+    evaluated_utc: datetime | str | None = None,
 ) -> dict[str, Any]:
+    reference_utc = normalize_reference_time(evaluated_utc)
     if source_state is None or volume2_text is None:
         use_private_final = bool(
             private_payload is not None and PRIVATE_FINAL_VOLUME2_PDF.is_file()
@@ -819,14 +1386,21 @@ def build_payload(
             PRIVATE_FINAL_VOLUME2_PDF if use_private_final else VOLUME2_PDF,
             private_final=use_private_final,
         )
+    if volume3_artifact_state is None:
+        volume3_artifact_state = inspect_private_volume3_artifact()
     if jcp_evidence_state is None:
         jcp_evidence_state = inspect_private_jcp_evidence()
+    if cmmc_packet_state is None:
+        cmmc_packet_state = inspect_cmmc_evidence_packet()
     evaluation = (
         evaluate_private_payload(
             private_payload,
             source_state=source_state,
             volume2_text=volume2_text,
+            volume3_artifact_state=volume3_artifact_state,
             jcp_evidence_state=jcp_evidence_state,
+            cmmc_packet_state=cmmc_packet_state,
+            evaluated_utc=reference_utc,
         )
         if private_payload is not None
         else None
@@ -861,9 +1435,24 @@ def build_payload(
         public_source_state["private_final_volume2_sha256_exposed"] = False
         public_source_state["absolute_private_path_exposed"] = False
 
-    if volume3_artifact_state is None:
-        volume3_artifact_state = inspect_private_volume3_artifact()
     reconciliation_groups = gate_reconciliation_groups(unresolved)
+    public_volume3_artifact_state = {
+        key: volume3_artifact_state.get(key)
+        for key in (
+            "receipt_present",
+            "workbook_present",
+            "receipt_header_valid",
+            "workbook_size_matches_receipt",
+            "workbook_hash_matches_receipt",
+            "formula_scan_clean",
+            "export_reimport_verified",
+            "financial_reconciliation_pass",
+            "review_guardrails_preserved",
+            "receipt_integrity_pass",
+            "private_path_exposed",
+            "private_hash_exposed",
+        )
+    }
     public_jcp_evidence_state = {
         key: jcp_evidence_state.get(key)
         for key in (
@@ -882,10 +1471,30 @@ def build_payload(
             "private_hash_exposed",
         )
     }
+    public_cmmc_packet_state = {
+        key: cmmc_packet_state.get(key)
+        for key in (
+            "packet_present",
+            "packet_regular_file",
+            "schema_valid",
+            "integrity_valid",
+            "generated_timestamp_valid",
+            "missionweave_program_unique",
+            "cmmc_requirement_unique",
+            "requirement_source_policy_valid",
+            "packet_consumed",
+            "packet_state",
+            "requirement_evidence_state",
+            "requirements_review_basis_present",
+            "phase_i_position_supported",
+            "overclaim_boundary_present",
+            "failure_code",
+        )
+    }
 
     payload: dict[str, Any] = {
         "schema": PUBLIC_SCHEMA,
-        "generated_utc": now_utc(),
+        "generated_utc": reference_utc.isoformat(),
         "topic": TOPIC,
         "deadline": {
             "expected_utc": "2026-07-22T16:00:00Z",
@@ -921,6 +1530,9 @@ def build_payload(
             ),
             "jcp_evidence_template": rel(PRIVATE_JCP_EVIDENCE_TEMPLATE),
             "pre_submit_excludes_action_time_approval": True,
+            "manual_preview_hash_can_establish_freshness": False,
+            "preview_binding_stored_privately": True,
+            "approval_binding_stored_privately": True,
             "credential_values_accepted": False,
             "firm_pin_value_accepted": False,
         },
@@ -955,7 +1567,27 @@ def build_payload(
             "portal_preview_receipt_present": bool(
                 evaluation and evaluation["portal_preview_receipt_present"]
             ),
+            "portal_preview_receipt_timestamp_present": bool(
+                evaluation
+                and evaluation["portal_preview_receipt_timestamp_present"]
+            ),
+            "portal_preview_receipt_fresh": bool(
+                evaluation and evaluation["portal_preview_receipt_fresh"]
+            ),
+            "portal_preview_binding_present": bool(
+                evaluation and evaluation["portal_preview_binding_present"]
+            ),
+            "portal_preview_binding_matches_current_upload_set": bool(
+                evaluation
+                and evaluation[
+                    "portal_preview_binding_matches_current_upload_set"
+                ]
+            ),
+            "portal_preview_evidence_current": bool(
+                evaluation and evaluation["portal_preview_evidence_current"]
+            ),
             "portal_preview_receipt_value_exposed": False,
+            "portal_preview_binding_value_exposed": False,
             "corporate_official_reviewed": bool(
                 evaluation and evaluation["corporate_official_reviewed"]
             ),
@@ -965,12 +1597,39 @@ def build_payload(
             "approval_timestamp_present": bool(
                 evaluation and evaluation["approval_timestamp_present"]
             ),
+            "approval_timestamp_fresh": bool(
+                evaluation and evaluation["approval_timestamp_fresh"]
+            ),
+            "approval_not_before_preview": bool(
+                evaluation and evaluation["approval_not_before_preview"]
+            ),
+            "approval_binding_matches_current_upload_set": bool(
+                evaluation
+                and evaluation["approval_binding_matches_current_upload_set"]
+            ),
+            "approval_binding_value_exposed": False,
             "dd2345_or_jcp_evidence_verified": bool(
                 evaluation and evaluation["dd2345_or_jcp_evidence_verified"]
             ),
+            "cmmc_packet_consumed": bool(
+                evaluation and evaluation["cmmc_packet_consumed"]
+            ),
+            "cmmc_phase_i_position_supported": bool(
+                evaluation and evaluation["cmmc_phase_i_position_supported"]
+            ),
         },
-        "private_volume3_artifact": deepcopy(volume3_artifact_state),
+        "private_volume3_artifact": public_volume3_artifact_state,
         "private_jcp_evidence": public_jcp_evidence_state,
+        "cmmc_evidence_packet": {
+            "path": rel(CMMC_EVIDENCE_PACKET),
+            "file_sha256": (
+                sha256_file(CMMC_EVIDENCE_PACKET)
+                if CMMC_EVIDENCE_PACKET.is_file()
+                and not CMMC_EVIDENCE_PACKET.is_symlink()
+                else None
+            ),
+            **public_cmmc_packet_state,
+        },
         "jcp_evidence_protocol": {
             "path": rel(JCP_EVIDENCE_PROTOCOL),
             "bytes": JCP_EVIDENCE_PROTOCOL.stat().st_size,
@@ -1005,6 +1664,17 @@ def build_payload(
             "credentials_allowed_in_public_output": False,
             "private_identifiers_allowed_in_public_output": False,
             "bare_jcp_checkbox_can_clear_gate": False,
+            "jcp_receipt_fields_required_to_clear_gate": True,
+            "cmmc_boolean_can_clear_supported_position_gate": False,
+            "cmmc_packet_integrity_required": True,
+            "preview_receipt_max_age_seconds": int(
+                PREVIEW_RECEIPT_MAX_AGE.total_seconds()
+            ),
+            "action_time_approval_max_age_seconds": int(
+                ACTION_TIME_APPROVAL_MAX_AGE.total_seconds()
+            ),
+            "approval_must_bind_current_preview_and_upload_set": True,
+            "upstream_change_invalidates_preview_and_approval": True,
         },
         "private_template": rel(TEMPLATE),
         "portal_checklist": rel(OUT_CHECKLIST),
@@ -1038,10 +1708,23 @@ def ensure_public_safe(
         "proposal_number",
         "volume2_pdf_sha256",
         "portal_preview_sha256",
+        "portal_preview_binding_sha256",
     ):
         value = proposal.get(field) if isinstance(proposal, dict) else None
         if isinstance(value, str) and value and value in serialized:
             raise MissionWeaveGateError(f"PRIVATE_{field.upper()}_EXPOSED")
+    approval = private_payload.get("approval", {})
+    approval_binding = (
+        approval.get("approval_binding_sha256")
+        if isinstance(approval, dict)
+        else None
+    )
+    if (
+        isinstance(approval_binding, str)
+        and approval_binding
+        and approval_binding in serialized
+    ):
+        raise MissionWeaveGateError("PRIVATE_APPROVAL_BINDING_SHA256_EXPOSED")
 
 
 def render_markdown(payload: dict[str, Any]) -> str:
@@ -1049,6 +1732,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     facts = payload["private_fact_state"]
     volume3 = payload["private_volume3_artifact"]
     jcp = payload["private_jcp_evidence"]
+    cmmc = payload["cmmc_evidence_packet"]
     lines = [
         "# MissionWeave DSIP Action Gate - 2026-07-17",
         "",
@@ -1093,8 +1777,16 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Volume 3 total matches official ceiling: `{str(facts['volume3_total_matches_official_ceiling']).lower()}`",
         f"- Volume 3 private amount exposed: `{str(facts['volume3_private_amount_exposed']).lower()}`",
         f"- Portal preview receipt present: `{str(facts['portal_preview_receipt_present']).lower()}`",
+        f"- Portal preview receipt timestamp present: `{str(facts['portal_preview_receipt_timestamp_present']).lower()}`",
+        f"- Portal preview receipt fresh: `{str(facts['portal_preview_receipt_fresh']).lower()}`",
+        f"- Portal preview binding matches current upload set: `{str(facts['portal_preview_binding_matches_current_upload_set']).lower()}`",
+        f"- Portal preview evidence current: `{str(facts['portal_preview_evidence_current']).lower()}`",
         f"- Corporate official reviewed: `{str(facts['corporate_official_reviewed']).lower()}`",
         f"- Action-time authorized: `{str(facts['action_time_authorized']).lower()}`",
+        f"- Approval timestamp fresh: `{str(facts['approval_timestamp_fresh']).lower()}`",
+        f"- Approval follows the current preview: `{str(facts['approval_not_before_preview']).lower()}`",
+        f"- Approval bound to the current preview/upload set: `{str(facts['approval_binding_matches_current_upload_set']).lower()}`",
+        f"- Private approval binding exposed: `{str(facts['approval_binding_value_exposed']).lower()}`",
         f"- DD Form 2345/JCP evidence verified: `{str(facts['dd2345_or_jcp_evidence_verified']).lower()}`",
         "",
         "## Private Volume 3 Artifact Integrity",
@@ -1127,6 +1819,16 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Protocol: `{payload['jcp_evidence_protocol']['path']}`",
         f"- Protocol SHA-256: `{payload['jcp_evidence_protocol']['sha256']}`",
         "",
+        "## CMMC Evidence Packet",
+        "",
+        f"- Packet: `{cmmc['path']}`",
+        f"- Schema valid: `{str(cmmc['schema_valid']).lower()}`",
+        f"- Integrity valid: `{str(cmmc['integrity_valid']).lower()}`",
+        f"- MissionWeave requirement consumed: `{str(cmmc['packet_consumed']).lower()}`",
+        f"- Requirement evidence state: `{cmmc['requirement_evidence_state']}`",
+        f"- Phase I position supported: `{str(cmmc['phase_i_position_supported']).lower()}`",
+        f"- Overclaim boundary present: `{str(cmmc['overclaim_boundary_present']).lower()}`",
+        "",
         "## Reconciliation Groups",
         "",
     ]
@@ -1143,10 +1845,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             f"1. Run `{payload['private_input']['capture_tool']} --check-target`. This validates the ignored destination without reading private contents.",
             "2. Run the hidden collector with `--section pre-submit`. It captures identity, proposal, and compliance sections but deliberately excludes action-time approval.",
-            f"3. After DSIP assigns a proposal number, run `{payload['private_input']['private_volume2_finalizer']}`. It reads the number only from the ignored private record, writes the assigned-number DOCX/PDF only to the ignored private area, performs PDF QA, and updates the private PDF hash without exposing either value publicly.",
+            f"3. After DSIP assigns a proposal number, run `{payload['private_input']['private_volume2_finalizer']}`. It reads the number only from the ignored private record, writes the assigned-number DOCX/PDF only to the ignored private area, performs PDF QA, and updates the private PDF hash without exposing either value publicly. Hash the completed portal-preview receipt with `--preview-receipt-file`; a manually entered digest does not establish freshness.",
             f"4. For the ITAR-marked topic, save only an official JCP portal submission receipt or certified DD Form 2345 as a private PDF and complete `{payload['private_input']['jcp_evidence_template']}` beside it. A boolean answer cannot clear this gate without a matching file hash.",
-            "5. Run `--section approval` only after the corporate official reviews the complete portal preview at action time. The collector never requests or accepts a Firm PIN or login credential.",
-            "6. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.",
+            f"5. Review the consumed CMMC packet at `{payload['cmmc_evidence_packet']['path']}`. An unresolved packet leaves the supported-position gate open even when a private boolean is checked.",
+            "6. Run `--section approval` only after the corporate official reviews the fresh complete portal preview at action time. The collector binds that authorization to the current preview/upload-set identity and never requests or accepts a Firm PIN or login credential.",
+            "7. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.",
             "",
             "## Controls",
             "",
@@ -1193,6 +1896,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - Do not upload the tracked neutral PDF after DSIP assigns a proposal number. Run `{rel(PRIVATE_FINALIZER)}`; the final PDF remains ignored and its path, number, and hash remain absent from public artifacts.
 - Private Volume 3 receipt integrity passes: `{str(payload['private_volume3_artifact']['receipt_integrity_pass']).lower()}`. This verifies the ignored workbook against its ignored receipt without publishing either path or hash; it does not replace corporate-official cost-basis review.
 - Private DD Form 2345/JCP evidence integrity passes: `{str(payload['private_jcp_evidence']['evidence_integrity_pass']).lower()}`. A checked private flag cannot clear this gate unless an official portal PDF exists, its SHA-256 matches the ignored receipt, and entity/corporate review are confirmed.
+- CMMC/export evidence packet consumed with valid integrity: `{str(payload['cmmc_evidence_packet']['packet_consumed']).lower()}`. MissionWeave CMMC evidence state: `{payload['cmmc_evidence_packet']['requirement_evidence_state']}`. An unresolved packet cannot support the Phase I position.
 
 ## Registration And Firm Controls
 
@@ -1218,7 +1922,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - Confirm U.S. small-business eligibility, ownership and affiliates, PI primary employment, the proposed 640 PI hours, and the SBIR percentage-of-work rule.
 - Compare MissionWeave with every prior, current, pending, or planned proposal. Disclose overlap and request no duplicate PI hours, cloud costs, software work, or deliverables.
 - Treat the topic as ITAR-marked. Keep controlled technical data out of the proposal and document the DD Form 2345/JCP and Technology Control Plan decisions.
-- Projected CMMC level: `{instruction['projected_cmmc_level']}`. {instruction['cmmc_amendment_note']} Do not claim an assessment, certification, or compliant enclave without current evidence.
+- Projected CMMC level: `{instruction['projected_cmmc_level']}`. {instruction['cmmc_amendment_note']} Consume `{payload['cmmc_evidence_packet']['path']}` and do not claim an assessment, certification, or compliant enclave without current authoritative evidence.
 - Confirm foreign-citizen participation, foreign affiliations, conflicts, joint-venture status, and each technical-data/software-rights assertion from current records.
 - TABA is not requested. Do not add a provider without a named, supported, topic-specific need and a reconciled cost entry.
 
@@ -1226,8 +1930,8 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 
 1. Run `python code\ops\FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py` after the assigned proposal number is captured. Require `PRIVATE_VOLUME2_REBUILT_AND_QA_PASSED`.
 2. Inspect every populated field, all seven volumes, every attachment filename and hash, the cost total, and the live deadline.
-3. Save a private local preview receipt and record only its SHA-256 in the ignored private gate file.
-4. Capture the action-time approval section separately. This command never clicks submit:
+3. Save a private local preview receipt and capture it with `--section proposal --preview-receipt-file <private-preview-receipt>`. The collector records only private consistency metadata and rejects a stale receipt; a manually entered digest cannot establish freshness.
+4. Capture the action-time approval section separately. It cryptographically binds approval to the current preview/upload set and expires after {int(ACTION_TIME_APPROVAL_MAX_AGE.total_seconds() // 60)} minutes. This command never clicks submit:
 
 ```powershell
 python code\ops\CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval

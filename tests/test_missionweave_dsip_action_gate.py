@@ -4,6 +4,7 @@ import hashlib
 import importlib.util
 import json
 from copy import deepcopy
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -18,6 +19,29 @@ JCP_PROTOCOL = (
     / "DLA26BZ03_NV011_MissionWeave"
     / "MISSIONWEAVE_JCP_EVIDENCE_PROTOCOL_2026-07-18.json"
 )
+CMMC_PACKET = (
+    ROOT
+    / "grant_submissions"
+    / "compliance_evidence"
+    / "CMMC_EXPORT_EVIDENCE_PACKET_2026-07-18.json"
+)
+REFERENCE_UTC = datetime(2026, 7, 19, 3, 20, tzinfo=timezone.utc)
+AUTHORITATIVE_OPEN_GATES = {
+    "ACTION_TIME_APPROVAL_TIMESTAMP",
+    "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+    "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+    "COMPLETE_PORTAL_PREVIEW_REVIEW",
+    "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+    "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+    "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+    "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+    "DSIP_FIRM_PIN_AVAILABILITY",
+    "PORTAL_PREVIEW_RECEIPT_HASH",
+    "SAM_REPRESENTATIONS_CURRENT",
+    "TECHNOLOGY_CONTROL_PLAN_DECISION",
+    "VOLUME3_COST_BASIS",
+    "VOLUME5_UPLOAD_SET",
+}
 
 
 def load_module():
@@ -28,10 +52,17 @@ def load_module():
     return module
 
 
-def synthetic_private_payload(module, source_state: dict) -> tuple[dict, str]:
+def synthetic_private_payload(
+    module,
+    source_state: dict,
+    *,
+    volume3_artifact_state: dict,
+    jcp_evidence_state: dict,
+    cmmc_packet_state: dict,
+) -> tuple[dict, str]:
     payload = json.loads(TEMPLATE.read_text(encoding="utf-8"))
     payload["template_only"] = False
-    payload["captured_utc"] = "2026-07-17T12:00:00-05:00"
+    payload["captured_utc"] = (REFERENCE_UTC - timedelta(minutes=6)).isoformat()
     for field in module.IDENTITY_GATES:
         payload["identity"][field] = True
     for field in module.PROPOSAL_FLAG_GATES:
@@ -48,12 +79,34 @@ def synthetic_private_payload(module, source_state: dict) -> tuple[dict, str]:
             "volume2_pdf_sha256": source_state["volume2_sha256"],
             "volume3_total_usd": "100000.00",
             "portal_preview_sha256": "A" * 64,
+            "portal_preview_captured_utc": (
+                REFERENCE_UTC - timedelta(minutes=5)
+            ).isoformat(),
         }
     )
     payload["eligibility_and_compliance"]["itar_scope_determination"] = (
         "SUBJECT_TO_ITAR"
     )
-    payload["approval"]["approval_utc"] = "2026-07-17T12:05:00-05:00"
+    payload["proposal"]["portal_preview_binding_sha256"] = (
+        module.preview_evidence_binding_sha256(
+            payload,
+            volume3_artifact_state=volume3_artifact_state,
+            jcp_evidence_state=jcp_evidence_state,
+            cmmc_packet_state=cmmc_packet_state,
+        )
+    )
+    payload["approval"]["approval_utc"] = (
+        REFERENCE_UTC - timedelta(minutes=1)
+    ).isoformat()
+    payload["approval"]["approval_binding_sha256"] = (
+        module.action_time_approval_binding_sha256(
+            payload,
+            approval_utc=payload["approval"]["approval_utc"],
+            volume3_artifact_state=volume3_artifact_state,
+            jcp_evidence_state=jcp_evidence_state,
+            cmmc_packet_state=cmmc_packet_state,
+        )
+    )
     return payload, private_proposal_number
 
 
@@ -82,9 +135,65 @@ def valid_jcp_evidence_state(module) -> dict:
         "evidence_integrity_pass": True,
         "evidence_kind": "JCP_APPLICATION_SUBMISSION_RECEIPT",
         "failure_code": None,
+        "evidence_binding_sha256": "E" * 64,
         "private_path_exposed": False,
         "private_hash_exposed": False,
     }
+
+
+def valid_volume3_artifact_state() -> dict:
+    return {
+        "receipt_present": True,
+        "workbook_present": True,
+        "receipt_header_valid": True,
+        "workbook_size_matches_receipt": True,
+        "workbook_hash_matches_receipt": True,
+        "formula_scan_clean": True,
+        "export_reimport_verified": True,
+        "financial_reconciliation_pass": True,
+        "review_guardrails_preserved": True,
+        "receipt_integrity_pass": True,
+        "artifact_binding_sha256": "D" * 64,
+        "private_path_exposed": False,
+        "private_hash_exposed": False,
+    }
+
+
+def valid_cmmc_packet_state(*, position_supported: bool = True) -> dict:
+    return {
+        "packet_present": True,
+        "packet_regular_file": True,
+        "schema_valid": True,
+        "integrity_valid": True,
+        "generated_timestamp_valid": True,
+        "missionweave_program_unique": True,
+        "cmmc_requirement_unique": True,
+        "requirement_source_policy_valid": True,
+        "packet_consumed": True,
+        "packet_state": (
+            "AUTHORITATIVE_EVIDENCE_INVENTORIED"
+            if position_supported
+            else "EVIDENCE_INCOMPLETE"
+        ),
+        "requirement_evidence_state": (
+            "AUTHORITATIVE_PROOF_INVENTORIED"
+            if position_supported
+            else "APPLICABILITY_UNRESOLVED"
+        ),
+        "requirements_review_basis_present": True,
+        "phase_i_position_supported": position_supported,
+        "overclaim_boundary_present": True,
+        "packet_binding_sha256": "C" * 64,
+        "failure_code": None,
+    }
+
+
+def complete_evidence_states(module) -> tuple[dict, dict, dict]:
+    return (
+        valid_volume3_artifact_state(),
+        valid_jcp_evidence_state(module),
+        valid_cmmc_packet_state(),
+    )
 
 
 def test_default_gate_verifies_package_and_fails_closed_without_private_input():
@@ -161,11 +270,87 @@ def test_jcp_protocol_accepts_only_official_hash_matched_private_evidence():
     )
 
 
+def test_cmmc_packet_is_consumed_but_unresolved_position_stays_open(
+    tmp_path: Path,
+):
+    module = load_module()
+    packet_state = module.inspect_cmmc_evidence_packet(CMMC_PACKET)
+
+    assert packet_state["packet_consumed"] is True
+    assert packet_state["integrity_valid"] is True
+    assert packet_state["requirement_evidence_state"] == "APPLICABILITY_UNRESOLVED"
+    assert packet_state["phase_i_position_supported"] is False
+    assert packet_state["overclaim_boundary_present"] is True
+
+    source_state, _ = module.inspect_source_package()
+    source_state = private_final_source_state(source_state)
+    volume3_state = valid_volume3_artifact_state()
+    jcp_state = valid_jcp_evidence_state(module)
+    private, proposal_number = synthetic_private_payload(
+        module,
+        source_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=packet_state,
+    )
+    payload = module.build_payload(
+        private,
+        source_state=source_state,
+        volume2_text=f"{proposal_number}\nassigned final header",
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=packet_state,
+        evaluated_utc=REFERENCE_UTC,
+    )
+
+    assert payload["gate_summary"]["unresolved_gates"] == [
+        "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION"
+    ]
+    assert payload["private_fact_state"]["cmmc_packet_consumed"] is True
+    assert payload["private_fact_state"]["cmmc_phase_i_position_supported"] is False
+
+    tampered_packet = json.loads(CMMC_PACKET.read_text(encoding="utf-8"))
+    missionweave = next(
+        row for row in tampered_packet["programs"] if row["program_id"] == "MissionWeave"
+    )
+    cmmc = next(
+        row
+        for row in missionweave["requirements"]
+        if row["fact_id"] == module.CMMC_FACT_ID
+    )
+    cmmc["evidence_state"] = "AUTHORITATIVE_PROOF_INVENTORIED"
+    cmmc["issues"] = []
+    tampered_path = tmp_path / "tampered-cmmc-packet.json"
+    tampered_path.write_text(json.dumps(tampered_packet), encoding="utf-8")
+
+    rejected = module.inspect_cmmc_evidence_packet(tampered_path)
+    assert rejected["integrity_valid"] is False
+    assert rejected["packet_consumed"] is False
+    assert rejected["phase_i_position_supported"] is False
+
+    tampered_packet["integrity"]["packet_sha256"] = ""
+    tampered_packet["integrity"]["packet_sha256"] = module.stable_sha256(
+        tampered_packet
+    )
+    tampered_path.write_text(json.dumps(tampered_packet), encoding="utf-8")
+    self_hashed_placeholder = module.inspect_cmmc_evidence_packet(tampered_path)
+    assert self_hashed_placeholder["integrity_valid"] is True
+    assert self_hashed_placeholder["packet_consumed"] is True
+    assert self_hashed_placeholder["phase_i_position_supported"] is False
+
+
 def test_complete_private_record_can_pass_without_exposing_private_values():
     module = load_module()
     source_state, _ = module.inspect_source_package()
     source_state = private_final_source_state(source_state)
-    private, proposal_number = synthetic_private_payload(module, source_state)
+    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    private, proposal_number = synthetic_private_payload(
+        module,
+        source_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+    )
     synthetic_volume2_text = f"{proposal_number}\nFinal assigned proposal header"
 
     payload = module.build_payload(
@@ -173,7 +358,10 @@ def test_complete_private_record_can_pass_without_exposing_private_values():
         private_input_sha256="B" * 64,
         source_state=source_state,
         volume2_text=synthetic_volume2_text,
-        jcp_evidence_state=valid_jcp_evidence_state(module),
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+        evaluated_utc=REFERENCE_UTC,
     )
     serialized = json.dumps(payload, sort_keys=True)
 
@@ -196,10 +384,14 @@ def test_complete_private_record_can_pass_without_exposing_private_values():
     assert facts["volume2_pdf_hash_matches_private_record"] is True
     assert facts["volume3_total_matches_official_ceiling"] is True
     assert facts["portal_preview_receipt_present"] is True
+    assert facts["portal_preview_binding_matches_current_upload_set"] is True
+    assert facts["portal_preview_evidence_current"] is True
     assert facts["corporate_official_reviewed"] is True
     assert facts["action_time_authorized"] is True
     assert facts["approval_timestamp_present"] is True
     assert facts["dd2345_or_jcp_evidence_verified"] is True
+    assert facts["cmmc_packet_consumed"] is True
+    assert facts["cmmc_phase_i_position_supported"] is True
     assert proposal_number not in serialized
     assert "B" * 64 not in serialized
     assert "A" * 64 not in serialized
@@ -216,11 +408,120 @@ def test_complete_private_record_can_pass_without_exposing_private_values():
     assert source_state["volume2_sha256"] not in serialized
 
 
+def test_stale_or_rebound_preview_cannot_reuse_action_time_approval():
+    module = load_module()
+    source_state, _ = module.inspect_source_package()
+    source_state = private_final_source_state(source_state)
+    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    private, proposal_number = synthetic_private_payload(
+        module,
+        source_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+    )
+    volume2_text = f"{proposal_number}\nassigned final header"
+
+    stale = module.build_payload(
+        private,
+        source_state=source_state,
+        volume2_text=volume2_text,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+        evaluated_utc=REFERENCE_UTC + timedelta(minutes=26),
+    )
+    stale_open = set(stale["gate_summary"]["unresolved_gates"])
+    assert {
+        "PORTAL_PREVIEW_RECEIPT_HASH",
+        "COMPLETE_PORTAL_PREVIEW_REVIEW",
+        "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+        "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+        "ACTION_TIME_APPROVAL_TIMESTAMP",
+    }.issubset(stale_open)
+    assert stale["private_fact_state"]["portal_preview_receipt_fresh"] is False
+
+    rebound = deepcopy(private)
+    rebound["proposal"]["portal_preview_sha256"] = "F" * 64
+    rebound["proposal"]["portal_preview_binding_sha256"] = (
+        module.preview_evidence_binding_sha256(
+            rebound,
+            volume3_artifact_state=volume3_state,
+            jcp_evidence_state=jcp_state,
+            cmmc_packet_state=cmmc_state,
+        )
+    )
+    rebound_payload = module.build_payload(
+        rebound,
+        source_state=source_state,
+        volume2_text=volume2_text,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+        evaluated_utc=REFERENCE_UTC,
+    )
+    rebound_facts = rebound_payload["private_fact_state"]
+    rebound_open = set(rebound_payload["gate_summary"]["unresolved_gates"])
+    assert rebound_facts["portal_preview_evidence_current"] is True
+    assert rebound_facts["approval_binding_matches_current_upload_set"] is False
+    assert {
+        "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+        "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+        "ACTION_TIME_APPROVAL_TIMESTAMP",
+    }.issubset(rebound_open)
+
+
+def test_upload_set_change_invalidates_preview_and_approval_bindings():
+    module = load_module()
+    source_state, _ = module.inspect_source_package()
+    source_state = private_final_source_state(source_state)
+    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    private, proposal_number = synthetic_private_payload(
+        module,
+        source_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+    )
+    private["proposal"]["volume5_upload_set_reviewed"] = False
+
+    payload = module.build_payload(
+        private,
+        source_state=source_state,
+        volume2_text=f"{proposal_number}\nassigned final header",
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+        evaluated_utc=REFERENCE_UTC,
+    )
+    facts = payload["private_fact_state"]
+    unresolved = set(payload["gate_summary"]["unresolved_gates"])
+
+    assert facts["portal_preview_receipt_fresh"] is True
+    assert facts["portal_preview_binding_matches_current_upload_set"] is False
+    assert facts["approval_binding_matches_current_upload_set"] is False
+    assert {
+        "VOLUME5_UPLOAD_SET",
+        "PORTAL_PREVIEW_RECEIPT_HASH",
+        "COMPLETE_PORTAL_PREVIEW_REVIEW",
+        "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+        "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+        "ACTION_TIME_APPROVAL_TIMESTAMP",
+    }.issubset(unresolved)
+
+
 def test_private_record_stays_open_when_pdf_header_or_action_gate_is_missing():
     module = load_module()
     source_state, actual_text = module.inspect_source_package()
     source_state = private_final_source_state(source_state)
-    private, _ = synthetic_private_payload(module, source_state)
+    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    private, _ = synthetic_private_payload(
+        module,
+        source_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+    )
     private["approval"]["final_submission_authorized_at_action_time"] = False
 
     payload = module.build_payload(
@@ -228,6 +529,10 @@ def test_private_record_stays_open_when_pdf_header_or_action_gate_is_missing():
         private_input_sha256="C" * 64,
         source_state=source_state,
         volume2_text=actual_text,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+        evaluated_utc=REFERENCE_UTC,
     )
 
     assert payload["status"] == "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
@@ -246,7 +551,14 @@ def test_private_record_auto_selects_guarded_private_final_pdf(
     module = load_module()
     base_state, _ = module.inspect_source_package()
     private_state = private_final_source_state(base_state)
-    private, proposal_number = synthetic_private_payload(module, private_state)
+    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    private, proposal_number = synthetic_private_payload(
+        module,
+        private_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+    )
     private_pdf = tmp_path / "MISSIONWEAVE_DSIP_VOLUME2_FINAL.private.pdf"
     private_pdf.write_bytes(b"private-final-marker")
     calls: list[tuple[Path, bool]] = []
@@ -261,7 +573,10 @@ def test_private_record_auto_selects_guarded_private_final_pdf(
     payload = module.build_payload(
         private,
         private_input_sha256="D" * 64,
-        jcp_evidence_state=valid_jcp_evidence_state(module),
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+        evaluated_utc=REFERENCE_UTC,
     )
 
     assert calls == [(private_pdf, True)]
@@ -281,7 +596,14 @@ def test_template_and_schema_drift_fail_closed():
         )
     assert exc.value.code == "TEMPLATE_CANNOT_BE_USED_AS_PRIVATE_INPUT"
 
-    private, _ = synthetic_private_payload(module, source_state)
+    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    private, _ = synthetic_private_payload(
+        module,
+        source_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+    )
     private["identity"]["unexpected_private_field"] = "must not be accepted"
     with pytest.raises(module.MissionWeaveGateError) as exc:
         module.evaluate_private_payload(
@@ -345,6 +667,8 @@ def test_private_volume3_receipt_verifies_workbook_without_exposing_path_or_hash
     assert state["workbook_hash_matches_receipt"] is True
     assert state["financial_reconciliation_pass"] is True
     assert state["review_guardrails_preserved"] is True
+    assert module.volume3_artifact_is_verified(state) is True
+    assert module.valid_sha256(state["artifact_binding_sha256"])
     assert state["private_path_exposed"] is False
     assert state["private_hash_exposed"] is False
     assert str(workbook) not in serialized
@@ -389,6 +713,8 @@ def test_private_jcp_evidence_requires_hash_matched_portal_pdf(
     assert state["evidence_hash_matches_receipt"] is True
     assert state["source_metadata_valid"] is True
     assert state["evidence_integrity_pass"] is True
+    assert module.jcp_evidence_is_verified(state) is True
+    assert module.valid_sha256(state["evidence_binding_sha256"])
     assert state["private_path_exposed"] is False
     assert state["private_hash_exposed"] is False
     assert str(evidence) not in serialized
@@ -406,14 +732,24 @@ def test_checked_jcp_flag_cannot_clear_gate_without_private_receipt():
     module = load_module()
     source_state, _ = module.inspect_source_package()
     source_state = private_final_source_state(source_state)
-    private, proposal_number = synthetic_private_payload(module, source_state)
+    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    private, proposal_number = synthetic_private_payload(
+        module,
+        source_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+    )
 
     payload = module.build_payload(
         private,
         private_input_sha256="E" * 64,
         source_state=source_state,
         volume2_text=f"{proposal_number}\nassigned final header",
+        volume3_artifact_state=volume3_state,
         jcp_evidence_state={"evidence_integrity_pass": False},
+        cmmc_packet_state=cmmc_state,
+        evaluated_utc=REFERENCE_UTC,
     )
 
     assert payload["submission_ready_for_human_click"] is False
@@ -437,8 +773,8 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     passed = summary["passed_private_gate_count"]
     open_count = summary["open_gate_count"]
     required = summary["required_private_gate_count"]
-    assert required == 50
-    assert passed + open_count == required
+    assert (passed, open_count, required) == (36, 14, 50)
+    assert set(summary["unresolved_gates"]) == AUTHORITATIVE_OPEN_GATES
     groups = summary["reconciliation_groups"]
     assert sum(group["count"] for group in groups.values()) == required
     assert (
@@ -489,7 +825,14 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
 def test_public_safety_rejects_injected_private_contact_or_proposal_number():
     module = load_module()
     source_state, _ = module.inspect_source_package()
-    private, proposal_number = synthetic_private_payload(module, source_state)
+    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    private, proposal_number = synthetic_private_payload(
+        module,
+        source_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+    )
 
     with pytest.raises(module.MissionWeaveGateError) as exc:
         module.ensure_public_safe({"unsafe": proposal_number}, private)

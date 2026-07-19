@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import getpass
+import hmac
 import importlib.util
 import json
 import os
@@ -169,6 +170,20 @@ def require_exact_keys(value: Any, expected: set[str], code: str) -> dict[str, A
     return value
 
 
+def require_compatible_keys(
+    value: Any,
+    required: set[str],
+    optional: set[str],
+    code: str,
+) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise CaptureError(code)
+    keys = set(value)
+    if not required.issubset(keys) or keys.difference(required | optional):
+        raise CaptureError(code)
+    return value
+
+
 def validate_payload_shape(payload: Any) -> dict[str, Any]:
     top_keys = {
         "schema",
@@ -195,15 +210,10 @@ def validate_payload_shape(payload: Any) -> dict[str, Any]:
     identity = require_exact_keys(
         record["identity"], set(GATE.IDENTITY_GATES), "IDENTITY_SCHEMA_DRIFT"
     )
-    proposal_value_keys = {
-        "proposal_number",
-        "volume2_pdf_sha256",
-        "volume3_total_usd",
-        "portal_preview_sha256",
-    }
-    proposal = require_exact_keys(
+    proposal = require_compatible_keys(
         record["proposal"],
-        set(GATE.PROPOSAL_FLAG_GATES) | proposal_value_keys,
+        set(GATE.PROPOSAL_FLAG_GATES) | GATE.PROPOSAL_VALUE_KEYS,
+        GATE.PROPOSAL_CONSISTENCY_KEYS,
         "PROPOSAL_SCHEMA_DRIFT",
     )
     compliance = require_exact_keys(
@@ -211,11 +221,15 @@ def validate_payload_shape(payload: Any) -> dict[str, Any]:
         set(GATE.COMPLIANCE_GATES) | {"itar_scope_determination"},
         "COMPLIANCE_SCHEMA_DRIFT",
     )
-    approval = require_exact_keys(
+    approval = require_compatible_keys(
         record["approval"],
-        set(GATE.APPROVAL_FLAG_GATES) | {"approval_utc"},
+        set(GATE.APPROVAL_FLAG_GATES) | GATE.APPROVAL_VALUE_KEYS,
+        GATE.APPROVAL_CONSISTENCY_KEYS,
         "APPROVAL_SCHEMA_DRIFT",
     )
+    proposal.setdefault("portal_preview_captured_utc", None)
+    proposal.setdefault("portal_preview_binding_sha256", None)
+    approval.setdefault("approval_binding_sha256", None)
 
     for field in GATE.IDENTITY_GATES:
         if not isinstance(identity[field], bool):
@@ -233,9 +247,17 @@ def validate_payload_shape(payload: Any) -> dict[str, Any]:
         proposal["proposal_number"], str
     ):
         raise CaptureError("PROPOSAL_NUMBER_TYPE_INVALID")
-    for field in ("volume2_pdf_sha256", "portal_preview_sha256"):
+    for field in (
+        "volume2_pdf_sha256",
+        "portal_preview_sha256",
+        "portal_preview_binding_sha256",
+    ):
         if proposal[field] is not None and not isinstance(proposal[field], str):
             raise CaptureError("PROPOSAL_HASH_TYPE_INVALID")
+    if proposal["portal_preview_captured_utc"] is not None and not GATE.valid_timestamp(
+        proposal["portal_preview_captured_utc"]
+    ):
+        raise CaptureError("PREVIEW_RECEIPT_TIMESTAMP_INVALID")
     if proposal["volume3_total_usd"] is not None and (
         isinstance(proposal["volume3_total_usd"], bool)
         or not isinstance(proposal["volume3_total_usd"], (str, int, float))
@@ -251,6 +273,10 @@ def validate_payload_shape(payload: Any) -> dict[str, Any]:
         approval["approval_utc"]
     ):
         raise CaptureError("APPROVAL_TIMESTAMP_INVALID")
+    if approval["approval_binding_sha256"] is not None and not GATE.valid_sha256(
+        approval["approval_binding_sha256"]
+    ):
+        raise CaptureError("APPROVAL_BINDING_INVALID")
     return record
 
 
@@ -275,7 +301,22 @@ def load_template(template_path: Path = TEMPLATE) -> dict[str, Any]:
         payload = json.loads(template_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise CaptureError("PRIVATE_TEMPLATE_UNREADABLE") from exc
-    return deepcopy(validate_payload_shape(payload))
+    clean = deepcopy(validate_payload_shape(payload))
+    clean["captured_utc"] = None
+    for field in GATE.IDENTITY_GATES:
+        clean["identity"][field] = False
+    for field in GATE.PROPOSAL_FLAG_GATES:
+        clean["proposal"][field] = False
+    for field in GATE.PROPOSAL_VALUE_KEYS | GATE.PROPOSAL_CONSISTENCY_KEYS:
+        clean["proposal"][field] = None
+    for field in GATE.COMPLIANCE_GATES:
+        clean["eligibility_and_compliance"][field] = False
+    clean["eligibility_and_compliance"]["itar_scope_determination"] = None
+    for field in GATE.APPROVAL_FLAG_GATES:
+        clean["approval"][field] = False
+    for field in GATE.APPROVAL_VALUE_KEYS | GATE.APPROVAL_CONSISTENCY_KEYS:
+        clean["approval"][field] = None
+    return clean
 
 
 def load_or_initialize_private_record(
@@ -410,9 +451,30 @@ def collect_identity(payload: dict[str, Any], *, prompt: Callable[[str], str]) -
 
 
 def hash_receipt_file(path: Path) -> str:
-    if path.is_symlink() or not path.is_file():
+    if path.is_symlink() or not path.is_file() or path.stat().st_size <= 0:
         raise CaptureError("PREVIEW_RECEIPT_NOT_REGULAR_FILE")
-    return GATE.sha256_file(path)
+    before = path.stat()
+    digest = GATE.sha256_file(path)
+    after = path.stat()
+    if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
+        raise CaptureError("PREVIEW_RECEIPT_CHANGED_DURING_HASH")
+    return digest
+
+
+def capture_preview_receipt(
+    path: Path,
+    *,
+    reference_utc: datetime,
+) -> tuple[str, str]:
+    digest = hash_receipt_file(path)
+    modified_utc = datetime.fromtimestamp(path.stat().st_mtime, timezone.utc)
+    if not GATE.timestamp_is_fresh(
+        modified_utc.isoformat(),
+        reference_utc=reference_utc,
+        max_age=GATE.PREVIEW_RECEIPT_MAX_AGE,
+    ):
+        raise CaptureError("PREVIEW_RECEIPT_NOT_FRESH")
+    return digest, modified_utc.isoformat()
 
 
 def hash_private_final_volume2() -> str:
@@ -425,12 +487,31 @@ def hash_private_final_volume2() -> str:
     return GATE.sha256_file(target)
 
 
+def clear_action_time_approval(payload: dict[str, Any]) -> None:
+    approval = payload["approval"]
+    approval["corporate_official_reviewed_all_volumes"] = False
+    approval["final_submission_authorized_at_action_time"] = False
+    approval["approval_utc"] = None
+    approval["approval_binding_sha256"] = None
+
+
+def clear_preview_evidence(payload: dict[str, Any]) -> None:
+    proposal = payload["proposal"]
+    proposal["portal_preview_reviewed"] = False
+    proposal["portal_preview_captured_utc"] = None
+    proposal["portal_preview_binding_sha256"] = None
+
+
 def collect_proposal(
     payload: dict[str, Any],
     *,
     prompt: Callable[[str], str],
     use_current_volume2_hash: bool,
     preview_receipt_file: Path | None,
+    reference_utc: datetime,
+    volume3_artifact_state: dict[str, Any],
+    jcp_evidence_state: dict[str, Any],
+    cmmc_packet_state: dict[str, Any],
 ) -> None:
     section = payload["proposal"]
     section["proposal_number"] = choose_proposal_number(
@@ -452,13 +533,32 @@ def collect_proposal(
         section["volume3_total_usd"], prompt=prompt
     )
     if preview_receipt_file is not None:
-        section["portal_preview_sha256"] = hash_receipt_file(preview_receipt_file)
+        preview_sha256, preview_captured_utc = capture_preview_receipt(
+            preview_receipt_file, reference_utc=reference_utc
+        )
+        section["portal_preview_sha256"] = preview_sha256
+        section["portal_preview_captured_utc"] = preview_captured_utc
+        section["portal_preview_binding_sha256"] = (
+            GATE.preview_evidence_binding_sha256(
+                payload,
+                volume3_artifact_state=volume3_artifact_state,
+                jcp_evidence_state=jcp_evidence_state,
+                cmmc_packet_state=cmmc_packet_state,
+            )
+        )
     else:
+        prior_preview_sha256 = section["portal_preview_sha256"]
         section["portal_preview_sha256"] = choose_sha256(
             "Complete portal preview receipt",
-            section["portal_preview_sha256"],
+            prior_preview_sha256,
             prompt=prompt,
         )
+        if (
+            section["portal_preview_sha256"] is None
+            or section["portal_preview_sha256"] != prior_preview_sha256
+        ):
+            section["portal_preview_captured_utc"] = None
+            section["portal_preview_binding_sha256"] = None
 
 
 def collect_compliance(
@@ -474,7 +574,15 @@ def collect_compliance(
     )
 
 
-def collect_approval(payload: dict[str, Any], *, prompt: Callable[[str], str]) -> None:
+def collect_approval(
+    payload: dict[str, Any],
+    *,
+    prompt: Callable[[str], str],
+    reference_utc: datetime,
+    volume3_artifact_state: dict[str, Any],
+    jcp_evidence_state: dict[str, Any],
+    cmmc_packet_state: dict[str, Any],
+) -> None:
     section = payload["approval"]
     section["corporate_official_reviewed_all_volumes"] = choose_bool(
         "The corporate official reviewed every populated field and all seven volumes",
@@ -489,10 +597,46 @@ def collect_approval(payload: dict[str, Any], *, prompt: Callable[[str], str]) -
     if section["final_submission_authorized_at_action_time"]:
         if not section["corporate_official_reviewed_all_volumes"]:
             raise CaptureError("APPROVAL_REQUIRES_ALL_VOLUME_REVIEW")
-        if not GATE.valid_timestamp(section["approval_utc"]):
-            section["approval_utc"] = now_utc()
+        proposal = payload["proposal"]
+        expected_preview_binding = GATE.preview_evidence_binding_sha256(
+            payload,
+            volume3_artifact_state=volume3_artifact_state,
+            jcp_evidence_state=jcp_evidence_state,
+            cmmc_packet_state=cmmc_packet_state,
+        )
+        recorded_preview_binding = proposal.get("portal_preview_binding_sha256")
+        preview_fresh = bool(
+            GATE.valid_sha256(proposal.get("portal_preview_sha256"))
+            and GATE.timestamp_is_fresh(
+                proposal.get("portal_preview_captured_utc"),
+                reference_utc=reference_utc,
+                max_age=GATE.PREVIEW_RECEIPT_MAX_AGE,
+            )
+            and expected_preview_binding is not None
+            and GATE.valid_sha256(recorded_preview_binding)
+            and hmac.compare_digest(
+                str(recorded_preview_binding).upper(), expected_preview_binding
+            )
+        )
+        if (
+            not preview_fresh
+            or proposal.get("portal_preview_reviewed") is not True
+            or proposal.get("volume5_upload_set_reviewed") is not True
+        ):
+            raise CaptureError("APPROVAL_REQUIRES_FRESH_CURRENT_PREVIEW")
+        section["approval_utc"] = reference_utc.isoformat()
+        section["approval_binding_sha256"] = (
+            GATE.action_time_approval_binding_sha256(
+                payload,
+                approval_utc=section["approval_utc"],
+                volume3_artifact_state=volume3_artifact_state,
+                jcp_evidence_state=jcp_evidence_state,
+                cmmc_packet_state=cmmc_packet_state,
+            )
+        )
     else:
         section["approval_utc"] = None
+        section["approval_binding_sha256"] = None
 
 
 def normalize_sections(requested: list[str]) -> tuple[str, ...]:
@@ -560,14 +704,24 @@ def capture_private_sections(
     preview_receipt_file: Path | None = None,
     source_state: dict[str, Any] | None = None,
     volume2_text: str | None = None,
+    volume3_artifact_state: dict[str, Any] | None = None,
+    jcp_evidence_state: dict[str, Any] | None = None,
+    cmmc_packet_state: dict[str, Any] | None = None,
+    reference_utc: datetime | str | None = None,
 ) -> dict[str, Any]:
     selected = normalize_sections(sections)
     if not selected:
         raise CaptureError("NO_CAPTURE_SECTION_SELECTED")
-    if preview_receipt_file is not None and "proposal" not in selected:
-        raise CaptureError("PREVIEW_RECEIPT_REQUIRES_PROPOSAL_SECTION")
+    if preview_receipt_file is not None and selected != ("proposal",):
+        raise CaptureError("PREVIEW_RECEIPT_REQUIRES_PROPOSAL_ONLY")
     if use_current_volume2_hash and "proposal" not in selected:
         raise CaptureError("VOLUME2_HASH_REQUIRES_PROPOSAL_SECTION")
+    if "approval" in selected and selected != ("approval",):
+        raise CaptureError("APPROVAL_SECTION_MUST_BE_CAPTURED_SEPARATELY")
+    try:
+        evaluated_utc = GATE.normalize_reference_time(reference_utc)
+    except GATE.MissionWeaveGateError as exc:
+        raise CaptureError(exc.code) from exc
 
     destination = validate_private_target(
         target,
@@ -578,6 +732,21 @@ def capture_private_sections(
     payload, resumed = load_or_initialize_private_record(
         destination, template_path=template_path
     )
+    if volume3_artifact_state is None:
+        volume3_artifact_state = GATE.inspect_private_volume3_artifact()
+    if jcp_evidence_state is None:
+        jcp_evidence_state = GATE.inspect_private_jcp_evidence()
+    if cmmc_packet_state is None:
+        cmmc_packet_state = GATE.inspect_cmmc_evidence_packet()
+
+    upload_identity_before = GATE.current_upload_set_identity_sha256(
+        payload,
+        volume3_artifact_state=volume3_artifact_state,
+        jcp_evidence_state=jcp_evidence_state,
+        cmmc_packet_state=cmmc_packet_state,
+    )
+    if selected != ("approval",):
+        clear_action_time_approval(payload)
 
     for section in selected:
         if section == "identity":
@@ -588,16 +757,40 @@ def capture_private_sections(
                 prompt=prompt,
                 use_current_volume2_hash=use_current_volume2_hash,
                 preview_receipt_file=preview_receipt_file,
+                reference_utc=evaluated_utc,
+                volume3_artifact_state=volume3_artifact_state,
+                jcp_evidence_state=jcp_evidence_state,
+                cmmc_packet_state=cmmc_packet_state,
             )
         elif section == "eligibility_and_compliance":
             collect_compliance(payload, prompt=prompt)
         elif section == "approval":
-            collect_approval(payload, prompt=prompt)
+            collect_approval(
+                payload,
+                prompt=prompt,
+                reference_utc=evaluated_utc,
+                volume3_artifact_state=volume3_artifact_state,
+                jcp_evidence_state=jcp_evidence_state,
+                cmmc_packet_state=cmmc_packet_state,
+            )
         else:
             raise CaptureError("UNKNOWN_CAPTURE_SECTION")
 
+    upload_identity_after = GATE.current_upload_set_identity_sha256(
+        payload,
+        volume3_artifact_state=volume3_artifact_state,
+        jcp_evidence_state=jcp_evidence_state,
+        cmmc_packet_state=cmmc_packet_state,
+    )
+    if (
+        selected != ("approval",)
+        and preview_receipt_file is None
+        and upload_identity_after != upload_identity_before
+    ):
+        clear_preview_evidence(payload)
+
     payload["template_only"] = False
-    payload["captured_utc"] = now_utc()
+    payload["captured_utc"] = evaluated_utc.isoformat()
     validate_payload_shape(payload)
     ensure_private_record_has_no_credential_material(payload)
 
@@ -609,7 +802,13 @@ def capture_private_sections(
         )
     try:
         evaluation = GATE.evaluate_private_payload(
-            payload, source_state=source_state, volume2_text=volume2_text
+            payload,
+            source_state=source_state,
+            volume2_text=volume2_text,
+            volume3_artifact_state=volume3_artifact_state,
+            jcp_evidence_state=jcp_evidence_state,
+            cmmc_packet_state=cmmc_packet_state,
+            evaluated_utc=evaluated_utc,
         )
     except GATE.MissionWeaveGateError as exc:
         raise CaptureError(exc.code) from exc
