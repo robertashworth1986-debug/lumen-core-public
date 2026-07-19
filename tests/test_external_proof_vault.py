@@ -43,6 +43,13 @@ def test_manifest_selects_high_value_proof_artifacts_without_moving_sources(tmp_
     assert "out/ops/top_geometry_live_replay_results_latest.json" in relative_paths
     assert "out/ops/sector_validation_priority_board_latest.json" in relative_paths
     assert "out/ops/lumencore_estate_master_index_manifest_latest.json" in relative_paths
+    assert "README.md" in relative_paths
+    assert "config/quant_hub_lexicon_v1.json" in relative_paths
+    assert "docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md" in relative_paths
+    assert "out/ops/quant_hub_reviewer_context_latest.json" in relative_paths
+    assert "dashboard/data/quant_hub_reviewer_context.json" in relative_paths
+    assert "code/ops/BUILD_QUANT_HUB_REVIEWER_CONTEXT.py" in relative_paths
+    assert "tests/test_quant_hub_reviewer_context.py" in relative_paths
     assert "code/geometry_time_series_model_routing_benchmark.py" in relative_paths
     assert "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.md" in relative_paths
     assert "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json" in relative_paths

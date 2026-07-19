@@ -24,6 +24,13 @@ PROOF_ARTIFACTS: list[tuple[str, str, bool]] = [
     ("continuity", "docs/LUMAJARVIS_LEGENDARY_GOAL_PROMPT_2026-06-21.md", False),
     ("continuity", "docs/LUMA_CONTEXT_DASHBOARD_PARITY_AUDIT_2026-06-22.md", True),
     ("continuity", "out/ops/luma_context_dashboard_parity_audit_latest.json", True),
+    ("quant_hub", "README.md", True),
+    ("quant_hub", "config/quant_hub_lexicon_v1.json", True),
+    ("quant_hub", "docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md", True),
+    ("quant_hub", "out/ops/quant_hub_reviewer_context_latest.json", True),
+    ("quant_hub", "dashboard/data/quant_hub_reviewer_context.json", True),
+    ("quant_hub", "code/ops/BUILD_QUANT_HUB_REVIEWER_CONTEXT.py", True),
+    ("quant_hub", "tests/test_quant_hub_reviewer_context.py", True),
     ("proof_value", "docs/LIVE_PROOF_VALUE_METER_2026-06-22.md", True),
     ("proof_value", "out/ops/live_proof_value_meter_latest.json", True),
     ("proof_value", "docs/CHAMPION_METRIC_GAUNTLET_2026-06-27.md", True),
@@ -276,7 +283,6 @@ def build_manifest(target_root: Path, package_name: str | None = None) -> dict[s
 
 
 def copy_artifacts(manifest: dict[str, Any]) -> dict[str, Any]:
-    packet_dir = Path(str(manifest["packet_dir"]))
     copied = []
     for row in manifest["artifacts"]:
         if not row["exists"]:
