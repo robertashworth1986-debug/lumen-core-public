@@ -62,6 +62,20 @@ def test_private_grant_artifact_tree_is_shadowed_before_static_mount() -> None:
     assert gateway.block_private_grant_artifacts("any/submission_packet.json").status_code == 404
 
 
+def test_raw_evidence_runs_are_shadowed_before_dashboard_static_mount() -> None:
+    route_paths = [getattr(route, "path", "") for route in gateway.app.routes]
+    block_index = route_paths.index("/evidence/runs/{artifact_path:path}")
+    static_index = next(
+        index
+        for index, route in enumerate(gateway.app.routes)
+        if getattr(route, "name", "") == "dashboard"
+    )
+
+    assert "/evidence/runs" in route_paths
+    assert block_index < static_index
+    assert gateway.block_raw_evidence_runs("old-provider/summary.json").status_code == 404
+
+
 def test_nginx_templates_block_private_grant_artifacts() -> None:
     templates = [
         ROOT / "code" / "deploy" / "nginx" / "lumatrader.conf",
@@ -71,3 +85,15 @@ def test_nginx_templates_block_private_grant_artifacts() -> None:
         text = template.read_text(encoding="utf-8")
         assert "location ^~ /out/grants/" in text
         assert text.index("location ^~ /out/grants/") < text.index("location /out/")
+
+
+def test_nginx_templates_block_raw_evidence_runs() -> None:
+    templates = [
+        ROOT / "code" / "deploy" / "nginx" / "lumatrader.conf",
+        ROOT / "deploy" / "VPS_DEPLOY.sh",
+    ]
+    for template in templates:
+        text = template.read_text(encoding="utf-8")
+        assert "location = /evidence/runs" in text
+        assert "location ^~ /evidence/runs/" in text
+        assert text.index("location ^~ /evidence/runs/") < text.index("location /evidence/")

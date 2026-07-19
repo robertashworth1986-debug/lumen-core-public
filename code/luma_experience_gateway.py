@@ -6230,6 +6230,14 @@ def block_private_grant_artifacts(artifact_path: str = "") -> Response:
     return Response(status_code=404)
 
 
+@app.get("/evidence/runs", include_in_schema=False)
+@app.get("/evidence/runs/{artifact_path:path}", include_in_schema=False)
+def block_raw_evidence_runs(artifact_path: str = "") -> Response:
+    """Expose only sanitized evidence projections, never raw provider responses."""
+    del artifact_path
+    return Response(status_code=404)
+
+
 if DASH.exists():
     # ──────────────────────────────────────────────────────────────
     # SPIKE HUNTER  — Live Kraken opportunity scanner

@@ -426,6 +426,14 @@ server {
         return 404;
     }
 
+    location = /evidence/runs {
+        return 404;
+    }
+
+    location ^~ /evidence/runs/ {
+        return 404;
+    }
+
     location /evidence/ {
         alias /opt/lumencore/dashboard/evidence/;
         try_files $uri $uri/ =404;
