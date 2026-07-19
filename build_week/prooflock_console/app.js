@@ -81,45 +81,47 @@ async function verifyArtifact(artifact) {
 }
 
 async function verifyReceipt(receipt) {
-  const errors = [];
-  if (receipt.schema !== "lumencore.prooflock_receipt.v1") errors.push("Unsupported or missing receipt schema");
-  if (!String(receipt.claim_boundary || "").trim()) errors.push("claim_boundary is required");
+  const integrityErrors = [];
+  const policyErrors = [];
+  if (receipt.schema !== "lumencore.prooflock_receipt.v1") integrityErrors.push("Unsupported or missing receipt schema");
+  if (!String(receipt.claim_boundary || "").trim()) integrityErrors.push("claim_boundary is required");
 
   const computedReceiptHash = await sha256Text(canonicalize(receiptPayload(receipt)));
   const expectedReceiptHash = String(receipt.receipt_sha256 || "").toLowerCase();
   const receiptHashMatches = computedReceiptHash === expectedReceiptHash;
-  if (!receiptHashMatches) errors.push("Receipt hash does not match canonical JSON");
+  if (!receiptHashMatches) integrityErrors.push("Receipt hash does not match canonical JSON");
 
   const artifacts = [];
   for (const artifact of Array.isArray(receipt.artifacts) ? receipt.artifacts : []) {
     const result = await verifyArtifact(artifact);
-    if (!result.hash_matches) errors.push(`${result.artifact_id || "artifact"}: ${result.error || "hash mismatch"}`);
+    if (!result.hash_matches) integrityErrors.push(`${result.artifact_id || "artifact"}: ${result.error || "hash mismatch"}`);
     artifacts.push(result);
   }
-  if (!artifacts.length) errors.push("At least one artifact is required");
+  if (!artifacts.length) integrityErrors.push("At least one artifact is required");
 
   const allowedStatuses = new Set(["PASS", "FAIL", "OPEN", "NOT_APPLICABLE"]);
   const gates = Array.isArray(receipt.gates) ? receipt.gates : [];
   const requiredOpenOrFailed = [];
   const seen = new Set();
   for (const gate of gates) {
-    if (!gate.gate_id || seen.has(gate.gate_id)) errors.push(`Missing or duplicate gate_id: ${gate.gate_id || "<missing>"}`);
+    if (!gate.gate_id || seen.has(gate.gate_id)) integrityErrors.push(`Missing or duplicate gate_id: ${gate.gate_id || "<missing>"}`);
     seen.add(gate.gate_id);
-    if (!allowedStatuses.has(gate.status)) errors.push(`Invalid gate status: ${gate.gate_id || "<missing>"}`);
+    if (!allowedStatuses.has(gate.status)) integrityErrors.push(`Invalid gate status: ${gate.gate_id || "<missing>"}`);
     if (gate.required_for_promotion && gate.status !== "PASS") requiredOpenOrFailed.push(gate.gate_id);
   }
-  if (!gates.length) errors.push("At least one gate is required");
+  if (!gates.length) integrityErrors.push("At least one gate is required");
 
   const decision = String(receipt.decision || "").toUpperCase();
-  if (!new Set(["HOLD", "PROMOTE", "REJECT"]).has(decision)) errors.push("Decision must be HOLD, PROMOTE, or REJECT");
-  if (decision === "PROMOTE" && requiredOpenOrFailed.length) errors.push("PROMOTE is blocked by required gates");
+  if (!new Set(["HOLD", "PROMOTE", "REJECT"]).has(decision)) integrityErrors.push("Decision must be HOLD, PROMOTE, or REJECT");
+  if (decision === "PROMOTE" && requiredOpenOrFailed.length) policyErrors.push("PROMOTE is blocked by required gates");
 
   return {
     schema: "lumencore.prooflock_verification_report.v1",
     verified_utc: new Date().toISOString(),
     receipt_id: receipt.receipt_id || "",
-    integrity_valid: errors.length === 0,
-    promotion_allowed: errors.length === 0 && requiredOpenOrFailed.length === 0,
+    integrity_valid: integrityErrors.length === 0,
+    policy_valid: policyErrors.length === 0,
+    promotion_allowed: integrityErrors.length === 0 && policyErrors.length === 0 && requiredOpenOrFailed.length === 0,
     recorded_decision: decision,
     receipt_hash: { expected: expectedReceiptHash, computed: computedReceiptHash, matches: receiptHashMatches },
     artifacts,
@@ -127,7 +129,9 @@ async function verifyReceipt(receipt) {
     artifact_hash_match_count: artifacts.filter((row) => row.hash_matches).length,
     gates,
     required_open_or_failed_gates: requiredOpenOrFailed,
-    errors,
+    errors: [...integrityErrors, ...policyErrors],
+    integrity_errors: integrityErrors,
+    policy_errors: policyErrors,
     claim_boundary: receipt.claim_boundary || "",
   };
 }

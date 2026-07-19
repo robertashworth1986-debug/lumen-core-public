@@ -3,6 +3,8 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 
@@ -65,9 +67,35 @@ def test_promotion_cannot_clear_required_open_gates():
 
     report = module.verify_receipt(receipt)
 
-    assert report["integrity_valid"] is False
+    assert report["integrity_valid"] is True
+    assert report["policy_valid"] is False
+    assert report["receipt_hash"]["matches"] is True
     assert report["promotion_allowed"] is False
     assert "PROMOTE is prohibited" in " ".join(report["errors"])
+    assert report["integrity_errors"] == []
+    assert "PROMOTE is prohibited" in " ".join(report["policy_errors"])
+
+
+def test_cli_returns_nonzero_for_policy_invalid_promotion(tmp_path):
+    module = load_module()
+    receipt = sample_receipt()
+    receipt["decision"] = "PROMOTE"
+    receipt["receipt_sha256"] = module.stable_hash(module.receipt_payload(receipt))
+    receipt_path = tmp_path / "policy_invalid_receipt.json"
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+
+    completed = subprocess.run(
+        [sys.executable, str(SCRIPT), str(receipt_path)],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    report = json.loads(completed.stdout)
+    assert completed.returncode == 1
+    assert report["integrity_valid"] is True
+    assert report["policy_valid"] is False
 
 
 def test_artifact_path_cannot_escape_repository_root():

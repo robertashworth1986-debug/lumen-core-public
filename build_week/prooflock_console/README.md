@@ -37,7 +37,7 @@ Supported platforms: current desktop and mobile browsers with Web Crypto and Fet
 python build_week/prooflock_console/verify_receipt.py
 ```
 
-The CLI exits nonzero when the canonical receipt hash, artifact hashes, schema, path boundary, or promotion logic fails. `integrity_valid` and `promotion_allowed` are deliberately separate: a truthful receipt can be intact while the engineering and release gates remain open.
+The CLI exits nonzero when the canonical receipt hash, artifact hashes, schema, path boundary, or recorded decision policy fails. `integrity_valid`, `policy_valid`, and `promotion_allowed` are deliberately separate: a receipt can be intact while a requested `PROMOTE` decision is prohibited or required engineering and release gates remain open.
 
 ## Test
 
