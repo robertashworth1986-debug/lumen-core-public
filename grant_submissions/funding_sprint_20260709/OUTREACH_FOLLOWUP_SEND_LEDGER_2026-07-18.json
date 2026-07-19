@@ -1,0 +1,12 @@
+{
+  "claim_boundary": "This ledger counts only bounded proactive follow-up sends recorded by privacy-safe sent-message receipt hashes. It does not expose recipients, message IDs, thread IDs, subjects, bodies, attachments, credentials, or private proposal facts, and it does not prove delivery, receipt, endorsement, validation, selection, funding, or award.",
+  "controls": {
+    "append_only": true,
+    "count_derived_from_receipts": true,
+    "private_identifiers_prohibited": true
+  },
+  "initialized_utc": "2026-07-19T01:50:00Z",
+  "ledger_sha256": "8CEFC82915AD884F4F2C01E4810861DB274E7E083837FDBC3ECA900EF37E7469",
+  "receipts": [],
+  "schema": "lumencore.outreach_followup_send_ledger.v1"
+}

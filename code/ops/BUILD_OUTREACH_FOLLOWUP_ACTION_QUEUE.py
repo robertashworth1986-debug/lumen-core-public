@@ -24,14 +24,25 @@ RESPONSE_REGISTRY_BUILDER = (
     ROOT / "code" / "ops" / "BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py"
 )
 FOLLOWUP_POLICY_CONFIG = ROOT / "config" / "outreach_followup_policies_v1.json"
+FOLLOWUP_SEND_LEDGER = (
+    SPRINT_DIR / "OUTREACH_FOLLOWUP_SEND_LEDGER_2026-07-18.json"
+)
 
 CANONICAL_JSON = SPRINT_DIR / "OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json"
 CANONICAL_MD = SPRINT_DIR / "OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md"
 LATEST_JSON = OUT_OPS / "outreach_followup_action_queue_latest.json"
 
 SCHEMA = "lumencore.outreach_followup_action_queue.v1"
+SEND_LEDGER_SCHEMA = "lumencore.outreach_followup_send_ledger.v1"
 REFERENCE_AS_OF_UTC = "2026-07-18T12:20:24Z"
 MAILBOX_RECHECK_MAX_AGE_SECONDS = 15 * 60
+PRIVATE_SEND_RECEIPT_KEYS = {
+    "body",
+    "message_id",
+    "recipient_email",
+    "subject",
+    "thread_id",
+}
 
 MODE_STATES = {
     "ACCOUNT_ACTION": "HUMAN_ACCOUNT_ACTION_OPEN",
@@ -78,6 +89,93 @@ def source_status(path: Path) -> dict[str, Any]:
     }
 
 
+def canonical_object_sha256(payload: dict[str, Any], *, omit: set[str]) -> str:
+    bounded = {key: value for key, value in payload.items() if key not in omit}
+    return hashlib.sha256(
+        json.dumps(bounded, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest().upper()
+
+
+def normalize_sha256(value: Any, label: str) -> str:
+    normalized = str(value or "").strip().upper()
+    if len(normalized) != 64 or any(
+        char not in "0123456789ABCDEF" for char in normalized
+    ):
+        raise ValueError(f"{label} SHA-256 is invalid")
+    return normalized
+
+
+def validate_followup_send_ledger(
+    ledger: dict[str, Any],
+    policies: dict[str, dict[str, Any]],
+    template_ids: set[str],
+    *,
+    as_of: datetime,
+) -> tuple[Counter[str], dict[str, list[str]]]:
+    if ledger.get("schema") != SEND_LEDGER_SCHEMA:
+        raise ValueError("Follow-up send ledger schema is invalid")
+    controls = ledger.get("controls", {})
+    if (
+        controls.get("append_only") is not True
+        or controls.get("count_derived_from_receipts") is not True
+        or controls.get("private_identifiers_prohibited") is not True
+    ):
+        raise ValueError("Follow-up send ledger controls are unsafe")
+    expected_ledger_sha = canonical_object_sha256(ledger, omit={"ledger_sha256"})
+    if normalize_sha256(ledger.get("ledger_sha256"), "Follow-up send ledger") != (
+        expected_ledger_sha
+    ):
+        raise ValueError("Follow-up send ledger integrity check failed")
+
+    receipts = ledger.get("receipts")
+    if not isinstance(receipts, list):
+        raise ValueError("Follow-up send ledger receipts must be a list")
+    counts: Counter[str] = Counter()
+    receipt_digests: dict[str, list[str]] = {}
+    seen_sent_receipts: set[str] = set()
+    for index, receipt in enumerate(receipts):
+        if not isinstance(receipt, dict):
+            raise ValueError(f"Follow-up send receipt {index} is invalid")
+        exposed = PRIVATE_SEND_RECEIPT_KEYS.intersection(receipt)
+        if exposed:
+            raise ValueError(
+                "Follow-up send receipt exposes private message material: "
+                + ", ".join(sorted(exposed))
+            )
+        lane_id = str(receipt.get("lane_id") or "")
+        policy = policies.get(lane_id)
+        if policy is None:
+            raise ValueError(f"Follow-up send receipt has unknown lane: {lane_id}")
+        if policy.get("mode") != "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD":
+            raise ValueError(f"Non-proactive lane has a send receipt: {lane_id}")
+        template_id = receipt.get("template_id")
+        if (
+            template_id not in template_ids
+            or template_id != policy.get("eligible_template_id")
+        ):
+            raise ValueError(f"Follow-up send receipt template mismatch: {lane_id}")
+        if receipt.get("delivery_state") != "SENT":
+            raise ValueError(f"Follow-up send receipt state is not SENT: {lane_id}")
+        sent_at = parse_aware_utc(str(receipt.get("sent_utc") or ""))
+        if sent_at > as_of:
+            raise ValueError(f"Follow-up send receipt is future-dated: {lane_id}")
+        sent_receipt_sha = normalize_sha256(
+            receipt.get("sent_message_receipt_sha256"), "Sent message receipt"
+        )
+        if sent_receipt_sha in seen_sent_receipts:
+            raise ValueError("Follow-up send ledger contains a duplicate receipt")
+        seen_sent_receipts.add(sent_receipt_sha)
+        counts[lane_id] += 1
+        receipt_digests.setdefault(lane_id, []).append(
+            canonical_object_sha256(receipt, omit=set())
+        )
+
+    for lane_id, count in counts.items():
+        if count > int(policies[lane_id]["max_proactive_sends"]):
+            raise ValueError(f"Follow-up send limit exceeded in ledger: {lane_id}")
+    return counts, receipt_digests
+
+
 def validate_embedded_source_evidence(reconciliation: dict[str, Any]) -> None:
     evidence = reconciliation.get("source_evidence")
     if not isinstance(evidence, dict) or not evidence:
@@ -108,7 +206,15 @@ def validate_sources(
     reconciliation: dict[str, Any],
     registry: dict[str, Any],
     policy_config: dict[str, Any],
-) -> tuple[set[str], dict[str, dict[str, Any]]]:
+    send_ledger: dict[str, Any],
+    *,
+    as_of: datetime,
+) -> tuple[
+    set[str],
+    dict[str, dict[str, Any]],
+    Counter[str],
+    dict[str, list[str]],
+]:
     if (
         reconciliation.get("schema")
         != "lumencore.email_action_reconciliation.v1"
@@ -158,12 +264,18 @@ def validate_sources(
         template_id = lane_policy.get("eligible_template_id")
         if template_id and template_id not in template_ids:
             raise ValueError(f"Unknown eligible template: {template_id}")
-    return template_ids, policies
+    send_counts, send_receipt_digests = validate_followup_send_ledger(
+        send_ledger, policies, template_ids, as_of=as_of
+    )
+    return template_ids, policies, send_counts, send_receipt_digests
 
 
-def evaluate_lane(lane: dict[str, Any], as_of: datetime) -> dict[str, Any]:
+def evaluate_lane(
+    lane: dict[str, Any], as_of: datetime, sent_counts: Counter[str]
+) -> dict[str, Any]:
     policy = lane["follow_up_policy"]
     mode = policy["mode"]
+    recorded_send_count = sent_counts.get(lane["lane_id"], 0)
     row = {
         "lane_id": lane["lane_id"],
         "organization": lane["organization"],
@@ -173,6 +285,7 @@ def evaluate_lane(lane: dict[str, Any], as_of: datetime) -> dict[str, Any]:
         "eligible_template_id": policy.get("eligible_template_id"),
         "not_before_utc": policy.get("not_before_utc"),
         "max_proactive_sends": policy.get("max_proactive_sends"),
+        "recorded_proactive_send_count": recorded_send_count,
         "rationale": policy["rationale"],
         "send_now": False,
         "draft_rendered": False,
@@ -186,6 +299,18 @@ def evaluate_lane(lane: dict[str, Any], as_of: datetime) -> dict[str, Any]:
         return row
     if mode != "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD":
         raise ValueError(f"Unsupported follow-up mode: {mode}")
+
+    if recorded_send_count >= int(policy["max_proactive_sends"]):
+        row.update(
+            {
+                "action_state": "FOLLOWUP_LIMIT_REACHED_NO_SEND",
+                "next_action": (
+                    "The bounded proactive follow-up allowance is exhausted. Monitor the "
+                    "existing thread and respond only to a specific inbound request."
+                ),
+            }
+        )
+        return row
 
     not_before = parse_aware_utc(str(policy["not_before_utc"]))
     if as_of < not_before:
@@ -227,7 +352,6 @@ def render_due_followup(
     mailbox_rechecked_utc: str,
     mailbox_check_receipt_sha256: str,
     no_reply_confirmed: bool,
-    prior_followup_count: int,
 ) -> dict[str, Any]:
     queue = build_payload(as_of_utc)
     action = next(
@@ -246,13 +370,9 @@ def render_due_followup(
         raise ValueError("Mailbox recheck timestamp cannot be in the future")
     if mailbox_check_age_seconds > MAILBOX_RECHECK_MAX_AGE_SECONDS:
         raise ValueError("Mailbox recheck is stale")
-    receipt = mailbox_check_receipt_sha256.strip().upper()
-    if len(receipt) != 64 or any(char not in "0123456789ABCDEF" for char in receipt):
-        raise ValueError("Mailbox recheck receipt SHA-256 is invalid")
-    if prior_followup_count < 0:
-        raise ValueError("Prior follow-up count cannot be negative")
-    if prior_followup_count >= int(action["max_proactive_sends"]):
-        raise ValueError("Maximum proactive follow-up count has been reached")
+    receipt = normalize_sha256(
+        mailbox_check_receipt_sha256, "Mailbox recheck receipt"
+    )
     template_id = action.get("eligible_template_id")
     if not template_id:
         raise ValueError("No eligible follow-up template is configured")
@@ -276,7 +396,7 @@ def render_due_followup(
     rendered["mailbox_recheck_age_seconds"] = mailbox_check_age_seconds
     rendered["mailbox_check_receipt_sha256"] = receipt
     rendered["no_reply_confirmed"] = True
-    rendered["prior_followup_count"] = prior_followup_count
+    rendered["prior_followup_count"] = action["recorded_proactive_send_count"]
     rendered["max_proactive_sends"] = action["max_proactive_sends"]
     return rendered
 
@@ -290,9 +410,19 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
     reconciliation = read_json(EMAIL_RECONCILIATION)
     registry = read_json(RESPONSE_TEMPLATE_REGISTRY)
     policy_config = read_json(FOLLOWUP_POLICY_CONFIG)
-    validate_sources(reconciliation, registry, policy_config)
+    send_ledger = read_json(FOLLOWUP_SEND_LEDGER)
+    _, _, sent_counts, sent_receipt_digests = validate_sources(
+        reconciliation,
+        registry,
+        policy_config,
+        send_ledger,
+        as_of=as_of,
+    )
 
-    actions = [evaluate_lane(lane, as_of) for lane in reconciliation["lanes"]]
+    actions = [
+        evaluate_lane(lane, as_of, sent_counts)
+        for lane in reconciliation["lanes"]
+    ]
     action_counts = Counter(row["action_state"] for row in actions)
     due_count = action_counts.get("RECHECK_MAILBOX_BEFORE_DRAFT", 0)
     payload: dict[str, Any] = {
@@ -310,6 +440,7 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
             "held_no_send_count": action_counts.get("HELD_NO_SEND", 0),
             "draft_rendered_count": sum(1 for row in actions if row["draft_rendered"]),
             "send_now_count": sum(1 for row in actions if row["send_now"]),
+            "recorded_proactive_send_count": sum(sent_counts.values()),
             "external_send_allowed_without_human": False,
         },
         "actions": actions,
@@ -319,6 +450,7 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
             "inbox_recheck_required_before_draft": True,
             "mailbox_recheck_max_age_seconds": MAILBOX_RECHECK_MAX_AGE_SECONDS,
             "mailbox_recheck_receipt_required": True,
+            "proactive_send_count_derived_from_sealed_ledger": True,
             "action_time_human_review_required": True,
             "final_send_performed": False,
         },
@@ -327,11 +459,14 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
             "response_template_registry": source_status(RESPONSE_TEMPLATE_REGISTRY),
             "response_registry_builder": source_status(RESPONSE_REGISTRY_BUILDER),
             "followup_policy_config": source_status(FOLLOWUP_POLICY_CONFIG),
+            "followup_send_ledger": source_status(FOLLOWUP_SEND_LEDGER),
         },
+        "followup_send_receipt_digests": dict(sorted(sent_receipt_digests.items())),
         "claim_boundary": (
             "This queue evaluates communication timing and routing controls only. A hold "
             "expiration requires a fresh mailbox check that is recent, timestamped, and "
-            "receipted; it does not authorize a draft or send. "
+            "receipted; prior proactive sends are derived from a sealed receipt ledger, "
+            "and neither condition authorizes a draft or send. "
             "The queue does not establish submission, receipt, selection, funding, endorsement, "
             "validation, technical performance, or authority to disclose private information."
         ),
@@ -353,6 +488,10 @@ def validate_payload(payload: dict[str, Any]) -> None:
         raise ValueError("Follow-up queue rendered a draft without a fresh inbox check")
     if any(row["send_now"] for row in payload["actions"]):
         raise ValueError("Follow-up queue contains a send-now row")
+    if payload["summary"]["recorded_proactive_send_count"] != sum(
+        row["recorded_proactive_send_count"] for row in payload["actions"]
+    ):
+        raise ValueError("Follow-up send ledger count is inconsistent")
     if any(
         row["action_state"] == "RECHECK_MAILBOX_BEFORE_DRAFT"
         and not row["inbox_recheck_required"]

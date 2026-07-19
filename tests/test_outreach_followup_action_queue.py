@@ -85,11 +85,16 @@ def test_current_queue_is_deterministic_and_never_sends():
     assert sum(actual["summary"]["action_state_counts"].values()) == 16
     assert actual["summary"]["draft_rendered_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
+    assert actual["summary"]["recorded_proactive_send_count"] == 0
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert actual["controls"]["mailbox_recheck_max_age_seconds"] == 900
     assert actual["controls"]["mailbox_recheck_receipt_required"] is True
+    assert actual["controls"][
+        "proactive_send_count_derived_from_sealed_ledger"
+    ] is True
     assert all(row["send_now"] is False for row in actual["actions"])
     assert all(row["draft_rendered"] is False for row in actual["actions"])
+    assert all(row["recorded_proactive_send_count"] == 0 for row in actual["actions"])
     assert all(
         row["inbox_recheck_required"] is True
         for row in actual["actions"]
@@ -158,7 +163,6 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
             mailbox_rechecked_utc="2026-07-23T13:59:30Z",
             mailbox_check_receipt_sha256=mailbox_receipt,
             no_reply_confirmed=True,
-            prior_followup_count=0,
         )
 
     for mailbox_rechecked, no_reply_confirmed in ((False, True), (True, False)):
@@ -171,20 +175,7 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
                 mailbox_rechecked_utc="2026-07-23T13:59:30Z",
                 mailbox_check_receipt_sha256=mailbox_receipt,
                 no_reply_confirmed=no_reply_confirmed,
-                prior_followup_count=0,
             )
-
-    with pytest.raises(ValueError, match="Maximum proactive follow-up"):
-        module.render_due_followup(
-            "lanl_vision_licensing_followup",
-            facts,
-            as_of_utc="2026-07-23T14:00:00Z",
-            mailbox_rechecked=True,
-            mailbox_rechecked_utc="2026-07-23T13:59:30Z",
-            mailbox_check_receipt_sha256=mailbox_receipt,
-            no_reply_confirmed=True,
-            prior_followup_count=1,
-        )
 
     rendered = module.render_due_followup(
         "lanl_vision_licensing_followup",
@@ -194,7 +185,6 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
         mailbox_rechecked_utc="2026-07-23T13:59:30Z",
         mailbox_check_receipt_sha256=mailbox_receipt,
         no_reply_confirmed=True,
-        prior_followup_count=0,
     )
     assert rendered["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
     assert rendered["template_id"] == "BOUNDED_REVIEW_FOLLOWUP"
@@ -207,6 +197,7 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
     assert rendered["mailbox_recheck_age_seconds"] == 30
     assert rendered["mailbox_check_receipt_sha256"] == mailbox_receipt
     assert rendered["no_reply_confirmed"] is True
+    assert rendered["prior_followup_count"] == 0
     assert "following up once" in rendered["body"]
     assert "does not assert receipt, endorsement, independent validation" in (
         rendered["body"]
@@ -249,7 +240,94 @@ def test_followup_render_rejects_unreceipted_or_nonfresh_mailbox_checks(
             mailbox_rechecked_utc=mailbox_rechecked_utc,
             mailbox_check_receipt_sha256=receipt,
             no_reply_confirmed=True,
-            prior_followup_count=0,
+        )
+
+
+def test_sealed_send_ledger_derives_count_and_exhausts_bounded_lane():
+    module = load_module()
+    ledger = module.read_json(module.FOLLOWUP_SEND_LEDGER)
+    policies_payload = module.read_json(module.FOLLOWUP_POLICY_CONFIG)
+    policies = {
+        row["lane_id"]: row for row in policies_payload["lane_policies"]
+    }
+    registry = module.read_json(module.RESPONSE_TEMPLATE_REGISTRY)
+    template_ids = {row["template_id"] for row in registry["templates"]}
+    as_of = module.parse_aware_utc("2026-07-23T15:00:00Z")
+
+    receipt = {
+        "delivery_state": "SENT",
+        "lane_id": "lanl_vision_licensing_followup",
+        "sent_message_receipt_sha256": "A" * 64,
+        "sent_utc": "2026-07-23T14:30:00Z",
+        "template_id": "BOUNDED_REVIEW_FOLLOWUP",
+    }
+    ledger["receipts"] = [receipt]
+    ledger["ledger_sha256"] = module.canonical_object_sha256(
+        ledger, omit={"ledger_sha256"}
+    )
+    counts, digests = module.validate_followup_send_ledger(
+        ledger, policies, template_ids, as_of=as_of
+    )
+
+    assert counts["lanl_vision_licensing_followup"] == 1
+    assert len(digests["lanl_vision_licensing_followup"][0]) == 64
+    reconciliation = module.read_json(module.EMAIL_RECONCILIATION)
+    lane = next(
+        row
+        for row in reconciliation["lanes"]
+        if row["lane_id"] == "lanl_vision_licensing_followup"
+    )
+    action = module.evaluate_lane(lane, as_of, counts)
+    assert action["action_state"] == "FOLLOWUP_LIMIT_REACHED_NO_SEND"
+    assert action["recorded_proactive_send_count"] == 1
+    assert action["send_now"] is False
+    assert "allowance is exhausted" in action["next_action"]
+
+
+def test_send_ledger_tamper_duplicate_and_private_material_fail_closed():
+    module = load_module()
+    base = module.read_json(module.FOLLOWUP_SEND_LEDGER)
+    policies_payload = module.read_json(module.FOLLOWUP_POLICY_CONFIG)
+    policies = {
+        row["lane_id"]: row for row in policies_payload["lane_policies"]
+    }
+    registry = module.read_json(module.RESPONSE_TEMPLATE_REGISTRY)
+    template_ids = {row["template_id"] for row in registry["templates"]}
+    as_of = module.parse_aware_utc("2026-07-23T15:00:00Z")
+    receipt = {
+        "delivery_state": "SENT",
+        "lane_id": "lanl_vision_licensing_followup",
+        "sent_message_receipt_sha256": "B" * 64,
+        "sent_utc": "2026-07-23T14:30:00Z",
+        "template_id": "BOUNDED_REVIEW_FOLLOWUP",
+    }
+
+    tampered = copy.deepcopy(base)
+    tampered["receipts"] = [receipt]
+    with pytest.raises(ValueError, match="integrity"):
+        module.validate_followup_send_ledger(
+            tampered, policies, template_ids, as_of=as_of
+        )
+
+    duplicate = copy.deepcopy(base)
+    duplicate["receipts"] = [receipt, dict(receipt)]
+    duplicate["ledger_sha256"] = module.canonical_object_sha256(
+        duplicate, omit={"ledger_sha256"}
+    )
+    with pytest.raises(ValueError, match="duplicate receipt"):
+        module.validate_followup_send_ledger(
+            duplicate, policies, template_ids, as_of=as_of
+        )
+
+    private = copy.deepcopy(base)
+    private_receipt = dict(receipt, message_id="private-message-id")
+    private["receipts"] = [private_receipt]
+    private["ledger_sha256"] = module.canonical_object_sha256(
+        private, omit={"ledger_sha256"}
+    )
+    with pytest.raises(ValueError, match="private message material"):
+        module.validate_followup_send_ledger(
+            private, policies, template_ids, as_of=as_of
         )
 
 
@@ -299,22 +377,30 @@ def test_missing_or_drifted_lane_policy_fails_closed():
     reconciliation = module.read_json(module.EMAIL_RECONCILIATION)
     registry = module.read_json(module.RESPONSE_TEMPLATE_REGISTRY)
     policies = module.read_json(module.FOLLOWUP_POLICY_CONFIG)
+    send_ledger = module.read_json(module.FOLLOWUP_SEND_LEDGER)
+    as_of = module.parse_aware_utc(module.REFERENCE_AS_OF_UTC)
 
     missing = copy.deepcopy(policies)
     missing["lane_policies"] = missing["lane_policies"][:-1]
     with pytest.raises(ValueError, match="coverage"):
-        module.validate_sources(reconciliation, registry, missing)
+        module.validate_sources(
+            reconciliation, registry, missing, send_ledger, as_of=as_of
+        )
 
     drifted = copy.deepcopy(reconciliation)
     drifted["lanes"][0]["follow_up_policy"]["mode"] = "CLOSED"
     with pytest.raises(ValueError, match="policy drift"):
-        module.validate_sources(drifted, registry, policies)
+        module.validate_sources(
+            drifted, registry, policies, send_ledger, as_of=as_of
+        )
 
     stale_evidence = copy.deepcopy(reconciliation)
     source_id = next(iter(stale_evidence["source_evidence"]))
     stale_evidence["source_evidence"][source_id]["sha256"] = "0" * 64
     with pytest.raises(ValueError, match="Source evidence hash drift"):
-        module.validate_sources(stale_evidence, registry, policies)
+        module.validate_sources(
+            stale_evidence, registry, policies, send_ledger, as_of=as_of
+        )
 
 
 def test_public_outputs_exclude_mailbox_and_secret_material():
@@ -326,6 +412,7 @@ def test_public_outputs_exclude_mailbox_and_secret_material():
     lowered = rendered.lower()
 
     assert "hold expiration requires a fresh mailbox check" in lowered
+    assert "prior proactive sends are derived from a sealed receipt ledger" in lowered
     assert "past hold authorizes send" not in lowered
     for forbidden in (
         "@gmail.com",
