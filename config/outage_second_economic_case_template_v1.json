@@ -1,0 +1,77 @@
+{
+  "schema": "outage_second_economic_case.v1",
+  "case_id": null,
+  "case_classification": "TEMPLATE_ONLY",
+  "protocol_id": "LUMENCORE_OUTAGE_SECOND_ECONOMIC_CONVERSION_20260716",
+  "protocol_sha256": null,
+  "prepared_utc": null,
+  "counterfactual_frozen_utc": null,
+  "valuation_perspective": "PRIVATE_ENTITY_INCREMENTAL_COST",
+  "currency": "USD",
+  "base_year": null,
+  "operating_entity": {
+    "legal_name": null,
+    "organization_id": null,
+    "economic_owner_organization": null
+  },
+  "named_system": null,
+  "named_outage_scenario": null,
+  "counterfactual_baseline": null,
+  "analysis_period": {
+    "start_utc": null,
+    "end_utc": null
+  },
+  "scenarios": {
+    "low": {
+      "annual_revenue_usd": null,
+      "reporting_period_seconds": null,
+      "affected_scope_fraction": null,
+      "nonrecoverable_fraction": null,
+      "contribution_margin_fraction": null,
+      "outage_duration_seconds": null,
+      "fixed_incremental_costs_per_event_usd": null,
+      "variable_incremental_costs_per_second_usd": null,
+      "interruption_related_savings_per_event_usd": null,
+      "interruption_related_savings_per_second_usd": null,
+      "annual_avoided_outage_seconds": null,
+      "annual_avoided_event_count": null,
+      "attribution_fraction": null,
+      "confidence_factor": null
+    },
+    "base": {
+      "annual_revenue_usd": null,
+      "reporting_period_seconds": null,
+      "affected_scope_fraction": null,
+      "nonrecoverable_fraction": null,
+      "contribution_margin_fraction": null,
+      "outage_duration_seconds": null,
+      "fixed_incremental_costs_per_event_usd": null,
+      "variable_incremental_costs_per_second_usd": null,
+      "interruption_related_savings_per_event_usd": null,
+      "interruption_related_savings_per_second_usd": null,
+      "annual_avoided_outage_seconds": null,
+      "annual_avoided_event_count": null,
+      "attribution_fraction": null,
+      "confidence_factor": null
+    },
+    "high": {
+      "annual_revenue_usd": null,
+      "reporting_period_seconds": null,
+      "affected_scope_fraction": null,
+      "nonrecoverable_fraction": null,
+      "contribution_margin_fraction": null,
+      "outage_duration_seconds": null,
+      "fixed_incremental_costs_per_event_usd": null,
+      "variable_incremental_costs_per_second_usd": null,
+      "interruption_related_savings_per_event_usd": null,
+      "interruption_related_savings_per_second_usd": null,
+      "annual_avoided_outage_seconds": null,
+      "annual_avoided_event_count": null,
+      "attribution_fraction": null,
+      "confidence_factor": null
+    }
+  },
+  "input_sources": [],
+  "technical_evidence": null,
+  "limitations": []
+}

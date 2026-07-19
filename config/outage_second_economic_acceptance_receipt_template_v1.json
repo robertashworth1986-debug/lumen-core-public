@@ -1,0 +1,59 @@
+{
+  "schema": "outage_second_economic_acceptance_receipt.v1",
+  "receipt_status": "UNSIGNED_TEMPLATE",
+  "receipt_id": null,
+  "bindings": {
+    "protocol_id": "LUMENCORE_OUTAGE_SECOND_ECONOMIC_CONVERSION_20260716",
+    "protocol_artifact_sha256": null,
+    "case_id": null,
+    "case_artifact_sha256": null,
+    "private_calculation_artifact_sha256": null,
+    "input_artifact_manifest_sha256": null,
+    "technical_evidence_artifact_sha256": null
+  },
+  "accepted_scope": null,
+  "accepted_outputs": null,
+  "attestations": [],
+  "decision": null,
+  "release_decision": "WITHHOLD",
+  "decision_utc": null,
+  "signers": {
+    "economic_owner": {
+      "signer_id": null,
+      "name": null,
+      "role": null,
+      "organization": null,
+      "independence_from_lumencore": null,
+      "independence_from_other_signer": null,
+      "independence_basis": null,
+      "independence_evidence_artifact_sha256": null,
+      "signed_utc": null
+    },
+    "technical_reviewer": {
+      "signer_id": null,
+      "name": null,
+      "role": null,
+      "organization": null,
+      "independence_from_lumencore": null,
+      "independence_from_other_signer": null,
+      "independence_basis": null,
+      "independence_evidence_artifact_sha256": null,
+      "signed_utc": null
+    }
+  },
+  "signatures": {
+    "economic_owner": {
+      "algorithm": "Ed25519",
+      "public_key_artifact_sha256": null,
+      "detached_signature_artifact_sha256": null,
+      "signed_payload_sha256": null
+    },
+    "technical_reviewer": {
+      "algorithm": "Ed25519",
+      "public_key_artifact_sha256": null,
+      "detached_signature_artifact_sha256": null,
+      "signed_payload_sha256": null
+    }
+  },
+  "claim_boundary": "A completed receipt accepts only the exact bound private-entity calculation, scope, source artifacts, technical evidence, outputs, decision, and release decision. It does not establish realized savings, social benefit, mission value, or commercial price."
+}
