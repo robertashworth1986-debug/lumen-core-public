@@ -75,6 +75,29 @@ QC_STATES = {
 }
 CIRCUIT_STATES = {"CLOSED", "OPEN", "HALF_OPEN"}
 
+CHILD_ENV_PASSTHROUGH = {
+    "APPDATA",
+    "COMSPEC",
+    "HOME",
+    "LANG",
+    "LC_ALL",
+    "LOCALAPPDATA",
+    "NO_PROXY",
+    "PATH",
+    "PATHEXT",
+    "PROGRAMDATA",
+    "PYTHONHOME",
+    "PYTHONPATH",
+    "REQUESTS_CA_BUNDLE",
+    "SSL_CERT_FILE",
+    "SYSTEMROOT",
+    "TEMP",
+    "TMP",
+    "TMPDIR",
+    "USERPROFILE",
+    "WINDIR",
+}
+
 
 class MalformedJSONError(ValueError):
     pass
@@ -219,6 +242,21 @@ def known_secret_values(env_names: list[str] | None = None) -> list[str]:
         if value and len(value) >= 4:
             values.append(value)
     return sorted(set(values), key=lambda value: (-len(value), value))
+
+
+def build_child_environment(provider_id: str) -> dict[str, str]:
+    """Pass only runtime essentials and the selected provider's credentials."""
+    if provider_id not in PROVIDER_BY_ID:
+        raise ValueError("provider id is not recognized")
+    provider_env_names = set(PROVIDER_BY_ID[provider_id].get("env_names", []))
+    allowed = CHILD_ENV_PASSTHROUGH | provider_env_names
+    child_env = {
+        name: value
+        for name, value in os.environ.items()
+        if name.upper() in allowed and isinstance(value, str)
+    }
+    child_env["CUDA_VISIBLE_DEVICES"] = ""
+    return child_env
 
 
 def sanitize_text(value: Any, env_names: list[str] | None = None) -> str:
@@ -1339,13 +1377,22 @@ def validate_namespace_assignments(assignments: dict[str, dict[str, str]]) -> No
             seen.add(value)
 
 
-def _validate_artifact(artifact: Any) -> dict[str, str]:
+def _validate_artifact(
+    artifact: Any,
+    *,
+    expected_provider_id: str | None = None,
+) -> dict[str, str]:
     if not isinstance(artifact, dict):
         raise ReceiptValidationError("published child receipt requires an artifact")
     expected = {"snapshot_json", "snapshot_latest_json", "snapshot_csv", "sha256"}
     if set(artifact) != expected:
         raise ReceiptValidationError("artifact fields do not match the v1 schema")
     validated: dict[str, str] = {}
+    expected_root = None
+    if expected_provider_id is not None:
+        if expected_provider_id not in PROVIDER_BY_ID:
+            raise ReceiptValidationError("artifact provider is not recognized")
+        expected_root = (DATA_ROOT / expected_provider_id.lower()).resolve()
     for key in ("snapshot_json", "snapshot_latest_json", "snapshot_csv"):
         value = artifact.get(key)
         if not isinstance(value, str) or not value or "\\" in value:
@@ -1353,6 +1400,9 @@ def _validate_artifact(artifact: Any) -> dict[str, str]:
         path = Path(value)
         if path.is_absolute() or ".." in path.parts:
             raise ReceiptValidationError("artifact path escaped the workspace")
+        resolved = (ROOT / path).resolve()
+        if expected_root is not None and expected_root not in resolved.parents:
+            raise ReceiptValidationError("artifact path escaped the provider data directory")
         validated[key] = value
     digest = artifact.get("sha256")
     if not isinstance(digest, str) or not SHA256_HEX.fullmatch(digest):
@@ -1443,7 +1493,10 @@ def validate_child_receipt(
     ):
         raise ReceiptValidationError("child receipt retry delay is invalid")
     if receipt["published_outputs"]:
-        _validate_artifact(receipt.get("artifact"))
+        _validate_artifact(
+            receipt.get("artifact"),
+            expected_provider_id=provider_id,
+        )
     elif receipt.get("artifact") is not None:
         raise ReceiptValidationError("unpublished child receipt cannot declare an artifact")
     return dict(receipt)
@@ -1524,10 +1577,14 @@ def registry_row(provider: dict[str, Any], result: dict[str, Any], artifact: dic
         "probe_ok": bool(result.get("probe_ok")),
         "http_status": result.get("http_status"),
         "evidence_basis": "LIVE_HTTP_SNAPSHOT" if measured else ("KEY_PRESENT_BUT_NO_USABLE_ROWS" if enabled else "NONE"),
-        "dollar_basis": "MEASURED" if measured else "UNMEASURED",
+        "dollar_basis": (
+            "HEURISTIC_TRANSLATION_FROM_MEASURED_ROW_COUNT"
+            if measured
+            else "UNMEASURED"
+        ),
         "constraint_type": provider.get("constraint_type", ""),
         "money_drain_mode": provider.get("money_drain_mode", ""),
-        "formula_basis": "bounded_log_translation_if_measured_else_zero",
+        "formula_basis": "bounded_log_heuristic_if_rows_measured_else_zero",
         "translated_value": translated,
         "env_names": env_names,
         "present_env_names": present_env_names(env_names),
@@ -1619,7 +1676,11 @@ def source_truth_from_registry(registry: dict[str, Any]) -> dict[str, Any]:
                 "enabled": bool(row.get("enabled", False)),
                 "measured": bool(row.get("measured", False)),
                 "estimated_hour_value": translated.get("hour", 0.0),
-                "value_basis": "MEASURED" if row.get("measured") else "UNMEASURED",
+                "value_basis": (
+                    "HEURISTIC_FROM_MEASURED_ROW_COUNT"
+                    if row.get("measured")
+                    else "UNMEASURED"
+                ),
                 "last_probe_utc": row.get("last_probe_utc", ""),
                 "probe_note": row.get("probe_note", ""),
                 "snapshot_json": row.get("snapshot_json", ""),
@@ -1650,13 +1711,17 @@ def build_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "failed_or_thin_sources": len(failed),
         "total_measured_rows": total_rows,
         "estimated_annual_value_surface_usd": round(annual, 2),
+        "estimated_annual_value_surface_basis": (
+            "UNVALIDATED_HEURISTIC_NOT_REALIZED_OR_MEASURED_VALUE"
+        ),
         "coverage_pct": round((len(measured) / len(enabled) * 100.0) if enabled else 0.0, 2),
         "measured_source_names": [str(row.get("source")) for row in measured],
         "failed_or_thin_source_names": [str(row.get("source")) for row in failed],
         "by_sector": by_sector,
         "claim_boundary": (
-            "This pass proves fresh measured rows and hashes. It does not prove realized savings, "
-            "field validation, trading profit, or guaranteed award value."
+            "This pass proves fresh measured row counts and snapshot hashes. Dollar translations "
+            "are unvalidated heuristics, not measured economic value, realized savings, field "
+            "validation, trading profit, or guaranteed award value."
         ),
     }
 
@@ -1675,7 +1740,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Failed/thin sources: {summary['failed_or_thin_sources']}",
         f"- Total measured rows: {summary['total_measured_rows']}",
         f"- Coverage: {summary['coverage_pct']}%",
-        f"- Estimated annual value surface: ${summary['estimated_annual_value_surface_usd']:,.2f}",
+        f"- Heuristic annual value surface (not measured dollars): "
+        f"${summary['estimated_annual_value_surface_usd']:,.2f}",
         f"- Boundary: {summary['claim_boundary']}",
         "",
         "## Measured Sources",
@@ -2032,6 +2098,7 @@ def run_provider_subprocess(
                 text=True,
                 check=False,
                 timeout=limits["child_timeout_seconds"],
+                env=build_child_environment(provider_id),
             )
         except subprocess.TimeoutExpired:
             result = _provider_process_failure(provider_id, namespace, qc_state="TIMEOUT", attempts=attempt)
@@ -2099,7 +2166,10 @@ def registry_row_from_provider_result(provider_result: dict[str, Any]) -> dict[s
     measured = qc_state == "PASS" and row_count > 0
     credential_state = str(provider_result.get("credential_state") or "UNKNOWN")
     enabled = not provider.get("env_names") or credential_state == "PRESENT"
-    artifact = _validate_artifact(provider_result.get("artifact"))
+    artifact = _validate_artifact(
+        provider_result.get("artifact"),
+        expected_provider_id=provider_result["provider_id"],
+    )
     return {
         "source": provider_result["provider_id"],
         "sector": sector,
@@ -2108,10 +2178,14 @@ def registry_row_from_provider_result(provider_result: dict[str, Any]) -> dict[s
         "probe_ok": measured,
         "http_status": provider_result.get("http_status"),
         "evidence_basis": "LIVE_HTTP_SNAPSHOT" if measured else ("KEY_PRESENT_BUT_NO_USABLE_ROWS" if enabled else "NONE"),
-        "dollar_basis": "MEASURED" if measured else "UNMEASURED",
+        "dollar_basis": (
+            "HEURISTIC_TRANSLATION_FROM_MEASURED_ROW_COUNT"
+            if measured
+            else "UNMEASURED"
+        ),
         "constraint_type": provider.get("constraint_type", ""),
         "money_drain_mode": provider.get("money_drain_mode", ""),
-        "formula_basis": "bounded_log_translation_if_measured_else_zero",
+        "formula_basis": "bounded_log_heuristic_if_rows_measured_else_zero",
         "translated_value": estimate_value(sector, row_count if measured else 0),
         "env_names": list(provider.get("env_names", [])),
         "present_env_names": [],

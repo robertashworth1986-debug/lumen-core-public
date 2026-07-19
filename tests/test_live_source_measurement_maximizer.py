@@ -161,6 +161,7 @@ def test_source_truth_contains_snapshot_hash_and_no_secret() -> None:
 
     assert truth["rows"][0]["source"] == "FRED"
     assert truth["rows"][0]["snapshot_sha256"] == "abc123"
+    assert truth["rows"][0]["value_basis"] == "HEURISTIC_FROM_MEASURED_ROW_COUNT"
     assert "secret" not in dumped.lower()
 
 
@@ -179,7 +180,11 @@ def test_build_summary_counts_measured_sources_and_value_surface() -> None:
     assert summary["failed_or_thin_sources"] == 1
     assert summary["total_measured_rows"] == 3
     assert summary["estimated_annual_value_surface_usd"] == 10.0
+    assert summary["estimated_annual_value_surface_basis"] == (
+        "UNVALIDATED_HEURISTIC_NOT_REALIZED_OR_MEASURED_VALUE"
+    )
     assert "realized savings" in summary["claim_boundary"]
+    assert "not measured economic value" in summary["claim_boundary"]
 
 
 def test_airnow_provider_is_registered_as_separate_air_quality_lane() -> None:
@@ -263,10 +268,12 @@ def test_checked_in_policy_is_public_safe_fail_closed_and_covers_catalog() -> No
     assert policy["resolved_state_path"].is_relative_to(module.ROOT / "run")
 
 
-def test_parent_never_places_key_values_in_argv_logs_receipts_or_state(tmp_path, monkeypatch) -> None:
+def test_parent_scopes_keys_to_child_env_and_keeps_them_out_of_receipts_and_state(tmp_path, monkeypatch) -> None:
     module = load_module()
     secret = "key-value-that-must-never-cross-parent-boundary"
+    unrelated_secret = "unrelated-provider-secret"
     monkeypatch.setenv("FRED_API_KEY", secret)
+    monkeypatch.setenv("SAM_API_KEY", unrelated_secret)
     policy = write_policy(module, tmp_path, ["FRED"], max_retries=0)
     registry = write_registry(module, tmp_path)
     state = tmp_path / "state.json"
@@ -288,12 +295,59 @@ def test_parent_never_places_key_values_in_argv_logs_receipts_or_state(tmp_path,
         sleep_fn=lambda _: None,
     )
 
-    rendered = json.dumps({"receipt": receipt, "calls": observed})
+    rendered = json.dumps(receipt)
     assert secret not in rendered
+    assert unrelated_secret not in rendered
     assert secret not in state.read_text(encoding="utf-8")
+    assert unrelated_secret not in state.read_text(encoding="utf-8")
     assert observed[0][0].count("--child-provider") == 1
-    assert "env" not in observed[0][1]
+    assert secret not in " ".join(observed[0][0])
+    assert unrelated_secret not in " ".join(observed[0][0])
+    assert observed[0][1]["env"]["FRED_API_KEY"] == secret
+    assert "SAM_API_KEY" not in observed[0][1]["env"]
     assert receipt["providers"][0]["child_receipt_sha256"]
+
+
+def test_published_receipt_rejects_artifact_outside_provider_directory() -> None:
+    module = load_module()
+    provider_id = "FRED"
+    run_id = "artifact-boundary-test"
+    namespace = module.build_namespace_assignments([provider_id], run_id)[provider_id]
+    receipt = module.seal_receipt(
+        {
+            "schema": module.RECEIPT_SCHEMA,
+            "run_id": run_id,
+            "provider_id": provider_id,
+            "attempt": 1,
+            "namespace": namespace,
+            "network_allowed": True,
+            "published_outputs": True,
+            "credential_state": "PRESENT",
+            "qc_state": "PASS",
+            "row_count": 1,
+            "http_status": 200,
+            "retry_after_seconds": None,
+            "artifact": {
+                "snapshot_json": "docs/not-a-provider-snapshot.json",
+                "snapshot_latest_json": "docs/not-a-provider-latest.json",
+                "snapshot_csv": "docs/not-a-provider-snapshot.csv",
+                "sha256": "0" * 64,
+            },
+        }
+    )
+
+    with pytest.raises(module.ReceiptValidationError, match="provider data directory"):
+        module.validate_child_receipt(
+            receipt,
+            allowlist=[provider_id],
+            expected_provider_id=provider_id,
+            expected_run_id=run_id,
+            expected_attempt=1,
+            expected_namespace=namespace,
+            expected_network_allowed=True,
+            expected_published_outputs=True,
+            max_rows=5,
+        )
 
 
 def test_invalid_provider_is_rejected_before_any_child_launch(tmp_path) -> None:
