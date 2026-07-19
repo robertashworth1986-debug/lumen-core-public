@@ -3,10 +3,11 @@
 **Owner role:** `CONTROL_PLANE_STEWARD`\
 **State ID:** `control-plane-20260719T025600Z`  
 **Machine-readable state:** `dashboard/data/control_plane_state.json`  
-**Embedded state SHA-256 (self-consistency only):** `fe5d6ec6d53d79fc4a4ddc28c2f2d9f0c81d4f6af8ba5e69b756d0178f2d3740`\
-**Custody/history anchor:** The Git commit containing this document and the machine-readable state.\
+**Embedded state SHA-256 (self-consistency only; not a custody anchor):** `a493e36146b8ab5cb2d3eb1b41644104fafd4dc32acc3ee3dba655d708ba4f7f`\
+**Authoritative custody/history anchor:** The Git commit containing this document and the machine-readable state, or a verification receipt that identifies that exact commit.\
 **Authority:** Public-safe reconciliation only; not action authority.  
-**Failure mode:** `FAIL_CLOSED`
+**Failure mode:** `FAIL_CLOSED`\
+**CI freshness policy:** `generated_utc` must be no more than 24 hours old and no more than 5 minutes in the future.
 
 ## Purpose
 
@@ -20,7 +21,7 @@ It exists to prevent five recurring control failures:
 4. green CI being treated as deployment or submission evidence;
 5. duplicate outreach being triggered by stale coordination text.
 
-The state does not send email, access a portal, sign, certify, issue final confirmation, merge, deploy, pay, accept legal terms, publish a public video, submit to Devpost, expand a claim, or submit anything else.
+The state does not send external email, access or modify a portal, upload to or submit through a portal, submit a proposal, sign, certify, issue final confirmation, merge, deploy, change DNS, pay, accept legal terms, publish a public video, submit to Devpost, or expand a claim.
 
 ## Current execution order
 
@@ -67,9 +68,10 @@ The branch is current-head green and has a later browser-QA receipt than the ini
 
 ## What this control-plane PR changes
 
-- adds the machine-readable control-plane state with an embedded self-consistency hash and Git-commit custody anchor;
-- adds a standard-library verifier for schema, embedded-hash self-consistency, deadline locks, unique priorities, evidence rows, required open gates, stale-source registration, generic public-safety patterns, and an exact non-action control schema;
-- adds focused adversarial tests for freshness and future skew, every required lane and control, unknown controls, hash-scope wording, payload mutation, and private-identifier patterns;
+- adds the machine-readable control-plane state with an embedded self-consistency digest that is explicitly not custody evidence;
+- records the Git commit, or a verification receipt identifying that exact commit, as the authoritative custody/history anchor;
+- adds a standard-library verifier for schema, bounded timestamp freshness, embedded-digest self-consistency, deadline locks, unique priorities, evidence rows, required open gates, stale-source registration, non-echoing public-safety checks, and an exact non-action control schema;
+- adds focused adversarial tests for freshness and future skew, every required lane and control, unknown controls, digest/custody wording, payload mutation, credentials, direct identifiers, and private or patent-sensitive paths and content;
 - adds path-scoped GitHub Actions CI;
 - marks the older canonical operating-state file as a historical snapshot pending full reconciliation.
 
@@ -83,6 +85,6 @@ The branch is current-head green and has a later browser-QA receipt than the ini
 
 ## Actions explicitly not taken by this state
 
-No external email, portal upload, certification, signature, final confirmation, payment, legal acceptance, pull-request merge, production deployment, public video publication, Devpost submission, or claim expansion is represented by this artifact.
+No external email, portal access, portal modification, portal upload, portal submission, proposal submission, certification, signature, final confirmation, payment, legal acceptance, pull-request merge, production deployment, DNS change, public video publication, Devpost submission, or claim expansion is represented by this artifact.
 
 **Operating principle:** evidence before claims; bounded light speed.

@@ -5,10 +5,14 @@
 ## Current ProofLock status — observed 2026-07-19 02:55 UTC
 
 **State:** `HOLD`\
-**Reviewed head:** PR #36 at `4584a41dbedd2f856bba5fa8202e7dcc8e4a448f` with current-head workflows green.\
+**Reviewed head:** PR #36 on `build-week/prooflock-judge-ready` at `4584a41dbedd2f856bba5fa8202e7dcc8e4a448f` with current-head workflows green.\
 **Release gate:** The live release remains 10/14; four files are stale. Green CI is not deployment evidence.\
 **Open human gates:** Refresh the release receipt after 14/14, confirm the `/feedback` Session ID, publish the final sub-three-minute video, and obtain founder approval before Devpost submission.\
-**Authority boundary:** This status does not authorize deployment, merge, final confirmation, public video publication, Devpost submission, or claim expansion. The Git commit is the custody/history anchor for this statement.
+**Authority boundary:** This status does not authorize deployment, merge, final confirmation, public video publication, Devpost submission, or claim expansion.\
+**Custody boundary:** The embedded digest is self-consistency metadata, not a custody anchor. The authoritative custody/history anchor is the Git commit or a verification receipt that identifies that exact commit.\
+**Scope boundary:** This remains a release of the existing proof-to-pilot product, not a new company, research lane, or replacement operating system. The branch remains limited to the ProofLock console, declared V2/V3 public demonstration artifacts, tests, provenance, and one readiness record; MissionWeave proposal files, outreach packets, trading systems, and unrelated generated outputs remain outside it.\
+**Claim boundary:** The console may prove receipt integrity, repository custody, declared lineage, and fail-closed authority logic. It may not claim CAD completeness, prototype status, performance, safety, certification, patentability, manufacturability, field validation, commercial readiness, or model provenance without direct evidence.\
+**Outbound boundary:** No other outbound message is currently authorized.
 
 ## Historical operating snapshot — 2026-07-17 UTC
 

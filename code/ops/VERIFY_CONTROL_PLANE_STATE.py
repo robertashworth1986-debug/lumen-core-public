@@ -13,11 +13,13 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_STATE = ROOT / "dashboard" / "data" / "control_plane_state.json"
 SCHEMA = "lumencore.control_plane_state.v1"
-HASH_SCOPE = (
-    "EMBEDDED_SHA256_SELF_CONSISTENCY_ONLY_GIT_COMMIT_IS_CUSTODY_ANCHOR"
-)
+HASH_SCOPE = "EMBEDDED_SHA256_SELF_CONSISTENCY_ONLY"
+CUSTODY_ANCHOR = "GIT_COMMIT_OR_COMMIT_BOUND_RECEIPT"
 OWNER_ROLE = "CONTROL_PLANE_STEWARD"
+DEFAULT_MAX_AGE_HOURS = 24.0
 DEFAULT_MAX_FUTURE_SKEW_MINUTES = 5.0
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+STATE_ID_RE = re.compile(r"^control-plane-\d{8}T\d{6}Z$")
 ALLOWED_STATES = {
     "BLOCKED",
     "HOLD",
@@ -42,24 +44,83 @@ REQUIRED_LANES = {
 }
 NO_ACTION_CONTROL_KEYS = {
     "external_email_sent_by_this_state",
+    "portal_access_performed",
+    "portal_modification_performed",
+    "portal_upload_performed",
     "portal_submission_performed",
-    "signature_or_certification_performed",
+    "proposal_submission_performed",
+    "signature_performed",
+    "certification_performed",
     "final_confirmation_performed",
     "merge_performed",
     "deployment_performed",
-    "payment_or_legal_acceptance_performed",
+    "dns_change_performed",
+    "payment_performed",
+    "legal_acceptance_performed",
     "public_video_publication_performed",
     "devpost_submission_performed",
     "claim_expansion_performed",
 }
+DIRECT_IDENTIFIER_FIELDS = {
+    "owner",
+    "owner_name",
+    "founder_name",
+    "contact",
+    "contact_name",
+    "contact_email",
+    "contact_phone",
+    "signatory",
+    "signatory_name",
+    "inventor",
+    "inventor_name",
+    "email",
+    "email_address",
+    "phone",
+    "phone_number",
+    "address",
+    "street_address",
+    "mailing_address",
+    "home_address",
+    "ssn",
+    "social_security_number",
+    "date_of_birth",
+    "dob",
+    "tax_id",
+    "ein",
+}
+CREDENTIAL_FIELDS = {
+    "api_key",
+    "api_token",
+    "access_key",
+    "access_token",
+    "auth_token",
+    "bearer_token",
+    "client_secret",
+    "credential",
+    "credentials",
+    "password",
+    "passwd",
+    "private_key",
+    "secret",
+    "secret_key",
+}
+PATENT_SENSITIVE_FIELDS = {
+    "application_number",
+    "customer_number",
+    "draft_claims",
+    "filing_receipt_path",
+    "invention_disclosure",
+    "patent_application_number",
+    "patent_claims",
+    "patent_document_path",
+    "claims_text",
+}
 PUBLIC_SAFETY_PATTERNS = {
-    "email address": (
+    "direct identifier": (
         re.compile(
             r"(?i)(?<![a-z0-9._%+-])[a-z0-9._%+-]+@"
             r"[a-z0-9.-]+\.[a-z]{2,}(?![a-z0-9.-])"
         ),
-    ),
-    "phone number": (
         re.compile(
             r"(?<![a-zA-Z0-9])(?:\+?1[\s.-]?)?"
             r"(?:\([2-9]\d{2}\)|[2-9]\d{2})[\s.-]"
@@ -74,8 +135,20 @@ PUBLIC_SAFETY_PATTERNS = {
             r"(?![a-zA-Z0-9])"
         ),
         re.compile(r"(?<![a-zA-Z0-9])\d{10,15}(?![a-zA-Z0-9])"),
+        re.compile(r"(?<!\d)\d{3}-\d{2}-\d{4}(?!\d)"),
+        re.compile(r"(?<!\d)\d{2}-\d{7}(?!\d)"),
+        re.compile(
+            r"(?i)\b\d{1,6}\s+(?:[a-z0-9.'-]+\s+){1,6}"
+            r"(?:street|st|avenue|ave|road|rd|boulevard|blvd|drive|dr|"
+            r"lane|ln|court|ct|way|parkway|pkwy|highway|hwy)\b"
+        ),
+        re.compile(
+            r"(?i)\b(?:owner|founder|contact|signatory|inventor)"
+            r"(?:\s+name)?\s*[:=]\s*[a-z][a-z'-]+"
+            r"(?:\s+[a-z][a-z'-]+){1,3}\b"
+        ),
     ),
-    "local filesystem path": (
+    "private or patent-sensitive path": (
         re.compile(r"(?i)(?:^|[\s\"'(=])[a-z]:[\\/]"),
         re.compile(r"(?:^|[\s\"'(=])\\\\[^\\/\s]+[\\/][^\s\"']+"),
         re.compile(
@@ -83,6 +156,20 @@ PUBLIC_SAFETY_PATTERNS = {
         ),
         re.compile(r"(?i)\bfile://(?:localhost/)?[^\s\"']+"),
         re.compile(r"(?:^|[\s\"'(=])\.\.?[\\/][^\s\"']+"),
+        re.compile(
+            r"(?i)(?:^|[\\/])(?:private|confidential|proprietary|secrets?|"
+            r"credentials?|patents?|provisional|invention_disclosures?)(?:[\\/])"
+        ),
+        re.compile(
+            r"(?i)(?:^|[\\/])[^\\/\s\"']*(?:private|confidential|"
+            r"proprietary|secret|credential|token|password|patent|provisional|"
+            r"invention|claims?)[^\\/\s\"']*\.[a-z0-9]{1,10}"
+            r"(?:$|[\s\"'])"
+        ),
+        re.compile(
+            r"(?i)(?:^|[\\/])(?:\.env(?:\.[a-z0-9_-]+)?|"
+            r"[^\\/]+\.(?:pem|key|p12|pfx|jks|kdbx))(?:$|[\s\"'])"
+        ),
     ),
     "credential or token": (
         re.compile(
@@ -91,9 +178,35 @@ PUBLIC_SAFETY_PATTERNS = {
         ),
         re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
         re.compile(r"\bAIza[0-9A-Za-z_-]{20,}\b"),
+        re.compile(r"-----BEGIN (?:[A-Z0-9]+ )?PRIVATE KEY-----"),
+        re.compile(r"\beyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\b"),
+        re.compile(r"(?i)\b[a-z][a-z0-9+.-]*://[^\s/:]+:[^\s/@]+@"),
         re.compile(
-            r"(?i)\b(?:api[_-]?(?:key|token)|access[_-]?token|auth[_-]?token|bearer|secret)"
-            r"\s*[:=]\s*[\"']?[a-z0-9._~+/=-]{12,}"
+            r"(?i)\b(?:api[_-]?(?:key|token)|access[_-]?(?:key|token)|"
+            r"auth[_-]?token|bearer(?:[_-]?token)?|client[_-]?secret|password|"
+            r"passwd|private[_-]?key|secret(?:[_-]?key)?)\s*[:=]\s*"
+            r"[\"']?[^\s\"',;]{8,}"
+        ),
+    ),
+    "private or patent-sensitive content": (
+        re.compile(r"(?<!\d)\d{2}/\d{3},?\d{3}(?!\d)"),
+        re.compile(
+            r"(?i)\b(?:attorney-client privileged|attorney work product|"
+            r"trade secret|confidential and proprietary|not for public(?:ation)?|"
+            r"internal only)\b"
+        ),
+        re.compile(
+            r"(?i)\b(?:unpublished|non-public|confidential|draft)\s+"
+            r"(?:patent(?: application)?|provisional application|claims?|"
+            r"invention disclosure)\b"
+        ),
+        re.compile(
+            r"(?i)\b(?:patent|provisional)\s+application\s+"
+            r"(?:no\.?|number|#)\s*\d"
+        ),
+        re.compile(
+            r"(?i)\bclaim\s+\d+\s*[:.)-]\s+"
+            r"(?:a|an|the|wherein|comprising)\b"
         ),
     ),
 }
@@ -129,16 +242,38 @@ def state_payload(state: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
-def iter_text(value: Any):
-    if isinstance(value, dict):
-        for key, item in value.items():
-            yield str(key)
-            yield from iter_text(item)
-    elif isinstance(value, list):
-        for item in value:
-            yield from iter_text(item)
-    elif isinstance(value, str):
-        yield value
+def normalized_field_name(value: Any) -> str:
+    return str(value).strip().lower().replace("-", "_")
+
+
+def public_safety_findings(value: Any) -> set[str]:
+    findings: set[str] = set()
+
+    def scan_text(text: str) -> None:
+        for label, patterns in PUBLIC_SAFETY_PATTERNS.items():
+            if any(pattern.search(text) for pattern in patterns):
+                findings.add(label)
+
+    def visit(item: Any) -> None:
+        if isinstance(item, dict):
+            for key, child in item.items():
+                field = normalized_field_name(key)
+                if field in DIRECT_IDENTIFIER_FIELDS:
+                    findings.add("direct identifier")
+                if field in CREDENTIAL_FIELDS:
+                    findings.add("credential or token")
+                if field in PATENT_SENSITIVE_FIELDS:
+                    findings.add("private or patent-sensitive content")
+                scan_text(str(key))
+                visit(child)
+        elif isinstance(item, list):
+            for child in item:
+                visit(child)
+        elif isinstance(item, str):
+            scan_text(item)
+
+    visit(value)
+    return findings
 
 
 def finite_limit(
@@ -148,16 +283,16 @@ def finite_limit(
     errors: list[str],
     allow_zero: bool,
 ) -> float | None:
+    qualifier = "non-negative" if allow_zero else "positive"
     if isinstance(value, bool):
-        errors.append(f"{field} must be a finite number")
+        errors.append(f"{field} must be a finite {qualifier} number")
         return None
     try:
         parsed = float(value)
     except (TypeError, ValueError):
-        errors.append(f"{field} must be a finite number")
+        errors.append(f"{field} must be a finite {qualifier} number")
         return None
     if not math.isfinite(parsed) or parsed < 0 or (parsed == 0 and not allow_zero):
-        qualifier = "non-negative" if allow_zero else "positive"
         errors.append(f"{field} must be a finite {qualifier} number")
         return None
     return parsed
@@ -167,12 +302,20 @@ def verify_state(
     state: Any,
     *,
     now: datetime | None = None,
-    max_age_hours: float | None = None,
+    max_age_hours: float = DEFAULT_MAX_AGE_HOURS,
     max_future_skew_minutes: float = DEFAULT_MAX_FUTURE_SKEW_MINUTES,
 ) -> dict[str, Any]:
     errors: list[str] = []
     warnings: list[str] = []
     safe_state = state if isinstance(state, dict) else {}
+    privacy_findings = public_safety_findings(safe_state)
+    for label in sorted(privacy_findings):
+        errors.append(f"public state contains prohibited {label}")
+
+    state_id = str(safe_state.get("state_id") or "")
+    state_id_valid = bool(STATE_ID_RE.fullmatch(state_id))
+    if not state_id_valid:
+        errors.append("state_id must use the public-safe canonical identifier format")
 
     if safe_state.get("schema") != SCHEMA:
         errors.append("unsupported or missing control-plane schema")
@@ -182,8 +325,11 @@ def verify_state(
         errors.append("failure_mode must be FAIL_CLOSED")
     if safe_state.get("hash_scope") != HASH_SCOPE:
         errors.append(
-            "hash_scope must limit the embedded SHA-256 to self-consistency and "
-            "identify the Git commit as the custody anchor"
+            "hash_scope must limit the embedded SHA-256 to self-consistency only"
+        )
+    if safe_state.get("custody_anchor") != CUSTODY_ANCHOR:
+        errors.append(
+            "custody_anchor must identify the Git commit or a receipt bound to that commit"
         )
     if safe_state.get("owner_role") != OWNER_ROLE:
         errors.append(f"owner_role must be {OWNER_ROLE}")
@@ -192,14 +338,12 @@ def verify_state(
 
     generated = parse_utc(safe_state.get("generated_utc"), "generated_utc", errors)
     observed_now = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
-    validated_max_age = None
-    if max_age_hours is not None:
-        validated_max_age = finite_limit(
-            max_age_hours,
-            field="max_age_hours",
-            errors=errors,
-            allow_zero=False,
-        )
+    validated_max_age = finite_limit(
+        max_age_hours,
+        field="max_age_hours",
+        errors=errors,
+        allow_zero=False,
+    )
     validated_future_skew = finite_limit(
         max_future_skew_minutes,
         field="max_future_skew_minutes",
@@ -226,9 +370,11 @@ def verify_state(
                 f"{future_skew_minutes:.2f}m > {validated_future_skew:.2f}m"
             )
 
-    expected_hash = str(safe_state.get("state_sha256") or "").lower()
+    raw_expected_hash = str(safe_state.get("state_sha256") or "").lower()
+    expected_hash = raw_expected_hash if SHA256_RE.fullmatch(raw_expected_hash) else None
     computed_hash = stable_hash(state_payload(safe_state))
-    if expected_hash != computed_hash:
+    hash_matches = expected_hash == computed_hash
+    if not hash_matches:
         errors.append("state_sha256 does not match the canonical control-plane payload")
 
     controls = safe_state.get("controls")
@@ -241,7 +387,7 @@ def verify_state(
     if missing_controls:
         errors.append(f"controls missing required keys: {', '.join(missing_controls)}")
     if unknown_controls:
-        errors.append(f"controls contain unknown keys: {', '.join(unknown_controls)}")
+        errors.append("controls contain unknown keys")
     for key in sorted(NO_ACTION_CONTROL_KEYS):
         if controls.get(key) is not False:
             errors.append(f"{key} must be explicitly false")
@@ -263,7 +409,7 @@ def verify_state(
         if not lane_id:
             errors.append(f"{prefix}.lane_id is required")
         elif lane_id in lane_ids:
-            errors.append(f"duplicate lane_id: {lane_id}")
+            errors.append(f"{prefix}.lane_id duplicates another lane_id")
         lane_ids.append(lane_id)
 
         priority = row.get("priority")
@@ -274,7 +420,7 @@ def verify_state(
 
         lane_state = str(row.get("state") or "")
         if lane_state not in ALLOWED_STATES:
-            errors.append(f"{prefix}.state is invalid: {lane_state}")
+            errors.append(f"{prefix}.state is invalid")
 
         deadline = row.get("deadline_utc")
         if deadline is not None:
@@ -355,16 +501,11 @@ def verify_state(
         if required_path not in stale_paths:
             errors.append(f"stale source register must include {required_path}")
 
-    public_text = tuple(iter_text(safe_state))
-    for label, patterns in PUBLIC_SAFETY_PATTERNS.items():
-        if any(pattern.search(text) for pattern in patterns for text in public_text):
-            errors.append(f"public state contains prohibited {label} pattern")
-
     return {
         "schema": "lumencore.control_plane_verification_report.v1",
         "verified_utc": observed_now.isoformat(),
         "integrity_valid": not errors,
-        "state_id": str(safe_state.get("state_id") or ""),
+        "state_id": state_id if state_id_valid and not privacy_findings else "REDACTED",
         "lane_count": len(lanes),
         "required_lane_count": len(REQUIRED_LANES),
         "generated_age_hours": round(age_hours, 3) if age_hours is not None else None,
@@ -373,20 +514,28 @@ def verify_state(
             if future_skew_minutes is not None
             else None
         ),
+        "freshness_policy": {
+            "max_age_hours": validated_max_age,
+            "max_future_skew_minutes": validated_future_skew,
+        },
         "state_hash": {
-            "expected": expected_hash,
+            "expected": expected_hash if hash_matches else None,
             "computed": computed_hash,
-            "matches": expected_hash == computed_hash,
-            "scope": "EMBEDDED_SELF_CONSISTENCY_ONLY",
-            "custody_anchor": "GIT_COMMIT",
+            "matches": hash_matches,
+            "scope": "SELF_CONSISTENCY_ONLY_NOT_CUSTODY",
+        },
+        "custody": {
+            "authoritative_anchor": CUSTODY_ANCHOR,
+            "embedded_hash_is_custody_anchor": False,
         },
         "errors": errors,
         "warnings": warnings,
         "claim_boundary": (
             "This verifier checks structure, embedded-hash self-consistency, deadline "
             "locks, and fail-closed action boundaries of one public-safe coordination "
-            "snapshot. The Git commit, not the recomputable embedded hash, is the "
-            "custody and history anchor. "
+            "snapshot. The recomputable embedded hash is not a custody anchor. The "
+            "authoritative custody/history anchor is the Git commit or a verification "
+            "receipt that identifies that exact commit. "
             "It does not prove portal readiness, proposal compliance, deployment, "
             "external validation, funding, legal status, or authority to send, sign, "
             "merge, deploy, pay, certify, or submit."
@@ -399,7 +548,11 @@ def main() -> int:
         description="Verify the LumenCore public-safe control-plane state."
     )
     parser.add_argument("state", nargs="?", type=Path, default=DEFAULT_STATE)
-    parser.add_argument("--max-age-hours", type=float, default=None)
+    parser.add_argument(
+        "--max-age-hours",
+        type=float,
+        default=DEFAULT_MAX_AGE_HOURS,
+    )
     parser.add_argument(
         "--max-future-skew-minutes",
         type=float,

@@ -3,6 +3,8 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import subprocess
+import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -15,6 +17,25 @@ WORKFLOW = ROOT / ".github" / "workflows" / "control-plane-state-gate.yml"
 CANONICAL_DOC = ROOT / "docs" / "CANONICAL_OPERATING_STATE.md"
 RECONCILIATION_DOC = ROOT / "docs" / "CONTROL_PLANE_RECONCILIATION_2026-07-19.md"
 CHECKED_NOW = datetime(2026, 7, 19, 3, 0, tzinfo=timezone.utc)
+EXPECTED_NO_ACTION_CONTROLS = {
+    "external_email_sent_by_this_state",
+    "portal_access_performed",
+    "portal_modification_performed",
+    "portal_upload_performed",
+    "portal_submission_performed",
+    "proposal_submission_performed",
+    "signature_performed",
+    "certification_performed",
+    "final_confirmation_performed",
+    "merge_performed",
+    "deployment_performed",
+    "dns_change_performed",
+    "payment_performed",
+    "legal_acceptance_performed",
+    "public_video_publication_performed",
+    "devpost_submission_performed",
+    "claim_expansion_performed",
+}
 
 
 def load_module():
@@ -44,6 +65,18 @@ def verify(module, state: dict, **overrides):
     return module.verify_state(state, **options)
 
 
+def iter_report_text(value):
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield str(key)
+            yield from iter_report_text(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from iter_report_text(item)
+    elif isinstance(value, str):
+        yield value
+
+
 def test_checked_in_control_plane_state_is_valid_and_fail_closed():
     module = load_module()
     state = load_state()
@@ -51,25 +84,42 @@ def test_checked_in_control_plane_state_is_valid_and_fail_closed():
 
     assert report["integrity_valid"] is True, report["errors"]
     assert report["state_hash"]["matches"] is True
-    assert report["state_hash"]["scope"] == "EMBEDDED_SELF_CONSISTENCY_ONLY"
-    assert report["state_hash"]["custody_anchor"] == "GIT_COMMIT"
+    assert report["state_hash"]["scope"] == "SELF_CONSISTENCY_ONLY_NOT_CUSTODY"
+    assert "custody_anchor" not in report["state_hash"]
+    assert report["custody"] == {
+        "authoritative_anchor": "GIT_COMMIT_OR_COMMIT_BOUND_RECEIPT",
+        "embedded_hash_is_custody_anchor": False,
+    }
+    assert report["freshness_policy"] == {
+        "max_age_hours": 24.0,
+        "max_future_skew_minutes": 5.0,
+    }
     assert report["lane_count"] == report["required_lane_count"] == 9
     assert state["failure_mode"] == "FAIL_CLOSED"
     assert state["hash_scope"] == module.HASH_SCOPE
+    assert state["custody_anchor"] == module.CUSTODY_ANCHOR
     assert state["owner_role"] == module.OWNER_ROLE
     assert "owner" not in state
-    assert set(state["controls"]) == module.NO_ACTION_CONTROL_KEYS
+    assert set(state["controls"]) == EXPECTED_NO_ACTION_CONTROLS
+    assert module.NO_ACTION_CONTROL_KEYS == EXPECTED_NO_ACTION_CONTROLS
     assert all(value is False for value in state["controls"].values())
+    assert module.public_safety_findings(state) == set()
 
 
 def test_ci_requires_finite_age_and_bounded_future_skew():
+    module = load_module()
     workflow = WORKFLOW.read_text(encoding="utf-8")
 
+    assert module.DEFAULT_MAX_AGE_HOURS == 24.0
+    assert module.DEFAULT_MAX_FUTURE_SKEW_MINUTES == 5.0
     assert "--max-age-hours 24" in workflow
     assert "--max-future-skew-minutes 5" in workflow
 
 
-@pytest.mark.parametrize("bad_limit", [float("nan"), float("inf"), 0, -1])
+@pytest.mark.parametrize(
+    "bad_limit",
+    [None, True, float("nan"), float("inf"), 0, -1],
+)
 def test_non_finite_or_non_positive_max_age_fails_closed(bad_limit):
     module = load_module()
     report = verify(module, load_state(), max_age_hours=bad_limit)
@@ -78,7 +128,10 @@ def test_non_finite_or_non_positive_max_age_fails_closed(bad_limit):
     assert "max_age_hours must be a finite positive number" in report["errors"]
 
 
-@pytest.mark.parametrize("bad_limit", [float("nan"), float("inf"), -1])
+@pytest.mark.parametrize(
+    "bad_limit",
+    [None, True, float("nan"), float("inf"), -1],
+)
 def test_non_finite_or_negative_future_skew_limit_fails_closed(bad_limit):
     module = load_module()
     report = verify(module, load_state(), max_future_skew_minutes=bad_limit)
@@ -94,7 +147,10 @@ def test_stale_state_fails_even_with_a_matching_embedded_hash():
     state = load_state()
     generated = datetime.fromisoformat(state["generated_utc"].replace("Z", "+00:00"))
 
-    report = verify(module, state, now=generated + timedelta(hours=24, seconds=1))
+    report = module.verify_state(
+        state,
+        now=generated + timedelta(hours=24, seconds=1),
+    )
 
     assert report["integrity_valid"] is False
     assert report["state_hash"]["matches"] is True
@@ -109,11 +165,49 @@ def test_excessive_future_skew_fails_even_after_rehash():
     )
     refresh_self_hash(module, mutated)
 
-    report = verify(module, mutated)
+    report = module.verify_state(mutated, now=CHECKED_NOW)
 
     assert report["integrity_valid"] is False
     assert report["state_hash"]["matches"] is True
     assert "control-plane state is too far in the future" in " ".join(report["errors"])
+
+
+@pytest.mark.parametrize(
+    ("generated_delta", "expected_error"),
+    [
+        (timedelta(hours=-25), "control-plane state is stale"),
+        (timedelta(minutes=10), "control-plane state is too far in the future"),
+    ],
+)
+def test_ci_command_rejects_stale_and_future_state(
+    tmp_path, generated_delta, expected_error
+):
+    module = load_module()
+    mutated = copy.deepcopy(load_state())
+    mutated["generated_utc"] = (
+        datetime.now(timezone.utc) + generated_delta
+    ).isoformat().replace("+00:00", "Z")
+    refresh_self_hash(module, mutated)
+    state_path = tmp_path / "timestamp-policy-state.json"
+    state_path.write_text(json.dumps(mutated), encoding="utf-8")
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            str(state_path),
+            "--max-age-hours",
+            "24",
+            "--max-future-skew-minutes",
+            "5",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 1
+    assert expected_error in completed.stdout
 
 
 def test_deadline_locks_and_lane_states_are_explicit():
@@ -157,25 +251,11 @@ def test_duplicate_lane_and_missing_gate_fail_closed_after_rehash():
 
     assert report["integrity_valid"] is False
     assert report["state_hash"]["matches"] is True
-    assert "duplicate lane_id" in " ".join(report["errors"])
+    assert "duplicates another lane_id" in " ".join(report["errors"])
     assert "open_gates" in " ".join(report["errors"])
 
 
-@pytest.mark.parametrize(
-    "control_key",
-    [
-        "external_email_sent_by_this_state",
-        "portal_submission_performed",
-        "signature_or_certification_performed",
-        "final_confirmation_performed",
-        "merge_performed",
-        "deployment_performed",
-        "payment_or_legal_acceptance_performed",
-        "public_video_publication_performed",
-        "devpost_submission_performed",
-        "claim_expansion_performed",
-    ],
-)
+@pytest.mark.parametrize("control_key", sorted(EXPECTED_NO_ACTION_CONTROLS))
 def test_each_no_action_control_must_remain_false(control_key):
     module = load_module()
     mutated = copy.deepcopy(load_state())
@@ -208,37 +288,64 @@ def test_missing_and_unknown_no_action_controls_fail_closed():
     ]
     assert unknown_report["integrity_valid"] is False
     assert unknown_report["state_hash"]["matches"] is True
-    assert "controls contain unknown keys: unreviewed_control" in unknown_report["errors"]
+    assert "controls contain unknown keys" in unknown_report["errors"]
 
 
-def test_embedded_hash_cannot_be_reframed_as_the_custody_anchor():
+@pytest.mark.parametrize(
+    ("field", "value", "expected_error"),
+    [
+        (
+            "hash_scope",
+            "EMBEDDED_SHA256_IS_CUSTODY_PROOF",
+            "hash_scope must limit the embedded SHA-256 to self-consistency only",
+        ),
+        (
+            "custody_anchor",
+            "EMBEDDED_SHA256",
+            "custody_anchor must identify the Git commit or a receipt bound to that commit",
+        ),
+    ],
+)
+def test_embedded_hash_cannot_be_reframed_as_the_custody_anchor(
+    field, value, expected_error
+):
     module = load_module()
     mutated = copy.deepcopy(load_state())
-    mutated["hash_scope"] = "EMBEDDED_SHA256_IS_CUSTODY_PROOF"
+    mutated[field] = value
     refresh_self_hash(module, mutated)
 
     report = verify(module, mutated)
 
     assert report["integrity_valid"] is False
     assert report["state_hash"]["matches"] is True
-    assert "Git commit as the custody anchor" in " ".join(report["errors"])
+    assert expected_error in report["errors"]
+    assert report["custody"]["embedded_hash_is_custody_anchor"] is False
 
 
 @pytest.mark.parametrize(
     ("private_value", "expected_label"),
     [
-        ("analyst@private.example", "email address"),
-        ("+1 (312) 555-0199", "phone number"),
-        ("020 7946 0958", "phone number"),
-        ("442079460958", "phone number"),
-        (r"D:\private\receipt.json", "local filesystem path"),
-        ("/home/analyst/private/receipt.json", "local filesystem path"),
-        (r"\\private-host\share\receipt.json", "local filesystem path"),
+        ("analyst@private.example", "direct identifier"),
+        ("+1 (312) 555-0199", "direct identifier"),
+        ("123-45-6789", "direct identifier"),
+        ("742 Evergreen Avenue", "direct identifier"),
+        (r"D:\private\receipt.json", "private or patent-sensitive path"),
+        ("/home/analyst/private/receipt.json", "private or patent-sensitive path"),
+        (r"\\private-host\share\receipt.json", "private or patent-sensitive path"),
+        ("private/patent_claims.docx", "private or patent-sensitive path"),
+        ("docs/PATENT_EMERGENCY_PACKET.md", "private or patent-sensitive path"),
         ("api_token=AbCdEf0123456789Secret", "credential or token"),
         ("xoxb-AbCdEf0123456789", "credential or token"),
+        ("-----BEGIN PRIVATE KEY-----", "credential or token"),
+        ("application 19/281,546", "private or patent-sensitive content"),
+        (
+            "draft patent claim 1: a non-public implementation",
+            "private or patent-sensitive content",
+        ),
+        ("attorney-client privileged", "private or patent-sensitive content"),
     ],
 )
-def test_generic_private_patterns_fail_even_after_rehash(
+def test_public_safety_categories_fail_without_echoing_matches(
     private_value, expected_label
 ):
     module = load_module()
@@ -250,27 +357,52 @@ def test_generic_private_patterns_fail_even_after_rehash(
 
     assert report["integrity_valid"] is False
     assert report["state_hash"]["matches"] is True
-    assert f"public state contains prohibited {expected_label} pattern" in report["errors"]
+    assert f"public state contains prohibited {expected_label}" in report["errors"]
+    assert all(private_value not in text for text in iter_report_text(report))
 
 
-@pytest.mark.parametrize(
-    "identity_mutation",
-    [
-        {"owner": "Named Person"},
-        {"owner_role": "Named Person"},
-    ],
-)
-def test_named_owner_publication_is_rejected(identity_mutation):
+@pytest.mark.parametrize("identity_field", ["owner", "contact_name", "inventor_name"])
+def test_direct_identifier_fields_are_rejected(identity_field):
     module = load_module()
     mutated = copy.deepcopy(load_state())
-    mutated.update(identity_mutation)
+    mutated[identity_field] = "Named Person"
     refresh_self_hash(module, mutated)
 
     report = verify(module, mutated)
 
     assert report["integrity_valid"] is False
     assert report["state_hash"]["matches"] is True
-    assert any("owner" in error for error in report["errors"])
+    assert "public state contains prohibited direct identifier" in report["errors"]
+    assert all("Named Person" not in text for text in iter_report_text(report))
+
+
+def test_cli_privacy_failure_never_prints_sensitive_values(tmp_path):
+    secret = "sk-proj-DoNotEchoThisCredential123456"
+    hex_secret = "ab" * 32
+    mutated = copy.deepcopy(load_state())
+    mutated["state_id"] = secret
+    mutated["state_sha256"] = hex_secret
+    mutated["controls"][secret] = False
+    state_path = tmp_path / "unsafe-state.json"
+    state_path.write_text(json.dumps(mutated), encoding="utf-8")
+
+    completed = subprocess.run(
+        [sys.executable, str(SCRIPT), str(state_path)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 1
+    assert secret not in completed.stdout
+    assert secret not in completed.stderr
+    assert hex_secret not in completed.stdout
+    assert hex_secret not in completed.stderr
+    report = json.loads(completed.stdout)
+    assert report["state_id"] == "REDACTED"
+    assert report["state_hash"]["expected"] is None
+    assert "controls contain unknown keys" in report["errors"]
+    assert "public state contains prohibited credential or token" in report["errors"]
 
 
 def test_public_state_marks_stale_sources_without_private_identifiers():
@@ -291,12 +423,35 @@ def test_docs_bound_hash_and_historical_prooflock_semantics():
 
     current_heading = "## Current ProofLock status"
     historical_heading = "## Historical operating snapshot"
-    assert canonical.index(current_heading) < canonical.index(historical_heading)
+    current_index = canonical.index(current_heading)
+    historical_index = canonical.index(historical_heading)
+    current_prooflock = canonical[current_index:historical_index]
+    historical_snapshot = canonical[historical_index:]
+
+    assert current_index < historical_index
     assert "The `Current ProofLock status` section is current only" in canonical
-    assert "This historical statement does not authorize outbound action now." in canonical
+    assert "4584a41dbedd2f856bba5fa8202e7dcc8e4a448f" in current_prooflock
+    assert "build-week/prooflock-judge-ready" in current_prooflock
+    assert "release of the existing proof-to-pilot product" in current_prooflock
+    assert "not a new company, research lane, or replacement operating system" in (
+        current_prooflock
+    )
+    assert "The console may prove receipt integrity" in current_prooflock
+    assert "No other outbound message is currently authorized" in current_prooflock
+    assert "This historical statement does not authorize outbound action now." in (
+        historical_snapshot
+    )
     assert "operational statements below" not in canonical
-    assert "Embedded state SHA-256 (self-consistency only)" in reconciliation
-    assert "Git commit" in reconciliation
+    assert (
+        "Embedded state SHA-256 (self-consistency only; not a custody anchor)"
+        in reconciliation
+    )
+    assert "Authoritative custody/history anchor" in reconciliation
+    assert "verification receipt that identifies that exact commit" in reconciliation
+    assert "no more than 24 hours old and no more than 5 minutes in the future" in (
+        reconciliation
+    )
     assert "hash-locked" not in reconciliation
+    assert "custody hash" not in reconciliation.lower()
     assert state["state_sha256"] in reconciliation
     assert "Robert Ashworth" not in canonical + reconciliation
