@@ -69,6 +69,14 @@ class PublicWebsiteTests(unittest.TestCase):
         "proof_to_pilot.html",
         "review_sprint.html",
     )
+    OPERATOR_PAGES = (
+        "mission_control.html",
+        "quant_lab.html",
+        "kraken_execution_dashboard.html",
+        "grants.html",
+        "forecast.html",
+        "explain.html",
+    )
 
     def inspect(self, name: str) -> tuple[str, PageInspector]:
         text = (DASHBOARD / name).read_text(encoding="utf-8")
@@ -145,6 +153,24 @@ class PublicWebsiteTests(unittest.TestCase):
         self.assertIn("Sitemap: https://lumen-core.ai/sitemap.xml", robots)
         self.assertIn("Disallow: /grants.html", robots)
         self.assertIn("Allow: /review_sprint.html", robots)
+
+    def test_public_pages_do_not_mount_operator_command_chrome(self) -> None:
+        fabric = (DASHBOARD / "assets" / "luma_command_fabric.js").read_text(
+            encoding="utf-8"
+        )
+        for name in self.PUBLIC_PAGES:
+            self.assertIn(f'"{name}": true', fabric)
+        self.assertIn("var isPublicPage = Boolean(PUBLIC_PAGES[currentFile]);", fabric)
+        self.assertIn("if (!isPublicPage) {", fabric)
+        self.assertIn("buildRail();", fabric)
+        self.assertIn("buildPalette();", fabric)
+
+    def test_canonical_operator_pages_are_not_indexable(self) -> None:
+        marker = '<meta name="robots" content="noindex,nofollow,noarchive">'
+        for name in self.OPERATOR_PAGES:
+            with self.subTest(page=name):
+                text = (DASHBOARD / name).read_text(encoding="utf-8")
+                self.assertIn(marker, text)
 
     def test_index_file_is_a_nonindexing_root_fallback(self) -> None:
         text = (DASHBOARD / "index.html").read_text(encoding="utf-8")

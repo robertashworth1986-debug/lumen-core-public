@@ -22,6 +22,12 @@
 
   var isFile = location.protocol === "file:";
   var currentFile = (location.pathname.replace(/\\/g, "/").split("/").pop() || "").toLowerCase();
+  var PUBLIC_PAGES = {
+    "operator_home.html": true,
+    "proof_to_pilot.html": true,
+    "review_sprint.html": true,
+  };
+  var isPublicPage = Boolean(PUBLIC_PAGES[currentFile]);
   var apiBase = typeof window.LUMA_API_BASE === "string"
     ? window.LUMA_API_BASE.trim().replace(/\/$/, "")
     : "";
@@ -274,8 +280,10 @@
   }
 
   function start() {
-    buildRail();
-    buildPalette();
+    if (!isPublicPage) {
+      buildRail();
+      buildPalette();
+    }
     renderStatus();
     updateStatus();
     setInterval(updateStatus, 15000);

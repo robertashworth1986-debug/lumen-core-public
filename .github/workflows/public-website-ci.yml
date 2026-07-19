@@ -12,6 +12,7 @@ on:
       - "dashboard/site.webmanifest"
       - "dashboard/assets/public_site*.css"
       - "dashboard/assets/public_site.js"
+      - "dashboard/assets/luma_command_fabric.js"
       - "dashboard/assets/lumencore-mark.svg"
       - "code/ops/ensure_dashboard_command_fabric.py"
       - "docs/DASHBOARD_ARCHITECTURE.md"
@@ -29,6 +30,7 @@ on:
       - "dashboard/site.webmanifest"
       - "dashboard/assets/public_site*.css"
       - "dashboard/assets/public_site.js"
+      - "dashboard/assets/luma_command_fabric.js"
       - "dashboard/assets/lumencore-mark.svg"
       - "code/ops/ensure_dashboard_command_fabric.py"
       - "docs/DASHBOARD_ARCHITECTURE.md"
@@ -58,4 +60,6 @@ jobs:
       - name: Validate public website
         run: python tests/test_public_website.py
       - name: Check public JavaScript syntax
-        run: node --check dashboard/assets/public_site.js
+        run: >-
+          node --check dashboard/assets/public_site.js &&
+          node --check dashboard/assets/luma_command_fabric.js
