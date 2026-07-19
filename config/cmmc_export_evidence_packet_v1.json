@@ -1,0 +1,382 @@
+{
+  "as_of_utc": "2026-07-19T03:11:29Z",
+  "max_evidence_age_days": 365,
+  "programs": [
+    {
+      "program_id": "DICE",
+      "requirements": [
+        {
+          "accepted_issuers": [
+            "SPRS"
+          ],
+          "accepted_source_classes": [
+            "PORTAL_ISSUED",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "OFFICIAL_SOURCE",
+            "state": "APPLIES"
+          },
+          "control": "CMMC_L1_SPRS_FINAL",
+          "evidence": [],
+          "fact_id": "dice.cmmc_l1_sprs_final"
+        },
+        {
+          "accepted_issuers": [
+            "SPRS"
+          ],
+          "accepted_source_classes": [
+            "PORTAL_ISSUED",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "OFFICIAL_SOURCE",
+            "state": "APPLIES"
+          },
+          "control": "CMMC_ANNUAL_AFFIRMATION",
+          "evidence": [],
+          "fact_id": "dice.cmmc_annual_affirmation"
+        },
+        {
+          "accepted_issuers": [
+            "CONTRACTING_OFFICER",
+            "QUALIFIED_SECURITY_REVIEWER"
+          ],
+          "accepted_source_classes": [
+            "LEGAL_REVIEW",
+            "TECHNICAL_CONTROL_EVIDENCE",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "AWARD_BOUNDARY_NOT_YET_ISSUED",
+            "state": "UNKNOWN"
+          },
+          "control": "FCI_CUI_BOUNDARY",
+          "evidence": [],
+          "fact_id": "dice.fci_cui_boundary"
+        },
+        {
+          "accepted_issuers": [
+            "CONTRACTING_OFFICER",
+            "DCSA",
+            "DDTC",
+            "BIS"
+          ],
+          "accepted_source_classes": [
+            "LEGAL_REVIEW",
+            "PORTAL_ISSUED",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "FINAL_TEAM_AND_AWARD_SCOPE_NOT_FIXED",
+            "state": "UNKNOWN"
+          },
+          "control": "FOREIGN_PERSON_AND_EXPORT_BOUNDARY",
+          "evidence": [],
+          "fact_id": "dice.foreign_person_boundary"
+        },
+        {
+          "accepted_issuers": [
+            "CONTRACTING_OFFICER",
+            "QUALIFIED_LEGAL_REVIEWER"
+          ],
+          "accepted_source_classes": [
+            "LEGAL_REVIEW",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "SPECIALIZED_SUBAWARDS_PLANNED",
+            "state": "APPLIES"
+          },
+          "control": "SUBCONTRACTOR_SECURITY_AND_EXPORT_FLOWDOWN",
+          "evidence": [],
+          "fact_id": "dice.subcontractor_flowdown"
+        }
+      ],
+      "requirements_sources": [
+        {
+          "path": "grant_submissions/DICE_HR001126S0010/HR001126S0010_AMENDMENT_01_OFFICIAL.pdf",
+          "reference": "Amendment 01 CMMC and proposal-security requirements"
+        }
+      ]
+    },
+    {
+      "program_id": "HarborSentinel",
+      "requirements": [
+        {
+          "accepted_issuers": [
+            "SPRS",
+            "CONTRACTING_OFFICER"
+          ],
+          "accepted_source_classes": [
+            "PORTAL_ISSUED",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "PROJECTED_TOPIC_LEVEL_REQUIRES_AWARD_CONFIRMATION",
+            "state": "UNKNOWN"
+          },
+          "control": "CMMC_L2_SELF_STATUS",
+          "evidence": [],
+          "fact_id": "harbor.cmmc_l2_self_status"
+        },
+        {
+          "accepted_issuers": [
+            "JCP"
+          ],
+          "accepted_source_classes": [
+            "PORTAL_ISSUED"
+          ],
+          "applicability": {
+            "basis": "CONTROLLED_TECHNICAL_INFORMATION_TOPIC",
+            "state": "APPLIES"
+          },
+          "control": "JCP_APPLICATION_SUBMITTED",
+          "evidence": [],
+          "fact_id": "harbor.jcp_application_submitted"
+        },
+        {
+          "accepted_issuers": [
+            "JCP"
+          ],
+          "accepted_source_classes": [
+            "PORTAL_ISSUED",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "DISTINCT_FROM_APPLICATION_SUBMISSION",
+            "state": "APPLIES"
+          },
+          "control": "DD2345_CERTIFIED",
+          "evidence": [],
+          "fact_id": "harbor.dd2345_certified"
+        },
+        {
+          "accepted_issuers": [
+            "EXPORT_COUNSEL",
+            "DDTC"
+          ],
+          "accepted_source_classes": [
+            "LEGAL_REVIEW",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "CLASSIFICATION_NOT_YET_REVIEWED",
+            "state": "UNKNOWN"
+          },
+          "control": "ITAR_CLASSIFICATION",
+          "evidence": [],
+          "fact_id": "harbor.itar_classification"
+        },
+        {
+          "accepted_issuers": [
+            "EXPORT_COUNSEL",
+            "BIS"
+          ],
+          "accepted_source_classes": [
+            "LEGAL_REVIEW",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "CLASSIFICATION_NOT_YET_REVIEWED",
+            "state": "UNKNOWN"
+          },
+          "control": "EAR_CLASSIFICATION",
+          "evidence": [],
+          "fact_id": "harbor.ear_classification"
+        },
+        {
+          "accepted_issuers": [
+            "CONTRACTING_OFFICER",
+            "QUALIFIED_SECURITY_REVIEWER"
+          ],
+          "accepted_source_classes": [
+            "LEGAL_REVIEW",
+            "TECHNICAL_CONTROL_EVIDENCE",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "PROPOSED_ENVIRONMENT_NOT_AN_ESTABLISHED_BOUNDARY",
+            "state": "UNKNOWN"
+          },
+          "control": "FCI_CUI_BOUNDARY",
+          "evidence": [],
+          "fact_id": "harbor.fci_cui_boundary"
+        },
+        {
+          "accepted_issuers": [
+            "CONTRACTING_OFFICER",
+            "QUALIFIED_LEGAL_REVIEWER"
+          ],
+          "accepted_source_classes": [
+            "LEGAL_REVIEW",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "CONSULTING_COSTS_PLANNED",
+            "state": "APPLIES"
+          },
+          "control": "SUBCONTRACTOR_SECURITY_AND_EXPORT_FLOWDOWN",
+          "evidence": [],
+          "fact_id": "harbor.subcontractor_flowdown"
+        }
+      ],
+      "requirements_sources": [
+        {
+          "path": "grant_submissions/NV063_HarborSentinel/NAVY_26BZ_PH_I_R3_INSTRUCTIONS.pdf",
+          "reference": "Navy Release 3 instructions and projected CMMC/export requirements"
+        }
+      ]
+    },
+    {
+      "program_id": "MissionWeave",
+      "requirements": [
+        {
+          "accepted_issuers": [
+            "SPRS",
+            "CONTRACTING_OFFICER"
+          ],
+          "accepted_source_classes": [
+            "PORTAL_ISSUED",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "PROJECTED_TOPIC_LEVEL_REQUIRES_AWARD_CONFIRMATION",
+            "state": "UNKNOWN"
+          },
+          "control": "CMMC_L2_SELF_STATUS",
+          "evidence": [],
+          "fact_id": "missionweave.cmmc_l2_self_status"
+        },
+        {
+          "accepted_issuers": [
+            "JCP"
+          ],
+          "accepted_source_classes": [
+            "PORTAL_ISSUED"
+          ],
+          "applicability": {
+            "basis": "SOLICITATION_ALLOWS_DISTINCT_APPLICATION_EVIDENCE",
+            "state": "APPLIES"
+          },
+          "control": "JCP_APPLICATION_SUBMITTED",
+          "evidence": [],
+          "fact_id": "missionweave.jcp_application_submitted"
+        },
+        {
+          "accepted_issuers": [
+            "JCP"
+          ],
+          "accepted_source_classes": [
+            "PORTAL_ISSUED",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "DISTINCT_FROM_APPLICATION_SUBMISSION",
+            "state": "APPLIES"
+          },
+          "control": "DD2345_CERTIFIED",
+          "evidence": [],
+          "fact_id": "missionweave.dd2345_certified"
+        },
+        {
+          "accepted_issuers": [
+            "EXPORT_COUNSEL",
+            "DDTC"
+          ],
+          "accepted_source_classes": [
+            "LEGAL_REVIEW",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "ITAR_AND_EAR_MUST_BE_EVALUATED_SEPARATELY",
+            "state": "UNKNOWN"
+          },
+          "control": "ITAR_CLASSIFICATION",
+          "evidence": [],
+          "fact_id": "missionweave.itar_classification"
+        },
+        {
+          "accepted_issuers": [
+            "EXPORT_COUNSEL",
+            "BIS"
+          ],
+          "accepted_source_classes": [
+            "LEGAL_REVIEW",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "ITAR_AND_EAR_MUST_BE_EVALUATED_SEPARATELY",
+            "state": "UNKNOWN"
+          },
+          "control": "EAR_CLASSIFICATION",
+          "evidence": [],
+          "fact_id": "missionweave.ear_classification"
+        },
+        {
+          "accepted_issuers": [
+            "CONTRACTING_OFFICER",
+            "QUALIFIED_SECURITY_REVIEWER"
+          ],
+          "accepted_source_classes": [
+            "LEGAL_REVIEW",
+            "TECHNICAL_CONTROL_EVIDENCE",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "PROPOSED_BOUNDARY_REQUIRES_QUALIFIED_REVIEW",
+            "state": "UNKNOWN"
+          },
+          "control": "FCI_CUI_BOUNDARY",
+          "evidence": [],
+          "fact_id": "missionweave.fci_cui_boundary"
+        },
+        {
+          "accepted_issuers": [
+            "CONTRACTING_OFFICER",
+            "QUALIFIED_LEGAL_REVIEWER"
+          ],
+          "accepted_source_classes": [
+            "LEGAL_REVIEW",
+            "AGENCY_DETERMINATION"
+          ],
+          "applicability": {
+            "basis": "NO_SUBCONTRACTORS_CURRENTLY_PLANNED_SUBJECT_TO_FINAL_REVIEW",
+            "state": "UNKNOWN"
+          },
+          "control": "SUBCONTRACTOR_SECURITY_AND_EXPORT_FLOWDOWN",
+          "evidence": [],
+          "fact_id": "missionweave.subcontractor_flowdown"
+        }
+      ],
+      "requirements_sources": [
+        {
+          "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/source_attachments/DLA_26BZ_RELEASE_3_COMPONENT_INSTRUCTIONS.pdf",
+          "reference": "DLA component instructions for JCP and ITAR or EAR requirements"
+        },
+        {
+          "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/source_attachments/DoW_2026_SBIR_BAA_RELEASE_3_AMENDMENT_2.pdf",
+          "reference": "Controlling generic BAA amendment"
+        }
+      ]
+    }
+  ],
+  "rules": [
+    "A boolean or locally generated receipt never upgrades its source class.",
+    "Wrong-entity, wrong-scope, stale, conflicting, malformed, or missing proof fails closed.",
+    "ITAR and EAR remain separate classification branches.",
+    "NOT_APPLICABLE requires a named legal or contracting review and a hashed decision reference.",
+    "A JCP submission receipt is distinct from a JCP-certified DD2345.",
+    "No output may claim compliance, certification, export authorization, or award eligibility."
+  ],
+  "schema": "lumencore.cmmc_export_evidence_packet_config.v1",
+  "source_classes": [
+    "FOUNDER_ATTESTATION",
+    "LEGAL_REVIEW",
+    "TECHNICAL_CONTROL_EVIDENCE",
+    "PORTAL_OBSERVED",
+    "PORTAL_ISSUED",
+    "AGENCY_DETERMINATION"
+  ],
+  "subject_ref": "compliance-subject"
+}
