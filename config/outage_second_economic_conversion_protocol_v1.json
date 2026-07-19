@@ -1,0 +1,336 @@
+{
+  "schema": "outage_second_economic_conversion_protocol.v1",
+  "protocol_id": "LUMENCORE_OUTAGE_SECOND_ECONOMIC_CONVERSION_20260716",
+  "version": "1.1.0",
+  "status": "FROZEN_PRIVATE_ENTITY_INCREMENTAL_COST_PROTOCOL",
+  "purpose": "Compute a private-entity incremental outage-cost model while keeping every claim closed until exact artifacts and a cryptographically verified external receipt are present.",
+  "valuation_perspective": "PRIVATE_ENTITY_INCREMENTAL_COST",
+  "currency": "USD",
+  "claim_boundary": "Version 1 is limited to the named private entity's incremental cost. It does not calculate federal social benefit, mission cost-effectiveness, market capitalization loss, realized savings, or a commercial price.",
+  "case_classifications": [
+    "SYNTHETIC_ILLUSTRATIVE",
+    "EXTERNAL_OPERATOR_CASE"
+  ],
+  "required_scenarios": [
+    "low",
+    "base",
+    "high"
+  ],
+  "scenario_fields": {
+    "annual_revenue_usd": {
+      "kind": "decimal",
+      "minimum": "0",
+      "maximum": "1000000000000000"
+    },
+    "reporting_period_seconds": {
+      "kind": "decimal",
+      "minimum": "0",
+      "exclusive_minimum": true,
+      "maximum": "1000000000"
+    },
+    "affected_scope_fraction": {
+      "kind": "decimal",
+      "minimum": "0",
+      "maximum": "1"
+    },
+    "nonrecoverable_fraction": {
+      "kind": "decimal",
+      "minimum": "0",
+      "maximum": "1"
+    },
+    "contribution_margin_fraction": {
+      "kind": "decimal",
+      "minimum": "0",
+      "maximum": "1"
+    },
+    "outage_duration_seconds": {
+      "kind": "decimal",
+      "minimum": "0",
+      "exclusive_minimum": true,
+      "maximum": "31536000"
+    },
+    "fixed_incremental_costs_per_event_usd": {
+      "kind": "decimal",
+      "minimum": "0",
+      "maximum": "1000000000000"
+    },
+    "variable_incremental_costs_per_second_usd": {
+      "kind": "decimal",
+      "minimum": "0",
+      "maximum": "1000000000"
+    },
+    "interruption_related_savings_per_event_usd": {
+      "kind": "decimal",
+      "minimum": "0",
+      "maximum": "1000000000000"
+    },
+    "interruption_related_savings_per_second_usd": {
+      "kind": "decimal",
+      "minimum": "0",
+      "maximum": "1000000000"
+    },
+    "annual_avoided_outage_seconds": {
+      "kind": "decimal",
+      "minimum": "0",
+      "maximum": "31536000"
+    },
+    "annual_avoided_event_count": {
+      "kind": "integer",
+      "minimum": "0",
+      "maximum": "1000000"
+    },
+    "attribution_fraction": {
+      "kind": "decimal",
+      "minimum": "0",
+      "maximum": "1"
+    },
+    "confidence_factor": {
+      "kind": "decimal",
+      "minimum": "0",
+      "maximum": "1"
+    }
+  },
+  "calculation_steps": [
+    {
+      "output": "gross_revenue_flow_per_second_usd",
+      "operation": "divide",
+      "operands": [
+        "annual_revenue_usd",
+        "reporting_period_seconds"
+      ]
+    },
+    {
+      "output": "gross_revenue_exposed_per_second_usd",
+      "operation": "multiply",
+      "operands": [
+        "gross_revenue_flow_per_second_usd",
+        "affected_scope_fraction"
+      ]
+    },
+    {
+      "output": "lost_contribution_margin_per_second_usd",
+      "operation": "multiply",
+      "operands": [
+        "gross_revenue_exposed_per_second_usd",
+        "nonrecoverable_fraction",
+        "contribution_margin_fraction"
+      ]
+    },
+    {
+      "output": "gross_time_flow_cost_per_second_usd",
+      "operation": "add",
+      "operands": [
+        "lost_contribution_margin_per_second_usd",
+        "variable_incremental_costs_per_second_usd"
+      ]
+    },
+    {
+      "output": "net_time_flow_cost_per_second_usd",
+      "operation": "subtract",
+      "operands": [
+        "gross_time_flow_cost_per_second_usd",
+        "interruption_related_savings_per_second_usd"
+      ]
+    },
+    {
+      "output": "net_fixed_incremental_cost_per_event_usd",
+      "operation": "subtract",
+      "operands": [
+        "fixed_incremental_costs_per_event_usd",
+        "interruption_related_savings_per_event_usd"
+      ]
+    },
+    {
+      "output": "event_time_flow_cost_usd",
+      "operation": "multiply",
+      "operands": [
+        "net_time_flow_cost_per_second_usd",
+        "outage_duration_seconds"
+      ]
+    },
+    {
+      "output": "incremental_outage_cost_per_event_usd",
+      "operation": "add",
+      "operands": [
+        "event_time_flow_cost_usd",
+        "net_fixed_incremental_cost_per_event_usd"
+      ]
+    },
+    {
+      "output": "annual_avoided_time_flow_cost_usd",
+      "operation": "multiply",
+      "operands": [
+        "net_time_flow_cost_per_second_usd",
+        "annual_avoided_outage_seconds"
+      ]
+    },
+    {
+      "output": "annual_avoided_fixed_event_cost_usd",
+      "operation": "multiply",
+      "operands": [
+        "net_fixed_incremental_cost_per_event_usd",
+        "annual_avoided_event_count"
+      ]
+    },
+    {
+      "output": "annual_avoided_cost_before_attribution_usd",
+      "operation": "add",
+      "operands": [
+        "annual_avoided_time_flow_cost_usd",
+        "annual_avoided_fixed_event_cost_usd"
+      ]
+    },
+    {
+      "output": "estimated_annual_avoided_cost_usd",
+      "operation": "multiply",
+      "operands": [
+        "annual_avoided_cost_before_attribution_usd",
+        "attribution_fraction",
+        "confidence_factor"
+      ]
+    }
+  ],
+  "monotonic_outputs": [
+    "incremental_outage_cost_per_event_usd",
+    "annual_avoided_time_flow_cost_usd",
+    "annual_avoided_fixed_event_cost_usd",
+    "estimated_annual_avoided_cost_usd"
+  ],
+  "numeric_controls": {
+    "intermediate_decimal_precision": 60,
+    "output_decimal_places": 6,
+    "rounding": "ROUND_HALF_UP",
+    "maximum_calculated_absolute_magnitude": "1000000000000000000000000",
+    "maximum_json_depth": 32,
+    "maximum_string_length": 4096,
+    "maximum_array_items": 256
+  },
+  "artifact_controls": {
+    "hash_algorithm": "sha256",
+    "relative_artifact_paths_only": true,
+    "reject_symlinks": true,
+    "strict_json_media_types": [
+      "application/json"
+    ],
+    "atomic_bundle_required": true,
+    "no_clobber_required": true
+  },
+  "technical_evidence_controls": {
+    "schema": "outage_second_technical_evidence.v1",
+    "required_artifact_roles": [
+      "BUYER_AUTHORIZATION",
+      "FROZEN_INCUMBENT_BASELINE",
+      "FROZEN_PRIMARY_METRIC",
+      "INDEPENDENT_REPRODUCTION_RECEIPT"
+    ],
+    "measured_effect_fields": [
+      "annual_avoided_outage_seconds",
+      "annual_avoided_event_count"
+    ],
+    "counterfactual_must_precede_scoring": true
+  },
+  "receipt_controls": {
+    "schema": "outage_second_economic_acceptance_receipt.v1",
+    "template_status": "UNSIGNED_BOUND_TEMPLATE",
+    "completed_status": "COMPLETED_EXTERNAL_RECEIPT",
+    "signature_algorithm": "Ed25519",
+    "required_signer_roles": [
+      "economic_owner",
+      "technical_reviewer"
+    ],
+    "decision_values": [
+      "ACCEPT_ESTIMATED_AVOIDED_COST",
+      "REJECT_ECONOMIC_CONVERSION"
+    ],
+    "acceptance_decision": "ACCEPT_ESTIMATED_AVOIDED_COST",
+    "release_decision_values": [
+      "WITHHOLD",
+      "APPROVE_PUBLIC_RELEASE"
+    ],
+    "release_approval_decision": "APPROVE_PUBLIC_RELEASE",
+    "maximum_signature_delay_seconds": 86400,
+    "maximum_future_skew_seconds": 300,
+    "forbidden_signer_organization_tokens": [
+      "lumencore"
+    ],
+    "trusted_key_source": "OUT_OF_BAND_CALLER_SUPPLIED_SHA256"
+  },
+  "required_receipt_attestations": [
+    "EXACT_CASE_AND_SOURCE_ARTIFACTS_ACCEPTED",
+    "COUNTERFACTUAL_FROZEN_BEFORE_SCORING",
+    "FIXED_AND_TIME_FLOW_COSTS_NOT_DOUBLE_COUNTED",
+    "AVOIDED_SECONDS_AND_AVOIDED_EVENT_COUNT_ACCEPTED",
+    "LOW_BASE_HIGH_OUTPUTS_AND_LIMITATIONS_ACCEPTED",
+    "TECHNICAL_EVIDENCE_AND_INDEPENDENT_REPRODUCTION_ACCEPTED",
+    "PRIVATE_ENTITY_INCREMENTAL_COST_PERSPECTIVE_ACCEPTED"
+  ],
+  "claim_gates": {
+    "evaluation_order": [
+      "accepted_estimated_avoided_cost_claim_allowed",
+      "public_economic_release_allowed"
+    ],
+    "definitions": {
+      "accepted_estimated_avoided_cost_claim_allowed": [
+        "external_operator_case",
+        "input_source_artifacts_recomputed",
+        "technical_evidence_artifact_recomputed",
+        "technical_support_artifacts_recomputed",
+        "case_effects_match_technical_evidence",
+        "receipt_bindings_exact",
+        "receipt_outputs_exact",
+        "receipt_scope_exact",
+        "receipt_attestations_exact",
+        "receipt_signers_verified",
+        "receipt_independence_verified",
+        "receipt_timestamps_valid",
+        "receipt_decision_accepts",
+        "receipt_signatures_verified"
+      ],
+      "public_economic_release_allowed": [
+        "accepted_estimated_avoided_cost_claim_allowed",
+        "receipt_release_decision_approves"
+      ]
+    }
+  },
+  "release_control": {
+    "default_public_release": false,
+    "closed_gate_summary_status": "NO_ACCEPTED_PUBLIC_ECONOMICS",
+    "accepted_private_summary_status": "ACCEPTED_PRIVATE_ECONOMICS_WITHHELD",
+    "released_summary_status": "PUBLIC_RELEASE_APPROVED_ACCEPTED_ESTIMATE",
+    "redact_scope_when_release_closed": true,
+    "redact_outputs_when_release_closed": true
+  },
+  "prohibited_inputs_or_shortcuts": [
+    "market_capitalization_as_loss_basis",
+    "enterprise_value_as_loss_basis",
+    "federal_social_benefit_in_v1",
+    "mission_cost_effectiveness_in_v1",
+    "fixed_event_cost_divided_by_seconds_for_annualization",
+    "internal_model_win_rate_as_seconds_avoided",
+    "internal_replay_delta_as_realized_savings",
+    "self_asserted_acceptance_boolean",
+    "hash_shaped_string_without_artifact_rehash",
+    "unsigned_or_hash_only_signature_artifact"
+  ],
+  "standards_alignment": [
+    {
+      "authority": "U.S. Department of Energy Federal Energy Management Program",
+      "reference": "Customer Damage Function Calculator",
+      "url": "https://www.energy.gov/cmei/femp/articles/estimate-value-resilience-customer-damage-function-calculator",
+      "compliance_or_endorsement_claimed": false
+    },
+    {
+      "authority": "Lawrence Berkeley National Laboratory",
+      "reference": "ICE Calculator 2.2 and interruption-cost methodology",
+      "url": "https://emp.lbl.gov/news/next-version-ice-calculator-now-available",
+      "compliance_or_endorsement_claimed": false
+    },
+    {
+      "authority": "Office of Management and Budget",
+      "reference": "Circular A-94, revised November 9, 2023",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2023/11/CircularA-94.pdf",
+      "compliance_or_endorsement_claimed": false
+    }
+  ],
+  "operator_fields_may_be_filled_by_lumencore": false
+}
