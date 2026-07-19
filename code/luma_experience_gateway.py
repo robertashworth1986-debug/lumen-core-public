@@ -6222,6 +6222,14 @@ def master_autofire_control(req: dict | None = None) -> dict[str, Any]:
     return {"status": "ok", **cur}
 
 
+@app.get("/out/grants", include_in_schema=False)
+@app.get("/out/grants/{artifact_path:path}", include_in_schema=False)
+def block_private_grant_artifacts(artifact_path: str = "") -> Response:
+    """Keep grant application packets off the public static artifact surface."""
+    del artifact_path
+    return Response(status_code=404)
+
+
 if DASH.exists():
     # ──────────────────────────────────────────────────────────────
     # SPIKE HUNTER  — Live Kraken opportunity scanner

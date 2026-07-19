@@ -431,6 +431,12 @@ server {
         try_files $uri $uri/ =404;
     }
 
+    # Grant application packets include operator-only form fields. Reviewer-safe
+    # grant feeds are published under /data and /dashboard/data instead.
+    location ^~ /out/grants/ {
+        return 404;
+    }
+
     location /out/ {
         proxy_pass         http://luma_gateway;
         proxy_http_version 1.1;

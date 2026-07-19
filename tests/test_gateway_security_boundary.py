@@ -50,3 +50,24 @@ def test_human_unlock_bearer_check_is_exact() -> None:
     assert gateway._human_unlock_bearer_authorized("token", "Basic token") is False
     assert gateway._human_unlock_bearer_authorized("token", "Bearer wrong") is False
     assert gateway._human_unlock_bearer_authorized("", "Bearer token") is False
+
+
+def test_private_grant_artifact_tree_is_shadowed_before_static_mount() -> None:
+    route_paths = [getattr(route, "path", "") for route in gateway.app.routes]
+    block_index = route_paths.index("/out/grants/{artifact_path:path}")
+    static_index = route_paths.index("/out")
+
+    assert "/out/grants" in route_paths
+    assert block_index < static_index
+    assert gateway.block_private_grant_artifacts("any/submission_packet.json").status_code == 404
+
+
+def test_nginx_templates_block_private_grant_artifacts() -> None:
+    templates = [
+        ROOT / "code" / "deploy" / "nginx" / "lumatrader.conf",
+        ROOT / "deploy" / "VPS_DEPLOY.sh",
+    ]
+    for template in templates:
+        text = template.read_text(encoding="utf-8")
+        assert "location ^~ /out/grants/" in text
+        assert text.index("location ^~ /out/grants/") < text.index("location /out/")
