@@ -1,0 +1,164 @@
+name: Deploy bounded ProofLock patch to VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_commit:
+        description: Full commit SHA at the selected workflow ref
+        required: true
+        type: string
+      approval:
+        description: Explicit four-file production deployment gate
+        required: true
+        type: choice
+        default: HOLD
+        options:
+          - HOLD
+          - DEPLOY_PROOFLOCK_EXACT_FOUR
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lumencore-production-site
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      source_commit: ${{ steps.gate.outputs.source_commit }}
+    steps:
+      - name: Fail closed unless this exact workflow commit is approved
+        id: gate
+        shell: bash
+        env:
+          APPROVAL: ${{ inputs.approval }}
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_COMMIT: ${{ inputs.release_commit }}
+          WORKFLOW_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$EVENT_NAME" == "workflow_dispatch" ]]
+          [[ "$APPROVAL" == "DEPLOY_PROOFLOCK_EXACT_FOUR" ]]
+          [[ "$RELEASE_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]
+          printf 'source_commit=%s\n' "$RELEASE_COMMIT" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: authorize
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://lumen-core.ai/build_week/prooflock_console/
+    env:
+      APPROVAL: ${{ inputs.approval }}
+      RELEASE_COMMIT: ${{ needs.authorize.outputs.source_commit }}
+      REMOTE_STAGE: /tmp/lumencore-prooflock-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+      - name: Checkout the approved commit
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ needs.authorize.outputs.source_commit }}
+
+      - name: Package exactly four immutable Git blobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -d -m 700 /tmp/prooflock-release
+          python3 code/deploy/package_prooflock_release.py \
+            --source-commit "$RELEASE_COMMIT" \
+            --archive /tmp/prooflock-release/prooflock-release.tar \
+            --manifest /tmp/prooflock-release/prooflock-release-manifest.json \
+            | tee /tmp/prooflock-package-receipt.json
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+
+      - name: Verify bounded remote prerequisites
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes "opc@$VPS_HOST" '
+            set -eu
+            sudo -n true
+            for command_name in python3 sha256sum stat cp cmp install date mktemp realpath; do
+              command -v "$command_name" >/dev/null
+            done
+          '
+
+      - name: Upload bounded release package
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          [[ "$REMOTE_STAGE" =~ ^/tmp/lumencore-prooflock-[0-9]+-[0-9]+$ ]]
+          ssh -o BatchMode=yes "opc@$VPS_HOST" \
+            "test ! -e '$REMOTE_STAGE' && install -d -m 700 '$REMOTE_STAGE'"
+          scp -o BatchMode=yes \
+            /tmp/prooflock-release/prooflock-release.tar \
+            /tmp/prooflock-release/prooflock-release-manifest.json \
+            "opc@$VPS_HOST:$REMOTE_STAGE/"
+
+      - name: Apply exactly four files with rollback capture
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes "opc@$VPS_HOST" \
+            "sudo -n bash -s -- \
+              --archive '$REMOTE_STAGE/prooflock-release.tar' \
+              --manifest '$REMOTE_STAGE/prooflock-release-manifest.json' \
+              --source-commit '$RELEASE_COMMIT' \
+              --approval '$APPROVAL'" \
+            < code/deploy/APPLY_PROOFLOCK_RELEASE_ON_VPS.sh \
+            | tee /tmp/prooflock-deploy-receipt.txt
+
+      - name: Smoke test exact live ProofLock release
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error --max-time 20 \
+            "https://lumen-core.ai/build_week/prooflock_console/?deploy=$RELEASE_COMMIT" \
+            --output /tmp/prooflock-index.html
+          grep -Fq '<title>ProofLock Console</title>' /tmp/prooflock-index.html
+          python3 code/ops/VERIFY_PROOFLOCK_LIVE_RELEASE.py \
+            --source-commit "$RELEASE_COMMIT" \
+            --no-write \
+            | tee /tmp/prooflock-live-gate.json
+
+      - name: Remove remote transfer staging
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          [[ "$REMOTE_STAGE" =~ ^/tmp/lumencore-prooflock-[0-9]+-[0-9]+$ ]]
+          ssh -o BatchMode=yes "opc@$VPS_HOST" "rm -rf -- '$REMOTE_STAGE'"
+
+      - name: Upload deployment receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prooflock-deploy-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            /tmp/prooflock-package-receipt.json
+            /tmp/prooflock-deploy-receipt.txt
+            /tmp/prooflock-live-gate.json
+          if-no-files-found: warn
+          retention-days: 30

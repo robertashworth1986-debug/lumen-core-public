@@ -238,11 +238,13 @@ jobs:
           set -euo pipefail
           rsync -rlvz --delete --inplace --size-only --no-perms --omit-dir-times \
             --rsync-path="sudo -n rsync" \
+            --filter='protect /build_week/***' \
             --exclude='*.py' \
             --exclude='*.ps1' \
             --exclude='.git/' \
             --exclude='node_modules/' \
             --exclude='data/' \
+            --exclude='/build_week/' \
             --exclude='assets/vendor/three.min.js' \
             -e "ssh -o StrictHostKeyChecking=no" \
             dashboard/ \
@@ -288,7 +290,8 @@ jobs:
           tmp_root="$(mktemp)"
           tmp_evidence="$(mktemp)"
           tmp_data="$(mktemp)"
-          trap 'rm -f "$tmp_root" "$tmp_evidence" "$tmp_data"' EXIT
+          tmp_prooflock="$(mktemp)"
+          trap 'rm -f "$tmp_root" "$tmp_evidence" "$tmp_data" "$tmp_prooflock"' EXIT
 
           status() {
             local url="$1"
@@ -299,17 +302,20 @@ jobs:
           ROOT="$(status "https://lumen-core.ai/?deploy=${GITHUB_SHA}" "$tmp_root")"
           EVIDENCE="$(status "https://lumen-core.ai/evidence/?deploy=${GITHUB_SHA}" "$tmp_evidence")"
           DATA="$(status "https://lumen-core.ai/data/site_health.json?deploy=${GITHUB_SHA}" "$tmp_data")"
+          PROOFLOCK="$(status "https://lumen-core.ai/build_week/prooflock_console/?deploy=${GITHUB_SHA}" "$tmp_prooflock")"
 
-          echo "Root: ${ROOT:-000} | Evidence: ${EVIDENCE:-000} | Site health data: ${DATA:-000}"
+          echo "Root: ${ROOT:-000} | Evidence: ${EVIDENCE:-000} | Site health data: ${DATA:-000} | ProofLock: ${PROOFLOCK:-000}"
 
           [[ "$ROOT" == "200" ]]
           [[ "$EVIDENCE" == "200" ]]
           [[ "$DATA" == "200" ]]
+          [[ "$PROOFLOCK" == "200" ]]
           grep -Fq 'One proof path. One bounded decision.' "$tmp_root"
           grep -Fq 'name="lumencore-surface" content="proof-to-pilot-evidence-v1"' "$tmp_evidence"
+          grep -Fq '<title>ProofLock Console</title>' "$tmp_prooflock"
           python3 -m json.tool "$tmp_data" >/dev/null
 
-          echo "Production root, bounded evidence page, and health JSON are live."
+          echo "Production root, bounded evidence page, health JSON, and ProofLock route are live."
 
       - name: Publish production deployment receipt
         if: always()

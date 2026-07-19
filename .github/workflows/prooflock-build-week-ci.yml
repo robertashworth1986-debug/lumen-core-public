@@ -6,6 +6,8 @@ on:
       - "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.*"
       - "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.*"
       - "build_week/prooflock_console/**"
+      - "code/deploy/APPLY_PROOFLOCK_RELEASE_ON_VPS.sh"
+      - "code/deploy/package_prooflock_release.py"
       - "code/ops/VERIFY_PROOFLOCK_LIVE_RELEASE.py"
       - "dashboard/assets/vendor/THREE_LICENSE.txt"
       - "dashboard/assets/vendor/three.core.min.js"
@@ -13,8 +15,11 @@ on:
       - "docs/OPENAI_BUILD_WEEK_PROOFLOCK_PREDEPLOYMENT_GATE_2026-07-18.*"
       - "docs/OPENAI_BUILD_WEEK_PROOFLOCK_SUBMISSION_READINESS_2026-07-17.md"
       - "tests/test_prooflock_console.py"
+      - "tests/test_prooflock_deploy_hardening.py"
       - "tests/test_prooflock_visual.py"
       - "tests/test_verify_prooflock_live_release.py"
+      - ".github/workflows/deploy-prooflock-release.yml"
+      - ".github/workflows/deploy.yml"
       - ".github/workflows/prooflock-build-week-ci.yml"
   push:
     branches: [main]
@@ -22,6 +27,8 @@ on:
       - "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v2_concept.*"
       - "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.*"
       - "build_week/prooflock_console/**"
+      - "code/deploy/APPLY_PROOFLOCK_RELEASE_ON_VPS.sh"
+      - "code/deploy/package_prooflock_release.py"
       - "code/ops/VERIFY_PROOFLOCK_LIVE_RELEASE.py"
       - "dashboard/assets/vendor/THREE_LICENSE.txt"
       - "dashboard/assets/vendor/three.core.min.js"
@@ -29,8 +36,11 @@ on:
       - "docs/OPENAI_BUILD_WEEK_PROOFLOCK_PREDEPLOYMENT_GATE_2026-07-18.*"
       - "docs/OPENAI_BUILD_WEEK_PROOFLOCK_SUBMISSION_READINESS_2026-07-17.md"
       - "tests/test_prooflock_console.py"
+      - "tests/test_prooflock_deploy_hardening.py"
       - "tests/test_prooflock_visual.py"
       - "tests/test_verify_prooflock_live_release.py"
+      - ".github/workflows/deploy-prooflock-release.yml"
+      - ".github/workflows/deploy.yml"
       - ".github/workflows/prooflock-build-week-ci.yml"
 
 permissions:
@@ -56,10 +66,14 @@ jobs:
         run: >-
           python -m py_compile
           build_week/prooflock_console/verify_receipt.py
+          code/deploy/package_prooflock_release.py
           code/ops/VERIFY_PROOFLOCK_LIVE_RELEASE.py
           tests/test_prooflock_console.py
+          tests/test_prooflock_deploy_hardening.py
           tests/test_prooflock_visual.py
           tests/test_verify_prooflock_live_release.py
+      - name: Check deployment shell syntax
+        run: bash -n code/deploy/APPLY_PROOFLOCK_RELEASE_ON_VPS.sh
       - name: Check JavaScript syntax
         run: |
           node --check build_week/prooflock_console/app.js
@@ -70,6 +84,7 @@ jobs:
         run: >-
           python -m pytest -q
           tests/test_prooflock_console.py
+          tests/test_prooflock_deploy_hardening.py
           tests/test_prooflock_visual.py
           tests/test_verify_prooflock_live_release.py
       - name: Verify bundled ProofLock receipt
