@@ -213,6 +213,7 @@ td code { font: 11px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .gate-row header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .gate-row h3 { margin: 0; font-size: 13px; letter-spacing: 0; }
 .gate-row p { margin: 10px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.gate-row .gate-authority { color: #45606a; font-size: 10px; font-weight: 700; overflow-wrap: anywhere; text-transform: uppercase; }
 
 pre {
   min-height: 76px;

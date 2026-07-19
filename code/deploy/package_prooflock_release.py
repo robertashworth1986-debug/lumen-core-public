@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the bounded ProofLock patch from immutable Git blobs."""
+"""Build the bounded ProofLock console snapshot from immutable Git blobs."""
 
 from __future__ import annotations
 
@@ -18,12 +18,23 @@ from typing import Final
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SCHEMA: Final = "lumencore.prooflock_patch_manifest.v1"
+SCHEMA: Final = "lumencore.prooflock_release_manifest.v2"
 FULL_COMMIT = re.compile(r"[0-9a-fA-F]{40}")
 RELEASE_PATHS: Final = (
+    "build_week/prooflock_console/THREE_LICENSE.txt",
+    "build_week/prooflock_console/README.md",
+    "build_week/prooflock_console/THREAT_MODEL.md",
+    "build_week/prooflock_console/app.js",
+    "build_week/prooflock_console/bootstrap.js",
+    "build_week/prooflock_console/index.html",
     "build_week/prooflock_console/prooflock_core.js",
     "build_week/prooflock_console/prooflock_favicon.svg",
-    "build_week/prooflock_console/THREE_LICENSE.txt",
+    "build_week/prooflock_console/prooflock_lattice.css",
+    "build_week/prooflock_console/prooflock_lattice.js",
+    "build_week/prooflock_console/sample_receipt.json",
+    "build_week/prooflock_console/styles.css",
+    "build_week/prooflock_console/three.core.min.js",
+    "build_week/prooflock_console/three.module.min.js",
     "build_week/prooflock_console/verify_receipt.py",
 )
 

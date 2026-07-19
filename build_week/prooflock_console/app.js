@@ -102,10 +102,15 @@ function renderGateRows(report) {
     const header = document.createElement("header");
     const heading = document.createElement("h3");
     heading.textContent = gate.label || gate.gate_id || "Unnamed gate";
-    header.append(heading, makePill(gate.status));
+    header.append(heading, makePill(gate.effective_status || gate.status));
     const basis = document.createElement("p");
-    basis.textContent = gate.basis || "No basis recorded.";
-    card.append(header, basis);
+    basis.textContent = gate.verification_basis || gate.basis || "No basis recorded.";
+    const authority = document.createElement("p");
+    authority.className = "gate-authority";
+    const recorded = gate.recorded_status || gate.status || "OPEN";
+    const effective = gate.effective_status || gate.status || "OPEN";
+    authority.textContent = `${gate.authority_source || "RECORDED"} · recorded ${recorded} · effective ${effective}`;
+    card.append(header, basis, authority);
     return card;
   });
   elements.gateGrid.replaceChildren(...rows);
@@ -113,8 +118,14 @@ function renderGateRows(report) {
 
 function reportStatus(report) {
   if (!report.integrity_valid) return "Verification failed";
+  if (!report.policy_valid) return "Integrity verified; authority claim rejected";
   if (report.promotion_allowed) return "Verified and releasable";
-  return "Verified, promotion held";
+  return "Files match; engineering claim not approved";
+}
+
+function effectiveDecision(report) {
+  if (!report.integrity_valid) return "INVALID";
+  return report.promotion_allowed ? "PROMOTE" : "HOLD";
 }
 
 function renderReport(report, receipt) {
@@ -126,23 +137,28 @@ function renderReport(report, receipt) {
   elements.integrity.textContent = report.integrity_valid ? "Verified" : "Failed";
   elements.artifacts.textContent = `${matches} / ${total}`;
   elements.gates.textContent = `${heldGates} held`;
-  elements.decision.textContent = report.recorded_decision || "Unknown";
+  const decision = effectiveDecision(report);
+  elements.decision.textContent = decision;
   elements.receiptHash.textContent = `SHA-256 ${shortHash(report.receipt_hash.computed)}`;
   elements.boundary.textContent = report.claim_boundary || "No claim boundary recorded.";
   elements.artifactSummary.textContent = `${matches} of ${total} matched`;
-  elements.gateSummary.textContent = report.promotion_allowed ? "Promotion gate clear" : "Promotion held";
+  elements.gateSummary.textContent = report.promotion_allowed
+    ? "Promotion gate clear"
+    : report.policy_valid ? "Promotion held" : "Authority escalation blocked";
   elements.verificationTime.textContent = new Date(report.verified_utc).toLocaleString();
   elements.headerStatusDot.className = `status-dot ${report.integrity_valid ? (report.promotion_allowed ? "pass" : "open") : "fail"}`;
   elements.headerStatus.textContent = status;
-  elements.verificationLive.textContent = `${status}. ${matches} of ${total} artifacts match. ${heldGates} required gates are held.`;
+  elements.verificationLive.textContent = `${status}. ${matches} of ${total} artifacts match. ${heldGates} required effective gates are held.`;
   renderArtifactRows(report);
   renderGateRows(report);
 
   const logLines = [
     `receipt ${report.receipt_hash.matches ? "PASS" : "FAIL"} ${report.receipt_hash.computed || "unavailable"}`,
     `artifacts ${matches}/${total} matched`,
-    `required gates held ${heldGates}`,
-    `decision ${report.recorded_decision || "INVALID"}`,
+    `policy ${report.policy_valid ? "PASS" : "BLOCKED"}`,
+    `required effective gates held ${heldGates}`,
+    `requested decision ${report.recorded_decision || "INVALID"}`,
+    `effective decision ${decision}`,
   ];
   report.errors.forEach((error) => logLines.push(`error ${error}`));
   report.warnings.forEach((warning) => logLines.push(`warning ${warning}`));
@@ -181,8 +197,8 @@ function setCommandState(disabled) {
 async function runVerification(options = {}) {
   const previousVerifyState = elements.verify.disabled;
   elements.verify.disabled = true;
-  elements.eventLog.textContent = options.stage === "tamper"
-    ? "Verifying the guided in-memory mutation..."
+  elements.eventLog.textContent = options.stage === "authority_attack"
+    ? "Verifying a resealed self-authored authority escalation..."
     : "Verifying canonical receipt and repository artifacts...";
   let receipt = options.receipt || null;
   try {
@@ -227,6 +243,7 @@ async function runGuidedProof() {
         elements.editor.value = text;
         return runVerification({ receipt, stage });
       },
+      seal: async (receipt) => Core.sha256Text(Core.canonicalize(Core.receiptPayload(receipt))),
     });
     if (result.status === "restored" && elements.editor.value !== canonicalSampleText) {
       throw new Error("Guided proof did not restore the exact canonical sample text");

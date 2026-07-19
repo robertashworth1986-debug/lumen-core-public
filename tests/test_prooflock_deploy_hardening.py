@@ -103,7 +103,7 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
         Path(repo_path).name: body for repo_path, body in committed.items()
     }
     assert payload["source_commit"] == commit
-    assert payload["file_count"] == 4
+    assert payload["file_count"] == len(module.RELEASE_PATHS)
     assert [row["repo_path"] for row in payload["files"]] == list(
         module.RELEASE_PATHS
     )
@@ -155,10 +155,10 @@ def test_workflows_encode_the_bounded_fail_closed_contract():
     trigger = prooflock.split("permissions:", maxsplit=1)[0]
     assert "workflow_dispatch:" in trigger
     assert "push:" not in trigger
-    assert "DEPLOY_PROOFLOCK_EXACT_FOUR" in trigger
+    assert "DEPLOY_PROOFLOCK_EXACT_SNAPSHOT" in trigger
     assert '[[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]' in prooflock
     assert "environment:\n      name: production" in prooflock
-    assert prooflock.index('[[ "$APPROVAL" == "DEPLOY_PROOFLOCK_EXACT_FOUR" ]]') < prooflock.index(
+    assert prooflock.index('[[ "$APPROVAL" == "DEPLOY_PROOFLOCK_EXACT_SNAPSHOT" ]]') < prooflock.index(
         "Install SSH key"
     )
     assert "--delete" not in prooflock
@@ -207,7 +207,7 @@ def apply_command(
     archive: Path,
     manifest: Path,
     commit: str,
-    approval: str = "DEPLOY_PROOFLOCK_EXACT_FOUR",
+    approval: str = "DEPLOY_PROOFLOCK_EXACT_SNAPSHOT",
 ):
     return [
         bash,
@@ -264,8 +264,8 @@ def test_posix_apply_captures_identity_and_installs_non_executable_files(tmp_pat
 
     pre_receipt = (rollback / "pre-deploy.tsv").read_text(encoding="utf-8")
     post_receipt = (rollback / "post-deploy.tsv").read_text(encoding="utf-8")
-    assert pre_receipt.count("\tPRESENT\t") == 4
-    assert post_receipt.count("\t644\n") == 4
+    assert pre_receipt.count("\tPRESENT\t") == len(module.RELEASE_PATHS)
+    assert post_receipt.count("\t644\n") == len(module.RELEASE_PATHS)
 
 
 def test_posix_apply_rolls_back_a_partial_install(tmp_path):

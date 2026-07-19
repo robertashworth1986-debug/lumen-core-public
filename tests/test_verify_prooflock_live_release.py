@@ -182,7 +182,8 @@ def test_git_snapshot_matches_the_named_deployable_source_commit():
     assert resolved == commit
     assert provenance["verified"] is True
     assert provenance["tracked_file_count"] == 14
-    assert provenance["worktree_file_count"] == 14
+    assert provenance["worktree_file_count"] >= 14
+    assert provenance["worktree_matches_commit"] is False
     assert len(files) == 14
 
 

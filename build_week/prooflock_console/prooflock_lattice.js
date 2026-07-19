@@ -106,7 +106,7 @@
     });
     const gates = (report?.gates || receipt?.gates || []).map((gate, index) => ({
       id: String(gate.gate_id || `gate-${index + 1}`),
-      status: String(gate.status || "OPEN"),
+      status: String(gate.effective_status || gate.status || "OPEN"),
       required: Boolean(gate.required_for_promotion),
       index,
     }));
@@ -120,7 +120,7 @@
   function phaseStatus(model, phase = runtime.phase) {
     if (phase === "lineage") return "Lineage focused: declared V2 to V3 custody path.";
     if (phase === "gates") return `${model.gates.filter((gate) => gate.required && gate.status !== "PASS").length} required authority gates remain open.`;
-    if (phase === "tamper") return "Tamper detected: receipt integrity fractured.";
+    if (phase === "authority") return "Authority escalation blocked: a resealed receipt cannot mint approval.";
     if (phase === "restored") return "Canonical receipt restored and verified; promotion remains held.";
     if (model.state === "FAIL") return "Integrity failed. The evidence lattice is fractured.";
     if (model.state === "PROMOTE") return "Integrity verified and all required gates are clear.";
@@ -377,7 +377,7 @@
 
     if (runtime.frameNumber % runtime.frameStride === 0) {
       if (runtime.renderer && runtime.sceneGroup) {
-        const speed = runtime.phase === "tamper" ? 0.00022 : 0.00009;
+        const speed = runtime.phase === "authority" ? 0.00022 : 0.00009;
         runtime.sceneGroup.rotation.y = now * speed + runtime.pointer.x * 0.08;
         runtime.sceneGroup.rotation.x = -0.16 + runtime.pointer.y * 0.04;
         if (runtime.model.state === "FAIL") {
@@ -468,7 +468,7 @@
 
   function setState({ receipt, report }) {
     runtime.model = buildVisualModel({ receipt, report });
-    runtime.phase = report?.integrity_valid ? "verified" : "tamper";
+    runtime.phase = !report?.integrity_valid ? "tamper" : report?.policy_valid ? "verified" : "authority";
     if (runtime.renderer) rebuildThree(runtime.model);
     else drawCanvas(performance.now());
     setReadableStatus(phaseStatus(runtime.model));
@@ -486,6 +486,7 @@
     if (typeof options.loadSample !== "function" || typeof options.verify !== "function") {
       throw new Error("Guided proof requires loadSample and verify callbacks");
     }
+    if (typeof options.seal !== "function") throw new Error("Guided proof requires a canonical reseal callback");
     runtime.guidedRunning = true;
     const delayMs = Math.max(0, Number(options.delayMs ?? (runtime.profile?.reducedMotion ? 180 : 900)));
     const wait = (multiplier) => new Promise((resolve) => root.setTimeout(resolve, delayMs * multiplier));
@@ -501,10 +502,21 @@
       setPhase("gates");
       await wait(1.15);
 
-      const mutatedReceipt = JSON.parse(JSON.stringify(canonical.receipt));
-      mutatedReceipt.claim_boundary = `${mutatedReceipt.claim_boundary} [guided in-memory mutation]`;
-      setPhase("tamper");
-      await options.verify({ receipt: mutatedReceipt, text: JSON.stringify(mutatedReceipt, null, 2), stage: "tamper" });
+      const authorityAttack = JSON.parse(JSON.stringify(canonical.receipt));
+      authorityAttack.gates.forEach((gate) => {
+        if (gate.required_for_promotion) gate.status = "PASS";
+      });
+      authorityAttack.decision = "PROMOTE";
+      authorityAttack.receipt_sha256 = await options.seal(authorityAttack);
+      setPhase("authority");
+      const attackReport = await options.verify({
+        receipt: authorityAttack,
+        text: `${JSON.stringify(authorityAttack, null, 2)}\n`,
+        stage: "authority_attack",
+      });
+      if (!attackReport?.integrity_valid || attackReport?.policy_valid || attackReport?.promotion_allowed) {
+        throw new Error("Resealed authority escalation did not fail closed");
+      }
       await wait(1.35);
 
       setPhase("restored");

@@ -9,6 +9,15 @@
   const REPORT_SCHEMA = "lumencore.prooflock_verification_report.v1";
   const ALLOWED_GATE_STATUSES = new Set(["PASS", "FAIL", "OPEN", "NOT_APPLICABLE"]);
   const ALLOWED_DECISIONS = new Set(["HOLD", "PROMOTE", "REJECT"]);
+  const CANONICAL_REQUIRED_GATE_IDS = new Set([
+    "artifact_hashes",
+    "lineage_manifest",
+    "engineering_cad",
+    "prototype_test",
+    "qualified_safety_review",
+    "human_release",
+  ]);
+  const VERIFIER_DERIVED_GATE_IDS = new Set(["artifact_hashes", "lineage_manifest"]);
   const SHA256_PATTERN = /^[0-9a-f]{64}$/;
   const SAFE_ARTIFACT_PATTERN = /^assets\/[A-Za-z0-9._/-]+$/;
   const SCHEME_PATTERN = /^[A-Za-z][A-Za-z0-9+.-]*:/;
@@ -110,36 +119,81 @@
     };
   }
 
+  function deriveLineageStatus(receipt, manifestPayloads) {
+    const current = manifestPayloads.get("current_concept_manifest");
+    const predecessor = manifestPayloads.get("predecessor_concept_manifest");
+    const lineageIsObject = Boolean(receipt.lineage && typeof receipt.lineage === "object" && !Array.isArray(receipt.lineage));
+    const subjectIsObject = Boolean(receipt.subject && typeof receipt.subject === "object" && !Array.isArray(receipt.subject));
+    const lineage = lineageIsObject ? receipt.lineage : {};
+    const subject = subjectIsObject ? receipt.subject : {};
+    const failures = [];
+
+    if (!current) failures.push("current concept manifest is missing or invalid JSON");
+    if (!predecessor) failures.push("predecessor concept manifest is missing or invalid JSON");
+    if (!lineageIsObject) failures.push("receipt lineage must be an object");
+    if (!subjectIsObject) failures.push("receipt subject must be an object");
+
+    if (!failures.length) {
+      const currentId = String(current.asset_id || "");
+      const predecessorId = String(predecessor.asset_id || "");
+      if (!currentId || currentId !== String(lineage.current_asset_id || "")) {
+        failures.push("current manifest asset_id does not match receipt lineage");
+      }
+      if (!predecessorId || predecessorId !== String(lineage.predecessor_asset_id || "")) {
+        failures.push("predecessor manifest asset_id does not match receipt lineage");
+      }
+      if (String(current.supersedes_asset_id || "") !== predecessorId) {
+        failures.push("current manifest does not supersede the predecessor asset_id");
+      }
+      if (String(subject.asset_id || "") !== currentId) {
+        failures.push("receipt subject does not match the current manifest asset_id");
+      }
+      const provenance = current.generation_provenance;
+      if (!provenance || typeof provenance !== "object" || Array.isArray(provenance)
+        || String(provenance.input_asset_id || "") !== predecessorId) {
+        failures.push("current manifest provenance does not reference the predecessor asset_id");
+      }
+    }
+
+    if (failures.length) return { status: "FAIL", basis: failures.join("; ") };
+    return {
+      status: "PASS",
+      basis: "Verifier parsed both hash-matched manifests and confirmed the declared current, predecessor, supersession, subject, and generation-provenance identifiers.",
+    };
+  }
+
   async function verifyReceipt(receipt, options = {}) {
-    const errors = [];
+    const integrityErrors = [];
+    const policyErrors = [];
     const warnings = [];
     const receiptIsObject = Boolean(receipt && typeof receipt === "object" && !Array.isArray(receipt));
     const safeReceipt = receiptIsObject ? receipt : {};
-    if (!receiptIsObject) errors.push("receipt must be an object");
-    if (safeReceipt.schema !== RECEIPT_SCHEMA) errors.push("unsupported or missing receipt schema");
-    if (!String(safeReceipt.claim_boundary || "").trim()) errors.push("claim_boundary is required");
+    if (!receiptIsObject) integrityErrors.push("receipt must be an object");
+    if (safeReceipt.schema !== RECEIPT_SCHEMA) integrityErrors.push("unsupported or missing receipt schema");
+    if (!String(safeReceipt.claim_boundary || "").trim()) integrityErrors.push("claim_boundary is required");
 
     const expectedReceiptHash = String(safeReceipt.receipt_sha256 || "").toLowerCase();
     const computedReceiptHash = await sha256Text(canonicalize(receiptPayload(safeReceipt)));
     const receiptHashMatches = expectedReceiptHash === computedReceiptHash;
-    if (!receiptHashMatches) errors.push("receipt_sha256 does not match the canonical receipt payload");
+    if (!receiptHashMatches) integrityErrors.push("receipt_sha256 does not match the canonical receipt payload");
 
     const artifactRows = Array.isArray(safeReceipt.artifacts) ? safeReceipt.artifacts : [];
-    if (!Array.isArray(safeReceipt.artifacts)) errors.push("artifacts must be an array");
-    if (!artifactRows.length) errors.push("at least one artifact is required");
+    if (!Array.isArray(safeReceipt.artifacts)) integrityErrors.push("artifacts must be an array");
+    if (!artifactRows.length) integrityErrors.push("at least one artifact is required");
     const artifacts = [];
+    const manifestPayloads = new Map();
     const seenArtifactIds = new Set();
     for (const [index, row] of artifactRows.entries()) {
       const rowIsObject = Boolean(row && typeof row === "object" && !Array.isArray(row));
       const safeRow = rowIsObject ? row : {};
-      if (!rowIsObject) errors.push(`artifact row ${index} must be an object`);
+      if (!rowIsObject) integrityErrors.push(`artifact row ${index} must be an object`);
       const result = makeArtifactResult(safeRow);
       if (!result.artifact_id || seenArtifactIds.has(result.artifact_id)) {
-        errors.push(`missing or duplicate artifact_id: ${result.artifact_id || "<missing>"}`);
+        integrityErrors.push(`missing or duplicate artifact_id: ${result.artifact_id || "<missing>"}`);
       }
       seenArtifactIds.add(result.artifact_id);
       if (!SHA256_PATTERN.test(result.expected_sha256)) {
-        errors.push(`invalid expected_sha256: ${result.artifact_id || "<missing>"}`);
+        integrityErrors.push(`invalid expected_sha256: ${result.artifact_id || "<missing>"}`);
         result.error = "Invalid expected SHA-256";
         artifacts.push(result);
         continue;
@@ -153,50 +207,128 @@
         result.observed_sha256 = await sha256Bytes(bytes);
         result.hash_matches = result.observed_sha256 === result.expected_sha256;
         if (!result.hash_matches) result.error = "Hash mismatch";
+        if (result.hash_matches && ["current_concept_manifest", "predecessor_concept_manifest"].includes(result.role)) {
+          try {
+            const payload = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+            if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+              manifestPayloads.set(result.role, payload);
+            }
+          } catch (_error) {
+            // Invalid manifest JSON is reflected by the verifier-derived lineage gate.
+          }
+        }
       } catch (error) {
         result.error = error instanceof Error ? error.message : String(error);
       }
-      if (!result.hash_matches) errors.push(`${result.artifact_id || "artifact"}: ${result.error || "hash mismatch"}`);
+      if (!result.hash_matches) integrityErrors.push(`${result.artifact_id || "artifact"}: ${result.error || "hash mismatch"}`);
       artifacts.push(result);
     }
 
+    const artifactStatus = artifacts.length && artifacts.length === artifactRows.length
+      && artifacts.every((row) => row.hash_matches) ? "PASS" : "FAIL";
+    const lineageStatus = deriveLineageStatus(safeReceipt, manifestPayloads);
+    const derivedGates = new Map([
+      ["artifact_hashes", {
+        status: artifactStatus,
+        basis: `Verifier rehashed ${artifacts.filter((row) => row.hash_matches).length}/${artifacts.length} declared repository artifacts.`,
+      }],
+      ["lineage_manifest", lineageStatus],
+    ]);
+
     const gates = Array.isArray(safeReceipt.gates) ? safeReceipt.gates : [];
-    if (!Array.isArray(safeReceipt.gates)) errors.push("gates must be an array");
-    if (!gates.length) errors.push("at least one gate is required");
+    if (!Array.isArray(safeReceipt.gates)) integrityErrors.push("gates must be an array");
+    if (!gates.length) integrityErrors.push("at least one gate is required");
     const gateCounts = Object.fromEntries(Array.from(ALLOWED_GATE_STATUSES, (status) => [status, 0]));
+    const recordedGateCounts = Object.fromEntries(Array.from(ALLOWED_GATE_STATUSES, (status) => [status, 0]));
     const requiredOpenOrFailed = [];
     const seenGateIds = new Set();
+    const gateReports = [];
     for (const [index, gate] of gates.entries()) {
       const gateIsObject = Boolean(gate && typeof gate === "object" && !Array.isArray(gate));
       const safeGate = gateIsObject ? gate : {};
-      if (!gateIsObject) errors.push(`gate row ${index} must be an object`);
+      if (!gateIsObject) integrityErrors.push(`gate row ${index} must be an object`);
       const gateId = String(safeGate.gate_id || "");
-      const status = String(safeGate.status || "");
-      if (!gateId || seenGateIds.has(gateId)) errors.push(`missing or duplicate gate_id: ${gateId || "<missing>"}`);
+      const recordedStatus = String(safeGate.status || "");
+      const required = Boolean(safeGate.required_for_promotion);
+      if (!gateId || seenGateIds.has(gateId)) integrityErrors.push(`missing or duplicate gate_id: ${gateId || "<missing>"}`);
       seenGateIds.add(gateId);
-      if (!ALLOWED_GATE_STATUSES.has(status)) {
-        errors.push(`invalid gate status for ${gateId || "<missing>"}: ${status}`);
-      } else {
-        gateCounts[status] += 1;
-        if (safeGate.required_for_promotion && status !== "PASS") requiredOpenOrFailed.push(gateId);
+      if (CANONICAL_REQUIRED_GATE_IDS.has(gateId) && !required) {
+        integrityErrors.push(`canonical gate must remain required for promotion: ${gateId}`);
       }
+
+      let effectiveStatus;
+      let authoritySource;
+      let verificationBasis;
+      if (!ALLOWED_GATE_STATUSES.has(recordedStatus)) {
+        integrityErrors.push(`invalid gate status for ${gateId || "<missing>"}: ${recordedStatus}`);
+        effectiveStatus = "FAIL";
+        authoritySource = "INVALID_RECEIPT_DECLARATION";
+        verificationBasis = "The recorded status is outside the receipt contract.";
+      } else if (VERIFIER_DERIVED_GATE_IDS.has(gateId)) {
+        recordedGateCounts[recordedStatus] += 1;
+        const derived = derivedGates.get(gateId);
+        effectiveStatus = derived.status;
+        authoritySource = "VERIFIER_DERIVED";
+        verificationBasis = derived.basis;
+        if (recordedStatus !== effectiveStatus) {
+          warnings.push(`recorded ${recordedStatus} for ${gateId} was replaced by verifier-derived ${effectiveStatus}`);
+        }
+      } else if (recordedStatus === "PASS") {
+        recordedGateCounts[recordedStatus] += 1;
+        effectiveStatus = "OPEN";
+        authoritySource = "UNTRUSTED_RECEIPT_DECLARATION";
+        verificationBasis = "Recorded PASS was not accepted because this gate requires evidence from a trusted external or human authority verifier.";
+        if (required) {
+          policyErrors.push(`required gate ${gateId || "<missing>"} has no verifier-supported authority; recorded PASS was not accepted`);
+        }
+      } else {
+        recordedGateCounts[recordedStatus] += 1;
+        effectiveStatus = recordedStatus;
+        authoritySource = "RECORDED_HOLD_OR_FAILURE";
+        verificationBasis = "A self-authored receipt may preserve a hold or failure, but it cannot mint a PASS for this authority gate.";
+      }
+
+      gateCounts[effectiveStatus] += 1;
+      gateReports.push({
+        gate_id: gateId,
+        label: String(safeGate.label || ""),
+        status: effectiveStatus,
+        recorded_status: recordedStatus,
+        effective_status: effectiveStatus,
+        required_for_promotion: required,
+        basis: String(safeGate.basis || ""),
+        authority_source: authoritySource,
+        verification_basis: verificationBasis,
+      });
+      if (required && effectiveStatus !== "PASS") requiredOpenOrFailed.push(gateId);
+    }
+
+    const missingCanonicalGates = Array.from(CANONICAL_REQUIRED_GATE_IDS)
+      .filter((gateId) => !seenGateIds.has(gateId))
+      .sort();
+    if (missingCanonicalGates.length) {
+      integrityErrors.push(`missing canonical required gates: ${missingCanonicalGates.join(", ")}`);
     }
 
     const decision = String(safeReceipt.decision || "").toUpperCase();
-    if (!ALLOWED_DECISIONS.has(decision)) errors.push("decision must be HOLD, PROMOTE, or REJECT");
+    if (!ALLOWED_DECISIONS.has(decision)) integrityErrors.push("decision must be HOLD, PROMOTE, or REJECT");
     if (decision === "PROMOTE" && requiredOpenOrFailed.length) {
-      errors.push("PROMOTE is prohibited while required gates are not PASS");
+      policyErrors.push("PROMOTE is prohibited while required effective gates are not PASS");
     }
     if (!Array.isArray(safeReceipt.limitations) || !safeReceipt.limitations.length) warnings.push("no limitations were recorded");
 
+    const integrityValid = integrityErrors.length === 0;
+    const policyValid = policyErrors.length === 0;
+    const errors = [...integrityErrors, ...policyErrors];
     const verifiedUtc = typeof options.now === "function" ? options.now() : new Date().toISOString();
     return {
       schema: REPORT_SCHEMA,
       verified_utc: verifiedUtc,
       receipt_id: String(safeReceipt.receipt_id || ""),
-      integrity_valid: errors.length === 0,
+      integrity_valid: integrityValid,
+      policy_valid: policyValid,
       promotion_allowed:
-        errors.length === 0 && requiredOpenOrFailed.length === 0 && decision === "PROMOTE",
+        integrityValid && policyValid && requiredOpenOrFailed.length === 0 && decision === "PROMOTE",
       recorded_decision: decision,
       receipt_hash: {
         expected: expectedReceiptHash,
@@ -206,9 +338,12 @@
       artifacts,
       artifact_count: artifacts.length,
       artifact_hash_match_count: artifacts.filter((row) => row.hash_matches).length,
-      gates,
+      gates: gateReports,
       gate_counts: gateCounts,
+      recorded_gate_counts: recordedGateCounts,
       required_open_or_failed_gates: requiredOpenOrFailed,
+      integrity_errors: integrityErrors,
+      policy_errors: policyErrors,
       errors,
       warnings,
       claim_boundary: String(safeReceipt.claim_boundary || ""),
@@ -221,6 +356,7 @@
       verified_utc: new Date().toISOString(),
       receipt_id: "",
       integrity_valid: false,
+      policy_valid: false,
       promotion_allowed: false,
       recorded_decision: "INVALID",
       receipt_hash: { expected: "", computed: "", matches: false },
@@ -229,7 +365,10 @@
       artifact_hash_match_count: 0,
       gates: [],
       gate_counts: Object.fromEntries(Array.from(ALLOWED_GATE_STATUSES, (status) => [status, 0])),
+      recorded_gate_counts: Object.fromEntries(Array.from(ALLOWED_GATE_STATUSES, (status) => [status, 0])),
       required_open_or_failed_gates: [],
+      integrity_errors: [error instanceof Error ? error.message : String(error)],
+      policy_errors: [],
       errors: [error instanceof Error ? error.message : String(error)],
       warnings: [],
       claim_boundary: "",

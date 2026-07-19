@@ -1,4 +1,4 @@
-name: Deploy bounded ProofLock patch to VPS
+name: Deploy bounded ProofLock snapshot to VPS
 
 on:
   workflow_dispatch:
@@ -8,13 +8,13 @@ on:
         required: true
         type: string
       approval:
-        description: Explicit four-file production deployment gate
+        description: Explicit exact-snapshot production deployment gate
         required: true
         type: choice
         default: HOLD
         options:
           - HOLD
-          - DEPLOY_PROOFLOCK_EXACT_FOUR
+          - DEPLOY_PROOFLOCK_EXACT_SNAPSHOT
 
 permissions:
   contents: read
@@ -41,7 +41,7 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$EVENT_NAME" == "workflow_dispatch" ]]
-          [[ "$APPROVAL" == "DEPLOY_PROOFLOCK_EXACT_FOUR" ]]
+          [[ "$APPROVAL" == "DEPLOY_PROOFLOCK_EXACT_SNAPSHOT" ]]
           [[ "$RELEASE_COMMIT" =~ ^[0-9a-f]{40}$ ]]
           [[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]
           printf 'source_commit=%s\n' "$RELEASE_COMMIT" >> "$GITHUB_OUTPUT"
@@ -67,7 +67,7 @@ jobs:
           persist-credentials: false
           ref: ${{ needs.authorize.outputs.source_commit }}
 
-      - name: Package exactly four immutable Git blobs
+      - name: Package the exact immutable ProofLock snapshot
         shell: bash
         run: |
           set -euo pipefail
@@ -112,7 +112,7 @@ jobs:
             /tmp/prooflock-release/prooflock-release-manifest.json \
             "opc@$VPS_HOST:$REMOTE_STAGE/"
 
-      - name: Apply exactly four files with rollback capture
+      - name: Apply the exact snapshot with rollback capture
         shell: bash
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}

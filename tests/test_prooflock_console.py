@@ -34,12 +34,17 @@ def test_bundled_receipt_hashes_every_artifact_and_holds_promotion():
 
     assert report["schema"] == "lumencore.prooflock_verification_report.v1"
     assert report["integrity_valid"] is True
+    assert report["policy_valid"] is True
     assert report["receipt_hash"]["matches"] is True
     assert report["artifact_count"] == 4
     assert report["artifact_hash_match_count"] == 4
     assert all(row["hash_matches"] for row in report["artifacts"])
     assert report["recorded_decision"] == "HOLD"
     assert report["promotion_allowed"] is False
+    assert [gate["authority_source"] for gate in report["gates"][:2]] == [
+        "VERIFIER_DERIVED",
+        "VERIFIER_DERIVED",
+    ]
     assert set(report["required_open_or_failed_gates"]) == {
         "engineering_cad",
         "prototype_test",
@@ -68,18 +73,17 @@ def test_promotion_cannot_clear_required_open_gates():
 
     report = module.verify_receipt(receipt)
 
-    assert report["integrity_valid"] is False
+    assert report["integrity_valid"] is True
+    assert report["policy_valid"] is False
     assert report["promotion_allowed"] is False
-    assert "PROMOTE is prohibited" in " ".join(report["errors"])
+    assert "PROMOTE is prohibited" in " ".join(report["policy_errors"])
 
 
 @pytest.mark.parametrize(
-    ("decision", "expected_promotion_allowed"),
-    [("HOLD", False), ("REJECT", False), ("PROMOTE", True)],
+    "decision",
+    ["HOLD", "REJECT", "PROMOTE"],
 )
-def test_all_required_gates_pass_still_requires_explicit_promote_decision(
-    decision, expected_promotion_allowed
-):
+def test_resealed_self_authored_passes_cannot_mint_authority(decision):
     module = load_module()
     receipt = sample_receipt()
     for gate in receipt["gates"]:
@@ -91,9 +95,39 @@ def test_all_required_gates_pass_still_requires_explicit_promote_decision(
     report = module.verify_receipt(receipt)
 
     assert report["integrity_valid"] is True
-    assert report["required_open_or_failed_gates"] == []
+    assert report["policy_valid"] is False
+    assert set(report["required_open_or_failed_gates"]) == {
+        "engineering_cad",
+        "prototype_test",
+        "qualified_safety_review",
+        "human_release",
+    }
     assert report["recorded_decision"] == decision
-    assert report["promotion_allowed"] is expected_promotion_allowed
+    assert report["promotion_allowed"] is False
+    assert all(
+        gate["effective_status"] == "OPEN"
+        for gate in report["gates"]
+        if gate["gate_id"] in report["required_open_or_failed_gates"]
+    )
+
+
+@pytest.mark.parametrize("attack", ["remove", "downgrade"])
+def test_canonical_required_gate_contract_cannot_be_removed_or_downgraded(attack):
+    module = load_module()
+    receipt = sample_receipt()
+    if attack == "remove":
+        receipt["gates"] = [gate for gate in receipt["gates"] if gate["gate_id"] != "human_release"]
+    else:
+        next(gate for gate in receipt["gates"] if gate["gate_id"] == "human_release")[
+            "required_for_promotion"
+        ] = False
+    receipt["receipt_sha256"] = module.stable_hash(module.receipt_payload(receipt))
+
+    report = module.verify_receipt(receipt)
+
+    assert report["integrity_valid"] is False
+    assert report["promotion_allowed"] is False
+    assert "canonical" in " ".join(report["integrity_errors"])
 
 
 @pytest.mark.parametrize(
@@ -140,6 +174,7 @@ def test_console_is_self_contained_and_documents_build_week_gates():
     core = (APP_DIR / "prooflock_core.js").read_text(encoding="utf-8")
     lattice = (APP_DIR / "prooflock_lattice.js").read_text(encoding="utf-8")
     readme = (APP_DIR / "README.md").read_text(encoding="utf-8")
+    threat_model = (APP_DIR / "THREAT_MODEL.md").read_text(encoding="utf-8")
     narration = (
         ROOT / "docs" / "OPENAI_BUILD_WEEK_PROOFLOCK_DEMO_NARRATION_2026-07-18.md"
     ).read_text(encoding="utf-8")
@@ -156,13 +191,20 @@ def test_console_is_self_contained_and_documents_build_week_gates():
     assert "ProofLock Console" in html
     assert "Artifact matrix" in html
     assert "Run guided proof" in html
+    assert "Effective decision" in html
     assert "crypto.subtle.digest" in core
     assert "PROMOTE is prohibited" in core
+    assert 'return report.promotion_allowed ? "PROMOTE" : "HOLD"' in script
+    assert "requested decision" in script
+    assert "effective decision" in script
     assert "runGuidedProof" in lattice
     assert "Developer Tools" in readme
     assert "/feedback" in readme
     assert "does not infer or invent the model identity" in readme
     assert "external service is required" in readme
+    assert "refusing self-authored authority escalation" in readme
+    assert "recomputes a valid receipt hash" in readme
+    assert "SHA-256 detects byte changes but does not authenticate" in threat_model
     assert "twenty-seven passing tests" not in narration
     assert "current-head CI receipt" in narration
     assert "Do not record the final video from the historical" in narration

@@ -3,17 +3,29 @@ set -Eeuo pipefail
 
 umask 077
 
-readonly REQUIRED_APPROVAL="DEPLOY_PROOFLOCK_EXACT_FOUR"
+readonly REQUIRED_APPROVAL="DEPLOY_PROOFLOCK_EXACT_SNAPSHOT"
 readonly PRODUCTION_TARGET="/opt/lumencore/dashboard/build_week/prooflock_console"
 readonly PRODUCTION_ROLLBACK_BASE="/opt/lumencore/rollbacks/prooflock"
-readonly MANIFEST_SCHEMA="lumencore.prooflock_patch_manifest.v1"
+readonly MANIFEST_SCHEMA="lumencore.prooflock_release_manifest.v2"
 readonly EXPECTED_TARGET_DIRECTORY="/opt/lumencore/dashboard/build_week/prooflock_console"
 readonly -a RELEASE_FILES=(
+  "THREE_LICENSE.txt"
+  "README.md"
+  "THREAT_MODEL.md"
+  "app.js"
+  "bootstrap.js"
+  "index.html"
   "prooflock_core.js"
   "prooflock_favicon.svg"
-  "THREE_LICENSE.txt"
+  "prooflock_lattice.css"
+  "prooflock_lattice.js"
+  "sample_receipt.json"
+  "styles.css"
+  "three.core.min.js"
+  "three.module.min.js"
   "verify_receipt.py"
 )
+readonly EXPECTED_FILE_COUNT="${#RELEASE_FILES[@]}"
 
 archive=""
 manifest=""
@@ -29,7 +41,7 @@ usage() {
   cat >&2 <<'EOF'
 Usage: APPLY_PROOFLOCK_RELEASE_ON_VPS.sh \
   --archive PATH --manifest PATH --source-commit FULL_SHA \
-  --approval DEPLOY_PROOFLOCK_EXACT_FOUR
+  --approval DEPLOY_PROOFLOCK_EXACT_SNAPSHOT
 EOF
   return 2
 }
@@ -133,7 +145,7 @@ rollback_on_error() {
   trap - ERR
   set +e
   if [[ "$deployment_started" -eq 1 && -n "$rollback_dir" ]]; then
-    printf 'Deployment failed; restoring the four-file rollback from %s\n' "$rollback_dir" >&2
+    printf 'Deployment failed; restoring the bounded snapshot rollback from %s\n' "$rollback_dir" >&2
     local name target_path backup_path temporary_target
     local backup_uid backup_gid backup_mode target_uid target_gid target_mode
     local rollback_failed=0
@@ -215,7 +227,7 @@ if manifest.get("source_commit") != source_commit:
 if manifest.get("target_directory") != target_directory:
     fail("manifest target directory is not the bounded ProofLock directory")
 if manifest.get("file_count") != len(expected_names):
-    fail("manifest file count is not exactly four")
+    fail("manifest file count does not match the exact allowlist")
 
 archive_sha256 = hashlib.sha256(archive_path.read_bytes()).hexdigest()
 if manifest.get("archive_sha256") != archive_sha256:
@@ -223,7 +235,7 @@ if manifest.get("archive_sha256") != archive_sha256:
 
 rows = manifest.get("files")
 if not isinstance(rows, list) or len(rows) != len(expected_names):
-    fail("manifest must contain exactly four file rows")
+    fail("manifest must contain exactly the allowlisted file rows")
 by_name = {}
 for row in rows:
     if not isinstance(row, dict):
@@ -239,7 +251,7 @@ if list(by_name) != expected_names:
 with tarfile.open(archive_path, mode="r:") as archive:
     members = archive.getmembers()
     if [member.name for member in members] != expected_names:
-        fail("archive entries do not match the four-file allowlist")
+        fail("archive entries do not match the exact-file allowlist")
     for member in members:
         if not member.isfile() or member.mode & 0o777 != 0o644:
             fail(f"archive entry is not a regular 0644 file: {member.name}")
@@ -281,7 +293,8 @@ while IFS=$'\t' read -r name expected_hash; do
   [[ -n "$name" && -n "$expected_hash" ]] || die "invalid expected hash row"
   expected_hashes["$name"]="$expected_hash"
 done < "$root_stage/expected.tsv"
-[[ "${#expected_hashes[@]}" -eq 4 ]] || die "expected hash set is not exactly four files"
+[[ "${#expected_hashes[@]}" -eq "$EXPECTED_FILE_COUNT" ]] || \
+  die "expected hash set does not match the exact-file allowlist"
 
 build_week_root="$(dirname "$target_root")"
 dashboard_root="$(dirname "$build_week_root")"

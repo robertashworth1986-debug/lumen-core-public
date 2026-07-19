@@ -16,7 +16,8 @@ SAMPLE = APP_DIR / "sample_receipt.json"
 CORE = APP_DIR / "prooflock_core.js"
 LATTICE = APP_DIR / "prooflock_lattice.js"
 PYTHON_VERIFIER = APP_DIR / "verify_receipt.py"
-RELEASE_VERSION = "20260718.1"
+APP_RELEASE_VERSION = "20260719.1"
+THREE_RELEASE_VERSION = "20260718.1"
 
 
 def run_node(source: str) -> str:
@@ -89,6 +90,7 @@ def test_guided_proof_restores_exact_sample_text():
     output = run_node(
         f"""
         const fs = require("node:fs");
+        const core = require({json.dumps(js_path(CORE))});
         const lattice = require({json.dumps(js_path(LATTICE))});
         const text = fs.readFileSync({json.dumps(js_path(SAMPLE))}, "utf8");
         const receipt = JSON.parse(text);
@@ -98,7 +100,14 @@ def test_guided_proof_restores_exact_sample_text():
           const result = await lattice.runGuidedProof({{
             delayMs: 0,
             loadSample: async () => ({{text, receipt}}),
-            verify: async (bundle) => {{ current = bundle.text; stages.push(bundle.stage); return {{}}; }}
+            verify: async (bundle) => {{
+              current = bundle.text;
+              stages.push(bundle.stage);
+              return bundle.stage === "authority_attack"
+                ? {{integrity_valid:true, policy_valid:false, promotion_allowed:false}}
+                : {{integrity_valid:true, policy_valid:true, promotion_allowed:false}};
+            }},
+            seal: async (candidate) => core.sha256Text(core.canonicalize(core.receiptPayload(candidate)))
           }});
           console.log(JSON.stringify({{status: result.status, exact: current === text, stages}}));
         }})().catch((error) => {{ console.error(error); process.exitCode = 1; }});
@@ -107,7 +116,7 @@ def test_guided_proof_restores_exact_sample_text():
     result = json.loads(output)
     assert result["status"] == "restored"
     assert result["exact"] is True
-    assert result["stages"] == ["custody", "tamper", "restored"]
+    assert result["stages"] == ["custody", "authority_attack", "restored"]
 
 
 def test_reduced_motion_disables_continuous_animation():
@@ -154,6 +163,7 @@ def test_python_and_browser_reports_match_on_canonical_fixture():
           const report = await core.verifyReceipt(receipt, {{loadArtifact: async (relative) => fs.readFileSync(path.join(root, relative))}});
           console.log(JSON.stringify({{
             integrity_valid: report.integrity_valid,
+            policy_valid: report.policy_valid,
             promotion_allowed: report.promotion_allowed,
             artifact_count: report.artifact_count,
             artifact_hash_match_count: report.artifact_hash_match_count,
@@ -166,6 +176,7 @@ def test_python_and_browser_reports_match_on_canonical_fixture():
     browser_report = json.loads(output)
     for key in (
         "integrity_valid",
+        "policy_valid",
         "promotion_allowed",
         "artifact_count",
         "artifact_hash_match_count",
@@ -192,6 +203,7 @@ def test_python_and_browser_fail_closed_parity_for_non_object_receipts_and_rows(
 
     comparable_keys = (
         "integrity_valid",
+        "policy_valid",
         "promotion_allowed",
         "artifact_count",
         "artifact_hash_match_count",
@@ -252,6 +264,7 @@ def test_python_and_browser_promotion_decision_parity_with_all_required_gates_pa
         python_reports.append(
             {
                 "integrity_valid": report["integrity_valid"],
+                "policy_valid": report["policy_valid"],
                 "promotion_allowed": report["promotion_allowed"],
                 "recorded_decision": report["recorded_decision"],
                 "required_open_or_failed_gates": report[
@@ -275,6 +288,7 @@ def test_python_and_browser_promotion_decision_parity_with_all_required_gates_pa
             }});
             reports.push({{
               integrity_valid: report.integrity_valid,
+              policy_valid: report.policy_valid,
               promotion_allowed: report.promotion_allowed,
               recorded_decision: report.recorded_decision,
               required_open_or_failed_gates: report.required_open_or_failed_gates
@@ -287,11 +301,18 @@ def test_python_and_browser_promotion_decision_parity_with_all_required_gates_pa
     browser_reports = json.loads(output)
 
     assert browser_reports == python_reports
-    assert [row["promotion_allowed"] for row in browser_reports] == [
-        False,
-        False,
-        True,
-    ]
+    assert [row["promotion_allowed"] for row in browser_reports] == [False, False, False]
+    assert [row["policy_valid"] for row in browser_reports] == [False, False, False]
+    assert all(
+        set(row["required_open_or_failed_gates"])
+        == {
+            "engineering_cad",
+            "prototype_test",
+            "qualified_safety_review",
+            "human_release",
+        }
+        for row in browser_reports
+    )
 
 
 def test_browser_path_allowlist_rejects_escape_forms():
@@ -359,7 +380,12 @@ def test_deployable_module_graph_is_self_contained():
             assert specifier.startswith("./"), (source, specifier)
             parsed = urlsplit(specifier)
             assert not parsed.scheme and not parsed.netloc and not parsed.fragment, (source, specifier)
-            assert parsed.query == f"v={RELEASE_VERSION}", (source, specifier)
+            expected_version = (
+                THREE_RELEASE_VERSION
+                if parsed.path in {"./three.module.min.js", "./three.core.min.js"}
+                else APP_RELEASE_VERSION
+            )
+            assert parsed.query == f"v={expected_version}", (source, specifier)
             dependency = (source.parent / parsed.path).resolve()
             assert dependency.is_relative_to(APP_DIR.resolve()), (source, specifier)
             assert dependency.is_file(), (source, specifier)
@@ -372,7 +398,7 @@ def test_deployable_module_graph_is_self_contained():
     canonical_three_module = (ROOT / "dashboard" / "assets" / "vendor" / "three.module.min.js").read_bytes()
     expected_three_module = canonical_three_module.replace(
         b'./three.core.min.js',
-        f'./three.core.min.js?v={RELEASE_VERSION}'.encode("ascii"),
+        f'./three.core.min.js?v={THREE_RELEASE_VERSION}'.encode("ascii"),
     )
     assert expected_three_module != canonical_three_module
     assert (APP_DIR / "three.module.min.js").read_bytes() == expected_three_module
@@ -387,7 +413,7 @@ def test_accessibility_and_mobile_contract_is_present():
     lattice_styles = (APP_DIR / "prooflock_lattice.css").read_text(encoding="utf-8")
     assert 'aria-live="polite"' in html
     assert 'aria-hidden="true"' in html
-    assert f'src="bootstrap.js?v={RELEASE_VERSION}" type="module"' in html
+    assert f'src="bootstrap.js?v={APP_RELEASE_VERSION}" type="module"' in html
     assert ":focus-visible" in styles
     assert "overflow-x: clip" in styles
     assert "@media (max-width: 420px)" in lattice_styles
