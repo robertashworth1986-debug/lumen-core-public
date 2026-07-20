@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import importlib.util
-import os
 import sys
 import tempfile
 import unittest
@@ -82,7 +81,6 @@ class RepairEvidenceRouteTests(unittest.TestCase):
         self.assertIn("location / {", result.repaired)
         self.assertIn("listen 443 ssl;", result.repaired)
 
-    @unittest.skipIf(os.name == "nt", "nginx document roots use POSIX paths")
     def test_cli_requires_explicit_apply_and_creates_backup(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
