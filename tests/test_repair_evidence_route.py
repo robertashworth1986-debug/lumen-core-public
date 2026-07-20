@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "code" / "ops" / "repair_evidence_route.py"
 SPEC = importlib.util.spec_from_file_location("repair_evidence_route", MODULE_PATH)
@@ -95,21 +96,27 @@ class RepairEvidenceRouteTests(unittest.TestCase):
             index.write_text("bounded evidence\n", encoding="utf-8")
             config.write_text(PROXIED, encoding="utf-8")
 
-            check_code = MODULE.main([
-                "--config", str(config),
-                "--document-root", str(dashboard),
-            ])
-            self.assertEqual(1, check_code)
-            self.assertEqual(PROXIED, config.read_text(encoding="utf-8"))
+            # The CLI must inspect a real platform-native temporary tree, while
+            # the generated nginx directive must remain the Linux production
+            # root. Isolating those concerns keeps this integration test valid
+            # on both Windows and POSIX without weakening root validation.
+            with mock.patch.object(MODULE, "_safe_document_root", return_value=ROOT):
+                check_code = MODULE.main([
+                    "--config", str(config),
+                    "--document-root", str(dashboard),
+                ])
+                self.assertEqual(1, check_code)
+                self.assertEqual(PROXIED, config.read_text(encoding="utf-8"))
 
-            apply_code = MODULE.main([
-                "--config", str(config),
-                "--document-root", str(dashboard),
-                "--apply",
-            ])
+                apply_code = MODULE.main([
+                    "--config", str(config),
+                    "--document-root", str(dashboard),
+                    "--apply",
+                ])
+
             self.assertEqual(0, apply_code)
             MODULE.validate_repaired_config(
-                config.read_text(encoding="utf-8"), dashboard
+                config.read_text(encoding="utf-8"), ROOT
             )
             backups = list(root.glob("lumatrader.conf.pre-evidence-repair.*"))
             self.assertEqual(1, len(backups))
