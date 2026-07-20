@@ -166,3 +166,34 @@ def test_private_output_boundary_and_public_redaction(tmp_path):
         "api_key",
     ):
         assert forbidden not in rendered
+
+
+def test_private_response_mirror_preserves_hashes_without_public_output(tmp_path):
+    module = load_module()
+    source_root = tmp_path / "private"
+    mirror_root = tmp_path / "vault" / "nashville"
+    mirror_root.parent.mkdir(parents=True)
+    private_json = source_root / "response.private.json"
+    private_markdown = source_root / "response.private.md"
+    private_json.parent.mkdir(parents=True)
+    private_json.write_text('{"private": true}\n', encoding="utf-8")
+    private_markdown.write_text("private response\n", encoding="utf-8")
+
+    payload, local_receipt, mirror_receipt = module.mirror_private_response(
+        private_json,
+        private_markdown,
+        mirror_root,
+        generated_utc="2026-07-20T23:40:00Z",
+    )
+
+    assert payload["schema"] == "lumencore.private_bounded_mirror_receipt.v1"
+    assert payload["artifact_count"] == 2
+    assert payload["all_sha256_matched_after_copy"] is True
+    assert payload["private_values_present"] is True
+    assert payload["public_repo_publish_allowed"] is False
+    assert local_receipt.parent == source_root
+    assert mirror_receipt.parent == mirror_root
+    assert local_receipt.read_bytes() == mirror_receipt.read_bytes()
+    assert all(row["copy_sha256_matched"] for row in payload["artifacts"])
+    assert all("source_name" in row for row in payload["artifacts"])
+    assert all("source_path" not in row for row in payload["artifacts"])

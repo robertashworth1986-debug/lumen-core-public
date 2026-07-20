@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.bounded_mirror_receipt.v1",
-  "generated_utc": "2026-07-20T23:54:20.747088Z",
+  "generated_utc": "2026-07-20T23:58:57.678091Z",
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720",
   "artifact_count": 19,
   "all_sha256_matched_after_copy": true,
@@ -11,8 +11,8 @@
     {
       "source": "code/ops/BUILD_NASHVILLE_EC_FINANCIAL_AID_ACTION.py",
       "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/code/ops/BUILD_NASHVILLE_EC_FINANCIAL_AID_ACTION.py",
-      "bytes": 17762,
-      "sha256": "072E38A7EDEF564835BBF1E6C310874049D7738AB082B100C4597C7655A2DED0",
+      "bytes": 21598,
+      "sha256": "603521E5FF6CF0B3245EBA41E8DF3F501B9D00A1B6085898273C40FC97A2B932",
       "copy_sha256_matched": true
     },
     {
@@ -53,8 +53,8 @@
     {
       "source": "tests/test_nashville_ec_financial_aid_action.py",
       "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/tests/test_nashville_ec_financial_aid_action.py",
-      "bytes": 6215,
-      "sha256": "55F47ABD28D455C2B212DE3656E74B761BACBB2B86CB7D696B2105AFD9A0271D",
+      "bytes": 7634,
+      "sha256": "31931EA3E06131103485B7183DFDD2BA3C942C86F949215016AED0C212DAD2AE",
       "copy_sha256_matched": true
     },
     {

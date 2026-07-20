@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -375,6 +376,78 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def mirror_private_response(
+    private_json: Path,
+    private_markdown: Path,
+    destination_root: Path,
+    *,
+    generated_utc: str | None = None,
+) -> tuple[dict[str, Any], Path, Path]:
+    destination_root = destination_root.resolve()
+    if destination_root == ROOT.resolve() or destination_root.is_relative_to(
+        ROOT.resolve()
+    ):
+        raise ValueError("Private mirror destination must remain outside the public repository")
+    if not destination_root.parent.exists():
+        raise ValueError(
+            f"Private mirror parent is unavailable: {destination_root.parent}"
+        )
+
+    destination_root.mkdir(parents=True, exist_ok=True)
+    artifacts: list[dict[str, Any]] = []
+    for source in (private_json.resolve(), private_markdown.resolve()):
+        if not source.is_file():
+            raise ValueError(f"Private response artifact is missing: {source.name}")
+        destination = (destination_root / source.name).resolve()
+        if not destination.is_relative_to(destination_root):
+            raise ValueError(f"Unsafe private mirror destination: {destination}")
+        shutil.copy2(source, destination)
+        source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+        destination_hash = hashlib.sha256(destination.read_bytes()).hexdigest()
+        if (
+            source_hash != destination_hash
+            or source.stat().st_size != destination.stat().st_size
+        ):
+            raise ValueError(f"Private mirror verification failed: {source.name}")
+        artifacts.append(
+            {
+                "source_name": source.name,
+                "destination_name": destination.name,
+                "bytes": source.stat().st_size,
+                "sha256": source_hash,
+                "copy_sha256_matched": True,
+            }
+        )
+
+    payload: dict[str, Any] = {
+        "schema": "lumencore.private_bounded_mirror_receipt.v1",
+        "generated_utc": generated_utc or now_utc(),
+        "destination_root": destination_root.as_posix(),
+        "artifact_count": len(artifacts),
+        "all_sha256_matched_after_copy": True,
+        "private_values_present": True,
+        "public_repo_publish_allowed": False,
+        "artifacts": artifacts,
+        "claim_boundary": (
+            "This private receipt proves only copy integrity for the two private response "
+            "artifacts. It does not prove form submission, financial-aid approval, "
+            "accelerator selection, funding, or independent verification of the answers."
+        ),
+    }
+    local_receipt = (
+        private_json.parent
+        / "nashville_ec_financial_aid_private_e_drive_sync_receipt.json"
+    )
+    mirror_receipt = destination_root / local_receipt.name
+    write_json(local_receipt, payload)
+    shutil.copy2(local_receipt, mirror_receipt)
+    if hashlib.sha256(local_receipt.read_bytes()).hexdigest() != hashlib.sha256(
+        mirror_receipt.read_bytes()
+    ).hexdigest():
+        raise ValueError("Private mirror receipt self-copy hash mismatch")
+    return payload, local_receipt, mirror_receipt
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Build the public-safe Nashville EC financial-aid action receipt."
@@ -382,6 +455,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--public-json", type=Path, default=PUBLIC_JSON)
     parser.add_argument("--private-facts", type=Path)
     parser.add_argument("--private-output", type=Path)
+    parser.add_argument("--private-mirror-root", type=Path)
     parser.add_argument("--fee-coverage", choices=FEE_COVERAGE_OPTIONS)
     return parser.parse_args()
 
@@ -402,7 +476,12 @@ def main() -> int:
         "action_receipt_sha256": public_payload["action_receipt_sha256"],
         "private_response_written": False,
     }
-    if args.private_facts or args.private_output or args.fee_coverage:
+    if (
+        args.private_facts
+        or args.private_output
+        or args.private_mirror_root
+        or args.fee_coverage
+    ):
         if not args.private_facts or not args.private_output:
             raise SystemExit(
                 "--private-facts and --private-output are both required for a private response"
@@ -431,6 +510,20 @@ def main() -> int:
                 ],
             }
         )
+        if args.private_mirror_root:
+            mirror_payload, local_receipt, mirror_receipt = mirror_private_response(
+                private_output,
+                private_md,
+                args.private_mirror_root,
+            )
+            result.update(
+                {
+                    "private_mirror_status": "PRIVATE_E_DRIVE_MIRROR_VERIFIED",
+                    "private_mirror_artifact_count": mirror_payload["artifact_count"],
+                    "private_mirror_receipt": str(local_receipt),
+                    "private_mirror_receipt_copy": str(mirror_receipt),
+                }
+            )
 
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0
