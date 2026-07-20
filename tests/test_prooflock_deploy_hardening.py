@@ -147,10 +147,7 @@ def test_workflows_encode_the_bounded_fail_closed_contract():
         "- name: Sync data snapshots", maxsplit=1
     )[0]
     assert "--delete" in dashboard_sync
-    assert "--filter='protect /build_week/***'" in dashboard_sync
-    assert "--exclude='/build_week/'" in dashboard_sync
-    assert "https://lumen-core.ai/build_week/prooflock_console/" in dashboard
-    assert "<title>ProofLock Console</title>" in dashboard
+    assert "build_week/prooflock_console" not in dashboard
 
     trigger = prooflock.split("permissions:", maxsplit=1)[0]
     assert "workflow_dispatch:" in trigger
@@ -158,6 +155,8 @@ def test_workflows_encode_the_bounded_fail_closed_contract():
     assert "DEPLOY_PROOFLOCK_EXACT_SNAPSHOT" in trigger
     assert '[[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]' in prooflock
     assert "environment:\n      name: production" in prooflock
+    assert "known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}" in prooflock
+    assert "StrictHostKeyChecking=no" not in prooflock
     assert prooflock.index('[[ "$APPROVAL" == "DEPLOY_PROOFLOCK_EXACT_SNAPSHOT" ]]') < prooflock.index(
         "Install SSH key"
     )
