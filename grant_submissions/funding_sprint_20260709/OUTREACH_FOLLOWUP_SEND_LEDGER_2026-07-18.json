@@ -6,7 +6,15 @@
     "private_identifiers_prohibited": true
   },
   "initialized_utc": "2026-07-19T01:50:00Z",
-  "ledger_sha256": "8CEFC82915AD884F4F2C01E4810861DB274E7E083837FDBC3ECA900EF37E7469",
-  "receipts": [],
+  "ledger_sha256": "1C56B710870F1DC45B902A6551F5A9B5BD2603103D7CB4F970D3E5509CF9A43D",
+  "receipts": [
+    {
+      "delivery_state": "SENT",
+      "lane_id": "missionweave_dsip_proposal",
+      "sent_message_receipt_sha256": "6DC9E2D4DAD3D146AEB6A397FBED865B5B9C8A83AB66929F3F2D47A6153F8A16",
+      "sent_utc": "2026-07-20T15:36:02Z",
+      "template_id": "COMPONENT_INSTRUCTION_ESCALATION"
+    }
+  ],
   "schema": "lumencore.outreach_followup_send_ledger.v1"
 }

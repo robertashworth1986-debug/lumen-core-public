@@ -85,7 +85,7 @@ def test_current_queue_is_deterministic_and_never_sends():
     assert sum(actual["summary"]["action_state_counts"].values()) == 16
     assert actual["summary"]["draft_rendered_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
-    assert actual["summary"]["recorded_proactive_send_count"] == 0
+    assert actual["summary"]["recorded_proactive_send_count"] == 1
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert actual["controls"]["mailbox_recheck_max_age_seconds"] == 900
     assert actual["controls"]["mailbox_recheck_receipt_required"] is True
@@ -94,7 +94,13 @@ def test_current_queue_is_deterministic_and_never_sends():
     ] is True
     assert all(row["send_now"] is False for row in actual["actions"])
     assert all(row["draft_rendered"] is False for row in actual["actions"])
-    assert all(row["recorded_proactive_send_count"] == 0 for row in actual["actions"])
+    assert sum(
+        row["recorded_proactive_send_count"] for row in actual["actions"]
+    ) == 1
+    by_lane = {row["lane_id"]: row for row in actual["actions"]}
+    assert by_lane["missionweave_dsip_proposal"][
+        "recorded_proactive_send_count"
+    ] == 1
     assert all(
         row["inbox_recheck_required"] is True
         for row in actual["actions"]
@@ -133,7 +139,7 @@ def test_lanl_hold_expiration_requires_recheck_and_still_does_not_authorize_send
     assert due_lanl["draft_rendered"] is False
     assert due_lanl["send_now"] is False
     assert at_gate["status"] == "FOLLOWUP_RECHECK_DUE_HUMAN_REVIEW"
-    assert at_gate["summary"]["due_for_mailbox_recheck_count"] == 2
+    assert at_gate["summary"]["due_for_mailbox_recheck_count"] == 1
     assert at_gate["summary"]["send_now_count"] == 0
 
 
@@ -331,7 +337,7 @@ def test_send_ledger_tamper_duplicate_and_private_material_fail_closed():
         )
 
 
-def test_missionweave_component_followup_waits_for_monday_and_full_thread_recheck():
+def test_recorded_missionweave_followup_exhausts_lane_before_and_after_gate():
     module = load_module()
     before = module.build_payload("2026-07-20T16:59:59Z")
     due = module.build_payload("2026-07-20T17:00:00Z")
@@ -342,12 +348,11 @@ def test_missionweave_component_followup_waits_for_monday_and_full_thread_rechec
         "missionweave_dsip_proposal"
     ]
 
-    assert before_row["action_state"] == "HELD_NO_SEND"
-    assert before_row["hold_seconds_remaining"] == 1
-    assert due_row["action_state"] == "RECHECK_MAILBOX_BEFORE_DRAFT"
-    assert due_row["eligible_template_id"] == "COMPONENT_INSTRUCTION_ESCALATION"
-    assert due_row["inbox_recheck_required"] is True
-    assert due_row["send_now"] is False
+    for row in (before_row, due_row):
+        assert row["action_state"] == "FOLLOWUP_LIMIT_REACHED_NO_SEND"
+        assert row["recorded_proactive_send_count"] == 1
+        assert row["draft_rendered"] is False
+        assert row["send_now"] is False
 
 
 def test_modes_route_closed_inbound_portal_private_and_account_work_separately():

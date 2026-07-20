@@ -157,14 +157,17 @@ def validate_followup_send_ledger(
         if receipt.get("delivery_state") != "SENT":
             raise ValueError(f"Follow-up send receipt state is not SENT: {lane_id}")
         sent_at = parse_aware_utc(str(receipt.get("sent_utc") or ""))
-        if sent_at > as_of:
-            raise ValueError(f"Follow-up send receipt is future-dated: {lane_id}")
         sent_receipt_sha = normalize_sha256(
             receipt.get("sent_message_receipt_sha256"), "Sent message receipt"
         )
         if sent_receipt_sha in seen_sent_receipts:
             raise ValueError("Follow-up send ledger contains a duplicate receipt")
         seen_sent_receipts.add(sent_receipt_sha)
+        # The ledger is append-only, so a historical queue rebuild can contain
+        # receipts recorded after that snapshot. Validate them, but count only
+        # receipts that existed by the requested as-of time.
+        if sent_at > as_of:
+            continue
         counts[lane_id] += 1
         receipt_digests.setdefault(lane_id, []).append(
             canonical_object_sha256(receipt, omit=set())

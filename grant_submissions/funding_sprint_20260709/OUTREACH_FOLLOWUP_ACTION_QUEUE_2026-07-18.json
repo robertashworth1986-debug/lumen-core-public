@@ -61,7 +61,7 @@
       "draft_rendered": false,
       "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 388293,
+      "hold_seconds_remaining": 227814,
       "inbox_recheck_required": false,
       "lane_id": "lanl_vision_licensing_followup",
       "max_proactive_sends": 1,
@@ -110,21 +110,20 @@
       "source_state": "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
     },
     {
-      "action_state": "HELD_NO_SEND",
+      "action_state": "FOLLOWUP_LIMIT_REACHED_NO_SEND",
       "action_time_human_review_required": true,
       "current_response_template_id": "NO_DUPLICATE_MONITOR",
       "draft_rendered": false,
       "eligible_template_id": "COMPONENT_INSTRUCTION_ESCALATION",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 139893,
       "inbox_recheck_required": false,
       "lane_id": "missionweave_dsip_proposal",
       "max_proactive_sends": 1,
-      "next_action": "Continue the JCP portal and DSIP evidence work. Recheck the complete component thread after the Monday hold; only if no component reply exists may one bounded instruction follow-up be drafted. Do not resend the proposal package.",
+      "next_action": "The bounded proactive follow-up allowance is exhausted. Monitor the existing thread and respond only to a specific inbound request.",
       "not_before_utc": "2026-07-20T17:00:00Z",
       "organization": "Defense SBIR/STTR Innovation Portal",
       "rationale": "DSIP Support redirected the Volume V DD Form 2345/JCP instruction question to the DLA component POC already included on the original message. Draft at most one component follow-up after the Monday hold and only after a fresh full-thread check confirms no component reply.",
-      "recorded_proactive_send_count": 0,
+      "recorded_proactive_send_count": 1,
       "send_now": false,
       "source_state": "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
     },
@@ -291,7 +290,7 @@
       "source_state": "ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY"
     }
   ],
-  "as_of_utc": "2026-07-19T02:08:26.508814Z",
+  "as_of_utc": "2026-07-20T22:43:05.546000Z",
   "claim_boundary": "This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, and neither condition authorizes a draft or send. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.",
   "controls": {
     "action_time_human_review_required": true,
@@ -303,8 +302,12 @@
     "past_hold_authorizes_send": false,
     "proactive_send_count_derived_from_sealed_ledger": true
   },
-  "followup_send_receipt_digests": {},
-  "queue_sha256": "DD921B12440E8DE81367D49C776D9F8572FBB19C9C0DBD2F260127E88756E9B5",
+  "followup_send_receipt_digests": {
+    "missionweave_dsip_proposal": [
+      "4B5EDC6BCB11F72B7A0896FBEA672EC8C5DC1B9D19F4FDAD099AADF7E7C41D45"
+    ]
+  },
+  "queue_sha256": "9F695B4E888E08CE8A4320AB30C8D3B53A2272D67095A3E6D36B4342C4DA4E03",
   "schema": "lumencore.outreach_followup_action_queue.v1",
   "source_evidence": {
     "email_reconciliation": {
@@ -318,9 +321,9 @@
       "sha256": "34F758D02549726463FCC1A3BFAE36542FBEB8D393991BD66037B870DBD1444C"
     },
     "followup_send_ledger": {
-      "bytes": 699,
+      "bytes": 996,
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_SEND_LEDGER_2026-07-18.json",
-      "sha256": "3F5670E2B3268010FBF22A86CEEF0EA46ACB3651054025E972FF7F60DACFDE80"
+      "sha256": "156C539544CDD43E599F384420AA8B29B576CE749631828C526485BD5E3B9216"
     },
     "response_registry_builder": {
       "bytes": 19601,
@@ -337,7 +340,8 @@
   "summary": {
     "action_state_counts": {
       "CLOSED_NO_ACTION": 2,
-      "HELD_NO_SEND": 2,
+      "FOLLOWUP_LIMIT_REACHED_NO_SEND": 1,
+      "HELD_NO_SEND": 1,
       "HUMAN_ACCOUNT_ACTION_OPEN": 1,
       "HUMAN_PORTAL_ACTION_OPEN": 2,
       "MONITOR_INBOUND_ONLY": 8,
@@ -346,9 +350,9 @@
     "draft_rendered_count": 0,
     "due_for_mailbox_recheck_count": 0,
     "external_send_allowed_without_human": false,
-    "held_no_send_count": 2,
+    "held_no_send_count": 1,
     "lane_count": 16,
-    "recorded_proactive_send_count": 0,
+    "recorded_proactive_send_count": 1,
     "send_now_count": 0
   }
 }
