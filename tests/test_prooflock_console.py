@@ -206,12 +206,15 @@ def test_console_is_self_contained_and_documents_build_week_gates():
     assert "recomputes a valid receipt hash" in readme
     assert "SHA-256 detects byte changes but does not authenticate" in threat_model
     assert "twenty-seven passing tests" not in narration
-    assert "current-head CI receipt" in narration
-    assert "Do not record the final video from the historical" in narration
+    assert "exact source commit and current test receipt" in narration
+    assert "Do not present the historical public release as current-head evidence" in narration
     assert "`28 passed`" not in checklist
     assert "public or unlisted" not in checklist
     assert "YouTube as **public**" in checklist
-    assert "Current live-file identity: `10/14`" in checklist
+    assert "Current focused local test result: `46 passed, 3 skipped`" in checklist
+    assert "GitHub account is locked by a billing issue" in checklist
+    assert "Current live-file identity: `4/15`" in checklist
+    assert "live verifier to `15/15`" in checklist
     assert "Historical release only" in release_receipt
     assert "must not be used as current release evidence" in release_receipt
     assert "`32 passed`" not in readiness
@@ -221,6 +224,21 @@ def test_hashed_json_artifacts_are_checkout_byte_stable():
     attributes = (ROOT / ".gitattributes").read_text(encoding="utf-8")
     assert "flowform_curved_motherboard_honeycomb_battery_v2_concept.json -text" in attributes
     assert "flowform_curved_motherboard_honeycomb_battery_v3_concept.json -text" in attributes
+
+
+def test_build_week_voiceover_is_bounded_and_describes_the_current_attack():
+    voiceover = (
+        ROOT / "docs" / "OPENAI_BUILD_WEEK_PROOFLOCK_VOICEOVER_2026-07-20.md"
+    ).read_text(encoding="utf-8")
+
+    assert len(re.findall(r"\b[\w'-]+\b", voiceover)) < 350
+    assert "recomputes a valid receipt hash" in voiceover
+    assert "Receipt integrity still passes" in voiceover
+    assert "ProofLock derives four held gates" in voiceover
+    assert "keeps the effective decision at HOLD" in voiceover
+    assert "external validation" in voiceover
+    assert "agent" not in voiceover.lower()
+    assert "gpt-" not in voiceover.lower()
 
 
 def test_public_session_reconciliation_is_bounded_and_identifier_free():

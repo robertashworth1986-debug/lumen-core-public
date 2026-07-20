@@ -1,44 +1,50 @@
 # ProofLock Demo Narration
 
-**Target runtime:** 2 minutes 20 seconds
+**Target runtime:** 2 minutes 35 seconds or less
 
-**Recording surface:** `HOLD`. Do not record the final video from the historical `e9a1aba` release. Replace this line with the newly verified public URL only after the current deployment candidate reaches `14/14` live byte identity.
+**Recording surface:** `HOLD`. Record locally from the current branch for rehearsal only. Do not present the historical public release as current-head evidence. Record the final public demo only after the exact 15-file release reaches `15/15` live byte identity and the live verifier passes against the same commit.
 
-## 0:00-0:18 - Open
+## 0:00-0:14 - Open
 
 On screen: show the complete console before selecting any control.
 
-> This is ProofLock, a developer tool for checking whether an evidence packet is intact and whether it has the authority to move forward. It separates a valid receipt from permission to promote the claim.
+> This is ProofLock, a developer tool that checks whether an evidence packet is intact and whether it has authority to move forward. A valid receipt is necessary, but it is not permission to promote a claim.
 
-## 0:18-0:42 - The Problem
+## 0:14-0:36 - The Problem
 
 On screen: point to Integrity, Artifacts, Required Gates, and Decision.
 
-> Technical projects often blur three different questions: did the files stay unchanged, do the files support the statement being made, and has the right person approved release? ProofLock keeps those questions separate and fails closed when any required authority gate is open.
+> Technical reviews often blur three questions: did the files stay unchanged, do they support the statement being made, and has a trusted reviewer authorized release? ProofLock keeps integrity, evidence, and authority separate, then fails closed when a required authority gate is unsupported.
 
-## 0:42-1:03 - Canonical Verification
+## 0:36-0:58 - Canonical Verification
 
 On screen: show `Verified`, `4 / 4`, `4 held`, and `HOLD`.
 
-> The browser canonicalizes and hashes the receipt, rehashes four same-origin public artifacts, and checks the required gates. Here, integrity is verified and all four artifacts match, but four engineering and human gates are still open. The honest decision is HOLD.
+> The browser canonicalizes and hashes the receipt, rehashes four same-origin public artifacts, and derives the effective gates. Integrity is verified and all four artifacts match. Four engineering and human authority gates remain held, so the effective decision is HOLD.
 
-## 1:03-1:38 - Guided Negative Proof
+## 0:58-1:34 - Guided Authority Attack
 
 On screen: select **Run guided proof** and let the sequence complete.
 
-> The guided proof first confirms custody. It then applies an in-memory mutation to the claim. That mutation breaks integrity, so the release is rejected. ProofLock restores the exact canonical text, verifies the artifacts again, and returns to HOLD. A truthful receipt can be intact without granting permission to promote the underlying claim.
+> Now the guided proof performs the harder attack. It changes every required gate to PASS, requests PROMOTE, and recomputes a valid receipt hash. Receipt integrity still passes. But self-authored engineering, prototype, safety, and human approvals are not trusted authority. ProofLock derives four held gates, blocks the requested promotion, and keeps the effective decision at HOLD.
 
-## 1:38-2:02 - Reproducibility
+## 1:34-1:50 - Exact Restoration
+
+On screen: let the guided proof restore the canonical sample.
+
+> The console restores the exact canonical receipt text, rehashes the artifacts, and returns to the original HOLD state. The attack never changes the source files or grants itself authority.
+
+## 1:50-2:16 - Reproducibility
 
 On screen: show the repository or briefly scroll the verification log.
 
-> The same rules run in the browser and in a Python command-line verifier. The focused suite covers canonical hashes, path boundaries, browser and Python parity, deterministic visuals, reduced motion, exact restoration, accessibility hooks, and local-only dependencies. The exact current result comes from the current-head CI receipt shown with the demo.
+> The same rules run in the browser and in a Python command-line verifier. Focused tests cover canonical hashes, path boundaries, browser and Python parity, deterministic visuals, reduced motion, exact restoration, accessibility hooks, deployment isolation, and local-only dependencies. The video must name the exact source commit and current test receipt used for the recording.
 
-## 2:02-2:20 - Codex And Boundary
+## 2:16-2:35 - Codex And Boundary
 
 On screen: return to the final `HOLD` state.
 
-> OpenAI Codex helped isolate, implement, and test this bounded release while preserving provenance and keeping unsupported claims behind explicit gates. ProofLock proves receipt integrity and artifact identity. It does not pretend that a hash proves safety, patentability, field performance, or commercial readiness.
+> OpenAI Codex helped isolate, implement, challenge, and test this bounded release while preserving provenance. ProofLock demonstrates receipt integrity, artifact identity, policy enforcement, and authority separation. It does not claim that a hash proves safety, patentability, field performance, external validation, or commercial readiness.
 
 ## Model Provenance Line
 
@@ -49,5 +55,6 @@ Do not record a model name or Session ID until the primary Codex task's `/feedba
 - Use a quiet room and a microphone level that never clips.
 - Record at 1080p or higher with the browser zoom at 100 percent.
 - Keep the pointer still except when identifying a control or selecting **Run guided proof**.
-- Wait for the exact restored `HOLD` state before the closing sentence.
+- During the attack, confirm `receipt PASS`, `policy BLOCKED`, requested decision `PROMOTE`, four effective gates held, and effective decision `HOLD`.
+- Wait for exact canonical restoration and the restored `HOLD` state before the closing sentence.
 - Do not show email, credentials, private proposals, patent drafts, browser bookmarks, or notification banners.
