@@ -211,7 +211,7 @@ def test_console_is_self_contained_and_documents_build_week_gates():
     assert "`28 passed`" not in checklist
     assert "public or unlisted" not in checklist
     assert "YouTube as **public**" in checklist
-    assert "Current focused local test result: `46 passed, 3 skipped`" in checklist
+    assert "Current focused local test result: `50 passed, 3 skipped`" in checklist
     assert "GitHub account is locked by a billing issue" in checklist
     assert "Current live-file identity: `4/15`" in checklist
     assert "live verifier to `15/15`" in checklist

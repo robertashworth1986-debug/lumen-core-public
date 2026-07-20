@@ -13,7 +13,7 @@
 - Historical live demonstration only: `https://lumen-core.ai/build_week/prooflock_console/?release=20260718.1&commit=e9a1aba`
 - Historical deployed source commit: `e9a1aba6fdfb368c64887af7e9caeee8aac21abb`; this release predates the corrected `decision == "PROMOTE"` invariant and must not be used for the final recording.
 - Current deployment candidate: `85ac6f1397d263bd75bc68a4629d0308277c4180`
-- Current focused local test result: `46 passed, 3 skipped`; rerun immediately before recording and preserve the exact current-head receipt.
+- Current focused local test result: `50 passed, 3 skipped`; rerun immediately before recording and preserve the exact current-head receipt.
 - Current-head GitHub Actions: workflow jobs did not start because the GitHub account is locked by a billing issue. This is an account gate, not a passing or failing test result.
 - Current live-file identity: `4/15` against candidate `85ac6f1`; the live route is not current-head evidence. The live-release and submission gates remain `HOLD`.
 - Model evidence: retain the private task-metadata candidate, but do not state a final model identity until the primary task's `/feedback` value is directly confirmed.
