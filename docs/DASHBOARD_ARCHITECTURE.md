@@ -1,6 +1,6 @@
 # Dashboard Architecture
 
-Updated: July 18, 2026
+Updated: July 20, 2026
 
 ## Canonical Public Surfaces
 
@@ -19,10 +19,10 @@ operator-only control surfaces.
 | Forecast | `/forecast.html` | Forecast scenarios and model comparison | Noindex |
 | Explainer | `/explain.html` | Per-series router rationale and evidence interpretation | Noindex |
 
-The public pages share `assets/public_site.css`, `assets/public_site.js`,
-`assets/luma_command_fabric.css`, and `assets/luma_command_fabric.js`.
-The command fabric provides canonical navigation, Ctrl+K routing, public API
-health, artifact freshness, and truthful execution mode. Public pages remain
+The public pages load the four local `assets/public_site_*.css` layers,
+`assets/public_site.js`, and the public-safe branch of
+`assets/luma_command_fabric.js`. The command fabric does not mount operator
+navigation or query runtime APIs on these three pages. Public pages remain
 useful when the runtime gateway is unavailable.
 
 `robots.txt` and `sitemap.xml` expose only the public company, proof, and
@@ -31,9 +31,12 @@ commercial-review paths. `code/ops/ensure_dashboard_command_fabric.py` injects
 already declare a robots policy.
 
 The canonical HTML files are explicit Git exceptions even though other
-generated dashboard HTML remains ignored. Deployment runs
-`code/ops/ensure_dashboard_command_fabric.py` before publishing so regenerated
-pages cannot silently lose the shared layer or indexing boundary.
+generated dashboard HTML remains ignored. The public release contains an exact
+allowlist of 19 HTML, metadata, script, style, font, and license files. It is
+built from immutable Git blobs at one full commit SHA, verified against a
+SHA-256 manifest before and after installation, and applied without deleting
+or replacing operator pages or data directories. The legacy whole-dashboard
+maintenance workflow is manual and fail-closed.
 
 ## Truth Rules
 
@@ -62,11 +65,25 @@ top-level product.
 
 ## Generated Pages
 
-Generated dashboards must retain the shared command-fabric references.
+Generated operator dashboards must retain the shared command-fabric references.
 Builders that overwrite a canonical page are responsible for emitting those
-references. The deployment copies the dashboard directory to the public web
-root, so a generated page that omits the shared layer can create visual, truth,
-or indexing drift.
+references. Public-site deployment is isolated from generated operator output;
+only files enumerated by `code/deploy/package_public_site_release.py` can enter
+an exact public release.
+
+## Release Contract
+
+- `.github/workflows/deploy-public-site-release.yml` is the only public-site
+  production release path.
+- A release requires the exact workflow commit and the explicit
+  `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` approval token.
+- `code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh` captures the prior identity
+  of every touched file, stages verified replacements, and retains a rollback
+  receipt under `/opt/lumencore/rollbacks/public-site/`.
+- `code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py` compares every public URL byte
+  for byte with the approved release manifest.
+- The release is bounded and recoverable, but the 19 file renames are not
+  claimed as a single filesystem-atomic directory swap.
 
 ## Storage
 

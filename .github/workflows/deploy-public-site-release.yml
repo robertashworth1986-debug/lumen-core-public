@@ -1,0 +1,162 @@
+name: Deploy exact public-site snapshot to VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_commit:
+        description: Full commit SHA at the selected workflow ref
+        required: true
+        type: string
+      approval:
+        description: Explicit exact-snapshot production deployment gate
+        required: true
+        type: choice
+        default: HOLD
+        options:
+          - HOLD
+          - DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lumencore-production-site
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      source_commit: ${{ steps.gate.outputs.source_commit }}
+    steps:
+      - name: Fail closed unless this exact workflow commit is approved
+        id: gate
+        shell: bash
+        env:
+          APPROVAL: ${{ inputs.approval }}
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_COMMIT: ${{ inputs.release_commit }}
+          WORKFLOW_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$EVENT_NAME" == "workflow_dispatch" ]]
+          [[ "$APPROVAL" == "DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT" ]]
+          [[ "$RELEASE_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]
+          printf 'source_commit=%s\n' "$RELEASE_COMMIT" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: authorize
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://lumen-core.ai/
+    env:
+      APPROVAL: ${{ inputs.approval }}
+      RELEASE_COMMIT: ${{ needs.authorize.outputs.source_commit }}
+      REMOTE_STAGE: /tmp/lumencore-public-site-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+      - name: Checkout the approved commit
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ needs.authorize.outputs.source_commit }}
+
+      - name: Package the exact immutable public site
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -d -m 700 /tmp/public-site-release
+          python3 code/deploy/package_public_site_release.py \
+            --source-commit "$RELEASE_COMMIT" \
+            --archive /tmp/public-site-release/public-site-release.tar \
+            --manifest /tmp/public-site-release/public-site-release-manifest.json \
+            | tee /tmp/public-site-package-receipt.json
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+
+      - name: Verify bounded remote prerequisites
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes "opc@$VPS_HOST" '
+            set -eu
+            sudo -n true
+            sudo -n test -d /opt/lumencore/dashboard
+            for command_name in python3 sha256sum stat cp cmp install date mktemp realpath; do
+              command -v "$command_name" >/dev/null
+            done
+          '
+
+      - name: Upload bounded release package
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          [[ "$REMOTE_STAGE" =~ ^/tmp/lumencore-public-site-[0-9]+-[0-9]+$ ]]
+          ssh -o BatchMode=yes "opc@$VPS_HOST" \
+            "test ! -e '$REMOTE_STAGE' && install -d -m 700 '$REMOTE_STAGE'"
+          scp -o BatchMode=yes \
+            /tmp/public-site-release/public-site-release.tar \
+            /tmp/public-site-release/public-site-release-manifest.json \
+            "opc@$VPS_HOST:$REMOTE_STAGE/"
+
+      - name: Apply exact files with rollback capture
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes "opc@$VPS_HOST" \
+            "sudo -n bash -s -- \
+              --archive '$REMOTE_STAGE/public-site-release.tar' \
+              --manifest '$REMOTE_STAGE/public-site-release-manifest.json' \
+              --source-commit '$RELEASE_COMMIT' \
+              --approval '$APPROVAL'" \
+            < code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh \
+            | tee /tmp/public-site-deploy-receipt.txt
+
+      - name: Verify every live byte against the release manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py \
+            --manifest /tmp/public-site-release/public-site-release-manifest.json \
+            --source-commit "$RELEASE_COMMIT" \
+            --base-url https://lumen-core.ai \
+            --output /tmp/public-site-live-gate.json
+
+      - name: Remove remote transfer staging
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          [[ "$REMOTE_STAGE" =~ ^/tmp/lumencore-public-site-[0-9]+-[0-9]+$ ]]
+          ssh -o BatchMode=yes "opc@$VPS_HOST" "rm -rf -- '$REMOTE_STAGE'"
+
+      - name: Upload deployment receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-site-deploy-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            /tmp/public-site-package-receipt.json
+            /tmp/public-site-deploy-receipt.txt
+            /tmp/public-site-live-gate.json
+          if-no-files-found: warn
+          retention-days: 30

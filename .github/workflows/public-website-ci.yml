@@ -14,9 +14,16 @@ on:
       - "dashboard/assets/public_site.js"
       - "dashboard/assets/luma_command_fabric.js"
       - "dashboard/assets/lumencore-mark.svg"
+      - "dashboard/assets/fonts/**"
+      - "code/deploy/package_public_site_release.py"
+      - "code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh"
+      - "code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py"
       - "code/ops/ensure_dashboard_command_fabric.py"
       - "docs/DASHBOARD_ARCHITECTURE.md"
       - "tests/test_public_website.py"
+      - "tests/test_public_site_deploy_hardening.py"
+      - ".github/workflows/deploy-public-site-release.yml"
+      - ".github/workflows/deploy.yml"
       - ".github/workflows/public-website-ci.yml"
   push:
     branches: [main]
@@ -32,9 +39,16 @@ on:
       - "dashboard/assets/public_site.js"
       - "dashboard/assets/luma_command_fabric.js"
       - "dashboard/assets/lumencore-mark.svg"
+      - "dashboard/assets/fonts/**"
+      - "code/deploy/package_public_site_release.py"
+      - "code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh"
+      - "code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py"
       - "code/ops/ensure_dashboard_command_fabric.py"
       - "docs/DASHBOARD_ARCHITECTURE.md"
       - "tests/test_public_website.py"
+      - "tests/test_public_site_deploy_hardening.py"
+      - ".github/workflows/deploy-public-site-release.yml"
+      - ".github/workflows/deploy.yml"
       - ".github/workflows/public-website-ci.yml"
 
 permissions:
@@ -55,10 +69,18 @@ jobs:
       - name: Compile website safeguards
         run: >-
           python -m py_compile
+          code/deploy/package_public_site_release.py
+          code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py
           code/ops/ensure_dashboard_command_fabric.py
+          tests/test_public_site_deploy_hardening.py
           tests/test_public_website.py
       - name: Validate public website
-        run: python tests/test_public_website.py
+        run: >-
+          python -m pytest -q
+          tests/test_public_website.py
+          tests/test_public_site_deploy_hardening.py
+      - name: Check release shell syntax
+        run: bash -n code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh
       - name: Check public JavaScript syntax
         run: >-
           node --check dashboard/assets/public_site.js &&
