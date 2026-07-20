@@ -114,17 +114,23 @@ LumenCore does not claim, without separately linked evidence:
 
 ```json
 {
-  "source": "authorized dataset, stream, sensor, benchmark, or sample window",
-  "baseline": "accepted incumbent, naive method, named comparator, or synthetic control",
-  "locked_metric": "metric selected before scoring",
-  "run_type": "measured | replay | synthetic | modeled | estimated",
-  "manifest": "hashes, timestamp, commit, dependencies, and run identity",
-  "result": "bounded result summary",
-  "failure_notes": "known issues, neutral outcomes, and adverse results",
-  "claim_boundary": "what the evidence proves and does not prove",
-  "pilot_decision": "promote | rerun | external_review | hold | reject"
+  "schema_version": "3.0",
+  "source": "named source, rights status, and bounded window",
+  "baseline": "named comparator selected before scoring",
+  "locked_metric": "metric definition locked before the run",
+  "run": "compatible run type, UTC timestamp, commit, dependencies, and window",
+  "manifest": "role-separated artifact hashes using proof-capsule-manifest-v3",
+  "external_validation": "explicit status plus manifest-bound report provenance",
+  "result": "bounded summary with negative results and failure notes",
+  "claim_boundary": "what this proves and does not prove",
+  "pilot_decision": "review, rerun, external validation, or pilot scope"
 }
 ```
+
+The verifier binds the exact capsule bytes and canonical JSON to its receipt, rejects
+unknown fields and artifact aliases, and distinguishes manifest-bound external-report
+custody from validator identity, independence, and conclusions that still require human
+review. Action-time HumanUnlock remains outside machine verification.
 
 ## Public review surfaces
 

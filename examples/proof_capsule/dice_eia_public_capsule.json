@@ -1,4 +1,5 @@
 {
+  "schema_version": "3.0",
   "capsule_id": "DICE-EIA-PUBLIC-SUMMARY-20260621",
   "title": "DICE public live-breadth replay summary",
   "module": "LumenCore",
@@ -28,6 +29,7 @@
     "seed_or_window": "14 deterministic replay windows"
   },
   "manifest": {
+    "manifest_format": "proof-capsule-manifest-v3",
     "input_hashes": [],
     "output_hashes": [
       {
@@ -35,8 +37,17 @@
         "sha256": "45f71b30fc1f7abab1d085f109cd3066e6281239c7323238911bad82fb73a371"
       }
     ],
-    "manifest_hash": "18949808da4b42246032a92cc169b2fbd327bd474389496a3bc552efea889132",
+    "manifest_hash": "04ae47cef01fc3bfdf45407be6f681c40a2ed0f5b03f5b5162c2b4bde4ccaa20",
     "public_safe": true
+  },
+  "external_validation": {
+    "status": "not_established",
+    "validator_name": null,
+    "validator_organization": null,
+    "scope": null,
+    "completed_at_utc": null,
+    "report_path": null,
+    "report_sha256": null
   },
   "result": {
     "summary": "Across 14 deterministic replay windows built from frozen Kraken and EIA time-series stress signals, the public summary reports higher safe completion and lower constraint violations and messaging cost, alongside a higher false-rejection cost.",
