@@ -1,0 +1,145 @@
+{
+  "schema": "lumencore.external_replication_docket.v1",
+  "version": "1.0.0",
+  "status": "template_unassigned",
+  "docket_id": "LUMENCORE-EXT-REPLICATION-TEMPLATE-V1",
+  "title": "LumenCore External Replication Docket Template",
+  "owner": "Robert Ashworth / LumenCore",
+  "purpose": "Pre-register one bounded comparison so an independent evaluator can reproduce, reject, rerun, or advance the result without relying on founder-authored authority.",
+  "evaluation": {
+    "hypothesis": {
+      "id": "HYPOTHESIS-PENDING",
+      "primary": "Pending evaluator-approved primary hypothesis.",
+      "null": "Pending evaluator-approved null hypothesis.",
+      "falsification_condition": "Pending explicit condition under which the candidate claim is rejected."
+    },
+    "source": {
+      "name": "Pending authorized source or dataset.",
+      "rights_status": "pending",
+      "authority": "Pending named source-rights owner.",
+      "unit_of_analysis": "Pending unit of analysis.",
+      "population": "Pending target population or operating envelope."
+    },
+    "design": {
+      "baseline": "Pending incumbent, naive, or accepted comparator.",
+      "candidate": "Pending candidate method and version.",
+      "inclusion_rules": [
+        "Define every inclusion rule before the holdout is revealed."
+      ],
+      "exclusion_rules": [
+        "Define every exclusion rule before the holdout is revealed."
+      ],
+      "holdout_strategy": "Pending evaluator-controlled holdout strategy.",
+      "temporal_or_seed_split": "Pending frozen time window, seed set, or sample split.",
+      "no_post_outcome_tuning": true,
+      "contamination_controls": [
+        "Separate development data from the evaluator-controlled holdout.",
+        "Record every person and process with access to holdout outcomes before scoring."
+      ]
+    },
+    "analysis": {
+      "primary_metric": "Pending one primary metric.",
+      "metric_definition": "Pending exact equation, units, aggregation, and edge-case handling.",
+      "direction": "target",
+      "acceptance_threshold": "Pending threshold locked before scoring.",
+      "uncertainty_method": "Pending confidence interval, bootstrap, Bayesian interval, or other evaluator-approved method.",
+      "confidence_level": 0.95,
+      "sample_adequacy_plan": "Pending power, precision, coverage, or minimum-sample justification.",
+      "multiplicity_policy": "One primary metric; predeclare correction or exploratory labeling for secondary analyses.",
+      "missing_data_policy": "Pending missingness definition, imputation prohibition or method, and incomplete-window treatment.",
+      "outlier_policy": "Pending outlier definition and treatment locked before scoring.",
+      "failure_rules": [
+        "A candidate run that violates a locked safety, integrity, or data-rights rule is a failed run, not a favorable omission."
+      ],
+      "incomplete_run_rules": [
+        "Every incomplete run remains in the denominator or is separately reported under the predeclared rule."
+      ],
+      "stop_rules": [
+        "Stop on source-rights ambiguity, holdout contamination, code drift, manifest mismatch, or evaluator withdrawal."
+      ]
+    },
+    "freeze": {
+      "protocol_hash": "pending",
+      "code_commit": "pending",
+      "dependency_lock": "pending",
+      "environment_spec": "pending",
+      "frozen_utc": "pending"
+    }
+  },
+  "independence": {
+    "evaluator_name": "pending",
+    "organization": "pending",
+    "role": "pending",
+    "relationship": "pending",
+    "conflict_disclosure": "pending",
+    "data_control": "pending",
+    "run_control": "pending",
+    "analysis_control": "pending",
+    "publication_permission": "pending"
+  },
+  "reproducibility": {
+    "input_manifest": "pending",
+    "output_manifest": "pending",
+    "run_receipt": "pending",
+    "second_environment_required": true,
+    "tolerance_definition": "Pending exact deterministic equality or stochastic tolerance rule.",
+    "negative_results_required": true,
+    "deviations_register_required": true,
+    "offline_verifier_required": true
+  },
+  "reporting": {
+    "evidence_class": "template",
+    "results_summary": "not_run",
+    "primary_result": "not_run",
+    "uncertainty_interval": "not_run",
+    "sample_size": "not_run",
+    "negative_results": [
+      "No result exists because this is an unassigned preregistration template."
+    ],
+    "failure_notes": [
+      "No run is authorized until the evaluator, source rights, protocol, holdout, code, environment, and analysis plan are frozen."
+    ],
+    "deviations": [
+      "No deviations recorded; the protocol is not yet assigned."
+    ],
+    "limitations": [
+      "This template does not establish an evaluator, a dataset, a result, external validation, field performance, certification, deployment, or customer adoption."
+    ]
+  },
+  "gates": {
+    "source_rights_resolved": false,
+    "evaluator_assigned": false,
+    "protocol_frozen": false,
+    "holdout_locked": false,
+    "code_pinned": false,
+    "environment_locked": false,
+    "analysis_plan_locked": false,
+    "external_run_complete": false,
+    "reviewer_attestation_present": false
+  },
+  "decision": {
+    "status": "hold",
+    "owner": "Robert Ashworth / LumenCore",
+    "next_gate": "Assign one qualified evaluator and one authorized source before freezing the protocol.",
+    "decided_utc": "pending"
+  },
+  "claim_boundary": {
+    "proves": [
+      "A machine-readable external-replication contract template exists.",
+      "The template requires source rights, preregistration, holdout separation, uncertainty, negative results, deviations, and offline verification before a stronger claim."
+    ],
+    "does_not_prove": [
+      "External validation",
+      "Independent validation",
+      "Field validation",
+      "Operational validation",
+      "Certification, endorsement, deployment, savings, revenue, or customer adoption"
+    ],
+    "safe_sentence": "LumenCore has prepared a fail-closed external-replication docket; no external result exists until a qualified evaluator controls the agreed test and records the outcome."
+  },
+  "custody": {
+    "hash_algorithm": "sha256",
+    "payload_sha256": "eb6cec4b17ecf9cee6cfc26c60f18c4fedfa5174be78050ebff04deb9060dec6",
+    "public_safe": true
+  }
+}
