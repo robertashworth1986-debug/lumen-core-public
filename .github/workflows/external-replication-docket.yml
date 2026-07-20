@@ -1,0 +1,89 @@
+name: External Replication Docket Gate
+
+on:
+  pull_request:
+    paths:
+      - "config/external_replication_docket_v1.json"
+      - "code/ops/validate_external_replication_docket.py"
+      - "tests/test_external_replication_docket.py"
+      - "docs/EXTERNAL_REPLICATION_DOCKET_V1.md"
+      - ".github/workflows/external-replication-docket.yml"
+  push:
+    branches: [main]
+    paths:
+      - "config/external_replication_docket_v1.json"
+      - "code/ops/validate_external_replication_docket.py"
+      - "tests/test_external_replication_docket.py"
+      - "docs/EXTERNAL_REPLICATION_DOCKET_V1.md"
+      - ".github/workflows/external-replication-docket.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: external-replication-docket-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Compile validator and tests
+        run: |
+          python -m py_compile \
+            code/ops/validate_external_replication_docket.py \
+            tests/test_external_replication_docket.py
+
+      - name: Run focused adversarial tests
+        run: |
+          python -m unittest discover \
+            -s tests \
+            -p "test_external_replication_docket.py" \
+            -v
+
+      - name: Validate canonical docket and write receipt
+        run: |
+          python code/ops/validate_external_replication_docket.py \
+            config/external_replication_docket_v1.json \
+            > external_replication_docket_receipt.json
+
+      - name: Enforce canonical hold boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(
+              Path("external_replication_docket_receipt.json").read_text(encoding="utf-8")
+          )
+          assert receipt["valid"] is True
+          assert receipt["schema"] == "lumencore.external_replication_docket.v1"
+          assert receipt["status"] == "template_unassigned"
+          assert receipt["evidence_class"] == "template"
+          assert receipt["decision"] == "hold"
+          assert receipt["preregistration_gates_passed"] == 0
+          assert receipt["external_gates_passed"] == 0
+          assert receipt["safe_for_external_validation_claim"] is False
+          assert len(receipt["payload_sha256"]) == 64
+          print(json.dumps(receipt, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload bounded validation receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-replication-docket-receipt-${{ github.run_id }}
+          path: external_replication_docket_receipt.json
+          if-no-files-found: error
+          retention-days: 30
