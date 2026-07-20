@@ -77,6 +77,10 @@ class RepairEvidenceRouteTests(unittest.TestCase):
         with self.assertRaises(MODULE.RouteRepairError):
             MODULE.repair_config(PROXIED, "/opt/lumencore/dashboard; return 200")
 
+    def test_refuses_windows_style_nginx_root(self) -> None:
+        with self.assertRaises(MODULE.RouteRepairError):
+            MODULE.repair_config(PROXIED, r"C:\lumencore\dashboard")
+
     def test_preserves_unrelated_config(self) -> None:
         result = MODULE.repair_config(PROXIED, ROOT)
         self.assertIn("location / {", result.repaired)
