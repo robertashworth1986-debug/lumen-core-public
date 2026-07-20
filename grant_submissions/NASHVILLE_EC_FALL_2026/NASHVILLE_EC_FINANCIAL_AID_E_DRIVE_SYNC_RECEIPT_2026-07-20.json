@@ -1,0 +1,146 @@
+{
+  "schema": "lumencore.bounded_mirror_receipt.v1",
+  "generated_utc": "2026-07-20T23:54:20.747088Z",
+  "destination_root": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720",
+  "artifact_count": 19,
+  "all_sha256_matched_after_copy": true,
+  "public_action_control_only": true,
+  "private_founder_values_mirrored": false,
+  "browser_navigation_performed": false,
+  "artifacts": [
+    {
+      "source": "code/ops/BUILD_NASHVILLE_EC_FINANCIAL_AID_ACTION.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/code/ops/BUILD_NASHVILLE_EC_FINANCIAL_AID_ACTION.py",
+      "bytes": 17762,
+      "sha256": "072E38A7EDEF564835BBF1E6C310874049D7738AB082B100C4597C7655A2DED0",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_NASHVILLE_EC_FINANCIAL_AID_E_DRIVE_SYNC_RECEIPT.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/code/ops/BUILD_NASHVILLE_EC_FINANCIAL_AID_E_DRIVE_SYNC_RECEIPT.py",
+      "bytes": 6357,
+      "sha256": "204586DB07DFF8A6F7BE1F07B0531CD0BA8A4878595E68A05A2DCBEE175D2E42",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
+      "bytes": 36511,
+      "sha256": "20C00E3EB26BC74FC8B6DEA59C26953E221FF71865A368231A2D0F803ACCF660",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py",
+      "bytes": 25301,
+      "sha256": "02C376A00601E5BCBC6CA5447FCDB0176B7FF9EBFC44E955A56D2FCF98C0399D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
+      "bytes": 48274,
+      "sha256": "ECC498F81102652C86E42477EED4F3CD1FB7EF3344D733D1473004CBC58D72DF",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "config/outreach_followup_policies_v1.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/config/outreach_followup_policies_v1.json",
+      "bytes": 6202,
+      "sha256": "43FD6A626282AFEB86A76E5EDB61D568AB1BED5AC2F81ECFB0AB9CACCADC9E86",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_nashville_ec_financial_aid_action.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/tests/test_nashville_ec_financial_aid_action.py",
+      "bytes": 6215,
+      "sha256": "55F47ABD28D455C2B212DE3656E74B761BACBB2B86CB7D696B2105AFD9A0271D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_nashville_ec_financial_aid_e_drive_sync_receipt.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/tests/test_nashville_ec_financial_aid_e_drive_sync_receipt.py",
+      "bytes": 2323,
+      "sha256": "A92AC8053108DA67CA47512D5E4DB3BEE6DB44C81C57A30F4276A824EC0336A0",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_email_action_reconciliation.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/tests/test_email_action_reconciliation.py",
+      "bytes": 10681,
+      "sha256": "1C2B0AE8A2E1C5B82B8EE4B6117A06530DAF3381EF8B6CD459C8A5B62E91D65A",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_outreach_followup_action_queue.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/tests/test_outreach_followup_action_queue.py",
+      "bytes": 18237,
+      "sha256": "C6E7B77F2F5DB2FC6F803A4CEB494AFD924216D84F4F78F8793FE7B6D5699074",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "tests/test_external_engagement_response_register.py",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/tests/test_external_engagement_response_register.py",
+      "bytes": 22708,
+      "sha256": "49EACE771685097827CF626D930CC483E3146B30CE2A5DB7D829DDD523ACE8EB",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FINANCIAL_AID_ACTION_2026-07-20.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FINANCIAL_AID_ACTION_2026-07-20.json",
+      "bytes": 2841,
+      "sha256": "1688435510D8BE006BFF6FDF53D2FB436CE6FF907159E3191F64065FF6D4FD9D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FINANCIAL_AID_ACTION_2026-07-20.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FINANCIAL_AID_ACTION_2026-07-20.md",
+      "bytes": 1371,
+      "sha256": "57AFC930AA6EDDACBDAC9DF578D7EAF5DB2EEE6B7DBD0E6C349DFC100A564888",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
+      "bytes": 24448,
+      "sha256": "9FCCFAA10DDCC45888406169AE0842155500D6B206A5F6C1776142BAA37A3A3D",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.md",
+      "bytes": 5368,
+      "sha256": "72FFB045430CA2948680B6EFAA9CD8D078F8A15B4C03614A10F775D863B3D1C1",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
+      "bytes": 19808,
+      "sha256": "024403BB8675F69F0F695F750129FEE993699273CFE74E8A743A8F1E6A14F1BA",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md",
+      "bytes": 2966,
+      "sha256": "052BD32AAF51AA3332884E0BDACEAEC2822B92FC66D9C77BB5F26AF01B8AAD68",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.json",
+      "bytes": 39129,
+      "sha256": "A16E94E50E01545F03032F627BEECC9B745CA24EF3F481C1E90E15199C5C6E7B",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.md",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/NASHVILLE_EC_FINANCIAL_AID_20260720/grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.md",
+      "bytes": 28345,
+      "sha256": "FC10F4472266D2F0E232AD84F363BFF478742E00B28BF6EBBFF2FD8975D3A1FC",
+      "copy_sha256_matched": true
+    }
+  ],
+  "claim_boundary": "This receipt proves only that the listed public Nashville EC financial-aid action-control, routing, test, and generated register artifacts were copied to the stated E-drive directory with matching SHA-256 hashes. It does not include private founder answers and does not prove form submission, financial-aid approval, accelerator selection, funding, endorsement, or external validation."
+}

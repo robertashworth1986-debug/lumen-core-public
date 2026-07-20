@@ -19,6 +19,31 @@
       "source_state": "PORTAL_SUBMISSION_CONFIRMED"
     },
     {
+      "action_state": "HUMAN_PORTAL_ACTION_OPEN",
+      "action_time_human_review_required": true,
+      "current_response_template_id": "NO_DUPLICATE_MONITOR",
+      "deadline_date": "2026-07-22",
+      "deadline_time_status": "NOT_STATED_IN_MESSAGE",
+      "deadline_timezone_status": "NOT_STATED_IN_MESSAGE",
+      "draft_rendered": false,
+      "eligible_template_id": null,
+      "final_form_submit_human_gated": true,
+      "financial_aid_form_action_required": true,
+      "follow_up_mode": "PORTAL_ACTION",
+      "inbox_recheck_required": false,
+      "initial_application_resubmission_required": false,
+      "internal_finish_target": "2026-07-21T17:00:00-05:00",
+      "lane_id": "nashville_ec_financial_aid_form",
+      "max_proactive_sends": 0,
+      "next_action": "Complete the separate three-question financial-aid form by July 22. Confirm the fee-coverage answer, review the private response sheet, and keep final Submit founder-gated. Do not resubmit the accelerator application or send an unnecessary email reply.",
+      "not_before_utc": null,
+      "organization": "Nashville Entrepreneur Center",
+      "rationale": "A specific inbound request opened a separate financial-aid form due July 22; complete that form without resubmitting the accelerator application or sending an unnecessary email reply.",
+      "recorded_proactive_send_count": 0,
+      "send_now": false,
+      "source_state": "FINANCIAL_AID_FORM_REQUEST_RECEIVED_ACTION_OPEN"
+    },
+    {
       "action_state": "MONITOR_INBOUND_ONLY",
       "action_time_human_review_required": true,
       "current_response_template_id": "NO_DUPLICATE_MONITOR",
@@ -61,7 +86,7 @@
       "draft_rendered": false,
       "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 227814,
+      "hold_seconds_remaining": 223973,
       "inbox_recheck_required": false,
       "lane_id": "lanl_vision_licensing_followup",
       "max_proactive_sends": 1,
@@ -95,6 +120,7 @@
       "action_state": "MONITOR_INBOUND_ONLY",
       "action_time_human_review_required": true,
       "current_response_template_id": "NO_DUPLICATE_MONITOR",
+      "deadline_date": "2026-07-17",
       "draft_rendered": false,
       "eligible_template_id": null,
       "follow_up_mode": "INBOUND_ONLY",
@@ -113,6 +139,7 @@
       "action_state": "FOLLOWUP_LIMIT_REACHED_NO_SEND",
       "action_time_human_review_required": true,
       "current_response_template_id": "NO_DUPLICATE_MONITOR",
+      "deadline_utc": "2026-07-22T16:00:00Z",
       "draft_rendered": false,
       "eligible_template_id": "COMPONENT_INSTRUCTION_ESCALATION",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
@@ -131,6 +158,7 @@
       "action_state": "HUMAN_PORTAL_ACTION_OPEN",
       "action_time_human_review_required": true,
       "current_response_template_id": "NO_DUPLICATE_MONITOR",
+      "deadline_utc": "2026-07-22T00:00:00Z",
       "draft_rendered": false,
       "eligible_template_id": null,
       "follow_up_mode": "PORTAL_ACTION",
@@ -290,7 +318,7 @@
       "source_state": "ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY"
     }
   ],
-  "as_of_utc": "2026-07-20T22:43:05.546000Z",
+  "as_of_utc": "2026-07-20T23:47:06.900420Z",
   "claim_boundary": "This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, and neither condition authorizes a draft or send. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.",
   "controls": {
     "action_time_human_review_required": true,
@@ -307,28 +335,28 @@
       "4B5EDC6BCB11F72B7A0896FBEA672EC8C5DC1B9D19F4FDAD099AADF7E7C41D45"
     ]
   },
-  "queue_sha256": "9F695B4E888E08CE8A4320AB30C8D3B53A2272D67095A3E6D36B4342C4DA4E03",
+  "queue_sha256": "53B58F08E484AD00CC5520E5CC0384C438819E0E4AB9FDAB9331BE602AA0FB32",
   "schema": "lumencore.outreach_followup_action_queue.v1",
   "source_evidence": {
     "email_reconciliation": {
-      "bytes": 22433,
+      "bytes": 24448,
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
-      "sha256": "DCA3E90621B7AB8A5A17F5C4CD0621E0EAE53A662F892ED71665EE1D3426029D"
+      "sha256": "9FCCFAA10DDCC45888406169AE0842155500D6B206A5F6C1776142BAA37A3A3D"
     },
     "followup_policy_config": {
-      "bytes": 5670,
+      "bytes": 6202,
       "path": "config/outreach_followup_policies_v1.json",
-      "sha256": "34F758D02549726463FCC1A3BFAE36542FBEB8D393991BD66037B870DBD1444C"
+      "sha256": "43FD6A626282AFEB86A76E5EDB61D568AB1BED5AC2F81ECFB0AB9CACCADC9E86"
     },
     "followup_send_ledger": {
-      "bytes": 996,
+      "bytes": 1016,
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_SEND_LEDGER_2026-07-18.json",
-      "sha256": "156C539544CDD43E599F384420AA8B29B576CE749631828C526485BD5E3B9216"
+      "sha256": "5CAAA4368E4DF3056030AB5486A9BF43644553F2F8CBA8418004C2B27D128414"
     },
     "response_registry_builder": {
-      "bytes": 19601,
+      "bytes": 20142,
       "path": "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py",
-      "sha256": "E3410ED6848C38AA3E0F385D95E8F1C02C59840117179A5F716EA923C319DAC8"
+      "sha256": "3984277717844ABA67A88EADCC732E8DE6B401F131B3C1F48E1E804E8ED982D8"
     },
     "response_template_registry": {
       "bytes": 18275,
@@ -336,22 +364,24 @@
       "sha256": "A72FA6DF0B4F6626D43062FC96957647CFEECC0EE5E6270333E47DA16FB61789"
     }
   },
-  "status": "NO_EXTERNAL_FOLLOWUP_DUE",
+  "status": "DEADLINE_PORTAL_ACTION_OPEN_NO_EMAIL_SEND",
   "summary": {
     "action_state_counts": {
       "CLOSED_NO_ACTION": 2,
       "FOLLOWUP_LIMIT_REACHED_NO_SEND": 1,
       "HELD_NO_SEND": 1,
       "HUMAN_ACCOUNT_ACTION_OPEN": 1,
-      "HUMAN_PORTAL_ACTION_OPEN": 2,
+      "HUMAN_PORTAL_ACTION_OPEN": 3,
       "MONITOR_INBOUND_ONLY": 8,
       "PRIVATE_RECONCILIATION_OPEN": 1
     },
+    "deadline_bearing_portal_action_count": 2,
     "draft_rendered_count": 0,
     "due_for_mailbox_recheck_count": 0,
     "external_send_allowed_without_human": false,
     "held_no_send_count": 1,
-    "lane_count": 16,
+    "human_portal_action_count": 3,
+    "lane_count": 17,
     "recorded_proactive_send_count": 1,
     "send_now_count": 0
   }

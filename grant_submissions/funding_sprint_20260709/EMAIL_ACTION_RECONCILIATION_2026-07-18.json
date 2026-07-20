@@ -1,5 +1,5 @@
 {
-  "as_of_date": "2026-07-18",
+  "as_of_date": "2026-07-20",
   "claim_boundary": "This dated mailbox reconciliation records only the messages observable at the check. It does not prove that no later message exists, portal state, eligibility, submission, acceptance, award, validation, or authorization to disclose private account or patent information.",
   "evidence_method": "Connected Gmail metadata and relevant-thread reconciliation against sent receipts and the canonical response register.",
   "excluded_message_classes": [
@@ -33,6 +33,34 @@
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
       "state": "PORTAL_SUBMISSION_CONFIRMED"
+    },
+    {
+      "deadline_date": "2026-07-22",
+      "deadline_time_status": "NOT_STATED_IN_MESSAGE",
+      "deadline_timezone_status": "NOT_STATED_IN_MESSAGE",
+      "do_not_duplicate_send": true,
+      "email_reply_required": false,
+      "final_form_submit_human_gated": true,
+      "financial_aid_form_action_required": true,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "nashville_ec_financial_aid_form",
+        "max_proactive_sends": 0,
+        "mode": "PORTAL_ACTION",
+        "not_before_utc": null,
+        "rationale": "A specific inbound request opened a separate financial-aid form due July 22; complete that form without resubmitting the accelerator application or sending an unnecessary email reply."
+      },
+      "initial_application_resubmission_required": false,
+      "internal_finish_target": "2026-07-21T17:00:00-05:00",
+      "lane_id": "nashville_ec_financial_aid_form",
+      "latest_event_type": "FINANCIAL_AID_FORM_REQUEST_RECEIVED",
+      "latest_event_utc": "2026-07-20T19:52:03Z",
+      "next_action": "Complete the separate three-question financial-aid form by July 22. Confirm the fee-coverage answer, review the private response sheet, and keep final Submit founder-gated. Do not resubmit the accelerator application or send an unnecessary email reply.",
+      "no_send_before": null,
+      "organization": "Nashville Entrepreneur Center",
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "FINANCIAL_AID_FORM_REQUEST_RECEIVED_ACTION_OPEN"
     },
     {
       "do_not_duplicate_send": true,
@@ -383,6 +411,7 @@
     "FHWA TSMO qualified-partner outreach",
     "Nashville EC Fall 2026 TakeOff deadline-support query",
     "Nashville EC Fall 2026 TakeOff portal-submission confirmation",
+    "Nashville EC financial-aid form request and live non-submitting schema check",
     "DARPA-SN-26-97 formal RFI response and agency-thread state",
     "MissionWeave DSIP and OpenAI Build Week portal deadlines",
     "OpenAI Build Week self-sent handoff attachment integrity",
@@ -396,10 +425,10 @@
       "sha256": "89B64A1A282AB72F0738E068952A14A82E38F5AEC4A78C1B7D2B4F4930410CB4"
     },
     "lvlup_independent_review_confirmation": {
-      "bytes": 1908,
+      "bytes": 1939,
       "path": "grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json",
       "present": true,
-      "sha256": "F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC"
+      "sha256": "0E51AB591549AC78345BE919B97AE37CD8D80133DEE65888850D2C2F8E1EC1EE"
     },
     "missionweave_dsip_action_gate": {
       "bytes": 13106,
@@ -407,17 +436,23 @@
       "present": true,
       "sha256": "60EB6F4EA94067C653BDCD7B7765AAB03DF4AD627A99B9C65E4D89C54991F53A"
     },
+    "nashville_financial_aid_action": {
+      "bytes": 2841,
+      "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FINANCIAL_AID_ACTION_2026-07-20.json",
+      "present": true,
+      "sha256": "1688435510D8BE006BFF6FDF53D2FB436CE6FF907159E3191F64065FF6D4FD9D"
+    },
     "nashville_official_deadline_confirmation": {
-      "bytes": 2272,
+      "bytes": 2310,
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json",
       "present": true,
-      "sha256": "DAC4B3120D9B4EC2A822198426939B89FE96BF7294C0CC251D1A299BB76B00E2"
+      "sha256": "39469C919CD9B7ADB0DC3F2DC260169F81B531BBFA95B530CAD4C2C998FD950A"
     },
     "nashville_submission_receipt": {
-      "bytes": 1347,
+      "bytes": 1374,
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json",
       "present": true,
-      "sha256": "E606530B0CCBAB06347BEF60DE527B4A76E5EE35BD7A15E71C3A0B49647BE505"
+      "sha256": "2B4F2F4A18725B2D585ADEA456FFCA1BF7EF0A441B3463C1EAA716D1D6D88590"
     },
     "openai_build_week_handoff_integrity_control": {
       "bytes": 3587,
@@ -432,10 +467,10 @@
       "sha256": "DAE0EF8377E3EFD60942CE9A61859C4E42CC2404917A06704A6B15B18F280E2A"
     },
     "outreach_followup_policy_config": {
-      "bytes": 5670,
+      "bytes": 6202,
       "path": "config/outreach_followup_policies_v1.json",
       "present": true,
-      "sha256": "34F758D02549726463FCC1A3BFAE36542FBEB8D393991BD66037B870DBD1444C"
+      "sha256": "43FD6A626282AFEB86A76E5EDB61D568AB1BED5AC2F81ECFB0AB9CACCADC9E86"
     },
     "outreach_response_template_registry": {
       "bytes": 18275,
@@ -444,9 +479,10 @@
       "sha256": "A72FA6DF0B4F6626D43062FC96957647CFEECC0EE5E6270333E47DA16FB61789"
     }
   },
-  "status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
+  "status": "DEADLINE_BEARING_PORTAL_ACTION_OPEN_NO_EMAIL_SEND",
   "summary": {
-    "duplicate_outbound_risk_count": 15,
+    "deadline_bearing_portal_action_count": 2,
+    "duplicate_outbound_risk_count": 16,
     "email_reply_required_count": 0,
     "external_send_allowed_without_human": false,
     "follow_up_mode_counts": {
@@ -454,12 +490,12 @@
       "CLOSED": 2,
       "INBOUND_ONLY": 8,
       "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD": 2,
-      "PORTAL_ACTION": 2,
+      "PORTAL_ACTION": 3,
       "PRIVATE_RECONCILIATION": 1
     },
     "human_account_action_count": 4,
-    "lane_count": 16,
-    "monitor_no_send_template_count": 15,
+    "lane_count": 17,
+    "monitor_no_send_template_count": 16,
     "out_of_office_count": 1,
     "send_now_count": 0
   }

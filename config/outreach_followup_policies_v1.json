@@ -18,6 +18,14 @@
       "rationale": "Portal submission is confirmed; monitor through the stated review date and answer only a specific inbound request."
     },
     {
+      "lane_id": "nashville_ec_financial_aid_form",
+      "mode": "PORTAL_ACTION",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "A specific inbound request opened a separate financial-aid form due July 22; complete that form without resubmitting the accelerator application or sending an unnecessary email reply."
+    },
+    {
       "lane_id": "epri_open_power_ai_mou",
       "mode": "INBOUND_ONLY",
       "eligible_template_id": null,

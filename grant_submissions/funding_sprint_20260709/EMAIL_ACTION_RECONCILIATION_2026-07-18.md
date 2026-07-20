@@ -1,16 +1,16 @@
 # Email Action Reconciliation
 
-As of: 2026-07-18
+As of: 2026-07-20
 
-Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
+Status: `DEADLINE_BEARING_PORTAL_ACTION_OPEN_NO_EMAIL_SEND`
 
 ## Control Line
 
-- Reconciled lanes: `16`
+- Reconciled lanes: `17`
 - Reply required now: `0`
 - Send now: `0`
-- Duplicate-outbound risks: `15`
-- No-send template coverage: `15`
+- Duplicate-outbound risks: `16`
+- No-send template coverage: `16`
 - Human account actions: `4`
 - Browser navigation performed: `false`
 
@@ -19,6 +19,7 @@ Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
 | Lane | State | Follow-up mode | Reply now | Next action |
 |---|---|---|---:|---|
 | Nashville Entrepreneur Center | `PORTAL_SUBMISSION_CONFIRMED` | `INBOUND_ONLY` | `false` | Monitor for the rolling review result through August 3; do not resubmit, reply to the automated confirmation, or describe the application as selected. |
+| Nashville Entrepreneur Center | `FINANCIAL_AID_FORM_REQUEST_RECEIVED_ACTION_OPEN` | `PORTAL_ACTION` | `false` | Complete the separate three-question financial-aid form by July 22. Confirm the fee-coverage answer, review the private response sheet, and keep final Submit founder-gated. Do not resubmit the accelerator application or send an unnecessary email reply. |
 | EPRI Open Power AI Consortium | `MOU_ROUTING_SENT_OUT_OF_OFFICE_RECEIVED` | `INBOUND_ONLY` | `false` | Wait for the MOU, a correction request, or an onboarding question; do not resend identity details. |
 | Georgia PATENTS | `SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION` | `CLOSED` | `false` | Close this pro bono route without a reply. Continue the private Patent Center docket capture, USPTO Pro Se procedural route, and a verified practitioner referral without emailing unpublished application material. |
 | Los Alamos National Laboratory | `PACKAGE_SENT_RESPONSE_PENDING` | `ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD` | `false` | Wait for LANL; use the single bounded follow-up only on or after July 23 if no reply arrives. |

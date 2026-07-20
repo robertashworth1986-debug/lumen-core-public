@@ -23,6 +23,12 @@ NASHVILLE_SUBMISSION_RECEIPT = (
     / "NASHVILLE_EC_FALL_2026"
     / "NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json"
 )
+NASHVILLE_FINANCIAL_AID_ACTION = (
+    ROOT
+    / "grant_submissions"
+    / "NASHVILLE_EC_FALL_2026"
+    / "NASHVILLE_EC_FINANCIAL_AID_ACTION_2026-07-20.json"
+)
 LVLUP_REVIEW_CONFIRMATION = (
     SPRINT_DIR / "LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json"
 )
@@ -63,7 +69,7 @@ VALID_FOLLOWUP_MODES = {
     "PRIVATE_RECONCILIATION",
 }
 
-AS_OF_DATE = "2026-07-18"
+AS_OF_DATE = "2026-07-20"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -86,6 +92,7 @@ def artifact_status(path: Path) -> dict[str, Any]:
 def build_payload() -> dict[str, Any]:
     nashville = read_json(NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION)
     nashville_submission = read_json(NASHVILLE_SUBMISSION_RECEIPT)
+    nashville_financial_aid = read_json(NASHVILLE_FINANCIAL_AID_ACTION)
     lvlup = read_json(LVLUP_REVIEW_CONFIRMATION)
     darpa = read_json(DARPA_SN_26_97_RECEIPT)
     missionweave = read_json(MISSIONWEAVE_ACTION_GATE)
@@ -106,6 +113,19 @@ def build_payload() -> dict[str, Any]:
         or nashville_submission.get("status") != "PORTAL_SUBMISSION_CONFIRMED"
     ):
         raise ValueError("Nashville application submission receipt is missing or stale")
+    if (
+        nashville_financial_aid.get("schema")
+        != "lumencore.nashville_ec_financial_aid_action.v1"
+        or nashville_financial_aid.get("status")
+        != "FINANCIAL_AID_FORM_REQUEST_RECEIVED_ACTION_OPEN"
+        or nashville_financial_aid.get("routing", {}).get(
+            "financial_aid_form_action_required"
+        )
+        is not True
+        or nashville_financial_aid.get("routing", {}).get("builder_can_submit_form")
+        is not False
+    ):
+        raise ValueError("Nashville financial-aid action receipt is missing or stale")
     if (
         lvlup.get("schema")
         != "lumencore.lvlup_independent_review_confirmation.v1"
@@ -202,6 +222,36 @@ def build_payload() -> dict[str, Any]:
             "next_action": (
                 "Monitor for the rolling review result through August 3; do not resubmit, "
                 "reply to the automated confirmation, or describe the application as selected."
+            ),
+        },
+        {
+            "lane_id": "nashville_ec_financial_aid_form",
+            "organization": "Nashville Entrepreneur Center",
+            "latest_event_type": "FINANCIAL_AID_FORM_REQUEST_RECEIVED",
+            "latest_event_utc": nashville_financial_aid["source"]["received_utc"],
+            "state": nashville_financial_aid["status"],
+            "deadline_date": nashville_financial_aid["deadline"]["date"],
+            "deadline_time_status": nashville_financial_aid["deadline"][
+                "time_status"
+            ],
+            "deadline_timezone_status": nashville_financial_aid["deadline"][
+                "timezone_status"
+            ],
+            "internal_finish_target": nashville_financial_aid["deadline"][
+                "internal_finish_target"
+            ],
+            "financial_aid_form_action_required": True,
+            "initial_application_resubmission_required": False,
+            "final_form_submit_human_gated": True,
+            "email_reply_required": False,
+            "send_now": False,
+            "no_send_before": None,
+            "do_not_duplicate_send": True,
+            "next_action": (
+                "Complete the separate three-question financial-aid form by July 22. "
+                "Confirm the fee-coverage answer, review the private response sheet, and "
+                "keep final Submit founder-gated. Do not resubmit the accelerator "
+                "application or send an unnecessary email reply."
             ),
         },
         {
@@ -487,7 +537,7 @@ def build_payload() -> dict[str, Any]:
     return {
         "schema": "lumencore.email_action_reconciliation.v1",
         "as_of_date": AS_OF_DATE,
-        "status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
+        "status": "DEADLINE_BEARING_PORTAL_ACTION_OPEN_NO_EMAIL_SEND",
         "evidence_method": (
             "Connected Gmail metadata and relevant-thread reconciliation against sent "
             "receipts and the canonical response register."
@@ -500,6 +550,7 @@ def build_payload() -> dict[str, Any]:
             "FHWA TSMO qualified-partner outreach",
             "Nashville EC Fall 2026 TakeOff deadline-support query",
             "Nashville EC Fall 2026 TakeOff portal-submission confirmation",
+            "Nashville EC financial-aid form request and live non-submitting schema check",
             "DARPA-SN-26-97 formal RFI response and agency-thread state",
             "MissionWeave DSIP and OpenAI Build Week portal deadlines",
             "OpenAI Build Week self-sent handoff attachment integrity",
@@ -529,6 +580,15 @@ def build_payload() -> dict[str, Any]:
             "out_of_office_count": 1,
             "human_account_action_count": 4,
             "external_send_allowed_without_human": False,
+            "deadline_bearing_portal_action_count": sum(
+                1
+                for lane in lanes
+                if lane["follow_up_policy"]["mode"] == "PORTAL_ACTION"
+                and (
+                    lane.get("deadline_date") is not None
+                    or lane.get("deadline_utc") is not None
+                )
+            ),
         },
         "lanes": lanes,
         "excluded_message_classes": [
@@ -542,6 +602,9 @@ def build_payload() -> dict[str, Any]:
             ),
             "nashville_submission_receipt": artifact_status(
                 NASHVILLE_SUBMISSION_RECEIPT
+            ),
+            "nashville_financial_aid_action": artifact_status(
+                NASHVILLE_FINANCIAL_AID_ACTION
             ),
             "lvlup_independent_review_confirmation": artifact_status(
                 LVLUP_REVIEW_CONFIRMATION
@@ -661,6 +724,25 @@ def validate_payload(payload: dict[str, Any]) -> None:
         or nashville["do_not_duplicate_send"] is not True
     ):
         raise ValueError("Nashville EC submission control is incomplete")
+    financial_aid = next(
+        lane
+        for lane in payload["lanes"]
+        if lane["lane_id"] == "nashville_ec_financial_aid_form"
+    )
+    if (
+        financial_aid["state"]
+        != "FINANCIAL_AID_FORM_REQUEST_RECEIVED_ACTION_OPEN"
+        or financial_aid["deadline_date"] != "2026-07-22"
+        or financial_aid["deadline_time_status"] != "NOT_STATED_IN_MESSAGE"
+        or financial_aid["deadline_timezone_status"] != "NOT_STATED_IN_MESSAGE"
+        or financial_aid["financial_aid_form_action_required"] is not True
+        or financial_aid["initial_application_resubmission_required"] is not False
+        or financial_aid["final_form_submit_human_gated"] is not True
+        or financial_aid["email_reply_required"] is not False
+        or financial_aid["do_not_duplicate_send"] is not True
+        or financial_aid["follow_up_policy"]["mode"] != "PORTAL_ACTION"
+    ):
+        raise ValueError("Nashville EC financial-aid action control is incomplete")
     lvlup = next(
         lane for lane in payload["lanes"] if lane["lane_id"] == "lvlup_optional_paid_event"
     )

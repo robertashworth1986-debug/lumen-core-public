@@ -222,7 +222,10 @@ def validate_sources(
         reconciliation.get("schema")
         != "lumencore.email_action_reconciliation.v1"
         or reconciliation.get("status")
-        != "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
+        not in {
+            "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
+            "DEADLINE_BEARING_PORTAL_ACTION_OPEN_NO_EMAIL_SEND",
+        }
         or reconciliation.get("summary", {}).get("send_now_count") != 0
     ):
         raise ValueError("Email reconciliation is missing, stale, or send-active")
@@ -296,6 +299,18 @@ def evaluate_lane(
         "action_time_human_review_required": True,
         "next_action": lane["next_action"],
     }
+    for key in (
+        "deadline_date",
+        "deadline_utc",
+        "deadline_time_status",
+        "deadline_timezone_status",
+        "internal_finish_target",
+        "financial_aid_form_action_required",
+        "initial_application_resubmission_required",
+        "final_form_submit_human_gated",
+    ):
+        if key in lane:
+            row[key] = lane[key]
 
     if mode in MODE_STATES:
         row["action_state"] = MODE_STATES[mode]
@@ -428,19 +443,33 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
     ]
     action_counts = Counter(row["action_state"] for row in actions)
     due_count = action_counts.get("RECHECK_MAILBOX_BEFORE_DRAFT", 0)
+    deadline_portal_count = sum(
+        1
+        for row in actions
+        if row["action_state"] == "HUMAN_PORTAL_ACTION_OPEN"
+        and (row.get("deadline_date") is not None or row.get("deadline_utc") is not None)
+    )
     payload: dict[str, Any] = {
         "schema": SCHEMA,
         "as_of_utc": utc_iso(as_of),
         "status": (
             "FOLLOWUP_RECHECK_DUE_HUMAN_REVIEW"
             if due_count
-            else "NO_EXTERNAL_FOLLOWUP_DUE"
+            else (
+                "DEADLINE_PORTAL_ACTION_OPEN_NO_EMAIL_SEND"
+                if deadline_portal_count
+                else "NO_EXTERNAL_FOLLOWUP_DUE"
+            )
         ),
         "summary": {
             "lane_count": len(actions),
             "action_state_counts": dict(sorted(action_counts.items())),
             "due_for_mailbox_recheck_count": due_count,
             "held_no_send_count": action_counts.get("HELD_NO_SEND", 0),
+            "human_portal_action_count": action_counts.get(
+                "HUMAN_PORTAL_ACTION_OPEN", 0
+            ),
+            "deadline_bearing_portal_action_count": deadline_portal_count,
             "draft_rendered_count": sum(1 for row in actions if row["draft_rendered"]),
             "send_now_count": sum(1 for row in actions if row["send_now"]),
             "recorded_proactive_send_count": sum(sent_counts.values()),
@@ -515,6 +544,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Lanes: `{summary['lane_count']}`",
         f"- Due for mailbox recheck: `{summary['due_for_mailbox_recheck_count']}`",
         f"- Held no-send: `{summary['held_no_send_count']}`",
+        f"- Human portal actions: `{summary['human_portal_action_count']}`",
+        f"- Deadline-bearing portal actions: `{summary['deadline_bearing_portal_action_count']}`",
         f"- Drafts rendered: `{summary['draft_rendered_count']}`",
         f"- Send now: `{summary['send_now_count']}`",
         f"- Autonomous external send allowed: `{str(summary['external_send_allowed_without_human']).lower()}`",
@@ -522,13 +553,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Action Queue",
         "",
-        "| Organization | Mode | Action state | Not before | Eligible template |",
-        "|---|---|---|---|---|",
+        "| Organization | Mode | Action state | Deadline | Not before | Eligible template |",
+        "|---|---|---|---|---|---|",
     ]
     for row in payload["actions"]:
         lines.append(
             f"| {row['organization']} | `{row['follow_up_mode']}` | "
-            f"`{row['action_state']}` | `{row['not_before_utc'] or 'none'}` | "
+            f"`{row['action_state']}` | "
+            f"`{row.get('deadline_date') or row.get('deadline_utc') or 'none'}` | "
+            f"`{row['not_before_utc'] or 'none'}` | "
             f"`{row['eligible_template_id'] or 'none'}` |"
         )
     lines.extend(["", "## Claim Boundary", "", payload["claim_boundary"], ""])

@@ -67,8 +67,8 @@
     }
   },
   "claim_boundary": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance.",
-  "direct_answer": "Nashville EC's portal displayed a submission confirmation before the operational July 17 close, and the follow-up email says rolling-review next steps are expected by August 3. Monitor without resubmitting or implying selection. DARPA-SN-26-97 received the formal two-attachment RFI package after inviting an instructions-aligned submission; monitor the thread without claiming deadline compliance or receipt acceptance. The Cambridge Systematics response lead then confirmed that its FHWA team is already set and will not add partners, so that route is closed with no follow-up. Georgia PATENTS also confirmed that it does not provide the requested already-filed prosecution support, so that route is closed. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. DARPA, EPRI, CDC, LANL, Terry, NASA, and Army are monitor-only. LvlUp confirmed that declining its optional paid sponsor track does not affect the separate investment and accelerator review, so monitor that thread without spending or sending a duplicate packet; duplicate sends would reduce credibility.",
-  "generated_utc": "2026-07-18T12:22:41.220507+00:00",
+  "direct_answer": "Nashville EC's portal displayed a submission confirmation before the operational July 17 close, and the follow-up email says rolling-review next steps are expected by August 3. Monitor without resubmitting or implying selection. A later specific inbound request opened a separate three-question financial-aid form due July 22; complete that form through its portal link, preserve the unstated time and timezone, and do not resubmit the accelerator application or send an unnecessary email reply. DARPA-SN-26-97 received the formal two-attachment RFI package after inviting an instructions-aligned submission; monitor the thread without claiming deadline compliance or receipt acceptance. The Cambridge Systematics response lead then confirmed that its FHWA team is already set and will not add partners, so that route is closed with no follow-up. Georgia PATENTS also confirmed that it does not provide the requested already-filed prosecution support, so that route is closed. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. DARPA, EPRI, CDC, LANL, Terry, NASA, and Army are monitor-only. LvlUp confirmed that declining its optional paid sponsor track does not affect the separate investment and accelerator review, so monitor that thread without spending or sending a duplicate packet; duplicate sends would reduce credibility.",
+  "generated_utc": "2026-07-20T23:53:29.277514+00:00",
   "inbox_risk_filters": [
     {
       "decision": "DO_NOT_TREAT_AS_OFFICIAL_SAM_NOTICE",
@@ -126,6 +126,32 @@
         "grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md",
         "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json",
         "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json"
+      ]
+    },
+    {
+      "action_gate": "Confirm the exact program-fee coverage answer, review the private financial response sheet, inspect the live preview, and keep final Submit founder-controlled.",
+      "claim_boundary": "This receipt records a connected-mailbox request and a non-submitting live form-schema observation. It does not prove that the financial-aid form was completed or submitted, that aid will be awarded, that the accelerator application was accepted, or that any financial statement was independently verified.",
+      "deadline": "2026-07-22",
+      "deadline_time_status": "NOT_STATED_IN_MESSAGE",
+      "deadline_timezone_status": "NOT_STATED_IN_MESSAGE",
+      "decision": "COMPLETE_SEPARATE_FINANCIAL_AID_FORM_HUMAN_SUBMIT",
+      "do_not_duplicate_send": true,
+      "email_reply_required": false,
+      "final_form_submit_human_gated": true,
+      "financial_aid_form_action_required": true,
+      "initial_application_resubmission_required": false,
+      "lane_id": "nashville_ec_financial_aid_form",
+      "next_action": "Complete the financial-aid form by July 22 without resubmitting the accelerator application or sending an unnecessary reply.",
+      "organization": "Nashville Entrepreneur Center",
+      "record_sha256": "5d9035222d4ef01a7d6324d38c928af82063cf60a752861d7bd50f97bd03b4d7",
+      "response_artifact": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FINANCIAL_AID_ACTION_2026-07-20.json",
+      "response_channel": "PORTAL_FORM",
+      "response_ready": false,
+      "send_now": false,
+      "state": "FINANCIAL_AID_FORM_REQUEST_RECEIVED_ACTION_OPEN",
+      "supporting_artifacts": [
+        "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json",
+        "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_HUMAN_FACT_RESOLUTION_2026-07-16.json"
       ]
     },
     {
@@ -379,14 +405,14 @@
       "state": "SENT_VERIFIED_RESPONSE_PENDING"
     }
   ],
-  "register_sha256": "480c85d3ab453a2591b09992e66d6721b9a833fbaf05d71dd3e31bc484d8881f",
+  "register_sha256": "a2a6671df78bf11d298153fa2adbbe08fd4b04c0cf9a44928fdee647322c3ad3",
   "schema": "lumencore.external_engagement_response_register.v1",
   "source_artifacts": {
     "cdc_engagement_receipt": {
-      "bytes": 1527,
+      "bytes": 1561,
       "path": "grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ENGAGEMENT_RECEIPT_2026-07-16.json",
       "present": true,
-      "sha256": "292157621B722B1973A1AA55140F08586AB41D07FBE38672B348C73E8A865B78"
+      "sha256": "68827B9306C9B5CB0861CA434776B22519140B3116244B91B2C27A69F052075C"
     },
     "darpa_sn_26_97_public_submission_receipt": {
       "bytes": 2834,
@@ -395,28 +421,28 @@
       "sha256": "89B64A1A282AB72F0738E068952A14A82E38F5AEC4A78C1B7D2B4F4930410CB4"
     },
     "email_action_reconciliation": {
-      "bytes": 22025,
+      "bytes": 24448,
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
       "present": true,
-      "sha256": "2C3CE20CBD6681EB2198F61E546F12B03EFCA645C5D8BA85EAD610CFD814FD54"
+      "sha256": "9FCCFAA10DDCC45888406169AE0842155500D6B206A5F6C1776142BAA37A3A3D"
     },
     "epri_engagement_receipt": {
-      "bytes": 1481,
+      "bytes": 1512,
       "path": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json",
       "present": true,
-      "sha256": "EBAFA995EB6D0BBC3749315F1F41EAC1CB0A28E56AE2EC6439C2E69757752EE8"
+      "sha256": "D2FC5B7775814B580A68D3EF7607E082039C5B33921072D726FF7FDE1AE3E57B"
     },
     "epri_response_template": {
-      "bytes": 1840,
+      "bytes": 1868,
       "path": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
       "present": true,
-      "sha256": "EFCF4FDDCED28472AA67F73B9B3D687F4DD317D42CF0162E57530B59A0114371"
+      "sha256": "B054F7D90150F88D6301DC45D0E9CCB5F391E37FD6DF5A4224AFA4B5BCA5034B"
     },
     "external_submission_receipt": {
-      "bytes": 2036,
+      "bytes": 2078,
       "path": "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json",
       "present": true,
-      "sha256": "2DAC72C484BB39A6AB5891405C00AD68C66A2D99A5152D0E53CCBE8603FBAE01"
+      "sha256": "0EFBFB6B0A6FF3162D602CF69491FE8019AE2A77B6DFB0A20F875F01786896BE"
     },
     "fhwa_partner_outreach_control": {
       "bytes": 12675,
@@ -437,22 +463,22 @@
       "sha256": "6614F9D452565F9E5F54B3E70B45E93F112DD1293A8845E43489E339D34B0819"
     },
     "georgia_patents_engagement_receipt": {
-      "bytes": 1595,
+      "bytes": 1627,
       "path": "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json",
       "present": true,
-      "sha256": "F7041E085AB62A100A41C35D8E056A0E7FE4F47FFC37D5C463FA68C5EF3C3F5F"
+      "sha256": "F0881C5A0EF673B14E11185FA5E4E1251C52115BF589E779FC2CCB3E17B3D230"
     },
     "georgia_patents_response_template": {
-      "bytes": 2822,
+      "bytes": 2871,
       "path": "grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_RESPONSE_2026-07-16.md",
       "present": true,
-      "sha256": "1AFB40471C270B6DC7D69D2B07D7718D5D57DB8D16B1CB96F6B42FADE33D2A39"
+      "sha256": "BB4A6D15C5CAE9E985483013C9608300DB561344461E63441BB684BBE3161B35"
     },
     "lanl_engagement_receipt": {
-      "bytes": 1414,
+      "bytes": 1447,
       "path": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json",
       "present": true,
-      "sha256": "74303CFC65C85D9EF73FB80CC8177E5D08DF43D03264FFCE73251ACD2CD9E9D0"
+      "sha256": "F482C11021357601F76107C18CD444189709118CEA32367744D525EBDD5D28EE"
     },
     "launchtn_application_manifest": {
       "bytes": 22736,
@@ -473,16 +499,16 @@
       "sha256": "C607E94D8E072EC9D9F93DA0D8C372FD5592B01D2CA3B4F71C0A079417C18A69"
     },
     "lvlup_historical_application_draft": {
-      "bytes": 12152,
+      "bytes": 12378,
       "path": "docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md",
       "present": true,
-      "sha256": "F75EBF8FD60A40968484D6AE147FB6D02848CA109AB277337C5BAE5085CBA796"
+      "sha256": "F909545B85C67B4158934EBCBCCCD6635CA759F134B96AFE557D8548BEE5824E"
     },
     "lvlup_independent_review_confirmation": {
-      "bytes": 1908,
+      "bytes": 1939,
       "path": "grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json",
       "present": true,
-      "sha256": "F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC"
+      "sha256": "0E51AB591549AC78345BE919B97AE37CD8D80133DEE65888850D2C2F8E1EC1EE"
     },
     "nashville_application_manifest": {
       "bytes": 18360,
@@ -491,16 +517,22 @@
       "sha256": "CD9501D1A61E248A62329595297592D00593BF0086C87DA58E120DF43DE2EF11"
     },
     "nashville_deadline_preservation_receipt": {
-      "bytes": 1801,
+      "bytes": 1839,
       "path": "grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_ENGAGEMENT_RECEIPT_2026-07-17.json",
       "present": true,
-      "sha256": "42FC996C7EBCDCE4027CCA5397347195D5B8FE74C90E75EFD114BD8265DC20B5"
+      "sha256": "C072CEFA57B60EE99ACC64CB7EC7B2E691EF1EE180C458C156593123778AA8ED"
     },
     "nashville_deadline_response_control": {
-      "bytes": 2610,
+      "bytes": 2663,
       "path": "grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md",
       "present": true,
-      "sha256": "81225B12C7B8B7E614A0FD50D559BCE076E2142E0535E06EA15DEB01FE1A9C93"
+      "sha256": "3E00B4EE5B717B37E65F66A334434949E3711496AC03DF76051CFEB510D7B1D9"
+    },
+    "nashville_financial_aid_action": {
+      "bytes": 2841,
+      "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FINANCIAL_AID_ACTION_2026-07-20.json",
+      "present": true,
+      "sha256": "1688435510D8BE006BFF6FDF53D2FB436CE6FF907159E3191F64065FF6D4FD9D"
     },
     "nashville_human_fact_resolution": {
       "bytes": 8597,
@@ -509,16 +541,16 @@
       "sha256": "998A267A08DF9E8923FAB1E57740F00F52270228A49417F40DA73AF4AA6D4D33"
     },
     "nashville_official_deadline_confirmation": {
-      "bytes": 2272,
+      "bytes": 2310,
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json",
       "present": true,
-      "sha256": "DAC4B3120D9B4EC2A822198426939B89FE96BF7294C0CC251D1A299BB76B00E2"
+      "sha256": "39469C919CD9B7ADB0DC3F2DC260169F81B531BBFA95B530CAD4C2C998FD950A"
     },
     "nashville_private_collector": {
-      "bytes": 11024,
+      "bytes": 11355,
       "path": "code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py",
       "present": true,
-      "sha256": "379A150CC558D9A37ED53D8C48C291275C3A04241CB91F164377E309A5E9D165"
+      "sha256": "99C701AC3D140AC8660A8911BADB72D77DD42C093859B40CE60117FDE85D9659"
     },
     "nashville_private_fill_map": {
       "bytes": 0,
@@ -529,16 +561,16 @@
       "sha256_published": false
     },
     "nashville_private_workflow": {
-      "bytes": 2256,
+      "bytes": 2300,
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_PRIVATE_FACT_CAPTURE_WORKFLOW_2026-07-17.md",
       "present": true,
-      "sha256": "FAD93E7ED7C93A1406657D5D678A3673CFD73ED29FE4DE5205E223E948EA9D88"
+      "sha256": "1582F5AE5D723EE4428858D4BED67DB0A4C84983A12F00EA30D6B84BB891AB51"
     },
     "nashville_submission_receipt": {
-      "bytes": 1347,
+      "bytes": 1374,
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json",
       "present": true,
-      "sha256": "E606530B0CCBAB06347BEF60DE527B4A76E5EE35BD7A15E71C3A0B49647BE505"
+      "sha256": "2B4F2F4A18725B2D585ADEA456FFCA1BF7EF0A441B3463C1EAA716D1D6D88590"
     },
     "patent_deadline_control": {
       "bytes": 6671,
@@ -547,16 +579,16 @@
       "sha256": "096904E114457C56383E495CFAD6C6E3D0D31596D6B53E2920099608B2B7519B"
     },
     "patent_practitioner_request_template": {
-      "bytes": 1815,
+      "bytes": 1849,
       "path": "grant_submissions/funding_sprint_20260709/PATENT_PRACTITIONER_DOCKET_REVIEW_REQUEST_TEMPLATE_2026-07-17.md",
       "present": true,
-      "sha256": "FAC3AA9FD88207FB881F33B38201325369E4820CDC34F6562079FEE7218D4792"
+      "sha256": "EDF9D63D01B49320D3FD04A9181C595A7EF56B7E34817C4832DE0519C824DD86"
     },
     "patent_private_capture_workflow": {
-      "bytes": 3090,
+      "bytes": 3144,
       "path": "grant_submissions/funding_sprint_20260709/PATENT_CENTER_PRIVATE_DOCKET_CAPTURE_WORKFLOW_2026-07-17.md",
       "present": true,
-      "sha256": "632D44E5640A6AF6E2BB63F157219799C834DD383E892CAC3247C2D4FB98734C"
+      "sha256": "A4AB18EBDBB2AA5591FCE2AA4A8811CC165FBCE7050B7C748EC3A9E45D41025C"
     },
     "sam_public_credential_rotation_control": {
       "bytes": 4544,
@@ -570,11 +602,11 @@
     "all_attachment_checks_pass": true,
     "autonomous_external_send_allowed": false,
     "autonomous_final_portal_submission_allowed": false,
-    "do_not_duplicate_send_count": 12,
-    "email_action_reconciliation_status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
-    "immediate_human_action_count": 1,
+    "do_not_duplicate_send_count": 13,
+    "email_action_reconciliation_status": "DEADLINE_BEARING_PORTAL_ACTION_OPEN_NO_EMAIL_SEND",
+    "immediate_human_action_count": 2,
     "monitor_only_count": 9,
-    "record_count": 13,
+    "record_count": 14,
     "verified_attachment_count": 6
   }
 }

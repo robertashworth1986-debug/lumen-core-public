@@ -1,0 +1,79 @@
+{
+  "action_receipt_sha256": "5cc087f625cd620aaddcb643a869f8c349f6a94be0d5a645d17a3b5d657058ef",
+  "claim_boundary": "This receipt records a connected-mailbox request and a non-submitting live form-schema observation. It does not prove that the financial-aid form was completed or submitted, that aid will be awarded, that the accelerator application was accepted, or that any financial statement was independently verified.",
+  "deadline": {
+    "date": "2026-07-22",
+    "internal_finish_target": "2026-07-21T17:00:00-05:00",
+    "internal_finish_target_status": "INTERNAL_TARGET_NOT_OFFICIAL_DEADLINE",
+    "time": null,
+    "time_status": "NOT_STATED_IN_MESSAGE",
+    "timezone": null,
+    "timezone_status": "NOT_STATED_IN_MESSAGE",
+    "weekday": "Wednesday"
+  },
+  "live_form_observation": {
+    "form_submitted_during_observation": false,
+    "method": "NON_SUBMITTING_BROWSER_DOM_INSPECTION",
+    "observed_utc": "2026-07-20T23:36:30Z",
+    "optional_context_field_count": 1,
+    "optional_fields": [
+      {
+        "control": "RICH_TEXT",
+        "field": "Anything about your situation you'd like us to know?"
+      }
+    ],
+    "required_fields": [
+      {
+        "control": "TEXT",
+        "field": "First Name"
+      },
+      {
+        "control": "TEXT",
+        "field": "Last Name"
+      },
+      {
+        "control": "SELECT",
+        "field": "How much of the program fee can you cover right now?",
+        "options": [
+          "None of it",
+          "Part of it",
+          "I can pay in full - I just need to confirm my spot"
+        ]
+      },
+      {
+        "control": "CURRENCY",
+        "field": "What is your current monthly revenue?"
+      },
+      {
+        "control": "SELECT",
+        "field": "Have you raised any outside capital in the last 12 months?",
+        "options": [
+          "Yes",
+          "No"
+        ]
+      }
+    ],
+    "required_financial_question_count": 3,
+    "required_identity_field_count": 2
+  },
+  "organization": "Nashville Entrepreneur Center",
+  "program": "Fall 2026 TakeOff accelerator",
+  "routing": {
+    "builder_can_submit_form": false,
+    "duplicate_application_send_allowed": false,
+    "email_reply_required": false,
+    "final_form_submit_human_gated": true,
+    "financial_aid_form_action_required": true,
+    "initial_application_resubmission_required": false
+  },
+  "schema": "lumencore.nashville_ec_financial_aid_action.v1",
+  "source": {
+    "channel": "CONNECTED_GMAIL_INBOUND",
+    "private_form_url_recorded": false,
+    "private_source_identifier_recorded": false,
+    "received_utc": "2026-07-20T19:52:03Z",
+    "sender_role": "Program Manager",
+    "subject": "Following Up on Your Accelerator Application"
+  },
+  "status": "FINANCIAL_AID_FORM_REQUEST_RECEIVED_ACTION_OPEN"
+}

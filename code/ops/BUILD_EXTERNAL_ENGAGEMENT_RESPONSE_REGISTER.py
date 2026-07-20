@@ -79,6 +79,12 @@ NASHVILLE_SUBMISSION_RECEIPT = (
     / "NASHVILLE_EC_FALL_2026"
     / "NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json"
 )
+NASHVILLE_FINANCIAL_AID_ACTION = (
+    ROOT
+    / "grant_submissions"
+    / "NASHVILLE_EC_FALL_2026"
+    / "NASHVILLE_EC_FINANCIAL_AID_ACTION_2026-07-20.json"
+)
 LAUNCHTN_MANIFEST = (
     ROOT
     / "grant_submissions"
@@ -251,6 +257,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     nashville_deadline = read_json(NASHVILLE_DEADLINE_RECEIPT)
     nashville_official_deadline = read_json(NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION)
     nashville_submission = read_json(NASHVILLE_SUBMISSION_RECEIPT)
+    nashville_financial_aid = read_json(NASHVILLE_FINANCIAL_AID_ACTION)
     launchtn = read_json(LAUNCHTN_MANIFEST)
     lvlup_review = read_json(LVLUP_REVIEW_CONFIRMATION)
     sam_rotation = read_json(SAM_ROTATION_CONTROL)
@@ -279,6 +286,19 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         or nashville_submission.get("status") != "PORTAL_SUBMISSION_CONFIRMED"
     ):
         raise ValueError("Nashville EC submission receipt is missing or stale")
+    if (
+        nashville_financial_aid.get("schema")
+        != "lumencore.nashville_ec_financial_aid_action.v1"
+        or nashville_financial_aid.get("status")
+        != "FINANCIAL_AID_FORM_REQUEST_RECEIVED_ACTION_OPEN"
+        or nashville_financial_aid.get("routing", {}).get(
+            "financial_aid_form_action_required"
+        )
+        is not True
+        or nashville_financial_aid.get("routing", {}).get("builder_can_submit_form")
+        is not False
+    ):
+        raise ValueError("Nashville EC financial-aid action is missing or stale")
     if (
         lvlup_review.get("schema")
         != "lumencore.lvlup_independent_review_confirmation.v1"
@@ -309,7 +329,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     ):
         raise ValueError("FHWA partner outreach control is missing or stale")
     if email_reconciliation.get("status") != (
-        "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
+        "DEADLINE_BEARING_PORTAL_ACTION_OPEN_NO_EMAIL_SEND"
     ):
         raise ValueError("Email action reconciliation requires a fresh action review")
     reconciliation_lanes = {
@@ -317,6 +337,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     }
     if {
         "nashville_ec_takeoff_fall_2026",
+        "nashville_ec_financial_aid_form",
         "epri_open_power_ai_mou",
         "georgia_patents_pro_bono_intake",
         "darpa_sn_26_97_low_resource_computing_rfi",
@@ -389,6 +410,42 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             ],
             "next_action": "Monitor the existing account through August 3. Do not resubmit or reply to the automated confirmation, and do not describe the application as accepted, selected, or funded.",
             "claim_boundary": nashville_submission["claim_boundary"],
+        },
+        {
+            "lane_id": "nashville_ec_financial_aid_form",
+            "organization": "Nashville Entrepreneur Center",
+            "state": nashville_financial_aid["status"],
+            "deadline": nashville_financial_aid["deadline"]["date"],
+            "deadline_time_status": nashville_financial_aid["deadline"][
+                "time_status"
+            ],
+            "deadline_timezone_status": nashville_financial_aid["deadline"][
+                "timezone_status"
+            ],
+            "decision": "COMPLETE_SEPARATE_FINANCIAL_AID_FORM_HUMAN_SUBMIT",
+            "response_channel": "PORTAL_FORM",
+            "response_ready": False,
+            "send_now": False,
+            "do_not_duplicate_send": True,
+            "action_gate": (
+                "Confirm the exact program-fee coverage answer, review the private "
+                "financial response sheet, inspect the live preview, and keep final "
+                "Submit founder-controlled."
+            ),
+            "response_artifact": rel(NASHVILLE_FINANCIAL_AID_ACTION),
+            "supporting_artifacts": [
+                rel(NASHVILLE_SUBMISSION_RECEIPT),
+                rel(NASHVILLE_FACT_RESOLUTION),
+            ],
+            "initial_application_resubmission_required": False,
+            "email_reply_required": False,
+            "financial_aid_form_action_required": True,
+            "final_form_submit_human_gated": True,
+            "next_action": (
+                "Complete the financial-aid form by July 22 without resubmitting the "
+                "accelerator application or sending an unnecessary reply."
+            ),
+            "claim_boundary": nashville_financial_aid["claim_boundary"],
         },
         {
             "lane_id": "launchtn_3686_pitch_2026",
@@ -701,6 +758,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "status": "CURRENT_RESPONSE_CONTROL_HUMAN_GATED",
         "direct_answer": (
             "Nashville EC's portal displayed a submission confirmation before the operational July 17 close, and the follow-up email says rolling-review next steps are expected by August 3. Monitor without resubmitting or implying selection. "
+            "A later specific inbound request opened a separate three-question financial-aid form due July 22; complete that form through its portal link, preserve the unstated time and timezone, and do not resubmit the accelerator application or send an unnecessary email reply. "
             "DARPA-SN-26-97 received the formal two-attachment RFI package after inviting an instructions-aligned submission; monitor the thread without claiming deadline compliance or receipt acceptance. "
             "The Cambridge Systematics response lead then confirmed that its FHWA team is already set and will not add partners, so that route is closed with no follow-up. Georgia PATENTS also confirmed that it does not provide the requested already-filed prosecution support, so that route is closed. "
             "No additional email should be sent now. "
@@ -713,7 +771,11 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "immediate_human_action_count": sum(
                 1
                 for row in records
-                if row["lane_id"] == "sam_public_credential_rotation"
+                if row["lane_id"]
+                in {
+                    "sam_public_credential_rotation",
+                    "nashville_ec_financial_aid_form",
+                }
             ),
             "monitor_only_count": sum(1 for row in records if str(row["decision"]).startswith("MONITOR")),
             "do_not_duplicate_send_count": sum(1 for row in records if row["do_not_duplicate_send"]),
@@ -768,6 +830,9 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             ),
             "nashville_submission_receipt": artifact_status(
                 NASHVILLE_SUBMISSION_RECEIPT
+            ),
+            "nashville_financial_aid_action": artifact_status(
+                NASHVILLE_FINANCIAL_AID_ACTION
             ),
             "nashville_private_fill_map": {
                 "path": rel(NASHVILLE_PRIVATE_FILL_MAP),

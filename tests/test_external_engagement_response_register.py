@@ -42,12 +42,12 @@ def test_register_routes_current_actions_without_duplicate_sends():
     records = {row["lane_id"]: row for row in payload["records"]}
 
     assert payload["schema"] == "lumencore.external_engagement_response_register.v1"
-    assert payload["summary"]["record_count"] == 13
-    assert payload["summary"]["immediate_human_action_count"] == 1
+    assert payload["summary"]["record_count"] == 14
+    assert payload["summary"]["immediate_human_action_count"] == 2
     assert payload["summary"]["monitor_only_count"] == 9
-    assert payload["summary"]["do_not_duplicate_send_count"] == 12
+    assert payload["summary"]["do_not_duplicate_send_count"] == 13
     assert payload["summary"]["email_action_reconciliation_status"] == (
-        "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
+        "DEADLINE_BEARING_PORTAL_ACTION_OPEN_NO_EMAIL_SEND"
     )
     assert payload["summary"]["autonomous_external_send_allowed"] is False
     assert payload["summary"]["autonomous_final_portal_submission_allowed"] is False
@@ -70,7 +70,7 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert nashville["official_close_time_confirmed"] is True
     assert nashville["deadline_timezone_explicit_in_message"] is False
     assert nashville["operational_timezone"] == "America/Chicago"
-    assert nashville["private_fill_map_present"] is True
+    assert nashville["private_fill_map_present"] is module.NASHVILLE_PRIVATE_FILL_MAP.is_file()
     assert nashville["private_fact_values_read_or_published"] is False
     assert nashville["portal_submission_verified"] is True
     assert nashville["expected_next_steps_by"] == "2026-08-03"
@@ -87,7 +87,9 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert payload["source_artifacts"]["nashville_human_fact_resolution"]["present"] is True
     assert payload["source_artifacts"]["nashville_private_collector"]["present"] is True
     assert payload["source_artifacts"]["nashville_private_workflow"]["present"] is True
-    assert payload["source_artifacts"]["nashville_private_fill_map"]["present"] is True
+    assert payload["source_artifacts"]["nashville_private_fill_map"][
+        "present"
+    ] is module.NASHVILLE_PRIVATE_FILL_MAP.is_file()
     assert payload["source_artifacts"]["nashville_private_fill_map"]["bytes"] == 0
     assert payload["source_artifacts"]["nashville_private_fill_map"]["sha256"] is None
     assert payload["source_artifacts"]["nashville_private_fill_map"]["private_values_read_or_published"] is False
@@ -95,6 +97,26 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert payload["source_artifacts"]["nashville_deadline_response_control"]["present"] is True
     assert payload["source_artifacts"]["nashville_official_deadline_confirmation"]["present"] is True
     assert payload["source_artifacts"]["nashville_submission_receipt"]["present"] is True
+    financial_aid = records["nashville_ec_financial_aid_form"]
+    assert financial_aid["state"] == (
+        "FINANCIAL_AID_FORM_REQUEST_RECEIVED_ACTION_OPEN"
+    )
+    assert financial_aid["deadline"] == "2026-07-22"
+    assert financial_aid["deadline_time_status"] == "NOT_STATED_IN_MESSAGE"
+    assert financial_aid["deadline_timezone_status"] == "NOT_STATED_IN_MESSAGE"
+    assert financial_aid["decision"] == (
+        "COMPLETE_SEPARATE_FINANCIAL_AID_FORM_HUMAN_SUBMIT"
+    )
+    assert financial_aid["response_channel"] == "PORTAL_FORM"
+    assert financial_aid["financial_aid_form_action_required"] is True
+    assert financial_aid["initial_application_resubmission_required"] is False
+    assert financial_aid["email_reply_required"] is False
+    assert financial_aid["final_form_submit_human_gated"] is True
+    assert financial_aid["do_not_duplicate_send"] is True
+    assert financial_aid["send_now"] is False
+    assert payload["source_artifacts"]["nashville_financial_aid_action"][
+        "present"
+    ] is True
     launchtn = records["launchtn_3686_pitch_2026"]
     assert launchtn["deadline"] == "2026-08-13T23:59:00-05:00"
     assert launchtn["state"] == (

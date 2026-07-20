@@ -34,21 +34,22 @@ def test_reconciliation_is_deterministic_and_no_send():
 
     module.validate_payload(actual)
     assert actual == expected
-    assert actual["status"] == "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
-    assert actual["summary"]["lane_count"] == 16
+    assert actual["status"] == "DEADLINE_BEARING_PORTAL_ACTION_OPEN_NO_EMAIL_SEND"
+    assert actual["summary"]["lane_count"] == 17
     assert actual["summary"]["email_reply_required_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
-    assert actual["summary"]["duplicate_outbound_risk_count"] == 15
-    assert actual["summary"]["monitor_no_send_template_count"] == 15
+    assert actual["summary"]["duplicate_outbound_risk_count"] == 16
+    assert actual["summary"]["monitor_no_send_template_count"] == 16
     assert actual["summary"]["follow_up_mode_counts"] == {
         "ACCOUNT_ACTION": 1,
         "CLOSED": 2,
         "INBOUND_ONLY": 8,
         "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD": 2,
-        "PORTAL_ACTION": 2,
+        "PORTAL_ACTION": 3,
         "PRIVATE_RECONCILIATION": 1,
     }
     assert actual["summary"]["human_account_action_count"] == 4
+    assert actual["summary"]["deadline_bearing_portal_action_count"] == 2
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert all(lane["send_now"] is False for lane in actual["lanes"])
 
@@ -146,6 +147,26 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert "do not resubmit" in nashville["next_action"]
     assert nashville["follow_up_policy"]["mode"] == "INBOUND_ONLY"
 
+    financial_aid = lanes["nashville_ec_financial_aid_form"]
+    assert financial_aid["latest_event_type"] == (
+        "FINANCIAL_AID_FORM_REQUEST_RECEIVED"
+    )
+    assert financial_aid["latest_event_utc"] == "2026-07-20T19:52:03Z"
+    assert financial_aid["state"] == (
+        "FINANCIAL_AID_FORM_REQUEST_RECEIVED_ACTION_OPEN"
+    )
+    assert financial_aid["deadline_date"] == "2026-07-22"
+    assert financial_aid["deadline_time_status"] == "NOT_STATED_IN_MESSAGE"
+    assert financial_aid["deadline_timezone_status"] == "NOT_STATED_IN_MESSAGE"
+    assert financial_aid["financial_aid_form_action_required"] is True
+    assert financial_aid["initial_application_resubmission_required"] is False
+    assert financial_aid["final_form_submit_human_gated"] is True
+    assert financial_aid["email_reply_required"] is False
+    assert financial_aid["do_not_duplicate_send"] is True
+    assert financial_aid["send_now"] is False
+    assert financial_aid["follow_up_policy"]["mode"] == "PORTAL_ACTION"
+    assert "Do not resubmit" in financial_aid["next_action"]
+
     lanl = lanes["lanl_vision_licensing_followup"]
     assert lanl["follow_up_policy"] == {
         "lane_id": "lanl_vision_licensing_followup",
@@ -175,6 +196,7 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     source_evidence = module.build_payload()["source_evidence"]
     assert source_evidence["nashville_official_deadline_confirmation"]["present"] is True
     assert source_evidence["nashville_submission_receipt"]["present"] is True
+    assert source_evidence["nashville_financial_aid_action"]["present"] is True
     assert source_evidence["lvlup_independent_review_confirmation"]["present"] is True
     assert source_evidence["darpa_sn_26_97_public_submission_receipt"]["present"] is True
     assert source_evidence["missionweave_dsip_action_gate"]["present"] is True
