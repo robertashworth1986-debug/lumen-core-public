@@ -1,5 +1,5 @@
 {
-  "capsule_sha256": "8cd4144854da6448c45883a1b46970cdea00a61c5266e8102a789f299d7253b8",
+  "capsule_sha256": "5555b241734f01f98118f38b5080d1b5e925a9679e3b832150667c5003589707",
   "claim_boundary": "A passing capsule proves that the named code reproduced the declared bounded facts from the packaged input under the recorded environment. It does not prove agency approval, cybersecurity certification, external validation, field performance, realized savings, patent scope, trading performance, or funding eligibility.",
   "dependencies": [
     {
@@ -217,7 +217,7 @@
       }
     },
     "implementation": "CPython",
-    "platform": "Linux-6.17.0-1020-azure-x86_64-with-glibc2.39",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
     "python": "3.11.9",
     "pythonhashseed": "0",
     "runtime_control": {
@@ -273,10 +273,10 @@
       "-k",
       "not frozen_eia_panel_and_result_manifests_are_hash_valid_and_claim_safe and not published_receipt_reconciles_hashes_assertions_and_public_projection and not sbom_has_scoped_component_identity_and_dependency_relationships and not markdown_reports_failures_and_unmet_external_gates_plainly"
     ],
-    "elapsed_seconds": 5.153,
+    "elapsed_seconds": 11.054,
     "exit_code": 0,
     "log_path": "out/reproducibility/ci/logs/fixture_tests.log",
-    "log_sha256": "ed69b8e9ba0045b9ea70b5f85e3980030f98dc1034dc978e2534c693710226ab",
+    "log_sha256": "2f35de92f581c140fa86135b411c36477b10fb571858bbc3c95e7c8b942bfd67",
     "passed": true
   },
   "frozen_input": {
@@ -316,10 +316,10 @@
     "passed": true,
     "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz"
   },
-  "generated_utc": "2026-07-16T02:51:34.802696+00:00",
+  "generated_utc": "2026-07-21T04:50:17.817043+00:00",
   "git": {
-    "branch": "codex/live-domain-proof-feed-bundle",
-    "commit": "7ec23f948bef5bce5441ac75be9603216e78c019",
+    "branch": "",
+    "commit": "2b04a9df3a78c3b6b61d5ceb15c2265ef900853f",
     "relevant_change_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "relevant_change_line_count": 0,
     "relevant_source_clean": true
@@ -356,16 +356,16 @@
       "sha256": "2fa8feb63735603960688161a252d2efa68077a51b27dc48bcdfe0d99d0ae14e"
     },
     {
-      "bytes": 2618,
+      "bytes": 2660,
       "hash_mode": "utf8_lf",
       "path": ".gitignore",
-      "sha256": "c25c01afa309ecee57a768b3d4e5ca98cc0bcfb6d7afaaf861da113b2421adbb"
+      "sha256": "72bba006cb5d77f56677464c515d3ea5fff56293542d8655f2d14cd4099d59a7"
     },
     {
-      "bytes": 13623,
+      "bytes": 15541,
       "hash_mode": "utf8_lf",
       "path": "README.md",
-      "sha256": "c08b9273c6bcb8a2cba388d1fa5a680010d325106da5399b6cd9f7c0b739fac1"
+      "sha256": "f9a868e41bc8d824c105a73254a2b78ec68a753f65700ef0bf59188b39aeca56"
     },
     {
       "bytes": 41017,
@@ -476,7 +476,7 @@
       "sha256": "4995d85976b862e16041e7e42ef005c0cb9b1543944cbed11ea254a37923948b"
     }
   ],
-  "source_chain_sha256": "b3e9af659d12ba0150754e1ec3e38c9dc04d62575fbafe4e93679f055d7c336f",
+  "source_chain_sha256": "ca04c902d143c89f1ae9bf089447be241060ef39c504199d5a865d219760679c",
   "standards_references": [
     {
       "name": "NIST SP 800-218 Secure Software Development Framework 1.1",
@@ -564,7 +564,7 @@
           "passed": true
         }
       ],
-      "elapsed_seconds": 30.92,
+      "elapsed_seconds": 25.745,
       "fact_projection": {
         "baseline_comparison_count": 6,
         "best_mase": 0.4794593727181179,
@@ -647,7 +647,7 @@
           "passed": true
         }
       ],
-      "elapsed_seconds": 10.109,
+      "elapsed_seconds": 9.116,
       "fact_projection": {
         "baseline_comparison_count": 6,
         "best_mase": 0.2112062642583228,
@@ -719,7 +719,7 @@
           "passed": true
         }
       ],
-      "elapsed_seconds": 0.108,
+      "elapsed_seconds": 0.237,
       "fact_projection": {
         "candidate_micro_f1": 0.9433962264150945,
         "candidate_supported_coverage": 0.9583333333333334,
