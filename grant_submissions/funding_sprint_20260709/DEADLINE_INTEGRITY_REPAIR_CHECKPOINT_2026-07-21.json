@@ -1,11 +1,11 @@
 {
   "schema": "lumencore.deadline_integrity_repair_checkpoint.v1",
-  "created_utc": "2026-07-21T16:00:26.133070Z",
-  "source_commit": "a65e1ae73c32cc0591e43f7a66669ee5d64ddcea",
+  "created_utc": "2026-07-21T16:25:07.621482Z",
+  "source_commit": "1f776a5c1b00ac6687b97f6e9cc2121bbbad7246",
   "source_branch": "codex/deadline-integrity-repair-20260721",
   "source_worktree_tracked_clean": true,
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721",
-  "artifact_count": 44,
+  "artifact_count": 45,
   "all_source_git_blobs_match_commit": true,
   "all_sha256_matched_after_copy": true,
   "relative_paths_preserved": true,
@@ -18,13 +18,13 @@
     {
       "source": "code/ops/BUILD_DEADLINE_INTEGRITY_REPAIR_CHECKPOINT.py",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/code/ops/BUILD_DEADLINE_INTEGRITY_REPAIR_CHECKPOINT.py",
-      "bytes": 11006,
-      "sha256": "5C1DF08413C755B315D5F1DB3E4B0721EBE8E0D6B06EA645B40A13152F9D21A3",
-      "source_git_blob_oid": "9113a51ba7848c92b2a4627766145be8e09892a2",
-      "commit_git_blob_oid": "9113a51ba7848c92b2a4627766145be8e09892a2",
+      "bytes": 11092,
+      "sha256": "EE56EEEA73F67F491B4424EE062B0597E315CF472B832F3A762A40ADEA3B9ED2",
+      "source_git_blob_oid": "3f9b928c94213cb7000f6069951883b53b2c064b",
+      "commit_git_blob_oid": "3f9b928c94213cb7000f6069951883b53b2c064b",
       "source_git_blob_match": true,
-      "copy_bytes": 11006,
-      "copy_sha256": "5C1DF08413C755B315D5F1DB3E4B0721EBE8E0D6B06EA645B40A13152F9D21A3",
+      "copy_bytes": 11092,
+      "copy_sha256": "EE56EEEA73F67F491B4424EE062B0597E315CF472B832F3A762A40ADEA3B9ED2",
       "copy_sha256_matched": true
     },
     {
@@ -42,13 +42,13 @@
     {
       "source": "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
-      "bytes": 34464,
-      "sha256": "238D118BC364B698B15D284D32BFD44FE79801651A9036FE8BBA730AD7962D54",
-      "source_git_blob_oid": "0699e22f0f6585651956d7543d64825b1e909b06",
-      "commit_git_blob_oid": "0699e22f0f6585651956d7543d64825b1e909b06",
+      "bytes": 36646,
+      "sha256": "669269772CC19980C526EA05B6DDC73788415EF61E92C3F1F887BD176969C5A7",
+      "source_git_blob_oid": "8b875868081f1c7e6296b6008083613e15fe712f",
+      "commit_git_blob_oid": "8b875868081f1c7e6296b6008083613e15fe712f",
       "source_git_blob_match": true,
-      "copy_bytes": 34464,
-      "copy_sha256": "238D118BC364B698B15D284D32BFD44FE79801651A9036FE8BBA730AD7962D54",
+      "copy_bytes": 36646,
+      "copy_sha256": "669269772CC19980C526EA05B6DDC73788415EF61E92C3F1F887BD176969C5A7",
       "copy_sha256_matched": true
     },
     {
@@ -90,13 +90,13 @@
     {
       "source": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-      "bytes": 172044,
-      "sha256": "73025CA79BA1045F9845FE36EE3A1B4B56D684A4266DBD01D371B090358A176A",
-      "source_git_blob_oid": "bc275660e7a3dddd5649292162a3ab2a25b9aafe",
-      "commit_git_blob_oid": "bc275660e7a3dddd5649292162a3ab2a25b9aafe",
+      "bytes": 177805,
+      "sha256": "9C1582BF358A12B8F61C3AE55FA440C00D449F4922893DA6D3B63E5C6738BCD9",
+      "source_git_blob_oid": "3c2fd1828e36bf41329e4bfc3f950876593f6a7d",
+      "commit_git_blob_oid": "3c2fd1828e36bf41329e4bfc3f950876593f6a7d",
       "source_git_blob_match": true,
-      "copy_bytes": 172044,
-      "copy_sha256": "73025CA79BA1045F9845FE36EE3A1B4B56D684A4266DBD01D371B090358A176A",
+      "copy_bytes": 177805,
+      "copy_sha256": "9C1582BF358A12B8F61C3AE55FA440C00D449F4922893DA6D3B63E5C6738BCD9",
       "copy_sha256_matched": true
     },
     {
@@ -126,13 +126,13 @@
     {
       "source": "config/outreach_followup_policies_v1.json",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/config/outreach_followup_policies_v1.json",
-      "bytes": 5933,
-      "sha256": "04BEFE8110CABF522F6D907ADA945D07C70AACFEE5401A87BA69EECE117ADDBF",
-      "source_git_blob_oid": "54431dc86436957d0124c909a8b7359c218ecea9",
-      "commit_git_blob_oid": "54431dc86436957d0124c909a8b7359c218ecea9",
+      "bytes": 5996,
+      "sha256": "36FA2CE5728294B2B4F170BF4AC933F3A633C43D48D67B15E88BD425A06DE824",
+      "source_git_blob_oid": "5aa2d2b319c346f2b21fbc957bc1bc3bb0eb6620",
+      "commit_git_blob_oid": "5aa2d2b319c346f2b21fbc957bc1bc3bb0eb6620",
       "source_git_blob_match": true,
-      "copy_bytes": 5933,
-      "copy_sha256": "04BEFE8110CABF522F6D907ADA945D07C70AACFEE5401A87BA69EECE117ADDBF",
+      "copy_bytes": 5996,
+      "copy_sha256": "36FA2CE5728294B2B4F170BF4AC933F3A633C43D48D67B15E88BD425A06DE824",
       "copy_sha256_matched": true
     },
     {
@@ -157,6 +157,18 @@
       "source_git_blob_match": true,
       "copy_bytes": 36934,
       "copy_sha256": "E1B1D023F653E7533CE2193B78D2CEC86EBE37D60EAD58762CCD55B92893F6A9",
+      "copy_sha256_matched": true
+    },
+    {
+      "source": "evidence/openai_build_week/prooflock_youtube_publication_receipt_20260721.json",
+      "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/evidence/openai_build_week/prooflock_youtube_publication_receipt_20260721.json",
+      "bytes": 3457,
+      "sha256": "127D3286581634E34592C420CAD6D109C119570947C210EC1FCC653F578F3C14",
+      "source_git_blob_oid": "359ea5cfe79b31fc7e9073d97af99b18456429c3",
+      "commit_git_blob_oid": "359ea5cfe79b31fc7e9073d97af99b18456429c3",
+      "source_git_blob_match": true,
+      "copy_bytes": 3457,
+      "copy_sha256": "127D3286581634E34592C420CAD6D109C119570947C210EC1FCC653F578F3C14",
       "copy_sha256_matched": true
     },
     {
@@ -222,13 +234,13 @@
     {
       "source": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
-      "bytes": 23662,
-      "sha256": "899F7E6C188884707C5AFA265BB8E14D4D21001F5C24CDC467702E29248AFBD2",
-      "source_git_blob_oid": "45ba52ac9d533dcabf9826943175b910771cf2c9",
-      "commit_git_blob_oid": "45ba52ac9d533dcabf9826943175b910771cf2c9",
+      "bytes": 24321,
+      "sha256": "667042ED3FC29B121645131E740DC0417309C6CAE963C248B645112E914BA690",
+      "source_git_blob_oid": "901ba8ecb2075120f312827029a7467e1c46eaa7",
+      "commit_git_blob_oid": "901ba8ecb2075120f312827029a7467e1c46eaa7",
       "source_git_blob_match": true,
-      "copy_bytes": 23662,
-      "copy_sha256": "899F7E6C188884707C5AFA265BB8E14D4D21001F5C24CDC467702E29248AFBD2",
+      "copy_bytes": 24321,
+      "copy_sha256": "667042ED3FC29B121645131E740DC0417309C6CAE963C248B645112E914BA690",
       "copy_sha256_matched": true
     },
     {
@@ -270,25 +282,25 @@
     {
       "source": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
-      "bytes": 19315,
-      "sha256": "0C9ABF7A2B230D1D9CE8A4B683F91C7EDC2C0AF2ECD8D8CB0BDE621A42703CC2",
-      "source_git_blob_oid": "d57ac13ccc63a6ba51bde4940e10db7be702f8a2",
-      "commit_git_blob_oid": "d57ac13ccc63a6ba51bde4940e10db7be702f8a2",
+      "bytes": 19389,
+      "sha256": "A2F268A199BF48871E84169F209FC7FCD87448474F3A92111FDB69C4FF772F22",
+      "source_git_blob_oid": "1569e885163f2fd798001ea48f37d7fe2cd67093",
+      "commit_git_blob_oid": "1569e885163f2fd798001ea48f37d7fe2cd67093",
       "source_git_blob_match": true,
-      "copy_bytes": 19315,
-      "copy_sha256": "0C9ABF7A2B230D1D9CE8A4B683F91C7EDC2C0AF2ECD8D8CB0BDE621A42703CC2",
+      "copy_bytes": 19389,
+      "copy_sha256": "A2F268A199BF48871E84169F209FC7FCD87448474F3A92111FDB69C4FF772F22",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md",
-      "bytes": 2938,
-      "sha256": "5D362323F0726548A9E09DA0CF13CE18752DAE7D2C4DC58F7D429DA875E6FD5D",
-      "source_git_blob_oid": "490b3fad796dd839bc8f4404780ab4f2933ec6c5",
-      "commit_git_blob_oid": "490b3fad796dd839bc8f4404780ab4f2933ec6c5",
+      "bytes": 2933,
+      "sha256": "41CB0B4F2959CC1D01F8B7BA137B7912C0BB63300C68EFC87011F242C2A99098",
+      "source_git_blob_oid": "479439773a871183bba14aedd03fed9e7c2d650c",
+      "commit_git_blob_oid": "479439773a871183bba14aedd03fed9e7c2d650c",
       "source_git_blob_match": true,
-      "copy_bytes": 2938,
-      "copy_sha256": "5D362323F0726548A9E09DA0CF13CE18752DAE7D2C4DC58F7D429DA875E6FD5D",
+      "copy_bytes": 2933,
+      "copy_sha256": "41CB0B4F2959CC1D01F8B7BA137B7912C0BB63300C68EFC87011F242C2A99098",
       "copy_sha256_matched": true
     },
     {
@@ -366,13 +378,13 @@
     {
       "source": "tests/test_email_action_reconciliation.py",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/tests/test_email_action_reconciliation.py",
-      "bytes": 10102,
-      "sha256": "E9A22A576CFCB46FCCAF59733747DE477BCC218BC89958EF33F3741A6B374C2B",
-      "source_git_blob_oid": "5865cf7f92cf2c95d1149ce2bc82547cd432b3c5",
-      "commit_git_blob_oid": "5865cf7f92cf2c95d1149ce2bc82547cd432b3c5",
+      "bytes": 10829,
+      "sha256": "44F44C8A9E0114DA8406107079FF21AF6D0E66EC6B27B065744EE87255D0E600",
+      "source_git_blob_oid": "e1b9dc4c5434742e188ed2f46b85a38a8a6da2f1",
+      "commit_git_blob_oid": "e1b9dc4c5434742e188ed2f46b85a38a8a6da2f1",
       "source_git_blob_match": true,
-      "copy_bytes": 10102,
-      "copy_sha256": "E9A22A576CFCB46FCCAF59733747DE477BCC218BC89958EF33F3741A6B374C2B",
+      "copy_bytes": 10829,
+      "copy_sha256": "44F44C8A9E0114DA8406107079FF21AF6D0E66EC6B27B065744EE87255D0E600",
       "copy_sha256_matched": true
     },
     {
@@ -462,13 +474,13 @@
     {
       "source": "tests/test_near_deadline_submission_command_board.py",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/tests/test_near_deadline_submission_command_board.py",
-      "bytes": 37723,
-      "sha256": "92F8BDAA5055A35E99B610F7B5258014392E80FEC0AFBCE8116773BA17D1AEE6",
-      "source_git_blob_oid": "8b2a17d4ef20da2458df058013aa2831882d20db",
-      "commit_git_blob_oid": "8b2a17d4ef20da2458df058013aa2831882d20db",
+      "bytes": 38323,
+      "sha256": "16B52C858FC69DA1C0DC012AE666A6A678B7F586275E66752B4AD84CC2E53104",
+      "source_git_blob_oid": "9f91158ee2540b123df48bade8c1d9c621d8920d",
+      "commit_git_blob_oid": "9f91158ee2540b123df48bade8c1d9c621d8920d",
       "source_git_blob_match": true,
-      "copy_bytes": 37723,
-      "copy_sha256": "92F8BDAA5055A35E99B610F7B5258014392E80FEC0AFBCE8116773BA17D1AEE6",
+      "copy_bytes": 38323,
+      "copy_sha256": "16B52C858FC69DA1C0DC012AE666A6A678B7F586275E66752B4AD84CC2E53104",
       "copy_sha256_matched": true
     },
     {
@@ -498,13 +510,13 @@
     {
       "source": "tests/test_outreach_followup_action_queue.py",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/tests/test_outreach_followup_action_queue.py",
-      "bytes": 18677,
-      "sha256": "EE66138AE1E856568D9A9EA3B156FD6D46E0AF43D79732D8AE07C9EC75459EAC",
-      "source_git_blob_oid": "c3cbe00bd6f0354d62c11758e57b7af55b65aef9",
-      "commit_git_blob_oid": "c3cbe00bd6f0354d62c11758e57b7af55b65aef9",
+      "bytes": 18779,
+      "sha256": "02B9F8205AA489772A3AAB07D2A7EF59236730E963E735B791BE9F57D3D39306",
+      "source_git_blob_oid": "f2b7d8a43803d43bc81ce749f4bf24d0943b280b",
+      "commit_git_blob_oid": "f2b7d8a43803d43bc81ce749f4bf24d0943b280b",
       "source_git_blob_match": true,
-      "copy_bytes": 18677,
-      "copy_sha256": "EE66138AE1E856568D9A9EA3B156FD6D46E0AF43D79732D8AE07C9EC75459EAC",
+      "copy_bytes": 18779,
+      "copy_sha256": "02B9F8205AA489772A3AAB07D2A7EF59236730E963E735B791BE9F57D3D39306",
       "copy_sha256_matched": true
     },
     {
@@ -547,5 +559,5 @@
   "receipt_copy_destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/grant_submissions/funding_sprint_20260709/DEADLINE_INTEGRITY_REPAIR_CHECKPOINT_2026-07-21.json",
   "sidecar_copy_destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/grant_submissions/funding_sprint_20260709/DEADLINE_INTEGRITY_REPAIR_CHECKPOINT_2026-07-21.json.sha256",
   "claim_boundary": "This receipt proves only that the listed public deadline-routing code, tests, and generated control surfaces matched the recorded Git commit after Git clean-filter normalization and that their exact checkout bytes were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove email transmission, portal submission, eligibility, certification, award, endorsement, external validation, technical performance, funding, or value. Final external and legal actions remain human-controlled.",
-  "receipt_payload_sha256": "8F018800EA3B50AEAA9491CA8446765143771CCC291A2CA54FC700D3246E1995"
+  "receipt_payload_sha256": "E30701E6435C3038AC9FD1081F4FB54F87CB86185CEC059F1548CF175F3DCC5F"
 }

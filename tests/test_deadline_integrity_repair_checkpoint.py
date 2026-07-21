@@ -36,7 +36,7 @@ def test_checkpoint_is_commit_bound_public_safe_and_human_gated():
     assert payload["schema"] == "lumencore.deadline_integrity_repair_checkpoint.v1"
     assert len(payload["source_commit"]) == 40
     assert payload["source_worktree_tracked_clean"] is True
-    assert payload["artifact_count"] == len(payload["artifacts"]) == 44
+    assert payload["artifact_count"] == len(payload["artifacts"]) == 45
     assert payload["all_source_git_blobs_match_commit"] is True
     assert payload["all_sha256_matched_after_copy"] is True
     assert payload["relative_paths_preserved"] is True
@@ -53,6 +53,10 @@ def test_checkpoint_is_commit_bound_public_safe_and_human_gated():
     assert (
         "grant_submissions/funding_sprint_20260709/"
         "DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json"
+    ) in sources
+    assert (
+        "evidence/openai_build_week/"
+        "prooflock_youtube_publication_receipt_20260721.json"
     ) in sources
 
     unhashed = dict(payload)
