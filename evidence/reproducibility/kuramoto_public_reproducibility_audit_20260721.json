@@ -1,0 +1,53 @@
+{
+  "schema": "kuramoto_public_reproducibility_audit_v1",
+  "generated_utc": "2026-07-21T08:21:51.4534416Z",
+  "audited_commit": "26bab45d9c4efcdc86078bf128bd57d9e2d9acd2",
+  "scope": "Kuramoto source-conditioned replay input integrity and public clean-checkout portability",
+  "claim_boundary": "This is a reproducibility-gap audit. It does not validate the Kuramoto result, establish field performance, prove savings, authorize trading, or constitute independent reproduction.",
+  "fresh_detached_checkout_probe": {
+    "ignored_source_manifest_present_before_probe": false,
+    "ignored_source_frontier_present_before_probe": false,
+    "test_file": "tests/test_kuramoto_holdout_expansion.py",
+    "tests_passed": 2,
+    "tests_failed": 1,
+    "observed_holdout_count": 0,
+    "expected_holdout_count_at_least": 20,
+    "public_clean_checkout_replay_ready": false
+  },
+  "local_cached_manifest_probe": {
+    "configured_route_count": 24,
+    "evidence_eligible_holdout_count": 5,
+    "excluded_holdout_count": 19,
+    "available_source_file_count": 5,
+    "missing_source_file_count": 19,
+    "fallback_source_count": 19,
+    "git_tracked_eligible_source_count": 0,
+    "input_integrity_passed": false,
+    "internal_20_holdout_gate_passed": false,
+    "public_clean_checkout_replay_ready": false
+  },
+  "repair_controls": {
+    "missing_or_fallback_sources_count_as_evidence": false,
+    "missing_source_path_is_hashed_as_source_content": false,
+    "bounded_source_hash_scope_is_explicit": true,
+    "public_clean_checkout_gate_requires_full_file_sha256": true,
+    "public_dashboard_contains_private_source_paths": false,
+    "public_markdown_contains_private_source_paths": false,
+    "holdout_chain_uses_machine_local_paths": false,
+    "unit_tests_require_hidden_local_source_files": false
+  },
+  "validation_state": {
+    "independent_reproduction_completed": false,
+    "external_validation_completed": false,
+    "field_validation_claim_allowed": false,
+    "real_dollar_savings_claim_allowed": false,
+    "live_trading_or_autonomous_execution_allowed": false
+  },
+  "next_unlock": [
+    "Select a bounded set of redistributable public source files with source URLs, retrieval timestamps, licenses, and full SHA-256 hashes.",
+    "Track the exact public-safe input bundle or a deterministic downloader plus immutable upstream identifiers.",
+    "Freeze the candidate, baseline, metrics, route selection, exclusions, and thresholds before inspecting results.",
+    "Run the protocol from a fresh checkout and preserve logs, environment inventory, hashes, and negative results.",
+    "Request an independent party to reproduce the locked packet; keep external validation false until its signed or otherwise attributable receipt exists."
+  ]
+}

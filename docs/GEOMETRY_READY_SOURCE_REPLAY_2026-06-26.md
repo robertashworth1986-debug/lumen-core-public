@@ -2,6 +2,8 @@
 
 Generated UTC: `2026-07-01T08:22:22.211094+00:00`
 
+Reproducibility audit, 2026-07-21: this historical local replay is not reproducible from the public repository because its exact source files are not tracked there. Public clean-checkout replay readiness and independent reproduction remain `false`; private source locators are redacted below.
+
 Geometry ready-source replay only. This reads local/uploaded measured files from the live source manifest, derives deterministic source profiles, and runs existing generated geometry benchmark adapters under equal candidate/baseline constraints. It is not field validation, not a clinical or addiction-treatment claim, not a trading signal, not realized savings, and not a fixed-dollar frozen-delta sales claim.
 
 ## Summary
@@ -35,16 +37,16 @@ Geometry ready-source replay only. This reads local/uploaded measured files from
 
 | Rank | Lane | Candidate | Baseline | Delta | Source |
 | --- | --- | --- | --- | --- | --- |
-| `1` | `optimal_curve_transport` | `brachistochrone_descent` | `minimum_jerk_curve` | `0.109345` | `C:/Users/Novac/AppData/Local/Temp/930-data-export.csv` |
-| `2` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `0.165389` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_master_index.csv__4839a4e25d.csv` |
-| `3` | `thermal_ventilation` | `thermal_plume_convection` | `straight_duct` | `0.134024` | `C:/Users/Novac/AppData/Local/Temp/Net_generation_United_States_all_sectors_annual (1).csv` |
-| `4` | `branching_transport` | `leaf_veins` | `minimum_spanning_tree` | `-0.025255` | `C:/Users/Novac/AppData/Local/Temp/930-data-export.csv` |
-| `5` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `0.186581` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/full_beast_leaderboard.csv` |
-| `6` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `0.198179` | `C:/Users/Novac/AppData/Local/Temp/Net_generation_United_States_all_sectors_annual (1).csv` |
-| `7` | `branching_transport` | `leaf_veins` | `minimum_spanning_tree` | `-0.05838` | `C:/Users/Novac/AppData/Local/Temp/Net_generation_United_States_all_sectors_annual (1).csv` |
-| `8` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `0.168155` | `C:/Users/Novac/AppData/Local/Temp/Net_generation_for_all_sectors (1).csv` |
-| `9` | `thermal_ventilation` | `thermal_plume_convection` | `straight_duct` | `0.119183` | `C:/Users/Novac/AppData/Local/Temp/Net_generation_for_all_sectors (1).csv` |
-| `10` | `branching_transport` | `leaf_veins` | `minimum_spanning_tree` | `-0.051203` | `C:/Users/Novac/AppData/Local/Temp/Net_generation_for_all_sectors (1).csv` |
+| `1` | `optimal_curve_transport` | `brachistochrone_descent` | `minimum_jerk_curve` | `0.109345` | `source://private-local/001` |
+| `2` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `0.165389` | `source://private-local/002` |
+| `3` | `thermal_ventilation` | `thermal_plume_convection` | `straight_duct` | `0.134024` | `source://private-local/003` |
+| `4` | `branching_transport` | `leaf_veins` | `minimum_spanning_tree` | `-0.025255` | `source://private-local/004` |
+| `5` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `0.186581` | `source://private-local/005` |
+| `6` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `0.198179` | `source://private-local/006` |
+| `7` | `branching_transport` | `leaf_veins` | `minimum_spanning_tree` | `-0.05838` | `source://private-local/007` |
+| `8` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `kalman_filter` | `0.168155` | `source://private-local/008` |
+| `9` | `thermal_ventilation` | `thermal_plume_convection` | `straight_duct` | `0.119183` | `source://private-local/009` |
+| `10` | `branching_transport` | `leaf_veins` | `minimum_spanning_tree` | `-0.051203` | `source://private-local/010` |
 
 ## Next 10 Actions
 

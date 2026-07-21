@@ -2,6 +2,8 @@
 
 Generated UTC: `2026-07-01T11:26:05.882035+00:00`
 
+Reproducibility audit, 2026-07-21: this historical run depended on local, untracked source files. A fresh detached checkout at commit `26bab45d` produced zero eligible holdouts, so public clean-checkout replay readiness and independent reproduction remain `false`. Private source locators are redacted below. The historical scores remain internal evidence only and do not unlock field-validation or savings claims.
+
 Kuramoto holdout expansion is internal source-conditioned replay evidence. It uses local/uploaded measured source files from the geometry live-source manifest to derive deterministic benchmark stress profiles, then compares kuramoto_phase_coupling against kalman_filter and the best same-run baseline under the existing wave-resonance timing adapter. It is not field validation, not grid/RF/PLL hardware validation, not realized savings, not a fixed-dollar frozen-delta sale claim, not medical treatment evidence, and not a trading signal.
 
 ## Result
@@ -18,8 +20,10 @@ Kuramoto holdout expansion is internal source-conditioned replay evidence. It us
 - One-sided sign-test p-value: `6e-08`
 - Mean delta vs Kalman: `0.140668`
 - Delta range vs Kalman: `0.044697` to `0.220761`
-- Passes internal 20-holdout gate: `true`
-- Ready for buyer-authorized field replay request: `true`
+- Historical internal 20-holdout gate result: `true` (requires a current integrity rerun)
+- Ready for buyer-authorized field replay request: `false` pending a portable input bundle and current rerun
+- Public clean-checkout replay ready: `false`
+- Independent reproduction completed: `false`
 - Holdout chain SHA-256: `2227dd06869d292c82918d3f9cfab2b87cbe441cd44e398ec4a1024c6f5a655c`
 
 ## Reviewer-Safe Interpretation
@@ -30,30 +34,30 @@ This is stronger than the prior four-route replay because it broadens the held-o
 
 | Rank | System | Source | Candidate Score | Kalman Score | Delta | Beats Kalman | Source Hash |
 | ---: | --- | --- | ---: | ---: | ---: | --- | --- |
-| 1 | `energy_grid` | `C:/Users/Novac/AppData/Local/Temp/Net_generation_United_States_all_sectors_annual (1).csv` | `0.579467` | `0.376377` | `0.20309` | `true` | `5a63a8347cd58ef4` |
-| 2 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_master_index.csv__4839a4e25d.csv` | `0.592508` | `0.406622` | `0.185886` | `true` | `ae5fbc8563f6cc4d` |
-| 3 | `macro_rates_labor` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/fred_DGS10_e437c5a7fd.csv` | `0.662912` | `0.503168` | `0.159744` | `true` | `7a251ff932340deb` |
-| 4 | `sports_market` | `data/live_measured/the_odds_api/the_odds_api_20260701T060342Z.csv` | `0.845646` | `0.777107` | `0.068539` | `true` | `e3b0c44298fc1c14` |
-| 5 | `energy_grid` | `C:/Users/Novac/AppData/Local/Temp/Net_generation_for_all_sectors (1).csv` | `0.448535` | `0.28038` | `0.168155` | `true` | `06e29941cea5dab8` |
-| 6 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/full_beast_leaderboard.csv` | `0.55108` | `0.341805` | `0.209275` | `true` | `7a3e0a8edd1c4bc1` |
-| 7 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__R.csv__06d36a49d5.csv` | `0.809618` | `0.738934` | `0.070684` | `true` | `8ef08751d25f7512` |
-| 8 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__a.csv__11dbf13ef1.csv` | `0.636412` | `0.483482` | `0.15293` | `true` | `09733d83c2c143eb` |
-| 9 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__b.csv__2cda7ce7e2.csv` | `0.81919` | `0.752745` | `0.066445` | `true` | `6c5dfc272c10607c` |
-| 10 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__distance.csv__83ef37f20a.csv` | `0.766095` | `0.673789` | `0.092306` | `true` | `33e6e3ab2fddaa41` |
-| 11 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__h_drop.csv__04e9a591c3.csv` | `0.692441` | `0.560423` | `0.132018` | `true` | `5d9899575a8b89a6` |
-| 12 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__pitch.csv__07ae67819a.csv` | `0.763978` | `0.671234` | `0.092744` | `true` | `231c7a54ae155e14` |
-| 13 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__score.csv__1a55521dbd.csv` | `0.866321` | `0.820055` | `0.046266` | `true` | `2f7349c4fe229ab0` |
-| 14 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__theta.csv__e85f616688.csv` | `0.772042` | `0.685111` | `0.086931` | `true` | `c0bd095f786949bf` |
-| 15 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__turns.csv__25b8f6d2d3.csv` | `0.866116` | `0.821419` | `0.044697` | `true` | `fc928062b04821fe` |
-| 16 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_O.000_runs_best_timeseries.csv__energy.csv__ba2779ebc7.csv` | `0.539484` | `0.331611` | `0.207873` | `true` | `41a3296eaaa1f17f` |
-| 17 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_O.000_runs_best_timeseries.csv__error.csv__09be40c1a0.csv` | `0.708152` | `0.574424` | `0.133728` | `true` | `22f8bedf45d0cc88` |
-| 18 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_O.000_runs_best_timeseries.csv__stability.csv__c2ee366398.csv` | `0.576062` | `0.385847` | `0.190215` | `true` | `3a12da61eee97591` |
-| 19 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_O.000_runs_best_timeseries.csv__t.csv__22b46e9294.csv` | `0.5652` | `0.344439` | `0.220761` | `true` | `804b2f085f952a17` |
-| 20 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_Termius_best_timeseries.csv__energy.csv__eb90fb4cc8.csv` | `0.511614` | `0.322273` | `0.189341` | `true` | `41a3296eaaa1f17f` |
-| 21 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_Termius_best_timeseries.csv__error.csv__d8e5992112.csv` | `0.576888` | `0.38512` | `0.191768` | `true` | `22f8bedf45d0cc88` |
-| 22 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_Termius_best_timeseries.csv__stability.csv__ff9af87b44.csv` | `0.722021` | `0.598713` | `0.123308` | `true` | `3a12da61eee97591` |
-| 23 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_Termius_best_timeseries.csv__t.csv__f51b9fb1ef.csv` | `0.722216` | `0.572108` | `0.150108` | `true` | `804b2f085f952a17` |
-| 24 | `market_data` | `C:/LumaTrader/INSTITUTIONAL_STACK_V2/clean_data/LumenLab__crawler_out_timeseries_C_STAGING_GLYPH_INGEST_20260129_082348Z_99_RAW_ORIGINALS_iCloud_O.000_runs_best_timeseries.csv__energy.csv__759bd2e952.csv` | `0.608721` | `0.419497` | `0.189224` | `true` | `41a3296eaaa1f17f` |
+| 1 | `energy_grid` | `source://energy_grid/001-5a63a8347cd58ef4` | `0.579467` | `0.376377` | `0.20309` | `true` | `5a63a8347cd58ef4` |
+| 2 | `market_data` | `source://market_data/002-ae5fbc8563f6cc4d` | `0.592508` | `0.406622` | `0.185886` | `true` | `ae5fbc8563f6cc4d` |
+| 3 | `macro_rates_labor` | `source://macro_rates_labor/003-7a251ff932340deb` | `0.662912` | `0.503168` | `0.159744` | `true` | `7a251ff932340deb` |
+| 4 | `sports_market` | `source://sports_market/004-e3b0c44298fc1c14` | `0.845646` | `0.777107` | `0.068539` | `true` | `e3b0c44298fc1c14` |
+| 5 | `energy_grid` | `source://energy_grid/005-06e29941cea5dab8` | `0.448535` | `0.28038` | `0.168155` | `true` | `06e29941cea5dab8` |
+| 6 | `market_data` | `source://market_data/006-7a3e0a8edd1c4bc1` | `0.55108` | `0.341805` | `0.209275` | `true` | `7a3e0a8edd1c4bc1` |
+| 7 | `market_data` | `source://market_data/007-8ef08751d25f7512` | `0.809618` | `0.738934` | `0.070684` | `true` | `8ef08751d25f7512` |
+| 8 | `market_data` | `source://market_data/008-09733d83c2c143eb` | `0.636412` | `0.483482` | `0.15293` | `true` | `09733d83c2c143eb` |
+| 9 | `market_data` | `source://market_data/009-6c5dfc272c10607c` | `0.81919` | `0.752745` | `0.066445` | `true` | `6c5dfc272c10607c` |
+| 10 | `market_data` | `source://market_data/010-33e6e3ab2fddaa41` | `0.766095` | `0.673789` | `0.092306` | `true` | `33e6e3ab2fddaa41` |
+| 11 | `market_data` | `source://market_data/011-5d9899575a8b89a6` | `0.692441` | `0.560423` | `0.132018` | `true` | `5d9899575a8b89a6` |
+| 12 | `market_data` | `source://market_data/012-231c7a54ae155e14` | `0.763978` | `0.671234` | `0.092744` | `true` | `231c7a54ae155e14` |
+| 13 | `market_data` | `source://market_data/013-2f7349c4fe229ab0` | `0.866321` | `0.820055` | `0.046266` | `true` | `2f7349c4fe229ab0` |
+| 14 | `market_data` | `source://market_data/014-c0bd095f786949bf` | `0.772042` | `0.685111` | `0.086931` | `true` | `c0bd095f786949bf` |
+| 15 | `market_data` | `source://market_data/015-fc928062b04821fe` | `0.866116` | `0.821419` | `0.044697` | `true` | `fc928062b04821fe` |
+| 16 | `market_data` | `source://market_data/016-41a3296eaaa1f17f` | `0.539484` | `0.331611` | `0.207873` | `true` | `41a3296eaaa1f17f` |
+| 17 | `market_data` | `source://market_data/017-22f8bedf45d0cc88` | `0.708152` | `0.574424` | `0.133728` | `true` | `22f8bedf45d0cc88` |
+| 18 | `market_data` | `source://market_data/018-3a12da61eee97591` | `0.576062` | `0.385847` | `0.190215` | `true` | `3a12da61eee97591` |
+| 19 | `market_data` | `source://market_data/019-804b2f085f952a17` | `0.5652` | `0.344439` | `0.220761` | `true` | `804b2f085f952a17` |
+| 20 | `market_data` | `source://market_data/020-41a3296eaaa1f17f` | `0.511614` | `0.322273` | `0.189341` | `true` | `41a3296eaaa1f17f` |
+| 21 | `market_data` | `source://market_data/021-22f8bedf45d0cc88` | `0.576888` | `0.38512` | `0.191768` | `true` | `22f8bedf45d0cc88` |
+| 22 | `market_data` | `source://market_data/022-3a12da61eee97591` | `0.722021` | `0.598713` | `0.123308` | `true` | `3a12da61eee97591` |
+| 23 | `market_data` | `source://market_data/023-804b2f085f952a17` | `0.722216` | `0.572108` | `0.150108` | `true` | `804b2f085f952a17` |
+| 24 | `market_data` | `source://market_data/024-41a3296eaaa1f17f` | `0.608721` | `0.419497` | `0.189224` | `true` | `41a3296eaaa1f17f` |
 
 ## Field Validation Unlock
 

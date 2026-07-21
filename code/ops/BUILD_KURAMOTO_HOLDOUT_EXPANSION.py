@@ -4,6 +4,8 @@ import hashlib
 import importlib.util
 import json
 import math
+import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -55,6 +57,10 @@ FORBIDDEN_TERMS = (
     "realized savings claim allowed",
     "heroin-like",
 )
+
+PRIVATE_PATH_PATTERN = re.compile(r"(?i)(?:(?<![a-z0-9+.-])[a-z]:[\\/]|/(?:users|home)/)")
+_TRACKED_PATH_CACHE: dict[str, bool] = {}
+SOURCE_HASH_MAX_BYTES = 2_000_000
 
 
 def now_utc() -> str:
@@ -124,12 +130,47 @@ def resolve_path(ready: Any, source_path: str) -> Path:
 
 def source_sha256(ready: Any, source_path: str) -> str:
     path = resolve_path(ready, source_path)
-    if path.exists():
+    if path.is_file():
         try:
-            return ready.file_sha256(path, max_bytes=2_000_000)
+            return ready.file_sha256(path, max_bytes=SOURCE_HASH_MAX_BYTES)
         except Exception:
             pass
-    return hashlib.sha256(str(source_path).encode("utf-8")).hexdigest()
+    return ""
+
+
+def path_within_repository(path: Path) -> bool:
+    try:
+        path.resolve().relative_to(ROOT.resolve())
+    except (OSError, ValueError):
+        return False
+    return True
+
+
+def git_tracked_source(path: Path) -> bool:
+    if not path_within_repository(path):
+        return False
+    relative = str(path.resolve().relative_to(ROOT.resolve())).replace("\\", "/")
+    if relative in _TRACKED_PATH_CACHE:
+        return _TRACKED_PATH_CACHE[relative]
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(ROOT), "ls-files", "--error-unmatch", "--", relative],
+            capture_output=True,
+            check=False,
+            text=True,
+            timeout=10,
+        )
+        tracked = result.returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        tracked = False
+    _TRACKED_PATH_CACHE[relative] = tracked
+    return tracked
+
+
+def public_source_ref(source_system: str, source_hash: str, rank: int) -> str:
+    digest = source_hash[:16] if source_hash else "unavailable"
+    system = re.sub(r"[^a-z0-9_-]+", "-", source_system.lower()).strip("-") or "unknown"
+    return f"source://{system}/{rank:03d}-{digest}"
 
 
 def select_wave_routes(manifest: dict[str, Any], *, max_routes: int) -> list[dict[str, Any]]:
@@ -202,6 +243,14 @@ def baseline_rows(leaderboard: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def replay_holdout_route(route: dict[str, Any], ready: Any, replay: Any, *, sample_limit: int) -> dict[str, Any]:
+    source_path = str(route.get("source_path", ""))
+    resolved_source = resolve_path(ready, source_path)
+    source_available = resolved_source.is_file()
+    try:
+        source_size_bytes = resolved_source.stat().st_size if source_available else 0
+    except OSError:
+        source_size_bytes = 0
+    source_hash = source_sha256(ready, source_path)
     profile = ready.source_profile(route, sample_limit=sample_limit)
     adapter = replay.run_lane_adapter(LANE, [profile])
     leaderboard = adapter.get("leaderboard", []) if isinstance(adapter.get("leaderboard"), list) else []
@@ -217,18 +266,33 @@ def replay_holdout_route(route: dict[str, Any], ready: Any, replay: Any, *, samp
     delta_vs_kalman = round(candidate_score - kalman_score, 6) if candidate_row and kalman_row else None
     delta_vs_best_baseline = round(candidate_score - best_baseline_score, 6) if candidate_row and best_baseline else None
 
-    source_path = str(route.get("source_path", ""))
+    rank = safe_int(route.get("holdout_rank"))
+    source_system = str(route.get("system", ""))
+    source_ref = public_source_ref(source_system, source_hash, rank)
+    fallback_used = bool(profile.get("fallback_used"))
+    numeric_samples = safe_int(profile.get("numeric_count"))
+    evidence_eligible = bool(source_available and source_hash and numeric_samples > 0 and not fallback_used)
     result = {
-        "rank": safe_int(route.get("holdout_rank")),
+        "rank": rank,
         "lane": LANE,
         "candidate_family": CANDIDATE,
         "named_baseline": NAMED_BASELINE,
         "source_path": source_path,
-        "source_system": route.get("system", ""),
-        "source_sha256": source_sha256(ready, source_path),
+        "source_ref": source_ref,
+        "source_system": source_system,
+        "source_sha256": source_hash,
+        "source_sha256_scope_bytes": min(source_size_bytes, SOURCE_HASH_MAX_BYTES),
+        "source_sha256_is_full_file": bool(source_available and source_size_bytes <= SOURCE_HASH_MAX_BYTES),
+        "source_size_bytes": source_size_bytes,
+        "source_available": source_available,
+        "source_within_repository": path_within_repository(resolved_source),
+        "source_git_tracked": source_available and git_tracked_source(resolved_source),
+        "source_path_publication_allowed": False,
         "estimated_rows": safe_int(route.get("estimated_rows")),
         "profile": profile,
-        "numeric_samples": safe_int(profile.get("numeric_count")),
+        "numeric_samples": numeric_samples,
+        "fallback_used": fallback_used,
+        "evidence_eligible": evidence_eligible,
         "adapter_status": adapter.get("adapter_status", ""),
         "candidate_rank": candidate_row.get("rank"),
         "candidate_score": round(candidate_score, 6),
@@ -243,7 +307,13 @@ def replay_holdout_route(route: dict[str, Any], ready: Any, replay: Any, *, samp
         "candidate_beats_best_baseline": bool(delta_vs_best_baseline is not None and delta_vs_best_baseline > 0),
         "claim_boundary": "Internal source-conditioned holdout replay; not field validation or a dollar claim.",
     }
-    result["holdout_sha256"] = stable_sha256({k: v for k, v in result.items() if k != "holdout_sha256"})
+    result["holdout_sha256"] = stable_sha256(
+        {
+            key: value
+            for key, value in result.items()
+            if key not in {"holdout_sha256", "source_path"}
+        }
+    )
     return result
 
 
@@ -265,21 +335,49 @@ def one_sided_sign_test_p_value(wins: int, total: int) -> float:
 
 
 def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
-    deltas = [safe_float(row.get("delta_vs_kalman")) for row in results if row.get("delta_vs_kalman") is not None]
-    wins = sum(1 for row in results if row.get("candidate_beats_kalman"))
-    best_wins = sum(1 for row in results if row.get("candidate_beats_best_baseline"))
+    eligible = [row for row in results if row.get("evidence_eligible")]
+    deltas = [safe_float(row.get("delta_vs_kalman")) for row in eligible if row.get("delta_vs_kalman") is not None]
+    wins = sum(1 for row in eligible if row.get("candidate_beats_kalman"))
+    best_wins = sum(1 for row in eligible if row.get("candidate_beats_best_baseline"))
     total = len(deltas)
     interval = wilson_interval(wins, total)
     sign_p = one_sided_sign_test_p_value(wins, total)
-    source_systems = sorted({str(row.get("source_system", "")) for row in results if row.get("source_system")})
+    source_systems = sorted({str(row.get("source_system", "")) for row in eligible if row.get("source_system")})
     mean_delta = round(mean(deltas), 6) if deltas else 0.0
-    internal_gate = bool(total >= 20 and wins >= 16 and interval["lower"] > 0.50 and sign_p <= 0.05 and mean_delta > 0.0)
+    route_count = len(results)
+    missing_source_count = sum(not bool(row.get("source_available")) for row in results)
+    fallback_count = sum(bool(row.get("fallback_used")) for row in results)
+    tracked_source_count = sum(bool(row.get("source_git_tracked")) for row in eligible)
+    full_file_hash_count = sum(bool(row.get("source_sha256_is_full_file")) for row in eligible)
+    input_integrity_passed = bool(route_count > 0 and total == route_count and missing_source_count == 0 and fallback_count == 0)
+    internal_gate = bool(
+        total >= 20
+        and wins >= 16
+        and interval["lower"] > 0.50
+        and sign_p <= 0.05
+        and mean_delta > 0.0
+        and input_integrity_passed
+    )
+    public_clean_checkout_replay_ready = bool(
+        internal_gate and tracked_source_count == total and full_file_hash_count == total
+    )
     return {
-        "holdout_count": len(results),
+        "route_count": route_count,
+        "holdout_count": total,
+        "excluded_holdout_count": route_count - total,
         "source_system_count": len(source_systems),
         "source_systems": source_systems,
-        "estimated_rows_replayed": sum(safe_int(row.get("estimated_rows")) for row in results),
-        "numeric_samples_read": sum(safe_int(row.get("numeric_samples")) for row in results),
+        "estimated_rows_replayed": sum(safe_int(row.get("estimated_rows")) for row in eligible),
+        "numeric_samples_read": sum(safe_int(row.get("numeric_samples")) for row in eligible),
+        "source_file_available_count": sum(bool(row.get("source_available")) for row in results),
+        "missing_source_file_count": missing_source_count,
+        "fallback_source_count": fallback_count,
+        "repository_contained_source_count": sum(bool(row.get("source_within_repository")) for row in eligible),
+        "git_tracked_source_count": tracked_source_count,
+        "full_file_sha256_count": full_file_hash_count,
+        "input_integrity_passed": input_integrity_passed,
+        "public_clean_checkout_replay_ready": public_clean_checkout_replay_ready,
+        "independent_reproduction_completed": False,
         "candidate": CANDIDATE,
         "named_baseline": NAMED_BASELINE,
         "wins_vs_kalman": wins,
@@ -301,10 +399,15 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def build_payload(*, max_routes: int = 24, sample_limit: int = 3_000) -> dict[str, Any]:
+def build_payload(
+    *,
+    max_routes: int = 24,
+    sample_limit: int = 3_000,
+    manifest: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     ready = ready_replay_module()
-    manifest = ready.ensure_manifest()
-    routes = select_wave_routes(manifest, max_routes=max_routes)
+    source_manifest = manifest if isinstance(manifest, dict) else ready.ensure_manifest()
+    routes = select_wave_routes(source_manifest, max_routes=max_routes)
     replay = top_replay_module()
     results = [replay_holdout_route(route, ready, replay, sample_limit=sample_limit) for route in routes]
     summary = summarize(results)
@@ -314,6 +417,8 @@ def build_payload(*, max_routes: int = 24, sample_limit: int = 3_000) -> dict[st
         "evidence_boundary": EVIDENCE_BOUNDARY,
         "inputs": {
             "source_manifest": rel(MANIFEST_JSON),
+            "source_manifest_mode": "injected" if manifest is not None else "local_generated_or_cached",
+            "source_manifest_sha256": stable_sha256(source_manifest),
             "ready_source_replay_adapter": rel(READY_REPLAY_SCRIPT),
             "top_replay_adapter": rel(TOP_REPLAY_SCRIPT),
         },
@@ -327,6 +432,8 @@ def build_payload(*, max_routes: int = 24, sample_limit: int = 3_000) -> dict[st
             "live_trading_or_autonomous_execution_allowed": False,
             "medical_or_addiction_treatment_claim_allowed": False,
             "buyer_authorized_field_pilot_required": True,
+            "public_clean_checkout_replay_ready": bool(summary["public_clean_checkout_replay_ready"]),
+            "independent_reproduction_completed": False,
         },
         "field_validation_unlock": [
             "Identify one external system owner with authority over a real operational or accepted historical holdout dataset.",
@@ -342,7 +449,7 @@ def build_payload(*, max_routes: int = 24, sample_limit: int = 3_000) -> dict[st
             "results": [
                 {
                     "rank": row["rank"],
-                    "source_path": row["source_path"],
+                    "source_ref": row["source_ref"],
                     "source_sha256": row["source_sha256"],
                     "delta_vs_kalman": row["delta_vs_kalman"],
                     "holdout_sha256": row["holdout_sha256"],
@@ -358,6 +465,26 @@ def build_payload(*, max_routes: int = 24, sample_limit: int = 3_000) -> dict[st
     return payload
 
 
+def build_public_projection(payload: dict[str, Any]) -> dict[str, Any]:
+    public = json.loads(json.dumps(payload, sort_keys=True, default=str))
+    for row in public.get("holdout_results", []):
+        if not isinstance(row, dict):
+            continue
+        row.pop("source_path", None)
+        profile = row.get("profile")
+        if isinstance(profile, dict):
+            profile.pop("source_path", None)
+            profile["source"] = row.get("source_ref")
+    public["privacy"] = {
+        "private_source_paths_included": False,
+        "public_source_references_are_hash_bound": True,
+    }
+    serialized = json.dumps(public, sort_keys=True, default=str)
+    if PRIVATE_PATH_PATTERN.search(serialized):
+        raise ValueError("Private absolute path leaked into Kuramoto public projection")
+    return public
+
+
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     lines = [
@@ -370,6 +497,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "## Result",
         "",
         f"- Holdout routes replayed: `{summary['holdout_count']}`",
+        f"- Configured routes: `{summary['route_count']}`",
+        f"- Excluded routes: `{summary['excluded_holdout_count']}`",
         f"- Source systems covered: `{summary['source_system_count']}` ({', '.join(summary['source_systems'])})",
         f"- Estimated rows replayed: `{summary['estimated_rows_replayed']}`",
         f"- Numeric samples read: `{summary['numeric_samples_read']}`",
@@ -383,6 +512,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Delta range vs Kalman: `{summary['min_delta_vs_kalman']}` to `{summary['max_delta_vs_kalman']}`",
         f"- Passes internal 20-holdout gate: `{str(summary['passes_internal_20_holdout_gate']).lower()}`",
         f"- Ready for buyer-authorized field replay request: `{str(summary['ready_for_buyer_authorized_field_replay_request']).lower()}`",
+        f"- Public clean-checkout replay ready: `{str(summary['public_clean_checkout_replay_ready']).lower()}`",
+        f"- Independent reproduction completed: `{str(summary['independent_reproduction_completed']).lower()}`",
         f"- Holdout chain SHA-256: `{summary['holdout_chain_sha256']}`",
         "",
         "## Reviewer-Safe Interpretation",
@@ -397,7 +528,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "| ---: | --- | --- | ---: | ---: | ---: | --- | --- |",
     ]
     for row in payload["holdout_results"]:
-        source = str(row["source_path"]).replace("|", "/")
+        source = str(row["source_ref"]).replace("|", "/")
         lines.append(
             f"| {row['rank']} | `{row['source_system']}` | `{source}` | `{row['candidate_score']}` | "
             f"`{row['kalman_score']}` | `{row['delta_vs_kalman']}` | `{str(row['candidate_beats_kalman']).lower()}` | "
@@ -422,9 +553,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
 
 def main() -> None:
     payload = build_payload()
+    public_payload = build_public_projection(payload)
     write_json(OUT_JSON, payload)
-    write_json(DASHBOARD_JSON, payload)
-    write_text(OUT_MD, render_markdown(payload))
+    write_json(DASHBOARD_JSON, public_payload)
+    write_text(OUT_MD, render_markdown(public_payload))
     print(f"Wrote {OUT_JSON}")
     print(f"Wrote {DASHBOARD_JSON}")
     print(f"Wrote {OUT_MD}")
