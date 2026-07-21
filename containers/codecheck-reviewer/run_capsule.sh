@@ -27,7 +27,8 @@ python code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py
 python -m pip check
 python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py \
   --with-fixture-tests \
-  --run-dir /output
+  --run-dir out/codecheck_eia
+cp -a out/codecheck_eia/. /output/
 
 python - <<'PY'
 import json

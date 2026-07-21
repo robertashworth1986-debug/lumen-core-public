@@ -113,6 +113,10 @@ def inspect_recipe(config: dict[str, Any], *, root: Path = ROOT) -> dict[str, An
         in runner_text,
         "runner_executes_bounded_capsule": "RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py"
         in runner_text,
+        "runner_uses_source_relative_output": "--run-dir out/codecheck_eia"
+        in runner_text,
+        "runner_exports_completed_outputs": "cp -a out/codecheck_eia/. /output/"
+        in runner_text,
         "claim_boundary_present": bool(config.get("claim_boundary")),
         "human_unlock_policy_present": bool(config.get("human_unlock_policy")),
     }
