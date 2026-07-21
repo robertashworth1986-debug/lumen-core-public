@@ -368,7 +368,7 @@
       "owner": "CODECHECK"
     }
   ],
-  "generated_utc": "2026-07-21T15:57:58.858683+00:00",
+  "generated_utc": "2026-07-21T16:05:55.311418+00:00",
   "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
   "operator_clean_runner": {
     "assertion_count": 31,
@@ -605,7 +605,7 @@
     "tests/test_codecheck_reviewer_container.py": true,
     "tests/test_codecheck_reviewer_runtime.py": true
   },
-  "portable_input_chain_sha256": "cced3aa97bcc3fab27ad48e791e8adc04a08039b308248cf3849e8385694f124",
+  "portable_input_chain_sha256": "a64d0c77bfc518b7fa669bf236c7a5efc0069915a0062a076956f0f616ffc906",
   "portable_inputs": [
     {
       "bytes": 7677,
@@ -662,10 +662,10 @@
       "sha256": "3bae7284e69e08be04ccb5aa494e1b8e9885f48d7c1b4e469c0554a45b4e236c"
     },
     {
-      "bytes": 22579,
+      "bytes": 22745,
       "hash_mode": "utf8_lf",
       "path": "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py",
-      "sha256": "a3dd24e7bdd4f9552ec56a4b1c6e8596b7ef5a171253a9ad7a08f99ef5a9a812"
+      "sha256": "ee0f987deba96e25f70db58e9097cb53ce82c83d0b312493aef98dc7fbef7546"
     },
     {
       "bytes": 45420,
@@ -728,10 +728,10 @@
       "sha256": "746307528a39cfe7d8cfe6891d6926fce64ed2b812f9a5202a368755b58561e8"
     },
     {
-      "bytes": 1555,
+      "bytes": 1753,
       "hash_mode": "utf8_lf",
       "path": "containers/codecheck-reviewer/run_capsule.sh",
-      "sha256": "cc1ecdbd50cbad1f0414f51028813871e8bde7e72e2a51702311dcc64ce867cc"
+      "sha256": "0e001267b4932fc973db0fd72d9a1080e2d299859b25ca89aa2eb58f091986fd"
     },
     {
       "bytes": 3286,
@@ -850,9 +850,9 @@
     "passed": true
   },
   "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
-  "readiness_sha256": "75e2387ea8efb932c7b180a94dfd971cb6114b3d7b6b6ac8221decfd7198b396",
+  "readiness_sha256": "4d29a5056b9d791d3d4a0a65f670685ce7b34650e2fe8569cdef0e14230b2ed6",
   "release_candidate": {
-    "bundle_input_chain_sha256": "014ec631574035946930b196c54e1bb9c822116683e10e41252df849b7cdd487",
+    "bundle_input_chain_sha256": "f3b23ce16c1f7c737e001b4704e95766c885f1901b9793299b37caf3a21f099c",
     "bundle_input_count": 41,
     "bundle_inputs": [
       {
@@ -910,10 +910,10 @@
         "sha256": "5065f238b5cb221521a075ae1314bc2437ade1f7ffd17db5720d54cac38797d2"
       },
       {
-        "bytes": 22579,
+        "bytes": 22745,
         "hash_mode": "utf8_lf",
         "path": "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py",
-        "sha256": "a3dd24e7bdd4f9552ec56a4b1c6e8596b7ef5a171253a9ad7a08f99ef5a9a812"
+        "sha256": "ee0f987deba96e25f70db58e9097cb53ce82c83d0b312493aef98dc7fbef7546"
       },
       {
         "bytes": 45420,
@@ -988,10 +988,10 @@
         "sha256": "746307528a39cfe7d8cfe6891d6926fce64ed2b812f9a5202a368755b58561e8"
       },
       {
-        "bytes": 1555,
+        "bytes": 1753,
         "hash_mode": "binary",
         "path": "containers/codecheck-reviewer/run_capsule.sh",
-        "sha256": "cc1ecdbd50cbad1f0414f51028813871e8bde7e72e2a51702311dcc64ce867cc"
+        "sha256": "0e001267b4932fc973db0fd72d9a1080e2d299859b25ca89aa2eb58f091986fd"
       },
       {
         "bytes": 7640,
