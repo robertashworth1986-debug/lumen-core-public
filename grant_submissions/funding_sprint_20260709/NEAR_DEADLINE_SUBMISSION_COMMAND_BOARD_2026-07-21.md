@@ -7,8 +7,8 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 ## Control Line
 
 - Status: `NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_FAIL_CLOSED_FRESHNESS_BLOCKERS`
-- Generated UTC: `2026-07-21T18:28:47Z`
-- Freshness as-of UTC: `2026-07-21T18:28:47Z`
+- Generated UTC: `2026-07-21T19:00:07.742611Z`
+- Freshness as-of UTC: `2026-07-21T19:00:07.742611Z`
 - Scan date: `2026-07-21`
 - Lane count: `23`
 - Curated Navy lanes: `3`
@@ -33,7 +33,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `7cc5708b0c07ed9c1408815ee4c3d84ae91ce972b1552beed0d9844666d705cb`
+- Command board SHA-256: `807f7089bbfcf57f3f8f2ad814c6ffaba4c050a7f7ebc4107b2595049054abb3`
 
 ## Source Freshness
 
@@ -43,12 +43,12 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 - Blockers: `6`
 - Boundary: Freshness describes local snapshots only. A current timestamp does not prove eligibility, an unchanged deadline, portal state, or submission readiness; zero-row or inconclusive discovery responses never prove opportunity absence.
 
-- `grant_reviewer_curation`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:21:42Z` age_hours=`107.118` blocking=`true`
-- `grant_reviewer_feed`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:58:16.957707Z` age_hours=`106.508` blocking=`true`
-- `sam_rush_board`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-10T17:17:18.392822Z` age_hours=`265.191` blocking=`true`
+- `grant_reviewer_curation`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:21:42Z` age_hours=`107.64` blocking=`true`
+- `grant_reviewer_feed`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:58:16.957707Z` age_hours=`107.031` blocking=`true`
+- `sam_rush_board`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-10T17:17:18.392822Z` age_hours=`265.714` blocking=`true`
 - `grants_ranked`: status=`UNDATED_REVERIFY_REQUIRED` freshness=`UNDATED_REVERIFY_REQUIRED` source_utc=`None` age_hours=`None` blocking=`true`
 - `zero_friction_pack`: status=`UNDATED_REVERIFY_REQUIRED` freshness=`UNDATED_REVERIFY_REQUIRED` source_utc=`None` age_hours=`None` blocking=`true`
-- `sam_live_discovery`: status=`ZERO_ROW_SAM_RESPONSE_INCONCLUSIVE_BLOCKER` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:57:56.457071Z` age_hours=`106.514` blocking=`true`
+- `sam_live_discovery`: status=`ZERO_ROW_SAM_RESPONSE_INCONCLUSIVE_BLOCKER` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:57:56.457071Z` age_hours=`107.036` blocking=`true`
   - SAM records: `0`; reported diagnostic: `HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE`; zero rows: `true`
 
 ## Operational Controls
@@ -703,7 +703,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
   - `grant_submissions/NV063_HarborSentinel/render_qa_20260716_dsip_candidate_v1/page-5.png`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `cee901b71d944dad731f96472fcf5afded966848faf11e4a03061fb7a70ec8d4`
+- Lane SHA-256: `047fbf5d2850cdd27d098d551ceefaff35efbc52e33307192e70d99418b3cb01`
 
 ### 7. DON26BZ03-NV065 - Adaptive Sensor Management
 
@@ -742,7 +742,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
   - `grant_submissions/NV065_AdaptiveSensorManagement/NV065_READINESS.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `96f61536e722a2ed1cac40383fe237ed5a187f561e65cd093f25261b16e06b3e`
+- Lane SHA-256: `7f16a787b45a105c3ba01ca0d823e97556dddc9f8941d1fa6b9bfd4c0955a615`
 
 ### 8. DON26BZ03-NV061 - Predictive Movement for Object Oriented Tracking
 
@@ -781,7 +781,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
   - `grant_submissions/NV061_TrackCast/NV061_READINESS.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `cc2effb004d48ad5715945489839b0336987eb8298ece66b5efb3f74d1164a74`
+- Lane SHA-256: `d921069c1c16b8d97a1264bea8d26225abcc0d2a2cedc0c719a094bbf0b2e232`
 
 ### 9. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
 
