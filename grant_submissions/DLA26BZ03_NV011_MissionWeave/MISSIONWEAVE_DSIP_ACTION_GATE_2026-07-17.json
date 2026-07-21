@@ -117,7 +117,7 @@
       {
         "evidence_required": "Current source review, hash-bound documentary register, and bounded founder/corporate-official position",
         "human_boundary": "No compliance, assessment, certification, or contracting-office acceptance is inferred.",
-        "instruction": "Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document whether a Technology Control Plan is a contracting-negotiation deliverable.",
+        "instruction": "Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document the bounded Technology Control Plan position. The DLA component instructions say an ITAR/EAR topic firm may be required to submit a TCP during contracting negotiation; that does not establish a current proposal-upload requirement or agency acceptance.",
         "open_gate_count": 6,
         "open_gates": [
           "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
@@ -224,7 +224,7 @@
     },
     "submission_readiness_logic_unchanged": true
   },
-  "gate_sha256": "f44725cd96edd1b5c1e65588e125ebbf46f753cf8fca5907b93d670af7165d7e",
+  "gate_sha256": "0d8ac4192af707c66f153782b1584764f84c0575aba223ce5bf1233e13e6840c",
   "gate_summary": {
     "open_gate_count": 15,
     "passed_private_gate_count": 35,
@@ -335,7 +335,7 @@
       "VOLUME5_UPLOAD_SET"
     ]
   },
-  "generated_utc": "2026-07-21T21:39:17.860849+00:00",
+  "generated_utc": "2026-07-21T23:24:34.027552+00:00",
   "jcp_evidence_protocol": {
     "bare_boolean_can_clear_gate": false,
     "bytes": 4034,
@@ -352,6 +352,7 @@
     "phase_i_max_duration_months": 12,
     "projected_cmmc_level": "Level 2 (Self)",
     "taba_requested": false,
+    "technology_control_plan_lifecycle_note": "The DLA component instructions say an ITAR/EAR topic firm may be required to submit a Technology Control Plan during contracting negotiation. This does not establish a current proposal-upload requirement, plan approval, or contracting-office acceptance.",
     "topic_itar_flag": true,
     "volume2_page_limit": 20,
     "volume6_fwa_training_required_annually": true,

@@ -15,7 +15,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Required private gates: `50`
 - Passed private gates: `35`
 - Open gates: `15`
-- Gate SHA-256: `f44725cd96edd1b5c1e65588e125ebbf46f753cf8fca5907b93d670af7165d7e`
+- Gate SHA-256: `0d8ac4192af707c66f153782b1584764f84c0575aba223ce5bf1233e13e6840c`
 
 ## Package Integrity
 
@@ -192,7 +192,7 @@ Review the proposed labor rate, 640 PI hours, fringe, indirect base, cloud/data,
 
 ### 4. Review conflicts, cost separation, data rights, CMMC, and export-control planning
 
-Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document whether a Technology Control Plan is a contracting-negotiation deliverable.
+Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document the bounded Technology Control Plan position. The DLA component instructions say an ITAR/EAR topic firm may be required to submit a TCP during contracting negotiation; that does not establish a current proposal-upload requirement or agency acceptance.
 
 - Evidence required: Current source review, hash-bound documentary register, and bounded founder/corporate-official position
 - Human boundary: No compliance, assessment, certification, or contracting-office acceptance is inferred.

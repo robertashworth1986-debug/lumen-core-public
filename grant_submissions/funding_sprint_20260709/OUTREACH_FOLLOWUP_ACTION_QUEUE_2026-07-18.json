@@ -97,7 +97,7 @@
       "draft_rendered": false,
       "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 139800,
+      "hold_seconds_remaining": 138909,
       "inbox_recheck_required": false,
       "lane_id": "lanl_vision_licensing_followup",
       "max_proactive_sends": 1,
@@ -326,7 +326,7 @@
       "source_state": "ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY"
     }
   ],
-  "as_of_utc": "2026-07-21T23:10:00Z",
+  "as_of_utc": "2026-07-21T23:24:50.012666Z",
   "claim_boundary": "This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, and neither condition authorizes a draft or send. Historical send-timing exceptions remain counted against the send cap and are surfaced fail-closed. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.",
   "controls": {
     "action_time_human_review_required": true,
@@ -344,7 +344,7 @@
       "4B5EDC6BCB11F72B7A0896FBEA672EC8C5DC1B9D19F4FDAD099AADF7E7C41D45"
     ]
   },
-  "queue_sha256": "3753C504ED4EE7632ADA09029B949874BBF3BD542C05928B4699D65A080F26C7",
+  "queue_sha256": "0F6AC7B187AE0C19163E0F8EF79FAACD181F7BA15732DBED523958DF047CCEE1",
   "routing_integrity_exceptions": [
     {
       "exception": "SENT_BEFORE_CONFIGURED_HOLD",
@@ -357,10 +357,10 @@
   "schema": "lumencore.outreach_followup_action_queue.v1",
   "source_evidence": {
     "email_reconciliation": {
-      "bytes": 28856,
-      "identity_source": "COMMITTED_GIT_BLOB",
+      "bytes": 29443,
+      "identity_source": "WORKTREE_BYTES",
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
-      "sha256": "9CF36719FF925A0C96A680C552446438F2AE8D87B5044D7827C4415FAD61A743",
+      "sha256": "EBC65DCFA777D3738F95E64942DD602BF222F0150FCB45753824CEDDAA4961B9",
       "worktree_eol_differs_from_git_blob": false
     },
     "followup_policy_config": {

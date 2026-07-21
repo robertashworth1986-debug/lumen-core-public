@@ -81,6 +81,21 @@ def test_finish_card_covers_every_open_gate_once_and_preserves_human_boundaries(
     assert "--confirm-entity-match" in payload["jcp_receipt_capture_command_template"]
     assert "--confirm-corporate-review" in payload["jcp_receipt_capture_command_template"]
 
+    lifecycle_gates = [
+        gate_id
+        for stage in payload["operator_focus"]["lifecycle_stages"]
+        for gate_id in stage["open_gates"]
+    ]
+    assert len(lifecycle_gates) == len(set(lifecycle_gates)) == 15
+    assert set(lifecycle_gates) == set(payload["current_truth"]["unresolved_gates"])
+    assert [
+        stage["open_gate_count"]
+        for stage in payload["operator_focus"]["lifecycle_stages"]
+    ] == [8, 2, 5]
+    assert [
+        stage["title"] for stage in payload["operator_focus"]["lifecycle_stages"]
+    ] == ["Do now", "Bound the pre-award position", "Do last"]
+
 
 def test_finish_card_records_no_duplicate_email_state_and_source_hashes():
     module = load_module()
@@ -121,6 +136,11 @@ def test_finish_card_self_hash_and_rendered_operator_language_are_current():
     assert "Additional email due now: **false**" in rendered
     assert "one-time code" in rendered
     assert "CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py" in rendered
+    assert "CMMC And TCP Decision Support" in rendered
+    assert rendered.index("## What To Do Now") < rendered.index("## Do These In Order")
+    assert "**Do now**: 8 open" in rendered
+    assert "APPLICABILITY_UNRESOLVED" in rendered
+    assert "during contracting negotiation" in rendered
     assert "does not prove JCP approval" in rendered
 
 

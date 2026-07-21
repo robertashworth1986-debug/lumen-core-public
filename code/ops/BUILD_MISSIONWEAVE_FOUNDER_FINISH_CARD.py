@@ -21,6 +21,13 @@ OUT_MD = MISSIONWEAVE_DIR / "MISSIONWEAVE_FOUNDER_FINISH_CARD_2026-07-21.md"
 
 DSIP_URL = "https://www.dodsbirsttr.mil/submissions/"
 JCP_URL = "https://www.public.dacs.dla.mil/jcp/ext/"
+LIFECYCLE_STAGE_TITLES = {
+    "A_PRE_SUBMISSION_CONTENT_AND_EVIDENCE": "Do now",
+    "B_PRE_AWARD_OR_CONTRACT_NEGOTIATION_READINESS": (
+        "Bound the pre-award position"
+    ),
+    "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN": "Do last",
+}
 PRIVATE_INPUT = (
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/private/"
     "MISSIONWEAVE_DSIP_ACTION.private.json"
@@ -145,6 +152,54 @@ def _validated_steps(
     return steps
 
 
+def _validated_lifecycle(
+    gate: dict[str, Any], unresolved: list[str]
+) -> list[dict[str, Any]]:
+    lifecycle = gate.get("gate_lifecycle")
+    _require(isinstance(lifecycle, dict), "GATE_LIFECYCLE_MISSING")
+    _require(
+        lifecycle.get("all_open_gates_classified_once") is True,
+        "GATE_LIFECYCLE_COVERAGE_FALSE",
+    )
+    _require(
+        lifecycle.get("classification_can_clear_gate") is False,
+        "GATE_LIFECYCLE_CLEARANCE_UNSAFE",
+    )
+    stages = lifecycle.get("stages")
+    _require(isinstance(stages, dict) and stages, "GATE_LIFECYCLE_STAGES_INVALID")
+    _require(
+        set(stages) == set(LIFECYCLE_STAGE_TITLES),
+        "GATE_LIFECYCLE_STAGE_SET_DRIFT",
+    )
+
+    rows: list[dict[str, Any]] = []
+    flattened: list[str] = []
+    for stage_id, raw_stage in stages.items():
+        _require(isinstance(raw_stage, dict), "GATE_LIFECYCLE_STAGE_NOT_OBJECT")
+        open_gates = raw_stage.get("open_gates")
+        _require(isinstance(open_gates, list), "GATE_LIFECYCLE_GATES_INVALID")
+        normalized_gates = [str(gate_id) for gate_id in open_gates]
+        _require(
+            int(raw_stage.get("open_gate_count", -1)) == len(normalized_gates),
+            "GATE_LIFECYCLE_COUNT_DRIFT",
+        )
+        flattened.extend(normalized_gates)
+        rows.append(
+            {
+                "stage_id": str(stage_id),
+                "title": LIFECYCLE_STAGE_TITLES[str(stage_id)],
+                "description": str(raw_stage.get("description", "")),
+                "submission_effect": str(raw_stage.get("submission_effect", "")),
+                "open_gate_count": len(normalized_gates),
+                "open_gates": normalized_gates,
+            }
+        )
+
+    _require(len(flattened) == len(set(flattened)), "GATE_LIFECYCLE_GATE_DUPLICATE")
+    _require(set(flattened) == set(unresolved), "GATE_LIFECYCLE_GATE_COVERAGE_DRIFT")
+    return rows
+
+
 def build_card(
     *,
     as_of_utc: str | datetime | None = None,
@@ -177,6 +232,19 @@ def build_card(
     _require(passed_count + open_count == required_count, "TOTAL_GATE_COUNT_DRIFT")
 
     steps = _validated_steps(gate, unresolved)
+    lifecycle_stages = _validated_lifecycle(gate, unresolved)
+    instruction_facts = gate.get("official_instruction_facts")
+    _require(isinstance(instruction_facts, dict), "OFFICIAL_INSTRUCTION_FACTS_INVALID")
+    _require(
+        instruction_facts.get("projected_cmmc_level") == "Level 2 (Self)",
+        "PROJECTED_CMMC_LEVEL_DRIFT",
+    )
+    cmmc_note = str(instruction_facts.get("cmmc_amendment_note", ""))
+    tcp_note = str(
+        instruction_facts.get("technology_control_plan_lifecycle_note", "")
+    )
+    _require("Phase I self-assessment requirements remain" in cmmc_note, "CMMC_NOTE_INVALID")
+    _require("during contracting negotiation" in tcp_note, "TCP_LIFECYCLE_NOTE_INVALID")
     deadline = gate.get("deadline")
     _require(isinstance(deadline, dict), "DEADLINE_INVALID")
     deadline_utc = parse_utc(str(deadline.get("expected_utc", "")))
@@ -238,6 +306,42 @@ def build_card(
             {"name": "Official JCP portal", "url": JCP_URL},
             {"name": "Defense SBIR/STTR submission portal", "url": DSIP_URL},
         ],
+        "operator_focus": {
+            "instruction": (
+                "Work the pre-submission evidence stage first. Do not spend action-time "
+                "approval or certify final submission until the upload set and fresh portal "
+                "preview are complete."
+            ),
+            "lifecycle_stages": lifecycle_stages,
+            "bounded_decision_support": {
+                "cmmc": {
+                    "projected_level": instruction_facts["projected_cmmc_level"],
+                    "official_note": cmmc_note,
+                    "current_packet_state": str(
+                        gate.get("cmmc_evidence_packet", {}).get(
+                            "requirement_evidence_state", ""
+                        )
+                    ),
+                    "supported_position": gate.get("cmmc_evidence_packet", {}).get(
+                        "phase_i_position_supported"
+                    )
+                    is True,
+                    "safe_rule": (
+                        "Do not mark the Phase I position supported from projected topic text "
+                        "alone; use current authoritative evidence or a qualified reviewed "
+                        "not-applicable determination."
+                    ),
+                },
+                "technology_control_plan": {
+                    "official_note": tcp_note,
+                    "safe_rule": (
+                        "Document only the present lifecycle position: a TCP may be requested "
+                        "during contracting negotiation. Do not claim it was submitted, "
+                        "approved, or accepted unless separate evidence proves that event."
+                    ),
+                },
+            },
+        },
         "ordered_founder_steps": steps,
         "outreach_control": {
             "queue_path": rel(queue_path),
@@ -324,6 +428,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
     truth = payload["current_truth"]
     deadline = payload["deadline"]
     outreach = payload["outreach_control"]
+    focus = payload["operator_focus"]
+    decision_support = focus["bounded_decision_support"]
     lines = [
         "# MissionWeave Founder Finish Card",
         "",
@@ -342,9 +448,31 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "Why first: " + payload["start_here"]["why_first"],
         "",
-        "## Do These In Order",
+        "## What To Do Now",
+        "",
+        focus["instruction"],
         "",
     ]
+    for stage in focus["lifecycle_stages"]:
+        lines.append(
+            f"- **{stage['title']}**: {stage['open_gate_count']} open. "
+            f"{stage['description']}"
+        )
+    lines.extend(
+        [
+            "",
+            "### CMMC And TCP Decision Support",
+            "",
+            f"- CMMC projected level: `{decision_support['cmmc']['projected_level']}`.",
+            f"- CMMC evidence state: `{decision_support['cmmc']['current_packet_state']}`; "
+            f"supported position: `{str(decision_support['cmmc']['supported_position']).lower()}`.",
+            f"- CMMC rule: {decision_support['cmmc']['safe_rule']}",
+            f"- TCP rule: {decision_support['technology_control_plan']['safe_rule']}",
+            "",
+            "## Do These In Order",
+            "",
+        ]
+    )
     for step in payload["ordered_founder_steps"]:
         lines.extend(
             [

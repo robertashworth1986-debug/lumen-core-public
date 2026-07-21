@@ -1,6 +1,6 @@
 # MissionWeave Founder Finish Card
 
-- Generated UTC: `2026-07-21T23:11:00Z`
+- Generated UTC: `2026-07-21T23:26:56.888548Z`
 - Deadline: **July 22, 2026 at 12:00 p.m. Eastern Time** (`2026-07-22T16:00:00Z`)
 - Time remaining at generation: `16` full hours
 - Current gate: **35/50 passed; 15 open**
@@ -14,6 +14,21 @@
 3. Keep the official receipt PDF private. Do not paste a Firm PIN, password, or one-time code into chat or Git.
 
 Why first: Volume 5 cannot be locked without the required official JCP/DD Form 2345 evidence for the current ITAR-marked scope.
+
+## What To Do Now
+
+Work the pre-submission evidence stage first. Do not spend action-time approval or certify final submission until the upload set and fresh portal preview are complete.
+
+- **Do now**: 8 open. Evidence, content, registration, and portal facts required before the bounded final-submission gate can open.
+- **Bound the pre-award position**: 2 open. The proposal must state a current bounded position. Implementation proof may occur during pre-award or contract negotiation only if the live portal or contracting office permits it; these gates remain fail-closed now.
+- **Do last**: 5 open. Fresh preview, corporate review, and final authorization occur only after the upload set is stable and immediately before the human submit action.
+
+### CMMC And TCP Decision Support
+
+- CMMC projected level: `Level 2 (Self)`.
+- CMMC evidence state: `APPLICABILITY_UNRESOLVED`; supported position: `false`.
+- CMMC rule: Do not mark the Phase I position supported from projected topic text alone; use current authoritative evidence or a qualified reviewed not-applicable determination.
+- TCP rule: Document only the present lifecycle position: a TCP may be requested during contracting negotiation. Do not claim it was submitted, approved, or accepted unless separate evidence proves that event.
 
 ## Do These In Order
 
@@ -40,7 +55,7 @@ Why first: Volume 5 cannot be locked without the required official JCP/DD Form 2
 
 ### 4. Review conflicts, cost separation, data rights, CMMC, and export-control planning
 
-- Do: Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document whether a Technology Control Plan is a contracting-negotiation deliverable.
+- Do: Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document the bounded Technology Control Plan position. The DLA component instructions say an ITAR/EAR topic firm may be required to submit a TCP during contracting negotiation; that does not establish a current proposal-upload requirement or agency acceptance.
 - Evidence needed: Current source review, hash-bound documentary register, and bounded founder/corporate-official position
 - Human boundary: No compliance, assessment, certification, or contracting-office acceptance is inferred.
 - Clears: `CMMC_PHASE_I_SELF_ASSESSMENT_POSITION, CONFLICTS_AND_JOINT_VENTURE_STATUS, CURRENT_CMMC_REQUIREMENTS_REVIEW, NO_DUPLICATE_COST_OR_DELIVERABLE, TECHNICAL_DATA_RIGHTS_ASSERTION, TECHNOLOGY_CONTROL_PLAN_DECISION`
@@ -92,8 +107,8 @@ Do not certify or click final submit until the regenerated action gate reports `
 ## Source Lock
 
 - Action gate: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json`
-- Action-gate canonical-text SHA-256: `ABBC656B11687706A441B9CDCF1272DFD324A34B6A1187EF0874FE83D05E3E88`
-- Outreach queue canonical-text SHA-256: `B30282628B67A4E439A02F83377AD0E954DC718C9133A2C9A671ACA69518C356`
-- Card SHA-256: `943F57FFE3BDE47C6995D80D8EC5DBE86C189D76AE8A07FB63C2EAFA42E12567`
+- Action-gate canonical-text SHA-256: `5FFF4C4074E8F0879C38662080E90CB5FE595E982359D88BBD10AE58EF5AAB5D`
+- Outreach queue canonical-text SHA-256: `B82A244081EB45E8D54B3A69C9972255D57FCB0AD98E92B44FFF2B96FC979E6D`
+- Card SHA-256: `C01C8E45F72B53FEA86511D1A5595AAA00F6323EDA17D09D8D2EEF7B751DEEA6`
 
 This card is a current operator checklist derived from local control artifacts. It does not prove JCP approval, DD Form 2345 certification, CMMC status, ITAR compliance, proposal submission, DLA receipt, eligibility, selection, award, endorsement, deployment, technical validation, funding, or value.

@@ -1303,6 +1303,14 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     assert "Do not upload a foreign-affiliations PDF in Volume 5" in checklist
     assert "CMMC Phase II implementation was suspended" in checklist
     assert "Phase I self-assessment requirements remain" in checklist
+    assert "during contracting negotiation" in checklist
+    assert "does not establish a current proposal-upload requirement" in checklist
+    assert (
+        "during contracting negotiation"
+        in payload["official_instruction_facts"][
+            "technology_control_plan_lifecycle_note"
+        ]
+    )
     assert "READY_FOR_HUMAN_FINAL_SUBMIT_CLICK" in checklist
     assert "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section identity" in checklist
     assert "CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval" in checklist

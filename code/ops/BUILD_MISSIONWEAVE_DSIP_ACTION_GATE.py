@@ -392,7 +392,10 @@ FOUNDER_ACTION_DEFINITIONS = (
             "Answer conflicts and joint-venture status from current facts; reconcile the "
             "no-duplicate-cost position and technical-data-rights schedule against source "
             "records; review the live CMMC requirement; preserve the no-overclaim position; "
-            "and document whether a Technology Control Plan is a contracting-negotiation deliverable."
+            "and document the bounded Technology Control Plan position. The DLA component "
+            "instructions say an ITAR/EAR topic firm may be required to submit a TCP during "
+            "contracting negotiation; that does not establish a current proposal-upload "
+            "requirement or agency acceptance."
         ),
         "evidence_required": (
             "Current source review, hash-bound documentary register, and bounded "
@@ -2818,6 +2821,12 @@ def build_payload(
                 "13, 2026 while Phase I self-assessment requirements remain in place; "
                 "the current live requirement must be reviewed before submission."
             ),
+            "technology_control_plan_lifecycle_note": (
+                "The DLA component instructions say an ITAR/EAR topic firm may be "
+                "required to submit a Technology Control Plan during contracting "
+                "negotiation. This does not establish a current proposal-upload "
+                "requirement, plan approval, or contracting-office acceptance."
+            ),
             "volume6_fwa_training_required_annually": True,
             "volume7_is_webform_not_volume5_pdf": True,
             "taba_requested": False,
@@ -3169,7 +3178,7 @@ This sequence covers every currently open gate exactly once. It does not certify
 - Confirm U.S. small-business eligibility, ownership and affiliates, PI primary employment, the proposed 640 PI hours, and the SBIR percentage-of-work rule.
 - Compare MissionWeave with every prior, current, pending, or planned proposal. Disclose overlap and request no duplicate PI hours, cloud costs, software work, or deliverables.
 - Keep `NO_DUPLICATE_COST_OR_DELIVERABLE` open until the authoritative proposal/award record, 640-hour schedule, cost categories, background/proposal separation, and final corporate review are reconciled in `{rel(CERTIFICATION_DOCUMENTARY_REGISTER)}`.
-- Treat the topic as ITAR-marked. Keep controlled technical data out of the proposal and document the DD Form 2345/JCP and Technology Control Plan decisions.
+- Treat the topic as ITAR-marked. Keep controlled technical data out of the proposal and document the DD Form 2345/JCP decision. {instruction['technology_control_plan_lifecycle_note']}
 - Projected CMMC level: `{instruction['projected_cmmc_level']}`. {instruction['cmmc_amendment_note']} Consume `{payload['cmmc_evidence_packet']['path']}` and do not claim an assessment, certification, or compliant enclave without current authoritative evidence.
 - Confirm foreign-citizen participation, foreign affiliations, conflicts, joint-venture status, and each technical-data/software-rights assertion from current records.
 - Keep `TECHNICAL_DATA_RIGHTS_ASSERTION` open until every asserted item is mapped to a version and funding-history record, MIT/open-source/public interfaces are separated from any restriction, and qualified rights plus corporate-official review is hash-bound in the documentary register.
