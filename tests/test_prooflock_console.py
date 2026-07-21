@@ -258,6 +258,7 @@ def test_youtube_publication_receipt_is_bounded_and_self_hashing():
     assert receipt["devpost"]["final_submission_performed"] is True
     assert receipt["devpost"]["public_project_page_resolved"] is True
     assert receipt["devpost"]["public_page_video_embed_matches"] is True
+    assert receipt["devpost"]["public_page_model_reference"] == "GPT-5.6"
     assert receipt["devpost"]["confirmation_email_received"] is True
     assert receipt["devpost"]["confirmation_email_reply_required"] is False
     assert receipt["devpost"]["confirmation_email_utc"] == "2026-07-21T16:00:55Z"

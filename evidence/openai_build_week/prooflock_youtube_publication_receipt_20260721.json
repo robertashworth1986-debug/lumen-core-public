@@ -49,6 +49,7 @@
     "public_project_url": "https://devpost.com/software/prooflock-console",
     "public_page_submitted_to": "OpenAI Build Week",
     "public_page_video_embed_matches": true,
+    "public_page_model_reference": "GPT-5.6",
     "confirmation_email_received": true,
     "confirmation_email_utc": "2026-07-21T16:00:55Z",
     "confirmation_email_subject": "Submission confirmed: ProofLock Console",
@@ -66,5 +67,5 @@
     "award_claimed": false
   },
   "claim_boundary": "This receipt records the observed YouTube publication state, declared local source-video and narration identities, transcript-QA boundaries, Robert's report that he completed submission, the publicly resolved Devpost page showing ProofLock Console submitted to OpenAI Build Week with the matching video embedded, and Devpost's submission-confirmation email. It does not independently prove that terms were read, contest acceptance beyond successful submission, judging, award, OpenAI endorsement, external validation, engineering performance, safety, patent rights, funding, or commercial readiness.",
-  "receipt_sha256": "caa32630070646f41386e37369b3c04806292720a0fcd06514fbb230ccc6109a"
+  "receipt_sha256": "c83e6e722ee80670b5a3435684e007c85f2544a99e68282259ec811cae9a78fb"
 }
