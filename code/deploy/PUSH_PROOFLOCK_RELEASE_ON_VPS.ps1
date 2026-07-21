@@ -24,6 +24,19 @@ Set-StrictMode -Version Latest
 $RequiredApproval = "DEPLOY_PROOFLOCK_EXACT_SNAPSHOT"
 $ReleaseFileCount = 15
 $ApplyRepoPath = "code/deploy/APPLY_PROOFLOCK_RELEASE_ON_VPS.sh"
+$PublicRepository = "robertashworth1986-debug/lumen-core-public"
+$RequiredPublicDescription = "Proof-to-pilot AI validation architecture with reproducible benchmarks, cryptographic evidence custody, and fail-closed review gates."
+$RequiredPublicHomepage = "https://lumen-core.ai"
+$RequiredPublicVisibility = "public"
+$RequiredPublicDefaultBranch = "main"
+$RequiredPublicTopics = @(
+    "ai-assurance",
+    "infrastructure",
+    "provenance",
+    "reproducibility",
+    "sbir",
+    "validation"
+)
 
 function Require-Command {
     param([Parameter(Mandatory = $true)][string]$Name)
@@ -69,6 +82,62 @@ function Write-Utf8NoBom {
 function Write-OperatorReceipt {
     $rendered = ($script:Receipt | ConvertTo-Json -Depth 8) + "`n"
     Write-Utf8NoBom -Path $script:ReceiptPath -Text $rendered
+}
+
+function Assert-PublicRepositoryMetadata {
+    $headers = @{
+        Accept = "application/vnd.github+json"
+        "X-GitHub-Api-Version" = "2022-11-28"
+        "User-Agent" = "LumenCore-ProofLock-Release-Preflight"
+    }
+    $repoUri = "https://api.github.com/repos/$script:PublicRepository"
+    $topicsUri = "$repoUri/topics"
+
+    try {
+        $repo = Invoke-RestMethod -Method Get -Uri $repoUri -Headers $headers
+        $topics = Invoke-RestMethod -Method Get -Uri $topicsUri -Headers $headers
+    }
+    catch {
+        throw "Public repository metadata query failed: $($_.Exception.Message)"
+    }
+
+    $observedTopics = @(
+        $topics.names |
+            ForEach-Object { "$($_)".ToLowerInvariant() } |
+            Sort-Object -Unique
+    )
+    $expectedTopics = @($script:RequiredPublicTopics | Sort-Object -Unique)
+    $mismatches = New-Object System.Collections.Generic.List[string]
+
+    if ($repo.description -cne $script:RequiredPublicDescription) {
+        $mismatches.Add("description")
+    }
+    if (("$($repo.homepage)".TrimEnd("/")) -cne $script:RequiredPublicHomepage) {
+        $mismatches.Add("homepage")
+    }
+    if ($repo.visibility -cne $script:RequiredPublicVisibility) {
+        $mismatches.Add("visibility")
+    }
+    if ($repo.default_branch -cne $script:RequiredPublicDefaultBranch) {
+        $mismatches.Add("default_branch")
+    }
+    if (Compare-Object -ReferenceObject $expectedTopics -DifferenceObject $observedTopics) {
+        $mismatches.Add("topics")
+    }
+    if ($mismatches.Count -gt 0) {
+        throw "Public repository metadata preflight failed: $($mismatches -join ', ')"
+    }
+
+    return [pscustomobject][ordered]@{
+        status = "PASS"
+        checked_utc = (Get-Date).ToUniversalTime().ToString("o")
+        repository = $script:PublicRepository
+        description = $repo.description
+        homepage = $repo.homepage
+        visibility = $repo.visibility
+        default_branch = $repo.default_branch
+        topics = $observedTopics
+    }
 }
 
 Require-Command -Name "git"
@@ -193,6 +262,15 @@ $Receipt = [ordered]@{
     file_count = $ReleaseFileCount
     archive_sha256 = $archiveSha256
     apply_script_git_blob_oid = $expectedApplyOid
+    public_repository_metadata = [ordered]@{
+        status = "NOT_CHECKED"
+        repository = $PublicRepository
+        required_description = $RequiredPublicDescription
+        required_homepage = $RequiredPublicHomepage
+        required_visibility = $RequiredPublicVisibility
+        required_default_branch = $RequiredPublicDefaultBranch
+        required_topics = $RequiredPublicTopics
+    }
     paths = [ordered]@{
         archive = $archivePath
         manifest = $manifestPath
@@ -211,6 +289,19 @@ if (-not $Execute) {
 }
 if ($Approval -ne $RequiredApproval) {
     throw "Execute requires the exact approval token $RequiredApproval"
+}
+
+try {
+    $Receipt.public_repository_metadata = Assert-PublicRepositoryMetadata
+    Write-OperatorReceipt
+}
+catch {
+    $Receipt.status = "PUBLIC_METADATA_HOLD"
+    $Receipt.public_repository_metadata.status = "FAIL"
+    $Receipt.public_repository_metadata.checked_utc = (Get-Date).ToUniversalTime().ToString("o")
+    $Receipt.public_repository_metadata.error_message = $_.Exception.Message
+    Write-OperatorReceipt
+    throw
 }
 
 Require-Command -Name "ssh"

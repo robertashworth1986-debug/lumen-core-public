@@ -202,6 +202,21 @@ def test_manual_release_bridge_preserves_the_exact_snapshot_gate():
     assert "StrictHostKeyChecking=accept-new" not in source
     assert "DEPLOYED_CURRENT_HEAD_LIVE_MATCH" in source
     assert "exact 15-file current-head parity" in source
+    assert "Assert-PublicRepositoryMetadata" in source
+    assert "PUBLIC_METADATA_HOLD" in source
+    assert (
+        "Proof-to-pilot AI validation architecture with reproducible benchmarks, "
+        "cryptographic evidence custody, and fail-closed review gates."
+    ) in source
+    for topic in (
+        "ai-assurance",
+        "infrastructure",
+        "provenance",
+        "reproducibility",
+        "sbir",
+        "validation",
+    ):
+        assert f'"{topic}"' in source
 
 
 def test_manual_release_bridge_packages_and_holds_without_network(tmp_path):
@@ -244,6 +259,7 @@ def test_manual_release_bridge_packages_and_holds_without_network(tmp_path):
     assert receipt["deployment_attempted"] is False
     assert receipt["deployment_succeeded"] is False
     assert receipt["live_verification_succeeded"] is False
+    assert receipt["public_repository_metadata"]["status"] == "NOT_CHECKED"
     assert receipt["file_count"] == len(load_packager().RELEASE_PATHS)
     assert receipt["archive_sha256"] == manifest["archive_sha256"]
     assert (output_dir / "code" / "deploy" / APPLY_SCRIPT.name).is_file()

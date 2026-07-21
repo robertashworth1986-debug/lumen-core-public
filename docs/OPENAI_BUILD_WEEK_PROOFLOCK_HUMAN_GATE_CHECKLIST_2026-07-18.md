@@ -20,6 +20,7 @@
 - Latest observed live-file identity: `4/15` against commit `305401d213cde9609e324d6559cd6fd00dfbe502` at `2026-07-21T04:40:55Z`; the live route is not current-head evidence. The live-release and submission gates remain `HOLD`.
 - Model evidence: retain the private task-metadata candidate, but do not state a final model identity until the primary task's `/feedback` value is directly confirmed.
 - Private Session ID SHA-256: `CEDEC32157F2516DF88505802805761AE3535F093FB9B1B06CA6DEFF4A344FD9`
+- Public repository metadata: the bounded manual release bridge now fails closed unless the exact reviewer-facing description, homepage, visibility, default branch, and six-topic set match the canonical public contract.
 - Session hash reconciliation: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_SESSION_HASH_RECONCILIATION_2026-07-18.md`
 - Release receipt: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_LIVE_RELEASE_RECEIPT_2026-07-18.md`
 - Timed narration: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_DEMO_NARRATION_2026-07-18.md`
