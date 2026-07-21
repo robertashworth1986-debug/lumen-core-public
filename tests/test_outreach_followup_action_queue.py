@@ -80,17 +80,22 @@ def test_current_queue_is_deterministic_and_never_sends():
     assert actual["status"] in {
         "NO_EXTERNAL_FOLLOWUP_DUE",
         "FOLLOWUP_RECHECK_DUE_HUMAN_REVIEW",
+        "ROUTING_INTEGRITY_EXCEPTION_NO_SEND",
     }
     assert actual["summary"]["lane_count"] == 16
     assert sum(actual["summary"]["action_state_counts"].values()) == 16
     assert actual["summary"]["draft_rendered_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
     assert actual["summary"]["recorded_proactive_send_count"] == 1
+    assert actual["summary"]["routing_integrity_exception_count"] == 1
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert actual["controls"]["mailbox_recheck_max_age_seconds"] == 900
     assert actual["controls"]["mailbox_recheck_receipt_required"] is True
     assert actual["controls"][
         "proactive_send_count_derived_from_sealed_ledger"
+    ] is True
+    assert actual["controls"][
+        "historical_send_timing_exceptions_fail_closed"
     ] is True
     assert all(row["send_now"] is False for row in actual["actions"])
     assert all(row["draft_rendered"] is False for row in actual["actions"])
@@ -138,8 +143,9 @@ def test_lanl_hold_expiration_requires_recheck_and_still_does_not_authorize_send
     assert due_lanl["eligible_template_id"] == "BOUNDED_REVIEW_FOLLOWUP"
     assert due_lanl["draft_rendered"] is False
     assert due_lanl["send_now"] is False
-    assert at_gate["status"] == "FOLLOWUP_RECHECK_DUE_HUMAN_REVIEW"
+    assert at_gate["status"] == "ROUTING_INTEGRITY_EXCEPTION_NO_SEND"
     assert at_gate["summary"]["due_for_mailbox_recheck_count"] == 1
+    assert at_gate["summary"]["routing_integrity_exception_count"] == 1
     assert at_gate["summary"]["send_now_count"] == 0
 
 
@@ -271,12 +277,13 @@ def test_sealed_send_ledger_derives_count_and_exhausts_bounded_lane():
     ledger["ledger_sha256"] = module.canonical_object_sha256(
         ledger, omit={"ledger_sha256"}
     )
-    counts, digests = module.validate_followup_send_ledger(
+    counts, digests, timing_exceptions = module.validate_followup_send_ledger(
         ledger, policies, template_ids, as_of=as_of
     )
 
     assert counts["lanl_vision_licensing_followup"] == 1
     assert len(digests["lanl_vision_licensing_followup"][0]) == 64
+    assert timing_exceptions == []
     reconciliation = module.read_json(module.EMAIL_RECONCILIATION)
     lane = next(
         row
@@ -354,6 +361,20 @@ def test_recorded_missionweave_followup_exhausts_lane_before_and_after_gate():
         assert row["draft_rendered"] is False
         assert row["send_now"] is False
 
+    assert before["status"] == "ROUTING_INTEGRITY_EXCEPTION_NO_SEND"
+    assert due["status"] == "ROUTING_INTEGRITY_EXCEPTION_NO_SEND"
+    assert before["routing_integrity_exceptions"] == [
+        {
+            "exception": "SENT_BEFORE_CONFIGURED_HOLD",
+            "lane_id": "missionweave_dsip_proposal",
+            "not_before_utc": "2026-07-20T17:00:00Z",
+            "sent_utc": "2026-07-20T15:36:02Z",
+            "sent_message_receipt_sha256": (
+                "6DC9E2D4DAD3D146AEB6A397FBED865B5B9C8A83AB66929F3F2D47A6153F8A16"
+            ),
+        }
+    ]
+
 
 def test_modes_route_closed_inbound_portal_private_and_account_work_separately():
     module = load_module()
@@ -402,10 +423,19 @@ def test_missing_or_drifted_lane_policy_fails_closed():
     stale_evidence = copy.deepcopy(reconciliation)
     source_id = next(iter(stale_evidence["source_evidence"]))
     stale_evidence["source_evidence"][source_id]["sha256"] = "0" * 64
-    with pytest.raises(ValueError, match="Source evidence hash drift"):
+    with pytest.raises(ValueError, match="Source evidence byte/hash drift"):
         module.validate_sources(
             stale_evidence, registry, policies, send_ledger, as_of=as_of
         )
+
+
+def test_source_identity_accepts_only_eol_equivalent_committed_bytes():
+    module = load_module()
+    status = module.source_status(module.FOLLOWUP_POLICY_CONFIG)
+
+    assert status["identity_source"] == "COMMITTED_GIT_BLOB"
+    assert isinstance(status["worktree_eol_differs_from_git_blob"], bool)
+    assert len(status["sha256"]) == 64
 
 
 def test_public_outputs_exclude_mailbox_and_secret_material():

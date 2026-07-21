@@ -186,6 +186,13 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert source_evidence["outreach_followup_policy_config"]["present"] is True
     assert len(source_evidence["nashville_official_deadline_confirmation"]["sha256"]) == 64
     assert len(source_evidence["lvlup_independent_review_confirmation"]["sha256"]) == 64
+    assert all(
+        row["identity_source"] in {"COMMITTED_GIT_BLOB", "WORKTREE_BYTES"}
+        for row in source_evidence.values()
+    )
+    assert source_evidence["outreach_followup_policy_config"][
+        "identity_source"
+    ] == "COMMITTED_GIT_BLOB"
 
     assert all(
         lane["response_template_id"] == "NO_DUPLICATE_MONITOR"

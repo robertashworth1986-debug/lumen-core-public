@@ -1,14 +1,15 @@
 # Outreach Follow-up Action Queue - 2026-07-18
 
-- Status: `NO_EXTERNAL_FOLLOWUP_DUE`
-- As of UTC: `2026-07-20T22:43:05.546000Z`
+- Status: `ROUTING_INTEGRITY_EXCEPTION_NO_SEND`
+- As of UTC: `2026-07-21T04:30:07.248915Z`
 - Lanes: `16`
 - Due for mailbox recheck: `0`
 - Held no-send: `1`
 - Drafts rendered: `0`
 - Send now: `0`
+- Routing integrity exceptions: `1`
 - Autonomous external send allowed: `false`
-- Queue SHA-256: `9F695B4E888E08CE8A4320AB30C8D3B53A2272D67095A3E6D36B4342C4DA4E03`
+- Queue SHA-256: `4A2EE8F1FE14EDA38CB6025E02D0210EECC72AF9D8292985095C4A18BA557D7B`
 
 ## Action Queue
 
@@ -31,6 +32,12 @@
 | U.S. Army | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
 | SAM.gov account credential control | `ACCOUNT_ACTION` | `HUMAN_ACCOUNT_ACTION_OPEN` | `none` | `none` |
 
+## Routing Integrity Exceptions
+
+| Lane | Exception | Sent UTC | Not before UTC |
+|---|---|---|---|
+| `missionweave_dsip_proposal` | `SENT_BEFORE_CONFIGURED_HOLD` | `2026-07-20T15:36:02Z` | `2026-07-20T17:00:00Z` |
+
 ## Claim Boundary
 
-This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, and neither condition authorizes a draft or send. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.
+This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, and neither condition authorizes a draft or send. Historical send-timing exceptions remain counted against the send cap and are surfaced fail-closed. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.

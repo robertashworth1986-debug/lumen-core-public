@@ -61,7 +61,7 @@
       "draft_rendered": false,
       "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 227814,
+      "hold_seconds_remaining": 206992,
       "inbox_recheck_required": false,
       "lane_id": "lanl_vision_licensing_followup",
       "max_proactive_sends": 1,
@@ -290,12 +290,13 @@
       "source_state": "ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY"
     }
   ],
-  "as_of_utc": "2026-07-20T22:43:05.546000Z",
-  "claim_boundary": "This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, and neither condition authorizes a draft or send. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.",
+  "as_of_utc": "2026-07-21T04:30:07.248915Z",
+  "claim_boundary": "This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, and neither condition authorizes a draft or send. Historical send-timing exceptions remain counted against the send cap and are surfaced fail-closed. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.",
   "controls": {
     "action_time_human_review_required": true,
     "builder_can_send_email": false,
     "final_send_performed": false,
+    "historical_send_timing_exceptions_fail_closed": true,
     "inbox_recheck_required_before_draft": true,
     "mailbox_recheck_max_age_seconds": 900,
     "mailbox_recheck_receipt_required": true,
@@ -307,36 +308,55 @@
       "4B5EDC6BCB11F72B7A0896FBEA672EC8C5DC1B9D19F4FDAD099AADF7E7C41D45"
     ]
   },
-  "queue_sha256": "9F695B4E888E08CE8A4320AB30C8D3B53A2272D67095A3E6D36B4342C4DA4E03",
+  "queue_sha256": "4A2EE8F1FE14EDA38CB6025E02D0210EECC72AF9D8292985095C4A18BA557D7B",
+  "routing_integrity_exceptions": [
+    {
+      "exception": "SENT_BEFORE_CONFIGURED_HOLD",
+      "lane_id": "missionweave_dsip_proposal",
+      "not_before_utc": "2026-07-20T17:00:00Z",
+      "sent_message_receipt_sha256": "6DC9E2D4DAD3D146AEB6A397FBED865B5B9C8A83AB66929F3F2D47A6153F8A16",
+      "sent_utc": "2026-07-20T15:36:02Z"
+    }
+  ],
   "schema": "lumencore.outreach_followup_action_queue.v1",
   "source_evidence": {
     "email_reconciliation": {
-      "bytes": 22433,
+      "bytes": 23324,
+      "identity_source": "WORKTREE_BYTES",
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
-      "sha256": "DCA3E90621B7AB8A5A17F5C4CD0621E0EAE53A662F892ED71665EE1D3426029D"
+      "sha256": "A67F5CAE62CB2C0F4D0E33CA9AEA43766E118400A54420954EA4D41D8A62A878",
+      "worktree_eol_differs_from_git_blob": false
     },
     "followup_policy_config": {
       "bytes": 5670,
+      "identity_source": "COMMITTED_GIT_BLOB",
       "path": "config/outreach_followup_policies_v1.json",
-      "sha256": "34F758D02549726463FCC1A3BFAE36542FBEB8D393991BD66037B870DBD1444C"
+      "sha256": "34F758D02549726463FCC1A3BFAE36542FBEB8D393991BD66037B870DBD1444C",
+      "worktree_eol_differs_from_git_blob": true
     },
     "followup_send_ledger": {
       "bytes": 996,
+      "identity_source": "COMMITTED_GIT_BLOB",
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_SEND_LEDGER_2026-07-18.json",
-      "sha256": "156C539544CDD43E599F384420AA8B29B576CE749631828C526485BD5E3B9216"
+      "sha256": "156C539544CDD43E599F384420AA8B29B576CE749631828C526485BD5E3B9216",
+      "worktree_eol_differs_from_git_blob": true
     },
     "response_registry_builder": {
       "bytes": 19601,
+      "identity_source": "COMMITTED_GIT_BLOB",
       "path": "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py",
-      "sha256": "E3410ED6848C38AA3E0F385D95E8F1C02C59840117179A5F716EA923C319DAC8"
+      "sha256": "E3410ED6848C38AA3E0F385D95E8F1C02C59840117179A5F716EA923C319DAC8",
+      "worktree_eol_differs_from_git_blob": true
     },
     "response_template_registry": {
-      "bytes": 18275,
+      "bytes": 17846,
+      "identity_source": "COMMITTED_GIT_BLOB",
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
-      "sha256": "A72FA6DF0B4F6626D43062FC96957647CFEECC0EE5E6270333E47DA16FB61789"
+      "sha256": "40363208CEBE14EF8C8929DAE98172C3470A052A3A5EBB23D80BEE90BF233A21",
+      "worktree_eol_differs_from_git_blob": true
     }
   },
-  "status": "NO_EXTERNAL_FOLLOWUP_DUE",
+  "status": "ROUTING_INTEGRITY_EXCEPTION_NO_SEND",
   "summary": {
     "action_state_counts": {
       "CLOSED_NO_ACTION": 2,
@@ -353,6 +373,7 @@
     "held_no_send_count": 1,
     "lane_count": 16,
     "recorded_proactive_send_count": 1,
+    "routing_integrity_exception_count": 1,
     "send_now_count": 0
   }
 }

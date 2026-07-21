@@ -70,7 +70,8 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert nashville["official_close_time_confirmed"] is True
     assert nashville["deadline_timezone_explicit_in_message"] is False
     assert nashville["operational_timezone"] == "America/Chicago"
-    assert nashville["private_fill_map_present"] is True
+    private_fill_map_present = module.NASHVILLE_PRIVATE_FILL_MAP.is_file()
+    assert nashville["private_fill_map_present"] is private_fill_map_present
     assert nashville["private_fact_values_read_or_published"] is False
     assert nashville["portal_submission_verified"] is True
     assert nashville["expected_next_steps_by"] == "2026-08-03"
@@ -87,7 +88,9 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert payload["source_artifacts"]["nashville_human_fact_resolution"]["present"] is True
     assert payload["source_artifacts"]["nashville_private_collector"]["present"] is True
     assert payload["source_artifacts"]["nashville_private_workflow"]["present"] is True
-    assert payload["source_artifacts"]["nashville_private_fill_map"]["present"] is True
+    assert payload["source_artifacts"]["nashville_private_fill_map"][
+        "present"
+    ] is private_fill_map_present
     assert payload["source_artifacts"]["nashville_private_fill_map"]["bytes"] == 0
     assert payload["source_artifacts"]["nashville_private_fill_map"]["sha256"] is None
     assert payload["source_artifacts"]["nashville_private_fill_map"]["private_values_read_or_published"] is False

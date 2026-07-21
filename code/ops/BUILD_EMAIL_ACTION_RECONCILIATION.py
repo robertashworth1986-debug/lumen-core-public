@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -73,13 +74,41 @@ def read_json(path: Path) -> dict[str, Any]:
     return payload
 
 
+def normalize_text_eol(payload: bytes) -> bytes:
+    return payload.replace(b"\r\n", b"\n")
+
+
+def read_head_blob(path: Path) -> bytes | None:
+    relative = path.resolve().relative_to(ROOT.resolve()).as_posix()
+    completed = subprocess.run(
+        ["git", "show", f"HEAD:{relative}"],
+        cwd=ROOT,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+    )
+    return completed.stdout if completed.returncode == 0 else None
+
+
 def artifact_status(path: Path) -> dict[str, Any]:
-    data = path.read_bytes()
+    worktree_bytes = path.read_bytes()
+    head_blob = read_head_blob(path)
+    eol_equivalent_to_head = (
+        head_blob is not None
+        and normalize_text_eol(worktree_bytes) == normalize_text_eol(head_blob)
+    )
+    data = head_blob if eol_equivalent_to_head else worktree_bytes
     return {
         "path": path.relative_to(ROOT).as_posix(),
         "present": True,
         "bytes": len(data),
         "sha256": hashlib.sha256(data).hexdigest().upper(),
+        "identity_source": (
+            "COMMITTED_GIT_BLOB" if eol_equivalent_to_head else "WORKTREE_BYTES"
+        ),
+        "worktree_eol_differs_from_git_blob": (
+            eol_equivalent_to_head and worktree_bytes != head_blob
+        ),
     }
 
 

@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import subprocess
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -60,8 +61,24 @@ def read_json(path: Path) -> dict[str, Any]:
     return payload
 
 
-def sha256_file(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest().upper()
+def sha256_bytes(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest().upper()
+
+
+def normalize_text_eol(payload: bytes) -> bytes:
+    return payload.replace(b"\r\n", b"\n")
+
+
+def read_head_blob(path: Path) -> bytes | None:
+    relative = path.resolve().relative_to(ROOT.resolve()).as_posix()
+    completed = subprocess.run(
+        ["git", "show", f"HEAD:{relative}"],
+        cwd=ROOT,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+    )
+    return completed.stdout if completed.returncode == 0 else None
 
 
 def parse_aware_utc(value: str) -> datetime:
@@ -82,10 +99,23 @@ def utc_iso(value: datetime) -> str:
 
 
 def source_status(path: Path) -> dict[str, Any]:
+    worktree_bytes = path.read_bytes()
+    head_blob = read_head_blob(path)
+    eol_equivalent_to_head = (
+        head_blob is not None
+        and normalize_text_eol(worktree_bytes) == normalize_text_eol(head_blob)
+    )
+    canonical_bytes = head_blob if eol_equivalent_to_head else worktree_bytes
     return {
         "path": path.relative_to(ROOT).as_posix(),
-        "bytes": path.stat().st_size,
-        "sha256": sha256_file(path),
+        "bytes": len(canonical_bytes),
+        "sha256": sha256_bytes(canonical_bytes),
+        "identity_source": (
+            "COMMITTED_GIT_BLOB" if eol_equivalent_to_head else "WORKTREE_BYTES"
+        ),
+        "worktree_eol_differs_from_git_blob": (
+            eol_equivalent_to_head and worktree_bytes != head_blob
+        ),
     }
 
 
@@ -111,7 +141,7 @@ def validate_followup_send_ledger(
     template_ids: set[str],
     *,
     as_of: datetime,
-) -> tuple[Counter[str], dict[str, list[str]]]:
+) -> tuple[Counter[str], dict[str, list[str]], list[dict[str, Any]]]:
     if ledger.get("schema") != SEND_LEDGER_SCHEMA:
         raise ValueError("Follow-up send ledger schema is invalid")
     controls = ledger.get("controls", {})
@@ -132,6 +162,7 @@ def validate_followup_send_ledger(
         raise ValueError("Follow-up send ledger receipts must be a list")
     counts: Counter[str] = Counter()
     receipt_digests: dict[str, list[str]] = {}
+    timing_exceptions: list[dict[str, Any]] = []
     seen_sent_receipts: set[str] = set()
     for index, receipt in enumerate(receipts):
         if not isinstance(receipt, dict):
@@ -168,6 +199,17 @@ def validate_followup_send_ledger(
         # receipts that existed by the requested as-of time.
         if sent_at > as_of:
             continue
+        not_before = parse_aware_utc(str(policy.get("not_before_utc") or ""))
+        if sent_at < not_before:
+            timing_exceptions.append(
+                {
+                    "exception": "SENT_BEFORE_CONFIGURED_HOLD",
+                    "lane_id": lane_id,
+                    "not_before_utc": utc_iso(not_before),
+                    "sent_utc": utc_iso(sent_at),
+                    "sent_message_receipt_sha256": sent_receipt_sha,
+                }
+            )
         counts[lane_id] += 1
         receipt_digests.setdefault(lane_id, []).append(
             canonical_object_sha256(receipt, omit=set())
@@ -176,7 +218,7 @@ def validate_followup_send_ledger(
     for lane_id, count in counts.items():
         if count > int(policies[lane_id]["max_proactive_sends"]):
             raise ValueError(f"Follow-up send limit exceeded in ledger: {lane_id}")
-    return counts, receipt_digests
+    return counts, receipt_digests, timing_exceptions
 
 
 def validate_embedded_source_evidence(reconciliation: dict[str, Any]) -> None:
@@ -199,10 +241,26 @@ def validate_embedded_source_evidence(reconciliation: dict[str, Any]) -> None:
             raise ValueError(f"Source evidence presence drift: {source_id}")
         if not present:
             continue
-        if candidate.stat().st_size != recorded.get("bytes"):
-            raise ValueError(f"Source evidence byte-count drift: {source_id}")
-        if sha256_file(candidate) != recorded.get("sha256"):
-            raise ValueError(f"Source evidence hash drift: {source_id}")
+        worktree_bytes = candidate.read_bytes()
+        worktree_matches = (
+            len(worktree_bytes) == recorded.get("bytes")
+            and sha256_bytes(worktree_bytes) == recorded.get("sha256")
+        )
+        if worktree_matches:
+            continue
+        head_blob = read_head_blob(candidate)
+        head_matches = (
+            head_blob is not None
+            and len(head_blob) == recorded.get("bytes")
+            and sha256_bytes(head_blob) == recorded.get("sha256")
+        )
+        eol_only_worktree_difference = (
+            head_blob is not None
+            and normalize_text_eol(worktree_bytes) == normalize_text_eol(head_blob)
+        )
+        if head_matches and eol_only_worktree_difference:
+            continue
+        raise ValueError(f"Source evidence byte/hash drift: {source_id}")
 
 
 def validate_sources(
@@ -217,6 +275,7 @@ def validate_sources(
     dict[str, dict[str, Any]],
     Counter[str],
     dict[str, list[str]],
+    list[dict[str, Any]],
 ]:
     if (
         reconciliation.get("schema")
@@ -267,10 +326,16 @@ def validate_sources(
         template_id = lane_policy.get("eligible_template_id")
         if template_id and template_id not in template_ids:
             raise ValueError(f"Unknown eligible template: {template_id}")
-    send_counts, send_receipt_digests = validate_followup_send_ledger(
+    send_counts, send_receipt_digests, timing_exceptions = validate_followup_send_ledger(
         send_ledger, policies, template_ids, as_of=as_of
     )
-    return template_ids, policies, send_counts, send_receipt_digests
+    return (
+        template_ids,
+        policies,
+        send_counts,
+        send_receipt_digests,
+        timing_exceptions,
+    )
 
 
 def evaluate_lane(
@@ -414,7 +479,13 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
     registry = read_json(RESPONSE_TEMPLATE_REGISTRY)
     policy_config = read_json(FOLLOWUP_POLICY_CONFIG)
     send_ledger = read_json(FOLLOWUP_SEND_LEDGER)
-    _, _, sent_counts, sent_receipt_digests = validate_sources(
+    (
+        _,
+        _,
+        sent_counts,
+        sent_receipt_digests,
+        routing_integrity_exceptions,
+    ) = validate_sources(
         reconciliation,
         registry,
         policy_config,
@@ -432,9 +503,13 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
         "schema": SCHEMA,
         "as_of_utc": utc_iso(as_of),
         "status": (
-            "FOLLOWUP_RECHECK_DUE_HUMAN_REVIEW"
-            if due_count
-            else "NO_EXTERNAL_FOLLOWUP_DUE"
+            "ROUTING_INTEGRITY_EXCEPTION_NO_SEND"
+            if routing_integrity_exceptions
+            else (
+                "FOLLOWUP_RECHECK_DUE_HUMAN_REVIEW"
+                if due_count
+                else "NO_EXTERNAL_FOLLOWUP_DUE"
+            )
         ),
         "summary": {
             "lane_count": len(actions),
@@ -444,9 +519,13 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
             "draft_rendered_count": sum(1 for row in actions if row["draft_rendered"]),
             "send_now_count": sum(1 for row in actions if row["send_now"]),
             "recorded_proactive_send_count": sum(sent_counts.values()),
+            "routing_integrity_exception_count": len(
+                routing_integrity_exceptions
+            ),
             "external_send_allowed_without_human": False,
         },
         "actions": actions,
+        "routing_integrity_exceptions": routing_integrity_exceptions,
         "controls": {
             "builder_can_send_email": False,
             "past_hold_authorizes_send": False,
@@ -454,6 +533,7 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
             "mailbox_recheck_max_age_seconds": MAILBOX_RECHECK_MAX_AGE_SECONDS,
             "mailbox_recheck_receipt_required": True,
             "proactive_send_count_derived_from_sealed_ledger": True,
+            "historical_send_timing_exceptions_fail_closed": True,
             "action_time_human_review_required": True,
             "final_send_performed": False,
         },
@@ -469,7 +549,8 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
             "This queue evaluates communication timing and routing controls only. A hold "
             "expiration requires a fresh mailbox check that is recent, timestamped, and "
             "receipted; prior proactive sends are derived from a sealed receipt ledger, "
-            "and neither condition authorizes a draft or send. "
+            "and neither condition authorizes a draft or send. Historical send-timing "
+            "exceptions remain counted against the send cap and are surfaced fail-closed. "
             "The queue does not establish submission, receipt, selection, funding, endorsement, "
             "validation, technical performance, or authority to disclose private information."
         ),
@@ -495,6 +576,20 @@ def validate_payload(payload: dict[str, Any]) -> None:
         row["recorded_proactive_send_count"] for row in payload["actions"]
     ):
         raise ValueError("Follow-up send ledger count is inconsistent")
+    timing_exceptions = payload.get("routing_integrity_exceptions", [])
+    if payload["summary"].get("routing_integrity_exception_count") != len(
+        timing_exceptions
+    ):
+        raise ValueError("Routing integrity exception count is inconsistent")
+    if timing_exceptions and payload.get("status") != (
+        "ROUTING_INTEGRITY_EXCEPTION_NO_SEND"
+    ):
+        raise ValueError("Routing integrity exceptions did not fail closed")
+    if any(
+        row.get("exception") != "SENT_BEFORE_CONFIGURED_HOLD"
+        for row in timing_exceptions
+    ):
+        raise ValueError("Routing integrity exception type is invalid")
     if any(
         row["action_state"] == "RECHECK_MAILBOX_BEFORE_DRAFT"
         and not row["inbox_recheck_required"]
@@ -517,6 +612,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Held no-send: `{summary['held_no_send_count']}`",
         f"- Drafts rendered: `{summary['draft_rendered_count']}`",
         f"- Send now: `{summary['send_now_count']}`",
+        f"- Routing integrity exceptions: `{summary['routing_integrity_exception_count']}`",
         f"- Autonomous external send allowed: `{str(summary['external_send_allowed_without_human']).lower()}`",
         f"- Queue SHA-256: `{payload['queue_sha256']}`",
         "",
@@ -531,6 +627,21 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"`{row['action_state']}` | `{row['not_before_utc'] or 'none'}` | "
             f"`{row['eligible_template_id'] or 'none'}` |"
         )
+    if payload["routing_integrity_exceptions"]:
+        lines.extend(
+            [
+                "",
+                "## Routing Integrity Exceptions",
+                "",
+                "| Lane | Exception | Sent UTC | Not before UTC |",
+                "|---|---|---|---|",
+            ]
+        )
+        for row in payload["routing_integrity_exceptions"]:
+            lines.append(
+                f"| `{row['lane_id']}` | `{row['exception']}` | "
+                f"`{row['sent_utc']}` | `{row['not_before_utc']}` |"
+            )
     lines.extend(["", "## Claim Boundary", "", payload["claim_boundary"], ""])
     return "\n".join(lines)
 
