@@ -3,8 +3,11 @@ from __future__ import annotations
 import importlib.util
 import hashlib
 import json
+from copy import deepcopy
 from datetime import date
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -342,6 +345,45 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert missionweave["action_gate_open_gate_count"] == (
         missionweave_gate_summary["open_gate_count"]
     )
+    assert missionweave["action_gate_unresolved_gates"] == (
+        missionweave_gate_summary["unresolved_gates"]
+    )
+    assert missionweave["action_gate_lifecycle"] == missionweave_gate[
+        "gate_lifecycle"
+    ]
+    assert missionweave["action_gate_founder_action_sequence"] == (
+        missionweave_gate["founder_action_sequence"]
+    )
+    assert missionweave["action_gate_next_founder_step"] == (
+        missionweave_gate["founder_action_sequence"]["ordered_steps"][0]
+    )
+    assert missionweave["action_gate_next_founder_step"]["step_id"] == (
+        "01_JCP_APPLICATION_EVIDENCE"
+    )
+    assert missionweave["action_gate_all_open_gates_classified_once"] is True
+    assert missionweave["action_gate_all_open_gates_sequenced_once"] is True
+    assert missionweave["action_gate_classification_can_clear_gate"] is False
+    assert missionweave["action_gate_final_submission_human_only"] is True
+    lifecycle_open = [
+        gate
+        for stage in missionweave["action_gate_lifecycle"]["stages"].values()
+        for gate in stage["open_gates"]
+    ]
+    sequenced_open = [
+        gate
+        for step in missionweave["action_gate_founder_action_sequence"][
+            "ordered_steps"
+        ]
+        for gate in step["open_gates"]
+    ]
+    assert lifecycle_open == list(dict.fromkeys(lifecycle_open))
+    assert sequenced_open == list(dict.fromkeys(sequenced_open))
+    assert set(lifecycle_open) == set(missionweave_gate_summary["unresolved_gates"])
+    assert set(sequenced_open) == set(missionweave_gate_summary["unresolved_gates"])
+    assert missionweave["today_work"] == [
+        f"{step['title']}: {step['instruction']}"
+        for step in missionweave_gate["founder_action_sequence"]["ordered_steps"]
+    ]
     assert missionweave["action_gate_private_input_present"] is True
     assert missionweave["action_gate_private_values_exposed"] is False
     assert missionweave["action_gate_private_input_sha256_exposed"] is False
@@ -447,6 +489,42 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert erdc["final_submit_allowed_without_human"] is False
 
 
+@pytest.mark.parametrize(
+    ("projection", "expected_error"),
+    [
+        ("lifecycle", "MissionWeave lifecycle open-gate projection failed"),
+        ("sequence", "MissionWeave founder sequence open-gate projection failed"),
+    ],
+)
+def test_missionweave_command_projection_rejects_duplicate_open_gate(
+    monkeypatch, projection: str, expected_error: str
+):
+    module = load_module()
+    original_read_json = module.read_json
+
+    def corrupted_read_json(path):
+        payload = original_read_json(path)
+        if Path(path).resolve() != module.MISSIONWEAVE_ACTION_GATE.resolve():
+            return payload
+        payload = deepcopy(payload)
+        if projection == "lifecycle":
+            stages = payload["gate_lifecycle"]["stages"]
+            first_open = next(
+                gate
+                for stage in stages.values()
+                for gate in stage["open_gates"]
+            )
+            next(iter(stages.values()))["open_gates"].append(first_open)
+        else:
+            steps = payload["founder_action_sequence"]["ordered_steps"]
+            steps[0]["open_gates"].append(steps[0]["open_gates"][0])
+        return payload
+
+    monkeypatch.setattr(module, "read_json", corrupted_read_json)
+    with pytest.raises(ValueError, match=expected_error):
+        build_test_payload(module)
+
+
 def test_near_deadline_board_keeps_hud_and_bop_behind_correct_gates():
     module = load_module()
     payload = build_test_payload(module)
@@ -503,6 +581,10 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "OPENAI-BUILD-WEEK-2026" in rendered
     assert "pinned app artifacts do not reconcile" in rendered
     assert "Action gate: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`" in rendered
+    assert "Next founder action: **Submit the JCP application" in rendered
+    assert "Exact founder sequence:" in rendered
+    assert "All open gates lifecycle-classified once: `true`" in rendered
+    assert "Classification can clear a gate: `false`" in rendered
     missionweave_gate = json.loads(
         MISSIONWEAVE_ACTION_GATE.read_text(encoding="utf-8")
     )

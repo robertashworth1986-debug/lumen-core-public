@@ -1660,6 +1660,95 @@ def build_command_lanes(
         is not False
     ):
         raise ValueError("MissionWeave private capture safety controls failed")
+    missionweave_gate_summary = missionweave_action_gate.get("gate_summary", {})
+    missionweave_unresolved_gates = missionweave_gate_summary.get(
+        "unresolved_gates", []
+    )
+    if (
+        not isinstance(missionweave_unresolved_gates, list)
+        or any(not isinstance(gate, str) for gate in missionweave_unresolved_gates)
+        or len(missionweave_unresolved_gates)
+        != len(set(missionweave_unresolved_gates))
+        or missionweave_gate_summary.get("open_gate_count")
+        != len(missionweave_unresolved_gates)
+        or missionweave_gate_summary.get("passed_private_gate_count", 0)
+        + len(missionweave_unresolved_gates)
+        != missionweave_gate_summary.get("required_private_gate_count")
+    ):
+        raise ValueError("MissionWeave open-gate accounting failed")
+
+    missionweave_lifecycle = missionweave_action_gate.get("gate_lifecycle", {})
+    missionweave_lifecycle_stages = missionweave_lifecycle.get("stages", {})
+    if (
+        missionweave_lifecycle.get("submission_readiness_logic_unchanged")
+        is not True
+        or missionweave_lifecycle.get("classification_can_clear_gate") is not False
+        or missionweave_lifecycle.get("all_open_gates_classified_once") is not True
+        or not isinstance(missionweave_lifecycle_stages, dict)
+        or any(
+            not isinstance(stage, dict)
+            for stage in missionweave_lifecycle_stages.values()
+        )
+    ):
+        raise ValueError("MissionWeave lifecycle controls failed")
+    missionweave_lifecycle_open = [
+        gate
+        for stage in missionweave_lifecycle_stages.values()
+        if isinstance(stage, dict)
+        for gate in stage.get("open_gates", [])
+    ]
+    if (
+        len(missionweave_lifecycle_open)
+        != len(set(missionweave_lifecycle_open))
+        or set(missionweave_lifecycle_open) != set(missionweave_unresolved_gates)
+    ):
+        raise ValueError("MissionWeave lifecycle open-gate projection failed")
+
+    missionweave_founder_sequence = missionweave_action_gate.get(
+        "founder_action_sequence", {}
+    )
+    missionweave_founder_steps = missionweave_founder_sequence.get(
+        "ordered_steps", []
+    )
+    if (
+        missionweave_founder_sequence.get("all_open_gates_covered_once") is not True
+        or missionweave_founder_sequence.get("classification_can_clear_gate")
+        is not False
+        or missionweave_founder_sequence.get("final_submission_human_only")
+        is not True
+        or not isinstance(missionweave_founder_steps, list)
+        or any(not isinstance(step, dict) for step in missionweave_founder_steps)
+        or missionweave_founder_sequence.get("open_step_count")
+        != len(missionweave_founder_steps)
+    ):
+        raise ValueError("MissionWeave founder action sequence controls failed")
+    missionweave_sequenced_open = [
+        gate
+        for step in missionweave_founder_steps
+        if isinstance(step, dict)
+        for gate in step.get("open_gates", [])
+    ]
+    if (
+        len(missionweave_sequenced_open)
+        != len(set(missionweave_sequenced_open))
+        or set(missionweave_sequenced_open) != set(missionweave_unresolved_gates)
+    ):
+        raise ValueError("MissionWeave founder sequence open-gate projection failed")
+    missionweave_next_founder_step = (
+        missionweave_founder_steps[0] if missionweave_founder_steps else None
+    )
+    missionweave_today_work = [
+        f"{step['title']}: {step['instruction']}"
+        for step in missionweave_founder_steps
+    ] or [
+        "No open action-gate steps remain; perform the fresh corporate review and final human submission check."
+    ]
+    missionweave_human_gate = list(
+        dict.fromkeys(
+            str(step["human_boundary"])
+            for step in missionweave_founder_steps
+        )
+    ) or ["The founder performs the final certification and submit action."]
     hud = grants.get("PDR-2600-DC-029Q", {})
     hhs_child = grants.get("HHS-2026-ACF-ACYF-CA-0037", {})
 
@@ -1854,6 +1943,14 @@ def build_command_lanes(
             "action_gate_open_gate_count": missionweave_action_gate.get(
                 "gate_summary", {}
             ).get("open_gate_count"),
+            "action_gate_unresolved_gates": missionweave_unresolved_gates,
+            "action_gate_lifecycle": missionweave_lifecycle,
+            "action_gate_founder_action_sequence": missionweave_founder_sequence,
+            "action_gate_next_founder_step": missionweave_next_founder_step,
+            "action_gate_all_open_gates_classified_once": True,
+            "action_gate_all_open_gates_sequenced_once": True,
+            "action_gate_classification_can_clear_gate": False,
+            "action_gate_final_submission_human_only": True,
             "action_gate_private_input_present": missionweave_action_gate.get(
                 "private_input", {}
             ).get("present", False),
@@ -1918,20 +2015,8 @@ def build_command_lanes(
                 "without exposing identity, cost, ITAR, CMMC, award-history, foreign-"
                 "affiliation, rights, preview, or certification values."
             ),
-            "today_work": [
-                "Open DLA26BZ03-NV011 in DSIP and verify the live countdown, organization linkage, and proposal number.",
-                "Capture the assigned proposal number in the ignored record, run the guarded private finalizer, and require its PDF QA receipt; never place the number, private PDF path, or final PDF hash in public artifacts.",
-                "Use the hidden sectioned collector for identity, proposal, and compliance; keep action-time approval separate and rerun the public gate after each bounded block.",
-                "Populate Volumes 1-7 from the hash-locked package and stop at the complete portal preview.",
-                "Resolve ITAR/JCP, projected CMMC Level 2 (Self), support-overlap, data-rights, and foreign-affiliation representations without claiming certifications that are not documented.",
-            ],
-            "human_gate": [
-                "Robert verifies the DSIP organization, submitter authority, legal entity, UEI, CAGE, SAM status, address, and proposal number.",
-                "Robert confirms PI primary-employment eligibility, 640 Phase I hours, six-month scope, and no conflicting support.",
-                "Robert approves direct labor, fringe, indirect treatment, ODCs, and the $100,000 total cost basis.",
-                "Robert answers prior SBIR/STTR award history, ITAR/JCP, CMMC, foreign-citizen, foreign-affiliation, and technical-data-rights fields from current facts.",
-                "Robert completes required training and reviews every certification, attachment hash, total, and the final DSIP preview before submission.",
-            ],
+            "today_work": missionweave_today_work,
+            "human_gate": missionweave_human_gate,
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,
         },
@@ -3071,6 +3156,20 @@ def render_markdown(payload: dict[str, Any]) -> str:
                     f"- Ready for human final click: `{str(row['action_gate_submission_ready_for_human_click']).lower()}`",
                 ]
             )
+        if row.get("action_gate_next_founder_step"):
+            next_step = row["action_gate_next_founder_step"]
+            lines.extend(
+                [
+                    f"- Next founder action: **{next_step['title']}**",
+                    f"- Next-action evidence: {next_step['evidence_required']}",
+                    "- Exact founder sequence:",
+                ]
+            )
+            for index, step in enumerate(
+                row["action_gate_founder_action_sequence"]["ordered_steps"],
+                start=1,
+            ):
+                lines.append(f"  {index}. {step['title']}")
         lines.append("")
 
     lines.extend(["## Freshness Blocked", ""])
@@ -3206,6 +3305,23 @@ def render_markdown(payload: dict[str, Any]) -> str:
                     f"- Ready for human final click: `{str(lane['action_gate_submission_ready_for_human_click']).lower()}`",
                 ]
             )
+        if lane.get("action_gate_next_founder_step"):
+            next_step = lane["action_gate_next_founder_step"]
+            lines.extend(
+                [
+                    f"- Next founder action: **{next_step['title']}**",
+                    f"- Next-action evidence: {next_step['evidence_required']}",
+                    f"- All open gates lifecycle-classified once: `{str(lane['action_gate_all_open_gates_classified_once']).lower()}`",
+                    f"- All open gates action-sequenced once: `{str(lane['action_gate_all_open_gates_sequenced_once']).lower()}`",
+                    f"- Classification can clear a gate: `{str(lane['action_gate_classification_can_clear_gate']).lower()}`",
+                    "- Exact founder sequence:",
+                ]
+            )
+            for index, step in enumerate(
+                lane["action_gate_founder_action_sequence"]["ordered_steps"],
+                start=1,
+            ):
+                lines.append(f"  {index}. {step['title']}")
         lines.extend(
             [
                 f"- External send without human: `{str(lane['external_send_allowed_without_human']).lower()}`",
