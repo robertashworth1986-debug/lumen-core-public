@@ -15,7 +15,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Required private gates: `50`
 - Passed private gates: `35`
 - Open gates: `15`
-- Gate SHA-256: `0d8ac4192af707c66f153782b1584764f84c0575aba223ce5bf1233e13e6840c`
+- Gate SHA-256: `8cb9e6f33064d43b4e963d21358263e739e7529fb964299220cb720a10a3c00f`
 
 ## Package Integrity
 
@@ -130,12 +130,11 @@ This classification is explanatory only. It cannot clear a gate or change submis
 Evidence, content, registration, and portal facts required before the bounded final-submission gate can open.
 
 - Submission effect: `RESOLVE_BEFORE_FINAL_SUBMISSION`
-- Open gates: `8`
+- Open gates: `7`
 - `CONFLICTS_AND_JOINT_VENTURE_STATUS`
 - `CURRENT_CMMC_REQUIREMENTS_REVIEW`
 - `DD2345_OR_JCP_APPLICATION_EVIDENCE`
 - `DSIP_FIRM_PIN_AVAILABILITY`
-- `NO_DUPLICATE_COST_OR_DELIVERABLE`
 - `TECHNICAL_DATA_RIGHTS_ASSERTION`
 - `VOLUME3_COST_BASIS`
 - `VOLUME5_UPLOAD_SET`
@@ -154,11 +153,12 @@ The proposal must state a current bounded position. Implementation proof may occ
 Fresh preview, corporate review, and final authorization occur only after the upload set is stable and immediately before the human submit action.
 
 - Submission effect: `ACTION_TIME_HUMAN_ONLY`
-- Open gates: `5`
+- Open gates: `6`
 - `ACTION_TIME_APPROVAL_TIMESTAMP`
 - `ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION`
 - `COMPLETE_PORTAL_PREVIEW_REVIEW`
 - `CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW`
+- `NO_DUPLICATE_COST_OR_DELIVERABLE`
 - `PORTAL_PREVIEW_RECEIPT_HASH`
 
 ## Founder Action Sequence
@@ -190,17 +190,16 @@ Review the proposed labor rate, 640 PI hours, fringe, indirect base, cloud/data,
 - Open gates: `1`
 - `VOLUME3_COST_BASIS`
 
-### 4. Review conflicts, cost separation, data rights, CMMC, and export-control planning
+### 4. Prepare conflicts, cost separation, data rights, CMMC, and export-control positions
 
-Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document the bounded Technology Control Plan position. The DLA component instructions say an ITAR/EAR topic firm may be required to submit a TCP during contracting negotiation; that does not establish a current proposal-upload requirement or agency acceptance.
+Answer conflicts and joint-venture status from current facts; prepare the no-duplicate-cost reconciliation for its final post-preview corporate decision; reconcile the technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document the bounded Technology Control Plan position. The DLA component instructions say an ITAR/EAR topic firm may be required to submit a TCP during contracting negotiation; that does not establish a current proposal-upload requirement or agency acceptance.
 
 - Evidence required: Current source review, hash-bound documentary register, and bounded founder/corporate-official position
 - Human boundary: No compliance, assessment, certification, or contracting-office acceptance is inferred.
-- Open gates: `6`
+- Open gates: `5`
 - `CMMC_PHASE_I_SELF_ASSESSMENT_POSITION`
 - `CONFLICTS_AND_JOINT_VENTURE_STATUS`
 - `CURRENT_CMMC_REQUIREMENTS_REVIEW`
-- `NO_DUPLICATE_COST_OR_DELIVERABLE`
 - `TECHNICAL_DATA_RIGHTS_ASSERTION`
 - `TECHNOLOGY_CONTROL_PLAN_DECISION`
 
@@ -223,16 +222,17 @@ After every field and upload is final, inspect all seven volumes, filenames, has
 - `COMPLETE_PORTAL_PREVIEW_REVIEW`
 - `PORTAL_PREVIEW_RECEIPT_HASH`
 
-### 7. Perform corporate review and action-time authorization
+### 7. Perform final corporate review, no-duplicate decision, and authorization
 
-Only after the fresh preview is stable, review every volume as corporate official, capture the short-lived approval binding, and authorize the exact final submission.
+Only after the fresh preview is stable, review every volume as corporate official; finalize and hash-bind the no-duplicate-cost and deliverable decision against that exact preview; capture the short-lived approval binding; and authorize the exact final submission.
 
 - Evidence required: Fresh approval timestamp and binding to the current preview/upload set
 - Human boundary: The final certification and submit click are founder-only actions.
-- Open gates: `3`
+- Open gates: `4`
 - `ACTION_TIME_APPROVAL_TIMESTAMP`
 - `ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION`
 - `CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW`
+- `NO_DUPLICATE_COST_OR_DELIVERABLE`
 
 ## Open Gates
 

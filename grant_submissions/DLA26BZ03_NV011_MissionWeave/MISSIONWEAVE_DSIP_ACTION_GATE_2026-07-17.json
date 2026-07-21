@@ -117,19 +117,18 @@
       {
         "evidence_required": "Current source review, hash-bound documentary register, and bounded founder/corporate-official position",
         "human_boundary": "No compliance, assessment, certification, or contracting-office acceptance is inferred.",
-        "instruction": "Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document the bounded Technology Control Plan position. The DLA component instructions say an ITAR/EAR topic firm may be required to submit a TCP during contracting negotiation; that does not establish a current proposal-upload requirement or agency acceptance.",
-        "open_gate_count": 6,
+        "instruction": "Answer conflicts and joint-venture status from current facts; prepare the no-duplicate-cost reconciliation for its final post-preview corporate decision; reconcile the technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document the bounded Technology Control Plan position. The DLA component instructions say an ITAR/EAR topic firm may be required to submit a TCP during contracting negotiation; that does not establish a current proposal-upload requirement or agency acceptance.",
+        "open_gate_count": 5,
         "open_gates": [
           "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
           "CONFLICTS_AND_JOINT_VENTURE_STATUS",
           "CURRENT_CMMC_REQUIREMENTS_REVIEW",
-          "NO_DUPLICATE_COST_OR_DELIVERABLE",
           "TECHNICAL_DATA_RIGHTS_ASSERTION",
           "TECHNOLOGY_CONTROL_PLAN_DECISION"
         ],
         "status": "OPEN",
         "step_id": "04_COMPLIANCE_AND_CONFLICT_POSITION",
-        "title": "Review conflicts, cost separation, data rights, CMMC, and export-control planning"
+        "title": "Prepare conflicts, cost separation, data rights, CMMC, and export-control positions"
       },
       {
         "evidence_required": "Reviewed attachment list with current file hashes",
@@ -159,36 +158,102 @@
       {
         "evidence_required": "Fresh approval timestamp and binding to the current preview/upload set",
         "human_boundary": "The final certification and submit click are founder-only actions.",
-        "instruction": "Only after the fresh preview is stable, review every volume as corporate official, capture the short-lived approval binding, and authorize the exact final submission.",
-        "open_gate_count": 3,
+        "instruction": "Only after the fresh preview is stable, review every volume as corporate official; finalize and hash-bind the no-duplicate-cost and deliverable decision against that exact preview; capture the short-lived approval binding; and authorize the exact final submission.",
+        "open_gate_count": 4,
         "open_gates": [
           "ACTION_TIME_APPROVAL_TIMESTAMP",
           "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
-          "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW"
+          "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+          "NO_DUPLICATE_COST_OR_DELIVERABLE"
         ],
         "status": "OPEN",
         "step_id": "07_ACTION_TIME_REVIEW_AND_AUTHORIZATION",
-        "title": "Perform corporate review and action-time authorization"
+        "title": "Perform final corporate review, no-duplicate decision, and authorization"
       }
     ],
-    "sequence_version": "missionweave.founder_action_sequence.v1"
+    "sequence_version": "missionweave.founder_action_sequence.v2"
   },
   "gate_lifecycle": {
     "all_open_gates_classified_once": true,
     "classification_can_clear_gate": false,
-    "classification_version": "missionweave.gate_lifecycle.v1",
+    "classification_version": "missionweave.gate_lifecycle.v2",
+    "dependencies": {
+      "ACTION_TIME_APPROVAL_TIMESTAMP": {
+        "gate_stage": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN",
+        "required_gate_stages": {
+          "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN",
+          "PORTAL_PREVIEW_RECEIPT_HASH": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN"
+        },
+        "required_gates": [
+          "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+          "PORTAL_PREVIEW_RECEIPT_HASH"
+        ]
+      },
+      "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION": {
+        "gate_stage": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN",
+        "required_gate_stages": {
+          "ACTION_TIME_APPROVAL_TIMESTAMP": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN"
+        },
+        "required_gates": [
+          "ACTION_TIME_APPROVAL_TIMESTAMP"
+        ]
+      },
+      "COMPLETE_PORTAL_PREVIEW_REVIEW": {
+        "gate_stage": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN",
+        "required_gate_stages": {
+          "VOLUME5_UPLOAD_SET": "A_PRE_SUBMISSION_CONTENT_AND_EVIDENCE"
+        },
+        "required_gates": [
+          "VOLUME5_UPLOAD_SET"
+        ]
+      },
+      "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW": {
+        "gate_stage": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN",
+        "required_gate_stages": {
+          "COMPLETE_PORTAL_PREVIEW_REVIEW": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN",
+          "PORTAL_PREVIEW_RECEIPT_HASH": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN"
+        },
+        "required_gates": [
+          "COMPLETE_PORTAL_PREVIEW_REVIEW",
+          "PORTAL_PREVIEW_RECEIPT_HASH"
+        ]
+      },
+      "NO_DUPLICATE_COST_OR_DELIVERABLE": {
+        "gate_stage": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN",
+        "required_gate_stages": {
+          "COMPLETE_PORTAL_PREVIEW_REVIEW": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN",
+          "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN"
+        },
+        "required_gates": [
+          "COMPLETE_PORTAL_PREVIEW_REVIEW",
+          "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW"
+        ]
+      },
+      "PORTAL_PREVIEW_RECEIPT_HASH": {
+        "gate_stage": "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN",
+        "required_gate_stages": {
+          "VOLUME5_UPLOAD_SET": "A_PRE_SUBMISSION_CONTENT_AND_EVIDENCE"
+        },
+        "required_gates": [
+          "VOLUME5_UPLOAD_SET"
+        ]
+      }
+    },
+    "dependency_edge_count": 9,
+    "dependency_graph_acyclic": true,
+    "dependency_policy_version": "missionweave.gate_lifecycle_dependencies.v1",
+    "dependency_stage_order_valid": true,
     "live_portal_or_contracting_office_confirmation_required": true,
     "stages": {
       "A_PRE_SUBMISSION_CONTENT_AND_EVIDENCE": {
-        "all_required_gate_count": 43,
+        "all_required_gate_count": 42,
         "description": "Evidence, content, registration, and portal facts required before the bounded final-submission gate can open.",
-        "open_gate_count": 8,
+        "open_gate_count": 7,
         "open_gates": [
           "CONFLICTS_AND_JOINT_VENTURE_STATUS",
           "CURRENT_CMMC_REQUIREMENTS_REVIEW",
           "DD2345_OR_JCP_APPLICATION_EVIDENCE",
           "DSIP_FIRM_PIN_AVAILABILITY",
-          "NO_DUPLICATE_COST_OR_DELIVERABLE",
           "TECHNICAL_DATA_RIGHTS_ASSERTION",
           "VOLUME3_COST_BASIS",
           "VOLUME5_UPLOAD_SET"
@@ -208,14 +273,15 @@
         "submission_effect": "REVIEW_AND_BOUND_POSITION_BEFORE_SUBMISSION"
       },
       "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN": {
-        "all_required_gate_count": 5,
+        "all_required_gate_count": 6,
         "description": "Fresh preview, corporate review, and final authorization occur only after the upload set is stable and immediately before the human submit action.",
-        "open_gate_count": 5,
+        "open_gate_count": 6,
         "open_gates": [
           "ACTION_TIME_APPROVAL_TIMESTAMP",
           "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
           "COMPLETE_PORTAL_PREVIEW_REVIEW",
           "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+          "NO_DUPLICATE_COST_OR_DELIVERABLE",
           "PORTAL_PREVIEW_RECEIPT_HASH"
         ],
         "status": "OPEN",
@@ -224,7 +290,7 @@
     },
     "submission_readiness_logic_unchanged": true
   },
-  "gate_sha256": "0d8ac4192af707c66f153782b1584764f84c0575aba223ce5bf1233e13e6840c",
+  "gate_sha256": "8cb9e6f33064d43b4e963d21358263e739e7529fb964299220cb720a10a3c00f",
   "gate_summary": {
     "open_gate_count": 15,
     "passed_private_gate_count": 35,
@@ -335,7 +401,7 @@
       "VOLUME5_UPLOAD_SET"
     ]
   },
-  "generated_utc": "2026-07-21T23:24:34.027552+00:00",
+  "generated_utc": "2026-07-21T23:59:26.314036+00:00",
   "jcp_evidence_protocol": {
     "bare_boolean_can_clear_gate": false,
     "bytes": 4034,
