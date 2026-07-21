@@ -173,6 +173,8 @@
       "support_redirect_received": true
     },
     {
+      "confirmation_email_received": true,
+      "confirmed_model_reference": "GPT-5.6",
       "deadline_utc": "2026-07-22T00:00:00Z",
       "do_not_duplicate_send": true,
       "email_reply_required": false,
@@ -180,19 +182,22 @@
         "eligible_template_id": null,
         "lane_id": "openai_build_week_prooflock",
         "max_proactive_sends": 0,
-        "mode": "PORTAL_ACTION",
+        "mode": "INBOUND_ONLY",
         "not_before_utc": null,
-        "rationale": "The remaining work is external submission-field, feedback-session, deployment, and video completion rather than an email reply."
+        "rationale": "Devpost submission is confirmed by the public project page and confirmation email. Monitor for a judging or correction request; do not reply to the automated confirmation or duplicate the submission."
       },
       "lane_id": "openai_build_week_prooflock",
-      "latest_event_type": "PROJECT_CORE_VERIFIED_SUBMISSION_FIELDS_OPEN",
-      "latest_event_utc": "2026-07-18T07:43:23.212373+00:00",
-      "next_action": "Confirm model provenance and the /feedback session ID, deploy the public demo, record the required public video, complete Devpost registration, and obtain action-time approval before final submission.",
+      "latest_event_type": "DEVPOST_SUBMISSION_CONFIRMED",
+      "latest_event_utc": "2026-07-21T16:00:55Z",
+      "next_action": "Preserve the submission receipt and monitor for a judging or correction request. Do not reply to the automated confirmation, resubmit without a verified issue, or describe successful submission as selection, endorsement, or an award.",
       "no_send_before": null,
       "organization": "OpenAI Build Week / Devpost",
+      "portal_submission_verified": true,
+      "public_page_video_embed_matches": true,
+      "public_project_page_resolved": true,
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
-      "state": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
+      "state": "PORTAL_SUBMISSION_CONFIRMED"
     },
     {
       "do_not_duplicate_send": true,
@@ -448,12 +453,20 @@
       "sha256": "F62728B470D7313A2E06E304C527D1C21844833EAE83D65010FDDF6E82C93A73",
       "worktree_eol_differs_from_git_blob": true
     },
+    "openai_build_week_submission_receipt": {
+      "bytes": 3457,
+      "identity_source": "COMMITTED_GIT_BLOB",
+      "path": "evidence/openai_build_week/prooflock_youtube_publication_receipt_20260721.json",
+      "present": true,
+      "sha256": "127D3286581634E34592C420CAD6D109C119570947C210EC1FCC653F578F3C14",
+      "worktree_eol_differs_from_git_blob": false
+    },
     "outreach_followup_policy_config": {
-      "bytes": 5793,
+      "bytes": 5864,
       "identity_source": "COMMITTED_GIT_BLOB",
       "path": "config/outreach_followup_policies_v1.json",
       "present": true,
-      "sha256": "EB5D9AA4462EB3CC0BEB312A0A08CD1C546BBF554FD0A646EC6A91B561D669E4",
+      "sha256": "15D00B862BDA00CA04B12F9EF1AE567A8721A6F49AD2645FD2F7239E9F0AC9A1",
       "worktree_eol_differs_from_git_blob": true
     },
     "outreach_response_template_registry": {
@@ -473,9 +486,9 @@
     "follow_up_mode_counts": {
       "ACCOUNT_ACTION": 1,
       "CLOSED": 2,
-      "INBOUND_ONLY": 8,
+      "INBOUND_ONLY": 9,
       "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD": 2,
-      "PORTAL_ACTION": 2,
+      "PORTAL_ACTION": 1,
       "PRIVATE_RECONCILIATION": 1
     },
     "human_account_action_count": 4,

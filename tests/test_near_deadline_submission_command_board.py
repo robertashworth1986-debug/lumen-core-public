@@ -67,8 +67,8 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert payload["summary"]["emergency_eligibility_gate_count"] == 0
     assert payload["summary"]["no_bid_or_partner_only_count"] == 6
     assert payload["summary"]["expired_without_verified_send_count"] == 1
-    assert payload["summary"]["human_gated_count"] == 17
-    assert payload["summary"]["freshness_blocked_lane_count"] == 14
+    assert payload["summary"]["human_gated_count"] == 16
+    assert payload["summary"]["freshness_blocked_lane_count"] == 13
     assert payload["summary"]["sam_zero_row_inconclusive_blocker"] is True
     assert payload["summary"]["final_submit_allowed_without_human"] is False
     assert payload["summary"]["external_send_allowed_without_human"] is False
@@ -592,7 +592,10 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE" in rendered
     assert "Status: `PORTAL_SUBMISSION_CONFIRMED`" in rendered
     assert "OPENAI-BUILD-WEEK-2026" in rendered
-    assert "pinned app artifacts do not reconcile" in rendered
+    assert (
+        "Devpost submission is confirmed by the public project page and confirmation email"
+        in rendered
+    )
     assert "Action gate: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`" in rendered
     assert "Next founder action: **Submit the JCP application" in rendered
     assert "Exact founder sequence:" in rendered

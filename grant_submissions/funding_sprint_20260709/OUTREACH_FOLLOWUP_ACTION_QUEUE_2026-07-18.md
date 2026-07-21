@@ -1,7 +1,7 @@
 # Outreach Follow-up Action Queue - 2026-07-18
 
 - Status: `ROUTING_INTEGRITY_EXCEPTION_NO_SEND`
-- As of UTC: `2026-07-21T15:40:19.270108Z`
+- As of UTC: `2026-07-21T16:19:35.822258Z`
 - Lanes: `16`
 - Due for mailbox recheck: `0`
 - Held no-send: `1`
@@ -9,7 +9,7 @@
 - Send now: `0`
 - Routing integrity exceptions: `1`
 - Autonomous external send allowed: `false`
-- Queue SHA-256: `B1D167D7005C2F2514697397DC42F20A8641491B9377FB7FF517F138D571384D`
+- Queue SHA-256: `A1CE31DD2A09915C132C55715E423E8070C53D24BF06CB363DA6C3394C411A73`
 
 ## Action Queue
 
@@ -22,7 +22,7 @@
 | Centers for Disease Control and Prevention | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
 | DARPA Multi X Office | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
 | Defense SBIR/STTR Innovation Portal | `ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD` | `FOLLOWUP_LIMIT_REACHED_NO_SEND` | `2026-07-20T17:00:00Z` | `COMPONENT_INSTRUCTION_ESCALATION` |
-| OpenAI Build Week / Devpost | `PORTAL_ACTION` | `HUMAN_PORTAL_ACTION_OPEN` | `none` | `none` |
+| OpenAI Build Week / Devpost | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
 | OpenAI Build Week internal handoff | `PRIVATE_RECONCILIATION` | `PRIVATE_RECONCILIATION_OPEN` | `none` | `none` |
 | LvlUp Ventures / Power of the Pitch Week | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
 | Terry Anderton / Vynetic | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
