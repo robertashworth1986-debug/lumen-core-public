@@ -254,11 +254,14 @@ def test_youtube_publication_receipt_is_bounded_and_self_hashing():
     assert receipt["youtube"]["visibility"] == "PUBLIC"
     assert receipt["youtube"]["copyright_check"] == "COMPLETE_NO_ISSUES_FOUND"
     assert receipt["youtube"]["public_watch_url_resolved"] is True
-    assert receipt["devpost"]["final_submission_performed"] is False
+    assert receipt["devpost"]["submission_state"] == "SUBMITTED"
+    assert receipt["devpost"]["final_submission_performed"] is True
+    assert receipt["devpost"]["public_project_page_resolved"] is True
+    assert receipt["devpost"]["public_page_video_embed_matches"] is True
     assert receipt["controls"]["private_session_identifier_exposed"] is False
     assert receipt["devpost"]["feedback_session_id_saved"] is True
-    assert receipt["devpost"]["final_legal_review_completed"] is False
-    assert "does not independently prove contest submission" in receipt["claim_boundary"]
+    assert receipt["devpost"]["final_terms_review_independently_verified"] is False
+    assert "does not independently prove that terms were read" in receipt["claim_boundary"]
 
 
 def test_build_week_voiceover_is_bounded_and_describes_the_current_attack():
