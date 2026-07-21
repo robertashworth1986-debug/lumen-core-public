@@ -78,7 +78,7 @@
     },
     "verified": true
   },
-  "docket_sha256": "1f52d8a0787a567c474544d4e863c7b9ac4e3496768a1c950eb2636f8adb4350",
+  "docket_sha256": "d02b8f71a37a8ca18036856155b1f77357149bcc3117d12d01dfe145b5e4a4bd",
   "evaluator_acceptance": {
     "accepted_protocol_sha256": null,
     "accepted_utc": null,
@@ -181,7 +181,7 @@
     "source_publisher": "U.S. Energy Information Administration",
     "source_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/"
   },
-  "generated_utc": "2026-07-21T04:52:05.711954+00:00",
+  "generated_utc": "2026-07-21T17:06:19.035306+00:00",
   "maturity": {
     "current_supported_level": 3,
     "external_validation_complete": false,
@@ -236,7 +236,7 @@
       "remaining_gap": "No external organization has adopted an incident, escalation, or production-use decision process for this experiment."
     }
   ],
-  "portable_input_chain_sha256": "00c1621d2b1835b9daa7dcd22272773bf2d7f4ba32a68ac837bc897b4f084783",
+  "portable_input_chain_sha256": "6b758e33eaf98fec05bf7281d3627dfab50be02d17eba8b147552df764cd2af3",
   "portable_inputs": [
     {
       "bytes": 9722,
@@ -281,10 +281,10 @@
       "sha256": "2fa8feb63735603960688161a252d2efa68077a51b27dc48bcdfe0d99d0ae14e"
     },
     {
-      "bytes": 45420,
+      "bytes": 50187,
       "hash_mode": "utf8_lf",
       "path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
-      "sha256": "2481919eca73df9469b372367d676d8713687c940f6565a1380d69547464f8e3"
+      "sha256": "cda60da03beefa75cf10d227b6dffe1be422a5e1531fc8b1b763fcfa805d0028"
     },
     {
       "bytes": 9082,
@@ -311,10 +311,10 @@
       "sha256": "abc3b961c7e0d17c2f8da95515a0cc51f0d0466acceb2e412340619f440ddf13"
     },
     {
-      "bytes": 10007,
+      "bytes": 10103,
       "hash_mode": "utf8_lf",
       "path": "config/reviewer_reproducibility_protocol_v1.json",
-      "sha256": "49582234ce107762f56a734b94d426e53fcec92e275b527a1a8f39a9822fc8d1"
+      "sha256": "c69fb78965cdf420e8354042f1e90d11c6b7dde59f0a4d9fb27d9dec58f4cb01"
     },
     {
       "bytes": 26091,
@@ -395,10 +395,10 @@
       "sha256": "cc10d035ef2712e41292ceec6b5fa93df93dfcb2145ab9b6d323b00b4d87d09f"
     },
     {
-      "bytes": 14138,
+      "bytes": 15577,
       "hash_mode": "utf8_lf",
       "path": "tests/test_reviewer_reproducibility_capsule.py",
-      "sha256": "4995d85976b862e16041e7e42ef005c0cb9b1543944cbed11ea254a37923948b"
+      "sha256": "576ccc0b49cbfb8012d078c4d403e16ca17700ca3943134087517845392d3d2b"
     }
   ],
   "privacy_scan": {

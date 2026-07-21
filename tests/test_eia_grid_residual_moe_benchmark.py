@@ -67,8 +67,15 @@ def synthetic_protocol():
     return protocol
 
 
-def test_protocol_registry_is_locked_to_implementation():
+def test_protocol_registry_is_locked_to_implementation(monkeypatch):
     module = load_module()
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("hash-locked protocol provenance must precede git")
+        ),
+    )
     protocol = module.load_protocol(PROTOCOL_PATH)
     assert [row["id"] for row in protocol["candidate_models"]] == module.CANDIDATE_IDS
     assert [row["id"] for row in protocol["baselines"]] == module.BASELINE_IDS

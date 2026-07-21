@@ -59,8 +59,15 @@ def test_open_set_metrics_separate_supported_coverage_from_unsupported_mapping()
     assert metrics["micro_f1"] == pytest.approx(2 / 3)
 
 
-def test_v2_benchmark_emits_complete_reproducible_receipts(tmp_path):
+def test_v2_benchmark_emits_complete_reproducible_receipts(tmp_path, monkeypatch):
     module = load_module()
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("hash-locked protocol provenance must precede git")
+        ),
+    )
     output = tmp_path / "out"
     doc_path = tmp_path / "result.md"
     result = module.run_benchmark(output_dir=output, doc_path=doc_path)

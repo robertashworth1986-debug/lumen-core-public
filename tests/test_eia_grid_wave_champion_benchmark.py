@@ -85,8 +85,17 @@ def synthetic_panel(module, protocol, *, holdout_multiplier: float = 1.0):
     }
 
 
-def test_protocol_was_frozen_before_the_benchmark_and_declares_strong_baselines():
+def test_protocol_was_frozen_before_the_benchmark_and_declares_strong_baselines(
+    monkeypatch,
+):
     module = load_module()
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("hash-locked protocol provenance must precede git")
+        ),
+    )
     protocol = module.load_protocol()
 
     assert protocol["schema"] == "eia_grid_wave_champion_protocol.v1"

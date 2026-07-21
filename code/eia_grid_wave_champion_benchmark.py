@@ -95,8 +95,33 @@ def load_protocol(path: Path = PROTOCOL_PATH) -> dict[str, Any]:
 
 def protocol_commit(path: Path = PROTOCOL_PATH) -> str | None:
     try:
+        relative = path.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        return None
+    if PROTOCOL_PROVENANCE_PATH.is_file():
+        try:
+            provenance = json.loads(
+                PROTOCOL_PROVENANCE_PATH.read_text(encoding="utf-8")
+            )
+            row = next(
+                item for item in provenance["entries"] if item["path"] == relative
+            )
+            commit = str(row["last_touch_commit"])
+            portable_text = (
+                path.read_text(encoding="utf-8")
+                .replace("\r\n", "\n")
+                .replace("\r", "\n")
+            )
+        except (OSError, KeyError, StopIteration, json.JSONDecodeError):
+            return None
+        if hashlib.sha256(portable_text.encode("utf-8")).hexdigest() != row["sha256"]:
+            return None
+        if len(commit) != 40 or any(char not in "0123456789abcdef" for char in commit):
+            return None
+        return commit
+    try:
         result = subprocess.run(
-            ["git", "log", "-1", "--format=%H", "--", str(path.relative_to(ROOT))],
+            ["git", "log", "-1", "--format=%H", "--", relative],
             cwd=ROOT,
             check=True,
             capture_output=True,
@@ -107,25 +132,7 @@ def protocol_commit(path: Path = PROTOCOL_PATH) -> str | None:
         value = ""
     else:
         value = result.stdout.strip()
-    if value:
-        return value
-    try:
-        relative = path.resolve().relative_to(ROOT.resolve()).as_posix()
-        provenance = json.loads(PROTOCOL_PROVENANCE_PATH.read_text(encoding="utf-8"))
-        row = next(item for item in provenance["entries"] if item["path"] == relative)
-        commit = str(row["last_touch_commit"])
-        portable_text = (
-            path.read_text(encoding="utf-8")
-            .replace("\r\n", "\n")
-            .replace("\r", "\n")
-        )
-        if hashlib.sha256(portable_text.encode("utf-8")).hexdigest() != row["sha256"]:
-            return None
-        if len(commit) != 40 or any(char not in "0123456789abcdef" for char in commit):
-            return None
-        return commit
-    except (OSError, ValueError, KeyError, StopIteration, json.JSONDecodeError):
-        return None
+    return value or None
 
 
 def read_eia_key() -> str:
