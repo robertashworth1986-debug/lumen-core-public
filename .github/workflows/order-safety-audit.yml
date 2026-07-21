@@ -26,8 +26,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install runtime test dependency
-        run: python -m pip install --disable-pip-version-check requests
+      - name: Install runtime test dependencies
+        run: >-
+          python -m pip install --disable-pip-version-check
+          requests
+          fastapi==0.138.2
+          httpx==0.28.1
 
       - name: Compile safety surfaces
         run: |
@@ -36,6 +40,7 @@ jobs:
             code/kraken_execution.py \
             code/execution/live_executor.py \
             code/luma_experience_gateway.py \
+            code/operator_api_access.py \
             code/auto_ticket_producer.py \
             code/kraken_swing_hunter.py \
             code/micro_position_kraken_bot.py \
@@ -48,6 +53,7 @@ jobs:
         run: |
           python tests/test_order_safety_gate.py
           python tests/test_order_safety_facades.py
+          python tests/test_operator_api_access.py
           python tests/test_standalone_no_orders_facades.py
           python tests/test_order_safety_promotion_lane.py
           python tests/test_order_safety_alpaca_paper_boundary.py
