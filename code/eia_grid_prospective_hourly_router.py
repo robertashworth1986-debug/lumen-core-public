@@ -21,12 +21,6 @@ from statistics import mean, median
 from typing import Any, Iterable, Iterator
 from zoneinfo import ZoneInfo
 
-import lightgbm as lgb
-import numpy as np
-import xgboost as xgb
-from sklearn.linear_model import Ridge
-
-
 ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL_PATH = ROOT / "config" / "eia_grid_prospective_hourly_router_protocol_v1.json"
 OUT_DIR = ROOT / "out" / "eia_grid_prospective_hourly_router"
@@ -39,6 +33,25 @@ STATUS_PATH = OUT_DIR / "prospective_status_latest.json"
 LATEST_CYCLE_PATH = OUT_DIR / "latest_cycle.json"
 LOCK_PATH = OUT_DIR / ".prospective_hourly_cycle.lock"
 ZERO_HASH = "0" * 64
+
+
+@lru_cache(maxsize=1)
+def load_numpy_runtime() -> Any:
+    """Load NumPy only when feature construction or model inference is needed."""
+    import numpy as np
+
+    return np
+
+
+@lru_cache(maxsize=1)
+def load_ml_runtime() -> tuple[Any, Any, Any, Any]:
+    """Load the optional model stack only when a new forecast must be fit."""
+    import lightgbm as lgb
+    import xgboost as xgb
+    from sklearn.linear_model import Ridge
+
+    np = load_numpy_runtime()
+    return lgb, np, xgb, Ridge
 
 
 def now_utc() -> datetime:
@@ -368,6 +381,7 @@ def build_feature_row(
         raise ValueError("recent residual window is incomplete")
     if any(index not in actual_index or index not in official_index for index in weekly_indices):
         raise ValueError("weekly residual window is incomplete")
+    np = load_numpy_runtime()
     recent_residuals = np.asarray(
         [actual_index[index] - official_index[index] for index in recent_indices],
         dtype=float,
@@ -472,6 +486,7 @@ def fit_models(
 ) -> tuple[dict[str, Any], dict[str, float]]:
     if not rows:
         raise ValueError("no complete hourly training rows")
+    lgb, np, xgb, Ridge = load_ml_runtime()
     matrix = np.asarray([row["features"] for row in rows], dtype=float)
     target = np.asarray([row["target_residual_scaled"] for row in rows], dtype=float)
     contract = protocol["model_contract"]
@@ -493,6 +508,7 @@ def candidate_predictions(
 ) -> list[dict[str, float]]:
     if not rows:
         return []
+    _, np, _, _ = load_ml_runtime()
     matrix = np.asarray([row["features"] for row in rows], dtype=float)
     with warnings.catch_warnings():
         warnings.filterwarnings(

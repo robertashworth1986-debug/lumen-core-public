@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -79,6 +81,32 @@ def test_protocol_freezes_real_hybrid_routes_and_no_backfill():
     }
     assert protocol["prospective_window"]["backfilled_predictions_allowed"] is False
     assert protocol["router"]["dynamic_override_allowed"] is False
+
+
+def test_module_import_does_not_load_optional_ml_runtime():
+    script = (
+        "import importlib.util,json,sys;"
+        f"p={str(MODULE_PATH)!r};"
+        "s=importlib.util.spec_from_file_location('eia_hourly_import_probe',p);"
+        "m=importlib.util.module_from_spec(s);s.loader.exec_module(m);"
+        "print(json.dumps({k:(k in sys.modules) for k in "
+        "['lightgbm','numpy','xgboost','sklearn']}))"
+    )
+    result = subprocess.run(
+        [sys.executable, "-I", "-c", script],
+        capture_output=True,
+        check=False,
+        text=True,
+        timeout=20,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout) == {
+        "lightgbm": False,
+        "numpy": False,
+        "xgboost": False,
+        "sklearn": False,
+    }
 
 
 def test_interval_deadline_is_one_hour_before_hour_ending():

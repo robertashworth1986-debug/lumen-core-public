@@ -14,7 +14,8 @@ def test_quiet_run_uses_atomic_success_output_and_separate_stderr() -> None:
 
     assert 'scheduler_cycle_latest.json.tmp' in text
     assert 'scheduler_stderr_latest.log.tmp' in text
-    assert '1> $SchedulerOutputTemp 2> $SchedulerStderrTemp' in text
+    assert '-RedirectStandardOutput $SchedulerOutputTemp' in text
+    assert '-RedirectStandardError $SchedulerStderrTemp' in text
     assert (
         'Move-Item -LiteralPath $SchedulerOutputTemp '
         '-Destination $SchedulerOutput -Force'
@@ -42,3 +43,14 @@ def test_python_path_is_validated_before_execution() -> None:
     execution = '& $PythonExe @Arguments'
     assert validation in text
     assert text.index(validation) < text.index(execution)
+
+
+def test_quiet_run_owns_and_terminates_timed_out_child_process() -> None:
+    text = wrapper_text()
+
+    assert '[int]$CycleTimeoutSeconds = 420' in text
+    assert 'Start-Process `' in text
+    assert '-WindowStyle Hidden `' in text
+    assert '$Process.WaitForExit($CycleTimeoutSeconds * 1000)' in text
+    assert 'Stop-Process -Id $Process.Id -Force' in text
+    assert 'the last good scheduler receipt was preserved' in text

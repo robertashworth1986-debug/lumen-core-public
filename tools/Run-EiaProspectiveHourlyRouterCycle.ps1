@@ -1,5 +1,6 @@
 param(
     [int]$TimeoutSeconds = 90,
+    [int]$CycleTimeoutSeconds = 420,
     [switch]$DryRun,
     [switch]$Quiet,
     [string]$PythonExe = ""
@@ -32,6 +33,9 @@ if ([string]::IsNullOrWhiteSpace($PythonExe)) {
 if (-not (Test-Path -LiteralPath $PythonExe -PathType Leaf)) {
     throw "Python executable not found: $PythonExe"
 }
+if ($CycleTimeoutSeconds -lt 30) {
+    throw "CycleTimeoutSeconds must be at least 30 seconds."
+}
 if ($DryRun) {
     $Arguments += "--dry-run"
 }
@@ -42,8 +46,20 @@ try {
     if ($Quiet) {
         Remove-Item -LiteralPath $SchedulerOutputTemp -Force -ErrorAction SilentlyContinue
         Remove-Item -LiteralPath $SchedulerStderrTemp -Force -ErrorAction SilentlyContinue
-        & $PythonExe @Arguments 1> $SchedulerOutputTemp 2> $SchedulerStderrTemp
-        $ExitCode = $LASTEXITCODE
+        $Process = Start-Process `
+            -FilePath $PythonExe `
+            -ArgumentList $Arguments `
+            -PassThru `
+            -WindowStyle Hidden `
+            -RedirectStandardOutput $SchedulerOutputTemp `
+            -RedirectStandardError $SchedulerStderrTemp
+        $Completed = $Process.WaitForExit($CycleTimeoutSeconds * 1000)
+        if (-not $Completed) {
+            Stop-Process -Id $Process.Id -Force -ErrorAction SilentlyContinue
+            $Process.WaitForExit()
+            throw "Prospective hourly router cycle exceeded the $CycleTimeoutSeconds-second process limit. Child process $($Process.Id) was terminated; the last good scheduler receipt was preserved."
+        }
+        $ExitCode = $Process.ExitCode
         if ($ExitCode -eq 0) {
             Move-Item -LiteralPath $SchedulerOutputTemp -Destination $SchedulerOutput -Force
             Remove-Item -LiteralPath $SchedulerStderrTemp -Force -ErrorAction SilentlyContinue

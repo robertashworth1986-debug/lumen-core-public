@@ -40,92 +40,92 @@
       "equation_id": "EIA-D-005"
     },
     {
-      "chain_sha256": "d1c41aa5dc724d44831cca0e778c2e8eb15cb73038715cbbda4e94e1ce6e33a7",
-      "entry_sha256": "a66e1cca91a2a16d61e5a547773bc887389591b9e06b924026c450c0bee05e25",
+      "chain_sha256": "cbf3b3f566cd1b7bf323a46761435b6812d6067d177a495270e1247fb6f90f0a",
+      "entry_sha256": "e17aa243e8dbe78026bc8523ee42e78ae6ad94046c8dc1444f13ed5e7715e0ca",
       "equation_id": "EIA-H-001"
     },
     {
-      "chain_sha256": "1ca50e121b57933b212d1e94e279957833b27e21294e31c71ed5ece00239d02c",
-      "entry_sha256": "2bc9994a932ada4bb9d640ea365ea36034ef1e8058ce6f130229a5a41311e311",
+      "chain_sha256": "ed4251a2e189d7067e7efa237cfa2641c465ee09b07614cbce2dd13b2eaad21a",
+      "entry_sha256": "f8eb6a1706adc020763968abea1bd9c6bd47105464f487c5c3db3aafecbef6b7",
       "equation_id": "EIA-H-002"
     },
     {
-      "chain_sha256": "75522407df37c92d2b479d224eaba796a8ad1940c1b9a7c20b8e902e3391fb09",
-      "entry_sha256": "7e7e259d4997609695336ec03a53868de782c8a4ea1a210326be2de56251d919",
+      "chain_sha256": "a5e489f7a0899cf356bada1072a14d1764537744fd55e06a4029325c5d12a138",
+      "entry_sha256": "3272b065aa41d00b19e259d7a9c420153f1cf970e97305c653de0464e7a59bfc",
       "equation_id": "EIA-H-003"
     },
     {
-      "chain_sha256": "1d4812bd966504cbc37ca8594f033f8b4ad5a689105959563943ce798eaa040a",
+      "chain_sha256": "eedae767826f2dea84e0f841fba6a894c25d8065362fcc91aa1cac36ae2fc1e4",
       "entry_sha256": "27df86bab800b1313445afa6d37be103aa24ababaec3fb550b55cb8439cec9ac",
       "equation_id": "FREQ-001"
     },
     {
-      "chain_sha256": "6486815791222d7abfbb2ec53dee7fe91555025c4c6d5fbe0bbbd9b3f85703ac",
+      "chain_sha256": "4eb046f0e1f3228194e3294fb748e2eb6bee361c6f6634b4a868d62969909f66",
       "entry_sha256": "b14b54d63218813c557dec97eb41fe8937e9415e4833e0e2bde2a0c94ade35db",
       "equation_id": "FREQ-002"
     },
     {
-      "chain_sha256": "a8a8c7845f9c49a7ed19e57ff4a1f9f4b6e6ba2b949948c58d579b4e21851281",
+      "chain_sha256": "09f25d2baa3a6917149884fcf3f374cf3e17733094b0413eb7bddbaf7be74c46",
       "entry_sha256": "7acae3bbfa25829a30593dd2440c90a2c4cc546377f8e3fed1a38151f0f598f8",
       "equation_id": "FREQ-003"
     },
     {
-      "chain_sha256": "4877885625189d099401f867f749775f18c20020d9c5e6ae08fa3ba8b94c3e0f",
+      "chain_sha256": "b80ce428869f128bd00a58864cb0c0f4cb1dcb8efb977d2840d504977d321452",
       "entry_sha256": "b8636dd82f4a2b44af47c679a00493cae6ddc794a5a31133d9c4defdc5993c27",
       "equation_id": "FREQ-004"
     },
     {
-      "chain_sha256": "d7bfc0b74d3cdb6ea6bcaa8eb178d38b0fbf30169e08010fc76e4030731fe02e",
+      "chain_sha256": "a5d8ef7e59a281c278e57cd00fc9a258b8d2c52dfae78d1c75d9c9a174d093ce",
       "entry_sha256": "6b8c9793fcb4b25828885b9604261bda04c81967ba632c821fe97c7b3abd5a4f",
       "equation_id": "FREQ-005"
     },
     {
-      "chain_sha256": "fa71f67e12fcba63a02991a31b1effde00e45f2f51e798fa91c6d72d55655482",
+      "chain_sha256": "9f7da09068c176f14997206f57feb4910a91c7ef89172d4c84b02ce27f0a202a",
       "entry_sha256": "a0bbff15f4ce0c94d0c2e5ccd339f55097a6c0f8c8f860d675a7072fc6a7e6f1",
       "equation_id": "FREQ-006"
     },
     {
-      "chain_sha256": "88e68aa7d6c3d79a8375d974feb4338b6715f389e5754f198c3cd684d44484d2",
+      "chain_sha256": "f6cb5211427cc21763af95db26602b3e70c53e36588f80e395f9434f5c888be9",
       "entry_sha256": "301fd126054c84bfbc23b068880ebf617d07e01e8160ffbcccedf37ccea95225",
       "equation_id": "GEO-CURVE-001"
     },
     {
-      "chain_sha256": "4447122b60b45b8126c83ee3032cd07c79fb3c40934603fd3b62e1ea049c5ced",
+      "chain_sha256": "d2497f027a5cab41fc10032766bba37c81fad2d6e39e90886c5ba81404dac3c7",
       "entry_sha256": "e8dfa40358e7c0da5a678889243972738fabd89a435f97ccf9aa2ca8388b8462",
       "equation_id": "GEO-GRAPH-001"
     },
     {
-      "chain_sha256": "06d7484a8cefbcd2d59be3931ccaa6e17dacc12ed4734b9651c4e74e939a1406",
+      "chain_sha256": "856119ab2e865312e46db4f23a01c6c59e0857362a67ecb3e1fcc0d10baaff33",
       "entry_sha256": "d445b1a1a4e8e8d62e6c4e3b9eca82738c1510de7e4a9e9b33a5e438a99a1110",
       "equation_id": "GEO-THERMAL-001"
     },
     {
-      "chain_sha256": "88d55985351ad9149e9cd31159b8110739111927f7418eb2cce42f933276ebe3",
+      "chain_sha256": "12cd4bd5fc417aee95fd85022981b88adac854fbea9e80979a3f7e8acebe88cb",
       "entry_sha256": "cff1a58bdea28cd3a0f10e8e8a4f4f7c01846bb31a7db07634bd74aa03622ed8",
       "equation_id": "GEO-WAVE-001"
     },
     {
-      "chain_sha256": "6e0aab6e61fbf20ed5309b616c6e7acf280f6dd820c8171e7ff8bea561cdee7d",
+      "chain_sha256": "8492eda25b32b72fcb73d3b11e4a82d1741585b820aaa90da659758cc6de81c2",
       "entry_sha256": "2125da1c100c174ceae0957c1bba94af2217b6bdfb8eceaa18314bf2752b011f",
       "equation_id": "MW-001"
     },
     {
-      "chain_sha256": "c27bfac05bd149378ee5adc5b51d81af1ac49c6d24e987963b5e85b968fe2f66",
+      "chain_sha256": "daf05d03eacbc48f5830e182bd13a1ce36caa5924d1e0ed5ffeb465bb4832e35",
       "entry_sha256": "81305837c75ebdcf3883bfde549fb3a4a154e3b83a1aa7a25f74b6141c66522b",
       "equation_id": "MW-002"
     },
     {
-      "chain_sha256": "96d9f1c4f1d600c6318e1afb15cb60557785331be2cf9915ad36516108180b5c",
+      "chain_sha256": "3661a6166faa5a5fb9885471f87580b24354828a4ff50e2255d31dc3eeddd829",
       "entry_sha256": "1832bedf264196ba9c3eaa5f07b64856b195b5645703d0e90ab73d01216944d3",
       "equation_id": "NV065-001"
     },
     {
-      "chain_sha256": "9efb3bec2cc49cd8f1fa6fd1c5df9bf1faf24f33be3f7f129e6e96bafa3d6abc",
+      "chain_sha256": "c276eea40a247739b5b1baa095cbd06388fc3c3df2268a4518dbe77fe8a8dbae",
       "entry_sha256": "28330c06a6ae8947425db12e4a9c87e4c95e7942384921654dc4dfc58c699ca0",
       "equation_id": "UH-001"
     },
     {
-      "chain_sha256": "0403a49b510968021b34350d2ab5697f7bd565bdec9e25e264551c0ef3617b5a",
+      "chain_sha256": "78c528b9c788f4657c88151bc617a1f03d39d957124b70f51135b52f95a0f933",
       "entry_sha256": "3494525487184b4beb8ee06b12a6087219dd645303dab094cf4f6283793c8212",
       "equation_id": "UH-002"
     }
@@ -894,8 +894,8 @@
       "name": "Hourly weekly-difference target scale",
       "negative_result_retained": true,
       "source": {
-        "file_sha256": "82f48921f5e3553fbb3b169ef1b1dc3e9c6677507735482e7d5cb820e12ccb41",
-        "line": 327,
+        "file_sha256": "0ae7cade56b4d63d593ffffe5be81e97af7d53a413048ac0a14725edd4538f06",
+        "line": 340,
         "path": "code/eia_grid_prospective_hourly_router.py",
         "symbol": "target_scale"
       },
@@ -970,8 +970,8 @@
       "name": "Leakage-controlled hourly feature vector",
       "negative_result_retained": true,
       "source": {
-        "file_sha256": "82f48921f5e3553fbb3b169ef1b1dc3e9c6677507735482e7d5cb820e12ccb41",
-        "line": 338,
+        "file_sha256": "0ae7cade56b4d63d593ffffe5be81e97af7d53a413048ac0a14725edd4538f06",
+        "line": 351,
         "path": "code/eia_grid_prospective_hourly_router.py",
         "symbol": "build_feature_row"
       },
@@ -1034,8 +1034,8 @@
       "name": "Append-only canonical SHA-256 chain",
       "negative_result_retained": true,
       "source": {
-        "file_sha256": "82f48921f5e3553fbb3b169ef1b1dc3e9c6677507735482e7d5cb820e12ccb41",
-        "line": 630,
+        "file_sha256": "0ae7cade56b4d63d593ffffe5be81e97af7d53a413048ac0a14725edd4538f06",
+        "line": 646,
         "path": "code/eia_grid_prospective_hourly_router.py",
         "symbol": "append_chain_record"
       },
@@ -1769,7 +1769,7 @@
     }
   ],
   "file_hash_audit": {
-    "audit_sha256": "abe85f0950cf6ee9d4cd5b107615ea968f59da5d1bfbc6141e6a5c0eaa4f0bdc",
+    "audit_sha256": "439c420451b770eaf26b7457b382ab7bdcfee096fd7b2c6096e979627e742b22",
     "records": [
       {
         "byte_count": 26426,
@@ -1780,9 +1780,9 @@
         "status": "CURRENT"
       },
       {
-        "byte_count": 41044,
-        "expected_sha256": "82f48921f5e3553fbb3b169ef1b1dc3e9c6677507735482e7d5cb820e12ccb41",
-        "observed_sha256": "82f48921f5e3553fbb3b169ef1b1dc3e9c6677507735482e7d5cb820e12ccb41",
+        "byte_count": 41538,
+        "expected_sha256": "0ae7cade56b4d63d593ffffe5be81e97af7d53a413048ac0a14725edd4538f06",
+        "observed_sha256": "0ae7cade56b4d63d593ffffe5be81e97af7d53a413048ac0a14725edd4538f06",
         "path": "code/eia_grid_prospective_hourly_router.py",
         "role": "source",
         "status": "CURRENT"
@@ -1993,12 +1993,12 @@
       "registry_files_valid": true
     }
   },
-  "generated_utc": "2026-07-21T07:53:26.536023+00:00",
+  "generated_utc": "2026-07-21T13:38:16.564494+00:00",
   "registry": {
     "path": "config/scientific_equation_registry_v1.json",
-    "sha256": "3c73ea29c9a4a58060811f7700219f1c82ae102e8aecfa70ee6b4341490324c2"
+    "sha256": "1dc62d0aff32eabd7bb3d5db87e297995fd078108d67c92de2519bd6d97ceab6"
   },
-  "repository_head_at_generation": "43c035e42ef2c273bffc9ed098b0441632331f1f",
+  "repository_head_at_generation": "9adbdd777ba71f29323d14697f1c9292c4802f08",
   "schema": "lumencore_scientific_equation_evidence_map_v1",
   "summary": {
     "claim_level_counts": {
@@ -2050,6 +2050,6 @@
     "independently_reproduced_entry_count": 0,
     "patentability_determined": false
   },
-  "terminal_chain_sha256": "0403a49b510968021b34350d2ab5697f7bd565bdec9e25e264551c0ef3617b5a",
+  "terminal_chain_sha256": "78c528b9c788f4657c88151bc617a1f03d39d957124b70f51135b52f95a0f933",
   "truth_line": "This map distinguishes exact standard methods, operational definitions, heuristic analogues, and exploratory heuristics. It is an internal traceability artifact, not patentability, agency acceptance, independent validation, field validation, or performance certification."
 }

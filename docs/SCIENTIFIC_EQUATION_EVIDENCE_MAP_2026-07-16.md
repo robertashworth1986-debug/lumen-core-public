@@ -1,9 +1,9 @@
 # Scientific Equation Evidence Map
 
-Generated UTC: `2026-07-21T07:53:26.536023+00:00`
-Registry SHA-256: `3c73ea29c9a4a58060811f7700219f1c82ae102e8aecfa70ee6b4341490324c2`
+Generated UTC: `2026-07-21T13:38:16.564494+00:00`
+Registry SHA-256: `1dc62d0aff32eabd7bb3d5db87e297995fd078108d67c92de2519bd6d97ceab6`
 Builder SHA-256: `1077dd04512caeda698a661df3c822322972e8953e11ee71b16d2e83c6baf736`
-Terminal chain SHA-256: `0403a49b510968021b34350d2ab5697f7bd565bdec9e25e264551c0ef3617b5a`
+Terminal chain SHA-256: `78c528b9c788f4657c88151bc617a1f03d39d957124b70f51135b52f95a0f933`
 
 ## Truth Line
 
@@ -36,9 +36,9 @@ This map distinguishes exact standard methods, operational definitions, heuristi
 | `EIA-D-003` | Autoregressive ridge baseline | `EXACT_STANDARD_METHOD` | `E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC` | `C2_FROZEN_INTERNAL_EVIDENCE` | `code/eia_grid_residual_moe_benchmark.py:138::forecast_autoregressive_ridge` | The frozen EIA lane includes a transparent autoregressive ridge baseline. |
 | `EIA-D-004` | Daily forecast metric row | `OPERATIONAL_DEFINITION` | `E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC` | `C2_FROZEN_INTERNAL_EVIDENCE` | `code/eia_grid_residual_moe_benchmark.py:463::metric_row` | Daily holdout rows expose declared error and direction metrics with units. |
 | `EIA-D-005` | Exact two-sided sign test | `EXACT_STANDARD_METHOD` | `E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC` | `C2_FROZEN_INTERNAL_EVIDENCE` | `code/eia_grid_residual_moe_benchmark.py:591::exact_two_sided_sign_test` | The paired comparison layer includes an exact two-sided sign test. |
-| `EIA-H-001` | Hourly weekly-difference target scale | `OPERATIONAL_DEFINITION` | `E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC` | `C2_FROZEN_INTERNAL_EVIDENCE` | `code/eia_grid_prospective_hourly_router.py:327::target_scale` | The prospective hourly protocol uses a declared median weekly-difference normalization scale. |
-| `EIA-H-002` | Leakage-controlled hourly feature vector | `OPERATIONAL_DEFINITION` | `E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC` | `C2_FROZEN_INTERNAL_EVIDENCE` | `code/eia_grid_prospective_hourly_router.py:338::build_feature_row` | The sealed-forecast feature contract excludes the target actual and uses declared lags and cyclic bases. |
-| `EIA-H-003` | Append-only canonical SHA-256 chain | `EXACT_STANDARD_METHOD` | `E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC` | `C2_FROZEN_INTERNAL_EVIDENCE` | `code/eia_grid_prospective_hourly_router.py:630::append_chain_record` | Prospective records are appended to a tamper-evident canonical SHA-256 chain. |
+| `EIA-H-001` | Hourly weekly-difference target scale | `OPERATIONAL_DEFINITION` | `E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC` | `C2_FROZEN_INTERNAL_EVIDENCE` | `code/eia_grid_prospective_hourly_router.py:340::target_scale` | The prospective hourly protocol uses a declared median weekly-difference normalization scale. |
+| `EIA-H-002` | Leakage-controlled hourly feature vector | `OPERATIONAL_DEFINITION` | `E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC` | `C2_FROZEN_INTERNAL_EVIDENCE` | `code/eia_grid_prospective_hourly_router.py:351::build_feature_row` | The sealed-forecast feature contract excludes the target actual and uses declared lags and cyclic bases. |
+| `EIA-H-003` | Append-only canonical SHA-256 chain | `EXACT_STANDARD_METHOD` | `E2_FROZEN_INTERNAL_OR_SOURCE_AUTHENTIC` | `C2_FROZEN_INTERNAL_EVIDENCE` | `code/eia_grid_prospective_hourly_router.py:646::append_chain_record` | Prospective records are appended to a tamper-evident canonical SHA-256 chain. |
 | `DICE-001` | Normalized strategy entropy | `EXACT_STANDARD_METHOD` | `E1_INTERNAL_IMPLEMENTATION` | `C1_INTERNAL_IMPLEMENTATION` | `code/dice_constraint_contract_benchmark.py:260::_strategy_entropy` | The generated benchmark reports normalized Shannon entropy across eight modeled strategies. |
 | `DICE-002` | Constraint-contract development objective | `OPERATIONAL_DEFINITION` | `E1_INTERNAL_IMPLEMENTATION` | `C1_INTERNAL_IMPLEMENTATION` | `code/dice_constraint_contract_benchmark.py:399::_objective` | A declared weighted objective selects contract margins on generated development conditions. |
 | `NV065-001` | Expected sensor contribution heuristic | `EXPLORATORY_HEURISTIC` | `E1_INTERNAL_IMPLEMENTATION` | `C1_INTERNAL_IMPLEMENTATION` | `code/nv065_sensor_tasking_benchmark.py:281::expected_contribution` | A deterministic nonnegative heuristic ranks generated sensor-track assignments in the NV065 software benchmark. |
