@@ -25,6 +25,7 @@ from execution.order_safety_gate import (
     ORDER_POLICY,
     evaluate_order_request,
 )
+from operator_api_access import install_operator_api_access
 
 
 ORDER_SAFETY_POLICY = ORDER_POLICY
@@ -50,6 +51,8 @@ _legacy._kraken_add_order = _kraken_add_order
 from luma_experience_gateway_legacy import *  # noqa: E402,F401,F403
 
 app = _legacy.app
+if hasattr(app, "add_middleware"):
+    install_operator_api_access(app)
 
 
 def main() -> int:
