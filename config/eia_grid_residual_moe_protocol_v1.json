@@ -1,0 +1,164 @@
+{
+  "schema": "eia_grid_residual_moe_protocol.v1",
+  "protocol_id": "EIA_GRID_RESIDUAL_MOE_20260713",
+  "version": 1,
+  "frozen_date_utc": "2026-07-13",
+  "purpose": "Test whether a preregistered residual mixture-of-experts can improve on EIA's official day-ahead forecast and strong direct algorithmic baselines without replacing a strong incumbent where correction evidence is weak.",
+  "primary_hypothesis": "The development-selected residual hybrid has lower seasonal-MASE than every predeclared baseline on the untouched 2026 common-intersection holdout panel.",
+  "frozen_panel": {
+    "path": "data/live_measured/eia_grid_validation/eia_grid_validation_panel_latest.json",
+    "file_sha256": "8b480ec4923c17d3782eacd428ee5ea599525145ce2a0772ba934aba0a40da59",
+    "row_chain_sha256": "594684318e85e3440e385cff3e30c5d095930410572c6c4b39472814ae4655dd",
+    "row_count": 14704,
+    "source_protocol_sha256": "273eb823b0be4b2d403d0aaa591673c2e470e3d7f30abb166a43fe6e311a1c3d",
+    "publisher": "U.S. Energy Information Administration",
+    "product": "Form EIA-930 daily demand and day-ahead demand forecast by balancing authority",
+    "actual_type": "D",
+    "official_forecast_type": "DF",
+    "native_unit": "megawatthours"
+  },
+  "splits": {
+    "feature_warmup_start": "2024-01-01",
+    "training_start": "2024-04-01",
+    "training_end": "2025-06-30",
+    "development_start": "2025-07-01",
+    "development_end": "2025-12-31",
+    "holdout_start": "2026-01-01",
+    "holdout_end": "2026-07-12",
+    "minimum_history_days": 90,
+    "maximum_history_days": 730,
+    "development_refit_rule": "Fit every candidate on training rows only and select exactly one candidate on development rows. After selection, refit the selected candidate and all fixed baselines on training plus development rows, then evaluate the holdout once.",
+    "leakage_rule": "A target-date feature may use the target's already-published EIA day-ahead forecast, calendar fields, and actual or forecast-error observations dated before the target. It may not use target actual demand or any later observation."
+  },
+  "feature_contract": {
+    "normalization": "Each continuous load or error feature is scaled by the history-only seven-day seasonal MASE denominator for its target. Authority identity is one-hot encoded.",
+    "continuous_features": [
+      "official_minus_ar_ridge_scaled",
+      "official_minus_seasonal_naive_scaled",
+      "official_minus_last_scaled",
+      "ar_minus_seasonal_naive_scaled",
+      "official_level_minus_history_median_scaled",
+      "official_residual_lag_1_scaled",
+      "official_residual_lag_7_scaled",
+      "official_residual_lag_14_scaled",
+      "official_residual_mean_7_scaled",
+      "official_residual_mean_28_scaled",
+      "official_residual_std_28_scaled",
+      "actual_change_1_scaled",
+      "actual_change_7_scaled",
+      "actual_volatility_28_scaled",
+      "day_of_week_sine",
+      "day_of_week_cosine",
+      "day_of_year_sine",
+      "day_of_year_cosine"
+    ],
+    "categorical_features": [
+      "authority_one_hot"
+    ],
+    "missing_rule": "A row is excluded if any required lag, actual, or official forecast is unavailable. Exclusions are reported by authority and split.",
+    "correction_clip": "Residual corrections are clipped to plus or minus 2.5 history-only seasonal scales."
+  },
+  "candidate_models": [
+    {
+      "id": "ridge_residual",
+      "definition": "StandardScaler plus Ridge(alpha=10.0) predicts official-forecast residual in seasonal-scale units."
+    },
+    {
+      "id": "xgboost_residual",
+      "definition": "XGBRegressor with objective reg:squarederror, 300 trees, depth 3, learning rate 0.03, subsample 0.8, colsample_bytree 0.8, reg_lambda 10, seed 20260713, n_jobs 4 predicts official residual."
+    },
+    {
+      "id": "lightgbm_residual",
+      "definition": "LGBMRegressor with 300 trees, 15 leaves, learning rate 0.03, min_child_samples 40, subsample 0.8, colsample_bytree 0.8, reg_lambda 10, seed 20260713, n_jobs 4 predicts official residual."
+    },
+    {
+      "id": "median_residual_ensemble",
+      "definition": "Apply the median of ridge, XGBoost, and LightGBM residual corrections."
+    },
+    {
+      "id": "half_median_residual_ensemble",
+      "definition": "Apply one half of the median residual correction as a conservative shrinkage candidate."
+    },
+    {
+      "id": "agreement_gated_residual_moe",
+      "definition": "Apply the median correction only when the maximum pairwise component disagreement is at most 0.75 seasonal-scale units and the absolute median correction is at most 1.5 scales; otherwise abstain to the official forecast."
+    },
+    {
+      "id": "official_ar_blend_75_25",
+      "definition": "Use 75 percent EIA official forecast and 25 percent autoregressive ridge p14 forecast."
+    }
+  ],
+  "baselines": [
+    {
+      "id": "eia_day_ahead_forecast",
+      "definition": "EIA type DF for the same authority and date."
+    },
+    {
+      "id": "autoregressive_ridge_p14",
+      "definition": "Fourteen-lag rolling autoregression using only actual demand before the target."
+    },
+    {
+      "id": "seasonal_naive_7",
+      "definition": "Actual demand from seven days before the target."
+    },
+    {
+      "id": "official_ar_equal_blend",
+      "definition": "Equal-weight average of EIA official and autoregressive ridge forecasts."
+    },
+    {
+      "id": "direct_xgboost_stack",
+      "definition": "The fixed XGBoost specification predicts target demand relative to the history median and seasonal scale using the identical feature contract."
+    },
+    {
+      "id": "direct_lightgbm_stack",
+      "definition": "The fixed LightGBM specification predicts target demand relative to the history median and seasonal scale using the identical feature contract."
+    }
+  ],
+  "selection": {
+    "rule": "Choose exactly one candidate with the lowest mean seasonal-MASE across all development rows. Ties break by lower mean absolute error, then candidate id.",
+    "holdout_visibility": "No holdout result may affect candidate identity, model settings, feature definitions, source inclusion, abstention thresholds, or tie breaking.",
+    "report_all_development_candidates": true,
+    "report_descriptive_holdout_rows_for_unselected_candidates": false,
+    "no_post_selection_substitution": true
+  },
+  "metrics": {
+    "primary": "seasonal_mase_7",
+    "primary_definition": "Absolute error divided by the history-only mean absolute seven-day difference.",
+    "secondary": [
+      "absolute_error_mwh",
+      "absolute_percentage_error",
+      "directional_accuracy",
+      "abstention_rate",
+      "runtime_ms"
+    ],
+    "aggregation_unit": "balancing_authority_calendar_month"
+  },
+  "inference": {
+    "paired_delta_direction": "Baseline seasonal-MASE minus selected-candidate seasonal-MASE; positive favors the candidate.",
+    "bootstrap": "10000 deterministic cluster-bootstrap draws resampling balancing authorities with replacement and retaining their months; seed 20260713.",
+    "sign_test": "Exact two-sided sign test over nonzero balancing-authority-month mean deltas.",
+    "multiple_comparison_control": "Holm correction across the selected candidate versus all six baselines.",
+    "source_robustness": "Report authority mean skill, authority win count, worst authority regression, and month win rate."
+  },
+  "promotion_gate": {
+    "minimum_balancing_authorities": 8,
+    "minimum_common_holdout_days_per_authority": 150,
+    "minimum_paired_authority_months": 40,
+    "required_authority_mean_wins": 6,
+    "required_month_win_rate": 0.6,
+    "maximum_single_authority_mase_regression": 0.05,
+    "require_positive_cluster_bootstrap_lower_bound": true,
+    "require_holm_adjusted_p_at_most": 0.05,
+    "must_beat_every_predeclared_baseline": true,
+    "external_replication_required_for_field_claim": true
+  },
+  "execution_controls": {
+    "network_access_allowed": false,
+    "frozen_panel_only": true,
+    "trading_execution_allowed": false,
+    "external_submission_allowed": false,
+    "dollar_conversion_allowed": false,
+    "post_holdout_tuning_allowed": false
+  },
+  "claim_boundary": "This protocol can produce measured public EIA-930 software forecast evidence in native MWh. It cannot by itself establish field control, grid reliability improvement, realized savings, procurement acceptance, safety, external validation, trading edge, or an unbeatable claim."
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "codecheck_reviewer_container_protocol.v1",
+  "protocol_id": "LUMENCORE_CODECHECK_REVIEWER_CONTAINER_20260721",
+  "version": 1,
+  "purpose": "Reconstruct the bounded CODECHECK reviewer environment from a public release bundle, execute it with network and privilege controls, and emit an operator-controlled machine receipt.",
+  "recipe": {
+    "dockerfile_path": "containers/codecheck-reviewer/Dockerfile",
+    "runner_path": "containers/codecheck-reviewer/run_capsule.sh",
+    "orchestrator_path": "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py",
+    "runtime_config_path": "config/codecheck_reviewer_runtime_v1.json",
+    "base_image": {
+      "repository": "mcr.microsoft.com/devcontainers/base",
+      "tag": "ubuntu-24.04",
+      "index_digest": "sha256:d94c97dd9cacf183d0a6fd12a8e87b526e9e928307674ae9c94139139c0c6eae",
+      "platform_manifest_digest": "sha256:3612b800eaae8513e7dca54f21d2e4eda48eda57426f3746a78677f342ac7ee9",
+      "platform": "linux/amd64"
+    },
+    "uv": {
+      "version": "0.11.28",
+      "archive_url": "https://github.com/astral-sh/uv/releases/download/0.11.28/uv-x86_64-unknown-linux-gnu.tar.gz",
+      "archive_sha256": "e490a6464492183c5d4534a5527fb4440f7f2bb2f228162ad7e4afe076dc0224"
+    },
+    "python": "3.11.9",
+    "image_tag_prefix": "lumencore-codecheck-reviewer"
+  },
+  "execution": {
+    "network": "none",
+    "read_only": true,
+    "cap_drop": [
+      "ALL"
+    ],
+    "security_opt": [
+      "no-new-privileges"
+    ],
+    "tmpfs": [
+      "/tmp:rw,nosuid,nodev,noexec,size=256m",
+      "/work:rw,nosuid,nodev,exec,size=2g"
+    ],
+    "pids_limit": 512,
+    "memory": "4g",
+    "cpus": "4",
+    "input_mount": "/input",
+    "output_mount": "/output"
+  },
+  "expected_outputs": [
+    "runtime_receipt.json",
+    "reviewer_reproducibility_receipt.json",
+    "reviewer_suite_sbom.cdx.json",
+    "logs/eia_wave.log",
+    "logs/eia_residual.log",
+    "logs/mda_open_set.log",
+    "logs/fixture_tests.log"
+  ],
+  "claim_boundary": "A passing container-rebuild receipt proves only that an operator rebuilt the digest-pinned public recipe and reproduced the bounded capsule under the named isolation controls. It is not independent execution, a CODECHECK certificate, scientific validation, field validation, performance endorsement, agency acceptance, or valuation evidence.",
+  "human_unlock_policy": "Publishing a release, opening a CODECHECK request, transferring a packet, contacting a validator, certifying an assertion, or changing an external-validation field requires duplicate-action reconciliation and fresh action-time HumanUnlock."
+}

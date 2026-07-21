@@ -1,0 +1,215 @@
+{
+  "schema": "mda_control_mapping_open_set_protocol.v2",
+  "protocol_id": "MDA_CONTROL_MAPPING_OPEN_SET_SYNTHETIC_20260713_V2",
+  "version": 2,
+  "topic": "MDA26BZ04-NV007",
+  "prepared_date_utc": "2026-07-13",
+  "status": "preregistered_before_v2_implementation_and_execution",
+  "purpose": "Test whether a static-first, confidence-and-margin-gated lexical router can preserve supported-case coverage while refusing out-of-domain synthetic findings that do not map to the frozen control registry.",
+  "motivation": "The sealed v1 experiment failed because the candidate mapped every unsupported blind-holdout record and improved micro-F1 by only 0.02305 over the best baseline. V2 treats open-set abstention as the central falsifiable risk without changing or reusing the v1 holdout for v2 selection or performance claims.",
+  "evidence_class": "independent_synthetic_open_set_feasibility_only",
+  "random_seed": 2026071302,
+  "independence": {
+    "reuse_v1_fixture_records": false,
+    "reuse_v1_holdout_for_selection": false,
+    "reuse_v1_holdout_for_v2_metrics": false,
+    "v1_role": "risk discovery and hypothesis motivation only",
+    "post_v2_holdout_change_allowed": false
+  },
+  "fixture_contract": {
+    "total_records": 128,
+    "supported_archetype_count": 8,
+    "supported_records_per_archetype": 12,
+    "unsupported_archetype_count": 4,
+    "unsupported_records_per_archetype": 8,
+    "development_records": 56,
+    "validation_records": 36,
+    "blind_holdout_records": 36,
+    "split_rule": "Deterministic stratified assignment within each supported and unsupported archetype using the frozen v2 seed. Supported groups allocate 6/3/3 and unsupported groups allocate 2/3/3 to development/validation/blind holdout.",
+    "source_kinds": [
+      "synthetic_acas_like",
+      "synthetic_scap_like"
+    ],
+    "control_ids": [
+      "AC-2",
+      "AU-6",
+      "CM-6",
+      "IA-5",
+      "RA-5",
+      "SC-7",
+      "SI-2",
+      "SI-3"
+    ],
+    "supported_archetypes": [
+      {
+        "id": "account_management",
+        "expected_controls": ["AC-2"],
+        "tokens": ["account", "disable", "inactive", "privilege", "identity"]
+      },
+      {
+        "id": "audit_review",
+        "expected_controls": ["AU-6"],
+        "tokens": ["audit", "log", "review", "correlation", "event"]
+      },
+      {
+        "id": "configuration_settings",
+        "expected_controls": ["CM-6"],
+        "tokens": ["configuration", "setting", "baseline", "harden", "parameter"]
+      },
+      {
+        "id": "authenticator_management",
+        "expected_controls": ["IA-5"],
+        "tokens": ["password", "authenticator", "credential", "rotate", "secret"]
+      },
+      {
+        "id": "vulnerability_scanning",
+        "expected_controls": ["RA-5"],
+        "tokens": ["vulnerability", "scan", "cve", "remediation", "assessment"]
+      },
+      {
+        "id": "boundary_protection",
+        "expected_controls": ["SC-7"],
+        "tokens": ["boundary", "firewall", "network", "ingress", "egress"]
+      },
+      {
+        "id": "flaw_remediation",
+        "expected_controls": ["SI-2"],
+        "tokens": ["patch", "flaw", "update", "remediate", "software"]
+      },
+      {
+        "id": "malicious_code",
+        "expected_controls": ["SI-3"],
+        "tokens": ["malware", "antivirus", "malicious", "quarantine", "signature"]
+      }
+    ],
+    "unsupported_archetypes": [
+      {
+        "id": "asset_catalog",
+        "tokens": ["inventory", "catalog", "checksum", "serial", "warranty"]
+      },
+      {
+        "id": "facility_environment",
+        "tokens": ["climate", "humidity", "rack", "cooling", "temperature"]
+      },
+      {
+        "id": "business_finance",
+        "tokens": ["invoice", "ledger", "purchase", "vendor", "budget"]
+      },
+      {
+        "id": "transport_logistics",
+        "tokens": ["vehicle", "route", "shipment", "delivery", "fuel"]
+      }
+    ],
+    "ambiguous_supported_records_per_archetype": 2,
+    "noise_tokens_per_record": 3,
+    "unsupported_title_policy": "Unsupported titles must use only the unsupported archetype name and record index; no supported archetype or control name may appear.",
+    "prohibited_fixture_claim": "Synthetic records are not ACAS, Nessus, SCAP, STIG, MDA, CUI, classified, or operational assessment evidence."
+  },
+  "record_contract": {
+    "required_fields": [
+      "fixture_id",
+      "source_kind",
+      "source_record_sha256",
+      "parser_version",
+      "finding_id",
+      "title",
+      "description",
+      "references",
+      "expected_controls",
+      "label_status",
+      "archetype_id",
+      "split"
+    ],
+    "provenance_completeness_target": 1.0,
+    "invalid_input_policy": "Reject malformed required fields and record the failure; never silently coerce a missing label or unsupported record."
+  },
+  "baselines": [
+    {
+      "id": "static_identifier_crosswalk",
+      "definition": "Map only explicit frozen synthetic identifiers to controls; abstain when no identifier is registered."
+    },
+    {
+      "id": "tfidf_lexical_retrieval",
+      "definition": "Fit TF-IDF control prototypes on v2 development records only and return the highest-cosine control above a validation-selected score threshold, without a margin constraint.",
+      "score_threshold_grid_source": "candidate.score_threshold_grid",
+      "selection_split": "validation",
+      "selection_order": [
+        "highest_macro_f1",
+        "highest_micro_f1",
+        "lowest_unsupported_mapping_rate",
+        "highest_supported_coverage",
+        "highest_score_threshold"
+      ]
+    }
+  ],
+  "candidate": {
+    "id": "hybrid_static_then_open_set_lexical_v2",
+    "definition": "Use the static route for an exact registered identifier. Otherwise emit the top lexical control only when both the top cosine score and the top-minus-second score margin clear validation-selected thresholds; otherwise abstain.",
+    "router_priority": [
+      "static_identifier_crosswalk",
+      "open_set_lexical_retrieval",
+      "abstain"
+    ],
+    "model_fit_split": "development",
+    "score_threshold_grid": [0.30, 0.40, 0.50, 0.60, 0.70],
+    "margin_threshold_grid": [0.00, 0.05, 0.10, 0.15, 0.20],
+    "selection_split": "validation",
+    "validation_constraints": {
+      "maximum_unsupported_mapping_rate": 0.05,
+      "minimum_supported_coverage": 0.75
+    },
+    "feasible_selection_order": [
+      "highest_macro_f1",
+      "highest_micro_f1",
+      "lowest_unsupported_mapping_rate",
+      "highest_supported_coverage",
+      "highest_score_threshold",
+      "highest_margin_threshold"
+    ],
+    "infeasible_fallback_order": [
+      "lowest_unsupported_mapping_rate",
+      "highest_supported_coverage",
+      "highest_macro_f1",
+      "highest_score_threshold",
+      "highest_margin_threshold"
+    ],
+    "post_holdout_change_allowed": false
+  },
+  "metrics": {
+    "primary": "micro_f1_over_all_control_decisions_including_unsupported_false_positives",
+    "secondary": [
+      "macro_f1",
+      "exact_set_match",
+      "precision",
+      "recall",
+      "supported_coverage",
+      "overall_coverage",
+      "abstention_rate",
+      "unsupported_mapping_rate",
+      "provenance_completeness",
+      "parser_rejection_count"
+    ]
+  },
+  "promotion_gates": {
+    "parser_conformance_rate": 1.0,
+    "provenance_completeness": 1.0,
+    "minimum_holdout_supported_coverage": 0.80,
+    "maximum_holdout_unsupported_mapping_rate": 0.05,
+    "minimum_micro_f1_delta_over_best_baseline": 0.03,
+    "all_baselines_required": true,
+    "negative_results_retained": true,
+    "operational_or_field_claim_allowed": false
+  },
+  "required_outputs": [
+    "fixture_manifest",
+    "split_manifest",
+    "full_predictions",
+    "per_strategy_metrics",
+    "threshold_selection_receipt",
+    "failure_and_abstention_log",
+    "artifact_chain_manifest",
+    "claim_boundary"
+  ],
+  "next_evidence_gate": "If v2 passes, rerun a separately preregistered protocol on lawfully obtained representative artifacts with a qualified cyber/RMF reviewer and an independently held blind set.",
+  "claim_boundary": "A passing result supports independent synthetic open-set routing feasibility only. It does not establish operational ACAS or SCAP parsing, authoritative STIG or CVE mapping, NIST or RMF compliance, CMMC status, MDA validation, field performance, labor savings, production readiness, or authorization to operate."
+}

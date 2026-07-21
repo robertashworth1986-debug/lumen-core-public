@@ -19,3 +19,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Third-Party Data Notice
+
+The frozen EIA-derived input in this repository is separate from the Software
+licensed above. The U.S. Energy Information Administration states that U.S.
+government publications on its website are in the public domain and may be
+used or distributed with source acknowledgment:
+
+https://www.eia.gov/about/copyrights_reuse.php
+
+Use of content obtained through the EIA API is also subject to the EIA API
+Terms of Service. In particular, attribution must not imply EIA endorsement,
+and EIA content must not be falsely represented:
+
+https://www.eia.gov/opendata/terms-of-service.php
+
+Source acknowledgment for the packaged measured-data input: U.S. Energy
+Information Administration, Form EIA-930 daily demand and day-ahead demand
+forecast by balancing authority. LumenCore is not endorsed by EIA.

@@ -1,0 +1,209 @@
+{
+  "schema": "reviewer_reproducibility_protocol.v1",
+  "protocol_id": "LUMENCORE_REVIEWER_REPRODUCIBILITY_20260714",
+  "version": 1,
+  "frozen_date_utc": "2026-07-14",
+  "amendment": {
+    "amended_utc": "2026-07-14",
+    "reason": "The first clean Ubuntu replay exposed a missing ignored panel path; the second clean replay passed 30 of 31 assertions but measured a 0.4269440625% XGBoost CPU histogram MASE drift relative to the Windows reference while preserving the selected champion, comparison count, and every gate outcome.",
+    "failed_github_run_ids": [29335084468, 29335574945],
+    "numeric_portability_observation": {
+      "github_run_id": 29335574945,
+      "reference_best_mase": 0.21211186326437864,
+      "ubuntu_best_mase": 0.2112062642583228,
+      "absolute_difference": 0.000905599006055829,
+      "relative_difference": 0.00426944062495496
+    },
+    "policy": "Keep structural, identity, coverage, and gate assertions exact. For the XGBoost residual MASE only, accept at most 1% relative drift from the frozen reference and record the exact observed metric in every receipt.",
+    "preregistration_boundary": "This portability tolerance is a post-observation protocol amendment, not a preregistered scientific threshold. The failed runs and their receipts remain in GitHub Actions history."
+  },
+  "purpose": "Give a reviewer a portable, fail-closed replay of selected public-safe evidence lanes from a version-pinned Python environment and a frozen public-data input.",
+  "standards_references": [
+    {
+      "name": "NIST SP 800-218 Secure Software Development Framework 1.1",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+      "use": "Informative source for provenance, protected artifacts, and repeatable verification practices. This capsule is not a NIST certification or full SSDF attestation."
+    },
+    {
+      "name": "CISA 2025 Minimum Elements for a Software Bill of Materials",
+      "url": "https://www.cisa.gov/sites/default/files/2025-08/2025_CISA_SBOM_Minimum_Elements.pdf",
+      "use": "Informative public-comment-draft reference for component identity and dependency relationships. The emitted inventory is scoped to the reviewer suite and is not a complete product SBOM."
+    },
+    {
+      "name": "pip Secure Installs",
+      "url": "https://pip.pypa.io/en/stable/topics/secure-installs/",
+      "use": "Primary installer guidance for all-or-nothing hash checking, exact transitive pins, and binary-only installation."
+    },
+    {
+      "name": "uv pip compile",
+      "url": "https://docs.astral.sh/uv/pip/compile/",
+      "use": "Primary resolver documentation for the target-specific, hash-emitting lock generation command recorded in the lock header."
+    }
+  ],
+  "environment": {
+    "python": "3.11.9",
+    "pythonhashseed": "0",
+    "timezone": "UTC",
+    "thread_limits": {
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    },
+    "requirements_path": "requirements-reviewer.txt",
+    "requirements_lock_path": "requirements-reviewer-ubuntu-py311.lock",
+    "requirements_lock_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18",
+    "requirements_lock_hash_mode": "utf8_lf",
+    "requirements_lock_package_count": 18,
+    "requirements_lock_verifier_path": "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+    "authoritative_runner": {
+      "github_image": "ubuntu-24.04",
+      "system": "Linux",
+      "machine": "x86_64",
+      "python": "3.11.9"
+    },
+    "requirements_lock_resolver": {
+      "name": "uv",
+      "version": "0.11.28",
+      "python": "3.11.9",
+      "target_platform": "x86_64-unknown-linux-gnu",
+      "source_builds_allowed": false
+    },
+    "target_required_transitive": {
+      "nvidia-nccl-cu12": "2.30.7"
+    },
+    "artifact_hash_lock_complete": true,
+    "artifact_hash_lock_scope": "Complete for the authoritative Ubuntu 24.04 x86-64 CPython 3.11.9 reviewer runner only.",
+    "cross_platform_artifact_hash_lock_complete": false,
+    "artifact_hash_lock_gap": "Other operating systems and architectures are not covered by this receipt until separately resolved, hash-locked, and replayed."
+  },
+  "dependencies": [
+    {"distribution": "lightgbm", "version": "4.6.0", "import_name": "lightgbm", "relationship": "direct"},
+    {"distribution": "numpy", "version": "2.3.5", "import_name": "numpy", "relationship": "direct"},
+    {"distribution": "packaging", "version": "25.0", "import_name": "packaging", "relationship": "runner"},
+    {"distribution": "pandas", "version": "2.3.3", "import_name": "pandas", "relationship": "direct"},
+    {"distribution": "pytest", "version": "9.1.0", "import_name": "pytest", "relationship": "test"},
+    {"distribution": "scikit-learn", "version": "1.8.0", "import_name": "sklearn", "relationship": "direct"},
+    {"distribution": "scipy", "version": "1.16.3", "import_name": "scipy", "relationship": "transitive_numeric_runtime"},
+    {"distribution": "xgboost", "version": "3.2.0", "import_name": "xgboost", "relationship": "direct"}
+  ],
+  "frozen_inputs": [
+    {
+      "input_id": "eia_grid_validation_panel_20260713",
+      "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
+      "materialized_path": "data/live_measured/eia_grid_validation/eia_grid_validation_panel_latest.json",
+      "media_type": "application/gzip",
+      "compressed_sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9",
+      "uncompressed_sha256": "8b480ec4923c17d3782eacd428ee5ea599525145ce2a0772ba934aba0a40da59",
+      "row_chain_sha256": "594684318e85e3440e385cff3e30c5d095930410572c6c4b39472814ae4655dd",
+      "row_count": 14704,
+      "publisher": "U.S. Energy Information Administration",
+      "product": "Form EIA-930 daily demand and day-ahead demand forecast by balancing authority",
+      "credential_serialized": false,
+      "public_data": true
+    }
+  ],
+  "suites": [
+    {
+      "suite_id": "eia_wave_frozen_holdout",
+      "kind": "measured_public_data_replay",
+      "runner": "eia_wave",
+      "source_paths": [
+        "code/eia_grid_wave_champion_benchmark.py",
+        "config/eia_grid_wave_champion_protocol_v1.json"
+      ],
+      "expected": {
+        "panel_rows": 14704,
+        "holdout_rows": 1525,
+        "holdout_authorities": 8,
+        "selected_candidate": "lissajous_phase_paths",
+        "best_strategy": "autoregressive_ridge_p14",
+        "best_mase": 0.47945937271811834,
+        "kuramoto_mase": 1.253508683225091,
+        "tolerance": 1e-6,
+        "promotion_gate_passed": false,
+        "field_validation_complete": false
+      }
+    },
+    {
+      "suite_id": "eia_residual_frozen_holdout",
+      "kind": "measured_public_data_replay",
+      "runner": "eia_residual",
+      "source_paths": [
+        "code/eia_grid_residual_moe_benchmark.py",
+        "config/eia_grid_residual_moe_protocol_v1.json"
+      ],
+      "expected": {
+        "panel_rows": 14704,
+        "holdout_rows": 1176,
+        "holdout_authorities": 8,
+        "selected_candidate": "xgboost_residual",
+        "best_strategy": "xgboost_residual",
+        "best_mase": 0.21211186326437864,
+        "baseline_comparison_count": 6,
+        "relative_tolerance": 0.01,
+        "promotion_gate_passed": false,
+        "coverage_gate_passed": false,
+        "field_validation_complete": false
+      }
+    },
+    {
+      "suite_id": "mda_open_set_v2",
+      "kind": "deterministic_synthetic_falsification_replay",
+      "runner": "mda_open_set",
+      "source_paths": [
+        "code/mda_control_mapping_open_set_benchmark.py",
+        "config/mda_control_mapping_open_set_protocol_v2.json"
+      ],
+      "expected": {
+        "fixture_count": 128,
+        "holdout_count": 36,
+        "candidate_micro_f1": 0.9433962264150945,
+        "candidate_supported_coverage": 0.9583333333333334,
+        "candidate_unsupported_mapping_rate": 0.0,
+        "tolerance": 1e-12,
+        "promotion_gate_passed": false,
+        "operational_or_field_claim_allowed": false
+      }
+    }
+  ],
+  "fixture_test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "-q",
+    "tests/test_eia_grid_wave_champion_benchmark.py",
+    "tests/test_eia_grid_residual_moe_benchmark.py",
+    "tests/test_mda_control_mapping_open_set_benchmark.py",
+    "tests/test_faa_sdr_10k_benchmark.py",
+    "tests/test_reviewer_dependency_lock.py",
+    "tests/test_reviewer_reproducibility_capsule.py",
+    "-k",
+    "not frozen_eia_panel_and_result_manifests_are_hash_valid_and_claim_safe and not published_receipt_reconciles_hashes_assertions_and_public_projection and not sbom_has_scoped_component_identity_and_dependency_relationships and not markdown_reports_failures_and_unmet_external_gates_plainly"
+  ],
+  "control_paths": [
+    ".gitignore",
+    ".github/workflows/reviewer-reproducibility.yml",
+    "README.md",
+    "code/ops/RUN_FAA_SDR_10K_BENCHMARK.py",
+    "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+    "config/reviewer_protocol_provenance_v1.json",
+    "requirements-reviewer-ubuntu-py311.lock",
+    "tests/test_reviewer_dependency_lock.py",
+    "tests/test_reviewer_reproducibility_capsule.py"
+  ],
+  "excluded_full_replays": [
+    {
+      "lane": "faa_sdr_10k",
+      "reason": "The four official FAA SDR CSV source files total about 114 MB and are not bundled in this capsule. Algorithmic fixture tests run, but the 10,000-report result is not clean-room replayed here."
+    },
+    {
+      "lane": "locked_source_baseline_replay_sweep",
+      "reason": "The broader private/local source universe is not bundled into the public capsule."
+    },
+    {
+      "lane": "external_validation",
+      "reason": "A clean CI replay is software reproducibility evidence, not independent scientific or field validation."
+    }
+  ],
+  "claim_boundary": "A passing capsule proves that the named code reproduced the declared bounded facts from the packaged input under the recorded environment. It does not prove agency approval, cybersecurity certification, external validation, field performance, realized savings, patent scope, trading performance, or funding eligibility."
+}

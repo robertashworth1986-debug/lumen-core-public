@@ -56,6 +56,7 @@ run/
 out/
 code/out/
 *.lock
+!requirements-reviewer-ubuntu-py311.lock
 
 # High-churn runtime JSON cache/state
 kraken_fill_prices.json

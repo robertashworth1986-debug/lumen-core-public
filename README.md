@@ -28,8 +28,20 @@ A reviewer should not infer current truth by reading every historical or draft p
 1. Read the [Canonical Evidence Index](EVIDENCE_INDEX.md).
 2. Inspect the merged [Proof Capsule verifier v2 PR](https://github.com/robertashworth1986-debug/lumen-core-public/pull/34).
 3. Inspect the deployed [ProofLock Console PR](https://github.com/robertashworth1986-debug/lumen-core-public/pull/36) and its bounded claim boundary.
-4. Inspect the consolidated [EIA/CODECHECK reviewer package PR](https://github.com/robertashworth1986-debug/lumen-core-public/pull/64).
+4. Inspect the [CODECHECK executable-computation note](docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md) and [author review checklist](docs/CODECHECK_AUTHOR_REVIEW_CHECKLIST_2026-07-21.md).
 5. Review the proposed [30-Day Bounded Validation Sprint PR](https://github.com/robertashworth1986-debug/lumen-core-public/pull/35).
+
+### Independent execution target
+
+The root `codecheck.yml` defines one bounded external execution target: three
+reproducibility suites, 31 assertions, and six declared outputs. The reviewed
+source and five-page preprint are frozen at commit
+`1c0eb51754beffac6f4df484914e35efc21c253f`.
+
+Author-operated CI and container receipts are first-party executability
+evidence only. Independent execution, a CODECHECK certificate, scientific or
+field validation, agency approval, savings, trading performance, patent
+conclusions, and company valuation remain unverified.
 
 ## Core method
 
