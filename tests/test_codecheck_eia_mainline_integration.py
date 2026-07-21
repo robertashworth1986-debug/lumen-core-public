@@ -84,3 +84,14 @@ def test_protocol_has_no_overlap_between_frozen_core_and_allowed_drift():
     drift = set(config["allowed_integration_drift_paths"])
 
     assert frozen.isdisjoint(drift)
+
+
+def test_workflow_hashes_artifacts_from_the_uploaded_root():
+    workflow = (ROOT / ".github" / "workflows" / "reviewer-reproducibility.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert "cd out/reproducibility/ci" in workflow
+    assert "find . -type f ! -name SHA256SUMS -print0" in workflow
+    assert "> SHA256SUMS" in workflow
+    assert "find out/reproducibility/ci -type f" not in workflow

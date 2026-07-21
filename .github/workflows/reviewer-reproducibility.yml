@@ -140,10 +140,13 @@ jobs:
         shell: bash
         run: |
           if [ -d out/reproducibility/ci ]; then
-            find out/reproducibility/ci -type f ! -name SHA256SUMS -print0 \
-              | LC_ALL=C sort -z \
-              | xargs -0 sha256sum \
-              > out/reproducibility/ci/SHA256SUMS
+            (
+              cd out/reproducibility/ci
+              find . -type f ! -name SHA256SUMS -print0 \
+                | LC_ALL=C sort -z \
+                | xargs -0 sha256sum \
+                > SHA256SUMS
+            )
           fi
 
       - name: Publish the bounded replay receipt
