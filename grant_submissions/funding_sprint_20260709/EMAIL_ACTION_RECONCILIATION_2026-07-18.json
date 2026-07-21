@@ -162,7 +162,7 @@
       "latest_event_utc": "2026-07-18T15:35:55Z",
       "next_action": "Continue the JCP portal and DSIP evidence work. Recheck the complete component thread after the Monday hold; only if no component reply exists may one bounded instruction follow-up be drafted. Do not resend the proposal package.",
       "no_send_before": "2026-07-20T17:00:00Z",
-      "open_gate_count": 14,
+      "open_gate_count": 13,
       "organization": "Defense SBIR/STTR Innovation Portal",
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
@@ -406,12 +406,12 @@
       "worktree_eol_differs_from_git_blob": true
     },
     "missionweave_dsip_action_gate": {
-      "bytes": 12767,
-      "identity_source": "COMMITTED_GIT_BLOB",
+      "bytes": 14989,
+      "identity_source": "WORKTREE_BYTES",
       "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
       "present": true,
-      "sha256": "5642930AFAC999758BF154048590A2643C45A4F3FDDE7A63D69CA2C70F3C2975",
-      "worktree_eol_differs_from_git_blob": true
+      "sha256": "1F048791C6F2353D444C04FB6916CFEF35097F595BB4332B073934DC7CED8BDD",
+      "worktree_eol_differs_from_git_blob": false
     },
     "nashville_official_deadline_confirmation": {
       "bytes": 2272,

@@ -37,7 +37,6 @@ AUTHORITATIVE_OPEN_GATES = {
     "DD2345_OR_JCP_APPLICATION_EVIDENCE",
     "DSIP_FIRM_PIN_AVAILABILITY",
     "PORTAL_PREVIEW_RECEIPT_HASH",
-    "SAM_REPRESENTATIONS_CURRENT",
     "TECHNOLOGY_CONTROL_PLAN_DECISION",
     "VOLUME3_COST_BASIS",
     "VOLUME5_UPLOAD_SET",
@@ -773,7 +772,7 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     passed = summary["passed_private_gate_count"]
     open_count = summary["open_gate_count"]
     required = summary["required_private_gate_count"]
-    assert (passed, open_count, required) == (36, 14, 50)
+    assert (passed, open_count, required) == (37, 13, 50)
     assert set(summary["unresolved_gates"]) == AUTHORITATIVE_OPEN_GATES
     groups = summary["reconciliation_groups"]
     assert sum(group["count"] for group in groups.values()) == required
