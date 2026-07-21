@@ -338,8 +338,23 @@ def build_projection(*, root: Path = ROOT) -> dict[str, Any]:
     return projection
 
 
-def write_projection(payload: dict[str, Any], *, root: Path = ROOT) -> Path:
-    target = root / OUTPUT_RELATIVE
+def resolve_output_path(*, root: Path, output: Path) -> Path:
+    root = root.resolve()
+    target = output.resolve() if output.is_absolute() else (root / output).resolve()
+    try:
+        target.relative_to(root)
+    except ValueError as exc:
+        raise ValueError("public projection output must remain inside the repository") from exc
+    return target
+
+
+def write_projection(
+    payload: dict[str, Any],
+    *,
+    root: Path = ROOT,
+    output: Path = OUTPUT_RELATIVE,
+) -> Path:
+    target = resolve_output_path(root=root, output=output)
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
@@ -353,13 +368,19 @@ def main() -> int:
         description="Project the private EIA hourly runtime into a public-safe reviewer snapshot."
     )
     parser.add_argument("--check", action="store_true")
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=OUTPUT_RELATIVE,
+        help="Repository-relative immutable projection path to write or check.",
+    )
     args = parser.parse_args()
     projection = build_projection()
-    target = ROOT / OUTPUT_RELATIVE
+    target = resolve_output_path(root=ROOT, output=args.output)
     expected = json.dumps(projection, indent=2, sort_keys=True) + "\n"
     published_current = target.is_file() and target.read_text(encoding="utf-8") == expected
     if not args.check:
-        write_projection(projection)
+        write_projection(projection, output=args.output)
         published_current = True
     print(
         json.dumps(
@@ -371,7 +392,7 @@ def main() -> int:
                     "common_settled_hour_count"
                 ],
                 "published_current": published_current,
-                "output": OUTPUT_RELATIVE.as_posix(),
+                "output": target.relative_to(ROOT.resolve()).as_posix(),
             },
             indent=2,
             sort_keys=True,

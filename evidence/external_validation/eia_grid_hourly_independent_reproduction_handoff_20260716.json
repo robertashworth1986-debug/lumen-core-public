@@ -131,7 +131,7 @@
   "performance_promotion_allowed": false,
   "receipt_template": {
     "operator_may_fill_reviewer_fields": false,
-    "path": "config/eia_grid_hourly_independent_reproduction_receipt_template_v1.json",
+    "path": "config/eia_grid_hourly_independent_reproduction_receipt_template_20260716_v1.json",
     "reviewer_fields_blank": true,
     "sha256": "68101f795152bd5ad0a62e6ed2e1c0edffb04a7b05642f4223ecd3fa09a5b407"
   },

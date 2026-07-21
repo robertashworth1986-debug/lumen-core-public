@@ -137,6 +137,31 @@ def test_projection_rejects_private_path_content(tmp_path: Path) -> None:
         MODULE.build_projection(root=root)
 
 
+def test_projection_writes_explicit_immutable_output_inside_repository(tmp_path: Path) -> None:
+    root = fixture_root(tmp_path)
+    projection = MODULE.build_projection(root=root)
+    output = Path(
+        "evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260721.json"
+    )
+
+    target = MODULE.write_projection(projection, root=root, output=output)
+
+    assert target == root / output
+    assert json.loads(target.read_text(encoding="utf-8")) == projection
+
+
+def test_projection_rejects_output_outside_repository(tmp_path: Path) -> None:
+    root = fixture_root(tmp_path)
+    projection = MODULE.build_projection(root=root)
+
+    with pytest.raises(ValueError, match="must remain inside"):
+        MODULE.write_projection(
+            projection,
+            root=root,
+            output=root.parent / "escaped_projection.json",
+        )
+
+
 def test_committed_projection_is_protocol_bound_and_public_safe() -> None:
     projection = MODULE.read_json(ROOT / MODULE.OUTPUT_RELATIVE)
     protocol_path = ROOT / MODULE.PROTOCOL_RELATIVE

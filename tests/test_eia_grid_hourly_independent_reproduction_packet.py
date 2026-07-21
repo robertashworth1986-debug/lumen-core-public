@@ -15,16 +15,15 @@ VERIFIER_PATH = (
 BUILDER_PATH = (
     ROOT / "code" / "ops" / "BUILD_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py"
 )
-PUBLIC_MANIFEST_PATH = (
-    ROOT
-    / "evidence"
-    / "external_validation"
-    / "eia_grid_hourly_independent_reproduction_handoff_20260716.json"
-)
-PUBLIC_TEMPLATE_PATH = (
-    ROOT
-    / "config"
-    / "eia_grid_hourly_independent_reproduction_receipt_template_v1.json"
+PUBLIC_HANDOFFS = (
+    (
+        ROOT
+        / "evidence"
+        / "external_validation"
+        / "eia_grid_hourly_independent_reproduction_handoff_20260716.json",
+        95,
+        84,
+    ),
 )
 EVALUATOR_TEMPLATE_PATH = (
     ROOT
@@ -40,6 +39,15 @@ def load_path(path: Path, name: str):
     sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def test_packet_source_bytes_match_current_commit() -> None:
+    builder = load_path(BUILDER_PATH, "eia_reproduction_builder_source_state")
+
+    state = builder.git_source_state()
+
+    assert state["all_packet_sources_match_commit"] is True
+    assert state["byte_exact_source_count"] == state["tracked_source_count"]
 
 
 def write_json(path: Path, payload: dict) -> None:
@@ -371,16 +379,29 @@ def test_operator_cannot_promote_performance(tmp_path: Path):
         verifier.validate_receipt(receipt, report, expect_template=True)
 
 
-def test_public_handoff_keeps_raw_runtime_private_and_template_blank():
+@pytest.mark.parametrize(
+    ("manifest_path", "expected_predictions", "expected_settlements"),
+    PUBLIC_HANDOFFS,
+)
+def test_public_handoff_keeps_raw_runtime_private_and_template_blank(
+    manifest_path: Path,
+    expected_predictions: int,
+    expected_settlements: int,
+):
     verifier = load_path(VERIFIER_PATH, "eia_reproduction_verifier_public")
-    handoff = json.loads(PUBLIC_MANIFEST_PATH.read_text(encoding="utf-8"))
-    template = json.loads(PUBLIC_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    handoff = json.loads(manifest_path.read_text(encoding="utf-8"))
+    template_path = ROOT / handoff["receipt_template"]["path"]
+    template = json.loads(template_path.read_text(encoding="utf-8"))
 
     assert handoff["status"] == "UNSIGNED_REVIEWER_HANDOFF_READY"
     assert handoff["packet"]["private_runtime_payload_published_in_repository"] is False
     assert handoff["frozen_snapshot"]["independent_reproduction_complete"] is False
+    assert handoff["frozen_snapshot"]["prediction_count"] == expected_predictions
+    assert handoff["frozen_snapshot"]["settlement_count"] == expected_settlements
+    assert handoff["frozen_snapshot"]["common_settled_hour_count"] == 0
+    assert not any(handoff["frozen_snapshot"]["sample_gates"].values())
     assert handoff["performance_promotion_allowed"] is False
-    assert verifier.file_sha256(PUBLIC_TEMPLATE_PATH) == handoff["receipt_template"][
+    assert verifier.file_sha256(template_path) == handoff["receipt_template"][
         "sha256"
     ]
     assert all(value is None for value in template["reviewer"].values())

@@ -113,32 +113,29 @@ def git_source_state() -> dict[str, Any]:
     tracked_sources = sorted(
         relative for relative in SOURCE_ARTIFACTS if not relative.startswith("out/")
     )
-    uncommitted = []
+    byte_mismatches = []
     for relative in tracked_sources:
-        tracked = subprocess.run(
-            ["git", "ls-files", "--error-unmatch", "--", relative],
+        source = ROOT / relative
+        committed = subprocess.run(
+            ["git", "cat-file", "blob", f"HEAD:{relative}"],
             cwd=ROOT,
             capture_output=True,
             timeout=15,
         )
-        if tracked.returncode != 0:
-            uncommitted.append(relative)
+        if not source.is_file() or committed.returncode != 0:
+            byte_mismatches.append(relative)
             continue
-        clean = subprocess.run(
-            ["git", "diff", "--quiet", "HEAD", "--", relative],
-            cwd=ROOT,
-            timeout=15,
-        )
-        if clean.returncode != 0:
-            uncommitted.append(relative)
-    if uncommitted:
+        if source.read_bytes() != committed.stdout:
+            byte_mismatches.append(relative)
+    if byte_mismatches:
         raise RuntimeError(
-            "packet source artifacts must match the current Git commit: "
-            + ", ".join(uncommitted)
+            "packet source bytes must exactly match the current Git commit: "
+            + ", ".join(byte_mismatches)
         )
     return {
         "commit": head,
         "tracked_source_count": len(tracked_sources),
+        "byte_exact_source_count": len(tracked_sources),
         "all_packet_sources_match_commit": True,
     }
 

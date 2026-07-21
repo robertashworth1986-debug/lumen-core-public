@@ -6,6 +6,14 @@
 *.xlsx binary
 evidence/reproducibility/github_run_*/** binary
 code/falcon_hybrid_context_benchmark.py text eol=lf
+config/eia_grid_prospective_hourly_router_protocol_v1.json text eol=lf
+config/eia_grid_hourly_external_evaluator_protocol_template_v1.json text eol=lf
+code/eia_grid_prospective_hourly_router.py text eol=lf
+code/ops/BUILD_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py text eol=lf
+code/ops/VERIFY_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py text eol=lf
+code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py text eol=lf
+evidence/external_validation/eia_grid_hourly_router_design_benchmark_20260714.json text eol=lf
+evidence/external_validation/eia_grid_hourly_router_design_freeze_20260714.json text eol=lf
 grant_submissions/DLA26BZ03_NV011_MissionWeave/*.md text eol=lf
 grant_submissions/DLA26BZ03_NV011_MissionWeave/*.py text eol=lf
 grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_BUILD_METADATA_2026-07-16.json text eol=crlf
