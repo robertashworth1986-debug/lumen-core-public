@@ -203,6 +203,10 @@
     "queue_path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
     "queue_as_of_utc": "2026-07-21T23:24:50Z",
     "queue_age_seconds": 0,
+    "mailbox_recheck_max_age_seconds": 900,
+    "queue_fresh_for_action_time": true,
+    "mailbox_recheck_required_now": false,
+    "email_action_state": "NO_EMAIL_DUE",
     "queue_status": "ROUTING_INTEGRITY_EXCEPTION_NO_SEND",
     "routing_integrity_exception_count": 1,
     "missionweave_action_state": "FOLLOWUP_LIMIT_REACHED_NO_SEND",
@@ -211,6 +215,7 @@
     "next_action": "The bounded proactive follow-up allowance is exhausted. Monitor the existing thread and respond only to a specific inbound request."
   },
   "safe_local_commands": [
+    "python code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py --check-only",
     "python code/ops/CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py --check-target",
     "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --check-target",
     "python code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py --check-target",
@@ -250,5 +255,5 @@
     "queue_payload_sha256": "B9B00F3A1EFCE74FD763FDB0B431B3A4C5061BC2024D60CD14433192FC230F1A"
   },
   "claim_boundary": "This card is a current operator checklist derived from local control artifacts. It does not prove JCP approval, DD Form 2345 certification, CMMC status, ITAR compliance, proposal submission, DLA receipt, eligibility, selection, award, endorsement, deployment, technical validation, funding, or value.",
-  "card_sha256": "BAFC299ACE777E92DF00FCC92B01342B48206CF77BB95796A11061BD2C0738FF"
+  "card_sha256": "EB92CCA4520AC44713C8B98D51FAB20BDB40F29C71F2D08CDE91644F500A52F2"
 }

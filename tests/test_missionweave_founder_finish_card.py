@@ -3,6 +3,9 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import subprocess
+import sys
+from datetime import timedelta
 from pathlib import Path
 
 
@@ -106,6 +109,10 @@ def test_finish_card_records_no_duplicate_email_state_and_source_hashes():
     assert outreach["missionweave_action_state"] == "FOLLOWUP_LIMIT_REACHED_NO_SEND"
     assert outreach["recorded_proactive_send_count"] == 1
     assert outreach["routing_integrity_exception_count"] == 1
+    assert outreach["mailbox_recheck_max_age_seconds"] == 900
+    assert outreach["queue_fresh_for_action_time"] is True
+    assert outreach["mailbox_recheck_required_now"] is False
+    assert outreach["email_action_state"] == "NO_EMAIL_DUE"
     assert len(payload["source_integrity"]["gate_canonical_text_sha256"]) == 64
     assert len(payload["source_integrity"]["queue_canonical_text_sha256"]) == 64
     assert payload["source_integrity"]["gate_source_checks_pass"] is True
@@ -134,6 +141,8 @@ def test_finish_card_self_hash_and_rendered_operator_language_are_current():
     assert "official JCP portal" in rendered
     assert "Do not certify or click final submit" in rendered
     assert "Additional email due now: **false**" in rendered
+    assert "Queue fresh for action time: **true**" in rendered
+    assert "Mailbox recheck required now: **false**" in rendered
     assert "one-time code" in rendered
     assert "CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py" in rendered
     assert "CMMC And TCP Decision Support" in rendered
@@ -142,6 +151,54 @@ def test_finish_card_self_hash_and_rendered_operator_language_are_current():
     assert "APPLICABILITY_UNRESOLVED" in rendered
     assert "during contracting negotiation" in rendered
     assert "does not prove JCP approval" in rendered
+
+
+def test_live_card_fails_closed_when_mailbox_queue_exceeds_freshness_window():
+    module = load_module()
+    tracked = module.build_card(as_of_utc=tracked_as_of_utc())
+    stale_at = module.parse_utc(
+        tracked["outreach_control"]["queue_as_of_utc"]
+    ) + timedelta(seconds=901)
+
+    payload = module.build_card(as_of_utc=stale_at)
+
+    assert payload["outreach_control"]["queue_age_seconds"] == 901
+    assert payload["outreach_control"]["queue_fresh_for_action_time"] is False
+    assert payload["outreach_control"]["mailbox_recheck_required_now"] is True
+    assert payload["outreach_control"]["no_email_send_due"] is False
+    assert (
+        payload["outreach_control"]["email_action_state"]
+        == "UNKNOWN_RECHECK_REQUIRED"
+    )
+    assert payload["current_truth"]["submission_ready_for_human_click"] is False
+    rendered = module.render_markdown(payload)
+    assert "Additional email due now: **unknown - refresh mailbox evidence**" in rendered
+    assert "Additional email due now: **true**" not in rendered
+
+
+def test_check_only_reports_live_state_without_rewriting_tracked_artifacts():
+    before_json = OUT_JSON.read_bytes()
+    before_md = OUT_MD.read_bytes()
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--check-only",
+            "--as-of-utc",
+            tracked_as_of_utc(),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    summary = json.loads(completed.stdout)
+    assert summary["write_performed"] is False
+    assert summary["mailbox_recheck_required_now"] is False
+    assert OUT_JSON.read_bytes() == before_json
+    assert OUT_MD.read_bytes() == before_md
 
 
 def test_tracked_finish_card_rebuilds_exactly_from_recorded_timestamp():

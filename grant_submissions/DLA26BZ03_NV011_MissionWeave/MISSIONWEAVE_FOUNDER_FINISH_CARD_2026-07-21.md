@@ -85,11 +85,14 @@ Work the pre-submission evidence stage first. Do not spend action-time approval 
 
 - Queue status: `ROUTING_INTEGRITY_EXCEPTION_NO_SEND`
 - MissionWeave action: `FOLLOWUP_LIMIT_REACHED_NO_SEND`
+- Queue fresh for action time: **true** (`0` / `900` seconds)
+- Mailbox recheck required now: **false**
 - Additional email due now: **false**
 - Next action: The bounded proactive follow-up allowance is exhausted. Monitor the existing thread and respond only to a specific inbound request.
 
 ## Safe Local Checks
 
+- `python code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py --check-only`
 - `python code/ops/CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py --check-target`
 - `python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --check-target`
 - `python code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py --check-target`
@@ -109,6 +112,6 @@ Do not certify or click final submit until the regenerated action gate reports `
 - Action gate: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json`
 - Action-gate canonical-text SHA-256: `5FFF4C4074E8F0879C38662080E90CB5FE595E982359D88BBD10AE58EF5AAB5D`
 - Outreach queue canonical-text SHA-256: `88027C4293999BEAEB42DD7847402E91F344546BF70798571CA0327D1FE8C6D3`
-- Card SHA-256: `BAFC299ACE777E92DF00FCC92B01342B48206CF77BB95796A11061BD2C0738FF`
+- Card SHA-256: `EB92CCA4520AC44713C8B98D51FAB20BDB40F29C71F2D08CDE91644F500A52F2`
 
 This card is a current operator checklist derived from local control artifacts. It does not prove JCP approval, DD Form 2345 certification, CMMC status, ITAR compliance, proposal submission, DLA receipt, eligibility, selection, award, endorsement, deployment, technical validation, funding, or value.

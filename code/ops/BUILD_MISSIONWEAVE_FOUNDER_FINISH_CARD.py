@@ -255,20 +255,45 @@ def build_card(
     _require(queue_as_of <= evaluated, "QUEUE_TIMESTAMP_IN_FUTURE")
     queue_summary = queue.get("summary")
     _require(isinstance(queue_summary, dict), "QUEUE_SUMMARY_INVALID")
+    queue_controls = queue.get("controls")
+    _require(isinstance(queue_controls, dict), "QUEUE_CONTROLS_INVALID")
+    mailbox_recheck_max_age_seconds = int(
+        queue_controls.get("mailbox_recheck_max_age_seconds", -1)
+    )
+    _require(
+        mailbox_recheck_max_age_seconds > 0,
+        "MAILBOX_RECHECK_MAX_AGE_INVALID",
+    )
+    queue_age_seconds = int((evaluated - queue_as_of).total_seconds())
+    queue_fresh_for_action_time = (
+        queue_age_seconds <= mailbox_recheck_max_age_seconds
+    )
     queue_action = _missionweave_queue_action(queue)
     no_email_send_due = bool(
-        queue_summary.get("send_now_count") == 0
+        queue_fresh_for_action_time
+        and queue_summary.get("send_now_count") == 0
         and queue_summary.get("due_for_mailbox_recheck_count") == 0
         and queue_action.get("send_now") is False
         and queue_action.get("inbox_recheck_required") is False
     )
+    if not queue_fresh_for_action_time:
+        email_action_state = "UNKNOWN_RECHECK_REQUIRED"
+    elif no_email_send_due:
+        email_action_state = "NO_EMAIL_DUE"
+    else:
+        email_action_state = "QUEUE_ACTION_REVIEW_REQUIRED"
 
     declared_ready = gate.get("submission_ready_for_human_click") is True
     ready_for_founder_final_review = bool(
-        declared_ready and open_count == 0 and not deadline_passed
+        declared_ready
+        and open_count == 0
+        and not deadline_passed
+        and no_email_send_due
     )
     if deadline_passed:
         status = "DEADLINE_PASSED_DO_NOT_CLAIM_SUBMISSION"
+    elif declared_ready and open_count == 0 and not queue_fresh_for_action_time:
+        status = "MAILBOX_RECHECK_REQUIRED_NOT_SUBMISSION_READY"
     elif ready_for_founder_final_review:
         status = "READY_FOR_FOUNDER_FINAL_REVIEW_NOT_SUBMITTED"
     else:
@@ -346,7 +371,11 @@ def build_card(
         "outreach_control": {
             "queue_path": rel(queue_path),
             "queue_as_of_utc": iso_z(queue_as_of),
-            "queue_age_seconds": int((evaluated - queue_as_of).total_seconds()),
+            "queue_age_seconds": queue_age_seconds,
+            "mailbox_recheck_max_age_seconds": mailbox_recheck_max_age_seconds,
+            "queue_fresh_for_action_time": queue_fresh_for_action_time,
+            "mailbox_recheck_required_now": not queue_fresh_for_action_time,
+            "email_action_state": email_action_state,
             "queue_status": str(queue.get("status", "")),
             "routing_integrity_exception_count": int(
                 queue_summary.get("routing_integrity_exception_count", 0)
@@ -359,6 +388,10 @@ def build_card(
             "next_action": str(queue_action.get("next_action", "")),
         },
         "safe_local_commands": [
+            (
+                "python code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py "
+                "--check-only"
+            ),
             "python code/ops/CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py --check-target",
             "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --check-target",
             "python code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py --check-target",
@@ -430,6 +463,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
     outreach = payload["outreach_control"]
     focus = payload["operator_focus"]
     decision_support = focus["bounded_decision_support"]
+    if outreach["email_action_state"] == "NO_EMAIL_DUE":
+        email_due_text = "false"
+    elif outreach["email_action_state"] == "UNKNOWN_RECHECK_REQUIRED":
+        email_due_text = "unknown - refresh mailbox evidence"
+    else:
+        email_due_text = "review required"
     lines = [
         "# MissionWeave Founder Finish Card",
         "",
@@ -492,7 +531,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             f"- Queue status: `{outreach['queue_status']}`",
             f"- MissionWeave action: `{outreach['missionweave_action_state']}`",
-            f"- Additional email due now: **{str(not outreach['no_email_send_due']).lower()}**",
+            f"- Queue fresh for action time: **{str(outreach['queue_fresh_for_action_time']).lower()}** "
+            f"(`{outreach['queue_age_seconds']}` / "
+            f"`{outreach['mailbox_recheck_max_age_seconds']}` seconds)",
+            f"- Mailbox recheck required now: **{str(outreach['mailbox_recheck_required_now']).lower()}**",
+            f"- Additional email due now: **{email_due_text}**",
             f"- Next action: {outreach['next_action']}",
             "",
             "## Safe Local Checks",
@@ -549,12 +592,18 @@ def main() -> int:
         "--as-of-utc",
         help="Aware timestamp used for the deadline countdown; defaults to current UTC.",
     )
+    parser.add_argument(
+        "--check-only",
+        action="store_true",
+        help="Print a live fail-closed summary without rewriting tracked artifacts.",
+    )
     parser.add_argument("--out-json", type=Path, default=OUT_JSON)
     parser.add_argument("--out-md", type=Path, default=OUT_MD)
     args = parser.parse_args()
 
     payload = build_card(as_of_utc=args.as_of_utc)
-    write_outputs(payload, out_json=args.out_json, out_md=args.out_md)
+    if not args.check_only:
+        write_outputs(payload, out_json=args.out_json, out_md=args.out_md)
     print(
         json.dumps(
             {
@@ -563,6 +612,10 @@ def main() -> int:
                 "open": payload["current_truth"]["open_gate_count"],
                 "hours_remaining": payload["deadline"]["hours_remaining_rounded_down"],
                 "no_email_send_due": payload["outreach_control"]["no_email_send_due"],
+                "mailbox_recheck_required_now": payload["outreach_control"][
+                    "mailbox_recheck_required_now"
+                ],
+                "write_performed": not args.check_only,
                 "card_sha256": payload["card_sha256"],
                 "json": rel(args.out_json),
                 "markdown": rel(args.out_md),
