@@ -11,6 +11,7 @@
 evidence/reproducibility/github_run_*/** binary
 code/falcon_hybrid_context_benchmark.py text eol=lf
 config/eia_grid_prospective_hourly_router_protocol_v1.json text eol=lf
+config/eia_grid_wave_champion_protocol_v1.json text eol=lf
 config/eia_grid_hourly_external_evaluator_protocol_template_v1.json text eol=lf
 code/eia_grid_prospective_hourly_router.py text eol=lf
 code/ops/BUILD_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py text eol=lf
