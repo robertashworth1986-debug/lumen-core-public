@@ -6,17 +6,20 @@
   "entries": [
     {
       "path": "config/eia_grid_wave_champion_protocol_v1.json",
+      "hash_mode": "utf8_lf",
       "sha256": "273eb823b0be4b2d403d0aaa591673c2e470e3d7f30abb166a43fe6e311a1c3d",
       "last_touch_commit": "5b4ddbaef438e8f1d7c7d294a451d59280175b35"
     },
     {
       "path": "config/eia_grid_residual_moe_protocol_v1.json",
-      "sha256": "d299fe746954a7ce6f2e78714d6a17aba6fbbaf872fab717b6530ec7ecdd493e",
+      "hash_mode": "utf8_lf",
+      "sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8",
       "last_touch_commit": "9fdde5f0d9836e3bdc995df22b04b8c3b72188cd"
     },
     {
       "path": "config/mda_control_mapping_open_set_protocol_v2.json",
-      "sha256": "8dec9cc47a0d716bdf1c2836b6e006ea3e670bcb50c5cfef46ff1f9e2626ded6",
+      "hash_mode": "utf8_lf",
+      "sha256": "9a694ed6f194137880c070e73355ef826a51d3fed438ccf65adf6d4726ca80f0",
       "last_touch_commit": "ff610a147b79350a37f92cfa65853cd402885922"
     }
   ],

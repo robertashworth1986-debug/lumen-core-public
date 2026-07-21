@@ -1,13 +1,13 @@
 # CODECHECK EIA Author Readiness
 
-Generated UTC: `2026-07-21T16:19:42.135778+00:00`
+Generated UTC: `2026-07-21T16:25:18.374469+00:00`
 
 An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.
 
 ## Decision
 
 - Status: `AUTHOR_PACKET_BLOCKED`
-- Internal checks: `86/90`
+- Internal checks: `88/90`
 - Declared reproducible outputs: `6`
 - Authoritative archive verified: `true`
 - Archived full source exact match: `false`
@@ -19,7 +19,7 @@ An author-readiness pass proves only that the declared public files, execution m
 - Exact reviewer runtime checks: `10/10`
 - Current commit clean-runner complete: `false`
 - Public preprint draft complete: `true`
-- Deterministic release-candidate definition ready: `false`
+- Deterministic release-candidate definition ready: `true`
 - Release publication ready: `false`
 - Stable public preprint identifier complete: `false`
 - Immutable public source release complete: `false`
@@ -29,7 +29,7 @@ An author-readiness pass proves only that the declared public files, execution m
 - Independent execution complete: `false`
 - Certificate issued: `false`
 - External validation complete: `false`
-- Readiness SHA-256: `6e7c36abb103320f45d04f4c1358ecfaf196b84fb7822b1131114e24eb6f1162`
+- Readiness SHA-256: `b2c84719cb468a68a7e95eb073ac428d0356135b3b0782f54c6ba7a44b79bb79`
 
 An internal pass means the author-side bundle is coherent enough for Robert to review. It is not a submission receipt, external execution, or certificate.
 
@@ -73,8 +73,8 @@ The manuscript and request text are author-side drafts. A stable public preprint
 
 - Proposed tag: `codecheck-eia-v0.1.0`
 - Bundle inputs: `43`
-- Bundle input chain SHA-256: `74e1cee31c83d87e1312679345a5db9b4316da00e591aae7a5e211639889c2f7`
-- Internal definition ready: `false`
+- Bundle input chain SHA-256: `63452c80420b2677f368a2d1324af90b94b67393ae88169ba457b53682d40378`
+- Internal definition ready: `true`
 - Publication ready: `false`
 - GitHub release published: `false`
 - Zenodo DOI issued: `false`

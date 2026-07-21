@@ -62,7 +62,12 @@ def protocol_commit(path: Path = PROTOCOL_PATH) -> str | None:
         provenance = json.loads(PROTOCOL_PROVENANCE_PATH.read_text(encoding="utf-8"))
         row = next(item for item in provenance["entries"] if item["path"] == relative)
         commit = str(row["last_touch_commit"])
-        if file_sha256(path) != row["sha256"]:
+        portable_text = (
+            path.read_text(encoding="utf-8")
+            .replace("\r\n", "\n")
+            .replace("\r", "\n")
+        )
+        if hashlib.sha256(portable_text.encode("utf-8")).hexdigest() != row["sha256"]:
             return None
         if len(commit) != 40 or any(char not in "0123456789abcdef" for char in commit):
             return None
