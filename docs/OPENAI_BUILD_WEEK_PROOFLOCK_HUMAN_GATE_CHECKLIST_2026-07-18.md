@@ -19,7 +19,7 @@
 - Current live-file identity: `15/15` against commit `b2ac8cef10ee5b9db765a17cdbf6f13e6b917ce5` at `2026-07-21T13:47:38Z`; release gate `PASS`; live-gate SHA-256 `4b241a62e4f3fd76582d5e7992cc6ff119e36594b4f77e8713a1a75bac7984bc`.
 - Exact release archive: 15 files; SHA-256 `e6a1b8adea8fb14432e6d3d27c9021dbd9349473323c347d3276b9906c47ca65`.
 - Verified video publication: the selected Luma-voice 125.27-second H.264/AAC candidate with SHA-256 `9f1d417cb29c132ecc9a31f3a572adbcb3ebd66208517e70ad9adab6e8684b15` is public at `https://youtu.be/3qhK9WSJuaY`. YouTube reported no copyright issues; its player exposed the complete `2:06` media; and the public watch page and oEmbed metadata resolved with the expected title. The narration transcript QA preserved every critical phrase. The channel still requires phone verification before accepting the prepared custom thumbnail.
-- Devpost state: Robert reported completing the final submission. The public page resolves at `https://devpost.com/software/prooflock-console`, visibly lists the project as submitted to OpenAI Build Week, and embeds the matching public Luma-voice video. This proves the observable submission state, not that terms were read, contest acceptance beyond submission, judging, endorsement, or an award.
+- Devpost state: Robert reported completing the final submission. The public page resolves at `https://devpost.com/software/prooflock-console`, visibly lists the project as submitted to OpenAI Build Week, and embeds the matching public Luma-voice video. Devpost independently sent `Submission confirmed: ProofLock Console` at `2026-07-21T16:00:55Z` and permits edits until `2026-07-21T17:00:00-07:00`. No reply is required. This proves the observable submission state, not that terms were read, contest acceptance beyond submission, judging, endorsement, or an award.
 - Model evidence: the private `/feedback` Session ID is saved in Devpost and the judge-facing model reference is consistently `GPT-5.6`; the identifier itself remains excluded from public receipts.
 - Private Session ID SHA-256: `CEDEC32157F2516DF88505802805761AE3535F093FB9B1B06CA6DEFF4A344FD9`
 - Public repository metadata: both bounded release paths fail closed unless the exact reviewer-facing description, homepage, visibility, default branch, and six-topic set match the canonical public contract; each path preserves that decision in its release receipt.
@@ -88,6 +88,7 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 - [x] All public links resolve from the submitted Devpost project page
 - [ ] Robert has reviewed the full preview
 - [x] Observable submission confirmation is saved in a self-hashed bounded receipt
+- [x] Devpost's confirmation email independently corroborates submission and requires no reply
 
 ## Stop Conditions
 

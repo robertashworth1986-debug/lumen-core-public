@@ -49,6 +49,12 @@
     "public_project_url": "https://devpost.com/software/prooflock-console",
     "public_page_submitted_to": "OpenAI Build Week",
     "public_page_video_embed_matches": true,
+    "confirmation_email_received": true,
+    "confirmation_email_utc": "2026-07-21T16:00:55Z",
+    "confirmation_email_subject": "Submission confirmed: ProofLock Console",
+    "confirmation_email_reply_required": false,
+    "post_submission_editing_allowed_until_deadline": true,
+    "confirmation_email_deadline": "2026-07-21T17:00:00-07:00",
     "final_terms_review_independently_verified": false,
     "final_submission_performed": true
   },
@@ -59,6 +65,6 @@
     "contest_acceptance_claimed": false,
     "award_claimed": false
   },
-  "claim_boundary": "This receipt records the observed YouTube publication state, declared local source-video and narration identities, transcript-QA boundaries, Robert's report that he completed submission, and the publicly resolved Devpost page showing ProofLock Console submitted to OpenAI Build Week with the matching video embedded. It does not independently prove that terms were read, contest acceptance beyond successful submission, judging, award, OpenAI endorsement, external validation, engineering performance, safety, patent rights, funding, or commercial readiness.",
-  "receipt_sha256": "95f77b043c2bc77369704c9664fc6e5be1371fe6b63a316ba0ac695fd74ea9fb"
+  "claim_boundary": "This receipt records the observed YouTube publication state, declared local source-video and narration identities, transcript-QA boundaries, Robert's report that he completed submission, the publicly resolved Devpost page showing ProofLock Console submitted to OpenAI Build Week with the matching video embedded, and Devpost's submission-confirmation email. It does not independently prove that terms were read, contest acceptance beyond successful submission, judging, award, OpenAI endorsement, external validation, engineering performance, safety, patent rights, funding, or commercial readiness.",
+  "receipt_sha256": "caa32630070646f41386e37369b3c04806292720a0fcd06514fbb230ccc6109a"
 }
