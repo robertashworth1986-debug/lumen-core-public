@@ -1,25 +1,25 @@
 # CODECHECK EIA Author Readiness
 
-Generated UTC: `2026-07-21T16:05:55.311418+00:00`
+Generated UTC: `2026-07-21T16:19:42.135778+00:00`
 
 An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.
 
 ## Decision
 
-- Status: `AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW`
-- Internal checks: `90/90`
+- Status: `AUTHOR_PACKET_BLOCKED`
+- Internal checks: `86/90`
 - Declared reproducible outputs: `6`
 - Authoritative archive verified: `true`
 - Archived full source exact match: `false`
-- Archived computational identity still matches: `true`
-- Operator clean-runner receipt verified: `true`
-- Operator clean-runner full source exact match: `true`
-- Operator clean-runner computational identity current: `true`
+- Archived computational identity still matches: `false`
+- Operator clean-runner receipt verified: `false`
+- Operator clean-runner full source exact match: `false`
+- Operator clean-runner computational identity current: `false`
 - Exact reviewer runtime receipt verified: `true`
 - Exact reviewer runtime checks: `10/10`
 - Current commit clean-runner complete: `false`
 - Public preprint draft complete: `true`
-- Deterministic release-candidate definition ready: `true`
+- Deterministic release-candidate definition ready: `false`
 - Release publication ready: `false`
 - Stable public preprint identifier complete: `false`
 - Immutable public source release complete: `false`
@@ -29,7 +29,7 @@ An author-readiness pass proves only that the declared public files, execution m
 - Independent execution complete: `false`
 - Certificate issued: `false`
 - External validation complete: `false`
-- Readiness SHA-256: `4d29a5056b9d791d3d4a0a65f670685ce7b34650e2fe8569cdef0e14230b2ed6`
+- Readiness SHA-256: `6e7c36abb103320f45d04f4c1358ecfaf196b84fb7822b1131114e24eb6f1162`
 
 An internal pass means the author-side bundle is coherent enough for Robert to review. It is not a submission receipt, external execution, or certificate.
 
@@ -72,9 +72,9 @@ The manuscript and request text are author-side drafts. A stable public preprint
 ## Immutable Release Candidate
 
 - Proposed tag: `codecheck-eia-v0.1.0`
-- Bundle inputs: `41`
-- Bundle input chain SHA-256: `f3b23ce16c1f7c737e001b4704e95766c885f1901b9793299b37caf3a21f099c`
-- Internal definition ready: `true`
+- Bundle inputs: `43`
+- Bundle input chain SHA-256: `74e1cee31c83d87e1312679345a5db9b4316da00e591aae7a5e211639889c2f7`
+- Internal definition ready: `false`
 - Publication ready: `false`
 - GitHub release published: `false`
 - Zenodo DOI issued: `false`
@@ -91,7 +91,7 @@ Creating a draft or published release, enabling repository integrations, attachi
 - Suites passed: `3/3`
 - Assertions passed: `31/31`
 - External validation complete in receipt: `false`
-- Current-source drift paths: `.gitignore, README.md`
+- Current-source drift paths: `.gitignore, README.md, code/eia_grid_residual_moe_benchmark.py, code/eia_grid_wave_champion_benchmark.py, code/mda_control_mapping_open_set_benchmark.py, code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py, config/reviewer_reproducibility_protocol_v1.json, tests/test_eia_grid_residual_moe_benchmark.py, tests/test_eia_grid_wave_champion_benchmark.py, tests/test_mda_control_mapping_open_set_benchmark.py, tests/test_reviewer_reproducibility_capsule.py`
 
 The archive demonstrates an older operator-controlled clean-runner execution. Its computational identity files still match, while the README and packaging controls have moved forward. It is a feasibility reference, not a current-commit receipt or independent evidence. The codechecker must execute the reviewed current commit.
 
@@ -100,10 +100,10 @@ The archive demonstrates an older operator-controlled clean-runner execution. It
 - Receipt: `evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json`
 - Receipt SHA-256: `8584550e85b826aed925ee4c3e44fb6beeb9e4ada4919be0c877774b26892351`
 - Source commit: `be7776f78af659f56c11a89bef0aab8ca07d5c18`
-- Source artifacts matched: `21/21`
-- Full source exact match: `true`
-- Computational identity exact match: `true`
-- Documentation drift paths: `none`
+- Source artifacts matched: `12/21`
+- Full source exact match: `false`
+- Computational identity exact match: `false`
+- Documentation drift paths: `code/eia_grid_residual_moe_benchmark.py, code/eia_grid_wave_champion_benchmark.py, code/mda_control_mapping_open_set_benchmark.py, code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py, config/reviewer_reproducibility_protocol_v1.json, tests/test_eia_grid_residual_moe_benchmark.py, tests/test_eia_grid_wave_champion_benchmark.py, tests/test_mda_control_mapping_open_set_benchmark.py, tests/test_reviewer_reproducibility_capsule.py`
 - Relevant source clean: `true`
 - Clean-runner replay: `true`
 - Authoritative runtime matched: `true`

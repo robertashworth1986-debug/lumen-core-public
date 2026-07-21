@@ -74,6 +74,8 @@ def test_protocol_is_frozen_version_pinned_and_claim_bounded():
     assert "not published_receipt_reconciles_hashes" in fixture_filter
     assert "not sbom_has_scoped_component_identity" in fixture_filter
     assert "not markdown_reports_failures" in fixture_filter
+    assert "code/ops/RUN_FAA_SDR_10K_BENCHMARK.py" in protocol["control_paths"]
+    assert "config/reviewer_protocol_provenance_v1.json" in protocol["control_paths"]
 
     pins = {
         line.split("==", 1)[0]: line.split("==", 1)[1]
@@ -145,6 +147,44 @@ def test_materialized_panel_is_scoped_verified_and_removed(tmp_path, monkeypatch
         assert target.read_bytes() == raw
 
     assert not target.exists()
+
+
+def test_gitless_release_manifest_state_is_verified_and_fail_closed(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    source_commit = "a" * 40
+    content = b"bounded\n"
+    source = tmp_path / "source.txt"
+    source.write_bytes(content)
+    row = {
+        "path": "source.txt",
+        "bytes": len(content),
+        "sha256": hashlib.sha256(content).hexdigest(),
+        "hash_mode": "utf8_lf",
+    }
+    manifest = {
+        "schema": "codecheck_eia_release_manifest.v1",
+        "source_commit": source_commit,
+        "bundle_inputs": [row],
+    }
+    (tmp_path / "RELEASE_MANIFEST.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    monkeypatch.setattr(module, "safe_git", lambda _args: "")
+    monkeypatch.setenv("CODECHECK_SOURCE_COMMIT", source_commit)
+
+    state = module.git_state([row])
+
+    assert state["mode"] == "release_manifest"
+    assert state["commit"] == source_commit
+    assert state["source_state_verified"] is True
+    assert state["relevant_source_clean"] is True
+    assert state["release_manifest"]["bundle_input_pass_count"] == 1
+
+    source.write_text("tampered\n", encoding="utf-8")
+    assert module.git_state([row])["relevant_source_clean"] is False
 
 
 def test_authoritative_runtime_gate_requires_linux_x86_64_python_3119(monkeypatch):

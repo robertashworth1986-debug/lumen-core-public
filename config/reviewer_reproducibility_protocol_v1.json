@@ -184,7 +184,9 @@
     ".gitignore",
     ".github/workflows/reviewer-reproducibility.yml",
     "README.md",
+    "code/ops/RUN_FAA_SDR_10K_BENCHMARK.py",
     "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+    "config/reviewer_protocol_provenance_v1.json",
     "requirements-reviewer-ubuntu-py311.lock",
     "tests/test_reviewer_dependency_lock.py",
     "tests/test_reviewer_reproducibility_capsule.py"

@@ -73,6 +73,9 @@ def test_protocol_registry_is_locked_to_implementation():
     assert [row["id"] for row in protocol["candidate_models"]] == module.CANDIDATE_IDS
     assert [row["id"] for row in protocol["baselines"]] == module.BASELINE_IDS
     assert protocol["execution_controls"]["post_holdout_tuning_allowed"] is False
+    assert module.protocol_commit(PROTOCOL_PATH) == (
+        "9fdde5f0d9836e3bdc995df22b04b8c3b72188cd"
+    )
 
 
 def test_target_actual_does_not_change_target_features():

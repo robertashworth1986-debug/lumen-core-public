@@ -26,8 +26,16 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder, OrdinalEncoder, S
 
 ROOT = Path(__file__).resolve().parents[2]
 LOCAL_DATA_DIR = ROOT / "data" / "faa_public" / "sdr"
-VAULT_DATA_DIR = Path("E:/LumaProofVault/FAA_PUBLIC_RAW/SDR")
-BENCHMARK_VAULT_DIR = Path("E:/LumaProofVault/FAA_PUBLIC_RAW/BENCHMARKS/FAA_SDR_10K_V1")
+VAULT_DATA_DIR = (
+    Path(os.environ["LUMACORE_FAA_VAULT_DATA_DIR"]).expanduser()
+    if os.environ.get("LUMACORE_FAA_VAULT_DATA_DIR")
+    else None
+)
+BENCHMARK_VAULT_DIR = (
+    Path(os.environ["LUMACORE_FAA_BENCHMARK_DIR"]).expanduser()
+    if os.environ.get("LUMACORE_FAA_BENCHMARK_DIR")
+    else ROOT / "out" / "ops" / "faa_sdr_10k_private_receipts"
+)
 PROTOCOL_PATH = ROOT / "config" / "faa_sdr_aviation_reliability_10k_protocol_v1.json"
 AUDIT_PATH = ROOT / "out" / "ops" / "faa_sdr_source_audit_latest.json"
 OUT_JSON = ROOT / "out" / "ops" / "faa_sdr_10k_benchmark_latest.json"
@@ -104,7 +112,9 @@ def normalize_text(series: pd.Series) -> pd.Series:
 
 def discover_source_files() -> list[Path]:
     local = sorted(LOCAL_DATA_DIR.glob("SDR-20??.csv"))
-    return local or sorted(VAULT_DATA_DIR.glob("SDR-20??.csv"))
+    if local:
+        return local
+    return sorted(VAULT_DATA_DIR.glob("SDR-20??.csv")) if VAULT_DATA_DIR else []
 
 
 def deterministic_holdout_indices(keys: Iterable[str], *, target: int, protocol_id: str) -> list[int]:

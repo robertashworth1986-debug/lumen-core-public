@@ -102,7 +102,7 @@ def test_protocol_was_frozen_before_the_benchmark_and_declares_strong_baselines(
     }
     assert "kuramoto_phase_coupling" in {row["id"] for row in protocol["wave_candidates"]}
     assert protocol["selection"]["no_post_selection_substitution"] is True
-    assert module.protocol_commit()
+    assert module.protocol_commit() == "5b4ddbaef438e8f1d7c7d294a451d59280175b35"
 
 
 def test_actual_forecasters_are_finite_and_development_selection_ignores_holdout_values():

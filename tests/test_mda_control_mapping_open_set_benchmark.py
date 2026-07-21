@@ -68,7 +68,7 @@ def test_v2_benchmark_emits_complete_reproducible_receipts(tmp_path):
         output_dir=tmp_path / "repeat",
         doc_path=tmp_path / "repeat.md",
     )
-    assert result["protocol_commit"]
+    assert result["protocol_commit"] == "ff610a147b79350a37f92cfa65853cd402885922"
     assert result["thresholds"]["fit_split"] == "development"
     assert result["thresholds"]["selection_split"] == "validation"
     assert result["thresholds"]["holdout_used_for_selection"] is False

@@ -32,6 +32,7 @@ from xgboost import XGBRegressor
 
 ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL_PATH = ROOT / "config" / "eia_grid_residual_moe_protocol_v1.json"
+PROTOCOL_PROVENANCE_PATH = ROOT / "config" / "reviewer_protocol_provenance_v1.json"
 OUT_DIR = ROOT / "out" / "eia_grid_residual_moe"
 OUT_JSON = OUT_DIR / "eia_grid_residual_moe_benchmark_latest.json"
 OUT_ROWS = OUT_DIR / "eia_grid_residual_moe_rows_latest.csv"
@@ -98,8 +99,23 @@ def protocol_commit(path: Path = PROTOCOL_PATH) -> str | None:
             timeout=10,
         )
     except (OSError, subprocess.SubprocessError, ValueError):
+        value = ""
+    else:
+        value = result.stdout.strip()
+    if value:
+        return value
+    try:
+        relative = path.resolve().relative_to(ROOT.resolve()).as_posix()
+        provenance = json.loads(PROTOCOL_PROVENANCE_PATH.read_text(encoding="utf-8"))
+        row = next(item for item in provenance["entries"] if item["path"] == relative)
+        commit = str(row["last_touch_commit"])
+        if file_sha256(path) != row["sha256"]:
+            return None
+        if len(commit) != 40 or any(char not in "0123456789abcdef" for char in commit):
+            return None
+        return commit
+    except (OSError, ValueError, KeyError, StopIteration, json.JSONDecodeError):
         return None
-    return result.stdout.strip() or None
 
 
 def load_panel(protocol: dict[str, Any]) -> dict[str, Any]:

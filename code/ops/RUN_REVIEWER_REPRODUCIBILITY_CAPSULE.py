@@ -867,15 +867,114 @@ def dependency_closure_receipt(
     }
 
 
+def valid_git_commit(value: Any) -> bool:
+    text = str(value or "")
+    return len(text) == 40 and all(char in "0123456789abcdef" for char in text)
+
+
+def release_manifest_state(artifacts: list[dict[str, Any]]) -> dict[str, Any]:
+    manifest_path = ROOT / "RELEASE_MANIFEST.json"
+    if not manifest_path.is_file():
+        return {
+            "present": False,
+            "passed": False,
+            "checks": {},
+            "failed_paths": [],
+        }
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        rows = manifest.get("bundle_inputs", [])
+        if not isinstance(rows, list):
+            raise ValueError("release manifest bundle_inputs must be a list")
+        paths = [str(row["path"]) for row in rows]
+        if len(paths) != len(set(paths)):
+            raise ValueError("release manifest contains duplicate paths")
+        row_checks = []
+        for row in rows:
+            relative = Path(str(row["path"]))
+            if relative.is_absolute() or ".." in relative.parts:
+                raise ValueError("release manifest contains an unsafe path")
+            target = (ROOT / relative).resolve()
+            target.relative_to(ROOT.resolve())
+            mode = "raw" if row["hash_mode"] == "binary" else row["hash_mode"]
+            content = portable_file_bytes(target, mode) if target.is_file() else b""
+            row_checks.append(
+                {
+                    "path": relative.as_posix(),
+                    "passed": (
+                        target.is_file()
+                        and len(content) == int(row["bytes"])
+                        and hashlib.sha256(content).hexdigest() == row["sha256"]
+                    ),
+                }
+            )
+        manifest_index = {str(row["path"]): row for row in rows}
+        source_artifacts_manifested = all(
+            row["path"] in manifest_index
+            and row["bytes"] == int(manifest_index[row["path"]]["bytes"])
+            and row["sha256"] == manifest_index[row["path"]]["sha256"]
+            for row in artifacts
+        )
+        source_commit = str(manifest.get("source_commit", ""))
+        environment_commit = os.environ.get("CODECHECK_SOURCE_COMMIT", "")
+        checks = {
+            "schema_matched": manifest.get("schema")
+            == "codecheck_eia_release_manifest.v1",
+            "source_commit_valid": valid_git_commit(source_commit),
+            "environment_source_commit_valid": valid_git_commit(environment_commit),
+            "source_commit_matches_environment": source_commit == environment_commit,
+            "bundle_inputs_present": bool(rows),
+            "bundle_input_hashes_matched": all(row["passed"] for row in row_checks),
+            "source_artifacts_manifested": source_artifacts_manifested,
+        }
+        return {
+            "present": True,
+            "passed": all(checks.values()),
+            "checks": checks,
+            "source_commit": source_commit,
+            "manifest_sha256": file_sha256(manifest_path),
+            "bundle_input_count": len(row_checks),
+            "bundle_input_pass_count": sum(1 for row in row_checks if row["passed"]),
+            "bundle_input_check_chain_sha256": canonical_sha256(row_checks),
+            "failed_paths": [row["path"] for row in row_checks if not row["passed"]],
+        }
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError) as error:
+        return {
+            "present": True,
+            "passed": False,
+            "checks": {},
+            "failed_paths": [],
+            "error": f"{type(error).__name__}: {error}",
+        }
+
+
 def git_state(artifacts: list[dict[str, Any]]) -> dict[str, Any]:
-    paths = [row["path"] for row in artifacts]
-    porcelain = safe_git(["status", "--porcelain", "--", *paths])
+    commit = safe_git(["rev-parse", "HEAD"])
+    if commit:
+        paths = [row["path"] for row in artifacts]
+        porcelain = safe_git(["status", "--porcelain", "--", *paths])
+        return {
+            "mode": "git",
+            "commit": commit,
+            "branch": safe_git(["branch", "--show-current"]),
+            "source_state_verified": valid_git_commit(commit),
+            "relevant_source_clean": not bool(porcelain),
+            "relevant_change_line_count": len(porcelain.splitlines())
+            if porcelain
+            else 0,
+            "relevant_change_digest": canonical_sha256(porcelain.splitlines()),
+            "release_manifest": {"present": False},
+        }
+    manifest = release_manifest_state(artifacts)
     return {
-        "commit": safe_git(["rev-parse", "HEAD"]),
-        "branch": safe_git(["branch", "--show-current"]),
-        "relevant_source_clean": not bool(porcelain),
-        "relevant_change_line_count": len(porcelain.splitlines()) if porcelain else 0,
-        "relevant_change_digest": canonical_sha256(porcelain.splitlines()),
+        "mode": "release_manifest",
+        "commit": manifest.get("source_commit", ""),
+        "branch": "release-bundle",
+        "source_state_verified": manifest["passed"],
+        "relevant_source_clean": manifest["passed"],
+        "relevant_change_line_count": 0 if manifest["passed"] else 1,
+        "relevant_change_digest": canonical_sha256(manifest),
+        "release_manifest": manifest,
     }
 
 
@@ -942,6 +1041,8 @@ def build_capsule(
         and authoritative_runtime["matches"]
         and dependency_lock["passed"]
         and dependency_closure["passed"]
+        and source_state["source_state_verified"]
+        and source_state["relevant_source_clean"]
         else "BOUNDED_REPRODUCIBILITY_FAIL"
     )
     capsule = {
@@ -982,9 +1083,12 @@ def build_capsule(
             ],
             "fixture_tests_executed": bool(with_fixture_tests),
             "fixture_tests_passed": fixture_tests.get("passed"),
+            "source_state_mode": source_state["mode"],
+            "source_state_verified": source_state["source_state_verified"],
             "relevant_source_clean": source_state["relevant_source_clean"],
             "clean_runner_replay": (
-                source_state["relevant_source_clean"]
+                source_state["source_state_verified"]
+                and source_state["relevant_source_clean"]
                 and with_fixture_tests
                 and authoritative_runtime["matches"]
                 and dependency_lock["passed"]
@@ -1049,6 +1153,8 @@ def render_markdown(capsule: dict[str, Any]) -> str:
         f"- Authoritative runtime matched: `{str(summary['authoritative_runtime_match']).lower()}`",
         f"- Installed dependency closure matched lock: `{str(summary['dependency_closure_exact_match']).lower()}`",
         f"- Frozen input passed: `{str(summary['frozen_input_passed']).lower()}`",
+        f"- Source-state mode: `{summary['source_state_mode']}`",
+        f"- Source state verified: `{str(summary['source_state_verified']).lower()}`",
         f"- Relevant source clean: `{str(summary['relevant_source_clean']).lower()}`",
         f"- Clean-runner replay: `{str(summary['clean_runner_replay']).lower()}`",
         f"- Artifact hash lock complete for authoritative runner: `{str(summary['artifact_hash_lock_complete']).lower()}`",
