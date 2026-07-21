@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 from pathlib import Path
 
 
@@ -33,6 +34,23 @@ PREPRINT_MARKDOWN = (
     / "preprint"
     / "BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md"
 )
+
+RAW_HASHED_TEXT_PATHS = (
+    "containers/codecheck-reviewer/Dockerfile",
+    "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py",
+    "code/ops/BUILD_CODECHECK_PREPRINT_PDF.py",
+    "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py",
+    "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
+    "config/codecheck_eia_release_candidate_v1.json",
+    "config/codecheck_reviewer_container_v1.json",
+    "config/codecheck_reviewer_runtime_v1.json",
+    "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
+    "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md",
+    "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
+    "tests/test_codecheck_eia_release_candidate.py",
+    "tests/test_codecheck_reviewer_container.py",
+    "tests/test_codecheck_reviewer_runtime.py",
+)
 PREPRINT_PDF = (
     ROOT
     / "docs"
@@ -56,6 +74,23 @@ def load_module():
 def inspect_release_candidate(module):
     release_module = module.load_release_candidate_module(RELEASE_SCRIPT)
     return release_module.inspect_release_candidate(RELEASE_CONFIG)
+
+
+def test_raw_hashed_text_inputs_have_lf_checkout_custody():
+    result = subprocess.run(
+        ["git", "check-attr", "eol", "--", *RAW_HASHED_TEXT_PATHS],
+        cwd=ROOT,
+        capture_output=True,
+        check=True,
+        text=True,
+    )
+    observed = {}
+    for line in result.stdout.splitlines():
+        path, attribute, value = line.split(": ", 2)
+        assert attribute == "eol"
+        observed[path] = value
+
+    assert observed == {path: "lf" for path in RAW_HASHED_TEXT_PATHS}
 
 
 def test_codecheck_configuration_is_author_scoped_and_manifest_exact():
