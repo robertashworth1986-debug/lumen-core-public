@@ -7,9 +7,10 @@
     "duplicate_send_fail_closed": true,
     "missing_fact_fail_closed": true,
     "past_deadline_fail_closed": true,
+    "secret_or_credential_fail_closed": true,
     "unchanged_rebuild_byte_stable": true
   },
-  "generated_utc": "2026-07-19T02:06:25Z",
+  "generated_utc": "2026-07-21T18:28:47Z",
   "global_rules": [
     "Ground every reply in the latest inbound message and preserve its thread identifier.",
     "Answer only the question asked; do not append an unrelated pitch or attachment.",
@@ -18,7 +19,8 @@
     "Keep legal, signatory, address, account, and portal identifiers in private renderings only.",
     "Attach files only when the recipient or governing instructions explicitly require them.",
     "Escalate deadlines with the exact date, time, timezone, portal, and observed blocker.",
-    "Require action-time human review for every outbound response."
+    "Require action-time human review for every outbound response.",
+    "Never include passwords, one-time authentication codes, API keys, bearer tokens, access tokens, refresh tokens, client secrets, private keys, or equivalent credentials in an outbound response."
   ],
   "private_render_template_count": 7,
   "schema": "lumencore.outreach_response_template_registry.v1",
@@ -28,8 +30,8 @@
     "REPLY_AFTER_FACT_REVIEW": 5
   },
   "source_config": "config/outreach_response_templates_v1.json",
-  "source_config_sha256": "E40607547C9E975CFAE05400A3E2DD1F28125C0A2278A88F408D41E933AC52F2",
-  "source_effective_utc": "2026-07-19T02:06:25Z",
+  "source_config_sha256": "722EF3766F03FA7FBD04191E1E0F9C5DC964E3EB2E6581D80BA9F925A6406106",
+  "source_effective_utc": "2026-07-21T18:28:47Z",
   "source_schema": "lumencore.outreach_response_templates.v1",
   "template_count": 11,
   "templates": [

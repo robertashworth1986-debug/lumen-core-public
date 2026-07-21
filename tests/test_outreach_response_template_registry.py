@@ -113,6 +113,58 @@ def test_missing_facts_invalid_email_and_unrequested_attachment_block_render():
     assert attachment["attachment_count"] == 1
 
 
+def test_secret_or_credential_facts_fail_closed_without_echoing_values():
+    module = load_module()
+    facts = common_facts()
+    facts.update(
+        {
+            "submission_name": "Synthetic Submission",
+            "portal_name": "Synthetic Portal",
+            "deadline_local": "July 22, 2026 at noon Eastern",
+            "portal_blocker": "Authentication code: 123456",
+            "steps_already_tried": "Signed in and requested a new code.",
+        }
+    )
+
+    blocked_value = module.render_response(
+        "PORTAL_SUPPORT_DEADLINE_RESCUE", facts
+    )
+    assert blocked_value["status"] == "BLOCKED_SECRET_OR_CREDENTIAL_FACT"
+    assert blocked_value["secret_or_credential_fields"] == ["portal_blocker"]
+    assert blocked_value["subject"] is None
+    assert blocked_value["body"] is None
+    assert "123456" not in json.dumps(blocked_value)
+
+    facts["portal_blocker"] = "The authentication-code prompt remains visible."
+    facts["one_time_code"] = "654321"
+    blocked_key = module.render_response("PORTAL_SUPPORT_DEADLINE_RESCUE", facts)
+    assert blocked_key["status"] == "BLOCKED_SECRET_OR_CREDENTIAL_FACT"
+    assert blocked_key["secret_or_credential_fields"] == ["one_time_code"]
+    assert "654321" not in json.dumps(blocked_key)
+
+
+def test_nested_secret_keys_and_private_key_material_fail_closed():
+    module = load_module()
+    facts = common_facts()
+    facts.update(
+        {
+            "opportunity_name": "Synthetic Notice",
+            "eligibility_question": "the current entity type is eligible",
+            "operator_context": {"access-token": "synthetic-secret-value"},
+        }
+    )
+    nested = module.render_response("DEADLINE_CLARIFICATION", facts)
+    assert nested["status"] == "BLOCKED_SECRET_OR_CREDENTIAL_FACT"
+    assert nested["secret_or_credential_fields"] == ["operator_context"]
+    assert "synthetic-secret-value" not in json.dumps(nested)
+
+    facts.pop("operator_context")
+    facts["operator_note"] = "-----BEGIN PRIVATE KEY-----"
+    private_key = module.render_response("DEADLINE_CLARIFICATION", facts)
+    assert private_key["status"] == "BLOCKED_SECRET_OR_CREDENTIAL_FACT"
+    assert private_key["secret_or_credential_fields"] == ["operator_note"]
+
+
 def test_deadline_urgency_is_timezone_aware_and_past_deadlines_block():
     module = load_module()
     facts = common_facts()
@@ -232,7 +284,9 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["template_count"] == 11
     assert payload["controls"]["builder_can_send_email"] is False
     assert payload["controls"]["duplicate_send_fail_closed"] is True
+    assert payload["controls"]["secret_or_credential_fail_closed"] is True
     assert "Duplicate-send gate: `FAIL_CLOSED`" in markdown
+    assert "Secret-or-credential gate: `FAIL_CLOSED`" in markdown
     assert "No message is rendered" in markdown
     assert "receipt check only, not a duplicate submission" in markdown
     assert not re.search(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", combined)

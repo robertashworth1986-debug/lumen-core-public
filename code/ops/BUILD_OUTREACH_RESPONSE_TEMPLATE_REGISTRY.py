@@ -45,6 +45,28 @@ POSITIVE_CLAIM_MARKERS = (
     "certified safe",
     "will save",
 )
+SECRET_FIELD_RE = re.compile(
+    r"(?:^|_)(?:password|passwd|passphrase|otp|mfa_code|2fa_code|"
+    r"one_time_code|authentication_code|auth_code|verification_code|"
+    r"api_key|apikey|client_secret|secret_key|access_token|refresh_token|"
+    r"bearer_token|private_key)(?:$|_)",
+    re.IGNORECASE,
+)
+SECRET_VALUE_PATTERNS = (
+    re.compile(
+        r"\b(?:authentication|verification|one[-_\s]?time|mfa|2fa|otp)"
+        r"(?:[-_\s]?(?:code|passcode))?\s*(?:=|:|is)\s*[\"']?\d{4,10}\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:api[-_\s]?key|client[-_\s]?secret|secret[-_\s]?key|"
+        r"access[-_\s]?token|refresh[-_\s]?token|bearer[-_\s]?token|"
+        r"password|passwd|passphrase)\s*(?:=|:|is)\s*[\"']?\S{4,}",
+        re.IGNORECASE,
+    ),
+    re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----", re.IGNORECASE),
+    re.compile(r"\bhttps?://[^/\s:@]+:[^/\s@]+@", re.IGNORECASE),
+)
 
 
 class OutreachRegistryError(ValueError):
@@ -80,6 +102,35 @@ def _string_list(value: Any, code: str) -> list[str]:
     ):
         raise OutreachRegistryError(code)
     return value
+
+
+def _normalized_field_name(value: Any) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", str(value).lower()).strip("_")
+
+
+def _value_contains_secret(value: Any) -> bool:
+    if isinstance(value, dict):
+        for key, nested_value in value.items():
+            if SECRET_FIELD_RE.search(_normalized_field_name(key)):
+                return True
+            if _value_contains_secret(nested_value):
+                return True
+        return False
+    if isinstance(value, (list, tuple, set)):
+        return any(_value_contains_secret(item) for item in value)
+    if not isinstance(value, str):
+        return False
+    return any(pattern.search(value) for pattern in SECRET_VALUE_PATTERNS)
+
+
+def secret_or_credential_fields(facts: dict[str, Any]) -> list[str]:
+    """Return only blocked top-level field names; never return secret values."""
+    blocked: list[str] = []
+    for field, value in facts.items():
+        normalized = _normalized_field_name(field)
+        if SECRET_FIELD_RE.search(normalized) or _value_contains_secret(value):
+            blocked.append(str(field))
+    return sorted(set(blocked))
 
 
 def validate_registry(payload: dict[str, Any]) -> dict[str, Any]:
@@ -246,6 +297,22 @@ def render_response(
     row = template_by_id(payload, template_id)
     deadline = deadline_state(facts.get("deadline_iso"), current_utc)
 
+    blocked_secret_fields = secret_or_credential_fields(facts)
+    if blocked_secret_fields:
+        result = _base_result(
+            payload, row, "BLOCKED_SECRET_OR_CREDENTIAL_FACT", deadline
+        )
+        result.update(
+            {
+                "duplicate_send_blocked": False,
+                "subject": None,
+                "body": None,
+                "missing_fields": [],
+                "secret_or_credential_fields": blocked_secret_fields,
+            }
+        )
+        return result
+
     if row["send_policy"] == "MONITOR_NO_SEND":
         result = _base_result(payload, row, "MONITOR_NO_SEND", deadline)
         result.update(
@@ -410,6 +477,7 @@ def build_public_payload(
         "controls": {
             "duplicate_send_fail_closed": True,
             "missing_fact_fail_closed": True,
+            "secret_or_credential_fail_closed": True,
             "past_deadline_fail_closed": True,
             "attachment_requires_explicit_request": True,
             "builder_can_send_email": False,
@@ -432,6 +500,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Builder can send email: `false`",
         "- Duplicate-send gate: `FAIL_CLOSED`",
         "- Missing-fact gate: `FAIL_CLOSED`",
+        "- Secret-or-credential gate: `FAIL_CLOSED`",
         "- Past-deadline gate: `FAIL_CLOSED`",
         "- Unchanged rebuilds byte-stable: `true`",
         "",

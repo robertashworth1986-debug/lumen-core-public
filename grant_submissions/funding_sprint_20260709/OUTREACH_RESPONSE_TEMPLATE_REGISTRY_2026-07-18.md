@@ -5,6 +5,7 @@
 - Builder can send email: `false`
 - Duplicate-send gate: `FAIL_CLOSED`
 - Missing-fact gate: `FAIL_CLOSED`
+- Secret-or-credential gate: `FAIL_CLOSED`
 - Past-deadline gate: `FAIL_CLOSED`
 - Unchanged rebuilds byte-stable: `true`
 
@@ -22,6 +23,7 @@ This response is a communication or routing artifact. It does not establish sele
 - Attach files only when the recipient or governing instructions explicitly require them.
 - Escalate deadlines with the exact date, time, timezone, portal, and observed blocker.
 - Require action-time human review for every outbound response.
+- Never include passwords, one-time authentication codes, API keys, bearer tokens, access tokens, refresh tokens, client secrets, private keys, or equivalent credentials in an outbound response.
 
 ## Decision Matrix
 
