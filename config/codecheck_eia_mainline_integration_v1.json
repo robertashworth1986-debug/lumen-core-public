@@ -14,6 +14,44 @@
     "declared_output_count": 6,
     "frozen_panel_row_count": 14704
   },
+  "author_review_control": {
+    "checklist_path": "docs/CODECHECK_AUTHOR_REVIEW_CHECKLIST_2026-07-21.md",
+    "request_draft_path": "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
+    "license_path": "LICENSE",
+    "citation_path": "CITATION.cff",
+    "expected_author_name": "Robert Ashworth",
+    "expected_checklist_status": "HUMAN_REVIEW_REQUIRED_NO_SEND",
+    "expected_request_status": "HOLD_IDENTIFIER_COLLISION_DUPLICATE_RECHECK_AND_HUMANUNLOCK",
+    "expected_human_decision_count": 9,
+    "expected_action_time_gate_count": 5,
+    "identifier_placeholder": "[IDENTIFIER_ASSIGNED_AT_ACTION_TIME]",
+    "required_checklist_snippets": [
+      "My name and authorship are correct.",
+      "I reviewed the five-page preprint and the executable-computation note.",
+      "at most 1% relative drift for the XGBoost residual MASE only.",
+      "I reviewed the six-file manifest in `codecheck.yml`.",
+      "I reviewed the MIT software license and the separate EIA data-use notice.",
+      "independently execute the frozen source, recreate all six outputs",
+      "author-operated receipts are first-party evidence only.",
+      "failed promotion and coverage gate.",
+      "company valuation remain unverified."
+    ],
+    "required_request_snippets": [
+      "This is an author-side draft. It has not been posted, emailed, submitted, assigned, or accepted.",
+      "immutable source commit https://github.com/robertashworth1986-debug/lumen-core-public/commit/1c0eb51754beffac6f4df484914e35efc21c253f",
+      "The author-side clean-runner receipt is first-party evidence only",
+      "It does not validate the live prospective router",
+      "fresh action-time HumanUnlock"
+    ],
+    "required_license_snippets": [
+      "MIT License",
+      "Third-Party Data Notice",
+      "https://www.eia.gov/about/copyrights_reuse.php",
+      "https://www.eia.gov/opendata/terms-of-service.php",
+      "LumenCore is not endorsed by EIA."
+    ],
+    "author_review_unlock_phrase": "CONFIRM CODECHECK AUTHOR REVIEW COMPLETE FOR FROZEN SOURCE 1c0eb51754beffac6f4df484914e35efc21c253f"
+  },
   "exact_frozen_files": [
     {"path": "CITATION.cff", "blob_sha1": "01a70e8cec86989e7ae91458c5582d51d0918038", "hash_mode": "utf8_lf"},
     {"path": "code/eia_grid_residual_moe_benchmark.py", "blob_sha1": "a384b4eceb7d6cbaf8a26ed0a4de0280de2726f5", "hash_mode": "utf8_lf"},
