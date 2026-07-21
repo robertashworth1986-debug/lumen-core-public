@@ -414,12 +414,12 @@
       "worktree_eol_differs_from_git_blob": true
     },
     "missionweave_dsip_action_gate": {
-      "bytes": 24792,
-      "identity_source": "WORKTREE_BYTES",
+      "bytes": 24218,
+      "identity_source": "COMMITTED_GIT_BLOB",
       "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
       "present": true,
-      "sha256": "1070EC552B89FCC8494CB7429F8BE2998531BB64E73D07734A36D3848B213DD9",
-      "worktree_eol_differs_from_git_blob": false
+      "sha256": "BE0DB4A91D55D0EDE6DCEE82404643DCC2E3B97C9C4E50619C4C6157E0E168AA",
+      "worktree_eol_differs_from_git_blob": true
     },
     "nashville_official_deadline_confirmation": {
       "bytes": 2272,
